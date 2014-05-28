@@ -7,8 +7,8 @@
     <ProjectGuid>{0BD679E4-9ACB-4B02-835B-CBCA1DE8B817}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SharpLessons.Linqed</RootNamespace>
-    <AssemblyName>linqed</AssemblyName>
+    <RootNamespace>uLearn.Courses.Linq</RootNamespace>
+    <AssemblyName>uLearn.Courses.Linq</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -47,57 +47,57 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="02-ReadNumbersExcercise.cs">
+    <Compile Include="Slides\02-ReadNumbersExcercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="10-SortTuplesExercise.cs">
+    <Compile Include="Slides\10-SortTuplesExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="16-AggregateExercise.cs">
+    <Compile Include="Slides\16-AggregateExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="15-AggregateFunctions.cs">
+    <Compile Include="Slides\15-AggregateFunctions.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="14-LookupExercise.cs">
+    <Compile Include="Slides\14-LookupExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="13-Lookup.cs">
+    <Compile Include="Slides\13-Lookup.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="12-WordsFrequenciesExercise.cs">
+    <Compile Include="Slides\12-WordsFrequenciesExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="11-Grouping.cs">
+    <Compile Include="Slides\11-Grouping.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="08-SortExercise.cs">
+    <Compile Include="Slides\08-SortExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="09-Tuple.cs">
+    <Compile Include="Slides\09-Tuple.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="07-SortAndDistinct.cs">
+    <Compile Include="Slides\07-SortAndDistinct.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="xx-AnonymousTypes.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="06-CartesianProductExercise.cs">
+    <Compile Include="Slides\06-CartesianProductExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="05-SelectManyExercise.cs">
+    <Compile Include="Slides\05-SelectManyExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="04-SelectMany.cs">
+    <Compile Include="Slides\04-SelectMany.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="03-ReadPointsExcercise.cs">
+    <Compile Include="Slides\03-ReadPointsExcercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="heap.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="01-SelectWhereToArray.cs">
+    <Compile Include="Slides\01-SelectWhereToArray.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -106,15 +106,19 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SharpLessons\SharpLessons.csproj">
+    <ProjectReference Include="..\..\uLearn\uLearn.csproj">
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
-      <Name>SharpLessons</Name>
+      <Name>uLearn</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

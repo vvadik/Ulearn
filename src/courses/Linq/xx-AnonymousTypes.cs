@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 
-namespace SharpLessons.Linqed
+namespace uLearn.Linq
 {
 	[TestFixture]
 	public class AnonymousTypes
