@@ -1,0 +1,23 @@
+﻿@model string[]
+
+<div class="panel-group" id="hints-accordion">
+	@for (int index = 0; index < Model.Length; index++)
+	{
+		var hintHtml = Model[index];
+		var id = "hint" + (index + 1);
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+					<a data-toggle="collapse" data-parent="#hints-accordion" href="#@id" data-target="#@id">
+						Подсказка @(index + 1)
+					</a>
+				</h4>
+			</div>
+			<div id="@id" class="panel-collapse collapse">
+				<div class="panel-body">
+					@Html.Raw(hintHtml)
+				</div>
+			</div>
+		</div>
+	}
+</div>

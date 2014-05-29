@@ -1,0 +1,46 @@
+﻿@using SharpLessons
+@inherits RazorEngine.Templating.TemplateBase<SharpLessons.Slide>
+<div id='@Model.Id' class='slide'>
+	@foreach (var slideBlock in Model.Blocks)
+	{
+		if (slideBlock.IsCodeSample)
+		{
+			<textarea class='code code-sample'>@slideBlock.Text</textarea>
+		}
+		else
+		{
+			<!--startblock-->
+			@Raw(slideBlock.RenderedText)
+			<!--endblock-->
+
+		}
+	}
+    
+	@{ var slide = Model as ExerciseSlide; }
+	@if (slide != null)
+	{
+		<p>Допишите решение в окне ниже:</p>
+	<textarea class='code code-exercise'>@slide.Exercise.Text</textarea>
+	<div class="panel-group" id="hints-accordion">
+		@for (int index = 0; index < slide.HintsHtml.Length; index++)
+		{
+			var hint = slide.HintsHtml[index];
+			var id = "hint" + (index + 1);
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parentt="#hints-accordion" href="#@id" data-target="#@id">
+							Подсказка @(index + 1)
+						</a>
+					</h4>
+				</div>
+				<div id="@id" class="panel-collapse collapse">
+					<div class="panel-body">
+						@Raw(hint)
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+	}
+</div>
