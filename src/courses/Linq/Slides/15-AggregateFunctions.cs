@@ -55,7 +55,7 @@ namespace uLearn.Courses.Linq.Slides
 		{
 			int[] numbers = {1, 2, 6, 2, 8, 0, 10, 6, 1, 2};
 
-			Assert.That(numbers.All(n => n > 0), Is.EqualTo(true));
+			Assert.That(numbers.All(n => n >= 0), Is.EqualTo(true));
 			Assert.That(numbers.All(n => n%2 == 0), Is.EqualTo(false));
 
 			Assert.That(numbers.Any(n => n == 0), Is.EqualTo(true));

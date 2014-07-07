@@ -1,8 +1,7 @@
 using System.Linq;
 using NUnit.Framework;
-using uLearn.CSharp;
 
-namespace uLearn
+namespace uLearn.CSharp
 {
 	[TestFixture]
 	public class SlideParser_should

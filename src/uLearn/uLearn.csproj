@@ -70,12 +70,13 @@
   <ItemGroup>
     <Compile Include="Course.cs" />
     <Compile Include="CoursePageModel.cs" />
+    <Compile Include="CSharp\SlideWalker.cs" />
     <Compile Include="ExerciseAttribute.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="Markdown_investigation.cs" />
     <Compile Include="Md.cs" />
     <Compile Include="ResourceLoader.cs" />
-    <Compile Include="SlideParser_should.cs" />
+    <Compile Include="CSharp\SlideParser_should.cs" />
     <Compile Include="CSharp\SlideParser.cs" />
     <Compile Include="HintAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
