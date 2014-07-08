@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -14,30 +15,28 @@ namespace uLearn.Courses.Linq.Slides
     {
         /*
 
-        ##Задача: Исправьте программу так, чтобы она давала корректный ответ. ОБъясните, почему программа не работает.
+        ##Задача: Реализуйте методы.
         */
 
         [Exercise(SingleStatement = true)]
         [Hint("var is very dangerous...")]
-        public double GetSumOfTwoNumbers()
+        [ExpectedOutput("49")]
+        public void MainX()
         {
-            double a = 5;
-            a += 0.5;
-            return a;
+            Print(GetSquare(7));
             /*uncomment
-            var a = 5;
-            a += 0.5;
-            Console.WriteLine(a)
+                Print(GetSquare(7));
             */
         }
 
-        [Test]
-        public void Test()
+        private int GetSquare(int i)
         {
-            var number = GetSumOfTwoNumbers();
-            Assert.That(
-                5.5,
-                Is.EqualTo(number));
+            return i*i;
+        }
+
+        private void Print(int number)
+        {
+            Console.WriteLine(GetSquare(number));
         }
 
         /*
