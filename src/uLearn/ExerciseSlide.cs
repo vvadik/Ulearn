@@ -6,21 +6,21 @@ namespace uLearn
 	public class ExerciseSlide : Slide
 	{
 		public SlideBlock Exercise { get; private set; }
-		public SlideBlock TestBlock { get; private set; }
+		public string ExpectedOutput { get; private set; }
 		public string[] HintsHtml { get; private set; }
 
-		public ExerciseSlide(IEnumerable<SlideBlock> blocks, SlideBlock exercise, SlideBlock testBlock,
+		public ExerciseSlide(IEnumerable<SlideBlock> blocks, SlideBlock exercise, string expectedOutput,
 			IEnumerable<string> hints)
 			: base(blocks)
 		{
 			Exercise = exercise;
-			TestBlock = testBlock;
+			ExpectedOutput = expectedOutput;
 			HintsHtml = hints.Select(Md.ToHtml).ToArray();
 		}
 
 		protected bool Equals(ExerciseSlide other)
 		{
-			return Equals(Exercise, other.Exercise) && Equals(TestBlock, other.TestBlock) && Equals(HintsHtml, other.HintsHtml);
+			return Equals(Exercise, other.Exercise) && Equals(ExpectedOutput, other.ExpectedOutput) && Equals(HintsHtml, other.HintsHtml);
 		}
 
 		public override bool Equals(object obj)
@@ -36,7 +36,7 @@ namespace uLearn
 			unchecked
 			{
 				int hashCode = (Exercise != null ? Exercise.GetHashCode() : 0);
-				hashCode = (hashCode*397) ^ (TestBlock != null ? TestBlock.GetHashCode() : 0);
+				hashCode = (hashCode*397) ^ (ExpectedOutput != null ? ExpectedOutput.GetHashCode() : 0);
 				hashCode = (hashCode*397) ^ (HintsHtml != null ? HintsHtml.GetHashCode() : 0);
 				return hashCode;
 			}

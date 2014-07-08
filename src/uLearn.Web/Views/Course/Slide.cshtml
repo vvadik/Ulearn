@@ -25,19 +25,21 @@
 				<p>Допишите решение в окне ниже:</p>
 				<textarea class='code code-exercise'>@slide.Exercise.Text</textarea>
 
+				<text>Ожидаемый вывод на консоль:</text>
+				<pre><code>@slide.ExpectedOutput</code></pre>
 				@Html.Partial("_ExerciseHints", slide.HintsHtml)
 			}
 		</div>
 	</div>
 	<div class="row">
-			@if (Model.HasPrevSlide)
-			{
-				<a class="nav-arrow nav-left" id="PrevLink" href="@Url.Action("Slide", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex - 1 })"><i class="glyphicon glyphicon-chevron-left"></i></a>
-			}
-			@if (Model.HasNextSlide)
-			{
-				<a class="nav-arrow nav-right" id="NextLink" href="@Url.Action("Slide", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex + 1 })"><i class="glyphicon glyphicon-chevron-right"></i></a>
-			}
+		@if (Model.HasPrevSlide)
+		{
+			<a class="nav-arrow nav-left" id="PrevLink" href="@Url.Action("Slide", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex - 1 })"><i class="glyphicon glyphicon-chevron-left"></i></a>
+		}
+		@if (Model.HasNextSlide)
+		{
+			<a class="nav-arrow nav-right" id="NextLink" href="@Url.Action("Slide", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex + 1 })"><i class="glyphicon glyphicon-chevron-right"></i></a>
+		}
 	</div>
 </div>
 @section scripts{

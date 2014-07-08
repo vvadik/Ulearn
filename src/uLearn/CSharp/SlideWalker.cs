@@ -13,10 +13,9 @@ namespace uLearn.CSharp
 	{
 		public readonly List<SlideBlock> Blocks = new List<SlideBlock>();
 		public SlideBlock Exercise { get; private set; }
-		public SlideBlock TestBlock { get; private set; }
+		public string ExpectedOutput { get; private set; }
 		public readonly List<string> Hints = new List<string>();
 		public MethodDeclarationSyntax ExerciseNode;
-		public MethodDeclarationSyntax TestNode;
 
 		public readonly List<MemberDeclarationSyntax> samples = new List<MemberDeclarationSyntax>();
 
@@ -46,14 +45,8 @@ namespace uLearn.CSharp
 			{
 				ExerciseNode = node;
 				Exercise = SlideBlock.FromCode(GetExerciseCode(node));
-				var hints = node.GetAttributes<HintAttribute>().Select(a => a.GetHint());
-				Hints.AddRange(hints);
-			}
-			else if (node.HasAttribute<TestAttribute>())
-			{
-				TestNode = node;
-				var testCode = node.Body.ToFullString().RemoveCommonNesting() + "\n";
-				TestBlock = SlideBlock.FromCode(testCode);
+				Hints.AddRange(node.GetAttributes<HintAttribute>().Select(attr => attr.GetArgument()));
+				ExpectedOutput = node.GetAttributes<ExpectedOutputAttribute>().Select(attr => attr.GetArgument()).FirstOrDefault();
 			}
 		}
 
