@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using uLearn;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.BasicProgramming.Slides
 {
     public class S07_Methods
     {
