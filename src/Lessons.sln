@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn", "uLearn\uLearn.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn.Web", "uLearn.Web\uLearn.Web.csproj", "{B3701D2E-D001-4E0A-AB2F-7ACB5A89589B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lection1 - Hello World", "Lection1 - Hello World\Lection1 - Hello World.csproj", "{83A81211-A139-4A37-92A0-716809232F08}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicProgramming", "courses\BasicProgramming\BasicProgramming.csproj", "{83A81211-A139-4A37-92A0-716809232F08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

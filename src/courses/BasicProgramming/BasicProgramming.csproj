@@ -44,7 +44,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\uLearn\uLearn.csproj">
+    <ProjectReference Include="..\..\uLearn\uLearn.csproj">
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
       <Name>uLearn</Name>
     </ProjectReference>
