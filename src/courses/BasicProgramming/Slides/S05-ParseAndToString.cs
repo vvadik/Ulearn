@@ -11,19 +11,21 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	public class S05_ParseAndToString
 	{
 		/*
-		##Задача: Гейтс написал код и не может найти ошибку :(, помогите ему.
+		##Задача: Парсинг
+		Гейтс написал код и не может найти ошибку :( 
+		Помогите ему!
 		*/
 		[Exercise(SingleStatement = true)]
-		[ExpectedOutput("894376.243643")]
+		[ExpectedOutput("894377.243643")]
 		static public void ParseAndToString()
 		{
 			string doubleNumber = "894376.243643";
 			double number = double.Parse(doubleNumber, CultureInfo.InvariantCulture);
-			Console.WriteLine(number);
+			Console.WriteLine(number + 1);
 			/*uncomment
 			string doubleNumber = "894376.243643";
 			int number = doubleNumber;
-			Console.WriteLine(number);
+			Console.WriteLine(number + 1);
 			*/
 		}
 

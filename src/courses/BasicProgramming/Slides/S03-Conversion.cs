@@ -10,11 +10,13 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	public class S03_Conversion
 	{
 		/*
-		##Задача: выведите на экран в отдельных строках:
+		##Задача: Конверсия типов
+		Один тип данных может быть конвертирован в другой, если не произойдет потери данных.
+		Выведите на экран в отдельных строках:
 
 		 * первое число - округлённое по математическим правилам,
 		 * второе число - приведенное к целочисленному типу,
-		очистите код от опасных действий
+		 * очистите код от опасных действий
 		*/
 
 		[Exercise(SingleStatement = true)]
@@ -26,8 +28,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			long third = 99999999999999999;
 			Console.WriteLine(Math.Round(first));
 			Console.WriteLine((int) second);
-
-
 			/*uncomment
 			checked
 			{

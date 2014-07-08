@@ -10,7 +10,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	public class S02_Types
 	{
 		/*
-		##Задача: допишите код, чтобы он заработал.
+		##Задача: Соответствие типов данных
+		Неправильно указанный тип данных - частая ошибка в работе программиста, которую он совершил и сейчас. Исправьте положение!
 		*/
 		[Exercise(SingleStatement = true)]
 		[ExpectedOutput("5.5\r\n7.8\r\n0")]

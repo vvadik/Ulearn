@@ -10,7 +10,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	public class S01_HelloWorld
 	{
 		/*
-		##Задача: Поприветствуйте котика фразой "Hello, kitty!"
+		##Задача: Обряд посвящения
+		Любая, даже самая сложная дорога, начинается с первого шага, поэтому просто поприветствуйте котика фразой "Hello, kitty!"
 		*/
 		[Exercise(SingleStatement = true)]
 		[ExpectedOutput("Hello, kitty!")]

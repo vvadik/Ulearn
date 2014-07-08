@@ -16,8 +16,9 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	public class S06_Operations
 	{
 		/*
-
-		##Задача: Исправьте программу так, чтобы она давала корректный ответ. ОБъясните, почему программа не работает.
+		##Задача: Операции с числами и var
+		Все, что на первый взгляд кажется очевидным, зачастую оказывается не тем и действует не так, как вы думали.
+		Исправьте программу так, чтобы она давала корректный ответ. Объясните, почему программа не работает
 		*/
 
 		[Exercise(SingleStatement = true)]
@@ -41,10 +42,5 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			TestExerciseStaff.TestExercise(GetType().GetMethod("GetSumOfTwoNumbers"));
 		}
 
-		
-
-		/*
-		### Краткая справка
-		*/
 	}
 }
