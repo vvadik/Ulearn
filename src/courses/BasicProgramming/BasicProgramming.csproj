@@ -43,9 +43,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
+    <Compile Include="Slides\S04-Strings.cs" />
+    <Compile Include="Slides\S09-DefaultValues.cs" />
+    <Compile Include="Slides\S08-Vision.cs" />
     <Compile Include="Slides\S07-Methods.cs" />
     <Compile Include="Slides\S06-Operations .cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Slides\S10-IntelliSense.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">

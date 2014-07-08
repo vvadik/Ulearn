@@ -19,9 +19,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
         */
 
         [Exercise(SingleStatement = true)]
-        [Hint("var is very dangerous...")]
         [ExpectedOutput("49")]
-        public void MainX()
+        static public void MainX()
         {
             Print(GetSquare(7));
             /*uncomment
@@ -29,16 +28,21 @@ namespace uLearn.Courses.BasicProgramming.Slides
             */
         }
 
-        private int GetSquare(int i)
+        static private int GetSquare(int i)
         {
             return i*i;
         }
 
-        private void Print(int number)
+        static private void Print(int number)
         {
-            Console.WriteLine(GetSquare(number));
+            Console.WriteLine(number);
         }
 
+		[Test]
+		public void Test()
+		{
+			TestExerciseStaff.TestExercise(GetType().GetMethod("MainX"));
+		}
         /*
         ### Краткая справка
         */
