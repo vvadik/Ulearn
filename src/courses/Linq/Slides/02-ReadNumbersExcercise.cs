@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -26,10 +27,28 @@ namespace uLearn.Courses.Linq.Slides
 		Решение этой задачи будет использоваться следующим образом:
 		*/
 
+		public int U(string s)
+		{
+			return 7;
+		}
+
+
+
 		[Sample]
 		public void ParseNumber_Sample()
 		{
 			int[] numbers = ParseNumbers(File.ReadLines("numbers.txt"));
+		}
+
+
+		public class AQ
+		{
+		}
+
+		public void Trash()
+		{
+			var a = 0;
+			var b = 1;
 		}
 
 		[Exercise(SingleStatement = true)]
@@ -56,6 +75,8 @@ namespace uLearn.Courses.Linq.Slides
 				actualNumbers,
 				Is.EqualTo(new[] {1, 2, 42}).AsCollection);
 		}
+
+
 
 		/*
 		### Краткая справка

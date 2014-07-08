@@ -15,7 +15,9 @@ namespace uLearn.CSharp
 		public SlideBlock Exercise { get; private set; }
 		public string ExpectedOutput { get; private set; }
 		public readonly List<string> Hints = new List<string>();
+		public readonly List<string> WithoutAttributs = new List<string>();
 		public MethodDeclarationSyntax ExerciseNode;
+		public string Head;
 
 		public readonly List<MemberDeclarationSyntax> samples = new List<MemberDeclarationSyntax>();
 
@@ -23,9 +25,25 @@ namespace uLearn.CSharp
 		{
 		}
 
+		public override void Visit(SyntaxNode node)
+		{
+			base.Visit(node);
+			var usings = node.DescendantNodes().Where(x => x is UsingDirectiveSyntax);
+			Head = "";
+			foreach (var u in usings)
+			{
+				Head += u;
+			}
+			Head += "namespace u \n{\n public class S\n {\n }}";
+		}
+
 		public override void VisitClassDeclaration(ClassDeclarationSyntax node)
 		{
 			base.VisitClassDeclaration(node);
+			if (node.AttributeLists.Count == 0)
+			{
+				WithoutAttributs.Add(node.ToString());
+			}
 			if (node.HasAttribute<SampleAttribute>())
 			{
 				samples.Add(node);
@@ -36,6 +54,10 @@ namespace uLearn.CSharp
 		public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
 		{
 			base.VisitMethodDeclaration(node);
+			if (node.AttributeLists.Count == 0)
+			{
+				WithoutAttributs.Add(node.ToString());
+			}
 			if (node.HasAttribute<SampleAttribute>())
 			{
 				samples.Add(node);

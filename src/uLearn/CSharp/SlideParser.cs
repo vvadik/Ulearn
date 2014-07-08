@@ -24,7 +24,7 @@ namespace uLearn.CSharp
 			if (walker.Exercise == null)
 				return new Slide(walker.Blocks);
 
-			return new ExerciseSlide(walker.Blocks, walker.Exercise, walker.ExpectedOutput, walker.Hints);
+			return new ExerciseSlide(walker.Blocks, walker.Exercise, walker.ExpectedOutput, walker.Hints, walker.WithoutAttributs, walker.Head);
 		}
 	}
 }

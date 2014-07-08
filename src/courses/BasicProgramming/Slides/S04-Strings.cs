@@ -15,12 +15,12 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		*/
 
 		[Exercise(SingleStatement = true)]
-		[ExpectedOutput("erty")]
+		[ExpectedOutput("CSharp!")]
 		static public void MainX()
 		{
-			PrintHalfWord("Property");
+			PrintHalfWord("I love CSharp!");
 			/*uncomment
-			 PrintHalfWord("Property");
+			 PrintHalfWord("I love CSharp!");
 			*/
 		}
 
