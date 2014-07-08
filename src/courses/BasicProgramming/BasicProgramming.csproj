@@ -43,6 +43,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
+    <Compile Include="Slides\S01-HelloWorld.cs" />
+    <Compile Include="Slides\S02-Types.cs" />
+    <Compile Include="Slides\S03-Conversion.cs" />
+    <Compile Include="Slides\S05-ParseAndToString.cs" />
     <Compile Include="Slides\S07-Methods.cs" />
     <Compile Include="Slides\S06-Operations .cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
