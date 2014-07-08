@@ -50,6 +50,7 @@
     <Compile Include="Slides\S07-Methods.cs" />
     <Compile Include="Slides\S06-Operations .cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Slides\S10-IntelliSense.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">
