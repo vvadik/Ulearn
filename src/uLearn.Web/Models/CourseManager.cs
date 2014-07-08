@@ -18,6 +18,7 @@ namespace uLearn.Web.Models
 		{
 			var result = new CourseManager();
 			result.AddCourse("Linq", "Linq");
+			result.AddCourse("BasicProgramming", "BasicProgramming");
 			return result;
 		}
 
