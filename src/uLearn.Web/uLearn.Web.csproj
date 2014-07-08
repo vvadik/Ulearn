@@ -183,6 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Courses\Linq\*.cs" />
+    <EmbeddedResource Include="Courses\BasicProgramming\*.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -341,7 +342,8 @@
   <PropertyGroup>
     <PreBuildEvent>rd /S /Q $(ProjectDir)\Courses
 mkdir $(ProjectDir)\Courses
-xcopy /Y /E $(SolutionDir)Courses\linq\Slides\*.cs $(ProjectDir)\Courses\linq\</PreBuildEvent>
+xcopy /Y /E $(SolutionDir)Courses\linq\Slides\*.cs $(ProjectDir)\Courses\linq\
+xcopy /Y /E $(SolutionDir)Courses\BasicProgramming\Slides\*.cs $(ProjectDir)\Courses\BasicProgramming\</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

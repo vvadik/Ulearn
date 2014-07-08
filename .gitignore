@@ -174,4 +174,4 @@ UpgradeLog*.htm
 FakesAssemblies/
 /src/Lessons.sln.ide
 /src/uLearn.Web/Ideone/ExecutionService.Credentials.cs
-/src/uLearn.Web/Courses/linq/
+/src/uLearn.Web/Courses/
