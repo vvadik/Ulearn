@@ -10,7 +10,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	class S04_Strings
 	{
 		/*
-		 *##Задача: реализуйте метод, который возвращает вторую половину слова, считая, что слово имеет четное количество букв.
+		##Задача: Две половинки одного целого
+		Реализуйте метод, который возвращает вторую половину слова, считая, что слово имеет четное количество букв.
 		*/
 
 		[Exercise(SingleStatement = true)]
@@ -21,7 +22,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			/*uncomment
 			 PrintHalfWord("Property");
 			*/
-
 		}
 
 		private static void PrintHalfWord(string str)
