@@ -30,15 +30,16 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="slide-nav">
-			@if (Model.SlideIndex < Model.Course.Slides.Length - 1)
+			@if (Model.HasPrevSlide)
 			{
-				@Html.ActionLink("Дальше! (Ctrl + →)", "Slide", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex + 1 }, new { id = "NextLink" })
+				<a class="nav-arrow nav-left" id="PrevLink" href="@Url.Action("Slide", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex - 1 })"><i class="glyphicon glyphicon-chevron-left"></i></a>
 			}
-		</div>
+			@if (Model.HasNextSlide)
+			{
+				<a class="nav-arrow nav-right" id="NextLink" href="@Url.Action("Slide", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex + 1 })"><i class="glyphicon glyphicon-chevron-right"></i></a>
+			}
 	</div>
 </div>
-
 @section scripts{
 	<script src="~/Scripts/navigate.js"></script>
 	<script src="~/Scripts/codemirror.js"></script>

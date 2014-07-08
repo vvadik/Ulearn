@@ -5,6 +5,8 @@
 		public Course Course;
 		public Slide Slide;
 		public int SlideIndex;
+		public bool HasNextSlide { get { return SlideIndex < Course.Slides.Length - 1; } }
+		public bool HasPrevSlide { get { return SlideIndex > 0; } }
 
 		public string SlideClass
 		{

@@ -31,3 +31,28 @@
     overflow-x: auto;
     height: auto;
 }
+
+.nav-arrow {
+    margin:0;
+    width:50%;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    font-size:xx-large;
+    color: lightblue;
+    padding:10px;
+}
+
+.nav-arrow:hover {
+    text-decoration: none;
+    color: #002240;
+    background-color: lightblue;
+}
+
+.nav-left {
+    float:left;
+}
+
+.nav-right {
+    float:right;
+}
