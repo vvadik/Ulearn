@@ -7,7 +7,7 @@
     <ProjectGuid>{83A81211-A139-4A37-92A0-716809232F08}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lection1___Hello_World</RootNamespace>
+    <RootNamespace>uLearn.Courses.BasicProgramming.Slides</RootNamespace>
     <AssemblyName>Lection1 - Hello World</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -42,7 +42,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExpectedOutput.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Slides\S07-Methods.cs" />
     <Compile Include="Slides\S06-Operations .cs" />
