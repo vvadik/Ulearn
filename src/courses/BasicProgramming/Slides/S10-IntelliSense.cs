@@ -11,9 +11,11 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	{
 		/*
 
-		##Задача: Напишите метод, которая реализует следующие требования:
-		 метод принимает на вход имя(Name) и зарплату(N). Должна напечатать строку следующего вида:
-		 "Hello, Name, you salary is N"
+		##Задача: Добрый работодатель
+		
+		Напишите метод, которая реализует следующие требования:
+		метод принимает на вход имя(Name) и зарплату(N). Должна напечатать строку следующего вида:
+		"Hello, Name, you salary is N"
 		*/
 
 		[Exercise(SingleStatement = true)]
@@ -40,9 +42,5 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		{
 			TestExerciseStaff.TestExercise(GetType().GetMethod("MainX"));
 		}
-
-		/*
-        ### Краткая справка
-        */
 	}
 }

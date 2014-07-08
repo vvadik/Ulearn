@@ -10,8 +10,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	public class S02_Types
 	{
 		/*
-        ##Задача: допишите код, чтобы он заработал.
-        */
+		##Задача: допишите код, чтобы он заработал.
+		*/
 		[Exercise(SingleStatement = true)]
 		[ExpectedOutput("5.5\r\n7.8\r\n0")]
 		static public void LearnTypes()

@@ -10,8 +10,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	public class S01_HelloWorld
 	{
 		/*
-        ##Задача: Поприветствуйте котика фразой "Hello, kitty!" :).
-        */
+		##Задача: Поприветствуйте котика фразой "Hello, kitty!"
+		*/
 		[Exercise(SingleStatement = true)]
 		[ExpectedOutput("Hello, kitty!")]
 		static public void HelloKitty()

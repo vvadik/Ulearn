@@ -11,8 +11,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	public class S05_ParseAndToString
 	{
 		/*
-        ##Задача: Гейтс написал код и не может найти ошибку :(, помогите ему.
-        */
+		##Задача: Гейтс написал код и не может найти ошибку :(, помогите ему.
+		*/
 		[Exercise(SingleStatement = true)]
 		[ExpectedOutput("894376.243643")]
 		static public void ParseAndToString()

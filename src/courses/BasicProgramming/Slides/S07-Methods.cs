@@ -11,40 +11,40 @@ using uLearn;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-    public class S07_Methods
-    {
-        /*
+	public class S07_Methods
+	{
+		/*
 
-        ##Задача: Реализуйте методы.
-        */
+		##Задача: Реализуйте методы.
+		*/
 
-        [Exercise(SingleStatement = true)]
-        [ExpectedOutput("49")]
-        static public void MainX()
-        {
-            Print(GetSquare(7));
-            /*uncomment
-                Print(GetSquare(7));
-            */
-        }
+		[Exercise(SingleStatement = true)]
+		[ExpectedOutput("49")]
+		static public void MainX()
+		{
+			Print(GetSquare(7));
+			/*uncomment
+				Print(GetSquare(7));
+			*/
+		}
 
-        static private int GetSquare(int i)
-        {
-            return i*i;
-        }
+		static private int GetSquare(int i)
+		{
+			return i * i;
+		}
 
-        static private void Print(int number)
-        {
-            Console.WriteLine(number);
-        }
+		static private void Print(int number)
+		{
+			Console.WriteLine(number);
+		}
 
 		[Test]
 		public void Test()
 		{
 			TestExerciseStaff.TestExercise(GetType().GetMethod("MainX"));
 		}
-        /*
-        ### Краткая справка
-        */
-    }
+		/*
+		### Краткая справка
+		*/
+	}
 }
