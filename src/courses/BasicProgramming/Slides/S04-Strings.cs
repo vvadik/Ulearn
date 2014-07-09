@@ -7,6 +7,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[TestFixture]
 	class S04_Strings
 	{
 		/*

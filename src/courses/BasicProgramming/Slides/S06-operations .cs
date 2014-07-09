@@ -13,6 +13,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[TestFixture]
 	public class S06_Operations
 	{
 		/*

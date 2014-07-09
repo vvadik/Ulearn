@@ -11,6 +11,7 @@ using uLearn;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[TestFixture]
 	public class S07_Methods
 	{
 		/*

@@ -7,6 +7,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[TestFixture]
 	public class S03_Conversion
 	{
 		/*

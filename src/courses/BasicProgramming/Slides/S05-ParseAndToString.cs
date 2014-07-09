@@ -8,6 +8,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[TestFixture]
 	public class S05_ParseAndToString
 	{
 		/*
