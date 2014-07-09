@@ -22,11 +22,6 @@
 		    @{ var slide = Model.Slide as ExerciseSlide; }
 			@if (slide != null)
 			{
-				<textarea class='code code-sample'>@slide.WithoutAttribut</textarea>
-				<textarea class='code code-sample'>@slide.Head</textarea>
-			}
-			@if (slide != null)
-			{
 				<p>Допишите решение в окне ниже:</p>
 				<textarea class='code code-exercise'>@slide.Exercise.Text</textarea>
 
