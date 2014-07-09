@@ -87,21 +87,21 @@ namespace uLearn.Courses.Linq.Slides
 			var b = 1;
 		}
 
-		//[Exercise(SingleStatement = true)]
-		//[Hint("`int.Parse` преобразует строку в целое число.")]
-		//public int[] ParseNumbers(IEnumerable<string> lines)
-		//{
-		//	return lines
-		//		.Where(line => line != "")
-		//		.Select(int.Parse)
-		//		.ToArray();
-		//	/*uncomment
-		//	return lines
-		//		.Where(...)
-		//		.Select(...)
-		//		...
-		//	*/
-		//}
+		[Exercise(SingleStatement = true)]
+		[Hint("`int.Parse` преобразует строку в целое число.")]
+		public int[] ParseNumbers(IEnumerable<string> lines)
+		{
+			return lines
+				.Where(line => line != "")
+				.Select(int.Parse)
+				.ToArray();
+			/*uncomment
+			return lines
+				.Where(...)
+				.Select(...)
+				...
+			*/
+		}
 
 
 

@@ -36,7 +36,6 @@ namespace uLearn.CSharp
 				Head += u;
 			}
 			Head += "namespace u \n{\n public class S\n {\n }}";
-			"/^**^*/"
 		}
 
 		public override void VisitClassDeclaration(ClassDeclarationSyntax node)
