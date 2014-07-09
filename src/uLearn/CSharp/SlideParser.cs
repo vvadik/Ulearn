@@ -23,8 +23,8 @@ namespace uLearn.CSharp
 			walker.Visit(tree.GetRoot());
 			if (walker.Exercise == null)
 				return new Slide(walker.Blocks);
-			walker.CleanWithoutAttributes();
-			return new ExerciseSlide(walker.Blocks, walker.Exercise, walker.ExpectedOutput, walker.Hints, walker.WithoutAttributs, walker.Head);
+			walker.CreateSolution();
+			return new ExerciseSlide(walker.Blocks, walker.Exercise, walker.ExpectedOutput, walker.Hints, walker.Solution);
 		}
 	}
 }

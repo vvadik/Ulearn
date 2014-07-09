@@ -22,14 +22,9 @@
 		    @{ var slide = Model.Slide as ExerciseSlide; }
 			@if (slide != null)
 			{
-				<textarea class='code code-sample'>@slide.WithoutAttribut</textarea>
-				<textarea class='code code-sample'>@slide.Head</textarea>
-			}
-			@if (slide != null)
-			{
 				<p>Допишите решение в окне ниже:</p>
 				<textarea class='code code-exercise'>@slide.Exercise.Text</textarea>
-
+				
 				<text>Ожидаемый вывод на консоль:</text>
 				<pre><code>@slide.ExpectedOutput</code></pre>
 				@Html.Partial("_ExerciseHints", slide.HintsHtml)

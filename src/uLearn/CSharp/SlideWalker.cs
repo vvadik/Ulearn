@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Services;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -16,9 +18,12 @@ namespace uLearn.CSharp
 		public SlideBlock Exercise { get; private set; }
 		public string ExpectedOutput { get; private set; }
 		public readonly List<string> Hints = new List<string>();
-		public List<string> WithoutAttributs = new List<string>();
+		private List<string> _withoutAttributes = new List<string>();
+		private readonly List<string> _withAttributes = new List<string>();
+		private string WithExersiceAttribute { get; set; }
 		public MethodDeclarationSyntax ExerciseNode;
-		public string Head;
+		public string InitialDataForSolution;
+		public SolutionForTesting Solution { get; private set; }
 
 		public readonly List<MemberDeclarationSyntax> samples = new List<MemberDeclarationSyntax>();
 
@@ -30,13 +35,9 @@ namespace uLearn.CSharp
 		{
 			base.Visit(node);
 			var usings = node.DescendantNodes().Where(x => x is UsingDirectiveSyntax);
-			Head = "";
-			foreach (var u in usings)
-			{
-				Head += u;
-			}
-			Head += "namespace u \n{\n public class S\n {\n }}";
-			"/^**^*/"
+			InitialDataForSolution = "";
+			InitialDataForSolution = usings.Aggregate("", (x, y) => x + y.ToString());
+			InitialDataForSolution += "namespace u \n{\n public class S\n {\n";
 		}
 
 		public override void VisitClassDeclaration(ClassDeclarationSyntax node)
@@ -44,11 +45,11 @@ namespace uLearn.CSharp
 			base.VisitClassDeclaration(node);
 			if (node.AttributeLists.Count == 0)
 			{
-				foreach (var nod in WithoutAttributs.ToList())
+				foreach (var nod in _withoutAttributes.Where(x => node.ToString().Contains(x)).ToList())
 				{
-					WithoutAttributs.Remove(nod);
+					_withoutAttributes.Remove(nod);
 				}
-				WithoutAttributs.Add(node.ToString());
+				_withoutAttributes.Add("\t\t" + node);
 			}
 
 			if (node.HasAttribute<SampleAttribute>())
@@ -63,7 +64,11 @@ namespace uLearn.CSharp
 			base.VisitMethodDeclaration(node);
 			if (node.AttributeLists.Count == 0)
 			{
-				WithoutAttributs.Add(node.ToString());
+				_withoutAttributes.Add("\t\t" + node);
+			}
+			else
+			{
+				_withAttributes.Add(node.ToString());
 			}
 
 			if (node.HasAttribute<SampleAttribute>())
@@ -73,6 +78,8 @@ namespace uLearn.CSharp
 			}
 			else if (node.HasAttribute<ExerciseAttribute>())
 			{
+				_withoutAttributes.Add("\t\t" + node);
+				WithExersiceAttribute = node.ToString();
 				ExerciseNode = node;
 				Exercise = SlideBlock.FromCode(GetExerciseCode(node));
 				Hints.AddRange(node.GetAttributes<HintAttribute>().Select(attr => attr.GetArgument()));
@@ -117,7 +124,6 @@ namespace uLearn.CSharp
 			}
 		}
 
-
 		public override void VisitTrivia(SyntaxTrivia trivia)
 		{
 			base.VisitTrivia(trivia);
@@ -152,10 +158,60 @@ namespace uLearn.CSharp
 
 		public void CleanWithoutAttributes()
 		{
-			if (Exercise == null)
-				return;
-			//WithoutAttributs =
-			//	WithoutAttributs.Select(x => x.Replace(WithoutAttributs, Exercise.Text.Split('\n').First() + "\n{\n}\n")).ToList();
+						_withoutAttributes = _withoutAttributes
+				.Select(x => x.Replace(WithExersiceAttribute, Exercise.Text
+					.Split('\n')
+					.First()))
+				.Select(RemoveBlocksFromSolution)
+				.ToList();
+		}
+
+		private string RemoveBlocksFromSolution(string arg)
+		{
+			return _withAttributes.Aggregate(arg, (current, block) => current.Replace(block, ""));
+		}
+
+		public void CreateSolution()
+		{
+			CleanWithoutAttributes();
+			var withoutAttribute = _withoutAttributes.Aggregate("", (current, v) => current + (v + "\n"));
+			withoutAttribute = CleanFromComments(withoutAttribute);
+			withoutAttribute = withoutAttribute
+				.Split('\n')
+				.Where(x => x.Length > 2)
+				.Select(x => x.Substring(2))
+				.Aggregate("", (current, v) => current + (v + "\n"));
+			//there is alignment for tabs
+			var indexForInsert = withoutAttribute.IndexOf(Exercise.Text.Split('\n').First(), StringComparison.Ordinal);
+			var sb = new StringBuilder();
+			for (var i = indexForInsert - 1; i >= 0 && withoutAttribute[i] == '\t'; i--)
+				sb.Append('\t');
+			var tabs = sb.ToString();
+			for (var i = indexForInsert; i < withoutAttribute.Length; i++)
+				if (withoutAttribute[i] == '\n')
+				{
+					withoutAttribute = withoutAttribute.Insert(i, "\n" + tabs + "{\n" + tabs + "}\n");
+					break;
+				}
+			Solution = new SolutionForTesting(InitialDataForSolution, withoutAttribute, indexForInsert);
+		}
+
+
+
+		public string CleanFromComments(string content)
+		{
+			var s = new StringBuilder();
+			var isOpen = false;
+			for (var i = 0; i < content.Length; i++)
+			{
+				if (content[i] == '/' && content[i + 1] == '*')
+					isOpen = true;
+				if (!isOpen) s.Append(content[i]);
+				if (content[i] != '*' || content[i + 1] != '/') continue;
+				i++;
+				isOpen = false;
+			}
+			return s.ToString();
 		}
 	}
 }

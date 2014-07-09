@@ -7,22 +7,16 @@ namespace uLearn
 	{
 		public SlideBlock Exercise { get; private set; }
 		public string ExpectedOutput { get; private set; }
-		public string Head { get; private set; }
-		public string WithoutAttribut { get; private set; }
+		public SolutionForTesting Solution { get; private set; }
 		public string[] HintsHtml { get; private set; }
 
 		public ExerciseSlide(IEnumerable<SlideBlock> blocks, SlideBlock exercise, string expectedOutput,
-			IEnumerable<string> hints, IEnumerable<string> withoutAttribut, string head)
+			IEnumerable<string> hints, SolutionForTesting solution)
 			: base(blocks)
 		{
 			Exercise = exercise;
 			ExpectedOutput = expectedOutput;
-			Head = head;
-			WithoutAttribut = "";
-			foreach (var v in withoutAttribut)
-			{
-				WithoutAttribut += v + "\n";
-			}
+			Solution = solution;
 			HintsHtml = hints.Select(Md.ToHtml).ToArray();
 		}
 
