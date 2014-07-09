@@ -33,21 +33,21 @@ namespace uLearn.Courses.Linq.Slides
 			int[] numbers = ParseNumbers(File.ReadLines("numbers.txt"));
 		}
 
-		[Exercise(SingleStatement = true)]
-		[Hint("`int.Parse` преобразует строку в целое число.")]
+				[Exercise(SingleStatement = true)]
+				[Hint("`int.Parse` преобразует строку в целое число.")]
 		public int[] ParseNumbers(IEnumerable<string> lines)
-		{
-			return lines
-				.Where(line => line != "")
-				.Select(int.Parse)
-				.ToArray();
-			/*uncomment
-			return lines
-				.Where(...)
-				.Select(...)
-				...
-			*/
-		}
+				{
+					return lines
+						.Where(line => line != "")
+						.Select(int.Parse)
+						.ToArray();
+					/*uncomment
+					return lines
+						.Where(...)
+						.Select(...)
+						...
+					*/
+				}
 
 
 

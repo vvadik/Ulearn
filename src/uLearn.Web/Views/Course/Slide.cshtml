@@ -26,7 +26,8 @@
 				<textarea class='code code-exercise'>@slide.Exercise.Text</textarea>
 				
 				<text>Ожидаемый вывод на консоль:</text>
-				<pre><code>@slide.ExpectedOutput</code></pre>
+				<pre class="expected-output"><code>@slide.ExpectedOutput</code></pre>
+				<pre class="actual-output"><code>@Model.ActualExerciseOutput</code></pre>
 				@Html.Partial("_ExerciseHints", slide.HintsHtml)
 			}
 			
@@ -45,24 +46,28 @@
 </div>
 @section scripts{
 	<script src="~/Scripts/navigate.js"></script>
-	<script src="~/Scripts/codemirror.js"></script>
-	<script src="~/Scripts/clike.js"></script>
 	<script>
-		function codeMirrorClass(c, theme) {
+		CodeMirror.commands.autocomplete = function (cm) {
+			cm.showHint({ hint: CodeMirror.hint.csharp });
+		}
+
+		function codeMirrorClass(c, editable) {
 			var codes = document.getElementsByClassName(c);
 			for (var i = 0; i < codes.length; i++)
 				CodeMirror.fromTextArea(codes[i],
-				{
-					mode: "text/x-csharp",
-					lineNumbers: true,
-					theme: theme,
-					indentWithTabs: true,
-					tabSize: 4,
-					indentUnit: 4,
-				});
+		        {
+		        	mode: "text/x-csharp",
+		        	lineNumbers: true,
+		        	theme: editable ? "cobalt" : "default",
+		        	indentWithTabs: true,
+		        	tabSize: 4,
+		        	indentUnit: 4,
+		        	extraKeys: { "Ctrl-Space": "autocomplete" },
+		        	readOnly: editable ? false : "nocursor",
+		        });
 		}
 
-		codeMirrorClass("code-exercise", "cobalt");
-		codeMirrorClass("code-sample", "default");
+		codeMirrorClass("code-exercise", true);
+		codeMirrorClass("code-sample", false);
 	</script>
 }

@@ -38,7 +38,7 @@ namespace uLearn.CSharp
 			InitialDataForSolution = "";
 			InitialDataForSolution = usings.Aggregate("", (x, y) => x + y.ToString());
 			InitialDataForSolution += "namespace u \n{\n public class S\n {\n";
-		}
+			}
 
 		public override void VisitClassDeclaration(ClassDeclarationSyntax node)
 		{
