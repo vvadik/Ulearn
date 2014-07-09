@@ -253,6 +253,7 @@
     <Content Include="codemirror\addon\hint\css-hint.js" />
     <Content Include="codemirror\addon\hint\html-hint.js" />
     <Content Include="codemirror\addon\hint\javascript-hint.js" />
+    <Content Include="codemirror\addon\hint\csharp-hint.js" />
     <Content Include="codemirror\addon\hint\python-hint.js" />
     <Content Include="codemirror\addon\hint\show-hint.css" />
     <Content Include="codemirror\addon\hint\show-hint.js" />

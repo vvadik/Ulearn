@@ -52,6 +52,10 @@
 @section scripts{
 	<script src="~/Scripts/navigate.js"></script>
 	<script>
+		CodeMirror.commands.autocomplete = function (cm) {
+			cm.showHint({ hint: CodeMirror.hint.csharp });
+		}
+
 		function codeMirrorClass(c, theme) {
 			var codes = document.getElementsByClassName(c);
 			for (var i = 0; i < codes.length; i++)
@@ -63,6 +67,7 @@
 					indentWithTabs: true,
 					tabSize: 4,
 					indentUnit: 4,
+					extraKeys: { "Ctrl-Space": "autocomplete" },
 				});
 		}
 
