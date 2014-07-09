@@ -87,6 +87,9 @@
     <Compile Include="StringExtensions_SplitToLines_should.cs" />
     <Compile Include="CSharp\SyntaxExtensions.cs" />
     <Compile Include="TestExerciseStaff.cs" />
+    <Compile Include="tests\ReadNumbersExcercise.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="tests\ExerciseWithStarterCode.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using NUnit.Framework;
 
@@ -112,6 +113,16 @@ namespace uLearn.CSharp
 		{
 			var slide = (ExerciseSlide) GenerateSlide("ExerciseWithHints.cs");
 			Assert.That(slide.HintsHtml, Is.EqualTo(new[] {"<p>hint1</p>\n", "<p>hint2</p>\n"}).AsCollection);
+		}
+
+		[Test]
+		public void provide_solution_for_server()
+		{
+			var slide = (ExerciseSlide) GenerateSlide("ReadNumbersExcercise.cs");
+			Console.WriteLine(slide.Head);
+			Console.WriteLine("**************");
+			Console.WriteLine(slide.WithoutAttribut);
+			Assert.That(0, Is.EqualTo(1));
 		}
 
 		private static Slide GenerateSlide(string name)

@@ -36,6 +36,7 @@ namespace uLearn.CSharp
 				Head += u;
 			}
 			Head += "namespace u \n{\n public class S\n {\n }}";
+			"/^**^*/"
 		}
 
 		public override void VisitClassDeclaration(ClassDeclarationSyntax node)
@@ -45,7 +46,7 @@ namespace uLearn.CSharp
 			{
 				foreach (var nod in WithoutAttributs.ToList())
 				{
-						WithoutAttributs.Remove(nod);
+					WithoutAttributs.Remove(nod);
 				}
 				WithoutAttributs.Add(node.ToString());
 			}
@@ -151,7 +152,10 @@ namespace uLearn.CSharp
 
 		public void CleanWithoutAttributes()
 		{
-			
+			if (Exercise == null)
+				return;
+			//WithoutAttributs =
+			//	WithoutAttributs.Select(x => x.Replace(WithoutAttributs, Exercise.Text.Split('\n').First() + "\n{\n}\n")).ToList();
 		}
 	}
 }
