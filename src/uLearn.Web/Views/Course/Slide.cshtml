@@ -31,7 +31,8 @@
 				<textarea class='code code-exercise'>@slide.Exercise.Text</textarea>
 
 				<text>Ожидаемый вывод на консоль:</text>
-				<pre><code>@slide.ExpectedOutput</code></pre>
+				<pre class="expected-output"><code>@slide.ExpectedOutput</code></pre>
+				<pre class="actual-output"><code>@Model.ActualExerciseOutput</code></pre>
 				@Html.Partial("_ExerciseHints", slide.HintsHtml)
 			}
 			
@@ -50,8 +51,6 @@
 </div>
 @section scripts{
 	<script src="~/Scripts/navigate.js"></script>
-	<script src="~/Scripts/codemirror.js"></script>
-	<script src="~/Scripts/clike.js"></script>
 	<script>
 		function codeMirrorClass(c, theme) {
 			var codes = document.getElementsByClassName(c);

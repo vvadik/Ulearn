@@ -4,8 +4,8 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>@ViewBag.Title | uLearn</title>
-	@Styles.Render("~/Content/css")
-	@Scripts.Render("~/bundles/modernizr")
+	@Styles.Render("~/css")
+	@Scripts.Render("~/modernizr")
 
 </head>
 <body>
@@ -32,8 +32,9 @@
 		@RenderBody()
 	</div>
 
-	@Scripts.Render("~/bundles/jquery")
-	@Scripts.Render("~/bundles/bootstrap")
+	@Scripts.Render("~/jquery")
+	@Scripts.Render("~/bootstrap")
+	@Scripts.Render("~/codemirror")
 	@RenderSection("scripts", required: false)
 </body>
 </html>
