@@ -118,11 +118,13 @@ namespace uLearn.CSharp
 		[Test]
 		public void provide_solution_for_server()
 		{
-			var slide = (ExerciseSlide) GenerateSlide("ReadNumbersExcercise.cs");
-			Console.WriteLine(slide.Head);
-			Console.WriteLine("**************");
-			Console.WriteLine(slide.WithoutAttribut);
-			Assert.That(0, Is.EqualTo(1));
+			Console.WriteLine("******For users*********");
+			var slide = (ExerciseSlide)GenerateSlide("HelloWorld.cs");
+			Console.WriteLine(slide.Solution.Content);
+			var ans = slide.Solution.BuildSolution("HELLO, HELL KITTY");
+			Console.WriteLine("******For server!********");
+			Console.WriteLine(ans);
+			Assert.That(0, Is.EqualTo(0));
 		}
 
 		private static Slide GenerateSlide(string name)

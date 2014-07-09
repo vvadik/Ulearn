@@ -15,7 +15,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		Любая, даже самая сложная дорога, начинается с первого шага, поэтому просто поприветствуйте котика фразой "Hello, kitty!"
 		*/
 
-		static public void Main()
+		public void Main()
 		{
 			HelloKitty();
 		}

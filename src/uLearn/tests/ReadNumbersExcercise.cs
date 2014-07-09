@@ -34,22 +34,6 @@ namespace uLearn.Courses.Linq.Slides
 			return 7;
 		}
 
-		[Exercise(SingleStatement = true)]
-		[Hint("`int.Parse` преобразует строку в целое число.")]
-		public int[] ParseNumbers(IEnumerable<string> lines)
-		{
-			return lines
-				.Where(line => line != "")
-				.Select(int.Parse)
-				.ToArray();
-			/*uncomment
-			return lines
-				.Where(...)
-				.Select(...)
-				...
-			*/
-		}
-
 		[Sample]
 		public void ParseNumber_Sample()
 		{
@@ -69,26 +53,24 @@ namespace uLearn.Courses.Linq.Slides
 				
 			}
 
-			
+			[Exercise(SingleStatement = true)]
+			[Hint("`int.Parse` преобразует строку в целое число.")]
+			public int[] ParseNumbers2(IEnumerable<string> lines)
+			{
+				return lines
+					.Where(line => line != "")
+					.Select(int.Parse)
+					.ToArray();
+				/*uncomment
+				return lines
+					.Where(...)
+					.Select(...)
+					...
+				*/
+			}
 
 			public class QQQ
 			{
-				[Exercise(SingleStatement = true)]
-				[Hint("`int.Parse` преобразует строку в целое число.")]
-				public int[] ParseNumbers2(IEnumerable<string> lines)
-				{
-					return lines
-						.Where(line => line != "")
-						.Select(int.Parse)
-						.ToArray();
-					/*uncomment
-					return lines
-						.Where(...)
-						.Select(...)
-						...
-					*/
-				}
-
 				public void W()
 				{
 				}
@@ -103,29 +85,29 @@ namespace uLearn.Courses.Linq.Slides
 
 		//[Exercise(SingleStatement = true)]
 		//[Hint("`int.Parse` преобразует строку в целое число.")]
-		//public int[] ParseNumbers(IEnumerable<string> lines)
-		//{
-		//	return lines
-		//		.Where(line => line != "")
-		//		.Select(int.Parse)
-		//		.ToArray();
-		//	/*uncomment
-		//	return lines
-		//		.Where(...)
-		//		.Select(...)
-		//		...
-		//	*/
-		//}
+		public int[] ParseNumbers(IEnumerable<string> lines)
+		{
+			return lines
+				.Where(line => line != "")
+				.Select(int.Parse)
+				.ToArray();
+			/*uncomment
+			return lines
+				.Where(...)
+				.Select(...)
+				...
+			*/
+		}
 
 
 
 		[Test]
 		public void Test()
 		{
-			int[] actualNumbers = ParseNumbers(new[] {"", "1", "2", "", "42"});
+			int[] actualNumbers = ParseNumbers(new[] { "", "1", "2", "", "42" });
 			Assert.That(
 				actualNumbers,
-				Is.EqualTo(new[] {1, 2, 42}).AsCollection);
+				Is.EqualTo(new[] { 1, 2, 42 }).AsCollection);
 		}
 
 
