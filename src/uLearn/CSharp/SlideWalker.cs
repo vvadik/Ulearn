@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Services;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -15,7 +16,7 @@ namespace uLearn.CSharp
 		public SlideBlock Exercise { get; private set; }
 		public string ExpectedOutput { get; private set; }
 		public readonly List<string> Hints = new List<string>();
-		public readonly List<string> WithoutAttributs = new List<string>();
+		public List<string> WithoutAttributs = new List<string>();
 		public MethodDeclarationSyntax ExerciseNode;
 		public string Head;
 
@@ -42,8 +43,13 @@ namespace uLearn.CSharp
 			base.VisitClassDeclaration(node);
 			if (node.AttributeLists.Count == 0)
 			{
+				foreach (var nod in WithoutAttributs.ToList())
+				{
+						WithoutAttributs.Remove(nod);
+				}
 				WithoutAttributs.Add(node.ToString());
 			}
+
 			if (node.HasAttribute<SampleAttribute>())
 			{
 				samples.Add(node);
@@ -58,6 +64,7 @@ namespace uLearn.CSharp
 			{
 				WithoutAttributs.Add(node.ToString());
 			}
+
 			if (node.HasAttribute<SampleAttribute>())
 			{
 				samples.Add(node);
@@ -140,6 +147,11 @@ namespace uLearn.CSharp
 				}
 			}
 			return SlideBlock.FromMarkdown(sb.ToString());
+		}
+
+		public void CleanWithoutAttributes()
+		{
+			
 		}
 	}
 }
