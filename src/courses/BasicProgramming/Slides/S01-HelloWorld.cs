@@ -2,7 +2,6 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-
 	public class S01_HelloWorld
 	{
 		/*

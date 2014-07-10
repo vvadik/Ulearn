@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "linq", "courses\linq\linq.csproj", "{0BD679E4-9ACB-4B02-835B-CBCA1DE8B817}"
 EndProject
@@ -10,6 +10,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn.Web", "uLearn.Web\uLearn.Web.csproj", "{B3701D2E-D001-4E0A-AB2F-7ACB5A89589B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicProgramming", "courses\BasicProgramming\BasicProgramming.csproj", "{83A81211-A139-4A37-92A0-716809232F08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicProgrammingMistakes", "BasicProgrammingMistakes\BasicProgrammingMistakes.csproj", "{3E9711A0-4BD5-4110-9C3D-B8B68DE9D0DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicProgrammingIfWhileFor", "BasicProgrammingBooleanVariablesAndComparison\BasicProgrammingIfWhileFor.csproj", "{B03DEDC0-559E-4152-8CF6-6F08C1F80C92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,14 @@ Global
 		{83A81211-A139-4A37-92A0-716809232F08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83A81211-A139-4A37-92A0-716809232F08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83A81211-A139-4A37-92A0-716809232F08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E9711A0-4BD5-4110-9C3D-B8B68DE9D0DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E9711A0-4BD5-4110-9C3D-B8B68DE9D0DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E9711A0-4BD5-4110-9C3D-B8B68DE9D0DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E9711A0-4BD5-4110-9C3D-B8B68DE9D0DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B03DEDC0-559E-4152-8CF6-6F08C1F80C92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B03DEDC0-559E-4152-8CF6-6F08C1F80C92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B03DEDC0-559E-4152-8CF6-6F08C1F80C92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B03DEDC0-559E-4152-8CF6-6F08C1F80C92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

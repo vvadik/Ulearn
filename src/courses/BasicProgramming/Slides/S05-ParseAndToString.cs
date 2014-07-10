@@ -9,7 +9,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		/*
 		##Задача: Парсинг
 		Гейтс написал код и не может найти ошибку :( 
-		Помогите ему!
+		Помогите ему, и исправьте её!
 		*/
 
 		[Exercise]
