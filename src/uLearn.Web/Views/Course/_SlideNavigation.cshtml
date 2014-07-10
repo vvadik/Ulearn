@@ -4,11 +4,19 @@
 
 	@if (Model.HasPrevSlide)
 	{
-		<a class="nav-arrow nav-left" id="PrevLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex - 1})"><i class="glyphicon glyphicon-chevron-left"></i></a>
+	    <a class="nav-arrow nav-left" id="PrevLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex - 1})"><i class="glyphicon glyphicon-chevron-left"></i></a>
+	}
+	else
+	{
+		<span class="nav-arrow nav-left">Листалка тут → </span>
 	}
 
 	@if (Model.HasNextSlide)
 	{
-		<a class="nav-arrow nav-right" id="NextLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex + 1})"><i class="glyphicon glyphicon-chevron-right"></i></a>
+	    <a class="nav-arrow nav-right" id="NextLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex + 1})"><i class="glyphicon glyphicon-chevron-right"></i></a>
+	}
+	else
+	{
+	    <span class="nav-arrow nav-right">Конец!</span>
 	}
 </div>

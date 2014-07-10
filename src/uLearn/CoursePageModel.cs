@@ -12,24 +12,5 @@
 		{
 			get { return Slide is ExerciseSlide ? "exercise" : "theory"; }
 		}
-
-		public string ActualExerciseOutput { get; private set; }
-		public string ExecutionVerdict { get; private set; }
-		public ExecutionStatus ExecutionStatus { get; private set; }
-	}
-
-	public enum ExecutionStatus
-	{
-		// тест пройден
-		OK,
-		
-		//неверный результат
-		WA,
-
-		//ошибка компиляции
-		CompilationError,
-
-		//запрещенное действие в коде
-		SemanticError
 	}
 }

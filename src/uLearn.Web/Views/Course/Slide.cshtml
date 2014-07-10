@@ -22,16 +22,28 @@
 			@{ var slide = Model.Slide as ExerciseSlide; }
 			@if (slide != null)
 			{
-			    <p>Допишите решение в окне ниже:</p>
-				<textarea class='code code-exercise'>@slide.ExerciseInitialCode</textarea>
+			    <textarea class='code code-exercise'>@slide.ExerciseInitialCode</textarea>
+				
+@*
+				<a href="#" onclick="updateVerdict(true, 'Успех!', 'some right answer', false)">OK</a>
+				<a href="#" onclick="updateVerdict(false, 'Compilation error', 'details', true)">CompilationError</a>
+				<a href="#" onclick="updateVerdict(false, 'Неверный ответ', 'Bullshit', false)">WrongAnswer</a>
+*@
 
-				<text>Ожидаемый вывод на консоль:</text>
-				<pre class="expected-output"><code>@slide.ExpectedOutput</code></pre>
-				<pre class="actual-output"><code>@Model.ActualExerciseOutput</code></pre>
 				@Html.Partial("_ExerciseHints", slide.HintsHtml)
 
-			    <button type="button" id="run" class="btn btn-primary btn-lg">RUN</button>
-				
+				<button type="button" id="run" class="run-solution-button btn btn-primary btn-lg no-rounds">RUN</button>
+				<div class="run-verdict clearfix"></div>
+				<div class="after-run-block">
+					<div class="actual-output">
+						<div class="output-label">Вывод вашей программы:</div>
+						<pre class="no-rounds"><code class="actual-output-content"></code></pre>
+					</div>
+					<div class="expected-output">
+						<div class="output-label">Правильный вывод:</div>
+						<pre class="no-rounds"><code class="expected-output-content">@slide.ExpectedOutput</code></pre>
+					</div>
+				</div>
 			}
 
 		</div>
@@ -42,10 +54,10 @@
 </div>
 @section scripts{
 	<script src="~/Scripts/navigate.js"></script>
-    <script src="~/Scripts/lessons.js"></script>
-    <script>
+	<script src="~/Scripts/slide.js"></script>
+	<script>
 		var runSolutionUrl = "@Html.Raw(Url.Action("RunSolution", new{courseId=Model.Course.Id, slideIndex=Model.SlideIndex}))";
 		console.log(runSolutionUrl);
-    </script>
+	</script>
 
 }

@@ -1,0 +1,118 @@
+.course-header {
+    background-color: #6f5499;
+    color: white;
+    padding: 30px 15px;
+    margin-bottom: 30px;
+}
+
+.slide-nav {
+    margin-top: 30px;
+}
+
+.slide-nav-link {
+    margin-right: 30px;
+}
+
+.container {
+    max-width: 800px;
+}
+
+.CodeMirror {
+    border: 1px solid #eee;
+    height: auto;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    line-height: 1.3em;
+    font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+}
+
+.CodeMirror-scroll {
+    overflow-y: hidden;
+    overflow-x: auto;
+    height: auto;
+}
+
+.nav-arrow {
+    margin:0;
+    width:50%;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    font-size:xx-large;
+    color: lightblue;
+    padding:10px;
+}
+
+a.nav-arrow:hover {
+    text-decoration: none;
+    color: white;
+    background-color: lightblue;
+}
+
+.nav-left {
+    float:left;
+}
+
+.nav-right {
+    float:right;
+}
+
+.output-label {
+    text-align: center;
+    margin-top:20px; 
+}
+.actual-output {
+    float: left;
+    width:50%;
+    margin:0;
+}
+
+.expected-output {
+    float: left;
+    width:50%;
+    margin:0;
+}
+
+.actual-output pre {
+    min-height: 200px;
+}
+
+.expected-output pre {
+    min-height: 200px;
+}
+
+
+
+.run-solution-button {
+    margin: 20px 0 20px 0;
+    width: 100%;
+}
+
+.after-run-block {
+    display: none;
+}
+
+.actual-output-content{}
+.expected-output-content{}
+.run-verdict {
+    height:46px;
+    line-height: 46px;
+    width: 100%;
+    text-align: center;
+    display:none;
+    font-size: x-large;
+    color:white;
+}
+
+.half-size {
+    width: 50%;
+}
+.full-size {
+    width: 100%;
+}
+
+.no-rounds {
+  border-radius:                    0px;
+  -webkit-border-radius:            0px;
+  -moz-border-radius:               0px;
+}
