@@ -19,7 +19,9 @@ namespace uLearn.tests
 			Console.WriteLine("S2");
 		}
 
-		/* text */
+		/* 
+		text 
+		*/
 		
 		[ShowBodyOnSlide]
 		public void Sample3()

@@ -1,38 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace uLearn
 {
 	public class SolutionForTesting
 	{
-		private string Usings { get; set; }
-		public string Content { get; private  set; }
-		private int IndexForInsert { get; set; }
+		private readonly int indexForInsert;
+		private readonly string preparedSlide;
 
-		public SolutionForTesting(string usings, string content, int indexForInsert)
+		public SolutionForTesting(SyntaxNode sourceForTestingRoot)
 		{
-			Usings = usings;
-			Content = content.Trim();
-			IndexForInsert = indexForInsert;
+			preparedSlide = sourceForTestingRoot.ToFullString();
+			var classDeclaration = sourceForTestingRoot.DescendantNodes().OfType<ClassDeclarationSyntax>().First();
+			indexForInsert = classDeclaration.OpenBraceToken.Span.End;
 		}
 
 		public string BuildSolution(string usersExercise)
 		{
-			var countOfNLines = 0;
-			for (var i = IndexForInsert; i < Content.Length; i++) //inserting of user exercise
-			{
-				if (Content[i] == '\n') countOfNLines++;
-				if (countOfNLines == 2)
-				{
-					var a = Content.Remove(IndexForInsert, i - IndexForInsert);
-					a = Usings + a.Insert(IndexForInsert, usersExercise) + "\n}";
-					return a;
-				}
-			}
-			return "error";
+			return preparedSlide.Insert(indexForInsert, "\n\r" + usersExercise + "\n\r");
 		}
 	}
 }

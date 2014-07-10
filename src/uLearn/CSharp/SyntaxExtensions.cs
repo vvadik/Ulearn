@@ -70,7 +70,7 @@ namespace uLearn.CSharp
 		public static string ToPrettyString(this MethodDeclarationSyntax node)
 		{
 			int bodyNestingSize = node.SyntaxTree.GetLineSpan(node.Body.OpenBraceToken.Span).StartLinePosition.Character;
-			return new string('\t', bodyNestingSize) + node.ToString();
+			return new string('\t', bodyNestingSize) + node;
 		}
 
 		public static string ToNotIdentedString(this SyntaxNode node)

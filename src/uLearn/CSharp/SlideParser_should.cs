@@ -1,4 +1,5 @@
 using System;
+using System.Activities.Expressions;
 using System.Linq;
 using NUnit.Framework;
 
@@ -120,7 +121,7 @@ namespace uLearn.CSharp
 		{
 			var slide = (ExerciseSlide) GenerateSlide("ExerciseWithStarterCode.cs");
 			var exerciseLines = slide.ExerciseInitialCode.SplitToLines();
-			Assert.That(exerciseLines.Length, Is.EqualTo(4));
+			Assert.That(exerciseLines.Length, Is.EqualTo(4), slide.ExerciseInitialCode);
 			Assert.That(exerciseLines[2], Is.EqualTo("	return x + y;"));
 		}
 
@@ -134,13 +135,14 @@ namespace uLearn.CSharp
 		[Test]
 		public void provide_solution_for_server()
 		{
-			Console.WriteLine("******For users*********");
 			var slide = (ExerciseSlide)GenerateSlide("HelloWorld.cs");
-			Console.WriteLine(slide.Solution.Content);
-			var ans = slide.Solution.BuildSolution("HELLO, HELL KITTY");
-			Console.WriteLine("******For server!********");
+			var userSolution = "/* no solution */";
+			var ans = slide.Solution.BuildSolution(userSolution);
 			Console.WriteLine(ans);
-			Assert.That(0, Is.EqualTo(0));
+			StringAssert.DoesNotContain("[", ans);
+			StringAssert.Contains("void Main(", ans);
+			StringAssert.Contains(userSolution, ans);
+			StringAssert.DoesNotContain("void HelloKitty(", ans);
 		}
 
 		private static Slide GenerateSlide(string name)
