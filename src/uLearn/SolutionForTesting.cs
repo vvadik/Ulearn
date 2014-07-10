@@ -18,7 +18,7 @@ namespace uLearn
 
 		public string BuildSolution(string usersExercise)
 		{
-			return preparedSlide.Insert(indexForInsert, "\n\r" + usersExercise + "\n\r");
+			return preparedSlide.Insert(indexForInsert, "\r\n#line 1\r\n" + usersExercise + "\r\n");
 		}
 	}
 }
