@@ -1,0 +1,14 @@
+﻿@model uLearn.CoursePageModel
+
+<div class="row">
+
+	@if (Model.HasPrevSlide)
+	{
+		<a class="nav-arrow nav-left" id="PrevLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex - 1})"><i class="glyphicon glyphicon-chevron-left"></i></a>
+	}
+
+	@if (Model.HasNextSlide)
+	{
+		<a class="nav-arrow nav-right" id="NextLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex + 1})"><i class="glyphicon glyphicon-chevron-right"></i></a>
+	}
+</div>

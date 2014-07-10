@@ -220,6 +220,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CourseManager.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\RunSolutionResult.cs" />
     <Compile Include="Models\SlideViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ideone\ExecutionService.cs" />
@@ -555,6 +556,7 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Course\Slide.cshtml" />
     <Content Include="Views\Course\_ExerciseHints.cshtml" />
+    <Content Include="Views\Course\_SlideNavigation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

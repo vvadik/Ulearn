@@ -18,56 +18,34 @@
 					@Html.Raw(block.RenderedText)
 				}
 			}
-			
-		    @{ var slide = Model.Slide as ExerciseSlide; }
+
+			@{ var slide = Model.Slide as ExerciseSlide; }
 			@if (slide != null)
 			{
-				<p>Допишите решение в окне ниже:</p>
+			    <p>Допишите решение в окне ниже:</p>
 				<textarea class='code code-exercise'>@slide.ExerciseInitialCode</textarea>
-				
+
 				<text>Ожидаемый вывод на консоль:</text>
 				<pre class="expected-output"><code>@slide.ExpectedOutput</code></pre>
 				<pre class="actual-output"><code>@Model.ActualExerciseOutput</code></pre>
 				@Html.Partial("_ExerciseHints", slide.HintsHtml)
+
+			    <button type="button" id="run" class="btn btn-primary btn-lg">RUN</button>
+				
 			}
-			
+
 		</div>
+
 	</div>
-	<div class="row">
-		@if (Model.HasPrevSlide)
-		{
-			<a class="nav-arrow nav-left" id="PrevLink" href="@Url.Action("Slide", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex - 1 })"><i class="glyphicon glyphicon-chevron-left"></i></a>
-		}
-		@if (Model.HasNextSlide)
-		{
-			<a class="nav-arrow nav-right" id="NextLink" href="@Url.Action("Slide", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex + 1 })"><i class="glyphicon glyphicon-chevron-right"></i></a>
-		}
-	</div>
+
+	@Html.Partial("_SlideNavigation", Model)
 </div>
 @section scripts{
 	<script src="~/Scripts/navigate.js"></script>
-	<script>
-		CodeMirror.commands.autocomplete = function (cm) {
-			cm.showHint({ hint: CodeMirror.hint.csharp });
-		}
+    <script src="~/Scripts/lessons.js"></script>
+    <script>
+		var runSolutionUrl = "@Html.Raw(Url.Action("RunSolution", new{courseId=Model.Course.Id, slideIndex=Model.SlideIndex}))";
+		console.log(runSolutionUrl);
+    </script>
 
-		function codeMirrorClass(c, editable) {
-			var codes = document.getElementsByClassName(c);
-			for (var i = 0; i < codes.length; i++)
-				CodeMirror.fromTextArea(codes[i],
-		        {
-		        	mode: "text/x-csharp",
-		        	lineNumbers: true,
-		        	theme: editable ? "cobalt" : "default",
-		        	indentWithTabs: true,
-		        	tabSize: 4,
-		        	indentUnit: 4,
-		        	extraKeys: { "Ctrl-Space": "autocomplete" },
-		        	readOnly: editable ? false : "nocursor",
-		        });
-		}
-
-		codeMirrorClass("code-exercise", true);
-		codeMirrorClass("code-sample", false);
-	</script>
 }
