@@ -182,8 +182,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Courses\Linq\*.cs" />
-    <EmbeddedResource Include="Courses\BasicProgramming\*.cs" />
+    <EmbeddedResource Include="Courses\**\*.cs">
+      <Visible>false</Visible>
+    </EmbeddedResource>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -503,7 +504,7 @@
     <Content Include="codemirror\theme\xq-light.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
-    <Content Include="Content\lessons.css" />
+    <Content Include="Content\ulearn.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -523,7 +524,7 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="Scripts\lessons.js" />
+    <Content Include="Scripts\slide.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\navigate.js" />
     <Content Include="Scripts\respond.js" />
