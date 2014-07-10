@@ -21,10 +21,10 @@ namespace uLearn.CSharp
 		{
 			var walker = new SlideWalker();
 			walker.Visit(tree.GetRoot());
-			if (walker.Exercise == null)
+			if (!walker.IsExercise)
 				return new Slide(walker.Blocks);
-			walker.CreateSolution();
-			return new ExerciseSlide(walker.Blocks, walker.Exercise, walker.ExpectedOutput, walker.Hints, walker.Solution);
+//			walker.CreateSolution();
+			return new ExerciseSlide(walker.Blocks, walker.ExerciseInitialCode, walker.ExpectedOutput, walker.Hints, walker.Solution);
 		}
 	}
 }

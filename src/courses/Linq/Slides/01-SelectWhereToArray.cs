@@ -49,7 +49,7 @@ namespace uLearn.Courses.Linq.Slides
 		*/
 
 		[Test]
-		[Sample]
+		[ShowBodyOnSlide]
 		public void BasicFunctional()
 		{
 			int[] numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -70,7 +70,7 @@ namespace uLearn.Courses.Linq.Slides
 		*/
 
 		[Test]
-		[Sample]
+		[ShowBodyOnSlide]
 		public void MethodChaining()
 		{
 			Assert.That(
@@ -92,7 +92,7 @@ namespace uLearn.Courses.Linq.Slides
 		*/
 
 		[Test]
-		[Sample]
+		[ShowBodyOnSlide]
 		public void MoreReadable()
 		{
 			var people = new[] {"Pavel", "", "Yuriy", null, "Michail", "Aleksey", "Dasha", "Irina"}

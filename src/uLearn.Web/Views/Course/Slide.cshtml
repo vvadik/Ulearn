@@ -9,7 +9,7 @@
 		<div class='slide'>
 			@foreach (SlideBlock block in Model.Slide.Blocks)
 			{
-				if (block.IsCodeSample)
+				if (block.IsCode)
 				{
 					<textarea class='code code-sample'>@block.Text</textarea>
 				}
@@ -23,7 +23,7 @@
 			@if (slide != null)
 			{
 				<p>Допишите решение в окне ниже:</p>
-				<textarea class='code code-exercise'>@slide.Exercise.Text</textarea>
+				<textarea class='code code-exercise'>@slide.ExerciseInitialCode</textarea>
 				
 				<text>Ожидаемый вывод на консоль:</text>
 				<pre class="expected-output"><code>@slide.ExpectedOutput</code></pre>

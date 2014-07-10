@@ -54,6 +54,7 @@
     <Compile Include="Slides\S08-Vision.cs" />
     <Compile Include="Slides\S09-DefaultValues.cs" />
     <Compile Include="Slides\S10-IntelliSense.cs" />
+    <Compile Include="Slides_Tests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">

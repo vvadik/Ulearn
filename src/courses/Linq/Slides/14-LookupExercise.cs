@@ -24,7 +24,7 @@ namespace uLearn.Courses.Linq.Slides
 		Документ определен так:
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		public class Document
 		{
 			public int Id;

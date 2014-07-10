@@ -1,21 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Services;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NUnit.Framework;
 
 namespace uLearn.CSharp
 {
 	public class SlideWalker : CSharpSyntaxWalker
 	{
 		public readonly List<SlideBlock> Blocks = new List<SlideBlock>();
-		public SlideBlock Exercise { get; private set; }
+		public string ExerciseInitialCode { get; private set; }
+		public bool IsExercise { get; private set; }
 		public string ExpectedOutput { get; private set; }
 		public readonly List<string> Hints = new List<string>();
 		private List<string> _withoutAttributes = new List<string>();
@@ -24,8 +21,6 @@ namespace uLearn.CSharp
 		public MethodDeclarationSyntax ExerciseNode;
 		public string InitialDataForSolution;
 		public SolutionForTesting Solution { get; private set; }
-
-		public readonly List<MemberDeclarationSyntax> samples = new List<MemberDeclarationSyntax>();
 
 		public SlideWalker() : base(SyntaxWalkerDepth.Trivia)
 		{
@@ -52,11 +47,20 @@ namespace uLearn.CSharp
 				_withoutAttributes.Add("\t\t" + node);
 			}
 
-			if (node.HasAttribute<SampleAttribute>())
+			if (ShowOnSlide(node))
 			{
-				samples.Add(node);
-				Blocks.Add(CreateSampleBlock(node));
+				AddSampleBlock(node);
 			}
+		}
+
+		private void AddSampleBlock(MemberDeclarationSyntax node)
+		{
+			var sampleBlock = (SlideBlock)CreateSampleBlock((dynamic)node);
+			SlideBlock lastBlock = Blocks.LastOrDefault();
+			if (lastBlock != null && lastBlock.IsCode)
+				Blocks[Blocks.Count - 1] = SlideBlock.FromCode(lastBlock.Text + "\r\n\r\n" + sampleBlock.Text);
+			else
+				Blocks.Add(sampleBlock);
 		}
 
 		public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
@@ -70,27 +74,38 @@ namespace uLearn.CSharp
 			{
 				_withAttributes.Add(node.ToString());
 			}
-
-			if (node.HasAttribute<SampleAttribute>())
+			if (node.HasAttribute<ExpectedOutputAttribute>())
 			{
-				samples.Add(node);
-				Blocks.Add(CreateSampleBlock(node));
+				IsExercise = true;
+				ExpectedOutput = node.GetAttributes<ExpectedOutputAttribute>().Select(attr => attr.GetArgument()).FirstOrDefault();
+			}
+			if (node.HasAttribute<HintAttribute>())
+			{
+				Hints.AddRange(node.GetAttributes<HintAttribute>().Select(attr => attr.GetArgument()));
+			}
+
+			if (ShowOnSlide(node))
+			{
+				AddSampleBlock(node);
 			}
 			else if (node.HasAttribute<ExerciseAttribute>())
 			{
 				_withoutAttributes.Add("\t\t" + node);
 				WithExersiceAttribute = node.ToString();
 				ExerciseNode = node;
-				Exercise = SlideBlock.FromCode(GetExerciseCode(node));
-				Hints.AddRange(node.GetAttributes<HintAttribute>().Select(attr => attr.GetArgument()));
-				ExpectedOutput = node.GetAttributes<ExpectedOutputAttribute>().Select(attr => attr.GetArgument()).FirstOrDefault();
+				ExerciseInitialCode = GetExerciseCode(node);
 			}
+		}
+
+		private static bool ShowOnSlide(MemberDeclarationSyntax node)
+		{
+			return node.HasAttribute<ShowBodyOnSlideAttribute>() || node.HasAttribute<ShowOnSlideAttribute>();
 		}
 
 		private SlideBlock CreateSampleBlock(MethodDeclarationSyntax node)
 		{
-			string code = node.Body.Statements.ToFullString().RemoveCommonNesting();
-			return SlideBlock.FromCode(code);
+			var code = node.HasAttribute<ShowOnSlideAttribute>() ? node.WithoutAttributes().ToPrettyString() : node.Body.Statements.ToFullString();
+			return SlideBlock.FromCode(code.RemoveCommonNesting());
 		}
 
 		private SlideBlock CreateSampleBlock(ClassDeclarationSyntax node)
@@ -159,7 +174,7 @@ namespace uLearn.CSharp
 		public void CleanWithoutAttributes()
 		{
 						_withoutAttributes = _withoutAttributes
-				.Select(x => x.Replace(WithExersiceAttribute, Exercise.Text
+				.Select(x => x.Replace(WithExersiceAttribute, ExerciseInitialCode
 					.Split('\n')
 					.First()))
 				.Select(RemoveBlocksFromSolution)
@@ -182,7 +197,7 @@ namespace uLearn.CSharp
 				.Select(x => x.Substring(2))
 				.Aggregate("", (current, v) => current + (v + "\n"));
 			//there is alignment for tabs
-			var indexForInsert = withoutAttribute.IndexOf(Exercise.Text.Split('\n').First(), StringComparison.Ordinal);
+			var indexForInsert = withoutAttribute.IndexOf(ExerciseInitialCode.Split('\n').First(), StringComparison.Ordinal);
 			var sb = new StringBuilder();
 			for (var i = indexForInsert - 1; i >= 0 && withoutAttribute[i] == '\t'; i--)
 				sb.Append('\t');

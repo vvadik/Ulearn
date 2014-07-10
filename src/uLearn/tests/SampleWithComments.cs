@@ -12,7 +12,7 @@ namespace uLearn.tests
 		Comment
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		public void DoSample()
 		{
 			Console.WriteLine("Hello Sample!");

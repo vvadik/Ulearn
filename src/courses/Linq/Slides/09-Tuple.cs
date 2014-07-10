@@ -14,7 +14,7 @@ namespace uLearn.Courses.Linq.Slides
 
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		[Test]
 		public void Test1()
 		{

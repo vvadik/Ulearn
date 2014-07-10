@@ -20,10 +20,17 @@ namespace uLearn
 
 		public static IEnumerable<string> RemoveCommonNesting(this string[] lines)
 		{
-			var nesting =
-				lines.Where(line => line.Trim().Length > 0).DefaultIfEmpty().Min(line => line.TakeWhile(char.IsWhiteSpace).Count());
-			var newLines = lines.Select(line => line.Length > nesting ? line.Substring(nesting) : line);
-			return newLines;
+			var nonEmptyLines = lines.Where(line => line.Trim().Length > 0).ToList();
+			if (nonEmptyLines.Any())
+			{
+				var nesting = nonEmptyLines.Min(line => line.TakeWhile(char.IsWhiteSpace).Count());
+				var newLines = lines.Select(line => line.Length > nesting ? line.Substring(nesting) : line);
+				return newLines;
+			}
+			else
+			{
+				return Enumerable.Repeat("", lines.Count());
+			}
 		}
 	}
 }

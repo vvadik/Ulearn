@@ -5,16 +5,16 @@ namespace uLearn
 {
 	public class ExerciseSlide : Slide
 	{
-		public SlideBlock Exercise { get; private set; }
+		public string ExerciseInitialCode { get; private set; }
 		public string ExpectedOutput { get; private set; }
 		public SolutionForTesting Solution { get; private set; }
 		public string[] HintsHtml { get; private set; }
 
-		public ExerciseSlide(IEnumerable<SlideBlock> blocks, SlideBlock exercise, string expectedOutput,
+		public ExerciseSlide(IEnumerable<SlideBlock> blocks, string exerciseInitialCode, string expectedOutput,
 			IEnumerable<string> hints, SolutionForTesting solution)
 			: base(blocks)
 		{
-			Exercise = exercise;
+			ExerciseInitialCode = exerciseInitialCode;
 			ExpectedOutput = expectedOutput;
 			Solution = solution;
 			HintsHtml = hints.Select(Md.ToHtml).ToArray();
@@ -22,7 +22,7 @@ namespace uLearn
 
 		protected bool Equals(ExerciseSlide other)
 		{
-			return Equals(Exercise, other.Exercise) && Equals(ExpectedOutput, other.ExpectedOutput) && Equals(HintsHtml, other.HintsHtml);
+			return Equals(ExerciseInitialCode, other.ExerciseInitialCode) && Equals(ExpectedOutput, other.ExpectedOutput) && Equals(HintsHtml, other.HintsHtml);
 		}
 
 		public override bool Equals(object obj)
@@ -37,7 +37,7 @@ namespace uLearn
 		{
 			unchecked
 			{
-				int hashCode = (Exercise != null ? Exercise.GetHashCode() : 0);
+				int hashCode = (ExerciseInitialCode != null ? ExerciseInitialCode.GetHashCode() : 0);
 				hashCode = (hashCode*397) ^ (ExpectedOutput != null ? ExpectedOutput.GetHashCode() : 0);
 				hashCode = (hashCode*397) ^ (HintsHtml != null ? HintsHtml.GetHashCode() : 0);
 				return hashCode;
@@ -46,7 +46,7 @@ namespace uLearn
 
 		public override string ToString()
 		{
-			return string.Format("Exercise: {0}, Hints: {1}", Exercise, HintsHtml);
+			return string.Format("Exercise: {0}, Hints: {1}", ExerciseInitialCode, HintsHtml);
 		}
 	}
 }

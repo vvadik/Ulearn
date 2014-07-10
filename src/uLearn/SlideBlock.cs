@@ -2,9 +2,9 @@
 {
 	public class SlideBlock
 	{
-		private SlideBlock(string text, bool isCodeSample)
+		private SlideBlock(string text, bool isCode)
 		{
-			IsCodeSample = isCodeSample;
+			IsCode = isCode;
 			Text = text.TrimEnd();
 		}
 
@@ -20,7 +20,7 @@
 
 		protected bool Equals(SlideBlock other)
 		{
-			return IsCodeSample.Equals(other.IsCodeSample) && string.Equals(Text, other.Text);
+			return IsCode.Equals(other.IsCode) && string.Equals(Text, other.Text);
 		}
 
 		public override bool Equals(object obj)
@@ -35,26 +35,26 @@
 		{
 			unchecked
 			{
-				return (IsCodeSample.GetHashCode()*397) ^ (Text != null ? Text.GetHashCode() : 0);
+				return (IsCode.GetHashCode()*397) ^ (Text != null ? Text.GetHashCode() : 0);
 			}
 		}
 
 		public override string ToString()
 		{
-			return string.Format("IsCodeSample: {0}, Text: {1}", IsCodeSample, Text);
+			return string.Format("IsCodeSample: {0}, Text: {1}", IsCode, Text);
 		}
 
-		public readonly bool IsCodeSample;
+		public readonly bool IsCode;
 		public readonly string Text;
 
 		public string RenderedText
 		{
-			get { return IsCodeSample ? Text : Md.ToHtml(Text); }
+			get { return IsCode ? Text : Md.ToHtml(Text); }
 		}
 
 		public SlideBlock WithAppendedText(string text)
 		{
-			return new SlideBlock(Text + "\n" + text, IsCodeSample);
+			return new SlideBlock(Text + "\n" + text, IsCode);
 		}
 	}
 }

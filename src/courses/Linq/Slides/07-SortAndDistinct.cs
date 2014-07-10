@@ -22,7 +22,7 @@ namespace uLearn.Courses.Linq.Slides
 		в соответствие некоторый ключ, по которому его и нужно отсортировать.
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		[Test]
 		public void Test1()
 		{
@@ -40,7 +40,7 @@ namespace uLearn.Courses.Linq.Slides
 		Например, в следующем примере все имена сортируются по убыванию длин, а при равных длинах — лексикографически.
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		[Test]
 		public void Test2()
 		{
@@ -55,7 +55,7 @@ namespace uLearn.Courses.Linq.Slides
 		Чтобы убрать из последовательности все повторяющиеся элементы, можно воспользоваться функцией `Distinct`.
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		[Test]
 		public void TestDistinct()
 		{

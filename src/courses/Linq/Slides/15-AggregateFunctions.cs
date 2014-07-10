@@ -17,7 +17,7 @@ namespace uLearn.Courses.Linq.Slides
 		*/
 
 		[Test]
-		[Sample]
+		[ShowBodyOnSlide]
 		public void MinMaxAvg()
 		{
 			IEnumerable<int> nums = new int[] {8, 9, 0, 1, 2, 3, 4, 5, 6, 7};
@@ -50,7 +50,7 @@ namespace uLearn.Courses.Linq.Slides
 		*/
 
 		[Test]
-		[Sample]
+		[ShowBodyOnSlide]
 		public void Test2()
 		{
 			int[] numbers = {1, 2, 6, 2, 8, 0, 10, 6, 1, 2};

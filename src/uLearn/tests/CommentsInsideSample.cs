@@ -8,7 +8,7 @@ namespace uLearn.tests
 {
 	internal class CommentsInsideSample
 	{
-		[Sample]
+		[ShowBodyOnSlide]
 		public void DoSample()
 		{
 //			Not a block!

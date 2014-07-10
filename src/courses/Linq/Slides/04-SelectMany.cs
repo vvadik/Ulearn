@@ -21,7 +21,7 @@ namespace uLearn.Courses.Linq.Slides
 		Следующий пример пояснит работу этого метода:
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		[Test]
 		public void SelectManyDemo()
 		{
@@ -35,7 +35,7 @@ namespace uLearn.Courses.Linq.Slides
 		поэтому вызов `ToCharArray` на самом деле лишний.
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		[Test]
 		public void SelectManyDemo2()
 		{

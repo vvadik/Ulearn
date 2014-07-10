@@ -8,7 +8,7 @@ namespace uLearn.tests
 {
 	public class SampleClass
 	{
-		[Sample]
+		[ShowBodyOnSlide]
 		public class Point
 		{
 			public int X, Y;

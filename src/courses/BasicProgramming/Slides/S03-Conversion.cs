@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[TestFixture]
 	public class S03_Conversion
 	{
 		/*
@@ -20,9 +14,9 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		 * очистите код от опасных действий
 		*/
 
-		[Exercise(SingleStatement = true)]
+		[Exercise]
 		[ExpectedOutput("14\r\n5")]
-		public static void ConvertNumbers()
+		public static void Main()
 		{
 			double first = 13.59;
 			double second = 5.20;
@@ -38,12 +32,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 				int integerNumber = (int)third;
 			}
 			*/
-		}
-
-		[Test]
-		public void Test()
-		{
-			TestExerciseStaff.TestExercise(GetType().GetMethod("ConvertNumbers"));
 		}
 	}
 }

@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
+
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[TestFixture]
 	public class S05_ParseAndToString
 	{
 		/*
@@ -16,9 +11,10 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		Гейтс написал код и не может найти ошибку :( 
 		Помогите ему!
 		*/
-		[Exercise(SingleStatement = true)]
+
+		[Exercise]
 		[ExpectedOutput("894377.243643")]
-		static public void ParseAndToString()
+		public static void Main()
 		{
 			string doubleNumber = "894376.243643";
 			double number = double.Parse(doubleNumber, CultureInfo.InvariantCulture);
@@ -28,12 +24,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			int number = doubleNumber;
 			Console.WriteLine(number + 1);
 			*/
-		}
-
-		[Test]
-		public void Test()
-		{
-			TestExerciseStaff.TestExercise(GetType().GetMethod("ParseAndToString"));
 		}
 	}
 }

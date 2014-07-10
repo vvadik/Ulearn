@@ -22,7 +22,7 @@ namespace uLearn.Linq
 
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		[Test]
 		public void Test1()
 		{
@@ -40,7 +40,7 @@ namespace uLearn.Linq
 		однако иногда их очень удобно использовать в Linq запросах. Это демонстрирует следующий пример:
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		[Test]
 		public void Test2()
 		{

@@ -8,13 +8,13 @@ using NUnit.Framework;
 
 namespace uLearn
 {
-    public class ExpectedOutputAttribute : Attribute
-    {
-        public ExpectedOutputAttribute(string s)
-        {
-            Output = s;
-        }
+	public class ExpectedOutputAttribute : Attribute
+	{
+		public ExpectedOutputAttribute(string s)
+		{
+			Output = s;
+		}
 
-        public string Output { get; private set; }
-    }
+		public string Output { get; private set; }
+	}
 }

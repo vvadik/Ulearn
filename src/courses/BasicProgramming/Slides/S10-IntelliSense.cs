@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[TestFixture]
 	public class S10_IntelliSense
 	{
 		/*
@@ -19,29 +14,23 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		"Hello, Name, you salary is N". Но так как работадатель очень добр, он всегда округляет дробная зарплату до ближайшего целого числа вверх.
 		*/
 
-		[Exercise(SingleStatement = true)]
 		[Hint("IntelliSense - сила")]
-		[ExpectedOutput("Hello, Kitty, your salary is 101")]
-		public static void MainX()
+		[ExpectedOutput("Hello, Kitty, your salary is 101\r\nHello, World, your salary is 0")]
+		[ShowOnSlide]
+		public static void Main()
 		{
-			PrintGreeting("Kitty", 100.01);
-			/*uncomment
-			PrintGreeting("Kitty", 100.01);
-			*/
+			Console.WriteLine(PrintGreeting("Kitty", 100.01));
+			Console.WriteLine(PrintGreeting("World", 0));
 		}
 
-		private static void PrintGreeting(string name, double salary)
+		[Exercise]
+		private static string PrintGreeting(string name, double salary)
 		{
 			var ans = new StringBuilder("Hello, *, your salary is ");
 			ans.Replace("*", name);
 			ans.Append(Math.Ceiling(salary));
-			Console.WriteLine(ans.ToString());
+			return ans.ToString();
 		}
 
-		[Test]
-		public void Test()
-		{
-			TestExerciseStaff.TestExercise(GetType().GetMethod("MainX"));
-		}
 	}
 }

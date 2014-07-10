@@ -8,7 +8,7 @@ namespace uLearn.tests
 {
 	class Sample
 	{
-		[Sample]
+		[ShowBodyOnSlide]
 		public void DoSample()
 		{
 			Console.WriteLine("Hello Sample!");

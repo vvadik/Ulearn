@@ -27,7 +27,7 @@ namespace uLearn.Courses.Linq.Slides
 		Решение этой задачи будет использоваться следующим образом:
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		public void ParseNumber_Sample()
 		{
 			int[] numbers = ParseNumbers(File.ReadLines("numbers.txt"));

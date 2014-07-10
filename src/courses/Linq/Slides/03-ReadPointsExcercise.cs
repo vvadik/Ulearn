@@ -25,7 +25,7 @@ namespace uLearn.Courses.Linq.Slides
 		Написанная вами функция в дальнейшем может быть использована, например, вот так:
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		public void ParseNumber_Sample()
 		{
 			List<Point> points = ParsePoints(File.ReadLines("points.txt"));

@@ -16,7 +16,7 @@ namespace uLearn.Courses.Linq.Slides
 		Учебный класс определен так:
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		public class Classroom
 		{
 			public List<string> Students = new List<string>();
@@ -27,7 +27,7 @@ namespace uLearn.Courses.Linq.Slides
 		Без использования Linq, решение могло бы выглядеть так:
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		public string[] GetAllStudents_NoLinq(Classroom[] classes)
 		{
 			var allStudents = new List<string>();

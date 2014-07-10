@@ -8,6 +8,11 @@ namespace uLearn.CSharp
 {
 	public static class SyntaxExtensions
 	{
+		public static bool HasAttribute<TAttr>(this MemberDeclarationSyntax node) where TAttr : Attribute
+		{
+			return SyntaxExtensions.HasAttribute<TAttr>((dynamic)node);
+		}
+
 		public static bool HasAttribute<TAttr>(this MethodDeclarationSyntax node) where TAttr : Attribute
 		{
 			return node.GetAttributes<TAttr>().Any();
@@ -60,6 +65,12 @@ namespace uLearn.CSharp
 		public static MethodDeclarationSyntax WithoutAttributes(this MethodDeclarationSyntax node)
 		{
 			return node.WithAttributeLists(new SyntaxList<AttributeListSyntax>());
+		}
+
+		public static string ToPrettyString(this MethodDeclarationSyntax node)
+		{
+			int bodyNestingSize = node.SyntaxTree.GetLineSpan(node.Body.OpenBraceToken.Span).StartLinePosition.Character;
+			return new string('\t', bodyNestingSize) + node.ToString();
 		}
 
 		public static string ToNotIdentedString(this SyntaxNode node)

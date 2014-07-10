@@ -12,7 +12,7 @@ namespace uLearn.tests.lesson
 		2nd block
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		public void TestIt()
 		{
 			Console.WriteLine(2 < 3 && 3 > 1);

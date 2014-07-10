@@ -8,8 +8,9 @@ namespace uLearn.tests
 		Add 2 and 3 please!
 		*/
 
+		[ExpectedOutput("5")]
 		[Exercise]
-		public int Add_2_and_3()
+		public void Add_2_and_3()
 		{
 			Console.WriteLine("Hello world!");
 			throw new NotImplementedException();

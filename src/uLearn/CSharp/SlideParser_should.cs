@@ -12,7 +12,7 @@ namespace uLearn.CSharp
 		{
 			Slide slide = GenerateSlide("SingleComment.cs");
 			Assert.That(slide.Blocks.Length, Is.EqualTo(1));
-			Assert.That(slide.Blocks[0].IsCodeSample, Is.False);
+			Assert.That(slide.Blocks[0].IsCode, Is.False);
 			Assert.That(slide.Blocks[0].Text, Is.EqualTo("==Multiline comment\r\nShould become markdown text"));
 		}
 
@@ -35,7 +35,7 @@ namespace uLearn.CSharp
 		{
 			var slide = GenerateSlide("CommentsInsideSample.cs");
 			Assert.That(slide.Blocks.Length, Is.EqualTo(1));
-			Assert.That(slide.Blocks[0].IsCodeSample);
+			Assert.That(slide.Blocks[0].IsCode);
 		}
 
 		[Test]
@@ -47,28 +47,45 @@ namespace uLearn.CSharp
 		}
 
 		[Test]
-		public void make_sample_as_code_block()
+		public void make_ShowOnSlide_method_as_code_block()
 		{
 			Slide slide = GenerateSlide("Sample.cs");
 			Assert.That(slide.Blocks.Length, Is.EqualTo(1));
-			Assert.That(slide.Blocks[0].IsCodeSample);
+			Assert.That(slide.Blocks[0].IsCode);
 			Assert.That(slide, Is.TypeOf<Slide>());
 		}
 
 		[Test]
-		public void make_sample_from_class()
+		public void make_ShowOnSlide_class_as_code_block()
 		{
 			Slide slide = GenerateSlide("SampleClass.cs");
 			Assert.That(slide.Blocks.Length, Is.EqualTo(1));
-			Assert.That(slide.Blocks[0].IsCodeSample);
+			Assert.That(slide.Blocks[0].IsCode);
 			Assert.That(slide.Blocks[0].Text, Is.StringContaining("class Point"));
 		}
 
 		[Test]
-		public void remove_method_header_from_code_sample_block()
+		public void remove_method_header_from_code_block()
 		{
 			Slide slide = GenerateSlide("Sample.cs");
 			Assert.That(slide.Blocks[0].Text, Is.EqualTo("Console.WriteLine(\"Hello Sample!\");"));
+		}
+
+		[Test]
+		public void join_adjacent_code_blocks()
+		{
+			Slide slide = GenerateSlide("AdjacentSamples.cs");
+			Assert.That(slide.Blocks[0].IsCode, Is.True);
+			Assert.That(slide.Blocks[1].IsCode, Is.False);
+			Assert.That(slide.Blocks[2].IsCode, Is.True);
+			Assert.That(slide.Blocks.Length, Is.EqualTo(3));
+		}
+
+		[Test]
+		public void make_code_block_with_method_signature_if_specified()
+		{
+			Slide slide = GenerateSlide("AdjacentSamples.cs");
+			Assert.That(slide.Blocks[0].Text, Is.StringContaining("public void Sample1()"));
 		}
 
 		[Test]
@@ -77,7 +94,7 @@ namespace uLearn.CSharp
 			Slide slide = GenerateSlide("SampleWithComments.cs");
 			Assert.That(slide.Blocks.Length, Is.EqualTo(3));
 			Assert.That(slide.Blocks[0].Text, Is.StringStarting("Comment"));
-			Assert.That(slide.Blocks[1].IsCodeSample);
+			Assert.That(slide.Blocks[1].IsCode);
 			Assert.That(slide.Blocks[2].Text, Is.StringStarting("Final"));
 		}
 
@@ -86,24 +103,23 @@ namespace uLearn.CSharp
 		{
 			var slide = (ExerciseSlide) GenerateSlide("Exercise.cs");
 			Assert.That(slide.Blocks.Single().Text, Is.EqualTo("Add 2 and 3 please!"));
-			Assert.That(slide.Exercise.IsCodeSample);
-			Assert.That(slide.Exercise.Text, Is.StringStarting("public int Add_2_and_3()"));
-			Assert.That(slide.Exercise.Text, Is.Not.StringContaining("NotImplementedException"));
+			Assert.That(slide.ExerciseInitialCode, Is.StringStarting("public void Add_2_and_3()"));
+			Assert.That(slide.ExerciseInitialCode, Is.Not.StringContaining("NotImplementedException"));
 			Assert.That(slide.HintsHtml.Length, Is.EqualTo(0));
 		}
 
 		[Test]
-		public void not_count_exercise_as_code_sample_block()
+		public void not_count_exercise_as_code_block()
 		{
 			var slide = GenerateSlide("Exercise.cs");
-			Assert.That(slide.Blocks.Where(b => b.IsCodeSample), Is.Empty);
+			Assert.That(slide.Blocks.Where(b => b.IsCode), Is.Empty);
 		}
 
 		[Test]
 		public void uncomment_special_comments_with_starter_code()
 		{
 			var slide = (ExerciseSlide) GenerateSlide("ExerciseWithStarterCode.cs");
-			var exerciseLines = slide.Exercise.Text.SplitToLines();
+			var exerciseLines = slide.ExerciseInitialCode.SplitToLines();
 			Assert.That(exerciseLines.Length, Is.EqualTo(4));
 			Assert.That(exerciseLines[2], Is.EqualTo("	return x + y;"));
 		}

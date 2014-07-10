@@ -22,7 +22,7 @@ namespace uLearn.Courses.Linq.Slides
 		*/
 
 		[Test]
-		[Sample]
+		[ShowBodyOnSlide]
 		public void Test()
 		{
 			string[] names = {"Pavel", "Peter", "Andrew", "Anna", "Alice", "John"};
@@ -46,7 +46,7 @@ namespace uLearn.Courses.Linq.Slides
 		`SelectMany` после `GroupBy` не поменяют состав последовательности, но могут изменить порядок следования элементов:
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		[Test]
 		public void SelectManyGroupBy()
 		{

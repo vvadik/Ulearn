@@ -34,7 +34,7 @@ namespace uLearn.Courses.Linq.Slides
 			return 7;
 		}
 
-		[Sample]
+		[ShowBodyOnSlide]
 		public void ParseNumber_Sample()
 		{
 			int[] numbers = ParseNumbers(File.ReadLines("numbers.txt"));

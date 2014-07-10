@@ -1,19 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using NUnit.Framework;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[TestFixture]
 	public class S06_Operations
 	{
 		/*
@@ -22,10 +10,10 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		Исправьте программу так, чтобы она давала корректный ответ. Объясните, почему программа не работает
 		*/
 
-		[Exercise(SingleStatement = true)]
+		[Exercise]
 		[Hint("var is very dangerous...")]
 		[ExpectedOutput("5.5")]
-		static public void GetSumOfTwoNumbers()
+		static public void Main()
 		{
 			double a = 5;
 			a += 0.5;
@@ -37,11 +25,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			*/
 		}
 
-		[Test]
-		public void Test()
-		{
-			TestExerciseStaff.TestExercise(GetType().GetMethod("GetSumOfTwoNumbers"));
-		}
 
 	}
 }

@@ -1,40 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[TestFixture]
 	class S04_Strings
 	{
 		/*
 		##Задача: Две половинки одного целого
-		Реализуйте метод, который возвращает вторую половину слова, считая, что слово имеет четное количество букв.
+		TODO
 		*/
 
-		[Exercise(SingleStatement = true)]
+		[Exercise]
 		[ExpectedOutput("CSharp!")]
-		static public void MainX()
+		static public void Main()
 		{
-			PrintHalfWord("I love CSharp!");
+			string text = "I love CSharp!";
+			string half = text.Substring(text.Length / 2);
+			Console.WriteLine(half);
 			/*uncomment
-			 PrintHalfWord("I love CSharp!");
+			string text = "I love CSharp!";
+			string half = ...;
+			Console.WriteLine(half);
 			*/
-		}
-
-		private static void PrintHalfWord(string str)
-		{
-			Console.WriteLine(str.Substring(str.Length/2));
-		}
-
-		[Test]
-		public void Test()
-		{
-
-			TestExerciseStaff.TestExercise(GetType().GetMethod("MainX"));
 		}
 	}
 }

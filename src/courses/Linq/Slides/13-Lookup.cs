@@ -19,7 +19,7 @@ namespace uLearn.Courses.Linq.Slides
 		*/
 
 		[Test]
-		[Sample]
+		[ShowBodyOnSlide]
 		public void Test()
 		{
 			string[] names = {"Pavel", "Peter", "Andrew", "Anna", "Alice", "John"};
@@ -39,7 +39,7 @@ namespace uLearn.Courses.Linq.Slides
 		
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		[Test]
 		public void TestName()
 		{
@@ -60,7 +60,7 @@ namespace uLearn.Courses.Linq.Slides
 
 		*/
 
-		[Sample]
+		[ShowBodyOnSlide]
 		[Test]
 		public void ToLookupSample()
 		{
