@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
@@ -13,7 +14,7 @@ namespace uLearn.Web.Ideone
 		private readonly string password;
 		private readonly Ideone_Service_v1Service service = new Ideone_Service_v1Service();
 
-		public ExecutionService(string userName = DefaultName, string password = DefaultPassword, int timeout = 2000)
+		public ExecutionService(string userName = DefaultName, string password = DefaultPassword, int timeout = 20000)
 		{
 			this.userName = userName;
 			this.password = password;
@@ -42,15 +43,18 @@ namespace uLearn.Web.Ideone
 		public async Task<GetSubmitionDetailsResult> Submit(string code, string input)
 		{
 			var link = CreateSubmition(code, input);
-			await Task.Delay(4000);
+			await Task.Delay(1000);
+			Debug.WriteLine("start checking status");
 			int count = 0;
 			while (GetSubmitionStatus(link).Status != SubmitionStatus.Done && count < 10)
 			{
+				Debug.WriteLine("nope. wait");
 				count++;
-				await Task.Delay(3000);
+				await Task.Delay(1000);
 			}
-			if (count >= 10)
+			if (count >= 20)
 				throw new Exception("Ideone service process execution too slow. Can't wait any more.");
+			Debug.WriteLine("requesting details");
 			return GetSubmitionDetails(link);
 		}
 

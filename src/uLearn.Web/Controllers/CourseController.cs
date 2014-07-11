@@ -1,9 +1,8 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using NUnit.Framework;
+using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Ideone;
 using uLearn.Web.Models;
@@ -13,7 +12,7 @@ namespace uLearn.Web.Controllers
 	public class CourseController : Controller
 	{
 		private readonly CourseManager courseManager;
-		private readonly ULearnDb db = new ULearnDb();
+		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 
 		public CourseController() : this(CourseManager.AllCourses)
 		{
@@ -40,30 +39,33 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> RunSolution(string courseId, int slideIndex = 0)
 		{
 			var code = GetUserCode(Request.InputStream);
-			Course course = courseManager.GetCourse(courseId);
-			var exerciseSlide = course.Slides[slideIndex] as ExerciseSlide;
-			if (exerciseSlide == null) return Json("not a exercise");
-			var solution = exerciseSlide.Solution.BuildSolution(code);
-			GetSubmitionDetailsResult submition = await new ExecutionService().Submit(solution, "");
-			var isRightAnswer = submition.Output.Trim().Equals(exerciseSlide.ExpectedOutput.Trim());
-//			ApplicationUser user = Request.IsAuthenticated ? User.
-//			db.UserSolutions.Add(new UserSolution
-//			{
-//				Code = code,
-//				CompilationError = submition.CompilationError,
-//				CourseId = courseId,
-//				SlideId = slideIndex.ToString(),
-//				IsCompilationError = !string.IsNullOrWhiteSpace(submition.CompilationError),
-//				IsRightAnswer = isRightAnswer,
-//				Output = submition.Output,
-//				Timestamp = DateTime.Now,
-////				User = db.Users.User.Identity.Name
-//			});
-			return Json(
-				new RunSolutionResult { 
-					ExecutionResult = submition, 
-					IsRightAnswer = isRightAnswer});
+			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
+			var result = await CheckSolution(exerciseSlide, code);
+			await SaveUserSolution(courseId, slideIndex, code, result.ExecutionResult, result.IsRightAnswer);
+			return Json(result);
 		}
+
+		private static async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code)
+		{
+			var solution = exerciseSlide.Solution.BuildSolution(code);
+			var submition = await new ExecutionService().Submit(solution, "");
+			var isRightAnswer = submition.Output.Trim().Equals(exerciseSlide.ExpectedOutput.Trim());
+			return new RunSolutionResult
+			{
+				ExecutionResult = submition,
+				IsRightAnswer = isRightAnswer
+			};
+		}
+
+		private async Task SaveUserSolution(string courseId, int slideIndex, string code, GetSubmitionDetailsResult submition,
+			bool isRightAnswer)
+		{
+			await solutionsRepo.AddUserSolution(
+				courseId, slideIndex, 
+				code, isRightAnswer, submition.CompilationError, submition.Output,
+				User.Identity.GetUserId());
+		}
+
 
 		private static string GetUserCode(Stream inputStream)
 		{

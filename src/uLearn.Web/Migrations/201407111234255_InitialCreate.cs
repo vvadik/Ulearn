@@ -70,31 +70,31 @@ namespace uLearn.Web.Migrations
                 "dbo.UserSolutions",
                 c => new
                     {
-                        SolutionId = c.Int(nullable: false, identity: true),
+                        Id = c.Int(nullable: false, identity: true),
                         CourseId = c.String(nullable: false, maxLength: 64),
                         SlideId = c.String(nullable: false, maxLength: 64),
+                        UserId = c.String(maxLength: 128),
                         Code = c.String(nullable: false, maxLength: 1024),
                         Timestamp = c.DateTime(nullable: false),
                         IsRightAnswer = c.Boolean(nullable: false),
                         IsCompilationError = c.Boolean(nullable: false),
-                        CompilationError = c.Boolean(nullable: false),
-                        Output = c.Boolean(nullable: false),
-                        User_Id = c.String(nullable: false, maxLength: 128),
+                        CompilationError = c.String(maxLength: 1024),
+                        Output = c.String(maxLength: 1024),
                     })
-                .PrimaryKey(t => t.SolutionId)
-                .ForeignKey("dbo.AspNetUsers", t => t.User_Id, cascadeDelete: true)
-                .Index(t => t.User_Id);
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.AspNetUsers", t => t.UserId)
+                .Index(t => t.UserId);
             
         }
         
         public override void Down()
         {
-            DropForeignKey("dbo.UserSolutions", "User_Id", "dbo.AspNetUsers");
+            DropForeignKey("dbo.UserSolutions", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.AspNetUserClaims", "User_Id", "dbo.AspNetUsers");
             DropForeignKey("dbo.AspNetUserRoles", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.AspNetUserRoles", "RoleId", "dbo.AspNetRoles");
             DropForeignKey("dbo.AspNetUserLogins", "UserId", "dbo.AspNetUsers");
-            DropIndex("dbo.UserSolutions", new[] { "User_Id" });
+            DropIndex("dbo.UserSolutions", new[] { "UserId" });
             DropIndex("dbo.AspNetUserClaims", new[] { "User_Id" });
             DropIndex("dbo.AspNetUserRoles", new[] { "UserId" });
             DropIndex("dbo.AspNetUserRoles", new[] { "RoleId" });

@@ -7,7 +7,7 @@ namespace uLearn.Web.Models
 	{
 		[Required]
 		[Key]
-		public int SolutionId { get; set; }
+		public int Id { get; set; }
 
 		[Required]
 		[StringLength(64)]
@@ -15,11 +15,12 @@ namespace uLearn.Web.Models
 
 		[Required]
 		[StringLength(64)]
+		public string SlideId { get; set; }
+
 		public virtual ApplicationUser User { get; set; }
 
-		[Required]
 		[StringLength(64)]
-		public string SlideId { get; set; }
+		public string UserId { get; set; }
 
 		[Required]
 		[StringLength(1024)]
@@ -34,11 +35,9 @@ namespace uLearn.Web.Models
 		[Required]
 		public bool IsCompilationError { get; set; }
 
-		[Required]
 		[StringLength(1024)]
 		public string CompilationError { get; set; }
 
-		[Required]
 		[StringLength(1024)]
 		public string Output { get; set; }
 	}

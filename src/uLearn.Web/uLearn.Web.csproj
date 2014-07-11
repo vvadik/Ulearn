@@ -182,32 +182,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\SlidesBarController.cs" />
-    <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S01-HelloWorld.cs" />
-    <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S02-Types.cs" />
-    <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S03-Conversion.cs" />
-    <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S04-Strings.cs" />
-    <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S05-ParseAndToString.cs" />
-    <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S07-Methods.cs" />
-    <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S08-Vision.cs" />
-    <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S09-DefaultValues.cs" />
-    <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S10-IntelliSense.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\01-SelectWhereToArray.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\02-ReadNumbersExcercise.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\03-ReadPointsExcercise.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\04-SelectMany.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\05-SelectManyExercise.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\06-CartesianProductExercise.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\07-SortAndDistinct.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\08-SortExercise.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\09-Tuple.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\10-SortTuplesExercise.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\11-Grouping.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\12-WordsFrequenciesExercise.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\13-Lookup.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\14-LookupExercise.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\15-AggregateFunctions.cs" />
-    <Compile Include="Courses\Linq\Initial-LINQ\16-AggregateExercise.cs" />
+    <Compile Include="DataContexts\UserSolutionsRepo_should.cs" />
+    <Compile Include="DataContexts\UserSolutionsRepo.cs" />
+    <Compile Include="Migrations\201407111234255_InitialCreate.cs" />
+    <Compile Include="Migrations\201407111234255_InitialCreate.Designer.cs">
+      <DependentUpon>201407111234255_InitialCreate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\CourseManager_should.cs" />
     <EmbeddedResource Include="Courses\**\*.*">
       <Visible>false</Visible>
@@ -241,10 +221,6 @@
     <Compile Include="Microsoft.Owin.Security.VK\VkAuthenticationHandler.cs" />
     <Compile Include="Microsoft.Owin.Security.VK\VkAuthenticationMiddleware.cs" />
     <Compile Include="Microsoft.Owin.Security.VK\VkAuthenticationOptions.cs" />
-    <Compile Include="Migrations\201407110620511_InitialCreate.cs" />
-    <Compile Include="Migrations\201407110620511_InitialCreate.Designer.cs">
-      <DependentUpon>201407110620511_InitialCreate.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CourseManager.cs" />
@@ -256,8 +232,8 @@
     <Compile Include="Ideone\ExecutionService.cs" />
     <Compile Include="Service References\Ideone_Service_v1Service.cs" />
     <Compile Include="Startup.cs" />
-    <EmbeddedResource Include="Migrations\201407110620511_InitialCreate.resx">
-      <DependentUpon>201407110620511_InitialCreate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201407111234255_InitialCreate.resx">
+      <DependentUpon>201407111234255_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -13,7 +13,7 @@ namespace uLearn.Web.Ideone
 		public void make_submition()
 		{
 			GetSubmitionDetailsResult res =
-				service.Submit(@"public class M{static void Main(){System.Console.WriteLine(42);}}", "")
+				service.Submit(@"public class M{static void Main(){System.Console.WriteLine(42)}}", "")
 					.Result;
 			Console.WriteLine(res.Error);
 			Console.WriteLine(res.Status);

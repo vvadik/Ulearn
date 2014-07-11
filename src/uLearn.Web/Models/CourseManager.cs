@@ -31,6 +31,13 @@ namespace uLearn.Web.Models
 			return course;
 		}
 
+		public ExerciseSlide GetExerciseSlide(string courseId, int slideIndex)
+		{
+			Course course = GetCourse(courseId);
+			return (ExerciseSlide)course.Slides[slideIndex];
+		}
+
+
 		private void AddCourse(string courseId, string courseTitle)
 		{
 			Courses.Add(LoadCourse(courseId, courseTitle));
