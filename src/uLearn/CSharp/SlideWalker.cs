@@ -20,7 +20,8 @@ namespace uLearn.CSharp
 
 		public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
 		{
-			var classDeclaration = base.VisitClassDeclaration(node);
+			var classDeclaration = ((ClassDeclarationSyntax)base.VisitClassDeclaration(node))
+				.WithAttributeLists(new SyntaxList<AttributeListSyntax>());
 			if (node.HasAttribute<TitleAttribute>())
 				Title = node.GetAttributes<TitleAttribute>().Select(a => a.GetArgument()).Single();
 			if (ShowOnSlide(node))
