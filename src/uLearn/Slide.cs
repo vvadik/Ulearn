@@ -6,6 +6,7 @@ namespace uLearn
 	public class Slide
 	{
 		public readonly SlideBlock[] Blocks;
+		public LocationSlideInfo Info = new LocationSlideInfo("", "", "","");
 
 		public Slide(IEnumerable<SlideBlock> blocks)
 		{
