@@ -42,14 +42,13 @@ function setRunVerdict($verdict, ans) {
 	}
 };
 
+var $actualOutput = $(".actual-output");
+var $expectedOutput = $(".expected-output");
+var $actualOutputContent = $(".actual-output-content");
+var $afterRunBlock = $(".after-run-block");
+var $runVerdict = $(".run-verdict");
+
 function updateVerdict(isRight, verdict, details, isCompileError) {
-	var $actualOutput = $(".actual-output");
-	var $expectedOutput = $(".expected-output");
-	var $actualOutputContent = $(".actual-output-content");
-	var $afterRunBlock = $(".after-run-block");
-	var $runVerdict = $(".run-verdict");
-
-
 	$runVerdict.show();
 	$runVerdict.text(verdict);
 	$runVerdict.toggleClass("label-danger", !isRight);
@@ -71,6 +70,9 @@ var $runButton = $("#run");
 $runButton.click(function () {
 	var code = $(".code-exercise")[0].codeMirrorEditor.getValue();
 	$runButton.text("...running...").addClass("active");
+	$afterRunBlock.hide();
+	$runVerdict.hide();
+
 	$.ajax(
 	{
 		type: "POST",
