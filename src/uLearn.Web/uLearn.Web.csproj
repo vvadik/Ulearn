@@ -188,7 +188,6 @@
     <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S03-Conversion.cs" />
     <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S04-Strings.cs" />
     <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S05-ParseAndToString.cs" />
-    <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S06-operations .cs" />
     <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S07-Methods.cs" />
     <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S08-Vision.cs" />
     <Compile Include="Courses\BasicProgramming\Unit1-Hello world\S09-DefaultValues.cs" />

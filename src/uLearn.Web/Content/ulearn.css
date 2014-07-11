@@ -116,3 +116,7 @@ a.nav-arrow:hover {
   -webkit-border-radius:            0px;
   -moz-border-radius:               0px;
 }
+
+.Unit li {
+    list-style-type: none;
+}

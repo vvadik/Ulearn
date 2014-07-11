@@ -5,7 +5,7 @@
 	foreach (var unit in Model.Course.Slides.GroupBy(z => z.Info.UnitName))
 	{
 		var currentUnit = unit.First().Info.UnitName;
-		<ul>
+	    <ul class="Unit">
 			<li style="font-weight: bold;"><p>@Html.ActionLink(currentUnit, "Slide", "Course", new { courseId = "BasicProgramming", slideIndex = 0 }, null)</p></li>
 			<ul>
 				@for (; index < Model.Course.Slides.Length; index++)

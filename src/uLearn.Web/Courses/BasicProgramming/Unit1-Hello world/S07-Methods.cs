@@ -2,6 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Title("Методы")]
 	public class S07_Methods
 	{
 		
