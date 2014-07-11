@@ -225,6 +225,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CourseManager.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
+    <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\RunSolutionResult.cs" />
     <Compile Include="Models\SlideViewModel.cs" />
     <Compile Include="Models\UserSolution.cs" />
