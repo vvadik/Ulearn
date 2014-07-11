@@ -1,0 +1,25 @@
+﻿@model uLearn.CoursePageModel
+<div style="width: 300px; height: 500px; overflow-y: scroll;">
+@{
+	int index = 0;
+	foreach (var unit in Model.Course.Slides.GroupBy(z => z.Info.UnitName))
+	{
+		var currentUnit = unit.First().Info.UnitName;
+		<ul>
+			<li style="font-weight: bold;"><p>@Html.ActionLink(currentUnit, "Slide", "Course", new { courseId = "BasicProgramming", slideIndex = 0 }, null)</p></li>
+			<ul>
+				@for (; index < Model.Course.Slides.Length; index++)
+				{
+					var inf = Model.Course.Slides[index];
+					if (inf.Info.UnitName != currentUnit)
+					{
+						break;
+					}
+					<li><p>@Html.ActionLink(inf.Title, "Slide", "Course", new { courseId = "BasicProgramming", slideIndex = index }, null)</p></li>
+				}
+			</ul>
+		</ul>
+	}
+}
+</div>
+
