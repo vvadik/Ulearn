@@ -22,13 +22,14 @@
 			@{ var slide = Model.Slide as ExerciseSlide; }
 			@if (slide != null)
 			{
-			    <textarea class='code code-exercise'>@slide.ExerciseInitialCode</textarea>
-				
-@*
-				<a href="#" onclick="updateVerdict(true, 'Успех!', 'some right answer', false)">OK</a>
-				<a href="#" onclick="updateVerdict(false, 'Compilation error', 'details', true)">CompilationError</a>
-				<a href="#" onclick="updateVerdict(false, 'Неверный ответ', 'Bullshit', false)">WrongAnswer</a>
-*@
+				<textarea class='code code-exercise'>@slide.ExerciseInitialCode</textarea>
+				<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine ™</a></div>
+
+				@*
+					<a href="#" onclick="updateVerdict(true, 'Успех!', 'some right answer', false)">OK</a>
+					<a href="#" onclick="updateVerdict(false, 'Compilation error', 'details', true)">CompilationError</a>
+					<a href="#" onclick="updateVerdict(false, 'Неверный ответ', 'Bullshit', false)">WrongAnswer</a>
+				*@
 
 				@Html.Partial("_ExerciseHints", slide.HintsHtml)
 
@@ -45,7 +46,6 @@
 					</div>
 				</div>
 			}
-
 		</div>
 
 	</div>

@@ -83,12 +83,13 @@ $runButton.click(function () {
 			: (ans.IsRightAnswer ? "Успех!" : "Неверный ответ");
 		var details = ans.ExecutionResult.CompilationError ? ans.ExecutionResult.CompilationError : ans.ExecutionResult.Output;
 		updateVerdict(ans.IsRightAnswer, verdict, details, isCompileError);
+		console.log(ans);
 	})
 	.fail(function (req) {
 		updateVerdict(false, "Ошибка сервера :(", req.status + " " + req.statusText);
-	})
+		console.log(req.responseText);
+		})
 	.always(function (ans) {
 		$runButton.text("RUN").removeClass("active");
-		console.log(ans);
 	});
 })
