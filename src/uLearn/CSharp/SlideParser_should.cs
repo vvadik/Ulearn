@@ -147,7 +147,7 @@ namespace uLearn.CSharp
 
 		private static Slide GenerateSlide(string name)
 		{
-			return SlideParser.ParseSlide(@".\tests\" + name);
+			return SlideParser.ParseSlide(@".\tests\" + name, null);
 		}
 	}
 }

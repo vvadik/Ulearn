@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
+using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -12,7 +13,7 @@ namespace uLearn.Web.Controllers
 	public class AccountController : Controller
 	{
 		public AccountController()
-			: this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext())))
+			: this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb())))
 		{
 		}
 

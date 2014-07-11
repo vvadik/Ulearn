@@ -193,6 +193,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="DataContexts\ULearnDb.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -214,20 +215,24 @@
     <Compile Include="Microsoft.Owin.Security.VK\VkAuthenticationHandler.cs" />
     <Compile Include="Microsoft.Owin.Security.VK\VkAuthenticationMiddleware.cs" />
     <Compile Include="Microsoft.Owin.Security.VK\VkAuthenticationOptions.cs" />
-    <Compile Include="Migrations\201405260543215_InitialCreate.cs" />
-    <Compile Include="Migrations\201405260543215_InitialCreate.Designer.cs">
-      <DependentUpon>201405260543215_InitialCreate.cs</DependentUpon>
+    <Compile Include="Migrations\201407110620511_InitialCreate.cs" />
+    <Compile Include="Migrations\201407110620511_InitialCreate.Designer.cs">
+      <DependentUpon>201407110620511_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CourseManager.cs" />
-    <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\ApplicationUser.cs" />
     <Compile Include="Models\RunSolutionResult.cs" />
     <Compile Include="Models\SlideViewModel.cs" />
+    <Compile Include="Models\UserSolution.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ideone\ExecutionService.cs" />
     <Compile Include="Service References\Ideone_Service_v1Service.cs" />
     <Compile Include="Startup.cs" />
+    <EmbeddedResource Include="Migrations\201407110620511_InitialCreate.resx">
+      <DependentUpon>201407110620511_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="codemirror\addon\comment\comment.js" />
@@ -572,9 +577,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Microsoft.Owin.Security.VK\Resources.resx" />
-    <EmbeddedResource Include="Migrations\201405260543215_InitialCreate.resx">
-      <DependentUpon>201405260543215_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\uLearn\uLearn.csproj">

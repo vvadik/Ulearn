@@ -2,7 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Title("Привет, мир")]
+	[Title("Привет, мир!")]
 	public class S01_HelloWorld
 	{
 	

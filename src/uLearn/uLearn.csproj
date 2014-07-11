@@ -74,7 +74,7 @@
     <Compile Include="ExerciseAttribute.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />
-    <Compile Include="LocationSlideInfo.cs" />
+    <Compile Include="SlideInfo.cs" />
     <Compile Include="Markdown_investigation.cs" />
     <Compile Include="Md.cs" />
     <Compile Include="ResourceLoader.cs" />

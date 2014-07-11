@@ -66,8 +66,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Slides\BlockName.txt" />
-    <Content Include="Slides\Unit1-Hello world\UnitName.txt" />
+    <Content Include="Slides\Title.txt" />
+    <Content Include="Slides\Unit1-Hello world\Title.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
