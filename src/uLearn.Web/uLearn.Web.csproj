@@ -182,7 +182,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Courses\**\*.cs">
+    <Compile Include="Models\CourseManager_should.cs" />
+    <EmbeddedResource Include="Courses\**\*.*">
       <Visible>false</Visible>
     </EmbeddedResource>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -615,7 +616,7 @@
   <PropertyGroup>
     <PreBuildEvent>rd /S /Q $(ProjectDir)\Courses
 mkdir $(ProjectDir)\Courses
-xcopy /Y /E $(SolutionDir)Courses\linq\Slides $(ProjectDir)\Courses\linq\
+xcopy /Y /E $(SolutionDir)Courses\Linq\Slides $(ProjectDir)\Courses\Linq\
 xcopy /Y /E $(SolutionDir)Courses\BasicProgramming\Slides $(ProjectDir)\Courses\BasicProgramming\</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
