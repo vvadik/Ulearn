@@ -13,6 +13,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
+		private readonly ExecutionService executionService = new ExecutionService();
 
 		public CourseController() : this(CourseManager.AllCourses)
 		{
@@ -45,11 +46,16 @@ namespace uLearn.Web.Controllers
 			return Json(result);
 		}
 
-		private static async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code)
+		private string NormalizeString(string s)
+		{
+			return s.LineEndingsToUnixStyle().Trim();
+		}
+
+		private async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code)
 		{
 			var solution = exerciseSlide.Solution.BuildSolution(code);
-			var submition = await new ExecutionService().Submit(solution, "");
-			var isRightAnswer = submition.Output.Trim().Equals(exerciseSlide.ExpectedOutput.Trim());
+			var submition = await executionService.Submit(solution, "");
+			var isRightAnswer = NormalizeString(submition.Output).Equals(NormalizeString(exerciseSlide.ExpectedOutput));
 			return new RunSolutionResult
 			{
 				ExecutionResult = submition,

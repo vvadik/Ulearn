@@ -18,6 +18,11 @@ namespace uLearn
 			return string.Join("\r\n", newLines);
 		}
 
+		public static string LineEndingsToUnixStyle(this string text)
+		{
+			return string.Join("\n", text.SplitToLines());
+		}
+
 		public static IEnumerable<string> RemoveCommonNesting(this string[] lines)
 		{
 			var nonEmptyLines = lines.Where(line => line.Trim().Length > 0).ToList();
