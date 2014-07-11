@@ -7,6 +7,7 @@ using NUnit.Framework.Constraints;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Title("Break")]
 	class S07_Break
 	{
 		/*
@@ -16,8 +17,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		После чего, вы опять же должны вызвать еще одну странную функцию MagicFunction от итоговой строки, после чего вернуть её
 		*/
 
-		[Hint("у каждого объекта в C# есть функция GetHashCode, которая однозначно определяет специальный код этого объета.\n" +
-		      "Это необходимо для сравнения объектов в некоторых случаях, о них вы узнаете позднее.")]
+		[Hint(@"у каждого объекта в C# есть функция GetHashCode, которая однозначно определяет специальный код этого объета.
+				Это необходимо для сравнения объектов в некоторых случаях, о них вы узнаете позднее.")]
 		[ExpectedOutput("43\r\n-42\r\n-53\r\nstartccccc\r\nkittyyyy\r\nC++++++")]
 		[ShowOnSlide]
 		public static void Main()

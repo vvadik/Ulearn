@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Title("Continue")]
 	class S08_Continue
 	{
 		/*

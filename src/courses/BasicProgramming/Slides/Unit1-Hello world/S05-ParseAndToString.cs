@@ -4,6 +4,7 @@ using System.Globalization;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Title("Парсинг")]
 	public class S05_ParseAndToString
 	{
 		/*

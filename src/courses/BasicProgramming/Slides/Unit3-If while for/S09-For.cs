@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Title("For")]
 	class S09_For
 	{
 		/*

@@ -3,6 +3,7 @@ using System.Text;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Title("Автокомплит")]
 	public class S10_IntelliSense
 	{
 		/*

@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[TestFixture]
+	[Title("if return")]
 	internal class S04_IfReturn
 	{
 		/*

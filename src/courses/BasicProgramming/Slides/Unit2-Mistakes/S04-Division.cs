@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Title("Деление на 0")]
 	class S04_Division
 	{
 		/*

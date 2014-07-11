@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Title("Ошибки в приведении типов")]
 	class S02_ErrorInTtypecasting
 	{
 		public static void Main()
@@ -15,7 +16,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 
 		private static double Magic(int i, int r)
 		{
-			double a;
 			throw new Exception();
 		}
 	}

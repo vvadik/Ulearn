@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[TestFixture]
+	[Title("Оператор условия")]
 	class S03_IfOperator
 	{
 		/*

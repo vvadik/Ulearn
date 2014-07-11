@@ -8,7 +8,7 @@ using uLearn;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[TestFixture]
+	[Title("Логические выражения")]
 	class S02_LogicalExpressions
 	{
 		/*
