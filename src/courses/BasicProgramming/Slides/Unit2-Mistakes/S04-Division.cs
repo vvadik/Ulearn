@@ -46,7 +46,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			}
 			var a = divident / divider;
 			Console.WriteLine(divident/divider);
-			/*uncoment
+			/*uncomment
 			...
 			*/
 		}

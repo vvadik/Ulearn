@@ -40,7 +40,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 					Console.Write(i * j + " ");
 				}
 			}
-			/*uncoment
+			/*uncomment
 			...
 			*/
 		}
