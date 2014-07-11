@@ -23,7 +23,8 @@ namespace uLearn.Web.Ideone
 		public string CreateSubmition(string code, string input)
 		{
 			object[] response = service.createSubmission(userName, password, code, 27, input, true, true);
-			return new CreateSubmitionResult(ParseResponse(response)).Link;
+			var createSubmitionResult = new CreateSubmitionResult(ParseResponse(response));
+			return createSubmitionResult.Link;
 		}
 
 		public GetSubmitionStatusResult GetSubmitionStatus(string link)

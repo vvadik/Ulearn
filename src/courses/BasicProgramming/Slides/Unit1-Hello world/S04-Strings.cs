@@ -6,7 +6,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	{
 		/*
 		##Задача: Две половинки одного целого
-		Нужно дописать код так, чтобы на экран выводилась вторая половина строки text.
+		TODO
 		*/
 
 		[Exercise]

@@ -74,6 +74,7 @@
     <Compile Include="ExerciseAttribute.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />
+    <Compile Include="SlideInfo.cs" />
     <Compile Include="Markdown_investigation.cs" />
     <Compile Include="Md.cs" />
     <Compile Include="ResourceLoader.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="tests\SingleComment.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="TitleAttribute.cs" />
     <Compile Include="Urls.cs" />
   </ItemGroup>
   <ItemGroup>

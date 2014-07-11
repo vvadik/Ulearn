@@ -16,10 +16,13 @@ namespace uLearn.CSharp
 		public string ExpectedOutput { get; private set; }
 		public readonly List<string> Hints = new List<string>();
 		public MethodDeclarationSyntax ExerciseNode;
+		public string Title;
 
 		public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
 		{
 			var classDeclaration = base.VisitClassDeclaration(node);
+			if (node.HasAttribute<TitleAttribute>())
+				Title = node.GetAttributes<TitleAttribute>().Select(a => a.GetArgument()).Single();
 			if (ShowOnSlide(node))
 				AddCodeBlock(node);
 			return classDeclaration;

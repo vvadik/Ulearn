@@ -1,22 +1,31 @@
-using System.Data.Entity.Migrations;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using uLearn.Web.Models;
-
 namespace uLearn.Web.Migrations
 {
-	internal sealed class Configuration : DbMigrationsConfiguration<ApplicationDbContext>
-	{
-		public Configuration()
-		{
-			AutomaticMigrationsEnabled = false;
-			ContextKey = "uLearn.Web.Models.ApplicationDbContext";
-		}
+    using System;
+    using System.Data.Entity;
+    using System.Data.Entity.Migrations;
+    using System.Linq;
 
-		protected override void Seed(ApplicationDbContext context)
-		{
-			var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
-			userManager.Create(new ApplicationUser {UserName = "ad"}, "asdqwe");
-		}
-	}
+    internal sealed class Configuration : DbMigrationsConfiguration<uLearn.Web.DataContexts.ULearnDb>
+    {
+        public Configuration()
+        {
+            AutomaticMigrationsEnabled = false;
+        }
+
+        protected override void Seed(uLearn.Web.DataContexts.ULearnDb context)
+        {
+            //  This method will be called after migrating to the latest version.
+
+            //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
+            //  to avoid creating duplicate seed data. E.g.
+            //
+            //    context.People.AddOrUpdate(
+            //      p => p.FullName,
+            //      new Person { FullName = "Andrew Peters" },
+            //      new Person { FullName = "Brice Lambson" },
+            //      new Person { FullName = "Rowan Miller" }
+            //    );
+
+        }
+    }
 }

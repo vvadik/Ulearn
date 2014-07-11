@@ -10,9 +10,8 @@ namespace uLearn
 		public SolutionForTesting Solution { get; private set; }
 		public string[] HintsHtml { get; private set; }
 
-		public ExerciseSlide(IEnumerable<SlideBlock> blocks, string exerciseInitialCode, string expectedOutput,
-			IEnumerable<string> hints, SolutionForTesting solution)
-			: base(blocks)
+		public ExerciseSlide(IEnumerable<SlideBlock> blocks, string exerciseInitialCode, string expectedOutput, IEnumerable<string> hints, SolutionForTesting solution, SlideInfo slideInfo, string title)
+			: base(blocks, slideInfo, title)
 		{
 			ExerciseInitialCode = exerciseInitialCode;
 			ExpectedOutput = expectedOutput;
