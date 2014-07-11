@@ -2,6 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Title("Строки")]
 	class S04_Strings
 	{
 		/*

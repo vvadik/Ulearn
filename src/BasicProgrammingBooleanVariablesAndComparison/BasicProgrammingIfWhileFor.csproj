@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{83A81211-A139-4A37-92A0-716809232F08}</ProjectGuid>
+    <ProjectGuid>{B03DEDC0-559E-4152-8CF6-6F08C1F80C92}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>uLearn.Courses.BasicProgramming.Slides</RootNamespace>
-    <AssemblyName>Lection1 - Hello World</AssemblyName>
+    <RootNamespace>BasicProgrammingBooleanVariablesAndComparison</RootNamespace>
+    <AssemblyName>BasicProgrammingBooleanVariablesAndComparison</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,8 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework">
-      <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -42,48 +43,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S01-HelloWorld.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S02-Types.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S03-Conversion.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S04-Strings.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S05-ParseAndToString.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S06-Operations.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S07-Methods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S08-Vision.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S09-DefaultValues.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S10-IntelliSense.cs" />
-    <Compile Include="Slides\Unit2-Mistakes\S01-MissedUsings.cs" />
-    <Compile Include="Slides\Unit2-Mistakes\S02-ErrorInTtypecasting.cs" />
-    <Compile Include="Slides\Unit2-Mistakes\S03-Typo.cs" />
-    <Compile Include="Slides\Unit2-Mistakes\S04-Division.cs" />
-    <Compile Include="Slides\Unit3-If while for\S01-BooleanVariablesAndComparison.cs" />
-    <Compile Include="Slides\Unit3-If while for\S02-LogicalExpressions.cs" />
-    <Compile Include="Slides\Unit3-If while for\S03-IfOperator.cs" />
-    <Compile Include="Slides\Unit3-If while for\S04-IfReturn.cs" />
-    <Compile Include="Slides\Unit3-If while for\S05-ExcessIf.cs" />
-    <Compile Include="Slides\Unit3-If while for\S06-While.cs" />
-    <Compile Include="Slides\Unit3-If while for\S07-Break.cs" />
-    <Compile Include="Slides\Unit3-If while for\S08-Continue.cs" />
-    <Compile Include="Slides\Unit3-If while for\S09-For.cs" />
-    <Compile Include="Slides\Unit3-If while for\S10-KtulhuFor.cs" />
+    <Compile Include="Slides\S05-ExcessIf.cs" />
+    <Compile Include="Slides\S01-BooleanVariablesAndComparison.cs" />
+    <Compile Include="Slides\S02-LogicalExpressions.cs" />
+    <Compile Include="Slides\S03-IfOperator.cs" />
+    <Compile Include="Slides\S04-IfReturn.cs" />
+    <Compile Include="Slides\S06-While.cs" />
+    <Compile Include="Slides\S07-Break.cs" />
+    <Compile Include="Slides\S08-Continue.cs" />
+    <Compile Include="Slides\S09-For.cs" />
+    <Compile Include="Slides\S10-KtulhuFor.cs" />
     <Compile Include="Slides_Tests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\uLearn\uLearn.csproj">
+    <ProjectReference Include="..\uLearn\uLearn.csproj">
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
       <Name>uLearn</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Slides\Title.txt" />
-    <Content Include="Slides\Unit1-Hello world\Title.txt" />
-    <Content Include="Slides\Unit2-Mistakes\Title.txt" />
-    <Content Include="Slides\Unit3-If while for\Title.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
