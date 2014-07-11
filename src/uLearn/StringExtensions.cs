@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -22,6 +23,13 @@ namespace uLearn
 		{
 			return string.Join("\n", text.SplitToLines());
 		}
+
+		public static string EnsureEnoughLines(this string text, int minLinesCount)
+		{
+			var lines = text.SplitToLines();
+			return string.Join("\n", lines.Concat(Enumerable.Repeat("", Math.Max(0, minLinesCount - lines.Length))));
+		}
+
 
 		public static IEnumerable<string> RemoveCommonNesting(this string[] lines)
 		{

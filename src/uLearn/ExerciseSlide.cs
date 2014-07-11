@@ -13,7 +13,7 @@ namespace uLearn
 		public ExerciseSlide(IEnumerable<SlideBlock> blocks, string exerciseInitialCode, string expectedOutput, IEnumerable<string> hints, SolutionForTesting solution, SlideInfo slideInfo, string title)
 			: base(blocks, slideInfo, title)
 		{
-			ExerciseInitialCode = exerciseInitialCode;
+			ExerciseInitialCode = exerciseInitialCode ?? "";
 			ExpectedOutput = expectedOutput;
 			Solution = solution;
 			HintsHtml = hints.Select(Md.ToHtml).ToArray();
