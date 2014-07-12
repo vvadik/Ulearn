@@ -6,7 +6,8 @@ namespace uLearn.Courses.BasicProgramming.Slidess
 	class S01_BooleanVariablesAndComparison
 	{
 		/*
-		##Задача: Логические выражения и мечты.
+		##Задача: Логические выражения и мечты
+		
 		К сожалению, вы попали не в хогвартс. Но и в мире информатики полно магии.
 		Например, некоторые программисты, как например Вася, пишут магические функции. А потом не могут сделать так, чтобы они давали нужный результат.
 		Вам же осталось лишь подобрать переменные a, b, c, d с помощью нереализованных функций так, чтобы магическия функция Magic выдавала желаемый результат.
@@ -20,39 +21,27 @@ namespace uLearn.Courses.BasicProgramming.Slidess
 			var b = SecondNumber();
 			var c = MagicString();
 			var d = MagicBoolean();
-			Magic(a, b, c, d);
+			Magic(a, b, c, d);//So how to get values False, True, False?!
 		}
 
 		private static string MagicString()
 		{
 			return "true";
-			/*uncomment
-			return ...
-			*/
 		}
 
 		private static int SecondNumber()
 		{
 			return 4;
-			/*uncomment
-			return ...
-			*/
 		}
 
 		private static bool MagicBoolean()
 		{
 			return false;
-			/*uncomment
-			return ...
-			*/
 		}
 
 		private static int FirstNumber()
 		{
 			return 2;
-			/*uncomment
-			return ...
-			*/
 		}
 
 		[ShowOnSlide]

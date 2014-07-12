@@ -4,11 +4,12 @@ using System.Globalization;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Title("Парсинг")]
+	[Title("Parse и ToString")]
 	public class S05_ParseAndToString
 	{
 		/*
 		##Задача: Парсинг
+		
 		Гейтс написал код и не может найти ошибку :( 
 		Помогите ему!
 		*/

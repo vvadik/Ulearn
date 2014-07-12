@@ -24,7 +24,7 @@ namespace uLearn.Web.Controllers
 			this.courseManager = courseManager;
 		}
 		
-		[Authorize]
+		//[Authorize]
 		public ActionResult Slide(string courseId, int slideIndex = 0)
 		{
 			Course course = courseManager.GetCourse(courseId);
@@ -38,7 +38,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize]
+		//[Authorize]
 		public async Task<ActionResult> RunSolution(string courseId, int slideIndex = 0)
 		{
 			var code = GetUserCode(Request.InputStream);

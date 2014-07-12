@@ -13,33 +13,34 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	{
 		/*
 		##Задача: Continue - На лугу, на лугу, на лугу пасутся ко...
-		Представьте, что вы коровка, и пасетесь на лугу. Несомненно, вы будете кушать только самую вкусную травку, а когда наедитесь, то пойдете домой.
-		Напишите себе алгоритм, как вы будете кушать травку :) Каждая травинка имеет свой порядковый номер. Необходимо пользоваться такими правилами: 
+		Вы попали на ферму, и вас просят написать код для распределительной машины. Она распределяет коров по стойлам. У каждой коровки есть свой собственный порядковый номер, 
+		и ходят коровки строем, соответственно их номерам. Все они поочереди проходят через распределительный автомат, и каких-то коров отправляют в новые стойла, а каких-то в старые.
+		Вам необходимо реализовать этот алгоритм, вот что необходимо сделать:
 		
-		 * Перебрать все числа от 0 до переданного значения maxCount включительно - это порядковые номера травинок.
-		 * Если фильтр Filter от значения number выдает true, значит травка с этим номером невкусная, и её есть не надо.
-		 * Если показатель сытости Satiety >= 100, следовательно вы уже наелись и надо уйти домой.
-		 * Чтобы съесть травку - нужно использовать функцию EatGrass от number, где number - номер текущей травки
-		 * Если необходимо уйти домой, или травка кончилась (достигли значения maxCount), просто выведите текущее значение Satiety и выйдите из функции
+		 * Перебрать все числа от 0 до переданного значения maxCount включительно - это порядковые номера коров.
+		 * Если фильтр Filter от значения number выдает true, значит коровка под номером number достойна пойти в новое стойло.
+		 * Если показатель наполненности нового стойла Fullness >= 100, то все остальные коровки идут в старое стойло.
+		 * Чтобы поместить корову в новое стойло, необходимо вызвать функцию Distribute. Если в старое - ничего не делать, коровка сама найдет дорогу. Distribute автоматически увеличит показатель наполненности.
+		 * Если кончились коровы, или кончились места, просто выведите текущее значение Fullness и выйдите из функции.
 		*/
 
-		public static int Satiety = 0;
+		public static int Fullness = 0;
 
 		
 		[ShowOnSlide]
-		[ExpectedOutput("15\r\n100\r\n57")]
+		[ExpectedOutput("42\r\n112\r\n68")]
 		public static void Main()
 		{
-			Eating(10);
-			Satiety = 0;
-			Eating(25);
-			Satiety = 0;
-			Eating(19);
-			Satiety = 0;
+			Distribute(10);
+			Fullness = 0;
+			Distribute(25);
+			Fullness = 0;
+			Distribute(13);
+			Fullness = 0;
 		}
 
 		[Exercise]
-		public static void Eating(int maxCount)
+		public static void Distribute(int maxCount)
 		{
 			int number = 0;
 			while (number < maxCount)
@@ -49,12 +50,12 @@ namespace uLearn.Courses.BasicProgramming.Slides
 					number++;
 					continue;
 				}
-				if (Satiety >= 100)
+				if (Fullness >= 100)
 					break;
 				EatGrass(number);
 				number++;
 			}
-			Console.WriteLine(Satiety);
+			Console.WriteLine(Fullness);
 			/*uncomment
 			...
 			*/
@@ -63,7 +64,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		[ShowOnSlide]
 		private static void EatGrass(int number)
 		{
-			Satiety += Math.Abs(number.GetHashCode())%30;
+			Fullness += ((number*397*13)%199)%30;
 		}
 
 		[ShowOnSlide]

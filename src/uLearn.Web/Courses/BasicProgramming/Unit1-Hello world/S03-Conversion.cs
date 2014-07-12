@@ -7,12 +7,14 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	{
 		/*
 		##Задача: Конверсия типов
+		
 		Один тип данных может быть конвертирован в другой, если не произойдет потери данных.
 		Выведите на экран в отдельных строках:
 
 		 * первое число - округлённое по математическим правилам,
-		 * второе число - приведенное к целочисленному типу,
-		 * очистите код от опасных действий
+		 * второе число - приведенное к целочисленному типу
+		
+		очистите код от опасных действий
 		*/
 
 		[Exercise]
@@ -21,17 +23,13 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		{
 			double first = 13.59;
 			double second = 5.20;
-//			long third = 99999999999999999;
 			Console.WriteLine(Math.Round(first));
 			Console.WriteLine((int) second);
 			/*uncomment
-			checked
-			{
-				double first = 13.59;
-				double second = 5.20;
-				long third = 99999999999999999;
-				int integerNumber = (int)third;
-			}
+			double first = 13.59;
+			double second = 5.20;
+			long third = 99999999999999999;
+			int integerNumber = (int)third;
 			*/
 		}
 	}
