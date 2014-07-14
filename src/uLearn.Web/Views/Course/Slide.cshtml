@@ -22,12 +22,6 @@
 				
             }
 
-            @{ var slide = Model.Slide as ExerciseSlide; }
-            @if (slide != null)
-            {
-                <textarea class='code code-exercise'>@slide.ExerciseInitialCode</textarea>
-
-<<<<<<< ours
 			@{ var slide = Model.Slide as ExerciseSlide; }
 			@if (slide != null)
 			{
@@ -55,31 +49,7 @@
 					</div>
 				</div>
 			}
-		</div>
-=======
-				
-				<a href="#" onclick="updateVerdict(true, 'Успех!', 'some right answer', false)">OK</a>
-				<a href="#" onclick="updateVerdict(false, 'Compilation error', 'details', true)">CompilationError</a>
-				<a href="#" onclick="updateVerdict(false, 'Неверный ответ', 'Bullshit', false)">WrongAnswer</a>
-				
->>>>>>> theirs
-
-                @Html.Partial("_ExerciseHints", slide.HintsHtml)
-                <div class="run-verdict clearfix"></div>
-                <div class="after-run-block">
-                    <div class="actual-output">
-                        <div class="output-label">Вывод вашей программы:</div>
-                        <pre class="no-rounds"><code class="actual-output-content"></code></pre>
-                    </div>
-                    <div class="expected-output">
-                        <div class="output-label">Правильный вывод:</div>
-                        <pre class="no-rounds"><code class="expected-output-content">@slide.ExpectedOutput</code></pre>
-                    </div>
-
-                </div>
-			<button type="button" id="run" class="run-solution-button btn btn-primary btn-lg no-rounds">RUN</button>
-            }
-                @Html.Partial("_SlideNavigation", Model);
+        @Html.Partial("_SlideNavigation", Model);
         </div>
     </div>
 </div>

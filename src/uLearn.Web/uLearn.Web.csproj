@@ -514,10 +514,6 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\ulearn.css" />
-    <Content Include="Courses\BasicProgramming\Title.txt" />
-    <Content Include="Courses\BasicProgramming\Unit1-Hello world\Title.txt" />
-    <Content Include="Courses\Linq\Initial-LINQ\Title.txt" />
-    <Content Include="Courses\Linq\Title.txt" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -575,6 +571,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Courses\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
