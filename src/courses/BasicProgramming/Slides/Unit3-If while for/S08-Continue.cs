@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
@@ -13,6 +7,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	{
 		/*
 		##Задача: Continue - На лугу, на лугу, на лугу пасутся ко...
+		
 		Вы попали на ферму, и вас просят написать код для распределительной машины. Она распределяет коров по стойлам. У каждой коровки есть свой собственный порядковый номер, 
 		и ходят коровки строем, соответственно их номерам. Все они поочереди проходят через распределительный автомат, и каких-то коров отправляют в новые стойла, а каких-то в старые.
 		Вам необходимо реализовать этот алгоритм, вот что необходимо сделать:

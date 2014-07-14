@@ -115,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />
+    <Content Include="Slides\Initial-LINQ\Usings.txt" />
     <Content Include="Slides\Title.txt" />
     <Content Include="Slides\Initial-LINQ\Title.txt" />
   </ItemGroup>

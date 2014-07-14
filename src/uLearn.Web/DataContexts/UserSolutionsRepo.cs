@@ -46,5 +46,10 @@ namespace uLearn.Web.DataContexts
 			db.UserSolutions.Remove(userSolution);
 			db.SaveChanges();
 		}
+
+		public IEnumerable<string> GetAllAcceptedSolutions(int slideIndex)
+		{
+			return db.UserSolutions.Where(x => x.IsRightAnswer && x.SlideId == slideIndex.ToString()).Select(x => x.Code);
+		}
 	}
 }

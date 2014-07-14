@@ -184,6 +184,7 @@
   <ItemGroup>
     <Compile Include="DataContexts\UserSolutionsRepo_should.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo.cs" />
+    <Compile Include="Ideone\ExecutionServise.Credentials.cs" />
     <Compile Include="Migrations\201407111234255_InitialCreate.cs" />
     <Compile Include="Migrations\201407111234255_InitialCreate.Designer.cs">
       <DependentUpon>201407111234255_InitialCreate.cs</DependentUpon>
@@ -204,7 +205,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Ideone\CreateSubmitionResult.cs" />
-    <Compile Include="Ideone\ExecutionService.Credentials.cs" />
     <Compile Include="Ideone\ExecutionService_should.cs" />
     <Compile Include="Ideone\GetSubmitionDetailsResult.cs" />
     <Compile Include="Ideone\GetSubmitionStatusResult.cs" />

@@ -25,7 +25,7 @@
 			@{ var slide = Model.Slide as ExerciseSlide; }
 			@if (slide != null)
 			{
-				<textarea class='code code-exercise'>@slide.ExerciseInitialCode.EnsureEnoughLines(10)</textarea>
+			    <textarea class='code code-exercise'>@slide.ExerciseInitialCode.EnsureEnoughLines(10)</textarea>
 				<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine ™</a></div>
 
 				@*
@@ -43,10 +43,10 @@
 						<div class="output-label">Вывод вашей программы:</div>
 						<pre class="no-rounds"><code class="actual-output-content"></code></pre>
 					</div>
-					<div class="expected-output">
-						<div class="output-label">Правильный вывод:</div>
-						<pre class="no-rounds"><code class="expected-output-content">@slide.ExpectedOutput</code></pre>
-					</div>
+				    <div class="expected-output">
+				        <div class="output-label">Правильный вывод:</div>
+				        <pre class="no-rounds"><code class="expected-output-content">@slide.ExpectedOutput</code></pre>
+				    </div>
 				</div>
 			}
         @Html.Partial("_SlideNavigation", Model);
