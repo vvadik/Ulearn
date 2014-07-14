@@ -125,3 +125,27 @@ a.nav-arrow:hover {
 .Unit li {
     list-style-type: none;
 }
+
+.Unit li.selected {
+    background-color: aliceblue;   
+
+}
+
+.side-bar {
+    width: 300px; 
+    height: 500px; 
+    float: left; 
+    margin: 30px 0 0 0;
+}
+
+li.unit-name {
+    font-weight: bold;
+}
+
+.unit-name ul {
+    font-weight: normal;
+}
+
+.slide-container {
+    margin-left: 300px;
+}

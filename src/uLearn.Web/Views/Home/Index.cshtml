@@ -1,25 +1,26 @@
 ﻿@{
 	ViewBag.Title = "Учебные курсы";
 }
-
-<div class="jumbotron">
-	<h1>uLearn</h1>
-	<p class="lead">Интерактивные онлайн учебные курсы по программированию</p>
-</div>
-
-<div class="row">
-	<div class="col-md-6">
-		<h2>Основы программирования на C#</h2>
-		<p>
-			14 недель. тра-ля-ля. На основе материала... Требуемые знания, содержание курса, для кого и зачем.
-		</p>
-		<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "BasicProgramming" }, null)</p>
+<div class="container body-content">
+	<div class="jumbotron">
+		<h1>uLearn</h1>
+		<p class="lead">Интерактивные онлайн учебные курсы по программированию</p>
 	</div>
-	<div class="col-md-6">
-		<h2>Практикум по LINQ</h2>
-		<p>
-			Множество практических примеров использования Linq запросов. Бла-бла-бла.
-		</p>
-		<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "Linq" }, null)</p>
+
+	<div class="row">
+		<div class="col-md-6">
+			<h2>Основы программирования на C#</h2>
+			<p>
+				14 недель. тра-ля-ля. На основе материала... Требуемые знания, содержание курса, для кого и зачем.
+			</p>
+			<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "BasicProgramming" }, null)</p>
+		</div>
+		<div class="col-md-6">
+			<h2>Практикум по LINQ</h2>
+			<p>
+				Множество практических примеров использования Linq запросов. Бла-бла-бла.
+			</p>
+			<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "Linq" }, null)</p>
+		</div>
 	</div>
 </div>
