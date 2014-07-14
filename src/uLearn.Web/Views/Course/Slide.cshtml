@@ -1,65 +1,67 @@
 ﻿@using uLearn
-@model CoursePageModel
-
-@{
-	ViewBag.Title = Model.Course.Title;
-}
-@Html.Partial("_Sidebar", Model)
+  @model CoursePageModel
+  
+  @{
+      ViewBag.Title = Model.Course.Title;
+  }
+ @Html.Partial("_Sidebar", Model)
 <div class="slide-container">
-<div class="container body-content" >
-    <div class="row" >
-        <div class='slide'>
-            @foreach (SlideBlock block in Model.Slide.Blocks)
-            {
-                if (block.IsCode)
+    <div class="container body-content" >
+        <div class="row" >
+            <div class='slide'>
+                @foreach (SlideBlock block in Model.Slide.Blocks)
                 {
-                    <textarea class='code code-sample'>@block.Text</textarea>
+                    if (block.IsCode)
+                    {
+                        <textarea class='code code-sample'>@block.Text</textarea>
+                    }
+                    else
+                    {
+                        @Html.Raw(block.RenderedText)
+                    }
+ 				
                 }
-                else
+                @{ var slide = Model.Slide as ExerciseSlide; }
+                @if (slide != null)
                 {
-                    @Html.Raw(block.RenderedText)
+                    <textarea class='code code-exercise'>@slide.ExerciseInitialCode.EnsureEnoughLines(10)</textarea>
+                    <div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine ™</a></div>
+
+				  @*
+  					<a href="#" onclick="updateVerdict(true, 'Успех!', 'some right answer', false)">OK</a>
+  					<a href="#" onclick="updateVerdict(false, 'Compilation error', 'details', true)">CompilationError</a>
+  					<a href="#" onclick="updateVerdict(false, 'Неверный ответ', 'Bullshit', false)">WrongAnswer</a>
+  				*@
+
+                    @Html.Partial("_ExerciseHints", slide.HintsHtml)
+
+                    <button type="button" id="run" class="run-solution-button btn btn-primary btn-lg no-rounds">RUN</button>
+                    <div class="run-verdict clearfix"></div>
+                    <div class="after-run-block">
+                        <div class="actual-output">
+                            <div class="output-label">Вывод вашей программы:</div>
+                            <pre class="no-rounds"><code class="actual-output-content"></code></pre>
+                        </div>
+                        <div class="expected-output">
+                            <div class="output-label">Правильный вывод:</div>
+                            <pre class="no-rounds"><code class="expected-output-content">@slide.ExpectedOutput</code></pre>
+                        </div>
+                    </div>
                 }
-				
-            }
+            </div>
+  
 
-			@{ var slide = Model.Slide as ExerciseSlide; }
-			@if (slide != null)
-			{
-			    <textarea class='code code-exercise'>@slide.ExerciseInitialCode.EnsureEnoughLines(10)</textarea>
-				<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine ™</a></div>
-
-				@*
-					<a href="#" onclick="updateVerdict(true, 'Успех!', 'some right answer', false)">OK</a>
-					<a href="#" onclick="updateVerdict(false, 'Compilation error', 'details', true)">CompilationError</a>
-					<a href="#" onclick="updateVerdict(false, 'Неверный ответ', 'Bullshit', false)">WrongAnswer</a>
-				*@
-
-				@Html.Partial("_ExerciseHints", slide.HintsHtml)
-
-				<button type="button" id="run" class="run-solution-button btn btn-primary btn-lg no-rounds">RUN</button>
-				<div class="run-verdict clearfix"></div>
-				<div class="after-run-block">
-					<div class="actual-output">
-						<div class="output-label">Вывод вашей программы:</div>
-						<pre class="no-rounds"><code class="actual-output-content"></code></pre>
-					</div>
-				    <div class="expected-output">
-				        <div class="output-label">Правильный вывод:</div>
-				        <pre class="no-rounds"><code class="expected-output-content">@slide.ExpectedOutput</code></pre>
-				    </div>
-				</div>
-			}
-        @Html.Partial("_SlideNavigation", Model);
+            
+            @Html.Partial("_SlideNavigation", Model);
         </div>
     </div>
 </div>
-</div>
-@section scripts{
-	<script src="~/Scripts/navigate.js"></script>
-	<script src="~/Scripts/slide.js"></script>
-	<script>
-		var runSolutionUrl = "@Html.Raw(Url.Action("RunSolution", new{courseId=Model.Course.Id, slideIndex=Model.SlideIndex}))";
-		console.log(runSolutionUrl);
-	</script>
-
-}
+  @section scripts{
+      <script src="~/Scripts/navigate.js"></script>
+      <script src="~/Scripts/slide.js"></script>
+      <script>
+          var runSolutionUrl = "@Html.Raw(Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex}))";
+          console.log(runSolutionUrl);
+      </script>
+  
+  }
