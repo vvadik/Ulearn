@@ -10,7 +10,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		
 		Нужно сделать так, чтобы код писал на экран вторую половину строки text.
 		*/
-
 		[Exercise]
 		[ExpectedOutput("CSharp!")]
 		static public void Main()

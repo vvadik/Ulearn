@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using uLearn.Web.Ideone;
 
 namespace uLearn.Web.Models
@@ -6,5 +7,6 @@ namespace uLearn.Web.Models
 	{
 		public GetSubmitionDetailsResult ExecutionResult;
 		public bool IsRightAnswer;
+		public IEnumerable<string> AllAcceptedSolutions { get; set; }
 	}
 }

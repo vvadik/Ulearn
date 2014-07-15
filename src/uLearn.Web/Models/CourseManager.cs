@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -58,8 +59,16 @@ namespace uLearn.Web.Models
 		private static Slide LoadSlide(ResourceFile slideFile, IList<ResourceFile> resourceFiles)
 		{
 			var sourceCode = Encoding.UTF8.GetString(slideFile.GetContent());
+			//var tmp = fileWithUsings.GetContent();
+			var usings = GetUsings(slideFile, resourceFiles); 
 			var info = GetInfoForSlide(slideFile, resourceFiles);
-			return SlideParser.ParseCode(sourceCode, info);
+			return SlideParser.ParseCode(sourceCode, info, usings);
+		}
+
+		private static string GetUsings(ResourceFile file, IList<ResourceFile> all)
+		{
+			var detailedPath = file.FullName.Split('.').ToArray();
+			return Encoding.UTF8.GetString(all.Single(x => x.FullName.EndsWith(detailedPath[detailedPath.Length - 3] + ".Usings.txt")).GetContent());
 		}
 
 		private static SlideInfo GetInfoForSlide(ResourceFile file, IList<ResourceFile> all)

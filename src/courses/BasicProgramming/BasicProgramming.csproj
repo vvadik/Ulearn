@@ -82,8 +82,11 @@
   <ItemGroup>
     <Content Include="Slides\Title.txt" />
     <Content Include="Slides\Unit1-Hello world\Title.txt" />
+    <Content Include="Slides\Unit1-Hello world\Usings.txt" />
     <Content Include="Slides\Unit2-Mistakes\Title.txt" />
+    <Content Include="Slides\Unit2-Mistakes\Usings.txt" />
     <Content Include="Slides\Unit3-If while for\Title.txt" />
+    <Content Include="Slides\Unit3-If while for\Usings.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

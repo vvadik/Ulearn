@@ -43,7 +43,7 @@ namespace uLearn.Web.Controllers
 		{
 			var code = GetUserCode(Request.InputStream);
 			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
-			var result = await CheckSolution(exerciseSlide, code);
+			var result = await CheckSolution(exerciseSlide, code, slideIndex);
 			await SaveUserSolution(courseId, slideIndex, code, result.ExecutionResult, result.IsRightAnswer);
 			return Json(result);
 		}
@@ -53,15 +53,17 @@ namespace uLearn.Web.Controllers
 			return s.LineEndingsToUnixStyle().Trim();
 		}
 
-		private async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code)
+		private async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code, int slideIndex)
 		{
 			var solution = exerciseSlide.Solution.BuildSolution(code);
 			var submition = await executionService.Submit(solution, "");
 			var isRightAnswer = NormalizeString(submition.Output).Equals(NormalizeString(exerciseSlide.ExpectedOutput));
+			var acceptedUsersSolutions = solutionsRepo.GetAllAcceptedSolutions(slideIndex);
 			return new RunSolutionResult
 			{
 				ExecutionResult = submition,
-				IsRightAnswer = isRightAnswer
+				IsRightAnswer = isRightAnswer,
+				AllAcceptedSolutions = acceptedUsersSolutions
 			};
 		}
 
