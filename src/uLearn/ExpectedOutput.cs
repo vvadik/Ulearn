@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
 
 namespace uLearn
 {
+	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
 	public class ExpectedOutputAttribute : Attribute
 	{
-		public ExpectedOutputAttribute(string s)
+		public ExpectedOutputAttribute(string expectedOutput)
 		{
-			Output = s;
+			Output = expectedOutput;
 		}
 
 		public string Output { get; private set; }

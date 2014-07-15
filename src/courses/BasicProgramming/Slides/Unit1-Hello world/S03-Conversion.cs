@@ -7,29 +7,27 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	{
 		/*
 		##Задача: Конверсия типов
-		
-		Один тип данных может быть конвертирован в другой, если не произойдет потери данных.
-		Выведите на экран в отдельных строках:
 
-		 * первое число - округлённое по математическим правилам,
-		 * второе число - приведенное к целочисленному типу
+		Вася регулярно получает за красивые глазки от кого-нибудь по ```amount``` [биткоинов](http://ru.wikipedia.org/wiki/Bitcoin).
 		
-		очистите код от опасных действий
+		Вася хочет знать сколько биткоинов у него уже накопилось. А чтобы не мелочиться, хочет округлить сумму до ближайшего целого.
+		
+		Он написал для этого программу, но что-то с ней не так... Помогите ему исправить все ошибки.
 		*/
 
 		[Exercise]
-		[ExpectedOutput("14\r\n5")]
+		[ExpectedOutput("67")]
 		public static void Main()
 		{
-			double first = 13.59;
-			double second = 5.20;
-			Console.WriteLine(Math.Round(first));
-			Console.WriteLine((int) second);
+			double amount = 1.11;
+			int peopleCount = 60; // количество человек, которые подарили Васе amount биткоинов каждый.
+			double totalMoney = Math.Round(amount*peopleCount);
+			Console.WriteLine(totalMoney);
 			/*uncomment
-			double first = 13.59;
-			double second = 5.20;
-			long third = 99999999999999999;
-			int integerNumber = (int)third;
+			double amount = 1.11; //количество биткоинов от одного человека
+			int peopleCount = 60; // количество человек
+			double totalMoney = (int) amount*peopleCount; // ← исправьте ошибку в этой строке
+			Console.WriteLine(totalMoney);
 			*/
 		}
 	}

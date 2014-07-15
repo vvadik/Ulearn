@@ -8,24 +8,51 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		/*
 		##Задача: Соответствие типов данных
 		
-		Неправильно указанный тип данных - частая ошибка в работе программиста. Вот и сейчас программист Вася в замешательстве. Исправьте положение!
+		Неправильно указанный тип данных - частая ошибка в работе начинающего программиста.
+		Вот и сейчас программист Вася в замешательстве.
+
+		Исправьте положение — укажите у всех объявленных переменных правильные типы вместо многоточия.
 		*/
+
 		[Exercise]
-		[ExpectedOutput("5.5\r\n7.8\r\n0")]
-		static public void Main()
+		[ExpectedOutput(
+			@"0.055
+7.8
+0
+2000000000000
+True
+hello
+h")]
+		public static void Main()
 		{
-			var a = 5.5;
-			var b = 7.8f;
-			var c = 0;
-			Console.WriteLine(a);
+			var num1 = +5.5e-2;
+			var num2 = 7.8f;
+			var num3 = 0;
+			var num4 = 2000000000000L;
+			var b = true;
+			var s = "hello";
+			var c = 'h';
+			Console.WriteLine(num1);
+			Console.WriteLine(num2);
+			Console.WriteLine(num3);
+			Console.WriteLine(num4);
 			Console.WriteLine(b);
+			Console.WriteLine(s);
 			Console.WriteLine(c);
 			/*uncomment
-			... a = 5.5;
-			... b = 7.8f;
-			... c = 0;
-			Console.WriteLine(a);
+			... num1 = 5.5;
+			... num2 = 7.8f;
+			... num3 = 0;
+			... num4 = 2000000000000L;
+			... b = true;
+			... s = "hello";
+			... c = 'h';
+			Console.WriteLine(num1);
+			Console.WriteLine(num2);
+			Console.WriteLine(num3);
+			Console.WriteLine(num4);
 			Console.WriteLine(b);
+			Console.WriteLine(s);
 			Console.WriteLine(c);
 			*/
 		}

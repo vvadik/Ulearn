@@ -1,5 +1,4 @@
 using System;
-using System.Activities.Expressions;
 using System.Linq;
 using NUnit.Framework;
 
@@ -114,6 +113,13 @@ namespace uLearn.CSharp
 		{
 			var slide = GenerateSlide("Exercise.cs");
 			Assert.That(slide.Blocks.Where(b => b.IsCode), Is.Empty);
+		}
+
+		[Test]
+		public void extract_ExpectedOutput()
+		{
+			var slide = (ExerciseSlide)GenerateSlide("Exercise.cs");
+			Assert.That(slide.ExpectedOutput, Is.EqualTo("5"));
 		}
 
 		[Test]

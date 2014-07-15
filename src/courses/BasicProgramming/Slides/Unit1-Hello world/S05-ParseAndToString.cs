@@ -4,18 +4,21 @@ using System.Globalization;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Title("Parse и ToString")]
+	[Title("Преобразование строки в число")]
 	public class S05_ParseAndToString
 	{
 		/*
-		##Задача: Парсинг
+		##Задача: Преобразование строки в число
 		
-		Гейтс написал код и не может найти ошибку :( 
-		Помогите ему!
+		Вася написал код, прибавляющий к числу единичку, но он опять не работает :( 
+		
+		Немедленно помогите Васе, иначе он решит, что программирование слишком сложно для него!
 		*/
 
 		[Exercise]
 		[ExpectedOutput("894377.243643")]
+		[Hint("Вспомните, как работает операция ```+``` со строковыми аргументами.")]
+		[Hint("Функцию преобразования строки в double логично искать среди статических методов класса double")]
 		public static void Main()
 		{
 			string doubleNumber = "894376.243643";
@@ -23,7 +26,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			Console.WriteLine(number + 1);
 			/*uncomment
 			string doubleNumber = "894376.243643";
-			int number = doubleNumber;
+			int number = doubleNumber; // Вася уверен, что ошибка где-то тут
 			Console.WriteLine(number + 1);
 			*/
 		}

@@ -19,8 +19,13 @@ namespace uLearn
 			methodInfo.Invoke(null, null);
 			var declaringType = methodInfo.DeclaringType;
 			if (declaringType == null) throw new Exception("should be!");
-			var attr = GetExpectedOutputAttributes(declaringType).Single();
-			Assert.AreEqual(attr.Output, newOut.ToString().Trim());
+			var expectedOutput = string.Join("\n", GetExpectedOutputAttributes(declaringType).Select(a => a.Output));
+			Assert.AreEqual(PrepareOutput(expectedOutput), PrepareOutput(newOut.ToString()));
+		}
+
+		private static string PrepareOutput(string output)
+		{
+			return string.Join("\n", output.Trim().SplitToLines());
 		}
 
 		public static IEnumerable<ExpectedOutputAttribute> GetExpectedOutputAttributes(Type declaringType)

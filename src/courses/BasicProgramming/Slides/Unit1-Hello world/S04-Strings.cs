@@ -8,18 +8,19 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		/*
 		##Задача: Две половинки одного целого
 		
-		Нужно сделать так, чтобы код писал на экран вторую половину строки text.
+		Допишите код вместо ```...``` так, чтобы он выводил на экран вторую половину строки ```text```.
 		*/
 		[Exercise]
 		[ExpectedOutput("CSharp!")]
+		[Hint("Можете ли вы собрать решение из известных вам уже функций работы со строками?")]
 		static public void Main()
 		{
 			string text = "I love CSharp!";
-			string half = text.Substring(text.Length / 2);
-			Console.WriteLine(half);
+			string secondHalf = text.Substring(text.Length / 2);
+			Console.WriteLine(secondHalf);
 			/*uncomment
 			string text = "I love CSharp!";
-			string half = ...;
+			string secondHalf = ...;
 			Console.WriteLine(half);
 			*/
 		}
