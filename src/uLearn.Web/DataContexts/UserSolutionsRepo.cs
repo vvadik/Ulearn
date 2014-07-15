@@ -49,7 +49,8 @@ namespace uLearn.Web.DataContexts
 
 		public IEnumerable<string> GetAllAcceptedSolutions(int slideIndex)
 		{
-			return db.UserSolutions.Where(x => x.IsRightAnswer && x.SlideId == slideIndex.ToString()).Select(x => x.Code);
+			var index = slideIndex.ToString();
+			return db.UserSolutions.Where(x => x.IsRightAnswer && x.SlideId == index).Select(x => x.Code);
 		}
 	}
 }
