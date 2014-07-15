@@ -128,14 +128,15 @@ a.nav-arrow:hover {
 
 .Unit li.selected {
     background-color: aliceblue;   
-
+    list-style-type: none;
 }
 
 .side-bar {
     width: 300px; 
     height: 500px; 
     float: left; 
-    margin: 30px 0 0 0;
+    margin:30px 0 0 0;
+    padding-left: 50px;
 }
 
 li.unit-name {
@@ -148,4 +149,8 @@ li.unit-name {
 
 .slide-container {
     margin-left: 300px;
+}
+
+.li-open {
+    display: block;
 }

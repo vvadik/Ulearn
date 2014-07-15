@@ -1,28 +1,39 @@
 ﻿@model uLearn.CoursePageModel
-<div class="side-bar">
+<div class="side-bar Unit">
 	@{
 		int index = 0;
+	    int groupNumber = 0;
+	    string previousName = "";
 		foreach (var unit in Model.Course.Slides.GroupBy(z => z.Info.UnitName))
 		{
+		    var collapseOption = unit.First().Info.UnitName == Model.Slide.Info.UnitName ? "collapse in" : "collapse";
 			var currentUnit = unit.First().Info.UnitName;
-			<ul class="Unit">
-				<li class="unit-name">
-					@Html.ActionLink(currentUnit, "Slide", "Course", new { courseId = "BasicProgramming", slideIndex = 0 }, null)
-					<ul>
-						@for (; index < Model.Course.Slides.Length; index++)
-						{
-							var inf = Model.Course.Slides[index];
-							if (inf.Info.UnitName != currentUnit)
-							{
-								break;
-							}
-							var selectedSlide = index == Model.SlideIndex;
-							<li class="@(selectedSlide ? "selected" : "")">@Html.ActionLink(inf.Title, "Slide", "Course", new { courseId = "BasicProgramming", slideIndex = index }, null)</li>
-						}
-					</ul>
-				</li>
-
-			</ul>
+		    if (previousName != currentUnit)
+		    {
+		        previousName = currentUnit;
+		        groupNumber++;
+		    }
+		    <li class="unit-name">
+		        <a data-toggle="collapse" href=@("#N"+groupNumber) class="Unit">
+					@currentUnit
+				</a>
+		        <ul id=@("N"+groupNumber) class="@collapseOption">
+		            @for (; index < Model.Course.Slides.Length; index++)
+		            {
+		                var inf = Model.Course.Slides[index];
+		                if (inf.Info.UnitName != currentUnit)
+		                {
+		                    break;
+		                }
+		                var selectedSlide = index == Model.SlideIndex;
+		                <li class="@(selectedSlide ? "selected" : "")">@Html.ActionLink(inf.Title, "Slide", "Course", new { courseId = "BasicProgramming", slideIndex = index }, null)</li>
+		            }
+		        </ul>
+		    </li>
 		}
 	}
 </div>
+
+
+
+
