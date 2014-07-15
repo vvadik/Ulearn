@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Задача №3")]
 	[TestFixture]
 	public class SelectManyExercise
 	{
@@ -50,15 +52,9 @@ namespace uLearn.Courses.Linq.Slides
 		
 		*/
 
-		[Exercise(SingleStatement = true)]
-		public string[] GetAllStudents(Classroom[] classes)
-		{
-			return classes.SelectMany(c => c.Students).ToArray();
-			// пишите решение тут
-		}
-
-		[Test]
-		public void Test()
+		[ExpectedOutput("Pavel\r\nIvan\r\nPetr\r\nAnna\r\nIlya\r\nVladimir\r\nBulat\r\nAlex\r\nGalina")]
+		[ShowOnSlide]
+		public static void Main()
 		{
 			Classroom[] classes =
 			{
@@ -66,16 +62,16 @@ namespace uLearn.Courses.Linq.Slides
 				new Classroom {Students = {"Anna", "Ilya", "Vladimir"},},
 				new Classroom {Students = {"Bulat", "Alex", "Galina"},}
 			};
-
 			var allStudents = GetAllStudents(classes);
+			foreach (var e in allStudents)
+				Console.WriteLine(e);
+		}
 
-			Assert.That(
-				allStudents,
-				Is.EquivalentTo(new[]
-				{
-					"Pavel", "Ivan", "Petr", "Anna", "Ilya",
-					"Vladimir", "Bulat", "Alex", "Galina"
-				}));
+		[Exercise(SingleStatement = true)]
+		public static string[] GetAllStudents(Classroom[] classes)
+		{
+			return classes.SelectMany(c => c.Students).ToArray();
+			// пишите решение тут
 		}
 	}
 }

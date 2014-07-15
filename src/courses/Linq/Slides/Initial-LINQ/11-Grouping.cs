@@ -3,6 +3,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Группировка элементов")]
 	[TestFixture]
 	public class Grouping
 	{

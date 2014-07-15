@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Задача №7")]
 	[TestFixture]
 	public class GroupingExercise
 	{
@@ -27,7 +28,7 @@ namespace uLearn.Courses.Linq.Slides
 		*/
 
 		[Exercise(SingleStatement = true)]
-		public Tuple<string, int>[] GetMostFrequentWords(string text, int count)
+		public static Tuple<string, int>[] GetMostFrequentWords(string text, int count)
 		{
 			return Regex.Split(text, @"\W+")
 				.Where(word => word != "")
@@ -45,15 +46,13 @@ namespace uLearn.Courses.Linq.Slides
 			*/
 		}
 
-		[Test]
-		public void Test()
+		[ExpectedOutput("you 2\r\nknows 1")]
+		[ShowOnSlide]
+		public static void Main()
 		{
 			var words = GetMostFrequentWords("You?! Or not you... who knows?", 2);
-			Assert.That(words[0], Is.EqualTo(Tuple.Create("you", 2)));
-			Assert.That(words[1], Is.EqualTo(Tuple.Create("knows", 1)));
-
-			words = GetMostFrequentWords("", 100500);
-			Assert.That(words, Is.Empty);
+			Console.WriteLine("{0} {1}", words[0].Item1, words[0].Item2);
+			Console.WriteLine("{0} {1}", words[1].Item1, words[1].Item2);
 		}
 	}
 }

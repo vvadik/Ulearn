@@ -3,6 +3,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Сортировка. Повторяющиеся элементы")]
 	[TestFixture]
 	public class Sort
 	{

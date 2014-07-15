@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Задача №9")]
 	[TestFixture]
 	public class AggregateExercise
 	{
@@ -23,18 +24,19 @@ namespace uLearn.Courses.Linq.Slides
 		[Exercise(SingleStatement = true)]
 		[Hint("Вспомните про кортежи")]
 		[Hint("Вспомните про особенности сравнения кортежей")]
-		public string GetLongest(IEnumerable<string> words)
+		public static string GetLongest(IEnumerable<string> words)
 		{
 			return words.Min(line => Tuple.Create(-line.Length, line)).Item2;
+			//Ваш код
 		}
 
-		[Test]
-		public void Test()
+		[ExpectedOutput("azazsdsd12345")]
+		[ShowOnSlide]
+		public static void Main()
 		{
-			Assert.That(GetLongest(new[] {"asas", "as", "sdsd"}), Is.EqualTo("asas"));
-			Assert.That(GetLongest(new[] {"zzzz", "as", "sdsd"}), Is.EqualTo("sdsd"));
-			Assert.That(GetLongest(new[] {"as", "12345", "as", "sds"}), Is.EqualTo("12345"));
-			Assert.That(GetLongest(new[] {""}).Length, Is.EqualTo(0));
+			Console.Write(GetLongest(new[] {"azaz", "as", "sdsd"}));
+			Console.Write(GetLongest(new[] {"zzzz", "as", "sdsd"}));
+			Console.Write(GetLongest(new[] {"as", "12345", "as", "sds"}));
 		}
 	}
 }

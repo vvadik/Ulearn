@@ -6,6 +6,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Задача №6")]
 	[TestFixture]
 	public class SortTuples
 	{
@@ -28,7 +29,7 @@ namespace uLearn.Courses.Linq.Slides
 		[Hint("`Regex.Split(s, @\"\\W+\")` разбивает текст на слова")]
 		[Hint("Пустая строка не является корректным словом")]
 		[Hint("`keySelector` в `OrderBy` должен возвращать ключ сортировки. Этот ключ может быть кортежем.")]
-		public List<string> GetSortedWords(string text)
+		public static List<string>  GetSortedWords(string text)
 		{
 			return Regex.Split(text, @"\W+")
 				.Where(word => word != "")
@@ -38,11 +39,21 @@ namespace uLearn.Courses.Linq.Slides
 			// ваше решение
 		}
 
-		[Test]
-		public void Test()
+		[ExpectedOutput("Good")]
+		[ShowOnSlide]
+		public static void Main()
 		{
-			var words = GetSortedWords("you?! or not you... who knows?");
-			Assert.That(words, Is.EqualTo(new[] {"or", "not", "who", "you", "knows"}));
+			var sortedList = GetSortedWords("you?! or not you... who knows?");
+			var result = IsRightAnswer(sortedList) ? "Good" : "Bad";
+			Console.WriteLine(result);
+		}
+
+		public static bool IsRightAnswer(List<string> sortedWords )
+		{
+			var rightAnswer = new[] {"or", "not", "who", "you", "knows"};
+			if (sortedWords.Count != rightAnswer.Length)
+				return false;
+			return !sortedWords.Where((t, i) => t != rightAnswer[i]).Any();
 		}
 	}
 }

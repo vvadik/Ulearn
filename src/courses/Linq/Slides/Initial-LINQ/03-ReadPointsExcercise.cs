@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Задача №2")]
 	[TestFixture]
 	public class ReadPointsExcercise
 	{
@@ -24,13 +26,14 @@ namespace uLearn.Courses.Linq.Slides
 		
 		Написанная вами функция в дальнейшем может быть использована, например, вот так:
 		*/
-
-		[ShowBodyOnSlide]
-		public void ParseNumber_Sample()
+		[ExpectedOutput("0,0\r\n1,1\r\n2,2")]
+		[ShowOnSlide]
+		public static void Main()
 		{
-			List<Point> points = ParsePoints(File.ReadLines("points.txt"));
+			List<Point> points = ParsePoints(new string[]{"0 0","1 1","2 2"});
+			foreach (var e in points)
+				Console.WriteLine("{0},{1}", e.X, e.Y);
 		}
-
 
 		[Exercise(SingleStatement = true)]
 		[Hint("string.Split — разбивает строку на части по разделителю")]
@@ -38,7 +41,7 @@ namespace uLearn.Courses.Linq.Slides
 		[Hint("Каждую строку нужно преобразовать в точку. Преобразование — это дело для метода Select. ",
 			"Но каждая строка — это список координат, каждую из которых нужно преобразовать из строки в число.",
 			"Подумайте про Select внутри Select-а.")]
-		public List<Point> ParsePoints(IEnumerable<string> lines)
+		public static List<Point> ParsePoints(IEnumerable<string> lines)
 		{
 			return lines
 				.Select(line => line.Split(' ').Select(int.Parse).ToList())
@@ -50,16 +53,6 @@ namespace uLearn.Courses.Linq.Slides
 				...
 			*/
 		}
-
-		[Test]
-		public void Test_ReadPoints()
-		{
-			List<Point> actualPoints = ParsePoints(new[] {"1 -2", "-3 4"});
-			Assert.That(
-				actualPoints,
-				Is.EqualTo(new[] {new Point(1, -2), new Point(-3, 4)}).AsCollection);
-		}
-
 		/*
 		### Краткая справка
 		  * `IEnumerable<R> Select(this IEnumerable<T> items, Func<T, R> map)`

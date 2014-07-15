@@ -1,9 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Задача №5")]
 	[TestFixture]
 	public class SortExercise
 	{
@@ -27,8 +29,8 @@ namespace uLearn.Courses.Linq.Slides
 		[Hint("`Regex.Split(s, @\"\\W+\")` разбивает текст на слова")]
 		[Hint("Пустая строка не является корректным словом")]
 		[Hint("У класса `string` есть метод `ToLower` для приведения строки к нижнему регистру")]
-		[Hint("Подмайте, как скомбинировать SelectMany, со вложенным Regex.Split")]
-		public string[] GetSortedWords(params string[] textLines)
+		[Hint("Подумайте, как скомбинировать SelectMany, со вложенным Regex.Split")]
+		public static string[] GetSortedWords(params string[] textLines)
 		{
 			return textLines.SelectMany(
 				line => Regex.Split(line, @"\W+")
@@ -41,8 +43,9 @@ namespace uLearn.Courses.Linq.Slides
 			// ваше решение
 		}
 
-		[Test]
-		public void Test()
+		[ShowOnSlide]
+		[ExpectedOutput("Good")]
+		public static void Main()
 		{
 			var words = GetSortedWords(
 				"Hello, hello, hello, how low",
@@ -53,15 +56,29 @@ namespace uLearn.Courses.Linq.Slides
 				"Here we are now; entertain us",
 				"A mulatto, an albino, a mosquito, my libido...",
 				"Yeah, hey");
-			Assert.That(words,
-				Is.EqualTo(new[]
+			var result = IsRightAnswer(words) ? "Good" : "Bad";
+			Console.WriteLine(result);
+		}
+
+		public static bool IsRightAnswer(string[] words)
+		{
+			var rightAnswer = new[]
+			{
+				"a", "albino", "an", "and", "are", "contagious", "dangerous",
+				"entertain", "feel", "hello", "here", "hey", "how",
+				"i", "it", "less", "libido", "lights", "low",
+				"mosquito", "mulatto", "my", "now", "out", "s", "stupid",
+				"the", "us", "we", "with", "yeah"
+			};
+			if (words.Length == rightAnswer.Length)
+			{
+				if (rightAnswer.Where((t, i) => words[i] != t).Any())
 				{
-					"a", "albino", "an", "and", "are", "contagious", "dangerous",
-					"entertain", "feel", "hello", "here", "hey", "how",
-					"i", "it", "less", "libido", "lights", "low",
-					"mosquito", "mulatto", "my", "now", "out", "s", "stupid",
-					"the", "us", "we", "with", "yeah"
-				}));
+					return false;
+				}
+			}
+			else return false;
+			return true;
 		}
 	}
 }

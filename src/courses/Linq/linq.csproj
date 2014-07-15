@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{0BD679E4-9ACB-4B02-835B-CBCA1DE8B817}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>uLearn.Courses.Linq</RootNamespace>
     <AssemblyName>uLearn.Courses.Linq</AssemblyName>
@@ -97,6 +97,7 @@
     <Compile Include="Slides\Initial-LINQ\16-AggregateExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="Slides_Tests.cs" />
     <Compile Include="xx-AnonymousTypes.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>

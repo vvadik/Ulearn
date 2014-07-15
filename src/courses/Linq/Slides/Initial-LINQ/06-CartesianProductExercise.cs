@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Задача №4")]
 	[TestFixture]
 	public class CartesianProduct
 	{
@@ -23,7 +25,7 @@ namespace uLearn.Courses.Linq.Slides
 		[Hint("Декартово произведение множества {-1, 0, 1} на себя даст все возможные относительные координаты соседей")]
 		[Hint("Используйте вызов Select внутри вызова SelectMany")]
 		[Hint("Метода ToHashSet не существует, однако у класса HashSet<T> есть конструктор, принимающие последовательность")]
-		public HashSet<Point> GetNeighbours(Point p)
+		public static HashSet<Point> GetNeighbours(Point p)
 		{
 			int[] d = {-1, 0, 1};
 			return new HashSet<Point>(
@@ -37,19 +39,29 @@ namespace uLearn.Courses.Linq.Slides
 			*/
 		}
 
-		[Test]
-		public void Test()
+		[ExpectedOutput("Good")]
+		[ShowOnSlide]
+		public static void Main()
 		{
-			var neighbours = GetNeighbours(new Point(1, 2));
+			var answer = GetNeighbours(new Point(1, 2));
+			var result = IsRightCartesian(answer) ? "Good" : "Bad";
+			Console.WriteLine(result);
+		}
 
-			Assert.That(
-				neighbours,
-				Is.EquivalentTo(new[]
-				{
-					new Point(0, 1), new Point(0, 2), new Point(0, 3),
-					new Point(1, 1), new Point(1, 3),
-					new Point(2, 1), new Point(2, 2), new Point(2, 3),
-				}));
+		public static bool IsRightCartesian(IEnumerable<Point> neighbours)
+		{
+			var correctAnswer = new HashSet<Point>()
+			{
+				new Point(0, 1),
+				new Point(0, 2),
+				new Point(0, 3),
+				new Point(1, 1),
+				new Point(1, 3),
+				new Point(2, 1),
+				new Point(2, 2),
+				new Point(2, 3)
+			};
+			return neighbours.All(correctAnswer.Contains);
 		}
 	}
 }

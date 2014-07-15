@@ -26,7 +26,7 @@
 		                    break;
 		                }
 		                var selectedSlide = index == Model.SlideIndex;
-		                <li class="@(selectedSlide ? "selected" : "")">@Html.ActionLink(inf.Title, "Slide", "Course", new { courseId = "BasicProgramming", slideIndex = index }, null)</li>
+		                <li class="@(selectedSlide ? "selected" : "")">@Html.ActionLink(inf.Title, "Slide", "Course", new { courseId = Model.Course.Title, slideIndex = index }, null)</li>
 		            }
 		        </ul>
 		    </li>
