@@ -1,8 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Configuration;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using NUnit.Framework;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Ideone;
 using uLearn.Web.Models;
@@ -37,6 +41,24 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 
+		[Authorize]
+		public ActionResult AcceptedSolutions(string courseId, int slideIndex = 0)
+		{
+			Course course = courseManager.GetCourse(courseId);
+			var coursePageModel = new CoursePageModel
+			{
+				Course = course,
+				SlideIndex = slideIndex,
+				Slide = course.Slides[slideIndex]
+			};
+			var model = new AcceptedSolutionsPageModel
+			{
+				CoursePageModel = coursePageModel,
+				AcceptedSolutions = solutionsRepo.GetAllAcceptedSolutions(slideIndex)
+			};
+			return View(model);
+		}
+
 		[HttpPost]
 		[Authorize]
 		public async Task<ActionResult> RunSolution(string courseId, int slideIndex = 0)
@@ -46,6 +68,13 @@ namespace uLearn.Web.Controllers
 			var result = await CheckSolution(exerciseSlide, code, slideIndex);
 			await SaveUserSolution(courseId, slideIndex, code, result.ExecutionResult, result.IsRightAnswer);
 			return Json(result);
+		}
+
+		[Authorize]
+		public void LikeSolution(int id)
+		{
+			return;
+			//solutionsRepo.Like(id, "");
 		}
 
 		private string NormalizeString(string s)
@@ -58,12 +87,10 @@ namespace uLearn.Web.Controllers
 			var solution = exerciseSlide.Solution.BuildSolution(code);
 			var submition = await executionService.Submit(solution, "");
 			var isRightAnswer = NormalizeString(submition.Output).Equals(NormalizeString(exerciseSlide.ExpectedOutput));
-			var acceptedUsersSolutions = solutionsRepo.GetAllAcceptedSolutions(slideIndex);
 			return new RunSolutionResult
 			{
 				ExecutionResult = submition,
-				IsRightAnswer = isRightAnswer,
-				AllAcceptedSolutions = acceptedUsersSolutions
+				IsRightAnswer = isRightAnswer
 			};
 		}
 

@@ -62,10 +62,19 @@ function updateVerdict(isRight, verdict, details, isCompileError) {
 	$actualOutputContent.text(details);
 
 	$afterRunBlock.show();
-
+    if (isRight) {
+        $showAnotherAnswer.show();
+        $nextLink.hide();
+        $endHere.hide();
+    }
 }
 
 var $runButton = $("#run");
+var $nextLink = $("#NextLink");
+var $prevLink = $("#PrevLink");
+var $endHere = $("#EndHere");
+var $selectorHere = $("#SelectorHere");
+var $showAnotherAnswer = $("#ShowAnotherAnswer");
 
 $runButton.click(function () {
 	var code = $(".code-exercise")[0].codeMirrorEditor.getValue();
@@ -94,4 +103,9 @@ $runButton.click(function () {
 	.always(function (ans) {
 		$runButton.text("RUN").removeClass("active");
 	});
+})
+
+
+$likeButton.click(function() {
+
 })

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 
 namespace uLearn.Web.Models
 {
@@ -25,6 +27,11 @@ namespace uLearn.Web.Models
 		[Required]
 		[StringLength(1024)]
 		public string Code { get; set; }
+
+		[Required]
+		public int CodeHash { get; set; }
+
+		public HashSet<string> LikersStorage { get; set; }
 
 		[Required]
 		public DateTime Timestamp { get; set; }
