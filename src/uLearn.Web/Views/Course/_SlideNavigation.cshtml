@@ -1,6 +1,6 @@
 ﻿@model uLearn.CoursePageModel
 
-<div class="row">
+<div>
 	<a class="nav-arrow nav-left" id="PrevLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex - 1})"><i class="glyphicon glyphicon-chevron-left"></i></a>
     <span class="nav-arrow nav-left" id="SelectorHere">Листалка тут → </span>
 	<a class="nav-arrow nav-right" id="NextLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex + 1})"><i class="glyphicon glyphicon-chevron-right"></i></a>
