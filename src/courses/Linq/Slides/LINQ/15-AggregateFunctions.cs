@@ -4,14 +4,11 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Title("Аггрегатные функции")]
+	[Title("Функции аггрегирования")]
 	[TestFixture]
 	public class AggregateFunctions
 	{
 		/*
-
-		##Функции аггрегирования
-
 		В Linq есть удобные методы для вычисления минимума, максимума, среднего и количества элементов в последовательности.
 		
 		Вот все они в действии:

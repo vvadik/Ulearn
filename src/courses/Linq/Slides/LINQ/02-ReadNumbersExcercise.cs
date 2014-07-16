@@ -6,13 +6,11 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Title("Задача №1")]
+	[Title("Задача. Чтение списка чисел")]
 	[TestFixture]
 	public class ReadNumbersExcercise
 	{
 		/*
-
-		##Задача: Чтение из файла
 
 		Linq удобно использовать для чтения из файла и разбора простых текстовых формат. Особенно удобно сочетать Linq с методом `File.ReadLines(filename)`.
 

@@ -5,13 +5,11 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Title("Задача №5")]
+	[Title("Задача. Словарь текста")]
 	[TestFixture]
 	public class SortExercise
 	{
 		/*
-
-		##Задача: Словарь текста
 
 		Дан текст, нужно составить лексикографически упорядоченный список всех слов, которые встречаются в этом тексте.
 

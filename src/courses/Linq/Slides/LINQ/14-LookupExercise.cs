@@ -6,13 +6,11 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Title("Задача №8")]
+	[Title("Задача. Обратный индекс")]
 	[TestFixture]
 	public class LookupExercise
 	{
 		/*
-
-		##Задача: Обратный индекс
 
 		Обратный индекс — это структура данных, часто использующаяся в задачах 
 		полнотекстового поиска нужного документа в большой базе документов.
