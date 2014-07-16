@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace uLearn
 {
@@ -23,6 +24,11 @@ namespace uLearn
 		public byte[] GetContent()
 		{
 			return getContent();
+		}
+
+		public string GetUtf8Content()
+		{
+			return Encoding.UTF8.GetString(getContent());
 		}
 	}
 

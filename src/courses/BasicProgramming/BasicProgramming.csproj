@@ -43,33 +43,34 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S010-HelloWorld.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S011-FirstStep.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S02-Types.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S03-Conversion2.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S03-Conversion.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S04-Strings.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S05-ParseAndToString.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S06-Operations.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S07-Methods.cs" />
+    <Compile Include="Slides\U01_Basics\S010-HelloWorld.cs" />
+    <Compile Include="Slides\U01_Basics\S011-FirstStep.cs" />
+    <Compile Include="Slides\U01_Basics\S02-Types.cs" />
+    <Compile Include="Slides\U01_Basics\S03-Conversion2.cs" />
+    <Compile Include="Slides\U01_Basics\S03-Conversion.cs" />
+    <Compile Include="Slides\U01_Basics\S04-Strings.cs" />
+    <Compile Include="Slides\U01_Basics\S05-ParseAndToString.cs" />
+    <Compile Include="Slides\U01_Basics\S06-Operations.cs" />
+    <Compile Include="Slides\U01_Basics\S07-Methods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S08-Vision.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S09-DefaultValues.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S10-IntelliSense.cs" />
-    <Compile Include="Slides\Unit2-Mistakes\S01-MissedUsings.cs" />
-    <Compile Include="Slides\Unit2-Mistakes\S02-ErrorInTtypecasting.cs" />
-    <Compile Include="Slides\Unit2-Mistakes\S03-Typo.cs" />
-    <Compile Include="Slides\Unit2-Mistakes\S04-Division.cs" />
-    <Compile Include="Slides\Unit3-If while for\S01-BooleanVariablesAndComparison.cs" />
-    <Compile Include="Slides\Unit3-If while for\S02-LogicalExpressions.cs" />
-    <Compile Include="Slides\Unit3-If while for\S03-IfOperator.cs" />
-    <Compile Include="Slides\Unit3-If while for\S04-IfReturn.cs" />
-    <Compile Include="Slides\Unit3-If while for\S05-ExcessIf.cs" />
-    <Compile Include="Slides\Unit3-If while for\S06-While.cs" />
-    <Compile Include="Slides\Unit3-If while for\S07-Break.cs" />
-    <Compile Include="Slides\Unit3-If while for\S08-Continue.cs" />
-    <Compile Include="Slides\Unit3-If while for\S09-For.cs" />
-    <Compile Include="Slides\Unit3-If while for\S10-KtulhuFor.cs" />
+    <Compile Include="Slides\U01_Basics\S08-Vision.cs" />
+    <Compile Include="Slides\U01_Basics\S09-DefaultValues.cs" />
+    <Compile Include="Slides\U01_Basics\S10-IntelliSense.cs" />
+    <Compile Include="Slides\U01_Basics\_HelloWorld.cs" />
+    <Compile Include="Slides\U02_Mistakes\S01-MissedUsings.cs" />
+    <Compile Include="Slides\U02_Mistakes\S02-ErrorInTtypecasting.cs" />
+    <Compile Include="Slides\U02_Mistakes\S03-Typo.cs" />
+    <Compile Include="Slides\U02_Mistakes\S04-Division.cs" />
+    <Compile Include="Slides\U03_Cycles\S01-BooleanVariablesAndComparison.cs" />
+    <Compile Include="Slides\U03_Cycles\S02-LogicalExpressions.cs" />
+    <Compile Include="Slides\U03_Cycles\S03-IfOperator.cs" />
+    <Compile Include="Slides\U03_Cycles\S04-IfReturn.cs" />
+    <Compile Include="Slides\U03_Cycles\S05-ExcessIf.cs" />
+    <Compile Include="Slides\U03_Cycles\S06-While.cs" />
+    <Compile Include="Slides\U03_Cycles\S07-Break.cs" />
+    <Compile Include="Slides\U03_Cycles\S08-Continue.cs" />
+    <Compile Include="Slides\U03_Cycles\S09-For.cs" />
+    <Compile Include="Slides\U03_Cycles\S10-KtulhuFor.cs" />
     <Compile Include="Slides_Tests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -83,12 +84,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Slides\Title.txt" />
-    <Content Include="Slides\Unit1-Hello world\Title.txt" />
-    <Content Include="Slides\Unit1-Hello world\Usings.txt" />
-    <Content Include="Slides\Unit2-Mistakes\Title.txt" />
-    <Content Include="Slides\Unit2-Mistakes\Usings.txt" />
-    <Content Include="Slides\Unit3-If while for\Title.txt" />
-    <Content Include="Slides\Unit3-If while for\Usings.txt" />
+    <Content Include="Slides\U01_Basics\Title.txt" />
+    <Content Include="Slides\U01_Basics\Usings.txt" />
+    <Content Include="Slides\U02_Mistakes\Title.txt" />
+    <Content Include="Slides\U02_Mistakes\Usings.txt" />
+    <Content Include="Slides\U03_Cycles\Title.txt" />
+    <Content Include="Slides\U03_Cycles\Usings.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
