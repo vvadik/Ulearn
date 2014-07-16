@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.SqlServer.Server;
 using uLearn.Web.Models;
+using uLearn;
 
 namespace uLearn.Web.DataContexts
 {
@@ -35,7 +37,9 @@ namespace uLearn.Web.DataContexts
 				IsRightAnswer = isRightAnswer,
 				Output = output,
 				Timestamp = DateTime.Now,
-				UserId = userId
+				UserId = userId,
+				CodeHash = code.GetHashCode(),
+				LikersStorage = new List<Like>()
 			});
 			await db.SaveChangesAsync();
 			return userSolution;
@@ -47,10 +51,31 @@ namespace uLearn.Web.DataContexts
 			db.SaveChanges();
 		}
 
-		public IEnumerable<string> GetAllAcceptedSolutions(int slideIndex)
+		public async Task<Like> Like(int id, string userId)
 		{
-			var index = slideIndex.ToString();
-			return db.UserSolutions.Where(x => x.IsRightAnswer && x.SlideId == index).Select(x => x.Code);
+			var solutionForLike = db.UserSolutions.Find(id);
+			solutionForLike.LikersStorage.Add(new Like {SolutionId = id, Timestamp = DateTime.Now, UserId = userId});
+			await db.SaveChangesAsync();
+			return new Like {SolutionId = id, Timestamp = DateTime.Now, UserId = userId};
+		}
+
+		public List<AcceptedSolutionInfo> GetAllAcceptedSolutions(int slideIndex)
+		{
+			var timeNow = DateTime.Now;
+			var stringSlideIndex = slideIndex.ToString();
+			var prepared = db.UserSolutions
+				.Where(x => x.IsRightAnswer && x.SlideId == stringSlideIndex)
+				.ToList();
+			var answer = prepared
+				.OrderByDescending(x => x.LikersStorage.Count /*/ (timeNow - x.Timestamp).TotalSeconds*/)
+				.Take(10).Select(x => new AcceptedSolutionInfo(x.Code, x.Id, x.LikersStorage.Select(y => y.UserId))).ToList();
+			return answer;
+		}
+
+		public bool IsUserPassedTask(string courseId, int slideIndex, string userId)
+		{
+			var slideId = slideIndex.ToString();
+			return db.UserSolutions.Any(x => x.SlideId == slideId && x.CourseId == courseId && x.UserId == userId && x.IsRightAnswer);
 		}
 	}
 }

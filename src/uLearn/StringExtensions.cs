@@ -1,12 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace uLearn
 {
 	public static class StringExtensions
 	{
+		public static string AsUtf8(this byte[] bytes)
+		{
+			return Encoding.UTF8.GetString(bytes).TrimStart(new[] { '\uFEFF', '\u200B' });
+		}
+
 		public static string[] SplitToLines(this string text)
 		{
 			return Regex.Split(text, @"\r?\n");

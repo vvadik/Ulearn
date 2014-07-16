@@ -2,20 +2,26 @@
 {
 	public class SlideBlock
 	{
-		private SlideBlock(string text, bool isCode)
+		private SlideBlock(string text, bool isCode, bool alreadyRendered)
 		{
 			IsCode = isCode;
+			this.AlreadyRendered = alreadyRendered;
 			Text = text.TrimEnd();
 		}
 
 		public static SlideBlock FromCode(string code)
 		{
-			return new SlideBlock(code, true);
+			return new SlideBlock(code, true, true);
+		}
+
+		public static SlideBlock FromHtml(string html)
+		{
+			return new SlideBlock(html, false, true);
 		}
 
 		public static SlideBlock FromMarkdown(string markdown)
 		{
-			return new SlideBlock(markdown, false);
+			return new SlideBlock(markdown, false, false);
 		}
 
 		protected bool Equals(SlideBlock other)
@@ -45,16 +51,17 @@
 		}
 
 		public readonly bool IsCode;
+		public readonly bool AlreadyRendered;
 		public readonly string Text;
 
 		public string RenderedText
 		{
-			get { return IsCode ? Text : Md.ToHtml(Text); }
+			get { return AlreadyRendered ? Text : Md.ToHtml(Text); }
 		}
 
 		public SlideBlock WithAppendedText(string text)
 		{
-			return new SlideBlock(Text + "\n" + text, IsCode);
+			return new SlideBlock(Text + "\n" + text, IsCode, AlreadyRendered);
 		}
 	}
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Activities.Expressions;
 using System.Linq;
 using NUnit.Framework;
 
@@ -117,6 +116,13 @@ namespace uLearn.CSharp
 		}
 
 		[Test]
+		public void extract_ExpectedOutput()
+		{
+			var slide = (ExerciseSlide)GenerateSlide("Exercise.cs");
+			Assert.That(slide.ExpectedOutput, Is.EqualTo("5"));
+		}
+
+		[Test]
 		public void uncomment_special_comments_with_starter_code()
 		{
 			var slide = (ExerciseSlide) GenerateSlide("ExerciseWithStarterCode.cs");
@@ -145,9 +151,27 @@ namespace uLearn.CSharp
 			StringAssert.DoesNotContain("void HelloKitty(", ans);
 		}
 
+		[Test]
+		public void include_video()
+		{
+			var slide = GenerateSlide("Includes.cs");
+			var renderedText = slide.Blocks.First().RenderedText;
+			var expected = "<iframe class='embedded-video' width='800' height='450' src='//www.youtube.com/embed/81Ub0SMxZQo' frameborder='0' allowfullscreen></iframe>";
+			Assert.That(renderedText, Contains.Substring(expected));
+		}
+
+		[Test]
+		public void include_code()
+		{
+			var slide = GenerateSlide("Includes.cs");
+			var renderedText = slide.Blocks[1].RenderedText;
+			var expected = "included(_HelloWorld.cs)";
+			Assert.That(renderedText, Contains.Substring(expected));
+		}
+
 		private static Slide GenerateSlide(string name)
 		{
-			return SlideParser.ParseSlide(@".\tests\" + name, null);
+			return SlideParser.ParseSlide(@".\tests\" + name, null, includeName => "included(" + includeName + ")");
 		}
 	}
 }

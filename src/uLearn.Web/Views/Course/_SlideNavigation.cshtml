@@ -1,22 +1,28 @@
 ﻿@model uLearn.CoursePageModel
 
-<div class="row">
+<div>
+	<a class="nav-arrow nav-left" id="PrevLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex - 1})"><i class="glyphicon glyphicon-chevron-left"></i></a>
+    <span class="nav-arrow nav-left" id="SelectorHere">Листалка тут → </span>
+	<a class="nav-arrow nav-right" id="NextLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex + 1})"><i class="glyphicon glyphicon-chevron-right"></i></a>
+    <span class="nav-arrow nav-right" id="EndHere">Конец!</span>
+	<a class="nav-arrow nav-right" id="ShowAnotherAnswer" href="@Url.Action("AcceptedSolutions", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex })"><i class="glyphicon glyphicon-chevron-right"></i></a>
 
+	@*
 	@if (Model.HasPrevSlide)
-	{
-	    <a class="nav-arrow nav-left" id="PrevLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex - 1})"><i class="glyphicon glyphicon-chevron-left"></i></a>
-	}
-	else
-	{
-		<span class="nav-arrow nav-left">Листалка тут → </span>
-	}
+    {
+        <a class="nav-arrow nav-left" id="PrevLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex - 1})"><i class="glyphicon glyphicon-chevron-left"></i></a>
+    }
+    else
+    {
+        <span class="nav-arrow nav-left">Листалка тут → </span>
+    }
 
-	@if (Model.HasNextSlide)
-	{
-	    <a class="nav-arrow nav-right" id="NextLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex + 1})"><i class="glyphicon glyphicon-chevron-right"></i></a>
-	}
-	else
-	{
-	    <span class="nav-arrow nav-right">Конец!</span>
-	}
+    @if (Model.HasNextSlide)
+    {
+    <a class="nav-arrow nav-right" id="NextLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex + 1})"><i class="glyphicon glyphicon-chevron-right"></i></a>
+    }
+    else
+    {
+    <span class="nav-arrow nav-right">Конец!</span>
+    }*@
 </div>

@@ -1,4 +1,7 @@
-﻿namespace uLearn
+﻿using System;
+using System.Collections.Generic;
+
+namespace uLearn
 {
 	public class CoursePageModel
 	{

@@ -1,38 +1,38 @@
 ﻿@model uLearn.CoursePageModel
-<div class="side-bar Unit">
+<ul class="side-bar unit">
 	@{
 		int index = 0;
-	    int groupNumber = 0;
-	    string previousName = "";
+		int groupNumber = 0;
+		string previousName = "";
 		foreach (var unit in Model.Course.Slides.GroupBy(z => z.Info.UnitName))
 		{
-		    var collapseOption = unit.First().Info.UnitName == Model.Slide.Info.UnitName ? "collapse in" : "collapse";
+			var collapseOption = unit.First().Info.UnitName == Model.Slide.Info.UnitName ? "collapse in" : "collapse";
 			var currentUnit = unit.First().Info.UnitName;
-		    if (previousName != currentUnit)
-		    {
-		        previousName = currentUnit;
-		        groupNumber++;
-		    }
-		    <li class="unit-name">
-		        <a data-toggle="collapse" href=@("#N"+groupNumber) class="Unit">
+			if (previousName != currentUnit)
+			{
+				previousName = currentUnit;
+				groupNumber++;
+			}
+			<li class="unit-name">
+				<a data-toggle="collapse" href=@("#N"+groupNumber) class="unit">
 					@currentUnit
 				</a>
-		        <ul id=@("N"+groupNumber) class="@collapseOption">
-		            @for (; index < Model.Course.Slides.Length; index++)
-		            {
-		                var inf = Model.Course.Slides[index];
-		                if (inf.Info.UnitName != currentUnit)
-		                {
-		                    break;
-		                }
-		                var selectedSlide = index == Model.SlideIndex;
-		                <li class="@(selectedSlide ? "selected" : "")">@Html.ActionLink(inf.Title, "Slide", "Course", new { courseId = Model.Course.Title, slideIndex = index }, null)</li>
-		            }
-		        </ul>
-		    </li>
+				<ul id=@("N"+groupNumber) class="@collapseOption">
+					@for (; index < Model.Course.Slides.Length; index++)
+					{
+						var slide = Model.Course.Slides[index];
+						if (slide.Info.UnitName != currentUnit)
+						{
+							break;
+						}
+						var selectedSlide = index == Model.SlideIndex;
+						<li class="@(selectedSlide ? "selected" : "")">@Html.ActionLink(slide.Title, "Slide", "Course", new { courseId = Model.Course.Id, slideIndex = index }, null)</li>
+					}
+				</ul>
+			</li>
 		}
 	}
-</div>
+</ul>
 
 
 

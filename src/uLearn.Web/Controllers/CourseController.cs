@@ -1,8 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Configuration;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using NUnit.Framework;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Ideone;
 using uLearn.Web.Models;
@@ -37,6 +41,25 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 
+		[Authorize]
+		public ActionResult AcceptedSolutions(string courseId, int slideIndex = 0)
+		{
+			Course course = courseManager.GetCourse(courseId);
+			var coursePageModel = new CoursePageModel
+			{
+				Course = course,
+				SlideIndex = slideIndex,
+				Slide = course.Slides[slideIndex]
+			};
+			var isLegal = solutionsRepo.IsUserPassedTask(courseId, slideIndex, User.Identity.GetUserId());
+			var model = new AcceptedSolutionsPageModel
+			{
+				CoursePageModel = coursePageModel,
+				AcceptedSolutions = isLegal ? solutionsRepo.GetAllAcceptedSolutions(slideIndex) : new List<AcceptedSolutionInfo>()
+			};
+			return View(model);
+		}
+
 		[HttpPost]
 		[Authorize]
 		public async Task<ActionResult> RunSolution(string courseId, int slideIndex = 0)
@@ -46,6 +69,15 @@ namespace uLearn.Web.Controllers
 			var result = await CheckSolution(exerciseSlide, code, slideIndex);
 			await SaveUserSolution(courseId, slideIndex, code, result.ExecutionResult, result.IsRightAnswer);
 			return Json(result);
+		}
+
+		[HttpPost]
+		[Authorize]
+		public async Task<Like> LikeSolution()
+		{
+			var id = GetUserCode(Request.InputStream);
+			var like = await solutionsRepo.Like(int.Parse(id), User.Identity.GetUserId());
+			return like;
 		}
 
 		private string NormalizeString(string s)
@@ -58,7 +90,6 @@ namespace uLearn.Web.Controllers
 			var solution = exerciseSlide.Solution.BuildSolution(code);
 			var submition = await executionService.Submit(solution, "");
 			var isRightAnswer = NormalizeString(submition.Output).Equals(NormalizeString(exerciseSlide.ExpectedOutput));
-			var acceptedUsersSolutions = solutionsRepo.GetAllAcceptedSolutions(slideIndex);
 			return new RunSolutionResult
 			{
 				ExecutionResult = submition,
