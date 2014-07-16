@@ -160,9 +160,18 @@ namespace uLearn.CSharp
 			Assert.That(renderedText, Contains.Substring(expected));
 		}
 
+		[Test]
+		public void include_code()
+		{
+			var slide = GenerateSlide("Includes.cs");
+			var renderedText = slide.Blocks[1].RenderedText;
+			var expected = "included(_HelloWorld.cs)";
+			Assert.That(renderedText, Contains.Substring(expected));
+		}
+
 		private static Slide GenerateSlide(string name)
 		{
-			return SlideParser.ParseSlide(@".\tests\" + name, null);
+			return SlideParser.ParseSlide(@".\tests\" + name, null, includeName => "included(" + includeName + ")");
 		}
 	}
 }

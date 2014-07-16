@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -44,14 +45,17 @@ namespace uLearn.Web.Models
 			Courses.Add(LoadCourse(courseId, courseTitle));
 		}
 
-		private static Course LoadCourse(string courseId, string courseTitle)
+		private Course LoadCourse(string courseId, string courseTitle)
 		{
 			var resourceFiles = Resources.EnumerateResourcesFrom("uLearn.Web.Courses." + courseId)
 				.OrderBy(f => f.Filename)
 				.ToList();
+			var includes = resourceFiles
+				.Where(f => !IsSlide(f))
+				.ToDictionary(inc => inc.Filename, inc => inc.GetContent().AsUtf8());
 			var slides = resourceFiles
 				.Where(IsSlide)
-				.Select(f => LoadSlide(f, resourceFiles))
+				.Select(f => LoadSlide(f, resourceFiles, name => includes[name]))
 				.ToArray();
 			return new Course(courseId, courseTitle, slides);
 		}
@@ -61,13 +65,13 @@ namespace uLearn.Web.Models
 			return !x.Filename.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) && !x.Filename.Contains("._");
 		}
 
-		private static Slide LoadSlide(ResourceFile slideFile, IList<ResourceFile> resourceFiles)
+		private static Slide LoadSlide(ResourceFile slideFile, IList<ResourceFile> resourceFiles, Func<string, string> getInclude)
 		{
 			var sourceCode = Encoding.UTF8.GetString(slideFile.GetContent());
 			//var tmp = fileWithUsings.GetContent();
 			var usings = GetUsings(slideFile, resourceFiles); 
 			var info = GetInfoForSlide(slideFile, resourceFiles);
-			return SlideParser.ParseCode(sourceCode, info, usings);
+			return SlideParser.ParseCode(sourceCode, info, usings, getInclude);
 		}
 
 		private static string GetUsings(ResourceFile file, IList<ResourceFile> all)

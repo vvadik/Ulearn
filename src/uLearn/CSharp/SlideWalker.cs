@@ -10,6 +10,7 @@ namespace uLearn.CSharp
 {
 	public class SlideWalker : CSharpSyntaxRewriter
 	{
+		private readonly Func<string, string> getInclude;
 		public readonly List<SlideBlock> Blocks = new List<SlideBlock>();
 		public string ExerciseInitialCode { get; private set; }
 		public bool IsExercise { get; private set; }
@@ -17,6 +18,11 @@ namespace uLearn.CSharp
 		public readonly List<string> Hints = new List<string>();
 		public MethodDeclarationSyntax ExerciseNode;
 		public string Title;
+
+		public SlideWalker(Func<string, string> getInclude) : base(false)
+		{
+			this.getInclude = getInclude;
+		}
 
 		public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
 		{
@@ -121,16 +127,27 @@ namespace uLearn.CSharp
 			}
 			else if (trivia.CSharpKind() == SyntaxKind.SingleLineCommentTrivia)
 			{
-				const string video = "//#video ";
-				if (comment.StartsWith(video))
+				if (comment.StartsWith("//#"))
 				{
-					var url = comment.Substring(video.Length);
-					Blocks.Add(SlideBlock.FromHtml(
-						string.Format(
-						"<iframe class='embedded-video' width='800' height='450' src='{0}' frameborder='0' allowfullscreen></iframe>", url)));
+					var parts = comment.Split(new[]{' '}, 2);
+					if (parts[0] == "//#video") EmbedVideo(parts[1]);
+					if (parts[0] == "//#include") EmbedCode(parts[1]);
+
 				}
 			}
-			return base.VisitTrivia(trivia);;
+			return base.VisitTrivia(trivia);
+		}
+
+		private void EmbedCode(string filename)
+		{
+			Blocks.Add(SlideBlock.FromCode(getInclude(filename)));
+		}
+
+		private void EmbedVideo(string url)
+		{
+			Blocks.Add(SlideBlock.FromHtml(
+				string.Format(
+					"<iframe class='embedded-video' width='800' height='450' src='{0}' frameborder='0' allowfullscreen></iframe>", url)));
 		}
 
 		public static SlideBlock ExtractMarkDownFromComment(SyntaxTrivia comment)
