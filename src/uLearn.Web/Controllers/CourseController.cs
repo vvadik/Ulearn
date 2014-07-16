@@ -36,7 +36,9 @@ namespace uLearn.Web.Controllers
 			{
 				Course = course,
 				SlideIndex = slideIndex,
-				Slide = course.Slides[slideIndex]
+				Slide = course.Slides[slideIndex],
+				NextSlideIndex = slideIndex + 1,
+				PrevSlideIndex = slideIndex - 1
 			};
 			return View(model);
 		}
@@ -49,6 +51,8 @@ namespace uLearn.Web.Controllers
 			{
 				Course = course,
 				SlideIndex = slideIndex,
+				NextSlideIndex = slideIndex + 1,
+				PrevSlideIndex = slideIndex,
 				Slide = course.Slides[slideIndex]
 			};
 			var isLegal = solutionsRepo.IsUserPassedTask(courseId, slideIndex, User.Identity.GetUserId());

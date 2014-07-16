@@ -1,28 +1,11 @@
 ﻿@model uLearn.CoursePageModel
 
-<div>
-	<a class="nav-arrow nav-left" id="PrevLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex - 1})"><i class="glyphicon glyphicon-chevron-left"></i></a>
-    <span class="nav-arrow nav-left" id="SelectorHere">Листалка тут → </span>
-	<a class="nav-arrow nav-right" id="NextLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex + 1})"><i class="glyphicon glyphicon-chevron-right"></i></a>
-    <span class="nav-arrow nav-right" id="EndHere">Конец!</span>
-	<a class="nav-arrow nav-right" id="ShowAnotherAnswer" href="@Url.Action("AcceptedSolutions", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex })"><i class="glyphicon glyphicon-chevron-right"></i></a>
+<div id="nav_arrows" data-hasnext="@(Model.HasNextSlide?"true":"")" data-hasprev="@(Model.HasPrevSlide?"true":"")">
+	<a class="nav-arrow nav-left" id="prev_slide_button" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.PrevSlideIndex})"><i class="glyphicon glyphicon-chevron-left"></i></a>
+	<a class="nav-arrow nav-right" id="next_slide_button" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.NextSlideIndex})"><i class="glyphicon glyphicon-chevron-right"></i></a>
 
-	@*
-	@if (Model.HasPrevSlide)
-    {
-        <a class="nav-arrow nav-left" id="PrevLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex - 1})"><i class="glyphicon glyphicon-chevron-left"></i></a>
-    }
-    else
-    {
-        <span class="nav-arrow nav-left">Листалка тут → </span>
-    }
+	<a class="nav-arrow nav-right" id="next_solutions_button" href="@Url.Action("AcceptedSolutions", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex })"><i class="glyphicon glyphicon-chevron-right"></i></a>
 
-    @if (Model.HasNextSlide)
-    {
-    <a class="nav-arrow nav-right" id="NextLink" href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex + 1})"><i class="glyphicon glyphicon-chevron-right"></i></a>
-    }
-    else
-    {
-    <span class="nav-arrow nav-right">Конец!</span>
-    }*@
+	<span class="nav-arrow nav-left" id="no_prev_slide">Листалка тут → </span>
+	<span class="nav-arrow nav-right" id="no_next_slide">Конец!</span>
 </div>
