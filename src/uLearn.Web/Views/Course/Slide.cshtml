@@ -26,6 +26,7 @@
                     {
                         <textarea class='code code-exercise'>@slide.ExerciseInitialCode.EnsureEnoughLines(10)</textarea>
                         <div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine ™</a></div>
+                    }
 
 				  @*
   					<a href="#" onclick="updateVerdict(true, 'Успех!', 'some right answer', false)">OK</a>
@@ -47,9 +48,11 @@
                                 <pre class="no-rounds"><code class="expected-output-content">@slide.ExpectedOutput</code></pre>
                             </div>
                         </div>
-                    }
                 </div>
-            @Html.Partial("_SlideNavigation")
+  
+
+            
+            @Html.Partial("_SlideNavigation", Model)
         </div>
     </div>
 </div>
