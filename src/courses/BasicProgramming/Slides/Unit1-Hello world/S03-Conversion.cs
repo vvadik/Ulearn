@@ -2,32 +2,34 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Title("Конверсия типов")]
+	[Title("Преобразования типов")]
 	public class S03_Conversion
 	{
 		/*
-		##Задача: Конверсия типов
-
-		Вася регулярно получает за красивые глазки от кого-нибудь по ```amount``` [биткоинов](http://ru.wikipedia.org/wiki/Bitcoin).
-		
-		Вася хочет знать сколько биткоинов у него уже накопилось. А чтобы не мелочиться, хочет округлить сумму до ближайшего целого.
-		
-		Он написал для этого программу, но что-то с ней не так... Помогите ему исправить все ошибки.
+		Исправьте все ошибки преобразования типов.
 		*/
 
 		[Exercise]
-		[ExpectedOutput("67")]
+		[ExpectedOutput("31415\n31416")]
 		public static void Main()
 		{
-			double amount = 1.11;
-			int peopleCount = 60; // количество человек, которые подарили Васе amount биткоинов каждый.
-			double totalMoney = Math.Round(amount*peopleCount);
-			Console.WriteLine(totalMoney);
+			double pi = Math.PI;
+			int tenThousend = (int)10000L;
+			float floatPi = (float) pi;
+			float tenThousendPi = floatPi*tenThousend;
+			int roundedTenThousendPi = (int)Math.Round(tenThousendPi);
+			int integerPartOfTenThousednPi = (int)tenThousendPi;
+			Console.WriteLine(integerPartOfTenThousednPi);
+			Console.WriteLine(roundedTenThousendPi);
 			/*uncomment
-			double amount = 1.11; //количество биткоинов от одного человека
-			int peopleCount = 60; // количество человек
-			double totalMoney = (int) amount*peopleCount; // ← исправьте ошибку в этой строке
-			Console.WriteLine(totalMoney);
+			double pi = Math.PI;
+			int tenThousend = 10000L;
+			float floatPi = pi;
+			float tenThousendPi = floatPi*tenThousend;
+			int roundedTenThousendPi = tenThousendPi;
+			int integerPartOfTenThousednPi = tenThousendPi;
+			Console.WriteLine(integerPartOfTenThousednPi);
+			Console.WriteLine(roundedTenThousendPi);
 			*/
 		}
 	}

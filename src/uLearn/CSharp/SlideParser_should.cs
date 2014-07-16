@@ -151,6 +151,15 @@ namespace uLearn.CSharp
 			StringAssert.DoesNotContain("void HelloKitty(", ans);
 		}
 
+		[Test]
+		public void include_video()
+		{
+			var slide = GenerateSlide("Includes.cs");
+			var renderedText = slide.Blocks.First().RenderedText;
+			var expected = "<iframe class='embedded-video' width='800' height='450' src='//www.youtube.com/embed/81Ub0SMxZQo' frameborder='0' allowfullscreen></iframe>";
+			Assert.That(renderedText, Contains.Substring(expected));
+		}
+
 		private static Slide GenerateSlide(string name)
 		{
 			return SlideParser.ParseSlide(@".\tests\" + name, null);

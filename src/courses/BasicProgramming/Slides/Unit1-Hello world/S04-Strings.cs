@@ -6,8 +6,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	class S04_Strings
 	{
 		/*
-		##Задача: Две половинки одного целого
-		
 		Допишите код вместо ```...``` так, чтобы он выводил на экран вторую половину строки ```text```.
 		*/
 		[Exercise]

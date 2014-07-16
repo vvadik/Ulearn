@@ -2,13 +2,11 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Title("Привет, мир!")]
-	public class S01_HelloWorld
+	[Title("Первый шаг")]
+	public class S011_FirstStep
 	{
 
 		/*
-		##Задача: Обряд посвящения
-		
 		Любая, даже самая сложная дорога, начинается с первого шага.
 
 		Выведите на консоль фразу ```The first step!```
@@ -16,7 +14,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 
 		[Exercise]
 		[ExpectedOutput("The first step!")]
-		[Hint("Вывод на консоль производится методом Console.WriteLine")]
+		[Hint("Вывод на консоль производится методом ```Console.WriteLine```")]
 		static public void Main()
 		{
 			Console.WriteLine("The first step!");

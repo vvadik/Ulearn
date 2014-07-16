@@ -20,13 +20,13 @@
 				<ul id=@("N"+groupNumber) class="@collapseOption">
 					@for (; index < Model.Course.Slides.Length; index++)
 					{
-						var inf = Model.Course.Slides[index];
-						if (inf.Info.UnitName != currentUnit)
+						var slide = Model.Course.Slides[index];
+						if (slide.Info.UnitName != currentUnit)
 						{
 							break;
 						}
 						var selectedSlide = index == Model.SlideIndex;
-						<li class="@(selectedSlide ? "selected" : "")">@Html.ActionLink(inf.Title, "Slide", "Course", new { courseId = Model.Course.Id, slideIndex = index }, null)</li>
+						<li class="@(selectedSlide ? "selected" : "")">@Html.ActionLink(slide.Title, "Slide", "Course", new { courseId = Model.Course.Id, slideIndex = index }, null)</li>
 					}
 				</ul>
 			</li>

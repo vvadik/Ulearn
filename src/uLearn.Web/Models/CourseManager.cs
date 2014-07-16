@@ -50,10 +50,15 @@ namespace uLearn.Web.Models
 				.OrderBy(f => f.Filename)
 				.ToList();
 			var slides = resourceFiles
-				.Where(x => !x.Filename.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+				.Where(IsSlide)
 				.Select(f => LoadSlide(f, resourceFiles))
 				.ToArray();
 			return new Course(courseId, courseTitle, slides);
+		}
+
+		private static bool IsSlide(ResourceFile x)
+		{
+			return !x.Filename.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) && !x.Filename.Contains("._");
 		}
 
 		private static Slide LoadSlide(ResourceFile slideFile, IList<ResourceFile> resourceFiles)

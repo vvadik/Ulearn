@@ -3,13 +3,11 @@ using System.Text;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Title("Intellisence")]
+	[Title("Добрый работодатель")]
 	public class S10_IntelliSense
 	{
 		/*
 
-		##Задача: Добрый работодатель
-		
 		Вася до завтра должен написать важную подпрограмму для Доброго Работодателя.
 		Осталось дописать всего один метод, когда Вася от переутомления крепчайше заснул.
 

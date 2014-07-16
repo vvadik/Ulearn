@@ -30,8 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MarkdownDeep">
-      <HintPath>..\packages\MarkdownDeep.NET.1.5\lib\.NetFramework 3.5\MarkdownDeep.dll</HintPath>
+    <Reference Include="MarkdownDeep, Version=1.5.4615.26275, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\libs\MarkdownDeep\MarkdownDeep.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis">
       <HintPath>..\packages\Microsoft.CodeAnalysis.Common.0.6.4033103-beta\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
@@ -92,6 +93,9 @@
     <Compile Include="StringExtensions_SplitToLines_should.cs" />
     <Compile Include="CSharp\SyntaxExtensions.cs" />
     <Compile Include="SlideTestsUtils.cs" />
+    <Compile Include="tests\Includes.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="tests\HelloWorld.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>

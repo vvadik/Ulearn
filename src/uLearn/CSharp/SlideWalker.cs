@@ -112,13 +112,25 @@ namespace uLearn.CSharp
 
 		public override SyntaxTrivia VisitTrivia(SyntaxTrivia trivia)
 		{
+			var comment = trivia.ToString();
 			if (trivia.CSharpKind() == SyntaxKind.MultiLineCommentTrivia)
 			{
-				var firstLine = trivia.ToString().SplitToLines().First().Trim();
+				var firstLine = comment.SplitToLines().First().Trim();
 				if (firstLine != "/*uncomment")
 					Blocks.Add(ExtractMarkDownFromComment(trivia));
 			}
-			return base.VisitTrivia(trivia);
+			else if (trivia.CSharpKind() == SyntaxKind.SingleLineCommentTrivia)
+			{
+				const string video = "//#video ";
+				if (comment.StartsWith(video))
+				{
+					var url = comment.Substring(video.Length);
+					Blocks.Add(SlideBlock.FromHtml(
+						string.Format(
+						"<iframe class='embedded-video' width='800' height='450' src='{0}' frameborder='0' allowfullscreen></iframe>", url)));
+				}
+			}
+			return base.VisitTrivia(trivia);;
 		}
 
 		public static SlideBlock ExtractMarkDownFromComment(SyntaxTrivia comment)

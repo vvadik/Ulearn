@@ -43,8 +43,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
-    <Compile Include="Slides\Unit1-Hello world\S01-HelloWorld.cs" />
+    <Compile Include="Slides\Unit1-Hello world\S010-HelloWorld.cs" />
+    <Compile Include="Slides\Unit1-Hello world\S011-FirstStep.cs" />
     <Compile Include="Slides\Unit1-Hello world\S02-Types.cs" />
+    <Compile Include="Slides\Unit1-Hello world\S03-Conversion2.cs" />
     <Compile Include="Slides\Unit1-Hello world\S03-Conversion.cs" />
     <Compile Include="Slides\Unit1-Hello world\S04-Strings.cs" />
     <Compile Include="Slides\Unit1-Hello world\S05-ParseAndToString.cs" />

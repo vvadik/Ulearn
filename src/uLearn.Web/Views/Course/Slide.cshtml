@@ -9,6 +9,7 @@
     <div class="container body-content" >
         <div class="row" >
                 <div class='slide'>
+                <h1>@Model.Slide.Title</h1>
                     @foreach (SlideBlock block in Model.Slide.Blocks)
                     {
                         if (block.IsCode)
