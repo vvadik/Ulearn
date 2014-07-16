@@ -38,7 +38,7 @@ h")]
 			Console.WriteLine(s);
 			Console.WriteLine(c);
 			/*uncomment
-			... num1 = 5.5;
+			... num1 = +5.5e-2;
 			... num2 = 7.8f;
 			... num3 = 0;
 			... num4 = 2000000000000L;
