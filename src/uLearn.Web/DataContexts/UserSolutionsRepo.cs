@@ -39,7 +39,7 @@ namespace uLearn.Web.DataContexts
 				Timestamp = DateTime.Now,
 				UserId = userId,
 				CodeHash = code.GetHashCode(),
-				LikersStorage = new HashSet<string>()
+				LikersStorage = new List<Like>()
 			});
 			await db.SaveChangesAsync();
 			return userSolution;
@@ -51,13 +51,12 @@ namespace uLearn.Web.DataContexts
 			db.SaveChanges();
 		}
 
-		public async void Like(int id, string userId)
+		public async Task<Like> Like(int id, string userId)
 		{
 			var solutionForLike = db.UserSolutions.Find(id);
-			Delete(solutionForLike);
-			solutionForLike.LikersStorage.Add(userId);
-			db.UserSolutions.Add(solutionForLike);
+			solutionForLike.LikersStorage.Add(new Like {SolutionId = id, Timestamp = DateTime.Now, UserId = userId});
 			await db.SaveChangesAsync();
+			return new Like {SolutionId = id, Timestamp = DateTime.Now, UserId = userId};
 		}
 
 		public List<AcceptedSolutionInfo> GetAllAcceptedSolutions(int slideIndex)
@@ -67,9 +66,16 @@ namespace uLearn.Web.DataContexts
 			var prepared = db.UserSolutions
 				.Where(x => x.IsRightAnswer && x.SlideId == stringSlideIndex)
 				.ToList();
-			return prepared
-				//.OrderBy(x => x.LikersStorage.Count / (timeNow - x.Timestamp).TotalSeconds)
-				.Take(10).Select(x => new AcceptedSolutionInfo(x.Code, x.Id)).ToList();
+			var answer = prepared
+				.OrderByDescending(x => x.LikersStorage.Count /*/ (timeNow - x.Timestamp).TotalSeconds*/)
+				.Take(10).Select(x => new AcceptedSolutionInfo(x.Code, x.Id, x.LikersStorage.Select(y => y.UserId))).ToList();
+			return answer;
+		}
+
+		public bool IsUserPassedTask(string courseId, int slideIndex, string userId)
+		{
+			var slideId = slideIndex.ToString();
+			return db.UserSolutions.Any(x => x.SlideId == slideId && x.CourseId == courseId && x.UserId == userId && x.IsRightAnswer);
 		}
 	}
 }

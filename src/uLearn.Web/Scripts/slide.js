@@ -106,6 +106,17 @@ $runButton.click(function () {
 })
 
 
-$likeButton.click(function() {
+function LikeSolution(solutionId) {
+    $.ajax(
+	{
+	    type: "POST",
+	    url: likeSolutionUrl,
+        data: String(solutionId)
+	}).success(function (ans) {
+	})
+	.fail(function (req) {
 
-})
+	})
+	.always(function (ans) {
+	});
+}

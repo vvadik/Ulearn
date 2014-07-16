@@ -31,7 +31,7 @@ namespace uLearn.Web.Models
 		[Required]
 		public int CodeHash { get; set; }
 
-		public HashSet<string> LikersStorage { get; set; }
+		public virtual IList<Like> LikersStorage { get; set; }
 
 		[Required]
 		public DateTime Timestamp { get; set; }

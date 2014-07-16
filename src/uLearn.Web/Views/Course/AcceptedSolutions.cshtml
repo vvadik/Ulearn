@@ -1,4 +1,5 @@
-﻿@model uLearn.AcceptedSolutionsPageModel
+﻿@using System.Diagnostics
+@model uLearn.AcceptedSolutionsPageModel
 
 @{
     ViewBag.Title = Model.CoursePageModel.Course.Title;
@@ -10,7 +11,8 @@
 			@foreach (AcceptedSolutionInfo solution in Model.AcceptedSolutions)
 			{
 			    <textarea class='code code-sample'>@solution.Code</textarea>
-				<button type="button" id="like" class="run-solution-button btn btn-primary btn-lg no-rounds">Like!</button>
+			    <button type="button" onclick="LikeSolution(@solution.Id)" class="btn btn-primary btn-lg no-rounds">Like!</button>
+				<textarea class='code'>@solution.UsersWhoLike.Count</textarea>
 			}
 			@Html.Partial("_SlideNavigation", Model.CoursePageModel)
 		</div>
@@ -19,40 +21,40 @@
 @section scripts{
     <script src="~/Scripts/navigate.js"></script>
     <script src="~/Scripts/slide.js"></script>
-	<script>
-	          var likeSolutionUrl = "@Html.Raw(Url.Action("LikeSolution", new {id = 1}))";
-	</script>
+    <script>
+		var likeSolutionUrl = "@Html.Raw(Url.Action("LikeSolution"))";
+    </script>
 	@if (Model.CoursePageModel.HasNextSlide)
 	{
 		<script>
-			var $endHere = $("#EndHere");
-			$endHere.hide();
+		    var $endHere = $("#EndHere");
+		    $endHere.hide();
 		</script>
 	}
 	else
 	{
 		<script>
-			var $nextLink = $("#NextLink");
-			$nextLink.hide();
+		    var $nextLink = $("#NextLink");
+		    $nextLink.hide();
 		</script>
 	}
 	@if (Model.CoursePageModel.HasPrevSlide)
 	{
 		<script>
-			var $selectorHere = $("#SelectorHere");
-			$selectorHere.hide();
+		    var $selectorHere = $("#SelectorHere");
+		    $selectorHere.hide();
 		</script>
 	}
 	else
 	{
 		<script>
-			var $prevLink = $("#PrevLink");
-			$prevLink.hide();
+		    var $prevLink = $("#PrevLink");
+		    $prevLink.hide();
 		</script>
 	}
 	<script>
-		var $showAnotherAnswer = $("#ShowAnotherAnswer");
-		$showAnotherAnswer.hide();
+	    var $showAnotherAnswer = $("#ShowAnotherAnswer");
+	    $showAnotherAnswer.hide();
 	</script>
 
 }

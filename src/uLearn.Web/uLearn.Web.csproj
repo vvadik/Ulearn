@@ -193,6 +193,10 @@
     <Compile Include="Migrations\201407151400345_AddLike.Designer.cs">
       <DependentUpon>201407151400345_AddLike.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201407161046277_ChangeLikesStorage.cs" />
+    <Compile Include="Migrations\201407161046277_ChangeLikesStorage.Designer.cs">
+      <DependentUpon>201407161046277_ChangeLikesStorage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\CourseManager_should.cs" />
     <EmbeddedResource Include="Courses\**\*.*">
       <Visible>false</Visible>
@@ -229,6 +233,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CourseManager.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
+    <Compile Include="Models\Like.cs" />
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\RunSolutionResult.cs" />
     <Compile Include="Models\SlideViewModel.cs" />
@@ -242,6 +247,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201407151400345_AddLike.resx">
       <DependentUpon>201407151400345_AddLike.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201407161046277_ChangeLikesStorage.resx">
+      <DependentUpon>201407161046277_ChangeLikesStorage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

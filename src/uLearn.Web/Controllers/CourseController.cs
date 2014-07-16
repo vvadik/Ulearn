@@ -51,10 +51,11 @@ namespace uLearn.Web.Controllers
 				SlideIndex = slideIndex,
 				Slide = course.Slides[slideIndex]
 			};
+			var isLegal = solutionsRepo.IsUserPassedTask(courseId, slideIndex, User.Identity.GetUserId());
 			var model = new AcceptedSolutionsPageModel
 			{
 				CoursePageModel = coursePageModel,
-				AcceptedSolutions = solutionsRepo.GetAllAcceptedSolutions(slideIndex)
+				AcceptedSolutions = isLegal ? solutionsRepo.GetAllAcceptedSolutions(slideIndex) : new List<AcceptedSolutionInfo>()
 			};
 			return View(model);
 		}
@@ -70,11 +71,13 @@ namespace uLearn.Web.Controllers
 			return Json(result);
 		}
 
+		[HttpPost]
 		[Authorize]
-		public void LikeSolution(int id)
+		public async Task<Like> LikeSolution()
 		{
-			return;
-			//solutionsRepo.Like(id, "");
+			var id = GetUserCode(Request.InputStream);
+			var like = await solutionsRepo.Like(int.Parse(id), User.Identity.GetUserId());
+			return like;
 		}
 
 		private string NormalizeString(string s)
