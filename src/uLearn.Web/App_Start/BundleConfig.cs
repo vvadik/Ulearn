@@ -37,6 +37,7 @@ namespace uLearn.Web
 				"~/codemirror/lib/codemirror.css",
 				"~/codemirror/theme/cobalt.css",
 				"~/codemirror/addon/hint/show-hint.css",
+				"~/Jsdifflib/jsdifflib.css",
 				"~/Content/ulearn.css",
 				"~/Content/site.css"));
 		}

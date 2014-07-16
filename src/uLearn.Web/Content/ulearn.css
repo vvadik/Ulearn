@@ -99,6 +99,11 @@ a.nav-arrow:hover {
 
 .actual-output-content{}
 .expected-output-content{}
+.diff-table {
+    width: 100%;
+    margin-top: 25px;
+    word-wrap: break-word;
+}
 .run-verdict {
     height:46px;
     line-height: 46px;

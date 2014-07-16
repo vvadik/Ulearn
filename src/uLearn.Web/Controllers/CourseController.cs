@@ -63,7 +63,8 @@ namespace uLearn.Web.Controllers
 			{
 				ExecutionResult = submition,
 				IsRightAnswer = isRightAnswer,
-				AllAcceptedSolutions = acceptedUsersSolutions
+				AllAcceptedSolutions = acceptedUsersSolutions,
+				ExpectedOutput = exerciseSlide.ExpectedOutput
 			};
 		}
 

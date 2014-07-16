@@ -518,6 +518,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Jsdifflib\jsdifflib.css" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="codemirror\README.md" />
@@ -533,6 +534,7 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Jsdifflib\jsdifflib.js" />
     <Content Include="Scripts\slide.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\navigate.js" />
