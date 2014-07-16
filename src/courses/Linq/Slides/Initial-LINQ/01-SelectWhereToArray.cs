@@ -4,6 +4,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Проецирование и фильтрация элементов")]
 	[TestFixture]
 	public class SelectWhereToArray
 	{

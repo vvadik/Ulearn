@@ -6,6 +6,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Задача №8")]
 	[TestFixture]
 	public class LookupExercise
 	{
@@ -38,11 +39,12 @@ namespace uLearn.Courses.Linq.Slides
 		*/
 
 
-		[Exercise(SingleStatement = true)]
+		
 		[Hint("Сегодня никаких подсказок!")]
 		[Hint("Да, задача сложная, но тем не менее подсказок не будет!")]
 		[Hint("Ну правда, пора научиться решать подобные задачи без подсказок!")]
-		public IDictionary<string, HashSet<int>> BuildInvertedIndex(Document[] documents)
+		[Exercise(SingleStatement = true)]
+		public static IDictionary<string, HashSet<int>> BuildInvertedIndex(Document[] documents)
 		{
 			return
 				documents
@@ -58,8 +60,9 @@ namespace uLearn.Courses.Linq.Slides
 			// ваш код
 		}
 
-		[Test]
-		public void TestInvertedIndex()
+		[ExpectedOutput("True\r\nTrue\r\nTrue")]
+		[ShowOnSlide]
+		public static void Main()
 		{
 			Document[] docs =
 			{
@@ -69,11 +72,9 @@ namespace uLearn.Courses.Linq.Slides
 				new Document {Id = 4, Text = ""},
 			};
 			var index = BuildInvertedIndex(docs);
-
-			Assert.That(index["world"], Is.EquivalentTo(new[] {1, 2}));
-			Assert.That(index["words"], Is.EquivalentTo(new[] {2, 3}));
-			Assert.That(index["power"], Is.EquivalentTo(new[] {3}));
-			Assert.That(!index.ContainsKey(""));
+			Console.WriteLine(index["world"].SetEquals(new int[] {1,2}));
+			Console.WriteLine(index["words"].SetEquals(new int[] { 2, 3 }));
+			Console.WriteLine(index["power"].SetEquals(new int[] { 3 }));
 		}
 	}
 }

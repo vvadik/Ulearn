@@ -6,6 +6,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Задача №1")]
 	[TestFixture]
 	public class ReadNumbersExcercise
 	{
@@ -24,18 +25,22 @@ namespace uLearn.Courses.Linq.Slides
 		    -3
 		    0
 
-		Решение этой задачи будет использоваться следующим образом:
+		Допустим, что у нас уже есть массив строк, полученный из файла, реализуйте метод ParseNumbers
 		*/
 
-		[ShowBodyOnSlide]
-		public void ParseNumber_Sample()
+		[ShowOnSlide]
+		[ExpectedOutput("1\r\n2\r\n3")]
+		public static void Main()
 		{
-			int[] numbers = ParseNumbers(File.ReadLines("numbers.txt"));
+			string[] strNumbers = new string[] {"1", "2", "3"};
+			int[] parsedNumbers = ParseNumbers(strNumbers);
+			foreach (var e in parsedNumbers)
+				Console.WriteLine(e);
 		}
 
-				[Exercise(SingleStatement = true)]
-				[Hint("`int.Parse` преобразует строку в целое число.")]
-		public int[] ParseNumbers(IEnumerable<string> lines)
+		[Exercise]
+		[Hint("`int.Parse` преобразует строку в целое число.")]
+		public static int[] ParseNumbers(IEnumerable<string> lines)
 				{
 					return lines
 						.Where(line => line != "")
@@ -48,19 +53,6 @@ namespace uLearn.Courses.Linq.Slides
 						...
 					*/
 				}
-
-
-
-		[Test]
-		public void Test()
-		{
-			int[] actualNumbers = ParseNumbers(new[] {"", "1", "2", "", "42"});
-			Assert.That(
-				actualNumbers,
-				Is.EqualTo(new[] {1, 2, 42}).AsCollection);
-		}
-
-
 
 		/*
 		### Краткая справка

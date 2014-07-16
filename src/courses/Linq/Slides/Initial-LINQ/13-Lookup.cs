@@ -4,6 +4,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Группировка по ключу")]
 	[TestFixture]
 	public class Lookups
 	{

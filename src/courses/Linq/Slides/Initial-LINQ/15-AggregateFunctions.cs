@@ -4,6 +4,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Аггрегатные функции")]
 	[TestFixture]
 	public class AggregateFunctions
 	{

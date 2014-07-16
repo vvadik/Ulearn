@@ -4,6 +4,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Title("Порождение коллекций")]
 	[TestFixture]
 	public class SelectManySample
 	{
@@ -16,7 +17,7 @@ namespace uLearn.Courses.Linq.Slides
 		`IEnumerable<R> SelectMany(this IEnumerable<T> items, Func<T, IEnumerable<R>> f)`
 
 		В качестве аргумента она принимает функцию, преобразующий каждый элемент исходной последовательности
-		в новую последовательность. А результатом работы является конкатинация всех полученных последовательностей.
+		в новую последовательность. А результатом работы является конкатенация всех полученных последовательностей.
 
 		Следующий пример пояснит работу этого метода:
 		*/
