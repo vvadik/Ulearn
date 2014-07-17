@@ -174,5 +174,15 @@ a.nav-arrow:hover {
 .slide-container {
     margin-left: 320px;
 }
-    display: block;
+
+.ask-bar {
+    max-width: 500px;
+    width: 500px;
+    resize: none;
 }
+
+.ask-button {
+    margin-top: 10px;
+}
+
+
