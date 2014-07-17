@@ -11,8 +11,9 @@
 			@foreach (AcceptedSolutionInfo solution in Model.AcceptedSolutions)
 			{
 				<textarea class='code code-sample'>@solution.Code</textarea>
+				var counterId = "counter" + solution.Id;
 				<button type="button" onclick="likeSolution(@solution.Id)" class="btn btn-primary btn-lg no-rounds">Like!</button>
-				<textarea class='code'>@solution.UsersWhoLike.Count</textarea>
+				<textarea class='code' id="@counterId">@solution.UsersWhoLike.Count</textarea>
 			}
 			@Html.Partial("_SlideNavigation", Model.CoursePageModel)
 		</div>

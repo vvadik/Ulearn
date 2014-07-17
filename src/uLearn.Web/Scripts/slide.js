@@ -112,16 +112,23 @@ $runButton.click(function () {
 var likeSolutionUrl = $("#LikeSolutionUrl").data("url");
 
 function likeSolution(solutionId) {
-	$.ajax(
-	{
-		type: "POST",
-		url: likeSolutionUrl,
-		data: String(solutionId)
-	}).success(function (ans) {
-	})
-	.fail(function (req) {
-	})
-	.always(function (ans) {
-	});
+    $.ajax(
+        {
+            type: "POST",
+            url: likeSolutionUrl,
+            data: String(solutionId)
+        }).success(function(ans) {
+            var likerCounterId = "#counter" + solutionId;
+            var likeCounter = $(likerCounterId);;
+            if (ans == "success") {
+                likeCounter.text(String(parseInt(likeCounter.val()) + 1));
+            } else {
+                likeCounter.text("already like from u");
+            }
+        })
+        .fail(function(req) {
+        })
+        .always(function(ans) {
+        });
 }
 

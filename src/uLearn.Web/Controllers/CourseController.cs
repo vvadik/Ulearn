@@ -77,7 +77,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<Like> LikeSolution()
+		public async Task<string> LikeSolution()
 		{
 			var id = GetUserCode(Request.InputStream);
 			var like = await solutionsRepo.Like(int.Parse(id), User.Identity.GetUserId());

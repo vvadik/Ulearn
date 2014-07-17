@@ -51,12 +51,16 @@ namespace uLearn.Web.DataContexts
 			db.SaveChanges();
 		}
 
-		public async Task<Like> Like(int id, string userId)
+		public async Task<string> Like(int solutionId, string userId)
 		{
-			var solutionForLike = db.UserSolutions.Find(id);
-			solutionForLike.LikersStorage.Add(new Like {SolutionId = id, Timestamp = DateTime.Now, UserId = userId});
+			var solutionForLike = db.UserSolutions.Find(solutionId);
+			if (solutionForLike.LikersStorage.Any(like => like.UserId == userId))
+			{
+				return "already been";
+			}
+			solutionForLike.LikersStorage.Add(new Like {SolutionId = solutionId, Timestamp = DateTime.Now, UserId = userId});
 			await db.SaveChangesAsync();
-			return new Like {SolutionId = id, Timestamp = DateTime.Now, UserId = userId};
+			return "success";
 		}
 
 		public List<AcceptedSolutionInfo> GetAllAcceptedSolutions(int slideIndex)
