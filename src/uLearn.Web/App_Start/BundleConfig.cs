@@ -1,6 +1,4 @@
-﻿using System.Web;
-using System.Web.Hosting;
-using System.Web.Optimization;
+﻿using System.Web.Optimization;
 
 namespace uLearn.Web
 {
@@ -20,11 +18,18 @@ namespace uLearn.Web
 			bundles.Add(new ScriptBundle("~/modernizr").Include(
 				"~/Scripts/modernizr-*"));
 
+			bundles.Add(new ScriptBundle("~/slide").Include(
+				"~/Scripts/slide-nav.js",
+				"~/Scripts/slide-editor.js",
+				"~/Scripts/slide-run.js",
+				"~/Scripts/slide-solutions-like.js",
+				"~/Jsdifflib/jsdifflib.js"
+				));
+
 			bundles.Add(new ScriptBundle("~/codemirror").Include(
 				"~/codemirror/lib/codemirror.js",
 				"~/codemirror/mode/clike/clike.js",
 				"~/codemirror/addon/hint/show-hint.js",
-				//"~/codemirror/addon/hint/anyword-hint.js",
 				"~/codemirror/addon/hint/csharp-hint.js"
 				));
 

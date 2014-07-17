@@ -552,9 +552,11 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Jsdifflib\jsdifflib.js" />
-    <Content Include="Scripts\slide.js" />
+    <Content Include="Scripts\slide-editor.js" />
+    <Content Include="Scripts\slide-run.js" />
+    <Content Include="Scripts\slide-solutions-like.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
-    <Content Include="Scripts\navigate.js" />
+    <Content Include="Scripts\slide-nav.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
