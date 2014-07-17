@@ -10,7 +10,6 @@ namespace uLearn.Web.DataContexts
 		public ULearnDb()
 			: base("DefaultConnection")
 		{
-			Database.SetInitializer(new CreateDatabaseIfNotExists<ULearnDb>());
 			Database.SetInitializer(new MigrateDatabaseToLatestVersion<ULearnDb, Configuration>());
 
 		}
