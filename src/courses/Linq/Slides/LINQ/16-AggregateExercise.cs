@@ -5,13 +5,11 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Title("Задача №9")]
+	[Title("Задача. Самое длинное слово")]
 	[TestFixture]
 	public class AggregateExercise
 	{
 		/*
-
-		##Задача: Самое длинное слово
 
 		Дан список слов, нужно найти самое длинное слово из этого списка, 
 		а из всех самых длинных — лексикографически первое слово.

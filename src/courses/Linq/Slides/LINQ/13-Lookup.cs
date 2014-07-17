@@ -4,13 +4,11 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Title("Группировка по ключу")]
+	[Title("Группировка с помощью ToDictionary и ToLookup")]
 	[TestFixture]
 	public class Lookups
 	{
 		/*
-
-		##Группировка с помощью ToDictionary и ToLookup
 
 		Нередко встречается необходимость сгруппировав элементы, 
 		преобразовать их в структуру данных для поиска группы по ключу группировки.

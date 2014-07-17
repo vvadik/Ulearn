@@ -6,14 +6,12 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Title("Задача №4")]
+	[Title("Задача. Декартово произведение")]
 	[TestFixture]
 	public class CartesianProduct
 	{
 		/*
 
-		##Задача: Соседи
-		
 		Одно из не совсем очевидных применений `SelectMany` — это вычисление декартова произвдеения двух множеств.
 		Попробуйте применить это знание при решении следующей задачи:
 

@@ -4,13 +4,11 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Title("Порождение коллекций")]
+	[Title("SelectMany")]
 	[TestFixture]
 	public class SelectManySample
 	{
 		/*
-
-		##SelectMany
 
 		Этот метод несколько менее очевиден, чем предыдущие, однако он довольно часто пригождается в самых разных задачах.
 

@@ -5,13 +5,11 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Title("Задача №7")]
+	[Title("Задача. Частотный словарь текста")]
 	[TestFixture]
 	public class GroupingExercise
 	{
 		/*
-
-		##Задача: Частотный словарь текста
 
 		Дан текст, нужно вывести count наиболее часто встречающихся в тексте слов, вместе с их частотой.
 

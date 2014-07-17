@@ -3,13 +3,11 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Title("Сортировка. Повторяющиеся элементы")]
+	[Title("OrderBy и Distinct")]
 	[TestFixture]
 	public class Sort
 	{
 		/*
-
-		## OrderBy и Distinct
 
 		Для сортировки последовательности в Linq имеется четыре метода:
 

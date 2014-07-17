@@ -5,13 +5,11 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Title("Задача №3")]
+	[Title("Задача. Объединение коллекций")]
 	[TestFixture]
 	public class SelectManyExercise
 	{
 		/*
-
-		##Задача: SelectMany
 
 		Вам дан список всех классов в школе. Нужно получить спиок всех учащихся всех классов.
 		

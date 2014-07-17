@@ -7,13 +7,11 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Title("Задача №2")]
+	[Title("Задача. Чтение списка точек")]
 	[TestFixture]
 	public class ReadPointsExcercise
 	{
 		/*
-
-		##Задача: Чтение из файла 2
 
 		В файле filename в каждой строке написаны две координаты точки, разделенные пробелом.
 		Прочитайте файл в массив точек.

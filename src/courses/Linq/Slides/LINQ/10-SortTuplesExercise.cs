@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Title("Задача №6")]
+	[Title("Задача. Сравнение кортежей")]
 	[TestFixture]
 	public class SortTuples
 	{

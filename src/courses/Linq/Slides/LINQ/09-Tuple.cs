@@ -9,10 +9,6 @@ namespace uLearn.Courses.Linq.Slides
 	{
 		/*
 
-		##Кортежи
-
-		
-
 		*/
 
 		[ShowBodyOnSlide]

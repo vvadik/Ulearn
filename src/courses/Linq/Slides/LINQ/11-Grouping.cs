@@ -3,13 +3,11 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Title("Группировка элементов")]
+	[Title("Группировка с помощью GroupBy")]
 	[TestFixture]
 	public class Grouping
 	{
 		/*
-
-		##Группировка
 
 		Linq содержит несколько методов группировки элементов последовательности в группы по некоторому признаку.
 		Основной способ группировки — это метод `GroupBy`. Вот его полная сигнатура:
