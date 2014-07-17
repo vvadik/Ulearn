@@ -586,6 +586,7 @@
     <Content Include="Views\Course\_SlideNavigation.cshtml" />
     <Content Include="Views\Course\_Sidebar.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
+    <Content Include="Views\Course\_AskBar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
