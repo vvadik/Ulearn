@@ -49,52 +49,52 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Slides\Initial-LINQ\01-SelectWhereToArray.cs">
+    <Compile Include="Slides\LINQ\01-SelectWhereToArray.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\02-ReadNumbersExcercise.cs">
+    <Compile Include="Slides\LINQ\02-ReadNumbersExcercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\03-ReadPointsExcercise.cs">
+    <Compile Include="Slides\LINQ\03-ReadPointsExcercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\04-SelectMany.cs">
+    <Compile Include="Slides\LINQ\04-SelectMany.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\05-SelectManyExercise.cs">
+    <Compile Include="Slides\LINQ\05-SelectManyExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\06-CartesianProductExercise.cs">
+    <Compile Include="Slides\LINQ\06-CartesianProductExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\07-SortAndDistinct.cs">
+    <Compile Include="Slides\LINQ\07-SortAndDistinct.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\08-SortExercise.cs">
+    <Compile Include="Slides\LINQ\08-SortExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\09-Tuple.cs">
+    <Compile Include="Slides\LINQ\09-Tuple.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\10-SortTuplesExercise.cs">
+    <Compile Include="Slides\LINQ\10-SortTuplesExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\11-Grouping.cs">
+    <Compile Include="Slides\LINQ\11-Grouping.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\12-WordsFrequenciesExercise.cs">
+    <Compile Include="Slides\LINQ\12-WordsFrequenciesExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\13-Lookup.cs">
+    <Compile Include="Slides\LINQ\13-Lookup.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\14-LookupExercise.cs">
+    <Compile Include="Slides\LINQ\14-LookupExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\15-AggregateFunctions.cs">
+    <Compile Include="Slides\LINQ\15-AggregateFunctions.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\Initial-LINQ\16-AggregateExercise.cs">
+    <Compile Include="Slides\LINQ\16-AggregateExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Slides_Tests.cs" />
@@ -116,9 +116,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />
-    <Content Include="Slides\Initial-LINQ\Usings.txt" />
+    <Content Include="Slides\LINQ\Usings.txt" />
     <Content Include="Slides\Title.txt" />
-    <Content Include="Slides\Initial-LINQ\Title.txt" />
+    <Content Include="Slides\LINQ\Title.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

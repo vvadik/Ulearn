@@ -36,7 +36,9 @@
 
 					@Html.Partial("_ExerciseHints", slide.HintsHtml)
 
-					<button type="button" id="run" class="run-solution-button btn btn-primary btn-lg no-rounds">RUN</button>
+					<button type="button" data-url="@Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})" class="run-solution-button btn btn-primary btn-lg no-rounds">
+						RUN
+					</button>
 					<div class="run-verdict clearfix"></div>
 					<div class="after-run-block">
 						<div class="actual-output">
@@ -57,42 +59,4 @@
 	<script src="~/Scripts/navigate.js"></script>
 	<script src="~/Jsdifflib/jsdifflib.js"></script>
 	<script src="~/Scripts/slide.js"></script>
-	<script>
-		var runSolutionUrl = "@Html.Raw(Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex}))";
-		console.log(runSolutionUrl);
-	</script>
-	@if (Model.HasNextSlide)
-	{
-		<script>
-			var $endHere = $("#EndHere");
-			$endHere.hide();
-		</script>
-	}
-	else
-	{
-		<script>
-			var $nextLink = $("#NextLink");
-			$nextLink.hide();
-		</script>
-	}
-	@if (Model.HasPrevSlide)
-	{
-		<script>
-			var $selectorHere = $("#SelectorHere");
-			$selectorHere.hide();
-		</script>
-	}
-	else
-	{
-		<script>
-			var $prevLink = $("#PrevLink");
-			$prevLink.hide();
-		</script>
-	}
-	<script>
-		var $showAnotherAnswer = $("#ShowAnotherAnswer");
-		$showAnotherAnswer.hide();
-	</script>
-
-
 }

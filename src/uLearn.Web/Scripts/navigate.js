@@ -3,64 +3,54 @@ document.onkeydown = NavigateThrough;
 var focusInInput = false;
 
 if (document.getElementsByTagName)
-    onload = function () {
-        var e, i = 0;
-        while (e = document.getElementsByTagName('INPUT')[i++]) {
-            if (e.type == 'text' || e.type == 'search') e.onfocus = function () {focusInInput = true};
-            if (e.type == 'text' || e.type == 'search') e.onblur = function () {focusInInput = false};
-        }
-        i = 0;
-        while (e = document.getElementsByTagName('TEXTAREA')[i++]) {
-            e.onfocus = function () {focusInInput = true};
-            e.onblur = function () {focusInInput = false};
-        }
-    };
+	onload = function () {
+		var e, i = 0;
+		while (e = document.getElementsByTagName('INPUT')[i++]) {
+			if (e.type == 'text' || e.type == 'search') e.onfocus = function () { focusInInput = true };
+			if (e.type == 'text' || e.type == 'search') e.onblur = function () { focusInInput = false };
+		}
+		i = 0;
+		while (e = document.getElementsByTagName('TEXTAREA')[i++]) {
+			e.onfocus = function () { focusInInput = true };
+			e.onblur = function () { focusInInput = false };
+		}
+	};
 
-function NavigateThrough (event) {
-	if (!document.getElementById) return;
-
+function NavigateThrough(event) {
 	if (window.event) event = window.event;
-
-	if ((event.ctrlKey || event.altKey) && !focusInInput){
-		var link = null;
+	if ((event.ctrlKey || event.altKey) && !focusInInput) {
 		var href = null;
-		switch (event.keyCode ? event.keyCode : event.which ? event.which : null){
+		switch (event.keyCode ? event.keyCode : event.which ? event.which : null) {
 			case 0x27:
-				link = document.getElementById ('NextLink');
+				href = $('.nav-right:visible').attr('href');
 				break;
 			case 0x25:
-				link = document.getElementById ('PrevLink');
-				break;
-			case 0x24:
-				href = '/';
+				href = $('.nav-left:visible').attr('href');
 				break;
 		}
-
-		if (link && link.href) document.location = link.href;
-		if (href) document.location = href;
-	}			
+		if (href)
+			document.location = href;
+	}
 }
 
-jQuery(function(){
-  if(jQuery('.howcr').size() > 0){
-    if(navigator.userAgent.toLowerCase().indexOf("mac os x")!=-1){
-	  if(jQuery('.howcr').html().indexOf('Ctrl') > -1){
-		jQuery('.howcr').html('Alt');
-	  }
-    } else if(navigator.userAgent.toLowerCase().indexOf("opera")!=-1){
-	  if(jQuery('.howcr').html().indexOf('Ctrl') > -1){
-		jQuery('.howcr').html('Ctrl + Shift');
-	  }
-    }
-  } else if(jQuery('.smaller.ctrl').size() > 0){
-    if(navigator.userAgent.toLowerCase().indexOf("mac os x")!=-1){
-      jQuery('.smaller.ctrl').each(function(){
-        $(this).html($(this).html().replace(/Ctrl/g, 'Alt'))
-      });
-    } else if(navigator.userAgent.toLowerCase().indexOf("opera")!=-1){
-      jQuery('.smaller.ctrl').each(function(){
-      	$(this).html($(this).html().replace(/Ctrl/g, 'Ctrl + Shift'))
-      });
+var slideNavigation = {
+	$prev: $("#prev_slide_button"),
+	$next: $("#next_slide_button"),
+	$noPrev: $("#no_prev_slide"),
+	$noNext: $("#no_next_slide"),
+	$nextSolutions: $("#next_solutions_button"),
+	update: function (hasNext, hasPrev) {
+		this.$next.toggle(hasNext);
+		this.$noNext.toggle(!hasNext);
+		this.$prev.toggle(hasPrev);
+		this.$noPrev.toggle(!hasPrev);
+		this.$nextSolutions.toggle(false);
+	},
+	makeShowSolutionsNext: function () {
+		this.$next.toggle(false);
+		this.$noNext.toggle(false);
+		this.$nextSolutions.toggle(true);
 	}
-  }
-});
+}
+var $parent = $("#nav_arrows");
+slideNavigation.update($parent.data("hasnext"), !!$parent.data("hasprev"));

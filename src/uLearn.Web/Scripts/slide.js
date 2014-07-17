@@ -56,32 +56,25 @@ function updateVerdict(isRight, verdict, details, isCompileError) {
 	$runVerdict.toggleClass("label-success", isRight);
 	var showExpectedOutput = !isCompileError && !isRight;
 	$expectedOutput.toggle(showExpectedOutput);
-    if (isCompileError) {
-        $actualOutput.toggleClass("full-size", true);
-	$actualOutput.find(".output-label").toggle(!isCompileError);
-        $actualOutputContent.text(details); //тут я возьму текущий вывод
-    }
-    $difTable.toggle(false);
-    $actualOutput.toggle(false);
-    if (isCompileError) {
-        $difTable.toggle(false);
-        $actualOutput.toggle(true);
-    } else if (!isRight)
-        $difTable.toggle(true);
+	if (isCompileError) {
+		$actualOutput.toggleClass("full-size", true);
+		$actualOutput.find(".output-label").toggle(!isCompileError);
+		$actualOutputContent.text(details); //тут я возьму текущий вывод
+	}
+	$difTable.toggle(false);
+	$actualOutput.toggle(false);
+	if (isCompileError) {
+		$difTable.toggle(false);
+		$actualOutput.toggle(true);
+	} else if (!isRight)
+		$difTable.toggle(true);
 	$afterRunBlock.show();
-    if (isRight) {
-        $showAnotherAnswer.show();
-        $nextLink.hide();
-        $endHere.hide();
-}
+	if (isRight) {
+		slideNavigation.makeShowSolutionsNext();
+	}
 }
 
-var $runButton = $("#run");
-var $nextLink = $("#NextLink");
-var $prevLink = $("#PrevLink");
-var $endHere = $("#EndHere");
-var $selectorHere = $("#SelectorHere");
-var $showAnotherAnswer = $("#ShowAnotherAnswer");
+var $runButton = $(".run-solution-button");
 
 $runButton.click(function () {
 	var code = $(".code-exercise")[0].codeMirrorEditor.getValue();
@@ -90,44 +83,45 @@ $runButton.click(function () {
 	$runVerdict.hide();
 
 	$.ajax(
+		{
+			type: "POST",
+			url: $runButton.data("url"),
+			data: code
+		}).success(function (ans) {
+			var isCompileError = ans.ExecutionResult.CompilationError;
+			var verdict = isCompileError
+				? "Compilation error"
+				: (ans.IsRightAnswer ? "Успех!" : "Неверный ответ");
+			var details = ans.ExecutionResult.CompilationError ? ans.ExecutionResult.CompilationError : ans.ExecutionResult.Output;
+			$difTable.html("<div></div>");
+			if (verdict != "Compilation error") {
+				var solutionsDiff = diffUsingJS(details, ans.ExpectedOutput);
+				$difTable.html(solutionsDiff);
+			}
+			updateVerdict(ans.IsRightAnswer, verdict, details, isCompileError);
+		})
+		.fail(function (req) {
+			updateVerdict(false, "Ошибка сервера :(", req.status + " " + req.statusText);
+			console.log(req.responseText);
+		})
+		.always(function (ans) {
+			$runButton.text("RUN").removeClass("active");
+		});
+});
+
+var likeSolutionUrl = $("#LikeSolutionUrl").data("url");
+
+function likeSolution(solutionId) {
+	$.ajax(
 	{
 		type: "POST",
-		url: runSolutionUrl,
-		data: code
-	}).success(function (ans) {
-		var isCompileError = ans.ExecutionResult.CompilationError;
-		var verdict = isCompileError
-			? "Compilation error" 
-			: (ans.IsRightAnswer ? "Успех!" : "Неверный ответ");
-		var details = ans.ExecutionResult.CompilationError ? ans.ExecutionResult.CompilationError : ans.ExecutionResult.Output;
-		$difTable.html("<div></div>");
-	        if (verdict != "Compilation error") {
-	            var solutionsDiff = diffUsingJS(details, ans.ExpectedOutput);
-	            $difTable.html(solutionsDiff);
-	        }
-		updateVerdict(ans.IsRightAnswer, verdict, details, isCompileError);
-	})
-	.fail(function (req) {
-		updateVerdict(false, "Ошибка сервера :(", req.status + " " + req.statusText);
-		console.log(req.responseText);
-		})
-	.always(function (ans) {
-		$runButton.text("RUN").removeClass("active");
-	});
-})
-
-
-function LikeSolution(solutionId) {
-    $.ajax(
-	{
-	    type: "POST",
-	    url: likeSolutionUrl,
-        data: String(solutionId)
+		url: likeSolutionUrl,
+		data: String(solutionId)
 	}).success(function (ans) {
 	})
 	.fail(function (req) {
-
 	})
 	.always(function (ans) {
 	});
 }
+

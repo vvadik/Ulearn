@@ -1,6 +1,6 @@
 ﻿namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Title("Не подключенные нэймспэйсы")]
+	[Title("Пространства имен")]
 	class S01_MissedUsings
 	{
 		//quize
