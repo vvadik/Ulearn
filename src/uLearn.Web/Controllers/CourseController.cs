@@ -31,35 +31,35 @@ namespace uLearn.Web.Controllers
 		[Authorize]
 		public ActionResult Slide(string courseId, int slideIndex = 0)
 		{
+			var model = CreateCoursePageModel(courseId, slideIndex);
+			return View(model);
+		}
+
+		private CoursePageModel CreateCoursePageModel(string courseId, int slideIndex)
+		{
 			Course course = courseManager.GetCourse(courseId);
+			var isPassedTask = solutionsRepo.IsUserPassedTask(courseId, slideIndex, User.Identity.GetUserId());
 			var model = new CoursePageModel
 			{
 				Course = course,
 				SlideIndex = slideIndex,
 				Slide = course.Slides[slideIndex],
 				NextSlideIndex = slideIndex + 1,
-				PrevSlideIndex = slideIndex - 1
+				PrevSlideIndex = slideIndex - 1,
+				IsPassedTask = isPassedTask,
+				LatestAcceptedSolution = isPassedTask ? solutionsRepo.GetLatestAcceptedSolution(courseId, slideIndex, User.Identity.GetUserId()) : null
 			};
-			return View(model);
+			return model;
 		}
 
 		[Authorize]
 		public ActionResult AcceptedSolutions(string courseId, int slideIndex = 0)
 		{
-			Course course = courseManager.GetCourse(courseId);
-			var coursePageModel = new CoursePageModel
-			{
-				Course = course,
-				SlideIndex = slideIndex,
-				NextSlideIndex = slideIndex + 1,
-				PrevSlideIndex = slideIndex,
-				Slide = course.Slides[slideIndex]
-			};
-			var isLegal = solutionsRepo.IsUserPassedTask(courseId, slideIndex, User.Identity.GetUserId());
+			var coursePageModel = CreateCoursePageModel(courseId, slideIndex);
 			var model = new AcceptedSolutionsPageModel
 			{
 				CoursePageModel = coursePageModel,
-				AcceptedSolutions = isLegal ? solutionsRepo.GetAllAcceptedSolutions(slideIndex) : new List<AcceptedSolutionInfo>()
+				AcceptedSolutions = coursePageModel.IsPassedTask ? solutionsRepo.GetAllAcceptedSolutions(slideIndex) : new List<AcceptedSolutionInfo>()
 			};
 			return View(model);
 		}

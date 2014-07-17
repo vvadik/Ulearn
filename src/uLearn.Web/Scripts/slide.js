@@ -70,6 +70,7 @@ function updateVerdict(isRight, verdict, details, isCompileError) {
 		$difTable.toggle(true);
 	$afterRunBlock.show();
 	if (isRight) {
+	    $('.label-success').show();
 		slideNavigation.makeShowSolutionsNext();
 	}
 }
@@ -123,7 +124,7 @@ function likeSolution(solutionId) {
             if (ans == "success") {
                 likeCounter.text(String(parseInt(likeCounter.val()) + 1));
             } else {
-                likeCounter.text("already like from u");
+                likeCounter.text("already like from you");
             }
         })
         .fail(function(req) {
@@ -131,4 +132,3 @@ function likeSolution(solutionId) {
         .always(function(ans) {
         });
 }
-
