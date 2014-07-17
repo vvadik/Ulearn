@@ -33,7 +33,7 @@ function setRunVerdict($verdict, ans) {
 	} else {
 		$verdict.addClass("label-danger");
 		$verdict.removeClass("label-success");
-		if (ans.ExecutionResult.CompilationError) {
+		if (ans.CompilationError) {
 			$verdict.text("Ошибка компиляции");
 		} else {
 			$verdict.text("Ошибка в программе");
@@ -58,8 +58,8 @@ function updateVerdict(isRight, verdict, details, isCompileError) {
 	$expectedOutput.toggle(showExpectedOutput);
 	if (isCompileError) {
 		$actualOutput.toggleClass("full-size", true);
-		$actualOutput.find(".output-label").toggle(!isCompileError);
-		$actualOutputContent.text(details); //тут я возьму текущий вывод
+		$actualOutput.find(".output-label").hide();
+		$actualOutputContent.text(details);
 	}
 	$difTable.toggle(false);
 	$actualOutput.toggle(false);
@@ -88,13 +88,13 @@ $runButton.click(function () {
 			url: $runButton.data("url"),
 			data: code
 		}).success(function (ans) {
-			var isCompileError = ans.ExecutionResult.CompilationError;
+			var isCompileError = !!ans.CompilationError;
 			var verdict = isCompileError
 				? "Compilation error"
 				: (ans.IsRightAnswer ? "Успех!" : "Неверный ответ");
-			var details = ans.ExecutionResult.CompilationError ? ans.ExecutionResult.CompilationError : ans.ExecutionResult.Output;
+			var details = ans.CompilationError ? ans.CompilationError : ans.ActualOutput;
 			$difTable.html("<div></div>");
-			if (verdict != "Compilation error") {
+			if (!isCompileError) {
 				var solutionsDiff = diffUsingJS(details, ans.ExpectedOutput);
 				$difTable.html(solutionsDiff);
 			}
@@ -104,7 +104,7 @@ $runButton.click(function () {
 			updateVerdict(false, "Ошибка сервера :(", req.status + " " + req.statusText);
 			console.log(req.responseText);
 		})
-		.always(function (ans) {
+		.always(function () {
 			$runButton.text("RUN").removeClass("active");
 		});
 });
@@ -112,23 +112,18 @@ $runButton.click(function () {
 var likeSolutionUrl = $("#LikeSolutionUrl").data("url");
 
 function likeSolution(solutionId) {
-    $.ajax(
-        {
-            type: "POST",
-            url: likeSolutionUrl,
-            data: String(solutionId)
-        }).success(function(ans) {
-            var likerCounterId = "#counter" + solutionId;
-            var likeCounter = $(likerCounterId);;
-            if (ans == "success") {
-                likeCounter.text(String(parseInt(likeCounter.val()) + 1));
-            } else {
-                likeCounter.text("already like from u");
-            }
-        })
-        .fail(function(req) {
-        })
-        .always(function(ans) {
-        });
+	$.ajax({
+		type: "POST",
+		url: likeSolutionUrl,
+		data: String(solutionId)
+	}).success(function (ans) {
+		var likerCounterId = "#counter" + solutionId;
+		var likeCounter = $(likerCounterId);;
+		if (ans == "success") {
+			likeCounter.text(String(parseInt(likeCounter.val()) + 1));
+		} else {
+			likeCounter.text("already like from u");
+		}
+	});
 }
 
