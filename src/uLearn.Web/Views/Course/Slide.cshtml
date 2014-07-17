@@ -55,7 +55,8 @@
 					*@
 					@Html.Partial("_ExerciseHints", slide.HintsHtml)
 					@Html.Partial("_AskBar")
-					<button type="button" data-url="@Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})" class="run-solution-button btn btn-primary btn-lg no-rounds">
+					<button type="button" class="run-solution-button btn btn-primary btn-lg no-rounds"
+							data-url="@Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">
 						RUN
 					</button>
 					<div class="run-verdict clearfix"></div>
@@ -98,8 +99,6 @@
 	</div>
 </div>
 
-	@section scripts{
-		<script src="~/Scripts/navigate.js"></script>
-		<script src="~/Jsdifflib/jsdifflib.js"></script>
-		<script src="~/Scripts/slide.js"></script>
-	}
+@section scripts{
+	@Scripts.Render("~/slide")
+}
