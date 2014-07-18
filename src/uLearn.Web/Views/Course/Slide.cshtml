@@ -1,4 +1,5 @@
-﻿@using uLearn
+﻿@using Microsoft.Ajax.Utilities
+@using uLearn
 @model CoursePageModel
 
 @{
@@ -25,29 +26,36 @@
 				@{ var slide = Model.Slide as ExerciseSlide; }
 				@if (slide != null)
 				{
-					<textarea class='code code-exercise'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
-					<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine ™</a></div>
-
+				    if (Model.IsPassedTask)
+				    {
+						<span class="label label-success">Success</span>
+				        <textarea class='code code-exercise'>@Model.LatestAcceptedSolution</textarea>
+					}
+					else
+					{
+				        <textarea class='code code-exercise'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
+				    }
+				    <div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine ™</a></div>
+					<button class="clear-code-button btn btn-lg" onclick="$('.code-exercise')[0].codeMirrorEditor.setValue('\n\n\n')">
+						ClearCode
+					</button>
 					@*
 						<a href="#" onclick="updateVerdict(true, 'Успех!', 'some right answer', false)">OK</a>
 						<a href="#" onclick="updateVerdict(false, 'Compilation error', 'details', true)">CompilationError</a>
 						<a href="#" onclick="updateVerdict(false, 'Неверный ответ', 'Bullshit', false)">WrongAnswer</a>
 					*@
-
-					@Html.Partial("_ExerciseHints", slide.HintsHtml)
-					@Html.Partial("_AskBar")
-					<button type="button" data-url="@Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})" class="run-solution-button btn btn-primary btn-lg no-rounds">
-						RUN
-					</button>
-					<div class="run-verdict clearfix"></div>
-					<div class="after-run-block">
-						<div class="actual-output">
-							<div class="output-label">Вывод вашей программы:</div>
-							<pre class="no-rounds"><code class="actual-output-content"></code></pre>
-						</div>
-						<div class="diff-table">
-
-						</div>
+				    @Html.Partial("_ExerciseHints", slide.HintsHtml)
+				    @Html.Partial("_AskBar")
+				    <button type="button" data-url="@Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})" class="run-solution-button btn btn-primary btn-lg no-rounds">
+				        RUN
+				    </button>
+				    <div class="run-verdict clearfix"></div>
+				    <div class="after-run-block">
+				        <div class="actual-output">
+				            <div class="output-label">Вывод вашей программы:</div>
+				            <pre class="no-rounds"><code class="actual-output-content"></code></pre>
+				        </div>
+				        <div class="diff-table"></div>
 					</div>
 				}
 				else
@@ -65,6 +73,22 @@
 		    </div>
 		</div>
 	</div>
+	}
+<div>
+	@if (Request.IsLocal)
+{
+	<div class="modal-footer">
+		<a href="#" onclick="toggleFakeRun()">Переключить в тестовый режим запуска</a>
+		<script>
+			function toggleFakeRun() {
+				var $btn = $(".run-solution-button");
+				$btn
+					.css("background-color", "blue")
+					.data("url", $btn.data("url").replace("/RunSolution", "/FakeRunSolution"));
+			}
+		</script>
+	</div>
+}
 </div>
 @section scripts{
 	<script src="~/Scripts/navigate.js"></script>

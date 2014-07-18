@@ -9,6 +9,8 @@ namespace uLearn.Web.Models
 	public class Like
 	{
 		[Key]
+		public int ID { get; set; }
+
 		[Required]
 		public int SolutionId { get; set; }
 

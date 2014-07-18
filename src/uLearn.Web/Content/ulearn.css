@@ -82,7 +82,9 @@ a.nav-arrow:hover {
     min-height: 200px;
 }
 
-
+.clear-code-button {
+    margin: 20px 0 20px 0;
+}
 
 .run-solution-button {
     margin: 20px 0 20px 0;
@@ -190,6 +192,11 @@ a.nav-arrow:hover {
 
 .ask-button {
     margin-top: 10px;
+}
+
+.solution-bar {
+    max-width: 500px;
+    width: 500px;
 }
 
 .answer-table {

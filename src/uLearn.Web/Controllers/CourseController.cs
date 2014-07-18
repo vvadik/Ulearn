@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Configuration;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using NUnit.Framework;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Ideone;
 using uLearn.Web.Models;
@@ -32,35 +30,35 @@ namespace uLearn.Web.Controllers
 		[Authorize]
 		public ActionResult Slide(string courseId, int slideIndex = 0)
 		{
+			var model = CreateCoursePageModel(courseId, slideIndex);
+			return View(model);
+		}
+
+		private CoursePageModel CreateCoursePageModel(string courseId, int slideIndex)
+		{
 			Course course = courseManager.GetCourse(courseId);
+			var isPassedTask = solutionsRepo.IsUserPassedTask(courseId, slideIndex, User.Identity.GetUserId());
 			var model = new CoursePageModel
 			{
 				Course = course,
 				SlideIndex = slideIndex,
 				Slide = course.Slides[slideIndex],
 				NextSlideIndex = slideIndex + 1,
-				PrevSlideIndex = slideIndex - 1
+				PrevSlideIndex = slideIndex - 1,
+				IsPassedTask = isPassedTask,
+				LatestAcceptedSolution = isPassedTask ? solutionsRepo.GetLatestAcceptedSolution(courseId, slideIndex, User.Identity.GetUserId()) : null
 			};
-			return View(model);
+			return model;
 		}
 
 		[Authorize]
 		public ActionResult AcceptedSolutions(string courseId, int slideIndex = 0)
 		{
-			Course course = courseManager.GetCourse(courseId);
-			var coursePageModel = new CoursePageModel
-			{
-				Course = course,
-				SlideIndex = slideIndex,
-				NextSlideIndex = slideIndex + 1,
-				PrevSlideIndex = slideIndex,
-				Slide = course.Slides[slideIndex]
-			};
-			var isLegal = solutionsRepo.IsUserPassedTask(courseId, slideIndex, User.Identity.GetUserId());
+			var coursePageModel = CreateCoursePageModel(courseId, slideIndex);
 			var model = new AcceptedSolutionsPageModel
 			{
 				CoursePageModel = coursePageModel,
-				AcceptedSolutions = isLegal ? solutionsRepo.GetAllAcceptedSolutions(slideIndex) : new List<AcceptedSolutionInfo>()
+				AcceptedSolutions = coursePageModel.IsPassedTask ? solutionsRepo.GetAllAcceptedSolutions(slideIndex) : new List<AcceptedSolutionInfo>()
 			};
 			return View(model);
 		}
@@ -72,7 +70,7 @@ namespace uLearn.Web.Controllers
 			var code = GetUserCode(Request.InputStream);
 			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
 			var result = await CheckSolution(exerciseSlide, code, slideIndex);
-			await SaveUserSolution(courseId, slideIndex, code, result.ExecutionResult, result.IsRightAnswer);
+			await SaveUserSolution(courseId, slideIndex, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer);
 			return Json(result);
 		}
 
@@ -98,6 +96,24 @@ namespace uLearn.Web.Controllers
 		[Authorize]
 		public async Task<Like> LikeSolution()
 		{
+			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
+			var rnd = DateTime.Now.Second % 3;
+			var isCompiled = rnd != 0;
+			var isRightAnswer = rnd == 1;
+			var result = new RunSolutionResult
+			{
+				CompilationError = isCompiled ? null : "some compilation error",
+				IsRightAnswer = isCompiled && isRightAnswer,
+				ExpectedOutput = exerciseSlide.ExpectedOutput,
+				ActualOutput = isRightAnswer ? exerciseSlide.ExpectedOutput : "some wrong output"
+			}; 
+			return Json(result);
+		}
+
+		[HttpPost]
+		[Authorize]
+		public async Task<string> LikeSolution()
+		{
 			var id = GetUserCode(Request.InputStream);
 			var like = await solutionsRepo.Like(int.Parse(id), User.Identity.GetUserId());
 			return like;
@@ -115,18 +131,19 @@ namespace uLearn.Web.Controllers
 			var isRightAnswer = NormalizeString(submition.Output).Equals(NormalizeString(exerciseSlide.ExpectedOutput));
 			return new RunSolutionResult
 			{
-				ExecutionResult = submition,
+				CompilationError = submition.CompilationError,
 				IsRightAnswer = isRightAnswer,
-				ExpectedOutput = exerciseSlide.ExpectedOutput
+				ExpectedOutput = exerciseSlide.ExpectedOutput,
+				ActualOutput = submition.Output
 			};
 		}
 
-		private async Task SaveUserSolution(string courseId, int slideIndex, string code, GetSubmitionDetailsResult submition,
+		private async Task SaveUserSolution(string courseId, int slideIndex, string code, string compilationError, string output,
 			bool isRightAnswer)
 		{
 			await solutionsRepo.AddUserSolution(
 				courseId, slideIndex, 
-				code, isRightAnswer, submition.CompilationError, submition.Output,
+				code, isRightAnswer, compilationError, output,
 				User.Identity.GetUserId());
 		}
 
