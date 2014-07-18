@@ -39,13 +39,11 @@
 					<button class="clear-code-button btn btn-lg" onclick="$('.code-exercise')[0].codeMirrorEditor.setValue('\n\n\n')">
 						ClearCode
 					</button>
-
 					@*
 						<a href="#" onclick="updateVerdict(true, 'Успех!', 'some right answer', false)">OK</a>
 						<a href="#" onclick="updateVerdict(false, 'Compilation error', 'details', true)">CompilationError</a>
 						<a href="#" onclick="updateVerdict(false, 'Неверный ответ', 'Bullshit', false)">WrongAnswer</a>
 					*@
-
 				    @Html.Partial("_ExerciseHints", slide.HintsHtml)
 				    @Html.Partial("_AskBar")
 				    <button type="button" data-url="@Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})" class="run-solution-button btn btn-primary btn-lg no-rounds">
@@ -57,22 +55,36 @@
 				            <div class="output-label">Вывод вашей программы:</div>
 				            <pre class="no-rounds"><code class="actual-output-content"></code></pre>
 				        </div>
-				        <div class="diff-table">
-
-				        </div>
-				    </div>
+				        <div class="diff-table"></div>
+					</div>
 				}
 				else
 				{
-				    @Html.Partial("_AskBar");
+					@Html.Partial("_AskBar");
 				}
-				</div>
-				@Html.Partial("_SlideNavigation", Model)
 			</div>
+			@Html.Partial("_SlideNavigation", Model)
 		</div>
 	</div>
-	@section scripts{
-		<script src="~/Scripts/navigate.js"></script>
-		<script src="~/Jsdifflib/jsdifflib.js"></script>
-		<script src="~/Scripts/slide.js"></script>
-	}
+</div>
+<div>
+	@if (Request.IsLocal)
+{
+	<div class="modal-footer">
+		<a href="#" onclick="toggleFakeRun()">Переключить в тестовый режим запуска</a>
+		<script>
+			function toggleFakeRun() {
+				var $btn = $(".run-solution-button");
+				$btn
+					.css("background-color", "blue")
+					.data("url", $btn.data("url").replace("/RunSolution", "/FakeRunSolution"));
+			}
+		</script>
+	</div>
+}
+</div>
+@section scripts{
+	<script src="~/Scripts/navigate.js"></script>
+	<script src="~/Jsdifflib/jsdifflib.js"></script>
+	<script src="~/Scripts/slide.js"></script>
+}

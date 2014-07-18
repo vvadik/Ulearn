@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Configuration;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using NUnit.Framework;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Ideone;
 using uLearn.Web.Models;
@@ -71,7 +69,25 @@ namespace uLearn.Web.Controllers
 			var code = GetUserCode(Request.InputStream);
 			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
 			var result = await CheckSolution(exerciseSlide, code, slideIndex);
-			await SaveUserSolution(courseId, slideIndex, code, result.ExecutionResult, result.IsRightAnswer);
+			await SaveUserSolution(courseId, slideIndex, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer);
+			return Json(result);
+		}
+
+		[HttpPost]
+		[Authorize]
+		public ActionResult FakeRunSolution(string courseId, int slideIndex = 0)
+		{
+			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
+			var rnd = DateTime.Now.Second % 3;
+			var isCompiled = rnd != 0;
+			var isRightAnswer = rnd == 1;
+			var result = new RunSolutionResult
+			{
+				CompilationError = isCompiled ? null : "some compilation error",
+				IsRightAnswer = isCompiled && isRightAnswer,
+				ExpectedOutput = exerciseSlide.ExpectedOutput,
+				ActualOutput = isRightAnswer ? exerciseSlide.ExpectedOutput : "some wrong output"
+			}; 
 			return Json(result);
 		}
 
@@ -96,18 +112,19 @@ namespace uLearn.Web.Controllers
 			var isRightAnswer = NormalizeString(submition.Output).Equals(NormalizeString(exerciseSlide.ExpectedOutput));
 			return new RunSolutionResult
 			{
-				ExecutionResult = submition,
+				CompilationError = submition.CompilationError,
 				IsRightAnswer = isRightAnswer,
-				ExpectedOutput = exerciseSlide.ExpectedOutput
+				ExpectedOutput = exerciseSlide.ExpectedOutput,
+				ActualOutput = submition.Output
 			};
 		}
 
-		private async Task SaveUserSolution(string courseId, int slideIndex, string code, GetSubmitionDetailsResult submition,
+		private async Task SaveUserSolution(string courseId, int slideIndex, string code, string compilationError, string output,
 			bool isRightAnswer)
 		{
 			await solutionsRepo.AddUserSolution(
 				courseId, slideIndex, 
-				code, isRightAnswer, submition.CompilationError, submition.Output,
+				code, isRightAnswer, compilationError, output,
 				User.Identity.GetUserId());
 		}
 
