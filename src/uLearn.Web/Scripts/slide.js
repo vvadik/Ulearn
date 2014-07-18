@@ -56,20 +56,23 @@ function updateVerdict(isRight, verdict, details, isCompileError) {
 	$runVerdict.toggleClass("label-success", isRight);
 	var showExpectedOutput = !isCompileError && !isRight;
 	$expectedOutput.toggle(showExpectedOutput);
+	$actualOutput.toggleClass("full-size", true);
 	if (isCompileError) {
-		$actualOutput.toggleClass("full-size", true);
 		$actualOutput.find(".output-label").hide();
 		$actualOutputContent.text(details);
 	}
 	$difTable.toggle(false);
-	$actualOutput.toggle(false);
+	$actualOutput.toggle(true);
 	if (isCompileError) {
 		$difTable.toggle(false);
 		$actualOutput.toggle(true);
-	} else if (!isRight)
-		$difTable.toggle(true);
-	$afterRunBlock.show();
+	} else if (!isRight) {
+	    $difTable.toggle(true);
+	    $actualOutput.toggle(false);
+    }
+    $afterRunBlock.show();
 	if (isRight) {
+	    $actualOutputContent.text(details);
 		slideNavigation.makeShowSolutionsNext();
 	}
 }
