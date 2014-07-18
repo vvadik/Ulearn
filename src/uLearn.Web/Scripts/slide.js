@@ -139,7 +139,7 @@ function sendQuestion() {
 		    url: questUrl,
 		    data: quest
 		}).success(function (ans) {
-		    $("#sendButton").text("Отправлено");
+		    $("#questField").val("");
         })
 		.fail(function (req) {
 		    console.log(req.responseText);
