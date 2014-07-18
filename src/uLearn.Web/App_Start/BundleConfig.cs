@@ -23,6 +23,7 @@ namespace uLearn.Web
 				"~/Scripts/slide-editor.js",
 				"~/Scripts/slide-run.js",
 				"~/Scripts/slide-solutions-like.js",
+				"~/Scripts/slide-questions.js",
 				"~/Jsdifflib/jsdifflib.js"
 				));
 

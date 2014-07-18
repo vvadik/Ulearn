@@ -9,7 +9,7 @@
 		if (ans == "success") {
 			likeCounter.text(String(parseInt(likeCounter.val()) + 1));
 		} else {
-			likeCounter.text("already like from u");
+			likeCounter.text("already like from you");
 		}
 	});
 }
