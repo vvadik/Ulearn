@@ -3,9 +3,9 @@
 	<a data-toggle="collapse" href=@("#Ask")>
 		Задать вопрос по материалу
 	</a>
-	<div id="Ask" class="collapse ask-bar">
-		<textarea class="ask-bar"></textarea>
-		<button type="button" class="btn btn-primary btn-lg no-rounds ask-button">
+	<div id="Ask" class="collapse ask-bar" data-url="@Url.Action("AddQuestion", new { Model.Slide.Title, Model.Slide.Info.UnitName })">
+		<textarea id="questField" class="ask-bar"></textarea>
+	    <button id="sendButton" type="button" class="btn btn-primary btn-lg no-rounds ask-button" onclick="sendQuestion()">
 			Отправить
 		</button>
 	</div>

@@ -16,5 +16,6 @@ namespace uLearn.Web.DataContexts
 		}
 
 		public DbSet<UserSolution> UserSolutions { get; set; }
+		public DbSet<UserQuestion> UserQuestions { get; set; }
 	}
 }

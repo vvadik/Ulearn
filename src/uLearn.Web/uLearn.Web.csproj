@@ -182,6 +182,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataContexts\UserQuestionsRepo.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo_should.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo.cs" />
     <Compile Include="Ideone\ExecutionService.Credentials.cs" />
@@ -196,6 +197,10 @@
     <Compile Include="Migrations\201407161046277_ChangeLikesStorage.cs" />
     <Compile Include="Migrations\201407161046277_ChangeLikesStorage.Designer.cs">
       <DependentUpon>201407161046277_ChangeLikesStorage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201407171111344_AddQuestions.cs" />
+    <Compile Include="Migrations\201407171111344_AddQuestions.Designer.cs">
+      <DependentUpon>201407171111344_AddQuestions.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\CourseManager_should.cs" />
     <EmbeddedResource Include="Courses\**\*.*">
@@ -233,6 +238,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CourseManager.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
+    <Compile Include="Models\UserQuestion.cs" />
     <Compile Include="Models\Like.cs" />
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\RunSolutionResult.cs" />
@@ -250,6 +256,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201407161046277_ChangeLikesStorage.resx">
       <DependentUpon>201407161046277_ChangeLikesStorage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201407171111344_AddQuestions.resx">
+      <DependentUpon>201407171111344_AddQuestions.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

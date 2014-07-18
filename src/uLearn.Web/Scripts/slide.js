@@ -47,7 +47,7 @@ var $actualOutputContent = $(".actual-output-content");
 var $afterRunBlock = $(".after-run-block");
 var $runVerdict = $(".run-verdict");
 var $difTable = $(".diff-table");
-
+var $questionLog= $(".questions-log");
 
 function updateVerdict(isRight, verdict, details, isCompileError) {
     $runVerdict.show();
@@ -112,6 +112,7 @@ $runButton.click(function () {
 });
 
 var likeSolutionUrl = $("#LikeSolutionUrl").data("url");
+var questUrl = $("#Ask").data("url");
 
 function likeSolution(solutionId) {
     $.ajax(
@@ -127,3 +128,50 @@ function likeSolution(solutionId) {
 	});
 }
 
+function sendQuestion() {
+    var quest = $("#questField").val();
+    $.ajax(
+		{
+		    type: "POST",
+		    url: questUrl,
+		    data: quest
+		}).success(function (ans) {
+		    $("#sendButton").text("Отправлено");
+        })
+		.fail(function (req) {
+		    console.log(req.responseText);
+		})
+		.always(function (ans) {
+		});
+};
+
+var getAllQuestionsUrl = $("#WatchQuestions").data("url");
+function printAllQuestions() {
+    $.ajax(
+		{
+		    type: "POST",
+		    url: getAllQuestionsUrl,
+		    data: " "
+		}).success(function (ans) {
+            $questionLog.html(makeTableForQuestions(ans));
+        })
+		.fail(function (req) {
+		    console.log(req.responseText);
+		})
+		.always(function (ans) {
+		});
+};
+
+function makeTableForQuestions(input) {
+    var content = input.split("\n***");
+    var table = "<table class=\"answer-table\" border=1px>";
+    for (var i = 0; i < content.length-1; i += 5) {
+        table += "<tr>";
+        for (var j = 0; j < 4; j++)
+            table += ("<td class=\"answer-table-headers\">" + content[i + j] + "</td>");
+        table += "</tr>";
+        table += "<tr><td colspan=\"4\">" + content[i + 4] + "</tr></td>";
+    }
+    table += "</table";
+    return table;
+}

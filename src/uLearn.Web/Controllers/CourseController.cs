@@ -17,6 +17,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
+		private readonly UserQuestionsRepo userQuestionsRepo = new UserQuestionsRepo();
 		private readonly ExecutionService executionService = new ExecutionService();
 
 		public CourseController() : this(CourseManager.AllCourses)
@@ -73,6 +74,24 @@ namespace uLearn.Web.Controllers
 			var result = await CheckSolution(exerciseSlide, code, slideIndex);
 			await SaveUserSolution(courseId, slideIndex, code, result.ExecutionResult, result.IsRightAnswer);
 			return Json(result);
+		}
+
+		[HttpPost]
+		[Authorize]
+		public async Task<string> AddQuestion(string title, string unitName)
+		{
+			var question = GetUserCode(Request.InputStream);
+			var userName = User.Identity.GetUserName();
+			await userQuestionsRepo.AddUserQuestion(question, title, userName,unitName, DateTime.Now);
+			return "Success!";
+		}
+
+		[HttpPost]
+		[Authorize]
+		public string GetAllQuestions(string courseName)
+		{
+			var questions =  userQuestionsRepo.GetAllQuestions(courseName);
+			return questions;
 		}
 
 		[HttpPost]

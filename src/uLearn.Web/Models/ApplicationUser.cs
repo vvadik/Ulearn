@@ -7,5 +7,6 @@ namespace uLearn.Web.Models
 	public class ApplicationUser : IdentityUser
 	{
 		public virtual ICollection<UserSolution> Solutions { get; set; }
+		public virtual ICollection<UserQuestion> Questions { get; set; }
 	}
 }

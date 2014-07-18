@@ -105,6 +105,13 @@ a.nav-arrow:hover {
 .expected-output-content {
 }
 
+.send-question {
+    
+}
+
+.questions-log {
+    
+}
 .diff-table {
     width: 100%;
     margin-top: 25px;
@@ -185,4 +192,17 @@ a.nav-arrow:hover {
     margin-top: 10px;
 }
 
+.answer-table {
+    border-width: 1px;
+    width: 100%;
+    background-color: aliceblue;
+    border-color: black;
+    margin-top: 10px;
+    table-layout: fixed;
+    word-break: break-word;
+}
 
+.answer-table-headers {
+    background-color: lightgray;
+    font-weight: bolder;
+}
