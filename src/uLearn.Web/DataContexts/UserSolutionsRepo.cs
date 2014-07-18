@@ -39,7 +39,7 @@ namespace uLearn.Web.DataContexts
 				Timestamp = DateTime.Now,
 				UserId = userId,
 				CodeHash = code.GetHashCode(),
-				LikersStorage = new List<Like>()
+				Likes = new List<Like>()
 			});
 			await db.SaveChangesAsync();
 			return userSolution;
@@ -54,11 +54,11 @@ namespace uLearn.Web.DataContexts
 		public async Task<string> Like(int solutionId, string userId)
 		{
 			var solutionForLike = db.UserSolutions.Find(solutionId);
-			if (solutionForLike.LikersStorage.Any(like => like.UserId == userId))
+			if (solutionForLike.Likes.Any(like => like.UserId == userId))
 			{
 				return "already been";
 			}
-			solutionForLike.LikersStorage.Add(new Like {SolutionId = solutionId, Timestamp = DateTime.Now, UserId = userId});
+			solutionForLike.Likes.Add(new Like {SolutionId = solutionId, Timestamp = DateTime.Now, UserId = userId});
 			await db.SaveChangesAsync();
 			return "success";
 		}
@@ -74,9 +74,9 @@ namespace uLearn.Web.DataContexts
 				.GroupBy(x => x.CodeHash)
 				.Select(x => x.OrderByDescending(y => timeNow.Subtract(y.Timestamp).TotalMilliseconds))
 				.Select(x => x.First())
-				.OrderByDescending(x => x.LikersStorage.Count/timeNow.Subtract(x.Timestamp).TotalMilliseconds)
+				.OrderByDescending(x => x.Likes.Count/timeNow.Subtract(x.Timestamp).TotalMilliseconds)
 				.Take(10)
-				.Select(x => new AcceptedSolutionInfo(x.Code, x.Id, x.LikersStorage.Select(y => y.UserId)))
+				.Select(x => new AcceptedSolutionInfo(x.Code, x.Id, x.Likes.Select(y => y.UserId)))
 				.ToList();
 			return answer;
 		}

@@ -70,7 +70,6 @@ function updateVerdict(isRight, verdict, details, isCompileError) {
 		$difTable.toggle(true);
 	$afterRunBlock.show();
 	if (isRight) {
-	    $('.label-success').show();
 		slideNavigation.makeShowSolutionsNext();
 	}
 }
@@ -113,22 +112,18 @@ $runButton.click(function () {
 var likeSolutionUrl = $("#LikeSolutionUrl").data("url");
 
 function likeSolution(solutionId) {
-    $.ajax(
-        {
-            type: "POST",
-            url: likeSolutionUrl,
-            data: String(solutionId)
-        }).success(function(ans) {
-            var likerCounterId = "#counter" + solutionId;
-            var likeCounter = $(likerCounterId);;
-            if (ans == "success") {
-                likeCounter.text(String(parseInt(likeCounter.val()) + 1));
-            } else {
-                likeCounter.text("already like from you");
-            }
-        })
-        .fail(function(req) {
-        })
-        .always(function(ans) {
-        });
+	$.ajax({
+		type: "POST",
+		url: likeSolutionUrl,
+		data: String(solutionId)
+	}).success(function (ans) {
+		var likerCounterId = "#counter" + solutionId;
+		var likeCounter = $(likerCounterId);;
+		if (ans == "success") {
+			likeCounter.text(String(parseInt(likeCounter.val()) + 1));
+		} else {
+			likeCounter.text("already like from you");
+		}
+	});
 }
+

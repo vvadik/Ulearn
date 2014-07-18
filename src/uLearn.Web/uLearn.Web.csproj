@@ -189,13 +189,9 @@
     <Compile Include="Migrations\201407111234255_InitialCreate.Designer.cs">
       <DependentUpon>201407111234255_InitialCreate.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201407151400345_AddLike.cs" />
-    <Compile Include="Migrations\201407151400345_AddLike.Designer.cs">
-      <DependentUpon>201407151400345_AddLike.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201407161046277_ChangeLikesStorage.cs" />
-    <Compile Include="Migrations\201407161046277_ChangeLikesStorage.Designer.cs">
-      <DependentUpon>201407161046277_ChangeLikesStorage.cs</DependentUpon>
+    <Compile Include="Migrations\201407180649039_SolutionLikes.cs" />
+    <Compile Include="Migrations\201407180649039_SolutionLikes.Designer.cs">
+      <DependentUpon>201407180649039_SolutionLikes.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\CourseManager_should.cs" />
     <EmbeddedResource Include="Courses\**\*.*">
@@ -245,11 +241,8 @@
     <EmbeddedResource Include="Migrations\201407111234255_InitialCreate.resx">
       <DependentUpon>201407111234255_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201407151400345_AddLike.resx">
-      <DependentUpon>201407151400345_AddLike.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201407161046277_ChangeLikesStorage.resx">
-      <DependentUpon>201407161046277_ChangeLikesStorage.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201407180649039_SolutionLikes.resx">
+      <DependentUpon>201407180649039_SolutionLikes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
