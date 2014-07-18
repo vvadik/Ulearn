@@ -26,19 +26,28 @@
 				@{ var slide = Model.Slide as ExerciseSlide; }
 				@if (slide != null)
 				{
+					<textarea id="secretCodeExercise" class='hide'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
+				    <span id="suc" class="label label-success">Success</span>
+						<script>
+						    function func() { $("#suc").hide(); };
+						    func();
+						</script>
 					if (Model.IsPassedTask)
 					{
-						<span class="label label-success">Success</span>
-						<textarea class='code code-exercise'>@Model.LatestAcceptedSolution</textarea>
+					    <textarea class='code code-exercise'>@Model.LatestAcceptedSolution</textarea>
 					}
 					else
 					{
 						<textarea class='code code-exercise'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
 					}
 					<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine ™</a></div>
-					<button class="clear-code-button btn btn-lg" onclick="$('.code-exercise')[0].codeMirrorEditor.setValue('\n\n\n')">
-						ClearCode
-					</button>
+				    <button class="clear-code-button btn btn-lg" onclick="cleanUserCode()">ClearCode</button>
+				    <script>
+    				    function cleanUserCode() {
+    				        var $secretCodeExercise = $('#secretCodeExercise');
+    				        $('.code-exercise')[0].codeMirrorEditor.setValue($secretCodeExercise.text());
+    				    }
+    				</script>
 					@*
 						<a href="#" onclick="updateVerdict(true, 'Успех!', 'some right answer', false)">OK</a>
 						<a href="#" onclick="updateVerdict(false, 'Compilation error', 'details', true)">CompilationError</a>
@@ -80,12 +89,12 @@
 			<div class="modal-footer">
 				<a href="#" onclick="toggleFakeRun()">Переключить в тестовый режим запуска</a>
 				<script>
-					function toggleFakeRun() {
-						var $btn = $(".run-solution-button");
-						$btn
-							.css("background-color", "blue")
-							.data("url", $btn.data("url").replace("/RunSolution", "/FakeRunSolution"));
-					}
+				    function toggleFakeRun() {
+				        var $btn = $(".run-solution-button");
+				        $btn
+				            .css("background-color", "blue")
+				            .data("url", $btn.data("url").replace("/RunSolution", "/FakeRunSolution"));
+				    }
 				</script>
 			</div>
 		}

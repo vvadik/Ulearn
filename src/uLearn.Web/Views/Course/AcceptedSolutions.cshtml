@@ -12,8 +12,9 @@
 			{
 				<textarea class='code code-sample'>@solution.Code</textarea>
 				var counterId = "counter" + solution.Id;
-				<button type="button" onclick="likeSolution(@solution.Id)" class="btn btn-primary btn-lg no-rounds">Like!</button>
-				<textarea class='code' id="@counterId">@solution.UsersWhoLike.Count</textarea>
+				<button id="@counterId" class="like-button glyphicon glyphicon-thumbs-up" onclick="likeSolution(@solution.Id)">
+					@solution.UsersWhoLike.Count
+				</button>
 			}
 			@Html.Partial("_SlideNavigation", Model.CoursePageModel)
 		</div>

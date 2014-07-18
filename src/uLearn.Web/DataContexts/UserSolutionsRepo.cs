@@ -63,18 +63,18 @@ namespace uLearn.Web.DataContexts
 			return "success";
 		}
 
-		public List<AcceptedSolutionInfo> GetAllAcceptedSolutions(int slideIndex)
+		public List<AcceptedSolutionInfo> GetAllAcceptedSolutions(string courseId, int slideIndex)
 		{
 			var timeNow = DateTime.Now;
 			var stringSlideIndex = slideIndex.ToString();
 			var prepared = db.UserSolutions
-				.Where(x => x.IsRightAnswer && x.SlideId == stringSlideIndex)
+				.Where(x => x.IsRightAnswer && x.SlideId == stringSlideIndex && x.CourseId == courseId)
 				.ToList();
 			var answer = prepared
 				.GroupBy(x => x.CodeHash)
 				.Select(x => x.OrderByDescending(y => timeNow.Subtract(y.Timestamp).TotalMilliseconds))
 				.Select(x => x.First())
-				.OrderByDescending(x => x.Likes.Count/timeNow.Subtract(x.Timestamp).TotalMilliseconds)
+				.OrderByDescending(x => (x.Likes.Count+1)/timeNow.Subtract(x.Timestamp).TotalMilliseconds)
 				.Take(10)
 				.Select(x => new AcceptedSolutionInfo(x.Code, x.Id, x.Likes.Select(y => y.UserId)))
 				.ToList();

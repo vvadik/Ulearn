@@ -58,7 +58,7 @@ namespace uLearn.Web.Controllers
 			var model = new AcceptedSolutionsPageModel
 			{
 				CoursePageModel = coursePageModel,
-				AcceptedSolutions = coursePageModel.IsPassedTask ? solutionsRepo.GetAllAcceptedSolutions(slideIndex) : new List<AcceptedSolutionInfo>()
+				AcceptedSolutions = coursePageModel.IsPassedTask ? solutionsRepo.GetAllAcceptedSolutions(courseId, slideIndex) : new List<AcceptedSolutionInfo>()
 			};
 			return View(model);
 		}
@@ -91,6 +91,8 @@ namespace uLearn.Web.Controllers
 			var questions =  userQuestionsRepo.GetAllQuestions(courseName);
 			return questions;
 		}
+
+		
 
 		[HttpPost]
 		[Authorize]
