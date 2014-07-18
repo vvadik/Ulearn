@@ -94,24 +94,6 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<Like> LikeSolution()
-		{
-			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
-			var rnd = DateTime.Now.Second % 3;
-			var isCompiled = rnd != 0;
-			var isRightAnswer = rnd == 1;
-			var result = new RunSolutionResult
-			{
-				CompilationError = isCompiled ? null : "some compilation error",
-				IsRightAnswer = isCompiled && isRightAnswer,
-				ExpectedOutput = exerciseSlide.ExpectedOutput,
-				ActualOutput = isRightAnswer ? exerciseSlide.ExpectedOutput : "some wrong output"
-			}; 
-			return Json(result);
-		}
-
-		[HttpPost]
-		[Authorize]
 		public async Task<string> LikeSolution()
 		{
 			var id = GetUserCode(Request.InputStream);

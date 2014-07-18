@@ -194,9 +194,9 @@
     <Compile Include="Migrations\201407180649039_SolutionLikes.Designer.cs">
       <DependentUpon>201407180649039_SolutionLikes.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201407171111344_AddQuestions.cs" />
-    <Compile Include="Migrations\201407171111344_AddQuestions.Designer.cs">
-      <DependentUpon>201407171111344_AddQuestions.cs</DependentUpon>
+    <Compile Include="Migrations\201407180807286_AddQuestions.cs" />
+    <Compile Include="Migrations\201407180807286_AddQuestions.Designer.cs">
+      <DependentUpon>201407180807286_AddQuestions.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\CourseManager_should.cs" />
     <EmbeddedResource Include="Courses\**\*.*">
@@ -250,8 +250,8 @@
     <EmbeddedResource Include="Migrations\201407180649039_SolutionLikes.resx">
       <DependentUpon>201407180649039_SolutionLikes.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201407171111344_AddQuestions.resx">
-      <DependentUpon>201407171111344_AddQuestions.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201407180807286_AddQuestions.resx">
+      <DependentUpon>201407180807286_AddQuestions.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
