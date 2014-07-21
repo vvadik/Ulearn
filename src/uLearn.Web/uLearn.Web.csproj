@@ -183,6 +183,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\AnalyticsController.cs" />
+    <Compile Include="DataContexts\AnalyticsTableRepo.cs" />
     <Compile Include="DataContexts\UserQuestionsRepo.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo_should.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo.cs" />
@@ -199,6 +201,11 @@
     <Compile Include="Migrations\201407180807286_AddQuestions.Designer.cs">
       <DependentUpon>201407180807286_AddQuestions.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201407210712401_AddAnalyticsTable.cs" />
+    <Compile Include="Migrations\201407210712401_AddAnalyticsTable.Designer.cs">
+      <DependentUpon>201407210712401_AddAnalyticsTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AnalyticsTable.cs" />
     <Compile Include="Models\CourseManager_should.cs" />
     <EmbeddedResource Include="Courses\**\*.*">
       <Visible>false</Visible>
@@ -235,12 +242,15 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CourseManager.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
+    <Compile Include="Models\SlideMark.cs" />
+    <Compile Include="Models\Solver.cs" />
     <Compile Include="Models\UserQuestion.cs" />
     <Compile Include="Models\Like.cs" />
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\RunSolutionResult.cs" />
     <Compile Include="Models\SlideViewModel.cs" />
     <Compile Include="Models\UserSolution.cs" />
+    <Compile Include="Models\Visiter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ideone\ExecutionService.cs" />
     <Compile Include="Service References\Ideone_Service_v1Service.cs" />
@@ -253,6 +263,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201407180807286_AddQuestions.resx">
       <DependentUpon>201407180807286_AddQuestions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201407210712401_AddAnalyticsTable.resx">
+      <DependentUpon>201407210712401_AddAnalyticsTable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -593,6 +606,7 @@
     <Content Include="Views\Course\_Sidebar.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
     <Content Include="Views\Course\_AskBar.cshtml" />
+    <Content Include="Views\Analytics\TableAnalytics.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

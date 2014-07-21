@@ -88,11 +88,15 @@ namespace uLearn.Web.Controllers
 		[Authorize]
 		public string GetAllQuestions(string courseName)
 		{
-			var questions =  userQuestionsRepo.GetAllQuestions(courseName);
-			return questions;
+			var questions = userQuestionsRepo.GetAllQuestions(courseName);
+			return ToProtectedString(questions);
 		}
 
-		
+		private string ToProtectedString(string questions)
+		{
+			return questions.Replace("<", "&lt;").Replace(">", "&gt;");
+		}
+
 
 		[HttpPost]
 		[Authorize]

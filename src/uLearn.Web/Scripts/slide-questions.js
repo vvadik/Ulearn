@@ -41,6 +41,6 @@ function makeTableForQuestions(input) {
 		table += "</tr>";
 		table += "<tr><td colspan=\"4\">" + content[i + 4] + "</tr></td>";
 	}
-	table += "</table";
+	table += "</table>";
 	return table;
 }
