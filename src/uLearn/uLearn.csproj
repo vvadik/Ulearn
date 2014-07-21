@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="AcceptedSolutionInfo.cs" />
     <Compile Include="AcceptedSolutionsPageModel.cs" />
+    <Compile Include="AnalyticsTableInfo.cs" />
     <Compile Include="Course.cs" />
     <Compile Include="CoursePageModel.cs" />
     <Compile Include="CSharp\SlideWalker.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="StringExtensions_SplitToLines_should.cs" />
     <Compile Include="CSharp\SyntaxExtensions.cs" />
     <Compile Include="SlideTestsUtils.cs" />
+    <Compile Include="AnalyticsTablePageModel.cs" />
     <Compile Include="tests\Includes.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>

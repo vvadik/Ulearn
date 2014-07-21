@@ -8,8 +8,10 @@ namespace uLearn.Web.Models
 {
 	public enum SlideMarks
 	{
-		OK,
-		Bad
+		Good,
+		NotUnderstand,
+		Trivial,
+		NotWatched
 	}
 	public class SlideMark
 	{
