@@ -17,6 +17,7 @@ namespace uLearn.Web.Controllers
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly UserQuestionsRepo userQuestionsRepo = new UserQuestionsRepo();
 		private readonly ExecutionService executionService = new ExecutionService();
+		private readonly AnalyticsTableRepo analyticsTableRepo = new AnalyticsTableRepo();
 
 		public CourseController() : this(CourseManager.AllCourses)
 		{
@@ -82,6 +83,18 @@ namespace uLearn.Web.Controllers
 			var userName = User.Identity.GetUserName();
 			await userQuestionsRepo.AddUserQuestion(question, title, userName,unitName, DateTime.Now);
 			return "Success!";
+		}
+
+		[HttpPost]
+		[Authorize]
+		public async Task<string> ApplyMark(string courseName, string unitName, string slideTitle, string mark )
+		{
+			var userId = User.Identity.GetUserId();
+			var slideMark = SlideMarks.OK;
+			await
+				analyticsTableRepo.AddMark(userId, slideMark,
+					analyticsTableRepo.CreateKey(courseName, unitName, slideTitle));
+			return "success!";
 		}
 
 		[HttpPost]

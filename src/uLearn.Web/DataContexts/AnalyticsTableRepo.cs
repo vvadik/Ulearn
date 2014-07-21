@@ -29,11 +29,36 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public async void AddMark(string userId, SlideMarks mark, string key)
+		public async Task<string> AddMark(string userId, SlideMarks mark, string key)
 		{
 			var table = db.AnalyticsTables.Find(key);
-			table.Marks.Add(new SlideMark { UserId = userId, Mark = mark});
+			if (table != null)
+			{
+				if (table.Marks == null)
+					table.Marks = new List<SlideMark>();
+				table.Marks.Add(new SlideMark {UserId = userId, Mark = mark});
+			}
+			else
+			{
+				await AddNewTable(key);
+				table = db.AnalyticsTables.Find(key);
+				table.Marks.Add(new SlideMark {UserId = userId, Mark = mark});
+			}
 			await db.SaveChangesAsync();
+			return "success!";
+		}
+
+		private async Task<string> AddNewTable(string key)
+		{
+			db.AnalyticsTables.Add(new AnalyticsTable
+			{
+				Id = key, 
+				Marks = new List<SlideMark>(), 
+				Solvers = new List<Solver>(), 
+				Visiters=new List<Visiter>()
+			});
+			await db.SaveChangesAsync();
+			return "success!";
 		}
 
 		public async void AddSolver(string userId, string key)
@@ -41,6 +66,11 @@ namespace uLearn.Web.DataContexts
 			var table = db.AnalyticsTables.Find(key);
 			table.Solvers.Add(new Solver { UserId = userId });
 			await db.SaveChangesAsync();
+		}
+
+		public string CreateKey(string courseName, string unitName, string slideTitle)
+		{
+			return courseName + "_" + unitName + "_" + slideTitle;
 		}
 	}
 }

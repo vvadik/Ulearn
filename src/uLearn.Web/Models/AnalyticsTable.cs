@@ -12,13 +12,13 @@ namespace uLearn.Web.Models
 		[Required]
 		public string Id { get; set; }
 
-		[Required]
-		public IList<Visiter> Visiters { get; set; }
 
-		[Required]
-		public IList<SlideMark> Marks { get; set; }
+		public virtual IList<Visiter> Visiters { get; set; }
 
-		[Required]
-		public IList<Solver> Solvers { get; set; } 
+
+		public virtual IList<SlideMark> Marks { get; set; }
+
+
+		public virtual IList<Solver> Solvers { get; set; }
 	}
 }
