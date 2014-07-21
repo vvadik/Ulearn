@@ -27,21 +27,18 @@
 				@if (slide != null)
 				{
 					<textarea id="secretCodeExercise" class='hide'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
-				    <span id="suc" class="label label-success">Success</span>
-						<script>
-						    function func() { $("#suc").hide(); };
-						    func();
-						</script>
 					if (Model.IsPassedTask)
 					{
-					    <textarea class='code code-exercise'>@Model.LatestAcceptedSolution</textarea>
+						<span id="suc" class="label label-success">Success</span>
+						<button class="label label-default" onclick="cleanUserCode()">ClearCode</button>
+						<textarea class='code code-exercise'>@Model.LatestAcceptedSolution</textarea>
 					}
 					else
 					{
+						<button class="label label-default" onclick="cleanUserCode()">ClearCode</button>
 						<textarea class='code code-exercise'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
 					}
 					<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine ™</a></div>
-				    <button class="clear-code-button btn btn-lg" onclick="cleanUserCode()">ClearCode</button>
 				    <script>
     				    function cleanUserCode() {
     				        var $secretCodeExercise = $('#secretCodeExercise');
