@@ -22,8 +22,8 @@ function printAllQuestions() {
 			url: $("#WatchQuestions").data("url"),
 			data: " "
 		}).success(function (ans) {
-			$questionLog.html(makeTableForQuestions(ans));
-		})
+		    $questionLog.html(makeTableForQuestions(ans));
+	    })
 		.fail(function (req) {
 			console.log(req.responseText);
 		})

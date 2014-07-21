@@ -1,0 +1,16 @@
+﻿@model uLearn.CoursePageModel
+<form id="marksButtons" style="margin-top: 10px;">
+    @{
+		var courseName = Model.Course.Title;
+		var unitName = Model.Course.Slides[Model.SlideIndex].Info.UnitName;
+        var slideTitle = Model.Course.Slides[Model.SlideIndex].Title;
+        const string good = "good";
+        const string notUnderstand = "notUnderstand";
+        const string trivial = "trivial";
+        const string notWatched = "notWatched";
+    }
+    <input id="good" type="radio" name="marks" value="good" onclick="handleMark()" data-url="@Url.Action("ApplyMark", new{courseName, unitName, slideTitle, mark=good})">Хорошо
+	<input id="not_understand" type="radio" name="marks" value="not_understand" onclick="handleMark()" data-url="@Url.Action("ApplyMark", new{courseName, unitName, slideTitle, mark=notUnderstand})">Не понял
+	<input id="trivial" type="radio" name="marks" value="trivial" onclick="handleMark()" data-url="@Url.Action("ApplyMark", new{courseName, unitName, slideTitle, mark=trivial})">Тривиально
+	<input id="not_watched" type="radio" name="marks" value="not_watched" onclick="handleMark()" checked data-url="@Url.Action("ApplyMark", new{courseName, unitName, slideTitle, mark=notWatched})">Не смотрел
+</form>
