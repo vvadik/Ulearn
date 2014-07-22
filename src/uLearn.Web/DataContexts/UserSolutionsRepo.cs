@@ -38,7 +38,7 @@ namespace uLearn.Web.DataContexts
 				Output = output,
 				Timestamp = DateTime.Now,
 				UserId = userId,
-				CodeHash = code.GetHashCode(),
+				CodeHash = code.Split('\n').Select(x => x.Trim()).Aggregate("", (x, y) => x + y).GetHashCode(),
 				Likes = new List<Like>()
 			});
 			await db.SaveChangesAsync();

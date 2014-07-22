@@ -1,57 +1,48 @@
-﻿@using Microsoft.Ajax.Utilities
+﻿@using System.Globalization
+@using Microsoft.Ajax.Utilities
 @using uLearn
 @model AnalyticsTablePageModel
 @{
 	ViewBag.Title = "TableAnalytics";
 }
-@Html.Partial("../Course/_Sidebar", Model.CoursePageModel)
-<div class="slide-container">
-	<div class="container body-content">
-		<div class="row">
-		    <div class='slide'>
-				<table id="Table" class="tablesorter">
-					<thead>
-						<tr>
-							<th>Unit name</th>
-							<th>Visiters</th>
-							<th>Solvers count</th>
-							<th>Marks count</th>
-							<th>Web Site</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>Smith</td>
-							<td>John</td>
-							<td>jsmith@gmail.com</td>
-							<td>$50.00</td>
-							<td>http://www.jsmith.com</td>
-						</tr>
-						<tr>
-							<td>Bach</td>
-							<td>Frank</td>
-							<td>fbach@yahoo.com</td>
-							<td>$50.00</td>
-							<td>http://www.frank.com</td>
-						</tr>
-						<tr>
-							<td>Doe</td>
-							<td>Jason</td>
-							<td>jdoe@hotmail.com</td>
-							<td>$100.00</td>
-							<td>http://www.jdoe.com</td>
-						</tr>
-						<tr>
-							<td>Conway</td>
-							<td>Tim</td>
-							<td>tconway@earthlink.net</td>
-							<td>$50.00</td>
-							<td>http://www.timconway.com</td>
-						</tr>
-					</tbody>
-				</table>
 
-		    </div>
+@Html.Partial("../Course/_Sidebar", Model.CoursePageModel)
+
+<body>
+	<div class="slide-container">
+		<div class="container body-content">
+			<div class="row">
+				<div class='slide'>
+					<table id="myTable" class="tablesorter">
+						<thead>
+							<tr>
+								<th>Unit name</th>
+								<th>Visiters count</th>
+								<th>Solvers count</th>
+								<th>Marks count</th>
+								<th>OK percent</th>
+								<th>Nipanyatna percent</th>
+								<th>ez percent</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var info in Model.TableInfo)
+							{
+								<tr>
+									<td>@info.Key</td>
+									<td>@info.Value.VisitersCount</td>
+									<td>@(info.Value.IsExercise ? info.Value.SolversCount.ToString(CultureInfo.InvariantCulture) : "")</td>
+									<td>@info.Value.Marks.Count</td>
+									<td>@info.Value.Marks.Good</td>
+									<td>@info.Value.Marks.NotUnderstand</td>
+									<td>@info.Value.Marks.Trivial</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+
+				</div>
+			</div>
 		</div>
 	</div>
-</div>
+</body>

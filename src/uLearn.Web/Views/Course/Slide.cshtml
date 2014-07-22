@@ -6,75 +6,78 @@
 	ViewBag.Title = Model.Course.Title;
 }
 @Html.Partial("_Sidebar", Model)
+
+
 <div class="slide-container">
 	<div class="container body-content">
-		<div class="row">
-			<div class='slide'>
-				<h1>@Model.Slide.Title</h1>
-				@foreach (SlideBlock block in Model.Slide.Blocks)
-				{
-					if (block.IsCode)
+	    <div class="row">
+	        <div class='slide'>
+					<h1>@Model.Slide.Title</h1>
+					@foreach (SlideBlock block in Model.Slide.Blocks)
 					{
-						<textarea class='code code-sample'>@block.Text</textarea>
-					}
-					else
-					{
-						@Html.Raw(block.RenderedText)
-					}
+						if (block.IsCode)
+						{
+							<textarea class='code code-sample'>@block.Text</textarea>
+						}
+						else
+						{
+							@Html.Raw(block.RenderedText)
+						}
 
-				}
-				@{ var slide = Model.Slide as ExerciseSlide; }
-				@if (slide != null)
-				{
-					<textarea id="secretCodeExercise" class='hide'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
-					if (Model.IsPassedTask)
+					}
+					@{ var slide = Model.Slide as ExerciseSlide; }
+					@if (slide != null)
 					{
-						<span id="suc" class="label label-success">Success</span>
-						<button class="label label-default" onclick="cleanUserCode()">ClearCode</button>
-						<textarea class='code code-exercise'>@Model.LatestAcceptedSolution</textarea>
+						<textarea id="secretCodeExercise" class='hide'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
+						if (Model.IsPassedTask)
+						{
+							<span id="suc" class="label label-success">Success</span>
+							<button class="label label-default" onclick="cleanUserCode()">ClearCode</button>
+							<textarea class='code code-exercise'>@Model.LatestAcceptedSolution</textarea>
+						}
+						else
+						{
+							<button class="label label-default" onclick="cleanUserCode()">ClearCode</button>
+							<textarea class='code code-exercise'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
+						}
+						<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine ™</a></div>
+						<script>
+						    function cleanUserCode() {
+						        var $secretCodeExercise = $('#secretCodeExercise');
+						        $('.code-exercise')[0].codeMirrorEditor.setValue($secretCodeExercise.text());
+						    }
+						</script>
+						@*
+				<a href="#" onclick="updateVerdict(true, 'Успех!', 'some right answer', false)">OK</a>
+				<a href="#" onclick="updateVerdict(false, 'Compilation error', 'details', true)">CompilationError</a>
+				<a href="#" onclick="updateVerdict(false, 'Неверный ответ', 'Bullshit', false)">WrongAnswer</a>
+						*@
+						@Html.Partial("_ExerciseHints", slide.HintsHtml)
+						@Html.Partial("_AskBar")
+						@Html.Partial("_MarksBar");
+						<button type="button" class="run-solution-button btn btn-primary btn-lg no-rounds"
+								data-url="@Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">
+							RUN
+						</button>
+						<div class="run-verdict clearfix"></div>
+						<div class="after-run-block">
+							<div class="actual-output">
+								<div class="output-label">Вывод вашей программы:</div>
+								<pre class="no-rounds"><code class="actual-output-content"></code></pre>
+							</div>
+							<div class="diff-table"></div>
+						</div>
 					}
 					else
 					{
-						<button class="label label-default" onclick="cleanUserCode()">ClearCode</button>
-						<textarea class='code code-exercise'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
+						@Html.Partial("_AskBar")
 					}
-					<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine ™</a></div>
-				    <script>
-    				    function cleanUserCode() {
-    				        var $secretCodeExercise = $('#secretCodeExercise');
-    				        $('.code-exercise')[0].codeMirrorEditor.setValue($secretCodeExercise.text());
-    				    }
-    				</script>
-					@*
-						<a href="#" onclick="updateVerdict(true, 'Успех!', 'some right answer', false)">OK</a>
-						<a href="#" onclick="updateVerdict(false, 'Compilation error', 'details', true)">CompilationError</a>
-						<a href="#" onclick="updateVerdict(false, 'Неверный ответ', 'Bullshit', false)">WrongAnswer</a>
-					*@
-					@Html.Partial("_ExerciseHints", slide.HintsHtml)
-					@Html.Partial("_AskBar")
-					@Html.Partial("_MarksBar");
-					<button type="button" class="run-solution-button btn btn-primary btn-lg no-rounds"
-							data-url="@Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">
-						RUN
-					</button>
-					<div class="run-verdict clearfix"></div>
-					<div class="after-run-block">
-						<div class="actual-output">
-							<div class="output-label">Вывод вашей программы:</div>
-							<pre class="no-rounds"><code class="actual-output-content"></code></pre>
-						</div>
-						<div class="diff-table"></div>
-					</div>
-				}
-				else
-				{
-					@Html.Partial("_AskBar")
-				}
-			</div>
+</div>
+
 			@Html.Partial("_SlideNavigation", Model)
-			<div id="WatchQuestions" data-url="@Url.Action("GetAllQuestions", new { courseName = @Model.Slide.Info.UnitName})">
-				<button onclick="printAllQuestions()">Посмотреть все заданные вопросы по теме</button>
-			</div>
+		    <div id="WatchQuestions" data-url="@Url.Action("GetAllQuestions", new { courseName = @Model.Slide.Info.UnitName})">
+		        <button onclick="printAllQuestions()">Посмотреть все заданные вопросы по теме</button>
+		    </div>
 			<div class="questions-log"></div>
 		</div>
 	</div>
@@ -100,3 +103,7 @@
 @section scripts{
 	@Scripts.Render("~/slide-js")
 }
+
+<script language="JavaScript" type="text/javascript" src="~/Scripts/jquery-2.1.1.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="~/Scripts/slide-onload-visit.js"></script>
+<script id="VisitSlideUrl" data-url='@Url.Action("VisitSlide", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex })'>smbVisit()</script>
