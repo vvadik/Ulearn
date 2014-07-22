@@ -1,23 +1,29 @@
-﻿@model string[]
-
+﻿@model uLearn.CoursePageModel
 <div class="panel-group" id="hints-accordion">
-	@for (int index = 0; index < Model.Length; index++)
-	{
-		var hintHtml = Model[index];
-		var id = "hint" + (index + 1);
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h4 class="panel-title">
-					<a data-toggle="collapse" data-parent="#hints-accordion" href="#@id" data-target="#@id">
-						Подсказка @(index + 1)
-					</a>
-				</h4>
-			</div>
-			<div id="@id" class="panel-collapse collapse">
-				<div class="panel-body">
-					@Html.Raw(hintHtml)
-				</div>
-			</div>
-		</div>
-	}
+    @{ var slide = Model.Slide as uLearn.ExerciseSlide;}
+    <div id="hintsStore" data-url="@Url.Action("GetHint", new { courseName = Model.Course.Title, unitName = slide.Info.UnitName, slideTitle = slide.Title })"></div>
+    @for (int index = 0; index < slide.HintsHtml.Length; index++)
+    {
+        var hintHtml = slide.HintsHtml[index];
+        var id = "hint" + (index + 1);
+        <div class="panel panel-default">
+            <div id="@("hintPanel"+index)"  class="panel-heading" data-url="@Url.Action("AddHint",new{courseName = Model.Course.Title,  unitName = slide.Info.UnitName,  slideTitle = slide.Title,  hintId = index})">
+                <h4 class="panel-title">
+                    <a onclick="addHints(@index)"
+                       data-toggle="collapse" data-parent="#hints-accordion" href="#@id" data-target="#@id">
+                        Подсказка @(index + 1)
+                    </a>
+                </h4>
+            </div>
+            <div id="@id" class="panel-collapse collapse">
+                <div class="panel-body">
+                    @Html.Raw(hintHtml)
+                </div>
+            </div>
+        </div>
+    }
+
+	<script src="~/Scripts/slide-hints.js"></script>
+	<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+	<script>getHints()</script>
 </div>

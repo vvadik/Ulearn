@@ -13,7 +13,8 @@ namespace uLearn.Web.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		public AnalyticsTableRepo() : this(new ULearnDb())
+		public AnalyticsTableRepo()
+			: this(new ULearnDb())
 		{
 
 		}
@@ -26,7 +27,7 @@ namespace uLearn.Web.DataContexts
 		public async void AddVisiter(string userId, string key)
 		{
 			var table = db.AnalyticsTables.Find(key);
-			table.Visiters.Add(new Visiter{UserId = userId});
+			table.Visiters.Add(new Visiter { UserId = userId });
 			await db.SaveChangesAsync();
 		}
 
@@ -38,26 +39,61 @@ namespace uLearn.Web.DataContexts
 			{
 				if (table.Marks == null)
 					table.Marks = new List<SlideMark>();
-			table.Marks.Add(new SlideMark { UserId = userId, Mark = mark});
+				if (table.Marks.Any(x => x.UserId == userId))
+					table.Marks.First(x => x.UserId == userId).Mark = mark;
+				else
+					table.Marks.Add(new SlideMark { UserId = userId, Mark = mark });
+
 			}
 			else
 			{
 				await AddNewTable(key);
 				table = db.AnalyticsTables.Find(key);
-				table.Marks.Add(new SlideMark {UserId = userId, Mark = mark});
+				table.Marks.Add(new SlideMark { UserId = userId, Mark = mark });
 			}
 			await db.SaveChangesAsync();
 			return "success!";
+		}
+
+		public async Task<string> AddHint(string userId, int hintId, string key)
+		{
+			var table = db.AnalyticsTables.Find(key);
+			if (table != null)
+			{
+				if (table.Hints == null)
+					table.Hints = new List<Hint>();
+				if (table.Hints.Any(x => x.UserId == userId && x.HintId == hintId))
+					return "Added yet";
+				table.Hints.Add(new Hint { UserId = userId, HintId = hintId });
+				await db.SaveChangesAsync();
+			}
+			return "success";
+		}
+
+		public string GetHint(string key, string userId)
+		{
+			var table = db.AnalyticsTables.Find(key);
+			if (table != null)
+			{
+				if (table.Hints != null)
+				{
+					var hints = table.Hints.Where(x => x.UserId == userId).ToList();
+					if (hints.Count != 0)
+						return string.Join(" ", hints.Select(x => x.HintId).ToList());
+				}
+					
+			}
+			return null;
 		}
 
 		private async Task<string> AddNewTable(string key)
 		{
 			db.AnalyticsTables.Add(new AnalyticsTable
 			{
-				Id = key, 
-				Marks = new List<SlideMark>(), 
-				Solvers = new List<Solver>(), 
-				Visiters=new List<Visiter>()
+				Id = key,
+				Marks = new List<SlideMark>(),
+				Solvers = new List<Solver>(),
+				Visiters = new List<Visiter>()
 			});
 			await db.SaveChangesAsync();
 			return "success!";
@@ -107,6 +143,16 @@ namespace uLearn.Web.DataContexts
 		public string CreateKey(string courseName, string unitName, string slideTitle)
 		{
 			return courseName + "_" + unitName + "_" + slideTitle;
+		}
+
+		public string FindMark(string courseName, string unitName, string slideTitle, string userId)
+		{
+			var key = CreateKey(courseName, unitName, slideTitle);
+			var ans = db.AnalyticsTables.Where(x => x.Id == key).ToList();
+			if (ans.Count == 0)
+				return null;
+			var mark = ans.Select(x => x.Marks.First(y => y.UserId == userId)).FirstOrDefault();
+			return mark == null ? null : mark.Mark.ToString();
 		}
 	}
 }

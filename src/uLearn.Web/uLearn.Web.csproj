@@ -205,6 +205,10 @@
     <Compile Include="Migrations\201407210712401_AddAnalyticsTable.Designer.cs">
       <DependentUpon>201407210712401_AddAnalyticsTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201407220815589_AddHints.cs" />
+    <Compile Include="Migrations\201407220815589_AddHints.Designer.cs">
+      <DependentUpon>201407220815589_AddHints.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\AnalyticsTable.cs" />
     <Compile Include="Models\CourseManager_should.cs" />
     <EmbeddedResource Include="Courses\**\*.*">
@@ -242,6 +246,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CourseManager.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
+    <Compile Include="Models\Hint.cs" />
     <Compile Include="Models\SlideMark.cs" />
     <Compile Include="Models\Solver.cs" />
     <Compile Include="Models\UserQuestion.cs" />
@@ -266,6 +271,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201407210712401_AddAnalyticsTable.resx">
       <DependentUpon>201407210712401_AddAnalyticsTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201407220815589_AddHints.resx">
+      <DependentUpon>201407220815589_AddHints.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -558,6 +566,7 @@
     </None>
     <None Include="Properties\PublishProfiles\ulearn.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\slide-hints.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />

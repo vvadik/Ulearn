@@ -90,11 +90,37 @@ namespace uLearn.Web.Controllers
 		public async Task<string> ApplyMark(string courseName, string unitName, string slideTitle, string mark )
 		{
 			var userId = User.Identity.GetUserId();
-			var slideMark = SlideMarks.OK;
+			var slideMark = (SlideMarks)Enum.Parse(typeof(SlideMarks), mark);
 			await
 				analyticsTableRepo.AddMark(userId, slideMark,
 					analyticsTableRepo.CreateKey(courseName, unitName, slideTitle));
 			return "success!";
+		}
+
+		[HttpPost]
+		[Authorize]
+		public string RecognizeMark(string courseName, string unitName, string slideTitle)
+		{
+			var userId = User.Identity.GetUserId();
+			return analyticsTableRepo.FindMark(courseName, unitName, slideTitle, userId);
+		}
+
+		[HttpPost]
+		[Authorize]
+		public async Task<string> AddHint(string courseName, string unitName, string slideTitle, int hintId)
+		{
+			var userId = User.Identity.GetUserId();
+			await analyticsTableRepo.AddHint(userId, hintId, analyticsTableRepo.CreateKey(courseName, unitName, slideTitle));
+			return "success";
+		}
+
+		[HttpPost]
+		[Authorize]
+		public string GetHint(string courseName, string unitName, string slideTitle)
+		{
+			var userId = User.Identity.GetUserId();
+			var answer = analyticsTableRepo.GetHint(analyticsTableRepo.CreateKey(courseName, unitName, slideTitle), userId);
+			return answer;
 		}
 
 		[HttpPost]

@@ -20,5 +20,7 @@ namespace uLearn.Web.Models
 
 
 		public virtual IList<Solver> Solvers { get; set; }
+
+		public virtual IList<Hint> Hints { get; set; }
 	}
 }

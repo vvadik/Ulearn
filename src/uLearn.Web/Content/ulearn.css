@@ -214,3 +214,11 @@ a.nav-arrow:hover {
     background-color: lightgray;
     font-weight: bolder;
 }
+
+.visited-hint {
+  background-color: lightgreen;
+  padding: 10px 15px;
+  border-bottom: 1px solid transparent;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
