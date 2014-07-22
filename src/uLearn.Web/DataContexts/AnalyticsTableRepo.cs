@@ -13,8 +13,7 @@ namespace uLearn.Web.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		public AnalyticsTableRepo()
-			: this(new ULearnDb())
+		public AnalyticsTableRepo() : this(new ULearnDb())
 		{
 
 		}
@@ -24,11 +23,21 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public async void AddVisiter(string userId, string key)
+		public async Task<string> AddVisiter(string userId, string key)
 		{
 			var table = db.AnalyticsTables.Find(key);
+			if (table == null)
+			{
+				await AddNewTable(key);
+				table = db.AnalyticsTables.Find(key);
+			}
+			if (table.Visiters == null)
+				table.Visiters = new List<Visiter>();
+			if (table.Visiters.Any(x => x.UserId == userId))
+				return "already yet";
 			table.Visiters.Add(new Visiter { UserId = userId });
 			await db.SaveChangesAsync();
+			return "success";
 		}
 
 
@@ -99,11 +108,21 @@ namespace uLearn.Web.DataContexts
 			return "success!";
 		}
 
-		public async void AddSolver(string userId, string key)
+		public async Task<string> AddSolver(string userId, string key)
 		{
 			var table = db.AnalyticsTables.Find(key);
+			if (table == null)
+			{
+				await AddNewTable(key);
+				table = db.AnalyticsTables.Find(key);
+			}
+			if (table.Solvers == null)
+				table.Solvers = new List<Solver>();
+			if (table.Solvers.Any(x => x.UserId == userId))
+				return "already yet";
 			table.Solvers.Add(new Solver { UserId = userId });
 			await db.SaveChangesAsync();
+			return "success";
 		}
 
 		public int GetSolversCount(string key)

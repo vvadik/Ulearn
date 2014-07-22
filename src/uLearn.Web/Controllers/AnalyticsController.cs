@@ -27,7 +27,9 @@ namespace uLearn.Web.Controllers
 		[Authorize]
 		public ActionResult TableAnalytics(string courseId, string slideIndex)
 		{
-			var model = CreateAnalyticsTable(courseId, CreateCoursePageModel(courseId, int.Parse(slideIndex)));
+			int slideIndexInt;
+			int.TryParse(slideIndex, out slideIndexInt);
+			var model = CreateAnalyticsTable(courseId, CreateCoursePageModel(courseId, slideIndexInt));
 			return View(model);
 		}
 
@@ -46,11 +48,13 @@ namespace uLearn.Web.Controllers
 			{
 				var key = analyticsTable.CreateKey(course.Title, slide.Info.UnitName, slide.Title);
 				var marks = analyticsTable.GetMarks(key);
+				var isExercise = (slide as ExerciseSlide) != null;
 				tableInfo.Add(course.Title + " " + slide.Title, new AnalyticsTableInfo
 				{
 					Marks = marks,
 					SolversCount = analyticsTable.GetSolversCount(key),
-					VisitersCount = analyticsTable.GetVisitersCount(key)
+					VisitersCount = analyticsTable.GetVisitersCount(key),
+					IsExercise = isExercise
 				});
 			}
 			return tableInfo;

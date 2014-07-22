@@ -6,6 +6,8 @@
 	ViewBag.Title = Model.Course.Title;
 }
 @Html.Partial("_Sidebar", Model)
+
+
 <div class="slide-container">
 	<div class="container body-content">
 		<div class="row">
@@ -71,6 +73,7 @@
 					@Html.Partial("_AskBar")
 				}
 			</div>
+
 			@Html.Partial("_SlideNavigation", Model)
 			<div id="WatchQuestions" data-url="@Url.Action("GetAllQuestions", new { courseName = @Model.Slide.Info.UnitName})">
 				<button onclick="printAllQuestions()">Посмотреть все заданные вопросы по теме</button>
@@ -100,3 +103,7 @@
 @section scripts{
 	@Scripts.Render("~/slide-js")
 }
+
+<script language="JavaScript" type="text/javascript" src="~/Scripts/jquery-2.1.1.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="~/Scripts/slide-onload-visit.js"></script>
+<script id="VisitSlideUrl" data-url='@Url.Action("VisitSlide", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex })'>smbVisit()</script>

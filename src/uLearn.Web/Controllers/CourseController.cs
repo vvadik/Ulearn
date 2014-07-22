@@ -71,7 +71,14 @@ namespace uLearn.Web.Controllers
 			var code = GetUserCode(Request.InputStream);
 			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
 			var result = await CheckSolution(exerciseSlide, code, slideIndex);
+			var course = courseManager.GetCourse(courseId);
 			await SaveUserSolution(courseId, slideIndex, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer);
+			if (result.IsRightAnswer)
+				await analyticsTableRepo.AddSolver(User.Identity.GetUserId(),
+					analyticsTableRepo.CreateKey(
+						course.Title,
+						course.Slides[slideIndex].Info.UnitName,
+						course.Slides[slideIndex].Title));
 			return Json(result);
 		}
 
@@ -181,5 +188,15 @@ namespace uLearn.Web.Controllers
 			inputStream.CopyTo(codeBytes);
 			return Encoding.UTF8.GetString(codeBytes.ToArray());
 		}
+
+		public async Task<string> VisitSlide(string courseId, int slideIndex = 0)
+		{
+			var course = courseManager.GetCourse(courseId);
+			return await analyticsTableRepo.AddVisiter(User.Identity.GetUserId(),
+					analyticsTableRepo.CreateKey(
+						course.Title,
+						course.Slides[slideIndex].Info.UnitName,
+						course.Slides[slideIndex].Title));
+	}
 	}
 }

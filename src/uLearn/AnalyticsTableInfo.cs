@@ -11,6 +11,7 @@ namespace uLearn
 		public int VisitersCount { get; set; }
 		public int SolversCount { get; set; }
 		public Marks Marks { get; set; }
+		public bool IsExercise { get; set; }
 	}
 
 	public class Marks
