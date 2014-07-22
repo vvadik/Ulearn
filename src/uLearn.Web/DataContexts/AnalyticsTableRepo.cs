@@ -170,7 +170,7 @@ namespace uLearn.Web.DataContexts
 			var ans = db.AnalyticsTables.Where(x => x.Id == key).ToList();
 			if (ans.Count == 0)
 				return null;
-			var mark = ans.Select(x => x.Marks.First(y => y.UserId == userId)).FirstOrDefault();
+			var mark = ans.Select(x => x.Marks.FirstOrDefault(y => y.UserId == userId)).FirstOrDefault();
 			return mark == null ? null : mark.Mark.ToString();
 		}
 	}
