@@ -46,6 +46,7 @@ namespace uLearn.Web
 				"~/codemirror/theme/cobalt.css",
 				"~/codemirror/addon/hint/show-hint.css",
 				"~/Jsdifflib/jsdifflib.css",
+				"~/Content/tablesorter.css",
 				"~/Content/ulearn.css",
 				"~/Content/site.css"));
 			
