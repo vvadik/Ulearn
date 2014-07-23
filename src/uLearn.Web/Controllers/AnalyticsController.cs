@@ -49,7 +49,7 @@ namespace uLearn.Web.Controllers
 				var key = analyticsTable.CreateKey(course.Title, slide.Info.UnitName, slide.Title);
 				var marks = analyticsTable.GetMarks(key);
 				var isExercise = (slide as ExerciseSlide) != null;
-				tableInfo.Add(course.Title + " " + slide.Title, new AnalyticsTableInfo
+				tableInfo.Add(slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
 				{
 					Marks = marks,
 					SolversCount = analyticsTable.GetSolversCount(key),
