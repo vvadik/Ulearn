@@ -35,9 +35,9 @@
 									<td>@info.Value.VisitersCount</td>
 									<td>@(info.Value.IsExercise ? info.Value.SolversCount.ToString(CultureInfo.InvariantCulture) : "")</td>
 									<td>@info.Value.Marks.Count</td>
-									<td>@(info.Value.Marks.Count == 0 ? 0 : 100*(double)info.Value.Marks.Good/info.Value.Marks.Count)%</td>
-									<td>@(info.Value.Marks.Count == 0 ? 0 : 100*(double)info.Value.Marks.NotUnderstand / info.Value.Marks.Count)%</td>
-									<td>@(info.Value.Marks.Count == 0 ? 0 : 100*(double)info.Value.Marks.Trivial / info.Value.Marks.Count)%</td>
+									<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100*(double)info.Value.Marks.Good/info.Value.Marks.Count))%</td>
+									<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100*(double)info.Value.Marks.NotUnderstand / info.Value.Marks.Count))%</td>
+									<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100*(double)info.Value.Marks.Trivial / info.Value.Marks.Count))%</td>
 								</tr>
 							}
 						</tbody>
