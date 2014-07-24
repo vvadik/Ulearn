@@ -222,3 +222,7 @@ a.nav-arrow:hover {
   border-top-right-radius: 3px;
   border-top-left-radius: 3px;
 }
+
+.green-cell {
+    background-color: lightgreen;
+}

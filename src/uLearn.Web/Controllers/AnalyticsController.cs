@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
 using System.Web.Mvc;
@@ -74,6 +75,43 @@ namespace uLearn.Web.Controllers
 				LatestAcceptedSolution = null
 			};
 			return model;
+		}
+
+		public ActionResult UserStats(string courseId, string slideIndex)
+		{
+			int slideIndexInt;
+			int.TryParse(slideIndex, out slideIndexInt);
+			var course = courseManager.GetCourse(courseId);
+			var model = CreateUsersStatsModel(course, CreateCoursePageModel(courseId, slideIndexInt), slideIndexInt);
+			return View(model);
+		}
+
+		private UsersStatsPageModel CreateUsersStatsModel(Course course, CoursePageModel coursePageModel, int slideIndex)
+		{
+			return new UsersStatsPageModel
+			{
+				CoursePageModel = coursePageModel,
+				UserStats = analyticsTable.CreateUsersStats(course, slideIndex)
+			};
+		}
+
+		[Authorize]
+		public ActionResult PersonalStatistics(string courseId, string slideIndex)
+		{
+			int slideIndexInt;
+			int.TryParse(slideIndex, out slideIndexInt);
+			var coursePageModel = CreateCoursePageModel(courseId, slideIndexInt);
+			var course = courseManager.GetCourse(courseId);
+			return View(CreatePersonalStaticticsModel(coursePageModel, User.Identity.GetUserId(), course));
+		}
+
+		private PersonalStatisticPageModel CreatePersonalStaticticsModel(CoursePageModel coursePageModel, string userId, Course course)
+		{
+			return new PersonalStatisticPageModel
+			{
+				CoursePageModel = coursePageModel,
+				PersonalStatistics = analyticsTable.CreatePersonalStatistics(userId, course)
+			};
 		}
 	}
 }

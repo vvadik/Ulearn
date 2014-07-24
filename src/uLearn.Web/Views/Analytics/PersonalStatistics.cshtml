@@ -1,0 +1,65 @@
+﻿@using uLearn
+@using System.Globalization
+@model uLearn.PersonalStatisticPageModel
+@{
+	ViewBag.Title = "TableAnalytics";
+}
+@Html.Partial("../Course/_Sidebar", Model.CoursePageModel)
+
+<body>
+	<script language="JavaScript" type="text/javascript" src="~/Scripts/jquery-2.1.1.min.js"></script>
+	<script language="JavaScript" type="text/javascript" src="~/tablesorter-master/jquery.tablesorter.js"></script>
+	<div class="slide-container">
+		<div class="container body-content">
+			<div class="row">
+				<div class='slide'>
+					<table id="myTable" class="tablesorter">
+						<thead>
+							<tr>
+								<th>Название слайда</th>
+								<th>Посещённые</th>
+								<th>Решённые</th>
+								<th>Ваша оценка</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var info in Model.PersonalStatistics)
+							{
+							    <tr>
+							        <td>@info.Key</td>
+							        @if (info.Value.IsVisited)
+							        {
+							            <td data-sort-value="1" style="background-color: lightgreen"></td>
+							        }
+							        else
+							        {
+							            <td }ata-sort-value="0" style="background-color: red"></td>
+							        }
+									
+							        @if (!info.Value.IsNotExercise)
+							        {
+							            if (info.Value.IsSolved)
+							            {
+							                <td data-sort-value="2" style="background-color: lightgreen"></td>
+							            }
+							            else
+							            {
+							                <td data-sort-value="1" style="background-color: red"></td>
+							            }
+							        }
+							        else
+							        {
+							            <td data-sort-value="0"></td>
+							        }
+							        <td>@(info.Value.UserMark ?? "")</td>
+							    </tr>
+							}
+						</tbody>
+					</table>
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="~/Scripts/table-configurator.js"> </script>
+</body>
