@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Security;
 using Microsoft.Owin.Security.Provider;
 using NUnit.Framework;
 using uLearn.Web.Models;
@@ -156,7 +157,7 @@ namespace uLearn.Web.DataContexts
 
 		private bool IsCollectionEmpty(string key)
 		{
-			return !db.AnalyticsTables.Any(x => x.Id == key);
+			return db.AnalyticsTables.Find(key) == null;
 		}
 
 		public string CreateKey(string courseName, string unitName, string slideTitle)
@@ -172,6 +173,67 @@ namespace uLearn.Web.DataContexts
 				return null;
 			var mark = ans.Select(x => x.Marks.FirstOrDefault(y => y.UserId == userId)).FirstOrDefault();
 			return mark == null ? null : mark.Mark.ToString();
+		}
+
+		public Dictionary<string, UserStatsInfo> CreateUsersStats(Course course, int slideIndex)
+		{
+			var ans = new Dictionary<string, UserStatsInfo>();
+			foreach (var slide in course.Slides)
+			{
+				var key = CreateKey(
+					course.Title,
+					slide.Info.UnitName,
+					slide.Title);
+				var table = db.AnalyticsTables.Find(key);
+				if (table == null)
+					continue;
+				var localKey = key.Split('_')[1];
+				
+				foreach (var solver in table.Solvers)
+				{
+					if (!ans.ContainsKey(solver.UserId))
+						ans[solver.UserId] = new UserStatsInfo();
+					if (!ans[solver.UserId].PercentAcceptedSolutionsPerUnit.ContainsKey(localKey))
+						ans[solver.UserId].PercentAcceptedSolutionsPerUnit[localKey] = new UnitStat();
+					ans[solver.UserId].PercentAcceptedSolutionsPerUnit[localKey].AddCount();
+				}
+			}
+			return ans;
+		}
+
+		public Dictionary<string, PersonalStatisticsInSlide> CreatePersonalStatistics(string userId, Course course)
+		{
+			var ans = new Dictionary<string, PersonalStatisticsInSlide>();
+			foreach (var slide in course.Slides)
+			{
+				var key = CreateKey(
+					course.Title,
+					slide.Info.UnitName,
+					slide.Title);
+				var stat = db.AnalyticsTables.Find(key);
+				var personalStatistics = new PersonalStatisticsInSlide
+				{
+					IsNotExercise = (slide as ExerciseSlide) == null,
+					IsSolved = stat.Solvers.Any(x => x.UserId == userId),
+					IsVisited = stat.Visiters.Any(x => x.UserId == userId),
+					UserMark = ConvertMarkToPrettyString(stat.Marks.FirstOrDefault(x => x.UserId == userId))
+				};
+				ans[key.Remove(0, key.IndexOf('_') + 1).Replace("_", ": ")] = personalStatistics;
+			}
+			return ans;
+		}
+
+		private string ConvertMarkToPrettyString(SlideMark slideMark)
+		{
+			return slideMark == null
+				? null
+				: slideMark.Mark == SlideMarks.Good
+					? "Хорошо"
+					: slideMark.Mark == SlideMarks.NotUnderstand
+						? "Не понял"
+						: slideMark.Mark == SlideMarks.Trivial
+							? "Тривиально"
+							: null;
 		}
 	}
 }

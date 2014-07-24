@@ -78,6 +78,7 @@
     <Compile Include="ExerciseAttribute.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />
+    <Compile Include="PersonalStatisticPageModel.cs" />
     <Compile Include="SlideInfo.cs" />
     <Compile Include="Markdown_investigation.cs" />
     <Compile Include="Md.cs" />
@@ -145,6 +146,8 @@
     </Compile>
     <Compile Include="TitleAttribute.cs" />
     <Compile Include="Urls.cs" />
+    <Compile Include="UsersStatsPageModel.cs" />
+    <Compile Include="UserStatsInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CSharp\README.md" />

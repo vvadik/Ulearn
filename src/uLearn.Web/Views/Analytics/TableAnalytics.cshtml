@@ -16,17 +16,17 @@
 			<div class="row">
 				<div class='slide'>
 					<table id="myTable" class="tablesorter">
-						<thead>
-							<tr>
-								<th>Unit name</th>
-								<th>Visiters count</th>
-								<th>Solvers count</th>
-								<th>Marks count</th>
-								<th>OK percent</th>
-								<th>Nipanyatna percent</th>
-								<th>ez percent</th>
-							</tr>
-						</thead>
+					    <thead>
+					        <tr>
+					            <th>Название</th>
+					            <th>Количество просмотревших</th>
+					            <th>Успешные решения</th>
+					            <th>Количество оценок</th>
+					            <th>оценок "хорошо"</th>
+					            <th>оценок "не понятно"</th>
+					            <th>оценок "тривиально"</th>
+					        </tr>
+					    </thead>
 						<tbody>
 							@foreach (var info in Model.TableInfo)
 							{
@@ -35,9 +35,9 @@
 									<td>@info.Value.VisitersCount</td>
 									<td>@(info.Value.IsExercise ? info.Value.SolversCount.ToString(CultureInfo.InvariantCulture) : "")</td>
 									<td>@info.Value.Marks.Count</td>
-									<td>@info.Value.Marks.Good</td>
-									<td>@info.Value.Marks.NotUnderstand</td>
-									<td>@info.Value.Marks.Trivial</td>
+									<td>@(info.Value.Marks.Count == 0 ? 0 : 100*(double)info.Value.Marks.Good/info.Value.Marks.Count)%</td>
+									<td>@(info.Value.Marks.Count == 0 ? 0 : 100*(double)info.Value.Marks.NotUnderstand / info.Value.Marks.Count)%</td>
+									<td>@(info.Value.Marks.Count == 0 ? 0 : 100*(double)info.Value.Marks.Trivial / info.Value.Marks.Count)%</td>
 								</tr>
 							}
 						</tbody>
