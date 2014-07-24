@@ -5,9 +5,12 @@
 		data: String(solutionId)
 	}).success(function (ans) {
 		var likerCounterId = "#counter" + solutionId;
-		var likeCounter = $(likerCounterId);;
+		var likeCounter = $(likerCounterId);
 		if (ans == "success") {
-			likeCounter.text(String(parseInt(likeCounter.val()) + 1));
+		    var lastVal = likeCounter.text();
+		    var newVal = parseInt(lastVal) + 1;
+		    var strNewVal = "   " + String(newVal);
+			likeCounter.text(strNewVal);
 		} else {
 			likeCounter.text("already like from you");
 		}
