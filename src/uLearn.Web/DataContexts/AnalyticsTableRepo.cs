@@ -211,6 +211,8 @@ namespace uLearn.Web.DataContexts
 					slide.Info.UnitName,
 					slide.Title);
 				var stat = db.AnalyticsTables.Find(key);
+				if (stat == null)
+					continue;
 				var personalStatistics = new PersonalStatisticsInSlide
 				{
 					IsNotExercise = (slide as ExerciseSlide) == null,

@@ -25,34 +25,34 @@
 						<tbody>
 							@foreach (var info in Model.PersonalStatistics)
 							{
-							    <tr>
-							        <td>@info.Key</td>
-							        @if (info.Value.IsVisited)
-							        {
-							            <td data-sort-value="1" style="background-color: lightgreen"></td>
-							        }
-							        else
-							        {
-							            <td }ata-sort-value="0" style="background-color: red"></td>
-							        }
-									
-							        @if (!info.Value.IsNotExercise)
-							        {
-							            if (info.Value.IsSolved)
-							            {
-							                <td data-sort-value="2" style="background-color: lightgreen"></td>
-							            }
-							            else
-							            {
-							                <td data-sort-value="1" style="background-color: red"></td>
-							            }
-							        }
-							        else
-							        {
-							            <td data-sort-value="0"></td>
-							        }
-							        <td>@(info.Value.UserMark ?? "")</td>
-							    </tr>
+								<tr>
+									<td>@info.Key</td>
+									@if (info.Value.IsVisited)
+									{
+										<td data-sort-value="1" style="background-color: lightgreen"></td>
+									}
+									else
+									{
+										<td data-sort-value="0" style="background-color: red"></td>
+									}
+
+									@if (!info.Value.IsNotExercise)
+									{
+										if (info.Value.IsSolved)
+										{
+											<td data-sort-value="2" style="background-color: lightgreen"></td>
+										}
+										else
+										{
+											<td data-sort-value="1" style="background-color: red"></td>
+										}
+									}
+									else
+									{
+										<td data-sort-value="0"></td>
+									}
+									<td>@(info.Value.UserMark ?? "")</td>
+								</tr>
 							}
 						</tbody>
 					</table>
