@@ -54,7 +54,6 @@
 					*@
 					@Html.Partial("_ExerciseHints", Model)
 					@Html.Partial("_AskBar")
-					@Html.Partial("_MarksBar");
 					<button type="button" class="run-solution-button btn btn-primary btn-lg no-rounds"
 							data-url="@Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">
 						RUN
@@ -73,7 +72,7 @@
 					@Html.Partial("_AskBar")
 				}
 			</div>
-
+			@Html.Partial("_MarksBar")
 			@Html.Partial("_SlideNavigation", Model)
 			<div id="WatchQuestions" data-url="@Url.Action("GetAllQuestions", new { courseName = @Model.Slide.Info.UnitName})">
 				<button onclick="printAllQuestions()">Посмотреть все заданные вопросы по теме</button>

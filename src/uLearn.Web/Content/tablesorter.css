@@ -6,6 +6,7 @@
 	width: 100%;
 	text-align: left;
     border: 1px solid #3D3D3D;
+    margin-top: 30px;
 }
 table.tablesorter thead tr th, table.tablesorter tfoot tr th {
 	background-color: #e6EEEE;
