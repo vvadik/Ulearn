@@ -55,7 +55,7 @@
 		+ " Where Select SelectMany ToArray ToList ToDictionary ToLookup Join Zip Aggregate GroupBy OrderBy OrderByDescending ThenBy ThenByDescending"
 		+ " "
 		).split(" ");
-	var types = ("Console CultureInfo Enumerable "
+	var types = ("Console CultureInfo Enumerable Math Int Double "
 		+ " "
 		).split(" ");
 

@@ -201,7 +201,7 @@ namespace uLearn.Web.DataContexts
 			return ans;
 		}
 
-		public Dictionary<string, PersonalStatisticsInSlide> CreatePersonalStatistics(string userId, Course course)
+		public async Task<Dictionary<string, PersonalStatisticsInSlide>> CreatePersonalStatistics(string userId, Course course)
 		{
 			var ans = new Dictionary<string, PersonalStatisticsInSlide>();
 			foreach (var slide in course.Slides)
@@ -212,7 +212,10 @@ namespace uLearn.Web.DataContexts
 					slide.Title);
 				var stat = db.AnalyticsTables.Find(key);
 				if (stat == null)
+				{
+					ans[key.Remove(0, key.IndexOf('_') + 1).Replace("_", ": ")] = null;
 					continue;
+				}
 				var personalStatistics = new PersonalStatisticsInSlide
 				{
 					IsNotExercise = (slide as ExerciseSlide) == null,

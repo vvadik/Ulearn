@@ -77,7 +77,8 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		public ActionResult UserStats(string courseId, string slideIndex)
+		[Authorize]
+		public ActionResult UsersStatistics(string courseId, string slideIndex)
 		{
 			int slideIndexInt;
 			int.TryParse(slideIndex, out slideIndexInt);
@@ -110,7 +111,7 @@ namespace uLearn.Web.Controllers
 			return new PersonalStatisticPageModel
 			{
 				CoursePageModel = coursePageModel,
-				PersonalStatistics = analyticsTable.CreatePersonalStatistics(userId, course)
+				PersonalStatistics = analyticsTable.CreatePersonalStatistics(userId, course).Result
 			};
 		}
 	}

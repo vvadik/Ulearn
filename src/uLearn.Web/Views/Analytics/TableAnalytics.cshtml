@@ -16,28 +16,30 @@
 			<div class="row">
 				<div class='slide'>
 					<table id="myTable" class="tablesorter">
-					    <thead>
-					        <tr>
-					            <th>Название</th>
-					            <th>Количество просмотревших</th>
-					            <th>Успешные решения</th>
-					            <th>Количество оценок</th>
-					            <th>оценок "хорошо"</th>
-					            <th>оценок "не понятно"</th>
-					            <th>оценок "тривиально"</th>
-					        </tr>
-					    </thead>
+						<thead>
+							<tr>
+								<th>Название</th>
+								<th>Количество просмотревших</th>
+								<th>Успешные решения</th>
+								<th>Количество оценок</th>
+								<th>оценок "хорошо"</th>
+								<th>оценок "не понятно"</th>
+								<th>оценок "тривиально"</th>
+							</tr>
+						</thead>
 						<tbody>
+							@{ var counter = -1;}
 							@foreach (var info in Model.TableInfo)
 							{
+								counter++;
 								<tr>
-									<td>@info.Key</td>
+									<td data-sort-value=@(counter + 1000)>@Html.ActionLink(info.Key, "Slide", "Course", new { courseId = Model.CoursePageModel.Course.Id, slideIndex = counter }, null)</td>
 									<td>@info.Value.VisitersCount</td>
 									<td>@(info.Value.IsExercise ? info.Value.SolversCount.ToString(CultureInfo.InvariantCulture) : "")</td>
 									<td>@info.Value.Marks.Count</td>
-									<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100*(double)info.Value.Marks.Good/info.Value.Marks.Count))%</td>
-									<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100*(double)info.Value.Marks.NotUnderstand / info.Value.Marks.Count))%</td>
-									<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100*(double)info.Value.Marks.Trivial / info.Value.Marks.Count))%</td>
+									<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100 * (double)info.Value.Marks.Good / info.Value.Marks.Count))%</td>
+									<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100 * (double)info.Value.Marks.NotUnderstand / info.Value.Marks.Count))%</td>
+									<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100 * (double)info.Value.Marks.Trivial / info.Value.Marks.Count))%</td>
 								</tr>
 							}
 						</tbody>

@@ -678,7 +678,7 @@
     <Content Include="tablesorter-master\README.md" />
     <Content Include="tablesorter-master\themes\blue\blue.zip" />
     <Content Include="tablesorter-master\themes\green\green.zip" />
-    <Content Include="Views\Analytics\UserStats.cshtml" />
+    <Content Include="Views\Analytics\UsersStatistics.cshtml" />
     <Content Include="Views\Analytics\PersonalStatistics.cshtml" />
   </ItemGroup>
   <ItemGroup>

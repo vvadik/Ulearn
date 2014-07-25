@@ -23,36 +23,50 @@
 							</tr>
 						</thead>
 						<tbody>
-							@foreach (var info in Model.PersonalStatistics)
-							{
-							    <tr>
-							        <td>@info.Key</td>
-							        @if (info.Value.IsVisited)
-							        {
-							            <td data-sort-value="1" style="background-color: lightgreen"></td>
-							        }
-							        else
-							        {
-										<td data-sort-value="0" style="background-color: red"></td>
-							        }
-									
-							        @if (!info.Value.IsNotExercise)
-							        {
-							            if (info.Value.IsSolved)
-							            {
-							                <td data-sort-value="2" style="background-color: lightgreen"></td>
-							            }
-							            else
-							            {
-							                <td data-sort-value="1" style="background-color: red"></td>
-							            }
-							        }
-							        else
-							        {
-							            <td data-sort-value="0"></td>
-							        }
-							        <td>@(info.Value.UserMark ?? "")</td>
-							    </tr>
+							@{
+								int counter = -1;
+								foreach (var info in Model.PersonalStatistics)
+								{
+									counter++;
+									if (info.Value == null)
+									{
+										<tr>
+											<td data-sort-value=@(counter + 1000)>@Html.ActionLink(info.Key, "Slide", "Course", new { courseId = Model.CoursePageModel.Course.Id, slideIndex = counter }, null)</td>
+											<td data-sort-value="0"></td>
+											<td data-sort-value="0"></td>
+											<td data-sort-value="0"></td>
+										</tr>
+										continue;
+									}
+									<tr>
+										<td data-sort-value=@(counter + 1000)>@Html.ActionLink(info.Key, "Slide", "Course", new { courseId = Model.CoursePageModel.Course.Id, slideIndex = counter }, null)</td>
+										@if (info.Value.IsVisited)
+										{
+											<td data-sort-value="2" style="background-color: lightgreen"></td>
+										}
+										else
+										{
+											<td data-sort-value="1" style="background-color: lightcoral"></td>
+										}
+
+										@if (!info.Value.IsNotExercise)
+										{
+											if (info.Value.IsSolved)
+											{
+												<td data-sort-value="2" style="background-color: lightgreen"></td>
+											}
+											else
+											{
+												<td data-sort-value="1" style="background-color: lightcoral"></td>
+											}
+										}
+										else
+										{
+											<td data-sort-value="0"></td>
+										}
+										<td>@(info.Value.UserMark ?? "")</td>
+									</tr>
+								}
 							}
 						</tbody>
 					</table>
