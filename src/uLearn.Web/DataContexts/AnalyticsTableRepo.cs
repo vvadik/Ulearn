@@ -201,7 +201,7 @@ namespace uLearn.Web.DataContexts
 			return ans;
 		}
 
-		public async Task<Dictionary<string, PersonalStatisticsInSlide>> CreatePersonalStatistics(string userId, Course course)
+		public  Dictionary<string, PersonalStatisticsInSlide> CreatePersonalStatistics(string userId, Course course)
 		{
 			var ans = new Dictionary<string, PersonalStatisticsInSlide>();
 			foreach (var slide in course.Slides)
