@@ -29,11 +29,9 @@ namespace uLearn.Web.Controllers
 		}
 
 		[Authorize]
-		public ActionResult TableAnalytics(string courseId, string slideIndex)
+		public ActionResult TableAnalytics(string courseId, int slideIndex)
 		{
-			int slideIndexInt;
-			int.TryParse(slideIndex, out slideIndexInt);
-			var model = CreateAnalyticsTable(courseId, CreateCoursePageModel(courseId, slideIndexInt));
+			var model = CreateAnalyticsTable(courseId, CreateCoursePageModel(courseId, slideIndex));
 			return View(model);
 		}
 

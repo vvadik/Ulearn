@@ -31,9 +31,9 @@
 				</ul>
 			</li>
 		}
-		<li class="units-list-item units-list-item-text">@Html.ActionLink("Total progress", "TableAnalytics", "Analytics", new { courseId = Model.Course.Id, slideIndex = "0" }, null)</li>
+		<li class="units-list-item units-list-item-text">@Html.ActionLink("Total progress", "TableAnalytics", "Analytics", new { courseId = Model.Course.Id, slideIndex = 0 }, null)</li>
 		@*<li class="units-list-item units-list-item-text">@Html.ActionLink("Users progress", "UsersStatistics", "Analytics", new { courseId = Model.Course.Id, slideIndex = "0" }, null)</li>*@
-		<li class="units-list-item units-list-item-text">@Html.ActionLink("Personal progress", "PersonalStatistics", "Analytics", new { courseId = Model.Course.Id, slideIndex = "0" }, null)</li>
+		<li class="units-list-item units-list-item-text">@Html.ActionLink("Personal progress", "PersonalStatistics", "Analytics", new { courseId = Model.Course.Id, slideIndex = 0 }, null)</li>
 
 	}
 </ul>

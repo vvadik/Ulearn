@@ -99,7 +99,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public string RecognizeMark(string courseId, int slideId)
+		public string GetMark(string courseId, int slideId)
 		{
 			var userId = User.Identity.GetUserId();
 			return slideRateRepo.FindRate(courseId, slideId, userId);
@@ -128,14 +128,8 @@ namespace uLearn.Web.Controllers
 		public string GetAllQuestions(string courseName)
 		{
 			var questions = userQuestionsRepo.GetAllQuestions(courseName);
-			return ToProtectedString(questions);
+			return Server.HtmlEncode(questions);
 		}
-
-		private string ToProtectedString(string questions)
-		{
-			return questions.Replace("<", "&lt;").Replace(">", "&gt;");
-		}
-
 
 		[HttpPost]
 		[Authorize]

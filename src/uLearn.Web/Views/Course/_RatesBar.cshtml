@@ -15,7 +15,7 @@
     <input id="notwatched" type="radio" name="marks" value="not_watched" onclick="handleMark()" checked data-url="@Url.Action("ApplyMark", new{courseId = courseId, slideId = slideId, rate=notWatched})">Не смотрел
 </form>
 
-<div id="finder" data-url="@Url.Action("RecognizeMark", new{courseId = courseId, slideId = slideId})"></div>
+<div id="finder" data-url="@Url.Action("GetMark", new{courseId = courseId, slideId = slideId})"></div>
 <script src="~/Scripts/slide-stats.js"></script>
 <script src="~/Scripts/jquery-1.10.2.min.js"></script>
 <script>giveMark()</script>
