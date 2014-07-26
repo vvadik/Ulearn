@@ -17,7 +17,9 @@ namespace uLearn.Web.Controllers
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly UserQuestionsRepo userQuestionsRepo = new UserQuestionsRepo();
 		private readonly ExecutionService executionService = new ExecutionService();
-		private readonly AnalyticsTableRepo analyticsTableRepo = new AnalyticsTableRepo();
+		private readonly VisitersRepo visitersRepo = new VisitersRepo();
+		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
+		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
 
 		public CourseController() : this(CourseManager.AllCourses)
 		{
@@ -71,14 +73,7 @@ namespace uLearn.Web.Controllers
 			var code = GetUserCode(Request.InputStream);
 			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
 			var result = await CheckSolution(exerciseSlide, code, slideIndex);
-			var course = courseManager.GetCourse(courseId);
 			await SaveUserSolution(courseId, slideIndex, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer);
-			if (result.IsRightAnswer)
-				await analyticsTableRepo.AddSolver(User.Identity.GetUserId(),
-					analyticsTableRepo.CreateKey(
-						course.Title,
-						course.Slides[slideIndex].Info.UnitName,
-						course.Slides[slideIndex].Title));
 			return Json(result);
 		}
 
@@ -94,39 +89,37 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<string> ApplyMark(string courseName, string unitName, string slideTitle, string mark )
+		public async Task<string> ApplyMark(string courseId, int slideId, string rate )
 		{
 			var userId = User.Identity.GetUserId();
-			var slideMark = (SlideMarks)Enum.Parse(typeof(SlideMarks), mark);
-			await
-				analyticsTableRepo.AddMark(userId, slideMark,
-					analyticsTableRepo.CreateKey(courseName, unitName, slideTitle));
+			var slideRate = (SlideRates)Enum.Parse(typeof(SlideRates), rate);
+			await slideRateRepo.AddRate(courseId, slideId, userId, slideRate);
 			return "success!";
 		}
 
 		[HttpPost]
 		[Authorize]
-		public string RecognizeMark(string courseName, string unitName, string slideTitle)
+		public string RecognizeMark(string courseId, int slideId)
 		{
 			var userId = User.Identity.GetUserId();
-			return analyticsTableRepo.FindMark(courseName, unitName, slideTitle, userId);
+			return slideRateRepo.FindRate(courseId, slideId, userId);
 		}
 
 		[HttpPost]
 		[Authorize]
-		public async Task<string> AddHint(string courseName, string unitName, string slideTitle, int hintId)
+		public async Task<string> AddHint(string courseId, int slideId, int hintId)
 		{
 			var userId = User.Identity.GetUserId();
-			await analyticsTableRepo.AddHint(userId, hintId, analyticsTableRepo.CreateKey(courseName, unitName, slideTitle));
+			await slideHintRepo.AddHint(userId, hintId, courseId, slideId);
 			return "success";
 		}
 
 		[HttpPost]
 		[Authorize]
-		public string GetHint(string courseName, string unitName, string slideTitle)
+		public string GetHint(string courseId, int slideId)
 		{
 			var userId = User.Identity.GetUserId();
-			var answer = analyticsTableRepo.GetHint(analyticsTableRepo.CreateKey(courseName, unitName, slideTitle), userId);
+			var answer = slideHintRepo.GetHint(userId, courseId, slideId);
 			return answer;
 		}
 
@@ -189,14 +182,10 @@ namespace uLearn.Web.Controllers
 			return Encoding.UTF8.GetString(codeBytes.ToArray());
 		}
 
-		public async Task<string> VisitSlide(string courseId, int slideIndex = 0)
+		public async Task VisitSlide(string courseId, int slideIndex)
 		{
 			var course = courseManager.GetCourse(courseId);
-			return await analyticsTableRepo.AddVisiter(User.Identity.GetUserId(),
-					analyticsTableRepo.CreateKey(
-						course.Title,
-						course.Slides[slideIndex].Info.UnitName,
-						course.Slides[slideIndex].Title));
-	}
+			await visitersRepo.AddVisiter(courseId, slideIndex, User.Identity.GetUserId());
+		}
 	}
 }

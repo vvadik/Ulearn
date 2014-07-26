@@ -6,7 +6,7 @@ using System.Web;
 
 namespace uLearn.Web.Models
 {
-	public class Hint
+	public class SlideHint
 	{
 		[Key]
 		public int Id { get; set; }
@@ -16,5 +16,12 @@ namespace uLearn.Web.Models
 
 		[Required]
 		public int HintId { get; set; }
+
+		[Required]
+		[StringLength(64)]
+		public string CourseId { get; set; }
+
+		[Required]
+		public int SlideId { get; set; }
 	}
 }

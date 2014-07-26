@@ -13,8 +13,11 @@ namespace uLearn.Web.Controllers
 {
 	public class AnalyticsController : Controller
 	{
-		private readonly AnalyticsTableRepo analyticsTable = new AnalyticsTableRepo();
 		private readonly CourseManager courseManager;
+		private readonly VisitersRepo visitersRepo = new VisitersRepo();
+		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
+		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
+
 
 		public AnalyticsController() : this(CourseManager.AllCourses)
 		{
@@ -45,16 +48,16 @@ namespace uLearn.Web.Controllers
 		private Dictionary<string, AnalyticsTableInfo> CreateTableInfo(Course course)
 		{
 			var tableInfo = new Dictionary<string, AnalyticsTableInfo>();
+			var slideId = -1;
 			foreach (var slide in course.Slides)
 			{
-				var key = analyticsTable.CreateKey(course.Title, slide.Info.UnitName, slide.Title);
-				var marks = analyticsTable.GetMarks(key);
-				var isExercise = (slide as ExerciseSlide) != null;
+				slideId++;
+				var isExercise = (slide is ExerciseSlide);
 				tableInfo.Add(slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
 				{
-					Marks = marks,
-					SolversCount = analyticsTable.GetSolversCount(key),
-					VisitersCount = analyticsTable.GetVisitersCount(key),
+					Marks = slideRateRepo.GetRates(slideId, course.Id),
+					SolversCount = userSolutionsRepo.GetAcceptedSolutionsCount(slideId, course.Id),
+					VisitersCount = visitersRepo.GetVisitersCount(slideId, course.Id),
 					IsExercise = isExercise
 				});
 			}
@@ -92,7 +95,7 @@ namespace uLearn.Web.Controllers
 			return new UsersStatsPageModel
 			{
 				CoursePageModel = coursePageModel,
-				UserStats = analyticsTable.CreateUsersStats(course, slideIndex)
+				UserStats = null
 			};
 		}
 
@@ -103,16 +106,34 @@ namespace uLearn.Web.Controllers
 			int.TryParse(slideIndex, out slideIndexInt);
 			var coursePageModel = CreateCoursePageModel(courseId, slideIndexInt);
 			var course = courseManager.GetCourse(courseId);
-			return View(CreatePersonalStaticticsModel(coursePageModel, User.Identity.GetUserId(), course));
+			return View(CreatePersonalStaticticsModel(coursePageModel, course));
 		}
 
-		private PersonalStatisticPageModel CreatePersonalStaticticsModel(CoursePageModel coursePageModel, string userId, Course course)
+		private PersonalStatisticPageModel CreatePersonalStaticticsModel(CoursePageModel coursePageModel, Course course)
 		{
 			return new PersonalStatisticPageModel
 			{
 				CoursePageModel = coursePageModel,
-				PersonalStatistics = analyticsTable.CreatePersonalStatistics(userId, course).Result
+				PersonalStatistics = CreatePersonalStatistic(course)
 			};
+		}
+
+		private Dictionary<string, PersonalStatisticsInSlide> CreatePersonalStatistic(Course course)
+		{
+			var ans = new Dictionary<string, PersonalStatisticsInSlide>();
+			var slideIndex = -1;
+			foreach (var slide in course.Slides)
+			{
+				slideIndex++;
+				ans[slide.Info.UnitName + ": " + slide.Title] = new PersonalStatisticsInSlide
+				{
+					IsNotExercise = !(slide is ExerciseSlide),
+					IsSolved = userSolutionsRepo.IsUserPassedTask(course.Id, slideIndex, User.Identity.GetUserId()),
+					IsVisited = visitersRepo.IsUserVisit(course.Id, slideIndex, User.Identity.GetUserId()),
+					UserMark = slideRateRepo.GetUserRate(course.Id, slideIndex, User.Identity.GetUserId())
+				};
+			}
+			return ans;
 		}
 	}
 }

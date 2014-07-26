@@ -1,0 +1,21 @@
+﻿@model uLearn.CoursePageModel
+<form id="marksButtons" style="margin-top: 10px;">
+    @{
+        var courseId = Model.Course.Id;
+        //var unitName = Model.Course.Slides[Model.SlideIndex].Info.UnitName;
+        var slideId = Model.SlideIndex;
+        const string good = "Good";
+        const string notUnderstand = "NotUnderstand";
+        const string trivial = "Trivial";
+        const string notWatched = "NotWatched";
+    }
+    <input id="good" type="radio" name="marks" value="good" onclick="handleMark()" data-url="@Url.Action("ApplyMark", new{ courseId = courseId, slideId = slideId, rate=good})">Хорошо
+    <input id="notunderstand" type="radio" name="marks" value="notunderstand" onclick="handleMark()" data-url="@Url.Action("ApplyMark", new{courseId = courseId, slideId = slideId, rate=notUnderstand})">Не понял
+    <input id="trivial" type="radio" name="marks" value="trivial" onclick="handleMark()" data-url="@Url.Action("ApplyMark", new{courseId = courseId, slideId = slideId, rate=trivial})">Тривиально
+    <input id="notwatched" type="radio" name="marks" value="not_watched" onclick="handleMark()" checked data-url="@Url.Action("ApplyMark", new{courseId = courseId, slideId = slideId, rate=notWatched})">Не смотрел
+</form>
+
+<div id="finder" data-url="@Url.Action("RecognizeMark", new{courseId = courseId, slideId = slideId})"></div>
+<script src="~/Scripts/slide-stats.js"></script>
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script>giveMark()</script>

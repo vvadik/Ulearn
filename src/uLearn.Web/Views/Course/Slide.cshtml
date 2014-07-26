@@ -72,7 +72,7 @@
 					@Html.Partial("_AskBar")
 				}
 			</div>
-			@Html.Partial("_MarksBar")
+			@Html.Partial("_RatesBar")
 			@Html.Partial("_SlideNavigation", Model)
 			<div id="WatchQuestions" data-url="@Url.Action("GetAllQuestions", new { courseName = @Model.Slide.Info.UnitName})">
 				<button onclick="printAllQuestions()">Посмотреть все заданные вопросы по теме</button>

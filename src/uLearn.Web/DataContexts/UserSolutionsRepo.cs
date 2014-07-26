@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -98,6 +99,12 @@ namespace uLearn.Web.DataContexts
 				.First()
 				.Code;
 			return answer;
+		}
+
+		public int GetAcceptedSolutionsCount(int slideId, string courseId)
+		{
+			var strSlideId = slideId.ToString(CultureInfo.InvariantCulture);
+			return db.UserSolutions.Count(x => x.SlideId == strSlideId && x.CourseId == courseId && x.IsRightAnswer);
 		}
 	}
 }

@@ -7,13 +7,13 @@ namespace uLearn.Web.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.0.0-20911")]
-    public sealed partial class AddHints : IMigrationMetadata
+    public sealed partial class NewAnalytics : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddHints));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(NewAnalytics));
         
         string IMigrationMetadata.Id
         {
-            get { return "201407220815589_AddHints"; }
+            get { return "201407261530409_NewAnalytics"; }
         }
         
         string IMigrationMetadata.Source

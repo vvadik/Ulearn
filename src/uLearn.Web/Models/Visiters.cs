@@ -6,12 +6,19 @@ using System.Web;
 
 namespace uLearn.Web.Models
 {
-	public class Solver
+	public class Visiters
 	{
 		[Key]
 		public int Id { get; set; }
 
 		[Required]
 		public string UserId { get; set; }
+
+		[Required]
+		[StringLength(64)]
+		public string CourseId { get; set; }
+
+		[Required]
+		public int SlideId { get; set; }
 	}
 }
