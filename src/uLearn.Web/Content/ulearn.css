@@ -241,3 +241,9 @@ a.nav-arrow:hover {
 .likes-counter {
 	margin-left: 0px;
 }
+
+.rate-buttons {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	float:right;
+}

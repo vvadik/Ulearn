@@ -91,8 +91,8 @@
 					function toggleFakeRun() {
 						var $btn = $(".run-solution-button");
 						$btn
-				            .css("background-color", "blue")
-				            .data("url", $btn.data("url").replace("/RunSolution", "/FakeRunSolution"));
+							.css("background-color", "blue")
+							.data("url", $btn.data("url").replace("/RunSolution", "/FakeRunSolution"));
 					}
 				</script>
 			</div>
@@ -102,8 +102,11 @@
 
 @section scripts{
 	@Scripts.Render("~/slide-js")
+	<script src="~/Scripts/slide-onload-visit.js"></script>
+	<script id="VisitSlideUrl" data-url='@Url.Action("VisitSlide", new { courseId = Model.Course.Id, slideId = Model.Slide.Id })'>smbVisit()</script>
+	<script src="~/Scripts/slide-stats.js"></script>
+	<script>
+		giveMark();
+	</script>
 }
 
-<script language="JavaScript" type="text/javascript" src="~/Scripts/jquery-2.1.1.min.js"></script>
-<script language="JavaScript" type="text/javascript" src="~/Scripts/slide-onload-visit.js"></script>
-<script id="VisitSlideUrl" data-url='@Url.Action("VisitSlide", new { courseId = Model.Course.Id, slideId = Model.Slide.Id })'>smbVisit()</script>
