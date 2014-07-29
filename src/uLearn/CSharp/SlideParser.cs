@@ -23,8 +23,8 @@ namespace uLearn.CSharp
 			var walker = new SlideWalker(getInclude);
 			var sourceForTestingRoot = walker.Visit(tree.GetRoot());
 			if (!walker.IsExercise)
-				return new Slide(walker.Blocks, slideInfo, walker.Title);
-			return new ExerciseSlide(walker.Blocks, walker.ExerciseInitialCode, walker.ExpectedOutput, walker.Hints, new SolutionForTesting(sourceForTestingRoot, usings), slideInfo, walker.Title);
+				return new Slide(walker.Blocks, slideInfo, walker.Title, walker.Id);
+			return new ExerciseSlide(walker.Blocks, walker.ExerciseInitialCode, walker.ExpectedOutput, walker.Hints, new SolutionForTesting(sourceForTestingRoot, usings), slideInfo, walker.Title, walker.Id);
 		}
 	}
 }

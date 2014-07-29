@@ -18,6 +18,7 @@ namespace uLearn.CSharp
 		public readonly List<string> Hints = new List<string>();
 		public MethodDeclarationSyntax ExerciseNode;
 		public string Title;
+		public string Id;
 
 		public SlideWalker(Func<string, string> getInclude) : base(false)
 		{
@@ -31,7 +32,7 @@ namespace uLearn.CSharp
 			if (node.HasAttribute<TitleAttribute>())
 				Title = node.GetAttributes<TitleAttribute>().Select(a => a.GetArgument()).Single();
 			if (node.HasAttribute<IdAttribute>())
-				Title = node.GetAttributes<TitleAttribute>().Select(a => a.GetArgument()).Single();
+				Id = node.GetAttributes<IdAttribute>().Select(a => a.GetArgument()).Single();
 			if (ShowOnSlide(node))
 				AddCodeBlock(node);
 			return classDeclaration;

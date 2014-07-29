@@ -78,6 +78,7 @@
     <Compile Include="ExerciseAttribute.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />
+    <Compile Include="IdAttribute.cs" />
     <Compile Include="PersonalStatisticPageModel.cs" />
     <Compile Include="SlideInfo.cs" />
     <Compile Include="Markdown_investigation.cs" />
