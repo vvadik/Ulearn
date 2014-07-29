@@ -32,9 +32,7 @@ namespace uLearn.CSharp
 			if (node.HasAttribute<TitleAttribute>())
 				Title = node.GetAttributes<TitleAttribute>().Select(a => a.GetArgument()).Single();
 			if (node.HasAttribute<IdAttribute>())
-			{
 				Id = node.GetAttributes<IdAttribute>().Select(a => a.GetArgument()).Single();
-			}
 			if (ShowOnSlide(node))
 				AddCodeBlock(node);
 			return classDeclaration;

@@ -1,7 +1,7 @@
 ﻿@using uLearn
 @model UsersStatsPageModel
 @{
-	ViewBag.Title = "TableAnalytics";
+	ViewBag.Title = "Users statistics";
 }
 
 @Html.Partial("_Sidebar", Model.CoursePageModel)
@@ -14,7 +14,7 @@
 					<thead>
 						<tr>
 							<th>user name</th>
-							@foreach (var unitName in Model.UserStats.FirstOrDefault().Value.PercentAcceptedSolutionsPerUnit.Keys)
+							@foreach (var unitName in Model.UnitNamesInOrdered)
 							{
 								<th>@unitName</th>
 							}
@@ -22,16 +22,16 @@
 						</tr>
 					</thead>
 					<tbody>
-						@foreach (var name in Model.UserStats)
+						@foreach (var user in Model.UserStats)
 						{
 							<tr>
-								<td>@name.Key</td>
-								@foreach (var unit in name.Value.PercentAcceptedSolutionsPerUnit.Values)
+								<td>@user.Key</td>
+								@foreach (var unitName in Model.UnitNamesInOrdered)
 								{
-									<td>@unit.Count</td>
+									<td>@(user.Value[unitName] + "%")</td>
 								}
 								<td>
-									@name.Value.PercentAcceptedSolutionsPerUnit.Values.Select(x => x.Count).Aggregate(0, (x, y) => x + y)
+									@(user.Value.Values.Aggregate(0, (x, y) => x + y) / user.Value.Count + "%")
 								</td>
 							</tr>
 						}

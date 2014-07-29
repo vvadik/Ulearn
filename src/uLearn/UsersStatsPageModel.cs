@@ -9,6 +9,7 @@ namespace uLearn
 	public class UsersStatsPageModel
 	{
 		public CoursePageModel CoursePageModel;
-		public Dictionary<string, UserStatsInfo> UserStats;
+		public Dictionary<string, SortedDictionary<string, int>> UserStats;
+		public List<string> UnitNamesInOrdered;
 	}
 }

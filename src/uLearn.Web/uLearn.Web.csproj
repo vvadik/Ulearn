@@ -670,7 +670,7 @@
     <Content Include="Views\Shared\_Sidebar.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
     <Content Include="Views\Course\_AskBar.cshtml" />
-    <Content Include="Views\Analytics\TableAnalytics.cshtml" />
+    <Content Include="Views\Analytics\TotalStatistics.cshtml" />
     <Content Include="Views\Course\_RatesBar.cshtml" />
     <Content Include="tablesorter-master\changelog" />
     <Content Include="tablesorter-master\docs\.tmp_index.html.55071~" />
