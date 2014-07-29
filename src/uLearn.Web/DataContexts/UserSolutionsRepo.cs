@@ -52,16 +52,18 @@ namespace uLearn.Web.DataContexts
 			db.SaveChanges();
 		}
 
-		public async Task<string> Like(int solutionId, string userId)
+		///<returns>(likesCount, isLikedByThisUsed)</returns>
+		public async Task<Tuple<int, bool>> Like(int solutionId, string userId)
 		{
 			var solutionForLike = db.UserSolutions.Find(solutionId);
-			if (solutionForLike.Likes.Any(like => like.UserId == userId))
-			{
-				return "already been";
-			}
-			solutionForLike.Likes.Add(new Like {SolutionId = solutionId, Timestamp = DateTime.Now, UserId = userId});
+			var hisLike = solutionForLike.Likes.FirstOrDefault(like => like.UserId == userId);
+			var votedAlready = hisLike != null;
+			if (votedAlready)
+				solutionForLike.Likes.Remove(hisLike);
+			else
+				solutionForLike.Likes.Add(new Like {SolutionId = solutionId, Timestamp = DateTime.Now, UserId = userId});
 			await db.SaveChangesAsync();
-			return "success";
+			return Tuple.Create(solutionForLike.Likes.Count(), !votedAlready);
 		}
 
 		public List<AcceptedSolutionInfo> GetAllAcceptedSolutions(string courseId, string slideId)

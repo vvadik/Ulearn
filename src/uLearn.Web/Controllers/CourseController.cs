@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -21,7 +22,8 @@ namespace uLearn.Web.Controllers
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
 
-		public CourseController() : this(CourseManager.AllCourses)
+		public CourseController()
+			: this(CourseManager.AllCourses)
 		{
 		}
 
@@ -29,7 +31,7 @@ namespace uLearn.Web.Controllers
 		{
 			this.courseManager = courseManager;
 		}
-		
+
 		[Authorize]
 		public ActionResult Slide(string courseId, int slideIndex = 0)
 		{
@@ -57,11 +59,18 @@ namespace uLearn.Web.Controllers
 		[Authorize]
 		public ActionResult AcceptedSolutions(string courseId, int slideIndex = 0)
 		{
+			var userId = User.Identity.GetUserId();
 			var coursePageModel = CreateCoursePageModel(courseId, slideIndex);
+			var solutions = coursePageModel.IsPassedTask
+				? solutionsRepo.GetAllAcceptedSolutions(courseId, coursePageModel.Course.Slides[slideIndex].Id)
+				: new List<AcceptedSolutionInfo>();
+			foreach (var solution in solutions)
+				solution.LikedAlready = solution.UsersWhoLike.Any(u => u == userId);
+
 			var model = new AcceptedSolutionsPageModel
 			{
 				CoursePageModel = coursePageModel,
-				AcceptedSolutions = coursePageModel.IsPassedTask ? solutionsRepo.GetAllAcceptedSolutions(courseId, coursePageModel.Course.Slides[slideIndex].Id) : new List<AcceptedSolutionInfo>()
+				AcceptedSolutions = solutions
 			};
 			return View(model);
 		}
@@ -83,13 +92,13 @@ namespace uLearn.Web.Controllers
 		{
 			var question = GetUserCode(Request.InputStream);
 			var userName = User.Identity.GetUserName();
-			await userQuestionsRepo.AddUserQuestion(question, title, userName,unitName, DateTime.Now);
+			await userQuestionsRepo.AddUserQuestion(question, title, userName, unitName, DateTime.Now);
 			return "Success!";
 		}
 
 		[HttpPost]
 		[Authorize]
-		public async Task<string> ApplyMark(string courseId, string slideId, string rate )
+		public async Task<string> ApplyMark(string courseId, string slideId, string rate)
 		{
 			var userId = User.Identity.GetUserId();
 			var slideRate = (SlideRates)Enum.Parse(typeof(SlideRates), rate);
@@ -133,11 +142,10 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<string> LikeSolution()
+		public async Task<JsonResult> LikeSolution(int solutionId)
 		{
-			var id = GetUserCode(Request.InputStream);
-			var like = await solutionsRepo.Like(int.Parse(id), User.Identity.GetUserId());
-			return like;
+			var res = await solutionsRepo.Like(solutionId, User.Identity.GetUserId());
+			return Json(new { likesCount = res.Item1, liked = res.Item2 });
 		}
 
 		private string NormalizeString(string s)
@@ -163,7 +171,7 @@ namespace uLearn.Web.Controllers
 			bool isRightAnswer)
 		{
 			await solutionsRepo.AddUserSolution(
-				courseId, slideId, 
+				courseId, slideId,
 				code, isRightAnswer, compilationError, output,
 				User.Identity.GetUserId());
 		}
