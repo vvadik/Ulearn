@@ -15,19 +15,19 @@
     sortInitialOrder: "asc",
     // These are detected by default,
     // but you can change or disable them
-    headers: {
-        // set "sorter : false" (no quotes) to disable the column
-        0: { sorter: "text" },
-        1: { sorter: "digit" },
-        2: { sorter: "text" },
-        3: { sorter: "url" }
-    },
+//    headers: {
+//         set "sorter : false" (no quotes) to disable the column
+//        0: { sorter: "text" },
+//        1: { sorter: "digit" },
+//        2: { sorter: "text" },
+//        3: { sorter: "url" }
+//    },
     // extract text from the table - this is how is
     // it done by default
-    textExtraction: {
-        0: function (node) { return $(node).text(); },
-        1: function (node) { return $(node).text(); }
-    },
+//    textExtraction: {
+//        0: function (node) { return $(node).text(); },
+//        1: function (node) { return $(node).text(); }
+//    },
     // forces the user to have this/these column(s) sorted first
     sortForce: null,
     // initial sort order of the columns
