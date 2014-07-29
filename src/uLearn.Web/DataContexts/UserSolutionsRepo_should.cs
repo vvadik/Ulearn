@@ -11,7 +11,7 @@ namespace uLearn.Web.DataContexts
 		public void save_anonymous_users_solution()
 		{
 			var repo = new UserSolutionsRepo();
-			var userSolution = repo.AddUserSolution("Linq", 0, "code", true, "", "output", null).Result;
+			var userSolution = repo.AddUserSolution("Linq", "0", "code", true, "", "output", null).Result;
 			Console.WriteLine(userSolution.Id);
 			repo.Delete(userSolution);
 		}

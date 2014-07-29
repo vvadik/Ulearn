@@ -21,7 +21,7 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public async Task AddHint(string userId, int hintId, string courseId, int slideId)
+		public async Task AddHint(string userId, int hintId, string courseId, string slideId)
 		{
 			db.Hints.Add(new SlideHint
 			{
@@ -33,7 +33,7 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public string GetHint(string userId, string courseId, int slideId)
+		public string GetHint(string userId, string courseId, string slideId)
 		{
 			var answer = db.Hints.Where(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId).ToList();
 			if (answer.Count == 0)

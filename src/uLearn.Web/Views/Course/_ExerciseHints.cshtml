@@ -1,13 +1,13 @@
 ﻿@model uLearn.CoursePageModel
 <div class="panel-group" id="hints-accordion">
     @{ var slide = Model.Slide as uLearn.ExerciseSlide;}
-    <div id="hintsStore" data-url="@Url.Action("GetHint", new { courseId = Model.Course.Id, slideId = Model.SlideIndex })"></div>
+    <div id="hintsStore" data-url="@Url.Action("GetHint", new { courseId = Model.Course.Id, slideId = Model.Slide.Id })"></div>
     @for (int index = 0; index < slide.HintsHtml.Length; index++)
     {
         var hintHtml = slide.HintsHtml[index];
         var id = "hint" + (index + 1);
         <div class="panel panel-default">
-            <div id="@("hintPanel"+index)"  class="panel-heading" data-url="@Url.Action("AddHint", new { courseId = Model.Course.Id, slideId = Model.SlideIndex, hintId = index })">
+            <div id="@("hintPanel"+index)"  class="panel-heading" data-url="@Url.Action("AddHint", new { courseId = Model.Course.Id, slideId = Model.Slide.Id, hintId = index })">
                 <h4 class="panel-title">
                     <a onclick="addHints(@index)"
                        data-toggle="collapse" data-parent="#hints-accordion" href="#@id" data-target="#@id">

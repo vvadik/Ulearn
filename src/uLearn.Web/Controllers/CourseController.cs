@@ -40,7 +40,7 @@ namespace uLearn.Web.Controllers
 		private CoursePageModel CreateCoursePageModel(string courseId, int slideIndex)
 		{
 			Course course = courseManager.GetCourse(courseId);
-			var isPassedTask = solutionsRepo.IsUserPassedTask(courseId, slideIndex, User.Identity.GetUserId());
+			var isPassedTask = solutionsRepo.IsUserPassedTask(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId());
 			var model = new CoursePageModel
 			{
 				Course = course,
@@ -49,7 +49,7 @@ namespace uLearn.Web.Controllers
 				NextSlideIndex = slideIndex + 1,
 				PrevSlideIndex = slideIndex - 1,
 				IsPassedTask = isPassedTask,
-				LatestAcceptedSolution = isPassedTask ? solutionsRepo.GetLatestAcceptedSolution(courseId, slideIndex, User.Identity.GetUserId()) : null
+				LatestAcceptedSolution = isPassedTask ? solutionsRepo.GetLatestAcceptedSolution(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId()) : null
 			};
 			return model;
 		}
@@ -61,7 +61,7 @@ namespace uLearn.Web.Controllers
 			var model = new AcceptedSolutionsPageModel
 			{
 				CoursePageModel = coursePageModel,
-				AcceptedSolutions = coursePageModel.IsPassedTask ? solutionsRepo.GetAllAcceptedSolutions(courseId, slideIndex) : new List<AcceptedSolutionInfo>()
+				AcceptedSolutions = coursePageModel.IsPassedTask ? solutionsRepo.GetAllAcceptedSolutions(courseId, coursePageModel.Course.Slides[slideIndex].Id) : new List<AcceptedSolutionInfo>()
 			};
 			return View(model);
 		}
@@ -73,7 +73,7 @@ namespace uLearn.Web.Controllers
 			var code = GetUserCode(Request.InputStream);
 			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
 			var result = await CheckSolution(exerciseSlide, code, slideIndex);
-			await SaveUserSolution(courseId, slideIndex, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer);
+			await SaveUserSolution(courseId, exerciseSlide.Id, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer);
 			return Json(result);
 		}
 
@@ -89,7 +89,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<string> ApplyMark(string courseId, int slideId, string rate )
+		public async Task<string> ApplyMark(string courseId, string slideId, string rate )
 		{
 			var userId = User.Identity.GetUserId();
 			var slideRate = (SlideRates)Enum.Parse(typeof(SlideRates), rate);
@@ -99,7 +99,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public string GetMark(string courseId, int slideId)
+		public string GetMark(string courseId, string slideId)
 		{
 			var userId = User.Identity.GetUserId();
 			return slideRateRepo.FindRate(courseId, slideId, userId);
@@ -107,7 +107,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<string> AddHint(string courseId, int slideId, int hintId)
+		public async Task<string> AddHint(string courseId, string slideId, int hintId)
 		{
 			var userId = User.Identity.GetUserId();
 			await slideHintRepo.AddHint(userId, hintId, courseId, slideId);
@@ -116,7 +116,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public string GetHint(string courseId, int slideId)
+		public string GetHint(string courseId, string slideId)
 		{
 			var userId = User.Identity.GetUserId();
 			var answer = slideHintRepo.GetHint(userId, courseId, slideId);
@@ -159,11 +159,11 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private async Task SaveUserSolution(string courseId, int slideIndex, string code, string compilationError, string output,
+		private async Task SaveUserSolution(string courseId, string slideId, string code, string compilationError, string output,
 			bool isRightAnswer)
 		{
 			await solutionsRepo.AddUserSolution(
-				courseId, slideIndex, 
+				courseId, slideId, 
 				code, isRightAnswer, compilationError, output,
 				User.Identity.GetUserId());
 		}
@@ -176,10 +176,9 @@ namespace uLearn.Web.Controllers
 			return Encoding.UTF8.GetString(codeBytes.ToArray());
 		}
 
-		public async Task VisitSlide(string courseId, int slideIndex)
+		public async Task VisitSlide(string courseId, string slideId)
 		{
-			var course = courseManager.GetCourse(courseId);
-			await visitersRepo.AddVisiter(courseId, slideIndex, User.Identity.GetUserId());
+			await visitersRepo.AddVisiter(courseId, slideId, User.Identity.GetUserId());
 		}
 	}
 }

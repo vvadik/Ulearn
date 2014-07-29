@@ -24,7 +24,7 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public async Task<UserSolution> AddUserSolution(string courseId, int slideIndex, string code, bool isRightAnswer,
+		public async Task<UserSolution> AddUserSolution(string courseId, string slideId, string code, bool isRightAnswer,
 			string compilationError,
 			string output, string userId)
 		{
@@ -33,7 +33,7 @@ namespace uLearn.Web.DataContexts
 				Code = code,
 				CompilationError = compilationError,
 				CourseId = courseId,
-				SlideId = slideIndex.ToString(),
+				SlideId = slideId,
 				IsCompilationError = !string.IsNullOrWhiteSpace(compilationError),
 				IsRightAnswer = isRightAnswer,
 				Output = output,
@@ -64,12 +64,11 @@ namespace uLearn.Web.DataContexts
 			return "success";
 		}
 
-		public List<AcceptedSolutionInfo> GetAllAcceptedSolutions(string courseId, int slideIndex)
+		public List<AcceptedSolutionInfo> GetAllAcceptedSolutions(string courseId, string slideId)
 		{
 			var timeNow = DateTime.Now;
-			var stringSlideIndex = slideIndex.ToString();
 			var prepared = db.UserSolutions
-				.Where(x => x.IsRightAnswer && x.SlideId == stringSlideIndex && x.CourseId == courseId)
+				.Where(x => x.IsRightAnswer && x.SlideId == slideId && x.CourseId == courseId)
 				.ToList();
 			var answer = prepared
 				.GroupBy(x => x.CodeHash)
@@ -82,16 +81,14 @@ namespace uLearn.Web.DataContexts
 			return answer;
 		}
 
-		public bool IsUserPassedTask(string courseId, int slideIndex, string userId)
+		public bool IsUserPassedTask(string courseId, string slideId, string userId)
 		{
-			var slideId = slideIndex.ToString();
 			return db.UserSolutions.Any(x => x.SlideId == slideId && x.CourseId == courseId && x.UserId == userId && x.IsRightAnswer);
 		}
 
-		public string GetLatestAcceptedSolution(string courseId, int slideIndex, string userId)
+		public string GetLatestAcceptedSolution(string courseId, string slideId, string userId)
 		{
 			var timeNow = DateTime.Now;
-			var slideId = slideIndex.ToString();
 			var allUserSolutionOnThisTask = db.UserSolutions
 				.Where(x => x.SlideId == slideId && x.CourseId == courseId && x.UserId == userId && x.IsRightAnswer).ToList();
 			var answer = allUserSolutionOnThisTask
@@ -101,10 +98,9 @@ namespace uLearn.Web.DataContexts
 			return answer;
 		}
 
-		public int GetAcceptedSolutionsCount(int slideId, string courseId)
+		public int GetAcceptedSolutionsCount(string slideId, string courseId)
 		{
-			var strSlideId = slideId.ToString(CultureInfo.InvariantCulture);
-			return db.UserSolutions.Count(x => x.SlideId == strSlideId && x.CourseId == courseId && x.IsRightAnswer);
+			return db.UserSolutions.Count(x => x.SlideId == slideId && x.CourseId == courseId && x.IsRightAnswer);
 		}
 	}
 }

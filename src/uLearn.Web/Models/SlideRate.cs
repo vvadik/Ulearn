@@ -29,6 +29,7 @@ namespace uLearn.Web.Models
 		public string CourseId { get; set; }
 
 		[Required]
-		public int SlideId { get; set; }
+		[StringLength(64)]
+		public string SlideId { get; set; }
 	}
 }

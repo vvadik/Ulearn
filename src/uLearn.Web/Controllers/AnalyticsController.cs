@@ -46,16 +46,14 @@ namespace uLearn.Web.Controllers
 		private Dictionary<string, AnalyticsTableInfo> CreateTableInfo(Course course)
 		{
 			var tableInfo = new Dictionary<string, AnalyticsTableInfo>();
-			var slideId = -1;
 			foreach (var slide in course.Slides)
 			{
-				slideId++;
 				var isExercise = (slide is ExerciseSlide);
 				tableInfo.Add(slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
 				{
-					Marks = slideRateRepo.GetRates(slideId, course.Id),
-					SolversCount = userSolutionsRepo.GetAcceptedSolutionsCount(slideId, course.Id),
-					VisitersCount = visitersRepo.GetVisitersCount(slideId, course.Id),
+					Marks = slideRateRepo.GetRates(slide.Id, course.Id),
+					SolversCount = userSolutionsRepo.GetAcceptedSolutionsCount(slide.Id, course.Id),
+					VisitersCount = visitersRepo.GetVisitersCount(slide.Id, course.Id),
 					IsExercise = isExercise
 				});
 			}
@@ -79,7 +77,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[Authorize]
-		public ActionResult UsersStatistics(string courseId, string slideIndex)
+		public ActionResult UsersStatistics(string courseId, string slideIndex) //while not using
 		{
 			int slideIndexInt;
 			int.TryParse(slideIndex, out slideIndexInt);
@@ -88,7 +86,7 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 
-		private UsersStatsPageModel CreateUsersStatsModel(Course course, CoursePageModel coursePageModel, int slideIndex)
+		private UsersStatsPageModel CreateUsersStatsModel(Course course, CoursePageModel coursePageModel, int slideIndex) //while not using
 		{
 			return new UsersStatsPageModel
 			{
@@ -119,16 +117,14 @@ namespace uLearn.Web.Controllers
 		private Dictionary<string, PersonalStatisticsInSlide> CreatePersonalStatistic(Course course)
 		{
 			var ans = new Dictionary<string, PersonalStatisticsInSlide>();
-			var slideIndex = -1;
 			foreach (var slide in course.Slides)
 			{
-				slideIndex++;
 				ans[slide.Info.UnitName + ": " + slide.Title] = new PersonalStatisticsInSlide
 				{
 					IsNotExercise = !(slide is ExerciseSlide),
-					IsSolved = userSolutionsRepo.IsUserPassedTask(course.Id, slideIndex, User.Identity.GetUserId()),
-					IsVisited = visitersRepo.IsUserVisit(course.Id, slideIndex, User.Identity.GetUserId()),
-					UserMark = slideRateRepo.GetUserRate(course.Id, slideIndex, User.Identity.GetUserId())
+					IsSolved = userSolutionsRepo.IsUserPassedTask(course.Id, slide.Id, User.Identity.GetUserId()),
+					IsVisited = visitersRepo.IsUserVisit(course.Id, slide.Id, User.Identity.GetUserId()),
+					UserMark = slideRateRepo.GetUserRate(course.Id, slide.Id, User.Identity.GetUserId())
 				};
 			}
 			return ans;

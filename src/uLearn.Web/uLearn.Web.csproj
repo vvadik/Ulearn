@@ -207,6 +207,10 @@
     <Compile Include="Migrations\201407261530409_NewAnalytics.Designer.cs">
       <DependentUpon>201407261530409_NewAnalytics.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201407290538592_ChangeSlideId.cs" />
+    <Compile Include="Migrations\201407290538592_ChangeSlideId.Designer.cs">
+      <DependentUpon>201407290538592_ChangeSlideId.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\CourseManager_should.cs" />
     <EmbeddedResource Include="Courses\**\*.*">
       <Visible>false</Visible>
@@ -267,6 +271,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201407261530409_NewAnalytics.resx">
       <DependentUpon>201407261530409_NewAnalytics.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201407290538592_ChangeSlideId.resx">
+      <DependentUpon>201407290538592_ChangeSlideId.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
