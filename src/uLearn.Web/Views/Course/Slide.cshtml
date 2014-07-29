@@ -31,8 +31,9 @@
 					<textarea id="secretCodeExercise" class='hide'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
 					if (Model.IsPassedTask)
 					{
-						<span id="suc" class="label label-success">Success</span>
-						<button class="label label-default" onclick="cleanUserCode()">ClearCode</button>
+					    <span id="suc" class="label label-success">Success</span>
+					    <a class="label label-success" href="@Url.Action("AcceptedSolutions", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex })">show another solution</a>
+						<a class="label label-default clear-code" onclick="cleanUserCode()">ClearCode</a>
 						<textarea class='code code-exercise'>@Model.LatestAcceptedSolution</textarea>
 					}
 					else
