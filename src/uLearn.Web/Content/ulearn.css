@@ -237,3 +237,8 @@ a.nav-arrow:hover {
         cursor: pointer;
         background-color: #838383;
 }
+
+
+.likes-counter {
+    margin-left: 0px;
+}

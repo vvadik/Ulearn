@@ -10,11 +10,15 @@
 			<div id="LikeSolutionUrl" data-url="@Url.Action("LikeSolution")"></div>
 			@foreach (AcceptedSolutionInfo solution in Model.AcceptedSolutions)
 			{
-				<textarea class='code code-sample'>@solution.Code</textarea>
-				var counterId = "counter" + solution.Id;
-				<button id="@counterId" class="like-button glyphicon glyphicon-thumbs-up" onclick="likeSolution(@solution.Id)">
-					@solution.UsersWhoLike.Count
-				</button>
+				var id = "solution_" + solution.Id;
+				<div id="@id">
+					<textarea class='code code-sample'>@solution.Code</textarea>
+
+					<button class="btn @(solution.LikedAlready ? "btn-primary" : "btn-default") like-button" onclick="likeSolution(@solution.Id)">
+						<i class="glyphicon glyphicon-thumbs-up"></i>
+						<span class="likes-counter">@solution.UsersWhoLike.Count</span>
+					</button>
+				</div>
 			}
 			@Html.Partial("_SlideNavigation", Model.CoursePageModel)
 		</div>

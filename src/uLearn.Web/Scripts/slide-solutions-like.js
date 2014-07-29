@@ -2,17 +2,12 @@
 	$.ajax({
 		type: "POST",
 		url: $("#LikeSolutionUrl").data("url"),
-		data: String(solutionId)
+		data: { solutionId: solutionId }
 	}).success(function (ans) {
-		var likerCounterId = "#counter" + solutionId;
-		var likeCounter = $(likerCounterId);
-		if (ans == "success") {
-		    var lastVal = likeCounter.text();
-		    var newVal = parseInt(lastVal) + 1;
-		    var strNewVal = "   " + String(newVal);
-			likeCounter.text(strNewVal);
-		} else {
-			likeCounter.text("already like from you");
-		}
+		var $block = $("#solution_" + solutionId);
+		$block.find(".likes-counter").text(ans.likesCount);
+		$block.find(".like-button")
+			.toggleClass("btn-default", !ans.liked)
+			.toggleClass("btn-primary", ans.liked);
 	});
 }
