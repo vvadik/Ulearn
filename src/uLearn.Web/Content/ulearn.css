@@ -1,104 +1,104 @@
 .course-header {
-    background-color: #6f5499;
-    color: white;
-    padding: 30px 15px;
-    margin-bottom: 30px;
+	background-color: #6f5499;
+	color: white;
+	padding: 30px 15px;
+	margin-bottom: 30px;
 }
 
 .slide-nav {
-    margin-top: 30px;
+	margin-top: 30px;
 }
 
 .slide-nav-link {
-    margin-right: 30px;
+	margin-right: 30px;
 }
 
 .container {
-    max-width: 800px;
+	max-width: 800px;
 }
 
 .CodeMirror {
-    border: 1px solid #eee;
-    height: auto;
-    margin-bottom: 20px;
-    margin-top: 20px;
-    line-height: 1.3em;
-    font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+	border: 1px solid #eee;
+	height: auto;
+	margin-bottom: 20px;
+	margin-top: 20px;
+	line-height: 1.3em;
+	font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
 }
 
 .CodeMirror-scroll {
-    overflow-y: hidden;
-    overflow-x: auto;
-    height: auto;
+	overflow-y: hidden;
+	overflow-x: auto;
+	height: auto;
 }
 
 .nav-arrow {
-    margin: 0;
-    width: 50%;
-    text-align: center;
-    justify-content: center;
-    align-content: center;
-    font-size: xx-large;
-    color: lightblue;
-    padding: 10px;
+	margin: 0;
+	width: 50%;
+	text-align: center;
+	justify-content: center;
+	align-content: center;
+	font-size: xx-large;
+	color: lightblue;
+	padding: 10px;
 }
 
 a.nav-arrow:hover {
-    text-decoration: none;
-    color: white;
-    background-color: lightblue;
+	text-decoration: none;
+	color: white;
+	background-color: lightblue;
 }
 
 .nav-left {
-    float: left;
+	float: left;
 }
 
 .nav-right {
-    float: right;
+	float: right;
 }
 
 .output-label {
-    text-align: center;
-    margin-top: 20px;
+	text-align: center;
+	margin-top: 20px;
 }
 
 .actual-output {
-    float: left;
-    width: 50%;
-    margin: 0;
+	float: left;
+	width: 50%;
+	margin: 0;
 }
 
 .expected-output {
-    float: left;
-    width: 50%;
-    margin: 0;
+	float: left;
+	width: 50%;
+	margin: 0;
 }
 
 .actual-output pre {
-    min-height: 200px;
+	min-height: 200px;
 }
 
 .expected-output pre {
-    min-height: 200px;
+	min-height: 200px;
 }
 
 .clear-code-button {
-    margin: 20px 0 20px 0;
+	margin: 20px 0 20px 0;
 }
 
 .run-solution-button {
-    margin: 20px 0 20px 0;
-    width: 100%;
+	margin: 20px 0 20px 0;
+	width: 100%;
 }
 
 .sphere-engine-tm {
-    margin: -20px 0 0 0;
-    text-align: right;
-    font-size: small;
+	margin: -20px 0 0 0;
+	text-align: right;
+	font-size: small;
 }
 
 .after-run-block {
-    display: none;
+	display: none;
 }
 
 .actual-output-content {
@@ -114,131 +114,130 @@ a.nav-arrow:hover {
 }
 
 .diff-table {
-    width: 100%;
-    margin-top: 25px;
-    word-wrap: break-word;
+	width: 100%;
+	margin-top: 25px;
+	word-wrap: break-word;
 }
 
 .run-verdict {
-    height: 46px;
-    line-height: 46px;
-    width: 100%;
-    text-align: center;
-    display: none;
-    font-size: x-large;
-    color: white;
+	height: 46px;
+	line-height: 46px;
+	width: 100%;
+	text-align: center;
+	display: none;
+	font-size: x-large;
+	color: white;
 }
 
 .half-size {
-    width: 50%;
+	width: 50%;
 }
 
 .full-size {
-    width: 100%;
+	width: 100%;
 }
 
 .no-rounds {
-    border-radius: 0px;
-    -webkit-border-radius: 0px;
-    -moz-border-radius: 0px;
+	border-radius: 0px;
+	-webkit-border-radius: 0px;
+	-moz-border-radius: 0px;
 }
 
 .units-list {
-    list-style-type: none;
+	list-style-type: none;
 }
 
 .units-list-item {
-    padding: 0.5em 0.2em 0.5em 0.1em;
+	padding: 0.5em 0.2em 0.5em 0.1em;
 }
 
 .units-list-item-text {
-    font-size: 1.3em;
+	font-size: 1.3em;
 }
 
 .slides-list {
-    font-weight: normal;
-    padding-left: 0;
-    margin-top: 0.5em;
+	font-weight: normal;
+	padding-left: 0;
+	margin-top: 0.5em;
 }
 
 .slide-list-item {
-    list-style-type: none;
-    border-bottom: 1px solid #eee;
-    padding: 0.5em 0 0.5em 2em;
+	list-style-type: none;
+	border-bottom: 1px solid #eee;
+	padding: 0.5em 0 0.5em 2em;
 }
 
-    .slide-list-item.selected {
-        background-color: #f5f5f5;
-        font-weight: bolder;
-        list-style-type: none;
-    }
+	.slide-list-item.selected {
+		background-color: #f5f5f5;
+		font-weight: bolder;
+		list-style-type: none;
+	}
 
 .side-bar {
-    width: 320px;
-    float: left;
-    margin: 0;
-    padding: 20px;
+	width: 320px;
+	float: left;
+	margin: 0;
+	padding: 20px;
 }
 
 .slide-container {
-    margin-left: 320px;
+	margin-left: 320px;
 }
 
 .ask-bar {
-    max-width: none;
-    width: 100%;
-    margin-bottom: 15px;
-    resize: none;
+	max-width: none;
+	width: 100%;
+	margin-bottom: 15px;
+	resize: none;
 }
 
 .ask-button {
-    margin-top: 10px;
+	margin-top: 10px;
 }
 
 .solution-bar {
-    max-width: 500px;
-    width: 500px;
+	max-width: 500px;
+	width: 500px;
 }
 
 .answer-table {
-    border-width: 1px;
-    width: 100%;
-    background-color: aliceblue;
-    border-color: black;
-    margin-top: 10px;
-    table-layout: fixed;
-    word-break: break-word;
+	border-width: 1px;
+	width: 100%;
+	background-color: aliceblue;
+	border-color: black;
+	margin-top: 10px;
+	table-layout: fixed;
+	word-break: break-word;
 }
 
 .answer-table-headers {
-    background-color: lightgray;
-    font-weight: bolder;
+	background-color: lightgray;
+	font-weight: bolder;
 }
 
 .visited-hint {
-    background-color: lightgreen;
-    padding: 10px 15px;
-    border-bottom: 1px solid transparent;
-    border-top-right-radius: 3px;
-    border-top-left-radius: 3px;
+	background-color: lightgreen;
+	padding: 10px 15px;
+	border-bottom: 1px solid transparent;
+	border-top-right-radius: 3px;
+	border-top-left-radius: 3px;
 }
 
 .green-cell {
-    background-color: lightgreen;
+	background-color: lightgreen;
 }
 
 .clear-code {
-    text-decoration: none;
+	text-decoration: none;
 }
 
-.clear-code:hover {
-        text-decoration: none;
-        color: white;
-        cursor: pointer;
-        background-color: #838383;
-}
-
+	.clear-code:hover {
+		text-decoration: none;
+		color: white;
+		cursor: pointer;
+		background-color: #838383;
+	}
 
 .likes-counter {
-    margin-left: 0px;
+	margin-left: 0px;
 }

@@ -1,53 +1,62 @@
 ﻿table.tablesorter {
-	font-family:arial;
-	margin:10px 0pt 15px;
+	font-family: arial;
+	margin: 10px 0pt 15px;
 	font-size: 8pt;
 	width: 100%;
 	text-align: left;
-    border: 1px solid #3D3D3D;
-    margin-top: 30px;
-}
-table.tablesorter thead tr th, table.tablesorter tfoot tr th {
-	background-color: #e6EEEE;
 	border: 1px solid #3D3D3D;
-	font-size: 8pt;
-	padding: 4px;
-}
-table.tablesorter thead tr .header {
-	background-repeat: no-repeat;
-	background-position: center right;
-    word-spacing: 2px;
-	cursor: pointer;
-}
-table.tablesorter tbody td {
-	color: #3D3D3D;
-    border: 1px solid #3D3D3D;
-	padding: 4px;
-	vertical-align: top;
-}
-table.tablesorter tbody tr.odd td {
-	background-color:#F0F0F6;
+	margin-top: 30px;
 }
 
-table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
-background-color: #8dbdd8;
-}
+	table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+		background-color: #e6EEEE;
+		border: 1px solid #3D3D3D;
+		font-size: 8pt;
+		padding: 4px;
+	}
 
-.headerSortUp:after {
-    content:" ↑";
-}
-.headerSortDown:after {
-    content:" ↓";
-}
+	table.tablesorter thead tr .header {
+		background-repeat: no-repeat;
+		background-position: center right;
+		word-spacing: 2px;
+		cursor: pointer;
+	}
+
+	table.tablesorter tbody td {
+		color: #3D3D3D;
+		border: 1px solid #3D3D3D;
+		padding: 4px;
+		vertical-align: top;
+	}
+
+	table.tablesorter tbody tr.odd td {
+		background-color: #F0F0F6;
+	}
+
+	table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+		background-color: #8dbdd8;
+	}
+
+	table.tablesorter .headerSortUp:after {
+		content: " ↑";
+	}
+
+	table.tablesorter .headerSortDown:after {
+		content: " ↓";
+	}
+
 .analytics.not-visited {
-    background-color: lightcoral
+	background-color: lightcoral;
 }
+
 .analytics.visited {
-    background-color: lightgreen
+	background-color: lightgreen;
 }
-.analytics.not-solved{
-    background-color: lightcoral
+
+.analytics.not-solved {
+	background-color: lightcoral;
 }
+
 .analytics.solved {
-    background-color: lightgreen
+	background-color: lightgreen;
 }
