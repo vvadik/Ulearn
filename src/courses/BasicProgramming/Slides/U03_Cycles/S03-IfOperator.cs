@@ -2,6 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("Operator_if")]
 	[Title("Оператор условия")]
 	class S03_IfOperator
 	{

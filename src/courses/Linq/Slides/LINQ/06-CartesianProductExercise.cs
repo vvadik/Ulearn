@@ -6,6 +6,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Id("Cartesian_product")]
 	[Title("Задача. Декартово произведение")]
 	[TestFixture]
 	public class CartesianProduct

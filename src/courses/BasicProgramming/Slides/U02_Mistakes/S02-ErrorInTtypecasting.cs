@@ -2,6 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("Error_typeCasting")]
 	[Title("Ошибки в приведении типов")]
 	class S02_ErrorInTtypecasting
 	{

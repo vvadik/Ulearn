@@ -2,6 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("For")]
 	[Title("For")]
 	class S09_For
 	{

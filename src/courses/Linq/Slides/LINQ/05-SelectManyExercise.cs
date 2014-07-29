@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Id("Select_Many_Ex")]
 	[Title("Задача. Объединение коллекций")]
 	[TestFixture]
 	public class SelectManyExercise

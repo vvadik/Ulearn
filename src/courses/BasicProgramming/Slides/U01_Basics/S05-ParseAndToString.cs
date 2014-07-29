@@ -4,6 +4,7 @@ using System.Globalization;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("Parse_and_toString")]
 	[Title("Преобразование строки в число")]
 	public class S05_ParseAndToString
 	{

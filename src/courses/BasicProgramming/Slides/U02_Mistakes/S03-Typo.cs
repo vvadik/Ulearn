@@ -2,6 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("Typos")]
 	[Title("Очепятки")]
 	class S03_Typo
 	{

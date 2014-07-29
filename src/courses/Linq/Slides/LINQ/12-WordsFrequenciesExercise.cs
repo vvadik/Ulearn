@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Id("Frequency_Ex")]
 	[Title("Задача. Частотный словарь текста")]
 	[TestFixture]
 	public class GroupingExercise
