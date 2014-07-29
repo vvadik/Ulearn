@@ -17,6 +17,6 @@ namespace uLearn
 		public bool IsVisited { get; set; }
 		public bool IsSolved { get; set; }
 		public string UserMark { get; set; }
-		public bool IsNotExercise { get; set; }
+		public bool IsExercise { get; set; }
 	}
 }

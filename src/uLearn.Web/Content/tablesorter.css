@@ -1,6 +1,5 @@
 ﻿table.tablesorter {
 	font-family:arial;
-	background-color: #CDCDCD;
 	margin:10px 0pt 15px;
 	font-size: 8pt;
 	width: 100%;
@@ -24,7 +23,6 @@ table.tablesorter tbody td {
 	color: #3D3D3D;
     border: 1px solid #3D3D3D;
 	padding: 4px;
-	background-color: #FFF;
 	vertical-align: top;
 }
 table.tablesorter tbody tr.odd td {
@@ -33,4 +31,17 @@ table.tablesorter tbody tr.odd td {
 
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
 background-color: #8dbdd8;
+}
+
+.analytics.not-visited {
+    background-color: lightcoral
+}
+.analytics.visited {
+    background-color: lightgreen
+}
+.analytics.not-solved{
+    background-color: lightcoral
+}
+.analytics.solved {
+    background-color: lightgreen
 }

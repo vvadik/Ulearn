@@ -121,7 +121,7 @@ namespace uLearn.Web.Controllers
 			{
 				ans[slide.Info.UnitName + ": " + slide.Title] = new PersonalStatisticsInSlide
 				{
-					IsNotExercise = !(slide is ExerciseSlide),
+					IsExercise = slide is ExerciseSlide,
 					IsSolved = userSolutionsRepo.IsUserPassedTask(course.Id, slide.Id, User.Identity.GetUserId()),
 					IsVisited = visitersRepo.IsUserVisit(course.Id, slide.Id, User.Identity.GetUserId()),
 					UserMark = slideRateRepo.GetUserRate(course.Id, slide.Id, User.Identity.GetUserId())

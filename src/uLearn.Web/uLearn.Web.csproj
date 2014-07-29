@@ -667,7 +667,7 @@
     <Content Include="Views\Course\Slide.cshtml" />
     <Content Include="Views\Course\_ExerciseHints.cshtml" />
     <Content Include="Views\Course\_SlideNavigation.cshtml" />
-    <Content Include="Views\Course\_Sidebar.cshtml" />
+    <Content Include="Views\Shared\_Sidebar.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
     <Content Include="Views\Course\_AskBar.cshtml" />
     <Content Include="Views\Analytics\TableAnalytics.cshtml" />

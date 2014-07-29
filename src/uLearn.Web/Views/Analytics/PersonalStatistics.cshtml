@@ -1,79 +1,51 @@
-﻿@using uLearn
-@using System.Globalization
+﻿@using System.Diagnostics
 @model uLearn.PersonalStatisticPageModel
 @{
-	ViewBag.Title = "TableAnalytics";
+	ViewBag.Title = "Personal progress";
 }
-@Html.Partial("../Course/_Sidebar", Model.CoursePageModel)
+@Html.Partial("_Sidebar", Model.CoursePageModel)
 
 <body>
-	<script language="JavaScript" type="text/javascript" src="~/Scripts/jquery-2.1.1.min.js"></script>
-	<script language="JavaScript" type="text/javascript" src="~/tablesorter-master/jquery.tablesorter.js"></script>
 	<div class="slide-container">
 		<div class="container body-content">
 			<div class="row">
-				<div class='slide'>
-					<table id="myTable" class="tablesorter">
-						<thead>
-							<tr>
-								<th>Название слайда</th>
-								<th>Посещённые</th>
-								<th>Решённые</th>
-								<th>Ваша оценка</th>
-							</tr>
-						</thead>
-						<tbody>
-							@{
-								int counter = -1;
-								foreach (var info in Model.PersonalStatistics)
-								{
-									counter++;
-									if (info.Value == null)
-									{
-										<tr>
-											<td data-sort-value=@(counter + 1000)>@Html.ActionLink(info.Key, "Slide", "Course", new { courseId = Model.CoursePageModel.Course.Id, slideIndex = counter }, null)</td>
-											<td data-sort-value="0"></td>
-											<td data-sort-value="0"></td>
-											<td data-sort-value="0"></td>
-										</tr>
-										continue;
-									}
-									<tr>
-										<td data-sort-value=@(counter + 1000)>@Html.ActionLink(info.Key, "Slide", "Course", new { courseId = Model.CoursePageModel.Course.Id, slideIndex = counter }, null)</td>
-										@if (info.Value.IsVisited)
-										{
-											<td data-sort-value="2" style="background-color: lightgreen"></td>
-										}
-										else
-										{
-											<td data-sort-value="1" style="background-color: lightcoral"></td>
-										}
-
-										@if (!info.Value.IsNotExercise)
-										{
-											if (info.Value.IsSolved)
-											{
-												<td data-sort-value="2" style="background-color: lightgreen"></td>
-											}
-											else
-											{
-												<td data-sort-value="1" style="background-color: lightcoral"></td>
-											}
-										}
-										else
-										{
-											<td data-sort-value="0"></td>
-										}
-										<td>@(info.Value.UserMark ?? "")</td>
-									</tr>
-								}
+				<table id="myTable" class="tablesorter">
+					<thead>
+						<tr>
+							<th>Название слайда</th>
+							<th>Посещённые</th>
+							<th>Решённые</th>
+							<th>Ваша оценка</th>
+						</tr>
+					</thead>
+					<tbody>
+						@{
+							int counter = -1;
+							foreach (var info in Model.PersonalStatistics)
+							{
+								var stats = info.Value;
+								Debug.Assert(stats != null);
+								counter++;
+								<tr>
+									<td data-sort-value=@(counter + 1000)>@Html.ActionLink(info.Key, "Slide", "Course", new { courseId = Model.CoursePageModel.Course.Id, slideIndex = counter }, null)</td>
+									<td data-sort-value="@(info.Value.IsVisited ? 1 : 0)" class="analytics @(info.Value.IsVisited ? "visited" : "not-visited")"></td>
+									<td 
+										data-sort-value="@(stats.IsSolved ? 1 : stats.IsExercise ? 0 : 2)" 
+										class="analytics @(stats.IsSolved? "solved" : stats.IsExercise ? "not-solved" : "")"></td>
+									<td>@(info.Value.UserMark ?? "")</td>
+								</tr>
 							}
-						</tbody>
-					</table>
-
-				</div>
+						}
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</div>
-	<script src="~/Scripts/table-configurator.js"> </script>
 </body>
+
+@section scripts{
+	<script src="~/tablesorter-master/jquery.tablesorter.js"></script>
+	<script src="~/Scripts/table-configurator.js"> </script>
+}
+
+
