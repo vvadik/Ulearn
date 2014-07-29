@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("Break")]
 	[Title("Break")]
 	class S07_Break
 	{

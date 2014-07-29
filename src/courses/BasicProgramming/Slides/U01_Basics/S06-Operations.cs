@@ -2,6 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("Ariphmetic_operations")]
 	[Title("Арифметические операции и var")]
 	public class S06_Operations
 	{

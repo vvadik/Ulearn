@@ -3,6 +3,7 @@ using System.Text;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("IntelliSense")]
 	[Title("Добрый работодатель")]
 	public class S10_IntelliSense
 	{

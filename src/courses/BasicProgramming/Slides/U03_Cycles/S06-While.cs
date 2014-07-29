@@ -2,6 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("While")]
 	[Title("While")]
 	class S06_While
 	{

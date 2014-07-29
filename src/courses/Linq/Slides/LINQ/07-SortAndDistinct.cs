@@ -3,6 +3,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Id("Sort_Distinct")]
 	[Title("OrderBy и Distinct")]
 	[TestFixture]
 	public class Sort

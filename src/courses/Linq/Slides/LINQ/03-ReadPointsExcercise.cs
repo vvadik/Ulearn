@@ -7,6 +7,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Id("Read_Point_Ex")]
 	[Title("Задача. Чтение списка точек")]
 	[TestFixture]
 	public class ReadPointsExcercise

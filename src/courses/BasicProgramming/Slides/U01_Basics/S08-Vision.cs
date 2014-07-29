@@ -1,6 +1,7 @@
 ﻿
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("Vision_areas")]
 	[Title("Области видимости")]
 	class S08_Vision
 	{

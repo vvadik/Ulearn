@@ -6,6 +6,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Id("Read_Number_Ex")]
 	[Title("Задача. Чтение списка чисел")]
 	[TestFixture]
 	public class ReadNumbersExcercise

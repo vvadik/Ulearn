@@ -2,6 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("The_first_step")]
 	[Title("Первый шаг")]
 	public class S011_FirstStep
 	{

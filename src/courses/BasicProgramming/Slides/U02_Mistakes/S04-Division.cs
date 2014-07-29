@@ -2,6 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("Zero_division")]
 	[Title("Деление на 0")]
 	class S04_Division
 	{

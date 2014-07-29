@@ -2,6 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("Data_types")]
 	[Title("Типы данных")]
 	public class S02_Types
 	{

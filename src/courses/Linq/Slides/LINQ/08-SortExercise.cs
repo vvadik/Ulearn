@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Id("Sort_Ex")]
 	[Title("Задача. Словарь текста")]
 	[TestFixture]
 	public class SortExercise

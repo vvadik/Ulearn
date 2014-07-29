@@ -1,5 +1,6 @@
 ﻿namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("Hello_World")]
 	[Title("Hello world")]
 	public class S01_HelloWorld
 	{

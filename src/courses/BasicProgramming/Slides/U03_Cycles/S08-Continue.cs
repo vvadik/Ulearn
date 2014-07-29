@@ -2,6 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("Continue")]
 	[Title("Continue")]
 	class S08_Continue
 	{

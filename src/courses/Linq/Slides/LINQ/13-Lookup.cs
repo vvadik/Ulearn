@@ -4,6 +4,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
+	[Id("Lookup")]
 	[Title("Группировка с помощью ToDictionary и ToLookup")]
 	[TestFixture]
 	public class Lookups

@@ -2,6 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
+	[Id("If_return")]
 	[Title("If return")]
 	internal class S04_IfReturn
 	{
