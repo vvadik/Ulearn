@@ -1,18 +1,18 @@
 ﻿@model uLearn.CoursePageModel
 <div class="panel-group" id="hints-accordion">
     @{ var slide = Model.Slide as uLearn.ExerciseSlide;}
-    <div id="hintsStore" data-url="@Url.Action("GetHint", new { courseId = Model.Course.Id, slideId = Model.Slide.Id })"></div>
+    <div id="hintsStore" data-url="@Url.Action("GetHint")"></div>
     @for (int index = 0; index < slide.HintsHtml.Length; index++)
     {
         var hintHtml = slide.HintsHtml[index];
         var id = "hint" + (index + 1);
         <div class="panel panel-default">
-            <div id="@("hintPanel"+index)"  class="panel-heading" data-url="@Url.Action("AddHint", new { courseId = Model.Course.Id, slideId = Model.Slide.Id, hintId = index })">
+            <div id="@("hintPanel"+index)"  class="panel-heading" data-url="@Url.Action("AddHint")">
                 <h4 class="panel-title">
-                    <a onclick="addHints(@index)"
-                       data-toggle="collapse" data-parent="#hints-accordion" href="#@id" data-target="#@id">
-                        Подсказка @(index + 1)
-                    </a>
+					<a onclick="addHints(@index,'@Model.Course.Id','@Model.Slide.Id')"
+					   data-toggle="collapse" data-parent="#hints-accordion" href="#@id" data-target="#@id">
+						Подсказка @(index + 1)
+					</a>
                 </h4>
             </div>
             <div id="@id" class="panel-collapse collapse">
@@ -25,5 +25,5 @@
 
 	<script src="~/Scripts/slide-hints.js"></script>
 	<script src="~/Scripts/jquery-1.10.2.min.js"></script>
-	<script>getHints()</script>
+	<script>getHints("@Model.Course.Id", "@Model.Slide.Id" )</script>
 </div>

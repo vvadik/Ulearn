@@ -38,6 +38,7 @@ namespace uLearn.Web
 
 			bundles.Add(new ScriptBundle("~/bootstrap-js").Include(
 				"~/Scripts/bootstrap.js",
+				"~/Scripts/buttons.js",
 				"~/Scripts/respond.js"));
 
 			bundles.Add(new StyleBundle("~/css").Include(

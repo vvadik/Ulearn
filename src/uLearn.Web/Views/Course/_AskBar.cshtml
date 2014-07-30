@@ -3,7 +3,7 @@
 	Задать вопрос по материалу
 </a>
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	<div id="Ask"class="modal-dialog" data-url="@Url.Action("AddQuestion", new { Model.Slide.Title, Model.Slide.Info.UnitName })">
+	<div id="Ask"class="modal-dialog" data-url="@Url.Action("AddQuestion")">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
@@ -11,7 +11,7 @@
 			</div>
 			<div class="modal-body">
 				<textarea id="questField" class="ask-bar"> </textarea>
-				<button class="btn btn-primary" id="sendButton" type="button" data-dismiss="modal" onclick="sendQuestion()">Отправить</button>
+				<button class="btn btn-primary" id="sendButton" type="button" data-dismiss="modal" onclick="sendQuestion('@Model.Slide.Title', '@Model.Slide.Info.UnitName')">Отправить</button>
 			</div>
 		</div>
 	</div>

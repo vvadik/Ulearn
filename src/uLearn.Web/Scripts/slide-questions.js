@@ -1,10 +1,11 @@
-function sendQuestion() {
+function sendQuestion(title, unitName) {
 	var quest = $("#questField").val();
 	$.ajax(
 		{
 			type: "POST",
 			url: $("#Ask").data("url"),
-			data: quest
+			data: {
+			    title: title, unitName:unitName, question:quest}
 		}).success(function (ans) {
 			$("#questField").val("");
 		})
@@ -15,12 +16,13 @@ function sendQuestion() {
 		});
 };
 
-function printAllQuestions() {
+function printAllQuestions(courseName) {
 	$.ajax(
 		{
 			type: "POST",
 			url: $("#WatchQuestions").data("url"),
-			data: " "
+			data: {
+			    courseName:courseName}
 		}).success(function (ans) {
 		    $questionLog.html(makeTableForQuestions(ans));
 	    })

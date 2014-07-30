@@ -10,13 +10,13 @@ namespace uLearn
 	{
 		public int VisitersCount { get; set; }
 		public int SolversCount { get; set; }
-		public Marks Marks { get; set; }
+		public Rates Rates { get; set; }
 		public bool IsExercise { get; set; }
 		public int TotalHintCount { get; set; }
 		public int HintUsedPercent { get; set; }
 	}
 
-	public class Marks
+	public class Rates
 	{
 		public int Good { get; private set; }
 		public int NotUnderstand { get; private set; }
@@ -28,7 +28,7 @@ namespace uLearn
 			get { return Good + NotUnderstand + NotWatched + Trivial; }
 		}
 
-		public Marks()
+		public Rates()
 		{
 			Good = 0;
 			NotUnderstand = 0;

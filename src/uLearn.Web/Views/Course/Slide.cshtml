@@ -75,8 +75,8 @@
 			</div>
 			@Html.Partial("_RatesBar")
 			@Html.Partial("_SlideNavigation", Model)
-			<div id="WatchQuestions" data-url="@Url.Action("GetAllQuestions", new { courseName = @Model.Slide.Info.UnitName})">
-				<button onclick="printAllQuestions()">Посмотреть все заданные вопросы по теме</button>
+			<div id="WatchQuestions" data-url="@Url.Action("GetAllQuestions")">
+				<button onclick="printAllQuestions('@Model.Slide.Info.UnitName')">Посмотреть все заданные вопросы по теме</button>
 			</div>
 			<div class="questions-log"></div>
 		</div>
@@ -102,8 +102,9 @@
 
 @section scripts{
 	@Scripts.Render("~/slide-js")
+	<script src="~/Scripts/slide-stats.js"></script>
+	<script>
+		FillRate('@Model.Rate');
+	</script>
 }
 
-<script language="JavaScript" type="text/javascript" src="~/Scripts/jquery-2.1.1.min.js"></script>
-<script language="JavaScript" type="text/javascript" src="~/Scripts/slide-onload-visit.js"></script>
-<script id="VisitSlideUrl" data-url='@Url.Action("VisitSlide", new { courseId = Model.Course.Id, slideId = Model.Slide.Id })'>smbVisit()</script>
