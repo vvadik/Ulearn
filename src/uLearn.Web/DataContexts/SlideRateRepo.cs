@@ -48,9 +48,9 @@ namespace uLearn.Web.DataContexts
 			return lastRate == null ? null : lastRate.Rate.ToString();
 		}
 
-		public Marks GetRates(string slideId, string courseId)
+		public Rates GetRates(string slideId, string courseId)
 		{
-			var rates = new Marks();
+			var rates = new Rates();
 			var allRates = db.SlideRates.Where(x => x.CourseId == courseId && x.SlideId == slideId).ToList();
 			foreach (var rate in allRates)
 			{

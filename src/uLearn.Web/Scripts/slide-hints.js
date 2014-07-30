@@ -1,9 +1,10 @@
-﻿function addHints(index) {
+﻿function addHints(index, courseId, slideId) {
     $.ajax(
 {
     type: "POST",
     url: $("#hintPanel"+index).data("url"),
-    data: ""
+    data: {
+        courseId: courseId, slideId: slideId, hintId:index }
 }).success(function (ans) {
     $('#hintPanel' + index).addClass("visited-hint").removeClass("panel-heading");
         })
@@ -14,12 +15,12 @@
     });
 }
 
-function getHints() {
+function getHints(courseId, slideId) {
     $.ajax(
 {
     type: "POST",
     url: $("#hintsStore").data("url"),
-    data: ""
+    data: {courseId:courseId, slideId:slideId}
 }).success(function (ans) {
     var hints = ans.split(' ');
             for (var hint in hints)

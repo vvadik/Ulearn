@@ -32,10 +32,10 @@
 								<td data-sort-value=@(counter + 1000)>@Html.ActionLink(info.Key, "Slide", "Course", new { courseId = Model.CoursePageModel.Course.Id, slideIndex = counter }, null)</td>
 								<td>@info.Value.VisitersCount</td>
 								<td>@(info.Value.IsExercise ? info.Value.SolversCount.ToString(CultureInfo.InvariantCulture) : "")</td>
-								<td>@info.Value.Marks.Count</td>
-								<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100 * (double)info.Value.Marks.Good / info.Value.Marks.Count))%</td>
-								<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100 * (double)info.Value.Marks.NotUnderstand / info.Value.Marks.Count))%</td>
-								<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100 * (double)info.Value.Marks.Trivial / info.Value.Marks.Count))%</td>
+								<td>@info.Value.Rates.Count</td>
+								<td>@(info.Value.Rates.Count == 0 ? 0 : (int)(100 * (double)info.Value.Rates.Good / info.Value.Rates.Count))%</td>
+								<td>@(info.Value.Rates.Count == 0 ? 0 : (int)(100 * (double)info.Value.Rates.NotUnderstand / info.Value.Rates.Count))%</td>
+								<td>@(info.Value.Rates.Count == 0 ? 0 : (int)(100 * (double)info.Value.Rates.Trivial / info.Value.Rates.Count))%</td>
 							</tr>
 						}
 					</tbody>

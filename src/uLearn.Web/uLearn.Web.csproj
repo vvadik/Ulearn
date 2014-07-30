@@ -578,7 +578,6 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Jsdifflib\jsdifflib.js" />
     <Content Include="Scripts\slide-editor.js" />
-    <Content Include="Scripts\slide-onload-visit.js" />
     <Content Include="Scripts\slide-questions.js" />
     <Content Include="Scripts\slide-run.js" />
     <Content Include="Scripts\slide-solutions-like.js" />

@@ -55,7 +55,7 @@ namespace uLearn.Web.Controllers
 				var isExercise = (slide is ExerciseSlide);
 				tableInfo.Add(slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
 				{
-					Marks = slideRateRepo.GetRates(slide.Id, course.Id),
+					Rates = slideRateRepo.GetRates(slide.Id, course.Id),
 					SolversCount = userSolutionsRepo.GetAcceptedSolutionsCount(slide.Id, course.Id),
 					VisitersCount = visitersRepo.GetVisitersCount(slide.Id, course.Id),
 					IsExercise = isExercise
@@ -190,7 +190,7 @@ namespace uLearn.Web.Controllers
 					IsExercise = slide is ExerciseSlide,
 					IsSolved = userSolutionsRepo.IsUserPassedTask(course.Id, slide.Id, User.Identity.GetUserId()),
 					IsVisited = visitersRepo.IsUserVisit(course.Id, slide.Id, User.Identity.GetUserId()),
-					UserMark = slideRateRepo.GetUserRate(course.Id, slide.Id, User.Identity.GetUserId())
+					UserRate = slideRateRepo.GetUserRate(course.Id, slide.Id, User.Identity.GetUserId())
 				};
 			}
 			return ans;

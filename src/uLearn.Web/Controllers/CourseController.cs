@@ -43,6 +43,7 @@ namespace uLearn.Web.Controllers
 		{
 			Course course = courseManager.GetCourse(courseId);
 			var isPassedTask = solutionsRepo.IsUserPassedTask(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId());
+			VisitSlide(courseId, course.Slides[slideIndex].Id);
 			var model = new CoursePageModel
 			{
 				Course = course,
@@ -51,7 +52,8 @@ namespace uLearn.Web.Controllers
 				NextSlideIndex = slideIndex + 1,
 				PrevSlideIndex = slideIndex - 1,
 				IsPassedTask = isPassedTask,
-				LatestAcceptedSolution = isPassedTask ? solutionsRepo.GetLatestAcceptedSolution(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId()) : null
+				LatestAcceptedSolution = isPassedTask ? solutionsRepo.GetLatestAcceptedSolution(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId()) : null,
+				Rate = GetRate(course.Id, course.Slides[slideIndex].Id)
 			};
 			return model;
 		}
@@ -88,9 +90,8 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<string> AddQuestion(string title, string unitName)
+		public async Task<string> AddQuestion(string title, string unitName, string question)
 		{
-			var question = GetUserCode(Request.InputStream);
 			var userName = User.Identity.GetUserName();
 			await userQuestionsRepo.AddUserQuestion(question, title, userName, unitName, DateTime.Now);
 			return "Success!";
@@ -98,7 +99,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<string> ApplyMark(string courseId, string slideId, string rate)
+		public async Task<string> ApplyRate(string courseId, string slideId, string rate)
 		{
 			var userId = User.Identity.GetUserId();
 			var slideRate = (SlideRates)Enum.Parse(typeof(SlideRates), rate);
@@ -108,7 +109,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public string GetMark(string courseId, string slideId)
+		public string GetRate(string courseId, string slideId)
 		{
 			var userId = User.Identity.GetUserId();
 			return slideRateRepo.FindRate(courseId, slideId, userId);

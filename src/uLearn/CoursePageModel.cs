@@ -11,5 +11,6 @@
 		public bool HasPrevSlide { get { return PrevSlideIndex >= 0; } }
 		public bool IsPassedTask { get; set; }
 		public string LatestAcceptedSolution { get; set; }
+		public string Rate{get; set;}
 	}
 }

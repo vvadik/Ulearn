@@ -32,7 +32,7 @@
 									<td 
 										data-sort-value="@(stats.IsSolved ? 1 : stats.IsExercise ? 0 : 2)" 
 										class="analytics @(stats.IsSolved? "solved" : stats.IsExercise ? "not-solved" : "")"></td>
-									<td>@(info.Value.UserMark ?? "")</td>
+									<td>@(info.Value.UserRate ?? "")</td>
 								</tr>
 							}
 						}

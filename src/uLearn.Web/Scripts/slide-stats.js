@@ -1,12 +1,12 @@
-﻿function handleMark() {
+﻿function handleRate(rate) {
     $.ajax(
     {
         type: "POST",
-        url: $("#" + $("input:radio[name='marks']:checked").val()).data("url"),
-        data: ""
+        url: $("#ratesBar").data("url"),
+        data: {rate:rate}
     }).success(function (ans) {
-        console.log(ans)
-    })
+            console.log(ans);
+        })
 		.fail(function (req) {
 		    console.log(req.responseText);
 		})
@@ -14,20 +14,8 @@
 		});
 };
 
-function giveMark() {
-    $.ajax(
-{
-    type: "POST",
-    url: $("#finder").data("url"),
-    data: ""
-}).success(function (ans) {
-    var switcher = ans.toLowerCase();
+function FillRate(rate) {
+    var switcher = rate.toLowerCase();
     console.log(switcher);
     $("#" + switcher).prop('checked', true);
-        })
-    .fail(function (req) {
-        console.log(req.responseText);
-    })
-    .always(function (ans) {
-    });
 };
