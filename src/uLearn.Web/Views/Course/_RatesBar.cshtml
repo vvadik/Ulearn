@@ -1,23 +1,22 @@
 ﻿@model uLearn.CoursePageModel
-<form id="marksButtons" style="margin-top: 10px;">
-<form class="rate-buttons">
+<form class="rate-buttons" style="margin-top: 10px;">
 	<div id="ratesBar" data-url="@Url.Action("ApplyRate", new{ courseId = Model.Course.Id, slideId = Model.Slide.Id})"></div>
 	Оцените материал:
 	<div class="btn-group" data-toggle="buttons">
-		<label class="btn btn-default active">
-			<input id="notwatched" type="radio" name="marks" value="not_watched" onclick="handleRate('NotWatched')" checked>
+		<label onclick="handleRate('NotWatched')" class="btn btn-default active">
+			<input id="notwatched" type="radio" name="marks" value="not_watched">
 			Ещё не смотрел
 		</label>
-		<label class="btn btn-default btn-hover" data-hover-class="btn-success">
-			<input id="good" type="radio" name="marks" value="good" onclick="handleRate('Good')">
+		<label onclick="handleRate('Good')" class="btn btn-default btn-hover" data-hover-class="btn-success">
+			<input id="good" type="radio" name="marks" value="good" checked>
 			Хорошо
 		</label>
-		<label class="btn btn-default btn-hover" data-hover-class="btn-danger">
-			<input id="notunderstand" type="radio" name="marks" value="notunderstand" onclick="handleRate('NotUnderstand')">
+		<label onclick="handleRate('NotUnderstand')" class="btn btn-default btn-hover" data-hover-class="btn-danger">
+			<input id="notunderstand" type="radio" name="marks" value="notunderstand">
 			Непонятно
 		</label>
-		<label class="btn btn-default btn-hover" data-hover-class="btn-info">
-	<		input id="trivial" type="radio" name="marks" value="trivial" onclick="handleRate('Trivial')">
+		<label onclick="handleRate('Trivial')" class="btn btn-default btn-hover" data-hover-class="btn-info">
+			<input id="trivial" type="radio" name="marks" value="trivial">
 			Тривиально
 		</label>
 	</div>
@@ -25,4 +24,3 @@
 </form>
 <script src="~/Scripts/slide-stats.js"></script>
 <script src="~/Scripts/jquery-1.10.2.min.js"></script>
-<script> FillRate('@Model.Rate')</script>

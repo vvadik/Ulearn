@@ -17,5 +17,5 @@
 function FillRate(rate) {
     var switcher = rate.toLowerCase();
     console.log(switcher);
-    $("#" + switcher).prop('checked', true);
+    $("#" + switcher).parent().button('toggle');
 };
