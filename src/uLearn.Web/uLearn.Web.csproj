@@ -695,6 +695,14 @@
     <EmbeddedResource Include="Microsoft.Owin.Security.VK\Resources.resx" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\courses\BasicProgramming\BasicProgramming.csproj">
+      <Project>{83a81211-a139-4a37-92a0-716809232f08}</Project>
+      <Name>BasicProgramming</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\courses\linq\linq.csproj">
+      <Project>{0bd679e4-9acb-4b02-835b-cbca1de8b817}</Project>
+      <Name>linq</Name>
+    </ProjectReference>
     <ProjectReference Include="..\uLearn\uLearn.csproj">
       <Project>{333DD5A7-9955-46CB-8905-79E800F2B435}</Project>
       <Name>uLearn</Name>

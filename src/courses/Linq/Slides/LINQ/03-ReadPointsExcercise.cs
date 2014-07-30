@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Id("Read_Point_Ex")]
 	[Slide("Задача. Чтение списка точек", "{563307C9-F265-4EA0-B06E-8390582F718E}")]
 	[TestFixture]
 	public class ReadPointsExcercise
