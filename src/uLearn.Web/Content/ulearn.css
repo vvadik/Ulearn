@@ -242,7 +242,12 @@ a.nav-arrow:hover {
         background-color: #838383;
 }
 
-
 .likes-counter {
     margin-left: 0px;
+}
+
+.rate-buttons {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	float:right;
 }

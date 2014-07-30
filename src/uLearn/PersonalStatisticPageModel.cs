@@ -9,11 +9,14 @@ namespace uLearn
 	public class PersonalStatisticPageModel
 	{
 		public CoursePageModel CoursePageModel;
-		public Dictionary<string, PersonalStatisticsInSlide> PersonalStatistics;
+		public PersonalStatisticsInSlide[] PersonalStatistics;
 	}
 
 	public class PersonalStatisticsInSlide
 	{
+		public string UnitName{ get; set; }
+		public string SlideTitle{ get; set; }
+		public int SlideIndex { get; set; }
 		public bool IsVisited { get; set; }
 		public bool IsSolved { get; set; }
 		public string UserRate { get; set; }

@@ -23,7 +23,8 @@ namespace uLearn.Web.Controllers
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
 
 
-		public AnalyticsController() : this(CourseManager.AllCourses)
+		public AnalyticsController()
+			: this(CourseManager.AllCourses)
 		{
 		}
 
@@ -55,7 +56,7 @@ namespace uLearn.Web.Controllers
 				var isExercise = (slide is ExerciseSlide);
 				tableInfo.Add(slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
 				{
-					Rates = slideRateRepo.GetRates(slide.Id, course.Id),
+					Marks = slideRateRepo.GetRates(slide.Id, course.Id),
 					SolversCount = userSolutionsRepo.GetAcceptedSolutionsCount(slide.Id, course.Id),
 					VisitersCount = visitersRepo.GetVisitersCount(slide.Id, course.Id),
 					IsExercise = isExercise
@@ -176,24 +177,20 @@ namespace uLearn.Web.Controllers
 			return new PersonalStatisticPageModel
 			{
 				CoursePageModel = coursePageModel,
-				PersonalStatistics = CreatePersonalStatistic(course)
-			};
-		}
-
-		private Dictionary<string, PersonalStatisticsInSlide> CreatePersonalStatistic(Course course)
+				PersonalStatistics =
+					course.Slides
+						.Select((slide, slideIndex) => new PersonalStatisticsInSlide
 		{
-			var ans = new Dictionary<string, PersonalStatisticsInSlide>();
-			foreach (var slide in course.Slides)
-			{
-				ans[slide.Info.UnitName + ": " + slide.Title] = new PersonalStatisticsInSlide
-				{
+							UnitName = slide.Info.UnitName,
+							SlideTitle = slide.Title,
+							SlideIndex = slideIndex,
 					IsExercise = slide is ExerciseSlide,
 					IsSolved = userSolutionsRepo.IsUserPassedTask(course.Id, slide.Id, User.Identity.GetUserId()),
 					IsVisited = visitersRepo.IsUserVisit(course.Id, slide.Id, User.Identity.GetUserId()),
-					UserRate = slideRateRepo.GetUserRate(course.Id, slide.Id, User.Identity.GetUserId())
+					UserMark = slideRateRepo.GetUserRate(course.Id, slide.Id, User.Identity.GetUserId())
+						})
+						.ToArray()
 				};
 			}
-			return ans;
 		}
-	}
 }

@@ -102,6 +102,11 @@
 
 @section scripts{
 	@Scripts.Render("~/slide-js")
+	<script src="~/Scripts/slide-onload-visit.js"></script>
+	<script id="VisitSlideUrl" data-url='@Url.Action("VisitSlide", new { courseId = Model.Course.Id, slideId = Model.Slide.Id })'>smbVisit()</script>
+	<script src="~/Scripts/slide-stats.js"></script>
+	<script>
+		giveMark();
+	</script>
 }
 
-<script language="JavaScript" type="text/javascript" src="~/Scripts/jquery-2.1.1.min.js"></script>
