@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Задача. Декартово произведение", "{FF3215D3-5CC7-4C28-83B1-77465F570DC8}")]
-	[TestFixture]
 	public class CartesianProduct
 	{
 		/*
@@ -38,7 +36,7 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		[ExpectedOutput("Good")]
-		[ShowOnSlide]
+		//[ShowOnSlide]
 		public static void Main()
 		{
 			var answer = GetNeighbours(new Point(1, 2));

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Задача. Объединение коллекций", "{7DB3F797-B99B-4580-ABE6-BB4EE929BB6B}")]
-	[TestFixture]
 	public class SelectManyExercise
 	{
 		/*

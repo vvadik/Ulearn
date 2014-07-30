@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Задача. Обратный индекс", "{52CAF978-4BB7-4CC1-92FB-607153DA0A1E}")]
-	[TestFixture]
 	public class LookupExercise
 	{
 		/*

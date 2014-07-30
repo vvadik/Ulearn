@@ -90,6 +90,18 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
+		public ActionResult FakeRunSolution(string courseId, int slideIndex = 0)
+		{
+			return Json(new RunSolutionResult
+			{
+				IsRightAnswer = false,
+				ActualOutput = string.Join("\n", Enumerable.Repeat("Тридцать три корабля лавировали лавировали, да не вылавировали", 21)),
+				ExpectedOutput = string.Join("\n", Enumerable.Repeat("Тридцать три корабля лавировали лавировали, да не вылавировали", 15)),
+			});
+		}
+
+		[HttpPost]
+		[Authorize]
 		public async Task<string> AddQuestion(string title, string unitName, string question)
 		{
 			var userName = User.Identity.GetUserName();

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Задача. Частотный словарь текста", "{0535734D-D258-44C6-99F3-F96258BCCA6F}")]
-	[TestFixture]
 	public class GroupingExercise
 	{
 		/*
