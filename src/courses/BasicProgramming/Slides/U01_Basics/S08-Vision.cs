@@ -1,8 +1,7 @@
 ﻿
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Id("Vision_areas")]
-	[Title("Области видимости")]
+	[Slide("Области видимости", "{AE197FE1-2040-4945-ACC6-5755CC61CE87}")]
 	class S08_Vision
 	{
 		/*

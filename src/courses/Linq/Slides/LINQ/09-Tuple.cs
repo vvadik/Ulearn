@@ -3,8 +3,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Id("Work_Tuples")]
-	[Title("Работа с кортежами")]
+	[Slide("Работа с кортежами", "{693D46E6-2400-43E4-AFDF-4ECA760A052F}")]
 	[TestFixture]
 	public class Tuples
 	{

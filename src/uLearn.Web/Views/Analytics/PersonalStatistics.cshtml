@@ -1,4 +1,5 @@
 ﻿@using System.Diagnostics
+@using System.Globalization
 @model uLearn.PersonalStatisticPageModel
 @{
 	ViewBag.Title = "Personal statistics";
@@ -15,7 +16,9 @@
 							<th>Название слайда</th>
 							<th>Посещённые</th>
 							<th>Решённые</th>
-							<th>Ваша оценка</th>
+						    <th>Ваша оценка</th>
+						    <th>Подсказок на слайде</th>
+							<th>Из них использовано</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -26,13 +29,20 @@
 								var stats = info.Value;
 								Debug.Assert(stats != null);
 								counter++;
+							    var isNeedDrowHintsInfo = stats.IsExercise && stats.HintsCountOnSlide != 0;
 								<tr>
 									<td data-sort-value=@(counter + 1000)>@Html.ActionLink(info.Key, "Slide", "Course", new { courseId = Model.CoursePageModel.Course.Id, slideIndex = counter }, null)</td>
 									<td data-sort-value="@(info.Value.IsVisited ? 1 : 0)" class="analytics @(info.Value.IsVisited ? "visited" : "not-visited")"></td>
 									<td 
 										data-sort-value="@(stats.IsSolved ? 1 : stats.IsExercise ? 0 : 2)" 
 										class="analytics @(stats.IsSolved? "solved" : stats.IsExercise ? "not-solved" : "")"></td>
-									<td>@(info.Value.UserMark ?? "")</td>
+								    <td>@(info.Value.UserMark ?? "")</td>
+								    <td data-sort-value="@(isNeedDrowHintsInfo ? stats.HintsCountOnSlide + 1000 : 0)">
+								        @(isNeedDrowHintsInfo ? stats.HintsCountOnSlide.ToString(CultureInfo.InvariantCulture) : "")
+								    </td>
+								    <td data-sort-value="@(isNeedDrowHintsInfo ? stats.HintUsedPercent + 1000 : 0)">
+								        @(isNeedDrowHintsInfo ? stats.HintUsedPercent + "%" : "")
+								    </td>
 								</tr>
 							}
 						}

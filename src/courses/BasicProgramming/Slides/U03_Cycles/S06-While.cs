@@ -2,8 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Id("While")]
-	[Title("While")]
+	[Slide("While", "{4158C9A6-A71D-4015-A283-DEF12BE0055E}")]
 	class S06_While
 	{
 		/*

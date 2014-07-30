@@ -2,8 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Id("If_return")]
-	[Title("If return")]
+	[Slide("If return", "{A72B8529-FF6D-4C57-9DB7-19999AC4A3B2}")]
 	internal class S04_IfReturn
 	{
 		/*

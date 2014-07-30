@@ -2,8 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Id("Excess_if")]
-	[Title("Лишний if")]
+	[Slide("Лишний if", "{FA865454-05CB-4297-ADA7-4D65D32A3F4F}")]
 	class S05_ExcessIf
 	{
 		/*

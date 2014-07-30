@@ -2,8 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Id("Types_conversion")]
-	[Title("Преобразования типов")]
+	[Slide("Преобразования типов", "{04D61C06-8A32-41A6-A47E-2AE2D095DEF3}")]
 	public class S03_Conversion
 	{
 		/*

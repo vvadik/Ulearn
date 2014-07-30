@@ -2,8 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Id("Logical_expression")]
-	[Title("Логические выражения")]
+	[Slide("Логические выражения", "{4C161B1E-2637-447B-ADFD-14647BF659AD}")]
 	class S02_LogicalExpressions
 	{
 		/*

@@ -2,8 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Id("Strings")]
-	[Title("Строки")]
+	[Slide("Строки", "{36F91BF6-6EBC-4E0E-AADB-64EF122D5247}")]
 	class S04_Strings
 	{
 		/*

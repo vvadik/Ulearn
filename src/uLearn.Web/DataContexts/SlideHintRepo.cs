@@ -23,6 +23,8 @@ namespace uLearn.Web.DataContexts
 
 		public async Task AddHint(string userId, int hintId, string courseId, string slideId)
 		{
+			if (db.Hints.Any(x => x.UserId == userId && x.HintId == hintId && x.SlideId == slideId && x.CourseId == courseId))
+				return;
 			db.Hints.Add(new SlideHint
 			{
 				UserId = userId,
@@ -39,6 +41,29 @@ namespace uLearn.Web.DataContexts
 			if (answer.Count == 0)
 				return null;
 			return string.Join(" ", answer.Select(x => x.HintId).ToList());
+		}
+
+		public int GetHintsCount(string slideId, string courseId)
+		{
+			return db.Hints.Count(x => x.CourseId == courseId && x.SlideId == slideId);
+		}
+
+		public int GetHintsCountForUser(string slideId, string courseId, string userId)
+		{
+			return db.Hints.Count(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId);
+		}
+
+		public int GetHintUsedPercent(string slideId, string courseId, int hintsCountOnSlide, int usersCount)
+		{
+			var hintsCount = GetHintsCount(slideId, courseId);
+			var maxPossibleHintsCount = hintsCountOnSlide*usersCount;
+			return (int)(100*(double)hintsCount/maxPossibleHintsCount);
+		}
+
+		public int GetHintUsedPercentForUser(string courseId, string slideId, string userId, int hintsCountOnSlide)
+		{
+			var hintsCount = GetHintsCountForUser(slideId, courseId, userId);
+			return (int)(100 * (double)hintsCount / hintsCountOnSlide);
 		}
 	}
 }

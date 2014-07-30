@@ -21,6 +21,7 @@ namespace uLearn.Web.Controllers
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
+		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
 
 
 		public AnalyticsController() : this(CourseManager.AllCourses)
@@ -42,23 +43,32 @@ namespace uLearn.Web.Controllers
 		private AnalyticsTablePageModel CreateTotalStatistics(string courseId, CoursePageModel coursePageModel)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var tableInfo = CreateTableInfo(course);
-			var model = new AnalyticsTablePageModel {Course = course, TableInfo = tableInfo, CoursePageModel = coursePageModel};
+			var tableInfo = CreateTotalStatisticsInfo(course);
+			var model = new AnalyticsTablePageModel
+			{
+				Course = course, 
+				TableInfo = tableInfo, 
+				CoursePageModel = coursePageModel
+			};
 			return model;
 		}
 
-		private Dictionary<string, AnalyticsTableInfo> CreateTableInfo(Course course)
+		private Dictionary<string, AnalyticsTableInfo> CreateTotalStatisticsInfo(Course course)
 		{
 			var tableInfo = new Dictionary<string, AnalyticsTableInfo>();
 			foreach (var slide in course.Slides)
 			{
-				var isExercise = (slide is ExerciseSlide);
+				var exerciseSlide = (slide as ExerciseSlide);
+				var isExercise = exerciseSlide != null;
+				var hintsCountOnSlide = isExercise ? exerciseSlide.HintsHtml.Count() : 0;
 				tableInfo.Add(slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
 				{
 					Marks = slideRateRepo.GetRates(slide.Id, course.Id),
-					SolversCount = userSolutionsRepo.GetAcceptedSolutionsCount(slide.Id, course.Id),
 					VisitersCount = visitersRepo.GetVisitersCount(slide.Id, course.Id),
-					IsExercise = isExercise
+					IsExercise = isExercise,
+					SolversCount = isExercise ? userSolutionsRepo.GetAcceptedSolutionsCount(slide.Id, course.Id) : 0,
+					TotalHintCount =  hintsCountOnSlide,
+					HintUsedPercent = isExercise ? slideHintRepo.GetHintUsedPercent(slide.Id, course.Id, hintsCountOnSlide, db.Users.Count()) : 0 
 				});
 			}
 			return tableInfo;
@@ -185,12 +195,17 @@ namespace uLearn.Web.Controllers
 			var ans = new Dictionary<string, PersonalStatisticsInSlide>();
 			foreach (var slide in course.Slides)
 			{
+				var exerciseSlide = (slide as ExerciseSlide);
+				var isExercise = exerciseSlide != null;
+				var hintsCountOnSlide = isExercise ? exerciseSlide.HintsHtml.Count() : 0;
 				ans[slide.Info.UnitName + ": " + slide.Title] = new PersonalStatisticsInSlide
 				{
-					IsExercise = slide is ExerciseSlide,
+					IsExercise = isExercise,
 					IsSolved = userSolutionsRepo.IsUserPassedTask(course.Id, slide.Id, User.Identity.GetUserId()),
 					IsVisited = visitersRepo.IsUserVisit(course.Id, slide.Id, User.Identity.GetUserId()),
-					UserMark = slideRateRepo.GetUserRate(course.Id, slide.Id, User.Identity.GetUserId())
+					UserMark = slideRateRepo.GetUserRate(course.Id, slide.Id, User.Identity.GetUserId()),
+					HintsCountOnSlide = hintsCountOnSlide,
+					HintUsedPercent = isExercise ? slideHintRepo.GetHintUsedPercentForUser(course.Id, slide.Id, User.Identity.GetUserId(), hintsCountOnSlide) : 0
 				};
 			}
 			return ans;

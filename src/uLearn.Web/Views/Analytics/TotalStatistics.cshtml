@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@using Microsoft.Ajax.Utilities
 @using uLearn
 @model AnalyticsTablePageModel
 @{
@@ -20,7 +21,9 @@
 							<th>Количество оценок</th>
 							<th>оценок "хорошо"</th>
 							<th>оценок "не понятно"</th>
-							<th>оценок "тривиально"</th>
+						    <th>оценок "тривиально"</th>
+						    <th>подсказок на слайде</th>
+							<th>из них в среднем используются</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -28,15 +31,22 @@
 						@foreach (var info in Model.TableInfo)
 						{
 							counter++;
-							<tr>
-								<td data-sort-value=@(counter + 1000)>@Html.ActionLink(info.Key, "Slide", "Course", new { courseId = Model.CoursePageModel.Course.Id, slideIndex = counter }, null)</td>
-								<td>@info.Value.VisitersCount</td>
-								<td>@(info.Value.IsExercise ? info.Value.SolversCount.ToString(CultureInfo.InvariantCulture) : "")</td>
-								<td>@info.Value.Marks.Count</td>
-								<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100 * (double)info.Value.Marks.Good / info.Value.Marks.Count))%</td>
-								<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100 * (double)info.Value.Marks.NotUnderstand / info.Value.Marks.Count))%</td>
-								<td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100 * (double)info.Value.Marks.Trivial / info.Value.Marks.Count))%</td>
-							</tr>
+						    <tr>
+						        @{var isNeedDrowHintsInfo = (info.Value.IsExercise && info.Value.TotalHintCount != 0);}
+						        <td data-sort-value=@(counter + 1000)>@Html.ActionLink(info.Key, "Slide", "Course", new { courseId = Model.CoursePageModel.Course.Id, slideIndex = counter }, null)</td>
+						        <td>@info.Value.VisitersCount</td>
+						        <td>@(info.Value.IsExercise ? info.Value.SolversCount.ToString(CultureInfo.InvariantCulture) : "")</td>
+						        <td>@info.Value.Marks.Count</td>
+						        <td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100 * (double)info.Value.Marks.Good / info.Value.Marks.Count))%</td>
+						        <td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100 * (double)info.Value.Marks.NotUnderstand / info.Value.Marks.Count))%</td>
+						        <td>@(info.Value.Marks.Count == 0 ? 0 : (int)(100 * (double)info.Value.Marks.Trivial / info.Value.Marks.Count))%</td>
+						        <td data-sort-value=@(isNeedDrowHintsInfo ? info.Value.TotalHintCount + 1000 : 0)>
+						            @(isNeedDrowHintsInfo ? info.Value.TotalHintCount.ToString(CultureInfo.InvariantCulture) : "")
+						        </td>
+						        <td data-sort-value=@(isNeedDrowHintsInfo ? info.Value.HintUsedPercent + 1000 : 0)>
+						            @(isNeedDrowHintsInfo ? info.Value.HintUsedPercent.ToString(CultureInfo.InvariantCulture) + "%" : "")
+						        </td>
+						    </tr>
 						}
 					</tbody>
 				</table>

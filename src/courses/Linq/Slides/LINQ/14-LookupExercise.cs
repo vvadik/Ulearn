@@ -6,8 +6,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Id("Lookup_Ex")]
-	[Title("Задача. Обратный индекс")]
+	[Slide("Задача. Обратный индекс", "{52CAF978-4BB7-4CC1-92FB-607153DA0A1E}")]
 	[TestFixture]
 	public class LookupExercise
 	{

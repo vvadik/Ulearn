@@ -1,7 +1,6 @@
 ﻿namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Id("Hello_World")]
-	[Title("Hello world")]
+	[Slide("Hello world", "{7FB8D0CC-B551-485B-8D0B-37993D1B4B08}")]
 	public class S01_HelloWorld
 	{
 		//#video //www.youtube.com/embed/81Ub0SMxZQo?rel=0

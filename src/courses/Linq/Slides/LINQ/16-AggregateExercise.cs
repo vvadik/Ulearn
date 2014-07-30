@@ -5,8 +5,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Id("Aggregate_Ex")]
-	[Title("Задача. Самое длинное слово")]
+	[Slide("Задача. Самое длинное слово", "{04A35AE5-67B9-4674-B4C5-98E8976F87F9}")]
 	[TestFixture]
 	public class AggregateExercise
 	{

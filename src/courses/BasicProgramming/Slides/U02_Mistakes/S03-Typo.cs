@@ -2,8 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Id("Typos")]
-	[Title("Очепятки")]
+	[Slide("Очепятки", "{7E86A275-9B84-4071-A0A3-2D1FE17B0DF1}")]
 	class S03_Typo
 	{
 		/*

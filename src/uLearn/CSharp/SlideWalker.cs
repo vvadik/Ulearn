@@ -29,10 +29,12 @@ namespace uLearn.CSharp
 		{
 			var classDeclaration = ((ClassDeclarationSyntax)base.VisitClassDeclaration(node))
 				.WithAttributeLists(new SyntaxList<AttributeListSyntax>());
-			if (node.HasAttribute<TitleAttribute>())
-				Title = node.GetAttributes<TitleAttribute>().Select(a => a.GetArgument()).Single();
-			if (node.HasAttribute<IdAttribute>())
-				Id = node.GetAttributes<IdAttribute>().Select(a => a.GetArgument()).Single();
+			if (node.HasAttribute<SlideAttribute>())
+			{
+				var argumentList = node.GetAttributes<SlideAttribute>().Select(a => a.ArgumentList).Single();
+				Title = argumentList.Arguments[0].ToString().Trim(new[] {'"'});
+				Id = argumentList.Arguments[1].ToString().Trim(new[] {'"'});
+			}
 			if (ShowOnSlide(node))
 				AddCodeBlock(node);
 			return classDeclaration;

@@ -18,5 +18,7 @@ namespace uLearn
 		public bool IsSolved { get; set; }
 		public string UserMark { get; set; }
 		public bool IsExercise { get; set; }
+		public int HintsCountOnSlide { get; set; }
+		public int HintUsedPercent { get; set; }
 	}
 }

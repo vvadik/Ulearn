@@ -4,8 +4,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Id("Select_Many")]
-	[Title("SelectMany")]
+	[Slide("SelectMany", "{51DF2D25-94F2-4D92-9304-397540C7233C}")]
 	[TestFixture]
 	public class SelectManySample
 	{

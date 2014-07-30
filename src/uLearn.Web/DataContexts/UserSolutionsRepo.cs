@@ -102,7 +102,7 @@ namespace uLearn.Web.DataContexts
 
 		public int GetAcceptedSolutionsCount(string slideId, string courseId)
 		{
-			return db.UserSolutions.Count(x => x.SlideId == slideId && x.CourseId == courseId && x.IsRightAnswer);
+			return db.UserSolutions.Where(x => x.SlideId == slideId && x.CourseId == courseId && x.IsRightAnswer).Select(x => x.UserId).Distinct().Count();
 		}
 	}
 }

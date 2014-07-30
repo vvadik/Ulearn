@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace uLearn.Courses.Linq.Slides
 {
 	[Id("Read_Point_Ex")]
-	[Title("Задача. Чтение списка точек")]
+	[Slide("Задача. Чтение списка точек", "{563307C9-F265-4EA0-B06E-8390582F718E}")]
 	[TestFixture]
 	public class ReadPointsExcercise
 	{

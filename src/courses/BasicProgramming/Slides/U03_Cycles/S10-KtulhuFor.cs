@@ -1,7 +1,6 @@
 ﻿namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Id("Ktulhu_for")]
-	[Title("Ktulhu for")]
+	[Slide("Ktulhu for", "{C65BE127-D5E6-46B6-9B5C-A6B1229461A4}")]
 	class S10_KtulhuFor
 	{
 		/*

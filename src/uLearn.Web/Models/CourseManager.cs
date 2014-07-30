@@ -57,6 +57,12 @@ namespace uLearn.Web.Models
 				.Where(IsSlide)
 				.Select(f => LoadSlide(f, resourceFiles, name => includes[name]))
 				.ToArray();
+			var slidesWithRepeatedGuide =
+				slides.GroupBy(x => x.Id).Where(x => x.Count() != 1).Select(x => x.Select(y => y.Info.CourseName + ": " + y.Title)).ToList();
+			if (slidesWithRepeatedGuide.Any())
+			{
+				throw new Exception("change repeated guid in slides:\n" + string.Join("\n", slidesWithRepeatedGuide.Select(x => string.Join("\n", x))));
+			}
 			return new Course(courseId, courseTitle, slides);
 		}
 

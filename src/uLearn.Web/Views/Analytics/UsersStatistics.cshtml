@@ -31,7 +31,7 @@
 									<td>@(user.Value[unitName] + "%")</td>
 								}
 								<td>
-									@(user.Value.Values.Aggregate(0, (x, y) => x + y) / user.Value.Count + "%")
+									@(user.Value.Values.Sum() / user.Value.Count + "%")
 								</td>
 							</tr>
 						}

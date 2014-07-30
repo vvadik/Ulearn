@@ -2,8 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slidess
 {
-	[Id("Boolean_variables")]
-	[Title("Логические выражения и сравнения")]
+	[Slide("Логические выражения и сравнения", "{C56C7CDE-64BD-4023-9D6D-6328E3302C00}")]
 	class S01_BooleanVariablesAndComparison
 	{
 		/*

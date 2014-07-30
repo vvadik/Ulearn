@@ -2,8 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Id("For")]
-	[Title("For")]
+	[Slide("For", "{67110A78-3932-4810-AF9F-F996799C3110}")]
 	class S09_For
 	{
 		/*

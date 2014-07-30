@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace uLearn
 {
-	public class IdAttribute : Attribute
+	public class SlideAttribute : Attribute
 	{
-		public IdAttribute(string title)
+		public SlideAttribute(string title, string guid)
 		{
 		}
 	}
