@@ -77,7 +77,8 @@ namespace uLearn.Web.DataContexts
 				.Select(x => x.OrderByDescending(y => timeNow.Subtract(y.Timestamp).TotalMilliseconds))
 				.Select(x => x.First())
 				.OrderByDescending(x => (x.Likes.Count+1)/timeNow.Subtract(x.Timestamp).TotalMilliseconds)
-				.Take(10)
+				.Take(5)
+				.OrderBy(x => x.Likes.Count)
 				.Select(x => new AcceptedSolutionInfo(x.Code, x.Id, x.Likes.Select(y => y.UserId)))
 				.ToList();
 			return answer;

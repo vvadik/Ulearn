@@ -1,4 +1,5 @@
 using System;
+using System.Activities.Debugger;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,16 +32,45 @@ namespace uLearn.CSharp
 				.WithAttributeLists(new SyntaxList<AttributeListSyntax>());
 			if (node.HasAttribute<SlideAttribute>())
 			{
+				AddInBlockEnumAndBasicFieldDeclarationSyntax(node);
 				var argumentList = node.GetAttributes<SlideAttribute>().Select(a => a.ArgumentList).Single();
 				Title = argumentList.Arguments[0].ToString().Trim(new[] {'"'});
 				Id = argumentList.Arguments[1].ToString().Trim(new[] {'"'});
 			}
 			if (ShowOnSlide(node))
-				AddCodeBlock(node);
+				AddCodeBlockInStart(node);
 			return classDeclaration;
 		}
 
-		private void AddCodeBlock(MemberDeclarationSyntax node)
+		private void AddInBlockEnumAndBasicFieldDeclarationSyntax(SyntaxNode node)
+		{
+			foreach (var statement in node.
+				DescendantNodes().
+				Where(x => x is EnumDeclarationSyntax || x is BaseFieldDeclarationSyntax).
+				Where(x => x.Parent == node))
+			{
+				if (statement is BaseFieldDeclarationSyntax)
+					AddCodeBlockInStart(statement.ToString());
+				else
+				{
+					var localEnum =
+						CSharpSyntaxTree.ParseText(statement.ToString())
+							.GetRoot()
+							.DescendantNodes()
+							.Where(x => x is EnumDeclarationSyntax)
+							.Select(x => (x as EnumDeclarationSyntax))
+							.First();
+					var endLine = localEnum.CloseBraceToken.GetLocation().GetLineSpan().StartLinePosition.Line;
+					var tabsCount = localEnum.OpenBraceToken.ToFullString().IndexOf('{');
+					var localEnumSplited = statement.ToString().SplitToLines();
+					for (var lineIndex = 1; lineIndex <= endLine; lineIndex++)
+						localEnumSplited[lineIndex] = localEnumSplited[lineIndex].Substring(tabsCount);
+					AddCodeBlockInStart(String.Join("\r\n", localEnumSplited));
+				}
+			}
+		}
+
+		private void AddCodeBlockInStart(MemberDeclarationSyntax node)
 		{
 			var sampleBlock = (SlideBlock)CreateSampleBlock((dynamic)node);
 			SlideBlock lastBlock = Blocks.LastOrDefault();
@@ -48,6 +78,17 @@ namespace uLearn.CSharp
 				Blocks[Blocks.Count - 1] = SlideBlock.FromCode(lastBlock.Text + "\r\n\r\n" + sampleBlock.Text);
 			else
 				Blocks.Add(sampleBlock);
+		}
+
+		private void AddCodeBlockInStart(string node)
+		{
+			for (var i = 0; i < Blocks.Count; i++)
+			{
+				if (!Blocks[i].IsCode) continue;
+				Blocks[i] = SlideBlock.FromCode(node + "\r\n\r\n" + Blocks[i].Text);
+				return;
+			}
+			Blocks.Add(SlideBlock.FromCode(node));
 		}
 
 		public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
@@ -65,7 +106,7 @@ namespace uLearn.CSharp
 
 			if (ShowOnSlide(node))
 			{
-				AddCodeBlock(node);
+				AddCodeBlockInStart(node);
 			}
 			else
 			{

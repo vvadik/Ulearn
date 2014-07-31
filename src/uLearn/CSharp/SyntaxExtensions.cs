@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -73,9 +74,27 @@ namespace uLearn.CSharp
 			return new string('\t', bodyNestingSize) + node;
 		}
 
+		public static string ToPrettyString(this SyntaxNode node)
+		{
+			return node.ToNotIdentedString();
+		}
+
+		private static string CutFirstCharacters(string str, char character, int size)
+		{
+			var counter = 0;
+			foreach (var c in str)
+			{
+				if (c == character)
+					counter++;
+				else
+					break;
+			}
+			return str.Remove(Math.Min(counter, size));
+		}
+
 		public static string ToNotIdentedString(this SyntaxNode node)
 		{
-			return node.ToFullString().RemoveCommonNesting();
+			return node.ToString().RemoveCommonNesting();
 		}
 
 		public static MethodDeclarationSyntax TransformExercise(this MethodDeclarationSyntax method)

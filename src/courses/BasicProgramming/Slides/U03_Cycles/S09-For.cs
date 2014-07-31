@@ -13,9 +13,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		Через пробел и именно в этом порядке.
 		*/
 
-		public static int Satiety = 0;
-
-
 		[ShowOnSlide]
 		[ExpectedOutput("1 0 4 2 0 9 6 3 0 \r\n1 0 4 2 0 9 6 3 0 16 12 8 4 0")]
 		public static void Main()
