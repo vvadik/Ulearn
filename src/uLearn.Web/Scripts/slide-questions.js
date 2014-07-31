@@ -1,5 +1,7 @@
 function sendQuestion(title, unitName) {
-	var quest = $("#questField").val();
+    var quest = $("#questField").val();
+    quest = quest.replace(new RegExp("<","gm"), "&lt;");
+    quest = quest.replace(new RegExp(">","gm"), "&gt;");
 	$.ajax(
 		{
 			type: "POST",
