@@ -1,21 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using System.Linq;
-using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Id("Read_Point_Ex")]
 	[Slide("Задача. Чтение списка точек", "{563307C9-F265-4EA0-B06E-8390582F718E}")]
-	[TestFixture]
 	public class ReadPointsExcercise
 	{
 		/*
 
-		В файле filename в каждой строке написаны две координаты точки, разделенные пробелом.
+		В файле в каждой строке написаны две координаты точки (X, Y), разделенные пробелом.
 		Прочитайте файл в массив точек.
+
 		Решите задачу в один LINQ-запрос. Постарайтесь не использовать функцию преобразования строки в число более одного раза.
 
 		###Пример файла
@@ -23,16 +19,19 @@ namespace uLearn.Courses.Linq.Slides
 		    -3 4
 		    0 2
 		
-		Написанная вами функция в дальнейшем может быть использована, например, вот так:
+		Считайте, что за вас уже вызвали функцию `File.ReadLines(filename)` и вашей функции пердают строки, прочитанные из файла:
 		*/
-		[ExpectedOutput("0,0\r\n1,1\r\n2,2")]
+		[ExpectedOutput("1 -2\n-3 4\n0 2\n1 -42")]
 		[ShowOnSlide]
 		public static void Main()
 		{
-			List<Point> points = ParsePoints(new string[]{"0 0","1 1","2 2"});
-			foreach (var e in points)
-				Console.WriteLine("{0},{1}", e.X, e.Y);
+			foreach (var point in ParsePoints(new[] { "1 -2", "-3 4", "0 2" }))
+				Console.WriteLine(point.X + " " + point.Y);
+			foreach (var point in ParsePoints(new List<string> { "+01 -0042" }))
+				Console.WriteLine(point.X + " " + point.Y);
 		}
+		[ShowOnSlide]
+		public class Point { public int X, Y; }
 
 		[Exercise(SingleStatement = true)]
 		[Hint("string.Split — разбивает строку на части по разделителю")]
@@ -44,7 +43,7 @@ namespace uLearn.Courses.Linq.Slides
 		{
 			return lines
 				.Select(line => line.Split(' ').Select(int.Parse).ToList())
-				.Select(nums => new Point(nums[0], nums[1]))
+				.Select(nums => new Point {X = nums[0], Y = nums[1]})
 				.ToList();
 			/*uncomment
 			return lines
@@ -52,10 +51,5 @@ namespace uLearn.Courses.Linq.Slides
 				...
 			*/
 		}
-		/*
-		### Краткая справка
-		  * `IEnumerable<R> Select(this IEnumerable<T> items, Func<T, R> map)`
-		  * `List<T> ToList(this IEnumerable<T> items)`
-		*/
 	}
 }

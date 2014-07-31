@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Задача. Сравнение кортежей", "{80D43879-1099-4972-AEE1-6EB3EDF1E923}")]
-	[TestFixture]
 	public class SortTuples
 	{
 		/*

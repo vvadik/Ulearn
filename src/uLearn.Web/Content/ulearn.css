@@ -251,3 +251,9 @@ a.nav-arrow:hover {
 	margin-bottom: 10px;
 	float:right;
 }
+
+table.diff tbody th{
+	padding:0 3px 0 0;
+	text-align: right;
+	vertical-align: middle;
+}

@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using uLearn.CSharp;
 
 namespace uLearn.Web.Models
@@ -48,7 +45,7 @@ namespace uLearn.Web.Models
 		private Course LoadCourse(string courseId, string courseTitle)
 		{
 			var resourceFiles = Resources.EnumerateResourcesFrom("uLearn.Web.Courses." + courseId)
-				.OrderBy(f => f.Filename)
+				.OrderBy(f => GetSortingKey(f.Filename))
 				.ToList();
 			var includes = resourceFiles
 				.Where(f => !IsSlide(f))
@@ -66,6 +63,11 @@ namespace uLearn.Web.Models
 			return new Course(courseId, courseTitle, slides);
 		}
 
+		private string GetSortingKey(string filename)
+		{
+			return filename.Split('-', '_', ' ')[0];
+		}
+
 		private static bool IsSlide(ResourceFile x)
 		{
 			return !x.Filename.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) && !x.Filename.Contains("._");
@@ -73,11 +75,17 @@ namespace uLearn.Web.Models
 
 		private static Slide LoadSlide(ResourceFile slideFile, IList<ResourceFile> resourceFiles, Func<string, string> getInclude)
 		{
-			var sourceCode = Encoding.UTF8.GetString(slideFile.GetContent());
-			//var tmp = fileWithUsings.GetContent();
-			var usings = GetUsings(slideFile, resourceFiles); 
-			var info = GetInfoForSlide(slideFile, resourceFiles);
-			return SlideParser.ParseCode(sourceCode, info, usings, getInclude);
+			try
+			{
+				var sourceCode = Encoding.UTF8.GetString(slideFile.GetContent());
+				var usings = GetUsings(slideFile, resourceFiles); 
+				var info = GetInfoForSlide(slideFile, resourceFiles);
+				return SlideParser.ParseCode(sourceCode, info, usings, getInclude);
+			}
+			catch (Exception e)
+			{
+				throw new Exception("Error loading slide " + slideFile.FullName, e);
+			}
 		}
 
 		private static string GetUsings(ResourceFile file, IList<ResourceFile> all)

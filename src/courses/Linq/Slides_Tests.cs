@@ -1,28 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using uLearn.Courses.Linq.Slides;
 
 namespace uLearn.Courses.Linq
 {
 	[TestFixture]
-	public class Slides_Tests
+	public class Slides_Tests : BaseSlideTests
 	{
-		[TestCaseSource("GetSlideTests")]
-		public void Slide(Type slideType)
+		public Slides_Tests() : base(typeof(Intro))
 		{
-			SlideTestsUtils.TestExercise(slideType.GetMethod("Main"));
-		}
-
-		public IEnumerable<TestCaseData> GetSlideTests()
-		{
-			return Assembly.GetExecutingAssembly()
-				.GetTypes()
-				.Where(t => t.Namespace == typeof (SelectWhereToArray).Namespace)
-				.Where(t => SlideTestsUtils.GetExpectedOutputAttributes(t).Any())
-				.Select(t => new TestCaseData(t));
 		}
 	}
 }

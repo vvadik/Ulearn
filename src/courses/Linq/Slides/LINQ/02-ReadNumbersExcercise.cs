@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Задача. Чтение списка чисел", "{CBA7BC68-F1B9-46B1-93D4-49AC113A1D02}")]
-	[TestFixture]
 	public class ReadNumbersExcercise
 	{
 		/*
-
 		Linq удобно использовать для чтения из файла и разбора простых текстовых формат. Особенно удобно сочетать Linq с методом `File.ReadLines(filename)`.
 
 		Предположим в файле filename в каждая строка либо пустая, либо содержит одно целое число. 
@@ -23,40 +19,35 @@ namespace uLearn.Courses.Linq.Slides
 		    -3
 		    0
 
-		Допустим, что у нас уже есть массив строк, полученный из файла, реализуйте метод ParseNumbers
+		Допустим, что кто-то уже вызвал метод `File.ReadLines(filename)` и теперь у вас есть массив всех строк файла.
+		Реализуйте метод ParseNumbers.
 		*/
 
+
 		[ShowOnSlide]
-		[ExpectedOutput("1\r\n2\r\n3")]
+		[ExpectedOutput("0\n0\n1\n-3\n0")]
 		public static void Main()
 		{
-			string[] strNumbers = new string[] {"1", "2", "3"};
-			int[] parsedNumbers = ParseNumbers(strNumbers);
-			foreach (var e in parsedNumbers)
-				Console.WriteLine(e);
+			foreach (var num in ParseNumbers(new[] {"-0", "+0000"}))
+				Console.WriteLine(num);
+			foreach (var num in ParseNumbers(new List<string> {"1", "", "-03", "0"}))
+				Console.WriteLine(num);
 		}
 
 		[Exercise]
 		[Hint("`int.Parse` преобразует строку в целое число.")]
 		public static int[] ParseNumbers(IEnumerable<string> lines)
-				{
-					return lines
-						.Where(line => line != "")
-						.Select(int.Parse)
-						.ToArray();
-					/*uncomment
-					return lines
-						.Where(...)
-						.Select(...)
-						...
-					*/
-				}
-
-		/*
-		### Краткая справка
-		  * `items.Where(item => isGoodItem(item))` — фильтрация последовательности
-		  * `items.Select(item => convert(item))` — поэлементное преобразование последовательности
-		  * `items.ToArray()` — преобразование последовательности в массив
-		*/
+		{
+			return lines
+				.Where(line => line != "")
+				.Select(int.Parse)
+				.ToArray();
+			/*uncomment
+			return lines
+				.Where(...)
+				.Select(...)
+				...
+			*/
+		}
 	}
 }

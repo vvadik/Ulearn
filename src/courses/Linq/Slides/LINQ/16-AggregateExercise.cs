@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Задача. Самое длинное слово", "{04A35AE5-67B9-4674-B4C5-98E8976F87F9}")]
-	[TestFixture]
 	public class AggregateExercise
 	{
 		/*

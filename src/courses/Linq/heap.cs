@@ -10,7 +10,6 @@
 	using NUnit.Framework;
 
 
-	[TestFixture]
 	public class ZipLinqed_Test
 	{
 		// Zip
@@ -33,7 +32,6 @@
 		}
 	}
 
-	[TestFixture]
 	public class SerializationLinqed
 	{
 		// string.Join
@@ -53,7 +51,6 @@
 		}
 	}
 
-	[TestFixture]
 	public class ShuffleLinqed
 	{
 		//Enumerable.Range
@@ -87,7 +84,6 @@
 	}
 
 
-	[TestFixture]
 	public class SmoothingLinqed
 	{
 		// Closure 
@@ -113,7 +109,6 @@
 		}
 	}
 
-	[TestFixture]
 	public class GameOfLifeLinqed
 	{
 		public IEnumerable<Point> GetNextGeneration(IEnumerable<Point> aliveCells)
@@ -152,7 +147,6 @@
 		}
 	}
 
-	[TestFixture]
 	public static class ExtendingLinq
 	{
 		public static IEnumerable<T> Except<T>(this IEnumerable<T> items, Func<T, bool> predicate)
