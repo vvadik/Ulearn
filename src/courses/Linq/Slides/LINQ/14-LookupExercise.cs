@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Slide("Задача. Обратный индекс", "{52CAF978-4BB7-4CC1-92FB-607153DA0A1E}")]
+	[Slide("Создание обратного индекса", "{52CAF978-4BB7-4CC1-92FB-607153DA0A1E}")]
 	public class LookupExercise
 	{
 		/*
@@ -21,7 +21,6 @@ namespace uLearn.Courses.Linq.Slides
 		Документ определен так:
 		*/
 
-		[ShowBodyOnSlide]
 		public class Document
 		{
 			public int Id;
@@ -57,7 +56,6 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		[ExpectedOutput("True\r\nTrue\r\nTrue")]
-		[ShowOnSlide]
 		public static void Main()
 		{
 			Document[] docs =

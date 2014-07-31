@@ -33,20 +33,11 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MarkdownDeep">
-      <HintPath>..\..\packages\MarkdownDeep.NET.1.5\lib\.NetFramework 3.5\MarkdownDeep.dll</HintPath>
-    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Slides\LINQ\012-AdditionalMethods.cs">
@@ -58,22 +49,22 @@
     <Compile Include="Slides\LINQ\011-SelectWhereToArray.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\01-Intro.cs">
+    <Compile Include="Slides\LINQ\010-Intro.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\02-ReadNumbersExcercise.cs">
+    <Compile Include="Slides\LINQ\020-ReadNumbersExcercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\03-ReadPointsExcercise.cs">
+    <Compile Include="Slides\LINQ\030-ReadPointsExcercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\04-SelectMany.cs">
+    <Compile Include="Slides\LINQ\040-SelectMany.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\05-SelectManyExercise.cs">
+    <Compile Include="Slides\LINQ\050-SelectManyExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\06-CartesianProductExercise.cs">
+    <Compile Include="Slides\LINQ\060-CartesianProductExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Slides\LINQ\07-SortAndDistinct.cs">
@@ -106,6 +97,7 @@
     <Compile Include="Slides\LINQ\16-AggregateExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="Point.cs" />
     <Compile Include="Slides_Tests.cs" />
     <Compile Include="heap.cs" />
     <Compile Include="Program.cs" />

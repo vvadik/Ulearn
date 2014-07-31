@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Slide("Задача. Самое длинное слово", "{04A35AE5-67B9-4674-B4C5-98E8976F87F9}")]
+	[Slide("Поиск самого длинного слова", "{04A35AE5-67B9-4674-B4C5-98E8976F87F9}")]
 	public class AggregateExercise
 	{
 		/*
@@ -12,8 +12,9 @@ namespace uLearn.Courses.Linq.Slides
 		Дан список слов, нужно найти самое длинное слово из этого списка, 
 		а из всех самых длинных — лексикографически первое слово.
 
-		Решите эту задачу без использования методов сортировки. 
-		Дело в том, что сложность сортировки O(N * log(N)), однако эту задачу можно решить за O(N).
+		Решите эту задачу в одно выражение. 
+		
+		Не используйте методы сортировки — сложность сортировки O(N * log(N)), однако эту задачу можно решить за O(N).
 
 		*/
 
@@ -27,12 +28,11 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		[ExpectedOutput("azazsdsd12345")]
-		[ShowOnSlide]
 		public static void Main()
 		{
-			Console.Write(GetLongest(new[] {"azaz", "as", "sdsd"}));
-			Console.Write(GetLongest(new[] {"zzzz", "as", "sdsd"}));
-			Console.Write(GetLongest(new[] {"as", "12345", "as", "sds"}));
+			Console.WriteLine(GetLongest(new[] {"azaz", "as", "sdsd"}));
+			Console.WriteLine(GetLongest(new[] {"zzzz", "as", "sdsd"}));
+			Console.WriteLine(GetLongest(new[] {"as", "12345", "as", "sds"}));
 		}
 	}
 }

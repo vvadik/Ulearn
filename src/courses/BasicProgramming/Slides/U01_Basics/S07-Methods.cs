@@ -17,7 +17,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		*/
 
 		[ExpectedOutput("1764")]
-		[ShowOnSlide]
 		static public void Main()
 		{
 			Print(GetSquare(42));

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Slide("Задача. Чтение списка чисел", "{CBA7BC68-F1B9-46B1-93D4-49AC113A1D02}")]
+	[Slide("Чтение списка чисел", "{CBA7BC68-F1B9-46B1-93D4-49AC113A1D02}")]
 	public class ReadNumbersExcercise
 	{
 		/*
@@ -24,7 +24,6 @@ namespace uLearn.Courses.Linq.Slides
 		*/
 
 
-		[ShowOnSlide]
 		[ExpectedOutput("0\n0\n1\n-3\n0")]
 		public static void Main()
 		{

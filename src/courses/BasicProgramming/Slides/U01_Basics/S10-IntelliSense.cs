@@ -25,9 +25,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		[Hint("Функция округления вверх — Math.Ceiling")]
 		[ExpectedOutput(@"Hello, Student, your salary is 11
 Hello, Bill Gates, your salary is 10000001
-Hello, Steve Jobs, your salary is 1
-")]
-		[ShowOnSlide]
+Hello, Steve Jobs, your salary is 1")]
 		public static void Main()
 		{
 			

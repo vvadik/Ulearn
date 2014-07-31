@@ -16,7 +16,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 
 		[Hint(@"")]
 		[ExpectedOutput("82\r\n70\r\n70\r\nstartc\r\nkittyyyyyy\r\nC+++++++++")]
-		[ShowOnSlide]
 		public static void Main()
 		{
 			string string1 = Start("start", "c");
@@ -28,7 +27,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		}
 
 		[Exercise]
-		private static string Start(string startstring, string s)
+		public static string Start(string startstring, string s)
 		{
 			while (true)
 			{
@@ -47,16 +46,14 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			*/
 		}
 
-		[ShowOnSlide]
-		private static void MagicFunction(string str)
+		public static void MagicFunction(string str)
 		{
 			Console.WriteLine((str.Length*397)%100);
 		}
 
-		[ShowOnSlide]
-		private static bool MagicChecker(string str)
+		public static bool MagicChecker(string str)
 		{
-			return (int)str.Substring(str.Length / 2).Last() % 3 == 0;
+			return str.Substring(str.Length / 2).Last() % 3 == 0;
 		}
 	}
 }

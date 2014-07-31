@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Slide("Задача. Частотный словарь текста", "{0535734D-D258-44C6-99F3-F96258BCCA6F}")]
+	[Slide("Создание частотного словаря", "{0535734D-D258-44C6-99F3-F96258BCCA6F}")]
 	public class GroupingExercise
 	{
 		/*
@@ -43,7 +43,6 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		[ExpectedOutput("you 2\r\nknows 1")]
-		[ShowOnSlide]
 		public static void Main()
 		{
 			var words = GetMostFrequentWords("You?! Or not you... who knows?", 2);

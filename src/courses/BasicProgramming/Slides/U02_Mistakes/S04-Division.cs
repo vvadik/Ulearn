@@ -14,7 +14,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		Результат деления нужно выводить на консоль. Если делить нельзя, выводите строку "impossible".
 		*/
 
-		[ShowOnSlide]
 		[ExpectedOutput("24\r\nimpossible\r\n-30\r\n5\r\n3\r\nimpossible\r\nimpossible\r\n-17\r\n0\r\nimpossible")]
 		public static void Main()
 		{

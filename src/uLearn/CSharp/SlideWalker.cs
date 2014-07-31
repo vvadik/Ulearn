@@ -94,6 +94,10 @@ namespace uLearn.CSharp
 		public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
 		{
 			var newMethod = (MethodDeclarationSyntax)base.VisitMethodDeclaration(node);
+			if (ShowOnSlide(node))
+			{
+				AddCodeBlock(node);
+			}
 			if (node.HasAttribute<ExpectedOutputAttribute>())
 			{
 				IsExercise = true;
@@ -115,19 +119,24 @@ namespace uLearn.CSharp
 					ExerciseNode = node;
 					ExerciseInitialCode = GetExerciseCode(node);
 				}
-				return null;
+			var includeInSolution =
+				!node.HasAttribute<ExerciseAttribute>()
+				&& !node.HasAttribute<ExcludeFromSolutionAttribute>();
+			return includeInSolution ? newMethod.WithoutAttributes() : null;
 			}
-			return newMethod.WithoutAttributes();
-		}
 
 		private static bool ShowOnSlide(MemberDeclarationSyntax node)
 		{
-			return node.HasAttribute<ShowBodyOnSlideAttribute>() || node.HasAttribute<ShowOnSlideAttribute>();
+			return !node.HasAttribute<SlideAttribute>()
+			&& !node.HasAttribute<HideOnSlideAttribute>() 
+			&& !node.HasAttribute<ExerciseAttribute>();
 		}
 
 		private SlideBlock CreateSampleBlock(MethodDeclarationSyntax node)
 		{
-			var code = node.HasAttribute<ShowOnSlideAttribute>() ? node.WithoutAttributes().ToPrettyString() : node.Body.Statements.ToFullString();
+			var code = node.HasAttribute<ShowBodyOnSlideAttribute>() 
+				? node.Body.Statements.ToFullString()
+				: node.WithoutAttributes().ToPrettyString();
 			return SlideBlock.FromCode(code.RemoveCommonNesting());
 		}
 

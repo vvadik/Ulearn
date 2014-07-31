@@ -11,7 +11,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		Иногда заказчикам требуются невероятные вещи. Вот, например, сейчас, клиенту нужна программа,
 		которая считает сколько раз надо умножить одно положительное число на другое положительное число,
 		чтобы оно переполнилось из сандартного типа, который, в добавок, может быть нескольких видов.
-		К счастью, гарантировали, что вам не попадутся еденички в качестве второго числа.
+		К счастью, гарантировали, что вам не попадутся единички в качестве второго числа.
 		*/
 
 		public enum Types
@@ -25,7 +25,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		      Это обусловлено способом хранения числа в двоичном представлении.
 		      Его даже можно переполнить снова, и оно опять станет положительным.")]
 		[ExpectedOutput("13\r\n7\r\n63\r\n9")]
-		[ShowOnSlide]
 		public static void Main()
 		{
 			Console.WriteLine(OverflowPowerNumber(Types.Integer, "3", 5));
@@ -43,6 +42,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			*/
 		}
 
+		[ExcludeFromSolution]
+		[HideOnSlide]
 		private static int CalcForLong(long accumulator, int multiplier)
 		{
 			int count = 0;
@@ -54,6 +55,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			return count;
 		}
 
+		[ExcludeFromSolution]
+		[HideOnSlide]
 		private static int CalcForInteger(int accumulator, int multiplier)
 		{
 			int count = 0;

@@ -23,7 +23,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		
 		      иначе, уменьшается на 20
 		*/
-		[ShowOnSlide]
 		[ExpectedOutput("8\r\n84\r\n4\r\n244")]
 		public static void Main()
 		{

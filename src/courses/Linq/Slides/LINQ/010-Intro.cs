@@ -6,6 +6,7 @@ namespace uLearn.Courses.Linq.Slides
 	[Slide("Введение", "{3446FAB2-15DF-4045-AB40-ABC1F3DC87C8}")]
 	public class Intro
 	{
+		[HideOnSlide]
 		private readonly Letter[] letters = new Letter[0];
 		/*
 		Linq — это встроенный в язык C# механизм для лаконичной и компактной записи алгоритмов манипуляции коллекциями элементов.
@@ -16,7 +17,6 @@ namespace uLearn.Courses.Linq.Slides
 		Продемонстрируем эти слова примером:
 		*/
 
-		[ShowOnSlide]
 		public int[] GetNewLettersIds_ClassicWay()
 		{
 			var res = new List<int>();
@@ -34,12 +34,12 @@ namespace uLearn.Courses.Linq.Slides
 		А вот версия решения той же задачи с помощью Linq:
 		*/
 
-		[ShowOnSlide]
 		public int[] GetNewLettersIds_LinqWay()
 		{
 			return letters.Where(l => l.IsNew).Select(l => l.Id).ToArray();
 		}
 
+		[HideOnSlide]
 		public class Letter
 		{
 			public bool IsNew { get; set; }

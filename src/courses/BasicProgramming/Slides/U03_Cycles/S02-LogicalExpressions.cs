@@ -18,7 +18,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		Помогите ему написать программу, которая поможет ему определиться с тем, какие компьютеры подходят под его условия.
 		*/
 		
-		[ShowOnSlide]
 		[ExpectedOutput("False\r\nTrue\r\nTrue")]
 		public static void Main()
 		{

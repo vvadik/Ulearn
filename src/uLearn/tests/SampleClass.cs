@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace uLearn.tests
 {
+	[Slide("title", "id")]
 	public class SampleClass
 	{
 		[ShowBodyOnSlide]

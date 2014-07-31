@@ -25,9 +25,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			FunnyMouse
 		}
 
-		[Hint("переменная типа bool, приведенная к строке, начинается с заглавной буквы")]
+		[Hint("Переменная типа bool, приведенная к строке, начинается с заглавной буквы")]
 		[ExpectedOutput("CSharpMouse\r\nFunnyMouse\r\nLuckyMouse\r\nCSharpMouse")]
-		[ShowOnSlide]
 		public static void Main()
 		{
 			Mouses firstMouse = GetMouse(13);

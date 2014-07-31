@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Slide("Задача. Объединение коллекций", "{7DB3F797-B99B-4580-ABE6-BB4EE929BB6B}")]
+	[Slide("Объединение коллекций", "{7DB3F797-B99B-4580-ABE6-BB4EE929BB6B}")]
 	public class SelectManyExercise
 	{
 		/*
@@ -14,10 +14,9 @@ namespace uLearn.Courses.Linq.Slides
 		Учебный класс определен так:
 		*/
 
-		[ShowBodyOnSlide]
 		public class Classroom
 		{
-			public List<string> Students = new List<string>();
+			public List<string> Students;
 		}
 
 		/*
@@ -41,15 +40,9 @@ namespace uLearn.Courses.Linq.Slides
 
 		/*
 		Напишите решение этой задачи с помощью Linq в одно выражение.
-
-		### Краткая справка
-		  * `IEnumerable<R> SelectMany(this IEnumerable<T> items, Func<T, IEnumerable<R>> f)`
-		  * `T[] ToArray(this IEnumerable<T> items)`
-		
 		*/
 
 		[ExpectedOutput("Pavel\r\nIvan\r\nPetr\r\nAnna\r\nIlya\r\nVladimir\r\nBulat\r\nAlex\r\nGalina")]
-		[ShowOnSlide]
 		public static void Main()
 		{
 			Classroom[] classes =
@@ -63,11 +56,12 @@ namespace uLearn.Courses.Linq.Slides
 				Console.WriteLine(e);
 		}
 
-		[Exercise(SingleStatement = true)]
+		[Exercise]
+		[Hint("`IEnumerable<R> SelectMany(this IEnumerable<T> items, Func<T, IEnumerable<R>> f)`")]
+		[Hint("`T[] ToArray(this IEnumerable<T> items)`")]
 		public static string[] GetAllStudents(Classroom[] classes)
 		{
 			return classes.SelectMany(c => c.Students).ToArray();
-			// пишите решение тут
 		}
 	}
 }

@@ -36,9 +36,9 @@ namespace uLearn.Courses.Linq.Slides
 		Тут самое время ещё раз взглянуть на пример с первого слайда — его логика должна проясниться:
 		*/
 
+		[HideOnSlide]
 		private readonly Intro.Letter[] letters = new Intro.Letter[0];
 
-		[ShowOnSlide]
 		public IEnumerable<int> GetNewLettersIds()
 		{
 			return letters.Where(l => l.IsNew).Select(l => l.Id);

@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Slide("Задача. Словарь текста", "{ACB110B3-C2F0-4E1A-9645-76DF88A75A7F}")]
+	[Slide("Составление словаря", "{ACB110B3-C2F0-4E1A-9645-76DF88A75A7F}")]
 	public class SortExercise
 	{
 		/*
@@ -39,7 +39,6 @@ namespace uLearn.Courses.Linq.Slides
 			// ваше решение
 		}
 
-		[ShowOnSlide]
 		[ExpectedOutput("Good")]
 		public static void Main()
 		{
@@ -56,6 +55,7 @@ namespace uLearn.Courses.Linq.Slides
 			Console.WriteLine(result);
 		}
 
+		[HideOnSlide]
 		public static bool IsRightAnswer(string[] words)
 		{
 			var rightAnswer = new[]

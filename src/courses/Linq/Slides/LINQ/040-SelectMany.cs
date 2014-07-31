@@ -26,7 +26,7 @@ namespace uLearn.Courses.Linq.Slides
 		{
 			string[] words = {"ab", "", "c", "de"};
 			IEnumerable<char> letters = words.SelectMany(w => w.ToCharArray());
-			Assert.That(letters, Is.EqualTo(new[] {'a', 'b', 'c', 'd', 'e'}).AsCollection);
+			Assert.That(letters, Is.EqualTo(new[] {'a', 'b', 'c', 'd', 'e'}));
 		}
 
 		/* 
@@ -39,8 +39,8 @@ namespace uLearn.Courses.Linq.Slides
 		public void SelectManyDemo2()
 		{
 			string[] words = {"ab", "", "c", "de"};
-			IEnumerable<char> letters = words.SelectMany(w => w);
-			Assert.That(letters, Is.EqualTo(new[] {'a', 'b', 'c', 'd', 'e'}).AsCollection);
+			IEnumerable<char> letters = words.SelectMany(w => w); // <=
+			Assert.That(letters, Is.EqualTo(new[] {'a', 'b', 'c', 'd', 'e'}));
 		}
 	}
 }

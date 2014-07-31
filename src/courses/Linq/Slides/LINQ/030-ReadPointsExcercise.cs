@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Slide("Задача. Чтение списка точек", "{563307C9-F265-4EA0-B06E-8390582F718E}")]
+	[Slide("Чтение списка точек", "{563307C9-F265-4EA0-B06E-8390582F718E}")]
 	public class ReadPointsExcercise
 	{
 		/*
@@ -22,7 +22,6 @@ namespace uLearn.Courses.Linq.Slides
 		Считайте, что за вас уже вызвали функцию `File.ReadLines(filename)` и вашей функции пердают строки, прочитанные из файла:
 		*/
 		[ExpectedOutput("1 -2\n-3 4\n0 2\n1 -42")]
-		[ShowOnSlide]
 		public static void Main()
 		{
 			foreach (var point in ParsePoints(new[] { "1 -2", "-3 4", "0 2" }))
@@ -30,8 +29,16 @@ namespace uLearn.Courses.Linq.Slides
 			foreach (var point in ParsePoints(new List<string> { "+01 -0042" }))
 				Console.WriteLine(point.X + " " + point.Y);
 		}
-		[ShowOnSlide]
-		public class Point { public int X, Y; }
+
+		public class Point
+		{
+			public Point(int x, int y)
+			{
+				X = x;
+				Y = y;
+			}
+			public int X, Y;
+		}
 
 		[Exercise(SingleStatement = true)]
 		[Hint("string.Split — разбивает строку на части по разделителю")]
@@ -43,7 +50,7 @@ namespace uLearn.Courses.Linq.Slides
 		{
 			return lines
 				.Select(line => line.Split(' ').Select(int.Parse).ToList())
-				.Select(nums => new Point {X = nums[0], Y = nums[1]})
+				.Select(nums => new Point(nums[0], nums[1]))
 				.ToList();
 			/*uncomment
 			return lines

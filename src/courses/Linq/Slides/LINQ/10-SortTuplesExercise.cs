@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Slide("Задача. Сравнение кортежей", "{80D43879-1099-4972-AEE1-6EB3EDF1E923}")]
+	[Slide("Сортировка кортежей", "{80D43879-1099-4972-AEE1-6EB3EDF1E923}")]
 	public class SortTuples
 	{
 		/*
@@ -38,7 +38,6 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		[ExpectedOutput("Good")]
-		[ShowOnSlide]
 		public static void Main()
 		{
 			var sortedList = GetSortedWords("you?! or not you... who knows?");
@@ -46,7 +45,7 @@ namespace uLearn.Courses.Linq.Slides
 			Console.WriteLine(result);
 		}
 
-		[ShowOnSlide]
+		[HideOnSlide]
 		public static bool IsRightAnswer(List<string> sortedWords )
 		{
 			var rightAnswer = new[] {"or", "not", "who", "you", "knows"};

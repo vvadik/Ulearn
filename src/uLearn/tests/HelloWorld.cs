@@ -2,6 +2,7 @@
 
 namespace uLearn.tests
 {
+	[Slide("title", "id")]
 	public class S01_HelloWorld
 	{
 		/*
@@ -10,7 +11,6 @@ namespace uLearn.tests
 		*/
 
 		[ExpectedOutput("Hello, kitty!")]
-		[ShowOnSlide]
 		public void Main()
 		{
 			HelloKitty();

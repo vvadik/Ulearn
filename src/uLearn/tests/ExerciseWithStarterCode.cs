@@ -2,6 +2,7 @@
 
 namespace uLearn.tests
 {
+	[Slide("title", "id")]
 	internal class ExerciseWithStarterCode
 	{
 		/*

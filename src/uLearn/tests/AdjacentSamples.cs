@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace uLearn.tests
 {
+	[Slide("title", "id")]
 	class AdjacentSamples
 	{
-		[ShowOnSlide]
 		public void Sample1()
 		{
 			Console.WriteLine("S1");
 		}
-		[ShowOnSlide]
 		public void Sample2()
 		{
 			Console.WriteLine("S2");

@@ -22,7 +22,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		public static int Fullness = 0;
 
 		
-		[ShowOnSlide]
 		[ExpectedOutput("42\r\n112\r\n68")]
 		public static void Main()
 		{
@@ -56,13 +55,11 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			*/
 		}
 
-		[ShowOnSlide]
 		private static void EatGrass(int number)
 		{
 			Fullness += ((number*397*13)%199)%30;
 		}
 
-		[ShowOnSlide]
 		private static bool Filter(int number)
 		{
 			return (number*number)%3 == number%3;
