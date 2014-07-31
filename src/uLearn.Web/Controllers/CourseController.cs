@@ -33,17 +33,17 @@ namespace uLearn.Web.Controllers
 		}
 
 		[Authorize]
-		public ActionResult Slide(string courseId, int slideIndex = 0)
+		public async Task<ActionResult> Slide(string courseId, int slideIndex = 0)
 		{
-			var model = CreateCoursePageModel(courseId, slideIndex);
+			var model = await CreateCoursePageModel(courseId, slideIndex);
 			return View(model);
 		}
 
-		private CoursePageModel CreateCoursePageModel(string courseId, int slideIndex)
+		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, int slideIndex)
 		{
 			Course course = courseManager.GetCourse(courseId);
 			var isPassedTask = solutionsRepo.IsUserPassedTask(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId());
-			VisitSlide(courseId, course.Slides[slideIndex].Id);
+			await VisitSlide(courseId, course.Slides[slideIndex].Id);
 			var model = new CoursePageModel
 			{
 				Course = course,
@@ -59,10 +59,10 @@ namespace uLearn.Web.Controllers
 		}
 
 		[Authorize]
-		public ActionResult AcceptedSolutions(string courseId, int slideIndex = 0)
+		public async Task<ActionResult> AcceptedSolutions(string courseId, int slideIndex = 0)
 		{
 			var userId = User.Identity.GetUserId();
-			var coursePageModel = CreateCoursePageModel(courseId, slideIndex);
+			var coursePageModel = await CreateCoursePageModel(courseId, slideIndex);
 			var solutions = coursePageModel.IsPassedTask
 				? solutionsRepo.GetAllAcceptedSolutions(courseId, coursePageModel.Course.Slides[slideIndex].Id)
 				: new List<AcceptedSolutionInfo>();
