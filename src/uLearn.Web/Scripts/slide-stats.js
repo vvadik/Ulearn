@@ -5,7 +5,7 @@
         url: $("#ratesBar").data("url"),
         data: {rate:rate}
     }).success(function (ans) {
-            console.log(ans);
+            FillRate(rate);
         })
 		.fail(function (req) {
 		    console.log(req.responseText);
@@ -16,6 +16,18 @@
 
 function FillRate(rate) {
     var switcher = rate.toLowerCase();
-    console.log(switcher);
+    var colors = {};
+    colors["good"] = "btn-success";
+    colors["notunderstand"] = "btn-danger";
+    colors["trivial"] = "btn-info";
+    var rated = false;
+    if (colors[switcher] != undefined)
+        rated = true;
+    for (var i in colors) {
+            $("#" + i).parent().removeClass(colors[i]);
+        }
+    if (rated)
+        $("#next_slide_button").removeClass("block-next");
     $("#" + switcher).parent().button('toggle');
+    $("#" + switcher).parent().addClass(colors[switcher]);
 };

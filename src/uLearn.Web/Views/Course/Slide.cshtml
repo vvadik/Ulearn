@@ -76,7 +76,7 @@
 			@Html.Partial("_RatesBar")
 			@Html.Partial("_SlideNavigation", Model)
 			<div id="WatchQuestions" data-url="@Url.Action("GetAllQuestions")">
-				<button onclick="printAllQuestions('@Model.Slide.Info.UnitName')">Посмотреть все заданные вопросы по теме</button>
+			    <button hidden onclick="printAllQuestions('@Model.Slide.Info.UnitName')">Посмотреть все заданные вопросы по теме</button>
 			</div>
 			<div class="questions-log"></div>
 		</div>

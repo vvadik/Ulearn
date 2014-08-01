@@ -166,7 +166,7 @@ a.nav-arrow:hover {
     border-bottom: 1px solid #eee;
     padding: 0.5em 0 0.5em 2em;
     cursor: pointer;
-    color:#428bca;
+    color: #428bca;
 }
 
     .slide-list-item.selected {
@@ -174,7 +174,7 @@ a.nav-arrow:hover {
         font-weight: bolder;
         list-style-type: none;
         cursor: pointer;
-        color:#428bca;
+        color: #428bca;
     }
 
 .side-bar {
@@ -235,25 +235,35 @@ a.nav-arrow:hover {
     text-decoration: none;
 }
 
-.clear-code:hover {
+    .clear-code:hover {
         text-decoration: none;
         color: white;
         cursor: pointer;
         background-color: #838383;
-}
+    }
 
 .likes-counter {
     margin-left: 0px;
 }
 
 .rate-buttons {
-	margin-top: 10px;
-	margin-bottom: 10px;
-	float:right;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    float: right;
 }
 
-table.diff tbody th{
-	padding:0 3px 0 0;
-	text-align: right;
-	vertical-align: middle;
+table.diff tbody th {
+    padding: 0 3px 0 0;
+    text-align: right;
+    vertical-align: middle;
+}
+
+.block-next {
+    color: gray;
+    background-color: aliceblue;
+}
+
+.free-next {
+    color: black;
+    background-color: white;
 }
