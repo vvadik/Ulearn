@@ -1,5 +1,5 @@
 ﻿@model uLearn.CoursePageModel
-<a data-toggle="modal" data-target="#myModal" href="#myModal">
+<a id="ask_question_window" data-toggle="modal" data-target="#myModal" href="#myModal">
 	Задать вопрос по материалу
 </a>
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -11,7 +11,7 @@
 			</div>
 			<div class="modal-body">
 				<textarea id="questField" class="ask-bar"> </textarea>
-				<button class="btn btn-primary" id="sendButton" type="button" data-dismiss="modal" onclick="sendQues tion('@Model.Slide.Title', '@Model.Slide.Info.UnitName')">Отправить</button>
+				<button class="btn btn-primary" id="sendButton" type="button" data-dismiss="modal" onclick="sendQuestion('@Model.Slide.Title', '@Model.Slide.Info.UnitName')">Отправить</button>
 			</div>
 		</div>
 	</div>

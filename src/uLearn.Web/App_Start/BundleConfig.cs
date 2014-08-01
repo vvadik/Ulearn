@@ -49,6 +49,7 @@ namespace uLearn.Web
 				"~/Jsdifflib/jsdifflib.css",
 				"~/Content/tablesorter.css",
 				"~/Content/ulearn.css",
+				"~/Content/bounce.css",
 				"~/Content/site.css"));
 			
 		}

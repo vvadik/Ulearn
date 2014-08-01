@@ -54,3 +54,14 @@ var slideNavigation = {
 }
 var $parent = $("#nav_arrows");
 slideNavigation.update($parent.data("hasnext"), !!$parent.data("hasprev"));
+
+document.getElementById('next_slide_button').onclick = function () {
+    var rated = !($("#notwatched").hasClass("not-watched"));
+    $("#ratings").removeClass("bounce-effect");
+    if (rated)
+        $("#next_slide_button").removeClass("block-next");
+    else
+        $("#ratings").addClass("bounce-effect");
+        //alert("Give us a rate, dude!");
+    return rated;
+};
