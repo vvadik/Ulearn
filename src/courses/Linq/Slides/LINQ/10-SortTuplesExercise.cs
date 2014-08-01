@@ -46,6 +46,7 @@ namespace uLearn.Courses.Linq.Slides
 			Console.WriteLine(result);
 		}
 
+		[ShowOnSlide]
 		public static bool IsRightAnswer(List<string> sortedWords )
 		{
 			var rightAnswer = new[] {"or", "not", "who", "you", "knows"};

@@ -31,7 +31,7 @@
 	                    var itemClass = "";
 	                    if (Model.VisitedSlide.Contains(slide.Id))
 	                    {
-	                        if (slide is ExerciseSlide) //(Model.SolvedSlide.Contains(slide.Id) ? "glyphicon glyphicon-edit label-success" : "glyphicon glyphicon-edit label-danger") : (Model.Slide is ExerciseSlide ? "glyphicon glyphicon-edit" : "");
+	                        if (slide is ExerciseSlide)
 							{
 								itemClass = Model.SolvedSlide.Contains(slide.Id) ? "glyphicon glyphicon-edit navbar-label-success" : "glyphicon glyphicon-edit navbar-label-danger";
 	                        }
