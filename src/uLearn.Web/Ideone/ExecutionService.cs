@@ -27,6 +27,18 @@ namespace uLearn.Web.Ideone
 			var createSubmitionResult = new CreateSubmitionResult(ParseResponse(response));
 			return createSubmitionResult.Link;
 		}
+		
+		public IEnumerable<KeyValuePair<string, string>> GetSupportedLanguages()
+		{
+			object[] response = service.getLanguages(userName, password);
+			var languagesNode = ParsePair(response.OfType<XmlElement>().ElementAt(1)).Value;
+			return ParseResponse(languagesNode.ChildNodes.Cast<XmlNode>());
+		}
+
+		private KeyValuePair<string, XmlElement> ParsePair(XmlElement element)
+		{
+			return new KeyValuePair<string, XmlElement>(element.ChildNodes[0].InnerText, (XmlElement) element.ChildNodes[1]);
+		}
 
 		public GetSubmitionStatusResult GetSubmitionStatus(string link)
 		{
@@ -63,8 +75,7 @@ namespace uLearn.Web.Ideone
 			return
 				response
 					.OfType<XmlElement>()
-					.Select(o => Tuple.Create(o.ChildNodes[0], o.ChildNodes[1]))
-					.ToDictionary(x => x.Item1.InnerText, x => x.Item2.InnerText);
+					.ToDictionary(x => x.ChildNodes[0].InnerText, x => x.ChildNodes[1].InnerText);
 		}
 	}
 }
