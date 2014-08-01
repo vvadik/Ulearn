@@ -53,7 +53,9 @@ namespace uLearn.Web.Controllers
 				PrevSlideIndex = slideIndex - 1,
 				IsPassedTask = isPassedTask,
 				LatestAcceptedSolution = isPassedTask ? solutionsRepo.GetLatestAcceptedSolution(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId()) : null,
-				Rate = GetRate(course.Id, course.Slides[slideIndex].Id)
+				Rate = GetRate(course.Id, course.Slides[slideIndex].Id),
+				SolvedSlide = solutionsRepo.GetIndexesOfPassedSlide(course.Id, User.Identity.GetUserId()),
+				VisitedSlide = visitersRepo.GetIndexesOfVisitedSlide(course.Id, User.Identity.GetUserId())
 			};
 			return model;
 		}

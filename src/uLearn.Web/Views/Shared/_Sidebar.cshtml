@@ -1,4 +1,5 @@
-﻿@model uLearn.CoursePageModel
+﻿@using uLearn
+@model uLearn.CoursePageModel
 <ul class="side-bar units-list">
 	@{
 	    int index = 0;
@@ -26,8 +27,28 @@
 	                        break;
 	                    }
 	                    var selectedSlide = index == Model.SlideIndex;
-	                    var url = Url.Action("Slide", "Course", new {courseId = Model.Course.Id, slideIndex = index});
-	                    <li class="slide-list-item @(selectedSlide ? "selected" : "")" onclick="window.location.href = '@url'">@slide.Title</li>
+						var url = Url.Action("Slide", "Course", new { courseId = Model.Course.Id, slideIndex = index });
+	                    var itemClass = "";
+	                    if (Model.VisitedSlide.Contains(slide.Id))
+	                    {
+	                        if (slide is ExerciseSlide) //(Model.SolvedSlide.Contains(slide.Id) ? "glyphicon glyphicon-edit label-success" : "glyphicon glyphicon-edit label-danger") : (Model.Slide is ExerciseSlide ? "glyphicon glyphicon-edit" : "");
+							{
+								itemClass = Model.SolvedSlide.Contains(slide.Id) ? "glyphicon glyphicon-edit navbar-label-success" : "glyphicon glyphicon-edit navbar-label-danger";
+	                        }
+	                        else
+							{
+								itemClass = "glyphicon glyphicon-ok navbar-label-success";
+	                        }
+	                    }
+	                    else
+	                    {
+	                        if (slide is ExerciseSlide)
+							{
+								itemClass = "glyphicon glyphicon-edit navbar-label-default";
+	                        }
+	                    }
+						<i class="@itemClass navbar-label"></i>
+	                    <li class="slide-list-item @(selectedSlide ? "selected" : "") " onclick="window.location.href = '@url'">@slide.Title</li>
 	                }
 	            </ul>
 	        </li>

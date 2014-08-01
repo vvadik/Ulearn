@@ -256,6 +256,28 @@ table.diff tbody th {
     padding: 0 3px 0 0;
     text-align: right;
     vertical-align: middle;
+
+.like-left-location {
+    margin-right: 10px;
+    float: left;
+}
+
+.navbar-label {
+    float: left;
+    margin-right: 5px;
+    margin-top: 7px;
+}
+
+.navbar-label-default {
+    color: lightgray;
+}
+
+.navbar-label-success {
+    color: lightgreen;
+}
+
+.navbar-label-danger {
+    color: lightcoral;
 }
 
 .block-next {

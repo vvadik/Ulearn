@@ -7,17 +7,17 @@
 <div class="slide-container">
 	<div class="container body-content">
 		<div class="row">
-			<div id="LikeSolutionUrl" data-url="@Url.Action("LikeSolution")"></div>
+		    <div id="LikeSolutionUrl" data-url="@Url.Action("LikeSolution")"></div>
+			<h1 class='page-header'>Другие решения</h1>
 			@foreach (AcceptedSolutionInfo solution in Model.AcceptedSolutions)
 			{
 				var id = "solution_" + solution.Id;
 				<div id="@id">
-					<textarea class='code code-sample'>@solution.Code</textarea>
-
-					<button class="btn @(solution.LikedAlready ? "btn-primary" : "btn-default") like-button" onclick="likeSolution(@solution.Id)">
+					<button class="like-left-location btn @(solution.LikedAlready ? "btn-primary" : "btn-default") like-button" onclick="likeSolution(@solution.Id)">
 						<i class="glyphicon glyphicon-thumbs-up"></i>
 						<span class="likes-counter">@solution.UsersWhoLike.Count</span>
 					</button>
+					<textarea class='code code-sample'>@solution.Code</textarea>
 				</div>
 			}
 			@Html.Partial("_SlideNavigation", Model.CoursePageModel)

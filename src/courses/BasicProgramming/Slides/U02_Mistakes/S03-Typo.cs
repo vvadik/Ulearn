@@ -14,9 +14,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		Сделйте так, чтобы код компилировался и писал нужные строки.
 		*/
 
-		public static int Satiety = 0;
-
-
 		[Exercise]
 		[ExpectedOutput("Hello, World!\r\n12.5")]
 		public static void Main()
