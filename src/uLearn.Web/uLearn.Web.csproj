@@ -552,6 +552,7 @@
     <Content Include="codemirror\theme\xq-light.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\bounce.css" />
     <Content Include="Content\tablesorter.css" />
     <Content Include="Content\ulearn.css" />
     <Content Include="favicon.ico" />
@@ -680,6 +681,7 @@
     <Content Include="tablesorter-master\themes\green\green.zip" />
     <Content Include="Views\Analytics\UsersStatistics.cshtml" />
     <Content Include="Views\Analytics\PersonalStatistics.cshtml" />
+    <Content Include="Views\Course\_SolutionControl.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

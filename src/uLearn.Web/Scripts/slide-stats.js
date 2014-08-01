@@ -1,4 +1,8 @@
 ﻿function handleRate(rate) {
+    if (rate == "NotUnderstand")
+        $("#ask_question_window").click();
+    $("#notwatched").removeClass("not-watched");
+    $("#ratings").removeClass("bounce");
     $.ajax(
     {
         type: "POST",
@@ -28,6 +32,8 @@ function FillRate(rate) {
         }
     if (rated)
         $("#next_slide_button").removeClass("block-next");
+    else
+        $("#notwatched").addClass("not-watched");
     $("#" + switcher).parent().button('toggle');
     $("#" + switcher).parent().addClass(colors[switcher]);
 };

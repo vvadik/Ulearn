@@ -3,27 +3,27 @@
     @{ var slide = Model.Slide as uLearn.ExerciseSlide;}
     <div id="hintsStore" data-url="@Url.Action("GetHint")"></div>
     @for (int index = 0; index < slide.HintsHtml.Length; index++)
-    {
-        var hintHtml = slide.HintsHtml[index];
-        var id = "hint" + (index + 1);
-        <div class="panel panel-default">
-            <div id="@("hintPanel"+index)"  class="panel-heading" data-url="@Url.Action("AddHint")">
-                <h4 class="panel-title">
-					<a onclick="addHints(@index,'@Model.Course.Id','@Model.Slide.Id')"
-					   data-toggle="collapse" data-parent="#hints-accordion" href="#@id" data-target="#@id">
-						Подсказка @(index + 1)
-					</a>
-                </h4>
-            </div>
-            <div id="@id" class="panel-collapse collapse">
-                <div class="panel-body">
-                    @Html.Raw(hintHtml)
-                </div>
-            </div>
-        </div>
-    }
-
+{
+	var hintHtml = slide.HintsHtml[index];
+	var id = "hint" + (index + 1);
+	<div class="panel panel-default" style="display:none">
+		<div id="@("hintPanel"+index)" class="panel-heading" data-url="@Url.Action("AddHint")">
+			<h4 class="panel-title">
+				<a
+				   data-parent="#hints-accordion" href="#@id" data-target="#@id">
+					Подсказка @(index + 1)
+				</a>
+			</h4>
+		</div>
+		<div id="@id" class="panel">
+			<div class="panel-body">
+				@Html.Raw(hintHtml)
+			</div>
+		</div>
+	</div>
+}
+    <div id="currentHint" style="display:none">-1</div>
 	<script src="~/Scripts/slide-hints.js"></script>
 	<script src="~/Scripts/jquery-1.10.2.min.js"></script>
-	<script>getHints("@Model.Course.Id", "@Model.Slide.Id" )</script>
+	<script>getHints("@Model.Course.Id", "@Model.Slide.Id")</script>
 </div>

@@ -86,11 +86,6 @@ a.nav-arrow:hover {
     margin: 20px 0 20px 0;
 }
 
-.run-solution-button {
-    margin: 20px 0 20px 0;
-    width: 100%;
-}
-
 .sphere-engine-tm {
     margin: -20px 0 0 0;
     text-align: right;
@@ -289,4 +284,23 @@ table.diff tbody th {
 .free-next {
     color: black;
     background-color: white;
+}
+
+.solution-control {
+    width: 100%;
+}
+
+.reset-btn {
+    width: 25%;
+}
+
+.hints-btn {
+    width: 25%;
+}
+
+.run-solution-button {
+    width: 50%;
+}
+
+.not-watched {
 }

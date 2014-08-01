@@ -1,5 +1,5 @@
 ﻿@model uLearn.CoursePageModel
-<form style="width:100%" class="rate-buttons" style="margin-top: 10px;">
+<form id="ratings" style="width:100%" class="rate-buttons" style="margin-top: 10px;">
 	<div id="ratesBar" data-url="@Url.Action("ApplyRate", new{ courseId = Model.Course.Id, slideId = Model.Slide.Id})"></div>
 	<div style="width:100%" class="btn-group" data-toggle="buttons">
 	    <label style="width:33%" onclick="handleRate('Good')" class="btn btn-default" data-hover-class="btn-success">
