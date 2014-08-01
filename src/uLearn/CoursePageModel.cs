@@ -1,4 +1,6 @@
-﻿namespace uLearn
+﻿using System.Collections.Generic;
+
+namespace uLearn
 {
 	public class CoursePageModel
 	{
@@ -11,6 +13,8 @@
 		public bool HasPrevSlide { get { return PrevSlideIndex >= 0; } }
 		public bool IsPassedTask { get; set; }
 		public string LatestAcceptedSolution { get; set; }
-		public string Rate{get; set;}
+		public string Rate {get; set;}
+		public HashSet<string> VisitedSlide { get; set; }
+		public HashSet<string> SolvedSlide { get; set; }
 	}
 }

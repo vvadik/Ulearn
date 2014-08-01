@@ -26,8 +26,10 @@
 	                        break;
 	                    }
 	                    var selectedSlide = index == Model.SlideIndex;
-	                    var url = Url.Action("Slide", "Course", new {courseId = Model.Course.Id, slideIndex = index});
-	                    <li class="slide-list-item @(selectedSlide ? "selected" : "")" onclick="window.location.href = '@url'">@slide.Title</li>
+						var url = Url.Action("Slide", "Course", new { courseId = Model.Course.Id, slideIndex = index });
+						//var itemClass = Model.VisitedSlide.Contains(slide.Id) ? (Model.SolvedSlide.Contains(slide.Id) ? "glyphicon glyphicon-edit" : "glyphicon glyphicon-edit") : "";
+						//<i class="glyphicon glyphicon-thumbs-up"></i>
+	                    <li class="slide-list-item @(selectedSlide ? "selected" : "") " onclick="window.location.href = '@url'">@slide.Title</li>
 	                }
 	            </ul>
 	        </li>

@@ -257,3 +257,8 @@ table.diff tbody th{
 	text-align: right;
 	vertical-align: middle;
 }
+
+.like-left-location {
+    margin-right: 10px;
+    float: left;
+}

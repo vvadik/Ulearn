@@ -78,7 +78,7 @@ namespace uLearn.Web.DataContexts
 				.Select(x => x.First())
 				.OrderByDescending(x => (x.Likes.Count+1)/timeNow.Subtract(x.Timestamp).TotalMilliseconds)
 				.Take(5)
-				.OrderBy(x => x.Likes.Count)
+				.OrderByDescending(x => x.Likes.Count)
 				.Select(x => new AcceptedSolutionInfo(x.Code, x.Id, x.Likes.Select(y => y.UserId)))
 				.ToList();
 			return answer;
@@ -104,6 +104,14 @@ namespace uLearn.Web.DataContexts
 		public int GetAcceptedSolutionsCount(string slideId, string courseId)
 		{
 			return db.UserSolutions.Where(x => x.SlideId == slideId && x.CourseId == courseId && x.IsRightAnswer).Select(x => x.UserId).Distinct().Count();
+		}
+
+		public HashSet<string> GetIndexesOfPassedSlide(string courseId, string userId)
+		{
+			return new HashSet<string>(db.UserSolutions
+				.Where(x => x.IsRightAnswer && x.CourseId == courseId && x.UserId == userId)
+				.Select(x => x.SlideId)
+				.Distinct());
 		}
 	}
 }
