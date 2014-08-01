@@ -53,7 +53,7 @@
     <Compile Include="Slides\U01_Basics\S06-Operations.cs" />
     <Compile Include="Slides\U01_Basics\S07-Methods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="Slides\U01_Basics\S08-Vision.quiz" />
+    <Compile Include="Slides\U01_Basics\S08-Vision.cs" />
     <Compile Include="Slides\U01_Basics\S09-DefaultValues.cs" />
     <Compile Include="Slides\U01_Basics\S10-IntelliSense.cs" />
     <Compile Include="Slides\U01_Basics\_HelloWorld.cs" />
