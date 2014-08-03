@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
 
 namespace uLearn.Web.Models
 {
@@ -25,7 +24,7 @@ namespace uLearn.Web.Models
 		public string UserId { get; set; }
 
 		[Required]
-		[StringLength(1024)]
+		[StringLength(4096)]
 		public string Code { get; set; }
 
 		[Required]
@@ -42,10 +41,10 @@ namespace uLearn.Web.Models
 		[Required]
 		public bool IsCompilationError { get; set; }
 
-		[StringLength(1024)]
+		[StringLength(4096)]
 		public string CompilationError { get; set; }
 
-		[StringLength(1024)]
+		[StringLength(4096)]
 		public string Output { get; set; }
 	}
 }

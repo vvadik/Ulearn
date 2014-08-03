@@ -16,7 +16,7 @@ namespace uLearn.Courses.Linq.Slides
 
 		public class Classroom
 		{
-			public List<string> Students;
+			public List<string> Students = new List<string>();
 		}
 
 		/*

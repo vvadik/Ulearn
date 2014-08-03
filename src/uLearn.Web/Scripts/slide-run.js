@@ -85,4 +85,21 @@ $runButton.click(function () {
 		});
 });
 
+var $prepareButton = $(".prepare-solution-button");
+$prepareButton.click(function () {
+	var code = $(".code-exercise")[0].codeMirrorEditor.getValue();
+	$.ajax(
+		{
+			type: "POST",
+			url: $prepareButton.data("url"),
+			data: code
+		})
+		.fail(function(req) {
+			console.log(req.responseText);
+		})
+		.success(function (ans) {
+			console.log(ans);
+		});
+});
+
 

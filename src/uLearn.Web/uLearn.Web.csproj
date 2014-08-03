@@ -59,6 +59,9 @@
       <HintPath>..\packages\MarkdownDeep.NET.1.5\lib\.NetFramework 3.5\MarkdownDeep.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="NLog">
+      <HintPath>..\packages\NLog.3.1.0.0\lib\net45\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -218,6 +221,10 @@
     <Compile Include="Migrations\201407290538592_ChangeSlideId.Designer.cs">
       <DependentUpon>201407290538592_ChangeSlideId.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201408031111210_MoreSpace_For_UserSolution_Fields.cs" />
+    <Compile Include="Migrations\201408031111210_MoreSpace_For_UserSolution_Fields.Designer.cs">
+      <DependentUpon>201408031111210_MoreSpace_For_UserSolution_Fields.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\CourseManager_should.cs" />
     <EmbeddedResource Include="Courses\**\*.*">
       <Visible>false</Visible>
@@ -281,6 +288,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201407290538592_ChangeSlideId.resx">
       <DependentUpon>201407290538592_ChangeSlideId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408031111210_MoreSpace_For_UserSolution_Fields.resx">
+      <DependentUpon>201408031111210_MoreSpace_For_UserSolution_Fields.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -573,6 +583,12 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="codemirror\README.md" />
     <None Include="encoding.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Properties\PublishProfiles\ulearn.pubxml" />

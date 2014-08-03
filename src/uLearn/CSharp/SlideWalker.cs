@@ -1,5 +1,4 @@
 using System;
-using System.Activities.Debugger;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,6 +39,51 @@ namespace uLearn.CSharp
 			if (ShowOnSlide(node))
 				AddCodeBlockInStart(node);
 			return classDeclaration;
+		}
+
+		public override SyntaxNode VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
+		{
+			var newNode =
+				((ConstructorDeclarationSyntax)base.VisitConstructorDeclaration(node))
+				.WithAttributeLists(new SyntaxList<AttributeListSyntax>());
+			var includeInSolution = !node.HasAttribute<ExcludeFromSolutionAttribute>();
+			return includeInSolution ? newNode : null;
+		}
+
+		public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
+		{
+			var newNode =
+				((FieldDeclarationSyntax)base.VisitFieldDeclaration(node))
+				.WithAttributeLists(new SyntaxList<AttributeListSyntax>());
+			var includeInSolution = !node.HasAttribute<ExcludeFromSolutionAttribute>();
+			return includeInSolution ? newNode : null;
+		}
+
+		public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
+		{
+			var newMethod = (MethodDeclarationSyntax) base.VisitMethodDeclaration(node);
+			if (ShowOnSlide(node))
+			{
+				AddCodeBlockInStart(node);
+			}
+			if (node.HasAttribute<ExpectedOutputAttribute>())
+			{
+				IsExercise = true;
+				ExpectedOutput = node.GetAttributes<ExpectedOutputAttribute>().Select(attr => attr.GetArgument()).FirstOrDefault();
+			}
+			if (node.HasAttribute<HintAttribute>())
+			{
+				Hints.AddRange(node.GetAttributes<HintAttribute>().Select(attr => attr.GetArgument()));
+			}
+			if (node.HasAttribute<ExerciseAttribute>())
+			{
+				ExerciseNode = node;
+				ExerciseInitialCode = GetExerciseCode(node);
+			}
+			var includeInSolution =
+				!node.HasAttribute<ExerciseAttribute>()
+				&& !node.HasAttribute<ExcludeFromSolutionAttribute>();
+			return includeInSolution ? newMethod.WithoutAttributes() : null;
 		}
 
 		private void AddInBlockEnumAndBasicFieldDeclarationSyntax(SyntaxNode node)
@@ -91,40 +135,6 @@ namespace uLearn.CSharp
 			Blocks.Add(SlideBlock.FromCode(node));
 		}
 
-		public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
-		{
-			var newMethod = (MethodDeclarationSyntax)base.VisitMethodDeclaration(node);
-			if (ShowOnSlide(node))
-			{
-				AddCodeBlock(node);
-			}
-			if (node.HasAttribute<ExpectedOutputAttribute>())
-			{
-				IsExercise = true;
-				ExpectedOutput = node.GetAttributes<ExpectedOutputAttribute>().Select(attr => attr.GetArgument()).FirstOrDefault();
-			}
-			if (node.HasAttribute<HintAttribute>())
-			{
-				Hints.AddRange(node.GetAttributes<HintAttribute>().Select(attr => attr.GetArgument()));
-			}
-
-			if (ShowOnSlide(node))
-			{
-				AddCodeBlockInStart(node);
-			}
-			else
-			{
-				if (node.HasAttribute<ExerciseAttribute>())
-				{
-					ExerciseNode = node;
-					ExerciseInitialCode = GetExerciseCode(node);
-				}
-			var includeInSolution =
-				!node.HasAttribute<ExerciseAttribute>()
-				&& !node.HasAttribute<ExcludeFromSolutionAttribute>();
-			return includeInSolution ? newMethod.WithoutAttributes() : null;
-			}
-
 		private static bool ShowOnSlide(MemberDeclarationSyntax node)
 		{
 			return !node.HasAttribute<SlideAttribute>()
@@ -142,7 +152,9 @@ namespace uLearn.CSharp
 
 		private SlideBlock CreateSampleBlock(ClassDeclarationSyntax node)
 		{
-			string code = node.WithAttributeLists(new SyntaxList<AttributeListSyntax>()).ToFullString().RemoveCommonNesting();
+			string code = node.WithAttributeLists(new SyntaxList<AttributeListSyntax>())
+				.ToFullString()
+				.RemoveCommonNesting();
 			return SlideBlock.FromCode(code);
 		}
 

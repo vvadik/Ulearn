@@ -12,7 +12,21 @@ namespace uLearn.tests
 		[ShowBodyOnSlide]
 		public class Point
 		{
+			[ExcludeFromSolution]
+			public Point(int x, int y)
+			{
+				X = x;
+				Y = y;
+			}
+
+			[ExcludeFromSolution]
 			public int X, Y;
+
+			[ExpectedOutput("")]
+			public void M()
+			{
+				
+			}
 		}
 	}
 }

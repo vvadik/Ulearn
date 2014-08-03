@@ -92,6 +92,16 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
+		public ContentResult PrepareSolution(string courseId, int slideIndex = 0)
+		{
+			var code = GetUserCode(Request.InputStream);
+			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
+			var solution = exerciseSlide.Solution.BuildSolution(code);
+			return Content(solution, "text/plain");
+		}
+
+		[HttpPost]
+		[Authorize]
 		public ActionResult FakeRunSolution(string courseId, int slideIndex = 0)
 		{
 			return Json(new RunSolutionResult
@@ -172,13 +182,14 @@ namespace uLearn.Web.Controllers
 		{
 			var solution = exerciseSlide.Solution.BuildSolution(code);
 			var submition = await executionService.Submit(solution, "");
-			var isRightAnswer = NormalizeString(submition.Output).Equals(NormalizeString(exerciseSlide.ExpectedOutput));
+			var output = submition.Output + "\n" + submition.StdErr;
+			var isRightAnswer = NormalizeString(output).Equals(NormalizeString(exerciseSlide.ExpectedOutput));
 			return new RunSolutionResult
 			{
 				CompilationError = submition.CompilationError,
 				IsRightAnswer = isRightAnswer,
 				ExpectedOutput = exerciseSlide.ExpectedOutput,
-				ActualOutput = submition.Output
+				ActualOutput = output
 			};
 		}
 

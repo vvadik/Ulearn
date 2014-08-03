@@ -11,17 +11,7 @@ namespace uLearn.CSharp
 	{
 		public static bool HasAttribute<TAttr>(this MemberDeclarationSyntax node) where TAttr : Attribute
 		{
-			return SyntaxExtensions.HasAttribute<TAttr>((dynamic)node);
-		}
-
-		public static bool HasAttribute<TAttr>(this MethodDeclarationSyntax node) where TAttr : Attribute
-		{
-			return node.GetAttributes<TAttr>().Any();
-		}
-
-		public static bool HasAttribute<TAttr>(this ClassDeclarationSyntax node) where TAttr : Attribute
-		{
-			return node.GetAttributes<TAttr>().Any();
+			return GetAttributes<TAttr>((SyntaxList<AttributeListSyntax>)((dynamic)node).AttributeLists).Any();
 		}
 
 		public static string GetHint(this AttributeSyntax attribute)

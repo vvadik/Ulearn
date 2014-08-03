@@ -23,7 +23,6 @@
 					{
 						@Html.Raw(block.RenderedText)
 					}
-
 				}
 				@{ var slide = Model.Slide as ExerciseSlide; }
 				@if (slide != null)
@@ -48,6 +47,7 @@
 		@if (Request.IsLocal)
 		{
 			<div class="modal-footer">
+				<a href="#" class="prepare-solution-button" data-url="@Url.Action("PrepareSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">Log prepared solution</a>
 				<a href="#" onclick="toggleFakeRun()">Переключить в тестовый режим запуска</a>
 				<script>
 					function toggleFakeRun() {
@@ -69,4 +69,3 @@
 		FillRate('@Model.Rate');
 	</script>
 }
-

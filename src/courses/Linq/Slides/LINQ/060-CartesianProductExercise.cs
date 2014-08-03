@@ -15,26 +15,49 @@ namespace uLearn.Courses.Linq.Slides
 		Вычислить множество всех соседей заданной точки в смысле 8-связности.
 
 		*/
-		
-		[ExpectedOutput("True")]
+
+		[ExpectedOutput(@"Neighbours of (1 2)
+0 1
+0 2
+0 3
+1 1
+1 3
+2 1
+2 2
+2 3
+Neighbours of (0 0)
+-1 -1
+-1 0
+-1 1
+0 -1
+0 1
+1 -1
+1 0
+1 1
+")]
 		public static void Main()
 		{
-			var answer = GetNeighbours(new Point(1, 2));
-			Console.WriteLine(IsRightCartesian(answer));
+			CheckForPoint(new Point(1, 2));
+			CheckForPoint(new Point(0, 0));
+		}
+
+		private static void CheckForPoint(Point point)
+		{
+			Console.WriteLine("Neighbours of ({0})", point);
+			var lines = GetNeighbours(point).OrderBy(p => p.X).ThenBy(p => p.Y).Select(p => p.ToString());
+			foreach (var line in lines)
+				Console.WriteLine(line);
 		}
 
 		[Exercise(SingleStatement = false)]
 		[Hint("Декартово произведение множества {-1, 0, 1} на себя даст все возможные относительные координаты соседей")]
 		[Hint("Используйте вызов Select внутри вызова SelectMany")]
-		[Hint("Метода ToHashSet не существует, однако у класса HashSet<T> есть конструктор, принимающий последовательность")]
-		public static HashSet<Point> GetNeighbours(Point p)
+		public static IEnumerable<Point> GetNeighbours(Point p)
 		{
-			int[] d = {-1, 0, 1};
-			return new HashSet<Point>(
-				d
-					.SelectMany(dx => d.Select(dy => new Point(p.X + dx, p.Y + dy)))
-					.Where(n => !n.Equals(p))
-				);
+			int[] d = { -1, 0, 1 };
+			return d
+				.SelectMany(dx => d.Select(dy => new Point(p.X + dx, p.Y + dy)))
+				.Where(n => !n.Equals(p));
 			/*uncomment
 			int[] d = {-1, 0, 1};
 			return ...
@@ -73,7 +96,7 @@ namespace uLearn.Courses.Linq.Slides
 			[HideOnSlide]
 			public override string ToString()
 			{
-				return string.Format("X: {0}, Y: {1}", X, Y);
+				return string.Format("{0} {1}", X, Y);
 			}
 
 			[HideOnSlide]

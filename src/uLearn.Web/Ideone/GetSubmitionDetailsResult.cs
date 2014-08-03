@@ -74,5 +74,10 @@ namespace uLearn.Web.Ideone
 		{
 			get { return Get("cmpinfo"); }
 		}
+
+		public override string ToString()
+		{
+			return string.Format("LangId: {0}\r\n LangName: {1}\r\n LangVersion: {2}\r\n Time: {3}\r\n Memory: {4}\r\n Signal: {5}\r\n IsPublic: {6}\r\n Date: {7}\r\n Source: {8}\r\n Input: {9}\r\n Output: {10}\r\n StdErr: {11}\r\n CompilationError: {12}", LangId, LangName, LangVersion, Time, Memory, Signal, IsPublic, Date, Source, Input, Output, StdErr, CompilationError);
+		}
 	}
 }

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
-using Microsoft.SqlServer.Server;
 using uLearn.Web.Models;
-using uLearn;
 
 namespace uLearn.Web.DataContexts
 {
@@ -42,7 +41,16 @@ namespace uLearn.Web.DataContexts
 				CodeHash = code.Split('\n').Select(x => x.Trim()).Aggregate("", (x, y) => x + y).GetHashCode(),
 				Likes = new List<Like>()
 			});
-			await db.SaveChangesAsync();
+			try
+			{
+				await db.SaveChangesAsync();
+			}
+			catch (DbEntityValidationException e)
+			{
+				Debug.Write(
+					string.Join("\r\n",
+					e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
+			}
 			return userSolution;
 		}
 

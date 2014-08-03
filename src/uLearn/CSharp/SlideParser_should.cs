@@ -65,6 +65,17 @@ namespace uLearn.CSharp
 		}
 
 		[Test]
+		public void remove_Excluded_members_from_solution()
+		{
+			var slide = (ExerciseSlide)GenerateSlide("SampleClass.cs");
+			var solution = slide.Solution.BuildSolution("");
+			Assert.That(solution, Is.Not.StringContaining("["));
+			Assert.That(solution, Is.Not.StringContaining("]"));
+			Assert.That(solution, Is.Not.StringContaining("public int X, Y"));
+			Assert.That(solution, Is.Not.StringContaining("public Point(int x, int y)"));
+		}
+
+		[Test]
 		public void remove_method_header_from_code_block()
 		{
 			Slide slide = GenerateSlide("Sample.cs");
