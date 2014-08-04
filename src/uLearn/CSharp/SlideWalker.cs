@@ -153,7 +153,7 @@ namespace uLearn.CSharp
 		private SlideBlock CreateSampleBlock(ClassDeclarationSyntax node)
 		{
 			string code = node.WithAttributeLists(new SyntaxList<AttributeListSyntax>())
-				.ToFullString()
+				.ToPrettyString()
 				.RemoveCommonNesting();
 			return SlideBlock.FromCode(code);
 		}

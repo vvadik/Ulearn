@@ -64,6 +64,12 @@ namespace uLearn.CSharp
 			return new string('\t', bodyNestingSize) + node;
 		}
 
+		public static string ToPrettyString(this ClassDeclarationSyntax node)
+		{
+			int bodyNestingSize = node.SyntaxTree.GetLineSpan(node.OpenBraceToken.Span).StartLinePosition.Character;
+			return new string('\t', bodyNestingSize) + node;
+		}
+
 		public static string ToPrettyString(this SyntaxNode node)
 		{
 			return node.ToNotIdentedString();

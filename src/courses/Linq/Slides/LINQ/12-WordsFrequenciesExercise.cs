@@ -9,18 +9,18 @@ namespace uLearn.Courses.Linq.Slides
 	{
 		/*
 
-		Дан текст, нужно вывести count наиболее часто встречающихся в тексте слов, вместе с их частотой.
+		Дан текст, нужно вывести `count` наиболее часто встречающихся в тексте слов, вместе с их частотой.
+		Среди слов, встречающихся одинаково часто, отдавать предпочтение лексикографически меньшим словам.
+		Слова сравнивать регистронезависимо и выводить в нижнем регистре.		
+		
+		Напомним сигнатуры некоторых Linq-методов, которые могут понадобятся в этом упражнении:
 
-		Напомним сигнатуры всех Linq-методов, которые вам понадобятся в этом упражнении:
-
-		    IEnumerable<IGrouping<K, T>> GroupBy(this IEnumerable<T> items, Func<T, K> keySelector)
-			IEnumerable<R> Select(this IEnumerable<T> items, Func<T, R> map)
-		    IOrderedEnumerable<T> OrderBy<T>(this IEnumerable<T> items, Func<T, K> keySelector)
+		    IEnumerable<IGrouping<K, T>>       GroupBy(this IEnumerable<T> items, Func<T, K> keySelector)
+		    IOrderedEnumerable<T>           OrderBy<T>(this IEnumerable<T> items, Func<T, K> keySelector)
 		    IOrderedEnumerable<T> OrderByDescending<T>(this IEnumerable<T> items, Func<T, K> keySelector)
-		    IOrderedEnumerable<T> ThenBy<T>(this IOrderedEnumerable<T> items, Func<T, K> keySelector)
-		    IOrderedEnumerable<T> ThenByDescending<T>(this IOrderedEnumerable<T> items, Func<T, K> keySelector)
-		    IEnumerable<T> Take(this IEnumerable<T> items, int count)
-
+		    IOrderedEnumerable<T>            ThenBy<T>(this IOrderedEnumerable<T> items, Func<T, K> keySelector)
+		    IOrderedEnumerable<T>  ThenByDescending<T>(this IOrderedEnumerable<T> items, Func<T, K> keySelector)
+		    IEnumerable<T>                        Take(this IEnumerable<T> items, int count)
 		*/
 
 		[Exercise(SingleStatement = true)]
@@ -42,12 +42,31 @@ namespace uLearn.Courses.Linq.Slides
 			*/
 		}
 
-		[ExpectedOutput("you 2\r\nknows 1")]
+		[ExpectedOutput(@"
+GetMostFrequentWords(""A box of biscuits, a box of mixed biscuits, and a biscuit mixer."", 2)
+  a 3
+  biscuits 2
+
+GetMostFrequentWords("""", 100)
+
+
+GetMostFrequentWords(""Each Easter Eddie eats eighty Easter eggs."", 3)
+  easter 2
+  each 1
+  eats 1")]
 		public static void Main()
 		{
-			var words = GetMostFrequentWords("You?! Or not you... who knows?", 2);
-			Console.WriteLine("{0} {1}", words[0].Item1, words[0].Item2);
-			Console.WriteLine("{0} {1}", words[1].Item1, words[1].Item2);
+			CheckOn(2, "A box of biscuits, a box of mixed biscuits, and a biscuit mixer.");
+			CheckOn(100, "");
+			CheckOn(3, "Each Easter Eddie eats eighty Easter eggs.");
+		}
+
+		private static void CheckOn(int count, string text)
+		{
+			Console.WriteLine("GetMostFrequentWords(\"{0}\", {1})", text, count);
+			var sortedList = GetMostFrequentWords(text, count);
+			Console.WriteLine(string.Join(Environment.NewLine, sortedList.Select(t => "  " + t.Item1 + " " + t.Item2).ToArray()));
+			Console.WriteLine();
 		}
 	}
 }
