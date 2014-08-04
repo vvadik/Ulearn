@@ -31,7 +31,6 @@ function getHints(courseId, slideId) {
             $("#currentHint").text(hints.length-1);
             for (var hint in hints)
                 $('#hint' + hints[hint]).show();
-    console.log(ans);
 })
     .fail(function (req) {
         console.log(req.responseText);

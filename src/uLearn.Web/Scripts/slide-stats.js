@@ -12,7 +12,7 @@
             FillRate(rate);
         })
 		.fail(function (req) {
-		    console.log(req.responseText);
+
 		})
 		.always(function (ans) {
 		});
@@ -29,11 +29,14 @@ function FillRate(rate) {
         rated = true;
     for (var i in colors) {
             $("#" + i).parent().removeClass(colors[i]);
-        }
+    }
+    console.log(rated);
     if (rated)
         $("#next_slide_button").removeClass("block-next");
-    else
+    else {
         $("#notwatched").addClass("not-watched");
+        $("#next_slide_button").addClass("block-next");
+    }
     $("#" + switcher).parent().button('toggle');
     $("#" + switcher).parent().addClass(colors[switcher]);
 };
