@@ -42,15 +42,11 @@
 						@Html.Raw(block.RenderedText)
 					}
 				}
-				@{ var slide = Model.Slide as ExerciseSlide; }
-				@if (slide != null)
+				@if (Model.Slide is ExerciseSlide)
 				{
-					@Html.Partial("_SolutionControl",Model);
+					@Html.Partial("_SolutionControl", Model)
 				}
-				else
-				{
-					@Html.Partial("_AskBar")
-				}
+				@Html.Partial("_AskBar")
 			</div>
 			@Html.Partial("_RatesBar")
 			@Html.Partial("_SlideNavigation", Model)
