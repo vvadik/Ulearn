@@ -18,7 +18,6 @@
 }
 
 .CodeMirror {
-    border: 1px solid #eee;
     height: auto;
     margin-bottom: 20px;
     margin-top: 20px;
@@ -60,6 +59,7 @@ a.nav-arrow:hover {
 .output-label {
     text-align: center;
     margin-top: 20px;
+    display: none;
 }
 
 .actual-output {
@@ -87,7 +87,7 @@ a.nav-arrow:hover {
 }
 
 .sphere-engine-tm {
-    margin: -20px 0 0 0;
+    margin: 0 0 -20px 0;
     text-align: right;
     font-size: small;
 }
@@ -122,6 +122,7 @@ a.nav-arrow:hover {
     display: none;
     font-size: x-large;
     color: white;
+    margin-top: 10px;
 }
 
 .half-size {
@@ -288,6 +289,7 @@ table.diff tbody th {
 
 .solution-control {
     width: 100%;
+    margin-top: -20px;
 }
 
 .reset-btn {
@@ -300,7 +302,22 @@ table.diff tbody th {
 
 .run-solution-button {
     width: 50%;
+    margin-bottom: 10px;
 }
 
 .not-watched {
+}
+
+.all-questions {
+    margin-top: 10px;
+    display: none;
+}
+
+.rates-bar {
+    width: 100%;
+    margin-bottom: -11px;
+}
+
+.navs {
+    margin-top: -21px;
 }

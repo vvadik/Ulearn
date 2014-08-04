@@ -1,11 +1,10 @@
-﻿@using Microsoft.Ajax.Utilities
-@using uLearn
+﻿@using uLearn
 @model CoursePageModel
 
 @{
 	ViewBag.Title = Model.Course.Title;
 }
-@Html.Partial("_Sidebar", Model)
+@Html.Partial("_TableOfContents", Model)
 
 
 <div class="slide-container">
@@ -54,7 +53,7 @@
 			@Html.Partial("_RatesBar")
 			@Html.Partial("_SlideNavigation", Model)
 			<div id="WatchQuestions" data-url="@Url.Action("GetAllQuestions")">
-			    <button hidden onclick="printAllQuestions('@Model.Slide.Info.UnitName')">Посмотреть все заданные вопросы по теме</button>
+			    <button class="all-questions" onclick="printAllQuestions('@Model.Slide.Info.UnitName')">Посмотреть все заданные вопросы по теме</button>
 			</div>
 			<div class="questions-log"></div>
 		</div>

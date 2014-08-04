@@ -9,12 +9,8 @@ namespace uLearn.Courses.Linq.Slides
 	public class SortTuples
 	{
 		/*
-		##Сравнение кортежей
-
 		Ещё одно полезное свойство кортежей — по умолчанию они сравниваются поэлементно.
 		Используя этот факт, решите следующую задачу:
-
-		##Задача: Словарь текста 2
 
 		Дан текст, нужно составить список всех встречающихся в тексте слов, 
 		упорядоченный сначала по длинне слова, а потом лексикографически.
@@ -29,7 +25,7 @@ namespace uLearn.Courses.Linq.Slides
 		[Hint("`keySelector` в `OrderBy` должен возвращать ключ сортировки. Этот ключ может быть кортежем.")]
 		public static List<string>  GetSortedWords(string text)
 		{
-			return Regex.Split(text, @"\W+")
+			return Regex.Split(text.ToLower(), @"\W+")
 				.Where(word => word != "")
 				.Distinct()
 				.OrderBy(word => Tuple.Create(word.Length, word))
@@ -37,21 +33,29 @@ namespace uLearn.Courses.Linq.Slides
 			// ваше решение
 		}
 
-		[ExpectedOutput("Good")]
+		[ExpectedOutput(@"
+GetSortedWords(""A box of biscuits, a box of mixed biscuits, and a biscuit mixer."")
+  a of and box mixed mixer biscuit biscuits
+
+GetSortedWords("""")
+  
+
+GetSortedWords(""Each Easter Eddie eats eighty Easter eggs."")
+  each eats eggs eddie easter eighty
+")]
 		public static void Main()
 		{
-			var sortedList = GetSortedWords("you?! or not you... who knows?");
-			var result = IsRightAnswer(sortedList) ? "Good" : "Bad";
-			Console.WriteLine(result);
+			CheckOn("A box of biscuits, a box of mixed biscuits, and a biscuit mixer.");
+			CheckOn("");
+			CheckOn("Each Easter Eddie eats eighty Easter eggs.");
 		}
 
-		[HideOnSlide]
-		public static bool IsRightAnswer(List<string> sortedWords )
+		private static void CheckOn(string text)
 		{
-			var rightAnswer = new[] {"or", "not", "who", "you", "knows"};
-			if (sortedWords.Count != rightAnswer.Length)
-				return false;
-			return !sortedWords.Where((t, i) => t != rightAnswer[i]).Any();
+			Console.WriteLine("GetSortedWords(\"{0}\")", text);
+			var sortedList = GetSortedWords(text);
+			Console.WriteLine("  " + string.Join(" ", sortedList.ToArray()));
+			Console.WriteLine();
 		}
 	}
 }

@@ -39,7 +39,7 @@ namespace uLearn.Courses.Linq.Slides
 		[Hint("Да, задача сложная, но тем не менее подсказок не будет!")]
 		[Hint("Ну правда, пора научиться решать подобные задачи без подсказок!")]
 		[Exercise(SingleStatement = true)]
-		public static IDictionary<string, HashSet<int>> BuildInvertedIndex(Document[] documents)
+		public static IDictionary<string, List<int>> BuildInvertedIndex(Document[] documents)
 		{
 			return
 				documents
@@ -51,24 +51,39 @@ namespace uLearn.Courses.Linq.Slides
 					.GroupBy(wordDoc => wordDoc.Item1)
 					.ToDictionary(
 						group => group.Key,
-						group => new HashSet<int>(group.Select(wordDoc => wordDoc.Item2.Id)));
+						group => group.Select(wordDoc => wordDoc.Item2.Id).OrderBy(id => id).ToList());
 			// ваш код
 		}
 
-		[ExpectedOutput("True\r\nTrue\r\nTrue")]
+		[ExpectedOutput(@"
+SearchQuery('world') found documents: 1, 2, 2, 2
+SearchQuery('words') found documents: 2, 3
+SearchQuery('power') found documents: 3
+SearchQuery('ktulhu') found documents: 
+")]
 		public static void Main()
 		{
-			Document[] docs =
+			Document[] documents =
 			{
 				new Document {Id = 1, Text = "Hello world!"},
 				new Document {Id = 2, Text = "World, world, world... Just words..."},
 				new Document {Id = 3, Text = "Words — power"},
 				new Document {Id = 4, Text = ""},
 			};
-			var index = BuildInvertedIndex(docs);
-			Console.WriteLine(index["world"].SetEquals(new int[] {1,2}));
-			Console.WriteLine(index["words"].SetEquals(new int[] { 2, 3 }));
-			Console.WriteLine(index["power"].SetEquals(new int[] { 3 }));
+			var index = BuildInvertedIndex(documents);
+			SearchQuery("world", index);
+			SearchQuery("words", index);
+			SearchQuery("power", index);
+			SearchQuery("ktulhu", index);
+		}
+
+		[HideOnSlide]
+		private static void SearchQuery(string word, IDictionary<string, List<int>> index)
+		{
+			List<int> ids = index.TryGetValue(word, out ids) ? ids : new List<int>();
+			var docIds = string.Join(", ", ids.Select(id => id.ToString()).ToArray());
+			Console.WriteLine("SearchQuery('{0}') found documents: {1}", word, docIds);
+			
 		}
 	}
 }

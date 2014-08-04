@@ -27,7 +27,7 @@ namespace uLearn.Courses.Linq.Slides
 			//Ваш код
 		}
 
-		[ExpectedOutput("azazsdsd12345")]
+		[ExpectedOutput("azaz\nsdsd\n12345")]
 		public static void Main()
 		{
 			Console.WriteLine(GetLongest(new[] {"azaz", "as", "sdsd"}));

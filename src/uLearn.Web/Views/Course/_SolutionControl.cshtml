@@ -2,6 +2,7 @@
 @using uLearn;
 @{ var slide = Model.Slide as ExerciseSlide; }
 <textarea id="secretCodeExercise" class='hide'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
+<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine ™</a></div>
 @if (Model.IsPassedTask)
 {
 	<textarea class='code code-exercise'>@Model.LatestAcceptedSolution</textarea>
@@ -10,7 +11,6 @@ else
 {
 	<textarea class='code code-exercise'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
 }
-<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine ™</a></div>
 <script>
 	function cleanUserCode() {
 		var $secretCodeExercise = $('#secretCodeExercise');
@@ -22,10 +22,8 @@ else
 	<a href="#" onclick="updateVerdict(false, 'Compilation error', 'details', true)">CompilationError</a>
 	<a href="#" onclick="updateVerdict(false, 'Неверный ответ', 'Bullshit', false)">WrongAnswer</a>
 *@
-@Html.Partial("_ExerciseHints", Model)
-@Html.Partial("_AskBar")
 <div class="solution-control btn-group">
-    <button type="button" class="run-solution-button btn btn-default"
+    <button type="button" class="run-solution-button btn btn-default no-rounds"
             data-url="@Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">
         RUN
     </button>
@@ -34,8 +32,8 @@ else
         RESET
     </button>
 
-    <button type="button" class="btn btn-default hints-btn" onclick="showHintForUser('@Model.Course.Id','@Model.Slide.Id')">
-        HINTS
+    <button type="button" class="btn btn-default hints-btn no-rounds" onclick="showHintForUser('@Model.Course.Id','@Model.Slide.Id')">
+        GET HINT
     </button>
 </div>
 <div class="run-verdict clearfix"></div>
@@ -46,3 +44,5 @@ else
 	</div>
 	<div class="diff-table"></div>
 </div>
+@Html.Partial("_ExerciseHints", Model)
+@Html.Partial("_AskBar")

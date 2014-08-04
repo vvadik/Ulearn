@@ -15,6 +15,11 @@ namespace uLearn.Web.Controllers
 		public AccountController()
 			: this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb())))
 		{
+			UserManager.UserValidator =
+				new UserValidator<ApplicationUser>(UserManager)
+				{
+					AllowOnlyAlphanumericUserNames = false
+				};
 		}
 
 		public AccountController(UserManager<ApplicationUser> userManager)
@@ -380,7 +385,8 @@ namespace uLearn.Web.Controllers
 
 		private class ChallengeResult : HttpUnauthorizedResult
 		{
-			public ChallengeResult(string provider, string redirectUri) : this(provider, redirectUri, null)
+			public ChallengeResult(string provider, string redirectUri)
+				: this(provider, redirectUri, null)
 			{
 			}
 

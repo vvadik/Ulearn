@@ -619,40 +619,6 @@
     <Content Include="tablesorter-master\addons\pager\jquery.tablesorter.pager.css" />
     <Content Include="tablesorter-master\addons\pager\jquery.tablesorter.pager.js" />
     <Content Include="tablesorter-master\build.xml" />
-    <Content Include="tablesorter-master\build\js.jar" />
-    <Content Include="tablesorter-master\build\jsmin.js" />
-    <Content Include="tablesorter-master\build\min.js" />
-    <Content Include="tablesorter-master\build\pack.js" />
-    <Content Include="tablesorter-master\build\packer.js" />
-    <Content Include="tablesorter-master\build\ParseMaster.js" />
-    <Content Include="tablesorter-master\build\writeFile.js" />
-    <Content Include="tablesorter-master\docs\assets\ajax-content.html" />
-    <Content Include="tablesorter-master\docs\css\jq.css" />
-    <Content Include="tablesorter-master\docs\example-ajax.html" />
-    <Content Include="tablesorter-master\docs\example-attribute-sort.html" />
-    <Content Include="tablesorter-master\docs\example-empty-table.html" />
-    <Content Include="tablesorter-master\docs\example-extending-defaults.html" />
-    <Content Include="tablesorter-master\docs\example-meta-headers.html" />
-    <Content Include="tablesorter-master\docs\example-meta-parsers.html" />
-    <Content Include="tablesorter-master\docs\example-meta-sort-list.html" />
-    <Content Include="tablesorter-master\docs\example-option-debug.html" />
-    <Content Include="tablesorter-master\docs\example-option-digits.html" />
-    <Content Include="tablesorter-master\docs\example-option-sort-force.html" />
-    <Content Include="tablesorter-master\docs\example-option-sort-key.html" />
-    <Content Include="tablesorter-master\docs\example-option-sort-list.html" />
-    <Content Include="tablesorter-master\docs\example-option-sort-order.html" />
-    <Content Include="tablesorter-master\docs\example-option-text-extraction.html" />
-    <Content Include="tablesorter-master\docs\example-options-headers.html" />
-    <Content Include="tablesorter-master\docs\example-pager.html" />
-    <Content Include="tablesorter-master\docs\example-parsers.html" />
-    <Content Include="tablesorter-master\docs\example-trigger-sort.html" />
-    <Content Include="tablesorter-master\docs\example-triggers.html" />
-    <Content Include="tablesorter-master\docs\example-update-cell.html" />
-    <Content Include="tablesorter-master\docs\example-widgets.html" />
-    <Content Include="tablesorter-master\docs\img\external.png" />
-    <Content Include="tablesorter-master\docs\index.html" />
-    <Content Include="tablesorter-master\docs\js\docs.js" />
-    <Content Include="tablesorter-master\docs\js\examples.js" />
     <Content Include="tablesorter-master\jquery-latest.js" />
     <Content Include="tablesorter-master\jquery.metadata.js" />
     <Content Include="tablesorter-master\jquery.tablesorter.js" />
@@ -693,13 +659,12 @@
     <Content Include="Views\Course\Slide.cshtml" />
     <Content Include="Views\Course\_ExerciseHints.cshtml" />
     <Content Include="Views\Course\_SlideNavigation.cshtml" />
-    <Content Include="Views\Shared\_Sidebar.cshtml" />
+    <Content Include="Views\Shared\_TableOfContents.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
     <Content Include="Views\Course\_AskBar.cshtml" />
     <Content Include="Views\Analytics\TotalStatistics.cshtml" />
     <Content Include="Views\Course\_RatesBar.cshtml" />
     <Content Include="tablesorter-master\changelog" />
-    <Content Include="tablesorter-master\docs\.tmp_index.html.55071~" />
     <Content Include="tablesorter-master\LICENSE" />
     <Content Include="tablesorter-master\README.md" />
     <Content Include="tablesorter-master\themes\blue\blue.zip" />
@@ -729,7 +694,7 @@
       <Name>linq</Name>
     </ProjectReference>
     <ProjectReference Include="..\uLearn\uLearn.csproj">
-      <Project>{333DD5A7-9955-46CB-8905-79E800F2B435}</Project>
+      <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
       <Name>uLearn</Name>
     </ProjectReference>
   </ItemGroup>
