@@ -2,7 +2,7 @@
     if (rate == "NotUnderstand")
         $("#ask_question_window").click();
     $("#notwatched").removeClass("not-watched");
-    $("#ratings").removeClass("bounce");
+    $("#ratings").removeClass("bounce-effect");
     $.ajax(
     {
         type: "POST",
