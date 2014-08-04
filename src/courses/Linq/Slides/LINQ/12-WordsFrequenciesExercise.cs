@@ -54,6 +54,7 @@ GetMostFrequentWords(""Each Easter Eddie eats eighty Easter eggs."", 3)
   easter 2
   each 1
   eats 1")]
+		[HideOnSlide]
 		public static void Main()
 		{
 			CheckOn(2, "A box of biscuits, a box of mixed biscuits, and a biscuit mixer.");
@@ -61,6 +62,7 @@ GetMostFrequentWords(""Each Easter Eddie eats eighty Easter eggs."", 3)
 			CheckOn(3, "Each Easter Eddie eats eighty Easter eggs.");
 		}
 
+		[HideOnSlide]
 		private static void CheckOn(int count, string text)
 		{
 			Console.WriteLine("GetMostFrequentWords(\"{0}\", {1})", text, count);

@@ -43,6 +43,7 @@ GetSortedWords("""")
 GetSortedWords(""Each Easter Eddie eats eighty Easter eggs."")
   each eats eggs eddie easter eighty
 ")]
+		[HideOnSlide]
 		public static void Main()
 		{
 			CheckOn("A box of biscuits, a box of mixed biscuits, and a biscuit mixer.");
@@ -50,6 +51,7 @@ GetSortedWords(""Each Easter Eddie eats eighty Easter eggs."")
 			CheckOn("Each Easter Eddie eats eighty Easter eggs.");
 		}
 
+		[HideOnSlide]
 		private static void CheckOn(string text)
 		{
 			Console.WriteLine("GetSortedWords(\"{0}\")", text);

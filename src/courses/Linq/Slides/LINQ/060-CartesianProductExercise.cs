@@ -35,12 +35,14 @@ Neighbours of (0 0)
 1 0
 1 1
 ")]
+		[HideOnSlide]
 		public static void Main()
 		{
 			CheckForPoint(new Point(1, 2));
 			CheckForPoint(new Point(0, 0));
 		}
 
+		[HideOnSlide]
 		private static void CheckForPoint(Point point)
 		{
 			Console.WriteLine("Neighbours of ({0})", point);
