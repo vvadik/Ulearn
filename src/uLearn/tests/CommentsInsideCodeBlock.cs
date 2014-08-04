@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace uLearn.tests
 {
 	[Slide("title", "id")]
-	internal class CommentsInsideSample
+	internal class CommentsInsideCodeBlock
 	{
 		[ShowBodyOnSlide]
 		public void DoSample()

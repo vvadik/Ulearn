@@ -33,9 +33,11 @@ namespace uLearn.CSharp
 		[Test]
 		public void ignore_comments_inside_methods()
 		{
-			var slide = GenerateSlide("CommentsInsideSample.cs");
+			var slide = GenerateSlide("CommentsInsideCodeBlock.cs");
 			Assert.That(slide.Blocks.Length, Is.EqualTo(1));
 			Assert.That(slide.Blocks[0].IsCode);
+			Assert.That(slide.Blocks[0].Text, Is.StringContaining("Not a block!"));
+			Assert.That(slide.Blocks[0].Text, Is.StringContaining("Not a block too"));
 		}
 
 		[Test]
@@ -49,25 +51,46 @@ namespace uLearn.CSharp
 		[Test]
 		public void make_ShowOnSlide_method_as_code_block()
 		{
-			Slide slide = GenerateSlide("Sample.cs");
+			Slide slide = GenerateSlide("Simple.cs");
 			Assert.That(slide.Blocks.Length, Is.EqualTo(1));
 			Assert.That(slide.Blocks[0].IsCode);
 			Assert.That(slide, Is.TypeOf<Slide>());
 		}
 
 		[Test]
-		public void make_ShowOnSlide_class_as_code_block()
+		public void make_class_as_code_block()
 		{
-			Slide slide = GenerateSlide("SampleClass.cs");
+			Slide slide = GenerateSlide("NestedClass.cs");
 			Assert.That(slide.Blocks.Length, Is.EqualTo(1));
 			Assert.That(slide.Blocks[0].IsCode);
 			Assert.That(slide.Blocks[0].Text, Is.StringContaining("class Point"));
 		}
 
 		[Test]
+		public void remove_attributes_from_nested_class_members()
+		{
+			Slide slide = GenerateSlide("NestedClass.cs");
+			Assert.That(slide.Blocks[0].Text, Is.Not.StringContaining("["));
+		}
+
+		[Test]
+		public void remove_hidden_members_of_nested_class()
+		{
+			Slide slide = GenerateSlide("NestedClass.cs");
+			Assert.That(slide.Blocks[0].Text, Is.Not.StringContaining("Hidden"));
+		}
+
+		[Test]
+		public void remove_common_nesting_of_nested_class()
+		{
+			Slide slide = GenerateSlide("NestedClass.cs");
+			Assert.That(slide.Blocks[0].Text, Is.StringStarting("public class Point"));
+		}
+
+		[Test]
 		public void remove_Excluded_members_from_solution()
 		{
-			var slide = (ExerciseSlide)GenerateSlide("SampleClass.cs");
+			var slide = (ExerciseSlide) GenerateSlide("NestedClass.cs");
 			var solution = slide.Solution.BuildSolution("");
 			Assert.That(solution, Is.Not.StringContaining("["));
 			Assert.That(solution, Is.Not.StringContaining("]"));
@@ -75,28 +98,57 @@ namespace uLearn.CSharp
 			Assert.That(solution, Is.Not.StringContaining("public Point(int x, int y)"));
 		}
 
+		
+		[Test]
+		public void make_code_block_with_method_signature_if_specified()
+		{
+			Slide slide = GenerateSlide("Simple.cs");
+			Assert.That(slide.Blocks[0].Text, Is.StringContaining("public void Method()"));
+		}
+
+		[Test]
+		public void remove_common_nesting_in_method_body()
+		{
+			Slide slide = GenerateSlide("Simple.cs");
+			Assert.That(slide.Blocks[0].Text, Is.StringStarting("Console.WriteLine(42);"));
+		}
+
+		[Test]
+		public void remove_common_nesting_in_method_with_header()
+		{
+			Slide slide = GenerateSlide("Simple.cs");
+			Assert.That(slide.Blocks[0].Text, Is.StringContaining("\npublic void Method()"));
+		}
+
 		[Test]
 		public void remove_method_header_from_code_block()
 		{
-			Slide slide = GenerateSlide("Sample.cs");
+			Slide slide = GenerateSlide("Simple.cs");
 			var blockText = slide.Blocks[0].Text;
-			Assert.That(blockText, Is.StringContaining("Console.WriteLine(\"Hello Sample!\");"));
+			Assert.That(blockText, Is.StringContaining("Console.WriteLine(42);"));
 			Assert.That(blockText, Is.Not.StringContaining("HiddenMethodHeader"));
 		}
 
 		[Test]
 		public void remove_hidden_members_from_code_block()
 		{
-			Slide slide = GenerateSlide("Sample.cs");
+			Slide slide = GenerateSlide("Simple.cs");
 			var blockText = slide.Blocks[0].Text;
 			Assert.That(blockText, Is.Not.StringContaining("Hidden"));
 		}
-		
-		
+
+		[Test]
+		public void not_show_members_of_hidden_class()
+		{
+			Slide slide = GenerateSlide("HiddenNestedClass.cs");
+			var blockText = slide.Blocks[0].Text;
+			Assert.That(blockText, Is.Not.StringContaining("Hidden"));
+		}
+
 		[Test]
 		public void join_adjacent_code_blocks()
 		{
-			Slide slide = GenerateSlide("AdjacentSamples.cs");
+			Slide slide = GenerateSlide("AdjacentCodeBlocks.cs");
 			Assert.That(slide.Blocks[0].IsCode, Is.True);
 			Assert.That(slide.Blocks[1].IsCode, Is.False);
 			Assert.That(slide.Blocks[2].IsCode, Is.True);
@@ -104,16 +156,9 @@ namespace uLearn.CSharp
 		}
 
 		[Test]
-		public void make_code_block_with_method_signature_if_specified()
-		{
-			Slide slide = GenerateSlide("AdjacentSamples.cs");
-			Assert.That(slide.Blocks[0].Text, Is.StringContaining("public void Sample1()"));
-		}
-
-		[Test]
 		public void preserve_blocks_order_as_in_source_file()
 		{
-			Slide slide = GenerateSlide("SampleWithComments.cs");
+			Slide slide = GenerateSlide("SlideWithComments.cs");
 			Assert.That(slide.Blocks.Length, Is.EqualTo(3));
 			Assert.That(slide.Blocks[0].Text, Is.StringStarting("Comment"));
 			Assert.That(slide.Blocks[1].IsCode);
@@ -140,7 +185,7 @@ namespace uLearn.CSharp
 		[Test]
 		public void extract_ExpectedOutput()
 		{
-			var slide = (ExerciseSlide)GenerateSlide("Exercise.cs");
+			var slide = (ExerciseSlide) GenerateSlide("Exercise.cs");
 			Assert.That(slide.ExpectedOutput, Is.EqualTo("5"));
 		}
 
@@ -163,7 +208,7 @@ namespace uLearn.CSharp
 		[Test]
 		public void provide_solution_for_server()
 		{
-			var slide = (ExerciseSlide)GenerateSlide("HelloWorld.cs");
+			var slide = (ExerciseSlide) GenerateSlide("HelloWorld.cs");
 			var userSolution = "/* no solution */";
 			var ans = slide.Solution.BuildSolution(userSolution);
 			Console.WriteLine(ans);
@@ -178,7 +223,8 @@ namespace uLearn.CSharp
 		{
 			var slide = GenerateSlide("Includes.cs");
 			var renderedText = slide.Blocks.First().RenderedText;
-			var expected = "<iframe class='embedded-video' width='800' height='450' src='//www.youtube.com/embed/81Ub0SMxZQo' frameborder='0' allowfullscreen></iframe>";
+			var expected =
+				"<iframe class='embedded-video' width='800' height='450' src='//www.youtube.com/embed/81Ub0SMxZQo' frameborder='0' allowfullscreen></iframe>";
 			Assert.That(renderedText, Contains.Substring(expected));
 		}
 

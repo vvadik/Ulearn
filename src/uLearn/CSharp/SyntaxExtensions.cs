@@ -9,9 +9,16 @@ namespace uLearn.CSharp
 {
 	public static class SyntaxExtensions
 	{
+
+		public static IEnumerable<SyntaxNode> GetParents(this SyntaxNode node)
+		{
+			while (node.Parent != null)
+				yield return node = node.Parent;
+		}
+
 		public static bool HasAttribute<TAttr>(this MemberDeclarationSyntax node) where TAttr : Attribute
 		{
-			return GetAttributes<TAttr>((SyntaxList<AttributeListSyntax>)((dynamic)node).AttributeLists).Any();
+			return node.GetAttributes<TAttr>().Any();
 		}
 
 		public static string GetHint(this AttributeSyntax attribute)
@@ -26,23 +33,16 @@ namespace uLearn.CSharp
 			return (string)expr.Token.Value;
 		}
 
-		public static IEnumerable<AttributeSyntax> GetAttributes<TAttr>(this MethodDeclarationSyntax node)
-			where TAttr : Attribute
+		private static SyntaxList<AttributeListSyntax> AttributeLists(this MemberDeclarationSyntax node)
 		{
-			return GetAttributes<TAttr>(node.AttributeLists);
+			return (SyntaxList<AttributeListSyntax>)((dynamic)node).AttributeLists;
 		}
 
-		public static IEnumerable<AttributeSyntax> GetAttributes<TAttr>(this ClassDeclarationSyntax node)
-			where TAttr : Attribute
-		{
-			return GetAttributes<TAttr>(node.AttributeLists);
-		}
-
-		public static IEnumerable<AttributeSyntax> GetAttributes<TAttr>(SyntaxList<AttributeListSyntax> attributes)
+		public static IEnumerable<AttributeSyntax> GetAttributes<TAttr>(this MemberDeclarationSyntax node)
 			where TAttr : Attribute
 		{
 			string attrShortName = GetAttributeShortName<TAttr>();
-			return attributes
+			return node.AttributeLists()
 				.SelectMany(a => a.Attributes)
 				.Where(a => a.Name.ToString() == attrShortName);
 		}
@@ -63,28 +63,18 @@ namespace uLearn.CSharp
 			return (MemberDeclarationSyntax)((dynamic)node).WithAttributeLists(new SyntaxList<AttributeListSyntax>());
 		}
 
-		private static string PrettyString(MethodDeclarationSyntax node)
-		{
-			return PrettyString(node, node.Body.OpenBraceToken);
-		}
-
 		private static string PrettyString(SyntaxNode node, SyntaxToken tokenToAlignLeft)
 		{
 			int bodyNestingSize = node.SyntaxTree.GetLineSpan(tokenToAlignLeft.Span).StartLinePosition.Character;
 			return (new string('\t', bodyNestingSize) + node).RemoveCommonNesting();
 		}
 
-		private static string PrettyString(EnumDeclarationSyntax node)
+		private static string PrettyString(MethodDeclarationSyntax node)
 		{
-			return PrettyString(node, node.OpenBraceToken);
+			return PrettyString(node, node.Body.OpenBraceToken);
 		}
 
-		private static string PrettyString(StructDeclarationSyntax node)
-		{
-			return PrettyString(node, node.OpenBraceToken);
-		}
-
-		private static string PrettyString(ClassDeclarationSyntax node)
+		private static string PrettyString(BaseTypeDeclarationSyntax node)
 		{
 			return PrettyString(node, node.OpenBraceToken);
 		}

@@ -7,24 +7,20 @@ using System.Threading.Tasks;
 namespace uLearn.tests
 {
 	[Slide("title", "id")]
-	class Sample
+	class SlideWithComments
 	{
+		/*
+		Comment
+		*/
+
 		[ShowBodyOnSlide]
-		public void HiddenMethodHeader()
+		public void DoSample()
 		{
 			Console.WriteLine("Hello Sample!");
 		}
 
-		public void Method()
-		{
-		}
-
-		[HideOnSlide]
-		public void HiddenMethod() { }
-
-		[HideOnSlide] 
-		public int HiddenField;
-		
-		public int Field;
+		/*
+		Final
+		*/
 	}
 }

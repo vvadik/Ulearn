@@ -75,7 +75,8 @@
     <Compile Include="BaseSlideTests.cs" />
     <Compile Include="Course.cs" />
     <Compile Include="CoursePageModel.cs" />
-    <Compile Include="CSharp\SlideWalker.cs" />
+    <Compile Include="CSharp\ExerciseBuilder.cs" />
+    <Compile Include="CSharp\BlocksBuilder.cs" />
     <Compile Include="ExerciseAttribute.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />
@@ -106,7 +107,7 @@
     <Compile Include="tests\HelloWorld.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="tests\AdjacentSamples.cs">
+    <Compile Include="tests\AdjacentCodeBlocks.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="tests\ExerciseWithStarterCode.cs">
@@ -124,16 +125,19 @@
     <Compile Include="tests\Exercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="tests\CommentsInsideSample.cs">
+    <Compile Include="tests\CommentsInsideCodeBlock.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="tests\SampleClass.cs">
+    <Compile Include="tests\HiddenNestedClass.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="tests\SampleWithComments.cs">
+    <Compile Include="tests\NestedClass.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="tests\Sample.cs">
+    <Compile Include="tests\SlideWithComments.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="tests\Simple.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="tests\WrongIdentationOfEmptyLines.cs">

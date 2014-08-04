@@ -22,12 +22,14 @@ namespace uLearn.CSharp
 		private static Slide ParseSyntaxTree(SyntaxTree tree, SlideInfo slideInfo, string usings,
 			Func<string, string> getInclude)
 		{
-			var walker = new SlideWalker(getInclude);
-			var sourceForTestingRoot = walker.Visit(tree.GetRoot());
-			if (!walker.IsExercise)
-				return new Slide(walker.Blocks, slideInfo, walker.Title, walker.Id);
-			return new ExerciseSlide(walker.Blocks, walker.ExerciseInitialCode, walker.ExpectedOutput, walker.Hints,
-				new SolutionForTesting(sourceForTestingRoot, usings), slideInfo, walker.Title, walker.Id);
+			var blocksBuilder = new SlideBuilder(getInclude);
+			var exerciseBuilder = new ExerciseBuilder();
+			blocksBuilder.Visit(tree.GetRoot());
+			var sourceForTestingRoot = exerciseBuilder.Visit(tree.GetRoot());
+			if (!exerciseBuilder.IsExercise)
+				return new Slide(blocksBuilder.Blocks, slideInfo, blocksBuilder.Title, blocksBuilder.Id);
+			return new ExerciseSlide(blocksBuilder.Blocks, exerciseBuilder.ExerciseInitialCode, exerciseBuilder.ExpectedOutput, exerciseBuilder.Hints,
+				new SolutionForTesting(sourceForTestingRoot, usings), slideInfo, blocksBuilder.Title, blocksBuilder.Id);
 		}
 	}
 }
