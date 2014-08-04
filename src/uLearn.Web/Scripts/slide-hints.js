@@ -5,12 +5,12 @@
     $.ajax(
 {
     type: "POST",
-    url: $("#hintPanel" + index).data("url"),
+    url: $("#hint" + index).data("url"),
     data: {
         courseId: courseId, slideId: slideId, hintId: index
     }
 }).success(function (ans) {
-            $('#hintPanel' + (index)).parent().show();
+            $('#hint' + (index)).show();
         })
     .fail(function (req) {
         console.log(req.responseText);
@@ -30,7 +30,7 @@ function getHints(courseId, slideId) {
     if (hints[0] != "")
             $("#currentHint").text(hints.length-1);
             for (var hint in hints)
-                $('#hintPanel' + hints[hint]).parent().show();
+                $('#hint' + hints[hint]).show();
     console.log(ans);
 })
     .fail(function (req) {

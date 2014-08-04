@@ -5,22 +5,12 @@
     @for (int index = 0; index < slide.HintsHtml.Length; index++)
 {
 	var hintHtml = slide.HintsHtml[index];
-	var id = "hint" + (index + 1);
-	<div class="panel panel-default" style="display:none">
-		<div id="@("hintPanel"+index)" class="panel-heading" data-url="@Url.Action("AddHint")">
-			<h4 class="panel-title">
-				<a
-				   data-parent="#hints-accordion" href="#@id" data-target="#@id">
-					Подсказка @(index + 1)
-				</a>
-			</h4>
+	var id = "hint" + index;
+		<div id="@id" data-url="@Url.Action("AddHint")" style="display:none">
+			@{ var intro = index == 0 ? "Подсказки:" : "";}
+		    <h4>@intro</h4>
+			<li>@Html.Raw(hintHtml)</li>
 		</div>
-		<div id="@id" class="panel">
-			<div class="panel-body">
-				@Html.Raw(hintHtml)
-			</div>
-		</div>
-	</div>
 }
     <div id="currentHint" style="display:none">-1</div>
 	<script src="~/Scripts/slide-hints.js"></script>

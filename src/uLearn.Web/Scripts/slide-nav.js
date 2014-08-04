@@ -40,10 +40,15 @@ var slideNavigation = {
 	$noNext: $("#no_next_slide"),
 	$nextSolutions: $("#next_solutions_button"),
 	update: function (hasNext, hasPrev) {
+	    $("#next_slide_button").removeClass("block-next");
 		this.$next.toggle(hasNext);
-		this.$noNext.toggle(!hasNext);
-		this.$prev.toggle(hasPrev);
-		this.$noPrev.toggle(!hasPrev);
+	    if (!hasNext) {
+	        this.$prev.width("100%");
+	        this.$next.toggle(false);
+	    }
+	    this.$prev.toggle(hasPrev);
+	    if (!hasPrev)
+	        $("#next_slide_button").width("100%");
 		this.$nextSolutions.toggle(false);
 	},
 	makeShowSolutionsNext: function () {
