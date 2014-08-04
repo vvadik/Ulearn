@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Slides\Title.txt" />
+    <Content Include="Slides\U01_Basics\S11-sampleXML.xml" />
     <Content Include="Slides\U01_Basics\Title.txt" />
     <Content Include="Slides\U01_Basics\Usings.txt" />
     <Content Include="Slides\U02_Mistakes\Title.txt" />

@@ -13,6 +13,23 @@
 		<div class="row">
 			<div class='slide'>
 				<h1>@Model.Slide.Title</h1>
+				@{var QuizSlide = Model.Slide as QuizSlide;}
+				@if (QuizSlide != null)
+				{
+					foreach (var quizBlock in QuizSlide.Quiz.QuizBlocks)
+					{
+						<h3>@quizBlock.Text</h3>
+						if (quizBlock.IsTask)
+						{
+							var task = quizBlock.QuizTask;
+							<h2>@task.Condition</h2>
+							foreach (var var in task.Var)
+							{
+								<h1>@var.V</h1>
+							}
+						}
+					}
+				}
 				@foreach (SlideBlock block in Model.Slide.Blocks)
 				{
 					if (block.IsCode)

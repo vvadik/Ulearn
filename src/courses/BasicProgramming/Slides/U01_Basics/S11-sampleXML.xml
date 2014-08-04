@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Quiz Title="sample" Id="111">
+	<Items>
+		
+		<QuizBlock>
+			<IsTask>1</IsTask>
+			<Text>##This is quiz</Text>
+			<QuizTask>
+				<Condition> 2 + 2 = ?</Condition>
+				<Variables>
+					<Var>
+						<V>2</V>
+					</Var>
+					<Var>
+						<V>4</V>
+					</Var>
+					<Var>
+						<V>5</V>
+					</Var>
+				</Variables>
+				<RightAnswer>4</RightAnswer>
+			</QuizTask>
+		</QuizBlock>
+
+		<QuizBlock>
+			<IsTask>1</IsTask>
+			<Text></Text>
+			<QuizTask>
+				<Condition> 2 * 2 = ?</Condition>
+				<Variables>
+					<Var>
+						<V>2</V>
+					</Var>
+					<Var>
+						<V>4</V>
+					</Var>
+					<Var>
+						<V>5</V>
+					</Var>
+				</Variables>
+				<RightAnswer>4</RightAnswer>
+			</QuizTask>
+		</QuizBlock>
+
+	<QuizBlock>
+		<IsTask>0</IsTask>
+		<Text>
+		  ##good job
+		  
+		  beautifull text, nice text, looooooooooooooooooooooooooooong text
+		  enters
+		  maybe trim this?
+		</Text>
+		<QuizTask>
+		</QuizTask>
+	</QuizBlock>
+		
+	</Items>
+</Quiz>

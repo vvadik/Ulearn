@@ -1,7 +1,12 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using NUnit.Framework;
 using uLearn.CSharp;
 
 namespace uLearn.Web.Models
@@ -80,6 +85,12 @@ namespace uLearn.Web.Models
 				var sourceCode = Encoding.UTF8.GetString(slideFile.GetContent());
 				var usings = GetUsings(slideFile, resourceFiles); 
 				var info = GetInfoForSlide(slideFile, resourceFiles);
+				if (slideFile.Filename.EndsWith(".xml"))
+				{
+					var a = new XmlSerializer(typeof (Quiz));
+					var quiz = (Quiz) a.Deserialize(new MemoryStream(slideFile.GetContent()));
+					return new QuizSlide(new List<SlideBlock>(), info, quiz);
+				}
 				return SlideParser.ParseCode(sourceCode, info, usings, getInclude);
 			}
 			catch (Exception e)
