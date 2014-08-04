@@ -8,6 +8,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using NUnit.Framework;
 using uLearn.CSharp;
+using uLearn.Quizes;
 
 namespace uLearn.Web.Models
 {
@@ -85,22 +86,25 @@ namespace uLearn.Web.Models
 				var sourceCode = Encoding.UTF8.GetString(slideFile.GetContent());
 				var usings = GetUsings(slideFile, resourceFiles); 
 				var info = GetInfoForSlide(slideFile, resourceFiles);
-				if (slideFile.Filename.EndsWith(".xml"))
-				{
-					var a = new XmlSerializer(typeof (Quiz));
-					var quiz = (Quiz) a.Deserialize(new MemoryStream(slideFile.GetContent()));
-					foreach (var quizBlock in quiz.QuizBlocks)
-					{
-						quizBlock.Text = Md.ToHtml(quizBlock.Text);
-					}
-					return new QuizSlide(new List<SlideBlock>(), info, quiz);
-				}
-				return SlideParser.ParseCode(sourceCode, info, usings, getInclude);
+				return slideFile.Filename.EndsWith(".xml") 
+					? LoadQuiz(slideFile, info) 
+					: SlideParser.ParseCode(sourceCode, info, usings, getInclude);
 			}
 			catch (Exception e)
 			{
 				throw new Exception("Error loading slide " + slideFile.FullName, e);
 			}
+		}
+
+		private static Slide LoadQuiz(ResourceFile slideFile, SlideInfo info)
+		{
+			var serializer = new XmlSerializer(typeof (Quiz));
+			var quiz = (Quiz) serializer.Deserialize(new MemoryStream(slideFile.GetContent()));
+			foreach (var quizBlock in quiz.Blocks)
+			{
+				quizBlock.Text = Md.ToHtml(quizBlock.Text);
+			}
+			return new QuizSlide(info, quiz);
 		}
 
 		private static string GetUsings(ResourceFile file, IList<ResourceFile> all)

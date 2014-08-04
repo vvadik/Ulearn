@@ -1,4 +1,5 @@
 ﻿@using uLearn
+@using uLearn.Quizes
 @model CoursePageModel
 
 @{
@@ -15,17 +16,18 @@
 				@{var QuizSlide = Model.Slide as QuizSlide;}
 				@if (QuizSlide != null)
 				{
-					foreach (var quizBlock in QuizSlide.Quiz.QuizBlocks)
+					foreach (var quizBlock in QuizSlide.Quiz.Blocks)
 					{
-						@Html.Raw(quizBlock.Text)
-						if (quizBlock.IsTask)
+						<p>@Html.Raw(quizBlock.Text)</p>
+
+						if (quizBlock is ChoiceBlock)
 						{
-							var task = quizBlock.QuizTask;
-							<h2>@task.Condition</h2>
-							foreach (var var in task.Var)
-							{
-								<h1 style="color: green">@var.V</h1>
-							}
+							<ul>
+								@foreach (var var in (quizBlock as ChoiceBlock).Items)
+								{
+									<li><input type="radio">@var.Description</li>
+								}
+							</ul>
 						}
 					}
 				}

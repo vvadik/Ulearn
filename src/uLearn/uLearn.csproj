@@ -83,7 +83,7 @@
     <Compile Include="Quiz.cs" />
     <Compile Include="QuizSlide.cs" />
     <Compile Include="QuizBlock.cs" />
-    <Compile Include="QuizTask.cs" />
+    <Compile Include="Quiz_Test.cs" />
     <Compile Include="SlideInfo.cs" />
     <Compile Include="Markdown_investigation.cs" />
     <Compile Include="Md.cs" />
