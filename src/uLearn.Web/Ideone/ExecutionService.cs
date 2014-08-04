@@ -58,13 +58,15 @@ namespace uLearn.Web.Ideone
 			await Task.Delay(1000);
 			Debug.WriteLine("start checking status");
 			int count = 0;
-			while (GetSubmitionStatus(link).Status != SubmitionStatus.Done && count < 10)
+			var lastStatus = GetSubmitionStatus(link).Status;
+			while (lastStatus != SubmitionStatus.Done && count < 10)
 			{
 				Debug.WriteLine("nope. wait");
 				count++;
 				await Task.Delay(1000);
+				lastStatus = GetSubmitionStatus(link).Status;
 			}
-			if (count >= 20)
+			if (lastStatus != SubmitionStatus.Done)
 				throw new Exception("Ideone service process execution too slow. Can't wait any more.");
 			Debug.WriteLine("requesting details");
 			return GetSubmitionDetails(link);
