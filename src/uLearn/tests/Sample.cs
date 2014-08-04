@@ -10,9 +10,21 @@ namespace uLearn.tests
 	class Sample
 	{
 		[ShowBodyOnSlide]
-		public void DoSample()
+		public void HiddenMethodHeader()
 		{
 			Console.WriteLine("Hello Sample!");
 		}
+
+		public void Method()
+		{
+		}
+
+		[HideOnSlide]
+		public void HiddenMethod() { }
+
+		[HideOnSlide] 
+		public int HiddenField;
+		
+		public int Field;
 	}
 }

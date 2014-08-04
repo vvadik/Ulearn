@@ -26,9 +26,9 @@ namespace uLearn.Web
 			//    clientSecret: "");
 
 
-			app.UseTwitterAuthentication(
-				consumerKey: "hC6XpJy0OPVkbvGzRIOJRA",
-				consumerSecret: "cEDewTtU7RKHimj2D1IpD75HUKnjVeobdSNhjAAQ");
+//			app.UseTwitterAuthentication(
+//				consumerKey: "hC6XpJy0OPVkbvGzRIOJRA",
+//				consumerSecret: "cEDewTtU7RKHimj2D1IpD75HUKnjVeobdSNhjAAQ");
 
 			app.UseVkAuthentication(
 				appId: "4381546",

@@ -56,12 +56,21 @@ namespace uLearn
 		{
 			Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 			var newOut = new StringWriter();
-			Console.SetOut(newOut);
+			var oldOut = Console.Out;
 			var methodInfo = slide.GetMethod("Main");
-			methodInfo.Invoke(null, null);
+			Console.SetOut(newOut);
+			try
+			{
+				methodInfo.Invoke(null, null);
+			}
+			finally
+			{
+				Console.SetOut(oldOut);
+			}
 			var declaringType = methodInfo.DeclaringType;
 			if (declaringType == null) throw new Exception("should be!");
 			var expectedOutput = String.Join("\n", GetExpectedOutputAttributes(declaringType).Select(a => a.Output));
+			Console.WriteLine(newOut.ToString());
 			Assert.AreEqual(PrepareOutput(expectedOutput), PrepareOutput(newOut.ToString()));
 		}
 

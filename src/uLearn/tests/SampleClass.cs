@@ -22,6 +22,7 @@ namespace uLearn.tests
 			[ExcludeFromSolution]
 			public int X, Y;
 
+
 			[ExpectedOutput("")]
 			public void M()
 			{

@@ -1,11 +1,10 @@
-﻿@using Microsoft.Ajax.Utilities
-@using uLearn
+﻿@using uLearn
 @model CoursePageModel
 
 @{
 	ViewBag.Title = Model.Course.Title;
 }
-@Html.Partial("_Sidebar", Model)
+@Html.Partial("_TableOfContents", Model)
 
 
 <div class="slide-container">
