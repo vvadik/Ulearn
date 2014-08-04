@@ -17,12 +17,12 @@ namespace uLearn.CSharp
 		public static string GetHint(this AttributeSyntax attribute)
 		{
 			if (attribute.Name.ToString() != GetAttributeShortName<HintAttribute>()) throw new Exception("Not a HintAttribute");
-			return attribute.GetArgument();
+			return attribute.GetArgument(0);
 		}
 
-		public static string GetArgument(this AttributeSyntax attribute)
+		public static string GetArgument(this AttributeSyntax attribute, int index)
 		{
-			var expr = (LiteralExpressionSyntax)attribute.ArgumentList.Arguments[0].Expression;
+			var expr = (LiteralExpressionSyntax)attribute.ArgumentList.Arguments[index].Expression;
 			return (string)expr.Token.Value;
 		}
 
@@ -58,34 +58,45 @@ namespace uLearn.CSharp
 			return node.WithAttributeLists(new SyntaxList<AttributeListSyntax>());
 		}
 
-		public static string ToPrettyString(this MethodDeclarationSyntax node)
+		public static MemberDeclarationSyntax WithoutAttributes(this MemberDeclarationSyntax node)
 		{
-			int bodyNestingSize = node.SyntaxTree.GetLineSpan(node.Body.OpenBraceToken.Span).StartLinePosition.Character;
-			return new string('\t', bodyNestingSize) + node;
+			return (MemberDeclarationSyntax)((dynamic)node).WithAttributeLists(new SyntaxList<AttributeListSyntax>());
 		}
 
-		public static string ToPrettyString(this ClassDeclarationSyntax node)
+		private static string PrettyString(MethodDeclarationSyntax node)
 		{
-			int bodyNestingSize = node.SyntaxTree.GetLineSpan(node.OpenBraceToken.Span).StartLinePosition.Character;
-			return new string('\t', bodyNestingSize) + node;
+			return PrettyString(node, node.Body.OpenBraceToken);
+		}
+
+		private static string PrettyString(SyntaxNode node, SyntaxToken tokenToAlignLeft)
+		{
+			int bodyNestingSize = node.SyntaxTree.GetLineSpan(tokenToAlignLeft.Span).StartLinePosition.Character;
+			return (new string('\t', bodyNestingSize) + node).RemoveCommonNesting();
+		}
+
+		private static string PrettyString(EnumDeclarationSyntax node)
+		{
+			return PrettyString(node, node.OpenBraceToken);
+		}
+
+		private static string PrettyString(StructDeclarationSyntax node)
+		{
+			return PrettyString(node, node.OpenBraceToken);
+		}
+
+		private static string PrettyString(ClassDeclarationSyntax node)
+		{
+			return PrettyString(node, node.OpenBraceToken);
+		}
+
+		private static string PrettyString(MemberDeclarationSyntax node)
+		{
+			return node.ToFullString().RemoveCommonNesting();
 		}
 
 		public static string ToPrettyString(this SyntaxNode node)
 		{
-			return node.ToNotIdentedString();
-		}
-
-		private static string CutFirstCharacters(string str, char character, int size)
-		{
-			var counter = 0;
-			foreach (var c in str)
-			{
-				if (c == character)
-					counter++;
-				else
-					break;
-			}
-			return str.Remove(Math.Min(counter, size));
+			return PrettyString((dynamic)node);
 		}
 
 		public static string ToNotIdentedString(this SyntaxNode node)

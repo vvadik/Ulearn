@@ -25,93 +25,61 @@ namespace uLearn.CSharp
 			this.getInclude = getInclude;
 		}
 
-		public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
+		private SyntaxNode VisitMemberDeclaration(MemberDeclarationSyntax node, SyntaxNode newNode)
 		{
-			var classDeclaration = ((ClassDeclarationSyntax)base.VisitClassDeclaration(node))
-				.WithAttributeLists(new SyntaxList<AttributeListSyntax>());
-			if (node.HasAttribute<SlideAttribute>())
-			{
-				AddInBlockEnumAndBasicFieldDeclarationSyntax(node);
-				var argumentList = node.GetAttributes<SlideAttribute>().Select(a => a.ArgumentList).Single();
-				Title = argumentList.Arguments[0].ToString().Trim(new[] {'"'});
-				Id = argumentList.Arguments[1].ToString().Trim(new[] {'"'});
-			}
+			var includeInSolution = !node.HasAttribute<ExcludeFromSolutionAttribute>() && !node.HasAttribute<ExerciseAttribute>();
 			if (ShowOnSlide(node))
 				AddCodeBlockInStart(node);
-			return classDeclaration;
+			return includeInSolution ? ((MemberDeclarationSyntax)newNode).WithoutAttributes() : null;
+		}
+
+		public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
+		{
+			if (node.HasAttribute<SlideAttribute>())
+			{
+				var arguments =
+					node.GetAttributes<SlideAttribute>()
+					.Select(a => new { title = a.GetArgument(0), id = a.GetArgument(1) })
+					.Single();
+				Title = arguments.title;
+				Id = arguments.id;
+			}
+			return VisitMemberDeclaration(node, base.VisitClassDeclaration(node));
+		}
+
+		public override SyntaxNode VisitEnumDeclaration(EnumDeclarationSyntax node)
+		{
+			return VisitMemberDeclaration(node, base.VisitEnumDeclaration(node));
 		}
 
 		public override SyntaxNode VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
 		{
-			var newNode =
-				((ConstructorDeclarationSyntax)base.VisitConstructorDeclaration(node))
-				.WithAttributeLists(new SyntaxList<AttributeListSyntax>());
-			var includeInSolution = !node.HasAttribute<ExcludeFromSolutionAttribute>();
-			return includeInSolution ? newNode : null;
+			return VisitMemberDeclaration(node, base.VisitConstructorDeclaration(node));
 		}
 
 		public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
 		{
-			var newNode =
-				((FieldDeclarationSyntax)base.VisitFieldDeclaration(node))
-				.WithAttributeLists(new SyntaxList<AttributeListSyntax>());
-			var includeInSolution = !node.HasAttribute<ExcludeFromSolutionAttribute>();
-			return includeInSolution ? newNode : null;
+			return VisitMemberDeclaration(node, base.VisitFieldDeclaration(node));
 		}
 
 		public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
 		{
-			var newMethod = (MethodDeclarationSyntax) base.VisitMethodDeclaration(node);
-			if (ShowOnSlide(node))
-			{
-				AddCodeBlockInStart(node);
-			}
+			var newMethod = VisitMemberDeclaration(node, base.VisitMethodDeclaration(node));
 			if (node.HasAttribute<ExpectedOutputAttribute>())
 			{
 				IsExercise = true;
-				ExpectedOutput = node.GetAttributes<ExpectedOutputAttribute>().Select(attr => attr.GetArgument()).FirstOrDefault();
+				ExpectedOutput = node.GetAttributes<ExpectedOutputAttribute>().Select(attr => attr.GetArgument(0)).FirstOrDefault();
 			}
 			if (node.HasAttribute<HintAttribute>())
 			{
-				Hints.AddRange(node.GetAttributes<HintAttribute>().Select(attr => attr.GetArgument()));
+				Hints.AddRange(node.GetAttributes<HintAttribute>().Select(attr => attr.GetArgument(0)));
 			}
 			if (node.HasAttribute<ExerciseAttribute>())
 			{
 				ExerciseNode = node;
 				ExerciseInitialCode = GetExerciseCode(node);
 			}
-			var includeInSolution =
-				!node.HasAttribute<ExerciseAttribute>()
-				&& !node.HasAttribute<ExcludeFromSolutionAttribute>();
-			return includeInSolution ? newMethod.WithoutAttributes() : null;
-		}
-
-		private void AddInBlockEnumAndBasicFieldDeclarationSyntax(SyntaxNode node)
-		{
-			foreach (var statement in node.
-				DescendantNodes().
-				Where(x => x is EnumDeclarationSyntax || x is BaseFieldDeclarationSyntax).
-				Where(x => x.Parent == node))
-			{
-				if (statement is BaseFieldDeclarationSyntax)
-					AddCodeBlockInStart(statement.ToString());
-				else
-				{
-					var localEnum =
-						CSharpSyntaxTree.ParseText(statement.ToString())
-							.GetRoot()
-							.DescendantNodes()
-							.Where(x => x is EnumDeclarationSyntax)
-							.Select(x => (x as EnumDeclarationSyntax))
-							.First();
-					var endLine = localEnum.CloseBraceToken.GetLocation().GetLineSpan().StartLinePosition.Line;
-					var tabsCount = localEnum.OpenBraceToken.ToFullString().IndexOf('{');
-					var localEnumSplited = statement.ToString().SplitToLines();
-					for (var lineIndex = 1; lineIndex <= endLine; lineIndex++)
-						localEnumSplited[lineIndex] = localEnumSplited[lineIndex].Substring(tabsCount);
-					AddCodeBlockInStart(String.Join("\r\n", localEnumSplited));
-				}
-			}
+			return newMethod;
 		}
 
 		private void AddCodeBlockInStart(MemberDeclarationSyntax node)
@@ -122,17 +90,6 @@ namespace uLearn.CSharp
 				Blocks[Blocks.Count - 1] = SlideBlock.FromCode(lastBlock.Text + "\r\n\r\n" + sampleBlock.Text);
 			else
 				Blocks.Add(sampleBlock);
-		}
-
-		private void AddCodeBlockInStart(string node)
-		{
-			for (var i = 0; i < Blocks.Count; i++)
-			{
-				if (!Blocks[i].IsCode) continue;
-				Blocks[i] = SlideBlock.FromCode(node + "\r\n\r\n" + Blocks[i].Text);
-				return;
-			}
-			Blocks.Add(SlideBlock.FromCode(node));
 		}
 
 		private static bool ShowOnSlide(MemberDeclarationSyntax node)
@@ -147,21 +104,18 @@ namespace uLearn.CSharp
 			var code = node.HasAttribute<ShowBodyOnSlideAttribute>() 
 				? node.Body.Statements.ToFullString()
 				: node.WithoutAttributes().ToPrettyString();
-			return SlideBlock.FromCode(code.RemoveCommonNesting());
+			return SlideBlock.FromCode(code);
 		}
 
-		private SlideBlock CreateSampleBlock(ClassDeclarationSyntax node)
+		private SlideBlock CreateSampleBlock(MemberDeclarationSyntax node)
 		{
-			string code = node.WithAttributeLists(new SyntaxList<AttributeListSyntax>())
-				.ToPrettyString()
-				.RemoveCommonNesting();
+			string code = node.WithoutAttributes().ToPrettyString();
 			return SlideBlock.FromCode(code);
 		}
 
 		private string GetExerciseCode(MethodDeclarationSyntax method)
 		{
-			var codeLines = method.TransformExercise().ToPrettyString().SplitToLines().RemoveCommonNesting();
-
+			var codeLines = method.TransformExercise().ToPrettyString().SplitToLines();
 			return string.Join("\n", FilterSpecialComments(codeLines));
 		}
 

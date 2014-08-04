@@ -79,9 +79,20 @@ namespace uLearn.CSharp
 		public void remove_method_header_from_code_block()
 		{
 			Slide slide = GenerateSlide("Sample.cs");
-			Assert.That(slide.Blocks[0].Text, Is.EqualTo("Console.WriteLine(\"Hello Sample!\");"));
+			var blockText = slide.Blocks[0].Text;
+			Assert.That(blockText, Is.StringContaining("Console.WriteLine(\"Hello Sample!\");"));
+			Assert.That(blockText, Is.Not.StringContaining("HiddenMethodHeader"));
 		}
 
+		[Test]
+		public void remove_hidden_members_from_code_block()
+		{
+			Slide slide = GenerateSlide("Sample.cs");
+			var blockText = slide.Blocks[0].Text;
+			Assert.That(blockText, Is.Not.StringContaining("Hidden"));
+		}
+		
+		
 		[Test]
 		public void join_adjacent_code_blocks()
 		{
