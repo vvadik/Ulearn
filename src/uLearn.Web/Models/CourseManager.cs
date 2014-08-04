@@ -89,6 +89,10 @@ namespace uLearn.Web.Models
 				{
 					var a = new XmlSerializer(typeof (Quiz));
 					var quiz = (Quiz) a.Deserialize(new MemoryStream(slideFile.GetContent()));
+					foreach (var quizBlock in quiz.QuizBlocks)
+					{
+						quizBlock.Text = Md.ToHtml(quizBlock.Text);
+					}
 					return new QuizSlide(new List<SlideBlock>(), info, quiz);
 				}
 				return SlideParser.ParseCode(sourceCode, info, usings, getInclude);

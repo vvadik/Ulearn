@@ -17,14 +17,14 @@
 				{
 					foreach (var quizBlock in QuizSlide.Quiz.QuizBlocks)
 					{
-						<h3>@quizBlock.Text</h3>
+						@Html.Raw(quizBlock.Text)
 						if (quizBlock.IsTask)
 						{
 							var task = quizBlock.QuizTask;
 							<h2>@task.Condition</h2>
 							foreach (var var in task.Var)
 							{
-								<h1>@var.V</h1>
+								<h1 style="color: green">@var.V</h1>
 							}
 						}
 					}

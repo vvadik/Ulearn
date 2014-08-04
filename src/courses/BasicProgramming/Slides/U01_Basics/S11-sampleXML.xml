@@ -4,7 +4,9 @@
 		
 		<QuizBlock>
 			<IsTask>1</IsTask>
-			<Text>##This is quiz</Text>
+			<Text>##This is quiz
+			tratata
+			</Text>
 			<QuizTask>
 				<Condition> 2 + 2 = ?</Condition>
 				<Variables>
@@ -44,8 +46,7 @@
 
 	<QuizBlock>
 		<IsTask>0</IsTask>
-		<Text>
-		  ##good job
+		<Text>##good job
 		  
 		  beautifull text, nice text, looooooooooooooooooooooooooooong text
 		  enters
