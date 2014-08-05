@@ -197,6 +197,7 @@
     <Compile Include="DataContexts\SlideHintRepo.cs" />
     <Compile Include="DataContexts\SlideRateRepo.cs" />
     <Compile Include="DataContexts\UserQuestionsRepo.cs" />
+    <Compile Include="DataContexts\UserQuizzesRepo.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo_should.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo.cs" />
     <Compile Include="DataContexts\VisitersRepo.cs" />
@@ -224,6 +225,10 @@
     <Compile Include="Migrations\201408031111210_MoreSpace_For_UserSolution_Fields.cs" />
     <Compile Include="Migrations\201408031111210_MoreSpace_For_UserSolution_Fields.Designer.cs">
       <DependentUpon>201408031111210_MoreSpace_For_UserSolution_Fields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201408050611273_AddQuizzes.cs" />
+    <Compile Include="Migrations\201408050611273_AddQuizzes.Designer.cs">
+      <DependentUpon>201408050611273_AddQuizzes.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\CourseManager_should.cs" />
     <EmbeddedResource Include="Courses\**\*.*">
@@ -268,6 +273,7 @@
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\RunSolutionResult.cs" />
     <Compile Include="Models\SlideViewModel.cs" />
+    <Compile Include="Models\UserQuiz.cs" />
     <Compile Include="Models\UserSolution.cs" />
     <Compile Include="Models\Visiters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -291,6 +297,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201408031111210_MoreSpace_For_UserSolution_Fields.resx">
       <DependentUpon>201408031111210_MoreSpace_For_UserSolution_Fields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408050611273_AddQuizzes.resx">
+      <DependentUpon>201408050611273_AddQuizzes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

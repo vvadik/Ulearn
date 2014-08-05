@@ -100,11 +100,23 @@ namespace uLearn.Web.Models
 		{
 			var serializer = new XmlSerializer(typeof (Quiz));
 			var quiz = (Quiz) serializer.Deserialize(new MemoryStream(slideFile.GetContent()));
-			foreach (var quizBlock in quiz.Blocks)
-			{
-				quizBlock.Text = Md.ToHtml(quizBlock.Text);
-			}
+			FillEmptyField(quiz);
 			return new QuizSlide(info, quiz);
+		}
+
+		private static void FillEmptyField(Quiz quiz)
+		{
+			for (var blockIndex = 0; blockIndex < quiz.Blocks.Length; blockIndex++)
+			{
+				quiz.Blocks[blockIndex].Text = Md.ToHtml(quiz.Blocks[blockIndex].Text);
+				if (quiz.Blocks[blockIndex].Id == null)
+					quiz.Blocks[blockIndex].Id = blockIndex.ToString();
+				var choiceBlock = quiz.Blocks[blockIndex] as ChoiceBlock;
+				if (choiceBlock == null) continue;
+				for (var itemIndex = 0; itemIndex < choiceBlock.Items.Length; itemIndex++)
+					if (choiceBlock.Items[itemIndex].Id == null)
+						choiceBlock.Items[itemIndex].Id = itemIndex.ToString();
+			}
 		}
 
 		private static string GetUsings(ResourceFile file, IList<ResourceFile> all)
