@@ -32,7 +32,7 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		/*
-		Ровно того же эффекта можно добиться и без цикла при помощи Linq-метода `ToDictionary`:
+		Ровно того же эффекта можно добиться и без цикла при помощи `LINQ`-метода `ToDictionary`:
 
 		`IDictionary<K, V> ToDictionary(this IEnumerable<T> items, Func<T, K> keySelector, Func<T, V> valueSelector)`
 		

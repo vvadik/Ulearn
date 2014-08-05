@@ -9,12 +9,14 @@ namespace uLearn.Courses.Linq.Slides
 	public class ReadNumbersExcercise
 	{
 		/*
-		Linq удобно использовать для чтения из файла и разбора простых текстовых форматов. Особенно удобно сочетать методы `Linq` с методами класса `File`: `File.ReadLines(filename)`, `File.WriteLines(filename, lines)`.
+		`LINQ` удобно использовать для чтения из файла и разбора простых текстовых форматов.
+		Особенно удобно сочетать методы `LINQ` с методами класса `File`: 
+		`File.ReadLines(filename)`, `File.WriteLines(filename, lines)`.
 
 		В файле каждая строка либо пустая, либо содержит одно целое число. 
 		Кто-то уже вызвал метод `File.ReadLines(filename)` и теперь у вас есть массив всех строк файла.
 
-		Реализуйте метод `ParseNumbers` в одно `Linq`-выражение.
+		Реализуйте метод `ParseNumbers` в одно `LINQ`-выражение.
 		*/
 
 
