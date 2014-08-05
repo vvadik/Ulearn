@@ -19,5 +19,6 @@ namespace uLearn.Web.DataContexts
 		public DbSet<SlideRate> SlideRates { get; set; }
 		public DbSet<Visiters> Visiters { get; set; }
 		public DbSet<SlideHint> Hints { get; set; }
+		public DbSet<UserQuiz> UserQuizzes { get; set; }
 	}
 }
