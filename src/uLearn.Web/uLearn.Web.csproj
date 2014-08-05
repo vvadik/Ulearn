@@ -594,6 +594,7 @@
     <None Include="Properties\PublishProfiles\ulearn.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\buttons.js" />
+    <Content Include="Scripts\slide-quiz.js" />
     <Content Include="Scripts\slide-hints.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -672,6 +673,7 @@
     <Content Include="Views\Analytics\UsersStatistics.cshtml" />
     <Content Include="Views\Analytics\PersonalStatistics.cshtml" />
     <Content Include="Views\Course\_SolutionControl.cshtml" />
+    <Content Include="Views\Course\_Quiz.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

@@ -13,24 +13,7 @@
 		<div class="row">
 			<div class='slide'>
 				<h1>@Model.Slide.Title</h1>
-				@{var QuizSlide = Model.Slide as QuizSlide;}
-				@if (QuizSlide != null)
-				{
-					foreach (var quizBlock in QuizSlide.Quiz.Blocks)
-					{
-						<p>@Html.Raw(quizBlock.Text)</p>
-
-						if (quizBlock is ChoiceBlock)
-						{
-							<ul>
-								@foreach (var var in (quizBlock as ChoiceBlock).Items)
-								{
-									<li><input type="radio">@var.Description</li>
-								}
-							</ul>
-						}
-					}
-				}
+				@Html.Partial("_Quiz", Model)
 				@foreach (SlideBlock block in Model.Slide.Blocks)
 				{
 					if (block.IsCode)

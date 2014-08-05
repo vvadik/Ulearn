@@ -1,0 +1,25 @@
+﻿@using uLearn
+@using uLearn.Quizes
+@model uLearn.CoursePageModel
+@{ var QuizSlide = Model.Slide as QuizSlide;}
+@if (QuizSlide != null)
+{
+	foreach (var quizBlock in QuizSlide.Quiz.Blocks)
+	{
+		<p>@Html.Raw(quizBlock.Text)</p>
+
+		if (quizBlock is ChoiceBlock)
+		{
+			<ul>
+				@foreach (var var in (quizBlock as ChoiceBlock).Items)
+				{
+					<li><input type="radio">@var.Description</li>
+				}
+			</ul>
+		}
+	}
+    <div id="quizGet" data-url="lol"></div>
+    <div id="quizSub" data-url="lol2">
+    <button>Submit my result</button>
+</div>
+}
