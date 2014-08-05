@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
@@ -15,7 +16,8 @@ namespace uLearn.Courses.Linq.Slides
 		Слова нужно сравнивать регистронезависимо, а выводить в нижнем регистре.
 		*/
 
-		[Exercise(SingleStatement = true)]
+		[Exercise]
+		[SingleStatementMethod]
 		[Hint("`Regex.Split` — позволяет задать регулярное выражение для разделителей слов и получить список слов.")]
 		[Hint("`Regex.Split(s, @\"\\W+\")` разбивает текст на слова")]
 		[Hint("Подумайте, как скомбинировать SelectMany, со вложенным `Regex.Split`")]

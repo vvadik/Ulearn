@@ -84,7 +84,7 @@ namespace uLearn.Web.Models
 			try
 			{
 				var sourceCode = Encoding.UTF8.GetString(slideFile.GetContent());
-				var usings = GetUsings(slideFile, resourceFiles); 
+				var usings = GetExercisePrelude(slideFile, resourceFiles); 
 				var info = GetInfoForSlide(slideFile, resourceFiles);
 				return slideFile.Filename.EndsWith(".xml") 
 					? LoadQuiz(slideFile, info) 
@@ -119,10 +119,10 @@ namespace uLearn.Web.Models
 			}
 		}
 
-		private static string GetUsings(ResourceFile file, IList<ResourceFile> all)
+		private static string GetExercisePrelude(ResourceFile file, IList<ResourceFile> all)
 		{
 			var detailedPath = file.FullName.Split('.').ToArray();
-			return Encoding.UTF8.GetString(all.Single(x => x.FullName.EndsWith(detailedPath[detailedPath.Length - 3] + ".Usings.txt")).GetContent());
+			return Encoding.UTF8.GetString(all.Single(x => x.FullName.EndsWith(detailedPath[detailedPath.Length - 3] + ".Prelude.txt")).GetContent());
 		}
 
 		private static SlideInfo GetInfoForSlide(ResourceFile file, IList<ResourceFile> all)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
@@ -57,6 +58,7 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		[Exercise]
+		[SingleStatementMethod]
 		[Hint("`IEnumerable<R> SelectMany(this IEnumerable<T> items, Func<T, IEnumerable<R>> f)`")]
 		[Hint("`T[] ToArray(this IEnumerable<T> items)`")]
 		public static string[] GetAllStudents(Classroom[] classes)

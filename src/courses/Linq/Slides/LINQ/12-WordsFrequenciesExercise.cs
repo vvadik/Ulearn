@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
@@ -23,7 +24,8 @@ namespace uLearn.Courses.Linq.Slides
 		    IEnumerable<T>                        Take(this IEnumerable<T> items, int count)
 		*/
 
-		[Exercise(SingleStatement = true)]
+		[Exercise]
+		[SingleStatementMethod]
 		public static Tuple<string, int>[] GetMostFrequentWords(string text, int count)
 		{
 			return Regex.Split(text, @"\W+")

@@ -210,7 +210,7 @@ namespace uLearn.CSharp
 		{
 			var slide = (ExerciseSlide) GenerateSlide("HelloWorld.cs");
 			var userSolution = "/* no solution */";
-			var ans = slide.Solution.BuildSolution(userSolution);
+			var ans = slide.Solution.BuildSolution(userSolution).SourceCode;
 			Console.WriteLine(ans);
 			StringAssert.DoesNotContain("[", ans);
 			StringAssert.Contains("void Main(", ans);

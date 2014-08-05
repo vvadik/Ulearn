@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
@@ -35,7 +36,8 @@ namespace uLearn.Courses.Linq.Slides
 			public int X, Y;
 		}
 
-		[Exercise(SingleStatement = true)]
+		[Exercise]
+		[SingleStatementMethod]
 		[Hint("string.Split — разбивает строку на части по разделителю")]
 		[Hint("int.Parse преобразует строку в целое число.")]
 		[Hint("Каждую строку нужно преобразовать в точку. Преобразование — это дело для метода Select. ",

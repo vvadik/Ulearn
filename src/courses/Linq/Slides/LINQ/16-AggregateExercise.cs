@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
@@ -18,7 +19,8 @@ namespace uLearn.Courses.Linq.Slides
 
 		*/
 
-		[Exercise(SingleStatement = true)]
+		[Exercise]
+		[SingleStatementMethod]
 		[Hint("Вспомните про кортежи")]
 		[Hint("Вспомните про особенности сравнения кортежей")]
 		public static string GetLongest(IEnumerable<string> words)

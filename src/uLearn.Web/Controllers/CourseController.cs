@@ -101,7 +101,7 @@ namespace uLearn.Web.Controllers
 			var code = GetUserCode(Request.InputStream);
 			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
 			var solution = exerciseSlide.Solution.BuildSolution(code);
-			return Content(solution, "text/plain");
+			return Content(solution.SourceCode ?? solution.ErrorMessage, "text/plain");
 		}
 
 		[HttpPost]
@@ -185,7 +185,15 @@ namespace uLearn.Web.Controllers
 		private async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code, int slideIndex)
 		{
 			var solution = exerciseSlide.Solution.BuildSolution(code);
-			var submition = await executionService.Submit(solution, "");
+			if (solution.HasErrors)
+				return new RunSolutionResult
+				{
+					CompilationError = solution.ErrorMessage,
+					IsRightAnswer = false,
+					ExpectedOutput = "",
+					ActualOutput = ""
+				};
+			var submition = await executionService.Submit(solution.SourceCode, "");
 			var output = submition.Output + "\n" + submition.StdErr;
 			var isRightAnswer = NormalizeString(output).Equals(NormalizeString(exerciseSlide.ExpectedOutput));
 			return new RunSolutionResult
