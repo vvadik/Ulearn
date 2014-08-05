@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using NUnit.Framework;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Ideone;
@@ -218,43 +219,83 @@ namespace uLearn.Web.Controllers
 			await visitersRepo.AddVisiter(courseId, slideId, User.Identity.GetUserId());
 		}
 
-		public async Task<List<string>> SubmitQuiz(string courseId, string slideId, string answer)
+		public async Task<string> SubmitQuiz(string courseId, string slideIndex, string answer)
 		{
+			var intSlideIndex = int.Parse(slideIndex);
 			var answers = answer.Split('*').Select(x => x.Split('_').Take(2).ToList()).GroupBy(x => x[0]);
 			var incorrectQuizzes = new List<string>();
 			var course = courseManager.GetCourse(courseId);
 			foreach (var ans in answers)
 			{
-				var quizInfo = GetQuizInfo(course, slideId, ans);
-				await userQuizzesRepo.AddUserQuiz(courseId, quizInfo.IsRightAnswer, quizInfo.ItemId, quizInfo.QuizId, slideId, quizInfo.Text, User.Identity.GetUserId());
-				if (!quizInfo.IsRightAnswer)
-					incorrectQuizzes.Add(quizInfo.QuizId);
+				var quizInfo = GetQuizInfo(course, intSlideIndex, ans);
+				foreach (var quizInfoForDb in quizInfo)
+				{
+					await
+						userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
+							course.Slides[intSlideIndex].Id, quizInfoForDb.Text, User.Identity.GetUserId());
+					if (!quizInfoForDb.IsRightAnswer)
+						incorrectQuizzes.Add(ans.Key);
+				}
 			}
+			return string.Join("*", incorrectQuizzes);
 		}
 
-		private QuizInfoForDb GetQuizInfo(Course course, string slideId, IGrouping<string, List<string>> answer)
+		private List<QuizInfoForDb> GetQuizInfo(Course course, int slideIndex, IGrouping<string, List<string>> answer)
 		{
-			var slide = course.GetSlideUsingId(slideId) as QuizSlide;
+			var slide = course.Slides[slideIndex] as QuizSlide;
 			if (slide == null)
 				throw new Exception("Error in func 'GetSlideUsingId' or in 'QuizSlideId'");
-			var block = slide.GetBlockById(answer.Key);
+			var block = slide.Quiz.Blocks[int.Parse(answer.Key)];
 			var data = answer.ToList();
 			if (block is FillInBlock)
 				return CreateQuizInfoForDb(block as FillInBlock, answer, data);
 			if (block is ChoiceBlock)
-			{
-				var choiseBlock = block as ChoiceBlock;
-			}
+				return CreateQuizInfoForDb(block as ChoiceBlock, answer, data);
+			return CreateQuizInfoForDb(block as IsTrueBlock, answer, data);
 		}
 
-		private QuizInfoForDb CreateQuizInfoForDb(FillInBlock fillInBlock, IGrouping<string, List<string>> answer, List<List<string>> data)
+		private List<QuizInfoForDb> CreateQuizInfoForDb(IsTrueBlock isTrueBlock, IGrouping<string, List<string>> answer, List<List<string>> data)
 		{
-			return new QuizInfoForDb
+			return null;
+		}
+
+		private List<QuizInfoForDb> CreateQuizInfoForDb(ChoiceBlock choiseBlock, IGrouping<string, List<string>> answer, List<List<string>> data)
+		{
+			if (choiseBlock.Multiple)
 			{
-				QuizId = answer.Key,
-				ItemId = null,
-				IsRightAnswer = fillInBlock.Regexes.Any(regex => Regex.IsMatch(data.First()[1], regex)),
-				Text = data.First()[1]
+				var ans = answer.ToList()
+					.Select(x => new QuizInfoForDb {QuizId = choiseBlock.Id, IsRightAnswer = false, ItemId = x[1], Text = null}).ToList();
+				var correctItems = new HashSet<string>(choiseBlock.Items.Where(x => x.IsCorrect).Select(x => x.Id));
+				var ansItem = new HashSet<string>(ans.Select(x => x.ItemId));
+				var count = ansItem.Count(correctItems.Contains);
+				if (count != correctItems.Count || count != ansItem.Count) return ans;
+				foreach (var info in ans)
+					info.IsRightAnswer = true;
+				return ans;
+			}
+			return new List<QuizInfoForDb>
+			{
+				new QuizInfoForDb
+				{
+					QuizId = choiseBlock.Id,
+					ItemId = choiseBlock.Items[int.Parse(data.First()[1])].Id,
+					IsRightAnswer = choiseBlock.Items[int.Parse(data.First()[1])].IsCorrect,
+					Text = null
+				}
+			};
+		}
+
+		private List<QuizInfoForDb> CreateQuizInfoForDb(FillInBlock fillInBlock, IGrouping<string, List<string>> answer, List<List<string>> data)
+		{
+			return new List<QuizInfoForDb>
+			{
+				new QuizInfoForDb
+				{
+					QuizId = fillInBlock.Id,
+					ItemId = null,
+					IsRightAnswer = fillInBlock.Regexes.Any(regex => Regex.IsMatch(data.First()[1], regex)),
+					Text = data.First()[1]
+				}
 			};
 		}
 	}
