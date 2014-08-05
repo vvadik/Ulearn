@@ -256,7 +256,16 @@ namespace uLearn.Web.Controllers
 
 		private List<QuizInfoForDb> CreateQuizInfoForDb(IsTrueBlock isTrueBlock, IGrouping<string, List<string>> answer, List<List<string>> data)
 		{
-			return null;
+			return new List<QuizInfoForDb>
+			{
+				new QuizInfoForDb
+				{
+					QuizId = isTrueBlock.Id,
+					ItemId = null,
+					IsRightAnswer = isTrueBlock.Answer.ToString() == data.First()[1],
+					Text = null
+				}
+			};
 		}
 
 		private List<QuizInfoForDb> CreateQuizInfoForDb(ChoiceBlock choiseBlock, IGrouping<string, List<string>> answer, List<List<string>> data)
@@ -264,7 +273,7 @@ namespace uLearn.Web.Controllers
 			if (choiseBlock.Multiple)
 			{
 				var ans = answer.ToList()
-					.Select(x => new QuizInfoForDb {QuizId = choiseBlock.Id, IsRightAnswer = false, ItemId = x[1], Text = null}).ToList();
+					.Select(x => new QuizInfoForDb { QuizId = choiseBlock.Id, IsRightAnswer = false, ItemId = x[1], Text = null }).ToList();
 				var correctItems = new HashSet<string>(choiseBlock.Items.Where(x => x.IsCorrect).Select(x => x.Id));
 				var ansItem = new HashSet<string>(ans.Select(x => x.ItemId));
 				var count = ansItem.Count(correctItems.Contains);
