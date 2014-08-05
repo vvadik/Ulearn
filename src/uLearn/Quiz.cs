@@ -66,6 +66,7 @@ namespace uLearn.Quizes
 
 		[XmlAttribute("isCorrect")]
 		public bool IsCorrect;
+
 		[XmlText]
 		public string Description;
 	}
