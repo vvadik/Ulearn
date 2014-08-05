@@ -59,7 +59,9 @@ namespace uLearn.Web.Controllers
 				LatestAcceptedSolution = isPassedTask ? solutionsRepo.GetLatestAcceptedSolution(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId()) : null,
 				Rate = GetRate(course.Id, course.Slides[slideIndex].Id),
 				SolvedSlide = solutionsRepo.GetIndexesOfPassedSlide(course.Id, User.Identity.GetUserId()),
-				VisitedSlide = visitersRepo.GetIndexesOfVisitedSlide(course.Id, User.Identity.GetUserId())
+				VisitedSlide = visitersRepo.GetIndexesOfVisitedSlide(course.Id, User.Identity.GetUserId()),
+				IsPassedQuiz = userQuizzesRepo.IsQuizPassed(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId()),
+				AnswersToQuizes = userQuizzesRepo.GetAnswersForShowOnSlide(courseId, course.Slides[slideIndex] as QuizSlide, User.Identity.GetUserId())
 			};
 			return model;
 		}
@@ -219,8 +221,11 @@ namespace uLearn.Web.Controllers
 			await visitersRepo.AddVisiter(courseId, slideId, User.Identity.GetUserId());
 		}
 
+		[HttpPost]
+		[Authorize]
 		public async Task<string> SubmitQuiz(string courseId, string slideIndex, string answer)
 		{
+			var time = DateTime.Now;
 			var intSlideIndex = int.Parse(slideIndex);
 			var answers = answer.Split('*').Select(x => x.Split('_').Take(2).ToList()).GroupBy(x => x[0]);
 			var incorrectQuizzes = new List<string>();
@@ -232,12 +237,12 @@ namespace uLearn.Web.Controllers
 				{
 					await
 						userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
-							course.Slides[intSlideIndex].Id, quizInfoForDb.Text, User.Identity.GetUserId());
+							course.Slides[intSlideIndex].Id, quizInfoForDb.Text, User.Identity.GetUserId(), time);
 					if (!quizInfoForDb.IsRightAnswer)
 						incorrectQuizzes.Add(ans.Key);
 				}
 			}
-			return string.Join("*", incorrectQuizzes);
+			return string.Join("*", incorrectQuizzes.Distinct());
 		}
 
 		private IEnumerable<QuizInfoForDb> GetQuizInfo(Course course, int slideIndex, IGrouping<string, List<string>> answer)
@@ -263,7 +268,7 @@ namespace uLearn.Web.Controllers
 					QuizId = isTrueBlock.Id,
 					ItemId = null,
 					IsRightAnswer = isTrueBlock.Answer.ToString() == data.First()[1],
-					Text = null
+					Text = data.First()[1]
 				}
 			};
 		}

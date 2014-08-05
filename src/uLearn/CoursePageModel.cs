@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace uLearn
 {
@@ -16,5 +17,7 @@ namespace uLearn
 		public string Rate {get; set;}
 		public HashSet<string> VisitedSlide { get; set; }
 		public HashSet<string> SolvedSlide { get; set; }
+		public bool IsPassedQuiz { get; set; }
+		public Dictionary<string, List<string>> AnswersToQuizes { get; set; } 
 	}
 }
