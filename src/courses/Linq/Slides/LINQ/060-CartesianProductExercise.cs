@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
@@ -51,7 +52,8 @@ Neighbours of (0 0)
 				Console.WriteLine(line);
 		}
 
-		[Exercise(SingleStatement = false)]
+		[Exercise]
+		[SingleStatementMethod]
 		[Hint("Декартово произведение множества {-1, 0, 1} на себя даст все возможные относительные координаты соседей")]
 		[Hint("Используйте вызов Select внутри вызова SelectMany")]
 		public static IEnumerable<Point> GetNeighbours(Point p)

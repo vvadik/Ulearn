@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
@@ -27,6 +28,7 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		[Exercise]
+		[SingleStatementMethod]
 		[Hint("`int.Parse` преобразует строку в целое число.")]
 		public static int[] ParseNumbers(IEnumerable<string> lines)
 		{

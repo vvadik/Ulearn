@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
@@ -18,7 +19,8 @@ namespace uLearn.Courses.Linq.Slides
 		Запрещено использовать `ThenBy` и `ThenByDescending`.
 		*/
 
-		[Exercise(SingleStatement = true)]
+		[Exercise]
+		[SingleStatementMethod]
 		[Hint("`Regex.Split` — позволяет задать регулярное выражение для разделителей слов и получить список слов.")]
 		[Hint("`Regex.Split(s, @\"\\W+\")` разбивает текст на слова")]
 		[Hint("Пустая строка не является корректным словом")]

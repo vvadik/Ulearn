@@ -2,6 +2,7 @@
     var answers = [];
     $(".quiz").each(function () {
         var id = $(this).attr('id');
+        $(this).removeClass('wrong-quiz');
         if (id.indexOf('placetoinsert') == -1) {
             if ($('#' + id).is(':checked')) {
                 answers.push(id);
@@ -25,10 +26,12 @@
     }
 }).success(function (ans) {
     var wrongIndexes = ans.split('*');
-            for (var i in wrongIndexes)
-                $("#" + wrongIndexes[i] + "_quizBlock").addClass("wrong-quiz");
-            console.log(ans);
-        })
+    for (var i in wrongIndexes) {
+        $("#" + wrongIndexes[i] + "_placetoinsert_quizItem").addClass("wrong-quiz");
+        $("#" + wrongIndexes[i] + "_quizBlock").addClass("wrong-quiz");
+    }
+    console.log(ans);
+})
     .fail(function (req) {
         console.log(req.responseText);
     })

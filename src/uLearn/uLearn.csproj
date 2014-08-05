@@ -77,9 +77,10 @@
     <Compile Include="CoursePageModel.cs" />
     <Compile Include="CSharp\ExerciseBuilder.cs" />
     <Compile Include="CSharp\BlocksBuilder.cs" />
-    <Compile Include="ExerciseAttribute.cs" />
+    <Compile Include="CSharp\ExerciseAttribute.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />
+    <Compile Include="CSharp\ISolutionValidator.cs" />
     <Compile Include="PersonalStatisticPageModel.cs" />
     <Compile Include="Quiz.cs" />
     <Compile Include="QuizSlide.cs" />
@@ -96,7 +97,8 @@
     <Compile Include="SampleAttribute.cs" />
     <Compile Include="Slide.cs" />
     <Compile Include="SlideBlock.cs" />
-    <Compile Include="SolutionForTesting.cs" />
+    <Compile Include="SolutionBuildResult.cs" />
+    <Compile Include="SolutionBuilder.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="StringExtensions_SplitToLines_should.cs" />
     <Compile Include="CSharp\SyntaxExtensions.cs" />

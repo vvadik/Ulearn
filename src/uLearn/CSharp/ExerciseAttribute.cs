@@ -1,10 +1,9 @@
 using System;
 
-namespace uLearn
+namespace uLearn.CSharp
 {
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 	public class ExerciseAttribute : Attribute
 	{
-		public bool SingleStatement;
 	}
 }

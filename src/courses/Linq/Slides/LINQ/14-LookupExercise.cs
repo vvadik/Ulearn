@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
@@ -38,7 +39,8 @@ namespace uLearn.Courses.Linq.Slides
 		[Hint("Сегодня никаких подсказок!")]
 		[Hint("Да, задача сложная, но тем не менее подсказок не будет!")]
 		[Hint("Ну правда, пора научиться решать подобные задачи без подсказок!")]
-		[Exercise(SingleStatement = true)]
+		[Exercise]
+		[SingleStatementMethod]
 		public static IDictionary<string, List<int>> BuildInvertedIndex(Document[] documents)
 		{
 			return
