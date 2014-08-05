@@ -12,14 +12,13 @@ namespace uLearn.Courses.Linq.Slides
 
 		В файле в каждой строке написаны две координаты точки (X, Y), разделенные пробелом.
 		Кто-то уже вызвал метод `File.ReadLines(filename)` и теперь у вас есть массив всех строк файла.
-
-		Реализуйте метод `ParsePoints` в одно `LINQ`-выражение.
-
-		Постарайтесь не использовать функцию преобразования строки в число более одного раза.
 		*/
+
 		[ExpectedOutput("1 -2\n-3 4\n0 2\n1 -42")]
 		public static void Main()
 		{
+			// Функция тестирования ParsePoints
+
 			foreach (var point in ParsePoints(new[] { "1 -2", "-3 4", "0 2" }))
 				Console.WriteLine(point.X + " " + point.Y);
 			foreach (var point in ParsePoints(new List<string> { "+01 -0042" }))
@@ -35,6 +34,12 @@ namespace uLearn.Courses.Linq.Slides
 			}
 			public int X, Y;
 		}
+
+		/*
+		Реализуйте метод `ParsePoints` в одно `LINQ`-выражение.
+		
+		Постарайтесь не использовать функцию преобразования строки в число более одного раза.
+		*/
 
 		[Exercise]
 		[SingleStatementMethod]

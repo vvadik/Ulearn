@@ -14,7 +14,7 @@ namespace uLearn.Courses.Linq.Slides
 
 		`IEnumerable<R> SelectMany(this IEnumerable<T> items, Func<T, IEnumerable<R>> f)`
 
-		В качестве аргумента она принимает функцию, преобразующий каждый элемент исходной последовательности
+		В качестве аргумента он принимает функцию, преобразующий каждый элемент исходной последовательности
 		в новую последовательность. А результатом работы является конкатенация всех полученных последовательностей.
 
 		Следующий пример пояснит работу этого метода:
@@ -39,7 +39,7 @@ namespace uLearn.Courses.Linq.Slides
 		public void SelectManyDemo2()
 		{
 			string[] words = {"ab", "", "c", "de"};
-			IEnumerable<char> letters = words.SelectMany(w => w); // <=
+			var letters = words.SelectMany(w => w); // <= исчез вызов ToCharArray
 			Assert.That(letters, Is.EqualTo(new[] {'a', 'b', 'c', 'd', 'e'}));
 		}
 	}
