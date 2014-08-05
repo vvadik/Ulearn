@@ -58,9 +58,9 @@ namespace uLearn.Web.Controllers
 				IsPassedTask = isPassedTask,
 				LatestAcceptedSolution = isPassedTask ? solutionsRepo.GetLatestAcceptedSolution(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId()) : null,
 				Rate = GetRate(course.Id, course.Slides[slideIndex].Id),
-				SolvedSlide = solutionsRepo.GetIndexesOfPassedSlide(course.Id, User.Identity.GetUserId()),
-				VisitedSlide = visitersRepo.GetIndexesOfVisitedSlide(course.Id, User.Identity.GetUserId()),
-				IsPassedQuiz = userQuizzesRepo.IsQuizPassed(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId()),
+				SolvedSlide = solutionsRepo.GetIdOfPassedSlides(course.Id, User.Identity.GetUserId()),
+				VisitedSlide = visitersRepo.GetIdOfVisitedSlides(course.Id, User.Identity.GetUserId()),
+				PassedQuiz = userQuizzesRepo.GetIdOfQuizPassedSlides(courseId, User.Identity.GetUserId()),
 				AnswersToQuizes = userQuizzesRepo.GetAnswersForShowOnSlide(courseId, course.Slides[slideIndex] as QuizSlide, User.Identity.GetUserId())
 			};
 			return model;

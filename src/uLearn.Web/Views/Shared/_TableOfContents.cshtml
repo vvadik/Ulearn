@@ -39,7 +39,7 @@
 							}
 							else if (slide is QuizSlide)
 							{
-								itemClass = Model.IsPassedQuiz ? "glyphicon glyphicon-pushpin navbar-label-success" : "glyphicon glyphicon-pushpin navbar-label-danger";
+								itemClass = Model.PassedQuiz.Contains(slide.Id) ? "glyphicon glyphicon-pushpin navbar-label-success" : "glyphicon glyphicon-pushpin navbar-label-danger";
 							}
 							else
 							{

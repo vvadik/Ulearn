@@ -44,7 +44,7 @@ namespace uLearn.Web.DataContexts
 			return db.Visiters.Any(x => x.SlideId == slideId && x.CourseId == courseId && x.UserId == userId);
 		}
 
-		public HashSet<string> GetIndexesOfVisitedSlide(string courseId, string userId)
+		public HashSet<string> GetIdOfVisitedSlides(string courseId, string userId)
 		{
 			return new HashSet<string>(db.Visiters.Where(x => x.UserId == userId && x.CourseId == courseId).Select(x => x.SlideId));
 		}

@@ -29,7 +29,7 @@ namespace uLearn.CSharp
 			if (!exerciseBuilder.IsExercise)
 				return new Slide(blocksBuilder.Blocks, slideInfo, blocksBuilder.Title, blocksBuilder.Id);
 			return new ExerciseSlide(blocksBuilder.Blocks, exerciseBuilder.ExerciseInitialCode, exerciseBuilder.ExpectedOutput, exerciseBuilder.Hints,
-				new SolutionBuilder(sourceForTestingRoot, prelude, exerciseBuilder.Validators), slideInfo, blocksBuilder.Title, blocksBuilder.Id);
+				new SolutionBuilder(sourceForTestingRoot, prelude, exerciseBuilder.Validators, exerciseBuilder.TemplateSolution), slideInfo, blocksBuilder.Title, blocksBuilder.Id);
 		}
 	}
 }

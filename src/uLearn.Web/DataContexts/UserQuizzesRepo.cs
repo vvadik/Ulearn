@@ -43,9 +43,9 @@ namespace uLearn.Web.DataContexts
 			return userQuiz;
 		}
 
-		public bool IsQuizPassed(string courseId, string slideId, string userId)
+		public HashSet<string> GetIdOfQuizPassedSlides(string courseId, string userId)
 		{
-			return db.UserQuizzes.Any(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId);
+			return new HashSet<string>(db.UserQuizzes.Where(x => x.CourseId == courseId && x.UserId == userId).Select(x => x.SlideId).Distinct());
 		}
 
 		public Dictionary<string, List<string>> GetAnswersForShowOnSlide(string courseId, QuizSlide slide, string userId)

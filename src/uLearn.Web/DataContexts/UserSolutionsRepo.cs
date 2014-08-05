@@ -114,7 +114,7 @@ namespace uLearn.Web.DataContexts
 			return db.UserSolutions.Where(x => x.SlideId == slideId && x.CourseId == courseId && x.IsRightAnswer).Select(x => x.UserId).Distinct().Count();
 		}
 
-		public HashSet<string> GetIndexesOfPassedSlide(string courseId, string userId)
+		public HashSet<string> GetIdOfPassedSlides(string courseId, string userId)
 		{
 			return new HashSet<string>(db.UserSolutions
 				.Where(x => x.IsRightAnswer && x.CourseId == courseId && x.UserId == userId)

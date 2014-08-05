@@ -11,6 +11,8 @@ namespace uLearn.CSharp
 		public string ExerciseInitialCode { get; private set; }
 		public bool IsExercise { get; private set; }
 		public string ExpectedOutput { get; private set; }
+		public string TemplateSolution { get; private set; }
+
 		public readonly List<string> Hints = new List<string>();
 		public MethodDeclarationSyntax ExerciseNode;
 		public List<ISolutionValidator> Validators = new List<ISolutionValidator>();
@@ -65,6 +67,7 @@ namespace uLearn.CSharp
 			}
 			if (node.HasAttribute<ExerciseAttribute>())
 			{
+				TemplateSolution = node.WithoutAttributes().ToString();
 				ExerciseNode = node;
 				ExerciseInitialCode = GetExerciseCode(node);
 				if (node.HasAttribute<IsStaticMethodAttribute>()) Validators.Add(new IsStaticMethodAttribute());

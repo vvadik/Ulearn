@@ -13,15 +13,17 @@ namespace uLearn
 		private readonly int indexForInsert;
 		private readonly string preparedSlide;
 		private readonly string prelude;
+		public readonly string TemplateSolution;
 		private readonly List<ISolutionValidator> validators;
 
-		public SolutionBuilder(SyntaxNode sourceForTestingRoot, string prelude, List<ISolutionValidator> validators)
+		public SolutionBuilder(SyntaxNode sourceForTestingRoot, string prelude, List<ISolutionValidator> validators, string templateSolution)
 		{
 			this.prelude = prelude;
 			this.validators = validators;
 			preparedSlide = sourceForTestingRoot.ToFullString();
 			var classDeclaration = sourceForTestingRoot.DescendantNodes().OfType<ClassDeclarationSyntax>().First();
 			indexForInsert = classDeclaration.OpenBraceToken.Span.End;
+			TemplateSolution = templateSolution;
 		}
 
 		public SolutionBuildResult BuildSolution(string usersExercise)
