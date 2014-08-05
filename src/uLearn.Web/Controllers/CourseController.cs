@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Ideone;
 using uLearn.Web.Models;
@@ -21,6 +23,7 @@ namespace uLearn.Web.Controllers
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
+		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 
 		public CourseController()
 			: this(CourseManager.AllCourses)
@@ -214,5 +217,53 @@ namespace uLearn.Web.Controllers
 		{
 			await visitersRepo.AddVisiter(courseId, slideId, User.Identity.GetUserId());
 		}
+
+		public async Task<List<string>> SubmitQuiz(string courseId, string slideId, string answer)
+		{
+			var answers = answer.Split('*').Select(x => x.Split('_').Take(2).ToList()).GroupBy(x => x[0]);
+			var incorrectQuizzes = new List<string>();
+			var course = courseManager.GetCourse(courseId);
+			foreach (var ans in answers)
+			{
+				var quizInfo = GetQuizInfo(course, slideId, ans);
+				await userQuizzesRepo.AddUserQuiz(courseId, quizInfo.IsRightAnswer, quizInfo.ItemId, quizInfo.QuizId, slideId, quizInfo.Text, User.Identity.GetUserId());
+				if (!quizInfo.IsRightAnswer)
+					incorrectQuizzes.Add(quizInfo.QuizId);
+			}
+		}
+
+		private QuizInfoForDb GetQuizInfo(Course course, string slideId, IGrouping<string, List<string>> answer)
+		{
+			var slide = course.GetSlideUsingId(slideId) as QuizSlide;
+			if (slide == null)
+				throw new Exception("Error in func 'GetSlideUsingId' or in 'QuizSlideId'");
+			var block = slide.GetBlockById(answer.Key);
+			var data = answer.ToList();
+			if (block is FillInBlock)
+				return CreateQuizInfoForDb(block as FillInBlock, answer, data);
+			if (block is ChoiceBlock)
+			{
+				var choiseBlock = block as ChoiceBlock;
+			}
+		}
+
+		private QuizInfoForDb CreateQuizInfoForDb(FillInBlock fillInBlock, IGrouping<string, List<string>> answer, List<List<string>> data)
+		{
+			return new QuizInfoForDb
+			{
+				QuizId = answer.Key,
+				ItemId = null,
+				IsRightAnswer = fillInBlock.Regexes.Any(regex => Regex.IsMatch(data.First()[1], regex)),
+				Text = data.First()[1]
+			};
+		}
+	}
+
+	public class QuizInfoForDb
+	{
+		public string QuizId;
+		public string ItemId;
+		public string Text;
+		public bool IsRightAnswer;
 	}
 }
