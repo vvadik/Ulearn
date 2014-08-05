@@ -16,7 +16,7 @@
 				<ul id='@(quizBlock.Id + "_quizBlock")'>
 					@for (int itemIndex = 0; itemIndex < choiceQuizBlock.Items.Length; itemIndex++)
 					{
-					    var ident = isMultiply ? blockIndex.ToString() : itemIndex + "noMult";
+					    var ident = !isMultiply ? blockIndex.ToString() : itemIndex + "noMult";
 						var var = choiceQuizBlock.Items[itemIndex];
 					    <li><input name=@("group"+ident) class="quiz" id='@(blockIndex + "_" + itemIndex + "_quizItem")' type="radio">@var.Description</li>
 					}
@@ -27,7 +27,7 @@
                 @:<input class="quiz"  id='@(blockIndex + "_" + "placetoinsert" + "_quizItem")'>
             }		
     }
-    <div id="quizSub">
+    <div id="quizSub" data-url='@Url.Action("SubmitQuiz")'>
         <button onclick="submitQuiz('@Model.Course.Id','@Model.SlideIndex')">Submit my result</button>
     </div>
 }

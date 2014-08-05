@@ -28,11 +28,11 @@ namespace uLearn.Web.Models
 		[StringLength(64)]
 		public string QuizId { get; set; }
 
-		[Required]
+		
 		[StringLength(64)]
 		public string ItemId { get; set; }
 
-		[Required]
+		
 		[StringLength(1024)]
 		public string Text { get; set; }
 
