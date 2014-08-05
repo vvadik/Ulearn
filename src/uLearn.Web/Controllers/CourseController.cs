@@ -240,7 +240,7 @@ namespace uLearn.Web.Controllers
 			return string.Join("*", incorrectQuizzes);
 		}
 
-		private List<QuizInfoForDb> GetQuizInfo(Course course, int slideIndex, IGrouping<string, List<string>> answer)
+		private IEnumerable<QuizInfoForDb> GetQuizInfo(Course course, int slideIndex, IGrouping<string, List<string>> answer)
 		{
 			var slide = course.Slides[slideIndex] as QuizSlide;
 			if (slide == null)
@@ -248,13 +248,13 @@ namespace uLearn.Web.Controllers
 			var block = slide.Quiz.Blocks[int.Parse(answer.Key)];
 			var data = answer.ToList();
 			if (block is FillInBlock)
-				return CreateQuizInfoForDb(block as FillInBlock, answer, data);
+				return CreateQuizInfoForDb(block as FillInBlock, data);
 			if (block is ChoiceBlock)
 				return CreateQuizInfoForDb(block as ChoiceBlock, answer, data);
-			return CreateQuizInfoForDb(block as IsTrueBlock, answer, data);
+			return CreateQuizInfoForDb(block as IsTrueBlock, data);
 		}
 
-		private List<QuizInfoForDb> CreateQuizInfoForDb(IsTrueBlock isTrueBlock, IGrouping<string, List<string>> answer, List<List<string>> data)
+		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(IsTrueBlock isTrueBlock, IEnumerable<List<string>> data)
 		{
 			return new List<QuizInfoForDb>
 			{
@@ -268,7 +268,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private List<QuizInfoForDb> CreateQuizInfoForDb(ChoiceBlock choiseBlock, IGrouping<string, List<string>> answer, List<List<string>> data)
+		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(ChoiceBlock choiseBlock, IEnumerable<List<string>> answer, List<List<string>> data)
 		{
 			if (choiseBlock.Multiple)
 			{
@@ -294,7 +294,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private List<QuizInfoForDb> CreateQuizInfoForDb(FillInBlock fillInBlock, IGrouping<string, List<string>> answer, List<List<string>> data)
+		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(FillInBlock fillInBlock, IEnumerable<List<string>> data)
 		{
 			return new List<QuizInfoForDb>
 			{
