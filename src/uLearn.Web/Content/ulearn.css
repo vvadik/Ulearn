@@ -321,3 +321,11 @@ table.diff tbody th {
 .navs {
     margin-top: -21px;
 }
+
+.quiz {
+    
+}
+
+.wrong-quiz {
+    background-color: lightcoral;
+}

@@ -26,7 +26,8 @@ namespace uLearn.Web
 				"~/Scripts/slide-questions.js",
 				"~/Scripts/slide-stats.js",
 				"~/Scripts/slide-hints.js",
-				"~/Jsdifflib/jsdifflib.js"
+				"~/Jsdifflib/jsdifflib.js",
+				"~/Scripts/slide-quiz.js"
 				));
 
 			bundles.Add(new ScriptBundle("~/codemirror-js").Include(
