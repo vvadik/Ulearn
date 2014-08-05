@@ -16,5 +16,10 @@ namespace uLearn
 		}
 
 		public Quiz Quiz { get; set; }
+
+		public QuizBlock GetBlockById(string id)
+		{
+			return Quiz.Blocks.FirstOrDefault(block => block.Id == id);
+		}
 	}
 }
