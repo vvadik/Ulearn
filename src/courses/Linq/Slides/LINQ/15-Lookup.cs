@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Slide("Группировка с помощью ToDictionary и ToLookup", "{1998BB06-8008-4F53-BED8-838FC20C6067}")]
+	[Slide("ToDictionary и ToLookup", "{1998BB06-8008-4F53-BED8-838FC20C6067}")]
 	[TestFixture]
 	public class Lookups
 	{
@@ -27,8 +27,9 @@ namespace uLearn.Courses.Linq.Slides
 			foreach (var group in names.GroupBy(name => name[0]))
 				namesByLetter.Add(group.Key, group.ToList());
 
-			Assert.That(namesByLetter['J'], Is.EquivalentTo(new[] {"John"}));
+			Assert.That(namesByLetter['J'], Is.EquivalentTo(new[] { "John" }));
 			Assert.That(namesByLetter['P'], Is.EquivalentTo(new[] {"Pavel", "Peter"}));
+			Assert.IsFalse(namesByLetter.ContainsKey('Z'));
 		}
 
 		/*
@@ -48,8 +49,9 @@ namespace uLearn.Courses.Linq.Slides
 				.GroupBy(name => name[0])
 				.ToDictionary(group => group.Key, group => group.ToList());
 
-			Assert.That(namesByLetter['J'], Is.EquivalentTo(new[] {"John"}));
+			Assert.That(namesByLetter['J'], Is.EquivalentTo(new[] { "John" }));
 			Assert.That(namesByLetter['P'], Is.EquivalentTo(new[] {"Pavel", "Peter"}));
+			Assert.IsFalse(namesByLetter.ContainsKey('Z'));
 		}
 
 		/*
@@ -68,6 +70,10 @@ namespace uLearn.Courses.Linq.Slides
 
 			Assert.That(namesByLetter['J'], Is.EquivalentTo(new[] {"John"}));
 			Assert.That(namesByLetter['P'], Is.EquivalentTo(new[] {"Pavel", "Peter"}));
+			
+			// Lookup по неизвестному ключу возвращает пустую коллекцию. 
+			//Часто это удобнее, чем поведение Dictionary, который в такой ситуации бросает исключение.
+			Assert.That(namesByLetter['Z'], Is.Empty);
 		}
 	}
 }

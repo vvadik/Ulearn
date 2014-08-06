@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Slide("Группировка с помощью GroupBy", "{421B0115-80E0-42B6-BE2D-79BD3661A2AD}")]
+	[Slide("Группировка", "{421B0115-80E0-42B6-BE2D-79BD3661A2AD}")]
 	[TestFixture]
 	public class Grouping
 	{
