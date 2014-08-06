@@ -133,8 +133,7 @@ namespace uLearn.Web.Controllers
 		{
 			var userId = User.Identity.GetUserId();
 			var slideRate = (SlideRates)Enum.Parse(typeof(SlideRates), rate);
-			await slideRateRepo.AddRate(courseId, slideId, userId, slideRate);
-			return "success!";
+			return await slideRateRepo.AddRate(courseId, slideId, userId, slideRate);
 		}
 
 		[HttpPost]
