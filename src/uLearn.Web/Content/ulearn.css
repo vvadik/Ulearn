@@ -327,5 +327,17 @@ table.diff tbody th {
 }
 
 .wrong-quiz {
-    background-color: lightcoral;
+    color: lightcoral;
+}
+
+.right-quiz {
+    color: darkseagreen;
+}
+
+.true {
+    
+}
+
+.false {
+    
 }

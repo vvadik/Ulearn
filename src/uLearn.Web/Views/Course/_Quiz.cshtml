@@ -13,26 +13,43 @@
 		{
 			var choiceQuizBlock = quizBlock as ChoiceBlock;
 			var isMultiply = choiceQuizBlock.Multiple;
-			<ul class="quiz" id='@(quizBlock.Id + "_quizBlock")'>
+			var typeInp = isMultiply ? "checkbox" : "radio";
+			<div class="@typeInp" id='@(quizBlock.Id + "_quizBlock")'>
 				@for (int itemIndex = 0; itemIndex < choiceQuizBlock.Items.Length; itemIndex++)
 				{
 					var ident = isMultiply ? itemIndex + "noMult" : blockIndex.ToString();
 					var var = choiceQuizBlock.Items[itemIndex];
-					var typeInp = isMultiply ? "checkbox" : "radio";
-					<li><input name=@("group"+ident) class="quiz" id='@(blockIndex + "_" + itemIndex + "_quizItem")' type="@typeInp">@var.Description</li>
+					var correct = var.IsCorrect ? "true" : "false";
+					<div class="quiz">
+						<i class="@correct"></i>
+						<label><input id='@(blockIndex + "_" + itemIndex + "_quizItem")' name=@("group"+ident) type="@typeInp">@var.Description</label>
+					</div>
 				}
-			</ul>
+			</div>
 		}
 		else if (quizBlock is FillInBlock)
 		{
-			@:<input class="quiz" id='@(blockIndex + "_" + "placetoinsert" + "_quizItem")'>
-            }
+		    <div class="quiz">
+				<label>
+					<input id='@(blockIndex + "_" + "placetoinsert" + "_quizItem")'>
+				</label>
+		    </div>
+		}
 		else if (quizBlock is IsTrueBlock)
 		{
-			<ul class="quiz" id="@(quizBlock.Id + "_quizBlock")">
-				<li><input class="quiz" name='@(quizBlock.Id+"group")' id='@(blockIndex + "_" + "True" + "_quizItem")' type="radio">True</li>
-				<li><input class="quiz" name='@(quizBlock.Id+"group")' id='@(blockIndex + "_" + "False" + "_quizItem")' type="radio">False</li>
-			</ul>
+			var selecter = quizBlock as IsTrueBlock;
+			var tr = selecter.Answer ? "true" : "false";
+			var fl = selecter.Answer ? "false" : "true";
+			<div class="radio" id="@(quizBlock.Id + "_quizBlock")">
+				<div class="quiz">
+					<i class="@tr"></i>
+					<label><input id='@(blockIndex + "_" + "True" + "_quizItem")' name='@(quizBlock.Id+"group")' type="radio">True</label>
+				</div>
+				<div class="quiz">
+					<i class="@fl"></i>
+					<label><input id='@(blockIndex + "_" + "False" + "_quizItem")' name='@(quizBlock.Id+"group")' type="radio">False</label>
+				</div>
+			</div>
 		}
 	}
 	<div id="quizSub" data-url='@Url.Action("SubmitQuiz")'>
