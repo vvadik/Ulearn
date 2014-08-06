@@ -103,17 +103,21 @@ namespace uLearn.Web.Models
 
 		private static void FillEmptyField(Quiz quiz)
 		{
-			for (var blockIndex = 0; blockIndex < quiz.Blocks.Length; blockIndex++)
+			var emptyIndex = 0;
+			foreach (var quizBlock in quiz.Blocks)
 			{
-				quiz.Blocks[blockIndex].Text = Md.ToHtml(quiz.Blocks[blockIndex].Text);
-				if (quiz.Blocks[blockIndex].Id == null)
-					quiz.Blocks[blockIndex].Id = blockIndex.ToString();
-				var choiceBlock = quiz.Blocks[blockIndex] as ChoiceBlock;
+				quizBlock.Text = Md.ToHtml(quizBlock.Text);
+				if (quizBlock.Id == null)
+				{
+					quizBlock.Id = emptyIndex.ToString();
+					emptyIndex++;
+				}
+				var choiceBlock = quizBlock as ChoiceBlock;
 				if (choiceBlock == null) continue;
 				for (var itemIndex = 0; itemIndex < choiceBlock.Items.Length; itemIndex++)
 					if (choiceBlock.Items[itemIndex].Id == null)
 						choiceBlock.Items[itemIndex].Id = itemIndex.ToString();
-				if (!choiceBlock.Shuffle) continue;
+				//if (!choiceBlock.Shuffle) continue;
 				//Shuffle(choiceBlock.Items);
 			}
 		}

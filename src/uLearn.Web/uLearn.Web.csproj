@@ -611,6 +611,7 @@
     <None Include="Properties\PublishProfiles\ulearn.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\buttons.js" />
+    <Content Include="Scripts\notify-custom.min.js" />
     <Content Include="Scripts\slide-quiz.js" />
     <Content Include="Scripts\slide-hints.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />

@@ -47,7 +47,8 @@ namespace uLearn.Quizes
 					new FillInBlock
 					{
 						Text = "What does the fox say?",
-						Regexes = new[] {"([Dd]ing )+", "Ap(ap)+"}
+						Regexes = new[] {"([Dd]ing )+", "Ap(ap)+"},
+						Sample = "Apapap"
 					},
 				}
 			};

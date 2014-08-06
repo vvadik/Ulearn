@@ -8,7 +8,8 @@ namespace uLearn.Web
 		public static void RegisterBundles(BundleCollection bundles)
 		{
 			bundles.Add(new ScriptBundle("~/jquery-js").Include(
-				"~/Scripts/jquery-{version}.js"));
+				"~/Scripts/jquery-{version}.js",
+				"~/Scripts/notify-custom.min.js"));
 
 			bundles.Add(new ScriptBundle("~/jqueryval-js").Include(
 				"~/Scripts/jquery.validate*"));

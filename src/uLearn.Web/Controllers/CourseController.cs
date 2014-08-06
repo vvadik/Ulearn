@@ -241,6 +241,7 @@ namespace uLearn.Web.Controllers
 			var time = DateTime.Now;
 			var answers = answer.Split('*').Select(x => x.Split('_').Take(2).ToList()).GroupBy(x => x[0]);
 			var incorrectQuizzes = new List<string>();
+			var fillInBlockType = typeof (FillInBlock);
 			foreach (var ans in answers)
 			{
 				var quizInfo = GetQuizInfo(course, intSlideIndex, ans);
@@ -249,7 +250,7 @@ namespace uLearn.Web.Controllers
 					await
 						userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
 							course.Slides[intSlideIndex].Id, quizInfoForDb.Text, User.Identity.GetUserId(), time);
-					if (!quizInfoForDb.IsRightAnswer)
+					if (!quizInfoForDb.IsRightAnswer && quizInfoForDb.QuizType == fillInBlockType)
 						incorrectQuizzes.Add(ans.Key);
 				}
 			}
@@ -279,7 +280,8 @@ namespace uLearn.Web.Controllers
 					QuizId = isTrueBlock.Id,
 					ItemId = null,
 					IsRightAnswer = isTrueBlock.Answer.ToString() == data.First()[1],
-					Text = data.First()[1]
+					Text = data.First()[1],
+					QuizType = typeof(IsTrueBlock)
 				}
 			};
 		}
@@ -289,7 +291,7 @@ namespace uLearn.Web.Controllers
 			if (choiseBlock.Multiple)
 			{
 				var ans = answer.ToList()
-					.Select(x => new QuizInfoForDb { QuizId = choiseBlock.Id, IsRightAnswer = false, ItemId = x[1], Text = null }).ToList();
+					.Select(x => new QuizInfoForDb { QuizId = choiseBlock.Id, IsRightAnswer = false, ItemId = x[1], Text = null, QuizType = typeof(ChoiceBlock)}).ToList();
 				var correctItems = new HashSet<string>(choiseBlock.Items.Where(x => x.IsCorrect).Select(x => x.Id));
 				var ansItem = new HashSet<string>(ans.Select(x => x.ItemId));
 				var count = ansItem.Count(correctItems.Contains);
@@ -305,7 +307,8 @@ namespace uLearn.Web.Controllers
 					QuizId = choiseBlock.Id,
 					ItemId = choiseBlock.Items[int.Parse(data.First()[1])].Id,
 					IsRightAnswer = choiseBlock.Items[int.Parse(data.First()[1])].IsCorrect,
-					Text = null
+					Text = null,
+					QuizType = typeof(ChoiceBlock)
 				}
 			};
 		}
@@ -319,7 +322,8 @@ namespace uLearn.Web.Controllers
 					QuizId = fillInBlock.Id,
 					ItemId = null,
 					IsRightAnswer = fillInBlock.Regexes.Any(regex => Regex.IsMatch(data.First()[1], regex)),
-					Text = data.First()[1]
+					Text = data.First()[1],
+					QuizType = typeof(FillInBlock)
 				}
 			};
 		}
@@ -331,5 +335,6 @@ namespace uLearn.Web.Controllers
 		public string ItemId;
 		public string Text;
 		public bool IsRightAnswer;
+		public Type QuizType;
 	}
 }

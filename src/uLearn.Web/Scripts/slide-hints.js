@@ -1,6 +1,11 @@
-﻿function showHintForUser(courseId, slideId) {
+﻿function showHintForUser(courseId, slideId, hintsCountStr) {
+	var hintsCount = parseInt(hintsCountStr) - 1;
     var index = parseInt(($("#currentHint").text()));
     index++;
+    if (index > hintsCount) {
+	    $("#GetHintButton").notify("Подсказок больше нет :(", "noHints");
+	    return;
+    }
     $("#currentHint").text(index);
     $.ajax(
 {
