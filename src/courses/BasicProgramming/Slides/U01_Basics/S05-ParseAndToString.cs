@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using uLearn.CSharp;
 
 
 namespace uLearn.Courses.BasicProgramming.Slides

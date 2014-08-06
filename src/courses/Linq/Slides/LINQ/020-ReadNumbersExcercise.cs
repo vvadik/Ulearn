@@ -1,21 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Slide("Чтение списка чисел", "{CBA7BC68-F1B9-46B1-93D4-49AC113A1D02}")]
+	[Slide("Чтение массива чисел", "{CBA7BC68-F1B9-46B1-93D4-49AC113A1D02}")]
 	public class ReadNumbersExcercise
 	{
 		/*
-		Linq удобно использовать для чтения из файла и разбора простых текстовых форматов. Особенно удобно сочетать методы `Linq` с методами класса `File`: `File.ReadLines(filename)`, `File.WriteLines(filename, lines)`.
+		`LINQ` удобно использовать для чтения из файла и разбора простых текстовых форматов.
+		Особенно удобно сочетать методы `LINQ` с методами класса `File`: 
+		`File.ReadLines(filename)`, `File.WriteLines(filename, lines)`.
 
-		В файле каждая строка либо пустая, либо содержит одно целое число. 
-		Кто-то уже вызвал метод `File.ReadLines(filename)` и теперь у вас есть массив всех строк файла.
+		Пусть у вас есть файл, в котором каждая строка либо пустая, либо содержит одно целое число. 
+		Кто-то уже вызвал метод `File.ReadLines(filename)` и теперь у вас есть массив всех строк этого файла.
 
-		Реализуйте метод `ParseNumbers` в одно `Linq`-выражение.
+		У вас даже есть метод `Main`, тестирующий будущий метод:
 		*/
-
 
 		[ExpectedOutput("0\n0\n1\n-3\n0")]
 		public static void Main()
@@ -26,7 +28,12 @@ namespace uLearn.Courses.Linq.Slides
 				Console.WriteLine(num);
 		}
 
+		/*
+		Реализуйте метод `ParseNumbers` в одно `LINQ`-выражение.
+		*/
+
 		[Exercise]
+		[SingleStatementMethod]
 		[Hint("`int.Parse` преобразует строку в целое число.")]
 		public static int[] ParseNumbers(IEnumerable<string> lines)
 		{

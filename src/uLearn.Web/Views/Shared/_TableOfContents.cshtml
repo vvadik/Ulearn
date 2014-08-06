@@ -1,4 +1,5 @@
-﻿@using uLearn
+﻿@using Elmah.ContentSyndication
+@using uLearn
 @model CoursePageModel
  
 <ul class="side-bar units-list">
@@ -34,7 +35,11 @@
 						{
 							if (slide is ExerciseSlide)
 							{
-								itemClass = Model.SolvedSlide.Contains(slide.Id) ? "glyphicon glyphicon-edit navbar-label-success" : "glyphicon glyphicon-edit navbar-label-danger";
+								itemClass = Model.SolvedSlide.Contains(slide.Id) ? "glyphicon glyphicon-check navbar-label-success" : "glyphicon glyphicon-edit navbar-label-danger";
+							}
+							else if (slide is QuizSlide)
+							{
+								itemClass = Model.PassedQuiz.Contains(slide.Id) ? "glyphicon glyphicon-pushpin navbar-label-success" : "glyphicon glyphicon-pushpin navbar-label-danger";
 							}
 							else
 							{
@@ -47,6 +52,10 @@
 							{
 								itemClass = "glyphicon glyphicon-edit navbar-label-default";
 							}
+							if (slide is QuizSlide)
+							{
+								itemClass = "glyphicon glyphicon-pushpin navbar-label-default";
+							}
 						}
 						<i class="@itemClass navbar-label"></i>
 						<li class="slide-list-item @(selectedSlide ? "selected" : "") " onclick="window.location.href = '@url'">@slide.Title</li>
@@ -54,8 +63,11 @@
 				</ul>
 			</li>
 		}
-		<li class="units-list-item units-list-item-text">@Html.ActionLink("Total statistics", "TotalStatistics", "Analytics", new { courseId = Model.Course.Id, slideIndex = 0 }, null)</li>
-		<li class="units-list-item units-list-item-text">@Html.ActionLink("Users statistics", "UsersStatistics", "Analytics", new { courseId = Model.Course.Id, slideIndex = 0 }, null)</li>
-		<li class="units-list-item units-list-item-text">@Html.ActionLink("Personal statistics", "PersonalStatistics", "Analytics", new { courseId = Model.Course.Id, slideIndex = 0 }, null)</li>
+		if (Request.IsLocal)
+		{
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Total statistics", "TotalStatistics", "Analytics", new {courseId = Model.Course.Id, slideIndex = 0}, null)</li>
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Users statistics", "UsersStatistics", "Analytics", new {courseId = Model.Course.Id, slideIndex = 0}, null)</li>
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Personal statistics", "PersonalStatistics", "Analytics", new {courseId = Model.Course.Id, slideIndex = 0}, null)</li>
+		}
 	}
 </ul>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
@@ -11,9 +12,9 @@ namespace uLearn.Courses.Linq.Slides
 
 		Дан текст, нужно вывести `count` наиболее часто встречающихся в тексте слов, вместе с их частотой.
 		Среди слов, встречающихся одинаково часто, отдавать предпочтение лексикографически меньшим словам.
-		Слова сравнивать регистронезависимо и выводить в нижнем регистре.		
+		Слова сравнивать регистронезависимо и выводить в нижнем регистре.
 		
-		Напомним сигнатуры некоторых Linq-методов, которые могут понадобятся в этом упражнении:
+		Напомним сигнатуры некоторых `LINQ`-методов, которые могут понадобятся в этом упражнении:
 
 		    IEnumerable<IGrouping<K, T>>       GroupBy(this IEnumerable<T> items, Func<T, K> keySelector)
 		    IOrderedEnumerable<T>           OrderBy<T>(this IEnumerable<T> items, Func<T, K> keySelector)
@@ -23,7 +24,8 @@ namespace uLearn.Courses.Linq.Slides
 		    IEnumerable<T>                        Take(this IEnumerable<T> items, int count)
 		*/
 
-		[Exercise(SingleStatement = true)]
+		[Exercise]
+		[SingleStatementMethod]
 		public static Tuple<string, int>[] GetMostFrequentWords(string text, int count)
 		{
 			return Regex.Split(text, @"\W+")

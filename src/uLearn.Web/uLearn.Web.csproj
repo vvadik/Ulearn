@@ -270,6 +270,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CourseManager.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
+    <Compile Include="Models\IdeonSubmitAllSlide-test.cs" />
     <Compile Include="Models\SlideHint.cs" />
     <Compile Include="Models\SlideRate.cs" />
     <Compile Include="Models\UserQuestion.cs" />
@@ -610,6 +611,7 @@
     <None Include="Properties\PublishProfiles\ulearn.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\buttons.js" />
+    <Content Include="Scripts\notify-custom.min.js" />
     <Content Include="Scripts\slide-quiz.js" />
     <Content Include="Scripts\slide-hints.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />

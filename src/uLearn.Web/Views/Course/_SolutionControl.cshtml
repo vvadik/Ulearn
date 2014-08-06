@@ -32,7 +32,7 @@ else
         RESET
     </button>
 
-    <button type="button" class="btn btn-default hints-btn no-rounds" onclick="showHintForUser('@Model.Course.Id','@Model.Slide.Id')">
+    <button id="GetHintButton" type="button" class="btn btn-default hints-btn no-rounds" onclick="showHintForUser('@Model.Course.Id','@Model.Slide.Id', '@slide.HintsHtml.Count()')">
         GET HINT
     </button>
 </div>

@@ -21,7 +21,7 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public async Task AddRate(string courseId, string slideId, string userId, SlideRates rate)
+		public async Task<string> AddRate(string courseId, string slideId, string userId, SlideRates rate)
 		{
 			var lastRate = db.SlideRates.FirstOrDefault(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId);
 			if (lastRate == null)
@@ -34,12 +34,17 @@ namespace uLearn.Web.DataContexts
 					CourseId = courseId
 				});
 				await db.SaveChangesAsync();
+				return "success";
 			}
-			else
+			if (lastRate.Rate == rate)
 			{
-				lastRate.Rate = rate;
+				lastRate.Rate = SlideRates.NotWatched;
 				await db.SaveChangesAsync();
+				return "cancel";
 			}
+			lastRate.Rate = rate;
+			await db.SaveChangesAsync();
+			return "success";
 		}
 
 		public string FindRate(string courseId, string slideId, string userId)

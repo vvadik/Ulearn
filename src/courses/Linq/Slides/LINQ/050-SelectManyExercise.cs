@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
@@ -9,7 +10,7 @@ namespace uLearn.Courses.Linq.Slides
 	{
 		/*
 
-		Вам дан список всех классов в школе. Нужно получить спиок всех учащихся всех классов.
+		Вам дан список всех классов в школе. Нужно получить список всех учащихся всех классов.
 		
 		Учебный класс определен так:
 		*/
@@ -21,7 +22,7 @@ namespace uLearn.Courses.Linq.Slides
 
 		/*
 
-		Без использования Linq, решение могло бы выглядеть так:
+		Без использования `LINQ`, решение могло бы выглядеть так:
 		*/
 
 		[ShowBodyOnSlide]
@@ -39,7 +40,7 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		/*
-		Напишите решение этой задачи с помощью Linq в одно выражение.
+		Напишите решение этой задачи с помощью `LINQ` в одно выражение.
 		*/
 
 		[ExpectedOutput("Pavel\r\nIvan\r\nPetr\r\nAnna\r\nIlya\r\nVladimir\r\nBulat\r\nAlex\r\nGalina")]
@@ -57,6 +58,7 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		[Exercise]
+		[SingleStatementMethod]
 		[Hint("`IEnumerable<R> SelectMany(this IEnumerable<T> items, Func<T, IEnumerable<R>> f)`")]
 		[Hint("`T[] ToArray(this IEnumerable<T> items)`")]
 		public static string[] GetAllStudents(Classroom[] classes)

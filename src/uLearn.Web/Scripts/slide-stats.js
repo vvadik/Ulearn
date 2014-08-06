@@ -1,6 +1,8 @@
 ﻿function handleRate(rate) {
-    if (rate == "NotUnderstand")
-        $("#ask_question_window").click();
+	// && $("#notunderstand").parent().hasAttribute("btn-danger")
+	if (rate == "NotUnderstand")
+		if(!$("#notunderstand").parent().hasClass("btn-danger"))
+			$("#ask_question_window").click();
     $("#notwatched").removeClass("not-watched");
     $("#ratings").removeClass("bounce-effect");
     $.ajax(
@@ -9,13 +11,31 @@
         url: $("#ratesBar").data("url"),
         data: {rate:rate}
     }).success(function (ans) {
-            FillRate(rate);
-        })
+		    if (ans == "success") {
+			    FillRate(rate);
+		    }
+			if (ans == "cancel") {
+				CancelRate(rate);
+			}
+	    })
 		.fail(function (req) {
 
 		})
 		.always(function (ans) {
 		});
+};
+
+function CancelRate(rate) {
+	var switcher = rate.toLowerCase();
+	var colors = {};
+	colors["good"] = "btn-success";
+	colors["notunderstand"] = "btn-danger";
+	colors["trivial"] = "btn-info";
+	$("#notwatched").addClass("not-watched");
+	$("#next_slide_button").addClass("block-next");
+	$("#" + switcher).parent().button('toggle');
+	$("#" + switcher).parent().removeClass(colors[switcher]).removeClass("active");
+	$("#notwatched").parent().addClass("active");
 };
 
 function FillRate(rate) {

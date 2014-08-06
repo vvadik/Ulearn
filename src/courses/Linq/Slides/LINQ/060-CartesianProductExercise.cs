@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
@@ -9,7 +10,7 @@ namespace uLearn.Courses.Linq.Slides
 	{
 		/*
 
-		Одно из не совсем очевидных применений `SelectMany` — это вычисление декартова произвдеения двух множеств.
+		Одно из не совсем очевидных применений `SelectMany` — это вычисление декартова произведения двух множеств.
 		Опробуйте этот трюк на следующей задаче:
 
 		Вычислить множество всех соседей заданной точки в смысле 8-связности.
@@ -51,7 +52,7 @@ Neighbours of (0 0)
 				Console.WriteLine(line);
 		}
 
-		[Exercise(SingleStatement = false)]
+		[Exercise]
 		[Hint("Декартово произведение множества {-1, 0, 1} на себя даст все возможные относительные координаты соседей")]
 		[Hint("Используйте вызов Select внутри вызова SelectMany")]
 		public static IEnumerable<Point> GetNeighbours(Point p)

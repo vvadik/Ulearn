@@ -86,11 +86,11 @@
     <Content Include="Slides\Title.txt" />
     <Content Include="Slides\U01_Basics\S11-sampleXML.xml" />
     <Content Include="Slides\U01_Basics\Title.txt" />
-    <Content Include="Slides\U01_Basics\Usings.txt" />
+    <Content Include="Slides\U01_Basics\Prelude.txt" />
     <Content Include="Slides\U02_Mistakes\Title.txt" />
-    <Content Include="Slides\U02_Mistakes\Usings.txt" />
+    <Content Include="Slides\U02_Mistakes\Prelude.txt" />
     <Content Include="Slides\U03_Cycles\Title.txt" />
-    <Content Include="Slides\U03_Cycles\Usings.txt" />
+    <Content Include="Slides\U03_Cycles\Prelude.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

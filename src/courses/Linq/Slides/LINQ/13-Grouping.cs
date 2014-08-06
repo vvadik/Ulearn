@@ -3,13 +3,13 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Slide("Группировка с помощью GroupBy", "{421B0115-80E0-42B6-BE2D-79BD3661A2AD}")]
+	[Slide("Группировка", "{421B0115-80E0-42B6-BE2D-79BD3661A2AD}")]
 	[TestFixture]
 	public class Grouping
 	{
 		/*
 
-		Linq содержит несколько методов группировки элементов последовательности в группы по некоторому признаку.
+		`LINQ` содержит несколько методов группировки элементов последовательности в группы по некоторому признаку.
 		Основной способ группировки — это метод `GroupBy`. Вот его полная сигнатура:
 
 		`IEnumerable<IGrouping<TKey, TItem>> GroupBy(Func<TItem, TKey> keySelector)`
@@ -39,7 +39,7 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		/*
-		В некотром смысле `GroupBy` — это метод противоположный по действию методу `SelectMany`.
+		В некотором смысле `GroupBy` — это метод противоположный по действию методу `SelectMany`.
 		`GroupBy` создает группы, а `SelectMany` из списка групп делает плоский список.
 
 		`SelectMany` после `GroupBy` не поменяют состав последовательности, но могут изменить порядок следования элементов:

@@ -11,12 +11,20 @@ namespace uLearn.CSharp
 		public string ExerciseInitialCode { get; private set; }
 		public bool IsExercise { get; private set; }
 		public string ExpectedOutput { get; private set; }
+		public string TemplateSolution { get; private set; }
+
 		public readonly List<string> Hints = new List<string>();
 		public MethodDeclarationSyntax ExerciseNode;
+		public List<ISolutionValidator> Validators = new List<ISolutionValidator>();
 
 		public ExerciseBuilder()
 			: base(false)
 		{
+		}
+
+		public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
+		{
+			return null;
 		}
 
 		private SyntaxNode VisitMemberDeclaration(MemberDeclarationSyntax node, SyntaxNode newNode)
@@ -59,8 +67,15 @@ namespace uLearn.CSharp
 			}
 			if (node.HasAttribute<ExerciseAttribute>())
 			{
+				TemplateSolution = TemplateSolution + node.WithoutAttributes();
 				ExerciseNode = node;
 				ExerciseInitialCode = GetExerciseCode(node);
+				if (node.HasAttribute<IsStaticMethodAttribute>()) Validators.Add(new IsStaticMethodAttribute());
+				if (node.HasAttribute<SingleStatementMethodAttribute>()) Validators.Add(new SingleStatementMethodAttribute());
+			}
+			if (node.AttributeLists.Count == 0)
+			{
+				TemplateSolution = TemplateSolution + node;
 			}
 			return newMethod;
 		}

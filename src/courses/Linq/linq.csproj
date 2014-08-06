@@ -79,22 +79,22 @@
     <Compile Include="Slides\LINQ\10-SortTuplesExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\11-Grouping.cs">
+    <Compile Include="Slides\LINQ\13-Grouping.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\12-WordsFrequenciesExercise.cs">
+    <Compile Include="Slides\LINQ\14-WordsFrequenciesExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\13-Lookup.cs">
+    <Compile Include="Slides\LINQ\15-Lookup.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\14-LookupExercise.cs">
+    <Compile Include="Slides\LINQ\16-LookupExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\15-AggregateFunctions.cs">
+    <Compile Include="Slides\LINQ\11-AggregateFunctions.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\16-AggregateExercise.cs">
+    <Compile Include="Slides\LINQ\12-AggregateExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Point.cs" />
@@ -114,7 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />
-    <Content Include="Slides\LINQ\Usings.txt" />
+    <Content Include="Slides\LINQ\Prelude.txt" />
     <Content Include="Slides\Title.txt" />
     <Content Include="Slides\LINQ\Title.txt" />
   </ItemGroup>

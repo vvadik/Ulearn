@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
@@ -28,35 +28,36 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		/*
-		Обратный индекс в нашем случае — это словарь `IDictionary<string, HashSet<int>>`, 
-		ключем в котором является слово, а значением — хэштаблица, содержащая идентификаторы
+		Обратный индекс в нашем случае — это словарь `ILookup<string, int>`, 
+		ключом в котором является слово, а значениямим — идентификаторы
 		всех документов, содержащих это слово.
 		*/
 
 
-		
+
 		[Hint("Сегодня никаких подсказок!")]
 		[Hint("Да, задача сложная, но тем не менее подсказок не будет!")]
 		[Hint("Ну правда, пора научиться решать подобные задачи без подсказок!")]
-		[Exercise(SingleStatement = true)]
-		public static IDictionary<string, List<int>> BuildInvertedIndex(Document[] documents)
+		[Exercise]
+		[SingleStatementMethod]
+		public static ILookup<string, int> BuildInvertedIndex(Document[] documents)
 		{
 			return
 				documents
 					.SelectMany(doc =>
 						Regex.Split(doc.Text, @"\W+")
 							.Where(word => word != "")
-							.Select(word => Tuple.Create(word.ToLower(), doc))
+							.Select(word => Tuple.Create(word.ToLower(), doc.Id))
+							.Distinct()
 					)
-					.GroupBy(wordDoc => wordDoc.Item1)
-					.ToDictionary(
-						group => group.Key,
-						group => group.Select(wordDoc => wordDoc.Item2.Id).OrderBy(id => id).ToList());
+					.ToLookup(
+						wd => wd.Item1,
+						wd => wd.Item2);
 			// ваш код
 		}
 
 		[ExpectedOutput(@"
-SearchQuery('world') found documents: 1, 2, 2, 2
+SearchQuery('world') found documents: 1, 2
 SearchQuery('words') found documents: 2, 3
 SearchQuery('power') found documents: 3
 SearchQuery('ktulhu') found documents: 
@@ -68,7 +69,7 @@ SearchQuery('ktulhu') found documents:
 				new Document {Id = 1, Text = "Hello world!"},
 				new Document {Id = 2, Text = "World, world, world... Just words..."},
 				new Document {Id = 3, Text = "Words — power"},
-				new Document {Id = 4, Text = ""},
+				new Document {Id = 4, Text = ""}
 			};
 			var index = BuildInvertedIndex(documents);
 			SearchQuery("world", index);
@@ -78,12 +79,13 @@ SearchQuery('ktulhu') found documents:
 		}
 
 		[HideOnSlide]
-		private static void SearchQuery(string word, IDictionary<string, List<int>> index)
+		private static void SearchQuery(string word, ILookup<string, int> index)
 		{
-			List<int> ids = index.TryGetValue(word, out ids) ? ids : new List<int>();
-			var docIds = string.Join(", ", ids.Select(id => id.ToString()).ToArray());
+
+			var ids = index[word].OrderBy(id => id).Select(id => id.ToString());
+			var docIds = string.Join(", ", ids.ToArray());
 			Console.WriteLine("SearchQuery('{0}') found documents: {1}", word, docIds);
-			
+
 		}
 	}
 }

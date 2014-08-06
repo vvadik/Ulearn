@@ -2,23 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Сортировка кортежей", "{80D43879-1099-4972-AEE1-6EB3EDF1E923}")]
-	public class SortTuples
+	public class SortTuplesExercise
 	{
 		/*
 		Ещё одно полезное свойство кортежей — по умолчанию они сравниваются поэлементно.
 		Используя этот факт, решите следующую задачу:
 
 		Дан текст, нужно составить список всех встречающихся в тексте слов, 
-		упорядоченный сначала по длинне слова, а потом лексикографически.
+		упорядоченный сначала по длине слова, а потом лексикографически.
 
 		Запрещено использовать `ThenBy` и `ThenByDescending`.
 		*/
 
-		[Exercise(SingleStatement = true)]
+		[Exercise]
+		[SingleStatementMethod]
 		[Hint("`Regex.Split` — позволяет задать регулярное выражение для разделителей слов и получить список слов.")]
 		[Hint("`Regex.Split(s, @\"\\W+\")` разбивает текст на слова")]
 		[Hint("Пустая строка не является корректным словом")]

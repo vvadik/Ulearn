@@ -58,8 +58,10 @@ namespace uLearn.Web.Controllers
 				IsPassedTask = isPassedTask,
 				LatestAcceptedSolution = isPassedTask ? solutionsRepo.GetLatestAcceptedSolution(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId()) : null,
 				Rate = GetRate(course.Id, course.Slides[slideIndex].Id),
-				SolvedSlide = solutionsRepo.GetIndexesOfPassedSlide(course.Id, User.Identity.GetUserId()),
-				VisitedSlide = visitersRepo.GetIndexesOfVisitedSlide(course.Id, User.Identity.GetUserId())
+				SolvedSlide = solutionsRepo.GetIdOfPassedSlides(course.Id, User.Identity.GetUserId()),
+				VisitedSlide = visitersRepo.GetIdOfVisitedSlides(course.Id, User.Identity.GetUserId()),
+				PassedQuiz = userQuizzesRepo.GetIdOfQuizPassedSlides(courseId, User.Identity.GetUserId()),
+				AnswersToQuizes = userQuizzesRepo.GetAnswersForShowOnSlide(courseId, course.Slides[slideIndex] as QuizSlide, User.Identity.GetUserId())
 			};
 			return model;
 		}
@@ -69,6 +71,8 @@ namespace uLearn.Web.Controllers
 		{
 			var userId = User.Identity.GetUserId();
 			var coursePageModel = await CreateCoursePageModel(courseId, slideIndex);
+			coursePageModel.PrevSlideIndex = coursePageModel.PrevSlideIndex + 1;
+			coursePageModel.IsSlideWithAcceptedSolutions = true;
 			var solutions = coursePageModel.IsPassedTask
 				? solutionsRepo.GetAllAcceptedSolutions(courseId, coursePageModel.Course.Slides[slideIndex].Id)
 				: new List<AcceptedSolutionInfo>();
@@ -101,7 +105,7 @@ namespace uLearn.Web.Controllers
 			var code = GetUserCode(Request.InputStream);
 			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
 			var solution = exerciseSlide.Solution.BuildSolution(code);
-			return Content(solution, "text/plain");
+			return Content(solution.SourceCode ?? solution.ErrorMessage, "text/plain");
 		}
 
 		[HttpPost]
@@ -131,8 +135,7 @@ namespace uLearn.Web.Controllers
 		{
 			var userId = User.Identity.GetUserId();
 			var slideRate = (SlideRates)Enum.Parse(typeof(SlideRates), rate);
-			await slideRateRepo.AddRate(courseId, slideId, userId, slideRate);
-			return "success!";
+			return await slideRateRepo.AddRate(courseId, slideId, userId, slideRate);
 		}
 
 		[HttpPost]
@@ -185,7 +188,15 @@ namespace uLearn.Web.Controllers
 		private async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code, int slideIndex)
 		{
 			var solution = exerciseSlide.Solution.BuildSolution(code);
-			var submition = await executionService.Submit(solution, "");
+			if (solution.HasErrors)
+				return new RunSolutionResult
+				{
+					CompilationError = solution.ErrorMessage,
+					IsRightAnswer = false,
+					ExpectedOutput = "",
+					ActualOutput = ""
+				};
+			var submition = await executionService.Submit(solution.SourceCode, "");
 			var output = submition.Output + "\n" + submition.StdErr;
 			var isRightAnswer = NormalizeString(output).Equals(NormalizeString(exerciseSlide.ExpectedOutput));
 			return new RunSolutionResult
@@ -219,12 +230,18 @@ namespace uLearn.Web.Controllers
 			await visitersRepo.AddVisiter(courseId, slideId, User.Identity.GetUserId());
 		}
 
+		[HttpPost]
+		[Authorize]
 		public async Task<string> SubmitQuiz(string courseId, string slideIndex, string answer)
 		{
 			var intSlideIndex = int.Parse(slideIndex);
+			var course = courseManager.GetCourse(courseId);
+			if (userQuizzesRepo.IsQuizSlidePassed(courseId, User.Identity.GetUserId(), course.Slides[intSlideIndex].Id))
+				return null;
+			var time = DateTime.Now;
 			var answers = answer.Split('*').Select(x => x.Split('_').Take(2).ToList()).GroupBy(x => x[0]);
 			var incorrectQuizzes = new List<string>();
-			var course = courseManager.GetCourse(courseId);
+			var fillInBlockType = typeof (FillInBlock);
 			foreach (var ans in answers)
 			{
 				var quizInfo = GetQuizInfo(course, intSlideIndex, ans);
@@ -232,12 +249,12 @@ namespace uLearn.Web.Controllers
 				{
 					await
 						userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
-							course.Slides[intSlideIndex].Id, quizInfoForDb.Text, User.Identity.GetUserId());
-					if (!quizInfoForDb.IsRightAnswer)
+							course.Slides[intSlideIndex].Id, quizInfoForDb.Text, User.Identity.GetUserId(), time);
+					if (!quizInfoForDb.IsRightAnswer && quizInfoForDb.QuizType == fillInBlockType)
 						incorrectQuizzes.Add(ans.Key);
 				}
 			}
-			return string.Join("*", incorrectQuizzes);
+			return string.Join("*", incorrectQuizzes.Distinct());
 		}
 
 		private IEnumerable<QuizInfoForDb> GetQuizInfo(Course course, int slideIndex, IGrouping<string, List<string>> answer)
@@ -263,7 +280,8 @@ namespace uLearn.Web.Controllers
 					QuizId = isTrueBlock.Id,
 					ItemId = null,
 					IsRightAnswer = isTrueBlock.Answer.ToString() == data.First()[1],
-					Text = null
+					Text = data.First()[1],
+					QuizType = typeof(IsTrueBlock)
 				}
 			};
 		}
@@ -273,7 +291,7 @@ namespace uLearn.Web.Controllers
 			if (choiseBlock.Multiple)
 			{
 				var ans = answer.ToList()
-					.Select(x => new QuizInfoForDb { QuizId = choiseBlock.Id, IsRightAnswer = false, ItemId = x[1], Text = null }).ToList();
+					.Select(x => new QuizInfoForDb { QuizId = choiseBlock.Id, IsRightAnswer = false, ItemId = x[1], Text = null, QuizType = typeof(ChoiceBlock)}).ToList();
 				var correctItems = new HashSet<string>(choiseBlock.Items.Where(x => x.IsCorrect).Select(x => x.Id));
 				var ansItem = new HashSet<string>(ans.Select(x => x.ItemId));
 				var count = ansItem.Count(correctItems.Contains);
@@ -289,7 +307,8 @@ namespace uLearn.Web.Controllers
 					QuizId = choiseBlock.Id,
 					ItemId = choiseBlock.Items[int.Parse(data.First()[1])].Id,
 					IsRightAnswer = choiseBlock.Items[int.Parse(data.First()[1])].IsCorrect,
-					Text = null
+					Text = null,
+					QuizType = typeof(ChoiceBlock)
 				}
 			};
 		}
@@ -303,7 +322,8 @@ namespace uLearn.Web.Controllers
 					QuizId = fillInBlock.Id,
 					ItemId = null,
 					IsRightAnswer = fillInBlock.Regexes.Any(regex => Regex.IsMatch(data.First()[1], regex)),
-					Text = data.First()[1]
+					Text = data.First()[1],
+					QuizType = typeof(FillInBlock)
 				}
 			};
 		}
@@ -315,5 +335,6 @@ namespace uLearn.Web.Controllers
 		public string ItemId;
 		public string Text;
 		public bool IsRightAnswer;
+		public Type QuizType;
 	}
 }

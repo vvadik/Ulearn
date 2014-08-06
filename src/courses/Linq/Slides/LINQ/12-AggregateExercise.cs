@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides
 {
@@ -14,11 +15,12 @@ namespace uLearn.Courses.Linq.Slides
 
 		Решите эту задачу в одно выражение. 
 		
-		Не используйте методы сортировки — сложность сортировки O(N * log(N)), однако эту задачу можно решить за O(N).
+		Не используйте методы сортировки — сложность сортировки `O(N * log(N))`, однако эту задачу можно решить за `O(N)`.
 
 		*/
 
-		[Exercise(SingleStatement = true)]
+		[Exercise]
+		[SingleStatementMethod]
 		[Hint("Вспомните про кортежи")]
 		[Hint("Вспомните про особенности сравнения кортежей")]
 		public static string GetLongest(IEnumerable<string> words)

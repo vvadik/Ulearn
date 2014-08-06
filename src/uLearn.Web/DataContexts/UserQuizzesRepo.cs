@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using NUnit.Framework;
+using uLearn.Quizes;
 using uLearn.Web.Migrations;
 using uLearn.Web.Models;
 
@@ -23,7 +25,7 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public async Task<UserQuiz> AddUserQuiz(string courseId, bool isRightAnswer, string itemId, string quizId, string slideId, string text, string userId)
+		public async Task<UserQuiz> AddUserQuiz(string courseId, bool isRightAnswer, string itemId, string quizId, string slideId, string text, string userId, DateTime time)
 		{
 			var userQuiz = new UserQuiz
 			{
@@ -33,7 +35,7 @@ namespace uLearn.Web.DataContexts
 				QuizId = quizId,
 				SlideId = slideId,
 				Text = text,
-				Timestamp = DateTime.Now,
+				Timestamp = time,
 				UserId = userId
 			};
 			db.UserQuizzes.Add(userQuiz);
@@ -41,15 +43,30 @@ namespace uLearn.Web.DataContexts
 			return userQuiz;
 		}
 
-		public bool IsAllQuizzesPassed(string courseId, string slideId, string userId)
+		public bool IsQuizSlidePassed(string courseId, string userId, string slideId)
 		{
-			var quiz = db.UserQuizzes.Where(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId).ToList();
-			return quiz.Count != 0 && quiz.All(x => x.IsRightAnswer);
+			return db.UserQuizzes.Any(x => x.UserId == userId && x.SlideId == slideId && x.CourseId == courseId);
 		}
 
-		public List<UserQuiz> GetQuizAnswers(string courseId, string slideId, string userId, string quizId)
+		public HashSet<string> GetIdOfQuizPassedSlides(string courseId, string userId)
 		{
-			return db.UserQuizzes.Where(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId).ToList();
+			return new HashSet<string>(db.UserQuizzes.Where(x => x.CourseId == courseId && x.UserId == userId).Select(x => x.SlideId).Distinct());
+		}
+
+		public Dictionary<string, List<string>> GetAnswersForShowOnSlide(string courseId, QuizSlide slide, string userId)
+		{
+			if (slide == null)
+				return null;
+			var answer = new Dictionary<string, List<string>>();
+			foreach (var block in slide.Quiz.Blocks)
+			{
+				var ans = db.UserQuizzes
+					.Where(x => x.UserId == userId && x.CourseId == courseId && x.SlideId == slide.Id && x.QuizId == block.Id).ToList();
+				if (block is ChoiceBlock)
+					answer[block.Id] = ans.Select(x => x.ItemId).ToList();
+				else answer[block.Id] = ans.Select(x => x.Text).ToList();
+			}
+			return answer;
 		}
 	}
 }

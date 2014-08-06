@@ -8,8 +8,13 @@
 	var id = "hint" + index;
 		<div id="@id" data-url="@Url.Action("AddHint")" style="display:none">
 			@{ var intro = index == 0 ? "Подсказки:" : "";}
-		    <h4>@intro</h4>
-			<li>@Html.Raw(hintHtml)</li>
+			<h4>@intro</h4>
+			<div>
+				<button style="float: left" class="like-left-location btn">
+					<i class="glyphicon glyphicon-thumbs-up"></i>
+				</button>
+				<li>@Html.Raw(hintHtml)</li>
+			</div>
 		</div>
 }
     <div id="currentHint" style="display:none">-1</div>

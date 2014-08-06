@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Xml;
 using System.Xml.Serialization;
-using NUnit.Framework;
 using uLearn.CSharp;
 using uLearn.Quizes;
 
@@ -84,7 +81,7 @@ namespace uLearn.Web.Models
 			try
 			{
 				var sourceCode = Encoding.UTF8.GetString(slideFile.GetContent());
-				var usings = GetUsings(slideFile, resourceFiles); 
+				var usings = GetExercisePrelude(slideFile, resourceFiles); 
 				var info = GetInfoForSlide(slideFile, resourceFiles);
 				return slideFile.Filename.EndsWith(".xml") 
 					? LoadQuiz(slideFile, info) 
@@ -106,23 +103,34 @@ namespace uLearn.Web.Models
 
 		private static void FillEmptyField(Quiz quiz)
 		{
-			for (var blockIndex = 0; blockIndex < quiz.Blocks.Length; blockIndex++)
+			var emptyIndex = 0;
+			foreach (var quizBlock in quiz.Blocks)
 			{
-				quiz.Blocks[blockIndex].Text = Md.ToHtml(quiz.Blocks[blockIndex].Text);
-				if (quiz.Blocks[blockIndex].Id == null)
-					quiz.Blocks[blockIndex].Id = blockIndex.ToString();
-				var choiceBlock = quiz.Blocks[blockIndex] as ChoiceBlock;
+				quizBlock.Text = Md.ToHtml(quizBlock.Text);
+				if (quizBlock.Id == null)
+				{
+					quizBlock.Id = emptyIndex.ToString();
+					emptyIndex++;
+				}
+				var choiceBlock = quizBlock as ChoiceBlock;
 				if (choiceBlock == null) continue;
 				for (var itemIndex = 0; itemIndex < choiceBlock.Items.Length; itemIndex++)
 					if (choiceBlock.Items[itemIndex].Id == null)
 						choiceBlock.Items[itemIndex].Id = itemIndex.ToString();
+				//if (!choiceBlock.Shuffle) continue;
+				//Shuffle(choiceBlock.Items);
 			}
 		}
 
-		private static string GetUsings(ResourceFile file, IList<ResourceFile> all)
+		//private static void Shuffle(ChoiceItem[] items)
+		//{
+		//	var shuffledItems = new ChoiceBlock[items.Length];
+		//}
+
+		private static string GetExercisePrelude(ResourceFile file, IList<ResourceFile> all)
 		{
 			var detailedPath = file.FullName.Split('.').ToArray();
-			return Encoding.UTF8.GetString(all.Single(x => x.FullName.EndsWith(detailedPath[detailedPath.Length - 3] + ".Usings.txt")).GetContent());
+			return Encoding.UTF8.GetString(all.Single(x => x.FullName.EndsWith(detailedPath[detailedPath.Length - 3] + ".Prelude.txt")).GetContent());
 		}
 
 		private static SlideInfo GetInfoForSlide(ResourceFile file, IList<ResourceFile> all)

@@ -55,6 +55,9 @@ namespace uLearn.Quizes
 	[XmlType("fillIn")]
 	public class FillInBlock : QuizBlock
 	{
+		[XmlElement("sample")]
+		public string Sample;
+
 		[XmlElement("regex")]
 		public string[] Regexes;
 	}
