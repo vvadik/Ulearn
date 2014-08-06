@@ -71,6 +71,8 @@ namespace uLearn.Web.Controllers
 		{
 			var userId = User.Identity.GetUserId();
 			var coursePageModel = await CreateCoursePageModel(courseId, slideIndex);
+			coursePageModel.PrevSlideIndex = coursePageModel.PrevSlideIndex + 1;
+			coursePageModel.IsSlideWithAcceptedSolutions = true;
 			var solutions = coursePageModel.IsPassedTask
 				? solutionsRepo.GetAllAcceptedSolutions(courseId, coursePageModel.Course.Slides[slideIndex].Id)
 				: new List<AcceptedSolutionInfo>();

@@ -48,23 +48,7 @@ namespace uLearn.Web.Models
 				            "\n" + "\terror: " + solution.ErrorMessage + "\n\n");
 			else
 			{
-				////string output = "";
-				//////CSharpCodeProvider codeProvider = new CSharpCodeProvider();
-				//////var codeProvider = new CodeDomProvider();
-				//////ICodeCompiler icc = codeProvider.CreateCompiler(); 
-				////CompilerParameters parameters = new CompilerParameters();
-				////parameters.GenerateExecutable = true;
-				////parameters.OutputAssembly = output;
-				////var provider = CodeDomProvider.CreateProvider("CSharp");
-				////var results = provider.CompileAssemblyFromSource(parameters, solution.SourceCode);
-				//////CompilerResults results = icc.CompileAssemblyFromSource(parameters, solution.SourceCode);
-				////Console.WriteLine(solution.SourceCode);
-				////Console.WriteLine(string.Join("\n", parameters.EmbeddedResources));
-				////foreach (var error in results.Errors)
-				////{
-				////	Console.WriteLine(error);
-				////}
-				////Assert.AreEqual(0, results.Errors.Count);
+				//ExperimentMethod(solution); Попытка научиться проводить тестирование, не отправляя на Ideon.
 				var submition = executionService.Submit(solution.SourceCode, "").Result;
 				var output = submition.Output + "\n" + submition.StdErr;
 				var isRightAnswer = NormalizeString(output).Equals(NormalizeString(slide.ExpectedOutput));
@@ -86,5 +70,25 @@ namespace uLearn.Web.Models
 			}
 		}
 
+		private static void ExperimentMethod(SolutionBuildResult solution)
+		{
+			string output = "";
+			//CSharpCodeProvider codeProvider = new CSharpCodeProvider();
+			//var codeProvider = new CodeDomProvider();
+			//ICodeCompiler icc = codeProvider.CreateCompiler(); 
+			CompilerParameters parameters = new CompilerParameters();
+			parameters.GenerateExecutable = true;
+			parameters.OutputAssembly = output;
+			var provider = CodeDomProvider.CreateProvider("CSharp");
+			var results = provider.CompileAssemblyFromSource(parameters, solution.SourceCode);
+			//CompilerResults results = icc.CompileAssemblyFromSource(parameters, solution.SourceCode);
+			Console.WriteLine(solution.SourceCode);
+			Console.WriteLine(string.Join("\n", parameters.EmbeddedResources));
+			foreach (var error in results.Errors)
+			{
+				Console.WriteLine(error);
+			}
+			Assert.AreEqual(0, results.Errors.Count);
+		}
 	}
 }

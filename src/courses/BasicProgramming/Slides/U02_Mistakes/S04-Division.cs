@@ -45,6 +45,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			*/
 		}
 
+		[HideOnSlide]
 		private static bool IsBadDivider(int divider)
 		{
 			return divider == 0;

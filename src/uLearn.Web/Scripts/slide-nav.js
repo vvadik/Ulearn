@@ -39,7 +39,7 @@ var slideNavigation = {
     $noPrev: $("#no_prev_slide"),
     $noNext: $("#no_next_slide"),
     $nextSolutions: $("#next_solutions_button"),
-    update: function (hasNext, hasPrev) {
+    update: function (hasNext, hasPrev, isAccepted) {
         $("#next_slide_button").removeClass("block-next");
         this.$next.toggle(hasNext);
         if (!hasNext) {
@@ -47,9 +47,15 @@ var slideNavigation = {
             this.$next.toggle(false);
         }
         this.$prev.toggle(hasPrev);
-        if (!hasPrev)
-            $("#next_slide_button").width("100%");
-        this.$nextSolutions.toggle(false);
+	    if (!hasPrev) {
+		    $("#next_solutions_button").width("100%");
+		    $("#next_slide_button").width("100%");
+	    }
+	    this.$nextSolutions.toggle(false);
+		if (isAccepted) {
+			this.$nextSolutions.toggle(true);
+			this.$next.toggle(false);
+		}
     },
     makeShowSolutionsNext: function () {
         this.$next.toggle(false);
@@ -58,7 +64,7 @@ var slideNavigation = {
     }
 }
 var $parent = $("#nav_arrows");
-slideNavigation.update($parent.data("hasnext"), !!$parent.data("hasprev"));
+slideNavigation.update($parent.data("hasnext"), !!$parent.data("hasprev"), $parent.data("isaccepted"));
 
 document.getElementById('next_slide_button').onclick = function () {
     var rated = !($("#notwatched").hasClass("not-watched"));
