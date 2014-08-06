@@ -3,7 +3,7 @@ using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Slide("Типы данных 2", "{38FD7DB3-E4E5-4EC1-ACBD-30F3A55A70F4}")]
+	[Slide("Числовые типы данных 2", "{38FD7DB3-E4E5-4EC1-ACBD-30F3A55A70F4}")]
 	public class S02_TypesExercise
 	{
 		/*
