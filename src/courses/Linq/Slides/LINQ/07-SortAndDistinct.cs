@@ -9,7 +9,7 @@ namespace uLearn.Courses.Linq.Slides
 	{
 		/*
 
-		Для сортировки последовательности в Linq имеется четыре метода:
+		Для сортировки последовательности в `LINQ` имеется четыре метода:
 
 		    IOrderedEnumerable<T> OrderBy<T>(this IEnumerable<T> items, Func<T, K> keySelector)
 		    IOrderedEnumerable<T> OrderByDescending<T>(this IEnumerable<T> items, Func<T, K> keySelector)

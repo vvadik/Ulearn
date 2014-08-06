@@ -22,7 +22,7 @@ namespace uLearn.Courses.Linq.Slides
 
 		/*
 
-		Без использования Linq, решение могло бы выглядеть так:
+		Без использования `LINQ`, решение могло бы выглядеть так:
 		*/
 
 		[ShowBodyOnSlide]
@@ -40,7 +40,7 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		/*
-		Напишите решение этой задачи с помощью Linq в одно выражение.
+		Напишите решение этой задачи с помощью `LINQ` в одно выражение.
 		*/
 
 		[ExpectedOutput("Pavel\r\nIvan\r\nPetr\r\nAnna\r\nIlya\r\nVladimir\r\nBulat\r\nAlex\r\nGalina")]
