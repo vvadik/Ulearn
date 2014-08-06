@@ -103,6 +103,9 @@
     <Compile Include="StringExtensions_SplitToLines_should.cs" />
     <Compile Include="CSharp\SyntaxExtensions.cs" />
     <Compile Include="AnalyticsTablePageModel.cs" />
+    <Compile Include="tests\Comments.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="tests\Includes.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>

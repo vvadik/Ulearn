@@ -43,14 +43,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
-    <Compile Include="Slides\U01_Basics\S010-HelloWorld.cs" />
+    <Compile Include="Slides\U01_Basics\S010-HelloWorldVideo.cs" />
     <Compile Include="Slides\U01_Basics\S011-FirstStep.cs" />
-    <Compile Include="Slides\U01_Basics\S02-Types.cs" />
-    <Compile Include="Slides\U01_Basics\S03-Conversion2.cs" />
-    <Compile Include="Slides\U01_Basics\S03-Conversion.cs" />
-    <Compile Include="Slides\U01_Basics\S04-Strings.cs" />
+    <Compile Include="Slides\U01_Basics\S020-TypesVideo.cs" />
+    <Compile Include="Slides\U01_Basics\S021-Types.cs" />
+    <Compile Include="Slides\U01_Basics\S030-ConversionVideo.cs" />
+    <Compile Include="Slides\U01_Basics\S031-Conversion2.cs" />
+    <Compile Include="Slides\U01_Basics\S031-Conversion.cs" />
+    <Compile Include="Slides\U01_Basics\S040-StringsVideo.cs" />
+    <Compile Include="Slides\U01_Basics\S041-Strings.cs" />
     <Compile Include="Slides\U01_Basics\S05-ParseAndToString.cs" />
-    <Compile Include="Slides\U01_Basics\S06-Operations.cs" />
+    <Compile Include="Slides\U01_Basics\S060-OperationsVideo.cs" />
+    <Compile Include="Slides\U01_Basics\S061-Operations.cs" />
     <Compile Include="Slides\U01_Basics\S07-Methods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Slides\U01_Basics\S08-Vision.cs" />

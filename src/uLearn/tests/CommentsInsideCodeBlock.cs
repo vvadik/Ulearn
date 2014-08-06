@@ -14,10 +14,29 @@ namespace uLearn.tests
 		{
 //			Not a block!
 
-			/*uncomment
+			/*
 			Not a block too
 			*/
 			Console.WriteLine("Hello Sample!");
+		}
+
+		public class C
+		{
+			/*
+			Not a block again
+			*/
+			
+		}
+		public class C2
+		{
+			/*
+			Not a block never
+			*/
+			public void X() { }
+			/* 
+			Not a block ever
+			*/
+
 		}
 	}
 }
