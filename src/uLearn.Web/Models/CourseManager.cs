@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Xml;
 using System.Xml.Serialization;
-using NUnit.Framework;
 using uLearn.CSharp;
 using uLearn.Quizes;
 
@@ -116,8 +113,15 @@ namespace uLearn.Web.Models
 				for (var itemIndex = 0; itemIndex < choiceBlock.Items.Length; itemIndex++)
 					if (choiceBlock.Items[itemIndex].Id == null)
 						choiceBlock.Items[itemIndex].Id = itemIndex.ToString();
+				if (!choiceBlock.Shuffle) continue;
+				//Shuffle(choiceBlock.Items);
 			}
 		}
+
+		//private static void Shuffle(ChoiceItem[] items)
+		//{
+		//	var shuffledItems = new ChoiceBlock[items.Length];
+		//}
 
 		private static string GetExercisePrelude(ResourceFile file, IList<ResourceFile> all)
 		{

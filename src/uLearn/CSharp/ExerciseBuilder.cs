@@ -67,11 +67,15 @@ namespace uLearn.CSharp
 			}
 			if (node.HasAttribute<ExerciseAttribute>())
 			{
-				TemplateSolution = node.WithoutAttributes().ToString();
+				TemplateSolution = TemplateSolution + node.WithoutAttributes();
 				ExerciseNode = node;
 				ExerciseInitialCode = GetExerciseCode(node);
 				if (node.HasAttribute<IsStaticMethodAttribute>()) Validators.Add(new IsStaticMethodAttribute());
 				if (node.HasAttribute<SingleStatementMethodAttribute>()) Validators.Add(new SingleStatementMethodAttribute());
+			}
+			if (node.AttributeLists.Count == 0)
+			{
+				TemplateSolution = TemplateSolution + node;
 			}
 			return newMethod;
 		}

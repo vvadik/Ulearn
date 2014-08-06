@@ -233,11 +233,13 @@ namespace uLearn.Web.Controllers
 		[Authorize]
 		public async Task<string> SubmitQuiz(string courseId, string slideIndex, string answer)
 		{
-			var time = DateTime.Now;
 			var intSlideIndex = int.Parse(slideIndex);
+			var course = courseManager.GetCourse(courseId);
+			if (userQuizzesRepo.IsQuizSlidePassed(courseId, User.Identity.GetUserId(), course.Slides[intSlideIndex].Id))
+				return null;
+			var time = DateTime.Now;
 			var answers = answer.Split('*').Select(x => x.Split('_').Take(2).ToList()).GroupBy(x => x[0]);
 			var incorrectQuizzes = new List<string>();
-			var course = courseManager.GetCourse(courseId);
 			foreach (var ans in answers)
 			{
 				var quizInfo = GetQuizInfo(course, intSlideIndex, ans);
