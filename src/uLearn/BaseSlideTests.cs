@@ -19,6 +19,16 @@ namespace uLearn
 			this.someSlideClass = someSlideClass;
 		}
 
+		[Test]
+		public void TestGetAllSlides()
+		{
+			var slides = GetExerciseSlidesTestCases();
+			foreach (var slide in slides)
+			{
+				Console.WriteLine(slide.TestName);
+			}
+		}
+
 		[TestCaseSource("GetExerciseSlidesTestCases")]
 		public void Slide(Type slideType)
 		{
@@ -57,7 +67,7 @@ namespace uLearn
 			Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 			var newOut = new StringWriter();
 			var oldOut = Console.Out;
-			var methodInfo = slide.GetMethod("Main");
+			var methodInfo = slide.GetMethod("Main", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 			Console.SetOut(newOut);
 			try
 			{
@@ -81,7 +91,7 @@ namespace uLearn
 
 		public static IEnumerable<ExpectedOutputAttribute> GetExpectedOutputAttributes(Type declaringType)
 		{
-			return declaringType.GetMethods()
+			return declaringType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
 				.SelectMany(m => m.GetCustomAttributes(typeof(ExpectedOutputAttribute)))
 				.Cast<ExpectedOutputAttribute>();
 		}

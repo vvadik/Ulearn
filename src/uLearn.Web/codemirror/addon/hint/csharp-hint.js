@@ -51,7 +51,7 @@
 	var keywords = Object.keys(CodeMirror.resolveMode("text/x-csharp").keywords);
 	var methods = (""
 		+ " WriteLine Write"
-		+ " Format Substring Length Parse TryParse ToString Split Join"
+		+ " Format Substring Length Parse TryParse ToString Split Join Round Min Max Ceiling Floor "
 		+ " Where Select SelectMany ToArray ToList ToDictionary ToLookup Join Zip Aggregate GroupBy OrderBy OrderByDescending ThenBy ThenByDescending"
 		+ " "
 		).split(" ");
