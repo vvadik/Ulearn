@@ -61,14 +61,14 @@ namespace uLearn.CSharp
 		{
 			return VisitMemberDeclaration(node, base.VisitMethodDeclaration(node));
 		}
-		
+
 		public override SyntaxTrivia VisitTrivia(SyntaxTrivia trivia)
 		{
 			var comment = trivia.ToString();
 			if (trivia.CSharpKind() == SyntaxKind.MultiLineCommentTrivia)
 			{
-				var firstLine = comment.SplitToLines().First().Trim();
-				if (firstLine != "/*uncomment")
+				bool shouldCreateTextBlock = trivia.GetParents().Count(p => IsNestingParent(p, trivia)) <= 1;
+				if (shouldCreateTextBlock)
 					Blocks.Add(ExtractMarkDownFromComment(trivia));
 			}
 			else if (trivia.CSharpKind() == SyntaxKind.SingleLineCommentTrivia)
@@ -78,10 +78,32 @@ namespace uLearn.CSharp
 					var parts = comment.Split(new[] { ' ' }, 2);
 					if (parts[0] == "//#video") EmbedVideo(parts[1]);
 					if (parts[0] == "//#include") EmbedCode(parts[1]);
-
 				}
 			}
 			return base.VisitTrivia(trivia);
+		}
+
+		///<summary>Is child _inside_ Type or Method parent</summary>
+		private bool IsNestingParent(SyntaxNode parent, SyntaxTrivia child)
+		{
+			return IsNestingParent(parent as TypeDeclarationSyntax, child) 
+				|| IsNestingParent(parent as MethodDeclarationSyntax, child);
+		}
+
+		private bool IsNestingParent(TypeDeclarationSyntax node, SyntaxTrivia trivia)
+		{
+			if (node == null) return false;
+			if (trivia.Span.Start < node.OpenBraceToken.Span.Start) return false;
+			if (trivia.Span.End > node.CloseBraceToken.Span.End) return false;
+			return true;
+		}
+		
+		private bool IsNestingParent(MethodDeclarationSyntax node, SyntaxTrivia trivia)
+		{
+			if (node == null) return false;
+			if (trivia.Span.Start < node.Body.Span.Start) return false;
+			if (trivia.Span.End > node.Body.Span.End) return false;
+			return true;
 		}
 
 		private void AddCodeBlock(MemberDeclarationSyntax node)

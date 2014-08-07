@@ -612,6 +612,8 @@
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\buttons.js" />
     <Content Include="Scripts\notify-custom.min.js" />
+    <Content Include="Orphus\orphus.gif" />
+    <Content Include="Orphus\orphus.js" />
     <Content Include="Scripts\slide-quiz.js" />
     <Content Include="Scripts\slide-hints.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />

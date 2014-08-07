@@ -3,7 +3,7 @@ using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Slide("Строки", "{36F91BF6-6EBC-4E0E-AADB-64EF122D5247}")]
+	[Slide("Строки 2", "{36F91BF6-6EBC-4E0E-AADB-64EF122D5247}")]
 	class S04_Strings
 	{
 		/*

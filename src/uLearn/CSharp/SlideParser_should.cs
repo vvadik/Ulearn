@@ -34,10 +34,11 @@ namespace uLearn.CSharp
 		public void ignore_comments_inside_methods()
 		{
 			var slide = GenerateSlide("CommentsInsideCodeBlock.cs");
-			Assert.That(slide.Blocks.Length, Is.EqualTo(1));
-			Assert.That(slide.Blocks[0].IsCode);
-			Assert.That(slide.Blocks[0].Text, Is.StringContaining("Not a block!"));
-			Assert.That(slide.Blocks[0].Text, Is.StringContaining("Not a block too"));
+			foreach (var block in slide.Blocks)
+			{
+				Console.WriteLine(block.ToString());
+				Assert.That(block.IsCode, Is.True);
+			}
 		}
 
 		[Test]
@@ -86,6 +87,25 @@ namespace uLearn.CSharp
 			Slide slide = GenerateSlide("NestedClass.cs");
 			Assert.That(slide.Blocks[0].Text, Is.StringStarting("public class Point"));
 		}
+
+		[Test]
+		public void text_blocks_from_comments()
+		{
+			Slide slide = GenerateSlide("Comments.cs");
+			var texts = slide.Blocks.Select(b => b.Text.Trim().ToLower()).ToArray();
+			Action<string> contains = block => Assert.That(texts, Has.Exactly(1).EqualTo(block));
+			contains("before slide class");
+			contains("before slide class 2");
+			contains("before nested class");
+			contains("before nested class 2");
+			contains("before method");
+			contains("before method 2");
+			contains("before slide class ends");
+			contains("before slide class ends 2");
+			contains("after slide class");
+			contains("after slide class 2");
+		}
+
 
 		[Test]
 		public void remove_Excluded_members_from_solution()
@@ -159,10 +179,10 @@ namespace uLearn.CSharp
 		public void preserve_blocks_order_as_in_source_file()
 		{
 			Slide slide = GenerateSlide("SlideWithComments.cs");
-			Assert.That(slide.Blocks.Length, Is.EqualTo(3));
 			Assert.That(slide.Blocks[0].Text, Is.StringStarting("Comment"));
 			Assert.That(slide.Blocks[1].IsCode);
 			Assert.That(slide.Blocks[2].Text, Is.StringStarting("Final"));
+			Assert.That(slide.Blocks.Length, Is.EqualTo(3));
 		}
 
 		[Test]

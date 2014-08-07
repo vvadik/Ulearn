@@ -16,6 +16,16 @@ namespace uLearn.CSharp
 				yield return node = node.Parent;
 		}
 
+		public static IEnumerable<SyntaxNode> GetParents(this SyntaxToken token)
+		{
+			return new[] {token.Parent}.Concat(token.Parent.GetParents());
+		}
+
+		public static IEnumerable<SyntaxNode> GetParents(this SyntaxTrivia trivia)
+		{
+			return trivia.Token.GetParents();
+		}
+
 		public static bool HasAttribute<TAttr>(this MemberDeclarationSyntax node) where TAttr : Attribute
 		{
 			return node.GetAttributes<TAttr>().Any();
