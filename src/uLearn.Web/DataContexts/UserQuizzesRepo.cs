@@ -64,7 +64,14 @@ namespace uLearn.Web.DataContexts
 					.Where(x => x.UserId == userId && x.CourseId == courseId && x.SlideId == slide.Id && x.QuizId == block.Id).ToList();
 				if (block is ChoiceBlock)
 					answer[block.Id] = ans.Select(x => x.ItemId).ToList();
-				else answer[block.Id] = ans.Select(x => x.Text).ToList();
+				else if (block is IsTrueBlock)
+					answer[block.Id] = ans.Select(x => x.Text).ToList();
+				else if(block is FillInBlock)
+					answer[block.Id] = new List<string>
+					{
+						ans.Select(x => x.Text).FirstOrDefault(),
+						ans.Select(x => x.IsRightAnswer).FirstOrDefault().ToString()
+					};
 			}
 			return answer;
 		}
