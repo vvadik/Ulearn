@@ -103,9 +103,12 @@ namespace uLearn.Web.Models
 		private static void FillEmptyField(Quiz quiz)
 		{
 			var emptyIndex = 0;
+			var questionIndex = 1;
 			foreach (var quizBlock in quiz.Blocks)
 			{
-				quizBlock.Text = Md.ToHtml(quizBlock.Text);
+				var questionBlock = quizBlock as AbstractQuestionBlock;
+				if (questionBlock != null)
+					questionBlock.QuestionIndex = questionIndex++;
 				if (quizBlock.Id == null)
 				{
 					quizBlock.Id = emptyIndex.ToString();

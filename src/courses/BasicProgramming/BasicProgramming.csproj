@@ -59,8 +59,9 @@
     <Compile Include="Slides\U01_Basics\S070-MethodsVideo.cs" />
     <Compile Include="Slides\U01_Basics\S072-Methods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Slides\U01_Basics\S081-Scope.cs" />
-    <Compile Include="Slides\U01_Basics\S082-DefaultValues.cs" />
+    <Content Include="Slides\U01_Basics\S081-Scope.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Compile Include="Slides\U01_Basics\S083-IntelliSense.cs" />
     <Compile Include="Slides\U01_Basics\_HelloWorld.cs" />
     <Compile Include="Slides\U02_Mistakes\S01-MissedUsings.cs" />

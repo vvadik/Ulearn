@@ -4,7 +4,7 @@ namespace uLearn
 {
 	public static class Md
 	{
-		public static string ToHtml(string md)
+		public static string RenderMd(this string md)
 		{
 			return new Markdown
 			{

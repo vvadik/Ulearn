@@ -19,7 +19,7 @@ namespace uLearn
 			ExerciseInitialCode = exerciseInitialCode ?? "";
 			ExpectedOutput = expectedOutput;
 			Solution = solution;
-			HintsHtml = hints.Select(Md.ToHtml).ToArray();
+			HintsHtml = hints.Select(Md.RenderMd).ToArray();
 		}
 
 		protected bool Equals(ExerciseSlide other)

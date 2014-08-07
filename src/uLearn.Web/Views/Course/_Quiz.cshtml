@@ -1,15 +1,29 @@
 ﻿@using uLearn
 @using uLearn.Quizes
-@model uLearn.CoursePageModel
+@model CoursePageModel
 @{ var QuizSlide = Model.Slide as QuizSlide;}
 @if (QuizSlide != null)
 {
-    var passed = Model.PassedQuiz.Contains(QuizSlide.Id);
+	var passed = Model.PassedQuiz.Contains(QuizSlide.Id);
 	for (int blockIndex = 0; blockIndex < QuizSlide.Quiz.Blocks.Length; blockIndex++)
 	{
 		var quizBlock = QuizSlide.Quiz.Blocks[blockIndex];
-		<p>@Html.Raw(quizBlock.Text)</p>
-
+		if (quizBlock is CodeBlock)
+		{
+			<textarea class='code code-sample'>@quizBlock.Text</textarea>
+		}
+		else
+		{
+			var questionBlock = quizBlock as AbstractQuestionBlock;
+			if (questionBlock != null)
+			{
+				<h4>@questionBlock.QuestionIndex. @questionBlock.Text</h4>
+			}
+			else
+			{
+				@Html.Raw(quizBlock.Text.RenderMd())
+			}
+		}
 		if (quizBlock is ChoiceBlock)
 		{
 			var choiceQuizBlock = quizBlock as ChoiceBlock;
@@ -81,13 +95,13 @@
 		}
 	}
 	<div id="quizSub" data-url='@Url.Action("SubmitQuiz")'>
-	    <button style="margin-top:10px; margin-bottom:5px;" class="btn btn-default" onclick="submitQuiz('@Model.Course.Id','@Model.SlideIndex','@Model.AnswersToQuizes.Count')">Submit my result</button>
+		<button style="margin-top:10px; margin-bottom:5px;" class="btn btn-default" onclick="submitQuiz('@Model.Course.Id','@Model.SlideIndex','@Model.AnswersToQuizes.Count')">Submit my result</button>
 		<script src="~/Scripts/slide-quiz.js"></script>
-	    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
-	    <script> areAllAnswered(5)</script>
-	    @if (passed)
+		<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+		<script> areAllAnswered(5)</script>
+		@if (passed)
 		{
-		    <script>markAnswers()</script>
+			<script>markAnswers()</script>
 		}
 	</div>
 }

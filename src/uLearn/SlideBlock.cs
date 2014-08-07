@@ -56,7 +56,7 @@
 
 		public string RenderedText
 		{
-			get { return AlreadyRendered ? Text : Md.ToHtml(Text); }
+			get { return AlreadyRendered ? Text : Md.RenderMd(Text); }
 		}
 
 		public SlideBlock WithAppendedText(string text)

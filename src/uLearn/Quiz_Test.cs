@@ -21,6 +21,7 @@ namespace uLearn.Quizes
 					new QuizBlock {Text = "This is quiz!"},
 					new IsTrueBlock
 					{
+						Id = "1",
 						Text = "Это утверждение ложно",
 					},
 					new ChoiceBlock

@@ -23,6 +23,7 @@ namespace uLearn.Quizes
 	[XmlInclude(typeof(IsTrueBlock))]
 	[XmlInclude(typeof(ChoiceBlock))]
 	[XmlInclude(typeof(FillInBlock))]
+	[XmlInclude(typeof(CodeBlock))]
 	public class QuizBlock
 	{
 		[XmlAttribute("id")]
@@ -32,8 +33,18 @@ namespace uLearn.Quizes
 		public string Text;
 	}
 
+	[XmlType("Code")]
+	public class CodeBlock : QuizBlock
+	{
+	}
+
+	public class AbstractQuestionBlock : QuizBlock
+	{
+		[XmlIgnore] public int QuestionIndex;
+	}
+
 	[XmlType("Choice")]
-	public class ChoiceBlock : QuizBlock
+	public class ChoiceBlock : AbstractQuestionBlock
 	{
 		[XmlAttribute("multiple")]
 		public bool Multiple;
@@ -46,14 +57,14 @@ namespace uLearn.Quizes
 	}
 
 	[XmlType("isTrue")]
-	public class IsTrueBlock : QuizBlock
+	public class IsTrueBlock : AbstractQuestionBlock
 	{
 		[XmlAttribute("answer")]
 		public bool Answer;
 	}
 
 	[XmlType("fillIn")]
-	public class FillInBlock : QuizBlock
+	public class FillInBlock : AbstractQuestionBlock
 	{
 		[XmlElement("sample")]
 		public string Sample;
