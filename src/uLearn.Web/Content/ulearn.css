@@ -329,3 +329,8 @@ table.diff tbody th {
 .wrong-quiz {
     background-color: lightcoral;
 }
+
+.hide-side-bar-icon {
+	color: white;
+	background-color: black;
+}

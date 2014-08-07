@@ -642,6 +642,7 @@
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\slide-stats.js" />
+    <Content Include="Scripts\slide-tableOfContent.js" />
     <Content Include="Scripts\table-configurator.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="tablesorter-master\.gitignore" />

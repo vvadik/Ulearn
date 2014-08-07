@@ -65,9 +65,9 @@
 		}
 		if (Request.IsLocal)
 		{
-			<li class="units-list-item units-list-item-text">@Html.ActionLink("Total statistics", "TotalStatistics", "Analytics", new {courseId = Model.Course.Id, slideIndex = 0}, null)</li>
-			<li class="units-list-item units-list-item-text">@Html.ActionLink("Users statistics", "UsersStatistics", "Analytics", new {courseId = Model.Course.Id, slideIndex = 0}, null)</li>
-			<li class="units-list-item units-list-item-text">@Html.ActionLink("Personal statistics", "PersonalStatistics", "Analytics", new {courseId = Model.Course.Id, slideIndex = 0}, null)</li>
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Total statistics", "TotalStatistics", "Analytics", new { courseId = Model.Course.Id, slideIndex = 0 }, null)</li>
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Users statistics", "UsersStatistics", "Analytics", new { courseId = Model.Course.Id, slideIndex = 0 }, null)</li>
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Personal statistics", "PersonalStatistics", "Analytics", new { courseId = Model.Course.Id, slideIndex = 0 }, null)</li>
 		}
 	}
 </ul>
