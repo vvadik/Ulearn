@@ -1,12 +1,25 @@
 ﻿function showHintForUser(courseId, slideId, hintsCountStr) {
-	var hintsCount = parseInt(hintsCountStr) - 1;
+	var hintsCount = parseInt(hintsCountStr);
     var index = parseInt(($("#currentHint").text()));
     index++;
-    if (index > hintsCount) {
+    if (hintsCount == 0) {
+        $("#GetHintButton").notify("Для слайда нет подсказок", "noHints");
+        return;
+    }
+    if (index >= hintsCount) {
 	    $("#GetHintButton").notify("Подсказок больше нет :(", "noHints");
 	    return;
     }
     $("#currentHint").text(index);
+    (function ($) {
+        $.fn.goTo = function () {
+            $('html, body').animate({
+                scrollTop: $(this).offset().top + 'px'
+            }, 'slow');
+            return this; // for chaining...
+        }
+    })(jQuery);
+
     $.ajax(
 {
     type: "POST",
@@ -15,7 +28,8 @@
         courseId: courseId, slideId: slideId, hintId: index
     }
 }).success(function (ans) {
-            $('#hint' + (index)).show();
+    $('#hint' + (index)).show();
+            $('#hint' + (index)).goTo();
         })
     .fail(function (req) {
         console.log(req.responseText);
