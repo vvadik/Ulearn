@@ -1,20 +1,20 @@
 ﻿@model uLearn.CoursePageModel
-<form id="ratings" style="width:100%" class="rate-buttons" style="margin-top: 10px;">
+<form id="ratings" style="width:100%" class="rate-buttons ctrl-group" style="margin-top: 10px;">
 	<div id="ratesBar" data-url="@Url.Action("ApplyRate", new{ courseId = Model.Course.Id, slideId = Model.Slide.Id})"></div>
-    <div class="btn-group rates-bar" data-toggle="buttons">
-        <label style="width:33%" onclick="handleRate('NotUnderstand')" class="btn btn-default no-rounds" data-hover-class="btn-danger">
+	<div class="btn-group rates-bar ctrl-group" data-toggle="buttons">
+		<label style="width:33%" onclick="handleRate('NotUnderstand')" class="btn btn-default no-rounds ctrl-group" data-hover-class="btn-danger">
 			<input id="notunderstand" type="radio" name="marks" value="notunderstand">
 			Непонятно
 		</label>
-        <label style="width:33%" onclick="handleRate('Good')" class="btn btn-default" data-hover-class="btn-success">
-            <input id="good" type="radio" name="marks" value="good" checked>
-            Понятно
-        </label>
-        <label style="width:34%" onclick="handleRate('Trivial')" class="btn btn-default no-rounds" data-hover-class="btn-info">
-            <input id="trivial" type="radio" name="marks" value="trivial">
-            Тривиально
-        </label>
-    </div>
+		<label style="width:33%" onclick="handleRate('Good')" class="btn btn-default ctrl-group" data-hover-class="btn-success">
+			<input id="good" type="radio" name="marks" value="good" checked>
+			Понятно
+		</label>
+		<label style="width:34%" onclick="handleRate('Trivial')" class="btn btn-default no-rounds ctrl-group" data-hover-class="btn-info">
+			<input id="trivial" type="radio" name="marks" value="trivial">
+			Тривиально
+		</label>
+	</div>
 	<div class="clearfix"></div>
 </form>
 <label hidden style="display:none" onclick="handleRate('NotWatched')" class="btn btn-default active">

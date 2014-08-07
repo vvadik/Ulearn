@@ -22,7 +22,7 @@ else
 	<a href="#" onclick="updateVerdict(false, 'Compilation error', 'details', true)">CompilationError</a>
 	<a href="#" onclick="updateVerdict(false, 'Неверный ответ', 'Bullshit', false)">WrongAnswer</a>
 *@
-<div class="solution-control btn-group">
+<div class="solution-control btn-group ctrl-group">
     <button type="button" class="run-solution-button btn btn-default no-rounds"
             data-url="@Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">
         RUN

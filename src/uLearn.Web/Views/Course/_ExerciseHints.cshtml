@@ -1,5 +1,5 @@
 ﻿@model uLearn.CoursePageModel
-<div class="panel-group" id="hints-accordion">
+<div class="panel-group ctrl-group" id="hints-accordion">
     @{ var slide = Model.Slide as uLearn.ExerciseSlide;}
     <div id="hintsStore" data-url="@Url.Action("GetHint")"></div>
     @for (int index = 0; index < slide.HintsHtml.Length; index++)

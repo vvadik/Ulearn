@@ -4,6 +4,7 @@
 @{ var QuizSlide = Model.Slide as QuizSlide;}
 @if (QuizSlide != null)
 {
+    var passed = Model.PassedQuiz.Contains(QuizSlide.Id);
 	for (int blockIndex = 0; blockIndex < QuizSlide.Quiz.Blocks.Length; blockIndex++)
 	{
 		var quizBlock = QuizSlide.Quiz.Blocks[blockIndex];
@@ -14,45 +15,79 @@
 			var choiceQuizBlock = quizBlock as ChoiceBlock;
 			var isMultiply = choiceQuizBlock.Multiple;
 			var typeInp = isMultiply ? "checkbox" : "radio";
-			<div class="@typeInp" id='@(quizBlock.Id + "_quizBlock")'>
+			<div class="quiz-block-mark @typeInp" id='@(quizBlock.Id + "_quizBlock")'>
 				@for (int itemIndex = 0; itemIndex < choiceQuizBlock.Items.Length; itemIndex++)
 				{
 					var ident = isMultiply ? itemIndex + "noMult" : blockIndex.ToString();
 					var var = choiceQuizBlock.Items[itemIndex];
 					var correct = var.IsCorrect ? "true" : "false";
+					var ans = "";
+					if (passed && Model.AnswersToQuizes[quizBlock.Id].Contains(var.Id))
+					{
+						ans = "checked";
+					}
 					<div class="quiz">
 						<i class="@correct"></i>
-						<label><input id='@(blockIndex + "_" + itemIndex + "_quizItem")' name=@("group"+ident) type="@typeInp">@var.Description</label>
+						<label><input @ans id='@(blockIndex + "_" + itemIndex + "_quizItem")' name=@("group"+ident) type="@typeInp">@var.Description</label>
 					</div>
 				}
 			</div>
 		}
 		else if (quizBlock is FillInBlock)
 		{
-		    <div class="quiz">
+			var value = "";
+			var quizRes = "";
+			var quizResSample = "none";
+			if (passed && Model.AnswersToQuizes[quizBlock.Id].FirstOrDefault() != null)
+			{
+				value = Model.AnswersToQuizes[quizBlock.Id].FirstOrDefault();
+				quizRes = Model.AnswersToQuizes[quizBlock.Id][1] == "False" ? "wrong-quiz" : "";
+				quizResSample = Model.AnswersToQuizes[quizBlock.Id][1] == "False" ? "block" : "hidden";
+			}
+			var fillIn = quizBlock as FillInBlock;
+			var sample = fillIn.Sample;
+
+			<div class="quiz quiz-block-input">
 				<label>
-					<input id='@(blockIndex + "_" + "placetoinsert" + "_quizItem")'>
+					<input class="@quizRes" value="@value" id='@(blockIndex + "_" + "placetoinsert" + "_quizItem")'>
 				</label>
-		    </div>
+				<i style="display:@quizResSample" id='@(blockIndex + "_" + "example" + "_quizItem")'>
+					Пример правильного варианта ответа: @sample
+				</i>
+			</div>
 		}
 		else if (quizBlock is IsTrueBlock)
 		{
 			var selecter = quizBlock as IsTrueBlock;
 			var tr = selecter.Answer ? "true" : "false";
 			var fl = selecter.Answer ? "false" : "true";
-			<div class="radio" id="@(quizBlock.Id + "_quizBlock")">
+			var tchecked = "";
+			var fchecked = "";
+			if (passed && Model.AnswersToQuizes[quizBlock.Id].FirstOrDefault() != null)
+			{
+				tchecked = Model.AnswersToQuizes[quizBlock.Id].FirstOrDefault() == "True" ? "checked" : "";
+				fchecked = Model.AnswersToQuizes[quizBlock.Id].FirstOrDefault() == "False" ? "checked" : "";
+			}
+			<div class="radio quiz-block-mark" id="@(quizBlock.Id + "_quizBlock")">
 				<div class="quiz">
 					<i class="@tr"></i>
-					<label><input id='@(blockIndex + "_" + "True" + "_quizItem")' name='@(quizBlock.Id+"group")' type="radio">True</label>
+					<label><input @tchecked id='@(blockIndex + "_" + "True" + "_quizItem")' name='@(quizBlock.Id+"group")' type="radio">True</label>
 				</div>
 				<div class="quiz">
 					<i class="@fl"></i>
-					<label><input id='@(blockIndex + "_" + "False" + "_quizItem")' name='@(quizBlock.Id+"group")' type="radio">False</label>
+					<label><input @fchecked id='@(blockIndex + "_" + "False" + "_quizItem")' name='@(quizBlock.Id+"group")' type="radio">False</label>
 				</div>
 			</div>
 		}
 	}
 	<div id="quizSub" data-url='@Url.Action("SubmitQuiz")'>
-		<button onclick="submitQuiz('@Model.Course.Id','@Model.SlideIndex')">Submit my result</button>
+	    <button style="margin-top:10px; margin-bottom:5px;" class="btn btn-default" onclick="submitQuiz('@Model.Course.Id','@Model.SlideIndex','@Model.AnswersToQuizes.Count')">Submit my result</button>
+		<script src="~/Scripts/slide-quiz.js"></script>
+	    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+	    <script> areAllAnswered(5)</script>
+	    @if (passed)
+		{
+		    <script>markAnswers()</script>
+		}
 	</div>
 }

@@ -3414,7 +3414,7 @@ input[type="button"].btn-block {
 .btn-group .btn + .btn-group,
 .btn-group .btn-group + .btn,
 .btn-group .btn-group + .btn-group {
-  margin-left: 0;
+  margin-left: -1px;
 }
 
 .btn-toolbar:before,
