@@ -91,6 +91,8 @@ namespace uLearn.CSharp
 
 		private static string PrettyString(MemberDeclarationSyntax node)
 		{
+			if (node is FieldDeclarationSyntax)
+				return node.ToString().RemoveCommonNesting();
 			return node.ToFullString().RemoveCommonNesting();
 		}
 

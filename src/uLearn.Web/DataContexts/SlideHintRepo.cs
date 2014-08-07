@@ -65,5 +65,26 @@ namespace uLearn.Web.DataContexts
 			var hintsCount = GetHintsCountForUser(slideId, courseId, userId);
 			return (int)(100 * (double)hintsCount / hintsCountOnSlide);
 		}
+
+		public async Task<string> LikeHint(string courseId, string slideId, int hintId, string userId)
+		{
+			var hint = db.Hints.FirstOrDefault(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId && x.HintId == hintId);
+			if (hint == null)
+				return "error";
+			if (hint.IsHintHelped)
+			{
+				hint.IsHintHelped = false;
+				await db.SaveChangesAsync();
+				return "cancel";
+			}
+			hint.IsHintHelped = true;
+			await db.SaveChangesAsync();
+			return "success";
+		}
+
+		public HashSet<int> GetLikedHints(string courseId, string slideId, string userId)
+		{
+			return new HashSet<int>(db.Hints.Where(x => x.SlideId == slideId && x.CourseId == courseId && x.UserId == userId && x.IsHintHelped).Select(x => x.HintId));
+		}
 	}
 }

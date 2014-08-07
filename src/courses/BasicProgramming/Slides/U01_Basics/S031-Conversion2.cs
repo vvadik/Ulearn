@@ -25,7 +25,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			/*uncomment
 			double amount = 1.11; //количество биткоинов от одного человека
 			int peopleCount = 60; // количество человек
-			double totalMoney = (int) amount*peopleCount; // ← исправьте ошибку в этой строке
+			int totalMoney = (int) amount*peopleCount; // ← исправьте ошибку в этой строке
 			Console.WriteLine(totalMoney);
 			*/
 		}

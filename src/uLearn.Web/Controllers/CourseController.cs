@@ -40,6 +40,9 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> Slide(string courseId, int slideIndex = 0)
 		{
 			var model = await CreateCoursePageModel(courseId, slideIndex);
+			var exerciseSlide = model.Slide as ExerciseSlide;
+			if (exerciseSlide != null)
+				exerciseSlide.LikedHints = slideHintRepo.GetLikedHints(courseId, exerciseSlide.Id, User.Identity.GetUserId());
 			return View(model);
 		}
 
@@ -326,6 +329,11 @@ namespace uLearn.Web.Controllers
 					QuizType = typeof(FillInBlock)
 				}
 			};
+		}
+
+		public async Task<string> LikeHint(string courseId, string slideId, int hintId)
+		{
+			return await slideHintRepo.LikeHint(courseId, slideId, hintId, User.Identity.GetUserId());
 		}
 	}
 

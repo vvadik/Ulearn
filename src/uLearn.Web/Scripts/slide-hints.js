@@ -43,3 +43,18 @@ function getHints(courseId, slideId) {
     .always(function (ans) {
     });
 }
+
+function likeHint(courseId, slideId, hintId) {
+	$.ajax({
+		type: "POST",
+		url: $("#" + hintId + "likeHint").data("url"),
+		data: { courseId: courseId, slideId: slideId, hintId: hintId }
+	}).success(function (ans) {
+		if (ans == "success") {
+			$("#" + hintId + "likeHint").removeClass("btn-default").addClass("btn-primary");
+		}
+		if (ans == "cancel") {
+			$("#" + hintId + "likeHint").removeClass("btn-primary").addClass("btn-default");
+		}
+	});
+}

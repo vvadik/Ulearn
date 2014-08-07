@@ -52,8 +52,9 @@
     <PublishDatabases>false</PublishDatabases>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Elmah">
-      <HintPath>..\packages\elmah.corelibrary.1.2.2\lib\Elmah.dll</HintPath>
+    <Reference Include="Elmah, Version=1.2.14706.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\External\Elmah\Elmah.dll</HintPath>
     </Reference>
     <Reference Include="MarkdownDeep">
       <HintPath>..\packages\MarkdownDeep.NET.1.5\lib\.NetFramework 3.5\MarkdownDeep.dll</HintPath>
@@ -234,6 +235,10 @@
     <Compile Include="Migrations\201408050909459_DeletedRequriedFieldsInQuizzes.Designer.cs">
       <DependentUpon>201408050909459_DeletedRequriedFieldsInQuizzes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201408070554397_AddHintsLike.cs" />
+    <Compile Include="Migrations\201408070554397_AddHintsLike.Designer.cs">
+      <DependentUpon>201408070554397_AddHintsLike.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\CourseManager_should.cs" />
     <EmbeddedResource Include="Courses\**\*.*">
       <Visible>false</Visible>
@@ -270,7 +275,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CourseManager.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
-    <Compile Include="Models\IdeonSubmitAllSlide-test.cs" />
+    <Compile Include="IdeoneSubmitAllSlide_Test.cs" />
     <Compile Include="Models\SlideHint.cs" />
     <Compile Include="Models\SlideRate.cs" />
     <Compile Include="Models\UserQuestion.cs" />
@@ -308,6 +313,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201408050909459_DeletedRequriedFieldsInQuizzes.resx">
       <DependentUpon>201408050909459_DeletedRequriedFieldsInQuizzes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408070554397_AddHintsLike.resx">
+      <DependentUpon>201408070554397_AddHintsLike.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

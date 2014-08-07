@@ -39,7 +39,6 @@ namespace uLearn.Web.Models
 			return (ExerciseSlide)course.Slides[slideIndex];
 		}
 
-
 		private void AddCourse(string courseId, string courseTitle)
 		{
 			Courses.Add(LoadCourse(courseId, courseTitle));
@@ -81,11 +80,11 @@ namespace uLearn.Web.Models
 			try
 			{
 				var sourceCode = Encoding.UTF8.GetString(slideFile.GetContent());
-				var usings = GetExercisePrelude(slideFile, resourceFiles); 
+				var prelude = GetExercisePrelude(slideFile, resourceFiles); 
 				var info = GetInfoForSlide(slideFile, resourceFiles);
 				return slideFile.Filename.EndsWith(".xml") 
 					? LoadQuiz(slideFile, info) 
-					: SlideParser.ParseCode(sourceCode, info, usings, getInclude);
+					: SlideParser.ParseCode(sourceCode, info, prelude, getInclude);
 			}
 			catch (Exception e)
 			{
