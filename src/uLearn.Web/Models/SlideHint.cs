@@ -24,5 +24,7 @@ namespace uLearn.Web.Models
 		[Required]
 		[StringLength(64)]
 		public string SlideId { get; set; }
+
+		public bool IsHintHelped { get; set; }
 	}
 }

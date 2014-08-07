@@ -25,7 +25,7 @@
 						@foreach (var user in Model.UserStats)
 						{
 							<tr>
-								<td>@user.Key</td>
+								<td><h6>@user.Key</h6></td>
 								@foreach (var unitName in Model.UnitNamesInOrdered)
 								{
 									<td>@(user.Value[unitName] + "%")</td>

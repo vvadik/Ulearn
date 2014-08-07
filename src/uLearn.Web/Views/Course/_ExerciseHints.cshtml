@@ -6,16 +6,16 @@
 {
 	var hintHtml = slide.HintsHtml[index];
 	var id = "hint" + index;
-		<div id="@id" data-url="@Url.Action("AddHint")" style="display:none">
-			@{ var intro = index == 0 ? "Подсказки:" : "";}
-			<h4>@intro</h4>
-			<div>
-				<button style="float: left" class="like-left-location btn">
-					<i class="glyphicon glyphicon-thumbs-up"></i>
-				</button>
-				<li>@Html.Raw(hintHtml)</li>
-			</div>
+	<div id="@id" data-url="@Url.Action("AddHint")" style="display:none">
+		@{ var intro = index == 0 ? "Подсказки:" : "";}
+		<h4>@intro</h4>
+		<button id="@(index+"likeHint")" class="like-left-location btn like-button @(slide.LikedHints.Contains(index) ? "btn-primary" : "btn-default")" data-url="@Url.Action("LikeHint")" onclick="likeHint('@Model.Course.Id', '@Model.Slide.Id', '@index')">
+			<i class="glyphicon glyphicon-thumbs-up"></i>
+		</button>
+		<div>
+			<li>@Html.Raw(hintHtml)</li>
 		</div>
+	</div>
 }
     <div id="currentHint" style="display:none">-1</div>
 	<script src="~/Scripts/slide-hints.js"></script>

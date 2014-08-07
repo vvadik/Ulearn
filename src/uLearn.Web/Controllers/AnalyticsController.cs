@@ -23,6 +23,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
+		private readonly UserQuizzesRepo userQuizzessRepo = new UserQuizzesRepo();
 
 
 		public AnalyticsController() : this(CourseManager.AllCourses)
@@ -88,7 +89,8 @@ namespace uLearn.Web.Controllers
 				IsPassedTask = false,
 				LatestAcceptedSolution = null,
 				SolvedSlide = userSolutionsRepo.GetIdOfPassedSlides(course.Id, User.Identity.GetUserId()),
-				VisitedSlide = visitersRepo.GetIdOfVisitedSlides(course.Id, User.Identity.GetUserId())
+				VisitedSlide = visitersRepo.GetIdOfVisitedSlides(course.Id, User.Identity.GetUserId()),
+				PassedQuiz = userQuizzessRepo.GetIdOfQuizPassedSlides(courseId, User.Identity.GetUserId())
 			};
 			return model;
 		}
