@@ -24,7 +24,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			/*uncomment
 			var a = 5;
 			a += 0.5;
-			Console.WriteLine(a)
+			Console.WriteLine(a);
 			*/
 		}
 
