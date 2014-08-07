@@ -23,12 +23,14 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		}
 
 		[HideOnSlide]
+		[ExcludeFromSolution]
 		static private int GetSquare(int i)
 		{
 			return i * i;
 		}
 
 		[HideOnSlide]
+		[ExcludeFromSolution]
 		static private void Print(int number)
 		{
 			Console.WriteLine(number);

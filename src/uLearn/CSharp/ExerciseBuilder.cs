@@ -29,8 +29,12 @@ namespace uLearn.CSharp
 
 		private SyntaxNode VisitMemberDeclaration(MemberDeclarationSyntax node, SyntaxNode newNode)
 		{
-			var includeInSolution = !node.HasAttribute<ExcludeFromSolutionAttribute>() && !node.HasAttribute<ExerciseAttribute>();
-			return includeInSolution ? ((MemberDeclarationSyntax) newNode).WithoutAttributes() : null;
+			var newMember = ((MemberDeclarationSyntax) newNode).WithoutAttributes();
+			var isSolutionPart = node.HasAttribute<ExcludeFromSolutionAttribute>() || node.HasAttribute<ExerciseAttribute>();
+			if (node.HasAttribute<ExcludeFromSolutionAttribute>())
+				TemplateSolution += newMember.ToFullString();
+			
+			return isSolutionPart ? null : newMember;
 		}
 
 		public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
@@ -72,10 +76,6 @@ namespace uLearn.CSharp
 				ExerciseInitialCode = GetExerciseCode(node);
 				if (node.HasAttribute<IsStaticMethodAttribute>()) Validators.Add(new IsStaticMethodAttribute());
 				if (node.HasAttribute<SingleStatementMethodAttribute>()) Validators.Add(new SingleStatementMethodAttribute());
-			}
-			if (node.AttributeLists.Count == 0)
-			{
-				TemplateSolution = TemplateSolution + node;
 			}
 			return newMethod;
 		}

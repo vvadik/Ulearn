@@ -274,7 +274,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CourseManager.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
-    <Compile Include="Models\IdeonSubmitAllSlide-test.cs" />
+    <Compile Include="IdeoneSubmitAllSlide_Test.cs" />
     <Compile Include="Models\SlideHint.cs" />
     <Compile Include="Models\SlideRate.cs" />
     <Compile Include="Models\UserQuestion.cs" />

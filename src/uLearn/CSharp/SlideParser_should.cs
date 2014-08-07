@@ -7,6 +7,16 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class SlideParser_should
 	{
+
+		[Test]
+		[Explicit("Для отладки на конкретных слайдах из курсов")]
+		public void Test()
+		{
+			var slide =
+				(ExerciseSlide)GenerateSlideFromFile(@"..\..\..\courses\BasicProgramming\Slides\U03_Cycles\S07-Break.cs");
+			Console.WriteLine(slide.Solution.TemplateSolution);
+		}
+
 		[Test]
 		public void make_markdown_from_comments()
 		{
@@ -258,9 +268,15 @@ namespace uLearn.CSharp
 			Assert.That(renderedText, Contains.Substring(expected));
 		}
 
+
 		private static Slide GenerateSlide(string name)
 		{
 			return SlideParser.ParseSlide(@".\tests\" + name, null, includeName => "included(" + includeName + ")");
+		}
+		
+		private static Slide GenerateSlideFromFile(string path)
+		{
+			return SlideParser.ParseSlide(path, null, includeName => "included(" + includeName + ")");
 		}
 	}
 }

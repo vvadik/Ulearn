@@ -1,19 +1,15 @@
 ﻿using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Mail;
-using System.Web;
-using Microsoft.CSharp;
 using NUnit.Framework;
-using uLearn.CSharp;
 using uLearn.Web.Ideone;
+using uLearn.Web.Models;
 
-namespace uLearn.Web.Models
+namespace uLearn.Web
 {
 	[TestFixture]
-	public class IdeonSubmitAllSlide_test
+	public class IdeoneSubmitAllSlide_Test
 	{
 		private static string NormalizeString(string s)
 		{
