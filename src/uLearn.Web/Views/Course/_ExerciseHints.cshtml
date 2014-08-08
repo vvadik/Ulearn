@@ -9,7 +9,7 @@
 	<div id="@id" data-url="@Url.Action("AddHint")" style="display:none">
 		@{ var intro = index == 0 ? "Подсказки:" : "";}
 		<h4>@intro</h4>
-		<button id="@(index+"likeHint")" class="like-left-location btn like-button @(slide.LikedHints.Contains(index) ? "btn-primary" : "btn-default")" data-url="@Url.Action("LikeHint")" onclick="likeHint('@Model.Course.Id', '@Model.Slide.Id', '@index')">
+		<button id="@(index+"likeHint")" class="like-left-location btn btn-xs like-button @(slide.LikedHints.Contains(index) ? "btn-primary" : "btn-default")" data-url="@Url.Action("LikeHint")" onclick="likeHint('@Model.Course.Id', '@Model.Slide.Id', '@index')">
 			<i class="glyphicon glyphicon-thumbs-up"></i>
 		</button>
 		<div>
