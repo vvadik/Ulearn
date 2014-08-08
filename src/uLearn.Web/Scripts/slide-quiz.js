@@ -87,6 +87,8 @@ function markAns(s) {
 
     $(".quiz").each(function () {
         var $e = (($(this).children('label').children('input')));
+        if (!$e.parent().parent().children('i').hasClass('right-quiz'))
+            $e.parent().parent().children('i').addClass('glyphicon glyphicon-remove wrong-quiz');
         if ($e.is(':checked')) {
             if (($.inArray(($e.attr('id')), rightAnswersId)) == -1)
                 ($e.parent().addClass("wrong-quiz"));
