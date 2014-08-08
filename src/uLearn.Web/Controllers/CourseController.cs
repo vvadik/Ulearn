@@ -240,23 +240,29 @@ namespace uLearn.Web.Controllers
 			var intSlideIndex = int.Parse(slideIndex);
 			var course = courseManager.GetCourse(courseId);
 			if (userQuizzesRepo.IsQuizSlidePassed(courseId, User.Identity.GetUserId(), course.Slides[intSlideIndex].Id))
-				return null;
+				return "already answered";
 			var time = DateTime.Now;
 			var answers = answer.Split('*').Select(x => x.Split('_').Take(2).ToList()).GroupBy(x => x[0]);
+			var quizBlockWithTaskCount = (course.Slides[intSlideIndex] as QuizSlide).Quiz.Blocks.Count(x => x is FillInBlock || x is IsTrueBlock || x is ChoiceBlock);
 			var incorrectQuizzes = new List<string>();
 			var fillInBlockType = typeof (FillInBlock);
+			var tmpFolder = new List<QuizInfoForDb>();
 			foreach (var ans in answers)
 			{
 				var quizInfo = GetQuizInfo(course, intSlideIndex, ans);
 				foreach (var quizInfoForDb in quizInfo)
 				{
-					await
-						userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
-							course.Slides[intSlideIndex].Id, quizInfoForDb.Text, User.Identity.GetUserId(), time);
+					tmpFolder.Add(quizInfoForDb);
 					if (!quizInfoForDb.IsRightAnswer && quizInfoForDb.QuizType == fillInBlockType)
 						incorrectQuizzes.Add(ans.Key);
 				}
 			}
+			var blocksInAnswerCount = tmpFolder.Select(x => x.QuizId).Distinct().Count();
+			if (blocksInAnswerCount != quizBlockWithTaskCount)
+				return "has empty bloks";
+			foreach (var quizInfoForDb in tmpFolder)
+				await userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
+					course.Slides[intSlideIndex].Id, quizInfoForDb.Text, User.Identity.GetUserId(), time);
 			return string.Join("*", incorrectQuizzes.Distinct());
 		}
 
@@ -265,7 +271,7 @@ namespace uLearn.Web.Controllers
 			var slide = course.Slides[slideIndex] as QuizSlide;
 			if (slide == null)
 				throw new Exception("Error in func 'GetSlideUsingId' or in 'QuizSlideId'");
-			var block = slide.Quiz.Blocks[int.Parse(answer.Key)];
+			var block = slide.GetBlockById(answer.Key);
 			var data = answer.ToList();
 			if (block is FillInBlock)
 				return CreateQuizInfoForDb(block as FillInBlock, data);
@@ -291,29 +297,35 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(ChoiceBlock choiseBlock, IEnumerable<List<string>> answer, List<List<string>> data)
 		{
-			if (choiseBlock.Multiple)
-			{
-				var ans = answer.ToList()
-					.Select(x => new QuizInfoForDb { QuizId = choiseBlock.Id, IsRightAnswer = false, ItemId = x[1], Text = null, QuizType = typeof(ChoiceBlock)}).ToList();
-				var correctItems = new HashSet<string>(choiseBlock.Items.Where(x => x.IsCorrect).Select(x => x.Id));
-				var ansItem = new HashSet<string>(ans.Select(x => x.ItemId));
-				var count = ansItem.Count(correctItems.Contains);
-				if (count != correctItems.Count || count != ansItem.Count) return ans;
-				foreach (var info in ans)
-					info.IsRightAnswer = true;
-				return ans;
-			}
-			return new List<QuizInfoForDb>
-			{
-				new QuizInfoForDb
+			if (!choiseBlock.Multiple)
+				return new List<QuizInfoForDb>
 				{
-					QuizId = choiseBlock.Id,
-					ItemId = choiseBlock.Items[int.Parse(data.First()[1])].Id,
-					IsRightAnswer = choiseBlock.Items[int.Parse(data.First()[1])].IsCorrect,
-					Text = null,
+					new QuizInfoForDb
+					{
+						QuizId = choiseBlock.Id,
+						ItemId = data.First()[1],
+						IsRightAnswer = choiseBlock.Items.First(x => x.Id == data.First()[1]).IsCorrect,
+						Text = null,
+						QuizType = typeof (ChoiceBlock)
+					}
+				};
+			var ans = answer.ToList()
+				.Select(x => new QuizInfoForDb
+				{
+					QuizId = choiseBlock.Id, 
+					IsRightAnswer = false, 
+					ItemId = x[1], 
+					Text = null, 
 					QuizType = typeof(ChoiceBlock)
-				}
-			};
+					
+				}).ToList();
+			var correctItems = new HashSet<string>(choiseBlock.Items.Where(x => x.IsCorrect).Select(x => x.Id));
+			var ansItem = new HashSet<string>(ans.Select(x => x.ItemId));
+			var count = ansItem.Count(correctItems.Contains);
+			if (count != correctItems.Count || count != ansItem.Count) return ans;
+			foreach (var info in ans)
+				info.IsRightAnswer = true;
+			return ans;
 		}
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(FillInBlock fillInBlock, IEnumerable<List<string>> data)

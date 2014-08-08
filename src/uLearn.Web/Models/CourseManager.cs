@@ -104,6 +104,7 @@ namespace uLearn.Web.Models
 		{
 			var emptyIndex = 0;
 			var questionIndex = 1;
+			var allReservedId = new HashSet<string>(quiz.Blocks.Select(x => x.Id));
 			foreach (var quizBlock in quiz.Blocks)
 			{
 				var questionBlock = quizBlock as AbstractQuestionBlock;
@@ -111,23 +112,40 @@ namespace uLearn.Web.Models
 					questionBlock.QuestionIndex = questionIndex++;
 				if (quizBlock.Id == null)
 				{
+					while (allReservedId.Contains(emptyIndex.ToString()))
+						emptyIndex++;
 					quizBlock.Id = emptyIndex.ToString();
 					emptyIndex++;
 				}
 				var choiceBlock = quizBlock as ChoiceBlock;
 				if (choiceBlock == null) continue;
-				for (var itemIndex = 0; itemIndex < choiceBlock.Items.Length; itemIndex++)
-					if (choiceBlock.Items[itemIndex].Id == null)
-						choiceBlock.Items[itemIndex].Id = itemIndex.ToString();
-				//if (!choiceBlock.Shuffle) continue;
-				//Shuffle(choiceBlock.Items);
+				var itemEmptyId = 0;
+				var allReservedItemId = new HashSet<string>(choiceBlock.Items.Select(x => x.Id));
+				foreach (var item in choiceBlock.Items.Where(item => item.Id == null))
+				{
+					while (allReservedItemId.Contains(itemEmptyId.ToString()))
+						itemEmptyId++;
+					item.Id = itemEmptyId.ToString();
+					itemEmptyId++;
+				}
+				if (!choiceBlock.Shuffle) continue;
+				choiceBlock.Items = Shuffle(choiceBlock.Items);
 			}
 		}
 
-		//private static void Shuffle(ChoiceItem[] items)
-		//{
-		//	var shuffledItems = new ChoiceBlock[items.Length];
-		//}
+		private static ChoiceItem[] Shuffle(IList<ChoiceItem> items)
+		{
+			var indexes = Enumerable.Range(0, items.Count).ToArray();
+			var random = new Random();
+			for (var i = items.Count; i >= 1; i--)
+			{
+				var randomNumber = random.Next(i);
+				var tmp = indexes[i - 1];
+				indexes[i - 1] = randomNumber;
+				indexes[randomNumber] = tmp;
+			}
+			return indexes.Select(index => items[index]).ToArray();
+		}
 
 		private static string GetExercisePrelude(ResourceFile file, IList<ResourceFile> all)
 		{

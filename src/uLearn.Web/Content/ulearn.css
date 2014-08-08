@@ -367,7 +367,6 @@ table.diff tbody th {
     
 }
 
-.hide-side-bar-icon {
-	color: white;
-	background-color: black;
+.hide-side-bar-button {
+	float: left;
 }
