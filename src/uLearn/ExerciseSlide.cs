@@ -11,7 +11,7 @@ namespace uLearn
 		public string ExpectedOutput { get; private set; }
 		public SolutionBuilder Solution { get; private set; }
 		public string[] HintsHtml { get; private set; }
-		public HashSet<int> LikedHints { get; set; } 
+		public HashSet<int> LikedHints { get; set; }  // TODO: убрать упоминание о лайках из этого класса. Оставить только в ViewModel
 
 		public ExerciseSlide(IEnumerable<SlideBlock> blocks, string exerciseInitialCode, string expectedOutput, IEnumerable<string> hints, SolutionBuilder solution, SlideInfo slideInfo, string title, string id)
 			: base(blocks, slideInfo, title, id)
