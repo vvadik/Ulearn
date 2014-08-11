@@ -1,4 +1,4 @@
-﻿function submitQuiz(courseId, slideIndex, needingCount, answersToQuiz) {
+﻿function submitQuiz(courseId, slideIndex, needingCount) {
     if (areAllAnswered(needingCount)) {
         var userAnswers = [];
         $(".quiz").each(function () {
@@ -15,7 +15,7 @@
                 }
         });
         var toSend = (userAnswers.join('*'));
-        markAns(answersToQuiz);
+        markSubmit(courseId, slideIndex);
         $.ajax(
             {
                 type: "POST",
@@ -41,10 +41,29 @@
             })
             .always(function(ans) {
             });
+        
     } else
         alert("Fill this quiz!");
 };
 
+function markSubmit(courseId, slideIndex) {
+  $.ajax(
+     {
+         type: "POST",
+         url: $("#quizAns").data("url"),
+         data: {
+             courseId: courseId,
+             slideIndex: slideIndex,
+         }
+     }).success(function (ans) {
+          markAns(ans);
+      })
+     .fail(function (req) {
+         console.log(req.responseText);
+     })
+     .always(function (ans) {
+     });
+}
 
 function areAllAnswered(needingCount) {
     var realCount = 0;
@@ -65,41 +84,44 @@ function areAllAnswered(needingCount) {
 }
 
 function markAns(s) {
-    var toMarkAsRight = s.split('||');
-    var rightAnswersId = [];
-    for (var q in toMarkAsRight) {
-        if (toMarkAsRight[q] != "") {
-            var content = toMarkAsRight[q].split('=');
-            var blockId = content[0];
-            if (content[1] == "True" || content[1] == "False") {
-                    $("#" + blockId  + content[1]).parent().addClass("right-quiz");
+    if (s != "none") {
+        var toMarkAsRight = s.split('||');
+        var rightAnswersId = [];
+        for (var q in toMarkAsRight) {
+            if (toMarkAsRight[q] != "") {
+                var content = toMarkAsRight[q].split('=');
+                var blockId = content[0];
+                if (content[1] == "True" || content[1] == "False") {
+                    $("#" + blockId + content[1]).parent().addClass("right-quiz");
                     $("#" + blockId + content[1]).parent().parent().children('i').addClass('right-quiz glyphicon glyphicon-ok');
-                rightAnswersId.push(blockId + content[1]);
-            } else {
-                var items = content[1].split("*");
-                for (var itemIndex in items) {
-                    $("#" + blockId + items[itemIndex]).parent().addClass("right-quiz");
-                    $("#" + blockId + items[itemIndex]).parent().parent().children('i').addClass('right-quiz glyphicon glyphicon-ok');
-                    rightAnswersId.push(blockId + items[itemIndex]);
+                    rightAnswersId.push(blockId + content[1]);
+                } else {
+                    var items = content[1].split("*");
+                    for (var itemIndex in items) {
+                        $("#" + blockId + items[itemIndex]).parent().addClass("right-quiz");
+                        $("#" + blockId + items[itemIndex]).parent().parent().children('i').addClass('right-quiz glyphicon glyphicon-ok');
+                        rightAnswersId.push(blockId + items[itemIndex]);
+                    }
                 }
             }
         }
-    }
 
-    $(".quiz").each(function () {
-        var $e = (($(this).children('label').children('input')));
-        if (!$e.parent().parent().children('i').hasClass('right-quiz'))
-            $e.parent().parent().children('i').addClass('glyphicon glyphicon-remove wrong-quiz');
-        if ($e.is(':checked')) {
-            if (($.inArray(($e.attr('id')), rightAnswersId)) == -1)
+
+        $(".quiz").each(function() {
+            var $e = (($(this).children('label').children('input')));
+            if (!$e.parent().parent().children('i').hasClass('right-quiz'))
+                $e.parent().parent().children('i').addClass('glyphicon glyphicon-remove wrong-quiz');
+            if ($e.is(':checked')) {
+                if (($.inArray(($e.attr('id')), rightAnswersId)) == -1)
                 ($e.parent().addClass("wrong-quiz"));
-            console.log(rightAnswersId);
-        }
-    });
+                console.log(rightAnswersId);
+            }
+        });
 
-    for (i in rightAnswersId) {
-        if ((!$("#" + rightAnswersId[i]).is(':checked')))
+        for (i in rightAnswersId) {
+            if ((!$("#" + rightAnswersId[i]).is(':checked')))
             ($("#" + rightAnswersId[i]).parent().removeClass("right-quiz").addClass("wrong-quiz"));
-        console.log(rightAnswersId[i]);
+            console.log(rightAnswersId[i]);
+        }
     }
 }

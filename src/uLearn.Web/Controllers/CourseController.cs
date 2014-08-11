@@ -280,7 +280,8 @@ namespace uLearn.Web.Controllers
 		{
 			var course = courseManager.GetCourse(courseId);
 			var quizSlide = course.Slides[slideIndex];
-			return (quizSlide as QuizSlide).RightAnswersToQuiz;
+			var e = (quizSlide as QuizSlide).RightAnswersToQuiz;
+			return e;
 		}
 
 		private IEnumerable<QuizInfoForDb> GetQuizInfo(Course course, int slideIndex, IGrouping<string, List<string>> answer)

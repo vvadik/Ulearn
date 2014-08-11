@@ -6,7 +6,6 @@
 @if (QuizSlide != null)
 {
 	var passed = Model.PassedQuiz.Contains(QuizSlide.Id);
-	//var rightAnswersStr = new StringBuilder();
 	for (int blockIndex = 0; blockIndex < QuizSlide.Quiz.Blocks.Length; blockIndex++)
 	{
 		var quizBlock = QuizSlide.Quiz.Blocks[blockIndex];
@@ -29,9 +28,6 @@
 		if (quizBlock is ChoiceBlock)
 		{
 			var choiceQuizBlock = quizBlock as ChoiceBlock;
-			//rightAnswersStr.Append(quizBlock.Id + "quizBlock" + "=");
-			//rightAnswersStr.Append(string.Join("*", choiceQuizBlock.Items.Where(x => x.IsCorrect).Select(x => x.Id).ToList()));
-			//rightAnswersStr.Append("||");
 			var isMultiply = choiceQuizBlock.Multiple;
 			var typeInp = isMultiply ? "checkbox" : "radio";
 			<div class="quiz-block-mark @typeInp" id='@(quizBlock.Id + "_quizBlock")'>
@@ -63,8 +59,6 @@
 				quizResSample = Model.AnswersToQuizes[quizBlock.Id][1] == "False" ? "block" : "none";
 			}
 			var fillIn = quizBlock as FillInBlock;
-			//rightAnswersStr.Append(quizBlock.Id + quizBlock.Id + "=" + fillIn.Sample);
-			//rightAnswersStr.Append("||");
 			var sample = fillIn.Sample;
 			<div class="quiz quiz-block-input">
 				<label>
@@ -77,9 +71,6 @@
 		}
 		else if (quizBlock is IsTrueBlock)
 		{
-			//var selecter = quizBlock as IsTrueBlock;
-			//rightAnswersStr.Append(quizBlock.Id + "quizBlock" + "=" + selecter.Answer);
-			//rightAnswersStr.Append("||");
 			var tchecked = "";
 			var fchecked = "";
 			if (passed && Model.AnswersToQuizes[quizBlock.Id].FirstOrDefault() != null)
@@ -99,13 +90,15 @@
 			</div>
 		}
 	}
+    <div style="display:none;" id="quizAns" data-url="@Url.Action("GetRightAnswersToQuiz")">none</div>
 	<div id="quizSub" data-url='@Url.Action("SubmitQuiz")'>
-		<button style="margin-top:10px; margin-bottom:5px;" class="btn btn-default" onclick="submitQuiz('@Model.Course.Id','@Model.SlideIndex','@Model.AnswersToQuizes.Count','@rightAnswersStr.ToString()' )">Submit my result</button>
+		<button style="margin-top:10px; margin-bottom:5px;" class="btn btn-default" onclick="submitQuiz('@Model.Course.Id','@Model.SlideIndex','@Model.AnswersToQuizes.Count')">Submit my result</button>
 		<script src="~/Scripts/slide-quiz.js"></script>
 		<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+		@{var answers = passed ? (Model.Slide as QuizSlide).RightAnswersToQuiz : "none";}
 		@if (passed)
 		{
-			<script>markAns('@rightAnswersStr.ToString()')</script>
+		    <script> markAns('@answers') </script>
 		}
 	</div>
 }
