@@ -184,6 +184,12 @@ a.nav-arrow:hover {
     margin-left: 320px;
 }
 
+@media (max-width: 700px) {
+	.slide-container {
+		margin-left: 10px;
+	}
+}
+
 .ask-bar {
     max-width: none;
     width: 100%;

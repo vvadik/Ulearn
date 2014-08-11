@@ -67,7 +67,10 @@ namespace uLearn.Web.Ideone
 				lastStatus = GetSubmitionStatus(link).Status;
 			}
 			if (lastStatus != SubmitionStatus.Done)
-				throw new Exception("Ideone service process execution too slow. Can't wait any more.");
+			{
+				Debug.WriteLine("Ideone service process execution too slow. Can't wait any more.");
+				return null;
+			}
 			Debug.WriteLine("requesting details");
 			return GetSubmitionDetails(link);
 		}

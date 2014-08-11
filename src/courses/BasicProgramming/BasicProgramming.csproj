@@ -63,6 +63,7 @@
       <SubType>Designer</SubType>
     </Content>
     <Compile Include="Slides\U01_Basics\S083-IntelliSense.cs" />
+    <Compile Include="Slides\U01_Basics\S000-Help.cs" />
     <Compile Include="Slides\U01_Basics\_HelloWorld.cs" />
     <Compile Include="Slides\U02_Mistakes\S01-MissedUsings.cs" />
     <Compile Include="Slides\U02_Mistakes\S02-ErrorInTtypecasting.cs" />
