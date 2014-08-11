@@ -129,22 +129,9 @@ namespace uLearn.Web.Models
 					itemEmptyId++;
 				}
 				if (!choiceBlock.Shuffle) continue;
-				choiceBlock.Items = Shuffle(choiceBlock.Items);
+				var rnd = new Random(DateTime.Now.Millisecond);
+				choiceBlock.Items = choiceBlock.Items.OrderBy(x => rnd.Next()).ToArray();
 			}
-		}
-
-		private static ChoiceItem[] Shuffle(IList<ChoiceItem> items)
-		{
-			var indexes = Enumerable.Range(0, items.Count).ToArray();
-			var random = new Random();
-			for (var i = items.Count; i >= 1; i--)
-			{
-				var randomNumber = random.Next(i);
-				var tmp = indexes[i - 1];
-				indexes[i - 1] = randomNumber;
-				indexes[randomNumber] = tmp;
-			}
-			return indexes.Select(index => items[index]).ToArray();
 		}
 
 		private static string GetExercisePrelude(ResourceFile file, IList<ResourceFile> all)

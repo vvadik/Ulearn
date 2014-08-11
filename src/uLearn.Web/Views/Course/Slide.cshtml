@@ -64,6 +64,9 @@
 	<script src="~/Scripts/slide-stats.js"></script>
 	<script>
 		fillRate('@Model.Rate');
-		getHints("@Model.Course.Id", "@Model.Slide.Id");
 	</script>
+	@if (Model.Slide is ExerciseSlide)
+	{
+		<script> getHints("@Model.Course.Id", "@Model.Slide.Id"); </script>
+	}
 }
