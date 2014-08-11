@@ -209,13 +209,16 @@ namespace uLearn.Web.Controllers
 					ExpectedOutput = "",
 					ActualOutput = ""
 				};
-			var output = submition.Output + "\n" + submition.StdErr;
-			var isRightAnswer = NormalizeString(output).Equals(NormalizeString(exerciseSlide.ExpectedOutput));
+			var output = submition.Output;
+			if (!string.IsNullOrEmpty(submition.StdErr)) output += "\n" + submition.StdErr;
+			output = NormalizeString(output);
+			var expectedOutput = NormalizeString(exerciseSlide.ExpectedOutput);
+			var isRightAnswer = output.Equals(expectedOutput);
 			return new RunSolutionResult
 			{
 				CompilationError = submition.CompilationError,
 				IsRightAnswer = isRightAnswer,
-				ExpectedOutput = exerciseSlide.ExpectedOutput,
+				ExpectedOutput = expectedOutput,
 				ActualOutput = output
 			};
 		}
