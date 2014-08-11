@@ -14,10 +14,10 @@
     (function ($) {
         $.fn.goTo = function () {
             $('html, body').animate({
-                scrollTop: $(this).offset().top + 'px'
+                scrollTop: $(this).offset() + 'px'
             }, 'slow');
             return this; // for chaining...
-        }
+        };
     })(jQuery);
 
     $.ajax(
@@ -29,7 +29,11 @@
     }
 }).success(function (ans) {
     $('#hint' + (index)).show();
-            $('#hint' + (index)).goTo();
+    var container = $('body'),
+    scrollTo = $('#hint' + (index));
+    container.animate({
+        scrollTop: scrollTo.offset().top - container.offset().top + container.scrollTop() - 300
+    });
         })
     .fail(function (req) {
         console.log(req.responseText);
