@@ -36,7 +36,10 @@ namespace uLearn.Web
 				"~/codemirror/lib/codemirror.js",
 				"~/codemirror/mode/clike/clike.js",
 				"~/codemirror/addon/hint/show-hint.js",
-				"~/codemirror/addon/hint/csharp-hint.js"
+				"~/codemirror/addon/hint/csharp-hint.js",
+				"~/codemirror/addon/edit/closebrackets.js",
+				"~/codemirror/addon/edit/matchbrackets.js",
+				"~/codemirror/addon/selection/active-line.js"
 				));
 
 			bundles.Add(new ScriptBundle("~/bootstrap-js").Include(

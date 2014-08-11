@@ -31,6 +31,10 @@
     height: auto;
 }
 
+.cm-s-cobalt .CodeMirror-matchingbracket {
+	outline-color: #006B8B !important;
+}
+
 .nav-arrow {
     margin: 0;
     width: 50%;
