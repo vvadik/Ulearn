@@ -34,7 +34,7 @@
 			@Html.Partial("_RatesBar")
 			@Html.Partial("_SlideNavigation", Model)
 			<div id="WatchQuestions" data-url="@Url.Action("GetAllQuestions")">
-			    <button class="all-questions" onclick="printAllQuestions('@Model.Slide.Info.UnitName')">Посмотреть все заданные вопросы по теме</button>
+				<button class="all-questions" onclick="printAllQuestions('@Model.Slide.Info.UnitName')">Посмотреть все заданные вопросы по теме</button>
 			</div>
 			<div class="questions-log"></div>
 		</div>
@@ -69,4 +69,12 @@
 	{
 		<script> getHints("@Model.Course.Id", "@Model.Slide.Id"); </script>
 	}
+
+	@{
+		var a = Model.PassedQuiz.Contains(Model.Slide.Id);
+		var b = Model.Slide is QuizSlide;
+		var answers = a && b ? (Model.Slide as QuizSlide).RightAnswersToQuiz : "none";
+		<script> markAns('@answers')</script>
+	}
 }
+
