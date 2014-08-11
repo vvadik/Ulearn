@@ -14,9 +14,18 @@ function codeMirrorClass(c, editable) {
 			indentWithTabs: true,
 			tabSize: 4,
 			indentUnit: 4,
-			extraKeys: { "Ctrl-Space": "autocomplete" },
+			extraKeys: {
+				"Ctrl-Space": "autocomplete",
+				".": function(cm) {
+					setTimeout(function() { cm.execCommand("autocomplete"); }, 100);
+					throw CodeMirror.Pass;
+				}
+			},
 			readOnly: !editable,
-		});
+			autoCloseBrackets: true,
+			styleActiveLine: true,
+			matchBrackets: true,
+	});
 		element.codeMirrorEditor = editor;
 		if (editable)
 			editor.focus();
