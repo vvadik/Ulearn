@@ -209,13 +209,16 @@ namespace uLearn.Web.Controllers
 					ExpectedOutput = "",
 					ActualOutput = ""
 				};
-			var output = submition.Output + "\n" + submition.StdErr;
-			var isRightAnswer = NormalizeString(output).Equals(NormalizeString(exerciseSlide.ExpectedOutput));
+			var output = submition.Output;
+			if (!string.IsNullOrEmpty(submition.StdErr)) output += "\n" + submition.StdErr;
+			output = NormalizeString(output);
+			var expectedOutput = NormalizeString(exerciseSlide.ExpectedOutput);
+			var isRightAnswer = output.Equals(expectedOutput);
 			return new RunSolutionResult
 			{
 				CompilationError = submition.CompilationError,
 				IsRightAnswer = isRightAnswer,
-				ExpectedOutput = exerciseSlide.ExpectedOutput,
+				ExpectedOutput = expectedOutput,
 				ActualOutput = output
 			};
 		}
@@ -280,7 +283,8 @@ namespace uLearn.Web.Controllers
 		{
 			var course = courseManager.GetCourse(courseId);
 			var quizSlide = course.Slides[slideIndex];
-			return (quizSlide as QuizSlide).RightAnswersToQuiz;
+			var e = (quizSlide as QuizSlide).RightAnswersToQuiz;
+			return e;
 		}
 
 		private IEnumerable<QuizInfoForDb> GetQuizInfo(Course course, int slideIndex, IGrouping<string, List<string>> answer)

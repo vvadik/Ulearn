@@ -1,8 +1,8 @@
-﻿@model uLearn.CoursePageModel
+﻿@model CoursePageModel
 @using uLearn;
 @{ var slide = Model.Slide as ExerciseSlide; }
 <textarea id="secretCodeExercise" class='hide'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
-<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine ™</a></div>
+<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine™</a> and <a target="blank" href="http://codemirror.net/">CodeMirror</a></div>
 @if (Model.IsPassedTask)
 {
 	<textarea class='code code-exercise'>@Model.LatestAcceptedSolution</textarea>
@@ -17,24 +17,19 @@ else
 		$('.code-exercise')[0].codeMirrorEditor.setValue($secretCodeExercise.text());
 	}
 </script>
-@*
-	<a href="#" onclick="updateVerdict(true, 'Успех!', 'some right answer', false)">OK</a>
-	<a href="#" onclick="updateVerdict(false, 'Compilation error', 'details', true)">CompilationError</a>
-	<a href="#" onclick="updateVerdict(false, 'Неверный ответ', 'Bullshit', false)">WrongAnswer</a>
-*@
 <div class="solution-control btn-group ctrl-group">
-    <button type="button" class="run-solution-button btn btn-default no-rounds"
-            data-url="@Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">
-        RUN
-    </button>
+	<button type="button" class="run-solution-button btn btn-primary no-rounds"
+			data-url="@Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">
+		RUN
+	</button>
 
-    <button type="button" class="btn btn-default reset-btn" onclick="cleanUserCode()">
-        RESET
-    </button>
+	<button type="button" class="btn btn-default reset-btn" onclick="cleanUserCode()">
+		RESET
+	</button>
 
-    <button id="GetHintButton" type="button" class="btn btn-default hints-btn no-rounds" onclick="showHintForUser('@Model.Course.Id','@Model.Slide.Id', '@slide.HintsHtml.Count()')">
-        GET HINT
-    </button>
+	<button id="GetHintButton" type="button" class="btn btn-default hints-btn no-rounds" onclick="showHintForUser('@Model.Course.Id','@Model.Slide.Id', '@slide.HintsHtml.Count()')">
+		GET HINT
+	</button>
 </div>
 <div class="run-verdict clearfix"></div>
 <div class="after-run-block">
