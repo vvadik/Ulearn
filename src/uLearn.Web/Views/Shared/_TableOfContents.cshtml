@@ -1,5 +1,4 @@
-﻿@using Elmah.ContentSyndication
-@using uLearn
+﻿@using uLearn
 @model CoursePageModel
  
 <ul class="side-bar units-list navbar-collapse collapse nav navbar-nav container">
@@ -30,34 +29,8 @@
 						}
 						var selectedSlide = index == Model.SlideIndex;
 						var url = Url.Action("Slide", "Course", new { courseId = Model.Course.Id, slideIndex = index });
-						var itemClass = "";
-						if (Model.VisitedSlide.Contains(slide.Id))
-						{
-							if (slide is ExerciseSlide)
-							{
-								itemClass = Model.SolvedSlide.Contains(slide.Id) ? "glyphicon glyphicon-check navbar-label-success" : "glyphicon glyphicon-edit navbar-label-danger";
-							}
-							else if (slide is QuizSlide)
-							{
-								itemClass = Model.PassedQuiz.Contains(slide.Id) ? "glyphicon glyphicon-pushpin navbar-label-success" : "glyphicon glyphicon-pushpin navbar-label-danger";
-							}
-							else
-							{
-								itemClass = "glyphicon glyphicon-ok navbar-label-success";
-							}
-						}
-						else
-						{
-							if (slide is ExerciseSlide)
-							{
-								itemClass = "glyphicon glyphicon-edit navbar-label-default";
-							}
-							if (slide is QuizSlide)
-							{
-								itemClass = "glyphicon glyphicon-pushpin navbar-label-default";
-							}
-						}
-						<i class="@itemClass navbar-label"></i>
+
+						<i class="@GetIconClass(slide) navbar-label" title="@GetTitle(slide)"></i>
 						<li class="slide-list-item @(selectedSlide ? "selected" : "") " onclick="window.location.href = '@url'">@slide.Title</li>
 					}
 				</ul>
@@ -71,3 +44,21 @@
 		}
 	}
 </ul>
+
+@helper GetIconClass(Slide slide)
+{
+	var isVisited = Model.VisitedSlide.Contains(slide.Id);
+	var isComplete = !(slide is ExerciseSlide && !Model.SolvedSlide.Contains(slide.Id)
+						|| slide is QuizSlide && !Model.PassedQuiz.Contains(slide.Id));
+	var progressClass = isComplete ? "navbar-label-success"
+		: (isVisited ? "navbar-label-danger" : "navbar-label-default");
+	string typeClass = slide is QuizSlide ? "glyphicon-pushpin"
+		: slide is ExerciseSlide ? (isComplete ? "glyphicon-check" : "glyphicon-edit")
+			: (isVisited ? "glyphicon-ok" : "");
+	@(progressClass + " glyphicon " + typeClass)
+}
+
+@helper GetTitle(Slide slide)
+{
+	@(slide is ExerciseSlide ? "Задача" : slide is QuizSlide ? "Тест" : "Теория")
+}

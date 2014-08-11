@@ -1,31 +1,29 @@
 ﻿function handleRate(rate) {
-	// && $("#notunderstand").parent().hasAttribute("btn-danger")
 	if (rate == "NotUnderstand")
-		if(!$("#notunderstand").parent().hasClass("btn-danger"))
+		if (!$("#notunderstand").parent().hasClass("btn-danger"))
 			$("#ask_question_window").click();
-    $("#notwatched").removeClass("not-watched");
-    $("#ratings").removeClass("bounce-effect");
-    $.ajax(
-    {
-        type: "POST",
-        url: $("#ratesBar").data("url"),
-        data: {rate:rate}
-    }).success(function (ans) {
-		    if (ans == "success") {
-			    FillRate(rate);
-		    }
-			if (ans == "cancel") {
-				CancelRate(rate);
-			}
-	    })
-		.fail(function (req) {
-
-		})
-		.always(function (ans) {
-		});
+	$("#notwatched").removeClass("not-watched");
+	$("#ratings").removeClass("bounce-effect");
+	$.ajax(
+	{
+		type: "POST",
+		url: $("#ratesBar").data("url"),
+		data: { rate: rate }
+	}).success(function (ans) {
+		if (ans == "success") {
+			fillRate(rate);
+		}
+		if (ans == "cancel") {
+			cancelRate(rate);
+		}
+	})
+	.fail(function (req) {
+	})
+	.always(function (ans) {
+	});
 };
 
-function CancelRate(rate) {
+function cancelRate(rate) {
 	var switcher = rate.toLowerCase();
 	var colors = {};
 	colors["good"] = "btn-success";
@@ -38,25 +36,25 @@ function CancelRate(rate) {
 	$("#notwatched").parent().addClass("active");
 };
 
-function FillRate(rate) {
-    var switcher = rate.toLowerCase();
-    var colors = {};
-    colors["good"] = "btn-success";
-    colors["notunderstand"] = "btn-danger";
-    colors["trivial"] = "btn-info";
-    var rated = false;
-    if (colors[switcher] != undefined)
-        rated = true;
-    for (var i in colors) {
-            $("#" + i).parent().removeClass(colors[i]);
-    }
-    console.log(rated);
-    if (rated)
-        $("#next_slide_button").removeClass("block-next");
-    else {
-        $("#notwatched").addClass("not-watched");
-        $("#next_slide_button").addClass("block-next");
-    }
-    $("#" + switcher).parent().button('toggle');
-    $("#" + switcher).parent().addClass(colors[switcher]);
+function fillRate(rate) {
+	var switcher = rate.toLowerCase();
+	var colors = {};
+	colors["good"] = "btn-success";
+	colors["notunderstand"] = "btn-danger";
+	colors["trivial"] = "btn-info";
+	var rated = false;
+	if (colors[switcher] != undefined)
+		rated = true;
+	for (var i in colors) {
+		$("#" + i).parent().removeClass(colors[i]);
+	}
+	console.log(rated);
+	if (rated)
+		$("#next_slide_button").removeClass("block-next");
+	else {
+		$("#notwatched").addClass("not-watched");
+		$("#next_slide_button").addClass("block-next");
+	}
+	$("#" + switcher).parent().button('toggle');
+	$("#" + switcher).parent().addClass(colors[switcher]);
 };

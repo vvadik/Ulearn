@@ -1,23 +1,23 @@
-﻿function submitQuiz(courseId, slideIndex, needingCount) {
+﻿function submitQuiz(courseId, slideIndex, needingCount, answersToQuiz) {
+    console.log("insub");
     if (areAllAnswered(needingCount)) {
-        var answers = [];
-        markAnswers();
-        $(".quiz").each(function() {
+        var userAnswers = [];
+        $(".quiz").each(function () {
             var id = $(this).children('label').children('input').attr('id');
-            if (id.indexOf('placetoinsert') == -1) {
-                if ($('#' + id).is(':checked')) {
-                    answers.push(id);
-                }
-            } else {
-                var input = $('#' + id).val();
-                if (input != "") {
-                    var ans = id.replace('placetoinsert', input);
-                    answers.push(ans);
-                }
+            var content = id.split('quizBlock');
+            if ($(this).hasClass('quiz-block-input')) {
+                var  val = $(this).children('label').children('input').val();
+                userAnswers.push(content[0] + "_"+val);
             }
+                if ($('#' + id).is(':checked')) {
+                    
+                    var ans = content[0] + "_" + content[1];
+                    userAnswers.push(ans);
+                }
         });
-        console.log(answers.join('*'));
-        var toSend = (answers.join('*'));
+        console.log(userAnswers.join('*'));
+        var toSend = (userAnswers.join('*'));
+        markAns(answersToQuiz);
         $.ajax(
             {
                 type: "POST",
@@ -44,23 +44,6 @@
         alert("Fill this quiz!");
 };
 
-function markAnswers() {
-    $(".false").each(function () {
-        $(this).addClass("glyphicon glyphicon-remove wrong-quiz");
-    });
-    $(".quiz").each(function () {
-        if ($(this).children('label').children('input').is(':checked')) {
-            if ($(this).children('i').hasClass("false"))
-                $(this).children('label').addClass("wrong-quiz");
-        } else {
-            if ($(this).children('i').hasClass("true") && $(this).parent().hasClass("checkbox"))
-                $(this).children('label').addClass("wrong-quiz");
-        }
-    });
-    $(".true").each(function () {
-        $(this).addClass('glyphicon glyphicon-ok right-quiz');
-    });
-}
 
 function areAllAnswered(needingCount) {
     var realCount = 0;
@@ -78,4 +61,47 @@ function areAllAnswered(needingCount) {
         }
     });
     return realCount >= needingCount;
+}
+
+function markAns(s) {
+    var toMarkAsRight = s.split('||');
+    var rightAnswersId = [];
+    for (var q in toMarkAsRight) {
+        if (toMarkAsRight[q] != "") {
+            var content = toMarkAsRight[q].split('=');
+            var blockId = content[0];
+            if (content[1] == "True" || content[1] == "False") {
+                    $("#" + blockId  + content[1]).parent().addClass("right-quiz");
+                    $("#" + blockId + content[1]).parent().parent().children('i').addClass('right-quiz glyphicon glyphicon-ok');
+                rightAnswersId.push(blockId + content[1]);
+            } else {
+                var items = content[1].split("*");
+                for (var itemIndex in items) {
+                    $("#" + blockId + items[itemIndex]).parent().addClass("right-quiz");
+                    $("#" + blockId + items[itemIndex]).parent().parent().children('i').addClass('right-quiz glyphicon glyphicon-ok');
+                    rightAnswersId.push(blockId + items[itemIndex]);
+                }
+            }
+        }
+    }
+
+    $(".quiz").each(function () {
+        var $e = (($(this).children('label').children('input')));
+        if (!$e.parent().parent().children('i').hasClass('right-quiz'))
+            $e.parent().parent().children('i').addClass('glyphicon glyphicon-remove wrong-quiz');
+        if ($e.is(':checked')) {
+            if (($.inArray(($e.attr('id')), rightAnswersId)) == -1)
+                ($e.parent().addClass("wrong-quiz"));
+            console.log(rightAnswersId);
+        }
+    });
+
+    for (i in rightAnswersId) {
+        if ((!$("#" + rightAnswersId[i]).is(':checked')))
+            ($("#" + rightAnswersId[i]).parent().removeClass("right-quiz").addClass("wrong-quiz"));
+        console.log(rightAnswersId[i]);
+    }
+
+    
+
 }
