@@ -6,7 +6,7 @@
 @if (QuizSlide != null)
 {
 	var passed = Model.PassedQuiz.Contains(QuizSlide.Id);
-    var rightAnswersStr = new StringBuilder();
+	var rightAnswersStr = new StringBuilder();
 	for (int blockIndex = 0; blockIndex < QuizSlide.Quiz.Blocks.Length; blockIndex++)
 	{
 		var quizBlock = QuizSlide.Quiz.Blocks[blockIndex];
@@ -30,7 +30,7 @@
 		{
 			var choiceQuizBlock = quizBlock as ChoiceBlock;
 			rightAnswersStr.Append(quizBlock.Id + "quizBlock" + "=");
-			rightAnswersStr.Append(string.Join("*",choiceQuizBlock.Items.Where(x => x.IsCorrect).Select(x => x.Id).ToList()));
+			rightAnswersStr.Append(string.Join("*", choiceQuizBlock.Items.Where(x => x.IsCorrect).Select(x => x.Id).ToList()));
 			rightAnswersStr.Append("||");
 			var isMultiply = choiceQuizBlock.Multiple;
 			var typeInp = isMultiply ? "checkbox" : "radio";
@@ -39,19 +39,13 @@
 				{
 					var ident = isMultiply ? itemIndex + "noMult" : blockIndex.ToString();
 					var var = choiceQuizBlock.Items[itemIndex];
-
 					var ans = "";
-				    var mark = "";
-				    if (passed)
-				    {
-				        mark = var.IsCorrect ? "glyphicon glyphicon-ok right-quiz" : "glyphicon glyphicon-remove wrong-quiz";
-				    }
-				    if (passed && Model.AnswersToQuizes[quizBlock.Id].Contains(var.Id))
+					if (passed && Model.AnswersToQuizes[quizBlock.Id].Contains(var.Id))
 					{
 						ans = "checked";
 					}
 					<div class="quiz">
-					    <i class="@mark"></i>
+						<i></i>
 						<label><input @ans id='@(quizBlock.Id + "quizBlock" + var.Id)' name=@("group"+ident) type="@typeInp">@var.Description</label>
 					</div>
 				}
@@ -65,21 +59,21 @@
 			if (passed && Model.AnswersToQuizes[quizBlock.Id].FirstOrDefault() != null)
 			{
 				value = Model.AnswersToQuizes[quizBlock.Id].FirstOrDefault();
-				quizRes = Model.AnswersToQuizes[quizBlock.Id][1] == "False" ? "wrong-quiz" : "";
-				quizResSample = Model.AnswersToQuizes[quizBlock.Id][1] == "False" ? "block" : "hidden";
+				quizRes = Model.AnswersToQuizes[quizBlock.Id][1] == "False" ? "wrong-quiz" : "right-quiz";
+				quizResSample = Model.AnswersToQuizes[quizBlock.Id][1] == "False" ? "block" : "none";
 			}
 			var fillIn = quizBlock as FillInBlock;
 			rightAnswersStr.Append(quizBlock.Id + quizBlock.Id + "=" + fillIn.Sample);
-		    rightAnswersStr.Append("||");
+			rightAnswersStr.Append("||");
 			var sample = fillIn.Sample;
 			<div class="quiz quiz-block-input">
 				<label>
 					<input class="@quizRes" value="@value" id='@(quizBlock.Id + "quizBlock")'>
 				</label>
-				<i style="display:@quizResSample" id='@(quizBlock.Id + "_" + "example" + "_quizItem")'>
-					Пример правильного варианта ответа: @sample
-				</i>
 			</div>
+			<i style="display:@quizResSample" id='@(quizBlock.Id + "_" + "example" + "_quizItem")'>
+				Пример правильного варианта ответа: @sample
+			</i>
 		}
 		else if (quizBlock is IsTrueBlock)
 		{
@@ -88,23 +82,18 @@
 			rightAnswersStr.Append("||");
 			var tchecked = "";
 			var fchecked = "";
-		    var markTrue = "";
-		    var markFalse = "";
-			
 			if (passed && Model.AnswersToQuizes[quizBlock.Id].FirstOrDefault() != null)
 			{
-				markTrue = selecter.Answer ? "glyphicon glyphicon-ok right-quiz" : "glyphicon glyphicon-remove wrong-quiz";
-				markFalse = selecter.Answer ? "glyphicon glyphicon-remove wrong-quiz" : "glyphicon glyphicon-ok right-quiz";
 				tchecked = Model.AnswersToQuizes[quizBlock.Id].FirstOrDefault() == "True" ? "checked" : "";
 				fchecked = Model.AnswersToQuizes[quizBlock.Id].FirstOrDefault() == "False" ? "checked" : "";
 			}
 			<div class="radio quiz-block-mark" id="@(quizBlock.Id + "_quizBlock")">
 				<div class="quiz">
-					<i class="@markTrue"></i>
+					<i></i>
 					<label><input @tchecked id='@(quizBlock.Id + "quizBlock" + "True")' name='@(quizBlock.Id+"group")' type="radio">True</label>
 				</div>
 				<div class="quiz">
-					<i class="@markFalse"></i>
+					<i></i>
 					<label><input @fchecked id='@(quizBlock.Id + "quizBlock" + "False")' name='@(quizBlock.Id+"group")' type="radio">False</label>
 				</div>
 			</div>

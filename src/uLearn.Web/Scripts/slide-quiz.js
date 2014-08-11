@@ -1,5 +1,4 @@
 ﻿function submitQuiz(courseId, slideIndex, needingCount, answersToQuiz) {
-    console.log("insub");
     if (areAllAnswered(needingCount)) {
         var userAnswers = [];
         $(".quiz").each(function () {
@@ -15,7 +14,6 @@
                     userAnswers.push(ans);
                 }
         });
-        console.log(userAnswers.join('*'));
         var toSend = (userAnswers.join('*'));
         markAns(answersToQuiz);
         $.ajax(
@@ -29,8 +27,11 @@
                 }
             }).success(function(ans) {
                 var wrongIndexes = ans.split('*');
+                $(".quiz-block-input").each(function() {
+                    $(this).find("input").addClass("right-quiz");
+                });
                 for (var i in wrongIndexes) {
-                    $("#" + wrongIndexes[i] + "_placetoinsert_quizItem").addClass("wrong-quiz");
+                    $("#" + wrongIndexes[i] + "quizBlock").removeClass("right-quiz").addClass("wrong-quiz");
                     $("#" + wrongIndexes[i] + "_example_quizItem").show();
                 }
                 console.log(ans);
@@ -101,7 +102,4 @@ function markAns(s) {
             ($("#" + rightAnswersId[i]).parent().removeClass("right-quiz").addClass("wrong-quiz"));
         console.log(rightAnswersId[i]);
     }
-
-    
-
 }
