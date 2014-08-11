@@ -10,21 +10,21 @@
 <body>
 	<div class="navbar navbar-inverse navbar-fixed-top">
 		<script src="/Scripts/slide-tableOfContent.js"></script>
-		<button type="button" class="navbar-toggle hide-side-bar-button" onclick="hideTable()">
+		<button type="button" class="navbar-toggle hide-side-bar-button" data-toggle="collapse" data-target=".side-bar">
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 		</button>
 		<div class="container">
 			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".empty-class">
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
 				@Html.ActionLink("uLearn", "Index", "Home", null, new { @class = "navbar-brand" })
 			</div>
-			<div class="navbar-collapse collapse">
+			<div class="empty-class navbar-collapse collapse">
 				<ul class="nav navbar-nav">
 					@*<li>@Html.ActionLink("Home", "Index", "Home")</li>*@
 

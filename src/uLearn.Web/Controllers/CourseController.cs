@@ -200,6 +200,14 @@ namespace uLearn.Web.Controllers
 					ActualOutput = ""
 				};
 			var submition = await executionService.Submit(solution.SourceCode, "");
+			if (submition == null)
+				return new RunSolutionResult
+				{
+					CompilationError = "Ой-ой, Sphere-engine, проверяющий задачи, не работает. Попробуйте отправить решение позже.",
+					IsRightAnswer = false,
+					ExpectedOutput = "",
+					ActualOutput = ""
+				};
 			var output = submition.Output + "\n" + submition.StdErr;
 			var isRightAnswer = NormalizeString(output).Equals(NormalizeString(exerciseSlide.ExpectedOutput));
 			return new RunSolutionResult
