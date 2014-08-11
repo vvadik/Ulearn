@@ -83,6 +83,7 @@
     <Compile Include="CSharp\ISolutionValidator.cs" />
     <Compile Include="PersonalStatisticPageModel.cs" />
     <Compile Include="Quiz.cs" />
+    <Compile Include="QuizInfoModel.cs" />
     <Compile Include="QuizSlide.cs" />
     <Compile Include="QuizBlock.cs" />
     <Compile Include="Quiz_Test.cs" />
