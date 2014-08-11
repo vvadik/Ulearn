@@ -31,6 +31,7 @@ function cancelRate(rate) {
 	colors["trivial"] = "btn-info";
 	$("#notwatched").addClass("not-watched");
 	$("#next_slide_button").addClass("block-next");
+	$("#next_solutions_button").addClass("block-next");
 	$("#" + switcher).parent().button('toggle');
 	$("#" + switcher).parent().removeClass(colors[switcher]).removeClass("active");
 	$("#notwatched").parent().addClass("active");
@@ -49,11 +50,13 @@ function fillRate(rate) {
 		$("#" + i).parent().removeClass(colors[i]);
 	}
 	console.log(rated);
-	if (rated)
+	if (rated) {
 		$("#next_slide_button").removeClass("block-next");
-	else {
+		$("#next_solutions_button").removeClass("block-next");
+	} else {
 		$("#notwatched").addClass("not-watched");
 		$("#next_slide_button").addClass("block-next");
+		$("#next_solutions_button").addClass("block-next");
 	}
 	$("#" + switcher).parent().button('toggle');
 	$("#" + switcher).parent().addClass(colors[switcher]);

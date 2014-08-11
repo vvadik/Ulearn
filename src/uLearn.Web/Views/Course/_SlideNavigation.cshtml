@@ -7,7 +7,7 @@
 	<a class="btn btn-default no-rounds ctrl-group" style="width:50%"
 	   id="prev_slide_button"
 	   href="@Url.Action("Slide", new {courseId = Model.Course.Id, slideIndex = Model.PrevSlideIndex})"><i class="glyphicon glyphicon-chevron-left"></i></a>
-	<a class="btn btn-default no-rounds ctrl-group" style="width:50%"
+	<a class="btn btn-default block-next no-rounds ctrl-group" style="width:50%"
 	   id="next_solutions_button"
 	   href="@Url.Action("AcceptedSolutions", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex })"><i class="glyphicon glyphicon-chevron-right"></i></a>
 	<a class="btn btn-default block-next no-rounds ctrl-group" style="width:50%"

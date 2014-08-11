@@ -43,3 +43,16 @@ document.getElementById('next_slide_button').onclick = function () {
 	}
 	return rated;
 };
+
+document.getElementById('next_solutions_button').onclick = function () {
+	var rated = !($("#notwatched").hasClass("not-watched"));
+	if (rated)
+		$("#next_solutions_button").removeClass("block-next");
+	else {
+		setTimeout(function () {
+			$("#ratings").removeClass("bounce-effect");
+		}, 1000);
+		$("#ratings").addClass("bounce-effect");
+	}
+	return rated;
+};

@@ -184,7 +184,7 @@ a.nav-arrow:hover {
     margin-left: 320px;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
 	.slide-container {
 		margin-left: 10px;
 	}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -272,6 +273,14 @@ namespace uLearn.Web.Controllers
 				await userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
 					course.Slides[intSlideIndex].Id, quizInfoForDb.Text, User.Identity.GetUserId(), time);
 			return string.Join("*", incorrectQuizzes.Distinct());
+		}
+
+		[HttpPost]
+		public string GetRightAnswersToQuiz(string courseId, int slideIndex)
+		{
+			var course = courseManager.GetCourse(courseId);
+			var quizSlide = course.Slides[slideIndex];
+			return (quizSlide as QuizSlide).RightAnswersToQuiz;
 		}
 
 		private IEnumerable<QuizInfoForDb> GetQuizInfo(Course course, int slideIndex, IGrouping<string, List<string>> answer)
