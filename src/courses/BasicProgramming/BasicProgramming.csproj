@@ -65,10 +65,23 @@
     <Compile Include="Slides\U01_Basics\S083-IntelliSense.cs" />
     <Compile Include="Slides\U01_Basics\S000-Help.cs" />
     <Compile Include="Slides\U01_Basics\_HelloWorld.cs" />
-    <Compile Include="Slides\U02_Mistakes\S01-MissedUsings.cs" />
-    <Compile Include="Slides\U02_Mistakes\S02-ErrorInTtypecasting.cs" />
-    <Compile Include="Slides\U02_Mistakes\S03-Typo.cs" />
-    <Compile Include="Slides\U02_Mistakes\S04-Division.cs" />
+    <Content Include="Slides\U02_Mistakes\S011-MissedUsings.xml" />
+    <Compile Include="Slides\U02_Mistakes\DRY.cs" />
+    <Compile Include="Slides\U02_Mistakes\S060-Experiments.cs" />
+    <Compile Include="Slides\U02_Mistakes\S010-CompilationMistakeVideo.cs" />
+    <Compile Include="Slides\U02_Mistakes\S020-ErrorInTypeCasting.cs" />
+    <Compile Include="Slides\U02_Mistakes\S030-TypoSlide.cs" />
+    <Compile Include="Slides\U02_Mistakes\S031-Typo.cs" />
+    <Compile Include="Slides\U02_Mistakes\S040-DivisionByZeroVideo.cs" />
+    <Compile Include="Slides\U02_Mistakes\S041-Division.cs" />
+    <Compile Include="Slides\U02_Mistakes\S050-DebugVideo.cs" />
+    <Compile Include="Slides\U02_Mistakes\S070-Style.cs" />
+    <Compile Include="Slides\U02_Mistakes\S080-ConstantAndEnum.cs" />
+    <Compile Include="Slides\U02_Mistakes\S090-MethodRefactoring.cs" />
+    <Compile Include="Slides\U02_Mistakes\_DivisionByZero.cs" />
+    <Compile Include="Slides\U02_Mistakes\_MissedUsings.cs" />
+    <Compile Include="Slides\U02_Mistakes\_TypeCastingMistaces.cs" />
+    <Compile Include="Slides\U02_Mistakes\_Typo.cs" />
     <Compile Include="Slides\U03_Cycles\S01-BooleanVariablesAndComparison.cs" />
     <Compile Include="Slides\U03_Cycles\S02-LogicalExpressions.cs" />
     <Compile Include="Slides\U03_Cycles\S03-IfOperator.cs" />
@@ -92,7 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Slides\Title.txt" />
-    <Content Include="Slides\U01_Basics\S11-sampleXML.xml" />
+    <Content Include="Slides\U01_Basics\S090-sampleXML.xml" />
     <Content Include="Slides\U01_Basics\Title.txt" />
     <Content Include="Slides\U01_Basics\Prelude.txt" />
     <Content Include="Slides\U02_Mistakes\Title.txt" />

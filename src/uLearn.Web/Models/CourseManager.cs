@@ -48,6 +48,7 @@ namespace uLearn.Web.Models
 		{
 			var resourceFiles = Resources.EnumerateResourcesFrom("uLearn.Web.Courses." + courseId)
 				.OrderBy(f => GetSortingKey(f.Filename))
+				.ThenBy(f => GetSecondSortingKey(f.Filename))
 				.ToList();
 			var includes = resourceFiles
 				.Where(f => !IsSlide(f))
@@ -63,6 +64,11 @@ namespace uLearn.Web.Models
 				throw new Exception("change repeated guid in slides:\n" + string.Join("\n", slidesWithRepeatedGuide.Select(x => string.Join("\n", x))));
 			}
 			return new Course(courseId, courseTitle, slides);
+		}
+
+		private string GetSecondSortingKey(string filename)
+		{
+			return filename.Split('.')[1].Split('_')[0];
 		}
 
 		private string GetSortingKey(string filename)
