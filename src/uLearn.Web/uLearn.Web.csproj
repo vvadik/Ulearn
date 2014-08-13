@@ -195,6 +195,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\AnalyticsController.cs" />
+    <Compile Include="Controllers\QuizController.cs" />
     <Compile Include="Controllers\SlideNavigationController.cs" />
     <Compile Include="DataContexts\SlideHintRepo.cs" />
     <Compile Include="DataContexts\SlideRateRepo.cs" />
@@ -321,6 +322,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\db.mdf" />
+    <Content Include="App_Data\db_log.ldf">
+      <DependentUpon>db.mdf</DependentUpon>
+    </Content>
+    <Content Include="App_Data\Elmah.sdf" />
     <Content Include="App_Data\ElmahErrors.txt" />
     <Content Include="App_Readme\Elmah.txt" />
     <Content Include="codemirror\addon\comment\comment.js" />
