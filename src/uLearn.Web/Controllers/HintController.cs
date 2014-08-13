@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
+using NUnit.Framework;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Ideone;
 using uLearn.Web.Models;
@@ -14,13 +17,7 @@ namespace uLearn.Web.Controllers
 	public class HintController : Controller
 	{
 		private readonly CourseManager courseManager;
-		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
-		private readonly UserQuestionsRepo userQuestionsRepo = new UserQuestionsRepo();
-		private readonly ExecutionService executionService = new ExecutionService();
-		private readonly VisitersRepo visitersRepo = new VisitersRepo();
-		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
-		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 
 		public HintController()
 			: this(CourseManager.AllCourses)
@@ -34,20 +31,52 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<string> UseHint(string courseId, string slideId, int hintId)
+		public async Task<ActionResult> UseHint(string courseId, int slideIndex, bool isNeedNewHint)
 		{
-			var userId = User.Identity.GetUserId();
-			await slideHintRepo.AddHint(userId, hintId, courseId, slideId);
-			return "success";
+			var slide = courseManager.GetCourse(courseId).Slides[slideIndex];
+			if (!(slide is ExerciseSlide))
+				return Json(new { Text = "Для слайда нет подсказок" });
+			var exerciseSlide = (ExerciseSlide) slide;
+			if (exerciseSlide.HintsHtml.Length == 0)
+				return Json(new { Text = "Для слайда нет подсказок" });
+			var a = new HintPageModel {Hints = await GetNewHintHtml(exerciseSlide, courseId, isNeedNewHint)};
+			if (a.Hints == null)
+				return Json(new {Text = "Подсказок больше нет"});
+			return PartialView("~/Views/Course/_ExerciseHint.cshtml", a);
 		}
 
-		[HttpPost]
-		[Authorize]
-		public ActionResult GetHint(string courseId, string slideId)
+		private async Task<HintWithLikeButton[]> GetNewHintHtml(ExerciseSlide exerciseSlide, string courseId, bool isNeedNewHint)
 		{
-			var userId = User.Identity.GetUserId();
-			var answer = slideHintRepo.GetUsedHintId(userId, courseId, slideId);
-			return Json(answer);
+			var usedHintsCount = slideHintRepo.GetUsedHintsCount(courseId, exerciseSlide.Id, User.Identity.GetUserId());
+			if (usedHintsCount != exerciseSlide.HintsHtml.Length)
+				return await RenderHtmlWithHint(exerciseSlide, isNeedNewHint ? usedHintsCount : usedHintsCount - 1, courseId);
+			if (isNeedNewHint)
+				return null;
+			return await RenderHtmlWithHint(exerciseSlide, usedHintsCount - 1, courseId);
+		}
+
+		private async Task<HintWithLikeButton[]> RenderHtmlWithHint(ExerciseSlide exerciseSlide, int hintsCount, string courseId)
+		{
+			var ans = new HintWithLikeButton[hintsCount + 1];
+			for (var i = 0; i <= hintsCount; i++)
+			{
+				var isLiked = slideHintRepo.IsHintLiked(courseId, exerciseSlide.Id, User.Identity.GetUserId(), i);
+				ans[i] = await MakeExerciseHint(exerciseSlide.HintsHtml[i], i, courseId, exerciseSlide.Id, isLiked);
+			}
+			return ans;
+		}
+
+		private async Task<HintWithLikeButton> MakeExerciseHint(string hintText, int hintId, string courseId, string slideId, bool isLiked)
+		{
+			await slideHintRepo.AddHint(User.Identity.GetUserId(), hintId, courseId, slideId);
+			return new HintWithLikeButton
+			{
+				CourseId = courseId,
+				Hint = hintText,
+				HintId = hintId,
+				IsLiked = isLiked,
+				SlideId = slideId
+			};
 		}
 
 		[HttpPost]

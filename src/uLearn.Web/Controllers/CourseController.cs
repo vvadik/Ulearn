@@ -21,7 +21,6 @@ namespace uLearn.Web.Controllers
 		private readonly CourseManager courseManager;
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly UserQuestionsRepo userQuestionsRepo = new UserQuestionsRepo();
-		private readonly ExecutionService executionService = new ExecutionService();
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
@@ -93,39 +92,6 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<ActionResult> RunSolution(string courseId, int slideIndex = 0)
-		{
-			var code = GetUserCode(Request.InputStream);
-			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
-			var result = await CheckSolution(exerciseSlide, code, slideIndex);
-			await SaveUserSolution(courseId, exerciseSlide.Id, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer);
-			return Json(result);
-		}
-
-		[HttpPost]
-		[Authorize]
-		public ContentResult PrepareSolution(string courseId, int slideIndex = 0)
-		{
-			var code = GetUserCode(Request.InputStream);
-			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
-			var solution = exerciseSlide.Solution.BuildSolution(code);
-			return Content(solution.SourceCode ?? solution.ErrorMessage, "text/plain");
-		}
-
-		[HttpPost]
-		[Authorize]
-		public ActionResult FakeRunSolution(string courseId, int slideIndex = 0)
-		{
-			return Json(new RunSolutionResult
-			{
-				IsRightAnswer = false,
-				ActualOutput = string.Join("\n", Enumerable.Repeat("Тридцать три корабля лавировали лавировали, да не вылавировали", 21)),
-				ExpectedOutput = string.Join("\n", Enumerable.Repeat("Тридцать три корабля лавировали лавировали, да не вылавировали", 15)),
-			});
-		}
-
-		[HttpPost]
-		[Authorize]
 		public async Task<string> AddQuestion(string title, string unitName, string question)
 		{
 			var userName = User.Identity.GetUserName();
@@ -164,62 +130,6 @@ namespace uLearn.Web.Controllers
 		{
 			var res = await solutionsRepo.Like(solutionId, User.Identity.GetUserId());
 			return Json(new { likesCount = res.Item1, liked = res.Item2 });
-		}
-
-		private string NormalizeString(string s)
-		{
-			return s.LineEndingsToUnixStyle().Trim();
-		}
-
-		private async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code, int slideIndex)
-		{
-			var solution = exerciseSlide.Solution.BuildSolution(code);
-			if (solution.HasErrors)
-				return new RunSolutionResult
-				{
-					CompilationError = solution.ErrorMessage,
-					IsRightAnswer = false,
-					ExpectedOutput = "",
-					ActualOutput = ""
-				};
-			var submition = await executionService.Submit(solution.SourceCode, "");
-			if (submition == null)
-				return new RunSolutionResult
-				{
-					CompilationError = "Ой-ой, Sphere-engine, проверяющий задачи, не работает. Попробуйте отправить решение позже.",
-					IsRightAnswer = false,
-					ExpectedOutput = "",
-					ActualOutput = ""
-				};
-			var output = submition.Output;
-			if (!string.IsNullOrEmpty(submition.StdErr)) output += "\n" + submition.StdErr;
-			output = NormalizeString(output);
-			var expectedOutput = NormalizeString(exerciseSlide.ExpectedOutput);
-			var isRightAnswer = output.Equals(expectedOutput);
-			return new RunSolutionResult
-			{
-				CompilationError = submition.CompilationError,
-				IsRightAnswer = isRightAnswer,
-				ExpectedOutput = expectedOutput,
-				ActualOutput = output
-			};
-		}
-
-		private async Task SaveUserSolution(string courseId, string slideId, string code, string compilationError, string output,
-			bool isRightAnswer)
-		{
-			await solutionsRepo.AddUserSolution(
-				courseId, slideId,
-				code, isRightAnswer, compilationError, output,
-				User.Identity.GetUserId());
-		}
-
-
-		private static string GetUserCode(Stream inputStream)
-		{
-			var codeBytes = new MemoryStream();
-			inputStream.CopyTo(codeBytes);
-			return Encoding.UTF8.GetString(codeBytes.ToArray());
 		}
 
 		public async Task VisitSlide(string courseId, string slideId)

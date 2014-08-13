@@ -19,7 +19,7 @@ else
 </script>
 <div class="solution-control btn-group ctrl-group">
 	<button type="button" class="run-solution-button btn btn-primary no-rounds"
-			data-url="@Url.Action("RunSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">
+			data-url="@Url.Action("RunSolution", "Exercise", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">
 		RUN
 	</button>
 
@@ -27,7 +27,9 @@ else
 		RESET
 	</button>
 
-	<button id="GetHintButton" type="button" class="btn btn-default hints-btn no-rounds" onclick="showHintForUser('@Model.Course.Id','@Model.Slide.Id', '@slide.HintsHtml.Count()')">
+	<button id="GetHintButton" type="button" class="btn btn-default hints-btn no-rounds"
+			onclick="showHintForUser('@Model.Course.Id','@Model.SlideIndex')"
+			data-url="@Url.Action("UseHint", "Hint")">
 		GET HINT
 	</button>
 </div>
@@ -39,4 +41,6 @@ else
 	</div>
 	<div class="diff-table"></div>
 </div>
-@Html.Partial("_ExerciseHints", Model)
+<div class="panel-group ctrl-group" id="hints-accordion">
+	<div id="hints-place"></div>
+</div>

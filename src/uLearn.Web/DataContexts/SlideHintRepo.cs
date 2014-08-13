@@ -81,7 +81,22 @@ namespace uLearn.Web.DataContexts
 
 		public HashSet<int> GetLikedHints(string courseId, string slideId, string userId)
 		{
-			return new HashSet<int>(db.Hints.Where(x => x.SlideId == slideId && x.CourseId == courseId && x.UserId == userId && x.IsHintHelped).Select(x => x.HintId));
+			return
+				new HashSet<int>(db.Hints
+						.Where(x => x.SlideId == slideId && x.CourseId == courseId && x.UserId == userId && x.IsHintHelped)
+						.Select(x => x.HintId));
+		}
+
+		public bool IsHintLiked(string courseId, string slideId, string userId, int hintId)
+		{
+			return
+				db.Hints.Any(
+					x => x.UserId == userId && x.CourseId == courseId && x.SlideId == slideId && x.HintId == hintId && x.IsHintHelped);
+		}
+
+		public int GetUsedHintsCount(string courseId, string slideId, string userId)
+		{
+			return db.Hints.Count(x => x.UserId == userId && x.SlideId == slideId && x.CourseId == courseId);
 		}
 	}
 }

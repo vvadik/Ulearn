@@ -3,7 +3,7 @@ using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Slide("While", "{4158C9A6-A71D-4015-A283-DEF12BE0055E}")]
+	[Slide("While 2", "{4158C9A6-A71D-4015-A283-DEF12BE0055E}")]
 	class S06_While
 	{
 		/*

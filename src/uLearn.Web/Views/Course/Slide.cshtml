@@ -44,7 +44,7 @@
 		@if (Request.IsLocal)
 		{
 			<div class="modal-footer">
-				<a href="#" class="prepare-solution-button" data-url="@Url.Action("PrepareSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">Log prepared solution</a>
+				<a href="#" class="prepare-solution-button" data-url="@Url.Action("PrepareSolution", "Exercise", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">Log prepared solution</a>
 				<a href="#" onclick="toggleFakeRun()">Переключить в тестовый режим запуска</a>
 				<script>
 					function toggleFakeRun() {
@@ -67,7 +67,7 @@
 	</script>
 	@if (Model.Slide is ExerciseSlide)
 	{
-		<script> getHints("@Model.Course.Id", "@Model.Slide.Id"); </script>
+		<script> getHints("@Model.Course.Id", "@Model.SlideIndex"); </script>
 	}
 
 	@{
