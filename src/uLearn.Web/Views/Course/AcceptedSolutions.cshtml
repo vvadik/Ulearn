@@ -3,12 +3,13 @@
 @{
 	ViewBag.Title = Model.CoursePageModel.Course.Title;
 }
-@Html.Action("RenderTOC", "Toc", new { courseId = Model.CoursePageModel.Course.Id })
+
+@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CoursePageModel.Course.Id })
 
 <div class="slide-container">
 	<div class="container body-content">
 		<div class="row">
-		    <div id="LikeSolutionUrl" data-url="@Url.Action("LikeSolution")"></div>
+			<div id="LikeSolutionUrl" data-url="@Url.Action("LikeSolution")"></div>
 			<h1 class='page-header'>Другие решения</h1>
 			@foreach (AcceptedSolutionInfo solution in Model.AcceptedSolutions)
 			{
@@ -21,7 +22,7 @@
 					<textarea class='code code-sample'>@solution.Code</textarea>
 				</div>
 			}
-			@Html.Partial("_SlideNavigation", Model.CoursePageModel)
+			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CoursePageModel.Course.Id, slideIndex = Model.CoursePageModel.SlideIndex, onSolutionsSlide = true })
 		</div>
 	</div>
 </div>

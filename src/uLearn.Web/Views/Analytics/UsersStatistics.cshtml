@@ -4,7 +4,8 @@
 	ViewBag.Title = "Users statistics";
 }
 
-@Html.Action("RenderTOC", "Toc", new { courseId = Model.CourseId })
+
+@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId })
 
 <body>
 	<div class="slide-container">

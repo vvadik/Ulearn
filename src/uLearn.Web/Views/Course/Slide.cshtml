@@ -4,7 +4,8 @@
 @{
 	ViewBag.Title = Model.Course.Title;
 }
-@Html.Action("RenderTOC", "Toc", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex })
+
+@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex })
 
 <div class="slide-container">
 	<div class="container body-content">
@@ -30,7 +31,7 @@
 				@Html.Partial("_AskBar")
 			</div>
 			@Html.Partial("_RatesBar")
-			@Html.Partial("_SlideNavigation", Model)
+			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex, onSolutionsSlide = false })
 			<div id="WatchQuestions" data-url="@Url.Action("GetAllQuestions")">
 				<button class="all-questions" onclick="printAllQuestions('@Model.Slide.Info.UnitName')">Посмотреть все заданные вопросы по теме</button>
 			</div>
