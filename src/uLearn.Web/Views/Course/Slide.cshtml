@@ -43,8 +43,7 @@
 		@if (Request.IsLocal)
 		{
 			<div class="modal-footer">
-				<a href="#" class="prepare-solution-button" data-url="@Url.Action("PrepareSolution", new {courseId = Model.CourseId, slideIndex = Model.Slide.Index})">Log prepared solution</a>
-				<a href="#" onclick="toggleFakeRun()">Переключить в тестовый режим запуска</a>
+				<a href="#" class="prepare-solution-button" data-url="@Url.Action("PrepareSolution", "Exercise", new {courseId = Model.CourseId, slideIndex = Model.Slide.Index})">Log prepared solution</a>				<a href="#" onclick="toggleFakeRun()">Переключить в тестовый режим запуска</a>
 				<script>
 					function toggleFakeRun() {
 						var $btn = $(".run-solution-button");
@@ -66,8 +65,7 @@
 	</script>
 	@if (Model.Slide is ExerciseSlide)
 	{
-		<script> getHints("@Model.CourseId", "@Model.Slide.Id"); </script>
-	}
+		<script> getHints("@Model.CourseId", "@Model.Slide.Index"); </script>	}
 
 	@{
 		var a = Model.PassedQuiz.Contains(Model.Slide.Id);

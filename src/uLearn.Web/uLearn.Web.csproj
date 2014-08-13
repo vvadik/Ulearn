@@ -197,6 +197,8 @@
     <Compile Include="Controllers\AnalyticsController.cs" />
     <Compile Include="Controllers\QuizController.cs" />
     <Compile Include="Controllers\SlideNavigationController.cs" />
+    <Compile Include="Controllers\ExerciseController.cs" />
+    <Compile Include="Controllers\HintController.cs" />
     <Compile Include="DataContexts\SlideHintRepo.cs" />
     <Compile Include="DataContexts\SlideRateRepo.cs" />
     <Compile Include="DataContexts\UserQuestionsRepo.cs" />
@@ -694,7 +696,6 @@
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Course\Slide.cshtml" />
-    <Content Include="Views\Course\_ExerciseHints.cshtml" />
     <Content Include="Views\SlideNavigation\PrevNextButtons.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
     <Content Include="Views\Course\_AskBar.cshtml" />
@@ -713,6 +714,7 @@
     <Content Include="Views\Course\_FillInBlock.cshtml" />
     <Content Include="Views\Course\_TrueFalseBlock.cshtml" />
     <Content Include="Views\SlideNavigation\TableOfContents.cshtml" />
+    <Content Include="Views\Course\_ExerciseHint.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Courses\" />

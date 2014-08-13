@@ -81,6 +81,7 @@
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />
     <Compile Include="CSharp\ISolutionValidator.cs" />
+    <Compile Include="HintPageModel.cs" />
     <Compile Include="PersonalStatisticPageModel.cs" />
     <Compile Include="Quiz.cs" />
     <Compile Include="QuizInfoModel.cs" />
