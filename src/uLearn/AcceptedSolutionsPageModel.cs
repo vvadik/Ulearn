@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using uLearn.Web.Models;
 
 namespace uLearn
 {
 	public class AcceptedSolutionsPageModel
 	{
-		public CoursePageModel CoursePageModel;
+		public string CourseId;
+		public string CourseTitle;
+		public Slide Slide;
 		public List<AcceptedSolutionInfo> AcceptedSolutions;
 	}
 }

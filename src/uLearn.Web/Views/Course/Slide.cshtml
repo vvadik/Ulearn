@@ -2,10 +2,10 @@
 @model CoursePageModel
 
 @{
-	ViewBag.Title = Model.Course.Title;
+	ViewBag.Title = Model.CourseTitle;
 }
 
-@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex })
+@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
 
 <div class="slide-container">
 	<div class="container body-content">
@@ -31,7 +31,7 @@
 				@Html.Partial("_AskBar")
 			</div>
 			@Html.Partial("_RatesBar")
-			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex, onSolutionsSlide = false })
+			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false })
 			<div id="WatchQuestions" data-url="@Url.Action("GetAllQuestions")">
 				<button class="all-questions" onclick="printAllQuestions('@Model.Slide.Info.UnitName')">Посмотреть все заданные вопросы по теме</button>
 			</div>
@@ -43,7 +43,7 @@
 		@if (Request.IsLocal)
 		{
 			<div class="modal-footer">
-				<a href="#" class="prepare-solution-button" data-url="@Url.Action("PrepareSolution", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">Log prepared solution</a>
+				<a href="#" class="prepare-solution-button" data-url="@Url.Action("PrepareSolution", new {courseId = Model.CourseId, slideIndex = Model.Slide.Index})">Log prepared solution</a>
 				<a href="#" onclick="toggleFakeRun()">Переключить в тестовый режим запуска</a>
 				<script>
 					function toggleFakeRun() {
@@ -66,7 +66,7 @@
 	</script>
 	@if (Model.Slide is ExerciseSlide)
 	{
-		<script> getHints("@Model.Course.Id", "@Model.Slide.Id"); </script>
+		<script> getHints("@Model.CourseId", "@Model.Slide.Id"); </script>
 	}
 
 	@{

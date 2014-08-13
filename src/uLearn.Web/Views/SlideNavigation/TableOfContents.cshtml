@@ -1,6 +1,6 @@
 ﻿@using uLearn
 @model TocModel
- 
+
 <ul class="side-bar units-list navbar-collapse collapse nav navbar-nav container">
 	@{
 		int iUnit = 0;
@@ -14,7 +14,7 @@
 				<ul id=@("N" + iUnit) class="slides-list @collapseOption">
 					@foreach (var slide in unit.Slides)
 					{
-						var url = Url.Action("Slide", "Course", new { courseId = Model.CourseId, slideIndex = slide.Info.Index });
+						var url = Url.Action("Slide", "Course", new { courseId = Model.CourseId, slideIndex = slide.Index });
 
 						<i class="@GetIconClass(slide) navbar-label" title="@GetTitle(slide)"></i>
 						<li class="slide-list-item @(slide == Model.CurrentSlide ? "selected" : "") " onclick="window.location.href = '@url'">@slide.Title</li>
@@ -25,9 +25,9 @@
 		}
 		if (Request.IsLocal)
 		{
-			<li class="units-list-item units-list-item-text">@Html.ActionLink("Total statistics", "TotalStatistics", "Analytics", new { courseId = Model.CourseId, slideIndex = 0 }, null)</li>
-			<li class="units-list-item units-list-item-text">@Html.ActionLink("Users statistics", "UsersStatistics", "Analytics", new { courseId = Model.CourseId, slideIndex = 0 }, null)</li>
-			<li class="units-list-item units-list-item-text">@Html.ActionLink("Personal statistics", "PersonalStatistics", "Analytics", new { courseId = Model.CourseId, slideIndex = 0 }, null)</li>
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Total statistics", "TotalStatistics", "Analytics", new { courseId = Model.CourseId}, null)</li>
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Users statistics", "UsersStatistics", "Analytics", new { courseId = Model.CourseId}, null)</li>
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Personal statistics", "PersonalStatistics", "Analytics", new { courseId = Model.CourseId}, null)</li>
 		}
 	}
 </ul>

@@ -54,7 +54,7 @@ namespace uLearn.Web.Controllers
 				var exerciseSlide = (slide as ExerciseSlide);
 				var isExercise = exerciseSlide != null;
 				var hintsCountOnSlide = isExercise ? exerciseSlide.HintsHtml.Count() : 0;
-				tableInfo.Add(slide.Info.Index + ". " + slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
+				tableInfo.Add(slide.Index + ". " + slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
 				{
 					Rates = slideRateRepo.GetRates(slide.Id, course.Id),
 					VisitersCount = visitersRepo.GetVisitersCount(slide.Id, course.Id),
@@ -149,7 +149,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[Authorize]
-		public ActionResult PersonalStatistics(string courseId, int slideIndex)
+		public ActionResult PersonalStatistics(string courseId)
 		{
 			var course = courseManager.GetCourse(courseId);
 			return View(CreatePersonalStaticticsModel(course));

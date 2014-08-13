@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using NUnit.Framework;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Ideone;
@@ -50,20 +48,14 @@ namespace uLearn.Web.Controllers
 		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, int slideIndex)
 		{
 			Course course = courseManager.GetCourse(courseId);
-			var isPassedTask = solutionsRepo.IsUserPassedTask(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId());
 			await VisitSlide(courseId, course.Slides[slideIndex].Id);
 			var model = new CoursePageModel
 			{
-				Course = course,
-				SlideIndex = slideIndex,
+				CourseId = course.Id,
+				CourseTitle = course.Title,
 				Slide = course.Slides[slideIndex],
-				NextSlideIndex = slideIndex + 1,
-				PrevSlideIndex = slideIndex - 1,
-				IsPassedTask = isPassedTask,
-				LatestAcceptedSolution = isPassedTask ? solutionsRepo.GetLatestAcceptedSolution(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId()) : null,
+				LatestAcceptedSolution = solutionsRepo.FindLatestAcceptedSolution(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId()),
 				Rate = GetRate(course.Id, course.Slides[slideIndex].Id),
-				SolvedSlide = solutionsRepo.GetIdOfPassedSlides(course.Id, User.Identity.GetUserId()),
-				VisitedSlide = visitersRepo.GetIdOfVisitedSlides(course.Id, User.Identity.GetUserId()),
 				PassedQuiz = userQuizzesRepo.GetIdOfQuizPassedSlides(courseId, User.Identity.GetUserId()),
 				AnswersToQuizes = userQuizzesRepo.GetAnswersForShowOnSlide(courseId, course.Slides[slideIndex] as QuizSlide, User.Identity.GetUserId())
 			};
@@ -74,18 +66,19 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> AcceptedSolutions(string courseId, int slideIndex = 0)
 		{
 			var userId = User.Identity.GetUserId();
-			var coursePageModel = await CreateCoursePageModel(courseId, slideIndex);
-			coursePageModel.PrevSlideIndex = coursePageModel.PrevSlideIndex + 1;
-			coursePageModel.IsSlideWithAcceptedSolutions = true;
-			var solutions = coursePageModel.IsPassedTask
-				? solutionsRepo.GetAllAcceptedSolutions(courseId, coursePageModel.Course.Slides[slideIndex].Id)
+			var course = courseManager.GetCourse(courseId);
+			var slide = course.Slides[slideIndex];
+			var isPassed = solutionsRepo.IsUserPassedTask(courseId, slide.Id, userId);
+			var solutions = isPassed
+				? solutionsRepo.GetAllAcceptedSolutions(courseId, slide.Id)
 				: new List<AcceptedSolutionInfo>();
 			foreach (var solution in solutions)
 				solution.LikedAlready = solution.UsersWhoLike.Any(u => u == userId);
-
 			var model = new AcceptedSolutionsPageModel
 			{
-				CoursePageModel = coursePageModel,
+				CourseId = courseId,
+				CourseTitle = course.Title,
+				Slide = slide,
 				AcceptedSolutions = solutions
 			};
 			return View(model);

@@ -1,10 +1,10 @@
 ﻿@model uLearn.AcceptedSolutionsPageModel
 
 @{
-	ViewBag.Title = Model.CoursePageModel.Course.Title;
+	ViewBag.Title = Model.CourseTitle;
 }
 
-@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CoursePageModel.Course.Id })
+@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId })
 
 <div class="slide-container">
 	<div class="container body-content">
@@ -22,7 +22,7 @@
 					<textarea class='code code-sample'>@solution.Code</textarea>
 				</div>
 			}
-			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CoursePageModel.Course.Id, slideIndex = Model.CoursePageModel.SlideIndex, onSolutionsSlide = true })
+			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = true })
 		</div>
 	</div>
 </div>
