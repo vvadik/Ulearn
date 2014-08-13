@@ -3,7 +3,9 @@
 @{
 	ViewBag.Title = "Personal statistics";
 }
-@Html.Partial("_TableOfContents", Model.CoursePageModel)
+
+
+@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId })
 
 <body>
 	<div class="slide-container">
@@ -15,35 +17,34 @@
 							<th>Название слайда</th>
 							<th>Посещённые</th>
 							<th>Решённые</th>
-						    <th>Ваша оценка</th>
-						    <th>Подсказок на слайде</th>
+							<th>Ваша оценка</th>
+							<th>Подсказок на слайде</th>
 							<th>Из них использовано</th>
 						</tr>
 					</thead>
 					<tbody>
-					    @{
-					        foreach (var stats in Model.PersonalStatistics)
+						@{
+							foreach (var stats in Model.PersonalStatistics)
 							{
-							    var isNeedDrowHintsInfo = stats.IsExercise && stats.HintsCountOnSlide != 0;
+								var isNeedDrowHintsInfo = stats.IsExercise && stats.HintsCountOnSlide != 0;
 								<tr>
 									<td data-sort-value=@(stats.SlideIndex)>
 										@Html.ActionLink(
-											stats.UnitName + ": " + stats.SlideTitle, 
-											"Slide", "Course", 
-											new { courseId = Model.CoursePageModel.Course.Id, slideIndex = stats.SlideIndex }, 
+											stats.UnitName + ": " + stats.SlideTitle,
+											"Slide", "Course",
+											new { courseId = Model.CourseId, slideIndex = stats.SlideIndex },
 											null)
 									</td>
 									<td data-sort-value="@(stats.IsVisited ? 1 : 0)" class="analytics @(stats.IsVisited ? "visited" : "not-visited")"></td>
-									<td 
-										data-sort-value="@(stats.IsSolved ? 1 : stats.IsExercise ? 0 : 2)" 
+									<td data-sort-value="@(stats.IsSolved ? 1 : stats.IsExercise ? 0 : 2)"
 										class="analytics @(stats.IsSolved? "solved" : stats.IsExercise ? "not-solved" : "")"></td>
 									<td>@(stats.UserRate ?? "")</td>
-								    <td data-sort-value="@(isNeedDrowHintsInfo ? stats.HintsCountOnSlide + 1000 : 0)">
-								        @(isNeedDrowHintsInfo ? stats.HintsCountOnSlide.ToString(CultureInfo.InvariantCulture) : "")
-								    </td>
-								    <td data-sort-value="@(isNeedDrowHintsInfo ? stats.HintUsedPercent + 1000 : 0)">
-								        @(isNeedDrowHintsInfo ? stats.HintUsedPercent + "%" : "")
-								    </td>
+									<td data-sort-value="@(isNeedDrowHintsInfo ? stats.HintsCountOnSlide + 1000 : 0)">
+										@(isNeedDrowHintsInfo ? stats.HintsCountOnSlide.ToString(CultureInfo.InvariantCulture) : "")
+									</td>
+									<td data-sort-value="@(isNeedDrowHintsInfo ? stats.HintUsedPercent + 1000 : 0)">
+										@(isNeedDrowHintsInfo ? stats.HintUsedPercent + "%" : "")
+									</td>
 								</tr>
 							}
 						}

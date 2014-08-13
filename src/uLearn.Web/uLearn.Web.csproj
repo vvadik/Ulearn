@@ -195,6 +195,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\AnalyticsController.cs" />
+    <Compile Include="Controllers\SlideNavigationController.cs" />
     <Compile Include="Controllers\ExerciseController.cs" />
     <Compile Include="Controllers\HintController.cs" />
     <Compile Include="DataContexts\SlideHintRepo.cs" />
@@ -278,6 +279,7 @@
     <Compile Include="Models\CourseManager.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
     <Compile Include="IdeoneSubmitAllSlide_Test.cs" />
+    <Compile Include="Models\PrevNextButtonsModel.cs" />
     <Compile Include="Models\SlideHint.cs" />
     <Compile Include="Models\SlideRate.cs" />
     <Compile Include="Models\UserQuestion.cs" />
@@ -688,8 +690,7 @@
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Course\Slide.cshtml" />
-    <Content Include="Views\Course\_SlideNavigation.cshtml" />
-    <Content Include="Views\Shared\_TableOfContents.cshtml" />
+    <Content Include="Views\SlideNavigation\PrevNextButtons.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
     <Content Include="Views\Course\_AskBar.cshtml" />
     <Content Include="Views\Analytics\TotalStatistics.cshtml" />
@@ -706,9 +707,12 @@
     <Content Include="Views\Course\_ChoiceBlock.cshtml" />
     <Content Include="Views\Course\_FillInBlock.cshtml" />
     <Content Include="Views\Course\_TrueFalseBlock.cshtml" />
+    <Content Include="Views\SlideNavigation\TableOfContents.cshtml" />
     <Content Include="Views\Course\_ExerciseHint.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Courses\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />

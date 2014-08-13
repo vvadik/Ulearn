@@ -19,5 +19,10 @@ namespace uLearn
 		{
 			return Slides.FirstOrDefault(x => x.Id == slideId);
 		}
+		
+		public Slide FindSlide(int index)
+		{
+			return index >= 0 && index < Slides.Length ? Slides[index] : null;
+		}
 	}
 }

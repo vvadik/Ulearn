@@ -1,12 +1,12 @@
 ﻿@using System.Globalization
-@using Microsoft.Ajax.Utilities
 @using uLearn
 @model AnalyticsTablePageModel
 @{
 	ViewBag.Title = "Total statistics";
 }
 
-@Html.Partial("_TableOfContents", Model.CoursePageModel)
+
+@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId })
 
 <body>
 	<div class="slide-container">
@@ -34,7 +34,7 @@
 						    <tr>
 						        @{
 							        var isNeedDrowHintsInfo = (info.Value.IsExercise && info.Value.TotalHintCount != 0);
-							        var url = Url.Action("Slide", "Course", new {courseId = Model.CoursePageModel.Course.Id, slideIndex = counter}, null);
+							var url = Url.Action("Slide", "Course", new { courseId = Model.CourseId, slideIndex = counter }, null);
 						        }
 								<td class="slide-list-item" data-sort-value=@(counter + 1000) onclick="window.location.href='@url'"><h6 class="table-header">@info.Key</h6></td>
 						        <td>@info.Value.VisitersCount</td>

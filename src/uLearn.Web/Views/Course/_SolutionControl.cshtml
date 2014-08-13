@@ -3,14 +3,7 @@
 @{ var slide = Model.Slide as ExerciseSlide; }
 <textarea id="secretCodeExercise" class='hide'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
 <div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine™</a> and <a target="blank" href="http://codemirror.net/">CodeMirror</a></div>
-@if (Model.IsPassedTask)
-{
-	<textarea class='code code-exercise'>@Model.LatestAcceptedSolution</textarea>
-}
-else
-{
-	<textarea class='code code-exercise'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
-}
+<textarea class='code code-exercise'>@(@Model.LatestAcceptedSolution ?? slide.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 <script>
 	function cleanUserCode() {
 		var $secretCodeExercise = $('#secretCodeExercise');
@@ -19,8 +12,7 @@ else
 </script>
 <div class="solution-control btn-group ctrl-group">
 	<button type="button" class="run-solution-button btn btn-primary no-rounds"
-			data-url="@Url.Action("RunSolution", "Exercise", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">
-		RUN
+			data-url="@Url.Action("RunSolution", "Exercise", new {courseId = Model.CourseId, slideIndex = Model.Slide.Index})">		RUN
 	</button>
 
 	<button type="button" class="btn btn-default reset-btn" onclick="cleanUserCode()">
@@ -28,7 +20,7 @@ else
 	</button>
 
 	<button id="GetHintButton" type="button" class="btn btn-default hints-btn no-rounds"
-			onclick="showHintForUser('@Model.Course.Id','@Model.SlideIndex')"
+			onclick="showHintForUser('@Model.CourseId','@Model.Slide.Index')"
 			data-url="@Url.Action("UseHint", "Hint")">
 		GET HINT
 	</button>
@@ -40,7 +32,6 @@ else
 		<pre class="no-rounds"><code class="actual-output-content"></code></pre>
 	</div>
 	<div class="diff-table"></div>
-</div>
-<div class="panel-group ctrl-group" id="hints-accordion">
+</div><div class="panel-group ctrl-group" id="hints-accordion">
 	<div id="hints-place"></div>
 </div>

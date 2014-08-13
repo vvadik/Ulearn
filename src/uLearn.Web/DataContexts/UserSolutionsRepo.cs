@@ -97,16 +97,14 @@ namespace uLearn.Web.DataContexts
 			return db.UserSolutions.Any(x => x.SlideId == slideId && x.CourseId == courseId && x.UserId == userId && x.IsRightAnswer);
 		}
 
-		public string GetLatestAcceptedSolution(string courseId, string slideId, string userId)
+		public string FindLatestAcceptedSolution(string courseId, string slideId, string userId)
 		{
-			var timeNow = DateTime.Now;
 			var allUserSolutionOnThisTask = db.UserSolutions
 				.Where(x => x.SlideId == slideId && x.CourseId == courseId && x.UserId == userId && x.IsRightAnswer).ToList();
 			var answer = allUserSolutionOnThisTask
-				.OrderBy(x => timeNow.Subtract(x.Timestamp).TotalMilliseconds)
-				.First()
-				.Code;
-			return answer;
+				.OrderByDescending(x => x.Timestamp)
+				.FirstOrDefault();
+			return answer == null ? null : answer.Code;
 		}
 
 		public int GetAcceptedSolutionsCount(string slideId, string courseId)

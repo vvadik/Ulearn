@@ -1,12 +1,11 @@
 ﻿@using uLearn
-@using uLearn.Quizes
 @model CoursePageModel
 
 @{
-	ViewBag.Title = Model.Course.Title;
+	ViewBag.Title = Model.CourseTitle;
 }
-@Html.Partial("_TableOfContents", Model)
 
+@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
 
 <div class="slide-container">
 	<div class="container body-content">
@@ -32,7 +31,7 @@
 				@Html.Partial("_AskBar")
 			</div>
 			@Html.Partial("_RatesBar")
-			@Html.Partial("_SlideNavigation", Model)
+			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false })
 			<div id="WatchQuestions" data-url="@Url.Action("GetAllQuestions")">
 				<button class="all-questions" onclick="printAllQuestions('@Model.Slide.Info.UnitName')">Посмотреть все заданные вопросы по теме</button>
 			</div>
@@ -44,8 +43,7 @@
 		@if (Request.IsLocal)
 		{
 			<div class="modal-footer">
-				<a href="#" class="prepare-solution-button" data-url="@Url.Action("PrepareSolution", "Exercise", new {courseId = Model.Course.Id, slideIndex = Model.SlideIndex})">Log prepared solution</a>
-				<a href="#" onclick="toggleFakeRun()">Переключить в тестовый режим запуска</a>
+				<a href="#" class="prepare-solution-button" data-url="@Url.Action("PrepareSolution", "Exercise", new {courseId = Model.CourseId, slideIndex = Model.Slide.Index})">Log prepared solution</a>				<a href="#" onclick="toggleFakeRun()">Переключить в тестовый режим запуска</a>
 				<script>
 					function toggleFakeRun() {
 						var $btn = $(".run-solution-button");
@@ -67,8 +65,7 @@
 	</script>
 	@if (Model.Slide is ExerciseSlide)
 	{
-		<script> getHints("@Model.Course.Id", "@Model.SlideIndex"); </script>
-	}
+		<script> getHints("@Model.CourseId", "@Model.Slide.Index"); </script>	}
 
 	@{
 		var a = Model.PassedQuiz.Contains(Model.Slide.Id);

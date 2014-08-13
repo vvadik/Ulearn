@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.Security;
-using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
-using NUnit.Framework;
-using uLearn;
 using uLearn.Web.DataContexts;
 using System.Web.Mvc;
 using uLearn.Web.Models;
-using uLearn.Web.Ideone;
 
 namespace uLearn.Web.Controllers
 {
@@ -23,7 +15,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
-		private readonly UserQuizzesRepo userQuizzessRepo = new UserQuizzesRepo();
+		private readonly UserQuizzesRepo userQuizzessRepo = new UserQuizzesRepo(); //TODO use in statistics
 
 
 		public AnalyticsController() : this(CourseManager.AllCourses)
@@ -36,21 +28,20 @@ namespace uLearn.Web.Controllers
 		}
 
 		[Authorize]
-		public ActionResult TotalStatistics(string courseId, int slideIndex)
+		public ActionResult TotalStatistics(string courseId)
 		{
-			var model = CreateTotalStatistics(courseId, CreateCoursePageModel(courseId, slideIndex));
+			var model = CreateTotalStatistics(courseId);
 			return View(model);
 		}
 
-		private AnalyticsTablePageModel CreateTotalStatistics(string courseId, CoursePageModel coursePageModel)
+		private AnalyticsTablePageModel CreateTotalStatistics(string courseId)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var tableInfo = CreateTotalStatisticsInfo(course);
 			var model = new AnalyticsTablePageModel
 			{
-				Course = course, 
 				TableInfo = tableInfo, 
-				CoursePageModel = coursePageModel
+				CourseId = courseId
 			};
 			return model;
 		}
@@ -63,7 +54,7 @@ namespace uLearn.Web.Controllers
 				var exerciseSlide = (slide as ExerciseSlide);
 				var isExercise = exerciseSlide != null;
 				var hintsCountOnSlide = isExercise ? exerciseSlide.HintsHtml.Count() : 0;
-				tableInfo.Add(slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
+				tableInfo.Add(slide.Index + ". " + slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
 				{
 					Rates = slideRateRepo.GetRates(slide.Id, course.Id),
 					VisitersCount = visitersRepo.GetVisitersCount(slide.Id, course.Id),
@@ -76,38 +67,19 @@ namespace uLearn.Web.Controllers
 			return tableInfo;
 		}
 
-		private CoursePageModel CreateCoursePageModel(string courseId, int slideIndex)
-		{
-			Course course = courseManager.GetCourse(courseId);
-			var model = new CoursePageModel
-			{
-				Course = course,
-				SlideIndex = slideIndex,
-				Slide = course.Slides[slideIndex],
-				NextSlideIndex = slideIndex + 1,
-				PrevSlideIndex = slideIndex - 1,
-				IsPassedTask = false,
-				LatestAcceptedSolution = null,
-				SolvedSlide = userSolutionsRepo.GetIdOfPassedSlides(course.Id, User.Identity.GetUserId()),
-				VisitedSlide = visitersRepo.GetIdOfVisitedSlides(course.Id, User.Identity.GetUserId()),
-				PassedQuiz = userQuizzessRepo.GetIdOfQuizPassedSlides(courseId, User.Identity.GetUserId())
-			};
-			return model;
-		}
-
 		[Authorize]
-		public ActionResult UsersStatistics(string courseId, int slideIndex)
+		public ActionResult UsersStatistics(string courseId)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var model = CreateUsersStatisticsModel(course, CreateCoursePageModel(courseId, slideIndex));
+			var model = CreateUsersStatisticsModel(course);
 			return View(model);
 		}
 
-		private UsersStatsPageModel CreateUsersStatisticsModel(Course course, CoursePageModel coursePageModel)
+		private UsersStatsPageModel CreateUsersStatisticsModel(Course course)
 		{
 			return new UsersStatsPageModel
 			{
-				CoursePageModel = coursePageModel,
+				CourseId = course.Id,
 				UserStats = CreateUserStats(course),
 				UnitNamesInOrdered = course.Slides.GroupBy(x => x.Info.UnitName).Select(x => x.Key).ToList()
 			};
@@ -177,20 +149,17 @@ namespace uLearn.Web.Controllers
 		}
 
 		[Authorize]
-		public ActionResult PersonalStatistics(string courseId, string slideIndex)
+		public ActionResult PersonalStatistics(string courseId)
 		{
-			int slideIndexInt;
-			int.TryParse(slideIndex, out slideIndexInt);
-			var coursePageModel = CreateCoursePageModel(courseId, slideIndexInt);
 			var course = courseManager.GetCourse(courseId);
-			return View(CreatePersonalStaticticsModel(coursePageModel, course));
+			return View(CreatePersonalStaticticsModel(course));
 		}
 
-		private PersonalStatisticPageModel CreatePersonalStaticticsModel(CoursePageModel coursePageModel, Course course)
+		private PersonalStatisticPageModel CreatePersonalStaticticsModel(Course course)
 		{
 			return new PersonalStatisticPageModel
 			{
-				CoursePageModel = coursePageModel,
+				CourseId = course.Id,
 				PersonalStatistics =
 					course.Slides
 						.Select((slide, slideIndex) => new PersonalStatisticsInSlide
