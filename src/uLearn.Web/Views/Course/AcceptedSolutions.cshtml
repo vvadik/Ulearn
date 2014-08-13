@@ -3,7 +3,8 @@
 @{
 	ViewBag.Title = Model.CoursePageModel.Course.Title;
 }
-@Html.Partial("_TableOfContents", Model.CoursePageModel)
+@Html.Action("RenderTOC", "Toc", new { courseId = Model.CoursePageModel.Course.Id })
+
 <div class="slide-container">
 	<div class="container body-content">
 		<div class="row">

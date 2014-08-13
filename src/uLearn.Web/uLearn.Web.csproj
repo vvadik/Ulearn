@@ -195,6 +195,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\AnalyticsController.cs" />
+    <Compile Include="Controllers\TocController.cs" />
     <Compile Include="DataContexts\SlideHintRepo.cs" />
     <Compile Include="DataContexts\SlideRateRepo.cs" />
     <Compile Include="DataContexts\UserQuestionsRepo.cs" />
@@ -688,7 +689,6 @@
     <Content Include="Views\Course\Slide.cshtml" />
     <Content Include="Views\Course\_ExerciseHints.cshtml" />
     <Content Include="Views\Course\_SlideNavigation.cshtml" />
-    <Content Include="Views\Shared\_TableOfContents.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
     <Content Include="Views\Course\_AskBar.cshtml" />
     <Content Include="Views\Analytics\TotalStatistics.cshtml" />
@@ -705,6 +705,7 @@
     <Content Include="Views\Course\_ChoiceBlock.cshtml" />
     <Content Include="Views\Course\_FillInBlock.cshtml" />
     <Content Include="Views\Course\_TrueFalseBlock.cshtml" />
+    <Content Include="Views\Toc\RenderTOC.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

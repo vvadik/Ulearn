@@ -9,6 +9,7 @@ namespace uLearn
 		public readonly SlideBlock[] Blocks;
 		public readonly SlideInfo Info;
 		public readonly string Id;
+		public virtual bool ShouldBeSolved { get { return false; } }
 
 
 		public Slide(IEnumerable<SlideBlock> blocks, SlideInfo info, string title, string id)

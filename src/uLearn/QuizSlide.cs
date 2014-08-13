@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using uLearn.Quizes;
 
 namespace uLearn
@@ -14,6 +11,8 @@ namespace uLearn
 		{
 			Quiz = quiz;
 		}
+
+		public override bool ShouldBeSolved { get { return true; } }
 
 		public Quiz Quiz { get; set; }
 

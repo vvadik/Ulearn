@@ -1,0 +1,50 @@
+﻿@using uLearn
+@model TocModel
+ 
+<ul class="side-bar units-list navbar-collapse collapse nav navbar-nav container">
+	@{
+		int iUnit = 0;
+		foreach (var unit in Model.Units)
+		{
+			var collapseOption = unit == Model.CurrentUnit ? "collapse in" : "collapse";
+			<li style="width:100%" class="units-list-item">
+				<a data-toggle="collapse" href=@("#N" + iUnit) class="units-list-item-text">
+					@unit.Title
+				</a>
+				<ul id=@("N" + iUnit) class="slides-list @collapseOption">
+					@foreach (var slide in unit.Slides)
+					{
+						var url = Url.Action("Slide", "Course", new { courseId = Model.CourseId, slideIndex = slide.Info.Index });
+
+						<i class="@GetIconClass(slide) navbar-label" title="@GetTitle(slide)"></i>
+						<li class="slide-list-item @(slide == Model.CurrentSlide ? "selected" : "") " onclick="window.location.href = '@url'">@slide.Title</li>
+					}
+				</ul>
+			</li>
+			iUnit++;
+		}
+		if (Request.IsLocal)
+		{
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Total statistics", "TotalStatistics", "Analytics", new { courseId = Model.CourseId, slideIndex = 0 }, null)</li>
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Users statistics", "UsersStatistics", "Analytics", new { courseId = Model.CourseId, slideIndex = 0 }, null)</li>
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Personal statistics", "PersonalStatistics", "Analytics", new { courseId = Model.CourseId, slideIndex = 0 }, null)</li>
+		}
+	}
+</ul>
+
+@helper GetIconClass(Slide slide)
+{
+	var isVisited = Model.VisitedSlideIds.Contains(slide.Id);
+	var isComplete = !slide.ShouldBeSolved || Model.SolvedSlideIds.Contains(slide.Id);
+	var progressClass = isComplete ? "navbar-label-success"
+		: (isVisited ? "navbar-label-danger" : "navbar-label-default");
+	string typeClass = slide is QuizSlide ? "glyphicon-pushpin"
+		: slide is ExerciseSlide ? (isComplete ? "glyphicon-check" : "glyphicon-edit")
+			: (isVisited ? "glyphicon-ok" : "");
+	@(progressClass + " glyphicon " + typeClass)
+}
+
+@helper GetTitle(Slide slide)
+{
+	@(slide is ExerciseSlide ? "Задача" : slide is QuizSlide ? "Тест" : "Теория")
+}

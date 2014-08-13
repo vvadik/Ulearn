@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using NUnit.Framework;
+﻿using System.Collections.Generic;
 
 namespace uLearn
 {
@@ -21,5 +19,21 @@ namespace uLearn
 		public HashSet<string> PassedQuiz { get; set; }
 		public Dictionary<string, List<string>> AnswersToQuizes { get; set; }
 		public bool IsSlideWithAcceptedSolutions { get; set; }
+	}
+
+	public class TocModel
+	{
+		public string CourseId;
+		public CourseUnitModel[] Units;
+		public CourseUnitModel CurrentUnit;
+		public Slide CurrentSlide;
+		public HashSet<string> VisitedSlideIds { get; set; }
+		public HashSet<string> SolvedSlideIds { get; set; }
+	}
+
+	public class CourseUnitModel
+	{
+		public string Title;
+		public Slide[] Slides;
 	}
 }

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace uLearn
+﻿namespace uLearn
 {
 	public class PersonalStatisticPageModel
 	{
-		public CoursePageModel CoursePageModel;
+		public string CourseId;
 		public PersonalStatisticsInSlide[] PersonalStatistics;
 	}
 

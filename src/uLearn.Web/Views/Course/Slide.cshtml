@@ -1,12 +1,10 @@
 ﻿@using uLearn
-@using uLearn.Quizes
 @model CoursePageModel
 
 @{
 	ViewBag.Title = Model.Course.Title;
 }
-@Html.Partial("_TableOfContents", Model)
-
+@Html.Action("RenderTOC", "Toc", new { courseId = Model.Course.Id, slideIndex = Model.SlideIndex })
 
 <div class="slide-container">
 	<div class="container body-content">

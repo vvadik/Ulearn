@@ -55,7 +55,7 @@ namespace uLearn.Web.Models
 				.ToDictionary(inc => inc.Filename, inc => inc.GetContent().AsUtf8());
 			var slides = resourceFiles
 				.Where(IsSlide)
-				.Select(f => LoadSlide(f, resourceFiles, name => includes[name]))
+				.Select((f, index) => LoadSlide(index, f, resourceFiles, name => includes[name]))
 				.ToArray();
 			var slidesWithRepeatedGuide =
 				slides.GroupBy(x => x.Id).Where(x => x.Count() != 1).Select(x => x.Select(y => y.Info.CourseName + ": " + y.Title)).ToList();
@@ -81,13 +81,13 @@ namespace uLearn.Web.Models
 			return !x.Filename.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) && !x.Filename.Contains("._");
 		}
 
-		private static Slide LoadSlide(ResourceFile slideFile, IList<ResourceFile> resourceFiles, Func<string, string> getInclude)
+		private static Slide LoadSlide(int index, ResourceFile slideFile, IList<ResourceFile> resourceFiles, Func<string, string> getInclude)
 		{
 			try
 			{
 				var sourceCode = Encoding.UTF8.GetString(slideFile.GetContent());
 				var prelude = GetExercisePrelude(slideFile, resourceFiles); 
-				var info = GetInfoForSlide(slideFile, resourceFiles);
+				var info = GetInfoForSlide(slideFile, resourceFiles, index);
 				return slideFile.Filename.EndsWith(".xml") 
 					? LoadQuiz(slideFile, info) 
 					: SlideParser.ParseCode(sourceCode, info, prelude, getInclude);
@@ -146,13 +146,14 @@ namespace uLearn.Web.Models
 			return Encoding.UTF8.GetString(all.Single(x => x.FullName.EndsWith(detailedPath[detailedPath.Length - 3] + ".Prelude.txt")).GetContent());
 		}
 
-		private static SlideInfo GetInfoForSlide(ResourceFile file, IList<ResourceFile> all)
+		private static SlideInfo GetInfoForSlide(ResourceFile file, IList<ResourceFile> all, int index)
 		{
 			var detailedPath = file.FullName.Split('.').ToArray();
 			return new SlideInfo(
 				fileName: detailedPath[detailedPath.Length - 2] + "." + detailedPath.Last(),
 				courseName: GetTitle(all, detailedPath, 3),
-				unitName: GetTitle(all, detailedPath, 2)
+				unitName: GetTitle(all, detailedPath, 2),
+				index: index
 				);
 		}
 
