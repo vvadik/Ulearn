@@ -2,7 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slidess
 {
-	[Slide("Логические выражения и сравнения", "{C56C7CDE-64BD-4023-9D6D-6328E3302C00}")]
+	[Slide("Сравнение и логический тип 2", "{C56C7CDE-64BD-4023-9D6D-6328E3302C00}")]
 	class S01_BooleanVariablesAndComparison
 	{
 		/*

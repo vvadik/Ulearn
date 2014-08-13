@@ -152,24 +152,6 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<string> AddHint(string courseId, string slideId, int hintId)
-		{
-			var userId = User.Identity.GetUserId();
-			await slideHintRepo.AddHint(userId, hintId, courseId, slideId);
-			return "success";
-		}
-
-		[HttpPost]
-		[Authorize]
-		public string GetHint(string courseId, string slideId)
-		{
-			var userId = User.Identity.GetUserId();
-			var answer = slideHintRepo.GetHint(userId, courseId, slideId);
-			return answer;
-		}
-
-		[HttpPost]
-		[Authorize]
 		public string GetAllQuestions(string courseName)
 		{
 			var questions = userQuestionsRepo.GetAllQuestions(courseName);
@@ -362,11 +344,6 @@ namespace uLearn.Web.Controllers
 					QuizType = typeof(FillInBlock)
 				}
 			};
-		}
-
-		public async Task<string> LikeHint(string courseId, string slideId, int hintId)
-		{
-			return await slideHintRepo.LikeHint(courseId, slideId, hintId, User.Identity.GetUserId());
 		}
 	}
 

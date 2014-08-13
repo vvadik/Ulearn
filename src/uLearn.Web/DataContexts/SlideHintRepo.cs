@@ -35,12 +35,9 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public string GetHint(string userId, string courseId, string slideId)
+		public IEnumerable<int> GetUsedHintId(string userId, string courseId, string slideId)
 		{
-			var answer = db.Hints.Where(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId).ToList();
-			if (answer.Count == 0)
-				return null;
-			return string.Join(" ", answer.Select(x => x.HintId).ToList());
+			return db.Hints.Where(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId).Select(x => x.HintId);
 		}
 
 		public int GetHintsCount(string slideId, string courseId)

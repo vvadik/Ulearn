@@ -1,22 +1,24 @@
 ﻿@model uLearn.CoursePageModel
 <div class="panel-group ctrl-group" id="hints-accordion">
 	@{ var slide = (uLearn.ExerciseSlide)Model.Slide;}
-	<div id="hintsStore" data-url="@Url.Action("GetHint")"></div>
+	<div id="hintsStore" data-url="@Url.Action("GetHint", "Hint")"></div>
 	@for (int index = 0; index < slide.HintsHtml.Length; index++)
 	{
 		var hintHtml = slide.HintsHtml[index];
 		var id = "hint" + index;
-		<div id="@id" data-url="@Url.Action("AddHint")" style="display:none">
-			@if (index == 0)
-			{
+		<div id="@id" data-url="@Url.Action("UseHint", "Hint")" style="display:none">
+		@if (index == 0)
+		{
 				<h4>Подсказки:</h4>
-			}
-			<button id="@(index+"likeHint")"
-					class="like-left-location btn btn-xs like-button @(slide.LikedHints.Contains(index) ? "btn-primary" : "btn-default")" 
-					data-url="@Url.Action("LikeHint")"
-					onclick="likeHint('@Model.Course.Id', '@Model.Slide.Id', '@index')"
-					title="Подсказка помогла!"><i class="glyphicon glyphicon-heart"></i></button>
-				@Html.Raw(hintHtml)
+		}
+		<button id="@(index + "likeHint")"
+			class="like-left-location btn btn-xs like-button @(slide.LikedHints.Contains(index) ? "btn-primary" : "btn-default")"
+			data-url="@Url.Action("LikeHint", "Hint")"
+			onclick="likeHint('@Model.Course.Id', '@Model.Slide.Id', '@index')"
+			title="Подсказка помогла!">
+			<i class="glyphicon glyphicon-heart"></i>
+		</button>
+		@Html.Raw(hintHtml)
 		</div>
 	}
 	<div id="currentHint" style="display:none">-1</div>
