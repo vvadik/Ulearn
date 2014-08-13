@@ -258,6 +258,10 @@ a.nav-arrow:hover {
     float: right;
 }
 
+.table-header {
+    color: #428bca;
+}
+
 table.diff tbody th {
     padding: 0 3px 0 0;
     text-align: right;
@@ -345,10 +349,6 @@ table.diff tbody th {
     margin-left: 0 !important;
 }
 
-.quiz {
-    
-}
-
 .wrong-quiz {
     color: lightcoral;
 }
@@ -356,6 +356,45 @@ table.diff tbody th {
 .right-quiz {
     color: darkseagreen;
 }
+
+.not-understand-btn {
+    width: 33%;
+}
+
+.understand-btn {
+    width: 33%;
+}
+
+.trivial-btn {
+    width: 34%;
+    float: right !important;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.half-width {
+    width: 50%;
+}
+
+.quiz-submit-btn {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.no-display {
+    display: none;
+}
+
+.block-display {
+    display: block;
+}
+
+.quiz {
+    
+}
+
 
 .true {
     

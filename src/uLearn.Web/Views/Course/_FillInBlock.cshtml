@@ -10,7 +10,7 @@
 	{
 		value = Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault();
 		quizRes = Model.CourseModel.AnswersToQuizes[quizBlock.Id][1] == "False" ? "wrong-quiz" : "right-quiz";
-		quizResSample = Model.CourseModel.AnswersToQuizes[quizBlock.Id][1] == "False" ? "block" : "none";
+		quizResSample = Model.CourseModel.AnswersToQuizes[quizBlock.Id][1] == "False" ? "block-display" : "no-display";
 	}
 	var fillIn = quizBlock as FillInBlock;
 	var sample = fillIn.Sample;
@@ -19,7 +19,7 @@
 			<input class="@quizRes" value="@value" id='@(quizBlock.Id + "quizBlock")'>
 		</label>
 	</div>
-	<i style="display:@quizResSample" id='@(quizBlock.Id + "_" + "example" + "_quizItem")'>
+	<i class="@quizResSample" id='@(quizBlock.Id + "_" + "example" + "_quizItem")'>
 		Пример правильного варианта ответа: @sample
 	</i>
 }

@@ -36,7 +36,7 @@
 							        var isNeedDrowHintsInfo = (info.Value.IsExercise && info.Value.TotalHintCount != 0);
 							        var url = Url.Action("Slide", "Course", new {courseId = Model.CoursePageModel.Course.Id, slideIndex = counter}, null);
 						        }
-								<td class="slide-list-item" data-sort-value=@(counter + 1000) onclick="window.location.href='@url'"><h6 style="color: #428bca">@info.Key</h6></td>
+								<td class="slide-list-item" data-sort-value=@(counter + 1000) onclick="window.location.href='@url'"><h6 class="table-header">@info.Key</h6></td>
 						        <td>@info.Value.VisitersCount</td>
 							    <td data-sort-value=@(info.Value.IsExercise ? info.Value.SolversCount+1000 : 0)>
 								    @(info.Value.IsExercise ? info.Value.SolversCount.ToString(CultureInfo.InvariantCulture) : "")

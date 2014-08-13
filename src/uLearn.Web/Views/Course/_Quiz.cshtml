@@ -40,8 +40,8 @@
 		    @Html.Partial("_TrueFalseBlock", quizModel)
 		}
 	}
-    <div style="display:none;" id="quizAns" data-url="@Url.Action("GetRightAnswersToQuiz")">none</div>
+    <div class="no-display" id="quizAns" data-url="@Url.Action("GetRightAnswersToQuiz")">none</div>
 	<div id="quizSub" data-url='@Url.Action("SubmitQuiz")'>
-		<button style="margin-top:10px; margin-bottom:5px;" class="btn btn-default" onclick="submitQuiz('@Model.Course.Id','@Model.SlideIndex','@Model.AnswersToQuizes.Count')">Submit my result</button>
+	    <button class="btn btn-default quiz-submit-btn" onclick="submitQuiz('@Model.Course.Id','@Model.SlideIndex','@Model.AnswersToQuizes.Count')">Submit my result</button>
 	</div>
 }

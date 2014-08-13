@@ -6,7 +6,7 @@
 	{
 		var hintHtml = slide.HintsHtml[index];
 		var id = "hint" + index;
-		<div id="@id" data-url="@Url.Action("AddHint")" style="display:none">
+	    <div id="@id" data-url="@Url.Action("AddHint")" class="no-display">
 			@if (index == 0)
 			{
 				<h4>Подсказки:</h4>
@@ -19,5 +19,5 @@
 				@Html.Raw(hintHtml)
 		</div>
 	}
-	<div id="currentHint" style="display:none">-1</div>
+	<div id="currentHint" class="no-display">-1</div>
 </div>
