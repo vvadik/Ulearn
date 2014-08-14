@@ -26,7 +26,7 @@ namespace uLearn
 			get { return GetRightAnswerToQuiz(); }
 		}
 
-		private string GetRightAnswerToQuiz()
+		private string  GetRightAnswerToQuiz()
 		{
 			var rightAnswersStr = new StringBuilder();
 			foreach (var quizBlock in Quiz.Blocks)

@@ -7,7 +7,7 @@
 	$.ajax(
 	{
 		type: "POST",
-		url: $("#ratesBar").data("url"),
+		url: $("#ApplyRate").data("url"),
 		data: { rate: rate }
 	}).success(function (ans) {
 		if (ans == "success") {

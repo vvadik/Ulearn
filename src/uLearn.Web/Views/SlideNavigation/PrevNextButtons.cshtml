@@ -6,11 +6,11 @@
 	 data-isaccepted="@((Model.IsPassedTask && !Model.OnSolutionsSlide) ? "true" : "")">
 	<a class="btn btn-default no-rounds ctrl-group half-width"
 	   id="prev_slide_button"
-	   href="@Url.Action("Slide", "Course", new {courseId = Model.CourseId, slideIndex = Model.PrevSlideIndex})"><i class="glyphicon glyphicon-chevron-left"></i></a>
+	   href="@Url.Action("Slide", "Course", new {courseId = Model.CourseId, slideIndex = Model.PrevSlideIndex})">Назад</a>
 	<a class="btn btn-default block-next no-rounds ctrl-group half-width"
 	   id="next_solutions_button"
-	   href="@Url.Action("AcceptedSolutions", "Course", new {courseId = Model.CourseId, slideIndex = Model.SlideIndex})"><i class="glyphicon glyphicon-chevron-right"></i></a>
+	   href="@Url.Action("AcceptedSolutions", "Course", new {courseId = Model.CourseId, slideIndex = Model.SlideIndex})">Далее</a>
 	<a class="btn btn-default block-next no-rounds ctrl-group half-width"
 	   id="next_slide_button"
-	   href="@Url.Action("Slide", "Course", new {courseId = Model.CourseId, slideIndex = Model.NextSlideIndex})"><i class="glyphicon glyphicon-chevron-right"></i></a>
+	   href="@Url.Action("Slide", "Course", new {courseId = Model.CourseId, slideIndex = Model.NextSlideIndex})">Далее</a>
 </div>

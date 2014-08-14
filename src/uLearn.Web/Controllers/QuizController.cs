@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using Newtonsoft.Json;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Ideone;
@@ -29,6 +30,33 @@ namespace uLearn.Web.Controllers
 			this.courseManager = courseManager;
 		}
 
+		internal class QuizAnswer
+		{
+			public string QuizType;
+			public string QuizId;
+			public string ItemId;
+			public string Text;
+
+			public QuizAnswer(string type, string quizId, string itemId, string text)
+			{
+				QuizType = type;
+				QuizId = quizId;
+				ItemId = itemId;
+				Text = text;
+			}
+		}
+
+
+		internal class QuizInfoForDb
+		{
+			public string QuizId;
+			public string ItemId;
+			public string Text;
+			public bool IsRightAnswer;
+			public Type QuizType;
+		}
+
+
 		[HttpPost]
 		[Authorize]
 		public async Task<string> SubmitQuiz(string courseId, string slideIndex, string answer)
@@ -38,12 +66,12 @@ namespace uLearn.Web.Controllers
 			if (userQuizzesRepo.IsQuizSlidePassed(courseId, User.Identity.GetUserId(), course.Slides[intSlideIndex].Id))
 				return "already answered";
 			var time = DateTime.Now;
-			var answers = answer.Split('*').Select(x => x.Split('_').Take(2).ToList()).GroupBy(x => x[0]);
-			var quizBlockWithTaskCount = (course.Slides[intSlideIndex] as QuizSlide).Quiz.Blocks.Count(x => x is FillInBlock || x is IsTrueBlock || x is ChoiceBlock);
+			var quizzes = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.QuizId);
+			var quizBlockWithTaskCount = ((QuizSlide) course.Slides[intSlideIndex]).Quiz.Blocks.Count(x => x is FillInBlock || x is IsTrueBlock || x is ChoiceBlock);
 			var incorrectQuizzes = new List<string>();
 			var fillInBlockType = typeof(FillInBlock);
 			var tmpFolder = new List<QuizInfoForDb>();
-			foreach (var ans in answers)
+			foreach (var ans in quizzes)
 			{
 				var quizInfo = GetQuizInfo(course, intSlideIndex, ans);
 				foreach (var quizInfoForDb in quizInfo)
@@ -67,25 +95,24 @@ namespace uLearn.Web.Controllers
 		{
 			var course = courseManager.GetCourse(courseId);
 			var quizSlide = course.Slides[slideIndex];
-			var e = (quizSlide as QuizSlide).RightAnswersToQuiz;
+			var e = ((QuizSlide) quizSlide).RightAnswersToQuiz;
 			return e;
 		}
 
-		private IEnumerable<QuizInfoForDb> GetQuizInfo(Course course, int slideIndex, IGrouping<string, List<string>> answer)
+		private IEnumerable<QuizInfoForDb> GetQuizInfo(Course course, int slideIndex, IGrouping<string, QuizAnswer> answer)
 		{
 			var slide = course.Slides[slideIndex] as QuizSlide;
 			if (slide == null)
 				throw new Exception("Error in func 'GetSlideUsingId' or in 'QuizSlideId'");
 			var block = slide.GetBlockById(answer.Key);
-			var data = answer.ToList();
 			if (block is FillInBlock)
-				return CreateQuizInfoForDb(block as FillInBlock, data);
+				return CreateQuizInfoForDb(block as FillInBlock, answer.First().Text);
 			if (block is ChoiceBlock)
-				return CreateQuizInfoForDb(block as ChoiceBlock, answer, data);
-			return CreateQuizInfoForDb(block as IsTrueBlock, data);
+				return CreateQuizInfoForDb(block as ChoiceBlock, answer);
+			return CreateQuizInfoForDb(block as IsTrueBlock, answer);
 		}
 
-		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(IsTrueBlock isTrueBlock, IEnumerable<List<string>> data)
+		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(IsTrueBlock isTrueBlock, IGrouping<string, QuizAnswer> data)
 		{
 			return new List<QuizInfoForDb>
 			{
@@ -93,14 +120,14 @@ namespace uLearn.Web.Controllers
 				{
 					QuizId = isTrueBlock.Id,
 					ItemId = null,
-					IsRightAnswer = isTrueBlock.Answer.ToString() == data.First()[1],
-					Text = data.First()[1],
+					IsRightAnswer = isTrueBlock.Answer.ToString() == data.First().ItemId,
+					Text = data.First().ItemId,
 					QuizType = typeof(IsTrueBlock)
 				}
 			};
 		}
 
-		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(ChoiceBlock choiseBlock, IEnumerable<List<string>> answer, List<List<string>> data)
+		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(ChoiceBlock choiseBlock, IGrouping<string, QuizAnswer> data)
 		{
 			if (!choiseBlock.Multiple)
 				return new List<QuizInfoForDb>
@@ -108,18 +135,18 @@ namespace uLearn.Web.Controllers
 					new QuizInfoForDb
 					{
 						QuizId = choiseBlock.Id,
-						ItemId = data.First()[1],
-						IsRightAnswer = choiseBlock.Items.First(x => x.Id == data.First()[1]).IsCorrect,
+						ItemId = data.First().ItemId,
+						IsRightAnswer = choiseBlock.Items.First(x => x.Id == data.First().ItemId).IsCorrect,
 						Text = null,
 						QuizType = typeof (ChoiceBlock)
 					}
 				};
-			var ans = answer.ToList()
+			var ans = data.Select(x => x.ItemId).ToList()
 				.Select(x => new QuizInfoForDb
 				{
 					QuizId = choiseBlock.Id,
 					IsRightAnswer = false,
-					ItemId = x[1],
+					ItemId = x,
 					Text = null,
 					QuizType = typeof(ChoiceBlock)
 
@@ -133,7 +160,7 @@ namespace uLearn.Web.Controllers
 			return ans;
 		}
 
-		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(FillInBlock fillInBlock, IEnumerable<List<string>> data)
+		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(FillInBlock fillInBlock, string data)
 		{
 			return new List<QuizInfoForDb>
 			{
@@ -141,20 +168,11 @@ namespace uLearn.Web.Controllers
 				{
 					QuizId = fillInBlock.Id,
 					ItemId = null,
-					IsRightAnswer = fillInBlock.Regexes.Any(regex => Regex.IsMatch(data.First()[1], regex)),
-					Text = data.First()[1],
+					IsRightAnswer = fillInBlock.Regexes.Any(regex => Regex.IsMatch(data, regex)),
+					Text = data,
 					QuizType = typeof(FillInBlock)
 				}
 			};
 		}
-	}
-
-	public class QuizInfoForDb
-	{
-		public string QuizId;
-		public string ItemId;
-		public string Text;
-		public bool IsRightAnswer;
-		public Type QuizType;
 	}
 }

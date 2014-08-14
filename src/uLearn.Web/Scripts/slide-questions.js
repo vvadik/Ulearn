@@ -5,7 +5,7 @@ function sendQuestion(title, unitName) {
 	$.ajax(
 		{
 			type: "POST",
-			url: $("#Ask").data("url"),
+			url: $("#AddQuestion").data("url"),
 			data: {
 			    title: title, unitName:unitName, question:quest}
 		}).success(function (ans) {
@@ -22,7 +22,7 @@ function printAllQuestions(courseName) {
 	$.ajax(
 		{
 			type: "POST",
-			url: $("#WatchQuestions").data("url"),
+			url: $("#GetAllQuestions").data("url"),
 			data: {
 			    courseName:courseName}
 		}).success(function (ans) {

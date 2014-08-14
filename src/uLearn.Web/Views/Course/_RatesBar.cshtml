@@ -1,6 +1,6 @@
 ﻿@model uLearn.CoursePageModel
 <form id="ratings" class="rate-buttons ctrl-group full-width">
-	<div id="ratesBar" data-url="@Url.Action("ApplyRate", new{ courseId = Model.CourseId, slideId = Model.Slide.Id})"></div>
+	<div id="ApplyRate" data-url="@Url.Action("ApplyRate", new{ courseId = Model.CourseId, slideId = Model.Slide.Id})"></div>
 	<div class="btn-group rates-bar ctrl-group" data-toggle="buttons">
 		<label class="btn btn-default no-rounds ctrl-group not-understand-btn" onclick="handleRate('NotUnderstand')" data-hover-class="btn-danger">
 			<input id="notunderstand" type="radio" name="marks" value="notunderstand">

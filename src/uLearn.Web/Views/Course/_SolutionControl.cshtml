@@ -18,9 +18,10 @@
 	<button type="button" class="btn btn-default reset-btn" onclick="cleanUserCode()">
 		RESET
 	</button>
-
-	<button id="GetHintButton" type="button" class="btn btn-default hints-btn no-rounds"
-			onclick="showHintForUser('@Model.CourseId','@Model.Slide.Index')"
+	
+	@{ var e  = ((ExerciseSlide) Model.Slide).HintsHtml; }
+    <button id="GetHintButton" type="button" class="btn btn-default hints-btn no-rounds"
+			onclick="showHintForUser('@Model.CourseId','@Model.Slide.Index', '@e.Length')"
 			data-url="@Url.Action("UseHint", "Hint")">
 		GET HINT
 	</button>

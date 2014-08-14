@@ -1,4 +1,4 @@
-﻿function showHintForUser(courseId, slideIndex) {
+﻿function showHintForUser(courseId, slideIndex, hintsCount) {
 	$.ajax({
 		type: "POST",
 		url: $("#GetHintButton").data("url"),
@@ -12,35 +12,54 @@
 			$("#GetHintButton").notify("Подсказок больше нет :(", "noHints");
 			return;
 		} else {
-			$('#hints-place').html(ans);
-			var container = $('body'),
-			scrollTo = $('#hints-place');
-			container.animate({ scrollTop: scrollTo.offset().top - container.offset().top + container.scrollTop() - 300 });
+		    $('#hints-place').html(ans);
+		    var container = $('body'),
+		    scrollTo = $('#hints-place');
+		    container.animate({ scrollTop: scrollTo.offset().top - container.offset().top + container.scrollTop() - 200});
 		}
+	    buttonNameChange(hintsCount);
 	}).fail(function (req) {
     	console.log(req.responseText);
     }).always(function (ans) {
     });
 }
 
-function getHints(courseId, slideIndex) {
-	$.ajax({
-		type: "POST",
-		url: $("#GetHintButton").data("url"),
-		data: { courseId: courseId, slideIndex: slideIndex, isNeedNewHint: false }
-	}).success(function (ans) {
-		if (ans.Text == "Для слайда нет подсказок") {
-			return;
-		}
-		else if (ans.Text == "Подсказок больше нет") {
-			return;
-		} else {
-			$('#hints-place').html(ans);
-		}
-	}).fail(function (req) {
-		console.log(req.responseText);
-	}).always(function (ans) {
-	});
+function getHints(courseId, slideIndex, hintsCount) {
+    $.ajax({
+        type: "POST",
+        url: $("#GetHintButton").data("url"),
+        data: { courseId: courseId, slideIndex: slideIndex, isNeedNewHint: false }
+    }).success(function(ans) {
+        if (ans.Text == "Для слайда нет подсказок") {
+            $("#GetHintButton").text("NO HINTS");
+            $("#GetHintButton").attr('disabled', 'disabled');
+            return;
+        } else if (ans.Text == "Подсказок больше нет") {
+            $("#GetHintButton").text("NO MORE HINTS");
+            return;
+        } else {
+            $('#hints-place').html(ans);
+        }
+        buttonNameChange(hintsCount);
+    }).fail(function(req) {
+        console.log(req.responseText);
+    }).always(function(ans) {
+    });
+    
+}
+
+
+function buttonNameChange(hintsCount) {
+    var showedHintsCount = 0;
+    $(".like-button").each(function() {
+        showedHintsCount ++;
+    });
+    if (showedHintsCount < hintsCount)
+        $("#GetHintButton").text("GET HINT");
+    else {
+        $("#GetHintButton").text("NO MORE HINTS");
+        $("#GetHintButton").attr('disabled', 'disabled')
+    }
 }
 
 function likeHint(courseId, slideId, hintId) {
