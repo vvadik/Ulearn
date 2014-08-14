@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Slides\U01_Basics\S010-HelloWorldVideo.cs" />
+    <Compile Include="Slides\U01_Basics\S012-InformationSources.cs" />
     <Compile Include="Slides\U01_Basics\S011-FirstStep.cs" />
     <Compile Include="Slides\U01_Basics\S020-TypesVideo.cs" />
     <Compile Include="Slides\U01_Basics\S021-Types.cs" />
@@ -119,6 +120,10 @@
     <Content Include="Slides\U03_Cycles\Prelude.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>rd /S /Q $(SolutionDir)uLearn.Web\Courses\$(ProjectName)\
+xcopy /Y /E $(ProjectDir)Slides $(SolutionDir)uLearn.Web\Courses\$(ProjectName)\</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
