@@ -633,6 +633,7 @@
     <Content Include="Scripts\notify-custom.min.js" />
     <Content Include="Orphus\orphus.gif" />
     <Content Include="Orphus\orphus.js" />
+    <Content Include="Scripts\slide-popovers.js" />
     <Content Include="Scripts\slide-quiz.js" />
     <Content Include="Scripts\slide-hints.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -711,11 +712,15 @@
     <Content Include="Views\Analytics\PersonalStatistics.cshtml" />
     <Content Include="Views\Course\_SolutionControl.cshtml" />
     <Content Include="Views\Course\_Quiz.cshtml" />
+    <Content Include="Views\SlideNavigation\TableOfContents.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\CodeBlock.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\MdBlock.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\YoutubeBlock.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\HintWithLikeButton.cshtml" />
+    <Content Include="Views\Hint\UseHint.cshtml" />
     <Content Include="Views\Course\_ChoiceBlock.cshtml" />
     <Content Include="Views\Course\_FillInBlock.cshtml" />
     <Content Include="Views\Course\_TrueFalseBlock.cshtml" />
-    <Content Include="Views\SlideNavigation\TableOfContents.cshtml" />
-    <Content Include="Views\Course\_ExerciseHint.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Courses\" />

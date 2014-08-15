@@ -9,7 +9,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U02_Mistakes
 	[Slide("Отладка", "{B591027E-9E13-4125-8A4F-7A432FBCEA7D}")]
 	class S050_DebugVideo
 	{
-		//#video //www.youtube.com/embed/AzD_1S9UR2A?rel=0
+		//#video AzD_1S9UR2A
 
 		/*
 		Вот пример кода, который сгенерирует Null references exception

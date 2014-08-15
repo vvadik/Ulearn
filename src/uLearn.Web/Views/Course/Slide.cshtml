@@ -13,17 +13,7 @@
 			<div class='slide'>
 				<h1>@Model.Slide.Title</h1>
 				@Html.Partial("_Quiz", Model)
-				@foreach (SlideBlock block in Model.Slide.Blocks)
-				{
-					if (block.IsCode)
-					{
-						<textarea class='code code-sample'>@block.Text</textarea>
-					}
-					else
-					{
-						@Html.Raw(block.RenderedText)
-					}
-				}
+				@Html.DisplayFor(m => m.Slide.Blocks)
 				@if (Model.Slide is ExerciseSlide)
 				{
 					@Html.Partial("_SolutionControl", Model)

@@ -3,7 +3,7 @@
 	[Slide("Hello world", "{7FB8D0CC-B551-485B-8D0B-37993D1B4B08}")]
 	public class S01_HelloWorldVideo
 	{
-		//#video //www.youtube.com/embed/e1aRhKlpNG4?rel=0
+		//#video e1aRhKlpNG4
 
 		/*
 		## Краткие заметки по лекции

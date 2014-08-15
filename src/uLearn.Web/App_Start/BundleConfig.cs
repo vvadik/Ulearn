@@ -20,16 +20,8 @@ namespace uLearn.Web
 				"~/Scripts/modernizr-*"));
 
 			bundles.Add(new ScriptBundle("~/slide-js").Include(
-				"~/Scripts/slide-nav.js",
-				"~/Scripts/slide-editor.js",
-				"~/Scripts/slide-run.js",
-				"~/Scripts/slide-solutions-like.js",
-				"~/Scripts/slide-questions.js",
-				"~/Scripts/slide-stats.js",
-				"~/Scripts/slide-hints.js",
 				"~/Jsdifflib/jsdifflib.js",
-				"~/Scripts/slide-quiz.js",
-				"~/Scripts/slide-hints.js"
+				"~/Scripts/slide-*"
 				));
 
 			bundles.Add(new ScriptBundle("~/codemirror-js").Include(

@@ -6,7 +6,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	[Slide("Преобразования типов", "{17fd348e-db6a-4dac-9ef4-c8602931e915}")]
 	public class S030_ConversionVideo
 	{
-		//#video //www.youtube.com/embed/shO5iC4xTmI?rel=0
+		//#video shO5iC4xTmI
 
 		/*
 		## Заметки по лекции

@@ -108,26 +108,24 @@ namespace uLearn.CSharp
 
 		private void AddCodeBlock(MemberDeclarationSyntax node)
 		{
-			var codeBlock = (SlideBlock)CreateCodeBlock((dynamic)node);
-			SlideBlock lastBlock = Blocks.LastOrDefault();
-			if (lastBlock != null && lastBlock.IsCode)
-				Blocks[Blocks.Count - 1] = SlideBlock.FromCode(lastBlock.Text + "\r\n\r\n" + codeBlock.Text);
+			var code = (string)CreateCodeBlock((dynamic)node);
+			var lastBlock = Blocks.LastOrDefault() as CodeBlock;
+			if (lastBlock != null)
+				Blocks[Blocks.Count - 1] = new CodeBlock(lastBlock.Code + "\r\n\r\n" + code);
 			else
-				Blocks.Add(codeBlock);
+				Blocks.Add(new CodeBlock(code));
 		}
 
-		private SlideBlock CreateCodeBlock(MethodDeclarationSyntax node)
+		private string CreateCodeBlock(MethodDeclarationSyntax node)
 		{
-			var code = node.HasAttribute<ShowBodyOnSlideAttribute>()
+			return node.HasAttribute<ShowBodyOnSlideAttribute>()
 				? node.Body.Statements.ToFullString().RemoveCommonNesting()
 				: node.WithoutAttributes().ToPrettyString();
-			return SlideBlock.FromCode(code);
 		}
 
-		private SlideBlock CreateCodeBlock(MemberDeclarationSyntax node)
+		private string CreateCodeBlock(MemberDeclarationSyntax node)
 		{
-			string code = node.WithoutAttributes().ToPrettyString();
-			return SlideBlock.FromCode(code);
+			return node.WithoutAttributes().ToPrettyString();
 		}
 		
 		private static bool ShowOnSlide(MemberDeclarationSyntax node)
@@ -139,14 +137,12 @@ namespace uLearn.CSharp
 
 		private void EmbedCode(string filename)
 		{
-			Blocks.Add(SlideBlock.FromCode(getInclude(filename)));
+			Blocks.Add(new CodeBlock(getInclude(filename)));
 		}
 
-		private void EmbedVideo(string url)
+		private void EmbedVideo(string videoId)
 		{
-			Blocks.Add(SlideBlock.FromHtml(
-				string.Format(
-					"<iframe class='embedded-video' width='800' height='450' src='{0}' frameborder='0' allowfullscreen></iframe>", url)));
+			Blocks.Add(new YoutubeBlock(videoId));
 		}
 
 		public static SlideBlock ExtractMarkDownFromComment(SyntaxTrivia comment)
@@ -167,7 +163,7 @@ namespace uLearn.CSharp
 					sb.AppendLine();
 				}
 			}
-			return SlideBlock.FromMarkdown(sb.ToString());
+			return new MdBlock(sb.ToString());
 		}
 	}
 }

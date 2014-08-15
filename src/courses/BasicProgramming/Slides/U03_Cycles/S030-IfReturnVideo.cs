@@ -9,7 +9,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 	[Slide("Типичные ошибки ветвлений", "{45E4CE73-C9E2-44D9-A5EB-559F3214183B}")]
 	class S030_IfReturnVideo
 	{
-		//#video //www.youtube.com/embed/GwAnw5Xqjyk?rel=0
+		//#video GwAnw5Xqjyk
 
 		/*
 		## Заметки по лекции

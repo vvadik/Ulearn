@@ -1,67 +1,70 @@
-﻿namespace uLearn
+﻿using System;
+
+namespace uLearn
 {
-	public class SlideBlock
+	public abstract class SlideBlock
 	{
-		private SlideBlock(string text, bool isCode, bool alreadyRendered)
-		{
-			IsCode = isCode;
-			this.AlreadyRendered = alreadyRendered;
-			Text = text.TrimEnd();
-		}
+	}
 
-		public static SlideBlock FromCode(string code)
-		{
-			return new SlideBlock(code, true, true);
-		}
+	public class MdBlock : SlideBlock
+	{
+		public readonly string Markdown;
 
-		public static SlideBlock FromHtml(string html)
+		public MdBlock(string markdown)
 		{
-			return new SlideBlock(html, false, true);
-		}
-
-		public static SlideBlock FromMarkdown(string markdown)
-		{
-			return new SlideBlock(markdown, false, false);
-		}
-
-		protected bool Equals(SlideBlock other)
-		{
-			return IsCode.Equals(other.IsCode) && string.Equals(Text, other.Text);
-		}
-
-		public override bool Equals(object obj)
-		{
-			if (ReferenceEquals(null, obj)) return false;
-			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != this.GetType()) return false;
-			return Equals((SlideBlock) obj);
-		}
-
-		public override int GetHashCode()
-		{
-			unchecked
-			{
-				return (IsCode.GetHashCode()*397) ^ (Text != null ? Text.GetHashCode() : 0);
-			}
+			Markdown = markdown.TrimEnd();
 		}
 
 		public override string ToString()
 		{
-			return string.Format("IsCodeSample: {0}, Text: {1}", IsCode, Text);
+			return string.Format("Markdown {0}", Markdown);
+		}
+	}
+
+	public class CodeBlock : SlideBlock
+	{
+		public readonly string Code;
+
+		public CodeBlock(string code)
+		{
+			Code = code;
 		}
 
-		public readonly bool IsCode;
-		public readonly bool AlreadyRendered;
-		public readonly string Text;
-
-		public string RenderedText
+		public override string ToString()
 		{
-			get { return AlreadyRendered ? Text : Md.RenderMd(Text); }
+			return string.Format("Code {0}", Code);
+		}
+	}
+
+	public class YoutubeBlock : SlideBlock
+	{
+		public readonly string VideoId;
+
+		public YoutubeBlock(string videoId)
+		{
+			VideoId = videoId;
 		}
 
-		public SlideBlock WithAppendedText(string text)
+		public override string ToString()
 		{
-			return new SlideBlock(Text + "\n" + text, IsCode, AlreadyRendered);
+			return string.Format("Video {0}", VideoId);
+		}
+	}
+
+	public static class SlideBlockExtensions
+	{
+		public static bool IsCode(this SlideBlock block)
+		{
+			return block is CodeBlock;
+		}
+
+		public static string Text(this SlideBlock block)
+		{
+			var md = block as MdBlock;
+			if (md != null) return md.Markdown;
+			var code = block as CodeBlock;
+			if (code != null) return code.Code;
+			throw new Exception(block.ToString());
 		}
 	}
 }

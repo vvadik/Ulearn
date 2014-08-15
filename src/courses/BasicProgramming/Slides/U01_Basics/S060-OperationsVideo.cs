@@ -6,7 +6,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	[Slide("Арифметические операции и var", "{778bd3b0-243a-423d-a1c4-9230557979ff}")]
 	public class S06_OperationsVideo
 	{
-		//#video //www.youtube.com/embed/PIrgeWaneXo?rel=0
+		//#video PIrgeWaneXo
 
 		/*
 		## Заметки по лекции
