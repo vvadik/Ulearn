@@ -116,6 +116,7 @@ a.nav-arrow:hover {
     width: 100%;
     margin-top: 25px;
     word-wrap: break-word;
+    margin-bottom: 10px;
 }
 
 .run-verdict {
