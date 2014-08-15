@@ -12,15 +12,16 @@
 </script>
 <div class="solution-control btn-group ctrl-group">
 	<button type="button" class="run-solution-button btn btn-primary no-rounds"
-			data-url="@Url.Action("RunSolution", "Exercise", new {courseId = Model.CourseId, slideIndex = Model.Slide.Index})">		RUN
+			data-url="@Url.Action("RunSolution", "Exercise", new {courseId = Model.CourseId, slideIndex = Model.Slide.Index})">
+		RUN
 	</button>
 
 	<button type="button" class="btn btn-default reset-btn" onclick="cleanUserCode()">
 		RESET
 	</button>
-	
-	@{ var e  = ((ExerciseSlide) Model.Slide).HintsHtml; }
-    <button id="GetHintButton" type="button" class="btn btn-default hints-btn no-rounds"
+
+	@{ var e = ((ExerciseSlide)Model.Slide).HintsHtml; }
+	<button id="GetHintButton" type="button" class="btn btn-default hints-btn no-rounds"
 			onclick="showHintForUser('@Model.CourseId','@Model.Slide.Index', '@e.Length')"
 			data-url="@Url.Action("UseHint", "Hint")">
 		GET HINT
@@ -32,7 +33,8 @@
 		<div class="output-label">Вывод вашей программы:</div>
 		<pre class="no-rounds"><code class="actual-output-content"></code></pre>
 	</div>
-	<div class="diff-table"></div>
-</div><div class="panel-group ctrl-group" id="hints-accordion">
+	<div class="diff-table tablesorter"></div>
+</div>
+<div class="panel-group ctrl-group" id="hints-accordion">
 	<div id="hints-place"></div>
 </div>
