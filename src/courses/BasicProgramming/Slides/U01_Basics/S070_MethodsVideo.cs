@@ -3,7 +3,7 @@
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Методы", "{3a14a28f-c11d-45b3-b3a9-1a3fac676ee7}")]
-	public class S07_MethodsVideo
+	public class S070_MethodsVideo
 	{
 		//#video 2Rh3otEbeaU
 

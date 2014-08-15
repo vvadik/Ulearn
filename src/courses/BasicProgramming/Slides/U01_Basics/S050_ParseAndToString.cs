@@ -6,7 +6,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Преобразование строки в число", "{ACE76228-B605-43B8-AC8D-4C85033AC7DF}")]
-	public class S05_ParseAndToString
+	public class S050_ParseAndToString
 	{
 		/*
 		Вася написал код, прибавляющий к числу единичку, но он опять не работает :( 

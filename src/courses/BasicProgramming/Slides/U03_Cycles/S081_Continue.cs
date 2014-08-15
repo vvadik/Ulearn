@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Continue", "{BE2A0C11-20F5-4351-96F7-07D60FFE73CF}")]
-	class S08_Continue
+	class S081_Continue
 	{
 		/*
 		##Задача: Continue - На лугу, на лугу, на лугу пасутся ко...

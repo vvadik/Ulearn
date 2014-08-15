@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Ktulhu for", "{C65BE127-D5E6-46B6-9B5C-A6B1229461A4}")]
-	class S10_KtulhuFor
+	class S101_KtulhuFor
 	{
 		/*
 		Ктулху наступает, и только вы можете его остановить! Сможете ли вы сотворить заклинание,

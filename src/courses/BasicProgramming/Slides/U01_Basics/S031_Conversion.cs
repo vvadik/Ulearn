@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Преобразования типов 2", "{04D61C06-8A32-41A6-A47E-2AE2D095DEF3}")]
-	public class S03_Conversion
+	public class S031_Conversion
 	{
 		/*
 		Исправьте все ошибки преобразования типов.

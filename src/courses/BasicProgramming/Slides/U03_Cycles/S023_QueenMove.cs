@@ -4,8 +4,8 @@ using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Slide("Операторы If и Else 4", "{EB11DFB6-5629-4D13-819B-6411B9F93DF6}")]
-	class S03_IfOperator
+	[Slide("Ход ферзя", "{EB11DFB6-5629-4D13-819B-6411B9F93DF6}")]
+	class S023_QueenMove
 	{
 		/*
 		Вася решил научиться играть в шахматы. Сейчас он разучивает ферзя. Он решает такую задачу:

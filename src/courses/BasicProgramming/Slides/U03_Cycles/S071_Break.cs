@@ -5,7 +5,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Break", "{43E238F8-424F-40D5-95AF-CF1575EF630D}")]
-	class S07_Break
+	class S071_Break
 	{
 		/*
 		##Задача: Break

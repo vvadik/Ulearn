@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("For", "{67110A78-3932-4810-AF9F-F996799C3110}")]
-	class S09_For
+	class S091_For
 	{
 		/*
 		##Задача: For

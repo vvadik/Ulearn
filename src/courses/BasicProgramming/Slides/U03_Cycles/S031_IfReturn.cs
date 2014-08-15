@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("If return", "{A72B8529-FF6D-4C57-9DB7-19999AC4A3B2}")]
-	internal class S04_IfReturn
+	internal class S031_IfReturn
 	{
 		/*
 		##Задача: if return

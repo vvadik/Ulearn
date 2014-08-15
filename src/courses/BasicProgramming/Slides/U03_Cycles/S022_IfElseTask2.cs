@@ -7,7 +7,7 @@ using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 {
-	[Slide("Операторы If и Else 3", "{937C4E64-7144-4F52-A75D-4BDC95BBDE72}")]
+	[Slide("Среднее трех", "{937C4E64-7144-4F52-A75D-4BDC95BBDE72}")]
 	class S022_IfElseTask2
 	{
 		/*

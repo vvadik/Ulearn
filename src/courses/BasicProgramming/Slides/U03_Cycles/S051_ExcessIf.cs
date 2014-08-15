@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Лишний if", "{71BD06D8-3784-4C59-A62B-978D25E60E50}")]
-	class S05_ExcessIf
+	class S051_ExcessIf
 	{
 		/*
 		##Задача: Excess if

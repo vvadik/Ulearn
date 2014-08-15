@@ -50,29 +50,29 @@
     <Compile Include="Slides\U01_Basics\S020_TypesExercise.cs" />
     <Compile Include="Slides\U01_Basics\S030_ConversionVideo.cs" />
     <Compile Include="Slides\U01_Basics\S03_Conversion2.cs" />
-    <Compile Include="Slides\U01_Basics\S03_Conversion.cs" />
-    <Compile Include="Slides\U01_Basics\S04_StringsVideo.cs" />
+    <Compile Include="Slides\U01_Basics\S031_Conversion.cs" />
+    <Compile Include="Slides\U01_Basics\S040_StringsVideo.cs" />
     <Compile Include="Slides\U01_Basics\S071_Strings.cs" />
-    <Compile Include="Slides\U01_Basics\S05_ParseAndToString.cs" />
-    <Compile Include="Slides\U01_Basics\S06_OperationsVideo.cs" />
-    <Compile Include="Slides\U01_Basics\S06_Operations.cs" />
-    <Compile Include="Slides\U01_Basics\S08_LocalAndGlobalVarsVideo.cs" />
-    <Compile Include="Slides\U01_Basics\S07_MethodsVideo.cs" />
-    <Compile Include="Slides\U01_Basics\S07_Methods.cs" />
+    <Compile Include="Slides\U01_Basics\S050_ParseAndToString.cs" />
+    <Compile Include="Slides\U01_Basics\S060_OperationsVideo.cs" />
+    <Compile Include="Slides\U01_Basics\S061_Operations.cs" />
+    <Compile Include="Slides\U01_Basics\S080_LocalAndGlobalVarsVideo.cs" />
+    <Compile Include="Slides\U01_Basics\S070_MethodsVideo.cs" />
+    <Compile Include="Slides\U01_Basics\S071_Methods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Slides\U01_Basics\S081-Scope.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Compile Include="Slides\U01_Basics\S10_IntelliSense.cs" />
+    <Compile Include="Slides\U01_Basics\S100_FinalTask.cs" />
     <Compile Include="Slides\U01_Basics\S000_HelpSlide.cs" />
     <Compile Include="Slides\U01_Basics\_HelloWorld.cs" />
     <Content Include="Slides\U02_Mistakes\S011-MissedUsings.xml" />
-    <Compile Include="Slides\U02_Mistakes\Dry.cs" />
-    <Compile Include="Slides\U02_Mistakes\Experiments.cs" />
+    <Compile Include="Slides\U02_Mistakes\S075_Dry.cs" />
+    <Compile Include="Slides\U02_Mistakes\S060_Experiments.cs" />
     <Compile Include="Slides\U02_Mistakes\S010_CompilationMistakeVideo.cs" />
     <Compile Include="Slides\U02_Mistakes\S031_Typo.cs" />
     <Compile Include="Slides\U02_Mistakes\S040_RuntimeExceptionsVideo.cs" />
-    <Compile Include="Slides\U02_Mistakes\S04_Division.cs" />
+    <Compile Include="Slides\U02_Mistakes\S041_RuntimeErrors.cs" />
     <Compile Include="Slides\U02_Mistakes\S050_DebugVideo.cs" />
     <Compile Include="Slides\U02_Mistakes\S070_Style.cs" />
     <Compile Include="Slides\U02_Mistakes\S080_ConstantAndEnum.cs" />
@@ -81,21 +81,21 @@
     <Compile Include="Slides\U02_Mistakes\_MissedUsings.cs" />
     <Compile Include="Slides\U02_Mistakes\_TypeCastingMistaces.cs" />
     <Compile Include="Slides\U02_Mistakes\_Typo.cs" />
-    <Compile Include="Slides\U03_Cycles\S01_BooleanVariablesAndComparison.cs" />
+    <Compile Include="Slides\U03_Cycles\S011_LogicalType.cs" />
     <Compile Include="Slides\U03_Cycles\S010_LogicalTypeVideo.cs" />
-    <Compile Include="Slides\U03_Cycles\S02_LogicalExpressions.cs" />
+    <Compile Include="Slides\U03_Cycles\S021_IsLeapYear.cs" />
     <Compile Include="Slides\U03_Cycles\S020_IfElse.cs" />
     <Compile Include="Slides\U03_Cycles\S022_IfElseTask2.cs" />
-    <Compile Include="Slides\U03_Cycles\S03_IfOperator.cs" />
-    <Compile Include="Slides\U03_Cycles\S030_IfReturnVideo.cs" />
-    <Compile Include="Slides\U03_Cycles\S04_IfReturn.cs" />
-    <Compile Include="Slides\U03_Cycles\S05_ExcessIf.cs" />
+    <Compile Include="Slides\U03_Cycles\S023_QueenMove.cs" />
+    <Compile Include="Slides\U03_Cycles\S030_IfErrorsVideo.cs" />
+    <Compile Include="Slides\U03_Cycles\S031_IfReturn.cs" />
+    <Compile Include="Slides\U03_Cycles\S051_ExcessIf.cs" />
     <Compile Include="Slides\U03_Cycles\S040_WhileVideo.cs" />
-    <Compile Include="Slides\U03_Cycles\S06_While.cs" />
-    <Compile Include="Slides\U03_Cycles\S07_Break.cs" />
-    <Compile Include="Slides\U03_Cycles\S08_Continue.cs" />
-    <Compile Include="Slides\U03_Cycles\S09_For.cs" />
-    <Compile Include="Slides\U03_Cycles\S10_KtulhuFor.cs" />
+    <Compile Include="Slides\U03_Cycles\S041_While.cs" />
+    <Compile Include="Slides\U03_Cycles\S071_Break.cs" />
+    <Compile Include="Slides\U03_Cycles\S081_Continue.cs" />
+    <Compile Include="Slides\U03_Cycles\S091_For.cs" />
+    <Compile Include="Slides\U03_Cycles\S101_KtulhuFor.cs" />
     <Compile Include="Slides_Tests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -109,7 +109,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Slides\Title.txt" />
-    <Content Include="Slides\U01_Basics\S090-sampleXML.xml" />
     <Content Include="Slides\U01_Basics\Title.txt" />
     <Content Include="Slides\U01_Basics\Prelude.txt" />
     <Content Include="Slides\U02_Mistakes\Title.txt" />

@@ -3,12 +3,10 @@ using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Slide("Операторы If и Else 2", "{4C161B1E-2637-447B-ADFD-14647BF659AD}")]
-	class S02_LogicalExpressions
+	[Slide("Високосный год", "{4C161B1E-2637-447B-ADFD-14647BF659AD}")]
+	class S021_IsLeapYear
 	{
 		/*
-		##Задача: Логические выражения
-		
 		Васе очень хочется знать, високосный ли какой-либо год. 
 		В [интернете](https://ru.wikipedia.org/wiki/Григорианский_календарь) он нашел способ определения високосности года.
 		год является високосным в двух случаях: либо он кратен 4, но при этом не кратен 100, либо кратен 400.

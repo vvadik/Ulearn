@@ -5,7 +5,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Добрый работодатель", "{F6559650-B3AF-4E5E-BE84-941FB21BC2AC}")]
-	public class S10_IntelliSense
+	public class S100_FinalTask
 	{
 		/*
 

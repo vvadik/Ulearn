@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Деление на 0 2", "{754B8DCB-E6F6-44A9-AEE6-9972BEB9AF7C}")]
-	class S04_Division
+	class S041_RuntimeErrors
 	{
 		/*
 		##Задача: Делить на ноль нелзя!
