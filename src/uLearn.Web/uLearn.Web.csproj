@@ -626,7 +626,8 @@
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Properties\PublishProfiles\ulearn.pubxml" />
+    <None Include="Properties\PublishProfiles\ulearn - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\ulearn - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\buttons.js" />
     <Content Include="Scripts\notify-custom.min.js" />
@@ -775,14 +776,11 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PreBuildEvent>rd /S /Q $(ProjectDir)\Courses
-mkdir $(ProjectDir)\Courses
-xcopy /Y /E $(SolutionDir)Courses\Linq\Slides $(ProjectDir)\Courses\Linq\
-xcopy /Y /E $(SolutionDir)Courses\BasicProgramming\Slides $(ProjectDir)\Courses\BasicProgramming\</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>
-if not exist "$(TargetDir)x86" md "$(TargetDir)x86"
+    <PostBuildEvent>if not exist "$(TargetDir)x86" md "$(TargetDir)x86"
 xcopy /s /y "$(SolutionDir)packages\SqlServerCompact.4.0.8482.1\NativeBinaries\x86\*.*" "$(TargetDir)x86"
 if not exist "$(TargetDir)amd64" md "$(TargetDir)amd64"
 xcopy /s /y "$(SolutionDir)packages\SqlServerCompact.4.0.8482.1\NativeBinaries\amd64\*.*" "$(TargetDir)amd64"</PostBuildEvent>

@@ -45,7 +45,7 @@ namespace uLearn
 		{
 			if (!ns.EndsWith(".")) ns = ns + ".";
 			return type.Assembly.GetManifestResourceNames()
-				.Where(name => name.StartsWith(ns))
+				.Where(name => name.StartsWith(ns, StringComparison.InvariantCultureIgnoreCase))
 				.Select(name => new ResourceFile(name.Substring(ns.Length), name, () => LoadResource(name)));
 		}
 

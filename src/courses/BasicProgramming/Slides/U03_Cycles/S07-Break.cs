@@ -15,7 +15,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		После чего, вы опять же должны вызвать еще одну странную функцию MagicFunction от итоговой строки, после чего вернуть её
 		*/
 
-		[Hint(@"")]
 		[ExpectedOutput("82\r\n70\r\n70\r\nstartc\r\nkittyyyyyy\r\nC+++++++++")]
 		public static void Main()
 		{
