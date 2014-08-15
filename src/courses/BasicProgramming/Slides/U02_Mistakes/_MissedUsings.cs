@@ -4,7 +4,7 @@ namespace Slide01
 {
 	class Program
 	{
-		public static void MainX()
+		public static void Main()
 		{
 			Console.Write("Hello, world!");
 		}

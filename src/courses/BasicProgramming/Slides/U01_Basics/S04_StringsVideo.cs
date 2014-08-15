@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Строки", "{ad432c0f-e475-4381-9072-0b55ffd574db}")]
-	class S04_StringsVideo
+	class S040_StringsVideo
 	{
 		//#video PIrgeWaneXo
 
@@ -18,7 +18,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 				//Строки - это последовательности символов
 				string myString = "Hello, world!";
 
-				//У строк есть свои собственные методы и "переменные" (правильно называть это свойствами), 
+				//У строк есть свои собственные методы и переменные (правильно называть это свойствами),
 				//которые позволяют узнать информацию о строке 
 				Console.WriteLine(myString.Length);
 

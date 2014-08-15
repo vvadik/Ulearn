@@ -13,7 +13,7 @@ namespace S04
 			return a / b;
 		}
 
-		static void MainX()
+		static void Main()
 		{
 			Console.WriteLine(Divide(1, 0));
 		}
@@ -22,12 +22,13 @@ namespace S04
 }
 
 /*
-  Важная информация, которую можно извлечь из информации об исключении: название, стэк вызовов
+  Важная информация, которую можно извлечь из информации об исключении: 
+    название, стэк вызовов
 
   System.DivideByZeroException was unhandled  
   StackTrace:
-       at S04.Program.Divide(Int32 a, Int32 b) in c:\Users\user\Desktop 3\BasicProgramming\CS\Часть 1 - Ошибки компиляции и выполнения\S04 - Деление на 0.cs:line 13
-       at S04.Program.Main() in c:\Users\user\Desktop 3\BasicProgramming\CS\Часть 1 - Ошибки компиляции и выполнения\S04 - Деление на 0.cs:line 18
+       at S04.Program.Divide(Int32 a, Int32 b) in Program.cs:line 13
+       at S04.Program.Main() in Program.cs:line 18
        at System.AppDomain._nExecuteAssembly(RuntimeAssembly assembly, String[] args)
        at System.AppDomain.ExecuteAssembly(String assemblyFile, Evidence assemblySecurity, String[] args)
        at Microsoft.VisualStudio.HostingProcess.HostProc.RunUsersAssembly()

@@ -6,14 +6,14 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	[Slide("Арифметические операции и var", "{778bd3b0-243a-423d-a1c4-9230557979ff}")]
 	public class S06_OperationsVideo
 	{
-		//#video PIrgeWaneXo
+		//#video qqkiKvGV0lg
 
 		/*
 		## Заметки по лекции
 		*/
 		class Program
 		{
-			static void MainX()
+			static void Main()
 			{
 				int a = 23;
 				int b = 45;
@@ -36,7 +36,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 				var f = a / 2.0;
 
 				c = b = a;
-				/* Как это работает? b=a - оператор присвоения, но он имеет собственное возвращаемое значение (равное a)
+				/* Как это работает? b=a - оператор присвоения, но он имеет собственное 
+				 * возвращаемое значение (равное a)
 				 * Поэтому c = b = a выполняется так:
 				 * - b присваевается a
 				 * - c присвается результату b=a, который также равен a

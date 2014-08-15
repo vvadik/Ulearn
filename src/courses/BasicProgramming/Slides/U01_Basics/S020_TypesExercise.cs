@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Числовые типы данных 2", "{38FD7DB3-E4E5-4EC1-ACBD-30F3A55A70F4}")]
-	public class S02_TypesExercise
+	public class S020_TypesExercise
 	{
 		/*
 		Неправильно указанный тип данных - частая ошибка в работе начинающего программиста.
@@ -20,6 +20,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 0
 2000000000000
 ")]
+		[Hint("5.5e-2 — это так называемая [Экспоненциальная запись](https://ru.wikipedia.org/wiki/%D0%AD%D0%BA%D1%81%D0%BF%D0%BE%D0%BD%D0%B5%D0%BD%D1%86%D0%B8%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F_%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D1%8C) действительного числа")]
+		[Hint("Обратите внимание на суффиксы f и L после чисел. Что они означают?")]
 		public static void Main()
 		{
 			var num1 = +5.5e-2;

@@ -8,7 +8,7 @@ namespace Slide02
 {
 	class Program
 	{
-		public static void MainX()
+		public static void Main()
 		{
 			int a = 10;
 			//a += 0.5; //раскомментируйте, чтобы получить ошибку

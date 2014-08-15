@@ -23,14 +23,18 @@ namespace uLearn.Courses.BasicProgramming.Slides
 				}
 
 				string localVariable = "Local variable";
-				Console.WriteLine(localVariable); // Так можно: эта переменная используется в той же области, где и объявлена
-				// Console.WriteLine(temporalVariable); // Так нельзя: temporalVariable определена только внутри блока if
+				
+				// Так можно — эта переменная используется в той же области, где и объявлена:
+				Console.WriteLine(localVariable);
+				
+				// Так нельзя — temporalVariable определена только внутри блока if:
+				// Console.WriteLine(temporalVariable); 
 			}
 
 			static void MethodB()
 			{
-				// Console.WriteLine(localVariable); // Так нельзя: переменная определена в другом методе.
-				Console.WriteLine(globalVariable); //Так можно: это глобальная переменная
+				// Console.WriteLine(localVariable); //Нельзя — переменная определена в другом методе.
+				Console.WriteLine(globalVariable); //Можно — это глобальная переменная
 
 			}
 		}

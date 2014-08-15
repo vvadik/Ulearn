@@ -15,7 +15,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 		## Заметки по лекции
 		*/
 
-		public static void MainX()
+		public static void Main()
 		{
 			var a = int.Parse(Console.ReadLine());
 

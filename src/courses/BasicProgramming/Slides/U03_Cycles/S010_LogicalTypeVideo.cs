@@ -11,7 +11,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 	{
 		//#video f2nVbV7M_k0
 
-		public static void MainX()
+		public static void Main()
 		{
 			//Сравнение, как и операции сложения или деления, тоже имеет возвращаемое значение
 			Console.WriteLine(5 < 4);

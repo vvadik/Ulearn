@@ -19,7 +19,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U02_Mistakes
 		{
 			static string myString;
 
-			static void MainX()
+			static void Main()
 			{
 				Console.WriteLine(myString[0]);
 			}
