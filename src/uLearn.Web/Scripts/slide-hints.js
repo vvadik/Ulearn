@@ -15,7 +15,7 @@
 		    $('#hints-place').html(ans);
 		    var container = $('body'),
 		    scrollTo = $('#hints-place');
-		    if ($('#hints-place').offset().top > $(window).height())
+		    if ($('#hints-place').offset().top + 200 > $(window).height())
 				container.animate({ scrollTop: scrollTo.offset().top - container.offset().top + container.scrollTop() - 200});
 		}
 	    buttonNameChange(hintsCount);
