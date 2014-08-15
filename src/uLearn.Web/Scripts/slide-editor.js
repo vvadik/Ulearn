@@ -35,3 +35,13 @@ function codeMirrorClass(c, editable) {
 
 codeMirrorClass("code-exercise", true);
 codeMirrorClass("code-sample", false);
+
+function refreshPreviousDraft(ac, id) {
+    window.onbeforeunload = function () {
+        if (ac == 'False')
+            localStorage[id] = $('.code-exercise')[0].codeMirrorEditor.getValue();
+    }
+    if (localStorage[id] != undefined && ac == 'False') {
+        $('.code-exercise')[0].codeMirrorEditor.setValue(localStorage[id]);
+    }
+}

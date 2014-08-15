@@ -45,12 +45,12 @@
 			<div class="modal-footer">
 				<a href="#" class="prepare-solution-button" data-url="@Url.Action("PrepareSolution", "Exercise", new {courseId = Model.CourseId, slideIndex = Model.Slide.Index})">Log prepared solution</a>				<a href="#" onclick="toggleFakeRun()">Переключить в тестовый режим запуска</a>
 				<script>
-					function toggleFakeRun() {
-						var $btn = $(".run-solution-button");
-						$btn
+				    function toggleFakeRun() {
+				        var $btn = $(".run-solution-button");
+				        $btn
 				            .css("background-color", "blue")
 				            .data("url", $btn.data("url").replace("/RunSolution", "/FakeRunSolution"));
-					}
+				    }
 				</script>
 			</div>
 		}
@@ -61,12 +61,13 @@
 	@Scripts.Render("~/slide-js")
 	<script src="~/Scripts/slide-stats.js"></script>
 	<script>
-		fillRate('@Model.Rate');
+	    fillRate('@Model.Rate');
 	</script>
 	@if (Model.Slide is ExerciseSlide)
 	{
-	    var e = (ExerciseSlide) Model.Slide;
-		<script> getHints("@Model.CourseId", "@Model.Slide.Index", '@e.HintsHtml.Length')</script>	
+		var e = (ExerciseSlide)Model.Slide;
+		<script> getHints("@Model.CourseId", "@Model.Slide.Index", '@e.HintsHtml.Length')</script>
+	    <script> refreshPreviousDraft('@(Model.LatestAcceptedSolution != null)', '@e.Id')</script>
 	}
 
 	@{

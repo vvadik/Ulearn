@@ -54,11 +54,11 @@ function buttonNameChange(hintsCount) {
     $(".like-button").each(function() {
         showedHintsCount ++;
     });
-    if (showedHintsCount < hintsCount)
-        $("#GetHintButton").text("GET HINT");
-    else {
+    if (showedHintsCount < hintsCount && showedHintsCount != 0)
+        $("#GetHintButton").text("NEXT HINT");
+    else if (showedHintsCount != 0) {
         $("#GetHintButton").text("NO MORE HINTS");
-        $("#GetHintButton").attr('disabled', 'disabled')
+        $("#GetHintButton").attr('disabled', 'disabled');
     }
 }
 

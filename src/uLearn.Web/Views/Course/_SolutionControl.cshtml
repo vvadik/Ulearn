@@ -5,26 +5,26 @@
 <div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine™</a> and <a target="blank" href="http://codemirror.net/">CodeMirror</a></div>
 <textarea class='code code-exercise'>@(@Model.LatestAcceptedSolution ?? slide.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 <script>
-	function cleanUserCode() {
-		var $secretCodeExercise = $('#secretCodeExercise');
-		$('.code-exercise')[0].codeMirrorEditor.setValue($secretCodeExercise.text());
-	}
+    function cleanUserCode() {
+        var $secretCodeExercise = $('#secretCodeExercise');
+        $('.code-exercise')[0].codeMirrorEditor.setValue($secretCodeExercise.text());
+    }
 </script>
 <div class="solution-control btn-group ctrl-group">
-	<button type="button" class="run-solution-button btn btn-primary no-rounds"
-			data-url="@Url.Action("RunSolution", "Exercise", new {courseId = Model.CourseId, slideIndex = Model.Slide.Index})">		RUN
-	</button>
+    <button type="button" class="run-solution-button btn btn-primary no-rounds"
+            data-url="@Url.Action("RunSolution", "Exercise", new {courseId = Model.CourseId, slideIndex = Model.Slide.Index})">		RUN
+    </button>
 
-	<button type="button" class="btn btn-default reset-btn" onclick="cleanUserCode()">
-		RESET
-	</button>
+    <button type="button" class="btn btn-default reset-btn" onclick="cleanUserCode()">
+        RESET
+    </button>
 	
-	@{ var e  = ((ExerciseSlide) Model.Slide).HintsHtml; }
+    @{ var e  = ((ExerciseSlide) Model.Slide).HintsHtml; }
     <button id="GetHintButton" type="button" class="btn btn-default hints-btn no-rounds"
-			onclick="showHintForUser('@Model.CourseId','@Model.Slide.Index', '@e.Length')"
-			data-url="@Url.Action("UseHint", "Hint")">
-		GET HINT
-	</button>
+            onclick="showHintForUser('@Model.CourseId','@Model.Slide.Index', '@e.Length')"
+            data-url="@Url.Action("UseHint", "Hint")">
+        GET HINT
+    </button>
 </div>
 <div class="run-verdict clearfix"></div>
 <div class="after-run-block">
