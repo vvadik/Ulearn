@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
+﻿using System.Threading.Tasks;
 using System.Web.Mvc;
-using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
-using NUnit.Framework;
 using uLearn.Web.DataContexts;
-using uLearn.Web.Ideone;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -17,16 +9,17 @@ namespace uLearn.Web.Controllers
 	public class HintController : Controller
 	{
 		private readonly CourseManager courseManager;
-		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
+		private readonly SlideHintRepo slideHintRepo;
 
 		public HintController()
-			: this(CourseManager.AllCourses)
+			: this(CourseManager.AllCourses, new SlideHintRepo())
 		{
 		}
 
-		public HintController(CourseManager courseManager)
+		public HintController(CourseManager courseManager, SlideHintRepo slideHintRepo)
 		{
 			this.courseManager = courseManager;
+			this.slideHintRepo = slideHintRepo;
 		}
 
 		[HttpPost]
@@ -39,10 +32,10 @@ namespace uLearn.Web.Controllers
 			var exerciseSlide = (ExerciseSlide) slide;
 			if (exerciseSlide.HintsHtml.Length == 0)
 				return Json(new { Text = "Для слайда нет подсказок" });
-			var a = new HintPageModel {Hints = await GetNewHintHtml(exerciseSlide, courseId, isNeedNewHint)};
-			if (a.Hints == null)
+			var model = new HintPageModel {Hints = await GetNewHintHtml(exerciseSlide, courseId, isNeedNewHint)};
+			if (model.Hints == null)
 				return Json(new {Text = "Подсказок больше нет"});
-			return PartialView("~/Views/Course/_ExerciseHint.cshtml", a);
+			return PartialView(model);
 		}
 
 		private async Task<HintWithLikeButton[]> GetNewHintHtml(ExerciseSlide exerciseSlide, string courseId, bool isNeedNewHint)

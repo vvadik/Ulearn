@@ -82,7 +82,7 @@ namespace uLearn.Web.Controllers
 			if (submition == null)
 				return new RunSolutionResult
 				{
-					CompilationError = "Ой-ой, Sphere-engine, проверяющий задачи, не работает. Попробуйте отправить решение позже.",
+					CompilationError = "Ой-ой, Sphere Engine, проверяющий задачи, не работает. Попробуйте отправить решение позже.",
 					IsRightAnswer = false,
 					ExpectedOutput = "",
 					ActualOutput = ""

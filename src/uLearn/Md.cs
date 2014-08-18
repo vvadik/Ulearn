@@ -8,7 +8,8 @@ namespace uLearn
 		{
 			return new Markdown
 			{
-				NewWindowForExternalLinks = true
+				NewWindowForExternalLinks = true,
+				SafeMode = true
 			}
 			.Transform(md);
 		}
