@@ -14,7 +14,7 @@ using NUnit.Framework;
 
 namespace uLearn.tests
 {
-	class CreateDictForAutocomplit
+	class CreateDictForAutocomplete
 	{
 		public static Dictionary<string, List<string>> ReturnTypeDictionary = new Dictionary<string, List<string>>();
 
