@@ -147,6 +147,7 @@
     <Compile Include="tests\Simple.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="tests\CreateDictForAutocomplit.cs" />
     <Compile Include="tests\WrongIdentationOfEmptyLines.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
