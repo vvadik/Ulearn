@@ -12,7 +12,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U02_Mistakes
 		//#video Ra5BZAr0SYg
 
 		/*
-		## Пропущенный Using
+		## Заметки по лекции
 		*/
 
 		//#include U02_Mistakes._MissedUsings.cs

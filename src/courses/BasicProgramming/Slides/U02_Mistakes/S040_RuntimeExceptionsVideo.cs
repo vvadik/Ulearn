@@ -12,7 +12,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U02_Mistakes
 		//#video G96d-hH9l1g
 
 		/*
-		## Краткие заметки
+		## Заметки по лекции
 		*/
 
 		//#include U02_Mistakes._DivisionByZero.cs

@@ -12,6 +12,8 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U02_Mistakes
 		//#video AzD_1S9UR2A
 
 		/*
+		## Заметки по лекции
+
 		Вот пример кода, который сгенерирует Null references exception
 		*/
 

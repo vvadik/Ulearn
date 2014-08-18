@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Преобразования типов 3", "{2B6E076C-4617-4322-9BDE-C44A1D4F394F}")]
-	public class S03_Conversion2
+	public class S030_Conversion2
 	{
 		/*
 		Вася регулярно получает за красивые глазки от кого-нибудь по ```amount``` [биткоинов](http://ru.wikipedia.org/wiki/Bitcoin).

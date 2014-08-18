@@ -6,7 +6,7 @@
 		//#video e1aRhKlpNG4
 
 		/*
-		## Краткие заметки по лекции
+		## Заметки по лекции
 
 		Студенты УрФУ могут бесплатно получить Visual Studio через [Microsoft DreamSpark](http://dreamspark.ru)
 
