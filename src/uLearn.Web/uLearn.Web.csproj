@@ -56,8 +56,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\External\Elmah\Elmah.dll</HintPath>
     </Reference>
-    <Reference Include="MarkdownDeep">
-      <HintPath>..\packages\MarkdownDeep.NET.1.5\lib\.NetFramework 3.5\MarkdownDeep.dll</HintPath>
+    <Reference Include="MarkdownDeep, Version=1.5.4615.26275, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\External\MarkdownDeep\MarkdownDeep.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NLog">
@@ -285,7 +286,7 @@
     <Compile Include="Models\SlideRate.cs" />
     <Compile Include="Models\UserQuestion.cs" />
     <Compile Include="Models\Like.cs" />
-    <Compile Include="Models\Roles.cs" />
+    <Compile Include="Models\LmsRoles.cs" />
     <Compile Include="Models\RunSolutionResult.cs" />
     <Compile Include="Models\SlideViewModel.cs" />
     <Compile Include="Models\UserQuiz.cs" />
