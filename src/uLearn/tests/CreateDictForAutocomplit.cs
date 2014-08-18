@@ -16,7 +16,7 @@ namespace uLearn.tests
 {
 	class CreateDictForAutocomplit
 	{
-		public static Dictionary<Type, List<string>> ReturnTypeDictionary = new Dictionary<Type, List<string>>();
+		public static Dictionary<string, List<string>> ReturnTypeDictionary = new Dictionary<string, List<string>>();
 
 		public static int TotalWordCount = 0;
 
@@ -30,16 +30,25 @@ namespace uLearn.tests
 				typeof (string),
 				typeof (double),
 				typeof (Console),
-				typeof (Math)
+				typeof (Math),
+				typeof (long),
+				typeof (Boolean),
+				typeof (float),
+				typeof (Enumerable),
+				typeof (Array),
+				typeof (List<>)
 			};
-
+			Console.WriteLine("var types = [{0}]\n", ToArrayString(myTypes.Select(ToPrettyString)));
 			WalkThroughTypes(myTypes);
 		}
 
 		private static void WalkThroughTypes(Type[] myTypes)
 		{
-			const string methodDict = "dictWithMethods";
-			VisitTypesElements(methodDict, GetMethods, myTypes);
+			const string staticMethodDict = "dictWithStaticMethods";
+			VisitTypesElements(staticMethodDict, GetStaticMethods, myTypes);
+
+			const string nonStaticMethodDict = "dictWithNonStaticMethods";
+			VisitTypesElements(nonStaticMethodDict, GetNonStaticMethods, myTypes);
 
 			const string propertiesDict = "dictWithProperties";
 			VisitTypesElements(propertiesDict, GetProperties, myTypes);
@@ -53,69 +62,74 @@ namespace uLearn.tests
 
 		private static void PrintReturnTypeDictionary(IEnumerable<Type> myTypes)
 		{
-			Console.WriteLine("var returnTypeDict = [];\n");
+			Console.WriteLine("var returnTypeDict = [];");
 			foreach (
 				var type in
-					ReturnTypeDictionary.Keys.Where(
-						type => !type.ToString().Contains("TSource") && !type.ToString().Contains("TResult") && myTypes.Contains(type)))
+					ReturnTypeDictionary.Keys/*.Where(
+						type => !type.ToString().Contains("TSource") && !type.ToString().Contains("TResult") && myTypes.Contains(type))*/)
 			{
-				Console.WriteLine("returnTypeDict['{0}'] = [{1}];", ToPrettyString(type),
-					ToDictString(ReturnTypeDictionary[type].Distinct()));
-				Console.WriteLine();
+				Console.WriteLine("returnTypeDict['{0}'] = [{1}];", type,
+					ToArrayString(ReturnTypeDictionary[type].Distinct()));
 				TotalWordCount += ReturnTypeDictionary[type].Distinct().Count();
 			}
+			Console.WriteLine();
 		}
 
 		private static void VisitTypesElements(string dictName, Func<Type, IEnumerable<string>> func, IEnumerable<Type> myTypes)
 		{
 			Console.WriteLine("var {0} = [];", dictName);
-			Console.WriteLine();
 			foreach (var myType in myTypes)
 			{
 				var collection = func(myType).ToList();
 				TotalWordCount += collection.Count();
 				if (!collection.Any())
 					continue;
-				Console.WriteLine("{0}['{1}'] = [{2}];", dictName, ToPrettyString(myType), ToDictString(collection));
-				Console.WriteLine();
+				Console.WriteLine("{0}['{1}'] = [{2}];", dictName, ToPrettyString(myType), ToArrayString(collection));
 			}
 			Console.WriteLine();
 		}
 
 		private static string ToPrettyString(Type myType)
 		{
-			var type = myType.ToString().Replace("System.", "");
-			if (type == "Int32")
+			var type = myType.ToString().Replace("System.", "").Replace("Linq.", "");
+			if (type.Contains("Int32") || type.Contains("Int16") || type.Contains("Decimal"))
 				return "int";
-			if (type == "String")
+			if (type.Contains("Int64"))
+				return "long";
+			if (type.Contains("String"))
 				return "string";
-			if (type == "Double")
+			if (type.Contains("Double"))
 				return "double";
+			if (type.Contains("Single"))
+				return "double";
+			if (type.Contains("Enumerable"))
+				return "Enumerable";
+			if (type.Contains("List"))
+				return "List";
 			return type;
 		}
 
-		private static string ToDictString(IEnumerable<string> collection)
+		private static string ToArrayString(IEnumerable<string> collection)
 		{
 			return "'" + string.Join("', '", collection) + "'";
 		}
 
-		private static void WriteMyCollection(IEnumerable<KeyValuePair<Type, IEnumerable<string>>> myTypesWithMethods)
+		private static IEnumerable<string> GetStaticMethods(Type myType)
 		{
-			foreach (var typeWithMethod in myTypesWithMethods)
-			{
-				Console.WriteLine("методы у {0}: \n", typeWithMethod.Key);
-				foreach (var method in typeWithMethod.Value)
-					Console.WriteLine(method);
-				Console.WriteLine();
-			}
+			return GetMethods(myType, true);
 		}
 
-		private static IEnumerable<string> GetMethods(Type myType)
+		private static IEnumerable<string> GetNonStaticMethods(Type myType)
 		{
-			var methods = myType.GetMethods().Where(y => y.Name[0] != y.Name.ToLower()[0]).ToArray();
+			return GetMethods(myType, false);
+		}
+
+		private static IEnumerable<string> GetMethods(Type myType, bool isNeedStatic)
+		{
+			var methods = myType.GetMethods().Where(y => y.Name[0] != y.Name.ToLower()[0]).Where(x => isNeedStatic ? x.IsStatic : !x.IsStatic).ToArray();
 			foreach (var methodInfo in methods)
 			{
-				var type = methodInfo.ReturnType;
+				var type = ToPrettyString(methodInfo.ReturnType);
 				if (!ReturnTypeDictionary.ContainsKey(type))
 					ReturnTypeDictionary[type] = new List<string>();
 				ReturnTypeDictionary[type].Add(methodInfo.Name);
@@ -128,7 +142,7 @@ namespace uLearn.tests
 			var properties = myType.GetProperties().Where(y => y.Name[0] != y.Name.ToLower()[0]).ToArray();
 			foreach (var propertyInfo in properties)
 			{
-				var type = propertyInfo.PropertyType;
+				var type = ToPrettyString(propertyInfo.PropertyType);
 				if (!ReturnTypeDictionary.ContainsKey(type))
 					ReturnTypeDictionary[type] = new List<string>();
 				ReturnTypeDictionary[type].Add(propertyInfo.Name);
@@ -141,7 +155,7 @@ namespace uLearn.tests
 			var fields = myType.GetFields().Where(y => y.Name[0] != y.Name.ToLower()[0]).ToArray();
 			foreach (var fieldInfo in fields)
 			{
-				var type = fieldInfo.FieldType;
+				var type = ToPrettyString(fieldInfo.FieldType);
 				if (!ReturnTypeDictionary.ContainsKey(type))
 					ReturnTypeDictionary[type] = new List<string>();
 				ReturnTypeDictionary[type].Add(fieldInfo.Name);
