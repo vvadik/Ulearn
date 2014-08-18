@@ -27,7 +27,7 @@ namespace uLearn.Web.Migrations
 			var userStore = new UserStore<ApplicationUser>();
 			var manager = new UserManager<ApplicationUser>(userStore);
 
-			var studentRole = new IdentityUserRole { Role = new IdentityRole(Roles.Student) };
+			var studentRole = new IdentityUserRole { Role = new IdentityRole(LmsRoles.Student) };
 			var user = new ApplicationUser { UserName = "user" };
 			user.Roles.Add(studentRole);
 			manager.Create(user, "asdasd");

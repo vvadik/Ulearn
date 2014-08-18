@@ -23,7 +23,7 @@
 		</li>
 				iUnit++;
 	}
-	if (Request.IsLocal)
+	if (User.IsInRole(LmsRoles.Instructor))
 	{
 			<li class="units-list-item units-list-item-text">@Html.ActionLink("Total statistics", "TotalStatistics", "Analytics", new { courseId = Model.CourseId}, null)</li>
 			<li class="units-list-item units-list-item-text">@Html.ActionLink("Users statistics", "UsersStatistics", "Analytics", new { courseId = Model.CourseId}, null)</li>
