@@ -71,7 +71,7 @@
     <Content Include="Slides\U02_Mistakes\S011-MissedUsings.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Compile Include="Slides\U02_Mistakes\S091_Final.cs" />
+    <Compile Include="Slides\U02_Mistakes\S099_Final.cs" />
     <Compile Include="Slides\U02_Mistakes\S075_Dry.cs" />
     <Compile Include="Slides\U02_Mistakes\S060_Experiments.cs" />
     <Compile Include="Slides\U02_Mistakes\S010_CompilationMistakeVideo.cs" />
