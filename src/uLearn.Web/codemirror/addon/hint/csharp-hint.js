@@ -102,10 +102,10 @@
 	}
 	var keywords = Object.keys(CodeMirror.resolveMode("text/x-csharp").keywords);
 
-	var types = ['int', 'string', 'double', 'Console', 'Math', 'long', 'Boolean', 'double', 'Enumerable', 'Array', 'List'];
-
 	var methods = (" WriteLine Write Format Substring Length Parse TryParse ToString Split Join Round Min Max Ceiling Floor"
 		+ " Where Select SelectMany ToArray ToList ToDictionary ToLookup Join Zip Aggregate GroupBy OrderBy OrderByDescending ThenBy ThenByDescending ").split(" ");
+
+	var types = ['int', 'string', 'double', 'Console', 'Math', 'long', 'Boolean', 'double', 'Enumerable', 'Array', 'Enumerable']
 
 	var dictWithStaticMethods = [];
 	dictWithStaticMethods['int'] = ['Parse', 'TryParse'];
@@ -119,6 +119,7 @@
 	dictWithStaticMethods['Enumerable'] = ['Sum', 'Min', 'Max', 'Average', 'Except', 'Reverse', 'SequenceEqual', 'AsEnumerable', 'ToArray', 'ToList', 'ToDictionary', 'ToLookup', 'DefaultIfEmpty', 'OfType', 'Cast', 'First', 'FirstOrDefault', 'Last', 'LastOrDefault', 'Single', 'SingleOrDefault', 'ElementAt', 'ElementAtOrDefault', 'Range', 'Repeat', 'Empty', 'Any', 'All', 'Count', 'LongCount', 'Contains', 'Aggregate', 'Where', 'Select', 'SelectMany', 'Take', 'TakeWhile', 'Skip', 'SkipWhile', 'Join', 'GroupJoin', 'OrderBy', 'OrderByDescending', 'ThenBy', 'ThenByDescending', 'GroupBy', 'Concat', 'Zip', 'Distinct', 'Union', 'Intersect'];
 	dictWithStaticMethods['Array'] = ['AsReadOnly', 'Resize', 'CreateInstance', 'Copy', 'ConstrainedCopy', 'Clear', 'BinarySearch', 'ConvertAll', 'Exists', 'Find', 'FindAll', 'FindIndex', 'FindLast', 'FindLastIndex', 'ForEach', 'IndexOf', 'LastIndexOf', 'Reverse', 'Sort', 'TrueForAll'];
 
+
 	var dictWithNonStaticMethods = [];
 	dictWithNonStaticMethods['int'] = ['CompareTo', 'Equals', 'GetHashCode', 'ToString', 'GetTypeCode', 'GetType'];
 	dictWithNonStaticMethods['string'] = ['Equals', 'CopyTo', 'ToCharArray', 'GetHashCode', 'Split', 'Substring', 'Trim', 'TrimStart', 'TrimEnd', 'IsNormalized', 'Normalize', 'CompareTo', 'Contains', 'EndsWith', 'IndexOf', 'IndexOfAny', 'LastIndexOf', 'LastIndexOfAny', 'PadLeft', 'PadRight', 'StartsWith', 'ToLower', 'ToLowerInvariant', 'ToUpper', 'ToUpperInvariant', 'ToString', 'Clone', 'Insert', 'Replace', 'Remove', 'GetTypeCode', 'GetEnumerator', 'GetType'];
@@ -130,13 +131,15 @@
 	dictWithNonStaticMethods['double'] = ['CompareTo', 'Equals', 'GetHashCode', 'ToString', 'GetTypeCode', 'GetType'];
 	dictWithNonStaticMethods['Enumerable'] = ['ToString', 'Equals', 'GetHashCode', 'GetType'];
 	dictWithNonStaticMethods['Array'] = ['GetValue', 'SetValue', 'GetLength', 'GetLongLength', 'GetUpperBound', 'GetLowerBound', 'Clone', 'CopyTo', 'GetEnumerator', 'Initialize', 'ToString', 'Equals', 'GetHashCode', 'GetType'];
-	dictWithNonStaticMethods['List'] = ['Add', 'AddRange', 'AsReadOnly', 'BinarySearch', 'Clear', 'Contains', 'ConvertAll', 'CopyTo', 'Find', 'FindAll', 'FindIndex', 'ForEach', 'GetEnumerator', 'GetRange', 'IndexOf', 'Insert', 'InsertRange', 'Remove', 'RemoveAll', 'RemoveAt', 'RemoveRange', 'Reverse', 'Sort', 'ToArray', 'TrimExcess', 'Exists', 'FindLast', 'FindLastIndex', 'LastIndexOf', 'TrueForAll', 'ToString', 'Equals', 'GetHashCode', 'GetType'];
+	dictWithNonStaticMethods['Enumerable'] = ['Add', 'AddRange', 'AsReadOnly', 'BinarySearch', 'Clear', 'Contains', 'ConvertAll', 'CopyTo', 'Find', 'FindAll', 'FindIndex', 'ForEach', 'GetEnumerator', 'GetRange', 'IndexOf', 'Insert', 'InsertRange', 'Remove', 'RemoveAll', 'RemoveAt', 'RemoveRange', 'Reverse', 'Sort', 'ToArray', 'TrimExcess', 'Exists', 'FindLast', 'FindLastIndex', 'LastIndexOf', 'TrueForAll', 'ToString', 'Equals', 'GetHashCode', 'GetType'];
+
 
 	var dictWithProperties = [];
 	dictWithProperties['string'] = ['Chars', 'Length'];
 	dictWithProperties['Console'] = ['IsInputRedirected', 'IsOutputRedirected', 'IsErrorRedirected', 'In', 'Out', 'Error', 'InputEncoding', 'OutputEncoding', 'BackgroundColor', 'ForegroundColor', 'BufferHeight', 'BufferWidth', 'WindowHeight', 'WindowWidth', 'LargestWindowWidth', 'LargestWindowHeight', 'WindowLeft', 'WindowTop', 'CursorLeft', 'CursorTop', 'CursorSize', 'CursorVisible', 'Title', 'KeyAvailable', 'NumberLock', 'CapsLock', 'TreatControlCAsInput'];
 	dictWithProperties['Array'] = ['Length', 'LongLength', 'Rank', 'SyncRoot', 'IsReadOnly', 'IsFixedSize', 'IsSynchronized'];
-	dictWithProperties['List'] = ['Capacity', 'Count', 'Item'];
+	dictWithProperties['Enumerable'] = ['Capacity', 'Count', 'Item'];
+
 
 	var dictWithConstants = [];
 	dictWithConstants['int'] = ['MaxValue', 'MinValue'];
@@ -147,10 +150,11 @@
 	dictWithConstants['Boolean'] = ['TrueString', 'FalseString'];
 	dictWithConstants['double'] = ['MinValue', 'Epsilon', 'MaxValue', 'PositiveInfinity', 'NegativeInfinity', 'NaN'];
 
+
 	var returnTypeDict = [];
-	returnTypeDict['int'] = ['Parse', 'Compare', 'CompareOrdinal', 'Read', 'Ceiling', 'Floor', 'Round', 'Truncate', 'Abs', 'Max', 'Min', 'Sign', 'DivRem', 'Sum', 'Average', 'Range', 'Count', 'BinarySearch', 'FindIndex', 'FindLastIndex', 'IndexOf', 'LastIndexOf', 'CompareTo', 'GetHashCode', 'IndexOfAny', 'LastIndexOfAny', 'GetLength', 'GetUpperBound', 'GetLowerBound', 'RemoveAll', 'Length', 'BufferHeight', 'BufferWidth', 'WindowHeight', 'WindowWidth', 'LargestWindowWidth', 'LargestWindowHeight', 'WindowLeft', 'WindowTop', 'CursorLeft', 'CursorTop', 'CursorSize', 'Rank', 'Capacity', 'MaxValue', 'MinValue'];
+	returnTypeDict['int'] = ['Parse', 'Compare', 'CompareOrdinal', 'Read', 'Ceiling', 'Floor', 'Round', 'Truncate', 'Abs', 'Max', 'Min', 'Sign', 'DivRem', 'Sum', 'Average', 'Count', 'BinarySearch', 'FindIndex', 'FindLastIndex', 'IndexOf', 'LastIndexOf', 'CompareTo', 'GetHashCode', 'IndexOfAny', 'LastIndexOfAny', 'GetLength', 'GetUpperBound', 'GetLowerBound', 'RemoveAll', 'Length', 'BufferHeight', 'BufferWidth', 'WindowHeight', 'WindowWidth', 'LargestWindowWidth', 'LargestWindowHeight', 'WindowLeft', 'WindowTop', 'CursorLeft', 'CursorTop', 'CursorSize', 'Rank', 'Capacity', 'MaxValue', 'MinValue'];
 	returnTypeDict['Boolean'] = ['TryParse', 'Equals', 'IsNullOrEmpty', 'IsNullOrWhiteSpace', 'IsInfinity', 'IsPositiveInfinity', 'IsNegativeInfinity', 'IsNaN', 'Parse', 'SequenceEqual', 'Any', 'All', 'Contains', 'Exists', 'TrueForAll', 'IsNormalized', 'EndsWith', 'StartsWith', 'Remove', 'IsInputRedirected', 'IsOutputRedirected', 'IsErrorRedirected', 'CursorVisible', 'KeyAvailable', 'NumberLock', 'CapsLock', 'TreatControlCAsInput', 'IsReadOnly', 'IsFixedSize', 'IsSynchronized'];
-	returnTypeDict['string'] = ['Join', 'Format', 'Copy', 'Concat', 'Intern', 'IsInterned', 'ReadLine', 'ToString', 'Split', 'Substring', 'Trim', 'TrimStart', 'TrimEnd', 'Normalize', 'PadLeft', 'PadRight', 'ToLower', 'ToLowerInvariant', 'ToUpper', 'ToUpperInvariant', 'Insert', 'Replace', 'Remove', 'Title', 'Empty', 'TrueString', 'FalseString'];
+	returnTypeDict['string'] = ['Join', 'Format', 'Copy', 'Concat', 'Intern', 'IsInterned', 'ReadLine', 'ToString', 'Substring', 'Trim', 'TrimStart', 'TrimEnd', 'Normalize', 'PadLeft', 'PadRight', 'ToLower', 'ToLowerInvariant', 'ToUpper', 'ToUpperInvariant', 'Insert', 'Replace', 'Remove', 'Title', 'Empty', 'TrueString', 'FalseString'];
 	returnTypeDict['double'] = ['Parse', 'Acos', 'Asin', 'Atan', 'Atan2', 'Ceiling', 'Cos', 'Cosh', 'Floor', 'Sin', 'Tan', 'Sinh', 'Tanh', 'Round', 'Truncate', 'Sqrt', 'Log', 'Log10', 'Exp', 'Pow', 'IEEERemainder', 'Abs', 'Max', 'Min', 'Sum', 'Average', 'MinValue', 'MaxValue', 'Epsilon', 'NegativeInfinity', 'PositiveInfinity', 'NaN', 'PI', 'E'];
 	returnTypeDict['Void'] = ['Beep', 'Clear', 'ResetColor', 'MoveBufferArea', 'SetBufferSize', 'SetWindowSize', 'SetWindowPosition', 'SetCursorPosition', 'SetIn', 'SetOut', 'SetError', 'WriteLine', 'Write', 'Resize', 'Copy', 'ConstrainedCopy', 'ForEach', 'Reverse', 'Sort', 'CopyTo', 'SetValue', 'Initialize', 'Add', 'AddRange', 'Insert', 'InsertRange', 'RemoveAt', 'RemoveRange', 'TrimExcess'];
 	returnTypeDict['ConsoleKeyInfo'] = ['ReadKey'];
@@ -158,24 +162,14 @@
 	returnTypeDict['SByte'] = ['Abs', 'Max', 'Min'];
 	returnTypeDict['long'] = ['Abs', 'Max', 'Min', 'BigMul', 'DivRem', 'Parse', 'LongCount', 'Sum', 'GetLongLength', 'LongLength', 'MaxValue', 'MinValue'];
 	returnTypeDict['Byte'] = ['Max', 'Min'];
+	returnTypeDict['Enumerable'] = ['Sum', 'Min', 'Max', 'Average', 'Except', 'Reverse', 'AsEnumerable', 'ToArray', 'ToList', 'ToDictionary', 'ToLookup', 'DefaultIfEmpty', 'OfType', 'Cast', 'Range', 'Repeat', 'Empty', 'Where', 'Select', 'SelectMany', 'Take', 'TakeWhile', 'Skip', 'SkipWhile', 'Join', 'GroupJoin', 'OrderBy', 'OrderByDescending', 'ThenBy', 'ThenByDescending', 'GroupBy', 'Concat', 'Zip', 'Distinct', 'Union', 'Intersect', 'AsReadOnly', 'ConvertAll', 'FindAll', 'ToCharArray', 'Split', 'GetEnumerator', 'GetRange'];
 	returnTypeDict['TSource'] = ['Min', 'Max', 'First', 'FirstOrDefault', 'Last', 'LastOrDefault', 'Single', 'SingleOrDefault', 'ElementAt', 'ElementAtOrDefault', 'Aggregate'];
 	returnTypeDict['TResult'] = ['Min', 'Max', 'Aggregate'];
-	returnTypeDict['Enumerable'] = ['Except', 'Reverse', 'AsEnumerable', 'DefaultIfEmpty', 'OfType', 'Cast', 'Repeat', 'Empty', 'Where', 'Select', 'SelectMany', 'Take', 'TakeWhile', 'Skip', 'SkipWhile', 'Join', 'GroupJoin', 'OrderBy', 'OrderByDescending', 'ThenBy', 'ThenByDescending', 'GroupBy', 'Concat', 'Zip', 'Distinct', 'Union', 'Intersect'];
-	returnTypeDict['TSource[]'] = ['ToArray'];
-	returnTypeDict['List'] = ['ToList', 'ConvertAll', 'FindAll', 'GetEnumerator', 'GetRange'];
-	returnTypeDict['Collections.Generic.Dictionary`2[TKey,TSource]'] = ['ToDictionary'];
-	returnTypeDict['Collections.Generic.Dictionary`2[TKey,TElement]'] = ['ToDictionary'];
-	returnTypeDict['ILookup`2[TKey,TSource]'] = ['ToLookup'];
-	returnTypeDict['ILookup`2[TKey,TElement]'] = ['ToLookup'];
 	returnTypeDict['TAccumulate'] = ['Aggregate'];
-	returnTypeDict['Collections.ObjectModel.ReadOnlyCollection`1[T]'] = ['AsReadOnly'];
 	returnTypeDict['Array'] = ['CreateInstance'];
-	returnTypeDict['TOutput[]'] = ['ConvertAll'];
 	returnTypeDict['T'] = ['Find', 'FindLast', 'Item'];
-	returnTypeDict['T[]'] = ['FindAll', 'ToArray'];
 	returnTypeDict['TypeCode'] = ['GetTypeCode'];
 	returnTypeDict['Type'] = ['GetType'];
-	returnTypeDict['Char[]'] = ['ToCharArray'];
 	returnTypeDict['Object'] = ['Clone', 'GetValue', 'SyncRoot'];
 	returnTypeDict['CharEnumerator'] = ['GetEnumerator'];
 	returnTypeDict['Collections.IEnumerator'] = ['GetEnumerator'];
@@ -197,16 +191,17 @@
 		function autocompliteAfterDotWords() {
 			isWasFound = false;
 			if (arrayContains(types, beforeDot)) {
-				if (dictWithStaticMethods[type] != undefined) {
-					forEach(dictWithStaticMethods[type], maybeAdd);
+				if (dictWithStaticMethods[beforeDot] != undefined) {
+					console.log(beforeDot);
+					forEach(dictWithStaticMethods[beforeDot], maybeAdd);
 					isWasFound = true;
 				}
-				if (dictWithProperties[type] != undefined) {
-					forEach(dictWithProperties[type], maybeAdd);
+				if (dictWithProperties[beforeDot] != undefined) {
+					forEach(dictWithProperties[beforeDot], maybeAdd);
 					isWasFound = true;
 				}
-				if (dictWithConstants[type] != undefined) {
-					forEach(dictWithConstants[type], maybeAdd);
+				if (dictWithConstants[beforeDot] != undefined) {
+					forEach(dictWithConstants[beforeDot], maybeAdd);
 					isWasFound = true;
 				}
 				if (!isWasFound) {
@@ -217,6 +212,11 @@
 					var isNeedBreak = false;
 					for (element in returnTypeDict[type]) {
 						if (beforeDot == returnTypeDict[type][element]) {
+							if (type == "Void") {
+								isWasFound = true;
+								isNeedBreak = true;
+								break;
+							}
 							if (dictWithNonStaticMethods[type] != undefined) {
 								forEach(dictWithNonStaticMethods[type], maybeAdd);
 								isWasFound = true;

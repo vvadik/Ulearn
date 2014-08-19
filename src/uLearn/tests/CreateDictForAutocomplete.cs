@@ -38,7 +38,7 @@ namespace uLearn.tests
 				typeof (Array),
 				typeof (List<>)
 			};
-			Console.WriteLine("var types = [{0}]\n", ToArrayString(myTypes.Select(ToPrettyString)));
+			Console.WriteLine("var types = [{0}];\n", ToArrayString(myTypes.Select(ToPrettyString)));
 			WalkThroughTypes(myTypes);
 		}
 
@@ -92,6 +92,12 @@ namespace uLearn.tests
 		private static string ToPrettyString(Type myType)
 		{
 			var type = myType.ToString().Replace("System.", "").Replace("Linq.", "");
+			if (type.Contains("["))
+				return "Enumerable";
+			if (type.Contains("Enumerable"))
+				return "Enumerable";
+			if (type.Contains("List"))
+				return "List";
 			if (type.Contains("Int32") || type.Contains("Int16") || type.Contains("Decimal"))
 				return "int";
 			if (type.Contains("Int64"))
@@ -102,10 +108,6 @@ namespace uLearn.tests
 				return "double";
 			if (type.Contains("Single"))
 				return "double";
-			if (type.Contains("Enumerable"))
-				return "Enumerable";
-			if (type.Contains("List"))
-				return "List";
 			return type;
 		}
 
