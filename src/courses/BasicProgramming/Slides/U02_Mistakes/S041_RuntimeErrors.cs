@@ -1,52 +1,35 @@
 ﻿using System;
+using System.Globalization;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Slide("Деление на ноль", "{754B8DCB-E6F6-44A9-AEE6-9972BEB9AF7C}")]
+	[Slide("Минимум функции", "{754B8DCB-E6F6-44A9-AEE6-9972BEB9AF7C}")]
 	class S041_RuntimeErrors
 	{
 		/*
-		Делить на ноль нельзя! Всегда надо проверять, что вы не делите не ноль!
-		А вдруг враги подсунут вам ноль? Тогда все сломается.
-		Но написать метод Divide, который производит целочисленное деление первого числа на второе, все-же придется.
-		Результат деления нужно выводить на консоль. Если делить нельзя, выводите строку "impossible".
+		Вам надо реализовать функцию для нахождения минимального значения параболы, заданной уравнением вида ax^2+bx+c=0.
+		Функция принимает коэффиценты ```a,b,c``` и, если они корректны, печатает минимальное значение, иначе строку "Impossible".
+		Все коэффиценты больше или равны нулю.
 		*/
 
-		[ExpectedOutput("24\r\nimpossible\r\n-30\r\n5\r\n3\r\nimpossible\r\nimpossible\r\n-17\r\n0\r\nimpossible")]
+		[ExpectedOutput("-1\r\nImpossible\r\n-0.2\r\n-0.375\r\nImpossible")]
 		public static void Main()
 		{
-			Divide(120, 5);
-			Divide(120, 0);
-			Divide(120, -4); 
-			Divide(120, 22); 
-			Divide(120, 35);
-			Divide(120, 0);
-			Divide(120, 0);
-			Divide(120, -7); 
-			Divide(120, 1111);
-			Divide(120, 0);
+			FindMinimum(1, 2, 3);
+			FindMinimum(0, 3, 2);
+			FindMinimum(5, 2, 1);
+			FindMinimum(4, 3, 2);
+			FindMinimum(0, 4, 5);
 		}
 
 		[Exercise]
-		private static void Divide(int divident, int divider)
+		private static void FindMinimum(int a, int b, int c)
 		{
-			if (IsBadDivider(divider))
-			{
-				Console.WriteLine("impossible");
-				return;
-			}
-			var a = divident / divider;
-			Console.WriteLine(divident/divider);
+			Console.WriteLine(a == 0 ? "Impossible" : (-b / (double)(2 * a)).ToString());
 			/*uncomment
 			...
 			*/
-		}
-
-		[HideOnSlide]
-		private static bool IsBadDivider(int divider)
-		{
-			return divider == 0;
 		}
 	}
 }

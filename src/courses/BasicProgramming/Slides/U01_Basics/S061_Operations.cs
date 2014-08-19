@@ -3,7 +3,7 @@ using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Slide("Арифметические операции и var 2", "{956A2160-CEB6-4485-8A94-C39DFE364F48}")]
+	[Slide("Использование var", "{956A2160-CEB6-4485-8A94-C39DFE364F48}")]
 	public class S061_Operations
 	{
 		/*

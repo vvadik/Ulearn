@@ -3,7 +3,7 @@ using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Slide("Преобразования типов 3", "{2B6E076C-4617-4322-9BDE-C44A1D4F394F}")]
+	[Slide("Биткоины в массы!", "{2B6E076C-4617-4322-9BDE-C44A1D4F394F}")]
 	public class S030_Conversion2
 	{
 		/*
