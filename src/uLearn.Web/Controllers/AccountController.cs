@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -28,6 +29,24 @@ namespace uLearn.Web.Controllers
 		}
 
 		public UserManager<ApplicationUser> UserManager { get; private set; }
+
+		[Authorize(Roles = LmsRoles.Admin)]
+		public ActionResult List()
+		{
+			var applicationUsers = new ULearnDb().Users.ToList();
+			return View(applicationUsers);
+		}
+
+
+		[Authorize(Roles = LmsRoles.Admin)]
+		public async Task<ActionResult> ToggleRole(string userId, string role)
+		{
+			if (UserManager.IsInRole(userId, role))
+				await UserManager.RemoveFromRoleAsync(userId, role);
+			else
+				await UserManager.AddToRolesAsync(userId, role);
+			return RedirectToAction("List");
+		}
 
 		//
 		// GET: /Account/Login

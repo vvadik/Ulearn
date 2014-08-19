@@ -1,0 +1,40 @@
+﻿@model List<ApplicationUser>
+
+@{
+	ViewBag.Title = "Administration";
+}
+<div class="container">
+	<h2>Роли пользователей</h2>
+
+	<p>Админ может видеть служебную информацию и управлять ролями других пользователей.</p>
+	<p>Преподаватель может видеть статистику по успеваемости на разных слайдах, задачах, тестах. Читать заданные вопросы.</p>
+	<p>Бетатестер может видеть ещё не опубликованные для всех материалы.</p>
+
+	<table class="table table-condensed">
+		@foreach (var user in Model)
+		{
+			<tr data-userid="@user.Id">
+				<td>@user.UserName</td>
+				<td class="btn-group">
+					@RoleButton(user, LmsRoles.Admin, "danger")
+					@RoleButton(user, LmsRoles.Instructor, "info")
+					@RoleButton(user, LmsRoles.Tester, "success")
+				</td>
+			</tr>
+		}
+	</table>
+</div>
+
+@helper RoleButton(ApplicationUser user, string role, string cssClass)
+{
+	<a href="@Url.Action("ToggleRole", new{userId=user.Id, role})"
+	   class="btn btn-sm btn-@RoleButtonClass(user, role, cssClass)">
+		@role
+	</a>
+}
+
+@helper RoleButtonClass(ApplicationUser user, string role, string cssClass)
+{
+	@(user.Roles.Any(r => r.Role.Name == role) ? cssClass : "default")
+}
+

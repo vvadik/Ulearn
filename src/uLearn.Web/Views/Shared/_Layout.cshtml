@@ -25,7 +25,10 @@
 			</div>
 			<div class="greeting-collapse-class navbar-collapse collapse">
 				<ul class="nav navbar-nav">
-					@*<li>@Html.ActionLink("Home", "Index", "Home")</li>*@
+					@if (User.IsInRole(LmsRoles.Admin))
+					{
+						<li>@Html.ActionLink("Users", "List", "Account")</li>
+					}
 
 				</ul>
 				@Html.Partial("_LoginPartial")
@@ -38,7 +41,7 @@
 	@Scripts.Render("~/bootstrap-js")
 	@Scripts.Render("~/codemirror-js")
 	@RenderSection("scripts", required: false)
-	
+
 	<script type="text/javascript" src="/Orphus/orphus.js"></script>
 	<a href="http://orphus.ru" id="orphus" target="_blank"><img alt="Система Orphus" src="/orphus/orphus.gif" border="0" width="0" height="0" /></a>
 

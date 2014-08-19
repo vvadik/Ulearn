@@ -1,36 +1,42 @@
+using System.Data.Entity.Migrations;
+using System.Data.Entity.Validation;
+using System.Linq;
+using System.Text;
+using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Migrations
 {
-	using System;
-	using System.Data.Entity;
-	using System.Data.Entity.Migrations;
-	using System.Linq;
-
-	internal sealed class Configuration : DbMigrationsConfiguration<uLearn.Web.DataContexts.ULearnDb>
+	internal sealed class Configuration : DbMigrationsConfiguration<ULearnDb>
 	{
 		public Configuration()
 		{
 			AutomaticMigrationsEnabled = false;
 		}
 
-		protected override void Seed(uLearn.Web.DataContexts.ULearnDb context)
+		protected override void Seed(ULearnDb context)
 		{
 			//  This method will be called after migrating to the latest version.
 
 			//  You can use the DbSet<T>.AddOrUpdate() helper extension method 
 			//  to avoid creating duplicate seed data. E.g.
 			//
-
-			var userStore = new UserStore<ApplicationUser>();
-			var manager = new UserManager<ApplicationUser>(userStore);
-
-			var studentRole = new IdentityUserRole { Role = new IdentityRole(LmsRoles.Student) };
-			var user = new ApplicationUser { UserName = "user" };
-			user.Roles.Add(studentRole);
-			manager.Create(user, "asdasd");
+			var roleStore = new RoleStore<IdentityRole>(context);
+			var roleManager = new RoleManager<IdentityRole>(roleStore);
+			roleManager.Create(new IdentityRole(LmsRoles.Instructor));
+			roleManager.Create(new IdentityRole(LmsRoles.Admin));
+			roleManager.Create(new IdentityRole(LmsRoles.Tester));
+			if (!context.Users.Any(u => u.UserName == "user"))
+			{
+				var userStore = new UserStore<ApplicationUser>();
+				var manager = new UserManager<ApplicationUser>(userStore);
+				var user = new ApplicationUser {UserName = "user"};
+				manager.Create(user, "asdasd");
+				context.SaveChanges();
+			}
 		}
 	}
 }
