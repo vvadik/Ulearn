@@ -2,7 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slidess
 {
-	[Slide("Сравнение и логический тип 2", "{C56C7CDE-64BD-4023-9D6D-6328E3302C00}")]
+	[Slide("Abrakadabra!", "{C56C7CDE-64BD-4023-9D6D-6328E3302C00}")]
 	class S011_LogicalType
 	{
 		/*
@@ -16,10 +16,10 @@ namespace uLearn.Courses.BasicProgramming.Slidess
 		[ExpectedOutput("False\r\nTrue\r\nFalse")]
 		public static void Main()
 		{
-			var a = GetA();
-			var b = GetB();
-			var c = GetS();
-			var d = GetD();
+			int a = GetA();
+			int b = GetB();
+			string c = GetS();
+			bool d = GetD();
 			MagicFunction(a, b, c, d); // Should print: False, True, False
 		}
 

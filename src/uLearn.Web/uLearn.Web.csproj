@@ -722,6 +722,7 @@
     <Content Include="Views\Course\_ChoiceBlock.cshtml" />
     <Content Include="Views\Course\_FillInBlock.cshtml" />
     <Content Include="Views\Course\_TrueFalseBlock.cshtml" />
+    <Content Include="Views\Course\_QuizAnalytics.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Courses\" />

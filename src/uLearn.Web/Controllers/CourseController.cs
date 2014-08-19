@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using linqed;
 using Microsoft.AspNet.Identity;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -41,7 +42,18 @@ namespace uLearn.Web.Controllers
 			var exerciseSlide = model.Slide as ExerciseSlide;
 			if (exerciseSlide != null)
 				exerciseSlide.LikedHints = slideHintRepo.GetLikedHints(courseId, exerciseSlide.Id, User.Identity.GetUserId());
+			var quizSlide = model.Slide as QuizSlide;
+			if (quizSlide != null)
+				foreach (var block in quizSlide.Quiz.Blocks.Where(x => x is ChoiceBlock).Where(x => ((ChoiceBlock)x).Shuffle))
+					Shuffle(block);
 			return View(model);
+		}
+
+		private void Shuffle(QuizBlock quizBlock)
+		{
+			var random = new Random();
+			var choiceBlock = (ChoiceBlock)quizBlock;
+			choiceBlock.Items = choiceBlock.Items.OrderBy(x => random.Next()).ToArray();
 		}
 
 		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, int slideIndex)

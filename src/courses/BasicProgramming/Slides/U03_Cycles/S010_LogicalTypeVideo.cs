@@ -9,7 +9,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 	[Slide("Сравнение и логический тип", "{2C4919E2-42BF-4B32-93DC-5D54A8FDB25C}")]
 	class S010_LogicalTypeVideo
 	{
-		//#video f2nVbV7M_k0
+		//#video 6jo2hk4ntV8
 
 		public static void Main()
 		{

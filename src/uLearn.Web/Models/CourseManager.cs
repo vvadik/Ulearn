@@ -134,9 +134,6 @@ namespace uLearn.Web.Models
 					item.Id = itemEmptyId.ToString();
 					itemEmptyId++;
 				}
-				if (!choiceBlock.Shuffle) continue;
-				var rnd = new Random(DateTime.Now.Millisecond);
-				choiceBlock.Items = choiceBlock.Items.OrderBy(x => rnd.Next()).ToArray();
 			}
 		}
 

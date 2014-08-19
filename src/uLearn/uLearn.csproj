@@ -84,6 +84,7 @@
     <Compile Include="HintPageModel.cs" />
     <Compile Include="PersonalStatisticPageModel.cs" />
     <Compile Include="Quiz.cs" />
+    <Compile Include="QuizAnalyticsModel.cs" />
     <Compile Include="QuizInfoModel.cs" />
     <Compile Include="QuizSlide.cs" />
     <Compile Include="QuizBlock.cs" />

@@ -81,6 +81,7 @@
     <Compile Include="Slides\U02_Mistakes\_MissedUsings.cs" />
     <Compile Include="Slides\U02_Mistakes\_TypeCastingMistaces.cs" />
     <Compile Include="Slides\U02_Mistakes\_Typo.cs" />
+    <Compile Include="Slides\U03_Cycles\S060_ForVsWhileVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S011_LogicalType.cs" />
     <Compile Include="Slides\U03_Cycles\S010_LogicalTypeVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S021_IsLeapYear.cs" />
@@ -89,13 +90,15 @@
     <Compile Include="Slides\U03_Cycles\S023_QueenMove.cs" />
     <Compile Include="Slides\U03_Cycles\S030_IfErrorsVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S031_IfReturn.cs" />
-    <Compile Include="Slides\U03_Cycles\S051_ExcessIf.cs" />
+    <Compile Include="Slides\U03_Cycles\S032_ExcessIf.cs" />
     <Compile Include="Slides\U03_Cycles\S040_WhileVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S041_While.cs" />
-    <Compile Include="Slides\U03_Cycles\S071_Break.cs" />
-    <Compile Include="Slides\U03_Cycles\S081_Continue.cs" />
-    <Compile Include="Slides\U03_Cycles\S091_For.cs" />
-    <Compile Include="Slides\U03_Cycles\S101_KtulhuFor.cs" />
+    <Compile Include="Slides\U03_Cycles\S042_Break.cs" />
+    <Compile Include="Slides\U03_Cycles\S043_Continue.cs" />
+    <Compile Include="Slides\U03_Cycles\S044_WhileRefactoringVideo.cs" />
+    <Compile Include="Slides\U03_Cycles\S050_ForVideo.cs" />
+    <Compile Include="Slides\U03_Cycles\S051_For.cs" />
+    <Compile Include="Slides\U03_Cycles\S061_KtulhuFor.cs" />
     <Compile Include="Slides_Tests.cs" />
   </ItemGroup>
   <ItemGroup>

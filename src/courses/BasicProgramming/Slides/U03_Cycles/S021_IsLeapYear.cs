@@ -32,7 +32,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		{
 			return DateTime.IsLeapYear(year);
 			/*uncomment
-			return ...
+			...
 			*/
 		}
 	}

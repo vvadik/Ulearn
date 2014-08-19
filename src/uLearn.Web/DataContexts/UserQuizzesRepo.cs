@@ -4,6 +4,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Owin.Security.Provider;
 using NUnit.Framework;
 using uLearn.Quizes;
 using uLearn.Web.Migrations;
@@ -74,6 +75,34 @@ namespace uLearn.Web.DataContexts
 					};
 			}
 			return answer;
+		}
+
+		public string GetFillInBlockAnswer(string courseId, string slideId, string quizId, string userId)
+		{
+			var answer = db.UserQuizzes.FirstOrDefault(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId);
+			return answer == null ? null : answer.Text;
+		}
+
+		public SortedDictionary<string, bool> GetChoiseBlockAnswer(string courseId, string slideId, ChoiceBlock block, string userId)
+		{
+			var ans = new SortedDictionary<string, bool>();
+			foreach (var item in block.Items)
+			{
+				ans[item.Id] = false;
+			}
+			foreach (var itemId in db.UserQuizzes.Where(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && x.QuizId == block.Id).Select(x => x.ItemId))
+			{
+				ans[itemId] = true;
+			}
+			return ans;
+		}
+
+		public bool GetIsTrueBlockAnswer(string courseId, string slideId, string quizId, string userId)
+		{
+			var answer =  db.UserQuizzes.FirstOrDefault(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId);
+			if (answer == null)
+				return false;
+			return answer.Text == "True";
 		}
 	}
 }

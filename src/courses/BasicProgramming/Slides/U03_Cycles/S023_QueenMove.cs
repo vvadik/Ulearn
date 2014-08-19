@@ -35,6 +35,9 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			return (lastPosition.First() - newPosition.First() == 0 || lastPosition.Last() - newPosition.Last() == 0 ||
 			         (Math.Abs(lastPosition.First() - newPosition.First())) == Math.Abs(lastPosition.Last() - newPosition.Last())) &&
 			        !(lastPosition.First() - newPosition.First() == 0 && lastPosition.Last() - newPosition.Last() == 0);
+			/*uncomment
+			...
+			*/
 		}
 	}
 }

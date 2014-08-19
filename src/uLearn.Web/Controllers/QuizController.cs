@@ -18,6 +18,7 @@ namespace uLearn.Web.Controllers
 	public class QuizController : Controller
 	{
 		private readonly CourseManager courseManager;
+		private readonly ULearnDb db = new ULearnDb();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 
 		public QuizController()
@@ -173,6 +174,32 @@ namespace uLearn.Web.Controllers
 					QuizType = typeof(FillInBlock)
 				}
 			};
+		}
+
+		public ActionResult GetAnalytics(string courseId, int slideIndex)
+		{
+			var course = courseManager.GetCourse(courseId);
+			var quizSlide = (QuizSlide) course.Slides[slideIndex];
+			quizSlide.Quiz.Blocks = quizSlide.Quiz.Blocks.OrderBy(x => x.Id).ToArray();
+			var dict = new SortedDictionary<string, List<QuizAnswerInfo>>();
+			foreach (var user in db.Users)
+				dict[user.UserName] = GetUserQuizAnswers(courseId, quizSlide, user.Id).OrderBy(x => x.Id).ToList();
+			return PartialView("~/Views/Course/_QuizAnalytics.cshtml", new QuizAnalyticsModel
+			{
+				UserAnswers = dict,
+				QuizSlide = quizSlide
+			});
+		}
+
+		private IEnumerable<QuizAnswerInfo> GetUserQuizAnswers(string courseId, QuizSlide slide, string userId)
+		{
+			foreach (var block in slide.Quiz.Blocks.Where(x => x is AbstractQuestionBlock))
+				if (block is FillInBlock)
+					yield return new FillInBlockAnswerInfo { Answer = userQuizzesRepo.GetFillInBlockAnswer(courseId, slide.Id, block.Id, userId), Id = slide.Id};
+				else if (block is ChoiceBlock)
+					yield return new ChoiseBlockAnswerInfo { AnswersId = userQuizzesRepo.GetChoiseBlockAnswer(courseId, slide.Id, (ChoiceBlock)block, userId), Id = slide.Id };
+				else if (block is IsTrueBlock)
+					yield return new IsTrueBlockAnswerInfo { Answer = userQuizzesRepo.GetIsTrueBlockAnswer(courseId, slide.Id, block.Id, userId), Id = slide.Id };
 		}
 	}
 }

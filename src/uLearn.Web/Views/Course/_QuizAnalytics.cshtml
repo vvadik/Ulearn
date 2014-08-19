@@ -1,0 +1,104 @@
+﻿@using System.Activities.Expressions
+@using System.Activities.Statements
+@using uLearn
+@using uLearn.Quizes
+@model uLearn.QuizAnalyticsModel
+
+@functions {
+	private int GetColSpan(QuizBlock block)
+	{
+		if (block is ChoiceBlock)
+			return ((ChoiceBlock) block).Items.Length;
+		if (block is FillInBlock)
+			return 1;
+		return 2;
+	}
+
+}
+<div>
+	<table id="myTable" class="tablesorter">
+		<thead>
+			<tr>
+				<th></th>
+				@foreach (var block in Model.QuizSlide.Quiz.Blocks.Where(x => x is AbstractQuestionBlock).OrderBy(x => x.Id))
+				{
+					<th colspan="@GetColSpan(block)">@block.Id</th>
+				}
+			</tr>
+			<tr>
+				<th>User name</th>
+				@foreach (var block in Model.QuizSlide.Quiz.Blocks.Where(x => x is AbstractQuestionBlock).OrderBy(x => x.Id))
+				{
+					if (block is ChoiceBlock)
+					{
+						var choiseBlock = ((ChoiceBlock) block);
+						foreach (var item in choiseBlock.Items.OrderBy(x => x.Id))
+						{
+							<th>@item.Id</th>
+						}
+					}
+					else if (block is FillInBlock)
+					{
+						<th>user answer</th>
+					}
+					else
+					{
+						<th>true</th>
+						<th>false</th>
+					}
+				}
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Total</td>
+				@foreach (var block in Model.QuizSlide.Quiz.Blocks.Where(x => x is AbstractQuestionBlock).OrderBy(x => x.Id))
+				{
+					if (block is ChoiceBlock)
+					{
+						var choiseBlock = ((ChoiceBlock) block);
+						foreach (var item in choiseBlock.Items)
+						{
+							<td>percent</td>
+						}
+					}
+					else if (block is FillInBlock)
+					{
+						<td>percent</td>
+					}
+					else
+					{
+						<td>percent</td>
+						<td>percent</td>
+					}
+				}
+			</tr>
+			@foreach (var user in Model.UserAnswers.Keys)
+			{
+				<tr>
+					<td>@user</td>
+					@foreach (var ans in Model.UserAnswers[user])
+					{
+						if (ans is FillInBlockAnswerInfo)
+						{
+							<td>@(((FillInBlockAnswerInfo)ans).Answer)</td>
+						}
+						else if (ans is IsTrueBlockAnswerInfo)
+						{
+							<td>@(((IsTrueBlockAnswerInfo)ans).Answer ? "true" : "")</td>
+							<td>@(((IsTrueBlockAnswerInfo)ans).Answer ? "" : "false")</td>
+						}
+						else
+						{
+							foreach (var item in ((ChoiseBlockAnswerInfo)ans).AnswersId)
+							{
+								<td>@item.Value</td>
+							}
+						}
+					}
+				</tr>
+			}
+		</tbody>
+	</table>
+
+</div>
