@@ -56,11 +56,11 @@ namespace uLearn.tests
 			const string constantDict = "dictWithConstants";
 			VisitTypesElements(constantDict, GetConstants, myTypes);
 			
-			PrintReturnTypeDictionary(myTypes);
+			PrintReturnTypeDictionary();
 			Console.WriteLine("Total word count in all dictionary: {0}", TotalWordCount);
 		}
 
-		private static void PrintReturnTypeDictionary(IEnumerable<Type> myTypes)
+		private static void PrintReturnTypeDictionary()
 		{
 			Console.WriteLine("var returnTypeDict = [];");
 			foreach (
