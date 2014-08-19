@@ -47,7 +47,7 @@ namespace uLearn.Web.Controllers
 			var isPassedTask = solutionsRepo.IsUserPassedTask(courseId, slide.Id, userId);
 			var model = new PrevNextButtonsModel(course, slideIndex, isPassedTask, onSolutionsSlide);
 			if (onSolutionsSlide) model.PrevSlideIndex = model.SlideIndex;
-			return View(model);
+			return PartialView(model);
 
 		}
 

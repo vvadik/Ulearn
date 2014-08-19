@@ -5,7 +5,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	[Slide("Переменные", "{fe3a32fb-9f61-4a58-a2f4-547d4c8fac77}")]
 	public class S080_LocalAndGlobalVarsVideo
 	{
-		//#video _-rHn9x-0ho
+		//#video 1iw5osYSRH0
 
 		/*
 		## Заметки по лекции

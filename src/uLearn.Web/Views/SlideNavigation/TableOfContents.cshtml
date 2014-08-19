@@ -15,7 +15,6 @@
 				@foreach (var slide in unit.Slides)
 				{
 					var url = Url.Action("Slide", "Course", new { courseId = Model.CourseId, slideIndex = slide.Index });
-
 					<i class="@GetIconClass(slide) navbar-label" title="@GetTitle(slide)"></i>
 				    <li class="slide-list-item @(slide == Model.CurrentSlide ? "selected" : "") " onclick="window.location.href = '@url'"><a href="@url">@slide.Title</a></li>
 				}
