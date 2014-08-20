@@ -245,6 +245,10 @@
     <Compile Include="Migrations\201408070554397_AddHintsLike.Designer.cs">
       <DependentUpon>201408070554397_AddHintsLike.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201408201208379_AddIsRightQuizBlock.cs" />
+    <Compile Include="Migrations\201408201208379_AddIsRightQuizBlock.Designer.cs">
+      <DependentUpon>201408201208379_AddIsRightQuizBlock.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\CourseManager_should.cs" />
     <EmbeddedResource Include="Courses\**\*.*">
       <Visible>false</Visible>
@@ -323,6 +327,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201408070554397_AddHintsLike.resx">
       <DependentUpon>201408070554397_AddHintsLike.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408201208379_AddIsRightQuizBlock.resx">
+      <DependentUpon>201408201208379_AddIsRightQuizBlock.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

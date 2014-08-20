@@ -26,7 +26,7 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public async Task<UserQuiz> AddUserQuiz(string courseId, bool isRightAnswer, string itemId, string quizId, string slideId, string text, string userId, DateTime time)
+		public async Task<UserQuiz> AddUserQuiz(string courseId, bool isRightAnswer, string itemId, string quizId, string slideId, string text, string userId, DateTime time, bool isRightQuizBlock)
 		{
 			var userQuiz = new UserQuiz
 			{
@@ -37,7 +37,8 @@ namespace uLearn.Web.DataContexts
 				SlideId = slideId,
 				Text = text,
 				Timestamp = time,
-				UserId = userId
+				UserId = userId,
+				IsRightQuizBlock = isRightQuizBlock
 			};
 			db.UserQuizzes.Add(userQuiz);
 			await db.SaveChangesAsync();
@@ -77,13 +78,18 @@ namespace uLearn.Web.DataContexts
 			return answer;
 		}
 
-		public string GetFillInBlockAnswer(string courseId, string slideId, string quizId, string userId)
+		public FillInBlockAnswerInfo GetFillInBlockAnswerInfo(string courseId, string slideId, string quizId, string userId, int questionIndex)
 		{
 			var answer = db.UserQuizzes.FirstOrDefault(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId);
-			return answer == null ? null : answer.Text;
+			return new FillInBlockAnswerInfo
+			{
+				Answer = answer == null ? null : answer.Text,
+				IsRight = answer != null && answer.IsRightAnswer,
+				Id = questionIndex.ToString()
+			};
 		}
 
-		public SortedDictionary<string, bool> GetChoiseBlockAnswer(string courseId, string slideId, ChoiceBlock block, string userId)
+		public ChoiceBlockAnswerInfo GetChoiseBlockAnswerInfo(string courseId, string slideId, ChoiceBlock block, string userId, int questionIndex)
 		{
 			var ans = new SortedDictionary<string, bool>();
 			foreach (var item in block.Items)
@@ -94,15 +100,55 @@ namespace uLearn.Web.DataContexts
 			{
 				ans[itemId] = true;
 			}
-			return ans;
+			return new ChoiceBlockAnswerInfo
+			{
+				AnswersId = ans,
+				Id = questionIndex.ToString(),
+				RealyRightAnswer = new HashSet<string>(block.Items.Where(x => x.IsCorrect).Select(x => x.Id))
+			};
 		}
 
-		public bool GetIsTrueBlockAnswer(string courseId, string slideId, string quizId, string userId)
+		public IsTrueBlockAnswerInfo GetIsTrueBlockAnswerInfo(string courseId, string slideId, string quizId, string userId, int questionIndex)
 		{
 			var answer =  db.UserQuizzes.FirstOrDefault(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId);
-			if (answer == null)
-				return false;
-			return answer.Text == "True";
+			return new IsTrueBlockAnswerInfo
+			{
+				IsAnswered = answer != null,
+				Answer = answer != null && answer.Text == "True",
+				Id = questionIndex.ToString(),
+				IsRight = answer != null && answer.IsRightAnswer
+			};
+		}
+
+		public int GetAverageStatistics(string slideId, string courseId)
+		{
+			return 0;
+			var a = db.UserQuizzes
+				.Where(x => x.SlideId == slideId && x.CourseId == courseId)
+				.GroupBy(x => x.UserId).ToList();
+			var e =  a.Select(x => x.Distinct(new UserQuizComparer()));
+			var t = e.Select(x => x.Select(ConvertQuizBlockInDouble).Average());
+			var q = t.Average() * 100; //не могу засунуть Dictinct в sql запрос ;(
+			return (int)q;
+		}
+
+		private double ConvertQuizBlockInDouble(UserQuiz userQuiz)
+		{
+			double e = userQuiz.IsRightQuizBlock ? 1 : 0;
+			return e;
+		}
+	}
+
+	public class UserQuizComparer : IEqualityComparer<UserQuiz>
+	{
+		public bool Equals(UserQuiz x, UserQuiz y)
+		{
+			return x.QuizId == y.QuizId;
+		}
+
+		public int GetHashCode(UserQuiz obj)
+		{
+			return obj.QuizId.GetHashCode();
 		}
 	}
 }

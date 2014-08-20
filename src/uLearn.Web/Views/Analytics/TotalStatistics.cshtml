@@ -17,7 +17,7 @@
 						<tr>
 							<th>Название</th>
 							<th>Количество просмотревших</th>
-							<th>Успешные решения</th>
+							<th>Количество успешно решивших пользователей</th>
 							<th>Количество оценок</th>
 							<th>оценок "хорошо"</th>
 							<th>оценок "не понятно"</th>
@@ -34,12 +34,12 @@
 						    <tr>
 						        @{
 							        var isNeedDrowHintsInfo = (info.Value.IsExercise && info.Value.TotalHintCount != 0);
-							var url = Url.Action("Slide", "Course", new { courseId = Model.CourseId, slideIndex = counter }, null);
+							        var url = Url.Action("Slide", "Course", new {courseId = Model.CourseId, slideIndex = counter}, null);
 						        }
 								<td class="slide-list-item" data-sort-value=@(counter + 1000) onclick="window.location.href='@url'"><h6 class="table-header">@info.Key</h6></td>
 						        <td>@info.Value.VisitersCount</td>
 							    <td data-sort-value=@(info.Value.IsExercise ? info.Value.SolversCount+1000 : 0)>
-								    @(info.Value.IsExercise ? info.Value.SolversCount.ToString(CultureInfo.InvariantCulture) : "")
+								    @((info.Value.IsExercise || info.Value.IsQuiz) ? info.Value.SolversCount.ToString(CultureInfo.InvariantCulture) : "" )
 							    </td>
 								<td>@info.Value.Rates.Count</td>
 								<td>@(info.Value.Rates.Count == 0 ? 0 : (int)(100 * (double)info.Value.Rates.Good / info.Value.Rates.Count))%</td>

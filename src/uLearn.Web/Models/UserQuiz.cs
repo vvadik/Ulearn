@@ -39,5 +39,8 @@ namespace uLearn.Web.Models
 
 		[Required]
 		public bool IsRightAnswer { get; set; }
+
+		[Required]
+		public bool IsRightQuizBlock { get; set; }
 	}
 }

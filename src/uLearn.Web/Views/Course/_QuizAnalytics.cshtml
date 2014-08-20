@@ -5,36 +5,50 @@
 @model uLearn.QuizAnalyticsModel
 
 @functions {
-	private int GetColSpan(QuizBlock block)
+	private static int GetColSpan(QuizBlock block)
 	{
 		if (block is ChoiceBlock)
-			return ((ChoiceBlock) block).Items.Length;
+			return ((ChoiceBlock)block).Items.Length;
 		if (block is FillInBlock)
 			return 1;
 		return 2;
 	}
 
+	private string GetSubstring(string text, int length)
+	{
+		var substring = text.Substring(0, Math.Min(length, text.Length));
+		if (substring.Length < text.Length)
+			substring += "...";
+		return substring;
+	}
+
 }
 <div>
+	@{ var maxQuestionIndex = Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex).Max(x => x.QuestionIndex);}
 	<table id="myTable" class="tablesorter">
 		<thead>
 			<tr>
-				<th></th>
-				@foreach (var block in Model.QuizSlide.Quiz.Blocks.Where(x => x is AbstractQuestionBlock).OrderBy(x => x.Id))
+				<th style="border-bottom: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа">наведи на меня!</th>
+				@foreach (var block in Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
-					<th colspan="@GetColSpan(block)">@block.Id</th>
+					<th title="@block.Text" colspan="@GetColSpan(block)">@GetSubstring(block.Text, 12)</th>
+					if (maxQuestionIndex == block.QuestionIndex)
+					{
+						break;
+					}
+					<th style="border-bottom: none"></th>
 				}
 			</tr>
 			<tr>
-				<th>User name</th>
-				@foreach (var block in Model.QuizSlide.Quiz.Blocks.Where(x => x is AbstractQuestionBlock).OrderBy(x => x.Id))
+				<th style="border-top: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа"></th>
+				@foreach (var block in Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
 					if (block is ChoiceBlock)
 					{
-						var choiseBlock = ((ChoiceBlock) block);
+						var choiseBlock = ((ChoiceBlock)block);
 						foreach (var item in choiseBlock.Items.OrderBy(x => x.Id))
 						{
-							<th>@item.Id</th>
+							<th title="@item.Description">@GetSubstring(item.Description, 7)</th>
 						}
 					}
 					else if (block is FillInBlock)
@@ -46,31 +60,71 @@
 						<th>true</th>
 						<th>false</th>
 					}
+					if (maxQuestionIndex == block.QuestionIndex)
+					{
+						break;
+					}
+					<th style="border-top: none; border-bottom: none"></th>
 				}
 			</tr>
 		</thead>
 		<tbody>
 			<tr>
 				<td>Total</td>
-				@foreach (var block in Model.QuizSlide.Quiz.Blocks.Where(x => x is AbstractQuestionBlock).OrderBy(x => x.Id))
+				@{ var usersCount = Model.UserAnswers.Keys.Count;}
+				@{ usersCount = usersCount == 0 ? 1 : usersCount; }
+				@foreach (var block in Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
 					if (block is ChoiceBlock)
 					{
-						var choiseBlock = ((ChoiceBlock) block);
-						foreach (var item in choiseBlock.Items)
+						var choiseBlock = ((ChoiceBlock)block);
+						foreach (var item in choiseBlock.Items.OrderBy(x => x.Id))
 						{
-							<td>percent</td>
+							<td>
+								@((100 *
+								   Model.UserAnswers.Values
+									   .SelectMany(x => x)
+									   .Where(x => x.Id == choiseBlock.QuestionIndex.ToString())
+									   .Select(x => (ChoiceBlockAnswerInfo)x)
+									   .Count(x => x.AnswersId[item.Id])) / usersCount)%
+							</td>
 						}
 					}
 					else if (block is FillInBlock)
 					{
-						<td>percent</td>
+						var fillInBlock = ((FillInBlock)block);
+						<td>
+							@((100 *
+							   Model.UserAnswers.Values
+								   .SelectMany(x => x)
+								   .Where(x => x.Id == fillInBlock.QuestionIndex.ToString())
+								   .Select(x => (FillInBlockAnswerInfo)x)
+								   .Count(x => x.IsRight)) / usersCount)%
+						</td>
 					}
 					else
 					{
-						<td>percent</td>
-						<td>percent</td>
+						var isTrueBlock = ((IsTrueBlock)block);
+						<td>
+							@((100 * Model.UserAnswers.Values
+								  .SelectMany(x => x)
+								  .Where(x => x.Id == isTrueBlock.QuestionIndex.ToString())
+								  .Select(x => (IsTrueBlockAnswerInfo)x)
+								  .Count(x => x.Answer)) / usersCount)%
+					</td>
+					<td>
+						@((100 * Model.UserAnswers.Values
+								  .SelectMany(x => x)
+								  .Where(x => x.Id == isTrueBlock.QuestionIndex.ToString())
+								  .Select(x => (IsTrueBlockAnswerInfo)x)
+								  .Count(x => !x.Answer)) / usersCount)%
+				</td>
 					}
+					if (maxQuestionIndex == block.QuestionIndex)
+					{
+						break;
+					}
+					<td style="border-top: none; border-bottom: none"></td>
 				}
 			</tr>
 			@foreach (var user in Model.UserAnswers.Keys)
@@ -81,24 +135,39 @@
 					{
 						if (ans is FillInBlockAnswerInfo)
 						{
-							<td>@(((FillInBlockAnswerInfo)ans).Answer)</td>
+							var answer = ((FillInBlockAnswerInfo)ans);
+							var fillClass = answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer";
+							<td class="@fillClass">@(answer.Answer)</td>
 						}
 						else if (ans is IsTrueBlockAnswerInfo)
 						{
-							<td>@(((IsTrueBlockAnswerInfo)ans).Answer ? "true" : "")</td>
-							<td>@(((IsTrueBlockAnswerInfo)ans).Answer ? "" : "false")</td>
+							var answer = ((IsTrueBlockAnswerInfo)ans);
+							var classForTrueCell = answer.Answer == answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer";
+							var classForFalseCell = answer.Answer != answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer";
+							var classForTrueGlyphicon = answer.Answer ? "glyphicon glyphicon-ok" : "";
+							var classForFalseGlyphicon = !answer.Answer ? "glyphicon glyphicon-ok" : "";
+							<td class="@classForTrueCell"><i class="@classForTrueGlyphicon"></i></td>
+							<td class="@classForFalseCell"><i class="@classForFalseGlyphicon"></i></td>
 						}
 						else
 						{
-							foreach (var item in ((ChoiseBlockAnswerInfo)ans).AnswersId)
+							var answer = ((ChoiceBlockAnswerInfo)ans);
+							foreach (var item in answer.AnswersId)
 							{
-								<td>@item.Value</td>
+								var isContain = answer.RealyRightAnswer.Contains(item.Key);
+								var classForCell = ((isContain && item.Value) || (!isContain && !item.Value)) ? "rightQuizAnswer" : "falseQuizAnswer";
+								var itemClass = item.Value ? "glyphicon glyphicon-ok" : "";
+								<td class="@classForCell"><i class="@itemClass"></i></td>
 							}
 						}
+						if (maxQuestionIndex == int.Parse(ans.Id))
+						{
+							break;
+						}
+						<td style="border-top: none; border-bottom: none"></td>
 					}
 				</tr>
 			}
 		</tbody>
 	</table>
-
 </div>

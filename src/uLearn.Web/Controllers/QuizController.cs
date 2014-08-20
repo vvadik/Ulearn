@@ -55,6 +55,7 @@ namespace uLearn.Web.Controllers
 			public string Text;
 			public bool IsRightAnswer;
 			public Type QuizType;
+			public bool IsRightQuizBlock;
 		}
 
 
@@ -87,7 +88,7 @@ namespace uLearn.Web.Controllers
 				return "has empty bloks";
 			foreach (var quizInfoForDb in tmpFolder)
 				await userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
-					course.Slides[intSlideIndex].Id, quizInfoForDb.Text, User.Identity.GetUserId(), time);
+					course.Slides[intSlideIndex].Id, quizInfoForDb.Text, User.Identity.GetUserId(), time, quizInfoForDb.IsRightQuizBlock);
 			return string.Join("*", incorrectQuizzes.Distinct());
 		}
 
@@ -96,8 +97,8 @@ namespace uLearn.Web.Controllers
 		{
 			var course = courseManager.GetCourse(courseId);
 			var quizSlide = course.Slides[slideIndex];
-			var e = ((QuizSlide) quizSlide).RightAnswersToQuiz;
-			return e;
+			var rightAnswersToQuiz = ((QuizSlide) quizSlide).RightAnswersToQuiz;
+			return rightAnswersToQuiz;
 		}
 
 		private IEnumerable<QuizInfoForDb> GetQuizInfo(Course course, int slideIndex, IGrouping<string, QuizAnswer> answer)
@@ -115,15 +116,17 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(IsTrueBlock isTrueBlock, IGrouping<string, QuizAnswer> data)
 		{
+			var isTrue = isTrueBlock.Answer.ToString() == data.First().ItemId;
 			return new List<QuizInfoForDb>
 			{
 				new QuizInfoForDb
 				{
 					QuizId = isTrueBlock.Id,
 					ItemId = null,
-					IsRightAnswer = isTrueBlock.Answer.ToString() == data.First().ItemId,
+					IsRightAnswer = isTrue,
 					Text = data.First().ItemId,
-					QuizType = typeof(IsTrueBlock)
+					QuizType = typeof(IsTrueBlock),
+					IsRightQuizBlock = isTrue
 				}
 			};
 		}
@@ -131,47 +134,53 @@ namespace uLearn.Web.Controllers
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(ChoiceBlock choiseBlock, IGrouping<string, QuizAnswer> data)
 		{
 			if (!choiseBlock.Multiple)
+			{
+				var isTrue = choiseBlock.Items.First(x => x.Id == data.First().ItemId).IsCorrect;
 				return new List<QuizInfoForDb>
 				{
 					new QuizInfoForDb
 					{
 						QuizId = choiseBlock.Id,
 						ItemId = data.First().ItemId,
-						IsRightAnswer = choiseBlock.Items.First(x => x.Id == data.First().ItemId).IsCorrect,
+						IsRightAnswer = isTrue,
 						Text = null,
-						QuizType = typeof (ChoiceBlock)
+						QuizType = typeof (ChoiceBlock),
+						IsRightQuizBlock = isTrue
 					}
 				};
+			}
 			var ans = data.Select(x => x.ItemId).ToList()
 				.Select(x => new QuizInfoForDb
 				{
 					QuizId = choiseBlock.Id,
-					IsRightAnswer = false,
+					IsRightAnswer = choiseBlock.Items.Where(y => y.IsCorrect).Any(y => y.Id == x),
 					ItemId = x,
 					Text = null,
-					QuizType = typeof(ChoiceBlock)
-
+					QuizType = typeof(ChoiceBlock),
+					IsRightQuizBlock = false
 				}).ToList();
-			var correctItems = new HashSet<string>(choiseBlock.Items.Where(x => x.IsCorrect).Select(x => x.Id));
-			var ansItem = new HashSet<string>(ans.Select(x => x.ItemId));
-			var count = ansItem.Count(correctItems.Contains);
-			if (count != correctItems.Count || count != ansItem.Count) return ans;
+			var isRightQuizBlock = ans.All(x => x.IsRightAnswer) &&
+			             choiseBlock.Items.Where(x => x.IsCorrect)
+				             .Select(x => x.Id)
+				             .All(x => ans.Where(y => y.IsRightAnswer).Select(y => y.ItemId).Contains(x));
 			foreach (var info in ans)
-				info.IsRightAnswer = true;
+				info.IsRightQuizBlock = isRightQuizBlock;
 			return ans;
 		}
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(FillInBlock fillInBlock, string data)
 		{
+			var isTrue = fillInBlock.Regexes.Any(regex => Regex.IsMatch(data, regex));
 			return new List<QuizInfoForDb>
 			{
 				new QuizInfoForDb
 				{
 					QuizId = fillInBlock.Id,
 					ItemId = null,
-					IsRightAnswer = fillInBlock.Regexes.Any(regex => Regex.IsMatch(data, regex)),
+					IsRightAnswer = isTrue,
 					Text = data,
-					QuizType = typeof(FillInBlock)
+					QuizType = typeof(FillInBlock),
+					IsRightQuizBlock = isTrue
 				}
 			};
 		}
@@ -180,10 +189,10 @@ namespace uLearn.Web.Controllers
 		{
 			var course = courseManager.GetCourse(courseId);
 			var quizSlide = (QuizSlide) course.Slides[slideIndex];
-			quizSlide.Quiz.Blocks = quizSlide.Quiz.Blocks.OrderBy(x => x.Id).ToArray();
 			var dict = new SortedDictionary<string, List<QuizAnswerInfo>>();
 			foreach (var user in db.Users)
-				dict[user.UserName] = GetUserQuizAnswers(courseId, quizSlide, user.Id).OrderBy(x => x.Id).ToList();
+				if (userQuizzesRepo.IsQuizSlidePassed(courseId, user.Id, quizSlide.Id)) //не сворачивать в Where! DB запросы не поймут!
+					dict[user.UserName] = GetUserQuizAnswers(courseId, quizSlide, user.Id).OrderBy(x => user.Id).ToList();
 			return PartialView("~/Views/Course/_QuizAnalytics.cshtml", new QuizAnalyticsModel
 			{
 				UserAnswers = dict,
@@ -193,13 +202,13 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<QuizAnswerInfo> GetUserQuizAnswers(string courseId, QuizSlide slide, string userId)
 		{
-			foreach (var block in slide.Quiz.Blocks.Where(x => x is AbstractQuestionBlock))
+			foreach (var block in slide.Quiz.Blocks.OfType<AbstractQuestionBlock>())
 				if (block is FillInBlock)
-					yield return new FillInBlockAnswerInfo { Answer = userQuizzesRepo.GetFillInBlockAnswer(courseId, slide.Id, block.Id, userId), Id = slide.Id};
+					yield return userQuizzesRepo.GetFillInBlockAnswerInfo(courseId, slide.Id, block.Id, userId, block.QuestionIndex);
 				else if (block is ChoiceBlock)
-					yield return new ChoiseBlockAnswerInfo { AnswersId = userQuizzesRepo.GetChoiseBlockAnswer(courseId, slide.Id, (ChoiceBlock)block, userId), Id = slide.Id };
+					yield return userQuizzesRepo.GetChoiseBlockAnswerInfo(courseId, slide.Id, (ChoiceBlock)block, userId, block.QuestionIndex);
 				else if (block is IsTrueBlock)
-					yield return new IsTrueBlockAnswerInfo { Answer = userQuizzesRepo.GetIsTrueBlockAnswer(courseId, slide.Id, block.Id, userId), Id = slide.Id };
+					yield return userQuizzesRepo.GetIsTrueBlockAnswerInfo(courseId, slide.Id, block.Id, userId, block.QuestionIndex);
 		}
 	}
 }

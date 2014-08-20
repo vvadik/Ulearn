@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Identity;
+using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using System.Web.Mvc;
 using uLearn.Web.Models;
@@ -52,14 +53,21 @@ namespace uLearn.Web.Controllers
 			foreach (var slide in course.Slides)
 			{
 				var exerciseSlide = (slide as ExerciseSlide);
+				var quizSlide = (slide as QuizSlide);
 				var isExercise = exerciseSlide != null;
+				var isQuiz = quizSlide != null;
 				var hintsCountOnSlide = isExercise ? exerciseSlide.HintsHtml.Count() : 0;
 				tableInfo.Add(slide.Index + ". " + slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
 				{
 					Rates = slideRateRepo.GetRates(slide.Id, course.Id),
 					VisitersCount = visitersRepo.GetVisitersCount(slide.Id, course.Id),
 					IsExercise = isExercise,
-					SolversCount = isExercise ? userSolutionsRepo.GetAcceptedSolutionsCount(slide.Id, course.Id) : 0,
+					IsQuiz = isQuiz,
+					SolversCount = isExercise 
+						? userSolutionsRepo.GetAcceptedSolutionsCount(slide.Id, course.Id) 
+						: isQuiz 
+							? userQuizzessRepo.GetAverageStatistics(slide.Id, course.Id)
+							: 0,
 					TotalHintCount =  hintsCountOnSlide,
 					HintUsedPercent = isExercise ? slideHintRepo.GetHintUsedPercent(slide.Id, course.Id, hintsCountOnSlide, db.Users.Count()) : 0 
 				});

@@ -3,30 +3,30 @@
 
 <ul class="side-bar units-list navbar-collapse collapse nav navbar-nav container">
 	@{
-	int iUnit = 0;
-	foreach (var unit in Model.Units)
-	{
-		var collapseOption = unit == Model.CurrentUnit ? "collapse in" : "collapse";
-		<li class="units-list-item full-width">
-			<a data-toggle="collapse" href=@("#N" + iUnit) class="units-list-item-text">
-				@unit.Title
-			</a>
-			<ul id=@("N" + iUnit) class="slides-list @collapseOption">
-				@foreach (var slide in unit.Slides)
-				{
-					var url = Url.Action("Slide", "Course", new { courseId = Model.CourseId, slideIndex = slide.Index });
-					<i class="@GetIconClass(slide) navbar-label" title="@GetTitle(slide)"></i>
-				    <li class="slide-list-item @(slide == Model.CurrentSlide ? "selected" : "") " onclick="window.location.href = '@url'"><a href="@url">@slide.Title</a></li>
-				}
-			</ul>
-		</li>
-				iUnit++;
-	}
-	if (User.IsInRole(LmsRoles.Instructor))
-	{
-			<li class="units-list-item units-list-item-text">@Html.ActionLink("Total statistics", "TotalStatistics", "Analytics", new { courseId = Model.CourseId}, null)</li>
-			<li class="units-list-item units-list-item-text">@Html.ActionLink("Users statistics", "UsersStatistics", "Analytics", new { courseId = Model.CourseId}, null)</li>
-			<li class="units-list-item units-list-item-text">@Html.ActionLink("Personal statistics", "PersonalStatistics", "Analytics", new { courseId = Model.CourseId}, null)</li>
+		int iUnit = 0;
+		foreach (var unit in Model.Units)
+		{
+			var collapseOption = unit == Model.CurrentUnit ? "collapse in" : "collapse";
+			<li class="units-list-item full-width">
+				<a data-toggle="collapse" href=@("#N" + iUnit) class="units-list-item-text">
+					@unit.Title
+				</a>
+				<ul id=@("N" + iUnit) class="slides-list @collapseOption">
+					@foreach (var slide in unit.Slides)
+					{
+						var url = Url.Action("Slide", "Course", new {courseId = Model.CourseId, slideIndex = slide.Index});
+						<i class="@GetIconClass(slide) navbar-label" title="@GetTitle(slide)"></i>
+						<li class="slide-list-item @(slide == Model.CurrentSlide ? "selected" : "") " onclick=" window.location.href = '@url' "><a href="@url">@slide.Title</a></li>
+					}
+				</ul>
+			</li>
+			iUnit++;
+		}
+		if (User.IsInRole(LmsRoles.Instructor) || User.IsInRole(LmsRoles.Admin))
+		{
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Total statistics", "TotalStatistics", "Analytics", new {courseId = Model.CourseId}, null)</li>
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Users statistics", "UsersStatistics", "Analytics", new {courseId = Model.CourseId}, null)</li>
+			<li class="units-list-item units-list-item-text">@Html.ActionLink("Personal statistics", "PersonalStatistics", "Analytics", new {courseId = Model.CourseId}, null)</li>
 		}
 	}
 </ul>

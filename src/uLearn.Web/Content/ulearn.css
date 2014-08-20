@@ -419,3 +419,11 @@ table.diff tbody th {
 .hide-side-bar-button {
 	float: left;
 }
+
+.falseQuizAnswer {
+	background-color: lightcoral;
+}
+
+.rightQuizAnswer {
+	background-color: lightgreen;
+}
