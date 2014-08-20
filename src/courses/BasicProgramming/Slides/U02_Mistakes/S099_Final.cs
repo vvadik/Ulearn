@@ -1,41 +1,62 @@
 ﻿using System;
 using System.Globalization;
-using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Slide("Заключение", "{C232BC62-FEB7-450F-A0F5-28911F4146A5}")]
-	class S099
+	[Slide("Сделай то, не знаю что", "5EE7337B-14FE-41A2-9E12-ACA989534A3A")]
+	class S099_Quest
 	{
 		/*
-		TODO
+		Задача-загадка. Попробуйте сами понять, что нужно сделать :-)
 		*/
 
-		[ExpectedOutput("-8\r\nNone\r\n16\r\nNone")]
+		[ExpectedOutput(@"
+Decode(<0>) = 0
+Decode(<123>) = 123
+Decode(<10-10>) = 1010
+Decode(<102-5>) = 1
+Decode(111) = 1
+Decode(1-1-1) = 1
+Decode(<--->) = -1
+Decode(<lkj>) = -1
+Decode(<65536>) = 0
+Decode(<9223372036854775807>) = 1023
+")]
+		
+		[HideOnSlide]
 		public static void Main()
 		{
-			FindDiscriminant(1, 2, 3);
-			FindDiscriminant(1, 0, 9);
-			FindDiscriminant(1, 2, -3);
-			FindDiscriminant(4, 3, 0);
+			Check("<0>");
+			Check("<123>");
+			Check("<10-10>");
+			Check("<102-5>");
+			Check("111");
+			Check("1-1-1");
+			Check("<--->");
+			Check("<lkj>");
+			Check("<65536>");
+			Check("<9223372036854775807>");
 		}
 
-		[Exercise]
-		private static void FindDiscriminant(int a, int b, int c)
+		[HideOnSlide]
+		private static void Check(string code)
+		{
+			long res = Decode(code);
+			Console.WriteLine("Decode({0}) = {1}", code, res);
+		}
+
+		[HideOnSlide]
+		[ExcludeFromSolution]
+		private static long Decode(string code)
 		{
 			try
 			{
-				int test = 1/a/b/c;
-				Console.WriteLine(b*b - 4*a*c);
+				return long.Parse(code.Substring(1, code.Length-2).Replace("-", "")) % 1024;
 			}
 			catch
 			{
-				Console.WriteLine("None");
+				return -1;
 			}
-			
-			/*uncomment
-			...
-			*/
 		}
 	}
 }

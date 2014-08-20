@@ -14,7 +14,7 @@ namespace uLearn.Web.Ideone
 		private readonly string password;
 		private readonly Ideone_Service_v1Service service = new Ideone_Service_v1Service();
 
-		public ExecutionService(string userName = DefaultName, string password = DefaultPassword, int timeout = 20000)
+		public ExecutionService(string userName = DefaultName, string password = DefaultPassword, int timeout = 30000)
 		{
 			this.userName = userName;
 			this.password = password;
@@ -59,7 +59,7 @@ namespace uLearn.Web.Ideone
 			Debug.WriteLine("start checking status");
 			int count = 0;
 			var lastStatus = GetSubmitionStatus(link).Status;
-			while (lastStatus != SubmitionStatus.Done && count < 10)
+			while (lastStatus != SubmitionStatus.Done && count < 30)
 			{
 				Debug.WriteLine("nope. wait");
 				count++;
