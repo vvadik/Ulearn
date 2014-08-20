@@ -57,7 +57,7 @@
     <Compile Include="Slides\U01_Basics\S061_Operations.cs" />
     <Compile Include="Slides\U01_Basics\S080_LocalAndGlobalVarsVideo.cs" />
     <Compile Include="Slides\U01_Basics\S070_MethodsVideo.cs" />
-    <Compile Include="Slides\U01_Basics\S071_Methods.cs" />
+    <Compile Include="Slides\U01_Basics\S072_Methods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Slides\U01_Basics\S081-Scope.xml">
       <SubType>Designer</SubType>
@@ -68,13 +68,13 @@
     <Content Include="Slides\U02_Mistakes\S076_Style.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U02_Mistakes\S011-MissedUsings.xml">
+    <Content Include="Slides\U02_Mistakes\S011-CompileErrors.xml">
       <SubType>Designer</SubType>
     </Content>
     <Compile Include="Slides\U02_Mistakes\S099_Final.cs" />
-    <Compile Include="Slides\U02_Mistakes\S075_Dry.cs" />
+    <Compile Include="Slides\U02_Mistakes\S075_RefactoringVideo.cs" />
     <Compile Include="Slides\U02_Mistakes\S060_Experiments.cs" />
-    <Compile Include="Slides\U02_Mistakes\S010_CompilationMistakeVideo.cs" />
+    <Compile Include="Slides\U02_Mistakes\S010_CompileErrorsVideo.cs" />
     <Compile Include="Slides\U02_Mistakes\S031_Typo.cs" />
     <Compile Include="Slides\U02_Mistakes\S040_RuntimeExceptionsVideo.cs" />
     <Compile Include="Slides\U02_Mistakes\S041_RuntimeErrors.cs" />

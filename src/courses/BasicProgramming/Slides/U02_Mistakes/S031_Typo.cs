@@ -26,7 +26,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			Console.WriteLine(number);
 			/*uncomment
 			Console.WriteLine{'Hello, World!'};
-			var number = 5,5;
+			var numher = 5,5;
 			number += 7;
 			Console.Writeline(number):
 			*/
