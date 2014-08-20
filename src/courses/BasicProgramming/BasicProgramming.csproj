@@ -104,7 +104,38 @@
     <Compile Include="Slides\U03_Cycles\S050_ForVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S051_For.cs" />
     <Compile Include="Slides\U03_Cycles\S061_KtulhuFor.cs" />
+    <Compile Include="Slides\U04_Arrays\S010_Array.cs" />
+    <Compile Include="Slides\U04_Arrays\S030_ShortForm.cs" />
+    <Compile Include="Slides\U04_Arrays\S040_ArrayNull.cs" />
+    <Compile Include="Slides\U04_Arrays\S050_PassArrToMethod.cs" />
+    <Compile Include="Slides\U04_Arrays\S060_MultiDimensionArr.cs" />
+    <Compile Include="Slides\U04_Arrays\S080_ArrayOfArrays.cs" />
+    <Compile Include="Slides\U05_Collections\S010_List.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Slides\U05_Collections\S020_Dictionary.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Slides\U05_Collections\S030_ArrAndStringDiff.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Slides\U05_Collections\S040_StringBuilder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Slides\U05_Collections\S050_SpecialChars.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Slides\U05_Collections\S060_FormatOutput.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Slides\U05_Collections\S070_IO.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Slides_Tests.cs" />
+    <Content Include="Slides\U04_Arrays\Prelude.txt" />
+    <Content Include="Slides\U04_Arrays\Title.txt" />
+    <Content Include="Slides\U05_Collections\Prelude.txt" />
+    <Content Include="Slides\U05_Collections\Title.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">
@@ -114,6 +145,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Slides\U04_Arrays\_S050_ValueRferenceType.odp" />
+    <None Include="Slides\U04_Arrays\_S070_GraphicDimensional.odp" />
+    <None Include="Slides\U04_Arrays\_S090_Memory.odp" />
+    <None Include="Slides\U05_Collections\_S030_StringToMethod.odp" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Slides\Title.txt" />
@@ -124,6 +159,7 @@
     <Content Include="Slides\U03_Cycles\Title.txt" />
     <Content Include="Slides\U03_Cycles\Prelude.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>rd /S /Q $(SolutionDir)uLearn.Web\Courses\$(ProjectName)\
