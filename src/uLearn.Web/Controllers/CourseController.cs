@@ -77,7 +77,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[Authorize]
-		public async Task<ActionResult> AcceptedSolutions(string courseId, int slideIndex = 0)
+		public ActionResult AcceptedSolutions(string courseId, int slideIndex = 0)
 		{
 			var userId = User.Identity.GetUserId();
 			var course = courseManager.GetCourse(courseId);

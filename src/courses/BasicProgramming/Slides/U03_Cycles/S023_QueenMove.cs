@@ -17,7 +17,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		[Hint("Функция взятия модуля числа находится в классе Math и называется Abs")]
 		[Hint(@"Воспользуйтесь знанием, что символы латинских букв в кодировке Unicod стоят в алфавитном порядке, а
  результат вычитания одного char из другого char - разница между их кодами в кодировке")]
-		[ExpectedOutput("8\r\n84\r\n4\r\n244")]
+		[ExpectedOutput("True\nFalse\nTrue\nTrue\nFalse\nTrue\nFalse")]
 		public static void Main()
 		{
 			Console.WriteLine(IsRightStep("a1", "d4"));
