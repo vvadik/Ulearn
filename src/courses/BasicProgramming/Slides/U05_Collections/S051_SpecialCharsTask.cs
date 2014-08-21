@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
@@ -24,7 +25,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			DoubleQuote, // {"}
 			OneQuote, // {'}
 			Slash, // {/}
-			FavouriteWord, // {I'm\t\a\t\robot} (сдесь нет спецсимволов!)
+			FavouriteWord, // {I'm\t\a\t\robot} (здесь нет спецсимволов!)
 			Tab, // таб
 			NewLine // перевод строки
 		}
@@ -38,6 +39,7 @@ I'm\t\a\t\robot")]
 			Console.WriteLine(robotSaid);
 		}
 
+		[Exercise]
 		private static string ConvertEnumList(List<Words> robotWords)
 		{
 			var str = new StringBuilder();
@@ -57,6 +59,9 @@ I'm\t\a\t\robot")]
 					str.Append("\n");
 			}
 			return str.ToString();
+			/*uncomment
+			...
+			*/
 		}
 
 		[HideOnSlide]
