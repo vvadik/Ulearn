@@ -85,12 +85,12 @@
     <Compile Include="Slides\U02_Mistakes\_MissedUsings.cs" />
     <Compile Include="Slides\U02_Mistakes\_TypeCastingMistaces.cs" />
     <Compile Include="Slides\U02_Mistakes\_Typo.cs" />
+    <Compile Include="Slides\U03_Cycles\S023_QueenMove.cs" />
     <Compile Include="Slides\U03_Cycles\S060_ForVsWhileVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S010_LogicalTypeVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S015_IsLeapYear.cs" />
     <Compile Include="Slides\U03_Cycles\S020_IfElse.cs" />
     <Compile Include="Slides\U03_Cycles\S022_MiddleOf3Task.cs" />
-    <Compile Include="Slides\U03_Cycles\S023_QueenMove.cs" />
     <Compile Include="Slides\U03_Cycles\S030_IfErrorsVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S032_RobotControl.cs" />
     <Compile Include="Slides\U03_Cycles\S040_WhileVideo.cs" />
