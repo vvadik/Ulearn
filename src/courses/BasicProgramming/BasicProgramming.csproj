@@ -7,7 +7,7 @@
     <ProjectGuid>{83A81211-A139-4A37-92A0-716809232F08}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>uLearn.Courses.BasicProgramming.Slides</RootNamespace>
+    <RootNamespace>uLearn.Courses.BasicProgramming</RootNamespace>
     <AssemblyName>Lection1 - Hello World</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -42,7 +42,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
     <Compile Include="Slides\U01_Basics\S010_HelloWorldVideo.cs" />
     <Compile Include="Slides\U01_Basics\S012_InformationSources.cs" />
     <Compile Include="Slides\U01_Basics\S011_FirstStep.cs" />
@@ -87,15 +86,13 @@
     <Compile Include="Slides\U02_Mistakes\_TypeCastingMistaces.cs" />
     <Compile Include="Slides\U02_Mistakes\_Typo.cs" />
     <Compile Include="Slides\U03_Cycles\S060_ForVsWhileVideo.cs" />
-    <Compile Include="Slides\U03_Cycles\S011_LogicalType.cs" />
     <Compile Include="Slides\U03_Cycles\S010_LogicalTypeVideo.cs" />
-    <Compile Include="Slides\U03_Cycles\S021_IsLeapYear.cs" />
+    <Compile Include="Slides\U03_Cycles\S015_IsLeapYear.cs" />
     <Compile Include="Slides\U03_Cycles\S020_IfElse.cs" />
-    <Compile Include="Slides\U03_Cycles\S022_IfElseTask2.cs" />
+    <Compile Include="Slides\U03_Cycles\S022_MiddleOf3Task.cs" />
     <Compile Include="Slides\U03_Cycles\S023_QueenMove.cs" />
     <Compile Include="Slides\U03_Cycles\S030_IfErrorsVideo.cs" />
-    <Compile Include="Slides\U03_Cycles\S031_IfReturn.cs" />
-    <Compile Include="Slides\U03_Cycles\S032_ExcessIf.cs" />
+    <Compile Include="Slides\U03_Cycles\S032_RobotControl.cs" />
     <Compile Include="Slides\U03_Cycles\S040_WhileVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S041_While.cs" />
     <Compile Include="Slides\U03_Cycles\S042_Break.cs" />

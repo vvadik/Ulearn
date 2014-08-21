@@ -32,7 +32,8 @@
 }
 
 .cm-s-cobalt .CodeMirror-matchingbracket {
-	outline-color: #006B8B !important;
+	outline-color: rgb(0, 100, 100) !important;
+	outline-color: rgba(0, 200, 200, 0.5) !important;
 }
 
 .nav-arrow {
