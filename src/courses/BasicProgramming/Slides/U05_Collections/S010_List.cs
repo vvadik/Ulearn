@@ -8,7 +8,7 @@ namespace Slide01
 	/*
 	## Заметки по лекции
 	*/
-	[Slide("Листы", "{D203BFDE-49E4-45AB-B9EE-DB11975F99D0}")]
+	[Slide("Списки", "{D203BFDE-49E4-45AB-B9EE-DB11975F99D0}")]
     public class S010_List
     {
         static void Main()

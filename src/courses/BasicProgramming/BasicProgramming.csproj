@@ -88,12 +88,12 @@
     <Compile Include="Slides\U02_Mistakes\_MissedUsings.cs" />
     <Compile Include="Slides\U02_Mistakes\_TypeCastingMistaces.cs" />
     <Compile Include="Slides\U02_Mistakes\_Typo.cs" />
+    <Compile Include="Slides\U03_Cycles\S023_QueenMove.cs" />
     <Compile Include="Slides\U03_Cycles\S060_ForVsWhileVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S010_LogicalTypeVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S015_IsLeapYear.cs" />
     <Compile Include="Slides\U03_Cycles\S020_IfElse.cs" />
     <Compile Include="Slides\U03_Cycles\S022_MiddleOf3Task.cs" />
-    <Compile Include="Slides\U03_Cycles\S023_QueenMove.cs" />
     <Compile Include="Slides\U03_Cycles\S030_IfErrorsVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S032_RobotControl.cs" />
     <Compile Include="Slides\U03_Cycles\S040_WhileVideo.cs" />
@@ -116,24 +116,29 @@
     <Compile Include="Slides\U05_Collections\S010_List.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Slides\U05_Collections\S011_ListTask.cs" />
     <Compile Include="Slides\U05_Collections\S020_Dictionary.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Slides\U05_Collections\S021_DictionaryTask.cs" />
     <Compile Include="Slides\U05_Collections\S030_ArrAndStringDiff.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Slides\U05_Collections\S040_StringBuilder.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Slides\U05_Collections\S041_StringBuilderTask.cs" />
     <Compile Include="Slides\U05_Collections\S050_SpecialChars.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Slides\U05_Collections\S051_SpecialCharsTask.cs" />
     <Compile Include="Slides\U05_Collections\S060_FormatOutput.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Slides\U05_Collections\S070_IO.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Slides\U05_Collections\_SpecialCharsInclude.cs" />
     <Compile Include="Slides_Tests.cs" />
     <Content Include="Slides\U04_Arrays\Prelude.txt" />
     <Content Include="Slides\U04_Arrays\Title.txt" />

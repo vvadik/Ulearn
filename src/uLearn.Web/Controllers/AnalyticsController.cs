@@ -57,14 +57,15 @@ namespace uLearn.Web.Controllers
 				var isExercise = exerciseSlide != null;
 				var isQuiz = quizSlide != null;
 				var hintsCountOnSlide = isExercise ? exerciseSlide.HintsHtml.Count() : 0;
+				var visitersCount = visitersRepo.GetVisitersCount(slide.Id, course.Id);
 				tableInfo.Add(slide.Index + ". " + slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
 				{
 					Rates = slideRateRepo.GetRates(slide.Id, course.Id),
-					VisitersCount = visitersRepo.GetVisitersCount(slide.Id, course.Id),
+					VisitersCount = visitersCount,
 					IsExercise = isExercise,
 					IsQuiz = isQuiz,
 					SolversCount = isExercise 
-						? userSolutionsRepo.GetAcceptedSolutionsCount(slide.Id, course.Id) 
+						? (visitersCount == 0 ? 0 : (int)((double)userSolutionsRepo.GetAcceptedSolutionsCount(slide.Id, course.Id)/visitersCount)*100)
 						: isQuiz 
 							? userQuizzessRepo.GetAverageStatistics(slide.Id, course.Id)
 							: 0,

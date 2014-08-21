@@ -122,14 +122,27 @@ namespace uLearn.Web.DataContexts
 
 		public int GetAverageStatistics(string slideId, string courseId)
 		{
-			return 0;
-			var a = db.UserQuizzes
+			var newA = db.UserQuizzes
 				.Where(x => x.SlideId == slideId && x.CourseId == courseId)
-				.GroupBy(x => x.UserId).ToList();
-			var e =  a.Select(x => x.Distinct(new UserQuizComparer()));
-			var t = e.Select(x => x.Select(ConvertQuizBlockInDouble).Average());
-			var q = t.Average() * 100; //не могу засунуть Dictinct в sql запрос ;(
-			return (int)q;
+				.GroupBy(x => x.UserId)
+				.Select(x => x
+					.GroupBy(y => y.QuizId)
+					.Select(y => y.All(z => z.IsRightQuizBlock))
+					.Select(y => y ? 1 : 0)
+					.Average())
+				.DefaultIfEmpty()
+				.Average() * 100;
+			//var a = db.UserQuizzes
+			//	.Where(x => x.SlideId == slideId && x.CourseId == courseId)
+			//	.GroupBy(x => x.UserId)
+			//	.Select(x => x.Distinct(new UserQuizComparer()))
+			//	.Select(x => x.Select(ConvertQuizBlockInDouble).Average())
+			//	.Average() * 100;
+			return (int) newA;
+			//var e =  a.Select(x => x.Distinct(new UserQuizComparer()));
+			//var t = e.Select(x => x.Select(ConvertQuizBlockInDouble).Average());
+			//var q = t.Average() * 100; //не могу засунуть Dictinct в sql запрос ;(
+			//return (int)q;
 		}
 
 		private double ConvertQuizBlockInDouble(UserQuiz userQuiz)
