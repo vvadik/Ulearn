@@ -64,6 +64,9 @@
     <Compile Include="Slides\U01_Basics\S100_FinalTask.cs" />
     <Compile Include="Slides\U01_Basics\S000_HelpSlide.cs" />
     <Compile Include="Slides\U01_Basics\_HelloWorld.cs" />
+    <Content Include="Slides\U02_Mistakes\S091_Style2.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Slides\U02_Mistakes\S076_Style.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -102,11 +105,14 @@
     <Compile Include="Slides\U03_Cycles\S051_For.cs" />
     <Compile Include="Slides\U03_Cycles\S061_KtulhuFor.cs" />
     <Compile Include="Slides\U04_Arrays\S010_Array.cs" />
-    <Compile Include="Slides\U04_Arrays\S030_ShortForm.cs" />
-    <Compile Include="Slides\U04_Arrays\S040_ArrayNull.cs" />
-    <Compile Include="Slides\U04_Arrays\S050_PassArrToMethod.cs" />
-    <Compile Include="Slides\U04_Arrays\S060_MultiDimensionArr.cs" />
-    <Compile Include="Slides\U04_Arrays\S080_ArrayOfArrays.cs" />
+    <Compile Include="Slides\U04_Arrays\S021_ArrayExercise.cs" />
+    <Compile Include="Slides\U04_Arrays\S020_ShortForm.cs" />
+    <Compile Include="Slides\U04_Arrays\S030_ArrayNull.cs" />
+    <Compile Include="Slides\U04_Arrays\S040_PassArrToMethod.cs" />
+    <Compile Include="Slides\U04_Arrays\S041_ArrayExercise2.cs" />
+    <Compile Include="Slides\U04_Arrays\S050_MultiDimensionArr.cs" />
+    <Compile Include="Slides\U04_Arrays\S060_ArrayOfArrays.cs" />
+    <Compile Include="Slides\U04_Arrays\S061_Exercise.cs" />
     <Compile Include="Slides\U05_Collections\S010_List.cs">
       <SubType>Code</SubType>
     </Compile>

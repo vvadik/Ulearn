@@ -100,13 +100,11 @@ function markAns(s) {
                 var blockId = content[0];
                 if (content[1] == "True" || content[1] == "False") {
                     $("#" + blockId + content[1]).parent().addClass("right-quiz");
-                    $("#" + blockId + content[1]).parent().parent().children('i').addClass('right-quiz glyphicon glyphicon-ok');
                     rightAnswersId.push(blockId + content[1]);
                 } else {
                     var items = content[1].split("*");
                     for (var itemIndex in items) {
                         $("#" + blockId + items[itemIndex]).parent().addClass("right-quiz");
-                        $("#" + blockId + items[itemIndex]).parent().parent().children('i').addClass('right-quiz glyphicon glyphicon-ok');
                         rightAnswersId.push(blockId + items[itemIndex]);
                     }
                 }
@@ -116,8 +114,6 @@ function markAns(s) {
 
         $(".quiz").each(function() {
             var $e = (($(this).children('label').children('input')));
-            if (!$e.parent().parent().children('i').hasClass('right-quiz'))
-                $e.parent().parent().children('i').addClass('glyphicon glyphicon-remove wrong-quiz');
             if ($e.is(':checked')) {
                 if (($.inArray(($e.attr('id')), rightAnswersId)) == -1)
                 ($e.parent().addClass("wrong-quiz"));
