@@ -57,7 +57,6 @@ namespace uLearn
 		{
 			return someSlideClass.Assembly
 				.GetTypes()
-				.Where(t => t.Namespace == someSlideClass.Namespace)
 				.Select(t => Tuple.Create(t, t.GetCustomAttributes(typeof(SlideAttribute)).Cast<SlideAttribute>().FirstOrDefault()))
 				.Where(t => t.Item2 != null);
 		}
@@ -91,7 +90,7 @@ namespace uLearn
 
 		public static IEnumerable<ExpectedOutputAttribute> GetExpectedOutputAttributes(Type declaringType)
 		{
-			return declaringType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+			return declaringType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)
 				.SelectMany(m => m.GetCustomAttributes(typeof(ExpectedOutputAttribute)))
 				.Cast<ExpectedOutputAttribute>();
 		}

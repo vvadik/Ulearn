@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Високосный год", "{4C161B1E-2637-447B-ADFD-14647BF659AD}")]
-	class S021_IsLeapYear
+	class S015_IsLeapYear
 	{
 		/*
 		Васе очень хочется знать, високосный ли какой-либо год. 
@@ -12,6 +12,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		год является високосным в двух случаях: либо он кратен 4, но при этом не кратен 100, либо кратен 400.
 		
 		Помогите ему написать программу, которая по введенному году определяет - високосный год или нет.
+
+		Напишите решение в однин оператор.
 		*/
 
 		[ExpectedOutput("False\nFalse\nTrue\nFalse\nFalse\nTrue\nFalse\nTrue")]
@@ -28,11 +30,12 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		}
 
 		[Exercise]
+		[SingleStatementMethod]
 		public static bool IsThisLeapYear(int year)
 		{
-			return DateTime.IsLeapYear(year);
+			return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
 			/*uncomment
-			...
+			return ...
 			*/
 		}
 	}
