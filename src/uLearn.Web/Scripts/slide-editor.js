@@ -23,7 +23,7 @@ function codeMirrorClass(c, editable) {
 			},
 			readOnly: !editable,
 			autoCloseBrackets: true,
-			styleActiveLine: true,
+			styleActiveLine: editable,
 			matchBrackets: true,
 	});
 		element.codeMirrorEditor = editor;
