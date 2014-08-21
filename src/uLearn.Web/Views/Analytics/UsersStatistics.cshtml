@@ -29,7 +29,14 @@
 								<td><h6>@user.Key</h6></td>
 								@foreach (var unitName in Model.UnitNamesInOrdered)
 								{
-									<td>@(user.Value[unitName] + "%")</td>
+									if (user.Value.ContainsKey(unitName))
+									{
+										<td>@(user.Value[unitName] + "%")</td>
+									}
+									else
+									{
+										<td>0%</td>
+									}
 								}
 								<td>
 									@(user.Value.Values.Sum() / user.Value.Count + "%")

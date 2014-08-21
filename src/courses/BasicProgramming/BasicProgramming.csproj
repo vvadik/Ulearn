@@ -132,6 +132,7 @@
     <Compile Include="Slides\U05_Collections\S070_IO.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Slides\U05_Collections\_SpecialCharsInclude.cs" />
     <Compile Include="Slides_Tests.cs" />
     <Content Include="Slides\U04_Arrays\Prelude.txt" />
     <Content Include="Slides\U04_Arrays\Title.txt" />
