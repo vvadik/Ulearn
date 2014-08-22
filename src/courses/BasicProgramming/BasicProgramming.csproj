@@ -36,6 +36,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -150,6 +152,14 @@
     <Compile Include="Slides\U06_AutomaticTesting\S050_FunctionalTestingcs.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\S060_ForWhatThisTests.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\_UnitTest.cs" />
+    <Compile Include="Slides\U07_Algorithms\S010_BasicComplexity.cs" />
+    <Compile Include="Slides\U07_Algorithms\S020_OSymbol.cs" />
+    <Compile Include="Slides\U07_Algorithms\S030_NumberComplex.cs" />
+    <Compile Include="Slides\U07_Algorithms\S060_ComplexityMeausure.cs" />
+    <Compile Include="Slides\U07_Algorithms\S040_FunctionGrowth.cs" />
+    <Compile Include="Slides\U07_Algorithms\S050_BasicTerms.cs" />
+    <Compile Include="Slides\U07_Algorithms\S070_ComplexityMark.cs" />
+    <Compile Include="Slides\U07_Algorithms\S080_ComplexityClasses.cs" />
     <Compile Include="Slides_Tests.cs" />
     <Content Include="Slides\U04_Arrays\Prelude.txt" />
     <Content Include="Slides\U04_Arrays\S021_ArrayQuiz.xml">
@@ -160,6 +170,8 @@
     <Content Include="Slides\U05_Collections\Title.txt" />
     <Content Include="Slides\U06_AutomaticTesting\Prelude.txt" />
     <Content Include="Slides\U06_AutomaticTesting\Title.txt" />
+    <Content Include="Slides\U07_Algorithms\Prelude.txt" />
+    <Content Include="Slides\U07_Algorithms\Title.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">
@@ -173,6 +185,7 @@
     <None Include="Slides\U04_Arrays\_S070_GraphicDimensional.odp" />
     <None Include="Slides\U04_Arrays\_S090_Memory.odp" />
     <None Include="Slides\U05_Collections\_S030_StringToMethod.odp" />
+    <None Include="Slides\U07_Algorithms\_Materials.zip" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Slides\Title.txt" />
