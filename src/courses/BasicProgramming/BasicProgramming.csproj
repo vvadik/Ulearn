@@ -141,6 +141,9 @@
     <Compile Include="Slides\U05_Collections\_SpecialCharsInclude.cs" />
     <Compile Include="Slides_Tests.cs" />
     <Content Include="Slides\U04_Arrays\Prelude.txt" />
+    <Content Include="Slides\U04_Arrays\S021_ArrayQuiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Slides\U04_Arrays\Title.txt" />
     <Content Include="Slides\U05_Collections\Prelude.txt" />
     <Content Include="Slides\U05_Collections\Title.txt" />

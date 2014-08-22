@@ -380,7 +380,7 @@ table.diff tbody th {
 }
 
 .quiz-submit-btn {
-    margin-top: 10px;
+    margin-top: -10px;
     margin-bottom: 5px;
 }
 
@@ -415,6 +415,13 @@ table.diff tbody th {
 
 .quiz-block-input {
     
+}
+
+.quiz-delimeter {
+    margin-bottom: 40px;
+    margin-top: 40px;
+    color: gray;
+    align-self: center;
 }
 
 .hide-side-bar-button {

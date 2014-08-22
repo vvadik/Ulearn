@@ -111,7 +111,6 @@ function markAns(s) {
             }
         }
 
-
         $(".quiz").each(function() {
             var $e = (($(this).children('label').children('input')));
             if ($e.is(':checked')) {
@@ -119,10 +118,5 @@ function markAns(s) {
                 ($e.parent().addClass("wrong-quiz"));
             }
         });
-
-        for (i in rightAnswersId) {
-            if ((!$("#" + rightAnswersId[i]).is(':checked')))
-            ($("#" + rightAnswersId[i]).parent().removeClass("right-quiz").addClass("wrong-quiz"));
-        }
     }
 }
