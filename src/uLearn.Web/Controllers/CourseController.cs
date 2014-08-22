@@ -36,7 +36,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[Authorize]
-		public async Task<ActionResult> Slide(string courseId, int slideIndex = 0)
+		public async Task<ActionResult> Slide(string courseId, int slideIndex = -1)
 		{
 			var model = await CreateCoursePageModel(courseId, slideIndex);
 			var exerciseSlide = model.Slide as ExerciseSlide;
@@ -56,9 +56,23 @@ namespace uLearn.Web.Controllers
 			choiceBlock.Items = choiceBlock.Items.OrderBy(x => random.Next()).ToArray();
 		}
 
+		private int GetInitialIndexForStartup(string courseId, Course course, int slideIndex)
+		{
+			var userId = User.Identity.GetUserId();
+			for (var index = 0; index < course.Slides.Length; index++)
+				if (!visitersRepo.IsUserVisit(courseId, course.Slides[index].Id, userId))
+				{
+					slideIndex = index;
+					break;
+				}
+			return slideIndex == -1 ? course.Slides.Length - 1 : slideIndex;
+		}
+
 		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, int slideIndex)
 		{
 			Course course = courseManager.GetCourse(courseId);
+			if (slideIndex == -1)
+				slideIndex = GetInitialIndexForStartup(courseId, course, slideIndex);
 			await VisitSlide(courseId, course.Slides[slideIndex].Id);
 			var model = new CoursePageModel
 			{
@@ -112,7 +126,7 @@ namespace uLearn.Web.Controllers
 		public async Task<string> ApplyRate(string courseId, string slideId, string rate)
 		{
 			var userId = User.Identity.GetUserId();
-			var slideRate = (SlideRates) Enum.Parse(typeof (SlideRates), rate);
+			var slideRate = (SlideRates)Enum.Parse(typeof(SlideRates), rate);
 			return await slideRateRepo.AddRate(courseId, slideId, userId, slideRate);
 		}
 
@@ -137,7 +151,7 @@ namespace uLearn.Web.Controllers
 		public async Task<JsonResult> LikeSolution(int solutionId)
 		{
 			var res = await solutionsRepo.Like(solutionId, User.Identity.GetUserId());
-			return Json(new {likesCount = res.Item1, liked = res.Item2});
+			return Json(new { likesCount = res.Item1, liked = res.Item2 });
 		}
 
 		public async Task VisitSlide(string courseId, string slideId)
