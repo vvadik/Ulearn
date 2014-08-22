@@ -6,10 +6,11 @@
 @if (QuizSlide != null)
 {
 	var passed = Model.PassedQuiz.Contains(QuizSlide.Id);
+	var delim = "";
 	for (int blockIndex = 0; blockIndex < QuizSlide.Quiz.Blocks.Length; blockIndex++)
 	{
 		var quizBlock = QuizSlide.Quiz.Blocks[blockIndex];
-	    var quizModel = new QuizInfoModel(Model, quizBlock, blockIndex, passed);
+		var quizModel = new QuizInfoModel(Model, quizBlock, blockIndex, passed);
 		if (quizBlock is CodeBlock)
 		{
 			<textarea class='code code-sample'>@quizBlock.Text</textarea>
@@ -26,18 +27,22 @@
 				@Html.Raw(quizBlock.Text.RenderMd())
 			}
 		}
-	    if (quizBlock is ChoiceBlock)
-	    {
-	        @Html.Partial("_ChoiceBlock", quizModel)
-	    }
-		
+		delim = blockIndex != QuizSlide.Quiz.Blocks.Length - 1 ? "quiz-delimeter" : "";
+		if (quizBlock is ChoiceBlock)
+		{
+			@Html.Partial("_ChoiceBlock", quizModel)
+			<hr class="@delim">
+		}
+
 		else if (quizBlock is FillInBlock)
 		{
-		    @Html.Partial("_FillInBlock", quizModel)
+			@Html.Partial("_FillInBlock", quizModel)
+			<hr class="@delim">
 		}
 		else if (quizBlock is IsTrueBlock)
 		{
-		    @Html.Partial("_TrueFalseBlock", quizModel)
+			@Html.Partial("_TrueFalseBlock", quizModel)
+			<hr class="@delim">
 		}
 	}
 	if (User.IsInRole(LmsRoles.Instructor) || User.IsInRole(LmsRoles.Admin))

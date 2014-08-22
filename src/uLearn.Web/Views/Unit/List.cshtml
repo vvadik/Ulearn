@@ -1,0 +1,38 @@
+﻿@model uLearn.Web.Controllers.UnitsListViewModel
+
+@{
+	ViewBag.Title = "Администрирование юнитов";
+}
+
+<div class="container">
+	<h2>Администрирование юнитов</h2>
+	<table class="table">
+		@foreach (var unit in Model.Units)
+		{
+			<tr>
+				<td>@unit.Item1</td>
+				<td>
+					@(unit.Item2 == null ? "Не опубликован" : unit.Item2.PublishTime.ToString("s"))
+				</td>
+				<td>
+					@using (Html.BeginForm("SetPublishTime", "Unit", new { courseId = Model.CourseId, unitName = unit.Item1 }, FormMethod.Post))
+					{
+						<input type="text" name="publishTime" value="@Model.CurrentDateTime.ToString("s")" />
+						<button type="submit" class="btn btn-info">Изменить</button>
+					}
+				</td>
+				<td>
+					@if (unit.Item2 != null)
+					{
+						using (Html.BeginForm("RemovePublishTime", "Unit", new { courseId = Model.CourseId, unitName = unit.Item1 }, FormMethod.Post))
+						{
+							<button type="submit" class="btn btn-danger">Удалить</button>
+						}
+					}
+				</td>
+
+
+			</tr>
+		}
+	</table>
+</div>

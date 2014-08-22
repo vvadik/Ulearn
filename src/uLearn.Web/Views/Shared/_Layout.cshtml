@@ -27,7 +27,12 @@
 				<ul class="nav navbar-nav">
 					@if (User.IsInRole(LmsRoles.Admin))
 					{
-						<li>@Html.ActionLink("Users", "List", "Account")</li>
+						<li>@Html.ActionLink("Пользователи", "List", "Account")</li>
+					}
+
+					@if (User.IsInRole(LmsRoles.Instructor))
+					{
+						<li>@Html.ActionLink("Администрирование курсов", "CourseList", "Unit")</li>
 					}
 
 				</ul>

@@ -7,13 +7,13 @@
 	var isMultiply = choiceQuizBlock.Multiple;
 	var typeInp = isMultiply ? "checkbox" : "radio";
 	
-    <div class="quiz-block-mark @typeInp" id='@(quizBlock.Id + "_quizBlock")'> 
+    <div class="quiz-block-mark @typeInp" id='@(quizBlock.Id + "_quizBlock")'>
         @for (int itemIndex = 0; itemIndex < choiceQuizBlock.Items.Length; itemIndex++)
         {
             var ident = isMultiply ? itemIndex + "noMult" : Model.BlockIndex.ToString();
             var var = choiceQuizBlock.Items[itemIndex];
-			var ans = "";
-			if (Model.Passed && Model.CourseModel.AnswersToQuizes[quizBlock.Id].Contains(var.Id))
+            var ans = "";
+            if (Model.Passed && Model.CourseModel.AnswersToQuizes[quizBlock.Id].Contains(var.Id))
             {
                 ans = "checked";
             }

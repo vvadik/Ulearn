@@ -98,7 +98,7 @@
     <Compile Include="Slides\U03_Cycles\S030_IfErrorsVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S032_RobotControl.cs" />
     <Compile Include="Slides\U03_Cycles\S040_WhileVideo.cs" />
-    <Compile Include="Slides\U03_Cycles\S041_While.cs" />
+    <Compile Include="Slides\U03_Cycles\S041_PowerOfTwo.cs" />
     <Compile Include="Slides\U03_Cycles\S042_Break.cs" />
     <Compile Include="Slides\U03_Cycles\S043_Continue.cs" />
     <Compile Include="Slides\U03_Cycles\S044_WhileRefactoringVideo.cs" />
@@ -152,6 +152,9 @@
     <Compile Include="Slides\U06_AutomaticTesting\_UnitTest.cs" />
     <Compile Include="Slides_Tests.cs" />
     <Content Include="Slides\U04_Arrays\Prelude.txt" />
+    <Content Include="Slides\U04_Arrays\S021_ArrayQuiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Slides\U04_Arrays\Title.txt" />
     <Content Include="Slides\U05_Collections\Prelude.txt" />
     <Content Include="Slides\U05_Collections\Title.txt" />
