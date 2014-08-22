@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
@@ -30,7 +29,7 @@ namespace uLearn.Web.Controllers
 				.ToArray();
 			var visitedSlideIds = visitersRepo.GetIdOfVisitedSlides(course.Id, userId);
 			var currentSlide = course.FindSlide(slideIndex);
-			if (!visibleUnits.Contains(currentSlide.Info.UnitName))
+			if (currentSlide != null && !visibleUnits.Contains(currentSlide.Info.UnitName))
 				currentSlide = null;
 			var currentUnit = units.FirstOrDefault(u => u.Slides.Contains(currentSlide) && visibleUnits.Contains(u.Title));
 			return PartialView(new TocModel
