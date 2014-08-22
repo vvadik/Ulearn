@@ -31,7 +31,7 @@ namespace uLearn.Web
 			foreach (var course in courseManager.Courses)
 				foreach (var slide in course.Slides.OfType<ExerciseSlide>())
 				{
-					yield return new TestCaseData(slide, executionService).SetName(slide.Info.CourseName+" - "+slide.Info.UnitName+" - "+slide.Title);
+					yield return new TestCaseData(slide, executionService).SetName(course.Id + " - " + slide.Info.UnitName + " - " + slide.Title);
 				}
 		}
 
@@ -40,7 +40,7 @@ namespace uLearn.Web
 			var solution = slide.Solution.BuildSolution(slide.Solution.TemplateSolution);
 			if (solution.HasErrors)
 				Assert.Fail("Template solution: "+slide.Solution.TemplateSolution + "\n\n" +"sourse code: "+ solution.SourceCode + "\n\n" + "solution has error in: " +
-				            slide.Info.CourseName + " - " + slide.Info.UnitName + " - " + slide.Title +
+				            slide.Info.UnitName + " - " + slide.Title +
 				            "\n" + "\terror: " + solution.ErrorMessage + "\n\n");
 			else
 			{
@@ -57,7 +57,7 @@ namespace uLearn.Web
 				};
 				if (!isRightAnswer)
 				{
-					Assert.Fail("mistake in: " + slide.Info.CourseName + " - " + slide.Info.UnitName + " - " + slide.Title + "\n" +
+					Assert.Fail("mistake in: " + slide.Info.UnitName + " - " + slide.Title + "\n" +
 								"\tActualOutput: " + result.ActualOutput + "\n" +
 								"\tExpectedOutput: " + result.ExpectedOutput + "\n" +
 								"\tCompilationError: " + result.CompilationError + "\n" +

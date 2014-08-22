@@ -9,14 +9,21 @@
 			var collapseOption = unit == Model.CurrentUnit ? "collapse in" : "collapse";
 			<li class="units-list-item full-width">
 				<a data-toggle="collapse" href=@("#N" + iUnit) class="units-list-item-text">
-					@unit.Title
+					@unit.UnitName
 				</a>
 				<ul id=@("N" + iUnit) class="slides-list @collapseOption">
 					@foreach (var slide in unit.Slides)
 					{
 						var url = Url.Action("Slide", "Course", new {courseId = Model.CourseId, slideIndex = slide.Index});
 						<i class="@GetIconClass(slide) navbar-label" title="@GetTitle(slide)"></i>
-						<li class="slide-list-item @(slide == Model.CurrentSlide ? "selected" : "") " onclick=" window.location.href = '@url' "><a href="@url">@slide.Title</a></li>
+						<li class="slide-list-item @(slide == Model.CurrentSlide ? "selected" : "") " onclick="window.location.href='@url'"><a href="@url">@slide.Title</a></li>
+					}
+					@if (User.IsInRole(LmsRoles.Instructor) && unit.InstructorNote != null)
+					{
+						var url = Url.Action("InstructorNote", "Course", new { courseId = Model.CourseId, unitName=unit.UnitName });
+						<li class="slide-list-item slide-list-item-instructor-note" onclick="window.location.href='@url'">
+							<a href="@url">Заметки преподавателю</a>
+						</li>
 					}
 				</ul>
 			</li>

@@ -14,7 +14,8 @@ namespace uLearn
 
 	public class CourseUnitModel
 	{
-		public string Title;
+		public string UnitName;
 		public Slide[] Slides;
+		public InstructorNote InstructorNote;
 	}
 }

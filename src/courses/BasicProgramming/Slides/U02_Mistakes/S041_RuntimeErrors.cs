@@ -16,15 +16,15 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		[ExpectedOutput("-1\r\nImpossible\r\n-0.2\r\n-0.375\r\nImpossible")]
 		public static void Main()
 		{
-			FindMinimum(1, 2, 3);
-			FindMinimum(0, 3, 2);
-			FindMinimum(5, 2, 1);
-			FindMinimum(4, 3, 2);
-			FindMinimum(0, 4, 5);
+			WriteParabolaMinX(1, 2, 3);
+			WriteParabolaMinX(0, 3, 2);
+			WriteParabolaMinX(5, 2, 1);
+			WriteParabolaMinX(4, 3, 2);
+			WriteParabolaMinX(0, 4, 5);
 		}
 
 		[Exercise]
-		private static void FindMinimum(int a, int b, int c)
+		private static void WriteParabolaMinX(int a, int b, int c)
 		{
 			Console.WriteLine(a == 0 ? "Impossible" : (-b / (double)(2 * a)).ToString());
 			/*uncomment

@@ -743,6 +743,7 @@
     <Content Include="Views\Account\List.cshtml" />
     <Content Include="Views\Unit\List.cshtml" />
     <Content Include="Views\Unit\CourseList.cshtml" />
+    <Content Include="Views\Course\InstructorNote.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Courses\" />

@@ -67,6 +67,7 @@
     <Compile Include="Slides\U01_Basics\S100_FinalTask.cs" />
     <Compile Include="Slides\U01_Basics\S000_HelpSlide.cs" />
     <Compile Include="Slides\U01_Basics\_HelloWorld.cs" />
+    <None Include="Slides\U01_Basics\InstructorNotes.md" />
     <Content Include="Slides\U02_Mistakes\S091_Style2.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -162,6 +163,7 @@
     <Compile Include="Slides\U07_Algorithms\S080_ComplexityClasses.cs" />
     <Compile Include="Slides_Tests.cs" />
     <Content Include="Slides\U04_Arrays\Prelude.txt" />
+    <Content Include="Slides\U03_Cycles\shapes.png" />
     <Content Include="Slides\U04_Arrays\S021_ArrayQuiz.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -181,10 +183,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Slides\U02_Mistakes\InstructorNotes.md" />
+    <None Include="Slides\U03_Cycles\InstructorNotes.md" />
+    <None Include="Slides\U04_Arrays\InstructorNotes.md" />
     <None Include="Slides\U04_Arrays\_S050_ValueRferenceType.odp" />
     <None Include="Slides\U04_Arrays\_S070_GraphicDimensional.odp" />
     <None Include="Slides\U04_Arrays\_S090_Memory.odp" />
+    <None Include="Slides\U05_Collections\InstructorNotes.md" />
     <None Include="Slides\U05_Collections\_S030_StringToMethod.odp" />
+    <None Include="Slides\U06_AutomaticTesting\InstructorNotes.md" />
+    <None Include="Slides\U07_Algorithms\InstructorNotes.md" />
     <None Include="Slides\U07_Algorithms\_Materials.zip" />
   </ItemGroup>
   <ItemGroup>
