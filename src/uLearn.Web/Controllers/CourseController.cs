@@ -13,13 +13,13 @@ namespace uLearn.Web.Controllers
 	public class CourseController : Controller
 	{
 		private readonly CourseManager courseManager;
-		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
-		private readonly UserQuestionsRepo userQuestionsRepo = new UserQuestionsRepo();
-		private readonly VisitersRepo visitersRepo = new VisitersRepo();
-		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
-		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
+		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
+		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly UnitsRepo unitsRepo = new UnitsRepo();
+		private readonly UserQuestionsRepo userQuestionsRepo = new UserQuestionsRepo();
+		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
+		private readonly VisitersRepo visitersRepo = new VisitersRepo();
 
 		public CourseController()
 			: this(CourseManager.AllCourses)
@@ -34,8 +34,8 @@ namespace uLearn.Web.Controllers
 		[Authorize]
 		public async Task<ActionResult> Slide(string courseId, int slideIndex = -1)
 		{
-			var model = await CreateCoursePageModel(courseId, slideIndex);
 			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
+			var model = await CreateCoursePageModel(courseId, slideIndex, visibleUnits);
 			if (!visibleUnits.Contains(model.Slide.Info.UnitName))
 				throw new Exception("Slide is hidden " + slideIndex);
 			var exerciseSlide = model.Slide as ExerciseSlide;
@@ -43,7 +43,8 @@ namespace uLearn.Web.Controllers
 				exerciseSlide.LikedHints = slideHintRepo.GetLikedHints(courseId, exerciseSlide.Id, User.Identity.GetUserId());
 			var quizSlide = model.Slide as QuizSlide;
 			if (quizSlide != null)
-				foreach (var block in quizSlide.Quiz.Blocks.Where(x => x is ChoiceBlock).Where(x => ((ChoiceBlock)x).Shuffle))
+				foreach (var block in quizSlide.Quiz.Blocks.Where(x => x is ChoiceBlock).Where(x => ((ChoiceBlock) x).Shuffle)
+					)
 					Shuffle(block);
 			return View(model);
 		}
@@ -51,27 +52,31 @@ namespace uLearn.Web.Controllers
 		private void Shuffle(QuizBlock quizBlock)
 		{
 			var random = new Random();
-			var choiceBlock = (ChoiceBlock)quizBlock;
+			var choiceBlock = (ChoiceBlock) quizBlock;
 			choiceBlock.Items = choiceBlock.Items.OrderBy(x => random.Next()).ToArray();
 		}
 
-		private int GetInitialIndexForStartup(string courseId, Course course, int slideIndex)
+		private int GetInitialIndexForStartup(string courseId, Course course, List<string> visibleUnits)
 		{
 			var userId = User.Identity.GetUserId();
+			var lastVisitedSlide = 0;
 			for (var index = 0; index < course.Slides.Length; index++)
-				if (!visitersRepo.IsUserVisit(courseId, course.Slides[index].Id, userId))
-				{
-					slideIndex = index;
-					break;
-				}
-			return slideIndex == -1 ? course.Slides.Length - 1 : slideIndex;
+			{
+				var slide = course.Slides[index];
+				if (!visibleUnits.Contains(slide.Info.UnitName)) continue;
+				if (visitersRepo.IsUserVisit(courseId, slide.Id, userId))
+					lastVisitedSlide = index;
+				else
+					return index;
+			}
+			return lastVisitedSlide;
 		}
 
-		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, int slideIndex)
+		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, int slideIndex, List<string> visibleUnits)
 		{
-			Course course = courseManager.GetCourse(courseId);
+			var course = courseManager.GetCourse(courseId);
 			if (slideIndex == -1)
-				slideIndex = GetInitialIndexForStartup(courseId, course, slideIndex);
+				slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
 			await VisitSlide(courseId, course.Slides[slideIndex].Id);
 			var model = new CoursePageModel
 			{
@@ -125,7 +130,7 @@ namespace uLearn.Web.Controllers
 		public async Task<string> ApplyRate(string courseId, string slideId, string rate)
 		{
 			var userId = User.Identity.GetUserId();
-			var slideRate = (SlideRates)Enum.Parse(typeof(SlideRates), rate);
+			var slideRate = (SlideRates) Enum.Parse(typeof (SlideRates), rate);
 			return await slideRateRepo.AddRate(courseId, slideId, userId, slideRate);
 		}
 
@@ -150,7 +155,7 @@ namespace uLearn.Web.Controllers
 		public async Task<JsonResult> LikeSolution(int solutionId)
 		{
 			var res = await solutionsRepo.Like(solutionId, User.Identity.GetUserId());
-			return Json(new { likesCount = res.Item1, liked = res.Item2 });
+			return Json(new {likesCount = res.Item1, liked = res.Item2});
 		}
 
 		public async Task VisitSlide(string courseId, string slideId)
