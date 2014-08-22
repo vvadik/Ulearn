@@ -12,7 +12,7 @@ namespace uLearn.Web
 			routes.MapRoute(
 				name: "Course",
 				url: "Course/{courseId}/{action}/{slideIndex}",
-				defaults: new { controller = "Course", action = "Slide", slideIndex = 0 }
+				defaults: new { controller = "Course", action = "Slide", slideIndex = -1 }
 			);
 			routes.MapRoute(
 				name: "Default",
