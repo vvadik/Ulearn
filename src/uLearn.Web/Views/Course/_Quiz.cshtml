@@ -2,14 +2,14 @@
 @using uLearn.Quizes
 @using CodeBlock = uLearn.Quizes.CodeBlock
 @model CoursePageModel
-@{ var QuizSlide = Model.Slide as QuizSlide;}
-@if (QuizSlide != null)
+@{ var quizSlide = Model.Slide as QuizSlide;}
+@if (quizSlide != null)
 {
-	var passed = Model.PassedQuiz.Contains(QuizSlide.Id);
+	var passed = Model.PassedQuiz.Contains(quizSlide.Id);
 	var delim = "";
-	for (int blockIndex = 0; blockIndex < QuizSlide.Quiz.Blocks.Length; blockIndex++)
+	for (int blockIndex = 0; blockIndex < quizSlide.Quiz.Blocks.Length; blockIndex++)
 	{
-		var quizBlock = QuizSlide.Quiz.Blocks[blockIndex];
+		var quizBlock = quizSlide.Quiz.Blocks[blockIndex];
 		var quizModel = new QuizInfoModel(Model, quizBlock, blockIndex, passed);
 		if (quizBlock is CodeBlock)
 		{
@@ -27,7 +27,7 @@
 				@Html.Raw(quizBlock.Text.RenderMd())
 			}
 		}
-		delim = blockIndex != QuizSlide.Quiz.Blocks.Length - 1 ? "quiz-delimeter" : "";
+		delim = blockIndex != quizSlide.Quiz.Blocks.Length - 1 ? "quiz-delimeter" : "";
 		if (quizBlock is ChoiceBlock)
 		{
 			@Html.Partial("_ChoiceBlock", quizModel)

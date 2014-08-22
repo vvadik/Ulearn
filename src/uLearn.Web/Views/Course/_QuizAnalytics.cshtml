@@ -31,7 +31,7 @@
 				<th style="border-bottom: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа">наведи на меня!</th>
 				@foreach (var block in Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
-					<th title="@block.Text" colspan="@GetColSpan(block)">@GetSubstring(block.Text, 12)</th>
+					<th title="@block.Text" colspan="@GetColSpan(block)">@GetSubstring(block.Text ?? "", 12)</th>
 					if (maxQuestionIndex == block.QuestionIndex)
 					{
 						break;
