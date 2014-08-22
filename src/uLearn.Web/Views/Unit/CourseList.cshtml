@@ -1,0 +1,14 @@
+﻿@model List<uLearn.Course>
+
+@{
+	ViewBag.Title = "Управление курсами";
+}
+<div class="container">
+	<h2>Управление курсами</h2>
+	<ul>
+		@foreach (var course in Model)
+		{
+			<li>@Html.ActionLink(course.Title, "List", new { courseId = course.Id })</li>
+		}
+	</ul>
+</div>

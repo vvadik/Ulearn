@@ -196,11 +196,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\UnitController.cs" />
     <Compile Include="Controllers\AnalyticsController.cs" />
     <Compile Include="Controllers\QuizController.cs" />
     <Compile Include="Controllers\SlideNavigationController.cs" />
     <Compile Include="Controllers\ExerciseController.cs" />
     <Compile Include="Controllers\HintController.cs" />
+    <Compile Include="Migrations\201408220628510_AddUnitAppearance.cs" />
+    <Compile Include="Migrations\201408220628510_AddUnitAppearance.Designer.cs">
+      <DependentUpon>201408220628510_AddUnitAppearance.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\UnitAppearance.cs" />
     <Compile Include="DataContexts\SlideHintRepo.cs" />
     <Compile Include="DataContexts\SlideRateRepo.cs" />
     <Compile Include="DataContexts\UserQuestionsRepo.cs" />
@@ -330,6 +336,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201408201208379_AddIsRightQuizBlock.resx">
       <DependentUpon>201408201208379_AddIsRightQuizBlock.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408220628510_AddUnitAppearance.resx">
+      <DependentUpon>201408220628510_AddUnitAppearance.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -732,6 +741,8 @@
     <Content Include="Views\Course\_TrueFalseBlock.cshtml" />
     <Content Include="Views\Course\_QuizAnalytics.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
+    <Content Include="Views\Unit\List.cshtml" />
+    <Content Include="Views\Unit\CourseList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Courses\" />

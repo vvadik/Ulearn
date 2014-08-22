@@ -15,6 +15,7 @@
 		public bool IsSolved { get; set; }
 		public string UserRate { get; set; }
 		public bool IsExercise { get; set; }
+		public bool IsQuiz { get; set; }
 		public int HintsCountOnSlide { get; set; }
 		public int HintUsedPercent { get; set; }
 	}
