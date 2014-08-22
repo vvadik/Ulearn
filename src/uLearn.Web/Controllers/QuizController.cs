@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -10,7 +8,6 @@ using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
-using uLearn.Web.Ideone;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -185,7 +182,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		public ActionResult GetAnalytics(string courseId, int slideIndex)
+		public ActionResult Analytics(string courseId, int slideIndex)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var quizSlide = (QuizSlide) course.Slides[slideIndex];
@@ -193,7 +190,7 @@ namespace uLearn.Web.Controllers
 			foreach (var user in db.Users)
 				if (userQuizzesRepo.IsQuizSlidePassed(courseId, user.Id, quizSlide.Id)) //не сворачивать в Where! DB запросы не поймут!
 					dict[user.UserName] = GetUserQuizAnswers(courseId, quizSlide, user.Id).OrderBy(x => user.Id).ToList();
-			return PartialView("~/Views/Course/_QuizAnalytics.cshtml", new QuizAnalyticsModel
+			return PartialView(new QuizAnalyticsModel
 			{
 				UserAnswers = dict,
 				QuizSlide = quizSlide

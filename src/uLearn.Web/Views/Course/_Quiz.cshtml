@@ -47,7 +47,7 @@
 	}
 	if (User.IsInRole(LmsRoles.Instructor) || User.IsInRole(LmsRoles.Admin))
 	{
-		@Html.Action("GetAnalytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
+		@Html.Action("Analytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
 	}
 	<div class="no-display" id="GetRightAnswersToQuiz" data-url="@Url.Action("GetRightAnswersToQuiz","Quiz")">none</div>
 	<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz","Quiz")'>
