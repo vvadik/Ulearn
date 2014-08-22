@@ -97,7 +97,7 @@
     <Compile Include="Slides\U03_Cycles\S030_IfErrorsVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S032_RobotControl.cs" />
     <Compile Include="Slides\U03_Cycles\S040_WhileVideo.cs" />
-    <Compile Include="Slides\U03_Cycles\S041_While.cs" />
+    <Compile Include="Slides\U03_Cycles\S041_PowerOfTwo.cs" />
     <Compile Include="Slides\U03_Cycles\S042_Break.cs" />
     <Compile Include="Slides\U03_Cycles\S043_Continue.cs" />
     <Compile Include="Slides\U03_Cycles\S044_WhileRefactoringVideo.cs" />
