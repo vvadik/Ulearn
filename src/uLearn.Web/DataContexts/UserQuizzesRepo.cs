@@ -129,39 +129,16 @@ namespace uLearn.Web.DataContexts
 					.GroupBy(y => y.QuizId)
 					.Select(y => y.All(z => z.IsRightQuizBlock))
 					.Select(y => y ? 1 : 0)
+					.DefaultIfEmpty()
 					.Average())
 				.DefaultIfEmpty()
 				.Average() * 100;
-			//var a = db.UserQuizzes
-			//	.Where(x => x.SlideId == slideId && x.CourseId == courseId)
-			//	.GroupBy(x => x.UserId)
-			//	.Select(x => x.Distinct(new UserQuizComparer()))
-			//	.Select(x => x.Select(ConvertQuizBlockInDouble).Average())
-			//	.Average() * 100;
 			return (int) newA;
-			//var e =  a.Select(x => x.Distinct(new UserQuizComparer()));
-			//var t = e.Select(x => x.Select(ConvertQuizBlockInDouble).Average());
-			//var q = t.Average() * 100; //не могу засунуть Dictinct в sql запрос ;(
-			//return (int)q;
 		}
 
-		private double ConvertQuizBlockInDouble(UserQuiz userQuiz)
+		public int GetSubmitQuizCount(string slideId, string courseId)
 		{
-			double e = userQuiz.IsRightQuizBlock ? 1 : 0;
-			return e;
-		}
-	}
-
-	public class UserQuizComparer : IEqualityComparer<UserQuiz>
-	{
-		public bool Equals(UserQuiz x, UserQuiz y)
-		{
-			return x.QuizId == y.QuizId;
-		}
-
-		public int GetHashCode(UserQuiz obj)
-		{
-			return obj.QuizId.GetHashCode();
+			return db.UserQuizzes.Where(x => x.SlideId == slideId && x.CourseId == courseId).Select(x => x.User).Distinct().Count();
 		}
 	}
 }

@@ -9,12 +9,13 @@ namespace uLearn
 	public class AnalyticsTableInfo
 	{
 		public int VisitersCount { get; set; }
-		public int SolversCount { get; set; }
+		public int SolversPercent { get; set; }
 		public Rates Rates { get; set; }
 		public bool IsExercise { get; set; }
 		public bool IsQuiz { get; set; }
 		public int TotalHintCount { get; set; }
 		public int HintUsedPercent { get; set; }
+		public int SuccessQuizPercentage { get; set; }
 	}
 
 	public class Rates

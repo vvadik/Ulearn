@@ -64,11 +64,12 @@ namespace uLearn.Web.Controllers
 					VisitersCount = visitersCount,
 					IsExercise = isExercise,
 					IsQuiz = isQuiz,
-					SolversCount = isExercise 
+					SolversPercent = isExercise 
 						? (visitersCount == 0 ? 0 : (int)((double)userSolutionsRepo.GetAcceptedSolutionsCount(slide.Id, course.Id)/visitersCount)*100)
-						: isQuiz 
-							? userQuizzessRepo.GetAverageStatistics(slide.Id, course.Id)
+						: isQuiz
+							? (visitersCount == 0 ? 0 : (int)((double)userQuizzessRepo.GetSubmitQuizCount(slide.Id, course.Id) / visitersCount) * 100)
 							: 0,
+					SuccessQuizPercentage = isQuiz ? userQuizzessRepo.GetAverageStatistics(slide.Id, course.Id) : 0,
 					TotalHintCount =  hintsCountOnSlide,
 					HintUsedPercent = isExercise ? slideHintRepo.GetHintUsedPercent(slide.Id, course.Id, hintsCountOnSlide, db.Users.Count()) : 0 
 				});
@@ -114,7 +115,7 @@ namespace uLearn.Web.Controllers
 
 		private static void FillCapacityOfUnits(Course course, Dictionary<string, int> slideCountInUnit)
 		{
-			foreach (var slide in course.Slides.OfType<ExerciseSlide>())
+			foreach (var slide in course.Slides.Where(x => x is ExerciseSlide || x is QuizSlide))
 			{
 				if (!slideCountInUnit.ContainsKey(slide.Info.UnitName))
 					slideCountInUnit[slide.Info.UnitName] = 0;
@@ -155,6 +156,20 @@ namespace uLearn.Web.Controllers
 					ans[userName][unitNames[userSolution.SlideId]] = 0;
 				ans[userName][unitNames[userSolution.SlideId]]++;
 			}
+			foreach (var quiz in db.UserQuizzes)
+			{
+				if (!unitNames.ContainsKey(quiz.SlideId)) //пока в старой базе есть старые записи с неправильными ID
+					continue;
+				var userName = db.Users.Find(quiz.UserId).UserName;
+				if (!acceptedSolutionsForUsers.ContainsKey(userName))
+					acceptedSolutionsForUsers[userName] = new HashSet<string>();
+				if (acceptedSolutionsForUsers[userName].Contains(quiz.SlideId))
+					continue;
+				acceptedSolutionsForUsers[userName].Add(quiz.SlideId);
+				if (!ans[userName].ContainsKey(unitNames[quiz.SlideId]))
+					ans[userName][unitNames[quiz.SlideId]] = 0;
+				ans[userName][unitNames[quiz.SlideId]]++;
+			}
 		}
 
 		[Authorize]
@@ -166,6 +181,7 @@ namespace uLearn.Web.Controllers
 
 		private PersonalStatisticPageModel CreatePersonalStaticticsModel(Course course)
 		{
+			var userId = User.Identity.GetUserId();
 			return new PersonalStatisticPageModel
 			{
 				CourseId = course.Id,
@@ -177,11 +193,12 @@ namespace uLearn.Web.Controllers
 							SlideTitle = slide.Title,
 							SlideIndex = slideIndex,
 							IsExercise = slide is ExerciseSlide,
-							IsSolved = userSolutionsRepo.IsUserPassedTask(course.Id, slide.Id, User.Identity.GetUserId()),
-							IsVisited = visitersRepo.IsUserVisit(course.Id, slide.Id, User.Identity.GetUserId()),
-							UserRate = slideRateRepo.GetUserRate(course.Id, slide.Id, User.Identity.GetUserId()),
+							IsQuiz = slide is QuizSlide,
+							IsSolved = userSolutionsRepo.IsUserPassedTask(course.Id, slide.Id, userId) || userQuizzessRepo.IsQuizSlidePassed(course.Id, userId, slide.Id),
+							IsVisited = visitersRepo.IsUserVisit(course.Id, slide.Id, userId),
+							UserRate = slideRateRepo.GetUserRate(course.Id, slide.Id, userId),
 							HintsCountOnSlide = slide is ExerciseSlide ? (slide as ExerciseSlide).HintsHtml.Count() : 0,
-							HintUsedPercent = slide is ExerciseSlide ? slideHintRepo.GetHintUsedPercentForUser(course.Id, slide.Id, User.Identity.GetUserId(), (slide as ExerciseSlide).HintsHtml.Count()) : 0
+							HintUsedPercent = slide is ExerciseSlide ? slideHintRepo.GetHintUsedPercentForUser(course.Id, slide.Id, userId, (slide as ExerciseSlide).HintsHtml.Count()) : 0
 						})
 						.ToArray()
 				

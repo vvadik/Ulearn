@@ -15,14 +15,15 @@
 				<table id="myTable" class="tablesorter">
 					<thead>
 						<tr>
-							<th>Название</th>
+							<th style="min-width: 200px">Название слайда</th>
 							<th>Количество просмотревших</th>
-							<th>Процент успешности</th>
+							<th>Процент нажавших submit/run от просмотревших</th>
+							<th>Средняя решабельность квиза</th>
 							<th>Количество оценок</th>
 							<th>оценок "хорошо"</th>
 							<th>оценок "не понятно"</th>
 						    <th>оценок "тривиально"</th>
-						    <th>подсказок на слайде</th>
+						    <th>Подсказок на слайде</th>
 							<th>из них в среднем используются</th>
 						</tr>
 					</thead>
@@ -36,10 +37,13 @@
 							        var isNeedDrowHintsInfo = (info.Value.IsExercise && info.Value.TotalHintCount != 0);
 							        var url = Url.Action("Slide", "Course", new {courseId = Model.CourseId, slideIndex = counter}, null);
 						        }
-								<td class="slide-list-item" data-sort-value=@(counter + 1000) onclick="window.location.href='@url'"><h6 class="table-header">@info.Key</h6></td>
+								<td class="slide-list-item" data-sort-value=@(counter + 100000) onclick="window.location.href='@url'"><p class="table-header">@info.Key</p></td>
 						        <td>@info.Value.VisitersCount</td>
-							    <td data-sort-value=@((info.Value.IsExercise || info.Value.IsQuiz) ? info.Value.SolversCount+1000 : 0)>
-								    @((info.Value.IsExercise || info.Value.IsQuiz) ? info.Value.SolversCount.ToString(CultureInfo.InvariantCulture)+"%" : "" )
+							    <td data-sort-value=@((info.Value.IsExercise || info.Value.IsQuiz) ? info.Value.SolversPercent+1000 : 0)>
+								    @((info.Value.IsExercise || info.Value.IsQuiz) ? info.Value.SolversPercent.ToString(CultureInfo.InvariantCulture)+"%" : "" )
+							    </td>
+							    <td data-sort-value=@(info.Value.IsQuiz ? info.Value.SuccessQuizPercentage +1000 : 0)>
+								    @(info.Value.IsQuiz ? (info.Value.SuccessQuizPercentage).ToString(CultureInfo.InvariantCulture)+"%" : "")
 							    </td>
 								<td>@info.Value.Rates.Count</td>
 								<td>@(info.Value.Rates.Count == 0 ? 0 : (int)(100 * (double)info.Value.Rates.Good / info.Value.Rates.Count))%</td>
