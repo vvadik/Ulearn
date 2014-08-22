@@ -1,14 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts
 {
+	public class UnitsRepo
+	{
+		private readonly ULearnDb db;
+		private readonly CourseManager courseManager;
+
+		public UnitsRepo() : this(new ULearnDb(), CourseManager.AllCourses)
+		{
+			
+		}
+
+		public UnitsRepo(ULearnDb db, CourseManager courseManager)
+		{
+			this.db = db;
+			this.courseManager = courseManager;
+		}
+
+		public List<string> GetVisibleUnits(string courseId, IPrincipal user)
+		{
+			var canSeeEverything = user.IsInRole(LmsRoles.Tester) || user.IsInRole(LmsRoles.Admin) || user.IsInRole(LmsRoles.Instructor);
+			if (canSeeEverything)
+				return courseManager.GetCourse(courseId).Slides.Select(s => s.Info.UnitName).Distinct().ToList();
+			return db.Units.Where(u => u.CourseId == courseId && u.PublishTime <= DateTime.Now).Select(u => u.UnitName).ToList();
+		}
+
+	}
+
 	public class UserSolutionsRepo
 	{
 		private readonly ULearnDb db;

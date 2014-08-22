@@ -1,8 +1,5 @@
 using System.Data.Entity.Migrations;
-using System.Data.Entity.Validation;
 using System.Linq;
-using System.Text;
-using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using uLearn.Web.DataContexts;
@@ -33,10 +30,18 @@ namespace uLearn.Web.Migrations
 			{
 				var userStore = new UserStore<ApplicationUser>();
 				var manager = new UserManager<ApplicationUser>(userStore);
-				var user = new ApplicationUser {UserName = "user"};
+				var user = new ApplicationUser { UserName = "user" };
 				manager.Create(user, "asdasd");
-				context.SaveChanges();
 			}
+			if (!context.Users.Any(u => u.UserName == "admin"))
+			{
+				var userStore = new UserStore<ApplicationUser>();
+				var manager = new UserManager<ApplicationUser>(userStore);
+				var user = new ApplicationUser { UserName = "admin" };
+				manager.Create(user, "fullcontrol");
+				manager.AddToRoleAsync(user.Id, LmsRoles.Admin);
+			}
+			context.SaveChanges();
 		}
 	}
 }

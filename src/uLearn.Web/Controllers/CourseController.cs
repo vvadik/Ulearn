@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using linqed;
 using Microsoft.AspNet.Identity;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
-using uLearn.Web.Ideone;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -24,6 +19,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
+		private readonly UnitsRepo unitsRepo = new UnitsRepo();
 
 		public CourseController()
 			: this(CourseManager.AllCourses)
@@ -39,6 +35,9 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> Slide(string courseId, int slideIndex = -1)
 		{
 			var model = await CreateCoursePageModel(courseId, slideIndex);
+			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
+			if (!visibleUnits.Contains(model.Slide.Info.UnitName))
+				throw new Exception("Slide is hidden " + slideIndex);
 			var exerciseSlide = model.Slide as ExerciseSlide;
 			if (exerciseSlide != null)
 				exerciseSlide.LikedHints = slideHintRepo.GetLikedHints(courseId, exerciseSlide.Id, User.Identity.GetUserId());
