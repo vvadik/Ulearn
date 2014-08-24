@@ -25,7 +25,8 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 					sum += i;
 
 				// Чтобы сделать что-то N раз, мы делаем цикл от 0 до N. 
-				// В C# принято в таких случаях делать цикл именно от 0 до i<N, а не от 1 до i<=N, например.
+				// В C# принято в таких случаях делать цикл именно от 0 до i<N, 
+				// а не от 1 до i<=N, например.
 				for (int i = 0; i < 10; i++)
 					Console.WriteLine(i);
 

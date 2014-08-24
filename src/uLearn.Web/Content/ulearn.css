@@ -264,6 +264,10 @@ a.nav-arrow:hover {
     color: #428bca;
 }
 
+table.diff tbody td {
+	padding: 0;	
+}
+
 table.diff tbody th {
     padding: 0 3px 0 0;
     text-align: right;

@@ -12,42 +12,45 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		У Васи уже написан код, генерирующий стандартную шахматную доску размера 8х8.
 		Помогите Васе переделать этот код так, чтобы он умел выводить доску любого заданного размера.
 
-		Например, доска зармера три должна выводиться так:
+		Например, доска размера пять должна выводиться так:
 
-			 # 
-			# #
-			 # 
+			██  ██  ██
+			  ██  ██  
+			██  ██  ██
+			  ██  ██  
+			██  ██  ██
 		*/
 
 		[ExpectedOutput(@"
- # # # #
-# # # # 
- # # # #
-# # # # 
- # # # #
-# # # # 
- # # # #
-# # # # 
+██  ██  ██  ██  
+  ██  ██  ██  ██
+██  ██  ██  ██  
+  ██  ██  ██  ██
+██  ██  ██  ██  
+  ██  ██  ██  ██
+██  ██  ██  ██  
+  ██  ██  ██  ██
 
- 
+██
 
- #
-# 
+██  
+  ██
 
- # 
-# #
- # 
+██  ██
+  ██  
+██  ██
 
- # # # # #
-# # # # # 
- # # # # #
-# # # # # 
- # # # # #
-# # # # # 
- # # # # #
-# # # # # 
- # # # # #
-# # # # # 
+██  ██  ██  ██  ██  
+  ██  ██  ██  ██  ██
+██  ██  ██  ██  ██  
+  ██  ██  ██  ██  ██
+██  ██  ██  ██  ██  
+  ██  ██  ██  ██  ██
+██  ██  ██  ██  ██  
+  ██  ██  ██  ██  ██
+██  ██  ██  ██  ██  
+  ██  ██  ██  ██  ██
+
 ")]
 		public static void Main()
 		{
@@ -61,29 +64,24 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		[Exercise]
 		private static void WriteBoard(int size)
 		{
-			bool firstIsBlack = false;
-			for(int y=0; y<size; y++)
+			for (int y = 0; y < size; y++)
 			{
-				bool isBlack = firstIsBlack;
 				for (int x = 0; x < size; x++)
-				{
-					Console.Write(isBlack ? "#" : " ");
-					isBlack = !isBlack;
-				}
-				firstIsBlack = !firstIsBlack;
+					if ((x + y) % 2 == 1) Console.Write("██");
+					else Console.Write("  ");
 				Console.WriteLine();
 			}
 			Console.WriteLine();
 
 			/*uncomment
-			Console.WriteLine(" # # # #");
-			Console.WriteLine("# # # # ");
-			Console.WriteLine(" # # # #");
-			Console.WriteLine("# # # # ");
-			Console.WriteLine(" # # # #");
-			Console.WriteLine("# # # # ");
-			Console.WriteLine(" # # # #");
-			Console.WriteLine("# # # # ");
+			Console.WriteLine("██  ██  ██  ██  ");
+			Console.WriteLine("  ██  ██  ██  ██");
+			Console.WriteLine("██  ██  ██  ██  ");
+			Console.WriteLine("  ██  ██  ██  ██");
+			Console.WriteLine("██  ██  ██  ██  ");
+			Console.WriteLine("  ██  ██  ██  ██");
+			Console.WriteLine("██  ██  ██  ██  ");
+			Console.WriteLine("  ██  ██  ██  ██");
 			Console.WriteLine();
 			*/
 		}

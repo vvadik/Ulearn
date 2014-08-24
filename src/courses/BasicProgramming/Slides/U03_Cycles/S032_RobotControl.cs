@@ -10,30 +10,30 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		В воскресенье Вася пошел в кружок робототехники и увидел там такой код управления боевым роботом:
 		*/
 
-		public static bool ShouldFight(
+		static bool ShouldFire(
 			bool enemyInFront, string enemyName, int enemyHealth,
 			int robotFirePower, int robotHealth)
 		{
-			bool shouldFight = false;
+			bool shouldFire = false;
 			if (enemyInFront == true)
 			{
 				if (enemyName == "Big boss")
 				{
-					if (robotHealth < 50) shouldFight = false;
-					if (robotHealth > 100) shouldFight = true;
+					if (robotHealth < 50) shouldFire = false;
+					if (robotHealth > 100) shouldFire = true;
 				}
 				else
 				{
 					if (robotFirePower > enemyHealth) return true;
-					else if (enemyHealth < robotHealth) shouldFight = true;
-					else shouldFight = false;
+					else if (enemyHealth < robotHealth) shouldFire = true;
+					else shouldFire = false;
 				}
 			}
 			else
 			{
 				return false;
 			}
-			return shouldFight;
+			return shouldFire;
 		}
 
 		/*
@@ -74,14 +74,14 @@ False ?= False
 			int robotFirePower, int robotHealth)
 		{
 			Console.WriteLine("{0} ?= {1}", 
-				ShouldFight(enemyInFront, enemyName, enemyHealth, robotFirePower, robotHealth),
-				ShouldFight2(enemyInFront, enemyName, enemyHealth, robotFirePower, robotHealth));
+				ShouldFire(enemyInFront, enemyName, enemyHealth, robotFirePower, robotHealth),
+				ShouldFire2(enemyInFront, enemyName, enemyHealth, robotFirePower, robotHealth));
 		}
 
 
 		[Exercise]
 		[SingleStatementMethod]
-		public static bool ShouldFight2(
+		static bool ShouldFire2(
 			bool enemyInFront, string enemyName, int enemyHealth, 
 			int robotFirePower, int robotHealth)
 		{

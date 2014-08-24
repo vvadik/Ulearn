@@ -17,8 +17,8 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 
 		public class Program
 		{
-			/* Допустим, мы хотим читать из консоли числа и суммировать их, пока не будет введена пустая строка.
-			 * Как это сделать?
+			/* Допустим, мы хотим читать из консоли числа и суммировать их, 
+			 * пока не будет введена пустая строка. Как это сделать?
 			 * 
 			 * Хочется написать как-то так:
 				while (line != "")
@@ -58,7 +58,8 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 				while (true)
 				{
 					var line = Console.ReadLine();
-					if (line == "") break; //break прерывает выполнение инструкций цикла и выходит из него
+					//break прерывает выполнение инструкций цикла и выходит из него:
+					if (line == "") break;
 					sum += int.Parse(line);
 				}
 				//Оптимальный вариант - все читаемо и логика цикла понятна
