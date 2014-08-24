@@ -93,6 +93,7 @@
     <Compile Include="Slides\U02_Mistakes\_TypeCastingMistaces.cs" />
     <Compile Include="Slides\U02_Mistakes\_Typo.cs" />
     <Compile Include="Slides\U03_Cycles\S023_QueenMove.cs" />
+    <Compile Include="Slides\U03_Cycles\S044_WhileRefactoringVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S060_ForVsWhileVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S010_LogicalTypeVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S015_IsLeapYear.cs" />
@@ -102,12 +103,10 @@
     <Compile Include="Slides\U03_Cycles\S032_RobotControl.cs" />
     <Compile Include="Slides\U03_Cycles\S040_WhileVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S041_PowerOfTwo.cs" />
-    <Compile Include="Slides\U03_Cycles\S042_Break.cs" />
-    <Compile Include="Slides\U03_Cycles\S043_Continue.cs" />
-    <Compile Include="Slides\U03_Cycles\S044_WhileRefactoringVideo.cs" />
+    <Compile Include="Slides\U03_Cycles\S046_RemoveSpaces.cs" />
     <Compile Include="Slides\U03_Cycles\S050_ForVideo.cs" />
-    <Compile Include="Slides\U03_Cycles\S051_For.cs" />
-    <Compile Include="Slides\U03_Cycles\S061_KtulhuFor.cs" />
+    <Compile Include="Slides\U03_Cycles\S055_Border.cs" />
+    <Compile Include="Slides\U03_Cycles\S065_Chessboard.cs" />
     <Compile Include="Slides\U04_Arrays\S010_Array.cs" />
     <Compile Include="Slides\U04_Arrays\S021_ArrayExercise.cs" />
     <Compile Include="Slides\U04_Arrays\S020_ShortForm.cs" />

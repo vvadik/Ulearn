@@ -24,9 +24,8 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 				for (int i = 1; i <= 10; i++)
 					sum += i;
 
-				// Инкремент
-				// Обратите внимание: чтобы сделать что-то 10 раз, мы делаем цикл от 0 до 10!
-				// Нумерация в шарпе всегда идет с нуля!
+				// Чтобы сделать что-то N раз, мы делаем цикл от 0 до N. 
+				// В C# принято в таких случаях делать цикл именно от 0 до i<N, а не от 1 до i<=N, например.
 				for (int i = 0; i < 10; i++)
 					Console.WriteLine(i);
 
@@ -58,8 +57,8 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 				Console.WriteLine();
 
 				//Проверка условия осуществляется КАЖДУЮ итерацию цикла! 
-				//Поэтому в данном случае лучше ввести переменную var bound=GetBound() и сравнивать с ней,
-				//а не вызывать цикл каждый раз
+				//Поэтому в данном случае лучше ввести переменную var bound=GetBound() 
+				//и сравнивать с ней, а не вызывать цикл каждый раз
 				for (int i = 0; i < GetBound(); i++)
 					Console.Write(i + " ");
 			}
