@@ -1,6 +1,8 @@
 ﻿@using uLearn
 @model YoutubeBlock
-<iframe class='embedded-video' width='800' height='450' src='//www.youtube.com/embed/@Model.VideoId' frameborder='0' allowfullscreen></iframe>
+<div class="video-container">
+	<iframe class='embedded-video' width='864' height='480' src='//www.youtube.com/embed/@Model.VideoId' frameborder='0' allowfullscreen></iframe>
+</div>
 <div>
 	<a href="javascript://" class="popover-trigger"
 	   title="Как ускорить видео?"
