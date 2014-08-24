@@ -1,5 +1,4 @@
 ﻿using System;
-using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
@@ -18,7 +17,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 				//Строки - это последовательности символов
 				string myString = "Hello, world!";
 
-				//У строк есть свои собственные методы и переменные (правильно называть это свойствами),
+				//У строк есть собственные методы и переменные (правильно называть это свойствами),
 				//которые позволяют узнать информацию о строке 
 				Console.WriteLine(myString.Length);
 
