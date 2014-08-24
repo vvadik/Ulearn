@@ -107,8 +107,9 @@
     <Compile Include="Slides\U03_Cycles\S050_ForVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S055_Border.cs" />
     <Compile Include="Slides\U03_Cycles\S065_Chessboard.cs" />
-    <Compile Include="Slides\U04_Arrays\S010_Array.cs" />
-    <Compile Include="Slides\U04_Arrays\S021_ArrayExercise.cs" />
+    <Compile Include="Slides\U04_Arrays\S010_ArrayAndForeach.cs" />
+    <Compile Include="Slides\U04_Arrays\S021_DigitsToText.cs" />
+    <Compile Include="Slides\U04_Arrays\S015_ReverseArray.cs" />
     <Compile Include="Slides\U04_Arrays\S020_ShortForm.cs" />
     <Compile Include="Slides\U04_Arrays\S030_ArrayNull.cs" />
     <Compile Include="Slides\U04_Arrays\S040_PassArrToMethod.cs" />
