@@ -67,7 +67,7 @@ namespace uLearn.Web.Controllers
 				if (visitersRepo.IsUserVisit(courseId, slide.Id, userId))
 					lastVisitedSlide = index;
 				else
-					return index;
+					return lastVisitedSlide;
 			}
 			return lastVisitedSlide;
 		}
