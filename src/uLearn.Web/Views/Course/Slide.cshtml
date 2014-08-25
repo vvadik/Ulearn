@@ -31,7 +31,6 @@
 			}
 		</div>
 	</div>
-
 	<div>
 		@if (User.IsInRole(LmsRoles.Admin))
 		{
@@ -49,7 +48,26 @@
 		}
 	</div>
 </div>
-
+@if (Model.IsFirstCourseVisit)
+{
+	<a id="first_visit" data-toggle="modal" data-target="#myModal2" href="#myModal2" class="hidden">
+		Выберите свою группу
+	</a>
+	<div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+		<div id="AddQuestion2" class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="myModalLabel2">Выберите свою группу</h4>
+				</div>
+				<div class="modal-body">
+					<textarea id="group-field" class="ask-bar" data-url="@Url.Action("AddGroup")"> </textarea>
+					<button class="btn btn-primary" id="sendButton2" type="button" data-dismiss="modal" onclick="choiceGroup()">Отправить</button>
+					<button class="btn btn-primary" id="sendButton2" type="button" data-dismiss="modal">Я - вольный слушатель!</button>
+				</div>
+			</div>
+		</div>
+	</div>
+}
 @section scripts{
 	@Scripts.Render("~/slide-js")
 	<script src="~/Scripts/slide-stats.js"></script>
@@ -67,7 +85,14 @@
 		var a = Model.PassedQuiz.Contains(Model.Slide.Id);
 		var b = Model.Slide is QuizSlide;
 		var answers = a && b ? (Model.Slide as QuizSlide).RightAnswersToQuiz : "none";
-		<script> markAns('@answers') </script>
+		<script>markAns('@answers')</script>
+	}
+	@if (Model.IsFirstCourseVisit)
+	{
+	<script src="~/Scripts/choice-group.js"></script>
+		<script>
+			$("#first_visit").click();
+		</script>
 	}
 }
 
