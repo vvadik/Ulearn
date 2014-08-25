@@ -1,0 +1,78 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
+{
+	[Slide("Сочетания", "{DE51CEB3-761A-4308-B042-6AC1C0625956}")]
+	class S060_Combinations
+	{
+		//#video vMG2x5kTpxk
+		/*
+		## Заметки по лекции
+		*/
+		static void Combinations(bool[] combination, int onesLeft, int rightEdge)
+		{
+			if (onesLeft == 0)
+			{
+				foreach (var c in combination.Reverse())
+					Console.Write(c ? 1 : 0);
+				Console.WriteLine();
+				return;
+			}
+
+			for (int j = rightEdge; j < combination.Length - onesLeft + 1; j++)
+			{
+				combination[j] = true;
+				Combinations(combination, onesLeft - 1, j + 1);
+				combination[j] = false;
+			}
+		}
+
+		static IEnumerable<bool[]> Combinations1(int N, int K)
+		{
+			var combination = new bool[N];
+			for (int i = N - K; i < N; i++) combination[i] = true;
+
+			while (true)
+			{
+				yield return combination.ToArray();
+				int j = N - 1;
+				int ones = 0;
+				for (j = N - 1; j >= 1; j--)
+				{
+					if (combination[j])
+					{
+						if (!combination[j - 1]) break;
+						ones++;
+					}
+				}
+				if (j == 0) yield break;
+				combination[j - 1] = true;
+				for (int k = j; k < N - ones; k++)
+					combination[k] = false;
+				for (int k = N - ones; k < N; k++)
+					combination[k] = true;
+
+			}
+
+
+		}
+
+
+		public static void MainX()
+		{
+
+
+			foreach (var e in Combinations1(5, 3))
+			{
+				foreach (var c in e)
+					Console.Write(c ? 1 : 0);
+				Console.WriteLine();
+			}
+
+		}
+	}
+}
