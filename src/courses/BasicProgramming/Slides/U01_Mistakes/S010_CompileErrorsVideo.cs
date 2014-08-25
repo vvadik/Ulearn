@@ -9,6 +9,6 @@
 		## Заметки по лекции
 		*/
 
-		//#include U02_Mistakes._MissedUsings.cs
+		//#include U01_Mistakes._MissedUsings.cs
 	}
 }

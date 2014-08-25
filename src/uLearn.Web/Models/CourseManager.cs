@@ -55,7 +55,7 @@ namespace uLearn.Web.Models
 				.ToDictionary(inc => inc.Filename, inc => inc.GetContent().AsUtf8());
 			var slides = resourceFiles
 				.Where(IsSlide)
-				.Select((f, index) => LoadSlide(index, f, resourceFiles, name => includes[name]))
+				.Select((f, index) => LoadSlide(index, f, resourceFiles, includes.Get))
 				.ToArray();
 			CheckDuplicateSlideIds(slides);
 			var notes = resourceFiles

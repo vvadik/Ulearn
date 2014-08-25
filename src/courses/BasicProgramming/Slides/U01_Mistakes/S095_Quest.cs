@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Globalization;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Сделай то, не знаю что", "5EE7337B-14FE-41A2-9E12-ACA989534A3A")]
-	class S099_Quest
+	class S095_Quest
 	{
 		/*
 		Задача-загадка. Попробуйте сами понять, что нужно сделать :-)

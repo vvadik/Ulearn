@@ -20,14 +20,16 @@
 					}
 					@if (User.IsInRole(LmsRoles.Instructor) && unit.InstructorNote != null)
 					{
-						var url = Url.Action("InstructorNote", "Course", new { courseId = Model.CourseId, unitName=unit.UnitName });
+						var url = Url.Action("InstructorNote", "Course", new { courseId = Model.CourseId, unitName = unit.UnitName });
+						<i class="glyphicon glyphicon-eye-close navbar-label" title="Не видно студентам"></i>
 						<li class="slide-list-item slide-list-item-instructor-note" onclick="window.location.href='@url'">
 							<a href="@url">Заметки преподавателю</a>
 						</li>
 					}
 					@if (User.IsInRole(LmsRoles.Instructor))
 					{
-						<li class="slide-list-item unit-statistic-ref">@Html.ActionLink("Unit statistics", "UnitStatistics", "Analytics", new { courseId = Model.CourseId, unitName = unit.UnitName }, null)</li>
+						<i class="glyphicon glyphicon-eye-close navbar-label" title="Не видно студентам"></i>
+						<li class="slide-list-item unit-statistic-ref">@Html.ActionLink("Успеваемость студентов", "UnitStatistics", "Analytics", new { courseId = Model.CourseId, unitName = unit.UnitName }, null)</li>
 					}
 				</ul>
 			</li>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -78,9 +79,16 @@ namespace uLearn.CSharp
 					var parts = comment.Split(new[] { ' ' }, 2);
 					if (parts[0] == "//#video") EmbedVideo(parts[1]);
 					if (parts[0] == "//#include") EmbedCode(parts[1]);
+					if (parts[0] == "//#http") EmbedExternalMarkdown(parts[1]);
 				}
 			}
 			return base.VisitTrivia(trivia);
+		}
+
+		private void EmbedExternalMarkdown(string url)
+		{
+			var markdown = new WebClient().DownloadData(url).AsUtf8();
+			Blocks.Add(new MdBlock(markdown));
 		}
 
 		///<summary>Is child _inside_ Type or Method parent</summary>
