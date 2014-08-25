@@ -42,7 +42,7 @@
 							<h6>@user.Key</h6>
 						</td>
 						<td data-sort-value="@user.Value.UserGroup">
-							<input id="@(user.Key)" class="form-control input-sm" onblur="changeGroup('@user.Key')" data-url="@Url.Action("AddUserGroup", "Analytics")" type="text" value="@user.Value.UserGroup" />
+							<input id="@(user.Key)" onblur="changeGroup('@user.Key')" data-url="@Url.Action("AddUserGroup", "Analytics")" type="text" value="@user.Value.UserGroup" />
 						</td>
 						@for (var i = 0; i < user.Value.SlidesInfo.Length; i++)
 						{

@@ -8,9 +8,14 @@ namespace uLearn
 {
 	public static class StringExtensions
 	{
+		public static string RemoveBom(this string text)
+		{
+			return text.TrimStart(new[] { '\uFEFF', '\u200B' });
+		}
+
 		public static string AsUtf8(this byte[] bytes)
 		{
-			return Encoding.UTF8.GetString(bytes).TrimStart(new[] { '\uFEFF', '\u200B' });
+			return Encoding.UTF8.GetString(bytes).RemoveBom();
 		}
 
 		public static string[] SplitToLines(this string text)

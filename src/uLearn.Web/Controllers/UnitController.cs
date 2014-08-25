@@ -35,7 +35,7 @@ namespace uLearn.Web.Controllers
 				course.Slides
 					.Select(s => s.Info.UnitName)
 					.Distinct()
-					.Select(unitName => Tuple.Create(unitName, appearances.FirstOrDefault(a => a.UnitName == unitName)))
+					.Select(unitName => Tuple.Create(unitName, appearances.FirstOrDefault(a => a.UnitName.RemoveBom() == unitName)))
 					.ToList();
 			return View(new UnitsListViewModel(course.Id, course.Title, unitAppearances, DateTime.Now));
 		}
@@ -44,19 +44,17 @@ namespace uLearn.Web.Controllers
 		public async Task<RedirectToRouteResult> SetPublishTime(string courseId, string unitName, string publishTime)
 		{
 
-			var unitAppearance = await db.Units.FirstOrDefaultAsync(u => u.CourseId == courseId && u.UnitName == unitName);
-			if (unitAppearance == null)
+			var oldInfo = await db.Units.Where(u => u.CourseId == courseId && u.UnitName == unitName).ToListAsync();
+			db.Units.RemoveRange(oldInfo);
+			var unitAppearance = new UnitAppearance
 			{
-				unitAppearance = new UnitAppearance
-				{
-					CourseId = courseId,
-					UnitName = unitName,
-				};
-				db.Units.Add(unitAppearance);
-			}
-			unitAppearance.UserName = User.Identity.Name;
-			unitAppearance.UserId = User.Identity.GetUserId();
-			unitAppearance.PublishTime = DateTime.Parse(publishTime);
+				CourseId = courseId,
+				UnitName = unitName,
+				UserName = User.Identity.Name,
+				UserId = User.Identity.GetUserId(),
+				PublishTime = DateTime.Parse(publishTime),
+			};
+			db.Units.Add(unitAppearance);
 			await db.SaveChangesAsync();
 			return RedirectToAction("List", new { courseId });
 		}
