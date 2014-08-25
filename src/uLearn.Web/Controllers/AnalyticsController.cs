@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -201,8 +202,70 @@ namespace uLearn.Web.Controllers
 							HintUsedPercent = slide is ExerciseSlide ? slideHintRepo.GetHintUsedPercentForUser(course.Id, slide.Id, userId, (slide as ExerciseSlide).HintsHtml.Count()) : 0
 						})
 						.ToArray()
-				
 			};
+		}
+
+		public ActionResult UnitStatistics(string courseId, string unitName)
+		{
+			var course = courseManager.GetCourse(courseId);
+			var slides = course.Slides
+				.Where(s => s.Info.UnitName == unitName).ToArray();
+			var unitStatisticPageModel = new UnitStatisticPageModel
+			{
+				CourseId = courseId,
+				Slides = slides,
+				Table = new Dictionary<string, UserInfo>()
+			};
+			var slideIdToSlideIndex = new Dictionary<string, int>();
+			for (var i = 0; i < slides.Length; i++)
+				slideIdToSlideIndex[slides[i].Id] = i;
+			foreach (var user in db.Users)
+			{
+				unitStatisticPageModel.Table[user.UserName] = new UserInfo();
+				unitStatisticPageModel.Table[user.UserName].UserGroup = user.GroupName ?? "";
+				unitStatisticPageModel.Table[user.UserName].SlidesInfo = new UserInfoInSlide[slides.Length];
+				for (var i = 0; i < slides.Length; i++)
+					unitStatisticPageModel.Table[user.UserName].SlidesInfo[i] = new UserInfoInSlide();
+			}
+			foreach (var userSolutions in db.UserSolutions.Where(x => x.CourseId == courseId).GroupBy(x => x.UserId))
+			{
+				var name = db.Users.Find(userSolutions.Key).UserName;
+				foreach (var slideGroup in userSolutions.Where(x => slideIdToSlideIndex.ContainsKey(x.SlideId)).GroupBy(x => x.SlideId))
+				{
+					var info = unitStatisticPageModel.Table[name].SlidesInfo[slideIdToSlideIndex[slideGroup.Key]];
+					info.AttemptsNumber = slideGroup.Count();
+					info.IsExerciseSolved = slideGroup.Any(x => x.IsRightAnswer);
+				}
+			}
+			foreach (var user in db.Users)
+			{
+				for (var i = 0; i < slides.Length; i++)
+				{
+					unitStatisticPageModel.Table[user.UserName].SlidesInfo[i].IsVisited = 
+						visitersRepo.IsUserVisit(courseId, slides[i].Id, user.Id);
+				}
+			}
+			foreach (var user in db.Users)
+			{
+				for (var i = 0; i < slides.Length; i++)
+				{
+					if (!(slides[i] is QuizSlide)) continue;
+					unitStatisticPageModel.Table[user.UserName].SlidesInfo[i].IsQuizPassed = 
+						userQuizzessRepo.IsQuizSlidePassed(courseId, user.Id, slides[i].Id);
+					unitStatisticPageModel.Table[user.UserName].SlidesInfo[i].QuizSuccessful =
+						userQuizzessRepo.GetQuizSuccessful(courseId, slides[i].Id, user.Id);
+				}
+			}
+			return View(unitStatisticPageModel);
+		}
+
+		[HttpPost]
+		[Authorize]
+		public async Task<ActionResult> AddUserGroup(string groupName, string userName)
+		{
+			db.Users.First(x => x.UserName == userName).GroupName = groupName;
+			await db.SaveChangesAsync();
+			return null;
 		}
 	}
 }

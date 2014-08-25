@@ -451,3 +451,16 @@ table.diff tbody th {
 		width: 100%;
 		height: 100%;
 	}
+}
+
+.unit-statistic-ref {
+	color: yellowgreen;
+}
+
+.green-stat {
+	background-color: lightgreen;
+}
+
+.red-stat {
+	background-color: lightcoral;
+}

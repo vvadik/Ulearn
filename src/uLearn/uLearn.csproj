@@ -159,6 +159,7 @@
     </Compile>
     <Compile Include="SlideAttribute.cs" />
     <Compile Include="TocModel.cs" />
+    <Compile Include="UnitStatisticPageModel.cs" />
     <Compile Include="Urls.cs" />
     <Compile Include="UsersStatsPageModel.cs" />
   </ItemGroup>

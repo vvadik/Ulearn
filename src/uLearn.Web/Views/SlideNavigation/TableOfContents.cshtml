@@ -16,7 +16,7 @@
 					{
 						var url = Url.Action("Slide", "Course", new {courseId = Model.CourseId, slideIndex = slide.Index});
 						<i class="@GetIconClass(slide) navbar-label" title="@GetTitle(slide)"></i>
-						<li class="slide-list-item @(slide == Model.CurrentSlide ? "selected" : "") " onclick="window.location.href='@url'"><a href="@url">@slide.Title</a></li>
+						<li class="slide-list-item @(slide == Model.CurrentSlide ? "selected" : "") " onclick="window.location.href = '@url' "><a href="@url">@slide.Title</a></li>
 					}
 					@if (User.IsInRole(LmsRoles.Instructor) && unit.InstructorNote != null)
 					{
@@ -24,6 +24,10 @@
 						<li class="slide-list-item slide-list-item-instructor-note" onclick="window.location.href='@url'">
 							<a href="@url">Заметки преподавателю</a>
 						</li>
+					}
+					@if (User.IsInRole(LmsRoles.Instructor))
+					{
+						<li class="slide-list-item unit-statistic-ref">@Html.ActionLink("Unit statistics", "UnitStatistics", "Analytics", new { courseId = Model.CourseId, unitName = unit.UnitName }, null)</li>
 					}
 				</ul>
 			</li>
