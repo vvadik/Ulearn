@@ -49,6 +49,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		}
 
 		[Exercise]
+		[Hint("Используйте цикл")]
 		private static void WriteTextWithBorder(string text)
 		{
 			string bar = "";

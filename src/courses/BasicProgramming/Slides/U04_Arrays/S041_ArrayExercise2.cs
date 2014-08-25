@@ -8,56 +8,38 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 {
 	/*
-	В этом задании вам понадобится четкое понимание типов ссылок и типов значения.
-	Есть метод ```FeedSnakeAndReport(int[] snake)```, который "кормит" змею. Что это значит:
-	суть змейки - массив [1,2,3,0,0,0] - змейка длины 6, которая сыта на троечку =)
-	Разумеется, есть и более длинные/короткие змейки. Что представляет собой кормление?
-	Это увеличение ее сытости на один, то есть в данном случае ```FeedSnakeAndReport``` изменит массив
-	на [1,2,3,4,0,0],и сытость станет равна 4. Если кормление возможно - кормим, печатаем текущую сытость,
-	иначе, если сытость полная, - сообщение "Full".
-	Вам следует реализовать метод ```FeedSnakeAndReport```. Удачи!
+	Помогите Васе написать
+	метод, который принимает массив ```int[]``` и возводит все его элементы в нужную степень,
+ 	возвращая результирующий массив. Исходный массив должен остаться неизменным.
 	*/
 
-	[Slide("Змейки", "{E3E45EC7-7BD0-4284-8CA1-0FBCB2FA0C21}")]
-	class S041_ArrayExercise2
+	[Slide("Степени", "{E3E45EC7-7BD0-4284-8CA1-0FBCB2FA0C21}")]
+	static class S041_ArrayExercise2
 	{
-		[ExpectedOutput("3\n5\n6\n4\nFull\n6\n7")]
+		[ExpectedOutput("1, 2, 3, 4, 5, 6, 7, 8, 9\n1, 4, 9, 16, 25, 36, 49, 64, 81\n1, 8, 27, 64, 125, 216, 343, 512, 729")]
 		public static void Main()
 		{
-			var lusy = new int[] {1, 2, 0, 0, 0, 0};
-			var tean = new int[] {1, 2, 3, 4, 0, 0, 0, 0, 0, 0};
-			var python = new int[] {1, 2, 3, 4, 5, 0, 0, 0};
-			var cobra = new int[] {1, 2, 3, 0};
-			FeedSnakeAndReport(lusy);
-			FeedSnakeAndReport(tean);
-			FeedSnakeAndReport(python);
-			FeedSnakeAndReport(cobra);
-			FeedSnakeAndReport(cobra);
-			FeedSnakeAndReport(tean);
-			FeedSnakeAndReport(python);
+			var integersToIncrease = new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9};
+			PrintArray(GetIncreasedArray(integersToIncrease, 1));
+			PrintArray(GetIncreasedArray(integersToIncrease, 2));
+			PrintArray(GetIncreasedArray(integersToIncrease, 3));
 		}
 
 		[Exercise]
-		public static void FeedSnakeAndReport(int[] snake)
+		[Hint("Вспомните, что такое ссылочные типы")]
+		[Hint("Массив - ссылочный тип")]
+		public static int[] GetIncreasedArray(int[] arr, int degree)
 		{
-			if (IsPossibleToFeed(snake))
-			{
-				var toFeedIndex = string.Join("", snake).IndexOf('0');
-				snake[toFeedIndex] = snake[toFeedIndex - 1] + 1;
-				Console.WriteLine(snake[toFeedIndex - 1] + 1);
-				return;
-			}
-			Console.WriteLine("Full");
+			return arr.Select(x => (int)Math.Pow(x, degree)).ToArray();
 			/*uncomment
 			 ...
 			*/
 		}
 
 		[HideOnSlide]
-		[ExcludeFromSolution]
-		public static bool IsPossibleToFeed(int[] snake)
+		public static void PrintArray(int[] a)
 		{
-			return snake.Length > snake.Max();
+			Console.WriteLine(string.Join(", ",a.Select(x => x.ToString()).ToArray()));
 		}
 	}
 }

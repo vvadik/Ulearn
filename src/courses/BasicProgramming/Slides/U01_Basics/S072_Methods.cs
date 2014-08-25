@@ -16,6 +16,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		*/
 
 		[ExpectedOutput("1764")]
+		[Hint("Посмотрите лекцию по методам еще раз!")]
 		static public void Main()
 		{
 			Print(GetSquare(42));

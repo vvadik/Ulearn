@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U07_Algorithms
 {
-	[Slide("Сложность алгоритмов с числами", "{0FC6D8B9-8E91-4A9B-A649-2C7E1B3A44A4}")]
-	class S030_NumberComplex
+	[Slide("Оценка сложности", "{F1991483-E9EC-4367-9ABF-3F773AF5F2C9}")]
+	class S060_ComplexityMark
 	{
-		//#video fy4fSRDjPTs
+		//#video qwx_pCfSyN0
 		/*
 		[Материалы по лекции](/Courses/BasicProgramming/U07_Algorithms/_Materials.zip)
 		*/

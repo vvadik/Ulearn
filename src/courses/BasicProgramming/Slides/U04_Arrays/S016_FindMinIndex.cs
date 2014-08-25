@@ -1,4 +1,4 @@
-﻿using System;
+﻿  using System;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
@@ -47,6 +47,8 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 		}
 
 		[Exercise]
+		[Hint("Помните, что массив может быть пустым")]
+		[Hint("Длина массива находится в ```.Length```")]
 		public static int MaxIndex(double[] a)
 		{
 			if (a.Length == 0) return -1;

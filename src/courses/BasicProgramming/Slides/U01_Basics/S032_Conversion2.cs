@@ -16,6 +16,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 
 		[Exercise]
 		[ExpectedOutput("67")]
+		[Hint("Подумайте, в какую сторону округляет (int)")]
+		[Hint("Есть чудесная библиотека Math")]
 		public static void Main()
 		{
 			double amount = 1.11;

@@ -33,6 +33,9 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		[ExpectedOutput(@"""
 \I'm\t\a\t\robot'	
 I'm\t\a\t\robot")]
+		[Hint("Подумайте о том, как можно поставить соответствие между элементом перечисления и строкой")]
+		[Hint("Вы можете использовать ```if``` для соответствия")]
+		[Hint("Неплохо будет выглядеть ```switch```")]
 		public static void Main()
 		{
 			string robotSaid = ConvertEnumList(GetRobotWords());

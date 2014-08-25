@@ -18,6 +18,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 
 		[Exercise]
 		[ExpectedOutput("Hello, World!\r\n12.5")]
+		[Hint("Вспомните, как работает ```var```")]
 		public static void Main()
 		{
 			Console.WriteLine("Hello, World!");

@@ -55,6 +55,7 @@ False ?= False
 False ?= False
 False ?= False
 ")]
+		[Hint("Грамотно используйте конъюнкцию вместе с дизъюнкцией")]
 		public static void Main()
 		{
 			CompareFunctions(true, "Big boss", 1000, 10, 10);

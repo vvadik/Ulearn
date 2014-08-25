@@ -49,28 +49,17 @@ namespace uLearn.Courses.BasicProgramming.Slides.U03_Cycles
 		}
 
 		[Exercise]
+		[Hint("Успехов")]
+		[Hint("Ну какие тут подсказки?!")]
+		[Hint("Просто напишите этот код!")]
 		private static int MiddleOf(int a, int b, int c)
 		{
 			if (a > b)
 				if (b > c) return b;
 				else if (a > c) return c;
 				else return a;
-			else // b < a
-			{
-				if (a > c) return a;
-				else if (b > c) return c;
-				else return b;
-			}
-			/*uncomment
-			...
-			*/
-		}
-		[HideOnSlide]
-		[ExcludeFromSolution]
-		private static int MiddleOf2(int a, int b, int c)
-		{
-			if (a > b) return MiddleOf(b, a, c);
-			if (b > c) return MiddleOf(a, c, b);
+			if (a > c) return a;
+			if (b > c) return c;
 			return b;
 			/*uncomment
 			...

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace uLearn.Courses.BasicProgramming.Slides.U07_Algorithms
 {
 	[Slide("Измерение сложности", "{0820F9D6-0B3A-4A91-99B3-ABC4DA5A0521}")]
-	class S060_ComplexityMeausure
+	class S030_ComplexityMeausure
 	{
 		//#video 78BFvmgOoNM
 		/*
