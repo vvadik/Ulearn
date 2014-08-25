@@ -96,9 +96,9 @@ namespace uLearn.Web.DataContexts
 			{
 				ans[item.Id] = false;
 			}
-			foreach (var itemId in db.UserQuizzes.Where(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && x.QuizId == block.Id).Select(x => x.ItemId))
+			foreach (var quizItem in db.UserQuizzes.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId && q.QuizId == block.Id && q.ItemId != null))
 			{
-				ans[itemId] = true;
+				ans[quizItem.ItemId] = true;
 			}
 			return new ChoiceBlockAnswerInfo
 			{

@@ -1,0 +1,21 @@
+﻿@using uLearn
+@model InstructorNote
+
+@{
+	ViewBag.Title = "Заметки преподавателю";
+}
+
+
+@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = -1 })
+
+<div class="slide-container">
+	<div class="container body-content">
+		<div class="row">
+			<div class='slide'>
+				<h1>Заметки преподавателю <small>@Model.UnitName</small></h1>
+				<hr/>
+				@Html.Raw(Model.Markdown.RenderMd())
+			</div>
+		</div>
+	</div>
+</div>

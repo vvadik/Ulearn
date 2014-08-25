@@ -21,8 +21,8 @@ namespace uLearn.Web.Models
 		public static CourseManager LoadAllCourses()
 		{
 			var result = new CourseManager();
-			result.AddCourse("Linq", "Linq");
-			result.AddCourse("BasicProgramming", "BasicProgramming");
+			result.AddCourse("Linq", "Практикум по LINQ");
+			result.AddCourse("BasicProgramming", "Основы программирования на C#");
 			return result;
 		}
 
@@ -51,19 +51,37 @@ namespace uLearn.Web.Models
 				.ThenBy(f => GetSecondSortingKey(f.Filename))
 				.ToList();
 			var includes = resourceFiles
-				.Where(f => !IsSlide(f))
+				.Where(IsInclude)
 				.ToDictionary(inc => inc.Filename, inc => inc.GetContent().AsUtf8());
 			var slides = resourceFiles
 				.Where(IsSlide)
 				.Select((f, index) => LoadSlide(index, f, resourceFiles, name => includes[name]))
 				.ToArray();
-			var slidesWithRepeatedGuide =
-				slides.GroupBy(x => x.Id).Where(x => x.Count() != 1).Select(x => x.Select(y => y.Info.CourseName + ": " + y.Title)).ToList();
-			if (slidesWithRepeatedGuide.Any())
-			{
-				throw new Exception("change repeated guid in slides:\n" + string.Join("\n", slidesWithRepeatedGuide.Select(x => string.Join("\n", x))));
-			}
-			return new Course(courseId, courseTitle, slides);
+			CheckDuplicateSlideIds(slides);
+			var notes = resourceFiles
+				.Where(IsInstructorNote)
+				.Select(f => LoadInstructorNote(courseId, f, resourceFiles))
+				.ToArray();
+			return new Course(courseId, courseTitle, slides, notes);
+		}
+
+		private static InstructorNote LoadInstructorNote(string courseId, ResourceFile resource, IEnumerable<ResourceFile> resourceFiles)
+		{
+			var content = resource.GetUtf8Content();
+			var unitName = GetUnitName(resourceFiles, resource);
+			return new InstructorNote(content, courseId, unitName);
+		}
+
+		private static void CheckDuplicateSlideIds(IEnumerable<Slide> slides)
+		{
+			var slidesWithDuplicateGuids =
+				slides.GroupBy(x => x.Id)
+					.Where(x => x.Count() != 1)
+					.Select(x => x.Select(y => y.Title))
+					.ToList();
+			if (slidesWithDuplicateGuids.Any())
+				throw new Exception("Duplecate Id in slides:\n" +
+									string.Join("\n", slidesWithDuplicateGuids.Select(x => string.Join("\n", x))));
 		}
 
 		private string GetSecondSortingKey(string filename)
@@ -78,7 +96,16 @@ namespace uLearn.Web.Models
 
 		private static bool IsSlide(ResourceFile x)
 		{
-			return !x.Filename.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) && !x.Filename.Contains("._");
+			var slideExtensions = new[] { ".cs", ".xml" };
+			return slideExtensions.Any(ext => x.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase)) && !IsInclude(x);
+		}
+		private static bool IsInstructorNote(ResourceFile x)
+		{
+			return x.Filename.EndsWith(".InstructorNotes.md", StringComparison.OrdinalIgnoreCase);
+		}
+		private static bool IsInclude(ResourceFile x)
+		{
+			return x.Filename.Contains("._");
 		}
 
 		private static Slide LoadSlide(int index, ResourceFile slideFile, IList<ResourceFile> resourceFiles, Func<string, string> getInclude)
@@ -86,8 +113,8 @@ namespace uLearn.Web.Models
 			try
 			{
 				var sourceCode = Encoding.UTF8.GetString(slideFile.GetContent());
-				var prelude = GetExercisePrelude(slideFile, resourceFiles); 
-				var info = GetInfoForSlide(slideFile, resourceFiles, index);
+				var prelude = GetExercisePrelude(slideFile, resourceFiles);
+				var info = new SlideInfo(GetUnitName(resourceFiles, slideFile), index);
 				return slideFile.Filename.EndsWith(".xml") 
 					? LoadQuiz(slideFile, info) 
 					: SlideParser.ParseCode(sourceCode, info, prelude, getInclude);
@@ -143,20 +170,10 @@ namespace uLearn.Web.Models
 			return Encoding.UTF8.GetString(all.Single(x => x.FullName.EndsWith(detailedPath[detailedPath.Length - 3] + ".Prelude.txt")).GetContent());
 		}
 
-		private static SlideInfo GetInfoForSlide(ResourceFile file, IList<ResourceFile> all, int index)
+		private static string GetUnitName(IEnumerable<ResourceFile> all, ResourceFile resource)
 		{
-			var detailedPath = file.FullName.Split('.').ToArray();
-			return new SlideInfo(
-				fileName: detailedPath[detailedPath.Length - 2] + "." + detailedPath.Last(),
-				courseName: GetTitle(all, detailedPath, 3),
-				unitName: GetTitle(all, detailedPath, 2),
-				index: index
-				);
-		}
-
-		private static string GetTitle(IEnumerable<ResourceFile> all, string[] slidePath, int depth)
-		{
-			var fullName = string.Join(".", slidePath.Take(slidePath.Length - depth)) + ".Title.txt";
+			var slidePath = resource.FullName.Split('.').ToArray();
+			var fullName = string.Join(".", slidePath.Take(slidePath.Length - 2)) + ".Title.txt";
 			return Encoding.UTF8.GetString(all.First(x => x.FullName == fullName).GetContent());
 			
 		}

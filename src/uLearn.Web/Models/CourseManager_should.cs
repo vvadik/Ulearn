@@ -14,8 +14,6 @@ namespace uLearn.Web.Models
 			{
 				foreach (var s in c.Slides)
 				{
-					Console.WriteLine("FileName: " + s.Info.FileName);
-					Console.WriteLine("BlockName: " + s.Info.CourseName);
 					Console.WriteLine("UnitName: " + s.Info.UnitName);
 					Console.WriteLine("Title: " + s.Title);
 					Console.WriteLine("*********************");

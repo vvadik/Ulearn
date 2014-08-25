@@ -739,11 +739,12 @@
     <Content Include="Views\Course\_ChoiceBlock.cshtml" />
     <Content Include="Views\Course\_FillInBlock.cshtml" />
     <Content Include="Views\Course\_TrueFalseBlock.cshtml" />
-    <Content Include="Views\Course\_QuizAnalytics.cshtml" />
+    <Content Include="Views\Quiz\Analytics.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
     <Content Include="Views\Unit\List.cshtml" />
     <Content Include="Views\Unit\CourseList.cshtml" />
     <Content Include="Views\Analytics\UnitStatistics.cshtml" />
+    <Content Include="Views\Course\InstructorNote.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Courses\" />

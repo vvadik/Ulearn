@@ -162,5 +162,12 @@ namespace uLearn.Web.Controllers
 		{
 			await visitersRepo.AddVisiter(courseId, slideId, User.Identity.GetUserId());
 		}
+
+		[Authorize(Roles = LmsRoles.Instructor)]
+		public ActionResult InstructorNote(string courseId, string unitName)
+		{
+			InstructorNote instructorNote = courseManager.GetCourse(courseId).GetInstructorNote(unitName);
+			return View(instructorNote);
+		}
 	}
 }

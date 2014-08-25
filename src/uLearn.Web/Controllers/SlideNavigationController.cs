@@ -25,13 +25,13 @@ namespace uLearn.Web.Controllers
 				.Where(s => visibleUnits.Contains(s.Info.UnitName))
 				.GroupBy(
 					s => s.Info.UnitName,
-					(unitName, slides) => new CourseUnitModel { Slides = slides.ToArray(), Title = unitName })
+					(unitName, slides) => new CourseUnitModel { Slides = slides.ToArray(), InstructorNote = course.GetInstructorNote(unitName), UnitName = unitName })
 				.ToArray();
 			var visitedSlideIds = visitersRepo.GetIdOfVisitedSlides(course.Id, userId);
 			var currentSlide = course.FindSlide(slideIndex);
 			if (currentSlide != null && !visibleUnits.Contains(currentSlide.Info.UnitName))
 				currentSlide = null;
-			var currentUnit = units.FirstOrDefault(u => u.Slides.Contains(currentSlide) && visibleUnits.Contains(u.Title));
+			var currentUnit = units.FirstOrDefault(u => u.Slides.Contains(currentSlide) && visibleUnits.Contains(u.UnitName));
 			return PartialView(new TocModel
 			{
 				CourseId = course.Id,

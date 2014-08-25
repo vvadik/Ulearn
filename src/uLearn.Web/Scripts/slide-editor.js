@@ -22,7 +22,7 @@ function codeMirrorClass(c, editable) {
 				}
 			},
 			readOnly: !editable,
-			autoCloseBrackets: true,
+			//autoCloseBrackets: true, // bug: autoCloseBracket breakes indentation after for|while|...
 			styleActiveLine: editable,
 			matchBrackets: true,
 	});

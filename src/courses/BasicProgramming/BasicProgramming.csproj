@@ -36,6 +36,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -65,6 +67,9 @@
     <Compile Include="Slides\U01_Basics\S100_FinalTask.cs" />
     <Compile Include="Slides\U01_Basics\S000_HelpSlide.cs" />
     <Compile Include="Slides\U01_Basics\_HelloWorld.cs" />
+    <Content Include="Slides\U99_Presentation\Prelude.txt" />
+    <Content Include="Slides\U99_Presentation\Title.txt" />
+    <None Include="Slides\U01_Basics\InstructorNotes.md" />
     <Content Include="Slides\U02_Mistakes\S091_Style2.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -90,6 +95,7 @@
     <Compile Include="Slides\U02_Mistakes\_TypeCastingMistaces.cs" />
     <Compile Include="Slides\U02_Mistakes\_Typo.cs" />
     <Compile Include="Slides\U03_Cycles\S023_QueenMove.cs" />
+    <Compile Include="Slides\U03_Cycles\S044_WhileRefactoringVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S060_ForVsWhileVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S010_LogicalTypeVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S015_IsLeapYear.cs" />
@@ -99,14 +105,13 @@
     <Compile Include="Slides\U03_Cycles\S032_RobotControl.cs" />
     <Compile Include="Slides\U03_Cycles\S040_WhileVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S041_PowerOfTwo.cs" />
-    <Compile Include="Slides\U03_Cycles\S042_Break.cs" />
-    <Compile Include="Slides\U03_Cycles\S043_Continue.cs" />
-    <Compile Include="Slides\U03_Cycles\S044_WhileRefactoringVideo.cs" />
+    <Compile Include="Slides\U03_Cycles\S046_RemoveSpaces.cs" />
     <Compile Include="Slides\U03_Cycles\S050_ForVideo.cs" />
-    <Compile Include="Slides\U03_Cycles\S051_For.cs" />
-    <Compile Include="Slides\U03_Cycles\S061_KtulhuFor.cs" />
-    <Compile Include="Slides\U04_Arrays\S010_Array.cs" />
-    <Compile Include="Slides\U04_Arrays\S021_ArrayExercise.cs" />
+    <Compile Include="Slides\U03_Cycles\S055_Border.cs" />
+    <Compile Include="Slides\U03_Cycles\S065_Chessboard.cs" />
+    <Compile Include="Slides\U04_Arrays\S010_ArrayAndForeach.cs" />
+    <Compile Include="Slides\U04_Arrays\S021_DigitsToText.cs" />
+    <Compile Include="Slides\U04_Arrays\S015_ReverseArray.cs" />
     <Compile Include="Slides\U04_Arrays\S020_ShortForm.cs" />
     <Compile Include="Slides\U04_Arrays\S030_ArrayNull.cs" />
     <Compile Include="Slides\U04_Arrays\S040_PassArrToMethod.cs" />
@@ -150,8 +155,37 @@
     <Compile Include="Slides\U06_AutomaticTesting\S050_FunctionalTestingcs.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\S060_ForWhatThisTests.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\_UnitTest.cs" />
+    <Compile Include="Slides\U07_Algorithms\S010_BasicComplexity.cs" />
+    <Compile Include="Slides\U07_Algorithms\S020_OSymbol.cs" />
+    <Compile Include="Slides\U07_Algorithms\S030_NumberComplex.cs" />
+    <Compile Include="Slides\U07_Algorithms\S060_ComplexityMeausure.cs" />
+    <Compile Include="Slides\U07_Algorithms\S040_FunctionGrowth.cs" />
+    <Compile Include="Slides\U07_Algorithms\S050_BasicTerms.cs" />
+    <Compile Include="Slides\U07_Algorithms\S070_ComplexityMark.cs" />
+    <Compile Include="Slides\U07_Algorithms\S080_ComplexityClasses.cs" />
+    <Compile Include="Slides\U99_Presentation\_S011_Attributes2.cs" />
+    <Compile Include="Slides\U99_Presentation\S011_Attributes2.cs" />
+    <Compile Include="Slides\U99_Presentation\S000_About.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Slides\U99_Presentation\S010_Attributes.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Slides\U99_Presentation\S020_Markdown.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Slides\U99_Presentation\_AttrInitial.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Slides\U99_Presentation\_MarkdownExample.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Slides\U99_Presentation\_SampleIncludeFile.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Slides_Tests.cs" />
     <Content Include="Slides\U04_Arrays\Prelude.txt" />
+    <Content Include="Slides\U03_Cycles\shapes.png" />
     <Content Include="Slides\U04_Arrays\S021_ArrayQuiz.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -160,6 +194,8 @@
     <Content Include="Slides\U05_Collections\Title.txt" />
     <Content Include="Slides\U06_AutomaticTesting\Prelude.txt" />
     <Content Include="Slides\U06_AutomaticTesting\Title.txt" />
+    <Content Include="Slides\U07_Algorithms\Prelude.txt" />
+    <Content Include="Slides\U07_Algorithms\Title.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">
@@ -169,10 +205,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Slides\U02_Mistakes\InstructorNotes.md" />
+    <None Include="Slides\U03_Cycles\InstructorNotes.md" />
+    <None Include="Slides\U04_Arrays\InstructorNotes.md" />
     <None Include="Slides\U04_Arrays\_S050_ValueRferenceType.odp" />
     <None Include="Slides\U04_Arrays\_S070_GraphicDimensional.odp" />
     <None Include="Slides\U04_Arrays\_S090_Memory.odp" />
+    <None Include="Slides\U05_Collections\InstructorNotes.md" />
     <None Include="Slides\U05_Collections\_S030_StringToMethod.odp" />
+    <None Include="Slides\U06_AutomaticTesting\InstructorNotes.md" />
+    <None Include="Slides\U07_Algorithms\InstructorNotes.md" />
+    <None Include="Slides\U07_Algorithms\_Materials.zip" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Slides\Title.txt" />
