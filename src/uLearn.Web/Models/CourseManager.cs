@@ -174,7 +174,7 @@ namespace uLearn.Web.Models
 		{
 			var slidePath = resource.FullName.Split('.').ToArray();
 			var fullName = string.Join(".", slidePath.Take(slidePath.Length - 2)) + ".Title.txt";
-			return Encoding.UTF8.GetString(all.First(x => x.FullName == fullName).GetContent());
+			return all.First(x => x.FullName == fullName).GetUtf8Content();
 			
 		}
 	}

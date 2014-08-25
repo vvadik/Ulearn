@@ -28,7 +28,7 @@ namespace uLearn
 
 		public string GetUtf8Content()
 		{
-			return Encoding.UTF8.GetString(getContent());
+			return getContent().AsUtf8();
 		}
 	}
 
