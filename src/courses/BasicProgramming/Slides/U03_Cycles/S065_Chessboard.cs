@@ -67,7 +67,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			for (int y = 0; y < size; y++)
 			{
 				for (int x = 0; x < size; x++)
-					if ((x + y) % 2 == 1) Console.Write("██");
+					if ((x + y) % 2 == 0) Console.Write("██");
 					else Console.Write("  ");
 				Console.WriteLine();
 			}
