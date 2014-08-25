@@ -464,3 +464,7 @@ table.diff tbody th {
 .red-stat {
 	background-color: lightcoral;
 }
+
+.wide-container {
+	margin: 0 50px;
+}

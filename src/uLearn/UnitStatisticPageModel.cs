@@ -11,6 +11,7 @@ namespace uLearn
 		public Slide[] Slides { get; set; }
 		public Dictionary<string, UserInfo> Table { get; set; }//string - userId
 		public string CourseId { get; set; }
+		public string UnitName { get; set; }
 	}
 
 	public class UserInfo

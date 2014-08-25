@@ -1,83 +1,77 @@
 ﻿@using uLearn
 @model uLearn.UnitStatisticPageModel
 @{
-	ViewBag.Title = "Total statistics";
+	ViewBag.Title = "Успеваемость студентов";
 }
 
-
-@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId })
-
 <body>
-	<div class="slide-container">
-		<div class="container body-content">
-			<div class="row">
-				<table id="myTable" class="tablesorter">
-					<thead>
-						<tr>
-							<th>user name</th>
-							<th>group name</th>
-							@foreach (var slide in Model.Slides)
-							{
-								string text;
-								if (slide is ExerciseSlide)
-								{
-									text = "Попыток решить:";
-								}
-								else if (slide is QuizSlide)
-								{
-									text = "Успешность квиза:";
-								}
-								else
-								{
-									text = "Посещаемость:";
-								}
-								<th>
-									<p>@slide.Title</p>
-									<p>@text</p>
-								</th>
-							}
-						</tr>
-					</thead>
-					<tbody>
-						@foreach (var user in Model.Table)
+	<div class="wide-container">
+		<h1>Модуль &laquo;@Model.UnitName&raquo; <small>успеваемость</small></h1>
+		<table id="myTable" class="tablesorter">
+			<thead>
+				<tr>
+					<th>Имя</th>
+					<th>Группа</th>
+					@foreach (var slide in Model.Slides)
+					{
+						string text;
+						if (slide is ExerciseSlide)
 						{
-							<tr>
-								<td>
-									<h6>@user.Key</h6>
-								</td>
-								<td data-sort-value="@user.Value.UserGroup">
-									<input id="@(user.Key)" data-url="@Url.Action("AddUserGroup", "Analytics")" type="text" value="@user.Value.UserGroup" />
-									<button onclick="changeGroup('@user.Key')">Change group</button>
-								</td>
-								@for (var i = 0; i < user.Value.SlidesInfo.Length; i++)
-								{
-									if (Model.Slides[i] is ExerciseSlide)
-									{
-										var styleClass = @user.Value.SlidesInfo[i].IsExerciseSolved ? "green-stat" : "red-stat";
-										<td data-sort-value="@(user.Value.SlidesInfo[i].AttemptsNumber + 1000000)" 
-											class="@styleClass">@user.Value.SlidesInfo[i].AttemptsNumber
-										</td>
-									}
-									else if (Model.Slides[i] is QuizSlide)
-									{
-										var styleClass = @user.Value.SlidesInfo[i].IsQuizPassed ? "green-stat" : "red-stat";
-										<td data-sort-value="@(user.Value.SlidesInfo[i].QuizSuccessful + 10000)"
-											class="@styleClass">
-											@(user.Value.SlidesInfo[i].QuizSuccessful)%
-										</td>
-									}
-									else
-									{
-										var styleClass = @user.Value.SlidesInfo[i].IsVisited ? "green-stat" : "red-stat";
-										<td data-sort-value="@styleClass" class="@styleClass"></td>
-									}
-								}
-							</tr>
+							text = "Попыток решить:";
 						}
-					</tbody>
-				</table>
-			</div>
-		</div>
+						else if (slide is QuizSlide)
+						{
+							text = "Успешность квиза:";
+						}
+						else
+						{
+							text = "Посещаемость:";
+						}
+						<th>
+							<p>@slide.Title</p>
+							<p>@text</p>
+						</th>
+					}
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var user in Model.Table)
+				{
+					<tr>
+						<td>
+							<h6>@user.Key</h6>
+						</td>
+						<td data-sort-value="@user.Value.UserGroup">
+							<input id="@(user.Key)" class="form-control input-sm" onblur="changeGroup('@user.Key')" data-url="@Url.Action("AddUserGroup", "Analytics")" type="text" value="@user.Value.UserGroup" />
+						</td>
+						@for (var i = 0; i < user.Value.SlidesInfo.Length; i++)
+						{
+							if (Model.Slides[i] is ExerciseSlide)
+							{
+								var styleClass = @user.Value.SlidesInfo[i].IsExerciseSolved ? "green-stat" : "red-stat";
+								<td data-sort-value="@(user.Value.SlidesInfo[i].AttemptsNumber + 1000000)"
+									class="@styleClass">
+									@user.Value.SlidesInfo[i].AttemptsNumber
+								</td>
+							}
+							else if (Model.Slides[i] is QuizSlide)
+							{
+								var styleClass = @user.Value.SlidesInfo[i].IsQuizPassed ? "green-stat" : "red-stat";
+								<td data-sort-value="@(user.Value.SlidesInfo[i].QuizSuccessful + 10000)"
+									class="@styleClass">
+									@(user.Value.SlidesInfo[i].QuizSuccessful)%
+								</td>
+							}
+							else
+							{
+								var styleClass = @user.Value.SlidesInfo[i].IsVisited ? "green-stat" : "red-stat";
+								<td data-sort-value="@styleClass" class="@styleClass"></td>
+							}
+						}
+					</tr>
+				}
+			</tbody>
+		</table>
 	</div>
 </body>
 

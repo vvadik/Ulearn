@@ -213,6 +213,7 @@ namespace uLearn.Web.Controllers
 			var unitStatisticPageModel = new UnitStatisticPageModel
 			{
 				CourseId = courseId,
+				UnitName = unitName,
 				Slides = slides,
 				Table = new Dictionary<string, UserInfo>()
 			};
