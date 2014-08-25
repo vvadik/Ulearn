@@ -4,6 +4,7 @@ namespace uLearn
 {
 	public class CoursePageModel
 	{
+		public bool IsFirstCourseVisit { get; set; }
 		public string CourseId;
 		public string CourseTitle;
 		public Slide Slide;

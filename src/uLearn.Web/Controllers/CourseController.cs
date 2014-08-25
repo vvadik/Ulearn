@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
 using Microsoft.AspNet.Identity;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -13,6 +15,7 @@ namespace uLearn.Web.Controllers
 	public class CourseController : Controller
 	{
 		private readonly CourseManager courseManager;
+		private readonly ULearnDb db = new ULearnDb();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
@@ -43,8 +46,7 @@ namespace uLearn.Web.Controllers
 				exerciseSlide.LikedHints = slideHintRepo.GetLikedHints(courseId, exerciseSlide.Id, User.Identity.GetUserId());
 			var quizSlide = model.Slide as QuizSlide;
 			if (quizSlide != null)
-				foreach (var block in quizSlide.Quiz.Blocks.Where(x => x is ChoiceBlock).Where(x => ((ChoiceBlock) x).Shuffle)
-					)
+				foreach (var block in quizSlide.Quiz.Blocks.Where(x => x is ChoiceBlock).Where(x => ((ChoiceBlock) x).Shuffle))
 					Shuffle(block);
 			return View(model);
 		}
@@ -77,9 +79,11 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			if (slideIndex == -1)
 				slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
+			var isFirstCourseVisit = !visitersRepo.GetIdOfVisitedSlides(courseId, User.Identity.GetUserId()).Any();
 			await VisitSlide(courseId, course.Slides[slideIndex].Id);
 			var model = new CoursePageModel
 			{
+				IsFirstCourseVisit = isFirstCourseVisit,
 				CourseId = course.Id,
 				CourseTitle = course.Title,
 				Slide = course.Slides[slideIndex],
@@ -168,6 +172,18 @@ namespace uLearn.Web.Controllers
 		{
 			InstructorNote instructorNote = courseManager.GetCourse(courseId).GetInstructorNote(unitName);
 			return View(instructorNote);
+		}
+
+		[Authorize]
+		[HttpPost]
+		public async Task<ActionResult> AddGroup(string groupName)
+		{
+			var userId = User.Identity.GetUserId();
+			var user = db.Users.FirstOrDefault(x => x.Id == userId);
+			if (user != null)
+				user.GroupName = groupName;
+			await db.SaveChangesAsync();
+			return null;
 		}
 	}
 }
