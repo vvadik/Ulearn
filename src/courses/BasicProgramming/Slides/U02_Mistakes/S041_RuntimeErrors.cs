@@ -14,6 +14,9 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		*/
 
 		[ExpectedOutput("-1\r\nImpossible\r\n-0.2\r\n-0.375\r\nImpossible")]
+		[Hint("Помните, что в вашу метод могут передать некорректные значения")]
+		[Hint("Проверка - ключ к успеху. Ищите ```if```")]
+		[Hint("Если вам очень интересно - прочитайте про тернарные операторы")]
 		public static void Main()
 		{
 			WriteParabolaMinX(1, 2, 3);

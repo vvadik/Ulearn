@@ -40,6 +40,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 		[Exercise]
 		[SingleStatementMethod]
 		[Hint("Подумайте, как тут можно применить сокращенный синтаксис создания массивов вместо if-ов.")]
+		[Hint("Между переданной цифрой и индексом массива есть связь")]
 		private static string DigitToText(int digit)
 		{
 			return new[] { "ноль", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять" }[digit];

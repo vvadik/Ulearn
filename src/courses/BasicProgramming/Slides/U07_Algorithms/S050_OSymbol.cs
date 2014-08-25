@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace uLearn.Courses.BasicProgramming.Slides.U07_Algorithms
 {
 	[Slide("О-Символика", "{0A165BD3-2893-447A-B873-75C0BCCAC0C3}")]
-	class S020_OSymbol
+	class S050_OSymbol
 	{
 		//#video HOoYSOdTroU
 		/*

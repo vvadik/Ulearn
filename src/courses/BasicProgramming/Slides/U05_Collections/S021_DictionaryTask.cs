@@ -56,6 +56,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		}
 
 		[Exercise]
+		[Hint("Проверяйте наличие ключа в словаре перед добавлением")]
+		[Hint("Вспомните, что делает метод ```Split()```")]
 		private static Dictionary<string, List<string>> GetOptimazedPhonebook(List<string> phonebook)
 		{
 			var dict = new Dictionary<string, List<string>>();

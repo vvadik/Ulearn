@@ -47,9 +47,9 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 		}
 
 		[Exercise]
+		[Hint("Просто запишите правила крестиков-ноликов на языке С#")]
 		public static GameResults GetGameResult(Marks[,] field)
 		{
-			GameResults res = GameResults.Draw;
 			var winPositions = new string[][]
 			{
 				new[] {"00", "10", "20"}, new[] {"00", "01", "02"}, new[] {"00", "11", "22"}, 

@@ -25,8 +25,8 @@ namespace Slide06
                 for (int j = 0; j < twoDimensionalArray.GetLength(1); j++)
                     twoDimensionalArray[i, j] = 10*i + j;
             //В памяти значения хранятся в следующем порядке: 0,1,2,10,11,12
-            Console.WriteLine(twoDimensionalArray.Length); //выведет 6. Длины размерностей нужно получать через метод GetLength
-
+            Console.WriteLine(twoDimensionalArray.Length); 
+            //Метод выше напечатает 6. Длины размерностей нужно получать через метод GetLength
             //Могут быть массивы сколь угодно большой размерности
             int[, ,] threeDimensionalArray = new int[2, 3, 4];
 

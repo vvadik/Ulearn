@@ -158,12 +158,12 @@
     <Compile Include="Slides\U06_AutomaticTesting\S060_ForWhatThisTests.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\_UnitTest.cs" />
     <Compile Include="Slides\U07_Algorithms\S010_BasicComplexity.cs" />
-    <Compile Include="Slides\U07_Algorithms\S020_OSymbol.cs" />
-    <Compile Include="Slides\U07_Algorithms\S030_NumberComplex.cs" />
-    <Compile Include="Slides\U07_Algorithms\S060_ComplexityMeausure.cs" />
+    <Compile Include="Slides\U07_Algorithms\S020_BasicTerms.cs" />
+    <Compile Include="Slides\U07_Algorithms\S030_ComplexityMeausure.cs" />
     <Compile Include="Slides\U07_Algorithms\S040_FunctionGrowth.cs" />
-    <Compile Include="Slides\U07_Algorithms\S050_BasicTerms.cs" />
-    <Compile Include="Slides\U07_Algorithms\S070_ComplexityMark.cs" />
+    <Compile Include="Slides\U07_Algorithms\S050_OSymbol.cs" />
+    <Compile Include="Slides\U07_Algorithms\S060_ComplexityMark.cs" />
+    <Compile Include="Slides\U07_Algorithms\S070_NumberComplex.cs" />
     <Compile Include="Slides\U07_Algorithms\S080_ComplexityClasses.cs" />
     <Compile Include="Slides\U99_Presentation\_S011_Attributes2.cs" />
     <Compile Include="Slides\U99_Presentation\S011_Attributes2.cs" />

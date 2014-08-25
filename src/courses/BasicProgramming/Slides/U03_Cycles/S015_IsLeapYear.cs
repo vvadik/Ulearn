@@ -17,6 +17,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		*/
 
 		[ExpectedOutput("False\nFalse\nTrue\nFalse\nFalse\nTrue\nFalse\nTrue")]
+		[Hint("Вспомните про то, как берется остаток от числа")]
 		public static void Main()
 		{
 			Console.WriteLine(IsThisLeapYear(2014));

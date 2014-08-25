@@ -43,6 +43,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 		}
 
 		[Exercise]
+		[Hint("Посмотрите на код в примере выше")]
 		public static int GetElementCount(int[] items, int itemToFind)
 		{
 			var count = 0;

@@ -47,6 +47,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		}
 
 		[HideOnSlide]
+		[Hint("Разумно будет получить одну строку - представление всей услышанной информации")]
+		[Hint("Длина этой строки и будет ответом")]
 		private static IEnumerable<StringBuilder> GetAllAdvertisement()
 		{
 			yield return new StringBuilder("New IPhone 94! Now!");

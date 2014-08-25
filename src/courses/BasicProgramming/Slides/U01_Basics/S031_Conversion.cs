@@ -12,6 +12,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 
 		[Exercise]
 		[ExpectedOutput("31415\n31416")]
+		[Hint("Вспомните о том, что в С# есть приведение типов ")]
+		[Hint("Округление можно найти в библиотеке Math")]
 		public static void Main()
 		{
 			double pi = Math.PI;
