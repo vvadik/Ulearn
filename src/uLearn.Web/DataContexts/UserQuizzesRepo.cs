@@ -4,6 +4,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Ajax.Utilities;
 using Microsoft.Owin.Security.Provider;
 using NUnit.Framework;
 using uLearn.Quizes;
@@ -143,13 +144,13 @@ namespace uLearn.Web.DataContexts
 
 		public int GetQuizSuccessful(string courseId, string slideId, string userId)
 		{
-			return (int) db.UserQuizzes
+			return (int)(db.UserQuizzes
 				.Where(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId)
 				.GroupBy(y => y.QuizId)
 				.Select(y => y.All(z => z.IsRightQuizBlock))
 				.Select(y => y ? 1 : 0)
 				.DefaultIfEmpty()
-				.Average() * 100;
+				.Average() * 100);
 		}
 	}
 }

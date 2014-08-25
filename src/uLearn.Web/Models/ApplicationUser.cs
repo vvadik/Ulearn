@@ -8,5 +8,7 @@ namespace uLearn.Web.Models
 	{
 		public virtual ICollection<UserSolution> Solutions { get; set; }
 		public virtual ICollection<UserQuestion> Questions { get; set; }
+
+		public string GroupName { get; set; }
 	}
 }

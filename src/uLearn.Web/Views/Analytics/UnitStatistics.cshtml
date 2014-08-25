@@ -15,9 +15,10 @@
 					<thead>
 						<tr>
 							<th>user name</th>
-							@for (var i = 0; i < Model.Unit.Slides.Length; i++)
+							<th>group name</th>
+							@for (var i = 0; i < Model.Slides.Length; i++)
 							{
-								var slide = Model.Unit.Slides[i];
+								var slide = Model.Slides[i];
 								var url = Url.Action("Slide", "Course", new {courseId = Model.CourseId, slideIndex = i}, null);
 								<th class="slide-list-item" 
 									data-sort-value=@(i + 100000) 
@@ -31,22 +32,28 @@
 						@foreach (var user in Model.Table)
 						{
 							<tr>
-								<td><h6>@user.Key</h6></td>
-								@for (var i = 0; i < user.Value.Length; i++)
+								<td>
+									<h6>@user.Key</h6>
+								</td>
+								<td>
+									<textarea id="@(user.Key)" data-url="@Url.Action("AddUserGroup","Analytics")">@user.Value.UserGroup</textarea>
+									<button onclick="changeGroup('@user.Key')">Change group</button>
+								</td>
+								@for (var i = 0; i < user.Value.SlidesInfo.Length; i++)
 								{
-									if (Model.Unit.Slides[i] is ExerciseSlide)
+									if (Model.Slides[i] is ExerciseSlide)
 									{
-										var styleClass = @user.Value[i].IsExerciseSolved ? "green-stat" : "red-stat";
-										<td class="@styleClass"></td>
+										var styleClass = @user.Value.SlidesInfo[i].IsExerciseSolved ? "green-stat" : "red-stat";
+										<td class="@styleClass">Попыток сделано: @user.Value.SlidesInfo[i].AttemptsNumber</td>
 									}
-									else if (Model.Unit.Slides[i] is QuizSlide)
+									else if (Model.Slides[i] is QuizSlide)
 									{
-										var styleClass = @user.Value[i].IsQuizPassed ? "green-stat" : "red-stat";
-										<td class="@styleClass"></td>
+										var styleClass = @user.Value.SlidesInfo[i].IsQuizPassed ? "green-stat" : "red-stat";
+										<td class="@styleClass">Квиз решен на: @(user.Value.SlidesInfo[i].QuizSuccessful)%</td>
 									}
 									else
 									{
-										var styleClass = @user.Value[i].IsVisited ? "green-stat" : "red-stat";
+										var styleClass = @user.Value.SlidesInfo[i].IsVisited ? "green-stat" : "red-stat";
 										<td class="@styleClass"></td>
 									}
 								}
@@ -57,10 +64,10 @@
 			</div>
 		</div>
 	</div>
-	<script src="~/Scripts/table-configurator.js"> </script>
 </body>
 
 @section scripts{
 	<script src="~/tablesorter-master/jquery.tablesorter.js"></script>
-	<script src="~/Scripts/table-configurator.js"> </script>
+	<script src="~/Scripts/table-configurator.js"></script>
+	<script src="~/Scripts/user-group-name-change.js"></script>
 }

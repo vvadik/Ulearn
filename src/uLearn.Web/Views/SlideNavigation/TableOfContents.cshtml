@@ -27,7 +27,7 @@
 					}
 					@if (User.IsInRole(LmsRoles.Instructor))
 					{
-						<li class="slide-list-item unit-statistic-ref">@Html.ActionLink("Unit statistics", "UnitStatistics", "Analytics", new { courseId = Model.CourseId, unit = unit }, null)</li>
+						<li class="slide-list-item unit-statistic-ref">@Html.ActionLink("Unit statistics", "UnitStatistics", "Analytics", new { courseId = Model.CourseId, unitName = unit.UnitName }, null)</li>
 					}
 				</ul>
 			</li>

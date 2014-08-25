@@ -8,11 +8,15 @@ namespace uLearn
 {
 	public class UnitStatisticPageModel
 	{
-		public CourseUnitModel Unit { get; set; }
-		public Dictionary<string, UserInfoInSlide[]> Table { get; set; }
+		public Slide[] Slides { get; set; }
+		public Dictionary<string, UserInfo> Table { get; set; }//string - userId
 		public string CourseId { get; set; }
+	}
 
-//string - userId
+	public class UserInfo
+	{
+		public string UserGroup { get; set; }
+		public UserInfoInSlide[] SlidesInfo { get; set; }
 	}
 
 	public class UserInfoInSlide

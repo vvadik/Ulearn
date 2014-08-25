@@ -206,6 +206,10 @@
     <Compile Include="Migrations\201408220628510_AddUnitAppearance.Designer.cs">
       <DependentUpon>201408220628510_AddUnitAppearance.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201408250717469_AddUsersGroupName.cs" />
+    <Compile Include="Migrations\201408250717469_AddUsersGroupName.Designer.cs">
+      <DependentUpon>201408250717469_AddUsersGroupName.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\UnitAppearance.cs" />
     <Compile Include="DataContexts\SlideHintRepo.cs" />
     <Compile Include="DataContexts\SlideRateRepo.cs" />
@@ -339,6 +343,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201408220628510_AddUnitAppearance.resx">
       <DependentUpon>201408220628510_AddUnitAppearance.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408250717469_AddUsersGroupName.resx">
+      <DependentUpon>201408250717469_AddUsersGroupName.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -673,6 +680,7 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\slide-stats.js" />
     <Content Include="Scripts\table-configurator.js" />
+    <Content Include="Scripts\user-group-name-change.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="tablesorter-master\.gitignore" />
     <Content Include="tablesorter-master\addons\pager\jquery.tablesorter.pager.css" />
