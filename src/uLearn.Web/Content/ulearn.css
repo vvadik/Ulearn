@@ -435,3 +435,15 @@ table.diff tbody th {
 .rightQuizAnswer {
 	background-color: lightgreen;
 }
+
+.unit-statistic-ref {
+	color: yellowgreen;
+}
+
+.green-stat {
+	background-color: lightgreen;
+}
+
+.red-stat {
+	background-color: lightcoral;
+}

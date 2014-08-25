@@ -1,0 +1,66 @@
+﻿@using uLearn
+@model uLearn.UnitStatisticPageModel
+@{
+	ViewBag.Title = "Total statistics";
+}
+
+
+@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId })
+
+<body>
+	<div class="slide-container">
+		<div class="container body-content">
+			<div class="row">
+				<table id="myTable" class="tablesorter">
+					<thead>
+						<tr>
+							<th>user name</th>
+							@for (var i = 0; i < Model.Unit.Slides.Length; i++)
+							{
+								var slide = Model.Unit.Slides[i];
+								var url = Url.Action("Slide", "Course", new {courseId = Model.CourseId, slideIndex = i}, null);
+								<th class="slide-list-item" 
+									data-sort-value=@(i + 100000) 
+									onclick="window.location.href='@url'">
+									<p class="table-header">@slide.Title</p>
+								</th>
+							}
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var user in Model.Table)
+						{
+							<tr>
+								<td><h6>@user.Key</h6></td>
+								@for (var i = 0; i < user.Value.Length; i++)
+								{
+									if (Model.Unit.Slides[i] is ExerciseSlide)
+									{
+										var styleClass = @user.Value[i].IsExerciseSolved ? "green-stat" : "red-stat";
+										<td class="@styleClass"></td>
+									}
+									else if (Model.Unit.Slides[i] is QuizSlide)
+									{
+										var styleClass = @user.Value[i].IsQuizPassed ? "green-stat" : "red-stat";
+										<td class="@styleClass"></td>
+									}
+									else
+									{
+										var styleClass = @user.Value[i].IsVisited ? "green-stat" : "red-stat";
+										<td class="@styleClass"></td>
+									}
+								}
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<script src="~/Scripts/table-configurator.js"> </script>
+</body>
+
+@section scripts{
+	<script src="~/tablesorter-master/jquery.tablesorter.js"></script>
+	<script src="~/Scripts/table-configurator.js"> </script>
+}

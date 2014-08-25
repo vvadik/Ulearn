@@ -201,8 +201,38 @@ namespace uLearn.Web.Controllers
 							HintUsedPercent = slide is ExerciseSlide ? slideHintRepo.GetHintUsedPercentForUser(course.Id, slide.Id, userId, (slide as ExerciseSlide).HintsHtml.Count()) : 0
 						})
 						.ToArray()
-				
 			};
+		}
+
+		public ActionResult UnitStatistics(string courseId, CourseUnitModel unit)
+		{
+			var unitStatisticPageModel = new UnitStatisticPageModel
+			{
+				CourseId = courseId,
+				Unit = unit,
+				Table = new Dictionary<string, UserInfoInSlide[]>()
+			};
+			var slideIdToSlideIndex = new Dictionary<string, int>();
+			for (var i = 0; i < unit.Slides.Length; i++)
+				slideIdToSlideIndex[unit.Slides[i].Id] = i;
+			foreach (var user in db.Users)
+				unitStatisticPageModel.Table[user.UserName] = new UserInfoInSlide[unit.Slides.Length];
+			foreach (var userSolutions in db.UserSolutions.GroupBy(x => x.UserId))
+			{
+				var name = db.Users.Find(userSolutions.Key).UserName;
+				foreach (var slideGroup in userSolutions.GroupBy(x => x.SlideId))
+				{
+					unitStatisticPageModel.Table[name][slideIdToSlideIndex[slideGroup.Key]] = new UserInfoInSlide
+					{
+						AttemptsNumber = slideGroup.Count(),
+						IsExerciseSolved = slideGroup.Any(x => x.IsRightAnswer),
+						IsQuizPassed = userQuizzessRepo.IsQuizSlidePassed(courseId, userSolutions.Key, slideGroup.Key),
+						IsVisited = visitersRepo.IsUserVisit(courseId, slideGroup.Key, userSolutions.Key),
+						QuizSuccessful = userQuizzessRepo.GetQuizSuccessful(courseId, slideGroup.Key, userSolutions.Key)
+					};
+				}
+			}
+			return View(unitStatisticPageModel);
 		}
 	}
 }
