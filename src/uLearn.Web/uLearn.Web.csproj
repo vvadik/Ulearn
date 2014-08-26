@@ -210,6 +210,10 @@
     <Compile Include="Migrations\201408250717469_AddUsersGroupName.Designer.cs">
       <DependentUpon>201408250717469_AddUsersGroupName.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201408260518531_Cascading.cs" />
+    <Compile Include="Migrations\201408260518531_Cascading.Designer.cs">
+      <DependentUpon>201408260518531_Cascading.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\UnitAppearance.cs" />
     <Compile Include="DataContexts\SlideHintRepo.cs" />
     <Compile Include="DataContexts\SlideRateRepo.cs" />
@@ -346,6 +350,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201408250717469_AddUsersGroupName.resx">
       <DependentUpon>201408250717469_AddUsersGroupName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408260518531_Cascading.resx">
+      <DependentUpon>201408260518531_Cascading.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -655,7 +662,6 @@
     <None Include="Properties\PublishProfiles\ulearn - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\buttons.js" />
-    <Content Include="Scripts\choice-group.js" />
     <Content Include="Scripts\notify-custom.min.js" />
     <Content Include="Orphus\orphus.gif" />
     <Content Include="Orphus\orphus.js" />

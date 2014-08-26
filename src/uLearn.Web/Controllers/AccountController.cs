@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -46,6 +47,17 @@ namespace uLearn.Web.Controllers
 			else
 				await UserManager.AddToRolesAsync(userId, role);
 			return RedirectToAction("List");
+		}
+
+		[HttpPost]
+		[Authorize(Roles = LmsRoles.Admin)]
+		public async Task<ActionResult> DeleteUser(string userId)
+		{
+			var db = new ULearnDb();
+			ApplicationUser user = await db.Users.FirstAsync(u => u.Id == userId);
+			db.Users.Remove(user);
+			await db.SaveChangesAsync();
+			return Content(userId + " deleted");
 		}
 
 		//

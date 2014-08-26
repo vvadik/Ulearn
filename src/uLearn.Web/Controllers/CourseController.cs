@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Web.UI.WebControls;
@@ -124,8 +125,8 @@ namespace uLearn.Web.Controllers
 		[Authorize]
 		public async Task<string> AddQuestion(string title, string unitName, string question)
 		{
-			var userName = User.Identity.GetUserName();
-			await userQuestionsRepo.AddUserQuestion(question, title, userName, unitName, DateTime.Now);
+			IIdentity user = User.Identity;
+			await userQuestionsRepo.AddUserQuestion(question, title, user.GetUserId(), user.Name, unitName, DateTime.Now);
 			return "Success!";
 		}
 

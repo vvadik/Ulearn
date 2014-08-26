@@ -51,7 +51,6 @@ namespace uLearn.Web.Controllers
 				CourseId = courseId,
 				UnitName = unitName,
 				UserName = User.Identity.Name,
-				UserId = User.Identity.GetUserId(),
 				PublishTime = DateTime.Parse(publishTime),
 			};
 			db.Units.Add(unitAppearance);

@@ -15,8 +15,15 @@ namespace uLearn.Web.Models
 		[Required]
 		public string SlideTitle { get; set; }
 
+		public virtual ApplicationUser User { get; set; }
+
+		[StringLength(64)]
 		[Required]
 		public string UserId { get; set; }
+
+		[StringLength(64)]
+		[Required]
+		public string UserName { get; set; }
 
 		[Required]
 		public string Question { get; set; }

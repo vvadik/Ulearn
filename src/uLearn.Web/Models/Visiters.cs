@@ -11,6 +11,9 @@ namespace uLearn.Web.Models
 		[Key]
 		public int Id { get; set; }
 
+		public virtual ApplicationUser User { get; set; }
+
+		[StringLength(64)]
 		[Required]
 		public string UserId { get; set; }
 

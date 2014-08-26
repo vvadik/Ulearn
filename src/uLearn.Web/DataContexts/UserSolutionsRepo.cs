@@ -92,12 +92,13 @@ namespace uLearn.Web.DataContexts
 		public async Task<Tuple<int, bool>> Like(int solutionId, string userId)
 		{
 			var solutionForLike = db.UserSolutions.Find(solutionId);
+			if (solutionForLike == null) throw new Exception("Solution " + solutionId + " not found");
 			var hisLike = solutionForLike.Likes.FirstOrDefault(like => like.UserId == userId);
 			var votedAlready = hisLike != null;
 			if (votedAlready)
 				solutionForLike.Likes.Remove(hisLike);
 			else
-				solutionForLike.Likes.Add(new Like {SolutionId = solutionId, Timestamp = DateTime.Now, UserId = userId});
+				solutionForLike.Likes.Add(new Like {UserSolutionId = solutionId, Timestamp = DateTime.Now, UserId = userId});
 			await db.SaveChangesAsync();
 			return Tuple.Create(solutionForLike.Likes.Count(), !votedAlready);
 		}

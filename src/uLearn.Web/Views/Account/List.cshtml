@@ -15,10 +15,19 @@
 		{
 			<tr data-userid="@user.Id">
 				<td>@user.UserName</td>
-				<td class="btn-group">
-					@RoleButton(user, LmsRoles.Admin, "danger")
-					@RoleButton(user, LmsRoles.Instructor, "info")
-					@RoleButton(user, LmsRoles.Tester, "success")
+				<td>
+					<div class="btn-group">
+						@RoleButton(user, LmsRoles.Admin, "danger")
+						@RoleButton(user, LmsRoles.Instructor, "info")
+						@RoleButton(user, LmsRoles.Tester, "success")
+					</div>
+				</td>
+				<td>
+					@using (Html.BeginForm("DeleteUser", "Account", new {userId=user.Id}, FormMethod.Post))
+					{
+						@Html.AntiForgeryToken()
+						<button type="submit" class="btn btn-sm btn-danger">Удалить пользователя</button>
+					}
 				</td>
 			</tr>
 		}

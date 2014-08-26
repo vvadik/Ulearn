@@ -147,7 +147,9 @@ namespace uLearn.Web.Controllers
 			{
 				if (!unitNames.ContainsKey(userSolution.SlideId)) //пока в старой базе есть старые записи с неправильными ID
 					continue;
-				var userName = db.Users.Find(userSolution.UserId).UserName;
+				var user = db.Users.Find(userSolution.UserId);
+				if (user == null) continue;
+				var userName = user.UserName;
 				if (!acceptedSolutionsForUsers.ContainsKey(userName))
 					acceptedSolutionsForUsers[userName] = new HashSet<string>();
 				if (acceptedSolutionsForUsers[userName].Contains(userSolution.SlideId))
@@ -161,7 +163,9 @@ namespace uLearn.Web.Controllers
 			{
 				if (!unitNames.ContainsKey(quiz.SlideId)) //пока в старой базе есть старые записи с неправильными ID
 					continue;
-				var userName = db.Users.Find(quiz.UserId).UserName;
+				var user = db.Users.Find(quiz.UserId);
+				if (user == null) continue;
+				var userName = user.UserName;
 				if (!acceptedSolutionsForUsers.ContainsKey(userName))
 					acceptedSolutionsForUsers[userName] = new HashSet<string>();
 				if (acceptedSolutionsForUsers[userName].Contains(quiz.SlideId))
@@ -230,7 +234,9 @@ namespace uLearn.Web.Controllers
 			}
 			foreach (var userSolutions in db.UserSolutions.Where(x => x.CourseId == courseId).GroupBy(x => x.UserId))
 			{
-				var name = db.Users.Find(userSolutions.Key).UserName;
+				var user = db.Users.Find(userSolutions.Key);
+				if (user == null) continue;
+				var name = user.UserName;
 				foreach (var slideGroup in userSolutions.Where(x => slideIdToSlideIndex.ContainsKey(x.SlideId)).GroupBy(x => x.SlideId))
 				{
 					var info = unitStatisticPageModel.Table[name].SlidesInfo[slideIdToSlideIndex[slideGroup.Key]];

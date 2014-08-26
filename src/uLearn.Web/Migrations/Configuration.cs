@@ -16,11 +16,9 @@ namespace uLearn.Web.Migrations
 
 		protected override void Seed(ULearnDb context)
 		{
-			//  This method will be called after migrating to the latest version.
+			context.Database.ExecuteSqlCommand("ALTER TABLE dbo.UserSolutions DROP CONSTRAINT [FK_dbo.UserSolutions_dbo.AspNetUsers_UserId]");
+			context.Database.ExecuteSqlCommand("ALTER TABLE dbo.UserSolutions ADD CONSTRAINT [FK_dbo.UserSolutions_dbo.AspNetUsers_UserId] FOREIGN KEY (UserId) REFERENCES dbo.[AspNetUsers](Id) ON UPDATE NO ACTION ON DELETE SET NULL");
 
-			//  You can use the DbSet<T>.AddOrUpdate() helper extension method 
-			//  to avoid creating duplicate seed data. E.g.
-			//
 			var roleStore = new RoleStore<IdentityRole>(context);
 			var roleManager = new RoleManager<IdentityRole>(roleStore);
 			roleManager.Create(new IdentityRole(LmsRoles.Instructor));

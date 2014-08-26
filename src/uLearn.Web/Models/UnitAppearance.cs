@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace uLearn.Web.Models
 {
@@ -16,8 +17,6 @@ namespace uLearn.Web.Models
 		public string UnitName { get; set; }
 
 		[Required]
-		public string UserId { get; set; }
-
 		public string UserName { get; set; }
 
 		[Required]

@@ -4,9 +4,16 @@
 	ViewBag.Title = "Администрирование юнитов";
 }
 
-<div class="container">
+<div class="wide-container">
 	<h2>Администрирование юнитов</h2>
 	<table class="table">
+		<tr>
+			<th>Модуль</th>
+			<th>Время публикации</th>
+			<th>Кем установлено время</th>
+			<th>Изменение времени публикации</th>
+			<th>Удаление публикации</th>
+		</tr>
 		@foreach (var unit in Model.Units)
 		{
 			<tr>
@@ -15,10 +22,13 @@
 					@(unit.Item2 == null ? "Не опубликован" : unit.Item2.PublishTime.ToString("s"))
 				</td>
 				<td>
+					@(unit.Item2 == null ? "" : unit.Item2.UserName)
+				</td>
+				<td>
 					@using (Html.BeginForm("SetPublishTime", "Unit", new { courseId = Model.CourseId, unitName = unit.Item1 }, FormMethod.Post))
 					{
 						<input type="text" name="publishTime" value="@Model.CurrentDateTime.ToString("s")" />
-						<button type="submit" class="btn btn-info">Изменить</button>
+						<button type="submit" class="btn btn-sm btn-info" title="Установить новое время публикации"><i class="glyphicon glyphicon-edit"></i></button>
 					}
 				</td>
 				<td>
@@ -26,7 +36,7 @@
 					{
 						using (Html.BeginForm("RemovePublishTime", "Unit", new { courseId = Model.CourseId, unitName = unit.Item1 }, FormMethod.Post))
 						{
-							<button type="submit" class="btn btn-danger">Удалить</button>
+							<button type="submit" class="btn btn-sm btn-danger" title="Удалить публикацию"><i class="glyphicon glyphicon-remove"></i></button>
 						}
 					}
 				</td>
