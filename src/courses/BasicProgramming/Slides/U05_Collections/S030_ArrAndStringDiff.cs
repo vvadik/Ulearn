@@ -13,7 +13,7 @@ namespace Slide03
 	[Slide("Сравнение строк и массивов", "{3FFACAA3-2097-4BE9-A9A6-8216DAD73FDA}")]
 	public class S030_ArrAndStringDiff
     {
-        static void MainX()
+        static void Main()
         {
             string str = "abc";
             //Если раскомментировать эту строку, возникнет ошибка: строки нельзя модифицировать.

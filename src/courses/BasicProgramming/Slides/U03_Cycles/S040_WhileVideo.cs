@@ -17,7 +17,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 
 		public class Program
 		{
-			public static void MainX()
+			public static void Main()
 			{
 				int number = 1;
 				while (number < 100)            // пока выполняется условия
@@ -30,7 +30,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 
 		public class Program2
 		{
-			public static void MainX()
+			public static void Main()
 			{
 				int sum = 0;
 				while (true)
@@ -45,7 +45,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 
 		public class Program3
 		{
-			public static void MainX()
+			public static void Main()
 			{
 				//Для выхода из вложенного цикла приходится использовать
 				//конструкцию "double break"

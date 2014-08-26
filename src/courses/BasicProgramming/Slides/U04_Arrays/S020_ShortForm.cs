@@ -10,7 +10,7 @@ namespace Slide02
 		/*
 		## Заметки по лекции
 		*/
-		public static void MainX()
+		public static void Main()
 		{
 			//Как и с другими типами, можно использовать var и совместить объявление и инициализацию
 			var array1 = new int[3];

@@ -8,14 +8,14 @@ namespace Slide04
     {
 		//#video OMxsc6Csj4k
 		/*
-		[Материалы по лекции](/Courses/BasicProgramming/U04_Arrays/_S050_ValueRferenceType.odp)
+		[Иллюстрация карты памяти](/Courses/BasicProgramming/U04_Arrays/_S050_ValueRferenceType.odp)
 		*/
 		/*
 		## Заметки по лекции
 		*/
         static int[] globalArray;
 		
-        public static void MainX()
+        public static void Main()
         {
             //Массив, как и строка, может быть равен null
             int[] localArray = null;

@@ -12,7 +12,7 @@ namespace Slide05
 	[Slide("StringBuilder", "{7D877273-0A8E-4257-8CA9-BDD90369DCDB}")]
     public class S040_StringBuilder
     {
-        static void MainX()
+        static void Main()
         {
             //StringBuilder - это класс, представляющий собой изменяемую строку
             var builder = new StringBuilder();
@@ -63,7 +63,7 @@ namespace Slide05
 			}
 		}
 
-		static void MainX2()
+		static void Main2()
 		{
 			var watch = new Stopwatch();
 			watch.Start();

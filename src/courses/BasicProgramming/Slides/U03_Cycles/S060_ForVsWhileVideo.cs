@@ -17,7 +17,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 
 		public class Program
 		{
-			public static void MainX()
+			public static void Main()
 			{
 
 

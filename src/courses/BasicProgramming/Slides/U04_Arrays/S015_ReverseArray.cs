@@ -1,59 +1,32 @@
 ﻿using System;
-using System.Linq;
+
 using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 {
 	/*
-	Напишите метод, который создает перевернутую копию переданного ему массива. 
-	Первый элемент должен стать последним, второй предпоследним и так далее.
-	Используйте цикл!
+	Напишите метод, который создает массив из 30 первых четных чисел.
 	*/
-	[Slide("Перевернуть массив", "{D9741319-FBDF-448E-BC4F-DB17CDC21B21}")]
+	[Slide("Чётный массив", "{CEB81EAC-069C-4D5D-87B7-EBD9B140E143}")]
 	class S015_ReverseArray
 	{
 		[ExpectedOutput(@"
-Reverse([1, 2, 3]) = [3, 2, 1]
-Reverse([1, 2, 3, 4]) = [4, 3, 2, 1]
-Reverse([1]) = [1]
-Reverse([]) = []
-Reverse([1, 1, 1, 2, 2, 2, 3]) = [3, 2, 2, 2, 1, 1, 1]
+2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 50 52 54 56 58 60
 ")]
 		[HideOnSlide]
 		public static void Main()
 		{
-			Check(new[] {1, 2, 3});
-			Check(new[] {1, 2, 3, 4});
-			Check(new[] {1});
-			Check(new int[0]);
-			Check(new[]{1, 1, 1, 2, 2, 2, 3});
-		}
-
-		[HideOnSlide]
-		private static void Check(int[] array)
-		{
-			var reversed = Reverse(array);
-			if (array == reversed)
-				Console.WriteLine("Original array should not be changed!");
-			else
-			{
-				Console.WriteLine("Reverse([{0}]) = [{1}]",
-					string.Join(", ", array.Select(a => a.ToString()).ToArray()),
-					string.Join(", ", reversed.Select(a => a.ToString()).ToArray())
-					);
-			}
+			foreach (var num in Get30EvenNumbers())
+				Console.Write(num + " ");
 		}
 
 		[Exercise]
-		public static int[] Reverse(int[] array)
+		public static int[] Get30EvenNumbers()
 		{
-			var reversed = new int[array.Length];
-			for (int i = 0; i < array.Length; i++)
-				reversed[i] = array[array.Length - i - 1];
-			return reversed;
-			/*uncomment
-			...
-			*/
+			var res = new int[30];
+			for (int i = 0; i < 30; i++)
+				res[i] = 2*(i + 1);
+			return res;
 		}
 	}
 }

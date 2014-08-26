@@ -8,12 +8,12 @@ namespace Slide06
     {
 		//#video tlE1-K0JE5w
 		/*
-		[Материалы по лекции](/Courses/BasicProgramming/U04_Arrays/_S070_GraphicDimensional.odp)
+		[Иллюстрация карты памяти](/Courses/BasicProgramming/U04_Arrays/_S070_GraphicDimensional.odp)
 		*/
 		/*
 		## Заметки по лекции
 		*/
-        public static void MainX()
+        public static void Main()
         {
             //Двумерные массивы имеют тип int[,] (соответственно, double[,], string[,] и т.д.)
             int[,] twoDimensionalArray = new int[2, 3];

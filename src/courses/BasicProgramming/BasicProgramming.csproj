@@ -64,7 +64,7 @@
     <Content Include="Slides\U00_Basics\S081-Scope.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Compile Include="Slides\U00_Basics\S100_FinalTask.cs" />
+    <Compile Include="Slides\U00_Basics\S100_Salary.cs" />
     <Compile Include="Slides\U00_Basics\S000_HelpSlide.cs" />
     <Compile Include="Slides\U00_Basics\_HelloWorld.cs" />
     <Content Include="Slides\U02_Ifs\Prelude.txt" />
@@ -114,6 +114,7 @@
     <Compile Include="Slides\U03_Cycles\S055_Border.cs" />
     <Compile Include="Slides\U03_Cycles\S065_Chessboard.cs" />
     <Compile Include="Slides\U04_Arrays\S010_ArrayAndForeach.cs" />
+    <Compile Include="Slides\U04_Arrays\S018_FindPattern.cs" />
     <Compile Include="Slides\U04_Arrays\S017_CountElement.cs" />
     <Compile Include="Slides\U04_Arrays\S016_FindMinIndex.cs" />
     <Compile Include="Slides\U04_Arrays\S021_DigitsToText.cs" />
@@ -121,10 +122,10 @@
     <Compile Include="Slides\U04_Arrays\S020_ShortForm.cs" />
     <Compile Include="Slides\U04_Arrays\S030_ArrayNull.cs" />
     <Compile Include="Slides\U04_Arrays\S040_PassArrToMethod.cs" />
-    <Compile Include="Slides\U04_Arrays\S041_ArrayExercise2.cs" />
+    <Compile Include="Slides\U04_Arrays\S041_ArrayInPower.cs" />
     <Compile Include="Slides\U04_Arrays\S050_MultiDimensionArr.cs" />
     <Compile Include="Slides\U04_Arrays\S060_ArrayOfArrays.cs" />
-    <Compile Include="Slides\U04_Arrays\S061_Exercise.cs" />
+    <Compile Include="Slides\U04_Arrays\S062_TicTacToe.cs" />
     <Compile Include="Slides\U05_Collections\S010_List.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -192,7 +193,7 @@
     <Compile Include="Slides_Tests.cs" />
     <Content Include="Slides\U04_Arrays\Prelude.txt" />
     <Content Include="Slides\U03_Cycles\shapes.png" />
-    <Content Include="Slides\U04_Arrays\S021_ArrayQuiz.xml">
+    <Content Include="Slides\U04_Arrays\S061_ArrayQuiz.xml">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Slides\U04_Arrays\Title.txt" />

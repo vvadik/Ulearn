@@ -4,7 +4,7 @@ namespace Slide07
 {
 	public class SpecialCharsInclude
 	{
-		public static void MainX()
+		public static void Main()
 		{
 			//Символ перевода строки
 			Console.WriteLine("First line\nSecond line");

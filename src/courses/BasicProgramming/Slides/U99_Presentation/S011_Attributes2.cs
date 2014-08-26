@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U99_Presentation
 {
-	[Slide("Attributes 2", "{15AE3D7A-C9CB-436C-B2B9-1504D1339208}")]
+	[Slide("Attributes 2", "{9E097AE1-C91D-48DE-A125-7FEEACF148E5}")]
 	class S011_Attributes2
 	{
 		/*

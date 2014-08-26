@@ -8,12 +8,12 @@ namespace Slide08
     {
 		//#video _L6_YCruwHs
 		/*
-		[Материалы по лекции](/Courses/BasicProgramming/U04_Arrays/_S090_Memory.odp)
+		[Иллюстрация карты памяти](/Courses/BasicProgramming/U04_Arrays/_S090_Memory.odp)
 		*/
 		/*
 		## Заметки по лекции
 		*/
-        public static void MainX()
+        public static void Main()
         {
             //Это - массив массивов. Поскольку массив является типом (как int или string),
             //то можно делать массивы этого типа, т.е. - массивы массивов

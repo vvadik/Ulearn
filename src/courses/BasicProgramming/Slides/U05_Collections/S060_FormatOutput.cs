@@ -10,7 +10,7 @@ namespace Slide08
 	[Slide("Форматированный вывод", "{458FFA94-D602-4E54-857D-FCEAF5E505FA}")]
 	public class S060_FormatOutput
     {
-        public static void MainX()
+        public static void Main()
         {
 
             var a = 13;
