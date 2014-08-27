@@ -1,7 +1,4 @@
-﻿@using System.Activities.Expressions
-@using System.Activities.Statements
-@using uLearn
-@using uLearn.Quizes
+﻿@using uLearn.Quizes
 @model QuizAnalyticsModel
 
 @functions {
@@ -9,9 +6,7 @@
 	{
 		if (block is ChoiceBlock)
 			return ((ChoiceBlock)block).Items.Length;
-		if (block is FillInBlock)
-			return 1;
-		return 2;
+		return 1;
 	}
 
 	private string GetSubstring(string text, int length)
@@ -57,8 +52,7 @@
 					}
 					else
 					{
-						<th>true</th>
-						<th>false</th>
+						<th>IsRight</th>
 					}
 					if (maxQuestionIndex == block.QuestionIndex)
 					{
@@ -110,15 +104,8 @@
 								  .SelectMany(x => x)
 								  .Where(x => x.Id == isTrueBlock.QuestionIndex.ToString())
 								  .Select(x => (IsTrueBlockAnswerInfo)x)
-								  .Count(x => x.Answer)) / usersCount)%
-					</td>
-					<td>
-						@((100 * Model.UserAnswers.Values
-								  .SelectMany(x => x)
-								  .Where(x => x.Id == isTrueBlock.QuestionIndex.ToString())
-								  .Select(x => (IsTrueBlockAnswerInfo)x)
-								  .Count(x => !x.Answer)) / usersCount)%
-				</td>
+								  .Count(x => x.IsRight)) / usersCount)%
+						</td>
 					}
 					if (maxQuestionIndex == block.QuestionIndex)
 					{
@@ -142,12 +129,7 @@
 						else if (ans is IsTrueBlockAnswerInfo)
 						{
 							var answer = ((IsTrueBlockAnswerInfo)ans);
-							var classForTrueCell = answer.Answer == answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer";
-							var classForFalseCell = answer.Answer != answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer";
-							var classForTrueGlyphicon = answer.Answer ? "glyphicon glyphicon-ok" : "";
-							var classForFalseGlyphicon = !answer.Answer ? "glyphicon glyphicon-ok" : "";
-							<td class="@classForTrueCell"><i class="@classForTrueGlyphicon"></i></td>
-							<td class="@classForFalseCell"><i class="@classForFalseGlyphicon"></i></td>
+							<td class="@(answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer")"><i class="@(answer.Answer ? "glyphicon glyphicon-ok" : "")"></i></td>
 						}
 						else
 						{

@@ -149,7 +149,7 @@ namespace uLearn.Web.Controllers
 		public async Task<string> AddQuestion(string courseId, string slideId, string question)
 		{
 			IIdentity user = User.Identity;
-			var slide = courseManager.GetCourse(courseId).GetSlideUsingId(slideId);
+			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			await userQuestionsRepo.AddUserQuestion(question, slide.Title, user.GetUserId(), user.Name, slide.Info.UnitName, DateTime.Now);
 			return "Success!";
 		}

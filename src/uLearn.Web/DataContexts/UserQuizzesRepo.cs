@@ -152,5 +152,12 @@ namespace uLearn.Web.DataContexts
 				.DefaultIfEmpty()
 				.Average() * 100);
 		}
+
+		public async Task RemoveAnswers(string userId, string slideId)
+		{
+			var answersToRemove = db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId).ToList();
+			db.UserQuizzes.RemoveRange(answersToRemove);
+			await db.SaveChangesAsync();
+		}
 	}
 }

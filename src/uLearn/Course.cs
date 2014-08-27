@@ -19,7 +19,7 @@ namespace uLearn
 		public Slide[] Slides { get; private set; }
 		public InstructorNote[] InstructorNotes { get; private set; }
 
-		public Slide GetSlideUsingId(string slideId)
+		public Slide GetSlideById(string slideId)
 		{
 			return Slides.FirstOrDefault(x => x.Id == slideId);
 		}
