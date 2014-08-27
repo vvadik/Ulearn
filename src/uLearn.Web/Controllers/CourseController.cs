@@ -171,10 +171,17 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public string GetAllQuestions(string courseName)
+		public string GetAllQuestions(string unitName)
 		{
-			var questions = userQuestionsRepo.GetAllQuestions(courseName);
+			var questions = userQuestionsRepo.GetAllQuestions(unitName);
 			return Server.HtmlEncode(questions);
+		}
+
+		[Authorize]
+		public ActionResult Questions(string unitName)
+		{
+			var questions = db.UserQuestions.Where(q => q.UnitName == unitName).ToList();
+			return PartialView(questions);
 		}
 
 		[HttpPost]

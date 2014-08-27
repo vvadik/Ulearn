@@ -1,4 +1,4 @@
-﻿namespace uLearn
+﻿namespace uLearn.Web.Models
 {
 	public class PrevNextButtonsModel
 	{

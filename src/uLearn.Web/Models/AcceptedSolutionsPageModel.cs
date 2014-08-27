@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using uLearn.Web.Models;
 
-namespace uLearn
+namespace uLearn.Web.Models
 {
 	public class AcceptedSolutionsPageModel
 	{

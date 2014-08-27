@@ -1,10 +1,7 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace uLearn
+namespace uLearn.Web.Models
 {
 	public class UnitStatisticPageModel
 	{
@@ -12,6 +9,8 @@ namespace uLearn
 		public Dictionary<string, UserInfo> Table { get; set; }//string - userId
 		public string CourseId { get; set; }
 		public string UnitName { get; set; }
+		public UserQuestion[] Questions { get; set; }
+		public SlideRate[] Rates { get; set; }
 	}
 
 	public class UserInfo

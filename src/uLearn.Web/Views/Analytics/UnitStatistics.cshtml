@@ -1,13 +1,46 @@
 ﻿@using uLearn
-@model uLearn.UnitStatisticPageModel
+@model UnitStatisticPageModel
 @{
 	ViewBag.Title = "Успеваемость студентов";
 }
 
 <body>
 	<div class="wide-container">
-		<h1>Модуль &laquo;@Model.UnitName&raquo; <small>успеваемость</small></h1>
-		<table id="myTable" class="tablesorter">
+		<h1>Модуль &laquo;@Model.UnitName&raquo;</h1>
+		<ul>
+			<li><a href="#rate">Оценки слайдов</a></li>
+			<li><a href="#questions">Заданные вопросы</a></li>
+			<li><a href="#progress">Таблица прогресса</a></li>
+		</ul>
+
+		<h2 id="rate">Оценки слайдов</h2>
+		<table class="table table-condensed" style="width:auto">
+			<thead>
+				<tr>
+					<th>Слайд</th>
+					<th>Непонятно</th>
+					<th>Хорошо</th>
+					<th>Тривиально</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var slide in Model.Slides)
+				{
+					<tr>
+						<td>@slide.Title</td>
+						<td>@Model.Rates.Count(r => r.SlideId == slide.Id && r.Rate == SlideRates.NotUnderstand)</td>
+						<td>@Model.Rates.Count(r => r.SlideId == slide.Id && r.Rate == SlideRates.Good)</td>
+						<td>@Model.Rates.Count(r => r.SlideId == slide.Id && r.Rate == SlideRates.Trivial)</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+
+		<h2 id="questions">Заданные вопросы</h2>
+		@Html.Action("Questions", "Course", new { unitName = Model.UnitName })
+
+		<h2 id="progress">Таблица прогресса</h2>
+		<table class="tablesorter">
 			<thead>
 				<tr>
 					<th>Имя</th>
@@ -72,6 +105,7 @@
 				}
 			</tbody>
 		</table>
+
 	</div>
 </body>
 

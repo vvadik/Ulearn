@@ -1,0 +1,13 @@
+﻿@model List<UserQuestion>
+
+@foreach (var q in Model.OrderByDescending(q => q.Time))
+{
+	<div>
+		<span>@q.Time.ToShortDateString()</span>
+		<span>@q.UserName</span>
+		<span>@q.SlideTitle</span>
+	</div>
+	<div>
+		@q.Question
+	</div>
+}
