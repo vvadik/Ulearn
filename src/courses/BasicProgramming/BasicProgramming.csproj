@@ -69,6 +69,8 @@
     <Compile Include="Slides\U00_Basics\_HelloWorld.cs" />
     <Content Include="Slides\U02_Ifs\Prelude.txt" />
     <Content Include="Slides\U02_Ifs\Title.txt" />
+    <Content Include="Slides\U08_Recursion\Prelude.txt" />
+    <Content Include="Slides\U08_Recursion\Title.txt" />
     <Content Include="Slides\U99_Presentation\Prelude.txt" />
     <Content Include="Slides\U99_Presentation\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
@@ -170,6 +172,15 @@
     <Compile Include="Slides\U07_Algorithms\S060_ComplexityMark.cs" />
     <Compile Include="Slides\U07_Algorithms\S070_NumberComplex.cs" />
     <Compile Include="Slides\U07_Algorithms\S080_ComplexityClasses.cs" />
+    <Compile Include="Slides\U08_Recursion\S010_Recursion.cs" />
+    <Compile Include="Slides\U08_Recursion\S020_RecursionTree.cs" />
+    <Compile Include="Slides\U08_Recursion\S030_AdvancedExample.cs" />
+    <Compile Include="Slides\U08_Recursion\S040_DivideAndRule.cs" />
+    <Compile Include="Slides\U08_Recursion\S050_Subsets.cs" />
+    <Compile Include="Slides\U08_Recursion\S060_Permutations.cs" />
+    <Compile Include="Slides\U08_Recursion\S070_Combinations.cs" />
+    <Compile Include="Slides\U08_Recursion\S080_BinSearch.cs" />
+    <Compile Include="Slides\U08_Recursion\S090_ComparingSearches.cs" />
     <Compile Include="Slides\U99_Presentation\_S011_Attributes2.cs" />
     <Compile Include="Slides\U99_Presentation\S011_Attributes2.cs" />
     <Compile Include="Slides\U99_Presentation\S000_About.cs">
@@ -203,6 +214,8 @@
     <Content Include="Slides\U06_AutomaticTesting\Title.txt" />
     <Content Include="Slides\U07_Algorithms\Prelude.txt" />
     <Content Include="Slides\U07_Algorithms\Title.txt" />
+    <None Include="Slides\U08_Recursion\InstructorNotes.md" />
+    <None Include="Slides\U08_Recursion\_S020_MemoryMap.odp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">

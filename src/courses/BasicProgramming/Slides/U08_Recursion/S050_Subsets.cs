@@ -41,6 +41,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
             subset[position] = true;
             MakeSubsets(subset, position + 1);
         }
+
         static void MainX()
         {
             MakeSubsets(new bool[weights.Length], 0);

@@ -2,56 +2,66 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides
 {
-	[Slide("Жара", "{673C8A47-9560-4458-9BD9-A0C0B58466AA}")]
+	[Slide("Шифр", "{673C8A47-9560-4458-9BD9-A0C0B58466AA}")]
 	public class S011_ListTask
 	{
 		/*
-		Вася этим летом отдыхал на море. А вы?
-		Также, он вел дневник погоды в течении 3х недель отпуска, и каждый день записывал температуру.
-		Теперь ему интересны только те температуры, которые он считает тёплыми.
-		Реализуйте функцию ```GetHighTemperatures```, которая возвращает список только самых теплых температур,
-		отсортированных в порядке возрастания.
-		Температура считается высокой, если её значение >= ```HighTemperature```.
+		Вася этим летом отдыхал на море. А вы? Но просто отдыхать оказалось скучно, и он решил размять мозги. 
+		По пути в библиотеку он встретил таинственную незнакомку, которая передала ему письмо.
+		В нем лежал лист с текстом и чистый обрывок бумаги. Вася долго пытался понять, что это означает.
+		Совсем отчаявшись, он решил сжечь обрывок, но в последний момент заметил, что от жара огня на нем появились буквы.
+		Это был алгоритм - как расшифровать таинственное послание:
+		вы получили текст, текст состоит из строк. Нужно разбить каждую строку на слова и найти все слова, 
+		написанные с большой буквы в том порядке, в каком они появляются в тексте. Объединенные через пробел в строку
+ 		они откроют вам свою тайну. Для разбиения строки на слова, можно использовать ```Regex.Split(line,@"\W+")```
+		Для этого Вася создал функцию ```string DecodeMessage(string[] lines)```, помогите ему завершить ее!
 		*/
-		private const int HighTemperature = 20;
 
-		[Hint("Методы сортировки присутствую в нестатических методах List")]
-		[ExpectedOutput("20\n21\n22\n22\n23\n24\n25\n44\n45")]
+		[Hint("Вы можете проверить, является ли символ заглавным с помощью ```Char.IsLower(char a)```")]
+		[ExpectedOutput("Я Должен Передать Тебе Сообщение О Программировании Точка Даже Если Очень Трудно Тире Не Сдавайся")]
 		public static void Main()
 		{
-			List<int[]> weatherDiary = new List<int[]>
-			{
-				 new int[] {15, 18, 20, 22, 19, 25, -8 },
-				 new int[] {1, 2, 3, 21, 22, 23, 24 },
-				 new int[] {-10, -1, 15, 45, 5, 44, 8 }
-			};
-			List<int> highTemperatures = GetHighTemperatures(weatherDiary);
-			foreach (var temperature in highTemperatures)
-				Console.WriteLine(temperature);
+			string[] text = LoadText();
+			Console.WriteLine(DecodeMessage(text));
 		}
 
 		[Exercise]
-		private static List<int> GetHighTemperatures(List<int[]> temperatures)
+		private static string DecodeMessage(string[] lines)
 		{
-			var result = new List<int>();
-			foreach (var week in temperatures)
+			var finalResult = new List<String>();
+			foreach (var line in lines)
 			{
-				foreach (var temperature in week)
+				var allWords = Regex.Split(line,@"\W+");
+				foreach (var word in allWords)
 				{
-					if (temperature >= HighTemperature)
-						result.Add(temperature);
+					if (word.Length != 0 && !Char.IsLower(word[0]))
+						finalResult.Add(word);
 				}
 			}
-			result.Sort();
-			return result;
+			return string.Join(" ", finalResult.ToArray());
 			/*uncomment
 			...
 			*/
+		}
+
+		[HideOnSlide]
+		public static string[] LoadText()
+		{
+			var ans = new string[7];
+			ans[0] = "этим дождливым серым и ненастным днем Я пробирался сквозь лес";
+			ans[1] = "мне никогда не нравились такие прогулки. но я Должен идти дальше.";
+			ans[2] = "мне хотелось бы Передать пару слов о Тебе, друг, но увы";
+			ans[3] = "очень интересное Сообщение, подумал я, - О, жестокий мир";
+			ans[4] = "Программировании, вероятно, подумал я, Точка";
+			ans[5] = "Даже Если Очень Трудно Тире";
+			ans[6] = "Не думал я, что скажу ему такое, но я сказал - Сдавайся";
+			return ans;
 		}
 	}
 }
