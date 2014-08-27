@@ -1,20 +1,21 @@
 ﻿@model List<ApplicationUser>
 
 @{
-	ViewBag.Title = "Administration";
+	ViewBag.Title = "Admin Users | uLearn";
 }
 <div class="container">
 	<h2>Роли пользователей</h2>
 
-	<p>Админ может видеть служебную информацию и управлять ролями других пользователей.</p>
-	<p>Преподаватель может видеть статистику по успеваемости на разных слайдах, задачах, тестах. Читать заданные вопросы.</p>
-	<p>Бетатестер может видеть ещё не опубликованные для всех материалы.</p>
+	<p><span class="label label-danger">admin</span> может видеть служебную информацию и управлять ролями других пользователей.</p>
+	<p><span class="label label-info">instructor</span> может видеть статистику по успеваемости на разных слайдах, задачах, тестах. Читать заданные вопросы.</p>
+	<p><span class="label label-success">tester</span> может видеть ещё не опубликованные для всех материалы.</p>
 
 	<table class="table table-condensed">
 		@foreach (var user in Model)
 		{
 			<tr data-userid="@user.Id">
 				<td>@user.UserName</td>
+				<td>@user.GroupName</td>
 				<td>
 					<div class="btn-group">
 						@RoleButton(user, LmsRoles.Admin, "danger")

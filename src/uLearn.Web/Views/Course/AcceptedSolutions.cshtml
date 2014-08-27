@@ -1,7 +1,7 @@
 ﻿@model AcceptedSolutionsPageModel
 
 @{
-	ViewBag.Title = Model.CourseTitle;
+	ViewBag.Title = Model.CourseTitle + " | uLearn";
 }
 
 @Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId })
