@@ -145,10 +145,12 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<string> AddQuestion(string title, string unitName, string question)
+		[ValidateInput(false)]
+		public async Task<string> AddQuestion(string courseId, string slideId, string question)
 		{
 			IIdentity user = User.Identity;
-			await userQuestionsRepo.AddUserQuestion(question, title, user.GetUserId(), user.Name, unitName, DateTime.Now);
+			var slide = courseManager.GetCourse(courseId).GetSlideUsingId(slideId);
+			await userQuestionsRepo.AddUserQuestion(question, slide.Title, user.GetUserId(), user.Name, slide.Info.UnitName, DateTime.Now);
 			return "Success!";
 		}
 

@@ -22,13 +22,6 @@
 			</div>
 			@Html.Partial("_RatesBar")
 			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false })
-			@if (User.IsInRole(LmsRoles.Instructor))
-			{
-				<div id="GetAllQuestions" data-url="@Url.Action("GetAllQuestions")">
-					<button class="all-questions" onclick="printAllQuestions('@Model.Slide.Info.UnitName')">Посмотреть все заданные вопросы по теме</button>
-				</div>
-				<div class="questions-log"></div>
-			}
 		</div>
 	</div>
 </div>
