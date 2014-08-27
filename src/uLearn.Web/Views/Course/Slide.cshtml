@@ -48,25 +48,9 @@
 		}
 	</div>
 </div>
-@if (false)
-{
-	<a id="first_visit" data-toggle="modal" data-target="#myModal2" href="#myModal2" class="hidden">
-		Выберите свою группу
-	</a>
-	<div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
-		<div id="AddQuestion2" class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h4 class="modal-title" id="myModalLabel2">Выберите свою группу</h4>
-				</div>
-				<div class="modal-body">
-					<textarea id="group-field" class="ask-bar" data-url="@Url.Action("AddGroup")"> </textarea>
-					<button class="btn btn-primary" id="sendButton2" type="button" data-dismiss="modal" onclick="choiceGroup()">Отправить</button>
-					<button class="btn btn-primary" id="sendButton2" type="button" data-dismiss="modal">Я - вольный слушатель!</button>
-				</div>
-			</div>
-		</div>
-	</div>
+@if (Model.IsFirstCourseVisit)
+{	
+	@Html.Partial("_ChoiceGroup")
 }
 @section scripts{
 	@Scripts.Render("~/slide-js")
