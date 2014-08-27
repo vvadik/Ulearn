@@ -72,6 +72,7 @@
     <Compile Include="AcceptedSolutionsPageModel.cs" />
     <Compile Include="AnalyticsTableInfo.cs" />
     <Compile Include="BaseSlideTests.cs" />
+    <Compile Include="ChoiceGroupPageModel.cs" />
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="Course.cs" />
     <Compile Include="CoursePageModel.cs" />

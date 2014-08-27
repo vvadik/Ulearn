@@ -662,6 +662,7 @@
     <None Include="Properties\PublishProfiles\ulearn - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\buttons.js" />
+    <Content Include="Scripts\choice-group.js" />
     <Content Include="Scripts\notify-custom.min.js" />
     <Content Include="Orphus\orphus.gif" />
     <Content Include="Orphus\orphus.js" />
@@ -760,6 +761,7 @@
     <Content Include="Views\Unit\CourseList.cshtml" />
     <Content Include="Views\Analytics\UnitStatistics.cshtml" />
     <Content Include="Views\Course\InstructorNote.cshtml" />
+    <Content Include="Views\Course\_ChoiceGroup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Courses\" />
