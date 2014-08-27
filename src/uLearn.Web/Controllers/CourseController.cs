@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using System.Web.UI.WebControls;
 using Microsoft.AspNet.Identity;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -55,7 +53,7 @@ namespace uLearn.Web.Controllers
 		private void Shuffle(QuizBlock quizBlock)
 		{
 			var random = new Random();
-			var choiceBlock = (ChoiceBlock) quizBlock;
+			var choiceBlock = (ChoiceBlock)quizBlock;
 			choiceBlock.Items = choiceBlock.Items.OrderBy(x => random.Next()).ToArray();
 		}
 
@@ -75,12 +73,36 @@ namespace uLearn.Web.Controllers
 			return lastVisitedSlide;
 		}
 
+		[Authorize]
+		[HttpGet]
+		public ActionResult SelectGroup()
+		{
+			var groups = db.Users.Select(u => u.GroupName).Distinct().OrderBy(g => g).ToArray();
+			return PartialView(groups);
+		}
+
+		[Authorize]
+		[HttpPost]
+		public async Task<ActionResult> SelectGroup(string groupName)
+		{
+			var userId = User.Identity.GetUserId();
+			var user = db.Users.FirstOrDefault(x => x.Id == userId);
+			if (user != null)
+			{
+				user.GroupName = groupName;
+				await db.SaveChangesAsync();
+				return Content("");
+			}
+			return HttpNotFound("User not found");
+		}
+
 		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, int slideIndex, List<string> visibleUnits)
 		{
 			var course = courseManager.GetCourse(courseId);
 			if (slideIndex == -1)
 				slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
-			var isFirstCourseVisit = !visitersRepo.GetIdOfVisitedSlides(courseId, User.Identity.GetUserId()).Any();
+			var isFirstCourseVisit = !visitersRepo.HasVisitedSlides(courseId, User.Identity.GetUserId());
+
 			await VisitSlide(courseId, course.Slides[slideIndex].Id);
 			var model = new CoursePageModel
 			{
@@ -173,18 +195,6 @@ namespace uLearn.Web.Controllers
 		{
 			InstructorNote instructorNote = courseManager.GetCourse(courseId).GetInstructorNote(unitName);
 			return View(instructorNote);
-		}
-
-		[Authorize]
-		[HttpPost]
-		public async Task<ActionResult> AddGroup(string groupName)
-		{
-			var userId = User.Identity.GetUserId();
-			var user = db.Users.FirstOrDefault(x => x.Id == userId);
-			if (user != null)
-				user.GroupName = groupName;
-			await db.SaveChangesAsync();
-			return null;
 		}
 	}
 }

@@ -9,6 +9,7 @@ namespace uLearn.Web
 		{
 			bundles.Add(new ScriptBundle("~/jquery-js").Include(
 				"~/Scripts/jquery-{version}.js",
+				"~/Scripts/jquery.unobtrusive-ajax*",
 				"~/Scripts/notify-custom.min.js"));
 
 			bundles.Add(new ScriptBundle("~/jqueryval-js").Include(
