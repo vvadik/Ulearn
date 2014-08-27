@@ -18,6 +18,7 @@
 	}
 
 }
+<h2>Статистика ответов</h2>
 <div>
 	@{ var maxQuestionIndex = Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex).Max(x => x.QuestionIndex);}
 	<table id="myTable" class="tablesorter">
@@ -26,7 +27,7 @@
 				<th style="border-bottom: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа">наведи на меня!</th>
 				@foreach (var block in Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
-					<th title="@block.Text" colspan="@GetColSpan(block)">@GetSubstring(block.Text ?? "", 12)</th>
+					<th title="@block.Text" colspan="@GetColSpan(block)">@block.Text</th>
 					if (maxQuestionIndex == block.QuestionIndex)
 					{
 						break;
@@ -43,7 +44,7 @@
 						var choiseBlock = ((ChoiceBlock)block);
 						foreach (var item in choiseBlock.Items.OrderBy(x => x.Id))
 						{
-							<th title="@item.Description">@GetSubstring(item.Description, 7)</th>
+							<th title="@item.Description">@GetSubstring(item.Description, 40)</th>
 						}
 					}
 					else if (block is FillInBlock)

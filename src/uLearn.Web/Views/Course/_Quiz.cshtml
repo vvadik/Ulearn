@@ -45,10 +45,6 @@
 			<hr class="@delim">
 		}
 	}
-	if (User.IsInRole(LmsRoles.Instructor) || User.IsInRole(LmsRoles.Admin))
-	{
-		@Html.Action("Analytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
-	}
 	<div class="no-display" id="GetRightAnswersToQuiz" data-url="@Url.Action("GetRightAnswersToQuiz", "Quiz")"></div>
 	<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz","Quiz")'>
 		<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId','@Model.Slide.Index','@Model.AnswersToQuizes.Count')">Готово!</button>
@@ -58,8 +54,12 @@
 			{
 				<input type="hidden" name="slideId" value="@Model.Slide.Id" />
 				<input type="hidden" name="courseId" value="@Model.CourseId" />
-				<button class="btn btn-danger" type="submit">Очистить ответы</button>
+				<button class="btn btn-danger" type="submit">Удалить ответы</button>
 			}
 		}
 	</div>
+	if (User.IsInRole(LmsRoles.Instructor))
+	{
+		@Html.Action("Analytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
+	}
 }
