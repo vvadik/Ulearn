@@ -13,16 +13,18 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		/*
 		В отпуске Вася не тратил время зря, а заводил новые знакомства.
 		Он знакомился с другими крутыми программистами, отдыхающими с ним в одном отеле, и записывал их номера телефонов.
-		В его дневнике получилось много записей типа ```"{name}:{number}"```.
-		Заметив, что многие имена повторяются, он решил сделать словарь,
-		и каждому имени поставить в соответствие все номера телефонов, принадлежащие людям с таким именем.
-		Вася уже написал функцию ```ReadPhonebook```, которая считывает его каракули из блокнота,
-		тем самым облегчив вам работу. Помогите ему!
+		
+		В его дневнике получилось много записей вида `<name>: <number>`.
+		
+		Чтобы искать телефоны было быстрее, он решил сделать словарь,
+		в котором каждому имени поставить в соответствие все номера телефонов, принадлежащие людям с таким именем.
+		
+		Вася уже написал функцию `ReadPhonebook`, которая считывает его каракули из блокнота. Помогите ему сделать все остальное!
 		*/
 
-		[ExpectedOutput(@"Ваня: 11211,79436,800944
-Саша: 792356,89023785,579235,9999
-Паша: 34621,788222
+		[ExpectedOutput(@"Ваня: 11211, 79436, 800944
+Саша: 792356, 89023785, 579235, 9999
+Паша: 34621, 788222
 Юра: 092358
 Вася: 00000
 Гена: 89237589")]
@@ -30,9 +32,9 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		{
 			var phonebook = ReadPhonebook();
 			
-			Dictionary<string, List<string>> optimazedPhonebook = GetOptimazedPhonebook(phonebook);
-			foreach (var record in optimazedPhonebook)
-				Console.WriteLine("{0}: {1}", record.Key, string.Join(",", record.Value));
+			Dictionary<string, List<string>> optimizedPhonebook = GetOptimizedPhonebook(phonebook);
+			foreach (var record in optimizedPhonebook)
+				Console.WriteLine("{0}: {1}", record.Key, string.Join(", ", record.Value.ToArray()));
 		}
 
 		[HideOnSlide]
@@ -57,20 +59,24 @@ namespace uLearn.Courses.BasicProgramming.Slides
 
 		[Exercise]
 		[Hint("Проверяйте наличие ключа в словаре перед добавлением")]
-		[Hint("Вспомните, что делает метод ```Split()```")]
-		private static Dictionary<string, List<string>> GetOptimazedPhonebook(List<string> phonebook)
+		[Hint("Вспомните, что делает метод `Split` у строки")]
+		private static Dictionary<string, List<string>> GetOptimizedPhonebook(List<string> phonebook)
 		{
-			var dict = new Dictionary<string, List<string>>();
+			var dictionary = new Dictionary<string, List<string>>();
 			foreach (var record in phonebook)
 			{
 				var list = record.Split(':');
-				if (!dict.ContainsKey(list[0]))
-					dict[list[0]] = new List<string>();
-				dict[list[0]].Add(list[1]);
+				var name = list[0];
+				var phone = list[1];
+				if (!dictionary.ContainsKey(name))
+					dictionary[name] = new List<string>();
+				dictionary[name].Add(phone);
 			}
-			return dict;
+			return dictionary;
 			/*uncomment
-			return new Dictionary<string, List<string>>();
+			var dictionary = new Dictionary<string, List<string>>();
+			...
+			return dictionary;
 			*/
 		}
 	}
