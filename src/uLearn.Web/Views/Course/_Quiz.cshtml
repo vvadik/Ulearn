@@ -51,6 +51,6 @@
 	}
 	<div class="no-display" id="GetRightAnswersToQuiz" data-url="@Url.Action("GetRightAnswersToQuiz","Quiz")">none</div>
 	<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz","Quiz")'>
-		<button class="btn btn-default quiz-submit-btn" onclick="submitQuiz('@Model.CourseId','@Model.Slide.Index','@Model.AnswersToQuizes.Count')">Submit my result</button>
+		<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId','@Model.Slide.Index','@Model.AnswersToQuizes.Count')">Готово!</button>
 	</div>
 }
