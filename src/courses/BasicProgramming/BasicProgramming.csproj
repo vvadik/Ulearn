@@ -68,7 +68,8 @@
     <Compile Include="Slides\U00_Basics\S000_HelpSlide.cs" />
     <Compile Include="Slides\U00_Basics\_HelloWorld.cs" />
     <Content Include="Slides\U02_Ifs\Prelude.txt" />
-    <Content Include="Slides\U02_Ifs\Title.txt" />    <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
+    <Content Include="Slides\U02_Ifs\Title.txt" />
+    <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
     <Content Include="Slides\U01_Mistakes\S091_Style2.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -176,26 +177,6 @@
     <Compile Include="Slides\U08_Recursion\S070_Combinations.cs" />
     <Compile Include="Slides\U08_Recursion\S080_BinSearch.cs" />
     <Compile Include="Slides\U08_Recursion\S090_ComparingSearches.cs" />
-    <Compile Include="Slides\U99_Presentation\_S011_Attributes2.cs" />
-    <Compile Include="Slides\U99_Presentation\S011_Attributes2.cs" />
-    <Compile Include="Slides\U99_Presentation\S000_About.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Slides\U99_Presentation\S010_Attributes.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Slides\U99_Presentation\S020_Markdown.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Slides\U99_Presentation\_AttrInitial.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Slides\U99_Presentation\_MarkdownExample.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Slides\U99_Presentation\_SampleIncludeFile.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Slides_Tests.cs" />
     <Content Include="Slides\U04_Arrays\Prelude.txt" />
     <Content Include="Slides\U03_Cycles\shapes.png" />
