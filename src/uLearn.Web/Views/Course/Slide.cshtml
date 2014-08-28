@@ -41,12 +41,5 @@
 		<script> getHints("@Model.CourseId", "@Model.Slide.Index", '@e.HintsHtml.Length') </script>
 		<script> refreshPreviousDraft('@(Model.LatestAcceptedSolution != null)', '@e.Id') </script>
 	}
-
-	@{
-		var a = Model.PassedQuiz.Contains(Model.Slide.Id);
-		var b = Model.Slide is QuizSlide;
-		var answers = a && b ? (Model.Slide as QuizSlide).RightAnswersToQuiz : "none";
-		<script>markAns('@answers')</script>
-	}
 }
 

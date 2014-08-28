@@ -354,12 +354,14 @@ table.diff tbody th {
 	margin-left: 0 !important;
 }
 
-.wrong-quiz {
-	color: lightcoral;
+div.quiz .wrong-quiz {
+	color: red;
+	font-weight: bolder;
 }
 
-.right-quiz {
-	color: darkseagreen;
+div.quiz .right-quiz {
+	color: green;
+	font-weight: bold;
 }
 
 .not-understand-btn {

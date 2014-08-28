@@ -69,6 +69,9 @@
     <Compile Include="Slides\U00_Basics\_HelloWorld.cs" />
     <Content Include="Slides\U02_Ifs\Prelude.txt" />
     <Content Include="Slides\U02_Ifs\Title.txt" />
+    <Content Include="Slides\U05_Collections\S085_IO.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Slides\U05_Collections\S061_StringQuiz.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -150,7 +153,8 @@
     <Compile Include="Slides\U05_Collections\S060_FormatOutput.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Slides\U05_Collections\S070_IO.cs">
+    <Compile Include="Slides\U05_Collections\S070_FilesAndDirectories.cs" />
+    <Compile Include="Slides\U05_Collections\S080_Encodings.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Slides\U05_Collections\_SpecialCharsInclude.cs" />

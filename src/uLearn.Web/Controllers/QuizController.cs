@@ -55,6 +55,14 @@ namespace uLearn.Web.Controllers
 			public bool IsRightQuizBlock;
 		}
 
+		[HttpPost]
+		[Authorize(Roles = LmsRoles.Tester)]
+		public async Task<ActionResult> ClearAnswers(string courseId, string slideId)
+		{
+			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
+			await userQuizzesRepo.RemoveAnswers(User.Identity.GetUserId(), slideId);
+			return RedirectToAction("Slide", "Course", new { courseId, slideIndex = slide.Index });
+		}
 
 		[HttpPost]
 		[Authorize]
@@ -82,21 +90,11 @@ namespace uLearn.Web.Controllers
 			}
 			var blocksInAnswerCount = tmpFolder.Select(x => x.QuizId).Distinct().Count();
 			if (blocksInAnswerCount != quizBlockWithTaskCount)
-				return "has empty bloks";
+				return "has empty blocks";
 			foreach (var quizInfoForDb in tmpFolder)
 				await userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
 					course.Slides[intSlideIndex].Id, quizInfoForDb.Text, User.Identity.GetUserId(), time, quizInfoForDb.IsRightQuizBlock);
 			return string.Join("*", incorrectQuizzes.Distinct());
-		}
-
-		[HttpPost]
-		[Authorize]
-		public string GetRightAnswersToQuiz(string courseId, int slideIndex)
-		{
-			var course = courseManager.GetCourse(courseId);
-			var quizSlide = course.Slides[slideIndex];
-			var rightAnswersToQuiz = ((QuizSlide)quizSlide).RightAnswersToQuiz;
-			return rightAnswersToQuiz;
 		}
 
 		private IEnumerable<QuizInfoForDb> GetQuizInfo(Course course, int slideIndex, IGrouping<string, QuizAnswer> answer)
@@ -168,7 +166,7 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(FillInBlock fillInBlock, string data)
 		{
-			var isTrue = fillInBlock.Regexes.Any(regex => Regex.IsMatch(data, regex));
+			var isTrue = fillInBlock.Regexes.Any(regex => Regex.IsMatch(data, "^" + regex + "$"));
 			return new List<QuizInfoForDb>
 			{
 				new QuizInfoForDb
@@ -207,14 +205,6 @@ namespace uLearn.Web.Controllers
 					yield return userQuizzesRepo.GetChoiseBlockAnswerInfo(courseId, slide.Id, (ChoiceBlock)block, userId, block.QuestionIndex);
 				else if (block is IsTrueBlock)
 					yield return userQuizzesRepo.GetIsTrueBlockAnswerInfo(courseId, slide.Id, block.Id, userId, block.QuestionIndex);
-		}
-		[HttpPost]
-		[Authorize(Roles = LmsRoles.Tester)]
-		public async Task<ActionResult> ClearAnswers(string courseId, string slideId)
-		{
-			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
-			await userQuizzesRepo.RemoveAnswers(User.Identity.GetUserId(), slideId);
-			return RedirectToAction("Slide", "Course", new { courseId, slideIndex = slide.Index });
 		}
 	}
 }

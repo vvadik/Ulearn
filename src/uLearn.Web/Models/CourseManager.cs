@@ -81,7 +81,7 @@ namespace uLearn.Web.Models
 					.Select(x => x.Select(y => y.Title))
 					.ToList();
 			if (slidesWithDuplicateGuids.Any())
-				throw new Exception("Duplecate Id in slides:\n" +
+				throw new Exception("Duplicate SlideId:\n" +
 									string.Join("\n", slidesWithDuplicateGuids.Select(x => string.Join("\n", x))));
 		}
 

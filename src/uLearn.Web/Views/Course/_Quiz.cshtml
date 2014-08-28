@@ -13,15 +13,15 @@
 		var quizModel = new QuizInfoModel(Model, quizBlock, blockIndex, passed);
 		if (quizBlock is CodeBlock)
 		{
-			<textarea class='code code-sample'>@(((CodeBlock)quizBlock).Text)</textarea>
+			<textarea class='code code-sample'>@(((CodeBlock) quizBlock).Text)</textarea>
 		}
 		else if (quizBlock is TextBlock)
 		{
-			@Html.Raw(((TextBlock)quizBlock).Text.RenderMd())
+			@Html.Raw(((TextBlock) quizBlock).Text.RenderMd())
 		}
 		else if (quizBlock is AbstractQuestionBlock)
 		{
-			var block = (AbstractQuestionBlock)quizBlock;
+			var block = (AbstractQuestionBlock) quizBlock;
 			<h4>@block.QuestionIndex. @block.Text</h4>
 		}
 		delim = blockIndex != quizSlide.Quiz.Blocks.Length - 1 ? "quiz-delimeter" : "";
@@ -42,19 +42,21 @@
 			<hr class="@delim">
 		}
 	}
-	<div class="no-display" id="GetRightAnswersToQuiz" data-url="@Url.Action("GetRightAnswersToQuiz", "Quiz")"></div>
-	<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz","Quiz")'>
-		<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId','@Model.Slide.Index','@Model.AnswersToQuizes.Count')">Готово!</button>
-		@if (User.IsInRole(LmsRoles.Tester))
-		{
-			using (Html.BeginForm("ClearAnswers", "Quiz"))
+		<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
+			@if (!passed)
 			{
-				<input type="hidden" name="slideId" value="@Model.Slide.Id" />
-				<input type="hidden" name="courseId" value="@Model.CourseId" />
-				<button class="btn btn-danger" type="submit">Удалить ответы</button>
+				<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count')">Готово!</button>
 			}
-		}
-	</div>
+			else if (User.IsInRole(LmsRoles.Tester))
+			{
+				using (Html.BeginForm("ClearAnswers", "Quiz"))
+				{
+					<input type="hidden" name="slideId" value="@Model.Slide.Id" />
+					<input type="hidden" name="courseId" value="@Model.CourseId" />
+					<button class="btn btn-danger" type="submit">Удалить ответы</button>
+				}
+			}
+		</div>
 	if (User.IsInRole(LmsRoles.Instructor))
 	{
 		@Html.Action("Analytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })

@@ -1,24 +1,22 @@
-﻿@using uLearn
-@using uLearn.Quizes
+﻿@using uLearn.Quizes
 @model QuizInfoModel
 @{
 	var value = "";
 	var quizRes = "";
-	var quizResSample = "none";
-    var quizBlock = (FillInBlock)Model.CurrentBlock;
+	var quizBlock = (FillInBlock)Model.CurrentBlock;
 	if (Model.Passed && Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() != null)
 	{
 		value = Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault();
 		quizRes = Model.CourseModel.AnswersToQuizes[quizBlock.Id][1] == "False" ? "wrong-quiz" : "right-quiz";
-		quizResSample = Model.CourseModel.AnswersToQuizes[quizBlock.Id][1] == "False" ? "block-display" : "no-display";
 	}
 	var sample = quizBlock.Sample;
 	<div class="quiz quiz-block-input">
 		<label>
-			<input class="@quizRes" value="@value" id='@(quizBlock.Id + "quizBlock")'>
+			<input class="form-control @quizRes" value="@value" id='@(quizBlock.Id + "quizBlock")'>
 		</label>
 	</div>
-	<i class="@quizResSample" id='@(quizBlock.Id + "_" + "example" + "_quizItem")'>
-		Пример правильного варианта ответа: @sample
-	</i>
+	if (Model.Passed)
+	{
+		<div>Правильный ответ: @sample</div>
+	}
 }

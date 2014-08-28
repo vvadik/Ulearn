@@ -1,23 +1,25 @@
-﻿@using uLearn
-@using uLearn.Quizes
+﻿@using uLearn.Quizes
 @model QuizInfoModel
 @{
 	var tchecked = "";
 	var fchecked = "";
+	var trueItemClass = "";
+	var falseItemClass = "";
 	var quizBlock = (IsTrueBlock)Model.CurrentBlock;
 	if (Model.Passed && Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() != null)
 	{
-		tchecked = Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() == "True" ? "checked" : "";
-		fchecked = Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() == "False" ? "checked" : "";
+		var userAnswer = Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() == "True";
+		tchecked = userAnswer ? "checked" : "";
+		fchecked = userAnswer ?  "" : "checked";
+		trueItemClass = quizBlock.Answer ? "right-quiz" : userAnswer ? "wrong-quiz" : "";
+		falseItemClass = !quizBlock.Answer ? "right-quiz" : !userAnswer ? "wrong-quiz" : "";
 	}
 	<div class="radio quiz-block-mark" id="@(quizBlock.Id + "_quizBlock")">
 		<div class="quiz">
-			<i></i>
-			<label><input @tchecked id='@(quizBlock.Id + "quizBlock" + "True")' name='@(quizBlock.Id+"group")' type="radio">Верно</label>
+			<label class="@trueItemClass"><input @tchecked id='@(quizBlock.Id + "quizBlock" + "True")' name='@(quizBlock.Id+"group")' type="radio">Верно</label>
 		</div>
 		<div class="quiz">
-			<i></i>
-			<label><input @fchecked id='@(quizBlock.Id + "quizBlock" + "False")' name='@(quizBlock.Id+"group")' type="radio">Не верно</label>
+			<label class="@falseItemClass"><input @fchecked id='@(quizBlock.Id + "quizBlock" + "False")' name='@(quizBlock.Id+"group")' type="radio">Не верно</label>
 		</div>
 	</div>
 }
