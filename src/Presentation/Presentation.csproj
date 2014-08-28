@@ -53,6 +53,7 @@
     <Compile Include="Slides\U99_Presentation\S040_Attributes.cs" />
     <Compile Include="Slides\U99_Presentation\S041_Attributes2.cs" />
     <Compile Include="Slides\U99_Presentation\S042_Attributes3.cs" />
+    <Compile Include="Slides\U99_Presentation\S050_Ideas.cs" />
     <Compile Include="Slides\U99_Presentation\_Attributes.cs" />
     <Compile Include="Slides\U99_Presentation\_AttrInitial.cs" />
     <Compile Include="Slides\U99_Presentation\_header.cs" />
