@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Slides\U99_Presentation\S010_Introduction.cs" />
     <Compile Include="Slides\U99_Presentation\S020_Markdown.cs" />
     <Compile Include="Slides\U99_Presentation\S022_MarkdownHeader.cs" />
     <Compile Include="Slides\U99_Presentation\S023_MarkdownInclude.cs" />
@@ -48,6 +49,7 @@
     <Compile Include="Slides\U99_Presentation\S026_MarkdownImage.cs" />
     <Compile Include="Slides\U99_Presentation\S030_SyntaxAnalyser.cs" />
     <Compile Include="Slides\U99_Presentation\S031_SyntaxAnalyserTests.cs" />
+    <Compile Include="Slides\U99_Presentation\S032_SyntaxAnalyserHowItWork.cs" />
     <Compile Include="Slides\U99_Presentation\S040_Attributes.cs" />
     <Compile Include="Slides\U99_Presentation\S041_Attributes2.cs" />
     <Compile Include="Slides\U99_Presentation\S042_Attributes3.cs" />
@@ -68,6 +70,7 @@
     <Content Include="Slides\Title.txt" />
     <Content Include="Slides\U99_Presentation\Prelude.txt" />
     <Content Include="Slides\U99_Presentation\Title.txt" />
+    <Content Include="Slides\U99_Presentation\Ящики.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\uLearn\uLearn.csproj">

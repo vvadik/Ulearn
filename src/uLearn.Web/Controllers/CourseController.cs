@@ -80,7 +80,8 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			if (slideIndex == -1)
 				slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
-			var isFirstCourseVisit = !visitersRepo.GetIdOfVisitedSlides(courseId, User.Identity.GetUserId()).Any();
+			var userId = User.Identity.GetUserId();
+			var isFirstCourseVisit = !db.Visiters.Any(x => x.UserId == userId);
 			await VisitSlide(courseId, course.Slides[slideIndex].Id);
 			var model = new CoursePageModel
 			{
@@ -89,12 +90,12 @@ namespace uLearn.Web.Controllers
 				CourseTitle = course.Title,
 				Slide = course.Slides[slideIndex],
 				LatestAcceptedSolution =
-					solutionsRepo.FindLatestAcceptedSolution(courseId, course.Slides[slideIndex].Id, User.Identity.GetUserId()),
+					solutionsRepo.FindLatestAcceptedSolution(courseId, course.Slides[slideIndex].Id, userId),
 				Rate = GetRate(course.Id, course.Slides[slideIndex].Id),
-				PassedQuiz = userQuizzesRepo.GetIdOfQuizPassedSlides(courseId, User.Identity.GetUserId()),
+				PassedQuiz = userQuizzesRepo.GetIdOfQuizPassedSlides(courseId, userId),
 				AnswersToQuizes =
 					userQuizzesRepo.GetAnswersForShowOnSlide(courseId, course.Slides[slideIndex] as QuizSlide,
-						User.Identity.GetUserId())
+						userId)
 			};
 			return model;
 		}

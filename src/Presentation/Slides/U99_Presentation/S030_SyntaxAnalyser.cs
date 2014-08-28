@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U99_Presentation
 {
-	[Slide("SyntaxAnalyser", "{CAD8E9F6-19E2-44F4-BEA2-874AB14D9235}")]
+	[Slide("Syntax analyser", "{CAD8E9F6-19E2-44F4-BEA2-874AB14D9235}")]
 	class S030_SyntaxAnalyser
 	{
 		/*
