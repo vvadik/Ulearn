@@ -24,6 +24,9 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		static string GetLastHalf(string text)
 		{
 			return text.Substring(text.Length / 2);
+			/*uncomment
+			...
+			*/
 		}
 	}
 }

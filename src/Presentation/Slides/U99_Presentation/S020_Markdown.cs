@@ -6,16 +6,13 @@ using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U00_Presentation
 {
-	[Slide("Attributes", "{EB939293-4AD4-4937-B863-B78A99CCF679}")]
-	class S010_Attributes
+	[Slide("Markdown: simple text", "{9A92F51C-CC29-4846-B131-21A4673A4158}")]
+	class S020_Markdown
 	{
 		/*
-		About attributes
+		this is simple text
 		*/
 
-		/*Example:
-		*/
-
-		//#include U99_Presentation._AttrInitial.cs
+		//#include U99_Presentation._simple_text.cs
 	}
 }

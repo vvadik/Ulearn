@@ -764,6 +764,7 @@
     <Content Include="Views\Course\_ChoiceGroup.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="bin\" />
     <Folder Include="Courses\" />
   </ItemGroup>
   <ItemGroup>

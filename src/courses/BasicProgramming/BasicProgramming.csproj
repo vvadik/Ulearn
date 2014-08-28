@@ -69,8 +69,6 @@
     <Compile Include="Slides\U00_Basics\_HelloWorld.cs" />
     <Content Include="Slides\U02_Ifs\Prelude.txt" />
     <Content Include="Slides\U02_Ifs\Title.txt" />
-    <Content Include="Slides\U99_Presentation\Prelude.txt" />
-    <Content Include="Slides\U99_Presentation\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
     <Content Include="Slides\U01_Mistakes\S091_Style2.xml">
       <SubType>Designer</SubType>
@@ -170,26 +168,6 @@
     <Compile Include="Slides\U07_Algorithms\S060_ComplexityMark.cs" />
     <Compile Include="Slides\U07_Algorithms\S070_NumberComplex.cs" />
     <Compile Include="Slides\U07_Algorithms\S080_ComplexityClasses.cs" />
-    <Compile Include="Slides\U99_Presentation\_S011_Attributes2.cs" />
-    <Compile Include="Slides\U99_Presentation\S011_Attributes2.cs" />
-    <Compile Include="Slides\U99_Presentation\S000_About.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Slides\U99_Presentation\S010_Attributes.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Slides\U99_Presentation\S020_Markdown.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Slides\U99_Presentation\_AttrInitial.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Slides\U99_Presentation\_MarkdownExample.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Slides\U99_Presentation\_SampleIncludeFile.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Slides_Tests.cs" />
     <Content Include="Slides\U04_Arrays\Prelude.txt" />
     <Content Include="Slides\U03_Cycles\shapes.png" />

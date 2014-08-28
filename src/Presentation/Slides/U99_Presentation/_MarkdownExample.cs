@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace uLearn.Courses.BasicProgramming.Slides.U00_Presentation
+﻿namespace uLearn.Courses.BasicProgramming.Slides.U00_Presentation
 {
 	class MarkdownExample
 	{

@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U00_Presentation
 {
-	[Slide("What is it", "{558D5C61-B077-4DBC-9A8F-BCE226CE02B8}")]
-	class S000_About
+	[Slide("Markdown: simple text", "{9A92F51C-CC29-4846-B131-21A4673A4158}")]
+	class S020_Markdown
 	{
 		/*
-		О чем презентация
+		this is simple text
 		*/
+
+		//#include U99_Presentation._simple_text.cs
 	}
 }

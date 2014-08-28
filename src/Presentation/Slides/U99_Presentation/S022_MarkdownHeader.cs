@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U99_Presentation
 {
-	[Slide("Attributes 2", "{9E097AE1-C91D-48DE-A125-7FEEACF148E5}")]
-	class S011_Attributes2
+	[Slide("Markdown: заголовки", "{700DD25B-FCCC-4113-BDDD-8EB4FA1DD7AD}")]
+	class S022_MarkdownHeader
 	{
 		/*
-		This is Code-sample `how to use attributes`;
+		## Header!
 		*/
 
-		//#include U99_Presentation._S011_Attributes2.cs
+		//#include U99_Presentation._header.cs
 	}
 }

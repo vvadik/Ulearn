@@ -23,6 +23,7 @@ namespace uLearn.Web.Models
 			var result = new CourseManager();
 			result.AddCourse("Linq", "Практикум по LINQ");
 			result.AddCourse("BasicProgramming", "Основы программирования на C#");
+			result.AddCourse("Presentation", "Презентация");
 			return result;
 		}
 

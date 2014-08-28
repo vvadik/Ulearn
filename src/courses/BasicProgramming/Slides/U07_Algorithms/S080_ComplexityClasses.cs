@@ -10,6 +10,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U07_Algorithms
 	class S080_ComplexityClasses
 	{
 		//#video vz3YSTi2XQY
+
 		/*
 		[Материалы по лекции](/Courses/BasicProgramming/U07_Algorithms/_Materials.zip)
 		*/

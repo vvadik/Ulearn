@@ -6,13 +6,9 @@ using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U99_Presentation
 {
-	[Slide("Attributes 2", "{15AE3D7A-C9CB-436C-B2B9-1504D1339208}")]
-	class _S011_Attributes2
+	[Slide("Тестирование слайда", "{87E48EEC-7A66-49D7-8E02-BBD0CD848ED3}")]
+	class S031_SyntaxAnalyserTests
 	{
-		[ExpectedOutput("s")]
-		public static void Main()
-		{
-			Console.WriteLine('s');
-		}
+		//#include U99_Presentation._Test.cs
 	}
 }
