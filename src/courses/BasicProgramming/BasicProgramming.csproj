@@ -131,7 +131,7 @@
     <Compile Include="Slides\U05_Collections\S010_List.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Slides\U05_Collections\S011_ListTask.cs" />
+    <Compile Include="Slides\U05_Collections\S011_Cipther.cs" />
     <Compile Include="Slides\U05_Collections\S020_Dictionary.cs">
       <SubType>Code</SubType>
     </Compile>
