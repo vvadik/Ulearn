@@ -89,14 +89,21 @@ namespace uLearn.Web.Controllers
 				};
 			var output = submition.Output;
 			if (!string.IsNullOrEmpty(submition.StdErr)) output += "\n" + submition.StdErr;
+			if (submition.Result != SubmitionResult.Success)
+			{
+				if (submition.Time > TimeSpan.FromSeconds(4))
+					output += "\n Time limit exceeded";
+				else
+					output += "\n" + submition.Result;
+			}
 			output = NormalizeString(output);
 			var expectedOutput = NormalizeString(exerciseSlide.ExpectedOutput);
-			var isRightAnswer = output.Equals(expectedOutput);
+			var isRightAnswer = submition.Result == SubmitionResult.Success && output.Equals(expectedOutput);
 			return new RunSolutionResult
 			{
 				CompilationError = submition.CompilationError,
 				IsRightAnswer = isRightAnswer,
-				ExpectedOutput = expectedOutput,
+				ExpectedOutput = exerciseSlide.HideExpectedOutputOnError ? null : expectedOutput,
 				ActualOutput = output
 			};
 		}

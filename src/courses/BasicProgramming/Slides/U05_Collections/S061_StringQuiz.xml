@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Quiz
+ xmlns="https://ulearn.azurewebsites.net/quiz"
+ id="{5C7A4FE0-7020-4812-9140-F59C0B232226}">
+	<title>Работа со строками</title>
+	<code xml:space="preserve">
+string result=""; 
+for (int i=0; i&lt;3; i++) 
+{ 
+	result+=i.ToString() + ", "; 
+}
+</code>
+
+	<isTrue id="0" answer="false">
+		<text>Этот код может быть существенно оптимизирован по производительности</text>
+	</isTrue>
+
+	<choice id="1" multiple="true" shuffle="true">
+		<text>Выберите все верные утверждения:</text>
+		<item id="1" isCorrect="false">При передаче строки в метод эта строка копируется</item>
+		<item id="2" isCorrect="false">Строки ничем не отличаются от массивов символов</item>
+		<item id="3" isCorrect="false">Строки являются типами-значениями (Value type)</item>
+		<item id="4" isCorrect="true">Строки являются типами-ссылками (Reference Type)</item>
+		<item id="5" isCorrect="false">Строки можно изменять во время выполнения</item>
+	</choice>
+
+	<choice id="2" multiple="false" shuffle="true">
+		<text>Что напечатает код Console.WriteLine("12345\r321");</text>
+		<item id="1" isCorrect="true">32145</item>
+		<item id="2" isCorrect="false">12345321</item>
+		<item id="3" isCorrect="false">12345</item>
+		<item id="4" isCorrect="false">321</item>
+		<item id="5" isCorrect="false">две строки: 12345 и 321</item>
+	</choice>
+
+	<code>
+		File.WriteAllText("C:\test\new.txt", "123456");
+	</code>
+	<choice id="3" multiple="false" shuffle="true">
+		<text>Хорош ли код?</text>
+		<item id="1" isCorrect="false">Код прекрасен!</item>
+		<item id="2" isCorrect="false">Код содержит стилистические погрешности</item>
+		<item id="3" isCorrect="false">Код вызовет ошибку компиляции</item>
+		<item id="4" isCorrect="true">Код вызовет ошибку при исполнении</item>
+	</choice>
+
+	<code>
+		Console.WriteLine(a.ToString()+"\t"+Math.Round(b,3).ToString());
+	</code>
+	<choice id="4" multiple="false" shuffle="true">
+		<text>Как улучшить этот код?</text>
+		<item id="1" isCorrect="false">Заменить сложение строк StringBuilder-ом</item>
+		<item id="2" isCorrect="false">Код и так прекрасен</item>
+		<item id="3" isCorrect="false">Вынести сложное выражение вне метода WriteLine</item>
+		<item id="4" isCorrect="true">Использовать форматированный вывод</item>
+	</choice>
+</Quiz>

@@ -56,9 +56,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			}
 			words.Reverse();
 			return string.Join(" ", words.ToArray());
-			/*uncomment
-			...
-			*/
 		}
 
 		[HideOnSlide]

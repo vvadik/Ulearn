@@ -9,17 +9,19 @@ namespace uLearn
 	{
 		public string ExerciseInitialCode { get; private set; }
 		public string ExpectedOutput { get; private set; }
+		public bool HideExpectedOutputOnError { get; private set; }
 		public SolutionBuilder Solution { get; private set; }
 		public string[] HintsHtml { get; private set; }
 		public HashSet<int> LikedHints { get; set; }  // TODO: убрать упоминание о лайках из этого класса. Оставить только в ViewModel
 		public override bool ShouldBeSolved { get { return true; } }
 
-		public ExerciseSlide(IEnumerable<SlideBlock> blocks, string exerciseInitialCode, string expectedOutput, IEnumerable<string> hints, SolutionBuilder solution, SlideInfo slideInfo, string title, string id)
+		public ExerciseSlide(IEnumerable<SlideBlock> blocks, string exerciseInitialCode, string expectedOutput, IEnumerable<string> hints, SolutionBuilder solution, SlideInfo slideInfo, string title, string id, bool hideExpectedOutputOnError)
 			: base(blocks, slideInfo, title, id)
 		{
 			ExerciseInitialCode = exerciseInitialCode ?? "";
 			ExpectedOutput = expectedOutput;
 			Solution = solution;
+			HideExpectedOutputOnError = hideExpectedOutputOnError;
 			HintsHtml = hints.Select(Md.RenderMd).ToArray();
 		}
 

@@ -4,7 +4,7 @@
 @{
 	var tchecked = "";
 	var fchecked = "";
-	var quizBlock = Model.CurrentBlock;
+	var quizBlock = (IsTrueBlock)Model.CurrentBlock;
 	if (Model.Passed && Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() != null)
 	{
 		tchecked = Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() == "True" ? "checked" : "";

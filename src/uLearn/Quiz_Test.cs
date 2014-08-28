@@ -18,7 +18,7 @@ namespace uLearn.Quizes
 				Id = "Id",
 				Blocks = new QuizBlock[]
 				{
-					new QuizBlock {Text = "This is quiz!"},
+					new TextBlock {Text = "This is quiz!"},
 					new IsTrueBlock
 					{
 						Id = "1",

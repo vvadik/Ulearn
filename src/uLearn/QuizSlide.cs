@@ -18,7 +18,7 @@ namespace uLearn
 
 		public QuizBlock GetBlockById(string id)
 		{
-			return Quiz.Blocks.FirstOrDefault(block => block.Id == id);
+			return Quiz.Blocks.OfType<AbstractQuestionBlock>().FirstOrDefault(block => block.Id == id);
 		}
 
 		public string RightAnswersToQuiz
@@ -34,20 +34,20 @@ namespace uLearn
 				if (quizBlock is ChoiceBlock)
 				{
 					var choiceQuizBlock = quizBlock as ChoiceBlock;
-					rightAnswersStr.Append(quizBlock.Id + "quizBlock" + "=");
+					rightAnswersStr.Append(choiceQuizBlock.Id + "quizBlock" + "=");
 					rightAnswersStr.Append(string.Join("*", choiceQuizBlock.Items.Where(x => x.IsCorrect).Select(x => x.Id).ToList()));
 					rightAnswersStr.Append("||");
 				}
 				else if (quizBlock is FillInBlock)
 				{
 					var fillIn = quizBlock as FillInBlock;
-					rightAnswersStr.Append(quizBlock.Id + quizBlock.Id + "=" + fillIn.Sample);
+					rightAnswersStr.Append(fillIn.Id + fillIn.Id + "=" + fillIn.Sample);
 					rightAnswersStr.Append("||");
 				}
 				else if (quizBlock is IsTrueBlock)
 				{
 					var selecter = quizBlock as IsTrueBlock;
-					rightAnswersStr.Append(quizBlock.Id + "quizBlock" + "=" + selecter.Answer);
+					rightAnswersStr.Append(selecter.Id + "quizBlock" + "=" + selecter.Answer);
 					rightAnswersStr.Append("||");
 				}
 			}

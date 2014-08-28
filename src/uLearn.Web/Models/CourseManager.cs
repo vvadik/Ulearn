@@ -128,30 +128,36 @@ namespace uLearn.Web.Models
 
 		private static Slide LoadQuiz(ResourceFile slideFile, SlideInfo info)
 		{
-			var serializer = new XmlSerializer(typeof (Quiz));
-			var quiz = (Quiz) serializer.Deserialize(new MemoryStream(slideFile.GetContent()));
-			FillEmptyField(quiz);
-			return new QuizSlide(info, quiz);
+			try
+			{
+				var serializer = new XmlSerializer(typeof(Quiz), "https://ulearn.azurewebsites.net/quiz");
+				var quiz = (Quiz) serializer.Deserialize(new MemoryStream(slideFile.GetContent()));
+				FillEmptyField(quiz);
+				return new QuizSlide(info, quiz);
+			}
+			catch (Exception e)
+			{
+				throw new Exception("Quiz " + slideFile.FullName + " is wrong", e);
+			}
 		}
 
 		private static void FillEmptyField(Quiz quiz)
 		{
 			var emptyIndex = 0;
 			var questionIndex = 1;
-			var allReservedId = new HashSet<string>(quiz.Blocks.Select(x => x.Id));
-			foreach (var quizBlock in quiz.Blocks)
+			var questionBlocks = quiz.Blocks.OfType<AbstractQuestionBlock>().ToList();
+			var allReservedId = new HashSet<string>(questionBlocks.Select(x => x.Id));
+			foreach (var questionBlock in questionBlocks)
 			{
-				var questionBlock = quizBlock as AbstractQuestionBlock;
-				if (questionBlock != null)
-					questionBlock.QuestionIndex = questionIndex++;
-				if (quizBlock.Id == null)
+				questionBlock.QuestionIndex = questionIndex++;
+				if (questionBlock.Id == null)
 				{
 					while (allReservedId.Contains(emptyIndex.ToString()))
 						emptyIndex++;
-					quizBlock.Id = emptyIndex.ToString();
+					questionBlock.Id = emptyIndex.ToString();
 					emptyIndex++;
 				}
-				var choiceBlock = quizBlock as ChoiceBlock;
+				var choiceBlock = questionBlock as ChoiceBlock;
 				if (choiceBlock == null) continue;
 				var itemEmptyId = 0;
 				var allReservedItemId = new HashSet<string>(choiceBlock.Items.Select(x => x.Id));

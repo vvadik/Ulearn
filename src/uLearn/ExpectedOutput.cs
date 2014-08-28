@@ -12,4 +12,8 @@ namespace uLearn
 
 		public string Output { get; private set; }
 	}
+
+	public class HideExpectedOutputOnErrorAttribute : Attribute
+	{
+	}
 }

@@ -69,6 +69,11 @@
     <Compile Include="Slides\U00_Basics\_HelloWorld.cs" />
     <Content Include="Slides\U02_Ifs\Prelude.txt" />
     <Content Include="Slides\U02_Ifs\Title.txt" />
+    <Content Include="Slides\U05_Collections\S061_StringQuiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Slides\U08_Recursion\Prelude.txt" />
+    <Content Include="Slides\U08_Recursion\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
     <Content Include="Slides\U01_Mistakes\S091_Style2.xml">
       <SubType>Designer</SubType>
@@ -138,11 +143,10 @@
     <Compile Include="Slides\U05_Collections\S040_StringBuilder.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Slides\U05_Collections\S041_StringBuilderTask.cs" />
+    <Compile Include="Slides\U05_Collections\S041_StackCipherTask.cs" />
     <Compile Include="Slides\U05_Collections\S050_SpecialChars.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Slides\U05_Collections\S051_SpecialCharsTask.cs" />
     <Compile Include="Slides\U05_Collections\S060_FormatOutput.cs">
       <SubType>Code</SubType>
     </Compile>

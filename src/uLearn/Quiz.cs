@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace uLearn.Quizes
 {
@@ -16,34 +11,42 @@ namespace uLearn.Quizes
 		[XmlElement("title")]
 		public string Title;
 
-		[XmlElement("p")]
+		[XmlElement("p", Type = typeof(TextBlock))]
+		[XmlElement("code", Type = typeof(CodeBlock))]
+		[XmlElement("isTrue", Type = typeof(IsTrueBlock))]
+		[XmlElement("choice", Type = typeof(ChoiceBlock))]
+		[XmlElement("fillIn", Type = typeof(FillInBlock))]
 		public QuizBlock[] Blocks;
 	}
 
-	[XmlInclude(typeof(IsTrueBlock))]
-	[XmlInclude(typeof(ChoiceBlock))]
-	[XmlInclude(typeof(FillInBlock))]
-	[XmlInclude(typeof(CodeBlock))]
-	public class QuizBlock
+	public abstract class QuizBlock
+	{
+	}
+	
+	public class TextBlock : QuizBlock
+	{
+		[XmlText]
+		public string Text;
+	}
+
+	public class CodeBlock : QuizBlock
+	{
+		[XmlText]
+		public string Text;
+	}
+
+	public class AbstractQuestionBlock : QuizBlock
 	{
 		[XmlAttribute("id")]
 		public string Id;
 
 		[XmlElement("text")]
 		public string Text;
+
+		[XmlIgnore]
+		public int QuestionIndex;
 	}
 
-	[XmlType("Code")]
-	public class CodeBlock : QuizBlock
-	{
-	}
-
-	public class AbstractQuestionBlock : QuizBlock
-	{
-		[XmlIgnore] public int QuestionIndex;
-	}
-
-	[XmlType("Choice")]
 	public class ChoiceBlock : AbstractQuestionBlock
 	{
 		[XmlAttribute("multiple")]
@@ -56,7 +59,6 @@ namespace uLearn.Quizes
 		public ChoiceItem[] Items;
 	}
 
-	[XmlType("isTrue")]
 	public class IsTrueBlock : AbstractQuestionBlock
 	{
 		[XmlAttribute("answer")]
@@ -68,7 +70,6 @@ namespace uLearn.Quizes
 		}
 	}
 
-	[XmlType("fillIn")]
 	public class FillInBlock : AbstractQuestionBlock
 	{
 		[XmlElement("sample")]

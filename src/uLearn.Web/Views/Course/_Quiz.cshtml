@@ -13,19 +13,16 @@
 		var quizModel = new QuizInfoModel(Model, quizBlock, blockIndex, passed);
 		if (quizBlock is CodeBlock)
 		{
-			<textarea class='code code-sample'>@quizBlock.Text</textarea>
+			<textarea class='code code-sample'>@(((CodeBlock)quizBlock).Text)</textarea>
 		}
-		else
+		else if (quizBlock is TextBlock)
 		{
-			var questionBlock = quizBlock as AbstractQuestionBlock;
-			if (questionBlock != null)
-			{
-				<h4>@questionBlock.QuestionIndex. @questionBlock.Text</h4>
-			}
-			else
-			{
-				@Html.Raw(quizBlock.Text.RenderMd())
-			}
+			@Html.Raw(((TextBlock)quizBlock).Text.RenderMd())
+		}
+		else if (quizBlock is AbstractQuestionBlock)
+		{
+			var block = (AbstractQuestionBlock)quizBlock;
+			<h4>@block.QuestionIndex. @block.Text</h4>
 		}
 		delim = blockIndex != quizSlide.Quiz.Blocks.Length - 1 ? "quiz-delimeter" : "";
 		if (quizBlock is ChoiceBlock)

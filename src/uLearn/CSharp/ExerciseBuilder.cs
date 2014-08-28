@@ -12,6 +12,7 @@ namespace uLearn.CSharp
 		public bool IsExercise { get; private set; }
 		public string ExpectedOutput { get; private set; }
 		public string TemplateSolution { get; private set; }
+		public bool HideExpectedOutputOnError { get; private set; }
 
 		public readonly List<string> Hints = new List<string>();
 		public MethodDeclarationSyntax ExerciseNode;
@@ -65,10 +66,10 @@ namespace uLearn.CSharp
 				IsExercise = true;
 				ExpectedOutput = node.GetAttributes<ExpectedOutputAttribute>().Select(attr => attr.GetArgument(0)).FirstOrDefault();
 			}
+			if (node.HasAttribute<HideExpectedOutputOnErrorAttribute>())
+				HideExpectedOutputOnError = true;
 			if (node.HasAttribute<HintAttribute>())
-			{
 				Hints.AddRange(node.GetAttributes<HintAttribute>().Select(attr => attr.GetArgument(0)));
-			}
 			if (node.HasAttribute<ExerciseAttribute>())
 			{
 				TemplateSolution = TemplateSolution + node.WithoutAttributes();
