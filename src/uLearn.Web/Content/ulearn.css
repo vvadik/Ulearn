@@ -467,3 +467,7 @@ table.diff tbody th {
 .wide-container {
 	margin: 0 50px;
 }
+
+.table.table-autowidth {
+	width:auto
+}

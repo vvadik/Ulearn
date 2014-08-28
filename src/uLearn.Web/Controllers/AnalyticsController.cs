@@ -219,6 +219,7 @@ namespace uLearn.Web.Controllers
 				CourseId = courseId,
 				UnitName = unitName,
 				Slides = slides,
+				Rates = db.SlideRates.Where(r => r.CourseId == courseId).ToArray(),
 				Table = new Dictionary<string, UserInfo>()
 			};
 			var slideIdToSlideIndex = new Dictionary<string, int>();

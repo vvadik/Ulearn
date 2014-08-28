@@ -29,7 +29,7 @@
 					@if (User.IsInRole(LmsRoles.Instructor))
 					{
 						<i class="glyphicon glyphicon-eye-close navbar-label" title="Не видно студентам"></i>
-						<li class="slide-list-item unit-statistic-ref">@Html.ActionLink("Успеваемость студентов", "UnitStatistics", "Analytics", new { courseId = Model.CourseId, unitName = unit.UnitName }, null)</li>
+						<li class="slide-list-item unit-statistic-ref">@Html.ActionLink("Статистика и успеваемость", "UnitStatistics", "Analytics", new { courseId = Model.CourseId, unitName = unit.UnitName }, null)</li>
 					}
 				</ul>
 			</li>

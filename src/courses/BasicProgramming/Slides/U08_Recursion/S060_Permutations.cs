@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 {
-	[Slide("Перестановка", "{198CA6C0-BD3B-4E90-AE96-9503DB0CC4E6}")]
-	class S070_Permutations
+	[Slide("Перестановки", "{DE51CEB3-761A-4308-B042-6AC1C0625956}")]
+	class S060_Permutations
 	{
-		//#video d9Beustq6Wg
+		//#video gNYKKnmqoX4
 		/*
 		## Заметки по лекции
 		*/

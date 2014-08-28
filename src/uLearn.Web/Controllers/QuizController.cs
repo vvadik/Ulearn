@@ -66,7 +66,7 @@ namespace uLearn.Web.Controllers
 				return "already answered";
 			var time = DateTime.Now;
 			var quizzes = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.QuizId);
-			var quizBlockWithTaskCount = ((QuizSlide) course.Slides[intSlideIndex]).Quiz.Blocks.Count(x => x is FillInBlock || x is IsTrueBlock || x is ChoiceBlock);
+			var quizBlockWithTaskCount = ((QuizSlide)course.Slides[intSlideIndex]).Quiz.Blocks.Count(x => x is FillInBlock || x is IsTrueBlock || x is ChoiceBlock);
 			var incorrectQuizzes = new List<string>();
 			var fillInBlockType = typeof(FillInBlock);
 			var tmpFolder = new List<QuizInfoForDb>();
@@ -90,11 +90,12 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
+		[Authorize]
 		public string GetRightAnswersToQuiz(string courseId, int slideIndex)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var quizSlide = course.Slides[slideIndex];
-			var rightAnswersToQuiz = ((QuizSlide) quizSlide).RightAnswersToQuiz;
+			var rightAnswersToQuiz = ((QuizSlide)quizSlide).RightAnswersToQuiz;
 			return rightAnswersToQuiz;
 		}
 
@@ -102,7 +103,7 @@ namespace uLearn.Web.Controllers
 		{
 			var slide = course.Slides[slideIndex] as QuizSlide;
 			if (slide == null)
-				throw new Exception("Error in func 'GetSlideUsingId' or in 'QuizSlideId'");
+				throw new Exception("Error in func 'GetSlideById' or in 'QuizSlideId'");
 			var block = slide.GetBlockById(answer.Key);
 			if (block is FillInBlock)
 				return CreateQuizInfoForDb(block as FillInBlock, answer.First().Text);
@@ -113,7 +114,7 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(IsTrueBlock isTrueBlock, IGrouping<string, QuizAnswer> data)
 		{
-			var isTrue = isTrueBlock.Answer.ToString() == data.First().ItemId;
+			var isTrue = isTrueBlock.IsRight(data.First().ItemId);
 			return new List<QuizInfoForDb>
 			{
 				new QuizInfoForDb
@@ -157,9 +158,9 @@ namespace uLearn.Web.Controllers
 					IsRightQuizBlock = false
 				}).ToList();
 			var isRightQuizBlock = ans.All(x => x.IsRightAnswer) &&
-			             choiseBlock.Items.Where(x => x.IsCorrect)
-				             .Select(x => x.Id)
-				             .All(x => ans.Where(y => y.IsRightAnswer).Select(y => y.ItemId).Contains(x));
+						 choiseBlock.Items.Where(x => x.IsCorrect)
+							 .Select(x => x.Id)
+							 .All(x => ans.Where(y => y.IsRightAnswer).Select(y => y.ItemId).Contains(x));
 			foreach (var info in ans)
 				info.IsRightQuizBlock = isRightQuizBlock;
 			return ans;
@@ -185,7 +186,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult Analytics(string courseId, int slideIndex)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var quizSlide = (QuizSlide) course.Slides[slideIndex];
+			var quizSlide = (QuizSlide)course.Slides[slideIndex];
 			var dict = new SortedDictionary<string, List<QuizAnswerInfo>>();
 			foreach (var user in db.Users)
 				if (userQuizzesRepo.IsQuizSlidePassed(courseId, user.Id, quizSlide.Id)) //не сворачивать в Where! DB запросы не поймут!
@@ -206,6 +207,14 @@ namespace uLearn.Web.Controllers
 					yield return userQuizzesRepo.GetChoiseBlockAnswerInfo(courseId, slide.Id, (ChoiceBlock)block, userId, block.QuestionIndex);
 				else if (block is IsTrueBlock)
 					yield return userQuizzesRepo.GetIsTrueBlockAnswerInfo(courseId, slide.Id, block.Id, userId, block.QuestionIndex);
+		}
+		[HttpPost]
+		[Authorize(Roles = LmsRoles.Tester)]
+		public async Task<ActionResult> ClearAnswers(string courseId, string slideId)
+		{
+			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
+			await userQuizzesRepo.RemoveAnswers(User.Identity.GetUserId(), slideId);
+			return RedirectToAction("Slide", "Course", new { courseId, slideIndex = slide.Index });
 		}
 	}
 }

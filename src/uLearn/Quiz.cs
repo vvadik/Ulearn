@@ -61,6 +61,11 @@ namespace uLearn.Quizes
 	{
 		[XmlAttribute("answer")]
 		public bool Answer;
+
+		public bool IsRight(string text)
+		{
+			return text.ToLower() == Answer.ToString().ToLower();
+		}
 	}
 
 	[XmlType("fillIn")]

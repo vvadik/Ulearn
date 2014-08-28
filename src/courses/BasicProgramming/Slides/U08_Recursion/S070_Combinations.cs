@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 {
-	[Slide("Сочетания", "{DE51CEB3-761A-4308-B042-6AC1C0625956}")]
-	class S060_Combinations
+	[Slide("Размещения", "{198CA6C0-BD3B-4E90-AE96-9503DB0CC4E6}")]
+	class S070_Combination
 	{
-		//#video vMG2x5kTpxk
+		//#video d9Beustq6Wg
 		/*
 		## Заметки по лекции
 		*/
@@ -57,15 +57,11 @@ namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 					combination[k] = true;
 
 			}
-
-
 		}
 
 
 		public static void MainX()
 		{
-
-
 			foreach (var e in Combinations1(5, 3))
 			{
 				foreach (var c in e)

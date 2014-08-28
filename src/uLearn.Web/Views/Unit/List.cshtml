@@ -1,18 +1,19 @@
 ﻿@model uLearn.Web.Controllers.UnitsListViewModel
 
 @{
-	ViewBag.Title = "Администрирование юнитов";
+	ViewBag.Title = "Admin Course | uLearn";
 }
 
-<div class="wide-container">
-	<h2>Администрирование юнитов</h2>
-	<table class="table">
+<div class="container">
+	<h2>Администрирование курса</h2>
+	<h3>@Model.CourseTitle</h3>
+	<table class="table table-autowidth">
 		<tr>
 			<th>Модуль</th>
 			<th>Время публикации</th>
-			<th>Кем установлено время</th>
+			<th>Автор</th>
 			<th>Изменение времени публикации</th>
-			<th>Удаление публикации</th>
+			<th>Скрыть</th>
 		</tr>
 		@foreach (var unit in Model.Units)
 		{

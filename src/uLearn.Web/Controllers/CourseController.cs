@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using System.Web.UI.WebControls;
 using Microsoft.AspNet.Identity;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -75,6 +73,29 @@ namespace uLearn.Web.Controllers
 			return lastVisitedSlide;
 		}
 
+		[Authorize]
+		[HttpGet]
+		public ActionResult SelectGroup()
+		{
+			var groups = db.Users.Select(u => u.GroupName).Distinct().OrderBy(g => g).ToArray();
+			return PartialView(groups);
+		}
+
+		[Authorize]
+		[HttpPost]
+		public async Task<ActionResult> SelectGroup(string groupName)
+		{
+			var userId = User.Identity.GetUserId();
+			var user = db.Users.FirstOrDefault(x => x.Id == userId);
+			if (user != null)
+			{
+				user.GroupName = groupName;
+				await db.SaveChangesAsync();
+				return Content("");
+			}
+			return HttpNotFound("User not found");
+		}
+
 		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, int slideIndex, List<string> visibleUnits)
 		{
 			var course = courseManager.GetCourse(courseId);
@@ -124,10 +145,12 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<string> AddQuestion(string title, string unitName, string question)
+		[ValidateInput(false)]
+		public async Task<string> AddQuestion(string courseId, string slideId, string question)
 		{
 			IIdentity user = User.Identity;
-			await userQuestionsRepo.AddUserQuestion(question, title, user.GetUserId(), user.Name, unitName, DateTime.Now);
+			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
+			await userQuestionsRepo.AddUserQuestion(question, slide.Title, user.GetUserId(), user.Name, slide.Info.UnitName, DateTime.Now);
 			return "Success!";
 		}
 
@@ -150,10 +173,17 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public string GetAllQuestions(string courseName)
+		public string GetAllQuestions(string unitName)
 		{
-			var questions = userQuestionsRepo.GetAllQuestions(courseName);
+			var questions = userQuestionsRepo.GetAllQuestions(unitName);
 			return Server.HtmlEncode(questions);
+		}
+
+		[Authorize]
+		public ActionResult Questions(string unitName)
+		{
+			var questions = db.UserQuestions.Where(q => q.UnitName == unitName).ToList();
+			return PartialView(questions);
 		}
 
 		[HttpPost]
@@ -175,17 +205,5 @@ namespace uLearn.Web.Controllers
 			InstructorNote instructorNote = courseManager.GetCourse(courseId).GetInstructorNote(unitName);
 			return View(instructorNote);
 		}
-
-		[Authorize]
-		[HttpPost]
-		public async Task<ActionResult> AddGroup(string groupName)
-		{
-			var userId = User.Identity.GetUserId();
-			var user = db.Users.FirstOrDefault(x => x.Id == userId);
-			if (user != null)
-				user.GroupName = groupName;
-			await db.SaveChangesAsync();
-			return null;
 		}
-	}
 }

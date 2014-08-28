@@ -34,7 +34,7 @@ namespace uLearn.Web.Controllers
 		[Authorize(Roles = LmsRoles.Admin)]
 		public ActionResult List()
 		{
-			var applicationUsers = new ULearnDb().Users.ToList();
+			var applicationUsers = new ULearnDb().Users.OrderBy(u => u.UserName).ToList();
 			return View(applicationUsers);
 		}
 
@@ -54,10 +54,13 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> DeleteUser(string userId)
 		{
 			var db = new ULearnDb();
-			ApplicationUser user = await db.Users.FirstAsync(u => u.Id == userId);
-			db.Users.Remove(user);
-			await db.SaveChangesAsync();
-			return Content(userId + " deleted");
+			ApplicationUser user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+			if (user != null)
+			{
+				db.Users.Remove(user);
+				await db.SaveChangesAsync();
+			}
+			return RedirectToAction("List");
 		}
 
 		//

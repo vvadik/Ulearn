@@ -49,7 +49,6 @@ function fillRate(rate) {
 	for (var i in colors) {
 		$("#" + i).parent().removeClass(colors[i]);
 	}
-	console.log(rated);
 	if (rated) {
 		$("#next_slide_button").removeClass("block-next");
 		$("#next_solutions_button").removeClass("block-next");

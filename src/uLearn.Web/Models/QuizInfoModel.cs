@@ -1,7 +1,6 @@
-﻿using System;
-using uLearn.Quizes;
+﻿using uLearn.Quizes;
 
-namespace uLearn
+namespace uLearn.Web.Models
 {
 	public class QuizInfoModel
 	{

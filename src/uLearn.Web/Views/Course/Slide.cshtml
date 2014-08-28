@@ -2,7 +2,7 @@
 @model CoursePageModel
 
 @{
-	ViewBag.Title = Model.CourseTitle;
+	ViewBag.Title = Model.CourseTitle + " | uLearn";
 }
 
 @Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
@@ -22,41 +22,18 @@
 			</div>
 			@Html.Partial("_RatesBar")
 			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false })
-			@if (User.IsInRole(LmsRoles.Instructor))
-			{
-				<div id="GetAllQuestions" data-url="@Url.Action("GetAllQuestions")">
-					<button class="all-questions" onclick="printAllQuestions('@Model.Slide.Info.UnitName')">Посмотреть все заданные вопросы по теме</button>
-				</div>
-				<div class="questions-log"></div>
-			}
 		</div>
-	</div>
-	<div>
-		@if (User.IsInRole(LmsRoles.Admin))
-		{
-			<div class="modal-footer">
-				<a href="#" class="prepare-solution-button" data-url="@Url.Action("PrepareSolution", "Exercise", new {courseId = Model.CourseId, slideIndex = Model.Slide.Index})">Log prepared solution</a>				<a href="#" onclick="toggleFakeRun()">Переключить в тестовый режим запуска</a>
-				<script>
-					function toggleFakeRun() {
-						var $btn = $(".run-solution-button");
-						$btn
-							.css("background-color", "blue")
-							.data("url", $btn.data("url").replace("/RunSolution", "/FakeRunSolution"));
-					}
-				</script>
-			</div>
-		}
 	</div>
 </div>
 @if (Model.IsFirstCourseVisit)
 {	
-	@Html.Partial("_ChoiceGroup")
+	@Html.Action("SelectGroup")
 }
 @section scripts{
 	@Scripts.Render("~/slide-js")
-	<script src="~/Scripts/slide-stats.js"></script>
 	<script>
 		fillRate('@Model.Rate');
+		$("#selectGroupModal").modal();
 	</script>
 	@if (Model.Slide is ExerciseSlide)
 	{
@@ -70,13 +47,6 @@
 		var b = Model.Slide is QuizSlide;
 		var answers = a && b ? (Model.Slide as QuizSlide).RightAnswersToQuiz : "none";
 		<script>markAns('@answers')</script>
-	}
-	@if (Model.IsFirstCourseVisit)
-	{
-	<script src="~/Scripts/choice-group.js"></script>
-		<script>
-			$("#first_visit").click();
-		</script>
 	}
 }
 
