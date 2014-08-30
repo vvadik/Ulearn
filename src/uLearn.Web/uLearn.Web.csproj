@@ -778,6 +778,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\" />
+    <Folder Include="Courses.Staging\" />
     <Folder Include="Courses\" />
   </ItemGroup>
   <ItemGroup>
