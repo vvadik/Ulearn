@@ -13,6 +13,6 @@ namespace uLearn.Courses.BasicProgramming.Slides.U00_Presentation
 		this is simple text
 		*/
 
-		//#include U99_Presentation._simple_text.cs
+		//#include _simple_text.cs
 	}
 }

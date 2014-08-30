@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace uLearn.Courses.BasicProgramming.Slides.U06_AutomaticTesting
+﻿namespace uLearn.Courses.BasicProgramming.Slides.U06_AutomaticTesting
 {
 	[Slide("Заключение", "{0AADE667-915B-40F3-BC49-F4622C57EA36}")]
 	class S070_Conclusion
@@ -15,10 +9,10 @@ namespace uLearn.Courses.BasicProgramming.Slides.U06_AutomaticTesting
 		*/
 
 
-		//#include U06_AutomaticTesting._UnitTest.cs
+		//#include _UnitTest.cs
 
-		//#include U06_AutomaticTesting._QuadricEquation.cs
+		//#include _QuadricEquation.cs
 
-		//#include U06_AutomaticTesting._Program.cs
+		//#include _Program.cs
 	}
 }

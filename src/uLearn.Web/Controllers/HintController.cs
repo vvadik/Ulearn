@@ -12,7 +12,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideHintRepo slideHintRepo;
 
 		public HintController()
-			: this(CourseManager.AllCourses, new SlideHintRepo())
+			: this(WebCourseManager.Instance, new SlideHintRepo())
 		{
 		}
 

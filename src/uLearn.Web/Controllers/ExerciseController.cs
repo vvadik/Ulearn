@@ -20,7 +20,7 @@ namespace uLearn.Web.Controllers
 		private readonly ExecutionService executionService = new ExecutionService();
 
 		public ExerciseController()
-			: this(CourseManager.AllCourses)
+			: this(WebCourseManager.Instance)
 		{
 		}
 

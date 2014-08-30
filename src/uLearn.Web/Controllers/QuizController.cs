@@ -19,7 +19,7 @@ namespace uLearn.Web.Controllers
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 
 		public QuizController()
-			: this(CourseManager.AllCourses)
+			: this(WebCourseManager.Instance)
 		{
 		}
 

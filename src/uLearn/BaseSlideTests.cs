@@ -20,7 +20,7 @@ namespace uLearn
 		}
 
 		[Test]
-		public void TestGetAllSlides()
+		public void PrintAllSlides()
 		{
 			var slides = GetExerciseSlidesTestCases();
 			foreach (var slide in slides)
@@ -29,23 +29,25 @@ namespace uLearn
 			}
 		}
 
+		[Test]
+		public void LoadAllSlides()
+		{
+			var course = CourseManager.LoadCourse(new DirectoryInfo(@"..\..\Slides"));
+			Assert.That(course.Slides.Length, Is.GreaterThan(0));
+			Console.WriteLine(course.Title);
+			Console.WriteLine(course.Slides.Length + " slides:");
+			Console.WriteLine();
+			foreach (var slide in course.Slides)
+				Console.WriteLine(slide.Info.UnitName + " " + slide.Title);
+		}
+
 		[TestCaseSource("GetExerciseSlidesTestCases")]
 		public void Slide(Type slideType)
 		{
 			TestExercise(slideType);
 		}
 
-		[Test]
-		public void TestUniqueSlideIds()
-		{
-			var ids = new HashSet<string>();
-			foreach (var slideType in GetSlideTypes())
-			{
-				Assert.IsTrue(ids.Add(slideType.Item2.Guid), slideType.Item1 + " duplicate slide id?");
-			}
-		}
-
-		public IEnumerable<TestCaseData> GetExerciseSlidesTestCases()
+	public IEnumerable<TestCaseData> GetExerciseSlidesTestCases()
 		{
 			return GetSlideTypes()
 				.Select(type_attr => type_attr.Item1)

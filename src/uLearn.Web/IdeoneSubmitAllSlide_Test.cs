@@ -26,9 +26,9 @@ namespace uLearn.Web
 		public IEnumerable<TestCaseData> GetSlidesTestCases()
 		{
 			var executionService = new ExecutionService();
-			var courseManager = CourseManager.LoadAllCourses();
-			Assert.That(courseManager.Courses.Count == 2);
-			foreach (var course in courseManager.Courses)
+			var courseManager = WebCourseManager.Instance;
+			Assert.That(courseManager.GetCourses().Count() >= 2);
+			foreach (var course in courseManager.GetCourses())
 				foreach (var slide in course.Slides.OfType<ExerciseSlide>())
 				{
 					yield return new TestCaseData(slide, executionService).SetName(course.Id + " - " + slide.Info.UnitName + " - " + slide.Title);

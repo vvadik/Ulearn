@@ -2,7 +2,7 @@
 {
 	public class SlideInfo
 	{
-		public int Index { get; private set; }
+		public int Index { get; set; }
 		public string UnitName { get; private set; }
 
 		public SlideInfo(string unitName, int index)

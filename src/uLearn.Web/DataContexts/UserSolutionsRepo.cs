@@ -16,7 +16,7 @@ namespace uLearn.Web.DataContexts
 		private readonly ULearnDb db;
 		private readonly CourseManager courseManager;
 
-		public UnitsRepo() : this(new ULearnDb(), CourseManager.AllCourses)
+		public UnitsRepo() : this(new ULearnDb(), WebCourseManager.Instance)
 		{
 			
 		}

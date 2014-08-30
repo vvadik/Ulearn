@@ -20,5 +20,11 @@ namespace uLearn
 			Title = title;
 			Id = id;
 		}
+
+		public Slide SetIndex(int index)
+		{
+			Info.Index = index;
+			return this;
+		}
 	}
 }

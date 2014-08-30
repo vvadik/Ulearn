@@ -274,9 +274,7 @@
       <DependentUpon>201408201208379_AddIsRightQuizBlock.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\CourseManager_should.cs" />
-    <EmbeddedResource Include="Courses\**\*.*">
-      <Visible>false</Visible>
-    </EmbeddedResource>
+    <Compile Include="WebCourseManager.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -307,7 +305,6 @@
     <Compile Include="Microsoft.Owin.Security.VK\VkAuthenticationOptions.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\CourseManager.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
     <Compile Include="IdeoneSubmitAllSlide_Test.cs" />
     <Compile Include="Models\PrevNextButtonsModel.cs" />
@@ -661,6 +658,8 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="codemirror\README.md" />
+    <Content Include="Courses.Staging\BasicProgramming.zip" />
+    <Content Include="Courses.Staging\linq.zip" />
     <None Include="encoding.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -778,7 +777,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\" />
-    <Folder Include="Courses.Staging\" />
     <Folder Include="Courses\" />
   </ItemGroup>
   <ItemGroup>
@@ -794,14 +792,6 @@
     <EmbeddedResource Include="Microsoft.Owin.Security.VK\Resources.resx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\courses\BasicProgramming\BasicProgramming.csproj">
-      <Project>{83a81211-a139-4a37-92a0-716809232f08}</Project>
-      <Name>BasicProgramming</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\courses\linq\linq.csproj">
-      <Project>{0bd679e4-9acb-4b02-835b-cbca1de8b817}</Project>
-      <Name>linq</Name>
-    </ProjectReference>
     <ProjectReference Include="..\uLearn\uLearn.csproj">
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
       <Name>uLearn</Name>

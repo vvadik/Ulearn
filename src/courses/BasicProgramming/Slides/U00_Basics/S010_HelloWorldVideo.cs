@@ -37,6 +37,6 @@
 	
 		*/
 
-		//#include U00_Basics._HelloWorld.cs
+		//#include _HelloWorld.cs
 	}
 }

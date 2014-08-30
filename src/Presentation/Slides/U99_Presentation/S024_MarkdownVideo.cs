@@ -11,6 +11,6 @@ namespace uLearn.Courses.BasicProgramming.Slides.U99_Presentation
 	{
 		//#video GZS36w_fxdg
 
-		//#include U99_Presentation._Video.cs
+		//#include _Video.cs
 	}
 }

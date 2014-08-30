@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\packages\DotNetZip.1.9.3\lib\net20\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="MarkdownDeep">
       <HintPath>..\packages\MarkdownDeep.NET.1.5\lib\.NetFramework 3.5\MarkdownDeep.dll</HintPath>
     </Reference>
@@ -73,16 +76,21 @@
     <Compile Include="BaseSlideTests.cs" />
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="Course.cs" />
+    <Compile Include="CourseManager.cs" />
+    <Compile Include="CSharp\CSharpSlideLoader.cs" />
     <Compile Include="CSharp\ExerciseBuilder.cs" />
     <Compile Include="CSharp\BlocksBuilder.cs" />
     <Compile Include="CSharp\ExerciseAttribute.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />
     <Compile Include="CSharp\ISolutionValidator.cs" />
-    <Compile Include="Quiz.cs" />
-    <Compile Include="QuizSlide.cs" />
-    <Compile Include="QuizBlock.cs" />
-    <Compile Include="Quiz_Test.cs" />
+    <Compile Include="FileExtensions.cs" />
+    <Compile Include="ISlideLoader.cs" />
+    <Compile Include="Quizes\Quiz.cs" />
+    <Compile Include="Quizes\QuizSlide.cs" />
+    <Compile Include="Quizes\QuizBlock.cs" />
+    <Compile Include="Quizes\Quiz_Test.cs" />
+    <Compile Include="Quizes\QuizSlideLoader.cs" />
     <Compile Include="SlideInfo.cs" />
     <Compile Include="Markdown_investigation.cs" />
     <Compile Include="Md.cs" />

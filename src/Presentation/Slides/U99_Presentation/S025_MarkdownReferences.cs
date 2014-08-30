@@ -13,7 +13,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U99_Presentation
 		[Ссылочка](http://google.com)
 		*/
 
-		//#include U99_Presentation._references.cs
+		//#include _references.cs
 
 	}
 }

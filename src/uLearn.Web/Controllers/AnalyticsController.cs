@@ -20,7 +20,8 @@ namespace uLearn.Web.Controllers
 		private readonly UserQuizzesRepo userQuizzessRepo = new UserQuizzesRepo(); //TODO use in statistics
 
 
-		public AnalyticsController() : this(CourseManager.AllCourses)
+		public AnalyticsController()
+			: this(WebCourseManager.Instance)
 		{
 		}
 

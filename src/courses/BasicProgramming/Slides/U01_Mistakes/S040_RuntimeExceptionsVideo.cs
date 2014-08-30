@@ -57,6 +57,6 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U02_Mistakes
 
 		*/
 
-		//#include U01_Mistakes._DivisionByZero.cs
+		//#include _DivisionByZero.cs
 	}
 }

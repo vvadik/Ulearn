@@ -24,7 +24,7 @@ namespace uLearn.Web.Controllers
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();
 
 		public CourseController()
-			: this(CourseManager.AllCourses)
+			: this(WebCourseManager.Instance)
 		{
 		}
 

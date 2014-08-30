@@ -10,7 +10,7 @@
 		## this is header
 		*/
 
-		//#include U99_Presentation._SampleIncludeFile.cs
+		//#include _SampleIncludeFile.cs
 
 		//#video yIIO7gxOAiY
 

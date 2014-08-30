@@ -8,7 +8,7 @@ namespace uLearn.Web.Controllers
 {
 	public class SlideNavigationController : Controller
 	{
-		private readonly CourseManager courseManager = CourseManager.AllCourses;
+		private readonly CourseManager courseManager = WebCourseManager.Instance;
 		private readonly UnitsRepo unitsRepo = new UnitsRepo();
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();

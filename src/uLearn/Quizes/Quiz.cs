@@ -2,7 +2,7 @@
 
 namespace uLearn.Quizes
 {
-	[XmlRootAttribute("Quiz", IsNullable = false)]
+	[XmlRootAttribute("Quiz", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/quiz")]
 	public class Quiz
 	{
 		[XmlAttribute("id")]

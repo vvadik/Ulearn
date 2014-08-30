@@ -19,12 +19,12 @@ namespace uLearn.Web.Controllers
 		public UnitController()
 		{
 			db = new ULearnDb();
-			courseManager = CourseManager.AllCourses;
+			courseManager = WebCourseManager.Instance;
 		}
 
 		public ActionResult CourseList()
 		{
-			return View(courseManager.Courses);
+			return View(courseManager.GetCourses().ToList());
 		}
 
 		public ActionResult List(string courseId)

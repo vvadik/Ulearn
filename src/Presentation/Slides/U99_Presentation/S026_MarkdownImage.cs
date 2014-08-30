@@ -13,6 +13,6 @@ namespace uLearn.Courses.BasicProgramming.Slides.U99_Presentation
 		![картинка](http://cs308422.vk.me/v308422836/8f01/B9od-xV5FnM.jpg)
 		*/
 
-		//#include U99_Presentation._image.cs
+		//#include _image.cs
 	}
 }
