@@ -6,7 +6,7 @@ namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("ToDictionary и ToLookup", "{1998BB06-8008-4F53-BED8-838FC20C6067}")]
 	[TestFixture]
-	public class Lookups
+	public class S150_Lookups
 	{
 		/*
 

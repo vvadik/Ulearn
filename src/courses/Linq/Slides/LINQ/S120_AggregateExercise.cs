@@ -6,7 +6,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Поиск самого длинного слова", "{04A35AE5-67B9-4674-B4C5-98E8976F87F9}")]
-	public class AggregateExercise
+	public class S120_AggregateExercise
 	{
 		/*
 

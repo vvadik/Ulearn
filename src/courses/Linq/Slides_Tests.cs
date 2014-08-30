@@ -6,7 +6,7 @@ namespace uLearn.Courses.Linq
 	[TestFixture]
 	public class Slides_Tests : BaseSlideTests
 	{
-		public Slides_Tests() : base(typeof(Intro))
+		public Slides_Tests() : base(typeof(S010_Intro))
 		{
 		}
 	}

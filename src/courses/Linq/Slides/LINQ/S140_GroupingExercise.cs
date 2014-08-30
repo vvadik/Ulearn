@@ -6,7 +6,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Создание частотного словаря", "{0535734D-D258-44C6-99F3-F96258BCCA6F}")]
-	public class GroupingExercise
+	public class S140_GroupingExercise
 	{
 		/*
 

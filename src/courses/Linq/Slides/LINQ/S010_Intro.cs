@@ -4,7 +4,7 @@ using System.Linq;
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Введение", "{3446FAB2-15DF-4045-AB40-ABC1F3DC87C8}")]
-	public class Intro
+	public class S010_Intro
 	{
 		/*
 		`LINQ` — это встроенный в C# механизм для удобной работы с коллекциями.

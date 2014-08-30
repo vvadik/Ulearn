@@ -5,7 +5,7 @@ namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Группировка", "{421B0115-80E0-42B6-BE2D-79BD3661A2AD}")]
 	[TestFixture]
-	public class Grouping
+	public class S130_Grouping
 	{
 		/*
 

@@ -4,7 +4,7 @@ using System.Linq;
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Фильтрация и преобразование", "{E0114584-4500-40B2-B6D6-DB8AF455978B}")]
-	public class SelectWhereToArray
+	public class S011_SelectWhereToArray
 	{
 		/*
 		В основе `LINQ` лежит интерфейс __последовательности__ `IEnumerable<T>`. 
@@ -36,7 +36,7 @@ namespace uLearn.Courses.Linq.Slides
 		*/
 
 		[HideOnSlide]
-		private readonly Intro.Letter[] letters = new Intro.Letter[0];
+		private readonly S010_Intro.Letter[] letters = new S010_Intro.Letter[0];
 
 		public IEnumerable<int> GetNewLettersIds()
 		{

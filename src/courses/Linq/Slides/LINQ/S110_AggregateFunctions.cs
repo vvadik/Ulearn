@@ -6,7 +6,7 @@ namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Функции аггрегирования", "{A6BACA4C-D211-428B-AE49-1F6882FD67F1}")]
 	[TestFixture]
-	public class AggregateFunctions
+	public class S110_AggregateFunctions
 	{
 		/*
 		В `LINQ` есть удобные методы для вычисления минимума, максимума, среднего и количества элементов в последовательности.

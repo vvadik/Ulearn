@@ -40,61 +40,61 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Slides\LINQ\012-AdditionalMethods.cs">
+    <Compile Include="Slides\LINQ\S012_AdditionalMethods.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\013-MethodChaining.cs">
+    <Compile Include="Slides\LINQ\S013_MethodChaining.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\011-SelectWhereToArray.cs">
+    <Compile Include="Slides\LINQ\S011_SelectWhereToArray.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\010-Intro.cs">
+    <Compile Include="Slides\LINQ\S010_Intro.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\020-ReadNumbersExcercise.cs">
+    <Compile Include="Slides\LINQ\S020_ReadNumbersExcercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\030-ReadPointsExcercise.cs">
+    <Compile Include="Slides\LINQ\S030_ReadPointsExcercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\040-SelectMany.cs">
+    <Compile Include="Slides\LINQ\S040_SelectManySample.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\050-SelectManyExercise.cs">
+    <Compile Include="Slides\LINQ\S050_SelectManyExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\060-CartesianProductExercise.cs">
+    <Compile Include="Slides\LINQ\S060_CartesianProduct.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\07-SortAndDistinct.cs">
+    <Compile Include="Slides\LINQ\S070_Sort.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\08-SortExercise.cs">
+    <Compile Include="Slides\LINQ\S080_SortExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\09-Tuple.cs">
+    <Compile Include="Slides\LINQ\S090_Tuples.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\10-SortTuplesExercise.cs">
+    <Compile Include="Slides\LINQ\S100_SortTuplesExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\13-Grouping.cs">
+    <Compile Include="Slides\LINQ\S130_Grouping.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\14-WordsFrequenciesExercise.cs">
+    <Compile Include="Slides\LINQ\S140_GroupingExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\15-Lookup.cs">
+    <Compile Include="Slides\LINQ\S150_Lookups.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\16-LookupExercise.cs">
+    <Compile Include="Slides\LINQ\S160_LookupExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\11-AggregateFunctions.cs">
+    <Compile Include="Slides\LINQ\S110_AggregateFunctions.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\12-AggregateExercise.cs">
+    <Compile Include="Slides\LINQ\S120_AggregateExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Point.cs" />
@@ -119,8 +119,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rd /S /Q $(SolutionDir)uLearn.Web\Courses\$(ProjectName)\
-xcopy /Y /E $(ProjectDir)Slides $(SolutionDir)uLearn.Web\Courses\$(ProjectName)\</PostBuildEvent>
+    <PostBuildEvent>REM copy this post build step to new course
+del "$(OutDir)$(ProjectName).zip"
+"$(SolutionDir)..\tools\7z\7za.exe" a "$(OutDir)$(ProjectName).zip" "$(ProjectDir)Slides\*"
+copy "$(OutDir)$(ProjectName).zip" $(SolutionDir)uLearn.Web\Courses.Staging\</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

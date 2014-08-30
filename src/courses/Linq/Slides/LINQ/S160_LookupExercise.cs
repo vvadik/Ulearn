@@ -6,7 +6,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Создание обратного индекса", "{52CAF978-4BB7-4CC1-92FB-607153DA0A1E}")]
-	public class LookupExercise
+	public class S160_LookupExercise
 	{
 		/*
 

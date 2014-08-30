@@ -5,7 +5,7 @@ namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("OrderBy и Distinct", "{CA6CAD1F-8352-4041-9233-DFF70ED3AB05}")]
 	[TestFixture]
-	public class Sort
+	public class S070_Sort
 	{
 		/*
 

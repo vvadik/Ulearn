@@ -6,7 +6,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Составление словаря", "{ACB110B3-C2F0-4E1A-9645-76DF88A75A7F}")]
-	public class SortExercise
+	public class S080_SortExercise
 	{
 		/*
 

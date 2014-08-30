@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Take, Skip, ToArray, ToList", "{11c65f91-8698-48d9-9a97-ba5b42d27133}")]
-	public class AdditionalMethods
+	public class S012_AdditionalMethods
 	{
 		/*
 		 Пора познакомиться ещё с несколькими простыми, но часто используемыми методами.

@@ -5,7 +5,7 @@ namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Работа с кортежами", "{693D46E6-2400-43E4-AFDF-4ECA760A052F}")]
 	[TestFixture]
-	public class Tuples
+	public class S090_Tuples
 	{
 		/*
 		В C# есть класс серия классов `Tuple<T1>`, `Tuple<T1, T2>`, `Tuple<T1, T2, T3>`, ... для описания кортежей размера 2, 3 ... 7.

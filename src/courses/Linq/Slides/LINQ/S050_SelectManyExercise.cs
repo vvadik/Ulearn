@@ -6,7 +6,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Объединение коллекций", "{7DB3F797-B99B-4580-ABE6-BB4EE929BB6B}")]
-	public class SelectManyExercise
+	public class S050_SelectManyExercise
 	{
 		/*
 

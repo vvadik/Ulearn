@@ -6,7 +6,7 @@ namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("SelectMany", "{51DF2D25-94F2-4D92-9304-397540C7233C}")]
 	[TestFixture]
-	public class SelectManySample
+	public class S040_SelectManySample
 	{
 		/*
 

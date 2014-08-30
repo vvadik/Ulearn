@@ -6,7 +6,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Декартово произведение", "{FF3215D3-5CC7-4C28-83B1-77465F570DC8}")]
-	public class CartesianProduct
+	public class S060_CartesianProduct
 	{
 		/*
 
