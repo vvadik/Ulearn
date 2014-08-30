@@ -10,14 +10,17 @@ namespace uLearn.Web.Ideone
 {
 	public partial class ExecutionService
 	{
+		private static readonly string DefaultName;
+		private static readonly string DefaultPassword;
+
 		private readonly string userName;
 		private readonly string password;
 		private readonly Ideone_Service_v1Service service = new Ideone_Service_v1Service();
 
-		public ExecutionService(string userName = DefaultName, string password = DefaultPassword, int timeout = 30000)
+		public ExecutionService(string userName = null, string password = null, int timeout = 30000)
 		{
-			this.userName = userName;
-			this.password = password;
+			this.userName = userName ?? DefaultName;
+			this.password = password ?? DefaultPassword;
 			service.Timeout = timeout;
 		}
 

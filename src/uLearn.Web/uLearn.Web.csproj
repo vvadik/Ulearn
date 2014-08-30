@@ -202,6 +202,7 @@
     <Compile Include="Controllers\SlideNavigationController.cs" />
     <Compile Include="Controllers\ExerciseController.cs" />
     <Compile Include="Controllers\HintController.cs" />
+    <Compile Include="Ideone\ExecutionService.Settings.Sample.cs" />
     <Compile Include="Migrations\201408220628510_AddUnitAppearance.cs" />
     <Compile Include="Migrations\201408220628510_AddUnitAppearance.Designer.cs">
       <DependentUpon>201408220628510_AddUnitAppearance.cs</DependentUpon>
@@ -231,7 +232,7 @@
     <Compile Include="DataContexts\UserSolutionsRepo_should.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo.cs" />
     <Compile Include="DataContexts\VisitersRepo.cs" />
-    <Compile Include="Ideone\ExecutionService.Credentials.cs" />
+    <Compile Include="Ideone\ExecutionService.Settings.cs" />
     <Compile Include="Migrations\201407111234255_InitialCreate.cs" />
     <Compile Include="Migrations\201407111234255_InitialCreate.Designer.cs">
       <DependentUpon>201407111234255_InitialCreate.cs</DependentUpon>
