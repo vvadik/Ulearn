@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Slides\U00_Basics\S005_Intro.cs" />
     <Compile Include="Slides\U00_Basics\S010_HelloWorldVideo.cs" />
     <Compile Include="Slides\U00_Basics\S012_InformationSources.cs" />
     <Compile Include="Slides\U00_Basics\S011_FirstStep.cs" />
