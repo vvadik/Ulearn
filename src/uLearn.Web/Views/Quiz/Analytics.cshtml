@@ -1,4 +1,5 @@
-﻿@using uLearn.Quizes
+﻿@using uLearn
+@using uLearn.Quizes
 @model QuizAnalyticsModel
 
 @functions {
@@ -64,6 +65,7 @@
 			</tr>
 		</thead>
 		<tbody>
+@*
 			<tr>
 				<td>Total</td>
 				@{ var usersCount = Model.UserAnswers.Keys.Count;}
@@ -81,7 +83,7 @@
 									   .SelectMany(x => x)
 									   .Where(x => x.Id == choiseBlock.QuestionIndex.ToString())
 									   .Select(x => (ChoiceBlockAnswerInfo)x)
-									   .Count(x => x.AnswersId[item.Id])) / usersCount)%
+									   .Count(x => x.AnswersId.Get(item.Id, false))) / usersCount)%
 							</td>
 						}
 					}
@@ -115,6 +117,7 @@
 					<td style="border-top: none; border-bottom: none"></td>
 				}
 			</tr>
+*@
 			@foreach (var user in Model.UserAnswers.Keys)
 			{
 				<tr>
