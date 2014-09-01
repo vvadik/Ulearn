@@ -101,7 +101,7 @@ namespace uLearn.Web.Controllers
 			var isRightAnswer = submition.Result == SubmitionResult.Success && output.Equals(expectedOutput);
 			return new RunSolutionResult
 			{
-				CompilationError = submition.CompilationError,
+				CompilationError = submition.Result != SubmitionResult.CompilationError ? "" : submition.CompilationError == "" ? "Compilation Error" : submition.CompilationError,
 				IsRightAnswer = isRightAnswer,
 				ExpectedOutput = exerciseSlide.HideExpectedOutputOnError ? null : expectedOutput,
 				ActualOutput = output

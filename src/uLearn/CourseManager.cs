@@ -1,4 +1,5 @@
 using System;
+using System.Activities.Debugger;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -37,6 +38,18 @@ namespace uLearn
 			return courses.Values;
 		}
 
+		public IEnumerable<StagingPackage> GetStagingPackages()
+		{
+			return stagedDirectory.GetFiles("*.zip").Select(f => new StagingPackage(f.Name, f.LastWriteTime));
+		}
+
+		public string GetStagingPackagePath(string name)
+		{
+			if (Path.GetInvalidFileNameChars().Any(name.Contains)) 
+				throw new Exception(name);
+			return stagedDirectory.GetFile(name).FullName;
+		}
+
 		public ExerciseSlide GetExerciseSlide(string courseId, int slideIndex)
 		{
 			var course = GetCourse(courseId);
@@ -53,6 +66,7 @@ namespace uLearn
 		{
 			var reloadTime = DateTime.Now;
 			var courseZips = stagedDirectory.GetFiles("*.zip").Where(d => d.LastWriteTime > lastReloadTime);
+			Exception lastException = null;
 			foreach (var zipFile in courseZips)
 				try
 				{
@@ -62,7 +76,9 @@ namespace uLearn
 				{
 					Debug.Write("Error loading course file " + zipFile.Name);
 					Debug.Write(e.ToString());
+					lastException = new Exception("Error loading course " + zipFile.Name, e);
 				}
+			if (lastException != null) throw lastException;
 			lastReloadTime = reloadTime;
 		}
 
@@ -171,5 +187,17 @@ namespace uLearn
 					"Duplicate SlideId:\n" +
 					string.Join("\n", badSlides.Select(x => string.Join("\n", x))));
 		}
+	}
+
+	public class StagingPackage
+	{
+		public StagingPackage(string name, DateTime timestamp)
+		{
+			Name = name;
+			Timestamp = timestamp;
+		}
+
+		public string Name;
+		public DateTime Timestamp;
 	}
 }

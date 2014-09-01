@@ -1,4 +1,4 @@
-﻿@model List<uLearn.Course>
+﻿@model uLearn.Web.Controllers.CourseListViewModel
 
 @{
 	ViewBag.Title = "Admin Courses | uLearn";
@@ -6,9 +6,17 @@
 <div class="container">
 	<h2>Управление курсами</h2>
 	<ul>
-		@foreach (var course in Model)
+		@foreach (var course in Model.Courses)
 		{
 			<li>@Html.ActionLink(course.Title, "List", new { courseId = course.Id })</li>
+		}
+	</ul>
+
+	<h2>Пакеты курсов</h2>
+	<ul>
+		@foreach (var package in Model.PackageNames)
+		{
+			<li>@package.Timestamp.ToString("dd.MM.yyyy hh:mm:ss") @Html.ActionLink(package.Name, "DownloadPackage", new { packageName=package.Name })</li>
 		}
 	</ul>
 </div>

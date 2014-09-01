@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 
@@ -24,7 +23,12 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult CourseList()
 		{
-			return View(courseManager.GetCourses().ToList());
+			var model = new CourseListViewModel
+			{
+				Courses = courseManager.GetCourses().ToList(), 
+				PackageNames = courseManager.GetStagingPackages().ToList()
+			};
+			return View(model);
 		}
 
 		public ActionResult List(string courseId)
@@ -69,6 +73,11 @@ namespace uLearn.Web.Controllers
 			}
 			return RedirectToAction("List", new { courseId });
 		}
+
+		public ActionResult DownloadPackage(string packageName)
+		{
+			return File(courseManager.GetStagingPackagePath(packageName), "application/zip", packageName);
+		}
 	}
 
 	public class UnitsListViewModel
@@ -87,4 +96,11 @@ namespace uLearn.Web.Controllers
 			CurrentDateTime = currentDateTime;
 		}
 	}
+
+	public class CourseListViewModel
+	{
+		public List<Course> Courses;
+		public List<StagingPackage> PackageNames;
+	}
+
 }
