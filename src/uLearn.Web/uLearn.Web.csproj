@@ -365,12 +365,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\db.mdf" />
-    <Content Include="App_Data\db_log.ldf">
-      <DependentUpon>db.mdf</DependentUpon>
-    </Content>
-    <Content Include="App_Data\Elmah.sdf" />
-    <Content Include="App_Data\ElmahErrors.txt" />
     <Content Include="App_Readme\Elmah.txt" />
     <Content Include="codemirror\addon\comment\comment.js" />
     <Content Include="codemirror\addon\comment\continuecomment.js" />
@@ -776,6 +770,7 @@
     <Content Include="Views\Course\Questions.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="App_Data\" />
     <Folder Include="bin\" />
     <Folder Include="Courses\" />
   </ItemGroup>
