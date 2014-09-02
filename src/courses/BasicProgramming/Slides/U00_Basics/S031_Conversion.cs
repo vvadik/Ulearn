@@ -17,22 +17,22 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		public static void Main()
 		{
 			double pi = Math.PI;
-			int tenThousend = (int)10000L;
+			int tenThousand = (int)10000L;
 			float floatPi = (float) pi;
-			float tenThousendPi = floatPi*tenThousend;
-			int roundedTenThousendPi = (int)Math.Round(tenThousendPi);
-			int integerPartOfTenThousednPi = (int)tenThousendPi;
-			Console.WriteLine(integerPartOfTenThousednPi);
-			Console.WriteLine(roundedTenThousendPi);
+			float tenThousandPi = floatPi * tenThousand;
+			int roundedTenThousandPi = (int)Math.Round(tenThousandPi);
+			int integerPartOfTenThousadnPi = (int)tenThousandPi;
+			Console.WriteLine(integerPartOfTenThousadnPi);
+			Console.WriteLine(roundedTenThousandPi);
 			/*uncomment
 			double pi = Math.PI;
-			int tenThousend = 10000L;
+			int tenThousand = 10000L;
 			float floatPi = pi;
-			float tenThousendPi = floatPi*tenThousend;
-			int roundedTenThousendPi = tenThousendPi;
-			int integerPartOfTenThousednPi = tenThousendPi;
-			Console.WriteLine(integerPartOfTenThousednPi);
-			Console.WriteLine(roundedTenThousendPi);
+			float tenThousandPi = floatPi*tenThousand;
+			int roundedTenThousandPi = tenThousandPi;
+			int integerPartOfTenThousandPi = tenThousandPi;
+			Console.WriteLine(integerPartOfTenThousandPi);
+			Console.WriteLine(roundedTenThousandPi);
 			*/
 		}
 	}
