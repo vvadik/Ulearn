@@ -8,7 +8,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	{
 		/*
 		В сети есть большое количество источников информации по платформе .NET и языку C#. 
-		Большая часть этой информации на английском.
+		Большая часть этой информации — на английском.
 
 		Однако Microsoft перевела на русский [учебник по языку C#](http://msdn.microsoft.com/ru-ru/library/zkxk2fwf(v=vs.90).aspx).
 

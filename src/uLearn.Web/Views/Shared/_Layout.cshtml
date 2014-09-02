@@ -4,6 +4,9 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>@ViewBag.Title | uLearn</title>
+	<meta name="title" content="uLearn" />
+	<meta name="description" content="Интерактивные учебные онлайн курсы по программированию" />
+	<link rel="image_src" href="~/Content/logo.png">
 	@Styles.Render("~/css")
 	@Scripts.Render("~/modernizr-js")
 </head>
@@ -47,9 +50,6 @@
 	@Scripts.Render("~/codemirror-js")
 	@RenderSection("scripts", required: false)
 
-	<script type="text/javascript" src="/Orphus/orphus.js"></script>
-	<a href="http://orphus.ru" id="orphus" target="_blank"><img alt="Система Orphus" src="/orphus/orphus.gif" border="0" width="0" height="0" /></a>
-	
 	<!-- Yandex.Metrika counter -->
 	<script type="text/javascript">(function (d, w, c) { (w[c] = w[c] || []).push(function () { try { w.yaCounter25997251 = new Ya.Metrika({ id: 25997251, webvisor: true, clickmap: true, trackLinks: true, accurateTrackBounce: true }); } catch (e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks");</script><noscript><div><img src="//mc.yandex.ru/watch/25997251" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 	<!-- /Yandex.Metrika counter -->

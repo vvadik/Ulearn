@@ -1,3 +1,9 @@
+.jumbotron-logo {
+	float:left;
+	margin: 30px;
+	margin-top: -20px;
+	margin-bottom: 0px;
+}
 .course-header {
 	background-color: #6f5499;
 	color: white;

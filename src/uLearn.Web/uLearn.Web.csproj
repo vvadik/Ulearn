@@ -648,6 +648,7 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bounce.css" />
+    <Content Include="Content\logo.png" />
     <Content Include="Content\tablesorter.css" />
     <Content Include="Content\ulearn.css" />
     <Content Include="favicon.ico" />
@@ -677,8 +678,6 @@
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\notify-custom.min.js" />
-    <Content Include="Orphus\orphus.gif" />
-    <Content Include="Orphus\orphus.js" />
     <Content Include="Scripts\slide-popovers.js" />
     <Content Include="Scripts\slide-quiz.js" />
     <Content Include="Scripts\slide-hints.js" />
