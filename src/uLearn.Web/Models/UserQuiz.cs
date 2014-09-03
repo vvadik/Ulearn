@@ -39,10 +39,13 @@ namespace uLearn.Web.Models
 		[Required]
 		public DateTime Timestamp { get; set; }
 
+		
 		[Required]
+		//Корректный ли вариант ItemId
 		public bool IsRightAnswer { get; set; }
 
 		[Required]
+		//Корректный ли весь ответ на вопрос? Отличается от IsRightAnswer для вопросов с множественным выбором
 		public bool IsRightQuizBlock { get; set; }
 	}
 }

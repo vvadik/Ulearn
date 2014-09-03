@@ -24,13 +24,13 @@
 				</tr>
 			</thead>
 			<tbody>
-				@foreach (var slide in Model.Slides)
+				@foreach (var slide in Model.SlideRateStats)
 				{
 					<tr>
-						<td>@slide.Title</td>
-						<td>@Model.Rates.Count(r => r.SlideId == slide.Id && r.Rate == SlideRates.NotUnderstand)</td>
-						<td>@Model.Rates.Count(r => r.SlideId == slide.Id && r.Rate == SlideRates.Good)</td>
-						<td>@Model.Rates.Count(r => r.SlideId == slide.Id && r.Rate == SlideRates.Trivial)</td>
+						<td>@slide.SlideTitle</td>
+						<td>@slide.NotUnderstand</td>
+						<td>@slide.Good</td>
+						<td>@slide.Trivial</td>
 					</tr>
 				}
 			</tbody>
@@ -68,36 +68,36 @@
 				</tr>
 			</thead>
 			<tbody>
-				@foreach (var user in Model.Table)
+				@foreach (var user in Model.UsersInfo)
 				{
 					<tr>
 						<td>
-							<h6>@user.Key</h6>
+							<h6>@user.UserName</h6>
 						</td>
-						<td data-sort-value="@user.Value.UserGroup">
-							<input id="@(user.Key)" onblur="changeGroup('@user.Key')" data-url="@Url.Action("AddUserGroup", "Analytics")" type="text" value="@user.Value.UserGroup" />
+						<td data-sort-value="@user.UserGroup">
+							<input id="@(user.UserId)" onblur="changeGroup('@user.UserId')" data-url="@Url.Action("AddUserGroup", "Analytics")" type="text" value="@user.UserGroup" />
 						</td>
-						@for (var i = 0; i < user.Value.SlidesInfo.Length; i++)
+						@for (var i = 0; i < user.SlidesSlideInfo.Length; i++)
 						{
 							if (Model.Slides[i] is ExerciseSlide)
 							{
-								var styleClass = @user.Value.SlidesInfo[i].IsExerciseSolved ? "green-stat" : "red-stat";
-								<td data-sort-value="@(user.Value.SlidesInfo[i].AttemptsNumber + 1000000)"
+								var styleClass = @user.SlidesSlideInfo[i].IsExerciseSolved ? "green-stat" : "red-stat";
+								<td data-sort-value="@(user.SlidesSlideInfo[i].AttemptsCount + 1000000)"
 									class="@styleClass">
-									@user.Value.SlidesInfo[i].AttemptsNumber
+									@user.SlidesSlideInfo[i].AttemptsCount
 								</td>
 							}
 							else if (Model.Slides[i] is QuizSlide)
 							{
-								var styleClass = @user.Value.SlidesInfo[i].IsQuizPassed ? "green-stat" : "red-stat";
-								<td data-sort-value="@(user.Value.SlidesInfo[i].QuizSuccessful + 10000)"
+								var styleClass = @user.SlidesSlideInfo[i].IsQuizPassed ? "green-stat" : "red-stat";
+								<td data-sort-value="@(user.SlidesSlideInfo[i].QuizPercentage + 10000)"
 									class="@styleClass">
-									@(user.Value.SlidesInfo[i].QuizSuccessful)%
+									@(user.SlidesSlideInfo[i].QuizPercentage)%
 								</td>
 							}
 							else
 							{
-								var styleClass = @user.Value.SlidesInfo[i].IsVisited ? "green-stat" : "red-stat";
+								var styleClass = @user.SlidesSlideInfo[i].IsVisited ? "green-stat" : "red-stat";
 								<td data-sort-value="@styleClass" class="@styleClass"></td>
 							}
 						}

@@ -62,24 +62,25 @@ namespace uLearn
 			return courses.Get(courseId);
 		}
 
+		private static readonly object ReloadLock = new object();
+		
 		private void ReloadNewStagedCourses()
 		{
-			var reloadTime = DateTime.Now;
-			var courseZips = stagedDirectory.GetFiles("*.zip").Where(d => d.LastWriteTime > lastReloadTime);
-			Exception lastException = null;
-			foreach (var zipFile in courseZips)
-				try
-				{
-					ReloadCourseFromZip(zipFile);
-				}
-				catch(Exception e)
-				{
-					Debug.Write("Error loading course file " + zipFile.Name);
-					Debug.Write(e.ToString());
-					lastException = new Exception("Error loading course " + zipFile.Name, e);
-				}
-			if (lastException != null) throw lastException;
-			lastReloadTime = reloadTime;
+			lock (ReloadLock)
+			{
+				var reloadTime = DateTime.Now;
+				var courseZips = stagedDirectory.GetFiles("*.zip").Where(d => d.LastWriteTime > lastReloadTime);
+				foreach (var zipFile in courseZips)
+					try
+					{
+						ReloadCourseFromZip(zipFile);
+					}
+					catch (Exception e)
+					{
+						throw new Exception("Error loading course from " + zipFile.Name, e);
+					}
+				lastReloadTime = reloadTime;
+			}
 		}
 
 		private void ReloadCourseFromZip(FileInfo zipFile)

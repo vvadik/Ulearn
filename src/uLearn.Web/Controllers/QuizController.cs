@@ -131,13 +131,14 @@ namespace uLearn.Web.Controllers
 		{
 			if (!choiseBlock.Multiple)
 			{
-				var isTrue = choiseBlock.Items.First(x => x.Id == data.First().ItemId).IsCorrect;
+				var answerItemId = data.First().ItemId;
+				var isTrue = choiseBlock.Items.First(x => x.Id == answerItemId).IsCorrect;
 				return new List<QuizInfoForDb>
 				{
 					new QuizInfoForDb
 					{
 						QuizId = choiseBlock.Id,
-						ItemId = data.First().ItemId,
+						ItemId = answerItemId,
 						IsRightAnswer = isTrue,
 						Text = null,
 						QuizType = typeof (ChoiceBlock),
