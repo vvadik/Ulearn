@@ -89,7 +89,7 @@ namespace uLearn.Web.Controllers
 				}
 				else
 				{
-					ModelState.AddModelError("", "Invalid username or password.");
+					ModelState.AddModelError("", "Неверное имя пользователя или пароль.");
 				}
 			}
 
@@ -157,13 +157,13 @@ namespace uLearn.Web.Controllers
 		{
 			ViewBag.StatusMessage =
 				message == ManageMessageId.ChangePasswordSuccess
-					? "Your password has been changed."
+					? "Пароль был изменен."
 					: message == ManageMessageId.SetPasswordSuccess
-						? "Your password has been set."
+						? "Пароль установлен."
 						: message == ManageMessageId.RemoveLoginSuccess
-							? "The external login was removed."
+							? "Внешний логин удален."
 							: message == ManageMessageId.Error
-								? "An error has occurred."
+								? "Ошибка."
 								: "";
 			ViewBag.HasLocalPassword = HasPassword();
 			ViewBag.ReturnUrl = Url.Action("Manage");

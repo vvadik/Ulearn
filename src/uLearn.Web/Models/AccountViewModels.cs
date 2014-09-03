@@ -4,19 +4,19 @@ namespace uLearn.Web.Models
 {
 	public class ExternalLoginConfirmationViewModel
 	{
-		[Required]
+		[Required(ErrorMessage = "Это обязательное поле")]
 		[Display(Name = "Имя (логин)")]
 		public string UserName { get; set; }
 	}
 
 	public class ManageUserViewModel
 	{
-		[Required]
+		[Required(ErrorMessage = "{0} — это обязательное поле")]
 		[DataType(DataType.Password)]
 		[Display(Name = "Текущий пароль")]
 		public string OldPassword { get; set; }
 
-		[Required]
+		[Required(ErrorMessage = "{0} — это обязательное поле")]
 		[StringLength(100, ErrorMessage = "{0} должен быть длиной как минимум {2} символов.", MinimumLength = 6)]
 		[DataType(DataType.Password)]
 		[Display(Name = "Новый пароль")]
@@ -30,11 +30,11 @@ namespace uLearn.Web.Models
 
 	public class LoginViewModel
 	{
-		[Required]
+		[Required(ErrorMessage = "{0} — это обязательное поле")]
 		[Display(Name = "Имя (логин)")]
 		public string UserName { get; set; }
 
-		[Required]
+		[Required(ErrorMessage = "{0} — это обязательное поле")]
 		[DataType(DataType.Password)]
 		[Display(Name = "Пароль")]
 		public string Password { get; set; }
@@ -45,11 +45,11 @@ namespace uLearn.Web.Models
 
 	public class RegisterViewModel
 	{
-		[Required]
+		[Required(ErrorMessage = "{0} — это обязательное поле")]
 		[Display(Name = "Имя (логин)")]
 		public string UserName { get; set; }
 
-		[Required]
+		[Required(ErrorMessage = "{0} — это обязательное поле")]
 		[StringLength(100, ErrorMessage = "{0} должен быть длиной как минимум {2} символов.", MinimumLength = 6)]
 		[DataType(DataType.Password)]
 		[Display(Name = "Пароль")]
@@ -57,7 +57,9 @@ namespace uLearn.Web.Models
 
 		[DataType(DataType.Password)]
 		[Display(Name = "Подтвердите пароль")]
-		[Compare("Password", ErrorMessage = "Подтверждение пароля и пароль отличаются.")]
+		// Bug workaround. Details: http://stackoverflow.com/questions/19978239/custom-errormessage-for-compare-attribute-does-not-work
+		// ReSharper disable once CSharpWarnings::CS0618
+		[System.Web.Mvc.Compare("Password", ErrorMessage = "Подтверждение пароля и пароль отличаются.")]
 		public string ConfirmPassword { get; set; }
 	}
 }
