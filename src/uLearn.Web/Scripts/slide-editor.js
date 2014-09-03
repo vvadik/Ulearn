@@ -18,7 +18,7 @@ function codeMirrorClass(c, editable) {
 				"Ctrl-Space": "autocomplete",
 				".": function(cm) {
 					setTimeout(function() { cm.execCommand("autocomplete"); }, 100);
-					throw CodeMirror.Pass;
+					return CodeMirror.Pass;
 				}
 			},
 			readOnly: !editable,

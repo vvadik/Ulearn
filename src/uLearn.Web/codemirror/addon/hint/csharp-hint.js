@@ -181,8 +181,7 @@
 
 	function getCompletions(beforeDot, start, afterDot) {
 		var found = [];
-		console.log("|" + start + "|");
-
+		
 		function maybeAdd(str) {
 			if (str.toLowerCase().lastIndexOf(start.toLowerCase(), 0) == 0 && !arrayContains(found, str))
 				found.push(str);

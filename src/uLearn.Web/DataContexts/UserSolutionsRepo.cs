@@ -93,14 +93,21 @@ namespace uLearn.Web.DataContexts
 		{
 			var solutionForLike = db.UserSolutions.Find(solutionId);
 			if (solutionForLike == null) throw new Exception("Solution " + solutionId + " not found");
-			var hisLike = solutionForLike.Likes.FirstOrDefault(like => like.UserId == userId);
+			var hisLike = db.SolutionLikes.FirstOrDefault(like => like.UserId == userId && like.UserSolutionId == solutionId);
 			var votedAlready = hisLike != null;
+			var likesCount = solutionForLike.Likes.Count();
 			if (votedAlready)
-				solutionForLike.Likes.Remove(hisLike);
+			{
+				db.SolutionLikes.Remove(hisLike);
+				likesCount--;
+			}
 			else
-				solutionForLike.Likes.Add(new Like {UserSolutionId = solutionId, Timestamp = DateTime.Now, UserId = userId});
+			{
+				db.SolutionLikes.Add(new Like {UserSolutionId = solutionId, Timestamp = DateTime.Now, UserId = userId});
+				likesCount++;
+			}
 			await db.SaveChangesAsync();
-			return Tuple.Create(solutionForLike.Likes.Count(), !votedAlready);
+			return Tuple.Create(likesCount, !votedAlready);
 		}
 
 		public List<AcceptedSolutionInfo> GetAllAcceptedSolutions(string courseId, string slideId)
