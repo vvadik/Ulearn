@@ -92,7 +92,7 @@
 								var styleClass = @user.SlidesSlideInfo[i].IsQuizPassed ? "green-stat" : "red-stat";
 								<td data-sort-value="@(user.SlidesSlideInfo[i].QuizPercentage + 10000)"
 									class="@styleClass">
-									@(user.SlidesSlideInfo[i].QuizPercentage)%
+									@(user.SlidesSlideInfo[i].QuizPercentage.ToString("P0"))
 								</td>
 							}
 							else

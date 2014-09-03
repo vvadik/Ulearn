@@ -249,9 +249,9 @@ namespace uLearn.Web.Controllers
 			{
 				SlideId = s.Id,
 				SlideTitle = s.Title,
-				NotUnderstand = rates[s.Id].Count(r => r.Rate == SlideRates.NotUnderstand),
-				Good = rates[s.Id].Count(r => r.Rate == SlideRates.Good),
-				Trivial = rates[s.Id].Count(r => r.Rate == SlideRates.Trivial),
+				NotUnderstand = rates[s.Id].Where(r => r.Rate == SlideRates.NotUnderstand).Sum(r => r.count),
+				Good = rates[s.Id].Where(r => r.Rate == SlideRates.Good).Sum(r => r.count),
+				Trivial = rates[s.Id].Where(r => r.Rate == SlideRates.Trivial).Sum(r => r.count),
 			}).ToArray();
 		}
 
@@ -325,7 +325,7 @@ namespace uLearn.Web.Controllers
 						AttemptsCount = slide.solutions.Count(),
 						IsExerciseSolved = slide.solutions.Any(sol => sol),
 						IsQuizPassed = slide.quizAnswers.Any(),
-						QuizPercentage = slide.quizAnswers.Any() ? 100.0 * slide.quizAnswers.Count(q => q) / slide.quizAnswers.Count() : 0.0,
+						QuizPercentage = slide.quizAnswers.Any() ? (double)slide.quizAnswers.Count(q => q) / slide.quizAnswers.Count() : 0.0,
 						IsVisited = slide.solutions.Any() // Если была запись в visited
 					}).ToArray();
 			return userInfo;
