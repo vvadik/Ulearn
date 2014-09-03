@@ -1,9 +1,36 @@
+/*#region js-classes */
+/* ReSharper disable DeclarationIsEmpty */
+.quiz {
+}
+
+.true {
+}
+
+
+.false {
+}
+
+.answered {
+}
+
+.quiz-block-mark {
+}
+
+.quiz-block-input {
+}
+
+.load-content {
+}
+/* ReSharper restore DeclarationIsEmpty */
+/*#endregion */
+
 .jumbotron-logo {
-	float:left;
+	float: left;
 	margin: 30px;
 	margin-top: -20px;
 	margin-bottom: 0px;
 }
+
 .course-header {
 	background-color: #6f5499;
 	color: white;
@@ -404,25 +431,6 @@ div.quiz .right-quiz {
 	display: block;
 }
 
-.quiz {
-}
-
-
-.true {
-}
-
-.false {
-}
-
-.answered {
-}
-
-.quiz-block-mark {
-}
-
-.quiz-block-input {
-}
-
 .quiz-delimeter {
 	margin-bottom: 40px;
 	margin-top: 40px;
@@ -477,5 +485,5 @@ div.quiz .right-quiz {
 }
 
 .table.table-autowidth {
-	width:auto
+	width: auto;
 }

@@ -775,6 +775,9 @@
     <Content Include="Views\Course\InstructorNote.cshtml" />
     <Content Include="Views\Course\SelectGroup.cshtml" />
     <Content Include="Views\Course\Questions.cshtml" />
+    <Content Include="Views\Analytics\DailyStatistics.cshtml" />
+    <Content Include="Views\Analytics\UsersProgress.cshtml" />
+    <Content Include="Views\Analytics\SlideRatings.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

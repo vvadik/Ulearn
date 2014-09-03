@@ -1,0 +1,69 @@
+﻿@using uLearn
+@model uLearn.Web.Controllers.UserProgressViewModel
+
+<table class="tablesorter">
+	<thead>
+		<tr>
+			<th>Имя</th>
+			<th>Группа</th>
+			@foreach (var slide in Model.Slides)
+			{
+				string text;
+				if (slide is ExerciseSlide)
+				{
+					text = "Попыток решить:";
+				}
+				else if (slide is QuizSlide)
+				{
+					text = "Успешность квиза:";
+				}
+				else
+				{
+					text = "Посещаемость:";
+				}
+				<th>
+					<p>@slide.Title</p>
+					<p>@text</p>
+				</th>
+			}
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var user in Model.Users)
+		{
+			<tr>
+				<td>
+					<h6>@user.UserName</h6>
+				</td>
+				<td data-sort-value="@user.UserGroup">
+					<input id="@(user.UserId)" onblur="changeGroup('@user.UserId')" data-url="@Url.Action("AddUserGroup", "Analytics")" type="text" value="@user.UserGroup" />
+				</td>
+				@for (var i = 0; i < user.SlidesSlideInfo.Length; i++)
+				{
+					if (Model.Slides[i] is ExerciseSlide)
+					{
+						var styleClass = @user.SlidesSlideInfo[i].IsExerciseSolved ? "green-stat" : "red-stat";
+						<td data-sort-value="@(user.SlidesSlideInfo[i].AttemptsCount + 1000000)"
+							class="@styleClass">
+							@user.SlidesSlideInfo[i].AttemptsCount
+						</td>
+					}
+					else if (Model.Slides[i] is QuizSlide)
+					{
+						var styleClass = @user.SlidesSlideInfo[i].IsQuizPassed ? "green-stat" : "red-stat";
+						<td data-sort-value="@(user.SlidesSlideInfo[i].QuizPercentage + 10000)"
+							class="@styleClass">
+							@(user.SlidesSlideInfo[i].QuizPercentage.ToString("P0"))
+						</td>
+					}
+					else
+					{
+						var styleClass = @user.SlidesSlideInfo[i].IsVisited ? "green-stat" : "red-stat";
+						<td data-sort-value="@styleClass" class="@styleClass"></td>
+					}
+				}
+			</tr>
+		}
+	</tbody>
+</table>
+<script src="~/Scripts/user-group-name-change.js"></script>

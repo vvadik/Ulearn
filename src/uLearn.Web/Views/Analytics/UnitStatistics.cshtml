@@ -1,7 +1,7 @@
-﻿@using uLearn
-@model UnitStatisticPageModel
+﻿@model UnitStatisticPageModel
 @{
 	ViewBag.Title = "Статистика и успеваемость | uLearn";
+	var args = new {courseId = Model.CourseId, unitName = Model.UnitName};
 }
 
 <body>
@@ -15,155 +15,23 @@
 		</ul>
 
 		<h2 id="rate">Оценки слайдов</h2>
-		<table class="table table-condensed table-autowidth">
-			<thead>
-				<tr>
-					<th>Слайд</th>
-					<th>Непонятно</th>
-					<th>Хорошо</th>
-					<th>Тривиально</th>
-				</tr>
-			</thead>
-			<tbody>
-				@foreach (var slide in Model.SlideRateStats)
-				{
-					<tr>
-						<td>@slide.SlideTitle</td>
-						<td>@slide.NotUnderstand</td>
-						<td>@slide.Good</td>
-						<td>@slide.Trivial</td>
-					</tr>
-				}
-			</tbody>
-		</table>
+		<div class="load-content" data-url="@Url.Action("SlideRatings", args)"></div>
 
 		<h2 id="questions">Заданные вопросы</h2>
-		@Html.Action("Questions", "Course", new { unitName = Model.UnitName })
+		<div class="load-content" data-url="@Url.Action("Questions", "Course", args)"></div>
 
 		<h2 id="timeline">Общая динамика прогресса</h2>
-		<div class="row">
-			<div id="timelineChart" style="margin-right:50px;" class="pull-left"></div>
-			<table id="timelineTable" class="table table-autowidth table-condensed table-striped">
-				<thead>
-					<tr>
-						<th>Дата</th>
-						<th title="Просмотрено впервые посещенных слайдов">Слайдов посещено</th>
-						<th title="Количество пройденных слайдов с задачами/тестами (несколько решений одной задачи одним пользователем считается за единицу)">Задач решено</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var day in Model.DailyStatistics)
-					{
-						<tr>
-							<td>@day.Day.ToString("dd.MM.yy")</td>
-							<td>@day.SlidesVisited</td>
-							<td>@day.TasksSolved</td>
-						</tr>
-					}
-				</tbody>
-			</table>
-			<div class="clearfix"></div>
-		</div>
+		<div class="load-content" data-url="@Url.Action("DailyStatistics", args)"></div>
 
-			<h2 id="progress">Прогресс по студентам</h2>
-			<table class="tablesorter">
-				<thead>
-					<tr>
-						<th>Имя</th>
-						<th>Группа</th>
-						@foreach (var slide in Model.Slides)
-						{
-							string text;
-							if (slide is ExerciseSlide)
-							{
-								text = "Попыток решить:";
-							}
-							else if (slide is QuizSlide)
-							{
-								text = "Успешность квиза:";
-							}
-							else
-							{
-								text = "Посещаемость:";
-							}
-							<th>
-								<p>@slide.Title</p>
-								<p>@text</p>
-							</th>
-						}
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var user in Model.UsersInfo)
-					{
-						<tr>
-							<td>
-								<h6>@user.UserName</h6>
-							</td>
-							<td data-sort-value="@user.UserGroup">
-								<input id="@(user.UserId)" onblur="changeGroup('@user.UserId')" data-url="@Url.Action("AddUserGroup", "Analytics")" type="text" value="@user.UserGroup" />
-							</td>
-							@for (var i = 0; i < user.SlidesSlideInfo.Length; i++)
-							{
-								if (Model.Slides[i] is ExerciseSlide)
-								{
-									var styleClass = @user.SlidesSlideInfo[i].IsExerciseSolved ? "green-stat" : "red-stat";
-									<td data-sort-value="@(user.SlidesSlideInfo[i].AttemptsCount + 1000000)"
-										class="@styleClass">
-										@user.SlidesSlideInfo[i].AttemptsCount
-									</td>
-								}
-								else if (Model.Slides[i] is QuizSlide)
-								{
-									var styleClass = @user.SlidesSlideInfo[i].IsQuizPassed ? "green-stat" : "red-stat";
-									<td data-sort-value="@(user.SlidesSlideInfo[i].QuizPercentage + 10000)"
-										class="@styleClass">
-										@(user.SlidesSlideInfo[i].QuizPercentage.ToString("P0"))
-									</td>
-								}
-								else
-								{
-									var styleClass = @user.SlidesSlideInfo[i].IsVisited ? "green-stat" : "red-stat";
-									<td data-sort-value="@styleClass" class="@styleClass"></td>
-								}
-							}
-						</tr>
-					}
-				</tbody>
-			</table>
-
+		<h2 id="progress">Прогресс по студентам</h2>
+		<div class="load-content" data-url="@Url.Action("UsersProgress", args)"></div>
 </div>
 </body>
 
 @section scripts{
 	<script src="~/tablesorter-master/jquery.tablesorter.js"></script>
 	<script src="~/Scripts/table-configurator.js"></script>
-	<script src="~/Scripts/user-group-name-change.js"></script>
 	<script src="//code.highcharts.com/highcharts.js"></script>
 	<script src="//code.highcharts.com/modules/data.js"></script>
-	<script>
-		$(function () {
-			$('#timelineChart').highcharts({
-				data: {
-					table: document.getElementById('timelineTable')
-				},
-				chart: {
-					type: 'line'
-				},
-				title: {
-					text: ''
-				},
-				xAxis: {
-					type: 'datetime',
-					tickInterval: 24 * 3600000
-				},
-				yAxis: {
-					allowDecimals: false,
-					title: {
-						text: 'Пройдено слайдов'
-					}
-				},
-			});
-		});
-	</script>
+
 }

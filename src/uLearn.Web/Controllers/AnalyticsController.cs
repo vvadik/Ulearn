@@ -227,10 +227,36 @@ namespace uLearn.Web.Controllers
 				UnitName = unitName,
 				Slides = slides,
 				SlideRateStats = GetSlideRateStats(course, slides),
-				UsersInfo = GetUserInfos(course, slides).OrderByDescending(GetRating).ToList(),
-				DailyStatistics = GetDailyStatistics(course, slides)
 			};
 			return View(model);
+		}
+		
+		public ActionResult SlideRatings(string courseId, string unitName)
+		{
+			var course = courseManager.GetCourse(courseId);
+			var slides = course.Slides
+				.Where(s => s.Info.UnitName == unitName).ToArray();
+			var model = GetSlideRateStats(course, slides);
+			return PartialView(model);
+		}
+
+		public ActionResult DailyStatistics(string courseId, string unitName)
+		{
+			var course = courseManager.GetCourse(courseId);
+			var slides = course.Slides
+				.Where(s => s.Info.UnitName == unitName).ToArray();
+			var model = GetDailyStatistics(course, slides);
+			return PartialView(model);
+		}
+
+
+		public ActionResult UsersProgress(string courseId, string unitName)
+		{
+			var course = courseManager.GetCourse(courseId);
+			var slides = course.Slides
+				.Where(s => s.Info.UnitName == unitName).ToArray();
+			var users = GetUserInfos(course, slides).OrderByDescending(GetRating).ToArray();
+			return PartialView(new UserProgressViewModel{Slides = slides, Users = users});
 		}
 
 		private DailyStatistics[] GetDailyStatistics(Course course, Slide[] slides)
@@ -387,7 +413,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize(Roles = LmsRoles.Instructor)]
 		public async Task<ActionResult> AddUserGroup(string groupName, string userName)
 		{
 			db.Users.First(x => x.UserName == userName).GroupName = groupName;
@@ -395,4 +420,11 @@ namespace uLearn.Web.Controllers
 			return null;
 		}
 	}
+
+	public class UserProgressViewModel
+	{
+		public UserInfo[] Users;
+		public Slide[] Slides;
+	}
+
 }
