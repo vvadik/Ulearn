@@ -215,6 +215,10 @@
     <Compile Include="Migrations\201408260518531_Cascading.Designer.cs">
       <DependentUpon>201408260518531_Cascading.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201409031100489_VisitTimestamp.cs" />
+    <Compile Include="Migrations\201409031100489_VisitTimestamp.Designer.cs">
+      <DependentUpon>201409031100489_VisitTimestamp.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\AcceptedSolutionsPageModel.cs" />
     <Compile Include="Models\AnalyticsTablePageModel.cs" />
     <Compile Include="Models\ChoiceGroupPageModel.cs" />
@@ -362,6 +366,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201408260518531_Cascading.resx">
       <DependentUpon>201408260518531_Cascading.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201409031100489_VisitTimestamp.resx">
+      <DependentUpon>201409031100489_VisitTimestamp.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

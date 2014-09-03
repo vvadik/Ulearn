@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -225,9 +227,62 @@ namespace uLearn.Web.Controllers
 				UnitName = unitName,
 				Slides = slides,
 				SlideRateStats = GetSlideRateStats(course, slides),
-				UsersInfo = GetUserInfos(course, slides).OrderByDescending(GetRating).ToList()
+				UsersInfo = GetUserInfos(course, slides).OrderByDescending(GetRating).ToList(),
+				DailyStatistics = GetDailyStatistics(course, slides)
 			};
 			return View(model);
+		}
+
+		private DailyStatistics[] GetDailyStatistics(Course course, Slide[] slides)
+		{
+			var slideIds = slides.Select(s => s.Id).ToArray();
+			var courseId = course.Id;
+			var lastDay = DateTime.Now.Date.Add(new TimeSpan(0, 23, 59, 59, 999));
+			var firstDay = lastDay.Date.AddDays(-14);
+			var tasks = GetTasksSolvedStats(slideIds, firstDay, lastDay);
+			var quizes = GetQuizPassedStats(slideIds, firstDay, lastDay);
+			var visits = GetSlidesVisitedStats(slideIds, firstDay, lastDay);
+			var result =
+				Enumerable.Range(0, 14)
+				.Select(diff => lastDay.AddDays(-diff).Date)
+				.Select(date => new DailyStatistics
+				{
+					Day = date, 
+					TasksSolved = tasks.Get(date, 0) + quizes.Get(date, 0),
+					SlidesVisited = visits.Get(date, 0)
+				})
+				.ToArray();
+			return result;
+		}
+
+		private Dictionary<DateTime, int> GetTasksSolvedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
+		{
+			var q = from s in db.UserSolutions
+					where slideIds.Contains(s.SlideId) && s.Timestamp > firstDay && s.Timestamp <= lastDay && s.IsRightAnswer
+					group s by DbFunctions.TruncateTime(s.Timestamp)
+						into day
+						select new { day.Key, count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
+			return q.ToDictionary(d => d.Key.Value, d => d.count);
+		}
+
+		private Dictionary<DateTime, int> GetQuizPassedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
+		{
+			var query = from q in db.UserQuizzes
+						where slideIds.Contains(q.SlideId) && q.Timestamp > firstDay && q.Timestamp <= lastDay
+						group q by DbFunctions.TruncateTime(q.Timestamp)
+							into day
+							select new { day.Key, count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
+			return query.ToDictionary(d => d.Key.Value, d => d.count);
+		}
+		
+		private Dictionary<DateTime, int> GetSlidesVisitedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
+		{
+			var query = from v in db.Visiters
+						where slideIds.Contains(v.SlideId) && v.Timestamp > firstDay && v.Timestamp <= lastDay
+						group v by DbFunctions.TruncateTime(v.Timestamp)
+							into day
+							select new { day.Key, count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
+			return query.ToDictionary(d => d.Key.Value, d => d.count);
 		}
 
 		private SlideRateStats[] GetSlideRateStats(Course course, IEnumerable<Slide> slides)

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace uLearn.Web.Models
 {
@@ -10,6 +12,15 @@ namespace uLearn.Web.Models
 		public SlideRateStats[] SlideRateStats { get; set; }
 		public Slide[] Slides { get; set; }
 		public List<UserInfo> UsersInfo { get; set; }
+		public DailyStatistics[] DailyStatistics { get; set; }
+	}
+
+	public class DailyStatistics
+	{
+		public DateTime Day { get; set; }
+		public int SlidesVisited { get; set; }
+		public int TasksSolved { get; set; }
+		public int QuizesPassed { get; set; }
 	}
 
 	public class SlideRateStats

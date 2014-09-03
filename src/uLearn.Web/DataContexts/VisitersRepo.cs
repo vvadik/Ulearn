@@ -29,7 +29,8 @@ namespace uLearn.Web.DataContexts
 			{
 				UserId = userId,
 				CourseId = courseId,
-				SlideId = slideId
+				SlideId = slideId,
+				Timestamp = DateTime.Now
 			});
 			await db.SaveChangesAsync();
 		}

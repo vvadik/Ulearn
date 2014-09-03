@@ -24,5 +24,8 @@ namespace uLearn.Web.Models
 		[Required]
 		[StringLength(64)]
 		public string SlideId { get; set; }
+
+		[Required]
+		public DateTime Timestamp { get; set; }
 	}
 }
