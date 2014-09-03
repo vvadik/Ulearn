@@ -12,7 +12,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		Функция должна принимать неотрицательные коэффиценты __a__, __b__, __c__ и, если решение существует, печатать на консоль искомый __x__ , а иначе — строку `Impossible`.
 		*/
 
-		[ExpectedOutput("-1\r\nImpossible\r\n-0.2\r\n-0.375\r\nImpossible\r\nImpossible")]
+		[ExpectedOutput("-1\r\nImpossible\r\n-0.2\r\n-0.375\r\nImpossible")]
 		[Hint("Помните, что в вашу метод могут передать некорректные значения")]
 		[Hint("Используйте `if`")]
 		[Hint("Можете погуглить про так называемый 'тернарный оператор' — он позволяет обойтись без `if`")]
