@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides
@@ -8,15 +7,15 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	class S041_RuntimeErrors
 	{
 		/*
-		Вам надо реализовать функцию для нахождения минимального значения параболы, заданной уравнением вида ax^2+bx+c=0.
-		Функция принимает коэффиценты ```a,b,c``` и, если они корректны, печатает минимальное значение, иначе строку "Impossible".
-		Все коэффиценты больше или равны нулю.
+		Реализуйте функцию для нахождения такого __x__, при котором парабола ax<sup>2</sup> + bx + c = 0 принимает минимальное значение.
+		
+		Функция должна принимать неотрицательные коэффиценты __a__, __b__, __c__ и, если решение существует, печатать на консоль искомый __x__ , а иначе — строку `Impossible`.
 		*/
 
-		[ExpectedOutput("-1\r\nImpossible\r\n-0.2\r\n-0.375\r\nImpossible")]
+		[ExpectedOutput("-1\r\nImpossible\r\n-0.2\r\n-0.375\r\nImpossible\r\nImpossible")]
 		[Hint("Помните, что в вашу метод могут передать некорректные значения")]
-		[Hint("Проверка - ключ к успеху. Ищите ```if```")]
-		[Hint("Если вам очень интересно - прочитайте про тернарные операторы")]
+		[Hint("Используйте `if`")]
+		[Hint("Можете погуглить про так называемый 'тернарный оператор' — он позволяет обойтись без `if`")]
 		public static void Main()
 		{
 			WriteParabolaMinX(1, 2, 3);
