@@ -1,16 +1,12 @@
-﻿function changeGroup(key) {
-	console.log(key);
-	var $textarea = $("#" + key);
+﻿function changeGroup(userId) {
+	var $textarea = $("#" + userId);
 	var group = $textarea.val();
 	$.ajax({
 		type: "POST",
 		url: $textarea.data("url"),
 		data: {
 			groupName: group,
-			userName : key
+			userId: userId
 		}
-	}).success(function (ans) {
-	}).fail(function (req) {
-	}).always(function (ans) {
 	});
 }

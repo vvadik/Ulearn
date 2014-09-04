@@ -7,9 +7,9 @@ namespace uLearn
 	{
 		public string HintText { get; set; }
 
-		public HintAttribute(params string[] hintLines)
+		public HintAttribute(string hint)
 		{
-			HintText = string.Join("\n", hintLines);
+			HintText = hint;
 		}
 	}
 }

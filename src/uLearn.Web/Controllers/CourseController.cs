@@ -126,7 +126,7 @@ namespace uLearn.Web.Controllers
 		{
 			var userId = User.Identity.GetUserId();
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.Slides[slideIndex];
+			var slide = (ExerciseSlide)course.Slides[slideIndex];
 			var isPassed = solutionsRepo.IsUserPassedTask(courseId, slide.Id, userId);
 			var solutions = isPassed
 				? solutionsRepo.GetAllAcceptedSolutions(courseId, slide.Id)

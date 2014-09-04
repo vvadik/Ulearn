@@ -27,7 +27,7 @@ namespace uLearn.CSharp
 			var sourceForTestingRoot = exerciseBuilder.Visit(tree.GetRoot());
 			if (!exerciseBuilder.IsExercise)
 				return new Slide(blocksBuilder.Blocks, slideInfo, blocksBuilder.Title, blocksBuilder.Id);
-			return new ExerciseSlide(blocksBuilder.Blocks, exerciseBuilder.ExerciseInitialCode, exerciseBuilder.ExpectedOutput, exerciseBuilder.Hints,
+			return new ExerciseSlide(blocksBuilder.Blocks, exerciseBuilder.ExerciseInitialCode, exerciseBuilder.ExpectedOutput, exerciseBuilder.Hints, exerciseBuilder.CommentAfterExerciseIsSolved,
 				new SolutionBuilder(sourceForTestingRoot, prelude, exerciseBuilder.Validators, exerciseBuilder.TemplateSolution), slideInfo, blocksBuilder.Title, blocksBuilder.Id, exerciseBuilder.HideExpectedOutputOnError);
 		}
 	}

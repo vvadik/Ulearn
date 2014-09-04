@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 {
@@ -24,13 +20,6 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 
 		public class Program
 		{
-			static string ColorName(Colors color)
-			{
-				if (color == Colors.Red) return "Красный";
-				else if (color == Colors.Blue) return "Синий";
-				else return "Зеленый";
-			}
-
 			static string ColorNameWrongWay(Colors color)
 			{
 				if (color == Colors.Red) return "Красный";
@@ -46,10 +35,32 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 				Но метод должен вернуть значение в любом случае, поэтому это - ошибка. 
 				*/
 			}
-		}
 
-		public class Program2
-		{
+			static string ColorNameGoodWay(Colors color)
+			{
+				if (color == Colors.Red) return "Красный";
+				if (color == Colors.Blue) return "Синий";
+				if (color == Colors.Green) return "Зеленый";
+				throw new Exception("Unknown color " + color);
+				/* 
+				В большинстве случаев писать нужно именно так.
+				Если появится новый цвет, то "магическая" строка throw new Exception
+				сгенерирует исключительную ситуацию, которая прервет работу программы.
+
+				Обычно падение программы в таком случае лучше, чем некорректная работа.
+ 				(Лучше вообще не стрелять, чем стрелять не туда)
+				*/
+			}
+
+			// Если совершенно точно известно, что новые цвета появляться не будут, можно писать так:
+			static string ColorName(Colors color)
+			{
+				if (color == Colors.Red) return "Красный";
+				else if (color == Colors.Blue) return "Синий";
+				else return "Зеленый";
+			}
+
+
 			//Часто встречающиеся стилевые ошибки
 
 			//Допустим, вы решили написать метод, возвращающий отрицание переменной

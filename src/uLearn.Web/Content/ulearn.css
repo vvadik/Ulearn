@@ -264,7 +264,9 @@ a.nav-arrow:hover {
 	background-color: lightgreen;
 	padding: 10px 15px;
 	border-bottom: 1px solid transparent;
+	-ms-border-top-right-radius: 3px;
 	border-top-right-radius: 3px;
+	-ms-border-top-left-radius: 3px;
 	border-top-left-radius: 3px;
 }
 

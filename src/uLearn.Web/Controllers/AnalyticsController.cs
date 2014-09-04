@@ -413,9 +413,9 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> AddUserGroup(string groupName, string userName)
+		public async Task<ActionResult> AddUserGroup(string groupName, string userId)
 		{
-			db.Users.First(x => x.UserName == userName).GroupName = groupName;
+			db.Users.First(x => x.Id == userId).GroupName = groupName;
 			await db.SaveChangesAsync();
 			return null;
 		}

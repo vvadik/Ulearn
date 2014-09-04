@@ -1,4 +1,5 @@
-﻿@model AcceptedSolutionsPageModel
+﻿@using uLearn
+@model AcceptedSolutionsPageModel
 
 @{
 	ViewBag.Title = Model.CourseTitle + " | uLearn";
@@ -10,7 +11,9 @@
 	<div class="container body-content">
 		<div class="row">
 			<div id="LikeSolutionUrl" data-url="@Url.Action("LikeSolution")"></div>
-			<h1 class='page-header'>Другие решения</h1>
+			<h1 class='page-header'>Решения</h1>
+			<p>@Html.Raw(Model.Slide.CommentAfterExerciseIsSolved.RenderMd())</p>
+
 			@foreach (AcceptedSolutionInfo solution in Model.AcceptedSolutions)
 			{
 				var id = "solution_" + solution.Id;

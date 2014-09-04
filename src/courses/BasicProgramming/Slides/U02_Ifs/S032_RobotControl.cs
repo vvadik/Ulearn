@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using NUnit.Framework;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides
@@ -10,6 +12,9 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		В воскресенье Вася пошел в кружок робототехники и увидел там такой код управления боевым роботом:
 		*/
 
+		public delegate bool ShouldFireDelegate(bool enemyInFront, string enemyName, int enemyHealth, int robotFirePower, int robotHealth);
+
+		[ExcludeFromSolution]
 		static bool ShouldFire(
 			bool enemyInFront, string enemyName, int enemyHealth,
 			int robotFirePower, int robotHealth)
@@ -22,12 +27,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 					if (robotHealth < 50) shouldFire = false;
 					if (robotHealth > 100) shouldFire = true;
 				}
-				else
-				{
-					if (robotFirePower > enemyHealth) return true;
-					else if (enemyHealth < robotHealth) shouldFire = true;
-					else shouldFire = false;
-				}
+				if (robotFirePower > enemyHealth) return true;
+				if (enemyHealth < robotHealth) shouldFire = true;
 			}
 			else
 			{
@@ -37,59 +38,64 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		}
 
 		/*
-		Код показался Васе слишком длинным и он поспорил с автором, что сможет написать функцию,
+		Код показался Васе слишком длинным, а к тому же ещё и неряшливым.
+		Вася поспорил с автором, что сможет написать функцию,
 		делающую ровно то же самое, но всего в один оператор.
 
 		Кажется, Вася погорячился... Или нет? Помогите ему не проиграть в споре!
 		*/
 
-		[ExpectedOutput(@"
-False ?= False
-False ?= False
-True ?= True
-True ?= True
-True ?= True
-True ?= True
-True ?= True
-False ?= False
-False ?= False
-False ?= False
-")]
-		[Hint("Грамотно используйте конъюнкцию вместе с дизъюнкцией")]
+		[Test]
+		[ExcludeFromSolution]
+		[HideOnSlide]
+		public void Test()
+		{
+			Check(ShouldFire, true);
+		}
+
+		[ExpectedOutput(@"Functions are the same!")]
+		[HideOnSlide]
 		public static void Main()
 		{
-			CompareFunctions(true, "Big boss", 1000, 10, 10);
-			CompareFunctions(true, "Big boss", 1000, 10, 65);
-			CompareFunctions(true, "Big boss", 1000, 10, 110);
-			CompareFunctions(true, "Big boss", 0, 10, 110);
-			CompareFunctions(true, "Zombie", 10, 100, 2);
-			CompareFunctions(true, "Zombie", 10, 100, 20);
-			CompareFunctions(true, "Zombie", 10, 1, 20);
-			CompareFunctions(true, "Zombie", 10, 10, 10);
-			CompareFunctions(false, "Zombie", 1, 100, 100);
-			CompareFunctions(false, null, 0, 100, 100);
+			Check(ShouldFire2, false);
 		}
 
-		private static void CompareFunctions(
-			bool enemyInFront, string enemyName, int enemyHealth, 
-			int robotFirePower, int robotHealth)
+		[HideOnSlide]
+		private static void Check(ShouldFireDelegate shouldFireFunction, bool throwOnError)
 		{
-			Console.WriteLine("{0} ?= {1}", 
-				ShouldFire(enemyInFront, enemyName, enemyHealth, robotFirePower, robotHealth),
-				ShouldFire2(enemyInFront, enemyName, enemyHealth, robotFirePower, robotHealth));
+			var errors =
+				from enemyInFront in new[] {true, false}
+				from enemyName in new[] {"Big boss", "Zombie", null}
+				from enemyHealth in new[] {1000, 0, 10, 1}
+				from robotFirePower in new[] {10, 100, 1}
+				from robotHealth in new[] {10, 65, 110, 2, 20}
+				let shouldFire = enemyInFront &&
+				   (enemyName == "Big boss" && robotHealth > 100
+				   || robotFirePower > enemyHealth || robotHealth > enemyHealth)
+				where shouldFire != shouldFireFunction(enemyInFront, enemyName, enemyHealth, robotFirePower, robotHealth)
+				select
+					string.Format("Functions are different on the input ({0}, \"{1}\", {2}, {3}, {4})",
+						enemyInFront, enemyName, enemyHealth, robotFirePower, robotHealth);
+			foreach (var error in errors)
+			{
+				if (throwOnError) throw new Exception(error);
+				Console.WriteLine(error);
+				return;
+			}
+			Console.WriteLine("Functions are the same!");
 		}
-
 
 		[Exercise]
+		[Hint("Грамотно используйте конъюнкцию вместе с дизъюнкцией")]
 		[SingleStatementMethod]
 		static bool ShouldFire2(
-			bool enemyInFront, string enemyName, int enemyHealth, 
+			bool enemyInFront, string enemyName, int enemyHealth,
 			int robotFirePower, int robotHealth)
 		{
 			return enemyInFront &&
-			       (enemyName == "Big boss" && robotHealth > 100 
-				   || robotFirePower > enemyHealth 
-				   || robotHealth > enemyHealth);
+					(enemyName == "Big boss" && robotHealth > 100
+					|| robotFirePower > enemyHealth 
+					|| robotHealth > enemyHealth);
 			/*uncomment
 			return ...
 			*/

@@ -6,7 +6,7 @@ namespace uLearn.Web.Models
 	{
 		public string CourseId;
 		public string CourseTitle;
-		public Slide Slide;
+		public ExerciseSlide Slide;
 		public List<AcceptedSolutionInfo> AcceptedSolutions;
 	}
 }

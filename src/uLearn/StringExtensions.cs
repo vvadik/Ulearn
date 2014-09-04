@@ -8,6 +8,11 @@ namespace uLearn
 {
 	public static class StringExtensions
 	{
+		public static string WithArgs(this string s, params object[] args)
+		{
+			return string.Format(s, args);
+		}
+
 		public static string RemoveBom(this string text)
 		{
 			return text.TrimStart(new[] { '\uFEFF', '\u200B' });

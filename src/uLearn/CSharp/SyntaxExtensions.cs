@@ -31,12 +31,6 @@ namespace uLearn.CSharp
 			return node.GetAttributes<TAttr>().Any();
 		}
 
-		public static string GetHint(this AttributeSyntax attribute)
-		{
-			if (attribute.Name.ToString() != GetAttributeShortName<HintAttribute>()) throw new Exception("Not a HintAttribute");
-			return attribute.GetArgument(0);
-		}
-
 		public static string GetArgument(this AttributeSyntax attribute, int index)
 		{
 			var expr = (LiteralExpressionSyntax)attribute.ArgumentList.Arguments[index].Expression;

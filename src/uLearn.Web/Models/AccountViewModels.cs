@@ -58,8 +58,10 @@ namespace uLearn.Web.Models
 		[DataType(DataType.Password)]
 		[Display(Name = "Подтвердите пароль")]
 		// Bug workaround. Details: http://stackoverflow.com/questions/19978239/custom-errormessage-for-compare-attribute-does-not-work
+#pragma warning disable 0618
 		// ReSharper disable once CSharpWarnings::CS0618
 		[System.Web.Mvc.Compare("Password", ErrorMessage = "Подтверждение пароля и пароль отличаются.")]
+#pragma warning restore 0618
 		public string ConfirmPassword { get; set; }
 	}
 }

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using NUnit.Framework;
 
 namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 {
@@ -15,6 +13,14 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 		## Заметки по лекции
 		*/
 
+		[SetUp]
+		[HideOnSlide]
+		public static void Setup()
+		{
+			Console.SetIn(new StringReader("2310"));
+		}
+
+		[Test]
 		public static void Main()
 		{
 			var a = int.Parse(Console.ReadLine());
