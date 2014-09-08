@@ -1,6 +1,6 @@
 ﻿using uLearn;
 
-namespace OOP.Slides
+namespace OOP.Slides.U01_DataTypes_And_Algorithms
 {
 	[Slide("Задача 'Движение робота'", "{4EDC2CA1-4A74-4B32-B7C5-F5881911D34A}")]
 	public class S060_RobotMoveTask
