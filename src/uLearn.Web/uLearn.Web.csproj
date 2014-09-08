@@ -663,6 +663,7 @@
     <Content Include="Courses.Staging\BasicProgramming.zip" />
     <Content Include="Courses.Staging\linq.zip" />
     <Content Include="Courses.Staging\Web.config" />
+    <Content Include="Courses.Staging\OOP.zip" />
     <None Include="encoding.xsd">
       <SubType>Designer</SubType>
     </None>

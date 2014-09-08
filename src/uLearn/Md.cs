@@ -6,12 +6,13 @@ namespace uLearn
 	{
 		public static string RenderMd(this string md)
 		{
-			return new Markdown
+			var markdown = new Markdown
 			{
 				NewWindowForExternalLinks = true,
-				SafeMode = true
-			}
-			.Transform(md);
+				ExtraMode = true,
+				SafeMode = true,
+			};
+			return markdown.Transform(md);
 		}
 	}
 }

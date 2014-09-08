@@ -16,7 +16,7 @@ namespace uLearn
 		public readonly string TemplateSolution;
 		private readonly List<ISolutionValidator> validators;
 
-		public SolutionBuilder(SyntaxNode sourceForTestingRoot, string prelude, List<ISolutionValidator> validators, string templateSolution)
+		public SolutionBuilder(SyntaxNode sourceForTestingRoot, string prelude, List<ISolutionValidator> validators, string templateSolution, ClassDeclarationSyntax solutionClass)
 		{
 			this.prelude = prelude;
 			this.validators = validators;

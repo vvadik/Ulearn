@@ -18,6 +18,8 @@ namespace uLearn.CSharp
 		public readonly List<string> Hints = new List<string>();
 		public MethodDeclarationSyntax ExerciseNode;
 		public List<ISolutionValidator> Validators = new List<ISolutionValidator>();
+		public ClassDeclarationSyntax SolutionClass;
+		public bool ExerciseMethodVisited = false;
 
 		public ExerciseBuilder()
 			: base(false)
@@ -35,13 +37,16 @@ namespace uLearn.CSharp
 			var isSolutionPart = node.HasAttribute<ExcludeFromSolutionAttribute>() || node.HasAttribute<ExerciseAttribute>();
 			if (node.HasAttribute<ExcludeFromSolutionAttribute>())
 				TemplateSolution += newMember.ToFullString();
-			
+			if (node.HasAttribute<ExerciseAttribute>())
+				ExerciseMethodVisited = true;
 			return isSolutionPart ? null : newMember;
 		}
 
 		public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
 		{
-			return VisitMemberDeclaration(node, base.VisitClassDeclaration(node));
+			var classDeclaration = VisitMemberDeclaration(node, base.VisitClassDeclaration(node));
+			if (SolutionClass == null && ExerciseMethodVisited) SolutionClass = (ClassDeclarationSyntax) classDeclaration;
+			return classDeclaration;
 		}
 
 		public override SyntaxNode VisitEnumDeclaration(EnumDeclarationSyntax node)
@@ -57,6 +62,11 @@ namespace uLearn.CSharp
 		public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
 		{
 			return VisitMemberDeclaration(node, base.VisitFieldDeclaration(node));
+		}
+
+		public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+		{
+			return VisitMemberDeclaration(node, base.VisitPropertyDeclaration(node));
 		}
 
 		public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
