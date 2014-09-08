@@ -18,7 +18,7 @@ namespace uLearn.Web.Models
 					Console.WriteLine(s.Info.UnitName + " " + s.Title);
 				Console.WriteLine();
 			}
-			Assert.That(manager.GetCourses().Count(), Is.EqualTo(2));
+			Assert.That(manager.GetCourses().Count(), Is.EqualTo(3));
 			Assert.That(manager.GetCourse("Linq").Slides.Length, Is.GreaterThan(10));
 		}
 	}

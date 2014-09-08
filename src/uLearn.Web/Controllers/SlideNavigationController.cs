@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -32,6 +33,7 @@ namespace uLearn.Web.Controllers
 			if (currentSlide != null && !visibleUnits.Contains(currentSlide.Info.UnitName))
 				currentSlide = null;
 			var currentUnit = units.FirstOrDefault(u => u.Slides.Contains(currentSlide) && visibleUnits.Contains(u.UnitName));
+			DateTime nextUnitTime = unitsRepo.GetNextUnitPublishTime(courseId);
 			return PartialView(new TocModel
 			{
 				CourseId = course.Id,
@@ -40,6 +42,7 @@ namespace uLearn.Web.Controllers
 				Units = units,
 				VisitedSlideIds = visitedSlideIds,
 				SolvedSlideIds = solvedSlides,
+				NextUnitTime = nextUnitTime
 			});
 		}
 

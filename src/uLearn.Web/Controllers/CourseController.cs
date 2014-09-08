@@ -36,6 +36,7 @@ namespace uLearn.Web.Controllers
 		[Authorize]
 		public async Task<ActionResult> Slide(string courseId, int slideIndex = -1)
 		{
+			if (string.IsNullOrWhiteSpace(courseId)) return RedirectToAction("Index", "Home");
 			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
 			var model = await CreateCoursePageModel(courseId, slideIndex, visibleUnits);
 			if (!visibleUnits.Contains(model.Slide.Info.UnitName))

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace uLearn.Web.Models
 {
@@ -10,6 +11,7 @@ namespace uLearn.Web.Models
 		public Slide CurrentSlide;
 		public HashSet<string> VisitedSlideIds { get; set; }
 		public HashSet<string> SolvedSlideIds { get; set; }
+		public DateTime NextUnitTime { get; set; }
 	}
 
 	public class CourseUnitModel
