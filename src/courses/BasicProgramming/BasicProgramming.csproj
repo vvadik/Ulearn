@@ -212,7 +212,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Slides\InstructorNotes_geom.md" />
+    <None Include="InstructorNotes_geom.md" />
     <None Include="Slides\U02_Ifs\InstructorNotes.md" />
     <None Include="Slides\U03_Cycles\InstructorNotes.md" />
     <None Include="Slides\U04_Arrays\_S050_ValueRferenceType.odp" />

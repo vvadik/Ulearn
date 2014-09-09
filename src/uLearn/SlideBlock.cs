@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 
 namespace uLearn
 {
@@ -8,11 +9,42 @@ namespace uLearn
 
 	public class MdBlock : SlideBlock
 	{
-		public readonly string Markdown;
-
-		public MdBlock(string markdown)
+		public string Markdown
 		{
-			Markdown = markdown.TrimEnd();
+			get { return markdown ?? (markdown = LoadMarkdown()); }
+		}
+
+		private string LoadMarkdown()
+		{
+			try
+			{
+				return new WebClient().DownloadData(url).AsUtf8();
+			}
+			catch (WebException e)
+			{
+				return "Error: Content is not available.\n\n" + e;
+			}
+		}
+
+		private string markdown;
+		private readonly string url;
+
+		private MdBlock(string markdown, string url)
+		{
+			if (markdown != null)
+				this.markdown = markdown.TrimEnd();
+			this.url = url;
+
+		}
+
+		public static MdBlock FromText(string markdown)
+		{
+			return new MdBlock(markdown, null);
+		}
+
+		public static MdBlock FromUrl(string url)
+		{
+			return new MdBlock(null, url);
 		}
 
 		public override string ToString()
@@ -20,6 +52,7 @@ namespace uLearn
 			return string.Format("Markdown {0}", Markdown);
 		}
 	}
+
 
 	public class CodeBlock : SlideBlock
 	{

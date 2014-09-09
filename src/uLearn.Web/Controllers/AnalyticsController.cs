@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
-using System.Data.Entity.Core.Objects;
-using System.Diagnostics;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
-using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using System.Web.Mvc;
 using uLearn.Web.Models;
@@ -256,7 +250,7 @@ namespace uLearn.Web.Controllers
 			var slides = course.Slides
 				.Where(s => s.Info.UnitName == unitName).ToArray();
 			var users = GetUserInfos(course, slides).OrderByDescending(GetRating).ToArray();
-			return PartialView(new UserProgressViewModel{Slides = slides, Users = users});
+			return PartialView(new UserProgressViewModel{Slides = slides, Users = users, CourseId = courseId});
 		}
 
 		private DailyStatistics[] GetDailyStatistics(Course course, Slide[] slides)
@@ -419,10 +413,34 @@ namespace uLearn.Web.Controllers
 			await db.SaveChangesAsync();
 			return null;
 		}
+
+		public ActionResult ShowSolutions(string courseId, string userId, string slideId)
+		{
+			var solutions = db.UserSolutions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
+			ApplicationUser user = db.Users.Find(userId);
+			var course = courseManager.GetCourse(courseId);
+			var model = new UserSolutionsViewModel
+			{
+				User = user,
+				Course = course,
+				Slide = course.GetSlideById(slideId),
+				Solutions = solutions
+			};
+			return View("UserSolutions", model);
+		}
+	}
+
+	public class UserSolutionsViewModel
+	{
+		public ApplicationUser User { get; set; }
+		public Course Course { get; set; }
+		public List<UserSolution> Solutions { get; set; }
+		public Slide Slide { get; set; }
 	}
 
 	public class UserProgressViewModel
 	{
+		public string CourseId;
 		public UserInfo[] Users;
 		public Slide[] Slides;
 	}

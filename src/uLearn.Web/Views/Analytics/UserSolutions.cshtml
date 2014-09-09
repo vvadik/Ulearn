@@ -1,0 +1,26 @@
+﻿@using uLearn
+@model uLearn.Web.Controllers.UserSolutionsViewModel
+
+@{
+	ViewBag.Title = "uLearn | Решения " + Model.User.UserName;
+}
+
+<div class="wide-container">
+	<h2>Решения @Model.User.UserName @Model.User.GroupName
+		<small>
+			@Html.ActionLink(Model.Slide.Title, "Slide", "Course", new { courseId = Model.Course.Id, slideIndex = Model.Slide.Index }, null)
+		</small>
+	</h2>
+	@foreach (var userSolution in Model.Solutions)
+	{
+		<label>@userSolution.GetVerdict()</label> @userSolution.Timestamp 
+
+		@Html.Partial("DisplayTemplates/CodeBlock", new CodeBlock(userSolution.Code))
+		<hr/>
+	}
+</div>
+
+@section scripts{
+	@Scripts.Render("~/slide-js")
+}
+

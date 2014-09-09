@@ -22,7 +22,7 @@
 					text = "Посещаемость:";
 				}
 				<th>
-					<p>@slide.Title</p>
+					<p>@Html.ActionLink(slide.Title, "Slide", "Course", new{courseId=Model.CourseId, slideIndex = slide.Index}, null)</p>
 					<p>@text</p>
 				</th>
 			}
@@ -45,7 +45,8 @@
 						var styleClass = @user.SlidesSlideInfo[i].IsExerciseSolved ? "green-stat" : "red-stat";
 						<td data-sort-value="@(user.SlidesSlideInfo[i].AttemptsCount + 1000000)"
 							class="@styleClass">
-							@user.SlidesSlideInfo[i].AttemptsCount
+							@Html.ActionLink(user.SlidesSlideInfo[i].AttemptsCount.ToString(), "ShowSolutions", new{courseId=Model.CourseId, userId=user.UserId, slideId=Model.Slides[i].Id})
+							
 						</td>
 					}
 					else if (Model.Slides[i] is QuizSlide)

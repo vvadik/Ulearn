@@ -46,5 +46,13 @@ namespace uLearn.Web.Models
 
 		[StringLength(4096)]
 		public string Output { get; set; }
+
+		public string GetVerdict()
+		{
+			if (IsCompilationError) return "CompilationError";
+			if (!IsRightAnswer) return "Wrong Answer";
+			
+			return "Accepted";
+		}
 	}
 }

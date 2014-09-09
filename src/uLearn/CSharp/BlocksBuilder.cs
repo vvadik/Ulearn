@@ -92,8 +92,7 @@ namespace uLearn.CSharp
 
 		private void EmbedExternalMarkdown(string url)
 		{
-			var markdown = new WebClient().DownloadData(url).AsUtf8();
-			Blocks.Add(new MdBlock(markdown));
+			Blocks.Add(MdBlock.FromUrl(url));
 		}
 
 		///<summary>Is child _inside_ Type or Method parent</summary>
@@ -176,7 +175,7 @@ namespace uLearn.CSharp
 					sb.AppendLine();
 				}
 			}
-			return new MdBlock(sb.ToString());
+			return MdBlock.FromText(sb.ToString());
 		}
 	}
 }
