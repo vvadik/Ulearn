@@ -40,7 +40,7 @@
 						</div>
 					</div>
 					<p>
-						@Html.ActionLink("Зарегистрируйтесь", "Register"), если у вас ещё нет аккаунта.
+						@Html.ActionLink("Зарегистрируйтесь", "Register", new {ReturnUrl=ViewBag.ReturnUrl}), если у вас ещё нет аккаунта.
 					</p>
 				}
 			</section>

@@ -100,9 +100,9 @@ namespace uLearn.Web.Controllers
 		//
 		// GET: /Account/Register
 		[AllowAnonymous]
-		public ActionResult Register()
+		public ActionResult Register(string returnUrl = null)
 		{
-			return View();
+			return View(new RegisterViewModel { ReturnUrl = returnUrl });
 		}
 
 		//
@@ -119,12 +119,11 @@ namespace uLearn.Web.Controllers
 				if (result.Succeeded)
 				{
 					await SignInAsync(user, isPersistent: false);
-					return RedirectToAction("Index", "Home");
+					if (string.IsNullOrWhiteSpace(model.ReturnUrl))
+						return RedirectToAction("Index", "Home");
+					return RedirectToLocal(model.ReturnUrl);
 				}
-				else
-				{
-					AddErrors(result);
-				}
+				AddErrors(result);
 			}
 
 			// If we got this far, something failed, redisplay form
