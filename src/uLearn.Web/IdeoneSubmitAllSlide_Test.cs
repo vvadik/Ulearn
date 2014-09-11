@@ -37,9 +37,9 @@ namespace uLearn.Web
 
 		private static void TestExerciseSlide(ExerciseSlide slide, ExecutionService executionService)
 		{
-			var solution = slide.Solution.BuildSolution(slide.Solution.TemplateSolution);
+			var solution = slide.Solution.BuildSolution(slide.EthalonSolution);
 			if (solution.HasErrors)
-				Assert.Fail("Template solution: "+slide.Solution.TemplateSolution + "\n\n" +"sourse code: "+ solution.SourceCode + "\n\n" + "solution has error in: " +
+				Assert.Fail("Template solution: " + slide.EthalonSolution + "\n\n" + "sourse code: " + solution.SourceCode + "\n\n" + "solution has error in: " +
 				            slide.Info.UnitName + " - " + slide.Title +
 				            "\n" + "\terror: " + solution.ErrorMessage + "\n\n");
 			else

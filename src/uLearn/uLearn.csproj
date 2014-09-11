@@ -79,12 +79,14 @@
     <Compile Include="Course.cs" />
     <Compile Include="CourseManager.cs" />
     <Compile Include="CSharp\CSharpSlideLoader.cs" />
+    <Compile Include="CSharp\CSharpSolutionValidator.cs" />
     <Compile Include="CSharp\ExerciseBuilder.cs" />
     <Compile Include="CSharp\BlocksBuilder.cs" />
     <Compile Include="CSharp\ExerciseAttribute.cs" />
+    <Compile Include="ISolutionValidator.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />
-    <Compile Include="CSharp\ISolutionValidator.cs" />
+    <Compile Include="CSharp\ICSharpSolutionValidator.cs" />
     <Compile Include="FileExtensions.cs" />
     <Compile Include="ISlideLoader.cs" />
     <Compile Include="Quizes\Quiz.cs" />

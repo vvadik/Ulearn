@@ -20,9 +20,9 @@
 		RESET
 	</button>
 
-	@{ var e = ((ExerciseSlide)Model.Slide).HintsHtml; }
+	@{ var e = ((ExerciseSlide)Model.Slide).HintsMd; }
 	<button id="GetHintButton" type="button" class="btn btn-default hints-btn no-rounds"
-			onclick="showHintForUser('@Model.CourseId','@Model.Slide.Index', '@e.Length')"
+			onclick="showHintForUser('@Model.CourseId','@Model.Slide.Index', '@e.Count')"
 			data-url="@Url.Action("UseHint", "Hint")">
 		GET HINT
 	</button>

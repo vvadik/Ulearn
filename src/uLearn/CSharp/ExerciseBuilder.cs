@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -8,22 +9,32 @@ namespace uLearn.CSharp
 {
 	public class ExerciseBuilder : CSharpSyntaxRewriter
 	{
-		public string ExerciseInitialCode { get; private set; }
-		public bool IsExercise { get; private set; }
-		public string ExpectedOutput { get; private set; }
-		public string TemplateSolution { get; private set; }
-		public bool HideExpectedOutputOnError { get; private set; }
-		public string CommentAfterExerciseIsSolved { get; private set; }
+		private readonly string prelude;
+		public string ExerciseClassName { get; set; }
 
-		public readonly List<string> Hints = new List<string>();
-		public MethodDeclarationSyntax ExerciseNode;
-		public List<ISolutionValidator> Validators = new List<ISolutionValidator>();
-		public ClassDeclarationSyntax SolutionClass;
-		public bool ExerciseMethodVisited = false;
+		public ExerciseSlide Slide { get; private set; }
+		private CSharpSolutionValidator validator;
 
-		public ExerciseBuilder()
+		public ExerciseBuilder(string prelude, SlideBuilder blocksBuilder, SlideInfo slideInfo)
 			: base(false)
 		{
+			this.prelude = prelude;
+			Slide = new ExerciseSlide(blocksBuilder.Blocks, slideInfo, blocksBuilder.Title, blocksBuilder.Id);
+		}
+
+		public ExerciseSlide BuildFrom(SyntaxTree tree)
+		{
+			ExerciseClassName = null;
+			var sb = new SolutionBuilder { Validator = validator = new CSharpSolutionValidator() };
+			SyntaxNode result = Visit(tree.GetRoot());
+			Debug.Assert(ExerciseClassName != null);
+			ClassDeclarationSyntax exerciseClass = result.DescendantNodes().OfType<ClassDeclarationSyntax>().First(n => n.Identifier.Text == ExerciseClassName);
+			int exerciseClassBodyStartIndex = exerciseClass.OpenBraceToken.Span.End;
+			const string pragma = "\n#line 1\n";
+			sb.ExerciseCode = prelude + result.ToFullString().Insert(exerciseClassBodyStartIndex, pragma);
+			sb.IndexForInsert = prelude.Length + exerciseClassBodyStartIndex + pragma.Length;
+			Slide.Solution = sb;
+			return Slide;
 		}
 
 		public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
@@ -31,22 +42,27 @@ namespace uLearn.CSharp
 			return null;
 		}
 
+		public static bool IsExercise(SyntaxTree tree)
+		{
+			return 
+				tree.GetRoot()
+				.DescendantNodes()
+				.OfType<MethodDeclarationSyntax>()
+				.Any(m => m.HasAttribute<ExpectedOutputAttribute>());
+		}
 		private SyntaxNode VisitMemberDeclaration(MemberDeclarationSyntax node, SyntaxNode newNode)
 		{
 			var newMember = ((MemberDeclarationSyntax) newNode).WithoutAttributes();
 			var isSolutionPart = node.HasAttribute<ExcludeFromSolutionAttribute>() || node.HasAttribute<ExerciseAttribute>();
 			if (node.HasAttribute<ExcludeFromSolutionAttribute>())
-				TemplateSolution += newMember.ToFullString();
-			if (node.HasAttribute<ExerciseAttribute>())
-				ExerciseMethodVisited = true;
+				Slide.EthalonSolution += newMember.ToFullString();
 			return isSolutionPart ? null : newMember;
 		}
 
+
 		public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
 		{
-			var classDeclaration = VisitMemberDeclaration(node, base.VisitClassDeclaration(node));
-			if (SolutionClass == null && ExerciseMethodVisited) SolutionClass = (ClassDeclarationSyntax) classDeclaration;
-			return classDeclaration;
+			return VisitMemberDeclaration(node, base.VisitClassDeclaration(node));
 		}
 
 		public override SyntaxNode VisitEnumDeclaration(EnumDeclarationSyntax node)
@@ -74,25 +90,33 @@ namespace uLearn.CSharp
 			var newMethod = VisitMemberDeclaration(node, base.VisitMethodDeclaration(node));
 			if (node.HasAttribute<ExpectedOutputAttribute>())
 			{
-				IsExercise = true;
-				ExpectedOutput = node.GetAttributes<ExpectedOutputAttribute>().Select(attr => attr.GetArgument(0)).FirstOrDefault();
+				if (ExerciseClassName == null)
+					ExerciseClassName = GetParentCassName(node);
+
+				Slide.ExpectedOutput = node.GetAttributes<ExpectedOutputAttribute>().Select(attr => attr.GetArgument(0)).FirstOrDefault();
 			}
 			if (node.HasAttribute<HideExpectedOutputOnErrorAttribute>())
-				HideExpectedOutputOnError = true;
+				Slide.HideExpectedOutputOnError = true;
 			if (node.HasAttribute<HintAttribute>())
-				Hints.AddRange(node.GetAttributes<HintAttribute>().Select(attr => attr.GetArgument(0)));
+				Slide.HintsMd.AddRange(node.GetAttributes<HintAttribute>().Select(attr => attr.GetArgument(0)));
 			if (node.HasAttribute<CommentAfterExerciseIsSolved>())
-				CommentAfterExerciseIsSolved = node.GetAttributes<CommentAfterExerciseIsSolved>().Single().GetArgument(0);
+				Slide.CommentAfterExerciseIsSolved = node.GetAttributes<CommentAfterExerciseIsSolved>().Single().GetArgument(0);
 			if (node.HasAttribute<ExerciseAttribute>())
 			{
-				TemplateSolution = TemplateSolution + node.WithoutAttributes();
-				ExerciseNode = node;
-				ExerciseInitialCode = GetExerciseCode(node);
-				if (node.HasAttribute<IsStaticMethodAttribute>()) Validators.Add(new IsStaticMethodAttribute());
-				if (node.HasAttribute<SingleStatementMethodAttribute>()) Validators.Add(new SingleStatementMethodAttribute());
+				ExerciseClassName = GetParentCassName(node);
+				Slide.EthalonSolution += node.WithoutAttributes();
+				Slide.ExerciseInitialCode = GetExerciseCode(node);
+				if (node.HasAttribute<IsStaticMethodAttribute>()) validator.AddValidator(new IsStaticMethodAttribute());
+				if (node.HasAttribute<SingleStatementMethodAttribute>()) validator.AddValidator(new SingleStatementMethodAttribute());
 			}
 			return newMethod;
 		}
+
+		private static string GetParentCassName(MethodDeclarationSyntax node)
+		{
+			return node.GetParents().OfType<ClassDeclarationSyntax>().First().Identifier.Text;
+		}
+
 		private string GetExerciseCode(MethodDeclarationSyntax method)
 		{
 			var codeLines = method.TransformExercise().ToPrettyString().SplitToLines();

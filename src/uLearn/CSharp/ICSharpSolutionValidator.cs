@@ -4,13 +4,13 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace uLearn.CSharp
 {
-	public interface ISolutionValidator
+	public interface ICSharpSolutionValidator
 	{
 		string FindError(SyntaxTree userSolution);
 	}
 
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-	public class IsStaticMethodAttribute : Attribute, ISolutionValidator
+	public class IsStaticMethodAttribute : Attribute, ICSharpSolutionValidator
 	{
 		public const string ShouldBeMethod = "Решение должно быть корректным определением статического метода";
 		public const string ShouldBeSingleMethod = "Решение должно состоять ровно из одного метода";

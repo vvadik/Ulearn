@@ -38,7 +38,7 @@
 	@if (Model.Slide is ExerciseSlide)
 	{
 		var e = (ExerciseSlide) Model.Slide;
-		<script> getHints("@Model.CourseId", "@Model.Slide.Index", '@e.HintsHtml.Length') </script>
+		<script> getHints("@Model.CourseId", "@Model.Slide.Index", '@e.HintsMd.Count') </script>
 		<script> refreshPreviousDraft('@(Model.LatestAcceptedSolution != null)', '@e.Id') </script>
 	}
 }

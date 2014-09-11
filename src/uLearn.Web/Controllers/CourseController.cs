@@ -41,9 +41,6 @@ namespace uLearn.Web.Controllers
 			var model = await CreateCoursePageModel(courseId, slideIndex, visibleUnits);
 			if (!visibleUnits.Contains(model.Slide.Info.UnitName))
 				throw new Exception("Slide is hidden " + slideIndex);
-			var exerciseSlide = model.Slide as ExerciseSlide;
-			if (exerciseSlide != null)
-				exerciseSlide.LikedHints = slideHintRepo.GetLikedHints(courseId, exerciseSlide.Id, User.Identity.GetUserId());
 			var quizSlide = model.Slide as QuizSlide;
 			if (quizSlide != null)
 				foreach (var block in quizSlide.Quiz.Blocks.Where(x => x is ChoiceBlock).Where(x => ((ChoiceBlock) x).Shuffle))

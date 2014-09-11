@@ -13,8 +13,10 @@ namespace uLearn.CSharp
 		public void Test()
 		{
 			var slide =
-				(ExerciseSlide)GenerateSlideFromFile(@"..\..\..\courses\BasicProgramming\Slides\U03_Cycles\S07-Break.cs");
-			Console.WriteLine(slide.Solution.TemplateSolution);
+				(ExerciseSlide)GenerateSlideFromFile(@"..\..\..\courses\BasicProgramming\Slides\U03_Cycles\S041_PowerOfTwo.cs");
+			Console.WriteLine(slide.Solution.ExerciseCode);
+			Console.WriteLine(slide.Solution.IndexForInsert);
+			Console.WriteLine(slide.Solution.BuildSolution("public void T(){}"));
 		}
 
 		[Test]
@@ -202,7 +204,7 @@ namespace uLearn.CSharp
 			Assert.That(slide.Blocks.Single().Text(), Is.EqualTo("Add 2 and 3 please!"));
 			Assert.That(slide.ExerciseInitialCode, Is.StringStarting("public void Add_2_and_3()"));
 			Assert.That(slide.ExerciseInitialCode, Is.Not.StringContaining("NotImplementedException"));
-			Assert.That(slide.HintsHtml.Length, Is.EqualTo(0));
+			Assert.That(slide.HintsMd.Count, Is.EqualTo(0));
 		}
 
 		[Test]
@@ -232,7 +234,7 @@ namespace uLearn.CSharp
 		public void make_hints_from_hint_attributes()
 		{
 			var slide = (ExerciseSlide) GenerateSlide("ExerciseWithHints.cs");
-			Assert.That(slide.HintsHtml, Is.EqualTo(new[] {"<p>hint1</p>\n", "<p>hint2</p>\n"}).AsCollection);
+			Assert.That(slide.HintsMd, Is.EqualTo(new[] {"<p>hint1</p>\n", "<p>hint2</p>\n"}).AsCollection);
 		}
 
 		[Test]

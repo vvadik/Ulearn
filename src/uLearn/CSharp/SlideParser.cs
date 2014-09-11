@@ -22,13 +22,11 @@ namespace uLearn.CSharp
 			Func<string, string> getInclude)
 		{
 			var blocksBuilder = new SlideBuilder(getInclude);
-			var exerciseBuilder = new ExerciseBuilder();
 			blocksBuilder.Visit(tree.GetRoot());
-			var sourceForTestingRoot = exerciseBuilder.Visit(tree.GetRoot());
-			if (!exerciseBuilder.IsExercise)
+			if (!ExerciseBuilder.IsExercise(tree))
 				return new Slide(blocksBuilder.Blocks, slideInfo, blocksBuilder.Title, blocksBuilder.Id);
-			return new ExerciseSlide(blocksBuilder.Blocks, exerciseBuilder.ExerciseInitialCode, exerciseBuilder.ExpectedOutput, exerciseBuilder.Hints, exerciseBuilder.CommentAfterExerciseIsSolved,
-				new SolutionBuilder(sourceForTestingRoot, prelude, exerciseBuilder.Validators, exerciseBuilder.TemplateSolution, exerciseBuilder.SolutionClass), slideInfo, blocksBuilder.Title, blocksBuilder.Id, exerciseBuilder.HideExpectedOutputOnError);
+			var exerciseBuilder = new ExerciseBuilder(prelude, blocksBuilder, slideInfo);
+			return exerciseBuilder.BuildFrom(tree);
 		}
 	}
 }

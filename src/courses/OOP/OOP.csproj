@@ -31,7 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
+      <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -85,6 +85,12 @@
     <Compile Include="Slides\U01_DataTypes_And_Algorithms\S010_DataType.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="Slides\U03_DataStructure\S010_DataStructures.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Slides\U02_Polymorphism\S010_DataType.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="Slides_Tests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +107,8 @@
     <Content Include="Slides\Title.txt" />
     <Content Include="Slides\U01_DataTypes_And_Algorithms\Title.txt" />
     <Content Include="Slides\U00_Intro\Title.txt" />
+    <Content Include="Slides\U02_Polymorphism\Title.txt" />
+    <Content Include="Slides\U03_DataStructure\Title.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
