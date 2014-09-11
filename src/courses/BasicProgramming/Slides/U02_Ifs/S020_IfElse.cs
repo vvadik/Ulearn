@@ -7,7 +7,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 	[Slide("Операторы If и Else", "{BEB02065-75DF-4443-B0DA-DE00971DC36B}")]
 	class S020_IfElse
 	{
-		//#video F68k4PkbBxg
+		//#video QbpOxn3ARmI
 
 		/*
 		## Заметки по лекции
