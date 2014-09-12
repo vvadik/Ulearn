@@ -70,7 +70,7 @@ a1-a4 True
 		}
 
 		[Exercise]
-		private static bool IsCorrectMove(string from, string to)
+		public static bool IsCorrectMove(string from, string to)
 		{
 			var dx = Math.Abs(to[0] - from[0]);
 			var dy = Math.Abs(to[1] - from[1]);

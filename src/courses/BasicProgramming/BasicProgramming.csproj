@@ -72,6 +72,9 @@
     <Compile Include="Slides\U00_Basics\S000_HelpSlide.cs" />
     <Compile Include="Slides\U00_Basics\_HelloWorld.cs" />
     <Content Include="Slides\U02_Ifs\Prelude.txt" />
+    <Content Include="Slides\U02_Ifs\S040_Quiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Slides\U02_Ifs\Title.txt" />
     <Content Include="Slides\U05_Collections\S085_IO.xml">
       <SubType>Designer</SubType>
@@ -116,7 +119,7 @@
     <Compile Include="Slides\U02_Ifs\S020_IfElse.cs" />
     <Compile Include="Slides\U02_Ifs\S022_MiddleOf3Task.cs" />
     <Compile Include="Slides\U02_Ifs\S030_IfErrorsVideo.cs" />
-    <Compile Include="Slides\U02_Ifs\S032_RobotControl.cs" />
+    <Compile Include="Slides\U02_Ifs\S050_RobotControl.cs" />
     <Compile Include="Slides\U03_Cycles\S040_WhileVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S041_PowerOfTwo.cs" />
     <Compile Include="Slides\U03_Cycles\S046_RemoveSpaces.cs" />

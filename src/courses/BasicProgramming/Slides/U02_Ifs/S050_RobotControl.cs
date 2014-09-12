@@ -6,7 +6,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Управление роботом", "{50AC4FC7-A6E1-4C4E-8C61-ECC75AEB912E}")]
-	class S032_RobotControl
+	class S050_RobotControl
 	{
 		/*
 		В воскресенье Вася пошел в кружок робототехники и увидел там такой код управления боевым роботом:
