@@ -82,6 +82,15 @@
     <Content Include="Slides\U05_Collections\S061_StringQuiz.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Slides\U06_AutomaticTesting\S015_Testing.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Slides\U06_AutomaticTesting\S045_UnitTests.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Slides\U06_AutomaticTesting\S095_UnitTests2.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Slides\U08_Recursion\Prelude.txt" />
     <Content Include="Slides\U08_Recursion\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />

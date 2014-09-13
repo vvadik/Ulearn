@@ -9,11 +9,11 @@
 
 		## Заметки по лекции
 		
-		Пример модульного теста:
-		//#include _S030_UnitTest.cs
-
 		[Описание шаблона Arrange-Act-Assert](http://c2.com/cgi/wiki?ArrangeActAssert)
+
+		Пример модульного теста:
 		*/
 
+		//#include _S030_UnitTest.cs
 	}
 }

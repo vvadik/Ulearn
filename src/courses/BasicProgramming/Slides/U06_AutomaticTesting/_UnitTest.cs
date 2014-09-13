@@ -7,10 +7,10 @@ namespace TestProject
     [TestClass]
     public class UnitTest
     {
-        void Test(double A, double B, double C, 
+        void Test(double a, double b, double c, 
             int length, double x1, double x2)
         {
-            var result = QuadricEquation.Solve(A, B, C);
+            var result = QuadricEquation.Solve(a, b, c);
             Assert.AreEqual(length, result.Length);
             if (length > 0)
                 Assert.AreEqual(result[0], x1);
@@ -21,7 +21,7 @@ namespace TestProject
        
 
         [TestMethod]
-        public void TestMethod2()
+        public void OrdinaryCase()
         {
             Test(2, -4, -6, 2, 3, -1);
            

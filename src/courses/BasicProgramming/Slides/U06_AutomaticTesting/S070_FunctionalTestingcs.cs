@@ -6,13 +6,17 @@
 		//#video C86-xJmLgow
 
 		/*
-		## Код, использованный на лекциях ранее
+		## Использованный в лекции код
 		*/
-
+	
+		/*
+		### Класс с автотестами
+		*/
 		//#include _UnitTest.cs
 
+		/*
+		### Тестируемый класс
+		*/
 		//#include _QuadricEquation.cs
-
-		//#include _Program.cs
 	}
 }
