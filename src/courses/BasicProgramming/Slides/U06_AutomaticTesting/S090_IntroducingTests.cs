@@ -1,6 +1,6 @@
 ﻿namespace uLearn.Courses.BasicProgramming.Slides.U06_AutomaticTesting
 {
-	[Slide("Внедрение тестов", "{B10A0FD9-E21C-4E26-9484-330D0C2E5766}")]
+	[Slide("Внедрение тестов", "{12D8DD7F-8881-4EE6-8489-C5D0108D7B06}")]
 	class S090_IntroducingTests
 	{
 		//#video WyvMdOX9Vco
