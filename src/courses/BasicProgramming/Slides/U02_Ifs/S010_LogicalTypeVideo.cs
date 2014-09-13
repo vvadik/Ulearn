@@ -7,6 +7,9 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 	{
 		//#video 6jo2hk4ntV8
 
+		/*
+		## Заметки по лекции
+		*/
 		public static void Main()
 		{
 			//Сравнение, как и операции сложения или деления, тоже имеет возвращаемое значение
@@ -28,7 +31,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 			Console.WriteLine(5 <= 5);
 			Console.WriteLine(5 > 5);
 			Console.WriteLine(5 >= 5);
-		
+
 			// Операция "И", или конъюнкция
 			Console.WriteLine((5 < 4) && (3 < 4));
 

@@ -112,8 +112,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe $(TargetPath)
-REM copy this post build step to new course
+    <PostBuildEvent>REM copy this post build step to new course
+$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe $(TargetPath) || exit /b
 del "$(OutDir)$(ProjectName).zip"
 "$(SolutionDir)..\tools\7z\7za.exe" a "$(OutDir)$(ProjectName).zip" "$(ProjectDir)Slides\*"
 copy "$(OutDir)$(ProjectName).zip" $(SolutionDir)uLearn.Web\Courses.Staging\</PostBuildEvent>

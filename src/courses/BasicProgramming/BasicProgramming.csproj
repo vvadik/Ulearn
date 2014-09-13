@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>uLearn.Courses.BasicProgramming</RootNamespace>
-    <AssemblyName>Lection1 - Hello World</AssemblyName>
+    <AssemblyName>BasicProgramming</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -164,15 +164,18 @@
     <Compile Include="Slides\U05_Collections\S080_Encodings.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Slides\U06_AutomaticTesting\S070_Conclusion.cs" />
+    <Compile Include="Slides\U06_AutomaticTesting\S060_Tdd.cs" />
+    <Compile Include="Slides\U06_AutomaticTesting\S050_Coverage.cs" />
+    <Compile Include="Slides\U06_AutomaticTesting\S090_IntroducingTests.cs" />
+    <Compile Include="Slides\U06_AutomaticTesting\S080_ValueOfTesting.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\_Program.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\_QuadricEquation.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\S010_Testing.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\S020_Library.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\S030_UnitTest.cs" />
-    <Compile Include="Slides\U06_AutomaticTesting\S040_MultiplyUnitTest.cs" />
-    <Compile Include="Slides\U06_AutomaticTesting\S050_FunctionalTestingcs.cs" />
-    <Compile Include="Slides\U06_AutomaticTesting\S060_ForWhatThisTests.cs" />
+    <Compile Include="Slides\U06_AutomaticTesting\S040_MoreTests.cs" />
+    <Compile Include="Slides\U06_AutomaticTesting\S070_FunctionalTestingcs.cs" />
+    <Compile Include="Slides\U06_AutomaticTesting\_S030_UnitTest.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\_UnitTest.cs" />
     <Compile Include="Slides\U07_Algorithms\S010_BasicComplexity.cs" />
     <Compile Include="Slides\U07_Algorithms\S020_BasicTerms.cs" />
@@ -242,6 +245,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>REM copy this post build step to new course
+$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe $(TargetPath) || exit /b
 del "$(OutDir)$(ProjectName).zip"
 "$(SolutionDir)..\tools\7z\7za.exe" a "$(OutDir)$(ProjectName).zip" "$(ProjectDir)Slides\*"
 copy "$(OutDir)$(ProjectName).zip" $(SolutionDir)uLearn.Web\Courses.Staging\</PostBuildEvent>

@@ -9,20 +9,20 @@ namespace Library
     public class QuadricEquation
     {
         public static double[] Solve
-            (double A, double B, double C)
+            (double a, double b, double c)
         {
-            if (A == 0)
-                return new double[] { -C / B };
+            if (a == 0)
+                return new double[] { -c / b };
 
-            var squareOfDisc = Math.Sqrt(B * B - 4 * A * C);
+            var squareOfDisc = Math.Sqrt(b * b - 4 * a * c);
             if (double.IsNaN(squareOfDisc)) 
                 return new double[0];
             if (squareOfDisc == 0)
-                return new double[] { -B / (2 * A) };
+                return new double[] { -b / (2 * a) };
             return new[] 
             {
-                (- B + squareOfDisc)/(2*A),
-                (- B - squareOfDisc)/(2*A)
+                (- b + squareOfDisc)/(2*a),
+                (- b - squareOfDisc)/(2*a)
             };
         }
     }
