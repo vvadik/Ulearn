@@ -27,14 +27,33 @@
 		GET HINT
 	</button>
 </div>
-<div class="run-verdict clearfix"></div>
-<div class="after-run-block">
-	<div class="actual-output">
-		<div class="output-label">Вывод вашей программы:</div>
-		<pre class="no-rounds"><code class="actual-output-content"></code></pre>
-	</div>
+
+<div class="run-result run-service-error">
+	<div class="run-verdict label-warning">Ошибка сервера :(</div>
+	<pre class="no-rounds"><code class="run-details"></code></pre>
+</div>
+
+<div class="run-result run-compile-error">
+	<div class="run-verdict label-danger">Ошибка компиляции</div>
+	<pre class="no-rounds"><code class="run-details"></code></pre>
+</div>
+
+<div class="run-result run-style-error">
+	<div class="run-verdict label-danger">Нарушение стиля</div>
+	<pre class="no-rounds"><code class="run-details"></code></pre>
+	<div><small>В некоторых ситуациях стилевые проверки тут могут быть жестче, чем необходимо в реальной жизни.</small></div>
+</div>
+
+<div class="run-result run-wa">
+	<div class="run-verdict label-danger">Неверный результат</div>
 	<div class="diff-table tablesorter"></div>
 </div>
+
+<div class="run-result run-success">
+	<div class="run-verdict label-success clearfix">Успех!</div>
+	<pre class="no-rounds"><code class="run-details"></code></pre>
+</div>
+
 <div class="panel-group ctrl-group" id="hints-accordion">
 	<div id="hints-place"></div>
 </div>

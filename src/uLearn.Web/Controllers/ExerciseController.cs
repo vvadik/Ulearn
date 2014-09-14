@@ -73,8 +73,8 @@ namespace uLearn.Web.Controllers
 			if (solution.HasErrors)
 				return new RunSolutionResult
 				{
+					IsCompileError = true,
 					CompilationError = solution.ErrorMessage,
-					IsRightAnswer = false,
 					ExpectedOutput = "",
 					ActualOutput = ""
 				};
@@ -82,8 +82,8 @@ namespace uLearn.Web.Controllers
 			if (submition == null)
 				return new RunSolutionResult
 				{
+					IsCompillerFailure = true,
 					CompilationError = "Ой-ой, Sphere Engine, проверяющий задачи, не работает. Попробуйте отправить решение позже.",
-					IsRightAnswer = false,
 					ExpectedOutput = "",
 					ActualOutput = ""
 				};
@@ -99,9 +99,11 @@ namespace uLearn.Web.Controllers
 			output = NormalizeString(output);
 			var expectedOutput = NormalizeString(exerciseSlide.ExpectedOutput);
 			var isRightAnswer = submition.Result == SubmitionResult.Success && output.Equals(expectedOutput);
+			var compilationError = submition.Result != SubmitionResult.CompilationError ? "" : submition.CompilationError == "" ? "Compilation Error" : submition.CompilationError;
 			return new RunSolutionResult
 			{
-				CompilationError = submition.Result != SubmitionResult.CompilationError ? "" : submition.CompilationError == "" ? "Compilation Error" : submition.CompilationError,
+				IsCompileError = submition.Result == SubmitionResult.CompilationError,
+				CompilationError = compilationError,
 				IsRightAnswer = isRightAnswer,
 				ExpectedOutput = exerciseSlide.HideExpectedOutputOnError ? null : expectedOutput,
 				ActualOutput = output
