@@ -7,7 +7,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	class S041_PowerOfTwo
 	{
 		/*
-		В алгоритмах иногда требуется найти минимальную степень двойки превосходящую данное число.
+		В алгоритмах иногда требуется найти минимальную целую неотрицательную степень двойки превосходящую данное число.
 
 		Решите эту задачу с помощью цикла while.
 		Если искомая степень двойки слишком велика и не помещается в тип long, возвращайте -1.
@@ -30,9 +30,9 @@ namespace uLearn.Courses.BasicProgramming.Slides
 ")]
 		public static void Main()
 		{
-			Console.WriteLine(GetMinPowerOfTwoLargerThan(2));
-			Console.WriteLine(GetMinPowerOfTwoLargerThan(15));
-			Console.WriteLine(GetMinPowerOfTwoLargerThan(-2));
+			Console.WriteLine(GetMinPowerOfTwoLargerThan(2)); // => 4
+			Console.WriteLine(GetMinPowerOfTwoLargerThan(15)); // => 16
+			Console.WriteLine(GetMinPowerOfTwoLargerThan(-2)); // => 1
 			Console.WriteLine(GetMinPowerOfTwoLargerThan(-100));
 			Console.WriteLine(GetMinPowerOfTwoLargerThan(100));
 			Console.WriteLine(GetMinPowerOfTwoLargerThan(2000000000));
