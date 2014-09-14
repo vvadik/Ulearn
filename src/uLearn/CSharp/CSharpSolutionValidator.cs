@@ -8,7 +8,10 @@ namespace uLearn.CSharp
 {
 	public class CSharpSolutionValidator : ISolutionValidator
 	{
-		private readonly List<ICSharpSolutionValidator> validators = new List<ICSharpSolutionValidator>();
+		private static readonly ICSharpSolutionValidator redundantIf = new RedundantIfStyleValidator();
+		private static readonly ICSharpSolutionValidator namingCase = new NamingCaseStyleValidator();
+
+		private readonly List<ICSharpSolutionValidator> validators = new List<ICSharpSolutionValidator> { redundantIf, namingCase };
 
 		public void AddValidator(ICSharpSolutionValidator validator)
 		{

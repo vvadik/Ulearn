@@ -1,9 +1,23 @@
+using System;
 using System.Collections.Generic;
 
 namespace uLearn
 {
 	public static class CollectionExtensions
 	{
+		public static TOutput Call<TInput, TOutput>(this TInput input, Func<TInput, TOutput> f)
+			where TInput : class
+			where TOutput : class
+		{
+			return input == null ? null : f(input);
+		}
+
+		public static TOutput Call<TInput, TOutput>(this TInput input, Func<TInput, TOutput> f, TOutput defaultValue)
+			where TInput : class
+		{
+			return input == null ? defaultValue : f(input);
+		}
+
 		public static TValue Get<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
 		{
 			TValue v;

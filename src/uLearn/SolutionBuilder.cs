@@ -9,8 +9,12 @@
 		public SolutionBuildResult BuildSolution(string usersExercise)
 		{
 			var solution =  ExerciseCode.Insert(IndexForInsert, usersExercise + "\r\n");
-			var error = Validator.FindSyntaxError(solution) ?? Validator.FindValidatorError(usersExercise, solution);
-			return error == null ? SolutionBuildResult.Success(solution) : SolutionBuildResult.Error(error, solution);
+			string message;
+			if ((message = Validator.FindSyntaxError(solution)) != null)
+				return SolutionBuildResult.Error(message, solution);
+			if ((message = Validator.FindValidatorError(usersExercise, solution)) != null)
+				return SolutionBuildResult.StyleIssue(message, solution);
+			return SolutionBuildResult.Success(solution);
 		}
 	}
 }

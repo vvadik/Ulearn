@@ -1,6 +1,4 @@
-﻿using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using uLearn.Web.Ideone;
@@ -28,11 +26,10 @@ namespace uLearn.Web
 			var executionService = new ExecutionService();
 			var courseManager = WebCourseManager.Instance;
 			Assert.That(courseManager.GetCourses().Count() >= 2);
-			foreach (var course in courseManager.GetCourses())
-				foreach (var slide in course.Slides.OfType<ExerciseSlide>())
-				{
-					yield return new TestCaseData(slide, executionService).SetName(course.Id + " - " + slide.Info.UnitName + " - " + slide.Title);
-				}
+			return 
+				from course in courseManager.GetCourses() 
+				from slide in course.Slides.OfType<ExerciseSlide>() 
+				select new TestCaseData(slide, executionService).SetName(course.Id + " - " + slide.Info.UnitName + " - " + slide.Title);
 		}
 
 		private static void TestExerciseSlide(ExerciseSlide slide, ExecutionService executionService)
@@ -64,27 +61,6 @@ namespace uLearn.Web
 								"\tSourceCode: " + solution.SourceCode + "\n\n");
 				}
 			}
-		}
-
-		private static void ExperimentMethod(SolutionBuildResult solution)
-		{
-			string output = "";
-			//CSharpCodeProvider codeProvider = new CSharpCodeProvider();
-			//var codeProvider = new CodeDomProvider();
-			//ICodeCompiler icc = codeProvider.CreateCompiler(); 
-			CompilerParameters parameters = new CompilerParameters();
-			parameters.GenerateExecutable = true;
-			parameters.OutputAssembly = output;
-			var provider = CodeDomProvider.CreateProvider("CSharp");
-			var results = provider.CompileAssemblyFromSource(parameters, solution.SourceCode);
-			//CompilerResults results = icc.CompileAssemblyFromSource(parameters, solution.SourceCode);
-			Console.WriteLine(solution.SourceCode);
-			Console.WriteLine(string.Join("\n", parameters.EmbeddedResources));
-			foreach (var error in results.Errors)
-			{
-				Console.WriteLine(error);
-			}
-			Assert.AreEqual(0, results.Errors.Count);
 		}
 	}
 }

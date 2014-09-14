@@ -234,7 +234,7 @@ namespace uLearn.CSharp
 		public void make_hints_from_hint_attributes()
 		{
 			var slide = (ExerciseSlide) GenerateSlide("ExerciseWithHints.cs");
-			Assert.That(slide.HintsMd, Is.EqualTo(new[] {"<p>hint1</p>\n", "<p>hint2</p>\n"}).AsCollection);
+			Assert.That(slide.HintsMd, Is.EqualTo(new[] {"hint1", "hint2"}).AsCollection);
 		}
 
 		[Test]

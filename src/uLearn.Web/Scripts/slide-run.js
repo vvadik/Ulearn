@@ -18,23 +18,21 @@ function setWA(expected, actual) {
 	$waError.show();
 }
 
+function RunSolutionResult() {
+	this.IsCompillerFailure = false;
+	this.IsCompileError = false;
+	this.IsStyleViolation = false;
+	this.IsRightAnswer = false;
+	this.ExpectedOutput = "";
+	this.ActualOutput = "";
+	this.CompilationError = "";
+}
+
 function setResults(ans) {
-	/*
-		ans : RunSolutionResult
-		public class RunSolutionResult
-		{
-			public bool IsCompillerFailure;
-			public bool IsCompileError;
-			public bool IsStyleViolation;
-			public bool IsRightAnswer;
-			public string ExpectedOutput { get; set; }
-			public string ActualOutput { get; set; }
-			public string CompilationError { get; set; }
-		}
-	*/
+	///<param name="ans" type="RunSolutionResult"></param>
 	if (ans.IsCompillerFailure) setSimpleResult($serviceError, ans.CompilationError);
 	else if (ans.IsCompileError) setSimpleResult($compileError, ans.CompilationError);
-	else if (ans.IsStyleError) setSimpleResult($styleError, ans.CompilationError);
+	else if (ans.IsStyleViolation) setSimpleResult($styleError, ans.CompilationError);
 	else if (ans.IsRightAnswer) setSimpleResult($success, ans.ActualOutput);
 	else setWA(ans.ExpectedOutput, ans.ActualOutput);
 }

@@ -22,7 +22,9 @@
 .load-content {
 }
 
-.run-style-error, .run-service-error, .run-compile-error, .run-success, .run-wa {
+.run-style-error, .run-service-error, .run-compile-error, .run-success, .run-wa, .run-details {
+}
+.code, .code-exercise {
 }
 
 /* ReSharper restore DeclarationIsEmpty */

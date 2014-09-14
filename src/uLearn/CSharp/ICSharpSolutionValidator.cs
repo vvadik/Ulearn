@@ -1,4 +1,6 @@
 using System;
+using System.Activities.Debugger;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -38,7 +40,10 @@ namespace uLearn.CSharp
 
 		protected override string FindError(MethodDeclarationSyntax method)
 		{
-			return method.Body.Statements.Count != 1 ? ShouldBeSingleMethodMessage : null;
+			var statements = method.Body.Statements;
+			return statements.Count != 1 
+				|| !(statements.Single() is ReturnStatementSyntax) 
+				? ShouldBeSingleMethodMessage : null;
 		}
 	}
 }
