@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides
 {
-	[Slide("Функции аггрегирования", "{A6BACA4C-D211-428B-AE49-1F6882FD67F1}")]
+	[Slide("Функции агрегирования", "{A6BACA4C-D211-428B-AE49-1F6882FD67F1}")]
 	[TestFixture]
 	public class S110_AggregateFunctions
 	{
@@ -19,16 +19,17 @@ namespace uLearn.Courses.Linq.Slides
 		public void MinMaxAvg()
 		{
 			IEnumerable<int> nums = new int[] {8, 9, 0, 1, 2, 3, 4, 5, 6, 7};
-			string[] words = {"hello", "kittie"};
 
 			Assert.That(nums.Count(), Is.EqualTo(10));
 
 			Assert.That(nums.Min(), Is.EqualTo(0));
 
-			Assert.That(words.Select(word => word.Length).Max(), Is.EqualTo(6));
+			string[] words = { "hi", "kitty" };
+
+			Assert.That(words.Select(word => word.Length).Max(), Is.EqualTo(5));
 			// Можно записать строку выше короче, если воспользоваться другой перегрузкой агрегатной функции.
 			// Подобные перегрузки есть у всех агрегатных функций
-			Assert.That(words.Max(word => word.Length), Is.EqualTo(6));
+			Assert.That(words.Max(word => word.Length), Is.EqualTo(5));
 
 			Assert.That(nums.Average(n => n*n), Is.EqualTo(28.5));
 		}

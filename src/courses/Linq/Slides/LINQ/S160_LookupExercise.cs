@@ -61,6 +61,7 @@ SearchQuery('world') found documents: 1, 2
 SearchQuery('words') found documents: 2, 3
 SearchQuery('power') found documents: 3
 SearchQuery('ktulhu') found documents: 
+SearchQuery('') found documents: 
 ")]
 		public static void Main()
 		{
@@ -76,6 +77,7 @@ SearchQuery('ktulhu') found documents:
 			SearchQuery("words", index);
 			SearchQuery("power", index);
 			SearchQuery("ktulhu", index);
+			SearchQuery("", index);
 		}
 
 		[HideOnSlide]

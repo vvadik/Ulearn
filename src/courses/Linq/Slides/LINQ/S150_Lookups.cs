@@ -57,7 +57,8 @@ namespace uLearn.Courses.Linq.Slides
 		/*
 		Но ещё проще воспользоваться специальным методом `ToLookup`:
 
-		`ILookup<K, T> ToLookup(this IEnumerable<T> items, Func<T, K> keySelector)`
+		* `ILookup<K, T> ToLookup(this IEnumerable<T> items, Func<T, K> keySelector)`
+		* `ILookup<K, V> ToLookup(this IEnumerable<T> items, Func<T, K> keySelector, Func<T, V> valueSelector)`
 
 		*/
 
@@ -66,10 +67,10 @@ namespace uLearn.Courses.Linq.Slides
 		public void ToLookupSample()
 		{
 			string[] names = {"Pavel", "Peter", "Andrew", "Anna", "Alice", "John"};
-			ILookup<char, string> namesByLetter = names.ToLookup(name => name[0]);
+			ILookup<char, string> namesByLetter = names.ToLookup(name => name[0], name => name.ToLower());
 
-			Assert.That(namesByLetter['J'], Is.EquivalentTo(new[] {"John"}));
-			Assert.That(namesByLetter['P'], Is.EquivalentTo(new[] {"Pavel", "Peter"}));
+			Assert.That(namesByLetter['J'], Is.EquivalentTo(new[] {"john"}));
+			Assert.That(namesByLetter['P'], Is.EquivalentTo(new[] {"pavel", "peter"}));
 			
 			// Lookup по неизвестному ключу возвращает пустую коллекцию. 
 			//Часто это удобнее, чем поведение Dictionary, который в такой ситуации бросает исключение.

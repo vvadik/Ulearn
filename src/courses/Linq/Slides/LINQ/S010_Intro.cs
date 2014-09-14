@@ -15,7 +15,7 @@ namespace uLearn.Courses.Linq.Slides
 		Посмотрите на код поиска всех новых писем в классическом стиле:
 		*/
 
-		public int[] GetNewLettersIds_ClassicWay()
+		public List<int> GetNewLettersIds_ClassicWay()
 		{
 			var res = new List<int>();
 			for(int i=0; i<letters.Length; i++)
@@ -23,7 +23,7 @@ namespace uLearn.Courses.Linq.Slides
 				if (letters[i].IsNew)
 					res.Add(letters[i].Id);
 			}
-			return res.ToArray();
+			return res;
 		}
 
 		/*
@@ -38,7 +38,7 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		/*
-		Всего одна строчка! Короткая и понятная!
+		Всего одна строчка! Короткая и понятная (если вы знакомы с LINQ)!
 
 		Лекционные слайды познакомят вас с основными возможностями `LINQ`.
 		Однако главная ценность этого курса — тщательно подобранный набор упражнений.
