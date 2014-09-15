@@ -14,7 +14,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		*/
 
 		[Exercise]
-		[Hint("Вспомните, как именно работает var. Какой тип у меременной a?")]
+		[Hint("Вспомните, как именно работает var. Какой тип у переменной a?")]
 		[ExpectedOutput("5.5")]
 		static public void Main()
 		{

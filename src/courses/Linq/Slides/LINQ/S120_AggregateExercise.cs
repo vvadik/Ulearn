@@ -26,7 +26,7 @@ namespace uLearn.Courses.Linq.Slides
 		public static string GetLongest(IEnumerable<string> words)
 		{
 			return words.Min(line => Tuple.Create(-line.Length, line)).Item2;
-			//Ваш код
+			//ваш код
 		}
 
 		[ExpectedOutput("azaz\nsdsd\n12345")]

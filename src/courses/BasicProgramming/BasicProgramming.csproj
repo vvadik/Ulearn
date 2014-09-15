@@ -206,7 +206,6 @@
     <Compile Include="Slides\U08_Recursion\S090_ComparingSearches.cs" />
     <Compile Include="Slides_Tests.cs" />
     <Content Include="Slides\U04_Arrays\Prelude.txt" />
-    <Content Include="Slides\U03_Cycles\shapes.png" />
     <Content Include="Slides\U04_Arrays\S061_ArrayQuiz.xml">
       <SubType>Designer</SubType>
     </Content>

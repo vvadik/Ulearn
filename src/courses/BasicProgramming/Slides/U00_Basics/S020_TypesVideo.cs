@@ -36,7 +36,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 				// Используются в библиотеках работы с графикой в Windows.
 				float floatNumber = 1.234f;
 
-				//long (большие целые числа). Используются в основном для подсчета милисекунд.
+				//long (большие целые числа). Используются в основном для подсчета миллисекунд.
 				long longIntegerNumber = 3000000000000;
 
 				// Есть и другие типы данных: short, decimal, и т.д.

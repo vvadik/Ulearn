@@ -10,7 +10,7 @@ namespace uLearn.Courses.Linq.Slides
 	{
 		/*
 
-		Нередко встречается необходимость сгруппировав элементы, 
+		Нередко встречается необходимость, сгруппировав элементы, 
 		преобразовать их в структуру данных для поиска группы по ключу группировки.
 
 		Это можно было бы сделать с помощью такой комбинации:
@@ -55,7 +55,7 @@ namespace uLearn.Courses.Linq.Slides
 		}
 
 		/*
-		Но ещё проще воспользоваться специальным методом `ToLookup`:
+		Но еще проще воспользоваться специальным методом `ToLookup`:
 
 		* `ILookup<K, T> ToLookup(this IEnumerable<T> items, Func<T, K> keySelector)`
 		* `ILookup<K, V> ToLookup(this IEnumerable<T> items, Func<T, K> keySelector, Func<T, V> valueSelector)`

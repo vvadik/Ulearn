@@ -20,7 +20,7 @@ namespace uLearn.Courses.Linq.Slides
 		[SingleStatementMethod]
 		[Hint("`Regex.Split` — позволяет задать регулярное выражение для разделителей слов и получить список слов.")]
 		[Hint("`Regex.Split(s, @\"\\W+\")` разбивает текст на слова")]
-		[Hint("Подумайте, как скомбинировать SelectMany, со вложенным `Regex.Split`")]
+		[Hint("Подумайте, как скомбинировать SelectMany со вложенным `Regex.Split`")]
 		[Hint("Пустая строка не является корректным словом")]
 		[Hint("У класса `string` есть метод `ToLower` для приведения строки к нижнему регистру")]
 		[Hint("`list.Distinct()` — возвращает список `list` без дубликатов")]

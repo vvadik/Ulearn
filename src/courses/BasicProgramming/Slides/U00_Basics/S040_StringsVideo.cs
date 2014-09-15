@@ -43,7 +43,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 
 				int number = int.Parse("42"); //Из строки в число
 				string numString = 42.ToString(); // Из числа в строку
-				double number2 = double.Parse("34.42"); // Зависит от настроект операционной системы
+				double number2 = double.Parse("34.42"); // Зависит от настроек операционной системы
 				
 				//Следующий вызов не зависит от настроек и всегда ожидает точку в качестве разделителя:
 				number2 = double.Parse("34.42", CultureInfo.InvariantCulture);

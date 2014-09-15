@@ -15,7 +15,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		Напишите метод, который принимает на вход имя <Name> и зарплату <Salary> и возвращает строку вида:
 		```Hello, <Name>, your salary is <Salary>```. 
 		
-		Но так как Работадатель Добр, он всегда округляет зарплату до ближайшего целого числа вверх.
+		Но так как Работодатель Добр, он всегда округляет зарплату до ближайшего целого числа вверх.
 
 		Во многих редакторах и IDE сочетание клавиш ```Ctrl + Space``` показывает контекстную подсказку.
 		Тут подсказки также работают, однако внутри Visual Studio они гораздо полнее и удобнее.
@@ -38,10 +38,10 @@ Hello, Steve Jobs, your salary is 1")]
 		[Exercise]
 		private static string PrintGreeting(string name, double salary)
 		{
-			var ans = new StringBuilder("Hello, *, your salary is ");
-			ans.Replace("*", name);
-			ans.Append(Math.Ceiling(salary));
-			return ans.ToString();
+			var text = new StringBuilder("Hello, *, your salary is ");
+			text.Replace("*", name);
+			text.Append(Math.Ceiling(salary));
+			return text.ToString();
 			/*uncomment
 			// возвращает "Hello, <name>, your salary is <salary>"
 			...

@@ -52,10 +52,10 @@
     <Compile Include="Slides\LINQ\S010_Intro.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\S020_ReadNumbersExcercise.cs">
+    <Compile Include="Slides\LINQ\S020_ReadNumbersExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\S030_ReadPointsExcercise.cs">
+    <Compile Include="Slides\LINQ\S030_ReadPointsExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Slides\LINQ\S040_SelectManySample.cs">

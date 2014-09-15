@@ -22,7 +22,7 @@ namespace uLearn.Courses.Linq.Slides
 
 		/*
 
-		Без использования `LINQ`, решение могло бы выглядеть так:
+		Без использования `LINQ` решение могло бы выглядеть так:
 		*/
 
 		[ShowBodyOnSlide]

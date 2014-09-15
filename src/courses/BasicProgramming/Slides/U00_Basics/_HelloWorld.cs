@@ -17,7 +17,7 @@ namespace Lectures
 		static void Main()
 		{
 			// Этот код выводит на экран строку
-			// Console — это класс, также как Program, определенный в пространстве имен System.
+			// Console — это класс, так же как Program, только определенный в пространстве имен System.
 			Console.WriteLine("Hello, world!");
 		}
 	}

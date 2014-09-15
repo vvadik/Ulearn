@@ -6,7 +6,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.Linq.Slides
 {
 	[Slide("Чтение списка точек", "{563307C9-F265-4EA0-B06E-8390582F718E}")]
-	public class S030_ReadPointsExcercise
+	public class S030_ReadPointsExercise
 	{
 		/*
 
