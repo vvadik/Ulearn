@@ -11,7 +11,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U07_Algorithms
 	{
 		//#video qwx_pCfSyN0
 		/*
-		[Материалы по лекции](/Courses/BasicProgramming/U07_Algorithms/_Materials.zip)
+		[Материалы по лекции](_Materials.zip)
 		*/
 	}
 }

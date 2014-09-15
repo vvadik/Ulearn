@@ -3,6 +3,7 @@
 
 @{
 	ViewBag.Title = Model.CourseTitle + " | uLearn";
+	ViewBag.Slide = Model.Slide;
 }
 
 @Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })

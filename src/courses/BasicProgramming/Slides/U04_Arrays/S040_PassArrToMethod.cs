@@ -8,7 +8,7 @@ namespace Slide06
     {
 		//#video UW8A9_r3XCQ
 		/*
-		[Иллюстрация карты памяти](/Courses/BasicProgramming/U04_Arrays/_S050_ValueRferenceType.odp)
+		[Иллюстрация карты памяти](_S050_ValueRferenceType.odp)
 		*/
 	}
 }

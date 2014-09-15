@@ -8,7 +8,7 @@ namespace Slide06
     {
 		//#video tlE1-K0JE5w
 		/*
-		[Иллюстрация карты памяти](/Courses/BasicProgramming/U04_Arrays/_S070_GraphicDimensional.odp)
+		[Иллюстрация карты памяти](_S070_GraphicDimensional.odp)
 		*/
 		/*
 		## Заметки по лекции

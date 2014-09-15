@@ -10,6 +10,8 @@ namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 	class S020_Tree
 	{
 		//#video ruWyL5k1tG0
-		//[Материалы по лекции](/Courses/BasicProgramming/U08_Recursion/_S020_MemoryMap.odp)
+		/*
+		[Материалы по лекции](_S020_MemoryMap.odp)
+		*/
 	}
 }

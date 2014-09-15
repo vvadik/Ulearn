@@ -135,6 +135,7 @@
     <Compile Include="Slides\U03_Cycles\S050_ForVideo.cs" />
     <Compile Include="Slides\U03_Cycles\S055_Border.cs" />
     <Compile Include="Slides\U03_Cycles\S065_Chessboard.cs" />
+    <Compile Include="Slides\U03_Cycles\S099_Exercise.cs" />
     <Compile Include="Slides\U04_Arrays\S010_ArrayAndForeach.cs" />
     <Compile Include="Slides\U04_Arrays\S018_FindPattern.cs" />
     <Compile Include="Slides\U04_Arrays\S017_CountElement.cs" />
@@ -216,6 +217,7 @@
     <Content Include="Slides\U06_AutomaticTesting\Title.txt" />
     <Content Include="Slides\U07_Algorithms\Prelude.txt" />
     <Content Include="Slides\U07_Algorithms\Title.txt" />
+    <None Include="Slides\U03_Cycles\loops.zip" />
     <None Include="Slides\U08_Recursion\InstructorNotes.md" />
     <None Include="Slides\U08_Recursion\_S020_MemoryMap.odp" />
   </ItemGroup>

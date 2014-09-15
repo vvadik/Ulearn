@@ -12,7 +12,7 @@
 		<div class="row">
 			<div id="LikeSolutionUrl" data-url="@Url.Action("LikeSolution")"></div>
 			<h1 class='page-header'>Решения</h1>
-			<p>@Html.Raw(Model.Slide.CommentAfterExerciseIsSolved.RenderMd())</p>
+			<p>@Html.Raw(Model.Slide.CommentAfterExerciseIsSolved.RenderMd(Model.Slide))</p>
 
 			@foreach (AcceptedSolutionInfo solution in Model.AcceptedSolutions)
 			{

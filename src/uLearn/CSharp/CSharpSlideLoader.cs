@@ -12,7 +12,7 @@ namespace uLearn.CSharp
 		{
 			var sourceCode = file.ContentAsUtf8();
 			var prelude = GetPrelude(file.Directory);
-			return SlideParser.ParseCode(sourceCode, new SlideInfo(unitName, slideIndex), prelude, fn => GetInclude(file.Directory, fn));
+			return SlideParser.ParseCode(sourceCode, new SlideInfo(unitName, file, slideIndex), prelude, fn => GetInclude(file.Directory, fn));
 		}
 
 		private string GetInclude(DirectoryInfo directory, string filename)

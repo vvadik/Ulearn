@@ -15,7 +15,7 @@ namespace uLearn.Quizes
 			{
 				b.QuestionIndex = index++;
 			}
-			var slideInfo = new SlideInfo(unitName, slideIndex);
+			var slideInfo = new SlideInfo(unitName, file, slideIndex);
 			return new QuizSlide(slideInfo, quiz);
 		}
 	}

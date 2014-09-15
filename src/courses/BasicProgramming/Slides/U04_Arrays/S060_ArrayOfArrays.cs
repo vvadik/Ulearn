@@ -8,7 +8,7 @@ namespace Slide08
     {
 		//#video _L6_YCruwHs
 		/*
-		[Иллюстрация карты памяти](/Courses/BasicProgramming/U04_Arrays/_S090_Memory.odp)
+		[Иллюстрация карты памяти](_S090_Memory.odp)
 		*/
 		/*
 		## Заметки по лекции

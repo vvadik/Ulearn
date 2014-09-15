@@ -5,7 +5,7 @@ namespace Slide03
 {
 	//#video hqoVg1bFwcY
 	/*
-	[Материалы по лекции](/Courses/BasicProgramming/U05_Collections/_S030_StringToMethod.odp)
+	[Материалы по лекции](_S030_StringToMethod.odp)
 	*/
 	/*
 	## Заметки по лекции

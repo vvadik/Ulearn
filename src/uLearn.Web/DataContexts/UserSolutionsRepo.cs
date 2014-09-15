@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -123,10 +121,11 @@ namespace uLearn.Web.DataContexts
 			var answer = prepared
 				.GroupBy(x => x.CodeHash)
 				.Select(x => x.OrderByDescending(y => timeNow.Subtract(y.Timestamp).TotalMilliseconds))
-				.Select(x => x.First())
-				.OrderByDescending(x => (x.Likes.Count+1)/timeNow.Subtract(x.Timestamp).TotalMilliseconds)
+				.Select(x => new{sol = x.First(), likes = x.Sum(s => s.Likes.Count)} )
+				.OrderByDescending(x => (x.likes+1)/timeNow.Subtract(x.sol.Timestamp).TotalMilliseconds)
 				.Take(5)
-				.OrderByDescending(x => x.Likes.Count)
+				.OrderByDescending(x => x.likes)
+				.Select(x => x.sol)
 				.Select(x => new AcceptedSolutionInfo(x.Code, x.Id, x.Likes.Select(y => y.UserId)))
 				.ToList();
 			return answer;
