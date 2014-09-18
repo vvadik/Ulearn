@@ -236,13 +236,20 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult DailyStatistics(string courseId, string unitName)
 		{
-			var course = courseManager.GetCourse(courseId);
-			var slides = course.Slides
-				.Where(s => s.Info.UnitName == unitName).ToArray();
-			var model = GetDailyStatistics(course, slides);
+			IEnumerable<Slide> slides = null;
+			if (courseId != null)
+			{
+				var course = courseManager.GetCourse(courseId);
+				slides = course.Slides.Where(s => unitName == null || s.Info.UnitName == unitName);
+			}
+			var model = GetDailyStatistics(slides);
 			return PartialView(model);
 		}
 
+		public ActionResult SystemStatistics()
+		{
+			return View();
+		}
 
 		public ActionResult UsersProgress(string courseId, string unitName)
 		{
@@ -253,10 +260,9 @@ namespace uLearn.Web.Controllers
 			return PartialView(new UserProgressViewModel{Slides = slides, Users = users, CourseId = courseId});
 		}
 
-		private DailyStatistics[] GetDailyStatistics(Course course, Slide[] slides)
+		private DailyStatistics[] GetDailyStatistics(IEnumerable<Slide> slides = null)
 		{
-			var slideIds = slides.Select(s => s.Id).ToArray();
-			var courseId = course.Id;
+			var slideIds = slides == null ? null : slides.Select(s => s.Id).ToArray();
 			var lastDay = DateTime.Now.Date.Add(new TimeSpan(0, 23, 59, 59, 999));
 			var firstDay = lastDay.Date.AddDays(-14);
 			var tasks = GetTasksSolvedStats(slideIds, firstDay, lastDay);
@@ -275,34 +281,38 @@ namespace uLearn.Web.Controllers
 			return result;
 		}
 
-		private Dictionary<DateTime, int> GetTasksSolvedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
+		private IQueryable<T> FilterBySlides<T>(IQueryable<T> source, IEnumerable<string> slideIds) where T : class, ISlideAction
 		{
-			var q = from s in db.UserSolutions
-					where slideIds.Contains(s.SlideId) && s.Timestamp > firstDay && s.Timestamp <= lastDay && s.IsRightAnswer
+			return slideIds == null ? source : source.Where(s => slideIds.Contains(s.SlideId));
+		}
+
+		private IQueryable<T> FilterByTime<T>(IQueryable<T> source, DateTime firstDay, DateTime lastDay) where T : class, ISlideAction
+		{
+			return source.Where(s => s.Timestamp > firstDay && s.Timestamp <= lastDay);
+		}
+
+		private Dictionary<DateTime, int> GroupByDays<T>(IQueryable<T> actions) where T : class, ISlideAction
+		{
+			var q = from s in actions
 					group s by DbFunctions.TruncateTime(s.Timestamp)
 						into day
 						select new { day.Key, count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
 			return q.ToDictionary(d => d.Key.Value, d => d.count);
 		}
 
+		private Dictionary<DateTime, int> GetTasksSolvedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
+		{
+			return GroupByDays(FilterByTime(FilterBySlides(db.UserSolutions, slideIds), firstDay, lastDay).Where(s => s.IsRightAnswer));
+		}
+
 		private Dictionary<DateTime, int> GetQuizPassedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
 		{
-			var query = from q in db.UserQuizzes
-						where slideIds.Contains(q.SlideId) && q.Timestamp > firstDay && q.Timestamp <= lastDay
-						group q by DbFunctions.TruncateTime(q.Timestamp)
-							into day
-							select new { day.Key, count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
-			return query.ToDictionary(d => d.Key.Value, d => d.count);
+			return GroupByDays(FilterByTime(FilterBySlides(db.UserQuizzes, slideIds), firstDay, lastDay));
 		}
 		
 		private Dictionary<DateTime, int> GetSlidesVisitedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
 		{
-			var query = from v in db.Visiters
-						where slideIds.Contains(v.SlideId) && v.Timestamp > firstDay && v.Timestamp <= lastDay
-						group v by DbFunctions.TruncateTime(v.Timestamp)
-							into day
-							select new { day.Key, count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
-			return query.ToDictionary(d => d.Key.Value, d => d.count);
+			return GroupByDays(FilterByTime(FilterBySlides(db.Visiters, slideIds), firstDay, lastDay));
 		}
 
 		private SlideRateStats[] GetSlideRateStats(Course course, IEnumerable<Slide> slides)

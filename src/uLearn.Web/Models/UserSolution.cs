@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace uLearn.Web.Models
 {
-	public class UserSolution
+	public class UserSolution : ISlideAction
 	{
 		[Required]
 		[Key]

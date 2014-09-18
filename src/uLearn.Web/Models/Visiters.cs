@@ -6,7 +6,7 @@ using System.Web;
 
 namespace uLearn.Web.Models
 {
-	public class Visiters
+	public class Visiters : ISlideAction
 	{
 		[Key]
 		public int Id { get; set; }
