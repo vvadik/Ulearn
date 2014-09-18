@@ -76,6 +76,8 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Slides\U02_Ifs\Title.txt" />
+    <Content Include="Slides\U03_Cycles\dragon.png" />
+    <Content Include="Slides\U03_Cycles\fern.png" />
     <Content Include="Slides\U05_Collections\S085_IO.xml">
       <SubType>Designer</SubType>
     </Content>
