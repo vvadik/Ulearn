@@ -31,7 +31,7 @@ namespace OOP.Slides.U01_DataTypes_And_Algorithms
 		/*
 		
 
-		Реализуйте в классе Vector следующие методв:
+		Реализуйте в классе Vector следующие методы:
 		
 		* Add, для сложения векторов, 
 		* Multiply для умножения вектора на число, 

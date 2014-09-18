@@ -105,6 +105,7 @@
   <ItemGroup>
     <Content Include="Slides\Prelude.txt" />
     <Content Include="Slides\Title.txt" />
+    <Content Include="Slides\U01_DataTypes_And_Algorithms\robot.png" />
     <Content Include="Slides\U01_DataTypes_And_Algorithms\Title.txt" />
     <Content Include="Slides\U00_Intro\Title.txt" />
     <Content Include="Slides\U02_Polymorphism\Title.txt" />
