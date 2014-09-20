@@ -19,6 +19,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 			██  ██  ██
 			  ██  ██  
 			██  ██  ██
+
+		Белая клетка обозначается двумя пробелами, черная — двумя символами [black square](http://unicode-table.com/en/25A0/). Вы можете копировать их из примера выше и вставлять в свой код.
 		*/
 
 		[ExpectedOutput(@"

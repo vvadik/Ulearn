@@ -9,7 +9,7 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	[Authorize(Roles = LmsRoles.Instructor)]
+	[Authorize(Roles = LmsRoles.Admin)]
 	public class UnitController : Controller
 	{
 		private readonly CourseManager courseManager;

@@ -32,10 +32,6 @@
 					@if (User.IsInRole(LmsRoles.Admin))
 					{
 						<li>@Html.ActionLink("Пользователи", "List", "Account")</li>
-					}
-
-					@if (User.IsInRole(LmsRoles.Instructor))
-					{
 						<li>@Html.ActionLink("Администрирование курсов", "CourseList", "Unit")</li>
 					}
 

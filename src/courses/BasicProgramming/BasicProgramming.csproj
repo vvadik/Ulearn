@@ -38,6 +38,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -95,6 +96,7 @@
     </Content>
     <Content Include="Slides\U08_Recursion\Prelude.txt" />
     <Content Include="Slides\U08_Recursion\Title.txt" />
+    <Content Include="Slides\U09_Sorting\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
     <Content Include="Slides\U01_Mistakes\S091_Style2.xml">
       <SubType>Designer</SubType>
@@ -206,6 +208,13 @@
     <Compile Include="Slides\U08_Recursion\S070_Combinations.cs" />
     <Compile Include="Slides\U08_Recursion\S080_BinSearch.cs" />
     <Compile Include="Slides\U08_Recursion\S090_ComparingSearches.cs" />
+    <Compile Include="Slides\U09_Sorting\S010_BinSearch.cs" />
+    <Compile Include="Slides\U09_Sorting\S020_LinearSearch.cs" />
+    <Compile Include="Slides\U09_Sorting\S030_BinSearchAnalysis.cs" />
+    <Compile Include="Slides\U09_Sorting\S040_Performance.cs" />
+    <Compile Include="Slides\U09_Sorting\S050_BubbleSort.cs" />
+    <Compile Include="Slides\U09_Sorting\S060_MergeSort.cs" />
+    <Compile Include="Slides\U09_Sorting\S070_QuickSort.cs" />
     <Compile Include="Slides_Tests.cs" />
     <Content Include="Slides\U04_Arrays\Prelude.txt" />
     <Content Include="Slides\U04_Arrays\S061_ArrayQuiz.xml">
@@ -254,6 +263,7 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>REM copy this post build step to new course

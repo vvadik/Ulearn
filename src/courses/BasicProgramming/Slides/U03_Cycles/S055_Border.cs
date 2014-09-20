@@ -49,7 +49,8 @@ namespace uLearn.Courses.BasicProgramming.Slides
 		}
 
 		[Exercise]
-		[Hint("Используйте цикл")]
+		[Hint("Разбейте код на три части — верх рамки, середина и низ рамки")]
+		[Hint("Верх и низ рамки одинаковый, можно один раз сформировать строку и вывести ее дважды — в начале и в конце")]
 		private static void WriteTextWithBorder(string text)
 		{
 			string bar = "";

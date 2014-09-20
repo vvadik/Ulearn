@@ -54,9 +54,6 @@ namespace uLearn.Courses.BasicProgramming.Slides
 					return twoPowered;
 				return -1;
 			}
-			/*uncomment
-			...
-			*/
 		}
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
+namespace uLearn.Courses.BasicProgramming.Slides.U03_Cycles
 {
 	[Slide("Убрать пробелы", "{9A15EBD5-0616-4A18-B842-E63E2C3C21FA}")]
 	internal class S046_RemoveSpaces
@@ -9,7 +9,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.Slides.U03_Cycles
 		/*
 		Враги вставили в начало каждого полезного текста целую кучу бесполезных пробельных символов!
 
-		Напишите функцию удаления начальных пробелов из строки, чтобы утереть нос врагам.
+		Напишите функцию для удаления начальных пробелов из строки, чтобы утереть нос врагам. Используйте цикл!
 		*/
 
 		[ExpectedOutput(@"
@@ -33,17 +33,18 @@ strange spaces
 			Console.WriteLine(RemoveStartSpaces("                             many spaces"));
 			Console.WriteLine(RemoveStartSpaces("               "));
 			Console.WriteLine(RemoveStartSpaces("\n\r line breaks are spaces too"));
-			Console.WriteLine(RemoveStartSpaces(StrangeSpaces + " strange spaces"));
+			Console.WriteLine(RemoveStartSpaces(strangeSpaces + " strange spaces"));
 		}
 
 		[HideOnSlide]
-		private const string StrangeSpaces = "\x000b\x000c\x00a0\x0085";
+		private const string strangeSpaces = "\x000b\x000c\x00a0\x0085";
 
 		[Exercise]
 		[Hint("Вам нужен цикл по символам текста до тех пор пока символы пробельные.")]
 		[Hint("На самом деле существует много различных 'пробельных' символов.")]
 		[Hint("В классе char есть статический метод для определения, является ли символ пробельным.")]
 		[Hint("Вам поможет char.IsWhiteSpace")]
+		[CommentAfterExerciseIsSolved("На самом деле уже есть готовая функция `TrimStart` в классе `string`, убирающая пробелы в начале строки. Эта задачу можно было решить в одну строку `text.TrimStart()`")]
 		public static string RemoveStartSpaces(string text)
 		{
 			var i = 0;
