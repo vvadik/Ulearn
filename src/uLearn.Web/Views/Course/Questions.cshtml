@@ -2,12 +2,13 @@
 
 @foreach (var q in Model.OrderByDescending(q => q.Time))
 {
-	<div>
+	<div style="font-weight:bold">
 		<span>@q.Time.ToShortDateString()</span>
 		<span>@q.UserName</span>
+		<span>@q.User.GroupName</span>
 		<span>@q.SlideTitle</span>
 	</div>
-	<div>
+	<div style="margin-bottom: 1em;">
 		@q.Question
 	</div>
 }

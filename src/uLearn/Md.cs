@@ -1,20 +1,15 @@
-﻿using MarkdownDeep;
+﻿using System.IO;
+using MarkdownDeep;
 using NUnit.Framework;
 
 namespace uLearn
 {
 	public static class Md
 	{
-		public static string RenderMd(this string md, Slide slide)
+		public static string RenderMd(this string md, FileInfo sourceFile)
 		{
-			var baseUrl = "/Courses/" + slide.Info.DirectoryRelativePath;
-			var markdown = new Markdown2(baseUrl)
-			{
-				NewWindowForExternalLinks = true,
-				ExtraMode = true,
-				SafeMode = true,
-			};
-			return markdown.Transform(md);
+			var baseUrl = "/Courses/" + CourseUnitUtls.GetDirectoryRelativeWebPath(sourceFile);
+			return md.RenderMd(baseUrl);
 		}
 
 		public static string RenderMd(this string md, string baseUrl = null)

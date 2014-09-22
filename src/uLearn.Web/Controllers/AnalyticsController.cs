@@ -438,6 +438,12 @@ namespace uLearn.Web.Controllers
 			};
 			return View("UserSolutions", model);
 		}
+
+		public ActionResult AllQuestions()
+		{
+			var questions = db.UserQuestions.OrderByDescending(q => q.Time).Take(20).ToList();
+			return PartialView("..\\Course\\Questions", questions);
+		}
 	}
 
 	public class UserSolutionsViewModel

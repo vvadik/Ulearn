@@ -54,7 +54,7 @@ namespace uLearn.Web.Controllers
 			for (var i = 0; i <= hintsCount; i++)
 			{
 				var isLiked = slideHintRepo.IsHintLiked(courseId, exerciseSlide.Id, User.Identity.GetUserId(), i);
-				ans[i] = await MakeExerciseHint(exerciseSlide.HintsMd[i].RenderMd(exerciseSlide), i, courseId, exerciseSlide.Id, isLiked);
+				ans[i] = await MakeExerciseHint(exerciseSlide.HintsMd[i].RenderMd(exerciseSlide.Info.SlideFile), i, courseId, exerciseSlide.Id, isLiked);
 			}
 			return ans;
 		}

@@ -153,6 +153,7 @@
     <Compile Include="Slides\U04_Arrays\S050_MultiDimensionArr.cs" />
     <Compile Include="Slides\U04_Arrays\S060_ArrayOfArrays.cs" />
     <Compile Include="Slides\U04_Arrays\S062_TicTacToe.cs" />
+    <Compile Include="Slides\U04_Arrays\S090_Exercise.cs" />
     <Compile Include="Slides\U05_Collections\S010_List.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -228,6 +229,7 @@
     <Content Include="Slides\U07_Algorithms\Prelude.txt" />
     <Content Include="Slides\U07_Algorithms\Title.txt" />
     <None Include="Slides\U03_Cycles\loops.zip" />
+    <None Include="Slides\U04_Arrays\arrays.zip" />
     <None Include="Slides\U08_Recursion\InstructorNotes.md" />
     <None Include="Slides\U08_Recursion\_S020_MemoryMap.odp" />
   </ItemGroup>

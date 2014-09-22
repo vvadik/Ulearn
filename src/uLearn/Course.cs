@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace uLearn
@@ -43,15 +44,17 @@ namespace uLearn
 
 	public class InstructorNote
 	{
-		public InstructorNote(string markdown, string courseId, string unitName)
+		public InstructorNote(string markdown, string courseId, string unitName, FileInfo file)
 		{
 			Markdown = markdown;
 			CourseId = courseId;
 			UnitName = unitName;
+			File = file;
 		}
 
 		public string Markdown;
 		public string CourseId;
 		public string UnitName;
+		public FileInfo File;
 	}
 }

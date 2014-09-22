@@ -14,7 +14,7 @@
 			<div class='slide'>
 				<h1>Заметки преподавателю <small>@Model.UnitName</small></h1>
 				<hr/>
-				@Html.Raw(Model.Markdown.RenderMd())
+				@Html.Raw(Model.Markdown.RenderMd(Model.File))
 			</div>
 		</div>
 	</div>

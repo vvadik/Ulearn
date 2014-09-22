@@ -19,12 +19,20 @@ namespace uLearn
 		{
 			get
 			{
-				// ReSharper disable PossibleNullReferenceException
-				var courseDir = SlideFile.Directory.Parent.Name;
-				var unitDir = SlideFile.Directory.Name;
-				// ReSharper restore PossibleNullReferenceException
-				return courseDir + "/" + unitDir;
+				return CourseUnitUtls.GetDirectoryRelativeWebPath(SlideFile);
 			}
+		}
+	}
+
+	public class CourseUnitUtls
+	{
+		public static string GetDirectoryRelativeWebPath(FileInfo file)
+		{
+			// ReSharper disable PossibleNullReferenceException
+			var courseDir = file.Directory.Parent.Name;
+			var unitDir = file.Directory.Name;
+			// ReSharper restore PossibleNullReferenceException
+			return courseDir + "/" + unitDir;
 		}
 	}
 }

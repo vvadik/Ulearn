@@ -17,7 +17,7 @@
 		}
 		else if (quizBlock is TextBlock)
 		{
-			@Html.Raw(((TextBlock) quizBlock).Text.RenderMd(quizSlide))
+			@Html.Raw(((TextBlock)quizBlock).Text.RenderMd(quizSlide.Info.SlideFile))
 		}
 		else if (quizBlock is AbstractQuestionBlock)
 		{
