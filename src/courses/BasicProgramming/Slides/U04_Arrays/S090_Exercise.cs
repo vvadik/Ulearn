@@ -2,7 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 {
-	[Slide("", "D6009361-59F4-476A-B256-8C343D4DFF1C")]
+	[Slide("Практика", "D6009361-59F4-476A-B256-8C343D4DFF1C")]
 	public class S090_Exercise
 	{
 		/* 
