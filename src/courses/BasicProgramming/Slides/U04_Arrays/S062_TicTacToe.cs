@@ -1,26 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 {
 	/*
-	В этой задаче вам предстоит написать программу, которая определяет, есть ли победитель.
+	Вам с Васей наконец-то надоело тренироваться на маленьких программках и вы взялись за настоящее дело!
+	Вы решили написать игру [крестики-нолики](https://ru.wikipedia.org/wiki/%D0%9A%D1%80%D0%B5%D1%81%D1%82%D0%B8%D0%BA%D0%B8-%D0%BD%D0%BE%D0%BB%D0%B8%D0%BA%D0%B8)!
 
-	Играть будем в [крестики-нолики](https://ru.wikipedia.org/wiki/%D0%9A%D1%80%D0%B5%D1%81%D1%82%D0%B8%D0%BA%D0%B8-%D0%BD%D0%BE%D0%BB%D0%B8%D0%BA%D0%B8)!
-	
+	Начать было решено с подпрограммы, определяющей не закончилась ли уже игра, а если закончилась, то кто выиграл.
+
 	Методу `GetGameResult` передается поле, представленное массивом 3х3 из `enum Markers`. 
-	Вам надо вернуть победителя (`BlackPlayer`, `WhitePlayer`), если таковой имеется или `Draw`, 
+	Вам надо вернуть победителя `BlackPlayer` или `WhitePlayer`, если таковой имеется или `Draw`, 
 	если выигрышной последовательности нет ни у одного, либо есть у обоих.
 
-	Это задача заметно сложнее предыдущих. Постарайтесь придумать красивое, понятное решение.
+	Постарайтесь придумать красивое, понятное решение.
 
 	Подумайте, как разбить задачу на более простые подзадачи. Попытайтесь выделить один или два вспомогательных метода.
-	
+
+	Если вы в затруднении, воспользуйтесь подсказками (кнопка GET HINTS)	
 	*/
 	[Slide("Крестики-нолики", "{B4F3138D-5CDB-4F8A-9976-E0F4D379687A}")]
 	class S062_TicTacToe
@@ -32,10 +29,10 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 			Circle
 		}
 
-		public enum GameResults 
+		public enum GameResult 
 		{ 
-			CrossPlayer, 
-			CirclePlayer, 
+			CrossWin, 
+			CircleWin, 
 			Draw
 		}
 
@@ -43,17 +40,17 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 XXX
 OO.
 ...
-CrossPlayer
+CrossWin
 
 OXO
 XO.
 .XO
-CirclePlayer
+CircleWin
 
 OXO
 XOX
 OX.
-CirclePlayer
+CircleWin
 
 XOX
 OXO
@@ -106,14 +103,14 @@ Draw
 		[Hint(@"Каждую выигрышную линию можно задать четверкой (x0, y0, dx, dy) — координатой левой верхней ячейки этой линии (x0, y0) и направлением к остальным ячейкам этой линии (dx, dy).
 Например, побочная диагональ задается четверкой (0, 2, 1, -1). 
 Подумайте, как это можно применить!")]
-		public static GameResults GetGameResult(Mark[,] field)
+		public static GameResult GetGameResult(Mark[,] field)
 		{
 			bool circleWin = HasWinSequence(field, Mark.Circle);
 			bool crossWin = HasWinSequence(field, Mark.Cross);
-			if (circleWin && crossWin) return GameResults.Draw;
-			if (circleWin) return GameResults.CirclePlayer;
-			if (crossWin) return GameResults.CrossPlayer;
-			return GameResults.Draw;
+			if (circleWin && crossWin) return GameResult.Draw;
+			if (circleWin) return GameResult.CircleWin;
+			if (crossWin) return GameResult.CrossWin;
+			return GameResult.Draw;
 		}
 
 		[HideOnSlide]

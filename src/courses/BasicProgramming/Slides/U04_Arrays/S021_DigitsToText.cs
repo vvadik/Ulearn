@@ -48,7 +48,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 			if (digit == 0) return "ноль";
 			else if (digit == 1) return "один";
 			else if (digit == 2) return "два";
-			...
+			return "надоело...";
 			*/
 		}
 	}
