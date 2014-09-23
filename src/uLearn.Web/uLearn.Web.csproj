@@ -780,6 +780,7 @@
     <Content Include="Views\Analytics\SlideRatings.cshtml" />
     <Content Include="Views\Analytics\UserSolutions.cshtml" />
     <Content Include="Views\Analytics\SystemStatistics.cshtml" />
+    <Content Include="Views\Account\ChangeDetailsPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

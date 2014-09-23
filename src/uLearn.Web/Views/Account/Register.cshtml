@@ -11,7 +11,7 @@
 		@Html.AntiForgeryToken()
 		<h4>Регистрация аккаунта</h4>
 		<hr />
-		@Html.ValidationSummary()
+		@Html.ValidationSummary("Нет, так не пойдет!")
 		<div class="form-group">
 			@Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })
 			<div class="col-md-10">

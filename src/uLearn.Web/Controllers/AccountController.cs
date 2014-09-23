@@ -114,7 +114,7 @@ namespace uLearn.Web.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var user = new ApplicationUser() {UserName = model.UserName};
+				var user = new ApplicationUser() { UserName = model.UserName };
 				var result = await UserManager.CreateAsync(user, model.Password);
 				if (result.Succeeded)
 				{
@@ -147,7 +147,7 @@ namespace uLearn.Web.Controllers
 			{
 				message = ManageMessageId.Error;
 			}
-			return RedirectToAction("Manage", new {Message = message});
+			return RedirectToAction("Manage", new { Message = message });
 		}
 
 		//
@@ -186,7 +186,7 @@ namespace uLearn.Web.Controllers
 						await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
 					if (result.Succeeded)
 					{
-						return RedirectToAction("Manage", new {Message = ManageMessageId.ChangePasswordSuccess});
+						return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
 					}
 					else
 					{
@@ -208,7 +208,7 @@ namespace uLearn.Web.Controllers
 					IdentityResult result = await UserManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword);
 					if (result.Succeeded)
 					{
-						return RedirectToAction("Manage", new {Message = ManageMessageId.SetPasswordSuccess});
+						return RedirectToAction("Manage", new { Message = ManageMessageId.SetPasswordSuccess });
 					}
 					else
 					{
@@ -229,7 +229,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult ExternalLogin(string provider, string returnUrl)
 		{
 			// Request a redirect to the external login provider
-			return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new {ReturnUrl = returnUrl}));
+			return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
 		}
 
 		//
@@ -256,7 +256,7 @@ namespace uLearn.Web.Controllers
 				ViewBag.ReturnUrl = returnUrl;
 				ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
 				return View("ExternalLoginConfirmation",
-					new ExternalLoginConfirmationViewModel {UserName = loginInfo.DefaultUserName});
+					new ExternalLoginConfirmationViewModel { UserName = loginInfo.DefaultUserName });
 			}
 		}
 
@@ -277,14 +277,14 @@ namespace uLearn.Web.Controllers
 			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(XsrfKey, User.Identity.GetUserId());
 			if (loginInfo == null)
 			{
-				return RedirectToAction("Manage", new {Message = ManageMessageId.Error});
+				return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
 			}
 			var result = await UserManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login);
 			if (result.Succeeded)
 			{
 				return RedirectToAction("Manage");
 			}
-			return RedirectToAction("Manage", new {Message = ManageMessageId.Error});
+			return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
 		}
 
 		//
@@ -307,7 +307,7 @@ namespace uLearn.Web.Controllers
 				{
 					return View("ExternalLoginFailure");
 				}
-				var user = new ApplicationUser() {UserName = model.UserName};
+				var user = new ApplicationUser() { UserName = model.UserName };
 				var result = await UserManager.CreateAsync(user);
 				if (result.Succeeded)
 				{
@@ -348,7 +348,7 @@ namespace uLearn.Web.Controllers
 		{
 			var linkedAccounts = UserManager.GetLogins(User.Identity.GetUserId());
 			ViewBag.ShowRemoveButton = HasPassword() || linkedAccounts.Count > 1;
-			return (ActionResult) PartialView("_RemoveAccountPartial", linkedAccounts);
+			return (ActionResult)PartialView("_RemoveAccountPartial", linkedAccounts);
 		}
 
 		protected override void Dispose(bool disposing)
@@ -375,7 +375,7 @@ namespace uLearn.Web.Controllers
 		{
 			AuthenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
 			var identity = await UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
-			AuthenticationManager.SignIn(new AuthenticationProperties() {IsPersistent = isPersistent}, identity);
+			AuthenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, identity);
 		}
 
 		private void AddErrors(IdentityResult result)
@@ -436,7 +436,7 @@ namespace uLearn.Web.Controllers
 
 			public override void ExecuteResult(ControllerContext context)
 			{
-				var properties = new AuthenticationProperties() {RedirectUri = RedirectUri};
+				var properties = new AuthenticationProperties() { RedirectUri = RedirectUri };
 				if (UserId != null)
 				{
 					properties.Dictionary[XsrfKey] = UserId;
@@ -446,5 +446,36 @@ namespace uLearn.Web.Controllers
 		}
 
 		#endregion
+
+		[Authorize]
+		public async Task<PartialViewResult> ChangeDetailsPartial()
+		{
+			var user = await UserManager.FindByNameAsync(User.Identity.Name);
+			return PartialView(new UserViewModel { Name = user.UserName, GroupName = user.GroupName, UserId = user.Id });
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> ChangeDetailsPartial(UserViewModel userModel)
+		{
+			var user = await UserManager.FindByIdAsync(userModel.UserId);
+			if (user == null)
+			{
+				AuthenticationManager.SignOut();
+				return RedirectToAction("Login");
+			}
+			var nameChanged = user.UserName != userModel.Name;
+			if (nameChanged && await UserManager.FindByNameAsync(userModel.Name) != null)
+				return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
+			user.UserName = userModel.Name;
+			user.GroupName = userModel.GroupName;
+			await UserManager.UpdateAsync(user);
+
+			if (nameChanged)
+			{
+				AuthenticationManager.SignOut();
+				return RedirectToAction("Login");
+			}
+			return RedirectToAction("Manage");
+		}
 	}
 }

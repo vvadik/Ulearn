@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace uLearn.Web.Models
 {
 	public class ExternalLoginConfirmationViewModel
 	{
-		[Required(ErrorMessage = "Это обязательное поле")]
+		[Required(ErrorMessage = "{0} — это обязательное поле")]
 		[Display(Name = "Имя (логин)")]
 		public string UserName { get; set; }
 	}
@@ -24,7 +25,7 @@ namespace uLearn.Web.Models
 
 		[DataType(DataType.Password)]
 		[Display(Name = "Подтвердите новый пароль")]
-		[Compare("NewPassword", ErrorMessage = "Подтверждение нового пароля и сам новый пароль отличаются.")]
+		[System.ComponentModel.DataAnnotations.Compare("NewPassword", ErrorMessage = "Подтверждение нового пароля и сам новый пароль отличаются.")]
 		public string ConfirmPassword { get; set; }
 	}
 
@@ -65,5 +66,18 @@ namespace uLearn.Web.Models
 		public string ConfirmPassword { get; set; }
 		
 		public string ReturnUrl { get; set; }
+	}
+
+	public class UserViewModel
+	{
+		[HiddenInput]
+		public string UserId { get; set; }
+
+		[Required(ErrorMessage = "{0} — это обязательное поле")]
+		[Display(Name = "Имя (логин)")]
+		public string Name { get; set; }
+
+		[Display(Name = "Учебная группа")]
+		public string GroupName { get; set; }
 	}
 }
