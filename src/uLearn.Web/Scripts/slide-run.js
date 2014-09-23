@@ -33,7 +33,10 @@ function setResults(ans) {
 	if (ans.IsCompillerFailure) setSimpleResult($serviceError, ans.CompilationError);
 	else if (ans.IsCompileError) setSimpleResult($compileError, ans.CompilationError);
 	else if (ans.IsStyleViolation) setSimpleResult($styleError, ans.CompilationError);
-	else if (ans.IsRightAnswer) setSimpleResult($success, ans.ActualOutput);
+	else if (ans.IsRightAnswer) {
+		setSimpleResult($success, ans.ActualOutput);
+		slideNavigation.makeShowSolutionsNext();
+	}
 	else setWA(ans.ExpectedOutput, ans.ActualOutput);
 }
 

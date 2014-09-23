@@ -114,21 +114,23 @@ namespace uLearn.Web.DataContexts
 
 		public List<AcceptedSolutionInfo> GetAllAcceptedSolutions(string courseId, string slideId)
 		{
-			var timeNow = DateTime.Now;
 			var prepared = db.UserSolutions
 				.Where(x => x.IsRightAnswer && x.SlideId == slideId && x.CourseId == courseId)
-				.ToList();
-			var answer = prepared
 				.GroupBy(x => x.CodeHash)
-				.Select(x => x.OrderByDescending(y => timeNow.Subtract(y.Timestamp).TotalMilliseconds))
-				.Select(x => new{sol = x.First(), likes = x.Sum(s => s.Likes.Count)} )
-				.OrderByDescending(x => (x.likes+1)/timeNow.Subtract(x.sol.Timestamp).TotalMilliseconds)
-				.Take(5)
-				.OrderByDescending(x => x.likes)
-				.Select(x => x.sol)
+				.Select(x => new { sol = x.OrderBy(y => y.Timestamp).FirstOrDefault(), likes = x.Sum(s => s.Likes.Count) })
+				.ToList();
+
+			var best = prepared
+				.OrderByDescending(x => x.likes);
+			var timeNow = DateTime.Now;
+			var trending = prepared
+				.OrderByDescending(x => (x.likes + 1) / timeNow.Subtract(x.sol.Timestamp).TotalMilliseconds);
+			var newest = prepared
+				.OrderByDescending(x => x.sol.Timestamp);
+			var answer = best.Take(3).Concat(trending.Take(3)).Concat(newest).Distinct().Take(10).Select(x => x.sol);
+			return answer
 				.Select(x => new AcceptedSolutionInfo(x.Code, x.Id, x.Likes.Select(y => y.UserId)))
 				.ToList();
-			return answer;
 		}
 
 		public bool IsUserPassedTask(string courseId, string slideId, string userId)

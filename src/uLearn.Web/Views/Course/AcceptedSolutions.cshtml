@@ -14,6 +14,8 @@
 			<h1 class='page-header'>Решения</h1>
 			<p>@Html.Raw(Model.Slide.CommentAfterExerciseIsSolved.RenderMd(Model.Slide.Info.SlideFile))</p>
 
+			<p>Изучите решения ваших коллег. Проголосуйте за решения, в которых вы нашли что-то новое для себя.</p>
+
 			@foreach (AcceptedSolutionInfo solution in Model.AcceptedSolutions)
 			{
 				var id = "solution_" + solution.Id;
@@ -22,6 +24,16 @@
 						<i class="glyphicon glyphicon-heart"></i>
 						<span class="likes-counter">@solution.UsersWhoLike.Count</span>
 					</button>
+
+					@if (User.IsInRole(LmsRoles.Instructor) || User.IsInRole(LmsRoles.Admin))
+					{
+						using (Html.BeginForm("RemoveSolution", "Course", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, solutionId = solution.Id }))
+						{
+							<button class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i>
+								Удалить решение
+							</button>
+						}
+					}
 					<textarea class='code code-sample'>@solution.Code</textarea>
 				</div>
 			}

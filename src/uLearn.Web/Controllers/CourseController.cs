@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -203,5 +204,18 @@ namespace uLearn.Web.Controllers
 			InstructorNote instructorNote = courseManager.GetCourse(courseId).GetInstructorNote(unitName);
 			return View(instructorNote);
 		}
+
+		[HttpPost]
+		[Authorize(Roles=LmsRoles.Instructor + "," + LmsRoles.Admin)]
+		public async Task<ActionResult> RemoveSolution(string courseId, int slideIndex, int solutionId)
+		{
+			var solution = await db.UserSolutions.FirstOrDefaultAsync(s => s.Id == solutionId);
+			if (solution != null)
+			{
+				db.UserSolutions.Remove(solution);
+				await db.SaveChangesAsync();
+			}
+			return RedirectToAction("AcceptedSolutions", new { courseId = courseId, slideIndex = slideIndex });
 		}
+	}
 }

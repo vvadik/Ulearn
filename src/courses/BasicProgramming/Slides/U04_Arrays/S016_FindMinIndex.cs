@@ -1,5 +1,6 @@
 ﻿  using System;
-using uLearn.CSharp;
+  using System.Linq;
+  using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 {
@@ -20,7 +21,8 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 		}
 
 		/*
-		А вам выпала задача посложнее — написать метод поиска индекса максимального элемента.
+		А вам выпала задача посложнее — написать метод поиска индекса максимального элемента. 
+		То есть такого числа i, что array[i] — это максимальное из чисел в массиве.
 		
 		Если в массиве максимальный элемент встречается несколько раз, вывести нужно минимальный индекс.
 		
@@ -34,8 +36,9 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 1
 3
 0
+999999
+0
 ")]
-		[HideOnSlide]
 		public static void Main()
 		{
 			Console.WriteLine(MaxIndex(new double[] { 1, 2, 3 }));
@@ -44,17 +47,29 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 			Console.WriteLine(MaxIndex(new double[] { 0, 100, 1, 2, 100 }));
 			Console.WriteLine(MaxIndex(new double[] { 1, 2, 3, 100, 4, 5, 6 }));
 			Console.WriteLine(MaxIndex(new double[] { 100, 100, 100, 100 }));
+			Console.WriteLine(MaxIndex(CreateSecretBigArray1()));
+			Console.WriteLine(MaxIndex(CreateSecretBigArray2()));
+		}
+		[HideOnSlide]
+		private static double[] CreateSecretBigArray1()
+		{
+			return Enumerable.Range(1, 1000000).Select(i => (double)i).ToArray();
+		}
+		[HideOnSlide]
+		private static double[] CreateSecretBigArray2()
+		{
+			return Enumerable.Range(1, 1000000).Select(i => 42.0).ToArray();
 		}
 
 		[Exercise]
 		[Hint("Помните, что массив может быть пустым")]
 		[Hint("Длина массива находится в ```.Length```")]
-		public static int MaxIndex(double[] a)
+		public static int MaxIndex(double[] array)
 		{
-			if (a.Length == 0) return -1;
+			if (array.Length == 0) return -1;
 			int maxIndex = 0;
-			for (int i = 0; i < a.Length; i++)
-				if (a[i] > a[maxIndex]) maxIndex = i;
+			for (int i = 0; i < array.Length; i++)
+				if (array[i] > array[maxIndex]) maxIndex = i;
 			return maxIndex;
 		}
 	}

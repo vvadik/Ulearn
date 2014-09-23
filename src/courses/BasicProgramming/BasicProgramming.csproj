@@ -145,7 +145,7 @@
     <Compile Include="Slides\U04_Arrays\S017_CountElement.cs" />
     <Compile Include="Slides\U04_Arrays\S016_FindMinIndex.cs" />
     <Compile Include="Slides\U04_Arrays\S021_DigitsToText.cs" />
-    <Compile Include="Slides\U04_Arrays\S015_ReverseArray.cs" />
+    <Compile Include="Slides\U04_Arrays\S015_EvenArray.cs" />
     <Compile Include="Slides\U04_Arrays\S020_ShortForm.cs" />
     <Compile Include="Slides\U04_Arrays\S030_ArrayNull.cs" />
     <Compile Include="Slides\U04_Arrays\S040_PassArrToMethod.cs" />
