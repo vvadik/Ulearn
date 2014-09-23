@@ -28,6 +28,13 @@ namespace uLearn.CSharp
 		}
 
 		[Test]
+		public void ignore_if_with_non_bool_return()
+		{
+			var errors = FindErrors(@"int A(){ if (true) return 1; else return 2; }");
+			Assert.That(errors, Is.Null);
+		}
+		
+		[Test]
 		public void warn_if_with_folowing_return()
 		{
 			var errors = FindErrors(@"bool A(){ if (true) return true; return false; }");

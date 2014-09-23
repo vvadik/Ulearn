@@ -15,26 +15,26 @@ namespace uLearn.CSharp
 
 		public IEnumerable<string> Inspect(IfStatementSyntax ifElseStatement)
 		{
-			var trueReturnValue =
+			bool trueStatementIsReturnBoolLiteral =
 				(ifElseStatement.Statement as ReturnStatementSyntax)
 					.Call(r => r.Expression as LiteralExpressionSyntax)
-					.Call(IsBoolLiteral, null);
-			var falseReturnValue =
+					.Call(IsBoolLiteral, false);
+			bool? falseStatementIsReturnBoolLiteral =
 				ifElseStatement.Else
 					.Call(e => e.Statement as ReturnStatementSyntax)
 					.Call(r => r.Expression as LiteralExpressionSyntax)
-					.Call(IsBoolLiteral, null);
+					.Call(e => (bool?)IsBoolLiteral(e), null);
 
 			var nextSibling = ifElseStatement.Parent.ChildNodes().SkipWhile(n => n != ifElseStatement).Skip(1).FirstOrDefault();
-			falseReturnValue = falseReturnValue ?? 
+			falseStatementIsReturnBoolLiteral = falseStatementIsReturnBoolLiteral ?? 
 								(nextSibling as ReturnStatementSyntax)
 									.Call(r => r.Expression as LiteralExpressionSyntax)
-									.Call(IsBoolLiteral, null);
-			if (trueReturnValue != null && falseReturnValue != null)
+									.Call(IsBoolLiteral, false);
+			if (trueStatementIsReturnBoolLiteral && falseStatementIsReturnBoolLiteral == true)
 				yield return Report(ifElseStatement, "Используйте return вместо if");
 		}
 
-		private static bool? IsBoolLiteral(LiteralExpressionSyntax node)
+		private static bool IsBoolLiteral(LiteralExpressionSyntax node)
 		{
 			var token = node.Token.CSharpKind();
 			return token == SyntaxKind.TrueKeyword || token == SyntaxKind.FalseKeyword;

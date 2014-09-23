@@ -36,7 +36,7 @@ namespace uLearn.CSharp
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 	public class SingleStatementMethodAttribute : IsStaticMethodAttribute
 	{
-		public const string ShouldBeSingleMethodMessage = "Решение должно быть в одно выражение";
+		public const string ShouldBeSingleMethodMessage = "Решение этой задачи должно быть в одно выражение 'return ...'";
 
 		protected override string FindError(MethodDeclarationSyntax method)
 		{
