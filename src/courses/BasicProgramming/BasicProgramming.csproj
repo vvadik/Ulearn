@@ -64,7 +64,6 @@
     <Compile Include="Slides\U00_Basics\S072_Methods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Slides\logo.png" />
-    <Content Include="Slides\shapes.png" />
     <Content Include="Slides\thumbnail.png" />
     <Content Include="Slides\U00_Basics\S081-Scope.xml">
       <SubType>Designer</SubType>

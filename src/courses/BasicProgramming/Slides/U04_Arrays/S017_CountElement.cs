@@ -7,20 +7,9 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 	class S017_CountElement
 	{
 		/*
-		Тренировки продолжаются.
-		На этот раз Вася написал метод, подсчитывающий количество чётных чисел в массиве.
-		*/
+		Тренировки продолжаются. На этот раз вы с Васей на перегонки решаете одну задачу — найти количество вхождений заданного числа в массив чисел.
 
-		static int GetEvenCount(int[] array)
-		{
-			var count = 0;
-			foreach (var item in array)
-				if (item % 2 == 0) count++;
-			return count;
-		}
-
-		/*
-		А вас ждет задача поиска количества вхождений в массив заданного числа.
+		На старт! Внимание! Марш!
 		*/
 
 		[ExpectedOutput(@"
@@ -43,7 +32,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 		}
 
 		[Exercise]
-		[Hint("Посмотрите на код в примере выше")]
+		[Hint("Используйте foreach в связке с if. Введите вспомогательную переменную для хранения количества уже найденных вхождений itemToFind")]
 		public static int GetElementCount(int[] items, int itemToFind)
 		{
 			var count = 0;
