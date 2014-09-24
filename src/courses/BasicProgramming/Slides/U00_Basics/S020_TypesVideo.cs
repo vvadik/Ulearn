@@ -6,7 +6,7 @@ namespace uLearn.Courses.BasicProgramming.Slides
 	[Slide("Числовые типы данных", "{f1953527-ac7a-4bb7-93fc-14bb9d2de249}")]
 	public class S020_TypesVideo
 	{
-		//#video phsGSmCB56s
+		//#video ooh2lcIxAmk
 
 		/*
 		## Заметки по лекции: типы данных

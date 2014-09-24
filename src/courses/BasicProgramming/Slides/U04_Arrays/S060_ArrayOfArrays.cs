@@ -1,12 +1,11 @@
 ﻿using System;
-using uLearn;
 
-namespace Slide08
+namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 {
 	[Slide("Массивы массивов", "{D0DAB02D-BDB6-4BD0-AC43-AA98305D6A17}")]
     public class Program
     {
-		//#video _L6_YCruwHs
+		//#video 8L-ljESNqmo
 		/*
 		[Иллюстрация карты памяти](_S090_Memory.odp)
 		*/
