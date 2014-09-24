@@ -10,7 +10,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 	Начать было решено с подпрограммы, определяющей не закончилась ли уже игра, а если закончилась, то кто выиграл.
 
 	Методу `GetGameResult` передается поле, представленное массивом 3х3 из `enum Markers`. 
-	Вам надо вернуть победителя `BlackPlayer` или `WhitePlayer`, если таковой имеется или `Draw`, 
+	Вам надо вернуть победителя `CrossWin` или `CircleWin`, если таковой имеется или `Draw`, 
 	если выигрышной последовательности нет ни у одного, либо есть у обоих.
 
 	Постарайтесь придумать красивое, понятное решение.
@@ -20,7 +20,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 	Если вы в затруднении, воспользуйтесь подсказками (кнопка GET HINTS)	
 	*/
 	[Slide("Крестики-нолики", "{B4F3138D-5CDB-4F8A-9976-E0F4D379687A}")]
-	class S062_TicTacToe
+	class S062_TicTacToe : SlideTestBase
 	{
 		public enum Mark
 		{

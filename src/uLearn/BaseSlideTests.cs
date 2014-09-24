@@ -10,6 +10,16 @@ using NUnit.Framework;
 namespace uLearn
 {
 	[TestFixture]
+	public abstract class SlideTestBase
+	{
+		[Test]
+		public void Test()
+		{
+			BaseSlideTests.TestExercise(GetType());
+		}
+	}
+
+	[TestFixture]
 	public abstract class BaseSlideTests
 	{
 		private readonly Type someSlideClass;
