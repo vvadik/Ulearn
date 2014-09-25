@@ -5,7 +5,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 {
 	[Slide("Шифр незнакомки", "{673C8A47-9560-4458-9BD9-A0C0B58466AA}")]
-	public class S011_ListTask : SlideTestBase
+	public class S011_CipherTask : SlideTestBase
 	{
 		/*
 		Вася этим летом отдыхал на море и встретил таинственную незнакомку, которая передала ему крайне странную записку.
@@ -33,7 +33,10 @@ namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 		*/
 
 		[Hint("Для разбиения строки на слова, можно использовать функцию `string.Split(' ', s)`")]
-		[Hint("Вы можете проверить, является ли символ заглавным с помощью `Char.IsLower`")]
+		[Hint("Вы можете проверить, является ли символ заглавным с помощью `Char.IsUpper`")]
+		[Hint("Используйте `List<string>`, чтобы сохранить все найденные в тексте слова с большой буквы")]
+		[Hint("У списка есть метод Reverse(), переворачивающий список")]
+		[Hint("Склеить отдельные слова в текст можно ещё одним циклом, а можно специальным методом `string.Join(' ', words.ToArray())`")]
 		[ExpectedOutput("Писать ХОРОШИЙ Код Трудно Но Ты НЕ Сдавайся Старайся Все Упрощать")]
 		[HideOnSlide]
 		public static void Main()

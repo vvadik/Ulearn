@@ -1,35 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 {
-	[Slide("Приятные знакомства", "{9A4D5FF4-2331-4BEF-A3EE-88E54BEC88C8}")]
+	[Slide("Полезные знакомства", "{9A4D5FF4-2331-4BEF-A3EE-88E54BEC88C8}")]
 	public class S021_DictionaryTask : SlideTestBase
 	{
 		/*
 		В отпуске Вася не тратил время зря, а заводил новые знакомства.
-		Он знакомился с другими крутыми программистами, отдыхающими с ним в одном отеле, и записывал их номера телефонов.
+		Он знакомился с другими крутыми программистами, отдыхающими с ним в одном отеле, и записывал их email-ы.
 		
-		В его дневнике получилось много записей вида `<name>: <number>`.
+		В его дневнике получилось много записей вида `<name>:<email>`.
 		
-		Чтобы искать телефоны было быстрее, он решил сделать словарь,
-		в котором каждому имени поставить в соответствие все номера телефонов, принадлежащие людям с таким именем.
+		Чтобы искать записи было быстрее, он решил сделать словарь,
+		в котором по двум первым буквам имени можно найти все записи его дневника.
 		
 		Вася уже написал функцию `ReadPhonebook`, которая считывает его каракули из блокнота. Помогите ему сделать все остальное!
 		*/
 
-		[ExpectedOutput(@"Ваня: 11211, 79436, 800944
-Саша: 792356, 89023785, 579235, 9999
-Паша: 34621, 788222
-Юра: 092358
-Вася: 00000
-Гена: 89237589")]
+		[ExpectedOutput(@"Ва: Ваня:v@mail.ru, Вася:vasiliy@gmail.com, Ваня:ivan@grozniy.ru, Ваня:vanechka@domain.com
+Са: Саша:sasha1995@sasha.ru, Саша:alex@nd.ru, Саша:alexandr@yandex.ru, Саша:a@lex.ru
+Па: Паша:p@p.ru, Паша:pavel.egorov@urfu.ru
+Юр: Юрий:dolg@rukiy.ru
+Ге: Гена:genadiy.the.best@inbox.ru
+Ы: Ы:nobody@nowhere.no")]
 		public static void Main()
 		{
-			var phonebook = ReadPhonebook();
+			List<string> phonebook = ReadPhonebook();
 			
 			Dictionary<string, List<string>> optimizedPhonebook = GetOptimizedPhonebook(phonebook);
+
 			foreach (var record in optimizedPhonebook)
 				Console.WriteLine("{0}: {1}", record.Key, string.Join(", ", record.Value.ToArray()));
 		}
@@ -39,18 +41,19 @@ namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 		{
 			return new List<string>
 			{
-				"Ваня:11211",
-				"Саша:792356",
-				"Паша:34621",
-				"Юра:092358",
-				"Саша:89023785",
-				"Вася:00000",
-				"Ваня:79436",
-				"Саша:579235",
-				"Гена:89237589",
-				"Паша:788222",
-				"Ваня:800944",
-				"Саша:9999"
+				"Ваня:v@mail.ru",
+				"Саша:sasha1995@sasha.ru",
+				"Паша:p@p.ru",
+				"Юрий:dolg@rukiy.ru",
+				"Саша:alex@nd.ru",
+				"Вася:vasiliy@gmail.com",
+				"Ваня:ivan@grozniy.ru",
+				"Саша:alexandr@yandex.ru",
+				"Гена:genadiy.the.best@inbox.ru",
+				"Паша:pavel.egorov@urfu.ru",
+				"Ваня:vanechka@domain.com",
+				"Саша:a@lex.ru",
+				"Ы:nobody@nowhere.no"
 			};
 		}
 
@@ -62,12 +65,11 @@ namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 			var dictionary = new Dictionary<string, List<string>>();
 			foreach (var record in phonebook)
 			{
-				var list = record.Split(':');
-				var name = list[0];
-				var phone = list[1];
+				var name = record.Split(':').First();
+				name = name.Substring(0, Math.Min(name.Length, 2));
 				if (!dictionary.ContainsKey(name))
 					dictionary[name] = new List<string>();
-				dictionary[name].Add(phone);
+				dictionary[name].Add(record);
 			}
 			return dictionary;
 			/*uncomment
