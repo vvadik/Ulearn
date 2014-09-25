@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("Чтение списка точек", "{563307C9-F265-4EA0-B06E-8390582F718E}")]
-	public class S030_ReadPointsExercise
+	public class S030_ReadPointsExercise : SlideTestBase
 	{
 		/*
 

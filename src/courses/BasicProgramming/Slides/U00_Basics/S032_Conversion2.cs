@@ -1,10 +1,10 @@
 ﻿using System;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U00_Basics
 {
 	[Slide("Биткоины в массы!", "{2B6E076C-4617-4322-9BDE-C44A1D4F394F}")]
-	public class S030_Conversion2
+	public class S030_Conversion2 : SlideTestBase
 	{
 		/*
 		Вася регулярно получает за красивые глазки от кого-нибудь по ```amount``` [биткоинов](http://ru.wikipedia.org/wiki/Bitcoin).

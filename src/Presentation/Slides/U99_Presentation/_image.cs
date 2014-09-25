@@ -1,4 +1,4 @@
-﻿namespace uLearn.Courses.BasicProgramming.Slides.U99_Presentation
+﻿namespace Presentation.Slides.U99_Presentation
 {
 	class _image
 	{

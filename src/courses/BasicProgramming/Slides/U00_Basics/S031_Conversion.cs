@@ -1,10 +1,10 @@
 ﻿using System;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U00_Basics
 {
 	[Slide("Ошибки преобразования типов", "{04D61C06-8A32-41A6-A47E-2AE2D095DEF3}")]
-	public class S031_Conversion
+	public class S031_Conversion : SlideTestBase
 	{
 		/*
 		Исправьте все ошибки преобразования типов.

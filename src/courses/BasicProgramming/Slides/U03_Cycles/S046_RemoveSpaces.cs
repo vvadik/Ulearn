@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides.U03_Cycles
 {
 	[Slide("Убрать пробелы", "{9A15EBD5-0616-4A18-B842-E63E2C3C21FA}")]
-	internal class S046_RemoveSpaces
+	internal class S046_RemoveSpaces : SlideTestBase
 	{
 		/*
 		Враги вставили в начало каждого полезного текста целую кучу бесполезных пробельных символов!

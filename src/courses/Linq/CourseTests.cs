@@ -4,9 +4,9 @@ using uLearn.Courses.Linq.Slides;
 namespace uLearn.Courses.Linq
 {
 	[TestFixture]
-	public class Slides_Tests : BaseSlideTests
+	public class CourseTests : BaseCourseTests
 	{
-		public Slides_Tests() : base(typeof(S010_Intro))
+		public CourseTests() : base(typeof(S010_Intro))
 		{
 		}
 	}

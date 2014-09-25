@@ -1,4 +1,4 @@
-﻿namespace uLearn.Courses.BasicProgramming.Slides.U00_Presentation
+﻿namespace Presentation.Slides.U99_Presentation
 {
 	class MarkdownExample
 	{

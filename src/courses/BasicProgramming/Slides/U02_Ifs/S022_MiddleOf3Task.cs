@@ -2,10 +2,10 @@
 using System.Linq;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides.U03_Cycles
+namespace uLearn.Courses.BasicProgramming.Slides.U02_Ifs
 {
 	[Slide("Среднее трех", "{937C4E64-7144-4F52-A75D-4BDC95BBDE72}")]
-	class S022_MiddleOf3Task
+	class S022_MiddleOf3Task : SlideTestBase
 	{
 		/*
 		Вы с Васей и Петей решили выбрать самые лучшие фотографии котиков в интернете.

@@ -1,10 +1,10 @@
 ﻿using System;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U00_Basics
 {
 	[Slide("Неверный тип данных", "{38FD7DB3-E4E5-4EC1-ACBD-30F3A55A70F4}")]
-	public class S020_TypesExercise
+	public class S020_TypesExercise : SlideTestBase
 	{
 		/*
 		Неправильно указанный тип данных - частая ошибка в работе начинающего программиста.

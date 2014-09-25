@@ -15,28 +15,18 @@ namespace uLearn
 		[Test]
 		public void Test()
 		{
-			BaseSlideTests.TestExercise(GetType());
+			BaseCourseTests.TestExercise(GetType());
 		}
 	}
 
 	[TestFixture]
-	public abstract class BaseSlideTests
+	public abstract class BaseCourseTests
 	{
 		private readonly Type someSlideClass;
 
-		protected BaseSlideTests(Type someSlideClass)
+		protected BaseCourseTests(Type someSlideClass)
 		{
 			this.someSlideClass = someSlideClass;
-		}
-
-		[Test]
-		public void PrintAllSlides()
-		{
-			var slides = GetExerciseSlidesTestCases();
-			foreach (var slide in slides)
-			{
-				Console.WriteLine(slide.TestName);
-			}
 		}
 
 		[Test]
@@ -54,10 +44,10 @@ namespace uLearn
 		[TestCaseSource("GetExerciseSlidesTestCases")]
 		public void Slide(Type slideType)
 		{
-			TestExercise(slideType);
+			Assert.IsTrue(typeof(SlideTestBase).IsAssignableFrom(slideType));
 		}
 
-	public IEnumerable<TestCaseData> GetExerciseSlidesTestCases()
+		public IEnumerable<TestCaseData> GetExerciseSlidesTestCases()
 		{
 			return GetSlideTypes()
 				.Select(type_attr => type_attr.Item1)

@@ -2,10 +2,10 @@
 using System.Text;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U00_Basics
 {
 	[Slide("Добрый работодатель", "{F6559650-B3AF-4E5E-BE84-941FB21BC2AC}")]
-	public class S100_Salary
+	public class S100_Salary : SlideTestBase
 	{
 		/*
 

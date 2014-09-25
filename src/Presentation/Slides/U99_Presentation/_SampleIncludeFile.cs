@@ -1,4 +1,4 @@
-﻿namespace uLearn.Courses.BasicProgramming.Slides
+﻿namespace Presentation.Slides.U99_Presentation
 {
 	public class SampleIncludeFile
 	{

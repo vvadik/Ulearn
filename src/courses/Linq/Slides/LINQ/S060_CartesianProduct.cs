@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("Декартово произведение", "{FF3215D3-5CC7-4C28-83B1-77465F570DC8}")]
-	public class S060_CartesianProduct
+	public class S060_CartesianProduct : SlideTestBase
 	{
 		/*
 

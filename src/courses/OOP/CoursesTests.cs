@@ -5,9 +5,9 @@ using uLearn;
 namespace OOP
 {
 	[TestFixture]
-	public class Slides_Tests : BaseSlideTests
+	public class CoursesTests : BaseCourseTests
 	{
-		public Slides_Tests() : base(typeof(S000_Intro))
+		public CoursesTests() : base(typeof(S000_Intro))
 		{
 		}
 	}

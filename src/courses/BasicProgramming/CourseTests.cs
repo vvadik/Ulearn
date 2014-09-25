@@ -2,9 +2,9 @@
 
 namespace uLearn.Courses.BasicProgramming
 {
-	public class Slides_Tests : BaseSlideTests
+	public class CourseTests : BaseCourseTests
 	{
-		public Slides_Tests()
+		public CourseTests()
 			: base(typeof(S01_HelloWorldVideo))
 		{
 		}

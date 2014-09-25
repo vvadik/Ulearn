@@ -5,7 +5,7 @@
 namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 {
 	[Slide("Индекс максимума", "{043015A0-0B28-4435-8079-21E4CA8E6526}")]
-	class S016_FindMinIndex
+	class S016_FindMinIndex : SlideTestBase
 	{
 		/*
 		Чтобы освоиться с массивами, вы с Васей решили потренироваться на простых алгоритмах.

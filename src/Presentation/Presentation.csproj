@@ -65,7 +65,7 @@
     <Compile Include="Slides\U99_Presentation\_simple_text.cs" />
     <Compile Include="Slides\U99_Presentation\_Test.cs" />
     <Compile Include="Slides\U99_Presentation\_Video.cs" />
-    <Compile Include="Slides_Tests.cs" />
+    <Compile Include="CourseTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Slides\Title.txt" />

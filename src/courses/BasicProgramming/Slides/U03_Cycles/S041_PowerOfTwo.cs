@@ -1,10 +1,10 @@
 ﻿using System;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U03_Cycles
 {
 	[Slide("В поисках степени двойки", "{4158C9A6-A71D-4015-A283-DEF12BE0055E}")]
-	class S041_PowerOfTwo
+	class S041_PowerOfTwo : SlideTestBase
 	{
 		/*
 		В алгоритмах иногда требуется найти минимальную целую неотрицательную степень двойки превосходящую данное число.

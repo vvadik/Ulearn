@@ -73,7 +73,7 @@
   <ItemGroup>
     <Compile Include="AcceptedSolutionInfo.cs" />
     <Compile Include="AnalyticsTableInfo.cs" />
-    <Compile Include="BaseSlideTests.cs" />
+    <Compile Include="BaseCourseTests.cs" />
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="CommentAfterExerciseIsSolved.cs" />
     <Compile Include="Course.cs" />

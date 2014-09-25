@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 {
 	[Slide("Подсчет", "{9EB1A5C2-135D-49A5-A922-0F3F91566080}")]
-	class S017_CountElement
+	class S017_CountElement : SlideTestBase
 	{
 		/*
 		Тренировки продолжаются. На этот раз вы с Васей наперегонки решаете одну задачу — найти количество вхождений заданного числа в массив чисел.

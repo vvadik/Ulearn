@@ -101,7 +101,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Point.cs" />
-    <Compile Include="Slides_Tests.cs" />
+    <Compile Include="CourseTests.cs" />
     <Compile Include="heap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

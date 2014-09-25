@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U00_Basics
 {
 	[Slide("Главный вопрос Вселенной", "{D5B59540-410F-4F6D-8F04-B5613E264BD5}")]
-	public class S072_Methods
+	public class S072_Methods : SlideTestBase
 	{
 
 		/*

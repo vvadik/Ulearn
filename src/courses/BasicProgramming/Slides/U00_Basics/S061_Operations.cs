@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides
 {
 	[Slide("Использование var", "{956A2160-CEB6-4485-8A94-C39DFE364F48}")]
-	public class S061_Operations
+	public class S061_Operations : SlideTestBase
 	{
 		/*
 		С прибавлением единицы все оказалось просто. Казалось бы прибавление к числу половинки должно быть не сложнее...

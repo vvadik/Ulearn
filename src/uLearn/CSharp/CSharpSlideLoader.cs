@@ -25,7 +25,7 @@ namespace uLearn.CSharp
 		private static string GetPrelude(DirectoryInfo dir)
 		{
 			var preludeFile = new[] { dir, dir.Parent }.
-				Select(d => FileExtensions.GetFile(d, "prelude.txt"))
+				SelectMany(d => d.GetFiles("prelude.*", SearchOption.TopDirectoryOnly))
 				.FirstOrDefault(f => f.Exists);
 			return preludeFile == null ? "" : preludeFile.ContentAsUtf8();
 		}

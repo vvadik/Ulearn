@@ -2,11 +2,10 @@
 using System.Globalization;
 using uLearn.CSharp;
 
-
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U00_Basics
 {
 	[Slide("Преобразование строки в число", "{ACE76228-B605-43B8-AC8D-4C85033AC7DF}")]
-	public class S050_ParseAndToString
+	public class S050_ParseAndToString : SlideTestBase
 	{
 		/*
 		Вася написал код, прибавляющий к числу единичку, но он опять не работает :( 

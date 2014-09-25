@@ -3,10 +3,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("Составление словаря", "{ACB110B3-C2F0-4E1A-9645-76DF88A75A7F}")]
-	public class S080_SortExercise
+	public class S080_SortExercise : SlideTestBase
 	{
 		/*
 

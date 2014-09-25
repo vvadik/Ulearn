@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U01_Mistakes
 {
 	[Slide("Сделай то, не знаю что", "5EE7337B-14FE-41A2-9E12-ACA989534A3A")]
-	class S095_Quest
+	public class S095_Quest : SlideTestBase
 	{
 		/*
 		Задача-загадка. Попробуйте сами понять, что нужно сделать :-)

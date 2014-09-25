@@ -71,7 +71,6 @@
     <Compile Include="Slides\U00_Basics\S100_Salary.cs" />
     <Compile Include="Slides\U00_Basics\S000_HelpSlide.cs" />
     <Compile Include="Slides\U00_Basics\_HelloWorld.cs" />
-    <Content Include="Slides\U02_Ifs\Prelude.txt" />
     <Content Include="Slides\U02_Ifs\S040_Quiz.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -93,7 +92,6 @@
     <Content Include="Slides\U06_AutomaticTesting\S095_UnitTests2.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U08_Recursion\Prelude.txt" />
     <Content Include="Slides\U08_Recursion\Title.txt" />
     <Content Include="Slides\U09_Sorting\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
@@ -215,17 +213,13 @@
     <Compile Include="Slides\U09_Sorting\S050_BubbleSort.cs" />
     <Compile Include="Slides\U09_Sorting\S060_MergeSort.cs" />
     <Compile Include="Slides\U09_Sorting\S070_QuickSort.cs" />
-    <Compile Include="Slides_Tests.cs" />
-    <Content Include="Slides\U04_Arrays\Prelude.txt" />
+    <Compile Include="CourseTests.cs" />
     <Content Include="Slides\U04_Arrays\S061_ArrayQuiz.xml">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Slides\U04_Arrays\Title.txt" />
-    <Content Include="Slides\U05_Collections\Prelude.txt" />
     <Content Include="Slides\U05_Collections\Title.txt" />
-    <Content Include="Slides\U06_AutomaticTesting\Prelude.txt" />
     <Content Include="Slides\U06_AutomaticTesting\Title.txt" />
-    <Content Include="Slides\U07_Algorithms\Prelude.txt" />
     <Content Include="Slides\U07_Algorithms\Title.txt" />
     <None Include="Slides\U03_Cycles\loops.zip" />
     <None Include="Slides\U04_Arrays\arrays.zip" />
@@ -255,11 +249,9 @@
   <ItemGroup>
     <Content Include="Slides\Title.txt" />
     <Content Include="Slides\U00_Basics\Title.txt" />
-    <Content Include="Slides\U00_Basics\Prelude.txt" />
+    <Content Include="Slides\Prelude.cs" />
     <Content Include="Slides\U01_Mistakes\Title.txt" />
-    <Content Include="Slides\U01_Mistakes\Prelude.txt" />
     <Content Include="Slides\U03_Cycles\Title.txt" />
-    <Content Include="Slides\U03_Cycles\Prelude.txt" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

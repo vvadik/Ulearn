@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 {
 	[Slide("Снова незнакомка", "{741D39BD-D543-40D2-ABBC-941C7F778106}")]
-	public class S041_StringBuilderTask
+	public class S041_StringBuilderTask : SlideTestBase
 	{
 		/*
 		Незнакомка вернулась!

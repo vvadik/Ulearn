@@ -3,10 +3,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("Создание частотного словаря", "{0535734D-D258-44C6-99F3-F96258BCCA6F}")]
-	public class S140_GroupingExercise
+	public class S140_GroupingExercise : SlideTestBase
 	{
 		/*
 

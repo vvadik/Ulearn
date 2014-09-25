@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using uLearn;
 
-namespace uLearn.Courses.BasicProgramming.Slides.U99_Presentation
+namespace Presentation.Slides.U99_Presentation
 {
 	[Slide("Markdown: картинки", "{27506F39-FCFC-4553-B67F-EB00F6244DE5}")]
 	class S026_MarkdownImage

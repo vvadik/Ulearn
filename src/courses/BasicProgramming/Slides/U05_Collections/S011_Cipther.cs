@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 {
 	[Slide("Шифр незнакомки", "{673C8A47-9560-4458-9BD9-A0C0B58466AA}")]
-	public class S011_ListTask
+	public class S011_ListTask : SlideTestBase
 	{
 		/*
 		Вася этим летом отдыхал на море и встретил таинственную незнакомку, которая передала ему крайне странную записку.

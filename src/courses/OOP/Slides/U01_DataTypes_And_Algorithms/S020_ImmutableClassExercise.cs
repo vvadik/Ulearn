@@ -5,7 +5,7 @@ using uLearn.CSharp;
 namespace OOP.Slides.U01_DataTypes_And_Algorithms
 {
 	[Slide("Vector.Normalize()", "{863A642D-45C8-4406-91FC-6EC62C243E01}")]
-	public class Vector
+	public class Vector : SlideTestBase
 	{
 		/*
 		В этой задаче вы можете закрепить свое понимание идеи неизменяемого класса.

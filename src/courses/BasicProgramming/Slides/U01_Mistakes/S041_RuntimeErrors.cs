@@ -1,10 +1,10 @@
 ﻿using System;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U01_Mistakes
 {
 	[Slide("Минимум функции", "{754B8DCB-E6F6-44A9-AEE6-9972BEB9AF7C}")]
-	class S041_RuntimeErrors
+	class S041_RuntimeErrors : SlideTestBase
 	{
 		/*
 		Реализуйте функцию для нахождения такого __x__, при котором парабола ax<sup>2</sup> + bx + c = 0 принимает минимальное значение.

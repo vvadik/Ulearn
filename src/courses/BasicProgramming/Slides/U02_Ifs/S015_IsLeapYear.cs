@@ -2,10 +2,10 @@
 using System.Linq;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U02_Ifs
 {
 	[Slide("Високосный год", "{4C161B1E-2637-447B-ADFD-14647BF659AD}")]
-	class S015_IsLeapYear
+	class S015_IsLeapYear : SlideTestBase
 	{
 		/*
 		Вы с Васей решили посчитать количество дней между двумя солнечными затмениями. 

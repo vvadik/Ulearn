@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("Чтение массива чисел", "{CBA7BC68-F1B9-46B1-93D4-49AC113A1D02}")]
-	public class S020_ReadNumbersExercise
+	public class S020_ReadNumbersExercise : SlideTestBase
 	{
 		/*
 		`LINQ` удобно использовать для чтения из файла и разбора простых текстовых форматов.

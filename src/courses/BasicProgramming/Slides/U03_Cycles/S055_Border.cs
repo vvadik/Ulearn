@@ -1,10 +1,10 @@
 ﻿using System;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U03_Cycles
 {
 	[Slide("Рамочка", "{6923AA65-95E0-4B5E-A98D-B286FD0B2153}")]
-	class S055_Border
+	class S055_Border : SlideTestBase
 	{
 		/*
 		Вы решили помочь Васе с разработкой его игры и взяли на себя красивый вывод сообщений в игре.

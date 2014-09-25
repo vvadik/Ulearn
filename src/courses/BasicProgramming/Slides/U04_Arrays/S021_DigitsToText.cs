@@ -12,7 +12,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 	Сделайте это!
 	*/
 	[Slide("Цифры прописью", "{0A58245F-518C-4979-84B2-E10E05A50593}")]
-	class S021_DigitsToText
+	class S021_DigitsToText : SlideTestBase
 	{
 		[ExpectedOutput(@"
 ноль

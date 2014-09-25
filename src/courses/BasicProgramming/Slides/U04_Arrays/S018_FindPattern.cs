@@ -4,7 +4,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 {
 	[Slide("Поиск массива в массиве", "{94B9A357-8F8F-4E6A-9497-C812A751F091}")]
-	class S018_FindPattern
+	class S018_FindPattern : SlideTestBase
 	{
 		/*
 		Вы с Васей решили, что одиночные циклы освоили в достаточной мере. Пора браться за что-то чуть более сложное!

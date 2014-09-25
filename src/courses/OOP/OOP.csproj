@@ -91,7 +91,7 @@
     <Compile Include="Slides\U02_Polymorphism\S010_DataType.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides_Tests.cs" />
+    <Content Include="CoursesTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">

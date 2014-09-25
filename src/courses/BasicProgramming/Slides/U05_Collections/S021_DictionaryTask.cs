@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 {
 	[Slide("Приятные знакомства", "{9A4D5FF4-2331-4BEF-A3EE-88E54BEC88C8}")]
-	public class S021_DictionaryTask
+	public class S021_DictionaryTask : SlideTestBase
 	{
 		/*
 		В отпуске Вася не тратил время зря, а заводил новые знакомства.

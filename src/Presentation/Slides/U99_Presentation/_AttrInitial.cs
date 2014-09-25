@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace uLearn.Courses.BasicProgramming.Slides.U00_Presentation
+namespace Presentation.Slides.U99_Presentation
 {
 	public class ExampleSlideAttribute : Attribute
 	{

@@ -1,10 +1,11 @@
 ﻿using System;
+using uLearn;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides.U99_Presentation
+namespace Presentation.Slides.U99_Presentation
 {
 	[Slide("Slide", "{15AE3D7A-C9CB-436C-B2B9-1504D1339208}")]
-	class _Attributes
+	class _Attributes : SlideTestBase
 	{
 		[ExpectedOutput("Hello, world!")]
 		public static void Main()

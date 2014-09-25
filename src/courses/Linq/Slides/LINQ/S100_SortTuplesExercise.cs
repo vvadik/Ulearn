@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("Сортировка кортежей", "{80D43879-1099-4972-AEE1-6EB3EDF1E923}")]
-	public class S100_SortTuplesExercise
+	public class S100_SortTuplesExercise : SlideTestBase
 	{
 		/*
 		Еще одно полезное свойство кортежей — по умолчанию они сравниваются поэлементно.

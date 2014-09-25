@@ -3,10 +3,10 @@ using System.Linq;
 using NUnit.Framework;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U02_Ifs
 {
 	[Slide("Управление роботом", "{50AC4FC7-A6E1-4C4E-8C61-ECC75AEB912E}")]
-	class S050_RobotControl
+	class S050_RobotControl : SlideTestBase
 	{
 		/*
 		В воскресенье Вася пошел в кружок робототехники и увидел там такой код управления боевым роботом:

@@ -8,7 +8,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 	Напишите метод, который создает массив из count четных чисел больших нуля, в порядке возрастания.
 	*/
 	[Slide("Четный массив", "{CEB81EAC-069C-4D5D-87B7-EBD9B140E143}")]
-	class S015_EvenArray
+	class S015_EvenArray : SlideTestBase
 	{
 		[ExpectedOutput(@"
 GetFirstEvenNumbers(30)

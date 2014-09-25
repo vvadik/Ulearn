@@ -1,10 +1,10 @@
 ﻿using System;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U03_Cycles
 {
 	[Slide("Шахматная доска", "{8E561342-9F4B-411D-BB9B-741A3677F696}")]
-	class S065_Chessboard
+	class S065_Chessboard : SlideTestBase
 	{
 		/*
 		Стали известны подробности про новую игру Васи. Оказывается ее действия разворачиваются на шахматных досках нестандартного размера.

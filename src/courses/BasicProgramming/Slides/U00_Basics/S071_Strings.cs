@@ -1,10 +1,10 @@
 ﻿using System;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U00_Basics
 {
 	[Slide("Ваш первый метод", "{d8578c7f-d7e2-4ce5-a3be-e6e32d9ac63e}")]
-	class S071_Strings
+	class S071_Strings : SlideTestBase
 	{
 		/*
 		Напишите тело метода так, чтобы он возвращал вторую половину строки `text`. Можете считать, что `text` всегда четной длины.

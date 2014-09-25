@@ -1,10 +1,10 @@
 ﻿using System;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U00_Basics
 {
 	[Slide("Первый шаг", "{90BCB61E-57F0-4BAA-8BC9-10C9CFD27F58}")]
-	public class S011_FirstStep
+	public class S011_FirstStep : SlideTestBase
 	{
 
 		/*

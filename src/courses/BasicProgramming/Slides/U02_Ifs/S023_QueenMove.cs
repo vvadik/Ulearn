@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.BasicProgramming.Slides
+namespace uLearn.Courses.BasicProgramming.Slides.U02_Ifs
 {
 	[Slide("Ход ферзя", "{EB11DFB6-5629-4D13-819B-6411B9F93DF6}")]
-	internal class S023_QueenMove
+	internal class S023_QueenMove : SlideTestBase
 	{
 		/*
 		Вася решил научить своего младшего брата играть в шахматы. 

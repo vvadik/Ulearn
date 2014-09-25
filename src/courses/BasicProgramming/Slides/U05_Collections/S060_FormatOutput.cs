@@ -1,8 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
-using uLearn;
 
-namespace Slide08
+namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 {
 	//#video EXenLjobvwc
 	/*

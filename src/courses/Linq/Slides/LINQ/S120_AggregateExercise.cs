@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("Поиск самого длинного слова", "{04A35AE5-67B9-4674-B4C5-98E8976F87F9}")]
-	public class S120_AggregateExercise
+	public class S120_AggregateExercise : SlideTestBase
 	{
 		/*
 
