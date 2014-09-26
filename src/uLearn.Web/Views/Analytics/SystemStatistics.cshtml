@@ -4,11 +4,11 @@
 
 <body>
 	<div class="wide-container">
-		<h2 id="questions">Заданные вопросы</h2>
-		<div class="load-content" data-url="@Url.Action("AllQuestions")"></div>
-
 		<h2 id="timeline">Общая динамика прогресса</h2>
 		<div class="load-content" data-url="@Url.Action("DailyStatistics")"></div>
+
+		<h2 id="questions">Заданные вопросы</h2>
+		<div class="load-content" data-url="@Url.Action("Items", "Questions")"></div>
 	</div>
 </body>
 

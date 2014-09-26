@@ -24,15 +24,17 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public async Task<UserQuestion> AddUserQuestion(string question, string slideTitle, string userId, string userName, string unitName, DateTime time)
+		public async Task<UserQuestion> AddUserQuestion(string question, string courseId, Slide slide, string userId, string userName, DateTime time)
 		{
 			var userSolution = db.UserQuestions.Add(new UserQuestion
 			{
 				Question = question,
 				UserId = userId,
 				UserName = userName,
-				SlideTitle = slideTitle,
-				UnitName = unitName,
+				SlideTitle = slide.Title,
+				UnitName = slide.Info.UnitName,
+				SlideId = slide.Id,
+				CourseId = courseId,
 				Time = time
 			});
 			await db.SaveChangesAsync();
@@ -44,17 +46,5 @@ namespace uLearn.Web.DataContexts
 			db.UserQuestions.Remove(userSolution);
 			db.SaveChanges();
 		}
-
-		public string GetAllQuestions(string unitName)
-		{
-			var answer = new StringBuilder();
-			foreach (var e in db.UserQuestions)
-			{
-				if (e.UnitName == unitName)
-					answer.Append(string.Format("{0}\n***{1}\n***{2}\n***{3}\n***{4}\n***", e.UserName, e.Time, e.UnitName, e.SlideTitle, e.Question));
-			}
-			return answer.ToString();
-		}
-
 	}
 }

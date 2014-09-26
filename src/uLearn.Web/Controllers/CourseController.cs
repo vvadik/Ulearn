@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -16,11 +15,9 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
-		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly UnitsRepo unitsRepo = new UnitsRepo();
-		private readonly UserQuestionsRepo userQuestionsRepo = new UserQuestionsRepo();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();
 
@@ -144,17 +141,6 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		[ValidateInput(false)]
-		public async Task<string> AddQuestion(string courseId, string slideId, string question)
-		{
-			IIdentity user = User.Identity;
-			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
-			await userQuestionsRepo.AddUserQuestion(question, slide.Title, user.GetUserId(), user.Name, slide.Info.UnitName, DateTime.Now);
-			return "Success!";
-		}
-
-		[HttpPost]
-		[Authorize]
 		public async Task<string> ApplyRate(string courseId, string slideId, string rate)
 		{
 			var userId = User.Identity.GetUserId();
@@ -168,21 +154,6 @@ namespace uLearn.Web.Controllers
 		{
 			var userId = User.Identity.GetUserId();
 			return slideRateRepo.FindRate(courseId, slideId, userId);
-		}
-
-		[HttpPost]
-		[Authorize]
-		public string GetAllQuestions(string unitName)
-		{
-			var questions = userQuestionsRepo.GetAllQuestions(unitName);
-			return Server.HtmlEncode(questions);
-		}
-
-		[Authorize]
-		public ActionResult Questions(string unitName)
-		{
-			var questions = db.UserQuestions.Where(q => q.UnitName == unitName).ToList();
-			return PartialView(questions);
 		}
 
 		[HttpPost]
@@ -218,4 +189,5 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("AcceptedSolutions", new { courseId = courseId, slideIndex = slideIndex });
 		}
 	}
+
 }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
-using System.Web.Mvc;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -149,7 +149,8 @@ namespace uLearn.Web.Controllers
 				if (!unitNames.ContainsKey(userSolution.SlideId)) //пока в старой базе есть старые записи с неправильными ID
 					continue;
 				var user = db.Users.Find(userSolution.UserId);
-				if (user == null) continue;
+				if (user == null)
+					continue;
 				var userName = user.UserName;
 				if (!acceptedSolutionsForUsers.ContainsKey(userName))
 					acceptedSolutionsForUsers[userName] = new HashSet<string>();
@@ -165,7 +166,8 @@ namespace uLearn.Web.Controllers
 				if (!unitNames.ContainsKey(quiz.SlideId)) //пока в старой базе есть старые записи с неправильными ID
 					continue;
 				var user = db.Users.Find(quiz.UserId);
-				if (user == null) continue;
+				if (user == null)
+					continue;
 				var userName = user.UserName;
 				if (!acceptedSolutionsForUsers.ContainsKey(userName))
 					acceptedSolutionsForUsers[userName] = new HashSet<string>();
@@ -224,7 +226,7 @@ namespace uLearn.Web.Controllers
 			};
 			return View(model);
 		}
-		
+
 		public ActionResult SlideRatings(string courseId, string unitName)
 		{
 			var course = courseManager.GetCourse(courseId);
@@ -257,7 +259,7 @@ namespace uLearn.Web.Controllers
 			var slides = course.Slides
 				.Where(s => s.Info.UnitName == unitName).ToArray();
 			var users = GetUserInfos(course, slides).OrderByDescending(GetRating).ToArray();
-			return PartialView(new UserProgressViewModel{Slides = slides, Users = users, CourseId = courseId});
+			return PartialView(new UserProgressViewModel { Slides = slides, Users = users, CourseId = courseId });
 		}
 
 		private DailyStatistics[] GetDailyStatistics(IEnumerable<Slide> slides = null)
@@ -270,14 +272,14 @@ namespace uLearn.Web.Controllers
 			var visits = GetSlidesVisitedStats(slideIds, firstDay, lastDay);
 			var result =
 				Enumerable.Range(0, 14)
-				.Select(diff => lastDay.AddDays(-diff).Date)
-				.Select(date => new DailyStatistics
-				{
-					Day = date, 
-					TasksSolved = tasks.Get(date, 0) + quizes.Get(date, 0),
-					SlidesVisited = visits.Get(date, 0)
-				})
-				.ToArray();
+					.Select(diff => lastDay.AddDays(-diff).Date)
+					.Select(date => new DailyStatistics
+					{
+						Day = date,
+						TasksSolved = tasks.Get(date, 0) + quizes.Get(date, 0),
+						SlidesVisited = visits.Get(date, 0)
+					})
+					.ToArray();
 			return result;
 		}
 
@@ -294,9 +296,9 @@ namespace uLearn.Web.Controllers
 		private Dictionary<DateTime, int> GroupByDays<T>(IQueryable<T> actions) where T : class, ISlideAction
 		{
 			var q = from s in actions
-					group s by DbFunctions.TruncateTime(s.Timestamp)
-						into day
-						select new { day.Key, count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
+				group s by DbFunctions.TruncateTime(s.Timestamp)
+				into day
+				select new { day.Key, count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
 			return q.ToDictionary(d => d.Key.Value, d => d.count);
 		}
 
@@ -309,7 +311,7 @@ namespace uLearn.Web.Controllers
 		{
 			return GroupByDays(FilterByTime(FilterBySlides(db.UserQuizzes, slideIds), firstDay, lastDay));
 		}
-		
+
 		private Dictionary<DateTime, int> GetSlidesVisitedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
 		{
 			return GroupByDays(FilterByTime(FilterBySlides(db.Visiters, slideIds), firstDay, lastDay));
@@ -320,16 +322,16 @@ namespace uLearn.Web.Controllers
 			var courseId = course.Id;
 			var rates =
 				(from rate in db.SlideRates
-				where rate.CourseId == courseId
-				group rate by new {rate.SlideId, rate.Rate}
-				into slideRate
-				select new
-				{
-					slideRate.Key.SlideId,
-					slideRate.Key.Rate,
-					count = slideRate.Count()
-				})
-				.ToLookup(r => r.SlideId);
+					where rate.CourseId == courseId
+					group rate by new { rate.SlideId, rate.Rate }
+					into slideRate
+					select new
+					{
+						slideRate.Key.SlideId,
+						slideRate.Key.Rate,
+						count = slideRate.Count()
+					})
+					.ToLookup(r => r.SlideId);
 			return slides.Select(s => new SlideRateStats
 			{
 				SlideId = s.Id,
@@ -344,10 +346,10 @@ namespace uLearn.Web.Controllers
 		{
 			return
 				user.SlidesSlideInfo.Sum(
-					s => 
-						(s.IsVisited ? 1 : 0) 
-						+ (s.IsExerciseSolved ? 1 : 0) 
-						+ (s.IsQuizPassed ? s.QuizPercentage/100.0 : 0));
+					s =>
+						(s.IsVisited ? 1 : 0)
+						+ (s.IsExerciseSolved ? 1 : 0)
+						+ (s.IsQuizPassed ? s.QuizPercentage / 100.0 : 0));
 		}
 
 		private IEnumerable<UserInfo> GetUserInfos(Course course, Slide[] slides)
@@ -359,9 +361,9 @@ namespace uLearn.Web.Controllers
 				where
 					v.CourseId == courseId
 					&& slideIds.Contains(v.SlideId)
-				join s in db.UserSolutions on new {v.SlideId, v.UserId} equals new {s.SlideId, s.UserId} into sInner
+				join s in db.UserSolutions on new { v.SlideId, v.UserId } equals new { s.SlideId, s.UserId } into sInner
 				from ss in sInner.DefaultIfEmpty()
-				join q in db.UserQuizzes on new {v.SlideId, v.UserId} equals new {q.SlideId, q.UserId} into qInner
+				join q in db.UserQuizzes on new { v.SlideId, v.UserId } equals new { q.SlideId, q.UserId } into qInner
 				from qq in qInner.DefaultIfEmpty()
 				join u in db.Users on v.UserId equals u.Id into users
 				from uu in users
@@ -374,21 +376,21 @@ namespace uLearn.Web.Controllers
 					SolvedExercise = ss != null && ss.IsRightAnswer,
 					IsRightQuiz = qq != null && qq.IsRightQuizBlock
 				};
-//			Debug.Write(dataQuery.ToString());
+			//			Debug.Write(dataQuery.ToString());
 
 			var res = from v in dataQuery.ToList()
-					  group v by new { v.UserId, v.UserName, v.GroupName }
-						  into u
-						  select FillUserInfo(
-							  new UserInfo
-							  {
-								  UserId = u.Key.UserId,
-								  UserName = u.Key.UserName,
-								  UserGroup = u.Key.GroupName
-							  },
-							  slides,
-							  u.Select(d => Tuple.Create(d.SlideId, d.SolvedExercise, d.IsRightQuiz))
-							  );
+				group v by new { v.UserId, v.UserName, v.GroupName }
+				into u
+				select FillUserInfo(
+					new UserInfo
+					{
+						UserId = u.Key.UserId,
+						UserName = u.Key.UserName,
+						UserGroup = u.Key.GroupName
+					},
+					slides,
+					u.Select(d => Tuple.Create(d.SlideId, d.SolvedExercise, d.IsRightQuiz))
+					);
 			return res;
 		}
 
@@ -427,7 +429,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult ShowSolutions(string courseId, string userId, string slideId)
 		{
 			var solutions = db.UserSolutions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
-			ApplicationUser user = db.Users.Find(userId);
+			var user = db.Users.Find(userId);
 			var course = courseManager.GetCourse(courseId);
 			var model = new UserSolutionsViewModel
 			{
@@ -437,12 +439,6 @@ namespace uLearn.Web.Controllers
 				Solutions = solutions
 			};
 			return View("UserSolutions", model);
-		}
-
-		public ActionResult AllQuestions()
-		{
-			var questions = db.UserQuestions.OrderByDescending(q => q.Time).Take(20).ToList();
-			return PartialView("..\\Course\\Questions", questions);
 		}
 	}
 
@@ -460,5 +456,4 @@ namespace uLearn.Web.Controllers
 		public UserInfo[] Users;
 		public Slide[] Slides;
 	}
-
 }

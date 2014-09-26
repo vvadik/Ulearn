@@ -195,6 +195,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\QuestionsController.cs" />
     <Compile Include="Controllers\UnitController.cs" />
     <Compile Include="Controllers\AnalyticsController.cs" />
     <Compile Include="Controllers\QuizController.cs" />
@@ -217,6 +218,10 @@
     <Compile Include="Migrations\201409031100489_VisitTimestamp.cs" />
     <Compile Include="Migrations\201409031100489_VisitTimestamp.Designer.cs">
       <DependentUpon>201409031100489_VisitTimestamp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201409260240008_AddQuestionSlideId.cs" />
+    <Compile Include="Migrations\201409260240008_AddQuestionSlideId.Designer.cs">
+      <DependentUpon>201409260240008_AddQuestionSlideId.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\AcceptedSolutionsPageModel.cs" />
     <Compile Include="Models\AnalyticsTablePageModel.cs" />
@@ -368,6 +373,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201409031100489_VisitTimestamp.resx">
       <DependentUpon>201409031100489_VisitTimestamp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201409260240008_AddQuestionSlideId.resx">
+      <DependentUpon>201409260240008_AddQuestionSlideId.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -774,7 +782,7 @@
     <Content Include="Views\Analytics\UnitStatistics.cshtml" />
     <Content Include="Views\Course\InstructorNote.cshtml" />
     <Content Include="Views\Course\SelectGroup.cshtml" />
-    <Content Include="Views\Course\Questions.cshtml" />
+    <Content Include="Views\Questions\Items.cshtml" />
     <Content Include="Views\Analytics\DailyStatistics.cshtml" />
     <Content Include="Views\Analytics\UsersProgress.cshtml" />
     <Content Include="Views\Analytics\SlideRatings.cshtml" />
