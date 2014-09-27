@@ -21,6 +21,7 @@ namespace uLearn.Web
 				"~/Scripts/modernizr-*"));
 
 			bundles.Add(new ScriptBundle("~/slide-js").Include(
+				"~/katex/katex.min.js",
 				"~/Jsdifflib/jsdifflib.js",
 				"~/Scripts/slide-*"
 				));
@@ -41,6 +42,7 @@ namespace uLearn.Web
 				"~/Scripts/respond.js"));
 
 			bundles.Add(new StyleBundle("~/css").Include(
+				"~/katex/katex.min.css",
 				"~/Content/bootstrap.css",
 				"~/codemirror/lib/codemirror.css",
 				"~/codemirror/theme/cobalt.css",

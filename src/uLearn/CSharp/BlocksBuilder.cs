@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -161,6 +160,12 @@ namespace uLearn.CSharp
 		{
 			int identation = comment.SyntaxTree.GetLineSpan(comment.FullSpan).StartLinePosition.Character;
 			string[] commentLines = comment.ToString().SplitToLines();
+			var content = GetCommentContent(commentLines, identation);
+			return MdBlock.FromText(content);
+		}
+
+		private static string GetCommentContent(string[] commentLines, int identation)
+		{
 			var sb = new StringBuilder();
 			foreach (string line in commentLines.Skip(1).Take(commentLines.Length - 2))
 			{
@@ -175,7 +180,7 @@ namespace uLearn.CSharp
 					sb.AppendLine();
 				}
 			}
-			return MdBlock.FromText(sb.ToString());
+			return sb.ToString();
 		}
 	}
 }

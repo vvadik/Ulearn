@@ -88,6 +88,9 @@
     <Compile Include="Slides\LINQ\S150_Lookups.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="Slides\LINQ\S200_HomeExercise.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="Slides\LINQ\S170_Final.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>

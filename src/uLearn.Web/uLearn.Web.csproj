@@ -663,6 +663,8 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Jsdifflib\jsdifflib.css" />
+    <Content Include="katex\katex.min.css" />
+    <Content Include="katex\katex.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="codemirror\README.md" />
@@ -676,6 +678,39 @@
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="katex\fonts\KaTeX_AMS-Regular.eot" />
+    <Content Include="katex\fonts\KaTeX_AMS-Regular.ttf" />
+    <Content Include="katex\fonts\KaTeX_AMS-Regular.woff" />
+    <Content Include="katex\fonts\KaTeX_Main-Bold.eot" />
+    <Content Include="katex\fonts\KaTeX_Main-Bold.ttf" />
+    <Content Include="katex\fonts\KaTeX_Main-Bold.woff" />
+    <Content Include="katex\fonts\KaTeX_Main-Italic.eot" />
+    <Content Include="katex\fonts\KaTeX_Main-Italic.ttf" />
+    <Content Include="katex\fonts\KaTeX_Main-Italic.woff" />
+    <Content Include="katex\fonts\KaTeX_Main-Regular.eot" />
+    <Content Include="katex\fonts\KaTeX_Main-Regular.ttf" />
+    <Content Include="katex\fonts\KaTeX_Main-Regular.woff" />
+    <Content Include="katex\fonts\KaTeX_Math-BoldItalic.eot" />
+    <Content Include="katex\fonts\KaTeX_Math-BoldItalic.ttf" />
+    <Content Include="katex\fonts\KaTeX_Math-BoldItalic.woff" />
+    <Content Include="katex\fonts\KaTeX_Math-Italic.eot" />
+    <Content Include="katex\fonts\KaTeX_Math-Italic.ttf" />
+    <Content Include="katex\fonts\KaTeX_Math-Italic.woff" />
+    <Content Include="katex\fonts\KaTeX_Math-Regular.eot" />
+    <Content Include="katex\fonts\KaTeX_Math-Regular.ttf" />
+    <Content Include="katex\fonts\KaTeX_Math-Regular.woff" />
+    <Content Include="katex\fonts\KaTeX_Size1-Regular.eot" />
+    <Content Include="katex\fonts\KaTeX_Size1-Regular.ttf" />
+    <Content Include="katex\fonts\KaTeX_Size1-Regular.woff" />
+    <Content Include="katex\fonts\KaTeX_Size2-Regular.eot" />
+    <Content Include="katex\fonts\KaTeX_Size2-Regular.ttf" />
+    <Content Include="katex\fonts\KaTeX_Size2-Regular.woff" />
+    <Content Include="katex\fonts\KaTeX_Size3-Regular.eot" />
+    <Content Include="katex\fonts\KaTeX_Size3-Regular.ttf" />
+    <Content Include="katex\fonts\KaTeX_Size3-Regular.woff" />
+    <Content Include="katex\fonts\KaTeX_Size4-Regular.eot" />
+    <Content Include="katex\fonts\KaTeX_Size4-Regular.ttf" />
+    <Content Include="katex\fonts\KaTeX_Size4-Regular.woff" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -706,6 +741,7 @@
     <Content Include="Scripts\slide-nav.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\slide-tex.js" />
     <Content Include="Scripts\slide-stats.js" />
     <Content Include="Scripts\table-configurator.js" />
     <Content Include="Scripts\user-group-name-change.js" />

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using MarkdownDeep;
 using NUnit.Framework;
 
@@ -18,7 +19,7 @@ namespace uLearn
 			{
 				NewWindowForExternalLinks = true,
 				ExtraMode = true,
-				SafeMode = true,
+				SafeMode = false,
 			};
 			return markdown.Transform(md);
 		}
@@ -55,6 +56,14 @@ namespace uLearn
 			Assert.That("[a](a.html)".RenderMd("/Course/"), Is.StringContaining("href=\"/Course/a.html\""));
 			Assert.That("[a](a.html)".RenderMd(), Is.StringContaining("href=\"a.html\""));
 			Assert.That("[a](/a.html)".RenderMd(), Is.StringContaining("href=\"/a.html\""));
+		}
+
+		[Test]
+		public void emphasize_underscore()
+		{
+			Assert.AreEqual(
+				"<p><strong>x</strong>,</p>\n",
+				new Markdown { ExtraMode = true }.Transform("__x__,"));
 		}
 	}
 }

@@ -69,6 +69,8 @@ namespace uLearn
 			var newOut = new StringWriter();
 			var oldOut = Console.Out;
 			var methodInfo = slide.GetMethod("Main", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+			if (methodInfo == null)
+				return;
 			Console.SetOut(newOut);
 			try
 			{
