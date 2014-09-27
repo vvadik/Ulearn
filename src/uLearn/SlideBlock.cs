@@ -7,6 +7,21 @@ namespace uLearn
 	{
 	}
 
+	public class TexBlock : SlideBlock
+	{
+		public string[] TexLines { get; set; }
+
+		public TexBlock(string[] texLines)
+		{
+			TexLines = texLines;
+		}
+
+		public override string ToString()
+		{
+			return string.Format("Tex {0}", string.Join("\n", TexLines));
+		}
+	}
+
 	public class MdBlock : SlideBlock
 	{
 		public string Markdown

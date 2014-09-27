@@ -1,0 +1,6 @@
+﻿@using uLearn
+@model TexBlock
+@foreach (var tex in Model.TexLines)
+{
+	<div class="tex">\displaystyle @tex.Trim()</div>
+}

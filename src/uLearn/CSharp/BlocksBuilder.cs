@@ -160,8 +160,9 @@ namespace uLearn.CSharp
 		{
 			int identation = comment.SyntaxTree.GetLineSpan(comment.FullSpan).StartLinePosition.Character;
 			string[] commentLines = comment.ToString().SplitToLines();
-			var content = GetCommentContent(commentLines, identation);
-			return MdBlock.FromText(content);
+			if (commentLines.First().EndsWith("tex"))
+				return new TexBlock(commentLines.Skip(1).Take(commentLines.Length - 2).ToArray());
+			return MdBlock.FromText(GetCommentContent(commentLines, identation));
 		}
 
 		private static string GetCommentContent(string[] commentLines, int identation)

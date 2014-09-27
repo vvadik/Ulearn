@@ -825,6 +825,7 @@
     <Content Include="Views\Analytics\UserSolutions.cshtml" />
     <Content Include="Views\Analytics\SystemStatistics.cshtml" />
     <Content Include="Views\Account\ChangeDetailsPartial.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\TexBlock.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
