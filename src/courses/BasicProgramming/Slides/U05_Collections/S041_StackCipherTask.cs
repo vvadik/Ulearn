@@ -78,7 +78,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 		[Hint(
 			"Возможно вам понадобятся методы `command.IndexOf(' ')` для поиска индекса первого пробела и `command.Substring` для взятия подстроки"
 			)]
-		[Hint("Массовы операции со строками эффективнее делать с помощью специального класса `StringBuilder`")]
+		[Hint("Массовые операции со строками эффективнее делать с помощью специального класса `StringBuilder`")]
 		private static string ApplyCommands(string[] commands)
 		{
 

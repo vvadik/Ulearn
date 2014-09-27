@@ -159,7 +159,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Slides\U05_Collections\S021_DictionaryTask.cs" />
-    <Compile Include="Slides\U05_Collections\S030_ArrAndStringDiff.cs">
+    <Compile Include="Slides\U05_Collections\S030_ArrayAndStringComparison.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Slides\U05_Collections\S040_StringBuilder.cs">
@@ -176,6 +176,7 @@
     <Compile Include="Slides\U05_Collections\S080_Encodings.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Slides\U05_Collections\S090_Exercise.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\S060_Tdd.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\S050_Coverage.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\S090_IntroducingTests.cs" />
@@ -223,6 +224,8 @@
     <Content Include="Slides\U07_Algorithms\Title.txt" />
     <None Include="Slides\U03_Cycles\loops.zip" />
     <None Include="Slides\U04_Arrays\arrays.zip" />
+    <None Include="Slides\U05_Collections\InstructorNotes.md" />
+    <None Include="Slides\U05_Collections\text.zip" />
     <None Include="Slides\U08_Recursion\InstructorNotes.md" />
     <None Include="Slides\U08_Recursion\_S020_MemoryMap.odp" />
   </ItemGroup>

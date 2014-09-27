@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text;
-using uLearn;
+using NUnit.Framework;
 
-namespace Slide05
+namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 {
 	//#video 5CzbNN73B3k
 	/*
@@ -12,7 +12,8 @@ namespace Slide05
 	[Slide("StringBuilder", "{7D877273-0A8E-4257-8CA9-BDD90369DCDB}")]
     public class S040_StringBuilder
     {
-        static void Main()
+		[Test]
+        public static void Main()
         {
             //StringBuilder - это класс, представляющий собой изменяемую строку
             var builder = new StringBuilder();
@@ -63,7 +64,9 @@ namespace Slide05
 			}
 		}
 
-		static void Main2()
+		[Test]
+		[Explicit]
+		public static void Main2()
 		{
 			var watch = new Stopwatch();
 			watch.Start();

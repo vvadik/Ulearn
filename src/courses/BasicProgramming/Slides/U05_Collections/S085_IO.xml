@@ -4,6 +4,13 @@
  id="{0B02B282-CFB1-4955-AE6B-981CA80AE3F0}">
 	<title>Работа файлами</title>
 
+
+	<fillIn id="1">
+		<text>Укажите пространство имен, используемое для работы с файлами и директориями</text>
+		<sample>System.IO</sample>
+		<regex>[Ss]ystem.[Ii][Oo]</regex>
+	</fillIn>
+
 	<fillIn id="0">
 		<text>Укажите имя класса, используемого для работы с каталогами</text>
 		<sample>System.IO.Directory</sample>
@@ -11,13 +18,7 @@
 		<regex>[Ss]ystem.[Ii][Oo].[Dd]irectory</regex>
 	</fillIn>
 
-	<fillIn id="1">
-		<text>Укажите пространство имен, используемое для работы с файлами</text>
-		<sample>System.IO</sample>
-		<regex>[Ss]ystem.[Ii][Oo]</regex>
-	</fillIn>
-
-	<code>File.WriteAllText("temp.txt","БФЩZW!",Encoding.UTF8);</code>
+	<code>File.WriteAllText("temp.txt", "БЩФzw!", Encoding.UTF8);</code>
 	
 	<fillIn id="2">
 		<text>Сколько байт будет в файле temp.txt после выполнения строки выше?</text>
@@ -25,16 +26,16 @@
 		<regex>9</regex>
 	</fillIn>
 
-	<choice id="3" multiple="true" shuffle="true">
+	<choice id="3" multiple="true" shuffle="false">
 		<text>Отметьте все верные факты про кодировки</text>
 		<item id="0" isCorrect="true">Кодировка — это способ преобразования символов в байты и обратно</item>
 		<item id="1" isCorrect="false">Кодировка — это только лишь сопоставление номера каждому символу</item>
 		<item id="2" isCorrect="false">В кодировке UTF-8 все символы кодируются более, чем одним байтом</item>
-		<item id="3" isCorrect="true">Формат записи латинских буквы в кодировке UTF-8 совпадает с форматом в старой кодировке ASCII</item>
-		<item id="4" isCorrect="false">Кодировка — это такая неприятная штука, которая портит все буквы, превращая их в кракозябры :(</item>
+		<item id="3" isCorrect="true">Формат записи латинских букв в кодировке UTF-8 совпадает с форматом в старой кодировке ASCII</item>
+		<item id="4" isCorrect="false">Кодировка — это непонятная и вредная штука, она портит все буквы, превращая их в кракозябры :(</item>
 	</choice>
 
-	<choice id="4" multiple="false" shuffle="true">
+	<choice id="4" multiple="false" shuffle="false">
 		<text>Откройте исходный код этой страницы (обычно есть такой пункт в контекстном меню) и найдите указание кодировки этой страницы. Какая она?</text>
 		<item id="0" isCorrect="false">Windows-1251</item>
 		<item id="1" isCorrect="false">KOI-8</item>

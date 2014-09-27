@@ -17,27 +17,29 @@ namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 		Чтобы искать записи было быстрее, он решил сделать словарь,
 		в котором по двум первым буквам имени можно найти все записи его дневника.
 		
-		Вася уже написал функцию `ReadPhonebook`, которая считывает его каракули из блокнота. Помогите ему сделать все остальное!
+		Вася уже написал функцию `GetContacts`, которая считывает его каракули из блокнота. Помогите ему сделать все остальное!
 		*/
 
-		[ExpectedOutput(@"Ва: Ваня:v@mail.ru, Вася:vasiliy@gmail.com, Ваня:ivan@grozniy.ru, Ваня:vanechka@domain.com
+		[ExpectedOutput(@"
+Ва: Ваня:v@mail.ru, Вася:vasiliy@gmail.com, Ваня:ivan@grozniy.ru, Ваня:vanechka@domain.com
 Са: Саша:sasha1995@sasha.ru, Саша:alex@nd.ru, Саша:alexandr@yandex.ru, Саша:a@lex.ru
 Па: Паша:p@p.ru, Паша:pavel.egorov@urfu.ru
 Юр: Юрий:dolg@rukiy.ru
 Ге: Гена:genadiy.the.best@inbox.ru
 Ы: Ы:nobody@nowhere.no")]
+		[HideOnSlide]
 		public static void Main()
 		{
-			List<string> phonebook = ReadPhonebook();
+			List<string> contacts = GetContacts();
 			
-			Dictionary<string, List<string>> optimizedPhonebook = GetOptimizedPhonebook(phonebook);
+			Dictionary<string, List<string>> optimizedPhonebook = OptimizeContacts(contacts);
 
 			foreach (var record in optimizedPhonebook)
 				Console.WriteLine("{0}: {1}", record.Key, string.Join(", ", record.Value.ToArray()));
 		}
 
 		[HideOnSlide]
-		private static List<string> ReadPhonebook()
+		private static List<string> GetContacts()
 		{
 			return new List<string>
 			{
@@ -58,12 +60,12 @@ namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 		}
 
 		[Exercise]
+		[Hint("Разбить запись на имя и email вам поможет уже знакомый метод `Split` у строки")]
 		[Hint("Проверяйте наличие ключа в словаре перед добавлением")]
-		[Hint("Вспомните, что делает метод `Split` у строки")]
-		private static Dictionary<string, List<string>> GetOptimizedPhonebook(List<string> phonebook)
+		private static Dictionary<string, List<string>> OptimizeContacts(List<string> contacts)
 		{
 			var dictionary = new Dictionary<string, List<string>>();
-			foreach (var record in phonebook)
+			foreach (var record in contacts)
 			{
 				var name = record.Split(':').First();
 				name = name.Substring(0, Math.Min(name.Length, 2));
@@ -74,7 +76,9 @@ namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 			return dictionary;
 			/*uncomment
 			var dictionary = new Dictionary<string, List<string>>();
-			...
+			
+
+
 			return dictionary;
 			*/
 		}
