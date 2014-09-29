@@ -31,9 +31,6 @@ namespace uLearn.Courses.BasicProgramming.Slides.U04_Arrays
 		public static int[] GetPoweredArray(int[] arr, int power)
 		{
 			return arr.Select(x => (int)Math.Pow(x, power)).ToArray();
-			/*uncomment
-			 ...
-			*/
 		}
 
 		[HideOnSlide]

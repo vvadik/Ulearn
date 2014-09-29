@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading;
 using NUnit.Framework;
@@ -30,15 +31,28 @@ namespace uLearn
 		}
 
 		[Test]
-		public void LoadAllSlides()
+		[Category("Long")]
+		public void CheckAllYoutubeVideos()
 		{
 			var course = CourseManager.LoadCourse(new DirectoryInfo(@"..\..\Slides"));
 			Assert.That(course.Slides.Length, Is.GreaterThan(0));
-			Console.WriteLine(course.Title);
-			Console.WriteLine(course.Slides.Length + " slides:");
-			Console.WriteLine();
-			foreach (var slide in course.Slides)
-				Console.WriteLine(slide.Info.UnitName + " " + slide.Title);
+			var webClient = new WebClient();
+			var youtubeBlocks = course.Slides.SelectMany(slide => slide.Blocks.OfType<YoutubeBlock>().Select(b => new { slide, b.VideoId }));
+			var videos = new HashSet<string>();
+			foreach (var b in youtubeBlocks)
+			{
+
+				try
+				{
+					webClient.DownloadData("http://gdata.youtube.com/feeds/api/videos/" + b.VideoId);
+
+				}
+				catch (Exception)
+				{
+					throw new AssertionException("Incorrect video {1} on slide {0}".WithArgs(b.slide.Title, b.VideoId));
+				}
+				Assert.IsTrue(videos.Add(b.VideoId), "Duplicate video {1} on slide {0}".WithArgs(b.slide.Title, b.VideoId));
+			}
 		}
 
 		[TestCaseSource("GetExerciseSlidesTestCases")]

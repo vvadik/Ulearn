@@ -3,7 +3,7 @@
 	[Slide("Функциональное тестирование", "{95B97EBE-5686-45A2-84FE-D5902351FF23}")]
 	class S070_FunctionalTestingcs
 	{
-		//#video C86-xJmLgow
+		//#video ymfu0ODDjn0
 
 		/*
 		## Дополнительные материалы

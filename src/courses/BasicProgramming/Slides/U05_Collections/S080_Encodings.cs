@@ -4,7 +4,7 @@ using System.Text;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 {
-	//#video rhKoXQyR_Fs
+	//#video YxFheXv6Vv8
 	/*
 	## Заметки по лекции
 	*/

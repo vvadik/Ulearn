@@ -3,7 +3,7 @@
 	[Slide("Test Driven Development", "{D73D0E96-E4C7-4817-B96E-434E8A4ABEF9}")]
 	class S060_Tdd
 	{
-		//#video C86-xJmLgow
+		//#video wnBCHqZ-dVM
 
 		/*
 		## Заметки по лекции
