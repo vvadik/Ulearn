@@ -43,7 +43,7 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		Напишите решение этой задачи с помощью `LINQ` в одно выражение.
 		*/
 
-		[ExpectedOutput("Pavel\r\nIvan\r\nPetr\r\nAnna\r\nIlya\r\nVladimir\r\nBulat\r\nAlex\r\nGalina")]
+		[ExpectedOutput("Alex Anna Bulat Galina Ilya Ivan Pavel Petr Vladimir")]
 		public static void Main()
 		{
 			Classroom[] classes =
@@ -53,8 +53,8 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 				new Classroom {Students = {"Bulat", "Alex", "Galina"},}
 			};
 			var allStudents = GetAllStudents(classes);
-			foreach (var e in allStudents)
-				Console.WriteLine(e);
+			Array.Sort(allStudents);
+			Console.WriteLine(string.Join(" ", allStudents));
 		}
 
 		[Exercise]

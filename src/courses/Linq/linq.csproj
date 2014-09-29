@@ -119,7 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />
-    <Content Include="Slides\LINQ\Prelude.txt" />
+    <Compile Include="Slides\LINQ\Prelude.cs" />
     <Content Include="Slides\Title.txt" />
     <Content Include="Slides\LINQ\Title.txt" />
   </ItemGroup>
