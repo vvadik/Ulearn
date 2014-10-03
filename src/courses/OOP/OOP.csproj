@@ -35,6 +35,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -85,10 +87,15 @@
     <Compile Include="Slides\U01_DataTypes_And_Algorithms\S010_DataType.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="Slides\U02_Polymorphism\S020_Logging.cs" />
+    <Compile Include="Slides\U02_Polymorphism\S045_NullObject.cs" />
+    <Compile Include="Slides\U02_Polymorphism\S050_OptimizeForNoise.cs" />
+    <Compile Include="Slides\U02_Polymorphism\S040_Noise.cs" />
+    <Compile Include="Slides\U02_Polymorphism\S060_Visualize.cs" />
     <Compile Include="Slides\U03_DataStructure\S010_DataStructures.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\U02_Polymorphism\S010_DataType.cs">
+    <Compile Include="Slides\U02_Polymorphism\S010_IRobotNavigator.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Content Include="CoursesTests.cs" />

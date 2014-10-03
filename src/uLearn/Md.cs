@@ -20,6 +20,7 @@ namespace uLearn
 				NewWindowForExternalLinks = true,
 				ExtraMode = true,
 				SafeMode = false,
+				MarkdownInHtml = false,
 			};
 			return markdown.Transform(md);
 		}
@@ -64,6 +65,14 @@ namespace uLearn
 			Assert.AreEqual(
 				"<p><strong>x</strong>,</p>\n",
 				new Markdown { ExtraMode = true }.Transform("__x__,"));
+		}
+	
+		[Test]
+		public void dot_emphasize_in_html()
+		{
+			Assert.AreEqual(
+				"<p><span>_x_</span></p>\n",
+				new Markdown { ExtraMode = true }.Transform("<span>_x_</span>"));
 		}
 	}
 }
