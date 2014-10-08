@@ -14,7 +14,7 @@
 			var ans = itemChecked ? "checked" : "";
 			var itemClass = Model.Passed ? (item.IsCorrect ? "right-quiz" : itemChecked ? "wrong-quiz" : "") : "";
 			<div class="quiz">
-				<label class="@itemClass"><input @ans id='@(quizBlock.Id + "quizBlock" + item.Id)' name=@("group"+ident) type="@typeInp">@item.Description</label>
+				<label class="@itemClass"><input @ans autocomplete="off" id='@(quizBlock.Id + "quizBlock" + item.Id)' name=@("group"+ident) type="@typeInp">@item.Description</label>
 			</div>
 		}
 	</div>

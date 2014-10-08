@@ -16,10 +16,10 @@
 	}
 	<div class="radio quiz-block-mark" id="@(quizBlock.Id + "_quizBlock")">
 		<div class="quiz">
-			<label class="@trueItemClass"><input @tchecked id='@(quizBlock.Id + "quizBlock" + "True")' name='@(quizBlock.Id+"group")' type="radio">Верно</label>
+			<label class="@trueItemClass"><input autocomplete="off" @tchecked id='@(quizBlock.Id + "quizBlock" + "True")' name='@(quizBlock.Id+"group")' type="radio">Верно</label>
 		</div>
 		<div class="quiz">
-			<label class="@falseItemClass"><input @fchecked id='@(quizBlock.Id + "quizBlock" + "False")' name='@(quizBlock.Id+"group")' type="radio">Не верно</label>
+			<label class="@falseItemClass"><input autocomplete="off" @fchecked id='@(quizBlock.Id + "quizBlock" + "False")' name='@(quizBlock.Id+"group")' type="radio">Не верно</label>
 		</div>
 	</div>
 }

@@ -12,7 +12,7 @@
 	var sample = quizBlock.Sample;
 	<div class="quiz quiz-block-input">
 		<label>
-			<input class="form-control @quizRes" value="@value" id='@(quizBlock.Id + "quizBlock")'>
+			<input autocomplete="off" class="form-control @quizRes" value="@value" id='@(quizBlock.Id + "quizBlock")'>
 		</label>
 	</div>
 	if (Model.Passed)
