@@ -1,12 +1,20 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using NUnit.Framework;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 {
 	//#video YxFheXv6Vv8
 	/*
 	## Заметки по лекции
+
+	В видео ошибка в описании работы метода File.WriteAllText при передаче ему третьего параметра — кодировки. 
+
+	Без этого параметра, WriteAllFile записывает файл в UTF-8, а не в соответствии с настройками локали.
+
+	C этим параметром, равным Encoding.UTF-8 он дополнительно добавляет три байта - маркер этой кодировки (так называемый BOM — ByteOrderMark).
+
 	*/
 	[Slide("Кодировка и работа с файлами", "{8E38E049-311E-45CD-B546-99FE1EC2C9D6}")]
 	public class S080_Encodings
@@ -37,10 +45,9 @@ namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 
 		}
 
-
+		[Test]
 		public static void Main()
 		{
-
 	
 			//Английский язык и базовые символы одинаковы во всех кодировках
 			//Однако, при сохранении текста в кодировке UTF добавляется специальный маркер файла,

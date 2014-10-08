@@ -18,10 +18,12 @@
 		<regex>[Ss]ystem.[Ii][Oo].[Dd]irectory</regex>
 	</fillIn>
 
-	<code>File.WriteAllText("temp.txt", "БЩФzw!", Encoding.UTF8);</code>
+	<p>Методом `Encoding.UTF8.GetBytes(string s)` можно преобразовать строку `s` в массив байтов согласно кодировке UTF-8.</p>
+	
+	<code>Console.WriteLine(Encoding.UTF8.GetBytes("БЩФzw!").Length);</code>
 	
 	<fillIn id="2">
-		<text>Сколько байт будет в файле temp.txt после выполнения строки выше?</text>
+		<text>Какое число напечатает приведенный выше код?</text>
 		<sample>9</sample>
 		<regex>9</regex>
 	</fillIn>
