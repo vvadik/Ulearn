@@ -3,6 +3,7 @@ var $serviceError = $runResults.filter(".run-service-error");
 var $compileError = $runResults.filter(".run-compile-error");
 var $styleError = $runResults.filter(".run-style-error");
 var $waError = $runResults.filter(".run-wa");
+var $waErrorNoDiff = $runResults.filter(".run-wa-no-diff");
 var $success = $runResults.filter(".run-success");
 
 
@@ -37,7 +38,10 @@ function setResults(ans) {
 		setSimpleResult($success, ans.ActualOutput);
 		slideNavigation.makeShowSolutionsNext();
 	}
-	else setWA(ans.ExpectedOutput, ans.ActualOutput);
+	else if (ans.ExpectedOutput === null)
+		setSimpleResult($waErrorNoDiff, ans.ActualOutput);
+	else
+		setWA(ans.ExpectedOutput, ans.ActualOutput);
 }
 
 var $runButton = $(".run-solution-button");

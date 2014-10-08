@@ -73,6 +73,14 @@ namespace uLearn
 			Assert.AreEqual(
 				"<p><span>_x_</span></p>\n",
 				new Markdown { ExtraMode = true }.Transform("<span>_x_</span>"));
+		}		
+		
+		[Test]
+		public void dot_emphasize_in_html2()
+		{
+			Assert.AreEqual(
+				@"<p><span class=""tex"">noise_V, noise_{\omega}</span></p>",
+				@"<span class=""tex"">noise_V, noise_{\omega}</span>".RenderMd("/").Trim());
 		}
 	}
 }

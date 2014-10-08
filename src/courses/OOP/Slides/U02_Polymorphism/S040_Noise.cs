@@ -30,7 +30,7 @@ namespace OOP.Slides.U02_Polymorphism
 		/*
 
 		<span class="tex">noise_V, noise_{\omega}</span> — это две функции, моделирующие искажения в линейной и угловой скоростях, 
-		а <span class="text">V_{command}, \omega_{command}</span> — значения из команды роботу.
+		а скорости с индексом command — значения из команды роботу.
 
 		## Задача
 
@@ -39,7 +39,7 @@ namespace OOP.Slides.U02_Polymorphism
 
 		2. Создайте класс `UniformNoise`, реализующий `INoise` согласно следующей формуле:
 
-			<div class="tex">noise(x) = x*rnd(-w, w)</div>
+			<div class="tex">noise(x) = x \cdot rnd(-w, w)</div>
 
 			где <span class="tex">rnd(min, max)</span> — генератор случайных действительных чисел в диапазоне от min до max, а <span class="tex">w</span> — параметр, передаваемый в конструктор `UniformNoise`
 		
