@@ -13,8 +13,9 @@
 			var itemChecked = Model.Passed && Model.CourseModel.AnswersToQuizes[quizBlock.Id].Contains(item.Id);
 			var ans = itemChecked ? "checked" : "";
 			var itemClass = Model.Passed ? (item.IsCorrect ? "right-quiz" : itemChecked ? "wrong-quiz" : "") : "";
+			var title = Model.Passed ? ((item.IsCorrect ? "Правильный" : "Неправильный") + " вариант") : "";
 			<div class="quiz">
-				<label class="@itemClass"><input @ans autocomplete="off" id='@(quizBlock.Id + "quizBlock" + item.Id)' name=@("group"+ident) type="@typeInp">@item.Description</label>
+				<label class="@itemClass" title="@title"><input @ans autocomplete="off" id='@(quizBlock.Id + "quizBlock" + item.Id)' name=@("group"+ident) type="@typeInp">@item.Description</label>
 			</div>
 		}
 	</div>
