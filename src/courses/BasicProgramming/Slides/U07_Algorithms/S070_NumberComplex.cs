@@ -10,8 +10,5 @@ namespace uLearn.Courses.BasicProgramming.Slides.U07_Algorithms
 	class S070_NumberComplex
 	{
 		//#video fy4fSRDjPTs
-		/*
-		[Материалы по лекции](_Materials.zip)
-		*/
 	}
 }

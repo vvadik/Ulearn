@@ -11,7 +11,8 @@ namespace uLearn.Courses.BasicProgramming.Slides.U07_Algorithms
 	{
 		//#video TmU1e5OuRr4
 		/*
-		[Материалы по лекции](_Materials.zip)
+		[Материалы по лекции](_complexity.pdf)
+
 		*/
 	}
 }

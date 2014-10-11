@@ -3,7 +3,7 @@
 	[Slide("Покрытие тестами", "{100E2265-30CD-41E5-A909-20132012BBFC}")]
 	class S050_Coverage
 	{
-		//#video C86-xJmLgow
+		//#video sVEPrOpYufE
 
 		/*
 		Чуть более подробно про покрытие кода тестами можно прочитать [в википедии](https://ru.wikipedia.org/wiki/%D0%9F%D0%BE%D0%BA%D1%80%D1%8B%D1%82%D0%B8%D0%B5_%D0%BA%D0%BE%D0%B4%D0%B0)

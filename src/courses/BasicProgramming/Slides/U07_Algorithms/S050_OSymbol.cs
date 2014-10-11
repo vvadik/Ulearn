@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U07_Algorithms
 {
-	[Slide("О-Символика", "{0A165BD3-2893-447A-B873-75C0BCCAC0C3}")]
+	[Slide("О-символика", "{0A165BD3-2893-447A-B873-75C0BCCAC0C3}")]
 	class S050_OSymbol
 	{
 		//#video HOoYSOdTroU
 		/*
-		[Материалы по лекции](_Materials.zip)
+		[Материалы по лекции](_complexity.pdf)
 		*/
 	}
 }

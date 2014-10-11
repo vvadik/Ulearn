@@ -37,13 +37,13 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 
 		[ExpectedOutput(@"
 GetSortedWords(""A box of biscuits, a box of mixed biscuits, and a biscuit mixer."")
-  a of and box mixed mixer biscuit biscuits
+'a' 'of' 'and' 'box' 'mixed' 'mixer' 'biscuit' 'biscuits'
 
 GetSortedWords("""")
-  
+
 
 GetSortedWords(""Each Easter Eddie eats eighty Easter eggs."")
-  each eats eggs eddie easter eighty
+'each' 'eats' 'eggs' 'eddie' 'easter' 'eighty'
 ")]
 		[HideOnSlide]
 		public static void Main()
@@ -58,7 +58,7 @@ GetSortedWords(""Each Easter Eddie eats eighty Easter eggs."")
 		{
 			Console.WriteLine("GetSortedWords(\"{0}\")", text);
 			var sortedList = GetSortedWords(text);
-			Console.WriteLine("  " + string.Join(" ", sortedList.ToArray()));
+			Console.WriteLine(string.Join(" ", sortedList.Select(w => "'" + w + "'").ToArray()));
 			Console.WriteLine();
 		}
 	}

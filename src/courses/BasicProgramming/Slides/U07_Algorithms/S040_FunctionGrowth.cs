@@ -10,8 +10,5 @@ namespace uLearn.Courses.BasicProgramming.Slides.U07_Algorithms
 	class S040_FunctionGrowth
 	{
 		//#video bfvDe2M5LVE
-		/*
-		[Материалы по лекции](_Materials.zip)
-		*/
 	}
 }

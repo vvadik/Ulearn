@@ -17,16 +17,31 @@
 		<item id="1" isCorrect="true">Логику, отделенную от ввода-вывода проще тестировать</item>
 		<item id="2" isCorrect="true">Логика может пригодиться в других обстоятельствах, а если она будет объединена с вводом-выводом, её не получится использовать повторно</item>
 		<item id="3" isCorrect="false">Тестировать программу через ввод-вывод невозможно</item>
-		<item id="4" isCorrect="false">Это незыблеммое правило, которому нужно следовать всегда без обсуждений и раздумий</item>
+		<item id="4" isCorrect="false">Это незыблемое правило, которому нужно следовать всегда без обсуждений и раздумий</item>
 	</choice>
-
+	
 	<choice id="2" multiple="true" shuffle="false">
 		<text>Чтобы создать модульный тест с помощью встроенной в Visual Studio системы тестирования, нужно:</text>
 		<item id="1" isCorrect="true">Создать новый проект с типом Test Project</item>
-		<item id="2" isCorrect="true">Добавить в тестовом проекте ссылку на сборку с тестируемым кодом</item>
+		<item id="2" isCorrect="true">Добавить в этом проекте ссылку на сборку с тестируемым кодом</item>
 		<item id="3" isCorrect="true">Создать класс с тестами и пометить его атрибутом [TestClass]</item>
-		<item id="4" isCorrect="true">Создать в классе нестатический void-метод без параметров</item>
+		<item id="4" isCorrect="true">Создать в классе нестатический public void-метод без параметров</item>
 		<item id="5" isCorrect="true">Пометить этот метод атрибутом [TestMethod]</item>
 		<item id="6" isCorrect="true">Написать код подготовки исходных данных, код вызова тестируемого метода и код проверки результата вызова</item>
+	</choice>
+	
+	<code xml:space="preserve">
+		[TestMethod]
+		public void Test(){
+			string givenName = NameAlgorithms.ExtractGivenName("Иванов Петр Владимирович");
+			Console.WriteLine(givenName); // "Иванов"
+		}
+	</code>
+	<choice id="3" multiple="true" shuffle="false">
+		<text>Чем плох этот тестовый метод?</text>
+		<item id="1" isCorrect="false">Он проверяет работу только на одном примере — этого не достаточно!</item>
+		<item id="2" isCorrect="true">Этот тест автоматический. Если алгоритм станет работать неправильно, тест не упадет и не станет "красным"</item>
+		<item id="3" isCorrect="true">Название теста не раскрывает сути — по слову Test непонятно, что тестируется</item>
+		<item id="4" isCorrect="true">Этот тест не содержит проверок корректности работы алгоритма. Это как минимум подозрительно.</item>
 	</choice>
 </Quiz>
