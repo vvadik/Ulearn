@@ -170,6 +170,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="SlideAttribute.cs" />
+    <Compile Include="TexReplacer.cs" />
     <Compile Include="Urls.cs" />
   </ItemGroup>
   <ItemGroup>

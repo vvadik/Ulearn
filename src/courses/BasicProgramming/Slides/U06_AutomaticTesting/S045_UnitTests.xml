@@ -9,7 +9,7 @@
 		<item id="1" isCorrect="false">Это ускоряет выполнение программы</item>
 		<item id="2" isCorrect="false">Это ускоряет компиляцию</item>
 		<item id="3" isCorrect="true">Чтобы можно было повторно использовать код из библиотек в других проектах</item>
-		<item id="4" isCorrect="false">Это необходимо, для написания модульных тестов</item>
+		<item id="4" isCorrect="false">Это необходимо для написания модульных тестов</item>
 	</choice>
 
 	<choice id="1" multiple="true" shuffle="true">

@@ -95,6 +95,9 @@
     <Content Include="Slides\U07_Algorithms\S035_Complexity_vs_Speed.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Slides\U07_Algorithms\S075_Estimation.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Slides\U07_Algorithms\S085_Final.xml">
       <SubType>Designer</SubType>
     </Content>

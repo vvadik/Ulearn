@@ -3,27 +3,6 @@
  xmlns="https://ulearn.azurewebsites.net/quiz"
  id="{BDBB546E-5692-475A-8A96-D170AA666B5E}">
 	<title>O-символика 2</title>
-	<code xml:space="preserve">
-		int F(int n){
-			int sum = 0;
-			for(int i=0; i&lt;1000; i++)
-				for(int j=0; j&lt;i; j+=2)
-					sum+=j;
-			return sum;
-		}
-	</code>
-
-	<choice id="0" multiple="true" shuffle="false">
-		<text>Какие оценки сложности алгоритма F в зависимости от числа n (а не от размера входа) верны?</text>
-		<item id="1" isCorrect="true">O(n^2)</item>
-		<item id="2" isCorrect="true">O(n^3)</item>
-		<item id="3" isCorrect="false">O(n)</item>
-		<item id="4" isCorrect="false">o(n^2)</item>
-		<item id="5" isCorrect="true">o(n^3)</item>
-		<item id="6" isCorrect="false">Θ(n)</item>
-		<item id="7" isCorrect="true">Θ(n^2)</item>
-		<item id="8" isCorrect="false">Θ(n^3)</item>
-	</choice>
 
 	<choice id="1" multiple="true" shuffle="false">
 		<text>Если f(n) = O(n), то какие еще оценки верны?</text>
@@ -36,4 +15,31 @@
 		<item id="7" isCorrect="false">f(n) = Θ(n + 10/n)</item>
 		<item id="8" isCorrect="false">f(n) = Θ(n)</item>
 	</choice>
+
+	<choice id="2" multiple="true" shuffle="false">
+		<text>Алгоритм F имеет оценку сложности O(n^2), а алгоритм G — O(n). Тогда... (выберите все верные варианты)</text>
+		<item id="1" isCorrect="true">F может быть быстрее G на любом входе.</item>
+		<item id="2" isCorrect="true">F может быть медленнее G на любом входе.</item>
+		<item id="3" isCorrect="true">Для любого n F может сделать n*n операций на некотором входе размера n.</item>
+		<item id="4" isCorrect="false">Для любого n G может сделать n*n операций на некотором входе размера n.</item>
+	</choice>
+
+	<choice id="3" multiple="true" shuffle="false">
+		<text>Если f(n)= Θ(g(n)), то...</text>
+		<item id="1" isCorrect="true">f(n) = O(g(n))</item>
+		<item id="2" isCorrect="false">0.0001 * f(n) = o(g(n))</item>
+		<item id="3" isCorrect="true">1000*f(n) = O(g(n))</item>
+		<item id="4" isCorrect="true">1000*f(n) = Θ(g(n))</item>
+	</choice>
+
+	<choice id="4" multiple="true" shuffle="false">
+		<text>Даны два алгоритма F и G, решающие одну и ту же задачу, со сложностями f(n) и g(n), и f(n)=o(g(n)). Тогда... (выберите все верные утверждения)</text>
+		<item id="1" isCorrect="false">Задачу однозначно следует решать алгоритмом F</item>
+		<item id="2" isCorrect="false">Задачу однозначно следует решать алгоритмом G</item>
+		<item id="3" isCorrect="true">Существует такой вход, на котором F выполнит меньше операций, чем G</item>
+		<item id="4" isCorrect="false">На любом входе F выполняет меньше операций, чем G</item>
+		<item id="5" isCorrect="false">На любом достаточно большом входе F выполняет меньше операций, чем G</item>
+		<item id="6" isCorrect="true">Начиная с некоторого размера входа F в худшем случае выполняет меньше операций, чем G в худшем случае</item>
+	</choice>
+
 </Quiz>
