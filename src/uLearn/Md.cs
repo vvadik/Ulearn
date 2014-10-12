@@ -108,10 +108,10 @@ namespace uLearn
 		}
 
 		[Test]
-		public void dont_render_tex_with_spaces_inside()
+		public void render_tex_with_spaces_inside()
 		{
 			Assert.AreEqual(
-				@"<p>1 $ = 2 $</p>",
+				@"<p>1 <span class='tex'> = 2 </span></p>",
 				@"1 $ = 2 $".RenderMd("/").Trim());
 		}
 		[Test]
