@@ -15,7 +15,7 @@ namespace uLearn
 			ReplacedText = ReplaceTexInserts(text);
 		}
 
-		private static readonly Regex texRegex = new Regex(@"(^|\W)\$([^ $]+?)\$($|\W)");
+		private static readonly Regex texRegex = new Regex(@"(^|\W)\$([^$]+?)\$($|\W)");
 		private readonly Regex backRegex; 
 		private readonly string id;
 		private readonly Dictionary<string, string> texInserts = new Dictionary<string, string>();

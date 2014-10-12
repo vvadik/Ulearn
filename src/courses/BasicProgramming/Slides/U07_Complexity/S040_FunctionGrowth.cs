@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace uLearn.Courses.BasicProgramming.Slides.U07_Algorithms
+namespace uLearn.Courses.BasicProgramming.Slides.U07_Complexity
 {
 	[Slide("Рост функции", "{CB320AAB-0383-42A0-932A-95D7C8F76765}")]
 	class S040_FunctionGrowth

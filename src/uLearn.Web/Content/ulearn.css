@@ -472,3 +472,8 @@ div.quiz .right-quiz {
 .table.table-autowidth {
 	width: auto;
 }
+
+div.tex {
+	font-size: 1.2em;
+	padding-bottom: 1em;
+}

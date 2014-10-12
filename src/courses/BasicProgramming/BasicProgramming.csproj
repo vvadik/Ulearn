@@ -92,19 +92,19 @@
     <Content Include="Slides\U06_AutomaticTesting\S095_UnitTests2.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U07_Algorithms\S035_Complexity_vs_Speed.xml">
+    <Content Include="Slides\U07_Complexity\S035_Complexity_vs_Speed.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U07_Algorithms\S075_Estimation.xml">
+    <Content Include="Slides\U07_Complexity\S075_Estimation.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U07_Algorithms\S085_Final.xml">
+    <Content Include="Slides\U07_Complexity\S085_Final.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U07_Algorithms\S055_OSymbols.xml">
+    <Content Include="Slides\U07_Complexity\S055_OSymbols.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U07_Algorithms\S025_Complexity.xml">
+    <Content Include="Slides\U07_Complexity\S025_Complexity.xml">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Slides\U08_Recursion\Title.txt" />
@@ -206,14 +206,14 @@
     <Compile Include="Slides\U06_AutomaticTesting\S070_FunctionalTestingcs.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\_S030_UnitTest.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\_UnitTest.cs" />
-    <Compile Include="Slides\U07_Algorithms\S010_BasicComplexity.cs" />
-    <Compile Include="Slides\U07_Algorithms\S020_BasicTerms.cs" />
-    <Compile Include="Slides\U07_Algorithms\S030_ComplexityMeausure.cs" />
-    <Compile Include="Slides\U07_Algorithms\S040_FunctionGrowth.cs" />
-    <Compile Include="Slides\U07_Algorithms\S050_OSymbol.cs" />
-    <Compile Include="Slides\U07_Algorithms\S060_ComplexityEstimation.cs" />
-    <Compile Include="Slides\U07_Algorithms\S070_NumberComplex.cs" />
-    <Compile Include="Slides\U07_Algorithms\S080_ComplexityClasses.cs" />
+    <Compile Include="Slides\U07_Complexity\S010_BasicComplexity.cs" />
+    <Compile Include="Slides\U07_Complexity\S020_BasicTerms.cs" />
+    <Compile Include="Slides\U07_Complexity\S030_ComplexityMeausure.cs" />
+    <Compile Include="Slides\U07_Complexity\S040_FunctionGrowth.cs" />
+    <Compile Include="Slides\U07_Complexity\S050_OSymbol.cs" />
+    <Compile Include="Slides\U07_Complexity\S060_ComplexityEstimation.cs" />
+    <Compile Include="Slides\U07_Complexity\S070_NumberComplex.cs" />
+    <Compile Include="Slides\U07_Complexity\S080_ComplexityClasses.cs" />
     <Compile Include="Slides\U08_Recursion\S010_Recursion.cs" />
     <Compile Include="Slides\U08_Recursion\S020_RecursionTree.cs" />
     <Compile Include="Slides\U08_Recursion\S030_AdvancedExample.cs" />
@@ -235,12 +235,12 @@
     <Content Include="Slides\U04_Arrays\Title.txt" />
     <Content Include="Slides\U05_Collections\Title.txt" />
     <Content Include="Slides\U06_AutomaticTesting\Title.txt" />
-    <Content Include="Slides\U07_Algorithms\Title.txt" />
+    <Content Include="Slides\U07_Complexity\Title.txt" />
     <None Include="Slides\U03_Cycles\loops.zip" />
     <None Include="Slides\U04_Arrays\arrays.zip" />
     <None Include="Slides\U05_Collections\InstructorNotes.md" />
     <None Include="Slides\U05_Collections\text.zip" />
-    <None Include="Slides\U07_Algorithms\_complexity.pdf" />
+    <None Include="Slides\U07_Complexity\_complexity.pdf" />
     <None Include="Slides\U08_Recursion\InstructorNotes.md" />
     <None Include="Slides\U08_Recursion\_S020_MemoryMap.odp" />
     <None Include="Slides\U09_Sorting\Search.pdf" />
@@ -262,7 +262,7 @@
     <None Include="Slides\U04_Arrays\InstructorNotes.md" />
     <None Include="Slides\U05_Collections\_S030_StringToMethod.odp" />
     <None Include="Slides\U06_AutomaticTesting\InstructorNotes.md" />
-    <None Include="Slides\U07_Algorithms\InstructorNotes.md" />
+    <None Include="Slides\U07_Complexity\InstructorNotes.md" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Slides\Title.txt" />
