@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using MarkdownDeep;
 using NUnit.Framework;
@@ -27,25 +28,6 @@ namespace uLearn
 			};
 			var html = markdown.Transform(texReplacer.ReplacedText);
 			return texReplacer.PlaceTexInsertsBack(html);
-		}
-	}
-
-	public class Markdown2 : Markdown
-	{
-		private readonly string baseUrl;
-
-		public Markdown2(string baseUrl)
-		{
-			this.baseUrl = baseUrl;
-			if (baseUrl != null && !baseUrl.EndsWith("/"))
-				this.baseUrl += "/";
-		}
-
-		public override string OnQualifyUrl(string url)
-		{
-			if (baseUrl != null && !url.StartsWith("/") && !url.Contains(":"))
-				url = baseUrl + url;
-			return base.OnQualifyUrl(url);
 		}
 	}
 
@@ -136,5 +118,46 @@ namespace uLearn
 				@"<p><span class='tex'>\rho\subset\Sigma^*\times\Sigma^*</span></p>",
 				@"$\rho\subset\Sigma^*\times\Sigma^*$".RenderMd("/").Trim());
 		}
+
+		[Test]
+		public void render_tex_div()
+		{
+			Assert.AreEqual(
+				@"<div class='tex'>\displaystyle x_1=y_1</div>",
+				@"$$x_1=y_1$$".RenderMd("/").Trim());
+		}
+
+		[Test]
+		public void render_tex_div_and_span()
+		{
+			Assert.AreEqual(
+				@"<div class='tex'>\displaystyle x_1=y_1</div><p> <span class='tex'>1</span></p>",
+				@"$$x_1=y_1$$ $1$".RenderMd("/").Trim());
+		}
+		[Test]
+		public void render_tex_div_and_div()
+		{
+			Assert.AreEqual(
+				@"<div class='tex'>\displaystyle 1</div><div class='tex'>\displaystyle 2</div>",
+@"$$1$$
+$$2$$".RenderMd("/").Trim());
+		}
+		[Test]
+		public void render_tex_triple_div()
+		{
+			Assert.AreEqual(
+				@"<div class='tex'>\displaystyle 1</div><div class='tex'>\displaystyle 2</div><div class='tex'>\displaystyle 3</div>",
+@"$$1$$
+$$2$$
+$$3$$".RenderMd("/").Trim());
+		}
+
+		[Test]
+		public void render_tex_div_surrounded_by_spaces()
+		{
+			Assert.AreEqual(
+				@"<div class='tex'>\displaystyle 1</div>",
+				@" $$1$$ ".RenderMd("/").Trim());
+		}		
 	}
 }

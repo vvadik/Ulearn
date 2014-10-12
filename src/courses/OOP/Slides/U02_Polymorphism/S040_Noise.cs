@@ -18,16 +18,9 @@ namespace OOP.Slides.U02_Polymorphism
 		
 		При симуляции время разбивается на интервалы размером dt.
 		На каждом промежутке реальные линейная и угловая скорости робота вычисляются по формулам:
-		*/
-
-		/*tex
-
-		V_{real} = V_{command} + noise_V(V_{command})
-		\omega_{real} = \omega_{command} + noise_{\omega}(\omega_{command})
-
-		*/
-
-		/*
+		
+		$$V_{real} = V_{command} + noise_V(V_{command})$$
+		$$\omega_{real} = \omega_{command} + noise_{\omega}(\omega_{command})$$
 
 		$noise_V,noise_{\omega}$ — это две функции, моделирующие искажения в линейной и угловой скоростях, 
 		а скорости с индексом $command$ — значения из команды роботу.

@@ -28,10 +28,9 @@ namespace uLearn.Courses.BasicProgramming.Slides.U07_Complexity
 		Этот код считает следующую сумму $sum=0+2+4+\ldots+2(n-1)=n(n-1)$
 
 		Вычислительная сложность этого алгоритма $f(n)$:
-		*/
-		/*tex
-		f(n)=n(n-1)(2_{++}+1_{*}+1_{<})+n(1_=+1_{++}+1_<)+2_=+RL+WL=
-		=k_{R}n+k_{W}\lceil\log_{10}n(n-1)\rceil+4n^2-n+2
+
+		$$f(n)=n(n-1)(2_{++}+1_{*}+1_{<})+n(1_=+1_{++}+1_<)+2_=+RL+WL=$$
+		$$=k_{R}n+k_{W}\lceil\log_{10}n(n-1)\rceil+4n^2-n+2$$
 		*/
 	}
 }

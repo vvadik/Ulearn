@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace uLearn
 {
@@ -15,38 +17,57 @@ namespace uLearn
 			ReplacedText = ReplaceTexInserts(text);
 		}
 
-		private static readonly Regex texRegex = new Regex(@"(^|\W)\$([^$]+?)\$($|\W)");
+		public enum InsertionType
+		{
+			Span,
+			Div
+		}
+		private static readonly Regex texDivRegex = new Regex(@"(^|\W)\$\$([^\$]+?)\$\$($|\W)", RegexOptions.Multiline);
+		private static readonly Regex texSpanRegex = new Regex(@"(^|\W)\$([^\$]+?)\$($|\W)", RegexOptions.Multiline);
+		private static readonly Regex emptyParaRegex = new Regex(@"<p>\s*</p>");
 		private readonly Regex backRegex; 
 		private readonly string id;
-		private readonly Dictionary<string, string> texInserts = new Dictionary<string, string>();
+		private readonly Dictionary<string, Tuple<string, InsertionType>> texInserts = new Dictionary<string, Tuple<string, InsertionType>>();
 		private int counter;
 
 		private string ReplaceTexInserts(string md)
 		{
-			return texRegex.Replace(md, MakeInsertId).Replace(" -- ", " — ");
+			var result = texDivRegex.Replace(md, m => MakeInsertId(m, InsertionType.Div), int.MaxValue);
+			result = texSpanRegex.Replace(result, m => MakeInsertId(m, InsertionType.Span));
+			result = result.Replace(" -- ", " — ");
+			return result;
 		}
-		
+
 		public string PlaceTexInsertsBack(string textWithIds)
 		{
-			return backRegex.Replace(textWithIds, PrepareTexInsert);
+			var html = backRegex.Replace(textWithIds, PrepareTexInsert);
+			return emptyParaRegex.Replace(html, "");
 		}
 
 		private string PrepareTexInsert(Match match)
 		{
 			var insertId = match.Value;
-			string tex;
-			return texInserts.TryGetValue(insertId, out tex) ? FormatTex(tex) : insertId;
+			Tuple<string, InsertionType> tex;
+			if (!texInserts.TryGetValue(insertId, out tex)) return insertId;
+			if (tex.Item2 == InsertionType.Div) return FormatTexDiv(tex.Item1);
+			if (tex.Item2 == InsertionType.Span) return FormatTexSpan(tex.Item1);
+			throw new Exception(tex.Item2.ToString());
 		}
 
-		private string FormatTex(string tex)
+		private string FormatTexSpan(string tex)
 		{
-			return "<span class='tex'>" + tex + "</span>";
+			return "<span class='tex'>" + HttpUtility.HtmlEncode(tex) + "</span>";
+		}
+		
+		private string FormatTexDiv(string tex)
+		{
+			return "</p><div class='tex'>\\displaystyle " + HttpUtility.HtmlEncode(tex) + "</div><p>";
 		}
 
-		private string MakeInsertId(Match match)
+		private string MakeInsertId(Match match, InsertionType insertionType)
 		{
 			var insertId = id + "[" + (counter++) + "]";
-			texInserts.Add(insertId, match.Groups[2].Value);
+			texInserts.Add(insertId, Tuple.Create(match.Groups[2].Value, insertionType));
 			return match.Groups[1].Value + "" + insertId + match.Groups[3].Value;
 		}
 	}

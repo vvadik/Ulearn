@@ -96,6 +96,7 @@
     <Compile Include="CSharp\ICSharpSolutionValidator.cs" />
     <Compile Include="FileExtensions.cs" />
     <Compile Include="ISlideLoader.cs" />
+    <Compile Include="Markdown2.cs" />
     <Compile Include="Quizes\Quiz.cs" />
     <Compile Include="Quizes\QuizSlide.cs" />
     <Compile Include="Quizes\QuizBlock.cs" />
