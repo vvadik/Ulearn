@@ -1,11 +1,24 @@
 ﻿@using uLearn
 @using uLearn.Quizes
+@using uLearn.Web.Controllers
 @using CodeBlock = uLearn.Quizes.CodeBlock
 @model CoursePageModel
 @{ var quizSlide = Model.Slide as QuizSlide;}
 @if (quizSlide != null)
 {
 	var passed = Model.PassedQuiz.Contains(quizSlide.Id);
+	if (passed)
+	{
+		var questionBlocks = quizSlide.Quiz.Blocks
+			.Where(block => block is AbstractQuestionBlock)
+			.Cast<AbstractQuestionBlock>()
+			.Select(block => block.IsCorrectAnswer(Model.AnswersToQuizes))
+			.Where(b => b.HasValue)
+			.ToList();
+		var correctCount = questionBlocks.Count(b => b.Value);
+		<h4> Верно @correctCount из @questionBlocks.Count. </h4>
+	}
+	
 	var delim = "";
 	for (int blockIndex = 0; blockIndex < quizSlide.Quiz.Blocks.Length; blockIndex++)
 	{
@@ -24,13 +37,13 @@
 			var block = (AbstractQuestionBlock) quizBlock;
 			<h4>@block.QuestionIndex. @block.Text</h4>
 		}
+		
 		delim = blockIndex != quizSlide.Quiz.Blocks.Length - 1 ? "quiz-delimeter" : "";
 		if (quizBlock is ChoiceBlock)
 		{
 			@Html.Partial("_ChoiceBlock", quizModel)
 			<hr class="@delim">
 		}
-
 		else if (quizBlock is FillInBlock)
 		{
 			@Html.Partial("_FillInBlock", quizModel)

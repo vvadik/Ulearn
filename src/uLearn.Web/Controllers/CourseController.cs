@@ -190,4 +190,40 @@ namespace uLearn.Web.Controllers
 		}
 	}
 
+	public static class AbstractQuestionBlockExtensions
+	{
+		public static bool? IsCorrectAnswer(this AbstractQuestionBlock questionBlock,  Dictionary<string, List<string>> answersToQuizes)
+		{
+			if (questionBlock is FillInBlock)
+				return ((FillInBlock)questionBlock).IsCorrectAnswer(answersToQuizes);
+			if (questionBlock is ChoiceBlock)
+				return ((ChoiceBlock)questionBlock).IsCorrectAnswer(answersToQuizes);
+			if (questionBlock is IsTrueBlock)
+				return ((IsTrueBlock)questionBlock).IsCorrectAnswer(answersToQuizes);
+
+			return null;
+		}
+
+		private static bool IsCorrectAnswer(this FillInBlock fillInBlock, Dictionary<string, List<string>> answersToQuizes)
+		{
+			return answersToQuizes[fillInBlock.Id][1] == "True";
+		}
+
+		private static bool IsCorrectAnswer(this ChoiceBlock choiceBlock, Dictionary<string, List<string>> answersToQuizes)
+		{
+			var itemsCorrect = new HashSet<string>(choiceBlock.Items.Where(item => item.IsCorrect).Select(item => item.Id));
+			var itemsChecked = new HashSet<string>(answersToQuizes[choiceBlock.Id]);
+
+			return itemsCorrect.SetEquals(itemsChecked);
+		}
+
+		private static bool IsCorrectAnswer(this IsTrueBlock isTrueBlock, Dictionary<string, List<string>> answersToQuizes)
+		{
+			var userAnswer = answersToQuizes[isTrueBlock.Id].FirstOrDefault() == "True";
+			var correctAnswer = isTrueBlock.Answer;
+
+			return userAnswer == correctAnswer;
+		}
+
+	}
 }
