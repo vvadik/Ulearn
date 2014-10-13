@@ -6,6 +6,7 @@
 @if (quizSlide != null)
 {
 	var passed = Model.PassedQuiz.Contains(quizSlide.Id);
+	var status = "";
 	if (passed)
 	{
 		var questionBlocks = quizSlide.Quiz.Blocks
@@ -13,9 +14,11 @@
 			.Cast<AbstractQuestionBlock>()
 			.ToList();
 		var correctCount = questionBlocks.Count(block => block.IsCorrectAnswer(Model));
-		<h4> Верно @correctCount из @questionBlocks.Count. </h4>
+		status = String.Format("Верно {0} из {1}.", correctCount, questionBlocks.Count);
 	}
-	
+	<h4 id="quiz-status">@status</h4>
+
+
 	var delim = "";
 	for (int blockIndex = 0; blockIndex < quizSlide.Quiz.Blocks.Length; blockIndex++)
 	{

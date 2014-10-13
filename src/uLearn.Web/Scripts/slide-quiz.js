@@ -24,6 +24,7 @@
 					answer: answer
 				}
 			}).success(function (ans) {
+				$("#quiz-status").text("Проверяется...");
 				window.scrollTo(0, 0);
 				window.location.reload();
 			})
