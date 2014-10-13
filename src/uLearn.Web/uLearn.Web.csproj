@@ -195,6 +195,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\AbstractQuestionBlockExtensions.cs" />
     <Compile Include="Controllers\QuestionsController.cs" />
     <Compile Include="Controllers\UnitController.cs" />
     <Compile Include="Controllers\AnalyticsController.cs" />

@@ -1,6 +1,5 @@
 ﻿@using uLearn
 @using uLearn.Quizes
-@using uLearn.Web.Controllers
 @using CodeBlock = uLearn.Quizes.CodeBlock
 @model CoursePageModel
 @{ var quizSlide = Model.Slide as QuizSlide;}
@@ -12,10 +11,8 @@
 		var questionBlocks = quizSlide.Quiz.Blocks
 			.Where(block => block is AbstractQuestionBlock)
 			.Cast<AbstractQuestionBlock>()
-			.Select(block => block.IsCorrectAnswer(Model.AnswersToQuizes))
-			.Where(b => b.HasValue)
 			.ToList();
-		var correctCount = questionBlocks.Count(b => b.Value);
+		var correctCount = questionBlocks.Count(block => block.IsCorrectAnswer(Model));
 		<h4> Верно @correctCount из @questionBlocks.Count. </h4>
 	}
 	
@@ -39,12 +36,9 @@
 			var style = "";
 			if (passed)
 			{
-				var res = block.IsCorrectAnswer(Model.AnswersToQuizes);
-				if (res.HasValue)
-				{
-					mark = "glyphicon " + (res.Value ? "glyphicon-ok" : "glyphicon-remove");
-//					style = "color: " + (res.Value ? "green" : "red");
-				}
+				var res = block.IsCorrectAnswer(Model);
+				mark = "glyphicon " + (res ? "glyphicon-ok" : "glyphicon-remove");
+//				style = "color: " + (res ? "green" : "red");
 			}
 			<h4><i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text</h4>
 		}
