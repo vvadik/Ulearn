@@ -214,6 +214,8 @@
     <Compile Include="Slides\U07_Complexity\S060_ComplexityEstimation.cs" />
     <Compile Include="Slides\U07_Complexity\S070_NumberComplex.cs" />
     <Compile Include="Slides\U07_Complexity\S080_ComplexityClasses.cs" />
+    <Compile Include="Slides\U07_Complexity\S099_Exercise.cs" />
+    <Compile Include="Slides\U09_Sorting\S099_Exercise.cs" />
     <Compile Include="Slides\U08_Recursion\S010_Recursion.cs" />
     <Compile Include="Slides\U08_Recursion\S020_RecursionTree.cs" />
     <Compile Include="Slides\U08_Recursion\S030_AdvancedExample.cs" />
@@ -240,9 +242,12 @@
     <None Include="Slides\U04_Arrays\arrays.zip" />
     <None Include="Slides\U05_Collections\InstructorNotes.md" />
     <None Include="Slides\U05_Collections\text.zip" />
+    <None Include="Slides\U07_Complexity\image.zip" />
     <None Include="Slides\U07_Complexity\_complexity.pdf" />
     <None Include="Slides\U08_Recursion\InstructorNotes.md" />
     <None Include="Slides\U08_Recursion\_S020_MemoryMap.odp" />
+    <None Include="Slides\U09_Sorting\autocomplete.zip" />
+    <None Include="Slides\U09_Sorting\InstructorNotes.md" />
     <None Include="Slides\U09_Sorting\Search.pdf" />
   </ItemGroup>
   <ItemGroup>
