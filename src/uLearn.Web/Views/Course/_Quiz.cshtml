@@ -35,7 +35,18 @@
 		else if (quizBlock is AbstractQuestionBlock)
 		{
 			var block = (AbstractQuestionBlock) quizBlock;
-			<h4>@block.QuestionIndex. @block.Text</h4>
+			var mark = "";
+			var style = "";
+			if (passed)
+			{
+				var res = block.IsCorrectAnswer(Model.AnswersToQuizes);
+				if (res.HasValue)
+				{
+					mark = "glyphicon " + (res.Value ? "glyphicon-ok" : "glyphicon-remove");
+//					style = "color: " + (res.Value ? "green" : "red");
+				}
+			}
+			<h4><i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text</h4>
 		}
 		
 		delim = blockIndex != quizSlide.Quiz.Blocks.Length - 1 ? "quiz-delimeter" : "";
