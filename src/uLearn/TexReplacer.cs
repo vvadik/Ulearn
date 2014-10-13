@@ -32,7 +32,7 @@ namespace uLearn
 
 		private string ReplaceTexInserts(string md)
 		{
-			var result = texDivRegex.Replace(md, m => MakeInsertId(m, InsertionType.Div), int.MaxValue);
+			var result = texDivRegex.Replace(md ?? "", m => MakeInsertId(m, InsertionType.Div), int.MaxValue);
 			result = texSpanRegex.Replace(result, m => MakeInsertId(m, InsertionType.Span));
 			result = result.Replace(" -- ", " — ");
 			return result;

@@ -26,17 +26,11 @@
 		$freq(g,T)$ — это количество вхождений граммы $g$ в текст $T$.
 		
 		$G$ — множество всех различных N-грамм, встречающихся хотя бы в одном текстов.
-		*/
 
-		/*tex
-		common(T_1, T_2) = \sum_{g \in G} \min(freq(g, T_1), freq(g, T_2))
-
-		total(T_1, T_2) = \sum_{g \in G} \max(freq(g, T_1), freq(g, T_2))
-
-		J(T_1, T_2) = \frac{common(T_1, T_2)}{total(T_1, T_2)}
-		*/
-
-		/*
+		$$common(T_1, T_2) = \sum_{g \in G} \min(freq(g, T_1), freq(g, T_2))$$
+		$$total(T_1, T_2) = \sum_{g \in G} \max(freq(g, T_1), freq(g, T_2))$$
+		$$J(T_1, T_2) = \frac{common(T_1, T_2)}{total(T_1, T_2)}$$
+		
 		### Требование к оформлению
 
 		Считайте, что все тексты в кодировке UTF-8.
