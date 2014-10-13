@@ -38,7 +38,7 @@
 			{
 				var res = block.IsCorrectAnswer(Model);
 				mark = "glyphicon " + (res ? "glyphicon-ok" : "glyphicon-remove");
-//				style = "color: " + (res ? "green" : "red");
+				style = "color: " + (res ? "green" : "red");
 			}
 			<h4><i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text</h4>
 		}
