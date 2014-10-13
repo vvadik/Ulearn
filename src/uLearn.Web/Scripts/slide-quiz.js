@@ -24,6 +24,7 @@
 					answer: answer
 				}
 			}).success(function (ans) {
+				window.scrollTo(0, 0);
 				window.location.reload();
 			})
 			.fail(function (req) {
