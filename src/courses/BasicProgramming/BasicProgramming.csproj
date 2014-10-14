@@ -98,7 +98,7 @@
     <Content Include="Slides\U07_Complexity\S075_Estimation.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U07_Complexity\S085_Final.xml">
+    <Content Include="Slides\U07_Complexity\S085_OSymbols2.xml">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Slides\U07_Complexity\S055_OSymbols.xml">
@@ -206,7 +206,7 @@
     <Compile Include="Slides\U06_AutomaticTesting\S070_FunctionalTestingcs.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\_S030_UnitTest.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\_UnitTest.cs" />
-    <Compile Include="Slides\U07_Complexity\S010_BasicComplexity.cs" />
+    <Compile Include="Slides\U07_Complexity\S010_AlgorithmsMatters.cs" />
     <Compile Include="Slides\U07_Complexity\S020_BasicTerms.cs" />
     <Compile Include="Slides\U07_Complexity\S030_ComplexityMeausure.cs" />
     <Compile Include="Slides\U07_Complexity\S040_FunctionGrowth.cs" />
