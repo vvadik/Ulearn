@@ -1,7 +1,5 @@
 using System;
-using System.Activities.Debugger;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Ionic.Zip;
@@ -157,9 +155,8 @@ namespace uLearn
 		{
 			try
 			{
-				var ext = file.Extension.Substring(1);
 				var slideLoader = SlideLoaders
-					.FirstOrDefault(loader => loader.Extension.Equals(ext, StringComparison.InvariantCultureIgnoreCase));
+					.FirstOrDefault(loader => file.FullName.EndsWith(loader.Extension, StringComparison.InvariantCultureIgnoreCase));
 				if (slideLoader == null)
 					throw new Exception("Unknown slide format " + file);
 				return slideLoader.Load(file, unitTitle, slideIndex);
