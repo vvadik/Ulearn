@@ -189,5 +189,4 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("AcceptedSolutions", new { courseId = courseId, slideIndex = slideIndex });
 		}
 	}
-
 }

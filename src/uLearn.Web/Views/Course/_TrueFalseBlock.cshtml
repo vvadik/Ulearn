@@ -6,6 +6,8 @@
 	var trueItemClass = "";
 	var falseItemClass = "";
 	var quizBlock = (IsTrueBlock)Model.CurrentBlock;
+	var ttitle = "";
+	var ftitle = "";
 	if (Model.Passed && Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() != null)
 	{
 		var userAnswer = Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() == "True";
@@ -13,13 +15,15 @@
 		fchecked = userAnswer ?  "" : "checked";
 		trueItemClass = quizBlock.Answer ? "right-quiz" : userAnswer ? "wrong-quiz" : "";
 		falseItemClass = !quizBlock.Answer ? "right-quiz" : !userAnswer ? "wrong-quiz" : "";
+		ttitle = (quizBlock.Answer ? "Правильный" : "Неправильный") + " вариант";
+		ftitle = (!quizBlock.Answer ? "Правильный" : "Неправильный") + " вариант";
 	}
 	<div class="radio quiz-block-mark" id="@(quizBlock.Id + "_quizBlock")">
 		<div class="quiz">
-			<label class="@trueItemClass"><input autocomplete="off" @tchecked id='@(quizBlock.Id + "quizBlock" + "True")' name='@(quizBlock.Id+"group")' type="radio">Верно</label>
+			<label class="@trueItemClass" title="@ttitle"><input autocomplete="off" @tchecked id='@(quizBlock.Id + "quizBlock" + "True")' name='@(quizBlock.Id+"group")' type="radio">Верно</label>
 		</div>
 		<div class="quiz">
-			<label class="@falseItemClass"><input autocomplete="off" @fchecked id='@(quizBlock.Id + "quizBlock" + "False")' name='@(quizBlock.Id+"group")' type="radio">Не верно</label>
+			<label class="@falseItemClass" title="@ftitle"><input autocomplete="off" @fchecked id='@(quizBlock.Id + "quizBlock" + "False")' name='@(quizBlock.Id+"group")' type="radio">Не верно</label>
 		</div>
 	</div>
 }

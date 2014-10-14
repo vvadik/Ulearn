@@ -6,6 +6,19 @@
 @if (quizSlide != null)
 {
 	var passed = Model.PassedQuiz.Contains(quizSlide.Id);
+	var status = "";
+	if (passed)
+	{
+		var questionBlocks = quizSlide.Quiz.Blocks
+			.Where(block => block is AbstractQuestionBlock)
+			.Cast<AbstractQuestionBlock>()
+			.ToList();
+		var correctCount = questionBlocks.Count(block => block.IsCorrectAnswer(Model));
+		status = String.Format("Верно {0} из {1}.", correctCount, questionBlocks.Count);
+	}
+	<h4 id="quiz-status">@status</h4>
+
+
 	var delim = "";
 	for (int blockIndex = 0; blockIndex < quizSlide.Quiz.Blocks.Length; blockIndex++)
 	{
@@ -22,15 +35,23 @@
 		else if (quizBlock is AbstractQuestionBlock)
 		{
 			var block = (AbstractQuestionBlock) quizBlock;
-			<h4>@block.QuestionIndex. @block.Text</h4>
+			var mark = "";
+			var style = "";
+			if (passed)
+			{
+				var res = block.IsCorrectAnswer(Model);
+				mark = "glyphicon " + (res ? "glyphicon-ok" : "glyphicon-remove");
+				style = "color: " + (res ? "green" : "red");
+			}
+			<h4><i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text</h4>
 		}
+		
 		delim = blockIndex != quizSlide.Quiz.Blocks.Length - 1 ? "quiz-delimeter" : "";
 		if (quizBlock is ChoiceBlock)
 		{
 			@Html.Partial("_ChoiceBlock", quizModel)
 			<hr class="@delim">
 		}
-
 		else if (quizBlock is FillInBlock)
 		{
 			@Html.Partial("_FillInBlock", quizModel)
