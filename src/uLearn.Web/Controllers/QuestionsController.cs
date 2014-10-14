@@ -1,4 +1,5 @@
 using System;
+using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -71,7 +72,11 @@ namespace uLearn.Web.Controllers
 		public ActionResult Items(string courseId, string unitName = null)
 		{
 			IQueryable<UserQuestion> questions = db.UserQuestions;
-			if (unitName != null) questions = questions.Where(q => q.CourseId == courseId && q.UnitName == unitName);
+			if (unitName != null)
+			{
+				var slideIds = courseManager.GetCourse(courseId).Slides.Where(s => s.Info.UnitName == unitName).Select(s => s.Id).ToArray();
+				questions = questions.Where(q => q.CourseId == courseId && slideIds.Contains(q.SlideId));
+			}
 			var result = questions.OrderByDescending(q => q.Time).Take(20).ToList()
 				.Select(q => new QuestionViewModel
 				{
