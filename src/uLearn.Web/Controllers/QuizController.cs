@@ -207,5 +207,16 @@ namespace uLearn.Web.Controllers
 				else if (block is IsTrueBlock)
 					yield return userQuizzesRepo.GetIsTrueBlockAnswerInfo(courseId, slide.Id, block.Id, userId, block.QuestionIndex);
 		}
+
+		[HttpPost]
+		[Authorize]
+		public async Task<ActionResult> DropQuiz(string courseId, string slideId)
+		{
+			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
+			var userId = User.Identity.GetUserId();
+			if (userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b) < CourseController.MAX_DROPS_COUNT)
+				await userQuizzesRepo.DropQuiz(userId, slideId);
+			return RedirectToAction("Slide", "Course", new { courseId, slideIndex = slide.Index });
+		}
 	}
 }

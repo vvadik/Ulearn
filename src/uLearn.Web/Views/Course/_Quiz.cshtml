@@ -5,9 +5,8 @@
 @{ var quizSlide = Model.Slide as QuizSlide;}
 @if (quizSlide != null)
 {
-	var passed = Model.PassedQuiz.Contains(quizSlide.Id);
 	var status = "";
-	if (passed)
+	if (Model.QuizState != QuizState.NotPassed)
 	{
 		var questionBlocks = quizSlide.Quiz.Blocks
 			.Where(block => block is AbstractQuestionBlock)
@@ -23,7 +22,7 @@
 	for (int blockIndex = 0; blockIndex < quizSlide.Quiz.Blocks.Length; blockIndex++)
 	{
 		var quizBlock = quizSlide.Quiz.Blocks[blockIndex];
-		var quizModel = new QuizInfoModel(Model, quizBlock, blockIndex, passed);
+		var quizModel = new QuizInfoModel(Model, quizBlock, blockIndex, Model.QuizState);
 		if (quizBlock is CodeBlock)
 		{
 			<textarea class='code code-sample'>@(((CodeBlock) quizBlock).Text)</textarea>
@@ -37,7 +36,7 @@
 			var block = (AbstractQuestionBlock) quizBlock;
 			var mark = "";
 			var style = "";
-			if (passed)
+			if (Model.QuizState != QuizState.NotPassed)
 			{
 				var res = block.IsCorrectAnswer(Model);
 				mark = "glyphicon " + (res ? "glyphicon-ok" : "glyphicon-remove");
@@ -64,9 +63,18 @@
 		}
 	}
 		<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
-			@if (!passed)
+			@if (Model.QuizState == QuizState.NotPassed)
 			{
 				<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count')">Готово!</button>
+			}
+			else if (Model.QuizState == QuizState.Subtotal)
+			{
+				using (Html.BeginForm("DropQuiz", "Quiz"))
+				{
+					<input type="hidden" name="slideId" value="@Model.Slide.Id" />
+					<input type="hidden" name="courseId" value="@Model.CourseId" />
+					<button class="btn btn-danger" type="submit">Попробовать снова</button>
+				}
 			}
 			else if (User.IsInRole(LmsRoles.Tester))
 			{

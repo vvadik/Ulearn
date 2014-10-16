@@ -13,6 +13,8 @@ namespace uLearn.Web.Controllers
 {
 	public class CourseController : Controller
 	{
+		public static readonly int MAX_DROPS_COUNT = 1;
+
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
@@ -109,12 +111,22 @@ namespace uLearn.Web.Controllers
 				LatestAcceptedSolution =
 					solutionsRepo.FindLatestAcceptedSolution(courseId, course.Slides[slideIndex].Id, userId),
 				Rate = GetRate(course.Id, course.Slides[slideIndex].Id),
-				PassedQuiz = userQuizzesRepo.GetIdOfQuizPassedSlides(courseId, userId),
+				QuizState = getQuizState(courseId, userId, course.Slides[slideIndex].Id),
 				AnswersToQuizes =
 					userQuizzesRepo.GetAnswersForShowOnSlide(courseId, course.Slides[slideIndex] as QuizSlide,
 						userId)
 			};
 			return model;
+		}
+
+		private QuizState getQuizState(string courseId, string userId, string slideId)
+		{
+			var states = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).ToList();
+			if (states.Count > MAX_DROPS_COUNT) // max drops
+				return QuizState.Total;
+			if (states.Any(b => !b))
+				return QuizState.Subtotal;
+			return QuizState.NotPassed;
 		}
 
 		[Authorize]
