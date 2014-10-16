@@ -18,7 +18,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U01_Mistakes
 
 		[Exercise]
 		[ExpectedOutput("Hello, World!\r\n12.5")]
-		[Hint("Вспомните, как работает ```var```")]
+		[Hint("Вспомните, как работает `var`")]
 		public static void Main()
 		{
 			Console.WriteLine("Hello, World!");

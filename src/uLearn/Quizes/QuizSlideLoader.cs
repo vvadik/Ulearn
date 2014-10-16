@@ -5,7 +5,7 @@ namespace uLearn.Quizes
 {
 	public class QuizSlideLoader : ISlideLoader
 	{
-		public string Extension { get { return "xml"; } }
+		public string Extension { get { return ".quiz.xml"; } }
 
 		public Slide Load(FileInfo file, string unitName, int slideIndex)
 		{

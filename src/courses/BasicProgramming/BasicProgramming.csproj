@@ -65,58 +65,58 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Slides\logo.png" />
     <Content Include="Slides\thumbnail.png" />
-    <Content Include="Slides\U00_Basics\S081-Scope.xml">
+    <Content Include="Slides\U00_Basics\S081-Scope.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
     <Compile Include="Slides\U00_Basics\S100_Salary.cs" />
     <Compile Include="Slides\U00_Basics\S000_HelpSlide.cs" />
     <Compile Include="Slides\U00_Basics\_HelloWorld.cs" />
-    <Content Include="Slides\U02_Ifs\S040_Quiz.xml">
+    <Content Include="Slides\U02_Ifs\S040_Quiz.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Slides\U02_Ifs\Title.txt" />
     <Content Include="Slides\U03_Cycles\dragon.png" />
     <Content Include="Slides\U03_Cycles\fern.png" />
-    <Content Include="Slides\U05_Collections\S085_IO.xml">
+    <Content Include="Slides\U05_Collections\S085_IO.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U05_Collections\S061_StringQuiz.xml">
+    <Content Include="Slides\U05_Collections\S061_StringQuiz.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U06_AutomaticTesting\S015_Testing.xml">
+    <Content Include="Slides\U06_AutomaticTesting\S015_Testing.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U06_AutomaticTesting\S045_UnitTests.xml">
+    <Content Include="Slides\U06_AutomaticTesting\S045_UnitTests.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U06_AutomaticTesting\S095_UnitTests2.xml">
+    <Content Include="Slides\U06_AutomaticTesting\S095_UnitTests2.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U07_Complexity\S035_Complexity_vs_Speed.xml">
+    <Content Include="Slides\U07_Complexity\S035_Complexity_vs_Speed.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U07_Complexity\S075_Estimation.xml">
+    <Content Include="Slides\U07_Complexity\S075_Estimation.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U07_Complexity\S085_Final.xml">
+    <Content Include="Slides\U07_Complexity\S085_OSymbols2.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U07_Complexity\S055_OSymbols.xml">
+    <Content Include="Slides\U07_Complexity\S055_OSymbols.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U07_Complexity\S025_Complexity.xml">
+    <Content Include="Slides\U07_Complexity\S025_Complexity.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Slides\U08_Recursion\Title.txt" />
     <Content Include="Slides\U09_Sorting\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
-    <Content Include="Slides\U01_Mistakes\S091_Style2.xml">
+    <Content Include="Slides\U01_Mistakes\S091_Style2.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U01_Mistakes\S076_Style.xml">
+    <Content Include="Slides\U01_Mistakes\S076_Style.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U01_Mistakes\S011-CompileErrors.xml">
+    <Content Include="Slides\U01_Mistakes\S011-CompileErrors.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
     <Compile Include="Slides\U01_Mistakes\S099_Exercise.cs" />
@@ -206,7 +206,7 @@
     <Compile Include="Slides\U06_AutomaticTesting\S070_FunctionalTestingcs.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\_S030_UnitTest.cs" />
     <Compile Include="Slides\U06_AutomaticTesting\_UnitTest.cs" />
-    <Compile Include="Slides\U07_Complexity\S010_BasicComplexity.cs" />
+    <Compile Include="Slides\U07_Complexity\S010_AlgorithmsMatters.cs" />
     <Compile Include="Slides\U07_Complexity\S020_BasicTerms.cs" />
     <Compile Include="Slides\U07_Complexity\S030_ComplexityMeausure.cs" />
     <Compile Include="Slides\U07_Complexity\S040_FunctionGrowth.cs" />
@@ -214,6 +214,8 @@
     <Compile Include="Slides\U07_Complexity\S060_ComplexityEstimation.cs" />
     <Compile Include="Slides\U07_Complexity\S070_NumberComplex.cs" />
     <Compile Include="Slides\U07_Complexity\S080_ComplexityClasses.cs" />
+    <Compile Include="Slides\U07_Complexity\S099_Exercise.cs" />
+    <Compile Include="Slides\U09_Sorting\S099_Exercise.cs" />
     <Compile Include="Slides\U08_Recursion\S010_Recursion.cs" />
     <Compile Include="Slides\U08_Recursion\S020_RecursionTree.cs" />
     <Compile Include="Slides\U08_Recursion\S030_AdvancedExample.cs" />
@@ -229,7 +231,7 @@
     <Compile Include="Slides\U09_Sorting\S060_MergeSort.cs" />
     <Compile Include="Slides\U09_Sorting\S070_QuickSort.cs" />
     <Compile Include="CourseTests.cs" />
-    <Content Include="Slides\U04_Arrays\S061_ArrayQuiz.xml">
+    <Content Include="Slides\U04_Arrays\S061_ArrayQuiz.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Slides\U04_Arrays\Title.txt" />
@@ -240,9 +242,12 @@
     <None Include="Slides\U04_Arrays\arrays.zip" />
     <None Include="Slides\U05_Collections\InstructorNotes.md" />
     <None Include="Slides\U05_Collections\text.zip" />
+    <None Include="Slides\U07_Complexity\image.zip" />
     <None Include="Slides\U07_Complexity\_complexity.pdf" />
     <None Include="Slides\U08_Recursion\InstructorNotes.md" />
     <None Include="Slides\U08_Recursion\_S020_MemoryMap.odp" />
+    <None Include="Slides\U09_Sorting\autocomplete.zip" />
+    <None Include="Slides\U09_Sorting\InstructorNotes.md" />
     <None Include="Slides\U09_Sorting\Search.pdf" />
   </ItemGroup>
   <ItemGroup>
