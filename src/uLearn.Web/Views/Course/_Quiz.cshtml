@@ -5,21 +5,10 @@
 @{ var quizSlide = Model.Slide as QuizSlide;}
 @if (quizSlide != null)
 {
-	var status = "";
-	if (Model.QuizState != QuizState.NotPassed)
-	{
-		var questionBlocks = quizSlide.Quiz.Blocks
-			.Where(block => block is AbstractQuestionBlock)
-			.Cast<AbstractQuestionBlock>()
-			.ToList();
-		var correctCount = questionBlocks.Count(block => block.IsCorrectAnswer(Model));
-		status = String.Format("Верно {0} из {1}.", correctCount, questionBlocks.Count);
-	}
+	var status = Model.QuizState == QuizState.NotPassed ? "" : String.Format("Верно {0} из {1}.", Model.RightAnswers, Model.QuestionsCount);
 	<h4 id="quiz-status">@status</h4>
 
-
-	var delim = "";
-	for (int blockIndex = 0; blockIndex < quizSlide.Quiz.Blocks.Length; blockIndex++)
+	for (var blockIndex = 0; blockIndex < quizSlide.Quiz.Blocks.Length; blockIndex++)
 	{
 		var quizBlock = quizSlide.Quiz.Blocks[blockIndex];
 		var quizModel = new QuizInfoModel(Model, quizBlock, blockIndex, Model.QuizState);
@@ -38,14 +27,14 @@
 			var style = "";
 			if (Model.QuizState != QuizState.NotPassed)
 			{
-				var res = block.IsCorrectAnswer(Model);
+				var res = Model.ResultsForQuizes[block.Id];
 				mark = "glyphicon " + (res ? "glyphicon-ok" : "glyphicon-remove");
 				style = "color: " + (res ? "green" : "red");
 			}
 			<h4><i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text</h4>
 		}
-		
-		delim = blockIndex != quizSlide.Quiz.Blocks.Length - 1 ? "quiz-delimeter" : "";
+
+		var delim = blockIndex != quizSlide.Quiz.Blocks.Length - 1 ? "quiz-delimeter" : "";
 		if (quizBlock is ChoiceBlock)
 		{
 			@Html.Partial("_ChoiceBlock", quizModel)

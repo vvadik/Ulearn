@@ -214,7 +214,8 @@ namespace uLearn.Web.Controllers
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			var userId = User.Identity.GetUserId();
-			if (userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b) < CourseController.MAX_DROPS_COUNT)
+			if (userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b) < CourseController.MAX_DROPS_COUNT && 
+				!userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId).All(b => b.Value))
 				await userQuizzesRepo.DropQuiz(userId, slideId);
 			return RedirectToAction("Slide", "Course", new { courseId, slideIndex = slide.Index });
 		}

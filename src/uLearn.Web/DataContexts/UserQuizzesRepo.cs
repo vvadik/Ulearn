@@ -177,5 +177,13 @@ namespace uLearn.Web.DataContexts
 			}
 			await db.SaveChangesAsync();
 		}
+
+		public Dictionary<string, bool> GetQuizBlocksTruth(string courseId, string userId, string slideId)
+		{
+			return db.UserQuizzes
+				.Where(q => q.UserId == userId && q.CourseId == courseId && q.SlideId == slideId && !q.isDropped)
+				.DistinctBy(q => q.QuizId)
+				.ToDictionary(q => q.QuizId, q => q.IsRightQuizBlock);
+		}
 	}
 }

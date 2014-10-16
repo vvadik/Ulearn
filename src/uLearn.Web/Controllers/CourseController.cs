@@ -101,7 +101,10 @@ namespace uLearn.Web.Controllers
 				slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
 			var userId = User.Identity.GetUserId();
 			var isFirstCourseVisit = !db.Visiters.Any(x => x.UserId == userId);
-			await VisitSlide(courseId, course.Slides[slideIndex].Id);
+			var slideId = course.Slides[slideIndex].Id;
+			var state = GetQuizState(courseId, userId, slideId);
+			var resultsForQuizes = GetResultForQuizes(courseId, userId, slideId, state);
+			await VisitSlide(courseId, slideId);
 			var model = new CoursePageModel
 			{
 				IsFirstCourseVisit = isFirstCourseVisit,
@@ -109,20 +112,30 @@ namespace uLearn.Web.Controllers
 				CourseTitle = course.Title,
 				Slide = course.Slides[slideIndex],
 				LatestAcceptedSolution =
-					solutionsRepo.FindLatestAcceptedSolution(courseId, course.Slides[slideIndex].Id, userId),
-				Rate = GetRate(course.Id, course.Slides[slideIndex].Id),
-				QuizState = getQuizState(courseId, userId, course.Slides[slideIndex].Id),
+					solutionsRepo.FindLatestAcceptedSolution(courseId, slideId, userId),
+				Rate = GetRate(course.Id, slideId),
+				QuizState = state,
+				ResultsForQuizes = resultsForQuizes,
 				AnswersToQuizes =
 					userQuizzesRepo.GetAnswersForShowOnSlide(courseId, course.Slides[slideIndex] as QuizSlide,
 						userId)
 			};
+
+			if (model.QuizState != QuizState.NotPassed && model.RightAnswers == model.QuestionsCount)
+				model.QuizState = QuizState.Total;
+
 			return model;
 		}
 
-		private QuizState getQuizState(string courseId, string userId, string slideId)
+		private Dictionary<string, bool> GetResultForQuizes(string courseId, string userId, string slideId, QuizState state)
+		{
+			return userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId);
+		}
+
+		private QuizState GetQuizState(string courseId, string userId, string slideId)
 		{
 			var states = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).ToList();
-			if (states.Count > MAX_DROPS_COUNT) // max drops
+			if (states.Count > MAX_DROPS_COUNT)
 				return QuizState.Total;
 			if (states.Any(b => !b))
 				return QuizState.Subtotal;
