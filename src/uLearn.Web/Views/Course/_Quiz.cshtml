@@ -1,11 +1,14 @@
 ﻿@using uLearn
 @using uLearn.Quizes
+@using uLearn.Web.Controllers
 @using CodeBlock = uLearn.Quizes.CodeBlock
 @model CoursePageModel
 @{ var quizSlide = Model.Slide as QuizSlide;}
 @if (quizSlide != null)
 {
-	var status = Model.QuizState == QuizState.NotPassed ? "" : String.Format("Верно {0} из {1}.", Model.RightAnswers, Model.QuestionsCount);
+	var status = Model.QuizState == QuizState.NotPassed ?
+		String.Format("Попытка {0} из {1}", Model.TryNumber + 1, CourseController.MAX_DROPS_COUNT + 1) : 
+		String.Format("Верно {0} из {1}.", Model.RightAnswers, Model.QuestionsCount);
 	<h4 id="quiz-status">@status</h4>
 
 	for (var blockIndex = 0; blockIndex < quizSlide.Quiz.Blocks.Length; blockIndex++)
