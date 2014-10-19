@@ -65,7 +65,9 @@
 				{
 					<input type="hidden" name="slideId" value="@Model.Slide.Id" />
 					<input type="hidden" name="courseId" value="@Model.CourseId" />
-					<button class="btn btn-danger" type="submit">Попробовать снова</button>
+					<button class="btn btn-danger" type="submit">Пройти тест повторно</button>
+					<small>У вас есть только две попытки пройти тест.</small>
+					
 				}
 			}
 			else if (User.IsInRole(LmsRoles.Tester))

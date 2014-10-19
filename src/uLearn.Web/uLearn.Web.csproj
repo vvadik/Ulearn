@@ -223,6 +223,10 @@
     <Compile Include="Migrations\201409260240008_AddQuestionSlideId.Designer.cs">
       <DependentUpon>201409260240008_AddQuestionSlideId.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201410192113426_AddUserQuizDroppedColumn.cs" />
+    <Compile Include="Migrations\201410192113426_AddUserQuizDroppedColumn.Designer.cs">
+      <DependentUpon>201410192113426_AddUserQuizDroppedColumn.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\AcceptedSolutionsPageModel.cs" />
     <Compile Include="Models\AnalyticsTablePageModel.cs" />
     <Compile Include="Models\ChoiceGroupPageModel.cs" />
@@ -377,6 +381,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201409260240008_AddQuestionSlideId.resx">
       <DependentUpon>201409260240008_AddQuestionSlideId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410192113426_AddUserQuizDroppedColumn.resx">
+      <DependentUpon>201410192113426_AddUserQuizDroppedColumn.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
