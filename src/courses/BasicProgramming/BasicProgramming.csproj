@@ -223,6 +223,7 @@
     <Compile Include="Slides\U08_Recursion\S065_FinishPermutations.cs" />
     <Compile Include="Slides\U08_Recursion\S055_FixSubsets.cs" />
     <Compile Include="Slides\U08_Recursion\S015_FixRecursion.cs" />
+    <Compile Include="Slides\U08_Recursion\S099_Exercise.cs" />
     <Compile Include="Slides\U09_Sorting\S099_Exercise.cs" />
     <Compile Include="Slides\U08_Recursion\S010_Recursion.cs" />
     <Compile Include="Slides\U08_Recursion\S020_RecursionTree.cs" />
