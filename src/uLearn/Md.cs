@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Web;
 using MarkdownDeep;
 using NUnit.Framework;
 
@@ -12,6 +13,13 @@ namespace uLearn
 		{
 			var baseUrl = "/Courses/" + CourseUnitUtls.GetDirectoryRelativeWebPath(sourceFile);
 			return md.RenderMd(baseUrl);
+		}
+
+		public static HtmlString RenderTex(this string textWithTex)
+		{
+			var texReplacer = new TexReplacer(textWithTex);
+			string html = HttpUtility.HtmlEncode(texReplacer.ReplacedText);
+			return new HtmlString(texReplacer.PlaceTexInsertsBack(html));
 		}
 
 		public static string RenderMd(this string md, string baseUrl = null)

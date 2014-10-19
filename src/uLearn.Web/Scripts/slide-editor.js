@@ -6,10 +6,11 @@ function codeMirrorClass(c, editable) {
 	var codes = document.getElementsByClassName(c);
 	for (var i = 0; i < codes.length; i++) {
 		var element = codes[i];
+		var showLineNumbers = (element.classList == undefined) ? true : !element.classList.contains("code-no-linenumbers");
 		var editor = CodeMirror.fromTextArea(element,
 		{
 			mode: "text/x-csharp",
-			lineNumbers: true,
+			lineNumbers: showLineNumbers,
 			theme: editable ? "cobalt" : "default",
 			indentWithTabs: true,
 			tabSize: 4,

@@ -7,67 +7,67 @@
 	<p>Изучите следующий алгоритм.</p>
 
 	<code xml:space="preserve">
-		int F(int n){
-			int sum = 0;
-			for(int i=0; i&lt;100000; i++)
-				sum+=n;
-			return sum;
-		}
+int F(int n){
+	int sum = 0;
+	for(int i=0; i&lt;100000; i++)
+		sum+=n;
+	return sum;
+}
 	</code>
 
 	<choice id="0" multiple="true" shuffle="false">
-		<text>Какие оценки сложности алгоритма F в зависимости от числа n (а не от размера входа) верны?</text>
-		<item id="1" isCorrect="true">O(n)</item>
-		<item id="2" isCorrect="true">O(1)</item>
-		<item id="3" isCorrect="true">O(n/10)</item>
-		<item id="4" isCorrect="true">o(n)</item>
-		<item id="5" isCorrect="false">Θ(n)</item>
-		<item id="6" isCorrect="true">Θ(1)</item>
+		<text>Какие оценки сложности алгоритма $F$ в зависимости от числа $n$ (а не от размера входа) верны?</text>
+		<item id="1" isCorrect="true">$O(n)$</item>
+		<item id="2" isCorrect="true">$O(1)$</item>
+		<item id="3" isCorrect="true">$O(n/10)$</item>
+		<item id="4" isCorrect="true">$o(n)$</item>
+		<item id="5" isCorrect="false">$\Theta(n)$</item>
+		<item id="6" isCorrect="true">$\Theta(1)$</item>
 	</choice>
 
 	<p>Изучите следующий алгоритм.</p>
 
 	<code xml:space="preserve">
-		int F(int n){
-			int sum = 0;
-			for(int i=0; i&lt;n; i++)
-				for(int j=0; j&lt;i; j+=2)
-					sum+=j;
-			return sum;
-		}
+int F(int n){
+	int sum = 0;
+	for(int i=0; i&lt;n; i++)
+		for(int j=0; j&lt;i; j+=2)
+			sum+=j;
+	return sum;
+}
 	</code>
 
 	<choice id="1" multiple="true" shuffle="false">
-		<text>Какие оценки сложности алгоритма F в зависимости от числа n (а не от размера входа) верны?</text>
-		<item id="1" isCorrect="true">O(n^2)</item>
-		<item id="2" isCorrect="true">O(n^3)</item>
-		<item id="3" isCorrect="false">O(n)</item>
-		<item id="4" isCorrect="false">o(n^2)</item>
-		<item id="5" isCorrect="true">o(n^3)</item>
-		<item id="6" isCorrect="false">Θ(n)</item>
-		<item id="7" isCorrect="true">Θ(n^2)</item>
-		<item id="8" isCorrect="false">Θ(n^3)</item>
+		<text>Какие оценки сложности алгоритма $F$ в зависимости от числа $n$ (а не от размера входа) верны?</text>
+		<item id="1" isCorrect="true">$O(n^2)$</item>
+		<item id="2" isCorrect="true">$O(n^3)$</item>
+		<item id="3" isCorrect="false">$O(n)$</item>
+		<item id="4" isCorrect="false">$o(n^2)$</item>
+		<item id="5" isCorrect="true">$o(n^3)$</item>
+		<item id="6" isCorrect="false">$\Theta(n)$</item>
+		<item id="7" isCorrect="true">$\Theta(n^2)$</item>
+		<item id="8" isCorrect="false">$\Theta(n^3)$</item>
 	</choice>
-	
-	
-	<p>Изучите следующий алгоритм. Обратите внимание на тип переменной s.</p>
+
+
+	<p>Изучите следующий алгоритм. Обратите внимание на тип переменной $s$.</p>
 
 	<code xml:space="preserve">
-		string F(int n){
-			string s = "a";
-			for(int i=0; i&lt;n; i++)
-				s += s;
-			return s;
-		}
+string F(int n){
+	string s = "a";
+	for(int i=0; i&lt;n; i++)
+		s += s;
+	return s;
+}
 	</code>
 
 	<choice id="2" multiple="false" shuffle="false">
-		<text>Какие оценки сложности алгоритма F в зависимости от числа n (а не от размера входа) верны?</text>
-		<item id="1" isCorrect="false">Θ(n)</item>
-		<item id="2" isCorrect="false">Θ(n^2)</item>
-		<item id="3" isCorrect="false">Θ(log(n))</item>
-		<item id="4" isCorrect="false">Θ(n log(n))</item>
-		<item id="5" isCorrect="true">Θ(2^n)</item>
+		<text>Какие оценки сложности алгоритма $F$ в зависимости от числа $n$ (а не от размера входа) верны?</text>
+		<item id="1" isCorrect="false">$\Theta(n)$</item>
+		<item id="2" isCorrect="false">$\Theta(n^2)$</item>
+		<item id="3" isCorrect="false">$\Theta(\log n)$</item>
+		<item id="4" isCorrect="false">$\Theta(n \log n)$</item>
+		<item id="5" isCorrect="true" >$\Theta(2^n)$</item>
 	</choice>
 
 </Quiz>

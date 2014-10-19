@@ -33,8 +33,8 @@ for (int i=0; i&lt;3; i++)
 		<item id="5" isCorrect="false">две строки: 12345 и 321</item>
 	</choice>
 
-	<code>
-		File.WriteAllText("C:\test\new.txt", "123456");
+	<code xml:space="preserve">
+File.WriteAllText("C:\test\new.txt", "123456");
 	</code>
 	<choice id="3" multiple="false" shuffle="true">
 		<text>Хорош ли код?</text>
@@ -44,8 +44,8 @@ for (int i=0; i&lt;3; i++)
 		<item id="4" isCorrect="true">Код вызовет ошибку при исполнении</item>
 	</choice>
 
-	<code>
-		Console.WriteLine(a.ToString() + "\t" + Math.Round(b, 3).ToString());
+	<code xml:space="preserve">
+Console.WriteLine(a.ToString() + "\t" + Math.Round(b, 3).ToString());
 	</code>
 	<choice id="4" multiple="false" shuffle="true">
 		<text>Как улучшить этот код?</text>
