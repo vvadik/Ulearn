@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 {
@@ -42,20 +43,16 @@ namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 
 			for (int i = 0; i < permutation.Length; i++)
 			{
-				bool found = false;
-				for (int j = 0; j < position; j++)
-					if (permutation[j] == i)
-					{
-						found = true;
-						break;
-					}
-				if (found) continue;
+				var index = Array.IndexOf(permutation, i, 0, position);
+				if (index  == -1)
+					continue;
 				permutation[position] = i;
 				MakePermutations(permutation, position + 1);
 			}
 		}
 
-		static void MainX()
+		[Test]
+		public static void Main()
 		{
 			MakePermutations(new int[4], 0);
 		}

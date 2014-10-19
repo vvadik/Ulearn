@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NUnit.Framework;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 {
@@ -13,62 +10,28 @@ namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 		/*
 		## Заметки по лекции
 		*/
-		static void Combinations(bool[] combination, int onesLeft, int rightEdge)
+		static void MakeCombinations(bool[] combination, int elementsLeft, int position)
 		{
-			if (onesLeft == 0)
+			if (elementsLeft == 0)
 			{
-				foreach (var c in combination.Reverse())
+				foreach (var c in combination)
 					Console.Write(c ? 1 : 0);
 				Console.WriteLine();
 				return;
 			}
+			if (position == combination.Length)
+				return;
 
-			for (int j = rightEdge; j < combination.Length - onesLeft + 1; j++)
-			{
-				combination[j] = true;
-				Combinations(combination, onesLeft - 1, j + 1);
-				combination[j] = false;
-			}
+			combination[position] = true;
+			MakeCombinations(combination, elementsLeft - 1, position + 1);
+			combination[position] = false;
+			MakeCombinations(combination, elementsLeft, position + 1);
 		}
 
-		static IEnumerable<bool[]> Combinations1(int N, int K)
+		[Test]
+		public static void Main()
 		{
-			var combination = new bool[N];
-			for (int i = N - K; i < N; i++) combination[i] = true;
-
-			while (true)
-			{
-				yield return combination.ToArray();
-				int j = N - 1;
-				int ones = 0;
-				for (j = N - 1; j >= 1; j--)
-				{
-					if (combination[j])
-					{
-						if (!combination[j - 1]) break;
-						ones++;
-					}
-				}
-				if (j == 0) yield break;
-				combination[j - 1] = true;
-				for (int k = j; k < N - ones; k++)
-					combination[k] = false;
-				for (int k = N - ones; k < N; k++)
-					combination[k] = true;
-
-			}
-		}
-
-
-		public static void MainX()
-		{
-			foreach (var e in Combinations1(5, 3))
-			{
-				foreach (var c in e)
-					Console.Write(c ? 1 : 0);
-				Console.WriteLine();
-			}
-
+			MakeCombinations(new bool[5], 3, 0);
 		}
 	}
 }

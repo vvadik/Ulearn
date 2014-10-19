@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 {
@@ -25,16 +21,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 
 		public static void Main()
 		{
-			Console.Write("Make(1): ");
-			Make(1);
-			Console.WriteLine();
-
-			Console.Write("Make(2): ");
-			Make(2);
-			Console.WriteLine();
-
-			Console.Write("Make(3): ");
-			Make(6);
+			Make(4);
 			Console.WriteLine();
 		}
 	}

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Quiz
+ xmlns="https://ulearn.azurewebsites.net/quiz"
+ id="8CB1D1CF0EA64EFEBB5D9A3E9FF53D85">
+	<title>Понимание рекурсии</title>
+	<code xml:space="preserve">
+static int F(int x)
+{
+	if (x % 10 == 0) return 0;
+	return 1 + F(x / 10);
+}
+	</code>
+
+	<choice id="1" multiple="false" shuffle="true">
+		<text>Что делает функция $F$?</text> 
+		<item id="1" isCorrect="false">Вычисляет НОД $x$ и $y$ по алгоритму Евклида</item>
+		<item id="2" isCorrect="false">Вычисляет значение $x^y$</item>
+		<item id="3" isCorrect="false">При некоторых значениях аргументов будет бесконечная рекурсия</item>
+		<item id="4" isCorrect="false">Вычисляет остаток от деления $x$ на $y$</item>
+		<item id="5" isCorrect="true">Вычисляет минимальный разряд десятичного числа $x$, в котором стоит $0$</item>
+	</choice>
+
+	<fillIn id="2">
+		<text>Легко проверить, что вызов $F(0)$ не породит ни одного рекурсивного вызова $F$. А сколько рекурсивных вызовов $F$ породит вызов $F(5)$?</text>
+		<sample>5</sample>
+		<regex>5</regex>
+	</fillIn>
+
+	<code xml:space="preserve">
+static int G(int x, int y)
+{
+	if (y == 0)
+		return x;
+	else
+		return G(y, x % y);
+}
+	</code>
+
+	<choice id="3" multiple="false" shuffle="true">
+		<text>Что делает функция $G$?</text>
+		<item id="1" isCorrect="true">Вычисляет НОД $x$ и $y$ по алгоритму Евклида</item>
+		<item id="2" isCorrect="false">Вычисляет значение $x^y$</item>
+		<item id="3" isCorrect="false">При некоторых значениях аргументов будет бесконечная рекурсия</item>
+		<item id="4" isCorrect="false">Вычисляет остаток от деления $x$ на $y$</item>
+		<item id="5" isCorrect="false">Вычисляет минимальный разряд десятичного числа $x$, в котором стоит $0$</item>
+	</choice>
+</Quiz>

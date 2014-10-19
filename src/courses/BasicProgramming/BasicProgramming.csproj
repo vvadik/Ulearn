@@ -107,7 +107,11 @@
     <Content Include="Slides\U07_Complexity\S025_Complexity.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Slides\U08_Recursion\S035_Recursion.quiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Slides\U08_Recursion\Title.txt" />
+    <Content Include="Slides\U08_Recursion\_20_map.png" />
     <Content Include="Slides\U09_Sorting\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
     <Content Include="Slides\U01_Mistakes\S091_Style2.quiz.xml">
@@ -215,6 +219,10 @@
     <Compile Include="Slides\U07_Complexity\S070_NumberComplex.cs" />
     <Compile Include="Slides\U07_Complexity\S080_ComplexityClasses.cs" />
     <Compile Include="Slides\U07_Complexity\S099_Exercise.cs" />
+    <Compile Include="Slides\U08_Recursion\S075_Passwords2.cs" />
+    <Compile Include="Slides\U08_Recursion\S065_FinishPermutations.cs" />
+    <Compile Include="Slides\U08_Recursion\S055_FixSubsets.cs" />
+    <Compile Include="Slides\U08_Recursion\S015_FixRecursion.cs" />
     <Compile Include="Slides\U09_Sorting\S099_Exercise.cs" />
     <Compile Include="Slides\U08_Recursion\S010_Recursion.cs" />
     <Compile Include="Slides\U08_Recursion\S020_RecursionTree.cs" />

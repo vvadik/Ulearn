@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 {
@@ -11,7 +7,26 @@ namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 	{
 		//#video ruWyL5k1tG0
 		/*
-		[Материалы по лекции](_S020_MemoryMap.odp)
+		##Заметки по лекции
 		*/
+
+		public static void Make(int n)
+		{
+			for (int i = n - 1; i >= 0; i--)
+			{
+				Console.Write(i + " ");
+				Make(i);
+			}
+		}
+
+		/*
+		![карта памяти](_20_map.png)
+
+		Расчет сложности:
+		$$
+		p(n)=1+\sum_{i=0}^{n-1} p(i) = 2^n
+		$$
+		*/
+
 	}
 }
