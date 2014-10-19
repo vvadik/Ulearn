@@ -195,7 +195,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\AbstractQuestionBlockExtensions.cs" />
     <Compile Include="Controllers\QuestionsController.cs" />
     <Compile Include="Controllers\UnitController.cs" />
     <Compile Include="Controllers\AnalyticsController.cs" />
@@ -232,6 +231,7 @@
     <Compile Include="Models\PersonalStatisticPageModel.cs" />
     <Compile Include="Models\QuizAnalyticsModel.cs" />
     <Compile Include="Models\QuizInfoModel.cs" />
+    <Compile Include="Models\QuizState.cs" />
     <Compile Include="Models\TocModel.cs" />
     <Compile Include="Models\UnitAppearance.cs" />
     <Compile Include="DataContexts\SlideHintRepo.cs" />

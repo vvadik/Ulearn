@@ -8,15 +8,18 @@
 	var quizBlock = (IsTrueBlock)Model.CurrentBlock;
 	var ttitle = "";
 	var ftitle = "";
-	if (Model.Passed && Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() != null)
+	if (Model.QuizState != QuizState.NotPassed && Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() != null)
 	{
 		var userAnswer = Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() == "True";
 		tchecked = userAnswer ? "checked" : "";
 		fchecked = userAnswer ?  "" : "checked";
-		trueItemClass = quizBlock.Answer ? "right-quiz" : userAnswer ? "wrong-quiz" : "";
-		falseItemClass = !quizBlock.Answer ? "right-quiz" : !userAnswer ? "wrong-quiz" : "";
-		ttitle = (quizBlock.Answer ? "Правильный" : "Неправильный") + " вариант";
-		ftitle = (!quizBlock.Answer ? "Правильный" : "Неправильный") + " вариант";
+		if (Model.QuizState == QuizState.Total)
+		{
+			trueItemClass = quizBlock.Answer ? "right-quiz" : userAnswer ? "wrong-quiz" : "";
+			falseItemClass = !quizBlock.Answer ? "right-quiz" : !userAnswer ? "wrong-quiz" : "";
+			ttitle = (quizBlock.Answer ? "Правильный" : "Неправильный") + " вариант";
+			ftitle = (!quizBlock.Answer ? "Правильный" : "Неправильный") + " вариант";
+		}
 	}
 	<div class="radio quiz-block-mark" id="@(quizBlock.Id + "_quizBlock")">
 		<div class="quiz">

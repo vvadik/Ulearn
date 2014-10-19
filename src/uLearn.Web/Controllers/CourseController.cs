@@ -13,6 +13,8 @@ namespace uLearn.Web.Controllers
 {
 	public class CourseController : Controller
 	{
+		public static readonly int MAX_DROPS_COUNT = 1;
+
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
@@ -99,7 +101,10 @@ namespace uLearn.Web.Controllers
 				slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
 			var userId = User.Identity.GetUserId();
 			var isFirstCourseVisit = !db.Visiters.Any(x => x.UserId == userId);
-			await VisitSlide(courseId, course.Slides[slideIndex].Id);
+			var slideId = course.Slides[slideIndex].Id;
+			var state = GetQuizState(courseId, userId, slideId);
+			var resultsForQuizes = GetResultForQuizes(courseId, userId, slideId, state.Item1);
+			await VisitSlide(courseId, slideId);
 			var model = new CoursePageModel
 			{
 				IsFirstCourseVisit = isFirstCourseVisit,
@@ -107,14 +112,35 @@ namespace uLearn.Web.Controllers
 				CourseTitle = course.Title,
 				Slide = course.Slides[slideIndex],
 				LatestAcceptedSolution =
-					solutionsRepo.FindLatestAcceptedSolution(courseId, course.Slides[slideIndex].Id, userId),
-				Rate = GetRate(course.Id, course.Slides[slideIndex].Id),
-				PassedQuiz = userQuizzesRepo.GetIdOfQuizPassedSlides(courseId, userId),
+					solutionsRepo.FindLatestAcceptedSolution(courseId, slideId, userId),
+				Rate = GetRate(course.Id, slideId),
+				QuizState = state.Item1,
+				TryNumber = state.Item2,
+				ResultsForQuizes = resultsForQuizes,
 				AnswersToQuizes =
 					userQuizzesRepo.GetAnswersForShowOnSlide(courseId, course.Slides[slideIndex] as QuizSlide,
 						userId)
 			};
+
+			if (model.QuizState != QuizState.NotPassed && model.RightAnswers == model.QuestionsCount)
+				model.QuizState = QuizState.Total;
+
 			return model;
+		}
+
+		private Dictionary<string, bool> GetResultForQuizes(string courseId, string userId, string slideId, QuizState state)
+		{
+			return userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId);
+		}
+
+		private Tuple<QuizState, int> GetQuizState(string courseId, string userId, string slideId)
+		{
+			var states = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).ToList();
+			if (states.Count > MAX_DROPS_COUNT)
+				return Tuple.Create(QuizState.Total, states.Count);
+			if (states.Any(b => !b))
+				return Tuple.Create(QuizState.Subtotal, states.Count);
+			return Tuple.Create(QuizState.NotPassed, states.Count);
 		}
 
 		[Authorize]

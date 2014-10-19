@@ -48,7 +48,15 @@ namespace uLearn.Web.DataContexts
 
 		public bool IsQuizSlidePassed(string courseId, string userId, string slideId)
 		{
-			return db.UserQuizzes.Any(x => x.UserId == userId && x.SlideId == slideId && x.CourseId == courseId);
+			return db.UserQuizzes.Any(x => x.UserId == userId && x.SlideId == slideId && x.CourseId == courseId && !x.isDropped);
+		}
+
+		public IEnumerable<bool> GetQuizDropStates(string courseId, string userId, string slideId)
+		{
+			return db.UserQuizzes
+				.Where(x => x.UserId == userId && x.SlideId == slideId && x.CourseId == courseId)
+				.DistinctBy(q => q.Timestamp)
+				.Select(q => q.isDropped);
 		}
 
 		public HashSet<string> GetIdOfQuizPassedSlides(string courseId, string userId)
@@ -64,7 +72,7 @@ namespace uLearn.Web.DataContexts
 			foreach (var block in slide.Quiz.Blocks.OfType<AbstractQuestionBlock>())
 			{
 				var ans = db.UserQuizzes
-					.Where(x => x.UserId == userId && x.CourseId == courseId && x.SlideId == slide.Id && x.QuizId == block.Id).ToList();
+					.Where(x => x.UserId == userId && x.CourseId == courseId && x.SlideId == slide.Id && x.QuizId == block.Id && !x.isDropped).ToList();
 				if (block is ChoiceBlock)
 					answer[block.Id] = ans.Select(x => x.ItemId).ToList();
 				else if (block is IsTrueBlock)
@@ -81,7 +89,7 @@ namespace uLearn.Web.DataContexts
 
 		public FillInBlockAnswerInfo GetFillInBlockAnswerInfo(string courseId, string slideId, string quizId, string userId, int questionIndex)
 		{
-			var answer = db.UserQuizzes.FirstOrDefault(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId);
+			var answer = db.UserQuizzes.FirstOrDefault(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId && !x.isDropped);
 			return new FillInBlockAnswerInfo
 			{
 				Answer = answer == null ? null : answer.Text,
@@ -97,7 +105,7 @@ namespace uLearn.Web.DataContexts
 			{
 				ans[item.Id] = false;
 			}
-			foreach (var quizItem in db.UserQuizzes.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId && q.QuizId == block.Id && q.ItemId != null))
+			foreach (var quizItem in db.UserQuizzes.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId && q.QuizId == block.Id && q.ItemId != null && !q.isDropped))
 			{
 				ans[quizItem.ItemId] = true;
 			}
@@ -111,7 +119,7 @@ namespace uLearn.Web.DataContexts
 
 		public IsTrueBlockAnswerInfo GetIsTrueBlockAnswerInfo(string courseId, string slideId, string quizId, string userId, int questionIndex)
 		{
-			var answer =  db.UserQuizzes.FirstOrDefault(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId);
+			var answer =  db.UserQuizzes.FirstOrDefault(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId && !x.isDropped);
 			return new IsTrueBlockAnswerInfo
 			{
 				IsAnswered = answer != null,
@@ -158,6 +166,24 @@ namespace uLearn.Web.DataContexts
 			var answersToRemove = db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId).ToList();
 			db.UserQuizzes.RemoveRange(answersToRemove);
 			await db.SaveChangesAsync();
+		}
+
+		public async Task DropQuiz(string userId, string slideId)
+		{
+			var quizzes = db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId).ToList();
+			foreach (var q in quizzes)
+			{
+				q.isDropped = true;
+			}
+			await db.SaveChangesAsync();
+		}
+
+		public Dictionary<string, bool> GetQuizBlocksTruth(string courseId, string userId, string slideId)
+		{
+			return db.UserQuizzes
+				.Where(q => q.UserId == userId && q.CourseId == courseId && q.SlideId == slideId && !q.isDropped)
+				.DistinctBy(q => q.QuizId)
+				.ToDictionary(q => q.QuizId, q => q.IsRightQuizBlock);
 		}
 	}
 }

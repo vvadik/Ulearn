@@ -43,7 +43,10 @@ namespace uLearn.Web.Models
 		[Required]
 		public DateTime Timestamp { get; set; }
 
-		
+		[Required]
+		public bool isDropped { get; set; }
+
+
 		[Required]
 		//Корректный ли вариант ItemId
 		public bool IsRightAnswer { get; set; }
