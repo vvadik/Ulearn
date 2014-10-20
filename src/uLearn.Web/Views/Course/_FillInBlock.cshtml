@@ -18,5 +18,9 @@
 	if (Model.QuizState == QuizState.Total)
 	{
 		<div>Правильный ответ: @sample</div>
+		if (!String.IsNullOrEmpty(quizBlock.Explanation))
+		{
+			<div> <h4>Пояснение:</h4> @quizBlock.Explanation</div>
+		}
 	}
 }

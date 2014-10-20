@@ -25,6 +25,10 @@
 					<input @ans autocomplete="off" id='@(quizBlock.Id + "quizBlock" + item.Id)' name=@("group"+ident) type="@typeInp">
 					@item.Description.RenderTex()
 				</label>
+				@if (Model.QuizState == QuizState.Total && !String.IsNullOrEmpty(item.Explanation))
+				{
+					<p class="text-muted">@item.Explanation</p>
+				}
 			</div>
 		}
 	</div>

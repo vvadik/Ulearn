@@ -29,4 +29,8 @@
 			<label class="@falseItemClass" title="@ftitle"><input autocomplete="off" @fchecked id='@(quizBlock.Id + "quizBlock" + "False")' name='@(quizBlock.Id+"group")' type="radio">Не верно</label>
 		</div>
 	</div>
+	if (Model.QuizState == QuizState.Total && !String.IsNullOrEmpty(quizBlock.Explanation))
+	{
+		<div> <h4>Пояснение:</h4> @quizBlock.Explanation</div>
+	}
 }

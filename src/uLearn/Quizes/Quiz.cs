@@ -64,6 +64,9 @@ namespace uLearn.Quizes
 		[XmlAttribute("answer")]
 		public bool Answer;
 
+		[XmlAttribute("explanation")]
+		public string Explanation;
+
 		public bool IsRight(string text)
 		{
 			return text.ToLower() == Answer.ToString().ToLower();
@@ -77,6 +80,9 @@ namespace uLearn.Quizes
 
 		[XmlElement("regex")]
 		public string[] Regexes;
+
+		[XmlAttribute("explanation")]
+		public string Explanation;
 	}
 
 	public class ChoiceItem
@@ -86,6 +92,9 @@ namespace uLearn.Quizes
 
 		[XmlAttribute("isCorrect")]
 		public bool IsCorrect;
+
+		[XmlAttribute("explanation")]
+		public string Explanation;
 
 		[XmlText]
 		public string Description;
