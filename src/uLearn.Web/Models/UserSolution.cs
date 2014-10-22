@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace uLearn.Web.Models
 {
@@ -36,6 +37,7 @@ namespace uLearn.Web.Models
 		public DateTime Timestamp { get; set; }
 
 		[Required]
+		[Index]
 		public bool IsRightAnswer { get; set; }
 
 		[Required]
