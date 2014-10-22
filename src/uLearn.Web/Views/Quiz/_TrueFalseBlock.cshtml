@@ -8,9 +8,9 @@
 	var quizBlock = (IsTrueBlock)Model.CurrentBlock;
 	var ttitle = "";
 	var ftitle = "";
-	if (Model.QuizState != QuizState.NotPassed && Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() != null)
+	if (Model.QuizState != QuizState.NotPassed && Model.QuizModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() != null)
 	{
-		var userAnswer = Model.CourseModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() == "True";
+		var userAnswer = Model.QuizModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() == "True";
 		tchecked = userAnswer ? "checked" : "";
 		fchecked = userAnswer ?  "" : "checked";
 		if (Model.QuizState == QuizState.Total)

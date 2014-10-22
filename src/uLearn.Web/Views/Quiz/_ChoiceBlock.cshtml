@@ -11,7 +11,7 @@
 		{
 			var ident = isMultiply ? itemIndex + "noMult" : Model.BlockIndex.ToString();
 			var item = quizBlock.Items[itemIndex];
-			var itemChecked = Model.QuizState != QuizState.NotPassed && Model.CourseModel.AnswersToQuizes[quizBlock.Id].Contains(item.Id);
+			var itemChecked = Model.QuizState != QuizState.NotPassed && Model.QuizModel.AnswersToQuizes[quizBlock.Id].Contains(item.Id);
 			var ans = itemChecked ? "checked" : "";
 			var itemClass = "";
 			var title = "";

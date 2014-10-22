@@ -4,14 +4,14 @@ namespace uLearn.Web.Models
 {
 	public class QuizInfoModel
 	{
-		public CoursePageModel CourseModel {get; set;}
+		public QuizModel QuizModel {get; set;}
 		public QuizBlock CurrentBlock { get; set;}
 		public int BlockIndex { get; set; }
 		public QuizState QuizState;
 
-		public QuizInfoModel(CoursePageModel model, QuizBlock currentBlock, int index, QuizState quizState)
+		public QuizInfoModel(QuizModel model, QuizBlock currentBlock, int index, QuizState quizState)
 		{
-			CourseModel = model;
+			QuizModel = model;
 			CurrentBlock = currentBlock;
 			BlockIndex = index;
 			QuizState = quizState;

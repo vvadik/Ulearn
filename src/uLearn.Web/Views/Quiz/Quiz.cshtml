@@ -1,13 +1,11 @@
 ﻿@using uLearn
 @using uLearn.Quizes
-@using uLearn.Web.Controllers
 @using CodeBlock = uLearn.Quizes.CodeBlock
-@model CoursePageModel
-@{ var quizSlide = Model.Slide as QuizSlide;}
-@if (quizSlide != null)
-{
+@model QuizModel
+@{
+	var quizSlide = Model.Slide;
 	var status = Model.QuizState == QuizState.NotPassed ?
-		String.Format("Попытка {0} из {1}", Model.TryNumber + 1, Model.MaxDropCount + 1) : 
+		String.Format("Попытка {0} из {1}", Model.TryNumber + 1, Model.MaxDropCount + 1) :
 		String.Format("Верно {0} из {1}.", Model.RightAnswers, Model.QuestionsCount);
 	<h4 id="quiz-status">@status</h4>
 
@@ -18,7 +16,7 @@
 		var quizModel = new QuizInfoModel(Model, quizBlock, blockIndex, Model.QuizState);
 		if (quizBlock is CodeBlock)
 		{
-			<textarea class='code code-sample code-no-linenumbers'>@(((CodeBlock) quizBlock).Text)</textarea>
+			<textarea class='code code-sample code-no-linenumbers'>@(((CodeBlock)quizBlock).Text)</textarea>
 		}
 		else if (quizBlock is TextBlock)
 		{
@@ -26,7 +24,7 @@
 		}
 		else if (quizBlock is AbstractQuestionBlock)
 		{
-			var block = (AbstractQuestionBlock) quizBlock;
+			var block = (AbstractQuestionBlock)quizBlock;
 			var mark = "";
 			var style = "";
 			if (Model.QuizState != QuizState.NotPassed)
@@ -55,31 +53,31 @@
 			<hr class="@delim">
 		}
 	}
-		<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
-			@if (Model.QuizState == QuizState.NotPassed)
+	<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
+		@if (Model.QuizState == QuizState.NotPassed)
+		{
+			<button class="btn btn-primary quiz-submit-btn" onclick=" submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count') ">Готово!</button>
+		}
+		else if (Model.QuizState == QuizState.Subtotal)
+		{
+			using (Html.BeginForm("DropQuiz", "Quiz"))
 			{
-				<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count')">Готово!</button>
+				<input type="hidden" name="slideId" value="@Model.Slide.Id" />
+				<input type="hidden" name="courseId" value="@Model.CourseId" />
+				<button class="btn btn-danger" type="submit">Пройти тест повторно</button>
+				<small>У вас остал@(remains == 1 ? "а" : "о")сь @remains из @(Model.MaxDropCount + 1) попыток</small>
 			}
-			else if (Model.QuizState == QuizState.Subtotal)
+		}
+		else if (User.IsInRole(LmsRoles.Tester))
+		{
+			using (Html.BeginForm("ClearAnswers", "Quiz"))
 			{
-				using (Html.BeginForm("DropQuiz", "Quiz"))
-				{
-					<input type="hidden" name="slideId" value="@Model.Slide.Id" />
-					<input type="hidden" name="courseId" value="@Model.CourseId" />
-					<button class="btn btn-danger" type="submit">Пройти тест повторно</button>
-					<small>У вас остал@(remains == 1 ? "а" : "о")сь @remains из @(Model.MaxDropCount + 1) попыток</small>
-				}
+				<input type="hidden" name="slideId" value="@Model.Slide.Id" />
+				<input type="hidden" name="courseId" value="@Model.CourseId" />
+				<button class="btn btn-danger" type="submit">Удалить ответы</button>
 			}
-			else if (User.IsInRole(LmsRoles.Tester))
-			{
-				using (Html.BeginForm("ClearAnswers", "Quiz"))
-				{
-					<input type="hidden" name="slideId" value="@Model.Slide.Id" />
-					<input type="hidden" name="courseId" value="@Model.CourseId" />
-					<button class="btn btn-danger" type="submit">Удалить ответы</button>
-				}
-			}
-		</div>
+		}
+	</div>
 	if (User.IsInRole(LmsRoles.Instructor))
 	{
 		@Html.Action("Analytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })

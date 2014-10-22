@@ -235,6 +235,7 @@
     <Compile Include="Models\PersonalStatisticPageModel.cs" />
     <Compile Include="Models\QuizAnalyticsModel.cs" />
     <Compile Include="Models\QuizInfoModel.cs" />
+    <Compile Include="Models\QuizModel.cs" />
     <Compile Include="Models\QuizState.cs" />
     <Compile Include="Models\TocModel.cs" />
     <Compile Include="Models\UnitAppearance.cs" />
@@ -809,16 +810,15 @@
     <Content Include="Views\Analytics\UsersStatistics.cshtml" />
     <Content Include="Views\Analytics\PersonalStatistics.cshtml" />
     <Content Include="Views\Course\_SolutionControl.cshtml" />
-    <Content Include="Views\Course\_Quiz.cshtml" />
     <Content Include="Views\SlideNavigation\TableOfContents.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\CodeBlock.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\MdBlock.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\YoutubeBlock.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\HintWithLikeButton.cshtml" />
     <Content Include="Views\Hint\UseHint.cshtml" />
-    <Content Include="Views\Course\_ChoiceBlock.cshtml" />
-    <Content Include="Views\Course\_FillInBlock.cshtml" />
-    <Content Include="Views\Course\_TrueFalseBlock.cshtml" />
+    <Content Include="Views\Quiz\_ChoiceBlock.cshtml" />
+    <Content Include="Views\Quiz\_FillInBlock.cshtml" />
+    <Content Include="Views\Quiz\_TrueFalseBlock.cshtml" />
     <Content Include="Views\Quiz\Analytics.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
     <Content Include="Views\Unit\List.cshtml" />
@@ -834,6 +834,7 @@
     <Content Include="Views\Analytics\SystemStatistics.cshtml" />
     <Content Include="Views\Account\ChangeDetailsPartial.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\TexBlock.cshtml" />
+    <Content Include="Views\Quiz\Quiz.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
