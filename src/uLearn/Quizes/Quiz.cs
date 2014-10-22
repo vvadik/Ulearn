@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 
 namespace uLearn.Quizes
 {
@@ -76,7 +77,23 @@ namespace uLearn.Quizes
 		public string Sample;
 
 		[XmlElement("regex")]
-		public string[] Regexes;
+		public RegexInfo[] Regexes;
+	}
+
+	public class RegexInfo
+	{
+		[XmlText]
+		public string Pattern;
+
+		[XmlAttribute("ignoreCase")]
+		public bool IgnoreCase;
+
+		private Regex regex;
+
+		public Regex Regex
+		{
+			get { return regex ?? (regex = new Regex("^" + Pattern + "$", IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None)); }
+		}
 	}
 
 	public class ChoiceItem

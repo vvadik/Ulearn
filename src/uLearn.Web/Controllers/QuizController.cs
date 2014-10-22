@@ -167,7 +167,7 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(FillInBlock fillInBlock, string data)
 		{
-			var isTrue = fillInBlock.Regexes.Any(regex => Regex.IsMatch(data, "^" + regex + "$"));
+			var isTrue = fillInBlock.Regexes.Any(regex => regex.Regex.IsMatch(data));
 			return new List<QuizInfoForDb>
 			{
 				new QuizInfoForDb

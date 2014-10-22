@@ -13,7 +13,7 @@
 	</choice>
 	
 	<choice id="1" multiple="true" shuffle="false">
-		<text>Отметье верные утверждения про анализ покрытия кода тестами</text>
+		<text>Отметьте верные утверждения про анализ покрытия кода тестами</text>
 		<item id="1" isCorrect="true">Он позволяет найти участки кода, которые еще не тестируются</item>
 		<item id="2" isCorrect="true">Он не позволяет найти ошибки, связанные с тем, что некоторые особые случаи не рассмотрены</item>
 		<item id="3" isCorrect="true">В простых случаях этот анализ можно провести с помощью точек останова и отладчика</item>
@@ -37,18 +37,18 @@
 	</choice>
 	
 	<p>NUnit — альтернативная система запуска модульных тестов, обладающая богатыми возможностями.
-	Используйте её документацию на официальном сайте [nunit.org](http://nunit.org) для поиска ответов на следующие вопросы.</p>
+	Используйте ее документацию на официальном сайте [nunit.org](http://nunit.org) для поиска ответов на следующие вопросы.</p>
 	<fillIn id="4">
 		<text>С помощью какого атрибута можно повторить один тест заданное количество раз?</text>
 		<sample>RepeatAttribute</sample>
-		<regex>\[?Repeat(Attribute)?(\(.+\))?\]?</regex>
+		<regex ignoreCase="true">\[?Repeat(Attribute)?(\(.+\))?\]?</regex>
 		
 	</fillIn>
 
 	<fillIn id="5">
 		<text>С помощью какого атрибута можно установить максимальное время выполнения теста?</text>
 		<sample>TimeoutAttribute</sample>
-		<regex>\[?(Maxtime|Timeout)(Attribute)?(\(.+\))?\]?</regex>
+		<regex ignoreCase="true">\[?(Maxtime|Timeout)(Attribute)?(\(.+\))?\]?</regex>
 	</fillIn>
 
 </Quiz>
