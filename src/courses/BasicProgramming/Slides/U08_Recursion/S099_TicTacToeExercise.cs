@@ -1,7 +1,7 @@
 ﻿namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 {
 	[Slide("Практика", "B8BE9F44E4FE433AA03AFC5CAB9195C5")]
-	public class S099_Exercise
+	public class S099_TicTacToeExercise
 	{
 		/*
 		## Перестановки (2 балла)
