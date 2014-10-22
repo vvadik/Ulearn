@@ -48,13 +48,13 @@ namespace uLearn.Web.DataContexts
 
 		public bool IsQuizSlidePassed(string courseId, string userId, string slideId)
 		{
-			return db.UserQuizzes.Any(x => x.UserId == userId && x.SlideId == slideId && x.CourseId == courseId && !x.isDropped);
+			return db.UserQuizzes.Any(x => x.UserId == userId && x.SlideId == slideId && !x.isDropped);
 		}
 
 		public IEnumerable<bool> GetQuizDropStates(string courseId, string userId, string slideId)
 		{
 			return db.UserQuizzes
-				.Where(x => x.UserId == userId && x.SlideId == slideId && x.CourseId == courseId)
+				.Where(x => x.UserId == userId && x.SlideId == slideId)
 				.DistinctBy(q => q.Timestamp)
 				.Select(q => q.isDropped);
 		}
@@ -72,7 +72,7 @@ namespace uLearn.Web.DataContexts
 			foreach (var block in slide.Quiz.Blocks.OfType<AbstractQuestionBlock>())
 			{
 				var ans = db.UserQuizzes
-					.Where(x => x.UserId == userId && x.CourseId == courseId && x.SlideId == slide.Id && x.QuizId == block.Id && !x.isDropped).ToList();
+					.Where(x => x.UserId == userId && x.SlideId == slide.Id && x.QuizId == block.Id && !x.isDropped).ToList();
 				if (block is ChoiceBlock)
 					answer[block.Id] = ans.Select(x => x.ItemId).ToList();
 				else if (block is IsTrueBlock)
@@ -89,7 +89,7 @@ namespace uLearn.Web.DataContexts
 
 		public FillInBlockAnswerInfo GetFillInBlockAnswerInfo(string courseId, string slideId, string quizId, string userId, int questionIndex)
 		{
-			var answer = db.UserQuizzes.FirstOrDefault(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId && !x.isDropped);
+			var answer = db.UserQuizzes.FirstOrDefault(x => x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId && !x.isDropped);
 			return new FillInBlockAnswerInfo
 			{
 				Answer = answer == null ? null : answer.Text,
@@ -105,7 +105,7 @@ namespace uLearn.Web.DataContexts
 			{
 				ans[item.Id] = false;
 			}
-			foreach (var quizItem in db.UserQuizzes.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId && q.QuizId == block.Id && q.ItemId != null && !q.isDropped))
+			foreach (var quizItem in db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId && q.QuizId == block.Id && q.ItemId != null && !q.isDropped))
 			{
 				ans[quizItem.ItemId] = true;
 			}
@@ -119,7 +119,7 @@ namespace uLearn.Web.DataContexts
 
 		public IsTrueBlockAnswerInfo GetIsTrueBlockAnswerInfo(string courseId, string slideId, string quizId, string userId, int questionIndex)
 		{
-			var answer =  db.UserQuizzes.FirstOrDefault(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId && !x.isDropped);
+			var answer =  db.UserQuizzes.FirstOrDefault(x => x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId && !x.isDropped);
 			return new IsTrueBlockAnswerInfo
 			{
 				IsAnswered = answer != null,
@@ -132,7 +132,7 @@ namespace uLearn.Web.DataContexts
 		public int GetAverageStatistics(string slideId, string courseId)
 		{
 			var newA = db.UserQuizzes
-				.Where(x => x.SlideId == slideId && x.CourseId == courseId)
+				.Where(x => x.SlideId == slideId)
 				.GroupBy(x => x.UserId)
 				.Select(x => x
 					.GroupBy(y => y.QuizId)
@@ -147,13 +147,13 @@ namespace uLearn.Web.DataContexts
 
 		public int GetSubmitQuizCount(string slideId, string courseId)
 		{
-			return db.UserQuizzes.Where(x => x.SlideId == slideId && x.CourseId == courseId).Select(x => x.User).Distinct().Count();
+			return db.UserQuizzes.Where(x => x.SlideId == slideId).Select(x => x.User).Distinct().Count();
 		}
 
 		public int GetQuizSuccessful(string courseId, string slideId, string userId)
 		{
 			return (int)(db.UserQuizzes
-				.Where(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId)
+				.Where(x => x.SlideId == slideId && x.UserId == userId)
 				.GroupBy(y => y.QuizId)
 				.Select(y => y.All(z => z.IsRightQuizBlock))
 				.Select(y => y ? 1 : 0)
@@ -181,7 +181,7 @@ namespace uLearn.Web.DataContexts
 		public Dictionary<string, bool> GetQuizBlocksTruth(string courseId, string userId, string slideId)
 		{
 			return db.UserQuizzes
-				.Where(q => q.UserId == userId && q.CourseId == courseId && q.SlideId == slideId && !q.isDropped)
+				.Where(q => q.UserId == userId && q.SlideId == slideId && !q.isDropped)
 				.DistinctBy(q => q.QuizId)
 				.ToDictionary(q => q.QuizId, q => q.IsRightQuizBlock);
 		}

@@ -152,10 +152,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="EntityFramework">
-      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer">
-      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Owin">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.1.0.0\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
@@ -226,6 +226,10 @@
     <Compile Include="Migrations\201410192113426_AddUserQuizDroppedColumn.cs" />
     <Compile Include="Migrations\201410192113426_AddUserQuizDroppedColumn.Designer.cs">
       <DependentUpon>201410192113426_AddUserQuizDroppedColumn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201410221523323_add index.cs" />
+    <Compile Include="Migrations\201410221523323_add index.Designer.cs">
+      <DependentUpon>201410221523323_add index.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\AcceptedSolutionsPageModel.cs" />
     <Compile Include="Models\AnalyticsTablePageModel.cs" />
@@ -385,6 +389,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201410192113426_AddUserQuizDroppedColumn.resx">
       <DependentUpon>201410192113426_AddUserQuizDroppedColumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410221523323_add index.resx">
+      <DependentUpon>201410221523323_add index.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

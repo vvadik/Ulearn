@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
@@ -15,6 +16,7 @@ namespace uLearn.Web.Models
 
 		[StringLength(64)]
 		[Required]
+		[Index("SlideAndUser", 2)]
 		public string UserId { get; set; }
 
 		[Required]
@@ -23,6 +25,7 @@ namespace uLearn.Web.Models
 
 		[Required]
 		[StringLength(64)]
+		[Index("SlideAndUser", 1)]
 		public string SlideId { get; set; }
 
 		[Required]

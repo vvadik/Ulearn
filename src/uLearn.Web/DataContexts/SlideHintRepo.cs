@@ -23,7 +23,7 @@ namespace uLearn.Web.DataContexts
 
 		public async Task AddHint(string userId, int hintId, string courseId, string slideId)
 		{
-			if (db.Hints.Any(x => x.UserId == userId && x.HintId == hintId && x.SlideId == slideId && x.CourseId == courseId))
+			if (db.Hints.Any(x => x.UserId == userId && x.HintId == hintId && x.SlideId == slideId))
 				return;
 			db.Hints.Add(new SlideHint
 			{
@@ -37,17 +37,17 @@ namespace uLearn.Web.DataContexts
 
 		public IEnumerable<int> GetUsedHintId(string userId, string courseId, string slideId)
 		{
-			return db.Hints.Where(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId).Select(x => x.HintId);
+			return db.Hints.Where(x => x.SlideId == slideId && x.UserId == userId).Select(x => x.HintId);
 		}
 
 		public int GetHintsCount(string slideId, string courseId)
 		{
-			return db.Hints.Count(x => x.CourseId == courseId && x.SlideId == slideId);
+			return db.Hints.Count(x => x.SlideId == slideId);
 		}
 
 		public int GetHintsCountForUser(string slideId, string courseId, string userId)
 		{
-			return db.Hints.Count(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId);
+			return db.Hints.Count(x => x.SlideId == slideId && x.UserId == userId);
 		}
 
 		public int GetHintUsedPercent(string slideId, string courseId, int hintsCountOnSlide, int usersCount)
@@ -65,7 +65,7 @@ namespace uLearn.Web.DataContexts
 
 		public async Task<string> LikeHint(string courseId, string slideId, int hintId, string userId)
 		{
-			var hint = db.Hints.FirstOrDefault(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId && x.HintId == hintId);
+			var hint = db.Hints.FirstOrDefault(x => x.SlideId == slideId && x.UserId == userId && x.HintId == hintId);
 			if (hint == null)
 				return "error";
 			if (hint.IsHintHelped)
@@ -83,7 +83,7 @@ namespace uLearn.Web.DataContexts
 		{
 			return
 				new HashSet<int>(db.Hints
-						.Where(x => x.SlideId == slideId && x.CourseId == courseId && x.UserId == userId && x.IsHintHelped)
+						.Where(x => x.SlideId == slideId && x.UserId == userId && x.IsHintHelped)
 						.Select(x => x.HintId));
 		}
 
@@ -91,12 +91,12 @@ namespace uLearn.Web.DataContexts
 		{
 			return
 				db.Hints.Any(
-					x => x.UserId == userId && x.CourseId == courseId && x.SlideId == slideId && x.HintId == hintId && x.IsHintHelped);
+					x => x.UserId == userId && x.SlideId == slideId && x.HintId == hintId && x.IsHintHelped);
 		}
 
 		public int GetUsedHintsCount(string courseId, string slideId, string userId)
 		{
-			return db.Hints.Count(x => x.UserId == userId && x.SlideId == slideId && x.CourseId == courseId);
+			return db.Hints.Count(x => x.UserId == userId && x.SlideId == slideId);
 		}
 	}
 }

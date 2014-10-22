@@ -23,7 +23,7 @@ namespace uLearn.Web.DataContexts
 
 		public async Task AddVisiter(string courseId, string slideId, string userId)
 		{
-			if (db.Visiters.Any(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId))
+			if (db.Visiters.Any(x => x.UserId == userId && x.SlideId == slideId))
 				return;
 			db.Visiters.Add(new Visiters
 			{
@@ -37,12 +37,12 @@ namespace uLearn.Web.DataContexts
 
 		public int GetVisitersCount(string slideId, string courseId)
 		{
-			return db.Visiters.Count(x => x.SlideId == slideId && x.CourseId == courseId);
+			return db.Visiters.Count(x => x.SlideId == slideId);
 		}
 
 		public bool IsUserVisit(string courseId, string slideId, string userId)
 		{
-			return db.Visiters.Any(x => x.SlideId == slideId && x.CourseId == courseId && x.UserId == userId);
+			return db.Visiters.Any(x => x.SlideId == slideId && x.UserId == userId);
 		}
 
 		public HashSet<string> GetIdOfVisitedSlides(string courseId, string userId)
