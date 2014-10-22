@@ -30,7 +30,8 @@
 			var style = "";
 			if (Model.QuizState != QuizState.NotPassed)
 			{
-				var res = Model.ResultsForQuizes[block.Id];
+				bool res;
+				res = Model.ResultsForQuizes.TryGetValue(block.Id, out res) && res;
 				mark = "glyphicon " + (res ? "glyphicon-ok" : "glyphicon-remove");
 				style = "color: " + (res ? "green" : "red");
 			}
