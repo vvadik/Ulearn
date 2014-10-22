@@ -110,6 +110,7 @@
     <Content Include="Slides\U08_Recursion\S035_Recursion.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Slides\manipulator.png" />
     <Content Include="Slides\U08_Recursion\Title.txt" />
     <Content Include="Slides\U08_Recursion\_20_map.png" />
     <Content Include="Slides\U09_Sorting\Title.txt" />
@@ -223,7 +224,8 @@
     <Compile Include="Slides\U08_Recursion\S065_FinishPermutations.cs" />
     <Compile Include="Slides\U08_Recursion\S055_FixSubsets.cs" />
     <Compile Include="Slides\U08_Recursion\S015_FixRecursion.cs" />
-    <Compile Include="Slides\U08_Recursion\S099_Exercise.cs" />
+    <Compile Include="Slides\U08_Recursion\S099_TicTacToeExercise.cs" />
+    <Compile Include="Slides\Manipulator_Exercise.cs" />
     <Compile Include="Slides\U09_Sorting\S099_Exercise.cs" />
     <Compile Include="Slides\U08_Recursion\S010_Recursion.cs" />
     <Compile Include="Slides\U08_Recursion\S020_RecursionTree.cs" />
