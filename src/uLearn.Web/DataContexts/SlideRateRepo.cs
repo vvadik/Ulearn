@@ -23,7 +23,7 @@ namespace uLearn.Web.DataContexts
 
 		public async Task<string> AddRate(string courseId, string slideId, string userId, SlideRates rate)
 		{
-			var lastRate = db.SlideRates.FirstOrDefault(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId);
+			var lastRate = db.SlideRates.FirstOrDefault(x => x.SlideId == slideId && x.UserId == userId);
 			if (lastRate == null)
 			{
 				db.SlideRates.Add(new SlideRate
@@ -49,14 +49,14 @@ namespace uLearn.Web.DataContexts
 
 		public string FindRate(string courseId, string slideId, string userId)
 		{
-			var lastRate = db.SlideRates.FirstOrDefault(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId);
+			var lastRate = db.SlideRates.FirstOrDefault(x => x.SlideId == slideId && x.UserId == userId);
 			return lastRate == null ? null : lastRate.Rate.ToString();
 		}
 
 		public Rates GetRates(string slideId, string courseId)
 		{
 			var rates = new Rates();
-			var allRates = db.SlideRates.Where(x => x.CourseId == courseId && x.SlideId == slideId).ToList();
+			var allRates = db.SlideRates.Where(x => x.SlideId == slideId).ToList();
 			foreach (var rate in allRates)
 			{
 				if (rate.Rate == SlideRates.Good)
@@ -73,7 +73,7 @@ namespace uLearn.Web.DataContexts
 
 		public string GetUserRate(string courseId, string slideId, string userId)
 		{
-			return ConvertMarkToPrettyString(db.SlideRates.FirstOrDefault(x => x.SlideId == slideId && x.UserId == userId && x.CourseId == courseId));
+			return ConvertMarkToPrettyString(db.SlideRates.FirstOrDefault(x => x.SlideId == slideId && x.UserId == userId));
 		}
 
 		private string ConvertMarkToPrettyString(SlideRate slideRate)
