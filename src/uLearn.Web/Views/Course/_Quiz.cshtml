@@ -7,10 +7,11 @@
 @if (quizSlide != null)
 {
 	var status = Model.QuizState == QuizState.NotPassed ?
-		String.Format("Попытка {0} из {1}", Model.TryNumber + 1, CourseController.MAX_DROPS_COUNT + 1) : 
+		String.Format("Попытка {0} из {1}", Model.TryNumber + 1, Model.MaxDropCount + 1) : 
 		String.Format("Верно {0} из {1}.", Model.RightAnswers, Model.QuestionsCount);
 	<h4 id="quiz-status">@status</h4>
 
+	var remains = Model.MaxDropCount - Model.TryNumber + 1;
 	for (var blockIndex = 0; blockIndex < quizSlide.Quiz.Blocks.Length; blockIndex++)
 	{
 		var quizBlock = quizSlide.Quiz.Blocks[blockIndex];
@@ -66,8 +67,7 @@
 					<input type="hidden" name="slideId" value="@Model.Slide.Id" />
 					<input type="hidden" name="courseId" value="@Model.CourseId" />
 					<button class="btn btn-danger" type="submit">Пройти тест повторно</button>
-					<small>У вас есть только две попытки пройти тест.</small>
-					
+					<small>У вас остал@(remains == 1 ? "а" : "о")сь @remains из @(Model.MaxDropCount + 1) попыток</small>
 				}
 			}
 			else if (User.IsInRole(LmsRoles.Tester))

@@ -213,10 +213,13 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> DropQuiz(string courseId, string slideId)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
-			var userId = User.Identity.GetUserId();
-			if (userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b) < CourseController.MAX_DROPS_COUNT && 
-				!userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId).All(b => b.Value))
-				await userQuizzesRepo.DropQuiz(userId, slideId);
+			if (slide is QuizSlide)
+			{
+				var userId = User.Identity.GetUserId();
+				if (userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b) < CourseController.GetMaxDropCount(slide as QuizSlide) &&
+				    !userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId).All(b => b.Value))
+					await userQuizzesRepo.DropQuiz(userId, slideId);
+			}
 			return RedirectToAction("Slide", "Course", new { courseId, slideIndex = slide.Index });
 		}
 	}

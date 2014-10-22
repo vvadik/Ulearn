@@ -15,6 +15,7 @@ namespace uLearn.Web.Models
 		public Dictionary<string, List<string>> AnswersToQuizes { get; set; }
 		public Dictionary<string, bool> ResultsForQuizes { get; set; }
 		public int TryNumber { get; set; }
+		public int MaxDropCount { get; set; }
 
 		public int RightAnswers
 		{

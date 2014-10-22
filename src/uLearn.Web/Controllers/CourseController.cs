@@ -13,7 +13,7 @@ namespace uLearn.Web.Controllers
 {
 	public class CourseController : Controller
 	{
-		public static readonly int MAX_DROPS_COUNT = 1;
+		private const int MAX_DROPS_COUNT = 1;
 
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
@@ -101,8 +101,9 @@ namespace uLearn.Web.Controllers
 				slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
 			var userId = User.Identity.GetUserId();
 			var isFirstCourseVisit = !db.Visiters.Any(x => x.UserId == userId);
+			var maxDropCount = GetMaxDropCount(course.Slides[slideIndex] as QuizSlide);
 			var slideId = course.Slides[slideIndex].Id;
-			var state = GetQuizState(courseId, userId, slideId);
+			var state = GetQuizState(courseId, userId, slideId, maxDropCount);
 			var resultsForQuizes = GetResultForQuizes(courseId, userId, slideId, state.Item1);
 			await VisitSlide(courseId, slideId);
 			var model = new CoursePageModel
@@ -116,6 +117,7 @@ namespace uLearn.Web.Controllers
 				Rate = GetRate(course.Id, slideId),
 				QuizState = state.Item1,
 				TryNumber = state.Item2,
+				MaxDropCount = maxDropCount,
 				ResultsForQuizes = resultsForQuizes,
 				AnswersToQuizes =
 					userQuizzesRepo.GetAnswersForShowOnSlide(courseId, course.Slides[slideIndex] as QuizSlide,
@@ -128,15 +130,23 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
+		public static int GetMaxDropCount(QuizSlide quizSlide)
+		{
+			if (quizSlide == null)
+				return MAX_DROPS_COUNT;
+			var maxDropCount = quizSlide.Quiz.MaxDropCount;
+			return maxDropCount == 0 ? MAX_DROPS_COUNT : maxDropCount;
+		}
+
 		private Dictionary<string, bool> GetResultForQuizes(string courseId, string userId, string slideId, QuizState state)
 		{
 			return userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId);
 		}
 
-		private Tuple<QuizState, int> GetQuizState(string courseId, string userId, string slideId)
+		private Tuple<QuizState, int> GetQuizState(string courseId, string userId, string slideId, int maxDropCount)
 		{
 			var states = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).ToList();
-			if (states.Count > MAX_DROPS_COUNT)
+			if (states.Count > maxDropCount)
 				return Tuple.Create(QuizState.Total, states.Count);
 			if (states.Any(b => !b))
 				return Tuple.Create(QuizState.Subtotal, states.Count);

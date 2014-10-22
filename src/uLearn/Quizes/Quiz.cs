@@ -8,6 +8,9 @@ namespace uLearn.Quizes
 		[XmlAttribute("id")]
 		public string Id;
 
+		[XmlAttribute("maxDropCount")]
+		public int MaxDropCount;
+
 		[XmlElement("title")]
 		public string Title;
 
