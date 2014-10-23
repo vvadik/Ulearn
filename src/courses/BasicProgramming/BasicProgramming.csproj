@@ -63,6 +63,21 @@
     <Compile Include="Slides\U00_Basics\S070_MethodsVideo.cs" />
     <Compile Include="Slides\U00_Basics\S072_Methods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Slides\U10_OOP\S010_Classes.cs" />
+    <Compile Include="Slides\U10_OOP\S020_StaticAndDynamic.cs" />
+    <Compile Include="Slides\U10_OOP\S030_Methods.cs" />
+    <Compile Include="Slides\U10_OOP\S040_ExtensionMethods.cs" />
+    <Compile Include="Slides\U10_OOP\S050_DirectoryAndFile.cs" />
+    <Compile Include="Slides\U10_OOP\S060_StaticClass.cs" />
+    <Compile Include="Slides\U11_Inheritance\S010_Why.cs" />
+    <Compile Include="Slides\U11_Inheritance\S020_Inheritance.cs" />
+    <Compile Include="Slides\U11_Inheritance\S030_Hierarchy.cs" />
+    <Compile Include="Slides\U11_Inheritance\S040_Array.cs" />
+    <Compile Include="Slides\U11_Inheritance\S050_Interfaces.cs" />
+    <Compile Include="Slides\U11_Inheritance\S070_ComparableImpl.cs" />
+    <Compile Include="Slides\U11_Inheritance\S080_IComparable.cs" />
+    <Compile Include="Slides\U11_Inheritance\S090_Polymorphism.cs" />
+    <Compile Include="Slides\U11_Inheritance\S100_VirtualMethods.cs" />
     <Content Include="Slides\logo.png" />
     <Content Include="Slides\thumbnail.png" />
     <Content Include="Slides\U00_Basics\S081-Scope.quiz.xml">
@@ -114,6 +129,8 @@
     <Content Include="Slides\U08_Recursion\Title.txt" />
     <Content Include="Slides\U08_Recursion\_20_map.png" />
     <Content Include="Slides\U09_Sorting\Title.txt" />
+    <Content Include="Slides\U10_OOP\Title.txt" />
+    <Content Include="Slides\U11_Inheritance\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
     <Content Include="Slides\U01_Mistakes\S091_Style2.quiz.xml">
       <SubType>Designer</SubType>

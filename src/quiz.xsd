@@ -71,7 +71,15 @@
 		<xs:sequence minOccurs="1" maxOccurs="1">
 			<xs:element name="text" minOccurs="1" maxOccurs="1" type="notEmptyString"/>
 			<xs:element name="sample" minOccurs="0" maxOccurs="1" type="xs:string"/>
-			<xs:element name="regex" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
+			<xs:element name="regex" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="ignoreCase" type="xs:boolean" use="optional" default="false"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="explanation" type="xs:string" use="optional"/>
 		<xs:attribute name="id" type="notEmptyString" use="required"/>
