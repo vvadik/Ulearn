@@ -105,6 +105,7 @@
     <Compile Include="Slides\U03_DataStructure\S030_Heap.cs" />
     <Compile Include="Slides\U03_DataStructure\S050_Generics.cs" />
     <Compile Include="Slides\U03_DataStructure\S060_LimitedAutocomplete.cs" />
+    <Compile Include="Slides\U03_DataStructure\S070_Mocks.cs" />
     <Content Include="CoursesTests.cs" />
   </ItemGroup>
   <ItemGroup>
