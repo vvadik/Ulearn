@@ -184,6 +184,8 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
+		[HttpGet]
+		[Authorize(Roles = LmsRoles.Instructor)]
 		public ActionResult Analytics(string courseId, int slideIndex)
 		{
 			var course = courseManager.GetCourse(courseId);

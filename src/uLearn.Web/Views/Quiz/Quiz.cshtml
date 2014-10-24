@@ -81,6 +81,6 @@
 	</div>
 	if (User.IsInRole(LmsRoles.Instructor))
 	{
-		@Html.Action("Analytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
+		<div class="load-content" data-url="@Url.Action("Analytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })"> </div>
 	}
 }
