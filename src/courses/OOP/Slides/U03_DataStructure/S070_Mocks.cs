@@ -11,7 +11,8 @@ namespace OOP.Slides.U03_DataStructure
         /*
         Данная задача является необязательной.
         
-        Предположим у вас есть сервис NumbersService, который использует абстракции INumbersCollection и INumberProcessor:
+        Предположим у вас есть сервис NumbersService, который использует абстракции INumbersCollection и INumberProcessor,
+        а так же реализации их абстракций MySqlNumbersCollections и FibonaciNumberProcessor соответственно:
         */
 
         public class MySqlNumberCollection : INumbersCollection
@@ -103,7 +104,7 @@ namespace OOP.Slides.U03_DataStructure
         Данную проблему решают фреймворки NMock, RhinoMocks. Подробно, например, о тестировании с RhinoMocks, можно почитать здесь(http://vsukhachev.wordpress.com/2011/03/23/unit-%D1%82%D0%B5%D1%81%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-%D1%81-rhino-mocks/)
         
         ## Задача
-        Необходимо провестировать ваш сервис автокомплита с помощью RhinoMocks.
+        Необходимо протестировать ваш сервис автокомплита с помощью RhinoMocks.
         */
     }
 }
