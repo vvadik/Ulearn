@@ -191,9 +191,15 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			var quizSlide = (QuizSlide)course.Slides[slideIndex];
 			var dict = new SortedDictionary<string, List<QuizAnswerInfo>>();
-			foreach (var user in db.Users)
-				if (userQuizzesRepo.IsQuizSlidePassed(courseId, user.Id, quizSlide.Id)) //не сворачивать в Where! DB запросы не поймут!
-					dict[user.UserName] = GetUserQuizAnswers(courseId, quizSlide, user.Id).OrderBy(x => user.Id).ToList();
+			var passedUsers = db.UserQuizzes
+				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped)
+				.Select(q => q.UserId)
+				.Distinct()
+				.Join(db.Users, userId => userId, u => u.Id, (userId, u) => new { UserId = userId, u.UserName });
+			foreach (var user in passedUsers)
+			{
+				dict[user.UserName] = GetUserQuizAnswers(courseId, quizSlide, user.UserId).ToList();
+			}
 			return PartialView(new QuizAnalyticsModel
 			{
 				UserAnswers = dict,
