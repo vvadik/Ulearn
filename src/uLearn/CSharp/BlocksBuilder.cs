@@ -42,6 +42,11 @@ namespace uLearn.CSharp
 			return VisitMemberDeclaration(node, base.VisitClassDeclaration(node));
 		}
 
+		public override SyntaxNode VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
+		{
+			return VisitMemberDeclaration(node, base.VisitInterfaceDeclaration(node));
+		}
+
 		public override SyntaxNode VisitEnumDeclaration(EnumDeclarationSyntax node)
 		{
 			return VisitMemberDeclaration(node, base.VisitEnumDeclaration(node));

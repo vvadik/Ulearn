@@ -11,18 +11,17 @@ namespace OOP.Slides.U03_DataStructure
         Необходимо реализовать max-кучу (бинарную, биномиальную или Фибоначчиеву кучу), где элементами являются целые числа:
        */
 
-        public interface IHeap
+        public interface Heap
         {
-            void Add(int elemet);
-            int FindMax();
-            int DeleteMax();
-            IHeap Merge(IHeap other);
+            void add(int elemet);
+            int findMax();
+            int deleteMax();
         }
 
         /* 
         Не забудьте протестировать вашу реализацию.
         
-        Использовать встроенные в Java коллекции(Map, Set, List и производные) нельзя, массивы — можно.
+        Использовать встроенные в Java коллекции — Map, Set, List и производные — нельзя, массивы можно.
         */
     }
 }
