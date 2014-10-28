@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.CSharp;
+using System.Collections.Generic;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
@@ -17,28 +17,28 @@ namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 
 		*/
 
-		[ExpectedOutput(@"CAt
-CaT
-Cat
-cAT
-cAt
+		[ExpectedOutput(@"cat
 caT
-cat
+cAt
+cAT
+Cat
+CaT
+CAt
 king
 
 
-A
 a
+A
 1
 123
-ABC
-ABc
-AbC
-Abc
-aBC
-aBc
-abC
 abc
+abC
+aBc
+aBC
+Abc
+AbC
+ABc
+ABC
 def
 deF
 dEf
@@ -47,21 +47,21 @@ Def
 DeF
 DEf
 DEF
-GhI
-Ghi
-GHI
-GHi
-ghI
 ghi
-gHI
+ghI
 gHi
+gHI
+Ghi
+GhI
+GHi
+GHI
 k_l_m
-k_L_M
 k_L_m
-K_l_M
+k_L_M
 K_l_m
-K_L_M
-K_L_m")]
+K_l_M
+K_L_m
+K_L_M")]
 		public static void Main()
 		{
 			MakePasswords("cat", 2);
@@ -79,14 +79,19 @@ K_L_m")]
 		
 		static void MakePasswords(string initialWord, int changes)
 		{
-			MakePasswords(initialWord, new char[initialWord.Length], changes, 0);
+			var passwords = new List<string>();
+			MakePasswords(initialWord, new char[initialWord.Length], changes, 0, passwords);
+			passwords.Sort();
+			foreach (var password in passwords)
+				Console.WriteLine(password);
 		}
 
 		[Exercise]
-		static void MakePasswords(string initialWord, char[] password, int caseChangesLeft, int position)
+		static void MakePasswords(string initialWord, char[] password, 
+			int caseChangesLeft, int position, List<string> passwords)
 		{
 			if (position == password.Length)
-				Console.WriteLine(new string(password));
+				passwords.Add(new string(password));
 			else
 			{
 				if (caseChangesLeft > 0)
@@ -94,20 +99,20 @@ K_L_m")]
 					if (char.IsUpper(initialWord[position]))
 					{
 						password[position] = char.ToLower(initialWord[position]);
-						MakePasswords(initialWord, password, caseChangesLeft - 1, position + 1);
+						MakePasswords(initialWord, password, caseChangesLeft - 1, position + 1, passwords);
 					}
 					else if (char.IsLower(initialWord[position]))
 					{
 						password[position] = char.ToUpper(initialWord[position]);
-						MakePasswords(initialWord, password, caseChangesLeft - 1, position + 1);
+						MakePasswords(initialWord, password, caseChangesLeft - 1, position + 1, passwords);
 					}
 				}
 				password[position] = initialWord[position];
-				MakePasswords(initialWord, password, caseChangesLeft, position + 1);
+				MakePasswords(initialWord, password, caseChangesLeft, position + 1, passwords);
 			}
 			/*uncomment
 			if (position == password.Length)
-				Console.WriteLine(new string(password));
+				passwords.Add(new string(password));
 			else
 			{
 				// ...

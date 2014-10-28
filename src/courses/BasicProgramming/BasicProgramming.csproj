@@ -64,6 +64,7 @@
     <Compile Include="Slides\U00_Basics\S072_Methods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Slides\U08_Recursion\S099_RoutePlanningExercise.cs" />
+    <Compile Include="Slides\U09_Sorting\S045_BinSearch.cs" />
     <Compile Include="Slides\U10_OOP\S010_Classes.cs" />
     <Compile Include="Slides\U10_OOP\S020_StaticAndDynamic.cs" />
     <Compile Include="Slides\U10_OOP\S030_Methods.cs" />
@@ -123,13 +124,17 @@
     <Content Include="Slides\U07_Complexity\S025_Complexity.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Slides\U08_Recursion\S035_Recursion.quiz.xml">
+    <Content Include="Slides\U09_Sorting\bubblesort.gif" />
+    <Content Include="Slides\U09_Sorting\mergesort.gif" />
+    <Content Include="Slides\U09_Sorting\quicksort.gif" />
+    <Content Include="Slides\U09_Sorting\S025_Analysis.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Slides\manipulator.png" />
     <Content Include="Slides\U08_Recursion\Title.txt" />
     <Content Include="Slides\U08_Recursion\_20_map.png" />
     <Content Include="Slides\U08_Recursion\_30_map.png" />
+    <Content Include="Slides\U09_Sorting\bin-search.png" />
     <Content Include="Slides\U09_Sorting\Title.txt" />
     <Content Include="Slides\U10_OOP\Title.txt" />
     <Content Include="Slides\U11_Inheritance\Title.txt" />
