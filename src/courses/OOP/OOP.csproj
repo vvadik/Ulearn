@@ -92,12 +92,20 @@
     <Compile Include="Slides\U02_Polymorphism\S050_OptimizeForNoise.cs" />
     <Compile Include="Slides\U02_Polymorphism\S040_Noise.cs" />
     <Compile Include="Slides\U02_Polymorphism\S060_Visualize.cs" />
-    <Compile Include="Slides\U03_DataStructure\S010_DataStructures.cs">
+    <Compile Include="Slides\U03_DataStructure\S040_IHeap.cs" />
+    <Compile Include="Slides\U03_DataStructure\S020_IAssociativeArray.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Slides\U03_DataStructure\S010_AssociativeArray.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Slides\U02_Polymorphism\S010_IRobotNavigator.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="Slides\U03_DataStructure\S030_Heap.cs" />
+    <Compile Include="Slides\U03_DataStructure\S050_Generics.cs" />
+    <Compile Include="Slides\U03_DataStructure\S060_LimitedAutocompleteService.cs" />
+    <Compile Include="Slides\U03_DataStructure\S070_Mocks.cs" />
     <Content Include="CoursesTests.cs" />
   </ItemGroup>
   <ItemGroup>
