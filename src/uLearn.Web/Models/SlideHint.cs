@@ -16,9 +16,11 @@ namespace uLearn.Web.Models
 
 		[StringLength(64)]
 		[Required]
+		[Index("FullIndex", 2)]
 		public string UserId { get; set; }
 
 		[Required]
+		[Index("FullIndex", 3)]
 		public int HintId { get; set; }
 
 		[Required]
@@ -27,8 +29,10 @@ namespace uLearn.Web.Models
 
 		[Required]
 		[StringLength(64)]
+		[Index("FullIndex", 1)]
 		public string SlideId { get; set; }
 
+		[Index("FullIndex", 4)]
 		public bool IsHintHelped { get; set; }
 	}
 }

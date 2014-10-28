@@ -9,6 +9,9 @@ namespace uLearn.Quizes
 		[XmlAttribute("id")]
 		public string Id;
 
+		[XmlAttribute("maxDropCount")]
+		public int MaxDropCount;
+
 		[XmlElement("title")]
 		public string Title;
 
@@ -65,6 +68,9 @@ namespace uLearn.Quizes
 		[XmlAttribute("answer")]
 		public bool Answer;
 
+		[XmlAttribute("explanation")]
+		public string Explanation;
+
 		public bool IsRight(string text)
 		{
 			return text.ToLower() == Answer.ToString().ToLower();
@@ -78,6 +84,9 @@ namespace uLearn.Quizes
 
 		[XmlElement("regex")]
 		public RegexInfo[] Regexes;
+
+		[XmlAttribute("explanation")]
+		public string Explanation;
 	}
 
 	public class RegexInfo
@@ -103,6 +112,9 @@ namespace uLearn.Quizes
 
 		[XmlAttribute("isCorrect")]
 		public bool IsCorrect;
+
+		[XmlAttribute("explanation")]
+		public string Explanation;
 
 		[XmlText]
 		public string Description;

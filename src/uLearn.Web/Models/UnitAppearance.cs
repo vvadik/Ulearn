@@ -11,6 +11,7 @@ namespace uLearn.Web.Models
 
 		[Required]
 		[StringLength(64)]
+		[Index("CourseAndTime", 1)]
 		public string CourseId { get; set; }
 
 		[Required]
@@ -20,6 +21,7 @@ namespace uLearn.Web.Models
 		public string UserName { get; set; }
 
 		[Required]
+		[Index("CourseAndTime", 2)]
 		public DateTime PublishTime { get; set; }
 	}
 }

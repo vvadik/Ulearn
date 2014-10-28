@@ -1,0 +1,26 @@
+﻿@using uLearn.Quizes
+@model QuizInfoModel
+@{
+	var value = "";
+	var quizRes = "";
+	var quizBlock = (FillInBlock)Model.CurrentBlock;
+	if (Model.QuizState != QuizState.NotPassed && Model.QuizModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault() != null)
+	{
+		value = Model.QuizModel.AnswersToQuizes[quizBlock.Id].FirstOrDefault();
+		quizRes = Model.QuizState == QuizState.Total ? (Model.QuizModel.AnswersToQuizes[quizBlock.Id][1] == "False" ? "wrong-quiz" : "right-quiz") : "";
+	}
+	var sample = quizBlock.Sample;
+	<div class="quiz quiz-block-input">
+		<label>
+			<input autocomplete="off" class="form-control @quizRes" value="@value" id='@(quizBlock.Id + "quizBlock")'>
+		</label>
+	</div>
+	if (Model.QuizState == QuizState.Total)
+	{
+		<div>Правильный ответ: @sample</div>
+		if (!String.IsNullOrEmpty(quizBlock.Explanation))
+		{
+			<div> <h4>Пояснение:</h4> @quizBlock.Explanation</div>
+		}
+	}
+}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace uLearn.Web.Models
 {
@@ -23,18 +24,22 @@ namespace uLearn.Web.Models
 
 		[Required]
 		[StringLength(64)]
+		[Index("FullIndex", 2)]
 		public string SlideId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
 
 		[StringLength(64)]
 		[Required]
+		[Index("FullIndex", 1)]
 		public string UserId { get; set; }
 
 		[StringLength(64)]
+		[Index("FullIndex", 4)]
 		public string QuizId { get; set; }
 
 		[StringLength(64)]
+		[Index("FullIndex", 5)]
 		public string ItemId { get; set; }
 
 		[StringLength(1024)]
@@ -44,6 +49,7 @@ namespace uLearn.Web.Models
 		public DateTime Timestamp { get; set; }
 
 		[Required]
+		[Index("FullIndex", 3)]
 		public bool isDropped { get; set; }
 
 

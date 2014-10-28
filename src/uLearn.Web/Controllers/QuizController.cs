@@ -14,6 +14,8 @@ namespace uLearn.Web.Controllers
 {
 	public class QuizController : Controller
 	{
+		private const int MAX_DROPS_COUNT = 1;
+
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
@@ -213,11 +215,62 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> DropQuiz(string courseId, string slideId)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
-			var userId = User.Identity.GetUserId();
-			if (userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b) < CourseController.MAX_DROPS_COUNT && 
-				!userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId).All(b => b.Value))
-				await userQuizzesRepo.DropQuiz(userId, slideId);
+			if (slide is QuizSlide)
+			{
+				var userId = User.Identity.GetUserId();
+				if (userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b) < GetMaxDropCount(slide as QuizSlide) &&
+				    !userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId).All(b => b.Value))
+					await userQuizzesRepo.DropQuiz(userId, slideId);
+			}
 			return RedirectToAction("Slide", "Course", new { courseId, slideIndex = slide.Index });
+		}
+
+		public ActionResult Quiz(QuizSlide slide, string courseId, string userId)
+		{
+			var slideId = slide.Id;
+			var maxDropCount = GetMaxDropCount(slide);
+			var state = GetQuizState(courseId, userId, slideId, maxDropCount);
+			var resultsForQuizes = GetResultForQuizes(courseId, userId, slideId, state.Item1);
+			var model = new QuizModel
+			{
+				CourseId = courseId,
+				Slide = slide,
+				QuizState = state.Item1,
+				TryNumber = state.Item2,
+				MaxDropCount = maxDropCount,
+				ResultsForQuizes = resultsForQuizes,
+				AnswersToQuizes =
+					userQuizzesRepo.GetAnswersForShowOnSlide(courseId, slide,
+						userId)
+			};
+
+			if (model.QuizState != QuizState.NotPassed && model.RightAnswers == model.QuestionsCount)
+				model.QuizState = QuizState.Total;
+
+			return PartialView(model);
+		}
+
+		private static int GetMaxDropCount(QuizSlide quizSlide)
+		{
+			if (quizSlide == null)
+				return MAX_DROPS_COUNT;
+			var maxDropCount = quizSlide.Quiz.MaxDropCount;
+			return maxDropCount == 0 ? MAX_DROPS_COUNT : maxDropCount;
+		}
+
+		private Dictionary<string, bool> GetResultForQuizes(string courseId, string userId, string slideId, QuizState state)
+		{
+			return userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId);
+		}
+
+		private Tuple<QuizState, int> GetQuizState(string courseId, string userId, string slideId, int maxDropCount)
+		{
+			var states = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).ToList();
+			if (states.Count > maxDropCount)
+				return Tuple.Create(QuizState.Total, states.Count);
+			if (states.Any(b => !b))
+				return Tuple.Create(QuizState.Subtotal, states.Count);
+			return Tuple.Create(QuizState.NotPassed, states.Count);
 		}
 	}
 }

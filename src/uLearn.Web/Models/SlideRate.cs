@@ -24,6 +24,7 @@ namespace uLearn.Web.Models
 
 		[StringLength(64)]
 		[Required]
+		[Index("SlideAndUser", 2)]
 		public string UserId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
@@ -34,6 +35,7 @@ namespace uLearn.Web.Models
 
 		[Required]
 		[StringLength(64)]
+		[Index("SlideAndUser", 1)]
 		public string SlideId { get; set; }
 	}
 }

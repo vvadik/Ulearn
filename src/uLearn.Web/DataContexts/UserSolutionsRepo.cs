@@ -115,7 +115,7 @@ namespace uLearn.Web.DataContexts
 		public List<AcceptedSolutionInfo> GetAllAcceptedSolutions(string courseId, string slideId)
 		{
 			var prepared = db.UserSolutions
-				.Where(x => x.IsRightAnswer && x.SlideId == slideId && x.CourseId == courseId)
+				.Where(x => x.IsRightAnswer && x.SlideId == slideId)
 				.GroupBy(x => x.CodeHash)
 				.Select(x => new { sol = x.OrderBy(y => y.Timestamp).FirstOrDefault(), likes = x.Sum(s => s.Likes.Count) })
 				.ToList();
@@ -135,13 +135,13 @@ namespace uLearn.Web.DataContexts
 
 		public bool IsUserPassedTask(string courseId, string slideId, string userId)
 		{
-			return db.UserSolutions.Any(x => x.SlideId == slideId && x.CourseId == courseId && x.UserId == userId && x.IsRightAnswer);
+			return db.UserSolutions.Any(x => x.SlideId == slideId && x.UserId == userId && x.IsRightAnswer);
 		}
 
 		public string FindLatestAcceptedSolution(string courseId, string slideId, string userId)
 		{
 			var allUserSolutionOnThisTask = db.UserSolutions
-				.Where(x => x.SlideId == slideId && x.CourseId == courseId && x.UserId == userId && x.IsRightAnswer).ToList();
+				.Where(x => x.SlideId == slideId && x.UserId == userId && x.IsRightAnswer).ToList();
 			var answer = allUserSolutionOnThisTask
 				.OrderByDescending(x => x.Timestamp)
 				.FirstOrDefault();
@@ -150,7 +150,7 @@ namespace uLearn.Web.DataContexts
 
 		public int GetAcceptedSolutionsCount(string slideId, string courseId)
 		{
-			return db.UserSolutions.Where(x => x.SlideId == slideId && x.CourseId == courseId && x.IsRightAnswer).Select(x => x.UserId).Distinct().Count();
+			return db.UserSolutions.Where(x => x.SlideId == slideId && x.IsRightAnswer).Select(x => x.UserId).Distinct().Count();
 		}
 
 		public HashSet<string> GetIdOfPassedSlides(string courseId, string userId)
