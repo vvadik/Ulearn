@@ -20,7 +20,7 @@ static int F(int x)
 		<item id="5" isCorrect="true">Вычисляет минимальный разряд десятичного числа $x$, в котором стоит $0$</item>
 	</choice>
 
-	<fillIn id="2">
+	<fillIn id="2" explanation="первый рекурсивный вызов — F(1), второй — F(0)">
 		<text>Легко проверить, что вызов $F(0)$ не породит ни одного рекурсивного вызова $F$. А сколько рекурсивных вызовов $F$ породит вызов $F(15)$?</text>
 		<sample>2</sample>
 		<regex>2</regex>
@@ -38,7 +38,7 @@ static int G(int x, int y)
 
 	<choice id="3" multiple="false" shuffle="true">
 		<text>Что делает функция $G$?</text>
-		<item id="1" isCorrect="true">Вычисляет НОД $x$ и $y$ по алгоритму Евклида</item>
+		<item id="1" isCorrect="true" explanation="это рекурсивная версия классического алгоритма Евклида">Вычисляет НОД $x$ и $y$ по алгоритму Евклида</item>
 		<item id="2" isCorrect="false">Вычисляет значение $x^y$</item>
 		<item id="3" isCorrect="false">При некоторых значениях аргументов будет бесконечная рекурсия</item>
 		<item id="4" isCorrect="false">Вычисляет остаток от деления $x$ на $y$</item>
