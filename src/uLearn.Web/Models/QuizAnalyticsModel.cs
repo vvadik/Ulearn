@@ -7,6 +7,7 @@ namespace uLearn.Web.Models
 		public SortedDictionary<string,List<QuizAnswerInfo>> UserAnswers { get; set; }
 		public QuizSlide QuizSlide { get; set; }
 		public Dictionary<string, int> RightAnswersCount { get; set; }
+		public Dictionary<string, string> Group { get; set; }
 	}
 
 	public class QuizAnswerInfo

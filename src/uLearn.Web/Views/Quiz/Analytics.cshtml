@@ -26,6 +26,8 @@
 		<thead>
 			<tr>
 				<th style="border-bottom: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа">наведи на меня!</th>
+				<th style="border-bottom: none">Группа</th>
+				<th style="border-bottom: none"></th>
 				@foreach (var block in Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
 					int count;
@@ -40,6 +42,8 @@
 			</tr>
 			<tr>
 				<th style="border-top: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа"></th>
+				<th style="border-top: none"></th>
+				<th style="border-top: none; border-bottom: none"></th>
 				@foreach (var block in Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
 					if (block is ChoiceBlock)
@@ -62,12 +66,12 @@
 					{
 						break;
 					}
-					<th style="border-top: none; border-bottom: none"></th>
+					<th style="border-top: none;border-bottom: none"></th>
 				}
 			</tr>
 		</thead>
 		<tbody>
-@*
+			@*
 			<tr>
 				<td>Total</td>
 				@{ var usersCount = Model.UserAnswers.Keys.Count;}
@@ -124,6 +128,8 @@
 			{
 				<tr>
 					<td>@user</td>
+					<td>@Model.Group[user]</td>
+					<td style="border-top: none; border-bottom: none"></td>
 					@foreach (var ans in Model.UserAnswers[user])
 					{
 						if (ans is FillInBlockAnswerInfo)

@@ -191,14 +191,16 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			var quizSlide = (QuizSlide)course.Slides[slideIndex];
 			var dict = new SortedDictionary<string, List<QuizAnswerInfo>>();
+			var groups = new Dictionary<string, string>();
 			var passedUsers = db.UserQuizzes
 				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped)
 				.Select(q => q.UserId)
 				.Distinct()
-				.Join(db.Users, userId => userId, u => u.Id, (userId, u) => new { UserId = userId, u.UserName });
+				.Join(db.Users, userId => userId, u => u.Id, (userId, u) => new { UserId = userId, u.UserName, u.GroupName });
 			foreach (var user in passedUsers)
 			{
 				dict[user.UserName] = GetUserQuizAnswers(courseId, quizSlide, user.UserId).ToList();
+				groups[user.UserName] = user.GroupName;
 			}
 			var rightAnswersCount = dict.Values
 				.SelectMany(list => list
@@ -210,7 +212,8 @@ namespace uLearn.Web.Controllers
 			{
 				UserAnswers = dict,
 				QuizSlide = quizSlide,
-				RightAnswersCount = rightAnswersCount
+				RightAnswersCount = rightAnswersCount,
+				Group = groups
 			});
 		}
 
