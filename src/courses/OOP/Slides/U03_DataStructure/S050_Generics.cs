@@ -33,26 +33,19 @@ namespace OOP.Slides.U03_DataStructure
         Одна из возможностей сделать в тип упорядочиваемым — реализовать в типе интерфейс
         [Comparable](http://docs.oracle.com/javase/7/docs/api/java/lang/Comparable.html).
         Значит, необходимо наложить на TKey следующее ограничение: он должен реализовывать интерфейс Comparable<TKey>:
-        */
 
-        public interface OrderedSimpleMap<TKey, TValue> where TKey : Comparable<TKey>
+
+		public interface OrderedSimpleMap<TKey extends Comparable<TKey>, TValue>
 		{
             TValue get(TKey key);
             TValue put(TKey key, TValue value);
             TValue remove(TKey key);
 		}
 
-        /*
-
         ## Задача
         Данная задача является обязательной.
         Необходимо реализовать обобщенные варианты SimpleMap и Heap. 
         Не забудьте протестировать ваши реализации.
         */
-
-        [HideOnSlide]
-	    public interface Comparable<T>
-	    {
-	    }
 	}
 }
