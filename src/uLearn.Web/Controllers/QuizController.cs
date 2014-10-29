@@ -200,10 +200,17 @@ namespace uLearn.Web.Controllers
 			{
 				dict[user.UserName] = GetUserQuizAnswers(courseId, quizSlide, user.UserId).ToList();
 			}
+			var rightAnswersCount = dict.Values
+				.SelectMany(list => list
+					.Where(info => info.IsRight)
+					.Select(info => new { info.Id, info.IsRight }))
+				.GroupBy(arg => arg.Id)
+				.ToDictionary(grouping => grouping.Key, grouping => grouping.Count());
 			return PartialView(new QuizAnalyticsModel
 			{
 				UserAnswers = dict,
-				QuizSlide = quizSlide
+				QuizSlide = quizSlide,
+				RightAnswersCount = rightAnswersCount
 			});
 		}
 
