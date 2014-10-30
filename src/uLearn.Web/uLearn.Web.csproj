@@ -767,6 +767,7 @@
     <Content Include="Scripts\slide-tex.js" />
     <Content Include="Scripts\slide-stats.js" />
     <Content Include="Scripts\table-configurator.js" />
+    <Content Include="Scripts\invertedTablesorter.js" />
     <Content Include="Scripts\user-group-name-change.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="tablesorter-master\.gitignore" />
