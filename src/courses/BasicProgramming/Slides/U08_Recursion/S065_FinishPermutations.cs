@@ -116,7 +116,8 @@ namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 					//иначе index — это номер позиции элемента i в массиве.
 					if (index == -1)
 					{
-						// доделать...
+						// если число i ещё не было использовано, то...
+						// доделать.
 
 					}
 				}
