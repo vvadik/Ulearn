@@ -105,7 +105,7 @@
     <Compile Include="Slides\U03_DataStructure\S030_Heap.cs" />
     <Compile Include="Slides\U03_DataStructure\S050_Generics.cs" />
     <Compile Include="Slides\U03_DataStructure\S060_LimitedAutocompleteService.cs" />
-    <Content Include="CoursesTests.cs" />
+    <Compile Include="CoursesTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">
