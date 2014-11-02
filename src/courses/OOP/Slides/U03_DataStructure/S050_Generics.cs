@@ -23,31 +23,29 @@ namespace OOP.Slides.U03_DataStructure
 			TValue remove(TKey key);
 		}
 
-		/*
-		В данном примере TKey и TValue называются типами-параметрами, а SimpleMap<TKey, TValue> — обобщенным типом.
+        /*
+        В данном примере TKey и TValue называются типами-параметрами, а SimpleMap<TKey, TValue> — обобщенным типом.
 
-		При реализации обобщенных типов часто возникает необходимость наложения ограничений на типы-параметры.
-		Например, при реализации ассоциативного массива с помощью самобалансирующегося дерева поиска, необходимо 
-		чтобы экземпляры TKey был упорядочиваемыми. 
+        При реализации обобщенных типов часто возникает необходимость наложения ограничений на типы-параметры.
+        Например, при реализации ассоциативного массива с помощью самобалансирующегося дерева поиска, необходимо 
+        чтобы экземпляры TKey был упорядочиваемыми. 
 		
-		Одна из возможностей сделать в С# тип упорядочиваемым — реализовать в типе интерфейс
-		[IComparable](http://msdn.microsoft.com/ru-ru/library/system.icomparable.aspx).
-		Значит, необходимо наложить на TKey следующее ограничение: он должен реализовывать интерфейс IComparable<TKey>:
-		*/
+        Одна из возможностей сделать в тип упорядочиваемым — реализовать в типе интерфейс
+        [Comparable](http://docs.oracle.com/javase/7/docs/api/java/lang/Comparable.html).
+        Значит, необходимо наложить на TKey следующее ограничение: он должен реализовывать интерфейс Comparable<TKey>:
 
-		public interface IOrderedAssociativeArray<TKey, TValue> where TKey : IComparable<TKey>
+
+		public interface OrderedSimpleMap<TKey extends Comparable<TKey>, TValue>
 		{
-			TValue Find(TKey key);
-			TValue Insert(TKey key, TValue value);
-			TValue Remove(TKey key);
+            TValue get(TKey key);
+            TValue put(TKey key, TValue value);
+            TValue remove(TKey key);
 		}
 
-		/*
-
-		## Задача
-		Данная задача является обязательной.
-		Необходимо реализовать обобщенные варианты IAssosiativeArray и IHeap. 
-		Не забудьте протестировать ваши реализации.
-		*/
+        ## Задача
+        Данная задача является обязательной.
+        Необходимо реализовать обобщенные варианты SimpleMap и Heap. 
+        Не забудьте протестировать ваши реализации.
+        */
 	}
 }
