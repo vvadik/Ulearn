@@ -14,13 +14,13 @@ namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 		/*
 		## Заметки по лекции
 		*/
-		static int[,] prices = new int[,]
-        {
-            { 0, 2, 4, 7 },
-            { 2, 0, 3, 1 },
-            { 4, 2, 0, 1 },
-            { 3, 5, 2, 0 }
-        };
+		static int[,] prices =
+		{
+			{ 0, 2, 4, 7 },
+			{ 2, 0, 3, 1 },
+			{ 4, 2, 0, 1 },
+			{ 3, 5, 2, 0 }
+		};
 
 		static void Evaluate(int[] permutation)
 		{
@@ -44,7 +44,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U08_Recursion
 			for (int i = 0; i < permutation.Length; i++)
 			{
 				var index = Array.IndexOf(permutation, i, 0, position);
-				if (index  == -1)
+				if (index != -1)
 					continue;
 				permutation[position] = i;
 				MakePermutations(permutation, position + 1);
