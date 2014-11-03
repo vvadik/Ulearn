@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Linq", "courses\linq\Linq.csproj", "{0BD679E4-9ACB-4B02-835B-CBCA1DE8B817}"
 EndProject
@@ -24,6 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6BAF40
 	ProjectSection(SolutionItems) = preProject
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Selenium", "Selenium\Selenium.csproj", "{52CCE1E4-9397-4794-A0D4-9E4776E813BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +57,10 @@ Global
 		{7D7AF3EA-890B-4844-84CE-80547C7E4DF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D7AF3EA-890B-4844-84CE-80547C7E4DF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D7AF3EA-890B-4844-84CE-80547C7E4DF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52CCE1E4-9397-4794-A0D4-9E4776E813BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52CCE1E4-9397-4794-A0D4-9E4776E813BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52CCE1E4-9397-4794-A0D4-9E4776E813BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52CCE1E4-9397-4794-A0D4-9E4776E813BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
