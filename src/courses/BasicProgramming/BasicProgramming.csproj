@@ -125,6 +125,8 @@
     <Content Include="Slides\U07_Complexity\S025_Complexity.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Slides\U08_Recursion\S035_Recursion.quiz.xml" />
+    <Content Include="Slides\U08_Recursion\tsp.png" />
     <Content Include="Slides\U09_Sorting\bubblesort.gif" />
     <Content Include="Slides\U09_Sorting\mergesort.gif" />
     <Content Include="Slides\U09_Sorting\quicksort.gif" />

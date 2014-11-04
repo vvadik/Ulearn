@@ -9,7 +9,7 @@
 		Роботу нужно проехать через указанные точки, посетив каждую хотя бы один раз.
 		Нужно спланировать маршрут так, чтобы суммарный путь был минимален.
 		
-		[![http://xkcd.com/399/](http://imgs.xkcd.com/comics/travelling_salesman_problem.png)](http://xkcd.com/399/)
+		[![TSP problem](tsp.png)](http://xkcd.com/399/)
 
 		Скачайте проект [route-planning](route-planning.zip).
 
