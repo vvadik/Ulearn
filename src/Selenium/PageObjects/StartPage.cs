@@ -12,11 +12,12 @@ namespace Selenium.PageObjects
 	public class StartPage
 	{
 		private readonly IWebDriver driver;
+		private const string courseBlockClass = "col-md-6";
 
 		public StartPage(IWebDriver driver)
 		{
 			this.driver = driver;
-			if (!driver.Title.Equals(Titles.startPageTitle))
+			if (!driver.Title.Equals(Titles.StartPageTitle))
 				throw new IllegalLocatorException("Это не стартовая страница, это: "
 								+ driver.Title);
 
@@ -27,17 +28,21 @@ namespace Selenium.PageObjects
 		/// </summary>
 		public SignInPage GoToSignInPage()
 		{
-			var loginLinkButton = driver.FindElement(ElementsId.signInButton);
+			var loginLinkButton = driver.FindElement(ElementsId.SignInButton);
 			loginLinkButton.Click();
 			return new SignInPage(driver);
 		}
 
+		/// <summary>
+		/// Перейти на страницу курса
+		/// </summary>
+		/// <param name="courseTitle">recommended to use title from class Titles</param>
 		public SlidePage GoToCourse(string courseTitle)
 		{
-			var courseBlocks = driver.FindElements(By.ClassName("col-md-6")).ToList();
-			if (courseTitle == Titles.basicProgrammingTitle)
+			var courseBlocks = driver.FindElements(By.ClassName(courseBlockClass)).ToList();
+			if (courseTitle == Titles.BasicProgrammingTitle)
 				return ClickCourseButton(courseTitle, courseBlocks, 0);
-			if (courseTitle == Titles.linqTitle)
+			if (courseTitle == Titles.LinqTitle)
 				return ClickCourseButton(courseTitle, courseBlocks, 1);
 			throw new NotImplementedException(string.Format("Для курса {0} нет реализации в методе GoToCourse", courseTitle));
 		}

@@ -16,7 +16,7 @@ namespace Selenium.PageObjects
 		public SignInPage(IWebDriver driver)
 		{
 			this.driver = driver;
-			if (!driver.Title.Equals(Titles.signInPageTitle))
+			if (!driver.Title.Equals(Titles.SignInPageTitle))
 				throw new IllegalLocatorException("Это не страница входа, это: "
 								+ driver.Title);
 		}
@@ -28,9 +28,9 @@ namespace Selenium.PageObjects
 		/// <param name="password">Пароль</param>
 		public StartPage LoginValidUser(String userName, String password)
 		{
-			var nameField = driver.FindElement(ElementsId.userNameField);
+			var nameField = driver.FindElement(ElementsId.UserNameField);
 			nameField.SendKeys(userName);
-			var passField = driver.FindElement(ElementsId.userPasswordField);
+			var passField = driver.FindElement(ElementsId.UserPasswordField);
 			passField.SendKeys(password);
 			var loginKey = driver.FindElements(By.ClassName("btn")).FirstOrDefault(x => x.Text != "ВКонтакте");
 			if (loginKey != null)

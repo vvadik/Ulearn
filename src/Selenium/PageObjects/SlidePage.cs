@@ -9,13 +9,28 @@ namespace Selenium.PageObjects
 {
 	public class SlidePage
 	{
-		private IWebDriver driver;
+		private const string TOCXPath = "/html/body/ul";
+
+		private readonly IWebDriver driver;
 
 		public SlidePage(IWebDriver driver, string courseTitle)
 		{
 			this.driver = driver;
 			if (!driver.Title.Equals(courseTitle))
 				throw new IllegalLocatorException(string.Format("Это не слайд курса {0}, это: {1}", courseTitle, driver.Title));
+		}
+
+		public TOC GetTOC()
+		{
+			var TOCDriver = driver.FindElement(By.XPath(TOCXPath));
+			return new TOC(TOCDriver, TOCXPath);
+		}
+
+		public void RateSlide(Rate rate)
+		{
+			string rateClass = StringValue.GetStringValue(rate);
+			var rateButton = driver.FindElement(By.ClassName(rateClass));
+			rateButton.Click();
 		}
 	}
 }

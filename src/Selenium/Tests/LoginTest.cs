@@ -22,7 +22,7 @@ namespace Selenium.Tests
 
 			var startPage = new StartPage(driver);
 			var signInPage = startPage.GoToSignInPage();
-			signInPage.LoginValidUser(Admin.login, Admin.password);
+			signInPage.LoginValidUser(Admin.login, Admin.Password);
 
 			driver.Dispose();
 		}
@@ -54,9 +54,9 @@ namespace Selenium.Tests
 
 			var startPage = new StartPage(driver);
 			var signInPage = startPage.GoToSignInPage();
-			var authorisedStartPage = signInPage.LoginValidUser(Admin.login, Admin.password);
+			var authorisedStartPage = signInPage.LoginValidUser(Admin.login, Admin.Password);
 
-			authorisedStartPage.GoToCourse(Titles.basicProgrammingTitle);
+			authorisedStartPage.GoToCourse(Titles.BasicProgrammingTitle);
 
 			driver.Dispose();
 		}
@@ -69,9 +69,9 @@ namespace Selenium.Tests
 
 			var startPage = new StartPage(driver);
 			var signInPage = startPage.GoToSignInPage();
-			var authorisedStartPage = signInPage.LoginValidUser(Admin.login, Admin.password);
+			var authorisedStartPage = signInPage.LoginValidUser(Admin.login, Admin.Password);
 
-			authorisedStartPage.GoToCourse(Titles.linqTitle);
+			authorisedStartPage.GoToCourse(Titles.LinqTitle);
 
 			driver.Dispose();
 		}
