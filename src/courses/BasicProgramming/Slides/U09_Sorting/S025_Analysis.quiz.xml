@@ -26,7 +26,7 @@ int FindIndex(string[] array, string element)
 	<choice id="3" multiple="false" shuffle="true">
 		<text>Оцените сложность алгоритма FindIndex. Обратите внимание на тип аргумента array.</text>
 		<item id="1" isCorrect="false">$O(n)$, где $n$ — максимальная длина строк в массиве $array$</item>
-		<item id="2" isCorrect="true">$\Theta(n)$, где $n$ — общая длина всех строк в массиве $array$</item>
+		<item id="2" isCorrect="true">$\Theta(n)$, где $n$ — сумма длин всех строк в массиве $array$</item>
 		<item id="3" isCorrect="false">$o(n)$, где $n$ — количество элементов в $array$</item>
 		<item id="4" isCorrect="false">$O(n + m)$, где $n$ — количество элементов в $array$, а $m$ — максимальная длина строк в массиве $array$</item>
 	</choice>
