@@ -729,7 +729,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Properties\PublishProfiles\ulearn - FTP.pubxml" />
-    <None Include="Properties\PublishProfiles\ulearn - Web Deploy %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\ulearn - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\buttons.js" />
