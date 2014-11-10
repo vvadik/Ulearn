@@ -8,7 +8,7 @@
     // primary, secondary and tertiary columns
     widgets: ['zebra'],
     // other options: "ddmmyyyy" & "yyyymmdd"
-    dateFormat: "mmddyyyy",
+    dateFormat: "ddmmyyyy",
 
     // *** Functionality ***
     // starting sort direction "asc" or "desc"
@@ -84,5 +84,7 @@
     cancelSelection: true,
 
     // *** send messages to console ***
-    debug: false
+    debug: false,
+
+	textAttribute: 'data-sort-value'
 });

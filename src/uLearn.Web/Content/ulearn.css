@@ -458,11 +458,11 @@ div.quiz .right-quiz {
 }
 
 .green-stat {
-	background-color: lightgreen;
+	background-color: lightgreen !important;
 }
 
 .red-stat {
-	background-color: lightcoral;
+	background-color: lightcoral !important;
 }
 
 .wide-container {
