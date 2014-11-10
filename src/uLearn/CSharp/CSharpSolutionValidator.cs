@@ -18,6 +18,14 @@ namespace uLearn.CSharp
 			validators.Add(validator);
 		}
 
+		public string FindFullSourceError(string userCode)
+		{
+			userCode = userCode.Trim();
+			if (userCode.StartsWith("using") || userCode.StartsWith("namespace"))
+				return "Нужно написать только один метод, а не весь исходник";
+			return null;
+		}
+
 		public string FindSyntaxError(string solution)
 		{
 			IEnumerable<Diagnostic> diagnostics = CSharpSyntaxTree.ParseText(solution).GetDiagnostics();
