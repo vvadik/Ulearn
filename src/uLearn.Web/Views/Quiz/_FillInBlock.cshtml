@@ -1,4 +1,5 @@
 ﻿@using uLearn.Quizes
+@using uLearn.Web.Controllers
 @model QuizInfoModel
 @{
 	var value = "";
@@ -12,7 +13,7 @@
 	var sample = quizBlock.Sample;
 	<div class="quiz quiz-block-input">
 		<label>
-			<input autocomplete="off" class="form-control @quizRes" value="@value" id='@(quizBlock.Id + "quizBlock")'>
+			<input autocomplete="off" class="form-control @quizRes" value="@value" id='@(quizBlock.Id + "quizBlock")' maxlength="@QuizController.MAX_FILLINBLOCK_SIZE">
 		</label>
 	</div>
 	if (Model.QuizState == QuizState.Total)
