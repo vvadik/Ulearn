@@ -73,6 +73,7 @@
     <Compile Include="Slides\U11_OOP\S040_ExtensionMethods.cs" />
     <Compile Include="Slides\U11_OOP\S050_DirectoryAndFile.cs" />
     <Compile Include="Slides\U11_OOP\S060_StaticClass.cs" />
+    <Compile Include="Slides\U11_OOP\_Fields.cs" />
     <Compile Include="Slides\U12_Inheritance\S010_Why.cs" />
     <Compile Include="Slides\U12_Inheritance\S020_Inheritance.cs" />
     <Compile Include="Slides\U12_Inheritance\S030_Hierarchy.cs" />
@@ -144,7 +145,15 @@
     <Content Include="Slides\U09_Sorting\Title.txt" />
     <Content Include="Slides\U10_Practice\manipulator.png" />
     <Content Include="Slides\U10_Practice\Title.txt" />
+    <Content Include="Slides\U11_OOP\classes.png" />
+    <Content Include="Slides\U11_OOP\S035_Methods.quiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Slides\U11_OOP\S025_Fields.quiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Slides\U11_OOP\Title.txt" />
+    <Content Include="Slides\U11_OOP\triangle.png" />
     <Content Include="Slides\U12_Inheritance\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
     <Content Include="Slides\U01_Mistakes\S091_Style2.quiz.xml">

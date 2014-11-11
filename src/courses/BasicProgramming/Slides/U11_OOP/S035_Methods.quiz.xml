@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Quiz
+	xmlns="https://ulearn.azurewebsites.net/quiz"
+	id="E038A6B59B77471CA8F132A8419EBBD2">
+	<title>Методы классов</title>
+	<isTrue id="1" answer="true">
+		<text>Динамический метод можно вызвать только в контексте объекта (экземпляра класса)</text>
+	</isTrue>
+
+	<isTrue id="2" answer="false">
+		<text>Чем больше в классе динамических методов, тем больше места в памяти занимает каждый экземпляр этого класса</text>
+	</isTrue>
+	
+	<p>Изучите код ниже:</p>
+	<code xml:space="preserve">
+class SomeClass {
+	public static int s = 1;
+	public int d = 1;
+
+	public void Run() {
+		Console.Write(s + " " + d + " ");
+		s++; d++;
+	}
+
+	public static void Main() {
+		var object1 = new SomeClass();
+		var object2 = new SomeClass();
+		object1.Run();
+		object2.Run();
+		object1.Run();
+	}
+}
+	</code>
+	<fillIn id="4" explanation="s — общее поле для обоих объектов. d — свое для каждого объекта.">
+		<text>Что напечатает вызов метода Main в листинге выше?</text>
+		<sample>1 1 2 1 3 2 </sample>
+		<regex>1 1 2 1 3 2\s*</regex>
+	</fillIn>
+
+	<isTrue id="5" answer="true">
+		<text>Метод Run динамический?</text>
+	</isTrue>
+
+	<isTrue id="6" answer="true">
+		<text>Метод Main статический?</text>
+	</isTrue>
+</Quiz>
