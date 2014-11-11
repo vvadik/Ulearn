@@ -268,6 +268,18 @@ namespace uLearn.CSharp
 			Assert.That(renderedText, Contains.Substring(expected));
 		}
 
+		[Test]
+		public void include_many_classes_on_slide()
+		{
+			var slide = GenerateSlide("ManyClasses.cs");
+			var code = slide.Blocks[0].Text();
+			Assert.That(code, Is.StringContaining("M0()"));
+			Assert.That(code, Is.StringContaining("M()"));
+			Assert.That(code, Is.StringContaining("ManyClasses3"));
+			Assert.That(code, Is.Not.StringContaining("ManyClasses1"));
+			Assert.That(code, Is.Not.StringContaining("ManyClasses2"));
+		}
+
 
 		private static Slide GenerateSlide(string name)
 		{

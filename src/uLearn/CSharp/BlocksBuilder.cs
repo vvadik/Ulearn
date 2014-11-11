@@ -24,7 +24,10 @@ namespace uLearn.CSharp
 		{
 			var parent = node.GetParents().OfType<BaseTypeDeclarationSyntax>().FirstOrDefault();
 			if (!ShowOnSlide(node)) return null;
-			if (parent.HasAttribute<SlideAttribute>()) AddCodeBlock(((MemberDeclarationSyntax)newNode));
+			if (parent == null 
+				|| parent.HasAttribute<SlideAttribute>() 
+				|| parent.HasAttribute<ShowBodyOnSlideAttribute>())
+				AddCodeBlock(((MemberDeclarationSyntax)newNode));
 			return ((MemberDeclarationSyntax)newNode).WithoutAttributes();
 		}
 
@@ -148,7 +151,8 @@ namespace uLearn.CSharp
 		{
 			return !node.HasAttribute<SlideAttribute>()
 			&& !node.HasAttribute<HideOnSlideAttribute>() 
-			&& !node.HasAttribute<ExerciseAttribute>();
+			&& !node.HasAttribute<ExerciseAttribute>()
+			&& !(node is TypeDeclarationSyntax && node.HasAttribute<ShowBodyOnSlideAttribute>());
 		}
 
 		private void EmbedCode(string filename)
