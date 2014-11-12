@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("Фильтрация и преобразование", "{E0114584-4500-40B2-B6D6-DB8AF455978B}")]
 	public class S011_SelectWhereToArray

@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using uLearn.Courses.Linq.Slides;
+using uLearn.Courses.Linq.Slides.LINQ;
 
 namespace uLearn.Courses.Linq
 {

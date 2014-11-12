@@ -2,7 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("Функции агрегирования", "{A6BACA4C-D211-428B-AE49-1F6882FD67F1}")]
 	[TestFixture]

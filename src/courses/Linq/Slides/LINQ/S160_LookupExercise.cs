@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.Linq.Slides.LINQ
+namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 {
 	[Slide("Создание обратного индекса", "{52CAF978-4BB7-4CC1-92FB-607153DA0A1E}")]
 	public class S160_LookupExercise : SlideTestBase

@@ -1,4 +1,4 @@
-﻿namespace uLearn.Courses.Linq.Slides.LINQ
+﻿namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 {
 	[Slide("Задача для самостоятельного решения", "{FCE846DF-84C4-426B-9D5C-CC99E2FBA454}")]
 	public class S200_HomeExercise : SlideTestBase
