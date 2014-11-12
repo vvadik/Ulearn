@@ -67,6 +67,7 @@
     <Compile Include="Slides\U09_Sorting\S045_BinSearch.cs" />
     <Compile Include="Slides\U09_Sorting\S055_BubbleSortRange.cs" />
     <Compile Include="Slides\U10_Practice\S099_Exercise.cs" />
+    <Compile Include="Slides\U11_OOP\S017_ShortSyntax.cs" />
     <Compile Include="Slides\U11_OOP\exclude_S016_CreateClass.cs" />
     <Compile Include="Slides\U11_OOP\S010_Classes.cs" />
     <Compile Include="Slides\U11_OOP\exclude_S015_CopyOfOldTask.cs" />
