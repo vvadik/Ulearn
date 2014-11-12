@@ -159,6 +159,12 @@
     </Content>
     <Content Include="Slides\U11_OOP\Title.txt" />
     <Content Include="Slides\U11_OOP\triangle.png" />
+    <Content Include="Slides\U12_Inheritance\S035_Casts.quiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Slides\U12_Inheritance\S025_InheritanceQuiz.quiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Slides\U12_Inheritance\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
     <Content Include="Slides\U01_Mistakes\S091_Style2.quiz.xml">
