@@ -1,15 +1,15 @@
 ﻿//using System;
-
+//
 //namespace uLearn.Courses.BasicProgramming.Slides.U11_OOP
 //{
 //    [Slide("Создание классов", "{06AA4E3E-C1F8-4895-BA1F-B7D5DF22BB28}")]
 //    public class S045_CreateExtension : SlideTestBase
 //    {
 //        /*
-         
+//         
 //         Сделайте так, чтобы заработало. 
 //         */
-
+//
 //        [ExpectedOutput("")]
 //        [Hint("Класс SuperBeautyImageFilter должен перестать быть статическим")]
 //        static void Main()
@@ -19,7 +19,7 @@
 //            filter.GaussianParameter = 0.4;
 //            filter.Run();
 //        }
-
+//
 //        [HideOnSlide]
 //        [ExcludeFromSolution]
 //        public class SuperBeautyImageFilter
@@ -29,9 +29,9 @@
 //            public double GaussianParameter;
 //            public void Run()
 //            {
-
+//
 //            }
-
+//
 //            //в окошке редактирования должно быть это:
 //            public static string ImageName;
 //            public static double GaussianParameter;
@@ -40,6 +40,6 @@
 //                //do something useful
 //            }
 //        }
-
+//
 //    }
 //}
