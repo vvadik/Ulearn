@@ -16,12 +16,12 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		
 		Напомним сигнатуры некоторых `LINQ`-методов, которые могут понадобиться в этом упражнении:
 
-		    IEnumerable<IGrouping<K, T>>       GroupBy(this IEnumerable<T> items, Func<T, K> keySelector)
-		    IOrderedEnumerable<T>           OrderBy<T>(this IEnumerable<T> items, Func<T, K> keySelector)
-		    IOrderedEnumerable<T> OrderByDescending<T>(this IEnumerable<T> items, Func<T, K> keySelector)
-		    IOrderedEnumerable<T>            ThenBy<T>(this IOrderedEnumerable<T> items, Func<T, K> keySelector)
-		    IOrderedEnumerable<T>  ThenByDescending<T>(this IOrderedEnumerable<T> items, Func<T, K> keySelector)
-		    IEnumerable<T>                        Take(this IEnumerable<T> items, int count)
+		    IEnumerable<IGrouping<K, T>>    GroupBy(this IEnumerable<T> items, Func<T, K> keySelector)
+		    IOrderedEnumerable<T>           OrderBy(this IEnumerable<T> items, Func<T, K> keySelector)
+		    IOrderedEnumerable<T> OrderByDescending(this IEnumerable<T> items, Func<T, K> keySelector)
+		    IOrderedEnumerable<T>            ThenBy(this IOrderedEnumerable<T> items, Func<T, K> keySelector)
+		    IOrderedEnumerable<T>  ThenByDescending(this IOrderedEnumerable<T> items, Func<T, K> keySelector)
+		    IEnumerable<T>                     Take(this IEnumerable<T> items, int count)
 		*/
 
 		[Exercise]
