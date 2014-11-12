@@ -182,7 +182,7 @@ namespace uLearn.CSharp
 				if (line.Trim() != "")
 				{
 					if (line.Length < identation || line.Substring(0, identation).Trim() != "")
-						throw new Exception("Wrong identation in line: " + line);
+						throw new Exception("Wrong indentation in line: " + line);
 					sb.AppendLine(line.Substring(identation));
 				}
 				else

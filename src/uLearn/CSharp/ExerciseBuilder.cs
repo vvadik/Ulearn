@@ -28,13 +28,26 @@ namespace uLearn.CSharp
 			var sb = new SolutionBuilder { Validator = validator = new CSharpSolutionValidator() };
 			SyntaxNode result = Visit(tree.GetRoot());
 			Debug.Assert(ExerciseClassName != null);
-			ClassDeclarationSyntax exerciseClass = result.DescendantNodes().OfType<ClassDeclarationSyntax>().First(n => n.Identifier.Text == ExerciseClassName);
-			int exerciseClassBodyStartIndex = exerciseClass.OpenBraceToken.Span.End;
+			var exerciseClassBodyStartIndex = GetExerciseInsertIndex(result);
 			const string pragma = "\n#line 1\n";
 			sb.ExerciseCode = prelude + result.ToFullString().Insert(exerciseClassBodyStartIndex, pragma);
 			sb.IndexForInsert = prelude.Length + exerciseClassBodyStartIndex + pragma.Length;
 			Slide.Solution = sb;
 			return Slide;
+		}
+
+		private int GetExerciseInsertIndex(SyntaxNode result)
+		{
+			ClassDeclarationSyntax exerciseClass =
+				result.DescendantNodes()
+					.OfType<ClassDeclarationSyntax>()
+					.FirstOrDefault(n => n.Identifier.Text == ExerciseClassName);
+			if (exerciseClass !=null)
+				return exerciseClass.OpenBraceToken.Span.End;
+			var ns = result.DescendantNodes().OfType<NamespaceDeclarationSyntax>().FirstOrDefault();
+			if (ns != null)
+				return ns.OpenBraceToken.Span.End;
+			return 0;
 		}
 
 		public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
