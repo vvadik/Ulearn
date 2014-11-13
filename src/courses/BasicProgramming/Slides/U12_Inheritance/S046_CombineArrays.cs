@@ -5,7 +5,7 @@ using uLearn.CSharp;
 namespace uLearn.Courses.BasicProgramming.Slides.U11_Inheritance
 {
     [Slide("Склейка массивов", "{3A0B67FC-73C1-498A-B015-7CCC06B7FFC9}")]
-    public class S045_CombineArrays : SlideTestBase
+    public class S046_CombineArrays : SlideTestBase
     {
         /*
         Реализуйте метод Combine, который возвращает массив, собранный из переданных массивов.
