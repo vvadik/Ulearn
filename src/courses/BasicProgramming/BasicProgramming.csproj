@@ -84,7 +84,7 @@
     <Compile Include="Slides\U12_Inheritance\S030_Hierarchy.cs" />
     <Compile Include="Slides\U12_Inheritance\S040_Array.cs" />
     <Compile Include="Slides\U12_Inheritance\S044_PrintEverything.cs" />
-    <Compile Include="Slides\U12_Inheritance\exclude_S045_CombineArrays.cs" />
+    <Compile Include="Slides\U12_Inheritance\S045_CombineArrays.cs" />
     <Compile Include="Slides\U12_Inheritance\S050_Interfaces.cs" />
     <Compile Include="Slides\U12_Inheritance\S070_ComparableImpl.cs" />
     <Compile Include="Slides\U12_Inheritance\S080_IComparable.cs" />
