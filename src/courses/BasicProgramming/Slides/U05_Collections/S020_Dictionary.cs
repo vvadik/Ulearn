@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using uLearn;
 
-namespace Slide02
+namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 {
 	[Slide("Словари", "{CA89802F-7462-4706-9AAF-51E76012D255}")]
 	public class S020_Dictionary

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -15,6 +14,7 @@ namespace uLearn.Web.Controllers
 	public class QuizController : Controller
 	{
 		private const int MAX_DROPS_COUNT = 1;
+		public const int MAX_FILLINBLOCK_SIZE = 1024;
 
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
@@ -169,6 +169,8 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(FillInBlock fillInBlock, string data)
 		{
+			if (data.Length > MAX_FILLINBLOCK_SIZE)
+				data = data.Substring(0, MAX_FILLINBLOCK_SIZE);
 			var isTrue = fillInBlock.Regexes.Any(regex => regex.Regex.IsMatch(data));
 			return new List<QuizInfoForDb>
 			{

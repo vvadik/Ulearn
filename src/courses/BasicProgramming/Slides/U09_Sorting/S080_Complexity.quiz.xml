@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Quiz
+ xmlns="https://ulearn.azurewebsites.net/quiz"
+ id="77057AF6F4DB4B27908B020E96C551C1">
+	<title>Сложность поиска и сортировки</title>
+	<choice id="1" multiple="false" shuffle="false">
+		<text>Оцените сложность линейного поиска элемента в массиве размера $n$</text>
+		<item id="0" isCorrect="false">$\Theta(1)$</item>
+		<item id="1" isCorrect="true">$\Theta(n)$</item>
+		<item id="2" isCorrect="false">$\Theta(\log n)$</item>
+		<item id="3" isCorrect="false">$\Theta(n\log n)$</item>
+		<item id="4" isCorrect="false">$\Theta(n^2)$</item>
+	</choice>
+
+	<choice id="2" multiple="false" shuffle="false">
+		<text>Оцените сложность бинарного поиска элемента в отсортированном массиве размера $n$</text>
+		<item id="0" isCorrect="false">$\Theta(1)$</item>
+		<item id="1" isCorrect="false">$\Theta(n)$</item>
+		<item id="2" isCorrect="true">$\Theta(\log n)$</item>
+		<item id="3" isCorrect="false">$\Theta(n\log n)$</item>
+		<item id="4" isCorrect="false">$\Theta(n^2)$</item>
+	</choice>
+
+	<choice id="3" multiple="false" shuffle="false">
+		<text>Оцените сложность пузырьковой сортировки массива размера $n$</text>
+		<item id="0" isCorrect="false">$\Theta(1)$</item>
+		<item id="1" isCorrect="false">$\Theta(n)$</item>
+		<item id="2" isCorrect="false">$\Theta(\log n)$</item>
+		<item id="3" isCorrect="false">$\Theta(n\log n)$</item>
+		<item id="4" isCorrect="true">$\Theta(n^2)$</item>
+	</choice>
+
+	<choice id="4" multiple="false" shuffle="false">
+		<text>Оцените сложность сортировки слиянием массива размера $n$</text>
+		<item id="0" isCorrect="false">$\Theta(1)$</item>
+		<item id="1" isCorrect="false">$\Theta(n)$</item>
+		<item id="2" isCorrect="false">$\Theta(\log n)$</item>
+		<item id="3" isCorrect="true">$\Theta(n\log n)$</item>
+		<item id="4" isCorrect="false">$\Theta(n^2)$</item>
+	</choice>
+
+	<choice id="5" multiple="false" shuffle="false">
+		<text>Оцените сложность быстрой сортировки массива размера $n$</text>
+		<item id="0" isCorrect="false">$\Theta(1)$</item>
+		<item id="1" isCorrect="false">$\Theta(n)$</item>
+		<item id="2" isCorrect="false">$\Theta(\log n)$</item>
+		<item id="3" isCorrect="false">$\Theta(n\log n)$</item>
+		<item id="4" isCorrect="true">$\Theta(n^2)$</item>
+	</choice>
+
+	<choice id="6" multiple="true" shuffle="false">
+		<text>Чем «быстрая сортировка» лучше «сортировки слиянием»?</text>
+		<item id="0" isCorrect="true">«Быстрая сортировка» в среднем работает быстрее</item>
+		<item id="1" isCorrect="false">«Быстрая сортировка» имеет лучшую асимптотическую оценку сложности</item>
+		<item id="2" isCorrect="true">«Быстрая сортировка» использует меньше дополнительной памяти</item>
+		<item id="3" isCorrect="false">Ничем не лучше</item>
+		<item id="4" isCorrect="false">«Быстрая сортировка» всегда работает быстрее «сортировки слиянием»</item>
+	</choice>
+</Quiz>

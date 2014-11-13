@@ -609,8 +609,6 @@
     <Content Include="codemirror\mode\solr\solr.js" />
     <Content Include="codemirror\mode\sparql\index.html" />
     <Content Include="codemirror\mode\sparql\sparql.js" />
-    <Content Include="codemirror\mode\sql\index.html" />
-    <Content Include="codemirror\mode\sql\sql.js" />
     <Content Include="codemirror\mode\stex\index.html" />
     <Content Include="codemirror\mode\stex\stex.js" />
     <Content Include="codemirror\mode\stex\test.js" />
@@ -853,7 +851,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="bin\" />
     <Folder Include="Courses\" />
   </ItemGroup>
   <ItemGroup>

@@ -92,13 +92,20 @@
     <Compile Include="Slides\U02_Polymorphism\S050_OptimizeForNoise.cs" />
     <Compile Include="Slides\U02_Polymorphism\S040_Noise.cs" />
     <Compile Include="Slides\U02_Polymorphism\S060_Visualize.cs" />
-    <Compile Include="Slides\U03_DataStructure\S010_DataStructures.cs">
+    <Compile Include="Slides\U03_DataStructure\S040_IHeap.cs" />
+    <Compile Include="Slides\U03_DataStructure\S020_IAssociativeArray.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Slides\U03_DataStructure\S010_AssociativeArray.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Slides\U02_Polymorphism\S010_IRobotNavigator.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Content Include="CoursesTests.cs" />
+    <Compile Include="Slides\U03_DataStructure\S030_Heap.cs" />
+    <Compile Include="Slides\U03_DataStructure\S050_Generics.cs" />
+    <Compile Include="Slides\U03_DataStructure\S060_LimitedAutocompleteService.cs" />
+    <Compile Include="CoursesTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">
@@ -116,6 +123,7 @@
     <Content Include="Slides\U01_DataTypes_And_Algorithms\Title.txt" />
     <Content Include="Slides\U00_Intro\Title.txt" />
     <Content Include="Slides\U02_Polymorphism\Title.txt" />
+    <Content Include="Slides\U03_DataStructure\heap.png" />
     <Content Include="Slides\U03_DataStructure\Title.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

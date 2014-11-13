@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using uLearn;
 
-namespace Slide01
+namespace uLearn.Courses.BasicProgramming.Slides.U05_Collections
 {
 	//#video KwFrLY_aRyo
 	/*

@@ -63,6 +63,7 @@ namespace uLearn.Web.Ideone
 		}
 
 		[Test]
+		[Explicit]
 		public void get_supported_languages()
 		{
 			foreach (var lang in service.GetSupportedLanguages())

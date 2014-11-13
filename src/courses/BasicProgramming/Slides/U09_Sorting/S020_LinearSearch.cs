@@ -9,5 +9,20 @@ namespace uLearn.Courses.BasicProgramming.Slides.U09_Sorting
 		/*
 		## Заметки по лекции
 		*/
+
+		static int FindIndex(int[] array, int element)
+		{
+			for (int i = 0; i < array.Length; i++)
+				if (array[i] == element)
+					return i;
+			return -1;
+		}
+		static int FindIndex(string[] array, string element)
+		{
+			for (int i = 0; i < array.Length; i++)
+				if (array[i] == element)
+					return i;
+			return -1;
+		}
 	}
 }
