@@ -77,6 +77,7 @@
     <Compile Include="Slides\U11_OOP\S040_ExtensionMethods.cs" />
     <Compile Include="Slides\U11_OOP\S050_DirectoryAndFile.cs" />
     <Compile Include="Slides\U11_OOP\S060_StaticClass.cs" />
+    <Compile Include="Slides\U11_OOP\excluded_S055_FileInfo.cs" />
     <Compile Include="Slides\U11_OOP\_Fields.cs" />
     <Compile Include="Slides\U12_Inheritance\S010_Why.cs" />
     <Compile Include="Slides\U12_Inheritance\S020_Inheritance.cs" />
