@@ -14,8 +14,6 @@ namespace uLearn.Courses.BasicProgramming.Slides.U11_Inheritance
 @"2
 A
 2")]
-        [Hint("Аргументами метода должны быть IComparable")]
-        [Hint("И возвращаемым значением тоже")]
         public static void Main()
         {
             Console.WriteLine(Min(new[] {3, 6, 2, 4}));
