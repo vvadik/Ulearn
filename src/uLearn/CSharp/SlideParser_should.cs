@@ -280,6 +280,25 @@ namespace uLearn.CSharp
 			Assert.That(code, Is.Not.StringContaining("ManyClasses2"));
 		}
 
+		[Test]
+		public void set_initial_exercise_code_even_if_no_exercise_method()
+		{
+			var slide = (ExerciseSlide)GenerateSlide("ExerciseWithoutExerciseMethod.cs");
+			Assert.That(slide.ExerciseInitialCode.Trim(), Is.StringStarting("class MyClass"));
+		}
+		[Test]
+		public void insert_userSolution_outside_class_if_exercise_is_under_class()
+		{
+			var slide = (ExerciseSlide)GenerateSlide("ExerciseWithoutExerciseMethod.cs");
+			var sol = slide.Solution.BuildSolution("public class MyClass{}").SourceCode;
+			Assert.IsNotNull(sol);
+			var indexOfMainClass = sol.IndexOf("ExerciseWithoutExerciseMethod");
+			var indexOfSolutionClass = sol.IndexOf("class MyClass");
+			Assert.That(indexOfSolutionClass, Is.LessThan(indexOfMainClass));
+			Assert.That(indexOfSolutionClass, Is.GreaterThanOrEqualTo(0));
+			Assert.That(indexOfMainClass, Is.GreaterThanOrEqualTo(0));
+		}
+
 
 		private static Slide GenerateSlide(string name)
 		{

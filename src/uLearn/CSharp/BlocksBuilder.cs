@@ -80,9 +80,12 @@ namespace uLearn.CSharp
 			var comment = trivia.ToString();
 			if (trivia.CSharpKind() == SyntaxKind.MultiLineCommentTrivia)
 			{
-				bool shouldCreateTextBlock = trivia.GetParents().Count(p => IsNestingParent(p, trivia)) <= 1;
-				if (shouldCreateTextBlock)
-					Blocks.Add(ExtractMarkDownFromComment(trivia));
+				if (!comment.StartsWith("/*uncomment"))
+				{
+					bool shouldCreateTextBlock = trivia.GetParents().Count(p => IsNestingParent(p, trivia)) <= 1;
+					if (shouldCreateTextBlock)
+						Blocks.Add(ExtractMarkDownFromComment(trivia));
+				}
 			}
 			else if (trivia.CSharpKind() == SyntaxKind.SingleLineCommentTrivia)
 			{
