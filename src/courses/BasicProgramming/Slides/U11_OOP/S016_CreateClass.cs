@@ -1,21 +1,28 @@
 ﻿using System;
+using System.Globalization;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U11_OOP
 {
 	[Slide("Создание классов", "B0529FF452D14462865B89920B240F57")]
 	public class S016_CreateClass : SlideTestBase
 	{
+		/*
+		Сделайте так, чтобы код заработал!
+		Для этого создайте недостающие классы City и GeoLocation.
+		*/
 
-		[ExpectedOutput("I love Yekaterinburg")]
+		[ExpectedOutput("I love Ekaterinburg located at (60.35, 56.5)")]
 		static void Main()
 		{
 			var city = new City();
-			city.Name = "Yekaterinburg";
-			city.FoundationDate = new DateTime(1723, 11, 18);
+			city.Name = "Ekaterinburg";
 			city.Location = new GeoLocation();
 			city.Location.Latitude = 56.50;
 			city.Location.Longitude = 60.35;
-			Console.WriteLine("I love " + city.Name);
+			Console.WriteLine("I love {0} located at ({1}, {2})", 
+				city.Name, 
+				city.Location.Longitude.ToString(CultureInfo.InvariantCulture),
+				city.Location.Latitude.ToString(CultureInfo.InvariantCulture));
 		}
 
 		[HideOnSlide]
@@ -31,7 +38,6 @@ namespace uLearn.Courses.BasicProgramming.Slides.U11_OOP
 		{
 			public GeoLocation Location;
 			public string Name;
-			public DateTime FoundationDate;
 		}
 	}
 }

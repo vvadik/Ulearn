@@ -15,6 +15,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U11_OOP
 		{
 			public int X;
 			public int Y;
+
 			public void Print()
 			{
 				Console.WriteLine("{0} {1}", X, Y);

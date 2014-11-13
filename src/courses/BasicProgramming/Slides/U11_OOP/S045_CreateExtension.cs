@@ -3,35 +3,30 @@ using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U11_OOP
 {
-	[Slide("Создание классов", "{06AA4E3E-C1F8-4895-BA1F-B7D5DF22BB28}")]
+	[Slide("Создание методов расширения", "{06AA4E3E-C1F8-4895-BA1F-B7D5DF22BB28}")]
 	public class S045_CreateExtension : SlideTestBase
 	{
 		/*
-		Сделайте так, чтобы заработало. 
+		И снова сделайте так, чтобы код заработал!
 		*/
 
-		[ExpectedOutput("15")]
-		[Hint("Создайте extension-метод, который бы присоединялся к типу массива int, и вычислял бы сумму элементов этого массива.")]
-		[Hint("Extension методы — статические, определяются в статических классах, имеют первый аргумент с ключевым словом this")]
-		static void Main()
+		[ExpectedOutput("100542")]
+		[Hint("Создайте метод расширения класса String, преобразующий строку в int.")]
+		[Hint("Метод расширения должен быть определен в статическом классе, а перед его первым аргументом должно быть ключевое слово this")]
+		public static void Main()
 		{
-			var array = new int[] { 1, 2, 3, 4, 5 };
-			Console.Write(array.Sum());
+			var arg1 = "100500";
+			Console.Write(arg1.ToInt() + "42".ToInt()); // 100542
 		}
 
 	}
 	
-	[HideOnSlide]
-	[ExcludeFromSolution]
-	public static class ArrayExtensionHidden
+	[Exercise]
+	public static class StringExtensions
 	{
-		[Exercise]
-		public static int Sum(this int[] array)
+		public static int ToInt(this string text)
 		{
-			var sum = 0;
-			foreach (var e in array)
-				sum += e;
-			return sum;
+			return Int32.Parse(text);
 		}
 	}
 }
