@@ -2,7 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("SelectMany", "{51DF2D25-94F2-4D92-9304-397540C7233C}")]
 	[TestFixture]

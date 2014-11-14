@@ -24,7 +24,10 @@ namespace uLearn.CSharp
 		{
 			var parent = node.GetParents().OfType<BaseTypeDeclarationSyntax>().FirstOrDefault();
 			if (!ShowOnSlide(node)) return null;
-			if (parent.HasAttribute<SlideAttribute>()) AddCodeBlock(((MemberDeclarationSyntax)newNode));
+			if (parent == null 
+				|| parent.HasAttribute<SlideAttribute>() 
+				|| parent.HasAttribute<ShowBodyOnSlideAttribute>())
+				AddCodeBlock(((MemberDeclarationSyntax)newNode));
 			return ((MemberDeclarationSyntax)newNode).WithoutAttributes();
 		}
 
@@ -77,9 +80,12 @@ namespace uLearn.CSharp
 			var comment = trivia.ToString();
 			if (trivia.CSharpKind() == SyntaxKind.MultiLineCommentTrivia)
 			{
-				bool shouldCreateTextBlock = trivia.GetParents().Count(p => IsNestingParent(p, trivia)) <= 1;
-				if (shouldCreateTextBlock)
-					Blocks.Add(ExtractMarkDownFromComment(trivia));
+				if (!comment.StartsWith("/*uncomment"))
+				{
+					bool shouldCreateTextBlock = trivia.GetParents().Count(p => IsNestingParent(p, trivia)) <= 1;
+					if (shouldCreateTextBlock)
+						Blocks.Add(ExtractMarkDownFromComment(trivia));
+				}
 			}
 			else if (trivia.CSharpKind() == SyntaxKind.SingleLineCommentTrivia)
 			{
@@ -148,7 +154,8 @@ namespace uLearn.CSharp
 		{
 			return !node.HasAttribute<SlideAttribute>()
 			&& !node.HasAttribute<HideOnSlideAttribute>() 
-			&& !node.HasAttribute<ExerciseAttribute>();
+			&& !node.HasAttribute<ExerciseAttribute>()
+			&& !(node is TypeDeclarationSyntax && node.HasAttribute<ShowBodyOnSlideAttribute>());
 		}
 
 		private void EmbedCode(string filename)
@@ -178,7 +185,7 @@ namespace uLearn.CSharp
 				if (line.Trim() != "")
 				{
 					if (line.Length < identation || line.Substring(0, identation).Trim() != "")
-						throw new Exception("Wrong identation in line: " + line);
+						throw new Exception("Wrong indentation in line: " + line);
 					sb.AppendLine(line.Substring(identation));
 				}
 				else

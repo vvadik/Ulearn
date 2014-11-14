@@ -7,13 +7,13 @@ namespace uLearn.Web.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.1-30610")]
-    public sealed partial class extractlargetextfields : IMigrationMetadata
+    public sealed partial class addindexforQuizzes : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(extractlargetextfields));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(addindexforQuizzes));
         
         string IMigrationMetadata.Id
         {
-            get { return "201411130734011_extract large text fields"; }
+            get { return "201410280605055_add index for Quizzes"; }
         }
         
         string IMigrationMetadata.Source

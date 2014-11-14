@@ -1,5 +1,3 @@
-using NLog.Targets;
-
 namespace uLearn.Web.Migrations
 {
     using System;
