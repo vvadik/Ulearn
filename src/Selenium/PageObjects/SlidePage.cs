@@ -22,8 +22,8 @@ namespace Selenium.PageObjects
 
 		public TOC GetTOC()
 		{
-			var TOCDriver = driver.FindElement(By.XPath(TOCXPath));
-			return new TOC(TOCDriver, TOCXPath);
+			var TOCElement = driver.FindElement(By.XPath(XPaths.TOCXPath));
+			return new TOC(driver, TOCElement, XPaths.TOCXPath);
 		}
 
 		public void RateSlide(Rate rate)

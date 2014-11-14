@@ -86,7 +86,7 @@
     <Compile Include="PageObjects\SlidePage.cs" />
     <Compile Include="PageObjects\StartPage.cs" />
     <Compile Include="PageObjects\TOC.cs" />
-    <Compile Include="PageObjects\TOCLection.cs" />
+    <Compile Include="PageObjects\TOCUnit.cs" />
     <Compile Include="PageObjects\ULearnConstants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SELENIUM_TESTS_1\DB_test_code.cs" />

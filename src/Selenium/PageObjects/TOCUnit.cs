@@ -7,22 +7,26 @@ using OpenQA.Selenium;
 
 namespace Selenium.PageObjects
 {
-	public class TOCLection
+	public class TOCUnit
 	{
 		private readonly IWebElement element;
 		private const string slideXPath = "/ul/li";
+		private IWebDriver driver;
 		public List<IWebElement> Slides { get; private set; }
-		public TOCLection(IWebElement element, string XPath, int i)
+		public TOCUnit(IWebDriver driver, IWebElement element, string XPath, int i)
 		{
+			this.driver = driver;
 			this.element = element;
-			string index = string.Format("[{0}]", i);
+			var index = string.Format("[{0}]", i);
 			var newXPath = XPath + index + slideXPath;
 			Slides = element.FindElements(By.XPath(newXPath)).ToList();
 		}
 
-		public void Click()
+		public TOC Click()
 		{
 			element.Click();
+			var TOCElement = driver.FindElement(By.XPath(XPaths.TOCXPath));
+			return new TOC(driver, TOCElement, XPaths.TOCXPath);
 		}
 	}
 }

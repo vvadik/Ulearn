@@ -10,7 +10,52 @@ using OpenQA.Selenium.Firefox;
 
 namespace Selenium.PageObjects
 {
-	public class StringValueAttribute : System.Attribute
+
+	public class ULearnReferences
+	{
+		public static string startPage { get { return "https://localhost:44300/"; } }
+	}
+
+	public class XPaths
+	{
+		public static string TOCXPath { get { return "/html/body/ul"; } }
+	}
+
+	public class Titles
+	{
+		public static string StartPageTitle { get { return "Главная | uLearn"; } }
+
+		public static string SignInPageTitle { get { return "Вход | uLearn"; } }
+
+		public static string BasicProgrammingTitle { get { return "Основы программирования | uLearn"; } }
+
+		public static string LinqTitle { get { return "Основы Linq | uLearn"; } }
+	}
+
+	public class ElementsId
+	{
+		public static By UserNameField { get { return By.Id("UserName"); } }
+
+		public static By UserPasswordField { get { return By.Id("Password"); } }
+
+		public static By SignInButton { get { return By.Id("loginLink"); } }
+	}
+
+	public class Admin
+	{
+		public static string Password { get { return "fullcontrol"; } }
+
+		public static string Login { get { return "admin"; } }
+	}
+
+	public enum Rate
+	{
+		[StringValue("unedrstand-btn")] Understand,
+		[StringValue("not-unedrstand-btn")] NotUnderstand,
+		[StringValue("trivial-btn")] Trivial
+	}
+
+	public class StringValueAttribute : Attribute
 	{
 		private readonly string _value;
 
@@ -52,44 +97,5 @@ namespace Selenium.PageObjects
 
 			return output;
 		}
-	}
-
-	public class ULearnReferences
-	{
-		public static string startPage { get { return "https://localhost:44300/"; } }
-	}
-
-	public class Titles
-	{
-		public static string StartPageTitle { get { return "Главная | uLearn"; } }
-
-		public static string SignInPageTitle { get { return "Вход | uLearn"; } }
-
-		public static string BasicProgrammingTitle { get { return "Основы программирования | uLearn"; } }
-
-		public static string LinqTitle { get { return "Основы Linq | uLearn"; } }
-	}
-
-	public class ElementsId
-	{
-		public static By UserNameField { get { return By.Id("UserName"); } }
-
-		public static By UserPasswordField { get { return By.Id("Password"); } }
-
-		public static By SignInButton { get { return By.Id("loginLink"); } }
-	}
-
-	public class Admin
-	{
-		public static string Password { get { return "fullcontrol"; } }
-
-		public static string login { get { return "admin"; } }
-	}
-
-	public enum Rate
-	{
-		[StringValue("unedrstand-btn")] Understand,
-		[StringValue("not-unedrstand-btn")] NotUnderstand,
-		[StringValue("trivial-btn")] Trivial
 	}
 }

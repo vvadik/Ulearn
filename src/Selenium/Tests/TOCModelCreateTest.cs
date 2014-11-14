@@ -22,7 +22,7 @@ namespace Selenium.Tests
 
 			var startPage = new StartPage(driver);
 			var signInPage = startPage.GoToSignInPage();
-			var authorisedStartPage = signInPage.LoginValidUser(Admin.login, Admin.Password);
+			var authorisedStartPage = signInPage.LoginValidUser(Admin.Login, Admin.Password);
 
 			return authorisedStartPage.GoToCourse(Titles.BasicProgrammingTitle);
 		}
@@ -41,15 +41,15 @@ namespace Selenium.Tests
 
 		[Test]
 		[Explicit]
-		public void TestTOCNavigate() //HTML перестраивается, и после первого клика эл-ты не находятся ;(
+		public void TestTOCNavigate()
 		{
 			var slide = LoginAndGoToCourse(Titles.BasicProgrammingTitle);
 			var TOC = slide.GetTOC();
 			using (driver)
 			{
-				foreach (var lection in TOC.Lections.Skip(1))
+				foreach (var unitName in TOC.Units.Keys)
 				{
-					lection.Click();
+					TOC = TOC.Units[unitName].Click();
 				}
 			}
 		}

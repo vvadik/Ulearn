@@ -22,7 +22,7 @@ namespace Selenium.Tests
 
 			var startPage = new StartPage(driver);
 			var signInPage = startPage.GoToSignInPage();
-			var authorisedStartPage = signInPage.LoginValidUser(Admin.login, Admin.Password);
+			var authorisedStartPage = signInPage.LoginValidUser(Admin.Login, Admin.Password);
 
 			return authorisedStartPage.GoToCourse(Titles.BasicProgrammingTitle);
 		}

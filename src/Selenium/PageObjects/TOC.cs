@@ -12,21 +12,29 @@ namespace Selenium.PageObjects
 		private const string lectionXPath = "/li";
 
 		private readonly IWebElement element;
-		public List<TOCLection> Lections { get; private set; }
+		private readonly IWebDriver driver;
+		public Dictionary<string, TOCUnit> Units { get; private set; }
 
-		public TOC(IWebElement element, string XPath)
+		private Dictionary<string, TOCUnit> statistics;
+
+		public TOC(IWebDriver driver, IWebElement element, string XPath)
 		{
+			this.driver = driver;
 			this.element = element;
 			var newXPath = XPath + lectionXPath;
-			var lections = element.FindElements(By.XPath(newXPath)).ToList();
-			Lections = new List<TOCLection>();
-			for (var i = 0; i < lections.Count; i++)
-				Lections.Add(new TOCLection(lections[i], newXPath, i));
-		}
-
-		public void CLick()
-		{
-			element.Click();
+			var units = element.FindElements(By.XPath(newXPath)).ToList();
+			Units = new Dictionary<string, TOCUnit>();
+			statistics = new Dictionary<string, TOCUnit>();
+			for (var i = 0; i < units.Count; i++)
+			{
+				var unitName = units[i].Text.Split('\n').FirstOrDefault();
+				if (unitName == null)
+					throw new Exception(string.Format("Юнит с номером {0} не имеет названия", i));
+				if (unitName == "Total statistics" || unitName == "Users statistics" || unitName == "Personal statistics")
+					statistics.Add(unitName, new TOCUnit(driver, units[i], newXPath, i));
+				else
+					Units.Add(unitName, new TOCUnit(driver, units[i], newXPath, i));
+			}
 		}
 	}
 }
