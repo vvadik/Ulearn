@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("Введение", "{3446FAB2-15DF-4045-AB40-ABC1F3DC87C8}")]
 	public class S010_Intro

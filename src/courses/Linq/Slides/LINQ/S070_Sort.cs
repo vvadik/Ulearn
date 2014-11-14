@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("OrderBy и Distinct", "{CA6CAD1F-8352-4041-9233-DFF70ED3AB05}")]
 	[TestFixture]

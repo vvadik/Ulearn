@@ -103,9 +103,10 @@
 	var keywords = Object.keys(CodeMirror.resolveMode("text/x-csharp").keywords);
 
 	var methods = (" WriteLine Write Format Substring Length Parse TryParse ToString Split Join Round Min Max Ceiling Floor"
+		+ " Add Contains ContainsKey Directory FullName Extension ToLower"
 		+ " Where Select SelectMany ToArray ToList ToDictionary ToLookup Join Zip Aggregate GroupBy OrderBy OrderByDescending ThenBy ThenByDescending ").split(" ");
 
-	var types = ['int', 'string', 'double', 'Console', 'Math', 'long', 'Boolean', 'double', 'Enumerable', 'Array', 'Enumerable']
+	var types = ['int', 'string', 'double', 'Console', 'Math', 'long', 'Boolean', 'double', 'Enumerable', 'Array', 'Enumerable'];
 
 	var dictWithStaticMethods = [];
 	dictWithStaticMethods['int'] = ['Parse', 'TryParse'];

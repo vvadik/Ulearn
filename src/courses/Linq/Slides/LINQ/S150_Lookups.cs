@@ -2,7 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("ToDictionary и ToLookup", "{1998BB06-8008-4F53-BED8-838FC20C6067}")]
 	[TestFixture]

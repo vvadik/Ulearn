@@ -1,4 +1,4 @@
-﻿namespace uLearn.Courses.Linq.Slides
+﻿namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("Итог", "{FEF32C59-F9E4-4D75-95FA-9E22CBB0B1BC}")]
 	public class S170_Final

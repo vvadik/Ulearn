@@ -67,19 +67,29 @@
     <Compile Include="Slides\U09_Sorting\S045_BinSearch.cs" />
     <Compile Include="Slides\U09_Sorting\S055_BubbleSortRange.cs" />
     <Compile Include="Slides\U10_Practice\S099_Exercise.cs" />
+    <Compile Include="Slides\U11_OOP\S066_RefactorStatic.cs" />
+    <Compile Include="Slides\U11_OOP\S045_CreateExtension.cs" />
+    <Compile Include="Slides\U11_OOP\S017_ShortSyntax.cs" />
+    <Compile Include="Slides\U11_OOP\S016_CreateClass.cs" />
     <Compile Include="Slides\U11_OOP\S010_Classes.cs" />
     <Compile Include="Slides\U11_OOP\S020_StaticAndDynamic.cs" />
     <Compile Include="Slides\U11_OOP\S030_Methods.cs" />
     <Compile Include="Slides\U11_OOP\S040_ExtensionMethods.cs" />
     <Compile Include="Slides\U11_OOP\S050_DirectoryAndFile.cs" />
     <Compile Include="Slides\U11_OOP\S060_StaticClass.cs" />
+    <Compile Include="Slides\U11_OOP\S055_FileInfo.cs" />
+    <Compile Include="Slides\U11_OOP\_Fields.cs" />
     <Compile Include="Slides\U12_Inheritance\S010_Why.cs" />
     <Compile Include="Slides\U12_Inheritance\S020_Inheritance.cs" />
     <Compile Include="Slides\U12_Inheritance\S030_Hierarchy.cs" />
     <Compile Include="Slides\U12_Inheritance\S040_Array.cs" />
+    <Compile Include="Slides\U12_Inheritance\S044_PrintEverything.cs" />
+    <Compile Include="Slides\U12_Inheritance\S056_Min.cs" />
+    <Compile Include="Slides\U12_Inheritance\S055_MiddleOfThreeAgain.cs" />
+    <Compile Include="Slides\U12_Inheritance\S046_CombineArrays.cs" />
     <Compile Include="Slides\U12_Inheritance\S050_Interfaces.cs" />
     <Compile Include="Slides\U12_Inheritance\S070_ComparableImpl.cs" />
-    <Compile Include="Slides\U12_Inheritance\S080_IComparable.cs" />
+    <Compile Include="Slides\U12_Inheritance\S080_IComparer.cs" />
     <Compile Include="Slides\U12_Inheritance\S090_Polymorphism.cs" />
     <Compile Include="Slides\U12_Inheritance\S100_VirtualMethods.cs" />
     <Content Include="Slides\logo.png" />
@@ -144,7 +154,21 @@
     <Content Include="Slides\U09_Sorting\Title.txt" />
     <Content Include="Slides\U10_Practice\manipulator.png" />
     <Content Include="Slides\U10_Practice\Title.txt" />
+    <Content Include="Slides\U11_OOP\classes.png" />
+    <Content Include="Slides\U11_OOP\S035_Methods.quiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Slides\U11_OOP\S025_Fields.quiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Slides\U11_OOP\Title.txt" />
+    <Content Include="Slides\U11_OOP\triangle.png" />
+    <Content Include="Slides\U12_Inheritance\S035_Casts.quiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Slides\U12_Inheritance\S025_InheritanceQuiz.quiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Slides\U12_Inheritance\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
     <Content Include="Slides\U01_Mistakes\S091_Style2.quiz.xml">

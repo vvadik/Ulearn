@@ -33,10 +33,10 @@ namespace uLearn
 		{
 			try
 			{
-			    using (var webClient = new WebClient())
-			    {
-                    return webClient.DownloadData(url).AsUtf8();   
-			    }
+				using (var webClient = new WebClient())
+				{
+					return webClient.DownloadData(url).AsUtf8();   
+				}
 			}
 			catch (WebException e)
 			{
