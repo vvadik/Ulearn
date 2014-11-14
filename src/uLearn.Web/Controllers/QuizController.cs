@@ -186,18 +186,36 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
+		[HttpGet]
+		[Authorize(Roles = LmsRoles.Instructor)]
 		public ActionResult Analytics(string courseId, int slideIndex)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var quizSlide = (QuizSlide)course.Slides[slideIndex];
 			var dict = new SortedDictionary<string, List<QuizAnswerInfo>>();
-			foreach (var user in db.Users)
-				if (userQuizzesRepo.IsQuizSlidePassed(courseId, user.Id, quizSlide.Id)) //не сворачивать в Where! DB запросы не поймут!
-					dict[user.UserName] = GetUserQuizAnswers(courseId, quizSlide, user.Id).OrderBy(x => user.Id).ToList();
+			var groups = new Dictionary<string, string>();
+			var passedUsers = db.UserQuizzes
+				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped)
+				.Select(q => q.UserId)
+				.Distinct()
+				.Join(db.Users, userId => userId, u => u.Id, (userId, u) => new { UserId = userId, u.UserName, u.GroupName });
+			foreach (var user in passedUsers)
+			{
+				dict[user.UserName] = GetUserQuizAnswers(courseId, quizSlide, user.UserId).ToList();
+				groups[user.UserName] = user.GroupName;
+			}
+			var rightAnswersCount = dict.Values
+				.SelectMany(list => list
+					.Where(info => info.IsRight)
+					.Select(info => new { info.Id, info.IsRight }))
+				.GroupBy(arg => arg.Id)
+				.ToDictionary(grouping => grouping.Key, grouping => grouping.Count());
 			return PartialView(new QuizAnalyticsModel
 			{
 				UserAnswers = dict,
-				QuizSlide = quizSlide
+				QuizSlide = quizSlide,
+				RightAnswersCount = rightAnswersCount,
+				Group = groups
 			});
 		}
 

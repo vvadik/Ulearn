@@ -22,13 +22,17 @@
 <h2>Статистика ответов</h2>
 <div>
 	@{ var maxQuestionIndex = Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex).Max(x => x.QuestionIndex);}
-	<table id="myTable" class="tablesorter">
+	<table id="myTable" class="invertedTablesorter">
 		<thead>
 			<tr>
-				<th style="border-bottom: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа">наведи на меня!</th>
+				<th style="border-bottom: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа" data-sorter="true">наведи на меня!</th>
+				<th style="border-bottom: none" data-sorter="true">Группа</th>
+				<th style="border-bottom: none"></th>
 				@foreach (var block in Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
-					<th title="@block.Text" colspan="@GetColSpan(block)">@block.Text</th>
+					int count;
+					Model.RightAnswersCount.TryGetValue(block.QuestionIndex.ToString(), out count);
+					<th title="@block.Text" colspan="@GetColSpan(block)">@block.Text (@count/@Model.UserAnswers.Count)</th>
 					if (maxQuestionIndex == block.QuestionIndex)
 					{
 						break;
@@ -37,7 +41,9 @@
 				}
 			</tr>
 			<tr>
-				<th style="border-top: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа"></th>
+				<th style="border-top: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа" data-sorter="true"></th>
+				<th style="border-top: none" data-sorter="true"></th>
+				<th style="border-top: none; border-bottom: none"></th>
 				@foreach (var block in Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
 					if (block is ChoiceBlock)
@@ -60,12 +66,12 @@
 					{
 						break;
 					}
-					<th style="border-top: none; border-bottom: none"></th>
+					<th style="border-top: none;border-bottom: none"></th>
 				}
 			</tr>
 		</thead>
 		<tbody>
-@*
+			@*
 			<tr>
 				<td>Total</td>
 				@{ var usersCount = Model.UserAnswers.Keys.Count;}
@@ -122,6 +128,8 @@
 			{
 				<tr>
 					<td>@user</td>
+					<td>@Model.Group[user]</td>
+					<td style="border-top: none; border-bottom: none"></td>
 					@foreach (var ans in Model.UserAnswers[user])
 					{
 						if (ans is FillInBlockAnswerInfo)
@@ -157,3 +165,5 @@
 		</tbody>
 	</table>
 </div>
+<script src="~/tablesorter-master/jquery.tablesorter.js"></script>
+<script src="~/Scripts/invertedTablesorter.js"></script>
