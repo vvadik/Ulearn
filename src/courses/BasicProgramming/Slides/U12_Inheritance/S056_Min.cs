@@ -8,7 +8,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U11_Inheritance
     public class S055_Min : SlideTestBase
     {
         /*
-        Помните задачу "Среднее трех"? Пришло время повторить ее для общего случая!       
+        Напишите метод Min, который бы вычислял минимум из элементов массива.   
         */
         [ExpectedOutput(
 @"2

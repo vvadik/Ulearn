@@ -80,6 +80,7 @@
     <Compile Include="Slides\U11_OOP\S055_FileInfo.cs" />
     <Compile Include="Slides\U11_OOP\_Fields.cs" />
     <Compile Include="Slides\U12_Inheritance\S010_Why.cs" />
+    <Compile Include="Slides\U12_Inheritance\S075_IComparableTask.cs" />
     <Compile Include="Slides\U12_Inheritance\S020_Inheritance.cs" />
     <Compile Include="Slides\U12_Inheritance\S030_Hierarchy.cs" />
     <Compile Include="Slides\U12_Inheritance\S040_Array.cs" />
