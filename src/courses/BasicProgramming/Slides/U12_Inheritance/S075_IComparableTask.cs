@@ -4,7 +4,7 @@ using System.Globalization;
 namespace uLearn.Courses.BasicProgramming.Slides.U11_Inheritance
 {
     [Slide("Сравнение книг", "{BD1F8054-A372-4EA4-9F5A-2EEE97CD2B71}")]
-	public class S016_CreateClass : SlideTestBase
+	public class S016_CompareBooks : SlideTestBase
 	{
 		/*
 		Вы пишете учетную систему для книжного магазина, и вам необходимо научиться 
