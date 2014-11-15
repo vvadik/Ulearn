@@ -27,13 +27,13 @@ namespace Selenium.PageObjects
 			statistics = new Dictionary<string, TOCUnit>();
 			for (var i = 0; i < unitsElements.Count; i++)
 			{
-				var unitName = unitsElements[i].Text.Split('\n').FirstOrDefault();
+				var unitName = unitsElements[i].Text.Split(new []{"\r\n"}, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
 				if (unitName == null)
 					throw new Exception(string.Format("Юнит с номером {0} в курсе {1} не имеет названия", i, driver.Title));
 				if (unitName == "Total statistics" || unitName == "Users statistics" || unitName == "Personal statistics")
 					statistics.Add(unitName, new TOCUnit(driver, unitsElements[i], newXPath, i));
 				else
-					units.Add(unitName, new TOCUnit(driver, unitsElements[i], newXPath, i));
+					units.Add(unitName, new TOCUnit(driver, unitsElements[i], newXPath, i + 1));
 			}
 		}
 

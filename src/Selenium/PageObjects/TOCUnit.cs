@@ -12,14 +12,17 @@ namespace Selenium.PageObjects
 		private readonly IWebElement element;
 		private const string slideXPath = "/ul/li";
 		private IWebDriver driver;
-		private List<IWebElement> slides;
+		private Dictionary<string, IWebElement> slides;
 		public TOCUnit(IWebDriver driver, IWebElement element, string XPath, int i)
 		{
 			this.driver = driver;
 			this.element = element;
 			var index = string.Format("[{0}]", i);
 			var newXPath = XPath + index + slideXPath;
-			slides = element.FindElements(By.XPath(newXPath)).ToList();
+			var slidesElements = element.FindElements(By.XPath(newXPath)).ToList();
+			slides = new Dictionary<string, IWebElement>();
+			foreach (var slide in slidesElements)
+				slides[slide.Text] = slide;
 		}
 
 		public TOC Click()
@@ -29,9 +32,16 @@ namespace Selenium.PageObjects
 			return new TOC(driver, TOCElement, XPaths.TOCXPath);
 		}
 
-		public string[] GetSlidesName()
+		public string[] GetSlidesNames()
 		{
-			return slides.Select(x => x.Text).ToArray();
+			return slides.Keys.ToArray();
+		}
+
+		public TOC ClickOnSlide(string slideName)
+		{
+			slides[slideName].Click();
+			var TOCElement = driver.FindElement(By.XPath(XPaths.TOCXPath));
+			return new TOC(driver, TOCElement, XPaths.TOCXPath);
 		}
 	}
 }

@@ -49,7 +49,13 @@ namespace Selenium.Tests
 			{
 				foreach (var unitName in TOC.GetUnitsNames())
 				{
-					TOC = TOC.GetUnitControl(unitName).Click();
+					var unit = TOC.GetUnitControl(unitName);
+					var names = unit.GetSlidesNames();
+					TOC = unit.Click();
+					foreach (var slideName in names)
+					{
+						TOC = TOC.GetUnitControl(unitName).ClickOnSlide(slideName);
+					}
 				}
 			}
 		}
