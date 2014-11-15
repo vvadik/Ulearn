@@ -47,9 +47,9 @@ namespace Selenium.Tests
 			var TOC = slide.GetTOC();
 			using (driver)
 			{
-				foreach (var unitName in TOC.Units.Keys)
+				foreach (var unitName in TOC.GetUnitsNames())
 				{
-					TOC = TOC.Units[unitName].Click();
+					TOC = TOC.GetUnitControl(unitName).Click();
 				}
 			}
 		}

@@ -13,7 +13,7 @@ namespace Selenium.PageObjects
 
 		private readonly IWebElement element;
 		private readonly IWebDriver driver;
-		public Dictionary<string, TOCUnit> Units { get; private set; }
+		private readonly Dictionary<string, TOCUnit> units;
 
 		private Dictionary<string, TOCUnit> statistics;
 
@@ -22,19 +22,29 @@ namespace Selenium.PageObjects
 			this.driver = driver;
 			this.element = element;
 			var newXPath = XPath + lectionXPath;
-			var units = element.FindElements(By.XPath(newXPath)).ToList();
-			Units = new Dictionary<string, TOCUnit>();
+			var unitsElements = element.FindElements(By.XPath(newXPath)).ToList();
+			units = new Dictionary<string, TOCUnit>();
 			statistics = new Dictionary<string, TOCUnit>();
-			for (var i = 0; i < units.Count; i++)
+			for (var i = 0; i < unitsElements.Count; i++)
 			{
-				var unitName = units[i].Text.Split('\n').FirstOrDefault();
+				var unitName = unitsElements[i].Text.Split('\n').FirstOrDefault();
 				if (unitName == null)
-					throw new Exception(string.Format("Юнит с номером {0} не имеет названия", i));
+					throw new Exception(string.Format("Юнит с номером {0} в курсе {1} не имеет названия", i, driver.Title));
 				if (unitName == "Total statistics" || unitName == "Users statistics" || unitName == "Personal statistics")
-					statistics.Add(unitName, new TOCUnit(driver, units[i], newXPath, i));
+					statistics.Add(unitName, new TOCUnit(driver, unitsElements[i], newXPath, i));
 				else
-					Units.Add(unitName, new TOCUnit(driver, units[i], newXPath, i));
+					units.Add(unitName, new TOCUnit(driver, unitsElements[i], newXPath, i));
 			}
+		}
+
+		public string[] GetUnitsNames()
+		{
+			return units.Keys.ToArray();
+		}
+
+		public TOCUnit GetUnitControl(string unitName)
+		{
+			return units[unitName];
 		}
 	}
 }
