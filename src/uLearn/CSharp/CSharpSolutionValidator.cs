@@ -22,7 +22,7 @@ namespace uLearn.CSharp
 		{
 			userCode = userCode.Trim();
 			if (userCode.StartsWith("using") || userCode.StartsWith("namespace"))
-				return "Ќужно написать только один метод, а не весь исходник";
+				return "Ќе нужно писать весь исходный файл целиком Ч пишите только метод / класс, который необходим в задаче.";
 			return null;
 		}
 

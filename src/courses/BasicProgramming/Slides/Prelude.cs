@@ -6,6 +6,7 @@ using System.Text;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Collections;
 
 public class SlideTestBase { }
 public class Assert {
