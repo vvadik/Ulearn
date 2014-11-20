@@ -11,8 +11,6 @@ namespace U14_Structures
 	class S070_Зачем_нужны_структуры
 	{
 		//#video 6kWx1s_BmVs
-		/*
-		## Заметки по лекции
-		*/
+		
     }
 }

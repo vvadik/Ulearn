@@ -14,5 +14,41 @@ namespace U15_StacksAndQueues
 		/*
 		## Заметки по лекции
 		*/
+
+        // Стэк - это структура данных типа "первым вошел - последним вышел"
+        public class ListStack
+        {
+            List<int> list = new List<int>();
+            public void Push(int value)
+            {
+                list.Add(value);
+            }
+            public int Pop()
+            {
+                if (list.Count == 0) throw new InvalidOperationException();
+                var result = list[list.Count - 1];
+                list.RemoveAt(list.Count - 1);
+                return result;
+            }
+        }
+
+        // Очередь, напротив, это структура данных "первым вошел - первым вышел"
+        public class ListQueue
+        {
+            List<int> list = new List<int>();
+            public void Enqueue(int value)
+            {
+                list.Add(value);
+            }
+
+            public int Dequeue()
+            {
+                if (list.Count == 0) throw new InvalidOperationException();
+                var result = list[0];
+                list.RemoveAt(0); //в этом месте реализация неэффективна,
+                                  //поскольку RemoveAt имеет линейную от размеров листа сложность
+                return result;
+            }
+        }
     }
 }

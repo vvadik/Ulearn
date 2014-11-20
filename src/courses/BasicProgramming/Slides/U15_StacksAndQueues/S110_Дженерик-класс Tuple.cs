@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using uLearn; 
 
@@ -14,5 +15,36 @@ namespace U15_StacksAndQueues
 		/*
 		## Заметки по лекции
 		*/
+
+        static Random rnd = new Random();
+
+        public class IntReply
+        {
+            public int Number { get; set; }
+            public bool Available { get; set; }
+        }
+
+        //Но все же out и ref - это не очень удачно.
+        //Лучше просто возвращать объект
+        public static IntReply GetNumber5()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                if (Console.KeyAvailable)
+                    return new IntReply { Available = true, Number = rnd.Next(100) };
+                Thread.Sleep(100);
+            }
+            return new IntReply { Available = false };
+        }
+
+        static void Main5()
+        {
+            var value = GetNumber5();
+            if (value.Available)
+                Console.WriteLine(value.Number);
+            else
+                Console.WriteLine("Error");
+        }
+
     }
 }
