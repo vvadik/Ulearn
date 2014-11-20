@@ -104,6 +104,41 @@
     <Compile Include="Slides\U13_Consistancy\S060_Конструкторы.cs" />
     <Compile Include="Slides\U13_Consistancy\S070_Поля readonly.cs" />
     <Compile Include="Slides\U13_Consistancy\S080_Статические конструкторы.cs" />
+    <Compile Include="Slides\U14_Structures\S010_Объявление структуры.cs" />
+    <Compile Include="Slides\U14_Structures\S020_Инициализация полей структуры.cs" />
+    <Compile Include="Slides\U14_Structures\S030_Передача структуры в метод.cs" />
+    <Compile Include="Slides\U14_Structures\S040_Ключевое слово ref.cs" />
+    <Compile Include="Slides\U14_Structures\S050_Боксинг и анбоксинг.cs" />
+    <Compile Include="Slides\U14_Structures\S060_Структуры и свойства.cs" />
+    <Compile Include="Slides\U14_Structures\S070_Зачем нужны структуры.cs" />
+    <Compile Include="Slides\U15_StacksAndQueues\S010_Стэки и очереди.cs" />
+    <Compile Include="Slides\U15_StacksAndQueues\S020_Очередь на связных списках.cs" />
+    <Compile Include="Slides\U15_StacksAndQueues\S030_Универсальная очередь и даункасты.cs" />
+    <Compile Include="Slides\U15_StacksAndQueues\S040_Дженерик-классы.cs" />
+    <Compile Include="Slides\U15_StacksAndQueues\S050_Стэки для анализа скобочных выражений.cs" />
+    <Compile Include="Slides\U15_StacksAndQueues\S060_Стэки для вычислений.cs" />
+    <Compile Include="Slides\U15_StacksAndQueues\S070_Очередь для скользящего среднего.cs" />
+    <Compile Include="Slides\U15_StacksAndQueues\S080_Дженерики и сортировка массивов.cs" />
+    <Compile Include="Slides\U15_StacksAndQueues\S090_Возврат из метода значения и ошибки.cs" />
+    <Compile Include="Slides\U15_StacksAndQueues\S100_Возврат нескольких значений.cs" />
+    <Compile Include="Slides\U15_StacksAndQueues\S110_Дженерик-класс Tuple.cs" />
+    <Compile Include="Slides\U15_StacksAndQueues\S120_Дженерик-класс Nullable.cs" />
+    <Compile Include="Slides\U16_yield_return\S010_foreach, IEnumerable и IEnumerator.cs" />
+    <Compile Include="Slides\U16_yield_return\S020_Реализация IEnumerator.cs" />
+    <Compile Include="Slides\U16_yield_return\S030_yield return.cs" />
+    <Compile Include="Slides\U16_yield_return\S040_Ленивые коллекции.cs" />
+    <Compile Include="Slides\U16_yield_return\S050_yield return в рекурсивных методах.cs" />
+    <Compile Include="Slides\U17_ListAndDict\S010_Листы и индексация.cs" />
+    <Compile Include="Slides\U17_ListAndDict\S020_Метод Contains.cs" />
+    <Compile Include="Slides\U17_ListAndDict\S030_Метод Equals.cs" />
+    <Compile Include="Slides\U17_ListAndDict\S040_Перегрузка операторов.cs" />
+    <Compile Include="Slides\U17_ListAndDict\S050_Когда следует перегружать операторы.cs" />
+    <Compile Include="Slides\U17_ListAndDict\S060_Хэширующие функции.cs" />
+    <Compile Include="Slides\U17_ListAndDict\S070_Хэши в компьютерной безопасности.cs" />
+    <Compile Include="Slides\U17_ListAndDict\S080_Поиск подстроки в строке - 1.cs" />
+    <Compile Include="Slides\U17_ListAndDict\S090_Поиск подстроки в строке - 2.cs" />
+    <Compile Include="Slides\U17_ListAndDict\S100_Класс Dictionary.cs" />
+    <Compile Include="Slides\U17_ListAndDict\S110_GetHashCode.cs" />
     <Content Include="Slides\logo.png" />
     <Content Include="Slides\thumbnail.png" />
     <Content Include="Slides\Title.txt" />
@@ -183,6 +218,10 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Slides\U12_Inheritance\Title.txt" />
+    <Content Include="Slides\U14_Structures\Title.txt" />
+    <Content Include="Slides\U15_StacksAndQueues\Title.txt" />
+    <Content Include="Slides\U16_yield_return\Title.txt" />
+    <Content Include="Slides\U17_ListAndDict\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
     <Content Include="Slides\U01_Mistakes\S091_Style2.quiz.xml">
       <SubType>Designer</SubType>
