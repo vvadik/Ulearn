@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainClass.cs" />
+    <Compile Include="PageObjects\ExerciseSlidePage.cs" />
     <Compile Include="PageObjects\SignInPage.cs" />
     <Compile Include="PageObjects\SlidePage.cs" />
     <Compile Include="PageObjects\StartPage.cs" />

@@ -32,5 +32,19 @@ namespace Selenium.PageObjects
 			var rateButton = driver.FindElement(By.ClassName(rateClass));
 			rateButton.Click();
 		}
+
+		public void NextSlide()
+		{
+			var nextButton = driver.FindElement(By.Id("next_slide_button"));
+			if (nextButton == null || !nextButton.Enabled)
+				return;
+			nextButton.Click();
+		}
+
+		public void PrevSlide()
+		{
+			var prevButton = driver.FindElement(By.Id("prev_slide_button"));
+			prevButton.Click();
+		}
 	}
 }
