@@ -96,8 +96,17 @@
     <Compile Include="Slides\U12_Inheritance\S080_IComparer.cs" />
     <Compile Include="Slides\U12_Inheritance\S090_Polymorphism.cs" />
     <Compile Include="Slides\U12_Inheritance\S100_VirtualMethods.cs" />
+    <Compile Include="Slides\U13_Consistancy\S010_Целостность данных.cs" />
+    <Compile Include="Slides\U13_Consistancy\S020_Ключевое слово private.cs" />
+    <Compile Include="Slides\U13_Consistancy\S030_Отложенные ошибки.cs" />
+    <Compile Include="Slides\U13_Consistancy\S040_Свойства.cs" />
+    <Compile Include="Slides\U13_Consistancy\S050_Больше свойств.cs" />
+    <Compile Include="Slides\U13_Consistancy\S060_Конструкторы.cs" />
+    <Compile Include="Slides\U13_Consistancy\S070_Поля readonly.cs" />
+    <Compile Include="Slides\U13_Consistancy\S080_Статические конструкторы.cs" />
     <Content Include="Slides\logo.png" />
     <Content Include="Slides\thumbnail.png" />
+    <Content Include="Slides\Title.txt" />
     <Content Include="Slides\U00_Basics\S081-Scope.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -343,7 +352,7 @@
     <None Include="Slides\U07_Complexity\InstructorNotes.md" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Slides\Title.txt" />
+    <Content Include="Slides\U13_Consistancy\Title.txt" />
     <Content Include="Slides\U00_Basics\Title.txt" />
     <Content Include="Slides\Prelude.cs" />
     <Content Include="Slides\U01_Mistakes\Title.txt" />
