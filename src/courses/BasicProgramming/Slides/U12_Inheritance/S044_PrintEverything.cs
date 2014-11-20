@@ -41,7 +41,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U12_Inheritance
 			for(var i=0; i<...){
 				if (i > 0) 
 					Console.Write(", ");
-				Console.Write(...);		
+				Console.Write(...);
 			}
 			Console.WriteLine();
 		}
