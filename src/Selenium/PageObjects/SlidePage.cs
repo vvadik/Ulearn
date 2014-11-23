@@ -9,15 +9,22 @@ namespace Selenium.PageObjects
 {
 	public class SlidePage
 	{
-		private const string TOCXPath = "/html/body/ul";
-
 		private readonly IWebDriver driver;
+		private Rates rates;
+		private NavArrows navArrows;
 
 		public SlidePage(IWebDriver driver, string courseTitle)
 		{
 			this.driver = driver;
 			if (!driver.Title.Equals(courseTitle))
 				throw new IllegalLocatorException(string.Format("Это не слайд курса {0}, это: {1}", courseTitle, driver.Title));
+			FindSlidePageElements();
+		}
+
+		private void FindSlidePageElements()
+		{
+			navArrows = new NavArrows(driver);
+			rates = new Rates(driver);
 		}
 
 		public TOC GetTOC()
@@ -28,23 +35,123 @@ namespace Selenium.PageObjects
 
 		public void RateSlide(Rate rate)
 		{
-			string rateClass = StringValue.GetStringValue(rate);
-			var rateButton = driver.FindElement(By.ClassName(rateClass));
-			rateButton.Click();
+			rates.RateSlide(rate);
 		}
 
-		public void NextSlide()
+		public bool IsRateActive(Rate rate)
 		{
-			var nextButton = driver.FindElement(By.Id("next_slide_button"));
-			if (nextButton == null || !nextButton.Enabled)
-				return;
-			nextButton.Click();
+			return rates.IsActive(rate);
 		}
 
-		public void PrevSlide()
+		public SlidePage ClickNextSlide()
 		{
-			var prevButton = driver.FindElement(By.Id("prev_slide_button"));
-			prevButton.Click();
+			return navArrows.ClickNextButton();
+		}
+
+		public SlidePage ClickPrevSlide()
+		{
+			return navArrows.ClickPrevButton();
+		}
+
+		public SolutionsPage ClickSolutionsSlide()
+		{
+			return navArrows.ClickNextSolutionsButton();
+		}
+	}
+
+	public class Rates
+	{
+		private readonly IWebDriver driver;
+		private readonly Dictionary<Rate, RateInfo> buttons;
+		public Rates(IWebDriver driver)
+		{
+			this.driver = driver;
+			buttons = new Dictionary<Rate, RateInfo>();
+			FillButtons();
+		}
+
+		private void FillButtons()
+		{
+			buttons[Rate.NotUnderstand] = new RateInfo(driver.FindElement(By.ClassName(StringValue.GetStringValue(Rate.NotUnderstand))));
+			buttons[Rate.Trivial] = new RateInfo(driver.FindElement(By.ClassName(StringValue.GetStringValue(Rate.Trivial))));
+			buttons[Rate.Understand] = new RateInfo(driver.FindElement(By.ClassName(StringValue.GetStringValue(Rate.Understand))));
+		}
+
+		public void RateSlide(Rate rate)
+		{
+			buttons[rate].Click();
+		}
+
+		public bool IsActive(Rate rate)
+		{
+			return buttons[rate].isActive;
+		}
+
+		class RateInfo
+		{
+			private readonly IWebElement rateButton;
+			public bool isActive;
+
+			public RateInfo(IWebElement button)
+			{
+				rateButton = button;
+				if (button == null)
+					throw new NotFoundException("не найдена rate кнопка");
+				isActive = button.GetCssValue("active") != null;
+			}
+
+			public void Click()
+			{
+				rateButton.Click();
+				isActive = !isActive;
+			}
+		}
+	}
+
+	public class NavArrows
+	{
+		private readonly IWebDriver driver;
+		private readonly IWebElement nextSlideButton;
+		private readonly IWebElement prevSlideButton;
+		private readonly IWebElement nextSolutionsButton;
+		public NavArrows(IWebDriver driver)
+		{
+			this.driver = driver;
+			nextSlideButton = driver.FindElement(ElementsId.NextNavArrow);
+			prevSlideButton = driver.FindElement(ElementsId.PrevNavArrow);
+			nextSolutionsButton = driver.FindElement(ElementsId.NextSolutionsButton);
+			CheckButtons();
+		}
+
+		private void CheckButtons()
+		{
+			if (nextSlideButton == null)
+				throw new NotFoundException("не найдена NextSlideButton");
+			if (prevSlideButton == null)
+				throw new NotFoundException("не найдена PrevSlideButton");
+			if (nextSolutionsButton == null)
+				throw new NotFoundException("не найдена NextSolutionsButton");
+		}
+
+		public SlidePage ClickNextButton()
+		{
+			var title = driver.Title;
+			nextSlideButton.Click();
+			return new SlidePage(driver, title);
+		}
+
+		public SlidePage ClickPrevButton()
+		{
+			var title = driver.Title;
+			prevSlideButton.Click();
+			return new SlidePage(driver, title);
+		}
+
+		public SolutionsPage ClickNextSolutionsButton()
+		{
+			var title = driver.Title;
+			nextSolutionsButton.Click();
+			return new SolutionsPage(driver, title);
 		}
 	}
 }

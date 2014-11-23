@@ -29,7 +29,7 @@ namespace Selenium.PageObjects
 			var codeExercise = driver.FindElement(By.ClassName(CodeExercise));
 			if (codeExercise == null)
 			{
-				throw new NotFoundException("не найдена область кода");
+				throw new NotFoundException("не найдена область для кода");
 			}
 			var codeMirror = driver.FindElement(By.ClassName(CodeMirror));
 			if (codeMirror == null)

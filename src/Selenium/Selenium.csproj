@@ -85,6 +85,7 @@
     <Compile Include="PageObjects\ExerciseSlidePage.cs" />
     <Compile Include="PageObjects\SignInPage.cs" />
     <Compile Include="PageObjects\SlidePage.cs" />
+    <Compile Include="PageObjects\SolutionsPage.cs" />
     <Compile Include="PageObjects\StartPage.cs" />
     <Compile Include="PageObjects\TOC.cs" />
     <Compile Include="PageObjects\TOCUnit.cs" />

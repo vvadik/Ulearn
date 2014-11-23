@@ -30,6 +30,8 @@ namespace Selenium.PageObjects
 		public static string BasicProgrammingTitle { get { return "Основы программирования | uLearn"; } }
 
 		public static string LinqTitle { get { return "Основы Linq | uLearn"; } }
+
+		
 	}
 
 	public class ElementsId
@@ -39,6 +41,12 @@ namespace Selenium.PageObjects
 		public static By UserPasswordField { get { return By.Id("Password"); } }
 
 		public static By SignInButton { get { return By.Id("loginLink"); } }
+
+		public static By NextNavArrow { get { return By.Id("next_slide_button"); } }
+
+		public static By PrevNavArrow { get { return By.Id("prev_slide_button"); } }
+
+		public static By NextSolutionsButton { get { return By.Id("next_solutions_button"); } }
 	}
 
 	public class Admin
@@ -57,16 +65,16 @@ namespace Selenium.PageObjects
 
 	public class StringValueAttribute : Attribute
 	{
-		private readonly string _value;
+		private readonly string value;
 
 		public StringValueAttribute(string value)
 		{
-			_value = value;
+			this.value = value;
 		}
 
 		public string Value
 		{
-			get { return _value; }
+			get { return value; }
 		}
 	}
 
