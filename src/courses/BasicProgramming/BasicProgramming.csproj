@@ -81,6 +81,7 @@
     <Compile Include="Slides\U11_OOP\S099_Exercise.cs" />
     <Compile Include="Slides\U11_OOP\_Fields.cs" />
     <Compile Include="Slides\U12_Inheritance\S010_Why.cs" />
+    <Compile Include="Slides\U12_Inheritance\S999_Exercise.cs" />
     <Compile Include="Slides\U12_Inheritance\S105_ToString.cs" />
     <Compile Include="Slides\U12_Inheritance\S085_IComparerTask.cs" />
     <Compile Include="Slides\U12_Inheritance\S075_IComparableTask.cs" />
@@ -211,6 +212,7 @@
     </Content>
     <Content Include="Slides\U11_OOP\Title.txt" />
     <Content Include="Slides\U11_OOP\triangle.png" />
+    <Content Include="Slides\U12_Inheritance\digger.png" />
     <Content Include="Slides\U12_Inheritance\S035_Casts.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -370,6 +372,7 @@
     <None Include="Slides\U10_Practice\InstructorNotes.md" />
     <None Include="Slides\U10_Practice\manipulator.zip" />
     <None Include="Slides\U11_OOP\InstructorNotes.md" />
+    <None Include="Slides\U12_Inheritance\digger.zip" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">
@@ -404,7 +407,6 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>REM copy this post build step to new course
-$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe $(TargetPath) /exclude:Long || exit /b
 del "$(OutDir)$(ProjectName).zip"
 "$(SolutionDir)..\tools\7z\7za.exe" a "$(OutDir)$(ProjectName).zip" "$(ProjectDir)Slides\*"
 copy "$(OutDir)$(ProjectName).zip" $(SolutionDir)uLearn.Web\Courses.Staging\</PostBuildEvent>
