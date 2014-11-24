@@ -11,18 +11,23 @@ namespace Selenium.PageObjects
 	{
 		private readonly IWebElement element;
 		private const string slideXPath = "/ul/li";
+		private const string slideLabelXPath = "/ul/i";
 		private IWebDriver driver;
-		private Dictionary<string, IWebElement> slides;
+		private Dictionary<string, SlideListItem> slides;
 		public TOCUnit(IWebDriver driver, IWebElement element, string XPath, int i)
 		{
 			this.driver = driver;
 			this.element = element;
 			var index = string.Format("[{0}]", i);
-			var newXPath = XPath + index + slideXPath;
-			var slidesElements = element.FindElements(By.XPath(newXPath)).ToList();
-			slides = new Dictionary<string, IWebElement>();
-			foreach (var slide in slidesElements)
-				slides[slide.Text] = slide;
+			var newSlideXPath = XPath + index + slideXPath;
+			var newLabelXPath = XPath + index + slideLabelXPath;
+			var slidesElements = element.FindElements(By.XPath(newSlideXPath)).ToList();
+			var slidesLabel = element.FindElements(By.XPath(newLabelXPath)).ToList();
+			slides = new Dictionary<string, SlideListItem>();
+			if (slidesElements.Count != slidesLabel.Count)
+				throw new Exception("incredible mistake in slide!");
+			for (var ind = 0; ind < slidesElements.Count; ind++)
+				slides[slidesElements[ind].Text] = new SlideListItem(slidesElements[ind], slidesLabel[ind]);
 		}
 
 		public TOC Click()
@@ -42,6 +47,23 @@ namespace Selenium.PageObjects
 			slides[slideName].Click();
 			var TOCElement = driver.FindElement(By.XPath(XPaths.TOCXPath));
 			return new TOC(driver, TOCElement, XPaths.TOCXPath);
+		}
+
+		class SlideListItem
+		{
+			private readonly IWebElement slideElement;
+			private readonly IWebElement slideLabelElement;
+
+			public SlideListItem(IWebElement slideElement, IWebElement slideLabelElement)
+			{
+				this.slideElement = slideElement;
+				this.slideLabelElement = slideLabelElement;
+			}
+
+			public void Click()
+			{
+				slideElement.Click();
+			}
 		}
 	}
 }

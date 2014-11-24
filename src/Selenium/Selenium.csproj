@@ -94,6 +94,7 @@
     <Compile Include="SELENIUM_TESTS_1\DB_test_code.cs" />
     <Compile Include="SELENIUM_TESTS_1\FirstTest.cs" />
     <Compile Include="Tests\LoginTest.cs" />
+    <Compile Include="Tests\NavArrowTest.cs" />
     <Compile Include="Tests\TestRateButton.cs" />
     <Compile Include="Tests\TOCModelCreateTest.cs" />
   </ItemGroup>

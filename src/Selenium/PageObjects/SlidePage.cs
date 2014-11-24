@@ -12,6 +12,8 @@ namespace Selenium.PageObjects
 		private readonly IWebDriver driver;
 		private Rates rates;
 		private NavArrows navArrows;
+		private readonly TOC TOC;
+
 
 		public SlidePage(IWebDriver driver, string courseTitle)
 		{
@@ -19,6 +21,7 @@ namespace Selenium.PageObjects
 			if (!driver.Title.Equals(courseTitle))
 				throw new IllegalLocatorException(string.Format("Это не слайд курса {0}, это: {1}", courseTitle, driver.Title));
 			FindSlidePageElements();
+			TOC = new TOC(driver, driver.FindElement(By.XPath(XPaths.TOCXPath)), XPaths.TOCXPath);
 		}
 
 		private void FindSlidePageElements()
@@ -29,8 +32,7 @@ namespace Selenium.PageObjects
 
 		public TOC GetTOC()
 		{
-			var TOCElement = driver.FindElement(By.XPath(XPaths.TOCXPath));
-			return new TOC(driver, TOCElement, XPaths.TOCXPath);
+			return TOC;
 		}
 
 		public void RateSlide(Rate rate)
@@ -97,7 +99,12 @@ namespace Selenium.PageObjects
 				rateButton = button;
 				if (button == null)
 					throw new NotFoundException("не найдена rate кнопка");
-				isActive = button.GetCssValue("active") != null;
+				try
+				{
+					var cssValue = button.GetCssValue("active");
+				}
+				catch { }
+				isActive = false;
 			}
 
 			public void Click()

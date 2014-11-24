@@ -58,8 +58,8 @@ namespace Selenium.PageObjects
 
 	public enum Rate
 	{
-		[StringValue("unedrstand-btn")] Understand,
-		[StringValue("not-unedrstand-btn")] NotUnderstand,
+		[StringValue("understand-btn")] Understand,
+		[StringValue("not-understand-btn")] NotUnderstand,
 		[StringValue("trivial-btn")] Trivial
 	}
 
