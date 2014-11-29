@@ -25,7 +25,7 @@ null
 A B A B 
 null")]
 		[Hint("Для создания метода с переменным количеством аргументом, используйте ключевое слово params")]
-		[Hint("static ArrayCombine(params Array[] arrays) { ...")]
+		[Hint("static Array Combine(params Array[] arrays) { ...")]
 		[Hint("var elementType=arrays[0].GetType().GetElementType();")]
 		[Hint("var result=Array.CreateInstance(elementType, summaryLength);")]
 		public static void Main()
@@ -39,7 +39,6 @@ null")]
 			Print(Combine());
 			Print(Combine(strings, strings));
 			Print(Combine(ints, strings));
-
 		}
 
 		static void Print(Array array)
