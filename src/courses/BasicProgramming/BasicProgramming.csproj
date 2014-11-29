@@ -99,9 +99,13 @@
     <Compile Include="Slides\U12_Inheritance\S100_VirtualMethods.cs" />
     <Compile Include="Slides\U13_Consistency\S010_Целостность данных.cs" />
     <Compile Include="Slides\U13_Consistency\S020_Ключевое слово private.cs" />
+    <Compile Include="Slides\U13_Consistency\S055_Свойство_вместо_поля_задача.cs" />
+    <Compile Include="Slides\U13_Consistency\S045_Не_откладывать_ошибки_задача.cs" />
     <Compile Include="Slides\U13_Consistency\S030_Отложенные ошибки.cs" />
     <Compile Include="Slides\U13_Consistency\S040_Свойства.cs" />
     <Compile Include="Slides\U13_Consistency\S050_Больше свойств.cs" />
+    <Compile Include="Slides\U13_Consistency\S075_Дробь_задача.cs" />
+    <Compile Include="Slides\U13_Consistency\S065_Конструктор_вектора_задача.cs" />
     <Compile Include="Slides\U13_Consistency\S060_Конструкторы.cs" />
     <Compile Include="Slides\U13_Consistency\S070_Поля readonly.cs" />
     <Compile Include="Slides\U13_Consistency\S080_Статические конструкторы.cs" />
@@ -220,6 +224,9 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Slides\U12_Inheritance\Title.txt" />
+    <Content Include="Slides\U13_Consistency\S025_private.quiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Slides\U14_Structures\Title.txt" />
     <Content Include="Slides\U15_StacksAndQueues\Title.txt" />
     <Content Include="Slides\U16_yield_return\Title.txt" />
