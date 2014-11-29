@@ -109,6 +109,7 @@
     <Compile Include="Slides\U13_Consistency\S060_Конструкторы.cs" />
     <Compile Include="Slides\U13_Consistency\S070_Поля readonly.cs" />
     <Compile Include="Slides\U13_Consistency\S080_Статические конструкторы.cs" />
+    <Compile Include="Slides\U13_Consistency\S099_Exercise.cs" />
     <Compile Include="Slides\U14_Structures\S010_Объявление структуры.cs" />
     <Compile Include="Slides\U14_Structures\S020_Инициализация полей структуры.cs" />
     <Compile Include="Slides\U14_Structures\S030_Передача структуры в метод.cs" />
@@ -224,6 +225,7 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Slides\U12_Inheritance\Title.txt" />
+    <Content Include="Slides\U13_Consistency\digger2.png" />
     <Content Include="Slides\U13_Consistency\S025_private.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
