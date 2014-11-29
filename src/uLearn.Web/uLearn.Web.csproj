@@ -686,6 +686,7 @@
     <Content Include="Jsdifflib\jsdifflib.css" />
     <Content Include="katex\katex.min.css" />
     <Content Include="katex\katex.min.js" />
+    <Content Include="Scripts\bootstrap.file-input.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="codemirror\README.md" />
