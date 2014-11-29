@@ -97,14 +97,14 @@
     <Compile Include="Slides\U12_Inheritance\S080_IComparer.cs" />
     <Compile Include="Slides\U12_Inheritance\S090_Polymorphism.cs" />
     <Compile Include="Slides\U12_Inheritance\S100_VirtualMethods.cs" />
-    <Compile Include="Slides\U13_Consistancy\S010_Целостность данных.cs" />
-    <Compile Include="Slides\U13_Consistancy\S020_Ключевое слово private.cs" />
-    <Compile Include="Slides\U13_Consistancy\S030_Отложенные ошибки.cs" />
-    <Compile Include="Slides\U13_Consistancy\S040_Свойства.cs" />
-    <Compile Include="Slides\U13_Consistancy\S050_Больше свойств.cs" />
-    <Compile Include="Slides\U13_Consistancy\S060_Конструкторы.cs" />
-    <Compile Include="Slides\U13_Consistancy\S070_Поля readonly.cs" />
-    <Compile Include="Slides\U13_Consistancy\S080_Статические конструкторы.cs" />
+    <Compile Include="Slides\U13_Consistency\S010_Целостность данных.cs" />
+    <Compile Include="Slides\U13_Consistency\S020_Ключевое слово private.cs" />
+    <Compile Include="Slides\U13_Consistency\S030_Отложенные ошибки.cs" />
+    <Compile Include="Slides\U13_Consistency\S040_Свойства.cs" />
+    <Compile Include="Slides\U13_Consistency\S050_Больше свойств.cs" />
+    <Compile Include="Slides\U13_Consistency\S060_Конструкторы.cs" />
+    <Compile Include="Slides\U13_Consistency\S070_Поля readonly.cs" />
+    <Compile Include="Slides\U13_Consistency\S080_Статические конструкторы.cs" />
     <Compile Include="Slides\U14_Structures\S010_Объявление структуры.cs" />
     <Compile Include="Slides\U14_Structures\S020_Инициализация полей структуры.cs" />
     <Compile Include="Slides\U14_Structures\S030_Передача структуры в метод.cs" />
@@ -394,7 +394,7 @@
     <None Include="Slides\U07_Complexity\InstructorNotes.md" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Slides\U13_Consistancy\Title.txt" />
+    <Content Include="Slides\U13_Consistency\Title.txt" />
     <Content Include="Slides\U00_Basics\Title.txt" />
     <Content Include="Slides\Prelude.cs" />
     <Content Include="Slides\U01_Mistakes\Title.txt" />

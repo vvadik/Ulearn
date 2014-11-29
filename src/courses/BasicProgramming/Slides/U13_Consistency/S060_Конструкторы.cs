@@ -1,11 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using uLearn; 
-
-namespace U13_Consistancy
+﻿namespace uLearn.Courses.BasicProgramming.Slides.U13_Consistency
 {
 	[Slide("Конструкторы", "44031426-2494-4718-9783-d0449d5211a6")]
 	class S060_Конструкторы

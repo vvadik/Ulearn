@@ -1,11 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using uLearn; 
 
-namespace U13_Consistancy
+namespace uLearn.Courses.BasicProgramming.Slides.U13_Consistency
 {
 	[Slide("Свойства", "68fc015e-3807-4c56-b6ff-4d5caf5b048d")]
 	class S040_Свойства

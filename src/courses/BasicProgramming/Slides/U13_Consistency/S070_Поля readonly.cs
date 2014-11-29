@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using uLearn;
+﻿using System;
 
-namespace U13_Consistancy
+namespace uLearn.Courses.BasicProgramming.Slides.U13_Consistency
 {
     [Slide("Поля readonly", "ac9cb965-c780-4117-abae-8f1ad41a08c9")]
     class S070_Поля_readonly

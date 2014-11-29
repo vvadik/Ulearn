@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using uLearn; 
+﻿using System;
 
-namespace U13_Consistancy
+namespace uLearn.Courses.BasicProgramming.Slides.U13_Consistency
 {
 	[Slide("Статические конструкторы", "73a67604-e583-417a-96a8-3e8740a6de25")]
 	class S080_Статические_конструкторы

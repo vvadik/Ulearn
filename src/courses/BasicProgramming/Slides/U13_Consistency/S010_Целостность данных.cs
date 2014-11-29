@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using uLearn; 
+﻿using System;
 
-namespace U13_Consistancy
+namespace uLearn.Courses.BasicProgramming.Slides.U13_Consistency
 {
 	[Slide("Целостность данных", "cd98d9f9-ecab-4aca-bbb7-1521280e1c8f")]
 	class S010_Целостность_данных

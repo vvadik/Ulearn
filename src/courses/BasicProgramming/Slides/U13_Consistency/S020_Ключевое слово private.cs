@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using uLearn; 
+﻿using System;
 
-namespace U13_Consistancy
+namespace uLearn.Courses.BasicProgramming.Slides.U13_Consistency
 {
 	[Slide("Ключевое слово private", "59e03b07-750a-4f8c-9936-b4025c097ee7")]
 	class S020_Ключевое_слово_private

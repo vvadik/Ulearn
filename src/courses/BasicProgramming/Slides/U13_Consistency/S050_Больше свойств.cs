@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using uLearn; 
+﻿using System;
 
-namespace U13_Consistancy
+namespace uLearn.Courses.BasicProgramming.Slides.U13_Consistency
 {
 	[Slide("Больше свойств", "632b5529-8873-4084-b3aa-186e5c26cc3d")]
 	class S050_Больше_свойств
