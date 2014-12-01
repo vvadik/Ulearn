@@ -202,6 +202,12 @@
     <Compile Include="Controllers\SlideNavigationController.cs" />
     <Compile Include="Controllers\ExerciseController.cs" />
     <Compile Include="Controllers\HintController.cs" />
+    <Compile Include="DataContexts\TextsRepo.cs" />
+    <Compile Include="Migrations\201411140847550_extract large text fields.cs" />
+    <Compile Include="Migrations\201411140847550_extract large text fields.Designer.cs">
+      <DependentUpon>201411140847550_extract large text fields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TextBlob.cs" />
     <Compile Include="Ideone\ExecutionService.Settings.Sample.cs" />
     <Compile Include="Migrations\201408220628510_AddUnitAppearance.cs" />
     <Compile Include="Migrations\201408220628510_AddUnitAppearance.Designer.cs">
@@ -399,6 +405,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201410280605055_add index for Quizzes.resx">
       <DependentUpon>201410280605055_add index for Quizzes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201411140847550_extract large text fields.resx">
+      <DependentUpon>201411140847550_extract large text fields.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
