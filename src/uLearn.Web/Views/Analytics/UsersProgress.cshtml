@@ -35,7 +35,7 @@
 				<td>
 					<h6>@user.UserName</h6>
 				</td>
-				<td data-sort-value="@(string.IsNullOrEmpty(user.UserGroup) ? "-" : user.UserGroup)">
+				<td data-sort-value="@(user.UserGroup??"")">
 					<input id="@(user.UserId)" onblur="changeGroup('@user.UserId')" data-url="@Url.Action("AddUserGroup", "Analytics")" type="text" value="@user.UserGroup" />
 				</td>
 				@for (var i = 0; i < user.SlidesSlideInfo.Length; i++)
