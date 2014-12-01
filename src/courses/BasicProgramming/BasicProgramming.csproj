@@ -382,6 +382,8 @@
     <None Include="Slides\U10_Practice\manipulator.zip" />
     <None Include="Slides\U11_OOP\InstructorNotes.md" />
     <None Include="Slides\U12_Inheritance\digger.zip" />
+    <None Include="Slides\U12_Inheritance\InstructorNotes.md" />
+    <None Include="Slides\U13_Consistency\InstructorNotes.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">

@@ -75,7 +75,7 @@ namespace uLearn
 					}
 					catch (Exception e)
 					{
-						throw new Exception("Error loading course from " + zipFile.Name, e);
+						//throw new Exception("Error loading course from " + zipFile.Name, e);
 					}
 			}
 		}
