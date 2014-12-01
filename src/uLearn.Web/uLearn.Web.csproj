@@ -788,8 +788,6 @@
     <Content Include="tablesorter-master\addons\pager\jquery.tablesorter.pager.js" />
     <Content Include="tablesorter-master\addons\pager\jquery.tablesorter.pager.min.js" />
     <Content Include="tablesorter-master\bower.json" />
-    <Content Include="tablesorter-master\build.xml" />
-    <Content Include="tablesorter-master\changelog" />
     <Content Include="tablesorter-master\changelog.txt" />
     <Content Include="tablesorter-master\css\filter.formatter.css" />
     <Content Include="tablesorter-master\css\images\black-asc.gif" />
@@ -830,10 +828,6 @@
     <Content Include="tablesorter-master\css\theme.jui.css" />
     <Content Include="tablesorter-master\css\theme.metro-dark.css" />
     <Content Include="tablesorter-master\index.html" />
-    <Content Include="tablesorter-master\jquery-latest.js" />
-    <Content Include="tablesorter-master\jquery.metadata.js" />
-    <Content Include="tablesorter-master\jquery.tablesorter.js" />
-    <Content Include="tablesorter-master\jquery.tablesorter.min.js" />
     <Content Include="tablesorter-master\js\extras\jquery.quicksearch.js" />
     <Content Include="tablesorter-master\js\extras\semver-mod.js" />
     <Content Include="tablesorter-master\js\extras\semver.js" />
@@ -876,21 +870,10 @@
     <Content Include="tablesorter-master\js\widgets\widget-repeatheaders.js" />
     <Content Include="tablesorter-master\js\widgets\widget-scroller.js" />
     <Content Include="tablesorter-master\js\widgets\widget-staticRow.js" />
-    <Content Include="tablesorter-master\LICENSE" />
     <Content Include="tablesorter-master\package.json" />
     <Content Include="tablesorter-master\README.md" />
     <Content Include="tablesorter-master\tablesorter.jquery.json" />
     <Content Include="tablesorter-master\test.html" />
-    <Content Include="tablesorter-master\themes\blue\asc.gif" />
-    <Content Include="tablesorter-master\themes\blue\bg.gif" />
-    <Content Include="tablesorter-master\themes\blue\blue.zip" />
-    <Content Include="tablesorter-master\themes\blue\desc.gif" />
-    <Content Include="tablesorter-master\themes\blue\style.css" />
-    <Content Include="tablesorter-master\themes\green\asc.png" />
-    <Content Include="tablesorter-master\themes\green\bg.png" />
-    <Content Include="tablesorter-master\themes\green\desc.png" />
-    <Content Include="tablesorter-master\themes\green\green.zip" />
-    <Content Include="tablesorter-master\themes\green\style.css" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

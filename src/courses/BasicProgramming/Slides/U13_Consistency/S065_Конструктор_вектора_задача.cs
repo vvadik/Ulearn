@@ -2,7 +2,7 @@
 
 namespace uLearn.Courses.BasicProgramming.Slides.U13_Consistency
 {
-	[Slide("Точка", "6011B77EB481445D982393E6A57FD757")]
+	[Slide("Вектор", "6011B77EB481445D982393E6A57FD757")]
 	class S065_Конструктор_вектора_задача : SlideTestBase
 	{
 		/*
@@ -11,7 +11,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U13_Consistency
 		Сделайте так, чтобы:
 
 		* поля этого класса инициализировались в конструкторе.
-		* поле Length (длина окружности), стало вычисляемым свойством.
+		* поле Length (длина вектора), стало вычисляемым свойством.
 		*/
 
 		[HideOnSlide]

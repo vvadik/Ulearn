@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using uLearn.CSharp;
 
 namespace uLearn.Courses.BasicProgramming.Slides.U12_Inheritance
 {
@@ -24,6 +22,9 @@ A
 
 		[ExcludeFromSolution]
 		[HideOnSlide]
+		[Hint("Используйте Array — базовый класс для всех массивов")]
+		[Hint("Сигнатура метода должна быть такой: static object Min(Array args)")]
+		[Hint("Используйте тот факт, что числа символы и строки реализуют интерфейс IComparable")]
 		static object Min(Array args)
 		{
 			IComparable min = args.GetValue(0) as IComparable;
