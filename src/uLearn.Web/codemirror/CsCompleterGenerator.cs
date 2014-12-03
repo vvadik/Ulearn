@@ -1,13 +1,19 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 
-namespace uLearn.tests
+namespace uLearn.Web.codemirror
 {
-	static class CreateDictForAutocomplete
+	static class CsCompleterGenerator
 	{
 		private static readonly Dictionary<string, List<string>> returnTypeDictionary = new Dictionary<string, List<string>>();
 		private static readonly Dictionary<Type, HashSet<Tuple<string, string>>> extensionMethods = new Dictionary<Type, HashSet<Tuple<string, string>>>();
@@ -16,6 +22,7 @@ namespace uLearn.tests
 			Tuple.Create("ReadOnlyCollection", "Enumerable"),
 			Tuple.Create("Lookup", "Enumerable"),
 			Tuple.Create("Enumerable", "Enumerable"),
+			Tuple.Create("Int", "int"),
 			Tuple.Create("Int16", "int"),
 			Tuple.Create("Int32", "int"),
 			Tuple.Create("Int64", "long"),
@@ -25,13 +32,10 @@ namespace uLearn.tests
 			Tuple.Create("Decimal", "double"),
 			Tuple.Create("Boolean", "bool"),
 			Tuple.Create("Char", "char"),
-			Tuple.Create("List", "List"),
-			Tuple.Create("Dictionary", "Dictionary"),
-			Tuple.Create("[]", "Array"),
 			Tuple.Create("IEqualityComparer", "IEqualityComparer"),
 			Tuple.Create("IEnumerator", "IEnumerator"),
 			Tuple.Create("ParallelQuery", "ParallelQuery"),
-			Tuple.Create("Queryable", "Queryable")
+			Tuple.Create("Queryable", "Queryable"),
 		};
 
 		private static int totalWordCount;
@@ -43,18 +47,33 @@ namespace uLearn.tests
 			var myTypes = new[]
 			{
 				typeof (int),
-				typeof (string),
+				typeof (char),
 				typeof (double),
+				typeof (long),
+				typeof (float),
+				typeof (string),
 				typeof (Console),
 				typeof (Math),
-				typeof (long),
 				typeof (Boolean),
-				typeof (float),
 				typeof (Enumerable),
 				typeof (Array),
-				typeof (List<>),
+				typeof (StringBuilder),
 				typeof (Dictionary<,>),
-				typeof (char)
+				typeof (List<>),
+				typeof (DirectoryInfo),
+				typeof (FileInfo),
+				typeof (CultureInfo),
+				typeof (Tuple),
+				typeof (Tuple<,>),
+				typeof (Tuple<,,>),
+				typeof (Tuple<,,,>),
+				typeof (IComparer),
+				typeof (IComparable),
+				typeof (IEnumerable),
+				typeof (ILookup<,>),
+				typeof (Regex),
+				typeof (KeyValuePair<,>),
+				typeof (Point),
 			};
 
 			var extendedTypes = new[]
@@ -64,7 +83,7 @@ namespace uLearn.tests
 				typeof(Queryable)
 			};
 
-			Console.WriteLine("this.types = [{0}];\n", ToArrayString(myTypes.Select(ToPrettyString)));
+			Console.WriteLine("this.types = [{0}];\n", ToArrayString(myTypes.Where(t => !t.IsGenericTypeDefinition).Select(ToPrettyString)));
 			Console.WriteLine("this.synonym = {{{0}}};\n", ToDictionary(prettyNames));
 			GetExtensionMethods(extendedTypes);
 			WalkThroughTypes(myTypes);
@@ -108,25 +127,21 @@ namespace uLearn.tests
 
 		private static void WalkThroughTypes(Type[] myTypes)
 		{
-			const string staticDict = "dictWithStatic";
-			VisitTypesElements(staticDict, GetStatic, myTypes);
-
-			const string nonStaticDict = "dictWithNonStatic";
-			VisitTypesElements(nonStaticDict, GetNonStatic, myTypes);
-
+			VisitTypesElements("staticMembers", GetStatic, myTypes);
+			VisitTypesElements("dynamicMembers", GetNonStatic, myTypes);
 			PrintReturnTypeDictionary();
-			Console.WriteLine("Total word count in all dictionary: {0}", totalWordCount);
+			Console.WriteLine("// Total word count in all dictionary: {0}", totalWordCount);
 		}
 
 		private static void PrintReturnTypeDictionary()
 		{
-			Console.WriteLine("this.returnTypeDict = [];");
+			Console.WriteLine("this.membersByReturnType = [];");
 			foreach (
 				var type in
 					returnTypeDictionary.Keys/*.Where(
 						type => !type.ToString().Contains("TSource") && !type.ToString().Contains("TResult") && myTypes.Contains(type))*/)
 			{
-				Console.WriteLine("this.returnTypeDict['{0}'] = [{1}];", type,
+				Console.WriteLine("this.membersByReturnType['{0}'] = [{1}];", type,
 					ToArrayString(returnTypeDictionary[type].Distinct()));
 				totalWordCount += returnTypeDictionary[type].Distinct().Count();
 			}
@@ -147,10 +162,11 @@ namespace uLearn.tests
 
 		private static string ToPrettyString(Type myType)
 		{
-			var type = myType.ToString().Replace("System.", "").Replace("Linq.", "");
+			var type = myType.Name;
 			foreach (var prettyName in prettyNames)
 			{
-				if (type.Contains(prettyName.Item1))
+				
+				if (type == prettyName.Item1)
 					return prettyName.Item2;
 			}
 			return type;

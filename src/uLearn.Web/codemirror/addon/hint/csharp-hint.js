@@ -64,14 +64,12 @@
 		do {
 			res.ch = token.start;
 			if (res.ch === 0) {
+				if (res.line == 0) return { pos: res, token: "" };
 				res = CodeMirror.Pos(res.line - 1);
 			}
 			token = editor.getTokenAt(res);
 		} while (token.string.length == 0 || !/\S/.test(token.string));
-		return {
-			pos: res,
-			token: token
-		};
+		return { pos: res, token: token };
 	}
 
 

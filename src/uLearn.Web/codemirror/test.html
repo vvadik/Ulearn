@@ -13,38 +13,33 @@
 		<div id="qunit-fixture"></div>
 
 		<script>
-
-			var keywords = [
-				'abstract', 'add', 'alias', 'as', 'ascending', 'async', 'await', 'base', 'bool', 'break', 'byte',
-				'case', 'catch', 'char', 'checked', 'class', 'const', 'continue', 'decimal', 'default', 'delegate',
-				'descending', 'do', 'double', 'dynamic', 'else', 'enum', 'event', 'explicit', 'extern', 'false',
-				'finally', 'fixed', 'float', 'for', 'foreach', 'from', 'get', 'global', 'goto', 'group', 'if',
-				'implicit', 'in ', 'in', 'int', 'interface', 'internal', 'into', 'is', 'join', 'let', 'lock',
-				'long', 'namespace', 'new', 'null', 'object', 'operator', 'orderby', 'out ', 'out', 'override',
-				'params', 'partial ', 'private', 'protected', 'public', 'readonly', 'ref', 'remove', 'return',
-				'sbyte', 'sealed', 'select', 'set', 'short', 'sizeof', 'stackalloc', 'static', 'string', 'struct',
-				'switch', 'this', 'throw', 'true', 'try', 'typeof', 'uint', 'ulong', 'unchecked', 'unsafe', 'ushort',
-				'using', 'value', 'var', 'virtual', 'void', 'volatile', 'where ', 'while', 'yield'
-			];
-
-			var completer = new CsCompleter(keywords);
+			var completer = new CsCompleter();
+			
+			function union(arr1, arr2){
+				var res = arr1.concat(arr2).sort();
+				res = res.filter(function(item, pos) {
+					return !pos || item != res[pos - 1];
+				});
+				return res;
+			}
+			function filterByPrefix(arr, prefix){
+				return arr.filter(function(item) {
+					return item.slice(0, prefix.length) == prefix;
+				});
+			}
+			
+			function assertContains(assert, big, subset){
+				for(var i=0; i<subset.length; i++)
+					assert.ok(big.indexOf(subset[i]) >= 0);
+			}
 		</script>
 
 		<script>
 			QUnit.module('Empty completion');
 			QUnit.test('', function (assert) {
-				var res = keywords;
-				res.push(
-					'Math', 'Console', 'Int32', 'Int64', 'Double', 'Boolean', 'Char', 'Array', 'Enumerable', 'List', 'Dictionary'
-				);
-				res.sort();
-				assert.deepEqual(completer.getCompletions("", "", false), res, 'all');
-				var resV = [];
-				for (var i = 0; i < res.length; ++i) {
-					if (res[i].charAt(0) == 'v')
-						resV.push(res[i]);
-				}
-				assert.deepEqual(completer.getCompletions("", "v", false), resV, 'all');
+				var res = union(completer.keywords, completer.types);
+				assert.deepEqual(completer.getCompletions("", "", false), res);
+				assert.deepEqual(completer.getCompletions("", "v", false), filterByPrefix(res, "v"));
 			});
 		</script>
 
@@ -72,12 +67,10 @@
 			});
 
 			QUnit.test('int', function(assert) {
-				assert.deepEqual(completer.getCompletions('int', '', true), [
-					'MaxValue', 'MinValue', 'Parse', 'TryParse'
-				], 'int all');
-				assert.deepEqual(completer.getCompletions('Int32', '', true), [
-					'MaxValue', 'MinValue', 'Parse', 'TryParse'
-				], 'Int32 all');
+				assert.deepEqual(completer.getCompletions('int', '', true), 
+					['MaxValue', 'MinValue', 'Parse', 'TryParse'], "int all");
+				assert.deepEqual(completer.getCompletions('Int32', '', true), 
+					['MaxValue', 'MinValue', 'Parse', 'TryParse'], "Int32 all");
 			});
 
 			QUnit.test('long', function (assert) {
@@ -161,16 +154,6 @@
 				], 'Enumerable all');
 			});
 
-			QUnit.test('List', function(assert) {
-				assert.deepEqual(completer.getCompletions('List', '', true), [
-				], 'List all');
-			});
-
-			QUnit.test('Dictionary', function (assert) {
-				assert.deepEqual(completer.getCompletions('Dictionary', '', true), [
-				], 'Dictionary all');
-			});
-
 		</script>
 
 		<script>
@@ -221,7 +204,8 @@
 			});
 
 			QUnit.test('Array', function (assert) {
-				assert.deepEqual(completer.getCompletions('ToArray', '', true), [
+				assertContains(assert, completer.getCompletions('ToArray', '', true),
+				[
 					'AsParallel', 'AsQueryable', 'Cast', 'Clone', 'CopyTo', 'Equals',
 					'GetEnumerator', 'GetHashCode', 'GetLength', 'GetLongLength', 'GetLowerBound',
 					'GetType', 'GetUpperBound', 'GetValue', 'Initialize', 'IsFixedSize', 'IsReadOnly',
@@ -298,8 +282,8 @@
 
 				var knownTokens = new SamePrefixArray();
 				knownTokens.container = completer.unknown;
-				for (var ind in completer.dictWithStatic) {
-					knownTokens.AddAll(completer.dictWithStatic[ind]);
+				for (var ind in completer.staticMembers) {
+					knownTokens.AddAll(completer.staticMembers[ind]);
 				}
 				knownTokens.AddAll(completer.keywords);
 				knownTokens.AddAll(completer.types);
