@@ -53,7 +53,7 @@ namespace uLearn.Web.DataContexts
 			}
 			catch (DbEntityValidationException e)
 			{
-				Debug.Write(
+				throw new Exception(
 					string.Join("\r\n",
 					e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
 			}
