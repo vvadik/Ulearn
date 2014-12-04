@@ -216,6 +216,10 @@
     <Compile Include="Migrations\201411140847550_extract large text fields.Designer.cs">
       <DependentUpon>201411140847550_extract large text fields.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201412040905024_TextBlobLimits.cs" />
+    <Compile Include="Migrations\201412040905024_TextBlobLimits.Designer.cs">
+      <DependentUpon>201412040905024_TextBlobLimits.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\TextBlob.cs" />
     <Compile Include="CreateListOfUsedTokens.cs" />
     <Compile Include="Ideone\ExecutionService.Settings.Sample.cs" />
@@ -418,6 +422,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201411140847550_extract large text fields.resx">
       <DependentUpon>201411140847550_extract large text fields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201412040905024_TextBlobLimits.resx">
+      <DependentUpon>201412040905024_TextBlobLimits.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

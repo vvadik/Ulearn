@@ -13,6 +13,7 @@ namespace uLearn.Web.DataContexts
 	public class TextsRepo
 	{
 		private readonly ULearnDb db;
+		public const int MAX_TEXT_SIZE = 4000;
 
 		public TextsRepo() : this(new ULearnDb())
 		{
@@ -32,6 +33,9 @@ namespace uLearn.Web.DataContexts
 					Hash = null, 
 					Text = null
 				};
+
+			if (text.Length > MAX_TEXT_SIZE)
+				text = text.Substring(0, MAX_TEXT_SIZE);
 
 			var hash = getHash(text);
 			var inBase = db.Texts.Find(hash);
