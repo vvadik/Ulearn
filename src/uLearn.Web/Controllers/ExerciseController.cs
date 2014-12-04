@@ -31,6 +31,14 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> RunSolution(string courseId, int slideIndex = 0)
 		{
 			var code = GetUserCode(Request.InputStream);
+			if (code.Length > TextsRepo.MAX_TEXT_SIZE)
+			{
+				return Json(new RunSolutionResult
+				{
+					IsCompileError = true,
+					CompilationError = "Слишком большой код."
+				});
+			}
 			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
 			var result = await CheckSolution(exerciseSlide, code);
 			await SaveUserSolution(courseId, exerciseSlide.Id, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer);
