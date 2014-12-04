@@ -73,6 +73,16 @@ namespace uLearn.Web.Controllers
 			return View();
 		}
 
+		protected override void OnException(ExceptionContext filterContext)
+		{
+			if (filterContext.Exception is HttpAntiForgeryException)
+			{
+				filterContext.ExceptionHandled = true;
+				filterContext.Result = RedirectToAction("Login");
+			}
+			base.OnException(filterContext);
+		}
+
 		//
 		// POST: /Account/Login
 		[HttpPost]
