@@ -6,7 +6,7 @@ namespace uLearn.Courses.BasicProgramming.Slides.U13_Consistency
 	internal class S055_Свойство_вместо_поля_задача : SlideTestBase
 	{
 		/*
-		Превратите поле Name в свойство самостоятельно. Это совсем не сложно!
+		Превратите поле Title в свойство самостоятельно. Это совсем не сложно!
 		*/
 
 		public static void Check()

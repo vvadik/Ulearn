@@ -114,9 +114,12 @@
     <Compile Include="Slides\U14_Structures\S020_Инициализация полей структуры.cs" />
     <Compile Include="Slides\U14_Structures\S030_Передача структуры в метод.cs" />
     <Compile Include="Slides\U14_Structures\S040_Ключевое слово ref.cs" />
+    <Compile Include="Slides\U14_Structures\S045_Сделать_ref.cs" />
     <Compile Include="Slides\U14_Structures\S050_Боксинг и анбоксинг.cs" />
     <Compile Include="Slides\U14_Structures\S060_Структуры и свойства.cs" />
     <Compile Include="Slides\U14_Structures\S070_Зачем нужны структуры.cs" />
+    <Compile Include="Slides\U14_Structures\S099_Exercise.cs" />
+    <Compile Include="Slides\U14_Structures\_055_boxing_quiz.cs" />
     <Compile Include="Slides\U15_StacksAndQueues\S010_Стэки и очереди.cs" />
     <Compile Include="Slides\U15_StacksAndQueues\S020_Очередь на связных списках.cs" />
     <Compile Include="Slides\U15_StacksAndQueues\S030_Универсальная очередь и даункасты.cs" />
@@ -229,6 +232,13 @@
     <Content Include="Slides\U13_Consistency\S025_private.quiz.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Slides\U14_Structures\S025_Структура_или_класс.quiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Slides\U14_Structures\S055_Боксинг.quiz.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Slides\U14_Structures\solitaire.png" />
     <Content Include="Slides\U14_Structures\Title.txt" />
     <Content Include="Slides\U15_StacksAndQueues\Title.txt" />
     <Content Include="Slides\U16_yield_return\Title.txt" />
@@ -384,6 +394,7 @@
     <None Include="Slides\U12_Inheritance\digger.zip" />
     <None Include="Slides\U12_Inheritance\InstructorNotes.md" />
     <None Include="Slides\U13_Consistency\InstructorNotes.md" />
+    <None Include="Slides\U14_Structures\InstructorNotes.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">
