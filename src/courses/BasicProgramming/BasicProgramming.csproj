@@ -145,6 +145,18 @@
     <Compile Include="Slides\U17_ListAndDict\S090_Поиск подстроки в строке - 2.cs" />
     <Compile Include="Slides\U17_ListAndDict\S100_Класс Dictionary.cs" />
     <Compile Include="Slides\U17_ListAndDict\S110_GetHashCode.cs" />
+    <Compile Include="Slides\U18_Delegates\S010_Постановка проблемы.cs" />
+    <Compile Include="Slides\U18_Delegates\S020_Делегаты.cs" />
+    <Compile Include="Slides\U18_Delegates\S030_Делегаты для динамических методов.cs" />
+    <Compile Include="Slides\U18_Delegates\S040_Карта памяти.cs" />
+    <Compile Include="Slides\U18_Delegates\S050_Дженерик-делегаты.cs" />
+    <Compile Include="Slides\U18_Delegates\S060_Func и Action.cs" />
+    <Compile Include="Slides\U18_Delegates\S070_Анонимные делегаты.cs" />
+    <Compile Include="Slides\U18_Delegates\S080_Лямбда-выражения.cs" />
+    <Compile Include="Slides\U18_Delegates\S090_Больше лямбд.cs" />
+    <Compile Include="Slides\U18_Delegates\S100_Замыкание.cs" />
+    <Compile Include="Slides\U18_Delegates\S110_Карта памяти.cs" />
+    <Compile Include="Slides\U18_Delegates\S120_Ловушка замыкания.cs" />
     <Content Include="Slides\logo.png" />
     <Content Include="Slides\thumbnail.png" />
     <Content Include="Slides\Title.txt" />
@@ -233,6 +245,9 @@
     <Content Include="Slides\U15_StacksAndQueues\Title.txt" />
     <Content Include="Slides\U16_yield_return\Title.txt" />
     <Content Include="Slides\U17_ListAndDict\Title.txt" />
+    <Content Include="Slides\U18_Delegates\map1.png" />
+    <Content Include="Slides\U18_Delegates\map2.png" />
+    <Content Include="Slides\U18_Delegates\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
     <Content Include="Slides\U01_Mistakes\S091_Style2.quiz.xml">
       <SubType>Designer</SubType>
