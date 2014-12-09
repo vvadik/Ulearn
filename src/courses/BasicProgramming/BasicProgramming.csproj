@@ -258,6 +258,7 @@
     <Content Include="Slides\U18_Delegates\map1.png" />
     <Content Include="Slides\U18_Delegates\map2.png" />
     <Content Include="Slides\U18_Delegates\Title.txt" />
+    <Content Include="Slides\U18_Delegates\Идеи задач.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
     <Content Include="Slides\U01_Mistakes\S091_Style2.quiz.xml">
       <SubType>Designer</SubType>
