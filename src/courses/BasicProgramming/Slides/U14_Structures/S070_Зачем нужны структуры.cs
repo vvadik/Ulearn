@@ -4,6 +4,12 @@
 	class S070_Зачем_нужны_структуры
 	{
 		//#video 6kWx1s_BmVs
-		
-    }
+
+		/*
+		##Дополнительный материал
+
+		Хорошее обсуждение того, когда стоит использовавать структуры есть 
+		на [stackoverflow.com](http://stackoverflow.com/questions/521298/when-to-use-struct-in-c)
+		*/
+	}
 }
