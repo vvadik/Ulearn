@@ -1,6 +1,6 @@
 ﻿$('.tablesorter').tablesorter({
 	widthFixed: true,
-	widgets: ['zebra'],
+	widgets: ['zebra', 'stickyHeaders'],
 
 	onRenderHeader: function () {
 		$(this).find('span').addClass('headerSpan');
@@ -14,6 +14,7 @@
 
 	widgetOptions: {
 		columns: ["primary", "secondary", "tertiary"],
+		stickyHeaders_offset: "#header",
 	},
 
 	textAttribute: 'data-sort-value'
