@@ -170,6 +170,17 @@
     <Compile Include="Slides\U19_FunctionalProgramming\S080_Реализация Select и ToList.cs" />
     <Compile Include="Slides\U19_FunctionalProgramming\S090_Последовательность вызовов Where и Select.cs" />
     <Compile Include="Slides\U19_FunctionalProgramming\S100_Последовательность вызовов с ToList.cs" />
+    <Compile Include="Slides\U24_Events\S010_Программирование GUI.cs" />
+    <Compile Include="Slides\U24_Events\S020_Событийная модель.cs" />
+    <Compile Include="Slides\U24_Events\S030_Событийная модель с делегатами.cs" />
+    <Compile Include="Slides\U24_Events\S040_Мультикаст-делегаты.cs" />
+    <Compile Include="Slides\U24_Events\S050_Целостность событийной модели.cs" />
+    <Compile Include="Slides\U24_Events\S060_События.cs" />
+    <Compile Include="Slides\U24_Events\S070_Сокращенный синтаксис событий.cs" />
+    <Compile Include="Slides\U24_Events\S080_Конвенция оформления событий.cs" />
+    <Compile Include="Slides\U24_Events\S090_Назначение protected virtual OnTick.cs" />
+    <Compile Include="Slides\U24_Events\S100_Назначение sender.cs" />
+    <Compile Include="Slides\U24_Events\S110_Назначение EventArgs.cs" />
     <Content Include="Slides\logo.png" />
     <Content Include="Slides\thumbnail.png" />
     <Content Include="Slides\Title.txt" />
@@ -270,6 +281,7 @@
     <Content Include="Slides\U18_Delegates\Title.txt" />
     <Content Include="Slides\U18_Delegates\Идеи задач.txt" />
     <Content Include="Slides\U19_FunctionalProgramming\Title.txt" />
+    <Content Include="Slides\U24_Events\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
     <Content Include="Slides\U01_Mistakes\S091_Style2.quiz.xml">
       <SubType>Designer</SubType>
