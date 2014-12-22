@@ -160,6 +160,16 @@
     <Compile Include="Slides\U18_Delegates\S100_Замыкание.cs" />
     <Compile Include="Slides\U18_Delegates\S110_Карта памяти.cs" />
     <Compile Include="Slides\U18_Delegates\S120_Ловушка замыкания.cs" />
+    <Compile Include="Slides\U19_FunctionalProgramming\S010_О функциональном программировании.cs" />
+    <Compile Include="Slides\U19_FunctionalProgramming\S020_Делегаты для диагностики кода.cs" />
+    <Compile Include="Slides\U19_FunctionalProgramming\S030_Делегаты в разборе арифметических выражений.cs" />
+    <Compile Include="Slides\U19_FunctionalProgramming\S040_Вычисление производной.cs" />
+    <Compile Include="Slides\U19_FunctionalProgramming\S050_Лямбда-выражения в тестах.cs" />
+    <Compile Include="Slides\U19_FunctionalProgramming\S060_Знакомство с LINQ.cs" />
+    <Compile Include="Slides\U19_FunctionalProgramming\S070_Реализация метода Where.cs" />
+    <Compile Include="Slides\U19_FunctionalProgramming\S080_Реализация Select и ToList.cs" />
+    <Compile Include="Slides\U19_FunctionalProgramming\S090_Последовательность вызовов Where и Select.cs" />
+    <Compile Include="Slides\U19_FunctionalProgramming\S100_Последовательность вызовов с ToList.cs" />
     <Content Include="Slides\logo.png" />
     <Content Include="Slides\thumbnail.png" />
     <Content Include="Slides\Title.txt" />
@@ -259,6 +269,7 @@
     <Content Include="Slides\U18_Delegates\map2.png" />
     <Content Include="Slides\U18_Delegates\Title.txt" />
     <Content Include="Slides\U18_Delegates\Идеи задач.txt" />
+    <Content Include="Slides\U19_FunctionalProgramming\Title.txt" />
     <None Include="Slides\U01_Mistakes\InstructorNotes.md" />
     <Content Include="Slides\U01_Mistakes\S091_Style2.quiz.xml">
       <SubType>Designer</SubType>
