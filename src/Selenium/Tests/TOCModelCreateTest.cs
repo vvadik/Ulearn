@@ -49,6 +49,9 @@ namespace Selenium.Tests
 			{
 				foreach (var unitName in TOC.GetUnitsNames())
 				{
+					if (!slide.IsActiveNextButton())
+						slide.RateSlide(Rate.Trivial);
+					slide = slide.ClickNextSlide();
 					var unit = TOC.GetUnitControl(unitName);
 					var names = unit.GetSlidesNames();
 					TOC = unit.Click();

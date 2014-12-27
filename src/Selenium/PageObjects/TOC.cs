@@ -13,7 +13,7 @@ namespace Selenium.PageObjects
 
 		private readonly IWebElement element;
 		private readonly IWebDriver driver;
-		private readonly Dictionary<string, TOCUnit> units;
+		private readonly Dictionary<string, Lazy<TOCUnit>> units;
 
 		private Dictionary<string, TOCUnit> statistics;
 
@@ -23,7 +23,7 @@ namespace Selenium.PageObjects
 			this.element = element;
 			var newXPath = XPath + lectionXPath;
 			var unitsElements = element.FindElements(By.XPath(newXPath)).ToList();
-			units = new Dictionary<string, TOCUnit>();
+			units = new Dictionary<string, Lazy<TOCUnit>>();
 			statistics = new Dictionary<string, TOCUnit>();
 			for (var i = 0; i < unitsElements.Count; i++)
 			{
@@ -33,7 +33,10 @@ namespace Selenium.PageObjects
 				if (unitName == "Total statistics" || unitName == "Users statistics" || unitName == "Personal statistics")
 					statistics.Add(unitName, new TOCUnit(driver, unitsElements[i], newXPath, i));
 				else
-					units.Add(unitName, new TOCUnit(driver, unitsElements[i], newXPath, i + 1));
+				{
+					var index = i;
+					units.Add(unitName, new Lazy<TOCUnit>(() => new TOCUnit(driver, unitsElements[index], newXPath, index + 1)));
+				}
 			}
 		}
 
@@ -44,7 +47,7 @@ namespace Selenium.PageObjects
 
 		public TOCUnit GetUnitControl(string unitName)
 		{
-			return units[unitName];
+			return units[unitName].Value;
 		}
 	}
 }

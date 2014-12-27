@@ -11,6 +11,7 @@
     <AssemblyName>Selenium</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -23,7 +24,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -83,6 +83,8 @@
   <ItemGroup>
     <Compile Include="MainClass.cs" />
     <Compile Include="PageObjects\ExerciseSlidePage.cs" />
+    <Compile Include="PageObjects\NavArrows.cs" />
+    <Compile Include="PageObjects\Rate.cs" />
     <Compile Include="PageObjects\SignInPage.cs" />
     <Compile Include="PageObjects\SlidePage.cs" />
     <Compile Include="PageObjects\SolutionsPage.cs" />
@@ -106,6 +108,10 @@
     <ProjectReference Include="..\uLearn.Web\uLearn.Web.csproj">
       <Project>{b3701d2e-d001-4e0a-ab2f-7acb5a89589b}</Project>
       <Name>uLearn.Web</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\uLearn\uLearn.csproj">
+      <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
+      <Name>uLearn</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
