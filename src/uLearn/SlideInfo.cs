@@ -19,12 +19,12 @@ namespace uLearn
 		{
 			get
 			{
-				return CourseUnitUtls.GetDirectoryRelativeWebPath(SlideFile);
+				return CourseUnitUtils.GetDirectoryRelativeWebPath(SlideFile);
 			}
 		}
 	}
 
-	public class CourseUnitUtls
+	public class CourseUnitUtils
 	{
 		public static string GetDirectoryRelativeWebPath(FileInfo file)
 		{
@@ -32,7 +32,7 @@ namespace uLearn
 			var courseDir = file.Directory.Parent.Name;
 			var unitDir = file.Directory.Name;
 			// ReSharper restore PossibleNullReferenceException
-			return courseDir + "/" + unitDir;
+			return string.Format("/Courses/{0}/{1}", courseDir, unitDir);
 		}
 	}
 }

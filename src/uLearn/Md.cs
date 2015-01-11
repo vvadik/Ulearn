@@ -11,7 +11,7 @@ namespace uLearn
 	{
 		public static string RenderMd(this string md, FileInfo sourceFile)
 		{
-			var baseUrl = "/Courses/" + CourseUnitUtls.GetDirectoryRelativeWebPath(sourceFile);
+			var baseUrl = CourseUnitUtils.GetDirectoryRelativeWebPath(sourceFile);
 			return md.RenderMd(baseUrl);
 		}
 

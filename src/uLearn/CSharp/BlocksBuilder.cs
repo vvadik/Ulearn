@@ -11,14 +11,14 @@ namespace uLearn.CSharp
 	public class SlideBuilder : CSharpSyntaxRewriter
 	{
 		public const string LangId = "csharp";
-		private readonly Func<string, string> getInclude;
+		private readonly IFileSystem fs;
 		public readonly List<SlideBlock> Blocks = new List<SlideBlock>();
 		public string Title;
 		public string Id;
 
-		public SlideBuilder(Func<string, string> getInclude) : base(false)
+		public SlideBuilder(IFileSystem fs) : base(false)
 		{
-			this.getInclude = getInclude;
+			this.fs = fs;
 		}
 
 		private SyntaxNode VisitMemberDeclaration(MemberDeclarationSyntax node, SyntaxNode newNode)
@@ -95,10 +95,17 @@ namespace uLearn.CSharp
 					var parts = comment.Split(new[] { ' ' }, 2);
 					if (parts[0] == "//#video") EmbedVideo(parts[1]);
 					if (parts[0] == "//#include") EmbedCode(parts[1]);
+					if (parts[0] == "//#gallery") EmbedGallery(parts[1]);
 					if (parts[0] == "//#http") EmbedExternalMarkdown(parts[1]);
 				}
 			}
 			return base.VisitTrivia(trivia);
+		}
+
+		private void EmbedGallery(string folderName)
+		{
+			string[] images = fs.GetFilenames(folderName);
+			Blocks.Add(new ImageGaleryBlock { ImageUrls = images });
 		}
 
 		private void EmbedExternalMarkdown(string url)
@@ -161,7 +168,7 @@ namespace uLearn.CSharp
 
 		private void EmbedCode(string filename)
 		{
-			Blocks.Add(new CodeBlock(getInclude(filename), LangId));
+			Blocks.Add(new CodeBlock(fs.GetContent(filename), LangId));
 		}
 
 		private void EmbedVideo(string videoId)

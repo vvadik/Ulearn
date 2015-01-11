@@ -787,6 +787,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Jsdifflib\jsdifflib.js" />
     <Content Include="Scripts\slide-editor.js" />
+    <Content Include="Scripts\slide-gallery.js" />
     <Content Include="Scripts\slide-run.js" />
     <Content Include="Scripts\slide-solutions-like.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
@@ -963,6 +964,7 @@
     <Content Include="tablesorter-master\css\theme.less" />
     <Content Include="Views\Account\Info.cshtml" />
     <Content Include="Views\Account\CourseInfo.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\ImageGaleryBlock.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

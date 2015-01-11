@@ -6,20 +6,20 @@ namespace uLearn.CSharp
 {
 	public static class SlideParser
 	{
-		public static Slide ParseSlide(string filename, SlideInfo slideInfo, Func<string, string> getInclude)
+		public static Slide ParseSlide(string filename, SlideInfo slideInfo, IFileSystem fs)
 		{
 			SyntaxTree tree = CSharpSyntaxTree.ParseFile(filename);
-			return ParseSyntaxTree(tree, slideInfo, "using System; using System.Linq;", getInclude);
+			return ParseSyntaxTree(tree, slideInfo, "using System; using System.Linq;", fs);
 		}
 
-		public static Slide ParseCode(string sourceCode, SlideInfo slideInfo, string prelude, Func<string, string> getInclude)
+		public static Slide ParseCode(string sourceCode, SlideInfo slideInfo, string prelude, IFileSystem fs)
 		{
 			SyntaxTree tree = CSharpSyntaxTree.ParseText(sourceCode);
-			return ParseSyntaxTree(tree, slideInfo, prelude, getInclude);
+			return ParseSyntaxTree(tree, slideInfo, prelude, fs);
 		}
 
 		private static Slide ParseSyntaxTree(SyntaxTree tree, SlideInfo slideInfo, string prelude,
-			Func<string, string> getInclude)
+			IFileSystem getInclude)
 		{
 			var blocksBuilder = new SlideBuilder(getInclude);
 			blocksBuilder.Visit(tree.GetRoot());

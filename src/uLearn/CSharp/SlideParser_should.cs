@@ -300,12 +300,26 @@ namespace uLearn.CSharp
 
 		private static Slide GenerateSlide(string name)
 		{
-			return SlideParser.ParseSlide(@".\tests\" + name, null, includeName => "included(" + includeName + ")");
+			return SlideParser.ParseSlide(@".\tests\" + name, null, new StubFS());
 		}
 		
 		private static Slide GenerateSlideFromFile(string path)
 		{
-			return SlideParser.ParseSlide(path, null, includeName => "included(" + includeName + ")");
+			return SlideParser.ParseSlide(path, null, new StubFS());
+		}
+
+		private class StubFS : IFileSystem
+		{
+			public string GetContent(string filepath)
+			{
+				return "included(" + filepath + ")";
+			}
+
+			public string[] GetFilenames(string dirPath)
+			{
+				return new[] { "a.png", "b.png" };
+			}
 		}
 	}
+
 }

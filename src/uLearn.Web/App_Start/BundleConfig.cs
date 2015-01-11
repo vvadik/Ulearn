@@ -21,6 +21,7 @@ namespace uLearn.Web
 				"~/Scripts/modernizr-*"));
 
 			bundles.Add(new ScriptBundle("~/slide-js").Include(
+				"~/flexslider/jquery.flexslider.js",
 				"~/katex/katex.min.js",
 				"~/Jsdifflib/jsdifflib.js",
 				"~/Scripts/slide-*"
@@ -45,6 +46,7 @@ namespace uLearn.Web
 				));
 
 			bundles.Add(new StyleBundle("~/css").Include(
+				"~/flexslider/flexslider.css",
 				"~/katex/katex.min.css",
 				"~/Content/bootstrap.css",
 				"~/codemirror/lib/codemirror.css",
