@@ -11,11 +11,23 @@
 	<p><a class="label label-success" href="@Url.Action("List", new{role=LmsRoles.Tester})">tester</a> может видеть ещё не опубликованные для всех материалы.</p>
 	<p><a class="label label-default" href="@Url.Action("List")">обычный пользователь</a> может видеть только опубликованные материалы.</p>
 
+	@using (Html.BeginForm("List", "Account", FormMethod.Get, new { @class = "form-inline" }))
+	{
+		<input class="form-control" type="text" name="namePrefix" />
+		<button class="btn btn-default" class="button" type="submit">Фильтровать по имени</button>
+	}
+	<p></p>
 	<table class="table table-condensed">
+		<tr>
+			<th>Имя</th>
+			<th>Группа</th>
+			<th>Роли</th>
+			<th>Удаление</th>
+		</tr>
 		@foreach (var user in Model)
 		{
 			<tr data-userid="@user.Id">
-				<td>@user.UserName</td>
+				<td>@Html.ActionLink(user.UserName, "Info", new { userName = user.UserName })</td>
 				<td>@user.GroupName</td>
 				<td>
 					<div class="btn-group">
@@ -25,7 +37,7 @@
 					</div>
 				</td>
 				<td>
-					@using (Html.BeginForm("DeleteUser", "Account", new {userId=user.Id}, FormMethod.Post))
+					@using (Html.BeginForm("DeleteUser", "Account", new { userId = user.Id }, FormMethod.Post))
 					{
 						@Html.AntiForgeryToken()
 						<button type="submit" class="btn btn-sm btn-danger">Удалить пользователя</button>

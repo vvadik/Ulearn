@@ -1,4 +1,7 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -14,9 +17,13 @@ namespace uLearn.Web.Controllers
 	[Authorize]
 	public class AccountController : Controller
 	{
+		private readonly ULearnDb db;
+		private readonly CourseManager courseManager;
 		public AccountController()
 			: this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb())))
 		{
+			db = new ULearnDb();
+			courseManager = WebCourseManager.Instance;
 			UserManager.UserValidator =
 				new UserValidator<ApplicationUser>(UserManager)
 				{
@@ -31,14 +38,14 @@ namespace uLearn.Web.Controllers
 
 		public UserManager<ApplicationUser> UserManager { get; private set; }
 
-		[Authorize(Roles = LmsRoles.Admin)]
-		public ActionResult List(string role = null)
+		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
+		public ActionResult List(string namePrefix = null, string role = null)
 		{
 			IQueryable<ApplicationUser> applicationUsers = new ULearnDb().Users;
+			if (!string.IsNullOrEmpty(namePrefix)) applicationUsers = applicationUsers.Where(u => u.UserName.StartsWith(namePrefix));
 			if (!string.IsNullOrEmpty(role)) applicationUsers = applicationUsers.Where(u => u.Roles.Any(r => r.Role.Name == role));
-			return View(applicationUsers.OrderBy(u => u.UserName).ToList());
+			return View(applicationUsers.OrderBy(u => u.UserName).Take(50).ToList());
 		}
-
 
 		[Authorize(Roles = LmsRoles.Admin)]
 		public async Task<ActionResult> ToggleRole(string userId, string role)
@@ -54,7 +61,6 @@ namespace uLearn.Web.Controllers
 		[Authorize(Roles = LmsRoles.Admin)]
 		public async Task<ActionResult> DeleteUser(string userId)
 		{
-			var db = new ULearnDb();
 			ApplicationUser user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
 			if (user != null)
 			{
@@ -62,6 +68,24 @@ namespace uLearn.Web.Controllers
 				await db.SaveChangesAsync();
 			}
 			return RedirectToAction("List");
+		}
+
+		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
+		public ActionResult Info(string userName)
+		{
+			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
+			if (user == null) return RedirectToAction("List");
+			var courses = new HashSet<string>(db.Visiters.Where(v => v.UserId == user.Id).Select(v => v.CourseId).Distinct());
+			return View(new UserInfoModel(user, courseManager.GetCourses().Where(c => courses.Contains(c.Id)).ToArray()));
+		}
+
+		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
+		public ActionResult CourseInfo(string userName, string courseId)
+		{
+			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
+			if (user == null) return RedirectToAction("List");
+			var course = courseManager.GetCourse(courseId);
+			return View(new UserCourseModel(course, user, db));
 		}
 
 		//
@@ -487,6 +511,78 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Login");
 			}
 			return RedirectToAction("Manage");
+		}
+	}
+
+	public class UserInfoModel
+	{
+		public ApplicationUser User { get; set; }
+		public Course[] Courses { get; private set; }
+
+		public UserInfoModel(ApplicationUser user, Course[] courses)
+		{
+			User = user;
+			Courses = courses;
+		}
+	}
+
+	public class UserCourseModel
+	{
+
+		public UserCourseModel(Course course, ApplicationUser user, ULearnDb db)
+		{
+			Course = course;
+			User = user;
+			var visits = db.Visiters.Where(v => v.UserId == user.Id && v.CourseId == course.Id).ToList();
+			var quizes = db.UserQuizzes.Where(v => v.UserId == user.Id && v.CourseId == course.Id && !v.isDropped).ToList();
+			var exercises = db.UserSolutions.Where(v => v.UserId == user.Id && v.CourseId == course.Id && v.IsRightAnswer && !v.IsCompilationError).ToList();
+			Units = course.GetUnits().Select(unitName =>
+				new UserCourseUnitModel
+				{
+					UnitName = unitName,
+					SlideVisits = CreateProgress(course, unitName, visits, v => v.SlideId, s => 1),
+					Exercises = CreateProgress(course, unitName, exercises, e => e.SlideId, s => s is ExerciseSlide ? 1 : 0),
+					Quizes = CreateProgress(course, unitName, quizes, q => q.SlideId, s => s is QuizSlide ? 1 : 0),
+				}
+				).ToArray();
+		}
+
+		public ProgressModel CreateProgress<T>(Course course, string unitName, List<T> items, Func<T, string> getSlideId, Func<Slide, int> getTotal)
+		{
+			var slides = course.Slides.Where(s => s.Info.UnitName == unitName).ToList();
+			return new ProgressModel
+			{
+				Total = slides.Sum(getTotal),
+				Earned = items.Select(getSlideId).Distinct().Count(slideId => slides.Any(s => s.Id == slideId))
+			};
+		}
+
+		public ApplicationUser User { get; set; }
+		public Course Course;
+		public ProgressModel Total;
+		public UserCourseUnitModel[] Units;
+	}
+
+	public class UserCourseUnitModel
+	{
+		public string UnitName;
+		public ProgressModel Total;
+		public ProgressModel Exercises;
+		public ProgressModel SlideVisits;
+		public ProgressModel Quizes;
+	}
+
+	public class ProgressModel
+	{
+		public int Earned;
+		public int Total;
+		public decimal? Progress { get { return Total == 0 ? null : (decimal?)Earned / Total; } }
+
+		public override string ToString()
+		{
+			if (Progress.HasValue)
+				return Progress.Value.ToString("0%");
+			return "—";
 		}
 	}
 }

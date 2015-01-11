@@ -32,7 +32,7 @@ namespace uLearn.Web.Controllers
 			this.courseManager = courseManager;
 		}
 
-		public ActionResult TotalStatistics(string courseId)
+		private ActionResult TotalStatistics(string courseId)
 		{
 			var model = CreateTotalStatistics(courseId);
 			return View(model);

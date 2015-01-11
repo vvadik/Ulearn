@@ -33,7 +33,7 @@ namespace uLearn
 
 		public IEnumerable<string> GetUnits()
 		{
-			return Slides.Select(s => s.Info.UnitName);
+			return Slides.Select(s => s.Info.UnitName).Distinct();
 		}
 
 		public InstructorNote GetInstructorNote(string unitName)

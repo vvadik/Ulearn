@@ -1,0 +1,35 @@
+﻿@model uLearn.Web.Controllers.UserCourseModel
+
+@{
+	ViewBag.Title = "User Course Stats";
+}
+
+<div class="container">
+	<h2>@Model.User.UserName — @Model.Course.Title</h2>
+
+	<h3>Лекции</h3>
+	<table class="table">
+		<tr>
+			<th>Лекция</th>
+			<th>Посещено слайдов</th>
+			<th>Решено задач</th>
+			<th>Решено тестов</th>
+			<th>Итого</th>
+		</tr>
+		@foreach (var unit in Model.Units)
+		{
+			<tr>
+				<td>@unit.UnitName</td>
+				<td title="@unit.SlideVisits.Earned of @unit.SlideVisits.Total">@unit.SlideVisits</td>
+				<td title="@unit.Exercises.Earned of @unit.Exercises.Total">@unit.Exercises</td>
+				<td title="@unit.Quizes.Earned of @unit.Quizes.Total">@unit.Quizes</td>
+				<td>--</td>
+			</tr>
+		}
+	</table>
+
+	<h3 id="questions">Заданные вопросы</h3>
+	<div class="load-content" data-url="@Url.Action("ItemsOfUser", "Questions", new{userId=Model.User.Id, courseId = Model.Course.Id})"></div>
+
+</div>
+

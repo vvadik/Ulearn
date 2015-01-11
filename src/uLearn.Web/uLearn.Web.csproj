@@ -961,6 +961,8 @@
     <Content Include="tablesorter-master\css\psd\green-unsorted.psd" />
     <Content Include="tablesorter-master\css\psd\metro-style.psd" />
     <Content Include="tablesorter-master\css\theme.less" />
+    <Content Include="Views\Account\Info.cshtml" />
+    <Content Include="Views\Account\CourseInfo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -40,12 +40,12 @@
 		{
 			<li class="units-list-item"><a id="badge"><div class="label label-info">Следующий модуль — @Model.NextUnitTime.ToString("dd MMMM", CultureInfo.CreateSpecificCulture("ru"))</div></a></li>
 		}
-		if (User.IsInRole(LmsRoles.Instructor) || User.IsInRole(LmsRoles.Admin))
-		{
-			<li class="units-list-item units-list-item-text">@Html.ActionLink("Total statistics", "TotalStatistics", "Analytics", new { courseId = Model.CourseId }, null)</li>
-			<li class="units-list-item units-list-item-text">@Html.ActionLink("Users statistics", "UsersStatistics", "Analytics", new { courseId = Model.CourseId }, null)</li>
-			<li class="units-list-item units-list-item-text">@Html.ActionLink("Personal statistics", "PersonalStatistics", "Analytics", new { courseId = Model.CourseId }, null)</li>
-		}
+@*		if (User.IsInRole(LmsRoles.Instructor) || User.IsInRole(LmsRoles.Admin))*@
+@*		{*@
+@*			<li class="units-list-item units-list-item-text">@Html.ActionLink("Total statistics", "TotalStatistics", "Analytics", new { courseId = Model.CourseId }, null)</li>*@
+@*			<li class="units-list-item units-list-item-text">@Html.ActionLink("Users statistics", "UsersStatistics", "Analytics", new { courseId = Model.CourseId }, null)</li>*@
+@*			<li class="units-list-item units-list-item-text">@Html.ActionLink("Personal statistics", "PersonalStatistics", "Analytics", new { courseId = Model.CourseId }, null)</li>*@
+@*		}*@
 	}
 </ul>
 
