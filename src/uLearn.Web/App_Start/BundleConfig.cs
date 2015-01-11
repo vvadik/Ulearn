@@ -45,8 +45,11 @@ namespace uLearn.Web
 				"~/Scripts/respond.js"
 				));
 
+			bundles.Add(new StyleBundle("~/flexslider/flexslider.css").Include(
+				"~/flexslider/flexslider.css"
+				));
+
 			bundles.Add(new StyleBundle("~/css").Include(
-				"~/flexslider/flexslider.css",
 				"~/katex/katex.min.css",
 				"~/Content/bootstrap.css",
 				"~/codemirror/lib/codemirror.css",

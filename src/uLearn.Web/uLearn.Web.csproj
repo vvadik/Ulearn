@@ -708,6 +708,11 @@
     <Content Include="Content\tablesorter.css" />
     <Content Include="Content\ulearn.css" />
     <Content Include="favicon.ico" />
+    <Content Include="flexslider\flexslider.css" />
+    <Content Include="flexslider\fonts\flexslider-icon.svg" />
+    <Content Include="flexslider\images\bg_play_pause.png" />
+    <Content Include="flexslider\jquery.flexslider-min.js" />
+    <Content Include="flexslider\jquery.flexslider.js" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -720,10 +725,8 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="codemirror\README.md" />
-    <Content Include="Courses.Staging\BasicProgramming.zip" />
-    <Content Include="Courses.Staging\linq.zip" />
+    <Content Include="Courses.Staging\*.zip" />
     <Content Include="Courses.Staging\Web.config" />
-    <Content Include="Courses.Staging\OOP.zip" />
     <None Include="encoding.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -763,6 +766,11 @@
     <Content Include="katex\fonts\KaTeX_Size4-Regular.eot" />
     <Content Include="katex\fonts\KaTeX_Size4-Regular.ttf" />
     <Content Include="katex\fonts\KaTeX_Size4-Regular.woff" />
+    <Content Include="flexslider\CONTRIBUTING.md" />
+    <Content Include="flexslider\fonts\flexslider-icon.eot" />
+    <Content Include="flexslider\fonts\flexslider-icon.ttf" />
+    <Content Include="flexslider\fonts\flexslider-icon.woff" />
+    <Content Include="flexslider\README.mdown" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
