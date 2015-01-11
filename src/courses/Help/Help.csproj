@@ -40,32 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Slides\U99_Presentation\S010_Introduction.cs" />
-    <Compile Include="Slides\U99_Presentation\S020_Markdown.cs" />
-    <Compile Include="Slides\U99_Presentation\S022_MarkdownHeader.cs" />
-    <Compile Include="Slides\U99_Presentation\S023_MarkdownInclude.cs" />
-    <Compile Include="Slides\U99_Presentation\S024_MarkdownVideo.cs" />
-    <Compile Include="Slides\U99_Presentation\S025_MarkdownReferences.cs" />
-    <Compile Include="Slides\U99_Presentation\S026_MarkdownImage.cs" />
-    <Compile Include="Slides\U99_Presentation\S030_SyntaxAnalyser.cs" />
-    <Compile Include="Slides\U99_Presentation\S031_SyntaxAnalyserTests.cs" />
-    <Compile Include="Slides\U99_Presentation\S032_SyntaxAnalyserHowItWork.cs" />
-    <Compile Include="Slides\U99_Presentation\S040_Attributes.cs" />
-    <Compile Include="Slides\U99_Presentation\S041_Attributes2.cs" />
-    <Compile Include="Slides\U99_Presentation\S042_Attributes3.cs" />
-    <Compile Include="Slides\U99_Presentation\S051_Gallery.cs" />
-    <Compile Include="Slides\U99_Presentation\S050_Ideas.cs" />
-    <Compile Include="Slides\U99_Presentation\_Attributes.cs" />
-    <Compile Include="Slides\U99_Presentation\_AttrInitial.cs" />
-    <Compile Include="Slides\U99_Presentation\_header.cs" />
-    <Compile Include="Slides\U99_Presentation\_image.cs" />
-    <Compile Include="Slides\U99_Presentation\_include.cs" />
-    <Compile Include="Slides\U99_Presentation\_MarkdownExample.cs" />
-    <Compile Include="Slides\U99_Presentation\_references.cs" />
-    <Compile Include="Slides\U99_Presentation\_SampleIncludeFile.cs" />
-    <Compile Include="Slides\U99_Presentation\_simple_text.cs" />
-    <Compile Include="Slides\U99_Presentation\_Test.cs" />
-    <Compile Include="Slides\U99_Presentation\_Video.cs" />
+    <Compile Include="Slides\U99_Presentation\S001_Gallery.cs" />
     <Compile Include="CourseTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -73,12 +48,10 @@
     <Content Include="Slides\U99_Presentation\img\01-Стек и очередь.png" />
     <Content Include="Slides\U99_Presentation\img\02-IEnumerable.png" />
     <Content Include="Slides\U99_Presentation\img\03-Структуры.png" />
-    <Content Include="Slides\U99_Presentation\Prelude.txt" />
     <Content Include="Slides\U99_Presentation\Title.txt" />
-    <Content Include="Slides\U99_Presentation\Ящики.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\uLearn\uLearn.csproj">
+    <ProjectReference Include="..\..\uLearn\uLearn.csproj">
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
       <Name>uLearn</Name>
     </ProjectReference>

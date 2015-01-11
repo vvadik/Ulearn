@@ -6,7 +6,7 @@ namespace Presentation
 	public class CourseTests : BaseCourseTests
 	{
 		public CourseTests()
-			: base(typeof(S020_Markdown))
+			: base(typeof(S001_Gallery))
 		{
 		}
 	}
