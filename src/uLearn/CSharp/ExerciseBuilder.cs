@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -19,20 +18,19 @@ namespace uLearn.CSharp
 			: base(false)
 		{
 			this.prelude = prelude;
-			Slide = new ExerciseSlide(blocksBuilder.Blocks, slideInfo, blocksBuilder.Title, blocksBuilder.Id);
+			Slide = new ExerciseSlide(SlideBuilder.LangId, blocksBuilder.Blocks, slideInfo, blocksBuilder.Title, blocksBuilder.Id);
+			Slide.ValidatorName = "csharp";
 		}
 
 		public ExerciseSlide BuildFrom(SyntaxTree tree)
 		{
 			ExerciseClassName = null;
 			Slide.ExerciseInitialCode = GetUncomment(tree.GetRoot()) ?? ""; //for uncomment-comment without exercise method
-			var sb = new SolutionBuilder { Validator = validator = new CSharpSolutionValidator() };
 			SyntaxNode result = Visit(tree.GetRoot());
 			var exerciseInsertIndex = GetExerciseInsertIndex(result);
 			const string pragma = "\n#line 1\n";
-			sb.ExerciseCode = prelude + result.ToFullString().Insert(exerciseInsertIndex, pragma);
-			sb.IndexForInsert = prelude.Length + exerciseInsertIndex + pragma.Length;
-			Slide.Solution = sb;
+			Slide.ExerciseCode = prelude + result.ToFullString().Insert(exerciseInsertIndex, pragma);
+			Slide.IndexToInsertSolution = prelude.Length + exerciseInsertIndex + pragma.Length;
 			return Slide;
 		}
 
@@ -138,8 +136,8 @@ namespace uLearn.CSharp
 				ExerciseClassName = ExerciseClassName ?? FindParentClassName(node);
 				Slide.EthalonSolution += node.WithoutAttributes();
 				Slide.ExerciseInitialCode = GetExerciseCode(node);
-				if (node.HasAttribute<IsStaticMethodAttribute>()) validator.AddValidator(new IsStaticMethodAttribute());
-				if (node.HasAttribute<SingleStatementMethodAttribute>()) validator.AddValidator(new SingleStatementMethodAttribute());
+				if (node.HasAttribute<SingleStatementMethodAttribute>())
+					Slide.ValidatorName += " SingleStatementMethod";
 			}
 			return newMethod;
 		}

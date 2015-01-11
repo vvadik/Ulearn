@@ -14,8 +14,6 @@ namespace uLearn.CSharp
 		{
 			var slide =
 				(ExerciseSlide)GenerateSlideFromFile(@"..\..\..\courses\BasicProgramming\Slides\U03_Cycles\S041_PowerOfTwo.cs");
-			Console.WriteLine(slide.Solution.ExerciseCode);
-			Console.WriteLine(slide.Solution.IndexForInsert);
 			Console.WriteLine(slide.Solution.BuildSolution("public void T(){}"));
 		}
 

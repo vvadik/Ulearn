@@ -37,6 +37,8 @@ namespace uLearn.Quizes
 	{
 		[XmlText]
 		public string Text;
+		[XmlAttribute("lang")]
+		public string Lang;
 	}
 
 	public class AbstractQuestionBlock : QuizBlock

@@ -431,11 +431,12 @@ namespace uLearn.Web.Controllers
 			var solutions = db.UserSolutions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
 			var user = db.Users.Find(userId);
 			var course = courseManager.GetCourse(courseId);
+			var slide = (ExerciseSlide)course.GetSlideById(slideId);
 			var model = new UserSolutionsViewModel
 			{
 				User = user,
 				Course = course,
-				Slide = course.GetSlideById(slideId),
+				Slide = slide,
 				Solutions = solutions
 			};
 			return View("UserSolutions", model);
@@ -447,7 +448,7 @@ namespace uLearn.Web.Controllers
 		public ApplicationUser User { get; set; }
 		public Course Course { get; set; }
 		public List<UserSolution> Solutions { get; set; }
-		public Slide Slide { get; set; }
+		public ExerciseSlide Slide { get; set; }
 	}
 
 	public class UserProgressViewModel

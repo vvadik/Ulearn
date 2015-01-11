@@ -13,9 +13,10 @@ namespace uLearn.CSharp
 
 		private readonly List<ICSharpSolutionValidator> validators = new List<ICSharpSolutionValidator> { redundantIf, namingCase };
 
-		public void AddValidator(ICSharpSolutionValidator validator)
+		public CSharpSolutionValidator AddValidator(ICSharpSolutionValidator validator)
 		{
 			validators.Add(validator);
+			return this;
 		}
 
 		public string FindFullSourceError(string userCode)

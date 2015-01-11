@@ -14,9 +14,11 @@
 	{
 		var quizBlock = quizSlide.Quiz.Blocks[blockIndex];
 		var quizModel = new QuizInfoModel(Model, quizBlock, blockIndex, Model.QuizState);
-		if (quizBlock is CodeBlock)
+		var cb = quizBlock as CodeBlock;
+		if (cb != null)
 		{
-			<textarea class='code code-sample code-no-linenumbers'>@(((CodeBlock)quizBlock).Text)</textarea>
+			var codeBlock = new uLearn.CodeBlock(cb.Text, cb.Lang);
+			@Html.DisplayFor(m => codeBlock)
 		}
 		else if (quizBlock is TextBlock)
 		{

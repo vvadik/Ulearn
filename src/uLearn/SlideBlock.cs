@@ -7,6 +7,16 @@ namespace uLearn
 	{
 	}
 
+	public class ImageGaleryBlock : SlideBlock
+	{
+		public string[] ImageUrls { get; set; }
+
+		public override string ToString()
+		{
+			return string.Format("Images {0}", string.Join("\n", ImageUrls));
+		}
+	}
+
 	public class TexBlock : SlideBlock
 	{
 		public string[] TexLines { get; set; }
@@ -75,15 +85,17 @@ namespace uLearn
 	public class CodeBlock : SlideBlock
 	{
 		public readonly string Code;
+		public readonly string Lang;
 
-		public CodeBlock(string code)
+		public CodeBlock(string code, string lang)
 		{
 			Code = code;
+			Lang = lang;
 		}
 
 		public override string ToString()
 		{
-			return string.Format("Code {0}", Code);
+			return string.Format("{0} code {1}", Lang, Code);
 		}
 	}
 

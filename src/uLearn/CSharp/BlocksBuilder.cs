@@ -10,6 +10,7 @@ namespace uLearn.CSharp
 {
 	public class SlideBuilder : CSharpSyntaxRewriter
 	{
+		public const string LangId = "csharp";
 		private readonly Func<string, string> getInclude;
 		public readonly List<SlideBlock> Blocks = new List<SlideBlock>();
 		public string Title;
@@ -133,9 +134,9 @@ namespace uLearn.CSharp
 			var code = (string)CreateCodeBlock((dynamic)node);
 			var lastBlock = Blocks.LastOrDefault() as CodeBlock;
 			if (lastBlock != null)
-				Blocks[Blocks.Count - 1] = new CodeBlock(lastBlock.Code + "\r\n\r\n" + code);
+				Blocks[Blocks.Count - 1] = new CodeBlock(lastBlock.Code + "\r\n\r\n" + code, LangId);
 			else
-				Blocks.Add(new CodeBlock(code));
+				Blocks.Add(new CodeBlock(code, LangId));
 		}
 
 		private string CreateCodeBlock(MethodDeclarationSyntax node)
@@ -160,7 +161,7 @@ namespace uLearn.CSharp
 
 		private void EmbedCode(string filename)
 		{
-			Blocks.Add(new CodeBlock(getInclude(filename)));
+			Blocks.Add(new CodeBlock(getInclude(filename), LangId));
 		}
 
 		private void EmbedVideo(string videoId)
