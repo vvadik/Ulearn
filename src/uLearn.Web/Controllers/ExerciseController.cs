@@ -1,11 +1,10 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using CsSandboxApi;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
-using uLearn.Web.Ideone;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -14,7 +13,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
-		private readonly ExecutionService executionService = new ExecutionService();
+		private readonly CsSandboxClient executionService = new CsSandboxClient();
 
 		public ExerciseController()
 			: this(WebCourseManager.Instance)
@@ -57,33 +56,32 @@ namespace uLearn.Web.Controllers
 				return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage };
 			if (solution.HasStyleIssues)
 				return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage };
-			var submition = await executionService.Submit(solution.SourceCode, "");
-			if (submition == null)
-				return new RunSolutionResult { IsCompillerFailure = true, CompilationError = "Ой-ой, Sphere Engine, проверяющий задачи, не работает. Попробуйте отправить решение позже." };
-			var output = GetOutput(submition);
+			var submissionDetails = await executionService.Submit(solution.SourceCode, "");
+			if (submissionDetails == null)
+				return new RunSolutionResult { IsCompillerFailure = true, CompilationError = "Ой-ой, CsSandbox, проверяющий задачи, не работает. Попробуйте отправить решение позже." };
+			var output = GetOutput(submissionDetails);
 			var expectedOutput = NormalizeString(exerciseSlide.ExpectedOutput);
-			var isRightAnswer = submition.Result == SubmitionResult.Success && output.Equals(expectedOutput);
-			var compilationError = submition.Result != SubmitionResult.CompilationError ? "" : submition.CompilationError == "" ? "Compilation Error" : submition.CompilationError;
+			var isRightAnswer = submissionDetails.IsSuccess() && output.Equals(expectedOutput);
 			return new RunSolutionResult
 			{
-				IsCompileError = submition.Result == SubmitionResult.CompilationError,
-				CompilationError = compilationError,
+				IsCompileError = submissionDetails.IsCompilationError(),
+				CompilationError = submissionDetails.GetCompilationError(),
 				IsRightAnswer = isRightAnswer,
 				ExpectedOutput = exerciseSlide.HideExpectedOutputOnError ? null : expectedOutput,
 				ActualOutput = output
 			};
 		}
 
-		private string GetOutput(GetSubmitionDetailsResult submition)
+		private string GetOutput(PublicSubmissionDetails submition)
 		{
 			var output = submition.Output;
-			if (!string.IsNullOrEmpty(submition.StdErr)) output += "\n" + submition.StdErr;
-			if (submition.Result != SubmitionResult.Success)
+			if (!string.IsNullOrEmpty(submition.Error)) output += "\n" + submition.Error;
+			if (!submition.IsSuccess())
 			{
-				if (submition.Time > TimeSpan.FromSeconds(4))
+				if (submition.IsTimeLimit())
 					output += "\n Time limit exceeded";
 				else
-					output += "\n" + submition.Result;
+					output += "\n" + submition.Verdict;
 			}
 			return NormalizeString(output);
 		}
