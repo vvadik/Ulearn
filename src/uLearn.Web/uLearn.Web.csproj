@@ -230,6 +230,7 @@
     <Compile Include="Controllers\HintController.cs" />
     <Compile Include="CsSandboxClient\CsSandboxClient.cs" />
     <Compile Include="CsSandboxClient\CsSandboxClient.Settings.Sample.cs" />
+    <Compile Include="CsSandboxClient\CsSandboxClient.Settings.cs" />
     <Compile Include="CsSandboxClient\CsSandboxClientException.cs" />
     <Compile Include="CsSandboxClient\PublicSubmissionDetails.cs" />
     <Compile Include="CsSandboxClient\Submission.cs" />
@@ -239,6 +240,7 @@
     <Compile Include="CsSandboxClient\Verdict.cs" />
     <Compile Include="DataContexts\TextsRepo.cs" />
     <Compile Include="CsSandboxSubmitAllSlide_Test.cs" />
+    <Compile Include="ExecutionServiceMigration_Test.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.Designer.cs">
       <DependentUpon>201411140847550_extract large text fields.cs</DependentUpon>

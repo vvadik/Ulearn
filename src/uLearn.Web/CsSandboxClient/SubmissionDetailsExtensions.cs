@@ -1,4 +1,6 @@
-﻿namespace CsSandboxApi
+﻿using uLearn;
+
+namespace CsSandboxApi
 {
 	public static class SubmissionDetailsExtensions
 	{
@@ -19,9 +21,26 @@
 
 		public static string GetCompilationError(this PublicSubmissionDetails details)
 		{
-			if (!details.IsCompilationError() || string.IsNullOrEmpty(details.CompilationInfo))
-				return "";
-			return details.CompilationInfo;
+			return details.CompilationInfo ?? "";
+		}
+
+		public static string GetOutput(this PublicSubmissionDetails details)
+		{
+			var output = details.Output;
+			if (!string.IsNullOrEmpty(details.Error)) output += "\n" + details.Error;
+			if (!details.IsSuccess())
+			{
+				if (details.IsTimeLimit())
+					output += "\n Time limit exceeded";
+				else
+					output += "\n" + details.Verdict;
+			}
+			return NormalizeString(output);
+		}
+
+		public static string NormalizeString(string s)
+		{
+			return s.LineEndingsToUnixStyle().Trim();
 		}
 	}
 }

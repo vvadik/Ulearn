@@ -44,11 +44,6 @@ namespace uLearn.Web.Controllers
 			return Json(result);
 		}
 
-		private string NormalizeString(string s)
-		{
-			return s.LineEndingsToUnixStyle().Trim();
-		}
-
 		private async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code)
 		{
 			var solution = exerciseSlide.Solution.BuildSolution(code);
@@ -59,8 +54,8 @@ namespace uLearn.Web.Controllers
 			var submissionDetails = await executionService.Submit(solution.SourceCode, "");
 			if (submissionDetails == null)
 				return new RunSolutionResult { IsCompillerFailure = true, CompilationError = "Ой-ой, CsSandbox, проверяющий задачи, не работает. Попробуйте отправить решение позже." };
-			var output = GetOutput(submissionDetails);
-			var expectedOutput = NormalizeString(exerciseSlide.ExpectedOutput);
+			var output = submissionDetails.GetOutput();
+			var expectedOutput = SubmissionDetailsExtensions.NormalizeString(exerciseSlide.ExpectedOutput);
 			var isRightAnswer = submissionDetails.IsSuccess() && output.Equals(expectedOutput);
 			return new RunSolutionResult
 			{
@@ -70,20 +65,6 @@ namespace uLearn.Web.Controllers
 				ExpectedOutput = exerciseSlide.HideExpectedOutputOnError ? null : expectedOutput,
 				ActualOutput = output
 			};
-		}
-
-		private string GetOutput(PublicSubmissionDetails submition)
-		{
-			var output = submition.Output;
-			if (!string.IsNullOrEmpty(submition.Error)) output += "\n" + submition.Error;
-			if (!submition.IsSuccess())
-			{
-				if (submition.IsTimeLimit())
-					output += "\n Time limit exceeded";
-				else
-					output += "\n" + submition.Verdict;
-			}
-			return NormalizeString(output);
 		}
 
 		private async Task SaveUserSolution(string courseId, string slideId, string code, string compilationError, string output,

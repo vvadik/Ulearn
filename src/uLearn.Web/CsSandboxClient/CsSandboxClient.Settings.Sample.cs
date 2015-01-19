@@ -3,7 +3,7 @@
  * https://github.com/Tinkturianec/CsSandbox
 */
 
-///*
+/*
 namespace CsSandboxApi
 {
 	public partial class CsSandboxClient
@@ -15,4 +15,4 @@ namespace CsSandboxApi
 		}
 	}
 }
-//*/
+*/
