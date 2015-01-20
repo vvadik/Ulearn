@@ -239,6 +239,7 @@
     <Compile Include="CsSandboxClient\SubmissionStatus.cs" />
     <Compile Include="CsSandboxClient\Verdict.cs" />
     <Compile Include="DataContexts\TextsRepo.cs" />
+    <Compile Include="ExecutionService\IdeoneService.cs" />
     <Compile Include="ExecutionService\StringExtention.cs" />
     <Compile Include="SubmitAllSlide_Test.cs" />
     <Compile Include="ExecutionServiceMigration_Test.cs" />
