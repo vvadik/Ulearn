@@ -239,8 +239,12 @@
     <Compile Include="CsSandboxClient\SubmissionStatus.cs" />
     <Compile Include="CsSandboxClient\Verdict.cs" />
     <Compile Include="DataContexts\TextsRepo.cs" />
-    <Compile Include="CsSandboxSubmitAllSlide_Test.cs" />
+    <Compile Include="ExecutionService\StringExtention.cs" />
+    <Compile Include="SubmitAllSlide_Test.cs" />
     <Compile Include="ExecutionServiceMigration_Test.cs" />
+    <Compile Include="ExecutionService\CsSandboxService.cs" />
+    <Compile Include="ExecutionService\IExecutionService.cs" />
+    <Compile Include="ExecutionService\SubmissionResult.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.Designer.cs">
       <DependentUpon>201411140847550_extract large text fields.cs</DependentUpon>

@@ -1,4 +1,4 @@
-﻿using uLearn;
+﻿using uLearn.Web.ExecutionService;
 
 namespace CsSandboxApi
 {
@@ -35,12 +35,7 @@ namespace CsSandboxApi
 				else
 					output += "\n" + details.Verdict;
 			}
-			return NormalizeString(output);
-		}
-
-		public static string NormalizeString(string s)
-		{
-			return s.LineEndingsToUnixStyle().Trim();
+			return output.NormalizeEoln();
 		}
 	}
 }

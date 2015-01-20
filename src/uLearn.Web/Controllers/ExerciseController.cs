@@ -2,9 +2,9 @@
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using CsSandboxApi;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
+using uLearn.Web.ExecutionService;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -13,7 +13,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
-		private readonly CsSandboxClient executionService = new CsSandboxClient();
+		private readonly IExecutionService executionService = new CsSandboxService();
 
 		public ExerciseController()
 			: this(WebCourseManager.Instance)
@@ -51,11 +51,11 @@ namespace uLearn.Web.Controllers
 				return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage };
 			if (solution.HasStyleIssues)
 				return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage };
-			var submissionDetails = await executionService.Submit(solution.SourceCode, "");
+			var submissionDetails = executionService.Submit(solution.SourceCode, "");
 			if (submissionDetails == null)
 				return new RunSolutionResult { IsCompillerFailure = true, CompilationError = "Ой-ой, CsSandbox, проверяющий задачи, не работает. Попробуйте отправить решение позже." };
 			var output = submissionDetails.GetOutput();
-			var expectedOutput = SubmissionDetailsExtensions.NormalizeString(exerciseSlide.ExpectedOutput);
+			var expectedOutput = exerciseSlide.ExpectedOutput.NormalizeEoln();
 			var isRightAnswer = submissionDetails.IsSuccess() && output.Equals(expectedOutput);
 			return new RunSolutionResult
 			{

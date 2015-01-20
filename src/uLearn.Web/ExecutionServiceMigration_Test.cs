@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CsSandboxApi;
-using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using uLearn.Web.DataContexts;
+using uLearn.Web.ExecutionService;
 using uLearn.Web.Models;
 
 namespace uLearn.Web
@@ -22,14 +22,19 @@ namespace uLearn.Web
 			var logger = new Logger("logs");
 			AppDomain.CurrentDomain.SetData("DataDirectory", Path.GetFullPath(@"..\App_Data\"));
 
-			var res = Parallel.ForEach(GetSources(), source =>
+			var parallelOptions = new ParallelOptions // if server, sandboxerRunner and test run in one machine
+			{
+				MaxDegreeOfParallelism = Environment.ProcessorCount
+			};
+
+			var res = Parallel.ForEach(GetSources(), parallelOptions, source =>
 			{
 				var id = String.Format("{0:D10}", source.Id);
-				var executionService = new CsSandboxClient();
-				PublicSubmissionDetails runResult = null;
+				var executionService = new CsSandboxService();
+				SubmissionResult runResult = null;
 				try
 				{
-					runResult = executionService.Submit(source.Code, "", id).Result;
+					runResult = executionService.Submit(source.Code, id);
 				}
 				catch (Exception ex)
 				{
@@ -45,17 +50,16 @@ namespace uLearn.Web
 			}
 		}
 
-		private static bool IsCorrectSolution(Solution solution, PublicSubmissionDetails runResult)
+		private static bool IsCorrectSolution(Solution solution, SubmissionResult runResult)
 		{
 			if (runResult == null)
 				return false;
 
-			if (runResult.Verdict == Verdict.SandboxError)
+			if (runResult.IsInternalError())
 				return false;
 
-			const string localValidationPrefix1 = "Решение";
-			const string localValidationPrefix2 = "Строка";
-			if (solution.CompilationError.StartsWith(localValidationPrefix1) || solution.CompilationError.StartsWith(localValidationPrefix2))
+			var localValidationPrefixes = new[] { "Решение", "Строка", "Не нужно писать" };
+			if (localValidationPrefixes.Any(s => solution.CompilationError.StartsWith(s)))
 				return true;
 
 			const string sphereEngineErrorMessage = "Ой-ой, Sphere Engine, проверяющий задачи, не работает. Попробуйте отправить решение позже.";
@@ -64,7 +68,7 @@ namespace uLearn.Web
 
 			const string oldCompilationError = "CompilationError";
 			var isCompilationError = solution.IsCompilationError || solution.ActualOutput == oldCompilationError;
-			var pseudoCompilationError = runResult.IsCompilationError() || !string.IsNullOrEmpty(runResult.CompilationInfo);
+			var pseudoCompilationError = runResult.IsCompilationError() || !string.IsNullOrEmpty(runResult.GetCompilationError());
 
 			if (isCompilationError != pseudoCompilationError && isCompilationError != runResult.IsCompilationError())
 				return false;
@@ -117,7 +121,7 @@ namespace uLearn.Web
 				.ToDictionary(slide => slide.Id);
 
 			var db = new ULearnDb();
-			var solutions = db.UserSolutions.OrderBy(solution => solution.Id).Skip(20000).ToList();
+			var solutions = db.UserSolutions.ToList();
 			return solutions.Select(solution => new Solution(slides[solution.SlideId], solution));
 		}
 	}
@@ -133,7 +137,7 @@ namespace uLearn.Web
 			CompilationError = GetText(solution.CompilationError);
 			ActualOutput = GetText(solution.Output);
 			IsRightAnswer = solution.IsRightAnswer;
-			ExpectedOutput = SubmissionDetailsExtensions.NormalizeString(slide.ExpectedOutput);
+			ExpectedOutput = slide.ExpectedOutput.NormalizeEoln();
 		}
 
 		public readonly int Id;
