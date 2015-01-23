@@ -58,6 +58,8 @@ namespace uLearn.Web.DataContexts
 			string compilationError,
 			string output, string userId)
 		{
+			if (string.IsNullOrWhiteSpace(code))
+				code = "// no code";
 			var hash = (await textsRepo.AddText(code)).Hash;
 			var compilationErrorHash = (await textsRepo.AddText(compilationError)).Hash;
 			var outputHash = (await textsRepo.AddText(output)).Hash;
