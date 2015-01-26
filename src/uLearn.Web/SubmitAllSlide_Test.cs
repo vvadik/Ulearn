@@ -42,7 +42,7 @@ namespace uLearn.Web
 				var isRightAnswer = output.NormalizeEoln().Equals(slide.ExpectedOutput.NormalizeEoln());
 				var result = new RunSolutionResult
 				{
-					CompilationError = submition.GetCompilationError(),
+					CompilationError = submition.CompilationErrorMessage,
 					IsRightAnswer = isRightAnswer,
 					ExpectedOutput = slide.ExpectedOutput,
 					ActualOutput = output

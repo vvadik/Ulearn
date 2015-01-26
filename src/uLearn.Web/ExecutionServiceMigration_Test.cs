@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CsSandboxApi;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using uLearn.Web.DataContexts;
@@ -24,10 +23,12 @@ namespace uLearn.Web
 
 			var parallelOptions = new ParallelOptions // if server, sandboxerRunner and test run in one machine
 			{
-				MaxDegreeOfParallelism = Environment.ProcessorCount
+//				MaxDegreeOfParallelism = Environment.ProcessorCount
+				MaxDegreeOfParallelism = 15
 			};
 
 			var res = Parallel.ForEach(GetSources(), parallelOptions, source =>
+//			var res = Parallel.ForEach(GetSources(), source =>
 			{
 				var id = String.Format("{0:D10}", source.Id);
 				var executionService = new CsSandboxService();
@@ -55,7 +56,7 @@ namespace uLearn.Web
 			if (runResult == null)
 				return false;
 
-			if (runResult.IsInternalError())
+			if (runResult.IsInternalError)
 				return false;
 
 			var localValidationPrefixes = new[] { "Решение", "Строка", "Не нужно писать" };
@@ -68,15 +69,15 @@ namespace uLearn.Web
 
 			const string oldCompilationError = "CompilationError";
 			var isCompilationError = solution.IsCompilationError || solution.ActualOutput == oldCompilationError;
-			var pseudoCompilationError = runResult.IsCompilationError() || !string.IsNullOrEmpty(runResult.GetCompilationError());
+			var pseudoCompilationError = runResult.IsCompilationError || !string.IsNullOrEmpty(runResult.CompilationErrorMessage);
 
-			if (isCompilationError != pseudoCompilationError && isCompilationError != runResult.IsCompilationError())
+			if (isCompilationError != pseudoCompilationError && isCompilationError != runResult.IsCompilationError)
 				return false;
 			if (isCompilationError)
 				return true;
 
 			var output = runResult.GetOutput();
-			var isRightAnswer = runResult.IsSuccess() && solution.ExpectedOutput.Equals(output);
+			var isRightAnswer = runResult.IsSuccess && solution.ExpectedOutput.Equals(output);
 			return solution.IsRightAnswer == isRightAnswer;
 		}
 

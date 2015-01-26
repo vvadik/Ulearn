@@ -23,31 +23,49 @@ namespace uLearn.Web.ExecutionService
 			this.result = result;
 		}
 
-		public override bool IsSuccess()
+		public override bool IsSuccess
 		{
-			return result.Result == SubmitionResult.Success;
+			get { return result.Result == SubmitionResult.Success; }
 		}
 
-		public override bool IsCompilationError()
+		public override bool IsCompilationError
 		{
-			return result.Result == SubmitionResult.CompilationError;
+			get { return result.Result == SubmitionResult.CompilationError; }
 		}
 
-		public override bool IsTimeLimit()
+		public override bool IsTimeLimit
 		{
-			return result.Time > TimeSpan.FromSeconds(4);
+			get { return result.Time > TimeSpan.FromSeconds(4); }
 		}
 
-		public override string GetCompilationError()
+		public override string CompilationErrorMessage
 		{
-			if (IsCompilationError())
-				return !string.IsNullOrWhiteSpace(result.CompilationError) ? result.CompilationError : "Compilation Error";
-			return "";
+			get
+			{
+				if (IsCompilationError)
+					return !string.IsNullOrWhiteSpace(result.CompilationError) ? result.CompilationError : "Compilation Error";
+				return "";
+			}
 		}
 
-		public override bool IsInternalError()
+		public override bool IsInternalError
 		{
-			return result.Result == SubmitionResult.InternalError;
+			get { return result.Result == SubmitionResult.InternalError; }
+		}
+
+		public override string StdOut
+		{
+			get { return result.Output; }
+		}
+
+		public override string StdErr
+		{
+			get { return result.StdErr; }
+		}
+
+		protected override string Verdict
+		{
+			get { return result.Result.ToString(); }
 		}
 	}
 }

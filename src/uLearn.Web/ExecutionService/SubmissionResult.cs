@@ -1,24 +1,26 @@
-﻿namespace uLearn.Web.ExecutionService
+﻿using System;
+using System.Linq;
+
+namespace uLearn.Web.ExecutionService
 {
 	public abstract class SubmissionResult
 	{
-		public abstract bool IsSuccess();
-		public abstract bool IsCompilationError();
-		public abstract bool IsTimeLimit();
-		public abstract string GetCompilationError();
-		public abstract bool IsInternalError();
-
-		public virtual string StdOut { get; private set; }
-		public virtual string StdErr { get; private set; }
-		protected virtual string Verdict { get; private set; }
+		public abstract bool IsSuccess { get; }
+		public abstract bool IsCompilationError { get; }
+		public abstract bool IsTimeLimit { get; }
+		public abstract string CompilationErrorMessage { get; }
+		public abstract bool IsInternalError { get; }
+		public abstract string StdOut { get; }
+		public abstract string StdErr { get; }
+		protected abstract string Verdict { get; }
 
 		public string GetOutput()
 		{
 			var output = StdOut;
 			if (!string.IsNullOrEmpty(StdErr)) output += "\n" + StdErr;
-			if (!IsSuccess())
+			if (!IsSuccess)
 			{
-				if (IsTimeLimit())
+				if (IsTimeLimit)
 					output += "\n Time limit exceeded";
 				else
 					output += "\n" + Verdict;

@@ -56,11 +56,11 @@ namespace uLearn.Web.Controllers
 				return new RunSolutionResult { IsCompillerFailure = true, CompilationError = "Ой-ой, CsSandbox, проверяющий задачи, не работает. Попробуйте отправить решение позже." };
 			var output = submissionDetails.GetOutput();
 			var expectedOutput = exerciseSlide.ExpectedOutput.NormalizeEoln();
-			var isRightAnswer = submissionDetails.IsSuccess() && output.Equals(expectedOutput);
+			var isRightAnswer = submissionDetails.IsSuccess && output.Equals(expectedOutput);
 			return new RunSolutionResult
 			{
-				IsCompileError = submissionDetails.IsCompilationError(),
-				CompilationError = submissionDetails.GetCompilationError(),
+				IsCompileError = submissionDetails.IsCompilationError,
+				CompilationError = submissionDetails.CompilationErrorMessage,
 				IsRightAnswer = isRightAnswer,
 				ExpectedOutput = exerciseSlide.HideExpectedOutputOnError ? null : expectedOutput,
 				ActualOutput = output

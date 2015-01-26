@@ -29,29 +29,29 @@ namespace uLearn.Web.ExecutionService
 			this.details = details;
 		}
 
-		public override bool IsSuccess()
+		public override bool IsSuccess
 		{
-			return details.Verdict == CsSandboxApi.Verdict.Ok;
+			get { return details.Verdict == CsSandboxApi.Verdict.Ok; }
 		}
 
-		public override bool IsCompilationError()
+		public override bool IsCompilationError
 		{
-			return details.Verdict == CsSandboxApi.Verdict.CompilationError;
+			get { return details.Verdict == CsSandboxApi.Verdict.CompilationError; }
 		}
 
-		public override bool IsTimeLimit()
+		public override bool IsTimeLimit
 		{
-			return details.Verdict == CsSandboxApi.Verdict.TimeLimit;
+			get { return details.Verdict == CsSandboxApi.Verdict.TimeLimit; }
 		}
 
-		public override string GetCompilationError()
+		public override string CompilationErrorMessage
 		{
-			return details.CompilationInfo ?? "";
+			get { return details.CompilationInfo ?? ""; }
 		}
 
-		public override bool IsInternalError()
+		public override bool IsInternalError
 		{
-			return details.Verdict == CsSandboxApi.Verdict.SandboxError;
+			get { return details.Verdict == CsSandboxApi.Verdict.SandboxError; }
 		}
 
 		public override string StdOut
