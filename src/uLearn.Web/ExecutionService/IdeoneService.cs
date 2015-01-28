@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using uLearn.Web.Ideone;
 
 namespace uLearn.Web.ExecutionService
@@ -7,10 +8,14 @@ namespace uLearn.Web.ExecutionService
 	{
 		private readonly Ideone.ExecutionService executionService = new Ideone.ExecutionService();
 
-		public SubmissionResult Submit(string code, string humanName = null)
+		public async Task<SubmissionResult> Submit(string code, string humanName = null)
 		{
-			var result = executionService.Submit(code, "").Result;
-			return new IdeoneSubmissionResult(result);
+			var result = await executionService.Submit(code, "");
+			return result == null ? null : new IdeoneSubmissionResult(result);
+		}
+
+		public string Name {
+			get { return "Sphere Engine"; }
 		}
 	}
 

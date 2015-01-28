@@ -23,19 +23,17 @@ namespace uLearn.Web
 
 			var parallelOptions = new ParallelOptions // if server, sandboxerRunner and test run in one machine
 			{
-//				MaxDegreeOfParallelism = Environment.ProcessorCount
-				MaxDegreeOfParallelism = 15
+				MaxDegreeOfParallelism = Environment.ProcessorCount
 			};
 
-			var res = Parallel.ForEach(GetSources(), parallelOptions, source =>
-//			var res = Parallel.ForEach(GetSources(), source =>
+			var res = Parallel.ForEach(GetSources(), parallelOptions, async source =>
 			{
 				var id = String.Format("{0:D10}", source.Id);
 				var executionService = new CsSandboxService();
 				SubmissionResult runResult = null;
 				try
 				{
-					runResult = executionService.Submit(source.Code, id);
+					runResult = await executionService.Submit(source.Code, id);
 				}
 				catch (Exception ex)
 				{

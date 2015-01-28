@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity.Validation;
-using System.Diagnostics;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -54,9 +53,7 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public async Task<UserSolution> AddUserSolution(string courseId, string slideId, string code, bool isRightAnswer,
-			string compilationError,
-			string output, string userId)
+		public async Task<UserSolution> AddUserSolution(string courseId, string slideId, string code, bool isRightAnswer, string compilationError, string output, string userId, string executionServiceName)
 		{
 			var hash = (await textsRepo.AddText(code)).Hash;
 			var compilationErrorHash = (await textsRepo.AddText(compilationError)).Hash;
@@ -74,7 +71,8 @@ namespace uLearn.Web.DataContexts
 				Timestamp = DateTime.Now,
 				UserId = userId,
 				CodeHash = code.Split('\n').Select(x => x.Trim()).Aggregate("", (x, y) => x + y).GetHashCode(),
-				Likes = new List<Like>()
+				Likes = new List<Like>(),
+				ExecutionServiceName = executionServiceName
 			});
 			try
 			{

@@ -1,7 +1,10 @@
-﻿namespace uLearn.Web.ExecutionService
+﻿using System.Threading.Tasks;
+
+namespace uLearn.Web.ExecutionService
 {
 	public interface IExecutionService
 	{
-		SubmissionResult Submit(string code, string humanName = null);
+		Task<SubmissionResult> Submit(string code, string humanName = null);
+		string Name { get; }
 	}
 }

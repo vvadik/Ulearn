@@ -25,7 +25,7 @@ namespace CsSandboxApi
 			_httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 		}
 
-		public async Task<Submission> CreateSubmit(string code, string input, string name, bool needRun = true)
+		public async Task<Submission> CreateSubmit(string code, string input, string name = null, bool needRun = true)
 		{
 			var model = new SubmissionModel
 			{

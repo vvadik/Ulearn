@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -13,7 +14,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
-		private readonly IExecutionService executionService = new CsSandboxService();
+//		private readonly IExecutionService executionService = new CsSandboxService();
 
 		public ExerciseController()
 			: this(WebCourseManager.Instance)
@@ -39,21 +40,31 @@ namespace uLearn.Web.Controllers
 				});
 			}
 			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
-			var result = await CheckSolution(exerciseSlide, code);
-			await SaveUserSolution(courseId, exerciseSlide.Id, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer);
+			var result = await CheckSolution(exerciseSlide, code, GenerateExecutionService());
+			await SaveUserSolution(courseId, exerciseSlide.Id, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer, result.ExecutionServiceName);
 			return Json(result);
 		}
 
-		private async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code)
+		private static IExecutionService GenerateExecutionService()
+		{
+			return Environment.TickCount % 10 == 0 ? (IExecutionService)new CsSandboxService() : new IdeoneService();
+		}
+
+		private async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code, IExecutionService executionService)
 		{
 			var solution = exerciseSlide.Solution.BuildSolution(code);
 			if (solution.HasErrors)
 				return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage };
 			if (solution.HasStyleIssues)
 				return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage };
-			var submissionDetails = executionService.Submit(solution.SourceCode, "");
+			var submissionDetails = await executionService.Submit(solution.SourceCode, "");
 			if (submissionDetails == null)
-				return new RunSolutionResult { IsCompillerFailure = true, CompilationError = "Ой-ой, CsSandbox, проверяющий задачи, не работает. Попробуйте отправить решение позже." };
+				return new RunSolutionResult
+				{
+					IsCompillerFailure = true, 
+					CompilationError = string.Format("Ой-ой, {0}, проверяющий задачи, не работает. Попробуйте отправить решение позже.", executionService.Name), 
+					ExecutionServiceName = executionService.Name
+				};
 			var output = submissionDetails.GetOutput();
 			var expectedOutput = exerciseSlide.ExpectedOutput.NormalizeEoln();
 			var isRightAnswer = submissionDetails.IsSuccess && output.Equals(expectedOutput);
@@ -63,17 +74,17 @@ namespace uLearn.Web.Controllers
 				CompilationError = submissionDetails.CompilationErrorMessage,
 				IsRightAnswer = isRightAnswer,
 				ExpectedOutput = exerciseSlide.HideExpectedOutputOnError ? null : expectedOutput,
-				ActualOutput = output
+				ActualOutput = output,
+				ExecutionServiceName = executionService.Name
 			};
 		}
 
-		private async Task SaveUserSolution(string courseId, string slideId, string code, string compilationError, string output,
-			bool isRightAnswer)
+		private async Task SaveUserSolution(string courseId, string slideId, string code, string compilationError, string output, bool isRightAnswer, string executionServiceName)
 		{
 			await solutionsRepo.AddUserSolution(
 				courseId, slideId,
 				code, isRightAnswer, compilationError, output,
-				User.Identity.GetUserId());
+				User.Identity.GetUserId(), executionServiceName);
 		}
 
 
