@@ -73,7 +73,7 @@ namespace uLearn
 					{
 						ReloadCourseFromZip(zipFile);
 					}
-					catch (Exception e)
+					catch
 					{
 						//throw new Exception("Error loading course from " + zipFile.Name, e);
 					}

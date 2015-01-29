@@ -55,6 +55,8 @@ namespace uLearn.Web.DataContexts
 
 		public async Task<UserSolution> AddUserSolution(string courseId, string slideId, string code, bool isRightAnswer, string compilationError, string output, string userId, string executionServiceName)
 		{
+			if (string.IsNullOrWhiteSpace(code))
+				code = "// no code";
 			var hash = (await textsRepo.AddText(code)).Hash;
 			var compilationErrorHash = (await textsRepo.AddText(compilationError)).Hash;
 			var outputHash = (await textsRepo.AddText(output)).Hash;

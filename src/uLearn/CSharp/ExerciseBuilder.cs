@@ -12,7 +12,6 @@ namespace uLearn.CSharp
 		public string ExerciseClassName { get; set; }
 
 		public ExerciseSlide Slide { get; private set; }
-		private CSharpSolutionValidator validator;
 
 		public ExerciseBuilder(string prelude, SlideBuilder blocksBuilder, SlideInfo slideInfo)
 			: base(false)
