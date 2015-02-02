@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Firefox;
 
-namespace Selenium.PageObjects
+namespace Selenium.UlearnDriver.Pages
 {
-	public class SignInPage
+	public class SignInPage : UlearnPage
 	{
 		private readonly IWebDriver driver;
 
 		public SignInPage(IWebDriver driver)
+			: base(driver)
 		{
 			this.driver = driver;
 			if (!driver.Title.Equals(Titles.SignInPageTitle))

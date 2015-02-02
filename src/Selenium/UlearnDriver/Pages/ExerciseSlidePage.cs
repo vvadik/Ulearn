@@ -1,17 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 
-namespace Selenium.PageObjects
+namespace Selenium.UlearnDriver.Pages
 {
 	class ExerciseSlidePage : SlidePage
 	{
 		private const string SecretCode = "secretCodeExercise";
 		private const string CodeExercise = "code-exercise";
 		private const string CodeMirror = "CodeMirror";
+
+		public ExerciseSlidePage(IWebDriver driver)
+			: base(driver)
+		{
+			CheckExerciseSlide(driver);
+		}
 
 		public ExerciseSlidePage(IWebDriver driver, string courseTitle)
 			: base(driver, courseTitle)

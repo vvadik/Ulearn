@@ -8,17 +8,22 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 
-namespace Selenium.PageObjects
+namespace Selenium.UlearnDriver
 {
 
 	public class ULearnReferences
 	{
-		public static string startPage { get { return "https://localhost:44300/"; } }
+		public static string StartPage { get { return "https://localhost:44300/"; } }
+		//public static string StartPage { get { return "https://ulearn.azurewebsites.net/"; } }
 	}
 
 	public class XPaths
 	{
 		public static string TOCXPath { get { return "/html/body/ul"; } }
+
+		public static string SlideXPath { get { return "/ul/li"; } }
+
+		public static string SlideLabelXPath { get { return "/ul/i"; } }
 	}
 
 	public class Titles
@@ -61,6 +66,17 @@ namespace Selenium.PageObjects
 		[StringValue("understand-btn")] Understand,
 		[StringValue("not-understand-btn")] NotUnderstand,
 		[StringValue("trivial-btn")] Trivial
+	}
+
+	public enum PageType
+	{
+		SolutionsPage,
+		ExerciseSlidePage,
+		SlidePage,
+		SignInPage,
+		StartPage,
+		Quiz,
+		IncomprehensibleType
 	}
 
 	public class StringValueAttribute : Attribute

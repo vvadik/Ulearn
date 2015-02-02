@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Firefox;
 
-namespace Selenium.PageObjects
+namespace Selenium.UlearnDriver.Pages
 {
-	public class StartPage
+	public class StartPage : UlearnPage
 	{
 		private readonly IWebDriver driver;
 		private const string courseBlockClass = "col-md-6";
 
-		public StartPage(IWebDriver driver)
+		public StartPage(IWebDriver driver) 
+			: base(driver)
 		{
 			this.driver = driver;
 			if (!driver.Title.Equals(Titles.StartPageTitle))

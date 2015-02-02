@@ -680,6 +680,10 @@
     <Content Include="Content\logo.png" />
     <Content Include="Content\tablesorter.css" />
     <Content Include="Content\ulearn.css" />
+    <Content Include="Controllers\db.mdf" />
+    <Content Include="Controllers\db_log.ldf">
+      <DependentUpon>db.mdf</DependentUpon>
+    </Content>
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />

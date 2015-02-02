@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using Selenium.PageObjects;
+using Selenium.UlearnDriver;
+using Selenium.UlearnDriver.Pages;
 
 namespace Selenium.Tests
 {
@@ -18,7 +19,7 @@ namespace Selenium.Tests
 		public SlidePage LoginAndGoToCourse(string courseTitle)
 		{
 			//IWebDriver driver = new ChromeDriver();
-			driver.Navigate().GoToUrl(ULearnReferences.startPage);
+			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 
 			var startPage = new StartPage(driver);
 			var signInPage = startPage.GoToSignInPage();
@@ -33,8 +34,8 @@ namespace Selenium.Tests
 			using (driver)
 			{
 				var slide = LoginAndGoToCourse(Titles.BasicProgrammingTitle);
-				slide = slide.ClickNextSlide();
-				slide.RateSlide(Rate.Understand);
+				//slide = slide.ClickNextButton();
+				//slide.RateSlide(Rate.Understand);
 			}
 		}
 	}

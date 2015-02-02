@@ -7,7 +7,8 @@ using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
-using Selenium.PageObjects;
+using Selenium.UlearnDriver;
+using Selenium.UlearnDriver.Pages;
 
 namespace Selenium.Tests
 {
@@ -18,7 +19,7 @@ namespace Selenium.Tests
 		public void TestLoginValidUser()
 		{
 			IWebDriver driver = new ChromeDriver();
-			driver.Navigate().GoToUrl(ULearnReferences.startPage);
+			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 
 			var startPage = new StartPage(driver);
 			var signInPage = startPage.GoToSignInPage();
@@ -31,7 +32,7 @@ namespace Selenium.Tests
 		public void TestLoginVK()
 		{
 			IWebDriver driver = new ChromeDriver();
-			driver.Navigate().GoToUrl(ULearnReferences.startPage);
+			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 
 			var startPage = new StartPage(driver);
 			var signInPage = startPage.GoToSignInPage();
@@ -50,7 +51,7 @@ namespace Selenium.Tests
 		public void TestGoToCourseBP()
 		{
 			IWebDriver driver = new ChromeDriver();
-			driver.Navigate().GoToUrl(ULearnReferences.startPage);
+			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 
 			var startPage = new StartPage(driver);
 			var signInPage = startPage.GoToSignInPage();
@@ -65,7 +66,7 @@ namespace Selenium.Tests
 		public void TestGoToCourseLinq()
 		{
 			IWebDriver driver = new ChromeDriver();
-			driver.Navigate().GoToUrl(ULearnReferences.startPage);
+			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 
 			var startPage = new StartPage(driver);
 			var signInPage = startPage.GoToSignInPage();

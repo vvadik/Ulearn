@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
+using Selenium.UlearnDriver.Pages;
 
-namespace Selenium.PageObjects
+namespace Selenium.UlearnDriver.PageObjects
 {
 	public class NavArrows
 	{
@@ -32,21 +28,21 @@ namespace Selenium.PageObjects
 				throw new NotFoundException("не найдена NextSolutionsButton");
 		}
 
-		public SlidePage ClickNextButton()
+		public UlearnDriver ClickNextButton()
 		{
 			var title = driver.Title;
 			if (nextSolutionsButton.Enabled)
 				nextSlideButton.Click();
 			else
 				nextSolutionsButton.Click();
-			return new SlidePage(driver, title);
+			return new UlearnDriver(driver);
 		}
 
-		public SlidePage ClickPrevButton()
+		public UlearnDriver ClickPrevButton()
 		{
 			var title = driver.Title;
 			prevSlideButton.Click();
-			return new SlidePage(driver, title);
+			return new UlearnDriver(driver);
 		}
 
 		//SolutionsPage ClickNextSolutionsButton()

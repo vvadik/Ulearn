@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 
-namespace Selenium.PageObjects
+namespace Selenium.UlearnDriver.Pages
 {
-	public class SolutionsPage
+	public class SolutionsPage : UlearnPage
 	{
 		private IWebDriver driver;
 
+		public SolutionsPage(IWebDriver driver)
+			: base(driver)
+		{ }
+
 		public SolutionsPage(IWebDriver driver, string courseTitle)
+			: base(driver)
 		{
 			this.driver = driver;
 			if (!driver.Title.Equals(courseTitle))

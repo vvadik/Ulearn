@@ -82,16 +82,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainClass.cs" />
-    <Compile Include="PageObjects\ExerciseSlidePage.cs" />
-    <Compile Include="PageObjects\NavArrows.cs" />
-    <Compile Include="PageObjects\Rate.cs" />
-    <Compile Include="PageObjects\SignInPage.cs" />
-    <Compile Include="PageObjects\SlidePage.cs" />
-    <Compile Include="PageObjects\SolutionsPage.cs" />
-    <Compile Include="PageObjects\StartPage.cs" />
-    <Compile Include="PageObjects\TOC.cs" />
-    <Compile Include="PageObjects\TOCUnit.cs" />
-    <Compile Include="PageObjects\ULearnConstants.cs" />
+    <Compile Include="Tests\UlearnDriverTest.cs" />
+    <Compile Include="UlearnDriver\Pages\ExerciseSlidePage.cs" />
+    <Compile Include="UlearnDriver\PageObjects\NavArrows.cs" />
+    <Compile Include="UlearnDriver\PageObjects\Rate.cs" />
+    <Compile Include="UlearnDriver\Pages\SignInPage.cs" />
+    <Compile Include="UlearnDriver\Pages\SlidePage.cs" />
+    <Compile Include="UlearnDriver\Pages\SolutionsPage.cs" />
+    <Compile Include="UlearnDriver\Pages\StartPage.cs" />
+    <Compile Include="UlearnDriver\PageObjects\TOC.cs" />
+    <Compile Include="UlearnDriver\PageObjects\TOCUnit.cs" />
+    <Compile Include="UlearnDriver\Pages\UlearnPage.cs" />
+    <Compile Include="UlearnDriver\ULearnConstants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SELENIUM_TESTS_1\DB_test_code.cs" />
     <Compile Include="SELENIUM_TESTS_1\FirstTest.cs" />
@@ -99,6 +101,7 @@
     <Compile Include="Tests\NavArrowTest.cs" />
     <Compile Include="Tests\TestRateButton.cs" />
     <Compile Include="Tests\TOCModelCreateTest.cs" />
+    <Compile Include="UlearnDriver\UlearnDriver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -131,6 +134,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
