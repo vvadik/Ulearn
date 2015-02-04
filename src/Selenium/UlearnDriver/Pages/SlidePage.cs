@@ -7,7 +7,7 @@ namespace Selenium.UlearnDriver.Pages
 {
 	public class SlidePage : UlearnPage
 	{
-		private readonly IWebDriver driver;
+		//protected readonly IWebDriver driver;
 		private Lazy<Rates> rates;
 		private Lazy<NavArrows> navArrows;
 		//private readonly Lazy<TOC> TOC;
@@ -16,7 +16,7 @@ namespace Selenium.UlearnDriver.Pages
 		public SlidePage(IWebDriver driver)
 			: base(driver)
 		{
-			this.driver = driver;
+			//this.driver = driver;
 			FindSlidePageElements();
 			//TOC = new Lazy<TOC>(() => new TOC(driver, driver.FindElement(By.XPath(XPaths.TOCXPath)), XPaths.TOCXPath));
 		}
@@ -24,7 +24,7 @@ namespace Selenium.UlearnDriver.Pages
 		public SlidePage(IWebDriver driver, string courseTitle)
 			: base(driver)
 		{
-			this.driver = driver;
+			//this.driver = driver;
 			if (!driver.Title.Equals(courseTitle))
 				throw new IllegalLocatorException(string.Format("Это не слайд курса {0}, это: {1}", courseTitle, driver.Title));
 			FindSlidePageElements();

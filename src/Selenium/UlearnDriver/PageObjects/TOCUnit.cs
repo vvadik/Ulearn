@@ -25,7 +25,7 @@ namespace Selenium.UlearnDriver.PageObjects
 			for (var ind = 0; ind < slidesElements.Count; ind++)
 			{
 				var lazyInd = ind;
-				slides[slidesElements[ind].Text] = new Lazy<SlideListItem>(() => new SlideListItem(slidesElements[lazyInd], slidesLabel[lazyInd]));
+				slides[slidesElements[ind].Text] = new Lazy<SlideListItem>(() => new SlideListItem(driver, slidesElements[lazyInd], slidesLabel[lazyInd]));
 			}
 		}
 
@@ -48,7 +48,7 @@ namespace Selenium.UlearnDriver.PageObjects
 			return new UlearnDriver(driver);
 		}
 
-		public SlideListItemInfo GetSlideListItemInfo(string slideName)
+		public SlideLabelInfo GetSlideListItemInfo(string slideName)
 		{
 			return slides[slideName].Value.GetInfo();
 		}
@@ -57,9 +57,11 @@ namespace Selenium.UlearnDriver.PageObjects
 		{
 			private readonly IWebElement slideElement;
 			private readonly IWebElement slideLabelElement;
+			private readonly IWebDriver driver;
 
-			public SlideListItem(IWebElement slideElement, IWebElement slideLabelElement)
+			public SlideListItem(IWebDriver driver, IWebElement slideElement, IWebElement slideLabelElement)
 			{
+				this.driver = driver;
 				this.slideElement = slideElement;
 				this.slideLabelElement = slideLabelElement;
 			}
@@ -69,48 +71,99 @@ namespace Selenium.UlearnDriver.PageObjects
 				slideElement.Click();
 			}
 
-			public SlideListItemInfo GetInfo()
+			public SlideLabelInfo GetInfo()
 			{
-				ListItemType itemType;
-				throw new NotImplementedException();
-				//if (slideLabelElement.GetCssValue(""))
+				if (slideLabelElement == null)
+					return new SlideLabelInfo(false);
+
+				var isVisited = IsVisited(slideLabelElement);
+
+				if (UlearnDriver.HasCss(slideLabelElement, "glyphicon-edit"))
+					return new ExerciseSlideLabelInfo(isVisited, IsPassed(slideLabelElement));
+
+				if (UlearnDriver.HasCss(slideLabelElement, "glyphicon-ok"))
+					return new SlideLabelInfo(isVisited);
+
+				if (UlearnDriver.HasCss(slideLabelElement, "glyphicon-pushpin"))
+				{
+					var isPassed = IsPassed(slideLabelElement);
+					var isHasAttempts = IsHasAttempts(slideLabelElement);
+					return new TestSlideLabelInfo(isVisited, isPassed, isHasAttempts);
+				}
+
+				throw new NotFoundException("navbar-label is not found");
+			}
+
+			private bool IsHasAttempts(IWebElement webElement)
+			{
+				return driver.FindElement(By.Id("quiz-submit-btn")) != null ||
+					   driver.FindElement(By.Id("SubmitQuiz")) != null;
+			}
+
+			private static bool IsVisited(IWebElement webElement)
+			{
+				return UlearnDriver.HasCss(webElement, "navbar-label-success") ||
+					   UlearnDriver.HasCss(webElement, "navbar-label-danger");
+			}
+
+			private static bool IsPassed(IWebElement webElement)
+			{
+				return UlearnDriver.HasCss(webElement, "navbar-label-success");
 			}
 		}
 	}
 
-	public enum ListItemType
+	public class SlideLabelInfo
 	{
-		Exersice,
-		Theory,
-		Test
-	}
-
-	public class SlideListItemInfo
-	{
-		private readonly ListItemType type;
 		private readonly bool isVisited;
-		private readonly bool isPassed;
 
-		public SlideListItemInfo(ListItemType type, bool isVisited, bool isPassed)
+		public SlideLabelInfo(bool isVisited)
 		{
-			this.type = type;
 			this.isVisited = isVisited;
-			this.isPassed = isPassed;
-		}
-
-		public ListItemType GetListItemType()
-		{
-			return type;
 		}
 
 		public bool IsVisited()
 		{
 			return isVisited;
 		}
+	}
+
+	public class ExerciseSlideLabelInfo : SlideLabelInfo
+	{
+		private readonly bool isPassed;
+
+		public ExerciseSlideLabelInfo(bool isVisited, bool isPassed)
+			: base(isVisited)
+		{
+			this.isPassed = isPassed;
+		}
 
 		public bool IsPassed()
 		{
 			return isPassed;
+		}
+	}
+
+	public class TestSlideLabelInfo : SlideLabelInfo
+	{
+		private readonly bool isPassed;
+		private readonly bool isHereAtempts;
+
+		public TestSlideLabelInfo(bool isVisited, bool isPassed, bool isHereAttempts)
+			: base(isVisited)
+		{
+			this.isPassed = isPassed;
+			this.isHereAtempts = isHereAttempts;
+		}
+
+		public bool IsPassed()//возможно, логика будет отличаться от ExerciseSlideLabelInfo, потом посмотрим.
+		{
+			return isPassed;
+		}
+
+		public bool IsHereAttempts()
+		{
+			return isHereAtempts;
 		}
 	}
 }

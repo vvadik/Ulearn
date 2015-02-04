@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
 using Selenium.UlearnDriver.PageObjects;
 using Selenium.UlearnDriver.Pages;
+using uLearn.Web.DataContexts;
 
 namespace Selenium.UlearnDriver
 {
@@ -85,6 +87,21 @@ namespace Selenium.UlearnDriver
 			authorisedStartPage.GoToCourse(Titles.BasicProgrammingTitle);
 
 			return new UlearnDriver(driver);
+		}
+
+		public static bool HasCss(IWebElement webElement, string css)
+		{
+			if (webElement == null)
+				return false;
+			try
+			{
+				webElement.GetCssValue(css);
+				return true;
+			}
+			catch (StaleElementReferenceException)
+			{
+				return false;
+			}
 		}
 	}
 }

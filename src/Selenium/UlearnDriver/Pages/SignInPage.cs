@@ -6,12 +6,12 @@ namespace Selenium.UlearnDriver.Pages
 {
 	public class SignInPage : UlearnPage
 	{
-		private readonly IWebDriver driver;
+		//private readonly IWebDriver driver;
 
 		public SignInPage(IWebDriver driver)
 			: base(driver)
 		{
-			this.driver = driver;
+			//this.driver = driver;
 			if (!driver.Title.Equals(Titles.SignInPageTitle))
 				throw new IllegalLocatorException("Это не страница входа, это: "
 								+ driver.Title);

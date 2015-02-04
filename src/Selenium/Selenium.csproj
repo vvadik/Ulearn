@@ -83,6 +83,8 @@
   <ItemGroup>
     <Compile Include="MainClass.cs" />
     <Compile Include="Tests\UlearnDriverTest.cs" />
+    <Compile Include="UlearnDriver\PageObjects\Hint.cs" />
+    <Compile Include="UlearnDriver\PageObjects\LikeButton.cs" />
     <Compile Include="UlearnDriver\Pages\ExerciseSlidePage.cs" />
     <Compile Include="UlearnDriver\PageObjects\NavArrows.cs" />
     <Compile Include="UlearnDriver\PageObjects\Rate.cs" />
@@ -104,7 +106,9 @@
     <Compile Include="UlearnDriver\UlearnDriver.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -134,7 +138,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

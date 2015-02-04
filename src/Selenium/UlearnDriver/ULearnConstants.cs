@@ -39,6 +39,20 @@ namespace Selenium.UlearnDriver
 		
 	}
 
+	public class ElementsClasses
+	{
+
+		public static By CodeExercise { get { return By.ClassName("code-exercise"); } }
+
+		public static By CodeMirror { get { return By.ClassName("CodeMirror"); } }
+
+		public static By RunSolutionButton { get { return By.ClassName("run-solution-button"); } }
+
+		public static By ResetButton { get { return By.ClassName("reset-btn"); } }
+
+		public static By GetHintsButton { get { return By.ClassName("hints-btn"); } }
+	}
+
 	public class ElementsId
 	{
 		public static By UserNameField { get { return By.Id("UserName"); } }
@@ -52,6 +66,8 @@ namespace Selenium.UlearnDriver
 		public static By PrevNavArrow { get { return By.Id("prev_slide_button"); } }
 
 		public static By NextSolutionsButton { get { return By.Id("next_solutions_button"); } }
+
+		public static By SecreteCode { get { return By.Id("secretCodeExercise"); } }
 	}
 
 	public class Admin

@@ -4,7 +4,7 @@ namespace Selenium.UlearnDriver.Pages
 {
 	public class UlearnPage
 	{
-		private readonly IWebDriver driver;
+		protected readonly IWebDriver driver;
 
 		public UlearnPage(IWebDriver driver)
 		{

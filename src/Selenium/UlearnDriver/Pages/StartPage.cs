@@ -7,13 +7,13 @@ namespace Selenium.UlearnDriver.Pages
 {
 	public class StartPage : UlearnPage
 	{
-		private readonly IWebDriver driver;
+		//private readonly IWebDriver driver;
 		private const string courseBlockClass = "col-md-6";
 
 		public StartPage(IWebDriver driver) 
 			: base(driver)
 		{
-			this.driver = driver;
+			//this.driver = driver;
 			if (!driver.Title.Equals(Titles.StartPageTitle))
 				throw new IllegalLocatorException("Это не стартовая страница, это: "
 								+ driver.Title);
