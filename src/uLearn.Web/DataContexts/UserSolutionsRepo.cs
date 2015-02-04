@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity.Validation;
-using System.Diagnostics;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -16,7 +15,7 @@ namespace uLearn.Web.DataContexts
 
 		public UnitsRepo() : this(new ULearnDb(), WebCourseManager.Instance)
 		{
-			
+
 		}
 
 		public UnitsRepo(ULearnDb db, CourseManager courseManager)
@@ -35,7 +34,7 @@ namespace uLearn.Web.DataContexts
 
 		public DateTime GetNextUnitPublishTime(string courseId)
 		{
-			return db.Units.Where(u => u.CourseId == courseId && u.PublishTime > DateTime.Now).Select(u => u.PublishTime).Concat(new[]{DateTime.MaxValue}).Min();
+			return db.Units.Where(u => u.CourseId == courseId && u.PublishTime > DateTime.Now).Select(u => u.PublishTime).Concat(new[] { DateTime.MaxValue }).Min();
 		}
 	}
 
@@ -123,20 +122,28 @@ namespace uLearn.Web.DataContexts
 		{
 			var prepared = db.UserSolutions
 				.Where(x => x.IsRightAnswer && x.SlideId == slideId)
-				.GroupBy(x => x.CodeHash)
-				.Select(x => new { sol = x.OrderBy(y => y.Timestamp).FirstOrDefault(), likes = x.Sum(s => s.Likes.Count) })
+				.GroupBy(x => x.CodeHash, (codeHash, ss) => new { codeHash, timestamp = ss.Min(s => s.Timestamp) })
+				.Join(
+					db.UserSolutions.Where(x => x.IsRightAnswer && x.SlideId == slideId), 
+					g => g, 
+					s => new { codeHash = s.CodeHash, timestamp = s.Timestamp }, (k, s) => new {sol = s, k.timestamp})
+				.Select(x => new { x.sol.Id, likes = x.sol.Likes.Count, x.timestamp })
 				.ToList();
 
 			var best = prepared
 				.OrderByDescending(x => x.likes);
 			var timeNow = DateTime.Now;
 			var trending = prepared
-				.OrderByDescending(x => (x.likes + 1) / timeNow.Subtract(x.sol.Timestamp).TotalMilliseconds);
+				.OrderByDescending(x => (x.likes + 1) / timeNow.Subtract(x.timestamp).TotalMilliseconds);
 			var newest = prepared
-				.OrderByDescending(x => x.sol.Timestamp);
-			var answer = best.Take(3).Concat(trending.Take(3)).Concat(newest).Distinct().Take(10).Select(x => x.sol);
-			return answer
-				.Select(x => new AcceptedSolutionInfo(x.SolutionCode.Text, x.Id, x.Likes.Select(y => y.UserId)))
+				.OrderByDescending(x => x.timestamp);
+			var answer = best.Take(3).Concat(trending.Take(3)).Concat(newest).Distinct().Take(10).Select(x => x.Id);
+			var result = db.UserSolutions
+				.Where(solution => answer.Contains(solution.Id))
+				.Select(solution => new { solution.Id, Code = solution.SolutionCode.Text,  Likes = solution.Likes.Select(y => y.UserId)})
+				.ToList();
+			return result
+				.Select(x => new AcceptedSolutionInfo(x.Code, x.Id, x.Likes))
 				.ToList();
 		}
 
