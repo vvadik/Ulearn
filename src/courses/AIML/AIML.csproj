@@ -94,6 +94,7 @@
     <None Include="Slides\L02 - Логика предикатов\_S07-slides.pdf" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Slides\L00 - История искусственного интеллекта\S99 - Quiz.quiz.xml" />
     <Content Include="Slides\L00 - История искусственного интеллекта\Title.txt" />
     <Content Include="Slides\L01 - Логика высказываний\Title.txt" />
     <Content Include="Slides\L02 - Логика предикатов\Title.txt" />
