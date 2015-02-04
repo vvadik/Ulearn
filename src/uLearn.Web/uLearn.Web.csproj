@@ -212,6 +212,7 @@
     <Compile Include="Controllers\ExerciseController.cs" />
     <Compile Include="Controllers\HintController.cs" />
     <Compile Include="DataContexts\TextsRepo.cs" />
+    <Compile Include="Ideone\ExecutionService.Settings.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.Designer.cs">
       <DependentUpon>201411140847550_extract large text fields.cs</DependentUpon>
@@ -274,7 +275,6 @@
     <Compile Include="DataContexts\UserSolutionsRepo_should.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo.cs" />
     <Compile Include="DataContexts\VisitersRepo.cs" />
-    <Compile Include="Ideone\ExecutionService.Settings.cs" />
     <Compile Include="Migrations\201407111234255_InitialCreate.cs" />
     <Compile Include="Migrations\201407111234255_InitialCreate.Designer.cs">
       <DependentUpon>201407111234255_InitialCreate.cs</DependentUpon>
