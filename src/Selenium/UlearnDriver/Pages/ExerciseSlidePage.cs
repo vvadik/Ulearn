@@ -10,8 +10,8 @@ namespace Selenium.UlearnDriver.Pages
 		private readonly IWebElement runSolutionButton;
 		private readonly IWebElement resetButton;
 		private readonly IWebElement hintsButton;
-		private List<Hint> hints;
-
+		private readonly List<Hint> hints;
+			
 		public ExerciseSlidePage(IWebDriver driver)
 			: base(driver)
 		{
@@ -24,12 +24,13 @@ namespace Selenium.UlearnDriver.Pages
 
 		private List<Hint> GetHints()
 		{
-			var allHints = driver.FindElement(By.Id("hint-place")).FindElements(By.XPath("/div"));
+			const string hintXpath = "hyml/body/div[1]/div/div/div/div[9]/div/div";
+			var allHints = driver.FindElement(By.Id("hint-place")).FindElements(By.XPath(hintXpath));
 			var localHints = new List<Hint>(allHints.Count);
 			for (var i = 0; i < allHints.Count; i++)
 			{
 				var likeButton = allHints[i].FindElement(By.Id(String.Format("{0}likeHint", i)));
-				var hint = allHints[i].FindElement(By.XPath("/p"));
+				var hint = allHints[i].FindElement(By.XPath(hintXpath + "/p"));
 				localHints[i] = new Hint(new LikeButton(likeButton), hint);
 			}
 			return localHints;
@@ -39,11 +40,11 @@ namespace Selenium.UlearnDriver.Pages
 		{
 			return hintsButton.Text;
 		}
-		//public ExerciseSlidePage(IWebDriver driver, string courseTitle)
-		//	: base(driver, courseTitle)
-		//{
-		//	CheckExerciseSlide(driver);
-		//}
+
+		public List<Hint> Hints()
+		{
+			return new List<Hint>(hints);
+		}
 
 		public bool HasMoreHints()
 		{
@@ -76,6 +77,11 @@ namespace Selenium.UlearnDriver.Pages
 		public string GetUserCodeText()
 		{
 			return driver.FindElement(ElementsClasses.CodeExercise).Text;
+		}
+
+		public ResultType GetRunResult()
+		{
+			return ResultType.Success;
 		}
 
 		private static void CheckExerciseSlide(IWebDriver driver)
