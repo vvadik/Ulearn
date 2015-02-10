@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using OpenQA.Selenium;
+using Selenium.UlearnDriver.Pages;
 
 namespace Selenium.UlearnDriver.PageObjects
 {
@@ -46,11 +47,30 @@ namespace Selenium.UlearnDriver.PageObjects
 	{
 		private readonly List<QuizItem> quizItems;
 		private readonly bool isMultiply;
+		private readonly Status blockStatus;
 
-		public ChoiseBlock(List<QuizItem> quizItems, bool isMultiply)
+		public ChoiseBlock(List<QuizItem> quizItems, bool isMultiply, IWebElement statusElement, QuizStatus quizStatus)
 		{
 			this.quizItems = quizItems;
 			this.isMultiply = isMultiply;
+			blockStatus = quizItems.Any(x => x.GetStatus() == Status.Wrong) ? Status.Wrong :
+				quizItems.Any(x => x.GetStatus() == Status.Right) ? Status.Right : Status.Undefined;
+			var localStatus = UlearnDriver.HasCss(statusElement, "glyphicon-ok") ? Status.Right :
+				UlearnDriver.HasCss(statusElement, "glyphicon-remove") ? Status.Wrong :
+					Status.Undefined;
+			if (localStatus != blockStatus)
+				throw new Exception("Не верно произведена оценка квиза");
+			if (quizStatus == QuizStatus.NoAttempts && localStatus == Status.Undefined)
+				throw new Exception("Не произведена проверка квиза");
+			if (quizStatus == QuizStatus.HasAttempts && quizItems.Any(x => x.GetStatus() == Status.Wrong || x.GetStatus() == Status.Right))
+				throw new Exception("Отмечены верные/неверные варианты ответа при имеющихся попытках");
+			if (quizStatus == QuizStatus.Clean && (quizItems.Any(x => x.GetStatus() == Status.Wrong || x.GetStatus() == Status.Right)) || (localStatus != Status.Undefined))
+				throw new Exception("Отмечены верные/неверные варианты ответа или выставлены оценки квиз-блокам, когда квиз еще не решался");
+		}
+
+		public Status GetBlockStatus()
+		{
+			return blockStatus;
 		}
 
 		public List<String> GetQuizItems()
@@ -72,15 +92,26 @@ namespace Selenium.UlearnDriver.PageObjects
 		}
 	}
 
+	public enum Status
+	{
+		Right,
+		Wrong,
+		Undefined
+	}
 	public class QuizItem
 	{
 		private readonly IWebElement box;
-		private readonly IWebElement text;
+		private readonly IWebElement textElement;
+		private readonly IWebElement infoElement;
+		private readonly Status itemStatus;
 
-		public QuizItem(IWebElement box, IWebElement text)
+		public QuizItem(IWebElement box, IWebElement textElement, IWebElement infoElement)
 		{
 			this.box = box;
-			this.text = text;
+			this.textElement = textElement;
+			this.infoElement = infoElement;
+			itemStatus = UlearnDriver.HasCss(infoElement, "wrong-quiz") ? Status.Wrong : 
+				UlearnDriver.HasCss(infoElement, "right-quiz") ? Status.Right : Status.Undefined;
 		}
 
 		public void CheckBox()
@@ -88,9 +119,14 @@ namespace Selenium.UlearnDriver.PageObjects
 			box.Click();
 		}
 
+		public Status GetStatus()
+		{
+			return itemStatus;
+		}
+
 		public string GetText()
 		{
-			return text.Text;
+			return textElement.Text;
 		}
 	}
 

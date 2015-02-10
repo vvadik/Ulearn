@@ -24,6 +24,42 @@ namespace Selenium.UlearnDriver
 		public static string SlideXPath { get { return "/ul/li"; } }
 
 		public static string SlideLabelXPath { get { return "/ul/i"; } }
+
+		public static string SlideBodyXPath { get { return "/html/body/div[2]/div/div/div"; } }
+
+		//public static string QuizTextXPath(int index)
+		//{
+		//	return SlideBodyXPath + string.Format("/p[{0}]", index);
+		//}
+
+		public static string QuizBlocksXPath { get { return "/html/body/div[2]/div/div/div/div[@class = \"quiz-block-mark\"]"; } }
+
+		public static string QuizItemInfoXPath(int blockIndex)
+		{
+			return String.Format(
+				"/html/body/div[2]/div/div/div/div[@class = \"quiz-block-mark\"][{0}]/div[@class = \"quiz\"]/label", blockIndex);
+		}
+
+		public static string QuizItemXPath(int blockIndex)
+		{
+			return String.Format(
+				"/html/body/div[2]/div/div/div/div[@class = \"quiz-block-mark\"][{0}]/div[@class = \"quiz\"]/label/input", blockIndex);
+		}
+
+		public static string QuizSubmitAgainButtonXPath { get { return "div[@id = \"SubmitQuiz\"]/form/button"; } }
+
+		public static string QuizSubmitAgainStatusXPath { get { return "div[@id = \"SubmitQuiz\"]/form/small"; } }
+
+		public static string QuizQuestionXPath(int blockIndex)
+		{
+			return String.Format(
+				"/html/body/div[2]/div/div/div/h4[{0}]", blockIndex + 1);
+		}
+
+		public static string QuizQuestionStatusXPath(int blockIndex)
+		{
+			return QuizQuestionXPath(blockIndex) + "/i";
+		}
 	}
 
 	public class Titles
@@ -51,6 +87,8 @@ namespace Selenium.UlearnDriver
 		public static By ResetButton { get { return By.ClassName("reset-btn"); } }
 
 		public static By GetHintsButton { get { return By.ClassName("hints-btn"); } }
+
+		public static By QuizSubmitButton { get { return By.ClassName("quiz-submit-btn"); } }
 	}
 
 	public class ElementsId
