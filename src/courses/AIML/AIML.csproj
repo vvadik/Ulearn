@@ -96,7 +96,9 @@
   <ItemGroup>
     <Content Include="Slides\L00 - История искусственного интеллекта\S99 - Quiz.quiz.xml" />
     <Content Include="Slides\L00 - История искусственного интеллекта\Title.txt" />
+    <Content Include="Slides\L01 - Логика высказываний\S99 - Quiz.quiz.xml" />
     <Content Include="Slides\L01 - Логика высказываний\Title.txt" />
+    <Content Include="Slides\L02 - Логика предикатов\S99 - Quiz.quiz.xml" />
     <Content Include="Slides\L02 - Логика предикатов\Title.txt" />
     <Content Include="Slides\Title.txt" />
   </ItemGroup>
