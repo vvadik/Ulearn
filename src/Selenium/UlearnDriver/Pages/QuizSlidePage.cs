@@ -23,13 +23,17 @@ namespace Selenium.UlearnDriver.Pages
 			submitButton = driver.FindElement(ElementsClasses.QuizSubmitButton);
 			submitAgainButton = driver.FindElement(By.XPath(XPaths.QuizSubmitAgainButtonXPath));
 			submitAgainStatus = driver.FindElement(By.XPath(XPaths.QuizSubmitAgainStatusXPath));
-			if (submitButton != null)
-				quizStatus = QuizStatus.Clean;
-			else if (submitAgainButton != null)
-				quizStatus = QuizStatus.HasAttempts;
-			else
-				quizStatus = QuizStatus.NoAttempts;
+			quizStatus = GetQuizStatus();
 			blocks = FindBlocks();
+		}
+
+		private QuizStatus GetQuizStatus()
+		{
+			if (submitButton != null)
+				return QuizStatus.Clean;
+			if (submitAgainButton != null)
+				return QuizStatus.HasAttempts;
+			return QuizStatus.NoAttempts;
 		}
 
 		public void SubminQuiz()

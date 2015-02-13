@@ -1,21 +1,31 @@
-﻿using OpenQA.Selenium;
+﻿using System.Collections.Generic;
+using OpenQA.Selenium;
+using Selenium.UlearnDriver.PageObjects;
+using System.Linq;
 
 namespace Selenium.UlearnDriver.Pages
 {
-	public class SolutionsPage : UlearnPage
+	public class SolutionsPage : UlearnContentPage
 	{
-		//private IWebDriver driver;
+		public List<SomeoneSolution> solutions { get; protected set; }
 
 		public SolutionsPage(IWebDriver driver)
 			: base(driver)
-		{ }
-
-		public SolutionsPage(IWebDriver driver, string courseTitle)
-			: base(driver)
 		{
-			//this.driver = driver;
-			if (!driver.Title.Equals(courseTitle))
-				throw new IllegalLocatorException(string.Format("Это не слайд курса {0}, это: {1}", courseTitle, driver.Title));
+			solutions = FindSolutions();
+		}
+
+		private List<SomeoneSolution> FindSolutions()
+		{
+			return Enumerable.Range(0, Constants.SomeoneSolutionsCount)
+				.Select(x => new SomeoneSolution(driver.FindElement(By.XPath(XPaths.SomeoneSolutionXPath(x))),
+							new LikeButton(driver.FindElement(By.XPath(XPaths.SomeoneSolutionLikeXPath(x))))))
+				.ToList();
+		}
+
+		public List<SomeoneSolution> GetSolutions()
+		{
+			return solutions;
 		}
 	}
 }

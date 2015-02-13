@@ -11,6 +11,11 @@ using OpenQA.Selenium.Firefox;
 namespace Selenium.UlearnDriver
 {
 
+	public class Constants
+	{
+		public static int SomeoneSolutionsCount { get { return 10; } }
+	}
+
 	public class ULearnReferences
 	{
 		public static string StartPage { get { return "https://localhost:44300/"; } }
@@ -59,6 +64,18 @@ namespace Selenium.UlearnDriver
 		public static string QuizQuestionStatusXPath(int blockIndex)
 		{
 			return QuizQuestionXPath(blockIndex) + "/i";
+		}
+
+		public static string SomeoneSolutionLikeXPath(int solutionIndex)
+		{
+			return String.Format(
+				"/html/body/div[2]/div/div/div[{0}]/button", solutionIndex + 2);
+		}
+
+		public static string SomeoneSolutionXPath(int solutionIndex)
+		{
+			return String.Format(
+				"/html/body/div[2]/div/div/div[{0}]/textarea", solutionIndex + 2);
 		}
 	}
 

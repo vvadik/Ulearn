@@ -87,6 +87,7 @@
     <Compile Include="UlearnDriver\PageObjects\LikeButton.cs" />
     <Compile Include="UlearnDriver\PageObjects\QuizBlock.cs" />
     <Compile Include="UlearnDriver\PageObjects\RunResult.cs" />
+    <Compile Include="UlearnDriver\PageObjects\SomeoneSolution.cs" />
     <Compile Include="UlearnDriver\Pages\ExerciseSlidePage.cs" />
     <Compile Include="UlearnDriver\PageObjects\NavArrows.cs" />
     <Compile Include="UlearnDriver\PageObjects\Rate.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="UlearnDriver\Pages\StartPage.cs" />
     <Compile Include="UlearnDriver\PageObjects\TOC.cs" />
     <Compile Include="UlearnDriver\PageObjects\TOCUnit.cs" />
+    <Compile Include="UlearnDriver\Pages\UlearnContentPage.cs" />
     <Compile Include="UlearnDriver\Pages\UlearnPage.cs" />
     <Compile Include="UlearnDriver\ULearnConstants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

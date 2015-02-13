@@ -15,11 +15,11 @@ namespace Selenium.UlearnDriver.Pages
 		public ExerciseSlidePage(IWebDriver driver)
 			: base(driver)
 		{
-			CheckExerciseSlide(driver);
 			runSolutionButton = driver.FindElement(ElementsClasses.RunSolutionButton);
 			resetButton = driver.FindElement(ElementsClasses.ResetButton);
 			hintsButton = driver.FindElement(ElementsClasses.GetHintsButton);
 			hints = GetHints();
+			CheckExerciseSlide();
 		}
 
 		private List<Hint> GetHints()
@@ -84,23 +84,33 @@ namespace Selenium.UlearnDriver.Pages
 			return ResultType.Success;
 		}
 
-		private static void CheckExerciseSlide(IWebDriver driver)
+		private void CheckExerciseSlide()
+		{
+			CheckCodeMirror();
+			CheckButtons();
+		}
+
+		private void CheckButtons()
+		{
+			if (runSolutionButton == null)
+				throw new NotFoundException("run-solution-button отсутствует на странице");
+			if (resetButton == null)
+				throw new NotFoundException("reset-button отсутствует на странице");
+			if (hintsButton == null)
+				throw new NotFoundException("get-hints-button отсутствует на странице");
+		}
+
+		private void CheckCodeMirror()
 		{
 			var secretCodeText = driver.FindElement(ElementsId.SecreteCode);
 			if (secretCodeText == null)
-			{
 				throw new NotFoundException("не найдена секретная область кода");
-			}
 			var codeExerciseField = driver.FindElement(ElementsClasses.CodeExercise);
 			if (codeExerciseField == null)
-			{
 				throw new NotFoundException("не найдена область для кода");
-			}
 			var codeMirrorObject = driver.FindElement(ElementsClasses.CodeMirror);
 			if (codeMirrorObject == null)
-			{
 				throw new NotFoundException("не найден codemirror");
-			}
 		}
 	}
 }
