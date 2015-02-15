@@ -17,6 +17,7 @@ namespace uLearn.Web.Models
 
 		[Required]
 		[StringLength(64)]
+		[Index("AcceptedList", 1)]
 		public string SlideId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
@@ -31,15 +32,17 @@ namespace uLearn.Web.Models
 		public string SolutionCodeHash { get; set; }
 
 		[Required]
+		[Index("AcceptedList", 3)]
 		public int CodeHash { get; set; }
 
 		public virtual IList<Like> Likes { get; set; }
 
 		[Required]
+		[Index("AcceptedList", 4)]
 		public DateTime Timestamp { get; set; }
 
 		[Required]
-		[Index]
+		[Index("AcceptedList", 2)]
 		public bool IsRightAnswer { get; set; }
 
 		[Required]
