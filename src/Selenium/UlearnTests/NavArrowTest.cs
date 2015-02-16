@@ -16,24 +16,14 @@ namespace Selenium.Tests
 	{
 		private static readonly IWebDriver driver = new ChromeDriver();
 
-		public SlidePage LoginAndGoToCourse(string courseTitle)
-		{
-			//IWebDriver driver = new ChromeDriver();
-			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-
-			var startPage = new StartPage(driver);
-			var signInPage = startPage.GoToSignInPage();
-			var authorisedStartPage = signInPage.LoginValidUser(Admin.Login, Admin.Password);
-
-			return authorisedStartPage.GoToCourse(Titles.BasicProgrammingTitle);
-		}
+		
 
 		[Test]
 		public void TestNavArrow1()
 		{
 			using (driver)
 			{
-				var slide = LoginAndGoToCourse(Titles.BasicProgrammingTitle);
+				//var slide = LoginAndGoToCourse(Titles.BasicProgrammingTitle);
 				//slide = slide.ClickNextButton();
 				//slide.RateSlide(Rate.Understand);
 			}

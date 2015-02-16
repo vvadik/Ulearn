@@ -15,7 +15,6 @@ namespace Selenium.UlearnDriver.Pages
 			if (!driver.Title.Equals(Titles.StartPageTitle))
 				throw new IllegalLocatorException("Это не стартовая страница, это: "
 								+ driver.Title);
-
 		}
 
 		public UlearnDriver GoToSignInPage()

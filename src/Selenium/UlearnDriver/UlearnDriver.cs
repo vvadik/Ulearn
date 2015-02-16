@@ -63,30 +63,25 @@ namespace Selenium.UlearnDriver
 			return new UlearnDriver(driver);
 		}
 
-		public UlearnDriver LoginAdminAndGoToCourse(string courseTitle)
+		private SignInPage GoToSignInPage()
 		{
 			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 
 			var startPage = new StartPage(driver);
-			var signInPage = startPage.GoToSignInPage();
-			var authorisedStartPage = signInPage.LoginValidUser(Admin.Login, Admin.Password);
+			var signInPage = startPage.GoToSignInPage().currentPage as SignInPage;
+			if (signInPage == null)
+				throw new Exception("Sign in page not found...");
+			return signInPage;
+		}
 
-			authorisedStartPage.GoToCourse(Titles.BasicProgrammingTitle);
-
-			return new UlearnDriver(driver);
+		public UlearnDriver LoginAdminAndGoToCourse(string courseTitle)
+		{
+			return GoToSignInPage().LoginValidUser(Admin.Login, Admin.Password).GoToCourse(courseTitle);
 		}
 
 		public UlearnDriver LoginVkAndGoToCourse(string courseTitle)
 		{
-			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-
-			var startPage = new StartPage(driver);
-			var signInPage = startPage.GoToSignInPage();
-			var authorisedStartPage = signInPage.LoginVk();
-
-			authorisedStartPage.GoToCourse(Titles.BasicProgrammingTitle);
-
-			return new UlearnDriver(driver);
+			return GoToSignInPage().LoginVk().GoToCourse(Titles.BasicProgrammingTitle);
 		}
 
 		public static bool HasCss(IWebElement webElement, string css)

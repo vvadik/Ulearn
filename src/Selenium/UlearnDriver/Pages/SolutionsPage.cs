@@ -7,12 +7,12 @@ namespace Selenium.UlearnDriver.Pages
 {
 	public class SolutionsPage : UlearnContentPage
 	{
-		public List<SomeoneSolution> solutions { get; protected set; }
+		public List<SomeoneSolution> Solutions { get; private set; }
 
 		public SolutionsPage(IWebDriver driver)
 			: base(driver)
 		{
-			solutions = FindSolutions();
+			Solutions = FindSolutions();
 		}
 
 		private List<SomeoneSolution> FindSolutions()
@@ -21,11 +21,6 @@ namespace Selenium.UlearnDriver.Pages
 				.Select(x => new SomeoneSolution(driver.FindElement(By.XPath(XPaths.SomeoneSolutionXPath(x))),
 							new LikeButton(driver.FindElement(By.XPath(XPaths.SomeoneSolutionLikeXPath(x))))))
 				.ToList();
-		}
-
-		public List<SomeoneSolution> GetSolutions()
-		{
-			return solutions;
 		}
 	}
 }
