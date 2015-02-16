@@ -241,9 +241,9 @@
     <Compile Include="Ideone\ExecutionService.Settings.cs" />
     <Compile Include="ExecutionService\IdeoneService.cs" />
     <Compile Include="ExecutionService\StringExtention.cs" />
-    <Compile Include="Migrations\201501281400301_ExecutionServiceName.cs" />
-    <Compile Include="Migrations\201501281400301_ExecutionServiceName.Designer.cs">
-      <DependentUpon>201501281400301_ExecutionServiceName.cs</DependentUpon>
+    <Compile Include="Migrations\201502160758511_ExecutionServiceName.cs" />
+    <Compile Include="Migrations\201502160758511_ExecutionServiceName.Designer.cs">
+      <DependentUpon>201502160758511_ExecutionServiceName.cs</DependentUpon>
     </Compile>
     <Compile Include="SubmitAllSlide_Test.cs" />
     <Compile Include="ExecutionServiceMigration_Test.cs" />
@@ -470,8 +470,8 @@
     <EmbeddedResource Include="Migrations\201502041429186_AcceptedSolutionsIndex.resx">
       <DependentUpon>201502041429186_AcceptedSolutionsIndex.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201501281400301_ExecutionServiceName.resx">
-      <DependentUpon>201501281400301_ExecutionServiceName.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201502160758511_ExecutionServiceName.resx">
+      <DependentUpon>201502160758511_ExecutionServiceName.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
