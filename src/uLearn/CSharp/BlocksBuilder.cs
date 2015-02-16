@@ -94,23 +94,23 @@ namespace uLearn.CSharp
 				{
 					var parts = comment.Split(new[] { ' ' }, 2);
 					if (parts[0] == "//#video") EmbedVideo(parts[1]);
-					if (parts[0] == "//#include") EmbedCode(parts[1]);
-					if (parts[0] == "//#gallery") EmbedGallery(parts[1]);
-					if (parts[0] == "//#http") EmbedExternalMarkdown(parts[1]);
+                    if (parts[0] == "//#include") EmbedCode(parts[1]);
+                    if (parts[0] == "//#para") EmbedPara(parts[1]);
+                    if (parts[0] == "//#gallery") EmbedGallery(parts[1]);
 				}
 			}
 			return base.VisitTrivia(trivia);
 		}
 
-		private void EmbedGallery(string folderName)
+	    private void EmbedPara(string filename)
+	    {
+	        Blocks.Add(new MdBlock(fs.GetContent(filename)));
+	    }
+
+	    private void EmbedGallery(string folderName)
 		{
 			string[] images = fs.GetFilenames(folderName);
 			Blocks.Add(new ImageGaleryBlock { ImageUrls = images });
-		}
-
-		private void EmbedExternalMarkdown(string url)
-		{
-			Blocks.Add(MdBlock.FromUrl(url));
 		}
 
 		///<summary>Is child _inside_ Type or Method parent</summary>
@@ -182,7 +182,7 @@ namespace uLearn.CSharp
 			string[] commentLines = comment.ToString().SplitToLines();
 			if (commentLines.First().EndsWith("tex"))
 				return new TexBlock(commentLines.Skip(1).Take(commentLines.Length - 2).ToArray());
-			return MdBlock.FromText(GetCommentContent(commentLines, identation));
+			return new MdBlock(GetCommentContent(commentLines, identation));
 		}
 
 		private static string GetCommentContent(string[] commentLines, int identation)

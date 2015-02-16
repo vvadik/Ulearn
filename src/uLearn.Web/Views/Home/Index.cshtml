@@ -35,31 +35,43 @@
 			<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "Linq" }, null)</p>
 		</div>
 	</div>
-	<div class="row">
-		<div class="col-md-6">
-			<h2>Основы программирования на примере C#. Часть 2</h2>
-			<p>Длительность курса: 1 семестр, 3–6 часов в неделю.</p>
-			<p>
-				Курс разработан для студентов первого года обучения компьютерных специальностей ИМКН УрФУ.
-				Расcчитан на людей с минимальным опытом программирования.
-			</p>
-			@if (Context.User.IsInRole(LmsRoles.Admin) || Context.User.IsInRole(LmsRoles.Instructor))
-			{
-				<p>только для админов и преподавателей: @Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "BasicProgramming2" }, null)</p>
-			}
-			else
-			{
-				<p>В процессе разработки...</p>
-			}
-		</div>
-		<div class="col-md-6">
-			<h2>The Clean Code Game</h2>
-			<p>Длительность: 10–20 минут</p>
-			<p>
-				Небольшая игра-тренажер на интерактивных примерах знакомит с базовыми правилами хорошего кода.
-				Качественные имена, стиль именования, комментарии, разбиение кода на методы.
-			</p>
-			<p><a href="https://cleancodegame.github.io">Поехали!</a></p>
-		</div>
-	</div>
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Основы программирования на примере C#. Часть 2</h2>
+            <p>Длительность курса: 1 семестр, 3–6 часов в неделю.</p>
+            <p>
+                Курс разработан для студентов первого года обучения компьютерных специальностей ИМКН УрФУ.
+                Расcчитан на людей с минимальным опытом программирования.
+            </p>
+            @if (Context.User.IsInRole(LmsRoles.Admin) || Context.User.IsInRole(LmsRoles.Instructor))
+            {
+                <p>только для админов и преподавателей: @Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "BasicProgramming2" }, null)</p>
+            }
+            else
+            {
+                <p>В процессе разработки...</p>
+            }
+        </div>
+        <div class="col-md-6">
+            <h2>Искусственный интеллект и машинное обучение</h2>
+            <p>Длительность: 1 семестр, 1-2 часа в неделю</p>
+            <p>
+
+            </p>
+            <p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "AIML" }, null)</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h2>The Clean Code Game</h2>
+            <p>Длительность: 10–20 минут</p>
+            <p>
+                Небольшая игра-тренажер на интерактивных примерах знакомит с базовыми правилами хорошего кода.
+                Качественные имена, стиль именования, комментарии, разбиение кода на методы.
+            </p>
+            <p>
+                <a href="https://cleancodegame.github.io">Поехали!</a>
+            </p>
+        </div>
+    </div>
 </div>

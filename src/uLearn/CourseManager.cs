@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Ionic.Zip;
 using uLearn.CSharp;
 using uLearn.Quizes;
@@ -88,7 +89,7 @@ namespace uLearn
 
 		private void ReloadCourseFromZip(FileInfo zipFile)
 		{
-			using (var zip = ZipFile.Read(zipFile.FullName))
+			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions {Encoding = Encoding.GetEncoding(866)}))
 			{
 				var courseId = Path.GetFileNameWithoutExtension(zipFile.Name);
 				var courseDir = coursesDirectory.CreateSubdirectory(courseId);
