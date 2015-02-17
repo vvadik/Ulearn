@@ -37,18 +37,33 @@ namespace Selenium.UlearnDriver
 		//	return SlideBodyXPath + string.Format("/p[{0}]", index);
 		//}
 
-		public static string QuizBlocksXPath { get { return "/html/body/div[2]/div/div/div/div[@class = \"quiz-block-mark\"]"; } }
+		public static string QuizBlocksXPath { get { return "/html/body/div[2]/div/div/div/div[@class = \"quiz-block-mark\" or @class = \"quiz-block-input\"]"; } }
+
+		public static string QuizChoiseBlocksXPath { get { return "/html/body/div[2]/div/div/div/div[@class = \"quiz-block-mark\"]"; } }
+
+		public static string QuizFillInBlocksXPath { get { return "/html/body/div[2]/div/div/div/div[@class = \"quiz-block-input\"]"; } }
+
+		public static string QuizFillInBlockField(int blockIndex)
+		{
+			return QuizBlocksXPath + String.Format("[{0}]/label/input", blockIndex);
+		}
+
+		public static string QuizBlockDescription(int blockIndex)
+		{
+			return String.Format("/html/body/div[2]/div/div/div/h4[{0}]", blockIndex + 1);
+		}
+
 
 		public static string QuizItemInfoXPath(int blockIndex)
 		{
-			return String.Format(
-				"/html/body/div[2]/div/div/div/div[@class = \"quiz-block-mark\"][{0}]/div[@class = \"quiz\"]/label", blockIndex);
+			return QuizBlocksXPath + String.Format(
+				"[{0}]/div[@class = \"quiz\"]/label", blockIndex);
 		}
 
 		public static string QuizItemXPath(int blockIndex)
 		{
-			return String.Format(
-				"/html/body/div[2]/div/div/div/div[@class = \"quiz-block-mark\"][{0}]/div[@class = \"quiz\"]/label/input", blockIndex);
+			return QuizBlocksXPath + String.Format(
+				"[{0}]/div[@class = \"quiz\"]/label/input", blockIndex);
 		}
 
 		public static string QuizSubmitAgainButtonXPath { get { return "div[@id = \"SubmitQuiz\"]/form/button"; } }

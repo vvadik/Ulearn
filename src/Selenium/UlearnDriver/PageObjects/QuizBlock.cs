@@ -13,6 +13,21 @@ namespace Selenium.UlearnDriver.PageObjects
 	{
 	}
 
+	public class AbstractQuestionBlock : QuizBlock
+	{
+		private readonly int blockIndex;
+
+		public AbstractQuestionBlock(int blockIndex)
+		{
+			this.blockIndex = blockIndex;
+		}
+
+		public int GetBlockIndex()
+		{
+			return blockIndex;
+		}
+	}
+
 	public class TextBlock : QuizBlock
 	{
 		private readonly string text;

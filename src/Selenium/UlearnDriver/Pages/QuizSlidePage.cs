@@ -51,30 +51,55 @@ namespace Selenium.UlearnDriver.Pages
 			return blocks;
 		}
 
-		private List<QuizBlock> FindBlocks() // пока без FillIn блоков!
+		private List<QuizBlock> FindBlocks()
 		{
-			var quizHtmlBlocks = driver.FindElements(By.XPath(XPaths.QuizBlocksXPath)).ToList();
-			var quizBlocks = new List<QuizBlock>(quizHtmlBlocks.Count);
-			for (var index = 0; index < quizHtmlBlocks.Count; index++)
-			{
-				var items = quizHtmlBlocks[index].FindElements(By.XPath(XPaths.QuizItemXPath(index)));
-				var list = items
-					.Select((x, i) => new QuizItem(x, x, quizHtmlBlocks[index]
-						.FindElement(By.XPath(XPaths.QuizItemInfoXPath(i))))).ToList();
-				quizBlocks[index] = new ChoiseBlock(list,
-					UlearnDriver.HasCss(quizHtmlBlocks[index], "checkbox"),
-					driver.FindElement(By.XPath(XPaths.QuizQuestionStatusXPath(index))),
-					quizStatus);
-			}
-			return quizBlocks;
-			return quizHtmlBlocks //попытка сделать все в LINQ :)
-				.Select((y, j) => new ChoiseBlock(y.FindElements(By.XPath(XPaths.QuizItemXPath(j)))
-					.Select((x, i) => new QuizItem(x, x, quizHtmlBlocks[j].FindElement(By.XPath(XPaths.QuizItemInfoXPath(i)))))
-					.ToList(), 
-					UlearnDriver.HasCss(quizHtmlBlocks[j], "checkbox"), 
-					driver.FindElement(By.XPath(XPaths.QuizQuestionStatusXPath(j))),
-					quizStatus))
-				.ToList<QuizBlock>();
+			//var quizChoiseHtmlBlocks = driver.FindElements(By.XPath(XPaths.QuizChoiseBlocksXPath)).ToList();
+			//var quizBlocks = new List<QuizBlock>(quizChoiseHtmlBlocks.Count);
+			//for (var index = 0; index < quizChoiseHtmlBlocks.Count; index++)
+			//{
+			//	var items = quizChoiseHtmlBlocks[index].FindElements(By.XPath(XPaths.QuizItemXPath(index)));
+			//	var list = items
+			//		.Select((x, i) => new QuizItem(x, x, quizChoiseHtmlBlocks[index]
+			//			.FindElement(By.XPath(XPaths.QuizItemInfoXPath(i))))).ToList();
+			//	quizBlocks[index] = new ChoiseBlock(list,
+			//		UlearnDriver.HasCss(quizChoiseHtmlBlocks[index], "checkbox"),
+			//		driver.FindElement(By.XPath(XPaths.QuizQuestionStatusXPath(index))),
+			//		quizStatus);
+			//}
+			//return quizBlocks;
+
+			//////////////////////////////////////////// вот тут все норм
+			return driver
+				.FindElements(By.XPath(XPaths.QuizBlocksXPath))
+				.Select(GetBlock)
+				.ToList();
+			////////////////////////////////////////////
+
+			//return driver.FindElements(By.XPath(XPaths.QuizChoiseBlocksXPath))//попытка сделать все в LINQ :)
+			//	.Select((y, j) => new ChoiseBlock(y.FindElements(By.XPath(XPaths.QuizItemXPath(j)))
+			//		.Select((x, i) => new QuizItem(x, x, quizChoiseHtmlBlocks[j].FindElement(By.XPath(XPaths.QuizItemInfoXPath(i)))))
+			//		.ToList(),
+			//		UlearnDriver.HasCss(quizChoiseHtmlBlocks[j], "checkbox"),
+			//		driver.FindElement(By.XPath(XPaths.QuizQuestionStatusXPath(j))),
+			//		quizStatus))
+			//	.Concat<QuizBlock>(//от сюда начинается поиск fillIn блоков, которые не описаны выше не в LINQ (но должно работать LINQ)
+			//		driver.FindElements(By.XPath(XPaths.QuizFillInBlocksXPath))
+			//			.Select((y, i) => new FillInBlock(y.FindElement(By.XPath(XPaths.QuizFillInBlockField(i))))))
+			//	.ToList<QuizBlock>();
+		}
+
+		private QuizBlock GetBlock(IWebElement webElement, int index)
+		{
+			if (UlearnDriver.HasCss(webElement, "quiz-block-input"))
+				return new FillInBlock(webElement.FindElement(By.XPath(XPaths.QuizFillInBlockField(index))));
+			return new ChoiseBlock(
+				webElement
+					.FindElements(By.XPath(XPaths.QuizItemXPath(index)))
+					.Select((x, i) => new QuizItem(x, x, webElement.FindElement(By.XPath(XPaths.QuizItemInfoXPath(i)))))
+					.ToList(),
+				UlearnDriver.HasCss(webElement, "checkbox"),
+				driver.FindElement(By.XPath(XPaths.QuizQuestionStatusXPath(index))),
+				quizStatus);
 		}
 	}
 
