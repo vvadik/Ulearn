@@ -36,7 +36,7 @@ namespace CsSandboxApi
 				HumanName = name
 			};
 
-			var response = await _httpClient.PostAsJsonAsync("/CreateSubmission", model);
+			var response = await _httpClient.PostAsJsonAsync("CreateSubmission", model);
 
 			if (!response.IsSuccessStatusCode)
 			{
@@ -49,7 +49,7 @@ namespace CsSandboxApi
 
 		public async Task<SubmissionStatus> GetSubmissionStatus(string submissionId)
 		{
-			var uri = GetUriForSubmission("/GetSubmissionStatus", submissionId);
+			var uri = GetUriForSubmission("GetSubmissionStatus", submissionId);
 			var response = await _httpClient.GetAsync(uri);
 			if (!response.IsSuccessStatusCode)
 			{
@@ -61,7 +61,7 @@ namespace CsSandboxApi
 
 		public async Task<PublicSubmissionDetails> GetSubmissionDetails(string submissionId)
 		{
-			var uri = GetUriForSubmission("/GetSubmissionDetails", submissionId);
+			var uri = GetUriForSubmission("GetSubmissionDetails", submissionId);
 			var response = await _httpClient.GetAsync(uri);
 			if (!response.IsSuccessStatusCode)
 			{

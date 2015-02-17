@@ -27,7 +27,7 @@ namespace uLearn.Web
 				select new TestCaseData(slide, executionService).SetName(course.Id + " - " + slide.Info.UnitName + " - " + slide.Title);
 		}
 
-		private static async void TestExerciseSlide(ExerciseSlide slide, IExecutionService executionService)
+		private static void TestExerciseSlide(ExerciseSlide slide, IExecutionService executionService)
 		{
 			var solution = slide.Solution.BuildSolution(slide.EthalonSolution);
 			if (solution.HasErrors)
@@ -37,7 +37,7 @@ namespace uLearn.Web
 			else
 			{
 				//ExperimentMethod(solution); Попытка научиться проводить тестирование, не отправляя на Ideon.
-				var submition = await executionService.Submit(solution.SourceCode, "");
+				var submition = executionService.Submit(solution.SourceCode, "").Result;
 				var output = submition.StdOut + "\n" + submition.StdErr;
 				var isRightAnswer = output.NormalizeEoln().Equals(slide.ExpectedOutput.NormalizeEoln());
 				var result = new RunSolutionResult
