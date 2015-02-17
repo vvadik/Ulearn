@@ -136,6 +136,10 @@
     <Compile Include="Slides\U05_UI2\S020_SeparatedPresentation.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="Slides\U10_NoIfs\S010_Ветвления.cs" />
+    <Compile Include="Slides\U10_NoIfs\S020_Wood.cs" />
+    <Compile Include="Slides\U10_NoIfs\S030_Основа.cs" />
+    <Compile Include="Slides\U10_NoIfs\S040_Визуализация.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">
@@ -165,6 +169,7 @@
     <Content Include="Slides\U05_UI2\observable.png" />
     <Content Include="Slides\U05_UI2\separated-presentation.png" />
     <Content Include="Slides\U05_UI2\Title.txt" />
+    <Content Include="Slides\U10_NoIfs\Title.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
