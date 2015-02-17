@@ -37,7 +37,8 @@ namespace uLearn.Web
 			else
 			{
 				//ExperimentMethod(solution); Попытка научиться проводить тестирование, не отправляя на Ideon.
-				var submition = executionService.Submit(solution.SourceCode, "").Result;
+				var testName = TestContext.CurrentContext.Test.Name;
+				var submition = executionService.Submit(solution.SourceCode, testName).Result;
 				var output = submition.StdOut + "\n" + submition.StdErr;
 				var isRightAnswer = output.NormalizeEoln().Equals(slide.ExpectedOutput.NormalizeEoln());
 				var result = new RunSolutionResult

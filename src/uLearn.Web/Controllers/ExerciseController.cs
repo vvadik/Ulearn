@@ -54,10 +54,10 @@ namespace uLearn.Web.Controllers
 		{
 			var solution = exerciseSlide.Solution.BuildSolution(code);
 			if (solution.HasErrors)
-				return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage };
+				return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
 			if (solution.HasStyleIssues)
-				return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage };
-			var submissionDetails = await executionService.Submit(solution.SourceCode, "");
+				return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage, ExecutionServiceName = "uLearn" };
+			var submissionDetails = await executionService.Submit(solution.SourceCode, GenerateSubmissionName(exerciseSlide));
 			if (submissionDetails == null)
 				return new RunSolutionResult
 				{
@@ -93,6 +93,11 @@ namespace uLearn.Web.Controllers
 			var codeBytes = new MemoryStream();
 			inputStream.CopyTo(codeBytes);
 			return Encoding.UTF8.GetString(codeBytes.ToArray());
+		}
+
+		private string GenerateSubmissionName(Slide exerciseSlide)
+		{
+			return string.Format("{0}: {1} - {2}", User.Identity.Name, exerciseSlide.Info.UnitName, exerciseSlide.Title);
 		}
 	}
 }

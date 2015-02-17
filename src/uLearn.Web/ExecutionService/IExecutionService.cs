@@ -4,7 +4,7 @@ namespace uLearn.Web.ExecutionService
 {
 	public interface IExecutionService
 	{
-		Task<SubmissionResult> Submit(string code, string humanName = null);
+		Task<SubmissionResult> Submit(string code, string displayName = null);
 		string Name { get; }
 	}
 }

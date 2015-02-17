@@ -8,7 +8,7 @@ namespace uLearn.Web.ExecutionService
 	{
 		private readonly Ideone.ExecutionService executionService = new Ideone.ExecutionService();
 
-		public async Task<SubmissionResult> Submit(string code, string humanName = null)
+		public async Task<SubmissionResult> Submit(string code, string displayName = null)
 		{
 			var result = await executionService.Submit(code, "");
 			return result == null ? null : new IdeoneSubmissionResult(result);

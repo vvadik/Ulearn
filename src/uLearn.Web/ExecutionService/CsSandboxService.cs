@@ -3,15 +3,18 @@ using CsSandboxApi;
 
 namespace uLearn.Web.ExecutionService
 {
-	public class CsSandboxService : IExecutionService
+	public partial class CsSandboxService : IExecutionService
 	{
-		private readonly CsSandboxClient client = new CsSandboxClient();
+		private static readonly string Token;
+		private static readonly string Address;
 
-		public async Task<SubmissionResult> Submit(string code, string humanName = null)
+		private readonly CsSandboxClient client = new CsSandboxClient(Token, Address);
+
+		public async Task<SubmissionResult> Submit(string code, string displayName = null)
 		{
 			try
 			{
-				var details = await client.Submit(code, "", humanName);
+				var details = await client.Submit(code, "", displayName);
 				return details == null ? null : new CsSandboxSubmissionResult(details);
 			}
 			catch (CsSandboxClientException)
