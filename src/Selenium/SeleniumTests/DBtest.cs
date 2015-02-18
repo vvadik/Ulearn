@@ -16,12 +16,11 @@ namespace Selenium.SELENIUM_TESTS_1
 	class DB_test_code
 	{
 		[Test]
-		public void TestCreateDB()
+		public void TestCreateDb()
 		{
-			var db = new uLearn.Web.DataContexts.ULearnDb();// ULearnDb();
-			var b = db.Users.Count();
-			//var a = db.AspNetUsers.Count();
-			Console.Write(b);
+			var db = new ULearnDb();
+			var userCount = db.Users.Count();
+			Console.Write(userCount);
 		}
 	}
 }

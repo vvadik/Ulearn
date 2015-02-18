@@ -82,7 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainClass.cs" />
-    <Compile Include="UlearnTests\UlearnDriverTest.cs" />
+    <Compile Include="SeleniumTests\UlearnDriverTest.cs" />
     <Compile Include="UlearnDriver\PageObjects\Hint.cs" />
     <Compile Include="UlearnDriver\PageObjects\LikeButton.cs" />
     <Compile Include="UlearnDriver\PageObjects\QuizBlock.cs" />
@@ -96,18 +96,13 @@
     <Compile Include="UlearnDriver\Pages\SlidePage.cs" />
     <Compile Include="UlearnDriver\Pages\SolutionsPage.cs" />
     <Compile Include="UlearnDriver\Pages\StartPage.cs" />
-    <Compile Include="UlearnDriver\PageObjects\TOC.cs" />
-    <Compile Include="UlearnDriver\PageObjects\TOCUnit.cs" />
+    <Compile Include="UlearnDriver\PageObjects\Toc.cs" />
+    <Compile Include="UlearnDriver\PageObjects\TocUnit.cs" />
     <Compile Include="UlearnDriver\Pages\UlearnContentPage.cs" />
     <Compile Include="UlearnDriver\Pages\UlearnPage.cs" />
     <Compile Include="UlearnDriver\ULearnConstants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UlearnTests\DB_test_code.cs" />
-    <Compile Include="UlearnTests\FirstTest.cs" />
-    <Compile Include="UlearnTests\LoginTest.cs" />
-    <Compile Include="UlearnTests\NavArrowTest.cs" />
-    <Compile Include="UlearnTests\TestRateButton.cs" />
-    <Compile Include="UlearnTests\TOCModelCreateTest.cs" />
+    <Compile Include="SeleniumTests\DBtest.cs" />
     <Compile Include="UlearnDriver\UlearnDriver.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -144,7 +139,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="SeleniumTests\" />
+    <Folder Include="UlearnTests\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

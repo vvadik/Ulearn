@@ -28,16 +28,16 @@ namespace Selenium.UlearnDriver.Pages
 				return PageType.StartPage;
 			if (title == Titles.SignInPageTitle)
 				return PageType.SignInPage;
-			if (driver.FindElement(By.ClassName("side-bar")) != null)
-			{
-				var element = driver.FindElement(By.ClassName("page-header"));
-				if (element != null && element.Text == "Решения")
-					return PageType.SolutionsPage;
-				if (driver.FindElement(By.ClassName("CodeMirror")) != null)
-					return PageType.ExerciseSlidePage;
-				return PageType.SlidePage;
-			}
-			return PageType.IncomprehensibleType;
+			if (UlearnDriver.FindElementSafely(driver, By.ClassName("side-bar")) == null)
+				return PageType.IncomprehensibleType;
+			var element = UlearnDriver.FindElementSafely(driver, By.ClassName("page-header"));
+			if (element != null && element.Text == "Решения")
+				return PageType.SolutionsPage;
+			if (UlearnDriver.FindElementSafely(driver, ElementsClasses.RunSolutionButton) != null)
+				return PageType.ExerciseSlidePage;
+			if (UlearnDriver.FindElementSafely(driver, By.ClassName("quiz")) != null)
+				return PageType.Quiz;
+			return PageType.SlidePage;
 		}
 
 		public UlearnPage CastTo(PageType pageType)

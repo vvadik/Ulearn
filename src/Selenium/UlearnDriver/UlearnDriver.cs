@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Selenium.UlearnDriver
 	{
 		private readonly IWebDriver driver;
 		private readonly UlearnPage currentPage;
-		private Lazy<TOC> TOC;
+		private Lazy<Toc> Toc;
 
 		public UlearnDriver(IWebDriver driver)
 		{
@@ -30,9 +31,9 @@ namespace Selenium.UlearnDriver
 		private void BuildTOC(PageType pageType)
 		{
 			if (pageType != PageType.SignInPage && pageType != PageType.StartPage && pageType != PageType.IncomprehensibleType)
-				TOC = new Lazy<TOC>(() => new TOC(driver, driver.FindElement(By.XPath(XPaths.TOCXPath)), XPaths.TOCXPath));
+				Toc = new Lazy<Toc>(() => new Toc(driver, driver.FindElement(By.XPath(XPaths.TOCXPath)), XPaths.TOCXPath));
 			else
-				TOC = null;
+				Toc = null;
 		}
 
 		public UlearnPage GetPage()
@@ -40,11 +41,11 @@ namespace Selenium.UlearnDriver
 			return currentPage;
 		}
 
-		public TOC GetToc()
+		public Toc GetToc()
 		{
-			if (TOC.Value == null)
-				throw new NotFoundException("TOC is not found");
-			return TOC.Value;
+			if (Toc.Value == null)
+				throw new NotFoundException("Toc is not found");
+			return Toc.Value;
 		}
 
 		//private PageType DeterminePageType()
@@ -96,6 +97,32 @@ namespace Selenium.UlearnDriver
 			catch (StaleElementReferenceException)
 			{
 				return false;
+			}
+		}
+
+		public static IWebElement FindElementSafely(IWebDriver driver, By by)
+		{
+			try
+			{
+				var element = driver.FindElement(by);
+				return element;
+			}
+			catch
+			{
+				return null;
+			}
+		}
+
+		public static IEnumerable<IWebElement> FindElementsSafely(IWebDriver driver, By by)
+		{
+			try
+			{
+				var elements = driver.FindElements(by);
+				return elements;
+			}
+			catch
+			{
+				return null;
 			}
 		}
 	}

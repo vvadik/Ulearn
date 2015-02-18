@@ -5,17 +5,17 @@ using OpenQA.Selenium;
 
 namespace Selenium.UlearnDriver.PageObjects
 {
-	public class TOCUnit
+	public class TocUnit
 	{
 		private readonly IWebElement element;
 		private readonly IWebDriver driver;
 		private readonly Dictionary<string, Lazy<SlideListItem>> slides;
-		public TOCUnit(IWebDriver driver, IWebElement element, string XPath, int i)
+		public TocUnit(IWebDriver driver, IWebElement element, string XPath, int i)
 		{
 			this.driver = driver;
 			this.element = element;
 			var index = string.Format("[{0}]", i);
-			var newSlideXPath = XPath + index + XPaths.SlideXPath;
+			var newSlideXPath = XPath + index + XPaths.SlideXPath + "/a";
 			var newLabelXPath = XPath + index + XPaths.SlideLabelXPath;
 			var slidesElements = element.FindElements(By.XPath(newSlideXPath)).ToList();
 			var slidesLabel = element.FindElements(By.XPath(newLabelXPath)).ToList();
