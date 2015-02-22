@@ -2,12 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
 using Selenium.UlearnDriver.PageObjects;
 using Selenium.UlearnDriver.Pages;
+using uLearn;
 using uLearn.Web.DataContexts;
 
 namespace Selenium.UlearnDriver
@@ -16,24 +18,32 @@ namespace Selenium.UlearnDriver
 	{
 		private readonly IWebDriver driver;
 		private readonly UlearnPage currentPage;
-		private Lazy<Toc> Toc;
+		private Toc toc;
+		private static readonly ULearnDb db = new ULearnDb();
+		private static readonly CourseManager courseManager = new CourseManager(new DirectoryInfo(@"C:\Users\213\Desktop\GitHub\uLearn\src\uLearn.Web"));
+		private readonly string currentUserName;
+		private string currentUserId;
 
 		public UlearnDriver(IWebDriver driver)
 		{
 			this.driver = driver;
 			currentPage = new UlearnPage(driver);
 			var pageType = currentPage.GetPageType();
+			currentUserName = currentPage.GetUserName();
+			currentUserId = db.Users.First(x => x.UserName == currentUserName).Id;
 			currentPage = currentPage.CastTo(pageType);
 
 			BuildTOC(pageType);
+
+			//var currentSlideName = toc.GetCurrentSlideName();
 		}
 
 		private void BuildTOC(PageType pageType)
 		{
 			if (pageType != PageType.SignInPage && pageType != PageType.StartPage && pageType != PageType.IncomprehensibleType)
-				Toc = new Lazy<Toc>(() => new Toc(driver, driver.FindElement(By.XPath(XPaths.TOCXPath)), XPaths.TOCXPath));
+				toc = new Toc(driver, driver.FindElement(By.XPath(XPaths.TocXPath)), XPaths.TocXPath);
 			else
-				Toc = null;
+				toc = null;
 		}
 
 		public UlearnPage GetPage()
@@ -43,20 +53,10 @@ namespace Selenium.UlearnDriver
 
 		public Toc GetToc()
 		{
-			if (Toc.Value == null)
+			if (toc == null)
 				throw new NotFoundException("Toc is not found");
-			return Toc.Value;
+			return toc;
 		}
-
-		//private PageType DeterminePageType()
-		//{
-		//	throw new NotImplementedException();
-		//}
-		//
-		//public PageType GetPageType()
-		//{
-		//	return pageType;
-		//}
 
 		public UlearnDriver GoToStartPage()
 		{
@@ -78,6 +78,11 @@ namespace Selenium.UlearnDriver
 		public UlearnDriver LoginAdminAndGoToCourse(string courseTitle)
 		{
 			return GoToSignInPage().LoginValidUser(Admin.Login, Admin.Password).GoToCourse(courseTitle);
+		}
+
+		public UlearnDriver LoginAndGoToCourse(string courseTitle, string login, string password)
+		{
+			return GoToSignInPage().LoginValidUser(login, password).GoToCourse(courseTitle);
 		}
 
 		public UlearnDriver LoginVkAndGoToCourse(string courseTitle)
@@ -113,12 +118,12 @@ namespace Selenium.UlearnDriver
 			}
 		}
 
-		public static IEnumerable<IWebElement> FindElementsSafely(IWebDriver driver, By by)
+		public static List<IWebElement> FindElementsSafely(IWebDriver driver, By by)
 		{
 			try
 			{
 				var elements = driver.FindElements(by);
-				return elements;
+				return elements.ToList();
 			}
 			catch
 			{

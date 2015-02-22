@@ -24,7 +24,9 @@ namespace Selenium.UlearnDriver
 
 	public class XPaths
 	{
-		public static string TOCXPath { get { return "/html/body/ul"; } }
+		public static string UserNameXPath { get { return "/html/body/div/div/div[1]/ul/form/ul/li/a"; } }
+
+		public static string TocXPath { get { return "/html/body/ul"; } }
 
 		public static string SlideXPath { get { return "/ul/li"; } }
 
@@ -69,6 +71,11 @@ namespace Selenium.UlearnDriver
 		public static string QuizSubmitAgainButtonXPath { get { return "div[@id = \"SubmitQuiz\"]/form/button"; } }
 
 		public static string QuizSubmitAgainStatusXPath { get { return "div[@id = \"SubmitQuiz\"]/form/small"; } }
+
+		public static string UnitInfoXPath(int unitIndex)
+		{
+			return String.Format("/html/budi/ul/li[{0}]/ul", unitIndex + 1);
+		}
 
 		public static string QuizQuestionXPath(int blockIndex)
 		{

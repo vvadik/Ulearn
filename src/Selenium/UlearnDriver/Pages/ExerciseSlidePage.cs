@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using OpenQA.Selenium;
 using Selenium.UlearnDriver.PageObjects;
+using uLearn;
+using uLearn.Web.DataContexts;
 
 namespace Selenium.UlearnDriver.Pages
 {
@@ -11,6 +15,8 @@ namespace Selenium.UlearnDriver.Pages
 		private readonly IWebElement resetButton;
 		private readonly IWebElement hintsButton;
 		private readonly List<Hint> hints;
+		private static readonly ULearnDb ulearnDb = new ULearnDb();
+		private static readonly CourseManager courseManager = new CourseManager(new DirectoryInfo(@"C:\Users\213\Desktop\GitHub\uLearn\src\uLearn.Web"));
 			
 		public ExerciseSlidePage(IWebDriver driver)
 			: base(driver)
@@ -25,7 +31,7 @@ namespace Selenium.UlearnDriver.Pages
 		private List<Hint> GetHints()
 		{
 			const string hintXpath = "hyml/body/div[1]/div/div/div/div[9]/div/div";
-			var allHints = driver.FindElement(By.Id("hint-place")).FindElements(By.XPath(hintXpath));
+			var allHints = UlearnDriver.FindElementsSafely(driver, By.XPath(hintXpath));// driver.FindElement(By.Id("hint-place")).FindElements();
 			var localHints = new List<Hint>(allHints.Count);
 			for (var i = 0; i < allHints.Count; i++)
 			{
@@ -88,6 +94,15 @@ namespace Selenium.UlearnDriver.Pages
 		{
 			CheckCodeMirror();
 			CheckButtons();
+			CheckHints();
+		}
+
+		private void CheckHints()//experiment
+		{
+			var userId = ulearnDb.Users.First(x => x.UserName == "admin").Id;
+			var slideId = courseManager.GetCourse("courseId").Slides.First(x => x.Title == "Title").Id;
+			var reallyHints = ulearnDb.Hints.Where(x => x.UserId == userId && x.SlideId == slideId).ToList();
+			//var slide = courseManager.GetCourse("courseId").GetSlideById(slideId).Blocks.Where();
 		}
 
 		private void CheckButtons()

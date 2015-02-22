@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-//using System.Data.Entity;
-//using Microsoft.AspNet.Identity.EntityFramework;
 using NUnit.Framework;
+using uLearn;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Migrations;
 using uLearn.Web.Models;
@@ -21,6 +21,14 @@ namespace Selenium.SELENIUM_TESTS_1
 			var db = new ULearnDb();
 			var userCount = db.Users.Count();
 			Console.Write(userCount);
+		}
+
+		[Test]
+		public void TestCourseManager()
+		{
+			var cm = new CourseManager(new DirectoryInfo(@"C:\Users\213\Desktop\GitHub\uLearn\src\uLearn.Web"));
+			foreach (var course in cm.GetCourses())
+				Console.WriteLine(course.Title);
 		}
 	}
 }

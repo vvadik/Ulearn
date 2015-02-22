@@ -17,11 +17,14 @@ namespace Selenium.UlearnDriver.PageObjects
 			var index = string.Format("[{0}]", i);
 			var newSlideXPath = XPath + index + XPaths.SlideXPath + "/a";
 			var newLabelXPath = XPath + index + XPaths.SlideLabelXPath;
-			var slidesElements = element.FindElements(By.XPath(newSlideXPath)).ToList();
+			var slidesElements = element
+				.FindElements(By.XPath(newSlideXPath))
+				.Where(x => x.Text != "Заметки преподавателю" && x.Text != "Статистика и успеваемость")
+				.ToList();
 			var slidesLabel = element.FindElements(By.XPath(newLabelXPath)).ToList();
 			slides = new Dictionary<string, Lazy<SlideListItem>>();
-			if (slidesElements.Count != slidesLabel.Count)
-				throw new Exception("incredible mistake in slide!");
+			//if (slidesElements.Count != slidesLabel.Count)
+			//	throw new Exception("incredible mistake on slide!");
 			for (var ind = 0; ind < slidesElements.Count; ind++)
 			{
 				var lazyInd = ind;
@@ -32,7 +35,7 @@ namespace Selenium.UlearnDriver.PageObjects
 		public UlearnDriver Click()
 		{
 			element.Click();
-			var TOCElement = driver.FindElement(By.XPath(XPaths.TOCXPath));
+			//var TOCElement = driver.FindElement(By.XPath(XPaths.TocXPath));
 			return new UlearnDriver(driver);
 		}
 
@@ -44,7 +47,7 @@ namespace Selenium.UlearnDriver.PageObjects
 		public UlearnDriver ClickOnSlide(string slideName)
 		{
 			slides[slideName].Value.Click();
-			var TOCElement = driver.FindElement(By.XPath(XPaths.TOCXPath));
+			//var TOCElement = driver.FindElement(By.XPath(XPaths.TocXPath));
 			return new UlearnDriver(driver);
 		}
 
@@ -121,6 +124,8 @@ namespace Selenium.UlearnDriver.PageObjects
 		{
 			this.isVisited = isVisited;
 		}
+
+		public bool Collapsed { get; set; }
 
 		public bool IsVisited()
 		{

@@ -46,10 +46,11 @@ namespace SeleniumTests
 
 				foreach (var unitName in unitsNames)
 				{
+					ulearnDriver = ulearnDriver.GetToc().GetUnitControl(unitName).Click();
 					var slidesNames = ulearnDriver.GetToc().GetUnitControl(unitName).GetSlidesNames();
 					foreach (var slideName in slidesNames)
 					{
-						ulearnDriver.GetToc().GetUnitControl(unitName).ClickOnSlide(slideName);
+						ulearnDriver = ulearnDriver.GetToc().GetUnitControl(unitName).ClickOnSlide(slideName);
 					}
 				}
 			}

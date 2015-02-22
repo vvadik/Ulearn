@@ -21,6 +21,12 @@ namespace Selenium.UlearnDriver.Pages
 			return driver.Url;
 		}
 
+		public string GetUserName()
+		{
+			var element = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UserNameXPath));
+			return element == null ? null : element.Text;
+		}
+
 		public PageType GetPageType()
 		{
 			var title = GetTitle();

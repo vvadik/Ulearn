@@ -11,7 +11,8 @@ namespace Selenium.UlearnDriver.PageObjects
 
 		private readonly IWebElement element;
 		private readonly IWebDriver driver;
-		private readonly Dictionary<string, Lazy<TocUnit>> units;
+		private readonly Dictionary<string, TocUnit> units;
+		private readonly Dictionary<string, UnitInitInfo> initInfo;
 
 		private Dictionary<string, TocUnit> statistics;
 
@@ -21,8 +22,9 @@ namespace Selenium.UlearnDriver.PageObjects
 			this.element = element;
 			var newXPath = XPath + lectionXPath;
 			var unitsElements = element.FindElements(By.XPath(newXPath)).ToList();
-			units = new Dictionary<string, Lazy<TocUnit>>();
+			units = new Dictionary<string, TocUnit>();
 			statistics = new Dictionary<string, TocUnit>();
+			initInfo = new Dictionary<string, UnitInitInfo>();
 			for (var i = 0; i < unitsElements.Count; i++)
 			{
 				var unitName = unitsElements[i].Text.Split(new []{"\r\n"}, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
@@ -32,8 +34,10 @@ namespace Selenium.UlearnDriver.PageObjects
 					statistics.Add(unitName, new TocUnit(driver, unitsElements[i], newXPath, i));
 				else
 				{
+					var isCollapsed = UlearnDriver.HasCss(driver.FindElement(By.XPath(XPaths.UnitInfoXPath(i))), "in");
 					var index = i;
-					units.Add(unitName, new Lazy<TocUnit>(() => new TocUnit(driver, unitsElements[index], newXPath, index + 1)));
+					units.Add(unitName, null);//new Lazy<TocUnit>(() => ));
+					initInfo.Add(unitName, new UnitInitInfo(unitsElements[index], newXPath, index + 1, isCollapsed));
 				}
 			}
 		}
@@ -45,7 +49,46 @@ namespace Selenium.UlearnDriver.PageObjects
 
 		public TocUnit GetUnitControl(string unitName)
 		{
-			return units[unitName].Value;
+			if (units.Keys.All(x => x != unitName))
+				throw new Exception(String.Format("slide with name {0} does not exist", unitName));
+			if (units[unitName] != null)
+				return units[unitName];
+			var unitInfo = initInfo[unitName];
+			units[unitName] = new TocUnit(driver, unitInfo.UnitElement, unitInfo.XPath, unitInfo.Iindex);
+			return units[unitName];
 		}
+
+		public string GetCurrentSlideName()
+		{
+			return units
+				.Where(x => initInfo[x.Key].IsCollapsed)
+				.Select(x => x.Value)
+				.Select(unit => unit
+					.GetSlidesNames()
+					.Select(name => new { Info = unit.GetSlideListItemInfo(name), Name = name })
+					.FirstOrDefault(unitInfo => unitInfo.Info.Collapsed))
+				.Where(x => x.Info != null)
+				.Select(x => x.Name)
+				.First();
+		}
+	}
+
+	class UnitInitInfo
+	{
+		public UnitInitInfo(IWebElement unitElement, string xPath, int index, bool isCollapsed)
+		{
+			UnitElement = unitElement;
+			XPath = xPath;
+			Iindex = index;
+			IsCollapsed = isCollapsed;
+		}
+
+		public bool IsCollapsed { get; private set; }
+
+		public int Iindex { get; private set; }
+
+		public string XPath { get; private set; }
+
+		public IWebElement UnitElement { get; private set; }
 	}
 }
