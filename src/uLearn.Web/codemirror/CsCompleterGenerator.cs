@@ -74,6 +74,8 @@ namespace uLearn.Web.codemirror
 				typeof (Regex),
 				typeof (KeyValuePair<,>),
 				typeof (Point),
+				typeof (IEnumerable),
+				typeof (IEnumerator),
 			};
 
 			var extendedTypes = new[]
