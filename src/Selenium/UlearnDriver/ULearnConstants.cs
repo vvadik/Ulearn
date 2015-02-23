@@ -72,9 +72,11 @@ namespace Selenium.UlearnDriver
 
 		public static string QuizSubmitAgainStatusXPath { get { return "div[@id = \"SubmitQuiz\"]/form/small"; } }
 
+		public static string SlideHeaderXPath { get { return "/html/body/div[2]/div/div/div/h1"; } }
+
 		public static string UnitInfoXPath(int unitIndex)
 		{
-			return String.Format("/html/budi/ul/li[{0}]/ul", unitIndex + 1);
+			return String.Format("/html/body/ul/li[{0}]/ul", unitIndex + 1);
 		}
 
 		public static string QuizQuestionXPath(int blockIndex)

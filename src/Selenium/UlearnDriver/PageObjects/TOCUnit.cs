@@ -77,30 +77,38 @@ namespace Selenium.UlearnDriver.PageObjects
 			public SlideLabelInfo GetInfo()
 			{
 				if (slideLabelElement == null)
-					return new SlideLabelInfo(false);
+					return new SlideLabelInfo(false, false);
 
 				var isVisited = IsVisited(slideLabelElement);
+				var selected = IsSelected(slideElement);
 
 				if (UlearnDriver.HasCss(slideLabelElement, "glyphicon-edit"))
-					return new ExerciseSlideLabelInfo(isVisited, IsPassed(slideLabelElement));
+					return new ExerciseSlideLabelInfo(isVisited, selected, IsPassed(slideLabelElement));
 
 				if (UlearnDriver.HasCss(slideLabelElement, "glyphicon-ok"))
-					return new SlideLabelInfo(isVisited);
+					return new SlideLabelInfo(isVisited, selected);
 
 				if (UlearnDriver.HasCss(slideLabelElement, "glyphicon-pushpin"))
 				{
 					var isPassed = IsPassed(slideLabelElement);
 					var isHasAttempts = IsHasAttempts(slideLabelElement);
-					return new TestSlideLabelInfo(isVisited, isPassed, isHasAttempts);
+					return new TestSlideLabelInfo(isVisited, selected, isPassed, isHasAttempts);
 				}
 
-				throw new NotFoundException("navbar-label is not found");
+				return new SlideLabelInfo(false, false); //throw new NotFoundException("navbar-label is not found");
+			}
+
+			private bool IsSelected(IWebElement element)
+			{
+				return UlearnDriver.HasCss(element, "selected");
 			}
 
 			private bool IsHasAttempts(IWebElement webElement)
 			{
-				return driver.FindElement(By.Id("quiz-submit-btn")) != null ||
-					   driver.FindElement(By.Id("SubmitQuiz")) != null;
+				if (webElement == null)
+					return false;
+				return UlearnDriver.FindElementSafely(driver, By.Id("quiz-submit-btn")) != null ||
+					   UlearnDriver.FindElementSafely(driver, By.Id("SubmitQuiz")) != null;
 			}
 
 			private static bool IsVisited(IWebElement webElement)
@@ -120,12 +128,13 @@ namespace Selenium.UlearnDriver.PageObjects
 	{
 		private readonly bool isVisited;
 
-		public SlideLabelInfo(bool isVisited)
+		public SlideLabelInfo(bool isVisited, bool selected)
 		{
 			this.isVisited = isVisited;
+			Selected = selected;
 		}
 
-		public bool Collapsed { get; set; }
+		public bool Selected { get; private set; }
 
 		public bool IsVisited()
 		{
@@ -137,8 +146,8 @@ namespace Selenium.UlearnDriver.PageObjects
 	{
 		private readonly bool isPassed;
 
-		public ExerciseSlideLabelInfo(bool isVisited, bool isPassed)
-			: base(isVisited)
+		public ExerciseSlideLabelInfo(bool isVisited, bool selected, bool isPassed)
+			: base(isVisited, selected)
 		{
 			this.isPassed = isPassed;
 		}
@@ -154,8 +163,8 @@ namespace Selenium.UlearnDriver.PageObjects
 		private readonly bool isPassed;
 		private readonly bool isHereAtempts;
 
-		public TestSlideLabelInfo(bool isVisited, bool isPassed, bool isHereAttempts)
-			: base(isVisited)
+		public TestSlideLabelInfo(bool isVisited, bool selected, bool isPassed, bool isHereAttempts)
+			: base(isVisited, selected)
 		{
 			this.isPassed = isPassed;
 			this.isHereAtempts = isHereAttempts;

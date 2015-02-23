@@ -22,7 +22,9 @@ namespace Selenium.UlearnDriver
 		private static readonly ULearnDb db = new ULearnDb();
 		private static readonly CourseManager courseManager = new CourseManager(new DirectoryInfo(@"C:\Users\213\Desktop\GitHub\uLearn\src\uLearn.Web"));
 		private readonly string currentUserName;
-		private string currentUserId;
+		private readonly string currentUserId;
+		private readonly string currentSlideName;
+		private readonly string currentSlideId;
 
 		public UlearnDriver(IWebDriver driver)
 		{
@@ -35,7 +37,18 @@ namespace Selenium.UlearnDriver
 
 			BuildTOC(pageType);
 
-			//var currentSlideName = toc.GetCurrentSlideName();
+			currentSlideName = currentPage.GetSlideName();
+			if (currentSlideName != null)
+			{
+				var currentSlide = courseManager.GetCourses().SelectMany(x => x.Slides).FirstOrDefault(x => x.Title == currentSlideName);
+				if (currentSlide != null)
+					currentSlideId = currentSlide.Id;
+			}
+		}
+
+		public string GetCurrentSlideName()
+		{
+			return currentSlideName ?? "";
 		}
 
 		private void BuildTOC(PageType pageType)
@@ -96,8 +109,8 @@ namespace Selenium.UlearnDriver
 				return false;
 			try
 			{
-				webElement.GetCssValue(css);
-				return true;
+				return webElement.GetAttribute("class").Contains(css);//.GetCssValue(css);
+				//return true;
 			}
 			catch (StaleElementReferenceException)
 			{

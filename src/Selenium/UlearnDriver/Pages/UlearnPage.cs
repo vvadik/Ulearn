@@ -65,5 +65,11 @@ namespace Selenium.UlearnDriver.Pages
 
 			return this;
 		}
+
+		public string GetSlideName()
+		{
+			var element = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.SlideHeaderXPath));
+			return element == null ? null : element.Text;
+		}
 	}
 }

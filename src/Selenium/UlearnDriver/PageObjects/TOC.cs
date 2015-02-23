@@ -34,9 +34,10 @@ namespace Selenium.UlearnDriver.PageObjects
 					statistics.Add(unitName, new TocUnit(driver, unitsElements[i], newXPath, i));
 				else
 				{
-					var isCollapsed = UlearnDriver.HasCss(driver.FindElement(By.XPath(XPaths.UnitInfoXPath(i))), "in");
+					var collapsedElement = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UnitInfoXPath(i)));
+					var isCollapsed = collapsedElement.GetAttribute("class").Contains("collapse in");// UlearnDriver.HasCss(collapsedElement, "collapse in");
 					var index = i;
-					units.Add(unitName, null);//new Lazy<TocUnit>(() => ));
+					units.Add(unitName, null);
 					initInfo.Add(unitName, new UnitInitInfo(unitsElements[index], newXPath, index + 1, isCollapsed));
 				}
 			}
@@ -58,19 +59,27 @@ namespace Selenium.UlearnDriver.PageObjects
 			return units[unitName];
 		}
 
-		public string GetCurrentSlideName()
-		{
-			return units
-				.Where(x => initInfo[x.Key].IsCollapsed)
-				.Select(x => x.Value)
-				.Select(unit => unit
-					.GetSlidesNames()
-					.Select(name => new { Info = unit.GetSlideListItemInfo(name), Name = name })
-					.FirstOrDefault(unitInfo => unitInfo.Info.Collapsed))
-				.Where(x => x.Info != null)
-				.Select(x => x.Name)
-				.First();
-		}
+		//public string GetCurrentSlideName()
+		//{
+		//	var a = units
+		//		.Where(x => initInfo[x.Key].IsCollapsed)
+		//		.Select(CreateUnit);
+		//	//foreach (var u in a)
+		//	//	units[u.Key] = new TocUnit(driver, initInfo[u.Key].UnitElement, initInfo[u.Key].XPath, initInfo[u.Key].Iindex);
+		//	var b = a	.Select(x => x.Value);
+		//	var c = b	.Select(unit => unit
+		//			.GetSlidesNames()
+		//			.Select(name => new { Info = unit.GetSlideListItemInfo(name), Name = name })
+		//			.FirstOrDefault(unitInfo => unitInfo.Info.Selected));
+		//	return c	.First(x => x.Info != null).Name;
+		//}
+		//
+		//private KeyValuePair<string, TocUnit> CreateUnit(KeyValuePair<string, TocUnit> pair)
+		//{
+		//	var unitInfo = initInfo[pair.Key];
+		//	units[pair.Key] = new TocUnit(driver, unitInfo.UnitElement, unitInfo.XPath, unitInfo.Iindex);
+		//	return new KeyValuePair<string, TocUnit>(pair.Key, units[pair.Key]);
+		//}
 	}
 
 	class UnitInitInfo

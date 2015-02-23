@@ -55,5 +55,20 @@ namespace SeleniumTests
 				}
 			}
 		}
+
+		[Test]
+		public void TestTocCurrentSlide()
+		{
+			using (driver)
+			{
+				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
+				var ulearnDriver = new UlearnDriver(driver);
+				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				//var toc = ulearnDriver.GetToc();
+				//var a = driver.FindElement(By.XPath(String.Format("/html/body/ul/li[{0}]/ul", 1)));
+				//Console.Write(a.)
+				Console.WriteLine(ulearnDriver.GetCurrentSlideName());
+			}
+		}
 	}
 }
