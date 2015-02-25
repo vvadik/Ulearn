@@ -382,19 +382,6 @@ div.quiz .right-quiz {
 	font-weight: bold;
 }
 
-.not-understand-btn {
-	width: 33%;
-}
-
-.understand-btn {
-	width: 33%;
-}
-
-.trivial-btn {
-	width: 34%;
-	float: right !important;
-}
-
 .full-width {
 	width: 100%;
 }
