@@ -85,6 +85,7 @@
     <Compile Include="Slides\L05 - Нечеткое управление\S03 - Сравнение веростностного и нечеткого подходов.cs" />
     <Compile Include="Slides\L05 - Нечеткое управление\S04 - Управление на нечеткой логике.cs" />
     <Compile Include="Slides\L05 - Нечеткое управление\S05 - Нечеткие системы, заключение.cs" />
+    <Compile Include="Slides\L05 - Нечеткое управление\S98 - Исходные коды.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -138,6 +139,7 @@
     <Content Include="Slides\L03 - Нечеткие множества\Title.txt" />
     <Content Include="Slides\L04 - Нечеткие вывод и арифметика\S99 - Quiz.quiz.xml" />
     <Content Include="Slides\L04 - Нечеткие вывод и арифметика\Title.txt" />
+    <Content Include="Slides\L05 - Нечеткое управление\S99 - Quiz.quiz.xml" />
     <Content Include="Slides\L05 - Нечеткое управление\Title.txt" />
     <Content Include="Slides\Title.txt" />
   </ItemGroup>
