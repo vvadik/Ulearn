@@ -33,6 +33,7 @@ namespace uLearn
 			Lang = lang;
 			ExerciseInitialCode = "";
 			HintsMd = new List<string>();
+			MaxScore = 5;
 		}
 
 		protected bool Equals(ExerciseSlide other)

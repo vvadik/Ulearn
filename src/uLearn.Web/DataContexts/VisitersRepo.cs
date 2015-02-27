@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts
@@ -53,6 +52,60 @@ namespace uLearn.Web.DataContexts
 		public bool HasVisitedSlides(string courseId, string userId)
 		{
 			return db.Visiters.Any(x => x.UserId == userId && x.CourseId == courseId);
+		}
+
+		private async Task UpdateAttempts(string slideId, string userId, Action<Visiters> action)
+		{
+			var visiters = db.Visiters.FirstOrDefault(v => v.SlideId == slideId && v.UserId == userId);
+			if (visiters == null)
+				return;
+			action(visiters);
+			await db.SaveChangesAsync();
+		}
+
+		public async Task RemoveAttempts(string slideId, string userId)
+		{
+			await UpdateAttempts(slideId, userId, visiters =>
+			{
+				visiters.AttemptsCount = 0;
+				visiters.Score = 0;
+			});
+		}
+
+		public async Task AddAttempt(string slideId, string userId, int score)
+		{
+			await UpdateAttempts(slideId, userId, visiters =>
+			{
+				visiters.AttemptsCount++;
+				visiters.Score = score;
+			});
+		}
+
+		public async Task DropAttempt(string slideId, string userId)
+		{
+			await UpdateAttempts(slideId, userId, visiters =>
+			{
+				visiters.Score = 0;
+			});
+		}
+
+		public async Task AddSolutionAttempt(string slideId, string userId, bool isRightAnswer)
+		{
+			await UpdateAttempts(slideId, userId, visiters =>
+			{
+				visiters.AttemptsCount++;
+				var newScore = isRightAnswer && !visiters.IsSkipped ? 5 : 0;
+				if (newScore > visiters.Score)
+					visiters.Score = newScore;
+			});
+		}
+
+		public Dictionary<string, int> GetScoresForSlides(string courseId, string userId)
+		{
+			return db.Visiters
+				.Where(v => v.CourseId == courseId && v.UserId == userId)
+				.GroupBy(v => v.SlideId, (s, visiterses) => new { Key = s, Value = visiterses.FirstOrDefault()})
+				.ToDictionary(g => g.Key, g => g.Value.Score);
 		}
 	}
 }

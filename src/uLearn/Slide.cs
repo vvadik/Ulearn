@@ -11,6 +11,7 @@ namespace uLearn
 		public int Index { get { return Info.Index; }}
 		public readonly string Id;
 		public virtual bool ShouldBeSolved { get { return false; } }
+		public int MaxScore { get; protected set; }
 
 
 		public Slide(IEnumerable<SlideBlock> blocks, SlideInfo info, string title, string id)
@@ -19,6 +20,7 @@ namespace uLearn
 			Info = info;
 			Title = title;
 			Id = id;
+			MaxScore = 0;
 		}
 
 		public Slide SetIndex(int index)

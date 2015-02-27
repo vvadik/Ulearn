@@ -240,6 +240,10 @@
     <Compile Include="Migrations\201502160758511_ExecutionServiceName.Designer.cs">
       <DependentUpon>201502160758511_ExecutionServiceName.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201502250945217_VisitResults.cs" />
+    <Compile Include="Migrations\201502250945217_VisitResults.Designer.cs">
+      <DependentUpon>201502250945217_VisitResults.cs</DependentUpon>
+    </Compile>
     <Compile Include="SubmitAllSlide_Test.cs" />
     <Compile Include="ExecutionServiceMigration_Test.cs" />
     <Compile Include="ExecutionService\CsSandboxService.cs" />
@@ -467,6 +471,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201502160758511_ExecutionServiceName.resx">
       <DependentUpon>201502160758511_ExecutionServiceName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201502250945217_VisitResults.resx">
+      <DependentUpon>201502250945217_VisitResults.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 
 namespace uLearn.Web.Models
 {
@@ -30,5 +27,9 @@ namespace uLearn.Web.Models
 
 		[Required]
 		public DateTime Timestamp { get; set; }
+
+		public int Score { get; set; }
+		public int AttemptsCount { get; set; }
+		public bool IsSkipped { get; set; }
 	}
 }

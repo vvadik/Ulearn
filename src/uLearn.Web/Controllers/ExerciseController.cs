@@ -14,6 +14,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
+		private readonly VisitersRepo visitersRepo = new VisitersRepo();
 //		private readonly IExecutionService executionService = new CsSandboxService();
 
 		public ExerciseController()
@@ -81,10 +82,12 @@ namespace uLearn.Web.Controllers
 
 		private async Task SaveUserSolution(string courseId, string slideId, string code, string compilationError, string output, bool isRightAnswer, string executionServiceName)
 		{
+			var userId = User.Identity.GetUserId();
 			await solutionsRepo.AddUserSolution(
 				courseId, slideId,
 				code, isRightAnswer, compilationError, output,
-				User.Identity.GetUserId(), executionServiceName);
+				userId, executionServiceName);
+			await visitersRepo.AddSolutionAttempt(slideId, userId, isRightAnswer);
 		}
 
 
