@@ -999,6 +999,10 @@
     <EmbeddedResource Include="Microsoft.Owin.Security.VK\Resources.resx" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\courses\AIML\AIML.csproj">
+      <Project>{fe23302c-0d46-4c8e-81be-c9b79f6e0263}</Project>
+      <Name>AIML</Name>
+    </ProjectReference>
     <ProjectReference Include="..\uLearn\uLearn.csproj">
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
       <Name>uLearn</Name>

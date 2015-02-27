@@ -68,6 +68,23 @@
     <Compile Include="Slides\L02 - Логика предикатов\S05 - Поиск теорем.cs" />
     <Compile Include="Slides\L02 - Логика предикатов\S06 - Пруверы и их применение.cs" />
     <Compile Include="Slides\L02 - Логика предикатов\S07 - Логическое программирование.cs" />
+    <Compile Include="Slides\L03 - Нечеткие множества\S00 - Развитие логических систем.cs" />
+    <Compile Include="Slides\L03 - Нечеткие множества\S01 - Нечеткие логические связки.cs" />
+    <Compile Include="Slides\L03 - Нечеткие множества\S02 - Нечеткие множества.cs" />
+    <Compile Include="Slides\L03 - Нечеткие множества\S03 - Отношения и отображения.cs" />
+    <Compile Include="Slides\L03 - Нечеткие множества\S04 - Пример отошений и отображений.cs" />
+    <Compile Include="Slides\L03 - Нечеткие множества\S05 - Композиция отношений.cs" />
+    <Compile Include="Slides\L04 - Нечеткие вывод и арифметика\S00 - Нечеткий вывод.cs" />
+    <Compile Include="Slides\L04 - Нечеткие вывод и арифметика\S01 - Пояснение к нечеткому выводу.cs" />
+    <Compile Include="Slides\L04 - Нечеткие вывод и арифметика\S02 - Нечеткие числа.cs" />
+    <Compile Include="Slides\L04 - Нечеткие вывод и арифметика\S03 - Принцип расширения.cs" />
+    <Compile Include="Slides\L04 - Нечеткие вывод и арифметика\S04 - Нечеткая арифметика.cs" />
+    <Compile Include="Slides\L05 - Нечеткое управление\S00 - Четкое управление.cs" />
+    <Compile Include="Slides\L05 - Нечеткое управление\S01 - Управление с нечеткой арифметикой.cs" />
+    <Compile Include="Slides\L05 - Нечеткое управление\S02 - Вероятностный подход.cs" />
+    <Compile Include="Slides\L05 - Нечеткое управление\S03 - Сравнение веростностного и нечеткого подходов.cs" />
+    <Compile Include="Slides\L05 - Нечеткое управление\S04 - Управление на нечеткой логике.cs" />
+    <Compile Include="Slides\L05 - Нечеткое управление\S05 - Нечеткие системы, заключение.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -92,6 +109,22 @@
     <None Include="Slides\L02 - Логика предикатов\_S04-slides.pdf" />
     <None Include="Slides\L02 - Логика предикатов\_S05-slides.pdf" />
     <None Include="Slides\L02 - Логика предикатов\_S07-slides.pdf" />
+    <None Include="Slides\L03 - Нечеткие множества\_S00-slides.pdf" />
+    <None Include="Slides\L03 - Нечеткие множества\_S01-slides.pdf" />
+    <None Include="Slides\L03 - Нечеткие множества\_S02-slides.pdf" />
+    <None Include="Slides\L03 - Нечеткие множества\_S03-slides.pdf" />
+    <None Include="Slides\L03 - Нечеткие множества\_S04-slides.pdf" />
+    <None Include="Slides\L03 - Нечеткие множества\_S05-slides.pdf" />
+    <None Include="Slides\L04 - Нечеткие вывод и арифметика\_S00-slides.pdf" />
+    <None Include="Slides\L04 - Нечеткие вывод и арифметика\_S01-slides.pdf" />
+    <None Include="Slides\L04 - Нечеткие вывод и арифметика\_S02-slides.pdf" />
+    <None Include="Slides\L04 - Нечеткие вывод и арифметика\_S03-slides.pdf" />
+    <None Include="Slides\L04 - Нечеткие вывод и арифметика\_S04-slides.pdf" />
+    <None Include="Slides\L05 - Нечеткое управление\_S00-slides.pdf" />
+    <None Include="Slides\L05 - Нечеткое управление\_S02-slides.pdf" />
+    <None Include="Slides\L05 - Нечеткое управление\_S03-slides.pdf" />
+    <None Include="Slides\L05 - Нечеткое управление\_S04-slides.pdf" />
+    <None Include="Slides\L05 - Нечеткое управление\_S05-slides.pdf" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Slides\L00 - История искусственного интеллекта\S99 - Quiz.quiz.xml" />
@@ -100,6 +133,11 @@
     <Content Include="Slides\L01 - Логика высказываний\Title.txt" />
     <Content Include="Slides\L02 - Логика предикатов\S99 - Quiz.quiz.xml" />
     <Content Include="Slides\L02 - Логика предикатов\Title.txt" />
+    <Content Include="Slides\L03 - Нечеткие множества\QuizImg1.png" />
+    <Content Include="Slides\L03 - Нечеткие множества\S99 - Quiz.quiz.xml" />
+    <Content Include="Slides\L03 - Нечеткие множества\Title.txt" />
+    <Content Include="Slides\L04 - Нечеткие вывод и арифметика\Title.txt" />
+    <Content Include="Slides\L05 - Нечеткое управление\Title.txt" />
     <Content Include="Slides\Title.txt" />
   </ItemGroup>
   <ItemGroup>
