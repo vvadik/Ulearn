@@ -179,10 +179,23 @@ a.nav-arrow:hover {
 	margin-top: 0.5em;
 }
 
+.units-list-item > a,
+.slide-list-item {
+	overflow: hidden;
+}
+
+.units-list-item > a:after,
+.slide-list-item > a:after {
+	content: attr(data-score);
+	float: right;
+	padding-left: 1em;
+	padding-top: 0.1em;
+}
+
 .slide-list-item {
 	list-style-type: none;
 	border-bottom: 1px solid #eee;
-	padding: 0.5em 0 0.5em 2em;
+	padding: 0.5em 0.5em 0.5em 2em;
 	cursor: pointer;
 	color: #428bca;
 }
@@ -463,4 +476,9 @@ div.quiz .right-quiz {
 div.tex {
 	font-size: 1.2em;
 	padding-bottom: 1em;
+}
+
+.courseNameString {
+	font-size: 1.2em;
+	font-weight: bold;
 }
