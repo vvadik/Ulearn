@@ -1,7 +1,6 @@
 ﻿using OpenQA.Selenium;
-using Selenium.UlearnDriver.Pages;
 
-namespace Selenium.UlearnDriver.PageObjects
+namespace Selenium.UlearnDriverComponents.PageObjects
 {
 	public class NavArrows
 	{
@@ -12,9 +11,9 @@ namespace Selenium.UlearnDriver.PageObjects
 		public NavArrows(IWebDriver driver)
 		{
 			this.driver = driver;
-			nextSlideButton = driver.FindElement(ElementsId.NextNavArrow);
-			prevSlideButton = driver.FindElement(ElementsId.PrevNavArrow);
-			nextSolutionsButton = driver.FindElement(ElementsId.NextSolutionsButton);
+			nextSlideButton = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, ElementsId.NextNavArrow);
+			prevSlideButton = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, ElementsId.PrevNavArrow);
+			nextSolutionsButton = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, ElementsId.NextSolutionsButton);
 			CheckButtons();
 		}
 
@@ -28,52 +27,29 @@ namespace Selenium.UlearnDriver.PageObjects
 				throw new NotFoundException("не найдена NextSolutionsButton");
 		}
 
-		public UlearnDriver ClickNextButton()
+		public UlearnDriverComponents.UlearnDriver ClickNextButton()
 		{
-			var title = driver.Title;
 			if (nextSolutionsButton.Enabled)
 				nextSlideButton.Click();
 			else
 				nextSolutionsButton.Click();
-			return new UlearnDriver(driver);
+			return new UlearnDriverComponents.UlearnDriver(driver);
 		}
 
-		public UlearnDriver ClickPrevButton()
+		public UlearnDriverComponents.UlearnDriver ClickPrevButton()
 		{
-			var title = driver.Title;
 			prevSlideButton.Click();
-			return new UlearnDriver(driver);
+			return new UlearnDriverComponents.UlearnDriver(driver);
 		}
-
-		//SolutionsPage ClickNextSolutionsButton()
-		//{
-		//	var title = driver.Title;
-		//	nextSolutionsButton.Click();
-		//	return new SolutionsPage(driver, title);
-		//}
 
 		public bool IsActiveNextButton()
 		{
 			return IsActive(nextSlideButton.Displayed ? nextSlideButton : nextSolutionsButton);
 		}
 
-
-		//public bool IsActiveNextSolutionButton()
-		//{
-		//	return IsActive(nextSolutionsButton);
-		//}
-
 		private static bool IsActive(IWebElement button)
 		{
-			try
-			{
-				button.GetCssValue("block_next");
-				return true;
-			}
-			catch 
-			{
-				return false;
-			}
+			return UlearnDriverComponents.UlearnDriver.HasCss(button, "block_next");
 		}
 
 	}

@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenQA.Selenium;
-using Selenium.UlearnDriver.PageObjects;
-using uLearn;
-using uLearn.Web.DataContexts;
+using Selenium.UlearnDriverComponents.PageObjects;
 
-namespace Selenium.UlearnDriver.Pages
+namespace Selenium.UlearnDriverComponents.Pages
 {
 	public class UlearnContentPage : UlearnPage
 	{
@@ -21,12 +14,12 @@ namespace Selenium.UlearnDriver.Pages
 		{
 			navArrows = new Lazy<NavArrows>(() => new NavArrows(driver));
 		}
-		public UlearnDriver ClickNextButton()
+		public UlearnDriverComponents.UlearnDriver ClickNextButton()
 		{
 			return navArrows.Value.ClickNextButton();
 		}
 
-		public UlearnDriver ClickPrevButton()
+		public UlearnDriverComponents.UlearnDriver ClickPrevButton()
 		{
 			return navArrows.Value.ClickPrevButton();
 		}
@@ -34,6 +27,14 @@ namespace Selenium.UlearnDriver.Pages
 		public bool IsActiveNextButton()
 		{
 			return navArrows.Value.IsActiveNextButton();
+		}
+
+
+
+		public string GetSlideName()
+		{
+			var element = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.SlideHeaderXPath));
+			return element == null ? null : element.Text;
 		}
 	}
 }

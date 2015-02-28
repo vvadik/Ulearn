@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 
-namespace Selenium.UlearnDriver.PageObjects
+namespace Selenium.UlearnDriverComponents.PageObjects
 {
 	public class LikeButton
 	{
@@ -17,7 +12,7 @@ namespace Selenium.UlearnDriver.PageObjects
 			if (like == null)
 				throw new NotFoundException("like button not found");
 			this.like = like;
-			isLiked = UlearnDriver.HasCss(like, "btn-primary");
+			isLiked = UlearnDriverComponents.UlearnDriver.HasCss(like, "btn-primary");
 		}
 
 		public void Click()

@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
 using OpenQA.Selenium;
-using Selenium.UlearnDriver.PageObjects;
+using Selenium.UlearnDriverComponents.PageObjects;
 
-namespace Selenium.UlearnDriver.Pages
+namespace Selenium.UlearnDriverComponents.Pages
 {
 	public class QuizSlidePage : SlidePage
 	{
@@ -20,9 +17,9 @@ namespace Selenium.UlearnDriver.Pages
 		public QuizSlidePage(IWebDriver driver)
 			: base(driver)
 		{
-			submitButton = driver.FindElement(ElementsClasses.QuizSubmitButton);
-			submitAgainButton = driver.FindElement(By.XPath(XPaths.QuizSubmitAgainButtonXPath));
-			submitAgainStatus = driver.FindElement(By.XPath(XPaths.QuizSubmitAgainStatusXPath));
+			submitButton = UlearnDriver.FindElementSafely(driver, ElementsClasses.QuizSubmitButton);
+			submitAgainButton = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.QuizSubmitAgainButtonXPath));
+			submitAgainStatus = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.QuizSubmitAgainStatusXPath));
 			quizStatus = GetQuizStatus();
 			blocks = FindBlocks();
 		}
@@ -90,14 +87,14 @@ namespace Selenium.UlearnDriver.Pages
 
 		private QuizBlock GetBlock(IWebElement webElement, int index)
 		{
-			if (UlearnDriver.HasCss(webElement, "quiz-block-input"))
+			if (UlearnDriverComponents.UlearnDriver.HasCss(webElement, "quiz-block-input"))
 				return new FillInBlock(webElement.FindElement(By.XPath(XPaths.QuizFillInBlockField(index))));
 			return new ChoiseBlock(
 				webElement
 					.FindElements(By.XPath(XPaths.QuizItemXPath(index)))
 					.Select((x, i) => new QuizItem(x, x, webElement.FindElement(By.XPath(XPaths.QuizItemInfoXPath(i)))))
 					.ToList(),
-				UlearnDriver.HasCss(webElement, "checkbox"),
+				UlearnDriverComponents.UlearnDriver.HasCss(webElement, "checkbox"),
 				driver.FindElement(By.XPath(XPaths.QuizQuestionStatusXPath(index))),
 				quizStatus);
 		}

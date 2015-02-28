@@ -1,6 +1,6 @@
 ﻿using OpenQA.Selenium;
 
-namespace Selenium.UlearnDriver.Pages
+namespace Selenium.UlearnDriverComponents.Pages
 {
 	public class UlearnPage
 	{
@@ -23,7 +23,7 @@ namespace Selenium.UlearnDriver.Pages
 
 		public string GetUserName()
 		{
-			var element = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UserNameXPath));
+			var element = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UserNameXPath));
 			return element == null ? null : element.Text;
 		}
 
@@ -34,15 +34,15 @@ namespace Selenium.UlearnDriver.Pages
 				return PageType.StartPage;
 			if (title == Titles.SignInPageTitle)
 				return PageType.SignInPage;
-			if (UlearnDriver.FindElementSafely(driver, By.ClassName("side-bar")) == null)
+			if (UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.ClassName("side-bar")) == null)
 				return PageType.IncomprehensibleType;
-			var element = UlearnDriver.FindElementSafely(driver, By.ClassName("page-header"));
+			var element = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.ClassName("page-header"));
 			if (element != null && element.Text == "Решения")
 				return PageType.SolutionsPage;
-			if (UlearnDriver.FindElementSafely(driver, ElementsClasses.RunSolutionButton) != null)
+			if (UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, ElementsClasses.RunSolutionButton) != null)
 				return PageType.ExerciseSlidePage;
-			if (UlearnDriver.FindElementSafely(driver, By.ClassName("quiz")) != null)
-				return PageType.Quiz;
+			if (UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.ClassName("quiz")) != null)
+				return PageType.QuizSlidePage;
 			return PageType.SlidePage;
 		}
 
@@ -63,13 +63,10 @@ namespace Selenium.UlearnDriver.Pages
 			if (pageType == PageType.StartPage)
 				return new StartPage(driver);
 
-			return this;
-		}
+			if (pageType == PageType.QuizSlidePage)
+				return new QuizSlidePage(driver);
 
-		public string GetSlideName()
-		{
-			var element = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.SlideHeaderXPath));
-			return element == null ? null : element.Text;
+			return this;
 		}
 	}
 }

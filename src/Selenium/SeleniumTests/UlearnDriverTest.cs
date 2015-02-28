@@ -3,28 +3,27 @@ using System.Linq;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using Selenium.UlearnDriver;
-using Selenium.UlearnDriver.Pages;
+using Selenium.UlearnDriverComponents;
+using Selenium.UlearnDriverComponents.Pages;
 using uLearn.Web.DataContexts;
-using Selenium.UlearnDriver;
 
 namespace SeleniumTests
 {
 	[TestFixture]
 	class UlearnDriverTest
 	{
-		private static readonly IWebDriver driver = new ChromeDriver();
 
 		[Test]
 		public void FirstTest()
 		{
-			using (driver)
+			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				var ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				for (int i = 0; i < 10; i++)
 				{
+					Console.WriteLine(ulearnDriver.GetPage().GetPageType());
 					var page = ulearnDriver.GetPage() as UlearnContentPage;
 					if (!page.IsActiveNextButton())
 						(page as SlidePage).RateSlide(Rate.Trivial);
@@ -36,21 +35,21 @@ namespace SeleniumTests
 		[Test]
 		public void TestToc()
 		{
-			using (driver)
+			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				var ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
-				var unitsNames = toc.GetUnitsNames();
+				var unitsNames = toc.GetUnitsName();
 
 				foreach (var unitName in unitsNames)
 				{
 					ulearnDriver = ulearnDriver.GetToc().GetUnitControl(unitName).Click();
-					var slidesNames = ulearnDriver.GetToc().GetUnitControl(unitName).GetSlidesNames();
+					var slidesNames = ulearnDriver.GetToc().GetUnitControl(unitName).GetSlidesName();
 					foreach (var slideName in slidesNames)
 					{
-						ulearnDriver = ulearnDriver.GetToc().GetUnitControl(unitName).ClickOnSlide(slideName);
+						ulearnDriver = ulearnDriver.GetToc().GetUnitControl(unitName).GetSlides().First(x => x.Name == slideName).Click();
 					}
 				}
 			}
@@ -59,14 +58,11 @@ namespace SeleniumTests
 		[Test]
 		public void TestTocCurrentSlide()
 		{
-			using (driver)
+			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				var ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
-				//var toc = ulearnDriver.GetToc();
-				//var a = driver.FindElement(By.XPath(String.Format("/html/body/ul/li[{0}]/ul", 1)));
-				//Console.Write(a.)
 				Console.WriteLine(ulearnDriver.GetCurrentSlideName());
 			}
 		}

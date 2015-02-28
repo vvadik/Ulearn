@@ -2,27 +2,20 @@
 using System.Linq;
 using OpenQA.Selenium;
 
-namespace Selenium.UlearnDriver.Pages
+namespace Selenium.UlearnDriverComponents.Pages
 {
 	public class SignInPage : UlearnPage
 	{
-		//private readonly IWebDriver driver;
 
 		public SignInPage(IWebDriver driver)
 			: base(driver)
 		{
-			//this.driver = driver;
 			if (!driver.Title.Equals(Titles.SignInPageTitle))
 				throw new IllegalLocatorException("Это не страница входа, это: "
 								+ driver.Title);
 		}
 
-		/// <summary>
-		/// Войти как пользователь системы
-		/// </summary>
-		/// <param name="userName">Имя пользователя</param>
-		/// <param name="password">Пароль</param>
-		public StartPage LoginValidUser(String userName, String password)
+		public UlearnDriverComponents.UlearnDriver LoginValidUser(String userName, String password)
 		{
 			var nameField = driver.FindElement(ElementsId.UserNameField);
 			nameField.SendKeys(userName);
@@ -34,13 +27,10 @@ namespace Selenium.UlearnDriver.Pages
 			else
 				throw new NotFoundException("Не найдена стандартная кнопка входа");
 
-			return new StartPage(driver);
+			return new UlearnDriverComponents.UlearnDriver(driver);
 		}
 
-		/// <summary>
-		/// Войти как пользователь системы через ВК
-		/// </summary>
-		public StartPage LoginVk()
+		public UlearnDriverComponents.UlearnDriver LoginVk()
 		{
 			var loginKey = driver.FindElements(By.ClassName("btn")).FirstOrDefault(x => x.Text == "ВКонтакте");
 			if (loginKey != null)
@@ -48,7 +38,7 @@ namespace Selenium.UlearnDriver.Pages
 			else
 				throw new NotFoundException("Не найдена кнопка входа через ВК");
 
-			return new StartPage(driver);
+			return new UlearnDriverComponents.UlearnDriver(driver);
 		}
 	}
 }

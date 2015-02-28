@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using OpenQA.Selenium;
 
-namespace Selenium.UlearnDriver.PageObjects
+namespace Selenium.UlearnDriverComponents.PageObjects
 {
 	public class Rates
 	{

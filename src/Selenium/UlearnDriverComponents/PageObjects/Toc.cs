@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
 
-namespace Selenium.UlearnDriver.PageObjects
+namespace Selenium.UlearnDriverComponents.PageObjects
 {
 	public class Toc
 	{
@@ -34,7 +34,7 @@ namespace Selenium.UlearnDriver.PageObjects
 					statistics.Add(unitName, new TocUnit(driver, unitsElements[i], newXPath, i));
 				else
 				{
-					var collapsedElement = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UnitInfoXPath(i)));
+					var collapsedElement = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UnitInfoXPath(i)));
 					var isCollapsed = collapsedElement.GetAttribute("class").Contains("collapse in");// UlearnDriver.HasCss(collapsedElement, "collapse in");
 					var index = i;
 					units.Add(unitName, null);
@@ -43,7 +43,7 @@ namespace Selenium.UlearnDriver.PageObjects
 			}
 		}
 
-		public string[] GetUnitsNames()
+		public string[] GetUnitsName()
 		{
 			return units.Keys.ToArray();
 		}
@@ -59,6 +59,11 @@ namespace Selenium.UlearnDriver.PageObjects
 			return units[unitName];
 		}
 
+		public bool IsCollapsed(string unitName)
+		{
+			return initInfo[unitName].IsCollapsed;
+		}
+
 		//public string GetCurrentSlideName()
 		//{
 		//	var a = units
@@ -68,7 +73,7 @@ namespace Selenium.UlearnDriver.PageObjects
 		//	//	units[u.Key] = new TocUnit(driver, initInfo[u.Key].UnitElement, initInfo[u.Key].XPath, initInfo[u.Key].Iindex);
 		//	var b = a	.Select(x => x.Value);
 		//	var c = b	.Select(unit => unit
-		//			.GetSlidesNames()
+		//			.GetSlidesName()
 		//			.Select(name => new { Info = unit.GetSlideListItemInfo(name), Name = name })
 		//			.FirstOrDefault(unitInfo => unitInfo.Info.Selected));
 		//	return c	.First(x => x.Info != null).Name;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
 
-namespace Selenium.UlearnDriver.Pages
+namespace Selenium.UlearnDriverComponents.Pages
 {
 	public class StartPage : UlearnPage
 	{
@@ -17,14 +17,14 @@ namespace Selenium.UlearnDriver.Pages
 								+ driver.Title);
 		}
 
-		public UlearnDriver GoToSignInPage()
+		public UlearnDriverComponents.UlearnDriver GoToSignInPage()
 		{
 			var loginLinkButton = driver.FindElement(ElementsId.SignInButton);
 			loginLinkButton.Click();
-			return new UlearnDriver(driver);
+			return new UlearnDriverComponents.UlearnDriver(driver);
 		}
 
-		public UlearnDriver GoToCourse(string courseTitle)
+		public UlearnDriverComponents.UlearnDriver GoToCourse(string courseTitle)
 		{
 			var courseBlocks = driver.FindElements(By.ClassName(courseBlockClass)).ToList();
 			if (courseTitle == Titles.BasicProgrammingTitle)
@@ -34,13 +34,13 @@ namespace Selenium.UlearnDriver.Pages
 			throw new NotImplementedException(string.Format("Для курса {0} нет реализации в методе GoToCourse", courseTitle));
 		}
 
-		private UlearnDriver ClickCourseButton(string courseTitle, IList<IWebElement> courseBlocks, int index)
+		private UlearnDriverComponents.UlearnDriver ClickCourseButton(string courseTitle, IList<IWebElement> courseBlocks, int index)
 		{
 			if (courseBlocks.Count >= index + 1)
 				courseBlocks[index].FindElement(By.LinkText("Поехали!")).Click();
 			else
 				throw new NotFoundException(string.Format("Не найдена кнопка перехода на курс {0}", courseTitle));
-			return new UlearnDriver(driver);
+			return new UlearnDriverComponents.UlearnDriver(driver);
 		}
 	}
 }

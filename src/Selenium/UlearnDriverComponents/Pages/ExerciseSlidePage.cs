@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OpenQA.Selenium;
-using Selenium.UlearnDriver.PageObjects;
+using Selenium.UlearnDriverComponents.PageObjects;
 using uLearn;
 using uLearn.Web.DataContexts;
 
-namespace Selenium.UlearnDriver.Pages
+namespace Selenium.UlearnDriverComponents.Pages
 {
 	class ExerciseSlidePage : SlidePage
 	{
@@ -31,7 +31,7 @@ namespace Selenium.UlearnDriver.Pages
 		private List<Hint> GetHints()
 		{
 			const string hintXpath = "hyml/body/div[1]/div/div/div/div[9]/div/div";
-			var allHints = UlearnDriver.FindElementsSafely(driver, By.XPath(hintXpath));// driver.FindElement(By.Id("hint-place")).FindElements();
+			var allHints = UlearnDriverComponents.UlearnDriver.FindElementsSafely(driver, By.XPath(hintXpath));// driver.FindElement(By.Id("hint-place")).FindElements();
 			var localHints = new List<Hint>(allHints.Count);
 			for (var i = 0; i < allHints.Count; i++)
 			{
@@ -57,22 +57,22 @@ namespace Selenium.UlearnDriver.Pages
 			return hintsButton.Enabled;
 		}
 
-		public UlearnDriver ClickRunButton()
+		public UlearnDriverComponents.UlearnDriver ClickRunButton()
 		{
 			runSolutionButton.Click();
-			return new UlearnDriver(driver);
+			return new UlearnDriverComponents.UlearnDriver(driver);
 		}
 
-		public UlearnDriver ClickResetButton()
+		public UlearnDriverComponents.UlearnDriver ClickResetButton()
 		{
 			resetButton.Click();
-			return new UlearnDriver(driver);
+			return new UlearnDriverComponents.UlearnDriver(driver);
 		}
 
-		public UlearnDriver ClickHintsButton()
+		public UlearnDriverComponents.UlearnDriver ClickHintsButton()
 		{
 			hintsButton.Click();
-			return new UlearnDriver(driver);
+			return new UlearnDriverComponents.UlearnDriver(driver);
 		}
 
 		public string GetTextFromSecretCode()

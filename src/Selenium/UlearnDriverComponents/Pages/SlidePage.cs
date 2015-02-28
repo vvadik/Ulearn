@@ -1,9 +1,8 @@
 ﻿using System;
 using OpenQA.Selenium;
-using Selenium.UlearnDriver.PageObjects;
-using Rates = Selenium.UlearnDriver.PageObjects.Rates;
+using Selenium.UlearnDriverComponents.PageObjects;
 
-namespace Selenium.UlearnDriver.Pages
+namespace Selenium.UlearnDriverComponents.Pages
 {
 	public class SlidePage : UlearnContentPage
 	{

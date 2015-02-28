@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using OpenQA.Selenium;
-using Selenium.UlearnDriver.PageObjects;
 using System.Linq;
+using OpenQA.Selenium;
+using Selenium.UlearnDriverComponents.PageObjects;
 
-namespace Selenium.UlearnDriver.Pages
+namespace Selenium.UlearnDriverComponents.Pages
 {
 	public class SolutionsPage : UlearnContentPage
 	{

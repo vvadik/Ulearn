@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Firefox;
 
-namespace Selenium.UlearnDriver
+namespace Selenium.UlearnDriverComponents
 {
 
 	public class Constants
@@ -24,7 +18,7 @@ namespace Selenium.UlearnDriver
 
 	public class XPaths
 	{
-		public static string UserNameXPath { get { return "/html/body/div/div/div[1]/ul/form/ul/li/a"; } }
+		public static string UserNameXPath { get { return "/html/body/div/div/div[2]/form/ul/li/a"; } }
 
 		public static string TocXPath { get { return "/html/body/ul"; } }
 
@@ -101,6 +95,16 @@ namespace Selenium.UlearnDriver
 			return String.Format(
 				"/html/body/div[2]/div/div/div[{0}]/textarea", solutionIndex + 2);
 		}
+
+		public static string RegistrationNameField { get { return "/html/body/div[2]/form/div[2]/div/input"; } }
+
+		public static string RegistrationPasswordField { get { return "/html/body/div[2]/form/div[3]/div/input"; } }
+
+		public static string RegistrationConfirmPasswordField { get { return "/html/body/div[2]/form/div[4]/div/input"; } }
+
+		public static string RegistrationRegisterButton { get { return "/html/body/div[2]/form/div[5]/div/input"; } }
+
+		public static string RegistrationHeaderButton { get { return "/html/body/div/div/div[2]/ul[2]/li[1]/a}"; } }
 	}
 
 	public class Titles
@@ -170,7 +174,7 @@ namespace Selenium.UlearnDriver
 		SlidePage,
 		SignInPage,
 		StartPage,
-		Quiz,
+		QuizSlidePage,
 		IncomprehensibleType
 	}
 

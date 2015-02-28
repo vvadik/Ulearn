@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
 using OpenQA.Selenium;
-using Selenium.UlearnDriver.Pages;
+using Selenium.UlearnDriverComponents.Pages;
 
-namespace Selenium.UlearnDriver.PageObjects
+namespace Selenium.UlearnDriverComponents.PageObjects
 {
 	public abstract class QuizBlock
 	{
@@ -70,8 +67,8 @@ namespace Selenium.UlearnDriver.PageObjects
 			this.isMultiply = isMultiply;
 			blockStatus = quizItems.Any(x => x.GetStatus() == Status.Wrong) ? Status.Wrong :
 				quizItems.Any(x => x.GetStatus() == Status.Right) ? Status.Right : Status.Undefined;
-			var localStatus = UlearnDriver.HasCss(statusElement, "glyphicon-ok") ? Status.Right :
-				UlearnDriver.HasCss(statusElement, "glyphicon-remove") ? Status.Wrong :
+			var localStatus = UlearnDriverComponents.UlearnDriver.HasCss(statusElement, "glyphicon-ok") ? Status.Right :
+				UlearnDriverComponents.UlearnDriver.HasCss(statusElement, "glyphicon-remove") ? Status.Wrong :
 					Status.Undefined;
 			if (localStatus != blockStatus)
 				throw new Exception("Не верно произведена оценка квиза");
@@ -125,8 +122,8 @@ namespace Selenium.UlearnDriver.PageObjects
 			this.box = box;
 			this.textElement = textElement;
 			this.infoElement = infoElement;
-			itemStatus = UlearnDriver.HasCss(infoElement, "wrong-quiz") ? Status.Wrong : 
-				UlearnDriver.HasCss(infoElement, "right-quiz") ? Status.Right : Status.Undefined;
+			itemStatus = UlearnDriverComponents.UlearnDriver.HasCss(infoElement, "wrong-quiz") ? Status.Wrong : 
+				UlearnDriverComponents.UlearnDriver.HasCss(infoElement, "right-quiz") ? Status.Right : Status.Undefined;
 		}
 
 		public void CheckBox()
