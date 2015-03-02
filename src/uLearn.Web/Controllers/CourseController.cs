@@ -41,15 +41,14 @@ namespace uLearn.Web.Controllers
 				throw new Exception("Slide is hidden " + slideIndex);
 			var quizSlide = model.Slide as QuizSlide;
 			if (quizSlide != null)
-				foreach (var block in quizSlide.Quiz.Blocks.Where(x => x is ChoiceBlock).Where(x => ((ChoiceBlock) x).Shuffle))
+				foreach (var block in quizSlide.Quiz.Blocks.OfType<ChoiceBlock>().Where(x => x.Shuffle))
 					Shuffle(block);
 			return View(model);
 		}
 
-		private void Shuffle(QuizBlock quizBlock)
+		private void Shuffle(ChoiceBlock choiceBlock)
 		{
 			var random = new Random();
-			var choiceBlock = (ChoiceBlock) quizBlock;
 			choiceBlock.Items = choiceBlock.Items.OrderBy(x => random.Next()).ToArray();
 		}
 
@@ -101,6 +100,7 @@ namespace uLearn.Web.Controllers
 			var isFirstCourseVisit = !db.Visiters.Any(x => x.UserId == userId);
 			var slideId = course.Slides[slideIndex].Id;
 			await VisitSlide(courseId, slideId);
+			var score = Tuple.Create(visitersRepo.GetScore(slideId, User.Identity.GetUserId()), course.Slides[slideIndex].MaxScore);
 			var model = new CoursePageModel
 			{
 				UserId = userId,
@@ -111,6 +111,7 @@ namespace uLearn.Web.Controllers
 				LatestAcceptedSolution =
 					solutionsRepo.FindLatestAcceptedSolution(courseId, slideId, userId),
 				Rate = GetRate(course.Id, slideId),
+				Score = score
 			};
 			return model;
 		}

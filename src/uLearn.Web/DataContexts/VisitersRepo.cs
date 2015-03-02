@@ -107,5 +107,13 @@ namespace uLearn.Web.DataContexts
 				.GroupBy(v => v.SlideId, (s, visiterses) => new { Key = s, Value = visiterses.FirstOrDefault()})
 				.ToDictionary(g => g.Key, g => g.Value.Score);
 		}
+
+		public int GetScore(string slideId, string userId)
+		{
+			return db.Visiters
+				.Where(v => v.SlideId == slideId && v.UserId == userId)
+				.Select(v => v.Score)
+				.FirstOrDefault();
+		}
 	}
 }
