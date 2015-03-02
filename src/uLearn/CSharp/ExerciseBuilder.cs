@@ -116,6 +116,11 @@ namespace uLearn.CSharp
 			return VisitMemberDeclaration(node, base.VisitPropertyDeclaration(node));
 		}
 
+		public override SyntaxNode VisitDelegateDeclaration(DelegateDeclarationSyntax node)
+		{
+			return VisitMemberDeclaration(node, base.VisitDelegateDeclaration(node));
+		}
+
 		public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
 		{
 			var newMethod = VisitMemberDeclaration(node, base.VisitMethodDeclaration(node));
