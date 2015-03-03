@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainClass.cs" />
+    <Compile Include="SeleniumTests\ContentPageShould.cs" />
     <Compile Include="SeleniumTests\ExercisePageShould.cs" />
     <Compile Include="SeleniumTests\SignInPageShould.cs" />
     <Compile Include="SeleniumTests\StartPageShould.cs" />
