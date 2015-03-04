@@ -121,11 +121,20 @@ namespace uLearn.Web.DataContexts
 			return db.Visiters.FirstOrDefault(v => v.SlideId == slideId && v.UserId == userId);
 		}
 
-		public async Task SkipSlide(string slideId, string userId)
+		public async Task SkipSlide(string courseId, string slideId, string userId)
 		{
 			var visiter = db.Visiters.FirstOrDefault(v => v.SlideId == slideId && v.UserId == userId);
 			if (visiter != null)
 				visiter.IsSkipped = true;
+			else
+				db.Visiters.Add(new Visiters
+				{
+					UserId = userId,
+					CourseId = courseId,
+					SlideId = slideId,
+					Timestamp = DateTime.Now,
+					IsSkipped = true
+				});
 			await db.SaveChangesAsync();
 		}
 
