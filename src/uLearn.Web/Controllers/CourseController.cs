@@ -100,7 +100,9 @@ namespace uLearn.Web.Controllers
 			var isFirstCourseVisit = !db.Visiters.Any(x => x.UserId == userId);
 			var slideId = course.Slides[slideIndex].Id;
 			await VisitSlide(courseId, slideId);
-			var score = Tuple.Create(visitersRepo.GetScore(slideId, User.Identity.GetUserId()), course.Slides[slideIndex].MaxScore);
+			var visiter = visitersRepo.GetVisiter(slideId, User.Identity.GetUserId());
+			var score = Tuple.Create(visiter.Score, course.Slides[slideIndex].MaxScore);
+			var lastAcceptedSolution = solutionsRepo.FindLatestAcceptedSolution(courseId, slideId, userId);
 			var model = new CoursePageModel
 			{
 				UserId = userId,
@@ -108,24 +110,24 @@ namespace uLearn.Web.Controllers
 				CourseId = course.Id,
 				CourseTitle = course.Title,
 				Slide = course.Slides[slideIndex],
-				LatestAcceptedSolution =
-					solutionsRepo.FindLatestAcceptedSolution(courseId, slideId, userId),
+				LatestAcceptedSolution = lastAcceptedSolution,
 				Rate = GetRate(course.Id, slideId),
-				Score = score
+				Score = score,
+				CanSkip = lastAcceptedSolution == null && !visiter.IsSkipped
 			};
 			return model;
 		}
 
 		[Authorize]
-		public ActionResult AcceptedSolutions(string courseId, int slideIndex = 0)
+		public async Task<ViewResult> AcceptedSolutions(string courseId, int slideIndex = 0)
 		{
 			var userId = User.Identity.GetUserId();
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.Slides[slideIndex];
 			var isPassed = solutionsRepo.IsUserPassedTask(courseId, slide.Id, userId);
-			var solutions = isPassed
-				? solutionsRepo.GetAllAcceptedSolutions(courseId, slide.Id)
-				: new List<AcceptedSolutionInfo>();
+			if (!isPassed)
+				await visitersRepo.SkipSlide(slide.Id, userId);
+			var solutions = solutionsRepo.GetAllAcceptedSolutions(courseId, slide.Id);
 			foreach (var solution in solutions)
 				solution.LikedAlready = solution.UsersWhoLike.Any(u => u == userId);
 			var model = new AcceptedSolutionsPageModel

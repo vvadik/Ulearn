@@ -12,5 +12,6 @@ namespace uLearn.Web.Models
 		public string LatestAcceptedSolution { get; set; }
 		public string Rate {get; set;}
 		public Tuple<int, int> Score { get; set; }
+		public bool CanSkip { get; set; }
 	}
 }

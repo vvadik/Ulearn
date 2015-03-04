@@ -115,5 +115,23 @@ namespace uLearn.Web.DataContexts
 				.Select(v => v.Score)
 				.FirstOrDefault();
 		}
+
+		public Visiters GetVisiter(string slideId, string userId)
+		{
+			return db.Visiters.FirstOrDefault(v => v.SlideId == slideId && v.UserId == userId);
+		}
+
+		public async Task SkipSlide(string slideId, string userId)
+		{
+			var visiter = db.Visiters.FirstOrDefault(v => v.SlideId == slideId && v.UserId == userId);
+			if (visiter != null)
+				visiter.IsSkipped = true;
+			await db.SaveChangesAsync();
+		}
+
+		public bool IsSkipped(string slideId, string userId)
+		{
+			return db.Visiters.Any(v => v.SlideId == slideId && v.UserId == userId && v.IsSkipped);
+		}
 	}
 }
