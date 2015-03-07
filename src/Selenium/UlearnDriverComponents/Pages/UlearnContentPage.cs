@@ -4,23 +4,30 @@ using Selenium.UlearnDriverComponents.PageObjects;
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
-	public class UlearnContentPage : UlearnPage
+	public class UlearnContentPage : UlearnPage, IObserver
 	{
+		private Lazy<NavArrows> navArrows;
 
-		private readonly Lazy<NavArrows> navArrows;
+		public UlearnContentPage(IWebDriver driver, IObserver parent)
+			: base(driver, parent)
+		{
+			Configure();
+		}
 
-		public UlearnContentPage(IWebDriver driver)
-			: base(driver)
+		protected void Configure()
 		{
 			navArrows = new Lazy<NavArrows>(() => new NavArrows(driver));
 		}
-		public UlearnDriverComponents.UlearnDriver ClickNextButton()
+
+		public UlearnDriver ClickNextButton()
 		{
+			parent.Update();
 			return navArrows.Value.ClickNextButton();
 		}
 
-		public UlearnDriverComponents.UlearnDriver ClickPrevButton()
+		public UlearnDriver ClickPrevButton()
 		{
+			parent.Update();
 			return navArrows.Value.ClickPrevButton();
 		}
 
@@ -29,12 +36,15 @@ namespace Selenium.UlearnDriverComponents.Pages
 			return navArrows.Value.IsActiveNextButton();
 		}
 
-
-
 		public string GetSlideName()
 		{
-			var element = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.SlideHeaderXPath));
+			var element = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.SlideHeaderXPath));
 			return element == null ? null : element.Text;
+		}
+
+		public new void Update()
+		{
+			Configure();
 		}
 	}
 }

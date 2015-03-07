@@ -11,16 +11,22 @@ namespace Selenium.UlearnDriverComponents.Pages
 {
 	class ExerciseSlidePage : SlidePage
 	{
-		private readonly IWebElement runSolutionButton;
-		private readonly IWebElement resetButton;
-		private readonly IWebElement hintsButton;
-		private readonly List<Hint> hints;
+		private IWebElement runSolutionButton;
+		private IWebElement resetButton;
+		private IWebElement hintsButton;
+		private List<Hint> hints;
 		private static readonly ULearnDb ulearnDb = new ULearnDb();
 		private static readonly CourseManager courseManager = new CourseManager(new DirectoryInfo(@"C:\Users\213\Desktop\GitHub\uLearn\src\uLearn.Web"));
 			
-		public ExerciseSlidePage(IWebDriver driver)
-			: base(driver)
+		public ExerciseSlidePage(IWebDriver driver, IObserver parent)
+			: base(driver, parent)
 		{
+			Configure();
+		}
+
+		private new void Configure()
+		{
+			base.Configure();
 			runSolutionButton = driver.FindElement(ElementsClasses.RunSolutionButton);
 			resetButton = driver.FindElement(ElementsClasses.ResetButton);
 			hintsButton = driver.FindElement(ElementsClasses.GetHintsButton);
@@ -126,6 +132,11 @@ namespace Selenium.UlearnDriverComponents.Pages
 			var codeMirrorObject = driver.FindElement(ElementsClasses.CodeMirror);
 			if (codeMirrorObject == null)
 				throw new NotFoundException("не найден codemirror");
+		}
+
+		public new void Update()
+		{
+			Configure();
 		}
 	}
 }

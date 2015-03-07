@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
+using OpenQA.Selenium.Chrome;
 using Selenium.UlearnDriverComponents;
+using Selenium.UlearnDriverComponents.Pages;
 using uLearn;
 using uLearn.Web.DataContexts;
-using uLearn.Web.Migrations;
-using uLearn.Web.Models;
 
-namespace Selenium.SELENIUM_TESTS_1
+namespace Selenium.SeleniumTests
 {
 	[TestFixture]
 	class DB_test_code
@@ -37,6 +34,25 @@ namespace Selenium.SELENIUM_TESTS_1
 			var cmUunitsName = c.GetUnits().Distinct();
 			foreach (var uName in cmUunitsName)
 				Console.WriteLine(uName);
+		}
+
+		
+		[Test]
+		public void TestWithoutObservale1()
+		{
+			using (var driver = new ChromeDriver())
+			{
+				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
+				var ulearnDriver = new UlearnDriver(driver);
+				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				var page = ulearnDriver.GetPage() as SlidePage;
+				//page.RateSlide(Rate.Trivial);
+				page.RateSlide(Rate.Understand);
+				ulearnDriver.GetToc().GetUnitControl(ulearnDriver.GetToc().GetUnitsName().First()).Click();
+				ulearnDriver.GetToc().GetUnitControl(ulearnDriver.GetToc().GetUnitsName().First()).Click();
+				page.RateSlide(Rate.Trivial);
+				page.RateSlide(Rate.Understand);
+			}
 		}
 	}
 }

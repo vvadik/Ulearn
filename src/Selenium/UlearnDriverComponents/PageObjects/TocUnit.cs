@@ -5,38 +5,55 @@ using OpenQA.Selenium;
 
 namespace Selenium.UlearnDriverComponents.PageObjects
 {
-	public class TocUnit
+	public class TocUnit : IObserver
 	{
-		private readonly IWebElement element;
 		private readonly IWebDriver driver;
-		private readonly List<SlideControl> slides;
-		public TocUnit(IWebDriver driver, IWebElement element, string XPath, int i)
+		private List<SlideControl> slides;
+		private readonly IObserver parent;
+		private readonly int unitIndex;
+		private IWebElement headerElement;
+		private readonly HashSet<IObserver> observers = new HashSet<IObserver>();
+
+		public TocUnit(IWebDriver driver, int unitIndex, IObserver parent)
 		{
+			this.parent = parent;
 			this.driver = driver;
-			this.element = element;
-			var index = string.Format("[{0}]", i);
-			var newSlideXPath = XPath + index + XPaths.SlideXPath + "/a";
-			var newLabelXPath = XPath + index + XPaths.SlideLabelXPath;
-			var slidesElements = element
-				.FindElements(By.XPath(newSlideXPath))
-				.Where(x => x.Text != "Заметки преподавателю" && x.Text != "Статистика и успеваемость")
-				.ToList();
-			var slidesLabel = element.FindElements(By.XPath(newLabelXPath)).ToList();
-			//slides = new Dictionary<string, Lazy<SlideListItem>>();
-			slides = new List<SlideControl>(slidesElements.Count);
-			//if (slidesElements.Count != slidesLabel.Count)
-			//	throw new Exception("incredible mistake on slide!");
-			for (var ind = 0; ind < slidesElements.Count; ind++)
+			this.unitIndex = unitIndex;
+
+			Configure();
+		}
+
+		private void Configure()
+		{
+			headerElement = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocUnitHeaderXPath(unitIndex)));
+
+			var courseTitle = UlearnDriver.ConvertCourseTitle(driver.Title);
+			var unitName = headerElement.Text;
+			var slidesCount = UlearnDriver.courseManager.GetCourse(courseTitle).Slides.Count(x => x.Info.UnitName == unitName);
+			if (slides == null)
+				slides = new List<SlideControl>(slidesCount);
+			for (var ind = 0; ind < slidesCount; ind++)
 			{
-				slides.Add(new SlideControl(slidesElements[ind].Text, new SlideListItem(driver, slidesElements[ind], slidesLabel[ind])));
+				if (slides.Count > ind)
+				{
+					if (slides[ind] != null)
+						continue;
+					slides[ind] = new SlideControl(driver, ind, unitIndex, parent);
+					observers.Add(slides[ind]);
+				}
+				else
+				{
+					slides.Add(new SlideControl(driver, ind, unitIndex, parent));
+					observers.Add(slides[ind]);
+				}
 			}
 		}
 
-		public UlearnDriver Click()
+		public void Click()
 		{
-			element.Click();
-			//var TOCElement = driver.FindElement(By.XPath(XPaths.TocXPath));
-			return new UlearnDriverComponents.UlearnDriver(driver);
+			headerElement.Click();
+			//var TOCElement = driver.FindElement(By.xPath(XPaths.TocXPath));
+			parent.Update();
 		}
 
 		public IReadOnlyCollection<string> GetSlidesName()
@@ -49,24 +66,21 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 			return slides;
 		}
 
-		//public UlearnDriver ClickOnSlide(string slideName)
-		//{
-		//	slides[slideName].Value.Click();
-		//	//var TOCElement = driver.FindElement(By.XPath(XPaths.TocXPath));
-		//	return new UlearnDriverComponents.UlearnDriver(driver);
-		//}
-
-		//public SlideLabelInfo GetSlideListItemInfo(string slideName)
-		//{
-		//	return slides[slideName].Value.GetInfo();
-		//}
-
-		
+		public void Update()
+		{
+			Configure();
+			foreach (var o in observers)
+				o.Update();
+		}
 	}
 
-	public class SlideControl
+	public class SlideControl : IObserver
 	{
-		private readonly SlideListItem item;
+		private SlideListItem item;
+		private readonly IWebDriver driver;
+		private readonly int slideIndex;
+		private readonly int unitIndex;
+		private readonly IObserver parent;
 		public SlideLabelInfo Item { get { return item.GetInfo(); } }
 
 		public PageType SlideType
@@ -82,19 +96,32 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 					PageType.SlidePage;
 		}
 
-		public SlideControl(string name, SlideListItem item)
+		public SlideControl(IWebDriver driver, int slideIndex, int unitIndex, IObserver parent)
 		{
-			Name = name;
-			this.item = item;
+			this.driver = driver;
+			this.slideIndex = slideIndex;
+			this.unitIndex = unitIndex;
+			this.parent = parent;
+			Configure();
 		}
 
-		public UlearnDriver Click()
+		private void Configure()
 		{
-			return item.Click();
+			Name = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocSlideXPath(unitIndex, slideIndex))).Text;
+			item = new SlideListItem(driver, slideIndex, unitIndex, parent);
+		}
+
+		public void Click()
+		{
+			item.Click();
 		}
 
 		public string Name { get; private set; }
 
+		public void Update()
+		{
+			Configure();
+		}
 	}
 
 	public class SlideListItem
@@ -102,18 +129,20 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		private readonly IWebElement slideElement;
 		private readonly IWebElement slideLabelElement;
 		private readonly IWebDriver driver;
+		private readonly IObserver parent;
 
-		public SlideListItem(IWebDriver driver, IWebElement slideElement, IWebElement slideLabelElement)
+		public SlideListItem(IWebDriver driver, int slideIndex, int unitIndex, IObserver parent)
 		{
 			this.driver = driver;
-			this.slideElement = slideElement;
-			this.slideLabelElement = slideLabelElement;
+			this.slideElement = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocSlideXPath(unitIndex, slideIndex)));
+			this.slideLabelElement = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocSlideLabelXPath(unitIndex, slideIndex)));
+			this.parent = parent;
 		}
 
-		public UlearnDriver Click()
+		public void Click()
 		{
 			slideElement.Click();
-			return new UlearnDriver(driver);
+			parent.Update();
 		}
 
 		public SlideLabelInfo GetInfo()
@@ -142,26 +171,26 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 
 		private bool IsSelected(IWebElement element)
 		{
-			return UlearnDriverComponents.UlearnDriver.HasCss(element, "selected");
+			return UlearnDriver.HasCss(element, "selected");
 		}
 
 		private bool IsHasAttempts(IWebElement webElement)
 		{
 			if (webElement == null)
 				return false;
-			return UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.Id("quiz-submit-btn")) != null ||
-			       UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.Id("SubmitQuiz")) != null;
+			return UlearnDriver.FindElementSafely(driver, By.Id("quiz-submit-btn")) != null ||
+			       UlearnDriver.FindElementSafely(driver, By.Id("SubmitQuiz")) != null;
 		}
 
 		private static bool IsVisited(IWebElement webElement)
 		{
-			return UlearnDriverComponents.UlearnDriver.HasCss(webElement, "navbar-label-success") ||
-			       UlearnDriverComponents.UlearnDriver.HasCss(webElement, "navbar-label-danger");
+			return UlearnDriver.HasCss(webElement, "navbar-label-success") ||
+			       UlearnDriver.HasCss(webElement, "navbar-label-danger");
 		}
 
 		private static bool IsPassed(IWebElement webElement)
 		{
-			return UlearnDriverComponents.UlearnDriver.HasCss(webElement, "navbar-label-success");
+			return UlearnDriver.HasCss(webElement, "navbar-label-success");
 		}
 	}
 

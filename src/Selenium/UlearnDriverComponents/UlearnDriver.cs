@@ -10,32 +10,51 @@ using uLearn.Web.DataContexts;
 
 namespace Selenium.UlearnDriverComponents
 {
-	public class UlearnDriver
+	public class UlearnDriver : IObservable, IObserver
 	{
 		private readonly IWebDriver driver;
-		private readonly UlearnPage currentPage;
+		private UlearnPage currentPage;
 		private Toc toc;
 		public static readonly ULearnDb db = new ULearnDb();
-		public static readonly CourseManager courseManager = new CourseManager(new DirectoryInfo(courseMenegerPath));
+		public static readonly CourseManager courseManager = new CourseManager(new DirectoryInfo(courseManagerPath));
 		private string currentUserName;
 		private string currentUserId;
 		private string currentSlideName;
 		private string currentSlideId;
-		private const string courseMenegerPath = @"C:\Users\213\Desktop\GitHub\uLearn\src\uLearn.Web";
+		private const string courseManagerPath = @"C:\Users\213\Desktop\GitHub\uLearn\src\uLearn.Web";
+		private readonly HashSet<IObserver> observers = new HashSet<IObserver>();
 
 		public UlearnDriver(IWebDriver driver)
 		{
 			this.driver = driver;
-			currentPage = new UlearnPage(driver);
 
-			var pageType = currentPage.GetPageType();
-			currentPage = currentPage.CastTo(pageType);
+			Configure();
+		}
+
+		private void Configure()
+		{
+			DeterminePage();
 
 			DetermineUser();
-			BuildTOC(pageType);
-
+			BuildToc(currentPage.GetPageType());
 
 			DetermineContentPageSettings();
+		}
+
+		private void DeterminePage()
+		{
+			var newPage = new UlearnPage(driver, this);
+			var newPageType = newPage.GetPageType();
+			if (currentPage == null)
+			{
+				currentPage = newPage.CastTo(newPageType);
+				return;
+			}
+			var pageType = currentPage.GetPageType();
+			if (pageType == newPageType)
+				(currentPage as IObserver).Update();
+			else
+				currentPage = currentPage.CastTo(pageType);
 		}
 
 		private void DetermineContentPageSettings()
@@ -86,10 +105,15 @@ namespace Selenium.UlearnDriverComponents
 			return currentSlideName ?? "";
 		}
 
-		private void BuildTOC(PageType pageType)
+		private void BuildToc(PageType pageType)
 		{
 			if (pageType != PageType.SignInPage && pageType != PageType.StartPage && pageType != PageType.IncomprehensibleType)
-				toc = new Toc(driver, driver.FindElement(By.XPath(XPaths.TocXPath)), XPaths.TocXPath);
+			{
+				if (toc == null)
+					toc = new Toc(driver, this);
+				else
+					toc.Update();
+			}
 			else
 				toc = null;
 		}
@@ -99,7 +123,7 @@ namespace Selenium.UlearnDriverComponents
 			return currentPage;
 		}
 
-		public Toc GetToc()
+		public IToc GetToc()
 		{
 			if (toc == null)
 				throw new NotFoundException("Toc is not found");
@@ -116,7 +140,7 @@ namespace Selenium.UlearnDriverComponents
 		{
 			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 
-			var startPage = new StartPage(driver);
+			var startPage = new StartPage(driver, this);
 			var signInPage = startPage.GoToSignInPage().currentPage as SignInPage;
 			if (signInPage == null)
 				throw new Exception("Sign in page not found...");
@@ -186,6 +210,43 @@ namespace Selenium.UlearnDriverComponents
 			{
 				return null;
 			}
+		}
+
+		public void AddObserver(IObserver observer)
+		{
+			observers.Add(observer);
+		}
+
+		public void RemoveObserver(IObserver observer)
+		{
+			observers.Remove(observer);
+		}
+
+		public void NotifyObservers()
+		{
+			foreach (var o in observers)
+				o.Update();
+		}
+
+		public void Update()
+		{
+			Configure();
+		}
+
+		public static readonly Dictionary<string, string> factory = new Dictionary<string, string>
+		{
+			{Titles.BasicProgrammingTitle, "BasicProgramming"}
+		};
+
+		/// <summary>
+		/// Конвертирует заголовок страницы (названия курса) в название курса из CourseManager
+		/// </summary>
+		/// <param name="courseName">имя курса, которое можно получить со страницы слайда, путём использования свойства driver.Title</param>
+		public static string ConvertCourseTitle(string courseName)
+		{
+			if (factory.ContainsKey(courseName))
+				return factory[courseName];
+			throw new NotImplementedException(string.Format("Для курса {0} не определено", courseName));
 		}
 	}
 }

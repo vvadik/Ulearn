@@ -2,20 +2,25 @@
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
-	class RegistrationPage : UlearnPage
+	class RegistrationPage : UlearnPage, IObserver
 	{
-		private readonly IWebElement loginField;
-		private readonly IWebElement passwordField;
-		private readonly IWebElement confirmPasswordField;
-		private readonly IWebElement registerButton;
+		private IWebElement loginField;
+		private IWebElement passwordField;
+		private IWebElement confirmPasswordField;
+		private IWebElement registerButton;
 
-		public RegistrationPage(IWebDriver driver)
-			: base(driver)
+		public RegistrationPage(IWebDriver driver, IObserver parent)
+			: base(driver, parent)
 		{
-			loginField = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.RegistrationNameField));
-			passwordField = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.RegistrationPasswordField));
-			confirmPasswordField = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.RegistrationConfirmPasswordField));
-			registerButton = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.RegistrationRegisterButton));
+			Configure();
+		}
+
+		private void Configure()
+		{
+			loginField = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.RegistrationNameField));
+			passwordField = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.RegistrationPasswordField));
+			confirmPasswordField = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.RegistrationConfirmPasswordField));
+			registerButton = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.RegistrationRegisterButton));
 			CheckPage();
 		}
 
@@ -38,6 +43,12 @@ namespace Selenium.UlearnDriverComponents.Pages
 			confirmPasswordField.SendKeys(password);
 			registerButton.Click();
 			return new UlearnDriverComponents.UlearnDriver(driver);
+		}
+
+		public new void Update()
+		{
+			base.Update();
+			Configure();
 		}
 	}
 }

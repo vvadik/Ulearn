@@ -8,15 +8,21 @@ namespace Selenium.UlearnDriverComponents.Pages
 {
 	public class QuizSlidePage : SlidePage
 	{
-		private readonly List<QuizBlock> blocks;
-		private readonly IWebElement submitButton;
-		private readonly IWebElement submitAgainButton;
-		private readonly IWebElement submitAgainStatus;
-		private readonly QuizStatus quizStatus;
+		private List<QuizBlock> blocks;
+		private IWebElement submitButton;
+		private IWebElement submitAgainButton;
+		private IWebElement submitAgainStatus;
+		private QuizStatus quizStatus;
 
-		public QuizSlidePage(IWebDriver driver)
-			: base(driver)
+		public QuizSlidePage(IWebDriver driver, IObserver parent)
+			: base(driver, parent)
 		{
+			Configure();
+		}
+
+		private new void Configure()
+		{
+			base.Configure();
 			submitButton = UlearnDriver.FindElementSafely(driver, ElementsClasses.QuizSubmitButton);
 			submitAgainButton = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.QuizSubmitAgainButtonXPath));
 			submitAgainStatus = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.QuizSubmitAgainStatusXPath));
@@ -87,16 +93,21 @@ namespace Selenium.UlearnDriverComponents.Pages
 
 		private QuizBlock GetBlock(IWebElement webElement, int index)
 		{
-			if (UlearnDriverComponents.UlearnDriver.HasCss(webElement, "quiz-block-input"))
+			if (UlearnDriver.HasCss(webElement, "quiz-block-input"))
 				return new FillInBlock(webElement.FindElement(By.XPath(XPaths.QuizFillInBlockField(index))));
 			return new ChoiseBlock(
 				webElement
 					.FindElements(By.XPath(XPaths.QuizItemXPath(index)))
 					.Select((x, i) => new QuizItem(x, x, webElement.FindElement(By.XPath(XPaths.QuizItemInfoXPath(i)))))
 					.ToList(),
-				UlearnDriverComponents.UlearnDriver.HasCss(webElement, "checkbox"),
+				UlearnDriver.HasCss(webElement, "checkbox"),
 				driver.FindElement(By.XPath(XPaths.QuizQuestionStatusXPath(index))),
 				quizStatus);
+		}
+
+		public new void Update()
+		{
+			Configure();
 		}
 	}
 

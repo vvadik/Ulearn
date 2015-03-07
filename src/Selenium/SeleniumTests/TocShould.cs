@@ -89,7 +89,7 @@ namespace Selenium.SeleniumTests
 					var unit = toc.GetUnitControl(unitName);
 					if (!toc.IsCollapsed(unitName))
 					{
-						ulearnDriver = unit.Click();
+						unit.Click();
 					}
 					var slides = ulearnDriver.GetToc().GetUnitControl(unitName).GetSlidesName();
 					var course = UlearnDriver.courseManager
@@ -117,7 +117,7 @@ namespace Selenium.SeleniumTests
 					var unit = toc.GetUnitControl(unitName);
 					if (!toc.IsCollapsed(unitName))
 					{
-						ulearnDriver = unit.Click();
+						unit.Click();
 					}
 					var slides = ulearnDriver.GetToc().GetUnitControl(unitName).GetSlides().ToList();
 					var course = UlearnDriver.courseManager
@@ -132,6 +132,72 @@ namespace Selenium.SeleniumTests
 								PageType.SlidePage;
 						Assert.AreEqual(type, slides[i].SlideType);
 					}
+				}
+			}
+		}
+
+		[Test]
+		public void GetSlideType_ObservableToc()
+		{
+			using (var driver = new ChromeDriver())
+			{
+				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
+				var ulearnDriver = new UlearnDriver(driver);
+				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				var toc = ulearnDriver.GetToc();
+				var unitsName = toc.GetUnitsName();
+				foreach (var unitName in unitsName)
+				{
+					var unit = toc.GetUnitControl(unitName);
+					if (!toc.IsCollapsed(unitName))
+						unit.Click();
+					var slides = ulearnDriver.GetToc().GetUnitControl(unitName).GetSlides().ToList();
+					var course = UlearnDriver.courseManager
+					.GetCourse(UlearnDriver.courseManager
+						.GetCourses()
+						.First(x => x.Title == "Основы программирования").Id);
+					var cmSlides = course.Slides.Where(s => s.Info.UnitName == unitName).ToList();
+					for (var i = 0; i < slides.Count; i++)
+					{
+						var type = cmSlides[i] is ExerciseSlide ? PageType.ExerciseSlidePage :
+							cmSlides[i] is QuizSlide ? PageType.QuizSlidePage :
+								PageType.SlidePage;
+						Assert.AreEqual(type, slides[i].SlideType);
+					}
+				}
+			}
+		}
+
+		[Test]
+		public void GoThroughAllSlides()
+		{
+			using (var driver = new ChromeDriver())
+			{
+				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
+				var ulearnDriver = new UlearnDriver(driver);
+				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				var toc = ulearnDriver.GetToc();
+				var unitsName = toc.GetUnitsName();
+				foreach (var unitName in unitsName)
+				{
+					var unit = toc.GetUnitControl(unitName);
+					if (!toc.IsCollapsed(unitName))
+						unit.Click();
+					foreach (var s in unit.GetSlides())
+						s.Click();
+					//var slides = ulearnDriver.GetToc().GetUnitControl(unitName).GetSlides().ToList();
+					//var course = UlearnDriver.courseManager
+					//.GetCourse(UlearnDriver.courseManager
+					//	.GetCourses()
+					//	.First(x => x.Title == "Основы программирования").Id);
+					//var cmSlides = course.Slides.Where(s => s.Info.UnitName == unitName).ToList();
+					//for (var i = 0; i < slides.Count; i++)
+					//{
+					//	var type = cmSlides[i] is ExerciseSlide ? PageType.ExerciseSlidePage :
+					//		cmSlides[i] is QuizSlide ? PageType.QuizSlidePage :
+					//			PageType.SlidePage;
+					//	Assert.AreEqual(type, slides[i].SlideType);
+					//}
 				}
 			}
 		}

@@ -88,6 +88,9 @@
     <Compile Include="SeleniumTests\StartPageShould.cs" />
     <Compile Include="SeleniumTests\TocShould.cs" />
     <Compile Include="SeleniumTests\UlearnDriverTest.cs" />
+    <Compile Include="UlearnDriverComponents\IObservable.cs" />
+    <Compile Include="UlearnDriverComponents\IObserver.cs" />
+    <Compile Include="UlearnDriverComponents\IToc.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\Hint.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\LikeButton.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\QuizBlock.cs" />

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
-using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using Selenium.UlearnDriverComponents;
 using Selenium.UlearnDriverComponents.Pages;
-using uLearn.Web.DataContexts;
 
-namespace SeleniumTests
+namespace Selenium.SeleniumTests
 {
 	[TestFixture]
 	class UlearnDriverTest
@@ -45,11 +43,11 @@ namespace SeleniumTests
 
 				foreach (var unitName in unitsNames)
 				{
-					ulearnDriver = ulearnDriver.GetToc().GetUnitControl(unitName).Click();
+					ulearnDriver.GetToc().GetUnitControl(unitName).Click();
 					var slidesNames = ulearnDriver.GetToc().GetUnitControl(unitName).GetSlidesName();
 					foreach (var slideName in slidesNames)
 					{
-						ulearnDriver = ulearnDriver.GetToc().GetUnitControl(unitName).GetSlides().First(x => x.Name == slideName).Click();
+						ulearnDriver.GetToc().GetUnitControl(unitName).GetSlides().First(x => x.Name == slideName).Click();
 					}
 				}
 			}

@@ -5,12 +5,12 @@ using Selenium.UlearnDriverComponents.PageObjects;
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
-	public class SolutionsPage : UlearnContentPage
+	public class SolutionsPage : UlearnContentPage, IObserver
 	{
 		public List<SomeoneSolution> Solutions { get; private set; }
 
-		public SolutionsPage(IWebDriver driver)
-			: base(driver)
+		public SolutionsPage(IWebDriver driver, IObserver parent)
+			: base(driver, parent)
 		{
 			Solutions = FindSolutions();
 		}

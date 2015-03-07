@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenQA.Selenium;
+using Selenium.UlearnDriverComponents.Pages;
 
 namespace Selenium.UlearnDriverComponents
 {
@@ -105,6 +106,22 @@ namespace Selenium.UlearnDriverComponents
 		public static string RegistrationRegisterButton { get { return "/html/body/div[2]/form/div[5]/div/input"; } }
 
 		public static string RegistrationHeaderButton { get { return "/html/body/div/div/div[2]/ul[2]/li[1]/a}"; } }
+
+		public static string TocUnitsXPath { get { return "html/body/ul/li"; } }
+
+		public static string TocUnitHeaderXPath(int unitIndex)
+		{ return String.Format("html/body/ul/li[{0}]/a", unitIndex + 1); }
+
+		public static string TocSlidesXPath(int unitIndex) 
+		{ return String.Format("html/body/ul/li[{0}]/ul/li/a", unitIndex + 1); }
+
+		public static string TocSlideXPath(int unitIndex, int slideIndex)
+		{ return String.Format("html/body/ul/li[{0}]/ul/li[{1}]/a", unitIndex + 1, slideIndex + 1); }
+
+		public static string TocSlidesLabelXPath(int unitIndex) 
+		{ return String.Format("html/body/ul/li[{0}]/ul/i", unitIndex + 1); }
+		public static string TocSlideLabelXPath(int unitIndex, int slideIndex)
+		{ return String.Format("html/body/ul/li[{0}]/ul/i[{1}]", unitIndex + 1, slideIndex + 1); }
 	}
 
 	public class Titles
@@ -219,6 +236,24 @@ namespace Selenium.UlearnDriverComponents
 			}
 
 			return output;
+		}
+	}
+
+	public static class PageTypeValue
+	{
+		private static readonly Dictionary<PageType, Type> factory = new Dictionary<PageType, Type>
+		{
+			{ PageType.ExerciseSlidePage, typeof(ExerciseSlidePage) },
+			{ PageType.QuizSlidePage, typeof(QuizSlidePage) },
+			{ PageType.SlidePage, typeof(SlidePage) },
+			{ PageType.SolutionsPage, typeof(SolutionsPage) },
+			{ PageType.StartPage, typeof(StartPage) },
+			{ PageType.SignInPage, typeof(SignInPage) }
+		};
+
+		public static Type GetTypeValue(PageType type)
+		{
+			return factory[type];
 		}
 	}
 }

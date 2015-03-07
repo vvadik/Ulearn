@@ -23,10 +23,11 @@ namespace Selenium.SeleniumTests
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				if (!toc.IsCollapsed(toc.GetUnitsName().First()))
-					ulearnDriver = toc.GetUnitControl(toc.GetUnitsName().First()).Click();
+					toc.GetUnitControl(toc.GetUnitsName().First()).Click();
 				toc = ulearnDriver.GetToc();
 				var unit = toc.GetUnitControl(toc.GetUnitsName().First());
-				ulearnDriver = unit.GetSlides().First().Click();
+				unit.GetSlides().First().Click();
+
 				var slides = UlearnDriver.courseManager
 						.GetCourses()
 						.First(x => x.Title == "Основы программирования")

@@ -2,29 +2,20 @@
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
-	public class UlearnPage
+	public class UlearnPage : IObserver
 	{
 		protected readonly IWebDriver driver;
+		protected IObserver parent;
 
-		public UlearnPage(IWebDriver driver)
+		public UlearnPage(IWebDriver driver, IObserver parent)
 		{
+			this.parent = parent;
 			this.driver = driver;
 		}
 
 		public string GetTitle()
 		{
 			return driver.Title;
-		}
-
-		public string GetUrl()
-		{
-			return driver.Url;
-		}
-
-		public string GetUserName()
-		{
-			var element = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UserNameXPath));
-			return element == null ? null : element.Text;
 		}
 
 		public PageType GetPageType()
@@ -34,14 +25,14 @@ namespace Selenium.UlearnDriverComponents.Pages
 				return PageType.StartPage;
 			if (title == Titles.SignInPageTitle)
 				return PageType.SignInPage;
-			if (UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.ClassName("side-bar")) == null)
+			if (UlearnDriver.FindElementSafely(driver, By.ClassName("side-bar")) == null)
 				return PageType.IncomprehensibleType;
-			var element = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.ClassName("page-header"));
+			var element = UlearnDriver.FindElementSafely(driver, By.ClassName("page-header"));
 			if (element != null && element.Text == "Решения")
 				return PageType.SolutionsPage;
-			if (UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, ElementsClasses.RunSolutionButton) != null)
+			if (UlearnDriver.FindElementSafely(driver, ElementsClasses.RunSolutionButton) != null)
 				return PageType.ExerciseSlidePage;
-			if (UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, By.ClassName("quiz")) != null)
+			if (UlearnDriver.FindElementSafely(driver, By.ClassName("quiz")) != null)
 				return PageType.QuizSlidePage;
 			return PageType.SlidePage;
 		}
@@ -49,24 +40,34 @@ namespace Selenium.UlearnDriverComponents.Pages
 		public UlearnPage CastTo(PageType pageType)
 		{
 			if (pageType == PageType.SignInPage)
-				return new SignInPage(driver);
+				return new SignInPage(driver, parent);
 
 			if (pageType == PageType.SlidePage)
-				return new SlidePage(driver);
+				return new SlidePage(driver, parent);
 
 			if (pageType == PageType.ExerciseSlidePage)
-				return new ExerciseSlidePage(driver);
+				return new ExerciseSlidePage(driver, parent);
 
 			if (pageType == PageType.SolutionsPage)
-				return new SolutionsPage(driver);
+				return new SolutionsPage(driver, parent);
 
 			if (pageType == PageType.StartPage)
-				return new StartPage(driver);
+				return new StartPage(driver, parent);
 
 			if (pageType == PageType.QuizSlidePage)
-				return new QuizSlidePage(driver);
+				return new QuizSlidePage(driver, parent);
 
 			return this;
+		}
+
+		public string GetUserName()
+		{
+			var element = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UserNameXPath));
+			return element == null ? null : element.Text;
+		}
+
+		public void Update()
+		{
 		}
 	}
 }
