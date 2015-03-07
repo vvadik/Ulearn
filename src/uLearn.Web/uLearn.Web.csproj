@@ -225,6 +225,10 @@
     <Compile Include="Migrations\201502041429186_AcceptedSolutionsIndex.Designer.cs">
       <DependentUpon>201502041429186_AcceptedSolutionsIndex.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201503021039386_RemoveTextBlobTextRequired.cs" />
+    <Compile Include="Migrations\201503021039386_RemoveTextBlobTextRequired.Designer.cs">
+      <DependentUpon>201503021039386_RemoveTextBlobTextRequired.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\TextBlob.cs" />
     <Compile Include="CreateListOfUsedTokens.cs" />
     <Compile Include="Ideone\ExecutionService.Settings.Sample.cs" />
@@ -432,6 +436,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201502041429186_AcceptedSolutionsIndex.resx">
       <DependentUpon>201502041429186_AcceptedSolutionsIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503021039386_RemoveTextBlobTextRequired.resx">
+      <DependentUpon>201503021039386_RemoveTextBlobTextRequired.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
