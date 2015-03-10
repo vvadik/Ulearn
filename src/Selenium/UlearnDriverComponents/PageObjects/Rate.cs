@@ -18,7 +18,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		{
 			buttons[Rate.NotUnderstand] = new RateInfo(driver.FindElement(By.ClassName(StringValue.GetStringValue(Rate.NotUnderstand))));
 			buttons[Rate.Trivial] = new RateInfo(driver.FindElement(By.ClassName(StringValue.GetStringValue(Rate.Trivial))));
-			buttons[Rate.Understand] = new RateInfo(driver.FindElement(By.ClassName(StringValue.GetStringValue(Rate.Understand))));
+			buttons[Rate.Good] = new RateInfo(driver.FindElement(By.ClassName(StringValue.GetStringValue(Rate.Good))));
 		}
 
 		public void RateSlide(Rate rate)

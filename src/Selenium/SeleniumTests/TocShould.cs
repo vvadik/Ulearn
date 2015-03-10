@@ -169,7 +169,8 @@ namespace Selenium.SeleniumTests
 		}
 
 		[Test]
-		public void GoThroughAllSlides()
+		[Explicit]
+		public void GoThroughAllSlides() //very very slooooow
 		{
 			using (var driver = new ChromeDriver())
 			{

@@ -15,7 +15,6 @@ namespace Selenium.UlearnDriverComponents
 		private readonly IWebDriver driver;
 		private UlearnPage currentPage;
 		private Toc toc;
-		public static readonly ULearnDb db = new ULearnDb();
 		public static readonly CourseManager courseManager = new CourseManager(new DirectoryInfo(courseManagerPath));
 		private string currentUserName;
 		private string currentUserId;
@@ -23,6 +22,7 @@ namespace Selenium.UlearnDriverComponents
 		private string currentSlideId;
 		private const string courseManagerPath = @"C:\Users\213\Desktop\GitHub\uLearn\src\uLearn.Web";
 		private readonly HashSet<IObserver> observers = new HashSet<IObserver>();
+		private static readonly Db db = new Db();
 
 		public UlearnDriver(IWebDriver driver)
 		{
@@ -30,6 +30,12 @@ namespace Selenium.UlearnDriverComponents
 
 			Configure();
 		}
+
+		public Rate GetRateFromDb()
+		{
+			return db.GetRate(currentSlideId);
+		}
+
 
 		private void Configure()
 		{
@@ -39,6 +45,11 @@ namespace Selenium.UlearnDriverComponents
 			BuildToc(currentPage.GetPageType());
 
 			DetermineContentPageSettings();
+		}
+
+		public string GetCurrentSlideId()
+		{
+			return currentSlideId;
 		}
 
 		private void DeterminePage()
@@ -75,7 +86,7 @@ namespace Selenium.UlearnDriverComponents
 			if (currentUserName != null)
 			{
 				currentUserName = currentUserName.Replace("Здравствуй, ", "").Replace("!", "");
-				currentUserId = db.Users.First(x => x.UserName == currentUserName).Id;
+				currentUserId = db.GetUserId(currentUserName);
 			}
 		}
 

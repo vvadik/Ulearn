@@ -85,9 +85,11 @@
     <Compile Include="SeleniumTests\ContentPageShould.cs" />
     <Compile Include="SeleniumTests\ExercisePageShould.cs" />
     <Compile Include="SeleniumTests\SignInPageShould.cs" />
+    <Compile Include="SeleniumTests\SlidePageShould.cs" />
     <Compile Include="SeleniumTests\StartPageShould.cs" />
     <Compile Include="SeleniumTests\TocShould.cs" />
     <Compile Include="SeleniumTests\UlearnDriverTest.cs" />
+    <Compile Include="UlearnDriverComponents\Db.cs" />
     <Compile Include="UlearnDriverComponents\IObservable.cs" />
     <Compile Include="UlearnDriverComponents\IObserver.cs" />
     <Compile Include="UlearnDriverComponents\IToc.cs" />

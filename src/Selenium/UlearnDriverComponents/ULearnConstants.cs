@@ -179,9 +179,10 @@ namespace Selenium.UlearnDriverComponents
 
 	public enum Rate
 	{
-		[StringValue("understand-btn")] Understand,
+		[StringValue("understand-btn")] Good,
 		[StringValue("not-understand-btn")] NotUnderstand,
-		[StringValue("trivial-btn")] Trivial
+		[StringValue("trivial-btn")] Trivial,
+		NotWatched = 0
 	}
 
 	public enum PageType

@@ -38,6 +38,7 @@ namespace Selenium.SeleniumTests
 
 		
 		[Test]
+		[Explicit]
 		public void TestWithoutObservale1()
 		{
 			using (var driver = new ChromeDriver())
@@ -46,12 +47,12 @@ namespace Selenium.SeleniumTests
 				var ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var page = ulearnDriver.GetPage() as SlidePage;
-				//page.RateSlide(Rate.Trivial);
-				page.RateSlide(Rate.Understand);
+				page.RateSlide(Rate.Trivial);
+				page.RateSlide(Rate.Good);
 				ulearnDriver.GetToc().GetUnitControl(ulearnDriver.GetToc().GetUnitsName().First()).Click();
 				ulearnDriver.GetToc().GetUnitControl(ulearnDriver.GetToc().GetUnitsName().First()).Click();
 				page.RateSlide(Rate.Trivial);
-				page.RateSlide(Rate.Understand);
+				page.RateSlide(Rate.Good);
 			}
 		}
 	}

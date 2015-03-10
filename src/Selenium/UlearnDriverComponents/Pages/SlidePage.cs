@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using OpenQA.Selenium;
 using Selenium.UlearnDriverComponents.PageObjects;
 
@@ -24,7 +27,17 @@ namespace Selenium.UlearnDriverComponents.Pages
 		public void RateSlide(Rate rate)
 		{
 			rates.Value.RateSlide(rate);
-			parent.Update();
+			//parent.Update();
+		}
+
+		public bool IsSlideRated()
+		{
+			return IsActiveNextButton();
+		}
+
+		public Rate GetCurrentRate()
+		{
+			return new List<Rate> { Rate.Good, Rate.NotUnderstand, Rate.NotWatched }.FirstOrDefault(IsRateActive);
 		}
 
 		public bool IsRateActive(Rate rate)

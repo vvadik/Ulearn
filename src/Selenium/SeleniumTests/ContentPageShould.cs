@@ -48,5 +48,39 @@ namespace Selenium.SeleniumTests
 				Assert.AreEqual(nextSlideName, ulearnDriver.GetCurrentSlideName());
 			}
 		}
+
+		[Test]
+		public void ClickPrevButton()//тест не будет работать, если слайдов в курсе меньше 2х!
+		{
+			using (var driver = new ChromeDriver())
+			{
+				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
+				var ulearnDriver = new UlearnDriver(driver);
+				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				var toc = ulearnDriver.GetToc();
+				if (!toc.IsCollapsed(toc.GetUnitsName().First()))
+					toc.GetUnitControl(toc.GetUnitsName().First()).Click();
+				toc = ulearnDriver.GetToc();
+				var unit = toc.GetUnitControl(toc.GetUnitsName().First());
+				unit.GetSlides().Last().Click();
+
+				var slides = UlearnDriver.courseManager
+						.GetCourses()
+						.First(x => x.Title == "Основы программирования")
+						.Slides.ToList();
+				var currentSlideName = ulearnDriver.GetCurrentSlideName();
+				var prevSlideName = "";
+				for (var i = 1; i < slides.Count; i++)
+					if (slides[i].Title == currentSlideName)
+					{
+						prevSlideName = slides[i - 1].Title;
+						break;
+					}
+
+				var page = ulearnDriver.GetPage() as UlearnContentPage;
+				ulearnDriver = page.ClickPrevButton();
+				Assert.AreEqual(prevSlideName, ulearnDriver.GetCurrentSlideName());
+			}
+		}
 	}
 }
