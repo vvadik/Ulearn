@@ -363,7 +363,7 @@ namespace uLearn.Web.Controllers
 					&& slideIds.Contains(v.SlideId)
 				join s in db.UserSolutions on new { v.SlideId, v.UserId } equals new { s.SlideId, s.UserId } into sInner
 				from ss in sInner.DefaultIfEmpty()
-				join q in db.UserQuizzes on new { v.SlideId, v.UserId } equals new { q.SlideId, q.UserId } into qInner
+				join q in db.UserQuizzes on new { v.SlideId, v.UserId, isDropped = false } equals new { q.SlideId, q.UserId, q.isDropped } into qInner
 				from qq in qInner.DefaultIfEmpty()
 				join u in db.Users on v.UserId equals u.Id into users
 				from uu in users
