@@ -55,13 +55,19 @@ namespace uLearn.Web.Controllers
 		private int GetInitialIndexForStartup(string courseId, Course course, List<string> visibleUnits)
 		{
 			var userId = User.Identity.GetUserId();
-			var lastVisitedSlide = 0;
-			for (var index = 0; index < course.Slides.Length; index++)
+			var visitedIds = visitersRepo.GetIdOfVisitedSlides(courseId, userId);
+			var visibleSlides = course.Slides.Where(slide => visibleUnits.Contains(slide.Info.UnitName)).OrderBy(slide => slide.Index).ToList();
+			var lastVisited = visibleSlides.LastOrDefault(slide => visitedIds.Contains(slide.Id));
+			if (lastVisited == null)
+				return visibleSlides.Any() ? visibleSlides.First().Index : 0;
+
+			var slides = visibleSlides.Where(slide => lastVisited.Info.UnitName == slide.Info.UnitName).ToList();
+
+			var lastVisitedSlide = slides.First().Index;
+			foreach (var slide in slides)
 			{
-				var slide = course.Slides[index];
-				if (!visibleUnits.Contains(slide.Info.UnitName)) continue;
-				if (visitersRepo.IsUserVisit(courseId, slide.Id, userId))
-					lastVisitedSlide = index;
+				if (visitedIds.Contains(slide.Id))
+					lastVisitedSlide = slide.Index;
 				else
 					return lastVisitedSlide;
 			}
