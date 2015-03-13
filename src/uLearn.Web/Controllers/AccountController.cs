@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -511,6 +512,16 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Login");
 			}
 			return RedirectToAction("Manage");
+		}
+
+		[HttpPost, Authorize(Roles = LmsRoles.Admin)]
+		public async Task<ActionResult> ResetPassword(string newPassword, string userId)
+		{
+			var user = await UserManager.FindByIdAsync(userId);
+			if (user == null) return RedirectToAction("List");
+			await UserManager.RemovePasswordAsync(userId);
+			await UserManager.AddPasswordAsync(userId, newPassword);
+			return RedirectToAction("Info", new{user.UserName});
 		}
 	}
 
