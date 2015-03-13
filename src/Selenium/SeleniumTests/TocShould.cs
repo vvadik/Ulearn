@@ -7,6 +7,7 @@ using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using Selenium.UlearnDriverComponents;
+using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.Pages;
 using uLearn;
 
@@ -21,7 +22,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				Assert.IsNotNull(toc);
@@ -61,7 +62,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				var unitsName = toc.GetUnitsName();
@@ -80,7 +81,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				var unitsName = toc.GetUnitsName();
@@ -108,7 +109,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				var unitsName = toc.GetUnitsName();
@@ -142,7 +143,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				var unitsName = toc.GetUnitsName();
@@ -175,7 +176,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				var unitsName = toc.GetUnitsName();
@@ -185,21 +186,35 @@ namespace Selenium.SeleniumTests
 					if (!toc.IsCollapsed(unitName))
 						unit.Click();
 					foreach (var s in unit.GetSlides())
+					{
 						s.Click();
-					//var slides = ulearnDriver.GetToc().GetUnitControl(unitName).GetSlides().ToList();
-					//var course = UlearnDriver.courseManager
-					//.GetCourse(UlearnDriver.courseManager
-					//	.GetCourses()
-					//	.First(x => x.Title == "Основы программирования").Id);
-					//var cmSlides = course.Slides.Where(s => s.Info.UnitName == unitName).ToList();
-					//for (var i = 0; i < slides.Count; i++)
-					//{
-					//	var type = cmSlides[i] is ExerciseSlide ? PageType.ExerciseSlidePage :
-					//		cmSlides[i] is QuizSlide ? PageType.QuizSlidePage :
-					//			PageType.SlidePage;
-					//	Assert.AreEqual(type, slides[i].SlideType);
-					//}
+						var slide = UlearnDriver.courseManager.
+							GetCourse("BasicProgramming").Slides.First(x => x.Title == ulearnDriver.GetCurrentSlideName());
+						PageType type;
+						if (slide is ExerciseSlide)
+							type = PageType.ExerciseSlidePage;
+						else if (slide is QuizSlide)
+							type = PageType.QuizSlidePage;
+						else
+							type = PageType.SlidePage;
+						Assert.AreEqual(type, ulearnDriver.GetPage().GetPageType());
+					}
 				}
+			}
+		}
+
+		[Test]
+		[Explicit]
+		public void Aaa()
+		{
+			using (var driver = new ChromeDriver())
+			{
+				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
+				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				var toc = ulearnDriver.GetToc();
+				var unitsName = toc.GetUnitsName();
+				ulearnDriver = ulearnDriver.GoToStartPage();
 			}
 		}
 	}

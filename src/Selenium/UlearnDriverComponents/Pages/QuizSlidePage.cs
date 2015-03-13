@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
+using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.PageObjects;
 
 namespace Selenium.UlearnDriverComponents.Pages
@@ -103,11 +104,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 				UlearnDriver.HasCss(webElement, "checkbox"),
 				driver.FindElement(By.XPath(XPaths.QuizQuestionStatusXPath(index))),
 				quizStatus);
-		}
-
-		public new void Update()
-		{
-			Configure();
 		}
 	}
 

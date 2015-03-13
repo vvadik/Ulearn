@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
+using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.PageObjects
 {
@@ -9,7 +10,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 	{
 		private readonly IWebDriver driver;
 
-		private Dictionary<string, TocUnit> units;
+		private Dictionary<string, ITocUnit> units;
 		private Dictionary<string, UnitInitInfo> initInfo;
 
 		private Dictionary<string, TocUnit> statistics;
@@ -53,7 +54,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		private void CreateCollections()
 		{
 			if (units == null)
-				units = new Dictionary<string, TocUnit>();
+				units = new Dictionary<string, ITocUnit>();
 			if (statistics == null)
 				statistics = new Dictionary<string, TocUnit>();
 			if (initInfo == null)
@@ -65,7 +66,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 			return units.Keys.ToArray();
 		}
 
-		public TocUnit GetUnitControl(string unitName)
+		public ITocUnit GetUnitControl(string unitName)
 		{
 			if (units.Keys.All(x => x != unitName))
 				throw new Exception(String.Format("slide with name {0} does not exist", unitName));
@@ -73,7 +74,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 				return units[unitName];
 			var unitInfo = initInfo[unitName];
 			units[unitName] = new TocUnit(driver, unitInfo.Iindex, parent);
-			observers.Add(units[unitName]);
+			observers.Add(units[unitName] as IObserver);
 			return units[unitName];
 		}
 

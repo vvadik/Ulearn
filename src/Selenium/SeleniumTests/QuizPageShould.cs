@@ -7,24 +7,26 @@ using NUnit.Framework;
 using OpenQA.Selenium.Chrome;
 using Selenium.UlearnDriverComponents;
 using Selenium.UlearnDriverComponents.Interfaces;
+using Selenium.UlearnDriverComponents.Pages;
 
 namespace Selenium.SeleniumTests
 {
 	[TestFixture]
-	public class ExercisePageShould
+	public class QuizPageShould
 	{
-		[Explicit]
 		[Test]
-		public void RunSolution()
+		public void CheckAnswers()
 		{
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				IUlearnDriver ulearnDriver = new UlearnDriverComponents.UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
+				ulearnDriver = ulearnDriver.ClickRegistration();
+				var registrationPage = ulearnDriver.GetPage() as RegistrationPage;
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
-				driver.Navigate().GoToUrl("https://localhost:44300/Course/BasicProgramming/Slide/21");
+				//var first
+				var page = ulearnDriver.GetPage() as SlidePage;
 			}
-			
 		}
 	}
 }

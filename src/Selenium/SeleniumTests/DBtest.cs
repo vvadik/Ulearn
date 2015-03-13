@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using OpenQA.Selenium.Chrome;
 using Selenium.UlearnDriverComponents;
+using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.Pages;
 using uLearn;
 using uLearn.Web.DataContexts;
@@ -44,7 +45,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var page = ulearnDriver.GetPage() as SlidePage;
 				page.RateSlide(Rate.Trivial);

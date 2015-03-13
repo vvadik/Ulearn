@@ -31,5 +31,10 @@ namespace Selenium.UlearnDriverComponents
 		{
 			return rateConverter[db.SlideRates.First(x => x.SlideId == currentSlideId).Rate];
 		}
+
+		public int GetAttemptsCount()
+		{
+			return 0; //db.UserQuizzes.Where(x => x.)
+		}
 	}
 }

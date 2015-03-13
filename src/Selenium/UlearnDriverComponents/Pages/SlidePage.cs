@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using OpenQA.Selenium;
+using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.PageObjects;
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
-	public class SlidePage : UlearnContentPage, IObserver
+	public class SlidePage : UlearnContentPage
 	{
 		private Lazy<Rates> rates;
 
@@ -43,11 +44,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 		public bool IsRateActive(Rate rate)
 		{
 			return rates.Value.IsActive(rate);
-		}
-
-		public new void Update()
-		{
-			Configure();
 		}
 	}
 }

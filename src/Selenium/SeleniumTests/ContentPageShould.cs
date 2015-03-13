@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using OpenQA.Selenium.Chrome;
 using Selenium.UlearnDriverComponents;
+using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.Pages;
 
 namespace Selenium.SeleniumTests
@@ -19,7 +20,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				if (!toc.IsCollapsed(toc.GetUnitsName().First()))
@@ -55,7 +56,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				if (!toc.IsCollapsed(toc.GetUnitsName().First()))

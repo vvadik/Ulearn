@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OpenQA.Selenium;
+using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.PageObjects;
 using Selenium.UlearnDriverComponents.Pages;
 using uLearn;
@@ -10,7 +11,7 @@ using uLearn.Web.DataContexts;
 
 namespace Selenium.UlearnDriverComponents
 {
-	public class UlearnDriver : IObservable, IObserver
+	public class UlearnDriver : IObservable, IObserver, IUlearnDriver
 	{
 		private readonly IWebDriver driver;
 		private UlearnPage currentPage;
@@ -56,16 +57,7 @@ namespace Selenium.UlearnDriverComponents
 		{
 			var newPage = new UlearnPage(driver, this);
 			var newPageType = newPage.GetPageType();
-			if (currentPage == null)
-			{
-				currentPage = newPage.CastTo(newPageType);
-				return;
-			}
-			var pageType = currentPage.GetPageType();
-			if (pageType == newPageType)
-				(currentPage as IObserver).Update();
-			else
-				currentPage = currentPage.CastTo(pageType);
+			currentPage = newPage.CastTo(newPageType);
 		}
 
 		private void DetermineContentPageSettings()
@@ -90,9 +82,9 @@ namespace Selenium.UlearnDriverComponents
 			}
 		}
 
-		public bool IsLogin()
+		public bool IsLogin
 		{
-			return currentUserName != null;
+			get {return currentUserName != null;}
 		}
 
 		public string GetCurrentUserName()
@@ -102,7 +94,7 @@ namespace Selenium.UlearnDriverComponents
 			return currentUserName;
 		}
 
-		public UlearnDriver ClickRegistration()
+		public IUlearnDriver ClickRegistration()
 		{
 			var registrationHeaderButton = FindElementSafely(driver, By.XPath(XPaths.RegistrationHeaderButton));
 			if (registrationHeaderButton == null)
@@ -141,9 +133,10 @@ namespace Selenium.UlearnDriverComponents
 			return toc;
 		}
 
-		public UlearnDriver GoToStartPage()
+		public IUlearnDriver GoToStartPage()
 		{
 			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
+			Update();
 			return new UlearnDriver(driver);
 		}
 
@@ -158,7 +151,7 @@ namespace Selenium.UlearnDriverComponents
 			return signInPage;
 		}
 
-		public UlearnDriver LoginAdminAndGoToCourse(string courseTitle)
+		public IUlearnDriver LoginAdminAndGoToCourse(string courseTitle)
 		{
 			var startPage = GoToSignInPage().LoginValidUser(Admin.Login, Admin.Password).GetPage() as StartPage;
 			if (startPage != null)
@@ -166,7 +159,7 @@ namespace Selenium.UlearnDriverComponents
 			throw new Exception("Start page was not found...");
 		}
 
-		public UlearnDriver LoginAndGoToCourse(string courseTitle, string login, string password)
+		public IUlearnDriver LoginAndGoToCourse(string courseTitle, string login, string password)
 		{
 			var startPage = GoToSignInPage().LoginValidUser(login, password).GetPage() as StartPage;
 			if (startPage != null)
@@ -174,7 +167,7 @@ namespace Selenium.UlearnDriverComponents
 			throw new Exception("Start page was not found...");
 		}
 
-		public UlearnDriver LoginVkAndGoToCourse(string courseTitle)
+		public IUlearnDriver LoginVkAndGoToCourse(string courseTitle)
 		{
 			var startPage = GoToSignInPage().LoginVk().GetPage() as StartPage;
 			if (startPage != null)

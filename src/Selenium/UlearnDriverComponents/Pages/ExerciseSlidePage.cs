@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OpenQA.Selenium;
+using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.PageObjects;
 using uLearn;
 using uLearn.Web.DataContexts;
@@ -37,7 +38,7 @@ namespace Selenium.UlearnDriverComponents.Pages
 		private List<Hint> GetHints()
 		{
 			const string hintXpath = "hyml/body/div[1]/div/div/div/div[9]/div/div";
-			var allHints = UlearnDriverComponents.UlearnDriver.FindElementsSafely(driver, By.XPath(hintXpath));// driver.FindElement(By.Id("hint-place")).FindElements();
+			var allHints = UlearnDriver.FindElementsSafely(driver, By.XPath(hintXpath));// driver.FindElement(By.Id("hint-place")).FindElements();
 			var localHints = new List<Hint>(allHints.Count);
 			for (var i = 0; i < allHints.Count; i++)
 			{
@@ -63,22 +64,22 @@ namespace Selenium.UlearnDriverComponents.Pages
 			return hintsButton.Enabled;
 		}
 
-		public UlearnDriverComponents.UlearnDriver ClickRunButton()
+		public UlearnDriver ClickRunButton()
 		{
 			runSolutionButton.Click();
-			return new UlearnDriverComponents.UlearnDriver(driver);
+			return new UlearnDriver(driver);
 		}
 
-		public UlearnDriverComponents.UlearnDriver ClickResetButton()
+		public UlearnDriver ClickResetButton()
 		{
 			resetButton.Click();
-			return new UlearnDriverComponents.UlearnDriver(driver);
+			return new UlearnDriver(driver);
 		}
 
-		public UlearnDriverComponents.UlearnDriver ClickHintsButton()
+		public UlearnDriver ClickHintsButton()
 		{
 			hintsButton.Click();
-			return new UlearnDriverComponents.UlearnDriver(driver);
+			return new UlearnDriver(driver);
 		}
 
 		public string GetTextFromSecretCode()
@@ -105,6 +106,7 @@ namespace Selenium.UlearnDriverComponents.Pages
 
 		private void CheckHints()//experiment
 		{
+			return;
 			var userId = ulearnDb.Users.First(x => x.UserName == "admin").Id;
 			var slideId = courseManager.GetCourse("courseId").Slides.First(x => x.Title == "Title").Id;
 			var reallyHints = ulearnDb.Hints.Where(x => x.UserId == userId && x.SlideId == slideId).ToList();
@@ -132,11 +134,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 			var codeMirrorObject = driver.FindElement(ElementsClasses.CodeMirror);
 			if (codeMirrorObject == null)
 				throw new NotFoundException("не найден codemirror");
-		}
-
-		public new void Update()
-		{
-			Configure();
 		}
 	}
 }

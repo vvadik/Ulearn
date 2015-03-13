@@ -7,6 +7,7 @@ using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using Selenium.UlearnDriverComponents;
+using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.Pages;
 
 namespace Selenium.SeleniumTests
@@ -30,17 +31,17 @@ namespace Selenium.SeleniumTests
 		[Test]
 		public void GoToSignInPage()
 		{
-			using (var driver = new ChromeDriver())
+			using (IWebDriver driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriverComponents.UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
 				var startPage = ulearnDriver.GetPage() as StartPage;
 
 				ulearnDriver = startPage.GoToSignInPage();
 				Assert.AreEqual(PageType.SignInPage, ulearnDriver.GetPage().GetPageType());
 
 				ulearnDriver = ulearnDriver.GoToStartPage();
-				var isLogin = ulearnDriver.IsLogin();
+				var isLogin = ulearnDriver.IsLogin;
 				Assert.IsFalse(isLogin);
 			}
 		}
@@ -51,13 +52,13 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriverComponents.UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
 				var startPage = ulearnDriver.GetPage() as StartPage;
 
 				ulearnDriver = startPage.GoToSignInPage();
 
 				ulearnDriver = ulearnDriver.GoToStartPage();
-				var isLogin = ulearnDriver.IsLogin();
+				var isLogin = ulearnDriver.IsLogin;
 				Assert.IsFalse(isLogin);
 			}
 		}

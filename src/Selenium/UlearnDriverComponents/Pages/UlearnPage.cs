@@ -1,8 +1,9 @@
 ﻿using OpenQA.Selenium;
+using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
-	public class UlearnPage : IObserver
+	public class UlearnPage
 	{
 		protected readonly IWebDriver driver;
 		protected IObserver parent;
@@ -64,10 +65,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 		{
 			var element = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UserNameXPath));
 			return element == null ? null : element.Text;
-		}
-
-		public void Update()
-		{
 		}
 	}
 }

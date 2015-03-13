@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using OpenQA.Selenium;
+using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
@@ -42,8 +43,5 @@ namespace Selenium.UlearnDriverComponents.Pages
 			parent.Update();
 			return new UlearnDriver(driver);
 		}
-
-		public new void Update()
-		{}
 	}
 }

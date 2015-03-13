@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
+using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.PageObjects;
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
-	public class SolutionsPage : UlearnContentPage, IObserver
+	public class SolutionsPage : UlearnContentPage
 	{
 		public List<SomeoneSolution> Solutions { get; private set; }
 

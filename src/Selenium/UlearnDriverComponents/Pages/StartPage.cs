@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
+using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
-	public class StartPage : UlearnPage, IObserver
+	public class StartPage : UlearnPage
 	{
 		private const string courseBlockClass = "col-md-6";
 
@@ -50,8 +51,5 @@ namespace Selenium.UlearnDriverComponents.Pages
 			parent.Update();
 			return new UlearnDriver(driver);
 		}
-
-		public new void Update()
-		{}
 	}
 }

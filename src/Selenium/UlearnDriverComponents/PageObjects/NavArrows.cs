@@ -11,9 +11,9 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		public NavArrows(IWebDriver driver)
 		{
 			this.driver = driver;
-			nextSlideButton = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, ElementsId.NextNavArrow);
-			prevSlideButton = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, ElementsId.PrevNavArrow);
-			nextSolutionsButton = UlearnDriverComponents.UlearnDriver.FindElementSafely(driver, ElementsId.NextSolutionsButton);
+			nextSlideButton = UlearnDriver.FindElementSafely(driver, ElementsId.NextNavArrow);
+			prevSlideButton = UlearnDriver.FindElementSafely(driver, ElementsId.PrevNavArrow);
+			nextSolutionsButton = UlearnDriver.FindElementSafely(driver, ElementsId.NextSolutionsButton);
 			CheckButtons();
 		}
 
@@ -27,19 +27,19 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 				throw new NotFoundException("не найдена NextSolutionsButton");
 		}
 
-		public UlearnDriverComponents.UlearnDriver ClickNextButton()
+		public UlearnDriver ClickNextButton()
 		{
 			if (nextSolutionsButton.Enabled)
 				nextSlideButton.Click();
 			else
 				nextSolutionsButton.Click();
-			return new UlearnDriverComponents.UlearnDriver(driver);
+			return new UlearnDriver(driver);
 		}
 
-		public UlearnDriverComponents.UlearnDriver ClickPrevButton()
+		public UlearnDriver ClickPrevButton()
 		{
 			prevSlideButton.Click();
-			return new UlearnDriverComponents.UlearnDriver(driver);
+			return new UlearnDriver(driver);
 		}
 
 		public bool IsActiveNextButton()
@@ -49,7 +49,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 
 		private static bool IsActive(IWebElement button)
 		{
-			return UlearnDriverComponents.UlearnDriver.HasCss(button, "block_next");
+			return UlearnDriver.HasCss(button, "block_next");
 		}
 
 	}

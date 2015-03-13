@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using OpenQA.Selenium.Chrome;
 using Selenium.UlearnDriverComponents;
+using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.Pages;
 
 namespace Selenium.SeleniumTests
@@ -17,7 +18,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				for (int i = 0; i < 10; i++)
 				{
@@ -36,7 +37,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				var unitsNames = toc.GetUnitsName();
@@ -59,7 +60,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriver(driver);
+				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				Console.WriteLine(ulearnDriver.GetCurrentSlideName());
 			}

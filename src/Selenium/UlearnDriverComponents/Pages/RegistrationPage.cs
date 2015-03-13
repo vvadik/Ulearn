@@ -1,8 +1,9 @@
 ﻿using OpenQA.Selenium;
+using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
-	class RegistrationPage : UlearnPage, IObserver
+	class RegistrationPage : UlearnPage
 	{
 		private IWebElement loginField;
 		private IWebElement passwordField;
@@ -36,19 +37,13 @@ namespace Selenium.UlearnDriverComponents.Pages
 				throw new NotFoundException("registrated button not found");
 		}
 
-		public UlearnDriverComponents.UlearnDriver SignUp(string login, string password)
+		public UlearnDriver SignUp(string login, string password)
 		{
 			loginField.SendKeys(login);
 			passwordField.SendKeys(password);
 			confirmPasswordField.SendKeys(password);
 			registerButton.Click();
-			return new UlearnDriverComponents.UlearnDriver(driver);
-		}
-
-		public new void Update()
-		{
-			base.Update();
-			Configure();
+			return new UlearnDriver(driver);
 		}
 	}
 }

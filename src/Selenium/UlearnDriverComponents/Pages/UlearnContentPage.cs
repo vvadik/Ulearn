@@ -1,10 +1,11 @@
 ﻿using System;
 using OpenQA.Selenium;
+using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.PageObjects;
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
-	public class UlearnContentPage : UlearnPage, IObserver
+	public class UlearnContentPage : UlearnPage
 	{
 		private Lazy<NavArrows> navArrows;
 
@@ -40,11 +41,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 		{
 			var element = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.SlideHeaderXPath));
 			return element == null ? null : element.Text;
-		}
-
-		public new void Update()
-		{
-			Configure();
 		}
 	}
 }
