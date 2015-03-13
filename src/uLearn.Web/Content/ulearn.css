@@ -166,7 +166,7 @@ a.nav-arrow:hover {
 }
 
 .units-list-item {
-	padding: 0.5em 0.2em 0.5em 0.1em;
+	padding: 0 0.2em 0 0.1em;
 }
 
 .units-list-item-text {
@@ -179,23 +179,24 @@ a.nav-arrow:hover {
 	margin-top: 0.5em;
 }
 
-.units-list-item > a,
+/*.units-list-item > a,
 .slide-list-item {
 	overflow: hidden;
-}
+}*/
 
-.units-list-item > a:after,
-.slide-list-item > a:after {
+.units-list-item > a:before,
+.slide-list-item > a:before {
 	content: attr(data-score);
 	float: right;
 	padding-left: 1em;
 	padding-top: 0.1em;
+	font-weight: 100;
 }
 
 .slide-list-item {
 	list-style-type: none;
 	border-bottom: 1px solid #eee;
-	padding: 0.5em 0.5em 0.5em 2em;
+	padding: 0.5em 0.5em 0.5em;
 	cursor: pointer;
 	color: #428bca;
 }
@@ -207,6 +208,11 @@ a.nav-arrow:hover {
 		cursor: pointer;
 		color: #428bca;
 	}
+
+.glyphicon-none:before {
+	content: "\2122";
+	color: transparent !important;
+}
 
 .side-bar {
 	width: 320px;
@@ -313,7 +319,10 @@ table.diff tbody th {
 .navbar-label {
 	float: left;
 	margin-right: 5px;
-	margin-top: 7px;
+}
+
+.navbar-label-privileged {
+	color: #333;
 }
 
 .navbar-label-default {
