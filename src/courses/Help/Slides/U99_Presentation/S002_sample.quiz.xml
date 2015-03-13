@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Quiz
+	xmlns="https://ulearn.azurewebsites.net/quiz"
+	id="41138C54848F4F49856BB738B7E39D28">
+	<title>Пример теста</title>
+	
+	<p xml:space="preserve">
+Можно использовать TeX: $\Theta(n)$
+
+__Markdown__ разметку `текста`.
+
+Изображения:
+![logo](img/markdown.png)
+
+[Markdown Extra](https://michelf.ca/projects/php-markdown/extra) фичи. В частности, простые таблицы:
+
+Header 1				| h2
+-------------		| -------------:
+*Content1*				| 42
+`Content Cell`	| 100500
+	</p>
+	
+	
+	<fillIn id="123" explanation="одна или более цифр">
+		<text>Введите корректное число</text>
+		<sample>42</sample>
+		<regex>\d+</regex>
+	</fillIn>
+</Quiz>

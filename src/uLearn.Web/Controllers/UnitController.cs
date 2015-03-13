@@ -34,9 +34,10 @@ namespace uLearn.Web.Controllers
 		}
 		
 		[HttpPost]
-		public ActionResult ReloadCourse(string packageName)
+		public ActionResult ReloadCourse(string packageName, string returnUrl = null)
 		{
 			courseManager.ReloadCourse(packageName);
+			if (returnUrl != null) return Redirect(returnUrl);
 			return RedirectToAction("CourseList");
 		}
 

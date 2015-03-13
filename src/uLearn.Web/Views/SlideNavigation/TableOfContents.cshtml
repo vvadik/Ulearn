@@ -3,6 +3,20 @@
 @model TocModel
 
 <ul class="side-bar units-list navbar-collapse collapse nav navbar-nav container">
+	@if (User.IsInRole(LmsRoles.Admin))
+	{
+		var currentUrl = Request.Url;
+		if (currentUrl != null)
+		{
+			<li>
+				@using (Html.BeginForm("ReloadCourse", "Unit", new { packageName = Model.CourseId + ".zip", returnUrl = currentUrl }, FormMethod.Post))
+				{
+					<button type="submit" class="btn btn-sm btn-danger">reload course</button>
+					<span class="text-muted">← видно только админам</span>
+				}
+			</li>
+		}
+	}
 	@{
 		int iUnit = 0;
 		foreach (var unit in Model.Units)
