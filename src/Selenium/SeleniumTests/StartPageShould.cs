@@ -40,7 +40,7 @@ namespace Selenium.SeleniumTests
 				ulearnDriver = startPage.GoToSignInPage();
 				Assert.AreEqual(PageType.SignInPage, ulearnDriver.GetPage().GetPageType());
 
-				ulearnDriver = ulearnDriver.GoToStartPage();
+				ulearnDriver.GoToStartPage();
 				var isLogin = ulearnDriver.IsLogin;
 				Assert.IsFalse(isLogin);
 			}
@@ -57,7 +57,7 @@ namespace Selenium.SeleniumTests
 
 				ulearnDriver = startPage.GoToSignInPage();
 
-				ulearnDriver = ulearnDriver.GoToStartPage();
+				ulearnDriver.GoToStartPage();
 				var isLogin = ulearnDriver.IsLogin;
 				Assert.IsFalse(isLogin);
 			}

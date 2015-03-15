@@ -19,7 +19,7 @@ namespace Selenium.SeleniumTests
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
-				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				for (int i = 0; i < 10; i++)
 				{
 					Console.WriteLine(ulearnDriver.GetPage().GetPageType());
@@ -38,7 +38,7 @@ namespace Selenium.SeleniumTests
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
-				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				var unitsNames = toc.GetUnitsName();
 
@@ -61,7 +61,7 @@ namespace Selenium.SeleniumTests
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
-				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				Console.WriteLine(ulearnDriver.GetCurrentSlideName());
 			}
 		}

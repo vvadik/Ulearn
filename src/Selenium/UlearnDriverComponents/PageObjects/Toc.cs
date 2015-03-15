@@ -6,16 +6,15 @@ using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.PageObjects
 {
-	public class Toc : IObserver, IToc
+	public class Toc : IToc
 	{
 		private readonly IWebDriver driver;
 
-		private Dictionary<string, ITocUnit> units;
+		private Dictionary<string, Lazy<ITocUnit>> units;
 		private Dictionary<string, UnitInitInfo> initInfo;
 
 		private Dictionary<string, TocUnit> statistics;
 		private readonly IObserver parent;
-		private readonly HashSet<IObserver> observers = new HashSet<IObserver>();
 
 		public Toc(IWebDriver driver, IObserver parent)
 		{
@@ -45,20 +44,17 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 						continue;
 					var collapsedElement = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UnitInfoXPath(i)));
 					var isCollapsed = UlearnDriver.HasCss(collapsedElement, "collapse in");
-					units.Add(unitName, null);
 					initInfo.Add(unitName, new UnitInitInfo(unitsElements[i], i, isCollapsed));
+					units.Add(unitName, new Lazy<ITocUnit>(() => new TocUnit(driver, initInfo[unitName].Index, parent)));
 				}
 			}
 		}
 
 		private void CreateCollections()
 		{
-			if (units == null)
-				units = new Dictionary<string, ITocUnit>();
-			if (statistics == null)
-				statistics = new Dictionary<string, TocUnit>();
-			if (initInfo == null)
-				initInfo = new Dictionary<string, UnitInitInfo>();
+			units = new Dictionary<string, Lazy<ITocUnit>>();
+			statistics = new Dictionary<string, TocUnit>();
+			initInfo = new Dictionary<string, UnitInitInfo>();
 		}
 
 		public string[] GetUnitsName()
@@ -70,12 +66,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		{
 			if (units.Keys.All(x => x != unitName))
 				throw new Exception(String.Format("slide with name {0} does not exist", unitName));
-			if (units[unitName] != null)
-				return units[unitName];
-			var unitInfo = initInfo[unitName];
-			units[unitName] = new TocUnit(driver, unitInfo.Iindex, parent);
-			observers.Add(units[unitName] as IObserver);
-			return units[unitName];
+			return units[unitName].Value;
 		}
 
 		public bool IsCollapsed(string unitName)
@@ -86,8 +77,6 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		public void Update()
 		{
 			Configure();
-			foreach (var o in observers)
-				o.Update();
 		}
 	}
 
@@ -96,13 +85,13 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		public UnitInitInfo(IWebElement unitElement, int index, bool isCollapsed)
 		{
 			UnitElement = unitElement;
-			Iindex = index;
+			Index = index;
 			IsCollapsed = isCollapsed;
 		}
 
 		public bool IsCollapsed { get; private set; }
 
-		public int Iindex { get; private set; }
+		public int Index { get; private set; }
 
 		public IWebElement UnitElement { get; private set; }
 	}

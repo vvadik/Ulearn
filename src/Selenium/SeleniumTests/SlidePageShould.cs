@@ -22,7 +22,7 @@ namespace Selenium.SeleniumTests
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
-				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var page = ulearnDriver.GetPage() as SlidePage;
 				var isRated = page.IsSlideRated();
 				var isReallyRated = ulearnDriver.GetRateFromDb() != Rate.NotWatched;
@@ -37,7 +37,7 @@ namespace Selenium.SeleniumTests
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
-				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var page = ulearnDriver.GetPage() as SlidePage;
 				if (!page.IsSlideRated())
 					page.RateSlide(Rate.Good);

@@ -10,12 +10,19 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 {
 	public class TocSlideControl : ITocSlide, IObserver
 	{
-		private SlideListItem item;
+		private Lazy<SlideListItem> item;
 		private readonly IWebDriver driver;
 		private readonly int slideIndex;
 		private readonly int unitIndex;
 		private readonly IObserver parent;
-		public SlideLabelInfo Item { get { return item.GetInfo(); } }
+		private Lazy<string> name;
+		public SlideLabelInfo Info 
+		{
+			get
+			{
+				return item.Value.GetInfo();
+			}
+		}
 
 		public PageType SlideType
 		{
@@ -24,7 +31,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 
 		private PageType DetermineType()
 		{
-			var info = item.GetInfo();
+			var info = item.Value.GetInfo();
 			return info is ExerciseSlideLabelInfo ? PageType.ExerciseSlidePage :
 				info is QuizSlideLabelInfo ? PageType.QuizSlidePage :
 					PageType.SlidePage;
@@ -41,16 +48,20 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 
 		private void Configure()
 		{
-			Name = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocSlideXPath(unitIndex, slideIndex))).Text;
-			item = new SlideListItem(driver, slideIndex, unitIndex, parent);
+			name = new Lazy<string>(
+				() => UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocSlideXPath(unitIndex, slideIndex))).Text);
+			item = new Lazy<SlideListItem>(() =>  new SlideListItem(driver, slideIndex, unitIndex, parent));
 		}
 
 		public void Click()
 		{
-			item.Click();
+			item.Value.Click();
 		}
 
-		public string Name { get; private set; }
+		public string Name
+		{
+			get { return name.Value; }
+		}
 
 		public void Update()
 		{
@@ -60,22 +71,28 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 
 	public class SlideListItem
 	{
-		private readonly IWebElement slideElement;
-		private readonly IWebElement slideLabelElement;
+		private readonly Lazy<IWebElement> slideElement;
+		private readonly Lazy<IWebElement> slideLabelElement;
 		private readonly IWebDriver driver;
 		private readonly IObserver parent;
+		private readonly int slideIndex;
+		private readonly int unitIndex;
 
 		public SlideListItem(IWebDriver driver, int slideIndex, int unitIndex, IObserver parent)
 		{
+			this.slideIndex = slideIndex;
+			this.unitIndex = unitIndex;
 			this.driver = driver;
-			slideElement = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocSlideXPath(unitIndex, slideIndex)));
-			slideLabelElement = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocSlideLabelXPath(unitIndex, slideIndex)));
+			slideElement = new Lazy<IWebElement>(
+				() => UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocSlideXPath(unitIndex, slideIndex))));
+			slideLabelElement = new Lazy<IWebElement>(
+				() => UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocSlideLabelXPath(unitIndex, slideIndex))));
 			this.parent = parent;
 		}
 
 		public void Click()
 		{
-			slideElement.Click();
+			slideElement.Value.Click();
 			parent.Update();
 		}
 
@@ -84,19 +101,20 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 			if (slideLabelElement == null)
 				return new SlideLabelInfo(false, false);
 
-			var isVisited = IsVisited(slideLabelElement);
-			var selected = IsSelected(slideElement);
+			var element = slideLabelElement.Value;
+			var isVisited = IsVisited(element);
+			var selected = IsSelected(slideElement.Value);
 
-			if (UlearnDriver.HasCss(slideLabelElement, "glyphicon-edit"))
-				return new ExerciseSlideLabelInfo(isVisited, selected, IsPassed(slideLabelElement));
+			if (UlearnDriver.HasCss(element, "glyphicon-edit"))
+				return new ExerciseSlideLabelInfo(isVisited, selected, IsPassed(element));
 
-			if (UlearnDriver.HasCss(slideLabelElement, "glyphicon-ok"))
+			if (UlearnDriver.HasCss(element, "glyphicon-ok"))
 				return new SlideLabelInfo(isVisited, selected);
 
-			if (UlearnDriver.HasCss(slideLabelElement, "glyphicon-pushpin"))
+			if (UlearnDriver.HasCss(element, "glyphicon-pushpin"))
 			{
-				var isPassed = IsPassed(slideLabelElement);
-				var isHasAttempts = IsHasAttempts(slideLabelElement);
+				var isPassed = IsPassed(element);
+				var isHasAttempts = IsHasAttempts(element);
 				return new QuizSlideLabelInfo(isVisited, selected, isPassed, isHasAttempts);
 			}
 

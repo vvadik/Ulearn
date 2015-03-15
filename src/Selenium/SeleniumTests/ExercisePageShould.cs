@@ -21,7 +21,7 @@ namespace Selenium.SeleniumTests
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				IUlearnDriver ulearnDriver = new UlearnDriverComponents.UlearnDriver(driver);
-				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				driver.Navigate().GoToUrl("https://localhost:44300/Course/BasicProgramming/Slide/21");
 			}
 			

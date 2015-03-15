@@ -21,7 +21,7 @@ namespace Selenium.SeleniumTests
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
-				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				if (!toc.IsCollapsed(toc.GetUnitsName().First()))
 					toc.GetUnitControl(toc.GetUnitsName().First()).Click();
@@ -57,7 +57,7 @@ namespace Selenium.SeleniumTests
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
-				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				if (!toc.IsCollapsed(toc.GetUnitsName().First()))
 					toc.GetUnitControl(toc.GetUnitsName().First()).Click();

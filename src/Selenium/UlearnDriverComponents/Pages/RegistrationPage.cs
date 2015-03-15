@@ -37,13 +37,13 @@ namespace Selenium.UlearnDriverComponents.Pages
 				throw new NotFoundException("registrated button not found");
 		}
 
-		public UlearnDriver SignUp(string login, string password)
+		public void SignUp(string login, string password)
 		{
 			loginField.SendKeys(login);
 			passwordField.SendKeys(password);
 			confirmPasswordField.SendKeys(password);
 			registerButton.Click();
-			return new UlearnDriver(driver);
+			parent.Update();
 		}
 	}
 }

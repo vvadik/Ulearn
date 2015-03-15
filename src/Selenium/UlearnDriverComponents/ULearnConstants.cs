@@ -105,7 +105,7 @@ namespace Selenium.UlearnDriverComponents
 
 		public static string RegistrationRegisterButton { get { return "/html/body/div[2]/form/div[5]/div/input"; } }
 
-		public static string RegistrationHeaderButton { get { return "/html/body/div/div/div[2]/ul[2]/li[1]/a}"; } }
+		public static string RegistrationHeaderButton { get { return "/html/body/div/div/div[2]/ul[2]/li[1]/a"; } }
 
 		public static string TocUnitsXPath { get { return "html/body/ul/li"; } }
 
@@ -122,6 +122,12 @@ namespace Selenium.UlearnDriverComponents
 		{ return String.Format("html/body/ul/li[{0}]/ul/i", unitIndex + 1); }
 		public static string TocSlideLabelXPath(int unitIndex, int slideIndex)
 		{ return String.Format("html/body/ul/li[{0}]/ul/i[{1}]", unitIndex + 1, slideIndex + 1); }
+
+		public static string SeleniumTextBlockXPath { get { return "html/body/div[2]/div[1]/div[1]/div[1]/*"; } }
+
+		public static string UserGroupSelectField { get { return "html/body/div[3]/div/div/div[2]/form/div/input"; } }
+
+		public static string UserGroupSelectButton{ get { return "html/body/div[3]/div/div/div[2]/form/button"; } }
 	}
 
 	public class Titles
@@ -133,8 +139,7 @@ namespace Selenium.UlearnDriverComponents
 		public static string BasicProgrammingTitle { get { return "Основы программирования | uLearn"; } }
 
 		public static string LinqTitle { get { return "Основы Linq | uLearn"; } }
-
-		
+		public static string RegistrationPageTitle { get { return "Регистрация | uLearn"; } }
 	}
 
 	public class ElementsClasses
@@ -193,7 +198,8 @@ namespace Selenium.UlearnDriverComponents
 		SignInPage,
 		StartPage,
 		QuizSlidePage,
-		IncomprehensibleType
+		IncomprehensibleType,
+		RegistrationPage
 	}
 
 	public class StringValueAttribute : Attribute

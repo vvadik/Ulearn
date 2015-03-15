@@ -7,14 +7,14 @@ namespace Selenium.UlearnDriverComponents.Interfaces
 		Rate GetRateFromDb();
 		string GetCurrentSlideId();
 		string GetCurrentUserName();
-		IUlearnDriver ClickRegistration();
+		void GoToRegistrationPage();
 		string GetCurrentSlideName();
 		UlearnPage GetPage();
 		IToc GetToc();
-		IUlearnDriver GoToStartPage();
-		IUlearnDriver LoginAdminAndGoToCourse(string courseTitle);
-		IUlearnDriver LoginAndGoToCourse(string courseTitle, string login, string password);
-		IUlearnDriver LoginVkAndGoToCourse(string courseTitle);
+		void GoToStartPage();
+		void LoginAdminAndGoToCourse(string courseTitle);
+		void LoginAndGoToCourse(string courseTitle, string login, string password);
+		void LoginVkAndGoToCourse(string courseTitle);
 
 		bool IsLogin { get; }
 	}

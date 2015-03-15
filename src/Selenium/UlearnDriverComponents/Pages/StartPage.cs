@@ -26,30 +26,29 @@ namespace Selenium.UlearnDriverComponents.Pages
 			return new UlearnDriver(driver);
 		}
 
-		public UlearnDriver GoToCourse(string courseTitle)
+		public void GoToCourse(string courseTitle)
 		{
 			var courseBlocks = driver.FindElements(By.ClassName(courseBlockClass)).ToList();
 			if (courseTitle == Titles.BasicProgrammingTitle)
 			{
-				parent.Update();
-				return ClickCourseButton(courseTitle, courseBlocks, 0);
+				ClickCourseButton(courseTitle, courseBlocks, 0);
+				return;
 			}
 			if (courseTitle == Titles.LinqTitle)
 			{
-				parent.Update();
-				return ClickCourseButton(courseTitle, courseBlocks, 1);
+				ClickCourseButton(courseTitle, courseBlocks, 1);
+				return;
 			}
 			throw new NotImplementedException(string.Format("Для курса {0} нет реализации в методе GoToCourse", courseTitle));
 		}
 
-		private UlearnDriver ClickCourseButton(string courseTitle, IList<IWebElement> courseBlocks, int index)
+		private void ClickCourseButton(string courseTitle, IList<IWebElement> courseBlocks, int index)
 		{
 			if (courseBlocks.Count >= index + 1)
 				courseBlocks[index].FindElement(By.LinkText("Поехали!")).Click();
 			else
 				throw new NotFoundException(string.Format("Не найдена кнопка перехода на курс {0}", courseTitle));
 			parent.Update();
-			return new UlearnDriver(driver);
 		}
 	}
 }

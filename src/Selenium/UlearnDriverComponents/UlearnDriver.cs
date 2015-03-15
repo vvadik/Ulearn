@@ -94,13 +94,13 @@ namespace Selenium.UlearnDriverComponents
 			return currentUserName;
 		}
 
-		public IUlearnDriver ClickRegistration()
+		public void GoToRegistrationPage()
 		{
 			var registrationHeaderButton = FindElementSafely(driver, By.XPath(XPaths.RegistrationHeaderButton));
 			if (registrationHeaderButton == null)
 				throw new NotFoundException();
 			registrationHeaderButton.Click();
-			return new UlearnDriver(driver);
+			Update();
 		}
 
 		public string GetCurrentSlideName()
@@ -133,11 +133,10 @@ namespace Selenium.UlearnDriverComponents
 			return toc;
 		}
 
-		public IUlearnDriver GoToStartPage()
+		public void GoToStartPage()
 		{
 			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 			Update();
-			return new UlearnDriver(driver);
 		}
 
 		private SignInPage GoToSignInPage()
@@ -151,27 +150,27 @@ namespace Selenium.UlearnDriverComponents
 			return signInPage;
 		}
 
-		public IUlearnDriver LoginAdminAndGoToCourse(string courseTitle)
+		public void LoginAdminAndGoToCourse(string courseTitle)
 		{
 			var startPage = GoToSignInPage().LoginValidUser(Admin.Login, Admin.Password).GetPage() as StartPage;
 			if (startPage != null)
-				return startPage.GoToCourse(courseTitle);
+				startPage.GoToCourse(courseTitle);
 			throw new Exception("Start page was not found...");
 		}
 
-		public IUlearnDriver LoginAndGoToCourse(string courseTitle, string login, string password)
+		public void LoginAndGoToCourse(string courseTitle, string login, string password)
 		{
 			var startPage = GoToSignInPage().LoginValidUser(login, password).GetPage() as StartPage;
 			if (startPage != null)
-				return startPage.GoToCourse(courseTitle);
+				startPage.GoToCourse(courseTitle);
 			throw new Exception("Start page was not found...");
 		}
 
-		public IUlearnDriver LoginVkAndGoToCourse(string courseTitle)
+		public void LoginVkAndGoToCourse(string courseTitle)
 		{
 			var startPage = GoToSignInPage().LoginVk().GetPage() as StartPage;
 			if (startPage != null)
-				return startPage.GoToCourse(Titles.BasicProgrammingTitle);
+				startPage.GoToCourse(Titles.BasicProgrammingTitle);
 			throw new Exception("Start page was not found...");
 		}
 

@@ -6,7 +6,7 @@ namespace Selenium.UlearnDriverComponents.Interfaces
 	{
 		PageType SlideType { get; }
 		string Name { get; }
-		SlideLabelInfo Item { get; }
+		SlideLabelInfo Info { get; }
 
 		void Click();
 

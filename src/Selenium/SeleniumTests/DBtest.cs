@@ -46,7 +46,7 @@ namespace Selenium.SeleniumTests
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
-				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var page = ulearnDriver.GetPage() as SlidePage;
 				page.RateSlide(Rate.Trivial);
 				page.RateSlide(Rate.Good);

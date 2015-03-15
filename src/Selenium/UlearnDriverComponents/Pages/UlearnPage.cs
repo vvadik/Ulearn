@@ -1,4 +1,6 @@
-﻿using OpenQA.Selenium;
+﻿using System;
+using System.Collections.Generic;
+using OpenQA.Selenium;
 using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.Pages
@@ -22,6 +24,8 @@ namespace Selenium.UlearnDriverComponents.Pages
 		public PageType GetPageType()
 		{
 			var title = GetTitle();
+			if (title == Titles.RegistrationPageTitle)
+				return PageType.RegistrationPage;
 			if (title == Titles.StartPageTitle)
 				return PageType.StartPage;
 			if (title == Titles.SignInPageTitle)
@@ -38,27 +42,22 @@ namespace Selenium.UlearnDriverComponents.Pages
 			return PageType.SlidePage;
 		}
 
+		private static readonly Dictionary<PageType, Func<IWebDriver, IObserver, UlearnPage>> pageFabric =
+			new Dictionary<PageType, Func<IWebDriver, IObserver, UlearnPage>>
+		{
+			{PageType.SignInPage, (driver, parent) => new SignInPage(driver, parent) },
+			{PageType.SlidePage, (driver, parent) => new SlidePage(driver, parent) },
+			{PageType.ExerciseSlidePage, (driver, parent) => new ExerciseSlidePage(driver, parent) },
+			{PageType.SolutionsPage, (driver, parent) => new SolutionsPage(driver, parent) },
+			{PageType.StartPage, (driver, parent) => new StartPage(driver, parent) },
+			{PageType.QuizSlidePage, (driver, parent) => new QuizSlidePage(driver, parent) },
+			{PageType.RegistrationPage, (driver, parent) => new RegistrationPage(driver, parent) },
+			{PageType.IncomprehensibleType, (driver, parent) => new UlearnPage(driver, parent) },
+		};
+
 		public UlearnPage CastTo(PageType pageType)
 		{
-			if (pageType == PageType.SignInPage)
-				return new SignInPage(driver, parent);
-
-			if (pageType == PageType.SlidePage)
-				return new SlidePage(driver, parent);
-
-			if (pageType == PageType.ExerciseSlidePage)
-				return new ExerciseSlidePage(driver, parent);
-
-			if (pageType == PageType.SolutionsPage)
-				return new SolutionsPage(driver, parent);
-
-			if (pageType == PageType.StartPage)
-				return new StartPage(driver, parent);
-
-			if (pageType == PageType.QuizSlidePage)
-				return new QuizSlidePage(driver, parent);
-
-			return this;
+			return pageFabric[pageType](driver, parent);
 		}
 
 		public string GetUserName()

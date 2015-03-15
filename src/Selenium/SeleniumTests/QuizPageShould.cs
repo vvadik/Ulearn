@@ -21,9 +21,9 @@ namespace Selenium.SeleniumTests
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
-				ulearnDriver = ulearnDriver.ClickRegistration();
+				ulearnDriver.GoToRegistrationPage();
 				var registrationPage = ulearnDriver.GetPage() as RegistrationPage;
-				ulearnDriver = ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
+				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				//var first
 				var page = ulearnDriver.GetPage() as SlidePage;
 			}
