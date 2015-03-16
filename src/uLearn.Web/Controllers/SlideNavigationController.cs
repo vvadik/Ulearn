@@ -62,7 +62,7 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.Slides[slideIndex];
 			var userId = User.Identity.GetUserId();
-			var isPassedTask = solutionsRepo.IsUserPassedTask(courseId, slide.Id, userId) || visitersRepo.IsSkipped(slide.Id, userId);
+			var isPassedTask = visitersRepo.IsSkippedOrPassed(slide.Id, userId);
 			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
 			var nextSlide = course.Slides.FirstOrDefault(s => s.Index > slideIndex && visibleUnits.Contains(s.Info.UnitName));
 			var prevSlide = course.Slides.LastOrDefault(s => s.Index < slideIndex && visibleUnits.Contains(s.Info.UnitName));

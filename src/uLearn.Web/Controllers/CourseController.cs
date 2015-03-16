@@ -130,7 +130,7 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.Slides[slideIndex];
-			var isPassed = solutionsRepo.IsUserPassedTask(courseId, slide.Id, userId);
+			var isPassed = visitersRepo.IsPassed(slide.Id, userId);
 			if (!isPassed)
 				await visitersRepo.SkipSlide(courseId, slide.Id, userId);
 			var solutions = solutionsRepo.GetAllAcceptedSolutions(courseId, slide.Id);

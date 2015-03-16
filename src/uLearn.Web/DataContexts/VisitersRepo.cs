@@ -146,5 +146,15 @@ namespace uLearn.Web.DataContexts
 		{
 			return db.Visiters.Any(v => v.SlideId == slideId && v.UserId == userId && v.IsSkipped);
 		}
+
+		public bool IsPassed(string slideId, string userId)
+		{
+			return db.Visiters.Any(v => v.SlideId == slideId && v.UserId == userId && v.IsPassed);
+		}
+
+		public bool IsSkippedOrPassed(string slideId, string userId)
+		{
+			return db.Visiters.Any(v => v.SlideId == slideId && v.UserId == userId && (v.IsPassed || v.IsSkipped));
+		}
 	}
 }

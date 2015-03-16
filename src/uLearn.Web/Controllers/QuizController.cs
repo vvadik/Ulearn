@@ -77,7 +77,7 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			var slideId = course.Slides[intSlideIndex].Id;
 
-			if (userQuizzesRepo.IsQuizSlidePassed(courseId, userId, slideId))
+			if (visitersRepo.IsPassed(userId, slideId))
 				return "already answered";
 			var time = DateTime.Now;
 			var quizzes = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.QuizId);

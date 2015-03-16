@@ -202,7 +202,7 @@ namespace uLearn.Web.Controllers
 							SlideIndex = slideIndex,
 							IsExercise = slide is ExerciseSlide,
 							IsQuiz = slide is QuizSlide,
-							IsSolved = userSolutionsRepo.IsUserPassedTask(course.Id, slide.Id, userId) || userQuizzesRepo.IsQuizSlidePassed(course.Id, userId, slide.Id),
+							IsSolved = visitersRepo.IsPassed(slide.Id, userId),
 							IsVisited = visitersRepo.IsUserVisit(course.Id, slide.Id, userId),
 							UserRate = slideRateRepo.GetUserRate(course.Id, slide.Id, userId),
 							HintsCountOnSlide = slide is ExerciseSlide ? (slide as ExerciseSlide).HintsMd.Count() : 0,
@@ -355,16 +355,10 @@ namespace uLearn.Web.Controllers
 		private IEnumerable<UserInfo> GetUserInfos(Course course, Slide[] slides)
 		{
 			var slideIds = slides.Select(s => s.Id).ToArray();
-			var courseId = course.Id;
-			var dataQuery =
+
+			var dq =
 				from v in db.Visiters
-				where
-					v.CourseId == courseId
-					&& slideIds.Contains(v.SlideId)
-				join s in db.UserSolutions on new { v.SlideId, v.UserId } equals new { s.SlideId, s.UserId } into sInner
-				from ss in sInner.DefaultIfEmpty()
-				join q in db.UserQuizzes on new { v.SlideId, v.UserId, isDropped = false } equals new { q.SlideId, q.UserId, q.isDropped } into qInner
-				from qq in qInner.DefaultIfEmpty()
+				where slideIds.Contains(v.SlideId)
 				join u in db.Users on v.UserId equals u.Id into users
 				from uu in users
 				select new
@@ -373,49 +367,44 @@ namespace uLearn.Web.Controllers
 					uu.UserName,
 					uu.GroupName,
 					v.SlideId,
-					SolvedExercise = ss != null && ss.IsRightAnswer,
-					IsRightQuiz = qq != null && qq.IsRightQuizBlock
+					v.IsPassed,
+					v.Score,
+					v.AttemptsCount
 				};
-			//			Debug.Write(dataQuery.ToString());
 
-			var res = from v in dataQuery.ToList()
+			var r = from v in dq.ToList()
 				group v by new { v.UserId, v.UserName, v.GroupName }
 				into u
-				select FillUserInfo(
-					new UserInfo
-					{
-						UserId = u.Key.UserId,
-						UserName = u.Key.UserName,
-						UserGroup = u.Key.GroupName
-					},
-					slides,
-					u.Select(d => Tuple.Create(d.SlideId, d.SolvedExercise, d.IsRightQuiz))
-					);
-			return res;
+				select new UserInfo
+				{
+					UserId = u.Key.UserId,
+					UserName = u.Key.UserName,
+					UserGroup = u.Key.GroupName,
+					SlidesSlideInfo = GetSlideInfo(slides, u.Select(arg => Tuple.Create(arg.SlideId, arg.IsPassed, arg.Score, arg.AttemptsCount)))
+				};
+
+			return r;
 		}
 
-		private UserInfo FillUserInfo(UserInfo userInfo, IEnumerable<Slide> slides, IEnumerable<Tuple<string, bool, bool>> slideExerciseQuiz)
+		private static UserSlideInfo[] GetSlideInfo(IEnumerable<Slide> slides, IEnumerable<Tuple<string, bool, int, int>> slideResults)
 		{
-			var lookup = slideExerciseQuiz.ToLookup(tuple => tuple.Item1);
-			userInfo.SlidesSlideInfo = slides
-				.Select(
-					slide => new
-					{
-						slide,
-						quizAnswers = lookup[slide.Id].Select(t => t.Item3),
-						solutions = lookup[slide.Id].Select(t => t.Item2)
-					}
-				)
-				.Select(
-					slide => new UserSlideInfo
-					{
-						AttemptsCount = slide.solutions.Count(),
-						IsExerciseSolved = slide.solutions.Any(sol => sol),
-						IsQuizPassed = slide.quizAnswers.Any(),
-						QuizPercentage = slide.quizAnswers.Any() ? (double)slide.quizAnswers.Count(q => q) / slide.quizAnswers.Count() : 0.0,
-						IsVisited = slide.solutions.Any() // Если была запись в visited
-					}).ToArray();
-			return userInfo;
+			var results = slideResults.GroupBy(tuple => tuple.Item1).ToDictionary(g => g.Key, g => g.First());
+			var defaultValue = Tuple.Create("", false, 0, 0);
+			return slides
+				.Select(slide => new
+				{
+					slide,
+					result = results.Get(slide.Id, defaultValue)
+				})
+				.Select(r => new UserSlideInfo
+				{
+					AttemptsCount = r.result.Item4,
+					IsExerciseSolved = r.result.Item2,
+					IsQuizPassed = r.result.Item2,
+					QuizPercentage = r.slide is QuizSlide ? (double)r.result.Item3 / r.slide.MaxScore : 0.0,
+					IsVisited = results.ContainsKey(r.slide.Id)
+				})
+				.ToArray();
 		}
 
 		[HttpPost]
