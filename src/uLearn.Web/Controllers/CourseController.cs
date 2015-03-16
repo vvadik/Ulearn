@@ -190,6 +190,13 @@ namespace uLearn.Web.Controllers
 			var solution = await db.UserSolutions.FirstOrDefaultAsync(s => s.Id == solutionId);
 			if (solution != null)
 			{
+				var visit = await db.Visiters.FirstOrDefaultAsync(v => v.UserId == solution.UserId && v.SlideId == solution.SlideId);
+				if (visit != null)
+				{
+					visit.IsPassed = db.UserSolutions.Any(s => s.UserId == solution.UserId && s.SlideId == solution.SlideId && s.IsRightAnswer && s.Id != solutionId);
+					visit.Score = visit.IsSkipped ? 0 : visit.IsPassed ? 5 : 0;
+					visit.AttemptsCount--;
+				}
 				db.UserSolutions.Remove(solution);
 				await db.SaveChangesAsync();
 			}
