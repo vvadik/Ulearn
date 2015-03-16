@@ -277,10 +277,20 @@ namespace uLearn.Web.Controllers
 					{
 						Day = date,
 						TasksSolved = tasks.Get(date, 0) + quizes.Get(date, 0),
-						SlidesVisited = visits.Get(date, 0)
+						SlidesVisited = visits.Get(date, Tuple.Create(0, 0)).Item1,
+						Score = visits.Get(date, Tuple.Create(0, 0)).Item2
 					})
 					.ToArray();
 			return result;
+		}
+
+		private Dictionary<DateTime, Tuple<int, int>> SumByDays(IQueryable<Visiters> actions)
+		{
+			var q = from s in actions
+				group s by DbFunctions.TruncateTime(s.Timestamp)
+				into day
+				select new { day.Key, sum = day.Sum(v => v.Score), count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
+			return q.ToDictionary(d => d.Key.Value, d => Tuple.Create(d.count, d.sum));
 		}
 
 		private IQueryable<T> FilterBySlides<T>(IQueryable<T> source, IEnumerable<string> slideIds) where T : class, ISlideAction
@@ -312,9 +322,9 @@ namespace uLearn.Web.Controllers
 			return GroupByDays(FilterByTime(FilterBySlides(db.UserQuizzes, slideIds), firstDay, lastDay));
 		}
 
-		private Dictionary<DateTime, int> GetSlidesVisitedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
+		private Dictionary<DateTime, Tuple<int, int>> GetSlidesVisitedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
 		{
-			return GroupByDays(FilterByTime(FilterBySlides(db.Visiters, slideIds), firstDay, lastDay));
+			return SumByDays(FilterByTime(FilterBySlides(db.Visiters, slideIds), firstDay, lastDay));
 		}
 
 		private SlideRateStats[] GetSlideRateStats(Course course, IEnumerable<Slide> slides)
