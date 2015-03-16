@@ -244,6 +244,10 @@
     <Compile Include="Migrations\201502250945217_VisitResults.Designer.cs">
       <DependentUpon>201502250945217_VisitResults.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201503131434231_AddIsPassed.cs" />
+    <Compile Include="Migrations\201503131434231_AddIsPassed.Designer.cs">
+      <DependentUpon>201503131434231_AddIsPassed.cs</DependentUpon>
+    </Compile>
     <Compile Include="SubmitAllSlide_Test.cs" />
     <Compile Include="ExecutionServiceMigration_Test.cs" />
     <Compile Include="ExecutionService\CsSandboxService.cs" />
@@ -474,6 +478,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201502250945217_VisitResults.resx">
       <DependentUpon>201502250945217_VisitResults.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503131434231_AddIsPassed.resx">
+      <DependentUpon>201503131434231_AddIsPassed.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -69,6 +69,7 @@ namespace uLearn.Web.DataContexts
 			{
 				visiters.AttemptsCount = 0;
 				visiters.Score = 0;
+				visiters.IsPassed = false;
 			});
 		}
 
@@ -78,6 +79,7 @@ namespace uLearn.Web.DataContexts
 			{
 				visiters.AttemptsCount++;
 				visiters.Score = score;
+				visiters.IsPassed = true;
 			});
 		}
 
@@ -86,6 +88,7 @@ namespace uLearn.Web.DataContexts
 			await UpdateAttempts(slideId, userId, visiters =>
 			{
 				visiters.Score = 0;
+				visiters.IsPassed = false;
 			});
 		}
 
@@ -93,6 +96,7 @@ namespace uLearn.Web.DataContexts
 		{
 			await UpdateAttempts(slideId, userId, visiters =>
 			{
+				visiters.IsPassed = visiters.IsPassed || isRightAnswer;
 				visiters.AttemptsCount++;
 				var newScore = isRightAnswer && !visiters.IsSkipped ? 5 : 0;
 				if (newScore > visiters.Score)
