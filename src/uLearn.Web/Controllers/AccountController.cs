@@ -533,33 +533,51 @@ namespace uLearn.Web.Controllers
 		{
 			Course = course;
 			User = user;
-			var visits = db.Visiters.Where(v => v.UserId == user.Id && v.CourseId == course.Id).ToList();
-			var quizes = db.UserQuizzes.Where(v => v.UserId == user.Id && v.CourseId == course.Id && !v.isDropped).ToList();
-			var exercises = db.UserSolutions.Where(v => v.UserId == user.Id && v.CourseId == course.Id && v.IsRightAnswer && !v.IsCompilationError).ToList();
-			Units = course.GetUnits().Select(unitName =>
-				new UserCourseUnitModel
-				{
-					UnitName = unitName,
-					SlideVisits = CreateProgress(course, unitName, visits, v => v.SlideId, s => 1),
-					Exercises = CreateProgress(course, unitName, exercises, e => e.SlideId, s => s is ExerciseSlide ? 1 : 0),
-					Quizes = CreateProgress(course, unitName, quizes, q => q.SlideId, s => s is QuizSlide ? 1 : 0),
-				}
-				).ToArray();
-		}
-
-		public ProgressModel CreateProgress<T>(Course course, string unitName, List<T> items, Func<T, string> getSlideId, Func<Slide, int> getTotal)
-		{
-			var slides = course.Slides.Where(s => s.Info.UnitName == unitName).ToList();
-			return new ProgressModel
+			var visits = db.Visiters.Where(v => v.UserId == user.Id && v.CourseId == course.Id).GroupBy(v => v.SlideId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
+			var unitResults = new Dictionary<string, UserCourseUnitModel>();
+			foreach (var slide in Course.Slides)
 			{
-				Total = slides.Sum(getTotal),
-				Earned = items.Select(getSlideId).Distinct().Count(slideId => slides.Any(s => s.Id == slideId))
-			};
+				var unit = slide.Info.UnitName;
+				if (!unitResults.ContainsKey(unit))
+					unitResults.Add(unit, new UserCourseUnitModel
+					{
+						UnitName = unit,
+						SlideVisits = new ProgressModel(),
+						Exercises = new ProgressModel(),
+						Quizes = new ProgressModel(),
+						Total = new ProgressModel()
+					});
+
+				var res = unitResults[unit];
+				var isVisited = visits.ContainsKey(slide.Id);
+				var isPassed = isVisited && visits[slide.Id].IsPassed;
+				var score = isPassed ? visits[slide.Id].Score : 0;
+
+				res.SlideVisits.Total++;
+				res.Total.Total += slide.MaxScore;
+				res.Total.Earned += score;
+				
+				if (isVisited)
+					res.SlideVisits.Earned++;
+
+				if (slide is ExerciseSlide)
+				{
+					res.Exercises.Total += slide.MaxScore;
+					res.Exercises.Earned += score;
+				}
+
+				if (slide is QuizSlide)
+				{
+					res.Quizes.Total += slide.MaxScore;
+					res.Quizes.Earned += score;
+				}
+			}
+
+			Units = course.GetUnits().Select(unitName => unitResults[unitName]).ToArray();
 		}
 
 		public ApplicationUser User { get; set; }
 		public Course Course;
-		public ProgressModel Total;
 		public UserCourseUnitModel[] Units;
 	}
 
