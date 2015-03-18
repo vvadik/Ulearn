@@ -40,7 +40,7 @@ namespace Selenium.UlearnTests
 				startPage.GoToCourse(Titles.BasicProgrammingTitle);
 				var slidePage = uDriver.GetPage() as SlidePage;
 				if (slidePage.IsUserFirstVisit)
-					slidePage.SelectGroup("lol-group");
+					slidePage.SelectGroup("group");
 				var slideIndex = -1;
 				foreach (var unitName in uDriver.GetToc().GetUnitsName().Take(1))
 				{
@@ -88,12 +88,17 @@ namespace Selenium.UlearnTests
 			var blocks = page.Blocks.Where(NotUserCodeBlock).ToArray();
 			foreach (var b in realPage.Blocks.Select((x, i) => new {Index = i, Value = x}))
 			{
-				if (b.Value is TexBlock)
+				if (b.Value is YoutubeBlock)
 				{
-					//Assert.AreEqual(string.Join("\n", (b.Value as TexBlock).TexLines), blocks[b.Index].Text);
+					Assert.IsTrue(blocks[b.Index] is SlidePageVideoBlock);
 				}
 				if (b.Value is MdBlock)
 				{
+					Assert.AreEqual(string.Join("\n", (b.Value as MdBlock).Markdown).RenderMd(), (blocks[b.Index] as SlidePageTextBlock).Text);
+				}
+				if (b.Value is TexBlock)
+				{
+					
 					//Assert.AreEqual((b.Value as MdBlock).Markdown, blocks[b.Index].Text);
 				}
 			}

@@ -35,16 +35,42 @@ namespace Selenium.UlearnDriverComponents.Pages
 				groupSelectButton = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UserGroupSelectButton));
 			}
 			var blockElements = UlearnDriver.FindElementsSafely(driver, By.XPath(XPaths.SeleniumTextBlockXPath));
-			blocks = UnionSubBlucks(blockElements.Where(
+			blocks = UnionSubBlocks(blockElements.Where(
 				x => x.TagName == "textarea" ||
 				x.TagName == "p" ||
 				(x.TagName == "div" && UlearnDriver.HasCss(x, "video-container")))
 				.Select(CreateBlock));
 		}
 
-		private List<SlidePageBlock> UnionSubBlucks(IEnumerable<SlidePageBlock> subBlocks)
+		private static List<SlidePageBlock> UnionSubBlocks(IEnumerable<SlidePageBlock> subBlocks)
 		{
-			return subBlocks.ToList();//TODO
+			var unionBlocks = new List<SlidePageBlock>();
+			foreach (var subBlock in subBlocks)
+			{
+				if (unionBlocks.Count == 0)
+				{
+					unionBlocks.Add(subBlock);
+					continue;
+				}
+				if (subBlock is SlidePageVideoBlock)
+				{
+					unionBlocks.Add(subBlock);
+					continue;
+				}
+				if (unionBlocks[unionBlocks.Count - 1] is SlidePageTextBlock && subBlock is SlidePageTextBlock)
+				{
+					unionBlocks[unionBlocks.Count - 1] = new SlidePageTextBlock(
+						(unionBlocks[unionBlocks.Count - 1] as SlidePageTextBlock).Text + "\r\n" + (subBlock as SlidePageTextBlock).Text);
+					continue;
+				}
+				unionBlocks.Add(subBlock);
+				//if (unionBlocks[unionBlocks.Count - 1] is SlidePageCodeBlock && subBlock is SlidePageCodeBlock)
+				//{
+				//	unionBlocks[unionBlocks.Count - 1] = new SlidePageTextBlock(
+				//		(unionBlocks[unionBlocks.Count - 1] as SlidePageTextBlock).Text + "\r\n" + (subBlock as SlidePageTextBlock).Text);
+				//}
+			}
+			return unionBlocks;
 		}
 
 		public void SelectGroup(string groupName)
