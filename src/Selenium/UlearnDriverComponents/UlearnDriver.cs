@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Remote;
 using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.PageObjects;
 using Selenium.UlearnDriverComponents.Pages;
@@ -30,6 +33,13 @@ namespace Selenium.UlearnDriverComponents
 			this.driver = driver;
 
 			Configure();
+
+
+			//DesiredCapabilities caps = DesiredCapabilities.Chrome();
+			//driver.Manage()
+			//LoggingPreferences logPrefs = new LoggingPreferences();
+			//logPrefsenable(LogType.BROWSER, Level.ALL);
+			//caps.SetCapability(CapabilityType.LOGGING_PREFS, logPrefs);
 		}
 
 		public Rate GetRateFromDb()
@@ -67,9 +77,10 @@ namespace Selenium.UlearnDriverComponents
 				currentSlideName = ulearnContentPage.GetSlideName();
 			if (currentSlideName == null)
 				return;
-			var currentSlide = courseManager.GetCourses().SelectMany(x => x.Slides).FirstOrDefault(x => x.Title == currentSlideName);
-			if (currentSlide != null)
-				currentSlideId = currentSlide.Id;
+			//commented CM
+			//var currentSlide = courseManager.GetCourses().SelectMany(x => x.Slides).FirstOrDefault(x => x.Title == currentSlideName);
+			//if (currentSlide != null)
+			//	currentSlideId = currentSlide.Id;
 		}
 
 		private void DetermineUser()

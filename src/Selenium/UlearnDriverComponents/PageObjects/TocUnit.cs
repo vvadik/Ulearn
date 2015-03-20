@@ -28,9 +28,9 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		{
 			headerElement = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocUnitHeaderXPath(unitIndex)));
 
-			var courseTitle = UlearnDriver.ConvertCourseTitle(driver.Title);
-			var unitName = headerElement.Text;
-			var slidesCount = UlearnDriver.courseManager.GetCourse(courseTitle).Slides.Count(x => x.Info.UnitName == unitName);
+			//var courseTitle = UlearnDriver.ConvertCourseTitle(driver.Title);
+			//var unitName = headerElement.Text;
+			var slidesCount = UlearnDriver.FindElementsSafely(driver, By.XPath(XPaths.TocSlidesXPath(unitIndex))).Count; //UlearnDriver.courseManager.GetCourse(courseTitle).Slides.Count(x => x.Info.UnitName == unitName);
 			slides = new List<Lazy<ITocSlide>>(slidesCount);
 			for (var ind = 0; ind < slidesCount; ind++)
 			{
@@ -54,7 +54,6 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		public void Click()
 		{
 			headerElement.Click();
-			//var TOCElement = driver.FindElement(By.xPath(XPaths.TocXPath));
 			parent.Update();
 		}
 
