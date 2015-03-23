@@ -52,6 +52,12 @@
     <PublishDatabases>false</PublishDatabases>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bitrium.Http.Extensions">
+      <HintPath>..\packages\Bitrium.Http.Extensions.1.1.0\lib\portable-net45+sl50\Bitrium.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="CsSandboxApi">
+      <HintPath>..\External\CsSandbox\CsSandboxApi.dll</HintPath>
+    </Reference>
     <Reference Include="Elmah, Version=1.2.14318.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\elmah.corelibrary.1.2.1\lib\Elmah.dll</HintPath>
@@ -76,6 +82,12 @@
       <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.0.6.4033103-beta\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Threading.Tasks">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.16\lib\net45\Microsoft.Threading.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.16\lib\net45\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="NLog">
       <HintPath>..\packages\NLog.3.1.0.0\lib\net45\NLog.dll</HintPath>
     </Reference>
@@ -89,6 +101,14 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http.Extensions">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Primitives.dll</HintPath>
+    </Reference>
     <Reference Include="System.Reflection.Metadata, Version=1.0.9.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Bcl.Metadata.1.0.9-alpha\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
@@ -212,7 +232,19 @@
     <Compile Include="Controllers\ExerciseController.cs" />
     <Compile Include="Controllers\HintController.cs" />
     <Compile Include="DataContexts\TextsRepo.cs" />
+    <Compile Include="ExecutionService\CsSandboxService.Settings.Sample.cs" />
     <Compile Include="Ideone\ExecutionService.Settings.cs" />
+    <Compile Include="ExecutionService\IdeoneService.cs" />
+    <Compile Include="ExecutionService\StringExtention.cs" />
+    <Compile Include="Migrations\201502160758511_ExecutionServiceName.cs" />
+    <Compile Include="Migrations\201502160758511_ExecutionServiceName.Designer.cs">
+      <DependentUpon>201502160758511_ExecutionServiceName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SubmitAllSlide_Test.cs" />
+    <Compile Include="ExecutionServiceMigration_Test.cs" />
+    <Compile Include="ExecutionService\CsSandboxService.cs" />
+    <Compile Include="ExecutionService\IExecutionService.cs" />
+    <Compile Include="ExecutionService\SubmissionResult.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.Designer.cs">
       <DependentUpon>201411140847550_extract large text fields.cs</DependentUpon>
@@ -436,6 +468,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201502041429186_AcceptedSolutionsIndex.resx">
       <DependentUpon>201502041429186_AcceptedSolutionsIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201502160758511_ExecutionServiceName.resx">
+      <DependentUpon>201502160758511_ExecutionServiceName.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503021039386_RemoveTextBlobTextRequired.resx">
       <DependentUpon>201503021039386_RemoveTextBlobTextRequired.cs</DependentUpon>
@@ -785,6 +820,7 @@
     <Content Include="flexslider\fonts\flexslider-icon.ttf" />
     <Content Include="flexslider\fonts\flexslider-icon.woff" />
     <Content Include="flexslider\README.mdown" />
+    <Compile Include="ExecutionService\CsSandboxService.Settings.cs" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -1053,6 +1089,11 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
