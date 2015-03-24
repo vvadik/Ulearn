@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -14,7 +13,6 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
-//		private readonly IExecutionService executionService = new CsSandboxService();
 
 		public ExerciseController()
 			: this(WebCourseManager.Instance)
@@ -40,14 +38,9 @@ namespace uLearn.Web.Controllers
 				});
 			}
 			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
-			var result = await CheckSolution(exerciseSlide, code, GenerateExecutionService());
+			var result = await CheckSolution(exerciseSlide, code, RedundantExecutionService.Default);
 			await SaveUserSolution(courseId, exerciseSlide.Id, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer, result.ExecutionServiceName);
 			return Json(result);
-		}
-
-		private static IExecutionService GenerateExecutionService()
-		{
-			return Environment.TickCount % 10 == 0 ? (IExecutionService)new CsSandboxService() : new IdeoneService();
 		}
 
 		private async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code, IExecutionService executionService)

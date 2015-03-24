@@ -233,6 +233,7 @@
     <Compile Include="Controllers\HintController.cs" />
     <Compile Include="DataContexts\TextsRepo.cs" />
     <Compile Include="ExecutionService\CsSandboxService.Settings.Sample.cs" />
+    <Compile Include="ExecutionService\RedundantExecutionService.cs" />
     <Compile Include="Ideone\ExecutionService.Settings.cs" />
     <Compile Include="ExecutionService\IdeoneService.cs" />
     <Compile Include="ExecutionService\StringExtention.cs" />
