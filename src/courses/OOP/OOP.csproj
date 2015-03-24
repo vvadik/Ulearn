@@ -140,6 +140,11 @@
     <Compile Include="Slides\U10_NoIfs\S020_Wood.cs" />
     <Compile Include="Slides\U10_NoIfs\S030_Основа.cs" />
     <Compile Include="Slides\U10_NoIfs\S040_Визуализация.cs" />
+    <Compile Include="Slides\U12_Network\S010_Network.cs" />
+    <Compile Include="Slides\U12_Network\S030_ServerAndClients.cs" />
+    <Compile Include="Slides\U12_Network\S040_Config.cs" />
+    <Compile Include="Slides\U12_Network\S020_Protocol.cs" />
+    <Compile Include="Slides\U11_AI\S010_AI.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">
@@ -170,6 +175,8 @@
     <Content Include="Slides\U05_UI2\separated-presentation.png" />
     <Content Include="Slides\U05_UI2\Title.txt" />
     <Content Include="Slides\U10_NoIfs\Title.txt" />
+    <Content Include="Slides\U12_Network\Title.txt" />
+    <Content Include="Slides\U11_AI\Title.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
