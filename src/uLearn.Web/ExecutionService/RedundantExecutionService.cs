@@ -16,7 +16,7 @@ namespace uLearn.Web.ExecutionService
 			foreach (var executionService in services)
 			{
 				var res = await executionService.Submit(code, displayName);
-				if (res != null)
+				if (res != null && !res.IsInternalError)
 					return res;
 			}
 			return null;
