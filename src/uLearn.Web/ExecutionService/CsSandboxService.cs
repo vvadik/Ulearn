@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using CsSandboxApi;
 
 namespace uLearn.Web.ExecutionService
@@ -8,7 +9,7 @@ namespace uLearn.Web.ExecutionService
 		private static readonly string Token;
 		private static readonly string Address;
 
-		private readonly CsSandboxClient client = new CsSandboxClient(Token, Address);
+		private readonly CsSandboxClient client = new CsSandboxClient(TimeSpan.FromSeconds(1), Token, Address);
 
 		public async Task<SubmissionResult> Submit(string code, string displayName = null)
 		{
