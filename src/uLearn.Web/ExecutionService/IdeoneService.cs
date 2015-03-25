@@ -72,5 +72,10 @@ namespace uLearn.Web.ExecutionService
 		{
 			get { return result.Result.ToString(); }
 		}
+
+		public override string ServiceName
+		{
+			get { return "Sphere Engine"; }
+		}
 	}
 }
