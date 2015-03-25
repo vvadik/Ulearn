@@ -68,7 +68,7 @@ namespace uLearn.Web.Controllers
 				IsRightAnswer = isRightAnswer,
 				ExpectedOutput = exerciseSlide.HideExpectedOutputOnError ? null : expectedOutput,
 				ActualOutput = output,
-				ExecutionServiceName = executionService.Name
+				ExecutionServiceName = submissionDetails.ServiceName
 			};
 		}
 

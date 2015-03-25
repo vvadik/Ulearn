@@ -76,5 +76,10 @@ namespace uLearn.Web.ExecutionService
 		{
 			get { return details.Verdict.ToString(); }
 		}
+
+		public override string ServiceName
+		{
+			get { return "CsSandbox"; }
+		}
 	}
 }
