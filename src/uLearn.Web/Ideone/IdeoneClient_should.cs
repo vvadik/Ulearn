@@ -1,13 +1,12 @@
 using System;
-using System.IO;
 using NUnit.Framework;
 
 namespace uLearn.Web.Ideone
 {
 	[TestFixture]
-	public class ExecutionService_should
+	public class IdeoneClient_should
 	{
-		private readonly ExecutionService service = new ExecutionService();
+		private readonly IdeoneClient service = new IdeoneClient(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(30));
 		
 		[Test]
 		[Explicit]

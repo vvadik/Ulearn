@@ -55,7 +55,7 @@ namespace uLearn.Web.Controllers
 				return new RunSolutionResult
 				{
 					IsCompillerFailure = true, 
-					CompilationError = string.Format("Ой-ой, {0}, проверяющий задачи, не работает. Попробуйте отправить решение позже.", executionService.Name), 
+					CompilationError = "Ой-ой, штуковина, которая проверяет решения сломалась (или просто устала). Попробуйте отправить решение позже (когда она немного отдохнет).", 
 					ExecutionServiceName = executionService.Name
 				};
 			var output = submissionDetails.GetOutput();

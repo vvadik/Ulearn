@@ -4,12 +4,22 @@ using CsSandboxApi;
 
 namespace uLearn.Web.ExecutionService
 {
-	public partial class CsSandboxService : IExecutionService
+	public partial class CsSandboxExecutionService : IExecutionService
 	{
 		private static readonly string Token;
 		private static readonly string Address;
 
-		private readonly CsSandboxClient client = new CsSandboxClient(TimeSpan.FromSeconds(1), Token, Address);
+		public CsSandboxExecutionService()
+			: this(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(30))
+		{
+		}
+
+		public CsSandboxExecutionService(TimeSpan httpTimeout, TimeSpan executionTimeout)
+		{
+			client = new CsSandboxClient(httpTimeout, Token, Address, (int)executionTimeout.TotalSeconds);
+		}
+
+		private readonly CsSandboxClient client;
 
 		public async Task<SubmissionResult> Submit(string code, string displayName = null)
 		{
@@ -24,7 +34,8 @@ namespace uLearn.Web.ExecutionService
 			}
 		}
 
-		public string Name {
+		public string Name
+		{
 			get { return "CsSandbox"; }
 		}
 	}
@@ -68,7 +79,8 @@ namespace uLearn.Web.ExecutionService
 			get { return details.Output; }
 		}
 
-		public override string StdErr {
+		public override string StdErr
+		{
 			get { return details.Error; }
 		}
 

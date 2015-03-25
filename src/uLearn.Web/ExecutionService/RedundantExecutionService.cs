@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace uLearn.Web.ExecutionService
 {
@@ -27,7 +28,14 @@ namespace uLearn.Web.ExecutionService
 		}
 
 		public static RedundantExecutionService Default {
-			get { return new RedundantExecutionService(new CsSandboxService(), new IdeoneService()); }
+			get
+			{
+				var httpTimeout = TimeSpan.FromSeconds(1);
+				var executionTimeout = TimeSpan.FromSeconds(30);
+				return new RedundantExecutionService(
+					new CsSandboxExecutionService(httpTimeout, executionTimeout), 
+					new IdeoneExecutionService(httpTimeout, executionTimeout));
+			}
 		}
 	}
 }

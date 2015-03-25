@@ -4,13 +4,18 @@ using uLearn.Web.Ideone;
 
 namespace uLearn.Web.ExecutionService
 {
-	public class IdeoneService : IExecutionService
+	public class IdeoneExecutionService : IExecutionService
 	{
-		private readonly Ideone.ExecutionService executionService = new Ideone.ExecutionService();
+		private readonly IdeoneClient client;
+
+		public IdeoneExecutionService(TimeSpan httpTimeout, TimeSpan executionTimeout)
+		{
+			client = new IdeoneClient(httpTimeout, executionTimeout);
+		}
 
 		public async Task<SubmissionResult> Submit(string code, string displayName = null)
 		{
-			var result = await executionService.Submit(code, "");
+			var result = await client.Submit(code, "");
 			return result == null ? null : new IdeoneSubmissionResult(result);
 		}
 
