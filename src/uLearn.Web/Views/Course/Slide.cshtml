@@ -12,7 +12,7 @@
 	<div class="container body-content">
 		<div class="row">
 			<div class='slide'>
-				<h1>@Model.Slide.Title @GetScore(Model.Score)</h1>
+				<h1>@Model.Slide.Title <span class="score">@GetScore(Model.Score)</span></h1>
 				@if (Model.Slide is QuizSlide)
 				{
 					@Html.Action("Quiz", "Quiz", new { slide = Model.Slide as QuizSlide, courseId = Model.CourseId, userId = Model.UserId })
@@ -49,5 +49,5 @@
 
 @helper GetScore(Tuple<int, int> score)
 {
-	@(score.Item2 == 0 ? "" : string.Format("({0}/{1})", score.Item1, score.Item2))
+	@(score.Item2 == 0 ? "" : string.Format("{0}/{1}", score.Item1, score.Item2))
 }

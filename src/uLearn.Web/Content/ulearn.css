@@ -179,10 +179,13 @@ a.nav-arrow:hover {
 	margin-top: 0.5em;
 }
 
-/*.units-list-item > a,
-.slide-list-item {
-	overflow: hidden;
-}*/
+.units-list-item > a:before,
+.slide-list-item > a:before,
+.score {
+	font-weight: lighter;
+	font-size: 0.9em;
+	color: #838383;
+}
 
 .units-list-item > a:before,
 .slide-list-item > a:before {
@@ -190,7 +193,6 @@ a.nav-arrow:hover {
 	float: right;
 	padding-left: 1em;
 	padding-top: 0.1em;
-	font-weight: 100;
 }
 
 .slide-list-item {
@@ -492,7 +494,12 @@ div.tex {
 	padding-bottom: 1em;
 }
 
-.courseNameString {
-	font-size: 1.2em;
+.course-name {
+	font-size: 1.56em;
 	font-weight: bold;
+}
+
+.course-name > a:hover {
+	background-color: white !important;
+	color: #428BCA;
 }

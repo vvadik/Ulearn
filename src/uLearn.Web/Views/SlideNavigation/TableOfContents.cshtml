@@ -4,7 +4,7 @@
 
 <ul class="side-bar units-list navbar-collapse collapse nav navbar-nav container">
 	@{
-		<li class="units-list-item full-width units-list-item-text"><a data-score="@GetScore(@Model.ScoreForCourse)" class="courseNameString">@Model.CourseName</a></li>
+		<li class="units-list-item full-width units-list-item-text course-name"><a data-score="@GetScore(@Model.ScoreForCourse)">@Model.CourseName</a></li>
 		int iUnit = 0;
 		foreach (var unit in Model.Units)
 		{
@@ -17,7 +17,7 @@
 						var url = Url.Action("Slide", "Course", new { courseId = Model.CourseId, slideIndex = slide.Index });
 						<li class="slide-list-item @(slide == Model.CurrentSlide ? "selected" : "") " onclick="window.location.href = '@url'">
 							<i class="@GetIconClass(slide) navbar-label" title="@GetTitle(slide)"></i>
-							<a href="@url" data-score="@GetScore(Model.ScoresForSlides[slide])" style="font: ">@slide.Title</a>
+							<a href="@url" data-score="@GetScore(Model.ScoresForSlides[slide])">@slide.Title</a>
 						</li>
 					}
 					@if (User.IsInRole(LmsRoles.Instructor) && unit.InstructorNote != null)
