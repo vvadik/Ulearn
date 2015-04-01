@@ -218,9 +218,15 @@ a.nav-arrow:hover {
 
 .side-bar {
 	width: 320px;
-	float: left;
 	margin: 0;
 	padding: 20px;
+	max-height: none !important;
+}
+
+@media (max-width: 768px) {
+	.slide-bar {
+		float: none !important;
+	}
 }
 
 .slide-container {
