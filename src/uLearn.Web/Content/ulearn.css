@@ -180,19 +180,21 @@ a.nav-arrow:hover {
 }
 
 .units-list-item > a:before,
-.slide-list-item > a:before,
 .score {
 	font-weight: lighter;
 	font-size: 0.9em;
 	color: #838383;
 }
 
-.units-list-item > a:before,
-.slide-list-item > a:before {
+.units-list-item > a:before {
 	content: attr(data-score);
 	float: right;
 	padding-left: 1em;
 	padding-top: 0.1em;
+}
+
+.right {
+	margin-left: auto;
 }
 
 .slide-list-item {
@@ -201,6 +203,7 @@ a.nav-arrow:hover {
 	padding: 0.5em 0.5em 0.5em;
 	cursor: pointer;
 	color: #428bca;
+	display: flex;
 }
 
 	.slide-list-item.selected {

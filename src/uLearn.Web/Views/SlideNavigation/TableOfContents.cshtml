@@ -15,9 +15,10 @@
 					@foreach (var slide in unit.Slides)
 					{
 						var url = Url.Action("Slide", "Course", new { courseId = Model.CourseId, slideIndex = slide.Index });
-						<li class="slide-list-item @(slide == Model.CurrentSlide ? "selected" : "") " onclick="window.location.href = '@url'">
+						<li class="slide-list-item @(slide == Model.CurrentSlide ? "selected" : "") full-size" onclick="window.location.href = '@url'">
 							<i class="@GetIconClass(slide) navbar-label" title="@GetTitle(slide)"></i>
-							<a href="@url" data-score="@GetScore(Model.ScoresForSlides[slide])">@slide.Title</a>
+							<a href="@url" style="margin-right: 5px">@slide.Title</a>
+							<span class="score right">@GetScore(Model.ScoresForSlides[slide])</span>
 						</li>
 					}
 					@if (User.IsInRole(LmsRoles.Instructor) && unit.InstructorNote != null)
