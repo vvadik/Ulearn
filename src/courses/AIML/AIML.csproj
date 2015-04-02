@@ -86,6 +86,20 @@
     <Compile Include="Slides\L05 - Нечеткое управление\S04 - Управление на нечеткой логике.cs" />
     <Compile Include="Slides\L05 - Нечеткое управление\S05 - Нечеткие системы, заключение.cs" />
     <Compile Include="Slides\L05 - Нечеткое управление\S98 - Исходные коды.cs" />
+    <Compile Include="Slides\L060 - Персептроны\S010 - Биологический нейрон и его модель.cs" />
+    <Compile Include="Slides\L060 - Персептроны\S020 - Персептрон и булевы функции.cs" />
+    <Compile Include="Slides\L060 - Персептроны\S030 - Обучение персептрона.cs" />
+    <Compile Include="Slides\L060 - Персептроны\S040 - Демонстрация обучения.cs" />
+    <Compile Include="Slides\L060 - Персептроны\S050 - Функция XOR и многослойный персептрон.cs" />
+    <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S010 - Обучение как минимизация функции.cs" />
+    <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S020 - Метод градиентного спуска.cs" />
+    <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S030 - Частные производные и градиенты.cs" />
+    <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S040 - Обратное распространение ошибки, веса.cs" />
+    <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S050 - Обратное распространение ошибки, входы.cs" />
+    <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S060 - Обратное распространение ошибки, пояснения.cs" />
+    <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S070 - Локальные и глобальные минимумы.cs" />
+    <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S080 - Онлайн и оффлайн обучение.cs" />
+    <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S090 - Методы ускорения обучения.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -126,6 +140,18 @@
     <None Include="Slides\L05 - Нечеткое управление\_S03-slides.pdf" />
     <None Include="Slides\L05 - Нечеткое управление\_S04-slides.pdf" />
     <None Include="Slides\L05 - Нечеткое управление\_S05-slides.pdf" />
+    <None Include="Slides\L060 - Персептроны\Perceptron.zip" />
+    <None Include="Slides\L060 - Персептроны\_S010.pdf" />
+    <None Include="Slides\L060 - Персептроны\_S020.pdf" />
+    <None Include="Slides\L060 - Персептроны\_S030.pdf" />
+    <None Include="Slides\L060 - Персептроны\_S050.pdf" />
+    <None Include="Slides\L070 - Метод обратного распространения ошибки\_S010.pdf" />
+    <None Include="Slides\L070 - Метод обратного распространения ошибки\_S020.pdf" />
+    <None Include="Slides\L070 - Метод обратного распространения ошибки\_S030.pdf" />
+    <None Include="Slides\L070 - Метод обратного распространения ошибки\_S040.pdf" />
+    <None Include="Slides\L070 - Метод обратного распространения ошибки\_S050.pdf" />
+    <None Include="Slides\L070 - Метод обратного распространения ошибки\_S080.pdf" />
+    <None Include="Slides\L070 - Метод обратного распространения ошибки\_S090.pdf" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Slides\L00 - История искусственного интеллекта\S99 - Quiz.quiz.xml" />
@@ -141,6 +167,9 @@
     <Content Include="Slides\L04 - Нечеткие вывод и арифметика\Title.txt" />
     <Content Include="Slides\L05 - Нечеткое управление\S99 - Quiz.quiz.xml" />
     <Content Include="Slides\L05 - Нечеткое управление\Title.txt" />
+    <Content Include="Slides\L060 - Персептроны\S099 - Quiz.quiz.xml" />
+    <Content Include="Slides\L060 - Персептроны\Title.txt" />
+    <Content Include="Slides\L070 - Метод обратного распространения ошибки\Title.txt" />
     <Content Include="Slides\Title.txt" />
   </ItemGroup>
   <ItemGroup>
