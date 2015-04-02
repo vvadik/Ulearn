@@ -533,6 +533,7 @@ namespace uLearn.Web.Controllers
 		{
 			Course = course;
 			User = user;
+
 			var visits = db.Visiters.Where(v => v.UserId == user.Id && v.CourseId == course.Id).GroupBy(v => v.SlideId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
 			var unitResults = new Dictionary<string, UserCourseUnitModel>();
 			foreach (var slide in Course.Slides)
@@ -574,11 +575,26 @@ namespace uLearn.Web.Controllers
 			}
 
 			Units = course.GetUnits().Select(unitName => unitResults[unitName]).ToArray();
+			Total = new UserCourseUnitModel
+			{
+				Total = new ProgressModel(),
+				Exercises = new ProgressModel(),
+				SlideVisits = new ProgressModel(),
+				Quizes = new ProgressModel()
+			};
+			foreach (var result in Units)
+			{
+				Total.Total.Add(result.Total);
+				Total.Exercises.Add(result.Exercises);
+				Total.SlideVisits.Add(result.SlideVisits);
+				Total.Quizes.Add(result.Quizes);
+			}
 		}
 
 		public ApplicationUser User { get; set; }
 		public Course Course;
 		public UserCourseUnitModel[] Units;
+		public UserCourseUnitModel Total;
 	}
 
 	public class UserCourseUnitModel
@@ -601,6 +617,12 @@ namespace uLearn.Web.Controllers
 			if (Progress.HasValue)
 				return Progress.Value.ToString("0%");
 			return "—";
+		}
+
+		public void Add(ProgressModel progress)
+		{
+			Earned += progress.Earned;
+			Total += progress.Total;
 		}
 	}
 }
