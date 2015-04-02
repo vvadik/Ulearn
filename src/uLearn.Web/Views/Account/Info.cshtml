@@ -26,5 +26,14 @@
 			<p>@login.LoginProvider @login.ProviderKey</p>
 		}
 	</ol>
+	@if (User.IsInRole(LmsRoles.Admin))
+	{
+		var newPassword = (DateTime.Now.Ticks % 1000000).ToString();
+		<h3>Сброс пароля</h3>
+		using(Html.BeginForm("ResetPassword", "Account", new { newPassword, userId = Model.User.Id }))
+		{
+			<button class="btn btn-danger"> Сбросить пароль в @newPassword </button>
+		}
+	}
 
 </div>

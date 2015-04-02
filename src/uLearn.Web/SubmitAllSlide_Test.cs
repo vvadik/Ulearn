@@ -3,24 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using uLearn.Web.ExecutionService;
-using uLearn.Web.Ideone;
 using uLearn.Web.Models;
 
 namespace uLearn.Web
 {
 	[TestFixture]
-	public class IdeoneSubmitAllSlide_Test
+	public class SubmitAllSlide_Test
 	{
 		[Explicit]
 		[TestCaseSource("GetSlidesTestCases")]
-		public void TestSlides(ExerciseSlide slide, Ideone.IdeoneClient ideoneClient)
+		public void TestSlides(ExerciseSlide slide, IExecutionService executionService)
 		{
-			TestExerciseSlide(slide, ideoneClient);
+			TestExerciseSlide(slide, executionService);
 		}
 
-		public IEnumerable<TestCaseData> GetSlidesTestCases()
+		private IEnumerable<TestCaseData> GetSlidesTestCases()
 		{
-			var executionService = new IdeoneClient();
+			var executionService = new CsSandboxExecutionService();
 			var courseManager = WebCourseManager.Instance;
 			Assert.That(courseManager.GetCourses().Count() >= 2);
 			return 
@@ -29,7 +28,7 @@ namespace uLearn.Web
 				select new TestCaseData(slide, executionService).SetName(course.Id + " - " + slide.Info.UnitName + " - " + slide.Title);
 		}
 
-		private static void TestExerciseSlide(ExerciseSlide slide, Ideone.IdeoneClient ideoneClient)
+		private static void TestExerciseSlide(ExerciseSlide slide, IExecutionService executionService)
 		{
 			var solution = slide.Solution.BuildSolution(slide.EthalonSolution);
 			if (solution.HasErrors)
@@ -39,12 +38,13 @@ namespace uLearn.Web
 			else
 			{
 				//ExperimentMethod(solution); Попытка научиться проводить тестирование, не отправляя на Ideon.
-				var submition = ideoneClient.Submit(solution.SourceCode, "").Result;
-				var output = submition.Output + "\n" + submition.StdErr;
+				var testName = TestContext.CurrentContext.Test.Name;
+				var submition = executionService.Submit(solution.SourceCode, testName).Result;
+				var output = submition.StdOut + "\n" + submition.StdErr;
 				var isRightAnswer = output.NormalizeEoln().Equals(slide.ExpectedOutput.NormalizeEoln());
 				var result = new RunSolutionResult
 				{
-					CompilationError = submition.CompilationError,
+					CompilationError = submition.CompilationErrorMessage,
 					IsRightAnswer = isRightAnswer,
 					ExpectedOutput = slide.ExpectedOutput,
 					ActualOutput = output

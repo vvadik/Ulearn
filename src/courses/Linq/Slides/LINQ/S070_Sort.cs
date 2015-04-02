@@ -16,7 +16,7 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		    IOrderedEnumerable<T> ThenBy<T>(this IOrderedEnumerable<T> items, Func<T, K> keySelector)
 		    IOrderedEnumerable<T> ThenByDescending<T>(this IOrderedEnumerable<T> items, Func<T, K> keySelector)
 		
-		Первые две дают на выходе последовательность, упорядоченную по возрастанию/убыванию ключей.
+		Первые два дают на выходе последовательность, упорядоченную по возрастанию/убыванию ключей.
 		А `keySelector` — это как раз функция, которая каждому элементу последовательности ставит
 		в соответствие некоторый ключ, по которому его будут сравнивать при сортировке.
 		*/

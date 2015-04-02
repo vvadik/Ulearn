@@ -58,6 +58,9 @@ namespace uLearn.Web.Models
 		[StringLength(40)]
 		public string OutputHash { get; set; }
 
+		[StringLength(40)]
+		public string ExecutionServiceName { get; set; }
+
 		public string GetVerdict()
 		{
 			if (IsCompilationError) return "CompilationError";
