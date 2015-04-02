@@ -7,7 +7,7 @@
 }
 <textarea id="secretCodeExercise" class='hide'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
 <div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine™</a> and <a target="blank" href="http://codemirror.net/">CodeMirror</a></div>
-<textarea class='code code-exercise' data-lang="@slide.Lang">@(@Model.LatestAcceptedSolution ?? slide.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+<textarea class='code code-exercise' data-lang="@slide.Lang">@(Model.LatestAcceptedSolution ?? slide.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 <script>
 	function cleanUserCode() {
 		var $secretCodeExercise = $('#secretCodeExercise');

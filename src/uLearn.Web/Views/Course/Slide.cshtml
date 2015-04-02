@@ -24,6 +24,15 @@
 				}
 				@Html.Partial("_AskBar")
 			</div>
+			@if (User.IsInRole(LmsRoles.Tester))
+			{
+				using (Html.BeginForm("ForgetAll", "Course"))
+				{
+					<input type="hidden" name="slideId" value="@Model.Slide.Id" />
+					<input type="hidden" name="courseId" value="@Model.CourseId" />
+					<button class="btn btn-danger" type="submit">Удалить прогресс</button>
+				}
+			}
 			@Html.Partial("_RatesBar")
 			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false })
 		</div>

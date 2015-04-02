@@ -202,5 +202,26 @@ namespace uLearn.Web.Controllers
 			}
 			return RedirectToAction("AcceptedSolutions", new { courseId = courseId, slideIndex = slideIndex });
 		}
+
+		[Authorize(Roles = LmsRoles.Tester)]
+		public async Task<ActionResult> ForgetAll(string courseId, string slideId)
+		{
+			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
+			var userId = User.Identity.GetUserId();
+			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.UserSolution.SlideId == slideId));
+			RemoveFrom(db.UserSolutions, slideId, userId);
+			RemoveFrom(db.UserQuizzes, slideId, userId);
+			RemoveFrom(db.Visiters, slideId, userId);
+			db.UserQuestions.RemoveRange(db.UserQuestions.Where(q => q.UserId == userId && q.SlideId == slideId));
+			db.SlideRates.RemoveRange(db.SlideRates.Where(q => q.UserId == userId && q.SlideId == slideId));
+			db.Hints.RemoveRange(db.Hints.Where(q => q.UserId == userId && q.SlideId == slideId));
+			await db.SaveChangesAsync();
+			return RedirectToAction("Slide", new { courseId, slideIndex = slide.Index });
+		}
+
+		private static void RemoveFrom<T>(DbSet<T> dbSet, string slideId, string userId) where T : class, ISlideAction
+		{
+			dbSet.RemoveRange(dbSet.Where(s => s.UserId == userId && s.SlideId == slideId));
+		}
 	}
 }
