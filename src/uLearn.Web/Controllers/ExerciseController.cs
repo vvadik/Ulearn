@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -15,7 +14,6 @@ namespace uLearn.Web.Controllers
 		private readonly CourseManager courseManager;
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();
-//		private readonly IExecutionService executionService = new CsSandboxService();
 
 		public ExerciseController()
 			: this(WebCourseManager.Instance)
@@ -41,14 +39,9 @@ namespace uLearn.Web.Controllers
 				});
 			}
 			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
-			var result = await CheckSolution(exerciseSlide, code, GenerateExecutionService());
+			var result = await CheckSolution(exerciseSlide, code, RedundantExecutionService.Default);
 			await SaveUserSolution(courseId, exerciseSlide.Id, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer, result.ExecutionServiceName);
 			return Json(result);
-		}
-
-		private static IExecutionService GenerateExecutionService()
-		{
-			return Environment.TickCount % 10 == 0 ? (IExecutionService)new CsSandboxService() : new IdeoneService();
 		}
 
 		private async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code, IExecutionService executionService)
@@ -63,7 +56,7 @@ namespace uLearn.Web.Controllers
 				return new RunSolutionResult
 				{
 					IsCompillerFailure = true, 
-					CompilationError = string.Format("Ой-ой, {0}, проверяющий задачи, не работает. Попробуйте отправить решение позже.", executionService.Name), 
+					CompilationError = "Ой-ой, штуковина, которая проверяет решения сломалась (или просто устала). Попробуйте отправить решение позже (когда она немного отдохнет).", 
 					ExecutionServiceName = executionService.Name
 				};
 			var output = submissionDetails.GetOutput();
@@ -76,7 +69,7 @@ namespace uLearn.Web.Controllers
 				IsRightAnswer = isRightAnswer,
 				ExpectedOutput = exerciseSlide.HideExpectedOutputOnError ? null : expectedOutput,
 				ActualOutput = output,
-				ExecutionServiceName = executionService.Name
+				ExecutionServiceName = submissionDetails.ServiceName
 			};
 		}
 

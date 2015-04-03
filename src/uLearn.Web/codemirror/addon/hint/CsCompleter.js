@@ -11,9 +11,9 @@
 				'switch', 'this', 'throw', 'true', 'try', 'typeof', 'uint', 'ulong', 'unchecked', 'unsafe', 'ushort',
 				'using', 'value', 'var', 'virtual', 'void', 'volatile', 'where ', 'while', 'yield'
 	];
-	this.types = ['int', 'char', 'double', 'long', 'double', 'string', 'Console', 'Math', 'bool', 'Enumerable', 'Array', 'StringBuilder', 'DirectoryInfo', 'FileInfo', 'CultureInfo', 'Tuple', 'IComparer', 'IComparable', 'IEnumerable', 'Regex', 'Point'];
+	this.types = ['int', 'char', 'double', 'long', 'double', 'string', 'Console', 'Math', 'bool', 'Enumerable', 'Array', 'StringBuilder', 'DirectoryInfo', 'FileInfo', 'CultureInfo', 'Tuple', 'IComparer', 'IComparable', 'IEnumerable', 'Regex', 'Point', 'IEnumerable', 'IEnumerator'];
 
-	this.synonym = {'ReadOnlyCollection' : 'Enumerable', 'Lookup' : 'Enumerable', 'Int' : 'int', 'Int16' : 'int', 'Int32' : 'int', 'Int64' : 'long', 'String' : 'string', 'Single' : 'double', 'Double' : 'double', 'Decimal' : 'double', 'Boolean' : 'bool', 'Char' : 'char'};
+	this.synonym = { 'ReadOnlyCollection': 'Enumerable', 'Lookup': 'Enumerable', 'Int': 'int', 'Int16': 'int', 'Int32': 'int', 'Int64': 'long', 'String': 'string', 'Single': 'double', 'Double': 'double', 'Decimal': 'double', 'Boolean': 'bool', 'Char': 'char' };
 
 	this.staticMembers = [];
 	this.staticMembers['int'] = ['MaxValue', 'MinValue', 'Parse', 'TryParse'];
@@ -44,7 +44,8 @@
 	this.staticMembers['Regex'] = ['CacheSize', 'CompileToAssembly', 'Escape', 'InfiniteMatchTimeout', 'IsMatch', 'Match', 'Matches', 'Replace', 'Split', 'Unescape'];
 	this.staticMembers['KeyValuePair`2'] = [];
 	this.staticMembers['Point'] = ['Add', 'Ceiling', 'Empty', 'Round', 'Subtract', 'Truncate'];
-
+	this.staticMembers['IEnumerable'] = [];
+	this.staticMembers['IEnumerator'] = [];
 
 	this.dynamicMembers = [];
 	this.dynamicMembers['int'] = ['CompareTo', 'Equals', 'GetHashCode', 'GetType', 'GetTypeCode', 'ToString'];
@@ -75,17 +76,18 @@
 	this.dynamicMembers['Regex'] = ['Equals', 'GetGroupNames', 'GetGroupNumbers', 'GetHashCode', 'GetType', 'GroupNameFromNumber', 'GroupNumberFromName', 'IsMatch', 'Match', 'Matches', 'MatchTimeout', 'Options', 'Replace', 'RightToLeft', 'Split', 'ToString'];
 	this.dynamicMembers['KeyValuePair`2'] = ['Equals', 'GetHashCode', 'GetType', 'Key', 'ToString', 'Value'];
 	this.dynamicMembers['Point'] = ['Equals', 'GetHashCode', 'GetType', 'IsEmpty', 'Offset', 'ToString', 'X', 'Y'];
-
+	this.dynamicMembers['IEnumerable'] = ['GetEnumerator'];
+	this.dynamicMembers['IEnumerator'] = ['Current', 'MoveNext', 'Reset'];
 
 	this.membersByReturnType = [];
 	this.membersByReturnType['int'] = ['Parse', 'MaxValue', 'MinValue', 'ConvertToUtf32', 'Compare', 'CompareOrdinal', 'Read', 'BufferHeight', 'BufferWidth', 'WindowHeight', 'WindowWidth', 'LargestWindowWidth', 'LargestWindowHeight', 'WindowLeft', 'WindowTop', 'CursorLeft', 'CursorTop', 'CursorSize', 'Abs', 'Max', 'Min', 'Sign', 'DivRem', 'Count', 'Sum', 'BinarySearch', 'FindIndex', 'FindLastIndex', 'IndexOf', 'LastIndexOf', 'CacheSize', 'CompareTo', 'GetHashCode', 'IndexOfAny', 'LastIndexOfAny', 'Length', 'GetLength', 'GetUpperBound', 'GetLowerBound', 'Rank', 'EnsureCapacity', 'Capacity', 'MaxCapacity', 'RemoveAll', 'LCID', 'KeyboardLayoutId', 'GroupNumberFromName', 'X', 'Y'];
-	this.membersByReturnType['bool'] = ['TryParse', 'IsDigit', 'IsLetter', 'IsWhiteSpace', 'IsUpper', 'IsLower', 'IsPunctuation', 'IsLetterOrDigit', 'IsControl', 'IsNumber', 'IsSeparator', 'IsSurrogate', 'IsSymbol', 'IsHighSurrogate', 'IsLowSurrogate', 'IsSurrogatePair', 'IsInfinity', 'IsPositiveInfinity', 'IsNegativeInfinity', 'IsNaN', 'Equals', 'IsNullOrEmpty', 'IsNullOrWhiteSpace', 'IsInputRedirected', 'IsOutputRedirected', 'IsErrorRedirected', 'CursorVisible', 'KeyAvailable', 'NumberLock', 'CapsLock', 'TreatControlCAsInput', 'Parse', 'SequenceEqual', 'Any', 'All', 'Contains', 'Exists', 'TrueForAll', 'IsMatch', 'IsNormalized', 'EndsWith', 'StartsWith', 'IsReadOnly', 'IsFixedSize', 'IsSynchronized', 'ContainsKey', 'Remove', 'TryGetValue', 'ContainsValue', 'IsNeutralCulture', 'UseUserOverride', 'RightToLeft', 'IsEmpty'];
+	this.membersByReturnType['bool'] = ['TryParse', 'IsDigit', 'IsLetter', 'IsWhiteSpace', 'IsUpper', 'IsLower', 'IsPunctuation', 'IsLetterOrDigit', 'IsControl', 'IsNumber', 'IsSeparator', 'IsSurrogate', 'IsSymbol', 'IsHighSurrogate', 'IsLowSurrogate', 'IsSurrogatePair', 'IsInfinity', 'IsPositiveInfinity', 'IsNegativeInfinity', 'IsNaN', 'Equals', 'IsNullOrEmpty', 'IsNullOrWhiteSpace', 'IsInputRedirected', 'IsOutputRedirected', 'IsErrorRedirected', 'CursorVisible', 'KeyAvailable', 'NumberLock', 'CapsLock', 'TreatControlCAsInput', 'Parse', 'SequenceEqual', 'Any', 'All', 'Contains', 'Exists', 'TrueForAll', 'IsMatch', 'IsNormalized', 'EndsWith', 'StartsWith', 'IsReadOnly', 'IsFixedSize', 'IsSynchronized', 'ContainsKey', 'Remove', 'TryGetValue', 'ContainsValue', 'IsNeutralCulture', 'UseUserOverride', 'RightToLeft', 'IsEmpty', 'MoveNext'];
 	this.membersByReturnType['string'] = ['ToString', 'ConvertFromUtf32', 'Join', 'Format', 'Copy', 'Concat', 'Intern', 'IsInterned', 'Empty', 'ReadLine', 'Title', 'TrueString', 'FalseString', 'Escape', 'Unescape', 'Replace', 'Substring', 'Trim', 'TrimStart', 'TrimEnd', 'Normalize', 'PadLeft', 'PadRight', 'ToLower', 'ToLowerInvariant', 'ToUpper', 'ToUpperInvariant', 'Insert', 'Remove', 'Name', 'FullName', 'Extension', 'DirectoryName', 'IetfLanguageTag', 'DisplayName', 'NativeName', 'EnglishName', 'TwoLetterISOLanguageName', 'ThreeLetterISOLanguageName', 'ThreeLetterWindowsLanguageName', 'GroupNameFromNumber'];
 	this.membersByReturnType['char'] = ['Parse', 'ToUpper', 'ToUpperInvariant', 'ToLower', 'ToLowerInvariant', 'MaxValue', 'MinValue', 'Chars'];
 	this.membersByReturnType['UnicodeCategory'] = ['GetUnicodeCategory'];
 	this.membersByReturnType['double'] = ['GetNumericValue', 'Parse', 'MinValue', 'MaxValue', 'Epsilon', 'NegativeInfinity', 'PositiveInfinity', 'NaN', 'Acos', 'Asin', 'Atan', 'Atan2', 'Ceiling', 'Cos', 'Cosh', 'Floor', 'Sin', 'Tan', 'Sinh', 'Tanh', 'Round', 'Truncate', 'Sqrt', 'Log', 'Log10', 'Exp', 'Pow', 'IEEERemainder', 'Abs', 'Max', 'Min', 'PI', 'E', 'Sum', 'Average'];
 	this.membersByReturnType['long'] = ['Parse', 'MaxValue', 'MinValue', 'Abs', 'Max', 'Min', 'BigMul', 'DivRem', 'LongCount', 'Sum', 'GetLongLength', 'LongLength', 'Length'];
-	this.membersByReturnType['Void'] = ['Beep', 'Clear', 'ResetColor', 'MoveBufferArea', 'SetBufferSize', 'SetWindowSize', 'SetWindowPosition', 'SetCursorPosition', 'SetIn', 'SetOut', 'SetError', 'WriteLine', 'Write', 'Resize', 'Copy', 'ConstrainedCopy', 'ForEach', 'Reverse', 'Sort', 'CompileToAssembly', 'CopyTo', 'SetValue', 'Initialize', 'Add', 'GetObjectData', 'OnDeserialization', 'AddRange', 'Insert', 'InsertRange', 'RemoveAt', 'RemoveRange', 'TrimExcess', 'Create', 'SetAccessControl', 'MoveTo', 'Delete', 'Refresh', 'Decrypt', 'Encrypt', 'ClearCachedData', 'Offset'];
+	this.membersByReturnType['Void'] = ['Beep', 'Clear', 'ResetColor', 'MoveBufferArea', 'SetBufferSize', 'SetWindowSize', 'SetWindowPosition', 'SetCursorPosition', 'SetIn', 'SetOut', 'SetError', 'WriteLine', 'Write', 'Resize', 'Copy', 'ConstrainedCopy', 'ForEach', 'Reverse', 'Sort', 'CompileToAssembly', 'CopyTo', 'SetValue', 'Initialize', 'Add', 'GetObjectData', 'OnDeserialization', 'AddRange', 'Insert', 'InsertRange', 'RemoveAt', 'RemoveRange', 'TrimExcess', 'Create', 'SetAccessControl', 'MoveTo', 'Delete', 'Refresh', 'Decrypt', 'Encrypt', 'ClearCachedData', 'Offset', 'Reset'];
 	this.membersByReturnType['ConsoleKeyInfo'] = ['ReadKey'];
 	this.membersByReturnType['Stream'] = ['OpenStandardError', 'OpenStandardInput', 'OpenStandardOutput'];
 	this.membersByReturnType['TextReader'] = ['In'];
@@ -130,7 +132,7 @@
 	this.membersByReturnType['TypeCode'] = ['GetTypeCode'];
 	this.membersByReturnType['Type'] = ['GetType'];
 	this.membersByReturnType['Char[]'] = ['ToCharArray'];
-	this.membersByReturnType['Object'] = ['Clone', 'GetValue', 'SyncRoot', 'GetLifetimeService', 'InitializeLifetimeService', 'GetFormat'];
+	this.membersByReturnType['Object'] = ['Clone', 'GetValue', 'SyncRoot', 'GetLifetimeService', 'InitializeLifetimeService', 'GetFormat', 'Current'];
 	this.membersByReturnType['CharEnumerator'] = ['GetEnumerator'];
 	this.membersByReturnType['ParallelQuery`1'] = ['AsParallel'];
 	this.membersByReturnType['IQueryable`1'] = ['AsQueryable'];
@@ -170,6 +172,8 @@
 	this.membersByReturnType['Int32[]'] = ['GetGroupNumbers'];
 	this.membersByReturnType['RegexOptions'] = ['Options'];
 	this.membersByReturnType['TKey'] = ['Key'];
+
+	// Total word count in all dictionary: 1213
 
 	var unknowns = new SamePrefixArray();
 	for (var type in this.dynamicMembers) {

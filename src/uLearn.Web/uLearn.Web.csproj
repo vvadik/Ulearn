@@ -232,13 +232,15 @@
     <Compile Include="Controllers\ExerciseController.cs" />
     <Compile Include="Controllers\HintController.cs" />
     <Compile Include="DataContexts\TextsRepo.cs" />
-    <Compile Include="ExecutionService\CsSandboxService.Settings.Sample.cs" />
-    <Compile Include="Ideone\ExecutionService.Settings.cs" />
-    <Compile Include="ExecutionService\IdeoneService.cs" />
+    <Compile Include="ExecutionService\CsSandboxExecutionService.Settings.cs" />
+    <Compile Include="ExecutionService\CsSandboxExecutionService.Settings.Sample.cs" />
+    <Compile Include="ExecutionService\RedundantExecutionService.cs" />
+    <Compile Include="ExecutionService\IdeoneExecutionService.cs" />
     <Compile Include="ExecutionService\StringExtention.cs" />
-    <Compile Include="Migrations\201502160758511_ExecutionServiceName.cs" />
-    <Compile Include="Migrations\201502160758511_ExecutionServiceName.Designer.cs">
-      <DependentUpon>201502160758511_ExecutionServiceName.cs</DependentUpon>
+    <Compile Include="Ideone\IdeoneClient.Settings.cs" />
+    <Compile Include="Migrations\201503231319119_ExecutionServiceName.cs" />
+    <Compile Include="Migrations\201503231319119_ExecutionServiceName.Designer.cs">
+      <DependentUpon>201503231319119_ExecutionServiceName.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\201502250945217_VisitResults.cs" />
     <Compile Include="Migrations\201502250945217_VisitResults.Designer.cs">
@@ -250,7 +252,7 @@
     </Compile>
     <Compile Include="SubmitAllSlide_Test.cs" />
     <Compile Include="ExecutionServiceMigration_Test.cs" />
-    <Compile Include="ExecutionService\CsSandboxService.cs" />
+    <Compile Include="ExecutionService\CsSandboxExecutionService.cs" />
     <Compile Include="ExecutionService\IExecutionService.cs" />
     <Compile Include="ExecutionService\SubmissionResult.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.cs" />
@@ -265,9 +267,13 @@
     <Compile Include="Migrations\201502041429186_AcceptedSolutionsIndex.Designer.cs">
       <DependentUpon>201502041429186_AcceptedSolutionsIndex.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201503021039386_RemoveTextBlobTextRequired.cs" />
+    <Compile Include="Migrations\201503021039386_RemoveTextBlobTextRequired.Designer.cs">
+      <DependentUpon>201503021039386_RemoveTextBlobTextRequired.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\TextBlob.cs" />
     <Compile Include="CreateListOfUsedTokens.cs" />
-    <Compile Include="Ideone\ExecutionService.Settings.Sample.cs" />
+    <Compile Include="Ideone\IdeoneClient.Settings.Sample.cs" />
     <Compile Include="Migrations\201408220628510_AddUnitAppearance.cs" />
     <Compile Include="Migrations\201408220628510_AddUnitAppearance.Designer.cs">
       <DependentUpon>201408220628510_AddUnitAppearance.cs</DependentUpon>
@@ -373,7 +379,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Ideone\CreateSubmitionResult.cs" />
-    <Compile Include="Ideone\ExecutionService_should.cs" />
+    <Compile Include="Ideone\IdeoneClient_should.cs" />
     <Compile Include="Ideone\GetSubmitionDetailsResult.cs" />
     <Compile Include="Ideone\GetSubmitionStatusResult.cs" />
     <Compile Include="Ideone\ResponseResult.cs" />
@@ -407,7 +413,7 @@
     <Compile Include="Models\UsersStatsPageModel.cs" />
     <Compile Include="Models\Visiters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Ideone\ExecutionService.cs" />
+    <Compile Include="Ideone\IdeoneClient.cs" />
     <Compile Include="Service References\Ideone_Service_v1Service.cs" />
     <Compile Include="Startup.cs" />
     <EmbeddedResource Include="Migrations\201407111234255_InitialCreate.resx">
@@ -473,8 +479,11 @@
     <EmbeddedResource Include="Migrations\201502041429186_AcceptedSolutionsIndex.resx">
       <DependentUpon>201502041429186_AcceptedSolutionsIndex.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201502160758511_ExecutionServiceName.resx">
-      <DependentUpon>201502160758511_ExecutionServiceName.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201503021039386_RemoveTextBlobTextRequired.resx">
+      <DependentUpon>201503021039386_RemoveTextBlobTextRequired.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503231319119_ExecutionServiceName.resx">
+      <DependentUpon>201503231319119_ExecutionServiceName.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201502250945217_VisitResults.resx">
       <DependentUpon>201502250945217_VisitResults.cs</DependentUpon>
@@ -827,7 +836,6 @@
     <Content Include="flexslider\fonts\flexslider-icon.ttf" />
     <Content Include="flexslider\fonts\flexslider-icon.woff" />
     <Content Include="flexslider\README.mdown" />
-    <Compile Include="ExecutionService\CsSandboxService.Settings.cs" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>

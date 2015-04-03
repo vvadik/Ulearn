@@ -45,9 +45,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Slides\Title.txt" />
-    <Content Include="Slides\U99_Presentation\img\01-Стек и очередь.png" />
+    <Content Include="Slides\U99_Presentation\img\01-stack.png" />
     <Content Include="Slides\U99_Presentation\img\02-IEnumerable.png" />
     <Content Include="Slides\U99_Presentation\img\03-Структуры.png" />
+    <Content Include="Slides\U99_Presentation\img\markdown.png" />
+    <Content Include="Slides\U99_Presentation\S002_sample.quiz.xml" />
     <Content Include="Slides\U99_Presentation\Title.txt" />
   </ItemGroup>
   <ItemGroup>
