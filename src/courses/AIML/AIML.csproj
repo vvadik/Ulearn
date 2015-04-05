@@ -169,6 +169,7 @@
     <Content Include="Slides\L05 - Нечеткое управление\Title.txt" />
     <Content Include="Slides\L060 - Персептроны\S099 - Quiz.quiz.xml" />
     <Content Include="Slides\L060 - Персептроны\Title.txt" />
+    <Content Include="Slides\L070 - Метод обратного распространения ошибки\S999 - Quiz.quiz.xml" />
     <Content Include="Slides\L070 - Метод обратного распространения ошибки\Title.txt" />
     <Content Include="Slides\Title.txt" />
   </ItemGroup>
