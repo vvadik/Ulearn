@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using uLearn.Web.ExecutionService;
@@ -18,7 +19,7 @@ namespace uLearn.Web
 
 		private IEnumerable<TestCaseData> GetSlidesTestCases()
 		{
-			var executionService = new CsSandboxService();
+			var executionService = new CsSandboxExecutionService();
 			var courseManager = WebCourseManager.Instance;
 			Assert.That(courseManager.GetCourses().Count() >= 2);
 			return 

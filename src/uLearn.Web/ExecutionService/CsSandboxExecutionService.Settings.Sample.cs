@@ -1,9 +1,9 @@
 ﻿/*
 namespace uLearn.Web.ExecutionService
 {
-	public partial class CsSandboxService
+	public partial class CsSandboxExecutionService
 	{
-		static CsSandboxService()
+		static CsSandboxExecutionService()
 		{
 			Token = "token";
 			Address = "address";

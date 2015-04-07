@@ -43,14 +43,7 @@
                 Курс разработан для студентов первого года обучения компьютерных специальностей ИМКН УрФУ.
                 Расcчитан на людей с минимальным опытом программирования.
             </p>
-            @if (Context.User.IsInRole(LmsRoles.Admin) || Context.User.IsInRole(LmsRoles.Instructor))
-            {
-                <p>только для админов и преподавателей: @Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "BasicProgramming2" }, null)</p>
-            }
-            else
-            {
-                <p>В процессе разработки...</p>
-            }
+            <p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "BasicProgramming2" }, null)</p>
         </div>
         <div class="col-md-6">
             <h2>Искусственный интеллект и машинное обучение</h2>

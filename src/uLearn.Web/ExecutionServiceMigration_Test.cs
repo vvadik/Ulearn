@@ -29,7 +29,7 @@ namespace uLearn.Web
 			var res = Parallel.ForEach(GetSources(), parallelOptions, async source =>
 			{
 				var id = String.Format("{0:D10}", source.Id);
-				var executionService = new CsSandboxService();
+				var executionService = new CsSandboxExecutionService();
 				SubmissionResult runResult = null;
 				try
 				{

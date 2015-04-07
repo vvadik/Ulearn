@@ -13,6 +13,7 @@ namespace uLearn.Web.ExecutionService
 		public abstract string StdOut { get; }
 		public abstract string StdErr { get; }
 		protected abstract string Verdict { get; }
+		public abstract string ServiceName { get; }
 
 		public string GetOutput()
 		{
