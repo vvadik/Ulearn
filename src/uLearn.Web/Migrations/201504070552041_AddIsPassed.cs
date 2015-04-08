@@ -1,13 +1,13 @@
 namespace uLearn.Web.Migrations
 {
-    using System;
-    using System.Data.Entity.Migrations;
-    
-    public partial class AddIsPassed : DbMigration
-    {
-        public override void Up()
-        {
-            AddColumn("dbo.Visiters", "IsPassed", c => c.Boolean(nullable: false));
+	using System;
+	using System.Data.Entity.Migrations;
+
+	public partial class AddIsPassed : DbMigration
+	{
+		public override void Up()
+		{
+			AddColumn("dbo.Visiters", "IsPassed", c => c.Boolean(nullable: false));
 
 			Sql(@"update Visiters
 				set IsPassed = 1
@@ -27,10 +27,10 @@ namespace uLearn.Web.Migrations
 					) as t
 					where Visiters.UserId = t.UserId and Visiters.SlideId = t.SlideId");
 		}
-        
-        public override void Down()
-        {
-            DropColumn("dbo.Visiters", "IsPassed");
-        }
-    }
+
+		public override void Down()
+		{
+			DropColumn("dbo.Visiters", "IsPassed");
+		}
+	}
 }

@@ -242,13 +242,13 @@
     <Compile Include="Migrations\201503231319119_ExecutionServiceName.Designer.cs">
       <DependentUpon>201503231319119_ExecutionServiceName.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201502250945217_VisitResults.cs" />
-    <Compile Include="Migrations\201502250945217_VisitResults.Designer.cs">
-      <DependentUpon>201502250945217_VisitResults.cs</DependentUpon>
+    <Compile Include="Migrations\201504070546498_VisitResults.cs" />
+    <Compile Include="Migrations\201504070546498_VisitResults.Designer.cs">
+      <DependentUpon>201504070546498_VisitResults.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201503131434231_AddIsPassed.cs" />
-    <Compile Include="Migrations\201503131434231_AddIsPassed.Designer.cs">
-      <DependentUpon>201503131434231_AddIsPassed.cs</DependentUpon>
+    <Compile Include="Migrations\201504070552041_AddIsPassed.cs" />
+    <Compile Include="Migrations\201504070552041_AddIsPassed.Designer.cs">
+      <DependentUpon>201504070552041_AddIsPassed.cs</DependentUpon>
     </Compile>
     <Compile Include="SubmitAllSlide_Test.cs" />
     <Compile Include="ExecutionServiceMigration_Test.cs" />
@@ -485,11 +485,11 @@
     <EmbeddedResource Include="Migrations\201503231319119_ExecutionServiceName.resx">
       <DependentUpon>201503231319119_ExecutionServiceName.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201502250945217_VisitResults.resx">
-      <DependentUpon>201502250945217_VisitResults.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201504070546498_VisitResults.resx">
+      <DependentUpon>201504070546498_VisitResults.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201503131434231_AddIsPassed.resx">
-      <DependentUpon>201503131434231_AddIsPassed.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201504070552041_AddIsPassed.resx">
+      <DependentUpon>201504070552041_AddIsPassed.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
