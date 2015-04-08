@@ -143,6 +143,7 @@ namespace uLearn.Web.DataContexts
 				.ToList();
 			return result
 				.Select(x => new AcceptedSolutionInfo(x.Code, x.Id, x.Likes))
+				.OrderByDescending(info => info.UsersWhoLike.Count)
 				.ToList();
 		}
 

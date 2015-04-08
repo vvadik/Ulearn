@@ -166,7 +166,7 @@ a.nav-arrow:hover {
 }
 
 .units-list-item {
-	padding: 0.5em 0.2em 0.5em 0.1em;
+	padding: 0 0.2em 0 0.1em;
 }
 
 .units-list-item-text {
@@ -179,12 +179,31 @@ a.nav-arrow:hover {
 	margin-top: 0.5em;
 }
 
+.units-list-item > a:before,
+.score {
+	font-weight: lighter;
+	font-size: 0.9em;
+	color: #838383;
+}
+
+.units-list-item > a:before {
+	content: attr(data-score);
+	float: right;
+	padding-left: 1em;
+	padding-top: 0.1em;
+}
+
+.right {
+	margin-left: auto;
+}
+
 .slide-list-item {
 	list-style-type: none;
 	border-bottom: 1px solid #eee;
-	padding: 0.5em 0 0.5em 2em;
+	padding: 0.5em 0.5em 0.5em;
 	cursor: pointer;
 	color: #428bca;
+	display: flex;
 }
 
 	.slide-list-item.selected {
@@ -195,11 +214,22 @@ a.nav-arrow:hover {
 		color: #428bca;
 	}
 
+.glyphicon-none:before {
+	content: "\2122";
+	color: transparent !important;
+}
+
 .side-bar {
 	width: 320px;
-	float: left;
 	margin: 0;
 	padding: 20px;
+	max-height: none !important;
+}
+
+@media (max-width: 768px) {
+	.slide-bar {
+		float: none !important;
+	}
 }
 
 .slide-container {
@@ -300,7 +330,10 @@ table.diff tbody th {
 .navbar-label {
 	float: left;
 	margin-right: 5px;
-	margin-top: 7px;
+}
+
+.navbar-label-privileged {
+	color: #333;
 }
 
 .navbar-label-default {
@@ -336,16 +369,21 @@ table.diff tbody th {
 .reset-btn {
 	width: 25%;
 	margin-left: 0 !important;
+	float: right !important;
 }
 
 .hints-btn {
 	width: 25%;
 	margin-left: 0 !important;
-	float: right !important;
+}
+
+.giveup-btn {
+	width: 25%;
+	margin-left: 0 !important;
 }
 
 .run-solution-button {
-	width: 50%;
+	width: 25%;
 	margin-bottom: 10px;
 	margin-left: 0 !important;
 }
@@ -380,19 +418,6 @@ div.quiz .wrong-quiz {
 div.quiz .right-quiz {
 	color: green;
 	font-weight: bold;
-}
-
-.not-understand-btn {
-	width: 33%;
-}
-
-.understand-btn {
-	width: 33%;
-}
-
-.trivial-btn {
-	width: 34%;
-	float: right !important;
 }
 
 .full-width {
@@ -476,4 +501,14 @@ div.quiz .right-quiz {
 div.tex {
 	font-size: 1.2em;
 	padding-bottom: 1em;
+}
+
+.course-name {
+	font-size: 1.56em;
+	font-weight: bold;
+}
+
+.course-name > a:hover {
+	background-color: white !important;
+	color: #428BCA;
 }

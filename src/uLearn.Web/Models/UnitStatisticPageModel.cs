@@ -21,6 +21,7 @@ namespace uLearn.Web.Models
 		public int SlidesVisited { get; set; }
 		public int TasksSolved { get; set; }
 		public int QuizesPassed { get; set; }
+		public int Score { get; set; }
 	}
 
 	public class SlideRateStats

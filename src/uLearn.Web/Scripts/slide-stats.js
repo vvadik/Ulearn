@@ -1,6 +1,6 @@
 ﻿function handleRate(rate) {
 	if (rate == "NotUnderstand")
-		if (!$("#notunderstand").parent().hasClass("btn-danger"))
+		if (!$("#notunderstand").hasClass("btn-danger"))
 			$("#ask_question_window").click();
 	$("#notwatched").removeClass("not-watched");
 	$("#ratings").removeClass("bounce-effect");
@@ -23,40 +23,37 @@
 	});
 };
 
+var rateButtons = {
+	colors: {
+		good: "btn-success",
+		notunderstand: "btn-danger",
+		trivial: "btn-info"
+	}
+};
+
 function cancelRate(rate) {
 	var switcher = rate.toLowerCase();
-	var colors = {};
-	colors["good"] = "btn-success";
-	colors["notunderstand"] = "btn-danger";
-	colors["trivial"] = "btn-info";
 	$("#notwatched").addClass("not-watched");
-	$("#next_slide_button").addClass("block-next");
-	$("#next_solutions_button").addClass("block-next");
-	$("#" + switcher).parent().button('toggle');
-	$("#" + switcher).parent().removeClass(colors[switcher]).removeClass("active");
-	$("#notwatched").parent().addClass("active");
+	slideNavigation.$nextButtons.addClass("block-next");
+	$("#" + switcher).button('toggle');
+	$("#" + switcher).removeClass(rateButtons.colors[switcher]).removeClass("active");
+	$("#notwatched").addClass("active");
 };
 
 function fillRate(rate) {
 	var switcher = rate.toLowerCase();
-	var colors = {};
-	colors["good"] = "btn-success";
-	colors["notunderstand"] = "btn-danger";
-	colors["trivial"] = "btn-info";
 	var rated = false;
-	if (colors[switcher] != undefined)
+	if (rateButtons.colors[switcher] != undefined)
 		rated = true;
-	for (var i in colors) {
-		$("#" + i).parent().removeClass(colors[i]);
+	for (var i in rateButtons.colors) {
+		$("#" + i).removeClass(rateButtons.colors[i]);
 	}
 	if (rated) {
-		$("#next_slide_button").removeClass("block-next");
-		$("#next_solutions_button").removeClass("block-next");
+		slideNavigation.$nextButtons.removeClass("block-next");
 	} else {
 		$("#notwatched").addClass("not-watched");
-		$("#next_slide_button").addClass("block-next");
-		$("#next_solutions_button").addClass("block-next");
+		slideNavigation.$nextButtons.addClass("block-next");
 	}
-	$("#" + switcher).parent().button('toggle');
-	$("#" + switcher).parent().addClass(colors[switcher]);
+	$("#" + switcher).button('toggle');
+	$("#" + switcher).addClass(rateButtons.colors[switcher]);
 };

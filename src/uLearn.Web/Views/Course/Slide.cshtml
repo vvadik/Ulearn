@@ -12,7 +12,7 @@
 	<div class="container body-content">
 		<div class="row">
 			<div class='slide'>
-				<h1>@Model.Slide.Title</h1>
+				<h1>@Model.Slide.Title <span class="score">@GetScore(Model.Score)</span></h1>
 				@if (Model.Slide is QuizSlide)
 				{
 					@Html.Action("Quiz", "Quiz", new { slide = Model.Slide as QuizSlide, courseId = Model.CourseId, userId = Model.UserId })
@@ -24,6 +24,15 @@
 				}
 				@Html.Partial("_AskBar")
 			</div>
+			@if (User.IsInRole(LmsRoles.Tester))
+			{
+				using (Html.BeginForm("ForgetAll", "Course"))
+				{
+					<input type="hidden" name="slideId" value="@Model.Slide.Id" />
+					<input type="hidden" name="courseId" value="@Model.CourseId" />
+					<button class="btn btn-danger" type="submit">Удалить прогресс</button>
+				}
+			}
 			@Html.Partial("_RatesBar")
 			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false })
 		</div>
@@ -47,3 +56,7 @@
 	}
 }
 
+@helper GetScore(Tuple<int, int> score)
+{
+	@(score.Item2 == 0 ? "" : string.Format("{0}/{1}", score.Item1, score.Item2))
+}
