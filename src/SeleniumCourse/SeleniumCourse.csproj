@@ -42,22 +42,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="U98_Sample\S010_SlidePage.cs" />
-    <Compile Include="U98_Sample\S020_ExerciseSlidePage.cs">
+    <Compile Include="Slides\U98_Sample\S010_SlidePage.cs" />
+    <Compile Include="Slides\U98_Sample\S020_ExerciseSlidePage.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="U98_Sample\_Code.cs" />
+    <Compile Include="Slides\U98_Sample\_Code.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Title.txt" />
-    <Content Include="U98_Sample\Prelude.txt" />
-    <Content Include="U98_Sample\S030-QuizSlidePage.xml">
+    <Content Include="Slides\U98_Sample\Prelude.txt" />
+    <Content Include="Slides\U98_Sample\S030-QuizSlidePage.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="U98_Sample\Title.txt" />
+    <Content Include="Slides\U98_Sample\Title.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\uLearn\uLearn.csproj">

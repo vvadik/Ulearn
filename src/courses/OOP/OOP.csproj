@@ -106,7 +106,17 @@
     <Compile Include="Slides\U03_DataStructure\S050_Generics.cs" />
     <Compile Include="Slides\U03_DataStructure\S060_LimitedAutocompleteService.cs" />
     <Compile Include="Slides\U03_DataStructure\S070_Mocks.cs" />
+    <Compile Include="Slides\U98_Sample\S010_SlidePage.cs" />
+    <Compile Include="Slides\U98_Sample\S020_ExerciseSlidePage.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Slides\U98_Sample\_Code.cs" />
     <Content Include="CoursesTests.cs" />
+    <Content Include="Slides\U98_Sample\Prelude.txt" />
+    <Content Include="Slides\U98_Sample\S030-QuizSlidePage.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Slides\U98_Sample\Title.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">

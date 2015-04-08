@@ -17,7 +17,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 		private IWebElement hintsButton;
 		private List<Hint> hints;
 		private static readonly ULearnDb ulearnDb = new ULearnDb();
-		private static readonly CourseManager courseManager = new CourseManager(new DirectoryInfo(@"C:\Users\213\Desktop\GitHub\uLearn\src\uLearn.Web"));
 			
 		public ExerciseSlidePage(IWebDriver driver, IObserver parent)
 			: base(driver, parent)
@@ -64,22 +63,22 @@ namespace Selenium.UlearnDriverComponents.Pages
 			return hintsButton.Enabled;
 		}
 
-		public UlearnDriver ClickRunButton()
+		public void ClickRunButton()
 		{
 			runSolutionButton.Click();
-			return new UlearnDriver(driver);
+			parent.Update();
 		}
 
-		public UlearnDriver ClickResetButton()
+		public void ClickResetButton()
 		{
 			resetButton.Click();
-			return new UlearnDriver(driver);
+			parent.Update();
 		}
 
-		public UlearnDriver ClickHintsButton()
+		public void ClickHintsButton()
 		{
 			hintsButton.Click();
-			return new UlearnDriver(driver);
+			parent.Update();
 		}
 
 		public string GetTextFromSecretCode()
@@ -104,13 +103,9 @@ namespace Selenium.UlearnDriverComponents.Pages
 			CheckHints();
 		}
 
-		private void CheckHints()//experiment
+		private void CheckHints()
 		{
 			return;
-			var userId = ulearnDb.Users.First(x => x.UserName == "admin").Id;
-			var slideId = courseManager.GetCourse("courseId").Slides.First(x => x.Title == "Title").Id;
-			var reallyHints = ulearnDb.Hints.Where(x => x.UserId == userId && x.SlideId == slideId).ToList();
-			//var slide = courseManager.GetCourse("courseId").GetSlideById(slideId).Blocks.Where();
 		}
 
 		private void CheckButtons()

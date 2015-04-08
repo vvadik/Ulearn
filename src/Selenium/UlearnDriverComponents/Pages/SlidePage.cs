@@ -23,6 +23,17 @@ namespace Selenium.UlearnDriverComponents.Pages
 			Configure();
 		}
 
+		public bool ChechTex()
+		{
+			var texs = UlearnDriver.FindElementsSafely(driver, By.XPath(XPaths.TexXPath));
+			if (texs.Select((tex, i) => UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.GetRenderTexXPath(i))))
+				.Any(renderTex => renderTex == null))
+			{
+				throw new Exception("Tex exception");
+			}
+			return true;
+		}
+
 		private new void Configure()
 		{
 			base.Configure();
@@ -48,27 +59,14 @@ namespace Selenium.UlearnDriverComponents.Pages
 			foreach (var subBlock in subBlocks)
 			{
 				if (unionBlocks.Count == 0)
-				{
 					unionBlocks.Add(subBlock);
-					continue;
-				}
-				if (subBlock is SlidePageVideoBlock)
-				{
+				else if (subBlock is SlidePageVideoBlock)
 					unionBlocks.Add(subBlock);
-					continue;
-				}
-				if (unionBlocks[unionBlocks.Count - 1] is SlidePageTextBlock && subBlock is SlidePageTextBlock)
-				{
+				else if (unionBlocks[unionBlocks.Count - 1] is SlidePageTextBlock && subBlock is SlidePageTextBlock)
 					unionBlocks[unionBlocks.Count - 1] = new SlidePageTextBlock(
 						(unionBlocks[unionBlocks.Count - 1] as SlidePageTextBlock).Text + "\r\n" + (subBlock as SlidePageTextBlock).Text);
-					continue;
-				}
-				unionBlocks.Add(subBlock);
-				//if (unionBlocks[unionBlocks.Count - 1] is SlidePageCodeBlock && subBlock is SlidePageCodeBlock)
-				//{
-				//	unionBlocks[unionBlocks.Count - 1] = new SlidePageTextBlock(
-				//		(unionBlocks[unionBlocks.Count - 1] as SlidePageTextBlock).Text + "\r\n" + (subBlock as SlidePageTextBlock).Text);
-				//}
+				else
+					unionBlocks.Add(subBlock);
 			}
 			return unionBlocks;
 		}
@@ -96,7 +94,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 		public void RateSlide(Rate rate)
 		{
 			rates.Value.RateSlide(rate);
-			//parent.Update();
 		}
 
 		public bool IsSlideRated()

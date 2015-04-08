@@ -14,6 +14,8 @@ namespace SeleniumCourse.U98_Sample
 		 * Параграф 1
 		 * Параграф 2
 		 * Параграф 3
+		 * $\Sigma$ — Сигма
+		 * $\WrongTex$ — WrongTex
 		*/
 
 		/*

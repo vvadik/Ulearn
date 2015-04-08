@@ -128,6 +128,11 @@ namespace Selenium.UlearnDriverComponents
 		public static string UserGroupSelectField { get { return "html/body/div[3]/div/div/div[2]/form/div/input"; } }
 
 		public static string UserGroupSelectButton{ get { return "html/body/div[3]/div/div/div[2]/form/button"; } }
+
+		public static string TexXPath { get { return "html/body/div[2]/div[1]/div[1]/div[1]/p/span[@class = \"tex\"]"; } }
+
+		public static string GetRenderTexXPath(int texIndex)
+		{ return String.Format("html/body/div[2]/div[1]/div[1]/div[1]/p/span[@class = \"tex\"][{0}]/span/span/span[3]/span", texIndex); } 
 	}
 
 	public class Titles
