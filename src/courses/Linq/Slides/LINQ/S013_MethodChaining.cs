@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("Method chaining", "{B7EDA13D-77E5-40B6-B5A9-66775E900EA6}")]
 	public class S013_MethodChaining

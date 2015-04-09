@@ -25,6 +25,7 @@ namespace uLearn.Web.Models
 		[Required]
 		[StringLength(64)]
 		[Index("FullIndex", 2)]
+		[Index]
 		public string SlideId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }

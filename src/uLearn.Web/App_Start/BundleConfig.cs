@@ -21,6 +21,7 @@ namespace uLearn.Web
 				"~/Scripts/modernizr-*"));
 
 			bundles.Add(new ScriptBundle("~/slide-js").Include(
+				"~/flexslider/jquery.flexslider.js",
 				"~/katex/katex.min.js",
 				"~/Jsdifflib/jsdifflib.js",
 				"~/Scripts/slide-*"
@@ -30,6 +31,7 @@ namespace uLearn.Web
 				"~/codemirror/lib/codemirror.js",
 				"~/codemirror/mode/clike/clike.js",
 				"~/codemirror/addon/hint/show-hint.js",
+				"~/codemirror/addon/hint/cscompleter.js",
 				"~/codemirror/addon/hint/csharp-hint.js",
 				"~/codemirror/addon/edit/closebrackets.js",
 				"~/codemirror/addon/edit/matchbrackets.js",
@@ -38,8 +40,14 @@ namespace uLearn.Web
 
 			bundles.Add(new ScriptBundle("~/bootstrap-js").Include(
 				"~/Scripts/bootstrap.js",
+				"~/Scripts/bootstrap.file-input.js",
 				"~/Scripts/buttons.js",
-				"~/Scripts/respond.js"));
+				"~/Scripts/respond.js"
+				));
+
+			bundles.Add(new StyleBundle("~/flexslider/flexslider.css").Include(
+				"~/flexslider/flexslider.css"
+				));
 
 			bundles.Add(new StyleBundle("~/css").Include(
 				"~/katex/katex.min.css",

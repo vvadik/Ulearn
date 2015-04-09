@@ -14,8 +14,6 @@ namespace uLearn.CSharp
 		{
 			var slide =
 				(ExerciseSlide)GenerateSlideFromFile(@"..\..\..\courses\BasicProgramming\Slides\U03_Cycles\S041_PowerOfTwo.cs");
-			Console.WriteLine(slide.Solution.ExerciseCode);
-			Console.WriteLine(slide.Solution.IndexForInsert);
 			Console.WriteLine(slide.Solution.BuildSolution("public void T(){}"));
 		}
 
@@ -268,15 +266,60 @@ namespace uLearn.CSharp
 			Assert.That(renderedText, Contains.Substring(expected));
 		}
 
+		[Test]
+		public void include_many_classes_on_slide()
+		{
+			var slide = GenerateSlide("ManyClasses.cs");
+			var code = slide.Blocks[0].Text();
+			Assert.That(code, Is.StringContaining("M0()"));
+			Assert.That(code, Is.StringContaining("M()"));
+			Assert.That(code, Is.StringContaining("ManyClasses3"));
+			Assert.That(code, Is.Not.StringContaining("ManyClasses1"));
+			Assert.That(code, Is.Not.StringContaining("ManyClasses2"));
+		}
+
+		[Test]
+		public void set_initial_exercise_code_even_if_no_exercise_method()
+		{
+			var slide = (ExerciseSlide)GenerateSlide("ExerciseWithoutExerciseMethod.cs");
+			Assert.That(slide.ExerciseInitialCode.Trim(), Is.StringStarting("class MyClass"));
+		}
+		[Test]
+		public void insert_userSolution_outside_class_if_exercise_is_under_class()
+		{
+			var slide = (ExerciseSlide)GenerateSlide("ExerciseWithoutExerciseMethod.cs");
+			var sol = slide.Solution.BuildSolution("public class MyClass{}").SourceCode;
+			Assert.IsNotNull(sol);
+			var indexOfMainClass = sol.IndexOf("ExerciseWithoutExerciseMethod");
+			var indexOfSolutionClass = sol.IndexOf("class MyClass");
+			Assert.That(indexOfSolutionClass, Is.LessThan(indexOfMainClass));
+			Assert.That(indexOfSolutionClass, Is.GreaterThanOrEqualTo(0));
+			Assert.That(indexOfMainClass, Is.GreaterThanOrEqualTo(0));
+		}
+
 
 		private static Slide GenerateSlide(string name)
 		{
-			return SlideParser.ParseSlide(@".\tests\" + name, null, includeName => "included(" + includeName + ")");
+			return SlideParser.ParseSlide(@".\tests\" + name, null, new StubFS());
 		}
 		
 		private static Slide GenerateSlideFromFile(string path)
 		{
-			return SlideParser.ParseSlide(path, null, includeName => "included(" + includeName + ")");
+			return SlideParser.ParseSlide(path, null, new StubFS());
+		}
+
+		private class StubFS : IFileSystem
+		{
+			public string GetContent(string filepath)
+			{
+				return "included(" + filepath + ")";
+			}
+
+			public string[] GetFilenames(string dirPath)
+			{
+				return new[] { "a.png", "b.png" };
+			}
 		}
 	}
+
 }

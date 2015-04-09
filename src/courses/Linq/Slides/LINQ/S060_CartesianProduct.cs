@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.Linq.Slides.LINQ
+namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 {
 	[Slide("Декартово произведение", "{FF3215D3-5CC7-4C28-83B1-77465F570DC8}")]
 	public class S060_CartesianProduct : SlideTestBase
@@ -13,7 +13,10 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		Одно из не совсем очевидных применений `SelectMany` — это вычисление декартова произведения двух множеств.
 		Опробуйте этот трюк на следующей задаче:
 
-		Вычислить множество всех соседей заданной точки в смысле 8-связности.
+		Вычислить координаты всех восьми соседей заданной точки.
+
+		Можете полагаться на то, что в классе `Point` переопределен метод `Equals`, 
+		сравнивающий точки покоординатно.
 
 		*/
 
@@ -62,13 +65,13 @@ Neighbours of (0 0)
 				.SelectMany(dx => d.Select(dy => new Point(p.X + dx, p.Y + dy)))
 				.Where(n => !n.Equals(p));
 			/*uncomment
-			int[] d = {-1, 0, 1};
+			int[] d = {-1, 0, 1}; // используйте подсказку, если не понимаете зачем тут этот массив :)
 			return ...
 			*/
 		}
 
 		[HideOnSlide]
-		public static bool IsRightCartesian(IEnumerable<Point> neighbours)
+		public static bool IsRightCartesian(IEnumerable<Point> neighbors)
 		{
 			var correctAnswer = new HashSet<Point>()
 			{
@@ -81,7 +84,7 @@ Neighbours of (0 0)
 				new Point(2, 2),
 				new Point(2, 3)
 			};
-			return neighbours.All(correctAnswer.Contains);
+			return neighbors.All(correctAnswer.Contains);
 		}
 
 		[HideOnSlide]

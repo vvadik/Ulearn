@@ -1,5 +1,9 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -14,9 +18,13 @@ namespace uLearn.Web.Controllers
 	[Authorize]
 	public class AccountController : Controller
 	{
+		private readonly ULearnDb db;
+		private readonly CourseManager courseManager;
 		public AccountController()
 			: this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb())))
 		{
+			db = new ULearnDb();
+			courseManager = WebCourseManager.Instance;
 			UserManager.UserValidator =
 				new UserValidator<ApplicationUser>(UserManager)
 				{
@@ -31,13 +39,14 @@ namespace uLearn.Web.Controllers
 
 		public UserManager<ApplicationUser> UserManager { get; private set; }
 
-		[Authorize(Roles = LmsRoles.Admin)]
-		public ActionResult List()
+		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
+		public ActionResult List(string namePrefix = null, string role = null)
 		{
-			var applicationUsers = new ULearnDb().Users.OrderBy(u => u.UserName).ToList();
-			return View(applicationUsers);
+			IQueryable<ApplicationUser> applicationUsers = new ULearnDb().Users;
+			if (!string.IsNullOrEmpty(namePrefix)) applicationUsers = applicationUsers.Where(u => u.UserName.StartsWith(namePrefix));
+			if (!string.IsNullOrEmpty(role)) applicationUsers = applicationUsers.Where(u => u.Roles.Any(r => r.Role.Name == role));
+			return View(applicationUsers.OrderBy(u => u.UserName).Take(50).ToList());
 		}
-
 
 		[Authorize(Roles = LmsRoles.Admin)]
 		public async Task<ActionResult> ToggleRole(string userId, string role)
@@ -53,7 +62,6 @@ namespace uLearn.Web.Controllers
 		[Authorize(Roles = LmsRoles.Admin)]
 		public async Task<ActionResult> DeleteUser(string userId)
 		{
-			var db = new ULearnDb();
 			ApplicationUser user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
 			if (user != null)
 			{
@@ -63,6 +71,24 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("List");
 		}
 
+		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
+		public ActionResult Info(string userName)
+		{
+			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
+			if (user == null) return RedirectToAction("List");
+			var courses = new HashSet<string>(db.Visiters.Where(v => v.UserId == user.Id).Select(v => v.CourseId).Distinct());
+			return View(new UserInfoModel(user, courseManager.GetCourses().Where(c => courses.Contains(c.Id)).ToArray()));
+		}
+
+		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
+		public ActionResult CourseInfo(string userName, string courseId)
+		{
+			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
+			if (user == null) return RedirectToAction("List");
+			var course = courseManager.GetCourse(courseId);
+			return View(new UserCourseModel(course, user, db));
+		}
+
 		//
 		// GET: /Account/Login
 		[AllowAnonymous]
@@ -70,6 +96,16 @@ namespace uLearn.Web.Controllers
 		{
 			ViewBag.ReturnUrl = returnUrl;
 			return View();
+		}
+
+		protected override void OnException(ExceptionContext filterContext)
+		{
+			if (filterContext.Exception is HttpAntiForgeryException)
+			{
+				filterContext.ExceptionHandled = true;
+				filterContext.Result = RedirectToAction("Login");
+			}
+			base.OnException(filterContext);
 		}
 
 		//
@@ -476,6 +512,128 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Login");
 			}
 			return RedirectToAction("Manage");
+		}
+
+		[HttpPost, Authorize(Roles = LmsRoles.Admin)]
+		public async Task<ActionResult> ResetPassword(string newPassword, string userId)
+		{
+			var user = await UserManager.FindByIdAsync(userId);
+			if (user == null) return RedirectToAction("List");
+			await UserManager.RemovePasswordAsync(userId);
+			await UserManager.AddPasswordAsync(userId, newPassword);
+			return RedirectToAction("Info", new{user.UserName});
+		}
+	}
+
+	public class UserInfoModel
+	{
+		public ApplicationUser User { get; set; }
+		public Course[] Courses { get; private set; }
+
+		public UserInfoModel(ApplicationUser user, Course[] courses)
+		{
+			User = user;
+			Courses = courses;
+		}
+	}
+
+	public class UserCourseModel
+	{
+
+		public UserCourseModel(Course course, ApplicationUser user, ULearnDb db)
+		{
+			Course = course;
+			User = user;
+
+			var visits = db.Visiters.Where(v => v.UserId == user.Id && v.CourseId == course.Id).GroupBy(v => v.SlideId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
+			var unitResults = new Dictionary<string, UserCourseUnitModel>();
+			foreach (var slide in Course.Slides)
+			{
+				var unit = slide.Info.UnitName;
+				if (!unitResults.ContainsKey(unit))
+					unitResults.Add(unit, new UserCourseUnitModel
+					{
+						UnitName = unit,
+						SlideVisits = new ProgressModel(),
+						Exercises = new ProgressModel(),
+						Quizes = new ProgressModel(),
+						Total = new ProgressModel()
+					});
+
+				var res = unitResults[unit];
+				var isVisited = visits.ContainsKey(slide.Id);
+				var isPassed = isVisited && visits[slide.Id].IsPassed;
+				var score = isPassed ? visits[slide.Id].Score : 0;
+
+				res.SlideVisits.Total++;
+				res.Total.Total += slide.MaxScore;
+				res.Total.Earned += score;
+				
+				if (isVisited)
+					res.SlideVisits.Earned++;
+
+				if (slide is ExerciseSlide)
+				{
+					res.Exercises.Total += slide.MaxScore;
+					res.Exercises.Earned += score;
+				}
+
+				if (slide is QuizSlide)
+				{
+					res.Quizes.Total += slide.MaxScore;
+					res.Quizes.Earned += score;
+				}
+			}
+
+			Units = course.GetUnits().Select(unitName => unitResults[unitName]).ToArray();
+			Total = new UserCourseUnitModel
+			{
+				Total = new ProgressModel(),
+				Exercises = new ProgressModel(),
+				SlideVisits = new ProgressModel(),
+				Quizes = new ProgressModel()
+			};
+			foreach (var result in Units)
+			{
+				Total.Total.Add(result.Total);
+				Total.Exercises.Add(result.Exercises);
+				Total.SlideVisits.Add(result.SlideVisits);
+				Total.Quizes.Add(result.Quizes);
+			}
+		}
+
+		public ApplicationUser User { get; set; }
+		public Course Course;
+		public UserCourseUnitModel[] Units;
+		public UserCourseUnitModel Total;
+	}
+
+	public class UserCourseUnitModel
+	{
+		public string UnitName;
+		public ProgressModel Total;
+		public ProgressModel Exercises;
+		public ProgressModel SlideVisits;
+		public ProgressModel Quizes;
+	}
+
+	public class ProgressModel
+	{
+		public int Earned;
+		public int Total;
+		public decimal? Progress { get { return Total == 0 ? null : (decimal?)Earned / Total; } }
+
+		public override string ToString()
+		{
+			if (Progress.HasValue)
+				return Progress.Value.ToString("0%");
+			return "—";
+		}
+
+		public void Add(ProgressModel progress)
+		{
+			Earned += progress.Earned;
+			Total += progress.Total;
 		}
 	}
 }

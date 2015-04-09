@@ -17,6 +17,7 @@ namespace uLearn.Web.Models
 
 		[Required]
 		[StringLength(64)]
+		[Index("AcceptedList", 1)]
 		public string SlideId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
@@ -24,30 +25,41 @@ namespace uLearn.Web.Models
 		[StringLength(64)]
 		public string UserId { get; set; }
 
+		public virtual TextBlob SolutionCode { get; set; }
+
+		[StringLength(40)]
 		[Required]
-		[StringLength(4096)]
-		public string Code { get; set; }
+		public string SolutionCodeHash { get; set; }
 
 		[Required]
+		[Index("AcceptedList", 3)]
 		public int CodeHash { get; set; }
 
 		public virtual IList<Like> Likes { get; set; }
 
 		[Required]
+		[Index("AcceptedList", 4)]
 		public DateTime Timestamp { get; set; }
 
 		[Required]
-		[Index]
+		[Index("AcceptedList", 2)]
 		public bool IsRightAnswer { get; set; }
 
 		[Required]
 		public bool IsCompilationError { get; set; }
 
-		[StringLength(4096)]
-		public string CompilationError { get; set; }
+		public virtual TextBlob CompilationError { get; set; }
 
-		[StringLength(4096)]
-		public string Output { get; set; }
+		[StringLength(40)]
+		public string CompilationErrorHash { get; set; }
+
+		public virtual TextBlob Output { get; set; }
+
+		[StringLength(40)]
+		public string OutputHash { get; set; }
+
+		[StringLength(40)]
+		public string ExecutionServiceName { get; set; }
 
 		public string GetVerdict()
 		{

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using uLearn.CSharp;
 
-namespace uLearn.Courses.Linq.Slides.LINQ
+namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 {
 	[Slide("Объединение коллекций", "{7DB3F797-B99B-4580-ABE6-BB4EE929BB6B}")]
 	public class S050_SelectManyExercise : SlideTestBase

@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.Ajax.Utilities;
-using Microsoft.Owin.Security.Provider;
-using NUnit.Framework;
 using uLearn.Quizes;
-using uLearn.Web.Migrations;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts
@@ -105,15 +100,18 @@ namespace uLearn.Web.DataContexts
 			{
 				ans[item.Id] = false;
 			}
+			var isRight = false;
 			foreach (var quizItem in db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId && q.QuizId == block.Id && q.ItemId != null && !q.isDropped))
 			{
+				isRight = quizItem.IsRightQuizBlock;
 				ans[quizItem.ItemId] = true;
 			}
 			return new ChoiceBlockAnswerInfo
 			{
 				AnswersId = ans,
 				Id = questionIndex.ToString(),
-				RealyRightAnswer = new HashSet<string>(block.Items.Where(x => x.IsCorrect).Select(x => x.Id))
+				RealyRightAnswer = new HashSet<string>(block.Items.Where(x => x.IsCorrect).Select(x => x.Id)),
+				IsRight = isRight
 			};
 		}
 

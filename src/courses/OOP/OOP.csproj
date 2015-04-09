@@ -105,8 +105,46 @@
     <Compile Include="Slides\U03_DataStructure\S030_Heap.cs" />
     <Compile Include="Slides\U03_DataStructure\S050_Generics.cs" />
     <Compile Include="Slides\U03_DataStructure\S060_LimitedAutocompleteService.cs" />
-    <Compile Include="Slides\U03_DataStructure\S070_Mocks.cs" />
-    <Content Include="CoursesTests.cs" />
+    <Compile Include="CoursesTests.cs" />
+    <Compile Include="Slides\U04_UI\S015_Contorls.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Slides\U04_UI\S030_SimpleUITask.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Slides\U04_UI\S020_Layouts.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Slides\U04_UI\S010_Intro.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Slides\U05_UI2\S050_Observable.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Slides\U05_UI2\S060_ChartTask.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Slides\U05_UI2\S040_ParametersTask.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Slides\U05_UI2\S030_ListTask.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Slides\U05_UI2\S010_FunctionsExplorer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Slides\U05_UI2\S020_SeparatedPresentation.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Slides\U10_NoIfs\S010_Ветвления.cs" />
+    <Compile Include="Slides\U10_NoIfs\S020_Wood.cs" />
+    <Compile Include="Slides\U10_NoIfs\S030_Основа.cs" />
+    <Compile Include="Slides\U10_NoIfs\S040_Визуализация.cs" />
+    <Compile Include="Slides\U12_Network\S010_Network.cs" />
+    <Compile Include="Slides\U12_Network\S030_ServerAndClients.cs" />
+    <Compile Include="Slides\U12_Network\S040_Config.cs" />
+    <Compile Include="Slides\U12_Network\S020_Protocol.cs" />
+    <Compile Include="Slides\U11_AI\S010_AI.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">
@@ -124,15 +162,28 @@
     <Content Include="Slides\U01_DataTypes_And_Algorithms\Title.txt" />
     <Content Include="Slides\U00_Intro\Title.txt" />
     <Content Include="Slides\U02_Polymorphism\Title.txt" />
-    <Content Include="Slides\U03_DataStructure\heap.bmp" />
+    <Content Include="Slides\U03_DataStructure\heap.png" />
     <Content Include="Slides\U03_DataStructure\Title.txt" />
+    <Content Include="Slides\U04_UI\anchors.png" />
+    <Content Include="Slides\U04_UI\controls.png" />
+    <Content Include="Slides\U04_UI\Title.txt" />
+    <Content Include="Slides\U04_UI\ui.png" />
+    <Content Include="Slides\U05_UI2\mockup-list.png" />
+    <Content Include="Slides\U05_UI2\mockup-params.png" />
+    <Content Include="Slides\U05_UI2\mockup.png" />
+    <Content Include="Slides\U05_UI2\observable.png" />
+    <Content Include="Slides\U05_UI2\separated-presentation.png" />
+    <Content Include="Slides\U05_UI2\Title.txt" />
+    <Content Include="Slides\U10_NoIfs\Title.txt" />
+    <Content Include="Slides\U12_Network\Title.txt" />
+    <Content Include="Slides\U11_AI\Title.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>REM copy this post build step to new course
-$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe $(TargetPath) || exit /b
 del "$(OutDir)$(ProjectName).zip"
-"$(SolutionDir)..\tools\7z\7za.exe" a "$(OutDir)$(ProjectName).zip" "$(ProjectDir)Slides\*"
+"$(SolutionDir)..\tools\7z\7za.exe" a -mcu "$(OutDir)$(ProjectName).zip" "$(ProjectDir)Slides\*"
 copy "$(OutDir)$(ProjectName).zip" $(SolutionDir)uLearn.Web\Courses.Staging\</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
