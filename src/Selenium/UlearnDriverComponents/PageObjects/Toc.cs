@@ -14,11 +14,9 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		private Dictionary<string, UnitInitInfo> initInfo;
 
 		private Dictionary<string, TocUnit> statistics;
-		private readonly IObserver parent;
 
-		public Toc(IWebDriver driver, IObserver parent)
+		public Toc(IWebDriver driver)
 		{
-			this.parent = parent;
 			this.driver = driver;
 
 			Configure();
@@ -36,7 +34,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 				if (unitName == "Total statistics" || unitName == "Users statistics" || unitName == "Personal statistics")
 				{
 					if (!statistics.ContainsKey(unitName))
-						statistics.Add(unitName, new TocUnit(driver, i, parent));
+						statistics.Add(unitName, new TocUnit(driver, i));
 				}
 				else
 				{
@@ -45,7 +43,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 					var collapsedElement = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UnitInfoXPath(i)));
 					var isCollapsed = UlearnDriver.HasCss(collapsedElement, "collapse in");
 					initInfo.Add(unitName, new UnitInitInfo(unitsElements[i], i, isCollapsed));
-					units.Add(unitName, new Lazy<ITocUnit>(() => new TocUnit(driver, initInfo[unitName].Index, parent)));
+					units.Add(unitName, new Lazy<ITocUnit>(() => new TocUnit(driver, initInfo[unitName].Index)));
 				}
 			}
 		}
@@ -72,11 +70,6 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		public bool IsCollapsed(string unitName)
 		{
 			return initInfo[unitName].IsCollapsed;
-		}
-
-		public void Update()
-		{
-			Configure();
 		}
 	}
 

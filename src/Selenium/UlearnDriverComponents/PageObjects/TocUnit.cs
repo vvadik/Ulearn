@@ -6,18 +6,15 @@ using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.PageObjects
 {
-	public class TocUnit : ITocUnit, IObserver
+	public class TocUnit : ITocUnit
 	{
 		private readonly IWebDriver driver;
 		private List<Lazy<ITocSlide>> slides;
-		private readonly IObserver parent;
 		private readonly int unitIndex;
 		private IWebElement headerElement;
-		private readonly HashSet<IObserver> observers = new HashSet<IObserver>();
 
-		public TocUnit(IWebDriver driver, int unitIndex, IObserver parent)
+		public TocUnit(IWebDriver driver, int unitIndex)
 		{
-			this.parent = parent;
 			this.driver = driver;
 			this.unitIndex = unitIndex;
 
@@ -35,7 +32,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 			for (var ind = 0; ind < slidesCount; ind++)
 			{
 				var lazyIndex = ind;
-				slides.Add(new Lazy<ITocSlide>(() => new TocSlideControl(driver, lazyIndex, unitIndex, parent)));
+				slides.Add(new Lazy<ITocSlide>(() => new TocSlideControl(driver, lazyIndex, unitIndex)));
 				//if (slides.Count > ind)
 				//{
 				//	if (slides[ind] != null)
@@ -54,7 +51,6 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		public void Click()
 		{
 			headerElement.Click();
-			parent.Update();
 		}
 
 		public IReadOnlyCollection<string> GetSlidesName()
@@ -65,13 +61,6 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		public IReadOnlyCollection<ITocSlide> GetSlides()
 		{
 			return slides.Select(x => x.Value).ToList();
-		}
-
-		public void Update()
-		{
-			Configure();
-			//foreach (var o in observers)
-			//	o.Update();
 		}
 	}
 }

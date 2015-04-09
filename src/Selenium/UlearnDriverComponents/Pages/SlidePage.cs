@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
-using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.PageObjects;
 
 namespace Selenium.UlearnDriverComponents.Pages
@@ -17,8 +16,8 @@ namespace Selenium.UlearnDriverComponents.Pages
 		public bool IsUserFirstVisit { get; private set; }
 
 
-		public SlidePage(IWebDriver driver, IObserver parent)
-			: base(driver, parent)
+		public SlidePage(IWebDriver driver)
+			: base(driver)
 		{
 			Configure();
 		}
@@ -75,7 +74,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 		{
 			groupSelector.SendKeys(groupName);
 			groupSelectButton.Click();
-			parent.Update();
 		}
 
 		private static SlidePageBlock CreateBlock(IWebElement element)

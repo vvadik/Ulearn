@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
-using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.PageObjects;
 
 namespace Selenium.UlearnDriverComponents.Pages
@@ -15,8 +14,8 @@ namespace Selenium.UlearnDriverComponents.Pages
 		private IWebElement submitAgainStatus;
 		private QuizStatus quizStatus;
 
-		public QuizSlidePage(IWebDriver driver, IObserver parent)
-			: base(driver, parent)
+		public QuizSlidePage(IWebDriver driver)
+			: base(driver)
 		{
 			Configure();
 		}

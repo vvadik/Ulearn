@@ -8,11 +8,9 @@ namespace Selenium.UlearnDriverComponents.Pages
 	public class UlearnPage
 	{
 		protected readonly IWebDriver driver;
-		protected IObserver parent;
 
-		public UlearnPage(IWebDriver driver, IObserver parent)
+		public UlearnPage(IWebDriver driver)
 		{
-			this.parent = parent;
 			this.driver = driver;
 		}
 
@@ -42,22 +40,22 @@ namespace Selenium.UlearnDriverComponents.Pages
 			return PageType.SlidePage;
 		}
 
-		private static readonly Dictionary<PageType, Func<IWebDriver, IObserver, UlearnPage>> pageFabric =
-			new Dictionary<PageType, Func<IWebDriver, IObserver, UlearnPage>>
+		private static readonly Dictionary<PageType, Func<IWebDriver, UlearnPage>> pageFabric =
+			new Dictionary<PageType, Func<IWebDriver, UlearnPage>>
 		{
-			{PageType.SignInPage, (driver, parent) => new SignInPage(driver, parent) },
-			{PageType.SlidePage, (driver, parent) => new SlidePage(driver, parent) },
-			{PageType.ExerciseSlidePage, (driver, parent) => new ExerciseSlidePage(driver, parent) },
-			{PageType.SolutionsPage, (driver, parent) => new SolutionsPage(driver, parent) },
-			{PageType.StartPage, (driver, parent) => new StartPage(driver, parent) },
-			{PageType.QuizSlidePage, (driver, parent) => new QuizSlidePage(driver, parent) },
-			{PageType.RegistrationPage, (driver, parent) => new RegistrationPage(driver, parent) },
-			{PageType.IncomprehensibleType, (driver, parent) => new UlearnPage(driver, parent) },
+			{PageType.SignInPage, driver => new SignInPage(driver) },
+			{PageType.SlidePage, driver => new SlidePage(driver) },
+			{PageType.ExerciseSlidePage, driver => new ExerciseSlidePage(driver) },
+			{PageType.SolutionsPage, driver => new SolutionsPage(driver) },
+			{PageType.StartPage, driver => new StartPage(driver) },
+			{PageType.QuizSlidePage, driver => new QuizSlidePage(driver) },
+			{PageType.RegistrationPage, driver => new RegistrationPage(driver) },
+			{PageType.IncomprehensibleType, driver => new UlearnPage(driver) },
 		};
 
 		public UlearnPage CastTo(PageType pageType)
 		{
-			return pageFabric[pageType](driver, parent);
+			return pageFabric[pageType](driver);
 		}
 
 		public string GetUserName()

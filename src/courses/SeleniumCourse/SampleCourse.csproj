@@ -42,7 +42,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Slides\U98_Sample\S010_SlidePage.cs" />
+    <Compile Include="Slides\U98_Sample\S010_TextBlocks.cs" />
+    <Compile Include="Slides\U98_Sample\S011_GoodTeX.cs" />
+    <Compile Include="Slides\U98_Sample\S012_WrongTeX.cs" />
+    <Compile Include="Slides\U98_Sample\S013_VideoBlock.cs" />
+    <Compile Include="Slides\U98_Sample\S014_CodeBlock.cs" />
     <Compile Include="Slides\U98_Sample\S020_ExerciseSlidePage.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>

@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OpenQA.Selenium;
-using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.PageObjects;
 using uLearn;
-using uLearn.Web.DataContexts;
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
@@ -16,10 +14,9 @@ namespace Selenium.UlearnDriverComponents.Pages
 		private IWebElement resetButton;
 		private IWebElement hintsButton;
 		private List<Hint> hints;
-		private static readonly ULearnDb ulearnDb = new ULearnDb();
-			
-		public ExerciseSlidePage(IWebDriver driver, IObserver parent)
-			: base(driver, parent)
+
+		public ExerciseSlidePage(IWebDriver driver)
+			: base(driver)
 		{
 			Configure();
 		}
@@ -66,19 +63,16 @@ namespace Selenium.UlearnDriverComponents.Pages
 		public void ClickRunButton()
 		{
 			runSolutionButton.Click();
-			parent.Update();
 		}
 
 		public void ClickResetButton()
 		{
 			resetButton.Click();
-			parent.Update();
 		}
 
 		public void ClickHintsButton()
 		{
 			hintsButton.Click();
-			parent.Update();
 		}
 
 		public string GetTextFromSecretCode()

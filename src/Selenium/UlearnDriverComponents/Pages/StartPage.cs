@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
-using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
@@ -10,8 +9,8 @@ namespace Selenium.UlearnDriverComponents.Pages
 	{
 		private const string courseBlockClass = "col-md-6";
 
-		public StartPage(IWebDriver driver, IObserver parent) 
-			: base(driver, parent)
+		public StartPage(IWebDriver driver) 
+			: base(driver)
 		{
 			if (!driver.Title.Equals(Titles.StartPageTitle))
 				throw new IllegalLocatorException("Это не стартовая страница, это: "
@@ -22,7 +21,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 		{
 			var loginLinkButton = driver.FindElement(ElementsId.SignInButton);
 			loginLinkButton.Click();
-			parent.Update();
 			return new UlearnDriver(driver);
 		}
 
@@ -48,7 +46,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 				courseBlocks[index].FindElement(By.LinkText("Поехали!")).Click();
 			else
 				throw new NotFoundException(string.Format("Не найдена кнопка перехода на курс {0}", courseTitle));
-			parent.Update();
 		}
 	}
 }

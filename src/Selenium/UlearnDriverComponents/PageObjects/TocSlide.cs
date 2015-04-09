@@ -8,13 +8,12 @@ using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.PageObjects
 {
-	public class TocSlideControl : ITocSlide, IObserver
+	public class TocSlideControl : ITocSlide
 	{
 		private Lazy<SlideListItem> item;
 		private readonly IWebDriver driver;
 		private readonly int slideIndex;
 		private readonly int unitIndex;
-		private readonly IObserver parent;
 		private Lazy<string> name;
 		public SlideLabelInfo Info 
 		{
@@ -37,12 +36,11 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 					PageType.SlidePage;
 		}
 
-		public TocSlideControl(IWebDriver driver, int slideIndex, int unitIndex, IObserver parent)
+		public TocSlideControl(IWebDriver driver, int slideIndex, int unitIndex)
 		{
 			this.driver = driver;
 			this.slideIndex = slideIndex;
 			this.unitIndex = unitIndex;
-			this.parent = parent;
 			Configure();
 		}
 
@@ -50,7 +48,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		{
 			name = new Lazy<string>(
 				() => UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocSlideXPath(unitIndex, slideIndex))).Text);
-			item = new Lazy<SlideListItem>(() =>  new SlideListItem(driver, slideIndex, unitIndex, parent));
+			item = new Lazy<SlideListItem>(() =>  new SlideListItem(driver, slideIndex, unitIndex));
 		}
 
 		public void Click()
@@ -62,11 +60,6 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		{
 			get { return name.Value; }
 		}
-
-		public void Update()
-		{
-			Configure();
-		}
 	}
 
 	public class SlideListItem
@@ -74,11 +67,10 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		private readonly Lazy<IWebElement> slideElement;
 		private readonly Lazy<IWebElement> slideLabelElement;
 		private readonly IWebDriver driver;
-		private readonly IObserver parent;
 		private readonly int slideIndex;
 		private readonly int unitIndex;
 
-		public SlideListItem(IWebDriver driver, int slideIndex, int unitIndex, IObserver parent)
+		public SlideListItem(IWebDriver driver, int slideIndex, int unitIndex)
 		{
 			this.slideIndex = slideIndex;
 			this.unitIndex = unitIndex;
@@ -87,13 +79,11 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 				() => UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocSlideXPath(unitIndex, slideIndex))));
 			slideLabelElement = new Lazy<IWebElement>(
 				() => UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocSlideLabelXPath(unitIndex, slideIndex))));
-			this.parent = parent;
 		}
 
 		public void Click()
 		{
 			slideElement.Value.Click();
-			parent.Update();
 		}
 
 		public SlideLabelInfo GetInfo()

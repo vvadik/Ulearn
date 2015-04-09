@@ -1,5 +1,4 @@
 ﻿using OpenQA.Selenium;
-using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
@@ -10,8 +9,8 @@ namespace Selenium.UlearnDriverComponents.Pages
 		private IWebElement confirmPasswordField;
 		private IWebElement registerButton;
 
-		public RegistrationPage(IWebDriver driver, IObserver parent)
-			: base(driver, parent)
+		public RegistrationPage(IWebDriver driver)
+			: base(driver)
 		{
 			Configure();
 		}
@@ -43,7 +42,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 			passwordField.SendKeys(password);
 			confirmPasswordField.SendKeys(password);
 			registerButton.Click();
-			parent.Update();
 		}
 	}
 }

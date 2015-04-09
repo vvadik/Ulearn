@@ -14,7 +14,7 @@ using uLearn.Web.DataContexts;
 
 namespace Selenium.UlearnDriverComponents
 {
-	public class UlearnDriver : IObservable, IObserver, IUlearnDriver
+	public class UlearnDriver :  IUlearnDriver
 	{
 		private readonly IWebDriver driver;
 		private UlearnPage currentPage;
@@ -65,7 +65,7 @@ namespace Selenium.UlearnDriverComponents
 
 		private void DeterminePage()
 		{
-			var newPage = new UlearnPage(driver, this);
+			var newPage = new UlearnPage(driver);
 			var newPageType = newPage.GetPageType();
 			currentPage = newPage.CastTo(newPageType);
 		}
@@ -123,10 +123,7 @@ namespace Selenium.UlearnDriverComponents
 		{
 			if (pageType != PageType.SignInPage && pageType != PageType.StartPage && pageType != PageType.IncomprehensibleType)
 			{
-				if (toc == null)
-					toc = new Toc(driver, this);
-				else
-					toc.Update();
+				toc = new Toc(driver);
 			}
 			else
 				toc = null;
@@ -154,7 +151,7 @@ namespace Selenium.UlearnDriverComponents
 		{
 			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 
-			var startPage = new StartPage(driver, this);
+			var startPage = new StartPage(driver);
 			var signInPage = startPage.GoToSignInPage().currentPage as SignInPage;
 			if (signInPage == null)
 				throw new Exception("Sign in page not found...");
