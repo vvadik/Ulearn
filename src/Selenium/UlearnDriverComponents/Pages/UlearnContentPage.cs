@@ -9,8 +9,8 @@ namespace Selenium.UlearnDriverComponents.Pages
 	{
 		private Lazy<NavArrows> navArrows;
 
-		public UlearnContentPage(IWebDriver driver, IObserver parent)
-			: base(driver, parent)
+		public UlearnContentPage(IWebDriver driver)
+			: base(driver)
 		{
 			Configure();
 		}
@@ -20,21 +20,9 @@ namespace Selenium.UlearnDriverComponents.Pages
 			navArrows = new Lazy<NavArrows>(() => new NavArrows(driver));
 		}
 
-		public UlearnDriver ClickNextButton()
+		public NavArrows GetNavArrows()
 		{
-			parent.Update();
-			return navArrows.Value.ClickNextButton();
-		}
-
-		public UlearnDriver ClickPrevButton()
-		{
-			parent.Update();
-			return navArrows.Value.ClickPrevButton();
-		}
-
-		public bool IsActiveNextButton()
-		{
-			return navArrows.Value.IsActiveNextButton();
+			return navArrows.Value;
 		}
 
 		public string GetSlideName()

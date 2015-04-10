@@ -14,48 +14,19 @@ using uLearn.Web.DataContexts;
 
 namespace Selenium.UlearnDriverComponents
 {
-	public class UlearnDriver :  IUlearnDriver
+	public class UlearnDriver
 	{
 		private readonly IWebDriver driver;
 		private UlearnPage currentPage;
-		private Toc toc;
-		public static readonly CourseManager courseManager = new CourseManager(new DirectoryInfo(courseManagerPath));
 		private string currentUserName;
-		private string currentUserId;
 		private string currentSlideName;
 		private string currentSlideId;
-		private const string courseManagerPath = @"C:\Users\213\Desktop\GitHub\uLearn\src\uLearn.Web";
-		private readonly HashSet<IObserver> observers = new HashSet<IObserver>();
-		private static readonly Db db = new Db();
 
 		public UlearnDriver(IWebDriver driver)
 		{
 			this.driver = driver;
 
-			Configure();
-
-
-			//DesiredCapabilities caps = DesiredCapabilities.Chrome();
-			//driver.Manage()
-			//LoggingPreferences logPrefs = new LoggingPreferences();
-			//logPrefsenable(LogType.BROWSER, Level.ALL);
-			//caps.SetCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-		}
-
-		public Rate GetRateFromDb()
-		{
-			return db.GetRate(currentSlideId);
-		}
-
-
-		private void Configure()
-		{
-			DeterminePage();
-
-			DetermineUser();
-			BuildToc(currentPage.GetPageType());
-
-			DetermineContentPageSettings();
+			//Configure();
 		}
 
 		public string GetCurrentSlideId()
@@ -87,10 +58,7 @@ namespace Selenium.UlearnDriverComponents
 		{
 			currentUserName = currentPage.GetUserName();
 			if (currentUserName != null)
-			{
 				currentUserName = currentUserName.Replace("Здравствуй, ", "").Replace("!", "");
-				currentUserId = db.GetUserId(currentUserName);
-			}
 		}
 
 		public bool IsLogin
@@ -111,22 +79,11 @@ namespace Selenium.UlearnDriverComponents
 			if (registrationHeaderButton == null)
 				throw new NotFoundException();
 			registrationHeaderButton.Click();
-			Update();
 		}
 
 		public string GetCurrentSlideName()
 		{
 			return currentSlideName ?? "";
-		}
-
-		private void BuildToc(PageType pageType)
-		{
-			if (pageType != PageType.SignInPage && pageType != PageType.StartPage && pageType != PageType.IncomprehensibleType)
-			{
-				toc = new Toc(driver);
-			}
-			else
-				toc = null;
 		}
 
 		public UlearnPage GetPage()
@@ -136,15 +93,23 @@ namespace Selenium.UlearnDriverComponents
 
 		public IToc GetToc()
 		{
-			if (toc == null)
-				throw new NotFoundException("Toc is not found");
-			return toc;
+			return new Toc(driver);
+		}
+
+		public bool ChechTex()
+		{
+			var texs = UlearnDriver.FindElementsSafely(driver, By.XPath(XPaths.TexXPath));
+			if (texs.Select((tex, i) => UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.GetRenderTexXPath(i))))
+				.Any(renderTex => renderTex == null))
+			{
+				throw new Exception("Tex exception");
+			}
+			return true;
 		}
 
 		public void GoToStartPage()
 		{
 			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-			Update();
 		}
 
 		private SignInPage GoToSignInPage()
@@ -221,27 +186,6 @@ namespace Selenium.UlearnDriverComponents
 			{
 				return null;
 			}
-		}
-
-		public void AddObserver(IObserver observer)
-		{
-			observers.Add(observer);
-		}
-
-		public void RemoveObserver(IObserver observer)
-		{
-			observers.Remove(observer);
-		}
-
-		public void NotifyObservers()
-		{
-			foreach (var o in observers)
-				o.Update();
-		}
-
-		public void Update()
-		{
-			Configure();
 		}
 
 		public static readonly Dictionary<string, string> factory = new Dictionary<string, string>

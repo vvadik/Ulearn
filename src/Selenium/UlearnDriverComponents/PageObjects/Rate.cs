@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using OpenQA.Selenium;
 
 namespace Selenium.UlearnDriverComponents.PageObjects
 {
-	public class Rates
+	public class RateBlock
 	{
 		private readonly IWebDriver driver;
 		private readonly Dictionary<Rate, RateInfo> buttons;
-		public Rates(IWebDriver driver)
+		public RateBlock(IWebDriver driver)
 		{
 			this.driver = driver;
 			buttons = new Dictionary<Rate, RateInfo>();
@@ -29,6 +30,11 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		public bool IsActive(Rate rate)
 		{
 			return buttons[rate].isActive;
+		}
+
+		public Rate GetCurrentRate()
+		{
+			return new List<Rate> { Rate.Good, Rate.NotUnderstand, Rate.NotWatched }.FirstOrDefault(IsActive);
 		}
 
 		class RateInfo

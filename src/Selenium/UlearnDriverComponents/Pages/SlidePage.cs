@@ -8,7 +8,7 @@ namespace Selenium.UlearnDriverComponents.Pages
 {
 	public class SlidePage : UlearnContentPage
 	{
-		private Lazy<Rates> rates;
+		private Lazy<RateBlock> rates;
 		private List<SlidePageBlock> blocks;
 		private IWebElement groupSelector;
 		private IWebElement groupSelectButton;
@@ -22,21 +22,10 @@ namespace Selenium.UlearnDriverComponents.Pages
 			Configure();
 		}
 
-		public bool ChechTex()
-		{
-			var texs = UlearnDriver.FindElementsSafely(driver, By.XPath(XPaths.TexXPath));
-			if (texs.Select((tex, i) => UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.GetRenderTexXPath(i))))
-				.Any(renderTex => renderTex == null))
-			{
-				throw new Exception("Tex exception");
-			}
-			return true;
-		}
-
 		private new void Configure()
 		{
 			base.Configure();
-			rates = new Lazy<Rates>(() => new Rates(driver));
+			rates = new Lazy<RateBlock>(() => new RateBlock(driver));
 			var modal = UlearnDriver.FindElementSafely(driver, By.Id("selectGroupModal"));
 			if (modal != null)
 			{
@@ -89,24 +78,9 @@ namespace Selenium.UlearnDriverComponents.Pages
 
 		public IReadOnlyCollection<SlidePageBlock> Blocks { get { return blocks; } }
 
-		public void RateSlide(Rate rate)
+		public RateBlock GetRateBlock()
 		{
-			rates.Value.RateSlide(rate);
-		}
-
-		public bool IsSlideRated()
-		{
-			return IsActiveNextButton();
-		}
-
-		public Rate GetCurrentRate()
-		{
-			return new List<Rate> { Rate.Good, Rate.NotUnderstand, Rate.NotWatched }.FirstOrDefault(IsRateActive);
-		}
-
-		public bool IsRateActive(Rate rate)
-		{
-			return rates.Value.IsActive(rate);
+			return rates.Value;
 		}
 	}
 }

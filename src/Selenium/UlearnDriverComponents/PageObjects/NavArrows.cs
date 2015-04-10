@@ -27,19 +27,17 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 				throw new NotFoundException("не найдена NextSolutionsButton");
 		}
 
-		public UlearnDriver ClickNextButton()
+		public void ClickNextButton()
 		{
 			if (nextSolutionsButton.Enabled)
 				nextSlideButton.Click();
 			else
 				nextSolutionsButton.Click();
-			return new UlearnDriver(driver);
 		}
 
-		public UlearnDriver ClickPrevButton()
+		public void ClickPrevButton()
 		{
 			prevSlideButton.Click();
-			return new UlearnDriver(driver);
 		}
 
 		public bool IsActiveNextButton()
@@ -47,7 +45,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 			return IsActive(nextSlideButton.Displayed ? nextSlideButton : nextSolutionsButton);
 		}
 
-		private static bool IsActive(IWebElement button)
+		private bool IsActive(IWebElement button)
 		{
 			return UlearnDriver.HasCss(button, "block_next");
 		}

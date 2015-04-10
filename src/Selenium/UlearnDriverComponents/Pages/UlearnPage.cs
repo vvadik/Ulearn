@@ -40,7 +40,7 @@ namespace Selenium.UlearnDriverComponents.Pages
 			return PageType.SlidePage;
 		}
 
-		private static readonly Dictionary<PageType, Func<IWebDriver, UlearnPage>> pageFabric =
+		private static readonly Dictionary<PageType, Func<IWebDriver, UlearnPage>> PageFabric =
 			new Dictionary<PageType, Func<IWebDriver, UlearnPage>>
 		{
 			{PageType.SignInPage, driver => new SignInPage(driver) },
@@ -55,7 +55,7 @@ namespace Selenium.UlearnDriverComponents.Pages
 
 		public UlearnPage CastTo(PageType pageType)
 		{
-			return pageFabric[pageType](driver);
+			return PageFabric[pageType](driver);
 		}
 
 		public string GetUserName()
