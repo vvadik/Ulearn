@@ -7,7 +7,7 @@ namespace Selenium.UlearnDriverComponents.Pages
 {
 	public class UlearnContentPage : UlearnPage
 	{
-		private Lazy<NavArrows> navArrows;
+		private Lazy<NavigationBlock> navArrows;
 
 		public UlearnContentPage(IWebDriver driver)
 			: base(driver)
@@ -17,10 +17,10 @@ namespace Selenium.UlearnDriverComponents.Pages
 
 		protected void Configure()
 		{
-			navArrows = new Lazy<NavArrows>(() => new NavArrows(driver));
+			navArrows = new Lazy<NavigationBlock>(() => new NavigationBlock(driver));
 		}
 
-		public NavArrows GetNavArrows()
+		public NavigationBlock GetNavArrows()
 		{
 			return navArrows.Value;
 		}

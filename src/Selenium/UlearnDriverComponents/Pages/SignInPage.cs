@@ -15,7 +15,7 @@ namespace Selenium.UlearnDriverComponents.Pages
 								+ driver.Title);
 		}
 
-		public UlearnDriver LoginValidUser(String userName, String password)
+		public StartPage LoginValidUser(String userName, String password)
 		{
 			var nameField = driver.FindElement(ElementsId.UserNameField);
 			nameField.SendKeys(userName);
@@ -27,10 +27,10 @@ namespace Selenium.UlearnDriverComponents.Pages
 			else
 				throw new NotFoundException("Не найдена стандартная кнопка входа");
 
-			return new UlearnDriver(driver);
+			return new StartPage(driver);
 		}
 
-		public UlearnDriver LoginVk()
+		public StartPage LoginVk()
 		{
 			var loginKey = driver.FindElements(By.ClassName("btn")).FirstOrDefault(x => x.Text == "ВКонтакте");
 			if (loginKey != null)
@@ -38,7 +38,7 @@ namespace Selenium.UlearnDriverComponents.Pages
 			else
 				throw new NotFoundException("Не найдена кнопка входа через ВК");
 
-			return new UlearnDriver(driver);
+			return new StartPage(driver);
 		}
 	}
 }

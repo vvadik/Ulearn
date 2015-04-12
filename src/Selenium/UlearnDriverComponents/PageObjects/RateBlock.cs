@@ -4,7 +4,7 @@ using OpenQA.Selenium;
 
 namespace Selenium.UlearnDriverComponents.PageObjects
 {
-	public class RateBlock
+	public class RateBlock : PageObject
 	{
 		private readonly IWebDriver driver;
 		private readonly Dictionary<Rate, RateInfo> buttons;
@@ -35,6 +35,11 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		public Rate GetCurrentRate()
 		{
 			return new List<Rate> { Rate.Good, Rate.NotUnderstand, Rate.NotWatched }.FirstOrDefault(IsActive);
+		}
+
+		public bool IsRated
+		{
+			get { return new List<Rate> { Rate.Good, Rate.NotUnderstand, Rate.NotWatched }.Any(IsActive); }
 		}
 
 		class RateInfo

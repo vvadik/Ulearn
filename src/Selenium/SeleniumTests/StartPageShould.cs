@@ -76,7 +76,7 @@ namespace Selenium.SeleniumTests
 				//ulearnDriver = startPage.GoToSignInPage();
 				//var signInPage = ulearnDriver.GetPage() as SignInPage;
 				//signInPage.
-				//Console.WriteLine(ulearnDriver.GetPage().GetPageType());
+				//Console.WriteLine(ulearnDriver.GetPage().GetCurrentPageType());
 			}
 		}
 	}

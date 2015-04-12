@@ -91,7 +91,6 @@
     <Compile Include="SeleniumTests\TestSeleniumCourse\MainEngineTest.cs" />
     <Compile Include="SeleniumTests\TocShould.cs" />
     <Compile Include="SeleniumTests\UlearnDriverTest.cs" />
-    <Compile Include="UlearnDriverComponents\Db.cs" />
     <Compile Include="UlearnDriverComponents\Interfaces\IObservable.cs" />
     <Compile Include="UlearnDriverComponents\Interfaces\IObserver.cs" />
     <Compile Include="UlearnDriverComponents\Interfaces\ITocSlide.cs" />
@@ -100,14 +99,15 @@
     <Compile Include="UlearnDriverComponents\Interfaces\ITocUnit.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\Hint.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\LikeButton.cs" />
+    <Compile Include="UlearnDriverComponents\PageObjects\PageObject.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\QuizBlock.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\RunResult.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\SlidePageTextBlock.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\SomeoneSolution.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\TocSlide.cs" />
     <Compile Include="UlearnDriverComponents\Pages\ExerciseSlidePage.cs" />
-    <Compile Include="UlearnDriverComponents\PageObjects\NavArrows.cs" />
-    <Compile Include="UlearnDriverComponents\PageObjects\Rate.cs" />
+    <Compile Include="UlearnDriverComponents\PageObjects\NavigationBlock.cs" />
+    <Compile Include="UlearnDriverComponents\PageObjects\RateBlock.cs" />
     <Compile Include="UlearnDriverComponents\Pages\QuizSlidePage.cs" />
     <Compile Include="UlearnDriverComponents\Pages\RegistrationPage.cs" />
     <Compile Include="UlearnDriverComponents\Pages\SignInPage.cs" />

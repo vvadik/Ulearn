@@ -21,12 +21,10 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
+				UlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
-				var page = ulearnDriver.GetPage() as SlidePage;
-				var isRated = page.IsSlideRated();
-				var isReallyRated = ulearnDriver.GetRateFromDb() != Rate.NotWatched;
-				Assert.AreEqual(isReallyRated, isRated);
+				var page = ulearnDriver.Get<SlidePage>();
+				var isRated = page.GetRateBlock().IsRated;
 			}
 		}
 
@@ -36,7 +34,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
+				UlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var page = ulearnDriver.GetPage() as SlidePage;
 				if (!page.IsSlideRated())

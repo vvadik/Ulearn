@@ -26,7 +26,7 @@ namespace Selenium.SeleniumTests.TestSeleniumCourse
 				uDriver.GoToRegistrationPage();
 				var page = uDriver.GetPage() as RegistrationPage;
 				page.SignUp("user", "asdasd");
-				driver.Navigate().GoToUrl("https://ulearn.azurewebsites.net/Course/SeleniumCourse");
+				driver.Navigate().GoToUrl("https://ulearn.azurewebsites.net/Course/SampleCourse");
 				var toc = uDriver.GetToc();
 				toc.GetUnitControl(toc.GetUnitsName().First())
 					.GetSlides()

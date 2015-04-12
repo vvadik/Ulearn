@@ -19,26 +19,7 @@ namespace Selenium.UlearnDriverComponents.Pages
 			return driver.Title;
 		}
 
-		public PageType GetPageType()
-		{
-			var title = GetTitle();
-			if (title == Titles.RegistrationPageTitle)
-				return PageType.RegistrationPage;
-			if (title == Titles.StartPageTitle)
-				return PageType.StartPage;
-			if (title == Titles.SignInPageTitle)
-				return PageType.SignInPage;
-			if (UlearnDriver.FindElementSafely(driver, By.ClassName("side-bar")) == null)
-				return PageType.IncomprehensibleType;
-			var element = UlearnDriver.FindElementSafely(driver, By.ClassName("page-header"));
-			if (element != null && element.Text == "Решения")
-				return PageType.SolutionsPage;
-			if (UlearnDriver.FindElementSafely(driver, ElementsClasses.RunSolutionButton) != null)
-				return PageType.ExerciseSlidePage;
-			if (UlearnDriver.FindElementSafely(driver, By.ClassName("quiz")) != null)
-				return PageType.QuizSlidePage;
-			return PageType.SlidePage;
-		}
+		
 
 		private static readonly Dictionary<PageType, Func<IWebDriver, UlearnPage>> PageFabric =
 			new Dictionary<PageType, Func<IWebDriver, UlearnPage>>
@@ -56,12 +37,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 		public UlearnPage CastTo(PageType pageType)
 		{
 			return PageFabric[pageType](driver);
-		}
-
-		public string GetUserName()
-		{
-			var element = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UserNameXPath));
-			return element == null ? null : element.Text;
 		}
 	}
 }

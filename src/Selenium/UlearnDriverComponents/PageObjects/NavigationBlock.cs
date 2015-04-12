@@ -2,13 +2,13 @@
 
 namespace Selenium.UlearnDriverComponents.PageObjects
 {
-	public class NavArrows
+	public class NavigationBlock : PageObject
 	{
 		private readonly IWebDriver driver;
 		private readonly IWebElement nextSlideButton;
 		private readonly IWebElement prevSlideButton;
 		private readonly IWebElement nextSolutionsButton;
-		public NavArrows(IWebDriver driver)
+		public NavigationBlock(IWebDriver driver)
 		{
 			this.driver = driver;
 			nextSlideButton = UlearnDriver.FindElementSafely(driver, ElementsId.NextNavArrow);

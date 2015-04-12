@@ -17,27 +17,21 @@ namespace Selenium.UlearnDriverComponents.Pages
 								+ driver.Title);
 		}
 
-		public UlearnDriver GoToSignInPage()
+		public SignInPage GoToSignInPage()
 		{
 			var loginLinkButton = driver.FindElement(ElementsId.SignInButton);
 			loginLinkButton.Click();
-			return new UlearnDriver(driver);
+			return new SignInPage(driver);
 		}
 
-		public void GoToCourse(string courseTitle)
+		public SlidePage GoToCourse(string courseTitle)
 		{
 			var courseBlocks = driver.FindElements(By.ClassName(courseBlockClass)).ToList();
 			if (courseTitle == Titles.BasicProgrammingTitle)
-			{
 				ClickCourseButton(courseTitle, courseBlocks, 0);
-				return;
-			}
 			if (courseTitle == Titles.LinqTitle)
-			{
 				ClickCourseButton(courseTitle, courseBlocks, 1);
-				return;
-			}
-			throw new NotImplementedException(string.Format("Для курса {0} нет реализации в методе GoToCourse", courseTitle));
+			return new SlidePage(driver);
 		}
 
 		private void ClickCourseButton(string courseTitle, IList<IWebElement> courseBlocks, int index)

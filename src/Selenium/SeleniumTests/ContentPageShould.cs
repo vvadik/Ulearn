@@ -20,7 +20,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
+				UlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				if (!toc.IsCollapsed(toc.GetUnitsName().First()))
@@ -56,7 +56,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
+				UlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				if (!toc.IsCollapsed(toc.GetUnitsName().First()))

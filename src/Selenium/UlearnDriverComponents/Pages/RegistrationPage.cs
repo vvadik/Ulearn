@@ -2,7 +2,7 @@
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
-	class RegistrationPage : UlearnPage
+	public class RegistrationPage : UlearnPage
 	{
 		private IWebElement loginField;
 		private IWebElement passwordField;
@@ -36,12 +36,13 @@ namespace Selenium.UlearnDriverComponents.Pages
 				throw new NotFoundException("registrated button not found");
 		}
 
-		public void SignUp(string login, string password)
+		public StartPage SignUp(string login, string password)
 		{
 			loginField.SendKeys(login);
 			passwordField.SendKeys(password);
 			confirmPasswordField.SendKeys(password);
 			registerButton.Click();
+			return new StartPage(driver);
 		}
 	}
 }
