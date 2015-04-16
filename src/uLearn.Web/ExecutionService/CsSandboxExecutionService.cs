@@ -28,7 +28,7 @@ namespace uLearn.Web.ExecutionService
 				var details = await client.Submit(code, "", displayName);
 				return details == null ? null : new CsSandboxSubmissionResult(details);
 			}
-			catch (TaskCanceledException e)
+			catch (TaskCanceledException)
 			{
 				return null;
 			}
