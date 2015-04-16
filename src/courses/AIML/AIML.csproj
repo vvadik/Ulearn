@@ -91,6 +91,7 @@
     <Compile Include="Slides\L060 - Персептроны\S030 - Обучение персептрона.cs" />
     <Compile Include="Slides\L060 - Персептроны\S040 - Демонстрация обучения.cs" />
     <Compile Include="Slides\L060 - Персептроны\S050 - Функция XOR и многослойный персептрон.cs" />
+    <Compile Include="Slides\L060 - Персептроны\S098 - Исходные коды.cs" />
     <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S010 - Обучение как минимизация функции.cs" />
     <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S020 - Метод градиентного спуска.cs" />
     <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S030 - Частные производные и градиенты.cs" />
@@ -100,6 +101,25 @@
     <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S070 - Локальные и глобальные минимумы.cs" />
     <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S080 - Онлайн и оффлайн обучение.cs" />
     <Compile Include="Slides\L070 - Метод обратного распространения ошибки\S090 - Методы ускорения обучения.cs" />
+    <Compile Include="Slides\L080 - Задача регрессии\S010 - Задача регрессии.cs" />
+    <Compile Include="Slides\L080 - Задача регрессии\S020 - Исправление грубых ошибок.cs" />
+    <Compile Include="Slides\L080 - Задача регрессии\S030 - Подбор методов улучшения обучения и размеров сети.cs" />
+    <Compile Include="Slides\L080 - Задача регрессии\S040 - Зашумленные данные и контрольные выборки.cs" />
+    <Compile Include="Slides\L080 - Задача регрессии\S050 - Методы устранения переобучения.cs" />
+    <Compile Include="Slides\L080 - Задача регрессии\S060 - Задача регрессии для калибровки манипулятора.cs" />
+    <Compile Include="Slides\L080 - Задача регрессии\S098 - Исходные коды.cs" />
+    <Compile Include="Slides\L090 - Классификация и распознавание образов\S010 - Задача распознавания.cs" />
+    <Compile Include="Slides\L090 - Классификация и распознавание образов\S020 - Построение структуры нейронной сети.cs" />
+    <Compile Include="Slides\L090 - Классификация и распознавание образов\S030 - Kernel Trick.cs" />
+    <Compile Include="Slides\L090 - Классификация и распознавание образов\S040 - Задача классификации.cs" />
+    <Compile Include="Slides\L090 - Классификация и распознавание образов\S050 - Применение карты Кохонена для классификации.cs" />
+    <Compile Include="Slides\L090 - Классификация и распознавание образов\S060 - Анализ и визуализация данных с помощью карты Кохонена.cs" />
+    <Compile Include="Slides\L100 - Разное о нейронных сетях\S010 - Нейронная сеть как функция действительных переменных.cs" />
+    <Compile Include="Slides\L100 - Разное о нейронных сетях\S020 - Рекуррентные нейронные сети. Сеть Элмана.cs" />
+    <Compile Include="Slides\L100 - Разное о нейронных сетях\S030 - Вычисления за пределами машины Тьюринга.cs" />
+    <Compile Include="Slides\L100 - Разное о нейронных сетях\S040 - Ассоциативная память.cs" />
+    <Compile Include="Slides\L100 - Разное о нейронных сетях\S050 - Реализация нейронных сетей.cs" />
+    <Compile Include="Slides\L100 - Разное о нейронных сетях\S060 - Заключение.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -152,6 +172,17 @@
     <None Include="Slides\L070 - Метод обратного распространения ошибки\_S050.pdf" />
     <None Include="Slides\L070 - Метод обратного распространения ошибки\_S080.pdf" />
     <None Include="Slides\L070 - Метод обратного распространения ошибки\_S090.pdf" />
+    <None Include="Slides\L080 - Задача регрессии\Regression.zip" />
+    <None Include="Slides\L080 - Задача регрессии\_S010.pdf" />
+    <None Include="Slides\L080 - Задача регрессии\_S060.pdf" />
+    <None Include="Slides\L090 - Классификация и распознавание образов\_S020.pdf" />
+    <None Include="Slides\L090 - Классификация и распознавание образов\_S030.pdf" />
+    <None Include="Slides\L090 - Классификация и распознавание образов\_S050.pdf" />
+    <None Include="Slides\L100 - Разное о нейронных сетях\_S010.pdf" />
+    <None Include="Slides\L100 - Разное о нейронных сетях\_S020.pdf" />
+    <None Include="Slides\L100 - Разное о нейронных сетях\_S030.pdf" />
+    <None Include="Slides\L100 - Разное о нейронных сетях\_S040.pdf" />
+    <None Include="Slides\L100 - Разное о нейронных сетях\_S050.pdf" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Slides\L00 - История искусственного интеллекта\S99 - Quiz.quiz.xml" />
@@ -171,6 +202,10 @@
     <Content Include="Slides\L060 - Персептроны\Title.txt" />
     <Content Include="Slides\L070 - Метод обратного распространения ошибки\S999 - Quiz.quiz.xml" />
     <Content Include="Slides\L070 - Метод обратного распространения ошибки\Title.txt" />
+    <Content Include="Slides\L080 - Задача регрессии\S099 - Quiz.quiz.xml" />
+    <Content Include="Slides\L080 - Задача регрессии\Title.txt" />
+    <Content Include="Slides\L090 - Классификация и распознавание образов\Title.txt" />
+    <Content Include="Slides\L100 - Разное о нейронных сетях\Title.txt" />
     <Content Include="Slides\Title.txt" />
   </ItemGroup>
   <ItemGroup>
