@@ -10,6 +10,7 @@ namespace uLearn
 			: base(new SlideBlock[0], slideInfo, quiz.Title, quiz.Id)
 		{
 			Quiz = quiz;
+			MaxScore = Quiz.Blocks.Count(block => block is AbstractQuestionBlock);
 		}
 
 		public override bool ShouldBeSolved { get { return true; } }

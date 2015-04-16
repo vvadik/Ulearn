@@ -18,33 +18,37 @@
 		}
 	}
 	@{
+		<li class="units-list-item full-width units-list-item-text course-name"><a data-score="@GetScore(@Model.ScoreForCourse)">@Model.CourseName</a></li>
 		int iUnit = 0;
 		foreach (var unit in Model.Units)
 		{
 			var collapseOption = unit == Model.CurrentUnit ? "collapse in" : "collapse";
 			<li class="units-list-item full-width">
-				<a data-toggle="collapse" href=@("#N" + iUnit) class="units-list-item-text">
-					@unit.UnitName
-				</a>
+				<a data-toggle="collapse" href=@("#N" + iUnit) class="units-list-item-text" data-score="@GetScore(Model.ScoresForUnits[unit.UnitName])">@unit.UnitName</a>
 				<ul id=@("N" + iUnit) class="slides-list @collapseOption">
 					@foreach (var slide in unit.Slides)
 					{
 						var url = Url.Action("Slide", "Course", new { courseId = Model.CourseId, slideIndex = slide.Index });
-						<i class="@GetIconClass(slide) navbar-label" title="@GetTitle(slide)"></i>
-						<li class="slide-list-item @(slide == Model.CurrentSlide ? "selected" : "") " onclick="window.location.href = '@url' "><a href="@url">@slide.Title</a></li>
+						<li class="slide-list-item @(slide == Model.CurrentSlide ? "selected" : "") full-size" onclick="window.location.href = '@url'">
+							<i class="@GetIconClass(slide) navbar-label" title="@GetTitle(slide)"></i>
+							<a href="@url" style="margin-right: 5px">@slide.Title</a>
+							<span class="score right">@GetScore(Model.ScoresForSlides[slide])</span>
+						</li>
 					}
 					@if (User.IsInRole(LmsRoles.Instructor) && unit.InstructorNote != null)
 					{
 						var url = Url.Action("InstructorNote", "Course", new { courseId = Model.CourseId, unitName = unit.UnitName });
-						<i class="glyphicon glyphicon-eye-close navbar-label" title="Не видно студентам"></i>
-						<li class="slide-list-item slide-list-item-instructor-note" onclick="window.location.href='@url'">
+						<li class="slide-list-item slide-list-item-instructor-note" onclick="window.location.href = '@url'">
+							<i class="glyphicon glyphicon-eye-close navbar-label-privileged navbar-label" title="Не видно студентам"></i>
 							<a href="@url">Заметки преподавателю</a>
 						</li>
 					}
 					@if (User.IsInRole(LmsRoles.Instructor))
 					{
-						<i class="glyphicon glyphicon-eye-close navbar-label" title="Не видно студентам"></i>
-						<li class="slide-list-item unit-statistic-ref">@Html.ActionLink("Статистика и успеваемость", "UnitStatistics", "Analytics", new { courseId = Model.CourseId, unitName = unit.UnitName }, null)</li>
+						<li class="slide-list-item unit-statistic-ref">
+							<i class="glyphicon glyphicon-eye-close navbar-label-privileged navbar-label" title="Не видно студентам"></i>
+							@Html.ActionLink("Статистика и успеваемость", "UnitStatistics", "Analytics", new { courseId = Model.CourseId, unitName = unit.UnitName }, null)
+						</li>
 					}
 				</ul>
 			</li>
@@ -69,13 +73,33 @@
 	var isComplete = !slide.ShouldBeSolved || Model.SolvedSlideIds.Contains(slide.Id);
 	var progressClass = isComplete ? "navbar-label-success"
 		: (isVisited ? "navbar-label-danger" : "navbar-label-default");
-	string typeClass = slide is QuizSlide ? "glyphicon-pushpin"
+	var typeClass = slide is QuizSlide ? "glyphicon-pushpin"
 		: slide is ExerciseSlide ? (isComplete ? "glyphicon-check" : "glyphicon-edit")
-			: (isVisited ? "glyphicon-ok" : "");
-			@(progressClass + " glyphicon " + typeClass)
+			: (isVisited ? "glyphicon-ok" : "glyphicon-none");
+	@(progressClass + " glyphicon " + typeClass)
 }
 
 @helper GetTitle(Slide slide)
 {
 	@(slide is ExerciseSlide ? "Задача" : slide is QuizSlide ? "Тест" : "Теория")
 }
+
+@helper GetScore(Tuple<int, int> score)
+{
+	score = score ?? Tuple.Create(0, 0);
+	@(score.Item2 == 0 ? "" : string.Format("{0}/{1}", score.Item1, score.Item2))
+}
+
+@*@helper GetScoreForUnit(string unitName)*@
+@*{*@
+@*	Tuple<int, int> score;*@
+@*	Model.ScoresForUnits.TryGetValue(unitName, out score);*@
+@*	@GetScore(score);*@
+@*}*@
+@**@
+@*@helper GetScoreForSlide(Slide slide)*@
+@*{*@
+@*	Tuple<int, int> score;*@
+@*	Model.ScoresForSlides.TryGetValue(slide, out score);*@
+@*	@GetScore(score);*@
+@*}*@

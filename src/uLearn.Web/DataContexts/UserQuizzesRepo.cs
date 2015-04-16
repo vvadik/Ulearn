@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.Ajax.Utilities;
-using Microsoft.Owin.Security.Provider;
-using NUnit.Framework;
 using uLearn.Quizes;
-using uLearn.Web.Migrations;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts

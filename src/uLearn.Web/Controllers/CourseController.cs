@@ -41,28 +41,33 @@ namespace uLearn.Web.Controllers
 				throw new Exception("Slide is hidden " + slideIndex);
 			var quizSlide = model.Slide as QuizSlide;
 			if (quizSlide != null)
-				foreach (var block in quizSlide.Quiz.Blocks.Where(x => x is ChoiceBlock).Where(x => ((ChoiceBlock) x).Shuffle))
+				foreach (var block in quizSlide.Quiz.Blocks.OfType<ChoiceBlock>().Where(x => x.Shuffle))
 					Shuffle(block);
 			return View(model);
 		}
 
-		private void Shuffle(QuizBlock quizBlock)
+		private void Shuffle(ChoiceBlock choiceBlock)
 		{
 			var random = new Random();
-			var choiceBlock = (ChoiceBlock) quizBlock;
 			choiceBlock.Items = choiceBlock.Items.OrderBy(x => random.Next()).ToArray();
 		}
 
 		private int GetInitialIndexForStartup(string courseId, Course course, List<string> visibleUnits)
 		{
 			var userId = User.Identity.GetUserId();
-			var lastVisitedSlide = 0;
-			for (var index = 0; index < course.Slides.Length; index++)
+			var visitedIds = visitersRepo.GetIdOfVisitedSlides(courseId, userId);
+			var visibleSlides = course.Slides.Where(slide => visibleUnits.Contains(slide.Info.UnitName)).OrderBy(slide => slide.Index).ToList();
+			var lastVisited = visibleSlides.LastOrDefault(slide => visitedIds.Contains(slide.Id));
+			if (lastVisited == null)
+				return visibleSlides.Any() ? visibleSlides.First().Index : 0;
+
+			var slides = visibleSlides.Where(slide => lastVisited.Info.UnitName == slide.Info.UnitName).ToList();
+
+			var lastVisitedSlide = slides.First().Index;
+			foreach (var slide in slides)
 			{
-				var slide = course.Slides[index];
-				if (!visibleUnits.Contains(slide.Info.UnitName)) continue;
-				if (visitersRepo.IsUserVisit(courseId, slide.Id, userId))
-					lastVisitedSlide = index;
+				if (visitedIds.Contains(slide.Id))
+					lastVisitedSlide = slide.Index;
 				else
 					return lastVisitedSlide;
 			}
@@ -101,6 +106,9 @@ namespace uLearn.Web.Controllers
 			var isFirstCourseVisit = !db.Visiters.Any(x => x.UserId == userId);
 			var slideId = course.Slides[slideIndex].Id;
 			await VisitSlide(courseId, slideId);
+			var visiter = visitersRepo.GetVisiter(slideId, User.Identity.GetUserId());
+			var score = Tuple.Create(visiter.Score, course.Slides[slideIndex].MaxScore);
+			var lastAcceptedSolution = solutionsRepo.FindLatestAcceptedSolution(courseId, slideId, userId);
 			var model = new CoursePageModel
 			{
 				UserId = userId,
@@ -108,23 +116,24 @@ namespace uLearn.Web.Controllers
 				CourseId = course.Id,
 				CourseTitle = course.Title,
 				Slide = course.Slides[slideIndex],
-				LatestAcceptedSolution =
-					solutionsRepo.FindLatestAcceptedSolution(courseId, slideId, userId),
+				LatestAcceptedSolution = lastAcceptedSolution,
 				Rate = GetRate(course.Id, slideId),
+				Score = score,
+				CanSkip = lastAcceptedSolution == null && !visiter.IsSkipped
 			};
 			return model;
 		}
 
 		[Authorize]
-		public ActionResult AcceptedSolutions(string courseId, int slideIndex = 0)
+		public async Task<ViewResult> AcceptedSolutions(string courseId, int slideIndex = 0)
 		{
 			var userId = User.Identity.GetUserId();
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.Slides[slideIndex];
-			var isPassed = solutionsRepo.IsUserPassedTask(courseId, slide.Id, userId);
-			var solutions = isPassed
-				? solutionsRepo.GetAllAcceptedSolutions(courseId, slide.Id)
-				: new List<AcceptedSolutionInfo>();
+			var isPassed = visitersRepo.IsPassed(slide.Id, userId);
+			if (!isPassed)
+				await visitersRepo.SkipSlide(courseId, slide.Id, userId);
+			var solutions = solutionsRepo.GetAllAcceptedSolutions(courseId, slide.Id);
 			foreach (var solution in solutions)
 				solution.LikedAlready = solution.UsersWhoLike.Any(u => u == userId);
 			var model = new AcceptedSolutionsPageModel
@@ -181,10 +190,38 @@ namespace uLearn.Web.Controllers
 			var solution = await db.UserSolutions.FirstOrDefaultAsync(s => s.Id == solutionId);
 			if (solution != null)
 			{
+				var visit = await db.Visiters.FirstOrDefaultAsync(v => v.UserId == solution.UserId && v.SlideId == solution.SlideId);
+				if (visit != null)
+				{
+					visit.IsPassed = db.UserSolutions.Any(s => s.UserId == solution.UserId && s.SlideId == solution.SlideId && s.IsRightAnswer && s.Id != solutionId);
+					visit.Score = visit.IsSkipped ? 0 : visit.IsPassed ? 5 : 0;
+					visit.AttemptsCount--;
+				}
 				db.UserSolutions.Remove(solution);
 				await db.SaveChangesAsync();
 			}
 			return RedirectToAction("AcceptedSolutions", new { courseId = courseId, slideIndex = slideIndex });
+		}
+
+		[Authorize(Roles = LmsRoles.Tester)]
+		public async Task<ActionResult> ForgetAll(string courseId, string slideId)
+		{
+			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
+			var userId = User.Identity.GetUserId();
+			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.UserSolution.SlideId == slideId));
+			RemoveFrom(db.UserSolutions, slideId, userId);
+			RemoveFrom(db.UserQuizzes, slideId, userId);
+			RemoveFrom(db.Visiters, slideId, userId);
+			db.UserQuestions.RemoveRange(db.UserQuestions.Where(q => q.UserId == userId && q.SlideId == slideId));
+			db.SlideRates.RemoveRange(db.SlideRates.Where(q => q.UserId == userId && q.SlideId == slideId));
+			db.Hints.RemoveRange(db.Hints.Where(q => q.UserId == userId && q.SlideId == slideId));
+			await db.SaveChangesAsync();
+			return RedirectToAction("Slide", new { courseId, slideIndex = slide.Index });
+		}
+
+		private static void RemoveFrom<T>(DbSet<T> dbSet, string slideId, string userId) where T : class, ISlideAction
+		{
+			dbSet.RemoveRange(dbSet.Where(s => s.UserId == userId && s.SlideId == slideId));
 		}
 	}
 }

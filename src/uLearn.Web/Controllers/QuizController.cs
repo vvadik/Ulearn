@@ -19,6 +19,7 @@ namespace uLearn.Web.Controllers
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
+		private readonly VisitersRepo visitersRepo = new VisitersRepo();
 
 		public QuizController()
 			: this(WebCourseManager.Instance)
@@ -63,6 +64,7 @@ namespace uLearn.Web.Controllers
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			await userQuizzesRepo.RemoveAnswers(User.Identity.GetUserId(), slideId);
+			await visitersRepo.RemoveAttempts(slideId, User.Identity.GetUserId());
 			return RedirectToAction("Slide", "Course", new { courseId, slideIndex = slide.Index });
 		}
 
@@ -72,7 +74,10 @@ namespace uLearn.Web.Controllers
 		{
 			var intSlideIndex = int.Parse(slideIndex);
 			var course = courseManager.GetCourse(courseId);
-			if (userQuizzesRepo.IsQuizSlidePassed(courseId, User.Identity.GetUserId(), course.Slides[intSlideIndex].Id))
+			var userId = User.Identity.GetUserId();
+			var slideId = course.Slides[intSlideIndex].Id;
+
+			if (visitersRepo.IsPassed(userId, slideId))
 				return "already answered";
 			var time = DateTime.Now;
 			var quizzes = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.QuizId);
@@ -93,9 +98,15 @@ namespace uLearn.Web.Controllers
 			var blocksInAnswerCount = tmpFolder.Select(x => x.QuizId).Distinct().Count();
 			if (blocksInAnswerCount != quizBlockWithTaskCount)
 				return "has empty blocks";
+			var score = tmpFolder
+				.Where(forDb => forDb.IsRightQuizBlock)
+				.Select(forDb => forDb.QuizId)
+				.Distinct()
+				.Count();
 			foreach (var quizInfoForDb in tmpFolder)
 				await userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
-					course.Slides[intSlideIndex].Id, quizInfoForDb.Text, User.Identity.GetUserId(), time, quizInfoForDb.IsRightQuizBlock);
+					slideId, quizInfoForDb.Text, userId, time, quizInfoForDb.IsRightQuizBlock);
+			await visitersRepo.AddAttempt(slideId, userId, score);
 			return string.Join("*", incorrectQuizzes.Distinct());
 		}
 
@@ -239,8 +250,11 @@ namespace uLearn.Web.Controllers
 			{
 				var userId = User.Identity.GetUserId();
 				if (userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b) < GetMaxDropCount(slide as QuizSlide) &&
-				    !userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId).All(b => b.Value))
+					!userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId).All(b => b.Value))
+				{
 					await userQuizzesRepo.DropQuiz(userId, slideId);
+					await visitersRepo.DropAttempt(slideId, userId);
+				}
 			}
 			return RedirectToAction("Slide", "Course", new { courseId, slideIndex = slide.Index });
 		}

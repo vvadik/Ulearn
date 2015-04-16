@@ -1,9 +1,13 @@
 ﻿@model CoursePageModel
 @using uLearn;
-@{ var slide = (ExerciseSlide)Model.Slide; }
+@{
+	var slide = (ExerciseSlide)Model.Slide;
+	var address = Url.Action("AcceptedSolutions", "Course", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index });
+	var action = Model.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", address);
+}
 <textarea id="secretCodeExercise" class='hide'>@slide.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
 <div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine™</a> and <a target="blank" href="http://codemirror.net/">CodeMirror</a></div>
-<textarea class='code code-exercise' data-lang="@slide.Lang">@(@Model.LatestAcceptedSolution ?? slide.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+<textarea class='code code-exercise' data-lang="@slide.Lang">@(Model.LatestAcceptedSolution ?? slide.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 <script>
 	function cleanUserCode() {
 		var $secretCodeExercise = $('#secretCodeExercise');
@@ -13,18 +17,22 @@
 <div class="solution-control btn-group ctrl-group">
 	<button type="button" class="run-solution-button btn btn-primary no-rounds"
 			data-url="@Url.Action("RunSolution", "Exercise", new {courseId = Model.CourseId, slideIndex = Model.Slide.Index})">
-		RUN
-	</button>
-
-	<button type="button" class="btn btn-default reset-btn" onclick="cleanUserCode()">
-		RESET
+		Run
 	</button>
 
 	@{ var e = ((ExerciseSlide)Model.Slide).HintsMd; }
-	<button id="GetHintButton" type="button" class="btn btn-default hints-btn no-rounds"
+	<button id="GetHintButton" type="button" class="btn btn-default hints-btn"
 			onclick="showHintForUser('@Model.CourseId','@Model.Slide.Index', '@e.Count')"
 			data-url="@Url.Action("UseHint", "Hint")">
-		GET HINT
+		Get hint
+	</button>
+	
+	<button type="button" class="btn btn-default giveup-btn" onclick="@action">
+		Show solutions
+	</button>
+
+	<button type="button" class="btn btn-default reset-btn no-rounds" onclick="cleanUserCode()">
+		Reset
 	</button>
 </div>
 
@@ -61,4 +69,22 @@
 
 <div class="panel-group ctrl-group" id="hints-accordion">
 	<div id="hints-place"></div>
+</div>
+
+<div class="modal fade" id="ShowSolutionsAlert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Внимание</h4>
+			</div>
+			<div class="modal-body">
+				<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
+			</div>
+			<div class="modal-footer">
+				<a class="btn btn-default" href="@address">Продолжить</a>
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Отмена</button>
+			</div>
+		</div>
+	</div>
 </div>

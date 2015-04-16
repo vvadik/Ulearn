@@ -6,7 +6,7 @@
 	var quizSlide = Model.Slide;
 	var status = Model.QuizState == QuizState.NotPassed ?
 		String.Format("Попытка {0} из {1}", Model.TryNumber + 1, Model.MaxDropCount + 1) :
-		String.Format("Верно {0} из {1}.", Model.RightAnswers, Model.QuestionsCount);
+		"";
 	<h4 id="quiz-status">@status</h4>
 
 	var remains = Model.MaxDropCount - Model.TryNumber + 1;
