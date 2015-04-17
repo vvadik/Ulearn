@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Ionic.Zip;
 using uLearn.CSharp;
+using uLearn.Lessions;
 using uLearn.Quizes;
 
 namespace uLearn
@@ -14,7 +15,7 @@ namespace uLearn
 		private readonly DirectoryInfo coursesDirectory;
 		private readonly Dictionary<string, Course> courses = new Dictionary<string, Course>(StringComparer.InvariantCultureIgnoreCase);
 
-		private static readonly IList<ISlideLoader> SlideLoaders = new ISlideLoader[]{new CSharpSlideLoader(), new QuizSlideLoader()};
+		private static readonly IList<ISlideLoader> SlideLoaders = new ISlideLoader[] { new LessonSlideLoader(), new CSharpSlideLoader(), new QuizSlideLoader() };
 
 		public CourseManager(DirectoryInfo baseDirectory)
 			: this(

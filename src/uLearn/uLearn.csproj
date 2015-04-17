@@ -96,6 +96,8 @@
     <Compile Include="CSharp\ICSharpSolutionValidator.cs" />
     <Compile Include="FileExtensions.cs" />
     <Compile Include="ISlideLoader.cs" />
+    <Compile Include="Lessions\Lesson.cs" />
+    <Compile Include="Lessions\LessonSlideLoader.cs" />
     <Compile Include="Markdown2.cs" />
     <Compile Include="NullValidator.cs" />
     <Compile Include="Quizes\Quiz.cs" />
@@ -179,6 +181,7 @@
     <Compile Include="SlideAttribute.cs" />
     <Compile Include="TexReplacer.cs" />
     <Compile Include="Urls.cs" />
+    <Compile Include="utils\Converter.cs" />
     <Compile Include="ValidatorsRepository.cs" />
   </ItemGroup>
   <ItemGroup>

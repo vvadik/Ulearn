@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns="https://ulearn.azurewebsites.net/lesson"
+	xmlns:x="http://www.w3.org/2001/XMLSchema-instance"
+	elementFormDefault="qualified"
+	targetNamespace="https://ulearn.azurewebsites.net/lesson">
+	
+	<xs:element name="Lesson" type="Lesson">
+		<xs:unique name="UniqueBlockId">
+			<xs:selector xpath="*" />
+			<xs:field xpath="@id" />
+		</xs:unique>
+	</xs:element>
+
+	<xs:complexType name="Lesson">
+		<xs:sequence>
+			<xs:element name="title" type="notEmptyString" minOccurs="1" maxOccurs="1" />
+			<xs:element name="id" type="notEmptyString" minOccurs="1" maxOccurs="1" />
+			<xs:group ref="blocks" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:group name="blocks">
+		<xs:choice>
+			<xs:element name="gallery-images" type="GalleryImages" />
+			<xs:element name="tex" type="Tex" />
+			<xs:element name="md" type="notEmptyString" />
+			<xs:element name="code" type="Code" />
+			<xs:element name="youtube" type="notEmptyString" />
+			<xs:element name="include-code" type="notEmptyString" />
+			<xs:element name="include-md" type="notEmptyString" />
+			<xs:element name="gallery" type="notEmptyString" />
+			<xs:element name="include-blocks" type="notEmptyString" />
+		</xs:choice>
+	</xs:group>
+
+	<xs:simpleType name="notEmptyString">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="GalleryImages">
+		<xs:sequence maxOccurs="unbounded">
+			<xs:element name="image" type="notEmptyString" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Tex">
+		<xs:sequence maxOccurs="unbounded">
+			<xs:element name="line" type="notEmptyString" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Code">
+		<xs:attribute name="lang" type="notEmptyString" use="required"/>
+	</xs:complexType>
+
+</xs:schema>
