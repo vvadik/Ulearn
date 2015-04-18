@@ -24,7 +24,7 @@ namespace Selenium.SeleniumTests.TestSeleniumCourse
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				var uDriver = new UlearnDriver(driver);
 				uDriver.GoToRegistrationPage();
-				var page = uDriver.GetPage() as RegistrationPage;
+				var page = uDriver.Get<RegistrationPage>();
 				page.SignUp("user", "asdasd");
 				driver.Navigate().GoToUrl("https://ulearn.azurewebsites.net/Course/SampleCourse");
 				var toc = uDriver.GetToc();
@@ -32,8 +32,8 @@ namespace Selenium.SeleniumTests.TestSeleniumCourse
 					.GetSlides()
 					.First()
 					.Click();
-				var sPage = uDriver.GetPage() as SlidePage;
-				sPage.ChechTex();
+				var sPage = uDriver.Get<SlidePage>();
+				uDriver.CheckTex();
 				Assert.AreEqual(4, sPage.Blocks.Count);
 			}
 		}
@@ -46,7 +46,7 @@ namespace Selenium.SeleniumTests.TestSeleniumCourse
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				var uDriver = new UlearnDriver(driver);
 				uDriver.GoToRegistrationPage();
-				var page = uDriver.GetPage() as RegistrationPage;
+				var page = uDriver.Get<RegistrationPage>();
 				page.SignUp("user", "asdasd");
 				driver.Navigate().GoToUrl("https://ulearn.azurewebsites.net/Course/SeleniumCourse");
 				var toc = uDriver.GetToc();
@@ -55,7 +55,7 @@ namespace Selenium.SeleniumTests.TestSeleniumCourse
 					.Skip(1)
 					.First()
 					.Click();
-				var sPage = uDriver.GetPage() as SlidePage;
+				var sPage = uDriver.Get<SlidePage>();
 				Assert.AreEqual(2, sPage.Blocks.Count);
 			}
 		}

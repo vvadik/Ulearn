@@ -20,7 +20,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				IUlearnDriver ulearnDriver = new UlearnDriverComponents.UlearnDriver(driver);
+				UlearnDriver ulearnDriver = new UlearnDriverComponents.UlearnDriver(driver);
 				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				driver.Navigate().GoToUrl("https://localhost:44300/Course/BasicProgramming/Slide/21");
 			}

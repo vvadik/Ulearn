@@ -243,6 +243,7 @@
     <Compile Include="ExecutionService\RedundantExecutionService.cs" />
     <Compile Include="ExecutionService\IdeoneExecutionService.cs" />
     <Compile Include="ExecutionService\StringExtention.cs" />
+    <Compile Include="Ideone\ExecutionService.Credentials.cs" />
     <Compile Include="Ideone\IdeoneClient.Settings.cs" />
     <Compile Include="Migrations\201503231319119_ExecutionServiceName.cs" />
     <Compile Include="Migrations\201503231319119_ExecutionServiceName.Designer.cs">

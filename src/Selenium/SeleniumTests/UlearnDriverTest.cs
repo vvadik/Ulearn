@@ -18,15 +18,15 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
+				UlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
-				for (int i = 0; i < 10; i++)
+				for (var i = 0; i < 10; i++)
 				{
-					Console.WriteLine(ulearnDriver.GetPage().GetPageType());
-					var page = ulearnDriver.GetPage() as UlearnContentPage;
-					if (!page.IsActiveNextButton())
-						(page as SlidePage).RateSlide(Rate.Trivial);
-					ulearnDriver = page.ClickNextButton();
+					Console.WriteLine(ulearnDriver.GetCurrentPageType());
+					var page = ulearnDriver.Get<SlidePage>();
+					if (!page.GetNavArrows().IsActiveNextButton())
+						page.GetRateBlock().RateSlide(Rate.Trivial);
+					page.GetNavArrows().ClickNextButton();
 				}
 			}
 		}
@@ -37,7 +37,7 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
+				UlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
 				var toc = ulearnDriver.GetToc();
 				var unitsNames = toc.GetUnitsName();
@@ -60,9 +60,8 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
+				UlearnDriver ulearnDriver = new UlearnDriver(driver);
 				ulearnDriver.LoginAdminAndGoToCourse(Titles.BasicProgrammingTitle);
-				Console.WriteLine(ulearnDriver.GetCurrentSlideName());
 			}
 		}
 	}

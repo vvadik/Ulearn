@@ -21,10 +21,9 @@ namespace Selenium.SeleniumTests
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				var ulearnDriver = new UlearnDriver(driver);
-				var startPage = ulearnDriver.GetPage() as StartPage;
-				ulearnDriver = startPage.GoToSignInPage();
-				var signInPage = ulearnDriver.GetPage() as SignInPage;
-				ulearnDriver = signInPage.LoginValidUser(Admin.Login, Admin.Password);
+				var startPage = ulearnDriver.Get<StartPage>();
+				var signInPage = startPage.GoToSignInPage();
+				signInPage.LoginValidUser(Admin.Login, Admin.Password);
 				Assert.AreEqual(Admin.Login, ulearnDriver.GetCurrentUserName());
 			}
 		}
@@ -36,12 +35,11 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var ulearnDriver = new UlearnDriverComponents.UlearnDriver(driver);
-				var startPage = ulearnDriver.GetPage() as StartPage;
-				ulearnDriver = startPage.GoToSignInPage();
-				var signInPage = ulearnDriver.GetPage() as SignInPage;
-				ulearnDriver = signInPage.LoginVk();
-				//Assert.AreEqual(Admin.Login, ulearnDriver.GetCurrentUserName());
+				var ulearnDriver = new UlearnDriver(driver);
+				var startPage = ulearnDriver.Get<StartPage>();
+				var signInPage = startPage.GoToSignInPage();
+				signInPage.LoginVk();
+				Assert.AreEqual(Admin.Login, ulearnDriver.GetCurrentUserName());
 			}
 		}
 	}

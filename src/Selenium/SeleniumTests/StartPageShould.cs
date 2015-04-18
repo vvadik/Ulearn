@@ -23,8 +23,8 @@ namespace Selenium.SeleniumTests
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				var ulearnDriver = new UlearnDriverComponents.UlearnDriver(driver);
-				var startPage = ulearnDriver.GetPage() as StartPage;
-				Assert.AreEqual(PageType.StartPage, startPage.GetPageType());
+				var startPage = ulearnDriver.Get<StartPage>();
+				Assert.AreEqual(PageType.StartPage, ulearnDriver.GetCurrentPageType());
 			}
 		}
 
@@ -34,11 +34,11 @@ namespace Selenium.SeleniumTests
 			using (IWebDriver driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
-				var startPage = ulearnDriver.GetPage() as StartPage;
+				UlearnDriver ulearnDriver = new UlearnDriver(driver);
+				var startPage = ulearnDriver.Get<StartPage>();
 
-				ulearnDriver = startPage.GoToSignInPage();
-				Assert.AreEqual(PageType.SignInPage, ulearnDriver.GetPage().GetPageType());
+				startPage.GoToSignInPage();
+				Assert.AreEqual(PageType.SignInPage, ulearnDriver.GetCurrentPageType());
 
 				ulearnDriver.GoToStartPage();
 				var isLogin = ulearnDriver.IsLogin;
@@ -52,31 +52,14 @@ namespace Selenium.SeleniumTests
 			using (var driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				IUlearnDriver ulearnDriver = new UlearnDriver(driver);
-				var startPage = ulearnDriver.GetPage() as StartPage;
+				UlearnDriver ulearnDriver = new UlearnDriver(driver);
+				var startPage = ulearnDriver.Get<StartPage>();
 
-				ulearnDriver = startPage.GoToSignInPage();
+				startPage.GoToSignInPage();
 
 				ulearnDriver.GoToStartPage();
 				var isLogin = ulearnDriver.IsLogin;
 				Assert.IsFalse(isLogin);
-			}
-		}
-
-
-
-		[Test]
-		public void TestNavArrows()
-		{
-			using (var driver = new ChromeDriver())
-			{
-				//driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				//var ulearnDriver = new UlearnDriver.UlearnDriver(driver);
-				//var startPage = ulearnDriver.GetPage() as StartPage;
-				//ulearnDriver = startPage.GoToSignInPage();
-				//var signInPage = ulearnDriver.GetPage() as SignInPage;
-				//signInPage.
-				//Console.WriteLine(ulearnDriver.GetPage().GetCurrentPageType());
 			}
 		}
 	}

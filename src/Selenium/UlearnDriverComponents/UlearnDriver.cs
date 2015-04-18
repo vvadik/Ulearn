@@ -100,7 +100,7 @@ namespace Selenium.UlearnDriverComponents
 			return new Toc(driver);
 		}
 
-		public bool ChechTex()
+		public bool CheckTex()
 		{
 			var texs = UlearnDriver.FindElementsSafely(driver, By.XPath(XPaths.TexXPath));
 			if (texs.Select((tex, i) => UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.GetRenderTexXPath(i))))

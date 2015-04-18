@@ -82,11 +82,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainClass.cs" />
-    <Compile Include="SeleniumTests\ContentPageShould.cs" />
     <Compile Include="SeleniumTests\ExercisePageShould.cs" />
     <Compile Include="SeleniumTests\QuizPageShould.cs" />
     <Compile Include="SeleniumTests\SignInPageShould.cs" />
-    <Compile Include="SeleniumTests\SlidePageShould.cs" />
     <Compile Include="SeleniumTests\StartPageShould.cs" />
     <Compile Include="SeleniumTests\TestSeleniumCourse\MainEngineTest.cs" />
     <Compile Include="SeleniumTests\TocShould.cs" />
@@ -120,7 +118,6 @@
     <Compile Include="UlearnDriverComponents\Pages\UlearnPage.cs" />
     <Compile Include="UlearnDriverComponents\ULearnConstants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SeleniumTests\DBtest.cs" />
     <Compile Include="UlearnDriverComponents\UlearnDriver.cs" />
     <Compile Include="UlearnTests\MainTest.cs" />
   </ItemGroup>
