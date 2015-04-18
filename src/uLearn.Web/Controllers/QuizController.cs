@@ -80,12 +80,12 @@ namespace uLearn.Web.Controllers
 			if (visitersRepo.IsPassed(userId, slideId))
 				return "already answered";
 			var time = DateTime.Now;
-			var quizzes = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.QuizId);
+			var answers = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.QuizId);
 			var quizBlockWithTaskCount = ((QuizSlide)course.Slides[intSlideIndex]).Quiz.Blocks.Count(x => x is FillInBlock || x is IsTrueBlock || x is ChoiceBlock);
 			var incorrectQuizzes = new List<string>();
 			var fillInBlockType = typeof(FillInBlock);
 			var tmpFolder = new List<QuizInfoForDb>();
-			foreach (var ans in quizzes)
+			foreach (var ans in answers)
 			{
 				var quizInfo = GetQuizInfo(course, intSlideIndex, ans);
 				foreach (var quizInfoForDb in quizInfo)
@@ -112,9 +112,7 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<QuizInfoForDb> GetQuizInfo(Course course, int slideIndex, IGrouping<string, QuizAnswer> answer)
 		{
-			var slide = course.Slides[slideIndex] as QuizSlide;
-			if (slide == null)
-				throw new Exception("Error in func 'GetSlideById' or in 'QuizSlideId'");
+			var slide = (QuizSlide)course.Slides[slideIndex];
 			var block = slide.GetBlockById(answer.Key);
 			if (block is FillInBlock)
 				return CreateQuizInfoForDb(block as FillInBlock, answer.First().Text);
@@ -140,17 +138,17 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(ChoiceBlock choiseBlock, IGrouping<string, QuizAnswer> data)
+		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(ChoiceBlock choiceBlock, IGrouping<string, QuizAnswer> answers)
 		{
-			if (!choiseBlock.Multiple)
+			if (!choiceBlock.Multiple)
 			{
-				var answerItemId = data.First().ItemId;
-				var isTrue = choiseBlock.Items.First(x => x.Id == answerItemId).IsCorrect;
+				var answerItemId = answers.First().ItemId;
+				var isTrue = choiceBlock.Items.First(x => x.Id == answerItemId).IsCorrect;
 				return new List<QuizInfoForDb>
 				{
 					new QuizInfoForDb
 					{
-						QuizId = choiseBlock.Id,
+						QuizId = choiceBlock.Id,
 						ItemId = answerItemId,
 						IsRightAnswer = isTrue,
 						Text = null,
@@ -159,18 +157,18 @@ namespace uLearn.Web.Controllers
 					}
 				};
 			}
-			var ans = data.Select(x => x.ItemId).ToList()
+			var ans = answers.Select(x => x.ItemId).ToList()
 				.Select(x => new QuizInfoForDb
 				{
-					QuizId = choiseBlock.Id,
-					IsRightAnswer = choiseBlock.Items.Where(y => y.IsCorrect).Any(y => y.Id == x),
+					QuizId = choiceBlock.Id,
+					IsRightAnswer = choiceBlock.Items.Where(y => y.IsCorrect).Any(y => y.Id == x),
 					ItemId = x,
 					Text = null,
 					QuizType = typeof(ChoiceBlock),
 					IsRightQuizBlock = false
 				}).ToList();
 			var isRightQuizBlock = ans.All(x => x.IsRightAnswer) &&
-						 choiseBlock.Items.Where(x => x.IsCorrect)
+						 choiceBlock.Items.Where(x => x.IsCorrect)
 							 .Select(x => x.Id)
 							 .All(x => ans.Where(y => y.IsRightAnswer).Select(y => y.ItemId).Contains(x));
 			foreach (var info in ans)

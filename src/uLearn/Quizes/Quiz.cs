@@ -98,7 +98,12 @@ namespace uLearn.Quizes
 
 		[XmlElement("item")]
 		public ChoiceItem[] Items;
-	
+
+		public ChoiceItem[] ShuffledItems()
+		{
+			return Shuffle ? Items.Shuffle().ToArray() : Items;
+		}
+
 		public override void Validate()
 		{
 			var correctCount = Items.Count(i => i.IsCorrect);
