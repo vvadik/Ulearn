@@ -199,7 +199,6 @@ a.nav-arrow:hover {
 
 .slide-list-item {
 	list-style-type: none;
-	border-bottom: 1px solid #eee;
 	padding: 0.5em 0.5em 0.5em;
 	cursor: pointer;
 	color: #428bca;
@@ -220,9 +219,9 @@ a.nav-arrow:hover {
 }
 
 .side-bar {
-	width: 320px;
+	width: 350px;
 	margin: 0;
-	padding: 20px;
+	padding-top: 20px;
 	max-height: none !important;
 }
 
@@ -329,7 +328,8 @@ table.diff tbody th {
 
 .navbar-label {
 	float: left;
-	margin-right: 5px;
+	margin-right: 8px;
+	width: 14px;
 }
 
 .navbar-label-privileged {

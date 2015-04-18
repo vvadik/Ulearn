@@ -18,7 +18,6 @@ namespace uLearn.Web.Controllers
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly UnitsRepo unitsRepo = new UnitsRepo();
-		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();
 
 		public CourseController()
@@ -39,17 +38,7 @@ namespace uLearn.Web.Controllers
 			var model = await CreateCoursePageModel(courseId, slideIndex, visibleUnits);
 			if (!visibleUnits.Contains(model.Slide.Info.UnitName))
 				throw new Exception("Slide is hidden " + slideIndex);
-			var quizSlide = model.Slide as QuizSlide;
-			if (quizSlide != null)
-				foreach (var block in quizSlide.Quiz.Blocks.OfType<ChoiceBlock>().Where(x => x.Shuffle))
-					Shuffle(block);
 			return View(model);
-		}
-
-		private void Shuffle(ChoiceBlock choiceBlock)
-		{
-			var random = new Random();
-			choiceBlock.Items = choiceBlock.Items.OrderBy(x => random.Next()).ToArray();
 		}
 
 		private int GetInitialIndexForStartup(string courseId, Course course, List<string> visibleUnits)
