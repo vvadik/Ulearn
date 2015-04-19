@@ -8,8 +8,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 {
 	public class SlidePage : UlearnContentPage
 	{
-		private Lazy<RateBlock> rates;
-		private List<SlidePageBlock> blocks;
 		private IWebElement groupSelector;
 		private IWebElement groupSelectButton;
 
@@ -25,19 +23,22 @@ namespace Selenium.UlearnDriverComponents.Pages
 		private new void Configure()
 		{
 			base.Configure();
-			rates = new Lazy<RateBlock>(() => new RateBlock(driver));
 			var modal = UlearnDriver.FindElementSafely(driver, By.Id("selectGroupModal"));
-			if (modal != null)
-			{
-				IsUserFirstVisit = true;
-				groupSelector = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UserGroupSelectField));
-				groupSelectButton = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UserGroupSelectButton));
-			}
+			if (modal == null) return;
+			IsUserFirstVisit = false;//пока сами закрываем окошко выбора группы
+			groupSelector = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UserGroupSelectField));
+			groupSelectButton = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UserGroupSelectButton));
+			groupSelector.SendKeys("0");
+			groupSelectButton.Click();
+		}
+
+		private List<SlidePageBlock> GetBlocks()
+		{
 			var blockElements = UlearnDriver.FindElementsSafely(driver, By.XPath(XPaths.SeleniumTextBlockXPath));
-			blocks = UnionSubBlocks(blockElements.Where(
+			return UnionSubBlocks(blockElements.Where(
 				x => x.TagName == "textarea" ||
-				x.TagName == "p" ||
-				(x.TagName == "div" && UlearnDriver.HasCss(x, "video-container")))
+				     x.TagName == "p" ||
+				     (x.TagName == "div" && UlearnDriver.HasCss(x, "video-container")))
 				.Select(CreateBlock));
 		}
 
@@ -76,11 +77,11 @@ namespace Selenium.UlearnDriverComponents.Pages
 			return new SlidePageCodeBlock(element.Text, true);
 		}
 
-		public IReadOnlyCollection<SlidePageBlock> Blocks { get { return blocks; } }
+		public IReadOnlyCollection<SlidePageBlock> Blocks { get { return GetBlocks();  } }
 
 		public RateBlock GetRateBlock()
 		{
-			return rates.Value;
+			return new RateBlock(driver);
 		}
 	}
 }

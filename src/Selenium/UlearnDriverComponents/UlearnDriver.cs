@@ -100,15 +100,13 @@ namespace Selenium.UlearnDriverComponents
 			return new Toc(driver);
 		}
 
-		public bool CheckTex()
+		public IEnumerable<TeX> TeX
 		{
-			var texs = UlearnDriver.FindElementsSafely(driver, By.XPath(XPaths.TexXPath));
-			if (texs.Select((tex, i) => UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.GetRenderTexXPath(i))))
-				.Any(renderTex => renderTex == null))
+			get
 			{
-				throw new Exception("Tex exception");
+				return FindElementsSafely(driver, By.XPath(XPaths.TexXPath))
+					.Select((tex, i) => new TeX(FindElementSafely(driver, By.XPath(XPaths.GetRenderTexXPath(i))) != null));
 			}
-			return true;
 		}
 
 		public StartPage GoToStartPage()
@@ -144,7 +142,7 @@ namespace Selenium.UlearnDriverComponents
 			return startPage.GoToCourse(Titles.BasicProgrammingTitle);
 		}
 
-		public IEnumerable<UlearnPage> EnumeratePages(string course, string userName, string password)
+		public IEnumerable<SlidePage> EnumeratePages(string course, string userName, string password)
 		{
 			var slideIndex = 0;
 			while (true)
@@ -152,10 +150,10 @@ namespace Selenium.UlearnDriverComponents
 				if (!IsLogin)
 					GoToSignInPage().LoginValidUser(userName, password);
 				driver.Navigate().GoToUrl("https://localhost/Course/" + course + slideIndex);
-				UlearnPage page;
+				SlidePage page;
 				try
 				{
-					page = Get<UlearnPage>();
+					page = Get<SlidePage>();
 				}
 				catch
 				{

@@ -86,7 +86,7 @@
     <Compile Include="SeleniumTests\QuizPageShould.cs" />
     <Compile Include="SeleniumTests\SignInPageShould.cs" />
     <Compile Include="SeleniumTests\StartPageShould.cs" />
-    <Compile Include="SeleniumTests\TestSeleniumCourse\MainEngineTest.cs" />
+    <Compile Include="SeleniumTests\TestSampleCourse\MainEngineTest.cs" />
     <Compile Include="SeleniumTests\TocShould.cs" />
     <Compile Include="SeleniumTests\UlearnDriverTest.cs" />
     <Compile Include="UlearnDriverComponents\Interfaces\IObservable.cs" />
@@ -102,6 +102,7 @@
     <Compile Include="UlearnDriverComponents\PageObjects\RunResult.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\SlidePageTextBlock.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\SomeoneSolution.cs" />
+    <Compile Include="UlearnDriverComponents\PageObjects\TeX.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\TocSlide.cs" />
     <Compile Include="UlearnDriverComponents\Pages\ExerciseSlidePage.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\NavigationBlock.cs" />

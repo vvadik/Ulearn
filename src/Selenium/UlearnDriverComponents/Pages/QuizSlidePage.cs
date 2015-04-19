@@ -8,7 +8,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 {
 	public class QuizSlidePage : SlidePage
 	{
-		private List<QuizBlock> blocks;
 		private IWebElement submitButton;
 		private IWebElement submitAgainButton;
 		private IWebElement submitAgainStatus;
@@ -27,7 +26,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 			submitAgainButton = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.QuizSubmitAgainButtonXPath));
 			submitAgainStatus = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.QuizSubmitAgainStatusXPath));
 			quizStatus = GetQuizStatus();
-			blocks = FindBlocks();
 		}
 
 		private QuizStatus GetQuizStatus()
@@ -51,7 +49,7 @@ namespace Selenium.UlearnDriverComponents.Pages
 
 		public List<QuizBlock> GetBlocks()
 		{
-			return blocks;
+			return FindBlocks();
 		}
 
 		private List<QuizBlock> FindBlocks()
@@ -71,7 +69,7 @@ namespace Selenium.UlearnDriverComponents.Pages
 			//}
 			//return quizBlocks;
 
-			//////////////////////////////////////////// вот тут все норм
+			//////////////////////////////////////////// вот тут все нормально
 			return driver
 				.FindElements(By.XPath(XPaths.QuizBlocksXPath))
 				.Select(GetBlock)

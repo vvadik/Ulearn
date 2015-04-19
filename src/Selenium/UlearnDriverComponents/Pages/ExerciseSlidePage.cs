@@ -13,7 +13,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 		private IWebElement runSolutionButton;
 		private IWebElement resetButton;
 		private IWebElement hintsButton;
-		private List<Hint> hints;
 
 		public ExerciseSlidePage(IWebDriver driver)
 			: base(driver)
@@ -27,8 +26,7 @@ namespace Selenium.UlearnDriverComponents.Pages
 			runSolutionButton = driver.FindElement(ElementsClasses.RunSolutionButton);
 			resetButton = driver.FindElement(ElementsClasses.ResetButton);
 			hintsButton = driver.FindElement(ElementsClasses.GetHintsButton);
-			hints = GetHints();
-			CheckExerciseSlide();
+			//CheckExerciseSlide();
 		}
 
 		private List<Hint> GetHints()
@@ -50,9 +48,9 @@ namespace Selenium.UlearnDriverComponents.Pages
 			return hintsButton.Text;
 		}
 
-		public List<Hint> Hints()
+		public List<Hint> Hints
 		{
-			return new List<Hint>(hints);
+			get {return GetHints();}
 		}
 
 		public bool HasMoreHints()

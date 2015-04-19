@@ -1,62 +1,107 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using Selenium.UlearnDriverComponents;
+using Selenium.UlearnDriverComponents.PageObjects;
 using Selenium.UlearnDriverComponents.Pages;
 
-namespace Selenium.SeleniumTests.TestSeleniumCourse
+namespace Selenium.SeleniumTests.TestSampleCourse
 {
+	public class TestData
+	{
+		public TestData(Action<UlearnDriver> test, string testName)
+		{
+			Test = test;
+			TestName = testName;
+		}
+
+		public string TestName { get; private set; }
+
+		public Action<UlearnDriver> Test { get; private set; }
+	}
+
 	[TestFixture]
 	public class MainEngineTest
 	{
+
 		
 
-		[Test]
-		public void TestSlidePage()
+		private static readonly Dictionary<int, TestData> TestFactory = new Dictionary<int, TestData>
 		{
-			using (IWebDriver driver = new ChromeDriver())
-			{
-				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var uDriver = new UlearnDriver(driver);
-				uDriver.GoToRegistrationPage();
-				var page = uDriver.Get<RegistrationPage>();
-				page.SignUp("user", "asdasd");
-				driver.Navigate().GoToUrl("https://ulearn.azurewebsites.net/Course/SampleCourse");
-				var toc = uDriver.GetToc();
-				toc.GetUnitControl(toc.GetUnitsName().First())
-					.GetSlides()
-					.First()
-					.Click();
-				var sPage = uDriver.Get<SlidePage>();
-				uDriver.CheckTex();
-				Assert.AreEqual(4, sPage.Blocks.Count);
-			}
+			{0, new TestData(TestTextBlocks, "Text_blocks")},
+			{1, new TestData(TestGoodTex, "Good_tex")},
+			{2, new TestData(TestWrongTex, "Wrong_tex")},
+			{3, new TestData(TestVideoBlock, "Video_block")},
+			{4, new TestData(TestCodeBlock, "Code_block")},
+			{5, new TestData(TestExerciseSlidePage, "ExerciseSlidePage")},
+			{6, new TestData(TestQuizSlidePage, "QuizSlidePage")},
+		};
+
+		private static void TestQuizSlidePage(UlearnDriver obj)
+		{
+			return;
 		}
 
-		[Test]
-		public void TestExerciseSlidePage()
+		private static void TestExerciseSlidePage(UlearnDriver obj)
 		{
+			return;
+		}
+
+		private static void TestCodeBlock(UlearnDriver driver)
+		{
+			Assert.IsTrue(driver.Get<SlidePage>().Blocks.First() is SlidePageCodeBlock);
+			Assert.AreEqual(1, driver.Get<SlidePage>().Blocks.Count);
+		}
+
+		private static void TestVideoBlock(UlearnDriver driver)
+		{
+			Assert.IsTrue(driver.Get<SlidePage>().Blocks.First() is SlidePageVideoBlock);
+			Assert.AreEqual(1, driver.Get<SlidePage>().Blocks.Count);
+		}
+
+		private static void TestWrongTex(UlearnDriver driver)
+		{
+			Assert.IsFalse(driver.TeX.All(x => x.IsRender));
+		}
+
+		private static void TestGoodTex(UlearnDriver driver)
+		{
+			Assert.IsTrue(driver.TeX.All(x => x.IsRender));
+		}
+
+		private static void TestTextBlocks(UlearnDriver driver)
+		{
+			var page = driver.Get<SlidePage>();
+			Assert.AreEqual(1, page.Blocks.Count);
+			Assert.AreEqual("Параграф 1\nПараграф 2\nПараграф 3", (page.Blocks.First() as SlidePageTextBlock).Text);
+		}
+
+		[TestCaseSource("EnumeratePages")]
+		public void TestSlides(TestData testData, UlearnDriver uDriver)
+		{
+			testData.Test(uDriver);
+		}
+
+		public IEnumerable<TestCaseData> EnumeratePages()
+		{
+			var r = new Random();
+			var login = r.Next().ToString();
+			var password = r.Next().ToString();
+			const string courseName = "BasicProgramming";
 			using (IWebDriver driver = new ChromeDriver())
 			{
 				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 				var uDriver = new UlearnDriver(driver);
-				uDriver.GoToRegistrationPage();
-				var page = uDriver.Get<RegistrationPage>();
-				page.SignUp("user", "asdasd");
-				driver.Navigate().GoToUrl("https://ulearn.azurewebsites.net/Course/SeleniumCourse");
-				var toc = uDriver.GetToc();
-				toc.GetUnitControl(toc.GetUnitsName().First())
-					.GetSlides()
-					.Skip(1)
-					.First()
-					.Click();
-				var sPage = uDriver.Get<SlidePage>();
-				Assert.AreEqual(2, sPage.Blocks.Count);
+
+				foreach (var test in uDriver
+					.EnumeratePages("SampleCourse", login, password)
+					.Select((x, i) => new TestCaseData(TestFactory[i], uDriver).SetName(TestFactory[i].TestName)))
+				{
+					yield return test;
+				}
 			}
 		}
 	}

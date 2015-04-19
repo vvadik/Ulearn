@@ -10,9 +10,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 		public SignInPage(IWebDriver driver)
 			: base(driver)
 		{
-			if (!driver.Title.Equals(Titles.SignInPageTitle))
-				throw new IllegalLocatorException("Это не страница входа, это: "
-								+ driver.Title);
 		}
 
 		public StartPage LoginValidUser(String userName, String password)

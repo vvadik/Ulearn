@@ -16,16 +16,5 @@ namespace SeleniumCourse.U98_Sample
 		 * Параграф 3
 		*/
 
-		/*
-		 * Видео
-		*/
-
-		//#video GZS36w_fxdg
-
-		/*
-		 * Код
-		*/
-
-		//#include _Code.cs
 	}
 }
