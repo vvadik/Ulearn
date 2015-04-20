@@ -3,7 +3,7 @@
 <div class="btn-group-justified ctrl-group full-width" id="nav_arrows"
 	data-hasnext="@(Model.HasNextSlide ? "true" : "")"
 	data-hasprev="@(Model.HasPrevSlide ? "true" : "")"
-	data-isaccepted="@((Model.IsPassedTask && !Model.OnSolutionsSlide) ? "true" : "")">
+	data-isaccepted="@(Model.NextIsAcceptedSolutions ? "true" : "")">
 	<a class="btn btn-default no-rounds ctrl-group"
 		id="prev_slide_button"
 		href="@Url.Action("Slide", "Course", new {courseId = Model.CourseId, slideIndex = Model.PrevSlideIndex})">Назад</a>
