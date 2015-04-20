@@ -14,7 +14,7 @@ namespace uLearn
 			var parts = name.ToLower().Split(' ');
 			if (parts.Contains("csharp"))
 			{
-				if (name.Contains("singlestatementmethod"))
+				if (parts.Contains("singlestatementmethod"))
 					return CSharpSingleStatementValidator;
 				return CSharpValidator;
 			}
