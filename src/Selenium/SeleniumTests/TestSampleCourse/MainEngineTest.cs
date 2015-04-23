@@ -40,6 +40,8 @@ namespace Selenium.SeleniumTests.TestSampleCourse
 			{6, new TestData(TestQuizSlidePage, "QuizSlidePage")},
 		};
 
+		private ChromeDriver driver;
+
 		private static void TestQuizSlidePage(UlearnDriver obj)
 		{
 			return;
@@ -76,12 +78,15 @@ namespace Selenium.SeleniumTests.TestSampleCourse
 		{
 			var page = driver.Get<SlidePage>();
 			Assert.AreEqual(1, page.Blocks.Count);
-			Assert.AreEqual("Параграф 1\nПараграф 2\nПараграф 3", (page.Blocks.First() as SlidePageTextBlock).Text);
+			Assert.AreEqual("Параграф 1\r\nПараграф 2\r\nПараграф 3", (page.Blocks.First() as SlidePageTextBlock).Text);
 		}
 
+
+		[Test]
 		[TestCaseSource("EnumeratePages")]
-		public void TestSlides(TestData testData, UlearnDriver uDriver)
+		public void TestSampleSlides(TestData testData, UlearnDriver uDriver, string url)
 		{
+			uDriver.GoToUrl(url);
 			testData.Test(uDriver);
 		}
 
@@ -90,19 +95,15 @@ namespace Selenium.SeleniumTests.TestSampleCourse
 			var r = new Random();
 			var login = r.Next().ToString();
 			var password = r.Next().ToString();
-			const string courseName = "BasicProgramming";
-			using (IWebDriver driver = new ChromeDriver())
-			{
-				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-				var uDriver = new UlearnDriver(driver);
+			driver = new ChromeDriver();
+			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
+			var uDriver = new UlearnDriver(driver);
+			var regPage = uDriver.GoToRegistrationPage();
+			regPage.SignUp(login, password);
 
-				foreach (var test in uDriver
-					.EnumeratePages("SampleCourse", login, password)
-					.Select((x, i) => new TestCaseData(TestFactory[i], uDriver).SetName(TestFactory[i].TestName)))
-				{
-					yield return test;
-				}
-			}
+			return uDriver
+				.EnumeratePages("SampleCourse", login, password)
+				.Select((x, i) => new TestCaseData(TestFactory[i], uDriver, uDriver.Url).SetName(TestFactory[i].TestName));
 		}
 	}
 }

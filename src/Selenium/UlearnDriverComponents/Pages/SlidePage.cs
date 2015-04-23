@@ -38,6 +38,7 @@ namespace Selenium.UlearnDriverComponents.Pages
 			return UnionSubBlocks(blockElements.Where(
 				x => x.TagName == "textarea" ||
 				     x.TagName == "p" ||
+					 x.TagName == "ul" ||
 				     (x.TagName == "div" && UlearnDriver.HasCss(x, "video-container")))
 				.Select(CreateBlock));
 		}

@@ -15,7 +15,7 @@ using uLearn.Web.DataContexts;
 
 namespace Selenium.UlearnDriverComponents
 {
-	public class UlearnDriver
+	public class UlearnDriver : IDisposable
 	{
 		private readonly IWebDriver driver;
 
@@ -58,7 +58,8 @@ namespace Selenium.UlearnDriverComponents
 		private object GetClassObject<T>()
 		{
 			var type = typeof (T);
-			var constructor = type.GetConstructor(Type.EmptyTypes);
+			var constructors = type.GetConstructors();
+			var constructor = constructors.FirstOrDefault();
 			if (constructor == null)
 				throw new Exception(String.Format("For type {0} constructor is not implemented", type.Name));
 			var classObject = constructor.Invoke(new object[] {driver});
@@ -104,9 +105,16 @@ namespace Selenium.UlearnDriverComponents
 		{
 			get
 			{
-				return FindElementsSafely(driver, By.XPath(XPaths.TexXPath))
-					.Select((tex, i) => new TeX(FindElementSafely(driver, By.XPath(XPaths.GetRenderTexXPath(i))) != null));
+				var texs = FindElementsSafely(driver, By.XPath(XPaths.TexXPath));
+				return texs.Select((tex, i) => GetTeX(i));
 			}
+		}
+
+		private TeX GetTeX(int i)
+		{
+			var element = FindElementSafely(driver, By.XPath(XPaths.GetRenderTexXPath(i)));
+			var tex =  new TeX(element != null);
+			return tex;
 		}
 
 		public StartPage GoToStartPage()
@@ -149,7 +157,7 @@ namespace Selenium.UlearnDriverComponents
 			{
 				if (!IsLogin)
 					GoToSignInPage().LoginValidUser(userName, password);
-				driver.Navigate().GoToUrl("https://localhost/Course/" + course + slideIndex);
+				driver.Navigate().GoToUrl("https://localhost:44300/Course/" + course + "/Slide/" + slideIndex);
 				SlidePage page;
 				try
 				{
@@ -159,6 +167,13 @@ namespace Selenium.UlearnDriverComponents
 				{
 					yield break;
 				}
+				try
+				{
+					var mayBeExceptionH1 = driver.FindElements(By.XPath("html/body/span/h1")).FirstOrDefault();
+					if (mayBeExceptionH1 != null && mayBeExceptionH1.Text.Contains("Ошибка сервера в приложении '/'."))
+						yield break;
+				}
+				catch { }
 				yield return page;
 				slideIndex++;
 			}
@@ -219,6 +234,28 @@ namespace Selenium.UlearnDriverComponents
 			if (factory.ContainsKey(courseName))
 				return factory[courseName];
 			throw new NotImplementedException(string.Format("Для курса {0} не определено", courseName));
+		}
+
+		public string Url
+		{
+			get { return driver.Url; }
+		}
+
+		public void GoToUrl(string url)
+		{
+			driver.Navigate().GoToUrl(url);
+		}
+
+		public void Dispose()
+		{
+			try
+			{
+				driver.Dispose();
+			}
+			catch
+			{
+				// ignored
+			}
 		}
 	}
 }
