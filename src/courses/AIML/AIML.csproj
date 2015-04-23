@@ -204,7 +204,9 @@
     <Content Include="Slides\L070 - Метод обратного распространения ошибки\Title.txt" />
     <Content Include="Slides\L080 - Задача регрессии\S099 - Quiz.quiz.xml" />
     <Content Include="Slides\L080 - Задача регрессии\Title.txt" />
+    <Content Include="Slides\L090 - Классификация и распознавание образов\S999 - Quiz.quiz.xml" />
     <Content Include="Slides\L090 - Классификация и распознавание образов\Title.txt" />
+    <Content Include="Slides\L100 - Разное о нейронных сетях\S999 - Quiz.quiz.xml" />
     <Content Include="Slides\L100 - Разное о нейронных сетях\Title.txt" />
     <Content Include="Slides\Title.txt" />
   </ItemGroup>
