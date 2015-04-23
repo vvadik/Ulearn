@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Linq", "courses\linq\Linq.csproj", "{0BD679E4-9ACB-4B02-835B-CBCA1DE8B817}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn", "uLearn\uLearn.csproj", "{333DD5A7-9955-46CB-8905-79E800F2B435}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn.Web", "uLearn.Web\uLearn.Web.csproj", "{B3701D2E-D001-4E0A-AB2F-7ACB5A89589B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{886309CE-DFC7-4449-9171-2351E2CE2B88}"
+	ProjectSection(SolutionItems) = preProject
+		quiz.xsd = quiz.xsd
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OOP", "courses\OOP\OOP.csproj", "{7D7AF3EA-890B-4844-84CE-80547C7E4DF7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6BAF4042-556E-48C8-BE45-27490ACFDDCC}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Help", "courses\Help\Help.csproj", "{E48C481C-AA34-4413-AED3-4B685AFF3239}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIML", "courses\AIML\AIML.csproj", "{FE23302C-0D46-4C8E-81BE-C9B79F6E0263}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0BD679E4-9ACB-4B02-835B-CBCA1DE8B817}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BD679E4-9ACB-4B02-835B-CBCA1DE8B817}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BD679E4-9ACB-4B02-835B-CBCA1DE8B817}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BD679E4-9ACB-4B02-835B-CBCA1DE8B817}.Release|Any CPU.Build.0 = Release|Any CPU
+		{333DD5A7-9955-46CB-8905-79E800F2B435}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{333DD5A7-9955-46CB-8905-79E800F2B435}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{333DD5A7-9955-46CB-8905-79E800F2B435}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{333DD5A7-9955-46CB-8905-79E800F2B435}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3701D2E-D001-4E0A-AB2F-7ACB5A89589B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3701D2E-D001-4E0A-AB2F-7ACB5A89589B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3701D2E-D001-4E0A-AB2F-7ACB5A89589B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3701D2E-D001-4E0A-AB2F-7ACB5A89589B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D7AF3EA-890B-4844-84CE-80547C7E4DF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D7AF3EA-890B-4844-84CE-80547C7E4DF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D7AF3EA-890B-4844-84CE-80547C7E4DF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D7AF3EA-890B-4844-84CE-80547C7E4DF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E48C481C-AA34-4413-AED3-4B685AFF3239}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E48C481C-AA34-4413-AED3-4B685AFF3239}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E48C481C-AA34-4413-AED3-4B685AFF3239}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E48C481C-AA34-4413-AED3-4B685AFF3239}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE23302C-0D46-4C8E-81BE-C9B79F6E0263}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE23302C-0D46-4C8E-81BE-C9B79F6E0263}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE23302C-0D46-4C8E-81BE-C9B79F6E0263}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE23302C-0D46-4C8E-81BE-C9B79F6E0263}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
