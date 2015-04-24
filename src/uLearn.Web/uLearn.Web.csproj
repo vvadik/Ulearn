@@ -232,12 +232,12 @@
     <Compile Include="Controllers\ExerciseController.cs" />
     <Compile Include="Controllers\HintController.cs" />
     <Compile Include="DataContexts\TextsRepo.cs" />
-    <Compile Include="ExecutionService\CsSandboxExecutionService.Settings.cs" />
+    <Compile Include="ExecutionService\CsSandboxExecutionService.*Settings.cs" />
     <Compile Include="ExecutionService\CsSandboxExecutionService.Settings.Sample.cs" />
     <Compile Include="ExecutionService\RedundantExecutionService.cs" />
     <Compile Include="ExecutionService\IdeoneExecutionService.cs" />
     <Compile Include="ExecutionService\StringExtention.cs" />
-    <Compile Include="Ideone\IdeoneClient.Settings.cs" />
+    <Compile Include="Ideone\IdeoneClient.*Settings.cs" />
     <Compile Include="Migrations\201503231319119_ExecutionServiceName.cs" />
     <Compile Include="Migrations\201503231319119_ExecutionServiceName.Designer.cs">
       <DependentUpon>201503231319119_ExecutionServiceName.cs</DependentUpon>
