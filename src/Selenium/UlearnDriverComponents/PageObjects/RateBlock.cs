@@ -17,9 +17,9 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 
 		private void FillButtons()
 		{
-			buttons[Rate.NotUnderstand] = new RateInfo(driver.FindElement(By.ClassName(StringValue.GetStringValue(Rate.NotUnderstand))));
-			buttons[Rate.Trivial] = new RateInfo(driver.FindElement(By.ClassName(StringValue.GetStringValue(Rate.Trivial))));
-			buttons[Rate.Good] = new RateInfo(driver.FindElement(By.ClassName(StringValue.GetStringValue(Rate.Good))));
+			buttons[Rate.NotUnderstand] = new RateInfo(driver.FindElement(By.Id(StringValue.GetStringValue(Rate.NotUnderstand))));
+			buttons[Rate.Trivial] = new RateInfo(driver.FindElement(By.Id(StringValue.GetStringValue(Rate.Trivial))));
+			buttons[Rate.Good] = new RateInfo(driver.FindElement(By.Id(StringValue.GetStringValue(Rate.Good))));
 		}
 
 		public void RateSlide(Rate rate)

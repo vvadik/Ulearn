@@ -26,9 +26,6 @@ namespace Selenium.SeleniumTests.TestSampleCourse
 	[TestFixture]
 	public class MainEngineTest
 	{
-
-		
-
 		private static readonly Dictionary<int, TestData> TestFactory = new Dictionary<int, TestData>
 		{
 			{0, new TestData(TestTextBlocks, "Text_blocks")},

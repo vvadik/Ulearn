@@ -29,7 +29,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 
 		public void ClickNextButton()
 		{
-			if (nextSolutionsButton.Enabled)
+			if (nextSlideButton.Displayed)
 				nextSlideButton.Click();
 			else
 				nextSolutionsButton.Click();
@@ -38,6 +38,16 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		public void ClickPrevButton()
 		{
 			prevSlideButton.Click();
+		}
+
+		public bool HasNextButton()
+		{
+			return (nextSlideButton.Displayed || nextSolutionsButton.Displayed);
+		}
+
+		public bool IsHasPrevButton()
+		{
+			return (prevSlideButton.Displayed);
 		}
 
 		public bool IsActiveNextButton()

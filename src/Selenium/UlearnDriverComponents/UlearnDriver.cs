@@ -152,31 +152,32 @@ namespace Selenium.UlearnDriverComponents
 
 		public IEnumerable<SlidePage> EnumeratePages(string course, string userName, string password)
 		{
-			var slideIndex = 0;
+			if (!IsLogin)
+				GoToSignInPage().LoginValidUser(userName, password);
+			driver.Navigate().GoToUrl("https://localhost:44300/Course/" + course + "/Slide/" + 0);
 			while (true)
 			{
-				if (!IsLogin)
-					GoToSignInPage().LoginValidUser(userName, password);
-				driver.Navigate().GoToUrl("https://localhost:44300/Course/" + course + "/Slide/" + slideIndex);
-				SlidePage page;
-				try
+				if (GetCurrentPageType() == PageType.SolutionsPage)
 				{
-					page = Get<SlidePage>();
-				}
-				catch
-				{
-					yield break;
-				}
-				try
-				{
-					var mayBeExceptionH1 = driver.FindElements(By.XPath("html/body/span/h1")).FirstOrDefault();
-					if (mayBeExceptionH1 != null && mayBeExceptionH1.Text.Contains("Ошибка сервера в приложении '/'."))
+					var solutionsPage = Get<SolutionsPage>();
+					if (!solutionsPage.GetNavArrows().HasNextButton())
 						yield break;
+					solutionsPage.GetNavArrows().ClickNextButton();
+					continue;
 				}
-				catch { }
+				SlidePage page = Get<SlidePage>();
 				yield return page;
-				slideIndex++;
+				if (!page.GetNavArrows().HasNextButton())
+					yield break;
+				GoToNextSlide(page);
 			}
+		}
+
+		private static void GoToNextSlide(SlidePage page)
+		{
+			if (!page.GetNavArrows().IsActiveNextButton())
+				page.GetRateBlock().RateSlide(Rate.Good);
+			page.GetNavArrows().ClickNextButton();
 		}
 
 		public static bool HasCss(IWebElement webElement, string css)

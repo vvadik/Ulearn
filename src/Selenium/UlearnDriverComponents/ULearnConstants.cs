@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenQA.Selenium;
 using Selenium.UlearnDriverComponents.Pages;
 
@@ -189,9 +190,9 @@ namespace Selenium.UlearnDriverComponents
 
 	public enum Rate
 	{
-		[StringValue("understand-btn")] Good,
-		[StringValue("not-understand-btn")] NotUnderstand,
-		[StringValue("trivial-btn")] Trivial,
+		[StringValue("good")] Good,
+		[StringValue("notunderstand")] NotUnderstand,
+		[StringValue("trivial")] Trivial,
 		NotWatched = 0
 	}
 
@@ -253,19 +254,29 @@ namespace Selenium.UlearnDriverComponents
 
 	public static class PageTypeValue
 	{
-		private static readonly Dictionary<PageType, Type> factory = new Dictionary<PageType, Type>
+		private static readonly Dictionary<PageType, Type> Factory = new Dictionary<PageType, Type>
 		{
 			{ PageType.ExerciseSlidePage, typeof(ExerciseSlidePage) },
 			{ PageType.QuizSlidePage, typeof(QuizSlidePage) },
 			{ PageType.SlidePage, typeof(SlidePage) },
 			{ PageType.SolutionsPage, typeof(SolutionsPage) },
 			{ PageType.StartPage, typeof(StartPage) },
-			{ PageType.SignInPage, typeof(SignInPage) }
+			{ PageType.SignInPage, typeof(SignInPage) },
+			{ PageType.RegistrationPage, typeof(RegistrationPage) }
 		};
 
 		public static Type GetTypeValue(PageType type)
 		{
-			return factory[type];
+			return Factory[type];
+		}
+
+		public static PageType GetTypeValue(Type type)
+		{
+			foreach (var pair in Factory.Where(pair => type == pair.Value))
+			{
+				return pair.Key;
+			}
+			return PageType.IncomprehensibleType;
 		}
 	}
 }
