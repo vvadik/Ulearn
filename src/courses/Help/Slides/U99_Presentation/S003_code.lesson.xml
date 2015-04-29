@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Lesson xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://ulearn.azurewebsites.net/lesson">
+	<title>Код</title>
+	<id>C1DA3BA7256142D58F245CCEF2B176A0</id>
+	<include-code file="_Code.cs">
+		<label>Code</label>
+	</include-code>
+	<include-code file="_Code.cs">
+		<label>A</label>
+	</include-code>
+	<include-code file="_Code.cs">
+		<label>A</label>
+		<label>B</label>
+	</include-code>
+</Lesson>

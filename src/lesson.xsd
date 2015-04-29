@@ -27,10 +27,10 @@
 			<xs:element name="md" type="notEmptyString" />
 			<xs:element name="code" type="Code" />
 			<xs:element name="youtube" type="notEmptyString" />
-			<xs:element name="include-code" type="notEmptyString" />
-			<xs:element name="include-md" type="notEmptyString" />
+			<xs:element name="include-code" type="IncludeCode" />
+			<xs:element name="include-md" type="Include" />
 			<xs:element name="gallery" type="notEmptyString" />
-			<xs:element name="include-blocks" type="notEmptyString" />
+			<xs:element name="include-blocks" type="Include" />
 		</xs:choice>
 	</xs:group>
 
@@ -56,4 +56,17 @@
 		<xs:attribute name="lang" type="notEmptyString" use="required"/>
 	</xs:complexType>
 
+	<xs:complexType name="Include">
+		<xs:attribute name="file" type="notEmptyString"/>
+	</xs:complexType>
+
+	<xs:complexType name="IncludeCode">
+		<xs:complexContent>
+			<xs:extension base="Include">
+				<xs:sequence minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="label" type="notEmptyString" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 </xs:schema>

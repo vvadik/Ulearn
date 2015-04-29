@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Slides\U99_Presentation\_Code.cs" />
     <Compile Include="Slides\U99_Presentation\S001_Gallery.cs" />
     <Compile Include="CourseTests.cs" />
   </ItemGroup>
@@ -50,6 +51,7 @@
     <Content Include="Slides\U99_Presentation\img\03-Структуры.png" />
     <Content Include="Slides\U99_Presentation\img\markdown.png" />
     <Content Include="Slides\U99_Presentation\S002_sample.quiz.xml" />
+    <Content Include="Slides\U99_Presentation\S003_code.lesson.xml" />
     <Content Include="Slides\U99_Presentation\Title.txt" />
   </ItemGroup>
   <ItemGroup>

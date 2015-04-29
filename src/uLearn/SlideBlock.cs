@@ -4,6 +4,8 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using uLearn.CSharp;
 
 namespace uLearn
@@ -128,8 +130,11 @@ namespace uLearn
 	[XmlType("include-code")]
 	public class IncludeCodeBlock : SlideBlock
 	{
-		[XmlText]
+		[XmlAttribute("file")]
 		public string File { get; set; }
+
+		[XmlElement("label")]
+		public string[] Labels { get; set; }
 
 		public IncludeCodeBlock(string file)
 		{
@@ -142,14 +147,35 @@ namespace uLearn
 
 		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress)
 		{
-			yield return new CodeBlock(fs.GetContent(File), Path.GetExtension(File));
+			var content = fs.GetContent(File);
+			var lang = Path.GetExtension(File).Trim('.');
+			if (lang == "cs")
+				lang = "csharp";
+			if (Labels == null || Labels.Length == 0)
+			{
+				yield return new CodeBlock(content, lang);
+			}
+			else
+			{
+				var tree = CSharpSyntaxTree.ParseText(content);
+				var objects = tree.GetRoot().DescendantNodes()
+					.OfType<MemberDeclarationSyntax>()
+					.Where(node => node is ClassDeclarationSyntax || node is MethodDeclarationSyntax)
+					.Where(node => !node.HasAttribute<HideOnSlideAttribute>())
+					.GroupBy(node => node.Identifier().ValueText)
+					.ToDictionary(
+						nodes => nodes.Key, 
+						nodes => String.Join("\r\n\r\n", nodes.Select(node => node.ToPrettyString()))
+					);
+				yield return new CodeBlock(String.Join("\r\n\r\n", Labels.Select(s => objects[s])), lang);
+			}
 		}
 	}
 
 	[XmlType("include-md")]
 	public class IncludeMdBlock : SlideBlock
 	{
-		[XmlText]
+		[XmlAttribute("file")]
 		public string File { get; set; }
 
 		public IncludeMdBlock(string file)
@@ -191,7 +217,7 @@ namespace uLearn
 	[XmlType("include-blocks")]
 	public class IncludeBlocksBlock : SlideBlock
 	{
-		[XmlText]
+		[XmlAttribute("file")]
 		public string File { get; set; }
 
 		public IncludeBlocksBlock(string file)
