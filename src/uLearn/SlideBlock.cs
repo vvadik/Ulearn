@@ -244,9 +244,20 @@ namespace uLearn
 
 		private static string GetLabelData(Label label, IEnumerable<SyntaxNode> nodes)
 		{
-//			if (label.OnlyBody)
-//				nodes = nodes.SelectMany(node => node.ChildNodes());
+			if (label.OnlyBody)
+				return string.Join("\r\n\r\n", nodes.Select(GetBody));
 			return String.Join("\r\n\r\n", nodes.Select(node => node.ToPrettyString()));
+		}
+
+		private static string GetBody(SyntaxNode node)
+		{
+			var method = node as BaseMethodDeclarationSyntax;
+			if (method != null)
+				return method.Body.Statements.ToFullString().RemoveCommonNesting();
+			var type = node as TypeDeclarationSyntax;
+			if (type != null)
+				return type.Members.ToFullString().RemoveCommonNesting();
+			return "";
 		}
 
 		public class Label

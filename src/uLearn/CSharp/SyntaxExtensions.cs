@@ -27,17 +27,7 @@ namespace uLearn.CSharp
 
 		public static SyntaxToken Identifier(this MemberDeclarationSyntax syntax)
 		{
-			return Identifier((dynamic)syntax);
-		}
-
-		private static SyntaxToken Identifier(BaseTypeDeclarationSyntax syntax)
-		{
-			return syntax.Identifier;
-		}
-
-		private static SyntaxToken Identifier(MethodDeclarationSyntax syntax)
-		{
-			return syntax.Identifier;
+			return ((dynamic)syntax).Identifier;
 		}
 
 		public static bool HasAttribute<TAttr>(this MemberDeclarationSyntax node) where TAttr : Attribute

@@ -34,7 +34,7 @@
 
 	<md>###Enum</md>
 	<include-code file="_Code.cs">
-		<label only-body="true">Enum</label>
+		<label>Enum</label>
 	</include-code>
 	
 	<md>###Регион</md>
