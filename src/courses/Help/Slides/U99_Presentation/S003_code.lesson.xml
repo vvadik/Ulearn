@@ -2,14 +2,43 @@
 <Lesson xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://ulearn.azurewebsites.net/lesson">
 	<title>Код</title>
 	<id>C1DA3BA7256142D58F245CCEF2B176A0</id>
+	
+	<md>###Весь файл</md>
+	<include-code file="_Code.cs" />
+	
+	<md>###Класс Code</md>
 	<include-code file="_Code.cs">
 		<label>Code</label>
 	</include-code>
+	
+	<md>###Метод A</md>
 	<include-code file="_Code.cs">
 		<label>A</label>
 	</include-code>
+	
+	<md>###Методы B и A</md>
 	<include-code file="_Code.cs">
-		<label>A</label>
 		<label>B</label>
+		<label>A</label>
+	</include-code>
+	
+	<md>###Класс Code. Только тело</md>
+	<include-code file="_Code.cs">
+		<label only-body="true">Code</label>
+	</include-code>
+	
+	<md>###Метод A. Только тело</md>
+	<include-code file="_Code.cs">
+		<label only-body="true">A</label>
+	</include-code>
+
+	<md>###Enum</md>
+	<include-code file="_Code.cs">
+		<label only-body="true">Enum</label>
+	</include-code>
+	
+	<md>###Регион</md>
+	<include-code file="_Code.cs">
+		<label>namedRegion</label>
 	</include-code>
 </Lesson>

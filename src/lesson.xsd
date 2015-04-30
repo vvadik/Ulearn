@@ -64,9 +64,17 @@
 		<xs:complexContent>
 			<xs:extension base="Include">
 				<xs:sequence minOccurs="0" maxOccurs="unbounded">
-					<xs:element name="label" type="notEmptyString" />
+					<xs:element name="label" type="Label" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Label">
+		<xs:simpleContent>
+			<xs:extension base="notEmptyString">
+				<xs:attribute name="only-body" type="xs:boolean" />
+			</xs:extension>
+		</xs:simpleContent>
 	</xs:complexType>
 </xs:schema>
