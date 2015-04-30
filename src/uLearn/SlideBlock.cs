@@ -153,8 +153,7 @@ namespace uLearn
 		{
 			var content = fs.GetContent(File);
 			var lang = (Path.GetExtension(File) ?? "").Trim('.');
-			if (lang == "cs")
-				lang = "csharp";
+
 			if (Labels == null || Labels.Length == 0)
 			{
 				yield return new CodeBlock(content, lang);
@@ -162,7 +161,7 @@ namespace uLearn
 			}
 
 			var members = 
-				lang == "csharp" ? 
+				lang == "cs" ? 
 					ParseCsFile(content) : 
 					new Dictionary<string, List<MemberDeclarationSyntax>>();
 
