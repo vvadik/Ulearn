@@ -4,16 +4,14 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 {
 	public class NavigationBlock : PageObject
 	{
-		private readonly IWebDriver driver;
 		private readonly IWebElement nextSlideButton;
 		private readonly IWebElement prevSlideButton;
 		private readonly IWebElement nextSolutionsButton;
-		public NavigationBlock(IWebDriver driver)
+		public NavigationBlock(IWebDriver driver) : base(driver)
 		{
-			this.driver = driver;
-			nextSlideButton = UlearnDriver.FindElementSafely(driver, ElementsId.NextNavArrow);
-			prevSlideButton = UlearnDriver.FindElementSafely(driver, ElementsId.PrevNavArrow);
-			nextSolutionsButton = UlearnDriver.FindElementSafely(driver, ElementsId.NextSolutionsButton);
+			nextSlideButton = UlearnDriver.FindElementSafely(Driver, ElementsId.NextNavArrow);
+			prevSlideButton = UlearnDriver.FindElementSafely(Driver, ElementsId.PrevNavArrow);
+			nextSolutionsButton = UlearnDriver.FindElementSafely(Driver, ElementsId.NextSolutionsButton);
 			CheckButtons();
 		}
 

@@ -62,5 +62,16 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		{
 			return slides.Select(x => x.Value).ToList();
 		}
+
+		public bool Collapse
+		{
+			get { return IsCollapse(); }
+		}
+
+		private bool IsCollapse()
+		{
+			var element = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocUnitHeaderCollapseInfoXPath(unitIndex)));
+			return UlearnDriver.HasCss(element, "in");
+		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -10,41 +11,26 @@ using Selenium.UlearnDriverComponents.Pages;
 
 namespace Selenium.SeleniumTests.TestSampleCourse
 {
-	public class TestData
-	{
-		public TestData(Action<UlearnDriver> test, string testName)
-		{
-			Test = test;
-			TestName = testName;
-		}
-
-		public string TestName { get; private set; }
-
-		public Action<UlearnDriver> Test { get; private set; }
-	}
-
 	[TestFixture]
 	public class MainEngineTest
 	{
-		private static readonly Dictionary<int, TestData> TestFactory = new Dictionary<int, TestData>
+		private static readonly Dictionary<int, Action<UlearnDriver>> TestFactory = new Dictionary<int, Action<UlearnDriver>>
 		{
-			{0, new TestData(TestTextBlocks, "Text_blocks")},
-			{1, new TestData(TestGoodTex, "Good_tex")},
-			{2, new TestData(TestWrongTex, "Wrong_tex")},
-			{3, new TestData(TestVideoBlock, "Video_block")},
-			{4, new TestData(TestCodeBlock, "Code_block")},
-			{5, new TestData(TestExerciseSlidePage, "ExerciseSlidePage")},
-			{6, new TestData(TestQuizSlidePage, "QuizSlidePage")},
+			{0, TestTextBlocks},
+			{1, TestGoodTex},
+			{2, TestWrongTex},
+			{3, TestVideoBlock},
+			{4, TestCodeBlock},
+			{5, TestExerciseSlidePage},
+			{6, TestQuizSlidePage}
 		};
 
-		private ChromeDriver driver;
-
-		private static void TestQuizSlidePage(UlearnDriver obj)
+		private static void TestQuizSlidePage(UlearnDriver driver)
 		{
 			return;
 		}
 
-		private static void TestExerciseSlidePage(UlearnDriver obj)
+		private static void TestExerciseSlidePage(UlearnDriver driver)
 		{
 			return;
 		}
@@ -80,27 +66,57 @@ namespace Selenium.SeleniumTests.TestSampleCourse
 
 
 		[Test]
-		[TestCaseSource("EnumeratePages")]
-		public void TestSampleSlides(TestData testData, UlearnDriver uDriver, string url)
+		public void EnumeratePages()
 		{
-			uDriver.GoToUrl(url);
-			testData.Test(uDriver);
-		}
-
-		public IEnumerable<TestCaseData> EnumeratePages()
-		{
+			var exceptions = new List<Exception>();
+			var screenshotsPath = new List<string>();
 			var r = new Random();
 			var login = r.Next().ToString();
 			var password = r.Next().ToString();
-			driver = new ChromeDriver();
-			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-			var uDriver = new UlearnDriver(driver);
-			var regPage = uDriver.GoToRegistrationPage();
-			regPage.SignUp(login, password);
+			using (var driver = new ChromeDriver())
+			{
+				driver.Navigate().GoToUrl(ULearnReferences.StartPage);
+				var uDriver = new UlearnDriver(driver);
+				var regPage = uDriver.GoToRegistrationPage();
+				regPage.SignUp(login, password);
 
-			return uDriver
-				.EnumeratePages("SampleCourse", login, password)
-				.Select((x, i) => new TestCaseData(TestFactory[i], uDriver, uDriver.Url).SetName(TestFactory[i].TestName));
+				var pages = uDriver.EnumeratePages("SampleCourse", login, password);
+				TestAllSlides(pages, uDriver, exceptions, screenshotsPath, driver);
+			}
+			Verdict(exceptions, screenshotsPath);
+		}
+
+		private static void TestAllSlides(IEnumerable<SlidePage> pages, UlearnDriver uDriver, List<Exception> exceptions,
+			List<string> screenshotsPath, IWebDriver driver)
+		{
+			foreach (var test in pages
+				.Select((x, i) => new {Value = x, Index = i}))
+			{
+				try
+				{
+					TestFactory[test.Index](uDriver);
+				}
+				catch (Exception e)
+				{
+					exceptions.Add(e);
+					screenshotsPath.Add(UlearnDriver.SaveScreenshot(driver));
+				}
+			}
+		}
+
+		private static void Verdict(IReadOnlyList<Exception> exceptions, IReadOnlyList<string> screenshotsPath)
+		{
+			if (exceptions.Count == 0)
+				return;
+			var exceptionString = new StringBuilder();
+			for (var i = 0; i < exceptions.Count; i++)
+			{
+				exceptionString.Append(exceptions[i]);
+				exceptionString.Append("\r\nPath to screenshot:\r\n===============\r\n");
+				exceptionString.Append(screenshotsPath[i]);
+				exceptionString.Append("\r\n===============\r\n");
+			}
+			throw new Exception(exceptionString.ToString());
 		}
 	}
 }

@@ -21,31 +21,12 @@ namespace Selenium.UlearnDriverComponents.Pages
 			var mayBeExceptionH2 = driver.FindElements(By.XPath("html/body/span/h2")).FirstOrDefault();
 			if (mayBeExceptionH1 == null) return;
 
-			var screenshotName = SaveScreenshot(driver);
+			var pathToScreenshot = UlearnDriver.SaveScreenshot(driver);
+
 			throw new Exception(mayBeExceptionH1.Text + "\r\n" + mayBeExceptionH2.Text + "\r\n" +
-			                    "Sreenshot: " + screenshotName);
+			                    "Sreenshot:\r\n" + pathToScreenshot);
 		}
 
-		private static string SaveScreenshot(IWebDriver driver)
-		{
-			var screenshot = ((ITakesScreenshot) driver).GetScreenshot();
-			var directoryInfo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent;
-			var projectDirectory = Directory.GetCurrentDirectory();
-			if (directoryInfo != null)
-				projectDirectory = directoryInfo.FullName;
-			var screenshotName = projectDirectory + "\\screenshots\\" +
-			                     DateTime.Now.ToString(CultureInfo.InvariantCulture)
-				                     .Replace("/", "").Replace(" ", "").Replace(":", "") + ".png";
-
-			var imageBytes = Convert.FromBase64String(screenshot.ToString());
-
-			using (var binaryWriter = new BinaryWriter(new FileStream(screenshotName, FileMode.Append, FileAccess.Write)))
-			{
-				binaryWriter.Write(imageBytes);
-				binaryWriter.Close();
-			}
-			return screenshotName;
-		}
 
 		public string GetTitle()
 		{

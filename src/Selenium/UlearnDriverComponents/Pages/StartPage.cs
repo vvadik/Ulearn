@@ -28,6 +28,8 @@ namespace Selenium.UlearnDriverComponents.Pages
 				ClickCourseButton(courseTitle, courseBlocks, 0);
 			if (courseTitle == Titles.LinqTitle)
 				ClickCourseButton(courseTitle, courseBlocks, 1);
+			if (courseTitle == Titles.SampleCourseTitle)
+				driver.Navigate().GoToUrl("https://localhost:44300/Course/SampleCourse/Slide/0");
 			return new SlidePage(driver);
 		}
 

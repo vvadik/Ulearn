@@ -6,20 +6,18 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 {
 	public class RateBlock : PageObject
 	{
-		private readonly IWebDriver driver;
 		private readonly Dictionary<Rate, RateInfo> buttons;
-		public RateBlock(IWebDriver driver)
+		public RateBlock(IWebDriver driver) : base(driver)
 		{
-			this.driver = driver;
 			buttons = new Dictionary<Rate, RateInfo>();
 			FillButtons();
 		}
 
 		private void FillButtons()
 		{
-			buttons[Rate.NotUnderstand] = new RateInfo(driver.FindElement(By.Id(StringValue.GetStringValue(Rate.NotUnderstand))));
-			buttons[Rate.Trivial] = new RateInfo(driver.FindElement(By.Id(StringValue.GetStringValue(Rate.Trivial))));
-			buttons[Rate.Good] = new RateInfo(driver.FindElement(By.Id(StringValue.GetStringValue(Rate.Good))));
+			buttons[Rate.NotUnderstand] = new RateInfo(Driver.FindElement(By.Id(StringValue.GetStringValue(Rate.NotUnderstand))));
+			buttons[Rate.Trivial] = new RateInfo(Driver.FindElement(By.Id(StringValue.GetStringValue(Rate.Trivial))));
+			buttons[Rate.Good] = new RateInfo(Driver.FindElement(By.Id(StringValue.GetStringValue(Rate.Good))));
 		}
 
 		public void RateSlide(Rate rate)

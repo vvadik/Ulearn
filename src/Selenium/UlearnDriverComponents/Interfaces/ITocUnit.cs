@@ -7,6 +7,7 @@ namespace Selenium.UlearnDriverComponents.Interfaces
 		void Click();
 		IReadOnlyCollection<string> GetSlidesName();
 		IReadOnlyCollection<ITocSlide> GetSlides();
-		
+		bool Collapse { get; }
+
 	}
 }

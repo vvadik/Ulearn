@@ -15,6 +15,8 @@ namespace Selenium.UlearnDriverComponents
 	public class ULearnReferences
 	{
 		public static string StartPage { get { return "https://localhost:44300/"; } }
+		public static string RegistrationPage { get { return "https://localhost:44300/Account/Register"; } }
+
 		//public static string StartPage { get { return "https://ulearn.azurewebsites.net/"; } }
 	}
 
@@ -113,6 +115,9 @@ namespace Selenium.UlearnDriverComponents
 		public static string TocUnitHeaderXPath(int unitIndex)
 		{ return String.Format("html/body/ul/li[{0}]/a", unitIndex + 1); }
 
+		public static string TocUnitHeaderCollapseInfoXPath(int unitIndex)
+		{ return String.Format("html/body/ul/li[{0}]/ul", unitIndex + 1); }
+
 		public static string TocSlidesXPath(int unitIndex) 
 		{ return String.Format("html/body/ul/li[{0}]/ul/li/a", unitIndex + 1); }
 
@@ -143,6 +148,8 @@ namespace Selenium.UlearnDriverComponents
 		public static string SignInPageTitle { get { return "Вход | uLearn"; } }
 
 		public static string BasicProgrammingTitle { get { return "Основы программирования | uLearn"; } }
+
+		public static string SampleCourseTitle { get { return "Шаблонный курс| uLearn"; } }
 
 		public static string LinqTitle { get { return "Основы Linq | uLearn"; } }
 		public static string RegistrationPageTitle { get { return "Регистрация | uLearn"; } }
@@ -225,20 +232,17 @@ namespace Selenium.UlearnDriverComponents
 
 	public class StringValue
 	{
-		private static Dictionary<Enum, StringValueAttribute> _stringValues = new Dictionary<Enum, StringValueAttribute>();
+		private static readonly Dictionary<Enum, StringValueAttribute> _stringValues =
+			new Dictionary<Enum, StringValueAttribute>();
 
 		public static string GetStringValue(Enum value)
 		{
 			string output = null;
 			var type = value.GetType();
-
-			//Check first in our cached results...
 			if (_stringValues.ContainsKey(value))
 				output = (_stringValues[value] as StringValueAttribute).Value;
 			else
 			{
-				//Look for our 'StringValueAttribute' 
-				//in the field's custom attributes
 				var fi = type.GetField(value.ToString());
 				var attrs = fi.GetCustomAttributes(typeof(StringValueAttribute), false) as StringValueAttribute[];
 				if (attrs.Length > 0)

@@ -14,6 +14,7 @@ namespace Selenium.SeleniumTests
 	[TestFixture]
 	public class QuizPageShould
 	{
+		[Explicit]
 		[Test]
 		public void CheckAnswers()
 		{

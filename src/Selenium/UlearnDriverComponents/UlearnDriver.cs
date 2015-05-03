@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -22,6 +23,12 @@ namespace Selenium.UlearnDriverComponents
 		public UlearnDriver(IWebDriver driver)
 		{
 			this.driver = driver;
+		}
+
+		public UlearnDriver()
+		{
+			driver = new ChromeDriver();
+			GoToStartPage();
 		}
 
 		public PageType GetCurrentPageType()
@@ -89,10 +96,7 @@ namespace Selenium.UlearnDriverComponents
 
 		public RegistrationPage GoToRegistrationPage()
 		{
-			var registrationHeaderButton = FindElementSafely(driver, By.XPath(XPaths.RegistrationHeaderButton));
-			if (registrationHeaderButton == null)
-				throw new NotFoundException();
-			registrationHeaderButton.Click();
+			driver.Navigate().GoToUrl(ULearnReferences.RegistrationPage);
 			return new RegistrationPage(driver);
 		}
 
@@ -165,7 +169,7 @@ namespace Selenium.UlearnDriverComponents
 					solutionsPage.GetNavArrows().ClickNextButton();
 					continue;
 				}
-				SlidePage page = Get<SlidePage>();
+				var page = Get<SlidePage>();
 				yield return page;
 				if (!page.GetNavArrows().HasNextButton())
 					yield break;
@@ -180,14 +184,54 @@ namespace Selenium.UlearnDriverComponents
 			page.GetNavArrows().ClickNextButton();
 		}
 
+		/// <summary>
+		/// Save screenshot and return path to it.
+		/// </summary>
+		/// <returns>path to screenshot</returns>
+		public static string SaveScreenshot(IWebDriver driver)
+		{
+			var directoryInfo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent;
+			var projectDirectory = Directory.GetCurrentDirectory();
+			if (directoryInfo != null)
+				projectDirectory = directoryInfo.FullName;
+			if (!Directory.Exists(projectDirectory + "\\screenshots"))
+				Directory.CreateDirectory(projectDirectory + "\\screenshots");
+			var screenshotName = projectDirectory + "\\screenshots\\" +
+								 DateTime.Now.ToString(CultureInfo.InvariantCulture)
+									 .Replace("/", "").Replace(" ", "").Replace(":", "") + ".png";
+
+			var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
+
+			var imageBytes = Convert.FromBase64String(screenshot.ToString());
+
+			using (var binaryWriter = new BinaryWriter(new FileStream(screenshotName, FileMode.Append, FileAccess.Write)))
+			{
+				binaryWriter.Write(imageBytes);
+				binaryWriter.Close();
+			}
+			return screenshotName;
+		}
+
+		public static void SaveScreenshot(IWebDriver driver, string fullPath)
+		{
+			var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
+
+			var imageBytes = Convert.FromBase64String(screenshot.ToString());
+
+			using (var binaryWriter = new BinaryWriter(new FileStream(fullPath, FileMode.Append, FileAccess.Write)))
+			{
+				binaryWriter.Write(imageBytes);
+				binaryWriter.Close();
+			}
+		}
+
 		public static bool HasCss(IWebElement webElement, string css)
 		{
 			if (webElement == null)
 				return false;
 			try
 			{
-				return webElement.GetAttribute("class").Contains(css);//.GetCssValue(css);
-				//return true;
+				return webElement.GetAttribute("class").Contains(css);
 			}
 			catch (StaleElementReferenceException)
 			{
