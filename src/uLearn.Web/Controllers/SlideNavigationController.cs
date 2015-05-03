@@ -62,11 +62,12 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.Slides[slideIndex];
 			var userId = User.Identity.GetUserId();
-			var isPassedTask = visitersRepo.IsSkippedOrPassed(slide.Id, userId);
+			var nextIsAcceptedSolutions = !onSolutionsSlide && slide is ExerciseSlide && visitersRepo.IsSkippedOrPassed(slide.Id, userId);
 			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
 			var nextSlide = course.Slides.FirstOrDefault(s => s.Index > slideIndex && visibleUnits.Contains(s.Info.UnitName));
 			var prevSlide = course.Slides.LastOrDefault(s => s.Index < slideIndex && visibleUnits.Contains(s.Info.UnitName));
-			var model = new PrevNextButtonsModel(course, slideIndex, isPassedTask, onSolutionsSlide, nextSlide == null ? -1 : nextSlide.Index, prevSlide == null ? -1 : prevSlide.Index);
+			
+			var model = new PrevNextButtonsModel(course, slideIndex, nextIsAcceptedSolutions, nextSlide == null ? -1 : nextSlide.Index, prevSlide == null ? -1 : prevSlide.Index);
 			if (onSolutionsSlide) model.PrevSlideIndex = model.SlideIndex;
 			return PartialView(model);
 		}
