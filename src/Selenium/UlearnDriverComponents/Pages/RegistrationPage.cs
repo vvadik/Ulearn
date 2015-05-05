@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using System;
+using OpenQA.Selenium;
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
@@ -43,6 +44,12 @@ namespace Selenium.UlearnDriverComponents.Pages
 			confirmPasswordField.SendKeys(password);
 			registerButton.Click();
 			return new StartPage(driver);
+		}
+
+		public StartPage SignUpAsRandomUser()
+		{
+			var random = new Random();
+			return SignUp(random.Next().ToString(), random.Next().ToString());
 		}
 	}
 }

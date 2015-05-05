@@ -158,6 +158,13 @@ namespace Selenium.UlearnDriverComponents
 		{
 			if (!IsLogin)
 				GoToSignInPage().LoginValidUser(userName, password);
+			return EnumeratePages(course);
+		}
+
+		public IEnumerable<SlidePage> EnumeratePages(string course)
+		{
+			if (factory.ContainsKey(course))
+				course = factory[course];
 			driver.Navigate().GoToUrl("https://localhost:44300/Course/" + course + "/Slide/" + 0);
 			while (true)
 			{
@@ -182,6 +189,16 @@ namespace Selenium.UlearnDriverComponents
 			if (!page.GetNavArrows().IsActiveNextButton())
 				page.GetRateBlock().RateSlide(Rate.Good);
 			page.GetNavArrows().ClickNextButton();
+		}
+
+		public string SaveScreenshot()
+		{
+			return SaveScreenshot(driver);
+		}
+
+		public void SaveScreenshot(string fullPath)
+		{
+			SaveScreenshot(driver, fullPath);
 		}
 
 		/// <summary>
@@ -267,7 +284,8 @@ namespace Selenium.UlearnDriverComponents
 
 		public static readonly Dictionary<string, string> factory = new Dictionary<string, string>
 		{
-			{Titles.BasicProgrammingTitle, "BasicProgramming"}
+			{Titles.BasicProgrammingTitle, "BasicProgramming"},
+			{Titles.LinqTitle, "Linq"},
 		};
 
 		/// <summary>

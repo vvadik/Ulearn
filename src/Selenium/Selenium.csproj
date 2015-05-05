@@ -87,12 +87,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainClass.cs" />
-    <Compile Include="SeleniumTests\ExercisePageShould.cs" />
-    <Compile Include="SeleniumTests\QuizPageShould.cs" />
-    <Compile Include="SeleniumTests\SignInPageShould.cs" />
-    <Compile Include="SeleniumTests\StartPageShould.cs" />
+    <Compile Include="SeleniumTests\MainTest.cs" />
+    <Compile Include="SeleniumTests\TestSampleCourse\ExercisePageShould.cs" />
     <Compile Include="SeleniumTests\TestSampleCourse\MainEngineTest.cs" />
-    <Compile Include="SeleniumTests\TestToc.cs" />
+    <Compile Include="SeleniumTests\TestSampleCourse\QuizPageShould.cs" />
+    <Compile Include="SeleniumTests\TestSampleCourse\SignInPageShould.cs" />
+    <Compile Include="SeleniumTests\TestSampleCourse\StartPageShould.cs" />
+    <Compile Include="SeleniumTests\TestSampleCourse\TestToc.cs" />
     <Compile Include="UlearnDriverComponents\Interfaces\IObservable.cs" />
     <Compile Include="UlearnDriverComponents\Interfaces\IObserver.cs" />
     <Compile Include="UlearnDriverComponents\Interfaces\ITocSlide.cs" />

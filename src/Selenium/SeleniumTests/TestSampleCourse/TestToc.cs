@@ -11,6 +11,7 @@ namespace Selenium.SeleniumTests
 	[TestFixture]
 	class TestToc
 	{
+		[Explicit]
 		[Test]
 		public void TestUnits()
 		{
