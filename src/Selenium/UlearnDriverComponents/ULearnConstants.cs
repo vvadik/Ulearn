@@ -149,7 +149,7 @@ namespace Selenium.UlearnDriverComponents
 
 		public static string BasicProgrammingTitle { get { return "Основы программирования | uLearn"; } }
 
-		public static string SampleCourseTitle { get { return "Шаблонный курс| uLearn"; } }
+		public static string SampleCourseTitle { get { return "Шаблонный курс | uLearn"; } }
 
 		public static string LinqTitle { get { return "Основы Linq | uLearn"; } }
 		public static string RegistrationPageTitle { get { return "Регистрация | uLearn"; } }

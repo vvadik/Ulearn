@@ -163,8 +163,8 @@ namespace Selenium.UlearnDriverComponents
 
 		public IEnumerable<SlidePage> EnumeratePages(string course)
 		{
-			if (factory.ContainsKey(course))
-				course = factory[course];
+			if (titlesFactory.ContainsKey(course))
+				course = titlesFactory[course];
 			driver.Navigate().GoToUrl("https://localhost:44300/Course/" + course + "/Slide/" + 0);
 			while (true)
 			{
@@ -211,9 +211,10 @@ namespace Selenium.UlearnDriverComponents
 			var projectDirectory = Directory.GetCurrentDirectory();
 			if (directoryInfo != null)
 				projectDirectory = directoryInfo.FullName;
-			if (!Directory.Exists(projectDirectory + "\\screenshots"))
-				Directory.CreateDirectory(projectDirectory + "\\screenshots");
-			var screenshotName = projectDirectory + "\\screenshots\\" +
+			var screenshotsDirectory = projectDirectory + "\\screenshots";
+			if (!Directory.Exists(screenshotsDirectory))
+				Directory.CreateDirectory(screenshotsDirectory);
+			var screenshotName = screenshotsDirectory +
 								 DateTime.Now.ToString(CultureInfo.InvariantCulture)
 									 .Replace("/", "").Replace(" ", "").Replace(":", "") + ".png";
 
@@ -282,10 +283,11 @@ namespace Selenium.UlearnDriverComponents
 			}
 		}
 
-		public static readonly Dictionary<string, string> factory = new Dictionary<string, string>
+		public static readonly Dictionary<string, string> titlesFactory = new Dictionary<string, string>
 		{
 			{Titles.BasicProgrammingTitle, "BasicProgramming"},
 			{Titles.LinqTitle, "Linq"},
+			{Titles.SampleCourseTitle, "SampleCourse"},
 		};
 
 		/// <summary>
@@ -294,8 +296,8 @@ namespace Selenium.UlearnDriverComponents
 		/// <param name="courseName">имя курса, которое можно получить со страницы слайда, путём использования свойства driver.Title</param>
 		public static string ConvertCourseTitle(string courseName)
 		{
-			if (factory.ContainsKey(courseName))
-				return factory[courseName];
+			if (titlesFactory.ContainsKey(courseName))
+				return titlesFactory[courseName];
 			throw new NotImplementedException(string.Format("Для курса {0} не определено", courseName));
 		}
 
