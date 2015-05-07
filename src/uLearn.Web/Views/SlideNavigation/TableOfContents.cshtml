@@ -58,12 +58,6 @@
 		{
 			<li class="units-list-item"><a id="badge"><div class="label label-info">Следующий модуль — @Model.NextUnitTime.ToString("dd MMMM", CultureInfo.CreateSpecificCulture("ru"))</div></a></li>
 		}
-@*		if (User.IsInRole(LmsRoles.Instructor) || User.IsInRole(LmsRoles.Admin))*@
-@*		{*@
-@*			<li class="units-list-item units-list-item-text">@Html.ActionLink("Total statistics", "TotalStatistics", "Analytics", new { courseId = Model.CourseId }, null)</li>*@
-@*			<li class="units-list-item units-list-item-text">@Html.ActionLink("Users statistics", "UsersStatistics", "Analytics", new { courseId = Model.CourseId }, null)</li>*@
-@*			<li class="units-list-item units-list-item-text">@Html.ActionLink("Personal statistics", "PersonalStatistics", "Analytics", new { courseId = Model.CourseId }, null)</li>*@
-@*		}*@
 	}
 </ul>
 
@@ -89,17 +83,3 @@
 	score = score ?? Tuple.Create(0, 0);
 	@(score.Item2 == 0 ? "" : string.Format("{0}/{1}", score.Item1, score.Item2))
 }
-
-@*@helper GetScoreForUnit(string unitName)*@
-@*{*@
-@*	Tuple<int, int> score;*@
-@*	Model.ScoresForUnits.TryGetValue(unitName, out score);*@
-@*	@GetScore(score);*@
-@*}*@
-@**@
-@*@helper GetScoreForSlide(Slide slide)*@
-@*{*@
-@*	Tuple<int, int> score;*@
-@*	Model.ScoresForSlides.TryGetValue(slide, out score);*@
-@*	@GetScore(score);*@
-@*}*@

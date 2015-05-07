@@ -42,11 +42,11 @@ function getHints(courseId, slideIndex, hintsCount) {
         data: { courseId: courseId, slideIndex: slideIndex, isNeedNewHint: false }
     }).success(function (ans) {
         if (ans.Text == "Для слайда нет подсказок") {
-            $("#GetHintButton").text("NO HINTS");
+            $("#GetHintButton").text("No hints");
             $("#GetHintButton").attr('disabled', 'disabled');
             return;
         } else if (ans.Text == "Подсказок больше нет") {
-            $("#GetHintButton").text("NO MORE HINTS");
+            $("#GetHintButton").text("No more hints");
             return;
         } else {
             $('#hints-place').html(ans);
@@ -66,9 +66,9 @@ function buttonNameChange(hintsCount) {
         showedHintsCount++;
     });
     if (showedHintsCount < hintsCount && showedHintsCount != 0)
-        $("#GetHintButton").text("NEXT HINT");
+        $("#GetHintButton").text("Next hint");
     else if (showedHintsCount != 0) {
-        $("#GetHintButton").text("NO MORE HINTS");
+    	$("#GetHintButton").text("No more hints");
         $("#GetHintButton").attr('disabled', 'disabled');
     }
 }

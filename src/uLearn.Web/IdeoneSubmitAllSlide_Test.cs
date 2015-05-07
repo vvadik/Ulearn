@@ -13,14 +13,14 @@ namespace uLearn.Web
 	{
 		[Explicit]
 		[TestCaseSource("GetSlidesTestCases")]
-		public void TestSlides(ExerciseSlide slide, Ideone.IdeoneClient ideoneClient)
+		public void TestSlides(ExerciseSlide slide, IExecutionService ideoneClient)
 		{
 			TestExerciseSlide(slide, ideoneClient);
 		}
 
 		public IEnumerable<TestCaseData> GetSlidesTestCases()
 		{
-			var executionService = new IdeoneClient();
+			var executionService = new CsSandboxExecutionService();
 			var courseManager = WebCourseManager.Instance;
 			Assert.That(courseManager.GetCourses().Count() >= 2);
 			return 
@@ -29,7 +29,7 @@ namespace uLearn.Web
 				select new TestCaseData(slide, executionService).SetName(course.Id + " - " + slide.Info.UnitName + " - " + slide.Title);
 		}
 
-		private static void TestExerciseSlide(ExerciseSlide slide, Ideone.IdeoneClient ideoneClient)
+		private static void TestExerciseSlide(ExerciseSlide slide, IExecutionService executionService)
 		{
 			var solution = slide.Solution.BuildSolution(slide.EthalonSolution);
 			if (solution.HasErrors)
@@ -39,22 +39,15 @@ namespace uLearn.Web
 			else
 			{
 				//ExperimentMethod(solution); Попытка научиться проводить тестирование, не отправляя на Ideon.
-				var submition = ideoneClient.Submit(solution.SourceCode, "").Result;
-				var output = submition.Output + "\n" + submition.StdErr;
+				var submition = executionService.Submit(solution.SourceCode, "").Result;
+				var output = submition.GetOutput() + "\n" + submition.StdErr;
 				var isRightAnswer = output.NormalizeEoln().Equals(slide.ExpectedOutput.NormalizeEoln());
-				var result = new RunSolutionResult
-				{
-					CompilationError = submition.CompilationError,
-					IsRightAnswer = isRightAnswer,
-					ExpectedOutput = slide.ExpectedOutput,
-					ActualOutput = output
-				};
 				if (!isRightAnswer)
 				{
 					Assert.Fail("mistake in: " + slide.Info.UnitName + " - " + slide.Title + "\n" +
-								"\tActualOutput: " + result.ActualOutput + "\n" +
-								"\tExpectedOutput: " + result.ExpectedOutput + "\n" +
-								"\tCompilationError: " + result.CompilationError + "\n" +
+								"\tActualOutput: " + output + "\n" +
+								"\tExpectedOutput: " + slide.ExpectedOutput + "\n" +
+								"\tCompilationError: " + submition.CompilationErrorMessage + "\n" +
 								"\tSourceCode: " + solution.SourceCode + "\n\n");
 				}
 			}
