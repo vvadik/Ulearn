@@ -2,20 +2,18 @@
 {
 	public class PrevNextButtonsModel
 	{
-		public PrevNextButtonsModel(Course course, int slideIndex, bool isPassedTask, bool onSolutionsSlide, int nextSlide, int prevSlide)
+		public PrevNextButtonsModel(Course course, int slideIndex, bool nextIsAcceptedSolutions, int nextSlide, int prevSlide)
 		{
 			this.course = course;
 			SlideIndex = slideIndex;
+			NextIsAcceptedSolutions = nextIsAcceptedSolutions;
 			NextSlideIndex = nextSlide;
 			PrevSlideIndex = prevSlide;
-			IsPassedTask = isPassedTask;
-			OnSolutionsSlide = onSolutionsSlide;
 		}
 		private readonly Course course;
 	
-		public readonly bool IsPassedTask;
-		public readonly bool OnSolutionsSlide;
 		public int SlideIndex { get; set; }
+		public bool NextIsAcceptedSolutions { get; set; }
 		public string CourseId { get { return course.Id; }}
 
 		public int NextSlideIndex;

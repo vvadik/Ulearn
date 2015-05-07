@@ -1,5 +1,5 @@
-﻿function submitQuiz(courseId, slideIndex, needingCount) {
-	if (areAllAnswered(needingCount)) {
+﻿function submitQuiz(courseId, slideIndex, expectedCount) {
+	if (areAllAnswered(expectedCount)) {
 		var answers = [];
 		$(".quiz").each(function () {
 			var id = $(this).children('label').children('input').attr('id'); //id of quiz

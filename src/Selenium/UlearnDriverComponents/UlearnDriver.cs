@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Remote;
 using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.PageObjects;
 using Selenium.UlearnDriverComponents.Pages;
@@ -11,167 +16,250 @@ using uLearn.Web.DataContexts;
 
 namespace Selenium.UlearnDriverComponents
 {
-	public class UlearnDriver : IObservable, IObserver, IUlearnDriver
+	public class UlearnDriver : IDisposable
 	{
 		private readonly IWebDriver driver;
-		private UlearnPage currentPage;
-		private Toc toc;
-		public static readonly CourseManager courseManager = new CourseManager(new DirectoryInfo(courseManagerPath));
-		private string currentUserName;
-		private string currentUserId;
-		private string currentSlideName;
-		private string currentSlideId;
-		private const string courseManagerPath = @"C:\Users\213\Desktop\GitHub\uLearn\src\uLearn.Web";
-		private readonly HashSet<IObserver> observers = new HashSet<IObserver>();
-		private static readonly Db db = new Db();
 
 		public UlearnDriver(IWebDriver driver)
 		{
 			this.driver = driver;
-
-			Configure();
 		}
 
-		public Rate GetRateFromDb()
+		public UlearnDriver()
 		{
-			return db.GetRate(currentSlideId);
+			driver = new ChromeDriver();
+			GoToStartPage();
 		}
 
-
-		private void Configure()
+		public PageType GetCurrentPageType()
 		{
-			DeterminePage();
-
-			DetermineUser();
-			BuildToc(currentPage.GetPageType());
-
-			DetermineContentPageSettings();
+			var title = driver.Title;
+			if (title == Titles.RegistrationPageTitle)
+				return PageType.RegistrationPage;
+			if (title == Titles.StartPageTitle)
+				return PageType.StartPage;
+			if (title == Titles.SignInPageTitle)
+				return PageType.SignInPage;
+			if (FindElementSafely(driver, By.ClassName("side-bar")) == null)
+				return PageType.IncomprehensibleType;
+			var element = FindElementSafely(driver, By.ClassName("page-header"));
+			if (element != null && element.Text == "Решения")
+				return PageType.SolutionsPage;
+			if (FindElementSafely(driver, ElementsClasses.RunSolutionButton) != null)
+				return PageType.ExerciseSlidePage;
+			if (FindElementSafely(driver, By.ClassName("quiz")) != null)
+				return PageType.QuizSlidePage;
+			return PageType.SlidePage;
 		}
 
-		public string GetCurrentSlideId()
+		public T Get<T>() where T : UlearnPage
 		{
-			return currentSlideId;
+			return GetClassObject<T>() as T;
 		}
 
-		private void DeterminePage()
+		public T GetPageObject<T>() where T : PageObject
 		{
-			var newPage = new UlearnPage(driver, this);
-			var newPageType = newPage.GetPageType();
-			currentPage = newPage.CastTo(newPageType);
+			return GetClassObject<T>() as T;
 		}
 
-		private void DetermineContentPageSettings()
+		private object GetClassObject<T>()
 		{
-			var ulearnContentPage = currentPage as UlearnContentPage;
-			if (ulearnContentPage != null)
-				currentSlideName = ulearnContentPage.GetSlideName();
-			if (currentSlideName == null)
-				return;
-			var currentSlide = courseManager.GetCourses().SelectMany(x => x.Slides).FirstOrDefault(x => x.Title == currentSlideName);
-			if (currentSlide != null)
-				currentSlideId = currentSlide.Id;
-		}
-
-		private void DetermineUser()
-		{
-			currentUserName = currentPage.GetUserName();
-			if (currentUserName != null)
-			{
-				currentUserName = currentUserName.Replace("Здравствуй, ", "").Replace("!", "");
-				currentUserId = db.GetUserId(currentUserName);
-			}
+			var type = typeof (T);
+			var constructors = type.GetConstructors();
+			var constructor = constructors.FirstOrDefault();
+			if (constructor == null)
+				throw new Exception(String.Format("For type {0} constructor is not implemented", type.Name));
+			var classObject = constructor.Invoke(new object[] {driver});
+			return classObject;
 		}
 
 		public bool IsLogin
 		{
-			get {return currentUserName != null;}
+			get {return GetUserName() != null;}
+		}
+
+		private string GetUserName()
+		{
+			var element = FindElementSafely(driver, By.XPath(XPaths.UserNameXPath));
+			return element == null ? null : element.Text;
 		}
 
 		public string GetCurrentUserName()
 		{
+			var currentUserName = GetUserName();
+			if (currentUserName != null)
+				currentUserName = currentUserName.Replace("Здравствуй, ", "").Replace("!", "");
 			if (currentUserName == null)
 				throw new Exception("You are not login");
 			return currentUserName;
 		}
 
-		public void GoToRegistrationPage()
+		public RegistrationPage GoToRegistrationPage()
 		{
-			var registrationHeaderButton = FindElementSafely(driver, By.XPath(XPaths.RegistrationHeaderButton));
-			if (registrationHeaderButton == null)
-				throw new NotFoundException();
-			registrationHeaderButton.Click();
-			Update();
-		}
-
-		public string GetCurrentSlideName()
-		{
-			return currentSlideName ?? "";
-		}
-
-		private void BuildToc(PageType pageType)
-		{
-			if (pageType != PageType.SignInPage && pageType != PageType.StartPage && pageType != PageType.IncomprehensibleType)
-			{
-				if (toc == null)
-					toc = new Toc(driver, this);
-				else
-					toc.Update();
-			}
-			else
-				toc = null;
-		}
-
-		public UlearnPage GetPage()
-		{
-			return currentPage;
+			driver.Navigate().GoToUrl(ULearnReferences.RegistrationPage);
+			return new RegistrationPage(driver);
 		}
 
 		public IToc GetToc()
 		{
-			if (toc == null)
-				throw new NotFoundException("Toc is not found");
-			return toc;
+			return new Toc(driver);
 		}
 
-		public void GoToStartPage()
+		public IEnumerable<TeX> TeX
+		{
+			get
+			{
+				var texs = FindElementsSafely(driver, By.XPath(XPaths.TexXPath));
+				return texs.Select((tex, i) => GetTeX(i));
+			}
+		}
+
+		private TeX GetTeX(int i)
+		{
+			var element = FindElementSafely(driver, By.XPath(XPaths.GetRenderTexXPath(i)));
+			var tex =  new TeX(element != null);
+			return tex;
+		}
+
+		public StartPage GoToStartPage()
 		{
 			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
-			Update();
+			return new StartPage(driver);
 		}
 
 		private SignInPage GoToSignInPage()
 		{
 			driver.Navigate().GoToUrl(ULearnReferences.StartPage);
 
-			var startPage = new StartPage(driver, this);
-			var signInPage = startPage.GoToSignInPage().currentPage as SignInPage;
-			if (signInPage == null)
-				throw new Exception("Sign in page not found...");
+			var startPage = new StartPage(driver);
+			var signInPage = startPage.GoToSignInPage();
 			return signInPage;
 		}
 
-		public void LoginAdminAndGoToCourse(string courseTitle)
+		public SlidePage LoginAdminAndGoToCourse(string courseTitle)
 		{
-			var startPage = GoToSignInPage().LoginValidUser(Admin.Login, Admin.Password).GetPage() as StartPage;
-			if (startPage != null)
-				startPage.GoToCourse(courseTitle);
-			throw new Exception("Start page was not found...");
+			var startPage = GoToSignInPage().LoginValidUser(Admin.Login, Admin.Password);
+			return startPage.GoToCourse(courseTitle);
 		}
 
-		public void LoginAndGoToCourse(string courseTitle, string login, string password)
+		public SlidePage LoginAndGoToCourse(string courseTitle, string login, string password)
 		{
-			var startPage = GoToSignInPage().LoginValidUser(login, password).GetPage() as StartPage;
-			if (startPage != null)
-				startPage.GoToCourse(courseTitle);
-			throw new Exception("Start page was not found...");
+			var startPage = GoToSignInPage().LoginValidUser(login, password);
+			return startPage.GoToCourse(courseTitle);
 		}
 
-		public void LoginVkAndGoToCourse(string courseTitle)
+		public SlidePage LoginVkAndGoToCourse(string courseTitle)
 		{
-			var startPage = GoToSignInPage().LoginVk().GetPage() as StartPage;
-			if (startPage != null)
-				startPage.GoToCourse(Titles.BasicProgrammingTitle);
-			throw new Exception("Start page was not found...");
+			var startPage = GoToSignInPage().LoginVk();
+			return startPage.GoToCourse(Titles.BasicProgrammingTitle);
+		}
+
+		public IEnumerable<SlidePage> EnumeratePages(string course, string userName, string password)
+		{
+			if (!IsLogin)
+				GoToSignInPage().LoginValidUser(userName, password);
+			return EnumeratePages(course);
+		}
+
+		public IEnumerable<SlidePage> EnumeratePages(string course)
+		{
+			if (titlesFactory.ContainsKey(course))
+				course = titlesFactory[course];
+			driver.Navigate().GoToUrl("https://localhost:44300/Course/" + course + "/Slide/" + 0);
+			while (true)
+			{
+				var currentPageType = GetCurrentPageType();
+				if (currentPageType == PageType.SolutionsPage)
+				{
+					var solutionsPage = Get<SolutionsPage>();
+					if (!solutionsPage.GetNavArrows().HasNextButton())
+						yield break;
+					solutionsPage.GetNavArrows().ClickNextButton();
+					continue;
+				}
+				var page = GetCorrectPage(currentPageType);
+				yield return page;
+				if (!page.GetNavArrows().HasNextButton())
+					yield break;
+				GoToNextSlide(page);
+			}
+		}
+
+		private SlidePage GetCorrectPage(PageType currentPageType)
+		{
+			SlidePage page;
+			switch (currentPageType)
+			{
+				case PageType.ExerciseSlidePage:
+					page = Get<ExerciseSlidePage>();
+					break;
+				case PageType.QuizSlidePage:
+					page = Get<QuizSlidePage>();
+					break;
+				default:
+					page = Get<SlidePage>();
+					break;
+			}
+			return page;
+		}
+
+		private static void GoToNextSlide(SlidePage page)
+		{
+			if (!page.GetNavArrows().IsActiveNextButton())
+				page.GetRateBlock().RateSlide(Rate.Good);
+			page.GetNavArrows().ClickNextButton();
+		}
+
+		public string SaveScreenshot()
+		{
+			return SaveScreenshot(driver);
+		}
+
+		public void SaveScreenshot(string fullPath)
+		{
+			SaveScreenshot(driver, fullPath);
+		}
+
+		/// <summary>
+		/// Save screenshot and return path to it.
+		/// </summary>
+		/// <returns>path to screenshot</returns>
+		public static string SaveScreenshot(IWebDriver driver)
+		{
+			var directoryInfo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent;
+			var projectDirectory = Directory.GetCurrentDirectory();
+			if (directoryInfo != null)
+				projectDirectory = directoryInfo.FullName;
+			var screenshotsDirectory = projectDirectory + "\\screenshots";
+			if (!Directory.Exists(screenshotsDirectory))
+				Directory.CreateDirectory(screenshotsDirectory);
+			var screenshotName = screenshotsDirectory +
+								 DateTime.Now.ToString(CultureInfo.InvariantCulture)
+									 .Replace("/", "").Replace(" ", "").Replace(":", "") + ".png";
+
+			var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
+
+			var imageBytes = Convert.FromBase64String(screenshot.ToString());
+
+			using (var binaryWriter = new BinaryWriter(new FileStream(screenshotName, FileMode.Append, FileAccess.Write)))
+			{
+				binaryWriter.Write(imageBytes);
+				binaryWriter.Close();
+			}
+			return screenshotName;
+		}
+
+		public static void SaveScreenshot(IWebDriver driver, string fullPath)
+		{
+			var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
+
+			var imageBytes = Convert.FromBase64String(screenshot.ToString());
+
+			using (var binaryWriter = new BinaryWriter(new FileStream(fullPath, FileMode.Append, FileAccess.Write)))
+			{
+				binaryWriter.Write(imageBytes);
+				binaryWriter.Close();
+			}
 		}
 
 		public static bool HasCss(IWebElement webElement, string css)
@@ -180,8 +268,7 @@ namespace Selenium.UlearnDriverComponents
 				return false;
 			try
 			{
-				return webElement.GetAttribute("class").Contains(css);//.GetCssValue(css);
-				//return true;
+				return webElement.GetAttribute("class").Contains(css);
 			}
 			catch (StaleElementReferenceException)
 			{
@@ -215,30 +302,11 @@ namespace Selenium.UlearnDriverComponents
 			}
 		}
 
-		public void AddObserver(IObserver observer)
+		public static readonly Dictionary<string, string> titlesFactory = new Dictionary<string, string>
 		{
-			observers.Add(observer);
-		}
-
-		public void RemoveObserver(IObserver observer)
-		{
-			observers.Remove(observer);
-		}
-
-		public void NotifyObservers()
-		{
-			foreach (var o in observers)
-				o.Update();
-		}
-
-		public void Update()
-		{
-			Configure();
-		}
-
-		public static readonly Dictionary<string, string> factory = new Dictionary<string, string>
-		{
-			{Titles.BasicProgrammingTitle, "BasicProgramming"}
+			{Titles.BasicProgrammingTitle, "BasicProgramming"},
+			{Titles.LinqTitle, "Linq"},
+			{Titles.SampleCourseTitle, "SampleCourse"},
 		};
 
 		/// <summary>
@@ -247,9 +315,31 @@ namespace Selenium.UlearnDriverComponents
 		/// <param name="courseName">имя курса, которое можно получить со страницы слайда, путём использования свойства driver.Title</param>
 		public static string ConvertCourseTitle(string courseName)
 		{
-			if (factory.ContainsKey(courseName))
-				return factory[courseName];
+			if (titlesFactory.ContainsKey(courseName))
+				return titlesFactory[courseName];
 			throw new NotImplementedException(string.Format("Для курса {0} не определено", courseName));
+		}
+
+		public string Url
+		{
+			get { return driver.Url; }
+		}
+
+		public void GoToUrl(string url)
+		{
+			driver.Navigate().GoToUrl(url);
+		}
+
+		public void Dispose()
+		{
+			try
+			{
+				driver.Dispose();
+			}
+			catch
+			{
+				// ignored
+			}
 		}
 	}
 }

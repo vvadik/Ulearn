@@ -9,5 +9,6 @@ namespace uLearn.Web.Models
 		public string ExpectedOutput { get; set; }
 		public string ActualOutput { get; set; }
 		public string CompilationError { get; set; }
+		public string ExecutionServiceName { get; set; }
 	}
 }

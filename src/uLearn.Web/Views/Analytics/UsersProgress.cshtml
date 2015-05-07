@@ -1,4 +1,5 @@
-﻿@using uLearn
+﻿@using System.Globalization
+@using uLearn
 @model uLearn.Web.Controllers.UserProgressViewModel
 
 <table class="tablesorter">
@@ -35,7 +36,7 @@
 				<td>
 					<h6>@user.UserName</h6>
 				</td>
-				<td data-sort-value="@(string.IsNullOrEmpty(user.UserGroup) ? "-" : user.UserGroup))">
+				<td data-sort-value="@(user.UserGroup??"")">
 					<input id="@(user.UserId)" onblur="changeGroup('@user.UserId')" data-url="@Url.Action("AddUserGroup", "Analytics")" type="text" value="@user.UserGroup" />
 				</td>
 				@for (var i = 0; i < user.SlidesSlideInfo.Length; i++)
@@ -43,8 +44,8 @@
 					if (Model.Slides[i] is ExerciseSlide)
 					{
 						var styleClass = @user.SlidesSlideInfo[i].IsExerciseSolved ? "green-stat" : "red-stat";
-						<td data-sort-value="@(user.SlidesSlideInfo[i].AttemptsCount + 1000000)"
-							class="@styleClass">
+						<td data-sort-value="@ToString(user.SlidesSlideInfo[i].AttemptsCount + 1000000)"
+						    class="@styleClass">
 							@Html.ActionLink(user.SlidesSlideInfo[i].AttemptsCount.ToString(), "ShowSolutions", new{courseId=Model.CourseId, userId=user.UserId, slideId=Model.Slides[i].Id})
 							
 						</td>
@@ -52,8 +53,8 @@
 					else if (Model.Slides[i] is QuizSlide)
 					{
 						var styleClass = @user.SlidesSlideInfo[i].IsQuizPassed ? "green-stat" : "red-stat";
-						<td data-sort-value="@(user.SlidesSlideInfo[i].QuizPercentage + 10000)"
-							class="@styleClass">
+						<td data-sort-value="@ToString(user.SlidesSlideInfo[i].QuizPercentage + 10000)"
+						    class="@styleClass">
 							@(user.SlidesSlideInfo[i].QuizPercentage.ToString("P0"))
 						</td>
 					}
@@ -67,6 +68,12 @@
 		}
 	</tbody>
 </table>
-<script src="~/tablesorter-master/jquery.tablesorter.js"></script>
+
+<script src="~/tablesorter-master/js/jquery.tablesorter.js"></script>
+<script src="~/tablesorter-master/js/jquery.tablesorter.widgets.min.js"></script>
 <script src="~/Scripts/table-configurator.js"></script>
 
+@helper ToString(double k)
+{
+	@(k.ToString(CultureInfo.InvariantCulture))
+}

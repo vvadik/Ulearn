@@ -1,5 +1,4 @@
-﻿using System;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.PageObjects;
 
@@ -7,34 +6,19 @@ namespace Selenium.UlearnDriverComponents.Pages
 {
 	public class UlearnContentPage : UlearnPage
 	{
-		private Lazy<NavArrows> navArrows;
-
-		public UlearnContentPage(IWebDriver driver, IObserver parent)
-			: base(driver, parent)
+		public UlearnContentPage(IWebDriver driver)
+			: base(driver)
 		{
 			Configure();
 		}
 
 		protected void Configure()
 		{
-			navArrows = new Lazy<NavArrows>(() => new NavArrows(driver));
 		}
 
-		public UlearnDriver ClickNextButton()
+		public NavigationBlock GetNavArrows()
 		{
-			parent.Update();
-			return navArrows.Value.ClickNextButton();
-		}
-
-		public UlearnDriver ClickPrevButton()
-		{
-			parent.Update();
-			return navArrows.Value.ClickPrevButton();
-		}
-
-		public bool IsActiveNextButton()
-		{
-			return navArrows.Value.IsActiveNextButton();
+			return new NavigationBlock(driver);
 		}
 
 		public string GetSlideName()

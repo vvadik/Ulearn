@@ -26,6 +26,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <NuGetPackageImportStamp>bb217248</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -45,6 +46,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -69,6 +73,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
@@ -82,15 +87,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainClass.cs" />
-    <Compile Include="SeleniumTests\ContentPageShould.cs" />
-    <Compile Include="SeleniumTests\ExercisePageShould.cs" />
-    <Compile Include="SeleniumTests\QuizPageShould.cs" />
-    <Compile Include="SeleniumTests\SignInPageShould.cs" />
-    <Compile Include="SeleniumTests\SlidePageShould.cs" />
-    <Compile Include="SeleniumTests\StartPageShould.cs" />
-    <Compile Include="SeleniumTests\TocShould.cs" />
-    <Compile Include="SeleniumTests\UlearnDriverTest.cs" />
-    <Compile Include="UlearnDriverComponents\Db.cs" />
+    <Compile Include="SeleniumTests\MainTest.cs" />
+    <Compile Include="SeleniumTests\TestSampleCourse\ExercisePageShould.cs" />
+    <Compile Include="SeleniumTests\TestSampleCourse\MainEngineTest.cs" />
+    <Compile Include="SeleniumTests\TestSampleCourse\QuizPageShould.cs" />
+    <Compile Include="SeleniumTests\TestSampleCourse\SignInPageShould.cs" />
+    <Compile Include="SeleniumTests\TestSampleCourse\StartPageShould.cs" />
+    <Compile Include="SeleniumTests\TestSampleCourse\TestToc.cs" />
     <Compile Include="UlearnDriverComponents\Interfaces\IObservable.cs" />
     <Compile Include="UlearnDriverComponents\Interfaces\IObserver.cs" />
     <Compile Include="UlearnDriverComponents\Interfaces\ITocSlide.cs" />
@@ -99,14 +102,16 @@
     <Compile Include="UlearnDriverComponents\Interfaces\ITocUnit.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\Hint.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\LikeButton.cs" />
+    <Compile Include="UlearnDriverComponents\PageObjects\PageObject.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\QuizBlock.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\RunResult.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\SlidePageTextBlock.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\SomeoneSolution.cs" />
+    <Compile Include="UlearnDriverComponents\PageObjects\TeX.cs" />
     <Compile Include="UlearnDriverComponents\PageObjects\TocSlide.cs" />
     <Compile Include="UlearnDriverComponents\Pages\ExerciseSlidePage.cs" />
-    <Compile Include="UlearnDriverComponents\PageObjects\NavArrows.cs" />
-    <Compile Include="UlearnDriverComponents\PageObjects\Rate.cs" />
+    <Compile Include="UlearnDriverComponents\PageObjects\NavigationBlock.cs" />
+    <Compile Include="UlearnDriverComponents\PageObjects\RateBlock.cs" />
     <Compile Include="UlearnDriverComponents\Pages\QuizSlidePage.cs" />
     <Compile Include="UlearnDriverComponents\Pages\RegistrationPage.cs" />
     <Compile Include="UlearnDriverComponents\Pages\SignInPage.cs" />
@@ -119,9 +124,7 @@
     <Compile Include="UlearnDriverComponents\Pages\UlearnPage.cs" />
     <Compile Include="UlearnDriverComponents\ULearnConstants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SeleniumTests\DBtest.cs" />
     <Compile Include="UlearnDriverComponents\UlearnDriver.cs" />
-    <Compile Include="UlearnTests\MainTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -156,8 +159,20 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="chromedriver.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="screenshots\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

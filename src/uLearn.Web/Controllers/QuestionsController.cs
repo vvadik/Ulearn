@@ -87,6 +87,22 @@ namespace uLearn.Web.Controllers
 			return PartialView(result);
 		}
 
+		[Authorize(Roles = LmsRoles.Instructor + "," + LmsRoles.Admin)]
+		public ActionResult ItemsOfUser(string userId, string courseId = null)
+		{
+			IQueryable<UserQuestion> questions = db.UserQuestions.Where(q => q.UserId == userId);
+			if (courseId != null)
+				questions = questions.Where(q => q.CourseId == courseId);
+			var result = questions.OrderByDescending(q => q.Time).Take(20).ToList()
+				.Select(q => new QuestionViewModel
+				{
+					Question = q,
+					Slide = courseManager.GetCourse(q.CourseId).GetSlideById(q.SlideId)
+				})
+				.ToList();
+			return PartialView("Items", result);
+		}
+
 		[HttpPost]
 		[Authorize]
 		[ValidateInput(false)]

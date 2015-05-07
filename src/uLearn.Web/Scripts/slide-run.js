@@ -62,6 +62,6 @@ $runButton.click(function () {
 			console.log(req.responseText);
 		})
 		.always(function () {
-			$runButton.text("RUN").removeClass("active");
+			$runButton.text("Run").removeClass("active");
 		});
 });

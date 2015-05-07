@@ -41,11 +41,9 @@ namespace uLearn
 			var videos = new HashSet<string>();
 			foreach (var b in youtubeBlocks)
 			{
-
 				try
 				{
 					webClient.DownloadData("http://gdata.youtube.com/feeds/api/videos/" + b.VideoId);
-
 				}
 				catch (Exception)
 				{
@@ -58,7 +56,7 @@ namespace uLearn
 		[TestCaseSource("GetExerciseSlidesTestCases")]
 		public void Slide(Type slideType)
 		{
-			Assert.IsTrue(typeof(SlideTestBase).IsAssignableFrom(slideType));
+			Assert.IsTrue(typeof(SlideTestBase).IsAssignableFrom(slideType), slideType.ToString() + " does not inherit from SlideTestBase");
 		}
 
 		public IEnumerable<TestCaseData> GetExerciseSlidesTestCases()

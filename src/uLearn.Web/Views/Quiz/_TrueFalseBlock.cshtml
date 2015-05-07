@@ -26,7 +26,7 @@
 			<label class="@trueItemClass" title="@ttitle"><input autocomplete="off" @tchecked id='@(quizBlock.Id + "quizBlock" + "True")' name='@(quizBlock.Id+"group")' type="radio">Верно</label>
 		</div>
 		<div class="quiz">
-			<label class="@falseItemClass" title="@ftitle"><input autocomplete="off" @fchecked id='@(quizBlock.Id + "quizBlock" + "False")' name='@(quizBlock.Id+"group")' type="radio">Не верно</label>
+			<label class="@falseItemClass" title="@ftitle"><input autocomplete="off" @fchecked id='@(quizBlock.Id + "quizBlock" + "False")' name='@(quizBlock.Id+"group")' type="radio">Неверно</label>
 		</div>
 	</div>
 	if (Model.QuizState == QuizState.Total && !String.IsNullOrEmpty(quizBlock.Explanation))

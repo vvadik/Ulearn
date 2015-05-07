@@ -9,10 +9,11 @@
 	<link rel="image_src" href="~/Content/logo.png">
 	<link rel="shortcut icon" href="~/favicon.ico?v=4" />
 	@Styles.Render("~/css")
+	@Styles.Render("~/flexslider/flexslider.css")
 	@Scripts.Render("~/modernizr-js")
 </head>
 <body>
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<div id="header" class="navbar navbar-inverse navbar-fixed-top">
 		<button type="button" class="navbar-toggle hide-side-bar-button" data-toggle="collapse" data-target=".side-bar">
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
@@ -31,11 +32,11 @@
 				<ul class="nav navbar-nav">
 					@if (User.IsInRole(LmsRoles.Admin))
 					{
-						<li>@Html.ActionLink("Admin users", "List", "Account")</li>
 						<li>@Html.ActionLink("Admin courses", "CourseList", "Unit")</li>
 					}
-					@if (User.IsInRole(LmsRoles.Instructor))
+					@if (User.IsInRole(LmsRoles.Admin) || User.IsInRole(LmsRoles.Instructor))
 					{
+						<li>@Html.ActionLink("Пользователи", "List", "Account", new { role = LmsRoles.Admin }, null)</li>
 						<li>@Html.ActionLink("Статистика", "SystemStatistics", "Analytics")</li>
 					}
 
@@ -50,7 +51,7 @@
 	@Scripts.Render("~/bootstrap-js")
 	@Scripts.Render("~/codemirror-js")
 	@RenderSection("scripts", required: false)
-	
+
 	<script>
 		$(function () {
 			$(".load-content")

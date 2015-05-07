@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium;
+using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.PageObjects
 {

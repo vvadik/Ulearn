@@ -1,0 +1,39 @@
+﻿@model uLearn.Web.Controllers.UserInfoModel
+
+@{
+	ViewBag.Title = "User Info";
+}
+
+<div class="container">
+	<h2>@Model.User.UserName</h2>
+	<p>@Model.User.GroupName</p>
+
+	<h3>Курсы</h3>
+	<ol>
+		@foreach (var courseInfo in Model.Courses)
+		{
+			<li>@Html.ActionLink(courseInfo.Title, "CourseInfo", new { userName = Model.User.Id, courseId = courseInfo.Id })</li>
+		}
+	</ol>
+
+	<h3 id="questions">Заданные вопросы</h3>
+	<div class="load-content" data-url="@Url.Action("ItemsOfUser", "Questions", new{userId=Model.User.Id})"></div>
+
+	<h3>Логины</h3>
+	<ol>
+		@foreach (var login in Model.User.Logins)
+		{
+			<p>@login.LoginProvider @login.ProviderKey</p>
+		}
+	</ol>
+	@if (User.IsInRole(LmsRoles.Admin))
+	{
+		var newPassword = (DateTime.Now.Ticks % 1000000).ToString();
+		<h3>Сброс пароля</h3>
+		using(Html.BeginForm("ResetPassword", "Account", new { newPassword, userId = Model.User.Id }))
+		{
+			<button class="btn btn-danger"> Сбросить пароль в @newPassword </button>
+		}
+	}
+
+</div>

@@ -6,18 +6,15 @@ using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.PageObjects
 {
-	public class TocUnit : ITocUnit, IObserver
+	public class TocUnit : ITocUnit
 	{
 		private readonly IWebDriver driver;
 		private List<Lazy<ITocSlide>> slides;
-		private readonly IObserver parent;
 		private readonly int unitIndex;
 		private IWebElement headerElement;
-		private readonly HashSet<IObserver> observers = new HashSet<IObserver>();
 
-		public TocUnit(IWebDriver driver, int unitIndex, IObserver parent)
+		public TocUnit(IWebDriver driver, int unitIndex)
 		{
-			this.parent = parent;
 			this.driver = driver;
 			this.unitIndex = unitIndex;
 
@@ -28,14 +25,14 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		{
 			headerElement = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocUnitHeaderXPath(unitIndex)));
 
-			var courseTitle = UlearnDriver.ConvertCourseTitle(driver.Title);
-			var unitName = headerElement.Text;
-			var slidesCount = UlearnDriver.courseManager.GetCourse(courseTitle).Slides.Count(x => x.Info.UnitName == unitName);
+			//var courseTitle = UlearnDriver.ConvertCourseTitle(driver.Title);
+			//var unitName = headerElement.Text;
+			var slidesCount = UlearnDriver.FindElementsSafely(driver, By.XPath(XPaths.TocSlidesXPath(unitIndex))).Count; //UlearnDriver.courseManager.GetCourse(courseTitle).Slides.Count(x => x.Info.UnitName == unitName);
 			slides = new List<Lazy<ITocSlide>>(slidesCount);
 			for (var ind = 0; ind < slidesCount; ind++)
 			{
 				var lazyIndex = ind;
-				slides.Add(new Lazy<ITocSlide>(() => new TocSlideControl(driver, lazyIndex, unitIndex, parent)));
+				slides.Add(new Lazy<ITocSlide>(() => new TocSlideControl(driver, lazyIndex, unitIndex)));
 				//if (slides.Count > ind)
 				//{
 				//	if (slides[ind] != null)
@@ -54,8 +51,6 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 		public void Click()
 		{
 			headerElement.Click();
-			//var TOCElement = driver.FindElement(By.xPath(XPaths.TocXPath));
-			parent.Update();
 		}
 
 		public IReadOnlyCollection<string> GetSlidesName()
@@ -68,11 +63,15 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 			return slides.Select(x => x.Value).ToList();
 		}
 
-		public void Update()
+		public bool Collapse
 		{
-			Configure();
-			//foreach (var o in observers)
-			//	o.Update();
+			get { return IsCollapse(); }
+		}
+
+		private bool IsCollapse()
+		{
+			var element = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.TocUnitHeaderCollapseInfoXPath(unitIndex)));
+			return UlearnDriver.HasCss(element, "in");
 		}
 	}
 }

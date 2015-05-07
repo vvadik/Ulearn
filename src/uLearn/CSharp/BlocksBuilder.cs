@@ -10,21 +10,25 @@ namespace uLearn.CSharp
 {
 	public class SlideBuilder : CSharpSyntaxRewriter
 	{
-		private readonly Func<string, string> getInclude;
+		public const string LangId = "csharp";
+		private readonly IFileSystem fs;
 		public readonly List<SlideBlock> Blocks = new List<SlideBlock>();
 		public string Title;
 		public string Id;
 
-		public SlideBuilder(Func<string, string> getInclude) : base(false)
+		public SlideBuilder(IFileSystem fs) : base(false)
 		{
-			this.getInclude = getInclude;
+			this.fs = fs;
 		}
 
 		private SyntaxNode VisitMemberDeclaration(MemberDeclarationSyntax node, SyntaxNode newNode)
 		{
 			var parent = node.GetParents().OfType<BaseTypeDeclarationSyntax>().FirstOrDefault();
 			if (!ShowOnSlide(node)) return null;
-			if (parent.HasAttribute<SlideAttribute>()) AddCodeBlock(((MemberDeclarationSyntax)newNode));
+			if (parent == null 
+				|| parent.HasAttribute<SlideAttribute>() 
+				|| parent.HasAttribute<ShowBodyOnSlideAttribute>())
+				AddCodeBlock(((MemberDeclarationSyntax)newNode));
 			return ((MemberDeclarationSyntax)newNode).WithoutAttributes();
 		}
 
@@ -45,6 +49,11 @@ namespace uLearn.CSharp
 		public override SyntaxNode VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
 		{
 			return VisitMemberDeclaration(node, base.VisitInterfaceDeclaration(node));
+		}
+
+		public override SyntaxNode VisitStructDeclaration(StructDeclarationSyntax node)
+		{
+			return VisitMemberDeclaration(node, base.VisitStructDeclaration(node));
 		}
 
 		public override SyntaxNode VisitEnumDeclaration(EnumDeclarationSyntax node)
@@ -77,9 +86,12 @@ namespace uLearn.CSharp
 			var comment = trivia.ToString();
 			if (trivia.CSharpKind() == SyntaxKind.MultiLineCommentTrivia)
 			{
-				bool shouldCreateTextBlock = trivia.GetParents().Count(p => IsNestingParent(p, trivia)) <= 1;
-				if (shouldCreateTextBlock)
-					Blocks.Add(ExtractMarkDownFromComment(trivia));
+				if (!comment.StartsWith("/*uncomment"))
+				{
+					bool shouldCreateTextBlock = trivia.GetParents().Count(p => IsNestingParent(p, trivia)) <= 1;
+					if (shouldCreateTextBlock)
+						Blocks.Add(ExtractMarkDownFromComment(trivia));
+				}
 			}
 			else if (trivia.CSharpKind() == SyntaxKind.SingleLineCommentTrivia)
 			{
@@ -87,16 +99,23 @@ namespace uLearn.CSharp
 				{
 					var parts = comment.Split(new[] { ' ' }, 2);
 					if (parts[0] == "//#video") EmbedVideo(parts[1]);
-					if (parts[0] == "//#include") EmbedCode(parts[1]);
-					if (parts[0] == "//#http") EmbedExternalMarkdown(parts[1]);
+                    if (parts[0] == "//#include") EmbedCode(parts[1]);
+                    if (parts[0] == "//#para") EmbedPara(parts[1]);
+                    if (parts[0] == "//#gallery") EmbedGallery(parts[1]);
 				}
 			}
 			return base.VisitTrivia(trivia);
 		}
 
-		private void EmbedExternalMarkdown(string url)
+	    private void EmbedPara(string filename)
+	    {
+	        Blocks.Add(new MdBlock(fs.GetContent(filename)));
+	    }
+
+	    private void EmbedGallery(string folderName)
 		{
-			Blocks.Add(MdBlock.FromUrl(url));
+			string[] images = fs.GetFilenames(folderName);
+			Blocks.Add(new ImageGaleryBlock { ImageUrls = images });
 		}
 
 		///<summary>Is child _inside_ Type or Method parent</summary>
@@ -127,9 +146,9 @@ namespace uLearn.CSharp
 			var code = (string)CreateCodeBlock((dynamic)node);
 			var lastBlock = Blocks.LastOrDefault() as CodeBlock;
 			if (lastBlock != null)
-				Blocks[Blocks.Count - 1] = new CodeBlock(lastBlock.Code + "\r\n\r\n" + code);
+				Blocks[Blocks.Count - 1] = new CodeBlock(lastBlock.Code + "\r\n\r\n" + code, LangId);
 			else
-				Blocks.Add(new CodeBlock(code));
+				Blocks.Add(new CodeBlock(code, LangId));
 		}
 
 		private string CreateCodeBlock(MethodDeclarationSyntax node)
@@ -148,12 +167,13 @@ namespace uLearn.CSharp
 		{
 			return !node.HasAttribute<SlideAttribute>()
 			&& !node.HasAttribute<HideOnSlideAttribute>() 
-			&& !node.HasAttribute<ExerciseAttribute>();
+			&& !node.HasAttribute<ExerciseAttribute>()
+			&& !(node is TypeDeclarationSyntax && node.HasAttribute<ShowBodyOnSlideAttribute>());
 		}
 
 		private void EmbedCode(string filename)
 		{
-			Blocks.Add(new CodeBlock(getInclude(filename)));
+			Blocks.Add(new CodeBlock(fs.GetContent(filename), LangId));
 		}
 
 		private void EmbedVideo(string videoId)
@@ -167,7 +187,7 @@ namespace uLearn.CSharp
 			string[] commentLines = comment.ToString().SplitToLines();
 			if (commentLines.First().EndsWith("tex"))
 				return new TexBlock(commentLines.Skip(1).Take(commentLines.Length - 2).ToArray());
-			return MdBlock.FromText(GetCommentContent(commentLines, identation));
+			return new MdBlock(GetCommentContent(commentLines, identation));
 		}
 
 		private static string GetCommentContent(string[] commentLines, int identation)
@@ -178,7 +198,7 @@ namespace uLearn.CSharp
 				if (line.Trim() != "")
 				{
 					if (line.Length < identation || line.Substring(0, identation).Trim() != "")
-						throw new Exception("Wrong identation in line: " + line);
+						throw new Exception("Wrong indentation in line: " + line);
 					sb.AppendLine(line.Substring(identation));
 				}
 				else

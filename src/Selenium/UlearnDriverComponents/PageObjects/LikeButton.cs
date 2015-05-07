@@ -12,7 +12,7 @@ namespace Selenium.UlearnDriverComponents.PageObjects
 			if (like == null)
 				throw new NotFoundException("like button not found");
 			this.like = like;
-			isLiked = UlearnDriverComponents.UlearnDriver.HasCss(like, "btn-primary");
+			isLiked = UlearnDriver.HasCss(like, "btn-primary");
 		}
 
 		public void Click()

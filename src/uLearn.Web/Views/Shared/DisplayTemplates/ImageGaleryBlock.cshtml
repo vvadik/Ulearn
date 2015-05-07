@@ -1,0 +1,16 @@
+﻿@using uLearn
+@model uLearn.ImageGaleryBlock
+<div class="flexslider">
+	<ul class="slides">
+		@{
+			var baseUrl = ((Slide)ViewBag.Slide).Info.DirectoryRelativePath;
+		}
+		@foreach (var imageUrl in Model.ImageUrls)
+		{
+			<li>
+				<img src="@string.Format("{0}/{1}", baseUrl, imageUrl)" alt="@imageUrl"/>
+			</li>
+		}
+	</ul>
+</div>
+

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
-using Selenium.UlearnDriverComponents.Interfaces;
 using Selenium.UlearnDriverComponents.PageObjects;
 
 namespace Selenium.UlearnDriverComponents.Pages
@@ -10,8 +9,8 @@ namespace Selenium.UlearnDriverComponents.Pages
 	{
 		public List<SomeoneSolution> Solutions { get; private set; }
 
-		public SolutionsPage(IWebDriver driver, IObserver parent)
-			: base(driver, parent)
+		public SolutionsPage(IWebDriver driver)
+			: base(driver)
 		{
 			Solutions = FindSolutions();
 		}

@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace uLearn.Courses.Linq.Slides
+namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("Фильтрация и преобразование", "{E0114584-4500-40B2-B6D6-DB8AF455978B}")]
 	public class S011_SelectWhereToArray
 	{
 		/*
 		В основе `LINQ` лежит интерфейс __последовательности__ `IEnumerable<T>`. 
-		Последовательность — это абстракция чего-то, что можно начать перечислять, 
+		Последовательность — это абстракция чего-то, что можно начать перечислять 
 		и переходить от текущего элемента к следующему пока последовательность не закончится (или пока не надоест).
 
 		Массивы, `List`, `Dictionary`, `HashSet` — все эти коллекции реализуют интерфейс последовательности.

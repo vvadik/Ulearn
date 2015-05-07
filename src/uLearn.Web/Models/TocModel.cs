@@ -12,6 +12,10 @@ namespace uLearn.Web.Models
 		public HashSet<string> VisitedSlideIds { get; set; }
 		public HashSet<string> SolvedSlideIds { get; set; }
 		public DateTime NextUnitTime { get; set; }
+		public Dictionary<Slide, Tuple<int, int>> ScoresForSlides { get; set; }
+		public Dictionary<string, Tuple<int, int>> ScoresForUnits { get; set; }
+		public Tuple<int, int> ScoreForCourse { get; set; }
+		public string CourseName { get; set; }
 	}
 
 	public class CourseUnitModel

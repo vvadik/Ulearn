@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
-using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.Pages
 {
@@ -10,36 +9,28 @@ namespace Selenium.UlearnDriverComponents.Pages
 	{
 		private const string courseBlockClass = "col-md-6";
 
-		public StartPage(IWebDriver driver, IObserver parent) 
-			: base(driver, parent)
+		public StartPage(IWebDriver driver) 
+			: base(driver)
 		{
-			if (!driver.Title.Equals(Titles.StartPageTitle))
-				throw new IllegalLocatorException("Это не стартовая страница, это: "
-								+ driver.Title);
 		}
 
-		public UlearnDriver GoToSignInPage()
+		public SignInPage GoToSignInPage()
 		{
 			var loginLinkButton = driver.FindElement(ElementsId.SignInButton);
 			loginLinkButton.Click();
-			parent.Update();
-			return new UlearnDriver(driver);
+			return new SignInPage(driver);
 		}
 
-		public void GoToCourse(string courseTitle)
+		public SlidePage GoToCourse(string courseTitle)
 		{
 			var courseBlocks = driver.FindElements(By.ClassName(courseBlockClass)).ToList();
 			if (courseTitle == Titles.BasicProgrammingTitle)
-			{
 				ClickCourseButton(courseTitle, courseBlocks, 0);
-				return;
-			}
 			if (courseTitle == Titles.LinqTitle)
-			{
 				ClickCourseButton(courseTitle, courseBlocks, 1);
-				return;
-			}
-			throw new NotImplementedException(string.Format("Для курса {0} нет реализации в методе GoToCourse", courseTitle));
+			if (courseTitle == Titles.SampleCourseTitle)
+				driver.Navigate().GoToUrl("https://localhost:44300/Course/SampleCourse/Slide/0");
+			return new SlidePage(driver);
 		}
 
 		private void ClickCourseButton(string courseTitle, IList<IWebElement> courseBlocks, int index)
@@ -48,7 +39,6 @@ namespace Selenium.UlearnDriverComponents.Pages
 				courseBlocks[index].FindElement(By.LinkText("Поехали!")).Click();
 			else
 				throw new NotFoundException(string.Format("Не найдена кнопка перехода на курс {0}", courseTitle));
-			parent.Update();
 		}
 	}
 }

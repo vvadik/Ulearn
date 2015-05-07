@@ -90,6 +90,7 @@
     <Compile Include="CSharp\NamingCaseStyleValidator.cs" />
     <Compile Include="CSharp\RedundantIfStyleValidator.cs" />
     <Compile Include="CSharp\RedundantIfStyleValidator_should.cs" />
+    <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="ISolutionValidator.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="FileExtensions.cs" />
     <Compile Include="ISlideLoader.cs" />
     <Compile Include="Markdown2.cs" />
+    <Compile Include="NullValidator.cs" />
     <Compile Include="Quizes\Quiz.cs" />
     <Compile Include="Quizes\QuizSlide.cs" />
     <Compile Include="Quizes\QuizBlock.cs" />
@@ -121,6 +123,9 @@
     <Compile Include="tests\Comments.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="tests\ExerciseWithoutExerciseMethod.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="tests\Includes.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
@@ -137,6 +142,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="tests\lesson\Slide1.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="tests\ManyClasses.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="tests\ManyComments.cs">
@@ -160,7 +168,6 @@
     <Compile Include="tests\Simple.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="tests\CreateDictForAutocomplete.cs" />
     <Compile Include="tests\WrongIdentationOfEmptyLines.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
@@ -173,12 +180,15 @@
     <Compile Include="SlideAttribute.cs" />
     <Compile Include="TexReplacer.cs" />
     <Compile Include="Urls.cs" />
+    <Compile Include="ValidatorsRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CSharp\README.md" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

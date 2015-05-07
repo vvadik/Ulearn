@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using System.Globalization;
 using Selenium.UlearnDriverComponents.Interfaces;
 
 namespace Selenium.UlearnDriverComponents.Pages
@@ -8,62 +13,44 @@ namespace Selenium.UlearnDriverComponents.Pages
 	public class UlearnPage
 	{
 		protected readonly IWebDriver driver;
-		protected IObserver parent;
 
-		public UlearnPage(IWebDriver driver, IObserver parent)
+		public UlearnPage(IWebDriver driver)
 		{
-			this.parent = parent;
 			this.driver = driver;
+			var mayBeExceptionH1 = driver.FindElements(By.XPath("html/body/span/h1")).FirstOrDefault();
+			var mayBeExceptionH2 = driver.FindElements(By.XPath("html/body/span/h2")).FirstOrDefault();
+			if (mayBeExceptionH1 == null) return;
+
+			var pathToScreenshot = UlearnDriver.SaveScreenshot(driver);
+
+			throw new Exception(mayBeExceptionH1.Text + "\r\n" + mayBeExceptionH2.Text + "\r\n" +
+			                    "Sreenshot:\r\n" + pathToScreenshot);
 		}
+
 
 		public string GetTitle()
 		{
 			return driver.Title;
 		}
 
-		public PageType GetPageType()
-		{
-			var title = GetTitle();
-			if (title == Titles.RegistrationPageTitle)
-				return PageType.RegistrationPage;
-			if (title == Titles.StartPageTitle)
-				return PageType.StartPage;
-			if (title == Titles.SignInPageTitle)
-				return PageType.SignInPage;
-			if (UlearnDriver.FindElementSafely(driver, By.ClassName("side-bar")) == null)
-				return PageType.IncomprehensibleType;
-			var element = UlearnDriver.FindElementSafely(driver, By.ClassName("page-header"));
-			if (element != null && element.Text == "Решения")
-				return PageType.SolutionsPage;
-			if (UlearnDriver.FindElementSafely(driver, ElementsClasses.RunSolutionButton) != null)
-				return PageType.ExerciseSlidePage;
-			if (UlearnDriver.FindElementSafely(driver, By.ClassName("quiz")) != null)
-				return PageType.QuizSlidePage;
-			return PageType.SlidePage;
-		}
+		
 
-		private static readonly Dictionary<PageType, Func<IWebDriver, IObserver, UlearnPage>> pageFabric =
-			new Dictionary<PageType, Func<IWebDriver, IObserver, UlearnPage>>
+		private static readonly Dictionary<PageType, Func<IWebDriver, UlearnPage>> PageFabric =
+			new Dictionary<PageType, Func<IWebDriver, UlearnPage>>
 		{
-			{PageType.SignInPage, (driver, parent) => new SignInPage(driver, parent) },
-			{PageType.SlidePage, (driver, parent) => new SlidePage(driver, parent) },
-			{PageType.ExerciseSlidePage, (driver, parent) => new ExerciseSlidePage(driver, parent) },
-			{PageType.SolutionsPage, (driver, parent) => new SolutionsPage(driver, parent) },
-			{PageType.StartPage, (driver, parent) => new StartPage(driver, parent) },
-			{PageType.QuizSlidePage, (driver, parent) => new QuizSlidePage(driver, parent) },
-			{PageType.RegistrationPage, (driver, parent) => new RegistrationPage(driver, parent) },
-			{PageType.IncomprehensibleType, (driver, parent) => new UlearnPage(driver, parent) },
+			{PageType.SignInPage, driver => new SignInPage(driver) },
+			{PageType.SlidePage, driver => new SlidePage(driver) },
+			{PageType.ExerciseSlidePage, driver => new ExerciseSlidePage(driver) },
+			{PageType.SolutionsPage, driver => new SolutionsPage(driver) },
+			{PageType.StartPage, driver => new StartPage(driver) },
+			{PageType.QuizSlidePage, driver => new QuizSlidePage(driver) },
+			{PageType.RegistrationPage, driver => new RegistrationPage(driver) },
+			{PageType.IncomprehensibleType, driver => new UlearnPage(driver) },
 		};
 
-		public UlearnPage CastTo(PageType pageType)
+		public T CastTo<T>() where T : UlearnPage
 		{
-			return pageFabric[pageType](driver, parent);
-		}
-
-		public string GetUserName()
-		{
-			var element = UlearnDriver.FindElementSafely(driver, By.XPath(XPaths.UserNameXPath));
-			return element == null ? null : element.Text;
+			return PageFabric[PageTypeValue.GetTypeValue(typeof(T))](driver) as T;
 		}
 	}
 }

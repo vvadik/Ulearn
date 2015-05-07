@@ -13,9 +13,9 @@
 	</h2>
 	@foreach (var userSolution in Model.Solutions)
 	{
-		<label>@userSolution.GetVerdict()</label> @userSolution.Timestamp 
-
-		@Html.Partial("DisplayTemplates/CodeBlock", new CodeBlock(userSolution.Code))
+		var code = new CodeBlock(userSolution.SolutionCode.Text, Model.Slide.Lang);
+		<label>@userSolution.GetVerdict()</label> @userSolution.Timestamp
+		@Html.DisplayFor(m => code)
 		<hr/>
 	}
 </div>
