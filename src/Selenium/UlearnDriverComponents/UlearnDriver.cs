@@ -168,7 +168,8 @@ namespace Selenium.UlearnDriverComponents
 			driver.Navigate().GoToUrl("https://localhost:44300/Course/" + course + "/Slide/" + 0);
 			while (true)
 			{
-				if (GetCurrentPageType() == PageType.SolutionsPage)
+				var currentPageType = GetCurrentPageType();
+				if (currentPageType == PageType.SolutionsPage)
 				{
 					var solutionsPage = Get<SolutionsPage>();
 					if (!solutionsPage.GetNavArrows().HasNextButton())
@@ -176,12 +177,30 @@ namespace Selenium.UlearnDriverComponents
 					solutionsPage.GetNavArrows().ClickNextButton();
 					continue;
 				}
-				var page = Get<SlidePage>();
+				var page = GetCorrectPage(currentPageType);
 				yield return page;
 				if (!page.GetNavArrows().HasNextButton())
 					yield break;
 				GoToNextSlide(page);
 			}
+		}
+
+		private SlidePage GetCorrectPage(PageType currentPageType)
+		{
+			SlidePage page;
+			switch (currentPageType)
+			{
+				case PageType.ExerciseSlidePage:
+					page = Get<ExerciseSlidePage>();
+					break;
+				case PageType.QuizSlidePage:
+					page = Get<QuizSlidePage>();
+					break;
+				default:
+					page = Get<SlidePage>();
+					break;
+			}
+			return page;
 		}
 
 		private static void GoToNextSlide(SlidePage page)
