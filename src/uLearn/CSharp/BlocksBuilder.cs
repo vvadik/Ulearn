@@ -10,7 +10,7 @@ namespace uLearn.CSharp
 {
 	public class SlideBuilder : CSharpSyntaxRewriter
 	{
-		public const string LangId = "csharp";
+		public const string LangId = "cs";
 		private readonly IFileSystem fs;
 		public readonly List<SlideBlock> Blocks = new List<SlideBlock>();
 		public string Title;
