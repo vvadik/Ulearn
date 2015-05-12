@@ -41,4 +41,9 @@
 	<include-code file="_Code.cs">
 		<label>namedRegion</label>
 	</include-code>
+
+	<include-code file="HelloWorld.py" lang_ver="3" />
+	<include-code file="HelloWorld.py" lang_ver="3">
+		<label>main</label>
+	</include-code>
 </Lesson>

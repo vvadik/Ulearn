@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Microsoft.CodeAnalysis;
@@ -92,11 +91,14 @@ namespace uLearn
 		public string Code { get; set; }
 		[XmlAttribute("lang")]
 		public string Lang { get; set; }
+		[XmlAttribute("ver")]
+		public string Ver { get; set; }
 
-        public CodeBlock(string code, string lang)
+		public CodeBlock(string code, string lang, string ver = null)
         {
             Code = code;
             Lang = lang;
+			Ver = ver;
         }
 
 	    public CodeBlock()
@@ -139,6 +141,12 @@ namespace uLearn
 		[XmlElement("label")]
 		public Label[] Labels { get; set; }
 
+		[XmlAttribute("lang_id")]
+		public string LangId { get; set; }
+
+		[XmlAttribute("lang_ver")]
+		public string LangVer { get; set; }
+
 		public IncludeCodeBlock(string file)
 		{
 			File = file;
@@ -152,11 +160,11 @@ namespace uLearn
 		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress)
 		{
 			var content = fs.GetContent(File);
-			var lang = (Path.GetExtension(File) ?? "").Trim('.');
+			var lang = LangId ?? (Path.GetExtension(File) ?? "").Trim('.');
 
 			if (Labels == null || Labels.Length == 0)
 			{
-				yield return new CodeBlock(content, lang);
+				yield return new CodeBlock(content, lang, LangVer);
 				yield break;
 			}
 
@@ -176,7 +184,7 @@ namespace uLearn
 					blocks.Add(GetLabelData(label, members[label.Name]));
 			}
 			var elements = blocks.Select(FixEolns);
-			yield return new CodeBlock(String.Join("\r\n\r\n", elements), lang);
+			yield return new CodeBlock(String.Join("\r\n\r\n", elements), lang, LangVer);
 		}
 
 		private Dictionary<string, string> ParseCodeFile(string content)

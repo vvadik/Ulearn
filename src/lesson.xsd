@@ -53,11 +53,12 @@
 	</xs:complexType>
 
 	<xs:complexType name="Code">
-		<xs:attribute name="lang" type="notEmptyString" use="required"/>
+		<xs:attribute name="lang" type="notEmptyString" use="required" />
+		<xs:attribute name="ver" type="notEmptyString" use="optional" />
 	</xs:complexType>
 
 	<xs:complexType name="Include">
-		<xs:attribute name="file" type="notEmptyString"/>
+		<xs:attribute name="file" type="notEmptyString" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="IncludeCode">
@@ -66,6 +67,8 @@
 				<xs:sequence minOccurs="0" maxOccurs="unbounded">
 					<xs:element name="label" type="Label" />
 				</xs:sequence>
+			<xs:attribute name="lang_id" type="notEmptyString" use="optional" />
+			<xs:attribute name="lang_ver" type="notEmptyString" use="optional" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
