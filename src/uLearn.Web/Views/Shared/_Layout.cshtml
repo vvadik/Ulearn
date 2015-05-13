@@ -29,7 +29,7 @@
 				@Html.ActionLink("uLearn", "Index", "Home", null, new { @class = "navbar-brand" })
 			</div>
 			<div class="greeting-collapse-class navbar-collapse collapse">
-				<ul class="nav navbar-nav">
+				<ul class="top-navigation nav navbar-nav">
 					@if (User.IsInRole(LmsRoles.Admin))
 					{
 						<li>@Html.ActionLink("Admin courses", "CourseList", "Unit")</li>

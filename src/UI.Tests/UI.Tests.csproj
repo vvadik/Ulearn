@@ -34,7 +34,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;JETBRAINS_ANNOTATIONS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -104,6 +104,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\FindByCssAttribute.cs" />
+    <Compile Include="Core\FindByTextAttribute.cs" />
+    <Compile Include="Core\IGetContext.cs" />
+    <Compile Include="Core\PageObject.cs" />
+    <Compile Include="Core\PageUrlAttribute.cs" />
+    <Compile Include="Core\SampleTest.cs" />
+    <Compile Include="Core\SearchContextExtensions.cs" />
+    <Compile Include="Core\TypeExtensions.cs" />
+    <Compile Include="JetBrains.Annotations.cs" />
+    <Compile Include="Core\Browser.cs" />
     <Compile Include="TestCases\Courses\TeX_Should.cs" />
     <Compile Include="TestCases\ULearn\ExercisePageShould.cs" />
     <Compile Include="TestCases\ULearn\MainEngineTest.cs" />
