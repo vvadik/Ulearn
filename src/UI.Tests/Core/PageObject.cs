@@ -14,39 +14,20 @@ namespace UI.Tests.Core
 
 		public TPageObject Get<TPageObject>()
 		{
-			return element == null ? browser.Get<TPageObject>() : element.Get<TPageObject>();
+			return browser.Get<TPageObject>(element);
 		}
 
 		public TPageObject[] All<TPageObject>()
 		{
-			return element == null ? browser.All<TPageObject>() : element.All<TPageObject>();
+			return browser.All<TPageObject>(element);
 		}
 
-		public TResult Safe<TResult>(Func<TResult> action, string message = null)
-		{
-			try
-			{
-				return action();
-			}
-			catch (Exception)
-			{
-				if (message != null)
-					Console.WriteLine("Действие: " + message);
-				// TODO Сохранить скриншот!
-				throw;
-			}
-		}
 		public TPageObect ClickAndOpen<TPageObect>()
 		{
-			return Safe(() =>
-			{
-				if (element == null)
-					throw new Exception("Cant click on page object without specified element");
-				// TODO обрабатывать исключения красиво (информативные логи, скриншоты)
-				element.Click();
-				return browser.Get<TPageObect>();
-			}, "Нажатие на кнопку и получение " + typeof(TPageObect).Name);
+			if (element == null)
+				throw new Exception("Cant click on page object without specified element");
+			browser.Safe(element.Click, "Mouse click " + element.Text);
+			return browser.Get<TPageObect>();
 		}
-		
 	}
 }

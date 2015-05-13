@@ -177,3 +177,4 @@ FakesAssemblies/
 *.Settings.cs
 /src/uLearn.Web/Courses/
 /src/uLearn.Web/Courses.Staging/*.zip
+/src/UI.Tests/screenshots

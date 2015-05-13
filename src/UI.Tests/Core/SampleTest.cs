@@ -1,6 +1,5 @@
 ﻿using System;
 using NUnit.Framework;
-using OpenQA.Selenium.Chrome;
 
 namespace UI.Tests.Core
 {
@@ -11,45 +10,52 @@ namespace UI.Tests.Core
 		[Explicit("Демонстрация нового API")]
 		public void Test()
 		{
-			using (var b = new Browser(new ChromeDriver()))
+			using (var b = Browser.CreateDefault())
 			{
 				StartPage startPage = b.Open<StartPage>();
+				foreach (var course in startPage.Courses.Value)
+				{
+					Console.WriteLine(course.Title);
+				}
 				var window = startPage.LoginButton.ClickAndOpen<PageObject>();
-				Console.WriteLine(window.Get<TopMenu>());
+				var topMenu = window.Get<TopMenu>();
+				Console.WriteLine(topMenu);
 				Console.WriteLine(b.WindowTitle);
 			}
 		}
 	}
 
-	[FindByCss(".top-navigation")]
+	[FindBy(Css = ".top-navigation")]
 	public class TopMenu : PageObject
 	{
-		[FindByText("Admin courses")]
+		[FindBy(LinkText = "Admin courses")]
 		public Lazy<PageObject> AdminCoursesButton;
 
-		[FindByText("Пользователи")]
+		[FindBy(LinkText = "Пользователи")]
 		public Lazy<PageObject> UsersButton;
 
-		[FindByText("Статистика")]
+		[FindBy(LinkText = "Статистика")]
 		public Lazy<PageObject> StatisticsButton;
 	}
 
 	[PageUrl("/")]
 	public class StartPage : PageObject
 	{
-		[FindByCss("#loginLink")]
+		[FindBy(Css = "#loginLink")]
 		public PageObject LoginButton;
 
+		[FindBy(Css = ".course-tile")]
 		public Lazy<CourseTile[]> Courses;
 	}
 
-	[FindByCss(".course-tile")]
+	//TODO: надо чтобы с этим указанием тоже работало
+	//[FindBy(Css = ".course-tile")]
 	public class CourseTile : PageObject
 	{
-		[FindByCss("h2")]
+		[FindBy(Css = "h2")]
 		public string Title;
 
-		[FindByCss("a")]
+		[FindBy(Css = "a")]
 		public PageObject StartButton;
 	}
 }

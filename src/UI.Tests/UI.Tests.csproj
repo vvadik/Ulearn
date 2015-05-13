@@ -104,12 +104,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\FindByCssAttribute.cs" />
+    <Compile Include="Core\FindByAttribute.cs" />
     <Compile Include="Core\FindByTextAttribute.cs" />
     <Compile Include="Core\IGetContext.cs" />
+    <Compile Include="Core\LazyUtils.cs" />
     <Compile Include="Core\PageObject.cs" />
     <Compile Include="Core\PageUrlAttribute.cs" />
     <Compile Include="Core\SampleTest.cs" />
+    <Compile Include="Core\Screenshoter.cs" />
     <Compile Include="Core\SearchContextExtensions.cs" />
     <Compile Include="Core\TypeExtensions.cs" />
     <Compile Include="JetBrains.Annotations.cs" />

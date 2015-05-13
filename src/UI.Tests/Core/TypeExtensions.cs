@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 
 namespace UI.Tests.Core
 {
 	public static class TypeExtensions
 	{
-		public static TAttr FindAttr<TAttr>(this Type t)
+		public static TAttr FindAttr<TAttr>(this ICustomAttributeProvider t)
 		{
 			return (TAttr)t.GetCustomAttributes(typeof(TAttr), true).FirstOrDefault();
 		}
