@@ -59,6 +59,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="FakeItEasy">
+      <HintPath>..\packages\FakeItEasy.1.25.2\lib\net40\FakeItEasy.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.1.0\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
@@ -104,15 +107,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\DontInjectAttribute.cs" />
+    <Compile Include="Core\EnumerableExtensions.cs" />
     <Compile Include="Core\FindByAttribute.cs" />
     <Compile Include="Core\FindByTextAttribute.cs" />
     <Compile Include="Core\IGetContext.cs" />
     <Compile Include="Core\LazyUtils.cs" />
     <Compile Include="Core\PageObject.cs" />
     <Compile Include="Core\PageUrlAttribute.cs" />
-    <Compile Include="Core\SampleTest.cs" />
+    <Compile Include="Core\Sample_Test.cs" />
     <Compile Include="Core\Screenshoter.cs" />
-    <Compile Include="Core\SearchContextExtensions.cs" />
+    <Compile Include="Core\TypeFactory.cs" />
+    <Compile Include="Core\ValueConstructionInfo.cs" />
+    <Compile Include="Core\WebDriverExtensions.cs" />
+    <Compile Include="Core\WebElementGetExtensions.cs" />
+    <Compile Include="Core\WebElementGetExtensions_Test.cs" />
     <Compile Include="Core\TypeExtensions.cs" />
     <Compile Include="JetBrains.Annotations.cs" />
     <Compile Include="Core\Browser.cs" />

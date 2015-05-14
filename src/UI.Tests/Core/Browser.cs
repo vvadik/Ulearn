@@ -1,17 +1,10 @@
 ﻿using System;
-using System.IO;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 
 namespace UI.Tests.Core
 {
 	public class Browser : IGetContext, IDisposable
 	{
-		public static Browser CreateDefault()
-		{
-			return new Browser(new ChromeDriver(), new Screenshoter(new DirectoryInfo("../../screenshots")), "https://localhost:44300/");
-		}
-
 		public IWebDriver Driver { get; private set; }
 		private Screenshoter screenshoter;
 		private readonly string baseUrl;
@@ -41,16 +34,16 @@ namespace UI.Tests.Core
 			return All<TPageObject>(null);
 		}
 
-		public TPageObject Get<TPageObject>(ISearchContext parent)
+		public TPageObject Get<TPageObject>(IWebElement parent)
 		{
-			var context = parent ?? Driver;
+			var context = parent ?? Driver.RootElement();
 			return Safe(() => context.Get<TPageObject>(this),
 				"Get " + typeof(TPageObject));
 		}
 
-		public TPageObject[] All<TPageObject>(ISearchContext parent)
+		public TPageObject[] All<TPageObject>(IWebElement parent)
 		{
-			var context = parent ?? Driver;
+			var context = parent ?? Driver.RootElement();
 			return Safe(() => context.All<TPageObject>(this),
 				"Get all " + typeof(TPageObject));
 		}

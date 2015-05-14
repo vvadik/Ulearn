@@ -6,28 +6,28 @@ namespace UI.Tests.Core
 	public class PageObject : IGetContext
 	{
 		[UsedImplicitly]
-		protected Browser browser;
+		public Browser Browser;
 		
 		[UsedImplicitly]
 		[CanBeNull]
-		protected IWebElement element;
+		public IWebElement Element;
 
 		public TPageObject Get<TPageObject>()
 		{
-			return browser.Get<TPageObject>(element);
+			return Browser.Get<TPageObject>(Element);
 		}
 
 		public TPageObject[] All<TPageObject>()
 		{
-			return browser.All<TPageObject>(element);
+			return Browser.All<TPageObject>(Element);
 		}
 
 		public TPageObect ClickAndOpen<TPageObect>()
 		{
-			if (element == null)
-				throw new Exception("Cant click on page object without specified element");
-			browser.Safe(element.Click, "Mouse click " + element.Text);
-			return browser.Get<TPageObect>();
+			if (Element == null)
+				throw new Exception("Cant click on page object without specified Element");
+			Browser.Safe(Element.Click, "Mouse click " + Element.Text);
+			return Browser.Get<TPageObect>();
 		}
 	}
 }
