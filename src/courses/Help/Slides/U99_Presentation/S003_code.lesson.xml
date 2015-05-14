@@ -39,7 +39,10 @@
 	
 	<md>###Регион</md>
 	<include-code file="_Code.cs">
-		<label>namedRegion</label>
+		<label>CSharpStyleRegion</label>
+	</include-code>
+	<include-code file="_Code.cs">
+		<label>CommentRegion</label>
 	</include-code>
 
 	<include-code file="HelloWorld.py" lang_ver="3" />

@@ -203,7 +203,7 @@ namespace uLearn
 			var lines = content.SplitToLines();
 			foreach (var line in lines)
 			{
-				if (line.Contains("end"))
+				if (line.Contains("endregion"))
 				{
 					var name = GetRegionName(line);
 					if (opened.ContainsKey(name))

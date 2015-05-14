@@ -4,11 +4,13 @@ namespace Presentation.Slides.U99_Presentation
 {
 	public class Code
 	{
-		//region namedRegion
+#region CSharpStyleRegion
 		public int C;
 
 		private int E { get; set; }
-		//end namedRegion
+#endregion CSharpStyleRegion
+
+		//region CommentRegion
 
 		// field D is hidden
 		[HideOnSlide]
@@ -18,6 +20,9 @@ namespace Presentation.Slides.U99_Presentation
 		public void A()
 		{
 		}
+
+		//endregion CommentRegion
+
 
 		// just comment
 
