@@ -39,27 +39,28 @@
 			<h4><i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text.RenderTex()</h4>
 		}
 
-		var delim = blockIndex != quizSlide.Quiz.Blocks.Length - 1 ? "quiz-delimeter" : "";
 		if (quizBlock is ChoiceBlock)
 		{
 			@Html.Partial("_ChoiceBlock", quizModel)
-			<hr class="@delim">
 		}
 		else if (quizBlock is FillInBlock)
 		{
 			@Html.Partial("_FillInBlock", quizModel)
-			<hr class="@delim">
 		}
 		else if (quizBlock is IsTrueBlock)
 		{
 			@Html.Partial("_TrueFalseBlock", quizModel)
-			<hr class="@delim">
+
+		}
+		if (quizBlock is AbstractQuestionBlock && blockIndex != quizSlide.Quiz.Blocks.Length - 1)
+		{
+			<hr class="quiz-block-delimiter">
 		}
 	}
 	<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
 		@if (Model.QuizState == QuizState.NotPassed)
 		{
-			<button class="btn btn-primary quiz-submit-btn" onclick=" submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count') ">Готово!</button>
+			<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count')">Готово!</button>
 		}
 		else if (Model.QuizState == QuizState.Subtotal)
 		{

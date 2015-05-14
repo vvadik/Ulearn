@@ -12,6 +12,7 @@
 	<s:Boolean x:Key="/Default/CodeEditing/Intellisense/ParameterInfo/DelegatesAsLambdas/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/CodeAnnotations/NamespacesWithAnnotations/=Diadoc_002EApi_002EAnnotations/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/CodeAnnotations/NamespacesWithAnnotations/=Kontur_002ERecognition_002EUtils_002EJetBrains_002EAnnotations/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeInspection/CodeAnnotations/NamespacesWithAnnotations/=UI_002ETests/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip/=835BF03E_002D0B49_002D4F1D_002DB9F5_002D05D0E49FBC9E_002Fd_003ARazorViews_002Ff_003ACleanup_002Ecshtml/@EntryIndexedValue">835BF03E-0B49-4F1D-B9F5-05D0E49FBC9E/d:RazorViews/f:Cleanup.cshtml</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip/=835BF03E_002D0B49_002D4F1D_002DB9F5_002D05D0E49FBC9E_002Fd_003ARazorViews_002Ff_003AControl_002Ecshtml/@EntryIndexedValue">835BF03E-0B49-4F1D-B9F5-05D0E49FBC9E/d:RazorViews/f:Control.cshtml</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip/=835BF03E_002D0B49_002D4F1D_002DB9F5_002D05D0E49FBC9E_002Fd_003ARazorViews_002Ff_003APush_002Ecshtml/@EntryIndexedValue">835BF03E-0B49-4F1D-B9F5-05D0E49FBC9E/d:RazorViews/f:Push.cshtml</s:String>

@@ -1,5 +1,6 @@
 /*#region js-classes */
 /* ReSharper disable DeclarationIsEmpty */
+/* ReSharper disable Html.CssClassElementsNotFound */
 .quiz {
 }
 
@@ -27,6 +28,7 @@
 .code, .code-exercise {
 }
 
+/* ReSharper restore Html.CssClassElementsNotFound */
 /* ReSharper restore DeclarationIsEmpty */
 /*#endregion */
 
@@ -34,28 +36,14 @@
 	float: left;
 	margin: 30px;
 	margin-top: -20px;
-	margin-bottom: 0px;
-}
-
-.course-header {
-	background-color: #6f5499;
-	color: white;
-	padding: 30px 15px;
-	margin-bottom: 30px;
-}
-
-.slide-nav {
-	margin-top: 30px;
-}
-
-.slide-nav-link {
-	margin-right: 30px;
+	margin-bottom: 0;
 }
 
 .container {
 	max-width: 864px;
 }
 
+/* ReSharper disable Html.CssClassElementsNotFound */
 .CodeMirror {
 	height: auto;
 	margin-bottom: 20px;
@@ -74,51 +62,7 @@
 	outline-color: rgb(0, 100, 100) !important;
 	outline-color: rgba(0, 200, 200, 0.5) !important;
 }
-
-.nav-arrow {
-	margin: 0;
-	width: 50%;
-	text-align: center;
-	justify-content: center;
-	align-content: center;
-	font-size: xx-large;
-	color: lightblue;
-	padding: 10px;
-}
-
-a.nav-arrow:hover {
-	text-decoration: none;
-	color: white;
-	background-color: lightblue;
-}
-
-.nav-left {
-	float: left;
-}
-
-.nav-right {
-	float: right;
-}
-
-.output-label {
-	text-align: center;
-	margin-top: 20px;
-	display: none;
-}
-
-.actual-output, .error-output, .expected-output {
-	float: left;
-	width: 50%;
-	margin: 0;
-}
-
-	.actual-output pre, .error-output pre, .expected-output pre {
-		min-height: 200px;
-	}
-
-.clear-code-button {
-	margin: 20px 0 20px 0;
-}
+/* ReSharper restore Html.CssClassElementsNotFound */
 
 .sphere-engine-tm {
 	margin: 0 0 -20px 0;
@@ -147,18 +91,11 @@ a.nav-arrow:hover {
 	margin-top: 10px;
 }
 
-.half-size {
-	width: 50%;
-}
-
-.full-size {
-	width: 100%;
-}
-
 .no-rounds {
-	border-radius: 0px;
-	-webkit-border-radius: 0px;
-	-moz-border-radius: 0px;
+	-ms-border-radius: 0;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
 }
 
 .units-list {
@@ -199,13 +136,13 @@ a.nav-arrow:hover {
 
 .slide-list-item {
 	list-style-type: none;
-	border-bottom: 1px solid #eee;
 	padding: 0.5em 0.5em 0.5em;
 	cursor: pointer;
 	color: #428bca;
 	display: flex;
 }
 
+	/* ReSharper disable Html.CssClassElementsNotFound */
 	.slide-list-item.selected {
 		background-color: #f5f5f5;
 		font-weight: bolder;
@@ -213,23 +150,12 @@ a.nav-arrow:hover {
 		cursor: pointer;
 		color: #428bca;
 	}
-
-.glyphicon-none:before {
-	content: "\2122";
-	color: transparent !important;
-}
-
+	/* ReSharper restore Html.CssClassElementsNotFound */
 .side-bar {
-	width: 320px;
+	width: 350px;
 	margin: 0;
-	padding: 20px;
+	padding-top: 20px;
 	max-height: none !important;
-}
-
-@media (max-width: 768px) {
-	.slide-bar {
-		float: none !important;
-	}
 }
 
 .slide-container {
@@ -246,60 +172,14 @@ a.nav-arrow:hover {
 	max-width: none;
 	width: 100%;
 	margin-bottom: 15px;
+	-moz-resize: none;
+	-ms-resize: none;
+	-o-resize: none;
 	resize: none;
 }
 
-.ask-button {
-	margin-top: 10px;
-}
-
-.solution-bar {
-	max-width: 500px;
-	width: 500px;
-}
-
-.answer-table {
-	border-width: 1px;
-	width: 100%;
-	background-color: aliceblue;
-	border-color: black;
-	margin-top: 10px;
-	table-layout: fixed;
-	word-break: break-word;
-}
-
-.answer-table-headers {
-	background-color: lightgray;
-	font-weight: bolder;
-}
-
-.visited-hint {
-	background-color: lightgreen;
-	padding: 10px 15px;
-	border-bottom: 1px solid transparent;
-	-ms-border-top-right-radius: 3px;
-	border-top-right-radius: 3px;
-	-ms-border-top-left-radius: 3px;
-	border-top-left-radius: 3px;
-}
-
-.green-cell {
-	background-color: lightgreen;
-}
-
-.clear-code {
-	text-decoration: none;
-}
-
-	.clear-code:hover {
-		text-decoration: none;
-		color: white;
-		cursor: pointer;
-		background-color: #838383;
-	}
-
 .likes-counter {
-	margin-left: 0px;
+	margin-left: 0;
 }
 
 .rate-buttons {
@@ -312,16 +192,6 @@ a.nav-arrow:hover {
 	color: #428bca;
 }
 
-table.diff tbody td {
-	padding: 0;
-}
-
-table.diff tbody th {
-	padding: 0 3px 0 0;
-	text-align: right;
-	vertical-align: middle;
-}
-
 .like-left-location {
 	margin-right: 10px;
 	float: left;
@@ -329,13 +199,15 @@ table.diff tbody th {
 
 .navbar-label {
 	float: left;
-	margin-right: 5px;
+	margin-right: 8px;
+	width: 14px;
 }
 
 .navbar-label-privileged {
 	color: #333;
 }
 
+/* ReSharper disable Html.CssClassElementsNotFound */
 .navbar-label-default {
 	color: lightgray;
 }
@@ -347,16 +219,11 @@ table.diff tbody th {
 .navbar-label-danger {
 	color: lightcoral;
 }
+/* ReSharper restore Html.CssClassElementsNotFound */
 
 .block-next {
 	color: gray;
 	background-color: aliceblue;
-	margin-left: 0 !important;
-}
-
-.free-next {
-	color: black;
-	background-color: white;
 	margin-left: 0 !important;
 }
 
@@ -388,21 +255,9 @@ table.diff tbody th {
 	margin-left: 0 !important;
 }
 
-.not-watched {
-}
-
-.all-questions {
-	margin-top: 10px;
-}
-
 .rates-bar {
 	width: 100%;
 	margin-bottom: -11px;
-	margin-left: 0 !important;
-}
-
-.navs {
-	margin-top: -21px;
 	margin-left: 0 !important;
 }
 
@@ -410,22 +265,8 @@ table.diff tbody th {
 	margin-left: 0 !important;
 }
 
-div.quiz .wrong-quiz {
-	color: red;
-	font-weight: bolder;
-}
-
-div.quiz .right-quiz {
-	color: green;
-	font-weight: bold;
-}
-
 .full-width {
 	width: 100%;
-}
-
-.half-width {
-	width: 50%;
 }
 
 .quiz-submit-btn {
@@ -437,11 +278,7 @@ div.quiz .right-quiz {
 	display: none;
 }
 
-.block-display {
-	display: block;
-}
-
-.quiz-delimeter {
+.quiz-block-delimiter {
 	margin-bottom: 40px;
 	margin-top: 40px;
 	color: gray;
@@ -452,6 +289,7 @@ div.quiz .right-quiz {
 	float: left;
 }
 
+/* ReSharper disable Html.CssClassElementsNotFound */
 .falseQuizAnswer {
 	background-color: lightcoral !important;
 }
@@ -459,6 +297,7 @@ div.quiz .right-quiz {
 .rightQuizAnswer {
 	background-color: lightgreen !important;
 }
+/* ReSharper restore Html.CssClassElementsNotFound */
 
 .video-container {
 	position: relative;
@@ -482,6 +321,7 @@ div.quiz .right-quiz {
 	color: yellowgreen;
 }
 
+/* ReSharper disable Html.CssClassElementsNotFound */
 .green-stat {
 	background-color: lightgreen !important;
 }
@@ -489,6 +329,7 @@ div.quiz .right-quiz {
 .red-stat {
 	background-color: lightcoral !important;
 }
+/* ReSharper restore Html.CssClassElementsNotFound */
 
 .wide-container {
 	margin: 0 50px;

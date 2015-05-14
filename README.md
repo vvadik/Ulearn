@@ -1,7 +1,11 @@
 uLearn
 =======
 
+[![Build status](https://ci.appveyor.com/api/projects/status/tokx1fary859l40f?svg=true)](https://ci.appveyor.com/project/xoposhiy/ulearn)
+
 E-learning platform and courses
+
+
 
 Подмодули
 ---------
