@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Slides\Title.txt" />
+    <Content Include="Slides\Course.xml" />
     <Content Include="Slides\U99_Presentation\HelloWorld.py" />
     <Content Include="Slides\U99_Presentation\img\01-stack.png" />
     <Content Include="Slides\U99_Presentation\img\02-IEnumerable.png" />

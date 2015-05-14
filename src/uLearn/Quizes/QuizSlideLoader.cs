@@ -7,7 +7,7 @@ namespace uLearn.Quizes
 	{
 		public string Extension { get { return ".quiz.xml"; } }
 
-		public Slide Load(FileInfo file, string unitName, int slideIndex)
+		public Slide Load(FileInfo file, string unitName, int slideIndex, CourseSettings settings)
 		{
 			var quiz = file.DeserializeXml<Quiz>();
 			int index = 1;

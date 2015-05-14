@@ -14,7 +14,7 @@ namespace uLearn
 {
     public abstract class SlideBlock
     {
-	    public virtual IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress)
+	    public virtual IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress, CourseSettings settings)
 	    {
 		    yield return this;
 	    }
@@ -92,20 +92,27 @@ namespace uLearn
 		[XmlAttribute("lang")]
 		public string Lang { get; set; }
 		[XmlAttribute("ver")]
-		public string Ver { get; set; }
+		public string Version { get; set; }
 
-		public CodeBlock(string code, string lang, string ver = null)
+		public CodeBlock(string code, string lang, string version = null)
         {
             Code = code;
             Lang = lang;
-			Ver = ver;
+			Version = version;
         }
 
 	    public CodeBlock()
 	    {
 	    }
 
-	    public override string ToString()
+		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress, CourseSettings settings)
+		{
+			if (Version == null)
+				Version = settings.GetLanguageVersion(Lang);
+			yield return this;
+		}
+
+		public override string ToString()
         {
             return string.Format("{0} code {1}", Lang, Code);
         }
@@ -157,10 +164,12 @@ namespace uLearn
 		}
 
 		
-		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress)
+		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress, CourseSettings settings)
 		{
 			var content = fs.GetContent(File);
 			var lang = LangId ?? (Path.GetExtension(File) ?? "").Trim('.');
+			if (LangVer == null)
+				LangVer = settings.GetLanguageVersion(lang);
 
 			if (Labels == null || Labels.Length == 0)
 			{
@@ -297,7 +306,7 @@ namespace uLearn
 		{
 		}
 
-		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress)
+		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress, CourseSettings settings)
 		{
 			yield return new MdBlock(fs.GetContent(File));
 		}
@@ -318,7 +327,7 @@ namespace uLearn
 		{
 		}
 
-		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress)
+		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress, CourseSettings settings)
 		{
 			yield return new ImageGaleryBlock(fs.GetFilenames(Directory));
 		}
@@ -339,7 +348,7 @@ namespace uLearn
 		{
 		}
 
-		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress)
+		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress, CourseSettings settings)
 		{
 			if (filesInProgress.Contains(File))
 				throw new Exception("Cyclic dependency");
@@ -348,7 +357,7 @@ namespace uLearn
 			var serializer = new XmlSerializer(typeof(SlideBlock[]));
 			var slideBlocks = (SlideBlock[])serializer.Deserialize(xmlStream);
 			var newInProgress = filesInProgress.Add(File);
-			return slideBlocks.SelectMany(b => b.BuildUp(fs, newInProgress));
+			return slideBlocks.SelectMany(b => b.BuildUp(fs, newInProgress, settings));
 		}
 	}
 

@@ -109,13 +109,14 @@ namespace uLearn
 		
 		public static Course LoadCourse(DirectoryInfo dir)
 		{
-			var slides = LoadSlides(dir).ToArray();
+			var settings = CourseSettings.Load(dir);
+			var slides = LoadSlides(dir, settings).ToArray();
 			CheckDuplicateSlideIds(slides);
 
 			var courseId = dir.Name;
 			var notes = LoadInstructorNotes(dir, courseId);
-			var title = GetTitle(dir);
-			return new Course(courseId, title, slides, notes);
+			var title = settings.Title ?? GetTitle(dir);
+			return new Course(courseId, title, slides, notes, settings);
 		}
 
 		private static InstructorNote[] LoadInstructorNotes(DirectoryInfo dir, string courseId)
@@ -131,23 +132,23 @@ namespace uLearn
 				.ToArray();
 		}
 
-		private static IEnumerable<Slide> LoadSlides(DirectoryInfo dir)
+		private static IEnumerable<Slide> LoadSlides(DirectoryInfo dir, CourseSettings settings)
 		{
 			var unitDirs = dir
 				.GetDirectories()
 				.OrderBy(d => d.Name);
 			return unitDirs
-				.SelectMany(LoadUnit)
+				.SelectMany(info => LoadUnit(info, settings))
 				.Select((makeSlide, index) => makeSlide(index));
 		}
 
-		private static IEnumerable<Func<int, Slide>> LoadUnit(DirectoryInfo unitDir)
+		private static IEnumerable<Func<int, Slide>> LoadUnit(DirectoryInfo unitDir, CourseSettings settings)
 		{
 			var unitTitle = GetTitle(unitDir);
 			return unitDir.GetFiles()
 				.Where(f => IsSlideFile(f.Name))
 				.OrderBy(f => f.Name)
-				.Select<FileInfo, Func<int, Slide>>(f => i => LoadSlide(f, unitTitle, i));
+				.Select<FileInfo, Func<int, Slide>>(f => i => LoadSlide(f, unitTitle, i, settings));
 		}
 
 		private static bool IsSlideFile(string name)
@@ -158,7 +159,7 @@ namespace uLearn
 					&& id.Skip(1).All(char.IsDigit);
 		}
 
-		private static Slide LoadSlide(FileInfo file, string unitTitle, int slideIndex)
+		private static Slide LoadSlide(FileInfo file, string unitTitle, int slideIndex, CourseSettings settings)
 		{
 			try
 			{
@@ -166,7 +167,7 @@ namespace uLearn
 					.FirstOrDefault(loader => file.FullName.EndsWith(loader.Extension, StringComparison.InvariantCultureIgnoreCase));
 				if (slideLoader == null)
 					throw new Exception("Unknown slide format " + file);
-				return slideLoader.Load(file, unitTitle, slideIndex);
+				return slideLoader.Load(file, unitTitle, slideIndex, settings);
 			}
 			catch (Exception e)
 			{

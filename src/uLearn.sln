@@ -11,6 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn.Web", "uLearn.Web\uL
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{886309CE-DFC7-4449-9171-2351E2CE2B88}"
 	ProjectSection(SolutionItems) = preProject
+		course.xsd = course.xsd
 		lesson.xsd = lesson.xsd
 		quiz.xsd = quiz.xsd
 	EndProjectSection

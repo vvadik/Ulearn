@@ -12,11 +12,11 @@ namespace uLearn.Lessions
 			get { return "lesson.xml"; }
 		}
 
-		public Slide Load(FileInfo file, string unitName, int slideIndex)
+		public Slide Load(FileInfo file, string unitName, int slideIndex, CourseSettings settings)
 		{
 			var lesson = file.DeserializeXml<Lesson>();
 			var fs = new FileSystem(file.Directory);
-			var blocks = lesson.Blocks.SelectMany(b => b.BuildUp(fs, ImmutableHashSet<string>.Empty));
+			var blocks = lesson.Blocks.SelectMany(b => b.BuildUp(fs, ImmutableHashSet<string>.Empty, settings));
 			return new Slide(blocks, new SlideInfo(unitName, file, slideIndex), lesson.Title, lesson.Id);
 		}
 	}
