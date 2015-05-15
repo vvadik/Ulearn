@@ -1,0 +1,3 @@
+[submodule "src/courses/BasicProgramming"]
+	path = src/courses/BasicProgramming
+	url = https://github.com/urfu-code/BasicProgramming
