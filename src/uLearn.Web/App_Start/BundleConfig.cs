@@ -30,6 +30,7 @@ namespace uLearn.Web
 			bundles.Add(new ScriptBundle("~/codemirror-js").Include(
 				"~/codemirror/lib/codemirror.js",
 				"~/codemirror/mode/clike/clike.js",
+				"~/codemirror/mode/python/python.js",
 				"~/codemirror/addon/hint/show-hint.js",
 				"~/codemirror/addon/hint/cscompleter.js",
 				"~/codemirror/addon/hint/csharp-hint.js",
