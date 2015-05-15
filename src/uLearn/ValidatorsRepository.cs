@@ -12,7 +12,7 @@ namespace uLearn
 		public static ISolutionValidator Get(string name)
 		{
 			var parts = name.ToLower().Split(' ');
-			if (parts.Contains("csharp"))
+			if (parts.Contains("cs"))
 			{
 				if (parts.Contains("singlestatementmethod"))
 					return CSharpSingleStatementValidator;

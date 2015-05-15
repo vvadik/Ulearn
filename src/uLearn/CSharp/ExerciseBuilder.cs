@@ -18,7 +18,7 @@ namespace uLearn.CSharp
 		{
 			this.prelude = prelude;
 			Slide = new ExerciseSlide(SlideBuilder.LangId, blocksBuilder.Blocks, slideInfo, blocksBuilder.Title, blocksBuilder.Id);
-			Slide.ValidatorName = "csharp";
+			Slide.ValidatorName = "cs";
 		}
 
 		public ExerciseSlide BuildFrom(SyntaxTree tree)

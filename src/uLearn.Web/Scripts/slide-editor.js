@@ -2,10 +2,15 @@
 	cm.showHint({ hint: CodeMirror.hint.csharp });
 }
 
-function getMode(langId) {
+function getMode(lang) {
 	// see http://codemirror.net/mode/
-	langId = langId || "csharp";
-	return "text/x-" + langId;
+
+	var langIds = {
+		"cs": "x-csharp"
+	};
+
+	lang = lang || "cs";
+	return "text/" + langIds[lang];
 }
 
 function codeMirrorClass(c, editable) {

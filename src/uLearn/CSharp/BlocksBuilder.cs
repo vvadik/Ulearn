@@ -10,7 +10,7 @@ namespace uLearn.CSharp
 {
 	public class SlideBuilder : CSharpSyntaxRewriter
 	{
-		public const string LangId = "csharp";
+		public const string LangId = "cs";
 		private readonly IFileSystem fs;
 		public readonly List<SlideBlock> Blocks = new List<SlideBlock>();
 		public string Title;
@@ -110,12 +110,14 @@ namespace uLearn.CSharp
 	    private void EmbedPara(string filename)
 	    {
 	        Blocks.Add(new MdBlock(fs.GetContent(filename)));
+//			Blocks.Add(new IncludeMdBlock(filename));
 	    }
 
 	    private void EmbedGallery(string folderName)
 		{
 			string[] images = fs.GetFilenames(folderName);
-			Blocks.Add(new ImageGaleryBlock { ImageUrls = images });
+			Blocks.Add(new ImageGaleryBlock(images));
+//			Blocks.Add(new IncludeImageGalleryBlock(folderName));
 		}
 
 		///<summary>Is child _inside_ Type or Method parent</summary>
@@ -174,6 +176,7 @@ namespace uLearn.CSharp
 		private void EmbedCode(string filename)
 		{
 			Blocks.Add(new CodeBlock(fs.GetContent(filename), LangId));
+//			Blocks.Add(new IncludeCodeBlock(filename));
 		}
 
 		private void EmbedVideo(string videoId)
