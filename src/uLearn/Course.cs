@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,18 +6,20 @@ namespace uLearn
 {
 	public class Course
 	{
-		public Course(string id, string title, Slide[] slides, InstructorNote[] instructorNotes)
+		public Course(string id, string title, Slide[] slides, InstructorNote[] instructorNotes, CourseSettings settings)
 		{
 			Id = id;
 			Title = title;
 			Slides = slides;
 			InstructorNotes = instructorNotes;
+			Settings = settings;
 		}
 
 		public string Id { get; private set; }
 		public string Title { get; private set; }
 		public Slide[] Slides { get; private set; }
 		public InstructorNote[] InstructorNotes { get; private set; }
+		public CourseSettings Settings { get; private set; }
 
 		public Slide GetSlideById(string slideId)
 		{

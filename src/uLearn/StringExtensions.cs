@@ -47,7 +47,7 @@ namespace uLearn
 		}
 
 
-		public static IEnumerable<string> RemoveCommonNesting(this string[] lines)
+		public static IEnumerable<string> RemoveCommonNesting(this IList<string> lines)
 		{
 			var nonEmptyLines = lines.Where(line => line.Trim().Length > 0).ToList();
 			if (nonEmptyLines.Any())

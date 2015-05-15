@@ -8,7 +8,7 @@ namespace uLearn.CSharp
 	{
 		public string Extension { get { return ".cs"; } }
 
-		public Slide Load(FileInfo file, string unitName, int slideIndex)
+		public Slide Load(FileInfo file, string unitName, int slideIndex, CourseSettings settings)
 		{
 			var sourceCode = file.ContentAsUtf8();
 			var prelude = GetPrelude(file.Directory);

@@ -47,7 +47,7 @@
 		<xs:attribute name="explanation" type="xs:string" use="optional"/>
 	</xs:complexType>
 	
-		<xs:complexType name="ChoiceBlock">
+	<xs:complexType name="ChoiceBlock">
 		<xs:sequence minOccurs="1" maxOccurs="1">
 			<xs:element name="text" minOccurs="1" maxOccurs="1" type="notEmptyString"></xs:element>
 			<xs:element name="item" minOccurs="0" maxOccurs="unbounded">

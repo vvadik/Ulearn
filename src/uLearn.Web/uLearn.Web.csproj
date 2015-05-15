@@ -645,7 +645,6 @@
     <Content Include="codemirror\mode\mirc\mirc.js" />
     <Content Include="codemirror\mode\mllike\index.html" />
     <Content Include="codemirror\mode\mllike\mllike.js" />
-    <Content Include="codemirror\mode\nginx\index.html" />
     <Content Include="codemirror\mode\nginx\nginx.js" />
     <Content Include="codemirror\mode\ntriples\index.html" />
     <Content Include="codemirror\mode\ntriples\ntriples.js" />

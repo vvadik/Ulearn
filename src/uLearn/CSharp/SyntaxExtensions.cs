@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,6 +23,11 @@ namespace uLearn.CSharp
 		public static IEnumerable<SyntaxNode> GetParents(this SyntaxTrivia trivia)
 		{
 			return trivia.Token.GetParents();
+		}
+
+		public static SyntaxToken Identifier(this MemberDeclarationSyntax syntax)
+		{
+			return ((dynamic)syntax).Identifier;
 		}
 
 		public static bool HasAttribute<TAttr>(this MemberDeclarationSyntax node) where TAttr : Attribute
