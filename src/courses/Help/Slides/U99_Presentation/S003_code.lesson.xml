@@ -45,7 +45,10 @@
 		<label>CommentRegion</label>
 	</include-code>
 
+	<md>###Питон весь файл</md>
 	<include-code file="HelloWorld.py" lang_ver="3" />
+
+	<md>###Питон регион main</md>
 	<include-code file="HelloWorld.py" lang_ver="3">
 		<label>main</label>
 	</include-code>

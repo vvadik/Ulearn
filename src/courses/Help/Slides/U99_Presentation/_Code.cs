@@ -1,4 +1,5 @@
-﻿using uLearn;
+﻿using System;
+using uLearn;
 
 namespace Presentation.Slides.U99_Presentation
 {
@@ -19,6 +20,7 @@ namespace Presentation.Slides.U99_Presentation
 		// info
 		public void A()
 		{
+			Console.WriteLine("another A");
 		}
 
 		//endregion CommentRegion
