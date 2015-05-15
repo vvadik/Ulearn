@@ -222,6 +222,7 @@
     <Content Include="Slides\L100 - Разное о нейронных сетях\Title.txt" />
     <Content Include="Slides\L110 - Генетические алгоритмы\S999 - Quiz.quiz.xml" />
     <Content Include="Slides\L110 - Генетические алгоритмы\Title.txt" />
+    <Content Include="Slides\L120 - Применение генетических алгоритмов\S999 - Quiz.quiz.xml" />
     <Content Include="Slides\L120 - Применение генетических алгоритмов\Title.txt" />
     <Content Include="Slides\Title.txt" />
   </ItemGroup>
