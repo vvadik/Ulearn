@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Xml.Serialization;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using uLearn.CSharp;
 
 namespace uLearn
@@ -177,104 +173,8 @@ namespace uLearn
 				yield break;
 			}
 
-			var members = 
-				lang == "cs" ? 
-					ParseCsFile(content) : 
-					new Dictionary<string, List<MemberDeclarationSyntax>>();
-
-			var regions = ParseCodeFile(content);
-
-			var blocks = new List<string>();
-			foreach (var label in Labels)
-			{
-				if (regions.ContainsKey(label.Name))
-					blocks.Add(regions[label.Name]);
-				else if (members.ContainsKey(label.Name))
-					blocks.Add(GetLabelData(label, members[label.Name]));
-			}
-			var elements = blocks.Select(FixEolns);
-			yield return new CodeBlock(String.Join("\r\n\r\n", elements), lang, LangVer);
-		}
-
-		private Dictionary<string, string> ParseCodeFile(string content)
-		{
-			var res = new Dictionary<string, string>();
-			var opened = new Dictionary<string, List<string>>();
-			var lines = content.SplitToLines();
-			foreach (var line in lines)
-			{
-				if (line.Contains("endregion"))
-				{
-					var name = GetRegionName(line);
-					if (opened.ContainsKey(name))
-					{
-						res[name] = String.Join("\r\n", opened[name].RemoveCommonNesting());
-						opened.Remove(name);
-					}
-				}
-
-				foreach (var value in opened.Values)
-					value.Add(line);
-
-				if (line.Contains("region"))
-				{
-					var name = GetRegionName(line);
-					opened[name] = new List<string>();
-				}
-			}
-
-			return res;
-		}
-
-		private static string GetRegionName(string line)
-		{
-			return line.Split().Last();
-		}
-
-		private static Dictionary<string, List<MemberDeclarationSyntax>> ParseCsFile(string content)
-		{
-			var tree = CSharpSyntaxTree.ParseText(content);
-			return tree.GetRoot().DescendantNodes()
-				.OfType<MemberDeclarationSyntax>()
-				.Where(node => node is BaseTypeDeclarationSyntax || node is MethodDeclarationSyntax)
-				.Where(node => !node.HasAttribute<HideOnSlideAttribute>())
-				.Select(HideOnSlide)
-				.GroupBy(node => node.Identifier().ValueText)
-				.ToDictionary(
-					nodes => nodes.Key,
-					nodes => nodes.ToList()
-				);
-		}
-
-		private static string FixEolns(string arg)
-		{
-			return Regex.Replace(arg.Trim(), "(\t*\r*\n){3,}", "\r\n\r\n");
-		}
-
-		private static MemberDeclarationSyntax HideOnSlide(MemberDeclarationSyntax node)
-		{
-			var hide = node.DescendantNodes()
-				.OfType<MemberDeclarationSyntax>()
-				.Where(syntax => syntax.HasAttribute<HideOnSlideAttribute>());
-			return node.RemoveNodes(hide, SyntaxRemoveOptions.KeepLeadingTrivia);
-		}
-
-		private static string GetLabelData(Label label, IEnumerable<SyntaxNode> nodes)
-		{
-			if (label.OnlyBody)
-				return string.Join("\r\n\r\n", nodes.Select(GetBody));
-			return String.Join("\r\n\r\n", nodes.Select(node => node.ToPrettyString()));
-		}
-
-		private static string GetBody(SyntaxNode node)
-		{
-			var method = node as BaseMethodDeclarationSyntax;
-			if (method != null)
-				return method.Body.Statements.ToFullString().RemoveCommonNesting();
-			var type = node as TypeDeclarationSyntax;
-			if (type != null)
-				return type.Members.ToFullString().RemoveCommonNesting();
-			return "";
+			var extractor = new RegionsExtractor(content, lang);
+			yield return new CodeBlock(String.Join("\r\n\r\n", extractor.GetRegions(Labels)), lang, LangVer);
 		}
 
 		public class Label
