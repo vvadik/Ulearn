@@ -16,7 +16,7 @@ namespace uLearn.Lessions
 		{
 			var lesson = file.DeserializeXml<Lesson>();
 			var fs = new FileSystem(file.Directory);
-			var blocks = lesson.Blocks.SelectMany(b => b.BuildUp(fs, ImmutableHashSet<string>.Empty, settings));
+			var blocks = lesson.Blocks.SelectMany(b => b.BuildUp(fs, ImmutableHashSet<string>.Empty, settings, lesson));
 			return new Slide(blocks, new SlideInfo(unitName, file, slideIndex), lesson.Title, lesson.Id);
 		}
 	}
