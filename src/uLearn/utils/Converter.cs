@@ -17,7 +17,7 @@ namespace uLearn.utils
 			var serializer = new XmlSerializer(typeof(Lesson));
 			foreach (var courseDirectory in courseDirectories)
 			{
-				var course = CourseManager.LoadCourse(courseDirectory);
+				var course = new CourseLoader().LoadCourse(courseDirectory);
 				foreach (var slide in course.Slides)
 				{
 					if (slide.ShouldBeSolved) continue;

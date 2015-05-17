@@ -1,0 +1,66 @@
+﻿@* Generator: MvcHelper GeneratePrettyNames: true *@
+@using uLearn
+
+@helper Slide(Slide slide, int currentScore, int maxScore)
+{
+	<div class='slide'>
+		<h1>
+			@slide.Title
+			<span class="score">@Score(currentScore, maxScore)</span>
+		</h1>
+
+		@foreach (var block in slide.Blocks)
+		{
+			@Block((dynamic)block, slide)
+		}
+	</div>
+}
+
+@helper Score(int currentScore, int maxScore)
+{
+	@(maxScore == 0 ? "" : string.Format("{0}/{1}", currentScore, maxScore))
+}
+
+@helper Block(MdBlock block, Slide slide)
+{
+	@MvcHtmlString.Create(block.Markdown.RenderMd(slide.Info.SlideFile))
+}
+
+@helper Block(CodeBlock block, Slide slide)
+{
+	<textarea class='code code-sample' data-lang="@block.Lang" data-ver="@block.Version">@block.Code</textarea>
+}
+
+@helper Block(TexBlock block, Slide slide)
+{
+	foreach (var texLine in block.TexLines)
+	{
+		<div class="tex">\displaystyle @texLine.Trim()</div>
+	}
+}
+
+@helper Block(YoutubeBlock block, Slide slide)
+{
+	<div class="video-container">
+		<iframe class='embedded-video' width='864' height='480' src='//www.youtube.com/embed/@block.VideoId' allowfullscreen></iframe>
+	</div>
+	<div>
+		<a href="javascript://" class="popover-trigger"
+		   title="Как ускорить видео?"
+		   data-content="Если по иконке с шестеренкой нет возможности ускорить видео, то вам нужно &lt;a target='blank' href='http://youtube.com/html5'>вручную включить&lt;/a> использование HTML5-плеера.">Как ускорить видео?</a>
+	</div>
+}
+
+@helper Block(ImageGaleryBlock block, Slide slide)
+{
+	<div class="flexslider">
+		<ul class="slides">
+			@foreach (var imageUrl in block.ImageUrls)
+			{
+				<li>
+					<img src="@string.Format("{0}/{1}", slide.Info.DirectoryRelativePath, imageUrl)" alt="@imageUrl" />
+				</li>
+			}
+		</ul>
+	</div>
+}

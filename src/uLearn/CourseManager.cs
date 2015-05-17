@@ -4,9 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Ionic.Zip;
-using uLearn.CSharp;
-using uLearn.Lessions;
-using uLearn.Quizes;
 
 namespace uLearn
 {
@@ -14,8 +11,7 @@ namespace uLearn
 	{
 		private readonly DirectoryInfo coursesDirectory;
 		private readonly Dictionary<string, Course> courses = new Dictionary<string, Course>(StringComparer.InvariantCultureIgnoreCase);
-
-		private static readonly IList<ISlideLoader> SlideLoaders = new ISlideLoader[] { new LessonSlideLoader(), new CSharpSlideLoader(), new QuizSlideLoader() };
+		private readonly CourseLoader loader = new CourseLoader();
 
 		public CourseManager(DirectoryInfo baseDirectory)
 			: this(
@@ -103,107 +99,9 @@ namespace uLearn
 
 		public void ReloadCourse(DirectoryInfo dir)
 		{
-			var course = LoadCourse(dir);
+			var course = loader.LoadCourse(dir);
 			courses[course.Id] = course;
 		}
 		
-		public static Course LoadCourse(DirectoryInfo dir)
-		{
-			var settings = CourseSettings.Load(dir);
-			var slides = LoadSlides(dir, settings).ToArray();
-			CheckDuplicateSlideIds(slides);
-
-			var courseId = dir.Name;
-			var notes = LoadInstructorNotes(dir, courseId);
-			var title = settings.Title ?? GetTitle(dir);
-			return new Course(courseId, title, slides, notes, settings);
-		}
-
-		private static InstructorNote[] LoadInstructorNotes(DirectoryInfo dir, string courseId)
-		{
-			return dir.GetDirectories()
-				.Select(unitDir => new
-				{
-					unitDir,
-					notes=unitDir.GetFile("InstructorNotes.md")
-				})
-				.Where(unit => unit.notes.Exists)
-				.Select(unit => new InstructorNote(unit.notes.ContentAsUtf8(), courseId, GetTitle(unit.unitDir), unit.notes))
-				.ToArray();
-		}
-
-		private static IEnumerable<Slide> LoadSlides(DirectoryInfo dir, CourseSettings settings)
-		{
-			var unitDirs = dir
-				.GetDirectories()
-				.OrderBy(d => d.Name);
-			return unitDirs
-				.SelectMany(info => LoadUnit(info, settings))
-				.Select((makeSlide, index) => makeSlide(index));
-		}
-
-		private static IEnumerable<Func<int, Slide>> LoadUnit(DirectoryInfo unitDir, CourseSettings settings)
-		{
-			var unitTitle = GetTitle(unitDir);
-			return unitDir.GetFiles()
-				.Where(f => IsSlideFile(f.Name))
-				.OrderBy(f => f.Name)
-				.Select<FileInfo, Func<int, Slide>>(f => i => LoadSlide(f, unitTitle, i, settings));
-		}
-
-		private static bool IsSlideFile(string name)
-		{
-			//S001_slide.ext
-			var id = name.Split(new []{'_', '-', ' '}, 2)[0];
-			return id.StartsWith("S", StringComparison.InvariantCultureIgnoreCase)
-					&& id.Skip(1).All(char.IsDigit);
-		}
-
-		private static Slide LoadSlide(FileInfo file, string unitTitle, int slideIndex, CourseSettings settings)
-		{
-			try
-			{
-				var slideLoader = SlideLoaders
-					.FirstOrDefault(loader => file.FullName.EndsWith(loader.Extension, StringComparison.InvariantCultureIgnoreCase));
-				if (slideLoader == null)
-					throw new Exception("Unknown slide format " + file);
-				return slideLoader.Load(file, unitTitle, slideIndex, settings);
-			}
-			catch (Exception e)
-			{
-				throw new Exception("Error loading slide " + file.FullName, e);
-			}
-		}
-
-
-		private static string GetTitle(DirectoryInfo dir)
-		{
-			return dir.GetFile("Title.txt").ContentAsUtf8();
-		}
-
-		private static void CheckDuplicateSlideIds(IEnumerable<Slide> slides)
-		{
-			var badSlides =
-				slides.GroupBy(x => x.Id)
-					.Where(x => x.Count() != 1)
-					.Select(x => x.Select(y => y.Title))
-					.ToList();
-			if (badSlides.Any())
-				throw new Exception(
-					"Duplicate SlideId:\n" +
-					string.Join("\n", badSlides.Select(x => string.Join("\n", x))));
-		}
-	}
-
-	public class StagingPackage
-	{
-		public StagingPackage(string name, DateTime timestamp)
-		{
-			Name = name;
-			Timestamp = timestamp;
-		}
-
-		public string Name;
-		public DateTime Timestamp;
 	}
 }
