@@ -250,6 +250,7 @@
     <Compile Include="Migrations\201504070552041_AddIsPassed.Designer.cs">
       <DependentUpon>201504070552041_AddIsPassed.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\TocModelBuilder.cs" />
     <Compile Include="SubmitAllSlide_Test.cs" />
     <Compile Include="ExecutionServiceMigration_Test.cs" />
     <Compile Include="ExecutionService\CsSandboxExecutionService.cs" />
@@ -366,6 +367,16 @@
       <DependentUpon>201408201208379_AddIsRightQuizBlock.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\CourseManager_should.cs" />
+    <Compile Include="Views\Course\SlideHtml.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SlideHtml.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SlideNavigation\TableOfContents.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TableOfContents.cshtml</DependentUpon>
+    </Compile>
     <Compile Include="WebCourseManager.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -1002,7 +1013,10 @@
     <Content Include="Views\Analytics\UsersStatistics.cshtml" />
     <Content Include="Views\Analytics\PersonalStatistics.cshtml" />
     <Content Include="Views\Course\_SolutionControl.cshtml" />
-    <Content Include="Views\SlideNavigation\TableOfContents.cshtml" />
+    <Content Include="Views\SlideNavigation\TableOfContents.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>TableOfContents.generated.cs</LastGenOutput>
+    </Content>
     <Content Include="Views\Shared\DisplayTemplates\CodeBlock.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\MdBlock.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\YoutubeBlock.cshtml" />
@@ -1037,6 +1051,10 @@
     <Content Include="Views\Account\Info.cshtml" />
     <Content Include="Views\Account\CourseInfo.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\ImageGaleryBlock.cshtml" />
+    <Content Include="Views\Course\SlideHtml.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>SlideHtml.generated.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
