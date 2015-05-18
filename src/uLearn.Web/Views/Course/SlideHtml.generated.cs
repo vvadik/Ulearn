@@ -37,7 +37,7 @@ namespace uLearn.Web.Views.Course
     public static class SlideHtml
     {
 
-public static System.Web.WebPages.HelperResult Slide(Slide slide, int currentScore, int maxScore)
+public static System.Web.WebPages.HelperResult Slide(Slide slide, int currentScore = 0)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
@@ -64,7 +64,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t<span class=\"scor
 
 
 #line 9 "..\..\Views\Course\SlideHtml.cshtml"
-WebViewPage.WriteTo(@__razor_helper_writer, Score(currentScore, maxScore));
+WebViewPage.WriteTo(@__razor_helper_writer, Score(currentScore, slide.MaxScore));
 
 #line default
 #line hidden

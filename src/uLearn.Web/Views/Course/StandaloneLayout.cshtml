@@ -1,0 +1,30 @@
+﻿@* Generator: MvcHelper GeneratePrettyNames: true *@
+@using uLearn
+@using uLearn.Web.Models
+@using uLearn.Web.Views.Course
+@using uLearn.Web.Views.SlideNavigation
+@helper Page(IEnumerable<string> cssFiles, IEnumerable<string> jsFiles, TocModel toc, Slide slide)
+{
+	<html>
+	<head>
+		<title>Course Preview</title>
+		<meta charset='UTF-8'>
+		@foreach (var cssFile in cssFiles)
+		{
+			<link href='html/@cssFile' rel='stylesheet' />
+		}
+	</head>
+	<body>
+		<div class='side-bar navbar-collapse collapse navbar-nav container'>
+			@TableOfContents.Toc(toc)
+		</div>
+
+		@SlideHtml.Slide(slide)
+
+		@foreach (var jsFile in jsFiles)
+		{
+			<script src='html/@jsFile'></script>
+		}
+	</body>
+</html>
+}

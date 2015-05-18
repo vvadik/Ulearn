@@ -1,12 +1,12 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true *@
 @using uLearn
 
-@helper Slide(Slide slide, int currentScore, int maxScore)
+@helper Slide(Slide slide, int currentScore = 0)
 {
 	<div class='slide'>
 		<h1>
 			@slide.Title
-			<span class="score">@Score(currentScore, maxScore)</span>
+			<span class="score">@Score(currentScore, slide.MaxScore)</span>
 		</h1>
 
 		@foreach (var block in slide.Blocks)

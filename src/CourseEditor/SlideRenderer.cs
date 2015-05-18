@@ -4,7 +4,6 @@ using System.Linq;
 using uLearn;
 using uLearn.Web.Models;
 using uLearn.Web.Views.Course;
-using uLearn.Web.Views.SlideNavigation;
 
 namespace CourseEditor
 {
@@ -25,33 +24,8 @@ namespace CourseEditor
 
 		public string RenderSlide(Course course, Slide slide)
 		{
-			const string template = @"<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset='UTF-8'>
-<!-- CSS -->
-	</head>
-	<body>
-		<div class='side-bar navbar-collapse collapse navbar-nav container'>
-<!-- TOC -->
-		</div>
-<!-- SLIDE -->
-<!-- SCRIPTS -->
-	</body>
-</html>
-";
-			const string link = @"<link href='html/{0}' rel='stylesheet'/>";
-			const string script = @"<script src='html/{0}'></script>";
-
-			var styles = string.Join("\n", GetCssFiles().Select(file => string.Format(link, file)));
-			var tocHtml = TableOfContents.Toc(CreateToc(course, slide)).ToHtmlString();
-			var scripts = string.Join("\n", GetJsFiles().Select(file => string.Format(script, file)));
-			var slideHtml = SlideHtml.Slide(slide, 0, 0).ToHtmlString();
-			return template
-				.Replace("<!-- CSS -->", styles)
-				.Replace("<!-- TOC -->", tocHtml)
-				.Replace("<!-- SLIDE -->", slideHtml)
-				.Replace("<!-- SCRIPTS -->", scripts);
+			var page = StandaloneLayout.Page(GetCssFiles(), GetJsFiles(), CreateToc(course, slide), slide);
+			return "<!DOCTYPE html>\n" + page.ToHtmlString();
 		}
 
 		private TocModel CreateToc(Course course, Slide slide)
