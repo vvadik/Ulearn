@@ -10,6 +10,9 @@ namespace uLearn.Lessions
 
 		[XmlElement("id")]
 		public string Id;
+		
+		[XmlElement("default-include-file")]
+		public string DefaultIncludeFile;
 
 		[XmlElement(typeof(YoutubeBlock))]
 		[XmlElement(typeof(MdBlock))]

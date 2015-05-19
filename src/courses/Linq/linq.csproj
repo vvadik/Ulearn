@@ -40,17 +40,29 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Slides\LINQ\Intro.cs">
+      <DependentUpon>S010_Intro.lesson.xml</DependentUpon>
+    </Compile>
+    <Content Include="Slides\LINQ\S010_Intro.lesson.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Slides\LINQ\S011_SelectWhereToArray.lesson.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
     <Compile Include="Slides\LINQ\S012_AdditionalMethods.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Slides\LINQ\S013_MethodChaining.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\S011_SelectWhereToArray.cs">
+    <Content Include="Slides\LINQ\S070_Sort.lesson.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="Slides\LINQ\S010_Intro.cs">
+    </Content>
+    <Compile Include="Slides\LINQ\SelectWhereToArray.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <DependentUpon>S011_SelectWhereToArray.lesson.xml</DependentUpon>
     </Compile>
     <Compile Include="Slides\LINQ\S020_ReadNumbersExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -67,8 +79,9 @@
     <Compile Include="Slides\LINQ\S060_CartesianProduct.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Slides\LINQ\S070_Sort.cs">
+    <Compile Include="Slides\LINQ\Sort.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <DependentUpon>S070_Sort.lesson.xml</DependentUpon>
     </Compile>
     <Compile Include="Slides\LINQ\S080_SortExercise.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -120,7 +133,7 @@
   <ItemGroup>
     <Content Include="Readme.txt" />
     <None Include="Slides\LINQ\Prelude.cs" />
-    <Content Include="Slides\Title.txt" />
+    <Content Include="Slides\Course.xml" />
     <Content Include="Slides\LINQ\Title.txt" />
   </ItemGroup>
   <ItemGroup>

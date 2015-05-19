@@ -6,7 +6,8 @@ function getMode(lang) {
 	// see http://codemirror.net/mode/
 
 	var langIds = {
-		"cs": "x-csharp"
+		"cs": "x-csharp",
+		"py": "x-python"
 	};
 
 	lang = lang || "cs";

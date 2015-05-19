@@ -5,7 +5,7 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 {
 	[Slide("OrderBy и Distinct", "{CA6CAD1F-8352-4041-9233-DFF70ED3AB05}")]
 	[TestFixture]
-	public class S070_Sort
+	public class Sort
 	{
 		/*
 
@@ -25,11 +25,11 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		[Test]
 		public void Test1()
 		{
-			var names = new[] {"Pavel", "Alexander", "Anna"};
+			var names = new[] { "Pavel", "Alexander", "Anna" };
 
 			IOrderedEnumerable<string> sorted = names.OrderBy(n => n.Length);
 
-			Assert.That(sorted, Is.EqualTo(new[] {"Anna", "Pavel", "Alexander"}));
+			Assert.That(sorted, Is.EqualTo(new[] { "Anna", "Pavel", "Alexander" }));
 		}
 
 		/*
@@ -43,11 +43,11 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		[Test]
 		public void Test2()
 		{
-			var names = new[] {"Pavel", "Alexander", "Irina"};
+			var names = new[] { "Pavel", "Alexander", "Irina" };
 			var sorted = names
 				.OrderByDescending(name => name.Length)
 				.ThenBy(n => n);
-			Assert.That(sorted, Is.EqualTo(new[] {"Alexander", "Irina", "Pavel"}).AsCollection);
+			Assert.That(sorted, Is.EqualTo(new[] { "Alexander", "Irina", "Pavel" }).AsCollection);
 		}
 
 		/*
@@ -58,7 +58,7 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		[Test]
 		public void TestDistinct()
 		{
-			var numbers = new[] {1, 2, 3, 3, 1, 1,};
+			var numbers = new[] { 1, 2, 3, 3, 1, 1, };
 			var uniqueNumbers = numbers.Distinct();
 			Assert.That(uniqueNumbers.Count(), Is.EqualTo(3));
 		}

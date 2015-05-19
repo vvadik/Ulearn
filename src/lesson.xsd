@@ -16,6 +16,7 @@
 		<xs:sequence>
 			<xs:element name="title" type="notEmptyString" minOccurs="1" maxOccurs="1" />
 			<xs:element name="id" type="notEmptyString" minOccurs="1" maxOccurs="1" />
+			<xs:element name="default-include-file" type="notEmptyString" minOccurs="0" maxOccurs="1" />
 			<xs:group ref="blocks" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
@@ -53,12 +54,16 @@
 	</xs:complexType>
 
 	<xs:complexType name="Code">
-		<xs:attribute name="lang" type="notEmptyString" use="required" />
-		<xs:attribute name="ver" type="notEmptyString" use="optional" />
+		<xs:simpleContent>
+			<xs:extension base="notEmptyString">
+				<xs:attribute name="lang" type="notEmptyString" use="required" />
+				<xs:attribute name="ver" type="notEmptyString" use="optional" />
+			</xs:extension>
+		</xs:simpleContent>
 	</xs:complexType>
 
 	<xs:complexType name="Include">
-		<xs:attribute name="file" type="notEmptyString" use="required" />
+		<xs:attribute name="file" type="notEmptyString" use="optional" />
 	</xs:complexType>
 
 	<xs:complexType name="IncludeCode">

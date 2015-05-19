@@ -64,14 +64,20 @@ namespace uLearn.Quizes
 
 	public class CodeBlock : QuizBlock
 	{
-		[XmlText]
-		public string Text;
+		private string text;
 		[XmlAttribute("lang")]
 		public string Lang;
 
+		[XmlText]
+		public string Text
+		{
+			get { return text; }
+			set { text = value.RemoveCommonNesting(); }
+		}
+
 		public override void Validate()
 		{
-			if (string.IsNullOrEmpty(Text))
+			if (string.IsNullOrEmpty(text))
 				throw new FormatException("Quiz TextBlock can't be empty");
 		}
 	}

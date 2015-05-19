@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Lesson
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="https://ulearn.azurewebsites.net/lesson">
+	<title>OrderBy и Distinct</title>
+	<id>{CA6CAD1F-8352-4041-9233-DFF70ED3AB05}</id>
+	<default-include-file>Sort.cs</default-include-file>
+	<md>
+		Для сортировки последовательности в `LINQ` имеется четыре метода:
+	</md>
+
+	<code lang="cs">
+		<![CDATA[
+		IOrderedEnumerable<T> OrderBy<T>(this IEnumerable<T> items, Func<T, K> keySelector)
+		IOrderedEnumerable<T> OrderByDescending<T>(this IEnumerable<T> items, Func<T, K> keySelector)
+		IOrderedEnumerable<T> ThenBy<T>(this IOrderedEnumerable<T> items, Func<T, K> keySelector)
+		IOrderedEnumerable<T> ThenByDescending<T>(this IOrderedEnumerable<T> items, Func<T, K> keySelector)
+	]]>
+	</code>
+	
+	<md>
+		Первые два дают на выходе последовательность, упорядоченную по возрастанию/убыванию ключей.
+		А `keySelector` — это как раз функция, которая каждому элементу последовательности ставит
+		в соответствие некоторый ключ, по которому его будут сравнивать при сортировке.
+	</md>
+
+	<include-code>
+		<label only-body="true">Test1</label>
+	</include-code>
+
+	<md>
+		<![CDATA[
+		Если при равенстве ключей вы хотите отсортировать элементы по другому критерию, 
+		на помощь приходит метод ThenBy.
+
+		Например, в следующем примере все имена сортируются по убыванию длин, а при равных длинах — лексикографически.
+		]]>
+	</md>
+
+	<include-code>
+		<label only-body="true">Test2</label>
+	</include-code>
+
+	<md>
+		<![CDATA[
+		Чтобы убрать из последовательности все повторяющиеся элементы, можно воспользоваться функцией `Distinct`.
+		]]>
+	</md>
+
+	<include-code>
+		<label only-body="true">TestDistinct</label>
+	</include-code>
+
+</Lesson>
