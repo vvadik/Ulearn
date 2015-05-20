@@ -199,10 +199,6 @@ namespace uLearn
 
 			[XmlAttribute("only-body")]
 			public bool OnlyBody { get; set; }
-
-			private Label()
-			{
-			}
 		}
 	}
 

@@ -28,6 +28,11 @@ namespace uLearn
 			return Regex.Split(text, @"\r?\n");
 		}
 
+		public static string[] SplitToLinesWithEoln(this string text)
+		{
+			return Regex.Split(text, @"(?<=\r?\n)");
+		}
+
 		public static string RemoveCommonNesting(this string text)
 		{
 			var lines = text.SplitToLines();
