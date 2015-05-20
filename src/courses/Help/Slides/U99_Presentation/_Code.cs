@@ -5,11 +5,11 @@ namespace Presentation.Slides.U99_Presentation
 {
 	public class Code
 	{
-#region CSharpStyleRegion
+		#region CSharpStyleRegion
 		public int C;
 
 		private int E { get; set; }
-#endregion CSharpStyleRegion
+		#endregion CSharpStyleRegion
 
 		//region CommentRegion
 
