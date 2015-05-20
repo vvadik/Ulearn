@@ -107,6 +107,7 @@
     <Compile Include="Quizes\QuizBlock.cs" />
     <Compile Include="Quizes\Quiz_Test.cs" />
     <Compile Include="Quizes\QuizSlideLoader.cs" />
+    <Compile Include="RegionRemover.cs" />
     <Compile Include="RegionsExtractor.cs" />
     <Compile Include="SlideInfo.cs" />
     <Compile Include="Markdown_investigation.cs" />
