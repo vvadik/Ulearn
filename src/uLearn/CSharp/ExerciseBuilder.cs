@@ -11,26 +11,27 @@ namespace uLearn.CSharp
 		private readonly string prelude;
 		public string ExerciseClassName { get; set; }
 
-		public ExerciseSlide Slide { get; private set; }
+		public ExerciseBlock Exercise { get; private set; }
 
-		public ExerciseBuilder(string prelude, SlideBuilder blocksBuilder, SlideInfo slideInfo)
+		public ExerciseBuilder(string langId, string prelude)
 			: base(false)
 		{
 			this.prelude = prelude;
-			Slide = new ExerciseSlide(SlideBuilder.LangId, blocksBuilder.Blocks, slideInfo, blocksBuilder.Title, blocksBuilder.Id);
-			Slide.ValidatorName = "cs";
+			Exercise = new ExerciseBlock();
+			Exercise.ValidatorName = "cs";
+			Exercise.Lang = langId;
 		}
 
-		public ExerciseSlide BuildFrom(SyntaxTree tree)
+		public ExerciseBlock BuildBlockFrom(SyntaxTree tree)
 		{
 			ExerciseClassName = null;
-			Slide.ExerciseInitialCode = GetUncomment(tree.GetRoot()) ?? ""; //for uncomment-comment without exercise method
+			Exercise.ExerciseInitialCode = GetUncomment(tree.GetRoot()) ?? ""; //for uncomment-comment without exercise method
 			SyntaxNode result = Visit(tree.GetRoot());
 			var exerciseInsertIndex = GetExerciseInsertIndex(result);
 			const string pragma = "\n#line 1\n";
-			Slide.ExerciseCode = prelude + result.ToFullString().Insert(exerciseInsertIndex, pragma);
-			Slide.IndexToInsertSolution = prelude.Length + exerciseInsertIndex + pragma.Length;
-			return Slide;
+			Exercise.ExerciseCode = prelude + result.ToFullString().Insert(exerciseInsertIndex, pragma);
+			Exercise.IndexToInsertSolution = prelude.Length + exerciseInsertIndex + pragma.Length;
+			return Exercise;
 		}
 
 		const string uncommentPrefix = "/*uncomment";
@@ -84,7 +85,7 @@ namespace uLearn.CSharp
 			var isSolutionPart = node.HasAttribute<ExcludeFromSolutionAttribute>() || node.HasAttribute<ExerciseAttribute>();
 			if (node.HasAttribute<ExcludeFromSolutionAttribute>() 
 				|| (node is TypeDeclarationSyntax && node.HasAttribute<ExerciseAttribute>()))
-				Slide.EthalonSolution += newMember.ToFullString();
+				Exercise.EthalonSolution += newMember.ToFullString();
 			return isSolutionPart ? null : newMember;
 		}
 
@@ -127,21 +128,21 @@ namespace uLearn.CSharp
 			if (node.HasAttribute<ExpectedOutputAttribute>())
 			{
 				ExerciseClassName = ExerciseClassName ?? FindParentClassName(node);
-				Slide.ExpectedOutput = node.GetAttributes<ExpectedOutputAttribute>().Select(attr => attr.GetArgument(0)).FirstOrDefault();
+				Exercise.ExpectedOutput = node.GetAttributes<ExpectedOutputAttribute>().Select(attr => attr.GetArgument(0)).FirstOrDefault();
 			}
 			if (node.HasAttribute<HideExpectedOutputOnErrorAttribute>())
-				Slide.HideExpectedOutputOnError = true;
+				Exercise.HideExpectedOutputOnError = true;
 			if (node.HasAttribute<HintAttribute>())
-				Slide.HintsMd.AddRange(node.GetAttributes<HintAttribute>().Select(attr => attr.GetArgument(0)));
+				Exercise.HintsMd.AddRange(node.GetAttributes<HintAttribute>().Select(attr => attr.GetArgument(0)));
 			if (node.HasAttribute<CommentAfterExerciseIsSolved>())
-				Slide.CommentAfterExerciseIsSolved = node.GetAttributes<CommentAfterExerciseIsSolved>().Single().GetArgument(0);
+				Exercise.CommentAfterExerciseIsSolved = node.GetAttributes<CommentAfterExerciseIsSolved>().Single().GetArgument(0);
 			if (node.HasAttribute<ExerciseAttribute>())
 			{
 				ExerciseClassName = ExerciseClassName ?? FindParentClassName(node);
-				Slide.EthalonSolution += node.WithoutAttributes();
-				Slide.ExerciseInitialCode = GetExerciseCode(node);
+				Exercise.EthalonSolution += node.WithoutAttributes();
+				Exercise.ExerciseInitialCode = GetExerciseCode(node);
 				if (node.HasAttribute<SingleStatementMethodAttribute>())
-					Slide.ValidatorName += " SingleStatementMethod";
+					Exercise.ValidatorName += " SingleStatementMethod";
 			}
 			return newMethod;
 		}

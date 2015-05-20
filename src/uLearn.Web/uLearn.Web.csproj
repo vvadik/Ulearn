@@ -251,6 +251,8 @@
     <Compile Include="Migrations\201504070552041_AddIsPassed.Designer.cs">
       <DependentUpon>201504070552041_AddIsPassed.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\BlockRenderContext.cs" />
+    <Compile Include="Models\ExerciseBlockData.cs" />
     <Compile Include="Models\TocModelBuilder.cs" />
     <Compile Include="SubmitAllSlide_Test.cs" />
     <Compile Include="ExecutionServiceMigration_Test.cs" />
@@ -424,7 +426,6 @@
     <Compile Include="Models\Like.cs" />
     <Compile Include="Models\LmsRoles.cs" />
     <Compile Include="Models\RunSolutionResult.cs" />
-    <Compile Include="Models\SlideViewModel.cs" />
     <Compile Include="Models\UserQuiz.cs" />
     <Compile Include="Models\UserSolution.cs" />
     <Compile Include="Models\UsersStatsPageModel.cs" />

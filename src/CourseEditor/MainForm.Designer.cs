@@ -53,7 +53,11 @@
 			// fileSystemWatcher
 			// 
 			this.fileSystemWatcher.EnableRaisingEvents = true;
+			this.fileSystemWatcher.IncludeSubdirectories = true;
 			this.fileSystemWatcher.SynchronizingObject = this;
+			this.fileSystemWatcher.Changed += new System.IO.FileSystemEventHandler(this.fileSystemWatcher_Changed);
+			this.fileSystemWatcher.Created += new System.IO.FileSystemEventHandler(this.fileSystemWatcher_Changed);
+			this.fileSystemWatcher.Deleted += new System.IO.FileSystemEventHandler(this.fileSystemWatcher_Changed);
 			// 
 			// menuStrip
 			// 

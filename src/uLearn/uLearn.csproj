@@ -94,6 +94,7 @@
     <Compile Include="CSharp\RedundantIfStyleValidator.cs" />
     <Compile Include="CSharp\RedundantIfStyleValidator_should.cs" />
     <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="ExerciseBlock.cs" />
     <Compile Include="ISolutionValidator.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />

@@ -59,7 +59,7 @@ namespace uLearn.Web.Controllers
 				var quizSlide = (slide as QuizSlide);
 				var isExercise = exerciseSlide != null;
 				var isQuiz = quizSlide != null;
-				var hintsCountOnSlide = isExercise ? exerciseSlide.HintsMd.Count() : 0;
+				var hintsCountOnSlide = isExercise ? exerciseSlide.Exercise.HintsMd.Count() : 0;
 				var visitersCount = visitersRepo.GetVisitersCount(slide.Id, course.Id);
 				tableInfo.Add(slide.Index + ". " + slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
 				{
@@ -205,8 +205,8 @@ namespace uLearn.Web.Controllers
 							IsSolved = visitersRepo.IsPassed(slide.Id, userId),
 							IsVisited = visitersRepo.IsUserVisit(course.Id, slide.Id, userId),
 							UserRate = slideRateRepo.GetUserRate(course.Id, slide.Id, userId),
-							HintsCountOnSlide = slide is ExerciseSlide ? (slide as ExerciseSlide).HintsMd.Count() : 0,
-							HintUsedPercent = slide is ExerciseSlide ? slideHintRepo.GetHintUsedPercentForUser(course.Id, slide.Id, userId, (slide as ExerciseSlide).HintsMd.Count()) : 0
+							HintsCountOnSlide = slide is ExerciseSlide ? (slide as ExerciseSlide).Exercise.HintsMd.Count() : 0,
+							HintUsedPercent = slide is ExerciseSlide ? slideHintRepo.GetHintUsedPercentForUser(course.Id, slide.Id, userId, (slide as ExerciseSlide).Exercise.HintsMd.Count()) : 0
 						})
 						.ToArray()
 			};

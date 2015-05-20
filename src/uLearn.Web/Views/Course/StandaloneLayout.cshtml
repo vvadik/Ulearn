@@ -1,17 +1,18 @@
-﻿@* Generator: MvcHelper GeneratePrettyNames: true *@
+﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
 @using uLearn
 @using uLearn.Web.Models
 @using uLearn.Web.Views.Course
 @using uLearn.Web.Views.SlideNavigation
-@helper Page(IEnumerable<string> cssFiles, IEnumerable<string> jsFiles, TocModel toc, Slide slide)
+
+@helper Page(Course course, Slide slide, TocModel toc, IEnumerable<string> cssFiles, IEnumerable<string> jsFiles)
 {
 	<html>
 	<head>
-		<title>Course Preview</title>
+		<title>Preview: @course.Title — @slide.Title</title>
 		<meta charset='UTF-8'>
 		@foreach (var cssFile in cssFiles)
 		{
-			<link href='html/@cssFile' rel='stylesheet' />
+			<link href='@cssFile' rel='stylesheet' />
 		}
 	</head>
 	<body>
@@ -19,11 +20,18 @@
 			@TableOfContents.Toc(toc)
 		</div>
 
-		@SlideHtml.Slide(slide)
+		<div class="slide-container">
+			<div class="container body-content">
+				<div class="row">
+					@SlideHtml.Slide(new BlockRenderContext(course, slide, slide.Info.SlideFile.Directory.FullName, slide.Blocks.Select(b => (dynamic)null).ToArray()))
+				</div>
+			</div>
+		</div>
+
 
 		@foreach (var jsFile in jsFiles)
 		{
-			<script src='html/@jsFile'></script>
+			<script src='@jsFile'></script>
 		}
 	</body>
 </html>

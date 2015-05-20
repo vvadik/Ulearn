@@ -35,15 +35,28 @@ namespace CourseEditor
 					settings = (CourseEditorSettings)new XmlSerializer(typeof(CourseEditorSettings)).Deserialize(reader);
 				if (settings.LastCourseDirectory != null)
 				{
-					model.LoadFrom(new DirectoryInfo(settings.LastCourseDirectory));
-					model.RegenerateCourse();
-					TocTree.ExpandAll();
+					var courseDirectory = new DirectoryInfo(settings.LastCourseDirectory);
+					LoadFrom(courseDirectory);
 				}
 			}
 			catch (Exception exception)
 			{
 				LogError(exception.ToString());
 			}
+		}
+
+		private void LoadFrom(DirectoryInfo courseDirectory)
+		{
+			model.LoadFrom(courseDirectory);
+			model.RegenerateCourse();
+			TocTree.ExpandAll();
+			if (TocTree.Nodes.Count > 0)
+			{
+				var unitNode = TocTree.Nodes[0];
+				if (unitNode.Nodes.Count > 0)
+					TocTree.SelectedNode = unitNode.Nodes[0];
+			}
+			fileSystemWatcher.Path = courseDirectory.FullName;
 		}
 
 		private void LogError(string message)
@@ -87,8 +100,7 @@ namespace CourseEditor
 			{
 				try
 				{
-					model.LoadFrom(dialog.FileName);
-					model.RegenerateCourse();
+					LoadFrom(new FileInfo(dialog.FileName).Directory);
 					SaveSettings();
 				}
 				catch (Exception e)
@@ -115,6 +127,12 @@ namespace CourseEditor
 		private void UpdateWebBrowser(Slide slide)
 		{
 			Process.Start(model.GetSlideHtmlFile(slide.Index).FullName);
+		}
+
+		private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
+		{
+			model.LoadFrom(model.CourseDirectory);
+			model.RegenerateCourse();
 		}
 	}
 }

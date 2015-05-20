@@ -12,11 +12,6 @@ namespace CourseEditor
 		public DirectoryInfo HtmlOutputDir { get { return CourseDirectory.Parent.GetOrCreateSubdir("Generated"); } }
 		public Course Course { get; private set; }
 
-		public void LoadFrom(string fileName)
-		{
-			var dir = new FileInfo(fileName).Directory;
-			LoadFrom(dir);
-		}
 		public void LoadFrom(DirectoryInfo dir)
 		{
 			Course = new CourseLoader().LoadCourse(dir);

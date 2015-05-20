@@ -131,12 +131,12 @@ namespace uLearn.Web
 		{
 			Id = solution.Id;
 			UserCode = GetText(solution.SolutionCode);
-			Code = slide.Solution.BuildSolution(UserCode).SourceCode;
+			Code = slide.Exercise.Solution.BuildSolution(UserCode).SourceCode;
 			IsCompilationError = solution.IsCompilationError;
 			CompilationError = GetText(solution.CompilationError);
 			ActualOutput = GetText(solution.Output);
 			IsRightAnswer = solution.IsRightAnswer;
-			ExpectedOutput = slide.ExpectedOutput.NormalizeEoln();
+			ExpectedOutput = slide.Exercise.ExpectedOutput.NormalizeEoln();
 		}
 
 		public readonly int Id;

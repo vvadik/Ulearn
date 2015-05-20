@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,7 +25,9 @@ namespace CourseEditor
 
 		public string RenderSlide(Course course, Slide slide)
 		{
-			var page = StandaloneLayout.Page(GetCssFiles(), GetJsFiles(), CreateToc(course, slide), slide);
+			var jsFiles = GetJsFiles().Select(f => Path.GetFullPath(".\\html\\" + f));
+			var cssFiles = GetCssFiles().Select(f => Path.GetFullPath(".\\html\\" + f));
+			var page = StandaloneLayout.Page(course, slide, CreateToc(course, slide), cssFiles, jsFiles);
 			return "<!DOCTYPE html>\n" + page.ToHtmlString();
 		}
 

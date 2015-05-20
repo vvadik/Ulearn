@@ -26,83 +26,44 @@ namespace uLearn.Web.Views.Course
     using System.Web.Security;
     using System.Web.UI;
     using System.Web.WebPages;
-    
-    #line 2 "..\..\Views\Course\SlideHtml.cshtml"
     using uLearn;
-    
-    #line default
-    #line hidden
+    using uLearn.Web.Models;
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "2.0.0.0")]
     public static class SlideHtml
     {
 
-public static System.Web.WebPages.HelperResult Slide(Slide slide, int currentScore = 0)
+public static System.Web.WebPages.HelperResult Slide(BlockRenderContext context, int currentScore = 0)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 
-
-#line 5 "..\..\Views\Course\SlideHtml.cshtml"
  
-
-#line default
-#line hidden
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\'slide\'>\r\n\t\t<h1>\r\n\t\t\t");
 
 
-
-#line 8 "..\..\Views\Course\SlideHtml.cshtml"
-WebViewPage.WriteTo(@__razor_helper_writer, slide.Title);
-
-#line default
-#line hidden
+WebViewPage.WriteTo(@__razor_helper_writer, context.Slide.Title);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t<span class=\"score\">");
 
 
-
-#line 9 "..\..\Views\Course\SlideHtml.cshtml"
-WebViewPage.WriteTo(@__razor_helper_writer, Score(currentScore, slide.MaxScore));
-
-#line default
-#line hidden
+WebViewPage.WriteTo(@__razor_helper_writer, Score(currentScore, context.Slide.MaxScore));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</span>\r\n\t\t</h1>\r\n\r\n");
 
 
-
-#line 12 "..\..\Views\Course\SlideHtml.cshtml"
- 		foreach (var block in slide.Blocks)
+ 		foreach (var block in context.Slide.Blocks)
 		{
 			
-#line default
-#line hidden
+WebViewPage.WriteTo(@__razor_helper_writer, Block((dynamic)block, context));
 
-
-#line 14 "..\..\Views\Course\SlideHtml.cshtml"
-WebViewPage.WriteTo(@__razor_helper_writer, Block((dynamic)block, slide));
-
-#line default
-#line hidden
-
-
-#line 14 "..\..\Views\Course\SlideHtml.cshtml"
-                                
+                                  
 		}
-
-#line default
-#line hidden
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t</div>\r\n");
 
 
-
-#line 17 "..\..\Views\Course\SlideHtml.cshtml"
-
-#line default
-#line hidden
 
 });
 
@@ -114,180 +75,100 @@ public static System.Web.WebPages.HelperResult Score(int currentScore, int maxSc
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 
-
-#line 20 "..\..\Views\Course\SlideHtml.cshtml"
  
 	
-#line default
-#line hidden
-
-
-#line 21 "..\..\Views\Course\SlideHtml.cshtml"
 WebViewPage.WriteTo(@__razor_helper_writer, maxScore == 0 ? "" : string.Format("{0}/{1}", currentScore, maxScore));
 
-#line default
-#line hidden
-
-
-#line 21 "..\..\Views\Course\SlideHtml.cshtml"
                                                                          
 
-#line default
-#line hidden
-
 });
 
 }
 
 
-public static System.Web.WebPages.HelperResult Block(MdBlock block, Slide slide)
+public static System.Web.WebPages.HelperResult Block(MdBlock block, BlockRenderContext context)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 
-
-#line 25 "..\..\Views\Course\SlideHtml.cshtml"
  
 	
-#line default
-#line hidden
+WebViewPage.WriteTo(@__razor_helper_writer, MvcHtmlString.Create(block.Markdown.RenderMd(context.BaseUrl)));
 
-
-#line 26 "..\..\Views\Course\SlideHtml.cshtml"
-WebViewPage.WriteTo(@__razor_helper_writer, MvcHtmlString.Create(block.Markdown.RenderMd(slide.Info.SlideFile)));
-
-#line default
-#line hidden
-
-
-#line 26 "..\..\Views\Course\SlideHtml.cshtml"
-                                                                     
-
-#line default
-#line hidden
+                                                                
 
 });
 
 }
 
 
-public static System.Web.WebPages.HelperResult Block(CodeBlock block, Slide slide)
+public static System.Web.WebPages.HelperResult Block(CodeBlock block, BlockRenderContext context)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 
-
-#line 30 "..\..\Views\Course\SlideHtml.cshtml"
  
-
-#line default
-#line hidden
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea class=\'code code-sample\' data-lang=\"");
 
 
-
-#line 31 "..\..\Views\Course\SlideHtml.cshtml"
     WebViewPage.WriteTo(@__razor_helper_writer, block.Lang);
-
-#line default
-#line hidden
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-ver=\"");
 
 
-
-#line 31 "..\..\Views\Course\SlideHtml.cshtml"
                            WebViewPage.WriteTo(@__razor_helper_writer, block.Version);
-
-#line default
-#line hidden
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">");
 
 
-
-#line 31 "..\..\Views\Course\SlideHtml.cshtml"
                                            WebViewPage.WriteTo(@__razor_helper_writer, block.Code);
-
-#line default
-#line hidden
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n");
 
 
 
-#line 32 "..\..\Views\Course\SlideHtml.cshtml"
-
-#line default
-#line hidden
-
 });
 
 }
 
 
-public static System.Web.WebPages.HelperResult Block(TexBlock block, Slide slide)
+public static System.Web.WebPages.HelperResult Block(TexBlock block, BlockRenderContext context)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 
-
-#line 35 "..\..\Views\Course\SlideHtml.cshtml"
  
 	foreach (var texLine in block.TexLines)
 	{
 
-#line default
-#line hidden
-
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"tex\">\\displaystyle ");
 
 
-
-#line 38 "..\..\Views\Course\SlideHtml.cshtml"
 WebViewPage.WriteTo(@__razor_helper_writer, texLine.Trim());
-
-#line default
-#line hidden
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</div>\r\n");
 
 
-
-#line 39 "..\..\Views\Course\SlideHtml.cshtml"
 	}
-
-#line default
-#line hidden
 
 });
 
 }
 
 
-public static System.Web.WebPages.HelperResult Block(YoutubeBlock block, Slide slide)
+public static System.Web.WebPages.HelperResult Block(YoutubeBlock block, BlockRenderContext context)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 
-
-#line 43 "..\..\Views\Course\SlideHtml.cshtml"
  
 
-#line default
-#line hidden
-
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"video-container\">\r\n\t\t<iframe class=\'embedded-video\' width=\'864\' heig" +
-"ht=\'480\' src=\'//www.youtube.com/embed/");
+"ht=\'480\' src=\'https://www.youtube.com/embed/");
 
 
-
-#line 45 "..\..\Views\Course\SlideHtml.cshtml"
-                                            WebViewPage.WriteTo(@__razor_helper_writer, block.VideoId);
-
-#line default
-#line hidden
+                                                  WebViewPage.WriteTo(@__razor_helper_writer, block.VideoId);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' allowfullscreen></iframe>\r\n\t</div>\r\n");
 
@@ -302,77 +183,237 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"	<div>
 
 
 
-#line 52 "..\..\Views\Course\SlideHtml.cshtml"
+});
 
-#line default
-#line hidden
+}
+
+
+public static System.Web.WebPages.HelperResult Block(ImageGaleryBlock block, BlockRenderContext context)
+{
+return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
+
+
+ 
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"flexslider\">\r\n\t\t<ul class=\"slides\">\r\n");
+
+
+ 			foreach (var imageUrl in block.ImageUrls)
+			{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<li>\r\n\t\t\t\t\t<img src=\"");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, string.Format("{0}/{1}", context.BaseUrl, imageUrl));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" alt=\"");
+
+
+                               WebViewPage.WriteTo(@__razor_helper_writer, imageUrl);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" />\r\n\t\t\t\t</li>\r\n");
+
+
+			}
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t</ul>\r\n\t</div>\r\n");
+
+
 
 });
 
 }
 
 
-public static System.Web.WebPages.HelperResult Block(ImageGaleryBlock block, Slide slide)
+public static System.Web.WebPages.HelperResult Block(ExerciseBlock block, BlockRenderContext context)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 
-
-#line 55 "..\..\Views\Course\SlideHtml.cshtml"
  
+	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData();
+	var action = data.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", data.AcceptedSolutionUrl);
 
-#line default
-#line hidden
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"flexslider\">\r\n\t\t<ul class=\"slides\">\r\n");
-
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea id=\"secretCodeExercise\" class=\'hide\'>");
 
 
-#line 58 "..\..\Views\Course\SlideHtml.cshtml"
- 			foreach (var imageUrl in block.ImageUrls)
-			{
+     WebViewPage.WriteTo(@__razor_helper_writer, block.ExerciseInitialCode.EnsureEnoughLines(4));
 
-#line default
-#line hidden
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<li>\r\n\t\t\t\t\t<img src=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, ")</textarea>\r\n");
 
 
 
-#line 61 "..\..\Views\Course\SlideHtml.cshtml"
-WebViewPage.WriteTo(@__razor_helper_writer, string.Format("{0}/{1}", slide.Info.DirectoryRelativePath, imageUrl));
-
-#line default
-#line hidden
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" alt=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"sphere-engine-tm\">Powered by <a target=\"blank\" href=\"http://sphere-e" +
+"ngine.com\">Sphere Engine™</a> and <a target=\"blank\" href=\"http://codemirror.net/" +
+"\">CodeMirror</a></div>\r\n");
 
 
 
-#line 61 "..\..\Views\Course\SlideHtml.cshtml"
-                                                WebViewPage.WriteTo(@__razor_helper_writer, imageUrl);
-
-#line default
-#line hidden
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" />\r\n\t\t\t\t</li>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea class=\'code code-exercise\' data-lang=\"");
 
 
+      WebViewPage.WriteTo(@__razor_helper_writer, block.Lang);
 
-#line 63 "..\..\Views\Course\SlideHtml.cshtml"
-			}
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">");
 
-#line default
-#line hidden
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t</ul>\r\n\t</div>\r\n");
+                    WebViewPage.WriteTo(@__razor_helper_writer, data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n");
 
 
 
-#line 66 "..\..\Views\Course\SlideHtml.cshtml"
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<script>\r\n\t\tfunction cleanUserCode() {\r\n\t\t\tvar $secretCodeExercise = $(\'#secretC" +
+"odeExercise\');\r\n\t\t\t$(\'.code-exercise\')[0].codeMirrorEditor.setValue($secretCodeE" +
+"xercise.text());\r\n\t\t}\r\n\t</script>\r\n");
 
-#line default
-#line hidden
+
+	if (data.ShowControls)
+	{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"solution-control btn-group ctrl-group\">\r\n\t\t\t<button type=\"button\" c" +
+"lass=\"run-solution-button btn btn-primary no-rounds\" data-url=\"");
+
+
+                                              WebViewPage.WriteTo(@__razor_helper_writer, data.RunSolutionUrl);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tRun\r\n\t\t\t</button>\r\n\r\n");
+
+
+  			 var e = ((ExerciseSlide)context.Slide).Exercise.HintsMd; 
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<button id=\"GetHintButton\" type=\"button\" class=\"btn btn-default hints-btn\" onc" +
+"lick=\"showHintForUser(\'");
+
+
+                                                             WebViewPage.WriteTo(@__razor_helper_writer, context.Course.Id);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\', \'");
+
+
+                                                                                   WebViewPage.WriteTo(@__razor_helper_writer, context.Slide.Index);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' , \'");
+
+
+                                                                                                            WebViewPage.WriteTo(@__razor_helper_writer, e.Count);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\')\" data-url=\"");
+
+
+                                                                                                                                  WebViewPage.WriteTo(@__razor_helper_writer, data.GetHintUrl);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tGet hint\r\n\t\t\t</button>\r\n\r\n\t\t\t<button type=\"button\" class=\"btn btn-default" +
+" giveup-btn\" onclick=\"");
+
+
+                          WebViewPage.WriteTo(@__razor_helper_writer, action);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tShow solutions\r\n\t\t\t</button>\r\n\r\n\t\t\t<button type=\"button\" class=\"btn btn-d" +
+"efault reset-btn no-rounds\" onclick=\"cleanUserCode()\">\r\n\t\t\t\tReset\r\n\t\t\t</button>\r" +
+"\n\t\t</div>\r\n");
+
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"run-result run-service-error\">\r\n\t\t\t<div class=\"run-verdict label-wa" +
+"rning\">Ошибка сервера :(</div>\r\n\t\t\t<pre class=\"no-rounds\"><code class=\"run-detai" +
+"ls\"></code></pre>\r\n\t\t</div>\r\n");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"run-result run-compile-error\">\r\n\t\t\t<div class=\"run-verdict label-da" +
+"nger\">Ошибка компиляции</div>\r\n\t\t\t<pre class=\"no-rounds\"><code class=\"run-detail" +
+"s\"></code></pre>\r\n\t\t</div>\r\n");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"		<div class=""run-result run-style-error"">
+			<div class=""run-verdict label-danger"">Нарушение стилевых требований</div>
+			<pre class=""no-rounds""><code class=""run-details""></code></pre>
+			<div>
+				<small>В некоторых ситуациях стилевые проверки тут могут быть жестче, чем необходимо в реальной жизни.</small>
+			</div>
+		</div>
+");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"run-result run-wa\">\r\n\t\t\t<div class=\"run-verdict label-danger\">Невер" +
+"ный результат</div>\r\n\t\t\t<div class=\"diff-table tablesorter\"></div>\r\n\t\t</div>\r\n");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"run-result run-wa-no-diff\">\r\n\t\t\t<div class=\"run-verdict label-dange" +
+"r\">Неверный результат</div>\r\n\t\t\t<pre class=\"no-rounds\"><code class=\"run-details\"" +
+"></code></pre>\r\n\t\t</div>\r\n");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"run-result run-success\">\r\n\t\t\t<div class=\"run-verdict label-success " +
+"clearfix\">Успех!</div>\r\n\t\t\t<pre class=\"no-rounds\"><code class=\"run-details\"></co" +
+"de></pre>\r\n\t\t</div>\r\n");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"panel-group ctrl-group\" id=\"hints-accordion\">\r\n\t\t\t<div id=\"hints-pl" +
+"ace\"></div>\r\n\t\t</div>\r\n");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"		<div class=""modal fade"" id=""ShowSolutionsAlert"" tabindex=""-1"" role=""dialog"" aria-labelledby=""myModalLabel"" aria-hidden=""true"">
+			<div class=""modal-dialog"">
+				<div class=""modal-content"">
+					<div class=""modal-header"">
+						<button type=""button"" class=""close"" data-dismiss=""modal"" aria-label=""Close""><span aria-hidden=""true"">&times;</span></button>
+						<h4 class=""modal-title"">Внимание</h4>
+					</div>
+					<div class=""modal-body"">
+						<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
+					</div>
+					<div class=""modal-footer"">
+						<a class=""btn btn-default"" href=""");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, data.AcceptedSolutionUrl);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">Продолжить</a>\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary\" data-dismis" +
+"s=\"modal\">Отмена</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n");
+
+
+	}
+	else
+	{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div>\r\n\t\t\t<h3>Подсказки</h3>\r\n\t\t\t<ol>\r\n");
+
+
+ 				foreach (var hint in block.HintsMd)
+				{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t<li>\r\n\t\t\t\t\t\t");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, MvcHtmlString.Create(hint.RenderMd(context.BaseUrl)));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t\t</li>\r\n");
+
+
+				}
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t</ol>\r\n\t\t</div>\r\n");
+
+
+
+	}
 
 });
 

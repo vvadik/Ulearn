@@ -26,138 +26,79 @@ namespace uLearn.Web.Views.Course
     using System.Web.Security;
     using System.Web.UI;
     using System.Web.WebPages;
-    
-    #line 2 "..\..\Views\Course\StandaloneLayout.cshtml"
     using uLearn;
-    
-    #line default
-    #line hidden
-    
-    #line 3 "..\..\Views\Course\StandaloneLayout.cshtml"
     using uLearn.Web.Models;
-    
-    #line default
-    #line hidden
-    
-    #line 4 "..\..\Views\Course\StandaloneLayout.cshtml"
     using uLearn.Web.Views.Course;
-    
-    #line default
-    #line hidden
-    
-    #line 5 "..\..\Views\Course\StandaloneLayout.cshtml"
     using uLearn.Web.Views.SlideNavigation;
-    
-    #line default
-    #line hidden
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "2.0.0.0")]
     public static class StandaloneLayout
     {
 
-public static System.Web.WebPages.HelperResult Page(IEnumerable<string> cssFiles, IEnumerable<string> jsFiles, TocModel toc, Slide slide)
+public static System.Web.WebPages.HelperResult Page(Course course, Slide slide, TocModel toc, IEnumerable<string> cssFiles, IEnumerable<string> jsFiles)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 
-
-#line 7 "..\..\Views\Course\StandaloneLayout.cshtml"
  
 
-#line default
-#line hidden
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<html>\r\n\t<head>\r\n\t\t<title>Course Preview</title>\r\n\t\t<meta charset=\'UTF-8\'>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<html>\r\n\t<head>\r\n\t\t<title>Preview: ");
 
 
+WebViewPage.WriteTo(@__razor_helper_writer, course.Title);
 
-#line 12 "..\..\Views\Course\StandaloneLayout.cshtml"
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, " — ");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, slide.Title);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</title>\r\n\t\t<meta charset=\'UTF-8\'>\r\n");
+
+
  		foreach (var cssFile in cssFiles)
 		{
 
-#line default
-#line hidden
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<link href=\'html/");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<link href=\'");
 
 
-
-#line 14 "..\..\Views\Course\StandaloneLayout.cshtml"
 WebViewPage.WriteTo(@__razor_helper_writer, cssFile);
-
-#line default
-#line hidden
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' rel=\'stylesheet\' />\r\n");
 
 
-
-#line 15 "..\..\Views\Course\StandaloneLayout.cshtml"
 		}
-
-#line default
-#line hidden
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t</head>\r\n\t<body>\r\n\t\t<div class=\'side-bar navbar-collapse collapse navbar-nav con" +
 "tainer\'>\r\n\t\t\t");
 
 
-
-#line 19 "..\..\Views\Course\StandaloneLayout.cshtml"
 WebViewPage.WriteTo(@__razor_helper_writer, TableOfContents.Toc(toc));
 
-#line default
-#line hidden
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t</div>\r\n\r\n\t\t");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t</div>\r\n\r\n\t\t<div class=\"slide-container\">\r\n\t\t\t<div class=\"container body-cont" +
+"ent\">\r\n\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t");
 
 
+WebViewPage.WriteTo(@__razor_helper_writer, SlideHtml.Slide(new BlockRenderContext(course, slide, slide.Info.SlideFile.Directory.FullName, slide.Blocks.Select(b => (dynamic)null).ToArray())));
 
-#line 22 "..\..\Views\Course\StandaloneLayout.cshtml"
-WebViewPage.WriteTo(@__razor_helper_writer, SlideHtml.Slide(slide));
-
-#line default
-#line hidden
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n");
 
 
-
-#line 24 "..\..\Views\Course\StandaloneLayout.cshtml"
  		foreach (var jsFile in jsFiles)
 		{
 
-#line default
-#line hidden
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<script src=\'html/");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<script src=\'");
 
 
-
-#line 26 "..\..\Views\Course\StandaloneLayout.cshtml"
 WebViewPage.WriteTo(@__razor_helper_writer, jsFile);
-
-#line default
-#line hidden
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\'></script>\r\n");
 
 
-
-#line 27 "..\..\Views\Course\StandaloneLayout.cshtml"
 		}
-
-#line default
-#line hidden
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t</body>\r\n</html>\r\n");
 
 
-
-#line 30 "..\..\Views\Course\StandaloneLayout.cshtml"
-
-#line default
-#line hidden
 
 });
 

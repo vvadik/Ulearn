@@ -30,9 +30,9 @@ namespace uLearn.Web
 
 		private static void TestExerciseSlide(ExerciseSlide slide, IExecutionService executionService)
 		{
-			var solution = slide.Solution.BuildSolution(slide.EthalonSolution);
+			var solution = slide.Exercise.Solution.BuildSolution(slide.Exercise.EthalonSolution);
 			if (solution.HasErrors)
-				Assert.Fail("Template solution: " + slide.EthalonSolution + "\n\n" + "source code: " + solution.SourceCode + "\n\n" + "solution has error in: " +
+				Assert.Fail("Template solution: " + slide.Exercise.EthalonSolution + "\n\n" + "source code: " + solution.SourceCode + "\n\n" + "solution has error in: " +
 				            slide.Info.UnitName + " - " + slide.Title +
 				            "\n" + "\terror: " + solution.ErrorMessage + "\n\n");
 			else
@@ -41,12 +41,12 @@ namespace uLearn.Web
 				var testName = TestContext.CurrentContext.Test.Name;
 				var submition = executionService.Submit(solution.SourceCode, testName).Result;
 				var output = submition.StdOut + "\n" + submition.StdErr;
-				var isRightAnswer = output.NormalizeEoln().Equals(slide.ExpectedOutput.NormalizeEoln());
+				var isRightAnswer = output.NormalizeEoln().Equals(slide.Exercise.ExpectedOutput.NormalizeEoln());
 				var result = new RunSolutionResult
 				{
 					CompilationError = submition.CompilationErrorMessage,
 					IsRightAnswer = isRightAnswer,
-					ExpectedOutput = slide.ExpectedOutput,
+					ExpectedOutput = slide.Exercise.ExpectedOutput,
 					ActualOutput = output
 				};
 				if (!isRightAnswer)

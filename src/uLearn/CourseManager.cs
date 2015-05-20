@@ -52,12 +52,6 @@ namespace uLearn
 			return StagedDirectory.GetFile(name).FullName;
 		}
 
-		public ExerciseSlide GetExerciseSlide(string courseId, int slideIndex)
-		{
-			var course = GetCourse(courseId);
-			return (ExerciseSlide)course.Slides[slideIndex];
-		}
-		
 		private static readonly object ReloadLock = new object();
 		
 		private void LoadCoursesIfNotYet()
