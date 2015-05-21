@@ -34,7 +34,7 @@ namespace uLearn
 		[Category("Long")]
 		public void CheckAllYoutubeVideos()
 		{
-			var course = CourseManager.LoadCourse(new DirectoryInfo(@"..\..\Slides"));
+			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
 			Assert.That(course.Slides.Length, Is.GreaterThan(0));
 			var webClient = new WebClient();
 			var youtubeBlocks = course.Slides.SelectMany(slide => slide.Blocks.OfType<YoutubeBlock>().Select(b => new { slide, b.VideoId }));

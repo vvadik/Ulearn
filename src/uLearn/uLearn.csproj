@@ -43,8 +43,9 @@
     <Reference Include="Microsoft.CodeAnalysis.CSharp">
       <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.0.6.4033103-beta\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="RazorEngine, Version=3.4.1.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -78,6 +79,7 @@
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="CommentAfterExerciseIsSolved.cs" />
     <Compile Include="Course.cs" />
+    <Compile Include="CourseLoader.cs" />
     <Compile Include="CourseSettings.cs" />
     <Compile Include="CourseManager.cs" />
     <Compile Include="CSharp\BaseNamingChecker.cs" />
@@ -92,6 +94,7 @@
     <Compile Include="CSharp\RedundantIfStyleValidator.cs" />
     <Compile Include="CSharp\RedundantIfStyleValidator_should.cs" />
     <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="ExerciseBlock.cs" />
     <Compile Include="ISolutionValidator.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />
@@ -122,6 +125,7 @@
     <Compile Include="SlideBlock.cs" />
     <Compile Include="SolutionBuildResult.cs" />
     <Compile Include="SolutionBuilder.cs" />
+    <Compile Include="StagingPackage.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="StringExtensions_SplitToLines_should.cs" />
     <Compile Include="CSharp\SyntaxExtensions.cs" />

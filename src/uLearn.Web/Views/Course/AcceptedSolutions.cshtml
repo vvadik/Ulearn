@@ -12,14 +12,14 @@
 		<div class="row">
 			<div id="LikeSolutionUrl" data-url="@Url.Action("LikeSolution")"></div>
 			<h1 class='page-header'>Решения</h1>
-			<p>@Html.Raw(Model.Slide.CommentAfterExerciseIsSolved.RenderMd(Model.Slide.Info.SlideFile))</p>
+			<p>@Html.Raw(Model.Slide.Exercise.CommentAfterExerciseIsSolved.RenderMd(Model.Slide.Info.SlideFile))</p>
 
 			<p>Изучите решения ваших коллег. Проголосуйте за решения, в которых вы нашли что-то новое для себя.</p>
 
 			@foreach (AcceptedSolutionInfo solution in Model.AcceptedSolutions)
 			{
 				var id = "solution_" + solution.Id;
-				var code = new CodeBlock(solution.Code, Model.Slide.Lang);
+				var code = new CodeBlock(solution.Code, Model.Slide.Exercise.Lang);
 				<div id="@id">
 					<button class="like-left-location btn @(solution.LikedAlready ? "btn-primary" : "btn-default") like-button" onclick="likeSolution(@solution.Id)">
 						<i class="glyphicon glyphicon-heart"></i>
@@ -43,6 +43,3 @@
 		</div>
 	</div>
 </div>
-@section scripts{
-	@Scripts.Render("~/slide-js")
-}

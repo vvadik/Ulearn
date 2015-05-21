@@ -9,7 +9,6 @@
 	<link rel="image_src" href="~/Content/logo.png">
 	<link rel="shortcut icon" href="~/favicon.ico?v=4" />
 	@Styles.Render("~/css")
-	@Styles.Render("~/flexslider/flexslider.css")
 	@Scripts.Render("~/modernizr-js")
 </head>
 <body>
@@ -47,9 +46,7 @@
 	</div>
 	@RenderBody()
 
-	@Scripts.Render("~/jquery-js")
-	@Scripts.Render("~/bootstrap-js")
-	@Scripts.Render("~/codemirror-js")
+	@Scripts.Render("~/main-js")
 	@RenderSection("scripts", required: false)
 
 	<script>

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 
@@ -21,40 +20,36 @@ namespace uLearn.Web.Controllers
 		{
 			var course = courseManager.GetCourse(courseId);
 			var userId = User.Identity.GetUserId();
+			return PartialView(CreateTocModel(course, slideIndex, userId));
+		}
+
+		private HashSet<string> GetSolvedSlides(Course course, string userId)
+		{
 			var solvedSlides = solutionsRepo.GetIdOfPassedSlides(course.Id, userId);
-			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
 			solvedSlides.UnionWith(userQuizzesRepo.GetIdOfQuizPassedSlides(course.Id, userId));
-			var units = course.Slides
-				.Where(s => visibleUnits.Contains(s.Info.UnitName))
-				.GroupBy(
-					s => s.Info.UnitName,
-					(unitName, slides) => new CourseUnitModel { Slides = slides.ToArray(), InstructorNote = course.GetInstructorNote(unitName), UnitName = unitName })
-				.ToArray();
-			var visitedSlideIds = visitersRepo.GetIdOfVisitedSlides(course.Id, userId);
-			var currentSlide = course.FindSlide(slideIndex);
-			if (currentSlide != null && !visibleUnits.Contains(currentSlide.Info.UnitName))
-				currentSlide = null;
-			var currentUnit = units.FirstOrDefault(u => u.Slides.Contains(currentSlide) && visibleUnits.Contains(u.UnitName));
-			var nextUnitTime = unitsRepo.GetNextUnitPublishTime(courseId);
+			return solvedSlides;
+		}
 
-			var scoresForSlides = GetScoresForSlides(course, userId);
-			var scoresForUnits = GetScoresForUnits(scoresForSlides);
-			var scoreForCourse = GetScoreForCourse(scoresForUnits);
-
-			return PartialView(new TocModel
-			{
-				CourseId = course.Id,
-				CourseName = course.Title,
-				CurrentSlide = currentSlide,
-				CurrentUnit = currentUnit,
-				Units = units,
-				VisitedSlideIds = visitedSlideIds,
-				SolvedSlideIds = solvedSlides,
-				NextUnitTime = nextUnitTime,
-				ScoresForSlides = scoresForSlides,
-				ScoresForUnits = scoresForUnits,
-				ScoreForCourse = scoreForCourse
-			});
+		private TocModel CreateTocModel(Course course, int slideIndex, string userId)
+		{
+			var visibleUnits = unitsRepo.GetVisibleUnits(course.Id, User);
+			var solved = GetSolvedSlides(course, userId);
+			var visited = visitersRepo.GetIdOfVisitedSlides(course.Id, userId);
+			var scoresForSlides = visitersRepo.GetScoresForSlides(course.Id, userId);
+			var builder = new TocModelBuilder(
+				s => Url.Action("Slide", "Course", new { courseId = course.Id, slideIndex = s.Index }),
+				s => scoresForSlides.ContainsKey(s.Id) ? scoresForSlides[s.Id] : 0,
+				course,
+				slideIndex);
+			builder.GetUnitInstructionNotesUrl = unitName => Url.Action("InstructorNote", "Course", new { courseId = course.Id, unitName });
+			builder.GetUnitStatisticsUrl = unitName => Url.Action("UnitStatistics", "Analytics", new { courseId = course.Id, unitName });
+			builder.IsInstructor = User.IsInRole(LmsRoles.Instructor);
+			builder.IsSolved = s => solved.Contains(s.Id);
+			builder.IsVisited = s => visited.Contains(s.Id);
+			builder.IsUnitVisible = u => visibleUnits.Contains(u);
+			var toc = builder.CreateTocModel();
+			toc.NextUnitTime = unitsRepo.GetNextUnitPublishTime(course.Id);
+			return toc;
 		}
 
 		public ActionResult PrevNextButtons(string courseId, int slideIndex, bool onSolutionsSlide)
@@ -70,32 +65,6 @@ namespace uLearn.Web.Controllers
 			var model = new PrevNextButtonsModel(course, slideIndex, nextIsAcceptedSolutions, nextSlide == null ? -1 : nextSlide.Index, prevSlide == null ? -1 : prevSlide.Index);
 			if (onSolutionsSlide) model.PrevSlideIndex = model.SlideIndex;
 			return PartialView(model);
-		}
-
-		private Dictionary<Slide, Tuple<int, int>> GetScoresForSlides(Course course, string userId)
-		{
-			var scoresForSlides = visitersRepo.GetScoresForSlides(course.Id, userId);
-			return course.Slides
-				.ToDictionary(slide => slide, slide => Tuple.Create(scoresForSlides.Get(slide.Id, 0), slide.MaxScore));
-		}
-
-		private Dictionary<string, Tuple<int, int>> GetScoresForUnits(Dictionary<Slide, Tuple<int, int>> scoresForSlides)
-		{
-			return scoresForSlides
-				.GroupBy(pair => pair.Key.Info.UnitName)
-				.ToDictionary(
-					pairs => pairs.Key, 
-					pairs => Sum(pairs.Select(pair => pair.Value)));
-		}
-
-		private Tuple<int, int> GetScoreForCourse(Dictionary<string, Tuple<int, int>> scoresForUnits)
-		{
-			return Sum(scoresForUnits.Values);
-		}
-
-		private Tuple<int, int> Sum(IEnumerable<Tuple<int, int>> tuples)
-		{
-			return tuples.Aggregate(Tuple.Create(0, 0), (t1, t2) => Tuple.Create(t1.Item1 + t2.Item1, t1.Item2 + t2.Item2));
 		}
 	}
 }

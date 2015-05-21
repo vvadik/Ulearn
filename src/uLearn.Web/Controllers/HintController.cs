@@ -30,7 +30,7 @@ namespace uLearn.Web.Controllers
 			if (!(slide is ExerciseSlide))
 				return Json(new { Text = "Для слайда нет подсказок" });
 			var exerciseSlide = (ExerciseSlide) slide;
-			if (exerciseSlide.HintsMd.Count == 0)
+			if (exerciseSlide.Exercise.HintsMd.Count == 0)
 				return Json(new { Text = "Для слайда нет подсказок" });
 			var model = new HintPageModel {Hints = await GetNewHintHtml(exerciseSlide, courseId, isNeedNewHint)};
 			if (model.Hints == null)
@@ -41,7 +41,7 @@ namespace uLearn.Web.Controllers
 		private async Task<HintWithLikeButton[]> GetNewHintHtml(ExerciseSlide exerciseSlide, string courseId, bool isNeedNewHint)
 		{
 			var usedHintsCount = slideHintRepo.GetUsedHintsCount(courseId, exerciseSlide.Id, User.Identity.GetUserId());
-			if (usedHintsCount != exerciseSlide.HintsMd.Count)
+			if (usedHintsCount != exerciseSlide.Exercise.HintsMd.Count)
 				return await RenderHtmlWithHint(exerciseSlide, isNeedNewHint ? usedHintsCount : usedHintsCount - 1, courseId);
 			if (isNeedNewHint)
 				return null;
@@ -54,7 +54,7 @@ namespace uLearn.Web.Controllers
 			for (var i = 0; i <= hintsCount; i++)
 			{
 				var isLiked = slideHintRepo.IsHintLiked(courseId, exerciseSlide.Id, User.Identity.GetUserId(), i);
-				ans[i] = await MakeExerciseHint(exerciseSlide.HintsMd[i].RenderMd(exerciseSlide.Info.SlideFile), i, courseId, exerciseSlide.Id, isLiked);
+				ans[i] = await MakeExerciseHint(exerciseSlide.Exercise.HintsMd[i].RenderMd(exerciseSlide.Info.SlideFile), i, courseId, exerciseSlide.Id, isLiked);
 			}
 			return ans;
 		}

@@ -24,8 +24,9 @@ namespace uLearn.CSharp
 			blocksBuilder.Visit(tree.GetRoot());
 			if (!ExerciseBuilder.IsExercise(tree))
 				return new Slide(blocksBuilder.Blocks, slideInfo, blocksBuilder.Title, blocksBuilder.Id);
-			var exerciseBuilder = new ExerciseBuilder(prelude, blocksBuilder, slideInfo);
-			return exerciseBuilder.BuildFrom(tree);
+			var exerciseBlock = new ExerciseBuilder(SlideBuilder.LangId, prelude).BuildBlockFrom(tree);
+			blocksBuilder.Blocks.Add(exerciseBlock);
+			return new ExerciseSlide(blocksBuilder.Blocks, slideInfo, blocksBuilder.Title, blocksBuilder.Id);
 		}
 	}
 }

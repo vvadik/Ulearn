@@ -16,6 +16,13 @@ namespace uLearn
 			return new DirectoryInfo(Path.Combine(dir.FullName, name));
 		}
 
+		public static DirectoryInfo GetOrCreateSubdir(this DirectoryInfo dir, string name)
+		{
+			var subdir = dir.GetSubdir(name);
+			if (!subdir.Exists) subdir.Create();
+			return subdir;
+		}
+
 		public static string ContentAsUtf8(this FileInfo file)
 		{
 			return File.ReadAllText(file.FullName, Encoding.UTF8);

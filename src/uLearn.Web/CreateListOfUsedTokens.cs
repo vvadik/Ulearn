@@ -15,7 +15,7 @@ namespace uLearn.Web
 			var solutions = WebCourseManager.Instance
 				.GetCourses()
 				.SelectMany(course => course.Slides.OfType<ExerciseSlide>())
-				.Select(slide => slide.EthalonSolution);
+				.Select(slide => slide.Exercise.EthalonSolution);
 			var domProvider = CodeDomProvider.CreateProvider("C#");
 			var tokensDict = solutions
 				.SelectMany(s => CSharpSyntaxTree

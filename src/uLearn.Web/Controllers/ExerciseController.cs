@@ -38,7 +38,7 @@ namespace uLearn.Web.Controllers
 					CompilationError = "Слишком большой код."
 				});
 			}
-			var exerciseSlide = courseManager.GetExerciseSlide(courseId, slideIndex);
+			var exerciseSlide = (ExerciseSlide)courseManager.GetCourse(courseId).Slides[slideIndex];
 			var result = await CheckSolution(exerciseSlide, code, RedundantExecutionService.Default);
 			await SaveUserSolution(courseId, exerciseSlide.Id, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer, result.ExecutionServiceName);
 			return Json(result);
@@ -46,7 +46,8 @@ namespace uLearn.Web.Controllers
 
 		private async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code, IExecutionService executionService)
 		{
-			var solution = exerciseSlide.Solution.BuildSolution(code);
+			var exerciseBlock = exerciseSlide.Exercise;
+			var solution = exerciseBlock.Solution.BuildSolution(code);
 			if (solution.HasErrors)
 				return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
 			if (solution.HasStyleIssues)
@@ -60,14 +61,14 @@ namespace uLearn.Web.Controllers
 					ExecutionServiceName = executionService.Name
 				};
 			var output = submissionDetails.GetOutput();
-			var expectedOutput = exerciseSlide.ExpectedOutput.NormalizeEoln();
+			var expectedOutput = exerciseBlock.ExpectedOutput.NormalizeEoln();
 			var isRightAnswer = submissionDetails.IsSuccess && output.Equals(expectedOutput);
 			return new RunSolutionResult
 			{
 				IsCompileError = submissionDetails.IsCompilationError,
 				CompilationError = submissionDetails.CompilationErrorMessage,
 				IsRightAnswer = isRightAnswer,
-				ExpectedOutput = exerciseSlide.HideExpectedOutputOnError ? null : expectedOutput,
+				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : expectedOutput,
 				ActualOutput = output,
 				ExecutionServiceName = submissionDetails.ServiceName
 			};

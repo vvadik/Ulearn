@@ -4,6 +4,7 @@
 @{
 	ViewBag.Title = Model.CourseTitle;
 	ViewBag.Slide = Model.Slide;
+	var blocks = Model.Slide.Blocks.Where(b => !(b is ExerciseBlock)).ToList();
 }
 
 @Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
@@ -17,7 +18,8 @@
 				{
 					@Html.Action("Quiz", "Quiz", new { slide = Model.Slide as QuizSlide, courseId = Model.CourseId, userId = Model.UserId })
 				}
-				@Html.DisplayFor(m => m.Slide.Blocks)
+
+				@Html.DisplayFor(m => blocks)
 				@if (Model.Slide is ExerciseSlide)
 				{
 					@Html.Partial("_SolutionControl", Model)
@@ -43,7 +45,6 @@
 	@Html.Action("SelectGroup")
 }
 @section scripts{
-	@Scripts.Render("~/slide-js")
 	<script>
 		fillRate('@Model.Rate');
 		$("#selectGroupModal").modal();
@@ -51,7 +52,7 @@
 	@if (Model.Slide is ExerciseSlide)
 	{
 		var e = (ExerciseSlide) Model.Slide;
-		<script> getHints("@Model.CourseId", "@Model.Slide.Index", '@e.HintsMd.Count') </script>
+		<script> getHints("@Model.CourseId", "@Model.Slide.Index", '@e.Exercise.HintsMd.Count') </script>
 		<script> refreshPreviousDraft('@(Model.LatestAcceptedSolution != null)', '@e.Id') </script>
 	}
 }

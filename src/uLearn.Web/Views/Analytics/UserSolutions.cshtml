@@ -13,14 +13,9 @@
 	</h2>
 	@foreach (var userSolution in Model.Solutions)
 	{
-		var code = new CodeBlock(userSolution.SolutionCode.Text, Model.Slide.Lang);
+		var code = new CodeBlock(userSolution.SolutionCode.Text, Model.Slide.Exercise.Lang);
 		<label>@userSolution.GetVerdict()</label> @userSolution.Timestamp
 		@Html.DisplayFor(m => code)
 		<hr/>
 	}
 </div>
-
-@section scripts{
-	@Scripts.Render("~/slide-js")
-}
-

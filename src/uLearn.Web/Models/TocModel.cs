@@ -1,27 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace uLearn.Web.Models
 {
 	public class TocModel
 	{
-		public string CourseId;
-		public CourseUnitModel[] Units;
-		public CourseUnitModel CurrentUnit;
-		public Slide CurrentSlide;
-		public HashSet<string> VisitedSlideIds { get; set; }
-		public HashSet<string> SolvedSlideIds { get; set; }
-		public DateTime NextUnitTime { get; set; }
-		public Dictionary<Slide, Tuple<int, int>> ScoresForSlides { get; set; }
-		public Dictionary<string, Tuple<int, int>> ScoresForUnits { get; set; }
-		public Tuple<int, int> ScoreForCourse { get; set; }
-		public string CourseName { get; set; }
+		public TocModel(Course course, TocUnitModel[] units)
+		{
+			Course = course;
+			Units = units;
+		}
+
+		public readonly Course Course;
+		public readonly TocUnitModel[] Units;
+		public int MaxScore { get { return Units.Sum(u => u.MaxScore); } }
+		public int Score { get { return Units.Sum(p => p.Score); } }
+		public DateTime NextUnitTime;
 	}
 
-	public class CourseUnitModel
+	public class TocUnitModel
 	{
 		public string UnitName;
-		public Slide[] Slides;
-		public InstructorNote InstructorNote;
+		public List<TocPageInfo> Pages;
+		public bool IsCurrent;
+		public int MaxScore { get { return Pages.Sum(p => p.MaxScore); } }
+		public int Score { get { return Pages.Sum(p => p.Score); } }
+	}
+
+
+	public class TocPageInfo
+	{
+		public string Url;
+		public string Name;
+		public bool ShouldBeSolved;
+		public int MaxScore;
+		public int Score;
+		public bool IsCurrent;
+		public TocPageType PageType;
+		public bool IsSolved;
+		public bool IsVisited;
+	}
+
+	public enum TocPageType
+	{
+		Theory,
+		Exercise,
+		Quiz,
+		InstructorNotes,
+		Statistics
 	}
 }
