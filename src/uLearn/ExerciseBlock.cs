@@ -17,6 +17,7 @@ namespace uLearn
 		// Если это вставить в ExerciseCode по индексу IndexToInsertSolution и выполнить полученный код, он должен вывести ExpectedOutput
 		public string EthalonSolution { get; set; }
 		public string Lang { get; set; }
+		public string LangVer { get; set; }
 		public string CommentAfterExerciseIsSolved { get; set; }
 		public bool HideExpectedOutputOnError { get; set; }
 		public string ValidatorName { get; set; }
@@ -26,8 +27,6 @@ namespace uLearn
 			get { return hintsMd = hintsMd ?? new List<string>(); }
 			set { hintsMd = value; }
 		}
-
-		public int MaxScore { get; set; }
 		
 		[XmlIgnore]
 		public SolutionBuilder Solution { get { return new SolutionBuilder(IndexToInsertSolution, ExerciseCode, ValidatorName); } }

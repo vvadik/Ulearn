@@ -176,20 +176,29 @@ namespace uLearn
 
 		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress, CourseSettings settings, Lesson lesson)
 		{
-			var file = File ?? lesson.DefaultIncludeFile;
-			var content = fs.GetContent(file);
-			var lang = LangId ?? (Path.GetExtension(file) ?? "").Trim('.');
-			if (LangVer == null)
-				LangVer = settings.GetLanguageVersion(lang);
+			FillProperties(settings, lesson);
+			var content = fs.GetContent(File);
 
-			if (Labels == null || Labels.Length == 0)
+			if (Labels.Length == 0)
 			{
-				yield return new CodeBlock(content, lang, LangVer);
+				yield return new CodeBlock(content, LangId, LangVer);
 				yield break;
 			}
 
-			var extractor = new RegionsExtractor(content, lang);
-			yield return new CodeBlock(String.Join("\r\n\r\n", extractor.GetRegions(Labels)), lang, LangVer);
+			var extractor = new RegionsExtractor(content, LangId);
+			yield return new CodeBlock(String.Join("\r\n\r\n", extractor.GetRegions(Labels)), LangId, LangVer);
+		}
+
+		protected void FillProperties(CourseSettings settings, Lesson lesson)
+		{
+			if (File == null)
+				File = lesson.DefaultIncludeFile;
+			if (LangId == null)
+				LangId = (Path.GetExtension(File) ?? "").Trim('.');
+			if (LangVer == null)
+				LangVer = settings.GetLanguageVersion(LangId);
+			if (Labels == null)
+				Labels = new Label[0];
 		}
 
 		public class Label
@@ -269,6 +278,62 @@ namespace uLearn
 			var slideBlocks = (SlideBlock[])serializer.Deserialize(xmlStream);
 			var newInProgress = filesInProgress.Add(File);
 			return slideBlocks.SelectMany(b => b.BuildUp(fs, newInProgress, settings, lesson));
+		}
+	}
+
+	[XmlType("execirse")]
+	public class ExecirseConfigBlock : IncludeCodeBlock
+	{
+		[XmlElement("inital-code")]
+		public string InitalCode { get; set; }
+
+		[XmlArray("hints")]
+		[XmlArrayItem("hint")]
+		public string[] Hints { get; set; }
+
+		[XmlElement("solution")]
+		public Label Solution { get; set; }
+
+//		[XmlArray("exclude")]
+//		[XmlArrayItem("label")]
+//		public new Label[] Labels { get; set; }
+
+		[XmlElement("comment")]
+		public string Comment { get; set; }
+
+		[XmlElement("expected")]
+		public string ExpectedOutput { get; set; }
+
+		[XmlElement("hide-expected-output")]
+		public bool HideExpectedOutputOnError { get; set; }
+		
+		[XmlElement("validator")]
+		public string Validator { get; set; }
+
+		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress, CourseSettings settings, Lesson lesson)
+		{
+			FillProperties(settings, lesson);
+			var code = fs.GetContent(File);
+			var regionExtractor = new RegionsExtractor(code, LangId);
+			var regionRemover = new RegionRemover(LangId);
+
+			var exerciseCode = code;
+			regionRemover.Remove(ref exerciseCode, Labels.Concat(new[] { Solution }));
+
+			yield return new ExerciseBlock
+			{
+				CommentAfterExerciseIsSolved = Comment,
+				EthalonSolution = regionExtractor.GetRegion(Solution),
+				ExerciseCode = exerciseCode,
+				ExerciseInitialCode = InitalCode.RemoveCommonNesting(),
+				ExpectedOutput = ExpectedOutput,
+				HideExpectedOutputOnError = HideExpectedOutputOnError,
+				HintsMd = Hints.ToList(),
+				IndexToInsertSolution = exerciseCode.Length, // TODO
+				Lang = LangId,
+				LangVer = LangVer,
+				ValidatorName = string.Join(" ", LangId, Validator)
+			};
 		}
 	}
 

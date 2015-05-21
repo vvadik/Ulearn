@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Lesson xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://ulearn.azurewebsites.net/lesson">
+	<title>Первый шаг</title>
+	<id>{90BCB61E-57F0-4BAA-8BC9-10C9CFD27F59}</id>
+	<default-include-file>_FirstStep.cs</default-include-file>
+	<md>
+		Любая, даже самая сложная дорога, начинается с первого шага.
+
+		Выведите на консоль фразу `The first step!`
+
+		Допишите код функции `Main`, а затем запустите и проверьте ваше решение с помощью кнопки Run.
+	</md>
+	
+	<execirse>
+		<output>The first step!</output>
+		<hints>
+			<hint>Вывод на консоль производится методом ```Console.WriteLine```</hint>
+		</hints>
+		<inital-code>
+			static public void Main()
+			{
+				// пишите код тут
+			}
+		</inital-code>
+		<solution>Main</solution>	
+		<comment>Молодец</comment>
+		<expected>The first step!</expected>
+	</execirse>
+</Lesson>

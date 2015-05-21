@@ -28,7 +28,7 @@ namespace uLearn
 				extractors.Add(new CsMembersExtractor(code));
 		}
 
-		private string GetRegion(IncludeCodeBlock.Label label)
+		public string GetRegion(IncludeCodeBlock.Label label)
 		{
 			return extractors.Select(extractor => extractor.GetRegion(label)).FirstOrDefault(res => res != null);
 		}
