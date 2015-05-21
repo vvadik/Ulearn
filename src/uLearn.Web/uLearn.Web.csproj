@@ -1019,7 +1019,6 @@
     <Content Include="Views\Course\_RatesBar.cshtml" />
     <Content Include="Views\Analytics\UsersStatistics.cshtml" />
     <Content Include="Views\Analytics\PersonalStatistics.cshtml" />
-    <Content Include="Views\Course\_SolutionControl.cshtml" />
     <Content Include="Views\SlideNavigation\TableOfContents.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>TableOfContents.generated.cs</LastGenOutput>

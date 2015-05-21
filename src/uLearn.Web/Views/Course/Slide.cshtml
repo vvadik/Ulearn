@@ -1,4 +1,5 @@
 ﻿@using uLearn
+@using uLearn.Web.Views.Course
 @model CoursePageModel
 
 @{
@@ -22,7 +23,7 @@
 				@Html.DisplayFor(m => blocks)
 				@if (Model.Slide is ExerciseSlide)
 				{
-					@Html.Partial("_SolutionControl", Model)
+					@SlideHtml.Block(((ExerciseSlide)Model.Slide).Exercise, Model.BlockRenderContext)
 				}
 				@Html.Partial("_AskBar")
 			</div>
@@ -52,8 +53,9 @@
 	@if (Model.Slide is ExerciseSlide)
 	{
 		var e = (ExerciseSlide) Model.Slide;
+		ExerciseBlockData data = Model.BlockRenderContext.GetBlockData(e.Exercise);
 		<script> getHints("@Model.CourseId", "@Model.Slide.Index", '@e.Exercise.HintsMd.Count') </script>
-		<script> refreshPreviousDraft('@(Model.LatestAcceptedSolution != null)', '@e.Id') </script>
+		<script> refreshPreviousDraft('@(data.LatestAcceptedSolution != null)', '@e.Id') </script>
 	}
 }
 
