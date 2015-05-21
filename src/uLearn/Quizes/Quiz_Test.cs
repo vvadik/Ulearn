@@ -16,9 +16,9 @@ namespace uLearn.Quizes
 			{
 				Title = "Title",
 				Id = "Id",
-				Blocks = new QuizBlock[]
+				Blocks = new SlideBlock[]
 				{
-					new TextBlock {Text = "This is quiz!"},
+					new MdBlock {Markdown = "This is quiz!"},
 					new IsTrueBlock
 					{
 						Id = "1",

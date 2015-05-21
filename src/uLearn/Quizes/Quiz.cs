@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection.PortableExecutable;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
@@ -18,16 +17,16 @@ namespace uLearn.Quizes
 		[XmlElement("title")]
 		public string Title;
 
-		private QuizBlock[] blocks;
+		private SlideBlock[] blocks;
 
-		[XmlElement("p", Type = typeof(TextBlock))]
+		[XmlElement("p", Type = typeof(MdBlock))]
 		[XmlElement("code", Type = typeof(CodeBlock))]
 		[XmlElement("isTrue", Type = typeof(IsTrueBlock))]
 		[XmlElement("choice", Type = typeof(ChoiceBlock))]
 		[XmlElement("fillIn", Type = typeof(FillInBlock))]
-		public QuizBlock[] Blocks
+		public SlideBlock[] Blocks
 		{
-			get { return blocks ?? new QuizBlock[0]; }
+			get { return blocks ?? new SlideBlock[0]; }
 			set { blocks = value; }
 		}
 
@@ -44,45 +43,8 @@ namespace uLearn.Quizes
 			}
 		}
 	}
-
-	public abstract class QuizBlock
-	{
-		public abstract void Validate();
-	}
 	
-	public class TextBlock : QuizBlock
-	{
-		[XmlText]
-		public string Text;
-
-		public override void Validate()
-		{
-			if (string.IsNullOrEmpty(Text)) 
-				throw new FormatException("Quiz TextBlock can't be empty");
-		}
-	}
-
-	public class CodeBlock : QuizBlock
-	{
-		private string text;
-		[XmlAttribute("lang")]
-		public string Lang;
-
-		[XmlText]
-		public string Text
-		{
-			get { return text; }
-			set { text = value.RemoveCommonNesting(); }
-		}
-
-		public override void Validate()
-		{
-			if (string.IsNullOrEmpty(text))
-				throw new FormatException("Quiz TextBlock can't be empty");
-		}
-	}
-
-	public abstract class AbstractQuestionBlock : QuizBlock
+	public abstract class AbstractQuestionBlock : SlideBlock
 	{
 		[XmlAttribute("id")]
 		public string Id;

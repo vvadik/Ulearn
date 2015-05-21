@@ -1,4 +1,5 @@
 ﻿@using uLearn
+@using uLearn.Quizes
 @using uLearn.Web.Views.Course
 @model CoursePageModel
 
@@ -19,8 +20,10 @@
 				{
 					@Html.Action("Quiz", "Quiz", new { slide = Model.Slide as QuizSlide, courseId = Model.CourseId, userId = Model.UserId })
 				}
-
-				@Html.DisplayFor(m => blocks)
+				else
+				{
+					@Html.DisplayFor(m => blocks)
+				}
 				@if (Model.Slide is ExerciseSlide)
 				{
 					@SlideHtml.Block(((ExerciseSlide)Model.Slide).Exercise, Model.BlockRenderContext)

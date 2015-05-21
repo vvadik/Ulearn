@@ -1,6 +1,5 @@
 ﻿@using uLearn
 @using uLearn.Quizes
-@using CodeBlock = uLearn.Quizes.CodeBlock
 @model QuizModel
 @{
 	var quizSlide = Model.Slide;
@@ -10,19 +9,17 @@
 	<h4 id="quiz-status">@status</h4>
 
 	var remains = Model.MaxDropCount - Model.TryNumber + 1;
-	for (var blockIndex = 0; blockIndex < quizSlide.Quiz.Blocks.Length; blockIndex++)
+	for (var blockIndex = 0; blockIndex < quizSlide.Blocks.Length; blockIndex++)
 	{
-		var quizBlock = quizSlide.Quiz.Blocks[blockIndex];
+		var quizBlock = quizSlide.Blocks[blockIndex];
 		var quizModel = new QuizInfoModel(Model, quizBlock, blockIndex, Model.QuizState);
-		var cb = quizBlock as CodeBlock;
-		if (cb != null)
+		if (quizBlock is CodeBlock)
 		{
-			var codeBlock = new uLearn.CodeBlock(cb.Text, cb.Lang);
-			@Html.DisplayFor(m => codeBlock)
+			@Html.DisplayFor(m => quizBlock)
 		}
-		else if (quizBlock is TextBlock)
+		else if (quizBlock is MdBlock)
 		{
-			@Html.Raw(((TextBlock)quizBlock).Text.RenderMd(quizSlide.Info.SlideFile))
+			@Html.Raw(((MdBlock)quizBlock).Markdown.RenderMd(quizSlide.Info.SlideFile))
 		}
 		else if (quizBlock is AbstractQuestionBlock)
 		{
@@ -52,7 +49,7 @@
 			@Html.Partial("_TrueFalseBlock", quizModel)
 
 		}
-		if (quizBlock is AbstractQuestionBlock && blockIndex != quizSlide.Quiz.Blocks.Length - 1)
+		if (quizBlock is AbstractQuestionBlock)
 		{
 			<hr class="quiz-block-delimiter">
 		}
