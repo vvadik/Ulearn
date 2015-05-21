@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using uLearn.Quizes;
 
 namespace uLearn.Web.Models
 {

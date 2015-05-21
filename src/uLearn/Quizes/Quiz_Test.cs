@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Xml.Serialization;
+using ApprovalTests.Reporters;
 using NUnit.Framework;
 
 namespace uLearn.Quizes
@@ -8,7 +9,7 @@ namespace uLearn.Quizes
 	[TestFixture]
 	public class Quiz_Test
 	{
-		[Test]
+		[Test, UseReporter(typeof(DiffReporter))]
 		public void Test()
 		{
 			var serializer = new XmlSerializer(typeof(Quiz));
@@ -57,6 +58,7 @@ namespace uLearn.Quizes
 			var ns = new XmlSerializerNamespaces();
 			ns.Add("x", "http://www.w3.org/2001/XMLSchema-instance");
 			serializer.Serialize(w1, quiz, ns);
+			ApprovalTests.Approvals.Verify(w1.ToString());
 			Console.WriteLine(w1.ToString());
 			Console.WriteLine();
 			var quiz2 = serializer.Deserialize(new StringReader(w1.ToString()));
