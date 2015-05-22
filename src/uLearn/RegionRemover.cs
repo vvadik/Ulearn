@@ -84,8 +84,9 @@ namespace uLearn
 				res = solution.FullSpan.Start;
 				tree = tree.RemoveNode(solution, SyntaxRemoveOptions.KeepNoTrivia);
 			}
-			code = tree.ToFullString();
-			return res;
+			const string pragma = "\n#line 1\n";
+			code = tree.ToFullString().Insert(res, pragma);
+			return res + pragma.Length;
 		}
 	}
 
