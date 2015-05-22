@@ -52,8 +52,6 @@ namespace uLearn
 		{
 			var tree = CSharpSyntaxTree.ParseText(code);
 			members = tree.GetRoot().GetMembers()
-				.Where(node => !node.HasAttribute<HideOnSlideAttribute>())
-				.Select(HideOnSlide)
 				.GroupBy(node => node.Identifier().ValueText)
 				.ToDictionary(
 					nodes => nodes.Key,
@@ -69,14 +67,6 @@ namespace uLearn
 			if (label.OnlyBody)
 				return string.Join("\r\n\r\n", nodes.Select(GetBody));
 			return String.Join("\r\n\r\n", nodes.Select(node => node.ToPrettyString()));
-		}
-
-		private static MemberDeclarationSyntax HideOnSlide(MemberDeclarationSyntax node)
-		{
-			var hide = node.DescendantNodes()
-				.OfType<MemberDeclarationSyntax>()
-				.Where(syntax => syntax.HasAttribute<HideOnSlideAttribute>());
-			return node.RemoveNodes(hide, SyntaxRemoveOptions.KeepLeadingTrivia);
 		}
 
 		private static string GetBody(SyntaxNode node)
