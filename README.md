@@ -1,7 +1,7 @@
 uLearn
 =======
 
-[![Build status](https://ci.appveyor.com/api/projects/status/tokx1fary859l40f?svg=true)](https://ci.appveyor.com/project/xoposhiy/ulearn)
+![Build status](https://tc.skbkontur.ru/app/rest/builds/buildType:\(id:ULearn_Build\)/statusIcon)
 
 E-learning platform and courses
 
