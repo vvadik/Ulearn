@@ -147,11 +147,6 @@ namespace uLearn.Web.DataContexts
 				.ToList();
 		}
 
-		public bool IsUserPassedTask(string courseId, string slideId, string userId)
-		{
-			return db.UserSolutions.Any(x => x.SlideId == slideId && x.UserId == userId && x.IsRightAnswer);
-		}
-
 		public string FindLatestAcceptedSolution(string courseId, string slideId, string userId)
 		{
 			var allUserSolutionOnThisTask = db.UserSolutions

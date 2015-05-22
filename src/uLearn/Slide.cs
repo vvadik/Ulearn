@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,17 +17,20 @@ namespace uLearn
 
 		public Slide(IEnumerable<SlideBlock> blocks, SlideInfo info, string title, string id)
 		{
-			Blocks = blocks.ToArray();
-			Info = info;
-			Title = title;
-			Id = id;
-			MaxScore = 0;
-		}
-
-		public Slide SetIndex(int index)
-		{
-			Info.Index = index;
-			return this;
+			try
+			{
+				Info = info;
+				Title = title;
+				Id = id;
+				MaxScore = 0;
+				Blocks = blocks.ToArray();
+				foreach (var block in Blocks)
+					block.Validate();
+			}
+			catch (Exception e)
+			{
+				throw new FormatException(string.Format("Error in slide {0} (id: {1}). {2}", title, id, e.Message), e);
+			}
 		}
 	}
 }

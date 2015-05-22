@@ -81,36 +81,36 @@ namespace uLearn.Web.Controllers
 				return "already answered";
 			var time = DateTime.Now;
 			var answers = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.QuizId);
-			var quizBlockWithTaskCount = ((QuizSlide)course.Slides[intSlideIndex]).Quiz.Blocks.Count(x => x is FillInBlock || x is IsTrueBlock || x is ChoiceBlock);
+			var quizBlockWithTaskCount = course.Slides[intSlideIndex].Blocks.Count(x => x is AbstractQuestionBlock);
 			var incorrectQuizzes = new List<string>();
 			var fillInBlockType = typeof(FillInBlock);
-			var tmpFolder = new List<QuizInfoForDb>();
+			var allQuizInfos = new List<QuizInfoForDb>();
 			foreach (var ans in answers)
 			{
-				var quizInfo = GetQuizInfo(course, intSlideIndex, ans);
-				foreach (var quizInfoForDb in quizInfo)
+				var quizInfos = CreateQuizInfo(course, intSlideIndex, ans);
+				foreach (var quizInfo in quizInfos)
 				{
-					tmpFolder.Add(quizInfoForDb);
-					if (!quizInfoForDb.IsRightAnswer && quizInfoForDb.QuizType == fillInBlockType)
+					allQuizInfos.Add(quizInfo);
+					if (!quizInfo.IsRightAnswer && quizInfo.QuizType == fillInBlockType)
 						incorrectQuizzes.Add(ans.Key);
 				}
 			}
-			var blocksInAnswerCount = tmpFolder.Select(x => x.QuizId).Distinct().Count();
+			var blocksInAnswerCount = allQuizInfos.Select(x => x.QuizId).Distinct().Count();
 			if (blocksInAnswerCount != quizBlockWithTaskCount)
 				return "has empty blocks";
-			var score = tmpFolder
+			var score = allQuizInfos
 				.Where(forDb => forDb.IsRightQuizBlock)
 				.Select(forDb => forDb.QuizId)
 				.Distinct()
 				.Count();
-			foreach (var quizInfoForDb in tmpFolder)
+			foreach (var quizInfoForDb in allQuizInfos)
 				await userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
 					slideId, quizInfoForDb.Text, userId, time, quizInfoForDb.IsRightQuizBlock);
 			await visitersRepo.AddAttempt(slideId, userId, score);
 			return string.Join("*", incorrectQuizzes.Distinct());
 		}
 
-		private IEnumerable<QuizInfoForDb> GetQuizInfo(Course course, int slideIndex, IGrouping<string, QuizAnswer> answer)
+		private IEnumerable<QuizInfoForDb> CreateQuizInfo(Course course, int slideIndex, IGrouping<string, QuizAnswer> answer)
 		{
 			var slide = (QuizSlide)course.Slides[slideIndex];
 			var block = slide.GetBlockById(answer.Key);
@@ -230,7 +230,7 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<QuizAnswerInfo> GetUserQuizAnswers(string courseId, QuizSlide slide, string userId)
 		{
-			foreach (var block in slide.Quiz.Blocks.OfType<AbstractQuestionBlock>())
+			foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
 				if (block is FillInBlock)
 					yield return userQuizzesRepo.GetFillInBlockAnswerInfo(courseId, slide.Id, block.Id, userId, block.QuestionIndex);
 				else if (block is ChoiceBlock)
@@ -286,7 +286,7 @@ namespace uLearn.Web.Controllers
 		{
 			if (quizSlide == null)
 				return MAX_DROPS_COUNT;
-			var maxDropCount = quizSlide.Quiz.MaxDropCount;
+			var maxDropCount = quizSlide.MaxDropCount;
 			return maxDropCount == 0 ? MAX_DROPS_COUNT : maxDropCount;
 		}
 

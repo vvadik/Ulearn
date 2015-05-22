@@ -3,7 +3,7 @@
 @model QuizAnalyticsModel
 
 @functions {
-	private static int GetColSpan(QuizBlock block)
+	private static int GetColSpan(SlideBlock block)
 	{
 		if (block is ChoiceBlock)
 			return ((ChoiceBlock)block).Items.Length;
@@ -21,14 +21,14 @@
 }
 <h2>Статистика ответов</h2>
 <div>
-	@{ var maxQuestionIndex = Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex).Max(x => x.QuestionIndex);}
+	@{ var maxQuestionIndex = Model.QuizSlide.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex).Max(x => x.QuestionIndex);}
 	<table id="myTable" class="tablesorter">
 		<thead>
 			<tr>
 				<th style="border-bottom: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа" data-sorter="true">наведи на меня!</th>
 				<th style="border-bottom: none">Группа</th>
 				<th style="border-bottom: none" data-sorter="false"></th>
-				@foreach (var block in Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
+				@foreach (var block in Model.QuizSlide.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
 					int count;
 					Model.RightAnswersCount.TryGetValue(block.QuestionIndex.ToString(), out count);
@@ -44,7 +44,7 @@
 				<th style="border-top: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа"></th>
 				<th style="border-top: none"></th>
 				<th style="border-top: none; border-bottom: none" data-sorter="false"></th>
-				@foreach (var block in Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
+				@foreach (var block in Model.QuizSlide.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
 					if (block is ChoiceBlock)
 					{

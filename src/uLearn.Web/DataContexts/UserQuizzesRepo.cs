@@ -64,7 +64,7 @@ namespace uLearn.Web.DataContexts
 			if (slide == null)
 				return null;
 			var answer = new Dictionary<string, List<string>>();
-			foreach (var block in slide.Quiz.Blocks.OfType<AbstractQuestionBlock>())
+			foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
 			{
 				var ans = db.UserQuizzes
 					.Where(x => x.UserId == userId && x.SlideId == slide.Id && x.QuizId == block.Id && !x.isDropped).ToList();

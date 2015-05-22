@@ -93,24 +93,48 @@ namespace uLearn.Web.Controllers
 				slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
 			var userId = User.Identity.GetUserId();
 			var isFirstCourseVisit = !db.Visiters.Any(x => x.UserId == userId);
-			var slideId = course.Slides[slideIndex].Id;
+			var slide = course.Slides[slideIndex];
+			var slideId = slide.Id;
 			await VisitSlide(courseId, slideId);
 			var visiter = visitersRepo.GetVisiter(slideId, User.Identity.GetUserId());
-			var score = Tuple.Create(visiter.Score, course.Slides[slideIndex].MaxScore);
-			var lastAcceptedSolution = solutionsRepo.FindLatestAcceptedSolution(courseId, slideId, userId);
+			var score = Tuple.Create(visiter.Score, slide.MaxScore);
 			var model = new CoursePageModel
 			{
 				UserId = userId,
 				IsFirstCourseVisit = isFirstCourseVisit,
 				CourseId = course.Id,
 				CourseTitle = course.Title,
-				Slide = course.Slides[slideIndex],
-				LatestAcceptedSolution = lastAcceptedSolution,
+				Slide = slide,
 				Rate = GetRate(course.Id, slideId),
 				Score = score,
-				CanSkip = lastAcceptedSolution == null && !visiter.IsSkipped
+				BlockRenderContext = CreateRenderContext(course, slide, userId, visiter)
 			};
 			return model;
+		}
+
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, string userId, Visiters visiter)
+		{
+			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visiter)).ToArray();
+			return new BlockRenderContext(
+				course,
+				slide,
+				slide.Info.DirectoryRelativePath,
+				blockData);
+		}
+
+		private dynamic CreateBlockData(Course course, Slide slide, SlideBlock slideBlock, Visiters visiter)
+		{
+			if (slideBlock is ExerciseBlock)
+			{
+				var lastAcceptedSolution = solutionsRepo.FindLatestAcceptedSolution(course.Id, slide.Id, visiter.UserId);
+				return new ExerciseBlockData(true, visiter.IsSkipped, lastAcceptedSolution)
+				{
+					RunSolutionUrl = Url.Action("RunSolution", "Exercise", new { courseId = course.Id, slideIndex = slide.Index }),
+					AcceptedSolutionUrl = Url.Action("AcceptedSolutions", "Course", new { courseId = course.Id, slideIndex = slide.Index }),
+					GetHintUrl = Url.Action("UseHint", "Hint")
+				};
+			}
+			return null;
 		}
 
 		[Authorize]
@@ -140,7 +164,7 @@ namespace uLearn.Web.Controllers
 		public async Task<string> ApplyRate(string courseId, string slideId, string rate)
 		{
 			var userId = User.Identity.GetUserId();
-			var slideRate = (SlideRates) Enum.Parse(typeof (SlideRates), rate);
+			var slideRate = (SlideRates)Enum.Parse(typeof(SlideRates), rate);
 			return await slideRateRepo.AddRate(courseId, slideId, userId, slideRate);
 		}
 
@@ -157,7 +181,7 @@ namespace uLearn.Web.Controllers
 		public async Task<JsonResult> LikeSolution(int solutionId)
 		{
 			var res = await solutionsRepo.Like(solutionId, User.Identity.GetUserId());
-			return Json(new {likesCount = res.Item1, liked = res.Item2});
+			return Json(new { likesCount = res.Item1, liked = res.Item2 });
 		}
 
 		public async Task VisitSlide(string courseId, string slideId)
@@ -173,7 +197,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize(Roles=LmsRoles.Instructor + "," + LmsRoles.Admin)]
+		[Authorize(Roles = LmsRoles.Instructor + "," + LmsRoles.Admin)]
 		public async Task<ActionResult> RemoveSolution(string courseId, int slideIndex, int solutionId)
 		{
 			var solution = await db.UserSolutions.FirstOrDefaultAsync(s => s.Id == solutionId);
