@@ -10,6 +10,7 @@ namespace uLearn
 	public interface IRegionRemover
 	{
 		IEnumerable<IncludeCodeBlock.Label> Remove(ref string code, IEnumerable<IncludeCodeBlock.Label> labels);
+		int RemoveSolution(ref string code, IncludeCodeBlock.Label label);
 	}
 
 	public class RegionRemover : IRegionRemover
@@ -30,6 +31,17 @@ namespace uLearn
 				labels = regionRemover.Remove(ref code, labels);
 			}
 			return labels.ToList();
+		}
+
+		public int RemoveSolution(ref string code, IncludeCodeBlock.Label label)
+		{
+			foreach (var regionRemover in regionRemovers)
+			{
+				var pos = regionRemover.RemoveSolution(ref code, label);
+				if (pos >= 0)
+					return pos;
+			}
+			return -1;
 		}
 	}
 
@@ -53,6 +65,28 @@ namespace uLearn
 			code = tree.ToFullString();
 			return res;
 		}
+
+		public int RemoveSolution(ref string code, IncludeCodeBlock.Label label)
+		{
+			var tree = CSharpSyntaxTree.ParseText(code).GetRoot();
+			var solution = tree.GetMembers().FirstOrDefault(node => node.Identifier().ValueText == label.Name);
+			if (solution == null)
+				return -1;
+			int res;
+			if (label.OnlyBody)
+			{
+				var body = solution.GetBody();
+				res = body.Span.Start;
+				tree = tree.RemoveNodes(body, SyntaxRemoveOptions.KeepNoTrivia);
+			}
+			else
+			{
+				res = solution.FullSpan.Start;
+				tree = tree.RemoveNode(solution, SyntaxRemoveOptions.KeepNoTrivia);
+			}
+			code = tree.ToFullString();
+			return res;
+		}
 	}
 
 	public class CommonRegionRemover : IRegionRemover
@@ -73,6 +107,16 @@ namespace uLearn
 			}
 
 			return labelsList.Where(label => !regions.ContainsKey(label.Name)).ToList();
+		}
+
+		public int RemoveSolution(ref string code, IncludeCodeBlock.Label label)
+		{
+			var regions = RegionsParser.GetRegions(code);
+			if (!regions.ContainsKey(label.Name))
+				return -1;
+			var region = regions[label.Name];
+			code = code.Remove(region.fullStart, region.fullLength);
+			return region.fullStart;
 		}
 	}
 }

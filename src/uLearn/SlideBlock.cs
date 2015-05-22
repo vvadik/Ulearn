@@ -294,10 +294,6 @@ namespace uLearn
 		[XmlElement("solution")]
 		public Label Solution { get; set; }
 
-//		[XmlArray("exclude")]
-//		[XmlArrayItem("label")]
-//		public new Label[] Labels { get; set; }
-
 		[XmlElement("comment")]
 		public string Comment { get; set; }
 
@@ -318,8 +314,9 @@ namespace uLearn
 			var regionRemover = new RegionRemover(LangId);
 
 			var exerciseCode = code;
-			regionRemover.Remove(ref exerciseCode, Labels.Concat(new[] { Solution }));
-
+			regionRemover.Remove(ref exerciseCode, Labels);
+			var index = regionRemover.RemoveSolution(ref exerciseCode, Solution);
+			
 			yield return new ExerciseBlock
 			{
 				CommentAfterExerciseIsSolved = Comment,
@@ -329,7 +326,7 @@ namespace uLearn
 				ExpectedOutput = ExpectedOutput,
 				HideExpectedOutputOnError = HideExpectedOutputOnError,
 				HintsMd = Hints.ToList(),
-				IndexToInsertSolution = exerciseCode.Length, // TODO
+				IndexToInsertSolution = index, // TODO
 				Lang = LangId,
 				LangVer = LangVer,
 				ValidatorName = string.Join(" ", LangId, Validator)
