@@ -317,20 +317,28 @@ namespace uLearn
 			var regionExtractor = new RegionsExtractor(code, LangId);
 			var regionRemover = new RegionRemover(LangId);
 
+			var prelude = "";
+			var preludeFile = settings.GetPrelude(LangId);
+			if (preludeFile != null)
+				prelude = fs.GetContent(Path.Combine("..", preludeFile));
+
 			var exerciseCode = code;
+			if (LangId == "cs" && prelude != "")
+				exerciseCode = CsMembersRemover.RemoveUsings(exerciseCode);
+
 			regionRemover.Remove(ref exerciseCode, Labels);
-			var index = regionRemover.RemoveSolution(ref exerciseCode, Solution);
+			var index = regionRemover.RemoveSolution(ref exerciseCode, Solution) + prelude.Length;
 			
 			yield return new ExerciseBlock
 			{
 				CommentAfterExerciseIsSolved = Comment,
 				EthalonSolution = regionExtractor.GetRegion(Solution),
-				ExerciseCode = exerciseCode,
+				ExerciseCode = prelude + exerciseCode,
 				ExerciseInitialCode = InitalCode.RemoveCommonNesting(),
 				ExpectedOutput = ExpectedOutput,
 				HideExpectedOutputOnError = HideExpectedOutputOnError,
 				HintsMd = Hints.ToList(),
-				IndexToInsertSolution = index, // TODO
+				IndexToInsertSolution = index,
 				Lang = LangId,
 				LangVer = LangVer,
 				ValidatorName = string.Join(" ", LangId, Validator)

@@ -14,16 +14,24 @@ namespace uLearn
 		[XmlElement("language")]
 		public Language[] DefaultLanguageVersions { get; set; }
 
-		public static readonly CourseSettings DefaultSettings = new CourseSettings(null, new Language("py", "3"));
+		[XmlElement("prelude")]
+		public PreludeFile[] Preludes { get; set; }
+
+		public static readonly CourseSettings DefaultSettings = new CourseSettings(
+			null, 
+			new[] { new Language("py", "3") }, 
+			new [] {new PreludeFile("cs", "Prelude.cs")}
+		);
 
 		public CourseSettings()
 		{
 		}
 
-		public CourseSettings(string title, params Language[] defaultLanguageVersions)
+		public CourseSettings(string title, Language[] defaultLanguageVersions, PreludeFile[] preludes)
 		{
 			Title = title;
 			DefaultLanguageVersions = defaultLanguageVersions;
+			Preludes = preludes;
 		}
 
 		public static CourseSettings Load(DirectoryInfo dir)
@@ -34,6 +42,8 @@ namespace uLearn
 			var settings = file.DeserializeXml<CourseSettings>();
 			if (settings.DefaultLanguageVersions == null)
 				settings.DefaultLanguageVersions = new Language[0];
+			if (settings.Preludes == null)
+				settings.Preludes = new PreludeFile[0];
 			return settings;
 		}
 
@@ -44,6 +54,33 @@ namespace uLearn
 				return DefaultSettings.GetLanguageVersion(language);
 			return res == null ? null : res.Version;
 		}
+
+		public string GetPrelude(string language)
+		{
+			var res = Preludes.FirstOrDefault(file => file.Language == language);
+			if (res == null && Title != null)
+				return DefaultSettings.GetPrelude(language);
+			return res == null ? null : res.File;
+		}
+	}
+
+	public class PreludeFile
+	{
+		public PreludeFile()
+		{
+		}
+
+		public PreludeFile(string language, string file)
+		{
+			Language = language;
+			File = file;
+		}
+
+		[XmlAttribute("language")]
+		public string Language { get; set; }
+
+		[XmlText]
+		public string File { get; set; }
 	}
 
 

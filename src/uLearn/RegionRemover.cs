@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using uLearn.CSharp;
 
 namespace uLearn
@@ -87,6 +88,13 @@ namespace uLearn
 			const string pragma = "\n#line 1\n";
 			code = tree.ToFullString().Insert(res, pragma);
 			return res + pragma.Length;
+		}
+
+		public static string RemoveUsings(string code)
+		{
+			var tree = CSharpSyntaxTree.ParseText(code).GetRoot();
+			var usings = tree.DescendantNodes().OfType<UsingDirectiveSyntax>();
+			return tree.RemoveNodes(usings, SyntaxRemoveOptions.KeepNoTrivia).ToFullString();
 		}
 	}
 
