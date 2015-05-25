@@ -40,6 +40,11 @@ namespace uLearn
 		{
 			return InstructorNotes.SingleOrDefault(n => n.UnitName == unitName);
 		}
+
+		public override string ToString()
+		{
+			return string.Format("Id: {0}, Title: {1}", Id, Title);
+		}
 	}
 
 	public class InstructorNote

@@ -32,5 +32,10 @@ namespace uLearn
 				throw new FormatException(string.Format("Error in slide {0} (id: {1}). {2}", title, id, e.Message), e);
 			}
 		}
+
+		public override string ToString()
+		{
+			return string.Format("Title: {0}, Id: {1}, MaxScore: {2}", Title, Id, MaxScore);
+		}
 	}
 }

@@ -1,0 +1,5 @@
+﻿Courses[0] = Id: AIML, Title: Искусственный интеллект и машинное обучение
+Courses[1] = Id: ForTests, Title: Шаблонный курс
+Courses[2] = Id: Help, Title: Справка для авторов курсов (xml)
+Courses[3] = Id: Linq, Title: Практикум по LINQ
+Courses[4] = Id: OOP, Title: Практикум по объектно-ориентированному программированию
