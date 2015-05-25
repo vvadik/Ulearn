@@ -95,6 +95,7 @@
     <Compile Include="CSharp\BaseStyleValidator.cs" />
     <Compile Include="CSharp\CSharpSlideLoader.cs" />
     <Compile Include="CSharp\CSharpSolutionValidator.cs" />
+    <Compile Include="CSharp\CsMembersExtractor.cs" />
     <Compile Include="CSharp\ExerciseBuilder.cs" />
     <Compile Include="CSharp\BlocksBuilder.cs" />
     <Compile Include="CSharp\ExerciseAttribute.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Quizes\QuizSlideLoader.cs" />
     <Compile Include="RegionRemover.cs" />
     <Compile Include="RegionsExtractor.cs" />
+    <Compile Include="RegionsParser.cs" />
     <Compile Include="SlideInfo.cs" />
     <Compile Include="Markdown_investigation.cs" />
     <Compile Include="Md.cs" />

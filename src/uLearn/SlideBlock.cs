@@ -195,24 +195,21 @@ namespace uLearn
 
 		protected void FillProperties(CourseSettings settings, Lesson lesson)
 		{
-			if (File == null)
-				File = lesson.DefaultIncludeFile;
-			if (LangId == null)
-				LangId = (Path.GetExtension(File) ?? "").Trim('.');
-			if (LangVer == null)
-				LangVer = settings.GetLanguageVersion(LangId);
-			if (Labels == null)
-				Labels = new Label[0];
+			File = File ?? lesson.DefaultIncludeFile;
+			LangId = LangId ?? (Path.GetExtension(File) ?? "").Trim('.');
+			LangVer = LangVer ?? settings.GetLanguageVersion(LangId);
+			Labels = Labels ?? new Label[0];
 		}
+	}
 
-		public class Label
-		{
-			[XmlText]
-			public string Name { get; set; }
+	///<summary>Отметка в коде</summary>
+	public class Label
+	{
+		[XmlText]
+		public string Name { get; set; }
 
-			[XmlAttribute("only-body")]
-			public bool OnlyBody { get; set; }
-		}
+		[XmlAttribute("only-body")]
+		public bool OnlyBody { get; set; }
 	}
 
 	[XmlType("include-md")]
@@ -314,7 +311,7 @@ namespace uLearn
 		{
 			FillProperties(settings, lesson);
 			var code = fs.GetContent(File);
-			var regionExtractor = new RegionsExtractor(code, LangId);
+			var ethalonSolution = new RegionsExtractor(code, LangId).GetRegion(Solution);
 			var regionRemover = new RegionRemover(LangId);
 
 			var prelude = "";
@@ -332,7 +329,7 @@ namespace uLearn
 			yield return new ExerciseBlock
 			{
 				CommentAfterExerciseIsSolved = Comment,
-				EthalonSolution = regionExtractor.GetRegion(Solution),
+				EthalonSolution = ethalonSolution,
 				ExerciseCode = prelude + exerciseCode,
 				ExerciseInitialCode = InitalCode.RemoveCommonNesting(),
 				ExpectedOutput = ExpectedOutput,

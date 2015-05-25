@@ -10,8 +10,8 @@ namespace uLearn
 {
 	public interface IRegionRemover
 	{
-		IEnumerable<IncludeCodeBlock.Label> Remove(ref string code, IEnumerable<IncludeCodeBlock.Label> labels);
-		int RemoveSolution(ref string code, IncludeCodeBlock.Label label);
+		IEnumerable<Label> Remove(ref string code, IEnumerable<Label> labels);
+		int RemoveSolution(ref string code, Label label);
 	}
 
 	public class RegionRemover : IRegionRemover
@@ -25,7 +25,7 @@ namespace uLearn
 			regionRemovers.Add(new CommonRegionRemover());
 		}
 
-		public IEnumerable<IncludeCodeBlock.Label> Remove(ref string code, IEnumerable<IncludeCodeBlock.Label> labels)
+		public IEnumerable<Label> Remove(ref string code, IEnumerable<Label> labels)
 		{
 			foreach (var regionRemover in regionRemovers)
 			{
@@ -34,7 +34,7 @@ namespace uLearn
 			return labels.ToList();
 		}
 
-		public int RemoveSolution(ref string code, IncludeCodeBlock.Label label)
+		public int RemoveSolution(ref string code, Label label)
 		{
 			foreach (var regionRemover in regionRemovers)
 			{
@@ -48,7 +48,7 @@ namespace uLearn
 
 	public class CsMembersRemover : IRegionRemover
 	{
-		private static bool Remove(IncludeCodeBlock.Label label, ref SyntaxNode tree)
+		private static bool Remove(Label label, ref SyntaxNode tree)
 		{
 			var members = tree.GetMembers()
 				.Where(node => node.Identifier().ValueText == label.Name)
@@ -59,7 +59,7 @@ namespace uLearn
 			return true;
 		}
 
-		public IEnumerable<IncludeCodeBlock.Label> Remove(ref string code, IEnumerable<IncludeCodeBlock.Label> labels)
+		public IEnumerable<Label> Remove(ref string code, IEnumerable<Label> labels)
 		{
 			var tree = CSharpSyntaxTree.ParseText(code).GetRoot();
 			var res = labels.Where(label => !Remove(label, ref tree)).ToList();
@@ -67,7 +67,7 @@ namespace uLearn
 			return res;
 		}
 
-		public int RemoveSolution(ref string code, IncludeCodeBlock.Label label)
+		public int RemoveSolution(ref string code, Label label)
 		{
 			var tree = CSharpSyntaxTree.ParseText(code).GetRoot();
 			var solution = tree.GetMembers().FirstOrDefault(node => node.Identifier().ValueText == label.Name);
@@ -100,7 +100,7 @@ namespace uLearn
 
 	public class CommonRegionRemover : IRegionRemover
 	{
-		public IEnumerable<IncludeCodeBlock.Label> Remove(ref string code, IEnumerable<IncludeCodeBlock.Label> labels)
+		public IEnumerable<Label> Remove(ref string code, IEnumerable<Label> labels)
 		{
 			var regions = RegionsParser.GetRegions(code);
 
@@ -118,7 +118,7 @@ namespace uLearn
 			return labelsList.Where(label => !regions.ContainsKey(label.Name)).ToList();
 		}
 
-		public int RemoveSolution(ref string code, IncludeCodeBlock.Label label)
+		public int RemoveSolution(ref string code, Label label)
 		{
 			var regions = RegionsParser.GetRegions(code);
 			if (!regions.ContainsKey(label.Name))
