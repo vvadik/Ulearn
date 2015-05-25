@@ -122,9 +122,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rd /S /Q $(TargetDir)html || echo no html yet
-md $(TargetDir)html
-for %25%25n in (Content, Scripts, katex, flexslider, codemirror, fonts) do xcopy /E $(SolutionDir)uLearn.Web\%25%25n $(TargetDir)html\%25%25n\
+    <PostBuildEvent>REM rd /S /Q $(TargetDir)html || echo no html yet
+REM md $(TargetDir)html
+for %25%25n in (Content, Scripts, katex, flexslider, codemirror, fonts) do xcopy /D /E $(SolutionDir)uLearn.Web\%25%25n $(TargetDir)html\%25%25n\
 </PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
