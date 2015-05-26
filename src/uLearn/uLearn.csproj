@@ -112,6 +112,8 @@
     <Compile Include="CSharp\ICSharpSolutionValidator.cs" />
     <Compile Include="FileExtensions.cs" />
     <Compile Include="ISlideLoader.cs" />
+    <Compile Include="Lessions\CommonSingleRegionExtractor.cs" />
+    <Compile Include="Lessions\CommonSingleRegionExtractor_should.cs" />
     <Compile Include="Lessions\Lesson.cs" />
     <Compile Include="Lessions\LessonSlideLoader.cs" />
     <Compile Include="Markdown2.cs" />
@@ -121,7 +123,7 @@
     <Compile Include="Quizes\Quiz_Test.cs" />
     <Compile Include="Quizes\QuizSlideLoader.cs" />
     <Compile Include="RegionRemover.cs" />
-    <Compile Include="RegionsExtractor.cs" />
+    <Compile Include="Lessions\RegionsExtractor.cs" />
     <Compile Include="RegionsParser.cs" />
     <Compile Include="SlideInfo.cs" />
     <Compile Include="Markdown_investigation.cs" />

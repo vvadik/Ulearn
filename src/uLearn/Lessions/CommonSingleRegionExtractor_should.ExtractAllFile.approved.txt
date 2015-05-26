@@ -1,5 +1,4 @@
-﻿//region all
-namespace uLearn.tests
+﻿namespace uLearn.tests
 {
 	internal class OverloadedMethods : IRunnable
 	{
@@ -32,4 +31,3 @@ namespace uLearn.tests
 	}
 }
 
-//endregion all
