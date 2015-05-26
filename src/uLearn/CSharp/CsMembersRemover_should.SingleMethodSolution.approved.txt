@@ -1,4 +1,6 @@
-﻿//region all
+﻿solution index: 415
+Code:
+//region all
 
 using System;
 using System.IO;
@@ -27,12 +29,7 @@ namespace uLearn.tests
 			return a;
 		}
 
-		//endregion methods_2_and_3
-
-		public void Main()
-		{
-			return;
-		}
+#line 1
 	}
 }
 

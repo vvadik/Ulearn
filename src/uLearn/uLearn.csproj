@@ -97,6 +97,7 @@
     <Compile Include="CSharp\CSharpSolutionValidator.cs" />
     <Compile Include="CSharp\CsMembersExtractor.cs" />
     <Compile Include="CSharp\CsMembersExtractor_should.cs" />
+    <Compile Include="CSharp\CsMembersRemover_should.cs" />
     <Compile Include="CSharp\ExerciseBuilder.cs" />
     <Compile Include="CSharp\BlocksBuilder.cs" />
     <Compile Include="CSharp\ExerciseAttribute.cs" />
@@ -104,6 +105,7 @@
     <Compile Include="CSharp\NamingCaseStyleValidator.cs" />
     <Compile Include="CSharp\RedundantIfStyleValidator.cs" />
     <Compile Include="CSharp\RedundantIfStyleValidator_should.cs" />
+    <Compile Include="CSharp\CsMembersRemover.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="ExerciseBlock.cs" />
     <Compile Include="ISolutionValidator.cs" />

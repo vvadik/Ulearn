@@ -26,13 +26,6 @@ namespace uLearn.tests
 		{
 			return a;
 		}
-
-		//endregion methods_2_and_3
-
-		public void Main()
-		{
-			return;
-		}
 	}
 }
 

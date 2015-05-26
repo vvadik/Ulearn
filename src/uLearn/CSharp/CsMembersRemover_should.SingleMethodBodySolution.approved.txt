@@ -1,4 +1,6 @@
-﻿//region all
+﻿solution index: 477
+Code:
+//region all
 
 using System;
 using System.IO;
@@ -31,7 +33,8 @@ namespace uLearn.tests
 
 		public void Main()
 		{
-			return;
+
+#line 1
 		}
 	}
 }

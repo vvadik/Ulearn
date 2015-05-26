@@ -1,0 +1,20 @@
+﻿//region all
+
+using System;
+using System.IO;
+
+namespace uLearn.tests
+{
+	internal class OverloadedMethods : IRunnable
+	{
+
+		//endregion methods_2_and_3
+
+		public void Main()
+		{
+			return;
+		}
+	}
+}
+
+//endregion all
