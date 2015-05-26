@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using SyntaxExtensions = uLearn.CSharp.SyntaxExtensions;
 
 namespace uLearn.CSharp
 {
@@ -16,7 +15,7 @@ namespace uLearn.CSharp
 		{
 			var tree = CSharpSyntaxTree.ParseText(code);
 			members = tree.GetRoot().GetMembers()
-				.GroupBy(node => SyntaxExtensions.Identifier(node).ValueText)
+				.GroupBy(node => node.Identifier().ValueText)
 				.ToDictionary(
 					nodes => nodes.Key,
 					nodes => nodes.ToList()

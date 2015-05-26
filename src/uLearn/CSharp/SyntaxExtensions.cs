@@ -101,7 +101,10 @@ namespace uLearn.CSharp
 
 		private static string PrettyString(MethodDeclarationSyntax node)
 		{
-			return PrettyString(node, node.Body.OpenBraceToken);
+			var body = node.Body;
+			if (body == null)
+				return node.ToFullString().RemoveCommonNesting();
+			return PrettyString(node, body.OpenBraceToken);
 		}
 
 		private static string PrettyString(BaseTypeDeclarationSyntax node)

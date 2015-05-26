@@ -96,6 +96,7 @@
     <Compile Include="CSharp\CSharpSlideLoader.cs" />
     <Compile Include="CSharp\CSharpSolutionValidator.cs" />
     <Compile Include="CSharp\CsMembersExtractor.cs" />
+    <Compile Include="CSharp\CsMembersExtractor_should.cs" />
     <Compile Include="CSharp\ExerciseBuilder.cs" />
     <Compile Include="CSharp\BlocksBuilder.cs" />
     <Compile Include="CSharp\ExerciseAttribute.cs" />
@@ -160,6 +161,9 @@
     <Compile Include="tests\ExerciseWithHints.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="tests\NonClassTypes.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="tests\lesson\Slide1.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
@@ -179,6 +183,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="tests\NestedClass.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="tests\OverloadedMethods.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="tests\SlideWithComments.cs">
