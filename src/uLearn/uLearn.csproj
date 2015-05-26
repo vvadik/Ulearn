@@ -122,6 +122,7 @@
     <Compile Include="Quizes\QuizSlide.cs" />
     <Compile Include="Quizes\Quiz_Test.cs" />
     <Compile Include="Quizes\QuizSlideLoader.cs" />
+    <Compile Include="RegionParser_should.cs" />
     <Compile Include="RegionRemover.cs" />
     <Compile Include="Lessions\RegionsExtractor.cs" />
     <Compile Include="RegionsParser.cs" />

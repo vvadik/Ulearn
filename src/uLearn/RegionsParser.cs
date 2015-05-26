@@ -6,7 +6,7 @@ namespace uLearn
 {
 	public static class RegionsParser
 	{
-		public class Region
+		public class Region : IEquatable<Region>
 		{
 			public readonly int dataStart;
 			public readonly int dataLength;
@@ -20,6 +20,47 @@ namespace uLearn
 				this.fullStart = fullStart;
 				this.fullLength = fullLength;
 			}
+
+			#region EqualsAndToString
+
+			public bool Equals(Region other)
+			{
+				if (ReferenceEquals(null, other))
+					return false;
+				if (ReferenceEquals(this, other))
+					return true;
+				return dataStart == other.dataStart && dataLength == other.dataLength && fullStart == other.fullStart && fullLength == other.fullLength;
+			}
+
+			public override bool Equals(object obj)
+			{
+				if (ReferenceEquals(null, obj))
+					return false;
+				if (ReferenceEquals(this, obj))
+					return true;
+				if (obj.GetType() != GetType())
+					return false;
+				return Equals((Region)obj);
+			}
+
+			public override int GetHashCode()
+			{
+				unchecked
+				{
+					var hashCode = dataStart;
+					hashCode = (hashCode * 397) ^ dataLength;
+					hashCode = (hashCode * 397) ^ fullStart;
+					hashCode = (hashCode * 397) ^ fullLength;
+					return hashCode;
+				}
+			}
+
+			public override string ToString()
+			{
+				return string.Format("data: ({0}, {1}); full: ({2}, {3})", dataStart, dataLength, fullStart, fullLength);
+			}
+
+			#endregion
 		}
 
 		public static Dictionary<string, Region> GetRegions(string code)
