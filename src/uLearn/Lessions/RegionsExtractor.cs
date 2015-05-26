@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using uLearn.CSharp;
 
 namespace uLearn.Lessions
@@ -31,12 +30,7 @@ namespace uLearn.Lessions
 
 		public IEnumerable<string> GetRegions(IEnumerable<Label> labels)
 		{
-			return labels.Select(GetRegion).Where(s => s != null).Select(FixEolns);
-		}
-
-		private static string FixEolns(string arg)
-		{
-			return Regex.Replace(arg.Trim(), "(\t*\r*\n){3,}", "\r\n\r\n");
+			return labels.Select(GetRegion).Where(s => s != null).Select(s => s.FixExtraEolns());
 		}
 	}
 }

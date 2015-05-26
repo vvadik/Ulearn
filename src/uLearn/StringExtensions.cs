@@ -30,7 +30,7 @@ namespace uLearn
 
 		public static string[] SplitToLinesWithEoln(this string text)
 		{
-			return Regex.Split(text, @"(?<=\r?\n)");
+			return Regex.Split(text, @"(?<=\r?\n)").Where(s => !string.IsNullOrEmpty(s)).ToArray();
 		}
 
 		public static string RemoveCommonNesting(this string text)
@@ -51,7 +51,6 @@ namespace uLearn
 			return string.Join("\n", lines.Concat(Enumerable.Repeat("", Math.Max(0, minLinesCount - lines.Length))));
 		}
 
-
 		public static IEnumerable<string> RemoveCommonNesting(this IList<string> lines)
 		{
 			var nonEmptyLines = lines.Where(line => line.Trim().Length > 0).ToList();
@@ -65,6 +64,11 @@ namespace uLearn
 			{
 				return Enumerable.Repeat("", lines.Count());
 			}
+		}
+
+		public static string FixExtraEolns(this string arg)
+		{
+			return Regex.Replace(arg.Trim(), "(\t*\r?\n){3,}", "\r\n\r\n");
 		}
 	}
 }
