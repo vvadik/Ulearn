@@ -114,6 +114,8 @@
     <Compile Include="CSharp\ICSharpSolutionValidator.cs" />
     <Compile Include="FileExtensions.cs" />
     <Compile Include="ISlideLoader.cs" />
+    <Compile Include="Lessions\CommonRegionRemover.cs" />
+    <Compile Include="Lessions\CommonRegionRemover_should.cs" />
     <Compile Include="Lessions\CommonSingleRegionExtractor.cs" />
     <Compile Include="Lessions\CommonSingleRegionExtractor_should.cs" />
     <Compile Include="Lessions\Lesson.cs" />
@@ -125,7 +127,7 @@
     <Compile Include="Quizes\Quiz_Test.cs" />
     <Compile Include="Quizes\QuizSlideLoader.cs" />
     <Compile Include="RegionParser_should.cs" />
-    <Compile Include="RegionRemover.cs" />
+    <Compile Include="Lessions\RegionRemover.cs" />
     <Compile Include="Lessions\RegionsExtractor.cs" />
     <Compile Include="RegionsParser.cs" />
     <Compile Include="SlideInfo.cs" />
@@ -220,6 +222,11 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="tests\regions.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
