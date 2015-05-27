@@ -33,7 +33,17 @@ namespace uLearn.tests
 		{
 			return;
 		}
+
+		private static void Region()
+		{
+		}
 	}
 }
+
+/*
+region Region
+Not method
+endregion Region 
+ */
 
 //endregion all
