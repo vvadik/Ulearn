@@ -27,6 +27,7 @@ namespace uLearn.Lessions
 			{
 				labels = regionRemover.Remove(ref code, labels);
 			}
+			code = code.FixExtraEolns();
 			return labels.ToList();
 		}
 
@@ -35,8 +36,10 @@ namespace uLearn.Lessions
 			foreach (var regionRemover in regionRemovers)
 			{
 				var pos = regionRemover.RemoveSolution(ref code, label);
-				if (pos >= 0)
-					return pos;
+				if (pos < 0)
+					continue;
+				code = code.FixExtraEolns();
+				return pos;
 			}
 			return -1;
 		}

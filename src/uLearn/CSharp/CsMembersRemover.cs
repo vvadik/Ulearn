@@ -16,7 +16,10 @@ namespace uLearn.CSharp
 				.ToList();
 			if (!members.Any())
 				return false;
-			tree = tree.RemoveNodes(label.OnlyBody ? members.SelectMany(syntax => syntax.GetBody()) : members, SyntaxRemoveOptions.KeepNoTrivia);
+			if (label.OnlyBody)
+				tree = tree.RemoveNodes(members.SelectMany(syntax => syntax.GetBody()), SyntaxRemoveOptions.KeepNoTrivia);
+			else
+				tree = tree.RemoveNodes(members, SyntaxRemoveOptions.KeepExteriorTrivia);
 			return true;
 		}
 
@@ -44,7 +47,7 @@ namespace uLearn.CSharp
 			else
 			{
 				res = solution.FullSpan.Start;
-				tree = tree.RemoveNode(solution, SyntaxRemoveOptions.KeepNoTrivia);
+				tree = tree.RemoveNode(solution, SyntaxRemoveOptions.KeepExteriorTrivia);
 			}
 			const string pragma = "\r\n#line 1\r\n";
 			code = tree.ToFullString().Insert(res, pragma);
