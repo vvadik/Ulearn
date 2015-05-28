@@ -120,6 +120,7 @@
     <Compile Include="Lessions\CommonSingleRegionExtractor_should.cs" />
     <Compile Include="Lessions\Lesson.cs" />
     <Compile Include="Lessions\LessonSlideLoader.cs" />
+    <Compile Include="Lessions\RegionRemover_should.cs" />
     <Compile Include="Lessions\RegionsExtractor_should.cs" />
     <Compile Include="Markdown2.cs" />
     <Compile Include="NullValidator.cs" />
