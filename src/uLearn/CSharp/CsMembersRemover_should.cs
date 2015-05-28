@@ -23,6 +23,13 @@ namespace uLearn.CSharp
 			return code;
 		}
 
+		private string RemoveRegions(params Label[] regions)
+		{
+			var code = LoadCode();
+			new CsMembersRemover().Remove(ref code, regions);
+			return code;
+		}
+
 		[Test, UseReporter(typeof(DiffReporter))]
 		public void SingleMethod()
 		{
@@ -80,6 +87,24 @@ namespace uLearn.CSharp
 		{
 			var code = LoadCode();
 			Approvals.Verify(CsMembersRemover.RemoveUsings(code));
+		}
+
+		[Test, UseReporter(typeof(DiffReporter))]
+		public void RemoveManyMethods()
+		{
+			Approvals.Verify(RemoveRegions(new Label { Name = "Method" }, new Label { Name = "Main" }));
+		}
+
+		[Test, UseReporter(typeof(DiffReporter))]
+		public void RemoveManyMethodsSameBody()
+		{
+			Approvals.Verify(RemoveRegions(new Label { Name = "Method", OnlyBody = true }, new Label { Name = "Main" }));
+		}
+
+		[Test, UseReporter(typeof(DiffReporter))]
+		public void RemoveManyMethodsAllBody()
+		{
+			Approvals.Verify(RemoveRegions(new Label { Name = "Method", OnlyBody = true }, new Label { Name = "Main", OnlyBody = true }));
 		}
 	}
 }
