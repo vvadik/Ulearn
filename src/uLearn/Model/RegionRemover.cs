@@ -2,7 +2,7 @@
 using System.Linq;
 using uLearn.CSharp;
 
-namespace uLearn.Lessions
+namespace uLearn.Model
 {
 	public interface IRegionRemover
 	{

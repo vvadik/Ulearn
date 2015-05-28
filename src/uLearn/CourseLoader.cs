@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using uLearn.CSharp;
-using uLearn.Lessions;
+using uLearn.Model;
 using uLearn.Quizes;
 
 namespace uLearn

@@ -2,28 +2,27 @@
 using ApprovalTests;
 using ApprovalTests.Reporters;
 using NUnit.Framework;
-using uLearn.CSharp;
 
-namespace uLearn.Lessions
+namespace uLearn.Model
 {
 	[TestFixture]
 	public class RegionRemover_should
 	{
-		private readonly FileSystem fs = new FileSystem(new DirectoryInfo("tests"));
+		private static readonly DirectoryInfo dir = new DirectoryInfo("tests");
 
-		private string LoadCode(string file = "OverloadedMethods.cs")
+		private static string LoadCode(string file = "OverloadedMethods.cs")
 		{
-			return fs.GetContent(file);
+			return dir.GetFile(file).ContentAsUtf8();
 		}
 
-		private string RemoveRegion(string region, bool onlyBody = false, string langId = "cs")
+		private static string RemoveRegion(string region, bool onlyBody = false, string langId = "cs")
 		{
 			var code = LoadCode();
 			new RegionRemover(langId).Remove(ref code, new[] { new Label { Name = region, OnlyBody = onlyBody } });
 			return code;
 		}
 
-		private string RemoveRegions(string langId, params Label[] regions)
+		private static string RemoveRegions(string langId, params Label[] regions)
 		{
 			var code = LoadCode();
 			new RegionRemover(langId).Remove(ref code, regions);

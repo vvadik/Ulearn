@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace uLearn.Lessions
+namespace uLearn.Model
 {
 	public class CommonRegionRemover : IRegionRemover
 	{

@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using uLearn.CSharp;
 
-namespace uLearn.Lessions
+namespace uLearn.Model
 {
 	public class LessonSlideLoader : ISlideLoader
 	{

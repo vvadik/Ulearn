@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using uLearn.CSharp;
-using uLearn.Lessions;
+using uLearn.Model;
 
 namespace uLearn
 {

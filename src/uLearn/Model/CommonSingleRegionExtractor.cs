@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace uLearn.Lessions
+namespace uLearn.Model
 {
 	public class CommonSingleRegionExtractor : ISingleRegionExtractor
 	{

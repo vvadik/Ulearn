@@ -2,18 +2,17 @@
 using ApprovalTests;
 using ApprovalTests.Reporters;
 using NUnit.Framework;
-using uLearn.CSharp;
 
-namespace uLearn.Lessions
+namespace uLearn.Model
 {
 	[TestFixture]
 	public class CommonSingleRegionExtractor_should
 	{
-		private readonly FileSystem fs = new FileSystem(new DirectoryInfo("tests"));
+		private static readonly DirectoryInfo dir = new DirectoryInfo("tests");
 
 		private string GetRegion(string region, string fileName = "OverloadedMethods.cs")
 		{
-			var code = fs.GetContent(fileName);
+			var code = dir.GetFile(fileName).ContentAsUtf8();
 			var extractor = new CommonSingleRegionExtractor(code);
 			return extractor.GetRegion(new Label { Name = region });
 		}

@@ -4,7 +4,7 @@ using ApprovalTests;
 using ApprovalTests.Reporters;
 using NUnit.Framework;
 
-namespace uLearn.Lessions
+namespace uLearn.Model
 {
 	[TestFixture]
 	public class CommonRegionRemover_should

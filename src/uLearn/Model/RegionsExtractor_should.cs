@@ -3,7 +3,7 @@ using ApprovalTests;
 using ApprovalTests.Reporters;
 using NUnit.Framework;
 
-namespace uLearn.Lessions
+namespace uLearn.Model
 {
 	[TestFixture]
 	public class RegionsExtractor_should
