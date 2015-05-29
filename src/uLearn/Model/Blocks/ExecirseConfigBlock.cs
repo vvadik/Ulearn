@@ -52,8 +52,11 @@ namespace uLearn.Model.Blocks
 			if (LangId == "cs" && prelude != "")
 				exerciseCode = CsMembersRemover.RemoveUsings(exerciseCode);
 
-			regionRemover.Remove(ref exerciseCode, RemovedLabels);
-			var index = regionRemover.RemoveSolution(ref exerciseCode, Solution) + prelude.Length;
+			IEnumerable<Label> notRemoved;
+			exerciseCode = regionRemover.Remove(exerciseCode, RemovedLabels, out notRemoved);
+			int index;
+			exerciseCode = regionRemover.RemoveSolution(exerciseCode, Solution, out index);
+			index += prelude.Length;
 			
 			yield return new ExerciseBlock
 			{

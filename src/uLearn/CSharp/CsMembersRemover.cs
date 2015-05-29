@@ -24,20 +24,22 @@ namespace uLearn.CSharp
 			return true;
 		}
 
-		public IEnumerable<Label> Remove(ref string code, IEnumerable<Label> labels)
+		public string Remove(string code, IEnumerable<Label> labels, out IEnumerable<Label> notRemoved)
 		{
 			var tree = CSharpSyntaxTree.ParseText(code).GetRoot();
-			var res = labels.Where(label => !Remove(label, ref tree)).ToList();
-			code = tree.ToFullString();
-			return res;
+			notRemoved = labels.Where(label => !Remove(label, ref tree)).ToList();
+			return tree.ToFullString();
 		}
 
-		public int RemoveSolution(ref string code, Label label)
+		public string RemoveSolution(string code, Label label, out int index)
 		{
 			var tree = CSharpSyntaxTree.ParseText(code).GetRoot();
 			var solution = tree.GetMembers().FirstOrDefault(node => node.Identifier().ValueText == label.Name);
 			if (solution == null)
-				return -1;
+			{
+				index = -1;
+				return code;
+			}
 			int res;
 			if (label.OnlyBody)
 			{
@@ -51,8 +53,8 @@ namespace uLearn.CSharp
 				tree = tree.RemoveNode(solution, SyntaxRemoveOptions.KeepExteriorTrivia);
 			}
 			const string pragma = "\r\n#line 1\r\n";
-			code = tree.ToFullString().Insert(res, pragma);
-			return res + pragma.Length;
+			index = res + pragma.Length;
+			return tree.ToFullString().Insert(res, pragma);
 		}
 
 		public static string RemoveUsings(string code)

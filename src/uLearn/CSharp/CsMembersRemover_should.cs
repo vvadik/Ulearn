@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using ApprovalTests;
 using ApprovalTests.Reporters;
@@ -20,14 +22,18 @@ namespace uLearn.CSharp
 		private string RemoveRegion(string region, bool onlyBody = false)
 		{
 			var code = LoadCode();
-			new CsMembersRemover().Remove(ref code, new[] { new Label { Name = region, OnlyBody = onlyBody } });
+			IEnumerable<Label> notRemoved;
+			code = new CsMembersRemover().Remove(code, new[] { new Label { Name = region, OnlyBody = onlyBody } }, out notRemoved);
+			Assert.IsEmpty(notRemoved);
 			return code;
 		}
 
 		private string RemoveRegions(params Label[] regions)
 		{
 			var code = LoadCode();
-			new CsMembersRemover().Remove(ref code, regions);
+			IEnumerable<Label> notRemoved;
+			code = new CsMembersRemover().Remove(code, regions, out notRemoved);
+			Assert.IsEmpty(notRemoved);
 			return code;
 		}
 
@@ -71,7 +77,8 @@ namespace uLearn.CSharp
 		public void SingleMethodSolution()
 		{
 			var code = LoadCode();
-			var index = new CsMembersRemover().RemoveSolution(ref code, new Label { Name = "Main" });
+			int index;
+			code = new CsMembersRemover().RemoveSolution(code, new Label { Name = "Main" }, out index);
 			Approvals.Verify(String.Format("solution index: {0}\r\nCode:\r\n{1}", index, code));
 		}
 
@@ -79,7 +86,8 @@ namespace uLearn.CSharp
 		public void SingleMethodBodySolution()
 		{
 			var code = LoadCode();
-			var index = new CsMembersRemover().RemoveSolution(ref code, new Label { Name = "Main", OnlyBody = true });
+			int index;
+			code = new CsMembersRemover().RemoveSolution(code, new Label { Name = "Main", OnlyBody = true }, out index);
 			Approvals.Verify(String.Format("solution index: {0}\r\nCode:\r\n{1}", index, code));
 		}
 

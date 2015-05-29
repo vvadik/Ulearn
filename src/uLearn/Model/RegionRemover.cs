@@ -7,8 +7,8 @@ namespace uLearn.Model
 {
 	public interface IRegionRemover
 	{
-		IEnumerable<Label> Remove(ref string code, IEnumerable<Label> labels);
-		int RemoveSolution(ref string code, Label label);
+		string Remove(string code, IEnumerable<Label> labels, out IEnumerable<Label> notRemoved);
+		string RemoveSolution(string code, Label label, out int index);
 	}
 
 	public class RegionRemover : IRegionRemover
@@ -22,27 +22,28 @@ namespace uLearn.Model
 			regionRemovers.Add(new CommonRegionRemover());
 		}
 
-		public IEnumerable<Label> Remove(ref string code, IEnumerable<Label> labels)
+		public string Remove(string code, IEnumerable<Label> labels, out IEnumerable<Label> notRemoved)
 		{
 			foreach (var regionRemover in regionRemovers)
 			{
-				labels = regionRemover.Remove(ref code, labels);
+				code = regionRemover.Remove(code, labels, out notRemoved);
+				labels = notRemoved;
 			}
-			code = code.FixExtraEolns();
-			return labels.ToList();
+			notRemoved = labels.ToList();
+			return code.FixExtraEolns();
 		}
 
-		public int RemoveSolution(ref string code, Label label)
+		public string RemoveSolution(string code, Label label, out int index)
 		{
 			foreach (var regionRemover in regionRemovers)
 			{
-				var pos = regionRemover.RemoveSolution(ref code, label);
-				if (pos < 0)
+				regionRemover.RemoveSolution(code, label, out index);
+				if (index < 0)
 					continue;
-				code = code.FixExtraEolns();
-				return pos;
+				return code.FixExtraEolns();
 			}
-			return -1;
+			index = -1;
+			return code;
 		}
 	}
 }

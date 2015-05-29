@@ -7,7 +7,7 @@ namespace uLearn.Model
 {
 	public class CommonRegionRemover : IRegionRemover
 	{
-		public IEnumerable<Label> Remove(ref string code, IEnumerable<Label> labels)
+		public string Remove(string code, IEnumerable<Label> labels, out IEnumerable<Label> notRemoved)
 		{
 			var regions = RegionsParser.GetRegions(code);
 
@@ -22,17 +22,22 @@ namespace uLearn.Model
 				prevStart = region.fullStart;
 			}
 
-			return labelsList.Where(label => !regions.ContainsKey(label.Name)).ToList();
+			notRemoved = labelsList.Where(label => !regions.ContainsKey(label.Name)).ToList();
+			return code;
 		}
 
-		public int RemoveSolution(ref string code, Label label)
+		public string RemoveSolution(string code, Label label, out int index)
 		{
 			var regions = RegionsParser.GetRegions(code);
 			if (!regions.ContainsKey(label.Name))
-				return -1;
+			{
+				index = -1;
+				return code;
+			}
+
 			var region = regions[label.Name];
-			code = code.Remove(region.fullStart, region.fullLength);
-			return region.fullStart;
+			index = region.fullStart;
+			return code.Remove(region.fullStart, region.fullLength);
 		}
 	}
 }

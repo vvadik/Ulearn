@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using ApprovalTests;
 using ApprovalTests.Reporters;
@@ -16,7 +17,9 @@ namespace uLearn.Model
 		{
 			var code = dir.GetFile(file).ContentAsUtf8();
 			var remover = new CommonRegionRemover();
-			Assert.IsEmpty(remover.Remove(ref code, labels.Select(s => new Label { Name = s })));
+			IEnumerable<Label> notRemoved;
+			code = remover.Remove(code, labels.Select(s => new Label { Name = s }), out notRemoved);
+			Assert.IsEmpty(notRemoved);
 			return code;
 		}
 

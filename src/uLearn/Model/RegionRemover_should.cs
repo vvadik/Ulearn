@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using ApprovalTests;
 using ApprovalTests.Reporters;
 using NUnit.Framework;
@@ -19,14 +20,18 @@ namespace uLearn.Model
 		private static string RemoveRegion(string region, bool onlyBody = false, string langId = "cs")
 		{
 			var code = LoadCode();
-			new RegionRemover(langId).Remove(ref code, new[] { new Label { Name = region, OnlyBody = onlyBody } });
+			IEnumerable<Label> notRemoved;
+			code = new RegionRemover(langId).Remove(code, new[] { new Label { Name = region, OnlyBody = onlyBody } }, out notRemoved);
+			Assert.IsEmpty(notRemoved);
 			return code;
 		}
 
 		private static string RemoveRegions(string langId, params Label[] regions)
 		{
 			var code = LoadCode();
-			new RegionRemover(langId).Remove(ref code, regions);
+			IEnumerable<Label> notRemoved;
+			code = new RegionRemover(langId).Remove(code, regions, out notRemoved);
+			Assert.IsEmpty(notRemoved);
 			return code;
 		}
 
