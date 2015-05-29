@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using uLearn.Quizes;
+using uLearn.Model.Blocks;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 

@@ -9,41 +9,41 @@
 	
 	<md>###Класс Code</md>
 	<include-code>
-		<label>Code</label>
+		<display>Code</display>
 	</include-code>
 	
 	<md>###Метод A</md>
 	<include-code>
-		<label>A</label>
+		<display>A</display>
 	</include-code>
 	
 	<md>###Методы B и A</md>
 	<include-code>
-		<label>B</label>
-		<label>A</label>
+		<display>B</display>
+		<display>A</display>
 	</include-code>
 	
 	<md>###Класс Code. Только тело</md>
 	<include-code>
-		<label only-body="true">Code</label>
+		<display only-body="true">Code</display>
 	</include-code>
 	
 	<md>###Метод A. Только тело</md>
 	<include-code>
-		<label only-body="true">A</label>
+		<display only-body="true">A</display>
 	</include-code>
 
 	<md>###Enum</md>
 	<include-code>
-		<label>Enum</label>
+		<display>Enum</display>
 	</include-code>
 	
 	<md>###Регион</md>
 	<include-code>
-		<label>CSharpStyleRegion</label>
+		<display>CSharpStyleRegion</display>
 	</include-code>
 	<include-code>
-		<label>CommentRegion</label>
+		<display>CommentRegion</display>
 	</include-code>
 
 	<md>###Питон весь файл</md>
@@ -51,6 +51,6 @@
 
 	<md>###Питон регион main</md>
 	<include-code file="HelloWorld.py" lang_ver="3">
-		<label>main</label>
+		<display>main</display>
 	</include-code>
 </Lesson>

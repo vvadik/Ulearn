@@ -27,6 +27,7 @@ namespace uLearn.Web.Views.Course
     using System.Web.UI;
     using System.Web.WebPages;
     using uLearn;
+	using uLearn.Model.Blocks;
     using uLearn.Web.Models;
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "2.0.0.0")]

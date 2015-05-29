@@ -1,4 +1,5 @@
 ﻿using System.Xml.Serialization;
+using uLearn.Model.Blocks;
 
 namespace uLearn.Model
 {

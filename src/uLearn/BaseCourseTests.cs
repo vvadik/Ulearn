@@ -7,6 +7,7 @@ using System.Net;
 using System.Reflection;
 using System.Threading;
 using NUnit.Framework;
+using uLearn.Model.Blocks;
 
 namespace uLearn
 {

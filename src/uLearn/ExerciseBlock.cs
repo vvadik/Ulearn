@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using uLearn.Model.Blocks;
 
 namespace uLearn
 {
@@ -40,7 +41,7 @@ namespace uLearn
 		{
 			if (ReferenceEquals(null, obj)) return false;
 			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != this.GetType()) return false;
+			if (obj.GetType() != GetType()) return false;
 			return Equals((ExerciseBlock)obj);
 		}
 
