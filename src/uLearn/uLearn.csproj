@@ -107,7 +107,6 @@
     <Compile Include="CSharp\RedundantIfStyleValidator_should.cs" />
     <Compile Include="CSharp\CsMembersRemover.cs" />
     <Compile Include="EnumerableExtensions.cs" />
-    <Compile Include="ExerciseBlock.cs" />
     <Compile Include="ISolutionValidator.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />
@@ -115,7 +114,7 @@
     <Compile Include="FileExtensions.cs" />
     <Compile Include="ISlideLoader.cs" />
     <Compile Include="Model\Blocks\CodeBlock.cs" />
-    <Compile Include="Model\Blocks\ExecirseConfigBlock.cs" />
+    <Compile Include="Model\Blocks\ExerciseBlock.cs" />
     <Compile Include="Model\Blocks\ImageGaleryBlock.cs" />
     <Compile Include="Model\Blocks\IncludeBlocksBlock.cs" />
     <Compile Include="Model\Blocks\IncludeCode.cs" />

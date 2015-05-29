@@ -253,7 +253,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"sphere-engine
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea class=\'code code-exercise\' data-lang=\"");
 
 
-      WebViewPage.WriteTo(@__razor_helper_writer, block.Lang);
+      WebViewPage.WriteTo(@__razor_helper_writer, block.LangId);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">");
 
