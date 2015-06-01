@@ -101,6 +101,7 @@
     <Compile Include="CSharp\ExerciseBuilder.cs" />
     <Compile Include="CSharp\BlocksBuilder.cs" />
     <Compile Include="CSharp\ExerciseAttribute.cs" />
+    <Compile Include="FileSystem.cs" />
     <Compile Include="CSharp\NamingCaseChecker_should.cs" />
     <Compile Include="CSharp\NamingCaseStyleValidator.cs" />
     <Compile Include="CSharp\RedundantIfStyleValidator.cs" />
