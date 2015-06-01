@@ -47,10 +47,7 @@ namespace uLearn.Model.Blocks
 			if (preludeFile != null)
 				prelude = fs.GetContent(Path.Combine("..", preludeFile));
 
-			var exerciseCode = code;
-			if (LangId == "cs" && prelude != "")
-				exerciseCode = CsMembersRemover.RemoveUsings(code);
-
+			var exerciseCode = regionRemover.Prepare(code);
 			IEnumerable<Label> notRemoved;
 			exerciseCode = regionRemover.Remove(exerciseCode, RemovedLabels, out notRemoved);
 			int index;

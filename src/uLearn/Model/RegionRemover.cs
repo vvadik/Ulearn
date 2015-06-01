@@ -9,6 +9,7 @@ namespace uLearn.Model
 	{
 		string Remove(string code, IEnumerable<Label> labels, out IEnumerable<Label> notRemoved);
 		string RemoveSolution(string code, Label label, out int index);
+		string Prepare(string code);
 	}
 
 	public class RegionRemover : IRegionRemover
@@ -44,6 +45,11 @@ namespace uLearn.Model
 			}
 			index = -1;
 			return code;
+		}
+
+		public string Prepare(string code)
+		{
+			return regionRemovers.Aggregate(code, (current, regionRemover) => regionRemover.Prepare(current));
 		}
 	}
 }

@@ -57,6 +57,11 @@ namespace uLearn.CSharp
 			return tree.ToFullString().Insert(res, pragma);
 		}
 
+		public string Prepare(string code)
+		{
+			return RemoveUsings(code);
+		}
+
 		public static string RemoveUsings(string code)
 		{
 			var tree = CSharpSyntaxTree.ParseText(code).GetRoot();

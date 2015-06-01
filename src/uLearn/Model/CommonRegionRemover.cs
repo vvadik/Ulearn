@@ -39,5 +39,10 @@ namespace uLearn.Model
 			index = region.fullStart;
 			return code.Remove(region.fullStart, region.fullLength);
 		}
+
+		public string Prepare(string code)
+		{
+			return code;
+		}
 	}
 }
