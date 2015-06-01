@@ -20,7 +20,7 @@
 			@foreach (AcceptedSolutionInfo solution in Model.AcceptedSolutions)
 			{
 				var id = "solution_" + solution.Id;
-				var code = new CodeBlock(solution.Code, Model.Slide.Exercise.Lang);
+				var code = new CodeBlock(solution.Code, Model.Slide.Exercise.LangId);
 				<div id="@id">
 					<button class="like-left-location btn @(solution.LikedAlready ? "btn-primary" : "btn-default") like-button" onclick="likeSolution(@solution.Id)">
 						<i class="glyphicon glyphicon-heart"></i>
