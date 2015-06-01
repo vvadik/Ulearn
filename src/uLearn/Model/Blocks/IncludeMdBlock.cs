@@ -19,9 +19,9 @@ namespace uLearn.Model.Blocks
 		{
 		}
 
-		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress, CourseSettings settings, Lesson lesson)
+		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
-			yield return new MdBlock(fs.GetContent(File));
+			yield return new MdBlock(context.FileSystem.GetContent(File));
 		}
 	}
 }

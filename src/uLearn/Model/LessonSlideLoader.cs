@@ -16,7 +16,8 @@ namespace uLearn.Model
 		{
 			var lesson = file.DeserializeXml<Lesson>();
 			var fs = new FileSystem(file.Directory);
-			var blocks = lesson.Blocks.SelectMany(b => b.BuildUp(fs, ImmutableHashSet<string>.Empty, settings, lesson)).ToList();
+			var context = new BuildUpContext(fs, settings, lesson);
+			var blocks = lesson.Blocks.SelectMany(b => b.BuildUp(context, ImmutableHashSet<string>.Empty)).ToList();
 			var slideInfo = new SlideInfo(unitName, file, slideIndex);
 			if (blocks.OfType<ExerciseBlock>().Any())
 				return new ExerciseSlide(blocks, slideInfo, lesson.Title, lesson.Id);

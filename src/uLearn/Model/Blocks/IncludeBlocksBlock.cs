@@ -22,16 +22,16 @@ namespace uLearn.Model.Blocks
 		{
 		}
 
-		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress, CourseSettings settings, Lesson lesson)
+		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
 			if (filesInProgress.Contains(File))
 				throw new Exception("Cyclic dependency");
 
-			var xmlStream = new StringReader(fs.GetContent(File));
+			var xmlStream = new StringReader(context.FileSystem.GetContent(File));
 			var serializer = new XmlSerializer(typeof(SlideBlock[]));
 			var slideBlocks = (SlideBlock[])serializer.Deserialize(xmlStream);
 			var newInProgress = filesInProgress.Add(File);
-			return slideBlocks.SelectMany(b => b.BuildUp(fs, newInProgress, settings, lesson));
+			return slideBlocks.SelectMany(b => b.BuildUp(context, newInProgress));
 		}
 	}
 }

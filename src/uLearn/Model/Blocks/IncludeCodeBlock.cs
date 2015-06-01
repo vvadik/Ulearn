@@ -21,11 +21,11 @@ namespace uLearn.Model.Blocks
 		}
 
 
-		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress, CourseSettings settings, Lesson lesson)
+		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
-			FillProperties(settings, lesson);
+			FillProperties(context);
 			DisplayLabels = DisplayLabels ?? new Label[0];
-			var content = fs.GetContent(File);
+			var content = context.FileSystem.GetContent(File);
 
 			if (DisplayLabels.Length == 0)
 			{

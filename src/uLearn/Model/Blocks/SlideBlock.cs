@@ -9,7 +9,7 @@ namespace uLearn.Model.Blocks
 		{
 		}
 
-		public virtual IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress, CourseSettings settings, Lesson lesson)
+		public virtual IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
 			yield return this;
 		}

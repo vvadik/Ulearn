@@ -24,11 +24,11 @@ namespace uLearn.Model.Blocks
 		public string LangVer { get; set; }
 
 
-		protected void FillProperties(CourseSettings settings, Lesson lesson)
+		protected void FillProperties(BuildUpContext context)
 		{
-			File = File ?? lesson.DefaultIncludeFile;
+			File = File ?? context.Lesson.DefaultIncludeFile;
 			LangId = LangId ?? (Path.GetExtension(File) ?? "").Trim('.');
-			LangVer = LangVer ?? settings.GetLanguageVersion(LangId);
+			LangVer = LangVer ?? context.CourseSettings.GetLanguageVersion(LangId);
 		}
 	}
 }

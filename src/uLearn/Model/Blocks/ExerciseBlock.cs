@@ -34,17 +34,17 @@ namespace uLearn.Model.Blocks
 		[XmlElement("validator")]
 		public string ValidatorName { get; set; }
 
-		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress, CourseSettings settings, Lesson lesson)
+		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
-			FillProperties(settings, lesson);
+			FillProperties(context);
 			RemovedLabels = RemovedLabels ?? new Label[0];
-			var code = fs.GetContent(File);
+			var code = context.FileSystem.GetContent(File);
 			var regionRemover = new RegionRemover(LangId);
 
 			var prelude = "";
-			var preludeFile = settings.GetPrelude(LangId);
+			var preludeFile = context.CourseSettings.GetPrelude(LangId);
 			if (preludeFile != null)
-				prelude = fs.GetContent(Path.Combine("..", preludeFile));
+				prelude = context.FileSystem.GetContent(Path.Combine("..", preludeFile));
 
 			var exerciseCode = regionRemover.Prepare(code);
 			IEnumerable<Label> notRemoved;

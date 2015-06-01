@@ -127,6 +127,7 @@
     <Compile Include="Model\Blocks\SlideBlockExtensions.cs" />
     <Compile Include="Model\Blocks\TexBlock.cs" />
     <Compile Include="Model\Blocks\YoutubeBlock.cs" />
+    <Compile Include="Model\BuildUpContext.cs" />
     <Compile Include="Model\CommonRegionRemover.cs" />
     <Compile Include="Model\CommonRegionRemover_should.cs" />
     <Compile Include="Model\CommonSingleRegionExtractor.cs" />
