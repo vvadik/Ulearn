@@ -39,6 +39,7 @@ namespace uLearn.Model.Blocks
 			RemovedLabels = RemovedLabels ?? new Label[0];
 			var code = context.FileSystem.GetContent(File);
 			var regionRemover = new RegionRemover(LangId);
+			var extractor = context.GetExtractor(File, LangId, code);
 
 			var prelude = "";
 			var preludeFile = context.CourseSettings.GetPrelude(LangId);
@@ -55,7 +56,7 @@ namespace uLearn.Model.Blocks
 			ExerciseInitialCode = ExerciseInitialCode.RemoveCommonNesting();
 			ExerciseCode = prelude + exerciseCode;
 			IndexToInsertSolution = index;
-			EthalonSolution = new RegionsExtractor(code, LangId).GetRegion(SolutionLabel);
+			EthalonSolution = extractor.GetRegion(SolutionLabel);
 			ValidatorName = string.Join(" ", LangId, ValidatorName);
 
 			yield return this;

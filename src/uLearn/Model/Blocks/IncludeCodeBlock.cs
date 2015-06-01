@@ -25,15 +25,15 @@ namespace uLearn.Model.Blocks
 		{
 			FillProperties(context);
 			DisplayLabels = DisplayLabels ?? new Label[0];
-			var content = context.FileSystem.GetContent(File);
 
 			if (DisplayLabels.Length == 0)
 			{
+				var content = context.FileSystem.GetContent(File);
 				yield return new CodeBlock(content, LangId, LangVer);
 				yield break;
 			}
 
-			var extractor = new RegionsExtractor(content, LangId);
+			var extractor = context.GetExtractor(File, LangId);
 			yield return new CodeBlock(String.Join("\r\n\r\n", extractor.GetRegions(DisplayLabels)), LangId, LangVer);
 		}
 	}

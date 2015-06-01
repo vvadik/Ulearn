@@ -13,9 +13,13 @@ namespace uLearn.Model
 	public class RegionsExtractor
 	{
 		private readonly List<ISingleRegionExtractor> extractors;
+		public readonly string file;
+		public readonly string langId;
 
-		public RegionsExtractor(string code, string langId)
+		public RegionsExtractor(string code, string langId, string file = null)
 		{
+			this.file = file;
+			this.langId = langId;
 			extractors = new List<ISingleRegionExtractor>
 			{
 				new CommonSingleRegionExtractor(code)
