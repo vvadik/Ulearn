@@ -15,9 +15,9 @@ namespace uLearn.Model
 	{
 		private readonly List<IRegionRemover> regionRemovers = new List<IRegionRemover>();
 
-		public RegionRemover(string language)
+		public RegionRemover(string langId)
 		{
-			if (language == "cs")
+			if (langId == "cs")
 				regionRemovers.Add(new CsMembersRemover());
 			regionRemovers.Add(new CommonRegionRemover());
 		}

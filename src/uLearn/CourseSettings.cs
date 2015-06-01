@@ -47,19 +47,19 @@ namespace uLearn
 			return settings;
 		}
 
-		public string GetLanguageVersion(string language)
+		public string GetLanguageVersion(string langId)
 		{
-			var res = DefaultLanguageVersions.FirstOrDefault(lang => lang.Name == language);
+			var res = DefaultLanguageVersions.FirstOrDefault(lang => lang.Name == langId);
 			if (res == null && Title != null)
-				return DefaultSettings.GetLanguageVersion(language);
+				return DefaultSettings.GetLanguageVersion(langId);
 			return res == null ? null : res.Version;
 		}
 
-		public string GetPrelude(string language)
+		public string GetPrelude(string langId)
 		{
-			var res = Preludes.FirstOrDefault(file => file.Language == language);
+			var res = Preludes.FirstOrDefault(file => file.LangId == langId);
 			if (res == null && Title != null)
-				return DefaultSettings.GetPrelude(language);
+				return DefaultSettings.GetPrelude(langId);
 			return res == null ? null : res.File;
 		}
 	}
@@ -70,14 +70,14 @@ namespace uLearn
 		{
 		}
 
-		public PreludeFile(string language, string file)
+		public PreludeFile(string langId, string file)
 		{
-			Language = language;
+			LangId = langId;
 			File = file;
 		}
 
 		[XmlAttribute("language")]
-		public string Language { get; set; }
+		public string LangId { get; set; }
 
 		[XmlText]
 		public string File { get; set; }

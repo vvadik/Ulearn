@@ -17,10 +17,10 @@ namespace uLearn.Model.Blocks
 		[XmlAttribute("file")]
 		public string File { get; set; }
 
-		[XmlAttribute("lang_id")]
+		[XmlAttribute("lang-id")]
 		public string LangId { get; set; }
 
-		[XmlAttribute("lang_ver")]
+		[XmlAttribute("lang-ver")]
 		public string LangVer { get; set; }
 
 

@@ -14,13 +14,13 @@ namespace uLearn.Model
 	{
 		private readonly List<ISingleRegionExtractor> extractors;
 
-		public RegionsExtractor(string code, string language)
+		public RegionsExtractor(string code, string langId)
 		{
 			extractors = new List<ISingleRegionExtractor>
 			{
 				new CommonSingleRegionExtractor(code)
 			};
-			if (language == "cs")
+			if (langId == "cs")
 				extractors.Add(new CsMembersExtractor(code));
 		}
 

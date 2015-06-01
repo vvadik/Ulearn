@@ -17,9 +17,9 @@ namespace uLearn.Model.Blocks
 			set { code = value.RemoveCommonNesting().TrimEnd(); }
 		}
 
-		[XmlAttribute("lang")]
+		[XmlAttribute("lang-id")]
 		public string Lang { get; set; }
-		[XmlAttribute("ver")]
+		[XmlAttribute("lang-ver")]
 		public string Version { get; set; }
 
 		public CodeBlock(string code, string lang, string version = null)

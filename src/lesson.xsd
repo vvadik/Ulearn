@@ -57,8 +57,8 @@
 	<xs:complexType name="Code">
 		<xs:simpleContent>
 			<xs:extension base="notEmptyString">
-				<xs:attribute name="lang" type="notEmptyString" use="required" />
-				<xs:attribute name="ver" type="notEmptyString" use="optional" />
+				<xs:attribute name="lang-id" type="notEmptyString" use="required" />
+				<xs:attribute name="lang-ver" type="notEmptyString" use="optional" />
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -80,8 +80,8 @@
 	<xs:complexType name="IncludeCode">
 		<xs:complexContent>
 			<xs:extension base="Include">
-			<xs:attribute name="lang_id" type="notEmptyString" use="optional" />
-			<xs:attribute name="lang_ver" type="notEmptyString" use="optional" />
+			<xs:attribute name="lang-id" type="notEmptyString" use="optional" />
+			<xs:attribute name="lang-ver" type="notEmptyString" use="optional" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
