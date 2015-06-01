@@ -99,10 +99,9 @@
 			<xs:extension base="IncludeCode">
 				<xs:sequence>
 					<xs:element name="inital-code" type="xs:string" />
-					<xs:element name="hints" type="HintsList" minOccurs="0" />
+					<xs:element name="hint" type="notEmptyString" minOccurs="0" maxOccurs="unbounded"/>
 					<xs:element name="solution" type="notEmptyString" />
 					<xs:element name="remove" type="Label" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="exclude" type="LabelsList" minOccurs="0" />
 					<xs:element name="comment" type="notEmptyString" minOccurs="0" />
 					<xs:element name="expected" type="xs:string" />
 					<xs:element name="hide-expected-output" type="xs:boolean" minOccurs="0" />
@@ -111,16 +110,5 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-
-	<xs:complexType name="HintsList">
-		<xs:sequence>
-			<xs:element name="hint" type="notEmptyString" minOccurs="0" />
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="LabelsList">
-		<xs:sequence>
-			<xs:element name="label" type="Label"/>
-		</xs:sequence>
-	</xs:complexType>
+	
 </xs:schema>

@@ -20,9 +20,7 @@
 			// пишите код тут
 			}
 		</inital-code>
-		<hints>
-			<hint>Вывод на консоль производится методом ```Console.WriteLine```</hint>
-		</hints>
+		<hint>Вывод на консоль производится методом ```Console.WriteLine```</hint>
 		<solution>Main</solution>
 		<comment>Молодец</comment>
 		<expected>The first step!</expected>

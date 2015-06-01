@@ -11,8 +11,7 @@ namespace uLearn.Model.Blocks
 		[XmlElement("inital-code")]
 		public string ExerciseInitialCode { get; set; }
 
-		[XmlArray("hints")]
-		[XmlArrayItem("hint")]
+		[XmlElement("hint")]
 		public List<string> Hints { get; set; }
 
 		[XmlElement("solution")]
