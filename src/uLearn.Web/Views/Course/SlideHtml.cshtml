@@ -29,7 +29,7 @@
 
 @helper Block(CodeBlock block, BlockRenderContext context)
 {
-	<textarea class='code code-sample' data-lang="@block.Lang" data-ver="@block.Version">@block.Code</textarea>
+	<textarea class='code code-sample' data-lang="@block.LangId" data-ver="@block.LangVer">@block.Code</textarea>
 }
 
 @helper Block(TexBlock block, BlockRenderContext context)

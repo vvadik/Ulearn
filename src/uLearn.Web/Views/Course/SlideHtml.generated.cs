@@ -113,12 +113,12 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea class=\'code code-sample\' data-lang=\"");
 
 
-    WebViewPage.WriteTo(@__razor_helper_writer, block.Lang);
+    WebViewPage.WriteTo(@__razor_helper_writer, block.LangId);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-ver=\"");
 
 
-                           WebViewPage.WriteTo(@__razor_helper_writer, block.Version);
+                           WebViewPage.WriteTo(@__razor_helper_writer, block.LangVer);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">");
 

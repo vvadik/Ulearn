@@ -17,15 +17,15 @@ namespace uLearn.Model.Blocks
 		}
 
 		[XmlAttribute("lang-id")]
-		public string Lang { get; set; }
+		public string LangId { get; set; }
 		[XmlAttribute("lang-ver")]
-		public string Version { get; set; }
+		public string LangVer { get; set; }
 
-		public CodeBlock(string code, string lang, string version = null)
+		public CodeBlock(string code, string langId, string langVer = null)
 		{
 			Code = code;
-			Lang = lang;
-			Version = version;
+			LangId = langId;
+			LangVer = langVer;
 		}
 
 		public CodeBlock()
@@ -34,14 +34,14 @@ namespace uLearn.Model.Blocks
 
 		public override IEnumerable<SlideBlock> BuildUp(IFileSystem fs, IImmutableSet<string> filesInProgress, CourseSettings settings, Lesson lesson)
 		{
-			if (Version == null)
-				Version = settings.GetLanguageVersion(Lang);
+			if (LangVer == null)
+				LangVer = settings.GetLanguageVersion(LangId);
 			yield return this;
 		}
 
 		public override string ToString()
 		{
-			return string.Format("{0} code {1}", Lang, Code);
+			return string.Format("{0} code {1}", LangId, Code);
 		}
 	}
 }
