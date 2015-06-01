@@ -106,6 +106,7 @@
 					<xs:element name="expected" type="xs:string" />
 					<xs:element name="hide-expected-output" type="xs:boolean" minOccurs="0" />
 					<xs:element name="validator" type="notEmptyString" minOccurs="0" />
+					<xs:element name="prelude" type="notEmptyString" minOccurs="0" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
