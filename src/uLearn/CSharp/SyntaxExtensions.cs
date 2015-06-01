@@ -104,12 +104,12 @@ namespace uLearn.CSharp
 			var body = node.Body;
 			if (body == null)
 				return node.ToFullString().RemoveCommonNesting();
-			return PrettyString(node, body.OpenBraceToken);
+			return PrettyString(node, body.CloseBraceToken);
 		}
 
 		private static string PrettyString(BaseTypeDeclarationSyntax node)
 		{
-			return PrettyString(node, node.OpenBraceToken);
+			return PrettyString(node, node.CloseBraceToken);
 		}
 
 		private static string PrettyString(MemberDeclarationSyntax node)
