@@ -1,4 +1,4 @@
-﻿solution index: 466
+﻿solution index: 452
 Code:
 //region all
 
@@ -31,9 +31,9 @@ namespace uLearn.tests
 
 		//endregion methods_2_and_3
 
-		public void Main()
-		{
-		}
+		
+#line 1
+
 
 		private static void Region()
 		{

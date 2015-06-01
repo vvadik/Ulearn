@@ -10,6 +10,8 @@ namespace uLearn.CSharp
 {
 	public class CsMembersRemover : IRegionRemover
 	{
+		public const string Pragma = "\r\n#line 1\r\n";
+
 		private static bool Remove(Label label, ref SyntaxNode tree)
 		{
 			var members = tree.GetMembers()
@@ -40,21 +42,20 @@ namespace uLearn.CSharp
 				index = -1;
 				return code;
 			}
-			int res;
 			if (label.OnlyBody)
 			{
 				var body = solution.GetBody();
-				res = body.FullSpan.Start;
+				index = body.FullSpan.Start;
 				tree = tree.RemoveNodes(body, SyntaxRemoveOptions.KeepNoTrivia);
 			}
 			else
 			{
-				res = solution.FullSpan.Start;
+				index = solution.Span.Start;
 				tree = tree.RemoveNode(solution, SyntaxRemoveOptions.KeepExteriorTrivia);
 			}
-			const string pragma = "\r\n#line 1\r\n";
-			index = res + pragma.Length;
-			return tree.ToFullString().Insert(res, pragma);
+
+			code = tree.ToFullString();
+			return code;
 		}
 
 		public string Prepare(string code)

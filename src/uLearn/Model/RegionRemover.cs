@@ -15,12 +15,18 @@ namespace uLearn.Model
 	public class RegionRemover : IRegionRemover
 	{
 		private readonly List<IRegionRemover> regionRemovers = new List<IRegionRemover>();
+		private readonly string pragma;
 
 		public RegionRemover(string langId)
 		{
 			if (langId == "cs")
+			{
 				regionRemovers.Add(new CsMembersRemover());
+				pragma = CsMembersRemover.Pragma;
+			}
 			regionRemovers.Add(new CommonRegionRemover());
+			if (pragma == null)
+				pragma = "";
 		}
 
 		public string Remove(string code, IEnumerable<Label> labels, out IEnumerable<Label> notRemoved)
@@ -38,10 +44,12 @@ namespace uLearn.Model
 		{
 			foreach (var regionRemover in regionRemovers)
 			{
-				regionRemover.RemoveSolution(code, label, out index);
+				code = regionRemover.RemoveSolution(code, label, out index);
 				if (index < 0)
 					continue;
-				return code.FixExtraEolns();
+				code = code.Insert(index, pragma);
+				index += pragma.Length;
+				return code;
 			}
 			index = -1;
 			return code;

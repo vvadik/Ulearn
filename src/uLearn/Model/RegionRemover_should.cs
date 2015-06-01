@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using ApprovalTests;
 using ApprovalTests.Reporters;
@@ -64,6 +65,33 @@ namespace uLearn.Model
 		public void RemovePriority()
 		{
 			Approvals.Verify(RemoveRegion("Region"));
+		}
+
+		[Test, UseReporter(typeof(DiffReporter))]
+		public void SingleMethodSolution()
+		{
+			var code = LoadCode();
+			int index;
+			code = new RegionRemover("cs").RemoveSolution(code, new Label { Name = "Main" }, out index);
+			Approvals.Verify(String.Format("solution index: {0}\r\nCode:\r\n{1}", index, code));
+		}
+
+		[Test, UseReporter(typeof(DiffReporter))]
+		public void SingleMethodSolutionBody()
+		{
+			var code = LoadCode();
+			int index;
+			code = new RegionRemover("cs").RemoveSolution(code, new Label { Name = "Main", OnlyBody = true}, out index);
+			Approvals.Verify(String.Format("solution index: {0}\r\nCode:\r\n{1}", index, code));
+		}
+
+		[Test, UseReporter(typeof(DiffReporter))]
+		public void SingleRegionSolution()
+		{
+			var code = LoadCode();
+			int index;
+			code = new RegionRemover("cs").RemoveSolution(code, new Label { Name = "methods_2_and_3" }, out index);
+			Approvals.Verify(String.Format("solution index: {0}\r\nCode:\r\n{1}", index, code));
 		}
 	}
 }
