@@ -28,6 +28,7 @@ namespace uLearn.Web.Views.Course
     using System.Web.WebPages;
     using uLearn;
     using uLearn.Model.Blocks;
+    using uLearn.Web.Models;
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "2.0.0.0")]
     public static class SlideHtml
@@ -252,12 +253,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"sphere-engine
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea class=\'code code-exercise\' data-lang=\"");
 
 
-      WebViewPage.WriteTo(@__razor_helper_writer, block.Lang);
+      WebViewPage.WriteTo(@__razor_helper_writer, block.LangId);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">");
 
 
-                    WebViewPage.WriteTo(@__razor_helper_writer, data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4));
+                      WebViewPage.WriteTo(@__razor_helper_writer, data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n");
 

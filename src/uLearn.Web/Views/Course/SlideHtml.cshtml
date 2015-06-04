@@ -1,6 +1,7 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
 @using uLearn;
 @using uLearn.Model.Blocks
+@using uLearn.Web.Models
 
 @helper Slide(BlockRenderContext context, int currentScore = 0)
 {
@@ -72,7 +73,7 @@
 	var action = data.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", data.AcceptedSolutionUrl);
 	<textarea id="secretCodeExercise" class='hide'>@block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
 	<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine™</a> and <a target="blank" href="http://codemirror.net/">CodeMirror</a></div>
-	<textarea class='code code-exercise' data-lang="@block.Lang">@(data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+	<textarea class='code code-exercise' data-lang="@block.LangId">@(data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 	<script>
 		function cleanUserCode() {
 			var $secretCodeExercise = $('#secretCodeExercise');
