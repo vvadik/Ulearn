@@ -123,7 +123,7 @@ namespace uLearn.Model.Blocks
 
 		public override string ToString()
 		{
-			return string.Format("Exercise: {0}, Hints: {1}", ExerciseInitialCode, HintsMd);
+			return string.Format("Exercise: {0}, Hints: {1}", ExerciseInitialCode, string.Join("; ", HintsMd));
 		}
 	}
 }

@@ -16,7 +16,7 @@ namespace uLearn.CSharp
 
 		private string LoadCode(string file = "OverloadedMethods.cs")
 		{
-			return fs.GetContent(file);
+			return fs.GetContent(file).LineEndingsToUnixStyle();
 		}
 
 		private string RemoveRegion(string region, bool onlyBody = false)
@@ -37,43 +37,43 @@ namespace uLearn.CSharp
 			return code;
 		}
 
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test]
 		public void SingleMethod()
 		{
 			Approvals.Verify(RemoveRegion("Main"));
 		}
 
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test]
 		public void SingleMethodBody()
 		{
 			Approvals.Verify(RemoveRegion("Main", true));
 		}
 
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test]
 		public void OverloadMethod()
 		{
 			Approvals.Verify(RemoveRegion("Method"));
 		}
 
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test]
 		public void OverloadMethodBody()
 		{
 			Approvals.Verify(RemoveRegion("Method", true));
 		}
 
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test]
 		public void SingleClass()
 		{
 			Approvals.Verify(RemoveRegion("OverloadedMethods"));
 		}
 
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test]
 		public void SingleClassBody()
 		{
 			Approvals.Verify(RemoveRegion("OverloadedMethods", true));
 		}
 
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test]
 		public void SingleMethodSolution()
 		{
 			var code = LoadCode();
@@ -82,7 +82,7 @@ namespace uLearn.CSharp
 			Approvals.Verify(String.Format("solution index: {0}\r\nCode:\r\n{1}", index, code));
 		}
 
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test]
 		public void SingleMethodBodySolution()
 		{
 			var code = LoadCode();
@@ -91,26 +91,26 @@ namespace uLearn.CSharp
 			Approvals.Verify(String.Format("solution index: {0}\r\nCode:\r\n{1}", index, code));
 		}
 
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test]
 		public void RemoveUsings()
 		{
 			var code = LoadCode();
 			Approvals.Verify(CsMembersRemover.RemoveUsings(code));
 		}
 
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test]
 		public void RemoveManyMethods()
 		{
 			Approvals.Verify(RemoveRegions(new Label { Name = "Method" }, new Label { Name = "Main" }));
 		}
 
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test]
 		public void RemoveManyMethodsSameBody()
 		{
 			Approvals.Verify(RemoveRegions(new Label { Name = "Method", OnlyBody = true }, new Label { Name = "Main" }));
 		}
 
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test]
 		public void RemoveManyMethodsAllBody()
 		{
 			Approvals.Verify(RemoveRegions(new Label { Name = "Method", OnlyBody = true }, new Label { Name = "Main", OnlyBody = true }));

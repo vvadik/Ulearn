@@ -13,7 +13,7 @@ namespace uLearn.CSharp
 
 		private string GetRegion(string region, bool onlyBody = false, string fileName = "OverloadedMethods.cs")
 		{
-			var code = fs.GetContent(fileName);
+			var code = fs.GetContent(fileName).LineEndingsToUnixStyle();
 			var extractor = new CsMembersExtractor(code);
 			return extractor.GetRegion(new Label
 			{

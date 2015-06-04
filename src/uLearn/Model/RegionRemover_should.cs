@@ -15,7 +15,7 @@ namespace uLearn.Model
 
 		private static string LoadCode(string file = "OverloadedMethods.cs")
 		{
-			return dir.GetFile(file).ContentAsUtf8();
+			return dir.GetFile(file).ContentAsUtf8().LineEndingsToUnixStyle();
 		}
 
 		private static string RemoveRegion(string region, bool onlyBody = false, string langId = "cs")

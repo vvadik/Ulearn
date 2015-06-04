@@ -1,4 +1,4 @@
-﻿solution index: 466
+﻿solution index: 433
 Code:
 //region all
 
