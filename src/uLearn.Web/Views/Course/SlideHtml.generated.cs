@@ -27,8 +27,7 @@ namespace uLearn.Web.Views.Course
     using System.Web.UI;
     using System.Web.WebPages;
     using uLearn;
-	using uLearn.Model.Blocks;
-    using uLearn.Web.Models;
+    using uLearn.Model.Blocks;
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "2.0.0.0")]
     public static class SlideHtml
@@ -118,12 +117,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea class=\'code cod
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-ver=\"");
 
 
-                           WebViewPage.WriteTo(@__razor_helper_writer, block.LangVer);
+                             WebViewPage.WriteTo(@__razor_helper_writer, block.LangVer);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">");
 
 
-                                           WebViewPage.WriteTo(@__razor_helper_writer, block.Code);
+                                             WebViewPage.WriteTo(@__razor_helper_writer, block.Code);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n");
 
@@ -240,7 +239,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea id=\"secretCodeE
 
      WebViewPage.WriteTo(@__razor_helper_writer, block.ExerciseInitialCode.EnsureEnoughLines(4));
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, ")</textarea>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n");
 
 
 
@@ -253,7 +252,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"sphere-engine
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea class=\'code code-exercise\' data-lang=\"");
 
 
-      WebViewPage.WriteTo(@__razor_helper_writer, block.LangId);
+      WebViewPage.WriteTo(@__razor_helper_writer, block.Lang);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">");
 

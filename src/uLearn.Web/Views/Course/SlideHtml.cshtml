@@ -70,7 +70,7 @@
 {
 	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData();
 	var action = data.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", data.AcceptedSolutionUrl);
-	<textarea id="secretCodeExercise" class='hide'>@block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+	<textarea id="secretCodeExercise" class='hide'>@block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
 	<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine™</a> and <a target="blank" href="http://codemirror.net/">CodeMirror</a></div>
 	<textarea class='code code-exercise' data-lang="@block.Lang">@(data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 	<script>

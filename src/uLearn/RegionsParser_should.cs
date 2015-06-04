@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace uLearn
 {
 	[TestFixture]
-	public class RegionParser_should
+	public class RegionsParser_should
 	{
 		[Test]
 		public void EmptyCode()
