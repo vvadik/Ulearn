@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using uLearn.Model.Blocks;
 
 namespace uLearn.CSharp
 {
@@ -19,7 +20,7 @@ namespace uLearn.CSharp
 			this.prelude = prelude;
 			Exercise = new ExerciseBlock();
 			Exercise.ValidatorName = "cs";
-			Exercise.Lang = langId;
+			Exercise.LangId = langId;
 		}
 
 		public ExerciseBlock BuildBlockFrom(SyntaxTree tree)

@@ -28,10 +28,11 @@
 			<xs:element name="md" type="notEmptyString" />
 			<xs:element name="code" type="Code" />
 			<xs:element name="youtube" type="notEmptyString" />
-			<xs:element name="include-code" type="IncludeCode" />
+			<xs:element name="include-code" type="IncludeCodeBlock" />
 			<xs:element name="include-md" type="Include" />
 			<xs:element name="gallery" type="notEmptyString" />
 			<xs:element name="include-blocks" type="Include" />
+			<xs:element name="execirse" type="Execirse" />
 		</xs:choice>
 	</xs:group>
 
@@ -56,8 +57,8 @@
 	<xs:complexType name="Code">
 		<xs:simpleContent>
 			<xs:extension base="notEmptyString">
-				<xs:attribute name="lang" type="notEmptyString" use="required" />
-				<xs:attribute name="ver" type="notEmptyString" use="optional" />
+				<xs:attribute name="lang-id" type="notEmptyString" use="required" />
+				<xs:attribute name="lang-ver" type="notEmptyString" use="optional" />
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -66,14 +67,21 @@
 		<xs:attribute name="file" type="notEmptyString" use="optional" />
 	</xs:complexType>
 
+	<xs:complexType name="IncludeCodeBlock">
+		<xs:complexContent>
+			<xs:extension base="IncludeCode">
+				<xs:sequence minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="display" type="Label" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
 	<xs:complexType name="IncludeCode">
 		<xs:complexContent>
 			<xs:extension base="Include">
-				<xs:sequence minOccurs="0" maxOccurs="unbounded">
-					<xs:element name="label" type="Label" />
-				</xs:sequence>
-			<xs:attribute name="lang_id" type="notEmptyString" use="optional" />
-			<xs:attribute name="lang_ver" type="notEmptyString" use="optional" />
+			<xs:attribute name="lang-id" type="notEmptyString" use="optional" />
+			<xs:attribute name="lang-ver" type="notEmptyString" use="optional" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -85,4 +93,23 @@
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
+
+	<xs:complexType name="Execirse">
+		<xs:complexContent>
+			<xs:extension base="IncludeCode">
+				<xs:sequence>
+					<xs:element name="inital-code" type="xs:string" />
+					<xs:element name="hint" type="notEmptyString" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="solution" type="notEmptyString" />
+					<xs:element name="remove" type="Label" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="comment" type="notEmptyString" minOccurs="0" />
+					<xs:element name="expected" type="xs:string" />
+					<xs:element name="hide-expected-output" type="xs:boolean" minOccurs="0" />
+					<xs:element name="validator" type="notEmptyString" minOccurs="0" />
+					<xs:element name="prelude" type="notEmptyString" minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
 </xs:schema>

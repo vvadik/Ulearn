@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using uLearn.Model.Blocks;
 
 namespace uLearn.Quizes
 {

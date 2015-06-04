@@ -16,6 +16,7 @@
 		<xs:sequence>
 			<xs:element name="title" type="notEmptyString" />
 			<xs:element name="language" type="Language" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="prelude" type="Prelude" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
 
@@ -30,4 +31,12 @@
 		<xs:attribute name="version" use="required" type="notEmptyString" />
 	</xs:complexType>
 
+	<xs:complexType name="Prelude">
+		<xs:simpleContent>
+			<xs:extension base="notEmptyString">
+				<xs:attribute name="language" type="notEmptyString" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
 </xs:schema>

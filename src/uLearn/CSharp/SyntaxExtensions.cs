@@ -8,6 +8,28 @@ namespace uLearn.CSharp
 {
 	public static class SyntaxExtensions
 	{
+		public static IEnumerable<MemberDeclarationSyntax> GetMembers(this SyntaxNode node)
+		{
+			return node.DescendantNodes()
+				.OfType<MemberDeclarationSyntax>()
+				.Where(n => n is BaseTypeDeclarationSyntax || n is MethodDeclarationSyntax);
+		}
+
+		public static SyntaxList<SyntaxNode> GetBody(this SyntaxNode node)
+		{
+			var method = node as BaseMethodDeclarationSyntax;
+			if (method != null)
+			{
+				var body = method.Body;
+				if (body != null)
+					return body.Statements;
+				return new SyntaxList<SyntaxNode>();
+			}
+			var type = node as TypeDeclarationSyntax;
+			if (type != null)
+				return type.Members;
+			return new SyntaxList<SyntaxNode>();
+		}
 
 		public static IEnumerable<SyntaxNode> GetParents(this SyntaxNode node)
 		{
@@ -79,12 +101,15 @@ namespace uLearn.CSharp
 
 		private static string PrettyString(MethodDeclarationSyntax node)
 		{
-			return PrettyString(node, node.Body.OpenBraceToken);
+			var body = node.Body;
+			if (body == null)
+				return node.ToFullString().RemoveCommonNesting();
+			return PrettyString(node, body.CloseBraceToken);
 		}
 
 		private static string PrettyString(BaseTypeDeclarationSyntax node)
 		{
-			return PrettyString(node, node.OpenBraceToken);
+			return PrettyString(node, node.CloseBraceToken);
 		}
 
 		private static string PrettyString(MemberDeclarationSyntax node)

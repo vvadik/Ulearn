@@ -1,6 +1,7 @@
 ﻿using System.Xml.Serialization;
+using uLearn.Model.Blocks;
 
-namespace uLearn.Lessions
+namespace uLearn.Model
 {
 	[XmlRoot("Lesson", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/lesson")]
 	public class Lesson
@@ -22,6 +23,7 @@ namespace uLearn.Lessions
 		[XmlElement(typeof(IncludeCodeBlock))]
 		[XmlElement(typeof(IncludeMdBlock))]
 		[XmlElement(typeof(IncludeImageGalleryBlock))]
+		[XmlElement(typeof(ExerciseBlock))]
 		public SlideBlock[] Blocks;
 
 		public Lesson()

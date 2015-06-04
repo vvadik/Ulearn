@@ -1,4 +1,4 @@
-﻿using uLearn.Quizes;
+﻿using uLearn.Model.Blocks;
 
 namespace uLearn.Web.Models
 {

@@ -2,47 +2,48 @@
 <Lesson xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://ulearn.azurewebsites.net/lesson">
 	<title>Код</title>
 	<id>C1DA3BA7256142D58F245CCEF2B176A0</id>
+	<default-include-file>_Code.cs</default-include-file>
 	
 	<md>###Весь файл</md>
-	<include-code file="_Code.cs" />
+	<include-code />
 	
 	<md>###Класс Code</md>
-	<include-code file="_Code.cs">
-		<label>Code</label>
+	<include-code>
+		<display>Code</display>
 	</include-code>
 	
 	<md>###Метод A</md>
-	<include-code file="_Code.cs">
-		<label>A</label>
+	<include-code>
+		<display>A</display>
 	</include-code>
 	
 	<md>###Методы B и A</md>
-	<include-code file="_Code.cs">
-		<label>B</label>
-		<label>A</label>
+	<include-code>
+		<display>B</display>
+		<display>A</display>
 	</include-code>
 	
 	<md>###Класс Code. Только тело</md>
-	<include-code file="_Code.cs">
-		<label only-body="true">Code</label>
+	<include-code>
+		<display only-body="true">Code</display>
 	</include-code>
 	
 	<md>###Метод A. Только тело</md>
-	<include-code file="_Code.cs">
-		<label only-body="true">A</label>
+	<include-code>
+		<display only-body="true">A</display>
 	</include-code>
 
 	<md>###Enum</md>
-	<include-code file="_Code.cs">
-		<label>Enum</label>
+	<include-code>
+		<display>Enum</display>
 	</include-code>
 	
 	<md>###Регион</md>
-	<include-code file="_Code.cs">
-		<label>CSharpStyleRegion</label>
+	<include-code>
+		<display>CSharpStyleRegion</display>
 	</include-code>
-	<include-code file="_Code.cs">
-		<label>CommentRegion</label>
+	<include-code>
+		<display>CommentRegion</display>
 	</include-code>
 
 	<md>###Питон весь файл</md>
@@ -50,6 +51,6 @@
 
 	<md>###Питон регион main</md>
 	<include-code file="HelloWorld.py" lang_ver="3">
-		<label>main</label>
+		<display>main</display>
 	</include-code>
 </Lesson>

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Xml.Serialization;
 using NUnit.Framework;
-using uLearn.Lessions;
+using uLearn.Model;
 
 namespace uLearn.utils
 {

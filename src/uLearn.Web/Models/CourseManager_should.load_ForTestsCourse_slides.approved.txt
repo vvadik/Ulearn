@@ -1,0 +1,9 @@
+﻿Slides[0] = Title: S010_TextBlocks, Id: {108C89D9-36F0-45E3-BBEE-B93AC971063F}, MaxScore: 0
+Slides[1] = Title: S011_GoodTeX, Id: {118C89D9-36F0-45E3-BBEE-B93AC971063F}, MaxScore: 0
+Slides[2] = Title: S012_WrongTeX, Id: {128C89D9-36F0-45E3-BBEE-B93AC971063F}, MaxScore: 0
+Slides[3] = Title: S013_VideoBlock, Id: {138C89D9-36F0-45E3-BBEE-B93AC971063F}, MaxScore: 0
+Slides[4] = Title: S014_CodeBlock, Id: {148C89D9-36F0-45E3-BBEE-B93AC971063F}, MaxScore: 0
+Slides[5] = ExerciseSlide: Exercise: public static void Print()
+{
+}, Hints: System.Collections.Generic.List`1[System.String]
+Slides[6] = Title: Шаблонный тест, Id: {42E607B8-E7D8-4D96-B3B6-B0CDED8BA8A8}, MaxScore: 3

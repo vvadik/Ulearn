@@ -1,20 +1,17 @@
 ﻿using System;
-using uLearn;
 
 namespace Presentation.Slides.U99_Presentation
 {
 	public class Code
 	{
-#region CSharpStyleRegion
+		#region CSharpStyleRegion
 		public int C;
 
 		private int E { get; set; }
-#endregion CSharpStyleRegion
+		#endregion CSharpStyleRegion
 
 		//region CommentRegion
 
-		// field D is hidden
-		[HideOnSlide]
 		public int D;
 
 		// info
@@ -28,8 +25,6 @@ namespace Presentation.Slides.U99_Presentation
 
 		// just comment
 
-		// public void A(int a) is hidden
-		[HideOnSlide]
 		public void A(int a)
 		{
 		}

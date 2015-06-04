@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using uLearn.Model.Blocks;
 
 namespace uLearn.CSharp
 {
