@@ -82,7 +82,7 @@ namespace uLearn
 				endregion c
 				region error2
 			";
-			var regions = RegionsParser.GetRegions(code);
+			var regions = RegionsParser.GetRegions(string.Join("\r\n", code.SplitToLines()));
 			var expected = new Dictionary<string, RegionsParser.Region>
 			{
 				{ "a", new RegionsParser.Region(38, 14, 24, 45) },

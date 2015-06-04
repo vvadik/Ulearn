@@ -10,7 +10,7 @@ namespace uLearn.Web.Models
 	[TestFixture]
 	public class CourseManager_should
 	{
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test]
 		public void load_all_courses()
 		{
 			var manager = WebCourseManager.Instance;
@@ -25,7 +25,7 @@ namespace uLearn.Web.Models
 			Approvals.VerifyAll(courses.Where(c => !c.Id.StartsWith("BasicProgramming")), "Courses");
 		}
 
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test]
 		public void load_ForTestsCourse_slides()
 		{
 			var manager = WebCourseManager.Instance;
