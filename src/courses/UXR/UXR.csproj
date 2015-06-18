@@ -79,9 +79,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Slides\L000 - Введение в Usability\S099 - Quiz.quiz.xml" />
     <Content Include="Slides\L000 - Введение в Usability\Title.txt" />
+    <Content Include="Slides\L010 - Сбор первичной информации\S999 - Quiz.quiz.xml" />
     <Content Include="Slides\L010 - Сбор первичной информации\Title.txt" />
+    <Content Include="Slides\L020 - Usability-тестирование\S999 - Quiz.quiz.xml" />
     <Content Include="Slides\L020 - Usability-тестирование\Title.txt" />
+    <Content Include="Slides\L030 - Исследование UX после релиза\S999 - Quiz.quiz.xml" />
     <Content Include="Slides\L030 - Исследование UX после релиза\Title.txt" />
     <Content Include="Slides\Title.txt" />
   </ItemGroup>
