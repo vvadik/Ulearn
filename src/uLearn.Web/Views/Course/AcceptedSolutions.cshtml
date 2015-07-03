@@ -1,46 +1,43 @@
 ﻿@using uLearn
-@using uLearn.Model.Blocks
+@using uLearn.Web.Views.Course
 @model AcceptedSolutionsPageModel
 
 @{
 	ViewBag.Title = Model.CourseTitle;
 }
+@if (!Model.IsLti)
+{
+	@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId })
 
-@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId })
-
-<div class="slide-container">
-	<div class="container body-content">
-		<div class="row">
-			<div id="LikeSolutionUrl" data-url="@Url.Action("LikeSolution")"></div>
-			<h1 class='page-header'>Решения</h1>
-			<p>@Html.Raw(Model.Slide.Exercise.CommentAfterExerciseIsSolved.RenderMd(Model.Slide.Info.SlideFile))</p>
-
-			<p>Изучите решения ваших коллег. Проголосуйте за решения, в которых вы нашли что-то новое для себя.</p>
-
-			@foreach (AcceptedSolutionInfo solution in Model.AcceptedSolutions)
-			{
-				var id = "solution_" + solution.Id;
-				var code = new CodeBlock(solution.Code, Model.Slide.Exercise.LangId);
-				<div id="@id">
-					<button class="like-left-location btn @(solution.LikedAlready ? "btn-primary" : "btn-default") like-button" onclick="likeSolution(@solution.Id)">
-						<i class="glyphicon glyphicon-heart"></i>
-						<span class="likes-counter">@solution.UsersWhoLike.Count</span>
-					</button>
-
-					@if (User.IsInRole(LmsRoles.Instructor) || User.IsInRole(LmsRoles.Admin))
-					{
-						using (Html.BeginForm("RemoveSolution", "Course", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, solutionId = solution.Id }))
-						{
-							<button class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i>
-								Удалить решение
-							</button>
-						}
-					}
-
-					@Html.DisplayFor(m => code)
-				</div>
-			}
-			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = true })
+	<div class="slide-container">
+		<div class="container body-content">
+			<div class="row">
+				@AcceptedSolutionsHtml.AcceptedSolutions(Model)
+				@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = true })
+			</div>
 		</div>
 	</div>
-</div>
+}
+else
+{
+	Layout = null;
+	<html>
+		<head>
+			<title>title</title>
+			@Styles.Render("~/css")
+		</head>
+		<body>
+			@if (Model.IsPassed)
+			{
+				@AcceptedSolutionsHtml.AcceptedSolutions(Model)
+			}
+			else
+			{
+				<div color="red">Недоступно</div> 
+				<!-- <input type="submit" onclick=""/> -->
+			}
+			@Scripts.Render("~/main-js")
+		</body>
+	</html>
+	
+}

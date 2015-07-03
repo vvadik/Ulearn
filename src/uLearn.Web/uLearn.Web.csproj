@@ -415,6 +415,11 @@
       <DependentUpon>201408201208379_AddIsRightQuizBlock.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\CourseManager_should.cs" />
+    <Compile Include="Views\Course\AcceptedSolutionsHtml.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AcceptedSolutionsHtml.cshtml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Course\StandaloneLayout.generated.cs">
       <DependentUpon>StandaloneLayout.cshtml</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -1123,6 +1128,10 @@
       <LastGenOutput>StandaloneLayout.generated.cs</LastGenOutput>
     </Content>
     <Content Include="Views\Code\Slide.cshtml" />
+    <Content Include="Views\Course\AcceptedSolutionsHtml.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>AcceptedSolutionsHtml.generated.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

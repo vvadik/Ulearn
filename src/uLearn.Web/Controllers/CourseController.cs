@@ -138,23 +138,31 @@ namespace uLearn.Web.Controllers
 		}
 
 		[Authorize]
-		public async Task<ViewResult> AcceptedSolutions(string courseId, int slideIndex = 0)
+		public async Task<ViewResult> AcceptedSolutions(string courseId, int slideIndex = 0, bool isLti = false)
 		{
 			var userId = User.Identity.GetUserId();
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.Slides[slideIndex];
 			var isPassed = visitersRepo.IsPassed(slide.Id, userId);
-			if (!isPassed)
+			if (!isPassed && !isLti)
 				await visitersRepo.SkipSlide(courseId, slide.Id, userId);
 			var solutions = solutionsRepo.GetAllAcceptedSolutions(courseId, slide.Id);
 			foreach (var solution in solutions)
+			{
 				solution.LikedAlready = solution.UsersWhoLike.Any(u => u == userId);
+				solution.RemoveSolutionUrl = Url.Action("RemoveSolution", "Course", new { courseId = courseId, slideIndex = slide.Index, solutionId = solution.Id });
+			}
+			
 			var model = new AcceptedSolutionsPageModel
 			{
 				CourseId = courseId,
 				CourseTitle = course.Title,
 				Slide = slide,
-				AcceptedSolutions = solutions
+				AcceptedSolutions = solutions,
+				User = User,
+				LikeSolutionUrl = Url.Action("LikeSolution"),
+				IsLti = isLti,
+				IsPassed = isPassed
 			};
 			return View(model);
 		}

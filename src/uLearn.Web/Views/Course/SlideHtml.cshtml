@@ -1,7 +1,7 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
-@using uLearn;
+@using uLearn
 @using uLearn.Model.Blocks
-@using uLearn.Web.Models
+@using uLearn.Web.Models;
 
 @helper Slide(BlockRenderContext context, int currentScore = 0)
 {
@@ -19,14 +19,10 @@
 }
 
 @helper Score(int currentScore, int maxScore)
-{
-	@(maxScore == 0 ? "" : string.Format("{0}/{1}", currentScore, maxScore))
-}
+{ @(maxScore == 0 ? "" : string.Format("{0}/{1}", currentScore, maxScore)) }
 
 @helper Block(MdBlock block, BlockRenderContext context)
-{
-	@MvcHtmlString.Create(block.Markdown.RenderMd(context.BaseUrl))
-}
+{ @MvcHtmlString.Create(block.Markdown.RenderMd(context.BaseUrl)) }
 
 @helper Block(CodeBlock block, BlockRenderContext context)
 {
@@ -48,8 +44,8 @@
 	</div>
 	<div>
 		<a href="javascript://" class="popover-trigger"
-		   title="Как ускорить видео?"
-		   data-content="Если по иконке с шестеренкой нет возможности ускорить видео, то вам нужно &lt;a target='blank' href='http://youtube.com/html5'>вручную включить&lt;/a> использование HTML5-плеера.">Как ускорить видео?</a>
+			title="Как ускорить видео?"
+			data-content="Если по иконке с шестеренкой нет возможности ускорить видео, то вам нужно &lt;a target='blank' href='http://youtube.com/html5'>вручную включить&lt;/a> использование HTML5-плеера.">Как ускорить видео?</a>
 	</div>
 }
 
@@ -102,7 +98,6 @@
 			</button>
 		</div>
 
-
 		<div class="run-result run-service-error">
 			<div class="run-verdict label-warning">Ошибка сервера :(</div>
 			<pre class="no-rounds"><code class="run-details"></code></pre>
@@ -139,26 +134,10 @@
 		<div class="panel-group ctrl-group" id="hints-accordion">
 			<div id="hints-place"></div>
 		</div>
-		@if (!data.IsLti)
-		 {
-			 <div class="modal fade" id="ShowSolutionsAlert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-							<h4 class="modal-title">Внимание</h4>
-						</div>
-						<div class="modal-body">
-							<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
-						</div>
-						<div class="modal-footer">
-							<a class="btn btn-default" href="@data.AcceptedSolutionUrl">Продолжить</a>
-							<button type="button" class="btn btn-primary" data-dismiss="modal">Отмена</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		 }
+		if (!data.IsLti)
+		{
+			@Alert(data)
+		}
 	}
 	else
 	{
@@ -173,6 +152,26 @@
 				}
 			</ol>
 		</div>
-
 	}
+}
+
+@helper Alert(ExerciseBlockData data)
+{
+	<div class="modal fade" id="ShowSolutionsAlert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Внимание</h4>
+				</div>
+				<div class="modal-body">
+					<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
+				</div>
+				<div class="modal-footer">
+					<a class="btn btn-default" href="@data.AcceptedSolutionUrl">Продолжить</a>
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Отмена</button>
+				</div>
+			</div>
+		</div>
+	</div>
 }

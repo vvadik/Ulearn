@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Security.Policy;
+using System.Security.Principal;
 
 namespace uLearn.Web.Models
 {
@@ -8,5 +10,9 @@ namespace uLearn.Web.Models
 		public string CourseTitle;
 		public ExerciseSlide Slide;
 		public List<AcceptedSolutionInfo> AcceptedSolutions;
+		public IPrincipal User;
+		public string LikeSolutionUrl;
+		public bool IsLti;
+		public bool IsPassed;
 	}
 }

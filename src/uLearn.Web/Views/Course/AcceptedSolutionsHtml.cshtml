@@ -1,0 +1,36 @@
+﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
+@using uLearn
+@using uLearn.Model.Blocks
+@using uLearn.Web.Models
+@using uLearn.Web.Views.Course
+
+@helper AcceptedSolutions(AcceptedSolutionsPageModel model) {
+	<div id="LikeSolutionUrl" data-url="@(model.LikeSolutionUrl)"></div>
+	<h1 class='page-header'>Решения</h1>
+	<p>@MvcHtmlString.Create(model.Slide.Exercise.CommentAfterExerciseIsSolved.RenderMd(model.Slide.Info.SlideFile))</p>
+
+	<p>Изучите решения ваших коллег. Проголосуйте за решения, в которых вы нашли что-то новое для себя.</p>
+	foreach (AcceptedSolutionInfo solution in model.AcceptedSolutions)
+	{
+		var id = "solution_" + solution.Id;
+		var code = new CodeBlock(solution.Code, model.Slide.Exercise.LangId);
+		<div id="@id">
+			<button class="like-left-location btn @(solution.LikedAlready ? "btn-primary" : "btn-default") like-button" onclick="likeSolution(@solution.Id) ">
+				<i class="glyphicon glyphicon-heart"></i>
+				<span class="likes-counter">@solution.UsersWhoLike.Count</span>
+			</button>
+
+			@if (model.User.IsInRole(LmsRoles.Instructor) || model.User.IsInRole(LmsRoles.Admin))
+			{
+				<form action="@(solution.RemoveSolutionUrl)" method="POST" novalidate="novalidate">
+					<button class="btn btn-danger">
+						<i class="glyphicon glyphicon-remove"></i>
+						Удалить решение
+					</button>
+				</form>
+			}
+
+			@SlideHtml.Block(code, null)
+		</div>
+	}
+}

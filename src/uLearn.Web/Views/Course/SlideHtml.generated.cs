@@ -76,15 +76,13 @@ public static System.Web.WebPages.HelperResult Score(int currentScore, int maxSc
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 
- 
-	
+  
 WebViewPage.WriteTo(@__razor_helper_writer, maxScore == 0 ? "" : string.Format("{0}/{1}", currentScore, maxScore));
 
-                                                                         
-
+                                                                           
 });
 
-}
+                                                                           }
 
 
 public static System.Web.WebPages.HelperResult Block(MdBlock block, BlockRenderContext context)
@@ -92,15 +90,13 @@ public static System.Web.WebPages.HelperResult Block(MdBlock block, BlockRenderC
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 
- 
-	
+  
 WebViewPage.WriteTo(@__razor_helper_writer, MvcHtmlString.Create(block.Markdown.RenderMd(context.BaseUrl)));
 
-                                                                
-
+                                                                  
 });
 
-}
+                                                                  }
 
 
 public static System.Web.WebPages.HelperResult Block(CodeBlock block, BlockRenderContext context)
@@ -177,8 +173,8 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' allowfullscreen></iframe>
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"	<div>
 		<a href=""javascript://"" class=""popover-trigger""
-		   title=""Как ускорить видео?""
-		   data-content=""Если по иконке с шестеренкой нет возможности ускорить видео, то вам нужно &lt;a target='blank' href='http://youtube.com/html5'>вручную включить&lt;/a> использование HTML5-плеера."">Как ускорить видео?</a>
+			title=""Как ускорить видео?""
+			data-content=""Если по иконке с шестеренкой нет возможности ускорить видео, то вам нужно &lt;a target='blank' href='http://youtube.com/html5'>вручную включить&lt;/a> использование HTML5-плеера."">Как ускорить видео?</a>
 	</div>
 ");
 
@@ -331,7 +327,6 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<button type=\"button\
 
 
 
-
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"run-result run-service-error\">\r\n\t\t\t<div class=\"run-verdict label-wa" +
 "rning\">Ошибка сервера :(</div>\r\n\t\t\t<pre class=\"no-rounds\"><code class=\"run-detai" +
 "ls\"></code></pre>\r\n\t\t</div>\r\n");
@@ -382,32 +377,13 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"panel-group
 "ace\"></div>\r\n\t\t</div>\r\n");
 
 
-		
-   if (!data.IsLti)
-		 {
+		if (!data.IsLti)
+		{
+			
+WebViewPage.WriteTo(@__razor_helper_writer, Alert(data));
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"			 <div class=""modal fade"" id=""ShowSolutionsAlert"" tabindex=""-1"" role=""dialog"" aria-labelledby=""myModalLabel"" aria-hidden=""true"">
-				<div class=""modal-dialog"">
-					<div class=""modal-content"">
-						<div class=""modal-header"">
-							<button type=""button"" class=""close"" data-dismiss=""modal"" aria-label=""Close""><span aria-hidden=""true"">&times;</span></button>
-							<h4 class=""modal-title"">Внимание</h4>
-						</div>
-						<div class=""modal-body"">
-							<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
-						</div>
-						<div class=""modal-footer"">
-							<a class=""btn btn-default"" href=""");
-
-
-WebViewPage.WriteTo(@__razor_helper_writer, data.AcceptedSolutionUrl);
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">Продолжить</a>\r\n\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary\" data-dismi" +
-"ss=\"modal\">Отмена</button>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n");
-
-
-		 }
-    
+               
+		}
 	}
 	else
 	{
@@ -431,8 +407,40 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t\t</li>\r\n");
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t</ol>\r\n\t\t</div>\r\n");
 
 
-
 	}
+
+});
+
+}
+
+
+public static System.Web.WebPages.HelperResult Alert(ExerciseBlockData data)
+{
+return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
+
+
+ 
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"	<div class=""modal fade"" id=""ShowSolutionsAlert"" tabindex=""-1"" role=""dialog"" aria-labelledby=""myModalLabel"" aria-hidden=""true"">
+		<div class=""modal-dialog"">
+			<div class=""modal-content"">
+				<div class=""modal-header"">
+					<button type=""button"" class=""close"" data-dismiss=""modal"" aria-label=""Close""><span aria-hidden=""true"">&times;</span></button>
+					<h4 class=""modal-title"">Внимание</h4>
+				</div>
+				<div class=""modal-body"">
+					<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
+				</div>
+				<div class=""modal-footer"">
+					<a class=""btn btn-default"" href=""");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, data.AcceptedSolutionUrl);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">Продолжить</a>\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary\" data-dismiss" +
+"=\"modal\">Отмена</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n");
+
+
 
 });
 
