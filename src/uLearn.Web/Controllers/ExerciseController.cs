@@ -1,7 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using LtiLibrary.Core.Outcomes.v1;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
 using uLearn.Web.ExecutionService;
@@ -14,6 +16,8 @@ namespace uLearn.Web.Controllers
 		private readonly CourseManager courseManager;
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();
+		private readonly ConsumersRepo consumersRepo = new ConsumersRepo();
+		private readonly LtiRequestsRepo ltiRequestsRepo = new LtiRequestsRepo();
 
 		public ExerciseController()
 			: this(WebCourseManager.Instance)
@@ -27,7 +31,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<ActionResult> RunSolution(string courseId, int slideIndex = 0)
+		public async Task<ActionResult> RunSolution(string courseId, int slideIndex = 0, bool isLti = false)
 		{
 			var code = GetUserCode(Request.InputStream);
 			if (code.Length > TextsRepo.MAX_TEXT_SIZE)
@@ -41,7 +45,37 @@ namespace uLearn.Web.Controllers
 			var exerciseSlide = (ExerciseSlide)courseManager.GetCourse(courseId).Slides[slideIndex];
 			var result = await CheckSolution(exerciseSlide, code, RedundantExecutionService.Default);
 			await SaveUserSolution(courseId, exerciseSlide.Id, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer, result.ExecutionServiceName);
+			if (isLti)
+				SubmitScore(exerciseSlide);
 			return Json(result);
+		}
+
+		private void SubmitScore(Slide slide)
+		{
+			var userId = User.Identity.GetUserId();
+
+			var ltiRequest = ltiRequestsRepo.Find(userId, slide.Id);
+			if (ltiRequest == null)
+				throw new Exception("LtiRequest for user '" + userId + "' not found");
+
+			var consumerSecret = consumersRepo.Find(ltiRequest.ConsumerKey).Secret;
+
+			var score = visitersRepo.GetScore(slide.Id, userId);
+
+			// TODO: fix outcome address in local edx (no localhost and no https)
+			var uri = new UriBuilder(ltiRequest.LisOutcomeServiceUrl);
+			if (uri.Host == "localhost")
+			{
+				uri.Host = "192.168.33.10";
+				uri.Port = 80;
+				uri.Scheme = "http";
+			}
+
+			var result = OutcomesClient.PostScore(uri.ToString(), ltiRequest.ConsumerKey, consumerSecret,
+				ltiRequest.LisResultSourcedId, score / (double)slide.MaxScore);
+
+			if (!result.IsValid)
+				throw new Exception(uri + "\r\n\r\n" + result.Message);
 		}
 
 		private async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code, IExecutionService executionService)
@@ -56,8 +90,8 @@ namespace uLearn.Web.Controllers
 			if (submissionDetails == null)
 				return new RunSolutionResult
 				{
-					IsCompillerFailure = true, 
-					CompilationError = "Ой-ой, штуковина, которая проверяет решения сломалась (или просто устала). Попробуйте отправить решение позже (когда она немного отдохнет).", 
+					IsCompillerFailure = true,
+					CompilationError = "Ой-ой, штуковина, которая проверяет решения сломалась (или просто устала). Попробуйте отправить решение позже (когда она немного отдохнет).",
 					ExecutionServiceName = executionService.Name
 				};
 			var output = submissionDetails.GetOutput();

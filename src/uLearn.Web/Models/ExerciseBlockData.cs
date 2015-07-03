@@ -15,5 +15,6 @@ namespace uLearn.Web.Models
 		public string RunSolutionUrl { get; set; } // Url.Action("RunSolution", "Exercise", new {courseId, slideIndex})
 		public string AcceptedSolutionUrl { get; set; } // Url.Action("AcceptedSolutions", "Course", new {courseId, slideIndex});
 		public string GetHintUrl { get; set; } // Url.Action("UseHint", "Hint")
+		public bool IsLti { get; set; }
 	}
 }

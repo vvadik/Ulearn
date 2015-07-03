@@ -255,6 +255,11 @@
 	margin-left: 0 !important;
 }
 
+.run-solution-button-lti {
+    width: 50% !important;
+}
+
+
 .rates-bar {
 	width: 100%;
 	margin-bottom: -11px;

@@ -77,6 +77,13 @@
     <Reference Include="Elmah.Mvc">
       <HintPath>..\packages\Elmah.MVC.2.1.1\lib\net40\Elmah.Mvc.dll</HintPath>
     </Reference>
+    <Reference Include="LtiLibrary.Core">
+      <HintPath>..\packages\LtiLibrary.Core.1.5.4\lib\net45\LtiLibrary.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="LtiLibrary.Owin.Security.Lti">
+      <HintPath>..\packages\LtiLibrary.Owin.Security.Lti.1.0.0-alpha\lib\net45\LtiLibrary.Owin.Security.Lti.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="MarkdownDeep, Version=1.5.4615.26275, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\External\MarkdownDeep\MarkdownDeep.dll</HintPath>
@@ -94,11 +101,23 @@
       <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.0.6.4033103-beta\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Owin, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.3.0.0\lib\net45\Microsoft.Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.3.0.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Threading.Tasks">
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.16\lib\net45\Microsoft.Threading.Tasks.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Threading.Tasks.Extensions">
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.16\lib\net45\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="NLog">
       <HintPath>..\packages\NLog.3.1.0.0\lib\net45\NLog.dll</HintPath>
@@ -178,10 +197,6 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.0.0\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <Private>True</Private>
-      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="WebGrease">
       <Private>True</Private>
       <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
@@ -207,14 +222,8 @@
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin">
-      <HintPath>..\packages\Microsoft.Owin.2.0.0\lib\net45\Microsoft.Owin.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Owin.Host.SystemWeb">
       <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.2.0.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security">
-      <HintPath>..\packages\Microsoft.Owin.Security.2.0.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin.Security.Facebook">
       <HintPath>..\packages\Microsoft.Owin.Security.Facebook.2.0.0\lib\net45\Microsoft.Owin.Security.Facebook.dll</HintPath>
@@ -237,6 +246,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="codemirror\CsCompleterGenerator.cs" />
+    <Compile Include="Controllers\CodeController.cs" />
     <Compile Include="Controllers\QuestionsController.cs" />
     <Compile Include="Controllers\UnitController.cs" />
     <Compile Include="Controllers\AnalyticsController.cs" />
@@ -244,6 +254,8 @@
     <Compile Include="Controllers\SlideNavigationController.cs" />
     <Compile Include="Controllers\ExerciseController.cs" />
     <Compile Include="Controllers\HintController.cs" />
+    <Compile Include="DataContexts\ConsumersRepo.cs" />
+    <Compile Include="DataContexts\LtiRequestsRepo.cs" />
     <Compile Include="DataContexts\TextsRepo.cs" />
     <Compile Include="ExecutionService\CsSandboxExecutionService.*Settings.cs" />
     <Compile Include="ExecutionService\CsSandboxExecutionService.Settings.Sample.cs" />
@@ -251,6 +263,8 @@
     <Compile Include="ExecutionService\IdeoneExecutionService.cs" />
     <Compile Include="ExecutionService\StringExtention.cs" />
     <Compile Include="Ideone\IdeoneClient.*Settings.cs" />
+    <Compile Include="LTI\LtiAuthenticationExtensions.cs" />
+    <Compile Include="LTI\SecurityHandler.cs" />
     <Compile Include="Migrations\201503231319119_ExecutionServiceName.cs" />
     <Compile Include="Migrations\201503231319119_ExecutionServiceName.Designer.cs">
       <DependentUpon>201503231319119_ExecutionServiceName.cs</DependentUpon>
@@ -263,7 +277,26 @@
     <Compile Include="Migrations\201504070552041_AddIsPassed.Designer.cs">
       <DependentUpon>201504070552041_AddIsPassed.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201507011221541_AddLti.cs" />
+    <Compile Include="Migrations\201507011221541_AddLti.Designer.cs">
+      <DependentUpon>201507011221541_AddLti.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201507011412286_AddConsumers.cs" />
+    <Compile Include="Migrations\201507011412286_AddConsumers.Designer.cs">
+      <DependentUpon>201507011412286_AddConsumers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201507011512267_AddLti1.cs" />
+    <Compile Include="Migrations\201507011512267_AddLti1.Designer.cs">
+      <DependentUpon>201507011512267_AddLti1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201507020846212_AddSlideIdToLtiRequests.cs" />
+    <Compile Include="Migrations\201507020846212_AddSlideIdToLtiRequests.Designer.cs">
+      <DependentUpon>201507020846212_AddSlideIdToLtiRequests.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
+    <Compile Include="Models\LtiRequestModel.cs" />
+    <Compile Include="Models\CodeModel.cs" />
+    <Compile Include="Models\Consumer.cs" />
     <Compile Include="Models\ExerciseBlockData.cs" />
     <Compile Include="Models\TocModelBuilder.cs" />
     <Compile Include="SubmitAllSlide_Test.cs" />
@@ -520,6 +553,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201504070552041_AddIsPassed.resx">
       <DependentUpon>201504070552041_AddIsPassed.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201507011221541_AddLti.resx">
+      <DependentUpon>201507011221541_AddLti.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201507011412286_AddConsumers.resx">
+      <DependentUpon>201507011412286_AddConsumers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201507011512267_AddLti1.resx">
+      <DependentUpon>201507011512267_AddLti1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201507020846212_AddSlideIdToLtiRequests.resx">
+      <DependentUpon>201507020846212_AddSlideIdToLtiRequests.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -1077,6 +1122,7 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>StandaloneLayout.generated.cs</LastGenOutput>
     </Content>
+    <Content Include="Views\Code\Slide.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
