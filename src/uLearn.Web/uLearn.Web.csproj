@@ -1132,6 +1132,7 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>AcceptedSolutionsHtml.generated.cs</LastGenOutput>
     </Content>
+    <Content Include="Views\Course\AcceptedAlert.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

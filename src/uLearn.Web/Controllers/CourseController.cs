@@ -144,7 +144,7 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.Slides[slideIndex];
 			var isPassed = visitersRepo.IsPassed(slide.Id, userId);
-			if (!isPassed && !isLti)
+			if (!isPassed)
 				await visitersRepo.SkipSlide(courseId, slide.Id, userId);
 			var solutions = solutionsRepo.GetAllAcceptedSolutions(courseId, slide.Id);
 			foreach (var solution in solutions)
@@ -163,6 +163,23 @@ namespace uLearn.Web.Controllers
 				LikeSolutionUrl = Url.Action("LikeSolution"),
 				IsLti = isLti,
 				IsPassed = isPassed
+			};
+			return View(model);
+		}
+
+		[Authorize]
+		public ViewResult AcceptedAlert(string courseId, int slideIndex = 0)
+		{
+			var userId = User.Identity.GetUserId();
+			var course = courseManager.GetCourse(courseId);
+			var slide = (ExerciseSlide)course.Slides[slideIndex];
+			var isSkippedOrPassed = visitersRepo.IsSkippedOrPassed(slide.Id, userId);
+			var model = new ExerciseBlockData
+			{
+				IsSkippedOrPassed = isSkippedOrPassed,
+				AcceptedSolutionUrl = Url.Action("AcceptedSolutions", "Course", new { courseId, slideIndex, isLti = true }),
+				CourseId = courseId,
+				SlideIndex = slideIndex
 			};
 			return View(model);
 		}

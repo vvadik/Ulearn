@@ -27,15 +27,7 @@ else
 			@Styles.Render("~/css")
 		</head>
 		<body>
-			@if (Model.IsPassed)
-			{
-				@AcceptedSolutionsHtml.AcceptedSolutions(Model)
-			}
-			else
-			{
-				<div color="red">Недоступно</div> 
-				<!-- <input type="submit" onclick=""/> -->
-			}
+			@AcceptedSolutionsHtml.AcceptedSolutions(Model)
 			@Scripts.Render("~/main-js")
 		</body>
 	</html>

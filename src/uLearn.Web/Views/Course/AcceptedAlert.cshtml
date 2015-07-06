@@ -1,0 +1,29 @@
+﻿@using uLearn.Web.Views.Course
+@model ExerciseBlockData
+
+@{
+	Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>title</title>
+		@Styles.Render("~/css")
+	</head>
+	<body>
+		<div>
+			@if (Model.IsSkippedOrPassed)
+			{
+				@Html.Action("AcceptedSolutions", "Course", new { Model.CourseId, Model.SlideIndex, isLti = true })
+			}
+			else
+			{
+				<h4 class="modal-title">Внимание</h4>
+				<p class="modal-body">Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
+				<a class="btn btn-default" href="@Model.AcceptedSolutionUrl">Продолжить</a>
+			}
+		</div>
+	</body>
+</html>
