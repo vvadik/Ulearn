@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Xml.Serialization;
+using uLearn.Model.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {
@@ -37,6 +39,12 @@ namespace uLearn.Model.Blocks
 			if (LangVer == null)
 				LangVer = context.CourseSettings.GetLanguageVersion(LangId);
 			yield return this;
+		}
+
+		public override Component ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
+		{
+			var urlName = slide.Guid + componentIndex;
+			return new CodeComponent(folderName, urlName, urlName, Code);
 		}
 
 		public override string ToString()

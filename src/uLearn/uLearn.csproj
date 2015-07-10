@@ -132,12 +132,16 @@
     <Compile Include="Model\CommonRegionRemover_should.cs" />
     <Compile Include="Model\CommonSingleRegionExtractor.cs" />
     <Compile Include="Model\CommonSingleRegionExtractor_should.cs" />
+    <Compile Include="Model\EdxComponents\Component.cs" />
+    <Compile Include="Model\EdxComponents\ComponentReference.cs" />
+    <Compile Include="Model\EdxComponents\ProblemComponent.cs" />
     <Compile Include="Model\Lesson.cs" />
     <Compile Include="Model\LessonSlideLoader.cs" />
     <Compile Include="Model\RegionRemover_should.cs" />
     <Compile Include="Model\RegionsExtractor_should.cs" />
     <Compile Include="Markdown2.cs" />
     <Compile Include="NullValidator.cs" />
+    <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Quizes\Quiz.cs" />
     <Compile Include="Quizes\QuizSlide.cs" />
     <Compile Include="Quizes\Quiz_Test.cs" />

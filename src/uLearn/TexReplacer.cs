@@ -54,12 +54,12 @@ namespace uLearn
 			throw new Exception(tex.Item2.ToString());
 		}
 
-		private string FormatTexSpan(string tex)
+		protected virtual string FormatTexSpan(string tex)
 		{
 			return "<span class='tex'>" + HttpUtility.HtmlEncode(tex) + "</span>";
 		}
 		
-		private string FormatTexDiv(string tex)
+		protected virtual string FormatTexDiv(string tex)
 		{
 			return "</p><div class='tex'>\\displaystyle " + HttpUtility.HtmlEncode(tex) + "</div><p>";
 		}
@@ -69,6 +69,24 @@ namespace uLearn
 			var insertId = id + "[" + (counter++) + "]";
 			texInserts.Add(insertId, Tuple.Create(match.Groups[2].Value, insertionType));
 			return match.Groups[1].Value + "" + insertId + match.Groups[3].Value;
+		}
+	}
+
+	public class EdxTexReplacer : TexReplacer
+	{
+		public EdxTexReplacer(string text)
+			: base(text)
+		{
+		}
+
+		protected override string FormatTexSpan(string tex)
+		{
+			return "`" + HttpUtility.HtmlEncode(tex) + "`";
+		}
+		
+		protected override string FormatTexDiv(string tex)
+		{
+			return "[mathjax]" + HttpUtility.HtmlEncode(tex) + "[/mathjax]";
 		}
 	}
 }

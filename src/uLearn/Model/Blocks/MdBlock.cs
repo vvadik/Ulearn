@@ -1,4 +1,8 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Security.Policy;
+using System.Xml.Serialization;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using uLearn.Model.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {
@@ -27,6 +31,12 @@ namespace uLearn.Model.Blocks
 		public override string ToString()
 		{
 			return string.Format("Markdown {0}", Markdown);
+		}
+
+		public override Component ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
+		{
+			var urlName = slide.Guid + componentIndex;
+			return new HtmlComponent(folderName, urlName, urlName, Markdown.GetHtml("static"));
 		}
 	}
 }

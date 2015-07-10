@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Xml.Serialization;
+using uLearn.Model.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {

@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
+using uLearn.Model.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {
@@ -32,6 +33,11 @@ namespace uLearn.Model.Blocks
 			var slideBlocks = (SlideBlock[])serializer.Deserialize(xmlStream);
 			var newInProgress = filesInProgress.Add(File);
 			return slideBlocks.SelectMany(b => b.BuildUp(context, newInProgress));
+		}
+
+		public override Component ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

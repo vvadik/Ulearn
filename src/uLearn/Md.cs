@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -32,9 +33,31 @@ namespace uLearn
 				ExtraMode = true,
 				SafeMode = false,
 				MarkdownInHtml = false
-				
 			};
+
 			var html = markdown.Transform(texReplacer.ReplacedText);
+			return texReplacer.PlaceTexInsertsBack(html);
+		}
+
+		public static string GetHtml(this string md, string baseUrl = null)
+		{
+			var texReplacer = new EdxTexReplacer(md);
+
+			var markdown = new Markdown2(baseUrl)
+			{
+				NewWindowForExternalLinks = true,
+				ExtraMode = true,
+				SafeMode = false,
+				MarkdownInHtml = false,
+			};
+			
+			var html = markdown.Transform(texReplacer.ReplacedText);
+			
+			foreach (var url in markdown.localUrls)
+			{
+				Console.WriteLine(url);
+			}
+			
 			return texReplacer.PlaceTexInsertsBack(html);
 		}
 	}

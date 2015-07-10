@@ -12,6 +12,7 @@ namespace uLearn
 		public readonly SlideInfo Info;
 		public int Index { get { return Info.Index; }}
 		public readonly string Id;
+		public string Guid { get { return System.Guid.Parse(Id).ToString("D"); } }
 		public virtual bool ShouldBeSolved { get { return false; } }
 		public int MaxScore { get; protected set; }
 

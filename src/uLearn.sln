@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Linq", "courses\linq\Linq.csproj", "{0BD679E4-9ACB-4B02-835B-CBCA1DE8B817}"
 EndProject
@@ -38,6 +38,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseEditor", "CourseEditor\CourseEditor.csproj", "{C63AAF92-C5DD-4B74-A6A7-0B2FB8D6BC22}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UXR", "courses\UXR\UXR.csproj", "{9A751AE8-9BBF-44F5-B898-3CD6A3C78C10}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearnToEdx", "uLearnToEdx\uLearnToEdx.csproj", "{38660028-BD75-4281-84E9-B35CE3E338DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +95,10 @@ Global
 		{9A751AE8-9BBF-44F5-B898-3CD6A3C78C10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A751AE8-9BBF-44F5-B898-3CD6A3C78C10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A751AE8-9BBF-44F5-B898-3CD6A3C78C10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38660028-BD75-4281-84E9-B35CE3E338DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38660028-BD75-4281-84E9-B35CE3E338DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38660028-BD75-4281-84E9-B35CE3E338DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38660028-BD75-4281-84E9-B35CE3E338DC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
