@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Policy;
 using System.Xml.Serialization;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -33,10 +34,10 @@ namespace uLearn.Model.Blocks
 			return string.Format("Markdown {0}", Markdown);
 		}
 
-		public override Component ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
+		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
 		{
 			var urlName = slide.Guid + componentIndex;
-			return new HtmlComponent(folderName, urlName, urlName, Markdown.GetHtml("static"));
+			return new [] { new HtmlComponent(folderName, urlName, urlName, Markdown.GetHtml("static")) };
 		}
 	}
 }

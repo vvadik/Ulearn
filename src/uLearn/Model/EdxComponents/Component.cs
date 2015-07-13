@@ -7,6 +7,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.Serialization;
 using MarkdownDeep;
@@ -16,20 +17,28 @@ namespace uLearn.Model.EdxComponents
 	public abstract class Component
 	{
 		[XmlIgnore]
-		public string UrlName;
+		public virtual string UrlName { get; set; }
 
 		[XmlIgnore]
 		public string FolderName;
 
-		public abstract void Save();
+		[XmlIgnore]
+		public virtual string SubfolderName { get; set; }
+
+		public virtual void Save()
+		{
+			File.WriteAllText(string.Format("{0}/{1}/{2}.xml", FolderName, SubfolderName, UrlName), this.Serialize());
+		}
+
 		public abstract ComponentReference GetReference();
+		public abstract XmlElement AsXmlElement();
 	}
 
 	[XmlRoot("video")]
 	public class VideoComponent : Component
 	{
 		[XmlAttribute("url_name")]
-		public new string UrlName;
+		public override string UrlName { get; set; }
 
 		[XmlAttribute("youtube")]
 		public string VideoId;
@@ -39,6 +48,13 @@ namespace uLearn.Model.EdxComponents
 
 		[XmlAttribute("display_name")]
 		public string DisplayName;
+
+		[XmlIgnore]
+		public override string SubfolderName
+		{
+			get { return "video"; }
+			set { }
+		}
 
 		public VideoComponent()
 		{
@@ -52,14 +68,14 @@ namespace uLearn.Model.EdxComponents
 			VideoId1 = videoId;
 		}
 
-		public override void Save()
-		{
-			File.WriteAllText(string.Format("{0}/video/{1}.xml", FolderName, UrlName), this.Serialize());
-		}
-
 		public override ComponentReference GetReference()
 		{
 			return new VideoComponentReference { UrlName = UrlName };
+		}
+
+		public override XmlElement AsXmlElement()
+		{
+			throw new NotImplementedException();
 		}
 	}
 
@@ -75,6 +91,13 @@ namespace uLearn.Model.EdxComponents
 		[XmlAttribute("display_name")]
 		public string DisplayName;
 
+		[XmlIgnore]
+		public override string SubfolderName
+		{
+			get { return "html"; }
+			set { }
+		}
+
 		public HtmlComponent()
 		{
 		}
@@ -89,13 +112,20 @@ namespace uLearn.Model.EdxComponents
 
 		public override void Save()
 		{
-			File.WriteAllText(string.Format("{0}/html/{1}.xml", FolderName, UrlName), this.Serialize());
-			File.WriteAllText(string.Format("{0}/html/{1}.html", FolderName, UrlName), Source);
+			File.WriteAllText(string.Format("{0}/{1}/{2}.xml", FolderName, SubfolderName, UrlName), this.Serialize());
+			File.WriteAllText(string.Format("{0}/{1}/{2}.html", FolderName, SubfolderName, UrlName), Source);
 		}
 
 		public override ComponentReference GetReference()
 		{
 			return new HtmlComponentReference { UrlName = UrlName };
+		}
+
+		public override XmlElement AsXmlElement()
+		{
+			var doc = new XmlDocument();
+			doc.LoadXml("<p>" + Source + "</p>");
+			return doc.DocumentElement;
 		}
 	}
 
@@ -111,6 +141,13 @@ namespace uLearn.Model.EdxComponents
 		[XmlAttribute("display_name")]
 		public string DisplayName;
 
+		[XmlIgnore]
+		public override string SubfolderName
+		{
+			get { return "html"; }
+			set { }
+		}
+
 		public CodeComponent()
 		{
 		}
@@ -125,8 +162,8 @@ namespace uLearn.Model.EdxComponents
 
 		public override void Save()
 		{
-			File.WriteAllText(string.Format("{0}/html/{1}.xml", FolderName, UrlName), this.Serialize());
-			File.WriteAllText(string.Format("{0}/html/{1}.html", FolderName, UrlName), File.ReadAllText("iframe-template.html").Replace("{0}", "code_" + UrlName));
+			File.WriteAllText(string.Format("{0}/{1}/{2}.xml", FolderName, SubfolderName, UrlName), this.Serialize());
+			File.WriteAllText(string.Format("{0}/{1}/{2}.html", FolderName, SubfolderName, UrlName), File.ReadAllText("iframe-template.html").Replace("{0}", "code_" + UrlName));
 			File.WriteAllText(string.Format("{0}/static/code_{1}.html", FolderName, UrlName), File.ReadAllText("code-template.html").Replace("{0}", Source));
 		}
 
@@ -134,17 +171,63 @@ namespace uLearn.Model.EdxComponents
 		{
 			return new HtmlComponentReference { UrlName = UrlName };
 		}
+
+		public override XmlElement AsXmlElement()
+		{
+			var doc = new XmlDocument();
+			doc.LoadXml(File.ReadAllText("iframe-template.html").Replace("{0}", "code_" + UrlName));
+			return doc.DocumentElement;
+		}
 	}
 
-	public class ProblemComponent : Component
+	[XmlRoot("problem")]
+	public class SlideProblemComponent : Component
 	{
-		public override void Save()
+		[XmlElement("p")]
+		public XmlElement[] Components;
+
+		[XmlAttribute("display_name")]
+		public string DisplayName;
+
+		[XmlIgnore]
+		public override string SubfolderName
 		{
+			get { return "problem"; }
+			set { }
 		}
 
 		public override ComponentReference GetReference()
 		{
 			return new ProblemComponentReference { UrlName = UrlName };
+		}
+
+		public override XmlElement AsXmlElement()
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public class ProblemComponent : Component
+	{
+		[XmlIgnore]
+		public override string SubfolderName
+		{
+			get { return "problem"; }
+			set { }
+		}
+
+		public override ComponentReference GetReference()
+		{
+			return new ProblemComponentReference { UrlName = UrlName };
+		}
+
+		public override XmlElement AsXmlElement()
+		{
+			var xmlString = this.Serialize();
+			xmlString = xmlString.Substring("<problem>".Length, xmlString.Length - "<problem></problem>".Length);
+			var doc = new XmlDocument();
+			doc.LoadXml("<p>" + xmlString + "</p>");
+			return doc.DocumentElement;
 		}
 	}
 
@@ -153,6 +236,9 @@ namespace uLearn.Model.EdxComponents
 	{
 		[XmlIgnore]
 		public int SlideIndex;
+
+		[XmlAttribute("display_name")]
+		public string DisplayName;
 
 		[XmlAttribute("has_score")]
 		public bool HasScore;
@@ -169,12 +255,20 @@ namespace uLearn.Model.EdxComponents
 		[XmlAttribute("weight")]
 		public double Weight;
 
+		[XmlIgnore]
+		public override string SubfolderName
+		{
+			get { return "lti"; }
+			set { }
+		}
+
 		public LtiComponent()
 		{
 		}
 
-		public LtiComponent(string folderName, string urlName, string launchUrl, string ltiId, bool hasScore, double weight, bool openInNewPage)
+		public LtiComponent(string displayName, string folderName, string urlName, string launchUrl, string ltiId, bool hasScore, double weight, bool openInNewPage)
 		{
+			DisplayName = displayName;
 			FolderName = folderName;
 			UrlName = urlName;
 			LaunchUrl = launchUrl;
@@ -184,14 +278,14 @@ namespace uLearn.Model.EdxComponents
 			OpenInNewPage = openInNewPage;
 		}
 
-		public override void Save()
-		{
-			File.WriteAllText(string.Format("{0}/lti/{1}.xml", FolderName, UrlName), this.Serialize());
-		}
-
 		public override ComponentReference GetReference()
 		{
 			return new LtiComponentReference { UrlName = UrlName };
+		}
+
+		public override XmlElement AsXmlElement()
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

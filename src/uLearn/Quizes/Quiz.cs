@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Policy;
 using System.Text.RegularExpressions;
@@ -84,9 +85,9 @@ namespace uLearn.Quizes
 				throw new FormatException("Should be exaclty one correct item for non-multiple choice. BlockId=" + Id);
 		}
 
-		public override Component ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
+		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
 		{
-			var items = Items.Select(x => new Choice {Correct = x.IsCorrect, Text = x.Description}).ToArray();
+			var items = Items.Select(x => new Choice { Correct = x.IsCorrect, Text = EdxTexReplacer.ReplaceTex(x.Description) }).ToArray();
 			ChoiceResponse cr;
 			if (Multiple)
 			{
@@ -98,7 +99,16 @@ namespace uLearn.Quizes
 				var cg = new MultipleChoiceGroup { Label = Text, Type = "MultipleChoice", Choices = items };
 				cr = new MultipleChoiceResponse { ChoiceGroup = cg };
 			}
-			return new MultipleChoiceComponent { FolderName = folderName, UrlName = slide.Guid + componentIndex, ChoiceResponse = cr, Title = Text };
+			return new[]
+			{
+				new MultipleChoiceComponent
+				{
+					FolderName = folderName, 
+					UrlName = slide.Guid + componentIndex, 
+					ChoiceResponse = cr, 
+					Title = EdxTexReplacer.ReplaceTex(Text)
+				}
+			};
 		}
 	}
 
@@ -118,7 +128,7 @@ namespace uLearn.Quizes
 		{
 		}
 
-		public override Component ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
+		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
 		{
 			var items = new []
 			{
@@ -126,7 +136,17 @@ namespace uLearn.Quizes
 				new Choice { Correct = !Answer, Text = "false" }
 			};
 			var cg = new MultipleChoiceGroup { Label = Text, Type = "MultipleChoice", Choices = items };
-			return new MultipleChoiceComponent {FolderName = folderName, UrlName = slide.Guid + componentIndex, ChoiceResponse = new MultipleChoiceResponse {ChoiceGroup = cg}, Title = Text, Solution = new Solution(Explanation) };
+			return new[]
+			{
+				new MultipleChoiceComponent
+				{
+					FolderName = folderName, 
+					UrlName = slide.Guid + componentIndex,
+					ChoiceResponse = new MultipleChoiceResponse { ChoiceGroup = cg }, 
+					Title = EdxTexReplacer.ReplaceTex(Text), 
+					Solution = new Solution(Explanation)
+				}
+			};
 		}
 	}
 
@@ -147,9 +167,25 @@ namespace uLearn.Quizes
 				throw new FormatException("Sample should match at least one regex. BlockId=" + Id);
 		}
 
-		public override Component ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
+		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
 		{
-			return new TextInputComponent { FolderName = folderName, UrlName = slide.Guid + componentIndex, Title = Text, StringResponse = new StringResponse { Type = "ci", Answer = Regexes[0].Pattern, AdditionalAnswers = Regexes.Skip(1).Select(x => new Answer { Text = x.Pattern }).ToArray(), Textline = new Textline { Label = Text, Size = 20 } } };
+			return new[]
+			{
+				new TextInputComponent
+				{
+					FolderName = folderName, 
+					UrlName = slide.Guid + componentIndex, 
+					Title = EdxTexReplacer.ReplaceTex(Text), 
+					StringResponse = new StringResponse
+					{
+						Type = (Regexes[0].IgnoreCase ? "ci " : "") + "regexp", 
+						Answer = "^" + Regexes[0].Pattern + "$", 
+						AdditionalAnswers = Regexes.Skip(1).Select(x => new Answer { Text = "^" + x.Pattern + "$" }).ToArray(), 
+						Textline = new Textline { Label = Text, Size = 20 }
+					}
+				}
+
+			};
 		}
 	}
 

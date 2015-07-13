@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Xml.Serialization;
 using uLearn.Model.EdxComponents;
 
@@ -23,7 +24,7 @@ namespace uLearn.Model.Blocks
 			return string.Format("Images {0}", string.Join("\n", ImageUrls));
 		}
 
-		public override Component ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
+		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
 		{
 			throw new System.NotImplementedException();
 		}

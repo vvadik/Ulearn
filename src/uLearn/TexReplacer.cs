@@ -79,6 +79,12 @@ namespace uLearn
 		{
 		}
 
+		public static string ReplaceTex(string text)
+		{
+			var replacer = new EdxTexReplacer(text);
+			return replacer.PlaceTexInsertsBack(replacer.ReplacedText);
+		}
+
 		protected override string FormatTexSpan(string tex)
 		{
 			return "`" + HttpUtility.HtmlEncode(tex) + "`";

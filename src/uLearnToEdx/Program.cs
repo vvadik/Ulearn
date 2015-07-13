@@ -1,13 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml;
+using System.Xml.Serialization;
 using uLearn;
+using uLearn.Model.EdxComponents;
+using uLearn.Quizes;
 using uLearnToEdx.Edx;
 using Component = uLearn.Model.EdxComponents.Component;
 using Course = uLearnToEdx.Edx.Course;
 
 namespace uLearnToEdx
 {
+	[XmlRoot("a")]
+	public class A
+	{
+		[XmlText]
+		public string Aa;
+	}
+	
 	internal class Program
 	{
 		private static void Main(string[] args)
@@ -53,7 +65,7 @@ namespace uLearnToEdx
 			File.WriteAllText(folderName + "/course.xml", c.Serialize());
 			File.WriteAllText(folderName + "/course/" + course.Id + ".xml", cc.Serialize());
 			File.WriteAllText(folderName + "/chapter/" + course.Id + "-1.xml", ch.Serialize());
-//			Console.WriteLine(new MultipleChoiceComponent { Title = "abc", ChoiceResponse = new ChoiceResponse { ChoiceGroup = new ChoiceGroup { Label = "abc", ? = "MultipleChoice", Choices = new[] { new Choice { Correct = false, Text = "abcdef" } } } } }.Serialize());
+			Console.WriteLine(new A {Aa = "<div></div>"}.Serialize());
 			int i = 0;
 			foreach (var unit in course.GetUnits())
 			{
@@ -69,19 +81,46 @@ namespace uLearnToEdx
 				{
 					int j = 0;
 					var components = new List<Component>();
-					foreach (var block in slide.Blocks)
+					if (slide.Blocks.Any(x => x is AbstractQuestionBlock))
 					{
-						var component = block.ToEdxComponent(folderName, course.Id, slide, j);
-						components.Add(component);
-						component.Save();
-						j++;
-					}
-					File.WriteAllText(folderName + "/vertical/" + slide.Guid + ".xml",
-						new Vertical
+						foreach (var block in slide.Blocks)
 						{
-							DisplayName = slide.Title,
-							Components = components.Select(x => x.GetReference()).ToArray()
-						}.Serialize());
+
+							var component = block.ToEdxComponent(folderName, course.Id, slide, j);
+							components.AddRange(component);
+							j++;
+						}
+						var slideComponent = new SlideProblemComponent { DisplayName = slide.Title, Components = components.Select(x => x.AsXmlElement()).ToArray(), FolderName = folderName, UrlName = slide.Guid };
+
+						foreach (var codeComponent in components.OfType<CodeComponent>())
+						{
+							codeComponent.Save();
+						}
+						slideComponent.Save();
+						File.WriteAllText(folderName + "/vertical/" + slide.Guid + ".xml",
+							new Vertical
+							{
+								DisplayName = slide.Title,
+								Components = new [] {slideComponent.GetReference() }
+							}.Serialize());
+					}
+					else
+					{
+						foreach (var block in slide.Blocks)
+						{
+							var component = block.ToEdxComponent(folderName, course.Id, slide, j);
+							components.AddRange(component);
+							foreach (var comp in component)
+								comp.Save();
+							j++;
+						}
+						File.WriteAllText(folderName + "/vertical/" + slide.Guid + ".xml",
+							new Vertical
+							{
+								DisplayName = slide.Title,
+								Components = components.Select(x => x.GetReference()).ToArray()
+							}.Serialize());
+					}
 				}
 			}
 			ArchiveManager.CreateTar(folderName + ".tar.gz", folderName);

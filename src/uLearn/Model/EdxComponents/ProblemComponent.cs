@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using Microsoft.CodeAnalysis.Text;
@@ -22,11 +24,6 @@ namespace uLearn.Model.EdxComponents
 
 		[XmlElement("solution")]
 		public Solution Solution;
-
-		public override void Save()
-		{
-			File.WriteAllText(string.Format("{0}/problem/{1}.xml", FolderName, UrlName), this.Serialize());
-		}
 	}
 
 	public class StringResponse
@@ -71,17 +68,12 @@ namespace uLearn.Model.EdxComponents
 
 		[XmlElement("solution")]
 		public Solution Solution;
-
-		public override void Save()
-		{
-			File.WriteAllText(string.Format("{0}/problem/{1}.xml", FolderName, UrlName), this.Serialize());
-		}
 	}
 
 	public class Solution
 	{
-		[XmlText]
-		public string Text;
+//		[XmlText]
+		public XmlElement Text;
 
 		public Solution()
 		{
@@ -89,7 +81,12 @@ namespace uLearn.Model.EdxComponents
 
 		public Solution(string text)
 		{
-//			Text = string.Format("<div class=\"detailed-solution\"><p>Explanation</p><p>{0}</p></div>", text);
+			if (!string.IsNullOrWhiteSpace(text))
+			{
+				var doc = new XmlDocument();
+				doc.LoadXml(string.Format("<div class=\"detailed-solution\"><p>Explanation</p><p>{0}</p></div>", text));
+				Text = doc.DocumentElement;
+			}
 		}
 	}
 
