@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using NUnit.Framework;
 using uLearn.Model.Blocks;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
@@ -64,7 +65,7 @@ namespace uLearn.Web.Controllers
 				CourseId = courseId,
 				SlideIndex = slideIndex,
 				ExerciseBlock = slide.Exercise,
-				Context = CreateRenderContext(course, slide, userId, visiter)
+				Context = CreateRenderContext(course, slide, userId, visiter, true)
 			};
 			return View(model);
 		}
@@ -150,9 +151,9 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, string userId, Visiters visiter)
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, string userId, Visiters visiter, bool isLti = false)
 		{
-			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visiter)).ToArray();
+			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visiter, isLti)).ToArray();
 			return new BlockRenderContext(
 				course,
 				slide,
@@ -160,7 +161,7 @@ namespace uLearn.Web.Controllers
 				blockData);
 		}
 
-		private dynamic CreateBlockData(Course course, Slide slide, SlideBlock slideBlock, Visiters visiter)
+		private dynamic CreateBlockData(Course course, Slide slide, SlideBlock slideBlock, Visiters visiter, bool isLti)
 		{
 			if (slideBlock is ExerciseBlock)
 			{
@@ -169,7 +170,8 @@ namespace uLearn.Web.Controllers
 				{
 					RunSolutionUrl = Url.Action("RunSolution", "Exercise", new { courseId = course.Id, slideIndex = slide.Index }),
 					AcceptedSolutionUrl = Url.Action("AcceptedSolutions", "Course", new { courseId = course.Id, slideIndex = slide.Index }),
-					GetHintUrl = Url.Action("UseHint", "Hint")
+					GetHintUrl = Url.Action("UseHint", "Hint"),
+					IsLti = isLti
 				};
 			}
 			return null;
