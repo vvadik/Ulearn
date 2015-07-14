@@ -1,0 +1,18 @@
+﻿@using uLearn.Web.Views.Course
+@model CodeModel
+
+@{
+	Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+	@Styles.Render("~/css")
+</head>
+<body>
+	@SlideHtml.Block(Model.ExerciseBlock, Model.Context)
+	@Scripts.Render("~/main-js")
+	<script>getHints("@Model.CourseId", "@Model.SlideIndex", '@Model.ExerciseBlock.HintsMd.Count')</script>
+</body>
+</html>

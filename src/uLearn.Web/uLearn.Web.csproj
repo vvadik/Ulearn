@@ -246,7 +246,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="codemirror\CsCompleterGenerator.cs" />
-    <Compile Include="Controllers\CodeController.cs" />
     <Compile Include="Controllers\QuestionsController.cs" />
     <Compile Include="Controllers\UnitController.cs" />
     <Compile Include="Controllers\AnalyticsController.cs" />
@@ -1106,7 +1105,6 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>StandaloneLayout.generated.cs</LastGenOutput>
     </Content>
-    <Content Include="Views\Code\Slide.cshtml" />
     <Content Include="Views\Course\AcceptedSolutionsHtml.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>AcceptedSolutionsHtml.generated.cs</LastGenOutput>

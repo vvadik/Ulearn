@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -18,7 +19,8 @@ namespace uLearn.Web.Controllers
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly UnitsRepo unitsRepo = new UnitsRepo();
-		private readonly VisitersRepo visitersRepo = new VisitersRepo();
+		private readonly VisitersRepo visitersRepo = new VisitersRepo(); 
+		private readonly LtiRequestsRepo ltiRequestsRepo = new LtiRequestsRepo();
 
 		public CourseController()
 			: this(WebCourseManager.Instance)
@@ -39,6 +41,42 @@ namespace uLearn.Web.Controllers
 			if (!visibleUnits.Contains(model.Slide.Info.UnitName))
 				throw new Exception("Slide is hidden " + slideIndex);
 			return View(model);
+		}
+
+		[Authorize]
+		public async Task<ActionResult> LtiSlide(string courseId, int slideIndex)
+		{
+			if (string.IsNullOrWhiteSpace(courseId))
+				return RedirectToAction("Index", "Home");
+
+			var userId = User.Identity.GetUserId();
+
+			var ltiRequestJson = FindLtiRequestJson();
+			var course = courseManager.GetCourse(courseId);
+			var slide = course.Slides[slideIndex] as ExerciseSlide;
+			if (!string.IsNullOrWhiteSpace(ltiRequestJson))
+				await ltiRequestsRepo.Update(userId, slide.Id, ltiRequestJson);
+
+			await visitersRepo.AddVisiter(courseId, slide.Id, userId);
+			var visiter = visitersRepo.GetVisiter(slide.Id, User.Identity.GetUserId());
+			var model = new CodeModel
+			{
+				CourseId = courseId,
+				SlideIndex = slideIndex,
+				ExerciseBlock = slide.Exercise,
+				Context = CreateRenderContext(course, slide, userId, visiter)
+			};
+			return View(model);
+		}
+
+		private string FindLtiRequestJson()
+		{
+			var user = User.Identity as ClaimsIdentity;
+			if (user == null)
+				return null;
+
+			var claim = user.Claims.FirstOrDefault(c => c.Type.Equals("LtiRequest"));
+			return claim == null ? null : claim.Value;
 		}
 
 		private int GetInitialIndexForStartup(string courseId, Course course, List<string> visibleUnits)

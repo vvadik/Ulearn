@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 using uLearn;
+using uLearn.Model.Blocks;
 using uLearn.Model.EdxComponents;
 using uLearn.Quizes;
 using uLearnToEdx.Edx;
@@ -79,9 +80,10 @@ namespace uLearnToEdx
 
 				foreach (var slide in course.Slides.Where(x => x.Info.UnitName == unit1))
 				{
+//					Console.WriteLine(slide.Info.SlideFile.Directory);
 					int j = 0;
 					var components = new List<Component>();
-					if (slide.Blocks.Any(x => x is AbstractQuestionBlock))
+					if (slide.Blocks.Any(x => x is AbstractQuestionBlock) && !slide.Blocks.Any(x => x is YoutubeBlock || x is ExerciseBlock))
 					{
 						foreach (var block in slide.Blocks)
 						{
