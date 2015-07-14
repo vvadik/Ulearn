@@ -6,9 +6,7 @@
 
 @helper AcceptedSolutions(AcceptedSolutionsPageModel model) {
 	<div id="LikeSolutionUrl" data-url="@(model.LikeSolutionUrl)"></div>
-	<h1 class='page-header'>Решения</h1>
 	<p>@MvcHtmlString.Create(model.Slide.Exercise.CommentAfterExerciseIsSolved.RenderMd(model.Slide.Info.SlideFile))</p>
-
 	<p>Изучите решения ваших коллег. Проголосуйте за решения, в которых вы нашли что-то новое для себя.</p>
 	foreach (AcceptedSolutionInfo solution in model.AcceptedSolutions)
 	{

@@ -50,17 +50,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"></div>\r\n");
 
 
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<h1 class=\'page-header\'>Решения</h1>\r\n");
-
-
-
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<p>");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, MvcHtmlString.Create(model.Slide.Exercise.CommentAfterExerciseIsSolved.RenderMd(model.Slide.Info.SlideFile)));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</p>\r\n");
-
 
 
 
