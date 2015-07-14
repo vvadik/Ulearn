@@ -63,10 +63,10 @@ namespace uLearnToEdx
 			Directory.CreateDirectory(folderName + "/problem");
 			foreach (var file in Directory.GetFiles("static"))
 				File.Copy(file, string.Format("{0}/static/{1}", folderName, Path.GetFileName(file)));
-			File.WriteAllText(folderName + "/course.xml", c.Serialize());
-			File.WriteAllText(folderName + "/course/" + course.Id + ".xml", cc.Serialize());
-			File.WriteAllText(folderName + "/chapter/" + course.Id + "-1.xml", ch.Serialize());
-			Console.WriteLine(new A {Aa = "<div></div>"}.Serialize());
+			File.WriteAllText(folderName + "/course.xml", c.XmlSerialize());
+			File.WriteAllText(folderName + "/course/" + course.Id + ".xml", cc.XmlSerialize());
+			File.WriteAllText(folderName + "/chapter/" + course.Id + "-1.xml", ch.XmlSerialize());
+			Console.WriteLine(new A {Aa = "<div></div>"}.XmlSerialize());
 			int i = 0;
 			foreach (var unit in course.GetUnits())
 			{
@@ -75,7 +75,7 @@ namespace uLearnToEdx
 				{
 					DisplayName = unit,
 					Verticals = course.Slides.Where(x => x.Info.UnitName == unit1).Select(x => new VerticalUrl { UrlName = x.Guid }).ToArray()
-				}.Serialize());
+				}.XmlSerialize());
 				i++;
 
 				foreach (var slide in course.Slides.Where(x => x.Info.UnitName == unit1))
@@ -104,7 +104,7 @@ namespace uLearnToEdx
 							{
 								DisplayName = slide.Title,
 								Components = new [] {slideComponent.GetReference() }
-							}.Serialize());
+							}.XmlSerialize());
 					}
 					else
 					{
@@ -121,7 +121,7 @@ namespace uLearnToEdx
 							{
 								DisplayName = slide.Title,
 								Components = components.Select(x => x.GetReference()).ToArray()
-							}.Serialize());
+							}.XmlSerialize());
 					}
 				}
 			}

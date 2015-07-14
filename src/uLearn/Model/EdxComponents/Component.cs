@@ -27,7 +27,7 @@ namespace uLearn.Model.EdxComponents
 
 		public virtual void Save()
 		{
-			File.WriteAllText(string.Format("{0}/{1}/{2}.xml", FolderName, SubfolderName, UrlName), this.Serialize());
+			File.WriteAllText(string.Format("{0}/{1}/{2}.xml", FolderName, SubfolderName, UrlName), this.XmlSerialize());
 		}
 
 		public abstract ComponentReference GetReference();
@@ -112,7 +112,7 @@ namespace uLearn.Model.EdxComponents
 
 		public override void Save()
 		{
-			File.WriteAllText(string.Format("{0}/{1}/{2}.xml", FolderName, SubfolderName, UrlName), this.Serialize());
+			File.WriteAllText(string.Format("{0}/{1}/{2}.xml", FolderName, SubfolderName, UrlName), this.XmlSerialize());
 			File.WriteAllText(string.Format("{0}/{1}/{2}.html", FolderName, SubfolderName, UrlName), Source);
 		}
 
@@ -162,7 +162,7 @@ namespace uLearn.Model.EdxComponents
 
 		public override void Save()
 		{
-			File.WriteAllText(string.Format("{0}/{1}/{2}.xml", FolderName, SubfolderName, UrlName), this.Serialize());
+			File.WriteAllText(string.Format("{0}/{1}/{2}.xml", FolderName, SubfolderName, UrlName), this.XmlSerialize());
 			File.WriteAllText(string.Format("{0}/{1}/{2}.html", FolderName, SubfolderName, UrlName), File.ReadAllText("iframe-template.html").Replace("{0}", "code_" + UrlName));
 			File.WriteAllText(string.Format("{0}/static/code_{1}.html", FolderName, UrlName), File.ReadAllText("code-template.html").Replace("{0}", Source));
 		}
@@ -223,7 +223,7 @@ namespace uLearn.Model.EdxComponents
 
 		public override XmlElement AsXmlElement()
 		{
-			var xmlString = this.Serialize();
+			var xmlString = this.XmlSerialize();
 			xmlString = xmlString.Substring("<problem>".Length, xmlString.Length - "<problem></problem>".Length);
 			var doc = new XmlDocument();
 			doc.LoadXml("<p>" + xmlString + "</p>");

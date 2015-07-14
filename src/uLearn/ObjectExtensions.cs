@@ -15,7 +15,7 @@ namespace uLearn
 		private static readonly XmlWriterSettings settings = new XmlWriterSettings { OmitXmlDeclaration = true };
 		private static readonly XmlSerializerNamespaces ns = new XmlSerializerNamespaces(new[] { new XmlQualifiedName("", "") });
 
-		public static string Serialize(this object o, bool raw = false)
+		public static string XmlSerialize(this object o, bool raw = false)
 		{
 			using (var ms = new MemoryStream())
 			using (var writer = XmlWriter.Create(ms, settings))
