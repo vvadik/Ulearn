@@ -7,13 +7,13 @@ namespace uLearn.Web.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.1-30610")]
-    public sealed partial class AddConsumers : IMigrationMetadata
+    public sealed partial class Lti : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddConsumers));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Lti));
         
         string IMigrationMetadata.Id
         {
-            get { return "201507011412286_AddConsumers"; }
+            get { return "201507140849505_Lti"; }
         }
         
         string IMigrationMetadata.Source

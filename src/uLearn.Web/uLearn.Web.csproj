@@ -277,21 +277,9 @@
     <Compile Include="Migrations\201504070552041_AddIsPassed.Designer.cs">
       <DependentUpon>201504070552041_AddIsPassed.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201507011221541_AddLti.cs" />
-    <Compile Include="Migrations\201507011221541_AddLti.Designer.cs">
-      <DependentUpon>201507011221541_AddLti.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201507011412286_AddConsumers.cs" />
-    <Compile Include="Migrations\201507011412286_AddConsumers.Designer.cs">
-      <DependentUpon>201507011412286_AddConsumers.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201507011512267_AddLti1.cs" />
-    <Compile Include="Migrations\201507011512267_AddLti1.Designer.cs">
-      <DependentUpon>201507011512267_AddLti1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201507020846212_AddSlideIdToLtiRequests.cs" />
-    <Compile Include="Migrations\201507020846212_AddSlideIdToLtiRequests.Designer.cs">
-      <DependentUpon>201507020846212_AddSlideIdToLtiRequests.cs</DependentUpon>
+    <Compile Include="Migrations\201507140849505_Lti.cs" />
+    <Compile Include="Migrations\201507140849505_Lti.Designer.cs">
+      <DependentUpon>201507140849505_Lti.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
     <Compile Include="Models\LtiRequestModel.cs" />
@@ -559,17 +547,8 @@
     <EmbeddedResource Include="Migrations\201504070552041_AddIsPassed.resx">
       <DependentUpon>201504070552041_AddIsPassed.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201507011221541_AddLti.resx">
-      <DependentUpon>201507011221541_AddLti.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201507011412286_AddConsumers.resx">
-      <DependentUpon>201507011412286_AddConsumers.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201507011512267_AddLti1.resx">
-      <DependentUpon>201507011512267_AddLti1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201507020846212_AddSlideIdToLtiRequests.resx">
-      <DependentUpon>201507020846212_AddSlideIdToLtiRequests.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201507140849505_Lti.resx">
+      <DependentUpon>201507140849505_Lti.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -1133,6 +1112,7 @@
       <LastGenOutput>AcceptedSolutionsHtml.generated.cs</LastGenOutput>
     </Content>
     <Content Include="Views\Course\AcceptedAlert.cshtml" />
+    <Content Include="Views\Course\LtiSlide.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

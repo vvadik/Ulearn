@@ -12,6 +12,7 @@ namespace uLearn.Web.Models
 		public string UserId { get; set; }
 
 		[Required]
+		[StringLength(64)]
 		public string SlideId { get; set; }
 
 		[Required]
