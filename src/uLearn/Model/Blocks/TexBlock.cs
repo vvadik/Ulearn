@@ -29,7 +29,7 @@ namespace uLearn.Model.Blocks
 		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
 		{
 			var urlName = slide.Guid + componentIndex;
-			return new [] { new HtmlComponent(folderName, urlName, urlName, string.Join("\n", TexLines.Select(x => "$$" + x + "$$")).GetHtml("static")) };
+			return new [] { new HtmlComponent(folderName, urlName, urlName, string.Join("\n", TexLines.Select(x => "$$" + x + "$$")).GetHtmlWithUrls("/static").Item1) };
 		}
 	}
 }

@@ -85,6 +85,12 @@ namespace uLearn.Model.EdxComponents
 		[XmlIgnore]
 		public string Source;
 
+		[XmlIgnore]
+		public string LocalFolder;
+
+		[XmlIgnore]
+		public List<string> LocalFiles;
+		
 		[XmlAttribute("filename")]
 		public string Filename;
 
@@ -110,10 +116,28 @@ namespace uLearn.Model.EdxComponents
 			Source = source;
 		}
 
+		public HtmlComponent(string folderName, string urlName, string filename, string source, string localFolder, List<string> localFiles)
+		{
+			FolderName = folderName;
+			UrlName = urlName;
+			Filename = filename;
+			Source = source;
+			LocalFolder = localFolder;
+			LocalFiles = localFiles;
+		}
+
 		public override void Save()
 		{
 			File.WriteAllText(string.Format("{0}/{1}/{2}.xml", FolderName, SubfolderName, UrlName), this.XmlSerialize());
 			File.WriteAllText(string.Format("{0}/{1}/{2}.html", FolderName, SubfolderName, UrlName), Source);
+			try
+			{
+				foreach (var localFile in LocalFiles)
+				{
+					File.Copy(string.Format("{0}/{1}", LocalFolder, localFile), string.Format("{0}/static/{1}", FolderName, localFile));
+				}
+			}
+			catch { }
 		}
 
 		public override ComponentReference GetReference()

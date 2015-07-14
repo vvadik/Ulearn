@@ -80,7 +80,7 @@ namespace uLearnToEdx
 
 				foreach (var slide in course.Slides.Where(x => x.Info.UnitName == unit1))
 				{
-//					Console.WriteLine(slide.Info.SlideFile.Directory);
+//					Console.WriteLine(slide.Info.SlideFile.Directory.FullName);
 					int j = 0;
 					var components = new List<Component>();
 					if (slide.Blocks.Any(x => x is AbstractQuestionBlock) && !slide.Blocks.Any(x => x is YoutubeBlock || x is ExerciseBlock))

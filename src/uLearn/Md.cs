@@ -39,7 +39,7 @@ namespace uLearn
 			return texReplacer.PlaceTexInsertsBack(html);
 		}
 
-		public static string GetHtml(this string md, string baseUrl = null)
+		public static Tuple<string, List<string>> GetHtmlWithUrls(this string md, string baseUrl = null)
 		{
 			var texReplacer = new EdxTexReplacer(md);
 
@@ -58,7 +58,7 @@ namespace uLearn
 				Console.WriteLine(url);
 			}
 			
-			return texReplacer.PlaceTexInsertsBack(html);
+			return Tuple.Create(texReplacer.PlaceTexInsertsBack(html), markdown.localUrls);
 		}
 	}
 

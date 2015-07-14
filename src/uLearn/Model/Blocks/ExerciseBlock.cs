@@ -134,7 +134,7 @@ namespace uLearn.Model.Blocks
 			{
 				new LtiComponent(
 					"Задача", folderName, slide.Guid + componentIndex,
-					string.Format("https://{0}:{1}/Code/Slide?courseId={2}&slideIndex={3}", "192.168.33.1", 44300, courseId, slide.Index),
+					string.Format("https://{0}:{1}/Course/{2}/LtiSlide/{3}", "192.168.33.1", 44300, courseId, slide.Index),
 					"myname", true, 5, false
 				),
 				new LtiComponent(
