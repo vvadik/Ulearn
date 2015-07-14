@@ -4,7 +4,7 @@
 
 <h4>Вход с помощью</h4>
 @{
-	var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes().ToList();
+	var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes().Where(x => x.AuthenticationType != "LTI").ToList();
 	if (!loginProviders.Any())
 	{
 		<div>
