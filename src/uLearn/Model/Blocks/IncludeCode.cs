@@ -36,7 +36,7 @@ namespace uLearn.Model.Blocks
 			LangVer = LangVer ?? context.CourseSettings.GetLanguageVersion(LangId);
 		}
 
-		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
+		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, string displayName, Slide slide, int componentIndex)
 		{
 			if (!string.IsNullOrEmpty(File))
 				throw new Exception("IncludeCode.cs: File string is not empty.");

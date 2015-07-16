@@ -25,9 +25,9 @@ namespace uLearn.Model.Blocks
 			return string.Format("Video {0}", VideoId);
 		}
 
-		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, Slide slide, int componentIndex)
+		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, string displayName, Slide slide, int componentIndex)
 		{
-			return new [] { new VideoComponent(folderName, slide.Guid + componentIndex, VideoId) };
+			return new [] { new VideoComponent(folderName, slide.Guid + componentIndex, displayName, VideoId) };
 		}
 	}
 }

@@ -53,11 +53,6 @@ namespace uLearn
 			
 			var html = markdown.Transform(texReplacer.ReplacedText);
 			
-			foreach (var url in markdown.localUrls)
-			{
-				Console.WriteLine(url);
-			}
-			
 			return Tuple.Create(texReplacer.PlaceTexInsertsBack(html), markdown.localUrls);
 		}
 	}
