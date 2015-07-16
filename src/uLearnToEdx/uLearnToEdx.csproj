@@ -74,9 +74,6 @@
     <Content Include="iframe-template.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="regex_template.py">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="static\clike.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
