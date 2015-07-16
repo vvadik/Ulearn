@@ -55,6 +55,8 @@ namespace uLearn.Web.Controllers
 			var ltiRequestJson = FindLtiRequestJson();
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.Slides[slideIndex] as ExerciseSlide;
+			if (slide == null)
+				return View();
 			if (!string.IsNullOrWhiteSpace(ltiRequestJson))
 				await ltiRequestsRepo.Update(userId, slide.Id, ltiRequestJson);
 
@@ -168,7 +170,7 @@ namespace uLearn.Web.Controllers
 				var lastAcceptedSolution = solutionsRepo.FindLatestAcceptedSolution(course.Id, slide.Id, visiter.UserId);
 				return new ExerciseBlockData(true, visiter.IsSkipped, lastAcceptedSolution)
 				{
-					RunSolutionUrl = Url.Action("RunSolution", "Exercise", new { courseId = course.Id, slideIndex = slide.Index }),
+					RunSolutionUrl = Url.Action("RunSolution", "Exercise", new { courseId = course.Id, slideIndex = slide.Index, isLti }),
 					AcceptedSolutionUrl = Url.Action("AcceptedSolutions", "Course", new { courseId = course.Id, slideIndex = slide.Index }),
 					GetHintUrl = Url.Action("UseHint", "Hint"),
 					IsLti = isLti
