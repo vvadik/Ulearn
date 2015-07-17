@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using uLearn;
 using uLearn.Model.Blocks;
 using uLearn.Model.EdxComponents;
@@ -13,10 +14,136 @@ namespace uLearnToEdx
 {
 	internal class Program
 	{
+		private static void SaveOrdinarySlide(uLearn.Course course, string folderName, Slide slide)
+		{
+			var componentIndex = 0;
+			var components = new List<Component>();
+			while (componentIndex < slide.Blocks.Length)
+			{
+				var blocks = slide.Blocks.Skip(componentIndex).TakeWhile(x => !(x is YoutubeBlock) && !(x is ExerciseBlock)).ToList();
+				if (blocks.Count != 0)
+				{
+					var innerComponents = new List<Component>();
+					foreach (var block in blocks)
+					{
+						var component = block.ToEdxComponent(folderName, course.Id, "", slide, componentIndex);
+						var comps = component as Component[] ?? component.ToArray();
+						innerComponents.AddRange(comps);
+						foreach (var comp in comps)
+							comp.SaveAdditional();
+						componentIndex++;
+					}
+
+					var slideComponent = new HtmlComponent
+					{
+						DisplayName = componentIndex <= blocks.Count ? slide.Title : "",
+						FolderName = folderName,
+						UrlName = slide.Guid + componentIndex,
+						Filename = slide.Guid + componentIndex,
+						Source = string.Join("", innerComponents.Select(x => x.AsHtmlString()))
+					};
+					components.Add(slideComponent);
+					slideComponent.Save();
+				}
+				if (componentIndex >= slide.Blocks.Length)
+					break;
+				var otherComponent = slide.Blocks[componentIndex].ToEdxComponent(folderName, course.Id, componentIndex == 0 ? slide.Title : "", slide, componentIndex);
+				var otherComps = otherComponent as Component[] ?? otherComponent.ToArray();
+				components.AddRange(otherComps);
+				foreach (var comp in otherComps)
+					comp.Save();
+				componentIndex++;
+			}
+			var solutionComponents = new List<Component>();
+			foreach (var result in slide.Blocks.OfType<ExerciseBlock>())
+			{
+				var comp = result.GetSolutionsComponent(folderName, course.Id, "Решения", slide, componentIndex);
+				comp.Save();
+				solutionComponents.Add(comp);
+				componentIndex++;
+			}
+			if (solutionComponents.Count > 0)
+			{
+				File.WriteAllText(folderName + "/vertical/" + slide.Guid + "0.xml",
+					new Vertical
+					{
+						DisplayName = "Решения",
+						Components = solutionComponents.Select(x => x.GetReference()).ToArray()
+					}.XmlSerialize());
+			}
+			File.WriteAllText(folderName + "/vertical/" + slide.Guid + ".xml",
+				new Vertical
+				{
+					DisplayName = slide.Title,
+					Components = components.Select(x => x.GetReference()).ToArray()
+				}.XmlSerialize());
+		}
+
+		private static void SaveQuizSlide(uLearn.Course course, string folderName, Slide slide)
+		{
+			var componentIndex = 0;
+			var components = new List<Component>();
+			foreach (var block in slide.Blocks)
+			{
+				var component = block.ToEdxComponent(folderName, course.Id, "", slide, componentIndex);
+				components.AddRange(component);
+				componentIndex++;
+			}
+			var slideComponent = new SlideProblemComponent
+			{
+				DisplayName = slide.Title,
+				FolderName = folderName,
+				UrlName = slide.Guid,
+				Components = components.Select(x => x.AsXmlElement()).ToArray()
+			};
+
+			foreach (var component in components)
+			{
+				component.SaveAdditional();
+			}
+
+			slideComponent.Save();
+			File.WriteAllText(folderName + "/vertical/" + slide.Guid + ".xml",
+				new Vertical
+				{
+					DisplayName = slide.Title,
+					Components = new[] { slideComponent.GetReference() }
+				}.XmlSerialize());
+		}
+
+		private static void SaveSlide(uLearn.Course course, string folderName, Slide slide)
+		{
+			if (slide.Blocks.Any(x => x is AbstractQuestionBlock) && !slide.Blocks.Any(x => x is ExerciseBlock))
+			{
+				SaveQuizSlide(course, folderName, slide);
+			}
+			else
+			{
+				SaveOrdinarySlide(course, folderName, slide);
+			}
+		}
+
+		private static void SaveUnit(uLearn.Course course, string folderName, string unit, int unitIndex)
+		{
+			var verticals = new List<VerticalUrl>();
+			foreach (var slide in course.Slides.Where(x => x.Info.UnitName == unit))
+			{
+				SaveSlide(course, folderName, slide);
+				verticals.Add(new VerticalUrl { UrlName = slide.Guid });
+				if (slide.Blocks.Any(x => x is ExerciseBlock))
+					verticals.Add(new VerticalUrl { UrlName = slide.Guid + "0" });
+			}
+			File.WriteAllText(string.Format("{0}/sequential/{1}-1-{2}.xml", folderName, course.Id, unitIndex), new Sequential
+			{
+				DisplayName = unit,
+				Verticals = verticals.ToArray()
+			}.XmlSerialize());
+		}
+
 		private static void Main(string[] args)
 		{
 			var cm = new CourseManager(new DirectoryInfo(@"..\..\..\uLearn.Web"));
-			cm.ReloadCourse("BasicProgramming.zip");
+			cm.ReloadCourse("OOP.zip");
 
 			var course = cm.GetCourses().First();
 			var folderName = course.Id;
@@ -53,123 +180,14 @@ namespace uLearnToEdx
 			Directory.CreateDirectory(folderName + "/problem");
 			foreach (var file in Directory.GetFiles("static"))
 				File.Copy(file, string.Format("{0}/static/{1}", folderName, Path.GetFileName(file)));
-			File.WriteAllText(folderName + "/course.xml", c.XmlSerialize());
-			File.WriteAllText(folderName + "/course/" + course.Id + ".xml", cc.XmlSerialize());
-			File.WriteAllText(folderName + "/chapter/" + course.Id + "-1.xml", ch.XmlSerialize());
-			int i = 0;
+			File.WriteAllText(string.Format("{0}/course.xml", folderName), c.XmlSerialize());
+			File.WriteAllText(string.Format("{0}/course/{1}.xml", folderName, course.Id), cc.XmlSerialize());
+			File.WriteAllText(string.Format("{0}/chapter/{1}-1.xml", folderName, course.Id), ch.XmlSerialize());
+			var unitIndex = 0;
 			foreach (var unit in course.GetUnits())
 			{
-				var unit1 = unit;
-				var verticals = new List<VerticalUrl>();
-				foreach (var slide in course.Slides.Where(x => x.Info.UnitName == unit1))
-				{
-					verticals.Add(new VerticalUrl { UrlName = slide.Guid} );
-					if (slide.Blocks.Any(x => x is ExerciseBlock))
-						verticals.Add(new VerticalUrl { UrlName = slide.Guid + "0" });
-				}
-				File.WriteAllText(folderName + "/sequential/" + course.Id + "-1-" + i + ".xml", new Sequential
-				{
-					DisplayName = unit,
-					Verticals = verticals.ToArray()
-				}.XmlSerialize());
-				i++;
-
-				foreach (var slide in course.Slides.Where(x => x.Info.UnitName == unit1))
-				{
-					int j = 0;
-					var components = new List<Component>();
-					if (slide.Blocks.Any(x => x is AbstractQuestionBlock) && !slide.Blocks.Any(x => x is YoutubeBlock || x is ExerciseBlock))
-					{
-						foreach (var block in slide.Blocks)
-						{
-							var component = block.ToEdxComponent(folderName, course.Id, "", slide, j);
-							components.AddRange(component);
-							j++;
-						}
-						var slideComponent = new SlideProblemComponent
-						{
-							DisplayName = slide.Title, 
-							FolderName = folderName, 
-							UrlName = slide.Guid,
-							Components = components.Select(x => x.AsXmlElement()).ToArray()
-						};
-
-						foreach (var codeComponent in components.OfType<CodeComponent>())
-						{
-							codeComponent.SaveAdditional();
-						}
-						slideComponent.Save();
-						File.WriteAllText(folderName + "/vertical/" + slide.Guid + ".xml",
-							new Vertical
-							{
-								DisplayName = slide.Title,
-								Components = new [] {slideComponent.GetReference() }
-							}.XmlSerialize());
-					}
-					else
-					{
-						while (j < slide.Blocks.Length)
-						{
-							var blocks = slide.Blocks.Skip(j).TakeWhile(x => !(x is YoutubeBlock) && !(x is ExerciseBlock)).ToList();
-							var innerComponents = new List<Component>();
-							foreach (var block in blocks)
-							{
-								
-								var component = block.ToEdxComponent(folderName, course.Id, "", slide, j);
-								var comps = component as Component[] ?? component.ToArray();
-								innerComponents.AddRange(comps);
-								
-								foreach (var comp in comps)
-									comp.Save();
-								j++;
-							}
-							if (blocks.Count != 0)
-							{
-								var slideComponent = new HtmlComponent
-								{
-									DisplayName = j <= blocks.Count ? slide.Title : "",
-									FolderName = folderName,
-									UrlName = slide.Guid + j,
-									Filename = slide.Guid + j,
-									Source = string.Join("", innerComponents.Select(x => x.AsHtmlString()))
-								};
-								components.Add(slideComponent);
-								slideComponent.Save();
-							}
-							if (j >= slide.Blocks.Length)
-								break;
-							var otherComponent = slide.Blocks[j].ToEdxComponent(folderName, course.Id, j == 0 ? slide.Title : "", slide, j);
-							var otherComps = otherComponent as Component[] ?? otherComponent.ToArray();
-							components.AddRange(otherComps);
-							foreach (var comp in otherComps)
-								comp.Save();
-							j++;
-						}
-						var solutionComponents = new List<Component>();
-						foreach (var result in slide.Blocks.OfType<ExerciseBlock>())
-						{
-							var comp = result.GetSolutionsComponent(folderName, course.Id, "Решения", slide, j);
-							comp.Save();
-							solutionComponents.Add(comp);
-							j++;
-						}
-						if (solutionComponents.Count > 0)
-						{
-							File.WriteAllText(folderName + "/vertical/" + slide.Guid + "0.xml",
-								new Vertical
-								{
-									DisplayName = "Решения",
-									Components = solutionComponents.Select(x => x.GetReference()).ToArray()
-								}.XmlSerialize());
-						}
-						File.WriteAllText(folderName + "/vertical/" + slide.Guid + ".xml",
-							new Vertical
-							{
-								DisplayName = slide.Title,
-								Components = components.Select(x => x.GetReference()).ToArray()
-							}.XmlSerialize());
-					}
-				}
+				SaveUnit(course, folderName, unit, unitIndex);
+				unitIndex++;
 			}
 			ArchiveManager.CreateTar(folderName + ".tar.gz", folderName);
 		}
