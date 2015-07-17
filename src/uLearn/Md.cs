@@ -43,7 +43,7 @@ namespace uLearn
 		{
 			var texReplacer = new EdxTexReplacer(md);
 
-			var markdown = new Markdown2(baseUrl)
+			var markdown = new Markdown2(baseUrl, false)
 			{
 				NewWindowForExternalLinks = true,
 				ExtraMode = true,
