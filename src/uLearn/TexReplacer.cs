@@ -81,13 +81,15 @@ namespace uLearn
 
 		public static string ReplaceTex(string text)
 		{
+			text = text.Replace("`", "");
 			var replacer = new EdxTexReplacer(text);
 			return replacer.PlaceTexInsertsBack(replacer.ReplacedText);
 		}
 
 		protected override string FormatTexSpan(string tex)
 		{
-			return "`" + HttpUtility.HtmlEncode(tex) + "`";
+			// A workaround for `\left(...\right)` problem
+			return "`" + Regex.Replace(HttpUtility.HtmlEncode(tex), @"\\left\((.*?)\\right\)", "($1)") + "`";
 		}
 		
 		protected override string FormatTexDiv(string tex)

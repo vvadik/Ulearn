@@ -87,7 +87,7 @@ namespace uLearn.Quizes
 
 		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, string displayName, Slide slide, int componentIndex)
 		{
-			var items = Items.Select(x => new Choice { Correct = x.IsCorrect, Text = EdxTexReplacer.ReplaceTex(x.Description).Replace("`", "") }).ToArray();
+			var items = Items.Select(x => new Choice { Correct = x.IsCorrect, Text = EdxTexReplacer.ReplaceTex(x.Description) }).ToArray();
 			ChoiceResponse cr;
 			if (Multiple)
 			{
@@ -106,7 +106,7 @@ namespace uLearn.Quizes
 					FolderName = folderName, 
 					UrlName = slide.Guid + componentIndex, 
 					ChoiceResponse = cr, 
-					Title = EdxTexReplacer.ReplaceTex(Text).Replace("`", "")
+					Title = EdxTexReplacer.ReplaceTex(Text)
 				}
 			};
 		}
@@ -143,7 +143,7 @@ namespace uLearn.Quizes
 					FolderName = folderName, 
 					UrlName = slide.Guid + componentIndex,
 					ChoiceResponse = new MultipleChoiceResponse { ChoiceGroup = cg }, 
-					Title = EdxTexReplacer.ReplaceTex(Text).Replace("`", ""), 
+					Title = EdxTexReplacer.ReplaceTex(Text), 
 					Solution = new Solution(Explanation)
 				}
 			};
@@ -175,7 +175,7 @@ namespace uLearn.Quizes
 				{
 					FolderName = folderName, 
 					UrlName = slide.Guid + componentIndex, 
-					Title = EdxTexReplacer.ReplaceTex(Text).Replace("`", ""), 
+					Title = EdxTexReplacer.ReplaceTex(Text), 
 					StringResponse = new StringResponse
 					{
 						Type = (Regexes[0].IgnoreCase ? "ci " : "") + "regexp", 
