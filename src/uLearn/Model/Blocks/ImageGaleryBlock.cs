@@ -26,7 +26,8 @@ namespace uLearn.Model.Blocks
 
 		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, string displayName, Slide slide, int componentIndex)
 		{
-			throw new System.NotImplementedException();
+			var urlName = slide.Guid + componentIndex;
+			return new [] { new GalleryComponent(folderName, urlName, displayName, urlName, slide.Info.SlideFile.Directory.FullName, ImageUrls) };
 		}
 	}
 }

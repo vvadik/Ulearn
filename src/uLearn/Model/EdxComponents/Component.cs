@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -20,6 +21,10 @@ namespace uLearn.Model.EdxComponents
 		public virtual void Save()
 		{
 			File.WriteAllText(string.Format("{0}/{1}/{2}.xml", FolderName, SubfolderName, UrlName), this.XmlSerialize());
+		}
+
+		public virtual void SaveAdditional()
+		{
 		}
 
 		public virtual XmlElement AsXmlElement()
@@ -75,7 +80,7 @@ namespace uLearn.Model.EdxComponents
 
 		public override string AsHtmlString()
 		{
-			throw new NotImplementedException();
+			return "<iframe class=\"embedded-video\" width=\"100%\" height=\"530\" src=\"//www.youtube.com/embed/1WaWDgBxyYc\" frameborder=\"0\" allowfullscreen=\"\"></iframe>";
 		}
 	}
 
@@ -135,16 +140,16 @@ namespace uLearn.Model.EdxComponents
 			SaveAdditional();
 		}
 
-		public void SaveAdditional()
+		public override void SaveAdditional()
 		{
 			try
 			{
 				foreach (var localFile in LocalFiles)
-				{
-					File.Copy(string.Format("{0}/{1}", LocalFolder, localFile), string.Format("{0}/static/{1}", FolderName, localFile));
-				}
+					File.Copy(string.Format("{0}/{1}", LocalFolder, localFile), string.Format("{0}/static/{1}_{2}", FolderName, UrlName, localFile.Replace("/", "_")));
 			}
-			catch { }
+			catch
+			{
+			}
 		}
 
 		public override ComponentReference GetReference()
@@ -164,6 +169,9 @@ namespace uLearn.Model.EdxComponents
 		[XmlIgnore]
 		public string Source;
 
+		[XmlIgnore]
+		public string LangId;
+
 		[XmlAttribute("filename")]
 		public string Filename;
 
@@ -181,25 +189,27 @@ namespace uLearn.Model.EdxComponents
 		{
 		}
 
-		public CodeComponent(string folderName, string urlName, string displayName, string filename, string source)
+		public CodeComponent(string folderName, string urlName, string displayName, string filename, string langId, string source)
 		{
 			FolderName = folderName;
 			UrlName = urlName;
 			DisplayName = displayName;
 			Filename = filename;
+			LangId = langId;
 			Source = source;
 		}
 
 		public override void Save()
 		{
 			File.WriteAllText(string.Format("{0}/{1}/{2}.xml", FolderName, SubfolderName, UrlName), this.XmlSerialize());
-			File.WriteAllText(string.Format("{0}/{1}/{2}.html", FolderName, SubfolderName, UrlName), File.ReadAllText("iframe-template.html").Replace("{0}", "code_" + UrlName));
+			File.WriteAllText(string.Format("{0}/{1}/{2}.html", FolderName, SubfolderName, UrlName), this.AsHtmlString());
 			SaveAdditional();
 		}
 
-		public void SaveAdditional()
+		public override void SaveAdditional()
 		{
-			File.WriteAllText(string.Format("{0}/static/code_{1}.html", FolderName, UrlName), File.ReadAllText("code-template.html").Replace("{0}", Source));
+			File.WriteAllText(string.Format("{0}/static/code_{1}.html", FolderName, UrlName), 
+				File.ReadAllText("code-template.html").Replace("{0}", LangId).Replace("{1}", Source));
 		}
 
 		public override ComponentReference GetReference()
@@ -209,7 +219,74 @@ namespace uLearn.Model.EdxComponents
 
 		public override string AsHtmlString()
 		{
-			return File.ReadAllText("iframe-template.html").Replace("{0}", "code_" + UrlName);
+			return File.ReadAllText("iframe-template.html")
+				.Replace("{0}", "code_" + UrlName)
+				.Replace("{1}", "(function (obj) { obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px'; })(this);");
+		}
+	}
+
+	[XmlRoot("html")]
+	public class GalleryComponent : Component
+	{
+		[XmlIgnore]
+		public string[] Images;
+
+		[XmlIgnore]
+		public string LocalFolder;
+
+		[XmlAttribute("filename")]
+		public string Filename;
+
+		[XmlAttribute("display_name")]
+		public string DisplayName;
+
+		[XmlIgnore]
+		public override string SubfolderName
+		{
+			get { return "html"; }
+			set { }
+		}
+
+		public GalleryComponent()
+		{
+		}
+
+		public GalleryComponent(string folderName, string urlName, string displayName, string filename, string localFolder, string[] images)
+		{
+			FolderName = folderName;
+			UrlName = urlName;
+			DisplayName = displayName;
+			Filename = filename;
+			LocalFolder = localFolder;
+			Images = images;
+		}
+
+		public override void Save()
+		{
+			File.WriteAllText(string.Format("{0}/{1}/{2}.xml", FolderName, SubfolderName, UrlName), this.XmlSerialize());
+			File.WriteAllText(string.Format("{0}/{1}/{2}.html", FolderName, SubfolderName, UrlName), this.AsHtmlString());
+			SaveAdditional();
+		}
+
+		public override void SaveAdditional()
+		{
+			foreach (var image in Images)
+				File.Copy(string.Format("{0}/{1}", LocalFolder, image), string.Format("{0}/static/{1}_{2}", FolderName, UrlName, image.Replace("/", "_")));
+			File.WriteAllText(string.Format("{0}/static/gallery_{1}.html", FolderName, UrlName), 
+				File.ReadAllText("gallery-template.html")
+					.Replace("{0}", string.Join("", Images.Select(x => "<li><img src='" + UrlName + "_" + x.Replace("/", "_") + "' alt=''/></li>"))));
+		}
+
+		public override ComponentReference GetReference()
+		{
+			return new HtmlComponentReference { UrlName = UrlName };
+		}
+
+		public override string AsHtmlString()
+		{
+			return File.ReadAllText("iframe-template.html")
+				.Replace("{0}", "gallery_" + UrlName)
+				.Replace("{1}", "(function (obj) { obj.style.height = '600px'; })(this);");
 		}
 	}
 
