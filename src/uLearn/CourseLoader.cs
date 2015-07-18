@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using uLearn.CSharp;
 using uLearn.Model;
 using uLearn.Quizes;
@@ -17,6 +18,12 @@ namespace uLearn
 			var settings = CourseSettings.Load(dir);
 			var slides = LoadSlides(dir, settings).ToArray();
 			CheckDuplicateSlideIds(slides);
+
+			var builder = new StringBuilder();
+			builder.Append("Number;Id;Title;Unit\n");
+			for (int i = 0; i < slides.Length; i++)
+				builder.Append(i + ";" + slides[i].Id + ";" + slides[i].Title+";"+slides[i].Info.UnitName+"\n");
+			string str = builder.ToString();
 
 			var courseId = dir.Name;
 			var notes = LoadInstructorNotes(dir, courseId);
