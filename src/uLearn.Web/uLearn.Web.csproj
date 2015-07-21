@@ -280,6 +280,10 @@
     <Compile Include="Migrations\201507140849505_Lti.Designer.cs">
       <DependentUpon>201507140849505_Lti.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201507210607402_ConsumerAndLtiRequestIndices.cs" />
+    <Compile Include="Migrations\201507210607402_ConsumerAndLtiRequestIndices.Designer.cs">
+      <DependentUpon>201507210607402_ConsumerAndLtiRequestIndices.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
     <Compile Include="Models\LtiRequestModel.cs" />
     <Compile Include="Models\CodeModel.cs" />
@@ -548,6 +552,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201507140849505_Lti.resx">
       <DependentUpon>201507140849505_Lti.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201507210607402_ConsumerAndLtiRequestIndices.resx">
+      <DependentUpon>201507210607402_ConsumerAndLtiRequestIndices.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
