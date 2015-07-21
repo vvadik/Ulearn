@@ -9,11 +9,10 @@ namespace uLearn
 	{
 		private readonly string baseUrl;
 		private readonly bool checkUrl;
-		public readonly List<string> localUrls;
+		public event Action<string> RelativeUrl;
 
 		public Markdown2(string baseUrl, bool checkUrl = true)
 		{
-			localUrls = new List<string>();
 			this.checkUrl = checkUrl;
 			this.baseUrl = baseUrl;
 			if (baseUrl != null && !baseUrl.EndsWith("/") && checkUrl)
@@ -24,7 +23,7 @@ namespace uLearn
 		{
 			if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
 			{
-				localUrls.Add(url);
+				if (RelativeUrl != null) RelativeUrl.Invoke(url);
 				if (!checkUrl)
 					url = url.Replace("/", "_");
 			}

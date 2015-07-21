@@ -41,6 +41,7 @@ namespace uLearn
 
 		public static Tuple<string, List<string>> GetHtmlWithUrls(this string md, string baseUrl = null)
 		{
+			
 			var texReplacer = new EdxTexReplacer(md);
 
 			var markdown = new Markdown2(baseUrl, false)
@@ -51,9 +52,12 @@ namespace uLearn
 				MarkdownInHtml = false,
 			};
 			
+			var relativeUrls = new List<string>();
+			markdown.RelativeUrl += relativeUrls.Add;
+
 			var html = markdown.Transform(texReplacer.ReplacedText);
 			
-			return Tuple.Create(texReplacer.PlaceTexInsertsBack(html), markdown.localUrls);
+			return Tuple.Create(texReplacer.PlaceTexInsertsBack(html), relativeUrls);
 		}
 	}
 
