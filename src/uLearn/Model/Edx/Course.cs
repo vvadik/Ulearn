@@ -1,6 +1,7 @@
-﻿using System.Xml.Serialization;
+﻿using System.IO;
+using System.Xml.Serialization;
 
-namespace uLearnToEdx.Edx
+namespace uLearn.Model.Edx
 {
 	[XmlRoot("course")]
 	public class Course
@@ -13,5 +14,11 @@ namespace uLearnToEdx.Edx
 
 		[XmlAttribute("course")]
 		public string CourseName;
+
+		public void Save()
+		{
+			File.WriteAllText(string.Format("{0}/course.xml", ""
+				), this.XmlSerialize());
+		}
 	}
 }

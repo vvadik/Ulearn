@@ -1,8 +1,58 @@
-﻿using System.Xml;
+﻿using System;
+using System.Xml;
 using System.Xml.Serialization;
 
-namespace uLearn.Model.EdxComponents
+namespace uLearn.Model.Edx.EdxComponents
 {
+	public class ProblemComponent : Component
+	{
+		[XmlIgnore]
+		public override string SubfolderName
+		{
+			get { return "problem"; }
+			set { }
+		}
+
+		public override EdxReference GetReference()
+		{
+			return new ProblemComponentReference { UrlName = UrlName };
+		}
+
+		public override string AsHtmlString()
+		{
+			var xmlString = this.XmlSerialize();
+			xmlString = xmlString.Substring("<problem>".Length, xmlString.Length - "<problem></problem>".Length);
+			return "<p>" + xmlString + "</p>";
+		}
+	}
+
+	[XmlRoot("problem")]
+	public class SlideProblemComponent : Component
+	{
+		[XmlElement("p")]
+		public XmlElement[] Components;
+
+		[XmlAttribute("display_name")]
+		public string DisplayName;
+
+		[XmlIgnore]
+		public override string SubfolderName
+		{
+			get { return "problem"; }
+			set { }
+		}
+
+		public override EdxReference GetReference()
+		{
+			return new ProblemComponentReference { UrlName = UrlName };
+		}
+
+		public override string AsHtmlString()
+		{
+			throw new NotImplementedException();
+		}
+	}
+
 	[XmlRoot("problem")]
 	public class TextInputComponent : ProblemComponent
 	{
@@ -89,7 +139,6 @@ namespace uLearn.Model.EdxComponents
 
 	public class MultipleChoiceResponse : ChoiceResponse
 	{
-		
 	}
 
 	public class ChoiceGroup
@@ -100,7 +149,6 @@ namespace uLearn.Model.EdxComponents
 		[XmlElement("choice")]
 		public Choice[] Choices;
 	}
-
 
 	public class MultipleChoiceGroup : ChoiceGroup
 	{

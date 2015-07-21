@@ -7,7 +7,7 @@ using System.Web.Services.Description;
 using System.Xml.Serialization;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using uLearn.Model.Blocks;
-using uLearn.Model.EdxComponents;
+using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Quizes
 {

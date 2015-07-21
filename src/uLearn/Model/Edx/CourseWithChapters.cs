@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
-namespace uLearnToEdx.Edx
+namespace uLearn.Model.Edx
 {
 	[XmlRoot("course")]
 	public class CourseWithChapters
@@ -23,12 +18,6 @@ namespace uLearnToEdx.Edx
 		public bool UseLatexCompiler;
 
 		[XmlElement("chapter")]
-		public ChapterUrl[] Chapters;
-	}
-
-	public class ChapterUrl
-	{
-		[XmlAttribute("url_name")]
-		public string UrlName;
+		public ChapterReference[] Chapters;
 	}
 }

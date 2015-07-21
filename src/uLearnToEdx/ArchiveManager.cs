@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Tar;
 
@@ -11,6 +6,19 @@ namespace uLearnToEdx
 {
 	class ArchiveManager
 	{
+		/// <summary>
+		/// Extracts contents of GZipped Tar file to specified directory
+		/// </summary>
+		/// <param name="filename">Input .tar.gz file</param>
+		/// <param name="directory">Output directory</param>
+		public static void ExtractTar(string filename, string directory)
+		{
+			using (Stream inStream = File.OpenRead(filename))
+			using (Stream gzipStream = new GZipInputStream(inStream))
+			using (TarArchive tarArchive = TarArchive.CreateInputTarArchive(gzipStream))
+				tarArchive.ExtractContents(directory);
+		}
+
 		/// <summary>
 		/// Creates a GZipped Tar file from a source directory
 		/// </summary>
@@ -21,9 +29,7 @@ namespace uLearnToEdx
 			using (FileStream fs = new FileStream(outputTarFilename, FileMode.Create, FileAccess.Write, FileShare.None))
 			using (Stream gzipStream = new GZipOutputStream(fs))
 			using (TarArchive tarArchive = TarArchive.CreateOutputTarArchive(gzipStream))
-			{
 				AddDirectoryFilesToTar(tarArchive, sourceDirectory, true);
-			}
 		}
 
 		/// <summary>

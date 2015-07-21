@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Policy;
 using System.Xml.Serialization;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using uLearn.Model.EdxComponents;
+using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {
