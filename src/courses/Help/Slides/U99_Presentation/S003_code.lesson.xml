@@ -47,10 +47,10 @@
 	</include-code>
 
 	<md>###Питон весь файл</md>
-	<include-code file="HelloWorld.py" lang_ver="3" />
+	<include-code file="HelloWorld.py" lang-ver="3" />
 
 	<md>###Питон регион main</md>
-	<include-code file="HelloWorld.py" lang_ver="3">
+	<include-code file="HelloWorld.py" lang-ver="3">
 		<display>main</display>
 	</include-code>
 </Lesson>

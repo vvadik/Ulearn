@@ -26,7 +26,7 @@
 	</md>
 
 	<include-code>
-		<label only-body="true">Test1</label>
+		<display only-body="true">Test1</display>
 	</include-code>
 
 	<md>
@@ -39,7 +39,7 @@
 	</md>
 
 	<include-code>
-		<label only-body="true">Test2</label>
+		<display only-body="true">Test2</display>
 	</include-code>
 
 	<md>
@@ -49,7 +49,7 @@
 	</md>
 
 	<include-code>
-		<label only-body="true">TestDistinct</label>
+		<display only-body="true">TestDistinct</display>
 	</include-code>
 
 </Lesson>
