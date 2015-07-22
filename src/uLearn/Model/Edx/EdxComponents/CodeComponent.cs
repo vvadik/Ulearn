@@ -22,16 +22,14 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override string SubfolderName
 		{
 			get { return "html"; }
-			set { }
 		}
 
 		public CodeComponent()
 		{
 		}
 
-		public CodeComponent(string folderName, string urlName, string displayName, string filename, string langId, string source)
+		public CodeComponent(string urlName, string displayName, string filename, string langId, string source)
 		{
-			FolderName = folderName;
 			UrlName = urlName;
 			DisplayName = displayName;
 			Filename = filename;
@@ -39,16 +37,15 @@ namespace uLearn.Model.Edx.EdxComponents
 			Source = source;
 		}
 
-		public override void Save()
+		public override void Save(string folderName)
 		{
-			base.Save();
-			File.WriteAllText(string.Format("{0}/{1}/{2}.html", FolderName, SubfolderName, UrlName), AsHtmlString());
-			SaveAdditional();
+			base.Save(folderName);
+			File.WriteAllText(string.Format("{0}/{1}/{2}.html", folderName, SubfolderName, UrlName), AsHtmlString());
 		}
 
-		public override void SaveAdditional()
+		public override void SaveAdditional(string folderName)
 		{
-			File.WriteAllText(string.Format("{0}/static/code_{1}.html", FolderName, UrlName),
+			File.WriteAllText(string.Format("{0}/static/code_{1}.html", folderName, UrlName),
 				File.ReadAllText("code-template.html").Replace("{0}", LangId).Replace("{1}", Source));
 		}
 

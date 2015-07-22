@@ -52,6 +52,10 @@
     <Reference Include="Microsoft.CodeAnalysis.CSharp">
       <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.0.6.4033103-beta\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
@@ -137,7 +141,7 @@
     <Compile Include="Model\Edx\EdxComponents\Component.cs" />
     <Compile Include="Model\Edx\EdxItem.cs" />
     <Compile Include="Model\Edx\EdxReference.cs" />
-    <Compile Include="Model\Edx\Course.cs" />
+    <Compile Include="Model\Edx\EdxCourse.cs" />
     <Compile Include="Model\Edx\CourseWithChapters.cs" />
     <Compile Include="Model\Edx\EdxComponents\GalleryComponent.cs" />
     <Compile Include="Model\Edx\EdxComponents\HtmlComponent.cs" />

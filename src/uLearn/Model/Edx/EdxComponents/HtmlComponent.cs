@@ -27,25 +27,25 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override string SubfolderName
 		{
 			get { return "html"; }
-			set { }
 		}
+
+		[XmlIgnore]
+		public Component[] Subcomponents;
 
 		public HtmlComponent()
 		{
 		}
 
-		public HtmlComponent(string folderName, string urlName, string displayName, string filename, string source)
+		public HtmlComponent(string urlName, string displayName, string filename, string source)
 		{
-			FolderName = folderName;
 			UrlName = urlName;
 			DisplayName = displayName;
 			Filename = filename;
 			Source = source;
 		}
 
-		public HtmlComponent(string folderName, string urlName, string displayName, string filename, string source, string localFolder, List<string> localFiles)
+		public HtmlComponent(string urlName, string displayName, string filename, string source, string localFolder, List<string> localFiles)
 		{
-			FolderName = folderName;
 			UrlName = urlName;
 			DisplayName = displayName;
 			Filename = filename;
@@ -54,19 +54,21 @@ namespace uLearn.Model.Edx.EdxComponents
 			LocalFiles = localFiles;
 		}
 
-		public override void Save()
+		public override void Save(string folderName)
 		{
-			base.Save();
-			File.WriteAllText(string.Format("{0}/{1}/{2}.html", FolderName, SubfolderName, UrlName), Source);
-			SaveAdditional();
+			base.Save(folderName);
+			File.WriteAllText(string.Format("{0}/{1}/{2}.html", folderName, SubfolderName, UrlName), Source);
 		}
 
-		public override void SaveAdditional()
+		public override void SaveAdditional(string folderName)
 		{
+			if (Subcomponents != null)
+				foreach (var subcomponent in Subcomponents)
+					subcomponent.SaveAdditional(folderName);
 			try
 			{
 				foreach (var localFile in LocalFiles)
-					File.Copy(string.Format("{0}/{1}", LocalFolder, localFile), string.Format("{0}/static/{1}_{2}", FolderName, UrlName, localFile.Replace("/", "_")));
+					File.Copy(string.Format("{0}/{1}", LocalFolder, localFile), string.Format("{0}/static/{1}_{2}", folderName, UrlName, localFile.Replace("/", "_")));
 			}
 			catch (Exception)
 			{

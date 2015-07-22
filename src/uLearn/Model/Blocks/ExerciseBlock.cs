@@ -128,30 +128,19 @@ namespace uLearn.Model.Blocks
 			return string.Format("Exercise: {0}, Hints: {1}", ExerciseInitialCode, string.Join("; ", HintsMd));
 		}
 
-		public Component GetSolutionsComponent(string folderName, string courseId, string displayName, Slide slide, int componentIndex)
+		public Component GetSolutionsComponent(string displayName, Slide slide, int componentIndex, string launchUrl)
 		{
-			return new LtiComponent(
-					displayName, folderName, slide.Guid + componentIndex + 1,
-					string.Format("https://{0}:{1}/Course/{2}/AcceptedAlert/{3}", "192.168.33.1", 44300, courseId, slide.Index),
-					"myname", false, 0, false
-				);
+			return new LtiComponent(displayName, slide.Guid + componentIndex + 1, launchUrl + slide.Index, "myname", false, 0, false);
 		}
 
-		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, string displayName, Slide slide, int componentIndex)
+		public Component GetExerciseComponent(string displayName, Slide slide, int componentIndex, string launchUrl)
 		{
-			return new [] 
-			{
-				new LtiComponent(
-					displayName, folderName, slide.Guid + componentIndex,
-					string.Format("https://{0}:{1}/Course/{2}/LtiSlide/{3}", "192.168.33.1", 44300, courseId, slide.Index),
-					"myname", true, 5, false
-				),
-//				new LtiComponent(
-//					displayName, folderName, slide.Guid + componentIndex + 1, 
-//					string.Format("https://{0}:{1}/Course/{2}/AcceptedAlert/{3}", "192.168.33.1", 44300, courseId, slide.Index),
-//					"myname", false, 0, false
-//				), 
-			};
+			return new LtiComponent(displayName, slide.Guid + componentIndex, launchUrl + slide.Index, "myname", true, 5, false);
+		}
+
+		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

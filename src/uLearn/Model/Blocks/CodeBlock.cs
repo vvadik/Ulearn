@@ -41,10 +41,10 @@ namespace uLearn.Model.Blocks
 			yield return this;
 		}
 
-		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
 		{
 			var urlName = slide.Guid + componentIndex;
-			return new [] { new CodeComponent(folderName, urlName, displayName, urlName, LangId, Code) };
+			return new CodeComponent(urlName, displayName, urlName, LangId, Code);
 		}
 
 		public override string ToString()

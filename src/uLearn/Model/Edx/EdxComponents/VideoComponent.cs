@@ -5,9 +5,6 @@ namespace uLearn.Model.Edx.EdxComponents
 	[XmlRoot("video")]
 	public class VideoComponent : Component
 	{
-		[XmlAttribute("url_name")]
-		public override string UrlName { get; set; }
-
 		[XmlAttribute("youtube")]
 		public string VideoId;
 
@@ -21,16 +18,14 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override string SubfolderName
 		{
 			get { return "video"; }
-			set { }
 		}
 
 		public VideoComponent()
 		{
 		}
 
-		public VideoComponent(string folderName, string urlName, string displayName, string videoId)
+		public VideoComponent(string urlName, string displayName, string videoId)
 		{
-			FolderName = folderName;
 			UrlName = urlName;
 			DisplayName = displayName;
 			VideoId = "1:00:" + videoId;

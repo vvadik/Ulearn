@@ -10,7 +10,6 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override string SubfolderName
 		{
 			get { return "problem"; }
-			set { }
 		}
 
 		public override EdxReference GetReference()
@@ -29,8 +28,11 @@ namespace uLearn.Model.Edx.EdxComponents
 	[XmlRoot("problem")]
 	public class SlideProblemComponent : Component
 	{
+		[XmlIgnore]
+		public Component[] Subcomponents;
+
 		[XmlElement("p")]
-		public XmlElement[] Components;
+		public XmlElement[] XmlSubcomponents;
 
 		[XmlAttribute("display_name")]
 		public string DisplayName;
@@ -39,7 +41,6 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override string SubfolderName
 		{
 			get { return "problem"; }
-			set { }
 		}
 
 		public override EdxReference GetReference()
@@ -50,6 +51,12 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override string AsHtmlString()
 		{
 			throw new NotImplementedException();
+		}
+
+		public override void SaveAdditional(string folderName)
+		{
+			foreach (var subcomponent in Subcomponents)
+				subcomponent.SaveAdditional(folderName);
 		}
 	}
 

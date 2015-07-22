@@ -24,10 +24,10 @@ namespace uLearn.Model.Blocks
 			return string.Format("Images {0}", string.Join("\n", ImageUrls));
 		}
 
-		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
 		{
 			var urlName = slide.Guid + componentIndex;
-			return new [] { new GalleryComponent(folderName, urlName, displayName, urlName, slide.Info.SlideFile.Directory.FullName, ImageUrls) };
+			return new GalleryComponent(urlName, displayName, urlName, slide.Info.SlideFile.Directory.FullName, ImageUrls);
 		}
 	}
 }

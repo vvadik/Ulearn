@@ -6,9 +6,6 @@ namespace uLearn.Model.Edx.EdxComponents
 	[XmlRoot("lti")]
 	public class LtiComponent : Component
 	{
-		[XmlIgnore]
-		public int SlideIndex;
-
 		[XmlAttribute("display_name")]
 		public string DisplayName;
 
@@ -31,17 +28,15 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override string SubfolderName
 		{
 			get { return "lti"; }
-			set { }
 		}
 
 		public LtiComponent()
 		{
 		}
 
-		public LtiComponent(string displayName, string folderName, string urlName, string launchUrl, string ltiId, bool hasScore, double weight, bool openInNewPage)
+		public LtiComponent(string displayName, string urlName, string launchUrl, string ltiId, bool hasScore, double weight, bool openInNewPage)
 		{
 			DisplayName = displayName;
-			FolderName = folderName;
 			UrlName = urlName;
 			LaunchUrl = launchUrl;
 			LtiId = ltiId;

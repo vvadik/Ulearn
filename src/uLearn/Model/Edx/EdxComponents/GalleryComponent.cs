@@ -23,16 +23,14 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override string SubfolderName
 		{
 			get { return "html"; }
-			set { }
 		}
 
 		public GalleryComponent()
 		{
 		}
 
-		public GalleryComponent(string folderName, string urlName, string displayName, string filename, string localFolder, string[] images)
+		public GalleryComponent(string urlName, string displayName, string filename, string localFolder, string[] images)
 		{
-			FolderName = folderName;
 			UrlName = urlName;
 			DisplayName = displayName;
 			Filename = filename;
@@ -40,18 +38,17 @@ namespace uLearn.Model.Edx.EdxComponents
 			Images = images;
 		}
 
-		public override void Save()
+		public override void Save(string folderName)
 		{
-			base.Save();
-			File.WriteAllText(string.Format("{0}/{1}/{2}.html", FolderName, SubfolderName, UrlName), AsHtmlString());
-			SaveAdditional();
+			base.Save(folderName);
+			File.WriteAllText(string.Format("{0}/{1}/{2}.html", folderName, SubfolderName, UrlName), AsHtmlString());
 		}
 
-		public override void SaveAdditional()
+		public override void SaveAdditional(string folderName)
 		{
 			foreach (var image in Images)
-				File.Copy(string.Format("{0}/{1}", LocalFolder, image), string.Format("{0}/static/{1}_{2}", FolderName, UrlName, image.Replace("/", "_")));
-			File.WriteAllText(string.Format("{0}/static/gallery_{1}.html", FolderName, UrlName),
+				File.Copy(string.Format("{0}/{1}", LocalFolder, image), string.Format("{0}/static/{1}_{2}", folderName, UrlName, image.Replace("/", "_")));
+			File.WriteAllText(string.Format("{0}/static/gallery_{1}.html", folderName, UrlName),
 				File.ReadAllText("gallery-template.html")
 					.Replace("{0}", string.Join("", Images.Select(x => "<li><img src='" + UrlName + "_" + x.Replace("/", "_") + "' alt=''/></li>"))));
 		}

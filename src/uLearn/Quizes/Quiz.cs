@@ -85,7 +85,7 @@ namespace uLearn.Quizes
 				throw new FormatException("Should be exaclty one correct item for non-multiple choice. BlockId=" + Id);
 		}
 
-		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
 		{
 			var items = Items.Select(x => new Choice { Correct = x.IsCorrect, Text = EdxTexReplacer.ReplaceTex(x.Description) }).ToArray();
 			ChoiceResponse cr;
@@ -99,15 +99,11 @@ namespace uLearn.Quizes
 				var cg = new MultipleChoiceGroup { Label = Text, Type = "MultipleChoice", Choices = items };
 				cr = new MultipleChoiceResponse { ChoiceGroup = cg };
 			}
-			return new[]
+			return new MultipleChoiceComponent
 			{
-				new MultipleChoiceComponent
-				{
-					FolderName = folderName, 
-					UrlName = slide.Guid + componentIndex, 
-					ChoiceResponse = cr, 
-					Title = EdxTexReplacer.ReplaceTex(Text)
-				}
+				UrlName = slide.Guid + componentIndex,
+				ChoiceResponse = cr,
+				Title = EdxTexReplacer.ReplaceTex(Text)
 			};
 		}
 	}
@@ -128,7 +124,7 @@ namespace uLearn.Quizes
 		{
 		}
 
-		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
 		{
 			var items = new []
 			{
@@ -136,16 +132,12 @@ namespace uLearn.Quizes
 				new Choice { Correct = !Answer, Text = "false" }
 			};
 			var cg = new MultipleChoiceGroup { Label = Text, Type = "MultipleChoice", Choices = items };
-			return new[]
+			return new MultipleChoiceComponent
 			{
-				new MultipleChoiceComponent
-				{
-					FolderName = folderName, 
-					UrlName = slide.Guid + componentIndex,
-					ChoiceResponse = new MultipleChoiceResponse { ChoiceGroup = cg }, 
-					Title = EdxTexReplacer.ReplaceTex(Text), 
-					Solution = new Solution(Explanation)
-				}
+				UrlName = slide.Guid + componentIndex,
+				ChoiceResponse = new MultipleChoiceResponse { ChoiceGroup = cg },
+				Title = EdxTexReplacer.ReplaceTex(Text),
+				Solution = new Solution(Explanation)
 			};
 		}
 	}
@@ -167,24 +159,19 @@ namespace uLearn.Quizes
 				throw new FormatException("Sample should match at least one regex. BlockId=" + Id);
 		}
 
-		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
 		{
-			return new[]
+			return new TextInputComponent
 			{
-				new TextInputComponent
+				UrlName = slide.Guid + componentIndex,
+				Title = EdxTexReplacer.ReplaceTex(Text),
+				StringResponse = new StringResponse
 				{
-					FolderName = folderName, 
-					UrlName = slide.Guid + componentIndex, 
-					Title = EdxTexReplacer.ReplaceTex(Text), 
-					StringResponse = new StringResponse
-					{
-						Type = (Regexes[0].IgnoreCase ? "ci " : "") + "regexp", 
-						Answer = "^" + Regexes[0].Pattern + "$", 
-						AdditionalAnswers = Regexes.Skip(1).Select(x => new Answer { Text = "^" + x.Pattern + "$" }).ToArray(), 
-						Textline = new Textline { Label = Text, Size = 20 }
-					}
+					Type = (Regexes[0].IgnoreCase ? "ci " : "") + "regexp",
+					Answer = "^" + Regexes[0].Pattern + "$",
+					AdditionalAnswers = Regexes.Skip(1).Select(x => new Answer { Text = "^" + x.Pattern + "$" }).ToArray(),
+					Textline = new Textline { Label = Text, Size = 20 }
 				}
-
 			};
 		}
 	}

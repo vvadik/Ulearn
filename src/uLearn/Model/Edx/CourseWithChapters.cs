@@ -1,10 +1,15 @@
-﻿using System.Xml.Serialization;
+﻿using System.Linq;
+using System.Xml.Serialization;
+using Newtonsoft.Json;
 
 namespace uLearn.Model.Edx
 {
 	[XmlRoot("course")]
-	public class CourseWithChapters
+	public class CourseWithChapters : EdxItem
 	{
+		[XmlIgnore]
+		public override string SubfolderName { get { return "course"; } }
+
 		[XmlAttribute("display_name")]
 		public string DisplayName;
 
@@ -18,6 +23,30 @@ namespace uLearn.Model.Edx
 		public bool UseLatexCompiler;
 
 		[XmlElement("chapter")]
-		public ChapterReference[] Chapters;
+		public ChapterReference[] ChapterReferences { get; set; }
+
+		[XmlIgnore]
+		public Chapter[] Chapters;
+
+		public CourseWithChapters()
+		{
+		}
+
+		public CourseWithChapters(string urlName, string displayName, string[] advancedModules, string[] ltiPassports, bool useLatexCompiler, Chapter[] chapters)
+		{
+			UrlName = urlName;
+			DisplayName = displayName;
+			AdvancedModules = JsonConvert.SerializeObject(advancedModules);
+			LtiPassports = JsonConvert.SerializeObject(ltiPassports);
+			UseLatexCompiler = useLatexCompiler;
+			Chapters = chapters;
+			ChapterReferences = chapters.Select(x => x.GetReference()).ToArray();
+		}
+
+		public override void SaveAdditional(string folderName)
+		{
+			foreach (var chapter in Chapters)
+				chapter.Save(folderName);
+		}
 	}
 }

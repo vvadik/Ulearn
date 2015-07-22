@@ -26,10 +26,10 @@ namespace uLearn.Model.Blocks
 			return string.Format("Tex {0}", string.Join("\n", TexLines));
 		}
 
-		public override IEnumerable<Component> ToEdxComponent(string folderName, string courseId, string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
 		{
 			var urlName = slide.Guid + componentIndex;
-			return new [] { new HtmlComponent(folderName, urlName, displayName, urlName, string.Join("\n", TexLines.Select(x => "$$" + x + "$$")).GetHtmlWithUrls("/static").Item1) };
+			return new HtmlComponent(urlName, displayName, urlName, string.Join("\n", TexLines.Select(x => "$$" + x + "$$")).GetHtmlWithUrls("/static").Item1);
 		}
 	}
 }
