@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Security.Policy;
 using System.Xml.Serialization;
 
@@ -43,6 +44,14 @@ namespace uLearn.Model.Edx
 		{
 			foreach (var vertical in Verticals)
 				vertical.Save(folderName);
+		}
+
+		public static Sequential Load(string folderName, string urlName)
+		{
+			var sequential = new FileInfo(string.Format("{0}/sequential/{1}.xml", folderName, urlName)).DeserializeXml<Sequential>();
+			sequential.UrlName = urlName;
+			sequential.Verticals = sequential.VerticalReferences.Select(x => Vertical.Load(folderName, x.UrlName)).ToArray();
+			return sequential;
 		}
 	}
 }

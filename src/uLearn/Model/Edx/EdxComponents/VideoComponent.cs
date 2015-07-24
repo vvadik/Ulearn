@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.IO;
+using System.Xml.Serialization;
 
 namespace uLearn.Model.Edx.EdxComponents
 {
@@ -40,6 +41,13 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override string AsHtmlString()
 		{
 			return "<iframe class=\"embedded-video\" width=\"100%\" height=\"530\" src=\"//www.youtube.com/embed/1WaWDgBxyYc\" frameborder=\"0\" allowfullscreen=\"\"></iframe>";
+		}
+
+		public static VideoComponent Load(string folderName, string urlName)
+		{
+			var component = new FileInfo(string.Format("{0}/video/{1}.xml", folderName, urlName)).DeserializeXml<VideoComponent>();
+			component.UrlName = urlName;
+			return component;
 		}
 	}
 }

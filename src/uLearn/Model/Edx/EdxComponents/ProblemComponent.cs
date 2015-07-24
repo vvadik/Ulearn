@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -55,8 +56,16 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		public override void SaveAdditional(string folderName)
 		{
-			foreach (var subcomponent in Subcomponents)
-				subcomponent.SaveAdditional(folderName);
+			if (Subcomponents != null)
+				foreach (var subcomponent in Subcomponents)
+					subcomponent.SaveAdditional(folderName);
+		}
+
+		public static SlideProblemComponent Load(string folderName, string urlName)
+		{
+			var component = new FileInfo(string.Format("{0}/problem/{1}.xml", folderName, urlName)).DeserializeXml<SlideProblemComponent>();
+			component.UrlName = urlName;
+			return component;
 		}
 	}
 

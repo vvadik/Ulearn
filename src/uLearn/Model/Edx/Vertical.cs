@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
 using uLearn.Model.Edx.EdxComponents;
 
@@ -46,6 +47,14 @@ namespace uLearn.Model.Edx
 		{
 			foreach (var component in Components)
 				component.Save(folderName);
+		}
+
+		public static Vertical Load(string folderName, string urlName)
+		{
+			var vertical = new FileInfo(string.Format("{0}/vertical/{1}.xml", folderName, urlName)).DeserializeXml<Vertical>();
+			vertical.UrlName = urlName;
+			vertical.Components = vertical.ComponentReferences.Select(x => x.GetComponent(folderName, x.UrlName)).ToArray();
+			return vertical;
 		}
 	}
 }

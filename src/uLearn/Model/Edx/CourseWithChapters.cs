@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Security.Policy;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 
@@ -47,6 +50,14 @@ namespace uLearn.Model.Edx
 		{
 			foreach (var chapter in Chapters)
 				chapter.Save(folderName);
+		}
+
+		public static CourseWithChapters Load(string folderName, string urlName)
+		{
+			var courseWithChapters = new FileInfo(string.Format("{0}/course/{1}.xml", folderName, urlName)).DeserializeXml<CourseWithChapters>();
+			courseWithChapters.UrlName = urlName;
+			courseWithChapters.Chapters = courseWithChapters.ChapterReferences.Select(x => Chapter.Load(folderName, x.UrlName)).ToArray();
+			return courseWithChapters;
 		}
 	}
 }

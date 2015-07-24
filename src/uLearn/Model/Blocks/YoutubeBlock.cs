@@ -25,9 +25,16 @@ namespace uLearn.Model.Blocks
 			return string.Format("Video {0}", VideoId);
 		}
 
+		public VideoComponent GetVideoComponent(string displayName, Slide slide, int componentIndex, Dictionary<string, string> videoGuids)
+		{
+			if (videoGuids.ContainsKey(VideoId))
+				return new VideoComponent(videoGuids[VideoId], displayName, VideoId);
+			return new VideoComponent(slide.Guid + componentIndex, displayName, VideoId);
+		}
+
 		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
 		{
-			return new VideoComponent(slide.Guid + componentIndex, displayName, VideoId);
+			throw new NotImplementedException();
 		}
 	}
 }

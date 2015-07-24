@@ -84,5 +84,13 @@ namespace uLearn.Model.Edx.EdxComponents
 		{
 			return "<p>" + Source + "</p>";
 		}
+
+		public static HtmlComponent Load(string folderName, string urlName)
+		{
+			var component = new FileInfo(string.Format("{0}/html/{1}.xml", folderName, urlName)).DeserializeXml<HtmlComponent>();
+			component.UrlName = urlName;
+			component.Source = File.ReadAllText(string.Format("{0}/html/{1}.html", folderName, component.Filename));
+			return component;
+		}
 	}
 }

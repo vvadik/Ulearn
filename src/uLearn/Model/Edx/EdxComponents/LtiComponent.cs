@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Xml.Serialization;
 
 namespace uLearn.Model.Edx.EdxComponents
@@ -53,6 +54,13 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override string AsHtmlString()
 		{
 			throw new NotImplementedException();
+		}
+
+		public static LtiComponent Load(string folderName, string urlName)
+		{
+			var component = new FileInfo(string.Format("{0}/lti/{1}.xml", folderName, urlName)).DeserializeXml<LtiComponent>();
+			component.UrlName = urlName;
+			return component;
 		}
 	}
 }
