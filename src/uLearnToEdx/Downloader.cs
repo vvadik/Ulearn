@@ -57,10 +57,11 @@ namespace uLearnToEdx
 			}
 			catch (WebException e)
 			{
-//				Console.WriteLine(e.Response.);
+				var bytes = new byte[32768];
+				e.Response.GetResponseStream().Read(bytes, 0, 32768);
+				Console.WriteLine(Encoding.UTF8.GetString(bytes));
+				File.WriteAllBytes("err.html", bytes);
 			}
-			
-//			client.UploadFile(uploadUrl, filename);
 		}
 	}
 }
