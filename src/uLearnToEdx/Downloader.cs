@@ -46,7 +46,7 @@ namespace uLearnToEdx
 			string boundary = "------------------------MLG-NOSCOPE" + DateTime.Now.Ticks.ToString("x");
 			client.Headers.Add("Content-Type", "multipart/form-data; boundary=" + boundary);
 			var fileData = client.Encoding.GetString(File.ReadAllBytes(filename));
-			var package = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"file\"; filename=\"{1}\"\r\nContent-Type: {2}\r\n\r\n{3}\r\n--{0}--\r\n", boundary, filename, "application/gzip", fileData);
+			var package = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"course-data\"; filename=\"{1}\"\r\nContent-Type: {2}\r\n\r\n{3}\r\n--{0}--\r\n", boundary, filename, "application/gzip", fileData);
 
 			var nfile = client.Encoding.GetBytes(package);
 
