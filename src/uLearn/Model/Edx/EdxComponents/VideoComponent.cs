@@ -10,7 +10,7 @@ namespace uLearn.Model.Edx.EdxComponents
 		public string VideoId;
 
 		[XmlAttribute("youtube_id_1_0")]
-		public string VideoId1;
+		public string NormalSpeedVideoId;
 
 		[XmlAttribute("display_name")]
 		public string DisplayName;
@@ -30,7 +30,7 @@ namespace uLearn.Model.Edx.EdxComponents
 			UrlName = urlName;
 			DisplayName = displayName;
 			VideoId = "1:00:" + videoId;
-			VideoId1 = videoId;
+			NormalSpeedVideoId = videoId;
 		}
 
 		public override EdxReference GetReference()
@@ -40,6 +40,7 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		public override string AsHtmlString()
 		{
+			//TODO
 			return "<iframe class=\"embedded-video\" width=\"100%\" height=\"530\" src=\"//www.youtube.com/embed/1WaWDgBxyYc\" frameborder=\"0\" allowfullscreen=\"\"></iframe>";
 		}
 

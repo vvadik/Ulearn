@@ -1,20 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Sockets;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using ApprovalTests;
-using ApprovalTests.Reporters;
-using ApprovalUtilities.Utilities;
-using NUnit.Framework;
-using ObjectPrinter;
 using uLearn;
-using uLearn.Model.Blocks;
 using uLearn.Model.Edx;
-using uLearn.Model.Edx.EdxComponents;
-using uLearn.Quizes;
-using uLearnToEdx.Json;
 
 namespace uLearnToEdx
 {
@@ -40,11 +27,11 @@ namespace uLearnToEdx
 
 		public static EdxCourse ToEdxCourse(
 			Course course, string organization, string[] advancedModules, string[] ltiPassports, string ltiHostname,
-			Dictionary<string, string> videoGuids)
+			Dictionary<string, string> youtubeId2UlearnVideoIds)
 		{
 			return new EdxCourse(
 				course.Id, organization, course.Title, advancedModules, ltiPassports, 
-				new [] { new Chapter(course.Id + "-1", course.Title, CourseToSequentials(course, videoGuids)) }
+				new [] { new Chapter(course.Id + "-1", course.Title, CourseToSequentials(course, youtubeId2UlearnVideoIds)) }
 			);
 		}
 	}

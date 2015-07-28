@@ -66,12 +66,12 @@ namespace uLearn.Model.Edx
 			return course;
 		}
 
-		public void CreateTestChapter(string folderName, Vertical[] verticals)
+		public void CreateUnsortedChapter(string folderName, Vertical[] verticals)
 		{
-			if (CourseWithChapters.Chapters.All(x => x.UrlName != "TestChapter"))
+			if (CourseWithChapters.Chapters.All(x => x.UrlName != "Unsorted"))
 			{
 				var chapters = new List<Chapter>(CourseWithChapters.Chapters);
-				var newChapter = new Chapter("TestChapter", "Test Chapter", new[] { new Sequential(Guid.NewGuid().ToString("D"), "Test Sequential", verticals) });
+				var newChapter = new Chapter("Unsorted", "Unsorted", new[] { new Sequential(Guid.NewGuid().ToString("D"), "Unsorted " + DateTime.Now, verticals) });
 				chapters.Add(newChapter);
 				CourseWithChapters.Chapters = chapters.ToArray();
 				CourseWithChapters.ChapterReferences = CourseWithChapters.Chapters.Select(x => new ChapterReference { UrlName = x.UrlName }).ToArray();
@@ -81,9 +81,9 @@ namespace uLearn.Model.Edx
 			}
 			else
 			{
-				var testChapter = CourseWithChapters.Chapters.Single(x => x.UrlName == "TestChapter");
+				var testChapter = CourseWithChapters.Chapters.Single(x => x.UrlName == "Unsorted");
 				var sequentials = new List<Sequential>(testChapter.Sequentials);
-				var newSequential = new Sequential(Guid.NewGuid().ToString("D"), "Test Sequential", verticals);
+				var newSequential = new Sequential(Guid.NewGuid().ToString("D"), "Unsorted " + DateTime.Now, verticals);
 				sequentials.Add(newSequential);
 				testChapter.Sequentials = sequentials.ToArray();
 				testChapter.SequentialReferences = testChapter.Sequentials.Select(x => new SequentialReference { UrlName = x.UrlName }).ToArray();
@@ -106,7 +106,7 @@ namespace uLearn.Model.Edx
 			if (newVideos.Count != 0)
 			{
 				var verticals = newVideos.Select(x => new Vertical(Guid.NewGuid().ToString("D"), x.DisplayName, new Component[] { x })).ToArray();
-				CreateTestChapter(folderName, verticals);
+				CreateUnsortedChapter(folderName, verticals);
 			}
 		}
 
@@ -115,18 +115,35 @@ namespace uLearn.Model.Edx
 			var verticals = new List<Vertical>();
 			foreach (var slide in slides)
 			{
-				var slideVerticals = slide.ToVerticals(folderName, "https://192.168.33.1:44300/Course/{0}/LtiSlide/", "https://192.168.33.1:44300/Course/{0}/AcceptedAlert/", new Dictionary<string, string>());
+				var slideVerticals = slide.ToVerticals(folderName, "https://192.168.33.1:44300/Course/{0}/LtiSlide/", "https://192.168.33.1:44300/Course/{0}/AcceptedAlert/", new Dictionary<string, string>()).ToList();
 				if (File.Exists(string.Format("{0}/vertical/{1}.xml", folderName, slide.Guid)))
 				{
 					slideVerticals.ForEach(x => x.Save(folderName));
+					if (slideVerticals.Count() > 1)
+					{
+						var sequential = GetSequentialContainingVertical(slide.Guid);
+						if (sequential.VerticalReferences.Count(x => x.UrlName.Contains(slide.Guid)) < 2)
+						{
+							var verticalReferences = sequential.VerticalReferences.ToList();
+							var exerciseReference = verticalReferences.Single(x => x.UrlName == slide.Guid);
+							verticalReferences.Insert(verticalReferences.IndexOf(exerciseReference) + 1, new VerticalReference { UrlName = slide.Guid + "0" });
+							sequential.VerticalReferences = verticalReferences.ToArray();
+							File.WriteAllText(string.Format("{0}/sequential/{1}.xml", folderName, sequential.UrlName), sequential.XmlSerialize());
+						}
+					}
 				}
 				else
 					verticals.AddRange(slideVerticals);
 			}
 			if (verticals.Count != 0)
 			{
-				CreateTestChapter(folderName, verticals.ToArray());
+				CreateUnsortedChapter(folderName, verticals.ToArray());
 			}
+		}
+
+		public Sequential GetSequentialContainingVertical(string id)
+		{
+			return CourseWithChapters.Chapters.SelectMany(x => x.Sequentials.Where(y => y.Verticals.Any(z => z.UrlName == id))).Single();
 		}
 
 		public Vertical GetVerticalById(string id)
