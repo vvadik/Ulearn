@@ -16,7 +16,8 @@ namespace uLearn.Web.Migrations
                         Key = c.String(nullable: false, maxLength: 64),
                         Secret = c.String(nullable: false, maxLength: 64),
                     })
-                .PrimaryKey(t => t.ConsumerId);
+                .PrimaryKey(t => t.ConsumerId)
+                .Index(t => new { t.Name, t.Key, t.Secret }, name: "FullIndex");
             
             CreateTable(
                 "dbo.LtiRequestModels",
@@ -27,12 +28,15 @@ namespace uLearn.Web.Migrations
                         SlideId = c.String(nullable: false, maxLength: 64),
                         Request = c.String(nullable: false),
                     })
-                .PrimaryKey(t => t.RequestId);
+                .PrimaryKey(t => t.RequestId)
+                .Index(t => new { t.SlideId, t.UserId }, name: "SlideAndUser");
             
         }
         
         public override void Down()
         {
+            DropIndex("dbo.LtiRequestModels", "SlideAndUser");
+            DropIndex("dbo.Consumers", "FullIndex");
             DropTable("dbo.LtiRequestModels");
             DropTable("dbo.Consumers");
         }

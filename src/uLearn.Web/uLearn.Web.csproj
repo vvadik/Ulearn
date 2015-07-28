@@ -276,13 +276,9 @@
     <Compile Include="Migrations\201504070552041_AddIsPassed.Designer.cs">
       <DependentUpon>201504070552041_AddIsPassed.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201507140849505_Lti.cs" />
-    <Compile Include="Migrations\201507140849505_Lti.Designer.cs">
-      <DependentUpon>201507140849505_Lti.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201507210607402_ConsumerAndLtiRequestIndices.cs" />
-    <Compile Include="Migrations\201507210607402_ConsumerAndLtiRequestIndices.Designer.cs">
-      <DependentUpon>201507210607402_ConsumerAndLtiRequestIndices.cs</DependentUpon>
+    <Compile Include="Migrations\201507270612338_Lti.cs" />
+    <Compile Include="Migrations\201507270612338_Lti.Designer.cs">
+      <DependentUpon>201507270612338_Lti.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
     <Compile Include="Models\LtiRequestModel.cs" />
@@ -550,11 +546,8 @@
     <EmbeddedResource Include="Migrations\201504070552041_AddIsPassed.resx">
       <DependentUpon>201504070552041_AddIsPassed.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201507140849505_Lti.resx">
-      <DependentUpon>201507140849505_Lti.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201507210607402_ConsumerAndLtiRequestIndices.resx">
-      <DependentUpon>201507210607402_ConsumerAndLtiRequestIndices.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201507270612338_Lti.resx">
+      <DependentUpon>201507270612338_Lti.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
