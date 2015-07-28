@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
-using System.Text;
 using uLearn;
 using uLearn.Model.Edx;
 
@@ -21,21 +17,31 @@ namespace uLearnToEdx
 			const string time = "Linq101_2015";
 			const string email = "staff@example.com";
 			const string password = "edx";
+			const string uLearnCourseName = "Linq";
+			const string videoJson = "";
+			const string exerciesUrl = "https://192.168.33.1:44300/Course/{0}/LtiSlide/{1}";
+			const string solutionsUrl = "https://192.168.33.1:44300/Course/{0}/AcceptedAlert/{1}";
 
-			Downloader.Download(hostname, port, email, password, organization, course, time, "filename");
-			Downloader.Upload(hostname, port, email, password, organization, course, time, "ForTests.tar.gz");
-//
-//						var cm = new CourseManager(new DirectoryInfo(@"..\..\..\uLearn.Web"));
-//						cm.ReloadCourse("BasicProgramming.zip");
-//						var course = cm.GetCourses().Single();
-//						var converted = Converter.ToEdxCourse(course, "Kontur", new[] { "lti" }, new[] { "myname:rfe:qwerty" }, "192.168.33.1:44300", new Dictionary<string, string>());
-//						converted.Save(course.Id);
-//						ArchiveManager.CreateTar(course.Id + ".tar.gz", course.Id);
-//						
-//						EdxCourse
-//							.Load("BasicProgramming")
-//							.Save("BasicProgramming2");
-//						ArchiveManager.CreateTar("BasicProgramming2.tar.gz", "BasicProgramming2");
+			Console.WriteLine("Downloading {0}...", course);
+			DownloadManager.Download(hostname, port, email, password, organization, course, time, time + ".tar.gz");
+			
+			Console.WriteLine("Extracting {0}...", course);
+			ArchiveManager.ExtractTar(time + ".tar.gz", ".");
+			var edxCourse = EdxCourse.Load(time);
+
+			Console.WriteLine("Loading {0}", uLearnCourseName);
+			var cm = new CourseManager(new DirectoryInfo(@"..\..\..\uLearn.Web"));
+			cm.ReloadCourse(string.Format("{0}.zip", uLearnCourseName));
+			var ulearnCourse = cm.GetCourses().Single();
+
+			Console.WriteLine("Patching {0} with slides from {1}...", course, uLearnCourseName);
+			edxCourse.PatchSlides(time, ulearnCourse.Id, ulearnCourse.Slides, exerciesUrl, solutionsUrl);
+			
+			Console.WriteLine("Creating {0}.tar.gz...", time);
+			ArchiveManager.CreateTar(time + ".tar.gz", time);
+			
+			Console.WriteLine("Uploading {0}.tar.gz...", course);
+			DownloadManager.Upload(hostname, port, email, password, organization, course, time, time + ".tar.gz");
 		}
 	}
 }

@@ -7,10 +7,7 @@ namespace uLearnToEdx
 {
 	public static class Converter
 	{
-		private static string exerciesUrl = "https://192.168.33.1:44300/Course/{0}/LtiSlide/";
-		private static string solutionsUrl = "https://192.168.33.1:44300/Course/{0}/AcceptedAlert/";
-
-		private static Sequential[] CourseToSequentials(Course course, Dictionary<string, string> videoGuids)
+		private static Sequential[] CourseToSequentials(Course course, string exerciseUrl, string solutionsUrl, Dictionary<string, string> videoGuids)
 		{
 			var units = course.GetUnits().ToList();
 			return Enumerable
@@ -19,19 +16,19 @@ namespace uLearnToEdx
 					x => new Sequential(course.Id + "-1-" + x, units[x], 
 						course.Slides
 							.Where(y => y.Info.UnitName == units[x])
-							.SelectMany(y => y.ToVerticals(course.Id, exerciesUrl, solutionsUrl, videoGuids))
+							.SelectMany(y => y.ToVerticals(course.Id, exerciseUrl, solutionsUrl, videoGuids))
 							.ToArray()
 					)
 				).ToArray();
 		}
 
 		public static EdxCourse ToEdxCourse(
-			Course course, string organization, string[] advancedModules, string[] ltiPassports, string ltiHostname,
+			Course course, string organization, string[] advancedModules, string[] ltiPassports, string ltiHostname, string exerciseUrl, string solutionsUrl,
 			Dictionary<string, string> youtubeId2UlearnVideoIds)
 		{
 			return new EdxCourse(
 				course.Id, organization, course.Title, advancedModules, ltiPassports, 
-				new [] { new Chapter(course.Id + "-1", course.Title, CourseToSequentials(course, youtubeId2UlearnVideoIds)) }
+				new [] { new Chapter(course.Id + "-1", course.Title, CourseToSequentials(course, exerciseUrl, solutionsUrl, youtubeId2UlearnVideoIds)) }
 			);
 		}
 	}

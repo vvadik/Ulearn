@@ -110,12 +110,12 @@ namespace uLearn.Model.Edx
 			}
 		}
 
-		public void PatchSlides(string folderName, Slide[] slides)
+		public void PatchSlides(string folderName, string courseId, Slide[] slides, string exerciseUrl, string solutionsUrl)
 		{
 			var verticals = new List<Vertical>();
 			foreach (var slide in slides)
 			{
-				var slideVerticals = slide.ToVerticals(folderName, "https://192.168.33.1:44300/Course/{0}/LtiSlide/", "https://192.168.33.1:44300/Course/{0}/AcceptedAlert/", new Dictionary<string, string>()).ToList();
+				var slideVerticals = slide.ToVerticals(courseId, exerciseUrl, solutionsUrl, new Dictionary<string, string>()).ToList();
 				if (File.Exists(string.Format("{0}/vertical/{1}.xml", folderName, slide.Guid)))
 				{
 					slideVerticals.ForEach(x => x.Save(folderName));

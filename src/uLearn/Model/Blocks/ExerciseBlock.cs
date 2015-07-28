@@ -130,12 +130,12 @@ namespace uLearn.Model.Blocks
 
 		public Component GetSolutionsComponent(string displayName, Slide slide, int componentIndex, string launchUrl)
 		{
-			return new LtiComponent(displayName, slide.Guid + componentIndex + 1, launchUrl + slide.Index, "myname", false, 0, false);
+			return new LtiComponent(displayName, slide.Guid + componentIndex + 1, launchUrl, "myname", false, 0, false);
 		}
 
 		public Component GetExerciseComponent(string displayName, Slide slide, int componentIndex, string launchUrl)
 		{
-			return new LtiComponent(displayName, slide.Guid + componentIndex, launchUrl + slide.Index, "myname", true, 5, false);
+			return new LtiComponent(displayName, slide.Guid + componentIndex, launchUrl, "myname", true, 5, false);
 		}
 
 		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
