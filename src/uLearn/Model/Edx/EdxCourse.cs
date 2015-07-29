@@ -93,15 +93,18 @@ namespace uLearn.Model.Edx
 			}
 		}
 
-		public void PatchVideos(string folderName, Dictionary<string, string> videoIds)
+		public void PatchVideos(string folderName, Dictionary<string, Tuple<string, string>> videoIds)
 		{
 			var newVideos = new List<VideoComponent>();
 			foreach (var videoGuid in videoIds.Keys)
 			{
 				if (File.Exists(string.Format("{0}/video/{1}.xml", folderName, videoGuid)))
-					new VideoComponent(videoGuid, new FileInfo(string.Format("{0}/video/{1}.xml", folderName, videoGuid)).DeserializeXml<VideoComponent>().DisplayName, videoIds[videoGuid]).Save(folderName);
-				else 
-					newVideos.Add(new VideoComponent(videoGuid, "", videoIds[videoGuid]));
+					new VideoComponent(videoGuid, new FileInfo(string.Format("{0}/video/{1}.xml", folderName, videoGuid)).DeserializeXml<VideoComponent>().DisplayName, videoIds[videoGuid].Item1).Save(folderName);
+				else
+				{
+					var video = videoIds[videoGuid];
+					newVideos.Add(new VideoComponent(videoGuid, video.Item2, video.Item1));
+				}
 			}
 			if (newVideos.Count != 0)
 			{

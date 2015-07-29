@@ -8,6 +8,8 @@ namespace uLearnToEdx
 {
 	public class LoginException : Exception
 	{
+		public LoginException() : base() { }
+		public LoginException(string message) : base(message) { }
 	}
 
 	public class UploadException : Exception
@@ -29,7 +31,7 @@ namespace uLearnToEdx
 				{ "password", password }
 			})));
 			if (!response.success.ToObject<bool>())
-				throw new LoginException();
+				throw new LoginException(response.value.ToObject<string>());
 			return client;
 		}
 

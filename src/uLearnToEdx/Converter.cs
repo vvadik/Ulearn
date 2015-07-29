@@ -23,7 +23,7 @@ namespace uLearnToEdx
 		}
 
 		public static EdxCourse ToEdxCourse(
-			Course course, string organization, string[] advancedModules, string[] ltiPassports, string ltiHostname, string exerciseUrl, string solutionsUrl,
+			Course course, string organization, string[] advancedModules, string[] ltiPassports, string exerciseUrl, string solutionsUrl,
 			Dictionary<string, string> youtubeId2UlearnVideoIds)
 		{
 			return new EdxCourse(
