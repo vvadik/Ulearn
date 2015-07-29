@@ -25,7 +25,7 @@ namespace uLearn.Web.DataContexts
 
 			if (ltiRequestModel == null)
 			{
-				ltiRequestModel = new LtiRequestModel
+				ltiRequestModel = new LtiSlideRequest
 				{
 					UserId = userId,
 					SlideId = slideId,
@@ -48,7 +48,7 @@ namespace uLearn.Web.DataContexts
 			return serializer.Deserialize<LtiRequest>(new JsonTextReader(new StringReader(ltiRequestModel.Request)));
 		}
 
-		private LtiRequestModel FindElement(string userId, string slideId)
+		private LtiSlideRequest FindElement(string userId, string slideId)
 		{
 			return db.LtiRequests.FirstOrDefault(request => request.UserId == userId && request.SlideId == slideId);
 		}

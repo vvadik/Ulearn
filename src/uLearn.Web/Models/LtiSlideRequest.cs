@@ -3,20 +3,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace uLearn.Web.Models
 {
-	public class LtiRequestModel
+	public class LtiSlideRequest
 	{
+		private const string SlideUserIndexName = "IDX_LtiSlideRequest_SlideAndUser";
+
 		[Key]
 		public int RequestId { get; set; }
 
 		[Required]
 		[StringLength(64)]
-		[Index("SlideAndUser", 2)]
-		public string UserId { get; set; }
+		[Index(SlideUserIndexName, 1)]
+		public string SlideId { get; set; }
 
 		[Required]
 		[StringLength(64)]
-		[Index("SlideAndUser", 1)]
-		public string SlideId { get; set; }
+		[Index(SlideUserIndexName, 2)]
+		public string UserId { get; set; }
 
 		[Required]
 		public string Request { get; set; }

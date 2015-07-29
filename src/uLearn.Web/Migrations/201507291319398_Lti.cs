@@ -7,8 +7,11 @@ namespace uLearn.Web.Migrations
     {
         public override void Up()
         {
-            CreateTable(
-                "dbo.Consumers",
+			Sql("ALTER TABLE dbo.UserSolutions DROP CONSTRAINT [FK_dbo.UserSolutions_dbo.AspNetUsers_UserId]");
+			Sql("ALTER TABLE dbo.UserSolutions ADD CONSTRAINT [FK_dbo.UserSolutions_dbo.AspNetUsers_UserId] FOREIGN KEY (UserId) REFERENCES dbo.[AspNetUsers](Id) ON UPDATE NO ACTION ON DELETE SET NULL");
+			
+			CreateTable(
+                "dbo.LtiConsumers",
                 c => new
                     {
                         ConsumerId = c.Int(nullable: false, identity: true),
@@ -17,28 +20,28 @@ namespace uLearn.Web.Migrations
                         Secret = c.String(nullable: false, maxLength: 64),
                     })
                 .PrimaryKey(t => t.ConsumerId)
-                .Index(t => new { t.Name, t.Key, t.Secret }, name: "FullIndex");
+                .Index(t => t.Key, name: "IDX_LtiConsumer_Key");
             
             CreateTable(
-                "dbo.LtiRequestModels",
+                "dbo.LtiSlideRequests",
                 c => new
                     {
                         RequestId = c.Int(nullable: false, identity: true),
-                        UserId = c.String(nullable: false, maxLength: 64),
                         SlideId = c.String(nullable: false, maxLength: 64),
+                        UserId = c.String(nullable: false, maxLength: 64),
                         Request = c.String(nullable: false),
                     })
                 .PrimaryKey(t => t.RequestId)
-                .Index(t => new { t.SlideId, t.UserId }, name: "SlideAndUser");
+                .Index(t => new { t.SlideId, t.UserId }, name: "IDX_LtiSlideRequest_SlideAndUser");
             
         }
         
         public override void Down()
         {
-            DropIndex("dbo.LtiRequestModels", "SlideAndUser");
-            DropIndex("dbo.Consumers", "FullIndex");
-            DropTable("dbo.LtiRequestModels");
-            DropTable("dbo.Consumers");
+            DropIndex("dbo.LtiSlideRequests", "IDX_LtiSlideRequest_SlideAndUser");
+            DropIndex("dbo.LtiConsumers", "IDX_LtiConsumer_Key");
+            DropTable("dbo.LtiSlideRequests");
+            DropTable("dbo.LtiConsumers");
         }
     }
 }

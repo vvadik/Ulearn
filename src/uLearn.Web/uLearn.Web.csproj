@@ -276,14 +276,14 @@
     <Compile Include="Migrations\201504070552041_AddIsPassed.Designer.cs">
       <DependentUpon>201504070552041_AddIsPassed.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201507270612338_Lti.cs" />
-    <Compile Include="Migrations\201507270612338_Lti.Designer.cs">
-      <DependentUpon>201507270612338_Lti.cs</DependentUpon>
+    <Compile Include="Migrations\201507291319398_Lti.cs" />
+    <Compile Include="Migrations\201507291319398_Lti.Designer.cs">
+      <DependentUpon>201507291319398_Lti.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
-    <Compile Include="Models\LtiRequestModel.cs" />
+    <Compile Include="Models\LtiSlideRequest.cs" />
     <Compile Include="Models\CodeModel.cs" />
-    <Compile Include="Models\Consumer.cs" />
+    <Compile Include="Models\LtiConsumer.cs" />
     <Compile Include="Models\ExerciseBlockData.cs" />
     <Compile Include="Models\TocModelBuilder.cs" />
     <Compile Include="SubmitAllSlide_Test.cs" />
@@ -546,8 +546,8 @@
     <EmbeddedResource Include="Migrations\201504070552041_AddIsPassed.resx">
       <DependentUpon>201504070552041_AddIsPassed.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201507270612338_Lti.resx">
-      <DependentUpon>201507270612338_Lti.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201507291319398_Lti.resx">
+      <DependentUpon>201507291319398_Lti.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -41,12 +41,13 @@ namespace uLearn.Web.Models
 			var pages = slides.Select(s => CreatePage(s)).ToList();
 			if (IsInstructor)
 			{
-				pages.Add(new TocPageInfo
-				{
-					Url = GetUnitInstructionNotesUrl(unitName),
-					Name = "Заметки преподавателю",
-					PageType = TocPageType.InstructorNotes,
-				});
+				if (course.FindInstructorNote(unitName) != null)
+					pages.Add(new TocPageInfo
+					{
+						Url = GetUnitInstructionNotesUrl(unitName),
+						Name = "Заметки преподавателю",
+						PageType = TocPageType.InstructorNotes,
+					});
 				pages.Add(new TocPageInfo
 				{
 					Url = GetUnitStatisticsUrl(unitName),
