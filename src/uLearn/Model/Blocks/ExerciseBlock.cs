@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Xml.Serialization;
+using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {
@@ -124,6 +126,21 @@ namespace uLearn.Model.Blocks
 		public override string ToString()
 		{
 			return string.Format("Exercise: {0}, Hints: {1}", ExerciseInitialCode, string.Join("; ", HintsMd));
+		}
+
+		public Component GetSolutionsComponent(string displayName, Slide slide, int componentIndex, string launchUrl)
+		{
+			return new LtiComponent(displayName, slide.Guid + componentIndex + 1, launchUrl, "myname", false, 0, false);
+		}
+
+		public Component GetExerciseComponent(string displayName, Slide slide, int componentIndex, string launchUrl)
+		{
+			return new LtiComponent(displayName, slide.Guid + componentIndex, launchUrl, "myname", true, 5, false);
+		}
+
+		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

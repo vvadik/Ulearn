@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using uLearn.Model.Blocks;
@@ -18,7 +21,8 @@ namespace uLearn.Web.Controllers
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly UnitsRepo unitsRepo = new UnitsRepo();
-		private readonly VisitersRepo visitersRepo = new VisitersRepo();
+		private readonly VisitersRepo visitersRepo = new VisitersRepo(); 
+		private readonly LtiRequestsRepo ltiRequestsRepo = new LtiRequestsRepo();
 
 		public CourseController()
 			: this(WebCourseManager.Instance)
@@ -39,6 +43,44 @@ namespace uLearn.Web.Controllers
 			if (!visibleUnits.Contains(model.Slide.Info.UnitName))
 				throw new Exception("Slide is hidden " + slideIndex);
 			return View(model);
+		}
+
+		[Authorize]
+		public async Task<ActionResult> LtiSlide(string courseId, int slideIndex)
+		{
+			if (string.IsNullOrWhiteSpace(courseId))
+				return RedirectToAction("Index", "Home");
+
+			var userId = User.Identity.GetUserId();
+
+			var ltiRequestJson = FindLtiRequestJson();
+			var course = courseManager.GetCourse(courseId);
+			var slide = course.Slides[slideIndex] as ExerciseSlide;
+			if (slide == null)
+				return View();
+			if (!string.IsNullOrWhiteSpace(ltiRequestJson))
+				await ltiRequestsRepo.Update(userId, slide.Id, ltiRequestJson);
+
+			await visitersRepo.AddVisiter(courseId, slide.Id, userId);
+			var visiter = visitersRepo.GetVisiter(slide.Id, User.Identity.GetUserId());
+			var model = new CodeModel
+			{
+				CourseId = courseId,
+				SlideIndex = slideIndex,
+				ExerciseBlock = slide.Exercise,
+				Context = CreateRenderContext(course, slide, userId, visiter, true)
+			};
+			return View(model);
+		}
+
+		private string FindLtiRequestJson()
+		{
+			var user = User.Identity as ClaimsIdentity;
+			if (user == null)
+				return null;
+
+			var claim = user.Claims.FirstOrDefault(c => c.Type.Equals("LtiRequest"));
+			return claim == null ? null : claim.Value;
 		}
 
 		private int GetInitialIndexForStartup(string courseId, Course course, List<string> visibleUnits)
@@ -112,9 +154,9 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, string userId, Visiters visiter)
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, string userId, Visiters visiter, bool isLti = false)
 		{
-			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visiter)).ToArray();
+			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visiter, isLti)).ToArray();
 			return new BlockRenderContext(
 				course,
 				slide,
@@ -122,23 +164,24 @@ namespace uLearn.Web.Controllers
 				blockData);
 		}
 
-		private dynamic CreateBlockData(Course course, Slide slide, SlideBlock slideBlock, Visiters visiter)
+		private dynamic CreateBlockData(Course course, Slide slide, SlideBlock slideBlock, Visiters visiter, bool isLti)
 		{
 			if (slideBlock is ExerciseBlock)
 			{
 				var lastAcceptedSolution = solutionsRepo.FindLatestAcceptedSolution(course.Id, slide.Id, visiter.UserId);
 				return new ExerciseBlockData(true, visiter.IsSkipped, lastAcceptedSolution)
 				{
-					RunSolutionUrl = Url.Action("RunSolution", "Exercise", new { courseId = course.Id, slideIndex = slide.Index }),
+					RunSolutionUrl = Url.Action("RunSolution", "Exercise", new { courseId = course.Id, slideIndex = slide.Index, isLti }),
 					AcceptedSolutionUrl = Url.Action("AcceptedSolutions", "Course", new { courseId = course.Id, slideIndex = slide.Index }),
-					GetHintUrl = Url.Action("UseHint", "Hint")
+					GetHintUrl = Url.Action("UseHint", "Hint"),
+					IsLti = isLti
 				};
 			}
 			return null;
 		}
 
 		[Authorize]
-		public async Task<ViewResult> AcceptedSolutions(string courseId, int slideIndex = 0)
+		public async Task<ViewResult> AcceptedSolutions(string courseId, int slideIndex = 0, bool isLti = false)
 		{
 			var userId = User.Identity.GetUserId();
 			var course = courseManager.GetCourse(courseId);
@@ -148,13 +191,38 @@ namespace uLearn.Web.Controllers
 				await visitersRepo.SkipSlide(courseId, slide.Id, userId);
 			var solutions = solutionsRepo.GetAllAcceptedSolutions(courseId, slide.Id);
 			foreach (var solution in solutions)
+			{
 				solution.LikedAlready = solution.UsersWhoLike.Any(u => u == userId);
+				solution.RemoveSolutionUrl = Url.Action("RemoveSolution", "Course", new { courseId = courseId, slideIndex = slide.Index, solutionId = solution.Id });
+			}
+			
 			var model = new AcceptedSolutionsPageModel
 			{
 				CourseId = courseId,
 				CourseTitle = course.Title,
 				Slide = slide,
-				AcceptedSolutions = solutions
+				AcceptedSolutions = solutions,
+				User = User,
+				LikeSolutionUrl = Url.Action("LikeSolution"),
+				IsLti = isLti,
+				IsPassed = isPassed
+			};
+			return View(model);
+		}
+
+		[Authorize]
+		public ViewResult AcceptedAlert(string courseId, int slideIndex = 0)
+		{
+			var userId = User.Identity.GetUserId();
+			var course = courseManager.GetCourse(courseId);
+			var slide = (ExerciseSlide)course.Slides[slideIndex];
+			var isSkippedOrPassed = visitersRepo.IsSkippedOrPassed(slide.Id, userId);
+			var model = new ExerciseBlockData
+			{
+				IsSkippedOrPassed = isSkippedOrPassed,
+				AcceptedSolutionUrl = Url.Action("AcceptedSolutions", "Course", new { courseId, slideIndex, isLti = true }),
+				CourseId = courseId,
+				SlideIndex = slideIndex
 			};
 			return View(model);
 		}
@@ -192,7 +260,9 @@ namespace uLearn.Web.Controllers
 		[Authorize(Roles = LmsRoles.Instructor)]
 		public ActionResult InstructorNote(string courseId, string unitName)
 		{
-			InstructorNote instructorNote = courseManager.GetCourse(courseId).GetInstructorNote(unitName);
+			InstructorNote instructorNote = courseManager.GetCourse(courseId).FindInstructorNote(unitName);
+			if (instructorNote == null)
+				return HttpNotFound("no instructor note for this unit");
 			return View(instructorNote);
 		}
 

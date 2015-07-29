@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {
@@ -13,5 +14,7 @@ namespace uLearn.Model.Blocks
 		{
 			yield return this;
 		}
+
+		public abstract Component ToEdxComponents(string displayName, Slide slide, int componentIndex);
 	}
 }

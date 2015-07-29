@@ -1,4 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
+using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {
@@ -20,6 +24,12 @@ namespace uLearn.Model.Blocks
 		public override string ToString()
 		{
 			return string.Format("Tex {0}", string.Join("\n", TexLines));
+		}
+
+		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		{
+			var urlName = slide.Guid + componentIndex;
+			return new HtmlComponent(urlName, displayName, urlName, string.Join("\n", TexLines.Select(x => "$$" + x + "$$")).GetHtmlWithUrls("/static").Item1);
 		}
 	}
 }

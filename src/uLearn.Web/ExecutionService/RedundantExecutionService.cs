@@ -30,7 +30,7 @@ namespace uLearn.Web.ExecutionService
 		public static RedundantExecutionService Default {
 			get
 			{
-				var httpTimeout = TimeSpan.FromSeconds(1);
+				var httpTimeout = TimeSpan.FromSeconds(10);
 				var executionTimeout = TimeSpan.FromSeconds(30);
 				return new RedundantExecutionService(
 					new CsSandboxExecutionService(httpTimeout, executionTimeout), 

@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text.RegularExpressions;
+using System.Web.Services.Description;
 using System.Xml.Serialization;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using uLearn.Model.Blocks;
+using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Quizes
 {
@@ -79,6 +84,28 @@ namespace uLearn.Quizes
 			if (!Multiple && correctCount != 1)
 				throw new FormatException("Should be exaclty one correct item for non-multiple choice. BlockId=" + Id);
 		}
+
+		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		{
+			var items = Items.Select(x => new Choice { Correct = x.IsCorrect, Text = EdxTexReplacer.ReplaceTex(x.Description) }).ToArray();
+			ChoiceResponse cr;
+			if (Multiple)
+			{
+				var cg = new CheckboxGroup { Label = Text, Direction = "vertical", Choices = items };
+				cr = new ChoiceResponse { ChoiceGroup = cg };
+			}
+			else
+			{
+				var cg = new MultipleChoiceGroup { Label = Text, Type = "MultipleChoice", Choices = items };
+				cr = new MultipleChoiceResponse { ChoiceGroup = cg };
+			}
+			return new MultipleChoiceComponent
+			{
+				UrlName = slide.Guid + componentIndex,
+				ChoiceResponse = cr,
+				Title = EdxTexReplacer.ReplaceTex(Text)
+			};
+		}
 	}
 
 	public class IsTrueBlock : AbstractQuestionBlock
@@ -95,6 +122,23 @@ namespace uLearn.Quizes
 		}
 		public override void Validate()
 		{
+		}
+
+		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		{
+			var items = new []
+			{
+				new Choice { Correct = Answer, Text = "true" },
+				new Choice { Correct = !Answer, Text = "false" }
+			};
+			var cg = new MultipleChoiceGroup { Label = Text, Type = "MultipleChoice", Choices = items };
+			return new MultipleChoiceComponent
+			{
+				UrlName = slide.Guid + componentIndex,
+				ChoiceResponse = new MultipleChoiceResponse { ChoiceGroup = cg },
+				Title = EdxTexReplacer.ReplaceTex(Text),
+				Solution = new Solution(Explanation)
+			};
 		}
 	}
 
@@ -113,6 +157,22 @@ namespace uLearn.Quizes
 		{
 			if (!Regexes.Any(re => re.Regex.IsMatch(Sample)))
 				throw new FormatException("Sample should match at least one regex. BlockId=" + Id);
+		}
+
+		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		{
+			return new TextInputComponent
+			{
+				UrlName = slide.Guid + componentIndex,
+				Title = EdxTexReplacer.ReplaceTex(Text),
+				StringResponse = new StringResponse
+				{
+					Type = (Regexes[0].IgnoreCase ? "ci " : "") + "regexp",
+					Answer = "^" + Regexes[0].Pattern + "$",
+					AdditionalAnswers = Regexes.Skip(1).Select(x => new Answer { Text = "^" + x.Pattern + "$" }).ToArray(),
+					Textline = new Textline { Label = Text, Size = 20 }
+				}
+			};
 		}
 	}
 

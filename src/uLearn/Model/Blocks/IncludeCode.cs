@@ -1,5 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.CodeDom;
+using System.Collections.Generic;
+using System.IO;
 using System.Xml.Serialization;
+using NUnit.Framework;
+using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {
@@ -29,6 +34,13 @@ namespace uLearn.Model.Blocks
 			File = File ?? context.Lesson.DefaultIncludeFile;
 			LangId = LangId ?? (Path.GetExtension(File) ?? "").Trim('.');
 			LangVer = LangVer ?? context.CourseSettings.GetLanguageVersion(LangId);
+		}
+
+		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		{
+			if (!string.IsNullOrEmpty(File))
+				throw new Exception("IncludeCode.cs: File string is not empty.");
+			return new CodeComponent();
 		}
 	}
 }

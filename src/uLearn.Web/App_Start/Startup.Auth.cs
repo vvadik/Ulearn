@@ -2,6 +2,7 @@
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Owin;
+using uLearn.Web.LTI;
 using uLearn.Web.Microsoft.Owin.Security.VK;
 
 namespace uLearn.Web
@@ -39,6 +40,7 @@ namespace uLearn.Web
 			//   appSecret: "");
 
 //			app.UseGoogleAuthentication();
+			app.UseLtiAuthentication();
 		}
 	}
 }

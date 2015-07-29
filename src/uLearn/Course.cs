@@ -36,7 +36,7 @@ namespace uLearn
 			return Slides.Select(s => s.Info.UnitName).Distinct();
 		}
 
-		public InstructorNote GetInstructorNote(string unitName)
+		public InstructorNote FindInstructorNote(string unitName)
 		{
 			return InstructorNotes.SingleOrDefault(n => n.UnitName == unitName);
 		}

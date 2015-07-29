@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Xml.Serialization;
+using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {
@@ -22,6 +23,11 @@ namespace uLearn.Model.Blocks
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
 			yield return new MdBlock(context.FileSystem.GetContent(File));
+		}
+
+		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		{
+			throw new System.NotImplementedException();
 		}
 	}
 }
