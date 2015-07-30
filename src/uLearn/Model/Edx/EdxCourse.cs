@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Activities.Expressions;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-using ApprovalUtilities.Utilities;
 using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Edx
@@ -93,15 +91,18 @@ namespace uLearn.Model.Edx
 			}
 		}
 
-		public void PatchVideos(string folderName, Dictionary<string, string> videoIds)
+		public void PatchVideos(string folderName, Dictionary<string, Tuple<string, string>> videoIds)
 		{
 			var newVideos = new List<VideoComponent>();
 			foreach (var videoGuid in videoIds.Keys)
 			{
 				if (File.Exists(string.Format("{0}/video/{1}.xml", folderName, videoGuid)))
-					new VideoComponent(videoGuid, new FileInfo(string.Format("{0}/video/{1}.xml", folderName, videoGuid)).DeserializeXml<VideoComponent>().DisplayName, videoIds[videoGuid]).Save(folderName);
-				else 
-					newVideos.Add(new VideoComponent(videoGuid, "", videoIds[videoGuid]));
+					new VideoComponent(videoGuid, new FileInfo(string.Format("{0}/video/{1}.xml", folderName, videoGuid)).DeserializeXml<VideoComponent>().DisplayName, videoIds[videoGuid].Item1).Save(folderName);
+				else
+				{
+					var video = videoIds[videoGuid];
+					newVideos.Add(new VideoComponent(videoGuid, video.Item2, video.Item1));
+				}
 			}
 			if (newVideos.Count != 0)
 			{
@@ -110,12 +111,12 @@ namespace uLearn.Model.Edx
 			}
 		}
 
-		public void PatchSlides(string folderName, string courseId, Slide[] slides, string exerciseUrl, string solutionsUrl)
+		public void PatchSlides(string folderName, string courseId, Slide[] slides, string exerciseUrl, string solutionsUrl, string ltiId)
 		{
 			var verticals = new List<Vertical>();
 			foreach (var slide in slides)
 			{
-				var slideVerticals = slide.ToVerticals(courseId, exerciseUrl, solutionsUrl, new Dictionary<string, string>()).ToList();
+				var slideVerticals = slide.ToVerticals(courseId, exerciseUrl, solutionsUrl, new Dictionary<string, string>(), ltiId).ToList();
 				if (File.Exists(string.Format("{0}/vertical/{1}.xml", folderName, slide.Guid)))
 				{
 					slideVerticals.ForEach(x => x.Save(folderName));

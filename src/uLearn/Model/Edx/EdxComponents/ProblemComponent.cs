@@ -21,8 +21,7 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override string AsHtmlString()
 		{
 			var xmlString = this.XmlSerialize();
-			xmlString = xmlString.Substring("<problem>".Length, xmlString.Length - "<problem></problem>".Length);
-			return "<p>" + xmlString + "</p>";
+			return xmlString.Substring("<problem>".Length, xmlString.Length - "<problem></problem>".Length);
 		}
 	}
 

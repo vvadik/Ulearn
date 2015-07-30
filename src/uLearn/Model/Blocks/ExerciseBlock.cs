@@ -128,14 +128,14 @@ namespace uLearn.Model.Blocks
 			return string.Format("Exercise: {0}, Hints: {1}", ExerciseInitialCode, string.Join("; ", HintsMd));
 		}
 
-		public Component GetSolutionsComponent(string displayName, Slide slide, int componentIndex, string launchUrl)
+		public Component GetSolutionsComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)
 		{
-			return new LtiComponent(displayName, slide.Guid + componentIndex + 1, launchUrl, "myname", false, 0, false);
+			return new LtiComponent(displayName, slide.Guid + componentIndex + 1, launchUrl, ltiId, false, 0, false);
 		}
 
-		public Component GetExerciseComponent(string displayName, Slide slide, int componentIndex, string launchUrl)
+		public Component GetExerciseComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)
 		{
-			return new LtiComponent(displayName, slide.Guid + componentIndex, launchUrl, "myname", true, 5, false);
+			return new LtiComponent(displayName, slide.Guid + componentIndex, launchUrl, ltiId, true, 5, false);
 		}
 
 		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
