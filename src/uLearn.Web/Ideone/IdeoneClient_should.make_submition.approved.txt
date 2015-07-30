@@ -1,0 +1,21 @@
+﻿GetSubmitionDetailsResult
+{
+	LangId: 27
+	LangName: C#
+	LangVersion: mono-4.0.2
+	Time: 00:00:00.0400000
+	Memory: 23880
+	Signal: 0
+	IsPublic: False
+	Date: 30.07.2015 10:09:09
+	Source: using System; public class M{static void Main(){System.Console.WriteLine(42);}}
+	Input: 
+	Output: 42
+
+	StdErr: 
+	CompilationError: 
+	Status: Done
+	Result: Success
+	IsOk: True
+	Error: OK
+}

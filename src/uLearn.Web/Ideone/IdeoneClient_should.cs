@@ -1,4 +1,8 @@
 using System;
+using System.Text;
+using ApprovalTests;
+using ApprovalTests.Reporters;
+using ApprovalUtilities.Utilities;
 using NUnit.Framework;
 
 namespace uLearn.Web.Ideone
@@ -8,7 +12,7 @@ namespace uLearn.Web.Ideone
 	{
 		private readonly IdeoneClient service = new IdeoneClient(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(30));
 		
-		[Test]
+		[Test, UseReporter(typeof(DiffReporter))]
 		[Explicit]
 		public void make_submition()
 		{
@@ -16,22 +20,7 @@ namespace uLearn.Web.Ideone
 				service.Submit(@"using System; public class M{static void Main(){System.Console.WriteLine(42);}}",
 					"")
 					.Result;
-			Console.WriteLine(res.Error);
-			Console.WriteLine(res.Status);
-			Console.WriteLine(res.Result);
-			Console.WriteLine(res.LangId);
-			Console.WriteLine(res.LangName);
-			Console.WriteLine(res.LangVersion);
-			Console.WriteLine(res.IsPublic);
-			Console.WriteLine(res.Date);
-			Console.WriteLine(res.Source);
-			Console.WriteLine(res.CompilationError);
-			Console.WriteLine(res.Input);
-			Console.WriteLine(res.Output);
-			Console.WriteLine(res.StdErr);
-			Console.WriteLine(res.Signal);
-			Console.WriteLine(res.Time);
-			Console.WriteLine(res.Memory);
+			Approvals.Verify(res.WritePropertiesToString());
 		}
 		
 		[Test]

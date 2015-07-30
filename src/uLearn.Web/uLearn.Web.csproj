@@ -896,8 +896,7 @@
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Properties\PublishProfiles\ulearn - FTP.pubxml" />
-    <None Include="Properties\PublishProfiles\ulearn - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\ulearn.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\buttons.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
