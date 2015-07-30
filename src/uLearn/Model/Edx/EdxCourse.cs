@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Activities.Expressions;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-using ApprovalUtilities.Utilities;
 using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Edx
@@ -113,12 +111,12 @@ namespace uLearn.Model.Edx
 			}
 		}
 
-		public void PatchSlides(string folderName, string courseId, Slide[] slides, string exerciseUrl, string solutionsUrl)
+		public void PatchSlides(string folderName, string courseId, Slide[] slides, string exerciseUrl, string solutionsUrl, string ltiId)
 		{
 			var verticals = new List<Vertical>();
 			foreach (var slide in slides)
 			{
-				var slideVerticals = slide.ToVerticals(courseId, exerciseUrl, solutionsUrl, new Dictionary<string, string>()).ToList();
+				var slideVerticals = slide.ToVerticals(courseId, exerciseUrl, solutionsUrl, new Dictionary<string, string>(), ltiId).ToList();
 				if (File.Exists(string.Format("{0}/vertical/{1}.xml", folderName, slide.Guid)))
 				{
 					slideVerticals.ForEach(x => x.Save(folderName));

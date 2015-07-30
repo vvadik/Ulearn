@@ -32,7 +32,6 @@ namespace uLearnToEdx
 
 	public class Config
 	{
-		public string WorkingDir;
 		public string Hostname;
 		public int Port;
 		public string Organization;
@@ -41,6 +40,7 @@ namespace uLearnToEdx
 		public string VideoJson;
 		public string ExerciseUrl;
 		public string SolutionsUrl;
+		public string LtiId;
 
 		public string[] AdvancedModules;
 		public string[] LtiPassports;

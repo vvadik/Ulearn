@@ -5,6 +5,9 @@ namespace uLearnToEdx
 	[Verb("convert", HelpText = "Convert uLearn course to Edx course.")]
 	class ConvertOptions
 	{
+		[Option('d', "dir", Required = true)]
+		public string Dir { get; set; }
+
 		[Option('i', HelpText = "", Required = true)]
 		public string InputDir { get; set; }
 
@@ -18,6 +21,9 @@ namespace uLearnToEdx
 	[Verb("patch", HelpText = "Patch Edx course with new slides or videos.")]
 	class PatchOptions
 	{
+		[Option('d', "dir", Required = true)]
+		public string Dir { get; set; }
+
 		[Option('i')]
 		public string InputDir { get; set; }
 
@@ -45,6 +51,9 @@ namespace uLearnToEdx
 
 		[Option('l', "lti_passports", Required = true)]
 		public string LtiPassports { get; set; }
+
+		[Option('i', "lti_id", Required = true)]
+		public string LtiId { get; set; }
 
 		[Option('h', "hostname", Required = true)]
 		public string Hostname { get; set; }

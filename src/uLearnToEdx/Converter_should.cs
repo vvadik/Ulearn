@@ -31,7 +31,7 @@ namespace uLearnToEdx
 		private EdxCourse ConvertForTestsCourseToEdx(Dictionary<string, string> youtubeId2UlearnVideoIds = null)
 		{
 			return Converter.ToEdxCourse(course, "org", new[] { "lti" }, new[] { "myname:rfe:qwerty" }, exerciesUrl, solutionsUrl,
-				youtubeId2UlearnVideoIds ?? new Dictionary<string, string>());
+				youtubeId2UlearnVideoIds ?? new Dictionary<string, string>(), "");
 		}
 
 		public HashSet<string> GetDirectoryFiles(string directory)
@@ -106,7 +106,7 @@ namespace uLearnToEdx
 			var edxCourse = ConvertForTestsCourseToEdx();
 			edxCourse.Save("ForTests");
 
-			edxCourse.PatchSlides("ForTests", "ForTests", course.Slides, exerciesUrl, solutionsUrl);
+			edxCourse.PatchSlides("ForTests", "ForTests", course.Slides, exerciesUrl, solutionsUrl, "edx");
 
 			var edxCourse2 = EdxCourse.Load("ForTests");
 			Assert.IsFalse(edxCourse2.CourseWithChapters.Chapters.Any(c => c.DisplayName == "Unsorted"));
@@ -117,7 +117,7 @@ namespace uLearnToEdx
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
 
-			edxCourse.PatchSlides("ForTests",  "ForTests", new[] { aTextSlide }, exerciesUrl, solutionsUrl);
+			edxCourse.PatchSlides("ForTests",  "ForTests", new[] { aTextSlide }, exerciesUrl, solutionsUrl, "edx");
 
 			var edxCourse2 = EdxCourse.Load("ForTests");
 			Assert.AreEqual("Unsorted", edxCourse2.CourseWithChapters.Chapters.Last().DisplayName);
@@ -129,7 +129,7 @@ namespace uLearnToEdx
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
 			var slidesCount = edxCourse.CourseWithChapters.Chapters[0].Sequentials[0].Verticals.Count();
-			edxCourse.PatchSlides("ForTests",  "ForTests", new[] { new Slide(new[] { new ExerciseBlock() }, new SlideInfo("u1", new FileInfo("file"), 0), "title", Guid.Parse(slideIdFromCourse).ToString("D")) }, exerciesUrl, solutionsUrl);
+			edxCourse.PatchSlides("ForTests",  "ForTests", new[] { new Slide(new[] { new ExerciseBlock() }, new SlideInfo("u1", new FileInfo("file"), 0), "title", Guid.Parse(slideIdFromCourse).ToString("D")) }, exerciesUrl, solutionsUrl, "edx");
 			var edxCourse2 = EdxCourse.Load("ForTests");
 			var patchedSlidesCount = edxCourse2.CourseWithChapters.Chapters[0].Sequentials[0].Verticals.Count();
 			Assert.AreEqual(slidesCount + 1, patchedSlidesCount);
