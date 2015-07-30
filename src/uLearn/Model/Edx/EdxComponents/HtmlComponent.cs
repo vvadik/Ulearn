@@ -82,7 +82,7 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		public override string AsHtmlString()
 		{
-			return "<p>" + Source + "</p>";
+			return Source;
 		}
 
 		public static HtmlComponent Load(string folderName, string urlName)

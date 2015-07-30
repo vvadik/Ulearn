@@ -30,8 +30,8 @@ namespace uLearnToEdx
 
 		private EdxCourse ConvertForTestsCourseToEdx(Dictionary<string, string> youtubeId2UlearnVideoIds = null)
 		{
-			return Converter.ToEdxCourse(course, "org", new[] { "lti" }, new[] { "myname:rfe:qwerty" }, "host", exerciesUrl, solutionsUrl,
-				youtubeId2UlearnVideoIds ?? new Dictionary<string, string>());
+			return Converter.ToEdxCourse(course, "org", new[] { "lti" }, new[] { "myname:rfe:qwerty" }, exerciesUrl, solutionsUrl,
+				youtubeId2UlearnVideoIds ?? new Dictionary<string, string>(), "");
 		}
 
 		public HashSet<string> GetDirectoryFiles(string directory)
@@ -81,7 +81,7 @@ namespace uLearnToEdx
 			var ulearnVideoGuid = Guid.NewGuid().ToString("D");
 			var edxCourse = ConvertForTestsCourseToEdx(new Dictionary<string, string> { { youtubeIdFromCourse, ulearnVideoGuid } });
 			edxCourse.Save("ForTests");
-			edxCourse.PatchVideos("ForTests", new Dictionary<string, string> { { ulearnVideoGuid, "QWFuk3ymXxc" } });
+			edxCourse.PatchVideos("ForTests", new Dictionary<string, Tuple<string, string>> { { ulearnVideoGuid, Tuple.Create("QWFuk3ymXxc", "") } });
 			Assert.That(File.ReadAllText(string.Format("{0}/video/{1}.xml", "ForTests", ulearnVideoGuid)).Contains("QWFuk3ymXxc"));
 		}
 
@@ -93,8 +93,8 @@ namespace uLearnToEdx
 			var videoGuid2 = Guid.NewGuid().ToString("D");
 			var edxCourse = ConvertForTestsCourseToEdx(new Dictionary<string, string> { { youtubeIdFromCourse, videoGuid } });
 			edxCourse.Save("ForTests");
-			edxCourse.PatchVideos("ForTests", new Dictionary<string, string> { { videoGuid, "QWFuk3ymXxc" }, { videoGuid2, "w8_GlqSkG-U" } });
-			edxCourse.PatchVideos("ForTests", new Dictionary<string, string> { { videoGuid, "QWFuk3ymXxc" }, { videoGuid2, "w8_GlqSkG-U" }, { Guid.NewGuid().ToString("D"), "qTnKi67AAlg" } });
+			edxCourse.PatchVideos("ForTests", new Dictionary<string, Tuple<string, string>> { { videoGuid, Tuple.Create("QWFuk3ymXxc", "") }, { videoGuid2, Tuple.Create("w8_GlqSkG-U", "") } });
+			edxCourse.PatchVideos("ForTests", new Dictionary<string, Tuple<string, string>> { { videoGuid, Tuple.Create("QWFuk3ymXxc", "") }, { videoGuid2, Tuple.Create("w8_GlqSkG-U", "") }, { Guid.NewGuid().ToString("D"), Tuple.Create("qTnKi67AAlg", "") } });
 			var edxCourse2 = EdxCourse.Load("ForTests");
 			Assert.AreEqual("Unsorted", edxCourse2.CourseWithChapters.Chapters[1].DisplayName);
 			Assert.AreEqual(2, edxCourse2.CourseWithChapters.Chapters[1].Sequentials.Length);
@@ -106,7 +106,7 @@ namespace uLearnToEdx
 			var edxCourse = ConvertForTestsCourseToEdx();
 			edxCourse.Save("ForTests");
 
-			edxCourse.PatchSlides("ForTests", "ForTests", course.Slides, exerciesUrl, solutionsUrl);
+			edxCourse.PatchSlides("ForTests", "ForTests", course.Slides, exerciesUrl, solutionsUrl, "edx");
 
 			var edxCourse2 = EdxCourse.Load("ForTests");
 			Assert.IsFalse(edxCourse2.CourseWithChapters.Chapters.Any(c => c.DisplayName == "Unsorted"));
@@ -117,7 +117,7 @@ namespace uLearnToEdx
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
 
-			edxCourse.PatchSlides("ForTests",  "ForTests", new[] { aTextSlide }, exerciesUrl, solutionsUrl);
+			edxCourse.PatchSlides("ForTests",  "ForTests", new[] { aTextSlide }, exerciesUrl, solutionsUrl, "edx");
 
 			var edxCourse2 = EdxCourse.Load("ForTests");
 			Assert.AreEqual("Unsorted", edxCourse2.CourseWithChapters.Chapters.Last().DisplayName);
@@ -129,7 +129,7 @@ namespace uLearnToEdx
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
 			var slidesCount = edxCourse.CourseWithChapters.Chapters[0].Sequentials[0].Verticals.Count();
-			edxCourse.PatchSlides("ForTests",  "ForTests", new[] { new Slide(new[] { new ExerciseBlock() }, new SlideInfo("u1", new FileInfo("file"), 0), "title", Guid.Parse(slideIdFromCourse).ToString("D")) }, exerciesUrl, solutionsUrl);
+			edxCourse.PatchSlides("ForTests",  "ForTests", new[] { new Slide(new[] { new ExerciseBlock() }, new SlideInfo("u1", new FileInfo("file"), 0), "title", Guid.Parse(slideIdFromCourse).ToString("D")) }, exerciesUrl, solutionsUrl, "edx");
 			var edxCourse2 = EdxCourse.Load("ForTests");
 			var patchedSlidesCount = edxCourse2.CourseWithChapters.Chapters[0].Sequentials[0].Verticals.Count();
 			Assert.AreEqual(slidesCount + 1, patchedSlidesCount);
