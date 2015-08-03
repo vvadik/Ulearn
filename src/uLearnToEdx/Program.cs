@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using CommandLine;
@@ -18,41 +19,30 @@ namespace uLearnToEdx
 				Directory.Delete(options.Dir, true);
 			Directory.CreateDirectory(options.Dir);
 
-			File.WriteAllText(options.Dir + "/config.xml", new Config
-			{
-				AdvancedModules = options.AdvancedModules.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries),
-				CourseNumber = options.CourseNumber,
-				CourseRun = options.CourseRun,
-				Hostname = options.Hostname,
-				LtiPassports = options.LtiPassports.Split(new []{','}, StringSplitOptions.RemoveEmptyEntries),
-				Organization = options.Organization,
-				Port = options.Port,
-				ExerciseUrl = options.ExerciseUrl,
-				SolutionsUrl = options.SolutionsUrl,
-				LtiId = options.LtiId
-			}.XmlSerialize());
-			Console.WriteLine(options.LtiId);
+			File.Copy(string.Format("{0}/templates/config.xml", Utils.GetRootDirectory()), options.Dir + "/config.xml");
+
 			Console.WriteLine("Enter email:");
 			var email = Console.ReadLine();
 			Console.WriteLine("Enter password:");
 			var password = Utils.GetPass();
 
 			File.WriteAllText(options.Dir + "/credentials.xml", new Credentials(email, password).XmlSerialize());
-
-			DownloadManager.Download(options.Hostname, options.Port, email, password, options.Organization, options.CourseNumber, options.CourseRun, options.CourseRun + ".tar.gz");
-			ArchiveManager.ExtractTar(options.CourseRun + ".tar.gz", options.Dir);
-			File.Delete(options.CourseRun + ".tar.gz");
-			Directory.Move(string.Format("{0}/{1}", options.Dir, options.CourseRun), string.Format("{0}/olx", options.Dir));
+			
+			Process.Start("notepad", options.Dir + "/config.xml");
 		}
 
 		private static void Convert(ConvertOptions options)
 		{
 			var config = new FileInfo(options.Dir + "/config.xml").DeserializeXml<Config>();
+			var credentials = new FileInfo(options.Dir + "/credentials.xml").DeserializeXml<Credentials>();
+
+			Console.WriteLine("Loading uLearn course from {0}", options.InputDir);
+			var course = new CourseLoader().LoadCourse(new DirectoryInfo(options.InputDir));
+
+			Console.WriteLine("Converting uLearn course \"{0}\" to Edx course", course.Id);
 			Converter.ToEdxCourse(
-				new CourseLoader().LoadCourse(new DirectoryInfo(options.InputDir)), 
+				course, 
 				config.Organization, 
-				config.AdvancedModules, 
-				config.LtiPassports, 
 				config.ExerciseUrl, 
 				config.SolutionsUrl,
 				options.VideoJson != null && File.Exists(options.VideoJson)
@@ -61,12 +51,24 @@ namespace uLearnToEdx
 					: new Dictionary<string, string>(),
 				config.LtiId
 			).Save(options.Dir + "/olx");
+
+			Upload(options.Dir, course.Id, config, credentials);
 		}
 
 		private static void Patch(PatchOptions options)
 		{
 			var config = new FileInfo(options.Dir + "/config.xml").DeserializeXml<Config>();
 			var credentials = new FileInfo(options.Dir + "/credentials.xml").DeserializeXml<Credentials>();
+
+			Console.WriteLine("Downloading {0}.tar.gz", config.CourseRun);
+			DownloadManager.Download(config.Hostname, config.Port, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, config.CourseRun + ".tar.gz");
+			
+			ArchiveManager.ExtractTar(config.CourseRun + ".tar.gz", ".");
+			File.Delete(config.CourseRun + ".tar.gz");
+			if (Directory.Exists(options.Dir + "/olx"))
+				Directory.Delete(options.Dir + "/olx", true);
+			Directory.Move(config.CourseRun, options.Dir + "/olx");
+			
 			var edxCourse = EdxCourse.Load(options.Dir + "/olx");
 
 			if (options.InputDir != null)
@@ -74,7 +76,7 @@ namespace uLearnToEdx
 				var ulearnCourse = new CourseLoader().LoadCourse(new DirectoryInfo(options.InputDir));
 				
 				Console.WriteLine("Patching {0} with slides from {1}...", config.CourseRun, ulearnCourse.Id);
-				edxCourse.PatchSlides(options.Dir + "/olx", ulearnCourse.Id, ulearnCourse.Slides, config.ExerciseUrl, config.SolutionsUrl, config.LtiId);
+				edxCourse.PatchSlides(options.Dir + "/olx", ulearnCourse.Id, ulearnCourse.Slides, config.ExerciseUrl, config.SolutionsUrl, config.LtiId, options.ReplaceExisting);
 			}
 
 			if (options.VideoJson != null && File.Exists(options.VideoJson))
@@ -83,15 +85,20 @@ namespace uLearnToEdx
 				edxCourse.PatchVideos(options.Dir + "/olx", video.Records.ToDictionary(x => x.Guid.ToString("D"), x => Tuple.Create(x.Data.Id, x.Data.Name)));
 			}
 
-			Environment.CurrentDirectory = options.Dir;
-			Console.WriteLine("Creating {0}.tar.gz...", edxCourse.CourseName);
-			Utils.DirectoryCopy("olx", edxCourse.CourseName, true);
-			ArchiveManager.CreateTar(edxCourse.CourseName + ".tar.gz", edxCourse.CourseName);
+			Upload(options.Dir, edxCourse.CourseName, config, credentials);
+		}
 
-			Console.WriteLine("Uploading {0}.tar.gz...", edxCourse.CourseName);
-			DownloadManager.Upload(config.Hostname, config.Port, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, edxCourse.CourseName + ".tar.gz");
-			Directory.Delete(edxCourse.CourseName, true);
-			File.Delete(edxCourse.CourseName + ".tar.gz");
+		private static void Upload(string baseDir, string courseName, Config config, Credentials credentials)
+		{
+			Environment.CurrentDirectory = baseDir;
+			Console.WriteLine("Creating {0}.tar.gz...", courseName);
+			Utils.DirectoryCopy("olx", courseName, true);
+			ArchiveManager.CreateTar(courseName + ".tar.gz", courseName);
+
+			Console.WriteLine("Uploading {0}.tar.gz...", courseName);
+			DownloadManager.Upload(config.Hostname, config.Port, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, courseName + ".tar.gz");
+			Directory.Delete(courseName, true);
+			File.Delete(courseName + ".tar.gz");
 		}
 
 		public static int Main(string[] args)

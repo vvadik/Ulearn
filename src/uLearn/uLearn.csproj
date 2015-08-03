@@ -248,6 +248,7 @@
     <Compile Include="SlideAttribute.cs" />
     <Compile Include="TexReplacer.cs" />
     <Compile Include="Urls.cs" />
+    <Compile Include="Utils.cs" />
     <Compile Include="utils\Converter.cs" />
     <Compile Include="ValidatorsRepository.cs" />
   </ItemGroup>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
+using ApprovalUtilities.Utilities;
 using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Edx
@@ -35,7 +36,7 @@ namespace uLearn.Model.Edx
 			UrlName = courseId;
 			Organization = organization;
 			CourseWithChapters = new CourseWithChapters(courseId, courseTitle, advancedModules, ltiPassports, true, chapters);
-			StaticFiles = Directory.GetFiles("static");
+			StaticFiles = Directory.GetFiles(string.Format("{0}/static", Utils.GetRootDirectory()));
 		}
 
 		private void CreateDirectories(string rootDir, params string[] subDirs)
@@ -111,7 +112,7 @@ namespace uLearn.Model.Edx
 			}
 		}
 
-		public void PatchSlides(string folderName, string courseId, Slide[] slides, string exerciseUrl, string solutionsUrl, string ltiId)
+		public void PatchSlides(string folderName, string courseId, Slide[] slides, string exerciseUrl, string solutionsUrl, string ltiId, bool replaceExisting)
 		{
 			var verticals = new List<Vertical>();
 			foreach (var slide in slides)
@@ -119,17 +120,21 @@ namespace uLearn.Model.Edx
 				var slideVerticals = slide.ToVerticals(courseId, exerciseUrl, solutionsUrl, new Dictionary<string, string>(), ltiId).ToList();
 				if (File.Exists(string.Format("{0}/vertical/{1}.xml", folderName, slide.Guid)))
 				{
-					slideVerticals.ForEach(x => x.Save(folderName));
-					if (slideVerticals.Count() > 1)
+//					slideVerticals.SelectMany(x => x.Components).OfType<CodeComponent>().ForEach(x => x.Save(folderName));
+					if (replaceExisting)
 					{
-						var sequential = GetSequentialContainingVertical(slide.Guid);
-						if (sequential.VerticalReferences.Count(x => x.UrlName.Contains(slide.Guid)) < 2)
+						slideVerticals.ForEach(x => x.Save(folderName));
+						if (slideVerticals.Count() > 1)
 						{
-							var verticalReferences = sequential.VerticalReferences.ToList();
-							var exerciseReference = verticalReferences.Single(x => x.UrlName == slide.Guid);
-							verticalReferences.Insert(verticalReferences.IndexOf(exerciseReference) + 1, new VerticalReference { UrlName = slide.Guid + "0" });
-							sequential.VerticalReferences = verticalReferences.ToArray();
-							File.WriteAllText(string.Format("{0}/sequential/{1}.xml", folderName, sequential.UrlName), sequential.XmlSerialize());
+							var sequential = GetSequentialContainingVertical(slide.Guid);
+							if (sequential.VerticalReferences.Count(x => x.UrlName.Contains(slide.Guid)) < 2)
+							{
+								var verticalReferences = sequential.VerticalReferences.ToList();
+								var exerciseReference = verticalReferences.Single(x => x.UrlName == slide.Guid);
+								verticalReferences.Insert(verticalReferences.IndexOf(exerciseReference) + 1, new VerticalReference { UrlName = slide.Guid + "0" });
+								sequential.VerticalReferences = verticalReferences.ToArray();
+								File.WriteAllText(string.Format("{0}/sequential/{1}.xml", folderName, sequential.UrlName), sequential.XmlSerialize());
+							}
 						}
 					}
 				}

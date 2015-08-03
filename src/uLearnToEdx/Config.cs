@@ -37,12 +37,8 @@ namespace uLearnToEdx
 		public string Organization;
 		public string CourseNumber;
 		public string CourseRun;
-		public string VideoJson;
 		public string ExerciseUrl;
 		public string SolutionsUrl;
 		public string LtiId;
-
-		public string[] AdvancedModules;
-		public string[] LtiPassports;
 	}
 }
