@@ -16,4 +16,8 @@
 	<SolutionsUrl>https://ulearn.azurewebsites.net/Course/{0}/AcceptedAlert/{1}</SolutionsUrl>
 	<!-- Lti Id used to access Exercise slides -->
 	<LtiId>edx</LtiId>
+	<!-- Id of corresponding uLearn course -->
+	<ULearnCourseId>BasicProgramming</ULearnCourseId>
+	<!-- Path to video json -->
+	<Video>video.json</Video>
 </Config>

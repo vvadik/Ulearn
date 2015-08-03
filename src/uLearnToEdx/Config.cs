@@ -40,5 +40,7 @@ namespace uLearnToEdx
 		public string ExerciseUrl;
 		public string SolutionsUrl;
 		public string LtiId;
+		public string ULearnCourseId;
+		public string Video;
 	}
 }

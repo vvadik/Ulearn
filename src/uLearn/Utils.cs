@@ -10,6 +10,18 @@ namespace uLearn
 			return AppDomain.CurrentDomain.BaseDirectory;
 		}
 
+		public static void DeleteFileIfExists(string file)
+		{
+			if (File.Exists(file))
+				File.Delete(file);
+		}
+
+		public static void DeleteDirectoryIfExists(string directory)
+		{
+			if (Directory.Exists(directory))
+				Directory.Delete(directory, true);
+		}
+
 		public static string GetPass()
 		{
 			var password = "";

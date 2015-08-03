@@ -92,8 +92,10 @@ namespace uLearn.Model.Edx
 			}
 		}
 
-		public void PatchVideos(string folderName, Dictionary<string, Tuple<string, string>> videoIds)
+		public void PatchVideos(string folderName, Dictionary<string, Tuple<string, string>> videoIds, string[] guids)
 		{
+			if (guids != null)
+				videoIds = videoIds.Where(x => guids.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
 			var newVideos = new List<VideoComponent>();
 			foreach (var videoGuid in videoIds.Keys)
 			{
@@ -112,9 +114,14 @@ namespace uLearn.Model.Edx
 			}
 		}
 
-		public void PatchSlides(string folderName, string courseId, Slide[] slides, string exerciseUrl, string solutionsUrl, string ltiId, bool replaceExisting)
+		public void PatchSlides(string folderName, string courseId, Slide[] slides, string exerciseUrl, string solutionsUrl, string ltiId, bool replaceExisting, string[] guids)
 		{
 			var verticals = new List<Vertical>();
+			if (guids != null)
+			{
+				replaceExisting = true;
+				slides = slides.Where(x => guids.Contains(x.Guid)).ToArray();
+			}
 			foreach (var slide in slides)
 			{
 				var slideVerticals = slide.ToVerticals(courseId, exerciseUrl, solutionsUrl, new Dictionary<string, string>(), ltiId).ToList();

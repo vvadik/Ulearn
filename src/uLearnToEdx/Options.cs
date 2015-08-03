@@ -21,14 +21,11 @@ namespace uLearnToEdx
 		[Option('d', "dir", HelpText = "Working directory for the project", Required = true)]
 		public string Dir { get; set; }
 
-		[Option('i', "input", HelpText = "Directory with uLearn course which slides are to be patched into Edx course")]
-		public string InputDir { get; set; }
-
-		[Option('v', "video", HelpText = "Json file with information about video used in the course")]
-		public string VideoJson { get; set; }
-
 		[Option('r', "replace", HelpText = "If set, patch replaces Edx slides on uLearn slides with same guid")]
 		public bool ReplaceExisting { get; set; }
+
+		[Option('g', "guid", HelpText = "Specific guids to be patched separated by comma")]
+		public string Guids { get; set; }
 	}
 
 	[Verb("start", HelpText = "Perform initial setup for Edx course.")]

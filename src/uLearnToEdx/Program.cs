@@ -13,20 +13,31 @@ namespace uLearnToEdx
 {
 	public class Program
 	{
+		private static Credentials GetCredentials(string dir)
+		{
+			Credentials credentials;
+			if (File.Exists(dir + "/credentials.xml"))
+				credentials = new FileInfo(dir + "/credentials.xml").DeserializeXml<Credentials>();
+			else
+			{
+				Console.WriteLine("Enter email:");
+				var email = Console.ReadLine();
+				Console.WriteLine("Enter password:");
+				var password = Utils.GetPass();
+				credentials = new Credentials(email, password);
+				File.WriteAllText(dir + "/credentials.xml", credentials.XmlSerialize());
+			}
+			return credentials;
+		}
+
 		private static void Start(StartOptions options)
 		{
 			if (Directory.Exists(options.Dir))
 				Directory.Delete(options.Dir, true);
 			Directory.CreateDirectory(options.Dir);
-
+			
 			File.Copy(string.Format("{0}/templates/config.xml", Utils.GetRootDirectory()), options.Dir + "/config.xml");
-
-			Console.WriteLine("Enter email:");
-			var email = Console.ReadLine();
-			Console.WriteLine("Enter password:");
-			var password = Utils.GetPass();
-
-			File.WriteAllText(options.Dir + "/credentials.xml", new Credentials(email, password).XmlSerialize());
+			GetCredentials(options.Dir);
 			
 			Process.Start("notepad", options.Dir + "/config.xml");
 		}
@@ -34,10 +45,16 @@ namespace uLearnToEdx
 		private static void Convert(ConvertOptions options)
 		{
 			var config = new FileInfo(options.Dir + "/config.xml").DeserializeXml<Config>();
-			var credentials = new FileInfo(options.Dir + "/credentials.xml").DeserializeXml<Credentials>();
+			var credentials = GetCredentials(options.Dir);
+			
+			if (Directory.Exists(string.Format("{0}/{1}", options.Dir, config.ULearnCourseId)))
+				Directory.Delete(string.Format("{0}/{1}", options.Dir, config.ULearnCourseId), true);
+			Utils.DirectoryCopy(options.InputDir, string.Format("{0}/{1}", options.Dir, config.ULearnCourseId), true);
+			if (options.VideoJson != null)
+				File.Copy(options.VideoJson, string.Format("{0}/{1}", options.Dir, config.Video));
 
-			Console.WriteLine("Loading uLearn course from {0}", options.InputDir);
-			var course = new CourseLoader().LoadCourse(new DirectoryInfo(options.InputDir));
+			Console.WriteLine("Loading uLearn course from {0}", config.ULearnCourseId);
+			var course = new CourseLoader().LoadCourse(new DirectoryInfo(string.Format("{0}/{1}", options.Dir, config.ULearnCourseId)));
 
 			Console.WriteLine("Converting uLearn course \"{0}\" to Edx course", course.Id);
 			Converter.ToEdxCourse(
@@ -58,7 +75,7 @@ namespace uLearnToEdx
 		private static void Patch(PatchOptions options)
 		{
 			var config = new FileInfo(options.Dir + "/config.xml").DeserializeXml<Config>();
-			var credentials = new FileInfo(options.Dir + "/credentials.xml").DeserializeXml<Credentials>();
+			var credentials = GetCredentials(options.Dir);
 
 			Console.WriteLine("Downloading {0}.tar.gz", config.CourseRun);
 			DownloadManager.Download(config.Hostname, config.Port, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, config.CourseRun + ".tar.gz");
@@ -71,18 +88,26 @@ namespace uLearnToEdx
 			
 			var edxCourse = EdxCourse.Load(options.Dir + "/olx");
 
-			if (options.InputDir != null)
-			{
-				var ulearnCourse = new CourseLoader().LoadCourse(new DirectoryInfo(options.InputDir));
-				
-				Console.WriteLine("Patching {0} with slides from {1}...", config.CourseRun, ulearnCourse.Id);
-				edxCourse.PatchSlides(options.Dir + "/olx", ulearnCourse.Id, ulearnCourse.Slides, config.ExerciseUrl, config.SolutionsUrl, config.LtiId, options.ReplaceExisting);
-			}
+			var ulearnCourse = new CourseLoader().LoadCourse(new DirectoryInfo(string.Format("{0}/{1}", options.Dir, config.ULearnCourseId)));
 
-			if (options.VideoJson != null && File.Exists(options.VideoJson))
+			Console.WriteLine("Patching {0} with slides from {1}...", config.CourseRun, ulearnCourse.Id);
+			edxCourse.PatchSlides(options.Dir + "/olx", 
+				ulearnCourse.Id, 
+				ulearnCourse.Slides, 
+				config.ExerciseUrl, 
+				config.SolutionsUrl, 
+				config.LtiId, 
+				options.ReplaceExisting, 
+				options.Guids == null ? null : options.Guids.Split(',')
+			);
+
+			if (config.Video != null && File.Exists(string.Format("{0}/{1}", options.Dir, config.Video)))
 			{
-				var video = JsonConvert.DeserializeObject<Video>(File.ReadAllText(options.VideoJson));
-				edxCourse.PatchVideos(options.Dir + "/olx", video.Records.ToDictionary(x => x.Guid.ToString("D"), x => Tuple.Create(x.Data.Id, x.Data.Name)));
+				var video = JsonConvert.DeserializeObject<Video>(File.ReadAllText(string.Format("{0}/{1}", options.Dir, config.Video)));
+				edxCourse.PatchVideos(options.Dir + "/olx", 
+					video.Records.ToDictionary(x => x.Guid.ToString("D"), x => Tuple.Create(x.Data.Id, x.Data.Name)), 
+					options.Guids == null ? null : options.Guids.Split(',')
+				);
 			}
 
 			Upload(options.Dir, edxCourse.CourseName, config, credentials);
@@ -91,14 +116,22 @@ namespace uLearnToEdx
 		private static void Upload(string baseDir, string courseName, Config config, Credentials credentials)
 		{
 			Environment.CurrentDirectory = baseDir;
-			Console.WriteLine("Creating {0}.tar.gz...", courseName);
+			Utils.DeleteDirectoryIfExists("temp");
+			if (Directory.Exists(courseName))
+				Directory.Move(courseName, "temp");
 			Utils.DirectoryCopy("olx", courseName, true);
-			ArchiveManager.CreateTar(courseName + ".tar.gz", courseName);
+			Utils.DeleteFileIfExists(courseName + ".tar.gz");
 
+			Console.WriteLine("Creating {0}.tar.gz...", courseName);
+			ArchiveManager.CreateTar(courseName + ".tar.gz", courseName);
+			
+			Utils.DeleteDirectoryIfExists(courseName);
+			if (Directory.Exists("temp"))
+				Directory.Move("temp", courseName);
+			
 			Console.WriteLine("Uploading {0}.tar.gz...", courseName);
 			DownloadManager.Upload(config.Hostname, config.Port, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, courseName + ".tar.gz");
-			Directory.Delete(courseName, true);
-			File.Delete(courseName + ".tar.gz");
+			Utils.DeleteFileIfExists(courseName + ".tar.gz");
 		}
 
 		public static int Main(string[] args)
