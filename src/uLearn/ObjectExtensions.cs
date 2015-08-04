@@ -12,7 +12,7 @@ namespace uLearn
 {
 	public static class ObjectExtensions
 	{
-		private static readonly XmlWriterSettings settings = new XmlWriterSettings { OmitXmlDeclaration = true };
+		private static readonly XmlWriterSettings settings = new XmlWriterSettings { OmitXmlDeclaration = true, Indent = true };
 		private static readonly XmlSerializerNamespaces ns = new XmlSerializerNamespaces(new[] { new XmlQualifiedName("", "") });
 
 		public static string XmlSerialize(this object o, bool raw = false)

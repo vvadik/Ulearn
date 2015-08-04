@@ -147,6 +147,9 @@
     <Compile Include="Model\Edx\EdxComponents\HtmlComponent.cs" />
     <Compile Include="Model\Edx\EdxComponents\LtiComponent.cs" />
     <Compile Include="Model\Edx\EdxComponents\ProblemComponent.cs" />
+    <Compile Include="Model\Edx\Patch\AbstractPatcher.cs" />
+    <Compile Include="Model\Edx\Patch\ULearnPatcher.cs" />
+    <Compile Include="Model\Edx\Patch\VideoPatcher.cs" />
     <Compile Include="Model\Edx\Sequential.cs" />
     <Compile Include="Model\Edx\Vertical.cs" />
     <Compile Include="Model\Edx\EdxComponents\VideoComponent.cs" />

@@ -32,13 +32,12 @@ namespace uLearnToEdx
 
 		private static void Start(StartOptions options)
 		{
-			if (Directory.Exists(options.Dir))
-				Directory.Delete(options.Dir, true);
+			Utils.DeleteDirectoryIfExists(options.Dir);
 			Directory.CreateDirectory(options.Dir);
 			
 			File.Copy(string.Format("{0}/templates/config.xml", Utils.GetRootDirectory()), options.Dir + "/config.xml");
 			GetCredentials(options.Dir);
-			
+			// Download(options.Dir, config, credentials);
 			Process.Start("notepad", options.Dir + "/config.xml");
 		}
 
@@ -47,8 +46,7 @@ namespace uLearnToEdx
 			var config = new FileInfo(options.Dir + "/config.xml").DeserializeXml<Config>();
 			var credentials = GetCredentials(options.Dir);
 			
-			if (Directory.Exists(string.Format("{0}/{1}", options.Dir, config.ULearnCourseId)))
-				Directory.Delete(string.Format("{0}/{1}", options.Dir, config.ULearnCourseId), true);
+			Utils.DeleteDirectoryIfExists(string.Format("{0}/{1}", options.Dir, config.ULearnCourseId));
 			Utils.DirectoryCopy(options.InputDir, string.Format("{0}/{1}", options.Dir, config.ULearnCourseId), true);
 			if (options.VideoJson != null)
 				File.Copy(options.VideoJson, string.Format("{0}/{1}", options.Dir, config.Video));
@@ -64,7 +62,7 @@ namespace uLearnToEdx
 				config.SolutionsUrl,
 				options.VideoJson != null && File.Exists(options.VideoJson)
 					? JsonConvert.DeserializeObject<Video>(File.ReadAllText(options.VideoJson)).Records
-						.ToDictionary(x => x.Data.Id, x => x.Guid.ToString("D"))
+						.ToDictionary(x => x.Data.Id, x => Utils.GetNormalizedGuid(x.Guid))
 					: new Dictionary<string, string>(),
 				config.LtiId
 			).Save(options.Dir + "/olx");
@@ -77,14 +75,7 @@ namespace uLearnToEdx
 			var config = new FileInfo(options.Dir + "/config.xml").DeserializeXml<Config>();
 			var credentials = GetCredentials(options.Dir);
 
-			Console.WriteLine("Downloading {0}.tar.gz", config.CourseRun);
-			DownloadManager.Download(config.Hostname, config.Port, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, config.CourseRun + ".tar.gz");
-			
-			ArchiveManager.ExtractTar(config.CourseRun + ".tar.gz", ".");
-			File.Delete(config.CourseRun + ".tar.gz");
-			if (Directory.Exists(options.Dir + "/olx"))
-				Directory.Delete(options.Dir + "/olx", true);
-			Directory.Move(config.CourseRun, options.Dir + "/olx");
+			Download(options.Dir, config, credentials);
 			
 			var edxCourse = EdxCourse.Load(options.Dir + "/olx");
 
@@ -98,19 +89,30 @@ namespace uLearnToEdx
 				config.SolutionsUrl, 
 				config.LtiId, 
 				options.ReplaceExisting, 
-				options.Guids == null ? null : options.Guids.Split(',')
+				options.Guids == null ? null : options.Guids.Split(',').Select(Utils.GetNormalizedGuid).ToArray()
 			);
 
 			if (config.Video != null && File.Exists(string.Format("{0}/{1}", options.Dir, config.Video)))
 			{
 				var video = JsonConvert.DeserializeObject<Video>(File.ReadAllText(string.Format("{0}/{1}", options.Dir, config.Video)));
 				edxCourse.PatchVideos(options.Dir + "/olx", 
-					video.Records.ToDictionary(x => x.Guid.ToString("D"), x => Tuple.Create(x.Data.Id, x.Data.Name)), 
+					video.Records.ToDictionary(x => Utils.GetNormalizedGuid(x.Guid), x => Tuple.Create(x.Data.Id, x.Data.Name)), 
 					options.Guids == null ? null : options.Guids.Split(',')
 				);
 			}
 
 			Upload(options.Dir, edxCourse.CourseName, config, credentials);
+		}
+
+		private static void Download(string baseDir, Config config, Credentials credentials)
+		{
+			Console.WriteLine("Downloading {0}.tar.gz", config.CourseRun);
+			DownloadManager.Download(config.Hostname, config.Port, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, config.CourseRun + ".tar.gz");
+
+			ArchiveManager.ExtractTar(config.CourseRun + ".tar.gz", ".");
+			Utils.DeleteFileIfExists(config.CourseRun + ".tar.gz");
+			Utils.DeleteDirectoryIfExists(baseDir + "/olx");
+			Directory.Move(config.CourseRun, baseDir + "/olx");
 		}
 
 		private static void Upload(string baseDir, string courseName, Config config, Credentials credentials)

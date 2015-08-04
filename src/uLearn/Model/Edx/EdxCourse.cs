@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-using ApprovalUtilities.Utilities;
 using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Edx
@@ -70,7 +69,7 @@ namespace uLearn.Model.Edx
 			if (CourseWithChapters.Chapters.All(x => x.UrlName != "Unsorted"))
 			{
 				var chapters = new List<Chapter>(CourseWithChapters.Chapters);
-				var newChapter = new Chapter("Unsorted", "Unsorted", new[] { new Sequential(Guid.NewGuid().ToString("D"), "Unsorted " + DateTime.Now, verticals) });
+				var newChapter = new Chapter("Unsorted", "Unsorted", new[] { new Sequential(Utils.NewNormalizedGuid(), "Unsorted " + DateTime.Now, verticals) });
 				chapters.Add(newChapter);
 				CourseWithChapters.Chapters = chapters.ToArray();
 				CourseWithChapters.ChapterReferences = CourseWithChapters.Chapters.Select(x => new ChapterReference { UrlName = x.UrlName }).ToArray();
@@ -82,7 +81,7 @@ namespace uLearn.Model.Edx
 			{
 				var testChapter = CourseWithChapters.Chapters.Single(x => x.UrlName == "Unsorted");
 				var sequentials = new List<Sequential>(testChapter.Sequentials);
-				var newSequential = new Sequential(Guid.NewGuid().ToString("D"), "Unsorted " + DateTime.Now, verticals);
+				var newSequential = new Sequential(Utils.NewNormalizedGuid(), "Unsorted " + DateTime.Now, verticals);
 				sequentials.Add(newSequential);
 				testChapter.Sequentials = sequentials.ToArray();
 				testChapter.SequentialReferences = testChapter.Sequentials.Select(x => new SequentialReference { UrlName = x.UrlName }).ToArray();
@@ -109,7 +108,7 @@ namespace uLearn.Model.Edx
 			}
 			if (newVideos.Count != 0)
 			{
-				var verticals = newVideos.Select(x => new Vertical(Guid.NewGuid().ToString("D"), x.DisplayName, new Component[] { x })).ToArray();
+				var verticals = newVideos.Select(x => new Vertical(Utils.NewNormalizedGuid(), x.DisplayName, new Component[] { x })).ToArray();
 				CreateUnsortedChapter(folderName, verticals);
 			}
 		}
@@ -127,7 +126,6 @@ namespace uLearn.Model.Edx
 				var slideVerticals = slide.ToVerticals(courseId, exerciseUrl, solutionsUrl, new Dictionary<string, string>(), ltiId).ToList();
 				if (File.Exists(string.Format("{0}/vertical/{1}.xml", folderName, slide.Guid)))
 				{
-//					slideVerticals.SelectMany(x => x.Components).OfType<CodeComponent>().ForEach(x => x.Save(folderName));
 					if (replaceExisting)
 					{
 						slideVerticals.ForEach(x => x.Save(folderName));

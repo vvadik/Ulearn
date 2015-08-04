@@ -5,6 +5,21 @@ namespace uLearn
 {
 	public class Utils
 	{
+		public static string NewNormalizedGuid()
+		{
+			return Guid.NewGuid().ToString("D");
+		}
+
+		public static string GetNormalizedGuid(string guid)
+		{
+			return Guid.Parse(guid).ToString("D");
+		}
+
+		public static string GetNormalizedGuid(Guid guid)
+		{
+			return guid.ToString("D");
+		}
+
 		public static string GetRootDirectory()
 		{
 			return AppDomain.CurrentDomain.BaseDirectory;
