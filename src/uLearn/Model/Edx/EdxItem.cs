@@ -9,6 +9,9 @@ namespace uLearn.Model.Edx
 		[XmlIgnore]
 		public string UrlName { get; set; }
 
+		[XmlAttribute("display_name")]
+		public virtual string DisplayName { get; set; }
+
 		[XmlIgnore]
 		public virtual string SubfolderName { get; set; }
 

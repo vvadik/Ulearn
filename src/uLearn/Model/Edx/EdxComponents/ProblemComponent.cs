@@ -8,6 +8,9 @@ namespace uLearn.Model.Edx.EdxComponents
 	public class ProblemComponent : Component
 	{
 		[XmlIgnore]
+		public override string DisplayName { get; set; }
+
+		[XmlIgnore]
 		public override string SubfolderName
 		{
 			get { return "problem"; }
@@ -33,9 +36,6 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		[XmlElement("p")]
 		public XmlElement[] XmlSubcomponents;
-
-		[XmlAttribute("display_name")]
-		public string DisplayName;
 
 		[XmlIgnore]
 		public override string SubfolderName

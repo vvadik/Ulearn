@@ -8,9 +8,6 @@ namespace uLearn.Model.Edx
 	[XmlRoot("sequential")]
 	public class Sequential : EdxItem
 	{
-		[XmlAttribute("display_name")]
-		public string DisplayName;
-
 		[XmlIgnore]
 		public override string SubfolderName
 		{

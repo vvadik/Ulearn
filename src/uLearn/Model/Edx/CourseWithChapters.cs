@@ -11,9 +11,6 @@ namespace uLearn.Model.Edx
 		[XmlIgnore]
 		public override string SubfolderName { get { return "course"; } }
 
-		[XmlAttribute("display_name")]
-		public string DisplayName;
-
 		[XmlAttribute("advanced_modules")]
 		public string AdvancedModules;
 

@@ -12,9 +12,6 @@ namespace uLearn.Model.Edx.EdxComponents
 		[XmlAttribute("youtube_id_1_0")]
 		public string NormalSpeedVideoId;
 
-		[XmlAttribute("display_name")]
-		public string DisplayName;
-
 		[XmlIgnore]
 		public override string SubfolderName
 		{
@@ -40,8 +37,7 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		public override string AsHtmlString()
 		{
-			//TODO
-			return "<iframe class=\"embedded-video\" width=\"100%\" height=\"530\" src=\"//www.youtube.com/embed/1WaWDgBxyYc\" frameborder=\"0\" allowfullscreen=\"\"></iframe>";
+			return string.Format(@"<iframe class=""embedded-video"" width=""100%"" height=""530"" src=""//www.youtube.com/embed/{0}"" frameborder=""0"" allowfullscreen=""\""></iframe>", NormalSpeedVideoId);
 		}
 
 		public static VideoComponent Load(string folderName, string urlName)
