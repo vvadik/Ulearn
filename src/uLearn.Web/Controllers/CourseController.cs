@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using NUnit.Framework;
 using uLearn.Model.Blocks;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
@@ -259,7 +260,9 @@ namespace uLearn.Web.Controllers
 		[Authorize(Roles = LmsRoles.Instructor)]
 		public ActionResult InstructorNote(string courseId, string unitName)
 		{
-			InstructorNote instructorNote = courseManager.GetCourse(courseId).GetInstructorNote(unitName);
+			InstructorNote instructorNote = courseManager.GetCourse(courseId).FindInstructorNote(unitName);
+			if (instructorNote == null)
+				return HttpNotFound("no instructor note for this unit");
 			return View(instructorNote);
 		}
 

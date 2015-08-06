@@ -8,6 +8,13 @@ namespace uLearn
 {
 	public static class StringExtensions
 	{
+
+		public static string ExcludeLinesWith(this string s, params string[] args)
+		{
+			return string.Join(
+				Environment.NewLine,
+				s.SplitToLines().Where(line => !args.Any(line.Contains)));
+		}
 		public static string WithArgs(this string s, params object[] args)
 		{
 			return string.Format(s, args);

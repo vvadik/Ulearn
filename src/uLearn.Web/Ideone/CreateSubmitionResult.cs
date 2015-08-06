@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace uLearn.Web.Ideone
@@ -10,7 +11,12 @@ namespace uLearn.Web.Ideone
 
 		public string Link
 		{
-			get { return Get("link"); }
+			get
+			{
+				if (IsOk)
+					return Get("link");
+				throw new Exception(ToString());
+			}
 		}
 	}
 }
