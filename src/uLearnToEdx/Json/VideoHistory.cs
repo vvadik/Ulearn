@@ -46,6 +46,7 @@ namespace uLearnToEdx.Json
 						if (distinctIds.Contains(data.Id))
 							throw new Exception(string.Format("Video with id {0} was encountered more than one time.", data.Id));
 					}
+					distinctIds.AddRange(recordHistory.Data.Select(x => x.Id));
 				}
 				
 				File.WriteAllText(videoHistoryJson, JsonConvert.SerializeObject(videoHistory));
