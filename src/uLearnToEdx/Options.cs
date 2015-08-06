@@ -17,7 +17,7 @@ namespace uLearnToEdx
 		int Execute();
 	}
 
-	[Verb("start", HelpText = "Perform initial setup for Edx course.")]
+	[Verb("start", HelpText = "Perform initial setup for Edx course")]
 	internal class StartOptions : IOptions
 	{
 		[Option('d', "dir", HelpText = "Working directory for the project", Required = true)]
@@ -36,10 +36,10 @@ namespace uLearnToEdx
 		}
 	}
 
-	[Verb("convert", HelpText = "Convert uLearn course to Edx course.")]
+	[Verb("convert", HelpText = "Convert uLearn course to Edx course")]
 	class ConvertOptions : IOptions
 	{
-		[Option('d', "dir", HelpText = "Working directory for the project", Required = true)]
+		[Option('d', "dir", HelpText = "Working directory for the project")]
 		public string Dir { get; set; }
 
 		[Option('i', "input", HelpText = "Directory with uLearn course to be converted", Required = true)]
@@ -50,13 +50,24 @@ namespace uLearnToEdx
 
 		public int Execute()
 		{
+			Dir = Dir ?? ".";
+
 			var config = new FileInfo(Dir + "/config.xml").DeserializeXml<Config>();
 			var credentials = Credentials.GetCredentials(Dir);
 
 			Utils.DeleteDirectoryIfExists(string.Format("{0}/{1}", Dir, config.ULearnCourseId));
 			Utils.DirectoryCopy(InputDir, string.Format("{0}/{1}", Dir, config.ULearnCourseId), true);
+
+			Video video;
 			if (VideoJson != null)
+			{
 				File.Copy(VideoJson, string.Format("{0}/{1}", Dir, config.Video));
+				video = JsonConvert.DeserializeObject<Video>(File.ReadAllText(VideoJson));
+			}
+			else
+				video = new Video { Records = new Record[0] };
+
+			VideoHistory.UpdateHistory(Dir, video);
 
 			Console.WriteLine("Loading uLearn course from {0}", config.ULearnCourseId);
 			var course = new CourseLoader().LoadCourse(new DirectoryInfo(string.Format("{0}/{1}", Dir, config.ULearnCourseId)));
@@ -67,10 +78,7 @@ namespace uLearnToEdx
 				config.Organization,
 				config.ExerciseUrl,
 				config.SolutionsUrl,
-				VideoJson != null && File.Exists(VideoJson)
-					? JsonConvert.DeserializeObject<Video>(File.ReadAllText(VideoJson)).Records
-						.ToDictionary(x => x.Data.Id, x => Utils.GetNormalizedGuid(x.Guid))
-					: new Dictionary<string, string>(),
+				video.Records.ToDictionary(x => x.Data.Id, x => Utils.GetNormalizedGuid(x.Guid)),
 				config.LtiId
 			).Save(Dir + "/olx");
 
@@ -81,7 +89,7 @@ namespace uLearnToEdx
 
 	abstract class PatchOptions : IOptions
 	{
-		[Option('d', "dir", HelpText = "Working directory for the project", Required = true)]
+		[Option('d', "dir", HelpText = "Working directory for the project")]
 		public string Dir { get; set; }
 
 		[Option('r', "replace", HelpText = "If set, patch replaces Edx slides on uLearn slides with same guid")]
@@ -92,6 +100,8 @@ namespace uLearnToEdx
 
 		public int Execute()
 		{
+			Dir = Dir ?? ".";
+
 			var config = new FileInfo(Dir + "/config.xml").DeserializeXml<Config>();
 			var credentials = Credentials.GetCredentials(Dir);
 
@@ -108,7 +118,7 @@ namespace uLearnToEdx
 		public abstract void Patch(OlxPatcher patcher, Config config, EdxCourse edxCourse);
 	}
 
-	[Verb("patch", HelpText = "Patch Edx course with new slides or videos.")]
+	[Verb("patch_ulearn", HelpText = "Patch Edx course with new slides from uLearn course")]
 	class ULearnPatchOptions : PatchOptions
 	{
 		public override void Patch(OlxPatcher patcher, Config config, EdxCourse edxCourse)
@@ -116,39 +126,60 @@ namespace uLearnToEdx
 			var ulearnCourse = new CourseLoader().LoadCourse(new DirectoryInfo(string.Format("{0}/{1}", Dir, config.ULearnCourseId)));
 
 			var videoJson = string.Format("{0}/{1}", Dir, config.Video);
-			var videoGuids = File.Exists(videoJson) 
-				? JsonConvert.DeserializeObject<Video>(File.ReadAllText(videoJson)).Records.ToDictionary(x => x.Data.Id, x => Utils.GetNormalizedGuid(x.Guid)) 
-				: new Dictionary<string, string>();
+			var video = File.Exists(videoJson)
+				? JsonConvert.DeserializeObject<Video>(File.ReadAllText(videoJson))
+				: new Video { Records = new Record[0] };
+			var videoHistory = VideoHistory.UpdateHistory(Dir, video);
+			var videoGuids = videoHistory.Records
+				.SelectMany(x => x.Data.Select(y => Tuple.Create(y.Id, Utils.GetNormalizedGuid(x.Guid))))
+				.ToDictionary(x => x.Item1, x => x.Item2);
+
+			var guids = Guids == null ? null : Guids.Split(',').Select(Utils.GetNormalizedGuid).ToList();
 
 			patcher.PatchVerticals(
 				edxCourse, 
 				ulearnCourse.Slides
+					.Where(x => guids == null || guids.Contains(x.Guid))
 					.Select(x => x.ToVerticals(
 							ulearnCourse.Id, 
 							config.ExerciseUrl, 
 							config.SolutionsUrl, 
 							videoGuids,
 							config.LtiId
-						).ToArray())
+						).ToArray()),
+				guids != null || ReplaceExisting
 			);
+		}
+	}
 
+	[Verb("patch_video", HelpText = "Patch Edx course with videos from json file")]
+	class VideoPatchOptions : PatchOptions
+	{
+		public override void Patch(OlxPatcher patcher, Config config, EdxCourse edxCourse)
+		{
+			var videoJson = string.Format("{0}/{1}", Dir, config.Video);
+			var video = File.Exists(videoJson)
+				? JsonConvert.DeserializeObject<Video>(File.ReadAllText(videoJson))
+				: new Video { Records = new Record[0] };
+			VideoHistory.UpdateHistory(Dir, video);
+			var guids = Guids == null ? null : Guids.Split(',').Select(Utils.GetNormalizedGuid).ToList();
 			if (config.Video != null && File.Exists(string.Format("{0}/{1}", Dir, config.Video)))
 			{
-				var video = JsonConvert.DeserializeObject<Video>(File.ReadAllText(string.Format("{0}/{1}", Dir, config.Video)));
 				var videoComponents = video
 					.Records
-					.ToDictionary(x => Utils.GetNormalizedGuid(x.Guid), x => Tuple.Create(x.Data.Id, x.Data.Name))
-					.Select(x => new VideoComponent(x.Key, x.Value.Item2, x.Value.Item1));
-				
+					.Where(x => guids == null || guids.Contains(Utils.GetNormalizedGuid(x.Guid)))
+					.Select(x => new VideoComponent(Utils.GetNormalizedGuid(x.Guid), x.Data.Name, x.Data.Id));
+
 				patcher.PatchComponents(
-					edxCourse, 
-					videoComponents
+					edxCourse,
+					videoComponents,
+					guids != null || ReplaceExisting
 				);
 			}
 		}
 	}
 
-	[Verb("custom", HelpText = "Patch Edx course with new slides or videos")]
+	[Verb("patch_custom", HelpText = "Patch Edx course with new slides or videos")]
 	class CustomPatchOptions : PatchOptions
 	{
 		[Option('s', "source", HelpText = "Source directory for custom slides", Required = true)]

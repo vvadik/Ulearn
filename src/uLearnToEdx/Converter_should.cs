@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ApprovalUtilities.Utilities;
 using NUnit.Framework;
 using uLearn;
 using uLearn.Model.Blocks;
@@ -44,11 +43,9 @@ namespace uLearnToEdx
 
 		public HashSet<string> GetDirectoryFiles(string directory)
 		{
-			var hs = new HashSet<string>();
 			var files = Directory.GetFiles(directory).Select(Path.GetFileName);
 			var dirFiles = Directory.GetDirectories(directory).SelectMany(x => Directory.GetFiles(x).Select(Path.GetFileName));
-			hs.AddAll(files);
-			hs.AddAll(dirFiles);
+			var hs = new HashSet<string>(files.Concat(dirFiles));
 			return hs;
 		}
 
@@ -93,7 +90,7 @@ namespace uLearnToEdx
 			var videoDict = new Dictionary<string, Tuple<string, string>> { { ulearnVideoGuid, Tuple.Create("QWFuk3ymXxc", "") } };
 
 			new OlxPatcher(course.Id)
-				.PatchComponents(edxCourse, GetVideoComponentFromDictionary(videoDict));
+				.PatchComponents(edxCourse, GetVideoComponentFromDictionary(videoDict), true);
 			
 			Assert.That(File.ReadAllText(string.Format("{0}/video/{1}.xml", course.Id, ulearnVideoGuid)).Contains("QWFuk3ymXxc"));
 		}

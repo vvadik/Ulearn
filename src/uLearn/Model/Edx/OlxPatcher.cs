@@ -16,7 +16,7 @@ namespace uLearn.Model.Edx
 			this.olxPath = olxPath;
 		}
 
-		public void PatchComponents(EdxCourse course, IEnumerable<Component> components)
+		public void PatchComponents(EdxCourse course, IEnumerable<Component> components, bool replaceExisting = true)
 		{
 			var newVerticals = new List<Vertical>();
 			foreach (var component in components)
@@ -24,26 +24,29 @@ namespace uLearn.Model.Edx
 				var filename = string.Format("{0}/{1}/{2}.xml", olxPath, component.SubfolderName, component.UrlName);
 				if (File.Exists(filename))
 				{
-					string displayName;
-					try
+					if (replaceExisting)
 					{
-						var xml = new XmlDocument();
-						xml.Load(filename);
-						displayName = xml.DocumentElement.Attributes["display_name"].InnerText;
+						string displayName;
+						try
+						{
+							var xml = new XmlDocument();
+							xml.Load(filename);
+							displayName = xml.DocumentElement.Attributes["display_name"].InnerText;
+						}
+						catch (Exception e)
+						{
+							displayName = component.DisplayName;
+						}
+						component.DisplayName = displayName;
+						component.Save(olxPath);
 					}
-					catch (Exception e)
-					{
-						displayName = component.DisplayName;
-					}
-					component.DisplayName = displayName;
-					component.Save(olxPath);
 				}
 				else newVerticals.Add(new Vertical(Utils.NewNormalizedGuid(), component.DisplayName, new[] { component }));
 			}
 			Add(course, newVerticals.ToArray());
 		}
 
-		public void PatchVerticals(EdxCourse course, IEnumerable<Vertical[]> verticals)
+		public void PatchVerticals(EdxCourse course, IEnumerable<Vertical[]> verticals, bool replaceExisting = true)
 		{
 			var newVerticals = new List<Vertical>();
 			foreach (var subverticals in verticals)
@@ -51,15 +54,18 @@ namespace uLearn.Model.Edx
 				var existsMap = subverticals.ToDictionary(x => x, x => File.Exists(string.Format("{0}/vertical/{1}.xml", olxPath, x.UrlName)));
 				if (subverticals.Any(x => existsMap[x]))
 				{
-					foreach (var subvertical in subverticals)
-						subvertical.Save(olxPath);
+					if (replaceExisting)
+					{
+						foreach (var subvertical in subverticals)
+							subvertical.Save(olxPath);
 
-					if (subverticals.Length > 1)
-						SaveSequentialContainingSubverticals(
-							course,
-							subverticals.Where(x => !existsMap[x]).ToArray(),
-							subverticals.First(x => existsMap[x])
-						);
+						if (subverticals.Length > 1)
+							SaveSequentialContainingSubverticals(
+								course,
+								subverticals.Where(x => !existsMap[x]).ToArray(),
+								subverticals.First(x => existsMap[x])
+							);
+					}
 				}
 				else newVerticals.AddRange(subverticals);
 			}
