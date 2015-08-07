@@ -35,7 +35,7 @@ namespace uLearn.Model.Edx
 			UrlName = courseId;
 			Organization = organization;
 			CourseWithChapters = new CourseWithChapters(courseId, courseTitle, advancedModules, ltiPassports, true, chapters);
-			StaticFiles = Directory.GetFiles("static");
+			StaticFiles = Directory.GetFiles(string.Format("{0}/static", Utils.GetRootDirectory()));
 		}
 
 		private void CreateDirectories(string rootDir, params string[] subDirs)
@@ -69,7 +69,7 @@ namespace uLearn.Model.Edx
 			if (CourseWithChapters.Chapters.All(x => x.UrlName != "Unsorted"))
 			{
 				var chapters = new List<Chapter>(CourseWithChapters.Chapters);
-				var newChapter = new Chapter("Unsorted", "Unsorted", new[] { new Sequential(Guid.NewGuid().ToString("D"), "Unsorted " + DateTime.Now, verticals) });
+				var newChapter = new Chapter("Unsorted", "Unsorted", new[] { new Sequential(Utils.NewNormalizedGuid(), "Unsorted " + DateTime.Now, verticals) });
 				chapters.Add(newChapter);
 				CourseWithChapters.Chapters = chapters.ToArray();
 				CourseWithChapters.ChapterReferences = CourseWithChapters.Chapters.Select(x => new ChapterReference { UrlName = x.UrlName }).ToArray();
@@ -81,64 +81,13 @@ namespace uLearn.Model.Edx
 			{
 				var testChapter = CourseWithChapters.Chapters.Single(x => x.UrlName == "Unsorted");
 				var sequentials = new List<Sequential>(testChapter.Sequentials);
-				var newSequential = new Sequential(Guid.NewGuid().ToString("D"), "Unsorted " + DateTime.Now, verticals);
+				var newSequential = new Sequential(Utils.NewNormalizedGuid(), "Unsorted " + DateTime.Now, verticals);
 				sequentials.Add(newSequential);
 				testChapter.Sequentials = sequentials.ToArray();
 				testChapter.SequentialReferences = testChapter.Sequentials.Select(x => new SequentialReference { UrlName = x.UrlName }).ToArray();
 
 				File.WriteAllText(string.Format("{0}/chapter/{1}.xml", folderName, testChapter.UrlName), testChapter.XmlSerialize());
 				newSequential.Save(folderName);
-			}
-		}
-
-		public void PatchVideos(string folderName, Dictionary<string, Tuple<string, string>> videoIds)
-		{
-			var newVideos = new List<VideoComponent>();
-			foreach (var videoGuid in videoIds.Keys)
-			{
-				if (File.Exists(string.Format("{0}/video/{1}.xml", folderName, videoGuid)))
-					new VideoComponent(videoGuid, new FileInfo(string.Format("{0}/video/{1}.xml", folderName, videoGuid)).DeserializeXml<VideoComponent>().DisplayName, videoIds[videoGuid].Item1).Save(folderName);
-				else
-				{
-					var video = videoIds[videoGuid];
-					newVideos.Add(new VideoComponent(videoGuid, video.Item2, video.Item1));
-				}
-			}
-			if (newVideos.Count != 0)
-			{
-				var verticals = newVideos.Select(x => new Vertical(Guid.NewGuid().ToString("D"), x.DisplayName, new Component[] { x })).ToArray();
-				CreateUnsortedChapter(folderName, verticals);
-			}
-		}
-
-		public void PatchSlides(string folderName, string courseId, Slide[] slides, string exerciseUrl, string solutionsUrl, string ltiId)
-		{
-			var verticals = new List<Vertical>();
-			foreach (var slide in slides)
-			{
-				var slideVerticals = slide.ToVerticals(courseId, exerciseUrl, solutionsUrl, new Dictionary<string, string>(), ltiId).ToList();
-				if (File.Exists(string.Format("{0}/vertical/{1}.xml", folderName, slide.Guid)))
-				{
-					slideVerticals.ForEach(x => x.Save(folderName));
-					if (slideVerticals.Count() > 1)
-					{
-						var sequential = GetSequentialContainingVertical(slide.Guid);
-						if (sequential.VerticalReferences.Count(x => x.UrlName.Contains(slide.Guid)) < 2)
-						{
-							var verticalReferences = sequential.VerticalReferences.ToList();
-							var exerciseReference = verticalReferences.Single(x => x.UrlName == slide.Guid);
-							verticalReferences.Insert(verticalReferences.IndexOf(exerciseReference) + 1, new VerticalReference { UrlName = slide.Guid + "0" });
-							sequential.VerticalReferences = verticalReferences.ToArray();
-							File.WriteAllText(string.Format("{0}/sequential/{1}.xml", folderName, sequential.UrlName), sequential.XmlSerialize());
-						}
-					}
-				}
-				else
-					verticals.AddRange(slideVerticals);
-			}
-			if (verticals.Count != 0)
-			{
-				CreateUnsortedChapter(folderName, verticals.ToArray());
 			}
 		}
 

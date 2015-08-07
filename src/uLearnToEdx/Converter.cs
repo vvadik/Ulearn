@@ -22,14 +22,11 @@ namespace uLearnToEdx
 				).ToArray();
 		}
 
-		public static EdxCourse ToEdxCourse(
-			Course course, string organization, string[] advancedModules, string[] ltiPassports, string exerciseUrl, string solutionsUrl,
+		public static EdxCourse ToEdxCourse(Course course, string organization, string exerciseUrl, string solutionsUrl,
 			Dictionary<string, string> youtubeId2UlearnVideoIds, string ltiId)
 		{
-			return new EdxCourse(
-				course.Id, organization, course.Title, advancedModules, ltiPassports, 
-				new [] { new Chapter(course.Id + "-1", course.Title, CourseToSequentials(course, exerciseUrl, solutionsUrl, youtubeId2UlearnVideoIds, ltiId)) }
-			);
+			return new EdxCourse(course.Id, organization, course.Title, null, null,
+				new [] { new Chapter(course.Id + "-1", course.Title, CourseToSequentials(course, exerciseUrl, solutionsUrl, youtubeId2UlearnVideoIds, ltiId)) });
 		}
 	}
 }

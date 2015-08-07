@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using uLearn;
 
 namespace uLearnToEdx
 {
@@ -17,6 +19,23 @@ namespace uLearnToEdx
 		{
 			Email = email;
 			SetPassword(password);
+		}
+
+		public static Credentials GetCredentials(string dir)
+		{
+			Credentials credentials;
+			if (File.Exists(dir + "/credentials.xml"))
+				credentials = new FileInfo(dir + "/credentials.xml").DeserializeXml<Credentials>();
+			else
+			{
+				Console.WriteLine("Enter email:");
+				var email = Console.ReadLine();
+				Console.WriteLine("Enter password:");
+				var password = Utils.GetPass();
+				credentials = new Credentials(email, password);
+				File.WriteAllText(dir + "/credentials.xml", credentials.XmlSerialize());
+			}
+			return credentials;
 		}
 
 		public string GetPassword()
@@ -37,12 +56,10 @@ namespace uLearnToEdx
 		public string Organization;
 		public string CourseNumber;
 		public string CourseRun;
-		public string VideoJson;
 		public string ExerciseUrl;
 		public string SolutionsUrl;
 		public string LtiId;
-
-		public string[] AdvancedModules;
-		public string[] LtiPassports;
+		public string ULearnCourseId;
+		public string Video;
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Resources;
 using System.Xml.Serialization;
 
 namespace uLearn.Model.Edx.EdxComponents
@@ -14,9 +15,6 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		[XmlAttribute("filename")]
 		public string Filename;
-
-		[XmlAttribute("display_name")]
-		public string DisplayName;
 
 		[XmlIgnore]
 		public override string SubfolderName
@@ -45,8 +43,10 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		public override void SaveAdditional(string folderName)
 		{
-			File.WriteAllText(string.Format("{0}/static/code_{1}.html", folderName, UrlName),
-				File.ReadAllText("code-template.html").Replace("{0}", LangId).Replace("{1}", Source));
+			File.WriteAllText(
+				string.Format("{0}/static/code_{1}.html", folderName, UrlName),
+				File.ReadAllText(string.Format("{0}/templates/code.html", Utils.GetRootDirectory())).Replace("{0}", LangId).Replace("{1}", Source)
+			);
 		}
 
 		public override EdxReference GetReference()
@@ -56,7 +56,7 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		public override string AsHtmlString()
 		{
-			return File.ReadAllText("iframe-template.html")
+			return File.ReadAllText(string.Format("{0}/templates/iframe.html", Utils.GetRootDirectory()))
 				.Replace("{0}", "code_" + UrlName)
 				.Replace("{1}", "(function (obj) { obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px'; })(this);");
 		}

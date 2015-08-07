@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Xml.Serialization;
 using uLearn.Model.Edx.EdxComponents;
 

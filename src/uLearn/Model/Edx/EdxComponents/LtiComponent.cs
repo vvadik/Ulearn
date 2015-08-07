@@ -7,9 +7,6 @@ namespace uLearn.Model.Edx.EdxComponents
 	[XmlRoot("lti")]
 	public class LtiComponent : Component
 	{
-		[XmlAttribute("display_name")]
-		public string DisplayName;
-
 		[XmlAttribute("has_score")]
 		public bool HasScore;
 

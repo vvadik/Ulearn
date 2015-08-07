@@ -1,7 +1,5 @@
 ﻿using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Security.Policy;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 
@@ -12,9 +10,6 @@ namespace uLearn.Model.Edx
 	{
 		[XmlIgnore]
 		public override string SubfolderName { get { return "course"; } }
-
-		[XmlAttribute("display_name")]
-		public string DisplayName;
 
 		[XmlAttribute("advanced_modules")]
 		public string AdvancedModules;
@@ -39,8 +34,8 @@ namespace uLearn.Model.Edx
 		{
 			UrlName = urlName;
 			DisplayName = displayName;
-			AdvancedModules = JsonConvert.SerializeObject(advancedModules);
-			LtiPassports = JsonConvert.SerializeObject(ltiPassports);
+			AdvancedModules = advancedModules == null ? null : JsonConvert.SerializeObject(advancedModules);
+			LtiPassports = ltiPassports == null ? null : JsonConvert.SerializeObject(ltiPassports);
 			UseLatexCompiler = useLatexCompiler;
 			Chapters = chapters;
 			ChapterReferences = chapters.Select(x => x.GetReference()).ToArray();

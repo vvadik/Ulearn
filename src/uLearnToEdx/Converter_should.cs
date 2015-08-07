@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ApprovalUtilities.Utilities;
 using NUnit.Framework;
 using uLearn;
 using uLearn.Model.Blocks;
 using uLearn.Model.Edx;
+using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearnToEdx
 {
@@ -14,11 +14,13 @@ namespace uLearnToEdx
 	public class Converter_should
 	{
 		private Course course;
-		private readonly Slide aTextSlide = new Slide(new[] { new MdBlock("hello"), }, new SlideInfo("u1", new FileInfo("file"), 0), "title", Guid.NewGuid().ToString("D"));
+		private readonly Slide aTextSlide = new Slide(new[] { new MdBlock("hello"), }, new SlideInfo("u1", new FileInfo("file"), 0), "title", Utils.NewNormalizedGuid());
+		private readonly Slide exerciseSlide = new Slide(new[] { new ExerciseBlock() }, new SlideInfo("u1", new FileInfo("file"), 0), "title", Utils.GetNormalizedGuid(slideIdFromCourse));
 		private const string youtubeIdFromCourse = "GZS36w_fxdg";
 		private const string slideIdFromCourse = "108C89D9-36F0-45E3-BBEE-B93AC971063F";
-		private const string exerciesUrl = "https://192.168.33.1:44300/Course/{0}/LtiSlide/{1}";
+		private const string exerciseUrl = "https://192.168.33.1:44300/Course/{0}/LtiSlide/{1}";
 		private const string solutionsUrl = "https://192.168.33.1:44300/Course/{0}/AcceptedAlert/{1}";
+		private const string ltiId = "edx";
 
 		[SetUp]
 		public void SetUp()
@@ -30,17 +32,20 @@ namespace uLearnToEdx
 
 		private EdxCourse ConvertForTestsCourseToEdx(Dictionary<string, string> youtubeId2UlearnVideoIds = null)
 		{
-			return Converter.ToEdxCourse(course, "org", new[] { "lti" }, new[] { "myname:rfe:qwerty" }, exerciesUrl, solutionsUrl,
+			return Converter.ToEdxCourse(course, "org", exerciseUrl, solutionsUrl,
 				youtubeId2UlearnVideoIds ?? new Dictionary<string, string>(), "");
+		}
+
+		private IEnumerable<VideoComponent> GetVideoComponentFromDictionary(Dictionary<string, Tuple<string, string>> dict)
+		{
+			return dict.Select(x => new VideoComponent(x.Key, x.Value.Item2, x.Value.Item1));
 		}
 
 		public HashSet<string> GetDirectoryFiles(string directory)
 		{
-			var hs = new HashSet<string>();
 			var files = Directory.GetFiles(directory).Select(Path.GetFileName);
 			var dirFiles = Directory.GetDirectories(directory).SelectMany(x => Directory.GetFiles(x).Select(Path.GetFileName));
-			hs.AddAll(files);
-			hs.AddAll(dirFiles);
+			var hs = new HashSet<string>(files.Concat(dirFiles));
 			return hs;
 		}
 
@@ -70,7 +75,7 @@ namespace uLearnToEdx
 		[Test]
 		public void convert_assign_VideoIds_accordingToPassedDictionary()
 		{
-			var ulearnVideoGuid = Guid.NewGuid().ToString("D");
+			var ulearnVideoGuid = Utils.NewNormalizedGuid();
 			var edxCourse = ConvertForTestsCourseToEdx(new Dictionary<string, string> { { youtubeIdFromCourse, ulearnVideoGuid } });
 			Assert.AreEqual(youtubeIdFromCourse, edxCourse.GetVideoById(ulearnVideoGuid).NormalSpeedVideoId);
 		}
@@ -78,24 +83,46 @@ namespace uLearnToEdx
 		[Test]
 		public void patch_updates_YoutubeIds()
 		{
-			var ulearnVideoGuid = Guid.NewGuid().ToString("D");
+			var ulearnVideoGuid = Utils.NewNormalizedGuid();
 			var edxCourse = ConvertForTestsCourseToEdx(new Dictionary<string, string> { { youtubeIdFromCourse, ulearnVideoGuid } });
-			edxCourse.Save("ForTests");
-			edxCourse.PatchVideos("ForTests", new Dictionary<string, Tuple<string, string>> { { ulearnVideoGuid, Tuple.Create("QWFuk3ymXxc", "") } });
-			Assert.That(File.ReadAllText(string.Format("{0}/video/{1}.xml", "ForTests", ulearnVideoGuid)).Contains("QWFuk3ymXxc"));
+			edxCourse.Save(course.Id);
+
+			var videoDict = new Dictionary<string, Tuple<string, string>> { { ulearnVideoGuid, Tuple.Create("QWFuk3ymXxc", "") } };
+
+			new OlxPatcher(course.Id)
+				.PatchComponents(edxCourse, GetVideoComponentFromDictionary(videoDict), true);
+			
+			Assert.That(File.ReadAllText(string.Format("{0}/video/{1}.xml", course.Id, ulearnVideoGuid)).Contains("QWFuk3ymXxc"));
 		}
 
 		[Test]
 		public void patch_putsNewVideos_toExistingUnsortedChapter()
 		{
-			//TODO переделать тест согласно названию
-			var videoGuid = Guid.NewGuid().ToString("D");
-			var videoGuid2 = Guid.NewGuid().ToString("D");
+			var videoGuid = Utils.NewNormalizedGuid();
+			var videoGuid2 = Utils.NewNormalizedGuid();
 			var edxCourse = ConvertForTestsCourseToEdx(new Dictionary<string, string> { { youtubeIdFromCourse, videoGuid } });
-			edxCourse.Save("ForTests");
-			edxCourse.PatchVideos("ForTests", new Dictionary<string, Tuple<string, string>> { { videoGuid, Tuple.Create("QWFuk3ymXxc", "") }, { videoGuid2, Tuple.Create("w8_GlqSkG-U", "") } });
-			edxCourse.PatchVideos("ForTests", new Dictionary<string, Tuple<string, string>> { { videoGuid, Tuple.Create("QWFuk3ymXxc", "") }, { videoGuid2, Tuple.Create("w8_GlqSkG-U", "") }, { Guid.NewGuid().ToString("D"), Tuple.Create("qTnKi67AAlg", "") } });
-			var edxCourse2 = EdxCourse.Load("ForTests");
+			edxCourse.Save(course.Id);
+
+			var patcher = new OlxPatcher(course.Id);
+
+			var videoDict = new Dictionary<string, Tuple<string, string>>
+			{
+				{ videoGuid, Tuple.Create("QWFuk3ymXxc", "") },
+				{ videoGuid2, Tuple.Create("w8_GlqSkG-U", "") }
+			};
+
+			patcher.PatchComponents(edxCourse, GetVideoComponentFromDictionary(videoDict));
+
+			videoDict = new Dictionary<string, Tuple<string, string>>
+			{
+				{ videoGuid, Tuple.Create("QWFuk3ymXxc", "") },
+				{ videoGuid2, Tuple.Create("w8_GlqSkG-U", "") },
+				{ Utils.NewNormalizedGuid(), Tuple.Create("qTnKi67AAlg", "") }
+			};
+
+			patcher.PatchComponents(edxCourse, GetVideoComponentFromDictionary(videoDict));
+			
+			var edxCourse2 = EdxCourse.Load(course.Id);
 			Assert.AreEqual("Unsorted", edxCourse2.CourseWithChapters.Chapters[1].DisplayName);
 			Assert.AreEqual(2, edxCourse2.CourseWithChapters.Chapters[1].Sequentials.Length);
 		}
@@ -104,11 +131,17 @@ namespace uLearnToEdx
 		public void patch_doesNotCreateUnsortedChapter_ifNoNewSlides()
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
-			edxCourse.Save("ForTests");
 
-			edxCourse.PatchSlides("ForTests", "ForTests", course.Slides, exerciesUrl, solutionsUrl, "edx");
+			new OlxPatcher(course.Id).PatchVerticals(edxCourse, course.Slides
+				.Select(x => x.ToVerticals(
+						course.Id,
+						exerciseUrl,
+						solutionsUrl,
+						new Dictionary<string, string>(), 
+						ltiId
+					).ToArray()));
 
-			var edxCourse2 = EdxCourse.Load("ForTests");
+			var edxCourse2 = EdxCourse.Load(course.Id);
 			Assert.IsFalse(edxCourse2.CourseWithChapters.Chapters.Any(c => c.DisplayName == "Unsorted"));
 		}
 
@@ -117,9 +150,16 @@ namespace uLearnToEdx
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
 
-			edxCourse.PatchSlides("ForTests",  "ForTests", new[] { aTextSlide }, exerciesUrl, solutionsUrl, "edx");
+			new OlxPatcher(course.Id).PatchVerticals(edxCourse, new [] {aTextSlide}
+				.Select(x => x.ToVerticals(
+						course.Id,
+						exerciseUrl,
+						solutionsUrl,
+						new Dictionary<string, string>(),
+						ltiId
+					).ToArray()));
 
-			var edxCourse2 = EdxCourse.Load("ForTests");
+			var edxCourse2 = EdxCourse.Load(course.Id);
 			Assert.AreEqual("Unsorted", edxCourse2.CourseWithChapters.Chapters.Last().DisplayName);
 		}
 
@@ -129,8 +169,17 @@ namespace uLearnToEdx
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
 			var slidesCount = edxCourse.CourseWithChapters.Chapters[0].Sequentials[0].Verticals.Count();
-			edxCourse.PatchSlides("ForTests",  "ForTests", new[] { new Slide(new[] { new ExerciseBlock() }, new SlideInfo("u1", new FileInfo("file"), 0), "title", Guid.Parse(slideIdFromCourse).ToString("D")) }, exerciesUrl, solutionsUrl, "edx");
-			var edxCourse2 = EdxCourse.Load("ForTests");
+
+			new OlxPatcher(course.Id).PatchVerticals(edxCourse, new[] { exerciseSlide }
+				.Select(x => x.ToVerticals(
+						course.Id,
+						exerciseUrl,
+						solutionsUrl,
+						new Dictionary<string, string>(),
+						ltiId
+					).ToArray()));
+			
+			var edxCourse2 = EdxCourse.Load(course.Id);
 			var patchedSlidesCount = edxCourse2.CourseWithChapters.Chapters[0].Sequentials[0].Verticals.Count();
 			Assert.AreEqual(slidesCount + 1, patchedSlidesCount);
 		}

@@ -7,9 +7,6 @@ namespace uLearn.Model.Edx
 	[XmlRoot("chapter")]
 	public class Chapter : EdxItem
 	{
-		[XmlAttribute("display_name")]
-		public string DisplayName;
-
 		[XmlIgnore]
 		public override string SubfolderName
 		{

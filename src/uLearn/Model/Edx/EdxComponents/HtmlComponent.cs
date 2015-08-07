@@ -20,9 +20,6 @@ namespace uLearn.Model.Edx.EdxComponents
 		[XmlAttribute("filename")]
 		public string Filename;
 
-		[XmlAttribute("display_name")]
-		public string DisplayName;
-
 		[XmlIgnore]
 		public override string SubfolderName
 		{

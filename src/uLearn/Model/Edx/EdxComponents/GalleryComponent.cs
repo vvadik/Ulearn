@@ -16,9 +16,6 @@ namespace uLearn.Model.Edx.EdxComponents
 		[XmlAttribute("filename")]
 		public string Filename;
 
-		[XmlAttribute("display_name")]
-		public string DisplayName;
-
 		[XmlIgnore]
 		public override string SubfolderName
 		{
@@ -49,7 +46,7 @@ namespace uLearn.Model.Edx.EdxComponents
 			foreach (var image in Images)
 				File.Copy(string.Format("{0}/{1}", LocalFolder, image), string.Format("{0}/static/{1}_{2}", folderName, UrlName, image.Replace("/", "_")));
 			File.WriteAllText(string.Format("{0}/static/gallery_{1}.html", folderName, UrlName),
-				File.ReadAllText("gallery-template.html")
+				File.ReadAllText(string.Format("{0}/templates/gallery.html", Utils.GetRootDirectory()))
 					.Replace("{0}", string.Join("", Images.Select(x => "<li><img src='" + UrlName + "_" + x.Replace("/", "_") + "' alt=''/></li>"))));
 		}
 
@@ -60,7 +57,7 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		public override string AsHtmlString()
 		{
-			return File.ReadAllText("iframe-template.html")
+			return File.ReadAllText(string.Format("{0}/templates/iframe.html", Utils.GetRootDirectory()))
 				.Replace("{0}", "gallery_" + UrlName)
 				.Replace("{1}", "(function (obj) { obj.style.height = '600px'; })(this);");
 		}

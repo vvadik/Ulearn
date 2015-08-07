@@ -88,8 +88,7 @@ namespace uLearn
 
 		protected override string FormatTexSpan(string tex)
 		{
-			// A workaround for `\left(...\right)` problem
-			return "`" + Regex.Replace(HttpUtility.HtmlEncode(tex), @"\\left\((.*?)\\right\)", "($1)") + "`";
+			return "`" + HttpUtility.HtmlEncode(tex) + "`";
 		}
 		
 		protected override string FormatTexDiv(string tex)
