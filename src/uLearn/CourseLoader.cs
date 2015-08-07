@@ -20,9 +20,11 @@ namespace uLearn
 			CheckDuplicateSlideIds(slides);
 
 			var builder = new StringBuilder();
-			builder.Append("Number;Id;Title;Unit\n");
+			builder.Append("Number;Id;Title;Unit;Type\n");
 			for (int i = 0; i < slides.Length; i++)
-				builder.Append(i + ";" + slides[i].Id + ";" + slides[i].Title+";"+slides[i].Info.UnitName+"\n");
+				builder.Append(i + ";" + slides[i].Id + ";" + slides[i].Title+";"+slides[i].Info.UnitName+";"+slides[i].GetType().Name+"\n");
+				
+
 			string str = builder.ToString();
 
 			var courseId = dir.Name;
