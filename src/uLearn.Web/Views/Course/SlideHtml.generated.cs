@@ -222,6 +222,111 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t</ul>\r\n\t</div>\r\n");
 }
 
 
+public static System.Web.WebPages.HelperResult CodeTextArea(string initialCode, string langId, string runSolutionUrl)
+{
+return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
+
+
+ 
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea id=\"secretCodeExercise\" class=\"hide\">");
+
+
+     WebViewPage.WriteTo(@__razor_helper_writer, initialCode);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n");
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"sphere-engine-tm\">Powered by <a target=\"blank\" href=\"http://sphere-e" +
+"ngine.com\">Sphere Engine™</a> and <a target=\"blank\" href=\"http://codemirror.net/" +
+"\">CodeMirror</a></div>\r\n");
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea class=\'code code-exercise\' data-lang=\"");
+
+
+      WebViewPage.WriteTo(@__razor_helper_writer, langId);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">");
+
+
+               WebViewPage.WriteTo(@__razor_helper_writer, initialCode);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n");
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<script>\r\n\t\tfunction cleanUserCode() {\r\n\t\t\tvar $secretCodeExercise = $(\'#secretC" +
+"odeExercise\');\r\n\t\t\t$(\'.code-exercise\')[0].codeMirrorEditor.setValue($secretCodeE" +
+"xercise.text());\r\n\t\t}\r\n\t</script>\r\n");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"solution-control btn-group ctrl-group\">\r\n\t\t<button type=\"button\" cla" +
+"ss=\"run-solution-button btn btn-primary no-rounds\" data-url=\"");
+
+
+                                             WebViewPage.WriteTo(@__razor_helper_writer, runSolutionUrl);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\tRun\r\n\t\t</button>\r\n\t\t<button type=\"button\" class=\"btn btn-default reset-btn" +
+" no-rounds\" onclick=\"cleanUserCode()\">\r\n\t\t\tReset\r\n\t\t</button>\r\n\t</div>\r\n");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"run-result run-service-error\">\r\n\t\t<div class=\"run-verdict label-warn" +
+"ing\">Ошибка сервера :(</div>\r\n\t\t<pre class=\"no-rounds\"><code class=\"run-details\"" +
+"></code></pre>\r\n\t</div>\r\n");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"run-result run-compile-error\">\r\n\t\t<div class=\"run-verdict label-dang" +
+"er\">Ошибка компиляции</div>\r\n\t\t<pre class=\"no-rounds\"><code class=\"run-details\">" +
+"</code></pre>\r\n\t</div>\r\n");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"	<div class=""run-result run-style-error"">
+		<div class=""run-verdict label-danger"">Нарушение стилевых требований</div>
+		<pre class=""no-rounds""><code class=""run-details""></code></pre>
+		<div>
+			<small>В некоторых ситуациях стилевые проверки тут могут быть жестче, чем необходимо в реальной жизни.</small>
+		</div>
+	</div>
+");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"run-result run-wa\">\r\n\t\t<div class=\"run-verdict label-danger\">Неверны" +
+"й результат</div>\r\n\t\t<div class=\"diff-table tablesorter\"></div>\r\n\t</div>\r\n");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"run-result run-wa-no-diff\">\r\n\t\t<div class=\"run-verdict label-danger\"" +
+">Неверный результат</div>\r\n\t\t<pre class=\"no-rounds\"><code class=\"run-details\"></" +
+"code></pre>\r\n\t</div>\r\n");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"run-result run-success\">\r\n\t\t<div class=\"run-verdict label-success cl" +
+"earfix\">Успех!</div>\r\n\t\t<pre class=\"no-rounds\"><code class=\"run-details\"></code>" +
+"</pre>\r\n\t</div>\r\n");
+
+
+
+});
+
+}
+
+
 public static System.Web.WebPages.HelperResult Block(ExerciseBlock block, BlockRenderContext context)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
@@ -285,7 +390,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tRun\r\n\t\t\t
   			 var e = ((ExerciseSlide)context.Slide).Exercise.HintsMd; 
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<button id=\"GetHintButton\" type=\"button\" class=\"btn btn-default hints-btn\" onc" +
-"lick=\" showHintForUser(\'");
+"lick=\" showhintforuser(\'");
 
 
                                                               WebViewPage.WriteTo(@__razor_helper_writer, context.Course.Id);
@@ -295,17 +400,17 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\', \'");
 
                                                                                     WebViewPage.WriteTo(@__razor_helper_writer, context.Slide.Index);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\', \'");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' , \'");
 
 
-                                                                                                            WebViewPage.WriteTo(@__razor_helper_writer, e.Count);
+                                                                                                             WebViewPage.WriteTo(@__razor_helper_writer, e.Count);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\') \" data-url=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' ) \" data-url=\" ");
 
 
-                                                                                                                                   WebViewPage.WriteTo(@__razor_helper_writer, data.GetHintUrl);
+                                                                                                                                      WebViewPage.WriteTo(@__razor_helper_writer, data.GetHintUrl);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tGet hint\r\n\t\t\t</button>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, " \">\r\n\t\t\t\tGet hint\r\n\t\t\t</button>\r\n");
 
 
  			if (!data.IsLti)
@@ -421,24 +526,24 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
  
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"	<div class=""modal fade"" id=""ShowSolutionsAlert"" tabindex=""-1"" role=""dialog"" aria-labelledby=""myModalLabel"" aria-hidden=""true"">
-		<div class=""modal-dialog"">
-			<div class=""modal-content"">
-				<div class=""modal-header"">
-					<button type=""button"" class=""close"" data-dismiss=""modal"" aria-label=""Close""><span aria-hidden=""true"">&times;</span></button>
-					<h4 class=""modal-title"">Внимание</h4>
-				</div>
-				<div class=""modal-body"">
-					<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
-				</div>
-				<div class=""modal-footer"">
-					<a class=""btn btn-default"" href=""");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"		<div class=""modal fade"" id=""ShowSolutionsAlert"" tabindex=""-1"" role=""dialog"" aria-labelledby=""myModalLabel"" aria-hidden=""true"">
+			<div class=""modal-dialog"">
+				<div class=""modal-content"">
+					<div class=""modal-header"">
+						<button type=""button"" class=""close"" data-dismiss=""modal"" aria-label=""Close""><span aria-hidden=""true"">&times;</span></button>
+						<h4 class=""modal-title"">Внимание</h4>
+					</div>
+					<div class=""modal-body"">
+						<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
+					</div>
+					<div class=""modal-footer"">
+						<a class=""btn btn-default"" href=""");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, data.AcceptedSolutionUrl);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">Продолжить</a>\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary\" data-dismiss" +
-"=\"modal\">Отмена</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">Продолжить</a>\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary\" data-dismis" +
+"s=\"modal\">Отмена</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n");
 
 
 

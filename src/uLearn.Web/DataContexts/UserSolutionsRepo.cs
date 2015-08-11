@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
 using System.Linq;
-using System.Security.Policy;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using CsSandboxApi;
+using uLearn.Web.ExecutionService;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts
@@ -43,6 +46,9 @@ namespace uLearn.Web.DataContexts
 	{
 		private readonly ULearnDb db;
 		private readonly TextsRepo textsRepo = new TextsRepo();
+		private readonly CourseManager courseManager = WebCourseManager.Instance;
+
+		private static readonly ConcurrentQueue<string> Unhandled = new ConcurrentQueue<string>();
 
 		public UserSolutionsRepo() : this(new ULearnDb())
 		{
@@ -54,7 +60,7 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public async Task<UserSolution> AddUserSolution(string courseId, string slideId, string code, bool isRightAnswer, string compilationError, string output, string userId, string executionServiceName)
+		public async Task<UserSolution> AddUserSolution(string courseId, string slideId, string code, bool isRightAnswer, string compilationError, string output, string userId, string executionServiceName, string displayName)
 		{
 			if (string.IsNullOrWhiteSpace(code))
 				code = "// no code";
@@ -75,7 +81,9 @@ namespace uLearn.Web.DataContexts
 				UserId = userId,
 				CodeHash = code.Split('\n').Select(x => x.Trim()).Aggregate("", (x, y) => x + y).GetHashCode(),
 				Likes = new List<Like>(),
-				ExecutionServiceName = executionServiceName
+				ExecutionServiceName = executionServiceName,
+				DisplayName = displayName,
+				Status = SubmissionStatus.Waiting
 			});
 			try
 			{
@@ -87,6 +95,7 @@ namespace uLearn.Web.DataContexts
 					string.Join("\r\n",
 					e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
 			}
+			Unhandled.Enqueue(userSolution.Id.ToString());
 			return userSolution;
 		}
 
@@ -169,6 +178,135 @@ namespace uLearn.Web.DataContexts
 				.Where(x => x.IsRightAnswer && x.CourseId == courseId && x.UserId == userId)
 				.Select(x => x.SlideId)
 				.Distinct());
+		}
+
+		public IEnumerable<UserSolution> GetAllSolutions(int max, int skip)
+		{
+			return db.UserSolutions
+				.OrderByDescending(x => x.Timestamp)
+				.Skip(skip)
+				.Take(max);
+		}
+
+		public UserSolution GetDetails(string id)
+		{
+			var solution = db.UserSolutions.AsNoTracking().SingleOrDefault(x => x.Id.ToString() == id);
+			if (solution == null)
+				return null;
+			solution.SolutionCode = textsRepo.GetText(solution.SolutionCodeHash);
+			solution.Output = textsRepo.GetText(solution.OutputHash);
+			solution.CompilationError = textsRepo.GetText(solution.CompilationErrorHash);
+			return solution;
+		}
+
+		public UserSolution FindUnhandled()
+		{
+			string id;
+			if (!Unhandled.TryDequeue(out id))
+				return null;
+			var submission = Find(id);
+			submission.Status = SubmissionStatus.Running;
+			Save(submission);
+			return submission;
+		}
+
+		public List<UserSolution> GetUnhandled(int count)
+		{
+			var submissions = new List<string>();
+			for (var i = 0; i < count; ++i)
+			{
+				string submission;
+				if (!Unhandled.TryDequeue(out submission))
+					break;
+				submissions.Add(submission);
+			}
+			var result = FindAll(submissions);
+			foreach (var details in result)
+			{
+				details.Status = SubmissionStatus.Running;
+			}
+			SaveAll(result);
+			return result;
+		}
+
+		protected UserSolution Find(string id)
+		{
+			return db.UserSolutions.Find(id);
+		}
+
+		protected List<UserSolution> FindAll(List<string> submissions)
+		{
+			return db.UserSolutions.Where(details => submissions.Contains(details.Id.ToString())).ToList();
+		}
+
+		protected void Save(UserSolution solution)
+		{
+			db.UserSolutions.AddOrUpdate(solution);
+			db.SaveChanges();
+		}
+
+		protected void SaveAll(IEnumerable<UserSolution> result)
+		{
+			foreach (var details in result)
+			{
+				db.UserSolutions.AddOrUpdate(details);
+			}
+			try
+			{
+				db.SaveChanges();
+			}
+			catch (DbEntityValidationException e)
+			{
+				throw new Exception(
+					string.Join("\r\n",
+					e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
+			}
+		}
+
+		public async Task SaveResults(RunningResults result)
+		{
+			var submission = Find(result.Id);
+			submission = await UpdateSubmission(submission, result);
+			Save(submission);
+		}
+
+		public async Task SaveAllResults(List<RunningResults> results)
+		{
+			var resultsDict = results.ToDictionary(result => result.Id);
+			var submissions = FindAll(results.Select(result => result.Id).ToList());
+			var res = new List<UserSolution>();
+			foreach (var submission in submissions)
+				res.Add(await UpdateSubmission(submission, resultsDict[submission.Id.ToString()]));
+			SaveAll(res);
+		}
+
+		private async Task<UserSolution> UpdateSubmission(UserSolution submission, RunningResults result)
+		{
+			var compilationErrorHash = (await textsRepo.AddText(result.CompilationOutput)).Hash;
+			var outputHash = (await textsRepo.AddText(result.GetOutput())).Hash;
+
+			var updated = new UserSolution
+			{
+				Id = submission.Id,
+				SolutionCodeHash = submission.SolutionCodeHash,
+				CompilationErrorHash = compilationErrorHash,
+				CourseId = submission.CourseId,
+				SlideId = submission.SlideId,
+				IsCompilationError = result.Verdict == Verdict.CompilationError,
+				IsRightAnswer = result.Verdict == Verdict.Ok 
+					&& (submission.CourseId == "web" && submission.SlideId == "runner" || ((ExerciseSlide) courseManager.GetCourse(submission.CourseId).GetSlideById(submission.SlideId)).Exercise.ExpectedOutput.NormalizeEoln() == result.GetOutput()),
+				OutputHash = outputHash,
+				Timestamp = submission.Timestamp,
+				UserId = submission.UserId,
+				CodeHash = submission.CodeHash,
+				Likes = submission.Likes,
+				ExecutionServiceName = submission.ExecutionServiceName,
+				Status = SubmissionStatus.Done,
+				DisplayName = submission.DisplayName,
+				Elapsed = DateTime.Now - submission.Timestamp
+			};
+
+			return updated;
 		}
 	}
 }

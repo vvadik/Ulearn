@@ -30,7 +30,7 @@ namespace uLearn.Web.DataContexts
 			if (text == null)
 				return new TextBlob
 				{
-					Hash = null, 
+					Hash = null,
 					Text = null
 				};
 

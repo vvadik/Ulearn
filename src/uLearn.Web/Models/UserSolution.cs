@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using CsSandboxApi;
 
 namespace uLearn.Web.Models
 {
@@ -40,6 +41,12 @@ namespace uLearn.Web.Models
 		[Required]
 		[Index("AcceptedList", 4)]
 		public DateTime Timestamp { get; set; }
+
+		public TimeSpan? Elapsed { get; set; }
+
+		public SubmissionStatus Status { get; set; }
+
+		public string DisplayName { get; set; }
 
 		[Required]
 		[Index("AcceptedList", 2)]

@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using CsSandboxApi;
 using LtiLibrary.Core.Outcomes.v1;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
@@ -18,6 +19,8 @@ namespace uLearn.Web.Controllers
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();
 		private readonly ConsumersRepo consumersRepo = new ConsumersRepo();
 		private readonly LtiRequestsRepo ltiRequestsRepo = new LtiRequestsRepo();
+
+		private const int _executionTimeout = 30;
 
 		public ExerciseController()
 			: this(WebCourseManager.Instance)
@@ -43,8 +46,9 @@ namespace uLearn.Web.Controllers
 				});
 			}
 			var exerciseSlide = (ExerciseSlide)courseManager.GetCourse(courseId).Slides[slideIndex];
-			var result = await CheckSolution(exerciseSlide, code, RedundantExecutionService.Default);
-			await SaveUserSolution(courseId, exerciseSlide.Id, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer, result.ExecutionServiceName);
+			
+			var result = await CheckSolution(courseId, exerciseSlide, code, RedundantExecutionService.Default);
+//			await SaveUserSolution(courseId, exerciseSlide.Id, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer, result.ExecutionServiceName);
 			if (isLti)
 				SubmitScore(exerciseSlide);
 			return Json(result);
@@ -78,7 +82,7 @@ namespace uLearn.Web.Controllers
 				throw new Exception(uri + "\r\n\r\n" + result.Message);
 		}
 
-		private async Task<RunSolutionResult> CheckSolution(ExerciseSlide exerciseSlide, string code, IExecutionService executionService)
+		private async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string code, IExecutionService executionService)
 		{
 			var exerciseBlock = exerciseSlide.Exercise;
 			var solution = exerciseBlock.Solution.BuildSolution(code);
@@ -86,7 +90,8 @@ namespace uLearn.Web.Controllers
 				return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
 			if (solution.HasStyleIssues)
 				return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage, ExecutionServiceName = "uLearn" };
-			var submissionDetails = await executionService.Submit(solution.SourceCode, GenerateSubmissionName(exerciseSlide));
+
+			var submissionDetails = await SaveUserSolution(exerciseSlide, courseId, exerciseSlide.Id, code, null, null, false, executionService.Name);
 			if (submissionDetails == null)
 				return new RunSolutionResult
 				{
@@ -94,30 +99,44 @@ namespace uLearn.Web.Controllers
 					CompilationError = "Ой-ой, штуковина, которая проверяет решения сломалась (или просто устала). Попробуйте отправить решение позже (когда она немного отдохнет).",
 					ExecutionServiceName = executionService.Name
 				};
-			var output = submissionDetails.GetOutput();
+			var output = submissionDetails.Output.Text;
 			var expectedOutput = exerciseBlock.ExpectedOutput.NormalizeEoln();
-			var isRightAnswer = submissionDetails.IsSuccess && output.Equals(expectedOutput);
+			var isRightAnswer = submissionDetails.GetVerdict() == "Accepted" && output.Equals(expectedOutput);
+
+			await visitersRepo.AddSolutionAttempt(exerciseSlide.Id, User.Identity.GetUserId(), isRightAnswer);
+
 			return new RunSolutionResult
 			{
 				IsCompileError = submissionDetails.IsCompilationError,
-				CompilationError = submissionDetails.CompilationErrorMessage,
+				CompilationError = submissionDetails.CompilationError.Text,
 				IsRightAnswer = isRightAnswer,
 				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : expectedOutput,
 				ActualOutput = output,
-				ExecutionServiceName = submissionDetails.ServiceName
+				ExecutionServiceName = submissionDetails.ExecutionServiceName
 			};
 		}
 
-		private async Task SaveUserSolution(string courseId, string slideId, string code, string compilationError, string output, bool isRightAnswer, string executionServiceName)
+		private async Task<UserSolution> SaveUserSolution(Slide exerciseSlide, string courseId, string slideId, string code, string compilationError, string output, bool isRightAnswer, string executionServiceName)
 		{
 			var userId = User.Identity.GetUserId();
-			await solutionsRepo.AddUserSolution(
+			var solution = await solutionsRepo.AddUserSolution(
 				courseId, slideId,
 				code, isRightAnswer, compilationError, output,
-				userId, executionServiceName);
-			await visitersRepo.AddSolutionAttempt(slideId, userId, isRightAnswer);
-		}
+				userId, executionServiceName, GenerateSubmissionName(exerciseSlide));
 
+			var count = _executionTimeout;
+			var lastStatus = solution.Status;
+			while (lastStatus != SubmissionStatus.Done && count >= 0)
+			{
+				await Task.Delay(1000);
+				--count;
+				lastStatus = solutionsRepo.GetDetails(solution.Id.ToString()).Status;
+			}
+			if (lastStatus != SubmissionStatus.Done)
+				return null;
+
+			return solutionsRepo.GetDetails(solution.Id.ToString());
+		}
 
 		private static string GetUserCode(Stream inputStream)
 		{

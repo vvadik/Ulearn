@@ -1,10 +1,22 @@
 ﻿using System;
 using System.IO;
+using uLearn.tests;
 
 namespace uLearn
 {
 	public class Utils
 	{
+		public static string GetSource(string courseId, string slideId, CourseManager courseManager, string code)
+		{
+			return courseId == "web" && slideId == "runner"
+				? code
+				: ((ExerciseSlide) courseManager.GetCourse(courseId).GetSlideById(slideId))
+					.Exercise
+					.Solution
+					.BuildSolution(code)
+					.SourceCode;
+		}
+
 		public static string NewNormalizedGuid()
 		{
 			return Guid.NewGuid().ToString("D");

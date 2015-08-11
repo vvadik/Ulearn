@@ -1,0 +1,29 @@
+﻿@using uLearn.Web.Views.Course
+@model dynamic
+@{
+	ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+	<h1>CsSandbox</h1>
+	<p class="lead">CsSandbox is a service for run programs written on C#</p>
+	<p>
+		@Html.ActionLink("Submissions", "Submissions", "Sandbox")
+	</p>
+	<p>
+		<a href="https://github.com/Tinkturianec/CsSandbox" class="btn btn-primary btn-large">Sources &raquo;</a>
+		<a class="btn btn-default" href="https://github.com/Tinkturianec/CsSandbox/README.md">Readme &raquo;</a>
+	</p>
+	@if (User.IsInRole(LmsRoles.Admin) || User.IsInRole(LmsRoles.Instructor))
+	{
+		@SlideHtml.CodeTextArea(@"using System;
+
+namespace uLearn {
+	class Program {
+		public static void Main(string[] args) {
+			Console.Out.WriteLine(""Hello, World!"");
+		}
+	}
+}", "cs", Url.Action("Run", "Sandbox"))
+	}
+</div>

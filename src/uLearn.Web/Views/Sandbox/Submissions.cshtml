@@ -1,0 +1,7 @@
+﻿@{
+	ViewBag.Title = "Submissions";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var model = Model as SubmissionsModel;
+}
+
+@Html.Action("SubmissionsList", "Sandbox", new { model.Max, model.Skip })
