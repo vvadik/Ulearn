@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CsSandboxApi;
+using Job;
 
 namespace uLearn.Web.ExecutionService
 {
@@ -16,26 +16,27 @@ namespace uLearn.Web.ExecutionService
 
 		public CsSandboxExecutionService(TimeSpan httpTimeout, TimeSpan executionTimeout)
 		{
-			client = new CsSandboxClient(httpTimeout, Token, Address, (int)executionTimeout.TotalSeconds);
+//			client = new CsSandboxClient(httpTimeout, Token, Address, (int)executionTimeout.TotalSeconds);
 		}
 
-		private readonly CsSandboxClient client;
+//		private readonly CsSandboxClient client;
 
 		public async Task<SubmissionResult> Submit(string code, string displayName = null)
 		{
-			try
-			{
-				var details = await client.Submit(code, "", displayName);
-				return details == null ? null : new CsSandboxSubmissionResult(details);
-			}
-			catch (TaskCanceledException)
-			{
-				return null;
-			}
-			catch (CsSandboxClientException)
-			{
-				return null;
-			}
+//			try
+//			{
+//				var details = await client.Submit(code, "", displayName);
+//				return details == null ? null : new CsSandboxSubmissionResult(details);
+//			}
+//			catch (TaskCanceledException)
+//			{
+//				return null;
+//			}
+//			catch (CsSandboxClientException)
+//			{
+//				return null;
+//			}
+			return null;
 		}
 
 		public string Name
@@ -55,17 +56,20 @@ namespace uLearn.Web.ExecutionService
 
 		public override bool IsSuccess
 		{
-			get { return details.Verdict == CsSandboxApi.Verdict.Ok; }
+//			get { return details.Verdict == CsSandboxApi.Verdict.Ok; }
+			get { return true; }
 		}
 
 		public override bool IsCompilationError
 		{
-			get { return details.Verdict == CsSandboxApi.Verdict.CompilationError; }
+//			get { return details.Verdict == CsSandboxApi.Verdict.CompilationError; }
+			get { return true; }
 		}
 
 		public override bool IsTimeLimit
 		{
-			get { return details.Verdict == CsSandboxApi.Verdict.TimeLimit; }
+//			get { return details.Verdict == CsSandboxApi.Verdict.TimeLimit; }
+			get { return true; }
 		}
 
 		public override string CompilationErrorMessage
@@ -75,7 +79,8 @@ namespace uLearn.Web.ExecutionService
 
 		public override bool IsInternalError
 		{
-			get { return details.Verdict == CsSandboxApi.Verdict.SandboxError; }
+//			get { return details.Verdict == CsSandboxApi.Verdict.SandboxError; }
+			get { return true; }
 		}
 
 		public override string StdOut

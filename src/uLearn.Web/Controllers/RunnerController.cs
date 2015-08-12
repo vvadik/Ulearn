@@ -3,8 +3,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Job;
 using uLearn.Web.DataContexts;
-using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {

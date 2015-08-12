@@ -1,29 +1,108 @@
-﻿@using uLearn.Web.Views.Course
-@model dynamic
+﻿@using Job
+@model SubmissionsListModel
 @{
-	ViewBag.Title = "Home Page";
+	ViewBag.Title = "Submissions";
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="jumbotron">
-	<h1>CsSandbox</h1>
-	<p class="lead">CsSandbox is a service for run programs written on C#</p>
-	<p>
-		@Html.ActionLink("Submissions", "Submissions", "Sandbox")
-	</p>
-	<p>
-		<a href="https://github.com/Tinkturianec/CsSandbox" class="btn btn-primary btn-large">Sources &raquo;</a>
-		<a class="btn btn-default" href="https://github.com/Tinkturianec/CsSandbox/README.md">Readme &raquo;</a>
-	</p>
-	@if (User.IsInRole(LmsRoles.Admin) || User.IsInRole(LmsRoles.Instructor))
-	{
-		@SlideHtml.CodeTextArea(@"using System;
+<a href="@Url.Action("RunCode", "Sandbox")" class="btn btn-primary btn-large">Run code &raquo;</a>
 
-namespace uLearn {
-	class Program {
-		public static void Main(string[] args) {
-			Console.Out.WriteLine(""Hello, World!"");
+<table class="table table-hover table-striped">
+	<thead>
+		<tr>
+			<th></th>
+			<th>Timestamp</th>
+			<th>Elapsed</th>
+			<th>ID</th>
+			<th>State</th>
+			<th>Verdict</th>
+		</tr>
+	</thead>
+	@for (var i = 0; i < Model.Submissions.Count; i++)
+	{
+		var detail = Model.Submissions[i];
+		var name = detail.DisplayName ?? detail.Id.ToString();
+		<tr class="@SubmissionClass(detail.GetVerdict()) submitions-item" data-id="@detail.Id">
+			<td>@i</td>
+			<td>@detail.Timestamp.ToString("dd.MM.yy HH:mm:ss")</td>
+			<td>@detail.Elapsed</td>
+			<td>@name</td>
+			<td>@detail.Status</td>
+			<td>@detail.GetVerdict()</td>
+		</tr>
+	}
+</table>
+
+<div class="modal fade" id="details-window">
+	<div class="modal-dialog" style="width: 75%">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title">Информация по посылке</h4>
+			</div>
+			<div class="modal-body" id="details-field">
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@helper SubmissionClass(string verdict)
+{
+	if (verdict == "SandboxError")
+	{
+		@("danger")
+	}
+	if (verdict == "Accepted")
+	{
+		@("success")
+	}
+	else if (verdict == "CompilationError")
+	{
+		@("info")
+	}
+	else
+	{
+		@("warning")
+	}
+}
+
+@helper SubmissionClass(SubmissionStatus status, Verdict verdict)
+{
+	if (status != SubmissionStatus.Done || verdict == Verdict.SandboxError)
+	{
+		@("danger")
+	}
+	else if (verdict == Verdict.Ok)
+	{
+		@("success")
+	}
+	else if (verdict == Verdict.CompilationError)
+	{
+		@("info")
+	}
+	else
+	{
+		@("warning")
+	}
+}
+
+@section scripts {
+	<script>
+		$(".submitions-item").click(function (item) {
+			openDetails(item.currentTarget.dataset.id);
+		});
+
+		function openDetails(id) {
+			$.ajax({
+				type: 'GET',
+				url: '@Url.Action("GetDetails")',
+				data:
+				{
+					id: id
+				}
+			}).always(function (ans) {
+				$('#details-field').html(ans);
+				$('#details-window').modal('show');
+			});
 		}
-	}
-}", "cs", Url.Action("Run", "Sandbox"))
-	}
-</div>
+	</script>
+}

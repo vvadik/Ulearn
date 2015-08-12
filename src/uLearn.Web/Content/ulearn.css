@@ -358,3 +358,7 @@ div.tex {
 	background-color: white !important;
 	color: #428BCA;
 }
+
+.submitions-item {
+	cursor: pointer;
+}

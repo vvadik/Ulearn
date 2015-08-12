@@ -1,13 +1,8 @@
-﻿using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using CsSandboxApi;
-using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
-using uLearn.Web.ExecutionService;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -17,19 +12,40 @@ namespace uLearn.Web.Controllers
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
-		public ActionResult Index()
+		private const int _timeout = 30;
+
+		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
+		public ActionResult Index(int max = 200, int skip = 0)
+		{
+			var submissions = solutionsRepo
+				.GetAllSolutions(max, skip)
+				.Select(details => details).ToList();
+			return View(new SubmissionsListModel
+			{
+				Submissions = submissions
+			}); 
+		}
+
+		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
+		public ActionResult RunCode()
 		{
 			return View();
 		}
 
 		[HttpPost]
-		[Authorize]
+		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public async Task<ActionResult> Run()
 		{
 			var token = Request.Cookies["token"];
 			if (token == null) return Index();
-			var code = GetUserCode(Request.InputStream);
-			var solution = await SaveUserSolution("web", "runner", code, null, null, false, "null", User.Identity.Name + ": CsSandbox Web Executor");
+			var code = Request.InputStream.GetString();
+
+			var solution = await solutionsRepo.RunUserSolution(
+				"web", "runner", User.Identity.GetUserId(), 
+				code, null, null, false, "null", 
+				User.Identity.Name + ": CsSandbox Web Executor", _timeout
+			);
+
 			return Json(new RunSolutionResult
 			{
 				ActualOutput = solution.Output.Text, 
@@ -40,62 +56,16 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		private static string GetUserCode(Stream inputStream)
-		{
-			var codeBytes = new MemoryStream();
-			inputStream.CopyTo(codeBytes);
-			return Encoding.UTF8.GetString(codeBytes.ToArray());
-		}
-
-		private async Task<UserSolution> SaveUserSolution(string courseId, string slideId, string code, string compilationError, string output, bool isRightAnswer, string executionServiceName, string displayName)
-		{
-			var userId = User.Identity.GetUserId();
-			var solution = await solutionsRepo.AddUserSolution(
-				courseId, slideId,
-				code, isRightAnswer, compilationError, output,
-				userId, executionServiceName, displayName);
-
-			var count = 30;
-			var lastStatus = solution.Status;
-			while (lastStatus != SubmissionStatus.Done && count >= 0)
-			{
-				await Task.Delay(1000);
-				--count;
-				lastStatus = solutionsRepo.GetDetails(solution.Id.ToString()).Status;
-			}
-			if (lastStatus != SubmissionStatus.Done)
-				return null;
-
-			return solutionsRepo.GetDetails(solution.Id.ToString());
-		}
-
-		public ActionResult Submissions(int max = 200, int skip = 0)
-		{
-			return View(new SubmissionsModel
-			{
-				Max = max,
-				Skip = skip
-			});
-		}
-
-		public ActionResult SubmissionsList(int max = 200, int skip = 0)
-		{
-			
-			var submissions = solutionsRepo
-				.GetAllSolutions(max, skip)
-				.Select(details => details);
-			return PartialView(new SubmissionsListModel
-			{
-				Submissions = submissions
-			});
-		}
-
-		public ActionResult GetDetails(string id)
+		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
+		public ActionResult GetDetails(int id)
 		{
 			var details = solutionsRepo.GetDetails(id);
-			details.SolutionCode.Text = Utils.GetSource(details.CourseId, details.SlideId, courseManager, details.SolutionCode.Text);
+			details.SolutionCode.Text = Utils.GetSource(
+				details.CourseId, 
+				details.SlideId, 
+				courseManager, 
+				details.SolutionCode.Text);
 			return View(solutionsRepo.GetDetails(id));
 		}
-
 	}
 }

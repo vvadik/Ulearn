@@ -1,7 +1,6 @@
-﻿using CsSandboxApi;
-using uLearn.Web.ExecutionService;
+﻿using uLearn;
 
-namespace uLearn.Web.Models
+namespace Job
 {
 	public class RunningResults
 	{

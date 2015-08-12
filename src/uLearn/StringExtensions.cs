@@ -52,6 +52,11 @@ namespace uLearn
 			return string.Join("\n", text.SplitToLines());
 		}
 
+		public static string NormalizeEoln(this string str)
+		{
+			return str.LineEndingsToUnixStyle().Trim();
+		}
+
 		public static string EnsureEnoughLines(this string text, int minLinesCount)
 		{
 			var lines = text.SplitToLines();

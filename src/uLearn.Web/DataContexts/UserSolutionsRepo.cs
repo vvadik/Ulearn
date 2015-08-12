@@ -6,8 +6,7 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using CsSandboxApi;
-using uLearn.Web.ExecutionService;
+using Job;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts
@@ -188,9 +187,9 @@ namespace uLearn.Web.DataContexts
 				.Take(max);
 		}
 
-		public UserSolution GetDetails(string id)
+		public UserSolution GetDetails(int id)
 		{
-			var solution = db.UserSolutions.AsNoTracking().SingleOrDefault(x => x.Id.ToString() == id);
+			var solution = db.UserSolutions.AsNoTracking().SingleOrDefault(x => x.Id == id);
 			if (solution == null)
 				return null;
 			solution.SolutionCode = textsRepo.GetText(solution.SolutionCodeHash);
@@ -307,6 +306,30 @@ namespace uLearn.Web.DataContexts
 			};
 
 			return updated;
+		}
+
+		public async Task<UserSolution> RunUserSolution(
+			string courseId, string slideId, string userId, string code, 
+			string compilationError, string output, bool isRightAnswer, 
+			string executionServiceName, string displayName, int timeout)
+		{
+			var solution = await AddUserSolution(
+				courseId, slideId,
+				code, isRightAnswer, compilationError, output,
+				userId, executionServiceName, displayName);
+
+			var count = timeout;
+			var lastStatus = solution.Status;
+			while (lastStatus != SubmissionStatus.Done && count >= 0)
+			{
+				await Task.Delay(1000);
+				--count;
+				lastStatus = GetDetails(solution.Id).Status;
+			}
+			if (lastStatus != SubmissionStatus.Done)
+				return null;
+
+			return GetDetails(solution.Id);
 		}
 	}
 }

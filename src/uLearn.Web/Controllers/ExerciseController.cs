@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using CsSandboxApi;
 using LtiLibrary.Core.Outcomes.v1;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
@@ -36,7 +33,7 @@ namespace uLearn.Web.Controllers
 		[Authorize]
 		public async Task<ActionResult> RunSolution(string courseId, int slideIndex = 0, bool isLti = false)
 		{
-			var code = GetUserCode(Request.InputStream);
+			var code = Request.InputStream.GetString();
 			if (code.Length > TextsRepo.MAX_TEXT_SIZE)
 			{
 				return Json(new RunSolutionResult
@@ -91,7 +88,12 @@ namespace uLearn.Web.Controllers
 			if (solution.HasStyleIssues)
 				return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage, ExecutionServiceName = "uLearn" };
 
-			var submissionDetails = await SaveUserSolution(exerciseSlide, courseId, exerciseSlide.Id, code, null, null, false, executionService.Name);
+			var submissionDetails = await solutionsRepo.RunUserSolution(
+				courseId, exerciseSlide.Id, User.Identity.GetUserId(), 
+				code, null, null, false, executionService.Name, 
+				GenerateSubmissionName(exerciseSlide), _executionTimeout
+			);
+
 			if (submissionDetails == null)
 				return new RunSolutionResult
 				{
@@ -114,35 +116,6 @@ namespace uLearn.Web.Controllers
 				ActualOutput = output,
 				ExecutionServiceName = submissionDetails.ExecutionServiceName
 			};
-		}
-
-		private async Task<UserSolution> SaveUserSolution(Slide exerciseSlide, string courseId, string slideId, string code, string compilationError, string output, bool isRightAnswer, string executionServiceName)
-		{
-			var userId = User.Identity.GetUserId();
-			var solution = await solutionsRepo.AddUserSolution(
-				courseId, slideId,
-				code, isRightAnswer, compilationError, output,
-				userId, executionServiceName, GenerateSubmissionName(exerciseSlide));
-
-			var count = _executionTimeout;
-			var lastStatus = solution.Status;
-			while (lastStatus != SubmissionStatus.Done && count >= 0)
-			{
-				await Task.Delay(1000);
-				--count;
-				lastStatus = solutionsRepo.GetDetails(solution.Id.ToString()).Status;
-			}
-			if (lastStatus != SubmissionStatus.Done)
-				return null;
-
-			return solutionsRepo.GetDetails(solution.Id.ToString());
-		}
-
-		private static string GetUserCode(Stream inputStream)
-		{
-			var codeBytes = new MemoryStream();
-			inputStream.CopyTo(codeBytes);
-			return Encoding.UTF8.GetString(codeBytes.ToArray());
 		}
 
 		private string GenerateSubmissionName(Slide exerciseSlide)
