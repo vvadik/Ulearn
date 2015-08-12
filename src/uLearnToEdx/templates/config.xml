@@ -1,8 +1,8 @@
 <!-- Replace default values in config with your values -->
 <Config>
-	<!-- Hostname of your OpenEdx installation -->
+	<!-- Hostname of OpenEdx Studio instance -->
 	<Hostname>openedu.urfu.ru</Hostname>
-	<!-- Port of Edx Studio of your OpenEdx installation -->
+	<!-- Port of OpenEdx Studio instance -->
 	<Port>8081</Port>
 	<!-- Name of the organization that you used when creating a course -->
 	<Organization>UrFU</Organization>

@@ -9,25 +9,30 @@ using uLearn.Quizes;
 
 namespace uLearn
 {
+	public static class FileSystemExtensions
+	{
+		public static bool HasSubdirectory(this DirectoryInfo root, string name)
+		{
+			return root.Subdirectory(name).Exists;
+		}
+
+		public static DirectoryInfo Subdirectory(this DirectoryInfo root, string name)
+		{
+			return new DirectoryInfo(Path.Combine(root.FullName, name));
+		}
+	}
 	public class CourseLoader
 	{
 		private static readonly IList<ISlideLoader> SlideLoaders = new ISlideLoader[] { new LessonSlideLoader(), new CSharpSlideLoader(), new QuizSlideLoader() };
 		
 		public Course LoadCourse(DirectoryInfo dir)
 		{
+			var courseId = dir.Name;
+
+			dir = dir.HasSubdirectory("Slides") ? dir.Subdirectory("Slides") : dir;
 			var settings = CourseSettings.Load(dir);
 			var slides = LoadSlides(dir, settings).ToArray();
 			CheckDuplicateSlideIds(slides);
-
-			var builder = new StringBuilder();
-			builder.Append("Number;Id;Title;Unit;Type\n");
-			for (int i = 0; i < slides.Length; i++)
-				builder.Append(i + ";" + slides[i].Id + ";" + slides[i].Title+";"+slides[i].Info.UnitName+";"+slides[i].GetType().Name+"\n");
-				
-
-			string str = builder.ToString();
-
-			var courseId = dir.Name;
 			var notes = LoadInstructorNotes(dir, courseId);
 			var title = settings.Title ?? GetTitle(dir);
 			return new Course(courseId, title, slides, notes, settings);
