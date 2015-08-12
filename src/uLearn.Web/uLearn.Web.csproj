@@ -401,7 +401,7 @@
     <Compile Include="Migrations\201408201208379_AddIsRightQuizBlock.Designer.cs">
       <DependentUpon>201408201208379_AddIsRightQuizBlock.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\CourseManager_should.cs" />
+    <Compile Include="Models\WebCourseManager_should.cs" />
     <Compile Include="Views\Course\AcceptedSolutionsHtml.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

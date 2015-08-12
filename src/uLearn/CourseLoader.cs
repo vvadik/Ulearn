@@ -29,7 +29,7 @@ namespace uLearn
 		{
 			var courseId = dir.Name;
 
-			dir = dir.Subdirectory("Slides") ?? dir;
+			dir = dir.HasSubdirectory("Slides") ? dir.Subdirectory("Slides") : dir;
 			var settings = CourseSettings.Load(dir);
 			var slides = LoadSlides(dir, settings).ToArray();
 			CheckDuplicateSlideIds(slides);

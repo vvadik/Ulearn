@@ -179,3 +179,4 @@ FakesAssemblies/
 /src/uLearn.Web/Courses.Staging/*.zip
 /src/UI.Tests/screenshots
 /src/courses/Linq/Generated
+*.received.txt
