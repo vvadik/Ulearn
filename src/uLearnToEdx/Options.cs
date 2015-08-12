@@ -20,13 +20,14 @@ namespace uLearnToEdx
 	[Verb("start", HelpText = "Perform initial setup for Edx course")]
 	internal class StartOptions : IOptions
 	{
-		[Option('d', "dir", HelpText = "Working directory for the project", Required = true)]
+		[Option('d', "dir", HelpText = "Working directory for the project")]
 		public string Dir { get; set; }
 
 		public int Execute()
 		{
-			Utils.DeleteDirectoryIfExists(Dir);
-			Directory.CreateDirectory(Dir);
+			Dir = Dir ?? Directory.GetCurrentDirectory();
+			if (!Directory.Exists(Dir))
+				Directory.CreateDirectory(Dir);
 
 			File.Copy(string.Format("{0}/templates/config.xml", Utils.GetRootDirectory()), Dir + "/config.xml");
 			Credentials.GetCredentials(Dir);
@@ -54,9 +55,6 @@ namespace uLearnToEdx
 
 			var config = new FileInfo(Dir + "/config.xml").DeserializeXml<Config>();
 			var credentials = Credentials.GetCredentials(Dir);
-
-			Utils.DeleteDirectoryIfExists(string.Format("{0}/{1}", Dir, config.ULearnCourseId));
-			Utils.DirectoryCopy(InputDir, string.Format("{0}/{1}", Dir, config.ULearnCourseId), true);
 
 			Video video;
 			if (VideoJson != null)
