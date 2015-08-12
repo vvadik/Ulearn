@@ -15,7 +15,7 @@ namespace uLearn.Web.Models
 			var courses = manager.GetCourses().ToList();
 //			foreach (var c in courses)
 //				PrintCourse(c);
-			Approvals.VerifyAll(courses.Where(c => !c.Id.StartsWith("BasicProgramming")), "Courses");
+			Assert.IsTrue(courses.Any(c => c.Id == "ForTests"));
 		}
 
 		private static void PrintCourse(Course c)
