@@ -21,13 +21,22 @@ namespace uLearnToEdx
 		private const string exerciseUrl = "https://192.168.33.1:44300/Course/{0}/LtiSlide/{1}";
 		private const string solutionsUrl = "https://192.168.33.1:44300/Course/{0}/AcceptedAlert/{1}";
 		private const string ltiId = "edx";
+		private const string testFolderName = "test";
 
 		[SetUp]
 		public void SetUp()
 		{
+			if (!Directory.Exists(testFolderName))
+				Directory.CreateDirectory(testFolderName);
 			var cm = new CourseManager(new DirectoryInfo(@"..\..\..\uLearn.Web"));
 			cm.ReloadCourse("ForTests.zip");
 			course = cm.GetCourses().Single();
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+			Utils.DeleteDirectoryIfExists(testFolderName);
 		}
 
 		private EdxCourse ConvertForTestsCourseToEdx(Dictionary<string, string> youtubeId2UlearnVideoIds = null)
@@ -54,10 +63,12 @@ namespace uLearnToEdx
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
 
-			edxCourse.Save("test/folder1");
-			EdxCourse.Load("test/folder1").Save("test/folder2");
+			var f1 = string.Format("{0}/{1}", testFolderName, 1);
+			var f2 = string.Format("{0}/{1}", testFolderName, 2);
+			edxCourse.Save(f1);
+			EdxCourse.Load(f1).Save(f2);
 
-			CollectionAssert.AreEqual(GetDirectoryFiles("test/folder1"), GetDirectoryFiles("test/folder2"));
+			CollectionAssert.AreEqual(GetDirectoryFiles(f1), GetDirectoryFiles(f2));
 		}
 
 		[Test]
@@ -85,14 +96,15 @@ namespace uLearnToEdx
 		{
 			var ulearnVideoGuid = Utils.NewNormalizedGuid();
 			var edxCourse = ConvertForTestsCourseToEdx(new Dictionary<string, string> { { youtubeIdFromCourse, ulearnVideoGuid } });
-			edxCourse.Save(course.Id);
+			var olxPath = string.Format("{0}/{1}", testFolderName, course.Id);
+			edxCourse.Save(olxPath);
 
 			var videoDict = new Dictionary<string, Tuple<string, string>> { { ulearnVideoGuid, Tuple.Create("QWFuk3ymXxc", "") } };
 
-			new OlxPatcher(course.Id)
-				.PatchComponents(edxCourse, GetVideoComponentFromDictionary(videoDict), true);
+			new OlxPatcher(olxPath)
+				.PatchComponents(edxCourse, GetVideoComponentFromDictionary(videoDict));
 			
-			Assert.That(File.ReadAllText(string.Format("{0}/video/{1}.xml", course.Id, ulearnVideoGuid)).Contains("QWFuk3ymXxc"));
+			Assert.That(File.ReadAllText(string.Format("{0}/video/{1}.xml", olxPath, ulearnVideoGuid)).Contains("QWFuk3ymXxc"));
 		}
 
 		[Test]
@@ -101,9 +113,10 @@ namespace uLearnToEdx
 			var videoGuid = Utils.NewNormalizedGuid();
 			var videoGuid2 = Utils.NewNormalizedGuid();
 			var edxCourse = ConvertForTestsCourseToEdx(new Dictionary<string, string> { { youtubeIdFromCourse, videoGuid } });
-			edxCourse.Save(course.Id);
+			var olxPath = string.Format("{0}/{1}", testFolderName, course.Id);
+			edxCourse.Save(olxPath);
 
-			var patcher = new OlxPatcher(course.Id);
+			var patcher = new OlxPatcher(olxPath);
 
 			var videoDict = new Dictionary<string, Tuple<string, string>>
 			{
@@ -122,7 +135,7 @@ namespace uLearnToEdx
 
 			patcher.PatchComponents(edxCourse, GetVideoComponentFromDictionary(videoDict));
 			
-			var edxCourse2 = EdxCourse.Load(course.Id);
+			var edxCourse2 = EdxCourse.Load(olxPath);
 			Assert.AreEqual("Unsorted", edxCourse2.CourseWithChapters.Chapters[1].DisplayName);
 			Assert.AreEqual(2, edxCourse2.CourseWithChapters.Chapters[1].Sequentials.Length);
 		}
@@ -131,8 +144,10 @@ namespace uLearnToEdx
 		public void patch_doesNotCreateUnsortedChapter_ifNoNewSlides()
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
+			var olxPath = string.Format("{0}/{1}", testFolderName, course.Id);
+			edxCourse.Save(olxPath);
 
-			new OlxPatcher(course.Id).PatchVerticals(edxCourse, course.Slides
+			new OlxPatcher(olxPath).PatchVerticals(edxCourse, course.Slides
 				.Select(x => x.ToVerticals(
 						course.Id,
 						exerciseUrl,
@@ -141,7 +156,7 @@ namespace uLearnToEdx
 						ltiId
 					).ToArray()));
 
-			var edxCourse2 = EdxCourse.Load(course.Id);
+			var edxCourse2 = EdxCourse.Load(olxPath);
 			Assert.IsFalse(edxCourse2.CourseWithChapters.Chapters.Any(c => c.DisplayName == "Unsorted"));
 		}
 
@@ -149,8 +164,10 @@ namespace uLearnToEdx
 		public void patch_createsUnsortedChapter_withNewSlides()
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
+			var olxPath = string.Format("{0}/{1}", testFolderName, course.Id);
+			edxCourse.Save(olxPath);
 
-			new OlxPatcher(course.Id).PatchVerticals(edxCourse, new [] {aTextSlide}
+			new OlxPatcher(olxPath).PatchVerticals(edxCourse, new [] {aTextSlide}
 				.Select(x => x.ToVerticals(
 						course.Id,
 						exerciseUrl,
@@ -159,18 +176,20 @@ namespace uLearnToEdx
 						ltiId
 					).ToArray()));
 
-			var edxCourse2 = EdxCourse.Load(course.Id);
+			var edxCourse2 = EdxCourse.Load(olxPath);
 			Assert.AreEqual("Unsorted", edxCourse2.CourseWithChapters.Chapters.Last().DisplayName);
 		}
-
 
 		[Test]
 		public void patch_updatesOrdinarySlide_withExerciseSlide()
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
+			var olxPath = string.Format("{0}/{1}", testFolderName, course.Id);
+			edxCourse.Save(olxPath);
+
 			var slidesCount = edxCourse.CourseWithChapters.Chapters[0].Sequentials[0].Verticals.Count();
 
-			new OlxPatcher(course.Id).PatchVerticals(edxCourse, new[] { exerciseSlide }
+			new OlxPatcher(olxPath).PatchVerticals(edxCourse, new[] { exerciseSlide }
 				.Select(x => x.ToVerticals(
 						course.Id,
 						exerciseUrl,
@@ -179,7 +198,7 @@ namespace uLearnToEdx
 						ltiId
 					).ToArray()));
 			
-			var edxCourse2 = EdxCourse.Load(course.Id);
+			var edxCourse2 = EdxCourse.Load(olxPath);
 			var patchedSlidesCount = edxCourse2.CourseWithChapters.Chapters[0].Sequentials[0].Verticals.Count();
 			Assert.AreEqual(slidesCount + 1, patchedSlidesCount);
 		}
