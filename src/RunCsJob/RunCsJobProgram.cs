@@ -3,10 +3,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Threading;
+using RunCsJob;
 
-namespace Job
+namespace RunCsJob
 {
-	internal class Program
+	internal class RunCsJobProgram
 	{
 		private readonly string address;
 		private readonly ConcurrentQueue<RunningResults> results = new ConcurrentQueue<RunningResults>();
@@ -16,17 +17,17 @@ namespace Job
 		private readonly BlockingCollection<InternalSubmissionModel> unhandled =
 			new BlockingCollection<InternalSubmissionModel>();
 
-		public Program()
+		public RunCsJobProgram()
 		{
 			address = ConfigurationManager.AppSettings["url"];
 			token = ConfigurationManager.AppSettings["token"];
 			if (!int.TryParse(ConfigurationManager.AppSettings["threadsCount"], out threadsCount))
-				threadsCount = Environment.ProcessorCount - 1;
+				threadsCount = Math.Max(1, Environment.ProcessorCount - 1);
 		}
 
 		public static void Main()
 		{
-			new Program().Run();
+			new RunCsJobProgram().Run();
 		}
 
 		private void Run()

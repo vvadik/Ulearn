@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace Job
+namespace RunCsJob
 {
 	public static class HttpClientExtensions
 	{

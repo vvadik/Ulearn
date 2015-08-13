@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Job
+namespace RunCsJob
 {
 	public class PublicSubmissionDetails
 	{

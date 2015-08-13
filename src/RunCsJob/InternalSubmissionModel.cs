@@ -1,4 +1,4 @@
-﻿namespace Job
+﻿namespace RunCsJob
 {
 	public class InternalSubmissionModel
 	{

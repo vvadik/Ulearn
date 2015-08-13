@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Threading;
 using NUnit.Framework;
 
-namespace Job
+namespace RunCsJob
 {
 	internal static class Tests
 	{

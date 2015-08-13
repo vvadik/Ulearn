@@ -7,7 +7,7 @@ using System.Text;
 using Microsoft.CSharp;
 using Newtonsoft.Json;
 
-namespace Job
+namespace RunCsJob
 {
 	public class SandboxRunner
 	{

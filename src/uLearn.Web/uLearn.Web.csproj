@@ -925,6 +925,7 @@
     </None>
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\ulearn.pubxml" />
+    <Content Include="Properties\webjobs-list.json" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\buttons.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
@@ -1143,7 +1144,7 @@
     <Content Include="Views\Sandbox\RunCode.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\jobs\continuous\Job\" />
+    <Folder Include="App_Data\" />
     <Folder Include="Courses\" />
     <Folder Include="tablesorter-master\docs\" />
   </ItemGroup>
@@ -1161,9 +1162,9 @@
       <Project>{fe23302c-0d46-4c8e-81be-c9b79f6e0263}</Project>
       <Name>AIML</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Job\Job.csproj">
+    <ProjectReference Include="..\RunCsJob\RunCsJob.csproj">
       <Project>{77b16f9d-3cdf-4cc6-be5f-b6badfac5394}</Project>
-      <Name>Job</Name>
+      <Name>RunCsJob</Name>
     </ProjectReference>
     <ProjectReference Include="..\uLearn\uLearn.csproj">
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
@@ -1209,7 +1210,8 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>xcopy $(SolutionDir)\Job\bin\Debug $(SolutionDir)\uLearn.Web\App_Data\jobs\continuous\Job /h/e/y/k/f/c</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
@@ -1223,6 +1225,7 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
+  <Import Project="..\packages\Microsoft.Web.WebJobs.Publish.1.0.2\tools\webjobs.targets" Condition="Exists('..\packages\Microsoft.Web.WebJobs.Publish.1.0.2\tools\webjobs.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

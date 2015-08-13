@@ -1,6 +1,6 @@
 ﻿using uLearn;
 
-namespace Job
+namespace RunCsJob
 {
 	public class RunningResults
 	{

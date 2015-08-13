@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Security;
 using System.Text;
 
-namespace Job
+namespace RunCsJob
 {
 	internal static class RunningResultsExtention
 	{
