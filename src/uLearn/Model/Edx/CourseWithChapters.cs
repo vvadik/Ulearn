@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
+using System.Xml;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 
@@ -39,6 +41,37 @@ namespace uLearn.Model.Edx
 			UseLatexCompiler = useLatexCompiler;
 			Chapters = chapters;
 			ChapterReferences = chapters.Select(x => x.GetReference()).ToArray();
+		}
+
+		public override void Save(string folderName)
+		{
+			var courseFile = string.Format("{0}/{1}/{2}.xml", folderName, SubfolderName, UrlName);
+			if (File.Exists(courseFile))
+			{
+				var doc = new XmlDocument();
+				doc.LoadXml(File.ReadAllText(courseFile));
+
+				XmlNode root = doc.DocumentElement;
+
+				var count = root.ChildNodes.Count;
+				for (var i = 0; i < count; i++)
+					foreach (XmlElement childNode in root.ChildNodes)
+						if (childNode.Name == "chapter")
+							root.RemoveChild(childNode);
+
+				foreach (var chapter in Chapters)
+				{
+					var elem = doc.CreateElement("chapter");
+					elem.SetAttribute("url_name", chapter.UrlName);
+					root.AppendChild(elem);
+				}
+				Console.WriteLine(doc.XmlSerialize());
+
+				File.WriteAllText(courseFile, doc.XmlSerialize());
+				SaveAdditional(folderName);
+			}
+			else 
+				base.Save(folderName);
 		}
 
 		public override void SaveAdditional(string folderName)

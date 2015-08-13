@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -12,58 +11,72 @@ using uLearnToEdx.Json;
 
 namespace uLearnToEdx
 {
-	interface IOptions
+	abstract class AbstractOptions
 	{
-		int Execute();
-	}
-
-	[Verb("start", HelpText = "Perform initial setup for Edx course")]
-	internal class StartOptions : IOptions
-	{
-		[Option('d', "dir", HelpText = "Working directory for the project")]
-		public string Dir { get; set; }
-
-		public int Execute()
+		public bool Start(string dir, string configFile)
 		{
-			Dir = Dir ?? Directory.GetCurrentDirectory();
-			if (!Directory.Exists(Dir))
-				Directory.CreateDirectory(Dir);
+			if (!Directory.Exists(dir))
+				Directory.CreateDirectory(dir);
 
-			File.Copy(string.Format("{0}/templates/config.xml", Utils.GetRootDirectory()), Dir + "/config.xml");
-			Credentials.GetCredentials(Dir);
-
-			Process.Start("notepad", Dir + "/config.xml");
-			return 0;
+			if (!File.Exists(configFile))
+			{
+				File.Copy(string.Format("{0}/templates/config.xml", Utils.GetRootDirectory()), configFile);
+				Process.Start("notepad", configFile);
+				Console.WriteLine("Edit the config file and run this option again.");
+				return true;
+			}
+			
+			return false;
 		}
+
+		public abstract int Execute();
 	}
 
 	[Verb("convert", HelpText = "Convert uLearn course to Edx course")]
-	class ConvertOptions : IOptions
+	class ConvertOptions : AbstractOptions
 	{
 		[Option('d', "dir", HelpText = "Working directory for the project")]
 		public string Dir { get; set; }
 
-		[Option('i', "input", HelpText = "Directory with uLearn course to be converted", Required = true)]
-		public string InputDir { get; set; }
-
-		[Option('v', "video", HelpText = "Json file with information about video used in the course")]
-		public string VideoJson { get; set; }
-
-		public int Execute()
+		public override int Execute()
 		{
-			Dir = Dir ?? ".";
+			Dir = Dir ?? Directory.GetCurrentDirectory();
+			var configFile = Dir + "/config.xml";
 
-			var config = new FileInfo(Dir + "/config.xml").DeserializeXml<Config>();
+			if (Start(Dir, configFile))
+				return 0;
+
+			var config = new FileInfo(configFile).DeserializeXml<Config>();
 			var credentials = Credentials.GetCredentials(Dir);
 
-			Video video;
-			if (VideoJson != null)
+			DownloadManager.Download(Dir, config, credentials);
+			
+			try
 			{
-				File.Copy(VideoJson, string.Format("{0}/{1}", Dir, config.Video));
-				video = JsonConvert.DeserializeObject<Video>(File.ReadAllText(VideoJson));
+				var edxCourse = EdxCourse.Load(Dir + "/olx");
+				if (edxCourse.CourseWithChapters.Chapters.Length != 0)
+					Console.WriteLine("List of chapters to be removed or replaced:");
+				foreach (var result in edxCourse.CourseWithChapters.Chapters.Select(x => x.DisplayName))
+					Console.WriteLine("\t" + result);
+				Console.WriteLine("Do you want to proceed?");
+				Console.WriteLine("y/n");
+				while (true)
+				{
+					var key = Console.ReadKey(true);
+					if (key.Key == ConsoleKey.Y)
+						break;
+					if (key.Key == ConsoleKey.N)
+						return 0;
+				}
 			}
-			else
-				video = new Video { Records = new Record[0] };
+			catch (Exception)
+			{
+			}
+
+			var videoFile = string.Format("{0}/{1}", Dir, config.Video);
+			var video = File.Exists(videoFile) 
+				? JsonConvert.DeserializeObject<Video>(File.ReadAllText(config.Video)) 
+				: new Video { Records = new Record[0] };
 
 			VideoHistory.UpdateHistory(Dir, video);
 
@@ -85,7 +98,7 @@ namespace uLearnToEdx
 		}
 	}
 
-	abstract class PatchOptions : IOptions
+	abstract class PatchOptions : AbstractOptions
 	{
 		[Option('d', "dir", HelpText = "Working directory for the project")]
 		public string Dir { get; set; }
@@ -96,11 +109,15 @@ namespace uLearnToEdx
 		[Option('g', "guid", HelpText = "Specific guids to be patched separated by comma")]
 		public string Guids { get; set; }
 
-		public int Execute()
+		public override int Execute()
 		{
-			Dir = Dir ?? ".";
+			Dir = Dir ?? Directory.GetCurrentDirectory();
+			var configFile = Dir + "/config.xml";
 
-			var config = new FileInfo(Dir + "/config.xml").DeserializeXml<Config>();
+			if (Start(Dir, configFile))
+				return 0;
+
+			var config = new FileInfo(configFile).DeserializeXml<Config>();
 			var credentials = Credentials.GetCredentials(Dir);
 
 			DownloadManager.Download(Dir, config, credentials);

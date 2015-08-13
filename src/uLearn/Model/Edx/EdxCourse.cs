@@ -40,19 +40,24 @@ namespace uLearn.Model.Edx
 
 		private void CreateDirectories(string rootDir, params string[] subDirs)
 		{
-			if (Directory.Exists(rootDir))
-				Directory.Delete(rootDir, true);
-			Directory.CreateDirectory(rootDir);
-			foreach (var subDir in subDirs)
-				Directory.CreateDirectory(string.Format("{0}/{1}", rootDir, subDir));
+			if (!Directory.Exists(rootDir))
+				Directory.CreateDirectory(rootDir);
+			foreach (var subdir in subDirs.Select(subDir => string.Format("{0}/{1}", rootDir, subDir)).Where(subdir => !Directory.Exists(subdir)))
+				Directory.CreateDirectory(subdir);
 		}
 
 		public void Save(string folderName)
 		{
 			CreateDirectories(folderName, "course", "chapter", "sequential", "vertical", "video", "html", "lti", "static", "problem");
 			foreach (var file in StaticFiles)
-				File.Copy(file, string.Format("{0}/static/{1}", folderName, Path.GetFileName(file)));
-			File.WriteAllText(string.Format("{0}/course.xml", folderName), this.XmlSerialize());
+				File.Copy(file, string.Format("{0}/static/{1}", folderName, Path.GetFileName(file)), true);
+			
+			var courseFile = string.Format("{0}/course.xml", folderName);
+			if (File.Exists(courseFile))
+				CourseWithChapters.UrlName = new FileInfo(courseFile).DeserializeXml<EdxCourse>().UrlName;
+			else 
+				File.WriteAllText(courseFile, this.XmlSerialize());
+
 			CourseWithChapters.Save(folderName);
 		}
 
