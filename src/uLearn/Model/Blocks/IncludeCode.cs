@@ -1,9 +1,6 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
-using NUnit.Framework;
 using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Blocks
@@ -27,7 +24,6 @@ namespace uLearn.Model.Blocks
 
 		[XmlAttribute("lang-ver")]
 		public string LangVer { get; set; }
-
 
 		protected void FillProperties(BuildUpContext context)
 		{

@@ -1,15 +1,16 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SharpLessons")]
+[assembly: AssemblyTitle("Course.TestsUtils")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SharpLessons")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
+[assembly: AssemblyCompany("SKB Kontur")]
+[assembly: AssemblyProduct("Course.TestsUtils")]
+[assembly: AssemblyCopyright("Copyright © SKB Kontur 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -19,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("33f4b634-e97b-482e-8aa0-73f0c2e7d711")]
+[assembly: Guid("e2989f26-1d6b-4742-bdb5-80ef5be05a1d")]
 
 // Version information for an assembly consists of the following four values:
 //

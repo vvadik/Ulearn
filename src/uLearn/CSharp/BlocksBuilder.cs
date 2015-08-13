@@ -85,7 +85,7 @@ namespace uLearn.CSharp
 		public override SyntaxTrivia VisitTrivia(SyntaxTrivia trivia)
 		{
 			var comment = trivia.ToString();
-			if (trivia.CSharpKind() == SyntaxKind.MultiLineCommentTrivia)
+			if (trivia.Kind() == SyntaxKind.MultiLineCommentTrivia)
 			{
 				if (!comment.StartsWith("/*uncomment"))
 				{
@@ -94,7 +94,7 @@ namespace uLearn.CSharp
 						Blocks.Add(ExtractMarkDownFromComment(trivia));
 				}
 			}
-			else if (trivia.CSharpKind() == SyntaxKind.SingleLineCommentTrivia)
+			else if (trivia.Kind() == SyntaxKind.SingleLineCommentTrivia)
 			{
 				if (comment.StartsWith("//#"))
 				{

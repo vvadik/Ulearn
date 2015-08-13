@@ -38,8 +38,7 @@ namespace uLearn.CSharp
 		{
 			try
 			{
-				SyntaxTree solutionTree = CSharpSyntaxTree.ParseText(userCode,
-					options: new CSharpParseOptions(kind: SourceCodeKind.Script));
+				SyntaxTree solutionTree = CSharpSyntaxTree.ParseText(userCode);
 				return validators.Select(v => v.FindError(solutionTree)).FirstOrDefault(err => err != null);
 			}
 			catch (Exception e)

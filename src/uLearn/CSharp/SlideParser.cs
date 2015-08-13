@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -7,7 +8,7 @@ namespace uLearn.CSharp
 	{
 		public static Slide ParseSlide(string filename, SlideInfo slideInfo, IFileSystem fs)
 		{
-			SyntaxTree tree = CSharpSyntaxTree.ParseFile(filename);
+			SyntaxTree tree = CSharpSyntaxTree.ParseText(File.ReadAllText(filename));
 			return ParseSyntaxTree(tree, slideInfo, "using System; using System.Linq;", fs);
 		}
 

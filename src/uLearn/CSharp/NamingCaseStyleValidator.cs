@@ -30,20 +30,20 @@ namespace uLearn.CSharp
 				node is BaseTypeDeclarationSyntax
 				|| node is TypeParameterSyntax
 				|| node is EnumMemberDeclarationSyntax
-				|| node is MethodDeclarationSyntax && ((MethodDeclarationSyntax)node).Modifiers.Any(t => t.CSharpKind() == SyntaxKind.PublicKeyword)
+				|| node is MethodDeclarationSyntax && ((MethodDeclarationSyntax)node).Modifiers.Any(t => t.Kind() == SyntaxKind.PublicKeyword)
 				|| node is VariableDeclaratorSyntax && MustStartWithUpper((VariableDeclaratorSyntax)node);
 		}
 
 		private bool MustStartWithUpper(VariableDeclaratorSyntax variableDeclarator)
 		{
 			var field = AsField(variableDeclarator);
-			return field != null && field.Modifiers.Any(m => m.CSharpKind() == SyntaxKind.PublicKeyword); // Публичное поле → с большой
+			return field != null && field.Modifiers.Any(m => m.Kind() == SyntaxKind.PublicKeyword); // Публичное поле → с большой
 		}
 
 		private bool MustStartWithLower(VariableDeclaratorSyntax variableDeclarator)
 		{
 			var field = AsField(variableDeclarator);
-			return field == null || field.Modifiers.Any(m => m.CSharpKind() == SyntaxKind.PrivateKeyword);
+			return field == null || field.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword);
 		}
 
 		private static FieldDeclarationSyntax AsField(VariableDeclaratorSyntax variableDeclarator)

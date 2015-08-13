@@ -41,7 +41,7 @@ namespace uLearn.CSharp
 		{
 			var comment = 
 				from c in root.DescendantTrivia()
-				where c.CSharpKind() == SyntaxKind.MultiLineCommentTrivia
+				where c.Kind() == SyntaxKind.MultiLineCommentTrivia
 				where c.ToString().StartsWith(uncommentPrefix)
 				select GetUncommentBody(c);
 			return comment.FirstOrDefault();

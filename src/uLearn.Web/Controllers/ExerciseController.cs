@@ -45,7 +45,6 @@ namespace uLearn.Web.Controllers
 			var exerciseSlide = (ExerciseSlide)courseManager.GetCourse(courseId).Slides[slideIndex];
 			
 			var result = await CheckSolution(courseId, exerciseSlide, code, RedundantExecutionService.Default);
-//			await SaveUserSolution(courseId, exerciseSlide.Id, code, result.CompilationError, result.ActualOutput, result.IsRightAnswer, result.ExecutionServiceName);
 			if (isLti)
 				SubmitScore(exerciseSlide);
 			return Json(result);

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace uLearn.CSharp
 {
@@ -27,6 +28,11 @@ namespace uLearn.CSharp
 		{
 			var nodes = userSolution.GetRoot().DescendantNodes().OfType<TNode>();
 			return nodes.SelectMany(inspect);
+		}
+
+		public string FindError(string code)
+		{
+			return FindError(CSharpSyntaxTree.ParseText(code));
 		}
 
 		public string FindError(SyntaxTree userSolution)

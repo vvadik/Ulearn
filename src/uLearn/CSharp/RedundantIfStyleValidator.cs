@@ -36,7 +36,7 @@ namespace uLearn.CSharp
 
 		private static bool IsBoolLiteral(LiteralExpressionSyntax node)
 		{
-			var token = node.Token.CSharpKind();
+			var token = node.Token.Kind();
 			return token == SyntaxKind.TrueKeyword || token == SyntaxKind.FalseKeyword;
 		}
 	}

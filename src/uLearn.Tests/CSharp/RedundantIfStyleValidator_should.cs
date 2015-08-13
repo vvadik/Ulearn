@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
 
 namespace uLearn.CSharp
@@ -71,10 +70,10 @@ void B(){ if (false) return true; return false; }
 			Assert.That(errors, Is.StringContaining("Строка 2:"));
 			Assert.That(errors, Is.StringContaining("Строка 3:"));
 		}
+
 		private static string FindErrors(string code)
 		{
-			var tree = CSharpSyntaxTree.ParseText(code);
-			var errors = new RedundantIfStyleValidator().FindError(tree);
+			var errors = new RedundantIfStyleValidator().FindError(code);
 			return errors;
 		}
 	}

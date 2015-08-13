@@ -32,15 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ApprovalTests">
-      <HintPath>..\packages\ApprovalTests.3.0.8\lib\net40\ApprovalTests.dll</HintPath>
-    </Reference>
-    <Reference Include="ApprovalUtilities">
-      <HintPath>..\packages\ApprovalUtilities.3.0.8\lib\net45\ApprovalUtilities.dll</HintPath>
-    </Reference>
-    <Reference Include="ApprovalUtilities.Net45">
-      <HintPath>..\packages\ApprovalUtilities.3.0.8\lib\net45\ApprovalUtilities.Net45.dll</HintPath>
-    </Reference>
     <Reference Include="Ionic.Zip">
       <HintPath>..\packages\DotNetZip.1.9.3\lib\net20\Ionic.Zip.dll</HintPath>
     </Reference>
@@ -48,28 +39,31 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\External\MarkdownDeep\MarkdownDeep.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.0.6.4033103-beta\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
+    <Reference Include="Microsoft.CodeAnalysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.1.0.0\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis.CSharp">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.0.6.4033103-beta\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.1.0.0\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Activities" />
-    <Reference Include="System.Collections.Immutable">
-      <HintPath>..\packages\Microsoft.Bcl.Immutable.1.1.20-beta\lib\portable-net45+win8\System.Collections.Immutable.dll</HintPath>
+    <Reference Include="System.Collections.Immutable, Version=1.1.36.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\System.Collections.Immutable.1.1.36\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="System.Reflection.Metadata">
-      <HintPath>..\packages\Microsoft.Bcl.Metadata.1.0.9-alpha\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
+    <Reference Include="System.Reflection.Metadata, Version=1.0.21.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\System.Reflection.Metadata.1.0.21\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -98,16 +92,12 @@
     <Compile Include="CSharp\CSharpSlideLoader.cs" />
     <Compile Include="CSharp\CSharpSolutionValidator.cs" />
     <Compile Include="CSharp\CsMembersExtractor.cs" />
-    <Compile Include="CSharp\CsMembersExtractor_should.cs" />
-    <Compile Include="CSharp\CsMembersRemover_should.cs" />
     <Compile Include="CSharp\ExerciseBuilder.cs" />
     <Compile Include="CSharp\BlocksBuilder.cs" />
     <Compile Include="CSharp\ExerciseAttribute.cs" />
     <Compile Include="FileSystem.cs" />
-    <Compile Include="CSharp\NamingCaseChecker_should.cs" />
     <Compile Include="CSharp\NamingCaseStyleValidator.cs" />
     <Compile Include="CSharp\RedundantIfStyleValidator.cs" />
-    <Compile Include="CSharp\RedundantIfStyleValidator_should.cs" />
     <Compile Include="CSharp\CsMembersRemover.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="ISolutionValidator.cs" />
@@ -131,9 +121,7 @@
     <Compile Include="Model\Blocks\YoutubeBlock.cs" />
     <Compile Include="Model\BuildUpContext.cs" />
     <Compile Include="Model\CommonRegionRemover.cs" />
-    <Compile Include="Model\CommonRegionRemover_should.cs" />
     <Compile Include="Model\CommonSingleRegionExtractor.cs" />
-    <Compile Include="Model\CommonSingleRegionExtractor_should.cs" />
     <Compile Include="Model\Edx\Chapter.cs" />
     <Compile Include="Model\Edx\EdxComponents\CodeComponent.cs" />
     <Compile Include="Model\Edx\EdxComponents\Component.cs" />
@@ -151,24 +139,18 @@
     <Compile Include="Model\Edx\EdxComponents\VideoComponent.cs" />
     <Compile Include="Model\Lesson.cs" />
     <Compile Include="Model\LessonSlideLoader.cs" />
-    <Compile Include="Model\RegionRemover_should.cs" />
-    <Compile Include="Model\RegionsExtractor_should.cs" />
     <Compile Include="Markdown2.cs" />
     <Compile Include="NullValidator.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Quizes\Quiz.cs" />
     <Compile Include="Quizes\QuizSlide.cs" />
-    <Compile Include="Quizes\Quiz_Test.cs" />
     <Compile Include="Quizes\QuizSlideLoader.cs" />
-    <Compile Include="RegionsParser_should.cs" />
     <Compile Include="Model\RegionRemover.cs" />
     <Compile Include="Model\RegionsExtractor.cs" />
     <Compile Include="RegionsParser.cs" />
     <Compile Include="SlideInfo.cs" />
-    <Compile Include="Markdown_investigation.cs" />
     <Compile Include="Md.cs" />
     <Compile Include="ResourceLoader.cs" />
-    <Compile Include="CSharp\SlideParser_should.cs" />
     <Compile Include="CSharp\SlideParser.cs" />
     <Compile Include="HintAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -180,76 +162,11 @@
     <Compile Include="StagingPackage.cs" />
     <Compile Include="StreamExtensions.cs" />
     <Compile Include="StringExtensions.cs" />
-    <Compile Include="StringExtensions_should.cs" />
     <Compile Include="CSharp\SyntaxExtensions.cs" />
-    <Compile Include="tests\Comments.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\ExerciseWithoutExerciseMethod.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\Includes.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\HelloWorld.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\AdjacentCodeBlocks.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\ExerciseWithStarterCode.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\ExerciseWithHints.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\NonClassTypes.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\lesson\Slide1.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\ManyClasses.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\ManyComments.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\Exercise.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\CommentsInsideCodeBlock.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\HiddenNestedClass.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\NestedClass.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\OverloadedMethods.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\SlideWithComments.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\Simple.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\WrongIdentationOfEmptyLines.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\WrongIdentation.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="tests\SingleComment.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
     <Compile Include="SlideAttribute.cs" />
     <Compile Include="TexReplacer.cs" />
     <Compile Include="Urls.cs" />
     <Compile Include="Utils.cs" />
-    <Compile Include="utils\Converter.cs" />
     <Compile Include="ValidatorsRepository.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -258,11 +175,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="tests\regions.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

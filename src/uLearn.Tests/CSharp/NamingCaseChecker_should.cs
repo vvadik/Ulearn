@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
 
 namespace uLearn.CSharp
@@ -93,8 +92,7 @@ namespace uLearn.CSharp
 
 		private static string FindErrors(string code)
 		{
-			var tree = CSharpSyntaxTree.ParseText(code);
-			return new NamingCaseStyleValidator().FindError(tree);
+			return new NamingCaseStyleValidator().FindError(code);
 		}
 	}
 }

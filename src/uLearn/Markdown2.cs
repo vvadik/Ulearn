@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using MarkdownDeep;
-using NUnit.Framework;
 
 namespace uLearn
 {
