@@ -1,28 +1,19 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Threading;
-using RunCsJob;
 
 namespace RunCsJob
 {
 	internal class RunCsJobProgram
 	{
 		private readonly string address;
-		private readonly ConcurrentQueue<RunningResults> results = new ConcurrentQueue<RunningResults>();
-		private readonly int threadsCount;
 		private readonly string token;
-
-		private readonly BlockingCollection<InternalSubmissionModel> unhandled =
-			new BlockingCollection<InternalSubmissionModel>();
 
 		public RunCsJobProgram()
 		{
-			address = ConfigurationManager.AppSettings["url"];
-			token = ConfigurationManager.AppSettings["token"];
-			if (!int.TryParse(ConfigurationManager.AppSettings["threadsCount"], out threadsCount))
-				threadsCount = Math.Max(1, Environment.ProcessorCount - 1);
+			address = ConfigurationManager.AppSettings["submissionsUrl"];
+			token = ConfigurationManager.AppSettings["runnerToken"];
 		}
 
 		public static void Main()
@@ -34,74 +25,43 @@ namespace RunCsJob
 		{
 			AppDomain.MonitoringIsEnabled = true;
 
-			Console.Error.WriteLine("Listen {0} with {1} threads", address, threadsCount);
-
-			StartHandleThreads();
+			Console.WriteLine("Listen {0}", address);
 
 			var client = new Client(address, token);
 			while (true)
 			{
-				ReceiveNewUnhandled(client);
-				SendNewResults(client);
-				Thread.Sleep(100);
+				var newUnhandled = client.TryGetSubmissions(10).Result;
+				foreach (var submission in newUnhandled)
+					Console.WriteLine("Received " + submission);
+				var results = newUnhandled.Select(HandleSubmission).ToList();
+				foreach (var res in results)
+				{
+					Console.WriteLine(res);
+				}
+				if (results.Any())
+					client.SendResults(results);
+				Thread.Sleep(1000);
 			}
 			// ReSharper disable once FunctionNeverReturns
 		}
 
-		private void StartHandleThreads()
+		private static RunningResults HandleSubmission(InternalSubmissionModel submission)
 		{
-			for (var i = 0; i < threadsCount; ++i)
-				new Thread(Handle).Start();
-		}
-
-		private void Handle()
-		{
-			foreach (var submission in unhandled.GetConsumingEnumerable())
+			RunningResults result;
+			try
 			{
-				RunningResults result;
-				try
-				{
-					result = new SandboxRunner(submission).Run();
-				}
-				catch (Exception ex)
-				{
-					result = new RunningResults
-					{
-						Id = submission.Id,
-						Verdict = Verdict.SandboxError,
-						Error = ex.ToString()
-					};
-				}
-				results.Enqueue(result);
+				result = new SandboxRunner(submission).Run();
 			}
-		}
-
-		private void ReceiveNewUnhandled(Client client)
-		{
-			if (unhandled.Count < (threadsCount + 1) / 2)
+			catch (Exception ex)
 			{
-				var newUnhandled = client.TryGetSubmissions(threadsCount).Result;
-				foreach (var submission in newUnhandled)
+				result = new RunningResults
 				{
-					unhandled.Add(submission);
-					Console.WriteLine("Received " + submission);
-				}
+					Id = submission.Id,
+					Verdict = Verdict.SandboxError,
+					Error = ex.ToString()
+				};
 			}
-		}
-
-		private void SendNewResults(Client client)
-		{
-			if (!results.IsEmpty)
-			{
-				var newResults = new List<RunningResults>();
-				RunningResults result;
-				while (results.TryDequeue(out result))
-				{
-					newResults.Add(result);
-					Console.WriteLine("Finished " + result);
-				}
-				client.SendResults(newResults);
-			}
+			return result;
 		}
 	}
 }

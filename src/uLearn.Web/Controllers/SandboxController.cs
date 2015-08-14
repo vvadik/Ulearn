@@ -18,8 +18,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult Index(int max = 200, int skip = 0)
 		{
 			var submissions = solutionsRepo
-				.GetAllSolutions(max, skip)
-				.Select(details => details).ToList();
+				.GetAllSolutions(max, skip).ToList();
 			return View(new SubmissionsListModel
 			{
 				Submissions = submissions

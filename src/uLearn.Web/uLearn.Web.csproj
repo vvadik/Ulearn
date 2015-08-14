@@ -22,9 +22,9 @@
     <IISExpressUseClassicPipelineMode />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-	<AllowedReferenceRelatedFileExtensions>
+    <AllowedReferenceRelatedFileExtensions>
 		.pdb
-    </AllowedReferenceRelatedFileExtensions> 
+    </AllowedReferenceRelatedFileExtensions>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -302,6 +302,10 @@
     <Compile Include="Migrations\201508110641479_AddStatus.Designer.cs">
       <DependentUpon>201508110641479_AddStatus.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201508141111366_UserSolution_TimestampIndex.cs" />
+    <Compile Include="Migrations\201508141111366_UserSolution_TimestampIndex.Designer.cs">
+      <DependentUpon>201508141111366_UserSolution_TimestampIndex.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
     <Compile Include="Models\LtiSlideRequest.cs" />
     <Compile Include="Models\CodeModel.cs" />
@@ -578,6 +582,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201508110641479_AddStatus.resx">
       <DependentUpon>201508110641479_AddStatus.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508141111366_UserSolution_TimestampIndex.resx">
+      <DependentUpon>201508141111366_UserSolution_TimestampIndex.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

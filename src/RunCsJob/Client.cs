@@ -22,18 +22,6 @@ namespace RunCsJob
 		}
 
 
-		public async Task<InternalSubmissionModel> TryGetSubmission()
-		{
-			var uri = GetUri("TryGetSubmission");
-			var response = await httpClient.GetAsync(uri);
-			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadAsAsync<InternalSubmissionModel>();
-
-			Console.Out.WriteLine(DateTime.Now.ToString("HH:mm:ss"));
-			Console.Out.WriteLine(response.ToString());
-			return null;
-		}
-
 		public async Task<List<InternalSubmissionModel>> TryGetSubmissions(int threadsCount)
 		{
 			var uri = GetUri("GetSubmissions", new[] { "count", threadsCount.ToString(CultureInfo.InvariantCulture) });
@@ -65,12 +53,13 @@ namespace RunCsJob
 		public async void SendResults(List<RunningResults> results)
 		{
 			var uri = GetUri("PostResults");
-			var responce = await httpClient.PostAsJsonAsync(uri, results);
+			var response = await httpClient.PostAsJsonAsync(uri, results);
 
-			if (responce.IsSuccessStatusCode) return;
+			if (response.IsSuccessStatusCode) return;
 
-			Console.Out.WriteLine(DateTime.Now.ToString("HH:mm:ss"));
-			Console.Out.WriteLine(responce.ToString());
+			Console.Out.WriteLine("cant send " + DateTime.Now.ToString("HH:mm:ss"));
+			Console.Out.WriteLine(response.ToString());
+			Console.Out.WriteLine(response.Content.ReadAsStringAsync().Result);
 			foreach (var result in results)
 			{
 				Console.Out.WriteLine(result);

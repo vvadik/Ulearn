@@ -47,8 +47,6 @@ namespace uLearn.Web.DataContexts
 		private readonly TextsRepo textsRepo = new TextsRepo();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
-		private static readonly ConcurrentQueue<string> Unhandled = new ConcurrentQueue<string>();
-
 		public UserSolutionsRepo() : this(new ULearnDb())
 		{
 			
@@ -94,7 +92,6 @@ namespace uLearn.Web.DataContexts
 					string.Join("\r\n",
 					e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
 			}
-			Unhandled.Enqueue(userSolution.Id.ToString());
 			return userSolution;
 		}
 
@@ -198,32 +195,11 @@ namespace uLearn.Web.DataContexts
 			return solution;
 		}
 
-		public UserSolution FindUnhandled()
-		{
-			string id;
-			if (!Unhandled.TryDequeue(out id))
-				return null;
-			var submission = Find(id);
-			submission.Status = SubmissionStatus.Running;
-			Save(submission);
-			return submission;
-		}
-
 		public List<UserSolution> GetUnhandled(int count)
 		{
-			var submissions = new List<string>();
-			for (var i = 0; i < count; ++i)
-			{
-				string submission;
-				if (!Unhandled.TryDequeue(out submission))
-					break;
-				submissions.Add(submission);
-			}
-			var result = FindAll(submissions);
+			var result = db.UserSolutions.Where(s => s.Status == SubmissionStatus.Waiting).Take(count).ToList();
 			foreach (var details in result)
-			{
 				details.Status = SubmissionStatus.Running;
-			}
 			SaveAll(result);
 			return result;
 		}
@@ -244,12 +220,10 @@ namespace uLearn.Web.DataContexts
 			db.SaveChanges();
 		}
 
-		protected void SaveAll(IEnumerable<UserSolution> result)
+		protected void SaveAll(IEnumerable<UserSolution> items)
 		{
-			foreach (var details in result)
-			{
+			foreach (var details in items)
 				db.UserSolutions.AddOrUpdate(details);
-			}
 			try
 			{
 				db.SaveChanges();
