@@ -1,6 +1,6 @@
 ﻿namespace RunCsJob
 {
-	public class InternalSubmissionModel
+	public class RunnerSubmition
 	{
 		public string Id;
 		public string Code;

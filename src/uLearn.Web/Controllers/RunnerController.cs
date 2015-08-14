@@ -21,12 +21,12 @@ namespace uLearn.Web.Controllers
 		/// <param name="count"> Count of submission </param>
 		[HttpGet]
 		[Route("GetSubmissions")]
-		public List<InternalSubmissionModel> GetSubmissions([FromUri] string token, [FromUri] int count)
+		public List<RunnerSubmition> GetSubmissions([FromUri] string token, [FromUri] int count)
 		{
 			CheckRunner(token);
 			var submissions = _userSolutionsRepo.GetUnhandled(count);
 			return submissions
-				.Select(details => new InternalSubmissionModel
+				.Select(details => new RunnerSubmition
 				{
 					Id = details.Id.ToString(),
 					Code = Utils.GetSource(

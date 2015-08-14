@@ -256,8 +256,9 @@ namespace uLearn.Web.DataContexts
 		private async Task<UserSolution> UpdateSubmission(UserSolution submission, RunningResults result)
 		{
 			var compilationErrorHash = (await textsRepo.AddText(result.CompilationOutput)).Hash;
-			var outputHash = (await textsRepo.AddText(result.GetOutput())).Hash;
+			var outputHash = (await textsRepo.AddText(result.GetOutput().NormalizeEoln())).Hash;
 
+			var exerciseSlide = ((ExerciseSlide) courseManager.GetCourse(submission.CourseId).GetSlideById(submission.SlideId));
 			var updated = new UserSolution
 			{
 				Id = submission.Id,
@@ -267,7 +268,8 @@ namespace uLearn.Web.DataContexts
 				SlideId = submission.SlideId,
 				IsCompilationError = result.Verdict == Verdict.CompilationError,
 				IsRightAnswer = result.Verdict == Verdict.Ok 
-					&& (submission.CourseId == "web" && submission.SlideId == "runner" || ((ExerciseSlide) courseManager.GetCourse(submission.CourseId).GetSlideById(submission.SlideId)).Exercise.ExpectedOutput.NormalizeEoln() == result.GetOutput()),
+					&& (submission.CourseId == "web" && submission.SlideId == "runner" 
+					|| exerciseSlide.Exercise.ExpectedOutput.NormalizeEoln() == result.GetOutput().NormalizeEoln()),
 				OutputHash = outputHash,
 				Timestamp = submission.Timestamp,
 				UserId = submission.UserId,

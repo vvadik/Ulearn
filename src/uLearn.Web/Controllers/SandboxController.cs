@@ -12,7 +12,7 @@ namespace uLearn.Web.Controllers
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
-		private const int _timeout = 30;
+		private const int timeout = 30;
 
 		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public ActionResult Index(int max = 200, int skip = 0)
@@ -35,14 +35,12 @@ namespace uLearn.Web.Controllers
 		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public async Task<ActionResult> Run()
 		{
-			var token = Request.Cookies["token"];
-			if (token == null) return Index();
 			var code = Request.InputStream.GetString();
 
 			var solution = await solutionsRepo.RunUserSolution(
 				"web", "runner", User.Identity.GetUserId(), 
 				code, null, null, false, "null", 
-				User.Identity.Name + ": CsSandbox Web Executor", _timeout
+				User.Identity.Name + ": CsSandbox Web Executor", timeout
 			);
 
 			return Json(new RunSolutionResult

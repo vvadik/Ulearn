@@ -91,7 +91,7 @@ namespace RunCsJob
 			TestName = "Get files list")]
 		[TestCase("using System; class A { static void Main() { foreach(var assembly in AppDomain.CurrentDomain.GetAssemblies()) Console.WriteLine(assembly.GetName().Name); }}",
 			TestName = "Loaded assemblies list")]
-		[TestCase("using System; using System.Threading; using System.Linq; using System.Reflection; using System.Security; [SecurityCritical] class A { static void Main() { var assemblies = Thread.GetDomain().GetAssemblies(); var ass = assemblies.FirstOrDefault(assembly => assembly.ToString().Contains(\"CsSandbox\")); var type = ass.GetType(\"CsSandboxer.Sandboxer\", true, true); if(type == null) Console.WriteLine(\"lol\"); else type.InvokeMember(\"MustDontWork\", BindingFlags.InvokeMethod, null, null, null); }}",
+		[TestCase("using System; using System.Threading; using System.Linq; using System.Reflection; using System.Security; [SecurityCritical] class A { static void Main() { var assemblies = Thread.GetDomain().GetAssemblies(); var ass = assemblies.FirstOrDefault(assembly => assembly.ToString().Contains(\"CsSandbox\")); var type = ass.GetType(\"CsSandboxer.Sandboxer\", true, true); if(type == null) Console.WriteLine(\"lol\"); else type.InvokeMember(\"MustNotWork\", BindingFlags.InvokeMethod, null, null, null); }}",
 			TestName = "Method in sandboxer")]
 		[TestCase("using System; using System.Threading; using System.Linq; using System.Reflection; using System.Security; [SecurityCritical] class A { static void Main() { var assemblies = Thread.GetDomain().GetAssemblies(); var ass = assemblies.FirstOrDefault(assembly => assembly.ToString().Contains(\"CsSandbox\")); var type = ass.GetType(\"CsSandboxer.Sandboxer\", true, true); if(type == null) Console.WriteLine(\"lol\"); else type.InvokeMember(\"Secret\", BindingFlags.GetField, null, null, null);; }}",
 			TestName = "Field in sandboxer")]
@@ -216,7 +216,7 @@ namespace RunCsJob
 
 		private static RunningResults GetDetails(string code, string input)
 		{
-			var model = new InternalSubmissionModel
+			var model = new RunnerSubmition
 			{
 				Id = Guid.NewGuid().ToString(),
 				Code = code,

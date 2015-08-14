@@ -7,6 +7,7 @@ using System.Net;
 using System.Reflection;
 using System.Threading;
 using NUnit.Framework;
+using RunCsJob;
 using uLearn.Model.Blocks;
 
 namespace uLearn
@@ -32,32 +33,17 @@ namespace uLearn
 		}
 
 		[Test]
-		[Category("Long")]
-		public void CheckAllYoutubeVideos()
+		public void NoDuplicateVideos()
 		{
-			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
-			Assert.That(course.Slides.Length, Is.GreaterThan(0));
-			var webClient = new WebClient();
-			var youtubeBlocks = course.Slides.SelectMany(slide => slide.Blocks.OfType<YoutubeBlock>().Select(b => new { slide, b.VideoId }));
-			var videos = new HashSet<string>();
-			foreach (var b in youtubeBlocks)
-			{
-				try
-				{
-					webClient.DownloadData("http://gdata.youtube.com/feeds/api/videos/" + b.VideoId);
-				}
-				catch (Exception)
-				{
-					throw new AssertionException("Incorrect video {1} on slide {0}".WithArgs(b.slide.Title, b.VideoId));
-				}
-				Assert.IsTrue(videos.Add(b.VideoId), "Duplicate video {1} on slide {0}".WithArgs(b.slide.Title, b.VideoId));
-			}
+			var videos = GetVideos().ToLookup(d=> d.Arguments[1], d => d.Arguments[0]);
+			foreach (var g in videos.Where(g => g.Count() > 1))
+				Assert.Fail("Duplicate videos on slides " + string.Join(", ", g));
 		}
 
 		[TestCaseSource("GetExerciseSlidesTestCases")]
 		public void Slide(Type slideType)
 		{
-			Assert.IsTrue(typeof(SlideTestBase).IsAssignableFrom(slideType), slideType.ToString() + " does not inherit from SlideTestBase");
+			Assert.IsTrue(typeof(SlideTestBase).IsAssignableFrom(slideType), slideType + " does not inherit from SlideTestBase");
 		}
 
 		public IEnumerable<TestCaseData> GetExerciseSlidesTestCases()
@@ -94,15 +80,16 @@ namespace uLearn
 				Console.SetOut(oldOut);
 			}
 			var declaringType = methodInfo.DeclaringType;
-			if (declaringType == null) throw new Exception("should be!");
-			var expectedOutput = String.Join("\n", GetExpectedOutputAttributes(declaringType).Select(a => a.Output));
+			if (declaringType == null)
+				throw new Exception("should be!");
+			var expectedOutput = string.Join("\n", GetExpectedOutputAttributes(declaringType).Select(a => a.Output));
 			Console.WriteLine(newOut.ToString());
 			Assert.AreEqual(PrepareOutput(expectedOutput), PrepareOutput(newOut.ToString()));
 		}
 
 		private static string PrepareOutput(string output)
 		{
-			return String.Join("\n", output.Trim().SplitToLines());
+			return string.Join("\n", output.Trim().SplitToLines());
 		}
 
 		public static IEnumerable<ExpectedOutputAttribute> GetExpectedOutputAttributes(Type declaringType)
@@ -111,5 +98,73 @@ namespace uLearn
 				.SelectMany(m => m.GetCustomAttributes(typeof(ExpectedOutputAttribute)))
 				.Cast<ExpectedOutputAttribute>();
 		}
+
+		public IEnumerable<TestCaseData> GetVideos()
+		{
+			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
+			Assert.That(course.Slides.Length, Is.GreaterThan(0));
+			return course.Slides
+				.SelectMany(slide =>
+					slide.Blocks.OfType<YoutubeBlock>()
+						.Select(b => new TestCaseData(slide.Info.SlideFile.Name, b.VideoId)));
+		}
+
+		[TestCaseSource("GetVideos")]
+		[Category("Long")]
+		public void CheckAllYoutubeVideos(string slideName, string videoId)
+		{
+			var url = "https://www.youtube.com/oembed?format=json&url=http://www.youtube.com/watch?v=" + videoId;
+			new WebClient().DownloadData(url);
+		}
+
+		[TestCaseSource("GetSlidesTestCases")]
+		public void EthalonSolutions_for_Exercises(ExerciseSlide slide)
+		{
+			var solution = slide.Exercise.Solution.BuildSolution(slide.Exercise.EthalonSolution);
+			if (solution.HasErrors)
+				FailOnError(slide, solution);
+			else
+			{
+				var submission = new RunnerSubmition()
+				{
+					Code = solution.SourceCode,
+					Id = slide.Id,
+					Input = "",
+					NeedRun = true
+				};
+				var result = SandboxRunner.Run(submission);
+				var output = result.GetOutput().NormalizeEoln();
+				var isRightAnswer = output.NormalizeEoln().Equals(slide.Exercise.ExpectedOutput.NormalizeEoln());
+				if (!isRightAnswer)
+				{
+					Assert.Fail("mistake in: " + slide.Info.UnitName + " - " + slide.Title + "\n" +
+								"\tActualOutput: " + output + "\n" +
+								"\tExpectedOutput: " + slide.Exercise.ExpectedOutput.NormalizeEoln() + "\n" +
+								"\tCompilationError: " + result.CompilationOutput + "\n" +
+								"\tSourceCode: " + solution.SourceCode + "\n\n");
+				}
+			}
+		}
+
+		private static void FailOnError(ExerciseSlide slide, SolutionBuildResult solution)
+		{
+			Assert.Fail(@"Template solution: {0}
+
+source code: {1}
+
+solution has error in: {2} - {3}
+
+error: {4}",
+				slide.Exercise.EthalonSolution, solution.SourceCode, slide.Info.UnitName, slide.Title, solution.ErrorMessage);
+		}
+
+		public IEnumerable<TestCaseData> GetSlidesTestCases()
+		{
+			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
+			return
+				from slide in course.Slides.OfType<ExerciseSlide>()
+				select new TestCaseData(slide).SetName(course.Id + " - " + slide.Info.UnitName + " - " + slide.Title);
+		}
+
 	}
 }

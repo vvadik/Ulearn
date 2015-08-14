@@ -22,20 +22,20 @@ namespace RunCsJob
 		}
 
 
-		public async Task<List<InternalSubmissionModel>> TryGetSubmissions(int threadsCount)
+		public async Task<List<RunnerSubmition>> TryGetSubmissions(int threadsCount)
 		{
 			var uri = GetUri("GetSubmissions", new[] { "count", threadsCount.ToString(CultureInfo.InvariantCulture) });
 			try
 			{
 				var response = await httpClient.GetAsync(uri);
 				if (response.IsSuccessStatusCode)
-					return await response.Content.ReadAsAsync<List<InternalSubmissionModel>>();
+					return await response.Content.ReadAsAsync<List<RunnerSubmition>>();
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine("Cant connect to {0}. {1}", uri, e.Message);
 			}
-			return new List<InternalSubmissionModel>();
+			return new List<RunnerSubmition>();
 		}
 
 		public async void SendResult(RunningResults result)

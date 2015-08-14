@@ -62,7 +62,7 @@
   <ItemGroup>
     <Compile Include="AsyncReader.cs" />
     <Compile Include="RunningResults.cs" />
-    <Compile Include="InternalSubmissionModel.cs" />
+    <Compile Include="RunnerSubmition.cs" />
     <Compile Include="Verdict.cs" />
     <Compile Include="SubmissionStatus.cs" />
     <Compile Include="PublicSubmissionDetails.cs" />
@@ -86,10 +86,6 @@
     <ProjectReference Include="..\CsSandboxer\CsSandboxer.csproj">
       <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
       <Name>CsSandboxer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\uLearn\uLearn.csproj">
-      <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
-      <Name>uLearn</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

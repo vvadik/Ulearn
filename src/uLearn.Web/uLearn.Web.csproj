@@ -271,11 +271,6 @@
     <Compile Include="DataContexts\ConsumersRepo.cs" />
     <Compile Include="DataContexts\LtiRequestsRepo.cs" />
     <Compile Include="DataContexts\TextsRepo.cs" />
-    <Compile Include="ExecutionService\CsSandboxExecutionService.*Settings.cs" />
-    <Compile Include="ExecutionService\CsSandboxExecutionService.Settings.Sample.cs" />
-    <Compile Include="ExecutionService\RedundantExecutionService.cs" />
-    <Compile Include="ExecutionService\IdeoneExecutionService.cs" />
-    <Compile Include="Ideone\IdeoneClient.*Settings.cs" />
     <Compile Include="LTI\LtiAuthenticationExtensions.cs" />
     <Compile Include="LTI\SecurityHandler.cs" />
     <Compile Include="Migrations\201503231319119_ExecutionServiceName.cs" />
@@ -314,11 +309,6 @@
     <Compile Include="Models\SubmissionListModel.cs" />
     <Compile Include="Models\SubmissionsModel.cs" />
     <Compile Include="Models\TocModelBuilder.cs" />
-    <Compile Include="SubmitAllSlide_Test.cs" />
-    <Compile Include="ExecutionServiceMigration_Test.cs" />
-    <Compile Include="ExecutionService\CsSandboxExecutionService.cs" />
-    <Compile Include="ExecutionService\IExecutionService.cs" />
-    <Compile Include="ExecutionService\SubmissionResult.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.Designer.cs">
       <DependentUpon>201411140847550_extract large text fields.cs</DependentUpon>
@@ -337,7 +327,6 @@
     </Compile>
     <Compile Include="Models\TextBlob.cs" />
     <Compile Include="CreateListOfUsedTokens.cs" />
-    <Compile Include="Ideone\IdeoneClient.Settings.Sample.cs" />
     <Compile Include="Migrations\201408220628510_AddUnitAppearance.cs" />
     <Compile Include="Migrations\201408220628510_AddUnitAppearance.Designer.cs">
       <DependentUpon>201408220628510_AddUnitAppearance.cs</DependentUpon>
@@ -462,13 +451,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Ideone\CreateSubmitionResult.cs" />
-    <Compile Include="Ideone\IdeoneClient_should.cs" />
-    <Compile Include="Ideone\GetSubmitionDetailsResult.cs" />
-    <Compile Include="Ideone\GetSubmitionStatusResult.cs" />
-    <Compile Include="Ideone\ResponseResult.cs" />
-    <Compile Include="Ideone\SubmitionResult.cs" />
-    <Compile Include="Ideone\SubmitionStatus.cs" />
     <Compile Include="Microsoft.Owin.Security.VK\Constants.cs" />
     <Compile Include="Microsoft.Owin.Security.VK\Provider\IVkAuthenticationProvider.cs" />
     <Compile Include="Microsoft.Owin.Security.VK\Provider\VkAuthenticatedContext.cs" />
@@ -482,7 +464,6 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
-    <Compile Include="IdeoneSubmitAllSlide_Test.cs" />
     <Compile Include="Models\PrevNextButtonsModel.cs" />
     <Compile Include="Models\SlideHint.cs" />
     <Compile Include="Models\SlideRate.cs" />
@@ -496,8 +477,6 @@
     <Compile Include="Models\UsersStatsPageModel.cs" />
     <Compile Include="Models\Visiters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Ideone\IdeoneClient.cs" />
-    <Compile Include="Service References\Ideone_Service_v1Service.cs" />
     <Compile Include="Startup.cs" />
     <EmbeddedResource Include="Migrations\201407111234255_InitialCreate.resx">
       <DependentUpon>201407111234255_InitialCreate.cs</DependentUpon>
@@ -1168,6 +1147,10 @@
     <EmbeddedResource Include="Microsoft.Owin.Security.VK\Resources.resx" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CsSandboxer\CsSandboxer.csproj">
+      <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
+      <Name>CsSandboxer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RunCsJob\RunCsJob.csproj">
       <Project>{77b16f9d-3cdf-4cc6-be5f-b6badfac5394}</Project>
       <Name>RunCsJob</Name>
@@ -1176,9 +1159,6 @@
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
       <Name>uLearn</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

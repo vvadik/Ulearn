@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Linq;
+using System.Text;
 using System.Threading;
 
 namespace RunCsJob
@@ -16,28 +17,32 @@ namespace RunCsJob
 			token = ConfigurationManager.AppSettings["runnerToken"];
 		}
 
-		public static void Main()
+		public static void Main(string[] args)
 		{
-			new RunCsJobProgram().Run();
+			if (args.Contains("--selfcheck"))
+				SelfCheck();
+			else
+				new RunCsJobProgram().Run();
 		}
 
 		private void Run()
 		{
 			AppDomain.MonitoringIsEnabled = true;
-
 			Console.WriteLine("Listen {0}", address);
-
 			var client = new Client(address, token);
+			MainLoop(client);
+		}
+
+		private static void MainLoop(Client client)
+		{
 			while (true)
 			{
 				var newUnhandled = client.TryGetSubmissions(10).Result;
 				foreach (var submission in newUnhandled)
 					Console.WriteLine("Received " + submission);
-				var results = newUnhandled.Select(HandleSubmission).ToList();
+				var results = newUnhandled.Select(SandboxRunner.Run).ToList();
 				foreach (var res in results)
-				{
-					Console.WriteLine(res);
-				}
+					Console.WriteLine("Result " + res);
 				if (results.Any())
 					client.SendResults(results);
 				Thread.Sleep(1000);
@@ -45,23 +50,15 @@ namespace RunCsJob
 			// ReSharper disable once FunctionNeverReturns
 		}
 
-		private static RunningResults HandleSubmission(InternalSubmissionModel submission)
+		private static void SelfCheck()
 		{
-			RunningResults result;
-			try
+			var res = SandboxRunner.Run(new RunnerSubmition()
 			{
-				result = new SandboxRunner(submission).Run();
-			}
-			catch (Exception ex)
-			{
-				result = new RunningResults
-				{
-					Id = submission.Id,
-					Verdict = Verdict.SandboxError,
-					Error = ex.ToString()
-				};
-			}
-			return result;
+				Id = Guid.NewGuid().ToString("N"),
+				NeedRun = true,
+				Code = "class C { static void Main(){ System.Console.WriteLine(\"Привет мир!\");}}"
+			});
+			Console.WriteLine(res);
 		}
 	}
 }

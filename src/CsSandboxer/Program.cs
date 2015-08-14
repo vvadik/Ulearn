@@ -21,10 +21,10 @@ namespace CsSandboxer
 
 		static void Main(string[] args)
 		{
+			Console.OutputEncoding = Encoding.UTF8;
 			SetErrorMode(ErrorModes.SEM_NOGPFAULTERRORBOX); // WinOnly StackOverflow handling fix
 			Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 //			Console.InputEncoding = Encoding.UTF8;
-//			Console.OutputEncoding = Encoding.UTF8;
 
 			var assemblyPath = args[0];
 			var id = args[1];
