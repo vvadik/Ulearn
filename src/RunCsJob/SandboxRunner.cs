@@ -98,7 +98,7 @@ namespace RunCsJob
 			var input = Encoding.Default.GetString(inputBytes);
 
 			var startInfo = new ProcessStartInfo(
-				"sandboxer\\CsSandboxer.exe", 
+				"CsSandboxer.exe", 
 				string.Format("\"{0}\" {1}", Path.GetFullPath(assembly.PathToAssembly), _submission.Id))
 			{
 				RedirectStandardInput = true,
