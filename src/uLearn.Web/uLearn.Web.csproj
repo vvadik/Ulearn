@@ -863,7 +863,6 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="codemirror\README.md" />
-    <Content Include="Courses.Staging\*.zip" />
     <Content Include="Courses.Staging\Web.config" />
     <None Include="encoding.xsd">
       <SubType>Designer</SubType>
