@@ -197,7 +197,12 @@ namespace uLearn.Web.DataContexts
 
 		public List<UserSolution> GetUnhandled(int count)
 		{
-			var result = db.UserSolutions.Where(s => s.Status == SubmissionStatus.Waiting).Take(count).ToList();
+			var hourAgo = DateTime.Now - TimeSpan.FromHours(1);
+			var result = db.UserSolutions
+				.Where(s =>
+					s.Timestamp > hourAgo
+					&& s.Status == SubmissionStatus.Waiting)
+				.Take(count).ToList();
 			foreach (var details in result)
 				details.Status = SubmissionStatus.Running;
 			SaveAll(result);
@@ -258,7 +263,8 @@ namespace uLearn.Web.DataContexts
 			var compilationErrorHash = (await textsRepo.AddText(result.CompilationOutput)).Hash;
 			var outputHash = (await textsRepo.AddText(result.GetOutput().NormalizeEoln())).Hash;
 
-			var exerciseSlide = ((ExerciseSlide) courseManager.GetCourse(submission.CourseId).GetSlideById(submission.SlideId));
+			var webRunner = submission.CourseId == "web" && submission.SlideId == "runner";
+			var exerciseSlide = webRunner ? null : ((ExerciseSlide)courseManager.GetCourse(submission.CourseId).GetSlideById(submission.SlideId));
 			var updated = new UserSolution
 			{
 				Id = submission.Id,
@@ -268,8 +274,7 @@ namespace uLearn.Web.DataContexts
 				SlideId = submission.SlideId,
 				IsCompilationError = result.Verdict == Verdict.CompilationError,
 				IsRightAnswer = result.Verdict == Verdict.Ok 
-					&& (submission.CourseId == "web" && submission.SlideId == "runner" 
-					|| exerciseSlide.Exercise.ExpectedOutput.NormalizeEoln() == result.GetOutput().NormalizeEoln()),
+					&& (webRunner || exerciseSlide.Exercise.ExpectedOutput.NormalizeEoln() == result.GetOutput().NormalizeEoln()),
 				OutputHash = outputHash,
 				Timestamp = submission.Timestamp,
 				UserId = submission.UserId,
