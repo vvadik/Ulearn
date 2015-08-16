@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -12,7 +13,7 @@ namespace uLearn.Web.Controllers
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
-		private const int timeout = 30;
+		private readonly static TimeSpan timeout = TimeSpan.FromSeconds(30);
 
 		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public ActionResult Index(int max = 200, int skip = 0)

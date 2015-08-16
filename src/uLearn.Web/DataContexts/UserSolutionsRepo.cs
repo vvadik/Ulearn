@@ -3,9 +3,13 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Principal;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
+using NUnit.Framework;
 using RunCsJob;
 using uLearn.Web.Models;
 
@@ -243,9 +247,10 @@ namespace uLearn.Web.DataContexts
 
 		public async Task SaveResults(RunningResults result)
 		{
-			var submission = Find(result.Id);
-			submission = await UpdateSubmission(submission, result);
-			Save(submission);
+			var solution = Find(result.Id);
+			var updatedSolution = await UpdateSubmission(solution, result);
+			Save(updatedSolution);
+			hasHandled = true;
 		}
 
 		public async Task SaveAllResults(List<RunningResults> results)
@@ -256,6 +261,7 @@ namespace uLearn.Web.DataContexts
 			foreach (var submission in submissions)
 				res.Add(await UpdateSubmission(submission, resultsDict[submission.Id.ToString()]));
 			SaveAll(res);
+			hasHandled = true;
 		}
 
 		private async Task<UserSolution> UpdateSubmission(UserSolution submission, RunningResults result)
@@ -292,25 +298,54 @@ namespace uLearn.Web.DataContexts
 		public async Task<UserSolution> RunUserSolution(
 			string courseId, string slideId, string userId, string code, 
 			string compilationError, string output, bool isRightAnswer, 
-			string executionServiceName, string displayName, int timeout)
+			string executionServiceName, string displayName, TimeSpan timeout)
 		{
 			var solution = await AddUserSolution(
 				courseId, slideId,
 				code, isRightAnswer, compilationError, output,
 				userId, executionServiceName, displayName);
+			hasUnhandled = true;
 
-			var count = timeout;
-			var lastStatus = solution.Status;
-			while (lastStatus != SubmissionStatus.Done && count >= 0)
+			var sw = Stopwatch.StartNew();
+			while (sw.Elapsed < timeout)
 			{
-				await Task.Delay(1000);
-				--count;
-				lastStatus = GetDetails(solution.Id).Status;
-			}
-			if (lastStatus != SubmissionStatus.Done)
-				return null;
-
-			return GetDetails(solution.Id);
+				await WaitHandled(TimeSpan.FromSeconds(2));
+				var details = GetDetails(solution.Id);
+				if (details.Status == SubmissionStatus.Done)
+					return details;
+			} 
+			return null;
 		}
+
+		public async Task WaitUnhandled(TimeSpan timeout)
+		{
+			var sw = Stopwatch.StartNew();
+			while (sw.Elapsed < timeout)
+			{
+				if (hasUnhandled)
+				{
+					hasUnhandled = false;
+					return;
+				}
+				await Task.Delay(TimeSpan.FromMilliseconds(100));
+			}
+		}
+
+		public async Task WaitHandled(TimeSpan timeout)
+		{
+			var sw = Stopwatch.StartNew();
+			while (sw.Elapsed < timeout)
+			{
+				if (hasHandled)
+				{
+					hasHandled = false;
+					return;
+				}
+				await Task.Delay(TimeSpan.FromMilliseconds(100));
+			}
+		}
+
+		private static volatile bool hasUnhandled;
+		private static volatile bool hasHandled;
 	}
 }

@@ -45,9 +45,9 @@ namespace RunCsJob
 
 			if (responce.IsSuccessStatusCode) return;
 
-			Console.Out.WriteLine(DateTime.Now.ToString("HH:mm:ss"));
-			Console.Out.WriteLine(responce.ToString());
-			Console.Out.WriteLine(result);
+			Console.Error.WriteLine(DateTime.Now.ToString("HH:mm:ss"));
+			Console.Error.WriteLine(responce.ToString());
+			Console.Error.WriteLine(result);
 		}
 
 		public async void SendResults(List<RunningResults> results)
@@ -57,12 +57,12 @@ namespace RunCsJob
 
 			if (response.IsSuccessStatusCode) return;
 
-			Console.Out.WriteLine("cant send " + DateTime.Now.ToString("HH:mm:ss"));
-			Console.Out.WriteLine(response.ToString());
-			Console.Out.WriteLine(response.Content.ReadAsStringAsync().Result);
+			Console.Error.WriteLine("can't send " + DateTime.Now.ToString("HH:mm:ss"));
+			Console.Error.WriteLine(response.ToString());
+			Console.Error.WriteLine(response.Content.ReadAsStringAsync().Result);
 			foreach (var result in results)
 			{
-				Console.Out.WriteLine(result);
+				Console.Error.WriteLine(result);
 			}
 		}
 

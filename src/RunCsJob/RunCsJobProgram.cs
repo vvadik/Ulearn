@@ -9,11 +9,15 @@ namespace RunCsJob
 	{
 		private readonly string address;
 		private readonly string token;
+		private readonly TimeSpan sleep;
+		private readonly int jobsToRequest;
 
 		public RunCsJobProgram()
 		{
 			address = ConfigurationManager.AppSettings["submissionsUrl"];
 			token = ConfigurationManager.AppSettings["runnerToken"];
+			sleep = TimeSpan.FromSeconds(int.Parse(ConfigurationManager.AppSettings["sleepSeconds"] ?? "1"));
+			jobsToRequest = int.Parse(ConfigurationManager.AppSettings["jobsToRequest"] ?? "5");
 		}
 
 		public static void Main(string[] args)
@@ -32,19 +36,20 @@ namespace RunCsJob
 			MainLoop(client);
 		}
 
-		private static void MainLoop(Client client)
+		private void MainLoop(Client client)
 		{
 			while (true)
 			{
-				var newUnhandled = client.TryGetSubmissions(10).Result;
-				foreach (var submission in newUnhandled)
-					Console.WriteLine("Received " + submission);
-				var results = newUnhandled.Select(SandboxRunner.Run).ToList();
-				foreach (var res in results)
-					Console.WriteLine("Result " + res);
-				if (results.Any())
+				var newUnhandled = client.TryGetSubmissions(jobsToRequest).Result;
+				Console.WriteLine("Received {0} submissions: [{1}]", newUnhandled.Count, string.Join(", ", newUnhandled.Select(s => s.Id)));
+
+				if (newUnhandled.Any())
+				{
+					var results = newUnhandled.Select(SandboxRunner.Run).ToList();
+					Console.WriteLine("Results: [{0}]", string.Join(", ", results.Select(r => r.Verdict)));
 					client.SendResults(results);
-				Thread.Sleep(1000);
+				}
+				Thread.Sleep(sleep);
 			}
 			// ReSharper disable once FunctionNeverReturns
 		}

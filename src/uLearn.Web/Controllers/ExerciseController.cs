@@ -16,7 +16,7 @@ namespace uLearn.Web.Controllers
 		private readonly ConsumersRepo consumersRepo = new ConsumersRepo();
 		private readonly LtiRequestsRepo ltiRequestsRepo = new LtiRequestsRepo();
 
-		private const int executionTimeout = 30;
+		private readonly static TimeSpan executionTimeout = TimeSpan.FromSeconds(30);
 
 		public ExerciseController()
 			: this(WebCourseManager.Instance)
