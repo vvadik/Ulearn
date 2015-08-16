@@ -1,4 +1,5 @@
-﻿namespace uLearn.tests
+﻿#pragma warning disable 169
+namespace uLearn.tests
 {
 	internal interface IRunnable
 	{
@@ -16,3 +17,4 @@
 		private int y, z;
 	}
 }
+#pragma warning restore 169

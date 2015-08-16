@@ -158,10 +158,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\uLearn.Web\uLearn.Web.csproj">
-      <Project>{b3701d2e-d001-4e0a-ab2f-7acb5a89589b}</Project>
-      <Name>uLearn.Web</Name>
-    </ProjectReference>
     <ProjectReference Include="..\uLearnToEdx\uLearnToEdx.csproj">
       <Project>{38660028-bd75-4281-84e9-b35ce3e338dc}</Project>
       <Name>uLearnToEdx</Name>
