@@ -271,6 +271,7 @@
     <Compile Include="DataContexts\ConsumersRepo.cs" />
     <Compile Include="DataContexts\LtiRequestsRepo.cs" />
     <Compile Include="DataContexts\TextsRepo.cs" />
+    <Compile Include="DataContexts\UnitsRepo.cs" />
     <Compile Include="LTI\LtiAuthenticationExtensions.cs" />
     <Compile Include="LTI\SecurityHandler.cs" />
     <Compile Include="Migrations\201503231319119_ExecutionServiceName.cs" />
