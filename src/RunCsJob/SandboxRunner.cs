@@ -15,8 +15,8 @@ namespace RunCsJob
 		private readonly RunnerSubmition _submission;
 
 		private const int TimeLimitInSeconds = 5;
-		private static readonly TimeSpan TimeLimit = new TimeSpan(0, 0, 0, TimeLimitInSeconds);
-		private static readonly TimeSpan IdleTimeLimit = new TimeSpan(0, 0, 0, 5 * TimeLimitInSeconds);
+		private static readonly TimeSpan TimeLimit = TimeSpan.FromSeconds(TimeLimitInSeconds);
+		private static readonly TimeSpan IdleTimeLimit = TimeSpan.FromSeconds(2*TimeLimitInSeconds);
 
 		private const int MemoryLimit = 64 * 1024 * 1024;
 		private const int OutputLimit = 10 * 1024 * 1024;
@@ -136,7 +136,7 @@ namespace RunCsJob
 			var stderrReader = new AsyncReader(sandboxer.StandardError, OutputLimit + 1);
 
 			var readyState = sandboxer.StandardOutput.ReadLineAsync();
-			if (!readyState.Wait(TimeLimitInSeconds * 1000) || readyState.Result != "Ready")
+			if (!readyState.Wait(TimeLimit) || readyState.Result != "Ready")
 			{
 				if (!sandboxer.HasExited)
 				{

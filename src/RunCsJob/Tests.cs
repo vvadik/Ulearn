@@ -62,9 +62,6 @@ namespace RunCsJob
 		[TestCase("using System; enum A {a} class B { static void Main() { Console.Error.Write(new string(new[] {(char) 9608, (char) 8212})); } }",
 			"", "", "█—",
 			TestName = "output stderr Unicode")]
-		[TestCase("using System; enum A {a} class B { static void Main() { var input = Console.ReadLine(); foreach (var ch in input){ Console.Out.WriteLine((int)ch); }} }",
-			"█—", "9608\r\n8212\r\n", "",
-			TestName = "read Unicode")]
 		[TestCase("using System; using System.Threading; class B { static void Main() { var t = new Thread(() => Console.WriteLine(4)); t.Start(); t.Join(); } }",
 			"", "4\r\n", "",
 			TestName = "Thread")]
@@ -137,11 +134,20 @@ namespace RunCsJob
 			Assert.AreEqual(new string('*', OutputLimit), details.Output);
 		}
 
-		[TestCase(@"using System; class Program { static void Main() { int a = 0; while(true) { ++a; } }}",
+		[TestCase(@"using System; class Program { static void Main() { 
+int a = 0; 
+while(true) ++a; 
+}}",
 			TestName = "Infinty loop")]
-		[TestCase(@"using System.Threading; class Program{ private static void Main() { Thread.Sleep(15000); }}",
+		[TestCase(@"using System.Threading; class Program{ private static void Main() { 
+Thread.Sleep(15000);
+}}",
 			TestName = "Thread.Sleep")]
-		[TestCase(@"using System; using System.Collections.Generic; class Program { static void Main() { const int memory = 63 * 1024 * 1024; var a = new byte[memory]; for (var i = 0; i < 1000*1000*1000; ++i){ a[i % memory] = (byte)i; } }}",
+		[TestCase(@"using System; using System.Collections.Generic; class Program { static void Main() { 
+const int memory = 63 * 1024 * 1024; 
+var a = new byte[memory]; 
+for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
+}}",
 			TestName = "many assignation")]
 		public static void TestTimeLimitError(string code)
 		{
