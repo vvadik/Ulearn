@@ -2,10 +2,20 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using RunCsJob;
 
 namespace uLearn.Web.Models
 {
+	public enum SubmissionStatus
+	{
+		Done = 0,
+		Waiting = 1,
+		NotFound = 2,
+		AccessDeny = 3,
+		Error = 4,
+		Running = 5,
+		RequestTimeLimit = 6
+	}
+
 	public class UserSolution : ISlideAction
 	{
 		[Required]

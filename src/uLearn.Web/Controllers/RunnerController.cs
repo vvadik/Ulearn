@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using NLog.Internal;
 using RunCsJob.Api;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
@@ -17,11 +17,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
-		/// <summary>
-		/// Return list of submissions for testing purposes
-		/// </summary>
-		/// <param name="token"> Runner autherization token </param>
-		/// <param name="count"> Count of submission </param>
+
 		[HttpGet]
 		[Route("GetSubmissions")]
 		public async Task<List<RunnerSubmition>> GetSubmissions([FromUri] string token, [FromUri] int count)
@@ -54,10 +50,6 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		/// <summary>
-		/// Get testing result
-		/// </summary>
-		/// <param name="token"> Runner autherization token </param>
 		[HttpPost]
 		[Route("PostResult")]
 		public async Task PostResult([FromUri]string token, RunningResults result)
@@ -69,10 +61,6 @@ namespace uLearn.Web.Controllers
 			await userSolutionsRepo.SaveResults(result);
 		}
 
-		/// <summary>
-		/// Get testing results
-		/// </summary>
-		/// <param name="token"> Runner autherization token </param>
 		[HttpPost]
 		[Route("PostResults")]
 		public async Task PostResults([FromUri]string token, List<RunningResults> results)
@@ -87,7 +75,7 @@ namespace uLearn.Web.Controllers
 
 		private void CheckRunner(string token)
 		{
-			var expectedToken = new ConfigurationManager().AppSettings["runnerToken"];
+			var expectedToken = ConfigurationManager.AppSettings["runnerToken"];
 			if (expectedToken != token)
 				throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Forbidden));
 		}

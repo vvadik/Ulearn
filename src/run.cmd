@@ -1,0 +1,1 @@
+RunCsJob\bin\Debug\RunCsJob.exe %*

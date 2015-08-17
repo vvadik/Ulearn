@@ -6,6 +6,12 @@ namespace uLearn
 {
 	public static class EnumerableExtensions
 	{
+		public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+		{
+			var hash = new HashSet<TKey>();
+			return source.Where(p => hash.Add(keySelector(p)));
+		}
+
 		public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> items, Random random = null)
 		{
 			random = random ?? new Random();

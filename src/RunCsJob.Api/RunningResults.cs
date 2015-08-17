@@ -1,32 +1,5 @@
-﻿ // ReSharper disable once CheckNamespace
-namespace RunCsJob.Api
+﻿namespace RunCsJob.Api
 {
-	public class RunnerSubmition
-	{
-		public string Id;
-		public string Code;
-		public string Input;
-		public bool NeedRun;
-
-		public override string ToString()
-		{
-			return string.Format("Id: {0}, NeedRun: {1}", Id, NeedRun);
-		}
-	}
-
-	public enum Verdict
-	{
-		NA = 0,
-		Ok = 1,
-		CompilationError = 2,
-		RuntimeError = 3,
-		SecurityException = 4,
-		SandboxError = 5,
-		OutputLimit = 6,
-		TimeLimit = 7,
-		MemoryLimit = 8,
-	}
-
 	public class RunningResults
 	{
 		public string Id { get; set; }
@@ -55,5 +28,4 @@ namespace RunCsJob.Api
 			return output;
 		}
 	}
-
 }

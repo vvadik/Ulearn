@@ -129,9 +129,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="NLog">
-      <HintPath>..\packages\NLog.3.1.0.0\lib\net45\NLog.dll</HintPath>
-    </Reference>
     <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
@@ -221,10 +218,6 @@
     <Reference Include="WebGrease">
       <Private>True</Private>
       <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
-    </Reference>
-    <Reference Include="Antlr3.Runtime">
-      <Private>True</Private>
-      <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -868,9 +861,6 @@
     <None Include="encoding.xsd">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="NLog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="katex\fonts\KaTeX_AMS-Regular.eot" />
     <Content Include="katex\fonts\KaTeX_AMS-Regular.ttf" />
     <Content Include="katex\fonts\KaTeX_AMS-Regular.woff" />
@@ -909,9 +899,6 @@
     <Content Include="flexslider\fonts\flexslider-icon.ttf" />
     <Content Include="flexslider\fonts\flexslider-icon.woff" />
     <Content Include="flexslider\README.mdown" />
-    <None Include="NLog.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\ulearn.pubxml" />
     <Content Include="Properties\webjobs-list.json" />
@@ -1147,17 +1134,9 @@
     <EmbeddedResource Include="Microsoft.Owin.Security.VK\Resources.resx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CsSandboxer\CsSandboxer.csproj">
-      <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
-      <Name>CsSandboxer</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
       <Project>{26580595-F4DC-41EE-BA66-0EF4692243AF}</Project>
       <Name>RunCsJob.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RunCsJob\RunCsJob.csproj">
-      <Project>{77b16f9d-3cdf-4cc6-be5f-b6badfac5394}</Project>
-      <Name>RunCsJob</Name>
     </ProjectReference>
     <ProjectReference Include="..\uLearn\uLearn.csproj">
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
