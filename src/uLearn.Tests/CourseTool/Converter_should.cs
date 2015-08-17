@@ -40,8 +40,15 @@ namespace uLearn.CourseTool
 
 		private EdxCourse ConvertForTestsCourseToEdx(Dictionary<string, string> youtubeId2UlearnVideoIds = null)
 		{
-			return Converter.ToEdxCourse(course, "org", exerciseUrl, solutionsUrl,
-				youtubeId2UlearnVideoIds ?? new Dictionary<string, string>(), "");
+			var config = new Config
+			{
+				Organization = "org",
+				ExerciseUrl = exerciseUrl,
+				SolutionsUrl = solutionsUrl,
+				LtiId = ""
+			};
+			return Converter.ToEdxCourse(course, config,
+				youtubeId2UlearnVideoIds ?? new Dictionary<string, string>());
 		}
 
 		private IEnumerable<VideoComponent> GetVideoComponentFromDictionary(Dictionary<string, Tuple<string, string>> dict)

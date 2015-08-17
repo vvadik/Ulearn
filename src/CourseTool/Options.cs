@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using CommandLine;
 using Newtonsoft.Json;
-using uLearn;
 using uLearn.CourseTool.Json;
 using uLearn.Model.Edx;
 using uLearn.Model.Edx.EdxComponents;
@@ -86,11 +85,8 @@ namespace uLearn.CourseTool
 			Console.WriteLine("Converting uLearn course \"{0}\" to Edx course", course.Id);
 			Converter.ToEdxCourse(
 				course,
-				config.Organization,
-				config.ExerciseUrl,
-				config.SolutionsUrl,
-				video.Records.ToDictionary(x => x.Data.Id, x => Utils.GetNormalizedGuid(x.Guid)),
-				config.LtiId
+				config,
+				video.Records.ToDictionary(x => x.Data.Id, x => Utils.GetNormalizedGuid(x.Guid))
 			).Save(Dir + "/olx");
 
 			DownloadManager.Upload(Dir, course.Id, config, credentials);
@@ -154,6 +150,7 @@ namespace uLearn.CourseTool
 			patcher.PatchVerticals(
 				edxCourse, 
 				ulearnCourse.Slides
+					.Where(s => !config.IgnoredSlides.Contains(s.Id))
 					.Where(x => guids == null || guids.Contains(x.Guid))
 					.Select(x => x.ToVerticals(
 							ulearnCourse.Id, 
