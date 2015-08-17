@@ -1,53 +1,20 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Linq;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using RunCsJob;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts
 {
-	public class UnitsRepo
-	{
-		private readonly ULearnDb db;
-		private readonly CourseManager courseManager;
-
-		public UnitsRepo() : this(new ULearnDb(), WebCourseManager.Instance)
-		{
-
-		}
-
-		public UnitsRepo(ULearnDb db, CourseManager courseManager)
-		{
-			this.db = db;
-			this.courseManager = courseManager;
-		}
-
-		public List<string> GetVisibleUnits(string courseId, IPrincipal user)
-		{
-			var canSeeEverything = user.IsInRole(LmsRoles.Tester) || user.IsInRole(LmsRoles.Admin) || user.IsInRole(LmsRoles.Instructor);
-			if (canSeeEverything)
-				return courseManager.GetCourse(courseId).Slides.Select(s => s.Info.UnitName).Distinct().ToList();
-			return db.Units.Where(u => u.CourseId == courseId && u.PublishTime <= DateTime.Now).Select(u => u.UnitName).ToList();
-		}
-
-		public DateTime GetNextUnitPublishTime(string courseId)
-		{
-			return db.Units.Where(u => u.CourseId == courseId && u.PublishTime > DateTime.Now).Select(u => u.PublishTime).Concat(new[] { DateTime.MaxValue }).Min();
-		}
-	}
-
 	public class UserSolutionsRepo
 	{
 		private readonly ULearnDb db;
 		private readonly TextsRepo textsRepo = new TextsRepo();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
-
-		private static readonly ConcurrentQueue<string> Unhandled = new ConcurrentQueue<string>();
 
 		public UserSolutionsRepo() : this(new ULearnDb())
 		{
@@ -94,7 +61,6 @@ namespace uLearn.Web.DataContexts
 					string.Join("\r\n",
 					e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
 			}
-			Unhandled.Enqueue(userSolution.Id.ToString());
 			return userSolution;
 		}
 
@@ -198,32 +164,16 @@ namespace uLearn.Web.DataContexts
 			return solution;
 		}
 
-		public UserSolution FindUnhandled()
-		{
-			string id;
-			if (!Unhandled.TryDequeue(out id))
-				return null;
-			var submission = Find(id);
-			submission.Status = SubmissionStatus.Running;
-			Save(submission);
-			return submission;
-		}
-
 		public List<UserSolution> GetUnhandled(int count)
 		{
-			var submissions = new List<string>();
-			for (var i = 0; i < count; ++i)
-			{
-				string submission;
-				if (!Unhandled.TryDequeue(out submission))
-					break;
-				submissions.Add(submission);
-			}
-			var result = FindAll(submissions);
+			var hourAgo = DateTime.Now - TimeSpan.FromHours(1);
+			var result = db.UserSolutions
+				.Where(s =>
+					s.Timestamp > hourAgo
+					&& s.Status == SubmissionStatus.Waiting)
+				.Take(count).ToList();
 			foreach (var details in result)
-			{
 				details.Status = SubmissionStatus.Running;
-			}
 			SaveAll(result);
 			return result;
 		}
@@ -244,12 +194,10 @@ namespace uLearn.Web.DataContexts
 			db.SaveChanges();
 		}
 
-		protected void SaveAll(IEnumerable<UserSolution> result)
+		protected void SaveAll(IEnumerable<UserSolution> items)
 		{
-			foreach (var details in result)
-			{
+			foreach (var details in items)
 				db.UserSolutions.AddOrUpdate(details);
-			}
 			try
 			{
 				db.SaveChanges();
@@ -264,9 +212,10 @@ namespace uLearn.Web.DataContexts
 
 		public async Task SaveResults(RunningResults result)
 		{
-			var submission = Find(result.Id);
-			submission = await UpdateSubmission(submission, result);
-			Save(submission);
+			var solution = Find(result.Id);
+			var updatedSolution = await UpdateSubmission(solution, result);
+			Save(updatedSolution);
+			hasHandled = true;
 		}
 
 		public async Task SaveAllResults(List<RunningResults> results)
@@ -277,13 +226,16 @@ namespace uLearn.Web.DataContexts
 			foreach (var submission in submissions)
 				res.Add(await UpdateSubmission(submission, resultsDict[submission.Id.ToString()]));
 			SaveAll(res);
+			hasHandled = true;
 		}
 
 		private async Task<UserSolution> UpdateSubmission(UserSolution submission, RunningResults result)
 		{
 			var compilationErrorHash = (await textsRepo.AddText(result.CompilationOutput)).Hash;
-			var outputHash = (await textsRepo.AddText(result.GetOutput())).Hash;
+			var outputHash = (await textsRepo.AddText(result.GetOutput().NormalizeEoln())).Hash;
 
+			var webRunner = submission.CourseId == "web" && submission.SlideId == "runner";
+			var exerciseSlide = webRunner ? null : ((ExerciseSlide)courseManager.GetCourse(submission.CourseId).GetSlideById(submission.SlideId));
 			var updated = new UserSolution
 			{
 				Id = submission.Id,
@@ -293,7 +245,7 @@ namespace uLearn.Web.DataContexts
 				SlideId = submission.SlideId,
 				IsCompilationError = result.Verdict == Verdict.CompilationError,
 				IsRightAnswer = result.Verdict == Verdict.Ok 
-					&& (submission.CourseId == "web" && submission.SlideId == "runner" || ((ExerciseSlide) courseManager.GetCourse(submission.CourseId).GetSlideById(submission.SlideId)).Exercise.ExpectedOutput.NormalizeEoln() == result.GetOutput()),
+					&& (webRunner || exerciseSlide.Exercise.ExpectedOutput.NormalizeEoln() == result.GetOutput().NormalizeEoln()),
 				OutputHash = outputHash,
 				Timestamp = submission.Timestamp,
 				UserId = submission.UserId,
@@ -311,25 +263,54 @@ namespace uLearn.Web.DataContexts
 		public async Task<UserSolution> RunUserSolution(
 			string courseId, string slideId, string userId, string code, 
 			string compilationError, string output, bool isRightAnswer, 
-			string executionServiceName, string displayName, int timeout)
+			string executionServiceName, string displayName, TimeSpan timeout)
 		{
 			var solution = await AddUserSolution(
 				courseId, slideId,
 				code, isRightAnswer, compilationError, output,
 				userId, executionServiceName, displayName);
+			hasUnhandled = true;
 
-			var count = timeout;
-			var lastStatus = solution.Status;
-			while (lastStatus != SubmissionStatus.Done && count >= 0)
+			var sw = Stopwatch.StartNew();
+			while (sw.Elapsed < timeout)
 			{
-				await Task.Delay(1000);
-				--count;
-				lastStatus = GetDetails(solution.Id).Status;
-			}
-			if (lastStatus != SubmissionStatus.Done)
-				return null;
-
-			return GetDetails(solution.Id);
+				await WaitHandled(TimeSpan.FromSeconds(2));
+				var details = GetDetails(solution.Id);
+				if (details.Status == SubmissionStatus.Done)
+					return details;
+			} 
+			return null;
 		}
+
+		public async Task WaitUnhandled(TimeSpan timeout)
+		{
+			var sw = Stopwatch.StartNew();
+			while (sw.Elapsed < timeout)
+			{
+				if (hasUnhandled)
+				{
+					hasUnhandled = false;
+					return;
+				}
+				await Task.Delay(TimeSpan.FromMilliseconds(100));
+			}
+		}
+
+		public async Task WaitHandled(TimeSpan timeout)
+		{
+			var sw = Stopwatch.StartNew();
+			while (sw.Elapsed < timeout)
+			{
+				if (hasHandled)
+				{
+					hasHandled = false;
+					return;
+				}
+				await Task.Delay(TimeSpan.FromMilliseconds(100));
+			}
+		}
+
+		private static volatile bool hasUnhandled;
+		private static volatile bool hasHandled;
 	}
 }

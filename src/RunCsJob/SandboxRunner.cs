@@ -11,7 +11,7 @@ namespace RunCsJob
 {
 	public class SandboxRunner
 	{
-		private readonly InternalSubmissionModel _submission;
+		private readonly RunnerSubmition _submission;
 
 		private const int TimeLimitInSeconds = 5;
 		private static readonly TimeSpan TimeLimit = new TimeSpan(0, 0, 0, TimeLimitInSeconds);
@@ -34,7 +34,24 @@ namespace RunCsJob
 			"mscorlib.dll"
 		};
 
-		public SandboxRunner(InternalSubmissionModel submission)
+		public static RunningResults Run(RunnerSubmition submission)
+		{
+			try
+			{
+				return new SandboxRunner(submission).Run();
+			}
+			catch (Exception ex)
+			{
+				return new RunningResults
+				{
+					Id = submission.Id,
+					Verdict = Verdict.SandboxError,
+					Error = ex.ToString()
+				};
+			}
+		}
+
+		public SandboxRunner(RunnerSubmition submission)
 		{
 			_submission = submission;
 			_result.Id = submission.Id;
@@ -94,11 +111,8 @@ namespace RunCsJob
 
 		private void RunSandboxer(CompilerResults assembly)
 		{
-			var inputBytes = Encoding.UTF8.GetBytes(_submission.Input ?? "");
-			var input = Encoding.Default.GetString(inputBytes);
-
 			var startInfo = new ProcessStartInfo(
-				"sandboxer\\CsSandboxer.exe", 
+				"CsSandboxer.exe", 
 				string.Format("\"{0}\" {1}", Path.GetFullPath(assembly.PathToAssembly), _submission.Id))
 			{
 				RedirectStandardInput = true,
@@ -146,7 +160,7 @@ namespace RunCsJob
 			var startTime = DateTime.Now;
 
 			sandboxer.StandardInput.WriteLine("Run");
-			sandboxer.StandardInput.WriteLineAsync(input);
+			sandboxer.StandardInput.WriteLineAsync(_submission.Input);
 
 			var stdoutReader = new AsyncReader(sandboxer.StandardOutput, OutputLimit + 1);
 			while (!sandboxer.HasExited

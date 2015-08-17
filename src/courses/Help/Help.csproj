@@ -59,6 +59,10 @@
     <Content Include="Slides\U99_Presentation\Title.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\CsSandboxer\CsSandboxer.csproj">
+      <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
+      <Name>CsSandboxer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
       <Name>uLearn</Name>

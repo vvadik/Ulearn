@@ -22,32 +22,20 @@ namespace RunCsJob
 		}
 
 
-		public async Task<InternalSubmissionModel> TryGetSubmission()
-		{
-			var uri = GetUri("TryGetSubmission");
-			var response = await httpClient.GetAsync(uri);
-			if (response.IsSuccessStatusCode)
-				return await response.Content.ReadAsAsync<InternalSubmissionModel>();
-
-			Console.Out.WriteLine(DateTime.Now.ToString("HH:mm:ss"));
-			Console.Out.WriteLine(response.ToString());
-			return null;
-		}
-
-		public async Task<List<InternalSubmissionModel>> TryGetSubmissions(int threadsCount)
+		public async Task<List<RunnerSubmition>> TryGetSubmissions(int threadsCount)
 		{
 			var uri = GetUri("GetSubmissions", new[] { "count", threadsCount.ToString(CultureInfo.InvariantCulture) });
 			try
 			{
 				var response = await httpClient.GetAsync(uri);
 				if (response.IsSuccessStatusCode)
-					return await response.Content.ReadAsAsync<List<InternalSubmissionModel>>();
+					return await response.Content.ReadAsAsync<List<RunnerSubmition>>();
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine("Cant connect to {0}. {1}", uri, e.Message);
 			}
-			return new List<InternalSubmissionModel>();
+			return new List<RunnerSubmition>();
 		}
 
 		public async void SendResult(RunningResults result)
@@ -57,23 +45,24 @@ namespace RunCsJob
 
 			if (responce.IsSuccessStatusCode) return;
 
-			Console.Out.WriteLine(DateTime.Now.ToString("HH:mm:ss"));
-			Console.Out.WriteLine(responce.ToString());
-			Console.Out.WriteLine(result);
+			Console.Error.WriteLine(DateTime.Now.ToString("HH:mm:ss"));
+			Console.Error.WriteLine(responce.ToString());
+			Console.Error.WriteLine(result);
 		}
 
 		public async void SendResults(List<RunningResults> results)
 		{
 			var uri = GetUri("PostResults");
-			var responce = await httpClient.PostAsJsonAsync(uri, results);
+			var response = await httpClient.PostAsJsonAsync(uri, results);
 
-			if (responce.IsSuccessStatusCode) return;
+			if (response.IsSuccessStatusCode) return;
 
-			Console.Out.WriteLine(DateTime.Now.ToString("HH:mm:ss"));
-			Console.Out.WriteLine(responce.ToString());
+			Console.Error.WriteLine("can't send " + DateTime.Now.ToString("HH:mm:ss"));
+			Console.Error.WriteLine(response.ToString());
+			Console.Error.WriteLine(response.Content.ReadAsStringAsync().Result);
 			foreach (var result in results)
 			{
-				Console.Out.WriteLine(result);
+				Console.Error.WriteLine(result);
 			}
 		}
 

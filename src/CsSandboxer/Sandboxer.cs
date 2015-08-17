@@ -12,7 +12,6 @@ namespace CsSandboxer
 		public void ExecuteUntrustedCode(MethodInfo entryPoint)
 		{
 			(new PermissionSet(PermissionState.Unrestricted)).Assert();
-
 			var parameters = entryPoint.GetParameters().Length != 0 ? new object[] { new[] { "" } } : null;
 			entryPoint.Invoke(null, parameters);
 
@@ -21,7 +20,7 @@ namespace CsSandboxer
 
 		#region Security Test
 
-		public static void MustDontWork()
+		public static void MustNotWork()
 		{
 			Console.WriteLine("Security broken!!!");
 		}

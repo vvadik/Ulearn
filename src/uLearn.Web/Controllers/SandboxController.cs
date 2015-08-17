@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -12,14 +13,13 @@ namespace uLearn.Web.Controllers
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
-		private const int _timeout = 30;
+		private readonly static TimeSpan timeout = TimeSpan.FromSeconds(30);
 
 		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public ActionResult Index(int max = 200, int skip = 0)
 		{
 			var submissions = solutionsRepo
-				.GetAllSolutions(max, skip)
-				.Select(details => details).ToList();
+				.GetAllSolutions(max, skip).ToList();
 			return View(new SubmissionsListModel
 			{
 				Submissions = submissions
@@ -36,14 +36,12 @@ namespace uLearn.Web.Controllers
 		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public async Task<ActionResult> Run()
 		{
-			var token = Request.Cookies["token"];
-			if (token == null) return Index();
 			var code = Request.InputStream.GetString();
 
 			var solution = await solutionsRepo.RunUserSolution(
 				"web", "runner", User.Identity.GetUserId(), 
 				code, null, null, false, "null", 
-				User.Identity.Name + ": CsSandbox Web Executor", _timeout
+				User.Identity.Name + ": CsSandbox Web Executor", timeout
 			);
 
 			return Json(new RunSolutionResult

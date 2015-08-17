@@ -1,11 +1,12 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
 @using uLearn
 @using uLearn.Model.Blocks
-@using uLearn.Web.Models;
+@* ReSharper disable once RedundantUsingDirective *@
+@using uLearn.Web.Models
 
 @helper Slide(BlockRenderContext context, int currentScore = 0)
 {
-	<div class='slide'>
+	<div class="slide">
 		<h1>
 			@context.Slide.Title
 			<span class="score">@Score(currentScore, context.Slide.MaxScore)</span>
@@ -26,7 +27,7 @@
 
 @helper Block(CodeBlock block, BlockRenderContext context)
 {
-	<textarea class='code code-sample' data-lang="@block.LangId" data-ver="@block.LangVer">@block.Code</textarea>
+	<textarea class="code code-sample" data-lang="@block.LangId" data-ver="@block.LangVer">@block.Code</textarea>
 }
 
 @helper Block(TexBlock block, BlockRenderContext context)
@@ -40,12 +41,14 @@
 @helper Block(YoutubeBlock block, BlockRenderContext context)
 {
 	<div class="video-container">
-		<iframe class='embedded-video' width='864' height='480' src='https://www.youtube.com/embed/@block.VideoId' allowfullscreen></iframe>
+		<iframe class="embedded-video" width="864" height="480" src="https://www.youtube.com/embed/@block.VideoId" allowfullscreen></iframe>
 	</div>
 	<div>
 		<a href="javascript://" class="popover-trigger"
-			title="Как ускорить видео?"
-			data-content="Если по иконке с шестеренкой нет возможности ускорить видео, то вам нужно &lt;a target='blank' href='http://youtube.com/html5'>вручную включить&lt;/a> использование HTML5-плеера.">Как ускорить видео?</a>
+		   title="Как ускорить видео?"
+		   data-content="Если по иконке с шестеренкой нет возможности ускорить видео, то вам нужно &lt;a target='blank' href='http://youtube.com/html5'>вручную включить&lt;/a> использование HTML5-плеера.">
+			Как ускорить видео?
+		</a>
 	</div>
 }
 
@@ -56,7 +59,7 @@
 			@foreach (var imageUrl in block.ImageUrls)
 			{
 				<li>
-					<img src="@string.Format("{0}/{1}", context.BaseUrl, imageUrl)" alt="@imageUrl" />
+					<img src="@string.Format("{0}/{1}", context.BaseUrl, imageUrl)" alt="@imageUrl"/>
 				</li>
 			}
 		</ul>
@@ -65,25 +68,80 @@
 
 @helper CodeTextArea(string initialCode, string langId, string runSolutionUrl)
 {
-	<textarea id="secretCodeExercise" class="hide">@initialCode</textarea>
-	<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine™</a> and <a target="blank" href="http://codemirror.net/">CodeMirror</a></div>
-	<textarea class='code code-exercise' data-lang="@langId">@initialCode</textarea>
+	<textarea class="code code-exercise" data-lang="@langId">@initialCode</textarea>
+	<div class="solution-control btn-group ctrl-group">
+		<button type="button" class="run-solution-button btn btn-primary no-rounds" data-url="@runSolutionUrl">
+			Run
+		</button>
+	</div>
+
+	@RunErrors()
+}
+
+@helper Block(ExerciseBlock block, BlockRenderContext context)
+{
+	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData();
+	var action = data.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", data.AcceptedSolutionUrl);
+	<textarea id="secretCodeExercise" class="hide">@block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
+	<textarea class="code code-exercise" data-lang="@block.LangId">@(data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 	<script>
 		function cleanUserCode() {
 			var $secretCodeExercise = $('#secretCodeExercise');
 			$('.code-exercise')[0].codeMirrorEditor.setValue($secretCodeExercise.text());
 		}
 	</script>
+	if (data.ShowControls)
+	{
+		<div class="solution-control btn-group ctrl-group">
+			<button type="button" class="run-solution-button btn btn-primary no-rounds @(data.IsLti ? "run-solution-button-lti" : "")" data-url="@data.RunSolutionUrl">
+				Run
+			</button>
 
-	<div class="solution-control btn-group ctrl-group">
-		<button type="button" class="run-solution-button btn btn-primary no-rounds" data-url="@runSolutionUrl">
-			Run
-		</button>
-		<button type="button" class="btn btn-default reset-btn no-rounds" onclick="cleanUserCode()">
-			Reset
-		</button>
-	</div>
+			@{ var e = ((ExerciseSlide)context.Slide).Exercise.HintsMd; }
+			<button id="GetHintButton" type="button" class="btn btn-default hints-btn"
+			        data-course-id="@context.Course.Id" data-slide-index="@context.Slide.Index" data-hints-count="@e.Count"
+			        data-url="@data.GetHintUrl">
+				Get hint
+			</button>
+			@if (!data.IsLti)
+			{
+				<button type="button" class="btn btn-default giveup-btn" onclick="@action">
+					Show solutions
+				</button>
+			}
+			<button type="button" class="btn btn-default reset-btn no-rounds" onclick=" cleanUserCode() ">
+				Reset
+			</button>
+		</div>
 
+		@RunErrors()
+
+		<div class="panel-group ctrl-group" id="hints-accordion">
+			<div id="hints-place"></div>
+		</div>
+		if (!data.IsLti)
+		{
+			@Alert(data)
+		}
+	}
+	else
+	{
+		<div>
+			<h3>Подсказки</h3>
+			<ol>
+				@foreach (var hint in block.HintsMd)
+				{
+					<li>
+						@MvcHtmlString.Create(hint.RenderMd(context.BaseUrl))
+					</li>
+				}
+			</ol>
+		</div>
+	}
+}
+
+@helper RunErrors()
+{
 	<div class="run-result run-service-error">
 		<div class="run-verdict label-warning">Ошибка сервера :(</div>
 		<pre class="no-rounds"><code class="run-details"></code></pre>
@@ -118,115 +176,24 @@
 	</div>
 }
 
-@helper Block(ExerciseBlock block, BlockRenderContext context)
+@helper Alert(ExerciseBlockData data)
 {
-	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData();
-	var action = data.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", data.AcceptedSolutionUrl);
-	<textarea id="secretCodeExercise" class='hide'>@block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
-	<div class="sphere-engine-tm">Powered by <a target="blank" href="http://sphere-engine.com">Sphere Engine™</a> and <a target="blank" href="http://codemirror.net/">CodeMirror</a></div>
-	<textarea class='code code-exercise' data-lang="@block.LangId">@(data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
-	<script>
-		function cleanUserCode() {
-			var $secretCodeExercise = $('#secretCodeExercise');
-			$('.code-exercise')[0].codeMirrorEditor.setValue($secretCodeExercise.text());
-		}
-	</script>
-	if (data.ShowControls)
-	{
-		<div class="solution-control btn-group ctrl-group">
-			<button type="button" class="run-solution-button btn btn-primary no-rounds @(data.IsLti ? "run-solution-button-lti" : "")" data-url="@data.RunSolutionUrl">
-				Run
-			</button>
-
-			@{ var e = ((ExerciseSlide)context.Slide).Exercise.HintsMd; }
-			<button id="GetHintButton" type="button" class="btn btn-default hints-btn" onclick=" showhintforuser('@context.Course.Id', '@context.Slide.Index' , '@e.Count' ) " data-url=" @data.GetHintUrl ">
-				Get hint
-			</button>
-			@if (!data.IsLti)
-			{
-				<button type="button" class="btn btn-default giveup-btn" onclick="@action">
-					Show solutions
-				</button>
-			}
-			<button type="button" class="btn btn-default reset-btn no-rounds" onclick=" cleanUserCode() ">
-				Reset
-			</button>
-		</div>
-
-		<div class="run-result run-service-error">
-			<div class="run-verdict label-warning">Ошибка сервера :(</div>
-			<pre class="no-rounds"><code class="run-details"></code></pre>
-		</div>
-
-		<div class="run-result run-compile-error">
-			<div class="run-verdict label-danger">Ошибка компиляции</div>
-			<pre class="no-rounds"><code class="run-details"></code></pre>
-		</div>
-
-		<div class="run-result run-style-error">
-			<div class="run-verdict label-danger">Нарушение стилевых требований</div>
-			<pre class="no-rounds"><code class="run-details"></code></pre>
-			<div>
-				<small>В некоторых ситуациях стилевые проверки тут могут быть жестче, чем необходимо в реальной жизни.</small>
-			</div>
-		</div>
-
-		<div class="run-result run-wa">
-			<div class="run-verdict label-danger">Неверный результат</div>
-			<div class="diff-table tablesorter"></div>
-		</div>
-
-		<div class="run-result run-wa-no-diff">
-			<div class="run-verdict label-danger">Неверный результат</div>
-			<pre class="no-rounds"><code class="run-details"></code></pre>
-		</div>
-
-		<div class="run-result run-success">
-			<div class="run-verdict label-success clearfix">Успех!</div>
-			<pre class="no-rounds"><code class="run-details"></code></pre>
-		</div>
-
-		<div class="panel-group ctrl-group" id="hints-accordion">
-			<div id="hints-place"></div>
-		</div>
-		if (!data.IsLti)
-		{
-			@Alert(data)
-		}
-	}
-	else
-	{
-		<div>
-			<h3>Подсказки</h3>
-			<ol>
-				@foreach (var hint in block.HintsMd)
-				{
-					<li>
-						@MvcHtmlString.Create(hint.RenderMd(context.BaseUrl))
-					</li>
-				}
-			</ol>
-		</div>
-	}
-}
-
-		@helper Alert(ExerciseBlockData data)
-{
-		<div class="modal fade" id="ShowSolutionsAlert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-						<h4 class="modal-title">Внимание</h4>
-					</div>
-					<div class="modal-body">
-						<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
-					</div>
-					<div class="modal-footer">
-						<a class="btn btn-default" href="@data.AcceptedSolutionUrl">Продолжить</a>
-						<button type="button" class="btn btn-primary" data-dismiss="modal">Отмена</button>
-					</div>
+	<div class="modal fade" id="ShowSolutionsAlert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Внимание</h4>
+				</div>
+				<div class="modal-body">
+					<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
+				</div>
+				<div class="modal-footer">
+					<a class="btn btn-default" href="@data.AcceptedSolutionUrl">Продолжить</a>
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Отмена</button>
 				</div>
 			</div>
 		</div>
+	</div>
 }

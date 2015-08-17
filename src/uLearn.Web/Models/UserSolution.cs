@@ -40,6 +40,7 @@ namespace uLearn.Web.Models
 
 		[Required]
 		[Index("AcceptedList", 4)]
+		[Index("IDX_UserSolution_Timestamp")]
 		public DateTime Timestamp { get; set; }
 
 		public TimeSpan? Elapsed { get; set; }

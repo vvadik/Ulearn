@@ -1,107 +1,68 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Threading;
-using RunCsJob;
 
 namespace RunCsJob
 {
 	internal class RunCsJobProgram
 	{
 		private readonly string address;
-		private readonly ConcurrentQueue<RunningResults> results = new ConcurrentQueue<RunningResults>();
-		private readonly int threadsCount;
 		private readonly string token;
-
-		private readonly BlockingCollection<InternalSubmissionModel> unhandled =
-			new BlockingCollection<InternalSubmissionModel>();
+		private readonly TimeSpan sleep;
+		private readonly int jobsToRequest;
 
 		public RunCsJobProgram()
 		{
-			address = ConfigurationManager.AppSettings["url"];
-			token = ConfigurationManager.AppSettings["token"];
-			if (!int.TryParse(ConfigurationManager.AppSettings["threadsCount"], out threadsCount))
-				threadsCount = Math.Max(1, Environment.ProcessorCount - 1);
+			address = ConfigurationManager.AppSettings["submissionsUrl"];
+			token = ConfigurationManager.AppSettings["runnerToken"];
+			sleep = TimeSpan.FromSeconds(int.Parse(ConfigurationManager.AppSettings["sleepSeconds"] ?? "1"));
+			jobsToRequest = int.Parse(ConfigurationManager.AppSettings["jobsToRequest"] ?? "5");
 		}
 
-		public static void Main()
+		public static void Main(string[] args)
 		{
-			new RunCsJobProgram().Run();
+			if (args.Contains("--selfcheck"))
+				SelfCheck();
+			else
+				new RunCsJobProgram().Run();
 		}
 
 		private void Run()
 		{
 			AppDomain.MonitoringIsEnabled = true;
-
-			Console.Error.WriteLine("Listen {0} with {1} threads", address, threadsCount);
-
-			StartHandleThreads();
-
+			Console.WriteLine("Listen {0}", address);
 			var client = new Client(address, token);
+			MainLoop(client);
+		}
+
+		private void MainLoop(Client client)
+		{
 			while (true)
 			{
-				ReceiveNewUnhandled(client);
-				SendNewResults(client);
-				Thread.Sleep(100);
+				var newUnhandled = client.TryGetSubmissions(jobsToRequest).Result;
+				Console.WriteLine("Received {0} submissions: [{1}]", newUnhandled.Count, string.Join(", ", newUnhandled.Select(s => s.Id)));
+
+				if (newUnhandled.Any())
+				{
+					var results = newUnhandled.Select(SandboxRunner.Run).ToList();
+					Console.WriteLine("Results: [{0}]", string.Join(", ", results.Select(r => r.Verdict)));
+					client.SendResults(results);
+				}
+				Thread.Sleep(sleep);
 			}
 			// ReSharper disable once FunctionNeverReturns
 		}
 
-		private void StartHandleThreads()
+		private static void SelfCheck()
 		{
-			for (var i = 0; i < threadsCount; ++i)
-				new Thread(Handle).Start();
-		}
-
-		private void Handle()
-		{
-			foreach (var submission in unhandled.GetConsumingEnumerable())
+			var res = SandboxRunner.Run(new RunnerSubmition()
 			{
-				RunningResults result;
-				try
-				{
-					result = new SandboxRunner(submission).Run();
-				}
-				catch (Exception ex)
-				{
-					result = new RunningResults
-					{
-						Id = submission.Id,
-						Verdict = Verdict.SandboxError,
-						Error = ex.ToString()
-					};
-				}
-				results.Enqueue(result);
-			}
-		}
-
-		private void ReceiveNewUnhandled(Client client)
-		{
-			if (unhandled.Count < (threadsCount + 1) / 2)
-			{
-				var newUnhandled = client.TryGetSubmissions(threadsCount).Result;
-				foreach (var submission in newUnhandled)
-				{
-					unhandled.Add(submission);
-					Console.WriteLine("Received " + submission);
-				}
-			}
-		}
-
-		private void SendNewResults(Client client)
-		{
-			if (!results.IsEmpty)
-			{
-				var newResults = new List<RunningResults>();
-				RunningResults result;
-				while (results.TryDequeue(out result))
-				{
-					newResults.Add(result);
-					Console.WriteLine("Finished " + result);
-				}
-				client.SendResults(newResults);
-			}
+				Id = Guid.NewGuid().ToString("N"),
+				NeedRun = true,
+				Code = "class C { static void Main(){ System.Console.WriteLine(\"Привет мир!\");}}"
+			});
+			Console.WriteLine(res);
 		}
 	}
 }

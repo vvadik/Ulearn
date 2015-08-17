@@ -1,40 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using NLog.Internal;
 using RunCsJob;
 using uLearn.Web.DataContexts;
+using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
 	public class RunnerController : ApiController
 	{
-//		private readonly UserRepo _user = new UserRepo();
-		private readonly UserSolutionsRepo _userSolutionsRepo = new UserSolutionsRepo();
+		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
-		/// <summary>
-		/// Return one submission for testing purposes
-		/// </summary>
-		/// <param name="token"> Runner autherization token </param>
-		[HttpGet]
-		[Route("TryGetSubmission")]
-		public InternalSubmissionModel TryGetSubmission(string token)
-		{
-			CheckRunner(token);
-
-			var submission = _userSolutionsRepo.FindUnhandled();
-			if (submission == null)
-				return null;
-			return new InternalSubmissionModel
-			{
-				Id = submission.Id.ToString(),
-				Code = submission.SolutionCode.Text,
-				Input = "",
-				NeedRun = true
-			};
-		}
-
 		/// <summary>
 		/// Return list of submissions for testing purposes
 		/// </summary>
@@ -42,24 +24,34 @@ namespace uLearn.Web.Controllers
 		/// <param name="count"> Count of submission </param>
 		[HttpGet]
 		[Route("GetSubmissions")]
-		public List<InternalSubmissionModel> GetSubmissions([FromUri] string token, [FromUri] int count)
+		public async Task<List<RunnerSubmition>> GetSubmissions([FromUri] string token, [FromUri] int count)
 		{
 			CheckRunner(token);
-			var submissions = _userSolutionsRepo.GetUnhandled(count);
-			return submissions
-				.Select(details => new InternalSubmissionModel
-				{
-					Id = details.Id.ToString(),
-					Code = Utils.GetSource(
-						details.CourseId, 
-						details.SlideId, 
-						courseManager, 
-						details.SolutionCode.Text
+			var sw = Stopwatch.StartNew();
+			while (true)
+			{
+				var repo = new UserSolutionsRepo();
+				var submissions = repo.GetUnhandled(count);
+				if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
+					return submissions.Select(ToRunnerSubmition).ToList();
+				await repo.WaitUnhandled(TimeSpan.FromSeconds(10));
+			}
+		}
+
+		private RunnerSubmition ToRunnerSubmition(UserSolution details)
+		{
+			return new RunnerSubmition
+			{
+				Id = details.Id.ToString(),
+				Code = Utils.GetSource(
+					details.CourseId, 
+					details.SlideId, 
+					courseManager, 
+					details.SolutionCode.Text
 					),
-					Input = "",
-					NeedRun = true
-				})
-				.ToList();
+				Input = "",
+				NeedRun = true
+			};
 		}
 
 		/// <summary>
@@ -74,7 +66,7 @@ namespace uLearn.Web.Controllers
 				throw new HttpResponseException(HttpStatusCode.BadRequest);
 			CheckRunner(token);
 
-			await _userSolutionsRepo.SaveResults(result);
+			await userSolutionsRepo.SaveResults(result);
 		}
 
 		/// <summary>
@@ -89,15 +81,15 @@ namespace uLearn.Web.Controllers
 				throw new HttpResponseException(HttpStatusCode.BadRequest);
 			CheckRunner(token);
 
-			await _userSolutionsRepo.SaveAllResults(results);
+			await userSolutionsRepo.SaveAllResults(results);
 		}
 
 
 		private void CheckRunner(string token)
 		{
-//			var roles = _user.FindRoles(token);
-//			if (!roles.Contains(Role.Runner))
-//				throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Forbidden));
+			var expectedToken = new ConfigurationManager().AppSettings["runnerToken"];
+			if (expectedToken != token)
+				throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Forbidden));
 		}
 	}
 }

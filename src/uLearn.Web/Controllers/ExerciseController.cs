@@ -4,7 +4,6 @@ using System.Web.Mvc;
 using LtiLibrary.Core.Outcomes.v1;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
-using uLearn.Web.ExecutionService;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -17,7 +16,7 @@ namespace uLearn.Web.Controllers
 		private readonly ConsumersRepo consumersRepo = new ConsumersRepo();
 		private readonly LtiRequestsRepo ltiRequestsRepo = new LtiRequestsRepo();
 
-		private const int _executionTimeout = 30;
+		private readonly static TimeSpan executionTimeout = TimeSpan.FromSeconds(30);
 
 		public ExerciseController()
 			: this(WebCourseManager.Instance)
@@ -44,7 +43,7 @@ namespace uLearn.Web.Controllers
 			}
 			var exerciseSlide = (ExerciseSlide)courseManager.GetCourse(courseId).Slides[slideIndex];
 			
-			var result = await CheckSolution(courseId, exerciseSlide, code, RedundantExecutionService.Default);
+			var result = await CheckSolution(courseId, exerciseSlide, code);
 			if (isLti)
 				SubmitScore(exerciseSlide);
 			return Json(result);
@@ -78,7 +77,7 @@ namespace uLearn.Web.Controllers
 				throw new Exception(uri + "\r\n\r\n" + result.Message);
 		}
 
-		private async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string code, IExecutionService executionService)
+		private async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string code)
 		{
 			var exerciseBlock = exerciseSlide.Exercise;
 			var solution = exerciseBlock.Solution.BuildSolution(code);
@@ -89,8 +88,8 @@ namespace uLearn.Web.Controllers
 
 			var submissionDetails = await solutionsRepo.RunUserSolution(
 				courseId, exerciseSlide.Id, User.Identity.GetUserId(), 
-				code, null, null, false, executionService.Name, 
-				GenerateSubmissionName(exerciseSlide), _executionTimeout
+				code, null, null, false, "uLearn", 
+				GenerateSubmissionName(exerciseSlide), executionTimeout
 			);
 
 			if (submissionDetails == null)
@@ -98,7 +97,7 @@ namespace uLearn.Web.Controllers
 				{
 					IsCompillerFailure = true,
 					CompilationError = "Ой-ой, штуковина, которая проверяет решения сломалась (или просто устала). Попробуйте отправить решение позже (когда она немного отдохнет).",
-					ExecutionServiceName = executionService.Name
+					ExecutionServiceName = "uLearn"
 				};
 			var output = submissionDetails.Output.Text;
 			var expectedOutput = exerciseBlock.ExpectedOutput.NormalizeEoln();

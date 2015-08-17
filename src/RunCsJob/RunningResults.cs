@@ -1,5 +1,4 @@
-﻿using uLearn;
-
+﻿
 namespace RunCsJob
 {
 	public class RunningResults
@@ -27,7 +26,7 @@ namespace RunCsJob
 				else
 					output += "\n" + Verdict;
 			}
-			return output.NormalizeEoln();
+			return output;
 		}
 	}
 }

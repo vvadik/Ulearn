@@ -33,7 +33,7 @@ namespace uLearn.Model.Edx
 							xml.Load(filename);
 							displayName = xml.DocumentElement.Attributes["display_name"].InnerText;
 						}
-						catch (Exception e)
+						catch (Exception)
 						{
 							displayName = component.DisplayName;
 						}
