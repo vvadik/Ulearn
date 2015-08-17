@@ -3,7 +3,7 @@ using System.Linq;
 using uLearn;
 using uLearn.Model.Edx;
 
-namespace uLearnToEdx
+namespace uLearn.CourseTool
 {
 	public static class Converter
 	{

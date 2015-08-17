@@ -3,10 +3,9 @@ using System.Xml.Serialization;
 using NUnit.Framework;
 using uLearn.Model;
 
-namespace uLearn.utils
+namespace uLearn.Utilities
 {
-
-	public class Converter
+	public class LessonToXmlConvertor
 	{
 		[Test]
 		[Explicit]

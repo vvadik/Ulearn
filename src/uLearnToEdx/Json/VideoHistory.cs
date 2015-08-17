@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace uLearnToEdx.Json
+namespace uLearn.CourseTool.Json
 {
 	public class VideoHistory
 	{

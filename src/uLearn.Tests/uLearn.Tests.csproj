@@ -70,7 +70,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Converter.cs" />
+    <Compile Include="CourseTool\Config_Test.cs" />
+    <Compile Include="CourseTool\Converter_should.cs" />
+    <Compile Include="Utilities\LessonToXmlConvertor.cs" />
     <Compile Include="CSharp\CsMembersExtractor_should.cs" />
     <Compile Include="CSharp\CsMembersRemover_should.cs" />
     <Compile Include="CSharp\NamingCaseChecker_should.cs" />
@@ -158,9 +160,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\uLearnToEdx\uLearnToEdx.csproj">
+    <ProjectReference Include="..\uLearnToEdx\Course.Tool.csproj">
       <Project>{38660028-bd75-4281-84e9-b35ce3e338dc}</Project>
-      <Name>uLearnToEdx</Name>
+      <Name>Course.Tool</Name>
     </ProjectReference>
     <ProjectReference Include="..\uLearn\uLearn.csproj">
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>

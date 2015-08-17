@@ -5,11 +5,11 @@ using System.Linq;
 using CommandLine;
 using Newtonsoft.Json;
 using uLearn;
+using uLearn.CourseTool.Json;
 using uLearn.Model.Edx;
 using uLearn.Model.Edx.EdxComponents;
-using uLearnToEdx.Json;
 
-namespace uLearnToEdx
+namespace uLearn.CourseTool
 {
 	abstract class AbstractOptions
 	{
@@ -20,12 +20,12 @@ namespace uLearnToEdx
 
 			if (!File.Exists(configFile))
 			{
-				File.Copy(string.Format("{0}/templates/config.xml", Utils.GetRootDirectory()), configFile);
+				var configTemplateFile = Path.Combine(Utils.GetRootDirectory(), "templates/config.xml");
+				File.Copy(configTemplateFile, configFile);
 				Process.Start("notepad", configFile);
-				Console.WriteLine("Edit the config file and run this option again.");
+				Console.WriteLine("Edit the config file {0} and run this option again.", configFile);
 				return true;
 			}
-			
 			return false;
 		}
 

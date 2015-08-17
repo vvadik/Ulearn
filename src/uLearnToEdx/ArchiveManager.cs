@@ -2,7 +2,7 @@
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Tar;
 
-namespace uLearnToEdx
+namespace uLearn.CourseTool
 {
 	class ArchiveManager
 	{

@@ -5,7 +5,7 @@ using System.Text;
 using Newtonsoft.Json;
 using uLearn;
 
-namespace uLearnToEdx
+namespace uLearn.CourseTool
 {
 	public class LoginException : Exception
 	{

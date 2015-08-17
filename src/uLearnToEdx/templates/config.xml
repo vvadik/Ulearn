@@ -20,4 +20,11 @@
 	<ULearnCourseId>BasicProgramming</ULearnCourseId>
 	<!-- Path to video json -->
 	<Video>video.json</Video>
+	<IgnoredSlides>
+		<!-- ULearn slides to skip during conversion and patching	-->
+		<!--
+		<SlideId>1</SlideId>
+		<SlideId>2</SlideId>
+		-->
+	</IgnoredSlides>
 </Config>

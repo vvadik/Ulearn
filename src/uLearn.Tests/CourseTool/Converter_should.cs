@@ -8,7 +8,7 @@ using uLearn.Model.Blocks;
 using uLearn.Model.Edx;
 using uLearn.Model.Edx.EdxComponents;
 
-namespace uLearnToEdx
+namespace uLearn.CourseTool
 {
 	[TestFixture]
 	public class Converter_should

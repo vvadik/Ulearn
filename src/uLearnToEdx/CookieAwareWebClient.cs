@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace uLearnToEdx
+namespace uLearn.CourseTool
 {
 	public class CookieAwareWebClient : WebClient
 	{

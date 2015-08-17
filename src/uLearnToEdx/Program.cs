@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace uLearnToEdx
+namespace uLearn.CourseTool
 {
 	public class Program
 	{
