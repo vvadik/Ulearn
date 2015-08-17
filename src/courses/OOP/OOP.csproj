@@ -157,6 +157,10 @@
       <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
       <Name>CsSandboxer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\uLearn.CourseLib\uLearn.CourseLib.csproj">
+      <Project>{70f83ad9-235d-4675-8585-608eb089ef94}</Project>
+      <Name>uLearn.CourseLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\uLearn\uLearn.csproj">
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
       <Name>uLearn</Name>

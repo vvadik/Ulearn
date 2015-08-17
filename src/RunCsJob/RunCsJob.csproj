@@ -61,11 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncReader.cs" />
-    <Compile Include="RunningResults.cs" />
-    <Compile Include="RunnerSubmition.cs" />
-    <Compile Include="Verdict.cs" />
     <Compile Include="SubmissionStatus.cs" />
-    <Compile Include="PublicSubmissionDetails.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="SandboxRunner.cs" />
     <Compile Include="RunningResultsExtention.cs" />
@@ -86,6 +82,10 @@
     <ProjectReference Include="..\CsSandboxer\CsSandboxer.csproj">
       <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
       <Name>CsSandboxer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
+      <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
+      <Name>RunCsJob.Api</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

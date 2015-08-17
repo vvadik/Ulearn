@@ -42,7 +42,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UXR", "courses\UXR\UXR.cspr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParProg", "courses\ParProg\ParProg.csproj", "{AC086E9B-19C3-4308-88D9-86CCA6262530}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Course.Tool", "uLearnToEdx\Course.Tool.csproj", "{38660028-BD75-4281-84E9-B35CE3E338DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn.CourseTool", "CourseTool\uLearn.CourseTool.csproj", "{38660028-BD75-4281-84E9-B35CE3E338DC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunCsJob", "RunCsJob\RunCsJob.csproj", "{77B16F9D-3CDF-4CC6-BE5F-B6BADFAC5394}"
 EndProject
@@ -51,6 +51,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "courses", "courses", "{AAEF3C90-14B4-476B-BD5F-D12654AF5816}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn.Tests", "uLearn.Tests\uLearn.Tests.csproj", "{BF698331-FF65-4B1E-850D-2E399434580B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn.CourseLib", "uLearn.CourseLib\uLearn.CourseLib.csproj", "{70F83AD9-235D-4675-8585-608EB089EF94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunCsJob.Api", "RunCsJob.Api\RunCsJob.Api.csproj", "{26580595-F4DC-41EE-BA66-0EF4692243AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -122,6 +126,14 @@ Global
 		{BF698331-FF65-4B1E-850D-2E399434580B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF698331-FF65-4B1E-850D-2E399434580B}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{BF698331-FF65-4B1E-850D-2E399434580B}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{70F83AD9-235D-4675-8585-608EB089EF94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70F83AD9-235D-4675-8585-608EB089EF94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70F83AD9-235D-4675-8585-608EB089EF94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70F83AD9-235D-4675-8585-608EB089EF94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26580595-F4DC-41EE-BA66-0EF4692243AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26580595-F4DC-41EE-BA66-0EF4692243AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26580595-F4DC-41EE-BA66-0EF4692243AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26580595-F4DC-41EE-BA66-0EF4692243AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

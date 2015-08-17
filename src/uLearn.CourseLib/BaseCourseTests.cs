@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Threading;
 using NUnit.Framework;
 using RunCsJob;
+using RunCsJob.Api;
 using uLearn.Model.Blocks;
 
 namespace uLearn

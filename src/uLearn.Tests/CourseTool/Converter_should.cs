@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using uLearn;
 using uLearn.Model.Blocks;
 using uLearn.Model.Edx;
 using uLearn.Model.Edx.EdxComponents;

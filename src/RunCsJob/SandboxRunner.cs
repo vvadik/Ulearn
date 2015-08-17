@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using Microsoft.CSharp;
 using Newtonsoft.Json;
+using RunCsJob.Api;
 
 namespace RunCsJob
 {

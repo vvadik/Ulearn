@@ -51,9 +51,6 @@
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Activities" />
     <Reference Include="System.Collections.Immutable, Version=1.1.36.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -80,7 +77,6 @@
   <ItemGroup>
     <Compile Include="AcceptedSolutionInfo.cs" />
     <Compile Include="AnalyticsTableInfo.cs" />
-    <Compile Include="BaseCourseTests.cs" />
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="CommentAfterExerciseIsSolved.cs" />
     <Compile Include="Course.cs" />
@@ -177,13 +173,9 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CsSandboxer\CsSandboxer.csproj">
-      <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
-      <Name>CsSandboxer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RunCsJob\RunCsJob.csproj">
-      <Project>{77b16f9d-3cdf-4cc6-be5f-b6badfac5394}</Project>
-      <Name>RunCsJob</Name>
+    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
+      <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
+      <Name>RunCsJob.Api</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
