@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using LtiLibrary.Owin.Security.Lti.Provider;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
 using uLearn.Web.DataContexts;
@@ -22,38 +24,55 @@ namespace uLearn.Web.LTI
 		/// <returns>A <see cref="Task"/> representing the completed operation.</returns>
 		public static async Task OnAuthenticated(LtiAuthenticatedContext context, IEnumerable<Claim> claims = null)
 		{
-			// Find existing pairing between LTI user and application user
-			var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb()));
-			var loginProvider = string.Join(":", new[] { context.Options.AuthenticationType, context.LtiRequest.ConsumerKey });
-			var providerKey = context.LtiRequest.UserId;
-			var login = new UserLoginInfo(loginProvider, providerKey);
-			var user = await userManager.FindAsync(login);
-			if (user == null)
+			ClaimsIdentity identity;
+			if (!IsAuthenticated(context.OwinContext))
 			{
-				var usernameContext = new LtiGenerateUserNameContext(context.OwinContext, context.LtiRequest);
-				await context.Options.Provider.GenerateUserName(usernameContext);
-				if (string.IsNullOrEmpty(usernameContext.UserName))
-				{
-					return;
-				}
-				user = await userManager.FindByNameAsync(usernameContext.UserName);
+				// Find existing pairing between LTI user and application user
+				var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb()));
+				var loginProvider = string.Join(":", new[] { context.Options.AuthenticationType, context.LtiRequest.ConsumerKey });
+				var providerKey = context.LtiRequest.UserId;
+				var login = new UserLoginInfo(loginProvider, providerKey);
+				var user = await userManager.FindAsync(login);
 				if (user == null)
 				{
-					user = new ApplicationUser { UserName = usernameContext.UserName };
-					var result = await userManager.CreateAsync(user);
-					if (!result.Succeeded)
+					var usernameContext = new LtiGenerateUserNameContext(context.OwinContext, context.LtiRequest);
+					await context.Options.Provider.GenerateUserName(usernameContext);
+					if (string.IsNullOrEmpty(usernameContext.UserName))
 					{
 						return;
 					}
+					user = await userManager.FindByNameAsync(usernameContext.UserName);
+					if (user == null)
+					{
+						user = new ApplicationUser { UserName = usernameContext.UserName };
+						var result = await userManager.CreateAsync(user);
+						if (!result.Succeeded)
+						{
+							return;
+						}
+					}
+					// Save the pairing between LTI user and application user
+					await userManager.AddLoginAsync(user.Id, login);
 				}
-				// Save the pairing between LTI user and application user
-				await userManager.AddLoginAsync(user.Id, login);
+
+				// Create the application identity, add the LTI request as a claim, and sign in
+				identity = await userManager.CreateIdentityAsync(user, context.Options.SignInAsAuthenticationType);
+			}
+			else
+			{
+				identity = (ClaimsIdentity)context.OwinContext.Authentication.User.Identity;
 			}
 
-			// Create the application identity, add the LTI request as a claim, and sign in
-			var identity = await userManager.CreateIdentityAsync(user, context.Options.SignInAsAuthenticationType);
-			identity.AddClaim(new Claim(context.Options.ClaimType, JsonConvert.SerializeObject(context.LtiRequest, Formatting.None,
-					new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }), ClaimValueTypes.String, context.Options.AuthenticationType));
+			var json = JsonConvert.SerializeObject(context.LtiRequest, Formatting.None,
+				new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+			
+			var claimsToRemove = identity.Claims.Where(c => c.Type.Equals("LtiRequest"));
+			foreach (var claim in claimsToRemove)
+			{
+				identity.RemoveClaim(claim);
+			}
+
+			identity.AddClaim(new Claim(context.Options.ClaimType, json, ClaimValueTypes.String, context.Options.AuthenticationType));
 			if (claims != null)
 			{
 				foreach (var claim in claims)
@@ -96,6 +115,14 @@ namespace uLearn.Web.LTI
 			}
 
 			return Task.FromResult<object>(null);
+		}
+
+		private static bool IsAuthenticated(IOwinContext context)
+		{
+			var auth = context.Authentication;
+			return auth.User != null
+					&& auth.User.Identity != null
+					&& auth.User.Identity.IsAuthenticated;
 		}
 	}
 }
