@@ -1,6 +1,14 @@
 ﻿@model UserViewModel
 
 
+@if (!Model.HasPassword)
+{
+	<p class="text-info">
+		У вас еще нет логина и пароля для этого сайта.
+		Создайте логин и пароль и вы сможете заходить на этот сайт без использования внешнего логина.
+	</p>
+}
+
 @using (Html.BeginForm("ChangeDetailsPartial", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 {
 	@Html.AntiForgeryToken()
@@ -19,6 +27,21 @@
 			@Html.TextBoxFor(m => m.GroupName, new { @class = "form-control" })
 		</div>
 	</div>
+	if (!Model.HasPassword)
+	{
+		<div class="form-group">
+			@Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
+			<div class="col-md-10">
+				@Html.TextBoxFor(m => m.Password, new { @class = "form-control" })
+			</div>
+		</div>
+		<div class="form-group">
+			@Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label" })
+			<div class="col-md-10">
+				@Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+			</div>
+		</div>
+	}
 	<div class="form-group">
 		<div class="col-md-offset-2 col-md-10">
 			<input type="submit" value="Сохранить изменения" class="btn btn-default" />

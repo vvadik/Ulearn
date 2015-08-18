@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -488,7 +485,8 @@ namespace uLearn.Web.Controllers
 		public async Task<PartialViewResult> ChangeDetailsPartial()
 		{
 			var user = await UserManager.FindByNameAsync(User.Identity.Name);
-			return PartialView(new UserViewModel { Name = user.UserName, GroupName = user.GroupName, UserId = user.Id });
+			var hasPassword = HasPassword();
+			return PartialView(new UserViewModel { Name = user.UserName, GroupName = user.GroupName, UserId = user.Id, HasPassword = hasPassword });
 		}
 
 		[HttpPost]
@@ -505,6 +503,9 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
 			user.UserName = userModel.Name;
 			user.GroupName = userModel.GroupName;
+			await UserManager.RemovePasswordAsync(user.Id);
+			await UserManager.AddPasswordAsync(user.Id, userModel.Password);
+			
 			await UserManager.UpdateAsync(user);
 
 			if (nameChanged)
