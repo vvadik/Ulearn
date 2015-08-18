@@ -97,12 +97,12 @@ namespace uLearn.Web.LTI
 		{
 			if (string.IsNullOrEmpty(context.LtiRequest.LisPersonEmailPrimary))
 			{
-				var username = string.Concat("anon_", context.LtiRequest.UserId);
+				var username = context.LtiRequest.UserId;
 				Uri url;
 				if (string.IsNullOrEmpty(context.LtiRequest.ToolConsumerInstanceUrl)
 					|| !Uri.TryCreate(context.LtiRequest.ToolConsumerInstanceUrl, UriKind.Absolute, out url))
 				{
-					context.UserName = string.Concat(username, "@anon_", context.LtiRequest.ConsumerKey, ".lti");
+					context.UserName = string.Concat(username, "@", context.LtiRequest.ConsumerKey);
 				}
 				else
 				{
