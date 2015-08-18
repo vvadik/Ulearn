@@ -96,9 +96,16 @@ namespace uLearn.Model.Edx
 			}
 		}
 
-		public Sequential GetSequentialContainingVertical(string id)
+		public Sequential GetSequentialContainingVertical(string verticalId)
 		{
-			return CourseWithChapters.Chapters.SelectMany(x => x.Sequentials.Where(y => y.Verticals.Any(z => z.UrlName == id))).Single();
+			var sequentials = CourseWithChapters.Chapters.SelectMany(
+				x => x.Sequentials.Where(y => y.Verticals.Any(z => z.UrlName == verticalId))).ToList();
+			if (sequentials.Count > 1)
+				throw new Exception(
+					string.Format("Vertical {0} are in several sequentials {1}", 
+					verticalId, 
+					string.Join(", ", sequentials.Select(s => s.UrlName))));
+			return sequentials.Single();
 		}
 
 		public Vertical GetVerticalById(string id)

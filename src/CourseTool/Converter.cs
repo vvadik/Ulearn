@@ -12,7 +12,7 @@ namespace uLearn.CourseTool
 			var units = course.GetUnits().ToList();
 			return Enumerable
 				.Range(0, units.Count)
-				.Select(x => new Chapter(string.Format("{0}-{1}", course.Id, x), units[x], new [] {
+				.Select(x => new Chapter(string.Format("{0}-{1}", course.Id, x), units[x], new[] {
 						new Sequential(string.Format("{0}-{1}-{2}", course.Id, x, 0), units[x], 
 							course.Slides
 								.Where(s => !config.IgnoredSlides.Contains(s.Id))
@@ -27,7 +27,7 @@ namespace uLearn.CourseTool
 		public static EdxCourse ToEdxCourse(Course course, Config config,
 			Dictionary<string, string> youtubeId2UlearnVideoIds)
 		{
-			return new EdxCourse(course.Id, config.Organization, course.Title, null, null, CourseToChapters(course, config, youtubeId2UlearnVideoIds));
+			return new EdxCourse(course.Id, config.Organization, course.Title, new[] { "lti" }, null, CourseToChapters(course, config, youtubeId2UlearnVideoIds));
 		}
 	}
 }

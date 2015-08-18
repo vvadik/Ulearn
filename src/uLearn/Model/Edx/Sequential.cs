@@ -14,8 +14,12 @@ namespace uLearn.Model.Edx
 			get { return "sequential"; }
 		}
 
+		private VerticalReference[] verticalReferences;
+
 		[XmlElement("vertical")]
-		public VerticalReference[] VerticalReferences;
+		public VerticalReference[] VerticalReferences {
+			get { return verticalReferences ?? new VerticalReference[0]; }
+			set { verticalReferences = value; } }
 
 		[XmlIgnore]
 		public Vertical[] Verticals;

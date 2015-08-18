@@ -29,7 +29,7 @@ namespace uLearn.CourseTool
 				patcher.PatchComponents(
 					edxCourse,
 					videoComponents,
-					guids != null || ReplaceExisting
+					guids != null || !SkipExistingGuids
 					);
 			}
 		}

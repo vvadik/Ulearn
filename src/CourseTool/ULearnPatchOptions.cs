@@ -13,7 +13,9 @@ namespace uLearn.CourseTool
 	{
 		public override void Patch(OlxPatcher patcher, Config config, EdxCourse edxCourse)
 		{
-			var ulearnCourse = new CourseLoader().LoadCourse(new DirectoryInfo(string.Format("{0}/{1}", Dir, config.ULearnCourseId)));
+			var ulearnDir = new DirectoryInfo(string.Format("{0}/{1}", Dir, config.ULearnCourseId));
+			Console.WriteLine("Loading Ulearn course from {0}", ulearnDir.Name);
+			var ulearnCourse = new CourseLoader().LoadCourse(ulearnDir);
 
 			var videoJson = string.Format("{0}/{1}", Dir, config.Video);
 			var video = File.Exists(videoJson)
@@ -38,7 +40,7 @@ namespace uLearn.CourseTool
 						videoGuids,
 						config.LtiId
 						).ToArray()),
-				guids != null || ReplaceExisting
+				guids != null || !SkipExistingGuids
 				);
 		}
 	}

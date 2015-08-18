@@ -1,5 +1,4 @@
-﻿using System.Runtime.Remoting.Messaging;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Edx
