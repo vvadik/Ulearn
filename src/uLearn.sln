@@ -28,9 +28,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6BAF40
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Help", "courses\Help\Help.csproj", "{E48C481C-AA34-4413-AED3-4B685AFF3239}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicProgramming", "courses\BasicProgramming\Part01\BasicProgramming.csproj", "{83A81211-A139-4A37-92A0-716809232F08}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicProgramming", "courses\BasicProgramming\Part01\BasicProgramming\BasicProgramming.csproj", "{83A81211-A139-4A37-92A0-716809232F08}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicProgramming2", "courses\BasicProgramming\Part02\BasicProgramming2.csproj", "{12A81211-B139-2A37-82A0-616809232F12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicProgramming2", "courses\BasicProgramming\Part02\BasicProgramming2\BasicProgramming2.csproj", "{12A81211-B139-2A37-82A0-616809232F12}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIML", "courses\AIML\AIML.csproj", "{FE23302C-0D46-4C8E-81BE-C9B79F6E0263}"
 EndProject

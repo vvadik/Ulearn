@@ -11,7 +11,7 @@ namespace uLearn.CourseTool
 		public void ConfigTemplate_IsOk()
 		{
 			var config = new FileInfo("templates\\config.xml").DeserializeXml<Config>();
-			config.IgnoredSlides = new[] { "1", "2" };
+			config.IgnoredUlearnSlides = new[] { "1", "2" };
 			Approvals.VerifyXml(config.XmlSerialize());
 		}
 	}

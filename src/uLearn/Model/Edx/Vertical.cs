@@ -21,7 +21,7 @@ namespace uLearn.Model.Edx
 		[XmlElement("html", Type = typeof(HtmlComponentReference))]
 		[XmlElement("problem", Type = typeof(ProblemComponentReference))]
 		[XmlElement("lti", Type = typeof(LtiComponentReference))]
-		public EdxReference[] ComponentReferences { get; set; }
+		public EdxReference[] ComponentReferences = new EdxReference[0];
 
 		public Vertical()
 		{

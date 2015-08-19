@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.IO;
+using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 using uLearn;
@@ -41,7 +42,20 @@ namespace uLearn.CourseTool
 			var baseUrl = String.Format("http://{0}:{1}", host, port);
 			var downloadUrl = String.Format("{0}/export/{1}/{2}/{3}?_accept=application/x-tgz", baseUrl, organization, course, time);
 			var client = GetLoggedInClient(baseUrl, email, password);
-			client.DownloadFile(downloadUrl, filename);
+			try
+			{
+				client.DownloadFile(downloadUrl, filename);
+			}
+			catch (WebException e)
+			{
+				var response = e.Response.GetResponseStream().GetString();
+				Console.WriteLine("Download failed");
+				Console.WriteLine(downloadUrl);
+				Console.WriteLine(e.Message);
+				File.WriteAllText("errorResponse.html", response);
+				Console.WriteLine("Error details in errorResponse.html");
+				throw new OperationFailedGracefully();
+			}
 		}
 
 		public static void Download(string baseDir, Config config, Credentials credentials)
@@ -57,19 +71,43 @@ namespace uLearn.CourseTool
 
 		public static void Upload(string host, int port, string email, string password, string organization, string course, string time, string filename)
 		{
-			var baseUrl = String.Format("http://{0}:{1}", host, port);
-			var uploadUrl = String.Format("{0}/import/{1}/{2}/{3}", baseUrl, organization, course, time);
+			var baseUrl = string.Format("http://{0}:{1}", host, port);
+			var uploadUrl = string.Format("{0}/import/{1}/{2}/{3}", baseUrl, organization, course, time);
 			var client = GetLoggedInClient(baseUrl, email, password);
 
 			var boundary = "---" + DateTime.Now.Ticks.ToString("x");
 			client.Headers.Add("Content-Type", "multipart/form-data; boundary=" + boundary);
 			var fileData = client.Encoding.GetString(File.ReadAllBytes(filename));
-			var package = String.Format("--{0}\r\nContent-Disposition: form-data; name=\"course-data\"; filename=\"{1}\"\r\nContent-Type: {2}\r\n\r\n{3}\r\n--{0}--\r\n", boundary, filename, "application/gzip", fileData);
+			var package = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"course-data\"; filename=\"{1}\"\r\nContent-Type: {2}\r\n\r\n{3}\r\n--{0}--\r\n", boundary, filename, "application/gzip", fileData);
 			var nfile = client.Encoding.GetBytes(package);
 
-			var response = JsonConvert.DeserializeObject<dynamic>(Encoding.UTF8.GetString(client.UploadData(uploadUrl, "POST", nfile)));
+			var responseString = TryUpload(client, uploadUrl, nfile);
+			var response = JsonConvert.DeserializeObject<dynamic>(responseString);
 			if (response.Status.ToObject<string>() != "OK")
-				throw new UploadException();
+			{
+				Console.WriteLine("Upload failed");
+				Console.WriteLine(uploadUrl);
+				Console.WriteLine(responseString);
+				throw new OperationFailedGracefully();
+			}
+		}
+
+		private static string TryUpload(CookieAwareWebClient client, string uploadUrl, byte[] nfile)
+		{
+			try
+			{
+				return Encoding.UTF8.GetString(client.UploadData(uploadUrl, "POST", nfile));
+			}
+			catch (WebException e)
+			{
+				var response = e.Response.GetResponseStream().GetString();
+				Console.WriteLine("Upload failed");
+				Console.WriteLine(uploadUrl);
+				Console.WriteLine(e.Message);
+				File.WriteAllText("errorResponse.html", response);
+				Console.WriteLine("Error details in errorResponse.html");
+				throw new OperationFailedGracefully();
+			}
 		}
 
 		public static void Upload(string baseDir, string courseName, Config config, Credentials credentials)
@@ -92,5 +130,9 @@ namespace uLearn.CourseTool
 			Upload(config.Hostname, config.Port, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, courseName + ".tar.gz");
 			Utils.DeleteFileIfExists(courseName + ".tar.gz");
 		}
+	}
+
+	public class OperationFailedGracefully : Exception
+	{
 	}
 }

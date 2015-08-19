@@ -9,8 +9,8 @@
   <LtiId>edx</LtiId>
   <ULearnCourseId>BasicProgramming</ULearnCourseId>
   <Video>video.json</Video>
-  <IgnoredSlides>
+  <IgnoredUlearnSlides>
     <SlideId>1</SlideId>
     <SlideId>2</SlideId>
-  </IgnoredSlides>
+  </IgnoredUlearnSlides>
 </Config>
