@@ -198,7 +198,7 @@ namespace uLearn.Web.Controllers
 							: message == ManageMessageId.Error
 								? "Ошибка."
 								: "";
-			ViewBag.HasLocalPassword = HasPassword();
+			ViewBag.HasLocalPassword = ControllerUtils.HasPassword(UserManager, User);
 			ViewBag.ReturnUrl = Url.Action("Manage");
 			return View();
 		}
@@ -209,7 +209,7 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Manage(ManageUserViewModel model)
 		{
-			bool hasPassword = HasPassword();
+			bool hasPassword = ControllerUtils.HasPassword(UserManager, User);
 			ViewBag.HasLocalPassword = hasPassword;
 			ViewBag.ReturnUrl = Url.Action("Manage");
 			if (hasPassword)
@@ -381,7 +381,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult RemoveAccountList()
 		{
 			var linkedAccounts = UserManager.GetLogins(User.Identity.GetUserId());
-			ViewBag.ShowRemoveButton = HasPassword() || linkedAccounts.Count > 1;
+			ViewBag.ShowRemoveButton = ControllerUtils.HasPassword(UserManager, User) || linkedAccounts.Count > 1;
 			return (ActionResult)PartialView("_RemoveAccountPartial", linkedAccounts);
 		}
 
@@ -418,16 +418,6 @@ namespace uLearn.Web.Controllers
 			{
 				ModelState.AddModelError("", error);
 			}
-		}
-
-		private bool HasPassword()
-		{
-			var user = UserManager.FindById(User.Identity.GetUserId());
-			if (user != null)
-			{
-				return user.PasswordHash != null;
-			}
-			return false;
 		}
 
 		public enum ManageMessageId
@@ -485,7 +475,7 @@ namespace uLearn.Web.Controllers
 		public async Task<PartialViewResult> ChangeDetailsPartial()
 		{
 			var user = await UserManager.FindByNameAsync(User.Identity.Name);
-			var hasPassword = HasPassword();
+			var hasPassword = ControllerUtils.HasPassword(UserManager, User);
 			return PartialView(new UserViewModel { Name = user.UserName, GroupName = user.GroupName, UserId = user.Id, HasPassword = hasPassword });
 		}
 

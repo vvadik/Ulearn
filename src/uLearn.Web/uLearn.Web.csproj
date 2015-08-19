@@ -236,6 +236,7 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="codemirror\CsCompleterGenerator.cs" />
+    <Compile Include="Controllers\ControllerUtils.cs" />
     <Compile Include="Controllers\QuestionsController.cs" />
     <Compile Include="Controllers\RunnerController.cs" />
     <Compile Include="Controllers\SandboxController.cs" />

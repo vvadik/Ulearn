@@ -12,19 +12,9 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult Index()
 		{
-			if (User.Identity.GetUserId() == null || HasPassword())
+			if (User.Identity.GetUserId() == null || ControllerUtils.HasPassword(userManager, User))
 				return View();
 			return RedirectToAction("Manage", "Account");
-		}
-
-		private bool HasPassword()
-		{
-			var user = userManager.FindById(User.Identity.GetUserId());
-			if (user != null)
-			{
-				return user.PasswordHash != null;
-			}
-			return false;
 		}
 	}
 }
