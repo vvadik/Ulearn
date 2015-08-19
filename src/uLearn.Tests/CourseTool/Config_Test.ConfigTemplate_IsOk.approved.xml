@@ -1,16 +1,16 @@
 ﻿<Config>
-  <Hostname>openedu.urfu.ru</Hostname>
-  <Port>8081</Port>
-  <Organization>UrFU</Organization>
-  <CourseNumber>IMCS.b.CS-0093</CourseNumber>
-  <CourseRun>2015</CourseRun>
-  <ExerciseUrl>https://ulearn.azurewebsites.net/Course/{0}/LtiSlide/{1}</ExerciseUrl>
-  <SolutionsUrl>https://ulearn.azurewebsites.net/Course/{0}/AcceptedAlert/{1}</SolutionsUrl>
-  <LtiId>edx</LtiId>
-  <ULearnCourseId>BasicProgramming</ULearnCourseId>
-  <Video>video.json</Video>
-  <IgnoredSlides>
-    <SlideId>1</SlideId>
-    <SlideId>2</SlideId>
-  </IgnoredSlides>
+	<Hostname>openedu.urfu.ru</Hostname>
+	<Port>8081</Port>
+	<Organization>UrFU</Organization>
+	<CourseNumber>IMCS.b.CS-0093</CourseNumber>
+	<CourseRun>2015</CourseRun>
+	<ExerciseUrl>https://ulearn.azurewebsites.net/Course/{0}/LtiSlide/{1}</ExerciseUrl>
+	<SolutionsUrl>https://ulearn.azurewebsites.net/Course/{0}/AcceptedAlert/{1}</SolutionsUrl>
+	<LtiId>edx</LtiId>
+	<ULearnCourseId>BasicProgramming</ULearnCourseId>
+	<Video>video.json</Video>
+	<IgnoredUlearnSlides>
+		<SlideId>1</SlideId>
+		<SlideId>2</SlideId>
+	</IgnoredUlearnSlides>
 </Config>
