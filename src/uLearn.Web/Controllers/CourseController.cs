@@ -67,6 +67,7 @@ namespace uLearn.Web.Controllers
 			{
 				CourseId = courseId,
 				SlideIndex = slideIndex,
+				SlideId = slide.Id,
 				ExerciseBlock = slide.Exercise,
 				Context = CreateRenderContext(course, slide, userId, visiter, true)
 			};
@@ -78,7 +79,6 @@ namespace uLearn.Web.Controllers
 			var user = User.Identity as ClaimsIdentity;
 			if (user == null)
 				return null;
-
 			var claim = user.Claims.FirstOrDefault(c => c.Type.Equals("LtiRequest"));
 			return claim == null ? null : claim.Value;
 		}

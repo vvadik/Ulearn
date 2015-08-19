@@ -8,6 +8,6 @@ namespace uLearn.Web.Models
 		public string CourseId;
 		public int SlideIndex;
 		public BlockRenderContext Context;
-
+		public string SlideId;
 	}
 }

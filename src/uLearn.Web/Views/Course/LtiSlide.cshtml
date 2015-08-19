@@ -1,4 +1,5 @@
-﻿@using uLearn.Web.Views.Course
+﻿@using uLearn
+@using uLearn.Web.Views.Course
 @model CodeModel
 
 @{
@@ -17,6 +18,8 @@
 
 			@Scripts.Render("~/main-js")
 			<script> getHints("@Model.CourseId", "@Model.SlideIndex", '@Model.ExerciseBlock.HintsMd.Count') </script>
+			ExerciseBlockData data = Model.Context.GetBlockData(Model.ExerciseBlock);
+			<script> refreshPreviousDraft('@(data.LatestAcceptedSolution != null)', '@Model.SlideId') </script>
 		}
 	</body>
 </html>
