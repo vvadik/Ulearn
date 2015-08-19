@@ -15,6 +15,6 @@ namespace uLearn.CourseTool
 		public string ULearnCourseId;
 		public string Video;
 		[XmlArrayItem("SlideId")]
-		public string[] IgnoredSlides = new string[0];
+		public string[] IgnoredUlearnSlides = new string[0];
 	}
 }
