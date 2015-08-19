@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using uLearn;
 using uLearn.Model.Edx;
 
 namespace uLearn.CourseTool
 {
 	public static class Converter
 	{
-		private static Chapter[] CourseToChapters(Course course, Config config, Dictionary<string, string> videoGuids)
+		private static Chapter[] CourseToChapters(Course course, Config config, string exerciseUrl, string solutionsUrl, Dictionary<string, string> videoGuids)
 		{
 			var units = course.GetUnits().ToList();
 			return Enumerable
@@ -17,17 +16,17 @@ namespace uLearn.CourseTool
 							course.Slides
 								.Where(s => !config.IgnoredUlearnSlides.Contains(s.Id))
 								.Where(y => y.Info.UnitName == units[x])
-								.SelectMany(y => y.ToVerticals(course.Id, config.ExerciseUrl, config.SolutionsUrl, videoGuids, config.LtiId))
+								.SelectMany(y => y.ToVerticals(course.Id, exerciseUrl, solutionsUrl, videoGuids, config.LtiId))
 								.ToArray()
 						)
 					})
 				).ToArray();
 		}
 
-		public static EdxCourse ToEdxCourse(Course course, Config config,
+		public static EdxCourse ToEdxCourse(Course course, Config config, string exerciseUrl, string solutionsUrl,
 			Dictionary<string, string> youtubeId2UlearnVideoIds)
 		{
-			return new EdxCourse(course.Id, config.Organization, course.Title, new[] { "lti" }, null, CourseToChapters(course, config, youtubeId2UlearnVideoIds));
+			return new EdxCourse(course.Id, config.Organization, course.Title, new[] { "lti" }, null, CourseToChapters(course, config, exerciseUrl, solutionsUrl, youtubeId2UlearnVideoIds));
 		}
 	}
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using CommandLine;
+﻿using CommandLine;
 using uLearn.Model.Edx;
 
 namespace uLearn.CourseTool
@@ -10,7 +9,7 @@ namespace uLearn.CourseTool
 		[Option('s', "source", HelpText = "Source directory for custom slides", Required = true)]
 		public string SourceDir { get; set; }
 
-		public override void Patch(OlxPatcher patcher, Config config, EdxCourse edxCourse)
+		public override void Patch(OlxPatcher patcher, Config config, Profile profile, EdxCourse edxCourse)
 		{
 			// input
 			//			 patcher.PatchComponents(...);

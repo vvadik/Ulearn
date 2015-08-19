@@ -1,19 +1,11 @@
 <!-- Replace default values in config with your values -->
 <Config>
-	<!-- Hostname of OpenEdx Studio instance -->
-	<Hostname>openedu.urfu.ru</Hostname>
-	<!-- Port of OpenEdx Studio instance -->
-	<Port>8081</Port>
 	<!-- Name of the organization that you used when creating a course -->
 	<Organization>UrFU</Organization>
 	<!-- Course Number that you used when creating a course -->
 	<CourseNumber>IMCS.b.CS-0093</CourseNumber>
 	<!-- Course Run that you used when creating a course -->
 	<CourseRun>2015</CourseRun>
-	<!-- If you use uLearn Exercise slides this must be set correctly -->
-	<ExerciseUrl>https://ulearn.azurewebsites.net/Course/{0}/LtiSlide/{1}</ExerciseUrl>
-	<!-- If you use uLearn Exercise slides this must be set correctly -->
-	<SolutionsUrl>https://ulearn.azurewebsites.net/Course/{0}/AcceptedAlert/{1}</SolutionsUrl>
 	<!-- Lti Id used to access Exercise slides -->
 	<LtiId>edx</LtiId>
 	<!-- Id of corresponding uLearn course -->
@@ -27,4 +19,16 @@
 		<SlideId>2</SlideId>
 		-->
 	</IgnoredUlearnSlides>
+	<!-- Here you can set up your profiles -->
+	<Profiles>
+		<!-- the 'default' profile will be used when patching/converting if not specified -->
+		<Profile name="default">
+			<EdxStudioUrl>https://openedu.urfu.ru:8081</EdxStudioUrl>
+			<UlearnUrl>https://ulearn.azurewebsites.net</UlearnUrl>
+		</Profile>
+		<Profile name="dev">
+			<EdxStudioUrl>http://192.168.33.10:18010</EdxStudioUrl>
+			<UlearnUrl>https://localhost:44300</UlearnUrl>
+		</Profile>
+	</Profiles>
 </Config>

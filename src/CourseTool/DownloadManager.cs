@@ -4,20 +4,9 @@ using System.IO;
 using System.Net;
 using System.Text;
 using Newtonsoft.Json;
-using uLearn;
 
 namespace uLearn.CourseTool
 {
-	public class LoginException : Exception
-	{
-		public LoginException() : base() { }
-		public LoginException(string message) : base(message) { }
-	}
-
-	public class UploadException : Exception
-	{
-	}
-
 	public static class DownloadManager
 	{
 		private static CookieAwareWebClient GetLoggedInClient(string baseUrl, string email, string password)
@@ -33,15 +22,18 @@ namespace uLearn.CourseTool
 				{ "password", password }
 			})));
 			if (!response.success.ToObject<bool>())
-				throw new LoginException(response.value.ToObject<string>());
+			{
+				Console.WriteLine("Login failed:");
+				Console.WriteLine(response.value.ToObject<string>());
+				throw new OperationFailedGracefully();
+			}
 			return client;
 		}
 
-		public static void Download(string host, int port, string email, string password, string organization, string course, string time, string filename)
+		public static void Download(string edxStudioUrl, string email, string password, string organization, string course, string time, string filename)
 		{
-			var baseUrl = String.Format("http://{0}:{1}", host, port);
-			var downloadUrl = String.Format("{0}/export/{1}/{2}/{3}?_accept=application/x-tgz", baseUrl, organization, course, time);
-			var client = GetLoggedInClient(baseUrl, email, password);
+			var downloadUrl = String.Format("{0}/export/{1}/{2}/{3}?_accept=application/x-tgz", edxStudioUrl, organization, course, time);
+			var client = GetLoggedInClient(edxStudioUrl, email, password);
 			try
 			{
 				client.DownloadFile(downloadUrl, filename);
@@ -58,10 +50,10 @@ namespace uLearn.CourseTool
 			}
 		}
 
-		public static void Download(string baseDir, Config config, Credentials credentials)
+		public static void Download(string baseDir, Config config, string edxStudioUrl, Credentials credentials)
 		{
 			Console.WriteLine("Downloading {0}.tar.gz", config.CourseRun);
-			Download(config.Hostname, config.Port, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, config.CourseRun + ".tar.gz");
+			Download(edxStudioUrl, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, config.CourseRun + ".tar.gz");
 
 			ArchiveManager.ExtractTar(config.CourseRun + ".tar.gz", ".");
 			Utils.DeleteFileIfExists(config.CourseRun + ".tar.gz");
@@ -69,11 +61,10 @@ namespace uLearn.CourseTool
 			Directory.Move(config.CourseRun, baseDir + "/olx");
 		}
 
-		public static void Upload(string host, int port, string email, string password, string organization, string course, string time, string filename)
+		public static void Upload(string edxStudioUrl, string email, string password, string organization, string course, string time, string filename)
 		{
-			var baseUrl = string.Format("http://{0}:{1}", host, port);
-			var uploadUrl = string.Format("{0}/import/{1}/{2}/{3}", baseUrl, organization, course, time);
-			var client = GetLoggedInClient(baseUrl, email, password);
+			var uploadUrl = string.Format("{0}/import/{1}/{2}/{3}", edxStudioUrl, organization, course, time);
+			var client = GetLoggedInClient(edxStudioUrl, email, password);
 
 			var boundary = "---" + DateTime.Now.Ticks.ToString("x");
 			client.Headers.Add("Content-Type", "multipart/form-data; boundary=" + boundary);
@@ -110,7 +101,7 @@ namespace uLearn.CourseTool
 			}
 		}
 
-		public static void Upload(string baseDir, string courseName, Config config, Credentials credentials)
+		public static void Upload(string baseDir, string courseName, Config config, string edxStudioUrl, Credentials credentials)
 		{
 			Environment.CurrentDirectory = baseDir;
 			Utils.DeleteDirectoryIfExists("temp");
@@ -127,7 +118,7 @@ namespace uLearn.CourseTool
 				Directory.Move("temp", courseName);
 
 			Console.WriteLine("Uploading {0}.tar.gz...", courseName);
-			Upload(config.Hostname, config.Port, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, courseName + ".tar.gz");
+			Upload(edxStudioUrl, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, courseName + ".tar.gz");
 			Utils.DeleteFileIfExists(courseName + ".tar.gz");
 		}
 	}

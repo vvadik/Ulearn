@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using CommandLine;
 using uLearn.Model.Edx;
 
@@ -7,9 +8,6 @@ namespace uLearn.CourseTool
 {
 	abstract class PatchOptions : AbstractOptions
 	{
-		[Option('d', "dir", HelpText = "Working directory for the project")]
-		public string Dir { get; set; }
-
 		[Option('s', "skip-existing", Default=false, HelpText = "If set, patch skips uLearn slides if edx slide with the same id exists already")]
 		public bool SkipExistingGuids { get; set; }
 
@@ -25,29 +23,32 @@ namespace uLearn.CourseTool
 		public override int Execute()
 		{
 			Dir = Dir ?? Directory.GetCurrentDirectory();
+			Profile = Profile ?? "default";
+
 			var configFile = Dir + "/config.xml";
 
 			if (Start(Dir, configFile))
 				return 0;
 
 			var config = new FileInfo(configFile).DeserializeXml<Config>();
-			var credentials = Credentials.GetCredentials(Dir);
+			var profile = CourseTool.Profile.GetProfile(config, Profile);
+			var credentials = Credentials.GetCredentials(Dir, Profile);
 
 			if (DownloadOnly || !UploadOnly)
-				DownloadManager.Download(Dir, config, credentials);
+				DownloadManager.Download(Dir, config, profile.EdxStudioUrl, credentials);
 
 			Console.WriteLine("Loading OLX");
 			var edxCourse = EdxCourse.Load(Dir + "/olx");
 
 			Console.WriteLine("Patching OLX...");
-			Patch(new OlxPatcher(Dir + "/olx"), config, edxCourse);
+			Patch(new OlxPatcher(Dir + "/olx"), config, profile, edxCourse);
 			Console.WriteLine("Patched!");
 
 			if(UploadOnly || !DownloadOnly)
-				DownloadManager.Upload(Dir, edxCourse.CourseName, config, credentials);
+				DownloadManager.Upload(Dir, edxCourse.CourseName, config, profile.EdxStudioUrl, credentials);
 			return 0;
 		}
 
-		public abstract void Patch(OlxPatcher patcher, Config config, EdxCourse edxCourse);
+		public abstract void Patch(OlxPatcher patcher, Config config, Profile profile, EdxCourse edxCourse);
 	}
 }

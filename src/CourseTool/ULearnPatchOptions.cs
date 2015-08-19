@@ -11,7 +11,7 @@ namespace uLearn.CourseTool
 	[Verb("patch_ulearn", HelpText = "Patch Edx course with new slides from uLearn course")]
 	class ULearnPatchOptions : PatchOptions
 	{
-		public override void Patch(OlxPatcher patcher, Config config, EdxCourse edxCourse)
+		public override void Patch(OlxPatcher patcher, Config config, Profile profile, EdxCourse edxCourse)
 		{
 			var ulearnDir = new DirectoryInfo(string.Format("{0}/{1}", Dir, config.ULearnCourseId));
 			Console.WriteLine("Loading Ulearn course from {0}", ulearnDir.Name);
@@ -35,8 +35,8 @@ namespace uLearn.CourseTool
 					.Where(x => guids == null || guids.Contains(x.Guid))
 					.Select(x => x.ToVerticals(
 						ulearnCourse.Id, 
-						config.ExerciseUrl, 
-						config.SolutionsUrl, 
+						profile.UlearnUrl + ExerciseUrlFormat, 
+						profile.UlearnUrl + SolutionsUrlFormat, 
 						videoGuids,
 						config.LtiId
 						).ToArray()),

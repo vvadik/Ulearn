@@ -11,7 +11,7 @@ namespace uLearn.CourseTool
 	[Verb("patch_video", HelpText = "Patch Edx course with videos from json file")]
 	class VideoPatchOptions : PatchOptions
 	{
-		public override void Patch(OlxPatcher patcher, Config config, EdxCourse edxCourse)
+		public override void Patch(OlxPatcher patcher, Config config, Profile profile, EdxCourse edxCourse)
 		{
 			var videoJson = string.Format("{0}/{1}", Dir, config.Video);
 			var video = File.Exists(videoJson)

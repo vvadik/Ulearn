@@ -11,21 +11,21 @@ namespace uLearn.CourseTool
 	[Verb("convert", HelpText = "Convert uLearn course to Edx course")]
 	class ConvertOptions : AbstractOptions
 	{
-		[Option('d', "dir", HelpText = "Working directory for the project")]
-		public string Dir { get; set; }
-
 		public override int Execute()
 		{
 			Dir = Dir ?? Directory.GetCurrentDirectory();
+			Profile = Profile ?? "default";
+
 			var configFile = Dir + "/config.xml";
 
 			if (Start(Dir, configFile))
 				return 0;
 
 			var config = new FileInfo(configFile).DeserializeXml<Config>();
-			var credentials = Credentials.GetCredentials(Dir);
+			var profile = CourseTool.Profile.GetProfile(config, Profile);
+			var credentials = Credentials.GetCredentials(Dir, Profile);
 
-			DownloadManager.Download(Dir, config, credentials);
+			DownloadManager.Download(Dir, config, profile.EdxStudioUrl, credentials);
 			
 			try
 			{
@@ -63,10 +63,12 @@ namespace uLearn.CourseTool
 			Converter.ToEdxCourse(
 				course,
 				config,
+				profile.UlearnUrl + ExerciseUrlFormat,
+				profile.UlearnUrl + SolutionsUrlFormat,
 				video.Records.ToDictionary(x => x.Data.Id, x => Utils.GetNormalizedGuid(x.Guid))
 				).Save(Dir + "/olx");
 
-			DownloadManager.Upload(Dir, course.Id, config, credentials);
+			DownloadManager.Upload(Dir, course.Id, config, profile.EdxStudioUrl, credentials);
 			return 0;
 		}
 	}
