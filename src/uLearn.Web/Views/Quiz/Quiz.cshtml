@@ -1,6 +1,7 @@
 ﻿@using uLearn
 @using uLearn.Model.Blocks
 @using uLearn.Quizes
+@using uLearn.Web.Views.Course
 @model QuizModel
 @{
 	var quizSlide = Model.Slide;
@@ -10,19 +11,17 @@
 	<h4 id="quiz-status">@status</h4>
 
 	var remains = Model.MaxDropCount - Model.TryNumber + 1;
+	var context = new BlockRenderContext(null, Model.Slide, CourseUnitUtils.GetDirectoryRelativeWebPath(quizSlide.Info.SlideFile), Enumerable
+			.Range(0, Model.Slide.Blocks.Length)
+			.Select(x => quizSlide.Blocks[x] is AbstractQuestionBlock
+				? new QuizInfoModel(Model, quizSlide.Blocks[x], x, Model.QuizState)
+				: null)
+			.ToArray<dynamic>()
+		);
 	for (var blockIndex = 0; blockIndex < quizSlide.Blocks.Length; blockIndex++)
 	{
 		var quizBlock = quizSlide.Blocks[blockIndex];
-		var quizModel = new QuizInfoModel(Model, quizBlock, blockIndex, Model.QuizState);
-		if (quizBlock is CodeBlock)
-		{
-			@Html.DisplayFor(m => quizBlock)
-		}
-		else if (quizBlock is MdBlock)
-		{
-			@Html.Raw(((MdBlock)quizBlock).Markdown.RenderMd(quizSlide.Info.SlideFile))
-		}
-		else if (quizBlock is AbstractQuestionBlock)
+		if (quizBlock is AbstractQuestionBlock)
 		{
 			var block = (AbstractQuestionBlock)quizBlock;
 			var mark = "";
@@ -37,19 +36,8 @@
 			<h4><i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text.RenderTex()</h4>
 		}
 
-		if (quizBlock is ChoiceBlock)
-		{
-			@Html.Partial("_ChoiceBlock", quizModel)
-		}
-		else if (quizBlock is FillInBlock)
-		{
-			@Html.Partial("_FillInBlock", quizModel)
-		}
-		else if (quizBlock is IsTrueBlock)
-		{
-			@Html.Partial("_TrueFalseBlock", quizModel)
-
-		}
+		@SlideHtml.Block((dynamic)quizBlock, context)
+	
 		if (quizBlock is AbstractQuestionBlock)
 		{
 			<hr class="quiz-block-delimiter">

@@ -1057,9 +1057,6 @@
     <Content Include="Views\Shared\DisplayTemplates\YoutubeBlock.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\HintWithLikeButton.cshtml" />
     <Content Include="Views\Hint\UseHint.cshtml" />
-    <Content Include="Views\Quiz\_ChoiceBlock.cshtml" />
-    <Content Include="Views\Quiz\_FillInBlock.cshtml" />
-    <Content Include="Views\Quiz\_TrueFalseBlock.cshtml" />
     <Content Include="Views\Quiz\Analytics.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
     <Content Include="Views\Unit\List.cshtml" />
