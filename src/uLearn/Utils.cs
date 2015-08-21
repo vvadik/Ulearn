@@ -74,7 +74,7 @@ namespace uLearn
 			foreach (var file in dir.GetFiles())
 			{
 				var tempPath = Path.Combine(dest, file.Name);
-				file.CopyTo(tempPath, false);
+				file.CopyTo(tempPath, true);
 			}
 
 			if (recursive)

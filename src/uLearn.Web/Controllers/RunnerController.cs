@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Microsoft.ApplicationInsights;
 using RunCsJob.Api;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
@@ -17,6 +18,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
+		private readonly TelemetryClient applicationInsights = new TelemetryClient();
 
 		[HttpGet]
 		[Route("GetSubmissions")]
@@ -29,7 +31,10 @@ namespace uLearn.Web.Controllers
 				var repo = new UserSolutionsRepo();
 				var submissions = repo.GetUnhandled(count);
 				if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
+				{
+					applicationInsights.TrackMetric("SubmissionTime", sw.ElapsedMilliseconds);
 					return submissions.Select(ToRunnerSubmition).ToList();
+				}
 				await repo.WaitUnhandled(TimeSpan.FromSeconds(10));
 			}
 		}

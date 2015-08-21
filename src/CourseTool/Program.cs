@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using CommandLine;
 
 namespace uLearn.CourseTool
@@ -7,10 +8,10 @@ namespace uLearn.CourseTool
 	{
 		public static int Main(string[] args)
 		{
-			return Parser.Default.ParseArguments<ConvertOptions, ULearnPatchOptions, VideoPatchOptions, SampleCustomPatchOptions>(args).Return(
+			return Parser.Default.ParseArguments<ConvertOptions, ULearnPatchOptions, VideoPatchOptions, SampleCustomPatchOptions, MonitorOptions>(args).Return(
 				(AbstractOptions options) => ExecuteOption(options),
 				_ => -1
-			);
+				);
 		}
 
 		private static int ExecuteOption(AbstractOptions options)
