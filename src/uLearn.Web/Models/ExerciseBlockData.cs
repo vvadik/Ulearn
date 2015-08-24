@@ -2,7 +2,7 @@ namespace uLearn.Web.Models
 {
 	public class ExerciseBlockData
 	{
-		public ExerciseBlockData(bool showControls = false, bool isSkipped = true, string latestAcceptedSolution = null)
+		public ExerciseBlockData(bool showControls = true, bool isSkipped = true, string latestAcceptedSolution = null)
 		{
 			ShowControls = showControls;
 			LatestAcceptedSolution = latestAcceptedSolution;
