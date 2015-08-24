@@ -39,13 +39,20 @@ namespace uLearn.CourseTool
 
 		private IEnumerable<string> GetJsFiles()
 		{
-			yield return @"scripts/jquery-1.10.2.min.js";
-			yield return @"scripts/bootstrap.min.js";
-			yield return @"scripts/katex.min.js";
-			yield return @"scripts/jquery.flexslider-min.js";
+			yield return "scripts/jquery-1.10.2.min.js";
+			yield return "scripts/bootstrap.min.js";
+			yield return "scripts/katex.min.js";
+			yield return "scripts/jsdifflib.js";
+			yield return "scripts/jquery.flexslider-min.js";
 			yield return "scripts/codemirror.js";
 			yield return "scripts/clike.js";
 			yield return "scripts/python.js";
+			yield return "scripts/show-hint.js";
+			yield return "scripts/cscompleter.js";
+			yield return "scripts/csharp-hint.js";
+			yield return "scripts/closebrackets.js";
+			yield return "scripts/matchbrackets.js";
+			yield return "scripts/active-line.js";
 			foreach (var slideJs in htmlDirectory.EnumerateFiles(@"scripts/slide*.js"))
 				yield return @"scripts/" + slideJs.Name;
 		}

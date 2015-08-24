@@ -111,6 +111,12 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
+    <None Include="renderer\fonts\glyphicons-halflings-regular.eot">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="renderer\fonts\glyphicons-halflings-regular.woff">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="static\flexslider-icon.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -119,13 +125,25 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="renderer\scripts\active-line.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="renderer\scripts\bootstrap.min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="renderer\scripts\clike.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="renderer\scripts\closebrackets.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="renderer\scripts\codemirror.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="renderer\scripts\CsCompleter.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="renderer\scripts\csharp-hint.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="renderer\scripts\jquery-1.10.2.min.js">
@@ -134,10 +152,19 @@
     <Content Include="renderer\scripts\jquery.flexslider-min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="renderer\scripts\jsdifflib.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="renderer\scripts\katex.min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="renderer\scripts\matchbrackets.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="renderer\scripts\python.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="renderer\scripts\show-hint.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="renderer\scripts\slide-editor.js">
@@ -188,7 +215,13 @@
     <Content Include="renderer\styles\flexslider.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="renderer\styles\jsdifflib.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="renderer\styles\katex.min.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="renderer\styles\show-hint.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="renderer\styles\ulearn.css">
@@ -241,6 +274,18 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CsSandboxer\CsSandboxer.csproj">
+      <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
+      <Name>CsSandboxer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
+      <Project>{26580595-F4DC-41EE-BA66-0EF4692243AF}</Project>
+      <Name>RunCsJob.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RunCsJob\RunCsJob.csproj">
+      <Project>{77B16F9D-3CDF-4CC6-BE5F-B6BADFAC5394}</Project>
+      <Name>RunCsJob</Name>
+    </ProjectReference>
     <ProjectReference Include="..\uLearn.Web\uLearn.Web.csproj">
       <Project>{B3701D2E-D001-4E0A-AB2F-7ACB5A89589B}</Project>
       <Name>uLearn.Web</Name>

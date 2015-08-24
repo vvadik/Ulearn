@@ -31,6 +31,7 @@ function RunSolutionResult() {
 
 function setResults(ans) {
 	///<param name="ans" type="RunSolutionResult"></param>
+	console.log(ans);
 	if (ans.IsCompillerFailure) setSimpleResult($serviceError, ans.CompilationError);
 	else if (ans.IsCompileError) setSimpleResult($compileError, ans.CompilationError);
 	else if (ans.IsStyleViolation) setSimpleResult($styleError, ans.CompilationError);
@@ -50,12 +51,14 @@ $runButton.click(function () {
 	var code = $(".code-exercise")[0].codeMirrorEditor.getValue();
 	$runButton.text("...running...").addClass("active");
 	$runResults.hide();
-
+	console.log($runButton.data("url"));
+	console.log(code);
 		$.ajax(
 		{
 			type: "POST",
 			url: $runButton.data("url"),
-			data: code
+			data: code,
+			contentType: "text/plain"
 		}).success(setResults)
 		.fail(function (req) {
 			setSimpleResult($serviceError, req.status + " " + req.statusText);
