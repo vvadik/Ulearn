@@ -21,9 +21,9 @@
 			{
 				<h4><i class="glyphicon"></i> @questionBlock.QuestionIndex. @questionBlock.Text.RenderTex()</h4>
 			}
-			
+
 			@Block((dynamic)block, context)
-			
+
 			if (questionBlock != null)
 			{
 				<hr class="quiz-block-delimiter"/>
@@ -137,7 +137,7 @@
 			@Alert(data)
 		}
 	}
-	else
+	if (data.ShowHints)
 	{
 		<div>
 			<h3>Подсказки</h3>
@@ -231,9 +231,12 @@
 		{
 			trueItemClass = block.Answer ? "right-quiz" : userAnswer ? "wrong-quiz" : "";
 			falseItemClass = !block.Answer ? "right-quiz" : !userAnswer ? "wrong-quiz" : "";
-			ttitle = (block.Answer ? "Правильный" : "Неправильный") + " вариант";
-			ftitle = (!block.Answer ? "Правильный" : "Неправильный") + " вариант";
 		}
+	}
+	if (model.QuizState == QuizState.Total)
+	{
+		ttitle = (block.Answer ? "Правильный" : "Неправильный") + " вариант";
+		ftitle = (!block.Answer ? "Правильный" : "Неправильный") + " вариант";
 	}
 	<div class="radio quiz-block-mark" id="@(block.Id + "_quizBlock")">
 		<div class="quiz">

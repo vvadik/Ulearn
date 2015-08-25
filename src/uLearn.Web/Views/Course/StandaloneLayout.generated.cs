@@ -28,6 +28,7 @@ namespace uLearn.Web.Views.Course
     using System.Web.WebPages;
     using uLearn;
     using uLearn.Model.Blocks;
+    using uLearn.Quizes;
     using uLearn.Web.Models;
     using uLearn.Web.Views.Course;
     using uLearn.Web.Views.SlideNavigation;
@@ -79,7 +80,16 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t</div>\r\n\r\n\t\t<d
 "ent\">\r\n\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t");
 
 
-WebViewPage.WriteTo(@__razor_helper_writer, SlideHtml.Slide(new BlockRenderContext(course, slide, slide.Info.SlideFile.Directory.FullName, slide.Blocks.Select(b => b is ExerciseBlock ? new ExerciseBlockData() {RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit"} : (dynamic)null).ToArray())));
+WebViewPage.WriteTo(@__razor_helper_writer, SlideHtml.Slide(new BlockRenderContext(course, slide, slide.Info.SlideFile.Directory.FullName, 
+						slide.Blocks.Select(
+							(b, i) => b is ExerciseBlock 
+								? new ExerciseBlockData { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", ShowHints = true } 
+								: b is AbstractQuestionBlock 
+									? new QuizInfoModel(new QuizModel() {AnswersToQuizes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<string>())}, b, i, QuizState.Total) 
+									: (dynamic)null
+							).ToArray()
+						)
+					));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n");
 

@@ -1,6 +1,7 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
 @using uLearn
 @using uLearn.Model.Blocks
+@using uLearn.Quizes
 @using uLearn.Web.Models
 @using uLearn.Web.Views.Course
 @using uLearn.Web.Views.SlideNavigation
@@ -24,7 +25,16 @@
 		<div class="slide-container">
 			<div class="container body-content">
 				<div class="row">
-					@SlideHtml.Slide(new BlockRenderContext(course, slide, slide.Info.SlideFile.Directory.FullName, slide.Blocks.Select(b => b is ExerciseBlock ? new ExerciseBlockData() {RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit"} : (dynamic)null).ToArray()))
+					@SlideHtml.Slide(new BlockRenderContext(course, slide, slide.Info.SlideFile.Directory.FullName, 
+						slide.Blocks.Select(
+							(b, i) => b is ExerciseBlock 
+								? new ExerciseBlockData { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", ShowHints = true } 
+								: b is AbstractQuestionBlock 
+									? new QuizInfoModel(new QuizModel() {AnswersToQuizes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<string>())}, b, i, QuizState.Total) 
+									: (dynamic)null
+							).ToArray()
+						)
+					)
 				</div>
 			</div>
 		</div>

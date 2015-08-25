@@ -76,12 +76,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</h4>\r\n");
 
 
 			}
-			
+
 			
 WebViewPage.WriteTo(@__razor_helper_writer, Block((dynamic)block, context));
 
                                   
-			
+
 			if (questionBlock != null)
 			{
 
@@ -410,7 +410,7 @@ WebViewPage.WriteTo(@__razor_helper_writer, Alert(data));
                
 		}
 	}
-	else
+	if (data.ShowHints)
 	{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div>\r\n\t\t\t<h3>Подсказки</h3>\r\n\t\t\t<ol>\r\n");
@@ -634,9 +634,12 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 		{
 			trueItemClass = block.Answer ? "right-quiz" : userAnswer ? "wrong-quiz" : "";
 			falseItemClass = !block.Answer ? "right-quiz" : !userAnswer ? "wrong-quiz" : "";
-			ttitle = (block.Answer ? "Правильный" : "Неправильный") + " вариант";
-			ftitle = (!block.Answer ? "Правильный" : "Неправильный") + " вариант";
 		}
+	}
+	if (model.QuizState == QuizState.Total)
+	{
+		ttitle = (block.Answer ? "Правильный" : "Неправильный") + " вариант";
+		ftitle = (!block.Answer ? "Правильный" : "Неправильный") + " вариант";
 	}
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"radio quiz-block-mark\" id=\"");

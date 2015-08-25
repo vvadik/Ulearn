@@ -12,11 +12,12 @@ namespace uLearn.Web.Models
 		public bool ShowControls { get; private set; }
 		public bool CanSkip { get; private set; }
 		public string LatestAcceptedSolution { get; private set; }
-		public string RunSolutionUrl { get; set; } // Url.Action("RunSolution", "Exercise", new {courseId, slideIndex})
-		public string AcceptedSolutionUrl { get; set; } // Url.Action("AcceptedSolutions", "Course", new {courseId, slideIndex});
-		public string GetHintUrl { get; set; } // Url.Action("UseHint", "Hint")
+		public string RunSolutionUrl { get; set; }
+		public string AcceptedSolutionUrl { get; set; }
+		public string GetHintUrl { get; set; }
 		
 		public bool IsLti { get; set; }
+		public bool ShowHints { get; set; }
 		public bool IsSkippedOrPassed { get; set; }
 		public string CourseId { get; set; }
 		public int SlideIndex { get; set; }
