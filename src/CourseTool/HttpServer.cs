@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -16,14 +17,15 @@ namespace uLearn.CourseTool
 		private readonly HttpListener listener;
 		private readonly string directory;
 		private const int timeout = 10;
-		private readonly Dictionary<string, bool> needRefresh; 
+		private bool needGlobalRefresh;
+		public Course course;
 
 		public HttpServer(string dir, int port)
 		{
 			listener = new HttpListener();
 			listener.Prefixes.Add(string.Format("http://+:{0}/", port));
 			directory = dir;
-			needRefresh = new Dictionary<string, bool>();
+			needGlobalRefresh = false;
 		}
 
 		public void Start()
@@ -32,11 +34,11 @@ namespace uLearn.CourseTool
 			StartListen();
 		}
 
-		public async void AddUpdate(string name)
+		public async void UpdateAll()
 		{
-			needRefresh[name] = true;
+			needGlobalRefresh = true;
 			await Task.Delay(2000);
-			needRefresh[name] = false;
+			needGlobalRefresh = false;
 		}
 
 		public async void StartListen()
@@ -57,52 +59,59 @@ namespace uLearn.CourseTool
 
 		private void StartHandle(HttpListenerContext context)
 		{
-			Task.Run(
-				async () =>
+			Task.Run(async () =>
+			{
+				var ctx = context;
+				try
 				{
-					var ctx = context;
-					try
-					{
-						await OnContextAsync(ctx);
-					}
-					catch (Exception e)
-					{
-						Console.WriteLine(e);
-					}
-					finally
-					{
-						ctx.Response.Close();
-					}
+					await OnContextAsync(ctx);
 				}
-				);
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+				}
+				finally
+				{
+					ctx.Response.Close();
+				}
+			});
 		}
 
 		private async Task OnContextAsync(HttpListenerContext context)
 		{
-			var requestId = Guid.NewGuid();
 			var query = context.Request.QueryString["query"];
 			var path = context.Request.Url.LocalPath;
-			var remoteEndPoint = context.Request.RemoteEndPoint;
-			Console.WriteLine("{0}: received {1} from {2}", requestId, query, remoteEndPoint);
-//			context.Request.InputStream.Close();
-			await Task.Delay(timeout);
+			Console.WriteLine("{0} {1} HTTP/{2}", context.Request.HttpMethod, context.Request.Url, context.Request.ProtocolVersion);
 			byte[] response;
 			if (query == "needRefresh")
 			{
-				var file = new FileInfo(path).Name;
-				var refresh = needRefresh.ContainsKey(file) && needRefresh[file];
-				response = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(refresh));
+				var sw = Stopwatch.StartNew();
+				while (true)
+				{
+					if (needGlobalRefresh || sw.Elapsed > TimeSpan.FromSeconds(10))
+					{
+						response = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(needGlobalRefresh));
+						break;
+					}
+					await Task.Delay(1000);
+				}
 			}
 			else if (query == "submit")
 			{
 				var code = context.Request.InputStream.GetString();
-				Console.WriteLine(code);
-				var result = SandboxRunner.Run(new RunnerSubmition { Code = code, Id = Utils.NewNormalizedGuid(), Input = "", NeedRun = true });
-				Console.WriteLine(result.Error);
-				Console.WriteLine(result.Output);
-				Console.WriteLine(result.CompilationOutput);
-				response = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new RunSolutionResult() { IsRightAnswer = true, ActualOutput = result.GetOutput(), CompilationError = result.CompilationOutput, ExecutionServiceName = "this", IsCompileError = result.Verdict == Verdict.CompilationError}));
+				var exercise = ((ExerciseSlide)course.Slides[int.Parse(path.Substring(1, 3))]).Exercise;
+				var solution = exercise.Solution.BuildSolution(code).SourceCode;
+				var result = SandboxRunner.Run(new RunnerSubmition { Code = solution, Id = Utils.NewNormalizedGuid(), Input = "", NeedRun = true });
 				context.Response.Headers["Content-Type"] = "application/json; charset=utf-8";
+				response = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new RunSolutionResult
+				{
+					IsRightAnswer = result.Verdict == Verdict.Ok && result.GetOutput().NormalizeEoln() == exercise.ExpectedOutput.NormalizeEoln(), 
+					ActualOutput = result.GetOutput().NormalizeEoln(), 
+					CompilationError = result.CompilationOutput, 
+					ExecutionServiceName = "this", 
+					IsCompileError = result.Verdict == Verdict.CompilationError,
+					ExpectedOutput = exercise.ExpectedOutput
+				}));
 			}
 			else
 			{
@@ -113,12 +122,13 @@ namespace uLearn.CourseTool
 				catch (IOException e)
 				{
 					context.Response.StatusCode = 404;
-					response = Encoding.UTF8.GetBytes("<!DOCTYPE html><html><head><meta charset='utf-8'></head><body>" + e.Message + "</body></html>");
+					context.Response.Headers["Content-Type"] = "text/plain; charset=utf-8";
+					response = Encoding.UTF8.GetBytes(e.ToString());
 				}
 			}
+			context.Response.ContentEncoding = Encoding.UTF8;
 			await context.Response.OutputStream.WriteAsync(response, 0, response.Length);
 			context.Response.OutputStream.Close();
-			Console.WriteLine("{0}: {1} sent back to {2}", requestId, response, remoteEndPoint);
 		}
 	}
 }
