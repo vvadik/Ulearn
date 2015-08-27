@@ -21,6 +21,10 @@ namespace uLearn.Model.Edx
 			get { return verticalReferences ?? new VerticalReference[0]; }
 			set { verticalReferences = value; } }
 
+		[XmlAttribute("visible_to_staff_only")]
+		public string VisibleToStaffOnly { get; set; }
+
+
 		[XmlIgnore]
 		public Vertical[] Verticals;
 

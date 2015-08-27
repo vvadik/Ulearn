@@ -53,12 +53,12 @@ namespace uLearn.CourseTool
 		public static void Download(string baseDir, Config config, string edxStudioUrl, Credentials credentials)
 		{
 			Console.WriteLine("Downloading {0}.tar.gz", config.CourseRun);
-			Download(edxStudioUrl, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, config.CourseRun + ".tar.gz");
+			Download(edxStudioUrl, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, baseDir + "/" + config.CourseRun + ".tar.gz");
 
-			ArchiveManager.ExtractTar(config.CourseRun + ".tar.gz", ".");
-			Utils.DeleteFileIfExists(config.CourseRun + ".tar.gz");
+			ArchiveManager.ExtractTar(baseDir + "/" + config.CourseRun + ".tar.gz", baseDir);
+			Utils.DeleteFileIfExists(baseDir + "/" + config.CourseRun + ".tar.gz");
 			Utils.DeleteDirectoryIfExists(baseDir + "/olx");
-			Directory.Move(config.CourseRun, baseDir + "/olx");
+			Directory.Move(baseDir + "/" + config.CourseRun, baseDir + "/olx");
 		}
 
 		public static void Upload(string edxStudioUrl, string email, string password, string organization, string course, string time, string filename)

@@ -54,7 +54,8 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, " — ");
 
 WebViewPage.WriteTo(@__razor_helper_writer, slide.Title);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</title>\r\n\t\t<meta charset=\'UTF-8\'>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</title>\r\n\t\t<link rel=\"shortcut icon\" href=\"favicon.ico?v=1\" />\r\n\t\t<meta charset=" +
+"\'UTF-8\'>\r\n");
 
 
  		foreach (var cssFile in cssFiles)
@@ -80,10 +81,10 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t</div>\r\n\r\n\t\t<d
 "ent\">\r\n\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t");
 
 
-WebViewPage.WriteTo(@__razor_helper_writer, SlideHtml.Slide(new BlockRenderContext(course, slide, slide.Info.SlideFile.Directory.FullName, 
+WebViewPage.WriteTo(@__razor_helper_writer, SlideHtml.Slide(new BlockRenderContext(course, slide, "/static/", 
 						slide.Blocks.Select(
 							(b, i) => b is ExerciseBlock 
-								? new ExerciseBlockData { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", ShowHints = true } 
+								? new ExerciseBlockData { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true } 
 								: b is AbstractQuestionBlock 
 									? new QuizInfoModel(new QuizModel() {AnswersToQuizes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<string>())}, b, i, QuizState.Total) 
 									: (dynamic)null

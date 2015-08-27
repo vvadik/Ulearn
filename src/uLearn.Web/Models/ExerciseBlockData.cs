@@ -17,7 +17,7 @@ namespace uLearn.Web.Models
 		public string GetHintUrl { get; set; }
 		
 		public bool IsLti { get; set; }
-		public bool ShowHints { get; set; }
+		public bool DebugView { get; set; }
 		public bool IsSkippedOrPassed { get; set; }
 		public string CourseId { get; set; }
 		public int SlideIndex { get; set; }

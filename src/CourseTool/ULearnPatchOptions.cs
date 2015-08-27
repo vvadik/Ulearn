@@ -4,6 +4,7 @@ using System.Linq;
 using CommandLine;
 using Newtonsoft.Json;
 using uLearn.CourseTool.Json;
+using uLearn.Model.Blocks;
 using uLearn.Model.Edx;
 
 namespace uLearn.CourseTool
@@ -27,7 +28,7 @@ namespace uLearn.CourseTool
 				.ToDictionary(x => x.Item1, x => x.Item2);
 
 			var guids = Guids == null ? null : Guids.Split(',').Select(Utils.GetNormalizedGuid).ToList();
-
+			
 			patcher.PatchVerticals(
 				edxCourse, 
 				ulearnCourse.Slides
@@ -42,6 +43,35 @@ namespace uLearn.CourseTool
 						).ToArray()),
 				guids != null || !SkipExistingGuids
 				);
+
+			PatchInstructorsNotes(edxCourse, ulearnCourse, patcher.OlxPath);
+		}
+
+		private void PatchInstructorsNotes(EdxCourse edxCourse, Course ulearnCourse, string olxPath)
+		{
+			foreach (var chapter in edxCourse.CourseWithChapters.Chapters)
+			{
+				var chapterNote = ulearnCourse.InstructorNotes.FirstOrDefault(x => x.UnitName == chapter.DisplayName);
+				if (chapterNote == null)
+					continue;
+				var unitIndex = ulearnCourse.GetUnits().ToList().IndexOf(chapterNote.UnitName);
+				var displayName = "Заметки преподавателю";
+				var sequentialId = string.Format("{0}-{1}-{2}", ulearnCourse.Id, unitIndex, "note-seq");
+				var verticalId = string.Format("{0}-{1}-{2}", ulearnCourse.Id, unitIndex, "note-vert");
+				var mdBlockId = string.Format("{0}-{1}-{2}", ulearnCourse.Id, unitIndex, "note-md");
+				var sequentialNote = new Sequential(sequentialId, displayName,
+					new[]
+					{
+						new Vertical(verticalId, displayName, new[] { new MdBlock(chapterNote.Markdown).ToEdxComponent(mdBlockId, displayName, ulearnCourse.GetDirectoryByUnitName(chapterNote.UnitName)) })
+					}) { VisibleToStaffOnly = "true" };
+				if (!File.Exists(string.Format("{0}/sequential/{1}.xml", olxPath, sequentialNote.UrlName)))
+				{
+					var sequentials = chapter.Sequentials.ToList();
+					sequentials.Add(sequentialNote);
+					new Chapter(chapter.UrlName, chapter.DisplayName, sequentials.ToArray()).Save(olxPath);
+				}
+				sequentialNote.Save(olxPath);
+			}
 		}
 	}
 }

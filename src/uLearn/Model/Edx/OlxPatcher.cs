@@ -9,11 +9,11 @@ namespace uLearn.Model.Edx
 {
 	public class OlxPatcher
 	{
-		private readonly string olxPath;
+		public readonly string OlxPath;
 
 		public OlxPatcher(string olxPath)
 		{
-			this.olxPath = olxPath;
+			OlxPath = olxPath;
 		}
 
 		public void PatchComponents(EdxCourse course, IEnumerable<Component> components, bool replaceExisting = true)
@@ -21,7 +21,7 @@ namespace uLearn.Model.Edx
 			var newVerticals = new List<Vertical>();
 			foreach (var component in components)
 			{
-				var filename = string.Format("{0}/{1}/{2}.xml", olxPath, component.SubfolderName, component.UrlName);
+				var filename = string.Format("{0}/{1}/{2}.xml", OlxPath, component.SubfolderName, component.UrlName);
 				if (File.Exists(filename))
 				{
 					if (replaceExisting)
@@ -38,7 +38,7 @@ namespace uLearn.Model.Edx
 							displayName = component.DisplayName;
 						}
 						component.DisplayName = displayName;
-						component.Save(olxPath);
+						component.Save(OlxPath);
 					}
 				}
 				else newVerticals.Add(new Vertical(Utils.NewNormalizedGuid(), component.DisplayName, new[] { component }));
@@ -51,13 +51,13 @@ namespace uLearn.Model.Edx
 			var newVerticals = new List<Vertical>();
 			foreach (var subverticals in verticals)
 			{
-				var existsMap = subverticals.ToDictionary(x => x, x => File.Exists(string.Format("{0}/vertical/{1}.xml", olxPath, x.UrlName)));
+				var existsMap = subverticals.ToDictionary(x => x, x => File.Exists(string.Format("{0}/vertical/{1}.xml", OlxPath, x.UrlName)));
 				if (subverticals.Any(x => existsMap[x]))
 				{
 					if (replaceExisting)
 					{
 						foreach (var subvertical in subverticals)
-							subvertical.Save(olxPath);
+							subvertical.Save(OlxPath);
 
 						if (subverticals.Length > 1)
 							SaveSequentialContainingSubverticals(
@@ -75,7 +75,7 @@ namespace uLearn.Model.Edx
 		public void Add(EdxCourse course, Vertical[] verticals)
 		{
 			if (verticals.Length != 0)
-				course.CreateUnsortedChapter(olxPath, verticals);
+				course.CreateUnsortedChapter(OlxPath, verticals);
 		}
 
 		private void SaveSequentialContainingSubverticals(EdxCourse course, IEnumerable<Vertical> subverticals, Vertical first)
@@ -90,7 +90,7 @@ namespace uLearn.Model.Edx
 			);
 
 			sequential.VerticalReferences = verticalReferences.ToArray();
-			File.WriteAllText(string.Format("{0}/sequential/{1}.xml", olxPath, sequential.UrlName), sequential.XmlSerialize());
+			File.WriteAllText(string.Format("{0}/sequential/{1}.xml", OlxPath, sequential.UrlName), sequential.XmlSerialize());
 		}
 	}
 }

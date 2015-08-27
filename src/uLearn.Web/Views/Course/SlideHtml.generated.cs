@@ -345,13 +345,15 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-url=\"");
 
                                                                                              WebViewPage.WriteTo(@__razor_helper_writer, data.RunSolutionUrl);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tRun\r\n\t\t\t</button>\r\n\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tRun\r\n\t\t\t</button>\r\n\t\t\t\r\n");
 
 
-  			 var e = ((ExerciseSlide)context.Slide).Exercise.HintsMd; 
+ 			if (!data.DebugView)
+			{
+				var e = ((ExerciseSlide)context.Slide).Exercise.HintsMd;
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<button id=\"GetHintButton\" type=\"button\" class=\"btn btn-default hints-btn\"\r\n\t\t" +
-"\t        data-course-id=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<button id=\"GetHintButton\" type=\"button\" class=\"btn btn-default hints-btn\"\r\n\t" +
+"\t\t\t\t\tdata-course-id=\"");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, context.Course.Id);
@@ -359,36 +361,41 @@ WebViewPage.WriteTo(@__razor_helper_writer, context.Course.Id);
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-slide-index=\"");
 
 
-                      WebViewPage.WriteTo(@__razor_helper_writer, context.Slide.Index);
+                 WebViewPage.WriteTo(@__razor_helper_writer, context.Slide.Index);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-hints-count=\"");
 
 
-                                                              WebViewPage.WriteTo(@__razor_helper_writer, e.Count);
+                                                         WebViewPage.WriteTo(@__razor_helper_writer, e.Count);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t        data-url=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t\t\t\tdata-url=\"");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, data.GetHintUrl);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tGet hint\r\n\t\t\t</button>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\tGet hint\r\n\t\t\t\t</button>\r\n");
 
 
- 			if (!data.IsLti)
-			{
+				if (!data.IsLti)
+				{
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<button type=\"button\" class=\"btn btn-default giveup-btn\" onclick=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t<button type=\"button\" class=\"btn btn-default giveup-btn\" onclick=\"");
 
 
-                           WebViewPage.WriteTo(@__razor_helper_writer, action);
+                            WebViewPage.WriteTo(@__razor_helper_writer, action);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\tShow solutions\r\n\t\t\t\t</button>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\t\tShow solutions\r\n\t\t\t\t\t</button>\r\n");
+
+
+				}
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<button type=\"button\" class=\"btn btn-default reset-btn no-rounds\" onclick=\" c" +
+"leanUserCode() \">\r\n\t\t\t\t\tReset\r\n\t\t\t\t</button>\r\n");
 
 
 			}
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<button type=\"button\" class=\"btn btn-default reset-btn no-rounds\" onclick=\" cl" +
-"eanUserCode() \">\r\n\t\t\t\tReset\r\n\t\t\t</button>\r\n\t\t</div>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t</div>\r\n");
 
 
 
@@ -410,7 +417,7 @@ WebViewPage.WriteTo(@__razor_helper_writer, Alert(data));
                
 		}
 	}
-	if (data.ShowHints)
+	if (data.DebugView)
 	{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div>\r\n\t\t\t<h3>Подсказки</h3>\r\n\t\t\t<ol>\r\n");

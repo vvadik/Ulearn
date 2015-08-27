@@ -109,22 +109,25 @@
 			<button type="button" class="run-solution-button btn btn-primary no-rounds @(data.IsLti ? "run-solution-button-lti" : "")" data-url="@data.RunSolutionUrl">
 				Run
 			</button>
-
-			@{ var e = ((ExerciseSlide)context.Slide).Exercise.HintsMd; }
-			<button id="GetHintButton" type="button" class="btn btn-default hints-btn"
-			        data-course-id="@context.Course.Id" data-slide-index="@context.Slide.Index" data-hints-count="@e.Count"
-			        data-url="@data.GetHintUrl">
-				Get hint
-			</button>
-			@if (!data.IsLti)
+			
+			@if (!data.DebugView)
 			{
-				<button type="button" class="btn btn-default giveup-btn" onclick="@action">
-					Show solutions
+				var e = ((ExerciseSlide)context.Slide).Exercise.HintsMd;
+				<button id="GetHintButton" type="button" class="btn btn-default hints-btn"
+						data-course-id="@context.Course.Id" data-slide-index="@context.Slide.Index" data-hints-count="@e.Count"
+						data-url="@data.GetHintUrl">
+					Get hint
+				</button>
+				if (!data.IsLti)
+				{
+					<button type="button" class="btn btn-default giveup-btn" onclick="@action">
+						Show solutions
+					</button>
+				}
+				<button type="button" class="btn btn-default reset-btn no-rounds" onclick=" cleanUserCode() ">
+					Reset
 				</button>
 			}
-			<button type="button" class="btn btn-default reset-btn no-rounds" onclick=" cleanUserCode() ">
-				Reset
-			</button>
 		</div>
 
 		@RunErrors()
@@ -137,7 +140,7 @@
 			@Alert(data)
 		}
 	}
-	if (data.ShowHints)
+	if (data.DebugView)
 	{
 		<div>
 			<h3>Подсказки</h3>

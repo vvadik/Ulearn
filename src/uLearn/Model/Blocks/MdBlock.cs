@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Policy;
-using System.Xml.Serialization;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using System.Xml.Serialization;
 using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Blocks
@@ -39,6 +35,12 @@ namespace uLearn.Model.Blocks
 			var urlName = slide.Guid + componentIndex;
 			var htmlWithUrls = Markdown.GetHtmlWithUrls("/static/" + urlName + "_");
 			return new HtmlComponent(urlName, displayName,urlName, htmlWithUrls.Item1, slide.Info.SlideFile.Directory.FullName, htmlWithUrls.Item2);
+		}
+
+		public Component ToEdxComponent(string urlName, string displayName, string directoryName)
+		{
+			var htmlWithUrls = Markdown.GetHtmlWithUrls("/static/" + urlName + "_");
+			return new HtmlComponent(urlName, displayName, urlName, htmlWithUrls.Item1, directoryName, htmlWithUrls.Item2);
 		}
 	}
 }

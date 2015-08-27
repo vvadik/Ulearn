@@ -11,6 +11,7 @@
 	<html>
 	<head>
 		<title>Preview: @course.Title — @slide.Title</title>
+		<link rel="shortcut icon" href="favicon.ico?v=1" />
 		<meta charset='UTF-8'>
 		@foreach (var cssFile in cssFiles)
 		{
@@ -25,10 +26,10 @@
 		<div class="slide-container">
 			<div class="container body-content">
 				<div class="row">
-					@SlideHtml.Slide(new BlockRenderContext(course, slide, slide.Info.SlideFile.Directory.FullName, 
+					@SlideHtml.Slide(new BlockRenderContext(course, slide, "/static/", 
 						slide.Blocks.Select(
 							(b, i) => b is ExerciseBlock 
-								? new ExerciseBlockData { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", ShowHints = true } 
+								? new ExerciseBlockData { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true } 
 								: b is AbstractQuestionBlock 
 									? new QuizInfoModel(new QuizModel() {AnswersToQuizes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<string>())}, b, i, QuizState.Total) 
 									: (dynamic)null

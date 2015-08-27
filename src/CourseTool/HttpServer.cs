@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -16,7 +15,6 @@ namespace uLearn.CourseTool
 	{
 		private readonly HttpListener listener;
 		private readonly string directory;
-		private const int timeout = 10;
 		private bool needGlobalRefresh;
 		public Course course;
 
@@ -126,7 +124,6 @@ namespace uLearn.CourseTool
 					response = Encoding.UTF8.GetBytes(e.ToString());
 				}
 			}
-			context.Response.ContentEncoding = Encoding.UTF8;
 			await context.Response.OutputStream.WriteAsync(response, 0, response.Length);
 			context.Response.OutputStream.Close();
 		}

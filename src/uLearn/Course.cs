@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Web.UI.WebControls;
 
 namespace uLearn
 {
@@ -20,6 +21,11 @@ namespace uLearn
 		public Slide[] Slides { get; private set; }
 		public InstructorNote[] InstructorNotes { get; private set; }
 		public CourseSettings Settings { get; private set; }
+
+		public string GetDirectoryByUnitName(string unitName)
+		{
+			return Slides.First(x => x.Info.UnitName == unitName).Info.SlideFile.Directory.FullName;
+		}
 
 		public Slide GetSlideById(string slideId)
 		{
