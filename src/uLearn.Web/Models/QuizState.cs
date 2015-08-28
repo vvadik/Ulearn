@@ -4,7 +4,6 @@
 	{
 		NotPassed,
 		Subtotal,
-		Total,
-		Debug
+		Total
 	}
 }

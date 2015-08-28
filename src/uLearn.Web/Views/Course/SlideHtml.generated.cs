@@ -478,7 +478,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\'>\r\n");
 			var ans = itemChecked ? "checked" : "";
 			var itemClass = "";
 			var title = "";
-			if (model.QuizState == QuizState.Total || model.QuizState == QuizState.Debug)
+			if (model.QuizState == QuizState.Total)
 			{
 				itemClass = item.IsCorrect ? "right-quiz" : itemChecked ? "wrong-quiz" : "";
 				title = (item.IsCorrect ? "Правильный" : "Неправильный") + " вариант";
@@ -522,16 +522,21 @@ WebViewPage.WriteTo(@__razor_helper_writer, item.Description.RenderTex());
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t</label>\r\n");
 
 
- 				if (model.QuizState == QuizState.Debug && item.IsCorrect)
+ 				if (model.QuizState == QuizState.Total && item.IsCorrect)
 				{
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t<i class=\"glyphicon glyphicon-ok\" style=\"color: green\"></i>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t<i class=\"glyphicon glyphicon-ok\" style=\"color: green\" title=\"");
+
+
+                        WebViewPage.WriteTo(@__razor_helper_writer, title);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"></i>\r\n");
 
 
 				}
 
 
- 				if ((model.QuizState == QuizState.Debug || model.QuizState == QuizState.Total) && !String.IsNullOrEmpty(item.Explanation))
+ 				if (model.QuizState == QuizState.Total && !String.IsNullOrEmpty(item.Explanation))
 				{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t<p class=\"text-muted\">");
@@ -570,7 +575,7 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
 	{
 		value = model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault();
-		quizRes = (model.QuizState == QuizState.Total || model.QuizState == QuizState.Debug) 
+		quizRes = (model.QuizState == QuizState.Total) 
 			? (model.QuizModel.AnswersToQuizes[block.Id][1] == "False" ? "wrong-quiz" : "right-quiz") : "";
 	}
 	var sample = block.Sample;
@@ -599,7 +604,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' maxlength=\"");
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t</label>\r\n\t</div>\r\n");
 
 
-	if (model.QuizState == QuizState.Total || model.QuizState == QuizState.Debug)
+	if (model.QuizState == QuizState.Total)
 	{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div>Правильный ответ: ");
@@ -647,13 +652,13 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 		var userAnswer = model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() == "True";
 		tchecked = userAnswer ? "checked" : "";
 		fchecked = userAnswer ? "" : "checked";
-		if (model.QuizState == QuizState.Total || model.QuizState == QuizState.Debug)
+		if (model.QuizState == QuizState.Total)
 		{
 			trueItemClass = block.Answer ? "right-quiz" : userAnswer ? "wrong-quiz" : "";
 			falseItemClass = !block.Answer ? "right-quiz" : !userAnswer ? "wrong-quiz" : "";
 		}
 	}
-	if (model.QuizState == QuizState.Total || model.QuizState == QuizState.Debug)
+	if (model.QuizState == QuizState.Total)
 	{
 		ttitle = (block.Answer ? "Правильный" : "Неправильный") + " вариант";
 		ftitle = (!block.Answer ? "Правильный" : "Неправильный") + " вариант";
@@ -692,10 +697,15 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' name=\'");
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' type=\"radio\">Верно</label>\r\n");
 
 
- 			if (model.QuizState == QuizState.Debug && block.Answer)
+ 			if (model.QuizState == QuizState.Total && block.Answer)
 			{
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<i class=\"glyphicon glyphicon-ok\" style=\"color: green\"></i>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<i class=\"glyphicon glyphicon-ok\" style=\"color: green\" title=\"");
+
+
+                       WebViewPage.WriteTo(@__razor_helper_writer, ttitle);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"></i>\r\n");
 
 
 			}
@@ -728,10 +738,15 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' name=\'");
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' type=\"radio\">Неверно</label>\r\n");
 
 
- 			if (model.QuizState == QuizState.Debug && !block.Answer)
+ 			if (model.QuizState == QuizState.Total && !block.Answer)
 			{
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<i class=\"glyphicon glyphicon-ok\" style=\"color: green\"></i>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<i class=\"glyphicon glyphicon-ok\" style=\"color: green\" title=\"");
+
+
+                       WebViewPage.WriteTo(@__razor_helper_writer, ftitle);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"></i>\r\n");
 
 
 			}
@@ -739,7 +754,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<i class=\"glyphicon
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t</div>\r\n\t</div>\r\n");
 
 
-	if ((model.QuizState == QuizState.Debug || model.QuizState == QuizState.Total) && !String.IsNullOrEmpty(block.Explanation))
+	if (model.QuizState == QuizState.Total && !String.IsNullOrEmpty(block.Explanation))
 	{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"text-muted\">");
