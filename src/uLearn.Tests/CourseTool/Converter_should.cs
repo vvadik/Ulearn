@@ -43,11 +43,9 @@ namespace uLearn.CourseTool
 			var config = new Config
 			{
 				Organization = "org",
-				ExerciseUrl = exerciseUrl,
-				SolutionsUrl = solutionsUrl,
 				LtiId = ""
 			};
-			return Converter.ToEdxCourse(course, config,
+			return Converter.ToEdxCourse(course, config, exerciseUrl, solutionsUrl,
 				youtubeId2UlearnVideoIds ?? new Dictionary<string, string>());
 		}
 
