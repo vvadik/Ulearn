@@ -1,14 +1,20 @@
 ﻿<Config>
-  <Hostname>openedu.urfu.ru</Hostname>
-  <Port>8081</Port>
   <Organization>UrFU</Organization>
   <CourseNumber>IMCS.b.CS-0093</CourseNumber>
   <CourseRun>2015</CourseRun>
-  <ExerciseUrl>https://ulearn.azurewebsites.net/Course/{0}/LtiSlide/{1}</ExerciseUrl>
-  <SolutionsUrl>https://ulearn.azurewebsites.net/Course/{0}/AcceptedAlert/{1}</SolutionsUrl>
   <LtiId>edx</LtiId>
   <ULearnCourseId>BasicProgramming</ULearnCourseId>
   <Video>video.json</Video>
+  <Profiles>
+    <Profile name="default">
+      <EdxStudioUrl>https://openedu.urfu.ru:8081</EdxStudioUrl>
+      <UlearnUrl>https://ulearn.azurewebsites.net</UlearnUrl>
+    </Profile>
+    <Profile name="dev">
+      <EdxStudioUrl>http://192.168.33.10:18010</EdxStudioUrl>
+      <UlearnUrl>https://localhost:44300</UlearnUrl>
+    </Profile>
+  </Profiles>
   <IgnoredUlearnSlides>
     <SlideId>1</SlideId>
     <SlideId>2</SlideId>
