@@ -15,8 +15,8 @@ namespace uLearn.CourseTool
 	{
 		private readonly HttpListener listener;
 		private readonly string directory;
-		private bool needGlobalRefresh;
-		public Course course;
+		private volatile bool needGlobalRefresh;
+		public volatile Course course;
 
 		public HttpServer(string dir, int port)
 		{

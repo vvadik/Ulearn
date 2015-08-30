@@ -28,8 +28,9 @@ namespace uLearn.CourseTool
 			fileWatcher.EnableRaisingEvents = true;
 			Console.WriteLine("Started monitoring {0}", Monitor.courseDir);
 			server.Start();
-			Process.Start(@"chrome", "http://localhost:1337/001.html -a");
-			while (Console.ReadKey().Key != ConsoleKey.Q);
+			Process.Start(@"http://localhost:1337/001.html");
+			while (Console.ReadKey(intercept:true).Key != ConsoleKey.Q)
+				Console.WriteLine("Press Q to exit");
 		}
 
 		static void Reload()
