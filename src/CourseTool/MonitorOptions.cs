@@ -3,21 +3,12 @@ using CommandLine;
 
 namespace uLearn.CourseTool
 {
-	[Verb("monitor", HelpText = "")]
+	[Verb("monitor", HelpText = "start small http server to monitor all changes in ulearn course")]
 	class MonitorOptions : AbstractOptions
 	{
-		public override int Execute()
+		public override void DoExecute()
 		{
-			Dir = Dir ?? Directory.GetCurrentDirectory();
-			var configFile = Dir + "/config.xml";
-
-			if (Start(Dir, configFile))
-				return 0;
-
-			var config = new FileInfo(configFile).DeserializeXml<Config>();
-
-			Monitor.StartMonitor(Dir, config.ULearnCourseId);
-			return 0;
+			Monitor.StartMonitor(Dir, Config.ULearnCourseId);
 		}
 	}
 }

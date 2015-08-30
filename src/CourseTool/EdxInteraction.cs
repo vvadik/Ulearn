@@ -7,12 +7,12 @@ using Newtonsoft.Json;
 
 namespace uLearn.CourseTool
 {
-	public static class DownloadManager
+	public static class EdxInteraction
 	{
-		private static CookieAwareWebClient GetLoggedInClient(string baseUrl, string email, string password)
+		private static CookieAwareWebClient LogIn(string baseUrl, string email, string password)
 		{
-			var signinUrl = String.Format("{0}/signin", baseUrl);
-			var loginUrl = String.Format("{0}/login_post", baseUrl);
+			var signinUrl = string.Format("{0}/signin", baseUrl);
+			var loginUrl = string.Format("{0}/login_post", baseUrl);
 			var client = new CookieAwareWebClient();
 			client.DownloadData(signinUrl);
 
@@ -21,19 +21,17 @@ namespace uLearn.CourseTool
 				{ "email", email },
 				{ "password", password }
 			})));
-			if (!response.success.ToObject<bool>())
-			{
-				Console.WriteLine("Login failed:");
-				Console.WriteLine(response.value.ToObject<string>());
-				throw new OperationFailedGracefully();
-			}
-			return client;
+			if (response.success.ToObject<bool>())
+				return client;
+			Console.WriteLine("Login failed:");
+			Console.WriteLine(response.value.ToObject<string>());
+			throw new OperationFailedGracefully();
 		}
 
 		public static void Download(string edxStudioUrl, string email, string password, string organization, string course, string time, string filename)
 		{
-			var downloadUrl = String.Format("{0}/export/{1}/{2}/{3}?_accept=application/x-tgz", edxStudioUrl, organization, course, time);
-			var client = GetLoggedInClient(edxStudioUrl, email, password);
+			var downloadUrl = string.Format("{0}/export/{1}/{2}/{3}?_accept=application/x-tgz", edxStudioUrl, organization, course, time);
+			var client = LogIn(edxStudioUrl, email, password);
 			try
 			{
 				client.DownloadFile(downloadUrl, filename);
@@ -64,7 +62,7 @@ namespace uLearn.CourseTool
 		public static void Upload(string edxStudioUrl, string email, string password, string organization, string course, string time, string filename)
 		{
 			var uploadUrl = string.Format("{0}/import/{1}/{2}/{3}", edxStudioUrl, organization, course, time);
-			var client = GetLoggedInClient(edxStudioUrl, email, password);
+			var client = LogIn(edxStudioUrl, email, password);
 
 			var boundary = "---" + DateTime.Now.Ticks.ToString("x");
 			client.Headers.Add("Content-Type", "multipart/form-data; boundary=" + boundary);
@@ -83,7 +81,7 @@ namespace uLearn.CourseTool
 			}
 		}
 
-		private static string TryUpload(CookieAwareWebClient client, string uploadUrl, byte[] nfile)
+		private static string TryUpload(WebClient client, string uploadUrl, byte[] nfile)
 		{
 			try
 			{
@@ -121,9 +119,5 @@ namespace uLearn.CourseTool
 			Upload(edxStudioUrl, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, courseName + ".tar.gz");
 			Utils.DeleteFileIfExists(courseName + ".tar.gz");
 		}
-	}
-
-	public class OperationFailedGracefully : Exception
-	{
 	}
 }

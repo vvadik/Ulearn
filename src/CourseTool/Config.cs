@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Xml.Serialization;
 
 namespace uLearn.CourseTool
@@ -16,6 +15,11 @@ namespace uLearn.CourseTool
 
 		[XmlArrayItem("SlideId")]
 		public string[] IgnoredUlearnSlides = new string[0];
+
+		public Profile GetProfile(string profile)
+		{
+			return Profiles.SingleVerbose(x => x.Name == profile, "profile name = " + profile);
+		}
 	}
 
 	public class Profile
@@ -25,18 +29,5 @@ namespace uLearn.CourseTool
 
 		public string EdxStudioUrl;
 		public string UlearnUrl;
-
-		public static Profile GetProfile(Config config, string profile)
-		{
-			try
-			{
-				return config.Profiles.Single(x => x.Name == profile);
-			}
-			catch (Exception)
-			{
-				Console.WriteLine("Profiles were set up incorrectly");
-				throw new OperationFailedGracefully();
-			}
-		}
 	}
 }

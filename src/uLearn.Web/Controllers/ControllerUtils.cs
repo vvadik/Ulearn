@@ -9,11 +9,7 @@ namespace uLearn.Web.Controllers
 		public static bool HasPassword(UserManager<ApplicationUser> userManager, IPrincipal principal)
 		{
 			var user = userManager.FindById(principal.Identity.GetUserId());
-			if (user != null)
-			{
-				return user.PasswordHash != null;
-			}
-			return false;
+			return user != null && user.PasswordHash != null;
 		}
 	}
 }

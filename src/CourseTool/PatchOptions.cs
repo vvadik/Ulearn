@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.Linq;
 using CommandLine;
 using uLearn.Model.Edx;
 
@@ -20,33 +18,23 @@ namespace uLearn.CourseTool
 		[Option("down", HelpText = "Download Only — do not upload course after patching. Usefull to download results of EdxStudio edits")]
 		public bool DownloadOnly { get; set; }
 
-		public override int Execute()
+		public override void DoExecute()
 		{
-			Dir = Dir ?? Directory.GetCurrentDirectory();
-			Profile = Profile ?? "default";
-
-			var configFile = Dir + "/config.xml";
-
-			if (Start(Dir, configFile))
-				return 0;
-
-			var config = new FileInfo(configFile).DeserializeXml<Config>();
-			var profile = CourseTool.Profile.GetProfile(config, Profile);
+			var profile = Config.GetProfile(Profile);
 			var credentials = Credentials.GetCredentials(Dir, Profile);
 
 			if (DownloadOnly || !UploadOnly)
-				DownloadManager.Download(Dir, config, profile.EdxStudioUrl, credentials);
+				EdxInteraction.Download(Dir, Config, profile.EdxStudioUrl, credentials);
 
 			Console.WriteLine("Loading OLX");
 			var edxCourse = EdxCourse.Load(Dir + "/olx");
 
 			Console.WriteLine("Patching OLX...");
-			Patch(new OlxPatcher(Dir + "/olx"), config, profile, edxCourse);
+			Patch(new OlxPatcher(Dir + "/olx"), Config, profile, edxCourse);
 			Console.WriteLine("Patched!");
 
 			if(UploadOnly || !DownloadOnly)
-				DownloadManager.Upload(Dir, edxCourse.CourseName, config, profile.EdxStudioUrl, credentials);
-			return 0;
+				EdxInteraction.Upload(Dir, edxCourse.CourseName, Config, profile.EdxStudioUrl, credentials);
 		}
 
 		public abstract void Patch(OlxPatcher patcher, Config config, Profile profile, EdxCourse edxCourse);

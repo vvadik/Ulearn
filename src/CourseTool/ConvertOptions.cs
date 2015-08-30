@@ -11,65 +11,53 @@ namespace uLearn.CourseTool
 	[Verb("convert", HelpText = "Convert uLearn course to Edx course")]
 	class ConvertOptions : AbstractOptions
 	{
-		public override int Execute()
+		public override void DoExecute()
 		{
-			Dir = Dir ?? Directory.GetCurrentDirectory();
-			Profile = Profile ?? "default";
-
-			var configFile = Dir + "/config.xml";
-
-			if (Start(Dir, configFile))
-				return 0;
-
-			var config = new FileInfo(configFile).DeserializeXml<Config>();
-			var profile = CourseTool.Profile.GetProfile(config, Profile);
+			var profile = Config.GetProfile(Profile);
 			var credentials = Credentials.GetCredentials(Dir, Profile);
 
-			DownloadManager.Download(Dir, config, profile.EdxStudioUrl, credentials);
+			EdxInteraction.Download(Dir, Config, profile.EdxStudioUrl, credentials);
 			
-			try
+			var edxCourse = EdxCourse.Load(Dir + "/olx");
+			if (edxCourse.CourseWithChapters.Chapters.Length != 0)
 			{
-				var edxCourse = EdxCourse.Load(Dir + "/olx");
-				if (edxCourse.CourseWithChapters.Chapters.Length != 0)
-					Console.WriteLine("List of chapters to be removed or replaced:");
-				foreach (var result in edxCourse.CourseWithChapters.Chapters.Select(x => x.DisplayName))
-					Console.WriteLine("\t" + result);
-				Console.WriteLine("Do you want to proceed?");
-				Console.WriteLine("y/n");
+				Console.WriteLine("List of chapters to be removed or replaced:");
+				foreach (var chapterName in edxCourse.CourseWithChapters.Chapters.Select(x => x.DisplayName))
+					Console.WriteLine("\t" + chapterName);
 				while (true)
 				{
-					var key = Console.ReadKey(true);
+					Console.WriteLine("Do you want to proceed? (y/n)");
+					var key = Console.ReadKey();
 					if (key.Key == ConsoleKey.Y)
 						break;
 					if (key.Key == ConsoleKey.N)
-						return 0;
+						return;
 				}
 			}
-			catch (Exception)
-			{
-			}
-
-			var videoFile = string.Format("{0}/{1}", Dir, config.Video);
-			var video = File.Exists(videoFile) 
-				? JsonConvert.DeserializeObject<Video>(File.ReadAllText(config.Video)) 
-				: new Video { Records = new Record[0] };
-
+			var video = LoadVideoInfo();
 			VideoHistory.UpdateHistory(Dir, video);
 
-			Console.WriteLine("Loading uLearn course from {0}", config.ULearnCourseId);
-			var course = new CourseLoader().LoadCourse(new DirectoryInfo(string.Format("{0}/{1}", Dir, config.ULearnCourseId)));
+			Console.WriteLine("Loading uLearn course from {0}", Config.ULearnCourseId);
+			var course = new CourseLoader().LoadCourse(new DirectoryInfo(Path.Combine(Dir, Config.ULearnCourseId)));
 
 			Console.WriteLine("Converting uLearn course \"{0}\" to Edx course", course.Id);
 			Converter.ToEdxCourse(
 				course,
-				config,
+				Config,
 				profile.UlearnUrl + ExerciseUrlFormat,
 				profile.UlearnUrl + SolutionsUrlFormat,
 				video.Records.ToDictionary(x => x.Data.Id, x => Utils.GetNormalizedGuid(x.Guid))
 				).Save(Dir + "/olx");
 
-			DownloadManager.Upload(Dir, course.Id, config, profile.EdxStudioUrl, credentials);
-			return 0;
+			EdxInteraction.Upload(Dir, course.Id, Config, profile.EdxStudioUrl, credentials);
+		}
+
+		private Video LoadVideoInfo()
+		{
+			var videoFile = string.Format("{0}/{1}", Dir, Config.Video);
+			return File.Exists(videoFile)
+				? JsonConvert.DeserializeObject<Video>(File.ReadAllText(Config.Video))
+				: new Video { Records = new Record[0] };
 		}
 	}
 }

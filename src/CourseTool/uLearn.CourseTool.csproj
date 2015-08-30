@@ -87,6 +87,7 @@
     <Compile Include="ArchiveManager.cs" />
     <Compile Include="Monitor.cs" />
     <Compile Include="MonitorOptions.cs" />
+    <Compile Include="OperationFailedGracefully.cs" />
     <Compile Include="SlideRenderer.cs" />
     <Compile Include="HttpServer.cs" />
     <Compile Include="Config.cs" />
@@ -97,7 +98,7 @@
     <Compile Include="Converter.cs" />
     <Compile Include="Credentials.cs" />
     <Compile Include="SampleCustomPatchOptions.cs" />
-    <Compile Include="DownloadManager.cs" />
+    <Compile Include="EdxInteraction.cs" />
     <Compile Include="Json\Video.cs" />
     <Compile Include="Json\VideoHistory.cs" />
     <Compile Include="PatchOptions.cs" />
