@@ -81,7 +81,7 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
  
 	var mark = "";
 	var style = "";
-	QuizInfoModel model = context.GetBlockData(block);
+	QuizBlockData model = context.GetBlockData(block);
 	if (model.QuizState != QuizState.NotPassed)
 	{
 		if (model.QuizModel != null && model.QuizModel.ResultsForQuizes != null)
@@ -489,7 +489,7 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 	var items = block.ShuffledItems();
 	var isMultiply = block.Multiple;
 	var typeInp = isMultiply ? "checkbox" : "radio";
-	QuizInfoModel model = context.GetBlockData(block) ?? new QuizInfoModel(new QuizModel(), 1, QuizState.NotPassed);
+	QuizBlockData model = context.GetBlockData(block) ?? new QuizBlockData(new QuizModel(), 1, QuizState.NotPassed);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"quiz-block-mark ");
 
@@ -605,7 +605,7 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
  
 	var value = "";
 	var quizRes = "";
-	QuizInfoModel model = context.GetBlockData(block) ?? new QuizInfoModel(new QuizModel(), 1, QuizState.NotPassed);
+	QuizBlockData model = context.GetBlockData(block) ?? new QuizBlockData(new QuizModel(), 1, QuizState.NotPassed);
 	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
 	{
 		value = model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault();
@@ -680,7 +680,7 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 	var falseItemClass = "";
 	var ttitle = "";
 	var ftitle = "";
-	QuizInfoModel model = context.GetBlockData(block) ?? new QuizInfoModel(new QuizModel(), 1, QuizState.NotPassed);
+	QuizBlockData model = context.GetBlockData(block) ?? new QuizBlockData(new QuizModel(), 1, QuizState.NotPassed);
 	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
 	{
 		var userAnswer = model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() == "True";

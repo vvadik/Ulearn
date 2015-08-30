@@ -13,7 +13,7 @@
 	var context = new BlockRenderContext(null, Model.Slide, CourseUnitUtils.GetDirectoryRelativeWebPath(quizSlide.Info.SlideFile), Enumerable
 			.Range(0, Model.Slide.Blocks.Length)
 			.Select(x => quizSlide.Blocks[x] is AbstractQuestionBlock
-				? new QuizInfoModel(Model, x, Model.QuizState)
+				? new QuizBlockData(Model, x, Model.QuizState)
 				: null)
 			.ToArray<dynamic>()
 		);

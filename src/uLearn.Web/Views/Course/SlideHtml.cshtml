@@ -26,7 +26,7 @@
 {
 	var mark = "";
 	var style = "";
-	QuizInfoModel model = context.GetBlockData(block);
+	QuizBlockData model = context.GetBlockData(block);
 	if (model.QuizState != QuizState.NotPassed)
 	{
 		if (model.QuizModel != null && model.QuizModel.ResultsForQuizes != null)
@@ -176,7 +176,7 @@
 	var items = block.ShuffledItems();
 	var isMultiply = block.Multiple;
 	var typeInp = isMultiply ? "checkbox" : "radio";
-	QuizInfoModel model = context.GetBlockData(block) ?? new QuizInfoModel(new QuizModel(), 1, QuizState.NotPassed);
+	QuizBlockData model = context.GetBlockData(block) ?? new QuizBlockData(new QuizModel(), 1, QuizState.NotPassed);
 	<div class="quiz-block-mark @typeInp" id='@(block.Id + "_quizBlock")'>
 		@for (var itemIndex = 0; itemIndex < items.Length; itemIndex++)
 		{
@@ -213,7 +213,7 @@
 {
 	var value = "";
 	var quizRes = "";
-	QuizInfoModel model = context.GetBlockData(block) ?? new QuizInfoModel(new QuizModel(), 1, QuizState.NotPassed);
+	QuizBlockData model = context.GetBlockData(block) ?? new QuizBlockData(new QuizModel(), 1, QuizState.NotPassed);
 	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
 	{
 		value = model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault();
@@ -244,7 +244,7 @@
 	var falseItemClass = "";
 	var ttitle = "";
 	var ftitle = "";
-	QuizInfoModel model = context.GetBlockData(block) ?? new QuizInfoModel(new QuizModel(), 1, QuizState.NotPassed);
+	QuizBlockData model = context.GetBlockData(block) ?? new QuizBlockData(new QuizModel(), 1, QuizState.NotPassed);
 	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
 	{
 		var userAnswer = model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() == "True";

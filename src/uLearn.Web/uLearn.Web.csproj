@@ -345,7 +345,7 @@
     <Compile Include="Models\HintPageModel.cs" />
     <Compile Include="Models\PersonalStatisticPageModel.cs" />
     <Compile Include="Models\QuizAnalyticsModel.cs" />
-    <Compile Include="Models\QuizInfoModel.cs" />
+    <Compile Include="Models\QuizBlockData.cs" />
     <Compile Include="Models\QuizModel.cs" />
     <Compile Include="Models\QuizState.cs" />
     <Compile Include="Models\TocModel.cs" />
