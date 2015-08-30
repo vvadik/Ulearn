@@ -36,7 +36,6 @@ namespace uLearn.CourseTool
 		static void Reload()
 		{
 			var course = new CourseLoader().LoadCourse(new DirectoryInfo(courseDir));
-			server.course = course;
 			var renderer = new SlideRenderer(new DirectoryInfo(htmlDir));
 			foreach (var slide in course.Slides)
 				File.WriteAllText(
@@ -48,6 +47,7 @@ namespace uLearn.CourseTool
 					string.Format("{0}/{1}.html", htmlDir, note.UnitName),
 					renderer.RenderInstructorsNote(course, note.UnitName)
 				);
+			server.course = course;
 			server.UpdateAll();
 		}
 
