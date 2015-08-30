@@ -3,9 +3,10 @@
 @using uLearn.Model.Blocks
 @using uLearn.Quizes
 @using uLearn.Web.Controllers
-@* ReSharper disable once RedundantUsingDirective *@
+@* ReSharper disable RedundantUsingDirective *@
 @using uLearn.Web.Models
-@using System.Linq
+@* ReSharper restore RedundantUsingDirective *@
+
 
 @helper Slide(BlockRenderContext context, int currentScore = 0)
 {
@@ -16,27 +17,41 @@
 		</h1>
 		@foreach (var block in context.Slide.Blocks)
 		{
-			var questionBlock = block as AbstractQuestionBlock;
-			if (questionBlock != null)
-			{
-				<h4><i class="glyphicon"></i> @questionBlock.QuestionIndex. @questionBlock.Text.RenderTex()</h4>
-			}
-
 			@Block((dynamic)block, context)
-
-			if (questionBlock != null)
-			{
-				<hr class="quiz-block-delimiter"/>
-			}
 		}
 	</div>
 }
 
+@helper Block(AbstractQuestionBlock block, BlockRenderContext context)
+{
+	var mark = "";
+	var style = "";
+	QuizInfoModel model = context.GetBlockData(block);
+	if (model.QuizState != QuizState.NotPassed)
+	{
+		if (model.QuizModel != null && model.QuizModel.ResultsForQuizes != null)
+		{
+			bool res;
+			res = model.QuizModel.ResultsForQuizes.TryGetValue(block.Id, out res) && res;
+			mark = "glyphicon " + (res ? "glyphicon-ok" : "glyphicon-remove");
+			style = "color: " + (res ? "green" : "red");
+		}
+	}
+	<h4><i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text.RenderTex()</h4>
+	@QuizBlock((dynamic)block, context)
+	<hr class="quiz-block-delimiter"/>
+}
+
+
 @helper Score(int currentScore, int maxScore)
-{ @(maxScore == 0 ? "" : string.Format("{0}/{1}", currentScore, maxScore)) }
+{
+	@(maxScore == 0 ? "" : string.Format("{0}/{1}", currentScore, maxScore))
+}
 
 @helper Block(MdBlock block, BlockRenderContext context)
-{ @MvcHtmlString.Create(block.Markdown.RenderMd(context.BaseUrl)) }
+{
+	@MvcHtmlString.Create(block.Markdown.RenderMd(context.BaseUrl))
+}
 
 @helper Block(CodeBlock block, BlockRenderContext context)
 {
@@ -109,13 +124,13 @@
 			<button type="button" class="run-solution-button btn btn-primary no-rounds @(data.IsLti ? "run-solution-button-lti" : "")" data-url="@data.RunSolutionUrl">
 				Run
 			</button>
-			
+
 			@if (!data.DebugView)
 			{
 				var e = ((ExerciseSlide)context.Slide).Exercise.HintsMd;
 				<button id="GetHintButton" type="button" class="btn btn-default hints-btn"
-						data-course-id="@context.Course.Id" data-slide-index="@context.Slide.Index" data-hints-count="@e.Count"
-						data-url="@data.GetHintUrl">
+				        data-course-id="@context.Course.Id" data-slide-index="@context.Slide.Index" data-hints-count="@e.Count"
+				        data-url="@data.GetHintUrl">
 					Get hint
 				</button>
 				if (!data.IsLti)
@@ -137,7 +152,7 @@
 		</div>
 		if (!data.IsLti)
 		{
-			@Alert(data)
+			@YouWillLoseScoresDialog(data)
 		}
 	}
 	if (data.DebugView)
@@ -156,14 +171,14 @@
 	}
 }
 
-@helper Block(ChoiceBlock block, BlockRenderContext context)
+@helper QuizBlock(ChoiceBlock block, BlockRenderContext context)
 {
 	var items = block.ShuffledItems();
 	var isMultiply = block.Multiple;
 	var typeInp = isMultiply ? "checkbox" : "radio";
-	QuizInfoModel model = context.GetBlockData(block) ?? new QuizInfoModel(new QuizModel(), block, 1, QuizState.NotPassed);
+	QuizInfoModel model = context.GetBlockData(block) ?? new QuizInfoModel(new QuizModel(), 1, QuizState.NotPassed);
 	<div class="quiz-block-mark @typeInp" id='@(block.Id + "_quizBlock")'>
-		@for (int itemIndex = 0; itemIndex < items.Length; itemIndex++)
+		@for (var itemIndex = 0; itemIndex < items.Length; itemIndex++)
 		{
 			var item = items[itemIndex];
 			var id = isMultiply ? itemIndex + "noMult" : model.BlockIndex.ToString();
@@ -178,14 +193,14 @@
 			}
 			<div class="quiz">
 				<label class="@itemClass" title="@title">
-					<input @ans autocomplete="off" id='@(block.Id + "quizBlock" + item.Id)' name=@("group"+id) type="@typeInp">
+					<input @ans autocomplete="off" id='@(block.Id + "quizBlock" + item.Id)' name=@("group" + id) type="@typeInp">
 					@item.Description.RenderTex()
 				</label>
 				@if (model.QuizState == QuizState.Total && item.IsCorrect)
 				{
 					<i class="glyphicon glyphicon-ok" style="color: green" title="@title"></i>
 				}
-				@if (model.QuizState == QuizState.Total && !String.IsNullOrEmpty(item.Explanation))
+				@if (model.QuizState == QuizState.Total && !string.IsNullOrEmpty(item.Explanation))
 				{
 					<p class="text-muted">@item.Explanation</p>
 				}
@@ -194,15 +209,15 @@
 	</div>
 }
 
-@helper Block(FillInBlock block, BlockRenderContext context)
+@helper QuizBlock(FillInBlock block, BlockRenderContext context)
 {
 	var value = "";
 	var quizRes = "";
-	QuizInfoModel model = context.GetBlockData(block) ?? new QuizInfoModel(new QuizModel(), block, 1, QuizState.NotPassed);
+	QuizInfoModel model = context.GetBlockData(block) ?? new QuizInfoModel(new QuizModel(), 1, QuizState.NotPassed);
 	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
 	{
 		value = model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault();
-		quizRes = (model.QuizState == QuizState.Total) 
+		quizRes = (model.QuizState == QuizState.Total)
 			? (model.QuizModel.AnswersToQuizes[block.Id][1] == "False" ? "wrong-quiz" : "right-quiz") : "";
 	}
 	var sample = block.Sample;
@@ -214,14 +229,14 @@
 	if (model.QuizState == QuizState.Total)
 	{
 		<div>Правильный ответ: @sample</div>
-		if (!String.IsNullOrEmpty(block.Explanation))
+		if (!string.IsNullOrEmpty(block.Explanation))
 		{
 			<div class="text-muted">@block.Explanation</div>
 		}
 	}
 }
 
-@helper Block(IsTrueBlock block, BlockRenderContext context)
+@helper QuizBlock(IsTrueBlock block, BlockRenderContext context)
 {
 	var tchecked = "";
 	var fchecked = "";
@@ -229,7 +244,7 @@
 	var falseItemClass = "";
 	var ttitle = "";
 	var ftitle = "";
-	QuizInfoModel model = context.GetBlockData(block) ?? new QuizInfoModel(new QuizModel(), block, 1, QuizState.NotPassed);
+	QuizInfoModel model = context.GetBlockData(block) ?? new QuizInfoModel(new QuizModel(), 1, QuizState.NotPassed);
 	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
 	{
 		var userAnswer = model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() == "True";
@@ -248,21 +263,21 @@
 	}
 	<div class="radio quiz-block-mark" id="@(block.Id + "_quizBlock")">
 		<div class="quiz">
-			<label class="@trueItemClass" title="@ttitle"><input autocomplete="off" @tchecked id='@(block.Id + "quizBlock" + "True")' name='@(block.Id+"group")' type="radio">Верно</label>
+			<label class="@trueItemClass" title="@ttitle"><input autocomplete="off" @tchecked id='@(block.Id + "quizBlock" + "True")' name='@(block.Id + "group")' type="radio">Верно</label>
 			@if (model.QuizState == QuizState.Total && block.Answer)
 			{
 				<i class="glyphicon glyphicon-ok" style="color: green" title="@ttitle"></i>
 			}
 		</div>
 		<div class="quiz">
-			<label class="@falseItemClass" title="@ftitle"><input autocomplete="off" @fchecked id='@(block.Id + "quizBlock" + "False")' name='@(block.Id+"group")' type="radio">Неверно</label>
+			<label class="@falseItemClass" title="@ftitle"><input autocomplete="off" @fchecked id='@(block.Id + "quizBlock" + "False")' name='@(block.Id + "group")' type="radio">Неверно</label>
 			@if (model.QuizState == QuizState.Total && !block.Answer)
 			{
 				<i class="glyphicon glyphicon-ok" style="color: green" title="@ftitle"></i>
 			}
 		</div>
 	</div>
-	if (model.QuizState == QuizState.Total && !String.IsNullOrEmpty(block.Explanation))
+	if (model.QuizState == QuizState.Total && !string.IsNullOrEmpty(block.Explanation))
 	{
 		<div class="text-muted">@block.Explanation</div>
 	}
@@ -304,14 +319,15 @@
 	</div>
 }
 
-@helper Alert(ExerciseBlockData data)
+@helper YouWillLoseScoresDialog(ExerciseBlockData data)
 {
 	<div class="modal fade" id="ShowSolutionsAlert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span></button>
+						<span aria-hidden="true">&times;</span>
+					</button>
 					<h4 class="modal-title">Внимание</h4>
 				</div>
 				<div class="modal-body">

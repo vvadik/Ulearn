@@ -1,12 +1,11 @@
 ﻿@using uLearn
-@using uLearn.Model.Blocks
 @using uLearn.Quizes
 @using uLearn.Web.Views.Course
 @model QuizModel
 @{
 	var quizSlide = Model.Slide;
 	var status = Model.QuizState == QuizState.NotPassed ?
-		String.Format("Попытка {0} из {1}", Model.TryNumber + 1, Model.MaxDropCount + 1) :
+		string.Format("Попытка {0} из {1}", Model.TryNumber + 1, Model.MaxDropCount + 1) :
 		"";
 	<h4 id="quiz-status">@status</h4>
 
@@ -14,34 +13,13 @@
 	var context = new BlockRenderContext(null, Model.Slide, CourseUnitUtils.GetDirectoryRelativeWebPath(quizSlide.Info.SlideFile), Enumerable
 			.Range(0, Model.Slide.Blocks.Length)
 			.Select(x => quizSlide.Blocks[x] is AbstractQuestionBlock
-				? new QuizInfoModel(Model, quizSlide.Blocks[x], x, Model.QuizState)
+				? new QuizInfoModel(Model, x, Model.QuizState)
 				: null)
 			.ToArray<dynamic>()
 		);
-	for (var blockIndex = 0; blockIndex < quizSlide.Blocks.Length; blockIndex++)
+	foreach (var block in quizSlide.Blocks)
 	{
-		var quizBlock = quizSlide.Blocks[blockIndex];
-		if (quizBlock is AbstractQuestionBlock)
-		{
-			var block = (AbstractQuestionBlock)quizBlock;
-			var mark = "";
-			var style = "";
-			if (Model.QuizState != QuizState.NotPassed)
-			{
-				bool res;
-				res = Model.ResultsForQuizes.TryGetValue(block.Id, out res) && res;
-				mark = "glyphicon " + (res ? "glyphicon-ok" : "glyphicon-remove");
-				style = "color: " + (res ? "green" : "red");
-			}
-			<h4><i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text.RenderTex()</h4>
-		}
-
-		@SlideHtml.Block((dynamic)quizBlock, context)
-	
-		if (quizBlock is AbstractQuestionBlock)
-		{
-			<hr class="quiz-block-delimiter">
-		}
+		@SlideHtml.Block((dynamic)block, context)
 	}
 	<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
 		@if (Model.QuizState == QuizState.NotPassed)
