@@ -30,7 +30,7 @@ namespace uLearn.Model.Blocks
 			return string.Format("Markdown {0}", Markdown);
 		}
 
-		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
 			var urlName = slide.Guid + componentIndex;
 			var htmlWithUrls = Markdown.GetHtmlWithUrls("/static/" + urlName + "_");

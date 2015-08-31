@@ -25,7 +25,7 @@ namespace uLearn.Model.Blocks
 			yield return new ImageGaleryBlock(context.FileSystem.GetFilenames(Directory));
 		}
 
-		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
 			throw new System.NotImplementedException();
 		}

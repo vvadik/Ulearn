@@ -64,11 +64,15 @@ namespace uLearn.Model.Edx.EdxComponents
 					subcomponent.SaveAdditional(folderName);
 			try
 			{
-				foreach (var localFile in LocalFiles)
-					File.Copy(string.Format("{0}/{1}", LocalFolder, localFile), string.Format("{0}/static/{1}_{2}", folderName, UrlName, localFile.Replace("/", "_")));
+				foreach (var localFile in LocalFiles ?? new List<string>())
+					File.Copy(
+						Path.Combine(LocalFolder, localFile), 
+						string.Format("{0}/static/{1}_{2}", folderName, UrlName, localFile.Replace("/", "_")), 
+						overwrite:true);
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
+				Console.WriteLine(e);
 			}
 		}
 

@@ -15,6 +15,6 @@ namespace uLearn.Model.Blocks
 			yield return this;
 		}
 
-		public abstract Component ToEdxComponents(string displayName, Slide slide, int componentIndex);
+		public abstract Component ToEdxComponent(string displayName, Slide slide, int componentIndex);
 	}
 }

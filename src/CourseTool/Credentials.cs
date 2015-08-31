@@ -15,7 +15,7 @@ namespace uLearn.CourseTool
 
 	public class Credentials
 	{
-		[XmlAttribute("name")]
+		[XmlAttribute("profile")]
 		public string Profile;
 
 		public string Email;

@@ -32,7 +32,7 @@ namespace uLearn.Model.Blocks
 			return new VideoComponent(slide.Guid + componentIndex, displayName, VideoId);
 		}
 
-		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
 			throw new NotImplementedException();
 		}

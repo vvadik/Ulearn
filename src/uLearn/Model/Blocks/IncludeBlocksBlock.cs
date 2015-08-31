@@ -35,7 +35,7 @@ namespace uLearn.Model.Blocks
 			return slideBlocks.SelectMany(b => b.BuildUp(context, newInProgress));
 		}
 
-		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
 			throw new NotImplementedException();
 		}

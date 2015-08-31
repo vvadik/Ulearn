@@ -19,17 +19,18 @@ namespace uLearn.CourseTool
 						.ToArray())
 			};
 			var note = course.FindInstructorNote(units[unitIndex]);
-			var displayName = "Заметки преподавателю";
-			var sequentialId = string.Format("{0}-{1}-{2}", course.Id, unitIndex, "note-seq");
-			var verticalId = string.Format("{0}-{1}-{2}", course.Id, unitIndex, "note-vert");
-			var mdBlockId = string.Format("{0}-{1}-{2}", course.Id, unitIndex, "note-md");
 			if (note != null)
+			{
+				var displayName = "Заметки преподавателю";
+				var sequentialId = string.Format("{0}-{1}-{2}", course.Id, unitIndex, "note-seq");
+				var verticalId = string.Format("{0}-{1}-{2}", course.Id, unitIndex, "note-vert");
+				var mdBlockId = string.Format("{0}-{1}-{2}", course.Id, unitIndex, "note-md");
 				result.Add(new Sequential(sequentialId, displayName,
 					new[]
 					{
 						new Vertical(verticalId, displayName, new[] { new MdBlock(course.FindInstructorNote(units[unitIndex]).Markdown).ToEdxComponent(mdBlockId, displayName, course.GetDirectoryByUnitName(units[unitIndex])) })
 					}) { VisibleToStaffOnly = "true" }
-				);
+				);}
 			return result.ToArray();
 		}
 
@@ -38,14 +39,23 @@ namespace uLearn.CourseTool
 			var units = course.GetUnits().ToList();
 			return Enumerable
 				.Range(0, units.Count)
-				.Select(x => new Chapter(string.Format("{0}-{1}", course.Id, x), units[x], UnitToSequentials(course, config, units, x, exerciseUrl, solutionsUrl, videoGuids)))
+				.Select(x => new Chapter(
+					string.Format("{0}-{1}", course.Id, x), 
+					units[x], 
+					UnitToSequentials(course, config, units, x, exerciseUrl, solutionsUrl, videoGuids)))
 				.ToArray();
 		}
 
 		public static EdxCourse ToEdxCourse(Course course, Config config, string exerciseUrl, string solutionsUrl,
 			Dictionary<string, string> youtubeId2UlearnVideoIds)
 		{
-			return new EdxCourse(course.Id, config.Organization, course.Title, new[] { "lti" }, null, CourseToChapters(course, config, exerciseUrl, solutionsUrl, youtubeId2UlearnVideoIds));
+			return new EdxCourse(
+				course.Id, 
+				config.Organization, 
+				course.Title, 
+				new[] { "lti" }, 
+				null, 
+				CourseToChapters(course, config, exerciseUrl, solutionsUrl, youtubeId2UlearnVideoIds));
 		}
 	}
 }

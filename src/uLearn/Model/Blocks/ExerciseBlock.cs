@@ -138,7 +138,7 @@ namespace uLearn.Model.Blocks
 			return new LtiComponent(displayName, slide.Guid + componentIndex, launchUrl, ltiId, true, 5, false);
 		}
 
-		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
 			throw new NotImplementedException();
 		}

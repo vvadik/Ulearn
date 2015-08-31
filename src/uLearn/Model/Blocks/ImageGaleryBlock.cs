@@ -24,7 +24,7 @@ namespace uLearn.Model.Blocks
 			return string.Format("Images {0}", string.Join("\n", ImageUrls));
 		}
 
-		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
 			var urlName = slide.Guid + componentIndex;
 			return new GalleryComponent(urlName, displayName, urlName, slide.Info.SlideFile.Directory.FullName, ImageUrls);

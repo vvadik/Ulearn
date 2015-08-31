@@ -85,7 +85,7 @@ namespace uLearn.Quizes
 				throw new FormatException("Should be exaclty one correct item for non-multiple choice. BlockId=" + Id);
 		}
 
-		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
 			var items = Items.Select(x => new Choice { Correct = x.IsCorrect, Text = EdxTexReplacer.ReplaceTex(x.Description) }).ToArray();
 			ChoiceResponse cr;
@@ -124,7 +124,7 @@ namespace uLearn.Quizes
 		{
 		}
 
-		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
 			var items = new []
 			{
@@ -159,7 +159,7 @@ namespace uLearn.Quizes
 				throw new FormatException("Sample should match at least one regex. BlockId=" + Id);
 		}
 
-		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
 			return new TextInputComponent
 			{

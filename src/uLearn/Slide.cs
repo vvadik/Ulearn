@@ -55,17 +55,19 @@ namespace uLearn
 					var innerComponents = new List<Component>();
 					foreach (var block in blocks)
 					{
-						var component = block.ToEdxComponents("", slide, componentIndex);
+						var component = block.ToEdxComponent("", slide, componentIndex);
 						innerComponents.Add(component);
 						componentIndex++;
 					}
 
+					var displayName = componentIndex == blocks.Count ? slide.Title : "";
+					var header = displayName == "" ? "" : "<h2>" + displayName + "</h2>";
 					var slideComponent = new HtmlComponent
 					{
-						DisplayName = componentIndex <= blocks.Count ? slide.Title : "",
+						DisplayName = displayName,
 						UrlName = slide.Guid + componentIndex,
 						Filename = slide.Guid + componentIndex,
-						Source = string.Join("", innerComponents.Select(x => x.AsHtmlString())),
+						Source = header + string.Join("", innerComponents.Select(x => x.AsHtmlString())),
 						Subcomponents = innerComponents.ToArray()
 					};
 					components.Add(slideComponent);
@@ -75,7 +77,7 @@ namespace uLearn
 
 				var exerciseBlock = slide.Blocks[componentIndex] as ExerciseBlock;
 				var otherComponent = exerciseBlock != null
-					? exerciseBlock.GetExerciseComponent(componentIndex == 0 ? slide.Title : "", slide, componentIndex, string.Format(exerciseUrl, courseId, slide.Index), ltiId)
+					? exerciseBlock.GetExerciseComponent(componentIndex == 0 ? slide.Title : "”пражнение", slide, componentIndex, string.Format(exerciseUrl, courseId, slide.Index), ltiId)
 					: ((YoutubeBlock)slide.Blocks[componentIndex]).GetVideoComponent(componentIndex == 0 ? slide.Title : "", slide, componentIndex, videoGuids);
 
 				components.Add(otherComponent);
@@ -98,7 +100,7 @@ namespace uLearn
 		private static IEnumerable<Vertical> QuizToVerticals(QuizSlide slide)
 		{
 			var components = slide.Blocks
-				.Select((b, i) => b.ToEdxComponents("", slide, i))
+				.Select((b, i) => b.ToEdxComponent("", slide, i))
 				.ToArray();
 
 			var slideComponent = new SlideProblemComponent

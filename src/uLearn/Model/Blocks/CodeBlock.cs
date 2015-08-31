@@ -40,7 +40,7 @@ namespace uLearn.Model.Blocks
 			yield return this;
 		}
 
-		public override Component ToEdxComponents(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
 			var urlName = slide.Guid + componentIndex;
 			return new CodeComponent(urlName, displayName, urlName, LangId, Code);
