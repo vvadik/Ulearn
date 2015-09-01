@@ -29,7 +29,7 @@ namespace uLearn.CourseTool
 					new[]
 					{
 						new Vertical(verticalId, displayName, new[] { new MdBlock(course.FindInstructorNote(units[unitIndex]).Markdown).ToEdxComponent(mdBlockId, displayName, course.GetDirectoryByUnitName(units[unitIndex])) })
-					}) { VisibleToStaffOnly = "true" }
+					}) { VisibleToStaffOnly = true }
 				);}
 			return result.ToArray();
 		}
@@ -42,6 +42,7 @@ namespace uLearn.CourseTool
 				.Select(x => new Chapter(
 					string.Format("{0}-{1}", course.Id, x), 
 					units[x], 
+					null,
 					UnitToSequentials(course, config, units, x, exerciseUrl, solutionsUrl, videoGuids)))
 				.ToArray();
 		}

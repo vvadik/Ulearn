@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 using uLearn.Model.Edx.EdxComponents;
 
@@ -51,11 +52,11 @@ namespace uLearn.Model.Edx
 			CreateDirectories(folderName, "course", "chapter", "sequential", "vertical", "video", "html", "lti", "static", "problem");
 			foreach (var file in StaticFiles)
 				File.Copy(file, string.Format("{0}/static/{1}", folderName, Path.GetFileName(file)), true);
-			
+
 			var courseFile = string.Format("{0}/course.xml", folderName);
 			if (File.Exists(courseFile))
 				CourseWithChapters.UrlName = new FileInfo(courseFile).DeserializeXml<EdxCourse>().UrlName;
-			else 
+			else
 				File.WriteAllText(courseFile, this.XmlSerialize());
 
 			CourseWithChapters.Save(folderName);
@@ -74,7 +75,7 @@ namespace uLearn.Model.Edx
 			if (CourseWithChapters.Chapters.All(x => x.UrlName != "Unsorted"))
 			{
 				var chapters = new List<Chapter>(CourseWithChapters.Chapters);
-				var newChapter = new Chapter("Unsorted", "Unsorted", new[] { new Sequential(Utils.NewNormalizedGuid(), "Unsorted " + DateTime.Now, verticals) });
+				var newChapter = new Chapter("Unsorted", "Unsorted", DateTime.MaxValue, new[] { new Sequential(Utils.NewNormalizedGuid(), "Unsorted " + DateTime.Now, verticals) { VisibleToStaffOnly = true } });
 				chapters.Add(newChapter);
 				CourseWithChapters.Chapters = chapters.ToArray();
 				CourseWithChapters.ChapterReferences = CourseWithChapters.Chapters.Select(x => new ChapterReference { UrlName = x.UrlName }).ToArray();
@@ -84,17 +85,18 @@ namespace uLearn.Model.Edx
 			}
 			else
 			{
-				var testChapter = CourseWithChapters.Chapters.Single(x => x.UrlName == "Unsorted");
-				var sequentials = new List<Sequential>(testChapter.Sequentials);
+				var unsortedChapter = CourseWithChapters.Chapters.Single(x => x.UrlName == "Unsorted");
+				var filename = string.Format("{0}/chapter/{1}.xml", folderName, unsortedChapter.UrlName);
+				var chapterXml = XDocument.Load(filename).Root ?? new XElement("chapter");
 				var newSequential = new Sequential(Utils.NewNormalizedGuid(), "Unsorted " + DateTime.Now, verticals);
-				sequentials.Add(newSequential);
-				testChapter.Sequentials = sequentials.ToArray();
-				testChapter.SequentialReferences = testChapter.Sequentials.Select(x => new SequentialReference { UrlName = x.UrlName }).ToArray();
-
-				File.WriteAllText(string.Format("{0}/chapter/{1}.xml", folderName, testChapter.UrlName), testChapter.XmlSerialize());
+				chapterXml.Add(new XElement("sequential", new XAttribute("url_name", newSequential.UrlName)));
+				chapterXml.Save(filename);
+				new FileInfo(filename).RemoveXmlDeclaration();
 				newSequential.Save(folderName);
 			}
 		}
+
+
 
 		public Sequential GetSequentialContainingVertical(string verticalId)
 		{
@@ -102,8 +104,8 @@ namespace uLearn.Model.Edx
 				x => x.Sequentials.Where(y => y.Verticals.Any(z => z.UrlName == verticalId))).ToList();
 			if (sequentials.Count > 1)
 				throw new Exception(
-					string.Format("Vertical {0} are in several sequentials {1}", 
-					verticalId, 
+					string.Format("Vertical {0} are in several sequentials {1}",
+					verticalId,
 					string.Join(", ", sequentials.Select(s => s.UrlName))));
 			return sequentials.Single();
 		}

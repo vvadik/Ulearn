@@ -22,7 +22,7 @@ namespace uLearn.Model.Edx
 			set { verticalReferences = value; } }
 
 		[XmlAttribute("visible_to_staff_only")]
-		public string VisibleToStaffOnly { get; set; }
+		public bool VisibleToStaffOnly { get; set; }
 
 
 		[XmlIgnore]

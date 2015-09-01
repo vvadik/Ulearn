@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 
@@ -13,6 +15,16 @@ namespace uLearn.Model.Edx
 			get { return "chapter"; }
 		}
 
+		[XmlAttribute("start")]
+		public string StartDateAsString { get; set; }
+
+		[XmlIgnore]
+		public DateTime? Start
+		{
+			get { return StartDateAsString == null ? null : (DateTime?)DateTime.Parse(StartDateAsString, CultureInfo.InvariantCulture); }
+			set { StartDateAsString = value.HasValue ? value.Value.ToString("O") : null; }
+		}
+
 		[XmlElement("sequential")]
 		public SequentialReference[] SequentialReferences;
 
@@ -23,9 +35,10 @@ namespace uLearn.Model.Edx
 		{
 		}
 
-		public Chapter(string urlName, string displayName, Sequential[] sequentials)
+		public Chapter(string urlName, string displayName, DateTime? start, Sequential[] sequentials)
 		{
 			DisplayName = displayName;
+			Start = start;
 			UrlName = urlName;
 			Sequentials = sequentials;
 			SequentialReferences = sequentials.Select(x => x.GetReference()).ToArray();

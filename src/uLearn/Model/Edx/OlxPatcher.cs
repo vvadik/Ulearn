@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using System.Xml.Linq;
 using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Edx
@@ -51,7 +52,7 @@ namespace uLearn.Model.Edx
 			var newVerticals = new List<Vertical>();
 			foreach (var subverticals in verticals)
 			{
-				var existsMap = subverticals.ToDictionary(x => x, x => File.Exists(string.Format("{0}/vertical/{1}.xml", OlxPath, x.UrlName)));
+				var existsMap = subverticals.ToDictionary(sv => sv, sv => File.Exists(string.Format("{0}/vertical/{1}.xml", OlxPath, sv.UrlName)));
 				if (subverticals.Any(x => existsMap[x]))
 				{
 					if (replaceExisting)
@@ -78,19 +79,19 @@ namespace uLearn.Model.Edx
 				course.CreateUnsortedChapter(OlxPath, verticals);
 		}
 
-		private void SaveSequentialContainingSubverticals(EdxCourse course, IEnumerable<Vertical> subverticals, Vertical first)
+		private void SaveSequentialContainingSubverticals(EdxCourse course, IEnumerable<Vertical> verticalsToAdd, Vertical afterThisVertical)
 		{
-			var sequential = course.GetSequentialContainingVertical(first.UrlName);
-			var verticalReferences = sequential.VerticalReferences.ToList();
-			var firstReference = verticalReferences.Single(x => x.UrlName == first.UrlName);
-
-			verticalReferences.InsertRange(
-				verticalReferences.IndexOf(firstReference) + 1,
-				subverticals.Select(x => new VerticalReference { UrlName = x.UrlName })
-			);
-
-			sequential.VerticalReferences = verticalReferences.ToArray();
-			File.WriteAllText(string.Format("{0}/sequential/{1}.xml", OlxPath, sequential.UrlName), sequential.XmlSerialize());
+			var sequential = course.GetSequentialContainingVertical(afterThisVertical.UrlName);
+			var filename = string.Format("{0}/sequential/{1}.xml", OlxPath, sequential.UrlName);
+			var sequentialXml = XDocument.Load(filename).Root ?? new XElement("sequential");
+			var refs = sequentialXml.Elements("vertical").ToList();
+			var insertIndex = refs
+				.Select((v, i) => new {urlName = v.Attribute("url_name").Value, i})
+				.First(v => v.urlName == afterThisVertical.UrlName).i + 1;
+			refs.InsertRange(insertIndex, verticalsToAdd.Select(v => new XElement("vertical", new XAttribute("url_name", v.UrlName))));
+			sequentialXml.ReplaceNodes(refs);
+			sequentialXml.Save(filename);
+			new FileInfo(filename).RemoveXmlDeclaration();
 		}
 	}
 }

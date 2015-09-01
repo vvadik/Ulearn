@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CommandLine;
@@ -24,7 +25,7 @@ namespace uLearn.CourseTool
 				: new Video { Records = new Record[0] };
 			var videoHistory = VideoHistory.UpdateHistory(Dir, video);
 			var videoGuids = videoHistory.Records
-				.SelectMany(x => x.Data.Select(y => Tuple.Create<string, string>(y.Id, Utils.GetNormalizedGuid((Guid)x.Guid))))
+				.SelectMany(x => x.Data.Select(y => Tuple.Create(y.Id, Utils.GetNormalizedGuid(x.Guid))))
 				.ToDictionary(x => x.Item1, x => x.Item2);
 
 			var guids = Guids == null ? null : Guids.Split(',').Select(Utils.GetNormalizedGuid).ToList();
@@ -33,8 +34,8 @@ namespace uLearn.CourseTool
 				edxCourse, 
 				ulearnCourse.Slides
 					.Where(s => !config.IgnoredUlearnSlides.Contains(s.Id))
-					.Where(x => guids == null || guids.Contains(x.Guid))
-					.Select(x => x.ToVerticals(
+					.Where(s => guids == null || guids.Contains(s.Guid))
+					.Select(s => s.ToVerticals(
 						ulearnCourse.Id, 
 						profile.UlearnUrl + ExerciseUrlFormat, 
 						profile.UlearnUrl + SolutionsUrlFormat, 
@@ -49,12 +50,13 @@ namespace uLearn.CourseTool
 
 		private void PatchInstructorsNotes(EdxCourse edxCourse, Course ulearnCourse, string olxPath)
 		{
+			var ulearnUnits = ulearnCourse.GetUnits().ToList();
 			foreach (var chapter in edxCourse.CourseWithChapters.Chapters)
 			{
 				var chapterNote = ulearnCourse.InstructorNotes.FirstOrDefault(x => x.UnitName == chapter.DisplayName);
 				if (chapterNote == null)
 					continue;
-				var unitIndex = ulearnCourse.GetUnits().ToList().IndexOf(chapterNote.UnitName);
+				var unitIndex = ulearnUnits.IndexOf(chapterNote.UnitName);
 				var displayName = "Заметки преподавателю";
 				var sequentialId = string.Format("{0}-{1}-{2}", ulearnCourse.Id, unitIndex, "note-seq");
 				var verticalId = string.Format("{0}-{1}-{2}", ulearnCourse.Id, unitIndex, "note-vert");
@@ -63,12 +65,12 @@ namespace uLearn.CourseTool
 					new[]
 					{
 						new Vertical(verticalId, displayName, new[] { new MdBlock(chapterNote.Markdown).ToEdxComponent(mdBlockId, displayName, ulearnCourse.GetDirectoryByUnitName(chapterNote.UnitName)) })
-					}) { VisibleToStaffOnly = "true" };
+					}) { VisibleToStaffOnly = true };
 				if (!File.Exists(string.Format("{0}/sequential/{1}.xml", olxPath, sequentialNote.UrlName)))
 				{
 					var sequentials = chapter.Sequentials.ToList();
 					sequentials.Add(sequentialNote);
-					new Chapter(chapter.UrlName, chapter.DisplayName, sequentials.ToArray()).Save(olxPath);
+					new Chapter(chapter.UrlName, chapter.DisplayName, chapter.Start, sequentials.ToArray()).Save(olxPath);
 				}
 				sequentialNote.Save(olxPath);
 			}
