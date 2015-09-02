@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -377,12 +378,36 @@ namespace uLearn.Web.Controllers
 			return View();
 		}
 
+		[Authorize]
+		public async Task<ActionResult> StudentInfo()
+		{
+			var userId = User.Identity.GetUserId();
+			var user = await UserManager.FindByIdAsync(userId);
+			return View(user);
+		}
+
+		[HttpPost]
+		[Authorize]
+		public async Task<ActionResult> StudentInfo(string firstName, string lastName, string email, string groupName)
+		{
+			var userId = User.Identity.GetUserId();
+			var user = await UserManager.FindByIdAsync(userId);
+			user.FirstName = firstName;
+			user.LastName = lastName;
+			user.Email = email;
+			user.GroupName = groupName;
+			user.LastEdit = DateTime.Now;
+			await UserManager.UpdateAsync(user);
+			return RedirectToAction("StudentInfo");
+		}
+
+
 		[ChildActionOnly]
 		public ActionResult RemoveAccountList()
 		{
 			var linkedAccounts = UserManager.GetLogins(User.Identity.GetUserId());
 			ViewBag.ShowRemoveButton = ControllerUtils.HasPassword(UserManager, User) || linkedAccounts.Count > 1;
-			return (ActionResult)PartialView("_RemoveAccountPartial", linkedAccounts);
+			return PartialView("_RemoveAccountPartial", linkedAccounts);
 		}
 
 		protected override void Dispose(bool disposing)

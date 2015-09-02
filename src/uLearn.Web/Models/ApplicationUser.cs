@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace uLearn.Web.Models
@@ -10,5 +11,9 @@ namespace uLearn.Web.Models
 		public virtual ICollection<UserQuestion> Questions { get; set; }
 
 		public string GroupName { get; set; }
+		public string FirstName { get; set; }
+		public string LastName { get; set; }
+		public string Email { get; set; }
+		public DateTime? LastEdit { get; set; }
 	}
 }

@@ -1,0 +1,59 @@
+﻿@model ApplicationUser
+
+@{
+	Layout = null;
+	var groups = new[] { "Вольнослушатель", "УрФУ КН-", "УрФУ КБ-", "УрФУ ФИИТ-", "ИжГТУ" };
+}
+
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title></title>
+		@Styles.Render("~/css")
+	</head>
+	<body>
+		<div>
+			<h2>Нам точно нужны эти данные!</h2>
+
+			@using (Html.BeginForm("StudentInfo", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+			{
+				<div class="form-group">
+					@Html.Label("Имя", new { @class = "col-md-1 control-label" })
+					<div class="col-md-10">
+						@Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+					</div>
+				</div>
+				<div class="form-group">
+					@Html.Label("Фамилия", new { @class = "col-md-1 control-label" })
+					<div class="col-md-10">
+						@Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+					</div>
+				</div>
+				<div class="form-group">
+					@Html.LabelFor(m => m.Email, new { @class = "col-md-1 control-label" })
+					<div class="col-md-10">
+						@Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+					</div>
+				</div>
+				<div class="form-group">
+					@Html.Label("Группа", new { @class = "col-md-1 control-label" })
+					<div class="col-md-10">
+						@Html.TextBoxFor(m => m.GroupName, new { @class = "form-control", list = "defaultGroups" })
+						<datalist id="defaultGroups">
+							@foreach (var group in groups)
+							{
+								<option>@group</option>
+							}
+						</datalist>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-md-offset-1 col-md-10">
+						<input type="submit" value="Сохранить изменения" class="btn btn-default" />
+					</div>
+				</div>
+			}
+		</div>
+	</body>
+</html>
