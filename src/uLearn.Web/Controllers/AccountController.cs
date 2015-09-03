@@ -19,6 +19,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly ULearnDb db;
 		private readonly CourseManager courseManager;
+
 		public AccountController()
 			: this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb())))
 		{
@@ -42,8 +43,10 @@ namespace uLearn.Web.Controllers
 		public ActionResult List(string namePrefix = null, string role = null)
 		{
 			IQueryable<ApplicationUser> applicationUsers = new ULearnDb().Users;
-			if (!string.IsNullOrEmpty(namePrefix)) applicationUsers = applicationUsers.Where(u => u.UserName.StartsWith(namePrefix));
-			if (!string.IsNullOrEmpty(role)) applicationUsers = applicationUsers.Where(u => u.Roles.Any(r => r.Role.Name == role));
+			if (!string.IsNullOrEmpty(namePrefix))
+				applicationUsers = applicationUsers.Where(u => u.UserName.StartsWith(namePrefix));
+			if (!string.IsNullOrEmpty(role))
+				applicationUsers = applicationUsers.Where(u => u.Roles.Any(r => r.Role.Name == role));
 			return View(applicationUsers.OrderBy(u => u.UserName).Take(50).ToList());
 		}
 
@@ -74,7 +77,8 @@ namespace uLearn.Web.Controllers
 		public ActionResult Info(string userName)
 		{
 			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
-			if (user == null) return RedirectToAction("List");
+			if (user == null)
+				return RedirectToAction("List");
 			var courses = new HashSet<string>(db.Visiters.Where(v => v.UserId == user.Id).Select(v => v.CourseId).Distinct());
 			return View(new UserInfoModel(user, courseManager.GetCourses().Where(c => courses.Contains(c.Id)).ToArray()));
 		}
@@ -83,7 +87,8 @@ namespace uLearn.Web.Controllers
 		public ActionResult CourseInfo(string userName, string courseId)
 		{
 			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
-			if (user == null) return RedirectToAction("List");
+			if (user == null)
+				return RedirectToAction("List");
 			var course = courseManager.GetCourse(courseId);
 			return View(new UserCourseModel(course, user, db));
 		}
@@ -383,19 +388,25 @@ namespace uLearn.Web.Controllers
 		{
 			var userId = User.Identity.GetUserId();
 			var user = await UserManager.FindByIdAsync(userId);
-			return View(user);
+			return View(new LtiUserViewModel
+			{
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				Email = user.Email,
+				GroupName = user.GroupName
+			});
 		}
 
 		[HttpPost]
 		[Authorize]
-		public async Task<ActionResult> StudentInfo(string firstName, string lastName, string email, string groupName)
+		public async Task<ActionResult> StudentInfo(LtiUserViewModel userInfo)
 		{
 			var userId = User.Identity.GetUserId();
 			var user = await UserManager.FindByIdAsync(userId);
-			user.FirstName = firstName;
-			user.LastName = lastName;
-			user.Email = email;
-			user.GroupName = groupName;
+			user.FirstName = userInfo.FirstName;
+			user.LastName = userInfo.LastName;
+			user.Email = userInfo.Email;
+			user.GroupName = userInfo.GroupName;
 			user.LastEdit = DateTime.Now;
 			await UserManager.UpdateAsync(user);
 			return RedirectToAction("StudentInfo");
@@ -501,7 +512,16 @@ namespace uLearn.Web.Controllers
 		{
 			var user = await UserManager.FindByNameAsync(User.Identity.Name);
 			var hasPassword = ControllerUtils.HasPassword(UserManager, User);
-			return PartialView(new UserViewModel { Name = user.UserName, GroupName = user.GroupName, UserId = user.Id, HasPassword = hasPassword });
+			return PartialView(new UserViewModel
+			{
+				Name = user.UserName, 
+				GroupName = user.GroupName, 
+				UserId = user.Id, 
+				HasPassword = hasPassword,
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				Email = user.Email
+			});
 		}
 
 		[HttpPost]
@@ -518,9 +538,13 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
 			user.UserName = userModel.Name;
 			user.GroupName = userModel.GroupName;
+			user.FirstName = userModel.FirstName;
+			user.LastName = userModel.LastName;
+			user.Email = userModel.Email;
+			user.LastEdit = DateTime.Now;
 			await UserManager.RemovePasswordAsync(user.Id);
 			await UserManager.AddPasswordAsync(user.Id, userModel.Password);
-			
+
 			await UserManager.UpdateAsync(user);
 
 			if (nameChanged)
@@ -535,10 +559,11 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> ResetPassword(string newPassword, string userId)
 		{
 			var user = await UserManager.FindByIdAsync(userId);
-			if (user == null) return RedirectToAction("List");
+			if (user == null)
+				return RedirectToAction("List");
 			await UserManager.RemovePasswordAsync(userId);
 			await UserManager.AddPasswordAsync(userId, newPassword);
-			return RedirectToAction("Info", new{user.UserName});
+			return RedirectToAction("Info", new { user.UserName });
 		}
 	}
 
@@ -585,7 +610,7 @@ namespace uLearn.Web.Controllers
 				res.SlideVisits.Total++;
 				res.Total.Total += slide.MaxScore;
 				res.Total.Earned += score;
-				
+
 				if (isVisited)
 					res.SlideVisits.Earned++;
 
@@ -638,7 +663,11 @@ namespace uLearn.Web.Controllers
 	{
 		public int Earned;
 		public int Total;
-		public decimal? Progress { get { return Total == 0 ? null : (decimal?)Earned / Total; } }
+
+		public decimal? Progress
+		{
+			get { return Total == 0 ? null : (decimal?)Earned / Total; }
+		}
 
 		public override string ToString()
 		{

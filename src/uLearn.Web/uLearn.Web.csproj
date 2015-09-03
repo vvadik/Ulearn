@@ -1107,6 +1107,7 @@
     <Content Include="Views\Sandbox\GetDetails.cshtml" />
     <Content Include="Views\Sandbox\RunCode.cshtml" />
     <Content Include="Views\Account\StudentInfo.cshtml" />
+    <Content Include="Views\Shared\_GroupsPrompt.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
