@@ -39,7 +39,7 @@ namespace uLearn.Web.LTI
 					await context.Options.Provider.GenerateUserName(usernameContext);
 					if (string.IsNullOrEmpty(usernameContext.UserName))
 					{
-						return;
+						throw new Exception("Can't generate username");
 					}
 					user = await userManager.FindByNameAsync(usernameContext.UserName);
 					if (user == null)
@@ -48,7 +48,8 @@ namespace uLearn.Web.LTI
 						var result = await userManager.CreateAsync(user);
 						if (!result.Succeeded)
 						{
-							return;
+							var errors = String.Join("\n\n", result.Errors);
+							throw new Exception("Can't create user: " + errors);
 						}
 					}
 					// Save the pairing between LTI user and application user
