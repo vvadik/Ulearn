@@ -1,0 +1,10 @@
+﻿@{
+	var groups = new[] { "Вольнослушатель", "УрФУ КН-", "УрФУ КБ-", "УрФУ ФИИТ-", "ИжГТУ" };
+}
+
+<datalist id="groupsList">
+	@foreach (var group in groups)
+	{
+		<option>@group</option>
+	}
+</datalist>
