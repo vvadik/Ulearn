@@ -1,4 +1,4 @@
-﻿function submitQuiz(courseId, slideIndex, expectedCount) {
+﻿function submitQuiz(courseId, slideIndex, expectedCount, isLti) {
 	if (areAllAnswered(expectedCount)) {
 		var answers = [];
 		$(".quiz").each(function () {
@@ -21,7 +21,8 @@
 				data: {
 					courseId: courseId,
 					slideIndex: slideIndex,
-					answer: answer
+					answer: answer,
+					isLti: isLti
 				}
 			}).success(function (ans) {
 				$("#quiz-status").text("Проверяется...");

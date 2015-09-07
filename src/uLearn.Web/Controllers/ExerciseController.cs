@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using LtiLibrary.Core.Outcomes.v1;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
+using uLearn.Web.LTI;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -45,37 +46,10 @@ namespace uLearn.Web.Controllers
 			
 			var result = await CheckSolution(courseId, exerciseSlide, code);
 			if (isLti)
-				SubmitScore(exerciseSlide);
+				LtiUtils.SubmitScore(exerciseSlide, User.Identity.GetUserId());
 			return Json(result);
 		}
 
-		private void SubmitScore(Slide slide)
-		{
-			var userId = User.Identity.GetUserId();
-
-			var ltiRequest = ltiRequestsRepo.Find(userId, slide.Id);
-			if (ltiRequest == null)
-				throw new Exception("LtiRequest for user '" + userId + "' not found");
-
-			var consumerSecret = consumersRepo.Find(ltiRequest.ConsumerKey).Secret;
-
-			var score = visitersRepo.GetScore(slide.Id, userId);
-
-			// TODO: fix outcome address in local edx (no localhost and no https)
-			var uri = new UriBuilder(ltiRequest.LisOutcomeServiceUrl);
-			if (uri.Host == "localhost")
-			{
-				uri.Host = "192.168.33.10";
-				uri.Port = 80;
-				uri.Scheme = "http";
-			}
-
-			var result = OutcomesClient.PostScore(uri.ToString(), ltiRequest.ConsumerKey, consumerSecret,
-				ltiRequest.LisResultSourcedId, score / (double)slide.MaxScore);
-
-			if (!result.IsValid)
-				throw new Exception(uri + "\r\n\r\n" + result.Message);
-		}
 
 		private async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string code)
 		{
