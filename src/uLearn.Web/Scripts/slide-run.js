@@ -14,7 +14,8 @@ function setSimpleResult($block, details) {
 
 function setWA(expected, actual) {
 	var $difTable = $waError.find(".diff-table");
-	var solutionsDiff = diffUsingJS(actual, expected);
+	//	var solutionsDiff = diffUsingJS(actual, expected);
+	var solutionsDiff = diffHtml(actual, expected);
 	$difTable.html(solutionsDiff);
 	$waError.show();
 }
