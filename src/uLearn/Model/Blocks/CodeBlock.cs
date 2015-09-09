@@ -50,5 +50,10 @@ namespace uLearn.Model.Blocks
 		{
 			return string.Format("{0} code {1}", LangId, Code);
 		}
+
+		public override string[] SpellCheck(string prefix)
+		{
+			return Code.SpellCheck(prefix);
+		}
 	}
 }

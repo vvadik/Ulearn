@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web.UI.WebControls;
 
 namespace uLearn
 {
@@ -50,6 +49,11 @@ namespace uLearn
 		public override string ToString()
 		{
 			return string.Format("Id: {0}, Title: {1}", Id, Title);
+		}
+
+		public string[] SpellCheck()
+		{
+			return Slides.SelectMany(s => s.SpellCheck()).ToArray();
 		}
 	}
 

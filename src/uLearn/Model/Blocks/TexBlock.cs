@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
 using uLearn.Model.Edx.EdxComponents;
@@ -30,6 +28,11 @@ namespace uLearn.Model.Blocks
 		{
 			var urlName = slide.Guid + componentIndex;
 			return new HtmlComponent(urlName, displayName, urlName, string.Join("\n", TexLines.Select(x => "$$" + x + "$$")).GetHtmlWithUrls("/static").Item1);
+		}
+
+		public override string[] SpellCheck(string prefix)
+		{
+			return TexLines.SelectMany(l => l.SpellCheck(prefix)).ToArray();
 		}
 	}
 }

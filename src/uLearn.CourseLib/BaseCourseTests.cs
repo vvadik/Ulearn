@@ -41,6 +41,13 @@ namespace uLearn
 				Assert.Fail("Duplicate videos on slides " + string.Join(", ", g));
 		}
 
+		[Test]
+		public void NoSpellCheckErrors()
+		{
+			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
+			Assert.IsEmpty(course.SpellCheck());
+		}
+
 		[TestCaseSource("GetExerciseSlidesTestCases")]
 		public void Slide(Type slideType)
 		{

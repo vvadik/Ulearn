@@ -42,5 +42,10 @@ namespace uLearn.Model.Blocks
 			var htmlWithUrls = Markdown.GetHtmlWithUrls("/static/" + urlName + "_");
 			return new HtmlComponent(urlName, displayName, urlName, htmlWithUrls.Item1, directoryName, htmlWithUrls.Item2);
 		}
+
+		public override string[] SpellCheck(string prefix)
+		{
+			return Markdown.SpellCheck(prefix);
+		}
 	}
 }
