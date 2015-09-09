@@ -23,12 +23,13 @@ namespace uLearn.Web.Controllers
 			courseManager = WebCourseManager.Instance;
 		}
 
-		public ActionResult CourseList()
+		public ActionResult CourseList(string courseId = "")
 		{
 			var model = new CourseListViewModel
 			{
 				Courses = courseManager.GetCourses().ToList(), 
-				PackageNames = courseManager.GetStagingPackages().ToList()
+				PackageNames = courseManager.GetStagingPackages().ToList(),
+				LastLoadedCourse = courseId
 			};
 			return View(model);
 		}
@@ -36,9 +37,15 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		public ActionResult ReloadCourse(string packageName, string returnUrl = null)
 		{
-			courseManager.ReloadCourse(packageName);
+			var courseId = courseManager.ReloadCourse(packageName);
 			if (returnUrl != null) return Redirect(returnUrl);
-			return RedirectToAction("CourseList");
+			return RedirectToAction("CourseList", new { courseId });
+		}
+
+		public ActionResult SpellingErrors(string courseId)
+		{
+			var course = courseManager.GetCourse(courseId);
+			return PartialView(course.SpellCheck());
 		}
 
 		public ActionResult List(string courseId)
@@ -126,6 +133,7 @@ namespace uLearn.Web.Controllers
 	{
 		public List<Course> Courses;
 		public List<StagingPackage> PackageNames;
+		public string LastLoadedCourse { get; set; }
 	}
 
 }

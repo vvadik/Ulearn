@@ -72,23 +72,25 @@ namespace uLearn
 			}
 		}
 
-		public void ReloadCourse(string packageName)
+		public string ReloadCourse(string packageName)
 		{
 			var file = StagedDirectory.GetFile(packageName);
-			ReloadCourseFromZip(file);
+			return ReloadCourseFromZip(file);
 		}
 
-		private void ReloadCourseFromZip(FileInfo zipFile)
+		private string ReloadCourseFromZip(FileInfo zipFile)
 		{
+			string courseId = "";
 			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions {Encoding = Encoding.GetEncoding(866)}))
 			{
-				var courseId = Path.GetFileNameWithoutExtension(zipFile.Name);
+				courseId = Path.GetFileNameWithoutExtension(zipFile.Name);
 				var courseDir = coursesDirectory.CreateSubdirectory(courseId);
 				Directory.Delete(courseDir.FullName, true);
 				courseDir.Create();
 				zip.ExtractAll(courseDir.FullName, ExtractExistingFileAction.OverwriteSilently);
 				ReloadCourse(courseDir);
 			}
+			return courseId;
 		}
 
 		public void ReloadCourse(DirectoryInfo dir)
