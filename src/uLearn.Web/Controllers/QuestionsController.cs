@@ -108,9 +108,10 @@ namespace uLearn.Web.Controllers
 		[ValidateInput(false)]
 		public async Task<string> AddQuestion(string courseId, string slideId, string question)
 		{
-			IIdentity user = User.Identity;
+			var user = User.Identity;
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
-			await userQuestionsRepo.AddUserQuestion(question, courseId, slide, user.GetUserId(), user.Name, DateTime.Now);
+			if (!string.IsNullOrWhiteSpace(question))
+				await userQuestionsRepo.AddUserQuestion(question, courseId, slide, user.GetUserId(), user.Name, DateTime.Now);
 			return "Success!";
 		}
 	}
