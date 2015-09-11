@@ -17,21 +17,26 @@ namespace uLearn
 		[XmlElement("prelude")]
 		public PreludeFile[] Preludes { get; set; }
 
+		[XmlElement("dictionary")]
+		public string DictionaryFile { get; set; }
+
 		public static readonly CourseSettings DefaultSettings = new CourseSettings(
 			null, 
 			new[] { new Language("py", "3") }, 
-			new [] {new PreludeFile("cs", "Prelude.cs")}
+			new [] {new PreludeFile("cs", "Prelude.cs")},
+			"dictionary.txt"
 		);
 
 		public CourseSettings()
 		{
 		}
 
-		public CourseSettings(string title, Language[] defaultLanguageVersions, PreludeFile[] preludes)
+		public CourseSettings(string title, Language[] defaultLanguageVersions, PreludeFile[] preludes, string dictionaryFile)
 		{
 			Title = title;
 			DefaultLanguageVersions = defaultLanguageVersions;
 			Preludes = preludes;
+			DictionaryFile = dictionaryFile;
 		}
 
 		public static CourseSettings Load(DirectoryInfo dir)
@@ -61,6 +66,11 @@ namespace uLearn
 			if (res == null && Title != null)
 				return DefaultSettings.GetPrelude(langId);
 			return res == null ? null : res.File;
+		}
+
+		public string GetDictionaryFile()
+		{
+			return DictionaryFile ?? DefaultSettings.DictionaryFile;
 		}
 	}
 

@@ -6,13 +6,14 @@ namespace uLearn
 {
 	public class Course
 	{
-		public Course(string id, string title, Slide[] slides, InstructorNote[] instructorNotes, CourseSettings settings)
+		public Course(string id, string title, Slide[] slides, InstructorNote[] instructorNotes, CourseSettings settings, DirectoryInfo directory)
 		{
 			Id = id;
 			Title = title;
 			Slides = slides;
 			InstructorNotes = instructorNotes;
 			Settings = settings;
+			Directory = directory;
 		}
 
 		public string Id { get; private set; }
@@ -20,6 +21,7 @@ namespace uLearn
 		public Slide[] Slides { get; private set; }
 		public InstructorNote[] InstructorNotes { get; private set; }
 		public CourseSettings Settings { get; private set; }
+		public DirectoryInfo Directory { get; private set; }
 
 		public string GetDirectoryByUnitName(string unitName)
 		{

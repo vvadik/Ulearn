@@ -35,7 +35,7 @@ namespace uLearn
 			CheckDuplicateSlideIds(slides);
 			var notes = LoadInstructorNotes(dir, courseId);
 			var title = settings.Title ?? GetTitle(dir);
-			return new Course(courseId, title, slides, notes, settings);
+			return new Course(courseId, title, slides, notes, settings, dir);
 		}
 
 		private static InstructorNote[] LoadInstructorNotes(DirectoryInfo dir, string courseId)
