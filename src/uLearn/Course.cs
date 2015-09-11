@@ -52,11 +52,6 @@ namespace uLearn
 		{
 			return string.Format("Id: {0}, Title: {1}", Id, Title);
 		}
-
-		public string[] SpellCheck()
-		{
-			return Slides.SelectMany(s => s.SpellCheck()).ToArray();
-		}
 	}
 
 	public class InstructorNote

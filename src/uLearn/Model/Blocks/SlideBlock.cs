@@ -17,9 +17,9 @@ namespace uLearn.Model.Blocks
 
 		public abstract Component ToEdxComponent(string displayName, Slide slide, int componentIndex);
 
-		public virtual string[] SpellCheck(string prefix)
+		public virtual string TryGetText()
 		{
-			return new string[0];
+			return null;
 		}
 	}
 }

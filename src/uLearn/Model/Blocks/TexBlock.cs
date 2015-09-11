@@ -30,9 +30,9 @@ namespace uLearn.Model.Blocks
 			return new HtmlComponent(urlName, displayName, urlName, string.Join("\n", TexLines.Select(x => "$$" + x + "$$")).GetHtmlWithUrls("/static").Item1);
 		}
 
-		public override string[] SpellCheck(string prefix)
+		public override string TryGetText()
 		{
-			return TexLines.SelectMany(l => l.SpellCheck(prefix)).ToArray();
+			return string.Join("\n", TexLines);
 		}
 	}
 }

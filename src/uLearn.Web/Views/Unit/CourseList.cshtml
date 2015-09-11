@@ -38,6 +38,6 @@
 	
 	@if (!string.IsNullOrWhiteSpace(Model.LastLoadedCourse))
 	{
-		<div class="load-content" data-url="@Url.Action("SpellingErrors", new {courseId = Model.LastLoadedCourse} )"> loading... </div>
+		<div class="load-content" data-url="@Url.Action("SpellingErrors", new {courseId = Model.LastLoadedCourse} )"> processing... </div>
 	}
 </div>

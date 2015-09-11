@@ -120,11 +120,5 @@ namespace uLearn
 				return QuizToVerticals(quizSlide);
 			return OrdinarySlideToVerticals(courseId, this, exerciseUrl, solutionsUrl, videoGuids, ltiId);
 		}
-
-		public string[] SpellCheck()
-		{
-			var slideName = string.Format("{0} ({1})", Title, Id);
-			return Blocks.SelectMany(b => b.SpellCheck(slideName)).ToArray();
-		}
 	}
 }

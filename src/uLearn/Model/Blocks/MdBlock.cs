@@ -34,7 +34,7 @@ namespace uLearn.Model.Blocks
 		{
 			var urlName = slide.Guid + componentIndex;
 			var htmlWithUrls = Markdown.GetHtmlWithUrls("/static/" + urlName + "_");
-			return new HtmlComponent(urlName, displayName,urlName, htmlWithUrls.Item1, slide.Info.SlideFile.Directory.FullName, htmlWithUrls.Item2);
+			return new HtmlComponent(urlName, displayName, urlName, htmlWithUrls.Item1, slide.Info.SlideFile.Directory.FullName, htmlWithUrls.Item2);
 		}
 
 		public Component ToEdxComponent(string urlName, string displayName, string directoryName)
@@ -43,9 +43,9 @@ namespace uLearn.Model.Blocks
 			return new HtmlComponent(urlName, displayName, urlName, htmlWithUrls.Item1, directoryName, htmlWithUrls.Item2);
 		}
 
-		public override string[] SpellCheck(string prefix)
+		public override string TryGetText()
 		{
-			return Markdown.SpellCheck(prefix);
+			return Markdown;
 		}
 	}
 }
