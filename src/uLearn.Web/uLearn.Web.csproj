@@ -281,6 +281,10 @@
     <Compile Include="Migrations\201508141111366_UserSolution_TimestampIndex.Designer.cs">
       <DependentUpon>201508141111366_UserSolution_TimestampIndex.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201509021133351_AddInfoAboutStudent.cs" />
+    <Compile Include="Migrations\201509021133351_AddInfoAboutStudent.Designer.cs">
+      <DependentUpon>201509021133351_AddInfoAboutStudent.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
     <Compile Include="Models\LtiQuizModel.cs" />
     <Compile Include="Models\LtiSlideRequest.cs" />
@@ -545,6 +549,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201508141111366_UserSolution_TimestampIndex.resx">
       <DependentUpon>201508141111366_UserSolution_TimestampIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201509021133351_AddInfoAboutStudent.resx">
+      <DependentUpon>201509021133351_AddInfoAboutStudent.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -1104,6 +1111,8 @@
     <Content Include="Views\Sandbox\RunCode.cshtml" />
     <Content Include="Views\Course\LtiQuizSlide.cshtml" />
     <Content Include="Views\Course\LtiSlide.cshtml" />
+    <Content Include="Views\Account\StudentInfo.cshtml" />
+    <Content Include="Views\Shared\_GroupsPrompt.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

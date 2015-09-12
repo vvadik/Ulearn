@@ -8,7 +8,7 @@ namespace uLearn.CourseTool
 	{
 		public override void DoExecute()
 		{
-			Monitor.StartMonitor(Dir, Config.ULearnCourseId);
+			Monitor.Start(Dir, Config.ULearnCourseId);
 		}
 	}
 }

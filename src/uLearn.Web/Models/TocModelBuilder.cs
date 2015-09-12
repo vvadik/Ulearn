@@ -38,7 +38,7 @@ namespace uLearn.Web.Models
 
 		private TocUnitModel CreateUnit(string unitName, List<Slide> slides)
 		{
-			var pages = slides.Select(s => CreatePage(s)).ToList();
+			var pages = slides.Select(CreatePage).ToList();
 			if (IsInstructor)
 			{
 				if (course.FindInstructorNote(unitName) != null)

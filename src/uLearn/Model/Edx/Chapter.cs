@@ -57,10 +57,17 @@ namespace uLearn.Model.Edx
 
 		public static Chapter Load(string folderName, string urlName)
 		{
-			var chapter = new FileInfo(string.Format("{0}/chapter/{1}.xml", folderName, urlName)).DeserializeXml<Chapter>();
-			chapter.UrlName = urlName;
-			chapter.Sequentials = chapter.SequentialReferences.Select(x => Sequential.Load(folderName, x.UrlName)).ToArray();
-			return chapter;
+			try
+			{
+				var chapter = new FileInfo(string.Format("{0}/chapter/{1}.xml", folderName, urlName)).DeserializeXml<Chapter>();
+				chapter.UrlName = urlName;
+				chapter.Sequentials = chapter.SequentialReferences.Select(x => Sequential.Load(folderName, x.UrlName)).ToArray();
+				return chapter;
+			}
+			catch (Exception e)
+			{
+				throw new Exception(string.Format("Chapter {0} load error", urlName), e);
+			}
 		}
 	}
 }

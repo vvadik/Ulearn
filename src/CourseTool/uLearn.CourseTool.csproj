@@ -85,11 +85,11 @@
   <ItemGroup>
     <Compile Include="AbstractOptions.cs" />
     <Compile Include="ArchiveManager.cs" />
+    <Compile Include="PreviewHttpServer.cs" />
     <Compile Include="Monitor.cs" />
     <Compile Include="MonitorOptions.cs" />
     <Compile Include="OperationFailedGracefully.cs" />
     <Compile Include="SlideRenderer.cs" />
-    <Compile Include="HttpServer.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="ConvertOptions.cs" />
     <Compile Include="CookieAwareWebClient.cs">

@@ -2,68 +2,59 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace uLearn.CourseTool
 {
 	class Monitor
 	{
-		static string courseDir = "BasicProgramming";
-		static string htmlDir = "html";
-		private static HttpServer server;
+		private readonly PreviewHttpServer server;
+		private readonly string courseDir;
 
-		public static void StartMonitor(string homeDir, string courseDir)
+		public static void Start(string homeDir, string courseId)
 		{
-			Monitor.courseDir = homeDir + "/" + courseDir;
-			htmlDir = homeDir + "/" + htmlDir;
-			if (!Directory.Exists(htmlDir))
-				Directory.CreateDirectory(htmlDir);
-			if (!Directory.Exists(htmlDir + "/static"))
-				Directory.CreateDirectory(htmlDir + "/static");
-			Utils.DirectoryCopy(Utils.GetRootDirectory() + "/renderer", htmlDir, true);
-			server = new HttpServer(htmlDir, 1337);
-			Reload();
-			var fileWatcher = new FileSystemWatcher(Monitor.courseDir);
-			fileWatcher.IncludeSubdirectories = true;
-			fileWatcher.Changed += FileWatcherOnChanged;
-			fileWatcher.EnableRaisingEvents = true;
-			Console.WriteLine("Started monitoring {0}", Monitor.courseDir);
+			// ReSharper disable once ObjectCreationAsStatement
+			new Monitor(homeDir, courseId);
+		}
+
+		private Monitor(string homeDir, string courseId)
+		{
+			courseDir = Path.Combine(homeDir, courseId);
+			server = new PreviewHttpServer(courseDir, Path.Combine(homeDir, "html"), 1337);
 			server.Start();
-			Process.Start(@"http://localhost:1337/001.html");
-			while (Console.ReadKey(intercept:true).Key != ConsoleKey.Q)
-				Console.WriteLine("Press Q to exit");
-		}
-
-		static void Reload()
-		{
-			var course = new CourseLoader().LoadCourse(new DirectoryInfo(courseDir));
-			var renderer = new SlideRenderer(new DirectoryInfo(htmlDir));
-			foreach (var slide in course.Slides)
-				File.WriteAllText(
-					string.Format("{0}/{1}.html", htmlDir, slide.Index.ToString("000")), 
-					renderer.RenderSlide(course, slide)
-				);
-			foreach (var note in course.GetUnits().Select(course.FindInstructorNote).Where(x => x != null))
-				File.WriteAllText(
-					string.Format("{0}/{1}.html", htmlDir, note.UnitName),
-					renderer.RenderInstructorsNote(course, note.UnitName)
-				);
-			server.course = course;
-			server.UpdateAll();
-		}
-
-		private static void FileWatcherOnChanged(object sender, FileSystemEventArgs fileSystemEventArgs)
-		{
-			Console.WriteLine("{0} was {1}.", fileSystemEventArgs.FullPath, fileSystemEventArgs.ChangeType.ToString().ToLower());
+			StartWatchingCourseDir();
+			Console.WriteLine("Started monitoring {0}", courseDir);
+			OpenInBrowser();
 			while (true)
-				try
-				{
-					Reload();
+			{
+				var key = Console.ReadKey(intercept:true).Key;
+				if (key == ConsoleKey.Q)
 					break;
-				}
-				catch (Exception e)
-				{
-					Console.WriteLine(e);
-				}
+				else if (key == ConsoleKey.O)
+					OpenInBrowser();
+				else
+					Console.WriteLine("Press 'Q' to exit. Press 'O' to open course in browser");
+			}
+		}
+
+		private void StartWatchingCourseDir()
+		{
+			var fileWatcher = new FileSystemWatcher(courseDir) { IncludeSubdirectories = true };
+			fileWatcher.Changed += FileWatcherOnChanged;
+			fileWatcher.Renamed += FileWatcherOnChanged;
+			fileWatcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite | NotifyFilters.DirectoryName | NotifyFilters.FileName;
+			fileWatcher.EnableRaisingEvents = true;
+		}
+
+		private static void OpenInBrowser()
+		{
+			Process.Start(@"http://localhost:1337/001.html");
+		}
+
+		private void FileWatcherOnChanged(object sender, FileSystemEventArgs args)
+		{
+			Console.WriteLine("{0} {1} was {2}.", DateTime.Now.ToString("T"), args.Name, args.ChangeType.ToString().ToLower());
+			server.MarkCourseAsChanged();
 		}
 	}
 }

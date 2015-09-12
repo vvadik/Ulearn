@@ -96,5 +96,30 @@ namespace uLearn.Web.Models
 		[System.Web.Mvc.Compare("Password", ErrorMessage = "Подтверждение пароля и пароль отличаются.")]
 #pragma warning restore 0618
 		public string ConfirmPassword { get; set; }
+
+		[Display(Name = "Имя")]
+		public string FirstName { get; set; }
+
+		[Display(Name = "Фамилия")]
+		public string LastName { get; set; }
+
+		[Display(Name = "Почта")]
+		public string Email { get; set; }
+
+	}
+
+	public class LtiUserViewModel
+	{
+		[Display(Name = "Имя")]
+		public string FirstName { get; set; }
+
+		[Display(Name = "Фамилия")]
+		public string LastName { get; set; }
+
+		[Display(Name = "Группа")]
+		public string GroupName { get; set; }
+
+		[Display(Name = "Почта")]
+		public string Email { get; set; }
 	}
 }
