@@ -362,3 +362,55 @@ div.tex {
 .submitions-item {
 	cursor: pointer;
 }
+
+table.diff {
+	border-collapse: collapse;
+	border: 1px solid lightblue /*darkgray*/;
+	white-space: pre-wrap;
+	table-layout: fixed;
+	width: 100%;
+}
+
+table.diff tbody {
+	font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+}
+
+table.diff thead th:first-child {
+	width: 30px;
+}
+
+table.diff th {
+	background: aliceblue;
+	font-weight: normal;
+	border: 1px solid lightblue /*#BBC*/;
+	text-align: center !important;
+	vertical-align: top;
+}
+
+table.diff tbody th {
+	font-size:11px;
+	color:#428bca/*#886*/;
+}
+
+table.diff tbody td {
+	padding: 0 .4em;
+	padding-top: .4em;
+	vertical-align: top;
+	border-right: 1px solid aliceblue;
+}
+
+table.diff .different:nth-child(odd) td {
+	background-color: #E99;
+}
+
+table.diff .different:nth-child(even) td {
+	background-color: #FAA;
+}
+
+table.diff .equals:nth-child(odd) td {
+	background-color: #9E9;
+}
+
+table.diff .equals:nth-child(even) td {
+	background-color: #AFA;
+}

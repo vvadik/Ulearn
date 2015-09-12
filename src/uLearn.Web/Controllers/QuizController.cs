@@ -7,6 +7,7 @@ using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
+using uLearn.Web.LTI;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -60,22 +61,30 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize(Roles = LmsRoles.Tester)]
-		public async Task<ActionResult> ClearAnswers(string courseId, string slideId)
+		public async Task<ActionResult> ClearAnswers(string courseId, string slideId, bool isLti)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
-			await userQuizzesRepo.RemoveAnswers(User.Identity.GetUserId(), slideId);
-			await visitersRepo.RemoveAttempts(slideId, User.Identity.GetUserId());
-			return RedirectToAction("Slide", "Course", new { courseId, slideIndex = slide.Index });
+			var userId = User.Identity.GetUserId();
+			await userQuizzesRepo.RemoveAnswers(userId, slideId);
+			await visitersRepo.RemoveAttempts(slideId, userId);
+			var model = new { courseId, slideIndex = slide.Index };
+			if (isLti)
+			{
+				LtiUtils.SubmitScore(slide, userId);
+				return RedirectToAction("LtiSlide", "Course", model);
+			}
+			return RedirectToAction("Slide", "Course", model);
 		}
 
 		[HttpPost]
 		[Authorize]
-		public async Task<string> SubmitQuiz(string courseId, string slideIndex, string answer)
+		public async Task<string> SubmitQuiz(string courseId, string slideIndex, string answer, bool isLti)
 		{
 			var intSlideIndex = int.Parse(slideIndex);
 			var course = courseManager.GetCourse(courseId);
 			var userId = User.Identity.GetUserId();
-			var slideId = course.Slides[intSlideIndex].Id;
+			var slide = course.Slides[intSlideIndex];
+			var slideId = slide.Id;
 
 			if (visitersRepo.IsPassed(userId, slideId))
 				return "already answered";
@@ -106,7 +115,11 @@ namespace uLearn.Web.Controllers
 			foreach (var quizInfoForDb in allQuizInfos)
 				await userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
 					slideId, quizInfoForDb.Text, userId, time, quizInfoForDb.IsRightQuizBlock);
+
 			await visitersRepo.AddAttempt(slideId, userId, score);
+			if (isLti)
+				LtiUtils.SubmitScore(slide, userId);
+
 			return string.Join("*", incorrectQuizzes.Distinct());
 		}
 
@@ -241,7 +254,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<ActionResult> DropQuiz(string courseId, string slideId)
+		public async Task<ActionResult> DropQuiz(string courseId, string slideId, bool isLti)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			if (slide is QuizSlide)
@@ -252,12 +265,17 @@ namespace uLearn.Web.Controllers
 				{
 					await userQuizzesRepo.DropQuiz(userId, slideId);
 					await visitersRepo.DropAttempt(slideId, userId);
+					if (isLti)
+						LtiUtils.SubmitScore(slide, userId);
 				}
 			}
-			return RedirectToAction("Slide", "Course", new { courseId, slideIndex = slide.Index });
+			var model = new { courseId, slideIndex = slide.Index, isLti };
+			if (isLti)
+				return RedirectToAction("LtiSlide", "Course", model);
+			return RedirectToAction("Slide", "Course", model);
 		}
 
-		public ActionResult Quiz(QuizSlide slide, string courseId, string userId)
+		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isLti = false)
 		{
 			var slideId = slide.Id;
 			var maxDropCount = GetMaxDropCount(slide);
@@ -273,7 +291,8 @@ namespace uLearn.Web.Controllers
 				ResultsForQuizes = resultsForQuizes,
 				AnswersToQuizes =
 					userQuizzesRepo.GetAnswersForShowOnSlide(courseId, slide,
-						userId)
+						userId),
+				IsLti = isLti
 			};
 
 			if (model.QuizState != QuizState.NotPassed && model.RightAnswers == model.QuestionsCount)

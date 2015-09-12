@@ -14,14 +14,21 @@ namespace uLearn.Web.Models
 		public Dictionary<string, bool> ResultsForQuizes { get; set; }
 		public int TryNumber { get; set; }
 		public int MaxDropCount { get; set; }
+		public bool IsLti { get; set; }
 
 		public int RightAnswers
 		{
 			get { return ResultsForQuizes == null ? 0 : ResultsForQuizes.AsEnumerable().Count(res => res.Value); }
 		}
+
 		public int QuestionsCount
 		{
 			get { return ResultsForQuizes == null ? 0 : ResultsForQuizes.Count; }
+		}
+
+		public string IsLtiToString
+		{
+			get { return IsLti.ToString().ToLowerInvariant(); }
 		}
 	}
 }
