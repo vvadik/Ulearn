@@ -20,6 +20,7 @@ namespace uLearn.CourseTool
 
 		public override void DoExecute()
 		{
+			Console.WriteLine("Profile {0}", Profile);
 			var profile = Config.GetProfile(Profile);
 			var credentials = Credentials.GetCredentials(Dir, Profile);
 
