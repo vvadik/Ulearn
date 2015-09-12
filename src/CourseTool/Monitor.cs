@@ -8,7 +8,7 @@ namespace uLearn.CourseTool
 {
 	class Monitor
 	{
-		private readonly HttpServer server;
+		private readonly PreviewHttpServer server;
 		private readonly string courseDir;
 
 		public static void Start(string homeDir, string courseId)
@@ -20,7 +20,7 @@ namespace uLearn.CourseTool
 		private Monitor(string homeDir, string courseId)
 		{
 			courseDir = Path.Combine(homeDir, courseId);
-			server = new HttpServer(courseDir, Path.Combine(homeDir, "html"), 1337);
+			server = new PreviewHttpServer(courseDir, Path.Combine(homeDir, "html"), 1337);
 			server.Start();
 			StartWatchingCourseDir();
 			Console.WriteLine("Started monitoring {0}", courseDir);

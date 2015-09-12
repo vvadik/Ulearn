@@ -12,7 +12,7 @@ using uLearn.Web.Models;
 
 namespace uLearn.CourseTool
 {
-	class HttpServer
+	class PreviewHttpServer
 	{
 		private readonly HttpListener listener;
 		private readonly string courseDir;
@@ -21,7 +21,7 @@ namespace uLearn.CourseTool
 		public volatile Course course;
 		private readonly object locker = new object();
 
-		public HttpServer(string courseDir, string htmlDir, int port)
+		public PreviewHttpServer(string courseDir, string htmlDir, int port)
 		{
 			listener = new HttpListener();
 			listener.Prefixes.Add(string.Format("http://+:{0}/", port));
@@ -177,17 +177,11 @@ namespace uLearn.CourseTool
 		Course ReloadCourse()
 		{
 			var loadedCourse = new CourseLoader().LoadCourse(new DirectoryInfo(courseDir));
-			var renderer = new SlideRenderer(new DirectoryInfo(htmlDir));
+			var renderer = new SlideRenderer(new DirectoryInfo(htmlDir), loadedCourse);
 			foreach (var slide in loadedCourse.Slides)
-				File.WriteAllText(
-					string.Format("{0}/{1}.html", htmlDir, slide.Index.ToString("000")),
-					renderer.RenderSlide(loadedCourse, slide)
-				);
-			foreach (var note in loadedCourse.GetUnits().Select(loadedCourse.FindInstructorNote).Where(x => x != null))
-				File.WriteAllText(
-					string.Format("{0}/{1}.html", htmlDir, note.UnitName),
-					renderer.RenderInstructorsNote(loadedCourse, note.UnitName)
-				);
+				renderer.RenderSlideToFile(slide, htmlDir);
+			foreach (var unit in course.GetUnits().Where(u => course.FindInstructorNote(u) != null))
+				renderer.RenderInstructorNotesToFile(unit, htmlDir);
 			return loadedCourse;
 		}
 

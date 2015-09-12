@@ -55,9 +55,16 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		public static LtiComponent Load(string folderName, string urlName)
 		{
-			var component = new FileInfo(string.Format("{0}/lti/{1}.xml", folderName, urlName)).DeserializeXml<LtiComponent>();
-			component.UrlName = urlName;
-			return component;
+			try
+			{
+				var component = new FileInfo(string.Format("{0}/lti/{1}.xml", folderName, urlName)).DeserializeXml<LtiComponent>();
+				component.UrlName = urlName;
+				return component;
+			}
+			catch (Exception e)
+			{
+				throw new Exception(string.Format("Lti {0} load error", urlName), e);
+			}
 		}
 	}
 }
