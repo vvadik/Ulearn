@@ -180,7 +180,7 @@ namespace uLearn.CourseTool
 			var renderer = new SlideRenderer(new DirectoryInfo(htmlDir), loadedCourse);
 			foreach (var slide in loadedCourse.Slides)
 				renderer.RenderSlideToFile(slide, htmlDir);
-			foreach (var unit in course.GetUnits().Where(u => course.FindInstructorNote(u) != null))
+			foreach (var unit in loadedCourse.GetUnits().Where(u => loadedCourse.FindInstructorNote(u) != null))
 				renderer.RenderInstructorNotesToFile(unit, htmlDir);
 			return loadedCourse;
 		}
