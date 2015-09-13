@@ -100,7 +100,7 @@ namespace uLearn
 		private static IEnumerable<Vertical> QuizToVerticals(string courseId, QuizSlide slide, string slideUrl, string ltiId)
 		{
 			var ltiComponent = 
-				new LtiComponent(slide.Title, slide.Guid + "quiz", string.Format(slideUrl, courseId, slide.Index), ltiId, true, slide.MaxScore, false);
+				new LtiComponent(slide.Title, slide.Guid + "-quiz", string.Format(slideUrl, courseId, slide.Index), ltiId, true, slide.MaxScore, false);
 			yield return new Vertical(slide.Guid, slide.Title, new Component[] { ltiComponent });
 		}
 
