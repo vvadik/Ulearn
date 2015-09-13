@@ -6,14 +6,15 @@
 
 <!DOCTYPE html>
 <html>
-	<head>
-		@Styles.Render("~/css")
-	</head>
-	<body>
-		@if (Model != null)
-		{
-			@Html.Action("Quiz", "Quiz", new { slide = Model.Slide, courseId = Model.CourseId, userId = Model.UserId, isLti = true });
-			@Scripts.Render("~/main-js")
-		}
-	</body>
+<head>
+	<title>Quiz</title>
+	@Styles.Render("~/css")
+</head>
+<body class="lti-component">
+	@if (Model != null)
+	{
+		@Html.Action("Quiz", "Quiz", new { slide = Model.Slide, courseId = Model.CourseId, userId = Model.UserId, isLti = true });
+		@Scripts.Render("~/main-js")
+	}
+</body>
 </html>

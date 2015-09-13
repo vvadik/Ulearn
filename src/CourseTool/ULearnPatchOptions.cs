@@ -37,7 +37,7 @@ namespace uLearn.CourseTool
 					.Where(s => guids == null || guids.Contains(s.Guid))
 					.Select(s => s.ToVerticals(
 						ulearnCourse.Id, 
-						profile.UlearnUrl + ExerciseUrlFormat, 
+						profile.UlearnUrl + SlideUrlFormat, 
 						profile.UlearnUrl + SolutionsUrlFormat, 
 						videoGuids,
 						config.LtiId

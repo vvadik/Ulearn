@@ -414,3 +414,9 @@ table.diff .equals:nth-child(odd) td {
 table.diff .equals:nth-child(even) td {
 	background-color: #AFA;
 }
+
+body.lti-component {
+	padding-top: 0;
+	margin-top: 0;
+	overflow-x: hidden;
+}
