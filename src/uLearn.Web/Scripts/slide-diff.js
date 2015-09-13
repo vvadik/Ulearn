@@ -1,10 +1,7 @@
 ﻿function diffHtml(actual, expected) {
 	this.getEoln = function (s) {
-		for (var eoln in ("\r\n", "\n", "\r")) {
-			if (s.indexOf(eoln) > -1)
-				return eoln;
-		}
-		return "\n";
+		var good = ["\r\n", "\n", "\r"].filter(function(eoln) { return s.indexOf(eoln) >= 0 });
+		return good.length > 0 ? good[0] : "\n";
 	}
 
 	this.split = function (s) {
