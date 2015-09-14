@@ -17,6 +17,7 @@ namespace uLearn.CourseTool
 		private readonly HttpListener listener;
 		private readonly string courseDir;
 		private readonly string htmlDir;
+		private readonly int port;
 		private DateTime lastChangeTime = DateTime.MinValue;
 		public volatile Course course;
 		private readonly object locker = new object();
@@ -27,6 +28,7 @@ namespace uLearn.CourseTool
 			listener.Prefixes.Add(string.Format("http://+:{0}/", port));
 			this.courseDir = courseDir;
 			this.htmlDir = htmlDir;
+			this.port = port;
 			CopyStaticToHtmlDir();
 		}
 
@@ -42,7 +44,19 @@ namespace uLearn.CourseTool
 
 		public void Start()
 		{
-			listener.Start();
+			try
+			{
+				listener.Start();
+			}
+			catch (HttpListenerException e)
+			{
+				Console.WriteLine("HttpListener Start Error: {0}", e.Message);
+				Console.WriteLine();
+				Console.WriteLine("On 'access is denied' error do one of the following:");
+				Console.WriteLine("1. Run this application with admin rights.");
+				Console.WriteLine("2. OR run this command in command line ('Everyone' may be some specific user):");
+				Console.WriteLine("   netsh http add urlacl url=http://+:{0}/ user=Everyone", port);
+			}
 			StartListen();
 		}
 
@@ -190,7 +204,7 @@ namespace uLearn.CourseTool
 			lock (locker)
 			{
 				var needReload = lastChangeTime > requestTime.Add(TimeSpan.FromMilliseconds(500));
-				if (needReload)
+				if (needReload || course == null)
 				{
 					course = ReloadCourse();
 					Console.WriteLine("Course reloaded. LastChangeTime: {0}", lastChangeTime);
