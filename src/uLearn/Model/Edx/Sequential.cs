@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Security.Policy;
 using System.Xml.Serialization;
@@ -53,10 +54,17 @@ namespace uLearn.Model.Edx
 
 		public static Sequential Load(string folderName, string urlName)
 		{
-			var sequential = new FileInfo(string.Format("{0}/sequential/{1}.xml", folderName, urlName)).DeserializeXml<Sequential>();
-			sequential.UrlName = urlName;
-			sequential.Verticals = sequential.VerticalReferences.Select(x => Vertical.Load(folderName, x.UrlName)).ToArray();
-			return sequential;
+			try
+			{
+				var sequential = new FileInfo(string.Format("{0}/sequential/{1}.xml", folderName, urlName)).DeserializeXml<Sequential>();
+				sequential.UrlName = urlName;
+				sequential.Verticals = sequential.VerticalReferences.Select(x => Vertical.Load(folderName, x.UrlName)).ToArray();
+				return sequential;
+			}
+			catch (Exception e)
+			{
+				throw new Exception(string.Format("Sequential {0} load error", urlName), e);
+			}
 		}
 	}
 }

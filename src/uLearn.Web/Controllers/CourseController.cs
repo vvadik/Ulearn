@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using uLearn.Model.Blocks;
+using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 
@@ -55,23 +57,40 @@ namespace uLearn.Web.Controllers
 
 			var ltiRequestJson = FindLtiRequestJson();
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.Slides[slideIndex] as ExerciseSlide;
-			if (slide == null)
-				return View();
+			var slide = course.Slides[slideIndex];
+
 			if (!string.IsNullOrWhiteSpace(ltiRequestJson))
 				await ltiRequestsRepo.Update(userId, slide.Id, ltiRequestJson);
 
-			await visitersRepo.AddVisiter(courseId, slide.Id, userId);
-			var visiter = visitersRepo.GetVisiter(slide.Id, User.Identity.GetUserId());
-			var model = new CodeModel
+			var visiter = await VisitSlide(courseId, slide.Id);
+
+			var exerciseSlide = slide as ExerciseSlide;
+			if (exerciseSlide != null)
 			{
-				CourseId = courseId,
-				SlideIndex = slideIndex,
-				SlideId = slide.Id,
-				ExerciseBlock = slide.Exercise,
-				Context = CreateRenderContext(course, slide, userId, visiter, true)
-			};
-			return View(model);
+				var model = new CodeModel
+				{
+					CourseId = courseId,
+					SlideIndex = slideIndex,
+					SlideId = exerciseSlide.Id,
+					ExerciseBlock = exerciseSlide.Exercise,
+					Context = CreateRenderContext(course, exerciseSlide, userId, visiter, true)
+				};
+				return View("LtiExerciseSlide", model);
+			}
+
+			var quizSlide = slide as QuizSlide;
+			if (quizSlide != null)
+			{
+				var model = new LtiQuizModel
+				{
+					CourseId = courseId,
+					Slide = quizSlide,
+					UserId = userId
+				};
+				return View("LtiQuizSlide", model);
+			}
+
+			return View();
 		}
 
 		private string FindLtiRequestJson()
@@ -137,8 +156,7 @@ namespace uLearn.Web.Controllers
 			var isFirstCourseVisit = !db.Visiters.Any(x => x.UserId == userId);
 			var slide = course.Slides[slideIndex];
 			var slideId = slide.Id;
-			await VisitSlide(courseId, slideId);
-			var visiter = visitersRepo.GetVisiter(slideId, User.Identity.GetUserId());
+			var visiter = await VisitSlide(courseId, slideId);
 			var score = Tuple.Create(visiter.Score, slide.MaxScore);
 			var model = new CoursePageModel
 			{
@@ -252,9 +270,11 @@ namespace uLearn.Web.Controllers
 			return Json(new { likesCount = res.Item1, liked = res.Item2 });
 		}
 
-		public async Task VisitSlide(string courseId, string slideId)
+		public async Task<Visiters> VisitSlide(string courseId, string slideId)
 		{
-			await visitersRepo.AddVisiter(courseId, slideId, User.Identity.GetUserId());
+			var userId = User.Identity.GetUserId();
+			await visitersRepo.AddVisiter(courseId, slideId, userId);
+			return visitersRepo.GetVisiter(slideId, userId);
 		}
 
 		[Authorize(Roles = LmsRoles.Instructor)]

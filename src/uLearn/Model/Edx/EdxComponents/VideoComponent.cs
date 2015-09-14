@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Xml.Serialization;
 
 namespace uLearn.Model.Edx.EdxComponents
@@ -42,9 +43,16 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		public static VideoComponent Load(string folderName, string urlName)
 		{
-			var component = new FileInfo(string.Format("{0}/video/{1}.xml", folderName, urlName)).DeserializeXml<VideoComponent>();
-			component.UrlName = urlName;
-			return component;
+			try
+			{
+				var component = new FileInfo(string.Format("{0}/video/{1}.xml", folderName, urlName)).DeserializeXml<VideoComponent>();
+				component.UrlName = urlName;
+				return component;
+			}
+			catch (Exception e)
+			{
+				throw new Exception(string.Format("Video {0} load error", urlName), e);
+			}
 		}
 	}
 }

@@ -24,7 +24,7 @@
 	<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
 		@if (Model.QuizState == QuizState.NotPassed)
 		{
-			<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count')">Готово!</button>
+			<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString)">Готово!</button>
 		}
 		else if (Model.QuizState == QuizState.Subtotal)
 		{
@@ -32,6 +32,7 @@
 			{
 				<input type="hidden" name="slideId" value="@Model.Slide.Id" />
 				<input type="hidden" name="courseId" value="@Model.CourseId" />
+				<input type="hidden" name="isLti" value="@Model.IsLtiToString">
 				<button class="btn btn-danger" type="submit">Пройти тест повторно</button>
 				<small>У вас остал@(remains == 1 ? "а" : "о")сь @remains из @(Model.MaxDropCount + 1) попыток</small>
 			}
@@ -42,6 +43,7 @@
 			{
 				<input type="hidden" name="slideId" value="@Model.Slide.Id" />
 				<input type="hidden" name="courseId" value="@Model.CourseId" />
+				<input type="hidden" name="isLti" value="@Model.IsLtiToString">
 				<button class="btn btn-danger" type="submit">Удалить ответы</button>
 			}
 		}

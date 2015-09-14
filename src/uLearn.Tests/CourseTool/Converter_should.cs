@@ -17,7 +17,7 @@ namespace uLearn.CourseTool
 		private readonly Slide exerciseSlide = new Slide(new[] { new ExerciseBlock() }, new SlideInfo("u1", new FileInfo("file"), 0), "title", Utils.GetNormalizedGuid(slideIdFromCourse));
 		private const string youtubeIdFromCourse = "GZS36w_fxdg";
 		private const string slideIdFromCourse = "108C89D9-36F0-45E3-BBEE-B93AC971063F";
-		private const string exerciseUrl = "https://192.168.33.1:44300/Course/{0}/LtiSlide/{1}";
+		private const string slideUrl = "https://192.168.33.1:44300/Course/{0}/LtiSlide/{1}";
 		private const string solutionsUrl = "https://192.168.33.1:44300/Course/{0}/AcceptedAlert/{1}";
 		private const string ltiId = "edx";
 		private const string testFolderName = "test";
@@ -45,7 +45,7 @@ namespace uLearn.CourseTool
 				Organization = "org",
 				LtiId = ""
 			};
-			return Converter.ToEdxCourse(course, config, exerciseUrl, solutionsUrl,
+			return Converter.ToEdxCourse(course, config, slideUrl, solutionsUrl,
 				youtubeId2UlearnVideoIds ?? new Dictionary<string, string>());
 		}
 
@@ -154,7 +154,7 @@ namespace uLearn.CourseTool
 			new OlxPatcher(olxPath).PatchVerticals(edxCourse, course.Slides
 				.Select(x => x.ToVerticals(
 						course.Id,
-						exerciseUrl,
+						slideUrl,
 						solutionsUrl,
 						new Dictionary<string, string>(), 
 						ltiId
@@ -174,7 +174,7 @@ namespace uLearn.CourseTool
 			new OlxPatcher(olxPath).PatchVerticals(edxCourse, new [] {aTextSlide}
 				.Select(x => x.ToVerticals(
 						course.Id,
-						exerciseUrl,
+						slideUrl,
 						solutionsUrl,
 						new Dictionary<string, string>(),
 						ltiId
@@ -196,7 +196,7 @@ namespace uLearn.CourseTool
 			new OlxPatcher(olxPath).PatchVerticals(edxCourse, new[] { exerciseSlide }
 				.Select(x => x.ToVerticals(
 						course.Id,
-						exerciseUrl,
+						slideUrl,
 						solutionsUrl,
 						new Dictionary<string, string>(),
 						ltiId

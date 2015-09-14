@@ -44,7 +44,7 @@ namespace uLearn.CourseTool
 			Converter.ToEdxCourse(
 				course,
 				Config,
-				profile.UlearnUrl + ExerciseUrlFormat,
+				profile.UlearnUrl + SlideUrlFormat,
 				profile.UlearnUrl + SolutionsUrlFormat,
 				video.Records.ToDictionary(x => x.Data.Id, x => Utils.GetNormalizedGuid(x.Guid))
 				).Save(Dir + "/olx");

@@ -251,6 +251,7 @@
     <Compile Include="DataContexts\TextsRepo.cs" />
     <Compile Include="DataContexts\UnitsRepo.cs" />
     <Compile Include="LTI\LtiAuthenticationExtensions.cs" />
+    <Compile Include="LTI\LtiUtils.cs" />
     <Compile Include="LTI\SecurityHandler.cs" />
     <Compile Include="Migrations\201503231319119_ExecutionServiceName.cs" />
     <Compile Include="Migrations\201503231319119_ExecutionServiceName.Designer.cs">
@@ -285,6 +286,7 @@
       <DependentUpon>201509021133351_AddInfoAboutStudent.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
+    <Compile Include="Models\LtiQuizModel.cs" />
     <Compile Include="Models\LtiSlideRequest.cs" />
     <Compile Include="Models\CodeModel.cs" />
     <Compile Include="Models\LtiConsumer.cs" />
@@ -899,6 +901,7 @@
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\notify-custom.min.js" />
+    <Content Include="Scripts\slide-diff.js" />
     <Content Include="Scripts\slide-modals.js" />
     <Content Include="Scripts\slide-popovers.js" />
     <Content Include="Scripts\slide-quiz.js" />
@@ -1102,10 +1105,12 @@
       <LastGenOutput>AcceptedSolutionsHtml.generated.cs</LastGenOutput>
     </Content>
     <Content Include="Views\Course\AcceptedAlert.cshtml" />
-    <Content Include="Views\Course\LtiSlide.cshtml" />
+    <Content Include="Views\Course\LtiExerciseSlide.cshtml" />
     <Content Include="Views\Sandbox\Index.cshtml" />
     <Content Include="Views\Sandbox\GetDetails.cshtml" />
     <Content Include="Views\Sandbox\RunCode.cshtml" />
+    <Content Include="Views\Course\LtiQuizSlide.cshtml" />
+    <Content Include="Views\Course\LtiSlide.cshtml" />
     <Content Include="Views\Account\StudentInfo.cshtml" />
     <Content Include="Views\Shared\_GroupsPrompt.cshtml" />
     <Content Include="Views\Unit\SpellingErrors.cshtml" />

@@ -88,10 +88,17 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		public static HtmlComponent Load(string folderName, string urlName)
 		{
-			var component = new FileInfo(string.Format("{0}/html/{1}.xml", folderName, urlName)).DeserializeXml<HtmlComponent>();
-			component.UrlName = urlName;
-			component.Source = File.ReadAllText(string.Format("{0}/html/{1}.html", folderName, component.Filename));
-			return component;
+			try
+			{
+				var component = new FileInfo(string.Format("{0}/html/{1}.xml", folderName, urlName)).DeserializeXml<HtmlComponent>();
+				component.UrlName = urlName;
+				component.Source = File.ReadAllText(string.Format("{0}/html/{1}.html", folderName, component.Filename));
+				return component;
+			}
+			catch (Exception e)
+			{
+				throw new Exception(string.Format("Html {0} load error", urlName), e);
+			}
 		}
 	}
 }

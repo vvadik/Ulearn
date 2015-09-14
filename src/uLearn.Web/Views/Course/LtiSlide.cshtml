@@ -1,25 +1,16 @@
-﻿@using uLearn
-@using uLearn.Web.Views.Course
-@model CodeModel
+﻿@model dynamic
 
 @{
 	Layout = null;
 }
 
 <!DOCTYPE html>
+
 <html>
 	<head>
-		@Styles.Render("~/css")
+		<title>Not supported slide type</title>
 	</head>
-	<body>
-		@if (Model != null)
-		{
-			@SlideHtml.Block(Model.ExerciseBlock, Model.Context)
-
-			@Scripts.Render("~/main-js")
-			<script> getHints("@Model.CourseId", "@Model.SlideIndex", '@Model.ExerciseBlock.HintsMd.Count') </script>
-			ExerciseBlockData data = Model.Context.GetBlockData(Model.ExerciseBlock);
-			<script> refreshPreviousDraft('@(data.LatestAcceptedSolution != null)', '@Model.SlideId') </script>
-		}
-	</body>
+<body>
+Not supported slide type
+</body>
 </html>

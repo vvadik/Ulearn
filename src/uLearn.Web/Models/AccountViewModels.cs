@@ -116,10 +116,10 @@ namespace uLearn.Web.Models
 		[Display(Name = "Фамилия")]
 		public string LastName { get; set; }
 
-		[Display(Name = "Группа")]
+		[Display(Name = "Группа и ВУЗ")]
 		public string GroupName { get; set; }
 
-		[Display(Name = "Почта")]
+		[Display(Name = "Email")]
 		public string Email { get; set; }
 	}
 }

@@ -82,10 +82,17 @@ namespace uLearn.Model.Edx
 
 		public static CourseWithChapters Load(string folderName, string urlName)
 		{
-			var courseWithChapters = new FileInfo(string.Format("{0}/course/{1}.xml", folderName, urlName)).DeserializeXml<CourseWithChapters>();
-			courseWithChapters.UrlName = urlName;
-			courseWithChapters.Chapters = courseWithChapters.ChapterReferences.Select(x => Chapter.Load(folderName, x.UrlName)).ToArray();
-			return courseWithChapters;
+			try
+			{
+				var courseWithChapters = new FileInfo(string.Format("{0}/course/{1}.xml", folderName, urlName)).DeserializeXml<CourseWithChapters>();
+				courseWithChapters.UrlName = urlName;
+				courseWithChapters.Chapters = courseWithChapters.ChapterReferences.Select(x => Chapter.Load(folderName, x.UrlName)).ToArray();
+				return courseWithChapters;
+			}
+			catch (Exception e)
+			{
+				throw new Exception(string.Format("Course {0} load error", urlName), e);
+			}
 		}
 	}
 }

@@ -10,7 +10,7 @@ using uLearn.Model.Edx;
 
 namespace uLearn.CourseTool
 {
-	[Verb("patch_ulearn", HelpText = "Patch Edx course with new slides from uLearn course")]
+	[Verb("patch-ulearn", HelpText = "Patch Edx course with new slides from uLearn course")]
 	class ULearnPatchOptions : PatchOptions
 	{
 		public override void Patch(OlxPatcher patcher, Config config, Profile profile, EdxCourse edxCourse)
@@ -37,7 +37,7 @@ namespace uLearn.CourseTool
 					.Where(s => guids == null || guids.Contains(s.Guid))
 					.Select(s => s.ToVerticals(
 						ulearnCourse.Id, 
-						profile.UlearnUrl + ExerciseUrlFormat, 
+						profile.UlearnUrl + SlideUrlFormat, 
 						profile.UlearnUrl + SolutionsUrlFormat, 
 						videoGuids,
 						config.LtiId
