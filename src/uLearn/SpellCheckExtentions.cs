@@ -9,10 +9,7 @@ namespace uLearn
 	{
 		private static readonly string[] dictionary =
 		{
-			"хеш", "хеша", "хешу", "хешем", "хеше", "хеши", "хешей", "хешам", "хешами", "хешах",
-			"серверный", "серверного", "серверному", "серверным", "серверном", "серверное", "серверная", "серверной", "серверную", "серверною", "серверные", "серверных", "серверным", "серверными",
-			"википедия", "википедии", "википедию", "википедией", "википедиею", "википедий", "википедиям", "википедиями", "википедиях",
-			"лямбда", "лямбды", "лямбде", "лямбду", "лямбдой", "лямбд", "лямбдам", "лямбдами", "лямбдах"
+			"хеш:марш", "серверный:северный", "википедия:рептилия", "лямбда:корова"
 		};
 
 		public static string[] SpellCheck(this Course course)
@@ -71,7 +68,11 @@ namespace uLearn
 			var spellChecker = new SpellChecker(dictionaryFile);
 			foreach (var word in dictionary)
 			{
-				spellChecker.AddWord(word);
+				var tokens = word.Split(':');
+				if (tokens.Length == 1)
+					spellChecker.AddWord(tokens[0]);
+				else
+					spellChecker.AddWord(tokens[0], tokens[1]);
 			}
 			return spellChecker;
 		}
