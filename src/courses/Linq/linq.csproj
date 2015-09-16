@@ -46,6 +46,7 @@
     <Compile Include="Slides\LINQ\Intro.cs">
       <DependentUpon>S010_Intro.lesson.xml</DependentUpon>
     </Compile>
+    <Content Include="Slides\dictionary.txt" />
     <Content Include="Slides\LINQ\S010_Intro.lesson.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>

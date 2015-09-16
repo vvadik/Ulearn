@@ -46,6 +46,7 @@
     <Compile Include="Slides\U99_Presentation\_FirstStep.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Slides\dictionary.txt" />
     <Content Include="Slides\Title.txt" />
     <Content Include="Slides\Course.xml" />
     <Content Include="Slides\U99_Presentation\HelloWorld.py" />
