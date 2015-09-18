@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using RunCsJob;
 using RunCsJob.Api;
+using uLearn.Model.Blocks;
 using uLearn.Web.Models;
 
 namespace uLearn.CourseTool
@@ -150,7 +151,19 @@ namespace uLearn.CourseTool
 		{
 			var code = context.Request.InputStream.GetString();
 			var exercise = ((ExerciseSlide)course.Slides[int.Parse(path.Substring(1, 3))]).Exercise;
-			var solution = exercise.Solution.BuildSolution(code).SourceCode;
+			var runResult = GetRunResult(exercise, code);
+			context.Response.Headers["Content-Type"] = "application/json; charset=utf-8";
+			return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(runResult));
+		}
+
+		private static RunSolutionResult GetRunResult(ExerciseBlock exercise, string code)
+		{
+			var buildResult = exercise.Solution.BuildSolution(code);
+			if (buildResult.HasErrors)
+				return new RunSolutionResult { IsCompileError = true, CompilationError = buildResult.ErrorMessage, ExecutionServiceName = "uLearn" };
+			if (buildResult.HasStyleIssues)
+				return new RunSolutionResult { IsStyleViolation = true, CompilationError = buildResult.StyleMessage, ExecutionServiceName = "uLearn" };
+			var solution = buildResult.SourceCode;
 			var submission = new RunnerSubmition
 			{
 				Code = solution,
@@ -159,17 +172,15 @@ namespace uLearn.CourseTool
 				NeedRun = true
 			};
 			var result = SandboxRunner.Run(submission);
-			var runResult = new RunSolutionResult
+			return new RunSolutionResult
 			{
 				IsRightAnswer = result.Verdict == Verdict.Ok && result.GetOutput().NormalizeEoln() == exercise.ExpectedOutput.NormalizeEoln(),
 				ActualOutput = result.GetOutput().NormalizeEoln(),
 				CompilationError = result.CompilationOutput,
 				ExecutionServiceName = "this",
 				IsCompileError = result.Verdict == Verdict.CompilationError,
-				ExpectedOutput = exercise.ExpectedOutput
+				ExpectedOutput = exercise.ExpectedOutput.NormalizeEoln()
 			};
-			context.Response.Headers["Content-Type"] = "application/json; charset=utf-8";
-			return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(runResult));
 		}
 
 		private byte[] ServeStatic(HttpListenerContext context, string path)
