@@ -16,7 +16,7 @@ namespace uLearn
 
 		public static string[] SpellCheck(this Course course)
 		{
-			using (var spellchecker = SpellChecker(course.TryGetDictionaryPath()))
+			using (var spellchecker = CreateSpellChecker(course.TryGetDictionaryPath()))
 			{
 				return spellchecker.SpellCheckCourse(course);
 			}
@@ -65,7 +65,7 @@ namespace uLearn
 			return File.Exists(file) ? file : null;
 		}
 
-		private static SpellChecker SpellChecker(string dictionaryFile)
+		private static SpellChecker CreateSpellChecker(string dictionaryFile)
 		{
 			var spellChecker = new SpellChecker(dictionaryFile);
 			foreach (var word in dictionary)
