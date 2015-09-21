@@ -142,5 +142,12 @@ namespace uLearn.Model.Blocks
 		{
 			throw new NotImplementedException();
 		}
+
+		public override string TryGetText()
+		{
+			return (ExerciseInitialCode ?? "") + '\n' 
+				+ string.Join("\n", HintsMd) + '\n' 
+				+ (CommentAfterExerciseIsSolved ?? "");
+		}
 	}
 }
