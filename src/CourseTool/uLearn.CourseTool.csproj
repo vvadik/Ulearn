@@ -85,11 +85,8 @@
   <ItemGroup>
     <Compile Include="AbstractOptions.cs" />
     <Compile Include="ArchiveManager.cs" />
-    <Compile Include="PreviewHttpServer.cs" />
-    <Compile Include="Monitor.cs" />
     <Compile Include="MonitorOptions.cs" />
     <Compile Include="OperationFailedGracefully.cs" />
-    <Compile Include="SlideRenderer.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="ConvertOptions.cs" />
     <Compile Include="CookieAwareWebClient.cs">
@@ -289,6 +286,10 @@
     <ProjectReference Include="..\RunCsJob\RunCsJob.csproj">
       <Project>{77B16F9D-3CDF-4CC6-BE5F-B6BADFAC5394}</Project>
       <Name>RunCsJob</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ulearn.CourseMonitor\ulearn.CourseMonitor.csproj">
+      <Project>{4db64ea3-a557-492a-adea-38831df52962}</Project>
+      <Name>ulearn.CourseMonitor</Name>
     </ProjectReference>
     <ProjectReference Include="..\uLearn.Web\uLearn.Web.csproj">
       <Project>{B3701D2E-D001-4E0A-AB2F-7ACB5A89589B}</Project>

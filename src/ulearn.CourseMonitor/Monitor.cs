@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Permissions;
 using System.Threading;
 
 namespace uLearn.CourseTool
@@ -11,7 +12,7 @@ namespace uLearn.CourseTool
 		private readonly PreviewHttpServer server;
 		private readonly string courseDir;
 
-		public static void Start(string homeDir, string courseId)
+    	public static void Start(string homeDir, string courseId)
 		{
 			// ReSharper disable once ObjectCreationAsStatement
 			new Monitor(homeDir, courseId);
