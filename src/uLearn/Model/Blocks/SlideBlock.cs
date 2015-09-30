@@ -16,5 +16,10 @@ namespace uLearn.Model.Blocks
 		}
 
 		public abstract Component ToEdxComponent(string displayName, Slide slide, int componentIndex);
+
+		public virtual string TryGetText()
+		{
+			return null;
+		}
 	}
 }

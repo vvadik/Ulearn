@@ -170,6 +170,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Slides\dictionary.txt" />
     <Content Include="Slides\Prelude.txt" />
     <Content Include="Slides\Title.txt" />
     <Content Include="Slides\U01_DataTypes_And_Algorithms\robot.png" />

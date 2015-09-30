@@ -1113,6 +1113,7 @@
     <Content Include="Views\Course\LtiSlide.cshtml" />
     <Content Include="Views\Account\StudentInfo.cshtml" />
     <Content Include="Views\Shared\_GroupsPrompt.cshtml" />
+    <Content Include="Views\Unit\SpellingErrors.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

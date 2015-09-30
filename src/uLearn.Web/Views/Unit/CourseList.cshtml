@@ -12,6 +12,13 @@
 		}
 	</ul>
 
+	<h3>Загрузить новый пакет</h3>
+	@using (Html.BeginForm("UploadCourse", "Unit", FormMethod.Post, new { enctype = "multipart/form-data" }))
+	{
+		<input type="file" data-filename-placement="inside" class="btn" name="file" />
+		<input type="submit" class="btn btn-danger" value="OK" />
+	}
+
 	<h2>Пакеты курсов</h2>
 	<table class="table table-condensed">
 		@foreach (var package in Model.PackageNames)
@@ -28,10 +35,9 @@
 			</tr>
 		}
 	</table>
-	<h3>Загрузить новый пакет</h3>
-	@using (Html.BeginForm("UploadCourse", "Unit", FormMethod.Post, new { enctype = "multipart/form-data" }))
+	
+	@if (!string.IsNullOrWhiteSpace(Model.LastLoadedCourse))
 	{
-		<input type="file" data-filename-placement="inside" class="btn" name="file" />
-		<input type="submit" class="btn btn-danger" value="OK" />
+		<div class="load-content" data-url="@Url.Action("SpellingErrors", new {courseId = Model.LastLoadedCourse} )"> processing... </div>
 	}
 </div>

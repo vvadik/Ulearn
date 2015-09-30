@@ -19,6 +19,7 @@ namespace uLearn.Model.Blocks
 
 		[XmlAttribute("lang-id")]
 		public string LangId { get; set; }
+
 		[XmlAttribute("lang-ver")]
 		public string LangVer { get; set; }
 
@@ -49,6 +50,11 @@ namespace uLearn.Model.Blocks
 		public override string ToString()
 		{
 			return string.Format("{0} code {1}", LangId, Code);
+		}
+
+		public override string TryGetText()
+		{
+			return Code;
 		}
 	}
 }

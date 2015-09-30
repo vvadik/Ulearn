@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 using System.Text.RegularExpressions;
-using System.Web.Services.Description;
 using System.Xml.Serialization;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using uLearn.Model.Blocks;
 using uLearn.Model.Edx.EdxComponents;
 
@@ -60,6 +56,11 @@ namespace uLearn.Quizes
 
 		[XmlIgnore]
 		public int QuestionIndex;
+
+		public override string TryGetText()
+		{
+			return Text;
+		}
 	}
 
 	public class ChoiceBlock : AbstractQuestionBlock
@@ -106,6 +107,11 @@ namespace uLearn.Quizes
 				Title = EdxTexReplacer.ReplaceTex(Text)
 			};
 		}
+
+		public override string TryGetText()
+		{
+			return Text + '\n' + string.Join("\n", Items.Select(item => item.GetText()));
+		}
 	}
 
 	public class IsTrueBlock : AbstractQuestionBlock
@@ -139,6 +145,11 @@ namespace uLearn.Quizes
 				Title = EdxTexReplacer.ReplaceTex(Text),
 				Solution = new Solution(Explanation)
 			};
+		}
+
+		public override string TryGetText()
+		{
+			return Text + '\n' + Explanation;
 		}
 	}
 
@@ -174,6 +185,11 @@ namespace uLearn.Quizes
 				}
 			};
 		}
+
+		public override string TryGetText()
+		{
+			return Text + '\n' + Sample + '\t' + Explanation;
+		}
 	}
 
 	public class RegexInfo
@@ -205,5 +221,10 @@ namespace uLearn.Quizes
 
 		[XmlText]
 		public string Description;
+
+		public string GetText()
+		{
+			return (Description ?? "") + '\t' + (Explanation ?? "");
+		}
 	}
 }

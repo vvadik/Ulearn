@@ -1,0 +1,11 @@
+﻿@model string[]
+
+@foreach (var error in Model)
+{
+	<pre>@error</pre>
+}
+
+@if (!Model.Any())
+{
+	<p>Орфографических ошибок нет.</p>
+}

@@ -197,6 +197,7 @@
     <None Include="Slides\L100 - Разное о нейронных сетях\_S050.pdf" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Slides\dictionary.txt" />
     <Content Include="Slides\L00 - История искусственного интеллекта\S99 - Quiz.quiz.xml" />
     <Content Include="Slides\L00 - История искусственного интеллекта\Title.txt" />
     <Content Include="Slides\L01 - Логика высказываний\S99 - Quiz.quiz.xml" />

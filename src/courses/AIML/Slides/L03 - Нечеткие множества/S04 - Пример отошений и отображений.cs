@@ -3,7 +3,7 @@
 using uLearn;
 namespace AIML 
 {
-    [Slide(@"Пример отошений и отображений","411381a8-7a2e-4e98-9877-b9a79335aaca")]
+    [Slide(@"Пример отношений и отображений","411381a8-7a2e-4e98-9877-b9a79335aaca")]
     public class Пример_отошений_и_отображений
         {
 		//#video z06p6mhHmgI

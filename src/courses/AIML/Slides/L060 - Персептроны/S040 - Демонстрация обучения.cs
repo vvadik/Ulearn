@@ -8,7 +8,7 @@ namespace AIML
         {
 		//#video BONF7vvmxsk
 		/*
-		[Исходные коды программыы](Perceptron.zip)
+		[Исходные коды программы](Perceptron.zip)
 		*/
         }
 }
