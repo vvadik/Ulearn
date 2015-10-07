@@ -1,0 +1,26 @@
+﻿@model RestorePasswordModel
+
+@{
+	ViewBag.Title = "Восстановление пароля";
+}
+
+
+<div>
+	@using (Html.BeginForm("Index", "RestorePassword", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+	{
+		<h2>Восстановление пароля</h2>
+		<p class="@(Model.HasError ? "text-danger" : "text-success")">@Model.Message</p>
+		@Html.AntiForgeryToken()
+		<div class="form-group">
+			@Html.Label("Имя пользователя", new { @class = "col-md-2 control-label" })
+			<div class="col-md-10">
+				@Html.TextBox("username", Model.UserName, new { @class = "form-control" })
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-md-offset-2 col-md-10">
+				<input type="submit" value="Сбросить пароль" class="btn btn-default" />
+			</div>
+		</div>
+	}
+</div>

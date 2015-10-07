@@ -25,5 +25,6 @@ namespace uLearn.Web.DataContexts
 		public DbSet<TextBlob> Texts { get; set; }
 		public DbSet<LtiConsumer> Consumers { get; set; }
 		public DbSet<LtiSlideRequest> LtiRequests { get; set; }
+		public DbSet<RestoreRequest> RestoreRequests { get; set; }
 	}
 }
