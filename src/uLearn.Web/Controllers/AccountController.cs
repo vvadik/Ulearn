@@ -547,7 +547,6 @@ namespace uLearn.Web.Controllers
 				await UserManager.RemovePasswordAsync(user.Id);
 				await UserManager.AddPasswordAsync(user.Id, userModel.Password);
 			}
-
 			await UserManager.UpdateAsync(user);
 
 			if (nameChanged)

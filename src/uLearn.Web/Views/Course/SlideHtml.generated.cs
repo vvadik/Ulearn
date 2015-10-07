@@ -470,7 +470,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t\t</li>\r\n");
 
 				}
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t</ol>\r\n\t\t</div>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t</ol>\r\n\t\t\t<h3>Комментарий после решения</h3>\r\n\t\t\t<p>");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, block.CommentAfterExerciseIsSolved);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</p>\r\n\t\t</div>\r\n");
 
 
 	}

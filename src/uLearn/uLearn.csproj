@@ -92,7 +92,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="SKBKontur.SpellChecker, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SKBKontur.SpellChecker.1.0.0.41\lib\net45\SKBKontur.SpellChecker.dll</HintPath>
+      <HintPath>..\packages\SKBKontur.SpellChecker.1.0.0.45\lib\net45\SKBKontur.SpellChecker.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
