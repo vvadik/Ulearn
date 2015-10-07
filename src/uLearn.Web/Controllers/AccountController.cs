@@ -542,9 +542,11 @@ namespace uLearn.Web.Controllers
 			user.LastName = userModel.LastName;
 			user.Email = userModel.Email;
 			user.LastEdit = DateTime.Now;
-			await UserManager.RemovePasswordAsync(user.Id);
-			await UserManager.AddPasswordAsync(user.Id, userModel.Password);
-
+			if (!string.IsNullOrEmpty(userModel.Password))
+			{
+				await UserManager.RemovePasswordAsync(user.Id);
+				await UserManager.AddPasswordAsync(user.Id, userModel.Password);
+			}
 			await UserManager.UpdateAsync(user);
 
 			if (nameChanged)
