@@ -35,10 +35,13 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<div class="col-md-offset-2 col-md-10">
+						<div class="col-md-offset-2" style="float: left">
 							<input type="submit" value="Войти" class="btn btn-default" />
 						</div>
-					</div>
+						<div class="col-md-offset-6">
+							<a href="@Url.Action("Index", "RestorePassword")" class="btn btn-primary">Забыли пароль?</a>
+						</div>
+				</div>
 					<p>
 						@Html.ActionLink("Зарегистрируйтесь", "Register", new {ReturnUrl=ViewBag.ReturnUrl}), если у вас ещё нет аккаунта.
 					</p>

@@ -295,9 +295,9 @@
     <Compile Include="Migrations\201509021133351_AddInfoAboutStudent.Designer.cs">
       <DependentUpon>201509021133351_AddInfoAboutStudent.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201510070841240_RestorePassword.cs" />
-    <Compile Include="Migrations\201510070841240_RestorePassword.Designer.cs">
-      <DependentUpon>201510070841240_RestorePassword.cs</DependentUpon>
+    <Compile Include="Migrations\201510071331139_RestorePassword.cs" />
+    <Compile Include="Migrations\201510071331139_RestorePassword.Designer.cs">
+      <DependentUpon>201510071331139_RestorePassword.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
     <Compile Include="Models\LtiQuizModel.cs" />
@@ -569,8 +569,8 @@
     <EmbeddedResource Include="Migrations\201509021133351_AddInfoAboutStudent.resx">
       <DependentUpon>201509021133351_AddInfoAboutStudent.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201510070841240_RestorePassword.resx">
-      <DependentUpon>201510070841240_RestorePassword.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201510071331139_RestorePassword.resx">
+      <DependentUpon>201510071331139_RestorePassword.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

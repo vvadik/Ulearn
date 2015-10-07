@@ -27,6 +27,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[AllowAnonymous]
+		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Index(string username)
 		{
 			var user = await userManager.FindByNameAsync(username);
@@ -55,13 +56,22 @@ namespace uLearn.Web.Controllers
 				return View(answer);
 			}
 
+			await SendRestorePasswordEmail(requestId, user);
+
+			answer.HasError = false;
+			answer.Message = "Письмо с инструкцией по восстановлению отправлено на Ваш email";
+			return View(answer);
+		}
+
+		private async Task SendRestorePasswordEmail(string requestId, ApplicationUser user)
+		{
 			var url = Url.Action("SetNewPassword", "RestorePassword", new { requestId }, "https");
 
 			var message = new SendGridMessage();
 			message.AddTo(user.Email);
-			message.From = new MailAddress("restore@ulearn.azurewebsites.net");
-			message.Subject = "uLearn password restoring";
-			message.Html = "Чтобы сбросить пароль перейдите по ссылке: " + url;
+			message.From = new MailAddress("noreply@ulearn.azurewebsites.net", "Добрый робот uLearn");
+			message.Subject = "Восстановление пароля uLearn";
+			message.Html = "Чтобы изменить пароль к аккаунту " + user.UserName + ", перейдите по ссылке: <a href=\"" + url + "\">" + url + "</a>";
 
 			var login = ConfigurationManager.AppSettings["SendGrid.Login"];
 			var password = ConfigurationManager.AppSettings["SendGrid.Password"];
@@ -75,12 +85,8 @@ namespace uLearn.Web.Controllers
 			}
 			catch (InvalidApiRequestException ex)
 			{
-				throw new Exception(ex.Message + ":\n\n" + string.Join("\n", ex.Errors));
+				throw new Exception(ex.Message + ":\n\n" + string.Join("\n", ex.Errors), ex);
 			}
-
-			answer.HasError = false;
-			answer.Message = "Письмо с инструкцией по восстановлению отправлено на Ваш email";
-			return View(answer);
 		}
 
 		[AllowAnonymous]
@@ -101,6 +107,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[AllowAnonymous]
+		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> SetNewPassword(SetNewPasswordModel model)
 		{
 			var answer = new SetNewPasswordModel

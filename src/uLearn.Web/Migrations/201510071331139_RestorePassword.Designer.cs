@@ -13,7 +13,7 @@ namespace uLearn.Web.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201510070841240_RestorePassword"; }
+            get { return "201510071331139_RestorePassword"; }
         }
         
         string IMigrationMetadata.Source

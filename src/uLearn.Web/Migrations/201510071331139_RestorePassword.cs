@@ -13,7 +13,7 @@ namespace uLearn.Web.Migrations
                     {
                         Id = c.String(nullable: false, maxLength: 128),
                         UserId = c.String(nullable: false, maxLength: 128),
-                        LastTry = c.DateTime(nullable: false),
+                        Timestamp = c.DateTime(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)

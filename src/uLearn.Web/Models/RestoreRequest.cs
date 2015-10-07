@@ -15,6 +15,6 @@ namespace uLearn.Web.Models
 		public string UserId { get; set; }
 
 		[Required]
-		public DateTime LastTry { get; set; }
+		public DateTime Timestamp { get; set; }
 	}
 }

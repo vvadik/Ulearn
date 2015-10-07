@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using NUnit.Framework;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts
@@ -22,19 +23,29 @@ namespace uLearn.Web.DataContexts
 
 		public async Task<string> CreateRequest(string userId)
 		{
-			var previous = db.RestoreRequests.FirstOrDefault(r => r.UserId == userId);
-			if (previous != null)
+			var previousRequests = db.RestoreRequests.Where(r => r.UserId == userId).ToList();
+			if (previousRequests.Any())
 			{
-				if (DateTime.Now.Subtract(previous.LastTry) < TimeSpan.FromMinutes(5))
+				var hasRecent = false;
+				foreach (var previous in previousRequests)
+				{
+					if (DateTime.Now.Subtract(previous.Timestamp) < TimeSpan.FromMinutes(5))
+						hasRecent = true;
+					else
+						db.RestoreRequests.Remove(previous);
+				}
+				if (hasRecent)
+				{
+					await db.SaveChangesAsync();
 					return null;
-				db.RestoreRequests.Remove(previous);
+				}
 			}
 
 			var request = new RestoreRequest
 			{
 				Id = Guid.NewGuid().ToString(),
 				UserId = userId,
-				LastTry = DateTime.Now
+				Timestamp = DateTime.Now
 			};
 			db.RestoreRequests.Add(request);
 			await db.SaveChangesAsync();
