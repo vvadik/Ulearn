@@ -19,14 +19,12 @@ namespace uLearn.Web.Controllers
 		private readonly RestoreRequestRepo requestRepo = new RestoreRequestRepo();
 		private readonly UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb()));
 
-		[AllowAnonymous]
 		public ActionResult Index()
 		{
 			return View(new RestorePasswordModel());
 		}
 
 		[HttpPost]
-		[AllowAnonymous]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Index(string username)
 		{
@@ -89,7 +87,6 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		[AllowAnonymous]
 		public ActionResult SetNewPassword(string requestId)
 		{
 			if (!requestRepo.ContainsRequest(requestId))
@@ -106,7 +103,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[AllowAnonymous]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> SetNewPassword(SetNewPasswordModel model)
 		{
@@ -145,6 +141,16 @@ namespace uLearn.Web.Controllers
 			await requestRepo.DeleteRequest(model.RequestId);
 
 			return RedirectToAction("Index", "Home");
+		}
+
+		protected override void OnException(ExceptionContext filterContext)
+		{
+			if (filterContext.Exception is HttpAntiForgeryException)
+			{
+				filterContext.ExceptionHandled = true;
+				filterContext.Result = RedirectToAction("Index", "Login");
+			}
+			base.OnException(filterContext);
 		}
 	}
 }

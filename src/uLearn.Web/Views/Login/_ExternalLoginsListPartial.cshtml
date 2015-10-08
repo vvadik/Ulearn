@@ -1,4 +1,4 @@
-﻿@model dynamic
+﻿@model ExternalLoginsListModel
 @using Microsoft.Owin.Security
 
 
@@ -16,9 +16,9 @@
 	}
 	else
 	{
-		string action = Model.Action;
-		string returnUrl = Model.ReturnUrl;
-		using (Html.BeginForm(action, "Account", new { ReturnUrl = returnUrl }))
+		var action = Model.Action;
+		var returnUrl = Model.ReturnUrl;
+		using (Html.BeginForm(action, "Login", new { ReturnUrl = returnUrl }))
 		{
 			@Html.AntiForgeryToken()
 			<div id="socialLoginList">
