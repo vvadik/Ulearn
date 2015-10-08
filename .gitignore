@@ -180,3 +180,4 @@ FakesAssemblies/
 /src/UI.Tests/screenshots
 /src/courses/Linq/Generated
 *.received.txt
+private.settings
