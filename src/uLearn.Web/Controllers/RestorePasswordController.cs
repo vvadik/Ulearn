@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Net;
@@ -18,6 +19,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly RestoreRequestRepo requestRepo = new RestoreRequestRepo();
 		private readonly UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb()));
+		private readonly ULearnDb db = new ULearnDb();
 
 		public ActionResult Index()
 		{
@@ -28,37 +30,47 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Index(string username)
 		{
-			var user = await userManager.FindByNameAsync(username);
+			var users = await FindUsers(username);
 			var answer = new RestorePasswordModel
 			{
-				UserName = username,
-				HasError = true
+				UserName = username
 			};
 
-			if (user == null)
+			if (!users.Any())
 			{
-				answer.Message = "Пользователь с таким именем не найден";
-				return View(answer);
-			}
-			if (string.IsNullOrWhiteSpace(user.Email))
-			{
-				answer.Message = "У данного пользователя не указан email";
+				answer.Messages.Add(new Message(string.Format("Пользователь {0} не найден", username)));
 				return View(answer);
 			}
 
-			var requestId = await requestRepo.CreateRequest(user.Id);
-
-			if (requestId == null)
+			foreach (var user in users)
 			{
-				answer.Message = "Слишком частые запросы. Попробуйте ещё раз через несколько минут";
-				return View(answer);
+				if (string.IsNullOrWhiteSpace(user.Email))
+				{
+					answer.Messages.Add(new Message(string.Format("У пользователя {0} не указан email", user.UserName)));
+					continue;
+				}
+
+				var requestId = await requestRepo.CreateRequest(user.Id);
+
+				if (requestId == null)
+				{
+					answer.Messages.Add(new Message(string.Format("Слишком частые запросы для пользователя {0}. Попробуйте ещё раз через несколько минут", user.UserName)));
+					continue;
+				}
+
+				await SendRestorePasswordEmail(requestId, user);
+				answer.Messages.Add(new Message(string.Format("Письмо с инструкцией по восстановлению пароля для пользователя {0} отправлено на Ваш email", user.UserName), false));
 			}
 
-			await SendRestorePasswordEmail(requestId, user);
-
-			answer.HasError = false;
-			answer.Message = "Письмо с инструкцией по восстановлению отправлено на Ваш email";
 			return View(answer);
+		}
+
+		private async Task<List<ApplicationUser>> FindUsers(string info)
+		{
+			var user = await userManager.FindByNameAsync(info);
+			if (user != null)
+				return new List<ApplicationUser> { user };
+			return db.Users.Where(appUser => appUser.Email == info).ToList();
 		}
 
 		private async Task SendRestorePasswordEmail(string requestId, ApplicationUser user)
@@ -141,7 +153,7 @@ namespace uLearn.Web.Controllers
 			await requestRepo.DeleteRequest(model.RequestId);
 
 			var user = await userManager.FindByIdAsync(userId);
-			await AuthenticationManager.LoginAsync(this, user, false);
+			await AuthenticationManager.LoginAsync(HttpContext, user, false);
 
 			return RedirectToAction("Index", "Home");
 		}

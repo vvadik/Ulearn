@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using System.Web;
-using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -19,37 +18,37 @@ namespace uLearn.Web.Controllers
 			userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb()));
 		}
 
-		public static async Task LoginAsync(Controller controller, ApplicationUser user, bool isPersistent)
+		public static async Task LoginAsync(HttpContextBase context, ApplicationUser user, bool isPersistent)
 		{
-			await new AuthenticationManager().InternalLoginAsync(controller, user, isPersistent);
+			await new AuthenticationManager().InternalLoginAsync(context, user, isPersistent);
 		}
 
-		private async Task InternalLoginAsync(Controller controller, ApplicationUser user, bool isPersistent)
+		public static void Logout(HttpContextBase context)
 		{
-			var authenticationManager = GetAuthenticationManager(controller);
+			GetAuthenticationManager(context).SignOut();
+		}
+
+		public static async Task<ExternalLoginInfo> GetExternalLoginInfoAsync(HttpContextBase context, string xsrfKey, string userId)
+		{
+			return await GetAuthenticationManager(context).GetExternalLoginInfoAsync(xsrfKey, userId);
+		}
+
+		private async Task InternalLoginAsync(HttpContextBase context, ApplicationUser user, bool isPersistent)
+		{
+			var authenticationManager = GetAuthenticationManager(context);
 			authenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
 			var identity = await userManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
 			authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = isPersistent }, identity);
 		}
 
-		public static void Logout(Controller controller)
+		public static async Task<ExternalLoginInfo> GetExternalLoginInfoAsync(HttpContextBase context)
 		{
-			GetAuthenticationManager(controller).SignOut();
+			return await GetAuthenticationManager(context).GetExternalLoginInfoAsync();
 		}
 
-		public static async Task<ExternalLoginInfo> GetExternalLoginInfoAsync(Controller controller, string xsrfKey, string userId)
+		private static IAuthenticationManager GetAuthenticationManager(HttpContextBase context)
 		{
-			return await GetAuthenticationManager(controller).GetExternalLoginInfoAsync(xsrfKey, userId);
-		}
-
-		public static async Task<ExternalLoginInfo> GetExternalLoginInfoAsync(Controller controller)
-		{
-			return await GetAuthenticationManager(controller).GetExternalLoginInfoAsync();
-		}
-
-		private static IAuthenticationManager GetAuthenticationManager(Controller controller)
-		{
-			return controller.HttpContext.GetOwinContext().Authentication;
+			return context.GetOwinContext().Authentication;
 		}
 	}
 }

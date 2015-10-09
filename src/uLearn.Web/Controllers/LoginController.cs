@@ -43,7 +43,7 @@ namespace uLearn.Web.Controllers
 				var user = await userManager.FindAsync(model.UserName, model.Password);
 				if (user != null)
 				{
-					await AuthenticationManager.LoginAsync(this, user, model.RememberMe);
+					await AuthenticationManager.LoginAsync(HttpContext, user, model.RememberMe);
 					return Redirect(this.FixRedirectUrl(returnUrl));
 				}
 				ModelState.AddModelError("", "Неверное имя пользователя или пароль.");
@@ -67,7 +67,7 @@ namespace uLearn.Web.Controllers
 		// GET: /Login/ExternalLoginCallback
 		public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
 		{
-			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(this);
+			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext);
 			if (loginInfo == null)
 			{
 				return RedirectToAction("Index", "Login");
@@ -77,7 +77,7 @@ namespace uLearn.Web.Controllers
 			var user = await userManager.FindAsync(loginInfo.Login);
 			if (user != null)
 			{
-				await AuthenticationManager.LoginAsync(this, user, isPersistent: false);
+				await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
 				return Redirect(this.FixRedirectUrl(returnUrl));
 			}
 
@@ -102,7 +102,7 @@ namespace uLearn.Web.Controllers
 			if (ModelState.IsValid)
 			{
 				// Get the information about the user from the external login provider
-				var info = await AuthenticationManager.GetExternalLoginInfoAsync(this);
+				var info = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext);
 				if (info == null)
 				{
 					return View("ExternalLoginFailure");
@@ -114,7 +114,7 @@ namespace uLearn.Web.Controllers
 					result = await userManager.AddLoginAsync(user.Id, info.Login);
 					if (result.Succeeded)
 					{
-						await AuthenticationManager.LoginAsync(this, user, isPersistent: false);
+						await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
 						return Redirect(this.FixRedirectUrl(returnUrl));
 					}
 				}
@@ -149,7 +149,7 @@ namespace uLearn.Web.Controllers
 		[Authorize]
 		public async Task<ActionResult> LinkLoginCallback()
 		{
-			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(this, XsrfKey, User.Identity.GetUserId());
+			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext, XsrfKey, User.Identity.GetUserId());
 			if (loginInfo == null)
 			{
 				return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.Error });
@@ -169,7 +169,7 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public ActionResult LogOff()
 		{
-			AuthenticationManager.Logout(this);
+			AuthenticationManager.Logout(HttpContext);
 			return RedirectToAction("Index", "Home");
 		}
 

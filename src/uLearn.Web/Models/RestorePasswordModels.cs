@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 
 namespace uLearn.Web.Models
@@ -26,8 +27,24 @@ namespace uLearn.Web.Models
 
 	public class RestorePasswordModel
 	{
+		public RestorePasswordModel()
+		{
+			Messages = new List<Message>();
+		}
+
 		public string UserName { get; set; }
-		public string Message { get; set; }
-		public bool HasError { get; set; }
+		public List<Message> Messages { get; set; }
+	}
+
+	public class Message
+	{
+		public Message(string text, bool isError = true)
+		{
+			Text = text;
+			IsError = isError;
+		}
+
+		public string Text { get; set; }
+		public bool IsError { get; set; }
 	}
 }

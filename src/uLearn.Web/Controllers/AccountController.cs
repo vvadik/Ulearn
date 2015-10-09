@@ -120,7 +120,7 @@ namespace uLearn.Web.Controllers
 				var result = await userManager.CreateAsync(user, model.Password);
 				if (result.Succeeded)
 				{
-					await AuthenticationManager.LoginAsync(this, user, isPersistent: false);
+					await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
 					if (string.IsNullOrWhiteSpace(model.ReturnUrl))
 						return RedirectToAction("Index", "Home");
 					return Redirect(this.FixRedirectUrl(model.ReturnUrl));
