@@ -140,6 +140,9 @@ namespace uLearn.Web.Controllers
 
 			await requestRepo.DeleteRequest(model.RequestId);
 
+			var user = await userManager.FindByIdAsync(userId);
+			await AuthenticationManager.LoginAsync(this, user, false);
+
 			return RedirectToAction("Index", "Home");
 		}
 
