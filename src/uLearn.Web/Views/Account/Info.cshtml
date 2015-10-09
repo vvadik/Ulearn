@@ -1,4 +1,4 @@
-﻿@model uLearn.Web.Controllers.UserInfoModel
+﻿@model UserInfoModel
 
 @{
 	ViewBag.Title = "User Info";
@@ -32,6 +32,7 @@
 		<h3>Сброс пароля</h3>
 		using(Html.BeginForm("ResetPassword", "Account", new { newPassword, userId = Model.User.Id }))
 		{
+			@Html.AntiForgeryToken()
 			<button class="btn btn-danger"> Сбросить пароль в @newPassword </button>
 		}
 	}

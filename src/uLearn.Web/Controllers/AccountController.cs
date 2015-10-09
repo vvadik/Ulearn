@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.Owin.Security;
-using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 
@@ -19,14 +16,15 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly ULearnDb db;
 		private readonly CourseManager courseManager;
+		private UserManager<ApplicationUser> userManager;
 
 		public AccountController()
 			: this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb())))
 		{
 			db = new ULearnDb();
 			courseManager = WebCourseManager.Instance;
-			UserManager.UserValidator =
-				new UserValidator<ApplicationUser>(UserManager)
+			userManager.UserValidator =
+				new UserValidator<ApplicationUser>(userManager)
 				{
 					AllowOnlyAlphanumericUserNames = false
 				};
@@ -34,10 +32,8 @@ namespace uLearn.Web.Controllers
 
 		public AccountController(UserManager<ApplicationUser> userManager)
 		{
-			UserManager = userManager;
+			this.userManager = userManager;
 		}
-
-		public UserManager<ApplicationUser> UserManager { get; private set; }
 
 		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public ActionResult List(string namePrefix = null, string role = null)
@@ -51,17 +47,19 @@ namespace uLearn.Web.Controllers
 		}
 
 		[Authorize(Roles = LmsRoles.Admin)]
+		//TODO [ValidateAntiForgeryToken]
 		public async Task<ActionResult> ToggleRole(string userId, string role)
 		{
-			if (UserManager.IsInRole(userId, role))
-				await UserManager.RemoveFromRoleAsync(userId, role);
+			if (userManager.IsInRole(userId, role))
+				await userManager.RemoveFromRoleAsync(userId, role);
 			else
-				await UserManager.AddToRolesAsync(userId, role);
+				await userManager.AddToRolesAsync(userId, role);
 			return RedirectToAction("List");
 		}
 
 		[HttpPost]
 		[Authorize(Roles = LmsRoles.Admin)]
+		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> DeleteUser(string userId)
 		{
 			ApplicationUser user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
@@ -94,50 +92,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		//
-		// GET: /Account/Login
-		[AllowAnonymous]
-		public ActionResult Login(string returnUrl)
-		{
-			ViewBag.ReturnUrl = returnUrl;
-			return View();
-		}
-
-		protected override void OnException(ExceptionContext filterContext)
-		{
-			if (filterContext.Exception is HttpAntiForgeryException)
-			{
-				filterContext.ExceptionHandled = true;
-				filterContext.Result = RedirectToAction("Login");
-			}
-			base.OnException(filterContext);
-		}
-
-		//
-		// POST: /Account/Login
-		[HttpPost]
-		[AllowAnonymous]
-		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
-		{
-			if (ModelState.IsValid)
-			{
-				var user = await UserManager.FindAsync(model.UserName, model.Password);
-				if (user != null)
-				{
-					await SignInAsync(user, model.RememberMe);
-					return RedirectToLocal(returnUrl);
-				}
-				else
-				{
-					ModelState.AddModelError("", "Неверное имя пользователя или пароль.");
-				}
-			}
-
-			// If we got this far, something failed, redisplay form
-			return View(model);
-		}
-
-		//
 		// GET: /Account/Register
 		[AllowAnonymous]
 		public ActionResult Register(string returnUrl = null)
@@ -154,16 +108,16 @@ namespace uLearn.Web.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var user = new ApplicationUser() { UserName = model.UserName };
-				var result = await UserManager.CreateAsync(user, model.Password);
+				var user = new ApplicationUser { UserName = model.UserName };
+				var result = await userManager.CreateAsync(user, model.Password);
 				if (result.Succeeded)
 				{
-					await SignInAsync(user, isPersistent: false);
+					await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
 					if (string.IsNullOrWhiteSpace(model.ReturnUrl))
 						return RedirectToAction("Index", "Home");
-					return RedirectToLocal(model.ReturnUrl);
+					return Redirect(this.FixRedirectUrl(model.ReturnUrl));
 				}
-				AddErrors(result);
+				this.AddErrors(result);
 			}
 
 			// If we got this far, something failed, redisplay form
@@ -176,9 +130,9 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Disassociate(string loginProvider, string providerKey)
 		{
-			ManageMessageId? message = null;
+			ManageMessageId? message;
 			IdentityResult result =
-				await UserManager.RemoveLoginAsync(User.Identity.GetUserId(), new UserLoginInfo(loginProvider, providerKey));
+				await userManager.RemoveLoginAsync(User.Identity.GetUserId(), new UserLoginInfo(loginProvider, providerKey));
 			if (result.Succeeded)
 			{
 				message = ManageMessageId.RemoveLoginSuccess;
@@ -204,7 +158,7 @@ namespace uLearn.Web.Controllers
 							: message == ManageMessageId.Error
 								? "Ошибка."
 								: "";
-			ViewBag.HasLocalPassword = ControllerUtils.HasPassword(UserManager, User);
+			ViewBag.HasLocalPassword = ControllerUtils.HasPassword(userManager, User);
 			ViewBag.ReturnUrl = Url.Action("Manage");
 			return View();
 		}
@@ -215,23 +169,19 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Manage(ManageUserViewModel model)
 		{
-			bool hasPassword = ControllerUtils.HasPassword(UserManager, User);
+			bool hasPassword = ControllerUtils.HasPassword(userManager, User);
 			ViewBag.HasLocalPassword = hasPassword;
 			ViewBag.ReturnUrl = Url.Action("Manage");
 			if (hasPassword)
 			{
 				if (ModelState.IsValid)
 				{
-					IdentityResult result =
-						await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
+					var result = await userManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
 					if (result.Succeeded)
 					{
 						return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
 					}
-					else
-					{
-						AddErrors(result);
-					}
+					this.AddErrors(result);
 				}
 			}
 			else
@@ -245,14 +195,14 @@ namespace uLearn.Web.Controllers
 
 				if (ModelState.IsValid)
 				{
-					IdentityResult result = await UserManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword);
+					IdentityResult result = await userManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword);
 					if (result.Succeeded)
 					{
 						return RedirectToAction("Manage", new { Message = ManageMessageId.SetPasswordSuccess });
 					}
 					else
 					{
-						AddErrors(result);
+						this.AddErrors(result);
 					}
 				}
 			}
@@ -261,133 +211,11 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 
-		//
-		// POST: /Account/ExternalLogin
-		[HttpPost]
-		[AllowAnonymous]
-		[ValidateAntiForgeryToken]
-		public ActionResult ExternalLogin(string provider, string returnUrl)
-		{
-			// Request a redirect to the external login provider
-			return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
-		}
-
-		//
-		// GET: /Account/ExternalLoginCallback
-		[AllowAnonymous]
-		public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
-		{
-			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
-			if (loginInfo == null)
-			{
-				return RedirectToAction("Login");
-			}
-
-			// Sign in the user with this external login provider if the user already has a login
-			var user = await UserManager.FindAsync(loginInfo.Login);
-			if (user != null)
-			{
-				await SignInAsync(user, isPersistent: false);
-				return RedirectToLocal(returnUrl);
-			}
-			else
-			{
-				// If the user does not have an account, then prompt the user to create an account
-				ViewBag.ReturnUrl = returnUrl;
-				ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-				return View("ExternalLoginConfirmation",
-					new ExternalLoginConfirmationViewModel { UserName = loginInfo.DefaultUserName });
-			}
-		}
-
-		//
-		// POST: /Account/LinkLogin
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public ActionResult LinkLogin(string provider)
-		{
-			// Request a redirect to the external login provider to link a login for the current user
-			return new ChallengeResult(provider, Url.Action("LinkLoginCallback", "Account"), User.Identity.GetUserId());
-		}
-
-		//
-		// GET: /Account/LinkLoginCallback
-		public async Task<ActionResult> LinkLoginCallback()
-		{
-			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(XsrfKey, User.Identity.GetUserId());
-			if (loginInfo == null)
-			{
-				return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
-			}
-			var result = await UserManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login);
-			if (result.Succeeded)
-			{
-				return RedirectToAction("Manage");
-			}
-			return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
-		}
-
-		//
-		// POST: /Account/ExternalLoginConfirmation
-		[HttpPost]
-		[AllowAnonymous]
-		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
-		{
-			if (User.Identity.IsAuthenticated)
-			{
-				return RedirectToAction("Manage");
-			}
-
-			if (ModelState.IsValid)
-			{
-				// Get the information about the user from the external login provider
-				var info = await AuthenticationManager.GetExternalLoginInfoAsync();
-				if (info == null)
-				{
-					return View("ExternalLoginFailure");
-				}
-				var user = new ApplicationUser() { UserName = model.UserName };
-				var result = await UserManager.CreateAsync(user);
-				if (result.Succeeded)
-				{
-					result = await UserManager.AddLoginAsync(user.Id, info.Login);
-					if (result.Succeeded)
-					{
-						await SignInAsync(user, isPersistent: false);
-						return RedirectToLocal(returnUrl);
-					}
-				}
-				AddErrors(result);
-			}
-
-			ViewBag.ReturnUrl = returnUrl;
-			return View(model);
-		}
-
-		//
-		// POST: /Account/LogOff
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public ActionResult LogOff()
-		{
-			AuthenticationManager.SignOut();
-			return RedirectToAction("Index", "Home");
-		}
-
-		//
-		// GET: /Account/ExternalLoginFailure
-		[AllowAnonymous]
-		public ActionResult ExternalLoginFailure()
-		{
-			return View();
-		}
-
 		[Authorize]
 		public async Task<ActionResult> StudentInfo()
 		{
 			var userId = User.Identity.GetUserId();
-			var user = await UserManager.FindByIdAsync(userId);
+			var user = await userManager.FindByIdAsync(userId);
 			return View(new LtiUserViewModel
 			{
 				FirstName = user.FirstName,
@@ -399,16 +227,17 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
+		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> StudentInfo(LtiUserViewModel userInfo)
 		{
 			var userId = User.Identity.GetUserId();
-			var user = await UserManager.FindByIdAsync(userId);
+			var user = await userManager.FindByIdAsync(userId);
 			user.FirstName = userInfo.FirstName;
 			user.LastName = userInfo.LastName;
 			user.Email = userInfo.Email;
 			user.GroupName = userInfo.GroupName;
 			user.LastEdit = DateTime.Now;
-			await UserManager.UpdateAsync(user);
+			await userManager.UpdateAsync(user);
 			return RedirectToAction("StudentInfo");
 		}
 
@@ -416,44 +245,19 @@ namespace uLearn.Web.Controllers
 		[ChildActionOnly]
 		public ActionResult RemoveAccountList()
 		{
-			var linkedAccounts = UserManager.GetLogins(User.Identity.GetUserId());
-			ViewBag.ShowRemoveButton = ControllerUtils.HasPassword(UserManager, User) || linkedAccounts.Count > 1;
+			var linkedAccounts = userManager.GetLogins(User.Identity.GetUserId());
+			ViewBag.ShowRemoveButton = ControllerUtils.HasPassword(userManager, User) || linkedAccounts.Count > 1;
 			return PartialView("_RemoveAccountPartial", linkedAccounts);
 		}
 
 		protected override void Dispose(bool disposing)
 		{
-			if (disposing && UserManager != null)
+			if (disposing && userManager != null)
 			{
-				UserManager.Dispose();
-				UserManager = null;
+				userManager.Dispose();
+				userManager = null;
 			}
 			base.Dispose(disposing);
-		}
-
-		#region Helpers
-
-		// Used for XSRF protection when adding external logins
-		private const string XsrfKey = "XsrfId";
-
-		private IAuthenticationManager AuthenticationManager
-		{
-			get { return HttpContext.GetOwinContext().Authentication; }
-		}
-
-		private async Task SignInAsync(ApplicationUser user, bool isPersistent)
-		{
-			AuthenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-			var identity = await UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
-			AuthenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, identity);
-		}
-
-		private void AddErrors(IdentityResult result)
-		{
-			foreach (var error in result.Errors)
-			{
-				ModelState.AddModelError("", error);
-			}
 		}
 
 		public enum ManageMessageId
@@ -464,54 +268,11 @@ namespace uLearn.Web.Controllers
 			Error
 		}
 
-		private ActionResult RedirectToLocal(string returnUrl)
-		{
-			if (Url.IsLocalUrl(returnUrl))
-			{
-				return Redirect(returnUrl);
-			}
-			else
-			{
-				return RedirectToAction("Index", "Home");
-			}
-		}
-
-		private class ChallengeResult : HttpUnauthorizedResult
-		{
-			public ChallengeResult(string provider, string redirectUri)
-				: this(provider, redirectUri, null)
-			{
-			}
-
-			public ChallengeResult(string provider, string redirectUri, string userId)
-			{
-				LoginProvider = provider;
-				RedirectUri = redirectUri;
-				UserId = userId;
-			}
-
-			public string LoginProvider { get; set; }
-			public string RedirectUri { get; set; }
-			public string UserId { get; set; }
-
-			public override void ExecuteResult(ControllerContext context)
-			{
-				var properties = new AuthenticationProperties() { RedirectUri = RedirectUri };
-				if (UserId != null)
-				{
-					properties.Dictionary[XsrfKey] = UserId;
-				}
-				context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
-			}
-		}
-
-		#endregion
-
 		[Authorize]
 		public async Task<PartialViewResult> ChangeDetailsPartial()
 		{
-			var user = await UserManager.FindByNameAsync(User.Identity.Name);
-			var hasPassword = ControllerUtils.HasPassword(UserManager, User);
+			var user = await userManager.FindByNameAsync(User.Identity.Name);
+			var hasPassword = ControllerUtils.HasPassword(userManager, User);
 			return PartialView(new UserViewModel
 			{
 				Name = user.UserName, 
@@ -525,16 +286,17 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ChangeDetailsPartial(UserViewModel userModel)
 		{
-			var user = await UserManager.FindByIdAsync(userModel.UserId);
+			var user = await userManager.FindByIdAsync(userModel.UserId);
 			if (user == null)
 			{
-				AuthenticationManager.SignOut();
-				return RedirectToAction("Login");
+				AuthenticationManager.Logout(HttpContext);
+				return RedirectToAction("Index", "Login");
 			}
 			var nameChanged = user.UserName != userModel.Name;
-			if (nameChanged && await UserManager.FindByNameAsync(userModel.Name) != null)
+			if (nameChanged && await userManager.FindByNameAsync(userModel.Name) != null)
 				return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
 			user.UserName = userModel.Name;
 			user.GroupName = userModel.GroupName;
@@ -544,144 +306,29 @@ namespace uLearn.Web.Controllers
 			user.LastEdit = DateTime.Now;
 			if (!string.IsNullOrEmpty(userModel.Password))
 			{
-				await UserManager.RemovePasswordAsync(user.Id);
-				await UserManager.AddPasswordAsync(user.Id, userModel.Password);
+				await userManager.RemovePasswordAsync(user.Id);
+				await userManager.AddPasswordAsync(user.Id, userModel.Password);
 			}
-			await UserManager.UpdateAsync(user);
+			await userManager.UpdateAsync(user);
 
 			if (nameChanged)
 			{
-				AuthenticationManager.SignOut();
-				return RedirectToAction("Login");
+				AuthenticationManager.Logout(HttpContext);
+				return RedirectToAction("Index", "Login");
 			}
 			return RedirectToAction("Manage");
 		}
 
 		[HttpPost, Authorize(Roles = LmsRoles.Admin)]
+		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ResetPassword(string newPassword, string userId)
 		{
-			var user = await UserManager.FindByIdAsync(userId);
+			var user = await userManager.FindByIdAsync(userId);
 			if (user == null)
 				return RedirectToAction("List");
-			await UserManager.RemovePasswordAsync(userId);
-			await UserManager.AddPasswordAsync(userId, newPassword);
+			await userManager.RemovePasswordAsync(userId);
+			await userManager.AddPasswordAsync(userId, newPassword);
 			return RedirectToAction("Info", new { user.UserName });
-		}
-	}
-
-	public class UserInfoModel
-	{
-		public ApplicationUser User { get; set; }
-		public Course[] Courses { get; private set; }
-
-		public UserInfoModel(ApplicationUser user, Course[] courses)
-		{
-			User = user;
-			Courses = courses;
-		}
-	}
-
-	public class UserCourseModel
-	{
-
-		public UserCourseModel(Course course, ApplicationUser user, ULearnDb db)
-		{
-			Course = course;
-			User = user;
-
-			var visits = db.Visiters.Where(v => v.UserId == user.Id && v.CourseId == course.Id).GroupBy(v => v.SlideId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
-			var unitResults = new Dictionary<string, UserCourseUnitModel>();
-			foreach (var slide in Course.Slides)
-			{
-				var unit = slide.Info.UnitName;
-				if (!unitResults.ContainsKey(unit))
-					unitResults.Add(unit, new UserCourseUnitModel
-					{
-						UnitName = unit,
-						SlideVisits = new ProgressModel(),
-						Exercises = new ProgressModel(),
-						Quizes = new ProgressModel(),
-						Total = new ProgressModel()
-					});
-
-				var res = unitResults[unit];
-				var isVisited = visits.ContainsKey(slide.Id);
-				var isPassed = isVisited && visits[slide.Id].IsPassed;
-				var score = isPassed ? visits[slide.Id].Score : 0;
-
-				res.SlideVisits.Total++;
-				res.Total.Total += slide.MaxScore;
-				res.Total.Earned += score;
-
-				if (isVisited)
-					res.SlideVisits.Earned++;
-
-				if (slide is ExerciseSlide)
-				{
-					res.Exercises.Total += slide.MaxScore;
-					res.Exercises.Earned += score;
-				}
-
-				if (slide is QuizSlide)
-				{
-					res.Quizes.Total += slide.MaxScore;
-					res.Quizes.Earned += score;
-				}
-			}
-
-			Units = course.GetUnits().Select(unitName => unitResults[unitName]).ToArray();
-			Total = new UserCourseUnitModel
-			{
-				Total = new ProgressModel(),
-				Exercises = new ProgressModel(),
-				SlideVisits = new ProgressModel(),
-				Quizes = new ProgressModel()
-			};
-			foreach (var result in Units)
-			{
-				Total.Total.Add(result.Total);
-				Total.Exercises.Add(result.Exercises);
-				Total.SlideVisits.Add(result.SlideVisits);
-				Total.Quizes.Add(result.Quizes);
-			}
-		}
-
-		public ApplicationUser User { get; set; }
-		public Course Course;
-		public UserCourseUnitModel[] Units;
-		public UserCourseUnitModel Total;
-	}
-
-	public class UserCourseUnitModel
-	{
-		public string UnitName;
-		public ProgressModel Total;
-		public ProgressModel Exercises;
-		public ProgressModel SlideVisits;
-		public ProgressModel Quizes;
-	}
-
-	public class ProgressModel
-	{
-		public int Earned;
-		public int Total;
-
-		public decimal? Progress
-		{
-			get { return Total == 0 ? null : (decimal?)Earned / Total; }
-		}
-
-		public override string ToString()
-		{
-			if (Progress.HasValue)
-				return Progress.Value.ToString("0%");
-			return "—";
-		}
-
-		public void Add(ProgressModel progress)
-		{
-			Earned += progress.Earned;
-			Total += progress.Total;
 		}
 	}
 }

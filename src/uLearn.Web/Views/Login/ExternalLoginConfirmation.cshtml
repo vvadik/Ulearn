@@ -1,4 +1,4 @@
-﻿@model uLearn.Web.Models.ExternalLoginConfirmationViewModel
+﻿@model ExternalLoginConfirmationViewModel
 @{
 	ViewBag.Title = "Регистрация";
 }
@@ -6,7 +6,7 @@
 	<h2>@ViewBag.Title.</h2>
 	<h3>Привязка вашего аккаунта @ViewBag.LoginProvider.</h3>
 
-	@using (Html.BeginForm("ExternalLoginConfirmation", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+	@using (Html.BeginForm("ExternalLoginConfirmation", "Login", new { ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 	{
 		@Html.AntiForgeryToken()
 
