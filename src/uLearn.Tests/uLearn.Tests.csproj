@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="CourseTool\Config_Test.cs" />
     <Compile Include="CourseTool\Converter_should.cs" />
+    <Compile Include="SpellChecking_Tests.cs" />
     <Compile Include="Utilities\LessonToXmlConvertor.cs" />
     <Compile Include="CSharp\CsMembersExtractor_should.cs" />
     <Compile Include="CSharp\CsMembersRemover_should.cs" />
