@@ -18,6 +18,7 @@
 
 		@using (Html.BeginForm("StudentInfo", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 		{
+			@Html.AntiForgeryToken()
 			<div class="form-group">
 				@Html.LabelFor(m => m.FirstName, new { @class = "col-md-1 control-label" })
 				<div class="col-md-10">

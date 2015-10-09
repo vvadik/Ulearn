@@ -47,6 +47,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[Authorize(Roles = LmsRoles.Admin)]
+		//TODO [ValidateAntiForgeryToken]
 		public async Task<ActionResult> ToggleRole(string userId, string role)
 		{
 			if (userManager.IsInRole(userId, role))
@@ -58,6 +59,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize(Roles = LmsRoles.Admin)]
+		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> DeleteUser(string userId)
 		{
 			ApplicationUser user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
@@ -87,16 +89,6 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("List");
 			var course = courseManager.GetCourse(courseId);
 			return View(new UserCourseModel(course, user, db));
-		}
-
-		protected override void OnException(ExceptionContext filterContext)
-		{
-			if (filterContext.Exception is HttpAntiForgeryException)
-			{
-				filterContext.ExceptionHandled = true;
-				filterContext.Result = RedirectToAction("Index", "Login");
-			}
-			base.OnException(filterContext);
 		}
 
 		//
@@ -235,6 +227,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Authorize]
+		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> StudentInfo(LtiUserViewModel userInfo)
 		{
 			var userId = User.Identity.GetUserId();
@@ -293,12 +286,13 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ChangeDetailsPartial(UserViewModel userModel)
 		{
 			var user = await userManager.FindByIdAsync(userModel.UserId);
 			if (user == null)
 			{
-				AuthenticationManager.Logout(this);
+				AuthenticationManager.Logout(HttpContext);
 				return RedirectToAction("Index", "Login");
 			}
 			var nameChanged = user.UserName != userModel.Name;
@@ -319,13 +313,14 @@ namespace uLearn.Web.Controllers
 
 			if (nameChanged)
 			{
-				AuthenticationManager.Logout(this);
+				AuthenticationManager.Logout(HttpContext);
 				return RedirectToAction("Index", "Login");
 			}
 			return RedirectToAction("Manage");
 		}
 
 		[HttpPost, Authorize(Roles = LmsRoles.Admin)]
+		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ResetPassword(string newPassword, string userId)
 		{
 			var user = await userManager.FindByIdAsync(userId);

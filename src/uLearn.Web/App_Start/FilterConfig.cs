@@ -8,6 +8,18 @@ namespace uLearn.Web
 		{
 			filters.Add(new HandleErrorAttribute());
 			filters.Add(new RequireHttpsAttribute());
+			filters.Add(new AntiForgeryTokenFilter());
+		}
+	}
+
+	public class AntiForgeryTokenFilter : FilterAttribute, IExceptionFilter
+	{
+		public void OnException(ExceptionContext filterContext)
+		{
+			if (!(filterContext.Exception is HttpAntiForgeryException))
+				return;
+			filterContext.Result = new RedirectResult("/");
+			filterContext.ExceptionHandled = true;
 		}
 	}
 }

@@ -200,15 +200,5 @@ namespace uLearn.Web.Controllers
 				context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
 			}
 		}
-
-		protected override void OnException(ExceptionContext filterContext)
-		{
-			if (filterContext.Exception is HttpAntiForgeryException)
-			{
-				filterContext.ExceptionHandled = true;
-				filterContext.Result = RedirectToAction("Index", "Login");
-			}
-			base.OnException(filterContext);
-		}
 	}
 }

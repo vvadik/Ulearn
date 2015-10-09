@@ -157,15 +157,5 @@ namespace uLearn.Web.Controllers
 
 			return RedirectToAction("Index", "Home");
 		}
-
-		protected override void OnException(ExceptionContext filterContext)
-		{
-			if (filterContext.Exception is HttpAntiForgeryException)
-			{
-				filterContext.ExceptionHandled = true;
-				filterContext.Result = RedirectToAction("Index", "Login");
-			}
-			base.OnException(filterContext);
-		}
 	}
 }
