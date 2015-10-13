@@ -42,7 +42,7 @@ namespace uLearn.Web.Controllers
 		private async Task<HintWithLikeButton[]> GetNewHintHtml(ExerciseSlide exerciseSlide, string courseId, bool isNeedNewHint)
 		{
 			var usedHintsCount = slideHintRepo.GetUsedHintsCount(courseId, exerciseSlide.Id, User.Identity.GetUserId());
-			if (usedHintsCount != exerciseSlide.Exercise.HintsMd.Count)
+			if (usedHintsCount < exerciseSlide.Exercise.HintsMd.Count)
 				return await RenderHtmlWithHint(exerciseSlide, isNeedNewHint ? usedHintsCount : usedHintsCount - 1, courseId);
 			if (isNeedNewHint)
 				return null;
