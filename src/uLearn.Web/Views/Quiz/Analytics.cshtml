@@ -71,59 +71,6 @@
 			</tr>
 		</thead>
 		<tbody>
-			@*
-			<tr>
-				<td>Total</td>
-				@{ var usersCount = Model.UserAnswers.Keys.Count;}
-				@{ usersCount = usersCount == 0 ? 1 : usersCount; }
-				@foreach (var block in Model.QuizSlide.Quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
-				{
-					if (block is ChoiceBlock)
-					{
-						var choiseBlock = ((ChoiceBlock)block);
-						foreach (var item in choiseBlock.Items.OrderBy(x => x.Id))
-						{
-							<td>
-								@((100 *
-								   Model.UserAnswers.Values
-									   .SelectMany(x => x)
-									   .Where(x => x.Id == choiseBlock.QuestionIndex.ToString())
-									   .Select(x => (ChoiceBlockAnswerInfo)x)
-									   .Count(x => x.AnswersId.Get(item.Id, false))) / usersCount)%
-							</td>
-						}
-					}
-					else if (block is FillInBlock)
-					{
-						var fillInBlock = ((FillInBlock)block);
-						<td>
-							@((100 *
-							   Model.UserAnswers.Values
-								   .SelectMany(x => x)
-								   .Where(x => x.Id == fillInBlock.QuestionIndex.ToString())
-								   .Select(x => (FillInBlockAnswerInfo)x)
-								   .Count(x => x.IsRight)) / usersCount)%
-						</td>
-					}
-					else
-					{
-						var isTrueBlock = ((IsTrueBlock)block);
-						<td>
-							@((100 * Model.UserAnswers.Values
-								  .SelectMany(x => x)
-								  .Where(x => x.Id == isTrueBlock.QuestionIndex.ToString())
-								  .Select(x => (IsTrueBlockAnswerInfo)x)
-								  .Count(x => x.IsRight)) / usersCount)%
-						</td>
-					}
-					if (maxQuestionIndex == block.QuestionIndex)
-					{
-						break;
-					}
-					<td style="border-top: none; border-bottom: none"></td>
-				}
-			</tr>
-*@
 			@foreach (var user in Model.UserAnswers.Keys)
 			{
 				var group = Model.Group[user];

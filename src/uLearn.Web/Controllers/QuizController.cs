@@ -247,7 +247,7 @@ namespace uLearn.Web.Controllers
 				if (block is FillInBlock)
 					yield return userQuizzesRepo.GetFillInBlockAnswerInfo(courseId, slide.Id, block.Id, userId, block.QuestionIndex);
 				else if (block is ChoiceBlock)
-					yield return userQuizzesRepo.GetChoiseBlockAnswerInfo(courseId, slide.Id, (ChoiceBlock)block, userId, block.QuestionIndex);
+					yield return userQuizzesRepo.GetChoiceBlockAnswerInfo(courseId, slide.Id, (ChoiceBlock)block, userId, block.QuestionIndex);
 				else if (block is IsTrueBlock)
 					yield return userQuizzesRepo.GetIsTrueBlockAnswerInfo(courseId, slide.Id, block.Id, userId, block.QuestionIndex);
 		}

@@ -92,7 +92,7 @@ namespace uLearn.Web.DataContexts
 			};
 		}
 
-		public ChoiceBlockAnswerInfo GetChoiseBlockAnswerInfo(string courseId, string slideId, ChoiceBlock block, string userId, int questionIndex)
+		public ChoiceBlockAnswerInfo GetChoiceBlockAnswerInfo(string courseId, string slideId, ChoiceBlock block, string userId, int questionIndex)
 		{
 			var ans = new SortedDictionary<string, bool>();
 			foreach (var item in block.Items)
@@ -100,8 +100,11 @@ namespace uLearn.Web.DataContexts
 				ans[item.Id] = false;
 			}
 			var isRight = false;
-			foreach (var quizItem in db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId && q.QuizId == block.Id && q.ItemId != null && !q.isDropped))
+			foreach (var quizItem in db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId && q.QuizId == block.Id && 
+				q.ItemId != null && !q.isDropped))
 			{
+				if (!ans.ContainsKey(quizItem.ItemId))
+					continue;
 				isRight = quizItem.IsRightQuizBlock;
 				ans[quizItem.ItemId] = true;
 			}
