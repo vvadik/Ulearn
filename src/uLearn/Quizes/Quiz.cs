@@ -81,8 +81,9 @@ namespace uLearn.Quizes
 
 		public override void Validate()
 		{
-			var correctCount = Items.Count(i => i.IsCorrect);
-			if (!Multiple && correctCount != 1)
+			if (Items.DistinctBy(i => i.Id).Count() != Items.Length)
+				throw new FormatException("Duplicate choice id in quizBlock " + Id);
+			if (!Multiple && Items.Count(i => i.IsCorrect) != 1)
 				throw new FormatException("Should be exaclty one correct item for non-multiple choice. BlockId=" + Id);
 		}
 
