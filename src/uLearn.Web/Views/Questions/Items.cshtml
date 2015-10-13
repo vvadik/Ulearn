@@ -2,11 +2,20 @@
 
 @foreach (var q in Model.OrderByDescending(q => q.Question.Time))
 {
-	<div style="font-weight:bold">
+	<div style="font-weight: bold">
 		<span>@q.Question.Time.ToString()</span>
 		<span>@q.Question.UserName</span>
 		<span>@q.Question.User.GroupName</span>
-		<span>@Html.ActionLink(q.SlideTitle, "Slide", "Course", new{courseId=q.Question.CourseId, slideIndex = q.Slide.Index}, null)</span>
+		<span>
+			@if (q.Slide != null)
+			{
+				@Html.ActionLink(q.SlideTitle, "Slide", "Course", new { courseId = q.Question.CourseId, slideIndex = q.Slide.Index }, null);
+			}
+			else
+			{
+				<abbr title="Слайд не найден. Возможно у него изменился идентификатор.">@q.SlideTitle</abbr>
+			}
+		</span>
 	</div>
 	<div style="margin-bottom: 1em;">
 		@q.Question.Question
