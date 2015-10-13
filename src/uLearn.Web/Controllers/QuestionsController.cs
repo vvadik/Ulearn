@@ -1,11 +1,8 @@
 using System;
-using System.Data.Entity.Core.Objects;
 using System.Linq;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using NUnit.Framework;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 using System.Collections.Generic;
