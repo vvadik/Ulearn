@@ -10,7 +10,7 @@
 	var blocks = Model.Slide.Blocks.Where(b => !(b is ExerciseBlock)).ToList();
 }
 
-@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
+@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, isGuest = Model.IsGuest })
 
 <div class="slide-container">
 	<div class="container body-content">
@@ -40,8 +40,11 @@
 					<button class="btn btn-danger" type="submit">Удалить прогресс</button>
 				}
 			}
-			@Html.Partial("_RatesBar")
-			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false })
+			@if (!Model.IsGuest)
+			{
+				@Html.Partial("_RatesBar")
+			}
+			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false, isGuest = Model.IsGuest })
 		</div>
 	</div>
 </div>
@@ -50,10 +53,13 @@
 	@Html.Action("SelectGroup")
 }
 @section scripts{
-	<script>
-		fillRate('@Model.Rate');
-		$("#selectGroupModal").modal();
-	</script>
+	@if (!Model.IsGuest)
+	{
+		<script>
+			fillRate('@Model.Rate');
+			$("#selectGroupModal").modal();
+		</script>
+	}
 	@if (Model.Slide is ExerciseSlide)
 	{
 		var e = (ExerciseSlide) Model.Slide;

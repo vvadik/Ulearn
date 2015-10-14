@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -16,11 +15,28 @@ namespace uLearn.Web.Controllers
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 		
-		public ActionResult TableOfContents(string courseId, int slideIndex = -1)
+		public ActionResult TableOfContents(string courseId, int slideIndex = -1, bool isGuest = false)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var userId = User.Identity.GetUserId();
-			return PartialView(CreateTocModel(course, slideIndex, userId));
+			var model = isGuest ? CreateGuestTocModel(course, slideIndex) : CreateTocModel(course, slideIndex, userId);
+			return PartialView(model);
+		}
+
+		private TocModel CreateGuestTocModel(Course course, int slideIndex)
+		{
+			var visibleUnits = unitsRepo.GetVisibleUnits(course.Id, User);
+			var builder = new TocModelBuilder(
+				s => Url.Action("Slide", "Course", new { courseId = course.Id, slideIndex = s.Index }),
+				s => 0,
+				course,
+				slideIndex);
+			builder.IsInstructor = false;
+			builder.IsVisited = s => false;
+			builder.IsUnitVisible = visibleUnits.Contains;
+			var toc = builder.CreateTocModel();
+			toc.NextUnitTime = unitsRepo.GetNextUnitPublishTime(course.Id);
+			return toc;
 		}
 
 		private HashSet<string> GetSolvedSlides(Course course, string userId)
@@ -46,13 +62,13 @@ namespace uLearn.Web.Controllers
 			builder.IsInstructor = User.IsInRole(LmsRoles.Instructor);
 			builder.IsSolved = s => solved.Contains(s.Id);
 			builder.IsVisited = s => visited.Contains(s.Id);
-			builder.IsUnitVisible = u => visibleUnits.Contains(u);
+			builder.IsUnitVisible = visibleUnits.Contains;
 			var toc = builder.CreateTocModel();
 			toc.NextUnitTime = unitsRepo.GetNextUnitPublishTime(course.Id);
 			return toc;
 		}
 
-		public ActionResult PrevNextButtons(string courseId, int slideIndex, bool onSolutionsSlide)
+		public ActionResult PrevNextButtons(string courseId, int slideIndex, bool onSolutionsSlide, bool isGuest)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.Slides[slideIndex];
@@ -62,7 +78,13 @@ namespace uLearn.Web.Controllers
 			var nextSlide = course.Slides.FirstOrDefault(s => s.Index > slideIndex && visibleUnits.Contains(s.Info.UnitName));
 			var prevSlide = course.Slides.LastOrDefault(s => s.Index < slideIndex && visibleUnits.Contains(s.Info.UnitName));
 			
-			var model = new PrevNextButtonsModel(course, slideIndex, nextIsAcceptedSolutions, nextSlide == null ? -1 : nextSlide.Index, prevSlide == null ? -1 : prevSlide.Index);
+			var model = new PrevNextButtonsModel(
+				course, 
+				slideIndex, 
+				nextIsAcceptedSolutions, 
+				nextSlide == null ? -1 : nextSlide.Index, 
+				prevSlide == null ? -1 : prevSlide.Index, 
+				isGuest);
 			if (onSolutionsSlide) model.PrevSlideIndex = model.SlideIndex;
 			return PartialView(model);
 		}
