@@ -156,5 +156,22 @@ namespace uLearn.Web.DataContexts
 		{
 			return db.Visiters.Any(v => v.SlideId == slideId && v.UserId == userId && (v.IsPassed || v.IsSkipped));
 		}
+
+		public async Task AddVisiters(IEnumerable<Tuple<string, string, string, DateTime>> visiters)
+		{
+			foreach (var visiter in visiters)
+			{
+				if (db.Visiters.Any(x => x.UserId == visiter.Item3 && x.SlideId == visiter.Item1))
+					continue;
+				db.Visiters.Add(new Visiters
+				{
+					UserId = visiter.Item3,
+					CourseId = visiter.Item1,
+					SlideId = visiter.Item2,
+					Timestamp = visiter.Item4
+				});
+			}
+			await db.SaveChangesAsync();
+		}
 	}
 }

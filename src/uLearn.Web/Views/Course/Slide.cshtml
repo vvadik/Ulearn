@@ -58,13 +58,22 @@
 		<script>
 			fillRate('@Model.Rate');
 			$("#selectGroupModal").modal();
+			uploadVisiters("@Url.Action("Upload", "Visiters")");
+		</script>
+	}
+	else
+	{
+		<script>
+			saveVisiters("@Model.CourseId/@Model.Slide.Index", "@DateTime.Now.ToString("u")")
 		</script>
 	}
 	@if (Model.Slide is ExerciseSlide)
 	{
-		var e = (ExerciseSlide) Model.Slide;
+		var e = (ExerciseSlide)Model.Slide;
 		ExerciseBlockData data = Model.BlockRenderContext.GetBlockData(e.Exercise);
-		<script> getHints("@Model.CourseId", "@Model.Slide.Index", '@e.Exercise.HintsMd.Count') </script>
+		<script>
+			getHints("@Model.CourseId", "@Model.Slide.Index", '@e.Exercise.HintsMd.Count')
+		</script>
 		<script> refreshPreviousDraft('@(data.LatestAcceptedSolution != null)', '@e.Id') </script>
 	}
 }
