@@ -157,19 +157,13 @@ namespace uLearn.Web.DataContexts
 			return db.Visiters.Any(v => v.SlideId == slideId && v.UserId == userId && (v.IsPassed || v.IsSkipped));
 		}
 
-		public async Task AddVisiters(IEnumerable<Tuple<string, string, string, DateTime>> visiters)
+		public async Task AddVisiters(IEnumerable<Visiters> visiters)
 		{
 			foreach (var visiter in visiters)
 			{
-				if (db.Visiters.Any(x => x.UserId == visiter.Item3 && x.SlideId == visiter.Item1))
+				if (db.Visiters.Any(x => x.UserId == visiter.UserId && x.SlideId == visiter.SlideId))
 					continue;
-				db.Visiters.Add(new Visiters
-				{
-					UserId = visiter.Item3,
-					CourseId = visiter.Item1,
-					SlideId = visiter.Item2,
-					Timestamp = visiter.Item4
-				});
+				db.Visiters.Add(visiter);
 			}
 			await db.SaveChangesAsync();
 		}

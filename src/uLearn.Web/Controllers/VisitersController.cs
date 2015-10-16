@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
 using uLearn.Web.DataContexts;
+using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
@@ -21,14 +22,21 @@ namespace uLearn.Web.Controllers
 			var visits = new StreamReader(Request.InputStream).ReadToEnd();
 			var visitsDictionary = JsonConvert.DeserializeObject<Dictionary<string, DateTime>>(visits);
 			var userId = User.Identity.GetUserId();
-			var visiters = new List<Tuple<string, string, string, DateTime>>();
+			var visiters = new List<Visiters>();
 			foreach (var dateTime in visitsDictionary)
 			{
-				var path = dateTime.Key.Split('/');
+				var path = dateTime.Key.Split(new []{'/'}, 3);
 				var courseId = path[0];
-				var slideIndex = int.Parse(path[1]);
-				var slideId = courseManager.GetCourse(path[0]).Slides[slideIndex].Id;
-				visiters.Add(Tuple.Create(courseId, slideId, userId, dateTime.Value));
+				var slideId = path[2];
+				if (courseManager.GetCourse(courseId).GetSlideById(slideId) == null)
+					continue;
+				visiters.Add(new Visiters
+				{
+					UserId = userId,
+					CourseId = courseId,
+					SlideId = slideId,
+					Timestamp = dateTime.Value
+				});
 			}
 			await visitersRepo.AddVisiters(visiters);
 			return null;

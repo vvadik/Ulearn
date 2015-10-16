@@ -68,7 +68,7 @@
 	else
 	{
 		<script>
-			saveVisiters("@Model.CourseId/@Model.Slide.Index", "@DateTime.Now.ToString("u")");
+			saveVisiters("@Model.CourseId/@Model.Slide.Index/@Model.Slide.Id", "@DateTime.Now.ToString("u")");
 			displayVisits("@Model.CourseId");
 		</script>
 	}
