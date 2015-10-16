@@ -10,7 +10,7 @@
 	var blocks = Model.Slide.Blocks.Where(b => !(b is ExerciseBlock)).ToList();
 }
 
-@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, isGuest = Model.IsGuest })
+@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
 
 <div class="slide-container">
 	<div class="container body-content">
@@ -44,7 +44,7 @@
 			{
 				@Html.Partial("_RatesBar")
 			}
-			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false, isGuest = Model.IsGuest })
+			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false })
 		</div>
 	</div>
 </div>

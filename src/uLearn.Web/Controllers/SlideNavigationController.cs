@@ -15,11 +15,11 @@ namespace uLearn.Web.Controllers
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 		
-		public ActionResult TableOfContents(string courseId, int slideIndex = -1, bool isGuest = false)
+		public ActionResult TableOfContents(string courseId, int slideIndex = -1)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var userId = User.Identity.GetUserId();
-			var model = isGuest ? CreateGuestTocModel(course, slideIndex) : CreateTocModel(course, slideIndex, userId);
+			var model = User.Identity.IsAuthenticated ? CreateTocModel(course, slideIndex, userId) : CreateGuestTocModel(course, slideIndex);
 			return PartialView(model);
 		}
 
@@ -68,7 +68,7 @@ namespace uLearn.Web.Controllers
 			return toc;
 		}
 
-		public ActionResult PrevNextButtons(string courseId, int slideIndex, bool onSolutionsSlide, bool isGuest)
+		public ActionResult PrevNextButtons(string courseId, int slideIndex, bool onSolutionsSlide)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.Slides[slideIndex];
@@ -84,7 +84,7 @@ namespace uLearn.Web.Controllers
 				nextIsAcceptedSolutions, 
 				nextSlide == null ? -1 : nextSlide.Index, 
 				prevSlide == null ? -1 : prevSlide.Index, 
-				isGuest);
+				!User.Identity.IsAuthenticated);
 			if (onSolutionsSlide) model.PrevSlideIndex = model.SlideIndex;
 			return PartialView(model);
 		}
