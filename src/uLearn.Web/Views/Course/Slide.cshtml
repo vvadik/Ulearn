@@ -29,7 +29,10 @@
 				{
 					@SlideHtml.Block(((ExerciseSlide)Model.Slide).Exercise, Model.BlockRenderContext)
 				}
-				@Html.Partial("_AskBar")
+				@if (!Model.IsGuest)
+				{
+					@Html.Partial("_AskBar")
+				}
 			</div>
 			@if (User.IsInRole(LmsRoles.Tester))
 			{
