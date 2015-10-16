@@ -35,6 +35,12 @@ namespace uLearn.Web.Controllers
 			this.userManager = userManager;
 		}
 
+		[AllowAnonymous]
+		public ActionResult Login(string returnUrl)
+		{
+			return RedirectToAction("Index", "Login", new { returnUrl });
+		}
+
 		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public ActionResult List(string namePrefix = null, string role = null)
 		{
