@@ -16,7 +16,7 @@ namespace uLearn.Web
 			app.UseCookieAuthentication(new CookieAuthenticationOptions
 			{
 				AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
-				LoginPath = new PathString("/Login/index")
+				LoginPath = new PathString("/Login")
 			});
 			// Use a cookie to temporarily store information about a user logging in with a third party login provider
 			app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
