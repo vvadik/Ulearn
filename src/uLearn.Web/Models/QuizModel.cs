@@ -15,6 +15,7 @@ namespace uLearn.Web.Models
 		public int TryNumber { get; set; }
 		public int MaxDropCount { get; set; }
 		public bool IsLti { get; set; }
+		public bool IsGuest { get; set; }
 
 		public int RightAnswers
 		{

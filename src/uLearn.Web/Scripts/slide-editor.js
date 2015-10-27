@@ -14,7 +14,7 @@ function getMode(lang) {
 	return "text/" + langIds[lang];
 }
 
-function codeMirrorClass(c, editable) {
+function codeMirrorClass(c, editable, guest) {
 	var codes = document.getElementsByClassName(c);
 	for (var i = 0; i < codes.length; i++) {
 		var element = codes[i];
@@ -24,7 +24,7 @@ function codeMirrorClass(c, editable) {
 		{
 			mode: getMode(langId),
 			lineNumbers: true,
-			theme: editable ? "cobalt" : "default",
+			theme: (editable || guest) ? "cobalt" : "default",
 			indentWithTabs: true,
 			tabSize: 4,
 			indentUnit: 4,
@@ -39,16 +39,18 @@ function codeMirrorClass(c, editable) {
 			//autoCloseBrackets: true, // bug: autoCloseBracket breakes indentation after for|while|...
 			styleActiveLine: editable,
 			matchBrackets: true,
-	});
+		});
 		element.codeMirrorEditor = editor;
 		if (editable)
 			editor.focus();
-
+		if (guest)
+			editor.on("mousedown", function(cm) { loginForContinue(); });
 	}
 }
 
-codeMirrorClass("code-exercise", true);
-codeMirrorClass("code-sample", false);
+codeMirrorClass("code-exercise", true, false);
+codeMirrorClass("code-sample", false, false);
+codeMirrorClass("code-guest", false, true);
 
 function refreshPreviousDraft(ac, id) {
     window.onbeforeunload = function () {

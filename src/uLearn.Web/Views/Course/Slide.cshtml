@@ -19,7 +19,13 @@
 				<h1>@Model.Slide.Title <span class="score">@GetScore(Model.Score)</span></h1>
 				@if (Model.Slide is QuizSlide)
 				{
-					@Html.Action("Quiz", "Quiz", new { slide = Model.Slide as QuizSlide, courseId = Model.CourseId, userId = Model.UserId })
+					@Html.Action("Quiz", "Quiz", new
+					{
+						slide = Model.Slide as QuizSlide,
+						courseId = Model.CourseId,
+						userId = Model.UserId,
+						isGuest = Model.IsGuest
+					})
 				}
 				else
 				{
@@ -46,6 +52,10 @@
 			@if (!Model.IsGuest)
 			{
 				@Html.Partial("_RatesBar")
+			}
+			else
+			{
+				@Html.Partial("_LoginForContinue")
 			}
 			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false })
 		</div>

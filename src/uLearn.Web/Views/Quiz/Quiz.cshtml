@@ -10,44 +10,51 @@
 	<h4 id="quiz-status">@status</h4>
 
 	var remains = Model.MaxDropCount - Model.TryNumber + 1;
-	var context = new BlockRenderContext(null, Model.Slide, CourseUnitUtils.GetDirectoryRelativeWebPath(quizSlide.Info.SlideFile), Enumerable
-			.Range(0, Model.Slide.Blocks.Length)
+	var context = new BlockRenderContext(
+		null, 
+		Model.Slide, 
+		CourseUnitUtils.GetDirectoryRelativeWebPath(quizSlide.Info.SlideFile), 
+		Enumerable.Range(0, Model.Slide.Blocks.Length)
 			.Select(x => quizSlide.Blocks[x] is AbstractQuestionBlock
-				? new QuizBlockData(Model, x, Model.QuizState)
-				: null)
-			.ToArray<dynamic>()
+					? new QuizBlockData(Model, x, Model.QuizState)
+					: null)
+			.ToArray<dynamic>(),
+		Model.IsGuest
 		);
 	foreach (var block in quizSlide.Blocks)
 	{
 		@SlideHtml.Block((dynamic)block, context)
 	}
-	<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
-		@if (Model.QuizState == QuizState.NotPassed)
-		{
-			<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString)">Готово!</button>
-		}
-		else if (Model.QuizState == QuizState.Subtotal)
-		{
-			using (Html.BeginForm("DropQuiz", "Quiz"))
+	if (!Model.IsGuest)
+	{
+		<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
+			@if (Model.QuizState == QuizState.NotPassed)
 			{
-				<input type="hidden" name="slideId" value="@Model.Slide.Id" />
-				<input type="hidden" name="courseId" value="@Model.CourseId" />
-				<input type="hidden" name="isLti" value="@Model.IsLtiToString">
-				<button class="btn btn-danger" type="submit">Пройти тест повторно</button>
-				<small>У вас остал@(remains == 1 ? "а" : "о")сь @remains из @(Model.MaxDropCount + 1) попыток</small>
+				<button class="btn btn-primary quiz-submit-btn" onclick=" submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString) ">Готово!</button>
 			}
-		}
-		else if (User.IsInRole(LmsRoles.Tester))
-		{
-			using (Html.BeginForm("ClearAnswers", "Quiz"))
+			else if (Model.QuizState == QuizState.Subtotal)
 			{
-				<input type="hidden" name="slideId" value="@Model.Slide.Id" />
-				<input type="hidden" name="courseId" value="@Model.CourseId" />
-				<input type="hidden" name="isLti" value="@Model.IsLtiToString">
-				<button class="btn btn-danger" type="submit">Удалить ответы</button>
+				using (Html.BeginForm("DropQuiz", "Quiz"))
+				{
+					<input type="hidden" name="slideId" value="@Model.Slide.Id" />
+					<input type="hidden" name="courseId" value="@Model.CourseId" />
+					<input type="hidden" name="isLti" value="@Model.IsLtiToString">
+					<button class="btn btn-danger" type="submit">Пройти тест повторно</button>
+					<small>У вас остал@(remains == 1 ? "а" : "о")сь @remains из @(Model.MaxDropCount + 1) попыток</small>
+				}
 			}
-		}
-	</div>
+			else if (User.IsInRole(LmsRoles.Tester))
+			{
+				using (Html.BeginForm("ClearAnswers", "Quiz"))
+				{
+					<input type="hidden" name="slideId" value="@Model.Slide.Id" />
+					<input type="hidden" name="courseId" value="@Model.CourseId" />
+					<input type="hidden" name="isLti" value="@Model.IsLtiToString">
+					<button class="btn btn-danger" type="submit">Удалить ответы</button>
+				}
+			}
+		</div>
+	}
 	if (User.IsInRole(LmsRoles.Instructor))
 	{
 		<div class="load-content" data-url="@Url.Action("Analytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })"> </div>

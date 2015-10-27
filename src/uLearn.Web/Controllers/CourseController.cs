@@ -41,8 +41,6 @@ namespace uLearn.Web.Controllers
 			var model = isGuest ?
 				CreateGuestCoursePageModel(courseId, slideIndex, visibleUnits) :
 				await CreateCoursePageModel(courseId, slideIndex, visibleUnits);
-			if (model.Slide.ShouldBeSolved && isGuest)
-				return RedirectToAction("Index", "Login", new { returnUrl = Url.Action("Slide", new { courseId, slideIndex }) });
 			if (!visibleUnits.Contains(model.Slide.Info.UnitName))
 				throw new Exception("Slide is hidden " + slideIndex);
 			return View(model);
@@ -153,15 +151,22 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			if (slideIndex == -1)
 				slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
+			var slide = course.Slides[slideIndex];
+			var exerciseBlockData = new ExerciseBlockData(false, false);
 			return new CoursePageModel
 			{
-				UserId = "Гость",
 				IsFirstCourseVisit = false,
 				CourseId = course.Id,
 				CourseTitle = course.Title,
-				Slide = course.Slides[slideIndex],
+				Slide = slide,
 				Score = Tuple.Create(0, 0),
-				IsGuest = true
+				BlockRenderContext = new BlockRenderContext(
+					course, 
+					slide, 
+					slide.Info.DirectoryRelativePath, 
+					slide.Blocks.Select(block => block is ExerciseBlock ? exerciseBlockData : (dynamic)null).ToArray(),
+					true),
+				IsGuest = true,
 			};
 		}
 
