@@ -37,5 +37,9 @@ function displayVisits(courseId) {
 			glyph.removeClass('glyphicon-none');
 			glyph.addClass('glyphicon-ok');
 		}
+		else if (!glyph.hasClass('navbar-label-success')) {
+			glyph.removeClass('navbar-label-default');
+			glyph.addClass('navbar-label-danger');
+		}
 	}
 }
