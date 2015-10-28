@@ -11,8 +11,8 @@
 			</div>
 			<div class="modal-body">
 				<p>
-					@Html.ActionLink("Войдите", "Index", "Login", new { returnUrl = Request.Url }, null) или
-					@Html.ActionLink("зарегистрируйтесь", "Register", "Account", new { returnUrl = Request.Url }, null),
+					@Html.ActionLink("Войдите", "Index", "Login", new { returnUrl = Url.Action() }, null) или
+					@Html.ActionLink("зарегистрируйтесь", "Register", "Account", new { returnUrl = Url.Action() }, null),
 					чтобы решать тесты и сдавать задачи.
 				</p>
 			</div>
