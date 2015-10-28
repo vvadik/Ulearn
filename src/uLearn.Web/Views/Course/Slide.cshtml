@@ -71,15 +71,15 @@
 		<script>
 			fillRate('@Model.Rate');
 			$("#selectGroupModal").modal();
-			displayVisits("@Model.CourseId");
+			displayVisits();
 			uploadVisiters("@Url.Action("Upload", "Visiters")");
 		</script>
 	}
 	else
 	{
 		<script>
-			saveVisiters("@Model.CourseId/@Model.Slide.Index/@Model.Slide.Id", "@DateTime.Now.ToString("u")");
-			displayVisits("@Model.CourseId");
+			saveVisiters("@Model.Slide.Id", "@DateTime.Now.ToString("u")");
+			displayVisits();
 		</script>
 	}
 	@if (Model.Slide is ExerciseSlide)

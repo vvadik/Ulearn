@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -23,19 +24,19 @@ namespace uLearn.Web.Controllers
 			var visitsDictionary = JsonConvert.DeserializeObject<Dictionary<string, DateTime>>(visits);
 			var userId = User.Identity.GetUserId();
 			var visiters = new List<Visiters>();
-			foreach (var dateTime in visitsDictionary)
+			var slides = courseManager.GetCourses().SelectMany(course => course.Slides.Select(slide => new { courseId = course.Id, slideId = slide.Id })).ToDictionary(arg => arg.slideId, arg => arg.courseId);
+			foreach (var visit in visitsDictionary)
 			{
-				var path = dateTime.Key.Split(new []{'/'}, 3);
-				var courseId = path[0];
-				var slideId = path[2];
-				if (courseManager.GetCourse(courseId).GetSlideById(slideId) == null)
+				var slideId = visit.Key;
+				string courseId;
+				if (!slides.TryGetValue(slideId, out courseId))
 					continue;
 				visiters.Add(new Visiters
 				{
 					UserId = userId,
 					CourseId = courseId,
 					SlideId = slideId,
-					Timestamp = dateTime.Value
+					Timestamp = visit.Value
 				});
 			}
 			await visitersRepo.AddVisiters(visiters);

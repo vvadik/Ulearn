@@ -7,8 +7,8 @@ namespace uLearn.Web.Models
 {
 	public class TocModelBuilder
 	{
-		private Func<Slide, string> getSlideUrl;
-		private Func<Slide, int> getSlideScore;
+		private readonly Func<Slide, string> getSlideUrl;
+		private readonly Func<Slide, int> getSlideScore;
 		private readonly Course course;
 		private readonly int currentSlideIndex;
 		public Func<string, string> GetUnitStatisticsUrl;
@@ -65,16 +65,19 @@ namespace uLearn.Web.Models
 
 		private TocPageInfo CreatePage(Slide slide)
 		{
-			var page = new TocPageInfo();
-			page.Url = getSlideUrl(slide);
-			page.Name = slide.Title;
-			page.ShouldBeSolved = slide.ShouldBeSolved;
-			page.MaxScore = slide.MaxScore;
-			page.Score = getSlideScore(slide);
-			page.IsCurrent = slide.Index == currentSlideIndex;
-			page.IsSolved = IsSolved(slide);
-			page.IsVisited = IsVisited(slide);
-			page.PageType = GetPageType(slide);
+			var page = new TocPageInfo
+			{
+				SlideId = slide.Id,
+				Url = getSlideUrl(slide), 
+				Name = slide.Title, 
+				ShouldBeSolved = slide.ShouldBeSolved, 
+				MaxScore = slide.MaxScore, 
+				Score = getSlideScore(slide), 
+				IsCurrent = slide.Index == currentSlideIndex, 
+				IsSolved = IsSolved(slide), 
+				IsVisited = IsVisited(slide), 
+				PageType = GetPageType(slide)
+			};
 			return page;
 		}
 
