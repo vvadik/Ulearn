@@ -25,7 +25,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		//
-		// GET: /Login/Login
+		// GET: /Login
 		public ActionResult Index(string returnUrl)
 		{
 			ViewBag.ReturnUrl = returnUrl;
@@ -33,7 +33,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		//
-		// POST: /Login/Login
+		// POST: /Login
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Index(LoginViewModel model, string returnUrl)
@@ -46,7 +46,7 @@ namespace uLearn.Web.Controllers
 					await AuthenticationManager.LoginAsync(HttpContext, user, model.RememberMe);
 					return Redirect(this.FixRedirectUrl(returnUrl));
 				}
-				ModelState.AddModelError("", "Неверное имя пользователя или пароль.");
+				ModelState.AddModelError("", @"Неверное имя пользователя или пароль.");
 			}
 
 			// If we got this far, something failed, redisplay form
@@ -165,7 +165,6 @@ namespace uLearn.Web.Controllers
 		//
 		// POST: /Login/LogOff
 		[HttpPost]
-		[Authorize]
 		[ValidateAntiForgeryToken]
 		public ActionResult LogOff()
 		{
