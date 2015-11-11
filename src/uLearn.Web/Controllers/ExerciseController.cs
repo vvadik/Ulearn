@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using LtiLibrary.Core.Outcomes.v1;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
 using uLearn.Web.LTI;
@@ -14,8 +13,6 @@ namespace uLearn.Web.Controllers
 		private readonly CourseManager courseManager;
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();
-		private readonly ConsumersRepo consumersRepo = new ConsumersRepo();
-		private readonly LtiRequestsRepo ltiRequestsRepo = new LtiRequestsRepo();
 
 		private readonly static TimeSpan executionTimeout = TimeSpan.FromSeconds(30);
 
@@ -34,7 +31,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> RunSolution(string courseId, int slideIndex = 0, bool isLti = false)
 		{
 			var code = Request.InputStream.GetString();
-			if (code.Length > TextsRepo.MAX_TEXT_SIZE)
+			if (code.Length > TextsRepo.MaxTextSize)
 			{
 				return Json(new RunSolutionResult
 				{
