@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using uLearn.Web.DataContexts;
+using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	[Authorize(Roles = LmsRoles.Admin)]
+	[PostAuthorize(Roles = LmsRoles.Admin)]
 	public class UnitController : Controller
 	{
 		private readonly CourseManager courseManager;

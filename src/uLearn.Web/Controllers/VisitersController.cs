@@ -7,17 +7,18 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
 using uLearn.Web.DataContexts;
+using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
+	[PostAuthorize]
 	public class VisitersController : Controller
 	{
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
 		[HttpPost]
-		[Authorize]
 		public async Task<ActionResult> Upload()
 		{
 			var visits = new StreamReader(Request.InputStream).ReadToEnd();

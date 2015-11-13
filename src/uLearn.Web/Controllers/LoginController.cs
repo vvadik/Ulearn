@@ -5,6 +5,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using uLearn.Web.DataContexts;
+using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -127,7 +128,6 @@ namespace uLearn.Web.Controllers
 
 		//
 		// GET: /Login/ExternalLoginFailure
-		[AllowAnonymous]
 		public ActionResult ExternalLoginFailure()
 		{
 			return View();
@@ -136,7 +136,7 @@ namespace uLearn.Web.Controllers
 		//
 		// POST: /Login/LinkLogin
 		[HttpPost]
-		[Authorize]
+		[PostAuthorize]
 		[ValidateAntiForgeryToken]
 		public ActionResult LinkLogin(string provider)
 		{
@@ -146,7 +146,7 @@ namespace uLearn.Web.Controllers
 
 		//
 		// GET: /Login/LinkLoginCallback
-		[Authorize]
+		[PostAuthorize]
 		public async Task<ActionResult> LinkLoginCallback()
 		{
 			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext, XsrfKey, User.Identity.GetUserId());

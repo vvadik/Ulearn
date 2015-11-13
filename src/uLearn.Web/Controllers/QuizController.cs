@@ -7,11 +7,13 @@ using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
+using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
+	[PostAuthorize]
 	public class QuizController : Controller
 	{
 		private const int MAX_DROPS_COUNT = 1;
@@ -60,7 +62,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize(Roles = LmsRoles.Tester)]
+		[PostAuthorize(Roles = LmsRoles.Tester)]
 		public async Task<ActionResult> ClearAnswers(string courseId, string slideId, bool isLti)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
@@ -77,7 +79,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize]
 		public async Task<string> SubmitQuiz(string courseId, string slideIndex, string answer, bool isLti)
 		{
 			var intSlideIndex = int.Parse(slideIndex);
@@ -209,7 +210,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpGet]
-		[Authorize(Roles = LmsRoles.Instructor)]
+		[PostAuthorize(Roles = LmsRoles.Instructor)]
 		public ActionResult Analytics(string courseId, int slideIndex)
 		{
 			var course = courseManager.GetCourse(courseId);
@@ -253,7 +254,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize]
 		public async Task<ActionResult> DropQuiz(string courseId, string slideId, bool isLti)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
@@ -275,6 +275,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Slide", "Course", model);
 		}
 
+		[AllowAnonymous]
 		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false)
 		{
 			if (isGuest)

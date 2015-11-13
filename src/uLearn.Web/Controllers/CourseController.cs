@@ -9,10 +9,12 @@ using Microsoft.AspNet.Identity;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
+using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
+	[PostAuthorize]
 	public class CourseController : Controller
 	{
 		private readonly CourseManager courseManager;
@@ -33,6 +35,7 @@ namespace uLearn.Web.Controllers
 			this.courseManager = courseManager;
 		}
 
+		[AllowAnonymous]
 		public async Task<ActionResult> Slide(string courseId, int slideIndex = -1)
 		{
 			if (string.IsNullOrWhiteSpace(courseId)) return RedirectToAction("Index", "Home");
@@ -46,7 +49,6 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 
-		[Authorize]
 		public async Task<ActionResult> LtiSlide(string courseId, int slideIndex)
 		{
 			if (string.IsNullOrWhiteSpace(courseId))
@@ -123,7 +125,6 @@ namespace uLearn.Web.Controllers
 			return lastVisitedSlide;
 		}
 
-		[Authorize]
 		[HttpGet]
 		public ActionResult SelectGroup()
 		{
@@ -131,7 +132,6 @@ namespace uLearn.Web.Controllers
 			return PartialView(groups);
 		}
 
-		[Authorize]
 		[HttpPost]
 		public async Task<ActionResult> SelectGroup(string groupName)
 		{
@@ -222,7 +222,6 @@ namespace uLearn.Web.Controllers
 			return null;
 		}
 
-		[Authorize]
 		public async Task<ViewResult> AcceptedSolutions(string courseId, int slideIndex = 0, bool isLti = false)
 		{
 			var userId = User.Identity.GetUserId();
@@ -252,7 +251,6 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 
-		[Authorize]
 		public ViewResult AcceptedAlert(string courseId, int slideIndex = 0)
 		{
 			var userId = User.Identity.GetUserId();
@@ -270,7 +268,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize]
 		public async Task<string> ApplyRate(string courseId, string slideId, string rate)
 		{
 			var userId = User.Identity.GetUserId();
@@ -279,7 +276,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize]
 		public string GetRate(string courseId, string slideId)
 		{
 			var userId = User.Identity.GetUserId();
@@ -287,7 +283,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize]
 		public async Task<JsonResult> LikeSolution(int solutionId)
 		{
 			var res = await solutionsRepo.Like(solutionId, User.Identity.GetUserId());
@@ -303,7 +298,7 @@ namespace uLearn.Web.Controllers
 			return visitersRepo.GetVisiter(slideId, userId);
 		}
 
-		[Authorize(Roles = LmsRoles.Instructor)]
+		[PostAuthorize(Roles = LmsRoles.Instructor)]
 		public ActionResult InstructorNote(string courseId, string unitName)
 		{
 			InstructorNote instructorNote = courseManager.GetCourse(courseId).FindInstructorNote(unitName);
@@ -313,7 +308,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize(Roles = LmsRoles.Instructor + "," + LmsRoles.Admin)]
+		[PostAuthorize(Roles = LmsRoles.Instructor + "," + LmsRoles.Admin)]
 		public async Task<ActionResult> RemoveSolution(string courseId, int slideIndex, int solutionId)
 		{
 			var solution = await db.UserSolutions.FirstOrDefaultAsync(s => s.Id == solutionId);
@@ -332,7 +327,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("AcceptedSolutions", new { courseId = courseId, slideIndex = slideIndex });
 		}
 
-		[Authorize(Roles = LmsRoles.Tester)]
+		[PostAuthorize(Roles = LmsRoles.Tester)]
 		public async Task<ActionResult> ForgetAll(string courseId, string slideId)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);

@@ -3,11 +3,13 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
+using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
+	[PostAuthorize]
 	public class ExerciseController : Controller
 	{
 		private readonly CourseManager courseManager;
@@ -27,7 +29,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize]
 		public async Task<ActionResult> RunSolution(string courseId, int slideIndex = 0, bool isLti = false)
 		{
 			var code = Request.InputStream.GetString();
