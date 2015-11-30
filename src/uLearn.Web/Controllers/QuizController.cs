@@ -211,14 +211,15 @@ namespace uLearn.Web.Controllers
 
 		[HttpGet]
 		[PostAuthorize(Roles = LmsRoles.Instructor)]
-		public ActionResult Analytics(string courseId, int slideIndex)
+		public ActionResult Analytics(string courseId, int slideIndex, bool onlyNew = true)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var quizSlide = (QuizSlide)course.Slides[slideIndex];
 			var dict = new SortedDictionary<string, List<QuizAnswerInfo>>();
 			var groups = new Dictionary<string, string>();
+			var time = onlyNew ? DateTime.Now.Subtract(TimeSpan.FromDays(365.0 / 2)) : DateTime.MinValue;
 			var passedUsers = db.UserQuizzes
-				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped)
+				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped && time < q.Timestamp)
 				.Select(q => q.UserId)
 				.Distinct()
 				.Join(db.Users, userId => userId, u => u.Id, (userId, u) => new { UserId = userId, u.UserName, u.GroupName });
