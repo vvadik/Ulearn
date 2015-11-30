@@ -1,4 +1,4 @@
-﻿@* Generator: MvcHelper GeneratePrettyNames: true *@
+﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
 
 @using System.Globalization
 @using uLearn
@@ -67,7 +67,7 @@
 
 @helper TocItem(TocPageInfo page)
 {
-	<li class="slide-list-item @(page.IsCurrent ? "selected" : "") full-size" onclick="window.location.href='@page.Url'">
+	<li class="slide-list-item @(page.IsCurrent ? "selected" : "") full-size" onclick="window.location.href='@page.Url'" data-slide-id="@page.SlideId">
 		<i class="@GetPageIconClass(page) navbar-label" title="@GetTocPageTytle(page.PageType)"></i>
 		<a href="@page.Url" style="margin-right: 5px">@page.Name</a>
 		<span class="score right">@SlideHtml.Score(page.Score, page.MaxScore)</span>

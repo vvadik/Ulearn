@@ -19,7 +19,13 @@
 				<h1>@Model.Slide.Title <span class="score">@GetScore(Model.Score)</span></h1>
 				@if (Model.Slide is QuizSlide)
 				{
-					@Html.Action("Quiz", "Quiz", new { slide = Model.Slide as QuizSlide, courseId = Model.CourseId, userId = Model.UserId })
+					@Html.Action("Quiz", "Quiz", new
+					{
+						slide = Model.Slide as QuizSlide,
+						courseId = Model.CourseId,
+						userId = Model.UserId,
+						isGuest = Model.IsGuest
+					})
 				}
 				else
 				{
@@ -29,7 +35,10 @@
 				{
 					@SlideHtml.Block(((ExerciseSlide)Model.Slide).Exercise, Model.BlockRenderContext)
 				}
-				@Html.Partial("_AskBar")
+				@if (!Model.IsGuest)
+				{
+					@Html.Partial("_AskBar")
+				}
 			</div>
 			@if (User.IsInRole(LmsRoles.Tester))
 			{
@@ -40,7 +49,14 @@
 					<button class="btn btn-danger" type="submit">Удалить прогресс</button>
 				}
 			}
-			@Html.Partial("_RatesBar")
+			@if (!Model.IsGuest)
+			{
+				@Html.Partial("_RatesBar")
+			}
+			else
+			{
+				@Html.Partial("_LoginForContinue")
+			}
 			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false })
 		</div>
 	</div>
@@ -50,15 +66,29 @@
 	@Html.Action("SelectGroup")
 }
 @section scripts{
-	<script>
-		fillRate('@Model.Rate');
-		$("#selectGroupModal").modal();
-	</script>
+	@if (!Model.IsGuest)
+	{
+		<script>
+			fillRate('@Model.Rate');
+			$("#selectGroupModal").modal();
+			displayVisits();
+			uploadVisiters("@Url.Action("Upload", "Visiters")");
+		</script>
+	}
+	else
+	{
+		<script>
+			saveVisiters("@Model.Slide.Id", "@DateTime.Now.ToString("u")");
+			displayVisits();
+		</script>
+	}
 	@if (Model.Slide is ExerciseSlide)
 	{
-		var e = (ExerciseSlide) Model.Slide;
+		var e = (ExerciseSlide)Model.Slide;
 		ExerciseBlockData data = Model.BlockRenderContext.GetBlockData(e.Exercise);
-		<script> getHints("@Model.CourseId", "@Model.Slide.Index", '@e.Exercise.HintsMd.Count') </script>
+		<script>
+			getHints("@Model.CourseId", "@Model.Slide.Index", '@e.Exercise.HintsMd.Count')
+		</script>
 		<script> refreshPreviousDraft('@(data.LatestAcceptedSolution != null)', '@e.Id') </script>
 	}
 }

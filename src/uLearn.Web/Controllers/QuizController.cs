@@ -275,8 +275,10 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Slide", "Course", model);
 		}
 
-		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isLti = false)
+		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false)
 		{
+			if (isGuest)
+				return PartialView(GuestQuiz(slide, courseId));
 			var slideId = slide.Id;
 			var maxDropCount = GetMaxDropCount(slide);
 			var state = GetQuizState(courseId, userId, slideId, maxDropCount);
@@ -299,6 +301,17 @@ namespace uLearn.Web.Controllers
 				model.QuizState = QuizState.Total;
 
 			return PartialView(model);
+		}
+
+		private QuizModel GuestQuiz(QuizSlide slide, string courseId)
+		{
+			return new QuizModel
+			{
+				CourseId = courseId,
+				Slide = slide,
+				IsGuest = true,
+				QuizState = QuizState.NotPassed
+			};
 		}
 
 		private static int GetMaxDropCount(QuizSlide quizSlide)

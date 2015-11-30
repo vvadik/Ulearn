@@ -336,6 +336,7 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
  
 	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData();
 	var action = data.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", data.AcceptedSolutionUrl);
+	var classString = context.IsGuest ? "code-guest" : "code-exercise";
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea id=\"secretCodeExercise\" class=\"hide\">");
 
@@ -346,15 +347,20 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n");
 
 
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea class=\"code code-exercise\" data-lang=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea class=\"code ");
 
 
-      WebViewPage.WriteTo(@__razor_helper_writer, block.LangId);
+WebViewPage.WriteTo(@__razor_helper_writer, classString);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-lang=\"");
+
+
+     WebViewPage.WriteTo(@__razor_helper_writer, block.LangId);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">");
 
 
-                      WebViewPage.WriteTo(@__razor_helper_writer, data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4));
+                     WebViewPage.WriteTo(@__razor_helper_writer, data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n");
 
@@ -423,8 +429,8 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\t\tShow solu
 
 				}
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<button type=\"button\" class=\"btn btn-default reset-btn no-rounds\" onclick=\" c" +
-"leanUserCode() \">\r\n\t\t\t\t\tReset\r\n\t\t\t\t</button>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<button type=\"button\" class=\"btn btn-default reset-btn no-rounds\" onclick=\"cl" +
+"eanUserCode()\">\r\n\t\t\t\t\tReset\r\n\t\t\t\t</button>\r\n");
 
 
 			}
@@ -533,7 +539,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" title=\"");
 
 WebViewPage.WriteTo(@__razor_helper_writer, title);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\t<input ");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" ");
+
+
+  WebViewPage.WriteTo(@__razor_helper_writer, GetGuestOnclick(context.IsGuest));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t\t\t<input ");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, ans);
@@ -553,7 +564,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, " type=\"");
 
                                                              WebViewPage.WriteTo(@__razor_helper_writer, typeInp);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\t");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" ");
+
+
+                                                                       WebViewPage.WriteTo(@__razor_helper_writer, GetGuestDisable(context.IsGuest));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t\t\t");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, item.Description.RenderTex());
@@ -619,8 +635,12 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 	}
 	var sample = block.Sample;
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"quiz quiz-block-input\">\r\n\t\t<label>\r\n\t\t\t<input autocomplete=\"off\" cla" +
-"ss=\"form-control ");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"quiz quiz-block-input\">\r\n\t\t<label ");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, GetGuestOnclick(context.IsGuest));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t<input autocomplete=\"off\" class=\"form-control ");
 
 
       WebViewPage.WriteTo(@__razor_helper_writer, quizRes);
@@ -640,7 +660,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' maxlength=\"");
 
                                                                          WebViewPage.WriteTo(@__razor_helper_writer, QuizController.MAX_FILLINBLOCK_SIZE);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t</label>\r\n\t</div>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" ");
+
+
+                                                                                                               WebViewPage.WriteTo(@__razor_helper_writer, GetGuestDisable(context.IsGuest));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t</label>\r\n\t</div>\r\n");
 
 
 	if (model.QuizState == QuizState.Total)
@@ -718,22 +743,32 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" title=\"");
 
 WebViewPage.WriteTo(@__razor_helper_writer, ttitle);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"><input autocomplete=\"off\" ");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" ");
 
 
-                                WebViewPage.WriteTo(@__razor_helper_writer, tchecked);
+      WebViewPage.WriteTo(@__razor_helper_writer, GetGuestOnclick(context.IsGuest));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t\t<input autocomplete=\"off\" ");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, tchecked);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, " id=\'");
 
 
-                                               WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "quizBlock" + "True");
+  WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "quizBlock" + "True");
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' name=\'");
 
 
-                                                                                         WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "group");
+                                            WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "group");
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' type=\"radio\">Верно</label>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' type=\"radio\" ");
+
+
+                                                                               WebViewPage.WriteTo(@__razor_helper_writer, GetGuestDisable(context.IsGuest));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t\tВерно\r\n\t\t\t</label>\r\n");
 
 
  			if (model.QuizState == QuizState.Total && block.Answer)
@@ -759,22 +794,32 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" title=\"");
 
 WebViewPage.WriteTo(@__razor_helper_writer, ftitle);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"><input autocomplete=\"off\" ");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" ");
 
 
-                                 WebViewPage.WriteTo(@__razor_helper_writer, fchecked);
+       WebViewPage.WriteTo(@__razor_helper_writer, GetGuestOnclick(context.IsGuest));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t\t<input autocomplete=\"off\" ");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, fchecked);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, " id=\'");
 
 
-                                                WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "quizBlock" + "False");
+  WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "quizBlock" + "False");
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' name=\'");
 
 
-                                                                                           WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "group");
+                                             WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "group");
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' type=\"radio\">Неверно</label>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' type=\"radio\" ");
+
+
+                                                                                WebViewPage.WriteTo(@__razor_helper_writer, GetGuestDisable(context.IsGuest));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t\tНеверно\r\n\t\t\t</label>\r\n");
 
 
  			if (model.QuizState == QuizState.Total && !block.Answer)
@@ -902,6 +947,16 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">Продолжить</a>\
 
 }
 
+
+	private static string GetGuestOnclick(bool isGuest)
+	{
+		return isGuest ? "onclick=loginForContinue()" : "";
+	}
+
+	private static string GetGuestDisable(bool isGuest)
+	{
+		return isGuest ? "disabled" : null;
+	}
 
     }
 }

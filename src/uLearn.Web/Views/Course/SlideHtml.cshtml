@@ -110,8 +110,9 @@
 {
 	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData();
 	var action = data.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", data.AcceptedSolutionUrl);
+	var classString = context.IsGuest ? "code-guest" : "code-exercise";
 	<textarea id="secretCodeExercise" class="hide">@block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
-	<textarea class="code code-exercise" data-lang="@block.LangId">@(data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+	<textarea class="code @classString" data-lang="@block.LangId">@(data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 	<script>
 		function cleanUserCode() {
 			var $secretCodeExercise = $('#secretCodeExercise');
@@ -139,7 +140,7 @@
 						Show solutions
 					</button>
 				}
-				<button type="button" class="btn btn-default reset-btn no-rounds" onclick=" cleanUserCode() ">
+				<button type="button" class="btn btn-default reset-btn no-rounds" onclick="cleanUserCode()">
 					Reset
 				</button>
 			}
@@ -194,8 +195,8 @@
 				title = (item.IsCorrect ? "Правильный" : "Неправильный") + " вариант";
 			}
 			<div class="quiz">
-				<label class="@itemClass" title="@title">
-					<input @ans autocomplete="off" id='@(block.Id + "quizBlock" + item.Id)' name=@("group" + id) type="@typeInp">
+				<label class="@itemClass" title="@title" @GetGuestOnclick(context.IsGuest)>
+					<input @ans autocomplete="off" id='@(block.Id + "quizBlock" + item.Id)' name=@("group" + id) type="@typeInp" @GetGuestDisable(context.IsGuest)>
 					@item.Description.RenderTex()
 				</label>
 				@if (model.QuizState == QuizState.Total && item.IsCorrect)
@@ -224,8 +225,8 @@
 	}
 	var sample = block.Sample;
 	<div class="quiz quiz-block-input">
-		<label>
-			<input autocomplete="off" class="form-control @quizRes" value="@value" id='@(block.Id + "quizBlock")' maxlength="@QuizController.MAX_FILLINBLOCK_SIZE">
+		<label @GetGuestOnclick(context.IsGuest)>
+			<input autocomplete="off" class="form-control @quizRes" value="@value" id='@(block.Id + "quizBlock")' maxlength="@QuizController.MAX_FILLINBLOCK_SIZE" @GetGuestDisable(context.IsGuest)>
 		</label>
 	</div>
 	if (model.QuizState == QuizState.Total)
@@ -265,14 +266,20 @@
 	}
 	<div class="radio quiz-block-mark" id="@(block.Id + "_quizBlock")">
 		<div class="quiz">
-			<label class="@trueItemClass" title="@ttitle"><input autocomplete="off" @tchecked id='@(block.Id + "quizBlock" + "True")' name='@(block.Id + "group")' type="radio">Верно</label>
+			<label class="@trueItemClass" title="@ttitle" @GetGuestOnclick(context.IsGuest)>
+				<input autocomplete="off" @tchecked id='@(block.Id + "quizBlock" + "True")' name='@(block.Id + "group")' type="radio" @GetGuestDisable(context.IsGuest)>
+				Верно
+			</label>
 			@if (model.QuizState == QuizState.Total && block.Answer)
 			{
 				<i class="glyphicon glyphicon-ok" style="color: green" title="@ttitle"></i>
 			}
 		</div>
 		<div class="quiz">
-			<label class="@falseItemClass" title="@ftitle"><input autocomplete="off" @fchecked id='@(block.Id + "quizBlock" + "False")' name='@(block.Id + "group")' type="radio">Неверно</label>
+			<label class="@falseItemClass" title="@ftitle" @GetGuestOnclick(context.IsGuest)>
+				<input autocomplete="off" @fchecked id='@(block.Id + "quizBlock" + "False")' name='@(block.Id + "group")' type="radio" @GetGuestDisable(context.IsGuest)>
+				Неверно
+			</label>
 			@if (model.QuizState == QuizState.Total && !block.Answer)
 			{
 				<i class="glyphicon glyphicon-ok" style="color: green" title="@ftitle"></i>
@@ -342,4 +349,17 @@
 			</div>
 		</div>
 	</div>
+}
+
+@functions
+{
+	private static string GetGuestOnclick(bool isGuest)
+	{
+		return isGuest ? "onclick=loginForContinue()" : "";
+	}
+
+	private static string GetGuestDisable(bool isGuest)
+	{
+		return isGuest ? "disabled" : null;
+	}
 }

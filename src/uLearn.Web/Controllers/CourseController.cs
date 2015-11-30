@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using uLearn.Model.Blocks;
@@ -36,12 +33,14 @@ namespace uLearn.Web.Controllers
 			this.courseManager = courseManager;
 		}
 
-		[Authorize]
 		public async Task<ActionResult> Slide(string courseId, int slideIndex = -1)
 		{
 			if (string.IsNullOrWhiteSpace(courseId)) return RedirectToAction("Index", "Home");
 			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
-			var model = await CreateCoursePageModel(courseId, slideIndex, visibleUnits);
+			var isGuest = !User.Identity.IsAuthenticated;
+			var model = isGuest ?
+				CreateGuestCoursePageModel(courseId, slideIndex, visibleUnits) :
+				await CreateCoursePageModel(courseId, slideIndex, visibleUnits);
 			if (!visibleUnits.Contains(model.Slide.Info.UnitName))
 				throw new Exception("Slide is hidden " + slideIndex);
 			return View(model);
@@ -147,6 +146,30 @@ namespace uLearn.Web.Controllers
 			return HttpNotFound("User not found");
 		}
 
+		private CoursePageModel CreateGuestCoursePageModel(string courseId, int slideIndex, List<string> visibleUnits)
+		{
+			var course = courseManager.GetCourse(courseId);
+			if (slideIndex == -1)
+				slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
+			var slide = course.Slides[slideIndex];
+			var exerciseBlockData = new ExerciseBlockData(false, false);
+			return new CoursePageModel
+			{
+				IsFirstCourseVisit = false,
+				CourseId = course.Id,
+				CourseTitle = course.Title,
+				Slide = slide,
+				Score = Tuple.Create(0, 0),
+				BlockRenderContext = new BlockRenderContext(
+					course, 
+					slide, 
+					slide.Info.DirectoryRelativePath, 
+					slide.Blocks.Select(block => block is ExerciseBlock ? exerciseBlockData : (dynamic)null).ToArray(),
+					true),
+				IsGuest = true,
+			};
+		}
+
 		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, int slideIndex, List<string> visibleUnits)
 		{
 			var course = courseManager.GetCourse(courseId);
@@ -167,7 +190,8 @@ namespace uLearn.Web.Controllers
 				Slide = slide,
 				Rate = GetRate(course.Id, slideId),
 				Score = score,
-				BlockRenderContext = CreateRenderContext(course, slide, userId, visiter)
+				BlockRenderContext = CreateRenderContext(course, slide, userId, visiter),
+				IsGuest = false
 			};
 			return model;
 		}
@@ -272,6 +296,8 @@ namespace uLearn.Web.Controllers
 
 		public async Task<Visiters> VisitSlide(string courseId, string slideId)
 		{
+			if (!User.Identity.IsAuthenticated)
+				return null;
 			var userId = User.Identity.GetUserId();
 			await visitersRepo.AddVisiter(courseId, slideId, userId);
 			return visitersRepo.GetVisiter(slideId, userId);

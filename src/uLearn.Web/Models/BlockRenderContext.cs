@@ -9,6 +9,7 @@ namespace uLearn.Web.Models
 		public Slide Slide { get; private set; }
 		public string BaseUrl { get; private set; }
 		public dynamic[] BlockData { get; private set; }
+		public bool IsGuest { get; set; }
 
 		public dynamic GetBlockData(SlideBlock block)
 		{
@@ -16,17 +17,17 @@ namespace uLearn.Web.Models
 			if (index < 0)
 				throw new ArgumentException("No block " + block + " in slide " + Slide);
 			return BlockData[index];
-
 		}
 
-		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData)
+		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData, bool isGuest = false)
 		{
+			if (blockData.Length != slide.Blocks.Length)
+				throw new ArgumentException("BlockData.Length should be slide.Blocks.Length");
 			Course = course;
 			Slide = slide;
 			BaseUrl = baseUrl;
 			BlockData = blockData;
-			if (BlockData.Length != Slide.Blocks.Length)
-				throw new ArgumentException("BlockData.Length should be slide.Blocks.Length");
+			IsGuest = isGuest;
 		}
 	}
 }
