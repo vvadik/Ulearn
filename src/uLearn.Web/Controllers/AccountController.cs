@@ -7,11 +7,12 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using uLearn.Web.DataContexts;
+using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	[Authorize]
+	[PostAuthorize]
 	public class AccountController : Controller
 	{
 		private readonly ULearnDb db;
@@ -41,7 +42,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Index", "Login", new { returnUrl });
 		}
 
-		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
+		[PostAuthorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public ActionResult List(string namePrefix = null, string role = null)
 		{
 			IQueryable<ApplicationUser> applicationUsers = new ULearnDb().Users;
@@ -52,7 +53,7 @@ namespace uLearn.Web.Controllers
 			return View(applicationUsers.OrderBy(u => u.UserName).Take(50).ToList());
 		}
 
-		[Authorize(Roles = LmsRoles.Admin)]
+		[PostAuthorize(Roles = LmsRoles.Admin)]
 		//TODO [ValidateAntiForgeryToken]
 		public async Task<ActionResult> ToggleRole(string userId, string role)
 		{
@@ -64,7 +65,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize(Roles = LmsRoles.Admin)]
+		[PostAuthorize(Roles = LmsRoles.Admin)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> DeleteUser(string userId)
 		{
@@ -77,7 +78,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("List");
 		}
 
-		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
+		[PostAuthorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public ActionResult Info(string userName)
 		{
 			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
@@ -87,7 +88,7 @@ namespace uLearn.Web.Controllers
 			return View(new UserInfoModel(user, courseManager.GetCourses().Where(c => courses.Contains(c.Id)).ToArray()));
 		}
 
-		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
+		[PostAuthorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public ActionResult CourseInfo(string userName, string courseId)
 		{
 			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
@@ -217,7 +218,6 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 
-		[Authorize]
 		public async Task<ActionResult> StudentInfo()
 		{
 			var userId = User.Identity.GetUserId();
@@ -232,7 +232,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> StudentInfo(LtiUserViewModel userInfo)
 		{
@@ -274,7 +273,6 @@ namespace uLearn.Web.Controllers
 			Error
 		}
 
-		[Authorize]
 		public async Task<PartialViewResult> ChangeDetailsPartial()
 		{
 			var user = await userManager.FindByNameAsync(User.Identity.Name);
@@ -325,7 +323,8 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Manage");
 		}
 
-		[HttpPost, Authorize(Roles = LmsRoles.Admin)]
+		[HttpPost]
+		[PostAuthorize(Roles = LmsRoles.Admin)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ResetPassword(string newPassword, string userId)
 		{

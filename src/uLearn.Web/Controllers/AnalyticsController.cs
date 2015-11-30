@@ -7,11 +7,12 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
+using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	[Authorize(Roles = LmsRoles.Instructor)]
+	[PostAuthorize(Roles = LmsRoles.Instructor)]
 	public class AnalyticsController : Controller
 	{
 		private readonly ULearnDb db = new ULearnDb();
@@ -181,7 +182,7 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		[Authorize]
+		[PostAuthorize]
 		public ActionResult PersonalStatistics(string courseId)
 		{
 			var course = courseManager.GetCourse(courseId);

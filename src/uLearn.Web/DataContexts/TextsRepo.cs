@@ -1,7 +1,6 @@
 ﻿using System;
+using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -13,7 +12,7 @@ namespace uLearn.Web.DataContexts
 	public class TextsRepo
 	{
 		private readonly ULearnDb db;
-		public const int MAX_TEXT_SIZE = 4000;
+		public const int MaxTextSize = 4000;
 
 		public TextsRepo() : this(new ULearnDb())
 		{
@@ -34,18 +33,20 @@ namespace uLearn.Web.DataContexts
 					Text = null
 				};
 
-			if (text.Length > MAX_TEXT_SIZE)
-				text = text.Substring(0, MAX_TEXT_SIZE);
+			if (text.Length > MaxTextSize)
+				text = text.Substring(0, MaxTextSize);
 
-			var hash = getHash(text);
-			var inBase = db.Texts.Find(hash);
-			if (inBase != null)
-				return inBase;
-			var blob = db.Texts.Add(new TextBlob
+			var hash = GetHash(text);
+			var blob = db.Texts.Find(hash);
+			if (blob != null)
+				return blob;
+
+			blob = new TextBlob
 			{
 				Hash = hash,
 				Text = text
-			});
+			};
+			db.Texts.AddOrUpdate(blob);
 
 			try
 			{
@@ -60,7 +61,7 @@ namespace uLearn.Web.DataContexts
 			return blob;
 		}
 
-		private string getHash(string text)
+		private static string GetHash(string text)
 		{
 			var byteArray = SHA1.Create().ComputeHash(Encoding.UTF8.GetBytes(text));
 			return BitConverter.ToString(byteArray).Replace("-", "");

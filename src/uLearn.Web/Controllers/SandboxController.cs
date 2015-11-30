@@ -4,10 +4,12 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
+using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
+	[PostAuthorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 	public class SandboxController : Controller
 	{
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
@@ -15,7 +17,6 @@ namespace uLearn.Web.Controllers
 
 		private readonly static TimeSpan timeout = TimeSpan.FromSeconds(30);
 
-		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public ActionResult Index(int max = 200, int skip = 0)
 		{
 			var submissions = solutionsRepo
@@ -26,14 +27,12 @@ namespace uLearn.Web.Controllers
 			}); 
 		}
 
-		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public ActionResult RunCode()
 		{
 			return View();
 		}
 
 		[HttpPost]
-		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public async Task<ActionResult> Run()
 		{
 			var code = Request.InputStream.GetString();
@@ -54,7 +53,6 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		[Authorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
 		public ActionResult GetDetails(int id)
 		{
 			var details = solutionsRepo.GetDetails(id);

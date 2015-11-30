@@ -3,10 +3,12 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
+using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
+	[PostAuthorize]
 	public class HintController : Controller
 	{
 		private readonly CourseManager courseManager;
@@ -24,7 +26,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize]
 		public async Task<ActionResult> UseHint(string courseId, int slideIndex, bool isNeedNewHint)
 		{
 			var slide = courseManager.GetCourse(courseId).Slides[slideIndex];
@@ -75,7 +76,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize]
 		public async Task<string> LikeHint(string courseId, string slideId, int hintId)
 		{
 			return await slideHintRepo.LikeHint(courseId, slideId, hintId, User.Identity.GetUserId());

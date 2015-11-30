@@ -5,6 +5,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using uLearn.Web.DataContexts;
+using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -25,7 +26,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		//
-		// GET: /Login/Login
+		// GET: /Login
 		public ActionResult Index(string returnUrl)
 		{
 			ViewBag.ReturnUrl = returnUrl;
@@ -33,7 +34,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		//
-		// POST: /Login/Login
+		// POST: /Login
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Index(LoginViewModel model, string returnUrl)
@@ -46,7 +47,7 @@ namespace uLearn.Web.Controllers
 					await AuthenticationManager.LoginAsync(HttpContext, user, model.RememberMe);
 					return Redirect(this.FixRedirectUrl(returnUrl));
 				}
-				ModelState.AddModelError("", "Неверное имя пользователя или пароль.");
+				ModelState.AddModelError("", @"Неверное имя пользователя или пароль.");
 			}
 
 			// If we got this far, something failed, redisplay form
@@ -127,7 +128,6 @@ namespace uLearn.Web.Controllers
 
 		//
 		// GET: /Login/ExternalLoginFailure
-		[AllowAnonymous]
 		public ActionResult ExternalLoginFailure()
 		{
 			return View();
@@ -136,7 +136,7 @@ namespace uLearn.Web.Controllers
 		//
 		// POST: /Login/LinkLogin
 		[HttpPost]
-		[Authorize]
+		[PostAuthorize]
 		[ValidateAntiForgeryToken]
 		public ActionResult LinkLogin(string provider)
 		{
@@ -146,7 +146,7 @@ namespace uLearn.Web.Controllers
 
 		//
 		// GET: /Login/LinkLoginCallback
-		[Authorize]
+		[PostAuthorize]
 		public async Task<ActionResult> LinkLoginCallback()
 		{
 			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext, XsrfKey, User.Identity.GetUserId());
@@ -165,7 +165,6 @@ namespace uLearn.Web.Controllers
 		//
 		// POST: /Login/LogOff
 		[HttpPost]
-		[Authorize]
 		[ValidateAntiForgeryToken]
 		public ActionResult LogOff()
 		{

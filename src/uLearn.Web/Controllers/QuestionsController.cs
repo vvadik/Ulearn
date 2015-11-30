@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
+using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using System.Collections.Generic;
 
@@ -16,6 +17,7 @@ namespace uLearn.Web.Controllers
 		public string SlideTitle { get { return Slide != null ? Slide.Title : Question.SlideTitle; } }
 	}
 	
+	[PostAuthorize]
 	public class QuestionsController : Controller
 	{
 		private readonly CourseManager courseManager;
@@ -32,7 +34,7 @@ namespace uLearn.Web.Controllers
 			this.courseManager = courseManager;
 		}
 
-		[Authorize(Roles = LmsRoles.Admin)]
+		[PostAuthorize(Roles = LmsRoles.Admin)]
 		public ActionResult FixQuestions()
 		{
 			var fixedQuestions = new List<string>();
@@ -65,7 +67,7 @@ namespace uLearn.Web.Controllers
 			return Content("Fixed:\n" + string.Join("\n", fixedQuestions) + "\n\n" + "Removed:\n" + string.Join("\n", removedQuestions));
 		}
 
-		[Authorize(Roles = LmsRoles.Instructor + "," + LmsRoles.Admin)]
+		[PostAuthorize(Roles = LmsRoles.Instructor + "," + LmsRoles.Admin)]
 		public ActionResult Items(string courseId, string unitName = null)
 		{
 			IQueryable<UserQuestion> questions = db.UserQuestions;
@@ -84,7 +86,7 @@ namespace uLearn.Web.Controllers
 			return PartialView(result);
 		}
 
-		[Authorize(Roles = LmsRoles.Instructor + "," + LmsRoles.Admin)]
+		[PostAuthorize(Roles = LmsRoles.Instructor + "," + LmsRoles.Admin)]
 		public ActionResult ItemsOfUser(string userId, string courseId = null)
 		{
 			IQueryable<UserQuestion> questions = db.UserQuestions.Where(q => q.UserId == userId);
@@ -101,7 +103,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Authorize]
 		[ValidateInput(false)]
 		public async Task<string> AddQuestion(string courseId, string slideId, string question)
 		{
