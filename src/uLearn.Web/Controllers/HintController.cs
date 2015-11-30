@@ -52,8 +52,8 @@ namespace uLearn.Web.Controllers
 
 		private async Task<HintWithLikeButton[]> RenderHtmlWithHint(ExerciseSlide exerciseSlide, int hintsCount, string courseId)
 		{
-			var ans = new HintWithLikeButton[hintsCount + 1];
 			hintsCount = Math.Min(hintsCount, exerciseSlide.Exercise.HintsMd.Count - 1);
+			var ans = new HintWithLikeButton[hintsCount + 1];
 			for (var i = 0; i <= hintsCount; i++)
 			{
 				var isLiked = slideHintRepo.IsHintLiked(courseId, exerciseSlide.Id, User.Identity.GetUserId(), i);

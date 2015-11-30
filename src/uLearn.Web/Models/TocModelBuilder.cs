@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.Linq;
 using uLearn.Quizes;
@@ -45,13 +45,13 @@ namespace uLearn.Web.Models
 					pages.Add(new TocPageInfo
 					{
 						Url = GetUnitInstructionNotesUrl(unitName),
-						Name = "Заметки преподавателю",
+						Name = "Р—Р°РјРµС‚РєРё РїСЂРµРїРѕРґР°РІР°С‚РµР»СЋ",
 						PageType = TocPageType.InstructorNotes,
 					});
 				pages.Add(new TocPageInfo
 				{
 					Url = GetUnitStatisticsUrl(unitName),
-					Name = "Статистика и успеваемость",
+					Name = "РЎС‚Р°С‚РёСЃС‚РёРєР° Рё СѓСЃРїРµРІР°РµРјРѕСЃС‚СЊ",
 					PageType = TocPageType.Statistics,
 				});
 			}
