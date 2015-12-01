@@ -211,21 +211,22 @@ namespace uLearn.Web.Controllers
 
 		[HttpGet]
 		[PostAuthorize(Roles = LmsRoles.Instructor)]
-		public ActionResult Analytics(string courseId, int slideIndex, bool onlyNew = true)
+		public ActionResult Analytics(string courseId, int slideIndex, bool onlyNew = false)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var quizSlide = (QuizSlide)course.Slides[slideIndex];
 			var dict = new SortedDictionary<string, List<QuizAnswerInfo>>();
 			var groups = new Dictionary<string, string>();
-			var time = onlyNew ? DateTime.Now.Subtract(TimeSpan.FromDays(365.0 / 2)) : DateTime.MinValue;
-			var passedUsers = db.UserQuizzes
-				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped && time < q.Timestamp)
-				.Select(q => q.UserId)
-				.Distinct()
-				.Join(db.Users, userId => userId, u => u.Id, (userId, u) => new { UserId = userId, u.UserName, u.GroupName });
+			var startTime = onlyNew ? DateTime.Now.Subtract(TimeSpan.FromDays(365.0 / 2)) : DateTime.MinValue;
+			var passes = db.UserQuizzes
+				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped && startTime < q.Timestamp)
+				.GroupBy(q => q.UserId)
+				.ToDictionary(g => g.Key, g => g.ToList());
+			var passedUsersId = new HashSet<string>(passes.Keys);
+			var passedUsers = db.Users.Where(user => passedUsersId.Contains(user.Id)).Select(u => new { UserId = u.Id, u.UserName, u.GroupName });
 			foreach (var user in passedUsers)
 			{
-				dict[user.UserName] = GetUserQuizAnswers(courseId, quizSlide, user.UserId).ToList();
+				dict[user.UserName] = GetUserQuizAnswers(quizSlide, passes[user.UserId]).ToList();
 				groups[user.UserName] = user.GroupName;
 			}
 			var rightAnswersCount = dict.Values
@@ -243,15 +244,72 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		private IEnumerable<QuizAnswerInfo> GetUserQuizAnswers(string courseId, QuizSlide slide, string userId)
+		private static IEnumerable<QuizAnswerInfo> GetUserQuizAnswers(QuizSlide slide, IEnumerable<UserQuiz> userQuizzes)
 		{
+			var answers = userQuizzes.GroupBy(q => q.QuizId).ToDictionary(g => g.Key, g => g.ToList());
 			foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
 				if (block is FillInBlock)
-					yield return userQuizzesRepo.GetFillInBlockAnswerInfo(courseId, slide.Id, block.Id, userId, block.QuestionIndex);
+					yield return GetFillInBlockAnswerInfo(answers, block.Id, block.QuestionIndex);
 				else if (block is ChoiceBlock)
-					yield return userQuizzesRepo.GetChoiceBlockAnswerInfo(courseId, slide.Id, (ChoiceBlock)block, userId, block.QuestionIndex);
+					yield return GetChoiceBlockAnswerInfo(answers, (ChoiceBlock)block, block.QuestionIndex);
 				else if (block is IsTrueBlock)
-					yield return userQuizzesRepo.GetIsTrueBlockAnswerInfo(courseId, slide.Id, block.Id, userId, block.QuestionIndex);
+					yield return GetIsTrueBlockAnswerInfo(answers, block.Id, block.QuestionIndex);
+		}
+
+		private static QuizAnswerInfo GetFillInBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, string quizId, int questionIndex)
+		{
+			UserQuiz answer = null;
+			if (answers.ContainsKey(quizId))
+				answer = answers[quizId].FirstOrDefault();
+			return new FillInBlockAnswerInfo
+			{
+				Answer = answer == null ? null : answer.Text,
+				IsRight = answer != null && answer.IsRightAnswer,
+				Id = questionIndex.ToString()
+			};
+		}
+
+		private static QuizAnswerInfo GetChoiceBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, ChoiceBlock block, int questionIndex)
+		{
+			IEnumerable<UserQuiz> answer = new List<UserQuiz>();
+			if (answers.ContainsKey(block.Id))
+				answer = answers[block.Id].Where(q => q.ItemId != null);
+
+			var ans = new SortedDictionary<string, bool>();
+			foreach (var item in block.Items)
+			{
+				ans[item.Id] = false;
+			}
+
+			var isRight = false;
+			foreach (var quizItem in answer.Where(quizItem => ans.ContainsKey(quizItem.ItemId)))
+			{
+				isRight = quizItem.IsRightQuizBlock;
+				ans[quizItem.ItemId] = true;
+			}
+
+			return new ChoiceBlockAnswerInfo
+			{
+				AnswersId = ans,
+				Id = questionIndex.ToString(),
+				RealyRightAnswer = new HashSet<string>(block.Items.Where(x => x.IsCorrect).Select(x => x.Id)),
+				IsRight = isRight
+			};
+		}
+
+
+		private static QuizAnswerInfo GetIsTrueBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, string quizId, int questionIndex)
+		{
+			UserQuiz answer = null;
+			if (answers.ContainsKey(quizId))
+				answer = answers[quizId].FirstOrDefault();
+			return new IsTrueBlockAnswerInfo
+			{
+				IsAnswered = answer != null,
+				Answer = answer != null && answer.Text == "True",
+				Id = questionIndex.ToString(),
+				IsRight = answer != null && answer.IsRightAnswer
+			};
 		}
 
 		[HttpPost]
