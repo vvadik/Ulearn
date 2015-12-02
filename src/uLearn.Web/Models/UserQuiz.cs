@@ -25,7 +25,7 @@ namespace uLearn.Web.Models
 		[Required]
 		[StringLength(64)]
 		[Index("FullIndex", 2)]
-		[Index]
+		[Index("StatisticsIndex", 1)]
 		public string SlideId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
@@ -47,6 +47,7 @@ namespace uLearn.Web.Models
 		public string Text { get; set; }
 
 		[Required]
+		[Index("StatisticsIndex", 2)]
 		public DateTime Timestamp { get; set; }
 
 		[Required]

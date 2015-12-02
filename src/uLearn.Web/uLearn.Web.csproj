@@ -314,6 +314,10 @@
     <Compile Include="Migrations\201510071331139_RestorePassword.Designer.cs">
       <DependentUpon>201510071331139_RestorePassword.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201512021145426_QuizStatisticsIndex.cs" />
+    <Compile Include="Migrations\201512021145426_QuizStatisticsIndex.Designer.cs">
+      <DependentUpon>201512021145426_QuizStatisticsIndex.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
     <Compile Include="Models\ExternalLoginsListModel.cs" />
     <Compile Include="Models\LtiQuizModel.cs" />
@@ -588,6 +592,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201510071331139_RestorePassword.resx">
       <DependentUpon>201510071331139_RestorePassword.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512021145426_QuizStatisticsIndex.resx">
+      <DependentUpon>201512021145426_QuizStatisticsIndex.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
