@@ -18,6 +18,7 @@ namespace uLearn.Web.Controllers
 	{
 		private const int MAX_DROPS_COUNT = 1;
 		public const int MAX_FILLINBLOCK_SIZE = 1024;
+		public const int STATISTIC_DAYS = 365 / 2;
 
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
@@ -211,13 +212,13 @@ namespace uLearn.Web.Controllers
 
 		[HttpGet]
 		[PostAuthorize(Roles = LmsRoles.Instructor)]
-		public ActionResult Analytics(string courseId, int slideIndex, bool onlyNew = false)
+		public ActionResult Analytics(string courseId, int slideIndex, bool onlyNew = true)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var quizSlide = (QuizSlide)course.Slides[slideIndex];
 			var dict = new SortedDictionary<string, List<QuizAnswerInfo>>();
 			var groups = new Dictionary<string, string>();
-			var startTime = onlyNew ? DateTime.Now.Subtract(TimeSpan.FromDays(365.0 / 2)) : DateTime.MinValue;
+			var startTime = onlyNew ? DateTime.Now.Subtract(TimeSpan.FromDays(STATISTIC_DAYS)) : DateTime.MinValue;
 			var passes = db.UserQuizzes
 				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped && startTime < q.Timestamp)
 				.GroupBy(q => q.UserId)
