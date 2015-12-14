@@ -23,6 +23,8 @@ namespace uLearn.Web.Controllers
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo(); //TODO use in statistics
 
+		private readonly TimeSpan StandardPeriod = TimeSpan.FromDays(365.0 / 2);
+
 
 		public AnalyticsController()
 			: this(WebCourseManager.Instance)
@@ -216,15 +218,10 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult UnitStatistics(string courseId, string unitName)
 		{
-			var course = courseManager.GetCourse(courseId);
-			var slides = course.Slides
-				.Where(s => s.Info.UnitName == unitName).ToArray();
 			var model = new UnitStatisticPageModel
 			{
 				CourseId = courseId,
-				UnitName = unitName,
-				Slides = slides,
-				SlideRateStats = GetSlideRateStats(course, slides),
+				UnitName = unitName
 			};
 			return View(model);
 		}
@@ -255,12 +252,12 @@ namespace uLearn.Web.Controllers
 			return View();
 		}
 
-		public ActionResult UsersProgress(string courseId, string unitName)
+		public ActionResult UsersProgress(string courseId, string unitName, bool onlyNew = true)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var slides = course.Slides
 				.Where(s => s.Info.UnitName == unitName).ToArray();
-			var users = GetUserInfos(course, slides).OrderByDescending(GetRating).ToArray();
+			var users = GetUserInfos(slides, onlyNew).OrderByDescending(GetRating).ToArray();
 			return PartialView(new UserProgressViewModel { Slides = slides, Users = users, CourseId = courseId });
 		}
 
@@ -354,6 +351,11 @@ namespace uLearn.Web.Controllers
 			}).ToArray();
 		}
 
+		private DateTime GetPeriod(bool onlyNew)
+		{
+			return onlyNew ? DateTime.Now.Subtract(StandardPeriod) : DateTime.MinValue;
+		}
+
 		private double GetRating(UserInfo user)
 		{
 			return
@@ -364,27 +366,21 @@ namespace uLearn.Web.Controllers
 						+ (s.IsQuizPassed ? s.QuizPercentage / 100.0 : 0));
 		}
 
-		private IEnumerable<UserInfo> GetUserInfos(Course course, Slide[] slides)
+		private IEnumerable<UserInfo> GetUserInfos(Slide[] slides, bool onlyNew)
 		{
 			var slideIds = slides.Select(s => s.Id).ToArray();
+			var periodStart = GetPeriod(onlyNew);
 
-			var dq =
-				from v in db.Visiters
-				where slideIds.Contains(v.SlideId)
-				join u in db.Users on v.UserId equals u.Id into users
-				from uu in users
-				select new
-				{
-					v.UserId,
-					uu.UserName,
-					uu.GroupName,
-					v.SlideId,
-					v.IsPassed,
-					v.Score,
-					v.AttemptsCount
-				};
+			var dq = db.Visiters
+				.Where(v => slideIds.Contains(v.SlideId) && periodStart <= v.Timestamp)
+				.Select(v => v.UserId)
+				.Distinct()
+				.Join(db.Visiters, s => s, v => v.UserId, (s, visiters) => visiters)
+				.Where(v => slideIds.Contains(v.SlideId))
+				.Select(v => new { v.UserId, v.User.UserName, v.User.GroupName, v.SlideId, v.IsPassed, v.Score, v.AttemptsCount})
+				.ToList();
 
-			var r = from v in dq.ToList()
+			var r = from v in dq
 				group v by new { v.UserId, v.UserName, v.GroupName }
 				into u
 				select new UserInfo

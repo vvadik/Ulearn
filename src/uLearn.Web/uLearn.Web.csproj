@@ -329,6 +329,7 @@
     <Compile Include="Models\RestoreRequest.cs" />
     <Compile Include="Models\SubmissionListModel.cs" />
     <Compile Include="Models\SubmissionsModel.cs" />
+    <Compile Include="Models\SwitchablePanelModel.cs" />
     <Compile Include="Models\TocModelBuilder.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.Designer.cs">
@@ -970,6 +971,7 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\slide-tex.js" />
     <Content Include="Scripts\slide-stats.js" />
+    <Content Include="Scripts\slide-utils.js" />
     <Content Include="Scripts\table-configurator.js" />
     <Content Include="Scripts\user-group-name-change.js" />
     <Content Include="Scripts\_references.js" />
@@ -1162,6 +1164,7 @@
     <Content Include="Views\RestorePassword\Index.cshtml" />
     <Content Include="Views\RestorePassword\SetNewPassword.cshtml" />
     <Content Include="Views\Course\_LoginForContinue.cshtml" />
+    <Content Include="App_Code\Utils.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

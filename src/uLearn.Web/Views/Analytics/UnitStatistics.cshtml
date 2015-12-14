@@ -30,7 +30,10 @@
 		<div class="load-content" data-url="@Url.Action("DailyStatistics", args)"></div>
 
 		<h2 id="progress">Прогресс по студентам</h2>
-		<div class="load-content" data-url="@Url.Action("UsersProgress", args)"></div>
+		@Utils.SwitchablePanel("progress-panel",
+			new SwitchablePanelModel { Name = "За пол года", Url = Url.Action("UsersProgress", args) },
+			new SwitchablePanelModel { Name = "За всё время", Url = Url.Action("UsersProgress", new {courseId=Model.CourseId, unitName = Model.UnitName, onlyNew = false})}
+		)
 	</div>
 </body>
 

@@ -58,11 +58,9 @@
 	if (User.IsInRole(LmsRoles.Instructor))
 	{
 		<h2>Статистика ответов</h2>
-		<div class="btn-group">
-			<button type="button" class="btn btn-default btn-primary" onclick="ShowQuizStatistic(event)" data-div-id="quiz-statistic-new">За полгода</button>
-			<button type="button" class="btn btn-default" onclick="ShowQuizStatistic(event)" data-div-id="quiz-statistic-all">За всё время</button>
-		</div>
-		<div id="quiz-statistic-new" class="statistic-container load-content" data-url="@Url.Action("Analytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })"></div>
-		<div id="quiz-statistic-all" class="statistic-container" data-url="@Url.Action("Analytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onlyNew = false })"></div>
+		@Utils.SwitchablePanel("quiz-statistic",
+			new SwitchablePanelModel{ Name = "За пол года", Url = Url.Action("Analytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index }) }, 
+			new SwitchablePanelModel{ Name = "За всё время", Url = Url.Action("Analytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onlyNew = false })}
+		)
 	}
 }
