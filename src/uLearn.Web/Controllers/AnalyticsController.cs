@@ -252,12 +252,12 @@ namespace uLearn.Web.Controllers
 			return View();
 		}
 
-		public ActionResult UsersProgress(string courseId, string unitName, bool onlyNew = true)
+		public ActionResult UsersProgress(string courseId, string unitName, DateTime periodStart)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var slides = course.Slides
 				.Where(s => s.Info.UnitName == unitName).ToArray();
-			var users = GetUserInfos(slides, onlyNew).OrderByDescending(GetRating).ToArray();
+			var users = GetUserInfos(slides, periodStart).OrderByDescending(GetRating).ToArray();
 			return PartialView(new UserProgressViewModel { Slides = slides, Users = users, CourseId = courseId });
 		}
 
@@ -351,11 +351,6 @@ namespace uLearn.Web.Controllers
 			}).ToArray();
 		}
 
-		private DateTime GetPeriod(bool onlyNew)
-		{
-			return onlyNew ? DateTime.Now.Subtract(StandardPeriod) : DateTime.MinValue;
-		}
-
 		private double GetRating(UserInfo user)
 		{
 			return
@@ -366,10 +361,9 @@ namespace uLearn.Web.Controllers
 						+ (s.IsQuizPassed ? s.QuizPercentage / 100.0 : 0));
 		}
 
-		private IEnumerable<UserInfo> GetUserInfos(Slide[] slides, bool onlyNew)
+		private IEnumerable<UserInfo> GetUserInfos(Slide[] slides, DateTime periodStart)
 		{
 			var slideIds = slides.Select(s => s.Id).ToArray();
-			var periodStart = GetPeriod(onlyNew);
 
 			var dq = db.Visiters
 				.Where(v => slideIds.Contains(v.SlideId) && periodStart <= v.Timestamp)

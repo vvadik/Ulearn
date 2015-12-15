@@ -58,9 +58,10 @@
 	if (User.IsInRole(LmsRoles.Instructor))
 	{
 		<h2>Статистика ответов</h2>
-		@Utils.SwitchablePanel("quiz-statistic",
-			new SwitchablePanelModel{ Name = "За пол года", Url = Url.Action("Analytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index }) }, 
-			new SwitchablePanelModel{ Name = "За всё время", Url = Url.Action("Analytics", "Quiz", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onlyNew = false })}
+		@Utils.TimeSwitchablePanel("quiz-statistic",
+			args => Url.Action("Analytics", "Quiz", args),
+			new { courseId = Model.CourseId, slideIndex = Model.Slide.Index },
+			Tuple.Create("За полгода", 365.0 / 2)
 		)
 	}
 }
