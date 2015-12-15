@@ -222,13 +222,12 @@ namespace uLearn.Web.Controllers
 			var passes = db.UserQuizzes
 				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped && startTime < q.Timestamp)
 				.GroupBy(q => q.UserId)
-				.ToDictionary(g => g.Key, g => g.ToList());
-			var passedUsersId = new HashSet<string>(passes.Keys);
-			var passedUsers = db.Users.Where(user => passedUsersId.Contains(user.Id)).Select(u => new { UserId = u.Id, u.UserName, u.GroupName });
-			foreach (var user in passedUsers)
+				.Join(db.Users, g => g.Key, user => user.Id, (g, user) => new { user.UserName, user.GroupName, UserQuizzes = g.ToList() })
+				.ToList();
+			foreach (var pass in passes)
 			{
-				dict[user.UserName] = GetUserQuizAnswers(quizSlide, passes[user.UserId]).ToList();
-				groups[user.UserName] = user.GroupName;
+				dict[pass.UserName] = GetUserQuizAnswers(quizSlide, pass.UserQuizzes).ToList();
+				groups[pass.UserName] = pass.GroupName;
 			}
 			var rightAnswersCount = dict.Values
 				.SelectMany(list => list
