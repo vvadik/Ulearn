@@ -318,6 +318,10 @@
     <Compile Include="Migrations\201512021145426_QuizStatisticsIndex.Designer.cs">
       <DependentUpon>201512021145426_QuizStatisticsIndex.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201512141043098_ChangeVisitsIndex.cs" />
+    <Compile Include="Migrations\201512141043098_ChangeVisitsIndex.Designer.cs">
+      <DependentUpon>201512141043098_ChangeVisitsIndex.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
     <Compile Include="Models\ExternalLoginsListModel.cs" />
     <Compile Include="Models\LtiQuizModel.cs" />
@@ -596,6 +600,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201512021145426_QuizStatisticsIndex.resx">
       <DependentUpon>201512021145426_QuizStatisticsIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512141043098_ChangeVisitsIndex.resx">
+      <DependentUpon>201512141043098_ChangeVisitsIndex.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

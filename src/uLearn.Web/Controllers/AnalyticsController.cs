@@ -425,7 +425,7 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult ShowSolutions(string courseId, string userId, string slideId)
 		{
-			var solutions = db.UserSolutions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
+			var solutions = db.UserSolutions.Where(s => s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
 			var user = db.Users.Find(userId);
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.GetSlideById(slideId);
