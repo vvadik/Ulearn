@@ -47,9 +47,10 @@ namespace uLearn.CourseTool
 			fileWatcher.EnableRaisingEvents = true;
 		}
 
-		private static void OpenInBrowser()
+		private void OpenInBrowser()
 		{
-			Process.Start(@"http://localhost:1337/001.html");
+			var lastChangedHtml = server.FindLastChangedSlideHtmlPath() ?? "001.html";
+			Process.Start(@"http://localhost:1337/" + lastChangedHtml);
 		}
 
 		private void FileWatcherOnChanged(object sender, FileSystemEventArgs args)
