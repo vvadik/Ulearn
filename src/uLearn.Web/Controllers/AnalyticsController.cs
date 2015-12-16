@@ -23,6 +23,8 @@ namespace uLearn.Web.Controllers
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo(); //TODO use in statistics
 
+		private readonly TimeSpan StandardPeriod = TimeSpan.FromDays(365.0 / 2);
+
 
 		public AnalyticsController()
 			: this(WebCourseManager.Instance)
@@ -216,15 +218,10 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult UnitStatistics(string courseId, string unitName)
 		{
-			var course = courseManager.GetCourse(courseId);
-			var slides = course.Slides
-				.Where(s => s.Info.UnitName == unitName).ToArray();
 			var model = new UnitStatisticPageModel
 			{
 				CourseId = courseId,
-				UnitName = unitName,
-				Slides = slides,
-				SlideRateStats = GetSlideRateStats(course, slides),
+				UnitName = unitName
 			};
 			return View(model);
 		}
@@ -255,12 +252,12 @@ namespace uLearn.Web.Controllers
 			return View();
 		}
 
-		public ActionResult UsersProgress(string courseId, string unitName)
+		public ActionResult UsersProgress(string courseId, string unitName, DateTime periodStart)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var slides = course.Slides
 				.Where(s => s.Info.UnitName == unitName).ToArray();
-			var users = GetUserInfos(course, slides).OrderByDescending(GetRating).ToArray();
+			var users = GetUserInfos(slides, periodStart).OrderByDescending(GetRating).ToArray();
 			return PartialView(new UserProgressViewModel { Slides = slides, Users = users, CourseId = courseId });
 		}
 
@@ -364,27 +361,20 @@ namespace uLearn.Web.Controllers
 						+ (s.IsQuizPassed ? s.QuizPercentage / 100.0 : 0));
 		}
 
-		private IEnumerable<UserInfo> GetUserInfos(Course course, Slide[] slides)
+		private IEnumerable<UserInfo> GetUserInfos(Slide[] slides, DateTime periodStart)
 		{
 			var slideIds = slides.Select(s => s.Id).ToArray();
 
-			var dq =
-				from v in db.Visiters
-				where slideIds.Contains(v.SlideId)
-				join u in db.Users on v.UserId equals u.Id into users
-				from uu in users
-				select new
-				{
-					v.UserId,
-					uu.UserName,
-					uu.GroupName,
-					v.SlideId,
-					v.IsPassed,
-					v.Score,
-					v.AttemptsCount
-				};
+			var dq = db.Visiters
+				.Where(v => slideIds.Contains(v.SlideId) && periodStart <= v.Timestamp)
+				.Select(v => v.UserId)
+				.Distinct()
+				.Join(db.Visiters, s => s, v => v.UserId, (s, visiters) => visiters)
+				.Where(v => slideIds.Contains(v.SlideId))
+				.Select(v => new { v.UserId, v.User.UserName, v.User.GroupName, v.SlideId, v.IsPassed, v.Score, v.AttemptsCount})
+				.ToList();
 
-			var r = from v in dq.ToList()
+			var r = from v in dq
 				group v by new { v.UserId, v.UserName, v.GroupName }
 				into u
 				select new UserInfo
@@ -429,7 +419,7 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult ShowSolutions(string courseId, string userId, string slideId)
 		{
-			var solutions = db.UserSolutions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
+			var solutions = db.UserSolutions.Where(s => s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
 			var user = db.Users.Find(userId);
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.GetSlideById(slideId);

@@ -19,7 +19,6 @@
 	}
 
 }
-<h2>Статистика ответов</h2>
 <div>
 	@{ var maxQuestionIndex = Model.QuizSlide.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex).Max(x => x.QuestionIndex);}
 	<table id="myTable" class="tablesorter">

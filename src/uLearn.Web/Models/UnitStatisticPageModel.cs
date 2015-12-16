@@ -8,11 +8,6 @@ namespace uLearn.Web.Models
 	{
 		public string CourseId { get; set; }
 		public string UnitName { get; set; }
-		public UserQuestion[] Questions { get; set; }
-		public SlideRateStats[] SlideRateStats { get; set; }
-		public Slide[] Slides { get; set; }
-		public List<UserInfo> UsersInfo { get; set; }
-		public DailyStatistics[] DailyStatistics { get; set; }
 	}
 
 	public class DailyStatistics

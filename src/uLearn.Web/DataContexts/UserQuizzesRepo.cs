@@ -81,54 +81,6 @@ namespace uLearn.Web.DataContexts
 			return answer;
 		}
 
-		public FillInBlockAnswerInfo GetFillInBlockAnswerInfo(string courseId, string slideId, string quizId, string userId, int questionIndex)
-		{
-			var answer = db.UserQuizzes.FirstOrDefault(x => x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId && !x.isDropped);
-			return new FillInBlockAnswerInfo
-			{
-				Answer = answer == null ? null : answer.Text,
-				IsRight = answer != null && answer.IsRightAnswer,
-				Id = questionIndex.ToString()
-			};
-		}
-
-		public ChoiceBlockAnswerInfo GetChoiceBlockAnswerInfo(string courseId, string slideId, ChoiceBlock block, string userId, int questionIndex)
-		{
-			var ans = new SortedDictionary<string, bool>();
-			foreach (var item in block.Items)
-			{
-				ans[item.Id] = false;
-			}
-			var isRight = false;
-			foreach (var quizItem in db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId && q.QuizId == block.Id && 
-				q.ItemId != null && !q.isDropped))
-			{
-				if (!ans.ContainsKey(quizItem.ItemId))
-					continue;
-				isRight = quizItem.IsRightQuizBlock;
-				ans[quizItem.ItemId] = true;
-			}
-			return new ChoiceBlockAnswerInfo
-			{
-				AnswersId = ans,
-				Id = questionIndex.ToString(),
-				RealyRightAnswer = new HashSet<string>(block.Items.Where(x => x.IsCorrect).Select(x => x.Id)),
-				IsRight = isRight
-			};
-		}
-
-		public IsTrueBlockAnswerInfo GetIsTrueBlockAnswerInfo(string courseId, string slideId, string quizId, string userId, int questionIndex)
-		{
-			var answer =  db.UserQuizzes.FirstOrDefault(x => x.UserId == userId && x.SlideId == slideId && x.QuizId == quizId && !x.isDropped);
-			return new IsTrueBlockAnswerInfo
-			{
-				IsAnswered = answer != null,
-				Answer = answer != null && answer.Text == "True",
-				Id = questionIndex.ToString(),
-				IsRight = answer != null && answer.IsRightAnswer
-			};
-		}
-
 		public int GetAverageStatistics(string slideId, string courseId)
 		{
 			var newA = db.UserQuizzes
@@ -184,6 +136,14 @@ namespace uLearn.Web.DataContexts
 				.Where(q => q.UserId == userId && q.SlideId == slideId && !q.isDropped)
 				.DistinctBy(q => q.QuizId)
 				.ToDictionary(q => q.QuizId, q => q.IsRightQuizBlock);
+		}
+
+		public Dictionary<string, List<UserQuiz>> GetAnswersForUser(string slideId, string userId)
+		{
+			return db.UserQuizzes
+				.Where(ans => ans.UserId == userId && ans.SlideId == slideId && !ans.isDropped)
+				.ToLookup(ans => ans.QuizId)
+				.ToDictionary(g => g.Key, g => g.ToList());
 		}
 	}
 }

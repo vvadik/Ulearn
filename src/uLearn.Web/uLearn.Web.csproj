@@ -314,6 +314,14 @@
     <Compile Include="Migrations\201510071331139_RestorePassword.Designer.cs">
       <DependentUpon>201510071331139_RestorePassword.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201512021145426_QuizStatisticsIndex.cs" />
+    <Compile Include="Migrations\201512021145426_QuizStatisticsIndex.Designer.cs">
+      <DependentUpon>201512021145426_QuizStatisticsIndex.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201512141043098_ChangeVisitsIndex.cs" />
+    <Compile Include="Migrations\201512141043098_ChangeVisitsIndex.Designer.cs">
+      <DependentUpon>201512141043098_ChangeVisitsIndex.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
     <Compile Include="Models\ExternalLoginsListModel.cs" />
     <Compile Include="Models\LtiQuizModel.cs" />
@@ -325,6 +333,7 @@
     <Compile Include="Models\RestoreRequest.cs" />
     <Compile Include="Models\SubmissionListModel.cs" />
     <Compile Include="Models\SubmissionsModel.cs" />
+    <Compile Include="Models\SwitchablePanelModel.cs" />
     <Compile Include="Models\TocModelBuilder.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.cs" />
     <Compile Include="Migrations\201411140847550_extract large text fields.Designer.cs">
@@ -588,6 +597,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201510071331139_RestorePassword.resx">
       <DependentUpon>201510071331139_RestorePassword.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512021145426_QuizStatisticsIndex.resx">
+      <DependentUpon>201512021145426_QuizStatisticsIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512141043098_ChangeVisitsIndex.resx">
+      <DependentUpon>201512141043098_ChangeVisitsIndex.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -963,6 +978,7 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\slide-tex.js" />
     <Content Include="Scripts\slide-stats.js" />
+    <Content Include="Scripts\slide-utils.js" />
     <Content Include="Scripts\table-configurator.js" />
     <Content Include="Scripts\user-group-name-change.js" />
     <Content Include="Scripts\_references.js" />
@@ -1155,6 +1171,7 @@
     <Content Include="Views\RestorePassword\Index.cshtml" />
     <Content Include="Views\RestorePassword\SetNewPassword.cshtml" />
     <Content Include="Views\Course\_LoginForContinue.cshtml" />
+    <Content Include="App_Code\Utils.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
