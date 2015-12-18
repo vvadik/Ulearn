@@ -13,9 +13,6 @@ namespace uLearn.CourseTool
 		[Option("upload", HelpText = "Upload course package")]
 		public bool Upload { get; set; }
 
-		[Option(HelpText = "Package name")]
-		public string Name { get; set; }
-
 		[Option('f', "force", HelpText = "Try force")]
 		public bool Force { get; set; }
 

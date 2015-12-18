@@ -52,8 +52,9 @@ namespace uLearn.CourseTool
 
 			var client = Login(ulearnUrl, credentials.Email, credentials.GetPassword());
 			client.TryDownloadFile(downloadUrl, fileFullName);
-			var dir = new DirectoryInfo(baseDir);
+			Console.Out.WriteLine("Package downloaded to {0}", fileFullName);
 
+			var dir = new DirectoryInfo(baseDir);
 			using (var zip = ZipFile.Read(fileFullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
 			{
 				var courseDir = dir.CreateSubdirectory(config.ULearnCourseId);
@@ -65,17 +66,17 @@ namespace uLearn.CourseTool
 			new FileInfo(fileFullName).Delete();
 		}
 
-		public static void Upload(string baseDir, bool force, Config config, string ulearnUrl, Credentials credentials)
+		public static void Upload(string baseDir, Config config, string ulearnUrl, Credentials credentials)
 		{
 			var fileFullName = Path.Combine(baseDir, config.ULearnCourseId + ".zip");
 			var uploadUrl = ulearnUrl + "/Unit/UploadCourse";
 			var courseDir = Path.Combine(baseDir, config.ULearnCourseId);
 
-			if (File.Exists(fileFullName) && !force)
+			if (File.Exists(fileFullName))
 				File.Delete(fileFullName);
 			using (var zip = new ZipFile(fileFullName, Encoding.GetEncoding(866)))
 			{
-				zip.UpdateDirectory(courseDir);
+				zip.AddDirectory(courseDir);
 				zip.Save();
 			}
 
