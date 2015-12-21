@@ -466,6 +466,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SlideHtml.cshtml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Shared\Helpers\SwitchablePanel.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SwitchablePanel.cshtml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SlideNavigation\TableOfContents.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1178,7 +1183,10 @@
     <Content Include="Views\RestorePassword\Index.cshtml" />
     <Content Include="Views\RestorePassword\SetNewPassword.cshtml" />
     <Content Include="Views\Course\_LoginForContinue.cshtml" />
-    <Content Include="App_Code\Utils.cshtml" />
+    <Content Include="Views\Shared\Helpers\SwitchablePanel.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>SwitchablePanel.generated.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,6 +1,7 @@
-﻿@using System.Web.Routing
+﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
+@using System.Web.Routing
 @using uLearn.Web.Models
-@helper SwitchablePanel(string idPrefix, params SwitchablePanelModel[] switches)
+@helper Panel(string idPrefix, params SwitchablePanelModel[] switches)
 {
 	if (string.IsNullOrWhiteSpace(idPrefix))
 	{
@@ -20,7 +21,7 @@
 	</div>
 }
 
-@helper TimeSwitchablePanel(string idPrefix, Func<RouteValueDictionary, string> getUrl, dynamic arguments, params Tuple<string, double>[] intervals) 
+@helper TimePanel(string idPrefix, Func<RouteValueDictionary, string> getUrl, dynamic arguments, params Tuple<string, double>[] intervals) 
 {
 	var switches = new List<SwitchablePanelModel>();
 	foreach (var interval in intervals)
@@ -37,7 +38,7 @@
 		Name = "За всё время",
 		Url = GetUrl(getUrl, arguments, DateTime.MinValue)
 	});
-	@SwitchablePanel(idPrefix, switches.ToArray())
+	@Panel(idPrefix, switches.ToArray())
 }
 
 @functions

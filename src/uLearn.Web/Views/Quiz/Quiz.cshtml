@@ -1,6 +1,7 @@
 ﻿@using uLearn
 @using uLearn.Quizes
 @using uLearn.Web.Views.Course
+@using uLearn.Web.Views.Shared.Helpers
 @model QuizModel
 @{
 	var quizSlide = Model.Slide;
@@ -58,7 +59,7 @@
 	if (User.IsInRole(LmsRoles.Instructor))
 	{
 		<h2>Статистика ответов</h2>
-		@Utils.TimeSwitchablePanel("quiz-statistic",
+		@SwitchablePanel.TimePanel("quiz-statistic",
 			args => Url.Action("Analytics", "Quiz", args),
 			new { courseId = Model.CourseId, slideIndex = Model.Slide.Index },
 			Tuple.Create("За полгода", 365.0 / 2)
