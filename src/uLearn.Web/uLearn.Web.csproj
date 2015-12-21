@@ -318,9 +318,9 @@
     <Compile Include="Migrations\201512021145426_QuizStatisticsIndex.Designer.cs">
       <DependentUpon>201512021145426_QuizStatisticsIndex.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201512141043098_ChangeVisitsIndex.cs" />
-    <Compile Include="Migrations\201512141043098_ChangeVisitsIndex.Designer.cs">
-      <DependentUpon>201512141043098_ChangeVisitsIndex.cs</DependentUpon>
+    <Compile Include="Migrations\201512210801368_ChangeVisitsIndex.cs" />
+    <Compile Include="Migrations\201512210801368_ChangeVisitsIndex.Designer.cs">
+      <DependentUpon>201512210801368_ChangeVisitsIndex.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
     <Compile Include="Models\ExternalLoginsListModel.cs" />
@@ -445,6 +445,7 @@
       <DependentUpon>201408201208379_AddIsRightQuizBlock.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\UserCourseModel.cs" />
+    <Compile Include="Models\Visiters.cs" />
     <Compile Include="Models\WebCourseManager_should.cs" />
     <Compile Include="Views\Course\AcceptedSolutionsHtml.generated.cs">
       <AutoGen>True</AutoGen>
@@ -502,7 +503,6 @@
     <Compile Include="Models\UserQuiz.cs" />
     <Compile Include="Models\UserSolution.cs" />
     <Compile Include="Models\UsersStatsPageModel.cs" />
-    <Compile Include="Models\Visiters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <EmbeddedResource Include="Migrations\201407111234255_InitialCreate.resx">
@@ -601,8 +601,8 @@
     <EmbeddedResource Include="Migrations\201512021145426_QuizStatisticsIndex.resx">
       <DependentUpon>201512021145426_QuizStatisticsIndex.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201512141043098_ChangeVisitsIndex.resx">
-      <DependentUpon>201512141043098_ChangeVisitsIndex.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201512210801368_ChangeVisitsIndex.resx">
+      <DependentUpon>201512210801368_ChangeVisitsIndex.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

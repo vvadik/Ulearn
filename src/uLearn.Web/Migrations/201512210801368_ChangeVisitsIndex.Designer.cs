@@ -13,7 +13,7 @@ namespace uLearn.Web.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201512141043098_ChangeVisitsIndex"; }
+            get { return "201512210801368_ChangeVisitsIndex"; }
         }
         
         string IMigrationMetadata.Source
