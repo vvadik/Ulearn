@@ -17,7 +17,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly CourseManager courseManager;
-		private readonly VisitersRepo visitersRepo = new VisitersRepo();
+		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
@@ -64,7 +64,7 @@ namespace uLearn.Web.Controllers
 				var isExercise = exerciseSlide != null;
 				var isQuiz = quizSlide != null;
 				var hintsCountOnSlide = isExercise ? exerciseSlide.Exercise.HintsMd.Count() : 0;
-				var visitersCount = visitersRepo.GetVisitersCount(slide.Id, course.Id);
+				var visitersCount = visitsRepo.GetVisitsCount(slide.Id, course.Id);
 				tableInfo.Add(slide.Index + ". " + slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
 				{
 					Rates = slideRateRepo.GetRates(slide.Id, course.Id),
@@ -151,7 +151,7 @@ namespace uLearn.Web.Controllers
 			return result;
 		}
 
-		private Dictionary<DateTime, Tuple<int, int>> SumByDays(IQueryable<Visiters> actions)
+		private Dictionary<DateTime, Tuple<int, int>> SumByDays(IQueryable<Visit> actions)
 		{
 			var q = from s in actions
 				group s by DbFunctions.TruncateTime(s.Timestamp)
@@ -191,7 +191,7 @@ namespace uLearn.Web.Controllers
 
 		private Dictionary<DateTime, Tuple<int, int>> GetSlidesVisitedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
 		{
-			return SumByDays(FilterByTime(FilterBySlides(db.Visiters, slideIds), firstDay, lastDay));
+			return SumByDays(FilterByTime(FilterBySlides(db.Visits, slideIds), firstDay, lastDay));
 		}
 
 		private SlideRateStats[] GetSlideRateStats(Course course, IEnumerable<Slide> slides)
@@ -233,11 +233,11 @@ namespace uLearn.Web.Controllers
 		{
 			var slideIds = slides.Select(s => s.Id).ToArray();
 
-			var dq = db.Visiters
+			var dq = db.Visits
 				.Where(v => slideIds.Contains(v.SlideId) && periodStart <= v.Timestamp)
 				.Select(v => v.UserId)
 				.Distinct()
-				.Join(db.Visiters, s => s, v => v.UserId, (s, visiters) => visiters)
+				.Join(db.Visits, s => s, v => v.UserId, (s, visiters) => visiters)
 				.Where(v => slideIds.Contains(v.SlideId))
 				.Select(v => new { v.UserId, v.User.UserName, v.User.GroupName, v.SlideId, v.IsPassed, v.Score, v.AttemptsCount})
 				.ToList();

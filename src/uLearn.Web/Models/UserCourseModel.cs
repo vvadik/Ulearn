@@ -13,7 +13,7 @@ namespace uLearn.Web.Models
 			Course = course;
 			User = user;
 
-			var visits = db.Visiters.Where(v => v.UserId == user.Id && v.CourseId == course.Id).GroupBy(v => v.SlideId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
+			var visits = db.Visits.Where(v => v.UserId == user.Id && v.CourseId == course.Id).GroupBy(v => v.SlideId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
 			var unitResults = new Dictionary<string, UserCourseUnitModel>();
 			foreach (var slide in Course.Slides)
 			{

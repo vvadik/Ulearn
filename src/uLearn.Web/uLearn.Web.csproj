@@ -268,7 +268,7 @@
     <Compile Include="Controllers\SlideNavigationController.cs" />
     <Compile Include="Controllers\ExerciseController.cs" />
     <Compile Include="Controllers\HintController.cs" />
-    <Compile Include="Controllers\VisitersController.cs" />
+    <Compile Include="Controllers\VisitsController.cs" />
     <Compile Include="DataContexts\ConsumersRepo.cs" />
     <Compile Include="DataContexts\LtiRequestsRepo.cs" />
     <Compile Include="DataContexts\RestoreRequestRepo.cs" />
@@ -321,6 +321,10 @@
     <Compile Include="Migrations\201512210801368_ChangeVisitsIndex.cs" />
     <Compile Include="Migrations\201512210801368_ChangeVisitsIndex.Designer.cs">
       <DependentUpon>201512210801368_ChangeVisitsIndex.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201512210814206_RenameTableVisitersToVisits.cs" />
+    <Compile Include="Migrations\201512210814206_RenameTableVisitersToVisits.Designer.cs">
+      <DependentUpon>201512210814206_RenameTableVisitersToVisits.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
     <Compile Include="Models\ExternalLoginsListModel.cs" />
@@ -403,7 +407,7 @@
     <Compile Include="DataContexts\UserQuizzesRepo.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo_should.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo.cs" />
-    <Compile Include="DataContexts\VisitersRepo.cs" />
+    <Compile Include="DataContexts\VisitsRepo.cs" />
     <Compile Include="Migrations\201407111234255_InitialCreate.cs" />
     <Compile Include="Migrations\201407111234255_InitialCreate.Designer.cs">
       <DependentUpon>201407111234255_InitialCreate.cs</DependentUpon>
@@ -445,7 +449,7 @@
       <DependentUpon>201408201208379_AddIsRightQuizBlock.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\UserCourseModel.cs" />
-    <Compile Include="Models\Visiters.cs" />
+    <Compile Include="Models\Visit.cs" />
     <Compile Include="Models\WebCourseManager_should.cs" />
     <Compile Include="Views\Course\AcceptedSolutionsHtml.generated.cs">
       <AutoGen>True</AutoGen>
@@ -603,6 +607,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201512210801368_ChangeVisitsIndex.resx">
       <DependentUpon>201512210801368_ChangeVisitsIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512210814206_RenameTableVisitersToVisits.resx">
+      <DependentUpon>201512210814206_RenameTableVisitersToVisits.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -954,7 +961,7 @@
     <Content Include="Scripts\notify-custom.min.js" />
     <Content Include="Scripts\slide-diff.js" />
     <Content Include="Scripts\slide-guest.js" />
-    <Content Include="Scripts\slide-localvisiters.js" />
+    <Content Include="Scripts\slide-localvisits.js" />
     <Content Include="Scripts\slide-modals.js" />
     <Content Include="Scripts\slide-popovers.js" />
     <Content Include="Scripts\slide-quiz.js" />

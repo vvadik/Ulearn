@@ -22,7 +22,7 @@ namespace uLearn.Web.Controllers
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
-		private readonly VisitersRepo visitersRepo = new VisitersRepo();
+		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 
 		public QuizController()
 			: this(WebCourseManager.Instance)
@@ -68,7 +68,7 @@ namespace uLearn.Web.Controllers
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			var userId = User.Identity.GetUserId();
 			await userQuizzesRepo.RemoveAnswers(userId, slideId);
-			await visitersRepo.RemoveAttempts(slideId, userId);
+			await visitsRepo.RemoveAttempts(slideId, userId);
 			var model = new { courseId, slideIndex = slide.Index };
 			if (isLti)
 			{
@@ -87,7 +87,7 @@ namespace uLearn.Web.Controllers
 			var slide = course.Slides[intSlideIndex];
 			var slideId = slide.Id;
 
-			if (visitersRepo.IsPassed(userId, slideId))
+			if (visitsRepo.IsPassed(userId, slideId))
 				return "already answered";
 			var time = DateTime.Now;
 			var answers = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.QuizId);
@@ -117,7 +117,7 @@ namespace uLearn.Web.Controllers
 				await userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
 					slideId, quizInfoForDb.Text, userId, time, quizInfoForDb.IsRightQuizBlock);
 
-			await visitersRepo.AddAttempt(slideId, userId, score);
+			await visitsRepo.AddAttempt(slideId, userId, score);
 			if (isLti)
 				LtiUtils.SubmitScore(slide, userId);
 
@@ -321,7 +321,7 @@ namespace uLearn.Web.Controllers
 					!userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId).All(b => b.Value))
 				{
 					await userQuizzesRepo.DropQuiz(userId, slideId);
-					await visitersRepo.DropAttempt(slideId, userId);
+					await visitsRepo.DropAttempt(slideId, userId);
 					if (isLti)
 						LtiUtils.SubmitScore(slide, userId);
 				}

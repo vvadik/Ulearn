@@ -10,7 +10,7 @@ namespace uLearn.Web.LTI
 		{
 			var ltiRequestsRepo = new LtiRequestsRepo();
 			var consumersRepo = new ConsumersRepo();
-			var visitersRepo = new VisitersRepo();
+			var visitsRepo = new VisitsRepo();
 
 			var ltiRequest = ltiRequestsRepo.Find(userId, slide.Id);
 			if (ltiRequest == null)
@@ -18,7 +18,7 @@ namespace uLearn.Web.LTI
 
 			var consumerSecret = consumersRepo.Find(ltiRequest.ConsumerKey).Secret;
 
-			var score = visitersRepo.GetScore(slide.Id, userId);
+			var score = visitsRepo.GetScore(slide.Id, userId);
 
 			// TODO: fix outcome address in local edx (no localhost and no https)
 			var uri = new UriBuilder(ltiRequest.LisOutcomeServiceUrl);
