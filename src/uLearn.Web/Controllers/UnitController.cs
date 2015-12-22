@@ -13,7 +13,7 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	[PostAuthorize(CourseRoles.Admin)]
+	[PostAuthorize(MinAccessLevel = CourseRoles.CourseAdmin)]
 	public class UnitController : Controller
 	{
 		private readonly CourseManager courseManager;
@@ -27,7 +27,7 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult CourseList(string courseId = "")
 		{
-			var courses = new HashSet<string>(User.GetCoursesIdFor(CourseRoles.Admin));
+			var courses = new HashSet<string>(User.GetCoursesIdFor(CourseRoles.CourseAdmin));
 			var model = new CourseListViewModel
 			{
 				Courses = courseManager.GetCourses().Where(course => courses.Contains(course.Id)).ToList(), 
@@ -41,7 +41,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult ReloadCourse(string packageName, string returnUrl = null)
 		{
 			var courseId = courseManager.GetCourseId(packageName);
-			if (!User.HasAccessFor(courseId, CourseRoles.Admin))
+			if (!User.HasAccessFor(courseId, CourseRoles.CourseAdmin))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			courseManager.ReloadCourse(packageName);
 			if (returnUrl != null) return Redirect(returnUrl);
@@ -100,7 +100,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult DownloadPackage(string packageName)
 		{
 			var courseId = courseManager.GetCourseId(packageName);
-			if (!User.HasAccessFor(courseId, CourseRoles.Admin))
+			if (!User.HasAccessFor(courseId, CourseRoles.CourseAdmin))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			return File(courseManager.GetStagingPackagePath(packageName), "application/zip", packageName);
 		}
@@ -115,7 +115,7 @@ namespace uLearn.Web.Controllers
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
 				return RedirectToAction("CourseList");
 			var courseId = courseManager.GetCourseId(fileName);
-			if (User.HasAccessFor(courseId, CourseRoles.Admin))
+			if (User.HasAccessFor(courseId, CourseRoles.CourseAdmin))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			var destinationFile = courseManager.StagedDirectory.GetFile(fileName);

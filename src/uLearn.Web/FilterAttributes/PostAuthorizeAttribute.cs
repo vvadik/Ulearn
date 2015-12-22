@@ -9,19 +9,7 @@ namespace uLearn.Web.FilterAttributes
 {
 	public class PostAuthorizeAttribute : AuthorizeAttribute
 	{
-		private CourseRoles? minAccessLevel;
-
-		public PostAuthorizeAttribute(string roles = null)
-		{
-			if (roles != null)
-				Roles = roles;
-		}
-
-		public PostAuthorizeAttribute(CourseRoles minAccessLevel, string roles = null)
-			: this(roles)
-		{
-			this.minAccessLevel = minAccessLevel;
-		}
+		public CourseRoles MinAccessLevel = CourseRoles.Student;
 
 		protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
 		{
@@ -43,27 +31,28 @@ namespace uLearn.Web.FilterAttributes
 			if (!user.Identity.IsAuthenticated)
 				return false;
 
-			if (!minAccessLevel.HasValue && rolesSplit.Length == 0)
+			if (MinAccessLevel == CourseRoles.Student && rolesSplit.Length == 0)
 				return true;
 
 			if (rolesSplit.Length > 0 && rolesSplit.Any(user.IsInRole))
 				return true;
 
-			if (!minAccessLevel.HasValue)
+			if (MinAccessLevel == CourseRoles.Student)
 				return false;
 
-			var courseIds = httpContext.Request.QueryString.Get("courseId");
+			var courseIds = httpContext.Request.Params.Get("courseId");
 			if (courseIds == null)
-				return user.HasAccess(minAccessLevel.Value);
+				return user.HasAccess(MinAccessLevel);
 
 			var courseId = courseIds.Split(',').FirstOrDefault();
-			return user.HasAccessFor(courseId, minAccessLevel.Value);
+			return user.HasAccessFor(courseId, MinAccessLevel);
 		}
 
 		private string[] rolesSplit = new string[0];
 
 		public new string Roles
 		{
+			get { return string.Join(",", rolesSplit); }
 			set { rolesSplit = SplitString(value); }
 		}
 

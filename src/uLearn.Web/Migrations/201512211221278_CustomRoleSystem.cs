@@ -20,9 +20,10 @@ namespace uLearn.Web.Migrations
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.AspNetUsers", t => t.UserId)
 				.Index(t => t.UserId);
-			Sql(string.Format(@"
+
+			Sql(@"
 					declare @adminId nvarchar(max);
-					set @adminId = (select id from AspNetRoles where Name = '{0}');
+					set @adminId = (select id from AspNetRoles where Name = 'admin');
 					insert 
 						into AspNetUserRoles(UserId, RoleId)
 						(
@@ -33,11 +34,10 @@ namespace uLearn.Web.Migrations
 									from AspNetUserRoles as d 
 									where t.UserId = d.UserId and d.RoleId = @adminId
 								)
-						);",
-				LmsRoles.Admin)
+						);"
 				);
-
-			Sql(string.Format(@"delete from AspNetRoles where Name != '{0}';", LmsRoles.Admin));
+			Sql(@"delete from AspNetRoles where Name != 'admin'");
+			Sql("update AspNetRoles set Name = N'SysAdmin'");
 		}
 
 		public override void Down()

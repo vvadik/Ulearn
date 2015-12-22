@@ -12,10 +12,10 @@
 <div class="container">
 	<h2>Роли пользователей</h2>
 
-	<p><a class="label label-danger" href="@Url.Action("List", new { role = LmsRoles.Admin })">admin</a> может всё.</p>
-	<p><a class="label label-warning" href="@Url.Action("List", new { courseRole = CourseRoles.Admin })">Admin</a> может видеть служебную информацию и управлять ролями других пользователей.</p>
-	<p><a class="label label-info" href="@Url.Action("List", new { courseRole = CourseRoles.Instructor })">Instructor</a> может видеть статистику по успеваемости на разных слайдах, задачах, тестах. Читать заданные вопросы.</p>
-	<p><a class="label label-success" href="@Url.Action("List", new { courseRole = CourseRoles.Tester })">Tester</a> может видеть ещё не опубликованные для всех материалы.</p>
+	<p><a class="label label-danger" href="@Url.Action("List", new { role = LmsRoles.SysAdmin })">@LmsRoles.SysAdmin</a> может всё.</p>
+	<p><a class="label label-warning" href="@Url.Action("List", new { courseRole = CourseRoles.CourseAdmin })">@CourseRoles.CourseAdmin</a> может видеть служебную информацию и управлять ролями других пользователей.</p>
+	<p><a class="label label-info" href="@Url.Action("List", new { courseRole = CourseRoles.Instructor })">@CourseRoles.Instructor</a> может видеть статистику по успеваемости на разных слайдах, задачах, тестах. Читать заданные вопросы.</p>
+	<p><a class="label label-success" href="@Url.Action("List", new { courseRole = CourseRoles.Tester })">@CourseRoles.Tester</a> может видеть ещё не опубликованные для всех материалы.</p>
 	<p><a class="label label-default" href="@Url.Action("List")">обычный пользователь</a> может видеть только опубликованные материалы.</p>
 
 	@using (Html.BeginForm("List", "Account", FormMethod.Get, new { @class = "form-inline" }))
@@ -41,8 +41,8 @@
 				<td>@user.GroupName</td>
 				<td>
 					<div class="btn-group">
-						@RoleButton(user, LmsRoles.Admin, "danger")
-						@RoleButton(user, CourseRoles.Admin, "warning")
+						@RoleButton(user, LmsRoles.SysAdmin, "danger")
+						@RoleButton(user, CourseRoles.CourseAdmin, "warning")
 						@RoleButton(user, CourseRoles.Instructor, "info")
 						@RoleButton(user, CourseRoles.Tester, "success")
 					</div>

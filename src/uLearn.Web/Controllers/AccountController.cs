@@ -45,7 +45,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Index", "Login", new { returnUrl });
 		}
 
-		[PostAuthorize(CourseRoles.Instructor)]
+		[PostAuthorize(MinAccessLevel = CourseRoles.Instructor)]
 		public ActionResult List(string namePrefix = null, string role = null, CourseRoles? courseRole = null)
 		{
 			IQueryable<ApplicationUser> applicationUsers = new ULearnDb().Users;
@@ -107,18 +107,18 @@ namespace uLearn.Web.Controllers
 		}
 
 
-		[PostAuthorize(LmsRoles.Admin)]
+		[PostAuthorize(Roles = LmsRoles.SysAdmin)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ToggleSystemAdministratorRole(string userId)
 		{
-			if (userManager.IsInRole(userId, LmsRoles.Admin))
-				await userManager.RemoveFromRoleAsync(userId, LmsRoles.Admin);
+			if (userManager.IsInRole(userId, LmsRoles.SysAdmin))
+				await userManager.RemoveFromRoleAsync(userId, LmsRoles.SysAdmin);
 			else
-				await userManager.AddToRolesAsync(userId, LmsRoles.Admin);
-			return Content(LmsRoles.Admin);
+				await userManager.AddToRolesAsync(userId, LmsRoles.SysAdmin);
+			return Content(LmsRoles.SysAdmin);
 		}
 
-		[PostAuthorize(CourseRoles.Admin)]
+		[PostAuthorize(MinAccessLevel = CourseRoles.CourseAdmin)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ToggleRole(string courseId, string userId, CourseRoles role)
 		{
@@ -131,7 +131,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[PostAuthorize(LmsRoles.Admin)]
+		[PostAuthorize(Roles = LmsRoles.SysAdmin)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> DeleteUser(string userId)
 		{
@@ -144,7 +144,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("List");
 		}
 
-		[PostAuthorize(CourseRoles.Instructor)]
+		[PostAuthorize(MinAccessLevel = CourseRoles.Instructor)]
 		public ActionResult Info(string userName)
 		{
 			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
@@ -154,7 +154,7 @@ namespace uLearn.Web.Controllers
 			return View(new UserInfoModel(user, courseManager.GetCourses().Where(c => courses.Contains(c.Id)).ToArray()));
 		}
 
-		[PostAuthorize(CourseRoles.Instructor)]
+		[PostAuthorize(MinAccessLevel = CourseRoles.Instructor)]
 		public ActionResult CourseInfo(string userName, string courseId)
 		{
 			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
@@ -390,7 +390,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[PostAuthorize(LmsRoles.Admin)]
+		[PostAuthorize(Roles = LmsRoles.SysAdmin)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ResetPassword(string newPassword, string userId)
 		{

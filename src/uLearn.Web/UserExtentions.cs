@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
-using Microsoft.AspNet.Identity.EntityFramework;
 using uLearn.Web.Models;
 
 namespace uLearn.Web
@@ -14,7 +13,7 @@ namespace uLearn.Web
 
 		public static bool HasAccessFor(this IPrincipal principal, string courseId, CourseRoles minAccessLevel)
 		{
-			if (principal.IsInRole(LmsRoles.Admin))
+			if (principal.IsInRole(LmsRoles.SysAdmin))
 				return true;
 
 			var courseRole = principal.GetAllRoles().FirstOrDefault(t => t.Item1 == courseId);
@@ -26,7 +25,7 @@ namespace uLearn.Web
 
 		public static bool HasAccess(this IPrincipal principal, CourseRoles minAccessLevel)
 		{
-			if (principal.IsInRole(LmsRoles.Admin))
+			if (principal.IsInRole(LmsRoles.SysAdmin))
 				return true;
 
 			var roles = principal.GetAllRoles().Select(t => t.Item2).ToList();
@@ -36,7 +35,7 @@ namespace uLearn.Web
 			return roles.Min() <= minAccessLevel;
 		}
 
-		public static IEnumerable<Tuple<string, CourseRoles>> GetAllRoles(this IPrincipal principal)
+		private static IEnumerable<Tuple<string, CourseRoles>> GetAllRoles(this IPrincipal principal)
 		{
 			var roleTuples = principal
 				.ToClaimsPrincipal()
@@ -52,22 +51,12 @@ namespace uLearn.Web
 			}
 		}
 
-		public static bool HasRole(this IPrincipal principal, CourseRoles role)
-		{
-			return principal.GetAllRoles().Any(t => t.Item2 == role);
-		}
-
-		public static bool HasRoleFor(this IPrincipal principal, string courseId, CourseRoles role)
-		{
-			return principal.GetAllRoles().Contains(Tuple.Create(courseId, role));
-		}
-
 		public static IEnumerable<string> GetCoursesIdFor(this IPrincipal principal, CourseRoles role)
 		{
 			return principal.GetAllRoles().Where(t => t.Item2 == role).Select(t => t.Item1);
 		}
 
-		public static ClaimsPrincipal ToClaimsPrincipal(this IPrincipal principal)
+		private static ClaimsPrincipal ToClaimsPrincipal(this IPrincipal principal)
 		{
 			return principal as ClaimsPrincipal ?? new ClaimsPrincipal(principal);
 		}
@@ -75,14 +64,14 @@ namespace uLearn.Web
 		public static IEnumerable<string> GetControllableCoursesId(this IPrincipal principal)
 		{
 			if (!principal.IsSystemAdministrator())
-				return principal.GetCoursesIdFor(CourseRoles.Admin);
+				return principal.GetCoursesIdFor(CourseRoles.CourseAdmin);
 			var courseManager = WebCourseManager.Instance;
 			return courseManager.GetCourses().Select(course => course.Id);
 		}
 
 		public static bool IsSystemAdministrator(this IPrincipal principal)
 		{
-			return principal.IsInRole(LmsRoles.Admin);
+			return principal.IsInRole(LmsRoles.SysAdmin);
 		}
 
 		public static void AddCourseRoles(this ClaimsIdentity identity, Dictionary<string, CourseRoles> roles)
@@ -91,7 +80,7 @@ namespace uLearn.Web
 				identity.AddCourseRole(role.Key, role.Value);
 		}
 
-		public static void AddCourseRole(this ClaimsIdentity identity, string courseId, CourseRoles role) 
+		private static void AddCourseRole(this ClaimsIdentity identity, string courseId, CourseRoles role) 
 		{
 			identity.AddClaim(new Claim(courseRoleClaimType, courseId + " " + role));
 		}

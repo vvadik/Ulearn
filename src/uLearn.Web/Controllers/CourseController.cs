@@ -298,7 +298,7 @@ namespace uLearn.Web.Controllers
 			return visitersRepo.GetVisiter(slideId, userId);
 		}
 
-		[PostAuthorize(CourseRoles.Instructor)]
+		[PostAuthorize(MinAccessLevel = CourseRoles.Instructor)]
 		public ActionResult InstructorNote(string courseId, string unitName)
 		{
 			InstructorNote instructorNote = courseManager.GetCourse(courseId).FindInstructorNote(unitName);
@@ -308,7 +308,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[PostAuthorize(CourseRoles.Instructor)]
+		[PostAuthorize(MinAccessLevel = CourseRoles.Instructor)]
 		public async Task<ActionResult> RemoveSolution(string courseId, int slideIndex, int solutionId)
 		{
 			var solution = await db.UserSolutions.FirstOrDefaultAsync(s => s.Id == solutionId);
@@ -327,7 +327,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("AcceptedSolutions", new { courseId, slideIndex });
 		}
 
-		[PostAuthorize(CourseRoles.Tester)]
+		[PostAuthorize(MinAccessLevel = CourseRoles.Tester)]
 		public async Task<ActionResult> ForgetAll(string courseId, string slideId)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);

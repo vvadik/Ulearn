@@ -62,7 +62,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[PostAuthorize(CourseRoles.Tester)]
+		[PostAuthorize(MinAccessLevel = CourseRoles.Tester)]
 		public async Task<ActionResult> ClearAnswers(string courseId, string slideId, bool isLti)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
@@ -210,7 +210,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpGet]
-		[PostAuthorize(CourseRoles.Instructor)]
+		[PostAuthorize(MinAccessLevel = CourseRoles.Instructor)]
 		public ActionResult Analytics(string courseId, int slideIndex, DateTime periodStart)
 		{
 			var course = courseManager.GetCourse(courseId);

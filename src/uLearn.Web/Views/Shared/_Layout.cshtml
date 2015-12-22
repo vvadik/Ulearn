@@ -29,7 +29,7 @@
 			</div>
 			<div class="greeting-collapse-class navbar-collapse collapse">
 				<ul class="top-navigation nav navbar-nav">
-					@if (User.HasAccess(CourseRoles.Admin))
+					@if (User.HasAccess(CourseRoles.CourseAdmin))
 					{
 						<li>@Html.ActionLink("Admin courses", "CourseList", "Unit")</li>
 					}
@@ -39,7 +39,7 @@
 					}
 					@if (User.HasAccess(CourseRoles.Instructor))
 					{
-						<li>@Html.ActionLink("Пользователи", "List", "Account", new { role = LmsRoles.Admin }, null)</li>
+						<li>@Html.ActionLink("Пользователи", "List", "Account", new { courseRole = CourseRoles.CourseAdmin }, null)</li>
 						<li>@Html.ActionLink("CsSandbox", "Index", "Sandbox")</li>
 					}
 				</ul>
