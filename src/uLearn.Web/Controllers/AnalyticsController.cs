@@ -247,6 +247,7 @@ namespace uLearn.Web.Controllers
 			return PartialView(model);
 		}
 
+		[PostAuthorize(LmsRoles.Admin)]
 		public ActionResult SystemStatistics()
 		{
 			return View();

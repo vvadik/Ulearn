@@ -83,7 +83,7 @@ namespace uLearn
 			string courseId = "";
 			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions {Encoding = Encoding.GetEncoding(866)}))
 			{
-				courseId = Path.GetFileNameWithoutExtension(zipFile.Name);
+				courseId = GetCourseId(zipFile.Name);
 				var courseDir = coursesDirectory.CreateSubdirectory(courseId);
 				Directory.Delete(courseDir.FullName, true);
 				courseDir.Create();
@@ -98,6 +98,11 @@ namespace uLearn
 			var course = loader.LoadCourse(dir);
 			courses[course.Id] = course;
 		}
-		
+
+		public string GetCourseId(string packageName)
+		{
+			return Path.GetFileNameWithoutExtension(packageName);
+		}
+
 	}
 }

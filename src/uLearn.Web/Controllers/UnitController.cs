@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -26,10 +27,11 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult CourseList(string courseId = "")
 		{
+			var courses = new HashSet<string>(User.GetCoursesIdFor(CourseRoles.Admin));
 			var model = new CourseListViewModel
 			{
-				Courses = courseManager.GetCourses().ToList(), 
-				PackageNames = courseManager.GetStagingPackages().ToList(),
+				Courses = courseManager.GetCourses().Where(course => courses.Contains(course.Id)).ToList(), 
+				PackageNames = courseManager.GetStagingPackages().Where(package => courses.Contains(courseManager.GetCourseId(package.Name))).ToList(),
 				LastLoadedCourse = courseId
 			};
 			return View(model);
@@ -38,7 +40,10 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		public ActionResult ReloadCourse(string packageName, string returnUrl = null)
 		{
-			var courseId = courseManager.ReloadCourse(packageName);
+			var courseId = courseManager.GetCourseId(packageName);
+			if (!User.HasAccessFor(courseId, CourseRoles.Admin))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			courseManager.ReloadCourse(packageName);
 			if (returnUrl != null) return Redirect(returnUrl);
 			return RedirectToAction("CourseList", new { courseId });
 		}
@@ -51,9 +56,9 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult List(string courseId)
 		{
-			Course course = courseManager.GetCourse(courseId);
-			List<UnitAppearance> appearances = db.Units.Where(u => u.CourseId == course.Id).ToList();
-			List<Tuple<string, UnitAppearance>> unitAppearances =
+			var course = courseManager.GetCourse(courseId);
+			var appearances = db.Units.Where(u => u.CourseId == course.Id).ToList();
+			var unitAppearances =
 				course.Slides
 					.Select(s => s.Info.UnitName)
 					.Distinct()
@@ -94,6 +99,9 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult DownloadPackage(string packageName)
 		{
+			var courseId = courseManager.GetCourseId(packageName);
+			if (!User.HasAccessFor(courseId, CourseRoles.Admin))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			return File(courseManager.GetStagingPackagePath(packageName), "application/zip", packageName);
 		}
 
@@ -106,10 +114,13 @@ namespace uLearn.Web.Controllers
 			var fileName = Path.GetFileName(file.FileName);
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
 				return RedirectToAction("CourseList");
+			var courseId = courseManager.GetCourseId(fileName);
+			if (User.HasAccessFor(courseId, CourseRoles.Admin))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			var destinationFile = courseManager.StagedDirectory.GetFile(fileName);
 			file.SaveAs(destinationFile.FullName);
-			var courseId = courseManager.ReloadCourse(fileName);
+			courseManager.ReloadCourse(fileName);
 			return RedirectToAction("CourseList", new { courseId });
 		}
 	}
