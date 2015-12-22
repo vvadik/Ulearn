@@ -34,7 +34,7 @@ namespace uLearn.Web.Controllers
 			this.courseManager = courseManager;
 		}
 
-		[PostAuthorize(Roles = LmsRoles.Admin)]
+		[PostAuthorize(CourseRoles.Admin)]
 		public ActionResult FixQuestions()
 		{
 			var fixedQuestions = new List<string>();
@@ -67,7 +67,7 @@ namespace uLearn.Web.Controllers
 			return Content("Fixed:\n" + string.Join("\n", fixedQuestions) + "\n\n" + "Removed:\n" + string.Join("\n", removedQuestions));
 		}
 
-		[PostAuthorize(Roles = LmsRoles.Instructor + "," + LmsRoles.Admin)]
+		[PostAuthorize(CourseRoles.Instructor)]
 		public ActionResult Items(string courseId, string unitName = null)
 		{
 			IQueryable<UserQuestion> questions = db.UserQuestions;
@@ -86,7 +86,7 @@ namespace uLearn.Web.Controllers
 			return PartialView(result);
 		}
 
-		[PostAuthorize(Roles = LmsRoles.Instructor + "," + LmsRoles.Admin)]
+		[PostAuthorize(CourseRoles.Instructor)]
 		public ActionResult ItemsOfUser(string userId, string courseId = null)
 		{
 			IQueryable<UserQuestion> questions = db.UserQuestions.Where(q => q.UserId == userId);

@@ -43,7 +43,7 @@
 					<small>У вас остал@(remains == 1 ? "а" : "о")сь @remains из @(Model.MaxDropCount + 1) попыток</small>
 				}
 			}
-			else if (User.IsInRole(LmsRoles.Tester))
+			else if (User.HasAccessFor(Model.CourseId, CourseRoles.Tester))
 			{
 				using (Html.BeginForm("ClearAnswers", "Quiz"))
 				{
@@ -55,7 +55,7 @@
 			}
 		</div>
 	}
-	if (User.IsInRole(LmsRoles.Instructor))
+	if (User.HasAccessFor(Model.CourseId, CourseRoles.Instructor))
 	{
 		<h2>Статистика ответов</h2>
 		@Utils.TimeSwitchablePanel("quiz-statistic",

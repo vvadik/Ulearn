@@ -12,7 +12,7 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	[PostAuthorize(Roles = LmsRoles.Admin)]
+	[PostAuthorize(CourseRoles.Admin)]
 	public class UnitController : Controller
 	{
 		private readonly CourseManager courseManager;

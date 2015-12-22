@@ -18,9 +18,7 @@ namespace uLearn.Web.Migrations
 		{
 			var roleStore = new RoleStore<IdentityRole>(context);
 			var roleManager = new RoleManager<IdentityRole>(roleStore);
-			roleManager.Create(new IdentityRole(LmsRoles.Instructor));
 			roleManager.Create(new IdentityRole(LmsRoles.Admin));
-			roleManager.Create(new IdentityRole(LmsRoles.Tester));
 			if (!context.Users.Any(u => u.UserName == "user"))
 			{
 				var userStore = new UserStore<ApplicationUser>();

@@ -9,7 +9,7 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	[PostAuthorize(Roles = LmsRoles.Admin + "," + LmsRoles.Instructor)]
+	[PostAuthorize(CourseRoles.Instructor)]
 	public class SandboxController : Controller
 	{
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();

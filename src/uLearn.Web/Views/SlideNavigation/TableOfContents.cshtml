@@ -8,7 +8,7 @@
 
 <div class="side-bar navbar-collapse collapse navbar-nav container">
 
-	@if (User.IsInRole(LmsRoles.Admin))
+	@if (User.HasAccessFor(Model.Course.Id, CourseRoles.Admin))
 	{
 		var currentUrl = Request.Url;
 		if (currentUrl != null)
