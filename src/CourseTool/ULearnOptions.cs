@@ -31,7 +31,7 @@ namespace uLearn.CourseTool
 			if (Download)
 				ULearnInteractor.Download(Dir, Force, Config, profile.UlearnUrl, credentials);
 			if (Upload)
-				ULearnInteractor.Upload(Dir, Force, Config, profile.UlearnUrl, credentials);
+				ULearnInteractor.Upload(Dir, Config, profile.UlearnUrl, credentials);
 		}
 	}
 }
