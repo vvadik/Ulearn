@@ -1,4 +1,4 @@
-﻿function ToggleRole(event, target) {
+﻿function ToggleRole(event, target, toggleClass) {
 	event.stopPropagation();
 	var obj = $(target);
 	var url = obj.data("toggle-url");
@@ -11,25 +11,27 @@
 			}
 		})
 		.success(function() {
-			ToggleClasses(obj);
+			toggleClass(obj);
 		});
 }
 
-function ToggleClasses(obj) {
-	obj.toggleClass(obj.data("css-class"));
-	var parents = obj.parents();
-	for (var ind = 0; ind < parents.length; ++ind) {
-		var parent = $(parents[ind]);
-		if (parent.hasClass("role-btn-group"))
+function ToggleButtonClass(button) {
+	button.toggleClass(button.data("css-class"));
+}
+
+function ToggleDropDownClass(dropdownElement) {
+	var parent = $(dropdownElement.parents()[0]);
+	var cssClass = parent.data("css-class");
+	dropdownElement.toggleClass(cssClass);
+	var elements = dropdownElement.siblings().andSelf();
+	var button = $(parent.siblings("button")[0]);
+	var buttonCss = button.data("css-class");
+	button.removeClass(buttonCss);
+	for (var i = 0; i < elements.length; ++i) {
+		var elem = $(elements[i]);
+		if (elem.hasClass(cssClass)) {
+			button.addClass(buttonCss);
 			break;
-		if (!parent.data("css-class"))
-			continue;
-		parent.removeClass(parent.data("css-class"));
-		var children = parent.children("[data-css-class]");
-		for (var i = 0; i < children.length; ++i) {
-			var child = $(children[i]);
-			if (child.hasClass(child.data("css-class")))
-				parent.addClass(parent.data("css-class"));
 		}
 	}
 }

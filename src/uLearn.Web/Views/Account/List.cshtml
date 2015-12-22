@@ -40,7 +40,7 @@
 				<td>@Html.ActionLink(user.UserName, "Info", new { userName = user.UserName })</td>
 				<td>@user.GroupName</td>
 				<td>
-					<div class="btn-group role-btn-group">
+					<div class="btn-group">
 						@RoleButton(user, LmsRoles.Admin, "danger")
 						@RoleButton(user, CourseRoles.Admin, "warning")
 						@RoleButton(user, CourseRoles.Instructor, "info")
@@ -64,15 +64,14 @@
 
 @helper RoleButton(UserModel user, string role, string cssClass)
 {
-	<div class="btn-group">
-		<button type="button"
-				class="btn btn-sm btn-default btn-@RoleButtonClass(user, role, cssClass)"
-				data-css-class="btn-@cssClass"
-				data-toggle-url="@Url.Action("ToggleSystemAdministratorRole", new { userId = user.UserId })"
-				onclick=" ToggleRole(event, this) ">
-			@role
-		</button>
-	</div>
+	<button type="button"
+			class="btn btn-sm btn-default btn-@RoleButtonClass(user, role, cssClass)"
+			data-css-class="btn-@cssClass"
+			data-toggle-url="@Url.Action("ToggleSystemAdministratorRole", new { userId = user.UserId })"
+			onclick=" ToggleRole(event, this, ToggleButtonClass) ">
+		@role
+	</button>
+
 }
 
 @helper RoleButton(UserModel user, CourseRoles role, string cssClass)
@@ -86,13 +85,12 @@
 				aria-expanded="false">
 			@role <span class="caret"></span>
 		</button>
-		<ul class="dropdown-menu">
+		<ul class="dropdown-menu" data-css-class="li-@cssClass">
 			@foreach (var courseId in Model.Courses)
 			{
-				<li data-css-class="li-@cssClass"
-					class="li-@RoleLiClass(user, role, courseId, cssClass)"
+				<li class="li-@RoleLiClass(user, role, courseId, cssClass)"
 					data-toggle-url="@Url.Action("ToggleRole", new { userId = user.UserId, courseId, role })"
-					onclick="ToggleRole(event, this)">
+					onclick="ToggleRole(event, this, ToggleDropDownClass)">
 					<a>@courseId</a>
 				</li>
 			}
