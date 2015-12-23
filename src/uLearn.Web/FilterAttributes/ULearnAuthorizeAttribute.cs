@@ -7,7 +7,7 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web.FilterAttributes
 {
-	public class PostAuthorizeAttribute : AuthorizeAttribute
+	public class ULearnAuthorizeAttribute : AuthorizeAttribute
 	{
 		public CourseRoles MinAccessLevel = CourseRoles.Student;
 
