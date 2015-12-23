@@ -27,7 +27,7 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult CourseList(string courseId = "")
 		{
-			var courses = new HashSet<string>(User.GetCoursesIdFor(CourseRoles.CourseAdmin));
+			var courses = new HashSet<string>(User.GetControllableCoursesId());
 			var model = new CourseListViewModel
 			{
 				Courses = courseManager.GetCourses().Where(course => courses.Contains(course.Id)).Select(course => new CourseViewModel
