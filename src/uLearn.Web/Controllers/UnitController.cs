@@ -13,7 +13,7 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	[PostAuthorize(MinAccessLevel = CourseRoles.CourseAdmin)]
+	[ULearnAuthorize(MinAccessLevel = CourseRoles.CourseAdmin)]
 	public class UnitController : Controller
 	{
 		private readonly CourseManager courseManager;

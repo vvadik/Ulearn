@@ -12,7 +12,7 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	[PostAuthorize(MinAccessLevel = CourseRoles.Instructor)]
+	[ULearnAuthorize(MinAccessLevel = CourseRoles.Instructor)]
 	public class AnalyticsController : Controller
 	{
 		private readonly ULearnDb db = new ULearnDb();
@@ -184,7 +184,7 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		[PostAuthorize]
+		[ULearnAuthorize]
 		public ActionResult PersonalStatistics(string courseId)
 		{
 			var course = courseManager.GetCourse(courseId);
@@ -247,7 +247,7 @@ namespace uLearn.Web.Controllers
 			return PartialView(model);
 		}
 
-		[PostAuthorize(Roles = LmsRoles.SysAdmin)]
+		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]
 		public ActionResult SystemStatistics()
 		{
 			return View();

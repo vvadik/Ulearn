@@ -12,7 +12,7 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	[PostAuthorize]
+	[ULearnAuthorize]
 	public class VisitersController : Controller
 	{
 		private readonly VisitersRepo visitersRepo = new VisitersRepo();

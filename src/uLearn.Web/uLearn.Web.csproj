@@ -275,7 +275,7 @@
     <Compile Include="DataContexts\TextsRepo.cs" />
     <Compile Include="DataContexts\UnitsRepo.cs" />
     <Compile Include="DataContexts\UserRolesRepo.cs" />
-    <Compile Include="FilterAttributes\PostAuthorizeAttribute.cs" />
+    <Compile Include="FilterAttributes\ULearnAuthorizeAttribute.cs" />
     <Compile Include="Migrations\201512211221278_CustomRoleSystem.cs" />
     <Compile Include="Migrations\201512211221278_CustomRoleSystem.Designer.cs">
       <DependentUpon>201512211221278_CustomRoleSystem.cs</DependentUpon>
