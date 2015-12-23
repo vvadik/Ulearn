@@ -2,6 +2,8 @@
 
 @{
 	ViewBag.Title = "Admin Users";
+	var isSystemAdministrator = User.IsSystemAdministrator();
+	var isCourseAdministrator = User.HasAccess(CourseRoles.CourseAdmin);
 }
 
 @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "AntiForgeryTokenContainer" }))
@@ -28,8 +30,11 @@
 		<tr>
 			<th>Имя</th>
 			<th>Группа</th>
-			<th>Роли</th>
-			@if (User.IsSystemAdministrator())
+			@if (isCourseAdministrator)
+			{
+				<th>Роли</th>
+			}
+			@if (isSystemAdministrator)
 			{
 				<th>Удаление</th>
 			}
@@ -39,15 +44,21 @@
 			<tr data-userid="@user.UserId">
 				<td>@Html.ActionLink(user.UserName, "Info", new { userName = user.UserName })</td>
 				<td>@user.GroupName</td>
-				<td>
-					<div class="btn-group">
-						@RoleButton(user, LmsRoles.SysAdmin, "danger")
-						@RoleButton(user, CourseRoles.CourseAdmin, "warning")
-						@RoleButton(user, CourseRoles.Instructor, "info")
-						@RoleButton(user, CourseRoles.Tester, "success")
-					</div>
-				</td>
-				@if (User.IsSystemAdministrator())
+				@if (isCourseAdministrator)
+				{
+					<td>
+						<div class="btn-group">
+							@if (isSystemAdministrator)
+							{
+								@RoleButton(user, LmsRoles.SysAdmin, "danger")
+							}
+							@RoleButton(user, CourseRoles.CourseAdmin, "warning")
+							@RoleButton(user, CourseRoles.Instructor, "info")
+							@RoleButton(user, CourseRoles.Tester, "success")
+						</div>
+					</td>
+				}
+				@if (isSystemAdministrator)
 				{
 					<td>
 						@using (Html.BeginForm("DeleteUser", "Account", new { userId = user.UserId }, FormMethod.Post))
