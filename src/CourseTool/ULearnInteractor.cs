@@ -48,7 +48,7 @@ namespace uLearn.CourseTool
 		{
 			var fileName = config.ULearnCourseId + ".zip";
 			var fileFullName = Path.Combine(baseDir, fileName);
-			var downloadUrl = string.Format("{0}/Unit/DownloadPackage?packageName={1}", ulearnUrl, HttpUtility.UrlEncode(fileName));
+			var downloadUrl = string.Format("{0}/Unit/DownloadPackage?courseId={1}", ulearnUrl, HttpUtility.UrlEncode(config.ULearnCourseId));
 
 			var client = Login(ulearnUrl, credentials.Email, credentials.GetPassword());
 			client.TryDownloadFile(downloadUrl, fileFullName);

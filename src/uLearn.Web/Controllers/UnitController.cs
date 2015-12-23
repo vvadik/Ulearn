@@ -30,20 +30,21 @@ namespace uLearn.Web.Controllers
 			var courses = new HashSet<string>(User.GetCoursesIdFor(CourseRoles.CourseAdmin));
 			var model = new CourseListViewModel
 			{
-				Courses = courseManager.GetCourses().Where(course => courses.Contains(course.Id)).ToList(), 
-				PackageNames = courseManager.GetStagingPackages().Where(package => courses.Contains(courseManager.GetCourseId(package.Name))).ToList(),
+				Courses = courseManager.GetCourses().Where(course => courses.Contains(course.Id)).Select(course => new CourseViewModel
+				{
+					Id = course.Id,
+					Title = course.Title,
+					LastWriteTime = courseManager.GetLastWriteTime(course)
+				}).ToList(), 
 				LastLoadedCourse = courseId
 			};
 			return View(model);
 		}
 		
 		[HttpPost]
-		public ActionResult ReloadCourse(string packageName, string returnUrl = null)
+		public ActionResult ReloadCourse(string courseId, string returnUrl = null)
 		{
-			var courseId = courseManager.GetCourseId(packageName);
-			if (!User.HasAccessFor(courseId, CourseRoles.CourseAdmin))
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-			courseManager.ReloadCourse(packageName);
+			courseManager.ReloadCourse(courseId);
 			if (returnUrl != null) return Redirect(returnUrl);
 			return RedirectToAction("CourseList", new { courseId });
 		}
@@ -97,12 +98,10 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("List", new { courseId });
 		}
 
-		public ActionResult DownloadPackage(string packageName)
+		public ActionResult DownloadPackage(string courseId)
 		{
-			var courseId = courseManager.GetCourseId(packageName);
-			if (!User.HasAccessFor(courseId, CourseRoles.CourseAdmin))
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-			return File(courseManager.GetStagingPackagePath(packageName), "application/zip", packageName);
+			var packageName = courseManager.GetPackageName(courseId);
+			return File(courseManager.GetStagingCoursePath(courseId), "application/zip", packageName);
 		}
 
 		[HttpPost]
@@ -114,7 +113,7 @@ namespace uLearn.Web.Controllers
 			var fileName = Path.GetFileName(file.FileName);
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
 				return RedirectToAction("CourseList");
-			var courseId = courseManager.GetCourseId(fileName);
+			var courseId = CourseManager.GetCourseId(fileName);
 			if (User.HasAccessFor(courseId, CourseRoles.CourseAdmin))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
@@ -144,9 +143,15 @@ namespace uLearn.Web.Controllers
 
 	public class CourseListViewModel
 	{
-		public List<Course> Courses;
-		public List<StagingPackage> PackageNames;
+		public List<CourseViewModel> Courses;
 		public string LastLoadedCourse { get; set; }
+	}
+
+	public class CourseViewModel
+	{
+		public string Title { get; set; }
+		public string Id { get; set; }
+		public DateTime LastWriteTime { get; set; }
 	}
 
 }

@@ -21,13 +21,13 @@
 
 	<h2>Пакеты курсов</h2>
 	<table class="table table-condensed">
-		@foreach (var package in Model.PackageNames)
+		@foreach (var course in Model.Courses)
 		{
 			<tr>
-				<td>@package.Timestamp.ToString("dd.MM.yyyy hh:mm:ss")</td>
-				<td>@Html.ActionLink(package.Name, "DownloadPackage", new { packageName = package.Name })</td>
+				<td>@course.LastWriteTime.ToString("dd.MM.yyyy hh:mm:ss")</td>
+				<td>@Html.ActionLink(course.Id, "DownloadPackage", new { courseId = course.Id })</td>
 				<td>
-					@using (Html.BeginForm("ReloadCourse", "Unit", new { packageName = package.Name }, FormMethod.Post))
+					@using (Html.BeginForm("ReloadCourse", "Unit", new { courseId = course.Id }, FormMethod.Post))
 					{
 						<button type="submit" class="btn btn-sm btn-danger">перечитать</button>
 					}

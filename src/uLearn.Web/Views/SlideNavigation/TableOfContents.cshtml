@@ -14,7 +14,7 @@
 		if (currentUrl != null)
 		{
 			<div>
-				@using (Html.BeginForm("ReloadCourse", "Unit", new { packageName = Model.Course.Id + ".zip", returnUrl = currentUrl }, FormMethod.Post))
+				@using (Html.BeginForm("ReloadCourse", "Unit", new { courseId = Model.Course.Id, returnUrl = currentUrl }, FormMethod.Post))
 				{
 					<button type="submit" class="btn btn-sm btn-danger">reload course</button>
 					<span class="text-muted">← видно только админам</span>
