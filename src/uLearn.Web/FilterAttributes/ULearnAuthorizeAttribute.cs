@@ -44,7 +44,7 @@ namespace uLearn.Web.FilterAttributes
 			if (courseIds == null)
 				return user.HasAccess(MinAccessLevel);
 
-			var courseId = courseIds.Split(',').FirstOrDefault();
+			var courseId = courseIds.Split(delims).SingleOrDefault();
 			return user.HasAccessFor(courseId, MinAccessLevel);
 		}
 
@@ -61,6 +61,8 @@ namespace uLearn.Web.FilterAttributes
 			set { throw new NotImplementedException(); }
 		}
 
+		private static readonly char[] delims = { ',' };
+
 		private static string[] SplitString(string original)
 		{
 			if (String.IsNullOrEmpty(original))
@@ -69,7 +71,7 @@ namespace uLearn.Web.FilterAttributes
 			}
 
 			return original
-				.Split(',')
+				.Split(delims)
 				.Select(piece => piece.Trim())
 				.Where(s => !String.IsNullOrEmpty(s))
 				.ToArray();
