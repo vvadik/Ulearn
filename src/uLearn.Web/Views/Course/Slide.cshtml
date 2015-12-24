@@ -72,13 +72,13 @@
 			fillRate('@Model.Rate');
 			$("#selectGroupModal").modal();
 			displayVisits();
-			uploadVisiters("@Url.Action("Upload", "Visiters")");
+			uploadVisits("@Url.Action("Upload", "Visits")");
 		</script>
 	}
 	else
 	{
 		<script>
-			saveVisiters("@Model.Slide.Id", "@DateTime.Now.ToString("u")");
+			saveVisits("@Model.Slide.Id", "@DateTime.Now.ToString("u")");
 			displayVisits();
 		</script>
 	}

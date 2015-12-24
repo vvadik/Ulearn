@@ -43,6 +43,16 @@ namespace uLearn.CourseTool
 			Utils.DirectoryCopy(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "renderer"), htmlDir, true);
 		}
 
+		public string FindLastChangedSlideHtmlPath()
+		{
+			var files = Directory.GetFiles(htmlDir, "*.html");
+			if (files.Length == 0)
+				return null;
+			return files
+				.Select(fn => Tuple.Create(File.GetLastWriteTime(fn), Path.GetFileName(fn)))
+				.Max().Item2;
+		}
+
 		public void Start()
 		{
 			try

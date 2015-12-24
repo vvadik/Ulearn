@@ -22,7 +22,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly UnitsRepo unitsRepo = new UnitsRepo();
-		private readonly VisitersRepo visitersRepo = new VisitersRepo(); 
+		private readonly VisitsRepo visitsRepo = new VisitsRepo(); 
 		private readonly LtiRequestsRepo ltiRequestsRepo = new LtiRequestsRepo();
 
 		public CourseController()
@@ -106,7 +106,7 @@ namespace uLearn.Web.Controllers
 		private int GetInitialIndexForStartup(string courseId, Course course, List<string> visibleUnits)
 		{
 			var userId = User.Identity.GetUserId();
-			var visitedIds = visitersRepo.GetIdOfVisitedSlides(courseId, userId);
+			var visitedIds = visitsRepo.GetIdOfVisitedSlides(courseId, userId);
 			var visibleSlides = course.Slides.Where(slide => visibleUnits.Contains(slide.Info.UnitName)).OrderBy(slide => slide.Index).ToList();
 			var lastVisited = visibleSlides.LastOrDefault(slide => visitedIds.Contains(slide.Id));
 			if (lastVisited == null)
@@ -176,7 +176,7 @@ namespace uLearn.Web.Controllers
 			if (slideIndex == -1)
 				slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
 			var userId = User.Identity.GetUserId();
-			var isFirstCourseVisit = !db.Visiters.Any(x => x.UserId == userId);
+			var isFirstCourseVisit = !db.Visits.Any(x => x.UserId == userId);
 			var slide = course.Slides[slideIndex];
 			var slideId = slide.Id;
 			var visiter = await VisitSlide(courseId, slideId);
@@ -196,9 +196,9 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, string userId, Visiters visiter, bool isLti = false)
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, string userId, Visit visit, bool isLti = false)
 		{
-			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visiter, isLti)).ToArray();
+			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visit, isLti)).ToArray();
 			return new BlockRenderContext(
 				course,
 				slide,
@@ -206,12 +206,12 @@ namespace uLearn.Web.Controllers
 				blockData);
 		}
 
-		private dynamic CreateBlockData(Course course, Slide slide, SlideBlock slideBlock, Visiters visiter, bool isLti)
+		private dynamic CreateBlockData(Course course, Slide slide, SlideBlock slideBlock, Visit visit, bool isLti)
 		{
 			if (slideBlock is ExerciseBlock)
 			{
-				var lastAcceptedSolution = solutionsRepo.FindLatestAcceptedSolution(course.Id, slide.Id, visiter.UserId);
-				return new ExerciseBlockData(true, visiter.IsSkipped, lastAcceptedSolution)
+				var lastAcceptedSolution = solutionsRepo.FindLatestAcceptedSolution(course.Id, slide.Id, visit.UserId);
+				return new ExerciseBlockData(true, visit.IsSkipped, lastAcceptedSolution)
 				{
 					RunSolutionUrl = Url.Action("RunSolution", "Exercise", new { courseId = course.Id, slideIndex = slide.Index, isLti }),
 					AcceptedSolutionUrl = Url.Action("AcceptedSolutions", "Course", new { courseId = course.Id, slideIndex = slide.Index }),
@@ -227,9 +227,9 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.Slides[slideIndex];
-			var isPassed = visitersRepo.IsPassed(slide.Id, userId);
+			var isPassed = visitsRepo.IsPassed(slide.Id, userId);
 			if (!isPassed)
-				await visitersRepo.SkipSlide(courseId, slide.Id, userId);
+				await visitsRepo.SkipSlide(courseId, slide.Id, userId);
 			var solutions = solutionsRepo.GetAllAcceptedSolutions(courseId, slide.Id);
 			foreach (var solution in solutions)
 			{
@@ -256,7 +256,7 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.Slides[slideIndex];
-			var isSkippedOrPassed = visitersRepo.IsSkippedOrPassed(slide.Id, userId);
+			var isSkippedOrPassed = visitsRepo.IsSkippedOrPassed(slide.Id, userId);
 			var model = new ExerciseBlockData
 			{
 				IsSkippedOrPassed = isSkippedOrPassed,
@@ -289,13 +289,13 @@ namespace uLearn.Web.Controllers
 			return Json(new { likesCount = res.Item1, liked = res.Item2 });
 		}
 
-		public async Task<Visiters> VisitSlide(string courseId, string slideId)
+		public async Task<Visit> VisitSlide(string courseId, string slideId)
 		{
 			if (!User.Identity.IsAuthenticated)
 				return null;
 			var userId = User.Identity.GetUserId();
-			await visitersRepo.AddVisiter(courseId, slideId, userId);
-			return visitersRepo.GetVisiter(slideId, userId);
+			await visitsRepo.AddVisit(courseId, slideId, userId);
+			return visitsRepo.GetVisiter(slideId, userId);
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRoles.Instructor)]
@@ -314,7 +314,7 @@ namespace uLearn.Web.Controllers
 			var solution = await db.UserSolutions.FirstOrDefaultAsync(s => s.Id == solutionId);
 			if (solution != null)
 			{
-				var visit = await db.Visiters.FirstOrDefaultAsync(v => v.UserId == solution.UserId && v.SlideId == solution.SlideId);
+				var visit = await db.Visits.FirstOrDefaultAsync(v => v.UserId == solution.UserId && v.SlideId == solution.SlideId);
 				if (visit != null)
 				{
 					visit.IsPassed = db.UserSolutions.Any(s => s.UserId == solution.UserId && s.SlideId == solution.SlideId && s.IsRightAnswer && s.Id != solutionId);
@@ -335,7 +335,7 @@ namespace uLearn.Web.Controllers
 			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.UserSolution.SlideId == slideId));
 			RemoveFrom(db.UserSolutions, slideId, userId);
 			RemoveFrom(db.UserQuizzes, slideId, userId);
-			RemoveFrom(db.Visiters, slideId, userId);
+			RemoveFrom(db.Visits, slideId, userId);
 			db.UserQuestions.RemoveRange(db.UserQuestions.Where(q => q.UserId == userId && q.SlideId == slideId));
 			db.SlideRates.RemoveRange(db.SlideRates.Where(q => q.UserId == userId && q.SlideId == slideId));
 			db.Hints.RemoveRange(db.Hints.Where(q => q.UserId == userId && q.SlideId == slideId));

@@ -1,4 +1,5 @@
-﻿@model UnitStatisticPageModel
+﻿@using uLearn.Web.Views.Shared.Helpers
+@model UnitStatisticPageModel
 @{
 	ViewBag.Title = "Статистика и успеваемость";
 	var args = new {courseId = Model.CourseId, unitName = Model.UnitName};
@@ -30,7 +31,7 @@
 		<div class="load-content" data-url="@Url.Action("DailyStatistics", args)"></div>
 
 		<h2 id="progress">Прогресс по студентам.</h2>
-		@Utils.TimeSwitchablePanel("progress-panel",
+		@SwitchablePanel.TimePanel("progress-panel",
 			arg => Url.Action("UsersProgress", arg),
 			args,
 			Tuple.Create("За полгода", 365.0 / 2)

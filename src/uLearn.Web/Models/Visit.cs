@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace uLearn.Web.Models
 {
-	public class Visiters : ISlideAction
+	public class Visit : ISlideAction
 	{
 		[Key]
 		public int Id { get; set; }
@@ -13,7 +13,7 @@ namespace uLearn.Web.Models
 
 		[StringLength(64)]
 		[Required]
-		[Index("SlideAndUser", 1)]
+		[Index("IDX_Visits_UserAndSlide", 1)]
 		public string UserId { get; set; }
 
 		[Required]
@@ -22,12 +22,13 @@ namespace uLearn.Web.Models
 
 		[Required]
 		[StringLength(64)]
-		[Index("SlideAndUser", 2)]
-		[Index("SlideAndTime", 1)]
+		[Index("IDX_Visits_UserAndSlide", 2)]
+		[Index("IDX_Visits_SlideAndTime", 1)]
 		public string SlideId { get; set; }
 
+		///<summary>Первый заход на слайд</summary>
 		[Required]
-		[Index("SlideAndTime", 2)]
+		[Index("IDX_Visits_SlideAndTime", 2)]
 		public DateTime Timestamp { get; set; }
 
 		public int Score { get; set; }

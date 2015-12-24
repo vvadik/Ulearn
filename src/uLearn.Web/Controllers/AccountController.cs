@@ -150,7 +150,7 @@ namespace uLearn.Web.Controllers
 			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
 			if (user == null)
 				return RedirectToAction("List");
-			var courses = new HashSet<string>(db.Visiters.Where(v => v.UserId == user.Id).Select(v => v.CourseId).Distinct());
+			var courses = new HashSet<string>(db.Visits.Where(v => v.UserId == user.Id).Select(v => v.CourseId).Distinct());
 			return View(new UserInfoModel(user, courseManager.GetCourses().Where(c => courses.Contains(c.Id)).ToArray()));
 		}
 

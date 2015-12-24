@@ -12,7 +12,7 @@ namespace uLearn.Web.Controllers
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 		private readonly UnitsRepo unitsRepo = new UnitsRepo();
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
-		private readonly VisitersRepo visitersRepo = new VisitersRepo();
+		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 		
 		public ActionResult TableOfContents(string courseId, int slideIndex = -1)
@@ -50,8 +50,8 @@ namespace uLearn.Web.Controllers
 		{
 			var visibleUnits = unitsRepo.GetVisibleUnits(course.Id, User);
 			var solved = GetSolvedSlides(course, userId);
-			var visited = visitersRepo.GetIdOfVisitedSlides(course.Id, userId);
-			var scoresForSlides = visitersRepo.GetScoresForSlides(course.Id, userId);
+			var visited = visitsRepo.GetIdOfVisitedSlides(course.Id, userId);
+			var scoresForSlides = visitsRepo.GetScoresForSlides(course.Id, userId);
 			var builder = new TocModelBuilder(
 				s => Url.Action("Slide", "Course", new { courseId = course.Id, slideIndex = s.Index }),
 				s => scoresForSlides.ContainsKey(s.Id) ? scoresForSlides[s.Id] : 0,
@@ -73,7 +73,7 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.Slides[slideIndex];
 			var userId = User.Identity.GetUserId();
-			var nextIsAcceptedSolutions = !onSolutionsSlide && slide is ExerciseSlide && visitersRepo.IsSkippedOrPassed(slide.Id, userId);
+			var nextIsAcceptedSolutions = !onSolutionsSlide && slide is ExerciseSlide && visitsRepo.IsSkippedOrPassed(slide.Id, userId);
 			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
 			var nextSlide = course.Slides.FirstOrDefault(s => s.Index > slideIndex && visibleUnits.Contains(s.Info.UnitName));
 			var prevSlide = course.Slides.LastOrDefault(s => s.Index < slideIndex && visibleUnits.Contains(s.Info.UnitName));

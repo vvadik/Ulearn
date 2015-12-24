@@ -268,7 +268,7 @@
     <Compile Include="Controllers\SlideNavigationController.cs" />
     <Compile Include="Controllers\ExerciseController.cs" />
     <Compile Include="Controllers\HintController.cs" />
-    <Compile Include="Controllers\VisitersController.cs" />
+    <Compile Include="Controllers\VisitsController.cs" />
     <Compile Include="DataContexts\ConsumersRepo.cs" />
     <Compile Include="DataContexts\LtiRequestsRepo.cs" />
     <Compile Include="DataContexts\RestoreRequestRepo.cs" />
@@ -325,9 +325,13 @@
     <Compile Include="Migrations\201512021145426_QuizStatisticsIndex.Designer.cs">
       <DependentUpon>201512021145426_QuizStatisticsIndex.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201512141043098_ChangeVisitsIndex.cs" />
-    <Compile Include="Migrations\201512141043098_ChangeVisitsIndex.Designer.cs">
-      <DependentUpon>201512141043098_ChangeVisitsIndex.cs</DependentUpon>
+    <Compile Include="Migrations\201512210801368_ChangeVisitsIndex.cs" />
+    <Compile Include="Migrations\201512210801368_ChangeVisitsIndex.Designer.cs">
+      <DependentUpon>201512210801368_ChangeVisitsIndex.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201512210814206_RenameTableVisitersToVisits.cs" />
+    <Compile Include="Migrations\201512210814206_RenameTableVisitersToVisits.Designer.cs">
+      <DependentUpon>201512210814206_RenameTableVisitersToVisits.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\BlockRenderContext.cs" />
     <Compile Include="Models\ExternalLoginsListModel.cs" />
@@ -410,7 +414,7 @@
     <Compile Include="DataContexts\UserQuizzesRepo.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo_should.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo.cs" />
-    <Compile Include="DataContexts\VisitersRepo.cs" />
+    <Compile Include="DataContexts\VisitsRepo.cs" />
     <Compile Include="Migrations\201407111234255_InitialCreate.cs" />
     <Compile Include="Migrations\201407111234255_InitialCreate.Designer.cs">
       <DependentUpon>201407111234255_InitialCreate.cs</DependentUpon>
@@ -452,6 +456,7 @@
       <DependentUpon>201408201208379_AddIsRightQuizBlock.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\UserCourseModel.cs" />
+    <Compile Include="Models\Visit.cs" />
     <Compile Include="Models\UserRole.cs" />
     <Compile Include="Models\WebCourseManager_should.cs" />
     <Compile Include="Views\Course\AcceptedSolutionsHtml.generated.cs">
@@ -468,6 +473,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SlideHtml.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\Helpers\SwitchablePanel.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SwitchablePanel.cshtml</DependentUpon>
     </Compile>
     <Compile Include="Views\SlideNavigation\TableOfContents.generated.cs">
       <AutoGen>True</AutoGen>
@@ -510,7 +520,6 @@
     <Compile Include="Models\UserQuiz.cs" />
     <Compile Include="Models\UserSolution.cs" />
     <Compile Include="Models\UsersStatsPageModel.cs" />
-    <Compile Include="Models\Visiters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <EmbeddedResource Include="Migrations\201407111234255_InitialCreate.resx">
@@ -609,8 +618,11 @@
     <EmbeddedResource Include="Migrations\201512021145426_QuizStatisticsIndex.resx">
       <DependentUpon>201512021145426_QuizStatisticsIndex.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201512141043098_ChangeVisitsIndex.resx">
-      <DependentUpon>201512141043098_ChangeVisitsIndex.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201512210801368_ChangeVisitsIndex.resx">
+      <DependentUpon>201512210801368_ChangeVisitsIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512210814206_RenameTableVisitersToVisits.resx">
+      <DependentUpon>201512210814206_RenameTableVisitersToVisits.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201512211221278_CustomRoleSystem.resx">
       <DependentUpon>201512211221278_CustomRoleSystem.cs</DependentUpon>
@@ -965,7 +977,7 @@
     <Content Include="Scripts\notify-custom.min.js" />
     <Content Include="Scripts\slide-diff.js" />
     <Content Include="Scripts\slide-guest.js" />
-    <Content Include="Scripts\slide-localvisiters.js" />
+    <Content Include="Scripts\slide-localvisits.js" />
     <Content Include="Scripts\slide-modals.js" />
     <Content Include="Scripts\slide-popovers.js" />
     <Content Include="Scripts\slide-quiz.js" />
@@ -1183,7 +1195,10 @@
     <Content Include="Views\RestorePassword\Index.cshtml" />
     <Content Include="Views\RestorePassword\SetNewPassword.cshtml" />
     <Content Include="Views\Course\_LoginForContinue.cshtml" />
-    <Content Include="App_Code\Utils.cshtml" />
+    <Content Include="Views\Shared\Helpers\SwitchablePanel.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>SwitchablePanel.generated.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

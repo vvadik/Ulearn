@@ -1,21 +1,21 @@
-﻿function saveVisiters(id, time) {
+﻿function saveVisits(id, time) {
 	var obj = {};
-	if (typeof localStorage['visiters'] !== 'undefined')
-		obj = JSON.parse(localStorage['visiters']);
+	if (typeof localStorage['visits'] !== 'undefined')
+		obj = JSON.parse(localStorage['visits']);
 	obj[id] = time;
-	localStorage['visiters'] = JSON.stringify(obj);
+	localStorage['visits'] = JSON.stringify(obj);
 }
 
-function uploadVisiters(url) {
-	if (typeof localStorage['visiters'] === 'undefined')
+function uploadVisits(url) {
+	if (typeof localStorage['visits'] === 'undefined')
 		return;
 	$.ajax({
 			type: 'POST',
 			url: url,
-			data: localStorage['visiters']
+			data: localStorage['visits']
 		})
 		.success(function(ans) {
-			localStorage.removeItem('visiters');
+			localStorage.removeItem('visits');
 		})
 		.fail(function(req) {
 			console.log(req.responseText);
@@ -23,9 +23,9 @@ function uploadVisiters(url) {
 }
 
 function displayVisits() {
-	if (typeof localStorage['visiters'] === 'undefined')
+	if (typeof localStorage['visits'] === 'undefined')
 		return;
-	var visits = JSON.parse(localStorage['visiters']);
+	var visits = JSON.parse(localStorage['visits']);
 	for (var visit in visits) {
 		var glyph = $('[data-slide-id="' + visit + '"] > i');
 		if (glyph.hasClass('glyphicon-none')) {

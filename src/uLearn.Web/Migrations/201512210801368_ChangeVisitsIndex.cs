@@ -8,14 +8,14 @@ namespace uLearn.Web.Migrations
         public override void Up()
         {
             DropIndex("dbo.Visiters", "SlideAndUser");
-            CreateIndex("dbo.Visiters", new[] { "UserId", "SlideId" }, name: "SlideAndUser");
-            CreateIndex("dbo.Visiters", new[] { "SlideId", "Timestamp" }, name: "SlideAndTime");
+            CreateIndex("dbo.Visiters", new[] { "UserId", "SlideId" }, name: "IDX_Visits_UserAndSlide");
+            CreateIndex("dbo.Visiters", new[] { "SlideId", "Timestamp" }, name: "IDX_Visits_SlideAndTime");
         }
         
         public override void Down()
         {
-            DropIndex("dbo.Visiters", "SlideAndTime");
-            DropIndex("dbo.Visiters", "SlideAndUser");
+            DropIndex("dbo.Visiters", "IDX_Visits_SlideAndTime");
+            DropIndex("dbo.Visiters", "IDX_Visits_UserAndSlide");
             CreateIndex("dbo.Visiters", new[] { "SlideId", "UserId" }, name: "SlideAndUser");
         }
     }

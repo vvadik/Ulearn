@@ -12,6 +12,7 @@ namespace uLearn.Web.Migrations
 		public Configuration()
 		{
 			AutomaticMigrationsEnabled = false;
+			CommandTimeout = 60 * 10; 
 		}
 
 		protected override void Seed(ULearnDb context)

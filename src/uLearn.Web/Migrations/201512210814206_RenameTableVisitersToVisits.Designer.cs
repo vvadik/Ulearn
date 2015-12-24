@@ -7,13 +7,13 @@ namespace uLearn.Web.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class ChangeVisitsIndex : IMigrationMetadata
+    public sealed partial class RenameTableVisitersToVisits : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangeVisitsIndex));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(RenameTableVisitersToVisits));
         
         string IMigrationMetadata.Id
         {
-            get { return "201512141043098_ChangeVisitsIndex"; }
+            get { return "201512210814206_RenameTableVisitersToVisits"; }
         }
         
         string IMigrationMetadata.Source

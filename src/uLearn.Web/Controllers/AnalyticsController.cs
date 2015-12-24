@@ -17,14 +17,11 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly CourseManager courseManager;
-		private readonly VisitersRepo visitersRepo = new VisitersRepo();
+		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo(); //TODO use in statistics
-
-		private readonly TimeSpan StandardPeriod = TimeSpan.FromDays(365.0 / 2);
-
 
 		public AnalyticsController()
 			: this(WebCourseManager.Instance)
@@ -64,7 +61,7 @@ namespace uLearn.Web.Controllers
 				var isExercise = exerciseSlide != null;
 				var isQuiz = quizSlide != null;
 				var hintsCountOnSlide = isExercise ? exerciseSlide.Exercise.HintsMd.Count() : 0;
-				var visitersCount = visitersRepo.GetVisitersCount(slide.Id, course.Id);
+				var visitersCount = visitsRepo.GetVisitsCount(slide.Id, course.Id);
 				tableInfo.Add(slide.Index + ". " + slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
 				{
 					Rates = slideRateRepo.GetRates(slide.Id, course.Id),
@@ -82,138 +79,6 @@ namespace uLearn.Web.Controllers
 				});
 			}
 			return tableInfo;
-		}
-
-		public ActionResult UsersStatistics(string courseId)
-		{
-			var course = courseManager.GetCourse(courseId);
-			var model = CreateUsersStatisticsModel(course);
-			return View(model);
-		}
-
-		private UsersStatsPageModel CreateUsersStatisticsModel(Course course)
-		{
-			return new UsersStatsPageModel
-			{
-				CourseId = course.Id,
-				UserStats = CreateUserStats(course),
-				UnitNamesInOrdered = course.Slides.GroupBy(x => x.Info.UnitName).Select(x => x.Key).ToList()
-			};
-		}
-
-		private Dictionary<string, SortedDictionary<string, int>> CreateUserStats(Course course)
-		{
-			var users = db.Users.ToList();
-			var ans = new Dictionary<string, SortedDictionary<string, int>>();
-			foreach (var user in users)
-				ans[user.UserName] = new SortedDictionary<string, int>();
-			var acceptedSolutionsForUsers = new Dictionary<string, HashSet<string>>();
-			var unitNames = new Dictionary<string, string>();
-			foreach (var slide in course.Slides)
-				unitNames[slide.Id] = slide.Info.UnitName;
-			var slideCountInUnit = new Dictionary<string, int>();
-			FillCapacityOfUnits(course, slideCountInUnit);
-			FillTheTable(unitNames, acceptedSolutionsForUsers, ans);
-			InitialEmptyUnit(slideCountInUnit, ans);
-			CalculatePercent(ans, slideCountInUnit);
-			return ans;
-		}
-
-		private static void FillCapacityOfUnits(Course course, Dictionary<string, int> slideCountInUnit)
-		{
-			foreach (var slide in course.Slides.Where(x => x is ExerciseSlide || x is QuizSlide))
-			{
-				if (!slideCountInUnit.ContainsKey(slide.Info.UnitName))
-					slideCountInUnit[slide.Info.UnitName] = 0;
-				slideCountInUnit[slide.Info.UnitName]++;
-			}
-		}
-
-		private static void CalculatePercent(Dictionary<string, SortedDictionary<string, int>> ans, Dictionary<string, int> slideCountInUnit)
-		{
-			foreach (var userRates in ans.ToList())
-				foreach (var rate in userRates.Value.ToList())
-					ans[userRates.Key][rate.Key] = (int)(100 * (double)rate.Value / slideCountInUnit[rate.Key]);
-		}
-
-		private static void InitialEmptyUnit(Dictionary<string, int> slideCountInUnit, Dictionary<string, SortedDictionary<string, int>> ans)
-		{
-			foreach (var unit in slideCountInUnit.Keys)
-			{
-				var unitName = unit;
-				foreach (var user in ans.Keys.Where(user => !ans[user].ContainsKey(unitName)))
-					ans[user].Add(unit, 0);
-			}
-		}
-
-		private void FillTheTable(Dictionary<string, string> unitNames, Dictionary<string, HashSet<string>> acceptedSolutionsForUsers, Dictionary<string, SortedDictionary<string, int>> ans)
-		{
-			foreach (var userSolution in db.UserSolutions.Where(x => x.IsRightAnswer))
-			{
-				if (!unitNames.ContainsKey(userSolution.SlideId)) //пока в старой базе есть старые записи с неправильными ID
-					continue;
-				var user = db.Users.Find(userSolution.UserId);
-				if (user == null)
-					continue;
-				var userName = user.UserName;
-				if (!acceptedSolutionsForUsers.ContainsKey(userName))
-					acceptedSolutionsForUsers[userName] = new HashSet<string>();
-				if (acceptedSolutionsForUsers[userName].Contains(userSolution.SlideId))
-					continue;
-				acceptedSolutionsForUsers[userName].Add(userSolution.SlideId);
-				if (!ans[userName].ContainsKey(unitNames[userSolution.SlideId]))
-					ans[userName][unitNames[userSolution.SlideId]] = 0;
-				ans[userName][unitNames[userSolution.SlideId]]++;
-			}
-			foreach (var quiz in db.UserQuizzes)
-			{
-				if (!unitNames.ContainsKey(quiz.SlideId)) //пока в старой базе есть старые записи с неправильными ID
-					continue;
-				var user = db.Users.Find(quiz.UserId);
-				if (user == null)
-					continue;
-				var userName = user.UserName;
-				if (!acceptedSolutionsForUsers.ContainsKey(userName))
-					acceptedSolutionsForUsers[userName] = new HashSet<string>();
-				if (acceptedSolutionsForUsers[userName].Contains(quiz.SlideId))
-					continue;
-				acceptedSolutionsForUsers[userName].Add(quiz.SlideId);
-				if (!ans[userName].ContainsKey(unitNames[quiz.SlideId]))
-					ans[userName][unitNames[quiz.SlideId]] = 0;
-				ans[userName][unitNames[quiz.SlideId]]++;
-			}
-		}
-
-		[ULearnAuthorize]
-		public ActionResult PersonalStatistics(string courseId)
-		{
-			var course = courseManager.GetCourse(courseId);
-			return View(CreatePersonalStaticticsModel(course));
-		}
-
-		private PersonalStatisticPageModel CreatePersonalStaticticsModel(Course course)
-		{
-			var userId = User.Identity.GetUserId();
-			return new PersonalStatisticPageModel
-			{
-				CourseId = course.Id,
-				PersonalStatistics =
-					course.Slides
-						.Select((slide, slideIndex) => new PersonalStatisticsInSlide
-						{
-							UnitName = slide.Info.UnitName,
-							SlideTitle = slide.Title,
-							SlideIndex = slideIndex,
-							IsExercise = slide is ExerciseSlide,
-							IsQuiz = slide is QuizSlide,
-							IsSolved = visitersRepo.IsPassed(slide.Id, userId),
-							IsVisited = visitersRepo.IsUserVisit(course.Id, slide.Id, userId),
-							UserRate = slideRateRepo.GetUserRate(course.Id, slide.Id, userId),
-							HintsCountOnSlide = slide is ExerciseSlide ? (slide as ExerciseSlide).Exercise.HintsMd.Count() : 0,
-							HintUsedPercent = slide is ExerciseSlide ? slideHintRepo.GetHintUsedPercentForUser(course.Id, slide.Id, userId, (slide as ExerciseSlide).Exercise.HintsMd.Count()) : 0
-						})
-						.ToArray()
-			};
 		}
 
 		public ActionResult UnitStatistics(string courseId, string unitName)
@@ -284,7 +149,7 @@ namespace uLearn.Web.Controllers
 			return result;
 		}
 
-		private Dictionary<DateTime, Tuple<int, int>> SumByDays(IQueryable<Visiters> actions)
+		private Dictionary<DateTime, Tuple<int, int>> SumByDays(IQueryable<Visit> actions)
 		{
 			var q = from s in actions
 				group s by DbFunctions.TruncateTime(s.Timestamp)
@@ -324,7 +189,7 @@ namespace uLearn.Web.Controllers
 
 		private Dictionary<DateTime, Tuple<int, int>> GetSlidesVisitedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
 		{
-			return SumByDays(FilterByTime(FilterBySlides(db.Visiters, slideIds), firstDay, lastDay));
+			return SumByDays(FilterByTime(FilterBySlides(db.Visits, slideIds), firstDay, lastDay));
 		}
 
 		private SlideRateStats[] GetSlideRateStats(Course course, IEnumerable<Slide> slides)
@@ -366,11 +231,11 @@ namespace uLearn.Web.Controllers
 		{
 			var slideIds = slides.Select(s => s.Id).ToArray();
 
-			var dq = db.Visiters
+			var dq = db.Visits
 				.Where(v => slideIds.Contains(v.SlideId) && periodStart <= v.Timestamp)
 				.Select(v => v.UserId)
 				.Distinct()
-				.Join(db.Visiters, s => s, v => v.UserId, (s, visiters) => visiters)
+				.Join(db.Visits, s => s, v => v.UserId, (s, visiters) => visiters)
 				.Where(v => slideIds.Contains(v.SlideId))
 				.Select(v => new { v.UserId, v.User.UserName, v.User.GroupName, v.SlideId, v.IsPassed, v.Score, v.AttemptsCount})
 				.ToList();

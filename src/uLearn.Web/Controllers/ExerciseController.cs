@@ -14,7 +14,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
-		private readonly VisitersRepo visitersRepo = new VisitersRepo();
+		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 
 		private readonly static TimeSpan executionTimeout = TimeSpan.FromSeconds(30);
 
@@ -75,7 +75,7 @@ namespace uLearn.Web.Controllers
 			var expectedOutput = exerciseBlock.ExpectedOutput.NormalizeEoln();
 			var isRightAnswer = submissionDetails.GetVerdict() == "Accepted" && output.Equals(expectedOutput);
 
-			await visitersRepo.AddSolutionAttempt(exerciseSlide.Id, User.Identity.GetUserId(), isRightAnswer);
+			await visitsRepo.AddSolutionAttempt(exerciseSlide.Id, User.Identity.GetUserId(), isRightAnswer);
 
 			return new RunSolutionResult
 			{
