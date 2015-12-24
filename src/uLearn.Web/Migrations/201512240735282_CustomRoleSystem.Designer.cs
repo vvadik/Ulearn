@@ -13,7 +13,7 @@ namespace uLearn.Web.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201512211221278_CustomRoleSystem"; }
+            get { return "201512240735282_CustomRoleSystem"; }
         }
         
         string IMigrationMetadata.Source

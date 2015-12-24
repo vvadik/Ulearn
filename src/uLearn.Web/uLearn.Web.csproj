@@ -276,9 +276,9 @@
     <Compile Include="DataContexts\UnitsRepo.cs" />
     <Compile Include="DataContexts\UserRolesRepo.cs" />
     <Compile Include="FilterAttributes\ULearnAuthorizeAttribute.cs" />
-    <Compile Include="Migrations\201512211221278_CustomRoleSystem.cs" />
-    <Compile Include="Migrations\201512211221278_CustomRoleSystem.Designer.cs">
-      <DependentUpon>201512211221278_CustomRoleSystem.cs</DependentUpon>
+    <Compile Include="Migrations\201512240735282_CustomRoleSystem.cs" />
+    <Compile Include="Migrations\201512240735282_CustomRoleSystem.Designer.cs">
+      <DependentUpon>201512240735282_CustomRoleSystem.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="UserExtentions.cs" />
@@ -624,8 +624,8 @@
     <EmbeddedResource Include="Migrations\201512210814206_RenameTableVisitersToVisits.resx">
       <DependentUpon>201512210814206_RenameTableVisitersToVisits.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201512211221278_CustomRoleSystem.resx">
-      <DependentUpon>201512211221278_CustomRoleSystem.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201512240735282_CustomRoleSystem.resx">
+      <DependentUpon>201512240735282_CustomRoleSystem.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

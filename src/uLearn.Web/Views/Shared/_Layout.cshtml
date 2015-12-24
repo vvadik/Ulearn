@@ -39,7 +39,7 @@
 					}
 					@if (User.HasAccess(CourseRoles.Instructor))
 					{
-						<li>@Html.ActionLink("Пользователи", "List", "Account", new { courseRole = CourseRoles.CourseAdmin }, null)</li>
+						<li>@Html.ActionLink("Пользователи", "List", "Account", new { role = LmsRoles.SysAdmin }, null)</li>
 						<li>@Html.ActionLink("CsSandbox", "Index", "Sandbox")</li>
 					}
 				</ul>
