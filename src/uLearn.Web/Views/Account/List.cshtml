@@ -1,14 +1,7 @@
-﻿@model UserListModel
+﻿@model object
 
 @{
 	ViewBag.Title = "Admin Users";
-	var isSystemAdministrator = User.IsSystemAdministrator();
-	var isCourseAdministrator = User.HasAccess(CourseRoles.CourseAdmin);
-}
-
-@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "AntiForgeryTokenContainer" }))
-{
-	@Html.AntiForgeryToken()
 }
 
 <div class="container">
@@ -19,117 +12,14 @@
 	<p><a class="label label-info" href="@Url.Action("List", new { courseRole = CourseRoles.Instructor })">@CourseRoles.Instructor</a> может видеть статистику по успеваемости на разных слайдах, задачах, тестах. Читать заданные вопросы.</p>
 	<p><a class="label label-success" href="@Url.Action("List", new { courseRole = CourseRoles.Tester })">@CourseRoles.Tester</a> может видеть ещё не опубликованные для всех материалы.</p>
 	<p><a class="label label-default" href="@Url.Action("List")">обычный пользователь</a> может видеть только опубликованные материалы.</p>
-
+	
 	@using (Html.BeginForm("List", "Account", FormMethod.Get, new { @class = "form-inline" }))
 	{
 		<input class="form-control" type="text" name="namePrefix" />
 		<button class="btn btn-default" class="button" type="submit">Фильтровать по имени</button>
 	}
-	<p></p>
-	<table class="table table-condensed">
-		<tr>
-			<th>Имя</th>
-			<th>Группа</th>
-			@if (isCourseAdministrator)
-			{
-				<th>Роли</th>
-			}
-			@if (isSystemAdministrator)
-			{
-				<th>Удаление</th>
-			}
-		</tr>
-		@foreach (var user in Model.Users)
-		{
-			<tr data-userid="@user.UserId">
-				<td>@Html.ActionLink(user.UserName, "Info", new { userName = user.UserName })</td>
-				<td>@user.GroupName</td>
-				@if (isCourseAdministrator)
-				{
-					<td>
-						<div class="btn-group">
-							@if (isSystemAdministrator)
-							{
-								@RoleButton(user, LmsRoles.SysAdmin, "danger")
-							}
-							@RoleButton(user, CourseRoles.CourseAdmin, "warning")
-							@RoleButton(user, CourseRoles.Instructor, "info")
-							@RoleButton(user, CourseRoles.Tester, "success")
-						</div>
-					</td>
-				}
-				@if (isSystemAdministrator)
-				{
-					<td>
-						@using (Html.BeginForm("DeleteUser", "Account", new { userId = user.UserId }, FormMethod.Post))
-						{
-							@Html.AntiForgeryToken()
-							<button type="submit" class="btn btn-sm btn-danger">Удалить пользователя</button>
-						}
-					</td>
-				}
-			</tr>
-		}
-	</table>
+
+	@Html.Action("ListPartial", routeValues: Model)
+
 </div>
 
-@helper RoleButton(UserModel user, string role, string cssClass)
-{
-	<button type="button"
-			class="btn btn-sm btn-default btn-@RoleButtonClass(user, role, cssClass)"
-			data-css-class="btn-@cssClass"
-			data-toggle-url="@Url.Action("ToggleSystemAdministratorRole", new { userId = user.UserId })"
-			onclick=" ToggleRole(event, this, ToggleButtonClass) ">
-		@role
-	</button>
-
-}
-
-@helper RoleButton(UserModel user, CourseRoles role, string cssClass)
-{
-	<div class="btn-group">
-		<button type="button"
-				class="btn btn-sm  btn-default dropdown-toggle btn-@RoleButtonClass(user, role, cssClass)"
-				data-css-class="btn-@cssClass"
-				data-toggle="dropdown"
-				aria-haspopup="true"
-				aria-expanded="false">
-			@role <span class="caret"></span>
-		</button>
-		<ul class="dropdown-menu" data-css-class="li-@cssClass">
-			@foreach (var courseId in Model.Courses)
-			{
-				<li class="li-@RoleLiClass(user, role, courseId, cssClass)"
-					data-toggle-url="@Url.Action("ToggleRole", new { userId = user.UserId, courseId, role })"
-					onclick="ToggleRole(event, this, ToggleDropDownClass)">
-					<a>@courseId</a>
-				</li>
-			}
-		</ul>
-	</div>
-}
-
-@helper RoleButtonClass(UserModel user, CourseRoles role, string cssClass)
-{
-	@(GetCourses(user, role).Any() ? cssClass : "default")
-}
-
-@helper RoleLiClass(UserModel user, CourseRoles role, string courseId, string cssClass)
-{
-	@(GetCourses(user, role).Contains(courseId) ? cssClass : "default")
-}
-
-@helper RoleButtonClass(UserModel user, string role, string cssClass)
-{
-	@(user.Roles.Contains(role) ? cssClass : "default")
-}
-
-@functions
-{
-	private static List<string> GetCourses(UserModel user, CourseRoles role)
-	{
-		if (user.Courses == null || !user.Courses.ContainsKey(role))
-			return new List<string>();
-		return user.Courses[role];
-	}
-}

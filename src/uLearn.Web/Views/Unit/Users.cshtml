@@ -1,0 +1,24 @@
+﻿@model uLearn.Web.Controllers.UsersListViewModel
+
+@{
+	ViewBag.Title = "Admin Users";
+}
+
+
+@Html.Action("ManageMenu");
+
+<div class="container">
+	<p><a class="label label-warning" href="@Url.Action("Users", new { Model.CourseId, courseRole = CourseRoles.CourseAdmin })">@CourseRoles.CourseAdmin</a> может видеть служебную информацию и управлять ролями других пользователей.</p>
+	<p><a class="label label-info" href="@Url.Action("Users", new { Model.CourseId, courseRole = CourseRoles.Instructor })">@CourseRoles.Instructor</a> может видеть статистику по успеваемости на разных слайдах, задачах, тестах. Читать заданные вопросы.</p>
+	<p><a class="label label-success" href="@Url.Action("Users", new { Model.CourseId, courseRole = CourseRoles.Tester })">@CourseRoles.Tester</a> может видеть ещё не опубликованные для всех материалы.</p>
+	<p><a class="label label-default" href="@Url.Action("Users", new { Model.CourseId })">обычный пользователь</a> может видеть только опубликованные материалы.</p>
+
+	@using (Html.BeginForm("Users", "Unit", FormMethod.Get, new { @class = "form-inline" }))
+	{
+		<input type="hidden" name="courseId" value="@Model.CourseId" />
+		<input class="form-control" type="text" name="namePrefix" />
+		<button class="btn btn-default" class="button" type="submit">Фильтровать по имени</button>
+	}
+
+	@Html.Action("ListPartial", "Account", Model)
+</div>

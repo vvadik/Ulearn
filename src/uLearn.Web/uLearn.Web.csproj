@@ -1201,6 +1201,8 @@
     </Content>
     <Content Include="Views\Unit\ManageMenu.cshtml" />
     <Content Include="Views\Unit\Packages.cshtml" />
+    <Content Include="Views\Account\ListPartial.cshtml" />
+    <Content Include="Views\Unit\Users.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

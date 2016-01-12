@@ -1,0 +1,130 @@
+﻿@model UserListModel
+
+@{
+	var isSystemAdministrator = string.IsNullOrEmpty(Model.CourseId) && User.IsSystemAdministrator();
+	var isCourseAdministrator = User.HasAccess(CourseRoles.CourseAdmin);
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "AntiForgeryTokenContainer" }))
+{
+	@Html.AntiForgeryToken()
+}
+
+<table class="table table-condensed">
+	<tr>
+		<th>Имя</th>
+		<th>Группа</th>
+		@if (isCourseAdministrator)
+		{
+			<th>Роли</th>
+		}
+		@if (isSystemAdministrator)
+		{
+			<th>Удаление</th>
+		}
+	</tr>
+	@foreach (var user in Model.Users)
+	{
+		<tr data-userid="@user.UserId">
+			<td>@Html.ActionLink(user.UserName, "Info", new { userName = user.UserName })</td>
+			<td>@user.GroupName</td>
+			@if (isCourseAdministrator)
+			{
+				<td>
+					<div class="btn-group">
+						@if (isSystemAdministrator)
+						{
+							@RoleButton(user, LmsRoles.SysAdmin, "danger")
+						}
+						@RoleButton(user, CourseRoles.CourseAdmin, "warning")
+						@RoleButton(user, CourseRoles.Instructor, "info")
+						@RoleButton(user, CourseRoles.Tester, "success")
+					</div>
+				</td>
+			}
+			@if (isSystemAdministrator)
+			{
+				<td>
+					@using (Html.BeginForm("DeleteUser", "Account", new { userId = user.UserId }, FormMethod.Post))
+					{
+						@Html.AntiForgeryToken()
+						<button type="submit" class="btn btn-sm btn-danger">Удалить пользователя</button>
+					}
+				</td>
+			}
+		</tr>
+	}
+</table>
+
+@helper RoleButton(UserModel user, string role, string cssClass)
+{
+	@RoleButton(user, role, cssClass, Url.Action("ToggleSystemAdministratorRole", new { userId = user.UserId }))
+}
+
+@helper RoleButton(UserModel user, CourseRoles role, string cssClass)
+{
+	if (Model.Courses == null)
+	{
+		@RoleButton(user, role.ToString(), cssClass, Url.Action("ToggleRole", new { userId = user.UserId, courseId = Model.CourseId, role }))
+	}
+	else
+	{
+		<div class="btn-group">
+			<button type="button"
+					class="btn btn-sm  btn-default dropdown-toggle btn-@RoleButtonClass(user, role, cssClass)"
+					data-css-class="btn-@cssClass"
+					data-toggle="dropdown"
+					aria-haspopup="true"
+					aria-expanded="false">
+				@role <span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu" data-css-class="li-@cssClass">
+				@foreach (var courseId in Model.Courses)
+				{
+					<li class="li-@RoleLiClass(user, role, courseId, cssClass)"
+						data-toggle-url="@Url.Action("ToggleRole", new { userId = user.UserId, courseId, role })"
+						onclick=" ToggleRole(event, this, ToggleDropDownClass) ">
+						<a>@courseId</a>
+					</li>
+				}
+			</ul>
+		</div>
+	}
+}
+
+@helper RoleButton(UserModel user, string role, string cssClass, string url)
+{
+	<button type="button"
+			class="btn btn-sm btn-default btn-@RoleButtonClass(user, role, cssClass)"
+			data-css-class="btn-@cssClass"
+			data-toggle-url="@url"
+			onclick="ToggleRole(event, this, ToggleButtonClass)">
+		@role
+	</button>
+
+}
+
+@helper RoleButtonClass(UserModel user, CourseRoles role, string cssClass)
+{
+	@(GetCourses(user, role).Any() ? cssClass : "default")
+}
+
+@helper RoleLiClass(UserModel user, CourseRoles role, string courseId, string cssClass)
+{
+	@(GetCourses(user, role).Contains(courseId) ? cssClass : "default")
+}
+
+@helper RoleButtonClass(UserModel user, string role, string cssClass)
+{
+	@(user.Roles.Contains(role) ? cssClass : "default")
+}
+
+@functions
+{
+	private static List<string> GetCourses(UserModel user, CourseRoles role)
+	{
+		if (user.Courses == null || !user.Courses.ContainsKey(role))
+			return new List<string>();
+		return user.Courses[role];
+	}
+}

@@ -147,6 +147,18 @@ namespace uLearn.Web.Controllers
 				HasPackage = hasPackage
 			});
 		}
+
+		public ActionResult Users(string courseId, bool onlyPrivileged = false, string namePrefix = null, string role = null, CourseRoles? courseRole = null)
+		{
+			return View(new UsersListViewModel
+			{
+				CourseId = courseId,
+				CourseRole = courseRole,
+				NamePrefix = namePrefix,
+				OnlyPrivileged = onlyPrivileged,
+				Role = role
+			});
+		}
 	}
 
 	public class UnitsListViewModel
@@ -188,5 +200,14 @@ namespace uLearn.Web.Controllers
 	{
 		public string CourseId { get; set; }
 		public bool HasPackage { get; set; }
+	}
+
+	public class UsersListViewModel
+	{
+		public string CourseId { get; set; }
+		public string Role { get; set; }
+		public string NamePrefix { get; set; }
+		public CourseRoles? CourseRole { get; set; }
+		public bool OnlyPrivileged { get; set; }
 	}
 }

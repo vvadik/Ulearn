@@ -6,6 +6,7 @@ namespace uLearn.Web.Models
 	{
 		public List<UserModel> Users { get; set; }
 		public List<string> Courses { get; set; }
+		public string CourseId { get; set; }
 	}
 
 	public class UserModel
