@@ -1,0 +1,30 @@
+﻿@model uLearn.Web.Controllers.PackagesViewModel
+
+@{
+	ViewBag.Title = "Packages";
+}
+
+@Html.Action("ManageMenu")
+
+<div class="container">
+	<h2>Управление пакетами</h2>
+
+	@if (Model.HasPackage)
+	{
+		@Html.ActionLink("Скачать пакет", "DownloadPackage", new { Model.CourseId }, new { @class = "btn btn-primary", style = "margin-bottom: 10px" })
+	}
+
+	@using (Html.BeginForm("UploadCourse", "Unit", new { Model.CourseId }, FormMethod.Post, new { enctype = "multipart/form-data", style = "margin-bottom: 10px" }))
+	{
+		<input type="file" data-filename-placement="inside" class="btn" name="file" />
+		<input type="submit" class="btn btn-danger" value="Загрузить пакет" />
+	}
+
+	@if (Model.HasPackage)
+	{
+		using (Html.BeginForm("ReloadCourse", "Unit", new { courseId = Model.CourseId }, FormMethod.Post))
+		{
+			 <button type="submit" class="btn btn-danger">Перечитать курс</button>
+		}
+	}
+</div>

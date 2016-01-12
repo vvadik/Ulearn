@@ -45,12 +45,17 @@ namespace uLearn
 			return StagedDirectory.GetFiles("*.zip").Select(f => new StagingPackage(f.Name, f.LastWriteTime));
 		}
 
-		public string GetStagingCoursePath(string name)
+		public FileInfo GetStagingCourseFile(string courseId)
 		{
-			var packageName = GetPackageName(name);
-			if (Path.GetInvalidFileNameChars().Any(name.Contains)) 
-				throw new Exception(name);
-			return StagedDirectory.GetFile(name).FullName;
+			var packageName = GetPackageName(courseId);
+			if (Path.GetInvalidFileNameChars().Any(packageName.Contains))
+				throw new Exception(courseId);
+			return StagedDirectory.GetFile(packageName);
+		}
+
+		public string GetStagingCoursePath(string courseId)
+		{
+			return GetStagingCourseFile(courseId).FullName;
 		}
 
 		private static readonly object ReloadLock = new object();
@@ -113,6 +118,22 @@ namespace uLearn
 		public DateTime GetLastWriteTime(Course course)
 		{
 			return StagedDirectory.GetFile(GetPackageName(course.Id)).LastWriteTime;
+		}
+
+		public void CreateCourse(string courseId)
+		{
+			var courseDir = coursesDirectory.GetSubdir(courseId);
+			if (courseDir.Exists)
+				return;
+			courseDir.Create();
+			var titleFile = new FileInfo(Path.Combine(courseDir.FullName, "Title.txt"));
+			File.WriteAllText(titleFile.FullName, courseId);
+			ReloadCourse(courseDir);
+		}
+
+		public bool HasPackageFor(string courseId)
+		{
+			return GetStagingCourseFile(courseId).Exists;
 		}
 	}
 }

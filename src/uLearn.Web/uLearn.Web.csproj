@@ -1199,6 +1199,8 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>SwitchablePanel.generated.cs</LastGenOutput>
     </Content>
+    <Content Include="Views\Unit\ManageMenu.cshtml" />
+    <Content Include="Views\Unit\Packages.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -25,7 +24,7 @@ namespace uLearn.Web.Controllers
 			courseManager = WebCourseManager.Instance;
 		}
 
-		public ActionResult CourseList(string courseId = "")
+		public ActionResult CourseList()
 		{
 			var courses = new HashSet<string>(User.GetControllableCoursesId());
 			var model = new CourseListViewModel
@@ -36,7 +35,6 @@ namespace uLearn.Web.Controllers
 					Title = course.Title,
 					LastWriteTime = courseManager.GetLastWriteTime(course)
 				}).ToList(), 
-				LastLoadedCourse = courseId
 			};
 			return View(model);
 		}
@@ -105,22 +103,49 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public ActionResult UploadCourse(HttpPostedFileBase file)
+		public ActionResult UploadCourse(string courseId, HttpPostedFileBase file)
 		{
 			if (file == null || file.ContentLength <= 0)
-				return RedirectToAction("CourseList");
+				return RedirectToAction("List", new { courseId });
 
 			var fileName = Path.GetFileName(file.FileName);
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
-				return RedirectToAction("CourseList");
-			var courseId = CourseManager.GetCourseId(fileName);
-			if (User.HasAccessFor(courseId, CourseRoles.CourseAdmin))
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+				return RedirectToAction("List", new { courseId });
 
-			var destinationFile = courseManager.StagedDirectory.GetFile(fileName);
+			var packageName = courseManager.GetPackageName(courseId);
+			var destinationFile = courseManager.StagedDirectory.GetFile(packageName);
 			file.SaveAs(destinationFile.FullName);
-			courseManager.ReloadCourse(fileName);
-			return RedirectToAction("CourseList", new { courseId });
+			courseManager.ReloadCourse(courseId);
+			return RedirectToAction("List", new { courseId });
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]
+		public ActionResult CreateCourse(string courseId)
+		{
+			courseManager.CreateCourse(courseId);
+			return RedirectToAction("List", new { courseId });
+		}
+
+		public ActionResult ManageMenu(string courseId)
+		{
+			var course = courseManager.GetCourse(courseId);
+			return PartialView(new ManageMenuViewModel
+			{
+				CourseId = courseId,
+				Title = course.Title
+			});
+		}
+
+		public ActionResult Packages(string courseId)
+		{
+			var hasPackage = courseManager.HasPackageFor(courseId);
+			return View(model: new PackagesViewModel
+			{
+				CourseId = courseId,
+				HasPackage = hasPackage
+			});
 		}
 	}
 
@@ -144,7 +169,6 @@ namespace uLearn.Web.Controllers
 	public class CourseListViewModel
 	{
 		public List<CourseViewModel> Courses;
-		public string LastLoadedCourse { get; set; }
 	}
 
 	public class CourseViewModel
@@ -154,4 +178,15 @@ namespace uLearn.Web.Controllers
 		public DateTime LastWriteTime { get; set; }
 	}
 
+	public class ManageMenuViewModel
+	{
+		public string CourseId { get; set; }
+		public string Title { get; set; }
+	}
+
+	public class PackagesViewModel
+	{
+		public string CourseId { get; set; }
+		public bool HasPackage { get; set; }
+	}
 }

@@ -11,33 +11,15 @@
 			<li>@Html.ActionLink(course.Title, "List", new { courseId = course.Id })</li>
 		}
 	</ul>
-
-	<h3>Загрузить новый курс</h3>
-	@using (Html.BeginForm("UploadCourse", "Unit", FormMethod.Post, new { enctype = "multipart/form-data" }))
-	{
-		<input type="file" data-filename-placement="inside" class="btn" name="file" />
-		<input type="submit" class="btn btn-danger" value="OK" />
-	}
-
-	<h2>Курсы</h2>
-	<table class="table table-condensed">
-		@foreach (var course in Model.Courses)
-		{
-			<tr>
-				<td>@course.LastWriteTime.ToString("dd.MM.yyyy hh:mm:ss")</td>
-				<td>@Html.ActionLink(course.Id, "DownloadPackage", new { courseId = course.Id })</td>
-				<td>
-					@using (Html.BeginForm("ReloadCourse", "Unit", new { courseId = course.Id }, FormMethod.Post))
-					{
-						<button type="submit" class="btn btn-sm btn-danger">перечитать</button>
-					}
-				</td>
-			</tr>
-		}
-	</table>
 	
-	@if (!string.IsNullOrWhiteSpace(Model.LastLoadedCourse))
+	@if (User.IsSystemAdministrator())
 	{
-		<div class="load-content" data-url="@Url.Action("SpellingErrors", new {courseId = Model.LastLoadedCourse} )"> processing... </div>
+		<h3>Создать новый курс</h3>
+		using (Html.BeginForm("CreateCourse", "Unit", FormMethod.Post, new { @class = "form-inline" }))
+		{
+			@Html.AntiForgeryToken()
+			<input type="text" class="form-control" name="courseId" />
+			<input type="submit" class="btn btn-danger" value="OK" />
+		}
 	}
 </div>
