@@ -115,20 +115,22 @@ namespace uLearn
 			return courseId + ".zip";
 		}
 
-		public DateTime GetLastWriteTime(Course course)
+		public DateTime GetLastWriteTime(string courseId)
 		{
-			return StagedDirectory.GetFile(GetPackageName(course.Id)).LastWriteTime;
+			return StagedDirectory.GetFile(GetPackageName(courseId)).LastWriteTime;
 		}
 
 		public void CreateCourse(string courseId)
 		{
-			var courseDir = coursesDirectory.GetSubdir(courseId);
-			if (courseDir.Exists)
+			var package = StagedDirectory.GetFile(GetPackageName(courseId));
+			if (package.Exists)
 				return;
-			courseDir.Create();
-			var titleFile = new FileInfo(Path.Combine(courseDir.FullName, "Title.txt"));
-			File.WriteAllText(titleFile.FullName, courseId);
-			ReloadCourse(courseDir);
+			using (var zip = new ZipFile(Encoding.GetEncoding(866)))
+			{
+				zip.AddEntry("Title.txt", courseId);
+				zip.Save(package.FullName);
+			}
+			ReloadCourseFromZip(package);
 		}
 
 		public bool HasPackageFor(string courseId)

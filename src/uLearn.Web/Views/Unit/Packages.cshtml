@@ -11,6 +11,8 @@
 
 	@if (Model.HasPackage)
 	{
+		<h4>Последнее обновление: @Model.LastUpdate.ToString("dd.MM.yyyy hh:mm:ss")</h4>
+		
 		@Html.ActionLink("Скачать пакет", "DownloadPackage", new { Model.CourseId }, new { @class = "btn btn-primary", style = "margin-bottom: 10px" })
 	}
 

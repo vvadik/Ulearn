@@ -33,7 +33,7 @@ namespace uLearn.Web.Controllers
 				{
 					Id = course.Id,
 					Title = course.Title,
-					LastWriteTime = courseManager.GetLastWriteTime(course)
+					LastWriteTime = courseManager.GetLastWriteTime(course.Id)
 				}).ToList(), 
 			};
 			return View(model);
@@ -125,7 +125,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult CreateCourse(string courseId)
 		{
 			courseManager.CreateCourse(courseId);
-			return RedirectToAction("List", new { courseId });
+			return RedirectToAction("Packages", new { courseId });
 		}
 
 		public ActionResult ManageMenu(string courseId)
@@ -141,10 +141,12 @@ namespace uLearn.Web.Controllers
 		public ActionResult Packages(string courseId)
 		{
 			var hasPackage = courseManager.HasPackageFor(courseId);
+			var lastUpdate = courseManager.GetLastWriteTime(courseId);
 			return View(model: new PackagesViewModel
 			{
 				CourseId = courseId,
-				HasPackage = hasPackage
+				HasPackage = hasPackage,
+				LastUpdate = lastUpdate
 			});
 		}
 
@@ -205,6 +207,7 @@ namespace uLearn.Web.Controllers
 	{
 		public string CourseId { get; set; }
 		public bool HasPackage { get; set; }
+		public DateTime LastUpdate { get; set; }
 	}
 
 	public class UsersListViewModel
