@@ -69,7 +69,7 @@ namespace uLearn.CourseTool
 		public static void Upload(string baseDir, Config config, string ulearnUrl, Credentials credentials)
 		{
 			var fileFullName = Path.Combine(baseDir, config.ULearnCourseId + ".zip");
-			var uploadUrl = ulearnUrl + "/Unit/UploadCourse";
+			var uploadUrl = ulearnUrl + "/Unit/UploadCourse?courseId=" + config.ULearnCourseId;
 			var courseDir = Path.Combine(baseDir, config.ULearnCourseId);
 
 			if (File.Exists(fileFullName))
