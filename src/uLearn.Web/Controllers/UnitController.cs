@@ -116,7 +116,7 @@ namespace uLearn.Web.Controllers
 			var destinationFile = courseManager.StagedDirectory.GetFile(packageName);
 			file.SaveAs(destinationFile.FullName);
 			courseManager.ReloadCourse(courseId);
-			return RedirectToAction("List", new { courseId });
+			return RedirectToAction("Diagnostics", new { courseId });
 		}
 
 		[HttpPost]
@@ -158,6 +158,11 @@ namespace uLearn.Web.Controllers
 				OnlyPrivileged = onlyPrivileged,
 				Role = role
 			});
+		}
+
+		public ActionResult Diagnostics(string courseId)
+		{
+			return View(model: courseId);
 		}
 	}
 

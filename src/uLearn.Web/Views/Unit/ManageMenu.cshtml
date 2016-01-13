@@ -6,5 +6,6 @@
 		<li class="units-list-item full-width">@Html.ActionLink("Управление юнитами", "List", new { Model.CourseId }, new { @class = "units-list-item-text" })</li>
 		<li class="units-list-item full-width">@Html.ActionLink("Управление пакетами", "Packages", new { Model.CourseId }, new { @class = "units-list-item-text" })</li>
 		<li class="units-list-item full-width">@Html.ActionLink("Управление доступом", "Users", new { Model.CourseId, onlyPrivileged = true }, new { @class = "units-list-item-text" })</li>
+		<li class="units-list-item full-width">@Html.ActionLink("Диагностики", "Diagnostics", new { Model.CourseId }, new { @class = "units-list-item-text" })</li>
 	</ul>
 </div>

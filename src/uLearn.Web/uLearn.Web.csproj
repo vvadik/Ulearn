@@ -1203,6 +1203,7 @@
     <Content Include="Views\Unit\Packages.cshtml" />
     <Content Include="Views\Account\ListPartial.cshtml" />
     <Content Include="Views\Unit\Users.cshtml" />
+    <Content Include="Views\Unit\Diagnostics.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
