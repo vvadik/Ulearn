@@ -1,8 +1,18 @@
 ﻿@model UserListModel
 
 @{
-	var isSystemAdministrator = string.IsNullOrEmpty(Model.CourseId) && User.IsSystemAdministrator();
-	var isCourseAdministrator = User.HasAccess(CourseRoles.CourseAdmin);
+	bool isSystemAdministrator;
+	bool isCourseAdministrator;
+	if (string.IsNullOrEmpty(Model.CourseId))
+	{
+		isSystemAdministrator = User.IsSystemAdministrator();
+		isCourseAdministrator = User.HasAccess(CourseRoles.CourseAdmin);
+	}
+	else
+	{
+		isSystemAdministrator = false;
+		isCourseAdministrator = User.HasAccessFor(Model.CourseId, CourseRoles.CourseAdmin);
+	}
 }
 
 @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "AntiForgeryTokenContainer" }))

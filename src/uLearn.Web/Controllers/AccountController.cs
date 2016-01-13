@@ -55,48 +55,24 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRoles.Instructor)]
 		public ActionResult ListPartial(string namePrefix = null, string role = null, CourseRoles? courseRole = null, string courseId = null, bool onlyPrivileged = false)
 		{
-			IQueryable<ApplicationUser> applicationUsers = db.Users;
-			if (!string.IsNullOrEmpty(namePrefix))
-				applicationUsers = applicationUsers.Where(u => u.UserName.StartsWith(namePrefix));
-			if (!string.IsNullOrEmpty(role))
-				applicationUsers = applicationUsers.Where(u => u.Roles.Any(r => r.Role.Name == role));
-			if (courseRole.HasValue)
-			{
-				var usersQuery = db.UserRoles.Where(userRole => userRole.Role == courseRole);
-				if (!string.IsNullOrEmpty(courseId))
-					usersQuery = usersQuery.Where(userRole => userRole.CourseId == courseId);
-				var users = usersQuery.Select(user => user.UserId).ToList();
-				applicationUsers = applicationUsers.Where(user => users.Contains(user.Id));
-			}
-			if (onlyPrivileged)
-			{
-				IQueryable<UserRole> usersQuery = db.UserRoles;
-				if (courseId != null)
-					usersQuery = usersQuery.Where(userRole => userRole.CourseId == courseId);
-				var users = usersQuery.Select(userRole => userRole.UserId).Distinct().ToList();
-				applicationUsers = applicationUsers.Where(user => users.Contains(user.Id));
-			}
-			var model = GetUserListModel(applicationUsers, courseId);
+			var users = db.Users
+				.FilterByName(namePrefix)
+				.FilterByRole(role)
+				.FilterByUserIds(
+					userRolesRepo.GetListOfUsersWithCourseRole(courseRole, courseId), 
+					userRolesRepo.GetListOfUsersByPrivilege(onlyPrivileged, courseId)
+				)
+				.GetUserModels(50);
+
+			var model = string.IsNullOrEmpty(courseId) 
+				? GetUserListModel(users) 
+				: GetSingleCourseUserListModel(users, courseId);
+
 			return PartialView(model);
 		}
 
-		private UserListModel GetUserListModel(IQueryable<ApplicationUser> applicationUsers, string courseId)
+		private UserListModel GetUserListModel(List<UserModel> users)
 		{
-			var users = applicationUsers
-				.OrderBy(u => u.UserName)
-				.Take(50)
-				.Select(user => new UserModel
-				{
-					UserId = user.Id,
-					UserName = user.UserName,
-					GroupName = user.GroupName,
-					Roles = user.Roles.Select(userRole => userRole.Role.Name).ToList()
-				})
-				.ToList();
-
-			if (!string.IsNullOrEmpty(courseId))
-				return GetSingleCourseUserListModel(courseId, users);
-
 			var coursesForUsers = db.UserRoles
 				.GroupBy(userRole => userRole.UserId)
 				.ToDictionary(
@@ -127,7 +103,7 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		private UserListModel GetSingleCourseUserListModel(string courseId, List<UserModel> users)
+		private UserListModel GetSingleCourseUserListModel(List<UserModel> users, string courseId)
 		{
 			var rolesForUsers = db.UserRoles
 				.Where(role => role.CourseId == courseId)
@@ -146,11 +122,13 @@ namespace uLearn.Web.Controllers
 					userModel.Roles = new List<string>();
 			}
 
-			return new UserListModel
+			var model = new UserListModel
 			{
 				Users = users,
 				CourseId = courseId
 			};
+
+			return model;
 		}
 
 

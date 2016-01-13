@@ -42,5 +42,27 @@ namespace uLearn.Web.DataContexts
 				db.UserRoles.Remove(userRole);
 			await db.SaveChangesAsync();
 		}
+
+		public List<string> GetListOfUsersWithCourseRole(CourseRoles? courseRole, string courseId)
+		{
+			if (!courseRole.HasValue)
+				return null;
+
+			var usersQuery = db.UserRoles.Where(userRole => userRole.Role == courseRole);
+			if (!string.IsNullOrEmpty(courseId))
+				usersQuery = usersQuery.Where(userRole => userRole.CourseId == courseId);
+			return usersQuery.Select(user => user.UserId).Distinct().ToList();
+		}
+
+		public List<string> GetListOfUsersByPrivilege(bool onlyPrivileged, string courseId)
+		{
+			if (!onlyPrivileged)
+				return null;
+
+			IQueryable<UserRole> usersQuery = db.UserRoles;
+			if (courseId != null)
+				usersQuery = usersQuery.Where(userRole => userRole.CourseId == courseId);
+			return usersQuery.Select(userRole => userRole.UserId).Distinct().ToList();
+		}
 	}
 }
