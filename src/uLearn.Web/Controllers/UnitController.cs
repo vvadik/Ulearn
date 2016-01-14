@@ -106,11 +106,11 @@ namespace uLearn.Web.Controllers
 		public ActionResult UploadCourse(string courseId, HttpPostedFileBase file)
 		{
 			if (file == null || file.ContentLength <= 0)
-				return RedirectToAction("List", new { courseId });
+				return RedirectToAction("Packages", new { courseId });
 
 			var fileName = Path.GetFileName(file.FileName);
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
-				return RedirectToAction("List", new { courseId });
+				return RedirectToAction("Packages", new { courseId });
 
 			var packageName = courseManager.GetPackageName(courseId);
 			var destinationFile = courseManager.StagedDirectory.GetFile(packageName);

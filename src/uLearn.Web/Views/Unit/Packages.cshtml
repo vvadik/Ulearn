@@ -21,12 +21,4 @@
 		<input type="file" data-filename-placement="inside" class="btn" name="file" />
 		<input type="submit" class="btn btn-danger" value="Загрузить пакет" />
 	}
-
-	@if (Model.HasPackage)
-	{
-		using (Html.BeginForm("ReloadCourse", "Unit", new { courseId = Model.CourseId }, FormMethod.Post))
-		{
-			 <button type="submit" class="btn btn-danger">Перечитать курс</button>
-		}
-	}
 </div>
