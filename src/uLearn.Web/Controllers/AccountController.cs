@@ -46,27 +46,26 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRoles.Instructor)]
-		public ActionResult List(string namePrefix = null, string role = null, CourseRoles? courseRole = null)
+		public ActionResult List(UserSearchQueryModel queryModel)
 		{
-			return View(new { namePrefix, role, courseRole });
+			return View(queryModel);
 		}
 
 		[ChildActionOnly]
-		[ULearnAuthorize(MinAccessLevel = CourseRoles.Instructor)]
-		public ActionResult ListPartial(string namePrefix = null, string role = null, CourseRoles? courseRole = null, string courseId = null, bool onlyPrivileged = false)
+		public ActionResult ListPartial(UserSearchQueryModel queryModel)
 		{
 			var users = db.Users
-				.FilterByName(namePrefix)
-				.FilterByRole(role)
+				.FilterByName(queryModel.NamePrefix)
+				.FilterByRole(queryModel.Role)
 				.FilterByUserIds(
-					userRolesRepo.GetListOfUsersWithCourseRole(courseRole, courseId), 
-					userRolesRepo.GetListOfUsersByPrivilege(onlyPrivileged, courseId)
+					userRolesRepo.GetListOfUsersWithCourseRole(queryModel.CourseRole, queryModel.CourseId), 
+					userRolesRepo.GetListOfUsersByPrivilege(queryModel.OnlyPrivileged, queryModel.CourseId)
 				)
 				.GetUserModels(50);
 
-			var model = string.IsNullOrEmpty(courseId) 
-				? GetUserListModel(users) 
-				: GetSingleCourseUserListModel(users, courseId);
+			var model = string.IsNullOrEmpty(queryModel.CourseId)
+				? GetUserListModel(users)
+				: GetSingleCourseUserListModel(users, queryModel.CourseId);
 
 			return PartialView(model);
 		}

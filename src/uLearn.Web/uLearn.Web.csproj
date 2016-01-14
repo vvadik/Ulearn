@@ -257,6 +257,7 @@
     <Compile Include="codemirror\CsCompleterGenerator.cs" />
     <Compile Include="Controllers\AuthenticationManager.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
+    <Compile Include="Models\UserSearchQueryModel.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\QuestionsController.cs" />
     <Compile Include="Controllers\RestorePasswordController.cs" />

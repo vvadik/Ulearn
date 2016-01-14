@@ -1,4 +1,4 @@
-﻿@model object
+﻿@model UserSearchQueryModel
 
 @{
 	ViewBag.Title = "Admin Users";
@@ -19,7 +19,7 @@
 		<button class="btn btn-default" class="button" type="submit">Фильтровать по имени</button>
 	}
 
-	@Html.Action("ListPartial", routeValues: Model)
+	@Html.Action("ListPartial", Model)
 
 </div>
 
