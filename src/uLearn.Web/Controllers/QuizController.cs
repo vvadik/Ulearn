@@ -333,7 +333,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[AllowAnonymous]
-		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest = true, bool isLti = false)
+		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false)
 		{
 			if (isGuest)
 				return PartialView(GuestQuiz(slide, courseId));
