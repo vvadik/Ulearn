@@ -3,20 +3,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using Ionic.Zip;
 
 namespace uLearn
 {
 	public class CourseManager
 	{
+		public const string HelpPackageName = "Help";
+
 		private readonly DirectoryInfo coursesDirectory;
 		private readonly Dictionary<string, Course> courses = new Dictionary<string, Course>(StringComparer.InvariantCultureIgnoreCase);
 		private readonly CourseLoader loader = new CourseLoader();
 
 		public CourseManager(DirectoryInfo baseDirectory)
 			: this(
-			baseDirectory.GetSubdir("Courses.Staging"),
-			baseDirectory.GetSubdir("Courses"))
+				baseDirectory.GetSubdir("Courses.Staging"),
+				baseDirectory.GetSubdir("Courses"))
 		{
 		}
 
@@ -59,12 +65,13 @@ namespace uLearn
 		}
 
 		private static readonly object ReloadLock = new object();
-		
+
 		private void LoadCoursesIfNotYet()
 		{
 			lock (ReloadLock)
 			{
-				if (courses.Count != 0) return;
+				if (courses.Count != 0)
+					return;
 				var courseZips = StagedDirectory.GetFiles("*.zip");
 				foreach (var zipFile in courseZips)
 					try
@@ -87,7 +94,7 @@ namespace uLearn
 		private string ReloadCourseFromZip(FileInfo zipFile)
 		{
 			string courseId = "";
-			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions {Encoding = Encoding.GetEncoding(866)}))
+			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
 			{
 				courseId = GetCourseId(zipFile.Name);
 				var courseDir = coursesDirectory.CreateSubdirectory(courseId);
@@ -125,12 +132,84 @@ namespace uLearn
 			var package = StagedDirectory.GetFile(GetPackageName(courseId));
 			if (package.Exists)
 				return;
+
+			var helpPackage = StagedDirectory.GetFile(GetPackageName(HelpPackageName));
+			if (!helpPackage.Exists)
+				CreateEmptyCourse(courseId, package.FullName);
+			else
+				CreateCourseFromExample(courseId, package.FullName, helpPackage);
+
+			ReloadCourseFromZip(package);
+		}
+
+		private static void CreateEmptyCourse(string courseId, string path)
+		{
 			using (var zip = new ZipFile(Encoding.GetEncoding(866)))
 			{
-				zip.AddEntry("Title.txt", courseId);
-				zip.Save(package.FullName);
+				zip.AddEntry("Course.xml", 
+					string.Format(
+						"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
+						"<Course xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"https://ulearn.azurewebsites.net/course\">\n" +
+						"\t<title>{0}</title>\n" +
+						"</Course>",
+						courseId), 
+					Encoding.UTF8);
+				zip.Save(path);
 			}
-			ReloadCourseFromZip(package);
+		}
+
+		private static void CreateCourseFromExample(string courseId, string path, FileInfo helpPackage)
+		{
+			helpPackage.CopyTo(path, true);
+			var nsResolver = new XmlNamespaceManager(new NameTable());
+			nsResolver.AddNamespace("course", "https://ulearn.azurewebsites.net/course");
+			nsResolver.AddNamespace("lesson", "https://ulearn.azurewebsites.net/lesson");
+			nsResolver.AddNamespace("quiz", "https://ulearn.azurewebsites.net/quiz");
+			using (var zip = ZipFile.Read(path, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
+			{
+				UpdateXmlElement(zip["Course.xml"], "//course:Course/course:title", courseId, zip, nsResolver);
+				foreach (var entry in zip.SelectEntries("name = *.lesson.xml").Where(entry => CourseLoader.IsSlideFile(Path.GetFileName(entry.FileName))))
+					UpdateXmlElement(entry, "//lesson:Lesson/lesson:id", Guid.NewGuid().ToString(), zip, nsResolver);
+				foreach (var entry in zip.SelectEntries("name = *.quiz.xml").Where(entry => CourseLoader.IsSlideFile(Path.GetFileName(entry.FileName))))
+					UpdateXmlAttribute(entry, "//quiz:Quiz", "id", Guid.NewGuid().ToString(), zip, nsResolver);
+				foreach (var entry in zip.SelectEntries("name = *.cs").Where(entry => CourseLoader.IsSlideFile(Path.GetFileName(entry.FileName))))
+					UpdateCsFiles(entry, Guid.NewGuid().ToString(), zip);
+			}
+		}
+
+		private static void UpdateXmlElement(ZipEntry entry, string selector, string value, ZipFile zip, IXmlNamespaceResolver nsResolver)
+		{
+			UpdateXmlEntity(entry, selector, element => element.Value = value, zip, nsResolver);
+		}
+
+		private static void UpdateXmlAttribute(ZipEntry entry, string selector, string attribute, string value, ZipFile zip, XmlNamespaceManager nsResolver)
+		{
+			UpdateXmlEntity(entry, selector, element => element.Attribute(attribute).Value = value, zip, nsResolver);
+		}
+
+		private static void UpdateCsFiles(ZipEntry entry, string slideId, ZipFile zip)
+		{
+			string code;
+			using (var entryStream = entry.OpenReader())
+			{
+				code = new StreamReader(entryStream).ReadToEnd();
+			}
+			code = Regex.Replace(code, "(?<=\\[Slide\\(\".*\",\\s*\").+(?=\"\\)\\])", slideId);
+			zip.UpdateEntry(entry.FileName, code, Encoding.UTF8);
+			zip.Save();
+		}
+
+		private static void UpdateXmlEntity(ZipEntry entry, string selector, Action<XElement> update, ZipFile zip, IXmlNamespaceResolver nsResolver)
+		{
+			var output = new MemoryStream();
+			using (var entryStream = entry.OpenReader())
+			{
+				var xml = XDocument.Load(entryStream);
+				update(xml.XPathSelectElement(selector, nsResolver));
+				xml.Save(output);
+			}
+			zip.UpdateEntry(entry.FileName, output.GetBuffer());
+			zip.Save();
 		}
 
 		public bool HasPackageFor(string courseId)
