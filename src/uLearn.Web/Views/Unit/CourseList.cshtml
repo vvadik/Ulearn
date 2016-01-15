@@ -8,7 +8,7 @@
 	<ul>
 		@foreach (var course in Model.Courses)
 		{
-			<li>@Html.ActionLink(course.Title, "Users", new { courseId = course.Id })</li>
+			<li>@Html.ActionLink(course.Title, "Users", new { courseId = course.Id, onlyPrivileged = true })</li>
 		}
 	</ul>
 	

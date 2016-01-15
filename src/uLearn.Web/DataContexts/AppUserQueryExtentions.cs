@@ -37,12 +37,12 @@ namespace uLearn.Web.DataContexts
 				: applicationUsers.Where(user => goodIds.Contains(user.Id));
 		}
 
-		public static List<UserModel> GetUserModels(this IQueryable<ApplicationUser> applicationUsers, int count)
+		public static List<UserRolesInfo> GetUserRolesInfo(this IQueryable<ApplicationUser> applicationUsers, int count)
 		{
 			return applicationUsers
 				.OrderBy(u => u.UserName)
 				.Take(count)
-				.Select(user => new UserModel
+				.Select(user => new UserRolesInfo
 				{
 					UserId = user.Id,
 					UserName = user.UserName,

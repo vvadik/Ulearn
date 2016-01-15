@@ -257,6 +257,7 @@
     <Compile Include="codemirror\CsCompleterGenerator.cs" />
     <Compile Include="Controllers\AuthenticationManager.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
+    <Compile Include="DataContexts\UsersRepo.cs" />
     <Compile Include="Models\UserSearchQueryModel.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\QuestionsController.cs" />
@@ -1203,7 +1204,7 @@
     </Content>
     <Content Include="Views\Unit\ManageMenu.cshtml" />
     <Content Include="Views\Unit\Packages.cshtml" />
-    <Content Include="Views\Account\ListPartial.cshtml" />
+    <Content Include="Views\Shared\_UserListPartial.cshtml" />
     <Content Include="Views\Unit\Users.cshtml" />
     <Content Include="Views\Unit\Diagnostics.cshtml" />
   </ItemGroup>

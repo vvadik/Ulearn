@@ -19,6 +19,7 @@ namespace uLearn.Web.Controllers
 		private readonly ULearnDb db;
 		private readonly CourseManager courseManager;
 		private UserManager<ApplicationUser> userManager;
+		private readonly UsersRepo usersRepo;
 		private UserRolesRepo userRolesRepo;
 
 		public AccountController()
@@ -31,6 +32,7 @@ namespace uLearn.Web.Controllers
 				{
 					AllowOnlyAlphanumericUserNames = false
 				};
+			usersRepo = new UsersRepo(db);
 			userRolesRepo = new UserRolesRepo(db);
 		}
 
@@ -54,23 +56,13 @@ namespace uLearn.Web.Controllers
 		[ChildActionOnly]
 		public ActionResult ListPartial(UserSearchQueryModel queryModel)
 		{
-			var users = db.Users
-				.FilterByName(queryModel.NamePrefix)
-				.FilterByRole(queryModel.Role)
-				.FilterByUserIds(
-					userRolesRepo.GetListOfUsersWithCourseRole(queryModel.CourseRole, queryModel.CourseId), 
-					userRolesRepo.GetListOfUsersByPrivilege(queryModel.OnlyPrivileged, queryModel.CourseId)
-				)
-				.GetUserModels(50);
+			var userRoles = usersRepo.FilterUsers(queryModel);
+			var model = GetUserListModel(userRoles);
 
-			var model = string.IsNullOrEmpty(queryModel.CourseId)
-				? GetUserListModel(users)
-				: GetSingleCourseUserListModel(users, queryModel.CourseId);
-
-			return PartialView(model);
+			return PartialView("_UserListPartial", model);
 		}
 
-		private UserListModel GetUserListModel(List<UserModel> users)
+		private UserListModel GetUserListModel(IEnumerable<UserRolesInfo> users)
 		{
 			var coursesForUsers = db.UserRoles
 				.GroupBy(userRole => userRole.UserId)
@@ -86,60 +78,65 @@ namespace uLearn.Web.Controllers
 						)
 				);
 
-			foreach (var userModel in users)
-			{
-				Dictionary<CourseRoles, List<string>> coursesForUser;
-				coursesForUsers.TryGetValue(userModel.UserId, out coursesForUser);
-				userModel.Courses = coursesForUser;
-			}
-
 			var courses = User.GetControllableCoursesId().ToList();
+
 			var model = new UserListModel
 			{
-				Courses = courses,
-				Users = users
+				IsCourseAdmin = User.HasAccess(CourseRoles.CourseAdmin), 
+				ShowDangerEntities = User.IsSystemAdministrator(),
+				Users = users.Select(user => GetUserModel(user, coursesForUsers, courses)).ToList()
 			};
+
 			return model;
 		}
 
-		private UserListModel GetSingleCourseUserListModel(List<UserModel> users, string courseId)
+		private UserModel GetUserModel(UserRolesInfo userRoles, Dictionary<string, Dictionary<CourseRoles, List<string>>> coursesForUsers, List<string> courses)
 		{
-			var rolesForUsers = db.UserRoles
-				.Where(role => role.CourseId == courseId)
-				.GroupBy(role => role.UserId)
-				.ToDictionary(
-					g => g.Key,
-					g => g.Select(role => role.Role).Distinct().ToList()
-				);
-
-			foreach (var userModel in users)
+			var user = new UserModel(userRoles)
 			{
-				List<CourseRoles> rolesForUser;
-				if (rolesForUsers.TryGetValue(userModel.UserId, out rolesForUser))
-					userModel.Roles = rolesForUser.Select(role => role.ToString()).ToList();
-				else
-					userModel.Roles = new List<string>();
-			}
-
-			var model = new UserListModel
-			{
-				Users = users,
-				CourseId = courseId
+				CoursesAccess = new Dictionary<string, ICoursesAccessListModel>
+				{
+					{
+						LmsRoles.SysAdmin,
+						new OneOptionCourseAccessModel
+						{
+							HasAccess = userRoles.Roles.Contains(LmsRoles.SysAdmin),
+							ToggleUrl = Url.Action("ToggleSystemRole", new { userId = userRoles.UserId, role = LmsRoles.SysAdmin })
+						}
+					}
+				}
 			};
 
-			return model;
-		}
+			Dictionary<CourseRoles, List<string>> coursesForUser;
+			if (!coursesForUsers.TryGetValue(userRoles.UserId, out coursesForUser))
+				coursesForUser = new Dictionary<CourseRoles, List<string>>();
 
+			foreach (var role in Enum.GetValues(typeof(CourseRoles)).Cast<CourseRoles>().Where(roles => roles != CourseRoles.Student))
+			{
+				user.CoursesAccess[role.ToString()] = new ManyOptionsCourseAccessModel
+				{
+					Courses = courses
+						.Select(s => new OneOptionCourseAccessModel
+						{
+							CourseId = s,
+							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s),
+							ToggleUrl = Url.Action("ToggleRole", new { courseId = s, userId = user.UserId, role })
+						})
+						.ToList()
+				};
+			}
+			return user;
+		}
 
 		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]
 		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> ToggleSystemAdministratorRole(string userId)
+		public async Task<ActionResult> ToggleSystemRole(string userId, string role)
 		{
-			if (userManager.IsInRole(userId, LmsRoles.SysAdmin))
-				await userManager.RemoveFromRoleAsync(userId, LmsRoles.SysAdmin);
+			if (userManager.IsInRole(userId, role))
+				await userManager.RemoveFromRoleAsync(userId, role);
 			else
-				await userManager.AddToRolesAsync(userId, LmsRoles.SysAdmin);
-			return Content(LmsRoles.SysAdmin);
+				await userManager.AddToRolesAsync(userId, role);
+			return Content(role);
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRoles.CourseAdmin)]

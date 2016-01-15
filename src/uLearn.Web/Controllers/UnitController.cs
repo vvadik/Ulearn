@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -17,11 +18,13 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db;
+		private readonly UsersRepo usersRepo;
 
 		public UnitController()
 		{
 			db = new ULearnDb();
 			courseManager = WebCourseManager.Instance;
+			usersRepo = new UsersRepo(db);
 		}
 
 		public ActionResult CourseList()
@@ -152,7 +155,60 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult Users(UserSearchQueryModel queryModel)
 		{
+			if (string.IsNullOrEmpty(queryModel.CourseId))
+				return RedirectToAction("CourseList");
 			return View(queryModel);
+		}
+
+		[ChildActionOnly]
+		public ActionResult UsersPartial(UserSearchQueryModel queryModel)
+		{
+			var userRoles = usersRepo.FilterUsers(queryModel);
+			var model = GetUserListModel(userRoles, queryModel.CourseId);
+
+			return PartialView("_UserListPartial", model);
+		}
+
+		private UserListModel GetUserListModel(IEnumerable<UserRolesInfo> userRoles, string courseId)
+		{
+			var rolesForUsers = db.UserRoles
+				.Where(role => role.CourseId == courseId)
+				.GroupBy(role => role.UserId)
+				.ToDictionary(
+					g => g.Key,
+					g => g.Select(role => role.Role).Distinct().ToList()
+				);
+
+			var model = new UserListModel
+			{
+				IsCourseAdmin = true,
+				ShowDangerEntities = false,
+				Users = new List<UserModel>()
+			};
+
+			foreach (var userRolesInfo in userRoles)
+			{
+				var user = new UserModel(userRolesInfo);
+
+				List<CourseRoles> roles;
+				if (!rolesForUsers.TryGetValue(userRolesInfo.UserId, out roles))
+					roles = new List<CourseRoles>();
+
+				user.CoursesAccess = Enum.GetValues(typeof(CourseRoles))
+					.Cast<CourseRoles>()
+					.Where(courseRoles => courseRoles != CourseRoles.Student)
+					.ToDictionary(
+						courseRoles => courseRoles.ToString(),
+						courseRoles => (ICoursesAccessListModel)new OneOptionCourseAccessModel
+						{
+							HasAccess = roles.Contains(courseRoles),
+							ToggleUrl = Url.Action("ToggleRole", "Account", new { courseId, userId = user.UserId, courseRoles })
+						});
+
+				model.Users.Add(user);
+			}
+
+			return model;
 		}
 
 		public ActionResult Diagnostics(string courseId)
