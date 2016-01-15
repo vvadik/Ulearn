@@ -17,6 +17,6 @@ namespace uLearn.Web.Models
 		public string CourseId { get; set; }
 
 		[Required]
-		public CourseRoles Role { get; set; }
+		public CourseRole Role { get; set; }
 	}
 }

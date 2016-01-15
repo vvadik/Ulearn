@@ -20,7 +20,7 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public Dictionary<string, CourseRoles> GetRoles(string userId)
+		public Dictionary<string, CourseRole> GetRoles(string userId)
 		{
 			return db.UserRoles
 				.Where(role => role.UserId == userId)
@@ -28,7 +28,7 @@ namespace uLearn.Web.DataContexts
 				.ToDictionary(g => g.Key, g => g.Select(role => role.Role).Min());
 		}
 
-		public async Task ToggleRole(string courseId, string userId, CourseRoles role)
+		public async Task ToggleRole(string courseId, string userId, CourseRole role)
 		{
 			var userRole = db.UserRoles.FirstOrDefault(u => u.UserId == userId && u.Role == role && u.CourseId == courseId);
 			if (userRole == null)
@@ -43,7 +43,7 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public List<string> GetListOfUsersWithCourseRole(CourseRoles? courseRole, string courseId)
+		public List<string> GetListOfUsersWithCourseRole(CourseRole? courseRole, string courseId)
 		{
 			if (!courseRole.HasValue)
 				return null;

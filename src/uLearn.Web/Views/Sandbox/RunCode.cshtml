@@ -5,7 +5,7 @@
 }
 
 <div class="container">
-	@if (User.HasAccess(CourseRoles.Instructor))
+	@if (User.HasAccess(CourseRole.Instructor))
 	{
 		@SlideHtml.CodeTextArea(@"using System;
 

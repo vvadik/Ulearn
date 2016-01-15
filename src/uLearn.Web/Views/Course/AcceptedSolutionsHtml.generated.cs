@@ -110,7 +110,7 @@ WriteLiteralTo(__razor_helper_writer, ">");
 WriteLiteralTo(__razor_helper_writer, "</span>\r\n\t\t\t</button>\r\n\r\n");
 
 			
-             if (model.User.HasAccessFor(model.CourseId, CourseRoles.Instructor))
+             if (model.User.HasAccessFor(model.CourseId, CourseRole.Instructor))
 			{
 
 WriteLiteralTo(__razor_helper_writer, "\t\t\t\t<form");

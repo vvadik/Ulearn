@@ -47,7 +47,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Index", "Login", new { returnUrl });
 		}
 
-		[ULearnAuthorize(MinAccessLevel = CourseRoles.Instructor)]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult List(UserSearchQueryModel queryModel)
 		{
 			return View(queryModel);
@@ -82,7 +82,7 @@ namespace uLearn.Web.Controllers
 
 			var model = new UserListModel
 			{
-				IsCourseAdmin = User.HasAccess(CourseRoles.CourseAdmin), 
+				IsCourseAdmin = User.HasAccess(CourseRole.CourseAdmin), 
 				ShowDangerEntities = User.IsSystemAdministrator(),
 				Users = users.Select(user => GetUserModel(user, coursesForUsers, courses)).ToList()
 			};
@@ -90,7 +90,7 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		private UserModel GetUserModel(UserRolesInfo userRoles, Dictionary<string, Dictionary<CourseRoles, List<string>>> coursesForUsers, List<string> courses)
+		private UserModel GetUserModel(UserRolesInfo userRoles, Dictionary<string, Dictionary<CourseRole, List<string>>> coursesForUsers, List<string> courses)
 		{
 			var user = new UserModel(userRoles)
 			{
@@ -107,11 +107,11 @@ namespace uLearn.Web.Controllers
 				}
 			};
 
-			Dictionary<CourseRoles, List<string>> coursesForUser;
+			Dictionary<CourseRole, List<string>> coursesForUser;
 			if (!coursesForUsers.TryGetValue(userRoles.UserId, out coursesForUser))
-				coursesForUser = new Dictionary<CourseRoles, List<string>>();
+				coursesForUser = new Dictionary<CourseRole, List<string>>();
 
-			foreach (var role in Enum.GetValues(typeof(CourseRoles)).Cast<CourseRoles>().Where(roles => roles != CourseRoles.Student))
+			foreach (var role in Enum.GetValues(typeof(CourseRole)).Cast<CourseRole>().Where(roles => roles != CourseRole.Student))
 			{
 				user.CoursesAccess[role.ToString()] = new ManyOptionsCourseAccessModel
 				{
@@ -139,9 +139,9 @@ namespace uLearn.Web.Controllers
 			return Content(role);
 		}
 
-		[ULearnAuthorize(MinAccessLevel = CourseRoles.CourseAdmin)]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> ToggleRole(string courseId, string userId, CourseRoles role)
+		public async Task<ActionResult> ToggleRole(string courseId, string userId, CourseRole role)
 		{
 			if (userManager.FindById(userId) != null)
 			{
@@ -165,7 +165,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("List");
 		}
 
-		[ULearnAuthorize(MinAccessLevel = CourseRoles.Instructor)]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult Info(string userName)
 		{
 			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
@@ -175,7 +175,7 @@ namespace uLearn.Web.Controllers
 			return View(new UserInfoModel(user, courseManager.GetCourses().Where(c => courses.Contains(c.Id)).ToArray()));
 		}
 
-		[ULearnAuthorize(MinAccessLevel = CourseRoles.Instructor)]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult CourseInfo(string userName, string courseId)
 		{
 			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);

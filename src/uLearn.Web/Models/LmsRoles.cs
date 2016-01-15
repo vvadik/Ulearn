@@ -5,7 +5,7 @@
 		public const string SysAdmin = "SysAdmin";
 	}
 
-	public enum CourseRoles
+	public enum CourseRole
 	{
 		
 		CourseAdmin,

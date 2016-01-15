@@ -13,7 +13,7 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	[ULearnAuthorize(MinAccessLevel = CourseRoles.CourseAdmin)]
+	[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 	public class UnitController : Controller
 	{
 		private readonly CourseManager courseManager;
@@ -190,13 +190,13 @@ namespace uLearn.Web.Controllers
 			{
 				var user = new UserModel(userRolesInfo);
 
-				List<CourseRoles> roles;
+				List<CourseRole> roles;
 				if (!rolesForUsers.TryGetValue(userRolesInfo.UserId, out roles))
-					roles = new List<CourseRoles>();
+					roles = new List<CourseRole>();
 
-				user.CoursesAccess = Enum.GetValues(typeof(CourseRoles))
-					.Cast<CourseRoles>()
-					.Where(courseRoles => courseRoles != CourseRoles.Student)
+				user.CoursesAccess = Enum.GetValues(typeof(CourseRole))
+					.Cast<CourseRole>()
+					.Where(courseRoles => courseRoles != CourseRole.Student)
 					.ToDictionary(
 						courseRoles => courseRoles.ToString(),
 						courseRoles => (ICoursesAccessListModel)new OneOptionCourseAccessModel

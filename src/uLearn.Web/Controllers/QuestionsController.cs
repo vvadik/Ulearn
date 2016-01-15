@@ -67,7 +67,7 @@ namespace uLearn.Web.Controllers
 			return Content("Fixed:\n" + string.Join("\n", fixedQuestions) + "\n\n" + "Removed:\n" + string.Join("\n", removedQuestions));
 		}
 
-		[ULearnAuthorize(MinAccessLevel = CourseRoles.Instructor)]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult Items(string courseId, string unitName = null)
 		{
 			IQueryable<UserQuestion> questions = db.UserQuestions;
@@ -86,7 +86,7 @@ namespace uLearn.Web.Controllers
 			return PartialView(result);
 		}
 
-		[ULearnAuthorize(MinAccessLevel = CourseRoles.Instructor)]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult ItemsOfUser(string userId, string courseId = null)
 		{
 			IQueryable<UserQuestion> questions = db.UserQuestions.Where(q => q.UserId == userId);

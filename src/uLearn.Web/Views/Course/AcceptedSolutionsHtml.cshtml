@@ -18,7 +18,7 @@
 				<span class="likes-counter">@solution.UsersWhoLike.Count</span>
 			</button>
 
-			@if (model.User.HasAccessFor(model.CourseId, CourseRoles.Instructor))
+			@if (model.User.HasAccessFor(model.CourseId, CourseRole.Instructor))
 			{
 				<form action="@(solution.RemoveSolutionUrl)" method="POST" novalidate="novalidate">
 					<button class="btn btn-danger">

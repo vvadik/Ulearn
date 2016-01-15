@@ -9,7 +9,7 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	[ULearnAuthorize(MinAccessLevel = CourseRoles.Instructor)]
+	[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 	public class SandboxController : Controller
 	{
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();

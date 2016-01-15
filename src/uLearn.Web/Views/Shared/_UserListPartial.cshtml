@@ -31,9 +31,9 @@
 						{
 							@RoleButton(user, LmsRoles.SysAdmin, "danger")
 						}
-						@RoleButton(user, CourseRoles.CourseAdmin, "warning")
-						@RoleButton(user, CourseRoles.Instructor, "info")
-						@RoleButton(user, CourseRoles.Tester, "success")
+						@RoleButton(user, CourseRole.CourseAdmin, "warning")
+						@RoleButton(user, CourseRole.Instructor, "info")
+						@RoleButton(user, CourseRole.Tester, "success")
 					</div>
 				</td>
 			}
@@ -51,7 +51,7 @@
 	}
 </table>
 
-@helper RoleButton(UserModel user, CourseRoles role, string cssClass)
+@helper RoleButton(UserModel user, CourseRole role, string cssClass)
 {
 	@RoleButton(user, role.ToString(), cssClass)
 }

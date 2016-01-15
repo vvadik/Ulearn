@@ -40,7 +40,7 @@
 					@Html.Partial("_AskBar")
 				}
 			</div>
-			@if (User.HasAccessFor(Model.CourseId, CourseRoles.Tester))
+			@if (User.HasAccessFor(Model.CourseId, CourseRole.Tester))
 			{
 				using (Html.BeginForm("ForgetAll", "Course"))
 				{

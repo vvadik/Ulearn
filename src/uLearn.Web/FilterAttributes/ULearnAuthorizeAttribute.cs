@@ -9,7 +9,7 @@ namespace uLearn.Web.FilterAttributes
 {
 	public class ULearnAuthorizeAttribute : AuthorizeAttribute
 	{
-		public CourseRoles MinAccessLevel = CourseRoles.Student;
+		public CourseRole MinAccessLevel = CourseRole.Student;
 
 		protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
 		{
@@ -31,13 +31,13 @@ namespace uLearn.Web.FilterAttributes
 			if (!user.Identity.IsAuthenticated)
 				return false;
 
-			if (MinAccessLevel == CourseRoles.Student && rolesSplit.Length == 0)
+			if (MinAccessLevel == CourseRole.Student && rolesSplit.Length == 0)
 				return true;
 
 			if (rolesSplit.Length > 0 && rolesSplit.Any(user.IsInRole))
 				return true;
 
-			if (MinAccessLevel == CourseRoles.Student)
+			if (MinAccessLevel == CourseRole.Student)
 				return false;
 
 			var courseIds = httpContext.Request.Params.Get("courseId");

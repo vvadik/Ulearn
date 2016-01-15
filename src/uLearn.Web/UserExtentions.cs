@@ -11,7 +11,7 @@ namespace uLearn.Web
 	{
 		private const string courseRoleClaimType = "CourseRole";
 
-		public static bool HasAccessFor(this IPrincipal principal, string courseId, CourseRoles minAccessLevel)
+		public static bool HasAccessFor(this IPrincipal principal, string courseId, CourseRole minAccessLevel)
 		{
 			if (principal.IsInRole(LmsRoles.SysAdmin))
 				return true;
@@ -23,7 +23,7 @@ namespace uLearn.Web
 			return courseRole.Item2 <= minAccessLevel;
 		}
 
-		public static bool HasAccess(this IPrincipal principal, CourseRoles minAccessLevel)
+		public static bool HasAccess(this IPrincipal principal, CourseRole minAccessLevel)
 		{
 			if (principal.IsInRole(LmsRoles.SysAdmin))
 				return true;
@@ -35,7 +35,7 @@ namespace uLearn.Web
 			return roles.Min() <= minAccessLevel;
 		}
 
-		private static IEnumerable<Tuple<string, CourseRoles>> GetAllRoles(this IPrincipal principal)
+		private static IEnumerable<Tuple<string, CourseRole>> GetAllRoles(this IPrincipal principal)
 		{
 			var roleTuples = principal
 				.ToClaimsPrincipal()
@@ -44,14 +44,14 @@ namespace uLearn.Web
 				.Select(s => Tuple.Create(s[0], s[1]));
 			foreach (var roleTuple in roleTuples)
 			{
-				CourseRoles role;
+				CourseRole role;
 				if (!Enum.TryParse(roleTuple.Item2, true, out role))
 					continue;
 				yield return Tuple.Create(roleTuple.Item1, role);
 			}
 		}
 
-		public static IEnumerable<string> GetCoursesIdFor(this IPrincipal principal, CourseRoles role)
+		public static IEnumerable<string> GetCoursesIdFor(this IPrincipal principal, CourseRole role)
 		{
 			return principal.GetAllRoles().Where(t => t.Item2 == role).Select(t => t.Item1);
 		}
@@ -64,7 +64,7 @@ namespace uLearn.Web
 		public static IEnumerable<string> GetControllableCoursesId(this IPrincipal principal)
 		{
 			if (!principal.IsSystemAdministrator())
-				return principal.GetCoursesIdFor(CourseRoles.CourseAdmin);
+				return principal.GetCoursesIdFor(CourseRole.CourseAdmin);
 			var courseManager = WebCourseManager.Instance;
 			return courseManager.GetCourses().Select(course => course.Id);
 		}
@@ -74,13 +74,13 @@ namespace uLearn.Web
 			return principal.IsInRole(LmsRoles.SysAdmin);
 		}
 
-		public static void AddCourseRoles(this ClaimsIdentity identity, Dictionary<string, CourseRoles> roles)
+		public static void AddCourseRoles(this ClaimsIdentity identity, Dictionary<string, CourseRole> roles)
 		{
 			foreach (var role in roles)
 				identity.AddCourseRole(role.Key, role.Value);
 		}
 
-		private static void AddCourseRole(this ClaimsIdentity identity, string courseId, CourseRoles role) 
+		private static void AddCourseRole(this ClaimsIdentity identity, string courseId, CourseRole role) 
 		{
 			identity.AddClaim(new Claim(courseRoleClaimType, courseId + " " + role));
 		}
