@@ -98,7 +98,7 @@ namespace uLearn.Web.Controllers
 				{
 					{
 						LmsRoles.SysAdmin,
-						new OneOptionCourseAccessModel
+						new SingleCourseAccessModel
 						{
 							HasAccess = userRoles.Roles.Contains(LmsRoles.SysAdmin),
 							ToggleUrl = Url.Action("ToggleSystemRole", new { userId = userRoles.UserId, role = LmsRoles.SysAdmin })
@@ -113,10 +113,10 @@ namespace uLearn.Web.Controllers
 
 			foreach (var role in Enum.GetValues(typeof(CourseRole)).Cast<CourseRole>().Where(roles => roles != CourseRole.Student))
 			{
-				user.CoursesAccess[role.ToString()] = new ManyOptionsCourseAccessModel
+				user.CoursesAccess[role.ToString()] = new ManyCourseAccessModel
 				{
-					Courses = courses
-						.Select(s => new OneOptionCourseAccessModel
+					CoursesAccesses = courses
+						.Select(s => new CourseAccessModel
 						{
 							CourseId = s,
 							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s),

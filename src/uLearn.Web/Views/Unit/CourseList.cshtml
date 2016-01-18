@@ -18,8 +18,12 @@
 		using (Html.BeginForm("CreateCourse", "Unit", FormMethod.Post, new { @class = "form-inline" }))
 		{
 			@Html.AntiForgeryToken()
-			<input type="text" class="form-control" name="courseId" />
+			<input type="text" class="form-control" name="courseId" value="@Model.CourseCreationLastTry"/>
 			<input type="submit" class="btn btn-danger" value="Создать" />
+		}
+		if (!string.IsNullOrEmpty(Model.CourseCreationLastTry))
+		{
+			<div style="margin: 10px">В идентификаторе курса недопустимы символы: <pre style="display: inline-block">@Model.InvalidCharacters</pre></div>
 		}
 	}
 </div>

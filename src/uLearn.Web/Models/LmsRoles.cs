@@ -7,7 +7,6 @@
 
 	public enum CourseRole
 	{
-		
 		CourseAdmin,
 		Instructor,
 		Tester,

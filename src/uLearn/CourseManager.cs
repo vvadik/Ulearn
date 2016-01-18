@@ -127,11 +127,15 @@ namespace uLearn
 			return StagedDirectory.GetFile(GetPackageName(courseId)).LastWriteTime;
 		}
 
-		public void CreateCourse(string courseId)
+		public bool TryCreateCourse(string courseId)
 		{
+			
+			if (courseId.Any(GetInvalidCharacters().Contains))
+				return false;
+
 			var package = StagedDirectory.GetFile(GetPackageName(courseId));
 			if (package.Exists)
-				return;
+				return true;
 
 			var helpPackage = StagedDirectory.GetFile(GetPackageName(HelpPackageName));
 			if (!helpPackage.Exists)
@@ -140,6 +144,7 @@ namespace uLearn
 				CreateCourseFromExample(courseId, package.FullName, helpPackage);
 
 			ReloadCourseFromZip(package);
+			return true;
 		}
 
 		private static void CreateEmptyCourse(string courseId, string path)
@@ -215,6 +220,11 @@ namespace uLearn
 		public bool HasPackageFor(string courseId)
 		{
 			return GetStagingCourseFile(courseId).Exists;
+		}
+
+		public static char[] GetInvalidCharacters()
+		{
+			return Path.GetInvalidFileNameChars().Concat(Path.GetInvalidPathChars()).Distinct().ToArray();
 		}
 	}
 }

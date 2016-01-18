@@ -27,9 +27,10 @@ namespace uLearn.Web.Controllers
 			usersRepo = new UsersRepo(db);
 		}
 
-		public ActionResult CourseList()
+		public ActionResult CourseList(string courseCreationLastTry = null)
 		{
 			var courses = new HashSet<string>(User.GetControllableCoursesId());
+			var incorrectChars = new string(CourseManager.GetInvalidCharacters().OrderBy(c => c).Where(c => 32 <= c).ToArray());
 			var model = new CourseListViewModel
 			{
 				Courses = courseManager.GetCourses().Where(course => courses.Contains(course.Id)).Select(course => new CourseViewModel
@@ -37,7 +38,9 @@ namespace uLearn.Web.Controllers
 					Id = course.Id,
 					Title = course.Title,
 					LastWriteTime = courseManager.GetLastWriteTime(course.Id)
-				}).ToList(), 
+				}).ToList(),
+				CourseCreationLastTry = courseCreationLastTry,
+				InvalidCharacters = incorrectChars
 			};
 			return View(model);
 		}
@@ -127,7 +130,8 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]
 		public ActionResult CreateCourse(string courseId)
 		{
-			courseManager.CreateCourse(courseId);
+			if (!courseManager.TryCreateCourse(courseId))
+				return RedirectToAction("CourseList", new { courseCreationLastTry = courseId });
 			return RedirectToAction("Packages", new { courseId });
 		}
 
@@ -199,7 +203,7 @@ namespace uLearn.Web.Controllers
 					.Where(courseRoles => courseRoles != CourseRole.Student)
 					.ToDictionary(
 						courseRoles => courseRoles.ToString(),
-						courseRoles => (ICoursesAccessListModel)new OneOptionCourseAccessModel
+						courseRoles => (ICoursesAccessListModel)new SingleCourseAccessModel
 						{
 							HasAccess = roles.Contains(courseRoles),
 							ToggleUrl = Url.Action("ToggleRole", "Account", new { courseId, userId = user.UserId, courseRoles })
@@ -237,6 +241,8 @@ namespace uLearn.Web.Controllers
 	public class CourseListViewModel
 	{
 		public List<CourseViewModel> Courses;
+		public string CourseCreationLastTry { get; set; }
+		public string InvalidCharacters { get; set; }
 	}
 
 	public class CourseViewModel

@@ -26,23 +26,29 @@ namespace uLearn.Web.Models
 			GroupName = userRoles.GroupName;
 		}
 
-		public string UserId { get; set; }
-		public string UserName { get; set; }
-		public string GroupName { get; set; }
+		public string UserId { get; private set; }
+		public string UserName { get; private set; }
+		public string GroupName { get; private set; }
 		public Dictionary<string, ICoursesAccessListModel> CoursesAccess { get; set; }
 	}
 
 	public interface ICoursesAccessListModel {}
 
-	public class OneOptionCourseAccessModel : ICoursesAccessListModel
+	public class SingleCourseAccessModel : ICoursesAccessListModel
+	{
+		public bool HasAccess { get; set; }
+		public string ToggleUrl { get; set; }
+	}
+
+	public class CourseAccessModel
 	{
 		public string CourseId { get; set; }
 		public bool HasAccess { get; set; }
 		public string ToggleUrl { get; set; }
 	}
 
-	public class ManyOptionsCourseAccessModel : ICoursesAccessListModel
+	public class ManyCourseAccessModel : ICoursesAccessListModel
 	{
-		public List<OneOptionCourseAccessModel> Courses { get; set; }
+		public List<CourseAccessModel> CoursesAccesses { get; set; }
 	}
 }

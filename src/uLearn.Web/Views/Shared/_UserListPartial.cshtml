@@ -64,7 +64,7 @@
 	}
 }
 
-@helper RoleButton(OneOptionCourseAccessModel courseAccess, string role, string cssClass)
+@helper RoleButton(SingleCourseAccessModel courseAccess, string role, string cssClass)
 {
 	var buttonClass = "btn-" + cssClass;
 	<button type="button"
@@ -76,11 +76,11 @@
 	</button>
 }
 
-@helper RoleButton(ManyOptionsCourseAccessModel coursesAccesses, string role, string cssClass)
+@helper RoleButton(ManyCourseAccessModel coursesAccesses, string role, string cssClass)
 {
 	var buttonClass = "btn-" + cssClass;
 	var liClass = "li-" + cssClass;
-	var hasAccess = coursesAccesses.Courses.Any(model => model.HasAccess);
+	var hasAccess = coursesAccesses.CoursesAccesses.Any(model => model.HasAccess);
 	<div class="btn-group">
 		<button type="button"
 				class="btn btn-sm  btn-default dropdown-toggle @(hasAccess ? buttonClass : "")"
@@ -91,7 +91,7 @@
 			@role <span class="caret"></span>
 		</button>
 		<ul class="dropdown-menu" data-css-class="li-@cssClass">
-			@foreach (var course in coursesAccesses.Courses)
+			@foreach (var course in coursesAccesses.CoursesAccesses)
 			{
 				<li class="@(course.HasAccess ? liClass : "")"
 					data-toggle-url="@course.ToggleUrl"
