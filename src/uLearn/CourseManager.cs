@@ -224,7 +224,7 @@ namespace uLearn
 
 		public static char[] GetInvalidCharacters()
 		{
-			return Path.GetInvalidFileNameChars().Concat(Path.GetInvalidPathChars()).Distinct().ToArray();
+			return new []{'&'}.Concat(Path.GetInvalidFileNameChars()).Concat(Path.GetInvalidPathChars()).Distinct().ToArray();
 		}
 	}
 }
