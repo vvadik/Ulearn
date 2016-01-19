@@ -47,7 +47,7 @@ namespace uLearn.Web.FilterAttributes
 			if (courseIds.Length != 1)
 				return false;
 
-			return user.HasAccessFor(courseIds[1], MinAccessLevel);
+			return user.HasAccessFor(courseIds[0], MinAccessLevel);
 		}
 
 		private string[] rolesSplit = new string[0];

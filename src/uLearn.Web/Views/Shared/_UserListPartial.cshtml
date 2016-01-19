@@ -69,7 +69,7 @@
 	var buttonClass = "btn-" + cssClass;
 	<button type="button"
 			class="btn btn-sm btn-default @(courseAccess.HasAccess ? buttonClass : "")"
-			data-css-class="@cssClass"
+			data-css-class="@buttonClass"
 			data-toggle-url="@courseAccess.ToggleUrl"
 			onclick="ToggleRole(event, this, ToggleButtonClass)">
 		@role
