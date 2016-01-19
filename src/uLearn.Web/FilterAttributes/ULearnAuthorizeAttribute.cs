@@ -40,12 +40,14 @@ namespace uLearn.Web.FilterAttributes
 			if (MinAccessLevel == CourseRole.Student)
 				return false;
 
-			var courseIds = httpContext.Request.Params.Get("courseId");
+			var courseIds = httpContext.Request.Params.GetValues("courseId"); 
 			if (courseIds == null)
 				return user.HasAccess(MinAccessLevel);
 
-			var courseId = courseIds.Split(delims).SingleOrDefault();
-			return user.HasAccessFor(courseId, MinAccessLevel);
+			if (courseIds.Length != 1)
+				return false;
+
+			return user.HasAccessFor(courseIds[1], MinAccessLevel);
 		}
 
 		private string[] rolesSplit = new string[0];

@@ -13,7 +13,7 @@ namespace uLearn.Web
 
 		public static bool HasAccessFor(this IPrincipal principal, string courseId, CourseRole minAccessLevel)
 		{
-			if (principal.IsInRole(LmsRoles.SysAdmin))
+			if (principal.IsSystemAdministrator())
 				return true;
 
 			var courseRole = principal.GetAllRoles().FirstOrDefault(t => t.Item1 == courseId);
@@ -25,7 +25,7 @@ namespace uLearn.Web
 
 		public static bool HasAccess(this IPrincipal principal, CourseRole minAccessLevel)
 		{
-			if (principal.IsInRole(LmsRoles.SysAdmin))
+			if (principal.IsSystemAdministrator())
 				return true;
 
 			var roles = principal.GetAllRoles().Select(t => t.Item2).ToList();
