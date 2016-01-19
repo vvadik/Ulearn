@@ -132,7 +132,7 @@ namespace uLearn.Web.Controllers
 		{
 			if (!courseManager.TryCreateCourse(courseId))
 				return RedirectToAction("CourseList", new { courseCreationLastTry = courseId });
-			return RedirectToAction("Packages", new { courseId });
+			return RedirectToAction("Users", new { courseId, onlyPrivileged = true });
 		}
 
 		public ActionResult ManageMenu(string courseId)
