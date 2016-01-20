@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
+using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
+using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 
 namespace uLearn.Web
@@ -83,6 +86,19 @@ namespace uLearn.Web
 		private static void AddCourseRole(this ClaimsIdentity identity, string courseId, CourseRole role) 
 		{
 			identity.AddClaim(new Claim(courseRoleClaimType, courseId + " " + role));
+		}
+
+		public static async Task<ClaimsIdentity> GenerateUserIdentityAsync(this ApplicationUser user, UserManager<ApplicationUser> manager, UserRolesRepo userRoles)
+		{
+			var identity = await manager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
+			identity.AddCourseRoles(userRoles.GetRoles(user.Id));
+			return identity;
+		}
+
+		public static async Task<ClaimsIdentity> GenerateUserIdentityAsync(this ApplicationUser user, UserManager<ApplicationUser> manager)
+		{
+			var userRoles = new UserRolesRepo();
+			return await user.GenerateUserIdentityAsync(manager, userRoles);
 		}
 	}
 }
