@@ -20,6 +20,7 @@
 			@Html.AntiForgeryToken()
 			<input type="text" class="form-control" name="courseId" value="@Model.CourseCreationLastTry"/>
 			<input type="submit" class="btn btn-danger" value="Создать" />
+			<p>CourseId используется как часть URL, имя файла, часть путей. Лучше использовать только латинские буквы и цифры.</p>
 		}
 		if (!string.IsNullOrEmpty(Model.CourseCreationLastTry))
 		{
