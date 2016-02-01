@@ -101,8 +101,12 @@
       <HintPath>..\External\MarkdownDeep\MarkdownDeep.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.1.0\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -238,9 +242,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.AspNet.Identity.Owin">
-      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.1.0.0\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.AspNet.Identity.EntityFramework">
       <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.1.0.0\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
     </Reference>
@@ -257,6 +258,8 @@
     <Compile Include="codemirror\CsCompleterGenerator.cs" />
     <Compile Include="Controllers\AuthenticationManager.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
+    <Compile Include="DataContexts\UsersRepo.cs" />
+    <Compile Include="Models\UserSearchQueryModel.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\QuestionsController.cs" />
     <Compile Include="Controllers\RestorePasswordController.cs" />
@@ -269,12 +272,20 @@
     <Compile Include="Controllers\ExerciseController.cs" />
     <Compile Include="Controllers\HintController.cs" />
     <Compile Include="Controllers\VisitsController.cs" />
+    <Compile Include="DataContexts\AppUserQueryExtentions.cs" />
     <Compile Include="DataContexts\ConsumersRepo.cs" />
     <Compile Include="DataContexts\LtiRequestsRepo.cs" />
     <Compile Include="DataContexts\RestoreRequestRepo.cs" />
     <Compile Include="DataContexts\TextsRepo.cs" />
     <Compile Include="DataContexts\UnitsRepo.cs" />
-    <Compile Include="FilterAttributes\PostAuthorizeAttribute.cs" />
+    <Compile Include="DataContexts\UserRolesRepo.cs" />
+    <Compile Include="FilterAttributes\ULearnAuthorizeAttribute.cs" />
+    <Compile Include="Migrations\201512240735282_CustomRoleSystem.cs" />
+    <Compile Include="Migrations\201512240735282_CustomRoleSystem.Designer.cs">
+      <DependentUpon>201512240735282_CustomRoleSystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\UserModel.cs" />
+    <Compile Include="UserExtentions.cs" />
     <Compile Include="LTI\LtiAuthenticationExtensions.cs" />
     <Compile Include="LTI\LtiUtils.cs" />
     <Compile Include="LTI\SecurityHandler.cs" />
@@ -450,6 +461,7 @@
     </Compile>
     <Compile Include="Models\UserCourseModel.cs" />
     <Compile Include="Models\Visit.cs" />
+    <Compile Include="Models\UserRole.cs" />
     <Compile Include="Models\WebCourseManager_should.cs" />
     <Compile Include="Views\Course\AcceptedSolutionsHtml.generated.cs">
       <AutoGen>True</AutoGen>
@@ -615,6 +627,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201512210814206_RenameTableVisitersToVisits.resx">
       <DependentUpon>201512210814206_RenameTableVisitersToVisits.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512240735282_CustomRoleSystem.resx">
+      <DependentUpon>201512240735282_CustomRoleSystem.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -993,6 +1008,7 @@
     <Content Include="Scripts\slide-utils.js" />
     <Content Include="Scripts\table-configurator.js" />
     <Content Include="Scripts\user-group-name-change.js" />
+    <Content Include="Scripts\users-list.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="tablesorter-master\.gitattributes" />
     <Content Include="tablesorter-master\.gitignore" />
@@ -1187,6 +1203,11 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>SwitchablePanel.generated.cs</LastGenOutput>
     </Content>
+    <Content Include="Views\Unit\ManageMenu.cshtml" />
+    <Content Include="Views\Unit\Packages.cshtml" />
+    <Content Include="Views\Shared\_UserListPartial.cshtml" />
+    <Content Include="Views\Unit\Users.cshtml" />
+    <Content Include="Views\Unit\Diagnostics.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

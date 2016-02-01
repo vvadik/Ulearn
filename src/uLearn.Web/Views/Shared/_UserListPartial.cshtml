@@ -1,0 +1,104 @@
+﻿@model UserListModel
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "AntiForgeryTokenContainer" }))
+{
+	@Html.AntiForgeryToken()
+}
+
+<table class="table table-condensed">
+	<tr>
+		<th>Имя</th>
+		<th>Группа</th>
+		@if (@Model.IsCourseAdmin)
+		{
+			<th>Роли</th>
+		}
+		@if (@Model.ShowDangerEntities)
+		{
+			<th>Удаление</th>
+		}
+	</tr>
+	@foreach (var user in Model.Users)
+	{
+		<tr data-userid="@user.UserId">
+			<td>@Html.ActionLink(user.UserName, "Info", new { userName = user.UserName })</td>
+			<td>@user.GroupName</td>
+			@if (@Model.IsCourseAdmin)
+			{
+				<td>
+					<div class="btn-group">
+						@if (@Model.ShowDangerEntities)
+						{
+							@RoleButton(user, LmsRoles.SysAdmin, "danger")
+						}
+						@RoleButton(user, CourseRole.CourseAdmin, "warning")
+						@RoleButton(user, CourseRole.Instructor, "info")
+						@RoleButton(user, CourseRole.Tester, "success")
+					</div>
+				</td>
+			}
+			@if (@Model.ShowDangerEntities)
+			{
+				<td>
+					@using (Html.BeginForm("DeleteUser", "Account", new { userId = user.UserId }, FormMethod.Post))
+					{
+						@Html.AntiForgeryToken()
+						<button type="submit" class="btn btn-sm btn-danger">Удалить пользователя</button>
+					}
+				</td>
+			}
+		</tr>
+	}
+</table>
+
+@helper RoleButton(UserModel user, CourseRole role, string cssClass)
+{
+	@RoleButton(user, role.ToString(), cssClass)
+}
+
+@helper RoleButton(UserModel user, string role, string cssClass)
+{
+	if (user.CoursesAccess.ContainsKey(role))
+	{
+		@RoleButton((dynamic)user.CoursesAccess[role], role, cssClass)
+	}
+}
+
+@helper RoleButton(SingleCourseAccessModel courseAccess, string role, string cssClass)
+{
+	var buttonClass = "btn-" + cssClass;
+	<button type="button"
+			class="btn btn-sm btn-default @(courseAccess.HasAccess ? buttonClass : "")"
+			data-css-class="@buttonClass"
+			data-toggle-url="@courseAccess.ToggleUrl"
+			onclick="ToggleRole(event, this, ToggleButtonClass)">
+		@role
+	</button>
+}
+
+@helper RoleButton(ManyCourseAccessModel coursesAccesses, string role, string cssClass)
+{
+	var buttonClass = "btn-" + cssClass;
+	var liClass = "li-" + cssClass;
+	var hasAccess = coursesAccesses.CoursesAccesses.Any(model => model.HasAccess);
+	<div class="btn-group">
+		<button type="button"
+				class="btn btn-sm  btn-default dropdown-toggle @(hasAccess ? buttonClass : "")"
+				data-css-class="@buttonClass"
+				data-toggle="dropdown"
+				aria-haspopup="true"
+				aria-expanded="false">
+			@role <span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu" data-css-class="li-@cssClass">
+			@foreach (var course in coursesAccesses.CoursesAccesses)
+			{
+				<li class="@(course.HasAccess ? liClass : "")"
+					data-toggle-url="@course.ToggleUrl"
+					onclick="ToggleRole(event, this, ToggleDropDownClass)">
+					<a>@course.CourseId</a>
+				</li>
+			}
+		</ul>
+	</div>
+}

@@ -1,63 +1,25 @@
-﻿@model List<ApplicationUser>
+﻿@model UserSearchQueryModel
 
 @{
 	ViewBag.Title = "Admin Users";
 }
+
 <div class="container">
 	<h2>Роли пользователей</h2>
 
-	<p><a class="label label-danger" href="@Url.Action("List", new{role=LmsRoles.Admin})">admin</a> может видеть служебную информацию и управлять ролями других пользователей.</p>
-	<p><a class="label label-info" href="@Url.Action("List", new{role=LmsRoles.Instructor})">instructor</a> может видеть статистику по успеваемости на разных слайдах, задачах, тестах. Читать заданные вопросы.</p>
-	<p><a class="label label-success" href="@Url.Action("List", new{role=LmsRoles.Tester})">tester</a> может видеть ещё не опубликованные для всех материалы.</p>
+	<p><a class="label label-danger" href="@Url.Action("List", new { role = LmsRoles.SysAdmin })">@LmsRoles.SysAdmin</a> может всё.</p>
+	<p><a class="label label-warning" href="@Url.Action("List", new { courseRole = CourseRole.CourseAdmin })">@CourseRole.CourseAdmin</a> может видеть служебную информацию и управлять ролями других пользователей.</p>
+	<p><a class="label label-info" href="@Url.Action("List", new { courseRole = CourseRole.Instructor })">@CourseRole.Instructor</a> может видеть статистику по успеваемости на разных слайдах, задачах, тестах. Читать заданные вопросы.</p>
+	<p><a class="label label-success" href="@Url.Action("List", new { courseRole = CourseRole.Tester })">@CourseRole.Tester</a> может видеть ещё не опубликованные для всех материалы.</p>
 	<p><a class="label label-default" href="@Url.Action("List")">обычный пользователь</a> может видеть только опубликованные материалы.</p>
-
+	
 	@using (Html.BeginForm("List", "Account", FormMethod.Get, new { @class = "form-inline" }))
 	{
 		<input class="form-control" type="text" name="namePrefix" />
 		<button class="btn btn-default" class="button" type="submit">Фильтровать по имени</button>
 	}
-	<p></p>
-	<table class="table table-condensed">
-		<tr>
-			<th>Имя</th>
-			<th>Группа</th>
-			<th>Роли</th>
-			<th>Удаление</th>
-		</tr>
-		@foreach (var user in Model)
-		{
-			<tr data-userid="@user.Id">
-				<td>@Html.ActionLink(user.UserName, "Info", new { userName = user.UserName })</td>
-				<td>@user.GroupName</td>
-				<td>
-					<div class="btn-group">
-						@RoleButton(user, LmsRoles.Admin, "danger")
-						@RoleButton(user, LmsRoles.Instructor, "info")
-						@RoleButton(user, LmsRoles.Tester, "success")
-					</div>
-				</td>
-				<td>
-					@using (Html.BeginForm("DeleteUser", "Account", new { userId = user.Id }, FormMethod.Post))
-					{
-						@Html.AntiForgeryToken()
-						<button type="submit" class="btn btn-sm btn-danger">Удалить пользователя</button>
-					}
-				</td>
-			</tr>
-		}
-	</table>
+
+	@Html.Action("ListPartial", Model)
+
 </div>
-
-@helper RoleButton(ApplicationUser user, string role, string cssClass)
-{
-	<a href="@Url.Action("ToggleRole", new{userId=user.Id, role})"
-	   class="btn btn-sm btn-@RoleButtonClass(user, role, cssClass)">
-		@role
-	</a>
-}
-
-@helper RoleButtonClass(ApplicationUser user, string role, string cssClass)
-{
-	@(user.Roles.Any(r => r.Role.Name == role) ? cssClass : "default")
-}
 

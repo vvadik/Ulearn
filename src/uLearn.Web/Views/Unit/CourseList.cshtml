@@ -8,36 +8,23 @@
 	<ul>
 		@foreach (var course in Model.Courses)
 		{
-			<li>@Html.ActionLink(course.Title, "List", new { courseId = course.Id })</li>
+			<li>@Html.ActionLink(course.Title, "Users", new { courseId = course.Id, onlyPrivileged = true })</li>
 		}
 	</ul>
-
-	<h3>Загрузить новый пакет</h3>
-	@using (Html.BeginForm("UploadCourse", "Unit", FormMethod.Post, new { enctype = "multipart/form-data" }))
-	{
-		<input type="file" data-filename-placement="inside" class="btn" name="file" />
-		<input type="submit" class="btn btn-danger" value="OK" />
-	}
-
-	<h2>Пакеты курсов</h2>
-	<table class="table table-condensed">
-		@foreach (var package in Model.PackageNames)
-		{
-			<tr>
-				<td>@package.Timestamp.ToString("dd.MM.yyyy hh:mm:ss")</td>
-				<td>@Html.ActionLink(package.Name, "DownloadPackage", new { packageName = package.Name })</td>
-				<td>
-					@using (Html.BeginForm("ReloadCourse", "Unit", new { packageName = package.Name }, FormMethod.Post))
-					{
-						<button type="submit" class="btn btn-sm btn-danger">перечитать</button>
-					}
-				</td>
-			</tr>
-		}
-	</table>
 	
-	@if (!string.IsNullOrWhiteSpace(Model.LastLoadedCourse))
+	@if (User.IsSystemAdministrator())
 	{
-		<div class="load-content" data-url="@Url.Action("SpellingErrors", new {courseId = Model.LastLoadedCourse} )"> processing... </div>
+		<h3>Создать новый курс</h3>
+		using (Html.BeginForm("CreateCourse", "Unit", FormMethod.Post, new { @class = "form-inline" }))
+		{
+			@Html.AntiForgeryToken()
+			<input type="text" class="form-control" name="courseId" value="@Model.CourseCreationLastTry"/>
+			<input type="submit" class="btn btn-danger" value="Создать" />
+			<p>CourseId используется как часть URL, имя файла, часть путей. Лучше использовать только латинские буквы и цифры.</p>
+		}
+		if (!string.IsNullOrEmpty(Model.CourseCreationLastTry))
+		{
+			<div style="margin: 10px">В идентификаторе курса недопустимы символы: <pre style="display: inline-block">@Model.InvalidCharacters</pre></div>
+		}
 	}
 </div>

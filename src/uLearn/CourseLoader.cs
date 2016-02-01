@@ -70,7 +70,7 @@ namespace uLearn
 				.Select<FileInfo, Func<int, Slide>>(f => i => LoadSlide(f, unitTitle, i, settings));
 		}
 
-		private static bool IsSlideFile(string name)
+		public static bool IsSlideFile(string name)
 		{
 			//S001_slide.ext
 			var id = name.Split(new[] { '_', '-', ' ' }, 2)[0];

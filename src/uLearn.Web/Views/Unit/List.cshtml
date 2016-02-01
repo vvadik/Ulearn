@@ -1,12 +1,14 @@
 ﻿@model uLearn.Web.Controllers.UnitsListViewModel
 
 @{
-	ViewBag.Title = "Admin Course";
+	ViewBag.Title = "List of Units";
 }
 
+@Html.Action("ManageMenu")
+
 <div class="container">
-	<h2>Администрирование курса</h2>
-	<h3>@Model.CourseTitle</h3>
+	<h2>Управление юнитами</h2>
+
 	<table class="table table-autowidth">
 		<tr>
 			<th>Модуль</th>

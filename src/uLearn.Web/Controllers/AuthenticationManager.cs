@@ -12,8 +12,9 @@ namespace uLearn.Web.Controllers
 	public class AuthenticationManager
 	{
 		private readonly UserManager<ApplicationUser> userManager;
+		private readonly UserRolesRepo userRoles = new UserRolesRepo();
 
-		public AuthenticationManager()
+		private AuthenticationManager()
 		{
 			userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb()));
 		}
@@ -37,7 +38,7 @@ namespace uLearn.Web.Controllers
 		{
 			var authenticationManager = GetAuthenticationManager(context);
 			authenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-			var identity = await userManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
+			var identity = await user.GenerateUserIdentityAsync(userManager, userRoles);
 			authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = isPersistent }, identity);
 		}
 
