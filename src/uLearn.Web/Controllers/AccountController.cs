@@ -56,7 +56,7 @@ namespace uLearn.Web.Controllers
 		[ChildActionOnly]
 		public ActionResult ListPartial(UserSearchQueryModel queryModel)
 		{
-			var userRoles = usersRepo.FilterUsers(queryModel);
+			var userRoles = usersRepo.FilterUsers(queryModel, userManager);
 			var model = GetUserListModel(userRoles);
 
 			return PartialView("_UserListPartial", model);
