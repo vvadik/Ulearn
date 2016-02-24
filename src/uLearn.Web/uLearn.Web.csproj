@@ -491,15 +491,15 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AcceptedSolutionsHtml.cshtml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Course\StandaloneLayout.generated.cs">
-      <DependentUpon>StandaloneLayout.cshtml</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <Compile Include="Views\Course\SlideHtml.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SlideHtml.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Course\StandaloneLayout.generated.cs">
+      <DependentUpon>StandaloneLayout.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Views\Shared\Helpers\SwitchablePanel.generated.cs">
       <AutoGen>True</AutoGen>
@@ -998,6 +998,8 @@
     <Content Include="flexslider\fonts\flexslider-icon.woff" />
     <Content Include="flexslider\README.mdown" />
     <Content Include="packages.config" />
+    <None Include="Properties\PublishProfiles\ulearn - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\ulearn - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\ulearn.pubxml" />
     <Content Include="Properties\webjobs-list.json" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />

@@ -53,20 +53,51 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t<span class=\"scor
 
 WebViewPage.WriteTo(@__razor_helper_writer, Score(currentScore, context.Slide.MaxScore));
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</span>\r\n\t\t</h1>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</span>\r\n\t\t</h1>\r\n\t\t");
 
 
- 		foreach (var block in context.Slide.Blocks)
-		{
-			
+WebViewPage.WriteTo(@__razor_helper_writer, Blocks(context.Slide.Blocks, context));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t</div>\r\n");
+
+
+
+});
+
+}
+
+
+public static System.Web.WebPages.HelperResult Blocks(IEnumerable<SlideBlock> blocks, BlockRenderContext context)
+{
+return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
+
+
+ 
+foreach (var block in context.Slide.Blocks)
+{
+	if (!block.Hide)
+	{
+		
 WebViewPage.WriteTo(@__razor_helper_writer, Block((dynamic)block, context));
 
-                                  
-		}
+                                 
+	}
+	else if (context.RevealHidden)
+	{
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t</div>\r\n");
 
 
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\'revealed\' data-toggle=\"tooltip\" data-placement=\"left\" title=\"Этот б" +
+"лок студенты не видят\">\r\n\t\t\t<h4>Инструктору</h4>\r\n\t\t\t");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, Block((dynamic)block, context));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t</div>\r\n");
+
+
+	}
+}
 
 });
 
@@ -121,7 +152,7 @@ WebViewPage.WriteTo(@__razor_helper_writer, QuizBlock((dynamic)block, context));
 
                                     
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<hr class=\"quiz-block-delimiter\"/>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<hr class=\"quiz-block-delimiter\" />\r\n");
 
 
 
@@ -273,7 +304,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" alt=\"");
 
                                WebViewPage.WriteTo(@__razor_helper_writer, imageUrl);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"/>\r\n\t\t\t\t</li>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" />\r\n\t\t\t\t</li>\r\n");
 
 
 			}
@@ -393,7 +424,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tRun\r\n\t\t\t
 				var e = ((ExerciseSlide)context.Slide).Exercise.HintsMd;
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<button id=\"GetHintButton\" type=\"button\" class=\"btn btn-default hints-btn\"\r\n\t" +
-"\t\t\t        data-course-id=\"");
+"\t\t\t\t\tdata-course-id=\"");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, context.Course.Id);
@@ -401,14 +432,14 @@ WebViewPage.WriteTo(@__razor_helper_writer, context.Course.Id);
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-slide-index=\"");
 
 
-                       WebViewPage.WriteTo(@__razor_helper_writer, context.Slide.Index);
+                 WebViewPage.WriteTo(@__razor_helper_writer, context.Slide.Index);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-hints-count=\"");
 
 
-                                                               WebViewPage.WriteTo(@__razor_helper_writer, e.Count);
+                                                         WebViewPage.WriteTo(@__razor_helper_writer, e.Count);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t\t        data-url=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t\t\t\tdata-url=\"");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, data.GetHintUrl);

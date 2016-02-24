@@ -75,6 +75,8 @@
   <ItemGroup>
     <Compile Include="CourseTool\Config_Test.cs" />
     <Compile Include="CourseTool\Converter_should.cs" />
+    <Compile Include="Model\Md_should.cs" />
+    <Compile Include="Quizes\CourseLoader_should.cs" />
     <Compile Include="SpellChecking_Tests.cs" />
     <Compile Include="Utilities\LessonToXmlConvertor.cs" />
     <Compile Include="CSharp\CsMembersExtractor_should.cs" />
@@ -156,9 +158,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Model\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
