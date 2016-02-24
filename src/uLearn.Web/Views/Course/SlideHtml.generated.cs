@@ -56,7 +56,7 @@ WebViewPage.WriteTo(@__razor_helper_writer, Score(currentScore, context.Slide.Ma
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</span>\r\n\t\t</h1>\r\n\t\t");
 
 
-WebViewPage.WriteTo(@__razor_helper_writer, Blocks(context.Slide.Blocks, context));
+WebViewPage.WriteTo(@__razor_helper_writer, Blocks(context));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t</div>\r\n");
 
@@ -67,37 +67,44 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t</div>\r\n");
 }
 
 
-public static System.Web.WebPages.HelperResult Blocks(IEnumerable<SlideBlock> blocks, BlockRenderContext context)
+public static System.Web.WebPages.HelperResult Blocks(BlockRenderContext context)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 
  
-foreach (var block in context.Slide.Blocks)
-{
-	if (!block.Hide)
+	foreach (var blockRange in context.Slide.GetBlocksRangesWithSameVisibility())
 	{
-		
+		if (!blockRange[0].Hide)
+		{
+			foreach (var block in blockRange)
+			{
+				
 WebViewPage.WriteTo(@__razor_helper_writer, Block((dynamic)block, context));
 
-                                 
-	}
-	else if (context.RevealHidden)
-	{
+                                   
+			}
+		}
+		else if (context.RevealHidden)
+		{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<div class=\'revealed\' data-toggle=\"tooltip\" data-placement=\"left\" title=\"Этот " +
+"блок студенты не видят\">\r\n\t\t\t\t<h4>Инструктору</h4>\r\n");
 
 
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\'revealed\' data-toggle=\"tooltip\" data-placement=\"left\" title=\"Этот б" +
-"лок студенты не видят\">\r\n\t\t\t<h4>Инструктору</h4>\r\n\t\t\t");
-
-
+ 				foreach (var block in blockRange)
+				{
+					
 WebViewPage.WriteTo(@__razor_helper_writer, Block((dynamic)block, context));
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t</div>\r\n");
+                                    
+				}
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t</div>\r\n");
 
 
+		}
 	}
-}
 
 });
 

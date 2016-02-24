@@ -15,28 +15,32 @@
 			@context.Slide.Title
 			<span class="score">@Score(currentScore, context.Slide.MaxScore)</span>
 		</h1>
-		@Blocks(context.Slide.Blocks, context)
+		@Blocks(context)
 	</div>
 }
 
-@helper Blocks(IEnumerable<SlideBlock> blocks, BlockRenderContext context)
+@helper Blocks(BlockRenderContext context)
 {
-foreach (var block in context.Slide.Blocks)
-{
-	if (!block.Hide)
+	foreach (var blockRange in context.Slide.GetBlocksRangesWithSameVisibility())
 	{
-		@Block((dynamic)block, context)
+		if (!blockRange[0].Hide)
+		{
+			foreach (var block in blockRange)
+			{
+				@Block((dynamic)block, context)
+			}
+		}
+		else if (context.RevealHidden)
+		{
+			<div class='revealed' data-toggle="tooltip" data-placement="left" title="Этот блок студенты не видят">
+				<h4>Инструктору</h4>
+				@foreach (var block in blockRange)
+				{
+					@Block((dynamic)block, context)
+				}
+			</div>
+		}
 	}
-	else if (context.RevealHidden)
-	{
-
-
-		<div class='revealed' data-toggle="tooltip" data-placement="left" title="Этот блок студенты не видят">
-			<h4>Инструктору</h4>
-			@Block((dynamic)block, context)
-		</div>
-	}
-}
 }
 
 @helper Block(AbstractQuestionBlock block, BlockRenderContext context)

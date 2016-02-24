@@ -99,7 +99,6 @@
 	<xs:complexType name="Label">
 		<xs:simpleContent>
 			<xs:extension base="notEmptyString">
-				<xs:attribute name="hide" type="xs:boolean"/>
 				<xs:attribute name="only-body" type="xs:boolean" />
 			</xs:extension>
 		</xs:simpleContent>
