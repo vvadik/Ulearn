@@ -30,10 +30,6 @@
 					@SlideHtml.Blocks(Model.BlockRenderContext)
 				}
 
-				@if (!Model.IsGuest)
-				{
-					@Html.Partial("_AskBar")
-				}
 			</div>
 			@if (User.HasAccessFor(Model.CourseId, CourseRole.Tester))
 			{
