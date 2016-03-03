@@ -21,7 +21,7 @@ namespace uLearn.CourseTool
 				return;
 			}
 			process.StartInfo.FileName = file.FullName;
-			process.StartInfo.Arguments = $"\"{Dir}\" \"{Config.ULearnCourseId}\"";
+			process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\"", Dir, Config.ULearnCourseId);
 			process.Start();
 		}
 	}
