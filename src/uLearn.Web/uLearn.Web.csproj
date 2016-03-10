@@ -525,6 +525,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SwitchablePanel.cshtml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Shared\UserAvatar.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>UserAvatar.cshtml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SlideNavigation\TableOfContents.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1264,7 +1269,10 @@
     <Content Include="Views\Unit\Diagnostics.cshtml" />
     <Content Include="Views\Comments\SlideComments.cshtml" />
     <Content Include="Views\Comments\_Comment.cshtml" />
-    <Content Include="App_Code\UserAvatar.cshtml" />
+    <Content Include="Views\Shared\UserAvatar.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>UserAvatar.generated.cs</LastGenOutput>
+    </Content>
     <Content Include="Views\Comments\_CommentText.cshtml" />
     <Content Include="Views\Unit\Comments.cshtml" />
   </ItemGroup>

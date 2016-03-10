@@ -1,4 +1,6 @@
-﻿@using uLearn.Web
+﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
+@using uLearn.Web
+@* ReSharper disable once RedundantUsingDirective *@
 @using uLearn.Web.Models
 
 @helper GetAvatarPlaceholderColor(ApplicationUser user)
@@ -16,7 +18,7 @@
 {
 	if (user.HasAvatar)
 	{
-		<img class="user__avatar @classes" src="@user.AvatarUrl" alt="@HttpUtility.HtmlAttributeEncode(user.VisibleName)">
+		<img class="user__avatar @classes" src="@user.AvatarUrl" alt="@HttpUtility.HtmlAttributeEncode(user.VisibleName)" />
 	}
 	else
 	{
