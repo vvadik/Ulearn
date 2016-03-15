@@ -23,8 +23,6 @@ namespace uLearn.Web
 		public static Bundle JsBundle()
 		{
 			return new ScriptBundle("~/main-js").Include(
-				new string[]
-				{
 					"~/Scripts/jquery-{version}.js",
 					"~/Scripts/jquery.unobtrusive-ajax*",
 					"~/Scripts/notify-custom.min.js",
@@ -47,7 +45,6 @@ namespace uLearn.Web
 					"~/Scripts/respond.js",
 					"~/Scripts/slide-*",
 					"~/Scripts/users-list.js"
-				}
 				);
 		}
 
@@ -56,6 +53,8 @@ namespace uLearn.Web
 			return new StyleBundle("~/css").Include(
 				"~/katex/katex.min.css",
 				"~/Content/bootstrap.css",
+				"~/Content/font-awesome.css",
+				"~/Content/awesome-bootstrap-checkbox.css",
 				"~/codemirror/lib/codemirror.css",
 				"~/codemirror/theme/cobalt.css",
 				"~/codemirror/addon/hint/show-hint.css",
@@ -64,7 +63,8 @@ namespace uLearn.Web
 				"~/Content/ulearn.css",
 				"~/Content/bounce.css",
 				"~/flexslider/flexslider.css",
-				"~/Content/site.css");
+				"~/Content/site.css",
+				"~/Content/buttons.css");
 		}
 	}
 }

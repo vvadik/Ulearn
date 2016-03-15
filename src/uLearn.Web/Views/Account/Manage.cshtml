@@ -2,20 +2,28 @@
 	ViewBag.Title = "Управление аккаунтом";
 }
 <div class="container">
-	<h2>@User.Identity.Name</h2>
-
-	<p class="text-success">@ViewBag.StatusMessage</p>
+	
 	<div class="row">
-		<div class="col-md-12">
+		<div class="col-md-offset-2 col-md-8">
+			<h2>@User.Identity.Name</h2>
+
+			<hr />
+
+			<p class="text-success">@ViewBag.StatusMessage</p>
+
 			@Html.Action("ChangeDetailsPartial")
 			@if (ViewBag.HasLocalPassword)
 			{
 				@Html.Partial("_ChangePasswordPartial")
 			}
-			
+
 			<section id="externalLogins">
 				@Html.Action("RemoveAccountList")
-				@Html.Partial("../Login/_ExternalLoginsListPartial", new ExternalLoginsListModel { Action = "LinkLogin", ReturnUrl = ViewBag.ReturnUrl })
+				<div class="row">
+					<div class="col-md-6">
+						@Html.Partial("../Login/_ExternalLoginsListPartial", new ExternalLoginsListModel { Action = "LinkLogin", ReturnUrl = ViewBag.ReturnUrl })
+					</div>
+				</div>
 			</section>
 		</div>
 	</div>

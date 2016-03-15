@@ -17,7 +17,7 @@ namespace uLearn.Web.Controllers
 	public class CommentsController : Controller
 	{
 		private readonly CommentsRepo commentsRepo = new CommentsRepo();
-		private readonly UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb()));
+		private readonly UserManager<ApplicationUser> userManager = new ULearnUserManager();
 
 		public ActionResult SlideComments(string courseId, string slideId)
 		{

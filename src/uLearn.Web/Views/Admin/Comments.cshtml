@@ -10,37 +10,36 @@
 
 	<h3>Комментарии</h3>
 
-	@using (Html.BeginForm("SaveCommentsPolicy", "Unit", FormMethod.Post, new { @class = "form-horizontal" }))
+	@using (Html.BeginForm("SaveCommentsPolicy", "Admin", FormMethod.Post, new { @class = "form-horizontal" }))
 	{
 		@Html.AntiForgeryToken()
 		<input type="hidden" name="courseId" value="@Model.CourseId" />
 
-		<div>
-			<label>
-				@Html.CheckBox("isCommentsEnabled", Model.IsCommentsEnabled)
-
+		<div class="checkbox checkbox-default">
+			@Html.CheckBox("isCommentsEnabled", Model.IsCommentsEnabled)
+			<label for="isCommentsEnabled">
 				Комментарии включены
 			</label>
 		</div>
 
-		<div>
-			<label>
-				@Html.CheckBox("onlyInstructorsCanReply", Model.OnlyInstructorsCanReply)
+		<div class="checkbox checkbox-default">
+			@Html.CheckBox("onlyInstructorsCanReply", Model.OnlyInstructorsCanReply)
+			<label for="onlyInstructorsCanReply">
 				Отвечать могут только преподаватели
 			</label>
 		</div>
 
 		<h4>Режим модерации</h4>
-		<div>
-			<label>
-				@Html.RadioButton("moderationPolicy", "Premoderation", Model.ModerationPolicy == CommentModerationPolicy.Premoderation)
+		<div class="radio radio-default">
+			@Html.RadioButton("moderationPolicy", "Premoderation", Model.ModerationPolicy == CommentModerationPolicy.Premoderation, new { @id= "moderationPolicyPremoderation" })
+			<label for="moderationPolicyPremoderation">
 				премодерация
 			</label>
 		</div>
 
-		<div>
-			<label>
-				@Html.RadioButton("moderationPolicy", "Postmoderation", Model.ModerationPolicy == CommentModerationPolicy.Postmoderation)
+		<div class="radio radio-defaul">
+			@Html.RadioButton("moderationPolicy", "Postmoderation", Model.ModerationPolicy == CommentModerationPolicy.Postmoderation, new { @id = "moderationPolicyPostmoderation" })
+			<label for="moderationPolicyPostmoderation">
 				постмодерация
 			</label>
 		</div>

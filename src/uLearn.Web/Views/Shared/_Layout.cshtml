@@ -31,7 +31,7 @@
 				<ul class="top-navigation nav navbar-nav">
 					@if (User.HasAccess(CourseRole.CourseAdmin))
 					{
-						<li>@Html.ActionLink("Admin courses", "CourseList", "Unit")</li>
+						<li>@Html.ActionLink("Курсы", "CourseList", "Admin")</li>
 					}
 					@if (User.IsSystemAdministrator())
 					{

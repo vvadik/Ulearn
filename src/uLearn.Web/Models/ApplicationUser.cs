@@ -27,9 +27,11 @@ namespace uLearn.Web.Models
 		{
 			get
 			{
-				if (FirstName + LastName == "")
-					return "Пользователь";
-				return FirstName + " " + LastName;
+				if (FirstName + LastName != "")
+					return FirstName + " " + LastName;
+				if (!string.IsNullOrEmpty(UserName))
+					return UserName;
+				return "Пользователь";
 			}
 		}
 	}

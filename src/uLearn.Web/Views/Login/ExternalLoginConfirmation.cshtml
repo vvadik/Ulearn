@@ -3,30 +3,30 @@
 	ViewBag.Title = "Регистрация";
 }
 <div class="container">
-	<h2>@ViewBag.Title.</h2>
-	<h3>Привязка вашего аккаунта @ViewBag.LoginProvider.</h3>
+	<div class="row">
+		<div class="col-md-offset-3 col-md-6">
+			<h2>@ViewBag.Title</h2>
 
-	@using (Html.BeginForm("ExternalLoginConfirmation", "Login", new { ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-	{
-		@Html.AntiForgeryToken()
+			<section class="login-and-registration-form">
+				@using (Html.BeginForm("ExternalLoginConfirmation", "Login", new { ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+				{
+					@Html.AntiForgeryToken()
 
-		<hr />
-		@Html.ValidationSummary(true)
-		<p class="text-info">
-			Вы вошли с помощью <strong>@ViewBag.LoginProvider</strong>.
-			Как вы хотите, чтобы мы отображали ваше имя на этом сайте?
-		</p>
-		<div class="form-group">
-			@Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })
-			<div class="col-md-10">
-				@Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
-				@Html.ValidationMessageFor(m => m.UserName)
-			</div>
+					<p class="strike-line grey">
+						<span>
+							Выберите себе логин
+						</span>
+					</p>
+					@Html.ValidationSummary(true)
+					<div class="form-group">
+						@Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Логин", @autofocus = "autofocus" })
+						@Html.ValidationMessageFor(m => m.UserName)
+					</div>
+					<div class="form-group">
+						<input type="submit" class="ph-btn ph-btn-green btn-block" value="Сохранить" />
+					</div>
+				}
+			</section>
 		</div>
-		<div class="form-group">
-			<div class="col-md-offset-2 col-md-10">
-				<input type="submit" class="btn btn-default" value="Зарегистрироваться" />
-			</div>
-		</div>
-	}
+	</div>
 </div>

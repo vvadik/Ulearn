@@ -19,7 +19,7 @@ namespace uLearn.Web.Controllers
 
 
 		public LoginController()
-			: this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb())))
+			: this(new ULearnUserManager())
 		{
 		}
 
@@ -50,7 +50,7 @@ namespace uLearn.Web.Controllers
 					await AuthenticationManager.LoginAsync(HttpContext, user, model.RememberMe);
 					return Redirect(this.FixRedirectUrl(returnUrl));
 				}
-				ModelState.AddModelError("", @"Неверное имя пользователя или пароль.");
+				ModelState.AddModelError("", @"Неверное имя пользователя или пароль");
 			}
 
 			// If we got this far, something failed, redisplay form
@@ -81,6 +81,12 @@ namespace uLearn.Web.Controllers
 			var user = await userManager.FindAsync(loginInfo.Login);
 			if (user != null)
 			{
+				var avatarUrl = loginInfo.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == "AvatarUrl")?.Value;
+				if (!string.IsNullOrEmpty(avatarUrl))
+				{
+					user.AvatarUrl = avatarUrl;
+					await userManager.UpdateAsync(user);
+				}
 				await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
 				return Redirect(this.FixRedirectUrl(returnUrl));
 			}
@@ -111,7 +117,15 @@ namespace uLearn.Web.Controllers
 			if (ModelState.IsValid)
 			{
 				var userAvatarUrl = info.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == "AvatarUrl")?.Value;
-				var user = new ApplicationUser { UserName = model.UserName, AvatarUrl = userAvatarUrl };
+				var firstName = info.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.GivenName)?.Value;
+				var lastName = info.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Surname)?.Value;
+				var user = new ApplicationUser
+				{
+					UserName = model.UserName,
+					FirstName = firstName,
+					LastName = lastName,
+					AvatarUrl = userAvatarUrl,
+				};
 				var result = await userManager.CreateAsync(user);
 				if (result.Succeeded)
 				{

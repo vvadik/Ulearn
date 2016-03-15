@@ -17,7 +17,7 @@ namespace uLearn.Web
 		// For more information on configuring authentication, please visit http://go.microsoft.com/fwlink/?LinkId=301864
 		public void ConfigureAuth(IAppBuilder app)
 		{
-			app.CreatePerOwinContext(() => new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb())));
+			app.CreatePerOwinContext(() => new ULearnUserManager());
 
 			// Enable the application to use a cookie to store information for the signed in user
 			app.UseCookieAuthentication(new CookieAuthenticationOptions

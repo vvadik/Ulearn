@@ -720,3 +720,95 @@ li.li-success {
 	font-size: 12pt;
 	padding-top: 2px;
 }
+
+
+/* Login and registration forms */
+.login-and-registration-form input {
+	max-width: initial;
+}
+
+.login-and-registration-form input[type=text],
+.login-and-registration-form input[type=password] {
+	border-width: 2px;
+    padding: 10px 16px;
+    height: 50px;
+    font-size: 16px;
+}
+
+.login-and-registration-form .field-validation-error {
+	display: inline-block;
+	padding: 4px 16px 4px;
+    color: #E46463;
+}
+
+.login-and-registration-form .input-validation-error {
+	border-color: #EA8180;
+}
+
+.login-and-registration-form .validation-summary-errors {
+    color: #FFFCFC;
+    border: 2px solid #EA8180;
+    border-radius: 6px;
+    background-color: #EA8180;
+    text-align: left;
+    padding: 10px 16px 0;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.login-and-registration-form .checkbox label::before {
+	border-width: 2px;
+}
+
+
+/* Account page */
+#externalLogins #socialLoginList .ph-btn {
+	padding: 6px 40px 5px;
+    display: inline-block;
+    width: auto;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+
+/* Strike line */
+.strike-line {
+    display: block;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+	margin-bottom: 10px;
+}
+
+.strike-line > span {
+    position: relative;
+    display: inline-block;
+	font-style: italic;
+}
+
+.strike-line > span:before,
+.strike-line > span:after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 9999px;
+    height: 1px;
+}
+
+.strike-line.grey > span:before,
+.strike-line.grey > span:after {
+	background-color: #ccc;
+}
+.strike-line.grey > span {
+	color: #999;
+}
+
+.strike-line > span:before {
+    right: 100%;
+    margin-right: 10px;
+}
+
+.strike-line > span:after {
+    left: 100%;
+    margin-left: 10px;
+}

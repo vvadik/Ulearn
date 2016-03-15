@@ -2,6 +2,16 @@
     ViewBag.Title = "Не удалось войти";
 }
 <div class="container">
-	<h2>@ViewBag.Title.</h2>
-	<h3 class="text-error">Не удалось войти с помощью стороннего сервиса аутентификации.</h3>
+	<div class="row">
+		<div class="col-md-offset-3 col-md-6">
+			<h2>@ViewBag.Title</h2>
+			<p>Не удалось войти с помощью стороннего сервиса аутентификации.</p>
+
+			<section id="socialLoginForm">
+				@Html.Partial("_ExternalLoginsListPartial", new ExternalLoginsListModel { Action = "ExternalLogin", ReturnUrl = ViewBag.ReturnUrl })
+			</section>
+
+			или <a href="/">вернуться на главную</a>
+		</div>
+	</div>
 </div>

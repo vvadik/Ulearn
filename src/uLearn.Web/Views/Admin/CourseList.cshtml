@@ -15,10 +15,10 @@
 	@if (User.IsSystemAdministrator())
 	{
 		<h3>Создать новый курс</h3>
-		using (Html.BeginForm("CreateCourse", "Unit", FormMethod.Post, new { @class = "form-inline" }))
+		using (Html.BeginForm("CreateCourse", "Admin", FormMethod.Post, new { @class = "form-inline" }))
 		{
 			@Html.AntiForgeryToken()
-			<input type="text" class="form-control" name="courseId" value="@Model.CourseCreationLastTry"/>
+			<input type="text" class="form-control" name="courseId" value="@Model.CourseCreationLastTry" placeholder="CourseId"/>
 			<input type="submit" class="btn btn-danger" value="Создать" />
 			<p>CourseId используется как часть URL, имя файла, часть путей. Лучше использовать только латинские буквы и цифры.</p>
 		}

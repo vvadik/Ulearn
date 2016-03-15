@@ -4,8 +4,7 @@
 @if (!Model.HasPassword)
 {
 	<p class="text-info">
-		У вас еще нет логина и пароля для этого сайта.
-		Создайте логин и пароль и вы сможете заходить на этот сайт без использования внешнего логина.
+		Задайте пароль, чтобы заходить на uLearn без внешнего логина
 	</p>
 }
 
@@ -16,32 +15,32 @@
 	@Html.ValidationSummary("Нет, так не пойдет!")
 	@Html.HiddenFor(m => m.UserId)
 	<div class="form-group">
-		@Html.LabelFor(m => m.Name, new { @class = "col-md-2 control-label" })
-		<div class="col-md-10">
+		@Html.LabelFor(m => m.Name, new { @class = "col-md-3 control-label" })
+		<div class="col-md-9">
 			@Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
 		</div>
 	</div>
 	<div class="form-group">
-		@Html.LabelFor(m => m.FirstName, new { @class = "col-md-2 control-label" })
-		<div class="col-md-10">
+		@Html.LabelFor(m => m.FirstName, new { @class = "col-md-3 control-label" })
+		<div class="col-md-9">
 			@Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
 		</div>
 	</div>
 	<div class="form-group">
-		@Html.LabelFor(m => m.LastName, new { @class = "col-md-2 control-label" })
-		<div class="col-md-10">
+		@Html.LabelFor(m => m.LastName, new { @class = "col-md-3 control-label" })
+		<div class="col-md-9">
 			@Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
 		</div>
 	</div>
 	<div class="form-group">
-		@Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
-		<div class="col-md-10">
+		@Html.LabelFor(m => m.Email, new { @class = "col-md-3 control-label" })
+		<div class="col-md-9">
 			@Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
 		</div>
 	</div>
 	<div class="form-group">
-		@Html.LabelFor(m => m.GroupName, new { @class = "col-md-2 control-label" })
-		<div class="col-md-10">
+		@Html.LabelFor(m => m.GroupName, new { @class = "col-md-3 control-label" })
+		<div class="col-md-9">
 			@Html.TextBoxFor(m => m.GroupName, new { @class = "form-control", list = "groupsList" })
 			@Html.Partial("_GroupsPrompt")
 		</div>
@@ -49,21 +48,21 @@
 	if (!Model.HasPassword)
 	{
 		<div class="form-group">
-			@Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
-			<div class="col-md-10">
+			@Html.LabelFor(m => m.Password, new { @class = "col-md-3 control-label" })
+			<div class="col-md-9">
 				@Html.PasswordFor(m => m.Password, new { @class = "form-control" })
 			</div>
 		</div>
 		<div class="form-group">
-			@Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label" })
-			<div class="col-md-10">
+			@Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-3 control-label" })
+			<div class="col-md-9">
 				@Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
 			</div>
 		</div>
 	}
 	<div class="form-group">
-		<div class="col-md-offset-2 col-md-10">
-			<input type="submit" value="Сохранить изменения" class="btn btn-default" />
+		<div class="col-md-offset-3 col-md-9">
+			<input type="submit" value="Сохранить изменения" class="btn btn-primary" />
 		</div>
 	</div>
 }

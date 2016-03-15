@@ -23,15 +23,10 @@ namespace uLearn.Web.Controllers
 		private UserRolesRepo userRolesRepo;
 
 		public AccountController()
-			: this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb())))
+			: this(new ULearnUserManager())
 		{
 			db = new ULearnDb();
 			courseManager = WebCourseManager.Instance;
-			userManager.UserValidator =
-				new UserValidator<ApplicationUser>(userManager)
-				{
-					AllowOnlyAlphanumericUserNames = false
-				};
 			usersRepo = new UsersRepo(db);
 			userRolesRepo = new UserRolesRepo(db);
 		}
@@ -244,13 +239,13 @@ namespace uLearn.Web.Controllers
 		{
 			ViewBag.StatusMessage =
 				message == ManageMessageId.ChangePasswordSuccess
-					? "Пароль был изменен."
+					? "Пароль был изменен"
 					: message == ManageMessageId.SetPasswordSuccess
-						? "Пароль установлен."
+						? "Пароль установлен"
 						: message == ManageMessageId.RemoveLoginSuccess
-							? "Внешний логин удален."
+							? "Внешний логин удален"
 							: message == ManageMessageId.Error
-								? "Ошибка."
+								? "Ошибка"
 								: "";
 			ViewBag.HasLocalPassword = ControllerUtils.HasPassword(userManager, User);
 			ViewBag.ReturnUrl = Url.Action("Manage");

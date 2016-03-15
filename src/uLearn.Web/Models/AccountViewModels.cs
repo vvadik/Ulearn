@@ -5,37 +5,37 @@ namespace uLearn.Web.Models
 {
 	public class ExternalLoginConfirmationViewModel
 	{
-		[Required(ErrorMessage = "{0} — это обязательное поле")]
+		[Required(ErrorMessage = "{0} есть у каждого пользователя")]
 		[Display(Name = "Логин")]
 		public string UserName { get; set; }
 	}
 
 	public class ManageUserViewModel
 	{
-		[Required(ErrorMessage = "{0} — это обязательное поле")]
+		[Required(ErrorMessage = "{0} обязателен")]
 		[DataType(DataType.Password)]
 		[Display(Name = "Текущий пароль")]
 		public string OldPassword { get; set; }
 
-		[Required(ErrorMessage = "{0} — это обязательное поле")]
-		[StringLength(100, ErrorMessage = "{0} должен быть длиной как минимум {2} символов.", MinimumLength = 6)]
+		[Required(ErrorMessage = "{0} нужно ввести обязательно")]
+		[StringLength(100, ErrorMessage = "{0} не может быть короче {2} символов", MinimumLength = 6)]
 		[DataType(DataType.Password)]
 		[Display(Name = "Новый пароль")]
 		public string NewPassword { get; set; }
 
 		[DataType(DataType.Password)]
-		[Display(Name = "Подтвердите новый пароль")]
-		[System.ComponentModel.DataAnnotations.Compare("NewPassword", ErrorMessage = "Подтверждение нового пароля и сам новый пароль отличаются.")]
+		[Display(Name = "Ещё раз")]
+		[System.ComponentModel.DataAnnotations.Compare("NewPassword", ErrorMessage = "Новый пароль и подтверждение отличаются")]
 		public string ConfirmPassword { get; set; }
 	}
 
 	public class LoginViewModel
 	{
-		[Required(ErrorMessage = "{0} — это обязательное поле")]
+		[Required(ErrorMessage = "Ты забыл логин?")]
 		[Display(Name = "Логин")]
 		public string UserName { get; set; }
 
-		[Required(ErrorMessage = "{0} — это обязательное поле")]
+		[Required(ErrorMessage = "Введи пароль")]
 		[DataType(DataType.Password)]
 		[Display(Name = "Пароль")]
 		public string Password { get; set; }
@@ -46,22 +46,22 @@ namespace uLearn.Web.Models
 
 	public class RegisterViewModel
 	{
-		[Required(ErrorMessage = "{0} — это обязательное поле")]
+		[Required(ErrorMessage = "{0} должен быть у каждого пользователя")]
 		[Display(Name = "Логин")]
 		public string UserName { get; set; }
 
-		[Required(ErrorMessage = "{0} — это обязательное поле")]
-		[StringLength(100, ErrorMessage = "{0} должен быть длиной как минимум {2} символов.", MinimumLength = 6)]
+		[Required(ErrorMessage = "{0} обязателен")]
+		[StringLength(100, ErrorMessage = "{0} не может быть короче {2} символов", MinimumLength = 6)]
 		[DataType(DataType.Password)]
 		[Display(Name = "Пароль")]
 		public string Password { get; set; }
 
 		[DataType(DataType.Password)]
-		[Display(Name = "Подтвердите пароль")]
+		[Display(Name = "Ещё раз")]
 		// Bug workaround. Details: http://stackoverflow.com/questions/19978239/custom-errormessage-for-compare-attribute-does-not-work
 #pragma warning disable 0618
 		// ReSharper disable once CSharpWarnings::CS0618
-		[System.Web.Mvc.Compare("Password", ErrorMessage = "Подтверждение пароля и пароль отличаются.")]
+		[System.Web.Mvc.Compare("Password", ErrorMessage = "Подтверждение пароля и пароль отличаются")]
 #pragma warning restore 0618
 		public string ConfirmPassword { get; set; }
 		
@@ -75,7 +75,7 @@ namespace uLearn.Web.Models
 
 		public bool HasPassword { get; set; }
 
-		[Required(ErrorMessage = "{0} — это обязательное поле")]
+		[Required(ErrorMessage = "{0} должен быть у каждого пользователя")]
 		[Display(Name = "Логин")]
 		public string Name { get; set; }
 
@@ -83,17 +83,17 @@ namespace uLearn.Web.Models
 		public string GroupName { get; set; }
 
 		[Required(ErrorMessage = "{0} — это обязательное поле")]
-		[StringLength(100, ErrorMessage = "{0} должен быть длиной как минимум {2} символов.", MinimumLength = 6)]
+		[StringLength(100, ErrorMessage = "{0} не может быть короче {2} символов", MinimumLength = 6)]
 		[DataType(DataType.Password)]
 		[Display(Name = "Пароль")]
 		public string Password { get; set; }
 
 		[DataType(DataType.Password)]
-		[Display(Name = "Подтвердите пароль")]
+		[Display(Name = "Ещё раз")]
 		// Bug workaround. Details: http://stackoverflow.com/questions/19978239/custom-errormessage-for-compare-attribute-does-not-work
 #pragma warning disable 0618
 		// ReSharper disable once CSharpWarnings::CS0618
-		[System.Web.Mvc.Compare("Password", ErrorMessage = "Подтверждение пароля и пароль отличаются.")]
+		[System.Web.Mvc.Compare("Password", ErrorMessage = "Пароль и подтверждение отличаются")]
 #pragma warning restore 0618
 		public string ConfirmPassword { get; set; }
 

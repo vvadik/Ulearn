@@ -16,7 +16,7 @@ namespace uLearn.Web
 		public static string ToDatePrettyString(this DateTime dateTime, bool withoutYearIfItsCurrent=false)
 		{
 			if (DateTime.Now.Year == dateTime.Year && withoutYearIfItsCurrent)
-				return dateTime.ToString("dd MMMM");
+				return dateTime.ToString("d MMMM");
 			return dateTime.ToLongDateString();
 		}
 

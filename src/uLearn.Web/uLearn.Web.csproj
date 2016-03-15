@@ -280,6 +280,7 @@
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
     <Compile Include="DataContexts\CommentsRepo.cs" />
+    <Compile Include="DataContexts\ULearnUserManager.cs" />
     <Compile Include="DataContexts\UsersRepo.cs" />
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="HtmlExtensions.cs" />
@@ -305,7 +306,7 @@
     <Compile Include="Controllers\RestorePasswordController.cs" />
     <Compile Include="Controllers\RunnerController.cs" />
     <Compile Include="Controllers\SandboxController.cs" />
-    <Compile Include="Controllers\UnitController.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AnalyticsController.cs" />
     <Compile Include="Controllers\QuizController.cs" />
     <Compile Include="Controllers\SlideNavigationController.cs" />
@@ -961,9 +962,13 @@
     <Content Include="codemirror\theme\vibrant-ink.css" />
     <Content Include="codemirror\theme\xq-dark.css" />
     <Content Include="codemirror\theme\xq-light.css" />
+    <Content Include="Content\awesome-bootstrap-checkbox.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bounce.css" />
+    <Content Include="Content\buttons.css" />
+    <Content Include="Content\font-awesome.css" />
+    <Content Include="Content\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\logo.png" />
     <Content Include="Content\tablesorter.css" />
     <Content Include="Content\ulearn.css" />
@@ -986,6 +991,11 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="codemirror\README.md" />
     <Content Include="Courses.Staging\Web.config" />
+    <Content Include="Content\fonts\fontawesome-webfont.eot" />
+    <Content Include="Content\fonts\fontawesome-webfont.ttf" />
+    <Content Include="Content\fonts\fontawesome-webfont.woff" />
+    <Content Include="Content\fonts\fontawesome-webfont.woff2" />
+    <Content Include="Content\fonts\FontAwesome.otf" />
     <None Include="encoding.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -1209,8 +1219,8 @@
     <Content Include="Views\Hint\UseHint.cshtml" />
     <Content Include="Views\Quiz\Analytics.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
-    <Content Include="Views\Unit\List.cshtml" />
-    <Content Include="Views\Unit\CourseList.cshtml" />
+    <Content Include="Views\Admin\List.cshtml" />
+    <Content Include="Views\Admin\CourseList.cshtml" />
     <Content Include="Views\Analytics\UnitStatistics.cshtml" />
     <Content Include="Views\Course\InstructorNote.cshtml" />
     <Content Include="Views\Course\SelectGroup.cshtml" />
@@ -1254,7 +1264,7 @@
     <Content Include="Views\Course\LtiSlide.cshtml" />
     <Content Include="Views\Account\StudentInfo.cshtml" />
     <Content Include="Views\Shared\_GroupsPrompt.cshtml" />
-    <Content Include="Views\Unit\SpellingErrors.cshtml" />
+    <Content Include="Views\Admin\SpellingErrors.cshtml" />
     <Content Include="Views\RestorePassword\Index.cshtml" />
     <Content Include="Views\RestorePassword\SetNewPassword.cshtml" />
     <Content Include="Views\Course\_LoginForContinue.cshtml" />
@@ -1262,11 +1272,11 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>SwitchablePanel.generated.cs</LastGenOutput>
     </Content>
-    <Content Include="Views\Unit\ManageMenu.cshtml" />
-    <Content Include="Views\Unit\Packages.cshtml" />
+    <Content Include="Views\Admin\ManageMenu.cshtml" />
+    <Content Include="Views\Admin\Packages.cshtml" />
     <Content Include="Views\Shared\_UserListPartial.cshtml" />
-    <Content Include="Views\Unit\Users.cshtml" />
-    <Content Include="Views\Unit\Diagnostics.cshtml" />
+    <Content Include="Views\Admin\Users.cshtml" />
+    <Content Include="Views\Admin\Diagnostics.cshtml" />
     <Content Include="Views\Comments\SlideComments.cshtml" />
     <Content Include="Views\Comments\_Comment.cshtml" />
     <Content Include="Views\Shared\UserAvatar.cshtml">
@@ -1274,7 +1284,7 @@
       <LastGenOutput>UserAvatar.generated.cs</LastGenOutput>
     </Content>
     <Content Include="Views\Comments\_CommentText.cshtml" />
-    <Content Include="Views\Unit\Comments.cshtml" />
+    <Content Include="Views\Admin\Comments.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
