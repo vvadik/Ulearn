@@ -201,7 +201,7 @@
 	var isMultiply = block.Multiple;
 	var typeInp = isMultiply ? "checkbox" : "radio";
 	QuizBlockData model = context.GetBlockData(block) ?? new QuizBlockData(new QuizModel(), 1, QuizState.NotPassed);
-	<div class="quiz-block-mark @typeInp" id='@(block.Id + "_quizBlock")'>
+	<div class="quiz-block-mark @typeInp @typeInp-default" id='@(block.Id + "_quizBlock")'>
 		@for (var itemIndex = 0; itemIndex < items.Length; itemIndex++)
 		{
 			var item = items[itemIndex];
@@ -216,8 +216,8 @@
 				title = (item.IsCorrect ? "Правильный" : "Неправильный") + " вариант";
 			}
 			<div class="quiz">
-				<label class="@itemClass" title="@title" @GetGuestOnclick(context.IsGuest)>
-					<input @ans autocomplete="off" id='@(block.Id + "quizBlock" + item.Id)' name=@("group" + id) type="@typeInp" @GetGuestDisable(context.IsGuest)>
+				<input @ans autocomplete="off" id='@(block.Id + "quizBlock" + item.Id)' name=@("group" + id) type="@typeInp" @GetGuestDisable(context.IsGuest)>
+				<label class="@itemClass" title="@title" for="@(block.Id + "quizBlock" + item.Id)" @GetGuestOnclick(context.IsGuest)>
 					@item.Description.RenderTex()
 				</label>
 				@if (model.QuizState == QuizState.Total && item.IsCorrect)
@@ -287,8 +287,8 @@
 	}
 	<div class="radio quiz-block-mark" id="@(block.Id + "_quizBlock")">
 		<div class="quiz">
-			<label class="@trueItemClass" title="@ttitle" @GetGuestOnclick(context.IsGuest)>
-				<input autocomplete="off" @tchecked id='@(block.Id + "quizBlock" + "True")' name='@(block.Id + "group")' type="radio" @GetGuestDisable(context.IsGuest)>
+			<input autocomplete="off" @tchecked id='@(block.Id + "quizBlock" + "True")' name='@(block.Id + "group")' type="radio" @GetGuestDisable(context.IsGuest)>
+			<label class="@trueItemClass" title="@ttitle" for="@(block.Id + "quizBlock" + "True")" @GetGuestOnclick(context.IsGuest)>
 				Верно
 			</label>
 			@if (model.QuizState == QuizState.Total && block.Answer)
@@ -297,8 +297,8 @@
 			}
 		</div>
 		<div class="quiz">
-			<label class="@falseItemClass" title="@ftitle" @GetGuestOnclick(context.IsGuest)>
-				<input autocomplete="off" @fchecked id='@(block.Id + "quizBlock" + "False")' name='@(block.Id + "group")' type="radio" @GetGuestDisable(context.IsGuest)>
+			<input autocomplete="off" @fchecked id='@(block.Id + "quizBlock" + "False")' name='@(block.Id + "group")' type="radio" @GetGuestDisable(context.IsGuest)>
+			<label class="@falseItemClass" title="@ftitle" for="@(block.Id + "quizBlock" + "False")" @GetGuestOnclick(context.IsGuest)>
 				Неверно
 			</label>
 			@if (model.QuizState == QuizState.Total && !block.Answer)
