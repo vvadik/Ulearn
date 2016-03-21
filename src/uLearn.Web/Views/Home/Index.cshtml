@@ -78,6 +78,8 @@
 	</div>
 </div>
 
-<script>
-	uploadVisits("@Url.Action("Upload", "Visits")")
-</script>
+@section scripts {
+	<script>
+		uploadVisits("@Url.Action("Upload", "Visits")")
+	</script>
+}

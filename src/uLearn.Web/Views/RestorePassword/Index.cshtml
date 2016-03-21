@@ -4,27 +4,33 @@
 	ViewBag.Title = "Восстановление пароля";
 }
 
-
 <div class="container">
-	@using (Html.BeginForm("Index", "RestorePassword", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-	{
-		<h2>Восстановление пароля</h2>
-		<hr/>
-		foreach (var message in Model.Messages)
-		{
-			<p class="@(message.IsError ? "text-danger" : "text-success")">@message.Text</p>
-		}
-		@Html.AntiForgeryToken()
-		<div class="form-group">
-			@Html.Label("Имя пользователя или электронная почта", new { @class = "col-md-3 control-label" })
-			<div class="col-md-9">
-				@Html.TextBox("username", Model.UserName, new { @class = "form-control" })
-			</div>
+	<div class="row">
+		<div class="col-md-offset-3 col-md-6">
+			<h2>@ViewBag.Title</h2>
+			<section class="login-and-registration-form">
+				@using (Html.BeginForm("Index", "RestorePassword", FormMethod.Post, new { role = "form" }))
+				{
+					<div class="strike-line grey">
+						<span>Мы вышлем ссылку на почту</span>
+					</div>
+
+					foreach (var message in Model.Messages)
+					{
+						<p class="@(message.IsError ? "text-danger" : "text-success")">@message.Text</p>
+					}
+
+					@Html.AntiForgeryToken()
+					<div class="form-group">
+						@Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Имя пользователя или электронная почта", @autofocus = "autofocus" })
+						@Html.ValidationMessageFor(m => m.UserName)
+					</div>
+					<div class="form-group">
+						<input type="submit" value="Сбросить пароль" class="ph-btn ph-btn-green btn-block"/>
+					</div>
+					@Html.ValidationSummary(true)
+				}
+			</section>
 		</div>
-		<div class="form-group">
-			<div class="col-md-offset-3 col-md-9">
-				<input type="submit" value="Сбросить пароль" class="btn btn-primary" />
-			</div>
-		</div>
-	}
+	</div>
 </div>

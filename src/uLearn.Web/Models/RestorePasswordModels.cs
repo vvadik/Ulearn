@@ -11,15 +11,15 @@ namespace uLearn.Web.Models
 		[Required]
 		public string RequestId { get; set; }
 
-		[Required(ErrorMessage = "{0} — это обязательное поле")]
-		[StringLength(100, ErrorMessage = "{0} должен быть длиной как минимум {2} символов.", MinimumLength = 6)]
+		[Required(ErrorMessage = "{0} обязателен")]
+		[StringLength(100, ErrorMessage = "{0} не может быть короче {2} символов", MinimumLength = 6)]
 		[DataType(DataType.Password)]
 		[Display(Name = "Новый пароль")]
 		public string NewPassword { get; set; }
 
 		[DataType(DataType.Password)]
-		[Display(Name = "Подтвердите новый пароль")]
-		[System.ComponentModel.DataAnnotations.Compare("NewPassword", ErrorMessage = "Подтверждение нового пароля и сам новый пароль отличаются.")]
+		[Display(Name = "Ещё раз")]
+		[System.ComponentModel.DataAnnotations.Compare("NewPassword", ErrorMessage = "Пароли отличаются")]
 		public string ConfirmPassword { get; set; }
 
 		public string[] Errors { get; set; }

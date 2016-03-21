@@ -78,9 +78,9 @@ namespace uLearn
 					{
 						ReloadCourseFromZip(zipFile);
 					}
-					catch
+					catch (Exception e)
 					{
-						//throw new Exception("Error loading course from " + zipFile.Name, e);
+						throw new Exception("Error loading course from " + zipFile.Name, e);
 					}
 			}
 		}
@@ -99,6 +99,7 @@ namespace uLearn
 				courseId = GetCourseId(zipFile.Name);
 				var courseDir = coursesDirectory.CreateSubdirectory(courseId);
 				Directory.Delete(courseDir.FullName, true);
+				courseDir.Refresh();
 				courseDir.Create();
 				zip.ExtractAll(courseDir.FullName, ExtractExistingFileAction.OverwriteSilently);
 				ReloadCourse(courseDir);

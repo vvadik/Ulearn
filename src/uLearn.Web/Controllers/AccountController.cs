@@ -202,14 +202,22 @@ namespace uLearn.Web.Controllers
 				if (result.Succeeded)
 				{
 					await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
+
 					if (string.IsNullOrWhiteSpace(model.ReturnUrl))
-						return RedirectToAction("Index", "Home");
-					return Redirect(this.FixRedirectUrl(model.ReturnUrl));
+						model.ReturnUrl = Url.Action("Index", "Home");
+					else
+						model.ReturnUrl = this.FixRedirectUrl(model.ReturnUrl);
+
+					model.RegistrationFinished = true;
+					
+//					if (string.IsNullOrWhiteSpace(model.ReturnUrl))
+//						return RedirectToAction("Index", "Home");
+//					return Redirect(this.FixRedirectUrl(model.ReturnUrl));
 				}
-				this.AddErrors(result);
+				else
+					this.AddErrors(result);
 			}
 
-			// If we got this far, something failed, redisplay form
 			return View(model);
 		}
 

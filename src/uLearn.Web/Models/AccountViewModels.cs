@@ -17,7 +17,7 @@ namespace uLearn.Web.Models
 		[Display(Name = "Текущий пароль")]
 		public string OldPassword { get; set; }
 
-		[Required(ErrorMessage = "{0} нужно ввести обязательно")]
+		[Required(ErrorMessage = "{0} нужно обязательно ввести")]
 		[StringLength(100, ErrorMessage = "{0} не может быть короче {2} символов", MinimumLength = 6)]
 		[DataType(DataType.Password)]
 		[Display(Name = "Новый пароль")]
@@ -25,7 +25,7 @@ namespace uLearn.Web.Models
 
 		[DataType(DataType.Password)]
 		[Display(Name = "Ещё раз")]
-		[System.ComponentModel.DataAnnotations.Compare("NewPassword", ErrorMessage = "Новый пароль и подтверждение отличаются")]
+		[System.ComponentModel.DataAnnotations.Compare("NewPassword", ErrorMessage = "Пароли отличаются")]
 		public string ConfirmPassword { get; set; }
 	}
 
@@ -61,11 +61,13 @@ namespace uLearn.Web.Models
 		// Bug workaround. Details: http://stackoverflow.com/questions/19978239/custom-errormessage-for-compare-attribute-does-not-work
 #pragma warning disable 0618
 		// ReSharper disable once CSharpWarnings::CS0618
-		[System.Web.Mvc.Compare("Password", ErrorMessage = "Подтверждение пароля и пароль отличаются")]
+		[System.Web.Mvc.Compare("Password", ErrorMessage = "Пароли отличаются")]
 #pragma warning restore 0618
 		public string ConfirmPassword { get; set; }
 		
 		public string ReturnUrl { get; set; }
+
+		public bool RegistrationFinished { get; set; }
 	}
 
 	public class UserViewModel
@@ -93,7 +95,7 @@ namespace uLearn.Web.Models
 		// Bug workaround. Details: http://stackoverflow.com/questions/19978239/custom-errormessage-for-compare-attribute-does-not-work
 #pragma warning disable 0618
 		// ReSharper disable once CSharpWarnings::CS0618
-		[System.Web.Mvc.Compare("Password", ErrorMessage = "Пароль и подтверждение отличаются")]
+		[System.Web.Mvc.Compare("Password", ErrorMessage = "Пароли отличаются")]
 #pragma warning restore 0618
 		public string ConfirmPassword { get; set; }
 

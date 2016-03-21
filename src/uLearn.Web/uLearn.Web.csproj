@@ -296,6 +296,10 @@
     <Compile Include="Migrations\201602291950318_AddUserAvatars.Designer.cs">
       <DependentUpon>201602291950318_AddUserAvatars.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201603210641239_AddUserRegistrationTimestamp.cs" />
+    <Compile Include="Migrations\201603210641239_AddUserRegistrationTimestamp.Designer.cs">
+      <DependentUpon>201603210641239_AddUserRegistrationTimestamp.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\CommentLike.cs" />
     <Compile Include="Models\CommentPolicy.cs" />
@@ -687,6 +691,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201602291950318_AddUserAvatars.resx">
       <DependentUpon>201602291950318_AddUserAvatars.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201603210641239_AddUserRegistrationTimestamp.resx">
+      <DependentUpon>201603210641239_AddUserRegistrationTimestamp.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
