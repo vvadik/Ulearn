@@ -1,13 +1,5 @@
 ﻿@model UserViewModel
 
-
-@if (!Model.HasPassword)
-{
-	<p class="text-info">
-		Задайте пароль, чтобы заходить на uLearn без внешнего логина
-	</p>
-}
-
 <section class="login-and-registration-form">
 	@using (Html.BeginForm("ChangeDetailsPartial", "Account", FormMethod.Post, new { role = "form" }))
 	{
@@ -40,6 +32,10 @@
 		</div>
 		if (!Model.HasPassword)
 		{
+			<p class="text-info">
+				Задайте пароль, чтобы авторизовываться по логину
+			</p>
+
 			<div class="form-group">
 				@Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "Пароль" })
 				@Html.ValidationMessageFor(m => m.Password)
