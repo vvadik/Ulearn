@@ -1125,24 +1125,6 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult QuizBlock(MatchingBlock block, BlockRenderContext context)
-{
-#line default
-#line hidden
-return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
- 
-	
-
-});
-
-#line default
-#line hidden
-}
-#line default
-#line hidden
-
-#line default
-#line hidden
 public static System.Web.WebPages.HelperResult RunErrors()
 {
 #line default
@@ -1340,9 +1322,9 @@ WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\t<a");
 
 WriteLiteralTo(__razor_helper_writer, " class=\"btn btn-default\"");
 
-WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 12982), Tuple.Create("\"", 13014)
-, Tuple.Create(Tuple.Create("", 12989), Tuple.Create<System.Object, System.Int32>(data.AcceptedSolutionUrl
-, 12989), false)
+WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 12903), Tuple.Create("\"", 12935)
+, Tuple.Create(Tuple.Create("", 12910), Tuple.Create<System.Object, System.Int32>(data.AcceptedSolutionUrl
+, 12910), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">Продолжить</a>\r\n\t\t\t\t\t<button");
