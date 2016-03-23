@@ -28,7 +28,7 @@
 					@(unit.Item2 == null ? "" : unit.Item2.UserName)
 				</td>
 				<td>
-					@using (Html.BeginForm("SetPublishTime", "Unit", new { courseId = Model.CourseId, unitName = unit.Item1 }, FormMethod.Post))
+					@using (Html.BeginForm("SetPublishTime", "Admin", new { courseId = Model.CourseId, unitName = unit.Item1 }, FormMethod.Post))
 					{
 						<input type="text" name="publishTime" value="@Model.CurrentDateTime.ToString("s")" />
 						<button type="submit" class="btn btn-sm btn-info" title="Установить новое время публикации"><i class="glyphicon glyphicon-edit"></i></button>
@@ -37,7 +37,7 @@
 				<td>
 					@if (unit.Item2 != null)
 					{
-						using (Html.BeginForm("RemovePublishTime", "Unit", new { courseId = Model.CourseId, unitName = unit.Item1 }, FormMethod.Post))
+						using (Html.BeginForm("RemovePublishTime", "Admin", new { courseId = Model.CourseId, unitName = unit.Item1 }, FormMethod.Post))
 						{
 							<button type="submit" class="btn btn-sm btn-danger" title="Удалить публикацию"><i class="glyphicon glyphicon-remove"></i></button>
 						}

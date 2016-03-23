@@ -2,7 +2,6 @@
 @using Microsoft.Owin.Security
 
 
-<h4>Вход с помощью</h4>
 @{
 	var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes().Where(x => x.AuthenticationType != "LTI").ToList();
 	if (!loginProviders.Any())
@@ -25,7 +24,7 @@
 				<p>
 					@foreach (AuthenticationDescription p in loginProviders)
 					{
-						<button type="submit" class="btn btn-default" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType" title="Войдите, используя ваше аккаунт @p.Caption">@p.AuthenticationType</button>
+						<button type="submit" class="ph-btn ph-btn-blue btn-block" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType" title="Войдите, используя ваш аккаунт @p.Caption">Войти через @p.AuthenticationType</button>
 					}
 				</p>
 			</div>

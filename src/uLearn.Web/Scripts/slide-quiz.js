@@ -2,10 +2,10 @@
 	if (areAllAnswered(expectedCount)) {
 		var answers = [];
 		$(".quiz").each(function () {
-			var id = $(this).children('label').children('input').attr('id'); //id of quiz
+			var id = $(this).find('input').attr('id'); //id of quiz
 			var content = id.split('quizBlock');
 			if ($(this).hasClass('quiz-block-input')) {
-				var val = $(this).children('label').children('input').val();
+				var val = $(this).find('input').val();
 				answers.push(new QuizAnswer("Text", content[0], "", val));
 			}
 			if ($('#' + id).is(':checked')) {
@@ -44,14 +44,14 @@
 function areAllAnswered(needingCount) {
 	var realCount = 0;
 	$(".quiz-block-mark").each(function () {
-		if ($(this).children().children().children().is(':checked')) {
+		if ($(this).children().children().is(':checked')) {
 			realCount++;
 			return;
 
 		}
 	});
 	$(".quiz-block-input").each(function () {
-		if ($(this).children('label').children('input').val() != "") {
+		if ($(this).find('input').val() != "") {
 			realCount++;
 			return;
 		}

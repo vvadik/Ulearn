@@ -18,7 +18,7 @@ namespace uLearn.Web.Controllers
 	public class RestorePasswordController : Controller
 	{
 		private readonly RestoreRequestRepo requestRepo = new RestoreRequestRepo();
-		private readonly UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb()));
+		private readonly UserManager<ApplicationUser> userManager = new ULearnUserManager();
 		private readonly ULearnDb db = new ULearnDb();
 
 		public ActionResult Index()

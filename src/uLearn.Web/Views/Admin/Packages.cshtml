@@ -16,7 +16,7 @@
 		@Html.ActionLink("Скачать пакет", "DownloadPackage", new { Model.CourseId }, new { @class = "btn btn-primary", style = "margin-bottom: 10px" })
 	}
 
-	@using (Html.BeginForm("UploadCourse", "Unit", new { Model.CourseId }, FormMethod.Post, new { enctype = "multipart/form-data", style = "margin-bottom: 10px" }))
+	@using (Html.BeginForm("UploadCourse", "Admin", new { Model.CourseId }, FormMethod.Post, new { enctype = "multipart/form-data", style = "margin-bottom: 10px" }))
 	{
 		<input type="file" data-filename-placement="inside" class="btn" name="file" />
 		<input type="submit" class="btn btn-danger" value="Загрузить пакет" />

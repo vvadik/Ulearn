@@ -4,58 +4,49 @@
 	ViewBag.Title = "Вход";
 }
 <div class="container">
-	<h2>Вход</h2>
 	<div class="row">
-		<div class="col-md-8">
-			<section id="loginForm">
-				@using (Html.BeginForm("Index", "Login", new { ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+		<div class="col-md-offset-3 col-md-6">
+			<h2>@ViewBag.Title</h2>
+
+			<section id="socialLoginForm">
+				@Html.Partial("_ExternalLoginsListPartial", new ExternalLoginsListModel { Action = "ExternalLogin", ReturnUrl = ViewBag.ReturnUrl })
+			</section>
+
+			<div class="strike-line grey">
+				<span>или введите логин и пароль</span>
+			</div>
+
+			<section class="login-and-registration-form">
+				@using (Html.BeginForm("Index", "Login", new { ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
 				{
 					@Html.AntiForgeryToken()
+					<div class="form-group">
+						@Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Логин", @autofocus = "autofocus" })
+						@Html.ValidationMessageFor(m => m.UserName)
+					</div>
+					<div class="form-group">
+						@Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "Пароль" })
+						@Html.ValidationMessageFor(m => m.Password)
+					</div>
+					<div class="form-group">
+						<div class="checkbox checkbox-default">
+							@Html.CheckBoxFor(m => m.RememberMe)
+							@Html.LabelFor(m => m.RememberMe)
+						</div>
+					</div>
+					<div class="form-group">
+						<input type="submit" value="Войти" class="ph-btn ph-btn-green btn-block"/>
+					</div>
 					@Html.ValidationSummary(true)
 					<div class="form-group">
-						@Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })
-						<div class="col-md-10">
-							@Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
-							@Html.ValidationMessageFor(m => m.UserName)
-						</div>
+						<p>
+							@Html.ActionLink("Зарегистрироваться", "Register", "Account", new { ViewBag.ReturnUrl }, new { }) — если у вас ещё нет аккаунта
+						</p>
+						<p>
+							<a href="@Url.Action("Index", "RestorePassword")">Восстановить забытый пароль</a>
+						</p>
 					</div>
-					<div class="form-group">
-						@Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
-						<div class="col-md-10">
-							@Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-							@Html.ValidationMessageFor(m => m.Password)
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="col-md-offset-2 col-md-10">
-							<div class="checkbox">
-								@Html.CheckBoxFor(m => m.RememberMe)
-								@Html.LabelFor(m => m.RememberMe)
-							</div>
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="col-md-offset-2 col-md-10">
-							<input type="submit" value="Войти" class="btn btn-primary"/>
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="col-md-offset-2 col-md-10">
-							<p>
-								@Html.ActionLink("Зарегистрироваться", "Register", "Account", new { ViewBag.ReturnUrl }, new { }) — если у вас ещё нет аккаунта
-							</p>
-							<p>
-								<a href="@Url.Action("Index", "RestorePassword")">Восстановить забытый пароль</a>
-							</p>
-
-						</div>
-				</div>
 				}
-			</section>
-		</div>
-		<div class="col-md-4">
-			<section id="socialLoginForm">
-				@Html.Partial("_ExternalLoginsListPartial", new ExternalLoginsListModel{ Action = "ExternalLogin", ReturnUrl = ViewBag.ReturnUrl })
 			</section>
 		</div>
 	</div>

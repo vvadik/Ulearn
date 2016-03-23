@@ -16,7 +16,7 @@ namespace uLearn.Web.Controllers
 
 		private AuthenticationManager()
 		{
-			userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb()));
+			userManager = new ULearnUserManager();
 		}
 
 		public static async Task LoginAsync(HttpContextBase context, ApplicationUser user, bool isPersistent)

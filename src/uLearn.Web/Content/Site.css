@@ -37,6 +37,11 @@ input[type="checkbox"].input-validation-error {
     color: #b94a48;
 }
 
+.validation-summary-errors ul {
+    padding-left: 0;
+    list-style-type: none;
+}
+
 .validation-summary-valid {
     display: none;
 }
@@ -53,4 +58,15 @@ input[type="checkbox"].input-validation-error {
 }
 .label-as-badge.label-default {
 	border-color: #999999;
+}
+
+
+.navbar-inverse {
+	background-color: #32383F;
+	border-color: #32383F;
+}
+
+.navbar-inverse .navbar-brand,
+.navbar-inverse .navbar-nav > li > a {
+	color: #D8D8D8;
 }

@@ -13,7 +13,7 @@
 	<p><a class="label label-success" href="@Url.Action("Users", new { Model.CourseId, courseRole = CourseRole.Tester })">@CourseRole.Tester</a> может видеть ещё не опубликованные для всех материалы.</p>
 	<p><a class="label label-default" href="@Url.Action("Users", new { Model.CourseId })">обычный пользователь</a> может видеть только опубликованные материалы.</p>
 
-	@using (Html.BeginForm("Users", "Unit", FormMethod.Get, new { @class = "form-inline" }))
+	@using (Html.BeginForm("Users", "Admin", FormMethod.Get, new { @class = "form-inline" }))
 	{
 		<input type="hidden" name="courseId" value="@Model.CourseId" />
 		<input class="form-control" type="text" name="namePrefix" />

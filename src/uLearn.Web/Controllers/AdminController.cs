@@ -6,9 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Routing;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -16,7 +14,7 @@ using uLearn.Web.Models;
 namespace uLearn.Web.Controllers
 {
 	[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-	public class UnitController : Controller
+	public class AdminController : Controller
 	{
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db;
@@ -24,13 +22,13 @@ namespace uLearn.Web.Controllers
 		private readonly CommentsRepo commentsRepo;
 		private readonly UserManager<ApplicationUser> userManager;
 
-		public UnitController()
+		public AdminController()
 		{
 			db = new ULearnDb();
 			courseManager = WebCourseManager.Instance;
 			usersRepo = new UsersRepo(db);
 			commentsRepo = new CommentsRepo(db);
-			userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb()));
+			userManager = new ULearnUserManager();
 		}
 
 		public ActionResult CourseList(string courseCreationLastTry = null)

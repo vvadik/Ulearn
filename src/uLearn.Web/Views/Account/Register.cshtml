@@ -1,39 +1,61 @@
-﻿@model RegisterViewModel
+﻿@using ApprovalUtilities.SimpleLogger
+@model RegisterViewModel
 @{
 	ViewBag.Title = "Регистрация";
 }
-<div class="container">
-	<h2>@ViewBag.Title.</h2>
 
-	@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-	{
-		@Html.HiddenFor(m => m.ReturnUrl)
-		@Html.AntiForgeryToken()
-		<h4>Регистрация аккаунта</h4>
-		<hr />
-		@Html.ValidationSummary("Нет, так не пойдет!")
-		<div class="form-group">
-			@Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })
-			<div class="col-md-10">
-				@Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+@if (!Model.RegistrationFinished)
+{
+	<div class="container">
+		<div class="row">
+			<div class="col-md-offset-3 col-md-6">
+				<h2>@ViewBag.Title</h2>
+
+				<section id="socialLoginForm">
+					@Html.Partial("../Login/_ExternalLoginsListPartial", new ExternalLoginsListModel { Action = "ExternalLogin", ReturnUrl = ViewBag.ReturnUrl })
+				</section>
+
+				<div class="strike-line grey">
+					<span>или придумайте логин и пароль</span>
+				</div>
+
+				<section class="login-and-registration-form">
+					@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form" }))
+					{
+						@Html.HiddenFor(m => m.ReturnUrl)
+						@Html.AntiForgeryToken()
+						<div class="form-group">
+							@Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Логин", @autofocus = "autofocus" })
+							@Html.ValidationMessageFor(m => m.UserName)
+						</div>
+						<div class="form-group">
+							@Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "Пароль" })
+							@Html.ValidationMessageFor(m => m.Password)
+						</div>
+						<div class="form-group">
+							@Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @placeholder = "Ещё раз" })
+							@Html.ValidationMessageFor(m => m.ConfirmPassword)
+						</div>
+
+						@Html.ValidationSummary(true)
+
+						<div class="form-group">
+							<input type="submit" value="Поехали" class="ph-btn ph-btn-green btn-block"/>
+						</div>
+					}
+				</section>
 			</div>
 		</div>
-		<div class="form-group">
-			@Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
-			<div class="col-md-10">
-				@Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-			</div>
-		</div>
-		<div class="form-group">
-			@Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label" })
-			<div class="col-md-10">
-				@Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
-			</div>
-		</div>
-		<div class="form-group">
-			<div class="col-md-offset-2 col-md-10">
-				<input type="submit" class="btn btn-default" value="Register" />
-			</div>
-		</div>
+	</div>
+}
+else
+{
+	@section scripts {
+		<script>
+			$(document).ready(function() {
+				window.yaCounter25997251.reachGoal('registration');
+				window.location.replace("@Html.AttributeEncode(Model.ReturnUrl)");
+			});
+		</script>
 	}
-</div>
+}

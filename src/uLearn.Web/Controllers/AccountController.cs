@@ -23,15 +23,10 @@ namespace uLearn.Web.Controllers
 		private UserRolesRepo userRolesRepo;
 
 		public AccountController()
-			: this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ULearnDb())))
+			: this(new ULearnUserManager())
 		{
 			db = new ULearnDb();
 			courseManager = WebCourseManager.Instance;
-			userManager.UserValidator =
-				new UserValidator<ApplicationUser>(userManager)
-				{
-					AllowOnlyAlphanumericUserNames = false
-				};
 			usersRepo = new UsersRepo(db);
 			userRolesRepo = new UserRolesRepo(db);
 		}
@@ -207,14 +202,22 @@ namespace uLearn.Web.Controllers
 				if (result.Succeeded)
 				{
 					await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
+
 					if (string.IsNullOrWhiteSpace(model.ReturnUrl))
-						return RedirectToAction("Index", "Home");
-					return Redirect(this.FixRedirectUrl(model.ReturnUrl));
+						model.ReturnUrl = Url.Action("Index", "Home");
+					else
+						model.ReturnUrl = this.FixRedirectUrl(model.ReturnUrl);
+
+					model.RegistrationFinished = true;
+					
+//					if (string.IsNullOrWhiteSpace(model.ReturnUrl))
+//						return RedirectToAction("Index", "Home");
+//					return Redirect(this.FixRedirectUrl(model.ReturnUrl));
 				}
-				this.AddErrors(result);
+				else
+					this.AddErrors(result);
 			}
 
-			// If we got this far, something failed, redisplay form
 			return View(model);
 		}
 
@@ -244,13 +247,13 @@ namespace uLearn.Web.Controllers
 		{
 			ViewBag.StatusMessage =
 				message == ManageMessageId.ChangePasswordSuccess
-					? "Пароль был изменен."
+					? "Пароль был изменен"
 					: message == ManageMessageId.SetPasswordSuccess
-						? "Пароль установлен."
+						? "Пароль установлен"
 						: message == ManageMessageId.RemoveLoginSuccess
-							? "Внешний логин удален."
+							? "Внешний логин удален"
 							: message == ManageMessageId.Error
-								? "Ошибка."
+								? "Ошибка"
 								: "";
 			ViewBag.HasLocalPassword = ControllerUtils.HasPassword(userManager, User);
 			ViewBag.ReturnUrl = Url.Action("Manage");
