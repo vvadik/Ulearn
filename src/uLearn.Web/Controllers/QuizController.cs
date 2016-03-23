@@ -63,7 +63,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Tester)]
-		public async Task<ActionResult> ClearAnswers(string courseId, string slideId, bool isLti)
+		public async Task<ActionResult> ClearAnswers(string courseId, Guid slideId, bool isLti)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			var userId = User.Identity.GetUserId();
@@ -87,7 +87,7 @@ namespace uLearn.Web.Controllers
 			var slide = course.Slides[intSlideIndex];
 			var slideId = slide.Id;
 
-			if (visitsRepo.IsPassed(userId, slideId))
+			if (visitsRepo.IsPassed(slideId, userId))
 				return "already answered";
 			var time = DateTime.Now;
 			var answers = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.QuizId);
@@ -311,7 +311,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> DropQuiz(string courseId, string slideId, bool isLti)
+		public async Task<ActionResult> DropQuiz(string courseId, Guid slideId, bool isLti)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			if (slide is QuizSlide)
@@ -380,12 +380,12 @@ namespace uLearn.Web.Controllers
 			return maxDropCount == 0 ? MAX_DROPS_COUNT : maxDropCount;
 		}
 
-		private Dictionary<string, bool> GetResultForQuizes(string courseId, string userId, string slideId, QuizState state)
+		private Dictionary<string, bool> GetResultForQuizes(string courseId, string userId, Guid slideId, QuizState state)
 		{
 			return userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId);
 		}
 
-		private Tuple<QuizState, int> GetQuizState(string courseId, string userId, string slideId, int maxDropCount)
+		private Tuple<QuizState, int> GetQuizState(string courseId, string userId, Guid slideId, int maxDropCount)
 		{
 			var states = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).ToList();
 			if (states.Count > maxDropCount)

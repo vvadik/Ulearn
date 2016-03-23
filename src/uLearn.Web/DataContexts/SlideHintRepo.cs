@@ -20,8 +20,8 @@ namespace uLearn.Web.DataContexts
 		{
 			this.db = db;
 		}
-
-		public async Task AddHint(string userId, int hintId, string courseId, string slideId)
+		
+		public async Task AddHint(string userId, int hintId, string courseId, Guid slideId)
 		{
 			if (db.Hints.Any(x => x.UserId == userId && x.HintId == hintId && x.SlideId == slideId))
 				return;
@@ -35,35 +35,35 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public IEnumerable<int> GetUsedHintId(string userId, string courseId, string slideId)
+		public IEnumerable<int> GetUsedHintId(string userId, string courseId, Guid slideId)
 		{
 			return db.Hints.Where(x => x.SlideId == slideId && x.UserId == userId).Select(x => x.HintId);
 		}
 
-		public int GetHintsCount(string slideId, string courseId)
+		public int GetHintsCount(Guid slideId, string courseId)
 		{
 			return db.Hints.Count(x => x.SlideId == slideId);
 		}
 
-		public int GetHintsCountForUser(string slideId, string courseId, string userId)
+		public int GetHintsCountForUser(Guid slideId, string courseId, string userId)
 		{
 			return db.Hints.Count(x => x.SlideId == slideId && x.UserId == userId);
 		}
 
-		public int GetHintUsedPercent(string slideId, string courseId, int hintsCountOnSlide, int usersCount)
+		public int GetHintUsedPercent(Guid slideId, string courseId, int hintsCountOnSlide, int usersCount)
 		{
 			var hintsCount = GetHintsCount(slideId, courseId);
 			var maxPossibleHintsCount = hintsCountOnSlide*usersCount;
 			return (int)(100*(double)hintsCount/maxPossibleHintsCount);
 		}
 
-		public int GetHintUsedPercentForUser(string courseId, string slideId, string userId, int hintsCountOnSlide)
+		public int GetHintUsedPercentForUser(string courseId, Guid slideId, string userId, int hintsCountOnSlide)
 		{
 			var hintsCount = GetHintsCountForUser(slideId, courseId, userId);
 			return (int)(100 * (double)hintsCount / hintsCountOnSlide);
 		}
 
-		public async Task<string> LikeHint(string courseId, string slideId, int hintId, string userId)
+		public async Task<string> LikeHint(string courseId, Guid slideId, int hintId, string userId)
 		{
 			var hint = db.Hints.FirstOrDefault(x => x.SlideId == slideId && x.UserId == userId && x.HintId == hintId);
 			if (hint == null)
@@ -79,7 +79,7 @@ namespace uLearn.Web.DataContexts
 			return "success";
 		}
 
-		public HashSet<int> GetLikedHints(string courseId, string slideId, string userId)
+		public HashSet<int> GetLikedHints(string courseId, Guid slideId, string userId)
 		{
 			return
 				new HashSet<int>(db.Hints
@@ -87,14 +87,14 @@ namespace uLearn.Web.DataContexts
 						.Select(x => x.HintId));
 		}
 
-		public bool IsHintLiked(string courseId, string slideId, string userId, int hintId)
+		public bool IsHintLiked(string courseId, Guid slideId, string userId, int hintId)
 		{
 			return
 				db.Hints.Any(
 					x => x.UserId == userId && x.SlideId == slideId && x.HintId == hintId && x.IsHintHelped);
 		}
 
-		public int GetUsedHintsCount(string courseId, string slideId, string userId)
+		public int GetUsedHintsCount(string courseId, Guid slideId, string userId)
 		{
 			return db.Hints.Count(x => x.UserId == userId && x.SlideId == slideId);
 		}

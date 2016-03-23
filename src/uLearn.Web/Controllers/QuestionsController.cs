@@ -104,7 +104,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateInput(false)]
-		public async Task<string> AddQuestion(string courseId, string slideId, string question)
+		public async Task<string> AddQuestion(string courseId, Guid slideId, string question)
 		{
 			var user = User.Identity;
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);

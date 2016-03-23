@@ -21,7 +21,7 @@ namespace uLearn.Web.Models
 
 	public class SlideRateStats
 	{
-		public string SlideId { get; set; }
+		public Guid SlideId { get; set; }
 		public string SlideTitle { get; set; }
 		public int NotUnderstand { get; set; }
 		public int Good { get; set; }

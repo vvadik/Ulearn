@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace uLearn
 			return Slides.First(x => x.Info.UnitName == unitName).Info.SlideFile.Directory.FullName;
 		}
 
-		public Slide GetSlideById(string slideId)
+		public Slide GetSlideById(Guid slideId)
 		{
 			return Slides.FirstOrDefault(x => x.Id == slideId);
 		}
@@ -38,7 +39,7 @@ namespace uLearn
 			return index >= 0 && index < Slides.Length ? Slides[index] : null;
 		}
 
-		public int GetSlideIndexById(string slideId)
+		public int GetSlideIndexById(Guid slideId)
 		{
 			return Slides.FindIndex(x => x.Id == slideId);
 		}

@@ -28,7 +28,7 @@ namespace uLearn.Web.Controllers
 			var slides = courseManager.GetCourses().SelectMany(course => course.Slides.Select(slide => new { courseId = course.Id, slideId = slide.Id })).ToDictionary(arg => arg.slideId, arg => arg.courseId);
 			foreach (var visit in visitsDictionary)
 			{
-				var slideId = visit.Key;
+				var slideId = Guid.Parse(visit.Key);
 				string courseId;
 				if (!slides.TryGetValue(slideId, out courseId))
 					continue;

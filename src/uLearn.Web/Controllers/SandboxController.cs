@@ -38,7 +38,7 @@ namespace uLearn.Web.Controllers
 			var code = Request.InputStream.GetString();
 
 			var solution = await solutionsRepo.RunUserSolution(
-				"web", "runner", User.Identity.GetUserId(), 
+				"web", Guid.Empty, User.Identity.GetUserId(), 
 				code, null, null, false, "null", 
 				User.Identity.Name + ": CsSandbox Web Executor", timeout
 			);

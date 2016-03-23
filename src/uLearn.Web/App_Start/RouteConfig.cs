@@ -1,5 +1,7 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.UI;
+using NUnit.Framework.Constraints;
 
 namespace uLearn.Web
 {
@@ -9,6 +11,23 @@ namespace uLearn.Web
 		{
 			routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
+			routes.MapRoute(
+				name: "Course.Slide",
+				url: "Course/{courseId}/{slideIndex}",
+				defaults: new { controller = "Course", action = "Slide", slideIndex = -1 },
+				constraints: new { slideIndex = @"-?\d+|"}
+			);
+			routes.MapRoute(
+				name: "Course.SlideById",
+				url: "Course/{courseId}/{slideId}",
+				defaults: new { controller = "Course", action = "SlideById", slideId = "" },
+				constraints: new { slideId = @"(.*_)?[{|\(]?[0-9A-F]{8}[-]?([0-9A-F]{4}[-]?){3}[0-9A-F]{12}[\)|}]?" }
+			);
+			routes.MapRoute(
+				name: "Slide",
+				url: "Slide/{slideId}",
+				defaults: new { controller = "Course", action = "SlideById" }
+			);
 			routes.MapRoute(
 				name: "Course",
 				url: "Course/{courseId}/{action}/{slideIndex}",

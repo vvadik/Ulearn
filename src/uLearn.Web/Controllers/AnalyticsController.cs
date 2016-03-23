@@ -158,7 +158,7 @@ namespace uLearn.Web.Controllers
 			return q.ToDictionary(d => d.Key.Value, d => Tuple.Create(d.count, d.sum));
 		}
 
-		private IQueryable<T> FilterBySlides<T>(IQueryable<T> source, IEnumerable<string> slideIds) where T : class, ISlideAction
+		private IQueryable<T> FilterBySlides<T>(IQueryable<T> source, IEnumerable<Guid> slideIds) where T : class, ISlideAction
 		{
 			return slideIds == null ? source : source.Where(s => slideIds.Contains(s.SlideId));
 		}
@@ -177,17 +177,17 @@ namespace uLearn.Web.Controllers
 			return q.ToDictionary(d => d.Key.Value, d => d.count);
 		}
 
-		private Dictionary<DateTime, int> GetTasksSolvedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
+		private Dictionary<DateTime, int> GetTasksSolvedStats(IEnumerable<Guid> slideIds, DateTime firstDay, DateTime lastDay)
 		{
 			return GroupByDays(FilterByTime(FilterBySlides(db.UserSolutions, slideIds), firstDay, lastDay).Where(s => s.IsRightAnswer));
 		}
 
-		private Dictionary<DateTime, int> GetQuizPassedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
+		private Dictionary<DateTime, int> GetQuizPassedStats(IEnumerable<Guid> slideIds, DateTime firstDay, DateTime lastDay)
 		{
 			return GroupByDays(FilterByTime(FilterBySlides(db.UserQuizzes, slideIds), firstDay, lastDay));
 		}
 
-		private Dictionary<DateTime, Tuple<int, int>> GetSlidesVisitedStats(IEnumerable<string> slideIds, DateTime firstDay, DateTime lastDay)
+		private Dictionary<DateTime, Tuple<int, int>> GetSlidesVisitedStats(IEnumerable<Guid> slideIds, DateTime firstDay, DateTime lastDay)
 		{
 			return SumByDays(FilterByTime(FilterBySlides(db.Visits, slideIds), firstDay, lastDay));
 		}
@@ -254,10 +254,10 @@ namespace uLearn.Web.Controllers
 			return r;
 		}
 
-		private static UserSlideInfo[] GetSlideInfo(IEnumerable<Slide> slides, IEnumerable<Tuple<string, bool, int, int>> slideResults)
+		private static UserSlideInfo[] GetSlideInfo(IEnumerable<Slide> slides, IEnumerable<Tuple<Guid, bool, int, int>> slideResults)
 		{
 			var results = slideResults.GroupBy(tuple => tuple.Item1).ToDictionary(g => g.Key, g => g.First());
-			var defaultValue = Tuple.Create("", false, 0, 0);
+			var defaultValue = Tuple.Create(Guid.Empty, false, 0, 0);
 			return slides
 				.Select(slide => new
 				{
@@ -283,7 +283,7 @@ namespace uLearn.Web.Controllers
 			return null;
 		}
 
-		public ActionResult ShowSolutions(string courseId, string userId, string slideId)
+		public ActionResult ShowSolutions(string courseId, string userId, Guid slideId)
 		{
 			var solutions = db.UserSolutions.Where(s => s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
 			var user = db.Users.Find(userId);

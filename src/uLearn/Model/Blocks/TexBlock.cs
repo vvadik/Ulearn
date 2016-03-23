@@ -26,7 +26,7 @@ namespace uLearn.Model.Blocks
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
-			var urlName = slide.Guid + componentIndex;
+			var urlName = slide.NormalizedGuid + componentIndex;
 			return new HtmlComponent(urlName, displayName, urlName, string.Join("\n", TexLines.Select(x => "$$" + x + "$$")).GetHtmlWithUrls("/static").Item1);
 		}
 

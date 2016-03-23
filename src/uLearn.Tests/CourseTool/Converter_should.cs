@@ -13,10 +13,10 @@ namespace uLearn.CourseTool
 	public class Converter_should
 	{
 		private Course course;
-		private readonly Slide aTextSlide = new Slide(new[] { new MdBlock("hello"), }, new SlideInfo("u1", new FileInfo("file"), 0), "title", Utils.NewNormalizedGuid());
-		private readonly Slide exerciseSlide = new Slide(new[] { new ExerciseBlock() }, new SlideInfo("u1", new FileInfo("file"), 0), "title", Utils.GetNormalizedGuid(slideIdFromCourse));
+		private readonly Slide aTextSlide = new Slide(new[] { new MdBlock("hello"), }, new SlideInfo("u1", new FileInfo("file"), 0), "title", Guid.NewGuid());
+		private readonly Slide exerciseSlide = new Slide(new[] { new ExerciseBlock() }, new SlideInfo("u1", new FileInfo("file"), 0), "title", slideIdFromCourse);
 		private const string youtubeIdFromCourse = "GZS36w_fxdg";
-		private const string slideIdFromCourse = "108C89D9-36F0-45E3-BBEE-B93AC971063F";
+		private static readonly Guid slideIdFromCourse = Guid.Parse("108C89D9-36F0-45E3-BBEE-B93AC971063F");
 		private const string slideUrl = "https://192.168.33.1:44300/Course/{0}/LtiSlide/{1}";
 		private const string solutionsUrl = "https://192.168.33.1:44300/Course/{0}/AcceptedAlert/{1}";
 		private const string ltiId = "edx";
@@ -80,7 +80,7 @@ namespace uLearn.CourseTool
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
 
-			var ulearnSlideIds = course.Slides.Select(x => x.Guid);
+			var ulearnSlideIds = course.Slides.Select(x => x.NormalizedGuid);
 			var edxUrlNames = edxCourse.CourseWithChapters.Chapters[0].Sequentials.SelectMany(x => x.Verticals)
 				.Where(x => x.DisplayName != "Решения")
 				.Select(x => x.UrlName);

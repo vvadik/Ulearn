@@ -24,7 +24,7 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public async Task<Comment> AddComment(IPrincipal author, string courseId, string slideId, int parentCommentId, string commentText)
+		public async Task<Comment> AddComment(IPrincipal author, string courseId, Guid slideId, int parentCommentId, string commentText)
 		{
 			var commentsPolicy = GetCommentsPolicy(courseId);
 			var isInstructor = author.HasAccessFor(courseId, CourseRole.Instructor);
@@ -54,7 +54,7 @@ namespace uLearn.Web.DataContexts
 			return db.Comments.Find(commentId);
 		}
 
-		public IEnumerable<Comment> GetSlideComments(string courseId, string slideId)
+		public IEnumerable<Comment> GetSlideComments(string courseId, Guid slideId)
 		{
 			return db.Comments.Where(x => x.SlideId == slideId && !x.IsDeleted);
 		}
@@ -116,7 +116,7 @@ namespace uLearn.Web.DataContexts
 				.ToDictionary(x => x.Key, x => x.Count());
 		}
 
-		public IEnumerable<int> GetSlideCommentsLikedByUser(string courseId, string slideId, string userId)
+		public IEnumerable<int> GetSlideCommentsLikedByUser(string courseId, Guid slideId, string userId)
 		{
 			return db.CommentLikes.Where(x => x.UserId == userId && x.Comment.SlideId == slideId).Select(x => x.CommentId);
 		}

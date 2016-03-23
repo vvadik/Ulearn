@@ -5,9 +5,9 @@ namespace uLearn
 {
 	public class Utils
 	{
-		public static string GetSource(string courseId, string slideId, CourseManager courseManager, string code)
+		public static string GetSource(string courseId, Guid slideId, CourseManager courseManager, string code)
 		{
-			return courseId == "web" && slideId == "runner"
+			return courseId == "web" && slideId == Guid.Empty
 				? code
 				: ((ExerciseSlide) courseManager.GetCourse(courseId).GetSlideById(slideId))
 					.Exercise

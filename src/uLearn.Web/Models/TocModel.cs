@@ -31,7 +31,7 @@ namespace uLearn.Web.Models
 
 	public class TocPageInfo
 	{
-		public string SlideId;
+		public Guid SlideId;
 		public string Url;
 		public string Name;
 		public bool ShouldBeSolved;

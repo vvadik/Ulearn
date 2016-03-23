@@ -1,4 +1,5 @@
-﻿using uLearn.Model.Blocks;
+﻿using System;
+using uLearn.Model.Blocks;
 
 namespace uLearn.Web.Models
 {
@@ -8,6 +9,6 @@ namespace uLearn.Web.Models
 		public string CourseId;
 		public int SlideIndex;
 		public BlockRenderContext Context;
-		public string SlideId;
+		public Guid SlideId;
 	}
 }

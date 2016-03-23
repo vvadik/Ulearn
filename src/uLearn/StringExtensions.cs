@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using BinaryAnalysis.UnidecodeSharp;
 
 namespace uLearn
 {
@@ -15,6 +16,7 @@ namespace uLearn
 				Environment.NewLine,
 				s.SplitToLines().Where(line => !args.Any(line.Contains)));
 		}
+
 		public static string WithArgs(this string s, params object[] args)
 		{
 			return string.Format(s, args);
@@ -81,6 +83,22 @@ namespace uLearn
 		public static string FixExtraEolns(this string arg)
 		{
 			return Regex.Replace(arg.Trim(), "(\t*\r?\n){3,}", "\r\n\r\n");
+		}
+
+		public static string ToLatin(this string arg)
+		{
+			const char nonLatinCharsReplacement = '_';
+
+			arg = arg.Unidecode();
+			var result = "";
+			foreach (var c in arg)
+			{
+				if (char.IsLetterOrDigit(c))
+					result += c;
+				else if (result.Length == 0 || result[result.Length - 1] != nonLatinCharsReplacement)
+					result += nonLatinCharsReplacement;
+			}
+			return result;
 		}
 	}
 }

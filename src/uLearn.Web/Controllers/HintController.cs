@@ -62,7 +62,7 @@ namespace uLearn.Web.Controllers
 			return ans;
 		}
 
-		private async Task<HintWithLikeButton> MakeExerciseHint(string hintText, int hintId, string courseId, string slideId, bool isLiked)
+		private async Task<HintWithLikeButton> MakeExerciseHint(string hintText, int hintId, string courseId, Guid slideId, bool isLiked)
 		{
 			await slideHintRepo.AddHint(User.Identity.GetUserId(), hintId, courseId, slideId);
 			return new HintWithLikeButton
@@ -76,7 +76,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public async Task<string> LikeHint(string courseId, string slideId, int hintId)
+		public async Task<string> LikeHint(string courseId, Guid slideId, int hintId)
 		{
 			return await slideHintRepo.LikeHint(courseId, slideId, hintId, User.Identity.GetUserId());
 		}

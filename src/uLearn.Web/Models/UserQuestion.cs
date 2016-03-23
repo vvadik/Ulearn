@@ -28,8 +28,8 @@ namespace uLearn.Web.Models
 		[Required]
 		public string UnitName { get; set; }
 
-		[StringLength(64)]
-		public string SlideId { get; set; }
+		[Required]
+		public Guid SlideId { get; set; }
 		
 		[StringLength(64)]
 		public string CourseId { get; set; }
