@@ -14,8 +14,8 @@ namespace uLearn
 		public readonly SlideBlock[] Blocks;
 		public readonly SlideInfo Info;
 		public int Index { get { return Info.Index; }}
-		public readonly string Id;
-		public string Guid { get { return Utils.GetNormalizedGuid(Id); } }
+		public readonly Guid Id;
+		public string NormalizedGuid { get { return Utils.GetNormalizedGuid(Id); } }
 		public virtual bool ShouldBeSolved { get { return false; } }
 		public int MaxScore { get; protected set; }
 
@@ -37,7 +37,7 @@ namespace uLearn
 		}
 
 
-		public Slide(IEnumerable<SlideBlock> blocks, SlideInfo info, string title, string id)
+		public Slide(IEnumerable<SlideBlock> blocks, SlideInfo info, string title, Guid id)
 		{
 			try
 			{
@@ -57,7 +57,17 @@ namespace uLearn
 
 		public override string ToString()
 		{
-			return string.Format("Title: {0}, Id: {1}, MaxScore: {2}", Title, Id, MaxScore);
+			return string.Format("Title: {0}, Id: {1}, MaxScore: {2}", Title, NormalizedGuid, MaxScore);
+		}
+
+		public string LatinTitle
+		{
+			get { return Title.ToLatin(); }
+		}
+
+		public string Url
+		{
+			get { return LatinTitle + "_" + NormalizedGuid;  }
 		}
 
 		private static IEnumerable<Vertical> OrdinarySlideToVerticals(string courseId, Slide slide, string slideUrl, string solutionsUrl, Dictionary<string, string> videoGuids, string ltiId)
@@ -82,8 +92,8 @@ namespace uLearn
 					var slideComponent = new HtmlComponent
 					{
 						DisplayName = displayName,
-						UrlName = slide.Guid + componentIndex,
-						Filename = slide.Guid + componentIndex,
+						UrlName = slide.NormalizedGuid + componentIndex,
+						Filename = slide.NormalizedGuid + componentIndex,
 						Source = header + string.Join("", innerComponents.Select(x => x.AsHtmlString())),
 						Subcomponents = innerComponents.ToArray()
 					};
@@ -109,16 +119,16 @@ namespace uLearn
 				componentIndex++;
 			}
 
-			yield return new Vertical(slide.Guid, slide.Title, components.ToArray());
+			yield return new Vertical(slide.NormalizedGuid, slide.Title, components.ToArray());
 			if (solutionComponents.Count != 0)
-				yield return new Vertical(slide.Guid + "0", "Решения", solutionComponents.ToArray());
+				yield return new Vertical(slide.NormalizedGuid + "0", "Решения", solutionComponents.ToArray());
 		}
 
 		private static IEnumerable<Vertical> QuizToVerticals(string courseId, QuizSlide slide, string slideUrl, string ltiId)
 		{
 			var ltiComponent = 
-				new LtiComponent(slide.Title, slide.Guid + "-quiz", string.Format(slideUrl, courseId, slide.Index), ltiId, true, slide.MaxScore, false);
-			yield return new Vertical(slide.Guid, slide.Title, new Component[] { ltiComponent });
+				new LtiComponent(slide.Title, slide.NormalizedGuid + "-quiz", string.Format(slideUrl, courseId, slide.Index), ltiId, true, slide.MaxScore, false);
+			yield return new Vertical(slide.NormalizedGuid, slide.Title, new Component[] { ltiComponent });
 		}
 
 		public IEnumerable<Vertical> ToVerticals(string courseId, string slideUrl, string solutionsUrl, Dictionary<string, string> videoGuids, string ltiId)

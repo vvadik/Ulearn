@@ -20,7 +20,7 @@ namespace uLearn.Utilities
 				foreach (var slide in course.Slides)
 				{
 					if (slide.ShouldBeSolved) continue;
-					var lesson = new Lesson(slide.Title, slide.Id, slide.Blocks);
+					var lesson = new Lesson(slide.Title, slide.NormalizedGuid, slide.Blocks);
 					var path = Path.ChangeExtension(slide.Info.SlideFile.FullName, "lesson.xml");
 					var file = new FileInfo(path);
 					using (var stream = file.OpenWrite())

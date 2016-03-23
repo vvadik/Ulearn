@@ -15,7 +15,7 @@ namespace uLearn.CSharp
 		private readonly IFileSystem fs;
 		public readonly List<SlideBlock> Blocks = new List<SlideBlock>();
 		public string Title;
-		public string Id;
+		public Guid Id;
 
 		public SlideBuilder(IFileSystem fs) : base(false)
 		{
@@ -42,7 +42,7 @@ namespace uLearn.CSharp
 					.Select(a => new { title = a.GetArgument(0), id = a.GetArgument(1) })
 					.Single();
 				Title = arguments.title;
-				Id = arguments.id;
+				Id = Guid.Parse(arguments.id);
 			}
 			return VisitMemberDeclaration(node, base.VisitClassDeclaration(node));
 		}

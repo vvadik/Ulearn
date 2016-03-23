@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace uLearn.Web.Models
@@ -30,8 +31,7 @@ namespace uLearn.Web.Models
 		public string CourseId { get; set; }
 
 		[Required]
-		[StringLength(64)]
 		[Index("SlideAndUser", 1)]
-		public string SlideId { get; set; }
+		public Guid SlideId { get; set; }
 	}
 }

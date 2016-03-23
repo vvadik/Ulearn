@@ -7,7 +7,7 @@ namespace uLearn.Web.Models
 	public interface ISlideAction
 	{
 		int Id { get; }
-		string SlideId { get; }
+		Guid SlideId { get; }
 		string UserId { get; }
 		DateTime Timestamp { get; }
 	}
@@ -23,10 +23,9 @@ namespace uLearn.Web.Models
 		public string CourseId { get; set; }
 
 		[Required]
-		[StringLength(64)]
 		[Index("FullIndex", 2)]
 		[Index("StatisticsIndex", 1)]
-		public string SlideId { get; set; }
+		public Guid SlideId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
 

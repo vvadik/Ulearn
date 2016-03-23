@@ -57,7 +57,7 @@ namespace uLearn.CourseTool
 			if (note == null)
 				return null;
 			var similarSlide = course.Slides.First(x => x.Info.UnitName == unitName);
-			var slide = new Slide(new[] { new MdBlock(note.Markdown) }, new SlideInfo(unitName, similarSlide.Info.SlideFile, -1), "Заметки преподавателю", "1");
+			var slide = new Slide(new[] { new MdBlock(note.Markdown) }, new SlideInfo(unitName, similarSlide.Info.SlideFile, -1), "Заметки преподавателю", Guid.NewGuid());
 			var page = StandaloneLayout.Page(course, slide, CreateToc(slide), GetCssFiles(), GetJsFiles());
 			CopyLocalFiles(note.Markdown, similarSlide.Info.Directory.FullName);
 			return "<!DOCTYPE html>\n" + page.ToHtmlString();

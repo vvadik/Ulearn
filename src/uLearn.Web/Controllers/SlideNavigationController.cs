@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -27,7 +28,7 @@ namespace uLearn.Web.Controllers
 		{
 			var visibleUnits = unitsRepo.GetVisibleUnits(course.Id, User);
 			var builder = new TocModelBuilder(
-				s => Url.Action("Slide", "Course", new { courseId = course.Id, slideIndex = s.Index }),
+				s => Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = s.Url }),
 				s => 0,
 				course,
 				slideIndex);
@@ -39,7 +40,7 @@ namespace uLearn.Web.Controllers
 			return toc;
 		}
 
-		private HashSet<string> GetSolvedSlides(Course course, string userId)
+		private HashSet<Guid> GetSolvedSlides(Course course, string userId)
 		{
 			var solvedSlides = solutionsRepo.GetIdOfPassedSlides(course.Id, userId);
 			solvedSlides.UnionWith(userQuizzesRepo.GetIdOfQuizPassedSlides(course.Id, userId));
@@ -53,7 +54,7 @@ namespace uLearn.Web.Controllers
 			var visited = visitsRepo.GetIdOfVisitedSlides(course.Id, userId);
 			var scoresForSlides = visitsRepo.GetScoresForSlides(course.Id, userId);
 			var builder = new TocModelBuilder(
-				s => Url.Action("Slide", "Course", new { courseId = course.Id, slideIndex = s.Index }),
+				s => Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = s.Url }),
 				s => scoresForSlides.ContainsKey(s.Id) ? scoresForSlides[s.Id] : 0,
 				course,
 				slideIndex);
@@ -82,10 +83,10 @@ namespace uLearn.Web.Controllers
 				course, 
 				slideIndex, 
 				nextIsAcceptedSolutions, 
-				nextSlide == null ? -1 : nextSlide.Index, 
-				prevSlide == null ? -1 : prevSlide.Index, 
+				nextSlide, 
+				prevSlide, 
 				!User.Identity.IsAuthenticated);
-			if (onSolutionsSlide) model.PrevSlideIndex = model.SlideIndex;
+			if (onSolutionsSlide) model.PrevSlide = slide;
 			return PartialView(model);
 		}
 	}

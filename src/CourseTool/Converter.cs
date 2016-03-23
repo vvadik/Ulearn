@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using uLearn.Model.Blocks;
 using uLearn.Model.Edx;
@@ -13,7 +14,7 @@ namespace uLearn.CourseTool
 			{
 				new Sequential(string.Format("{0}-{1}-{2}", course.Id, unitIndex, 0), units[unitIndex],
 					course.Slides
-						.Where(s => !config.IgnoredUlearnSlides.Contains(s.Id))
+						.Where(s => !config.IgnoredUlearnSlides.Select(Guid.Parse).Contains(s.Id))
 						.Where(y => y.Info.UnitName == units[unitIndex])
 						.SelectMany(y => y.ToVerticals(course.Id, exerciseUrl, solutionsUrl, videoGuids, config.LtiId))
 						.ToArray())

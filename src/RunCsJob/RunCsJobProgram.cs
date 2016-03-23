@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Linq;
 using System.Threading;
 using RunCsJob.Api;
+using uLearn;
 
 namespace RunCsJob
 {
@@ -57,9 +58,9 @@ namespace RunCsJob
 
 		private static void SelfCheck()
 		{
-			var res = SandboxRunner.Run(new RunnerSubmition()
+			var res = SandboxRunner.Run(new RunnerSubmition
 			{
-				Id = Guid.NewGuid().ToString("N"),
+				Id = Utils.NewNormalizedGuid(),
 				NeedRun = true,
 				Code = "class C { static void Main(){ System.Console.WriteLine(\"Привет мир!\");}}"
 			});

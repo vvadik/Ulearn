@@ -80,7 +80,7 @@ namespace uLearn
 					}
 					catch (Exception e)
 					{
-						throw new Exception("Error loading course from " + zipFile.Name, e);
+						//throw new Exception("Error loading course from " + zipFile.Name, e);
 					}
 			}
 		}
@@ -226,6 +226,12 @@ namespace uLearn
 		public static char[] GetInvalidCharacters()
 		{
 			return new []{'&'}.Concat(Path.GetInvalidFileNameChars()).Concat(Path.GetInvalidPathChars()).Distinct().ToArray();
+		}
+
+		public Course FindCourseBySlideById(Guid slideId)
+		{
+			var courses = GetCourses();
+			return courses.FirstOrDefault(c => c.Slides.Count(s => s.Id == slideId) > 0);
 		}
 	}
 }

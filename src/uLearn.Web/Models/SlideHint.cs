@@ -28,9 +28,8 @@ namespace uLearn.Web.Models
 		public string CourseId { get; set; }
 
 		[Required]
-		[StringLength(64)]
 		[Index("FullIndex", 1)]
-		public string SlideId { get; set; }
+		public Guid SlideId { get; set; }
 
 		[Index("FullIndex", 4)]
 		public bool IsHintHelped { get; set; }

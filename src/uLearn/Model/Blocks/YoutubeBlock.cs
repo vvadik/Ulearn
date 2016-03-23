@@ -29,7 +29,7 @@ namespace uLearn.Model.Blocks
 		{
 			if (videoGuids.ContainsKey(VideoId))
 				return new VideoComponent(videoGuids[VideoId], displayName, VideoId);
-			return new VideoComponent(slide.Guid + componentIndex, displayName, VideoId);
+			return new VideoComponent(slide.NormalizedGuid + componentIndex, displayName, VideoId);
 		}
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)

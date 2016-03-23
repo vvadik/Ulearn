@@ -43,7 +43,7 @@ namespace uLearn.Model.Blocks
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
-			var urlName = slide.Guid + componentIndex;
+			var urlName = slide.NormalizedGuid + componentIndex;
 			return new CodeComponent(urlName, displayName, urlName, LangId, Code);
 		}
 

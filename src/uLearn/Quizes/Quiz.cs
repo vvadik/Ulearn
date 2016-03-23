@@ -103,7 +103,7 @@ namespace uLearn.Quizes
 			}
 			return new MultipleChoiceComponent
 			{
-				UrlName = slide.Guid + componentIndex,
+				UrlName = slide.NormalizedGuid + componentIndex,
 				ChoiceResponse = cr,
 				Title = EdxTexReplacer.ReplaceTex(Text)
 			};
@@ -141,7 +141,7 @@ namespace uLearn.Quizes
 			var cg = new MultipleChoiceGroup { Label = Text, Type = "MultipleChoice", Choices = items };
 			return new MultipleChoiceComponent
 			{
-				UrlName = slide.Guid + componentIndex,
+				UrlName = slide.NormalizedGuid + componentIndex,
 				ChoiceResponse = new MultipleChoiceResponse { ChoiceGroup = cg },
 				Title = EdxTexReplacer.ReplaceTex(Text),
 				Solution = new Solution(Explanation)
@@ -175,7 +175,7 @@ namespace uLearn.Quizes
 		{
 			return new TextInputComponent
 			{
-				UrlName = slide.Guid + componentIndex,
+				UrlName = slide.NormalizedGuid + componentIndex,
 				Title = EdxTexReplacer.ReplaceTex(Text),
 				StringResponse = new StringResponse
 				{

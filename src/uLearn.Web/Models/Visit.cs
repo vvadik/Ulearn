@@ -21,10 +21,9 @@ namespace uLearn.Web.Models
 		public string CourseId { get; set; }
 
 		[Required]
-		[StringLength(64)]
 		[Index("IDX_Visits_UserAndSlide", 2)]
 		[Index("IDX_Visits_SlideAndTime", 1)]
-		public string SlideId { get; set; }
+		public Guid SlideId { get; set; }
 
 		///<summary>Первый заход на слайд</summary>
 		[Required]

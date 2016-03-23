@@ -1,4 +1,6 @@
-﻿namespace uLearn.Web.Models
+﻿using System;
+
+namespace uLearn.Web.Models
 {
 	public class HintPageModel
 	{
@@ -10,7 +12,7 @@
 		public int HintId { get; set; }
 		public bool IsLiked { get; set; }
 		public string CourseId { get; set; }
-		public string SlideId { get; set; }
+		public Guid SlideId { get; set; }
 		public string Hint { get; set; }
 	}
 }

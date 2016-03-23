@@ -1,4 +1,5 @@
-﻿using System.Data.Entity.Migrations;
+﻿using System;
+using System.Data.Entity.Migrations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace uLearn.Web.DataContexts
 			serializer = new JsonSerializer();
 		}
 
-		public async Task Update(string userId, string slideId, string ltiRequestJson)
+		public async Task Update(string userId, Guid slideId, string ltiRequestJson)
 		{
 			var ltiRequestModel = FindElement(userId, slideId);
 
@@ -39,7 +40,7 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public LtiRequest Find(string userId, string slideId)
+		public LtiRequest Find(string userId, Guid slideId)
 		{
 			var ltiRequestModel = FindElement(userId, slideId);
 			if (ltiRequestModel == null)
@@ -48,7 +49,7 @@ namespace uLearn.Web.DataContexts
 			return serializer.Deserialize<LtiRequest>(new JsonTextReader(new StringReader(ltiRequestModel.Request)));
 		}
 
-		private LtiSlideRequest FindElement(string userId, string slideId)
+		private LtiSlideRequest FindElement(string userId, Guid slideId)
 		{
 			return db.LtiRequests.FirstOrDefault(request => request.UserId == userId && request.SlideId == slideId);
 		}

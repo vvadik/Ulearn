@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using uLearn.Quizes;
 using uLearn.Web.Models;
@@ -21,7 +22,7 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public async Task<UserQuiz> AddUserQuiz(string courseId, bool isRightAnswer, string itemId, string quizId, string slideId, string text, string userId, DateTime time, bool isRightQuizBlock)
+		public async Task<UserQuiz> AddUserQuiz(string courseId, bool isRightAnswer, string itemId, string quizId, Guid slideId, string text, string userId, DateTime time, bool isRightQuizBlock)
 		{
 			var userQuiz = new UserQuiz
 			{
@@ -40,12 +41,12 @@ namespace uLearn.Web.DataContexts
 			return userQuiz;
 		}
 
-		public bool IsQuizSlidePassed(string courseId, string userId, string slideId)
+		public bool IsQuizSlidePassed(string courseId, string userId, Guid slideId)
 		{
 			return db.UserQuizzes.Any(x => x.UserId == userId && x.SlideId == slideId && !x.isDropped);
 		}
 
-		public IEnumerable<bool> GetQuizDropStates(string courseId, string userId, string slideId)
+		public IEnumerable<bool> GetQuizDropStates(string courseId, string userId, Guid slideId)
 		{
 			return db.UserQuizzes
 				.Where(x => x.UserId == userId && x.SlideId == slideId)
@@ -53,9 +54,9 @@ namespace uLearn.Web.DataContexts
 				.Select(q => q.isDropped);
 		}
 
-		public HashSet<string> GetIdOfQuizPassedSlides(string courseId, string userId)
+		public HashSet<Guid> GetIdOfQuizPassedSlides(string courseId, string userId)
 		{
-			return new HashSet<string>(db.UserQuizzes.Where(x => x.CourseId == courseId && x.UserId == userId).Select(x => x.SlideId).Distinct());
+			return new HashSet<Guid>(db.UserQuizzes.Where(x => x.CourseId == courseId && x.UserId == userId).Select(x => x.SlideId).Distinct());
 		}
 
 		public Dictionary<string, List<string>> GetAnswersForShowOnSlide(string courseId, QuizSlide slide, string userId)
@@ -81,7 +82,7 @@ namespace uLearn.Web.DataContexts
 			return answer;
 		}
 
-		public int GetAverageStatistics(string slideId, string courseId)
+		public int GetAverageStatistics(Guid slideId, string courseId)
 		{
 			var newA = db.UserQuizzes
 				.Where(x => x.SlideId == slideId)
@@ -97,12 +98,12 @@ namespace uLearn.Web.DataContexts
 			return (int) newA;
 		}
 
-		public int GetSubmitQuizCount(string slideId, string courseId)
+		public int GetSubmitQuizCount(Guid slideId, string courseId)
 		{
 			return db.UserQuizzes.Where(x => x.SlideId == slideId).Select(x => x.User).Distinct().Count();
 		}
 
-		public int GetQuizSuccessful(string courseId, string slideId, string userId)
+		public int GetQuizSuccessful(string courseId, Guid slideId, string userId)
 		{
 			return (int)(db.UserQuizzes
 				.Where(x => x.SlideId == slideId && x.UserId == userId)
@@ -113,14 +114,14 @@ namespace uLearn.Web.DataContexts
 				.Average() * 100);
 		}
 
-		public async Task RemoveAnswers(string userId, string slideId)
+		public async Task RemoveAnswers(string userId, Guid slideId)
 		{
 			var answersToRemove = db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId).ToList();
 			db.UserQuizzes.RemoveRange(answersToRemove);
 			await db.SaveChangesAsync();
 		}
 
-		public async Task DropQuiz(string userId, string slideId)
+		public async Task DropQuiz(string userId, Guid slideId)
 		{
 			var quizzes = db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId).ToList();
 			foreach (var q in quizzes)
@@ -130,7 +131,7 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public Dictionary<string, bool> GetQuizBlocksTruth(string courseId, string userId, string slideId)
+		public Dictionary<string, bool> GetQuizBlocksTruth(string courseId, string userId, Guid slideId)
 		{
 			return db.UserQuizzes
 				.Where(q => q.UserId == userId && q.SlideId == slideId && !q.isDropped)
@@ -138,7 +139,7 @@ namespace uLearn.Web.DataContexts
 				.ToDictionary(q => q.QuizId, q => q.IsRightQuizBlock);
 		}
 
-		public Dictionary<string, List<UserQuiz>> GetAnswersForUser(string slideId, string userId)
+		public Dictionary<string, List<UserQuiz>> GetAnswersForUser(Guid slideId, string userId)
 		{
 			return db.UserQuizzes
 				.Where(ans => ans.UserId == userId && ans.SlideId == slideId && !ans.isDropped)

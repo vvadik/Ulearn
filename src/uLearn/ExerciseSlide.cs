@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using uLearn.Model.Blocks;
 
@@ -13,7 +14,7 @@ namespace uLearn
 		public ExerciseSlide(
 			List<SlideBlock> blocks,
 			SlideInfo slideInfo,
-			string title, string id)
+			string title, Guid id)
 			: base(blocks, slideInfo, title, id)
 		{
 			MaxScore = 5;

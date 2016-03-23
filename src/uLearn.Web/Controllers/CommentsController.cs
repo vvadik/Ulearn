@@ -19,7 +19,7 @@ namespace uLearn.Web.Controllers
 		private readonly CommentsRepo commentsRepo = new CommentsRepo();
 		private readonly UserManager<ApplicationUser> userManager = new ULearnUserManager();
 
-		public ActionResult SlideComments(string courseId, string slideId)
+		public ActionResult SlideComments(string courseId, Guid slideId)
 		{
 			var comments = commentsRepo.GetSlideComments(courseId, slideId).ToList();
 			var commentsPolicy = commentsRepo.GetCommentsPolicy(courseId);
@@ -96,7 +96,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> AddComment(string courseId, string slideId, string commentText, string parentCommentId)
+		public async Task<ActionResult> AddComment(string courseId, Guid slideId, string commentText, string parentCommentId)
 		{
 			var parentCommentIdInt = -1;
 			if (parentCommentId != null)
@@ -233,7 +233,7 @@ namespace uLearn.Web.Controllers
 	public class SlideCommentsModel
 	{
 		public string CourseId { get; set; }
-		public string SlideId { get; set; }
+		public Guid SlideId { get; set; }
 		public bool IsAuthorizedAndCanComment { get; set; }
 		public bool CanReply { get; set; }
 		public bool CanModerateComments { get; set; }

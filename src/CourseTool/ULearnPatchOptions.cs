@@ -33,8 +33,8 @@ namespace uLearn.CourseTool
 			patcher.PatchVerticals(
 				edxCourse, 
 				ulearnCourse.Slides
-					.Where(s => !config.IgnoredUlearnSlides.Contains(s.Id))
-					.Where(s => guids == null || guids.Contains(s.Guid))
+					.Where(s => !config.IgnoredUlearnSlides.Select(Guid.Parse).Contains(s.Id))
+					.Where(s => guids == null || guids.Contains(s.NormalizedGuid))
 					.Select(s => s.ToVerticals(
 						ulearnCourse.Id, 
 						profile.UlearnUrl + SlideUrlFormat, 

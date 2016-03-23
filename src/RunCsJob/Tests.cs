@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Threading;
 using NUnit.Framework;
 using RunCsJob.Api;
+using uLearn;
 
 namespace RunCsJob
 {
@@ -225,7 +226,7 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 		{
 			var model = new RunnerSubmition
 			{
-				Id = Guid.NewGuid().ToString(),
+				Id = Utils.NewNormalizedGuid(),
 				Code = code,
 				Input = input,
 				NeedRun = true

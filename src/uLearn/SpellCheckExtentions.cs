@@ -39,7 +39,7 @@ namespace uLearn
 
 		public static string SpellCheckSlide(this SpellChecker spellchecker, Slide slide)
 		{
-			var prefix = string.Format("{0} ({1}):", slide.Title, slide.Id);
+			var prefix = string.Format("{0} ({1}):", slide.Title, slide.NormalizedGuid);
 			var titleErrors = spellchecker.SpellCheckString(slide.Title);
 			var blocksErrors = slide.Blocks.Select(b => b.TryGetText()).Where(s => !string.IsNullOrWhiteSpace(s)).SelectMany(spellchecker.SpellCheckString);
 			var errorsList = titleErrors.Concat(blocksErrors).Select(e => e.ToPrettyString()).ToList();

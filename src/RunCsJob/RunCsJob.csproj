@@ -86,6 +86,10 @@
       <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
       <Name>RunCsJob.Api</Name>
     </ProjectReference>
+    <ProjectReference Include="..\uLearn\uLearn.csproj">
+      <Project>{333DD5A7-9955-46CB-8905-79E800F2B435}</Project>
+      <Name>uLearn</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

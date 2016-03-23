@@ -26,7 +26,7 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public async Task<UserSolution> AddUserSolution(string courseId, string slideId, string code, bool isRightAnswer, string compilationError, string output, string userId, string executionServiceName, string displayName)
+		public async Task<UserSolution> AddUserSolution(string courseId, Guid slideId, string code, bool isRightAnswer, string compilationError, string output, string userId, string executionServiceName, string displayName)
 		{
 			if (string.IsNullOrWhiteSpace(code))
 				code = "// no code";
@@ -92,7 +92,7 @@ namespace uLearn.Web.DataContexts
 			return Tuple.Create(likesCount, !votedAlready);
 		}
 
-		public List<AcceptedSolutionInfo> GetAllAcceptedSolutions(string courseId, string slideId)
+		public List<AcceptedSolutionInfo> GetAllAcceptedSolutions(string courseId, Guid slideId)
 		{
 			var prepared = db.UserSolutions
 				.Where(x => x.IsRightAnswer && x.SlideId == slideId)
@@ -122,7 +122,7 @@ namespace uLearn.Web.DataContexts
 				.ToList();
 		}
 
-		public string FindLatestAcceptedSolution(string courseId, string slideId, string userId)
+		public string FindLatestAcceptedSolution(string courseId, Guid slideId, string userId)
 		{
 			var allUserSolutionOnThisTask = db.UserSolutions
 				.Where(x => x.SlideId == slideId && x.UserId == userId && x.IsRightAnswer).ToList();
@@ -132,14 +132,14 @@ namespace uLearn.Web.DataContexts
 			return answer == null ? null : answer.SolutionCode.Text;
 		}
 
-		public int GetAcceptedSolutionsCount(string slideId, string courseId)
+		public int GetAcceptedSolutionsCount(Guid slideId, string courseId)
 		{
 			return db.UserSolutions.Where(x => x.SlideId == slideId && x.IsRightAnswer).Select(x => x.UserId).Distinct().Count();
 		}
 
-		public HashSet<string> GetIdOfPassedSlides(string courseId, string userId)
+		public HashSet<Guid> GetIdOfPassedSlides(string courseId, string userId)
 		{
-			return new HashSet<string>(db.UserSolutions
+			return new HashSet<Guid>(db.UserSolutions
 				.Where(x => x.IsRightAnswer && x.CourseId == courseId && x.UserId == userId)
 				.Select(x => x.SlideId)
 				.Distinct());
@@ -234,7 +234,7 @@ namespace uLearn.Web.DataContexts
 			var compilationErrorHash = (await textsRepo.AddText(result.CompilationOutput)).Hash;
 			var outputHash = (await textsRepo.AddText(result.GetOutput().NormalizeEoln())).Hash;
 
-			var webRunner = submission.CourseId == "web" && submission.SlideId == "runner";
+			var webRunner = submission.CourseId == "web" && submission.SlideId == Guid.Empty;
 			var exerciseSlide = webRunner ? null : ((ExerciseSlide)courseManager.GetCourse(submission.CourseId).GetSlideById(submission.SlideId));
 			var updated = new UserSolution
 			{
@@ -261,7 +261,7 @@ namespace uLearn.Web.DataContexts
 		}
 
 		public async Task<UserSolution> RunUserSolution(
-			string courseId, string slideId, string userId, string code, 
+			string courseId, Guid slideId, string userId, string code, 
 			string compilationError, string output, bool isRightAnswer, 
 			string executionServiceName, string displayName, TimeSpan timeout)
 		{
