@@ -812,3 +812,89 @@ li.li-success {
     left: 100%;
     margin-left: 10px;
 }
+
+/* Ordering quizes */
+.quiz-block-ordering ul {
+	list-style: none;
+	padding-left: 0;	
+}
+
+.quiz-block-ordering .quiz-block-ordering__item {
+	width: 350px;
+	background-color: #ddd;
+	border-radius: 4px;
+	padding: 8px 15px;
+	margin-bottom: 10px;
+	cursor: n-resize;
+}
+
+.quiz-block-ordering .quiz-block-ordering__item .quiz-block-ordering__item__icons {
+	float: right;
+	display: inline-block;
+	margin-left: 5px;
+	cursor: pointer;
+}
+
+.quiz-block-ordering ul li:first-child .quiz-block-ordering__item .quiz-block-ordering__item__icons .glyphicon-arrow-up{visibility:hidden}
+.quiz-block-ordering ul li:last-child .quiz-block-ordering__item .quiz-block-ordering__item__icons .glyphicon-arrow-down{visibility:hidden}
+.quiz-block-ordering .quiz-block-ordering__item .quiz-block-ordering__item__icons .glyphicon:hover{color:#a0a0b5}
+
+/* Matching quizes */
+.quiz-block-matching {
+	margin-top: -8px;	
+}
+
+.quiz-block-matching .quiz-block-matching__description {
+	margin-bottom: 14px;
+}
+
+.quiz-block-matching ul {
+	list-style: none;
+	padding-left: 15px;	
+}
+
+.quiz-block-matching .quiz-block-matching__fixed-item,
+.quiz-block-matching .quiz-block-matching__movable-item {
+	background-color: #ddd;
+	border-radius: 4px;
+	padding: 8px 15px;
+	margin-bottom: 10px;
+	border: 1px solid #bbb;
+}
+
+.quiz-block-matching .quiz-block-matching__movable-item {
+	cursor: cell;
+	z-index: 2;
+}
+
+.quiz-block-matching .quiz-block-matching__droppable,
+.quiz-block-matching .quiz-block-matching__source__droppable {
+	border-radius: 4px;
+	border: 1px solid #bbb;
+	height: 37px;
+	padding: 0;
+}
+
+.quiz-block-matching .quiz-block-matching__droppable {
+	margin-left: 10px;
+}
+
+.quiz-block-matching .quiz-block-matching__droppable.active,
+.quiz-block-matching .quiz-block-matching__source__droppable.active {
+	border: 1px dashed #999;
+}
+
+.quiz-block-matching .quiz-block-matching__droppable.highlight,
+.quiz-block-matching .quiz-block-matching__source__droppable.highlight {
+	background-color: #87ceeb;
+	border-color: #67aecb;
+}
+
+.quiz-block-matching .quiz-block-matching__droppable.added,
+.quiz-block-matching .quiz-block-matching__source__droppable.added {
+	border-width: 0;
+}
+
+.quiz-block__correct {
+	margin-bottom: 10px;
+}

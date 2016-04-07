@@ -33,4 +33,14 @@ namespace uLearn.Web.Models
 		public SortedDictionary<string, bool> AnswersId { get; set; }
 		public HashSet<string> RealyRightAnswer { get; set; }
 	}
+
+	public class OrderingBlockAnswerInfo : QuizAnswerInfo
+	{
+		public List<string> Answers { get; set; }
+	}
+
+	public class MatchingBlockAnswerInfo : QuizAnswerInfo
+	{
+		public List<string> Answers { get; set; }
+	}
 }

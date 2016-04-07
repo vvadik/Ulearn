@@ -90,6 +90,16 @@
 							var answer = ((IsTrueBlockAnswerInfo)ans);
 							<td class="@(answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer")" data-sort-value="@answer.Answer"><i class="@(answer.Answer ? "glyphicon glyphicon-ok" : "")"></i></td>
 						}
+						else if (ans is OrderingBlockAnswerInfo)
+						{
+							var answer = (OrderingBlockAnswerInfo)ans;
+							<td class="@(answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer")"></td>
+						}
+						else if (ans is MatchingBlockAnswerInfo)
+						{
+							var answer = (MatchingBlockAnswerInfo)ans;
+							<td class="@(answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer")"></td>
+						}
 						else
 						{
 							var answer = ((ChoiceBlockAnswerInfo)ans);

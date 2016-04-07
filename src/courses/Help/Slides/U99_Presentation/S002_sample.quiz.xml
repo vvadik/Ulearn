@@ -27,4 +27,39 @@ Header 1				| h2
 		<sample>42</sample>
 		<regex>\d+</regex>
 	</fillIn>
+
+    <ordering id="234">
+        <text>Упорядочите элементы</text>
+        <explanation>Объяснение правильного ответа</explanation>
+        <item id="1">Первый</item>
+        <item id="2">Второй</item>
+        <item id="3">Третий</item>
+        <item id="4">Четвёртый</item>
+        <item id="5">Пятый</item>
+    </ordering>
+
+    <matching id="345" shuffleFixed="true">
+        <text>Поставьте в соответствие</text>
+        <explanation>Объяснение правильного ответа</explanation>
+        <match id="1">
+            <fixed>Пётр Первый</fixed> 
+            <movable>Иван Первый</movable>
+        </match>
+        <match id="2">
+            <fixed>Пётр Второй</fixed> 
+            <movable>Иван Второй</movable>
+        </match>
+        <match id="3">
+            <fixed>Пётр Третий</fixed> 
+            <movable>Иван Третий</movable>
+        </match>
+        <match id="4">
+            <fixed>Пётр Четвёртый</fixed> 
+            <movable>Иван Грозный</movable>
+        </match>
+        <match id="5">
+            <fixed>Пётр Пятый</fixed> 
+            <movable>Иван Пятый</movable>
+        </match>
+    </matching>
 </Quiz>
