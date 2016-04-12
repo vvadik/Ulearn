@@ -295,7 +295,7 @@ namespace uLearn.Web.Controllers
 				else if (block is OrderingBlock)
 					yield return GetOrderingBlockAnswerInfo(answers, (OrderingBlock) block, block.QuestionIndex);
 				else if (block is MatchingBlock)
-					yield return GetOrderingBlockAnswerInfo(answers, (MatchingBlock)block, block.QuestionIndex);
+					yield return GetMatchingBlockAnswerInfo(answers, (MatchingBlock)block, block.QuestionIndex);
 		}
 
 		private static QuizAnswerInfo GetFillInBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, string quizId, int questionIndex)
@@ -356,48 +356,38 @@ namespace uLearn.Web.Controllers
 
 		private static QuizAnswerInfo GetOrderingBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, OrderingBlock block, int questionIndex)
 		{
-//			IEnumerable<UserQuiz> answer = new List<UserQuiz>();
-//			if (answers.ContainsKey(block.Id))
-//				answer = answers[block.Id].Where(q => q.ItemId != null);
+			IEnumerable<UserQuiz> userAnswers = new List<UserQuiz>();
+			if (answers.ContainsKey(block.Id))
+				userAnswers = answers[block.Id].Where(q => q.ItemId != null);
 
-			var ans = new SortedDictionary<string, bool>();
-			foreach (var item in block.Items)
-			{
-				ans[item.Id] = false;
-			}
-//
-//			var isRight = false;
-//			foreach (var quizItem in answer.Where(quizItem => ans.ContainsKey(quizItem.ItemId)))
-//			{
-//				isRight = quizItem.IsRightQuizBlock;
-//				ans[quizItem.ItemId] = true;
-//			}
-//
-//			return new ChoiceBlockAnswerInfo
-//			{
-//				AnswersId = ans,
-//				Id = questionIndex.ToString(),
-//				RealyRightAnswer = new HashSet<string>(block.Items.Where(x => x.IsCorrect).Select(x => x.Id)),
-//				IsRight = isRight
-//			};
+			var answersPositions = userAnswers.Select(
+				userAnswer => block.Items.FindIndex(i => i.GetHash() == userAnswer.ItemId)
+			).ToList();
+
 			return new OrderingBlockAnswerInfo
 			{
 				Id = questionIndex.ToString(),
-				IsRight = true
+				AnswersPositions = answersPositions,
 			};
 		}
 
-		private static QuizAnswerInfo GetOrderingBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, MatchingBlock block, int questionIndex)
+		private static QuizAnswerInfo GetMatchingBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, MatchingBlock block, int questionIndex)
 		{
-			var ans = new SortedDictionary<string, bool>();
-			foreach (var item in block.Matches)
+			IEnumerable<UserQuiz> userAnswers = new List<UserQuiz>();
+			if (answers.ContainsKey(block.Id))
+				userAnswers = answers[block.Id].Where(q => q.ItemId != null);
+
+			var isRightMatches = new List<bool>();
+			foreach (var match in block.Matches)
 			{
-				ans[item.Id] = false;
+				var userAnswer = userAnswers.FirstOrDefault(a => a.ItemId == match.GetHashForFixedItem());
+				isRightMatches.Add(userAnswer != null && userAnswer.IsRightAnswer);
 			}
+
 			return new MatchingBlockAnswerInfo
 			{
 				Id = questionIndex.ToString(),
-				IsRight = true
+				IsRightMatches = isRightMatches
 			};
 		}
 

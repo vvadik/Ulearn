@@ -318,30 +318,20 @@
 @helper QuizBlock(OrderingBlock block, BlockRenderContext context)
 {
 	var items = block.ShuffledItems();
+	var correctItems = block.Items;
 	QuizBlockData model = context.GetBlockData(block) ?? new QuizBlockData(new QuizModel(), 1, QuizState.NotPassed);
 	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
 	{
-		var userAnswers = model.QuizModel.AnswersToQuizes[block.Id].Select(x => x.Text).ToList();
+		var userAnswers = model.QuizModel.AnswersToQuizes[block.Id].Select(x => x.ItemId).ToList();
 		items = items.OrderBy(item => userAnswers.IndexOf(item.GetHash())).ToArray();
-	}	
+	}
 	<div class="quiz-block-ordering @(model.QuizState != QuizState.NotPassed ? "not-movable" : "")" id='@(block.Id + "_quizBlock")'>
-		@if (model.QuizState == QuizState.Total && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault().IsRightQuizBlock)
-		{
-			<div class="quiz-block__correct">
-				<button class="quiz-block-ordering__correct-button btn btn-primary"
-				        title="Нажмите и удерживайте"
-						data-order="@(string.Join(",", block.Items.Select(x => x.GetHash())))"
-						>Правильные ответы</button>
-			</div>
-		}
 		<ul>
 			@for (var itemIndex = 0; itemIndex < items.Length; itemIndex++)
 			{
 				var item = items[itemIndex];
-				<li>
-					<div class="quiz quiz-block-ordering__item" data-item-id="@item.GetHash()">
-						<input autocomplete="off" id='@(block.Id + "quizBlock" + item.GetHash())' type="hidden">
-						@item.Text.RenderTex()
+				<li class="row">
+					<div class="quiz quiz-block-ordering__item col-xs-12 col-sm-5" data-item-id="@item.GetHash()">
 						@if (model.QuizState == QuizState.NotPassed)
 						{
 							<div class="quiz-block-ordering__item__icons">
@@ -349,7 +339,16 @@
 								<span class="glyphicon glyphicon-arrow-down"></span>
 							</div>
 						}
+						<input autocomplete="off" id='@(block.Id + "quizBlock" + item.GetHash())' type="hidden">
+						<div class="text">@item.Text.RenderTex()</div>
 					</div>
+					@if (model.QuizState == QuizState.Total)
+					{
+						var correctItem = correctItems[itemIndex];
+						<div class="quiz-block-ordering__item correct col-xs-12 col-sm-offset-1 col-sm-5">
+							@correctItem.Text.RenderTex()
+						</div>
+					}
 				</li>
 			}
 		</ul>
@@ -373,16 +372,6 @@
 		movableItems = GetMovableItemsAccordingToUserAnswers(userAnswers, fixedItems);
 	}
 	<div class="quiz-block-matching @(model.QuizState != QuizState.NotPassed ? "not-movable" : "")" id='@(block.Id + "_quizBlock")'>
-		@if (model.QuizState == QuizState.Total && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault().IsRightQuizBlock)
-		{
-			<div class="quiz-block__correct">
-				<button class="quiz-block-matching__correct-button btn btn-primary"
-						title="Нажмите и удерживайте"
-						data-order="@(string.Join(",", fixedItems.Select(x => x.GetHashForMovableItem())))">
-					Правильные ответы
-				</button>
-			</div>
-		}
 		@if (model.QuizState == QuizState.NotPassed)
 		{
 			<div class="quiz-block-matching__description text-muted">Перетащите элементы из правого столбца на свободные места</div>
@@ -392,8 +381,13 @@
 			{
 				var fixedItem = fixedItems[itemIndex];
 				var movableItem = movableItems[itemIndex];
+				var isRightClass = "";
+				if (model.QuizState == QuizState.Total)
+				{
+					isRightClass = fixedItem.Id == movableItem.Id ? "right" : "wrong";
+				}
 				<li>
-					<div class="quiz quiz-block-matching__item row">
+					<div class="quiz quiz-block-matching__item @isRightClass row">
 						<input autocomplete="off" id='@(block.Id + "quizBlock" + fixedItem.GetHashForFixedItem())' type="hidden">
 						<div class="quiz-block-matching__fixed-item col-xs-3" data-item-id="@fixedItem.GetHashForFixedItem()">@fixedItem.FixedItem</div>
 						@if (model.QuizState == QuizState.NotPassed)
@@ -408,6 +402,12 @@
 							<div class="quiz-block-matching__droppable col-xs-3 added" data-block-id="@block.Id" data-item-id="@fixedItem.GetHashForFixedItem()">
 								<div class="quiz-block-matching__movable-item" data-block-id="@block.Id" data-item-id="@movableItem.GetHashForMovableItem()">@movableItem.MovableItem</div>
 							</div>
+							if (model.QuizState == QuizState.Total)
+							{
+								<div class="quiz-block-matching__fixed-item correct col-xs-3 col-sm-offset-1">
+									@fixedItem.MovableItem
+								</div>
+							}
 						}
 						
 					</div>

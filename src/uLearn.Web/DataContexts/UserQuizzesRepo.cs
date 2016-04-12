@@ -69,20 +69,6 @@ namespace uLearn.Web.DataContexts
 				var ans = db.UserQuizzes
 					.Where(x => x.UserId == userId && x.SlideId == slide.Id && x.QuizId == block.Id && !x.isDropped).ToList();
 				answer[block.Id] = ans;
-				//				if (block is ChoiceBlock)
-				//					answer[block.Id] = ans.Select(x => x.ItemId).ToList();
-				//				else if (block is IsTrueBlock)
-				//					answer[block.Id] = ans.Select(x => x.Text).ToList();
-				//				else if (block is FillInBlock)
-				//					answer[block.Id] = new List<string>
-				//					{
-				//						ans.Select(x => x.Text).FirstOrDefault(),
-				//						ans.Select(x => x.IsRightAnswer).FirstOrDefault().ToString()
-				//					};
-				//				else if (block is OrderingBlock)
-				//					answer[block.Id] = ans.Select(x => x.ItemId).ToList();
-				//				else if (block is MatchingBlock)
-				//					answer[block.Id] = ans.Select(x => x.ItemId).ToList();
 			}
 			return answer;
 		}

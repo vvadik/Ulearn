@@ -7,6 +7,10 @@
 	{
 		if (block is ChoiceBlock)
 			return ((ChoiceBlock)block).Items.Length;
+		if (block is OrderingBlock)
+			return ((OrderingBlock)block).Items.Length;
+		if (block is MatchingBlock)
+			return ((MatchingBlock)block).Matches.Length;
 		return 1;
 	}
 
@@ -57,6 +61,22 @@
 					{
 						<th>user answer</th>
 					}
+					else if (block is OrderingBlock)
+					{
+						var orderingBlock = (OrderingBlock) block;
+						foreach (var item in orderingBlock.Items.OrderBy(x => x.Id))
+						{
+							<th title="@item.Text">@GetSubstring(item.Text, 40)</th>
+						}
+					}
+					else if (block is MatchingBlock)
+					{
+						var matchingBlock = (MatchingBlock)block;
+						foreach (var text in matchingBlock.Matches.OrderBy(x => x.Id).Select(x => x.FixedItem))
+						{
+							<th title="@text">@GetSubstring(text, 40)</th>
+						}
+					}
 					else
 					{
 						<th>IsRight</th>
@@ -93,16 +113,27 @@
 						else if (ans is OrderingBlockAnswerInfo)
 						{
 							var answer = (OrderingBlockAnswerInfo)ans;
-							<td class="@(answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer")"></td>
+							for (var idx = 0; idx < answer.AnswersPositions.Count; idx++)
+							{
+								var userAnswerPosition = answer.AnswersPositions[idx];
+								var isRight = userAnswerPosition == idx;
+								<td class="@(isRight ? "rightQuizAnswer" : "falseQuizAnswer")">
+									@(isRight ? "" : (1 + userAnswerPosition).ToString())
+								</td>
+							}
 						}
 						else if (ans is MatchingBlockAnswerInfo)
 						{
 							var answer = (MatchingBlockAnswerInfo)ans;
-							<td class="@(answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer")"></td>
+							foreach (var isRight in answer.IsRightMatches)
+							{
+								<td class="@(isRight ? "rightQuizAnswer" : "falseQuizAnswer")">
+								</td>
+							}
 						}
 						else
 						{
-							var answer = ((ChoiceBlockAnswerInfo)ans);
+							var answer = (ChoiceBlockAnswerInfo)ans;
 							foreach (var item in answer.AnswersId)
 							{
 								var isContain = answer.RealyRightAnswer.Contains(item.Key);

@@ -1134,87 +1134,49 @@ public static System.Web.WebPages.HelperResult QuizBlock(OrderingBlock block, Bl
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
  
 	var items = block.ShuffledItems();
+	var correctItems = block.Items;
 	QuizBlockData model = context.GetBlockData(block) ?? new QuizBlockData(new QuizModel(), 1, QuizState.NotPassed);
 	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
 	{
-		var userAnswers = model.QuizModel.AnswersToQuizes[block.Id].Select(x => x.Text).ToList();
+		var userAnswers = model.QuizModel.AnswersToQuizes[block.Id].Select(x => x.ItemId).ToList();
 		items = items.OrderBy(item => userAnswers.IndexOf(item.GetHash())).ToArray();
-	}	
+	}
 
 WriteLiteralTo(__razor_helper_writer, "\t<div");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 11574), Tuple.Create("\"", 11664)
-, Tuple.Create(Tuple.Create("", 11582), Tuple.Create("quiz-block-ordering", 11582), true)
-, Tuple.Create(Tuple.Create(" ", 11601), Tuple.Create<System.Object, System.Int32>(model.QuizState != QuizState.NotPassed ? "not-movable" : ""
-, 11602), false)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 11609), Tuple.Create("\"", 11699)
+, Tuple.Create(Tuple.Create("", 11617), Tuple.Create("quiz-block-ordering", 11617), true)
+, Tuple.Create(Tuple.Create(" ", 11636), Tuple.Create<System.Object, System.Int32>(model.QuizState != QuizState.NotPassed ? "not-movable" : ""
+, 11637), false)
 );
 
-WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 11665), Tuple.Create("\'", 11696)
-                        , Tuple.Create(Tuple.Create("", 11670), Tuple.Create<System.Object, System.Int32>(block.Id + "_quizBlock"
-, 11670), false)
+WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 11700), Tuple.Create("\'", 11731)
+                        , Tuple.Create(Tuple.Create("", 11705), Tuple.Create<System.Object, System.Int32>(block.Id + "_quizBlock"
+, 11705), false)
 );
 
-WriteLiteralTo(__razor_helper_writer, ">\r\n");
-
-		
-         if (model.QuizState == QuizState.Total && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault().IsRightQuizBlock)
-		{
-
-WriteLiteralTo(__razor_helper_writer, "\t\t\t<div");
-
-WriteLiteralTo(__razor_helper_writer, " class=\"quiz-block__correct\"");
-
-WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t<button");
-
-WriteLiteralTo(__razor_helper_writer, " class=\"quiz-block-ordering__correct-button btn btn-primary\"");
-
-WriteLiteralTo(__razor_helper_writer, "\r\n\t\t\t\t        title=\"Нажмите и удерживайте\"");
-
-WriteLiteralTo(__razor_helper_writer, "\r\n\t\t\t\t\t\tdata-order=\"");
-
-       WriteTo(__razor_helper_writer, string.Join(",", block.Items.Select(x => x.GetHash())));
-
-WriteLiteralTo(__razor_helper_writer, "\"");
-
-WriteLiteralTo(__razor_helper_writer, "\r\n\t\t\t\t\t\t>Правильные ответы</button>\r\n\t\t\t</div>\r\n");
-
-		}
-
-WriteLiteralTo(__razor_helper_writer, "\t\t<ul>\r\n");
+WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t<ul>\r\n");
 
 			
              for (var itemIndex = 0; itemIndex < items.Length; itemIndex++)
 			{
 				var item = items[itemIndex];
 
-WriteLiteralTo(__razor_helper_writer, "\t\t\t\t<li>\r\n\t\t\t\t\t<div");
+WriteLiteralTo(__razor_helper_writer, "\t\t\t\t<li");
 
-WriteLiteralTo(__razor_helper_writer, " class=\"quiz quiz-block-ordering__item\"");
+WriteLiteralTo(__razor_helper_writer, " class=\"row\"");
+
+WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\t<div");
+
+WriteLiteralTo(__razor_helper_writer, " class=\"quiz quiz-block-ordering__item col-xs-12 col-sm-5\"");
 
 WriteLiteralTo(__razor_helper_writer, " data-item-id=\"");
 
-                                                WriteTo(__razor_helper_writer, item.GetHash());
+                                                                   WriteTo(__razor_helper_writer, item.GetHash());
 
 WriteLiteralTo(__razor_helper_writer, "\"");
 
-WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\t\t<input");
-
-WriteLiteralTo(__razor_helper_writer, " autocomplete=\"off\"");
-
-WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 12350), Tuple.Create("\'", 12397)
-, Tuple.Create(Tuple.Create("", 12355), Tuple.Create<System.Object, System.Int32>(block.Id + "quizBlock" + item.GetHash()
-, 12355), false)
-);
-
-WriteLiteralTo(__razor_helper_writer, " type=\"hidden\"");
-
 WriteLiteralTo(__razor_helper_writer, ">\r\n");
-
-WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t\t");
-
-WriteTo(__razor_helper_writer, item.Text.RenderTex());
-
-WriteLiteralTo(__razor_helper_writer, "\r\n");
 
 						
                          if (model.QuizState == QuizState.NotPassed)
@@ -1236,7 +1198,47 @@ WriteLiteralTo(__razor_helper_writer, "></span>\r\n\t\t\t\t\t\t\t</div>\r\n");
 
 						}
 
-WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t</div>\r\n\t\t\t\t</li>\r\n");
+WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t\t<input");
+
+WriteLiteralTo(__razor_helper_writer, " autocomplete=\"off\"");
+
+WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 12267), Tuple.Create("\'", 12314)
+, Tuple.Create(Tuple.Create("", 12272), Tuple.Create<System.Object, System.Int32>(block.Id + "quizBlock" + item.GetHash()
+, 12272), false)
+);
+
+WriteLiteralTo(__razor_helper_writer, " type=\"hidden\"");
+
+WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\t\t<div");
+
+WriteLiteralTo(__razor_helper_writer, " class=\"text\"");
+
+WriteLiteralTo(__razor_helper_writer, ">");
+
+            WriteTo(__razor_helper_writer, item.Text.RenderTex());
+
+WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t\t\t\t</div>\r\n");
+
+					
+                     if (model.QuizState == QuizState.Total)
+					{
+						var correctItem = correctItems[itemIndex];
+
+WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t\t<div");
+
+WriteLiteralTo(__razor_helper_writer, " class=\"quiz-block-ordering__item correct col-xs-12 col-sm-offset-1 col-sm-5\"");
+
+WriteLiteralTo(__razor_helper_writer, ">\r\n");
+
+WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t\t\t");
+
+WriteTo(__razor_helper_writer, correctItem.Text.RenderTex());
+
+WriteLiteralTo(__razor_helper_writer, "\r\n\t\t\t\t\t\t</div>\r\n");
+
+					}
+
+WriteLiteralTo(__razor_helper_writer, "\t\t\t\t</li>\r\n");
 
 			}
 
@@ -1286,45 +1288,20 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 WriteLiteralTo(__razor_helper_writer, "\t<div");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 13610), Tuple.Create("\"", 13700)
-, Tuple.Create(Tuple.Create("", 13618), Tuple.Create("quiz-block-matching", 13618), true)
-, Tuple.Create(Tuple.Create(" ", 13637), Tuple.Create<System.Object, System.Int32>(model.QuizState != QuizState.NotPassed ? "not-movable" : ""
-, 13638), false)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 13544), Tuple.Create("\"", 13634)
+, Tuple.Create(Tuple.Create("", 13552), Tuple.Create("quiz-block-matching", 13552), true)
+, Tuple.Create(Tuple.Create(" ", 13571), Tuple.Create<System.Object, System.Int32>(model.QuizState != QuizState.NotPassed ? "not-movable" : ""
+, 13572), false)
 );
 
-WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 13701), Tuple.Create("\'", 13732)
-                        , Tuple.Create(Tuple.Create("", 13706), Tuple.Create<System.Object, System.Int32>(block.Id + "_quizBlock"
-, 13706), false)
+WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 13635), Tuple.Create("\'", 13666)
+                        , Tuple.Create(Tuple.Create("", 13640), Tuple.Create<System.Object, System.Int32>(block.Id + "_quizBlock"
+, 13640), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n");
 
 		
-         if (model.QuizState == QuizState.Total && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault().IsRightQuizBlock)
-		{
-
-WriteLiteralTo(__razor_helper_writer, "\t\t\t<div");
-
-WriteLiteralTo(__razor_helper_writer, " class=\"quiz-block__correct\"");
-
-WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t<button");
-
-WriteLiteralTo(__razor_helper_writer, " class=\"quiz-block-matching__correct-button btn btn-primary\"");
-
-WriteLiteralTo(__razor_helper_writer, "\r\n\t\t\t\t\t\ttitle=\"Нажмите и удерживайте\"");
-
-WriteLiteralTo(__razor_helper_writer, "\r\n\t\t\t\t\t\tdata-order=\"");
-
-       WriteTo(__razor_helper_writer, string.Join(",", fixedItems.Select(x => x.GetHashForMovableItem())));
-
-WriteLiteralTo(__razor_helper_writer, "\"");
-
-WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\tПравильные ответы\r\n\t\t\t\t</button>\r\n\t\t\t</div>\r\n");
-
-		}
-
-WriteLiteralTo(__razor_helper_writer, "\t\t");
-
          if (model.QuizState == QuizState.NotPassed)
 		{
 
@@ -1343,18 +1320,29 @@ WriteLiteralTo(__razor_helper_writer, "\t\t<ul>\r\n");
 			{
 				var fixedItem = fixedItems[itemIndex];
 				var movableItem = movableItems[itemIndex];
+				var isRightClass = "";
+				if (model.QuizState == QuizState.Total)
+				{
+					isRightClass = fixedItem.Id == movableItem.Id ? "right" : "wrong";
+				}
 
 WriteLiteralTo(__razor_helper_writer, "\t\t\t\t<li>\r\n\t\t\t\t\t<div");
 
-WriteLiteralTo(__razor_helper_writer, " class=\"quiz quiz-block-matching__item row\"");
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 14210), Tuple.Create("\"", 14266)
+, Tuple.Create(Tuple.Create("", 14218), Tuple.Create("quiz", 14218), true)
+, Tuple.Create(Tuple.Create(" ", 14222), Tuple.Create("quiz-block-matching__item", 14223), true)
+, Tuple.Create(Tuple.Create(" ", 14248), Tuple.Create<System.Object, System.Int32>(isRightClass
+, 14249), false)
+, Tuple.Create(Tuple.Create(" ", 14262), Tuple.Create("row", 14263), true)
+);
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\t\t<input");
 
 WriteLiteralTo(__razor_helper_writer, " autocomplete=\"off\"");
 
-WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 14616), Tuple.Create("\'", 14680)
-, Tuple.Create(Tuple.Create("", 14621), Tuple.Create<System.Object, System.Int32>(block.Id + "quizBlock" + fixedItem.GetHashForFixedItem()
-, 14621), false)
+WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 14301), Tuple.Create("\'", 14365)
+, Tuple.Create(Tuple.Create("", 14306), Tuple.Create<System.Object, System.Int32>(block.Id + "quizBlock" + fixedItem.GetHashForFixedItem()
+, 14306), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, " type=\"hidden\"");
@@ -1477,6 +1465,22 @@ WriteLiteralTo(__razor_helper_writer, ">");
 
 WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t\t\t\t\t\t</div>\r\n");
 
+							if (model.QuizState == QuizState.Total)
+							{
+
+WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t\t\t\t<div");
+
+WriteLiteralTo(__razor_helper_writer, " class=\"quiz-block-matching__fixed-item correct col-xs-3 col-sm-offset-1\"");
+
+WriteLiteralTo(__razor_helper_writer, ">\r\n");
+
+WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t\t\t\t\t");
+
+      WriteTo(__razor_helper_writer, fixedItem.MovableItem);
+
+WriteLiteralTo(__razor_helper_writer, "\r\n\t\t\t\t\t\t\t\t</div>\r\n");
+
+							}
 						}
 
 WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t\t\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</li>\r\n");
@@ -1707,9 +1711,9 @@ WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\t<a");
 
 WriteLiteralTo(__razor_helper_writer, " class=\"btn btn-default\"");
 
-WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 17893), Tuple.Create("\"", 17925)
-, Tuple.Create(Tuple.Create("", 17900), Tuple.Create<System.Object, System.Int32>(data.AcceptedSolutionUrl
-, 17900), false)
+WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 17783), Tuple.Create("\"", 17815)
+, Tuple.Create(Tuple.Create("", 17790), Tuple.Create<System.Object, System.Int32>(data.AcceptedSolutionUrl
+, 17790), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">Продолжить</a>\r\n\t\t\t\t\t<button");

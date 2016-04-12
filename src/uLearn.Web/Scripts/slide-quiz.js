@@ -11,7 +11,7 @@
 			}
 			if ($(this).hasClass('quiz-block-ordering__item')) {
 				val = $(this).data('item-id');
-				answers.push(new QuizAnswer("Ordering", content[0], "", val));
+				answers.push(new QuizAnswer("Ordering", content[0], val, ""));
 			}
 			if ($(this).hasClass('quiz-block-matching__item')) {
 				var orderId = $(this).find('.quiz-block-matching__droppable').data('item-id');
@@ -96,15 +96,15 @@ $(document).ready(function() {
 		});
 	};
 
-	$(".quiz-block-ordering ul").sortable();
+	$(".quiz-block-ordering:not(.not-movable) ul").sortable();
 
 	$(".quiz-block-ordering .quiz-block-ordering__item .quiz-block-ordering__item__icons").click(function(e) {
 		var $target = $(e.target);
-		var item = $target.closest("li");
+		var $item = $target.closest("li");
 		if ($target.is(".glyphicon-arrow-down"))
-			item.moveDown();
+			$item.moveDown();
 		if ($target.is(".glyphicon-arrow-up"))
-			item.moveUp();
+			$item.moveUp();
 	});
 
 
@@ -119,10 +119,13 @@ $(document).ready(function() {
 		$this.droppable({
 			activeClass: 'active',
 			hoverClass: 'hover',
-			accept: '[data-block-id=' + blockId + ']',
+			accept: function($el) {
+				return $el.data('block-id') === blockId &&
+					(!$(this).hasClass('added') || $(this).data('movable-item-id') === $el.data('item-id'));
+			},
 			drop: function (event, ui) {
 				if ($(this).hasClass('added'))
-					return;
+					return false;
 				$(this).addClass('added');
 				var $dropped = $(ui.draggable);
 				var $droppedOn = $(this);
@@ -140,25 +143,16 @@ $(document).ready(function() {
 		});
 	});
 
-	$('.quiz-block-ordering__correct-button').on('mousedown mouseup', function() {
-		var $block = $(this).closest('.quiz-block-ordering');
-		var $items = $block.find('.quiz-block-ordering__item');
-		var order = $(this).data('order').split(',');
-		$(this).data('order', $items.map(function () { return $(this).data('item-id'); }).get().join(','));
-		order.forEach(function(itemId, idx) {
-			var $item = $items.filter('[data-item-id=' + itemId + ']');
-			$item.appendTo($block.find('li').get(idx));
-		});
-	});
+	/* Auto-height by maximum hieght in matching block */
+	$('.quiz-block-matching').each(function(idx, block) {
+		var $block = $(block);
+		var $allItems = $block.find('.quiz-block-matching__fixed-item').
+			add($block.find('.quiz-block-matching__movable-item')).
+			add($block.find('.quiz-block-matching__droppable')).
+			add($block.find('.quiz-block-matching__source__droppable'));
+		var heights = $allItems.map(function (_, el) { return $(el).outerHeight(); }).get();
+		var maxHeight = Math.max.apply(null, heights);
 
-	$('.quiz-block-matching__correct-button').on('mousedown mouseup', function () {
-		var $block = $(this).closest('.quiz-block-matching');
-		var $items = $block.find('.quiz-block-matching__movable-item');
-		var order = $(this).data('order').split(',');
-		$(this).data('order', $items.map(function () { return $(this).data('item-id'); }).get().join(','));
-		order.forEach(function (itemId, idx) {
-			var $item = $items.filter('[data-item-id=' + itemId + ']');
-			$item.appendTo($block.find('.quiz-block-matching__droppable').get(idx));
-		});
+		$allItems.outerHeight(maxHeight);
 	});
 });

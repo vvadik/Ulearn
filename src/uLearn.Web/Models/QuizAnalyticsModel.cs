@@ -36,11 +36,11 @@ namespace uLearn.Web.Models
 
 	public class OrderingBlockAnswerInfo : QuizAnswerInfo
 	{
-		public List<string> Answers { get; set; }
+		public List<int> AnswersPositions { get; set; }
 	}
 
 	public class MatchingBlockAnswerInfo : QuizAnswerInfo
 	{
-		public List<string> Answers { get; set; }
+		public List<bool> IsRightMatches { get; set; }
 	}
 }
