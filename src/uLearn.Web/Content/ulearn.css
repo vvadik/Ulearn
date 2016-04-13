@@ -940,3 +940,21 @@ li.li-success {
     border-color: #71BB71;
     color: white;
 }
+
+.quiz-block-ordering__correct-description,
+.quiz-block-matching__correct-description {
+	padding-bottom: 8px;
+    font-size: 13pt;
+}
+
+.quiz-block-matching__correct-description {
+	padding-left: 15px;
+}
+
+.quiz-block-ordering__correct-description div {
+	padding-left: 29px;
+}
+
+.quiz-block-matching__correct-description div {
+	padding-left: 23px;
+}
