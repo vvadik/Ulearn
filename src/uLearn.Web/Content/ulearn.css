@@ -847,7 +847,7 @@ li.li-success {
     top: 9px;
 }
 
-.quiz-block-ordering .quiz-block-ordering__item .text {
+.quiz-block-ordering:not(.not-movable) .quiz-block-ordering__item .text {
 	margin-right: 35px;
 }
 
@@ -861,7 +861,7 @@ li.li-success {
 
 /* Matching quizes */
 .quiz-block-matching {
-	margin-top: -8px;	
+	/* margin-top: -8px; */
 }
 
 .quiz-block-matching .quiz-block-matching__description {
@@ -936,7 +936,7 @@ li.li-success {
 
 .quiz-block-ordering .quiz-block-ordering__item.correct,
 .quiz-block-matching .quiz-block-matching__fixed-item.correct {
-	border-color: #468246;
-	background-color: #62AB62;
+    background-color: #82D082;
+    border-color: #71BB71;
     color: white;
 }
