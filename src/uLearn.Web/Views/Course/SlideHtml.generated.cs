@@ -1515,7 +1515,7 @@ WriteLiteralTo(__razor_helper_writer, ">\r\n");
 
 WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t\t\t\t\t");
 
-      WriteTo(__razor_helper_writer, fixedItem.MovableItem);
+      WriteTo(__razor_helper_writer, fixedItem.MovableItem.RenderTex());
 
 WriteLiteralTo(__razor_helper_writer, "\r\n\t\t\t\t\t\t\t\t</div>\r\n");
 
@@ -1750,9 +1750,9 @@ WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\t<a");
 
 WriteLiteralTo(__razor_helper_writer, " class=\"btn btn-default\"");
 
-WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 18307), Tuple.Create("\"", 18339)
-, Tuple.Create(Tuple.Create("", 18314), Tuple.Create<System.Object, System.Int32>(data.AcceptedSolutionUrl
-, 18314), false)
+WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 18319), Tuple.Create("\"", 18351)
+, Tuple.Create(Tuple.Create("", 18326), Tuple.Create<System.Object, System.Int32>(data.AcceptedSolutionUrl
+, 18326), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">Продолжить</a>\r\n\t\t\t\t\t<button");
