@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -79,7 +80,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public async Task<string> SubmitQuiz(string courseId, string slideIndex, string answer, bool isLti)
+		public async Task<ActionResult> SubmitQuiz(string courseId, string slideIndex, string answer, bool isLti)
 		{
 			var intSlideIndex = int.Parse(slideIndex);
 			var course = courseManager.GetCourse(courseId);
@@ -88,26 +89,19 @@ namespace uLearn.Web.Controllers
 			var slideId = slide.Id;
 
 			if (visitsRepo.IsPassed(slideId, userId))
-				return "already answered";
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Already answered");
 			var time = DateTime.Now;
 			var answers = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.QuizId);
 			var quizBlockWithTaskCount = course.Slides[intSlideIndex].Blocks.Count(x => x is AbstractQuestionBlock);
-			var incorrectQuizzes = new List<string>();
-			var fillInBlockType = typeof(FillInBlock);
 			var allQuizInfos = new List<QuizInfoForDb>();
 			foreach (var ans in answers)
 			{
 				var quizInfos = CreateQuizInfo(course, intSlideIndex, ans);
-				foreach (var quizInfo in quizInfos)
-				{
-					allQuizInfos.Add(quizInfo);
-					if (!quizInfo.IsRightAnswer && quizInfo.QuizType == fillInBlockType)
-						incorrectQuizzes.Add(ans.Key);
-				}
+				allQuizInfos.AddRange(quizInfos);
 			}
 			var blocksInAnswerCount = allQuizInfos.Select(x => x.QuizId).Distinct().Count();
 			if (blocksInAnswerCount != quizBlockWithTaskCount)
-				return "has empty blocks";
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Has empty blocks");
 			var score = allQuizInfos
 				.Where(forDb => forDb.IsRightQuizBlock)
 				.Select(forDb => forDb.QuizId)
@@ -121,7 +115,7 @@ namespace uLearn.Web.Controllers
 			if (isLti)
 				LtiUtils.SubmitScore(slide, userId);
 
-			return string.Join("*", incorrectQuizzes.Distinct());
+			return new HttpStatusCodeResult(HttpStatusCode.OK);
 		}
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfo(Course course, int slideIndex, IGrouping<string, QuizAnswer> answer)
@@ -132,6 +126,10 @@ namespace uLearn.Web.Controllers
 				return CreateQuizInfoForDb(block as FillInBlock, answer.First().Text);
 			if (block is ChoiceBlock)
 				return CreateQuizInfoForDb(block as ChoiceBlock, answer);
+			if (block is OrderingBlock)
+				return CreateQuizInfoForDb(block as OrderingBlock, answer);
+			if (block is MatchingBlock)
+				return CreateQuizInfoForDb(block as MatchingBlock, answer);
 			return CreateQuizInfoForDb(block as IsTrueBlock, answer);
 		}
 
@@ -187,6 +185,48 @@ namespace uLearn.Web.Controllers
 							 .All(x => ans.Where(y => y.IsRightAnswer).Select(y => y.ItemId).Contains(x));
 			foreach (var info in ans)
 				info.IsRightQuizBlock = isRightQuizBlock;
+			return ans;
+		}
+
+		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(OrderingBlock orderingBlock, IGrouping<string, QuizAnswer> answers)
+		{
+			var ans = answers.Select(x => x.ItemId).ToList()
+				.Select(x => new QuizInfoForDb
+				{
+					QuizId = orderingBlock.Id,
+					IsRightAnswer = true,
+					ItemId = x,
+					Text = null,
+					QuizType = typeof(OrderingBlock),
+					IsRightQuizBlock = false
+				}).ToList();
+
+			var isRightQuizBlock = answers.Count() == orderingBlock.Items.Length &&
+				answers.Zip(orderingBlock.Items, (answer, item) => answer.Text == item.GetHash()).All(x => x);
+			foreach (var info in ans)
+				info.IsRightQuizBlock = isRightQuizBlock;
+
+			return ans;
+		}
+
+		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(MatchingBlock matchingBlock, IGrouping<string, QuizAnswer> answers)
+		{
+			var ans = answers.ToList()
+				.Select(x => new QuizInfoForDb
+				{
+					QuizId = matchingBlock.Id,
+					IsRightAnswer = matchingBlock.Matches.FirstOrDefault(m => m.GetHashForFixedItem() == x.ItemId)?.
+										GetHashForMovableItem() == x.Text,
+					ItemId = x.ItemId,
+					Text = x.Text,
+					QuizType = typeof(MatchingBlock),
+					IsRightQuizBlock = false
+				}).ToList();
+
+			var isRightQuizBlock = ans.All(x => x.IsRightAnswer);
+			foreach (var info in ans)
+				info.IsRightQuizBlock = isRightQuizBlock;
+
 			return ans;
 		}
 
@@ -252,6 +292,10 @@ namespace uLearn.Web.Controllers
 					yield return GetChoiceBlockAnswerInfo(answers, (ChoiceBlock)block, block.QuestionIndex);
 				else if (block is IsTrueBlock)
 					yield return GetIsTrueBlockAnswerInfo(answers, block.Id, block.QuestionIndex);
+				else if (block is OrderingBlock)
+					yield return GetOrderingBlockAnswerInfo(answers, (OrderingBlock) block, block.QuestionIndex);
+				else if (block is MatchingBlock)
+					yield return GetMatchingBlockAnswerInfo(answers, (MatchingBlock)block, block.QuestionIndex);
 		}
 
 		private static QuizAnswerInfo GetFillInBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, string quizId, int questionIndex)
@@ -310,6 +354,43 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
+		private static QuizAnswerInfo GetOrderingBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, OrderingBlock block, int questionIndex)
+		{
+			IEnumerable<UserQuiz> userAnswers = new List<UserQuiz>();
+			if (answers.ContainsKey(block.Id))
+				userAnswers = answers[block.Id].Where(q => q.ItemId != null);
+
+			var answersPositions = userAnswers.Select(
+				userAnswer => block.Items.FindIndex(i => i.GetHash() == userAnswer.ItemId)
+			).ToList();
+
+			return new OrderingBlockAnswerInfo
+			{
+				Id = questionIndex.ToString(),
+				AnswersPositions = answersPositions,
+			};
+		}
+
+		private static QuizAnswerInfo GetMatchingBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, MatchingBlock block, int questionIndex)
+		{
+			IEnumerable<UserQuiz> userAnswers = new List<UserQuiz>();
+			if (answers.ContainsKey(block.Id))
+				userAnswers = answers[block.Id].Where(q => q.ItemId != null);
+
+			var isRightMatches = new List<bool>();
+			foreach (var match in block.Matches)
+			{
+				var userAnswer = userAnswers.FirstOrDefault(a => a.ItemId == match.GetHashForFixedItem());
+				isRightMatches.Add(userAnswer != null && userAnswer.IsRightAnswer);
+			}
+
+			return new MatchingBlockAnswerInfo
+			{
+				Id = questionIndex.ToString(),
+				IsRightMatches = isRightMatches
+			};
+		}
+
 		[HttpPost]
 		public async Task<ActionResult> DropQuiz(string courseId, Guid slideId, bool isLti)
 		{
@@ -350,8 +431,7 @@ namespace uLearn.Web.Controllers
 				MaxDropCount = maxDropCount,
 				ResultsForQuizes = resultsForQuizes,
 				AnswersToQuizes =
-					userQuizzesRepo.GetAnswersForShowOnSlide(courseId, slide,
-						userId),
+					userQuizzesRepo.GetAnswersForShowOnSlide(courseId, slide, userId),
 				IsLti = isLti
 			};
 

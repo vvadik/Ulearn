@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
@@ -26,6 +27,8 @@ namespace uLearn.Quizes
 		[XmlElement("isTrue", Type = typeof(IsTrueBlock))]
 		[XmlElement("choice", Type = typeof(ChoiceBlock))]
 		[XmlElement("fillIn", Type = typeof(FillInBlock))]
+		[XmlElement("ordering", Type = typeof(OrderingBlock))]
+		[XmlElement("matching", Type = typeof(MatchingBlock))]
 		public SlideBlock[] Blocks
 		{
 			get { return blocks ?? new SlideBlock[0]; }
@@ -190,6 +193,88 @@ namespace uLearn.Quizes
 		public override string TryGetText()
 		{
 			return Text + '\n' + Sample + '\t' + Explanation;
+		}
+	}
+
+	public class OrderingBlock : AbstractQuestionBlock
+	{
+		[XmlElement("item")]
+		public OrderingItem[] Items;
+
+		[XmlElement("explanation")]
+		public string Explanation;
+
+		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+		{
+			throw new NotImplementedException();
+		}
+
+		public OrderingItem[] ShuffledItems()
+		{
+			return Items.Shuffle().ToArray();
+		}
+	}
+
+	public class MatchingBlock : AbstractQuestionBlock
+	{
+		[XmlAttribute("shuffleFixed")]
+		public bool ShuffleFixed;
+
+		[XmlElement("explanation")]
+		public string Explanation;
+
+		[XmlElement("match")]
+		public MatchingMatch[] Matches;
+
+		private readonly Random random = new Random();
+
+		public List<MatchingMatch> GetMatches(bool shuffle=false)
+		{
+			if (shuffle)
+				return Matches.Shuffle(random).ToList();
+
+			return Matches.ToList();
+		}
+
+		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public class OrderingItem
+	{
+		[XmlAttribute("id")]
+		public string Id;
+
+		[XmlText]
+		public string Text;
+
+		public string GetHash()
+		{
+			return (Id + "OrderingItemSalt").GetHashCode().ToString();
+		}
+	}
+
+	public class MatchingMatch
+	{
+		[XmlAttribute("id")]
+		public string Id;
+
+		[XmlElement("fixed")]
+		public string FixedItem;
+
+		[XmlElement("movable")]
+		public string MovableItem;
+
+		public string GetHashForFixedItem()
+		{
+			return (Id + "MatchingItemFixedItemSalt").GetHashCode().ToString();
+		}
+
+		public string GetHashForMovableItem()
+		{
+			return (Id + "MatchingItemMovableItemSalt").GetHashCode().ToString();
 		}
 	}
 
