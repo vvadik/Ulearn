@@ -958,3 +958,12 @@ li.li-success {
 .quiz-block-matching__correct-description div {
 	padding-left: 23px;
 }
+
+/* Quiz Analytics */
+.analytics__quiz-version__info {
+	margin-top: 15px;	
+}
+
+table.analytics__user-answers {
+	margin-top: 15px;
+}

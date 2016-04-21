@@ -1,12 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using uLearn.Quizes;
 
 namespace uLearn.Web.Models
 {
 	public class QuizAnalyticsModel
 	{
-		public SortedDictionary<string,List<QuizAnswerInfo>> UserAnswers { get; set; }
+		public string CourseId { get; set; }
+		public Guid SlideId { get; set; }
+
+		public SortedDictionary<string, List<QuizAnswerInfo>> UserAnswers { get; set; }
 		public QuizSlide QuizSlide { get; set; }
+		public List<QuizVersion> QuizVersions { get; set; }
+		public Dictionary<int?, List<string>> UsersByQuizVersion { get; set; }
 		public Dictionary<string, int> RightAnswersCount { get; set; }
 		public Dictionary<string, string> Group { get; set; }
 	}

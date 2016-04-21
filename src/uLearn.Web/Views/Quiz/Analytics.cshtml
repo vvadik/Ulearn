@@ -1,4 +1,5 @@
-﻿@using uLearn.Model.Blocks
+﻿@using uLearn
+@using uLearn.Model.Blocks
 @using uLearn.Quizes
 @model QuizAnalyticsModel
 
@@ -23,15 +24,22 @@
 	}
 
 }
-<div>
-	@{ var maxQuestionIndex = Model.QuizSlide.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex).Max(x => x.QuestionIndex);}
-	<table id="myTable" class="tablesorter">
-		<thead>
+
+@{
+	var quizVersionIdx = 0;
+}
+@foreach (var quizVersion in Model.QuizVersions)
+{
+	var quizSlide = quizVersion.RestoredQuiz;
+	<div>
+		@{ var maxQuestionIndex = quizSlide.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex).Max(x => x.QuestionIndex); }
+		<table class="analytics__user-answers tablesorter">
+			<thead>
 			<tr>
 				<th style="border-bottom: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа" data-sorter="true">наведи на меня!</th>
 				<th style="border-bottom: none">Группа</th>
 				<th style="border-bottom: none" data-sorter="false"></th>
-				@foreach (var block in Model.QuizSlide.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
+				@foreach (var block in quizSlide.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
 					int count;
 					Model.RightAnswersCount.TryGetValue(block.QuestionIndex.ToString(), out count);
@@ -46,8 +54,8 @@
 			<tr>
 				<th style="border-top: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа"></th>
 				<th style="border-top: none"></th>
-				<th style="border-top: none; border-bottom: none" data-sorter="false"></th>
-				@foreach (var block in Model.QuizSlide.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
+				<th style="border-top: none;border-bottom: none" data-sorter="false"></th>
+				@foreach (var block in quizSlide.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
 					if (block is ChoiceBlock)
 					{
@@ -63,7 +71,7 @@
 					}
 					else if (block is OrderingBlock)
 					{
-						var orderingBlock = (OrderingBlock) block;
+						var orderingBlock = (OrderingBlock)block;
 						foreach (var item in orderingBlock.Items.OrderBy(x => x.Id))
 						{
 							<th title="@item.Text">@GetSubstring(item.Text, 40)</th>
@@ -88,15 +96,18 @@
 					<th style="border-top: none;border-bottom: none" data-sorter="false"></th>
 				}
 			</tr>
-		</thead>
-		<tbody>
-			@foreach (var user in Model.UserAnswers.Keys)
+			</thead>
+			<tbody>
+			@{
+				var users = Model.UsersByQuizVersion.Get(quizVersion.Id, new List<string>());
+			}
+			@foreach (var user in users)
 			{
 				var group = Model.Group[user];
 				<tr>
 					<td>@user</td>
-					<td data-sort-value="@(String.IsNullOrEmpty(group) ? "-" : group)">@group</td>
-					<td style="border-top: none; border-bottom: none"></td>
+					<td data-sort-value="@(string.IsNullOrEmpty(group) ? "-" : group)">@group</td>
+					<td style="border-top: none;border-bottom: none"></td>
 					@foreach (var ans in Model.UserAnswers[user])
 					{
 						if (ans is FillInBlockAnswerInfo)
@@ -146,13 +157,36 @@
 						{
 							break;
 						}
-						<td style="border-top: none; border-bottom: none"></td>
+						<td style="border-top: none;border-bottom: none"></td>
 					}
 				</tr>
 			}
-		</tbody>
-	</table>
-</div>
+			</tbody>
+		</table>
+		@if (quizVersionIdx != Model.QuizVersions.Count - 1)
+		{
+			var nextQuizVersion = Model.QuizVersions[quizVersionIdx + 1];
+			using (Html.BeginForm("MergeQuizVersions", "Quiz", FormMethod.Post))
+			{
+				@Html.AntiForgeryToken()
+				<div class="analytics__quiz-version__info">
+					Изменено @quizVersion.LoadingTime
+				</div>
+				<div class="analytics__quiz-version__merge">
+					@Html.Hidden("courseId", Model.CourseId)
+					@Html.Hidden("slideId", Model.SlideId)
+					@Html.Hidden("quizVersionId", nextQuizVersion.Id)
+					@Html.Hidden("mergeWithQuizVersionId", quizVersion.Id)
+					<button class="btn btn-success" type="submit">Склеить версии</button> <small>(это незначительное изменение)</small>
+				</div>
+			}
+		}
+
+	</div>
+	{
+		quizVersionIdx++;
+	}
+}
 <script src="~/tablesorter-master/js/jquery.tablesorter.js"></script>
 <script src="~/tablesorter-master/js/jquery.tablesorter.widgets.min.js"></script>
 <script src="~/Scripts/table-configurator.js"></script>

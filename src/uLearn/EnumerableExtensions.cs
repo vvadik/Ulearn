@@ -33,6 +33,12 @@ namespace System.Linq
 			}
 		}
 
+		public static void Iterate<T>(this IEnumerable<T> items)
+		{
+			// ReSharper disable once UnusedVariable
+			var list = items.ToList();
+		}
+
 		///<summary>Finds the index of the first item matching an expression in an enumerable.</summary>
 		///<param name="items">The enumerable to search.</param>
 		///<param name="predicate">The expression to test the items against.</param>

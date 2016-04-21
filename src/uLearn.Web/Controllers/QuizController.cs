@@ -24,6 +24,7 @@ namespace uLearn.Web.Controllers
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 		private readonly VisitsRepo visitsRepo = new VisitsRepo();
+		private readonly QuizzesRepo quizzesRepo = new QuizzesRepo();
 
 		public QuizController()
 			: this(WebCourseManager.Instance)
@@ -249,18 +250,45 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
+		[HttpPost]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		public async Task <ActionResult> MergeQuizVersions(string courseId, Guid slideId, int quizVersionId, int mergeWithQuizVersionId)
+		{
+			using (var transcation = db.Database.BeginTransaction())
+			{
+				var quizVersion = db.QuizVersions.FirstOrDefault(x => x.CourseId == courseId && x.SlideId == slideId && x.Id == quizVersionId);
+				var mergeWithQuizVersion = db.QuizVersions.FirstOrDefault(x => x.CourseId == courseId && x.SlideId == slideId && x.Id == mergeWithQuizVersionId);
+				if (quizVersion == null || mergeWithQuizVersion == null)
+					return HttpNotFound();
+
+				foreach (var userQuiz in db.UserQuizzes.Where(x => x.QuizVersionId == mergeWithQuizVersionId))
+					userQuiz.QuizVersionId = quizVersionId;
+
+				quizVersion.NormalizedXml = mergeWithQuizVersion.NormalizedXml;
+
+				db.QuizVersions.Remove(mergeWithQuizVersion);
+
+				await db.SaveChangesAsync();
+
+				transcation.Commit();
+			}
+
+			return RedirectToAction("SlideById", "Course", new { courseId, slideId});
+		}
+
 		[HttpGet]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult Analytics(string courseId, int slideIndex, DateTime periodStart)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var quizSlide = (QuizSlide)course.Slides[slideIndex];
+			var quizVersions = quizzesRepo.GetQuizVersions(courseId, quizSlide.Id).ToList();
 			var dict = new SortedDictionary<string, List<QuizAnswerInfo>>();
 			var groups = new Dictionary<string, string>();
 			var passes = db.UserQuizzes
 				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped && periodStart <= q.Timestamp)
 				.GroupBy(q => q.UserId)
-				.Join(db.Users, g => g.Key, user => user.Id, (g, user) => new { user.UserName, user.GroupName, UserQuizzes = g.ToList() })
+				.Join(db.Users, g => g.Key, user => user.Id, (g, user) => new { user.UserName, user.GroupName, UserQuizzes = g.ToList(), QuizVersionId = g.FirstOrDefault().QuizVersionId })
 				.ToList();
 			foreach (var pass in passes)
 			{
@@ -273,10 +301,18 @@ namespace uLearn.Web.Controllers
 					.Select(info => new { info.Id, info.IsRight }))
 				.GroupBy(arg => arg.Id)
 				.ToDictionary(grouping => grouping.Key, grouping => grouping.Count());
+
+			var usersByQuizVersion = passes.GroupBy(p => p.QuizVersionId).ToDictionary(g => g.Key, g => g.Select(u => u.UserName).ToList());
+
 			return PartialView(new QuizAnalyticsModel
 			{
+				CourseId = courseId,
+				SlideId = quizSlide.Id,
+
 				UserAnswers = dict,
 				QuizSlide = quizSlide,
+				QuizVersions = quizVersions,
+				UsersByQuizVersion = usersByQuizVersion,
 				RightAnswersCount = rightAnswersCount,
 				Group = groups
 			});
@@ -421,17 +457,36 @@ namespace uLearn.Web.Controllers
 			var slideId = slide.Id;
 			var maxDropCount = GetMaxDropCount(slide);
 			var state = GetQuizState(courseId, userId, slideId, maxDropCount);
+			var quizState = state.Item1;
+			var tryNumber = state.Item2;
 			var resultsForQuizes = GetResultForQuizes(courseId, userId, slideId, state.Item1);
+			var userAnswers = userQuizzesRepo.GetAnswersForShowOnSlide(courseId, slide, userId);
+
+			var quizVersion = quizzesRepo.GetLastQuizVersion(courseId, slideId);
+			if (quizState != QuizState.NotPassed && userAnswers.Count > 0)
+			{
+				var firstUserAnswer = userAnswers.FirstOrDefault().Value.FirstOrDefault();
+				if (firstUserAnswer != null && firstUserAnswer.QuizVersion != null)
+					quizVersion = firstUserAnswer.QuizVersion;
+			}
+
+			/* If we haven't quiz version in database, create it */
+			if (quizVersion == null)
+				quizVersion = quizzesRepo.AddQuizVersionIfNeeded(courseId, slide);
+
+			/* Restore quiz slide from version stored in the database */
+			var quiz = quizVersion.RestoredQuiz;
+			slide = new QuizSlide(slide.Info, quiz);
+
 			var model = new QuizModel
 			{
 				CourseId = courseId,
 				Slide = slide,
-				QuizState = state.Item1,
-				TryNumber = state.Item2,
+				QuizState = quizState,
+				TryNumber = tryNumber,
 				MaxDropCount = maxDropCount,
 				ResultsForQuizes = resultsForQuizes,
-				AnswersToQuizes =
-					userQuizzesRepo.GetAnswersForShowOnSlide(courseId, slide, userId),
+				AnswersToQuizes = userAnswers,
 				IsLti = isLti
 			};
 

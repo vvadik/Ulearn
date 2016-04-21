@@ -2,7 +2,7 @@
 
 namespace OOP.Slides.U02_Polymorphism
 {
-	[Slide("Задача: Обобщенный навигатор", "{B70292B6-D84B-4C63-B189-700AD235E1BE}}")]
+	[Slide("Задача: Обобщенный навигатор", "{B70292B6-D84B-4C63-B189-700AD235E1BE}")]
 	public class S010_IRobotNavigator
 	{
 		/*

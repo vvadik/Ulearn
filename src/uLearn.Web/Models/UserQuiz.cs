@@ -27,6 +27,10 @@ namespace uLearn.Web.Models
 		[Index("StatisticsIndex", 1)]
 		public Guid SlideId { get; set; }
 
+		public virtual QuizVersion QuizVersion { get; set; }
+		
+		public int? QuizVersionId { get; set; }
+
 		public virtual ApplicationUser User { get; set; }
 
 		[StringLength(64)]

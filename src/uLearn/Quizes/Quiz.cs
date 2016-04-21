@@ -35,6 +35,11 @@ namespace uLearn.Quizes
 			set { blocks = value; }
 		}
 
+		public string NormalizedXml
+		{
+			get { return this.XmlSerialize(true); }
+		}
+
 		public void Validate()
 		{
 			try

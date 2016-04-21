@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -21,6 +22,7 @@ namespace uLearn.Web.Controllers
 		private readonly UsersRepo usersRepo;
 		private readonly CommentsRepo commentsRepo;
 		private readonly UserManager<ApplicationUser> userManager;
+		private readonly QuizzesRepo quizzesRepo;
 
 		public AdminController()
 		{
@@ -29,6 +31,7 @@ namespace uLearn.Web.Controllers
 			usersRepo = new UsersRepo(db);
 			commentsRepo = new CommentsRepo(db);
 			userManager = new ULearnUserManager();
+			quizzesRepo = new QuizzesRepo(db);
 		}
 
 		public ActionResult CourseList(string courseCreationLastTry = null)
@@ -111,6 +114,12 @@ namespace uLearn.Web.Controllers
 			var packageName = courseManager.GetPackageName(courseId);
 			return File(courseManager.GetStagingCoursePath(courseId), "application/zip", packageName);
 		}
+		
+		private void CreateQuizVersionsForSlides(string courseId, IEnumerable<Slide> slides)
+		{
+			foreach (var slide in slides.OfType<QuizSlide>())
+				quizzesRepo.AddQuizVersionIfNeeded(courseId, slide);
+		}
 
 		[HttpPost]
 		public ActionResult UploadCourse(string courseId, HttpPostedFileBase file)
@@ -125,7 +134,10 @@ namespace uLearn.Web.Controllers
 			var packageName = courseManager.GetPackageName(courseId);
 			var destinationFile = courseManager.StagedDirectory.GetFile(packageName);
 			file.SaveAs(destinationFile.FullName);
-			courseManager.ReloadCourse(courseId);
+
+			var slides = courseManager.ReloadCourse(courseId);
+			CreateQuizVersionsForSlides(courseId, slides);
+
 			return RedirectToAction("Diagnostics", new { courseId });
 		}
 

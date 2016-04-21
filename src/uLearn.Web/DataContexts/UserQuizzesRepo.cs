@@ -24,13 +24,16 @@ namespace uLearn.Web.DataContexts
 
 		public async Task<UserQuiz> AddUserQuiz(string courseId, bool isRightAnswer, string itemId, string quizId, Guid slideId, string text, string userId, DateTime time, bool isRightQuizBlock)
 		{
+			var quizzesRepo = new QuizzesRepo(db);
+			var currentQuizVersion = quizzesRepo.GetLastQuizVersion(courseId, slideId);
 			var userQuiz = new UserQuiz
 			{
 				CourseId = courseId,
+				SlideId = slideId,
+				QuizVersionId = currentQuizVersion.Id,
 				IsRightAnswer = isRightAnswer,
 				ItemId = itemId,
 				QuizId = quizId,
-				SlideId = slideId,
 				Text = text,
 				Timestamp = time,
 				UserId = userId,
@@ -136,6 +139,13 @@ namespace uLearn.Web.DataContexts
 				.Where(ans => ans.UserId == userId && ans.SlideId == slideId && !ans.isDropped)
 				.ToLookup(ans => ans.QuizId)
 				.ToDictionary(g => g.Key, g => g.ToList());
+		}
+
+		public void UpdateQuizVersions(Guid slideId, int? oldQuizVersionId, int newQuizVersionId)
+		{
+			foreach (var userQuiz in db.UserQuizzes.Where(q => q.SlideId == slideId && q.QuizVersionId == oldQuizVersionId))
+				userQuiz.QuizVersionId = newQuizVersionId;
+			db.SaveChanges();
 		}
 	}
 }

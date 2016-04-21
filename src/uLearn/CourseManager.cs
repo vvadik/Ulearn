@@ -76,40 +76,46 @@ namespace uLearn
 				foreach (var zipFile in courseZips)
 					try
 					{
-						ReloadCourseFromZip(zipFile);
+						ReloadCourseFromZip(zipFile).Iterate();
 					}
 					catch (Exception e)
 					{
-						//throw new Exception("Error loading course from " + zipFile.Name, e);
+						throw new Exception("Error loading course from " + zipFile.Name, e);
 					}
 			}
 		}
 
-		public string ReloadCourse(string courseId)
+		public IEnumerable<Slide> ReloadCourse(string courseId)
 		{
 			var file = StagedDirectory.GetFile(GetPackageName(courseId));
 			return ReloadCourseFromZip(file);
 		}
 
-		private string ReloadCourseFromZip(FileInfo zipFile)
+		private void ClearDirectory(DirectoryInfo directory)
 		{
-			string courseId = "";
-			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
-			{
-				courseId = GetCourseId(zipFile.Name);
-				var courseDir = coursesDirectory.CreateSubdirectory(courseId);
-				Directory.Delete(courseDir.FullName, true);
-				courseDir.Refresh();
-				courseDir.Create();
-				zip.ExtractAll(courseDir.FullName, ExtractExistingFileAction.OverwriteSilently);
-				ReloadCourse(courseDir);
-			}
-			return courseId;
+			foreach (var file in directory.GetFiles())
+				file.Delete();
+			foreach (var subDirectory in directory.GetDirectories())
+				subDirectory.Delete(true);
 		}
 
-		public void ReloadCourse(DirectoryInfo dir)
+		private IEnumerable<Slide> ReloadCourseFromZip(FileInfo zipFile)
+		{
+			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
+			{
+				var courseId = GetCourseId(zipFile.Name);
+				var courseDir = coursesDirectory.CreateSubdirectory(courseId);
+				ClearDirectory(courseDir);
+				zip.ExtractAll(courseDir.FullName, ExtractExistingFileAction.OverwriteSilently);
+				return ReloadCourse(courseDir);
+			}
+		}
+
+		public IEnumerable<Slide> ReloadCourse(DirectoryInfo dir)
 		{
 			var course = loader.LoadCourse(dir);
+			foreach (var slide in course.Slides)
+				yield return slide;
 			courses[course.Id] = course;
 		}
 
@@ -130,7 +136,6 @@ namespace uLearn
 
 		public bool TryCreateCourse(string courseId)
 		{
-			
 			if (courseId.Any(GetInvalidCharacters().Contains))
 				return false;
 
@@ -144,7 +149,7 @@ namespace uLearn
 			else
 				CreateCourseFromExample(courseId, package.FullName, helpPackage);
 
-			ReloadCourseFromZip(package);
+			ReloadCourseFromZip(package).Iterate();
 			return true;
 		}
 
