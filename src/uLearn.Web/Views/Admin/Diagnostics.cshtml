@@ -1,4 +1,7 @@
-﻿@model string
+﻿@using uLearn
+@using uLearn.Web.Controllers
+
+@model DiagnosticsModel
 
 @{
 	ViewBag.Title = "Diagnostics";
@@ -7,10 +10,83 @@
 @Html.Action("ManageMenu")
 
 <div class="container">
-<h2>Диагностики</h2>
-	
+	<h2>
+		Диагностики
+		@if (Model.CourseDiff != null)
+		{
+			@Html.ActionLink("Перейти к публикации →", "Packages", new { Model.CourseId }, new {@class = "btn btn-xs btn-success"})
+		}
+	</h2>
+
 	<div>
 		<h3>Результат проверки орфографии:</h3>
-		<div class="load-content" data-url="@Url.Action("SpellingErrors", new { courseId = Model })"> processing... </div>
+		<div class="load-content" data-url="@Url.Action("SpellingErrors", new { courseId = Model.CourseId })"> processing... </div>
 	</div>
+
+	@if (Model.CourseDiff != null)
+	{
+		<h2>Отличия от текущей версии</h2>
+		if (Model.CourseDiff.SlideDiffs.Count > 0)
+		{
+			<h4>Изменённые слайды:</h4>
+			foreach (var slideDiff in Model.CourseDiff.SlideDiffs)
+			{
+				<div>
+					@slideDiff.OriginalSlide.Title
+					@if (slideDiff.IsTitleChanged)
+					{
+						<span>→</span>
+						@slideDiff.ChangedSlide.Title
+					}
+				</div>
+
+				if (slideDiff.SlideBlockDiffs.Count > 0)
+				{
+					<h6>Изменённые задания</h6>
+					foreach (var blockDiff in slideDiff.SlideBlockDiffs)
+					{
+						<div class="row">
+							<div class="col-sm-6">@blockDiff.OriginalSlideBlock.XmlSerialize()</div>
+							<div class="col-sm-6">@blockDiff.ChangedSlideBlock.XmlSerialize()</div>
+						</div>
+					}
+				}
+
+				if (slideDiff.RemovedBlocks.Count > 0)
+				{
+					<h6>Удалённые задания</h6>
+					foreach (var block in slideDiff.RemovedBlocks)
+					{
+						<div>@block.TryGetText()</div>
+					}
+				}
+
+				if (slideDiff.InsertedBlocks.Count > 0)
+				{
+					<h6>Добавленные задания</h6>
+					foreach (var block in slideDiff.RemovedBlocks)
+					{
+						<div>@block.TryGetText()</div>
+					}
+				}
+
+			}
+		}
+		if (Model.CourseDiff.RemovedSlides.Count > 0)
+		{
+			<h4>Удалённые слайды:</h4>
+			foreach (var slide in Model.CourseDiff.RemovedSlides)
+			{
+				<div>@slide.Title</div>
+			}
+		}
+		if (Model.CourseDiff.InsertedSlides.Count > 0)
+		{
+			<h4>Добавленные слайды:</h4>
+			foreach (var slide in Model.CourseDiff.InsertedSlides)
+			{
+				<div>@slide.Title</div>
+			}
+		}
+	}
 </div>

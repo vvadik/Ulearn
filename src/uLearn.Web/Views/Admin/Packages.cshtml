@@ -12,7 +12,7 @@
 	@if (Model.HasPackage)
 	{
 		<div style="margin-bottom: 10px">
-			Последнее обновление: <b title="@Model.LastUpdate.ToPrettyString()">@Model.LastUpdate.ToAgoPrettyString()</b>
+			Текущая версия загружена <b title="@Model.LastUpdate.ToPrettyString()">@Model.LastUpdate.ToAgoPrettyString()</b>
 
 			@Html.ActionLink("Скачать опубликованный пакет", "DownloadPackage", new { Model.CourseId }, new { @class = "btn btn-xs btn-primary", style = "margin-left: 10px" })
 		</div>
@@ -47,13 +47,18 @@
 					</div>
 					@if (!isCurrentVersion)
 					{
-					<div class="courses-versions__publish">
-						@using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, versionId = version.Id }, FormMethod.Post))
-						{
-							@Html.AntiForgeryToken()
-							<input type="submit" class="btn btn-xs btn-danger" value="Опубликовать" />
-						}
-					</div>
+						<div class="courses-versions__publish">
+							@using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, versionId = version.Id }, FormMethod.Post))
+							{
+								@Html.AntiForgeryToken()
+								<input type="submit" class="btn btn-xs btn-primary" value="Опубликовать" />
+							}
+							@using (Html.BeginForm("DeleteVersion", "Admin", new { Model.CourseId, versionId = version.Id }, FormMethod.Post))
+							{
+								@Html.AntiForgeryToken()
+								<input type="submit" class="btn btn-xs btn-danger" value="Удалить" />
+							}
+						</div>
 					}
 				</div>
 			}

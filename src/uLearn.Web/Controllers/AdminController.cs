@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using uLearn.Model.Blocks;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
@@ -53,7 +54,7 @@ namespace uLearn.Web.Controllers
 			};
 			return View(model);
 		}
-		
+
 		public ActionResult SpellingErrors(string courseId)
 		{
 			var course = courseManager.GetCourse(courseId);
@@ -137,10 +138,10 @@ namespace uLearn.Web.Controllers
 			var destinationFile = courseManager.StagedDirectory.GetFile(packageName);
 			file.SaveAs(destinationFile.FullName);
 
-			var course = courseManager.LoadCourseFromZip(destinationFile);
+			courseManager.LoadCourseFromZip(destinationFile);
 			await coursesRepo.AddCourseVersion(courseId, versionId, User.Identity.GetUserId());
 
-			return RedirectToAction("Diagnostics", new { courseId });
+			return RedirectToAction("Diagnostics", new { courseId, maybeVersionId=versionId });
 		}
 
 		[HttpPost]
@@ -178,12 +179,12 @@ namespace uLearn.Web.Controllers
 				PublishedVersion = publishedVersion,
 			});
 		}
-		
+
 		public ActionResult Comments(string courseId)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var commentsPolicy = commentsRepo.GetCommentsPolicy(courseId);
-			
+
 			var comments = commentsRepo.GetCourseComments(courseId).OrderByDescending(x => x.PublishTime).ToList();
 			var commentsLikes = commentsRepo.GetCommentsLikesCounts(comments);
 			var commentsLikedByUser = commentsRepo.GetCourseCommentsLikedByUser(courseId, User.Identity.GetUserId());
@@ -233,7 +234,7 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("CourseList");
 			return View(queryModel);
 		}
-		
+
 		[ChildActionOnly]
 		public ActionResult UsersPartial(UserSearchQueryModel queryModel)
 		{
@@ -285,9 +286,32 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		public ActionResult Diagnostics(string courseId)
+		public ActionResult Diagnostics(string courseId, Guid? maybeVersionId)
 		{
-			return View(model: courseId);
+			if (maybeVersionId == null)
+			{
+				return View(new DiagnosticsModel
+				{
+					CourseId = courseId,
+					CourseDiff = null,
+				});
+			}
+
+			var versionId = (Guid)maybeVersionId;
+
+			var course = courseManager.GetCourse(courseId);
+
+			var versionPackageName = courseManager.GetPackageName(versionId);
+			var versionZipFile = courseManager.StagedDirectory.GetFile(versionPackageName);
+			var version = courseManager.LoadCourseFromZip(versionZipFile);
+
+			var courseDiff = new CourseDiff(course, version);
+
+			return View(new DiagnosticsModel
+			{
+				CourseId = courseId,
+				CourseDiff = courseDiff,
+			});
 		}
 
 		[HttpPost]
@@ -309,7 +333,14 @@ namespace uLearn.Web.Controllers
 			CreateQuizVersionsForSlides(courseId, course.Slides);
 			await coursesRepo.MarkCourseVersionAsPublished(versionId);
 
-			return RedirectToAction("Packages", new {courseId});
+			return RedirectToAction("Packages", new { courseId });
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> DeleteVersion(string courseId, Guid versionId)
+		{
+			await coursesRepo.DeleteCourseVersion(courseId, versionId);
+			return RedirectToAction("Packages", new { courseId });
 		}
 	}
 
@@ -366,5 +397,11 @@ namespace uLearn.Web.Controllers
 		public CommentModerationPolicy ModerationPolicy { get; set; }
 		public bool OnlyInstructorsCanReply { get; set; }
 		public List<CommentViewModel> Comments { get; set; }
+	}
+
+	public class DiagnosticsModel
+	{
+		public string CourseId { get; set; }
+		public CourseDiff CourseDiff { get; set; }
 	}
 }

@@ -990,3 +990,7 @@ table.analytics__user-answers {
 	margin-top: 5px;
 	display: block;
 }
+
+.courses-versions .courses-versions__version .courses-versions__publish form {
+	display: inline-block;
+}

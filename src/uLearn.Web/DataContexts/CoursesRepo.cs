@@ -55,5 +55,18 @@ namespace uLearn.Web.DataContexts
 			courseVersion.PublishTime = DateTime.Now;
 			await db.SaveChangesAsync();
 		}
+
+		public async Task DeleteCourseVersion(string courseId, Guid versionId)
+		{
+			var courseVersion = db.CourseVersions.Find(versionId);
+			if (courseVersion == null)
+				return;
+
+			if (courseVersion.CourseId != courseId)
+				return;
+
+			db.CourseVersions.Remove(courseVersion);
+			await db.SaveChangesAsync();
+		}
 	}
 }
