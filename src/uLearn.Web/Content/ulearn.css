@@ -967,3 +967,26 @@ li.li-success {
 table.analytics__user-answers {
 	margin-top: 15px;
 }
+
+/* Admin's course versions */
+.courses-versions {
+	
+}
+
+.courses-versions .courses-versions__version {
+	margin-bottom: 20px;
+}
+
+.courses-versions .courses-versions__version > div {
+	display: inline-block;
+}
+
+.courses-versions .courses-versions__version .glyphicon {
+	margin-right: 10px;
+	color: green;
+}
+
+.courses-versions .courses-versions__version .courses-versions__publish {
+	margin-top: 5px;
+	display: block;
+}

@@ -46,10 +46,6 @@ namespace uLearn
 			return courses.Get(courseId);
 		}
 
-		public IEnumerable<StagingPackage> GetStagingPackages()
-		{
-			return StagedDirectory.GetFiles("*.zip").Select(f => new StagingPackage(f.Name, f.LastWriteTime));
-		}
 
 		public FileInfo GetStagingCourseFile(string courseId)
 		{
@@ -64,31 +60,46 @@ namespace uLearn
 			return GetStagingCourseFile(courseId).FullName;
 		}
 
-		private static readonly object ReloadLock = new object();
+		private static readonly object reloadLock = new object();
 
 		private void LoadCoursesIfNotYet()
 		{
-			lock (ReloadLock)
+			lock (reloadLock)
 			{
 				if (courses.Count != 0)
 					return;
 				var courseZips = StagedDirectory.GetFiles("*.zip");
 				foreach (var zipFile in courseZips)
+				{
+					var courseOrVersionId = GetCourseId(zipFile.Name);
+					/* Guid-named zips are not courses, they are course versions */
+					Guid guid;
+					if (Guid.TryParse(courseOrVersionId, out guid))
+						continue;
+
 					try
 					{
-						ReloadCourseFromZip(zipFile).Iterate();
+						ReloadCourseFromZip(zipFile);
 					}
 					catch (Exception e)
 					{
 						throw new Exception("Error loading course from " + zipFile.Name, e);
 					}
+				}
 			}
 		}
 
-		public IEnumerable<Slide> ReloadCourse(string courseId)
+		public Course ReloadCourse(string courseId)
 		{
 			var file = StagedDirectory.GetFile(GetPackageName(courseId));
 			return ReloadCourseFromZip(file);
+		}
+
+		private Course ReloadCourseFromZip(FileInfo zipFile)
+		{
+			var course = LoadCourseFromZip(zipFile);
+			courses[course.Id] = course;
+			return course;
 		}
 
 		private void ClearDirectory(DirectoryInfo directory)
@@ -99,24 +110,21 @@ namespace uLearn
 				subDirectory.Delete(true);
 		}
 
-		private IEnumerable<Slide> ReloadCourseFromZip(FileInfo zipFile)
+		public Course LoadCourseFromZip(FileInfo zipFile)
 		{
 			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
 			{
-				var courseId = GetCourseId(zipFile.Name);
-				var courseDir = coursesDirectory.CreateSubdirectory(courseId);
+				var courseOrVersionId = GetCourseId(zipFile.Name);
+				var courseDir = coursesDirectory.CreateSubdirectory(courseOrVersionId);
 				ClearDirectory(courseDir);
 				zip.ExtractAll(courseDir.FullName, ExtractExistingFileAction.OverwriteSilently);
-				return ReloadCourse(courseDir);
+				return LoadCourseFromDirectory(courseDir);
 			}
 		}
 
-		public IEnumerable<Slide> ReloadCourse(DirectoryInfo dir)
+		public Course LoadCourseFromDirectory(DirectoryInfo dir)
 		{
-			var course = loader.LoadCourse(dir);
-			foreach (var slide in course.Slides)
-				yield return slide;
-			courses[course.Id] = course;
+			return loader.LoadCourse(dir);
 		}
 
 		public static string GetCourseId(string packageName)
@@ -127,6 +135,11 @@ namespace uLearn
 		public string GetPackageName(string courseId)
 		{
 			return courseId + ".zip";
+		}
+
+		public string GetPackageName(Guid versionId)
+		{
+			return Utils.GetNormalizedGuid(versionId) + ".zip";
 		}
 
 		public DateTime GetLastWriteTime(string courseId)
@@ -149,7 +162,7 @@ namespace uLearn
 			else
 				CreateCourseFromExample(courseId, package.FullName, helpPackage);
 
-			ReloadCourseFromZip(package).Iterate();
+			ReloadCourseFromZip(package);
 			return true;
 		}
 
@@ -235,8 +248,14 @@ namespace uLearn
 
 		public Course FindCourseBySlideById(Guid slideId)
 		{
-			var courses = GetCourses();
-			return courses.FirstOrDefault(c => c.Slides.Count(s => s.Id == slideId) > 0);
+			return GetCourses().FirstOrDefault(c => c.Slides.Count(s => s.Id == slideId) > 0);
+		}
+
+		public void UpdateCourse(Course course)
+		{
+			if (!courses.ContainsKey(course.Id))
+				return;
+			courses[course.Id] = course;
 		}
 	}
 }

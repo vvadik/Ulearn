@@ -32,7 +32,7 @@
 {
 	var quizSlide = quizVersion.RestoredQuiz;
 	<div>
-		@{ var maxQuestionIndex = quizSlide.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex).Max(x => x.QuestionIndex); }
+		@{ var maxQuestionIndex = quizSlide.Blocks.OfType<AbstractQuestionBlock>().Max(x => x.QuestionIndex); }
 		<table class="analytics__user-answers tablesorter">
 			<thead>
 			<tr>
@@ -172,13 +172,16 @@
 				<div class="analytics__quiz-version__info">
 					Изменено @quizVersion.LoadingTime
 				</div>
-				<div class="analytics__quiz-version__merge">
-					@Html.Hidden("courseId", Model.CourseId)
-					@Html.Hidden("slideId", Model.SlideId)
-					@Html.Hidden("quizVersionId", nextQuizVersion.Id)
-					@Html.Hidden("mergeWithQuizVersionId", quizVersion.Id)
-					<button class="btn btn-success" type="submit">Склеить версии</button> <small>(это незначительное изменение)</small>
-				</div>
+				if (quizVersion.RestoredQuiz.HasEqualStructureWith(nextQuizVersion.RestoredQuiz))
+				{
+					<div class="analytics__quiz-version__merge">
+						@Html.Hidden("courseId", Model.CourseId)
+						@Html.Hidden("slideId", Model.SlideId)
+						@Html.Hidden("quizVersionId", nextQuizVersion.Id)
+						@Html.Hidden("mergeWithQuizVersionId", quizVersion.Id)
+						<button class="btn btn-success" type="submit">Склеить версии</button> <small>(это незначительное изменение)</small>
+					</div>
+				}
 			}
 		}
 

@@ -280,6 +280,7 @@
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
     <Compile Include="DataContexts\CommentsRepo.cs" />
+    <Compile Include="DataContexts\CoursesRepo.cs" />
     <Compile Include="DataContexts\QuizzesRepo.cs" />
     <Compile Include="DataContexts\ULearnUserManager.cs" />
     <Compile Include="DataContexts\UsersRepo.cs" />
@@ -305,10 +306,19 @@
     <Compile Include="Migrations\201603230005459_SlideIdIsGuid.Designer.cs">
       <DependentUpon>201603230005459_SlideIdIsGuid.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201604210836401_AddQuizVersions.cs" />
+    <Compile Include="Migrations\201604210836401_AddQuizVersions.Designer.cs">
+      <DependentUpon>201604210836401_AddQuizVersions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604280922514_AddCourseVersions.cs" />
+    <Compile Include="Migrations\201604280922514_AddCourseVersions.Designer.cs">
+      <DependentUpon>201604280922514_AddCourseVersions.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\CommentLike.cs" />
     <Compile Include="Models\CommentPolicy.cs" />
     <Compile Include="Models\CommentViewModel.cs" />
+    <Compile Include="Models\CourseVersion.cs" />
     <Compile Include="Models\QuizVersion.cs" />
     <Compile Include="Models\UserSearchQueryModel.cs" />
     <Compile Include="Controllers\LoginController.cs" />
@@ -703,6 +713,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201603230005459_SlideIdIsGuid.resx">
       <DependentUpon>201603230005459_SlideIdIsGuid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604210836401_AddQuizVersions.resx">
+      <DependentUpon>201604210836401_AddQuizVersions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604280922514_AddCourseVersions.resx">
+      <DependentUpon>201604280922514_AddCourseVersions.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

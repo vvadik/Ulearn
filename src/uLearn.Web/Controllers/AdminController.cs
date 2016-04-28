@@ -23,6 +23,7 @@ namespace uLearn.Web.Controllers
 		private readonly CommentsRepo commentsRepo;
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly QuizzesRepo quizzesRepo;
+		private readonly CoursesRepo coursesRepo;
 
 		public AdminController()
 		{
@@ -32,6 +33,7 @@ namespace uLearn.Web.Controllers
 			commentsRepo = new CommentsRepo(db);
 			userManager = new ULearnUserManager();
 			quizzesRepo = new QuizzesRepo(db);
+			coursesRepo = new CoursesRepo(db);
 		}
 
 		public ActionResult CourseList(string courseCreationLastTry = null)
@@ -52,14 +54,6 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 		
-		[HttpPost]
-		public ActionResult ReloadCourse(string courseId, string returnUrl = null)
-		{
-			courseManager.ReloadCourse(courseId);
-			if (returnUrl != null) return Redirect(returnUrl);
-			return RedirectToAction("CourseList", new { courseId });
-		}
-
 		public ActionResult SpellingErrors(string courseId)
 		{
 			var course = courseManager.GetCourse(courseId);
@@ -114,7 +108,13 @@ namespace uLearn.Web.Controllers
 			var packageName = courseManager.GetPackageName(courseId);
 			return File(courseManager.GetStagingCoursePath(courseId), "application/zip", packageName);
 		}
-		
+
+		public ActionResult DownloadVersion(string courseId, Guid versionId)
+		{
+			var packageName = courseManager.GetPackageName(versionId);
+			return File(courseManager.StagedDirectory.GetFile(packageName).FullName, "application/zip", courseId);
+		}
+
 		private void CreateQuizVersionsForSlides(string courseId, IEnumerable<Slide> slides)
 		{
 			foreach (var slide in slides.OfType<QuizSlide>())
@@ -122,7 +122,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public ActionResult UploadCourse(string courseId, HttpPostedFileBase file)
+		public async Task<ActionResult> UploadCourse(string courseId, HttpPostedFileBase file)
 		{
 			if (file == null || file.ContentLength <= 0)
 				return RedirectToAction("Packages", new { courseId });
@@ -131,12 +131,14 @@ namespace uLearn.Web.Controllers
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
 				return RedirectToAction("Packages", new { courseId });
 
-			var packageName = courseManager.GetPackageName(courseId);
+			var versionId = Guid.NewGuid();
+
+			var packageName = courseManager.GetPackageName(versionId);
 			var destinationFile = courseManager.StagedDirectory.GetFile(packageName);
 			file.SaveAs(destinationFile.FullName);
 
-			var slides = courseManager.ReloadCourse(courseId);
-			CreateQuizVersionsForSlides(courseId, slides);
+			var course = courseManager.LoadCourseFromZip(destinationFile);
+			await coursesRepo.AddCourseVersion(courseId, versionId, User.Identity.GetUserId());
 
 			return RedirectToAction("Diagnostics", new { courseId });
 		}
@@ -165,11 +167,15 @@ namespace uLearn.Web.Controllers
 		{
 			var hasPackage = courseManager.HasPackageFor(courseId);
 			var lastUpdate = courseManager.GetLastWriteTime(courseId);
+			var courseVersions = coursesRepo.GetCourseVersions(courseId).ToList();
+			var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
 			return View(model: new PackagesViewModel
 			{
 				CourseId = courseId,
 				HasPackage = hasPackage,
-				LastUpdate = lastUpdate
+				LastUpdate = lastUpdate,
+				Versions = courseVersions,
+				PublishedVersion = publishedVersion,
 			});
 		}
 		
@@ -283,6 +289,28 @@ namespace uLearn.Web.Controllers
 		{
 			return View(model: courseId);
 		}
+
+		[HttpPost]
+		public async Task<ActionResult> PublishVersion(string courseId, Guid versionId)
+		{
+			var versionPackageName = courseManager.GetPackageName(versionId);
+			var coursePackageName = courseManager.GetPackageName(courseId);
+			var versionDestinationFile = courseManager.StagedDirectory.GetFile(versionPackageName);
+			var courseDestinationFile = courseManager.StagedDirectory.GetFile(coursePackageName);
+
+			/* First, try to load course from zip file */
+			var course = courseManager.LoadCourseFromZip(versionDestinationFile);
+
+			/* Copy version zip file to main course zip file, overwrite if need */
+			versionDestinationFile.CopyTo(courseDestinationFile.FullName, true);
+
+			courseManager.UpdateCourse(course);
+
+			CreateQuizVersionsForSlides(courseId, course.Slides);
+			await coursesRepo.MarkCourseVersionAsPublished(versionId);
+
+			return RedirectToAction("Packages", new {courseId});
+		}
 	}
 
 	public class UnitsListViewModel
@@ -327,6 +355,8 @@ namespace uLearn.Web.Controllers
 		public string CourseId { get; set; }
 		public bool HasPackage { get; set; }
 		public DateTime LastUpdate { get; set; }
+		public List<CourseVersion> Versions { get; set; }
+		public CourseVersion PublishedVersion { get; set; }
 	}
 
 	public class AdminCommentsViewModel

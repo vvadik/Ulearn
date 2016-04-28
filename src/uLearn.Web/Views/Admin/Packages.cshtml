@@ -11,14 +11,52 @@
 
 	@if (Model.HasPackage)
 	{
-		<h4>Последнее обновление: @Model.LastUpdate.ToString("dd.MM.yyyy HH:mm:ss")</h4>
-		
-		@Html.ActionLink("Скачать пакет", "DownloadPackage", new { Model.CourseId }, new { @class = "btn btn-primary", style = "margin-bottom: 10px" })
+		<div style="margin-bottom: 10px">
+			Последнее обновление: <b title="@Model.LastUpdate.ToPrettyString()">@Model.LastUpdate.ToAgoPrettyString()</b>
+
+			@Html.ActionLink("Скачать опубликованный пакет", "DownloadPackage", new { Model.CourseId }, new { @class = "btn btn-xs btn-primary", style = "margin-left: 10px" })
+		</div>
 	}
 
 	@using (Html.BeginForm("UploadCourse", "Admin", new { Model.CourseId }, FormMethod.Post, new { enctype = "multipart/form-data", style = "margin-bottom: 10px" }))
 	{
 		<input type="file" data-filename-placement="inside" class="btn" name="file" />
-		<input type="submit" class="btn btn-danger" value="Загрузить пакет" />
+		<input type="submit" class="btn btn-success" value="Загрузить пакет" />
+	}
+
+	@if (Model.Versions.Count > 0)
+	{
+		<h4>Загруженные версии</h4>
+		<div class="courses-versions">
+			@foreach (var version in Model.Versions)
+			{
+				<div class="courses-versions__version">
+					@{
+						var isCurrentVersion = Model.PublishedVersion != null && version.Id == Model.PublishedVersion.Id;
+					}
+					@if (isCurrentVersion)
+					{
+						<span class="glyphicon glyphicon-ok" title="Текущая версия"></span>
+					}
+					<div class="courses-versions__author">
+						@version.Author.VisibleName
+						@Html.ActionLink("загрузил(а)", "DownloadVersion", new { Model.CourseId, versionId = version.Id })
+					</div>
+					<div class="courses-versions__time">
+						<span title="@version.LoadingTime.ToPrettyString()">@version.LoadingTime.ToAgoPrettyString()</span>
+					</div>
+					@if (!isCurrentVersion)
+					{
+					<div class="courses-versions__publish">
+						@using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, versionId = version.Id }, FormMethod.Post))
+						{
+							@Html.AntiForgeryToken()
+							<input type="submit" class="btn btn-xs btn-danger" value="Опубликовать" />
+						}
+					</div>
+					}
+				</div>
+			}
+		</div>
 	}
 </div>

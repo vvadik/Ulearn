@@ -39,5 +39,6 @@ namespace uLearn.Web.DataContexts
 		public DbSet<CommentLike> CommentLikes { get; set; }
 		public DbSet<CommentsPolicy> CommentsPolicies { get; set; }
 		public DbSet<QuizVersion> QuizVersions { get; set; }
+		public DbSet<CourseVersion> CourseVersions { get; set; }
 	}
 }
