@@ -1,7 +1,7 @@
 ﻿@model uLearn.Web.Controllers.PackagesViewModel
 
 @{
-	ViewBag.Title = "Packages";
+	ViewBag.Title = "Управление пакетами";
 }
 
 @Html.Action("ManageMenu")
@@ -30,37 +30,33 @@
 		<div class="courses-versions">
 			@foreach (var version in Model.Versions)
 			{
-				<div class="courses-versions__version">
-					@{
-						var isCurrentVersion = Model.PublishedVersion != null && version.Id == Model.PublishedVersion.Id;
-					}
-					@if (isCurrentVersion)
-					{
-						<span class="glyphicon glyphicon-ok" title="Текущая версия"></span>
-					}
-					<div class="courses-versions__author">
-						@version.Author.VisibleName
-						@Html.ActionLink("загрузил(а)", "DownloadVersion", new { Model.CourseId, versionId = version.Id })
-					</div>
-					<div class="courses-versions__time">
-						<span title="@version.LoadingTime.ToPrettyString()">@version.LoadingTime.ToAgoPrettyString()</span>
-					</div>
-					@if (!isCurrentVersion)
-					{
-						<div class="courses-versions__publish">
-							@using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, versionId = version.Id }, FormMethod.Post))
-							{
-								@Html.AntiForgeryToken()
-								<input type="submit" class="btn btn-xs btn-primary" value="Опубликовать" />
-							}
-							@using (Html.BeginForm("DeleteVersion", "Admin", new { Model.CourseId, versionId = version.Id }, FormMethod.Post))
-							{
-								@Html.AntiForgeryToken()
-								<input type="submit" class="btn btn-xs btn-danger" value="Удалить" />
-							}
+				var isCurrentVersion = Model.PublishedVersion != null && version.Id == Model.PublishedVersion.Id;
+				<a href="@Url.Action("Diagnostics", new { Model.CourseId, versionId = version.Id })" class="no-underline @(isCurrentVersion ? "current" : "")">
+					<div class="courses-versions__version @(isCurrentVersion ? "current" : "")">
+						@if (isCurrentVersion)
+						{
+							<span class="glyphicon glyphicon-ok" title="Текущая версия"></span>
+						}
+						<div class="courses-versions__author">
+							<b>@version.Author.VisibleName</b>
+							загрузил(а)
 						</div>
-					}
-				</div>
+						<div class="courses-versions__time">
+							<b title="@version.LoadingTime.ToPrettyString()">@version.LoadingTime.ToAgoPrettyString()</b>
+						</div>
+						@if (!isCurrentVersion)
+						{
+							<div class="courses-versions__actions">
+								<a href="@Url.Action("DownloadVersion", new { Model.CourseId, versionId = version.Id })"><span class="glyphicon glyphicon-download-alt"></span></a>
+								@using (Html.BeginForm("DeleteVersion", "Admin", new { Model.CourseId, versionId = version.Id }, FormMethod.Post))
+								{
+									@Html.AntiForgeryToken()
+									<input type="submit" class="btn btn-xs btn-danger" value="&times;" title="Удалить" />
+								}
+							</div>
+						}
+					</div>
+				</a>
 			}
 		</div>
 	}

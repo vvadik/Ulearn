@@ -70,3 +70,13 @@ input[type="checkbox"].input-validation-error {
 .navbar-inverse .navbar-nav > li > a {
 	color: #D8D8D8;
 }
+
+a.no-underline {
+	color: inherit;
+}
+
+a.no-underline:hover,
+a.no-underline:active,
+a.no-underline:focus {
+	text-decoration: none;
+}

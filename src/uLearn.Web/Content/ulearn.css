@@ -973,24 +973,49 @@ table.analytics__user-answers {
 	
 }
 
-.courses-versions .courses-versions__version {
-	margin-bottom: 20px;
+.courses-versions > a {
+	display: block;	
 }
 
-.courses-versions .courses-versions__version > div {
+.courses-versions .courses-versions__version {
+	margin-bottom: 20px;
+	width: 500px;
+	padding: 5px 5px;
+}
+
+.courses-versions .courses-versions__version:not(.current) {
+	border: 1px solid #ccc;
+	border-radius: 5px;
+}
+
+.courses-versions .courses-versions__version:not(.current):hover {
+	cursor: pointer;
+	background-color: #eef;
+}
+
+.courses-versions .courses-versions__version > div,
+.courses-versions .courses-versions__version > a > div  {
 	display: inline-block;
 }
 
-.courses-versions .courses-versions__version .glyphicon {
+.courses-versions a.current {
+	pointer-events: none;
+	cursor: text;
+}
+
+.courses-versions .courses-versions__version .glyphicon.glyphicon-ok {
 	margin-right: 10px;
 	color: green;
 }
 
-.courses-versions .courses-versions__version .courses-versions__publish {
-	margin-top: 5px;
-	display: block;
+.courses-versions .courses-versions__version .courses-versions__actions {
+	float: right;
 }
 
-.courses-versions .courses-versions__version .courses-versions__publish form {
+.courses-versions .courses-versions__version .courses-versions__actions a {
+	margin-right: 10px;
+}
+
+.courses-versions .courses-versions__version .courses-versions__actions form {
 	display: inline-block;
 }

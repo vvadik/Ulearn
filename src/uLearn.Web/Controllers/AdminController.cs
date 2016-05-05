@@ -141,7 +141,7 @@ namespace uLearn.Web.Controllers
 			courseManager.LoadCourseFromZip(destinationFile);
 			await coursesRepo.AddCourseVersion(courseId, versionId, User.Identity.GetUserId());
 
-			return RedirectToAction("Diagnostics", new { courseId, maybeVersionId=versionId });
+			return RedirectToAction("Diagnostics", new { courseId, versionId });
 		}
 
 		[HttpPost]
@@ -286,9 +286,9 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		public ActionResult Diagnostics(string courseId, Guid? maybeVersionId)
+		public ActionResult Diagnostics(string courseId, Guid? versionId)
 		{
-			if (maybeVersionId == null)
+			if (versionId == null)
 			{
 				return View(new DiagnosticsModel
 				{
@@ -297,11 +297,11 @@ namespace uLearn.Web.Controllers
 				});
 			}
 
-			var versionId = (Guid)maybeVersionId;
+			var versionIdGuid = (Guid) versionId;
 
 			var course = courseManager.GetCourse(courseId);
 
-			var versionPackageName = courseManager.GetPackageName(versionId);
+			var versionPackageName = courseManager.GetPackageName(versionIdGuid);
 			var versionZipFile = courseManager.StagedDirectory.GetFile(versionPackageName);
 			var version = courseManager.LoadCourseFromZip(versionZipFile);
 
@@ -310,6 +310,7 @@ namespace uLearn.Web.Controllers
 			return View(new DiagnosticsModel
 			{
 				CourseId = courseId,
+				VersionId = versionIdGuid,
 				CourseDiff = courseDiff,
 			});
 		}
@@ -319,15 +320,16 @@ namespace uLearn.Web.Controllers
 		{
 			var versionPackageName = courseManager.GetPackageName(versionId);
 			var coursePackageName = courseManager.GetPackageName(courseId);
-			var versionDestinationFile = courseManager.StagedDirectory.GetFile(versionPackageName);
-			var courseDestinationFile = courseManager.StagedDirectory.GetFile(coursePackageName);
+			var versionFile = courseManager.StagedDirectory.GetFile(versionPackageName);
+			var courseFile = courseManager.StagedDirectory.GetFile(coursePackageName);
 
 			/* First, try to load course from zip file */
-			var course = courseManager.LoadCourseFromZip(versionDestinationFile);
+			courseManager.LoadCourseFromZip(versionFile);
 
 			/* Copy version zip file to main course zip file, overwrite if need */
-			versionDestinationFile.CopyTo(courseDestinationFile.FullName, true);
+			versionFile.CopyTo(courseFile.FullName, true);
 
+			var course = courseManager.LoadCourseFromZip(courseFile);
 			courseManager.UpdateCourse(course);
 
 			CreateQuizVersionsForSlides(courseId, course.Slides);
@@ -402,6 +404,7 @@ namespace uLearn.Web.Controllers
 	public class DiagnosticsModel
 	{
 		public string CourseId { get; set; }
+		public Guid VersionId { get; set; }
 		public CourseDiff CourseDiff { get; set; }
 	}
 }

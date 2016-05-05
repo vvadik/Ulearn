@@ -278,9 +278,9 @@ namespace uLearn.Quizes
 				return false;
 			if (Items.Length != block.Items.Length)
 				return false;
-			var idsSet = Items.Select(i => i.Id).ToImmutableHashSet();
-			var blockIdsSet = block.Items.Select(i => i.Id).ToImmutableHashSet();
-			return idsSet.SetEquals(blockIdsSet);
+			var idsSet = Items.Select(i => i.Id).ToList();
+			var blockIdsSet = block.Items.Select(i => i.Id).ToList();
+			return idsSet.SequenceEqual(blockIdsSet);
 		}
 	}
 

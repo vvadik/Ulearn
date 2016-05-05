@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using uLearn.Model.Blocks;
@@ -37,7 +38,7 @@ namespace uLearn
 				else
 				{
 					var slideDiff = new SlideDiff(slide, ChangedCourse.GetSlideById(slide.Id));
-					if (!slideDiff.IsEmpty)
+					if (!slideDiff.IsEmptyChangeset)
 						SlideDiffs.Add(slideDiff);
 				}
 			}
@@ -50,7 +51,7 @@ namespace uLearn
 			get { return OriginalCourse.Title != ChangedCourse.Title; }
 		}
 
-		public bool IsEmpty
+		public bool IsEmptyChangeset
 		{
 			get { return !IsTitleChanged && RemovedSlides.Count + InsertedSlides.Count + SlideDiffs.Count == 0; }
 		}
@@ -78,6 +79,29 @@ namespace uLearn
 
 		private void FindDifferences()
 		{
+			FindDifferencesInNonquestionBlocks();
+			FindDifferencesInQuestionBlocks();
+		}
+
+		private void FindDifferencesInNonquestionBlocks()
+		{
+			var originalBlocks = OriginalSlide.Blocks.NotOfType<SlideBlock, AbstractQuestionBlock>().ToList();
+			var changedBlocks = ChangedSlide.Blocks.NotOfType<SlideBlock, AbstractQuestionBlock>().ToList();
+
+			foreach (var pair in originalBlocks.Zip(changedBlocks, Tuple.Create))
+			{
+				var isBlocksEqual = pair.Item1.XmlSerialize(true) == pair.Item2.XmlSerialize(true);
+				if (!isBlocksEqual)
+				{
+					var slideBlockDiff = new SlideBlockDiff(pair.Item1, pair.Item2);
+					SlideBlockDiffs.Add(slideBlockDiff);
+				}
+			}
+			
+		}
+
+		private void FindDifferencesInQuestionBlocks()
+		{
 			var originalBlocks = OriginalSlide.Blocks.OfType<AbstractQuestionBlock>().ToList();
 			var changedBlocks = ChangedSlide.Blocks.OfType<AbstractQuestionBlock>().ToList();
 
@@ -93,7 +117,7 @@ namespace uLearn
 					SlideBlockDiffs.Add(slideBlockDiff);
 				}
 			}
-			
+
 			InsertedBlocks.AddRange(changedBlocks.Where(b => !originalBlocksIds.Contains(b.Id)));
 		}
 
@@ -102,7 +126,7 @@ namespace uLearn
 			get { return OriginalSlide.Title != ChangedSlide.Title; }
 		}
 
-		public bool IsEmpty
+		public bool IsEmptyChangeset
 		{
 			get { return !IsTitleChanged && RemovedBlocks.Count + InsertedBlocks.Count + SlideBlockDiffs.Count == 0; }
 		}

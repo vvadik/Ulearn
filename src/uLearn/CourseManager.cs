@@ -64,6 +64,7 @@ namespace uLearn
 
 		private void LoadCoursesIfNotYet()
 		{
+			Exception firstException = null;
 			lock (reloadLock)
 			{
 				if (courses.Count != 0)
@@ -83,10 +84,12 @@ namespace uLearn
 					}
 					catch (Exception e)
 					{
-						throw new Exception("Error loading course from " + zipFile.Name, e);
+						firstException = new Exception("Error loading course from " + zipFile.Name, e);
 					}
 				}
 			}
+			if (firstException != null)
+				throw firstException;
 		}
 
 		public Course ReloadCourse(string courseId)

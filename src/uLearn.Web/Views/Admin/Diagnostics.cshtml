@@ -4,7 +4,7 @@
 @model DiagnosticsModel
 
 @{
-	ViewBag.Title = "Diagnostics";
+	ViewBag.Title = "Диагностика";
 }
 
 @Html.Action("ManageMenu")
@@ -14,7 +14,11 @@
 		Диагностики
 		@if (Model.CourseDiff != null)
 		{
-			@Html.ActionLink("Перейти к публикации →", "Packages", new { Model.CourseId }, new {@class = "btn btn-xs btn-success"})
+			using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, Model.VersionId }, FormMethod.Post))
+			{
+				@Html.AntiForgeryToken()
+				<button class="btn btn-xs btn-success">Опубликовать эту версию →</button>
+			}
 		}
 	</h2>
 
@@ -25,29 +29,36 @@
 
 	@if (Model.CourseDiff != null)
 	{
-		<h2>Отличия от текущей версии</h2>
+		if (Model.CourseDiff.IsEmptyChangeset)
+		{
+			<h3>Отличий от текущей версии нет</h3>
+		}
+		else
+		{
+			<h3>Отличия от текущей версии</h3>
+		}
 		if (Model.CourseDiff.SlideDiffs.Count > 0)
 		{
-			<h4>Изменённые слайды:</h4>
+			<h4>Изменятся слайды:</h4>
 			foreach (var slideDiff in Model.CourseDiff.SlideDiffs)
 			{
 				<div>
-					@slideDiff.OriginalSlide.Title
+					«@Html.RouteLink(slideDiff.OriginalSlide.Title, "Course.SlideById", new { Model.CourseId, slideId=slideDiff.OriginalSlide.Id }, new { target = "_blank", title = "Открыть текущую версию" })»
 					@if (slideDiff.IsTitleChanged)
 					{
 						<span>→</span>
-						@slideDiff.ChangedSlide.Title
+						<span>«@slideDiff.ChangedSlide.Title»</span>
 					}
 				</div>
 
-				if (slideDiff.SlideBlockDiffs.Count > 0)
+				@*if (slideDiff.SlideBlockDiffs.Count > 0)
 				{
 					<h6>Изменённые задания</h6>
 					foreach (var blockDiff in slideDiff.SlideBlockDiffs)
 					{
 						<div class="row">
-							<div class="col-sm-6">@blockDiff.OriginalSlideBlock.XmlSerialize()</div>
-							<div class="col-sm-6">@blockDiff.ChangedSlideBlock.XmlSerialize()</div>
+							<div class="col-sm-6"><pre>@blockDiff.OriginalSlideBlock.TryGetText()</pre></div>
+							<div class="col-sm-6"><pre>@blockDiff.ChangedSlideBlock.TryGetText()</pre></div>
 						</div>
 					}
 				}
@@ -68,25 +79,33 @@
 					{
 						<div>@block.TryGetText()</div>
 					}
-				}
+				}*@
 
 			}
 		}
 		if (Model.CourseDiff.RemovedSlides.Count > 0)
 		{
-			<h4>Удалённые слайды:</h4>
+			<h4>Будут удалены слайды</h4>
 			foreach (var slide in Model.CourseDiff.RemovedSlides)
 			{
-				<div>@slide.Title</div>
+				<div>«@Html.RouteLink(slide.Title, "Course.SlideById", new { Model.CourseId, slideId = slide.Id }, new { target = "_blank", title = "Открыть текущую версию" })»</div>
 			}
 		}
 		if (Model.CourseDiff.InsertedSlides.Count > 0)
 		{
-			<h4>Добавленные слайды:</h4>
+			<h4>Следующие слайды будут добавлены</h4>
 			foreach (var slide in Model.CourseDiff.InsertedSlides)
 			{
-				<div>@slide.Title</div>
+				<div>«@slide.Title»</div>
 			}
 		}
+
+		<p>
+			@using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, Model.VersionId }, FormMethod.Post))
+			{
+				@Html.AntiForgeryToken()
+				<button class="btn btn-success">Опубликовать →</button>
+			}
+		</p>
 	}
 </div>

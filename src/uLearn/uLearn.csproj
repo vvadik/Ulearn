@@ -92,6 +92,7 @@
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="CommentAfterExerciseIsSolved.cs" />
     <Compile Include="Course.cs" />
+    <Compile Include="CourseDiff.cs" />
     <Compile Include="CourseLoader.cs" />
     <Compile Include="CourseSettings.cs" />
     <Compile Include="CourseManager.cs" />
