@@ -293,7 +293,6 @@ namespace uLearn.Web.Controllers
 				return View(new DiagnosticsModel
 				{
 					CourseId = courseId,
-					CourseDiff = null,
 				});
 			}
 
@@ -310,6 +309,7 @@ namespace uLearn.Web.Controllers
 			return View(new DiagnosticsModel
 			{
 				CourseId = courseId,
+				IsDiagnosticsForVersion = true,
 				VersionId = versionIdGuid,
 				CourseDiff = courseDiff,
 			});
@@ -322,20 +322,32 @@ namespace uLearn.Web.Controllers
 			var coursePackageName = courseManager.GetPackageName(courseId);
 			var versionFile = courseManager.StagedDirectory.GetFile(versionPackageName);
 			var courseFile = courseManager.StagedDirectory.GetFile(coursePackageName);
+			var oldCourse = courseManager.GetCourse(courseId);
 
 			/* First, try to load course from zip file */
-			courseManager.LoadCourseFromZip(versionFile);
+			var version = courseManager.LoadCourseFromZip(versionFile);
 
 			/* Copy version zip file to main course zip file, overwrite if need */
 			versionFile.CopyTo(courseFile.FullName, true);
 
+			/* Load course again for correct CourseId definition */
 			var course = courseManager.LoadCourseFromZip(courseFile);
 			courseManager.UpdateCourse(course);
 
 			CreateQuizVersionsForSlides(courseId, course.Slides);
 			await coursesRepo.MarkCourseVersionAsPublished(versionId);
 
-			return RedirectToAction("Packages", new { courseId });
+			var courseDiff = new CourseDiff(oldCourse, course);
+
+			return View("Diagnostics", new DiagnosticsModel
+			{
+				CourseId = courseId,
+				IsDiagnosticsForVersion = true,
+				IsVersionPublished = true,
+				VersionId = versionId,
+				CourseDiff = courseDiff,
+			});
+			//return RedirectToAction("Packages", new { courseId });
 		}
 
 		[HttpPost]
@@ -404,6 +416,9 @@ namespace uLearn.Web.Controllers
 	public class DiagnosticsModel
 	{
 		public string CourseId { get; set; }
+
+		public bool IsDiagnosticsForVersion { get; set; }
+		public bool IsVersionPublished { get; set; }
 		public Guid VersionId { get; set; }
 		public CourseDiff CourseDiff { get; set; }
 	}

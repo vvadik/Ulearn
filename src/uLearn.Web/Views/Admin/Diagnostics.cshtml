@@ -10,102 +10,145 @@
 @Html.Action("ManageMenu")
 
 <div class="container">
-	<h2>
-		Диагностики
-		@if (Model.CourseDiff != null)
-		{
-			using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, Model.VersionId }, FormMethod.Post))
-			{
-				@Html.AntiForgeryToken()
-				<button class="btn btn-xs btn-success">Опубликовать эту версию →</button>
-			}
-		}
-	</h2>
-
-	<div>
-		<h3>Результат проверки орфографии:</h3>
-		<div class="load-content" data-url="@Url.Action("SpellingErrors", new { courseId = Model.CourseId })"> processing... </div>
-	</div>
-
-	@if (Model.CourseDiff != null)
+	@if (Model.IsVersionPublished)
 	{
-		if (Model.CourseDiff.IsEmptyChangeset)
-		{
-			<h3>Отличий от текущей версии нет</h3>
-		}
-		else
-		{
-			<h3>Отличия от текущей версии</h3>
-		}
+		<h2>Курс обновлён, @Html.RouteLink("перейти к курсу →", "Course", new { courseId = Model.CourseId, action = "SLide" }, new {})</h2>
+
+		<div>
+			@Html.ActionLink("← Назад", "Packages", new { courseId = Model.CourseId }, new { @class = "btn btn-primary" })
+		</div>
+
 		if (Model.CourseDiff.SlideDiffs.Count > 0)
 		{
-			<h4>Изменятся слайды:</h4>
+			<h4>Изменились слайды:</h4>
 			foreach (var slideDiff in Model.CourseDiff.SlideDiffs)
 			{
 				<div>
-					«@Html.RouteLink(slideDiff.OriginalSlide.Title, "Course.SlideById", new { Model.CourseId, slideId=slideDiff.OriginalSlide.Id }, new { target = "_blank", title = "Открыть текущую версию" })»
 					@if (slideDiff.IsTitleChanged)
 					{
+						<span>«@slideDiff.OriginalSlide.Title»</span>
 						<span>→</span>
-						<span>«@slideDiff.ChangedSlide.Title»</span>
 					}
+					«@Html.RouteLink(slideDiff.ChangedSlide.Title, "Course.SlideById", new { Model.CourseId, slideId = slideDiff.ChangedSlide.Url }, new { target = "_blank", title = "Открыть новую версию" })»
 				</div>
-
-				@*if (slideDiff.SlideBlockDiffs.Count > 0)
-				{
-					<h6>Изменённые задания</h6>
-					foreach (var blockDiff in slideDiff.SlideBlockDiffs)
-					{
-						<div class="row">
-							<div class="col-sm-6"><pre>@blockDiff.OriginalSlideBlock.TryGetText()</pre></div>
-							<div class="col-sm-6"><pre>@blockDiff.ChangedSlideBlock.TryGetText()</pre></div>
-						</div>
-					}
-				}
-
-				if (slideDiff.RemovedBlocks.Count > 0)
-				{
-					<h6>Удалённые задания</h6>
-					foreach (var block in slideDiff.RemovedBlocks)
-					{
-						<div>@block.TryGetText()</div>
-					}
-				}
-
-				if (slideDiff.InsertedBlocks.Count > 0)
-				{
-					<h6>Добавленные задания</h6>
-					foreach (var block in slideDiff.RemovedBlocks)
-					{
-						<div>@block.TryGetText()</div>
-					}
-				}*@
-
 			}
 		}
 		if (Model.CourseDiff.RemovedSlides.Count > 0)
 		{
-			<h4>Будут удалены слайды</h4>
+			<h4>Удаленные слайды</h4>
 			foreach (var slide in Model.CourseDiff.RemovedSlides)
-			{
-				<div>«@Html.RouteLink(slide.Title, "Course.SlideById", new { Model.CourseId, slideId = slide.Id }, new { target = "_blank", title = "Открыть текущую версию" })»</div>
-			}
-		}
-		if (Model.CourseDiff.InsertedSlides.Count > 0)
-		{
-			<h4>Следующие слайды будут добавлены</h4>
-			foreach (var slide in Model.CourseDiff.InsertedSlides)
 			{
 				<div>«@slide.Title»</div>
 			}
 		}
-
-		<p>
-			@using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, Model.VersionId }, FormMethod.Post))
+		if (Model.CourseDiff.InsertedSlides.Count > 0)
+		{
+			<h4>Добавленные слайды</h4>
+			foreach (var slide in Model.CourseDiff.InsertedSlides)
 			{
-				@Html.AntiForgeryToken()
-				<button class="btn btn-success">Опубликовать →</button>
+				<div>«@Html.RouteLink(slide.Title, "Course.SlideById", new { Model.CourseId, slideId = slide.Url }, new { target = "_blank", title = "Открыть слайд" })»</div>
 			}
-		</p>
+		}
+	}
+	else
+	{
+		<h2>
+			Диагностики
+			@if (Model.IsDiagnosticsForVersion)
+			{
+				using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, Model.VersionId }, FormMethod.Post))
+				{
+					@Html.AntiForgeryToken()
+					<button class="btn btn-xs btn-success">Опубликовать эту версию →</button>
+				}
+			}
+		</h2>
+
+		<div>
+			<h3>Результат проверки орфографии:</h3>
+			<div class="load-content" data-url="@Url.Action("SpellingErrors", new { courseId = Model.CourseId })"> processing... </div>
+		</div>
+
+		if (Model.IsDiagnosticsForVersion)
+		 {
+			 if (Model.CourseDiff.IsEmptyChangeset)
+			 {
+				 <h3>Отличий от текущей версии нет</h3>
+			 }
+			 else
+			 {
+				 <h3>Отличия от текущей версии</h3>
+			 }
+			 if (Model.CourseDiff.SlideDiffs.Count > 0)
+			 {
+				 <h4>Изменятся слайды:</h4>
+				 foreach (var slideDiff in Model.CourseDiff.SlideDiffs)
+				 {
+					 <div>
+						 «@Html.RouteLink(slideDiff.OriginalSlide.Title, "Course.SlideById", new { Model.CourseId, slideId = slideDiff.OriginalSlide.Url }, new { target = "_blank", title = "Открыть текущую версию" })»
+						 @if (slideDiff.IsTitleChanged)
+						 {
+							 <span>→</span>
+							 <span>«@slideDiff.ChangedSlide.Title»</span>
+						 }
+					 </div>
+
+					@*if (slideDiff.SlideBlockDiffs.Count > 0)
+					{
+						<h6>Изменённые задания</h6>
+						foreach (var blockDiff in slideDiff.SlideBlockDiffs)
+						{
+							<div class="row">
+								<div class="col-sm-6"><pre>@blockDiff.OriginalSlideBlock.TryGetText()</pre></div>
+								<div class="col-sm-6"><pre>@blockDiff.ChangedSlideBlock.TryGetText()</pre></div>
+							</div>
+						}
+					}
+
+					if (slideDiff.RemovedBlocks.Count > 0)
+					{
+						<h6>Удалённые задания</h6>
+						foreach (var block in slideDiff.RemovedBlocks)
+						{
+							<div>@block.TryGetText()</div>
+						}
+					}
+
+					if (slideDiff.InsertedBlocks.Count > 0)
+					{
+						<h6>Добавленные задания</h6>
+						foreach (var block in slideDiff.RemovedBlocks)
+						{
+							<div>@block.TryGetText()</div>
+						}
+					}*@
+
+				 }
+			 }
+			 if (Model.CourseDiff.RemovedSlides.Count > 0)
+			 {
+				 <h4>Будут удалены слайды</h4>
+				 foreach (var slide in Model.CourseDiff.RemovedSlides)
+				 {
+					 <div>«@Html.RouteLink(slide.Title, "Course.SlideById", new { Model.CourseId, slideId = slide.Url }, new { target = "_blank", title = "Открыть текущую версию" })»</div>
+				 }
+			 }
+			 if (Model.CourseDiff.InsertedSlides.Count > 0)
+			 {
+				 <h4>Следующие слайды будут добавлены</h4>
+				 foreach (var slide in Model.CourseDiff.InsertedSlides)
+				 {
+					 <div>«@slide.Title»</div>
+				 }
+			 }
+
+			 <p>
+				 @using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, Model.VersionId }, FormMethod.Post))
+				 {
+					 @Html.AntiForgeryToken()
+					 <button class="btn btn-success">Опубликовать →</button>
+				 }
+			 </p>
+		 }
 	}
 </div>
