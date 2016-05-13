@@ -115,6 +115,7 @@
     <Compile Include="CSharp\ICSharpSolutionValidator.cs" />
     <Compile Include="FileExtensions.cs" />
     <Compile Include="ISlideLoader.cs" />
+    <Compile Include="LruCache.cs" />
     <Compile Include="Model\Blocks\CodeBlock.cs" />
     <Compile Include="Model\Blocks\ExerciseBlock.cs" />
     <Compile Include="Model\Blocks\ImageGaleryBlock.cs" />

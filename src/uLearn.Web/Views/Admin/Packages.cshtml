@@ -44,17 +44,18 @@
 						<div class="courses-versions__time">
 							<b title="@version.LoadingTime.ToPrettyString()">@version.LoadingTime.ToAgoPrettyString()</b>
 						</div>
-						@if (!isCurrentVersion)
-						{
-							<div class="courses-versions__actions">
-								<a href="@Url.Action("DownloadVersion", new { Model.CourseId, versionId = version.Id })"><span class="glyphicon glyphicon-download-alt"></span></a>
-								@using (Html.BeginForm("DeleteVersion", "Admin", new { Model.CourseId, versionId = version.Id }, FormMethod.Post))
+						
+						<div class="courses-versions__actions">
+							<a href="@Url.Action("DownloadVersion", new { Model.CourseId, versionId = version.Id })"><span class="glyphicon glyphicon-download-alt"></span></a>
+							@if (!isCurrentVersion)
+							{
+								using (Html.BeginForm("DeleteVersion", "Admin", new { Model.CourseId, versionId = version.Id }, FormMethod.Post))
 								{
 									@Html.AntiForgeryToken()
 									<input type="submit" class="btn btn-xs btn-danger" value="&times;" title="Удалить" />
 								}
-							</div>
-						}
+							}
+						</div>
 					</div>
 				</a>
 			}

@@ -12,7 +12,7 @@
 <div class="container">
 	@if (Model.IsVersionPublished)
 	{
-		<h2>Курс обновлён, @Html.RouteLink("перейти к курсу →", "Course", new { courseId = Model.CourseId, action = "SLide" }, new {})</h2>
+		<h2>Курс обновлён, @Html.RouteLink("перейти к курсу →", "Course", new { courseId = Model.CourseId, action = "Slide" }, new {})</h2>
 
 		<div>
 			@Html.ActionLink("← Назад", "Packages", new { courseId = Model.CourseId }, new { @class = "btn btn-primary" })
@@ -59,6 +59,7 @@
 				using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, Model.VersionId }, FormMethod.Post))
 				{
 					@Html.AntiForgeryToken()
+					@Html.ActionLink("← Назад", "Packages", new { courseId = Model.CourseId }, new { @class = "btn btn-xs btn-default" })
 					<button class="btn btn-xs btn-success">Опубликовать эту версию →</button>
 				}
 			}

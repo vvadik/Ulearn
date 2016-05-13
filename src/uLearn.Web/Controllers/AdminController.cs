@@ -112,8 +112,8 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult DownloadVersion(string courseId, Guid versionId)
 		{
-			var packageName = courseManager.GetPackageName(versionId);
-			return File(courseManager.StagedDirectory.GetFile(packageName).FullName, "application/zip", courseId);
+			var packageName = courseManager.GetPackageName(courseId);
+			return File(courseManager.GetCourseVersionFile(versionId).FullName, "application/zip", packageName);
 		}
 
 		private void CreateQuizVersionsForSlides(string courseId, IEnumerable<Slide> slides)
@@ -133,12 +133,12 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Packages", new { courseId });
 
 			var versionId = Guid.NewGuid();
-
-			var packageName = courseManager.GetPackageName(versionId);
-			var destinationFile = courseManager.StagedDirectory.GetFile(packageName);
+			
+			var destinationFile = courseManager.GetCourseVersionFile(versionId);
 			file.SaveAs(destinationFile.FullName);
 
-			courseManager.LoadCourseFromZip(destinationFile);
+			/* Load version and put it into LRU-cache */
+			courseManager.GetVersion(versionId);
 			await coursesRepo.AddCourseVersion(courseId, versionId, User.Identity.GetUserId());
 
 			return RedirectToAction("Diagnostics", new { courseId, versionId });
@@ -299,10 +299,7 @@ namespace uLearn.Web.Controllers
 			var versionIdGuid = (Guid) versionId;
 
 			var course = courseManager.GetCourse(courseId);
-
-			var versionPackageName = courseManager.GetPackageName(versionIdGuid);
-			var versionZipFile = courseManager.StagedDirectory.GetFile(versionPackageName);
-			var version = courseManager.LoadCourseFromZip(versionZipFile);
+			var version = courseManager.GetVersion(versionIdGuid);
 
 			var courseDiff = new CourseDiff(course, version);
 
@@ -318,26 +315,24 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		public async Task<ActionResult> PublishVersion(string courseId, Guid versionId)
 		{
-			var versionPackageName = courseManager.GetPackageName(versionId);
-			var coursePackageName = courseManager.GetPackageName(courseId);
-			var versionFile = courseManager.StagedDirectory.GetFile(versionPackageName);
-			var courseFile = courseManager.StagedDirectory.GetFile(coursePackageName);
+			var versionFile = courseManager.GetCourseVersionFile(versionId);
+			var courseFile = courseManager.GetStagingCourseFile(courseId);
 			var oldCourse = courseManager.GetCourse(courseId);
 
-			/* First, try to load course from zip file */
-			var version = courseManager.LoadCourseFromZip(versionFile);
+			/* First, try to load course from LRU-cache or zip file */
+			var version = courseManager.GetVersion(versionId);
 
-			/* Copy version zip file to main course zip file, overwrite if need */
+			/* Copy version's zip file to course's zip file, overwrite if need */
 			versionFile.CopyTo(courseFile.FullName, true);
 
-			/* Load course again for correct CourseId definition */
-			var course = courseManager.LoadCourseFromZip(courseFile);
-			courseManager.UpdateCourse(course);
+			/* Replace courseId */
+			version.Id = courseId;
+			courseManager.UpdateCourse(version);
 
-			CreateQuizVersionsForSlides(courseId, course.Slides);
+			CreateQuizVersionsForSlides(courseId, version.Slides);
 			await coursesRepo.MarkCourseVersionAsPublished(versionId);
 
-			var courseDiff = new CourseDiff(oldCourse, course);
+			var courseDiff = new CourseDiff(oldCourse, version);
 
 			return View("Diagnostics", new DiagnosticsModel
 			{
@@ -347,13 +342,17 @@ namespace uLearn.Web.Controllers
 				VersionId = versionId,
 				CourseDiff = courseDiff,
 			});
-			//return RedirectToAction("Packages", new { courseId });
 		}
 
 		[HttpPost]
 		public async Task<ActionResult> DeleteVersion(string courseId, Guid versionId)
 		{
+			/* Remove information from database */
 			await coursesRepo.DeleteCourseVersion(courseId, versionId);
+
+			/* Delete zip-archive from file system */
+			courseManager.GetCourseVersionFile(versionId).Delete();
+
 			return RedirectToAction("Packages", new { courseId });
 		}
 	}
