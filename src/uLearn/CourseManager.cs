@@ -148,13 +148,7 @@ namespace uLearn
 				ClearDirectory(courseDir);
 				zip.ExtractAll(courseDir.FullName, ExtractExistingFileAction.OverwriteSilently);
 
-				var course = LoadCourseFromDirectory(courseDir);
-
-				/* Clear unzipped directory, we don't need it when course has been loaded */
-				ClearDirectory(courseDir);
-				courseDir.Delete();
-
-				return course;
+				return LoadCourseFromDirectory(courseDir);
 			}
 		}
 
