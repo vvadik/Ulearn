@@ -48,7 +48,7 @@
 	var mark = "";
 	var style = "";
 	QuizBlockData model = context.GetBlockData(block);
-	if (model.QuizState != QuizState.NotPassed)
+	if (model.QuizState != QuizState.NotPassed && model.QuizState != QuizState.WaitForCheck)
 	{
 		if (model.QuizModel != null && model.QuizModel.ResultsForQuizes != null)
 		{
@@ -59,7 +59,16 @@
 		}
 	}
 	<h4><i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text.RenderTex()</h4>
+
 	@QuizBlock((dynamic)block, context)
+	if (context.CheckingUserId != null)
+	{
+		<h4>Оцените от 0 до @block.MaxScore</h4>
+		<div>
+			<input type="number" class="form-control" min="0" max="@block.MaxScore"/>
+		</div>
+	}
+
 	<hr class="quiz-block-delimiter" />
 }
 

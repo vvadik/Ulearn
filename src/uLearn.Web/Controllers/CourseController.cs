@@ -36,7 +36,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[AllowAnonymous]
-		public async Task<ActionResult> SlideById(string courseId, string slideId = "")
+		public async Task<ActionResult> SlideById(string courseId, string slideId="", Guid? user=null)
 		{
 			if (slideId.Contains("_"))
 				slideId = slideId.Substring(slideId.LastIndexOf('_') + 1);
@@ -60,9 +60,10 @@ namespace uLearn.Web.Controllers
 
 			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
 			var isGuest = !User.Identity.IsAuthenticated;
+			var slide_for_user = User.HasAccessFor(courseId, CourseRole.Instructor) ? user : null;
 			var model = isGuest ?
 				CreateGuestCoursePageModel(courseId, slideGuid, visibleUnits) :
-				await CreateCoursePageModel(courseId, slideGuid, visibleUnits);
+				await CreateCoursePageModel(courseId, slideGuid, visibleUnits, slide_for_user);
 			if (!visibleUnits.Contains(model.Slide.Info.UnitName))
 				throw new Exception("Slide is hidden " + slideGuid);
 			return View("Slide", model);
@@ -104,7 +105,7 @@ namespace uLearn.Web.Controllers
 					SlideIndex = slideIndex,
 					SlideId = exerciseSlide.Id,
 					ExerciseBlock = exerciseSlide.Exercise,
-					Context = CreateRenderContext(course, exerciseSlide, userId, visiter, true)
+					Context = CreateRenderContext(course, exerciseSlide, visiter, true)
 				};
 				return View("LtiExerciseSlide", model);
 			}
@@ -207,7 +208,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits)
+		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits, Guid? slideForUser)
 		{
 			var course = courseManager.GetCourse(courseId);
 
@@ -221,6 +222,10 @@ namespace uLearn.Web.Controllers
 				slide = course.GetSlideById(slideId);
 
 			var userId = User.Identity.GetUserId();
+
+			if (slideForUser.HasValue)
+				userId = slideForUser.Value.ToString();
+
 			var isFirstCourseVisit = !db.Visits.Any(x => x.UserId == userId);
 			var visiter = await VisitSlide(courseId, slideId);
 			var score = Tuple.Create(visiter.Score, slide.MaxScore);
@@ -233,13 +238,13 @@ namespace uLearn.Web.Controllers
 				Slide = slide,
 				Rate = GetRate(course.Id, slideId),
 				Score = score,
-				BlockRenderContext = CreateRenderContext(course, slide, userId, visiter),
+				BlockRenderContext = CreateRenderContext(course, slide, visiter, false, slideForUser),
 				IsGuest = false,
 			};
 			return model;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, string userId, Visit visit, bool isLti = false)
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, Visit visit, bool isLti = false, Guid? forUserId = null)
 		{
 			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visit, isLti)).ToArray();
 			return new BlockRenderContext(
@@ -248,7 +253,8 @@ namespace uLearn.Web.Controllers
 				slide.Info.DirectoryRelativePath,
 				blockData,
 				false,
-				User.HasAccessFor(course.Id, CourseRole.Instructor)
+				User.HasAccessFor(course.Id, CourseRole.Instructor),
+				forUserId
 				);
 		}
 

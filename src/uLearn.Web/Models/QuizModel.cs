@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using uLearn.Quizes;
 
@@ -16,6 +17,7 @@ namespace uLearn.Web.Models
 		public int MaxDropCount { get; set; }
 		public bool IsLti { get; set; }
 		public bool IsGuest { get; set; }
+		public Guid? CheckingUserId { get; set; }
 
 		public int RightAnswers
 		{

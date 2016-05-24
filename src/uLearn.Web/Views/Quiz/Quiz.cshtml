@@ -5,9 +5,17 @@
 @model QuizModel
 @{
 	var quizSlide = Model.Slide;
-	var status = Model.QuizState == QuizState.NotPassed ?
-		string.Format("Попытка {0} из {1}", Model.TryNumber + 1, Model.MaxDropCount + 1) :
-		"";
+
+	var status = "";
+	if (Model.QuizState == QuizState.NotPassed)
+	{
+		status = string.Format("Попытка {0} из {1}", Model.TryNumber + 1, Model.MaxDropCount + 1);
+	}
+	if (Model.QuizState == QuizState.WaitForCheck)
+	{
+		status = "Ожидает проверки инструктором";
+	}
+
 	<h4 id="quiz-status">@status</h4>
 
 	var remains = Model.MaxDropCount - Model.TryNumber + 1;
@@ -20,18 +28,24 @@
 					? new QuizBlockData(Model, x, Model.QuizState)
 					: null)
 			.ToArray<dynamic>(),
-		Model.IsGuest
+		Model.IsGuest,
+		true,
+		Model.CheckingUserId
 		);
-	foreach (var block in quizSlide.Blocks)
-	{
-		@SlideHtml.Block((dynamic)block, context)
-	}
+
+	@SlideHtml.Blocks(context)
+
 	if (!Model.IsGuest)
 	{
 		<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
 			@if (Model.QuizState == QuizState.NotPassed)
 			{
-				<button class="btn btn-primary quiz-submit-btn" onclick=" submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString) ">Готово!</button>
+				<button class="btn btn-primary quiz-submit-btn" onclick=" submitQuiz('@Model.CourseId', '@Model.Slide.Index' , '@Model.AnswersToQuizes.Count' , @Model.IsLtiToString ) ">Готово!</button>
+			}
+			else if (Model.QuizState == QuizState.WaitForCheck && Model.CheckingUserId != null)
+			{
+				<button class="btn btn-default quiz-submit-btn">Сохранить и вернуться</button>
+				<button class="btn btn-primary quiz-submit-btn">Сохранить и перейти к следующему</button>
 			}
 			else if (Model.QuizState == QuizState.Subtotal)
 			{

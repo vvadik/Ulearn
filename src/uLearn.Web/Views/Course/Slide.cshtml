@@ -19,12 +19,13 @@
 				@if (Model.Slide is QuizSlide)
 				{
 					@Html.Action("Quiz", "Quiz", new
-					{
-						slide = (QuizSlide)Model.Slide,
-						courseId = Model.CourseId,
-						userId = Model.UserId,
-						isGuest = Model.IsGuest
-					})
+					   {
+						   slide = (QuizSlide)Model.Slide,
+						   courseId = Model.CourseId,
+						   userId = Model.UserId,
+						   isGuest = Model.IsGuest,
+						   CheckingUserId = Model.BlockRenderContext.CheckingUserId
+					   })
 				}
 				else
 				{

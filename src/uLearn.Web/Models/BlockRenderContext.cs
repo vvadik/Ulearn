@@ -10,6 +10,7 @@ namespace uLearn.Web.Models
 		public string BaseUrl { get; private set; }
 		public dynamic[] BlockData { get; private set; }
 		public bool IsGuest { get; set; }
+		public Guid? CheckingUserId { get; set; }
 		public bool RevealHidden { get; private set; }
 
 		public dynamic GetBlockData(SlideBlock block)
@@ -20,7 +21,7 @@ namespace uLearn.Web.Models
 			return BlockData[index];
 		}
 
-		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData, bool isGuest = false, bool revealHidden = false)
+		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData, bool isGuest = false, bool revealHidden = false, Guid? checkingUserId=null)
 		{
 			if (blockData.Length != slide.Blocks.Length)
 				throw new ArgumentException("BlockData.Length should be slide.Blocks.Length");
@@ -30,6 +31,7 @@ namespace uLearn.Web.Models
 			BlockData = blockData;
 			IsGuest = isGuest;
 			RevealHidden = revealHidden;
+			CheckingUserId = checkingUserId;
 		}
 	}
 }

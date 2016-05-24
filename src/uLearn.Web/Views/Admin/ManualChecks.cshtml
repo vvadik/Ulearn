@@ -1,0 +1,51 @@
+﻿@model uLearn.Web.Controllers.ManualChecksViewModel
+
+@{
+	ViewBag.Title = "Очередь на проверку";
+}
+
+@Html.Action("ManageMenu")
+
+
+<div class="slide-container">
+	<h3>Очередь на проверку</h3>
+
+	@if (Model.Message != "")
+	{
+		<div class="alert alert-danger">
+			@if (Model.Message == "already_checked")
+			{
+				<p>Эта работа уже проверена, выберите другую</p>
+			}
+			@if (Model.Message == "locked")
+			{
+				<p>Эта работа проверяется другим инструктором, выберите другую</p>
+			}
+		</div>
+	}
+
+	@foreach (var checkModel in Model.Checks)
+	{
+		var check = checkModel.Check;
+		<div>
+			<div>
+				@check.User.VisibleName заполнил тест «<a href="@Url.Action("SlideById", "Course", new
+				                                                {
+					                                                courseId = check.CourseId,
+					                                                slideId = check.SlideId,
+				                                                })">@checkModel.ContextSlideTitle</a>»
+			</div>
+			<div>
+				@if (check.LockedBy != null)
+				{
+					<p>Проверяется инструктором @check.LockedBy.VisibleName</p>
+				}
+				else
+				{
+					@Html.ActionLink("Перейти к проверке →", "Check", new { id = check.Id }, new { @class = "btn btn-sm btn-success" })
+				}
+			</div>
+			<hr/>
+		</div>
+	}
+</div>

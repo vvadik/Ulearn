@@ -314,11 +314,20 @@
     <Compile Include="Migrations\201604280922514_AddCourseVersions.Designer.cs">
       <DependentUpon>201604280922514_AddCourseVersions.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201605241640170_AddManualChecks.cs" />
+    <Compile Include="Migrations\201605241640170_AddManualChecks.Designer.cs">
+      <DependentUpon>201605241640170_AddManualChecks.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201605241647562_AddManualChecks1.cs" />
+    <Compile Include="Migrations\201605241647562_AddManualChecks1.Designer.cs">
+      <DependentUpon>201605241647562_AddManualChecks1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\CommentLike.cs" />
     <Compile Include="Models\CommentPolicy.cs" />
     <Compile Include="Models\CommentViewModel.cs" />
     <Compile Include="Models\CourseVersion.cs" />
+    <Compile Include="Models\ManualCheck.cs" />
     <Compile Include="Models\QuizVersion.cs" />
     <Compile Include="Models\UserSearchQueryModel.cs" />
     <Compile Include="Controllers\LoginController.cs" />
@@ -719,6 +728,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201604280922514_AddCourseVersions.resx">
       <DependentUpon>201604280922514_AddCourseVersions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605241640170_AddManualChecks.resx">
+      <DependentUpon>201605241640170_AddManualChecks.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605241647562_AddManualChecks1.resx">
+      <DependentUpon>201605241647562_AddManualChecks1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -1320,6 +1335,7 @@
     </Content>
     <Content Include="Views\Comments\_CommentText.cshtml" />
     <Content Include="Views\Admin\Comments.cshtml" />
+    <Content Include="Views\Admin\ManualChecks.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

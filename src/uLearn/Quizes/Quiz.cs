@@ -18,6 +18,9 @@ namespace uLearn.Quizes
 		[XmlAttribute("maxDropCount")]
 		public int MaxDropCount;
 
+		[XmlAttribute("manualCheck")]
+		public bool ManualCheck;
+
 		[XmlElement("title")]
 		public string Title;
 
@@ -80,8 +83,17 @@ namespace uLearn.Quizes
 	
 	public abstract class AbstractQuestionBlock : SlideBlock
 	{
+		public AbstractQuestionBlock()
+		{
+			/* Default max score */
+			MaxScore = 1;
+		}
+
 		[XmlAttribute("id")]
 		public string Id;
+
+		[XmlAttribute("maxScore")]
+		public int MaxScore;
 
 		[XmlElement("text")]
 		public string Text;
@@ -95,6 +107,11 @@ namespace uLearn.Quizes
 		}
 
 		public abstract bool HasEqualStructureWith(SlideBlock other);
+
+		public bool IsScoring
+		{
+			get { return MaxScore > 0; }
+		}
 	}
 
 	public class ChoiceBlock : AbstractQuestionBlock
@@ -276,11 +293,7 @@ namespace uLearn.Quizes
 			var block = other as OrderingBlock;
 			if (block == null)
 				return false;
-			if (Items.Length != block.Items.Length)
-				return false;
-			var idsSet = Items.Select(i => i.Id).ToList();
-			var blockIdsSet = block.Items.Select(i => i.Id).ToList();
-			return idsSet.SequenceEqual(blockIdsSet);
+			return Items.SequenceEqual(block.Items);
 		}
 	}
 

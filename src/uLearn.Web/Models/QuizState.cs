@@ -3,6 +3,7 @@
 	public enum QuizState
 	{
 		NotPassed,
+		WaitForCheck,
 		Subtotal,
 		Total
 	}

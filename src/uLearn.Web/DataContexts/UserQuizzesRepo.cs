@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using uLearn.Quizes;
 using uLearn.Web.Models;
+using WebGrease.Css.Extensions;
 
 namespace uLearn.Web.DataContexts
 {
@@ -42,6 +44,25 @@ namespace uLearn.Web.DataContexts
 			db.UserQuizzes.Add(userQuiz);
 			await db.SaveChangesAsync();
 			return userQuiz;
+		}
+
+		public async Task<ManualCheck> QueueForManualCheck(string courseId, Guid slideId, string userId)
+		{
+			var check = new ManualCheck
+			{
+				CourseId = courseId,
+				SlideId = slideId,
+				Timestamp = DateTime.Now,
+				UserId = userId,
+			};
+			db.ManualChecks.Add(check);
+			await db.SaveChangesAsync();
+			return check;
+		}
+
+		public bool IsWaitingForManualCheck(string courseId, Guid slideId, string userId)
+		{
+			return db.ManualChecks.Any(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId && ! c.IsChecked);
 		}
 
 		public bool IsQuizSlidePassed(string courseId, string userId, Guid slideId)
@@ -143,9 +164,25 @@ namespace uLearn.Web.DataContexts
 
 		public void UpdateQuizVersions(Guid slideId, int? oldQuizVersionId, int newQuizVersionId)
 		{
-			foreach (var userQuiz in db.UserQuizzes.Where(q => q.SlideId == slideId && q.QuizVersionId == oldQuizVersionId))
-				userQuiz.QuizVersionId = newQuizVersionId;
-			db.SaveChanges();
+			/* Mass update in the database */
+			db.Database.ExecuteSqlCommand("UPDATE UserQuizs SET QuizVersionId = {0} WHERE SlideId = {1} AND QuizVersionId = {2}", newQuizVersionId, slideId, oldQuizVersionId);
+		}
+
+		public IEnumerable<ManualCheck> GetQueueForManualChecks(string courseId)
+		{
+			return db.ManualChecks.Where(c => c.CourseId == courseId && ! c.IsChecked).OrderBy(c => c.Timestamp);
+		}
+
+		public ManualCheck GetManualCheckById(int id)
+		{
+			return db.ManualChecks.Find(id);
+		}
+
+		public async Task LockManualCheck(ManualCheck check, string lockedBy)
+		{
+			check.LockedById = lockedBy;
+			check.LockedUntil = DateTime.Now.Add(TimeSpan.FromMinutes(30));
+			await db.SaveChangesAsync();
 		}
 	}
 }

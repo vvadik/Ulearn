@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -24,6 +25,7 @@ namespace uLearn.Web.Controllers
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly QuizzesRepo quizzesRepo;
 		private readonly CoursesRepo coursesRepo;
+		private readonly UserQuizzesRepo userQuizzesRepo;
 
 		public AdminController()
 		{
@@ -34,6 +36,7 @@ namespace uLearn.Web.Controllers
 			userManager = new ULearnUserManager();
 			quizzesRepo = new QuizzesRepo(db);
 			coursesRepo = new CoursesRepo(db);
+			userQuizzesRepo = new UserQuizzesRepo(db);
 		}
 
 		public ActionResult CourseList(string courseCreationLastTry = null)
@@ -208,6 +211,57 @@ namespace uLearn.Web.Controllers
 					ContextSlideTitle = course.GetSlideById(c.SlideId).Title,
 					ContextParentComment = c.IsTopLevel() ? null : commentsById[c.ParentCommentId].Text,
 				}).ToList()
+			});
+		}
+
+		public ActionResult ManualChecks(string courseId, string message="")
+		{
+			var course = courseManager.GetCourse(courseId);
+			var checks = userQuizzesRepo.GetQueueForManualChecks(courseId);
+
+			return View(new ManualChecksViewModel
+			{
+				CourseId = courseId,
+				Checks = checks.Select(c => new ManualCheckViewModel
+				{
+					Check = c,
+					ContextSlideTitle = course.GetSlideById(c.SlideId).Title
+				}).ToList(),
+				Message = message,
+			});
+		}
+
+		public async Task<ActionResult> Check(int id)
+		{
+			ManualCheck check;
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				check = userQuizzesRepo.GetManualCheckById(id);
+				if (!User.HasAccessFor(check.CourseId, CourseRole.Instructor))
+					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+				if (check.IsChecked)
+					return RedirectToAction("ManualChecks",
+						new
+						{
+							courseId = check.CourseId,
+							message = "already_checked"
+						});
+				if (check.LockedBy != null && check.LockedUntil >= DateTime.Now)
+					return RedirectToAction("ManualChecks",
+							new
+							{
+								courseId = check.CourseId,
+								message = "locked"
+							});
+
+				await userQuizzesRepo.LockManualCheck(check, User.Identity.GetUserId());
+				transaction.Commit();
+			}
+			return RedirectToRoute("Course.SlideById", new
+			{
+				CourseId = check.CourseId,
+				SlideId = check.SlideId,
+				User = check.UserId
 			});
 		}
 
@@ -409,6 +463,20 @@ namespace uLearn.Web.Controllers
 		public CommentModerationPolicy ModerationPolicy { get; set; }
 		public bool OnlyInstructorsCanReply { get; set; }
 		public List<CommentViewModel> Comments { get; set; }
+	}
+
+	public class ManualChecksViewModel
+	{
+		public string CourseId { get; set; }
+		public List<ManualCheckViewModel> Checks { get; set; }
+		public string Message { get; set; }
+	}
+
+	public class ManualCheckViewModel
+	{
+		public ManualCheck Check { get; set; }
+
+		public string ContextSlideTitle { get; set; }
 	}
 
 	public class DiagnosticsModel
