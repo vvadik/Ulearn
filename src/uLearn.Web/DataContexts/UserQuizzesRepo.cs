@@ -165,7 +165,7 @@ namespace uLearn.Web.DataContexts
 		public void UpdateQuizVersions(Guid slideId, int? oldQuizVersionId, int newQuizVersionId)
 		{
 			/* Mass update in the database */
-			db.Database.ExecuteSqlCommand("UPDATE UserQuizs SET QuizVersionId = {0} WHERE SlideId = {1} AND QuizVersionId = {2}", newQuizVersionId, slideId, oldQuizVersionId);
+			db.Database.ExecuteSqlCommand("UPDATE UserQuizs SET QuizVersionId = {0} WHERE QuizVersionId = {1}", newQuizVersionId, oldQuizVersionId);
 		}
 
 		public IEnumerable<ManualCheck> GetQueueForManualChecks(string courseId)
