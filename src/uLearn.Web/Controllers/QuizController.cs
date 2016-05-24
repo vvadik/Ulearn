@@ -235,17 +235,17 @@ namespace uLearn.Web.Controllers
 		{
 			if (data.Length > MAX_FILLINBLOCK_SIZE)
 				data = data.Substring(0, MAX_FILLINBLOCK_SIZE);
-			var isTrue = fillInBlock.Regexes.Any(regex => regex.Regex.IsMatch(data));
+			var isRightAnswer = fillInBlock.Regexes.Any(regex => regex.Regex.IsMatch(data));
 			return new List<QuizInfoForDb>
 			{
 				new QuizInfoForDb
 				{
 					QuizId = fillInBlock.Id,
 					ItemId = null,
-					IsRightAnswer = isTrue,
+					IsRightAnswer = isRightAnswer,
 					Text = data,
 					QuizType = typeof(FillInBlock),
-					IsRightQuizBlock = isTrue
+					IsRightQuizBlock = isRightAnswer
 				}
 			};
 		}
