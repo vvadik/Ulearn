@@ -203,7 +203,7 @@ namespace uLearn.Web.Controllers
 				}).ToList();
 
 			var isRightQuizBlock = answers.Count() == orderingBlock.Items.Length &&
-				answers.Zip(orderingBlock.Items, (answer, item) => answer.Text == item.GetHash()).All(x => x);
+				answers.Zip(orderingBlock.Items, (answer, item) => answer.ItemId == item.GetHash()).All(x => x);
 			foreach (var info in ans)
 				info.IsRightQuizBlock = isRightQuizBlock;
 

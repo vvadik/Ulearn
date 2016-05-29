@@ -276,11 +276,7 @@ namespace uLearn.Quizes
 			var block = other as OrderingBlock;
 			if (block == null)
 				return false;
-			if (Items.Length != block.Items.Length)
-				return false;
-			var idsSet = Items.Select(i => i.Id).ToList();
-			var blockIdsSet = block.Items.Select(i => i.Id).ToList();
-			return idsSet.SequenceEqual(blockIdsSet);
+			return Items.SequenceEqual(block.Items);
 		}
 	}
 
