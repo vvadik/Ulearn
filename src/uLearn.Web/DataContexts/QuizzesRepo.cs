@@ -31,6 +31,11 @@ namespace uLearn.Web.DataContexts
 			return db.QuizVersions.Where(v => v.CourseId == courseId && v.SlideId == slideId).OrderByDescending(v => v.LoadingTime).FirstOrDefault();
 		}
 
+		public QuizVersion GetFirstQuizVersion(string courseId, Guid slideId)
+		{
+			return db.QuizVersions.Where(v => v.CourseId == courseId && v.SlideId == slideId).OrderBy(v => v.LoadingTime).FirstOrDefault();
+		}
+
 		public QuizVersion AddQuizVersionIfNeeded(string courseId, QuizSlide slide)
 		{
 			var slideId = slide.Id;
@@ -49,9 +54,6 @@ namespace uLearn.Web.DataContexts
 			{
 				db.QuizVersions.Add(newQuizVersion);
 				db.SaveChanges();
-
-				if (lastQuizVersion == null)
-					userQuizzesRepo.UpdateQuizVersions(slideId, null, newQuizVersion.Id);
 
 				return newQuizVersion;
 			}

@@ -466,8 +466,12 @@ namespace uLearn.Web.Controllers
 			if (quizState != QuizState.NotPassed && userAnswers.Count > 0)
 			{
 				var firstUserAnswer = userAnswers.FirstOrDefault().Value.FirstOrDefault();
+				/* If we know version which user has answered*/
 				if (firstUserAnswer != null && firstUserAnswer.QuizVersion != null)
 					quizVersion = firstUserAnswer.QuizVersion;
+				/* If user's version is null, show first created version for this slide ever */
+				if (firstUserAnswer != null && firstUserAnswer.QuizVersion == null)
+					quizVersion = quizzesRepo.GetFirstQuizVersion(courseId, slideId);
 			}
 
 			/* If we haven't quiz version in database, create it */

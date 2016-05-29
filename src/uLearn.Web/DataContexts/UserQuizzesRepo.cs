@@ -140,12 +140,5 @@ namespace uLearn.Web.DataContexts
 				.ToLookup(ans => ans.QuizId)
 				.ToDictionary(g => g.Key, g => g.ToList());
 		}
-
-		public void UpdateQuizVersions(Guid slideId, int? oldQuizVersionId, int newQuizVersionId)
-		{
-			foreach (var userQuiz in db.UserQuizzes.Where(q => q.SlideId == slideId && q.QuizVersionId == oldQuizVersionId))
-				userQuiz.QuizVersionId = newQuizVersionId;
-			db.SaveChanges();
-		}
 	}
 }
