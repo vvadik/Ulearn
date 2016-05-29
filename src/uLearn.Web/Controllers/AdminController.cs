@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using uLearn.Model.Blocks;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;

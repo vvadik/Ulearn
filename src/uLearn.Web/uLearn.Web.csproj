@@ -1023,6 +1023,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="codemirror\README.md" />
     <Content Include="Courses.Staging\Web.config" />
+    <Content Include="Courses.Versions\Web.config" />
     <Content Include="Content\fonts\fontawesome-webfont.eot" />
     <Content Include="Content\fonts\fontawesome-webfont.ttf" />
     <Content Include="Content\fonts\fontawesome-webfont.woff" />

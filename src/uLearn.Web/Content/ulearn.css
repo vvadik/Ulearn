@@ -23,6 +23,18 @@
 .load-content {
 }
 
+.popover-trigger {
+	text-decoration: none;
+	border-bottom: 1px dashed black;
+	border-bottom-color: inherit;
+}
+
+.popover-trigger:hover, 
+.popover-trigger:focus,
+.popover-trigger:active {
+	text-decoration: none;
+}
+
 .run-style-error, .run-service-error, .run-compile-error, .run-success, .run-wa, .run-wa-no-diff, .run-details {
 }
 
@@ -153,29 +165,39 @@
 	display: flex;
 }
 
-	/* ReSharper disable Html.CssClassElementsNotFound */
-	.slide-list-item.selected {
-		background-color: #f5f5f5;
-		font-weight: bolder;
-		list-style-type: none;
-		cursor: pointer;
-		color: #428bca;
+.slide-list-item.selected {
+	background-color: #f5f5f5;
+	list-style-type: none;
+	cursor: pointer;
+	color: #428bca;
+	pointer-events: none;
+}
+
+.slide-list-item.selected *:not(.navbar-label-danger) {
+	color: #444480;
+}
+
+@media (min-width: 768px) {
+	.side-bar.navbar-nav {
+		width: 350px;
+		margin: 0;
+		padding-top: 20px;
+		max-height: none !important;
+		display: inline-block !important;
+		position: absolute;
 	}
-/* ReSharper restore Html.CssClassElementsNotFound */
-.side-bar {
-	max-width: 350px;
-	margin: 0;
-	padding-top: 20px;
-	max-height: none !important;
 }
 
 .slide-container {
-	margin-left: 320px;
+	display: inline-block !important;
+	margin-top: 10px;
+	width: 100%;
+	padding-left: 10px;
 }
 
-@media (max-width: 768px) {
+@media (min-width: 768px) {
 	.slide-container {
-		margin-left: 10px;
+		padding-left: 350px;
 	}
 }
 

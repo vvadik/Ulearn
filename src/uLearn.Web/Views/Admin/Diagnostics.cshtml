@@ -9,7 +9,7 @@
 
 @Html.Action("ManageMenu")
 
-<div class="container">
+<div class="slide-container">
 	@if (Model.IsVersionPublished)
 	{
 		<h2>Курс обновлён, @Html.RouteLink("перейти к курсу →", "Course", new { courseId = Model.CourseId, action = "Slide" }, new {})</h2>

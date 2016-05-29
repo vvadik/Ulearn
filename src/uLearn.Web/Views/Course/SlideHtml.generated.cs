@@ -268,14 +268,16 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"video-contain
 
                                                   WebViewPage.WriteTo(@__razor_helper_writer, block.VideoId);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" allowfullscreen></iframe>\r\n\t</div>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" frameborder=\"0\" allowfullscreen></iframe>\r\n\t</div>\r\n");
 
 
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"	<div>
-		<a href=""javascript://"" class=""popover-trigger""
+		<a href=""javascript://"" class=""popover-trigger pull-right""
 		   title=""Как ускорить видео?""
-		   data-content=""Если по иконке с шестеренкой нет возможности ускорить видео, то вам нужно &lt;a target='blank' href='http://youtube.com/html5'>вручную включить&lt;/a> использование HTML5-плеера."">
+		   data-content=""Если по иконке с шестеренкой нет возможности ускорить видео, то вам нужно &lt;a target='blank' href='http://youtube.com/html5'>вручную включить&lt;/a> использование HTML5-плеера.""
+		   data-placement=""left"">
+			<span class=""glyphicon glyphicon-question-sign""></span>
 			Как ускорить видео?
 		</a>
 	</div>
@@ -404,9 +406,9 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n");
 
 
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<script>\r\n\t\tfunction cleanUserCode() {\r\n\t\t\tvar $secretCodeExercise = $(\'#secretC" +
-"odeExercise\');\r\n\t\t\t$(\'.code-exercise\')[0].codeMirrorEditor.setValue($secretCodeE" +
-"xercise.text());\r\n\t\t}\r\n\t</script>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<script type=\"text/javascript\">\r\n\t\tfunction cleanUserCode() {\r\n\t\t\tvar $secretCod" +
+"eExercise = $(\'#secretCodeExercise\');\r\n\t\t\t$(\'.code-exercise\')[0].codeMirrorEdito" +
+"r.setValue($secretCodeExercise.text());\r\n\t\t}\r\n\t</script>\r\n");
 
 
 	if (data.ShowControls)
