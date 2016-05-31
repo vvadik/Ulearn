@@ -2,8 +2,9 @@
 
 <Quiz
 	xmlns="https://ulearn.azurewebsites.net/quiz"
-	id="41138C54848F4F49856BB738B7E39D28">
-	<title>Пример теста</title>
+	id="41138C54848F4F49856BB738B7E39D29"
+	manualCheck="true">
+	<title>Пример теста с ручной проверкой</title>
 	
 	<p xml:space="preserve">
 Можно использовать TeX: $\Theta(n)$
@@ -22,13 +23,13 @@ Header 1				| h2
 	</p>
 	
 	
-	<fillIn id="123" explanation="одна или более цифр" maxScore="2">
+	<fillIn id="123" explanation="одна или более цифр" maxScore="5">
 		<text>Введите корректное число</text>
 		<sample>42</sample>
 		<regex>\d+</regex>
 	</fillIn>
 
-    <ordering id="234" maxScore="5">
+    <ordering id="234" maxScore="4">
         <text>Упорядочите элементы</text>
         <explanation>Объяснение правильного ответа</explanation>
         <item id="1">Первый длинный вариант, очень длинный, самый длинный, многострочный и никуда не влазящий</item>

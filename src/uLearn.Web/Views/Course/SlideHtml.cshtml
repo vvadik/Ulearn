@@ -58,7 +58,20 @@
 			style = "color: " + (res ? "green" : "red");
 		}
 	}
-	<h4><i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text.RenderTex()</h4>
+	<h4>
+		<i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text.RenderTex()
+		<sup class="text-muted">
+			@block.MaxScore.PluralizeInRussian(new RussianPluralizationOptions
+			     {
+				     One = "балл",
+				     Two = "балла",
+				     Five = "баллов",
+				     smallNumbersAreWords = false,
+				     hideNumberOne = false
+			     }
+			)
+		</sup>
+	</h4>
 
 	@QuizBlock((dynamic)block, context)
 	if (context.CheckingUserId != null)

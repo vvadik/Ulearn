@@ -26,7 +26,7 @@
 
 	@foreach (var checkModel in Model.Checks)
 	{
-		var check = checkModel.Check;
+		var check = checkModel.QuizCheckQueueItem;
 		<div>
 			<div>
 				@check.User.VisibleName заполнил тест «<a href="@Url.Action("SlideById", "Course", new

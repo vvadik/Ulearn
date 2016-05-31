@@ -314,20 +314,16 @@
     <Compile Include="Migrations\201604280922514_AddCourseVersions.Designer.cs">
       <DependentUpon>201604280922514_AddCourseVersions.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201605241640170_AddManualChecks.cs" />
-    <Compile Include="Migrations\201605241640170_AddManualChecks.Designer.cs">
-      <DependentUpon>201605241640170_AddManualChecks.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201605241647562_AddManualChecks1.cs" />
-    <Compile Include="Migrations\201605241647562_AddManualChecks1.Designer.cs">
-      <DependentUpon>201605241647562_AddManualChecks1.cs</DependentUpon>
+    <Compile Include="Migrations\201605310936533_AddManualQuizChecks.cs" />
+    <Compile Include="Migrations\201605310936533_AddManualQuizChecks.Designer.cs">
+      <DependentUpon>201605310936533_AddManualQuizChecks.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\CommentLike.cs" />
     <Compile Include="Models\CommentPolicy.cs" />
     <Compile Include="Models\CommentViewModel.cs" />
     <Compile Include="Models\CourseVersion.cs" />
-    <Compile Include="Models\ManualCheck.cs" />
+    <Compile Include="Models\ManualQuizCheckQueueItem.cs" />
     <Compile Include="Models\QuizVersion.cs" />
     <Compile Include="Models\UserSearchQueryModel.cs" />
     <Compile Include="Controllers\LoginController.cs" />
@@ -729,11 +725,8 @@
     <EmbeddedResource Include="Migrations\201604280922514_AddCourseVersions.resx">
       <DependentUpon>201604280922514_AddCourseVersions.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201605241640170_AddManualChecks.resx">
-      <DependentUpon>201605241640170_AddManualChecks.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201605241647562_AddManualChecks1.resx">
-      <DependentUpon>201605241647562_AddManualChecks1.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201605310936533_AddManualQuizChecks.resx">
+      <DependentUpon>201605310936533_AddManualQuizChecks.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

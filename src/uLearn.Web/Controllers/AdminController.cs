@@ -224,7 +224,7 @@ namespace uLearn.Web.Controllers
 				CourseId = courseId,
 				Checks = checks.Select(c => new ManualCheckViewModel
 				{
-					Check = c,
+					QuizCheckQueueItem = c,
 					ContextSlideTitle = course.GetSlideById(c.SlideId).Title
 				}).ToList(),
 				Message = message,
@@ -233,35 +233,35 @@ namespace uLearn.Web.Controllers
 
 		public async Task<ActionResult> Check(int id)
 		{
-			ManualCheck check;
+			ManualQuizCheckQueueItem quizCheckQueueItem;
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				check = userQuizzesRepo.GetManualCheckById(id);
-				if (!User.HasAccessFor(check.CourseId, CourseRole.Instructor))
+				quizCheckQueueItem = userQuizzesRepo.GetManualCheckById(id);
+				if (!User.HasAccessFor(quizCheckQueueItem.CourseId, CourseRole.Instructor))
 					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-				if (check.IsChecked)
+				if (quizCheckQueueItem.IsChecked)
 					return RedirectToAction("ManualChecks",
 						new
 						{
-							courseId = check.CourseId,
+							courseId = quizCheckQueueItem.CourseId,
 							message = "already_checked"
 						});
-				if (check.LockedBy != null && check.LockedUntil >= DateTime.Now)
+				if (quizCheckQueueItem.LockedBy != null && quizCheckQueueItem.LockedUntil >= DateTime.Now)
 					return RedirectToAction("ManualChecks",
 							new
 							{
-								courseId = check.CourseId,
+								courseId = quizCheckQueueItem.CourseId,
 								message = "locked"
 							});
 
-				await userQuizzesRepo.LockManualCheck(check, User.Identity.GetUserId());
+				await userQuizzesRepo.LockManualCheck(quizCheckQueueItem, User.Identity.GetUserId());
 				transaction.Commit();
 			}
 			return RedirectToRoute("Course.SlideById", new
 			{
-				CourseId = check.CourseId,
-				SlideId = check.SlideId,
-				User = check.UserId
+				CourseId = quizCheckQueueItem.CourseId,
+				SlideId = quizCheckQueueItem.SlideId,
+				User = quizCheckQueueItem.UserId
 			});
 		}
 
@@ -474,7 +474,7 @@ namespace uLearn.Web.Controllers
 
 	public class ManualCheckViewModel
 	{
-		public ManualCheck Check { get; set; }
+		public ManualQuizCheckQueueItem QuizCheckQueueItem { get; set; }
 
 		public string ContextSlideTitle { get; set; }
 	}

@@ -24,7 +24,7 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public async Task<UserQuiz> AddUserQuiz(string courseId, bool isRightAnswer, string itemId, string quizId, Guid slideId, string text, string userId, DateTime time, bool isRightQuizBlock)
+		public async Task<UserQuiz> AddUserQuiz(string courseId, bool isRightAnswer, string itemId, string quizId, Guid slideId, string text, string userId, DateTime time, int quizBlockScore, int quizBlockMaxScore)
 		{
 			var quizzesRepo = new QuizzesRepo(db);
 			var currentQuizVersion = quizzesRepo.GetLastQuizVersion(courseId, slideId);
@@ -39,16 +39,17 @@ namespace uLearn.Web.DataContexts
 				Text = text,
 				Timestamp = time,
 				UserId = userId,
-				IsRightQuizBlock = isRightQuizBlock
+				QuizBlockScore = quizBlockScore,
+				QuizBlockMaxScore = quizBlockMaxScore
 			};
 			db.UserQuizzes.Add(userQuiz);
 			await db.SaveChangesAsync();
 			return userQuiz;
 		}
 
-		public async Task<ManualCheck> QueueForManualCheck(string courseId, Guid slideId, string userId)
+		public async Task<ManualQuizCheckQueueItem> QueueForManualCheck(string courseId, Guid slideId, string userId)
 		{
-			var check = new ManualCheck
+			var check = new ManualQuizCheckQueueItem
 			{
 				CourseId = courseId,
 				SlideId = slideId,
@@ -104,7 +105,7 @@ namespace uLearn.Web.DataContexts
 				.GroupBy(x => x.UserId)
 				.Select(x => x
 					.GroupBy(y => y.QuizId)
-					.Select(y => y.All(z => z.IsRightQuizBlock))
+					.Select(y => y.All(z => z.QuizBlockScore == z.QuizBlockMaxScore))
 					.Select(y => y ? 1 : 0)
 					.DefaultIfEmpty()
 					.Average())
@@ -118,12 +119,13 @@ namespace uLearn.Web.DataContexts
 			return db.UserQuizzes.Where(x => x.SlideId == slideId).Select(x => x.User).Distinct().Count();
 		}
 
+		// TODO: Deprecated? This method is never used
 		public int GetQuizSuccessful(string courseId, Guid slideId, string userId)
 		{
 			return (int)(db.UserQuizzes
 				.Where(x => x.SlideId == slideId && x.UserId == userId)
 				.GroupBy(y => y.QuizId)
-				.Select(y => y.All(z => z.IsRightQuizBlock))
+				.Select(y => y.All(z => z.QuizBlockScore == z.QuizBlockMaxScore))
 				.Select(y => y ? 1 : 0)
 				.DefaultIfEmpty()
 				.Average() * 100);
@@ -151,7 +153,7 @@ namespace uLearn.Web.DataContexts
 			return db.UserQuizzes
 				.Where(q => q.UserId == userId && q.SlideId == slideId && !q.isDropped)
 				.DistinctBy(q => q.QuizId)
-				.ToDictionary(q => q.QuizId, q => q.IsRightQuizBlock);
+				.ToDictionary(q => q.QuizId, q => q.IsQuizBlockScoredMaximum);
 		}
 
 		public Dictionary<string, List<UserQuiz>> GetAnswersForUser(Guid slideId, string userId)
@@ -162,26 +164,20 @@ namespace uLearn.Web.DataContexts
 				.ToDictionary(g => g.Key, g => g.ToList());
 		}
 
-		public void UpdateQuizVersions(Guid slideId, int? oldQuizVersionId, int newQuizVersionId)
-		{
-			/* Mass update in the database */
-			db.Database.ExecuteSqlCommand("UPDATE UserQuizs SET QuizVersionId = {0} WHERE QuizVersionId = {1}", newQuizVersionId, oldQuizVersionId);
-		}
-
-		public IEnumerable<ManualCheck> GetQueueForManualChecks(string courseId)
+		public IEnumerable<ManualQuizCheckQueueItem> GetQueueForManualChecks(string courseId)
 		{
 			return db.ManualChecks.Where(c => c.CourseId == courseId && ! c.IsChecked).OrderBy(c => c.Timestamp);
 		}
 
-		public ManualCheck GetManualCheckById(int id)
+		public ManualQuizCheckQueueItem GetManualCheckById(int id)
 		{
 			return db.ManualChecks.Find(id);
 		}
 
-		public async Task LockManualCheck(ManualCheck check, string lockedBy)
+		public async Task LockManualCheck(ManualQuizCheckQueueItem quizCheckQueueItem, string lockedBy)
 		{
-			check.LockedById = lockedBy;
-			check.LockedUntil = DateTime.Now.Add(TimeSpan.FromMinutes(30));
+			quizCheckQueueItem.LockedById = lockedBy;
+			quizCheckQueueItem.LockedUntil = DateTime.Now.Add(TimeSpan.FromMinutes(30));
 			await db.SaveChangesAsync();
 		}
 	}
