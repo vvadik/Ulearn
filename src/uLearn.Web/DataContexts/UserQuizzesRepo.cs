@@ -56,14 +56,14 @@ namespace uLearn.Web.DataContexts
 				Timestamp = DateTime.Now,
 				UserId = userId,
 			};
-			db.ManualChecks.Add(check);
+			db.ManualQuizCheckQueueItems.Add(check);
 			await db.SaveChangesAsync();
 			return check;
 		}
 
 		public bool IsWaitingForManualCheck(string courseId, Guid slideId, string userId)
 		{
-			return db.ManualChecks.Any(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId && ! c.IsChecked);
+			return db.ManualQuizCheckQueueItems.Any(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId && ! c.IsChecked);
 		}
 
 		public bool IsQuizSlidePassed(string courseId, string userId, Guid slideId)
@@ -148,13 +148,20 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public Dictionary<string, bool> GetQuizBlocksTruth(string courseId, string userId, Guid slideId)
+		public Dictionary<string, int> GetQuizBlocksTruth(string courseId, string userId, Guid slideId)
 		{
 			return db.UserQuizzes
 				.Where(q => q.UserId == userId && q.SlideId == slideId && !q.isDropped)
 				.DistinctBy(q => q.QuizId)
-				.ToDictionary(q => q.QuizId, q => q.IsQuizBlockScoredMaximum);
+				.ToDictionary(q => q.QuizId, q => q.QuizBlockScore);
 		}
+
+		public bool IsQuizScoredMaximum(string courseId, string userId, Guid slideId)
+		{
+			return db.UserQuizzes
+				.Where(q => q.UserId == userId && q.SlideId == slideId && !q.isDropped)
+				.All(q => q.QuizBlockScore == q.QuizBlockMaxScore);
+	}
 
 		public Dictionary<string, List<UserQuiz>> GetAnswersForUser(Guid slideId, string userId)
 		{
@@ -164,20 +171,45 @@ namespace uLearn.Web.DataContexts
 				.ToDictionary(g => g.Key, g => g.ToList());
 		}
 
-		public IEnumerable<ManualQuizCheckQueueItem> GetQueueForManualChecks(string courseId)
+		public IEnumerable<ManualQuizCheckQueueItem> GetManualQuizCheckQueue(string courseId)
 		{
-			return db.ManualChecks.Where(c => c.CourseId == courseId && ! c.IsChecked).OrderBy(c => c.Timestamp);
+			return db.ManualQuizCheckQueueItems
+				.Where(c => c.CourseId == courseId && ! c.IsChecked)
+				.OrderBy(c => c.Timestamp);
 		}
 
-		public ManualQuizCheckQueueItem GetManualCheckById(int id)
+		public IEnumerable<ManualQuizCheckQueueItem> GetManualQuizCheckQueue(string courseId, Guid slideId)
 		{
-			return db.ManualChecks.Find(id);
+			return db.ManualQuizCheckQueueItems
+				.Where(c => c.CourseId == courseId && c.SlideId == slideId && ! c.IsChecked)
+				.OrderBy(c => c.Timestamp);
 		}
 
-		public async Task LockManualCheck(ManualQuizCheckQueueItem quizCheckQueueItem, string lockedBy)
+		public ManualQuizCheckQueueItem GetManualQuizCheckQueueItemById(int id)
 		{
-			quizCheckQueueItem.LockedById = lockedBy;
+			return db.ManualQuizCheckQueueItems.Find(id);
+		}
+
+		public async Task LockManualQuizCheckQueueItem(ManualQuizCheckQueueItem quizCheckQueueItem, string lockedById)
+		{
+			quizCheckQueueItem.LockedById = lockedById;
 			quizCheckQueueItem.LockedUntil = DateTime.Now.Add(TimeSpan.FromMinutes(30));
+			await db.SaveChangesAsync();
+		}
+
+		public async Task SetScoreForQuizBlock(string userId, Guid slideId, string blockId, int score)
+		{
+			db.UserQuizzes
+				.Where(q => q.UserId == userId && q.SlideId == slideId && q.QuizId == blockId)
+				.ForEach(q => q.QuizBlockScore = score);
+			await db.SaveChangesAsync();
+		}
+
+		public async Task MarkManualQuizCheckQueueItemAsChecked(ManualQuizCheckQueueItem queueItem)
+		{
+			queueItem.LockedBy = null;
+			queueItem.LockedUntil = null;
+			queueItem.IsChecked = true;
 			await db.SaveChangesAsync();
 		}
 	}

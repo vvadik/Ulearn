@@ -47,13 +47,13 @@
 {
 	var mark = "";
 	var style = "";
+	var blockScore = -1;
 	QuizBlockData model = context.GetBlockData(block);
 	if (model.QuizState != QuizState.NotPassed && model.QuizState != QuizState.WaitForCheck)
 	{
 		if (model.QuizModel != null && model.QuizModel.ResultsForQuizes != null)
 		{
-			bool res;
-			res = model.QuizModel.ResultsForQuizes.TryGetValue(block.Id, out res) && res;
+			var res = model.QuizModel.ResultsForQuizes.TryGetValue(block.Id, out blockScore) && blockScore == block.MaxScore;
 			mark = "glyphicon " + (res ? "glyphicon-ok" : "glyphicon-remove");
 			style = "color: " + (res ? "green" : "red");
 		}
@@ -61,24 +61,33 @@
 	<h4>
 		<i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text.RenderTex()
 		<sup class="text-muted">
-			@block.MaxScore.PluralizeInRussian(new RussianPluralizationOptions
-			     {
-				     One = "балл",
-				     Two = "балла",
-				     Five = "баллов",
-				     smallNumbersAreWords = false,
-				     hideNumberOne = false
-			     }
-			)
+			@if (blockScore >= 0)
+			{
+				<span>
+					@blockScore из @block.MaxScore балл@(block.MaxScore == 1 ? "а" : "ов")
+				</span>
+			}
+			else
+			{
+				@block.MaxScore.PluralizeInRussian(new RussianPluralizationOptions
+					{
+						One = "балл",
+						Two = "балла",
+						Five = "баллов",
+						smallNumbersAreWords = false,
+						hideNumberOne = false
+					}
+				)
+			}
 		</sup>
 	</h4>
 
 	@QuizBlock((dynamic)block, context)
-	if (context.CheckingUserId != null)
+	if (context.ManualQuizCheckQueueItem != null)
 	{
 		<h4>Оцените от 0 до @block.MaxScore</h4>
 		<div>
-			<input type="number" class="form-control" min="0" max="@block.MaxScore"/>
+			<input type="number" class="form-control" min="0" max="@block.MaxScore" name="quiz__score__@block.Id" />
 		</div>
 	}
 
@@ -244,7 +253,7 @@
 				<label class="@itemClass" title="@title" for="@(block.Id + "quizBlock" + item.Id)" @GetGuestOnclick(context.IsGuest)>
 					@item.Description.RenderTex()
 				</label>
-				@if (model.QuizState == QuizState.Total && item.IsCorrect)
+				@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && item.IsCorrect)
 				{
 					<i class="glyphicon glyphicon-ok" style="color: green" title="@title"></i>
 				}
@@ -278,7 +287,10 @@
 	</div>
 	if (model.QuizState == QuizState.Total)
 	{
-		<div>Правильный ответ: @sample</div>
+		if (model.ShowCorrectAnswer)
+		{
+			<div>Правильный ответ: @sample</div>
+		}
 		if (!string.IsNullOrEmpty(block.Explanation))
 		{
 			<div class="text-muted">@block.Explanation</div>
@@ -317,7 +329,7 @@
 			<label class="@trueItemClass" title="@ttitle" for="@(block.Id + "quizBlock" + "True")" @GetGuestOnclick(context.IsGuest)>
 				Верно
 			</label>
-			@if (model.QuizState == QuizState.Total && block.Answer)
+			@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && block.Answer)
 			{
 				<i class="glyphicon glyphicon-ok" style="color: green" title="@ttitle"></i>
 			}
@@ -327,7 +339,7 @@
 			<label class="@falseItemClass" title="@ftitle" for="@(block.Id + "quizBlock" + "False")" @GetGuestOnclick(context.IsGuest)>
 				Неверно
 			</label>
-			@if (model.QuizState == QuizState.Total && !block.Answer)
+			@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && !block.Answer)
 			{
 				<i class="glyphicon glyphicon-ok" style="color: green" title="@ftitle"></i>
 			}
@@ -350,7 +362,7 @@
 		items = items.OrderBy(item => userAnswers.IndexOf(item.GetHash())).ToArray();
 	}
 	<div class="quiz-block-ordering @(model.QuizState != QuizState.NotPassed ? "not-movable" : "")" id='@(block.Id + "_quizBlock")'>
-		@if (model.QuizState == QuizState.Total)
+		@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer)
 		{
 			<div class="quiz-block-ordering__correct-description row">
 				<div class="text-success col-sm-5 col-sm-offset-6">Правильный ответ</div>
@@ -372,7 +384,7 @@
 						<input autocomplete="off" id='@(block.Id + "quizBlock" + item.GetHash())' type="hidden">
 						<div class="text">@item.Text.RenderTex()</div>
 					</div>
-					@if (model.QuizState == QuizState.Total)
+					@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer)
 					{
 						var correctItem = correctItems[itemIndex];
 						<div class="quiz-block-ordering__item correct col-xs-12 col-sm-offset-1 col-sm-5">
@@ -410,7 +422,10 @@
 		{
 			<div class="quiz-block-matching__correct-description row">
 				<div class="text-muted col-sm-3 col-sm-offset-3">Ваш вариант</div>
-				<div class="text-success col-sm-3 col-sm-offset-1">Правильный вариант</div>
+				@if (model.ShowCorrectAnswer)
+				{
+					<div class="text-success col-sm-3 col-sm-offset-1">Правильный вариант</div>
+				}
 			</div>
 		}
 		<ul>
@@ -439,7 +454,7 @@
 							<div class="quiz-block-matching__droppable col-xs-3 added" data-block-id="@block.Id" data-item-id="@fixedItem.GetHashForFixedItem()">
 								<div class="quiz-block-matching__movable-item" data-block-id="@block.Id" data-item-id="@movableItem.GetHashForMovableItem()">@movableItem.MovableItem.RenderTex()</div>
 							</div>
-							if (model.QuizState == QuizState.Total)
+							if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer)
 							{
 								<div class="quiz-block-matching__fixed-item correct col-xs-3 col-sm-offset-1">
 									@fixedItem.MovableItem.RenderTex()

@@ -12,16 +12,16 @@ namespace uLearn.Web.Models
 		public QuizSlide Slide { get; set; }
 		public QuizState QuizState { get; set; }
 		public Dictionary<string, List<UserQuiz>> AnswersToQuizes { get; set; }
-		public Dictionary<string, bool> ResultsForQuizes { get; set; }
+		public Dictionary<string, int> ResultsForQuizes { get; set; }
 		public int TryNumber { get; set; }
 		public int MaxDropCount { get; set; }
 		public bool IsLti { get; set; }
 		public bool IsGuest { get; set; }
-		public Guid? CheckingUserId { get; set; }
+		public ManualQuizCheckQueueItem ManualQuizCheckQueueItem { get; set; }
 
-		public int RightAnswers
+		public int Score
 		{
-			get { return ResultsForQuizes == null ? 0 : ResultsForQuizes.AsEnumerable().Count(res => res.Value); }
+			get { return ResultsForQuizes == null ? 0 : ResultsForQuizes.AsEnumerable().Sum(res => res.Value); }
 		}
 
 		public int QuestionsCount

@@ -11,18 +11,29 @@
 	{
 		status = string.Format("Попытка {0} из {1}", Model.TryNumber + 1, Model.MaxDropCount + 1);
 	}
-	if (Model.QuizState == QuizState.WaitForCheck)
+	else if (Model.ManualQuizCheckQueueItem != null)
+	{
+		status = string.Format("Проверка попытки {0} из {1}", Model.TryNumber, Model.MaxDropCount + 1);
+	}
+	else if (Model.QuizState == QuizState.WaitForCheck)
 	{
 		status = "Ожидает проверки инструктором";
 	}
 
-	<h4 id="quiz-status">@status</h4>
+	if (! string.IsNullOrEmpty(status))
+	{
+		<p id="quiz-status">@status</p>
+	}
+	if (! string.IsNullOrEmpty(Request.QueryString["error"]))
+	{
+		<p class="alert alert-danger">@Request.QueryString["error"]</p>
+	}
 
 	var remains = Model.MaxDropCount - Model.TryNumber + 1;
 	var context = new BlockRenderContext(
-		null, 
-		Model.Slide, 
-		CourseUnitUtils.GetDirectoryRelativeWebPath(quizSlide.Info.SlideFile), 
+		null,
+		Model.Slide,
+		CourseUnitUtils.GetDirectoryRelativeWebPath(quizSlide.Info.SlideFile),
 		Enumerable.Range(0, Model.Slide.Blocks.Length)
 			.Select(x => quizSlide.Blocks[x] is AbstractQuestionBlock
 					? new QuizBlockData(Model, x, Model.QuizState)
@@ -30,29 +41,46 @@
 			.ToArray<dynamic>(),
 		Model.IsGuest,
 		true,
-		Model.CheckingUserId
-		);
+		Model.ManualQuizCheckQueueItem
+	);
 
-	@SlideHtml.Blocks(context)
+	MvcForm form = null;
+	if (Model.ManualQuizCheckQueueItem != null)
+	{
+		form = Html.BeginForm("ScoreQuiz", "Quiz", FormMethod.Post, new {id = "quiz__score-form"});
+	}
+
+	using (form)
+	{
+		if (Model.ManualQuizCheckQueueItem != null)
+		{
+			@Html.Hidden("id", Model.ManualQuizCheckQueueItem.Id)
+			@Html.Hidden("errorUrl", Request.RawUrl + "&error=")
+			@Html.Hidden("nextUrl", Url.Action("ManualQuizChecksQueue", "Admin", new { courseId = Model.CourseId }))
+		}
+		@SlideHtml.Blocks(context)
+	}
 
 	if (!Model.IsGuest)
 	{
 		<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
 			@if (Model.QuizState == QuizState.NotPassed)
 			{
-				<button class="btn btn-primary quiz-submit-btn" onclick=" submitQuiz('@Model.CourseId', '@Model.Slide.Index' , '@Model.AnswersToQuizes.Count' , @Model.IsLtiToString ) ">Готово!</button>
+				<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString) ">Готово!</button>
 			}
-			else if (Model.QuizState == QuizState.WaitForCheck && Model.CheckingUserId != null)
+			else if (Model.QuizState == QuizState.WaitForCheck && Model.ManualQuizCheckQueueItem != null)
 			{
-				<button class="btn btn-default quiz-submit-btn">Сохранить и вернуться</button>
-				<button class="btn btn-primary quiz-submit-btn">Сохранить и перейти к следующему</button>
+				<input type="submit" class="btn btn-default" form="quiz__score-form" value="Сохранить и вернуться">
+				<input type="submit" class="btn btn-primary" form="quiz__score-form" value="Сохранить и перейти к следующему"
+				       data-url="@Url.Action("CheckSlide", "Admin", new { courseId = Model.CourseId, slideId = Model.Slide.Id })"
+					   onclick="$('[name=nextUrl]').val($(this).data('url'))">
 			}
 			else if (Model.QuizState == QuizState.Subtotal)
 			{
 				using (Html.BeginForm("DropQuiz", "Quiz"))
 				{
-					<input type="hidden" name="slideId" value="@Model.Slide.Id" />
-					<input type="hidden" name="courseId" value="@Model.CourseId" />
+					<input type="hidden" name="slideId" value="@Model.Slide.Id"/>
+					<input type="hidden" name="courseId" value="@Model.CourseId"/>
 					<input type="hidden" name="isLti" value="@Model.IsLtiToString">
 					<button class="btn btn-danger" type="submit">Пройти тест повторно</button>
 					<small>У вас остал@(remains == 1 ? "а" : "о")сь @remains из @(Model.MaxDropCount + 1) попыток</small>
@@ -62,14 +90,15 @@
 			{
 				using (Html.BeginForm("ClearAnswers", "Quiz"))
 				{
-					<input type="hidden" name="slideId" value="@Model.Slide.Id" />
-					<input type="hidden" name="courseId" value="@Model.CourseId" />
+					<input type="hidden" name="slideId" value="@Model.Slide.Id"/>
+					<input type="hidden" name="courseId" value="@Model.CourseId"/>
 					<input type="hidden" name="isLti" value="@Model.IsLtiToString">
 					<button class="btn btn-danger" type="submit">Удалить ответы</button>
 				}
 			}
 		</div>
 	}
+	
 	if (User.HasAccessFor(Model.CourseId, CourseRole.Instructor))
 	{
 		<h2>Статистика ответов</h2>

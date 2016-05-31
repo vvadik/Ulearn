@@ -1,4 +1,4 @@
-﻿@model uLearn.Web.Controllers.ManualChecksViewModel
+﻿@model uLearn.Web.Controllers.ManualQuizCheckQueueViewModel
 
 @{
 	ViewBag.Title = "Очередь на проверку";
@@ -10,7 +10,7 @@
 <div class="slide-container">
 	<h3>Очередь на проверку</h3>
 
-	@if (Model.Message != "")
+	@if (! string.IsNullOrEmpty(Model.Message) && Model.Checks.Count > 0)
 	{
 		<div class="alert alert-danger">
 			@if (Model.Message == "already_checked")
@@ -21,7 +21,17 @@
 			{
 				<p>Эта работа проверяется другим инструктором, выберите другую</p>
 			}
+			@if (Model.Message == "slide_checked")
+			{
+				<p>Для этого слайда больше нет непроверенных работ</p>
+			}
 		</div>
+	}
+
+	@if (Model.Checks.Count == 0)
+	{
+		<div class="alert alert-success">Поздравляем, очередь пуста! Работ для проверки нет</div>
+		<div>Здесь будут появляться ответы студентов на тесты, которые должны быть проверены инструктором вручную.</div>
 	}
 
 	@foreach (var checkModel in Model.Checks)
@@ -29,14 +39,10 @@
 		var check = checkModel.QuizCheckQueueItem;
 		<div>
 			<div>
-				@check.User.VisibleName заполнил тест «<a href="@Url.Action("SlideById", "Course", new
-				                                                {
-					                                                courseId = check.CourseId,
-					                                                slideId = check.SlideId,
-				                                                })">@checkModel.ContextSlideTitle</a>»
+				@check.User.VisibleName заполнил тест «@checkModel.ContextSlideTitle»
 			</div>
 			<div>
-				@if (check.LockedBy != null)
+				@if (check.IsLocked)
 				{
 					<p>Проверяется инструктором @check.LockedBy.VisibleName</p>
 				}

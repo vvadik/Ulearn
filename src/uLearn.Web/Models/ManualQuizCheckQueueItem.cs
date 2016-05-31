@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Security.Principal;
 using System.Web;
+using Microsoft.AspNet.Identity;
 
 namespace uLearn.Web.Models
 {
@@ -44,5 +46,15 @@ namespace uLearn.Web.Models
 		public bool IsChecked { get; set; }
 
 		public int Score { get; set; }
+
+		public bool IsLocked
+		{
+			get { return LockedUntil.HasValue && LockedUntil.Value > DateTime.Now; }
+		}
+
+		public bool IsLockedBy(IIdentity identity)
+		{
+			return IsLocked && LockedById == identity.GetUserId();
+		}
 	}
 }

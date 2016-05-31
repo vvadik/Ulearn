@@ -62,11 +62,58 @@ namespace uLearn.Web.Controllers
 			public Type QuizType;
 			public int QuizBlockScore;
 			public int QuizBlockMaxScore;
+		}
 
-			public bool IsQuizBlockScoredMaximum
+		[AllowAnonymous]
+		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizCheckQueueItem manualQuizCheckQueueItem = null)
+		{
+			if (isGuest)
+				return PartialView(GuestQuiz(slide, courseId));
+			var slideId = slide.Id;
+			var maxDropCount = GetMaxDropCount(slide);
+			var state = GetQuizState(courseId, userId, slideId, maxDropCount);
+			var quizState = state.Item1;
+			var tryNumber = state.Item2;
+			var resultsForQuizes = GetResultForQuizes(courseId, userId, slideId, state.Item1);
+			var userAnswers = userQuizzesRepo.GetAnswersForShowOnSlide(courseId, slide, userId);
+
+			var quizVersion = quizzesRepo.GetLastQuizVersion(courseId, slideId);
+			if (quizState != QuizState.NotPassed && userAnswers.Count > 0)
 			{
-				get { return QuizBlockScore == QuizBlockMaxScore; }
+				var firstUserAnswer = userAnswers.FirstOrDefault().Value.FirstOrDefault();
+				/* If we know version which user has answered*/
+				if (firstUserAnswer != null && firstUserAnswer.QuizVersion != null)
+					quizVersion = firstUserAnswer.QuizVersion;
+				/* If user's version is null, show first created version for this slide ever */
+				if (firstUserAnswer != null && firstUserAnswer.QuizVersion == null)
+					quizVersion = quizzesRepo.GetFirstQuizVersion(courseId, slideId);
 			}
+
+			/* If we haven't quiz version in database, create it */
+			if (quizVersion == null)
+				quizVersion = quizzesRepo.AddQuizVersionIfNeeded(courseId, slide);
+
+			/* Restore quiz slide from version stored in the database */
+			var quiz = quizVersion.RestoredQuiz;
+			slide = new QuizSlide(slide.Info, quiz);
+
+			var model = new QuizModel
+			{
+				CourseId = courseId,
+				Slide = slide,
+				QuizState = quizState,
+				TryNumber = tryNumber,
+				MaxDropCount = maxDropCount,
+				ResultsForQuizes = resultsForQuizes,
+				AnswersToQuizes = userAnswers,
+				IsLti = isLti,
+				ManualQuizCheckQueueItem = manualQuizCheckQueueItem
+			};
+
+			if (model.QuizState != QuizState.NotPassed && model.Score == quiz.MaxScore)
+				model.QuizState = QuizState.Total;
+
+			return PartialView(model);
 		}
 
 		[HttpPost]
@@ -132,6 +179,63 @@ namespace uLearn.Web.Controllers
 			}
 
 			return new HttpStatusCodeResult(HttpStatusCode.OK);
+		}
+
+		[HttpPost]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		public async Task<ActionResult> ScoreQuiz(int id, string nextUrl, string errorUrl = "")
+		{
+			if (string.IsNullOrEmpty(errorUrl))
+				errorUrl = nextUrl;
+
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				var queueItem = userQuizzesRepo.GetManualQuizCheckQueueItemById(id);
+
+				if (queueItem.IsChecked)
+					return Redirect(errorUrl + "Эта работа уже была проверена");
+
+				if (! queueItem.IsLockedBy(User.Identity))
+					return Redirect(errorUrl + "Эта работа проверяется другим инструктором");
+
+				var answers = userQuizzesRepo.GetAnswersForUser(queueItem.SlideId, queueItem.UserId);
+
+				QuizVersion quizVersion;
+				/* If there is no user's answers for quiz, get the latest quiz versoin*/
+				if (answers.Count == 0)
+					quizVersion = quizzesRepo.GetLastQuizVersion(queueItem.CourseId, queueItem.SlideId);
+				else
+				{
+					var firstAnswer = answers.FirstOrDefault().Value.FirstOrDefault();
+					quizVersion = firstAnswer != null
+						? firstAnswer.QuizVersion
+						: quizzesRepo.GetFirstQuizVersion(queueItem.CourseId, queueItem.SlideId);
+				}
+
+				int totalScore = 0;
+
+				foreach (var question in quizVersion.RestoredQuiz.Blocks.OfType<AbstractQuestionBlock>())
+				{
+					var scoreFieldName = "quiz__score__" + question.Id;
+					var scoreStr = Request.Form[scoreFieldName];
+					int score;
+					/* Invalid form: score isn't integer */
+					if (!int.TryParse(scoreStr, out score))
+						return Redirect(errorUrl + string.Format("Неверное количество баллов: {0}", scoreStr));
+					/* Invalid form: score isn't from range 0..MAX_SCORE */
+					if (score < 0 || score > question.MaxScore)
+						return Redirect(errorUrl + string.Format("Неверное количество баллов: {0}", score));
+
+					await userQuizzesRepo.SetScoreForQuizBlock(queueItem.UserId, queueItem.SlideId, question.Id, score);
+					totalScore += score;
+				}
+
+				await userQuizzesRepo.MarkManualQuizCheckQueueItemAsChecked(queueItem);
+				await visitsRepo.SetScoreForAttempt(queueItem.SlideId, queueItem.UserId, totalScore);
+				transaction.Commit();
+			}
+
+			return Redirect(nextUrl);
 		}
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfo(Course course, int slideIndex, IGrouping<string, QuizAnswer> answer)
@@ -463,7 +567,7 @@ namespace uLearn.Web.Controllers
 			{
 				var userId = User.Identity.GetUserId();
 				if (userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b) < GetMaxDropCount(slide as QuizSlide) &&
-					!userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId).All(b => b.Value))
+					!userQuizzesRepo.IsQuizScoredMaximum(courseId, userId, slideId))
 				{
 					await userQuizzesRepo.DropQuiz(userId, slideId);
 					await visitsRepo.DropAttempt(slideId, userId);
@@ -475,58 +579,6 @@ namespace uLearn.Web.Controllers
 			if (isLti)
 				return RedirectToAction("LtiSlide", "Course", model);
 			return RedirectToAction("Slide", "Course", model);
-		}
-
-		[AllowAnonymous]
-		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, Guid? checkingUserId = null)
-		{
-			if (isGuest)
-				return PartialView(GuestQuiz(slide, courseId));
-			var slideId = slide.Id;
-			var maxDropCount = GetMaxDropCount(slide);
-			var state = GetQuizState(courseId, userId, slideId, maxDropCount);
-			var quizState = state.Item1;
-			var tryNumber = state.Item2;
-			var resultsForQuizes = GetResultForQuizes(courseId, userId, slideId, state.Item1);
-			var userAnswers = userQuizzesRepo.GetAnswersForShowOnSlide(courseId, slide, userId);
-
-			var quizVersion = quizzesRepo.GetLastQuizVersion(courseId, slideId);
-			if (quizState != QuizState.NotPassed && userAnswers.Count > 0)
-			{
-				var firstUserAnswer = userAnswers.FirstOrDefault().Value.FirstOrDefault();
-				/* If we know version which user has answered*/
-				if (firstUserAnswer != null && firstUserAnswer.QuizVersion != null)
-					quizVersion = firstUserAnswer.QuizVersion;
-				/* If user's version is null, show first created version for this slide ever */
-				if (firstUserAnswer != null && firstUserAnswer.QuizVersion == null)
-					quizVersion = quizzesRepo.GetFirstQuizVersion(courseId, slideId);
-			}
-
-			/* If we haven't quiz version in database, create it */
-			if (quizVersion == null)
-				quizVersion = quizzesRepo.AddQuizVersionIfNeeded(courseId, slide);
-
-			/* Restore quiz slide from version stored in the database */
-			var quiz = quizVersion.RestoredQuiz;
-			slide = new QuizSlide(slide.Info, quiz);
-
-			var model = new QuizModel
-			{
-				CourseId = courseId,
-				Slide = slide,
-				QuizState = quizState,
-				TryNumber = tryNumber,
-				MaxDropCount = maxDropCount,
-				ResultsForQuizes = resultsForQuizes,
-				AnswersToQuizes = userAnswers,
-				IsLti = isLti,
-				CheckingUserId = checkingUserId
-			};
-
-			if (model.QuizState != QuizState.NotPassed && model.RightAnswers == model.QuestionsCount)
-				model.QuizState = QuizState.Total;
-
-			return PartialView(model);
 		}
 
 		private QuizModel GuestQuiz(QuizSlide slide, string courseId)
@@ -548,7 +600,7 @@ namespace uLearn.Web.Controllers
 			return maxDropCount == 0 ? MAX_DROPS_COUNT : maxDropCount;
 		}
 
-		private Dictionary<string, bool> GetResultForQuizes(string courseId, string userId, Guid slideId, QuizState state)
+		private Dictionary<string, int> GetResultForQuizes(string courseId, string userId, Guid slideId, QuizState state)
 		{
 			return userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId);
 		}

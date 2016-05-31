@@ -44,6 +44,11 @@ namespace uLearn.Quizes
 			get { return this.XmlSerialize(true); }
 		}
 
+		public int MaxScore
+		{
+			get { return Blocks.OfType<AbstractQuestionBlock>().Sum(b => b.MaxScore); }
+		}
+
 		public void Validate()
 		{
 			try

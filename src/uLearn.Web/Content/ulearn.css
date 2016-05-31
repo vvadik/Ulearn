@@ -312,6 +312,13 @@
 	margin-bottom: 5px;
 }
 
+#quiz-status {
+    background-color: #d9edf7;
+	padding: 15px 18px;
+	color: #333;
+	font-size: 13pt;
+}
+
 .no-display {
 	display: none;
 }

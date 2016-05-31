@@ -1,5 +1,8 @@
 ﻿function submitQuiz(courseId, slideIndex, expectedCount, isLti) {
 	if (areAllAnswered(expectedCount)) {
+		/* Disable quiz submit button */
+		$('.quiz-submit-btn').prop('disabled', true);
+
 		var answers = [];
 		$(".quiz").each(function () {
 			var id = $(this).find('input').attr('id'); //id of quiz
@@ -35,7 +38,7 @@
 					isLti: isLti
 				}
 			}).success(function (ans) {
-				$("#quiz-status").text("Проверяется...");
+				$("#quiz-status").text("Отправляем..");
 				window.scrollTo(0, 0);
 				window.location.reload();
 			})
@@ -47,7 +50,7 @@
 		console.log(answers);
 		return answer;
 	} else
-		alert("Fill this quiz!");
+		alert("Выполните все задания перед отправкой теста");
 };
 
 

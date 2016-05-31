@@ -12,6 +12,11 @@
 			BlockIndex = index;
 			QuizState = quizState;
 		}
+
+		public bool ShowCorrectAnswer
+		{
+			get { return QuizState == QuizState.Total && !QuizModel.Slide.Quiz.ManualCheck; }
+		}
 	}
 
 }
