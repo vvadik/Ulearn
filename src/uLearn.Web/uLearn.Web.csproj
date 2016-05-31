@@ -314,6 +314,10 @@
     <Compile Include="Migrations\201604280922514_AddCourseVersions.Designer.cs">
       <DependentUpon>201604280922514_AddCourseVersions.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201605310807254_Empty.cs" />
+    <Compile Include="Migrations\201605310807254_Empty.Designer.cs">
+      <DependentUpon>201605310807254_Empty.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\CommentLike.cs" />
     <Compile Include="Models\CommentPolicy.cs" />
@@ -719,6 +723,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201604280922514_AddCourseVersions.resx">
       <DependentUpon>201604280922514_AddCourseVersions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605310807254_Empty.resx">
+      <DependentUpon>201605310807254_Empty.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
