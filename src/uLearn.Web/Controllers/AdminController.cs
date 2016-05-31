@@ -246,7 +246,7 @@ namespace uLearn.Web.Controllers
 							courseId = quizCheckQueueItem.CourseId,
 							message = "already_checked"
 						});
-				if (quizCheckQueueItem.IsLocked && ! _ignoreLock)
+				if (quizCheckQueueItem.IsLocked && ! _ignoreLock && ! quizCheckQueueItem.IsLockedBy(User.Identity))
 					return RedirectToAction("ManualQuizChecksQueue",
 							new
 							{

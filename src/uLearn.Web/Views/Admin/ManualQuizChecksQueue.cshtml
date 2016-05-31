@@ -44,7 +44,23 @@
 			<div>
 				@if (check.IsLocked)
 				{
-					<p>Проверяется инструктором @check.LockedBy.VisibleName</p>
+					<p>
+						Проверяется инструктором <b>@check.LockedBy.VisibleName</b>,
+						заблокирована ещё на @{
+							var minutes = (int)(check.LockedUntil.Value - DateTime.Now).TotalMinutes;
+							@minutes.PluralizeInRussian(new RussianPluralizationOptions
+							{
+								One = "минуту",
+								Two = "минуты",
+								Five = "минут",
+								Gender = Gender.Female,
+							})
+						}
+					</p>
+					if (check.IsLockedBy(User.Identity))
+					{
+						 @Html.ActionLink("Вернуться к проверке →", "Check", new { id = check.Id }, new { @class = "btn btn-sm btn-primary" })
+					}
 				}
 				else
 				{
