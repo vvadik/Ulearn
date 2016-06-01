@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -21,6 +22,8 @@ namespace uLearn.Web.Controllers
 		private readonly UsersRepo usersRepo;
 		private readonly CommentsRepo commentsRepo;
 		private readonly UserManager<ApplicationUser> userManager;
+		private readonly QuizzesRepo quizzesRepo;
+		private readonly CoursesRepo coursesRepo;
 
 		public AdminController()
 		{
@@ -29,6 +32,8 @@ namespace uLearn.Web.Controllers
 			usersRepo = new UsersRepo(db);
 			commentsRepo = new CommentsRepo(db);
 			userManager = new ULearnUserManager();
+			quizzesRepo = new QuizzesRepo(db);
+			coursesRepo = new CoursesRepo(db);
 		}
 
 		public ActionResult CourseList(string courseCreationLastTry = null)
@@ -47,14 +52,6 @@ namespace uLearn.Web.Controllers
 				InvalidCharacters = incorrectChars
 			};
 			return View(model);
-		}
-		
-		[HttpPost]
-		public ActionResult ReloadCourse(string courseId, string returnUrl = null)
-		{
-			courseManager.ReloadCourse(courseId);
-			if (returnUrl != null) return Redirect(returnUrl);
-			return RedirectToAction("CourseList", new { courseId });
 		}
 
 		public ActionResult SpellingErrors(string courseId)
@@ -112,8 +109,20 @@ namespace uLearn.Web.Controllers
 			return File(courseManager.GetStagingCoursePath(courseId), "application/zip", packageName);
 		}
 
+		public ActionResult DownloadVersion(string courseId, Guid versionId)
+		{
+			var packageName = courseManager.GetPackageName(courseId);
+			return File(courseManager.GetCourseVersionFile(versionId).FullName, "application/zip", packageName);
+		}
+
+		private void CreateQuizVersionsForSlides(string courseId, IEnumerable<Slide> slides)
+		{
+			foreach (var slide in slides.OfType<QuizSlide>())
+				quizzesRepo.AddQuizVersionIfNeeded(courseId, slide);
+		}
+
 		[HttpPost]
-		public ActionResult UploadCourse(string courseId, HttpPostedFileBase file)
+		public async Task<ActionResult> UploadCourse(string courseId, HttpPostedFileBase file)
 		{
 			if (file == null || file.ContentLength <= 0)
 				return RedirectToAction("Packages", new { courseId });
@@ -122,11 +131,16 @@ namespace uLearn.Web.Controllers
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
 				return RedirectToAction("Packages", new { courseId });
 
-			var packageName = courseManager.GetPackageName(courseId);
-			var destinationFile = courseManager.StagedDirectory.GetFile(packageName);
+			var versionId = Guid.NewGuid();
+			
+			var destinationFile = courseManager.GetCourseVersionFile(versionId);
 			file.SaveAs(destinationFile.FullName);
-			courseManager.ReloadCourse(courseId);
-			return RedirectToAction("Diagnostics", new { courseId });
+
+			/* Load version and put it into LRU-cache */
+			courseManager.GetVersion(versionId);
+			await coursesRepo.AddCourseVersion(courseId, versionId, User.Identity.GetUserId());
+
+			return RedirectToAction("Diagnostics", new { courseId, versionId });
 		}
 
 		[HttpPost]
@@ -153,19 +167,23 @@ namespace uLearn.Web.Controllers
 		{
 			var hasPackage = courseManager.HasPackageFor(courseId);
 			var lastUpdate = courseManager.GetLastWriteTime(courseId);
+			var courseVersions = coursesRepo.GetCourseVersions(courseId).ToList();
+			var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
 			return View(model: new PackagesViewModel
 			{
 				CourseId = courseId,
 				HasPackage = hasPackage,
-				LastUpdate = lastUpdate
+				LastUpdate = lastUpdate,
+				Versions = courseVersions,
+				PublishedVersion = publishedVersion,
 			});
 		}
-		
+
 		public ActionResult Comments(string courseId)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var commentsPolicy = commentsRepo.GetCommentsPolicy(courseId);
-			
+
 			var comments = commentsRepo.GetCourseComments(courseId).OrderByDescending(x => x.PublishTime).ToList();
 			var commentsLikes = commentsRepo.GetCommentsLikesCounts(comments);
 			var commentsLikedByUser = commentsRepo.GetCourseCommentsLikedByUser(courseId, User.Identity.GetUserId());
@@ -215,7 +233,7 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("CourseList");
 			return View(queryModel);
 		}
-		
+
 		[ChildActionOnly]
 		public ActionResult UsersPartial(UserSearchQueryModel queryModel)
 		{
@@ -267,9 +285,74 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		public ActionResult Diagnostics(string courseId)
+		public ActionResult Diagnostics(string courseId, Guid? versionId)
 		{
-			return View(model: courseId);
+			if (versionId == null)
+			{
+				return View(new DiagnosticsModel
+				{
+					CourseId = courseId,
+				});
+			}
+
+			var versionIdGuid = (Guid) versionId;
+
+			var course = courseManager.GetCourse(courseId);
+			var version = courseManager.GetVersion(versionIdGuid);
+
+			var courseDiff = new CourseDiff(course, version);
+
+			return View(new DiagnosticsModel
+			{
+				CourseId = courseId,
+				IsDiagnosticsForVersion = true,
+				VersionId = versionIdGuid,
+				CourseDiff = courseDiff,
+			});
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> PublishVersion(string courseId, Guid versionId)
+		{
+			var versionFile = courseManager.GetCourseVersionFile(versionId);
+			var courseFile = courseManager.GetStagingCourseFile(courseId);
+			var oldCourse = courseManager.GetCourse(courseId);
+
+			/* First, try to load course from LRU-cache or zip file */
+			var version = courseManager.GetVersion(versionId);
+
+			/* Copy version's zip file to course's zip file, overwrite if need */
+			versionFile.CopyTo(courseFile.FullName, true);
+
+			/* Replace courseId */
+			version.Id = courseId;
+			courseManager.UpdateCourse(version);
+
+			CreateQuizVersionsForSlides(courseId, version.Slides);
+			await coursesRepo.MarkCourseVersionAsPublished(versionId);
+
+			var courseDiff = new CourseDiff(oldCourse, version);
+
+			return View("Diagnostics", new DiagnosticsModel
+			{
+				CourseId = courseId,
+				IsDiagnosticsForVersion = true,
+				IsVersionPublished = true,
+				VersionId = versionId,
+				CourseDiff = courseDiff,
+			});
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> DeleteVersion(string courseId, Guid versionId)
+		{
+			/* Remove information from database */
+			await coursesRepo.DeleteCourseVersion(courseId, versionId);
+
+			/* Delete zip-archive from file system */
+			courseManager.GetCourseVersionFile(versionId).Delete();
+
+			return RedirectToAction("Packages", new { courseId });
 		}
 	}
 
@@ -315,6 +398,8 @@ namespace uLearn.Web.Controllers
 		public string CourseId { get; set; }
 		public bool HasPackage { get; set; }
 		public DateTime LastUpdate { get; set; }
+		public List<CourseVersion> Versions { get; set; }
+		public CourseVersion PublishedVersion { get; set; }
 	}
 
 	public class AdminCommentsViewModel
@@ -324,5 +409,15 @@ namespace uLearn.Web.Controllers
 		public CommentModerationPolicy ModerationPolicy { get; set; }
 		public bool OnlyInstructorsCanReply { get; set; }
 		public List<CommentViewModel> Comments { get; set; }
+	}
+
+	public class DiagnosticsModel
+	{
+		public string CourseId { get; set; }
+
+		public bool IsDiagnosticsForVersion { get; set; }
+		public bool IsVersionPublished { get; set; }
+		public Guid VersionId { get; set; }
+		public CourseDiff CourseDiff { get; set; }
 	}
 }

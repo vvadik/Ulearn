@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 // ReSharper disable once CheckNamespace
 namespace System.Linq
@@ -33,6 +34,11 @@ namespace System.Linq
 			}
 		}
 
+		public static IEnumerable<TSource> NotOfType<TSource, TSearch>(this IEnumerable<TSource> enumerable)
+		{
+			return enumerable.Where(item => !(item is TSearch));
+		}
+		
 		///<summary>Finds the index of the first item matching an expression in an enumerable.</summary>
 		///<param name="items">The enumerable to search.</param>
 		///<param name="predicate">The expression to test the items against.</param>

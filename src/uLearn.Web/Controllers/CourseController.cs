@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
-using System.ServiceModel.Configuration;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -25,7 +24,6 @@ namespace uLearn.Web.Controllers
 		private readonly UnitsRepo unitsRepo = new UnitsRepo();
 		private readonly VisitsRepo visitsRepo = new VisitsRepo(); 
 		private readonly LtiRequestsRepo ltiRequestsRepo = new LtiRequestsRepo();
-		private readonly CommentsRepo commentsRepo = new CommentsRepo();
 
 		public CourseController()
 			: this(WebCourseManager.Instance)

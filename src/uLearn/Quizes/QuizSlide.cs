@@ -10,11 +10,14 @@ namespace uLearn.Quizes
 		{
 			MaxDropCount = quiz.MaxDropCount;
 			MaxScore = Blocks.Count(block => block is AbstractQuestionBlock);
+			QuizNormalizedXml = quiz.NormalizedXml;
 		}
 
 		public override bool ShouldBeSolved { get { return true; } }
 
 		public int MaxDropCount { get; private set; }
+
+		public string QuizNormalizedXml { get; private set; }
 
 		public AbstractQuestionBlock GetBlockById(string id)
 		{

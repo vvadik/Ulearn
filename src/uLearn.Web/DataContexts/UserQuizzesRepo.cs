@@ -24,13 +24,16 @@ namespace uLearn.Web.DataContexts
 
 		public async Task<UserQuiz> AddUserQuiz(string courseId, bool isRightAnswer, string itemId, string quizId, Guid slideId, string text, string userId, DateTime time, bool isRightQuizBlock)
 		{
+			var quizzesRepo = new QuizzesRepo(db);
+			var currentQuizVersion = quizzesRepo.GetLastQuizVersion(courseId, slideId);
 			var userQuiz = new UserQuiz
 			{
 				CourseId = courseId,
+				SlideId = slideId,
+				QuizVersionId = currentQuizVersion.Id,
 				IsRightAnswer = isRightAnswer,
 				ItemId = itemId,
 				QuizId = quizId,
-				SlideId = slideId,
 				Text = text,
 				Timestamp = time,
 				UserId = userId,
@@ -59,25 +62,16 @@ namespace uLearn.Web.DataContexts
 			return new HashSet<Guid>(db.UserQuizzes.Where(x => x.CourseId == courseId && x.UserId == userId).Select(x => x.SlideId).Distinct());
 		}
 
-		public Dictionary<string, List<string>> GetAnswersForShowOnSlide(string courseId, QuizSlide slide, string userId)
+		public Dictionary<string, List<UserQuiz>> GetAnswersForShowOnSlide(string courseId, QuizSlide slide, string userId)
 		{
 			if (slide == null)
 				return null;
-			var answer = new Dictionary<string, List<string>>();
+			var answer = new Dictionary<string, List<UserQuiz>>();
 			foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
 			{
 				var ans = db.UserQuizzes
 					.Where(x => x.UserId == userId && x.SlideId == slide.Id && x.QuizId == block.Id && !x.isDropped).ToList();
-				if (block is ChoiceBlock)
-					answer[block.Id] = ans.Select(x => x.ItemId).ToList();
-				else if (block is IsTrueBlock)
-					answer[block.Id] = ans.Select(x => x.Text).ToList();
-				else if(block is FillInBlock)
-					answer[block.Id] = new List<string>
-					{
-						ans.Select(x => x.Text).FirstOrDefault(),
-						ans.Select(x => x.IsRightAnswer).FirstOrDefault().ToString()
-					};
+				answer[block.Id] = ans;
 			}
 			return answer;
 		}

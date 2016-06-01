@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
@@ -26,10 +28,17 @@ namespace uLearn.Quizes
 		[XmlElement("isTrue", Type = typeof(IsTrueBlock))]
 		[XmlElement("choice", Type = typeof(ChoiceBlock))]
 		[XmlElement("fillIn", Type = typeof(FillInBlock))]
+		[XmlElement("ordering", Type = typeof(OrderingBlock))]
+		[XmlElement("matching", Type = typeof(MatchingBlock))]
 		public SlideBlock[] Blocks
 		{
 			get { return blocks ?? new SlideBlock[0]; }
 			set { blocks = value; }
+		}
+
+		public string NormalizedXml
+		{
+			get { return this.XmlSerialize(true); }
 		}
 
 		public void Validate()
@@ -43,6 +52,29 @@ namespace uLearn.Quizes
 			{
 				throw new FormatException("QuizId=" + Id, e);
 			}
+		}
+
+		public bool HasEqualStructureWith(Quiz other)
+		{
+			if (Blocks.Length != other.Blocks.Length)
+				return false;
+			for (var blockIdx = 0; blockIdx < Blocks.Length; blockIdx++)
+			{
+				var block = Blocks[blockIdx];
+				var otherBlock = other.Blocks[blockIdx];
+				var questionBlock = block as AbstractQuestionBlock;
+				var otherQuestionBlock = otherBlock as AbstractQuestionBlock;
+				/* Ignore non-question blocks */
+				if (questionBlock == null)
+					continue;
+				/* If our block is question, block in other slide must be question with the same Id */
+				if (otherQuestionBlock == null || questionBlock.Id != otherQuestionBlock.Id)
+					return false;
+
+				if (! questionBlock.HasEqualStructureWith(otherQuestionBlock))
+					return false;
+			}
+			return true;
 		}
 	}
 	
@@ -61,6 +93,8 @@ namespace uLearn.Quizes
 		{
 			return Text;
 		}
+
+		public abstract bool HasEqualStructureWith(SlideBlock other);
 	}
 
 	public class ChoiceBlock : AbstractQuestionBlock
@@ -113,6 +147,19 @@ namespace uLearn.Quizes
 		{
 			return Text + '\n' + string.Join("\n", Items.Select(item => item.GetText()));
 		}
+
+		public override bool HasEqualStructureWith(SlideBlock other)
+		{
+			var block = other as ChoiceBlock;
+			if (block == null)
+				return false;
+			if (Items.Length != block.Items.Length || Multiple != block.Multiple)
+				return false;
+
+			var idsSet = Items.Select(i => i.Id).ToImmutableHashSet();
+			var blockIdsSet = block.Items.Select(i => i.Id).ToImmutableHashSet();
+			return idsSet.SetEquals(blockIdsSet);
+		}
 	}
 
 	public class IsTrueBlock : AbstractQuestionBlock
@@ -151,6 +198,14 @@ namespace uLearn.Quizes
 		public override string TryGetText()
 		{
 			return Text + '\n' + Explanation;
+		}
+
+		public override bool HasEqualStructureWith(SlideBlock other)
+		{
+			var block = other as IsTrueBlock;
+			if (block == null)
+				return false;
+			return Answer == block.Answer;
 		}
 	}
 
@@ -191,6 +246,113 @@ namespace uLearn.Quizes
 		{
 			return Text + '\n' + Sample + '\t' + Explanation;
 		}
+
+		public override bool HasEqualStructureWith(SlideBlock other)
+		{
+			return other is FillInBlock;
+		}
+	}
+
+	public class OrderingBlock : AbstractQuestionBlock
+	{
+		[XmlElement("item")]
+		public OrderingItem[] Items;
+
+		[XmlElement("explanation")]
+		public string Explanation;
+
+		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+		{
+			throw new NotImplementedException();
+		}
+
+		public OrderingItem[] ShuffledItems()
+		{
+			return Items.Shuffle().ToArray();
+		}
+
+		public override bool HasEqualStructureWith(SlideBlock other)
+		{
+			var block = other as OrderingBlock;
+			if (block == null)
+				return false;
+			return Items.SequenceEqual(block.Items);
+		}
+	}
+
+	public class MatchingBlock : AbstractQuestionBlock
+	{
+		[XmlAttribute("shuffleFixed")]
+		public bool ShuffleFixed;
+
+		[XmlElement("explanation")]
+		public string Explanation;
+
+		[XmlElement("match")]
+		public MatchingMatch[] Matches;
+
+		private readonly Random random = new Random();
+
+		public List<MatchingMatch> GetMatches(bool shuffle=false)
+		{
+			if (shuffle)
+				return Matches.Shuffle(random).ToList();
+
+			return Matches.ToList();
+		}
+
+		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override bool HasEqualStructureWith(SlideBlock other)
+		{
+			var block = other as MatchingBlock;
+			if (block == null)
+				return false;
+			if (Matches.Length != block.Matches.Length)
+				return false;
+			var idsSet = Matches.Select(m => m.Id).ToImmutableHashSet();
+			var blockIdsSet = block.Matches.Select(m => m.Id).ToImmutableHashSet();
+			return idsSet.SetEquals(blockIdsSet);
+		}
+	}
+
+	public class OrderingItem
+	{
+		[XmlAttribute("id")]
+		public string Id;
+
+		[XmlText]
+		public string Text;
+
+		public string GetHash()
+		{
+			return (Id + "OrderingItemSalt").GetHashCode().ToString();
+		}
+	}
+
+	public class MatchingMatch
+	{
+		[XmlAttribute("id")]
+		public string Id;
+
+		[XmlElement("fixed")]
+		public string FixedItem;
+
+		[XmlElement("movable")]
+		public string MovableItem;
+
+		public string GetHashForFixedItem()
+		{
+			return (Id + "MatchingItemFixedItemSalt").GetHashCode().ToString();
+		}
+
+		public string GetHashForMovableItem()
+		{
+			return (Id + "MatchingItemMovableItemSalt").GetHashCode().ToString();
+		}
 	}
 
 	public class RegexInfo
@@ -229,3 +391,4 @@ namespace uLearn.Quizes
 		}
 	}
 }
+
