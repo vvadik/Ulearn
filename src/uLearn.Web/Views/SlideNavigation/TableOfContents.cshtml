@@ -5,22 +5,7 @@
 @model TocModel
 
 <div class="side-bar navbar-collapse collapse navbar-nav container">
-
-	@if (User.HasAccessFor(Model.Course.Id, CourseRole.CourseAdmin))
-	{
-		var currentUrl = Request.Url;
-		if (currentUrl != null)
-		{
-			<div>
-				@using (Html.BeginForm("ReloadCourse", "Admin", new { courseId = Model.Course.Id, returnUrl = currentUrl }, FormMethod.Post))
-				{
-					<button type="submit" class="btn btn-sm btn-danger">reload course</button>
-					<span class="text-muted">← видно только админам</span>
-				}
-			</div>
-		}
-	}
-
+	
 	@Toc(Model)
 
 	@if (Model.NextUnitTime < DateTime.MaxValue)

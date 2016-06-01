@@ -92,6 +92,7 @@
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="CommentAfterExerciseIsSolved.cs" />
     <Compile Include="Course.cs" />
+    <Compile Include="CourseDiff.cs" />
     <Compile Include="CourseLoader.cs" />
     <Compile Include="CourseSettings.cs" />
     <Compile Include="CourseManager.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="CSharp\ICSharpSolutionValidator.cs" />
     <Compile Include="FileExtensions.cs" />
     <Compile Include="ISlideLoader.cs" />
+    <Compile Include="LruCache.cs" />
     <Compile Include="Model\Blocks\CodeBlock.cs" />
     <Compile Include="Model\Blocks\ExerciseBlock.cs" />
     <Compile Include="Model\Blocks\ImageGaleryBlock.cs" />

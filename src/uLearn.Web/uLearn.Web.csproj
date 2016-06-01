@@ -280,6 +280,8 @@
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
     <Compile Include="DataContexts\CommentsRepo.cs" />
+    <Compile Include="DataContexts\CoursesRepo.cs" />
+    <Compile Include="DataContexts\QuizzesRepo.cs" />
     <Compile Include="DataContexts\ULearnUserManager.cs" />
     <Compile Include="DataContexts\UsersRepo.cs" />
     <Compile Include="DateTimeExtensions.cs" />
@@ -304,10 +306,24 @@
     <Compile Include="Migrations\201603230005459_SlideIdIsGuid.Designer.cs">
       <DependentUpon>201603230005459_SlideIdIsGuid.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201604210836401_AddQuizVersions.cs" />
+    <Compile Include="Migrations\201604210836401_AddQuizVersions.Designer.cs">
+      <DependentUpon>201604210836401_AddQuizVersions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604280922514_AddCourseVersions.cs" />
+    <Compile Include="Migrations\201604280922514_AddCourseVersions.Designer.cs">
+      <DependentUpon>201604280922514_AddCourseVersions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201605310807254_Empty.cs" />
+    <Compile Include="Migrations\201605310807254_Empty.Designer.cs">
+      <DependentUpon>201605310807254_Empty.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\CommentLike.cs" />
     <Compile Include="Models\CommentPolicy.cs" />
     <Compile Include="Models\CommentViewModel.cs" />
+    <Compile Include="Models\CourseVersion.cs" />
+    <Compile Include="Models\QuizVersion.cs" />
     <Compile Include="Models\UserSearchQueryModel.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\QuestionsController.cs" />
@@ -702,6 +718,15 @@
     <EmbeddedResource Include="Migrations\201603230005459_SlideIdIsGuid.resx">
       <DependentUpon>201603230005459_SlideIdIsGuid.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604210836401_AddQuizVersions.resx">
+      <DependentUpon>201604210836401_AddQuizVersions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604280922514_AddCourseVersions.resx">
+      <DependentUpon>201604280922514_AddCourseVersions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605310807254_Empty.resx">
+      <DependentUpon>201605310807254_Empty.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="codemirror\addon\comment\comment.js" />
@@ -1005,6 +1030,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="codemirror\README.md" />
     <Content Include="Courses.Staging\Web.config" />
+    <Content Include="Courses.Versions\Web.config" />
     <Content Include="Content\fonts\fontawesome-webfont.eot" />
     <Content Include="Content\fonts\fontawesome-webfont.ttf" />
     <Content Include="Content\fonts\fontawesome-webfont.woff" />
@@ -1059,6 +1085,7 @@
     <Content Include="Properties\webjobs-list.json" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\buttons.js" />
+    <Content Include="Scripts\jquery-ui.min.js" />
     <Content Include="Scripts\jquery.color-2.1.0.min.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />

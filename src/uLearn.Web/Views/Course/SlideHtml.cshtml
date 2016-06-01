@@ -90,12 +90,14 @@
 @helper Block(YoutubeBlock block, BlockRenderContext context)
 {
 	<div class="video-container">
-		<iframe class="embedded-video" width="864" height="480" src="https://www.youtube.com/embed/@block.VideoId" allowfullscreen></iframe>
+		<iframe class="embedded-video" width="864" height="480" src="https://www.youtube.com/embed/@block.VideoId" frameborder="0" allowfullscreen></iframe>
 	</div>
 	<div>
-		<a href="javascript://" class="popover-trigger"
+		<a href="javascript://" class="popover-trigger pull-right"
 		   title="Как ускорить видео?"
-		   data-content="Если по иконке с шестеренкой нет возможности ускорить видео, то вам нужно &lt;a target='blank' href='http://youtube.com/html5'>вручную включить&lt;/a> использование HTML5-плеера.">
+		   data-content="Если по иконке с шестеренкой нет возможности ускорить видео, то вам нужно &lt;a target='blank' href='http://youtube.com/html5'>вручную включить&lt;/a> использование HTML5-плеера."
+		   data-placement="left">
+			<span class="glyphicon glyphicon-question-sign"></span>
 			Как ускорить видео?
 		</a>
 	</div>
@@ -134,7 +136,7 @@
 	var classString = context.IsGuest ? "code-guest" : "code-exercise";
 	<textarea id="secretCodeExercise" class="hide">@block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
 	<textarea class="code @classString" data-lang="@block.LangId">@(data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
-	<script>
+	<script type="text/javascript">
 		function cleanUserCode() {
 			var $secretCodeExercise = $('#secretCodeExercise');
 			$('.code-exercise')[0].codeMirrorEditor.setValue($secretCodeExercise.text());
@@ -206,7 +208,7 @@
 		{
 			var item = items[itemIndex];
 			var id = isMultiply ? itemIndex + "noMult" : model.BlockIndex.ToString();
-			var itemChecked = model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].Contains(item.Id);
+			var itemChecked = model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].Select(x => x.ItemId).Contains(item.Id);
 			var ans = itemChecked ? "checked" : "";
 			var itemClass = "";
 			var title = "";
@@ -240,9 +242,11 @@
 	QuizBlockData model = context.GetBlockData(block) ?? new QuizBlockData(new QuizModel(), 1, QuizState.NotPassed);
 	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
 	{
-		value = model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault();
+		var answers = model.QuizModel.AnswersToQuizes[block.Id];
+		var userAnswer = answers.FirstOrDefault();
+		value = userAnswer.Text;
 		quizRes = (model.QuizState == QuizState.Total)
-			? (model.QuizModel.AnswersToQuizes[block.Id][1] == "False" ? "wrong-quiz" : "right-quiz") : "";
+			? (userAnswer.IsRightAnswer ? "right-quiz" : "wrong-quiz") : "";
 	}
 	var sample = block.Sample;
 	<div class="quiz quiz-block-input">
@@ -271,7 +275,7 @@
 	QuizBlockData model = context.GetBlockData(block) ?? new QuizBlockData(new QuizModel(), 1, QuizState.NotPassed);
 	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
 	{
-		var userAnswer = model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() == "True";
+		var userAnswer = model.QuizModel.AnswersToQuizes[block.Id].Select(x => x.Text).FirstOrDefault() == "True";
 		tchecked = userAnswer ? "checked" : "";
 		fchecked = userAnswer ? "" : "checked";
 		if (model.QuizState == QuizState.Total)
@@ -306,6 +310,125 @@
 				<i class="glyphicon glyphicon-ok" style="color: green" title="@ftitle"></i>
 			}
 		</div>
+	</div>
+	if (model.QuizState == QuizState.Total && !string.IsNullOrEmpty(block.Explanation))
+	{
+		<div class="text-muted">@block.Explanation</div>
+	}
+}
+
+@helper QuizBlock(OrderingBlock block, BlockRenderContext context)
+{
+	var items = block.ShuffledItems();
+	var correctItems = block.Items;
+	QuizBlockData model = context.GetBlockData(block) ?? new QuizBlockData(new QuizModel(), 1, QuizState.NotPassed);
+	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
+	{
+		var userAnswers = model.QuizModel.AnswersToQuizes[block.Id].Select(x => x.ItemId).ToList();
+		items = items.OrderBy(item => userAnswers.IndexOf(item.GetHash())).ToArray();
+	}
+	<div class="quiz-block-ordering @(model.QuizState != QuizState.NotPassed ? "not-movable" : "")" id='@(block.Id + "_quizBlock")'>
+		@if (model.QuizState == QuizState.Total)
+		{
+			<div class="quiz-block-ordering__correct-description row">
+				<div class="text-success col-sm-5 col-sm-offset-6">Правильный ответ</div>
+			</div>
+		}
+		<ul>
+			@for (var itemIndex = 0; itemIndex < items.Length; itemIndex++)
+			{
+				var item = items[itemIndex];
+				<li class="row">
+					<div class="quiz quiz-block-ordering__item col-xs-12 col-sm-5" data-item-id="@item.GetHash()">
+						@if (model.QuizState == QuizState.NotPassed)
+						{
+							<div class="quiz-block-ordering__item__icons">
+								<span class="glyphicon glyphicon-arrow-up"></span>
+								<span class="glyphicon glyphicon-arrow-down"></span>
+							</div>
+						}
+						<input autocomplete="off" id='@(block.Id + "quizBlock" + item.GetHash())' type="hidden">
+						<div class="text">@item.Text.RenderTex()</div>
+					</div>
+					@if (model.QuizState == QuizState.Total)
+					{
+						var correctItem = correctItems[itemIndex];
+						<div class="quiz-block-ordering__item correct col-xs-12 col-sm-offset-1 col-sm-5">
+							@correctItem.Text.RenderTex()
+						</div>
+					}
+				</li>
+			}
+		</ul>
+	</div>
+	if (model.QuizState == QuizState.Total && !string.IsNullOrEmpty(block.Explanation))
+	{
+		<div class="text-muted">@block.Explanation</div>
+	}
+}
+
+@helper QuizBlock(MatchingBlock block, BlockRenderContext context)
+{
+	var fixedItems = block.GetMatches(block.ShuffleFixed);
+	var movableItems = block.GetMatches(true);
+
+	QuizBlockData model = context.GetBlockData(block) ?? new QuizBlockData(new QuizModel(), 1, QuizState.NotPassed);
+	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
+	{
+		var userAnswers = model.QuizModel.AnswersToQuizes[block.Id];
+		fixedItems = block.GetMatches().OrderBy(item => userAnswers.FindIndex(answer => item.GetHashForFixedItem() == answer.ItemId)).ToList();
+		movableItems = GetMovableItemsAccordingToUserAnswers(userAnswers, fixedItems);
+	}
+	<div class="quiz-block-matching @(model.QuizState != QuizState.NotPassed ? "not-movable" : "")" id='@(block.Id + "_quizBlock")'>
+		@if (model.QuizState == QuizState.NotPassed)
+		{
+			<div class="quiz-block-matching__description text-muted">Перетащите элементы из правого столбца на свободные места</div>
+		}
+		@if (model.QuizState == QuizState.Total)
+		{
+			<div class="quiz-block-matching__correct-description row">
+				<div class="text-muted col-sm-3 col-sm-offset-3">Ваш вариант</div>
+				<div class="text-success col-sm-3 col-sm-offset-1">Правильный вариант</div>
+			</div>
+		}
+		<ul>
+			@for (var itemIndex = 0; itemIndex < fixedItems.Count; itemIndex++)
+			{
+				var fixedItem = fixedItems[itemIndex];
+				var movableItem = movableItems[itemIndex];
+				var isRightClass = "";
+				if (model.QuizState == QuizState.Total)
+				{
+					isRightClass = fixedItem.Id == movableItem.Id ? "right" : "wrong";
+				}
+				<li>
+					<div class="quiz quiz-block-matching__item @isRightClass row">
+						<input autocomplete="off" id='@(block.Id + "quizBlock" + fixedItem.GetHashForFixedItem())' type="hidden">
+						<div class="quiz-block-matching__fixed-item col-xs-3" data-item-id="@fixedItem.GetHashForFixedItem()">@fixedItem.FixedItem.RenderTex()</div>
+						@if (model.QuizState == QuizState.NotPassed)
+						{
+							<div class="quiz-block-matching__droppable col-xs-3" data-block-id="@block.Id" data-item-id="@fixedItem.GetHashForFixedItem()"></div>
+							<div class="quiz-block-matching__source__droppable col-xs-3 col-sm-offset-1 added" data-block-id="@block.Id" data-movable-item-id="@movableItem.GetHashForMovableItem()">
+								<div class="quiz-block-matching__movable-item" data-block-id="@block.Id" data-item-id="@movableItem.GetHashForMovableItem()">@movableItem.MovableItem.RenderTex()</div>
+							</div>
+						}
+						else
+						{
+							<div class="quiz-block-matching__droppable col-xs-3 added" data-block-id="@block.Id" data-item-id="@fixedItem.GetHashForFixedItem()">
+								<div class="quiz-block-matching__movable-item" data-block-id="@block.Id" data-item-id="@movableItem.GetHashForMovableItem()">@movableItem.MovableItem.RenderTex()</div>
+							</div>
+							if (model.QuizState == QuizState.Total)
+							{
+								<div class="quiz-block-matching__fixed-item correct col-xs-3 col-sm-offset-1">
+									@fixedItem.MovableItem.RenderTex()
+								</div>
+							}
+						}
+						
+					</div>
+				</li>
+			}
+		</ul>
 	</div>
 	if (model.QuizState == QuizState.Total && !string.IsNullOrEmpty(block.Explanation))
 	{
@@ -383,4 +506,18 @@
 	{
 		return isGuest ? "disabled" : null;
 	}
+
+	private static List<MatchingMatch> GetMovableItemsAccordingToUserAnswers(List<UserQuiz> userAnswers, List<MatchingMatch> fixedItems)
+	{
+		var movableItems = new List<MatchingMatch>();
+		foreach (var fixedItem in fixedItems)
+		{
+			var userAnswer = userAnswers.FirstOrDefault(answer => answer.ItemId == fixedItem.GetHashForFixedItem());
+			if (userAnswer == null)
+				continue;
+			movableItems.Add(fixedItems.FirstOrDefault(item => item.GetHashForMovableItem() == userAnswer.Text));
+		}
+		return movableItems;
+	}
+
 }

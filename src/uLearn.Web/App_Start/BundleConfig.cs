@@ -20,6 +20,7 @@ namespace uLearn.Web
 		{
 			return new ScriptBundle("~/main-js").Include(
 					"~/Scripts/jquery-{version}.js",
+					"~/Scripts/jquery-ui.min.js",
 					"~/Scripts/jquery.unobtrusive-ajax*",
 					"~/Scripts/notify-custom.min.js",
 					"~/Scripts/jquery.validate*",

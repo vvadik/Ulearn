@@ -10,7 +10,7 @@ namespace uLearn.Web.Models
 
 		public QuizSlide Slide { get; set; }
 		public QuizState QuizState { get; set; }
-		public Dictionary<string, List<string>> AnswersToQuizes { get; set; }
+		public Dictionary<string, List<UserQuiz>> AnswersToQuizes { get; set; }
 		public Dictionary<string, bool> ResultsForQuizes { get; set; }
 		public int TryNumber { get; set; }
 		public int MaxDropCount { get; set; }

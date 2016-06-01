@@ -17,7 +17,7 @@ namespace uLearn
 			Directory = directory;
 		}
 
-		public string Id { get; private set; }
+		public string Id { get; set; }
 		public string Title { get; private set; }
 		public Slide[] Slides { get; private set; }
 		public InstructorNote[] InstructorNotes { get; private set; }
