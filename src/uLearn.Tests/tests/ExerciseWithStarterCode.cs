@@ -3,7 +3,7 @@ using uLearn.CSharp;
 
 namespace uLearn.tests
 {
-	[Slide("title", "id")]
+	[Slide("title", "8abc175fee184226b45b180dc44f7aec")]
 	internal class ExerciseWithStarterCode
 	{
 		/*

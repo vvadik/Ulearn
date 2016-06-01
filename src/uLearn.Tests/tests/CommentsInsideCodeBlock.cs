@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace uLearn.tests
 {
-	[Slide("title", "id")]
+	[Slide("title", "8abc175fee184226b45b180dc44f7aec")]
 	internal class CommentsInsideCodeBlock
 	{
 		[ShowBodyOnSlide]
 		public void DoSample()
 		{
-//			Not a block!
+			//			Not a block!
 
 			/*
 			Not a block too
@@ -25,7 +21,7 @@ namespace uLearn.tests
 			/*
 			Not a block again
 			*/
-			
+
 		}
 		public class C2
 		{

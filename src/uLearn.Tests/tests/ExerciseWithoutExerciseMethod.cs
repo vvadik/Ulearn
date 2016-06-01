@@ -1,9 +1,8 @@
-﻿using System;
-using uLearn.CSharp;
+﻿using uLearn.CSharp;
 
 namespace uLearn.tests
 {
-	[Slide("title", "id")]
+	[Slide("title", "8abc175fee184226b45b180dc44f7aec")]
 	internal class ExerciseWithoutExerciseMethod
 	{
 		[ExpectedOutput("42")]
@@ -13,7 +12,7 @@ namespace uLearn.tests
 		}
 	}
 
-	
+
 	[Exercise]
 	class MyClass
 	{
