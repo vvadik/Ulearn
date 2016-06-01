@@ -25,6 +25,10 @@
 			{
 				<p>Для этого слайда больше нет непроверенных работ</p>
 			}
+			@if (Model.Message == "time_is_over")
+			{
+				<p>Время проверки работы вышло. Выберите другую</p>
+			}
 		</div>
 	}
 
@@ -59,12 +63,12 @@
 					</p>
 					if (check.IsLockedBy(User.Identity))
 					{
-						 @Html.ActionLink("Вернуться к проверке →", "Check", new { id = check.Id }, new { @class = "btn btn-sm btn-primary" })
+						@Html.ActionLink("Вернуться к проверке →", "CheckQuiz", new { id = check.Id }, new { @class = "btn btn-sm btn-primary" })
 					}
 				}
 				else
 				{
-					@Html.ActionLink("Перейти к проверке →", "Check", new { id = check.Id }, new { @class = "btn btn-sm btn-success" })
+					@Html.ActionLink("Перейти к проверке →", "CheckQuiz", new { id = check.Id }, new { @class = "btn btn-sm btn-success" })
 				}
 			</div>
 			<hr/>

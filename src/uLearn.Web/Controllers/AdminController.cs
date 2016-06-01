@@ -230,13 +230,13 @@ namespace uLearn.Web.Controllers
 				Message = message,
 			});
 		}
-		
-		public async Task<ActionResult> Check(int id, bool _ignoreLock=false)
+
+		private async Task<ActionResult> InternalCheckQuiz(int queueItemId, bool ignoreLock = false)
 		{
 			ManualQuizCheckQueueItem quizCheckQueueItem;
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				quizCheckQueueItem = userQuizzesRepo.GetManualQuizCheckQueueItemById(id);
+				quizCheckQueueItem = userQuizzesRepo.GetManualQuizCheckQueueItemById(queueItemId);
 				if (!User.HasAccessFor(quizCheckQueueItem.CourseId, CourseRole.Instructor))
 					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 				if (quizCheckQueueItem.IsChecked)
@@ -246,7 +246,7 @@ namespace uLearn.Web.Controllers
 							courseId = quizCheckQueueItem.CourseId,
 							message = "already_checked"
 						});
-				if (quizCheckQueueItem.IsLocked && ! _ignoreLock && ! quizCheckQueueItem.IsLockedBy(User.Identity))
+				if (quizCheckQueueItem.IsLocked && !ignoreLock && !quizCheckQueueItem.IsLockedBy(User.Identity))
 					return RedirectToAction("ManualQuizChecksQueue",
 							new
 							{
@@ -265,8 +265,13 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
+		public async Task<ActionResult> CheckQuiz(int id)
+		{
+			return await InternalCheckQuiz(id);
+		}
+
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public async Task<ActionResult> CheckSlide(string courseId, Guid slideId)
+		public async Task<ActionResult> CheckNextQuizForSlide(string courseId, Guid slideId)
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
@@ -274,12 +279,15 @@ namespace uLearn.Web.Controllers
 				var itemToCheck = queueItems.FirstOrDefault(i => i.LockedById == null);
 				if (itemToCheck == null)
 					return RedirectToAction("ManualQuizChecksQueue", new { courseId = courseId, message = "slide_checked" });
+				
+				if (itemToCheck.CourseId != courseId)
+					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 				await userQuizzesRepo.LockManualQuizCheckQueueItem(itemToCheck, User.Identity.GetUserId());
 
 				transaction.Commit();
 
-				return await Check(itemToCheck.Id, true);
+				return await InternalCheckQuiz(itemToCheck.Id, true);
 			}
 		}
 

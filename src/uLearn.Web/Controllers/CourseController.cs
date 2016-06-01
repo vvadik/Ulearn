@@ -68,7 +68,7 @@ namespace uLearn.Web.Controllers
 				queueItem = userQuizzesRepo.GetManualQuizCheckQueueItemById(checkQueueItemId.Value);
 				/* If lock time is finished or some mistake happened */
 				if (!queueItem.IsLockedBy(User.Identity))
-					return RedirectToAction("ManualQuizChecksQueue", "Admin", new { CourseId = courseId });
+					return RedirectToAction("ManualQuizChecksQueue", "Admin", new { CourseId = courseId, message = "time_is_over" });
 			}
 			var model = isGuest ?
 				CreateGuestCoursePageModel(courseId, slideGuid, visibleUnits) :
