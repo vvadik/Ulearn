@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,22 +19,33 @@ namespace uLearn
 		}
 
 		public string Id { get; set; }
-		public string Title { get; private set; }
-		public Slide[] Slides { get; private set; }
-		public InstructorNote[] InstructorNotes { get; private set; }
+		public string Title { get; }
+		public Slide[] Slides { get; }
+		public InstructorNote[] InstructorNotes { get; }
 		public CourseSettings Settings { get; private set; }
 		public DirectoryInfo Directory { get; private set; }
 
 		public string GetDirectoryByUnitName(string unitName)
 		{
-			return Slides.First(x => x.Info.UnitName == unitName).Info.SlideFile.Directory.FullName;
+			return Slides.First(x => x.Info.UnitName == unitName).Info.Directory.FullName;
 		}
 
-		public Slide GetSlideById(Guid slideId)
+		[CanBeNull]
+		public Slide FindSlideById(Guid slideId)
 		{
 			return Slides.FirstOrDefault(x => x.Id == slideId);
 		}
-		
+
+		[NotNull]
+		public Slide GetSlideById(Guid slideId)
+		{
+			var slide = Slides.FirstOrDefault(x => x.Id == slideId);
+			if (slide == null)
+				throw new Exception($"No slide with id {slideId}");
+			return slide;
+		}
+
+		[CanBeNull]
 		public Slide FindSlide(int index)
 		{
 			return index >= 0 && index < Slides.Length ? Slides[index] : null;

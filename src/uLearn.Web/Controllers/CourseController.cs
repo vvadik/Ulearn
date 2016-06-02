@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -22,7 +22,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly UnitsRepo unitsRepo = new UnitsRepo();
-		private readonly VisitsRepo visitsRepo = new VisitsRepo(); 
+		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly LtiRequestsRepo ltiRequestsRepo = new LtiRequestsRepo();
 
 		public CourseController()
@@ -54,7 +54,6 @@ namespace uLearn.Web.Controllers
 				if (course == null)
 					return HttpNotFound();
 				var slide = course.GetSlideById(slideGuid);
-
 				return RedirectToRoute("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
 			}
 
@@ -76,7 +75,7 @@ namespace uLearn.Web.Controllers
 			if (slideIndex == -1)
 				slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
 			var slide = course.Slides[slideIndex];
-			return RedirectToRoute("Course.SlideById", new { courseId=courseId, slideId=slide.Url });
+			return RedirectToRoute("Course.SlideById", new { courseId, slideId = slide.Url });
 		}
 
 		public async Task<ActionResult> LtiSlide(string courseId, int slideIndex)
@@ -104,7 +103,7 @@ namespace uLearn.Web.Controllers
 					SlideIndex = slideIndex,
 					SlideId = exerciseSlide.Id,
 					ExerciseBlock = exerciseSlide.Exercise,
-					Context = CreateRenderContext(course, exerciseSlide, userId, visiter, true)
+					Context = CreateRenderContext(course, exerciseSlide, visiter, true)
 				};
 				return View("LtiExerciseSlide", model);
 			}
@@ -127,10 +126,8 @@ namespace uLearn.Web.Controllers
 		private string FindLtiRequestJson()
 		{
 			var user = User.Identity as ClaimsIdentity;
-			if (user == null)
-				return null;
-			var claim = user.Claims.FirstOrDefault(c => c.Type.Equals("LtiRequest"));
-			return claim == null ? null : claim.Value;
+			var claim = user?.Claims.FirstOrDefault(c => c.Type.Equals("LtiRequest"));
+			return claim?.Value;
 		}
 
 		private int GetInitialIndexForStartup(string courseId, Course course, List<string> visibleUnits)
@@ -187,7 +184,6 @@ namespace uLearn.Web.Controllers
 			}
 			else
 				slide = course.GetSlideById(slideId);
-
 			var exerciseBlockData = new ExerciseBlockData(false, false);
 			return new CoursePageModel
 			{
@@ -197,12 +193,11 @@ namespace uLearn.Web.Controllers
 				Slide = slide,
 				Score = Tuple.Create(0, 0),
 				BlockRenderContext = new BlockRenderContext(
-					course, 
-					slide, 
-					slide.Info.DirectoryRelativePath, 
+					course,
+					slide,
+					slide.Info.DirectoryRelativePath,
 					slide.Blocks.Select(block => block is ExerciseBlock ? exerciseBlockData : (dynamic)null).ToArray(),
-					true,
-					false),
+					true),
 				IsGuest = true,
 			};
 		}
@@ -233,13 +228,13 @@ namespace uLearn.Web.Controllers
 				Slide = slide,
 				Rate = GetRate(course.Id, slideId),
 				Score = score,
-				BlockRenderContext = CreateRenderContext(course, slide, userId, visiter),
+				BlockRenderContext = CreateRenderContext(course, slide, visiter),
 				IsGuest = false,
 			};
 			return model;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, string userId, Visit visit, bool isLti = false)
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, Visit visit, bool isLti = false)
 		{
 			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visit, isLti)).ToArray();
 			return new BlockRenderContext(
@@ -280,9 +275,9 @@ namespace uLearn.Web.Controllers
 			foreach (var solution in solutions)
 			{
 				solution.LikedAlready = solution.UsersWhoLike.Any(u => u == userId);
-				solution.RemoveSolutionUrl = Url.Action("RemoveSolution", "Course", new { courseId = courseId, slideIndex = slide.Index, solutionId = solution.Id });
+				solution.RemoveSolutionUrl = Url.Action("RemoveSolution", "Course", new { courseId, slideIndex = slide.Index, solutionId = solution.Id });
 			}
-			
+
 			var model = new AcceptedSolutionsPageModel
 			{
 				CourseId = courseId,
@@ -388,7 +383,7 @@ namespace uLearn.Web.Controllers
 			await db.SaveChangesAsync();
 			return RedirectToAction("Slide", new { courseId, slideIndex = slide.Index });
 		}
-		
+
 		private static void RemoveFrom<T>(DbSet<T> dbSet, Guid slideId, string userId) where T : class, ISlideAction
 		{
 			dbSet.RemoveRange(dbSet.Where(s => s.UserId == userId && s.SlideId == slideId));

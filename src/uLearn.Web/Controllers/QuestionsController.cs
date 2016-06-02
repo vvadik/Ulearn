@@ -1,12 +1,12 @@
+using Microsoft.AspNet.Identity;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
-using System.Collections.Generic;
 
 namespace uLearn.Web.Controllers
 {
@@ -14,9 +14,9 @@ namespace uLearn.Web.Controllers
 	{
 		public UserQuestion Question { get; set; }
 		public Slide Slide { get; set; }
-		public string SlideTitle { get { return Slide != null ? Slide.Title : Question.SlideTitle; } }
+		public string SlideTitle => Slide != null ? Slide.Title : Question.SlideTitle;
 	}
-	
+
 	[ULearnAuthorize]
 	public class QuestionsController : Controller
 	{
@@ -28,7 +28,7 @@ namespace uLearn.Web.Controllers
 			: this(WebCourseManager.Instance)
 		{
 		}
-		
+
 		public QuestionsController(CourseManager courseManager)
 		{
 			this.courseManager = courseManager;
@@ -96,8 +96,9 @@ namespace uLearn.Web.Controllers
 				.Select(q => new QuestionViewModel
 				{
 					Question = q,
-					Slide = courseManager.GetCourse(q.CourseId).GetSlideById(q.SlideId)
+					Slide = courseManager.GetCourse(q.CourseId).FindSlideById(q.SlideId)
 				})
+				.Where(m => m.Slide != null)
 				.ToList();
 			return PartialView("Items", result);
 		}

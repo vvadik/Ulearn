@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
@@ -152,9 +151,9 @@ namespace uLearn.Web.Controllers
 		private Dictionary<DateTime, Tuple<int, int>> SumByDays(IQueryable<Visit> actions)
 		{
 			var q = from s in actions
-				group s by DbFunctions.TruncateTime(s.Timestamp)
+					group s by DbFunctions.TruncateTime(s.Timestamp)
 				into day
-				select new { day.Key, sum = day.Sum(v => v.Score), count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
+					select new { day.Key, sum = day.Sum(v => v.Score), count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
 			return q.ToDictionary(d => d.Key.Value, d => Tuple.Create(d.count, d.sum));
 		}
 
@@ -171,9 +170,9 @@ namespace uLearn.Web.Controllers
 		private Dictionary<DateTime, int> GroupByDays<T>(IQueryable<T> actions) where T : class, ISlideAction
 		{
 			var q = from s in actions
-				group s by DbFunctions.TruncateTime(s.Timestamp)
+					group s by DbFunctions.TruncateTime(s.Timestamp)
 				into day
-				select new { day.Key, count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
+					select new { day.Key, count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
 			return q.ToDictionary(d => d.Key.Value, d => d.count);
 		}
 
@@ -197,15 +196,15 @@ namespace uLearn.Web.Controllers
 			var courseId = course.Id;
 			var rates =
 				(from rate in db.SlideRates
-					where rate.CourseId == courseId
-					group rate by new { rate.SlideId, rate.Rate }
+				 where rate.CourseId == courseId
+				 group rate by new { rate.SlideId, rate.Rate }
 					into slideRate
-					select new
-					{
-						slideRate.Key.SlideId,
-						slideRate.Key.Rate,
-						count = slideRate.Count()
-					})
+				 select new
+				 {
+					 slideRate.Key.SlideId,
+					 slideRate.Key.Rate,
+					 count = slideRate.Count()
+				 })
 					.ToLookup(r => r.SlideId);
 			return slides.Select(s => new SlideRateStats
 			{
@@ -237,19 +236,19 @@ namespace uLearn.Web.Controllers
 				.Distinct()
 				.Join(db.Visits, s => s, v => v.UserId, (s, visiters) => visiters)
 				.Where(v => slideIds.Contains(v.SlideId))
-				.Select(v => new { v.UserId, v.User.UserName, v.User.GroupName, v.SlideId, v.IsPassed, v.Score, v.AttemptsCount})
+				.Select(v => new { v.UserId, v.User.UserName, v.User.GroupName, v.SlideId, v.IsPassed, v.Score, v.AttemptsCount })
 				.ToList();
 
 			var r = from v in dq
-				group v by new { v.UserId, v.UserName, v.GroupName }
+					group v by new { v.UserId, v.UserName, v.GroupName }
 				into u
-				select new UserInfo
-				{
-					UserId = u.Key.UserId,
-					UserName = u.Key.UserName,
-					UserGroup = u.Key.GroupName,
-					SlidesSlideInfo = GetSlideInfo(slides, u.Select(arg => Tuple.Create(arg.SlideId, arg.IsPassed, arg.Score, arg.AttemptsCount)))
-				};
+					select new UserInfo
+					{
+						UserId = u.Key.UserId,
+						UserName = u.Key.UserName,
+						UserGroup = u.Key.GroupName,
+						SlidesSlideInfo = GetSlideInfo(slides, u.Select(arg => Tuple.Create(arg.SlideId, arg.IsPassed, arg.Score, arg.AttemptsCount)))
+					};
 
 			return r;
 		}
@@ -288,7 +287,9 @@ namespace uLearn.Web.Controllers
 			var solutions = db.UserSolutions.Where(s => s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
 			var user = db.Users.Find(userId);
 			var course = courseManager.GetCourse(courseId);
-			var slide = (ExerciseSlide)course.GetSlideById(slideId);
+			var slide = (ExerciseSlide)course.FindSlideById(slideId);
+			if (slide == null)
+				return HttpNotFound($"No slide with id {slideId}");
 			var model = new UserSolutionsViewModel
 			{
 				User = user,

@@ -1,11 +1,11 @@
-﻿using System;
+﻿using RunCsJob.Api;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using RunCsJob.Api;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts
@@ -18,7 +18,7 @@ namespace uLearn.Web.DataContexts
 
 		public UserSolutionsRepo() : this(new ULearnDb())
 		{
-			
+
 		}
 
 		public UserSolutionsRepo(ULearnDb db)
@@ -85,7 +85,7 @@ namespace uLearn.Web.DataContexts
 			}
 			else
 			{
-				db.SolutionLikes.Add(new Like {UserSolutionId = solutionId, Timestamp = DateTime.Now, UserId = userId});
+				db.SolutionLikes.Add(new Like { UserSolutionId = solutionId, Timestamp = DateTime.Now, UserId = userId });
 				likesCount++;
 			}
 			await db.SaveChangesAsync();
@@ -98,12 +98,12 @@ namespace uLearn.Web.DataContexts
 				.Where(x => x.IsRightAnswer && x.SlideId == slideId)
 				.GroupBy(x => x.CodeHash, (codeHash, ss) => new { codeHash, timestamp = ss.Min(s => s.Timestamp) })
 				.Join(
-					db.UserSolutions.Where(x => x.IsRightAnswer && x.SlideId == slideId), 
-					g => g, 
-					s => new { codeHash = s.CodeHash, timestamp = s.Timestamp }, (k, s) => new {sol = s, k.timestamp})
+					db.UserSolutions.Where(x => x.IsRightAnswer && x.SlideId == slideId),
+					g => g,
+					s => new { codeHash = s.CodeHash, timestamp = s.Timestamp }, (k, s) => new { sol = s, k.timestamp })
 				.Select(x => new { x.sol.Id, likes = x.sol.Likes.Count, x.timestamp })
 				.ToList();
-			
+
 			var best = prepared
 				.OrderByDescending(x => x.likes);
 			var timeNow = DateTime.Now;
@@ -114,7 +114,7 @@ namespace uLearn.Web.DataContexts
 			var answer = best.Take(3).Concat(trending.Take(3)).Concat(newest).Distinct().Take(10).Select(x => x.Id);
 			var result = db.UserSolutions
 				.Where(solution => answer.Contains(solution.Id))
-				.Select(solution => new { solution.Id, Code = solution.SolutionCode.Text,  Likes = solution.Likes.Select(y => y.UserId)})
+				.Select(solution => new { solution.Id, Code = solution.SolutionCode.Text, Likes = solution.Likes.Select(y => y.UserId) })
 				.ToList();
 			return result
 				.Select(x => new AcceptedSolutionInfo(x.Code, x.Id, x.Likes))
@@ -244,7 +244,7 @@ namespace uLearn.Web.DataContexts
 				CourseId = submission.CourseId,
 				SlideId = submission.SlideId,
 				IsCompilationError = result.Verdict == Verdict.CompilationError,
-				IsRightAnswer = result.Verdict == Verdict.Ok 
+				IsRightAnswer = result.Verdict == Verdict.Ok
 					&& (webRunner || exerciseSlide.Exercise.ExpectedOutput.NormalizeEoln() == result.GetOutput().NormalizeEoln()),
 				OutputHash = outputHash,
 				Timestamp = submission.Timestamp,
@@ -261,8 +261,8 @@ namespace uLearn.Web.DataContexts
 		}
 
 		public async Task<UserSolution> RunUserSolution(
-			string courseId, Guid slideId, string userId, string code, 
-			string compilationError, string output, bool isRightAnswer, 
+			string courseId, Guid slideId, string userId, string code,
+			string compilationError, string output, bool isRightAnswer,
 			string executionServiceName, string displayName, TimeSpan timeout)
 		{
 			var solution = await AddUserSolution(
@@ -278,7 +278,7 @@ namespace uLearn.Web.DataContexts
 				var details = GetDetails(solution.Id);
 				if (details.Status == SubmissionStatus.Done)
 					return details;
-			} 
+			}
 			return null;
 		}
 

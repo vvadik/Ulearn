@@ -7,7 +7,7 @@ namespace uLearn
 		public int Index { get; set; }
 		public string UnitName { get; private set; }
 		public FileInfo SlideFile { get; set; }
-		public DirectoryInfo Directory { get { return SlideFile.Directory; } }
+		public DirectoryInfo Directory => SlideFile.Directory;
 
 		public SlideInfo(string unitName, FileInfo slideFile, int index)
 		{
@@ -16,13 +16,7 @@ namespace uLearn
 			SlideFile = slideFile;
 		}
 
-		public string DirectoryRelativePath
-		{
-			get
-			{
-				return CourseUnitUtils.GetDirectoryRelativeWebPath(SlideFile);
-			}
-		}
+		public string DirectoryRelativePath => CourseUnitUtils.GetDirectoryRelativeWebPath(SlideFile);
 	}
 
 	public class CourseUnitUtils

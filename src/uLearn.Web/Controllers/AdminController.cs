@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
@@ -6,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
@@ -132,7 +132,7 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Packages", new { courseId });
 
 			var versionId = Guid.NewGuid();
-			
+
 			var destinationFile = courseManager.GetCourseVersionFile(versionId);
 			file.SaveAs(destinationFile.FullName);
 
@@ -195,19 +195,23 @@ namespace uLearn.Web.Controllers
 				IsCommentsEnabled = commentsPolicy.IsCommentsEnabled,
 				ModerationPolicy = commentsPolicy.ModerationPolicy,
 				OnlyInstructorsCanReply = commentsPolicy.OnlyInstructorsCanReply,
-				Comments = comments.Select(c => new CommentViewModel
-				{
-					Comment = c,
-					LikesCount = commentsLikes.Get(c.Id, 0),
-					IsLikedByUser = commentsLikedByUser.Contains(c.Id),
-					Replies = new List<CommentViewModel>(),
-					CanEditAndDeleteComment = true,
-					CanModerateComment = true,
-					IsCommentVisibleForUser = true,
-					ShowContextInformation = true,
-					ContextSlideTitle = course.GetSlideById(c.SlideId).Title,
-					ContextParentComment = c.IsTopLevel() ? null : commentsById[c.ParentCommentId].Text,
-				}).ToList()
+				Comments = (from c in comments
+							let slide = course.FindSlideById(c.SlideId)
+							where slide != null
+							select
+							new CommentViewModel
+							{
+								Comment = c,
+								LikesCount = commentsLikes.Get(c.Id, 0),
+								IsLikedByUser = commentsLikedByUser.Contains(c.Id),
+								Replies = new List<CommentViewModel>(),
+								CanEditAndDeleteComment = true,
+								CanModerateComment = true,
+								IsCommentVisibleForUser = true,
+								ShowContextInformation = true,
+								ContextSlideTitle = slide.Title,
+								ContextParentComment = c.IsTopLevel() ? null : commentsById[c.ParentCommentId].Text,
+							}).ToList()
 			});
 		}
 
@@ -295,7 +299,7 @@ namespace uLearn.Web.Controllers
 				});
 			}
 
-			var versionIdGuid = (Guid) versionId;
+			var versionIdGuid = (Guid)versionId;
 
 			var course = courseManager.GetCourse(courseId);
 			var version = courseManager.GetVersion(versionIdGuid);
