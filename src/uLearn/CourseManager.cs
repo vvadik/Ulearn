@@ -1,3 +1,4 @@
+using Ionic.Zip;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Ionic.Zip;
 
 namespace uLearn
 {
@@ -23,7 +23,7 @@ namespace uLearn
 		/* LRU-cache for course versions. 50 is a capactiy of the cache. */
 		private readonly LruCache<Guid, Course> versionsCache = new LruCache<Guid, Course>(50);
 
-		private readonly CourseLoader loader = new CourseLoader();
+		private static readonly CourseLoader loader = new CourseLoader();
 
 		public CourseManager(DirectoryInfo baseDirectory)
 			: this(
@@ -138,12 +138,18 @@ namespace uLearn
 			}
 		}
 
-		public Course LoadCourseFromZip(FileInfo zipFile)
+		private Course LoadCourseFromZip(FileInfo zipFile)
+		{
+			var dir = coursesDirectory;
+			return LoadCourseFromZip(zipFile, dir);
+		}
+
+		public static Course LoadCourseFromZip(FileInfo zipFile, DirectoryInfo dir)
 		{
 			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
 			{
 				var courseOrVersionId = GetCourseId(zipFile.Name);
-				var courseDir = coursesDirectory.CreateSubdirectory(courseOrVersionId);
+				var courseDir = dir.CreateSubdirectory(courseOrVersionId);
 
 				ClearDirectory(courseDir);
 				zip.ExtractAll(courseDir.FullName, ExtractExistingFileAction.OverwriteSilently);
@@ -152,7 +158,7 @@ namespace uLearn
 			}
 		}
 
-		public Course LoadCourseFromDirectory(DirectoryInfo dir)
+		public static Course LoadCourseFromDirectory(DirectoryInfo dir)
 		{
 			return loader.LoadCourse(dir);
 		}
@@ -200,13 +206,13 @@ namespace uLearn
 		{
 			using (var zip = new ZipFile(Encoding.GetEncoding(866)))
 			{
-				zip.AddEntry("Course.xml", 
+				zip.AddEntry("Course.xml",
 					string.Format(
 						"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
 						"<Course xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"https://ulearn.azurewebsites.net/course\">\n" +
 						"\t<title>{0}</title>\n" +
 						"</Course>",
-						courseId), 
+						courseId),
 					Encoding.UTF8);
 				zip.Save(path);
 			}
@@ -273,7 +279,7 @@ namespace uLearn
 
 		public static char[] GetInvalidCharacters()
 		{
-			return new []{'&'}.Concat(Path.GetInvalidFileNameChars()).Concat(Path.GetInvalidPathChars()).Distinct().ToArray();
+			return new[] { '&' }.Concat(Path.GetInvalidFileNameChars()).Concat(Path.GetInvalidPathChars()).Distinct().ToArray();
 		}
 
 		public Course FindCourseBySlideById(Guid slideId)

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using NUnit.Framework;
 using uLearn.Model.Blocks;
 using uLearn.Model.Edx;
 using uLearn.Model.Edx.EdxComponents;
@@ -27,9 +27,7 @@ namespace uLearn.CourseTool
 		{
 			if (!Directory.Exists(testFolderName))
 				Directory.CreateDirectory(testFolderName);
-			var cm = new CourseManager(new DirectoryInfo(@"..\..\..\uLearn.Web"));
-			cm.ReloadCourse("ForTests");
-			course = cm.GetCourses().Single();
+			course = CourseManager.LoadCourseFromDirectory(new DirectoryInfo(@"..\..\..\courses\ForTests\Slides"));
 		}
 
 		[TearDown]
@@ -107,7 +105,7 @@ namespace uLearn.CourseTool
 
 			new OlxPatcher(olxPath)
 				.PatchComponents(edxCourse, GetVideoComponentFromDictionary(videoDict));
-			
+
 			Assert.That(File.ReadAllText(string.Format("{0}/video/{1}.xml", olxPath, ulearnVideoGuid)).Contains("QWFuk3ymXxc"));
 		}
 
@@ -138,7 +136,7 @@ namespace uLearn.CourseTool
 			};
 
 			patcher.PatchComponents(edxCourse, GetVideoComponentFromDictionary(videoDict));
-			
+
 			var edxCourse2 = EdxCourse.Load(olxPath);
 			Assert.AreEqual("Unsorted", edxCourse2.CourseWithChapters.Chapters[1].DisplayName);
 			Assert.AreEqual(2, edxCourse2.CourseWithChapters.Chapters[1].Sequentials.Length);
@@ -156,7 +154,7 @@ namespace uLearn.CourseTool
 						course.Id,
 						slideUrl,
 						solutionsUrl,
-						new Dictionary<string, string>(), 
+						new Dictionary<string, string>(),
 						ltiId
 					).ToArray()));
 
@@ -171,7 +169,7 @@ namespace uLearn.CourseTool
 			var olxPath = string.Format("{0}/{1}", testFolderName, course.Id);
 			edxCourse.Save(olxPath);
 
-			new OlxPatcher(olxPath).PatchVerticals(edxCourse, new [] {aTextSlide}
+			new OlxPatcher(olxPath).PatchVerticals(edxCourse, new[] { aTextSlide }
 				.Select(x => x.ToVerticals(
 						course.Id,
 						slideUrl,
@@ -201,7 +199,7 @@ namespace uLearn.CourseTool
 						new Dictionary<string, string>(),
 						ltiId
 					).ToArray()));
-			
+
 			var edxCourse2 = EdxCourse.Load(olxPath);
 			var patchedSlidesCount = edxCourse2.CourseWithChapters.Chapters[0].Sequentials[0].Verticals.Count();
 			Assert.AreEqual(slidesCount + 1, patchedSlidesCount);
