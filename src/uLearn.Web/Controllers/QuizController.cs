@@ -221,10 +221,12 @@ namespace uLearn.Web.Controllers
 					int score;
 					/* Invalid form: score isn't integer */
 					if (!int.TryParse(scoreStr, out score))
-						return Redirect(errorUrl + string.Format("Неверное количество баллов: {0}", scoreStr));
+						return Redirect(errorUrl + string.Format("Неверное количество баллов в задании «{0}. {1}»",
+							question.QuestionIndex, question.Text.TruncateWithEllipsis(50)));
 					/* Invalid form: score isn't from range 0..MAX_SCORE */
 					if (score < 0 || score > question.MaxScore)
-						return Redirect(errorUrl + string.Format("Неверное количество баллов: {0}", score));
+						return Redirect(errorUrl + string.Format("Неверное количество баллов в задании «{0}. {1}»: {2}",
+							question.QuestionIndex, question.Text.TruncateWithEllipsis(50), score));
 
 					await userQuizzesRepo.SetScoreForQuizBlock(queueItem.UserId, queueItem.SlideId, question.Id, score);
 					totalScore += score;

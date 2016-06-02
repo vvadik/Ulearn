@@ -13,7 +13,7 @@
 	}
 	else if (Model.ManualQuizCheckQueueItem != null)
 	{
-		status = string.Format("Проверка попытки {0} из {1}", Model.TryNumber, Model.MaxDropCount + 1);
+		status = string.Format("{0}, попытка {0} из {1}", Model.ManualQuizCheckQueueItem.User.VisibleName, Model.TryNumber, Model.MaxDropCount + 1);
 	}
 	else if (Model.QuizState == QuizState.WaitForCheck)
 	{
@@ -47,7 +47,7 @@
 	MvcForm form = null;
 	if (Model.ManualQuizCheckQueueItem != null)
 	{
-		form = Html.BeginForm("ScoreQuiz", "Quiz", FormMethod.Post, new {id = "quiz__score-form"});
+		form = Html.BeginForm("ScoreQuiz", "Quiz", FormMethod.Post, new { id = "quiz__score-form" });
 	}
 
 	using (form)
@@ -55,7 +55,7 @@
 		if (Model.ManualQuizCheckQueueItem != null)
 		{
 			@Html.Hidden("id", Model.ManualQuizCheckQueueItem.Id)
-			@Html.Hidden("errorUrl", Request.RawUrl + "&error=")
+			@Html.Hidden("errorUrl", Url.RouteUrl("Course.SlideById", new { courseId = Model.CourseId, slideId = Model.Slide.Url, CheckQueueItemId = Model.ManualQuizCheckQueueItem.Id }) + "&error=")
 			@Html.Hidden("nextUrl", Url.Action("ManualQuizChecksQueue", "Admin", new { courseId = Model.CourseId }))
 		}
 		@SlideHtml.Blocks(context)
