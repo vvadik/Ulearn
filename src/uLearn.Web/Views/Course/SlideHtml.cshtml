@@ -282,7 +282,14 @@
 	var sample = block.Sample;
 	<div class="quiz quiz-block-input">
 		<label @GetGuestOnclick(context.IsGuest)>
-			<input autocomplete="off" class="form-control @quizRes" value="@value" id='@(block.Id + "quizBlock")' maxlength="@QuizController.MAX_FILLINBLOCK_SIZE" @GetGuestDisable(context.IsGuest)>
+			@if (block.Multiline)
+			{
+ 				<textarea class="form-control @quizRes" id='@(block.Id + "quizBlock")' maxlength="@QuizController.MAX_FILLINBLOCK_SIZE" @GetGuestDisable(context.IsGuest) cols="70" rows="5">@value</textarea>
+			}
+			else
+			{
+				<input autocomplete="off" class="form-control @quizRes" value="@value" id='@(block.Id + "quizBlock")' maxlength="@QuizController.MAX_FILLINBLOCK_SIZE" @GetGuestDisable(context.IsGuest)>
+			}
 		</label>
 	</div>
 	if (model.QuizState == QuizState.Total)

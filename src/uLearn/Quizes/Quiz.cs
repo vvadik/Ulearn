@@ -242,8 +242,15 @@ namespace uLearn.Quizes
 		[XmlAttribute("explanation")]
 		public string Explanation;
 
+		[XmlAttribute("multiline")]
+		public bool Multiline;
+
 		public override void Validate()
 		{
+			if (string.IsNullOrEmpty(Sample))
+				return;
+			if (Regexes == null)
+				return;
 			if (!Regexes.Any(re => re.Regex.IsMatch(Sample)))
 				throw new FormatException("Sample should match at least one regex. BlockId=" + Id);
 		}

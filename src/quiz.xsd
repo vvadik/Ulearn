@@ -93,6 +93,7 @@
 		<xs:attribute name="explanation" type="xs:string" use="optional"/>
 		<xs:attribute name="id" type="notEmptyString" use="required"/>
 		<xs:attribute name="maxScore" type="xs:int" use="optional"/>
+		<xs:attribute name="multiline" type="xs:boolean" use="optional"/>
 	</xs:complexType>
 	
 	<xs:complexType name="OrderingBlock">

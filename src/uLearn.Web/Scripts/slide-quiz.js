@@ -5,11 +5,11 @@
 
 		var answers = [];
 		$(".quiz").each(function () {
-			var id = $(this).find('input').attr('id'); //id of quiz
+			var id = $(this).find('input, textarea').attr('id'); //id of quiz
 			var content = id.split('quizBlock');
 			var val;
 			if ($(this).hasClass('quiz-block-input')) {
-				val = $(this).find('input').val();
+				val = $(this).find('input, textarea').val();
 				answers.push(new QuizAnswer("Text", content[0], "", val));
 			}
 			if ($(this).hasClass('quiz-block-ordering__item')) {
@@ -62,7 +62,7 @@ function areAllAnswered(needingCount) {
 		}
 	});
 	$(".quiz-block-input").each(function () {
-		if ($(this).find('input').val() != "") {
+		if ($(this).find('input, textarea').val() != "") {
 			realCount++;
 		}
 	});

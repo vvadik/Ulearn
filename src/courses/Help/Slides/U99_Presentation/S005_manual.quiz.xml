@@ -12,6 +12,10 @@
 		<regex>\d+</regex>
 	</fillIn>
 
+	<fillIn id="123a" multiline="true">
+		<text>Напишите сочинение</text>
+	</fillIn>
+
 	<ordering id="234" maxScore="4">
 		<text>Упорядочите элементы</text>
 		<explanation>Объяснение правильного ответа</explanation>

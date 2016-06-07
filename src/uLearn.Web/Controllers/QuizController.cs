@@ -360,7 +360,9 @@ namespace uLearn.Web.Controllers
 		{
 			if (data.Length > MAX_FILLINBLOCK_SIZE)
 				data = data.Substring(0, MAX_FILLINBLOCK_SIZE);
-			var isRightAnswer = fillInBlock.Regexes.Any(regex => regex.Regex.IsMatch(data));
+			var isRightAnswer = true;
+			if (fillInBlock.Regexes != null)
+				isRightAnswer = fillInBlock.Regexes.Any(regex => regex.Regex.IsMatch(data));
 			var blockScore = isRightAnswer ? fillInBlock.MaxScore : 0;
 			return new List<QuizInfoForDb>
 			{
