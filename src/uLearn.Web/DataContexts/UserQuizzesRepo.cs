@@ -98,6 +98,22 @@ namespace uLearn.Web.DataContexts
 			return answer;
 		}
 
+		public QuizVersion FindQuizVersionFromUsersAnswer(string courseId, Guid slideId, string userId)
+		{
+			var firstUserAnswer = db.UserQuizzes.FirstOrDefault(x => x.UserId == userId && x.SlideId == slideId && !x.isDropped);
+
+			if (firstUserAnswer == null)
+				return null;
+
+			/* If we know version which user has answered*/
+			if (firstUserAnswer.QuizVersion != null)
+				return firstUserAnswer.QuizVersion;
+
+			/* If user's version is null, show first created version for this slide ever */
+			var quizzesRepo = new QuizzesRepo(db);
+			return quizzesRepo.GetFirstQuizVersion(courseId, slideId);
+		}
+
 		public int GetAverageStatistics(Guid slideId, string courseId)
 		{
 			var newA = db.UserQuizzes
