@@ -177,7 +177,7 @@ namespace uLearn.Web.DataContexts
 			return db.UserQuizzes
 				.Where(q => q.UserId == userId && q.SlideId == slideId && !q.isDropped)
 				.All(q => q.QuizBlockScore == q.QuizBlockMaxScore);
-	}
+		}
 
 		public Dictionary<string, List<UserQuiz>> GetAnswersForUser(Guid slideId, string userId)
 		{
@@ -206,6 +206,14 @@ namespace uLearn.Web.DataContexts
 			return db.ManualQuizCheckQueueItems.Find(id);
 		}
 
+		public ManualQuizCheckQueueItem FindManualQuizCheckQueueItem(string courseId, Guid slideId, string userId)
+		{
+			return db.ManualQuizCheckQueueItems
+				.Where(i => i.CourseId == courseId && i.SlideId == slideId && i.UserId == userId && ! i.IsChecked)
+				.OrderByDescending(i => i.Timestamp)
+				.FirstOrDefault();
+		}
+
 		public async Task LockManualQuizCheckQueueItem(ManualQuizCheckQueueItem quizCheckQueueItem, string lockedById)
 		{
 			quizCheckQueueItem.LockedById = lockedById;
@@ -226,6 +234,16 @@ namespace uLearn.Web.DataContexts
 			queueItem.LockedBy = null;
 			queueItem.LockedUntil = null;
 			queueItem.IsChecked = true;
+			await db.SaveChangesAsync();
+		}
+
+		public async Task RemoveUserQuizzes(string courseId, Guid slideId, string userId)
+		{
+			db.UserQuizzes.RemoveRange(
+				db.UserQuizzes.Where(
+					q => q.CourseId == courseId && q.SlideId == slideId && q.UserId == userId && !q.isDropped
+				)
+			);
 			await db.SaveChangesAsync();
 		}
 	}

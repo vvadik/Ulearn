@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using uLearn.Quizes;
 
 namespace uLearn.Web.Models
@@ -14,6 +15,7 @@ namespace uLearn.Web.Models
 		public Dictionary<int?, List<string>> UsersByQuizVersion { get; set; }
 		public Dictionary<string, int> RightAnswersCount { get; set; }
 		public Dictionary<string, string> GroupByUser { get; set; }
+		public ImmutableHashSet<string> UsersWaitsForManualCheck { get; set; }
 	}
 
 	public class QuizAnswerInfo

@@ -117,8 +117,15 @@
 					{
 						if (isManualCheck)
 						{
-							var fillClass = ans.Score == ans.MaxScore ? "rightQuizAnswer" : "falseQuizAnswer";
-							<td class="@fillClass" data-sort-value="@ans.Score">@ans.Score из @ans.MaxScore</td>
+							if (Model.UsersWaitsForManualCheck.Contains(user))
+							{
+								<td class="manualQuizAnswer" data-sort-value="0" title="Ожидает проверки инструктором"></td>
+							}
+							else
+							{
+								var fillClass = ans.Score == ans.MaxScore ? "rightQuizAnswer" : "falseQuizAnswer";
+								<td class="@fillClass" data-sort-value="@ans.Score">@ans.Score из @ans.MaxScore</td>
+							}
 						}
 						else
 						{

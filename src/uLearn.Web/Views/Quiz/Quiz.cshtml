@@ -22,6 +22,10 @@
 	{
 		status = "Ожидает проверки инструктором";
 	}
+	else if (Model.QuizState == QuizState.IsChecking)
+	{
+		status = "Проверяется инструктором";
+	}
 
 	if (! string.IsNullOrEmpty(status))
 	{
@@ -44,7 +48,8 @@
 			.ToArray<dynamic>(),
 		Model.IsGuest,
 		true,
-		Model.ManualQuizCheckQueueItem
+		Model.ManualQuizCheckQueueItem,
+		Model.CanUserFillQuiz
 	);
 
 	MvcForm form = null;
@@ -71,7 +76,11 @@
 			{
 				<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString) ">Готово!</button>
 			}
-			else if (Model.QuizState == QuizState.WaitForCheck && Model.ManualQuizCheckQueueItem != null)
+			else if (Model.QuizState == QuizState.WaitForCheck && Model.ManualQuizCheckQueueItem == null)
+			{
+				<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString) ">Переотправить ответы</button>
+			}
+			else if (Model.QuizState == QuizState.IsChecking && Model.ManualQuizCheckQueueItem != null)
 			{
 				<input type="submit" class="btn btn-default" form="quiz__score-form" value="Сохранить и вернуться">
 				<input type="submit" class="btn btn-primary" form="quiz__score-form" value="Сохранить и перейти к следующему"
@@ -87,7 +96,7 @@
 					<input type="hidden" name="isLti" value="@Model.IsLtiToString">
 					<button class="btn btn-danger" type="submit">Пройти тест повторно</button>
 					<small>У вас остал@(remains == 1 ? "а" : "о")сь @remains из @(Model.MaxDropCount + 1) попыток</small>
-				}
+			}
 			}
 			else if (User.HasAccessFor(Model.CourseId, CourseRole.Tester))
 			{

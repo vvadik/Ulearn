@@ -38,7 +38,7 @@
 					isLti: isLti
 				}
 			}).success(function (ans) {
-				$("#quiz-status").text("Отправляем..");
+				$("#quiz-status").text("Отправляем...");
 				window.scrollTo(0, 0);
 				window.location.reload();
 			})

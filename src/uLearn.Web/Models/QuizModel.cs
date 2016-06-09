@@ -18,6 +18,7 @@ namespace uLearn.Web.Models
 		public bool IsLti { get; set; }
 		public bool IsGuest { get; set; }
 		public ManualQuizCheckQueueItem ManualQuizCheckQueueItem { get; set; }
+		public bool CanUserFillQuiz { get; set; }
 
 		public int Score
 		{

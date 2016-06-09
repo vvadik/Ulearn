@@ -4,7 +4,8 @@
 	{
 		NotPassed,
 		WaitForCheck,
+		IsChecking,
 		Subtotal,
-		Total
+		Total,
 	}
 }

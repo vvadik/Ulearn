@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -64,6 +65,11 @@ namespace uLearn.Web.Controllers
 			public int QuizBlockMaxScore;
 		}
 
+		public bool CanUserFillQuiz(QuizState state)
+		{
+			return state == QuizState.NotPassed || state == QuizState.WaitForCheck;
+		}
+
 		[AllowAnonymous]
 		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizCheckQueueItem manualQuizCheckQueueItem = null)
 		{
@@ -89,6 +95,7 @@ namespace uLearn.Web.Controllers
 			slide = new QuizSlide(slide.Info, quiz);
 
 			var userAnswers = userQuizzesRepo.GetAnswersForShowOnSlide(courseId, slide, userId);
+			var canUserFillQuiz = CanUserFillQuiz(quizState);
 
 			var model = new QuizModel
 			{
@@ -100,7 +107,8 @@ namespace uLearn.Web.Controllers
 				ResultsForQuizes = resultsForQuizes,
 				AnswersToQuizes = userAnswers,
 				IsLti = isLti,
-				ManualQuizCheckQueueItem = manualQuizCheckQueueItem
+				ManualQuizCheckQueueItem = manualQuizCheckQueueItem,
+				CanUserFillQuiz = canUserFillQuiz
 			};
 
 			if (model.QuizState != QuizState.NotPassed && model.Score == quiz.MaxScore)
@@ -137,8 +145,10 @@ namespace uLearn.Web.Controllers
 				return new HttpNotFoundResult();
 			var slideId = slide.Id;
 
-			if (visitsRepo.IsPassed(slideId, userId))
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Already answered");
+			var quizState = GetQuizState(courseId, userId, slideId, slide.MaxDropCount).Item1;
+			if (! CanUserFillQuiz(quizState))
+				return new HttpStatusCodeResult(HttpStatusCode.OK, "Already answered");
+
 			var time = DateTime.Now;
 			var answers = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.QuizId);
 			var quizBlockWithTaskCount = course.Slides[intSlideIndex].Blocks.Count(x => x is AbstractQuestionBlock);
@@ -151,15 +161,23 @@ namespace uLearn.Web.Controllers
 			var blocksInAnswerCount = allQuizInfos.Select(x => x.QuizId).Distinct().Count();
 			if (blocksInAnswerCount != quizBlockWithTaskCount)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Has empty blocks");
-			
-			foreach (var quizInfoForDb in allQuizInfos)
-				await userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
-					slideId, quizInfoForDb.Text, userId, time, quizInfoForDb.QuizBlockScore, quizInfoForDb.QuizBlockMaxScore);
 
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				await userQuizzesRepo.RemoveUserQuizzes(courseId, slideId, userId);
+
+				foreach (var quizInfoForDb in allQuizInfos)
+					await userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
+						slideId, quizInfoForDb.Text, userId, time, quizInfoForDb.QuizBlockScore, quizInfoForDb.QuizBlockMaxScore);
+
+				transaction.Commit();
+			}
 
 			if (slide.Quiz.ManualCheck)
 			{
-				await userQuizzesRepo.QueueForManualCheck(courseId, slideId, userId);
+				/* If this quiz is already queued for checking for this user, don't add it to queue again */
+				if (quizState != QuizState.WaitForCheck)
+					await userQuizzesRepo.QueueForManualCheck(courseId, slideId, userId);
 			}
 			else
 			{
@@ -417,7 +435,7 @@ namespace uLearn.Web.Controllers
 			var passes = db.UserQuizzes
 				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped && periodStart <= q.Timestamp)
 				.GroupBy(q => q.UserId)
-				.Join(db.Users, g => g.Key, user => user.Id, (g, user) => new { user.UserName, user.GroupName, UserQuizzes = g.ToList(), QuizVersion = g.FirstOrDefault().QuizVersion })
+				.Join(db.Users, g => g.Key, user => user.Id, (g, user) => new { UserId = user.Id, user.UserName, user.GroupName, UserQuizzes = g.ToList(), QuizVersion = g.FirstOrDefault().QuizVersion })
 				.ToList();
 			foreach (var pass in passes)
 			{
@@ -434,6 +452,7 @@ namespace uLearn.Web.Controllers
 				.ToDictionary(grouping => grouping.Key, grouping => grouping.Count());
 
 			var usersByQuizVersion = passes.GroupBy(p => p.QuizVersion?.Id).ToDictionary(g => g.Key, g => g.Select(u => u.UserName).ToList());
+			var usersWaitsForManualCheck = userQuizzesRepo.GetManualQuizCheckQueue(courseId, quizSlide.Id).ToList().Select(i => i.User.UserName).ToImmutableHashSet();
 
 			return PartialView(new QuizAnalyticsModel
 			{
@@ -444,7 +463,8 @@ namespace uLearn.Web.Controllers
 				QuizVersions = quizVersions,
 				UsersByQuizVersion = usersByQuizVersion,
 				RightAnswersCount = rightAnswersCount,
-				GroupByUser = groups
+				GroupByUser = groups,
+				UsersWaitsForManualCheck = usersWaitsForManualCheck,
 			});
 		}
 
@@ -629,8 +649,9 @@ namespace uLearn.Web.Controllers
 		{
 			var states = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).ToList();
 
-			if (userQuizzesRepo.IsWaitingForManualCheck(courseId, slideId, userId))
-				return Tuple.Create(QuizState.WaitForCheck, states.Count);
+			var queueItem = userQuizzesRepo.FindManualQuizCheckQueueItem(courseId, slideId, userId);
+			if (queueItem != null)
+				return Tuple.Create(queueItem.IsLocked ? QuizState.IsChecking : QuizState.WaitForCheck, states.Count);
 			
 			if (states.Count > maxDropCount)
 				return Tuple.Create(QuizState.Total, states.Count);

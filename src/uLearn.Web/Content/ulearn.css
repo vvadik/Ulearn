@@ -342,6 +342,10 @@
 .rightQuizAnswer {
 	background-color: lightgreen !important;
 }
+
+.manualQuizAnswer {
+	background-color: lightblue !important;
+}
 /* ReSharper restore Html.CssClassElementsNotFound */
 
 .video-container {
