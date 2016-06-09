@@ -9,7 +9,7 @@ namespace uLearn
 		{
 			return courseId == "web" && slideId == Guid.Empty
 				? code
-				: ((ExerciseSlide) courseManager.GetCourse(courseId).GetSlideById(slideId))
+				: ((ExerciseSlide)courseManager.GetCourse(courseId).GetSlideById(slideId))
 					.Exercise
 					.Solution
 					.BuildSolution(code)

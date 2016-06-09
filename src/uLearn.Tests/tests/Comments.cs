@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace uLearn.tests
+﻿namespace uLearn.tests
 {
 	/*
 	before slide class
@@ -13,7 +7,7 @@ namespace uLearn.tests
 	/*
 	before slide class 2
 	*/
-	[Slide("title", "id")]
+	[Slide("title", "8abc175fee184226b45b180dc44f7aec")]
 	internal class Comments
 	{
 		/*

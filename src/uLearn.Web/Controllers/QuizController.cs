@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
-using Newtonsoft.Json;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
@@ -399,7 +399,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public async Task <ActionResult> MergeQuizVersions(string courseId, Guid slideId, int quizVersionId, int mergeWithQuizVersionId)
+		public async Task<ActionResult> MergeQuizVersions(string courseId, Guid slideId, int quizVersionId, int mergeWithQuizVersionId)
 		{
 			using (var transcation = db.Database.BeginTransaction())
 			{
@@ -420,7 +420,7 @@ namespace uLearn.Web.Controllers
 				transcation.Commit();
 			}
 
-			return RedirectToAction("SlideById", "Course", new { courseId, slideId});
+			return RedirectToAction("SlideById", "Course", new { courseId, slideId });
 		}
 
 		[HttpGet]
@@ -479,7 +479,7 @@ namespace uLearn.Web.Controllers
 				else if (block is IsTrueBlock)
 					yield return GetIsTrueBlockAnswerInfo(answers, block.Id, block.QuestionIndex);
 				else if (block is OrderingBlock)
-					yield return GetOrderingBlockAnswerInfo(answers, (OrderingBlock) block, block.QuestionIndex);
+					yield return GetOrderingBlockAnswerInfo(answers, (OrderingBlock)block, block.QuestionIndex);
 				else if (block is MatchingBlock)
 					yield return GetMatchingBlockAnswerInfo(answers, (MatchingBlock)block, block.QuestionIndex);
 		}
