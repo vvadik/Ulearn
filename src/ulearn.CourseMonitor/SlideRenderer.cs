@@ -93,6 +93,7 @@ namespace uLearn.CourseTool
 		private IEnumerable<string> GetJsFiles()
 		{
 			yield return "scripts/jquery-1.10.2.min.js";
+			yield return "scripts/jquery-ui.min.js";
 			yield return "scripts/bootstrap.min.js";
 			yield return "scripts/katex.min.js";
 			yield return "scripts/jsdifflib.js";
