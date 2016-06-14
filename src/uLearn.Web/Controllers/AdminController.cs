@@ -223,7 +223,7 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			var checks = userQuizzesRepo.GetManualQuizCheckQueue(courseId).ToList();
 
-			if (!checks.Any())
+			if (!checks.Any() && ! string.IsNullOrEmpty(message))
 				return RedirectToAction("ManualQuizChecksQueue", new { courseId });
 
 			return View(new ManualQuizCheckQueueViewModel
