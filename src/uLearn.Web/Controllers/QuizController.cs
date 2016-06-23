@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -60,7 +61,60 @@ namespace uLearn.Web.Controllers
 			public string Text;
 			public bool IsRightAnswer;
 			public Type QuizType;
-			public bool IsRightQuizBlock;
+			public int QuizBlockScore;
+			public int QuizBlockMaxScore;
+		}
+
+		public bool CanUserFillQuiz(QuizState state)
+		{
+			return state == QuizState.NotPassed || state == QuizState.WaitForCheck;
+		}
+
+		[AllowAnonymous]
+		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizCheckQueueItem manualQuizCheckQueueItem = null)
+		{
+			if (isGuest)
+				return PartialView(GuestQuiz(slide, courseId));
+			var slideId = slide.Id;
+			var maxDropCount = GetMaxDropCount(slide);
+			var state = GetQuizState(courseId, userId, slideId, maxDropCount);
+			var quizState = state.Item1;
+			var tryNumber = state.Item2;
+			var resultsForQuizes = GetResultForQuizes(courseId, userId, slideId, state.Item1);
+
+			var quizVersion = quizzesRepo.GetLastQuizVersion(courseId, slideId);
+			if (quizState != QuizState.NotPassed)
+				quizVersion = userQuizzesRepo.FindQuizVersionFromUsersAnswer(courseId, slideId, userId);
+
+			/* If we haven't quiz version in database, create it */
+			if (quizVersion == null)
+				quizVersion = quizzesRepo.AddQuizVersionIfNeeded(courseId, slide);
+
+			/* Restore quiz slide from version stored in the database */
+			var quiz = quizVersion.RestoredQuiz;
+			slide = new QuizSlide(slide.Info, quiz);
+
+			var userAnswers = userQuizzesRepo.GetAnswersForShowOnSlide(courseId, slide, userId);
+			var canUserFillQuiz = CanUserFillQuiz(quizState);
+
+			var model = new QuizModel
+			{
+				CourseId = courseId,
+				Slide = slide,
+				QuizState = quizState,
+				TryNumber = tryNumber,
+				MaxDropCount = maxDropCount,
+				ResultsForQuizes = resultsForQuizes,
+				AnswersToQuizes = userAnswers,
+				IsLti = isLti,
+				ManualQuizCheckQueueItem = manualQuizCheckQueueItem,
+				CanUserFillQuiz = canUserFillQuiz
+			};
+
+			if (model.QuizState != QuizState.NotPassed && model.Score == quiz.MaxScore)
+				model.QuizState = QuizState.Total;
+
+			return PartialView(model);
 		}
 
 		[HttpPost]
@@ -86,11 +140,15 @@ namespace uLearn.Web.Controllers
 			var intSlideIndex = int.Parse(slideIndex);
 			var course = courseManager.GetCourse(courseId);
 			var userId = User.Identity.GetUserId();
-			var slide = course.Slides[intSlideIndex];
+			var slide = (QuizSlide) course.Slides[intSlideIndex];
+			if (slide == null)
+				return new HttpNotFoundResult();
 			var slideId = slide.Id;
 
-			if (visitsRepo.IsPassed(slideId, userId))
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Already answered");
+			var quizState = GetQuizState(courseId, userId, slideId, slide.MaxDropCount).Item1;
+			if (! CanUserFillQuiz(quizState))
+				return new HttpStatusCodeResult(HttpStatusCode.OK, "Already answered");
+
 			var time = DateTime.Now;
 			var answers = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.QuizId);
 			var quizBlockWithTaskCount = course.Slides[intSlideIndex].Blocks.Count(x => x is AbstractQuestionBlock);
@@ -103,20 +161,94 @@ namespace uLearn.Web.Controllers
 			var blocksInAnswerCount = allQuizInfos.Select(x => x.QuizId).Distinct().Count();
 			if (blocksInAnswerCount != quizBlockWithTaskCount)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Has empty blocks");
-			var score = allQuizInfos
-				.Where(forDb => forDb.IsRightQuizBlock)
-				.Select(forDb => forDb.QuizId)
-				.Distinct()
-				.Count();
-			foreach (var quizInfoForDb in allQuizInfos)
-				await userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
-					slideId, quizInfoForDb.Text, userId, time, quizInfoForDb.IsRightQuizBlock);
 
-			await visitsRepo.AddAttempt(slideId, userId, score);
-			if (isLti)
-				LtiUtils.SubmitScore(slide, userId);
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				await userQuizzesRepo.RemoveUserQuizzes(courseId, slideId, userId);
+
+				foreach (var quizInfoForDb in allQuizInfos)
+					await userQuizzesRepo.AddUserQuiz(courseId, quizInfoForDb.IsRightAnswer, quizInfoForDb.ItemId, quizInfoForDb.QuizId,
+						slideId, quizInfoForDb.Text, userId, time, quizInfoForDb.QuizBlockScore, quizInfoForDb.QuizBlockMaxScore);
+
+				transaction.Commit();
+			}
+
+			if (slide.Quiz.ManualCheck)
+			{
+				/* If this quiz is already queued for checking for this user, don't add it to queue again */
+				if (quizState != QuizState.WaitForCheck)
+					await userQuizzesRepo.QueueForManualCheck(courseId, slideId, userId);
+			}
+			else
+			{
+				var score = allQuizInfos
+					.DistinctBy(forDb => forDb.QuizId)
+					.Sum(forDb => forDb.QuizBlockScore);
+				await visitsRepo.AddAttempt(slideId, userId, score);
+				if (isLti)
+					LtiUtils.SubmitScore(slide, userId);
+			}
 
 			return new HttpStatusCodeResult(HttpStatusCode.OK);
+		}
+
+		[HttpPost]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		public async Task<ActionResult> ScoreQuiz(int id, string nextUrl, string errorUrl = "")
+		{
+			if (string.IsNullOrEmpty(errorUrl))
+				errorUrl = nextUrl;
+
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				var queueItem = userQuizzesRepo.GetManualQuizCheckQueueItemById(id);
+
+				if (queueItem.IsChecked)
+					return Redirect(errorUrl + "Эта работа уже была проверена");
+
+				if (! queueItem.IsLockedBy(User.Identity))
+					return Redirect(errorUrl + "Эта работа проверяется другим инструктором");
+
+				var answers = userQuizzesRepo.GetAnswersForUser(queueItem.SlideId, queueItem.UserId);
+
+				QuizVersion quizVersion;
+				/* If there is no user's answers for quiz, get the latest quiz versoin*/
+				if (answers.Count == 0)
+					quizVersion = quizzesRepo.GetLastQuizVersion(queueItem.CourseId, queueItem.SlideId);
+				else
+				{
+					var firstAnswer = answers.FirstOrDefault().Value.FirstOrDefault();
+					quizVersion = firstAnswer != null
+						? firstAnswer.QuizVersion
+						: quizzesRepo.GetFirstQuizVersion(queueItem.CourseId, queueItem.SlideId);
+				}
+
+				int totalScore = 0;
+
+				foreach (var question in quizVersion.RestoredQuiz.Blocks.OfType<AbstractQuestionBlock>())
+				{
+					var scoreFieldName = "quiz__score__" + question.Id;
+					var scoreStr = Request.Form[scoreFieldName];
+					int score;
+					/* Invalid form: score isn't integer */
+					if (!int.TryParse(scoreStr, out score))
+						return Redirect(errorUrl + string.Format("Неверное количество баллов в задании «{0}. {1}»",
+							question.QuestionIndex, question.Text.TruncateWithEllipsis(50)));
+					/* Invalid form: score isn't from range 0..MAX_SCORE */
+					if (score < 0 || score > question.MaxScore)
+						return Redirect(errorUrl + string.Format("Неверное количество баллов в задании «{0}. {1}»: {2}",
+							question.QuestionIndex, question.Text.TruncateWithEllipsis(50), score));
+
+					await userQuizzesRepo.SetScoreForQuizBlock(queueItem.UserId, queueItem.SlideId, question.Id, score);
+					totalScore += score;
+				}
+
+				await userQuizzesRepo.MarkManualQuizCheckQueueItemAsChecked(queueItem);
+				await visitsRepo.SetScoreForAttempt(queueItem.SlideId, queueItem.UserId, totalScore);
+				transaction.Commit();
+			}
+
+			return Redirect(nextUrl);
 		}
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfo(Course course, int slideIndex, IGrouping<string, QuizAnswer> answer)
@@ -137,6 +269,7 @@ namespace uLearn.Web.Controllers
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(IsTrueBlock isTrueBlock, IGrouping<string, QuizAnswer> data)
 		{
 			var isTrue = isTrueBlock.IsRight(data.First().ItemId);
+			var blockScore = isTrue ? isTrueBlock.MaxScore : 0;
 			return new List<QuizInfoForDb>
 			{
 				new QuizInfoForDb
@@ -146,17 +279,20 @@ namespace uLearn.Web.Controllers
 					IsRightAnswer = isTrue,
 					Text = data.First().ItemId,
 					QuizType = typeof(IsTrueBlock),
-					IsRightQuizBlock = isTrue
+					QuizBlockScore = blockScore,
+					QuizBlockMaxScore = isTrueBlock.MaxScore
 				}
 			};
 		}
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(ChoiceBlock choiceBlock, IGrouping<string, QuizAnswer> answers)
 		{
+			int blockScore;
 			if (!choiceBlock.Multiple)
 			{
 				var answerItemId = answers.First().ItemId;
 				var isTrue = choiceBlock.Items.First(x => x.Id == answerItemId).IsCorrect;
+				blockScore = isTrue ? choiceBlock.MaxScore : 0;
 				return new List<QuizInfoForDb>
 				{
 					new QuizInfoForDb
@@ -166,7 +302,8 @@ namespace uLearn.Web.Controllers
 						IsRightAnswer = isTrue,
 						Text = null,
 						QuizType = typeof (ChoiceBlock),
-						IsRightQuizBlock = isTrue
+						QuizBlockScore = blockScore,
+						QuizBlockMaxScore = choiceBlock.MaxScore
 					}
 				};
 			}
@@ -178,14 +315,16 @@ namespace uLearn.Web.Controllers
 					ItemId = x,
 					Text = null,
 					QuizType = typeof(ChoiceBlock),
-					IsRightQuizBlock = false
+					QuizBlockScore = 0,
+					QuizBlockMaxScore = choiceBlock.MaxScore
 				}).ToList();
 			var isRightQuizBlock = ans.All(x => x.IsRightAnswer) &&
 						 choiceBlock.Items.Where(x => x.IsCorrect)
 							 .Select(x => x.Id)
 							 .All(x => ans.Where(y => y.IsRightAnswer).Select(y => y.ItemId).Contains(x));
+			blockScore = isRightQuizBlock ? choiceBlock.MaxScore : 0;
 			foreach (var info in ans)
-				info.IsRightQuizBlock = isRightQuizBlock;
+				info.QuizBlockScore = blockScore;
 			return ans;
 		}
 
@@ -199,13 +338,15 @@ namespace uLearn.Web.Controllers
 					ItemId = x,
 					Text = null,
 					QuizType = typeof(OrderingBlock),
-					IsRightQuizBlock = false
+					QuizBlockScore = 0,
+					QuizBlockMaxScore = orderingBlock.MaxScore
 				}).ToList();
 
 			var isRightQuizBlock = answers.Count() == orderingBlock.Items.Length &&
 				answers.Zip(orderingBlock.Items, (answer, item) => answer.ItemId == item.GetHash()).All(x => x);
+			var blockScore = isRightQuizBlock ? orderingBlock.MaxScore : 0;
 			foreach (var info in ans)
-				info.IsRightQuizBlock = isRightQuizBlock;
+				info.QuizBlockScore = blockScore;
 
 			return ans;
 		}
@@ -221,12 +362,14 @@ namespace uLearn.Web.Controllers
 					ItemId = x.ItemId,
 					Text = x.Text,
 					QuizType = typeof(MatchingBlock),
-					IsRightQuizBlock = false
+					QuizBlockScore = 0,
+					QuizBlockMaxScore = matchingBlock.MaxScore
 				}).ToList();
 
 			var isRightQuizBlock = ans.All(x => x.IsRightAnswer);
+			var blockScore = isRightQuizBlock ? matchingBlock.MaxScore : 0;
 			foreach (var info in ans)
-				info.IsRightQuizBlock = isRightQuizBlock;
+				info.QuizBlockScore = blockScore;
 
 			return ans;
 		}
@@ -235,7 +378,10 @@ namespace uLearn.Web.Controllers
 		{
 			if (data.Length > MAX_FILLINBLOCK_SIZE)
 				data = data.Substring(0, MAX_FILLINBLOCK_SIZE);
-			var isRightAnswer = fillInBlock.Regexes.Any(regex => regex.Regex.IsMatch(data));
+			var isRightAnswer = true;
+			if (fillInBlock.Regexes != null)
+				isRightAnswer = fillInBlock.Regexes.Any(regex => regex.Regex.IsMatch(data));
+			var blockScore = isRightAnswer ? fillInBlock.MaxScore : 0;
 			return new List<QuizInfoForDb>
 			{
 				new QuizInfoForDb
@@ -245,7 +391,8 @@ namespace uLearn.Web.Controllers
 					IsRightAnswer = isRightAnswer,
 					Text = data,
 					QuizType = typeof(FillInBlock),
-					IsRightQuizBlock = isRightAnswer
+					QuizBlockScore = blockScore,
+					QuizBlockMaxScore = fillInBlock.MaxScore
 				}
 			};
 		}
@@ -288,21 +435,24 @@ namespace uLearn.Web.Controllers
 			var passes = db.UserQuizzes
 				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped && periodStart <= q.Timestamp)
 				.GroupBy(q => q.UserId)
-				.Join(db.Users, g => g.Key, user => user.Id, (g, user) => new { user.UserName, user.GroupName, UserQuizzes = g.ToList(), QuizVersionId = g.FirstOrDefault().QuizVersionId })
+				.Join(db.Users, g => g.Key, user => user.Id, (g, user) => new { UserId = user.Id, user.UserName, user.GroupName, UserQuizzes = g.ToList(), QuizVersion = g.FirstOrDefault().QuizVersion })
 				.ToList();
 			foreach (var pass in passes)
 			{
-				dict[pass.UserName] = GetUserQuizAnswers(quizSlide, pass.UserQuizzes).ToList();
+				var slide = quizSlide;
+				if (pass.QuizVersion != null)
+					slide = new QuizSlide(quizSlide.Info, pass.QuizVersion.RestoredQuiz);
+				dict[pass.UserName] = GetUserQuizAnswers(slide, pass.UserQuizzes).ToList();
 				groups[pass.UserName] = pass.GroupName;
 			}
 			var rightAnswersCount = dict.Values
 				.SelectMany(list => list
-					.Where(info => info.IsRight)
-					.Select(info => new { info.Id, info.IsRight }))
+					.Where(info => info.Score == info.MaxScore))
 				.GroupBy(arg => arg.Id)
 				.ToDictionary(grouping => grouping.Key, grouping => grouping.Count());
 
-			var usersByQuizVersion = passes.GroupBy(p => p.QuizVersionId).ToDictionary(g => g.Key, g => g.Select(u => u.UserName).ToList());
+			var usersByQuizVersion = passes.GroupBy(p => p.QuizVersion?.Id).ToDictionary(g => g.Key, g => g.Select(u => u.UserName).ToList());
+			var usersWaitsForManualCheck = userQuizzesRepo.GetManualQuizCheckQueue(courseId, quizSlide.Id).ToList().Select(i => i.User.UserName).ToImmutableHashSet();
 
 			return PartialView(new QuizAnalyticsModel
 			{
@@ -310,11 +460,11 @@ namespace uLearn.Web.Controllers
 				SlideId = quizSlide.Id,
 
 				UserAnswers = dict,
-				QuizSlide = quizSlide,
 				QuizVersions = quizVersions,
 				UsersByQuizVersion = usersByQuizVersion,
 				RightAnswersCount = rightAnswersCount,
-				Group = groups
+				GroupByUser = groups,
+				UsersWaitsForManualCheck = usersWaitsForManualCheck,
 			});
 		}
 
@@ -341,8 +491,10 @@ namespace uLearn.Web.Controllers
 				answer = answers[quizId].FirstOrDefault();
 			return new FillInBlockAnswerInfo
 			{
-				Answer = answer == null ? null : answer.Text,
+				Answer = answer?.Text,
 				IsRight = answer != null && answer.IsRightAnswer,
+				Score = answer?.QuizBlockScore ?? 0,
+				MaxScore = answer?.QuizBlockMaxScore ?? 0,
 				Id = questionIndex.ToString()
 			};
 		}
@@ -360,10 +512,14 @@ namespace uLearn.Web.Controllers
 			}
 
 			var isRight = false;
+			var score = 0;
+			var maxScore = 0;
 			foreach (var quizItem in answer.Where(quizItem => ans.ContainsKey(quizItem.ItemId)))
 			{
-				isRight = quizItem.IsRightQuizBlock;
+				isRight = quizItem.IsQuizBlockScoredMaximum;
 				ans[quizItem.ItemId] = true;
+				score = quizItem.QuizBlockScore;
+				maxScore = quizItem.QuizBlockMaxScore;
 			}
 
 			return new ChoiceBlockAnswerInfo
@@ -371,6 +527,8 @@ namespace uLearn.Web.Controllers
 				AnswersId = ans,
 				Id = questionIndex.ToString(),
 				RealyRightAnswer = new HashSet<string>(block.Items.Where(x => x.IsCorrect).Select(x => x.Id)),
+				Score = score,
+				MaxScore = maxScore,
 				IsRight = isRight
 			};
 		}
@@ -386,15 +544,21 @@ namespace uLearn.Web.Controllers
 				IsAnswered = answer != null,
 				Answer = answer != null && answer.Text == "True",
 				Id = questionIndex.ToString(),
-				IsRight = answer != null && answer.IsRightAnswer
+				IsRight = answer != null && answer.IsRightAnswer,
+				Score = answer?.QuizBlockScore ?? 0,
+				MaxScore = answer?.QuizBlockMaxScore ?? 0,
 			};
 		}
 
 		private static QuizAnswerInfo GetOrderingBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, OrderingBlock block, int questionIndex)
 		{
 			IEnumerable<UserQuiz> userAnswers = new List<UserQuiz>();
+			UserQuiz firstAnswer = null;
 			if (answers.ContainsKey(block.Id))
+			{
 				userAnswers = answers[block.Id].Where(q => q.ItemId != null);
+				firstAnswer = userAnswers.FirstOrDefault();
+			}
 
 			var answersPositions = userAnswers.Select(
 				userAnswer => block.Items.FindIndex(i => i.GetHash() == userAnswer.ItemId)
@@ -404,14 +568,20 @@ namespace uLearn.Web.Controllers
 			{
 				Id = questionIndex.ToString(),
 				AnswersPositions = answersPositions,
+				Score = firstAnswer?.QuizBlockScore ?? 0,
+				MaxScore = firstAnswer?.QuizBlockMaxScore ?? 0,
 			};
 		}
 
 		private static QuizAnswerInfo GetMatchingBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, MatchingBlock block, int questionIndex)
 		{
 			IEnumerable<UserQuiz> userAnswers = new List<UserQuiz>();
+			UserQuiz firstAnswer = null;
 			if (answers.ContainsKey(block.Id))
+			{
 				userAnswers = answers[block.Id].Where(q => q.ItemId != null);
+				firstAnswer = userAnswers.FirstOrDefault();
+			}
 
 			var isRightMatches = new List<bool>();
 			foreach (var match in block.Matches)
@@ -423,7 +593,9 @@ namespace uLearn.Web.Controllers
 			return new MatchingBlockAnswerInfo
 			{
 				Id = questionIndex.ToString(),
-				IsRightMatches = isRightMatches
+				IsRightMatches = isRightMatches,
+				Score = firstAnswer?.QuizBlockScore ?? 0,
+				MaxScore = firstAnswer?.QuizBlockMaxScore ?? 0,
 			};
 		}
 
@@ -435,7 +607,7 @@ namespace uLearn.Web.Controllers
 			{
 				var userId = User.Identity.GetUserId();
 				if (userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b) < GetMaxDropCount(slide as QuizSlide) &&
-					!userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId).All(b => b.Value))
+					!userQuizzesRepo.IsQuizScoredMaximum(courseId, userId, slideId))
 				{
 					await userQuizzesRepo.DropQuiz(userId, slideId);
 					await visitsRepo.DropAttempt(slideId, userId);
@@ -447,57 +619,6 @@ namespace uLearn.Web.Controllers
 			if (isLti)
 				return RedirectToAction("LtiSlide", "Course", model);
 			return RedirectToAction("Slide", "Course", model);
-		}
-
-		[AllowAnonymous]
-		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false)
-		{
-			if (isGuest)
-				return PartialView(GuestQuiz(slide, courseId));
-			var slideId = slide.Id;
-			var maxDropCount = GetMaxDropCount(slide);
-			var state = GetQuizState(courseId, userId, slideId, maxDropCount);
-			var quizState = state.Item1;
-			var tryNumber = state.Item2;
-			var resultsForQuizes = GetResultForQuizes(courseId, userId, slideId, state.Item1);
-			var userAnswers = userQuizzesRepo.GetAnswersForShowOnSlide(courseId, slide, userId);
-
-			var quizVersion = quizzesRepo.GetLastQuizVersion(courseId, slideId);
-			if (quizState != QuizState.NotPassed && userAnswers.Count > 0)
-			{
-				var firstUserAnswer = userAnswers.FirstOrDefault().Value.FirstOrDefault();
-				/* If we know version which user has answered*/
-				if (firstUserAnswer != null && firstUserAnswer.QuizVersion != null)
-					quizVersion = firstUserAnswer.QuizVersion;
-				/* If user's version is null, show first created version for this slide ever */
-				if (firstUserAnswer != null && firstUserAnswer.QuizVersion == null)
-					quizVersion = quizzesRepo.GetFirstQuizVersion(courseId, slideId);
-			}
-
-			/* If we haven't quiz version in database, create it */
-			if (quizVersion == null)
-				quizVersion = quizzesRepo.AddQuizVersionIfNeeded(courseId, slide);
-
-			/* Restore quiz slide from version stored in the database */
-			var quiz = quizVersion.RestoredQuiz;
-			slide = new QuizSlide(slide.Info, quiz);
-
-			var model = new QuizModel
-			{
-				CourseId = courseId,
-				Slide = slide,
-				QuizState = quizState,
-				TryNumber = tryNumber,
-				MaxDropCount = maxDropCount,
-				ResultsForQuizes = resultsForQuizes,
-				AnswersToQuizes = userAnswers,
-				IsLti = isLti
-			};
-
-			if (model.QuizState != QuizState.NotPassed && model.RightAnswers == model.QuestionsCount)
-				model.QuizState = QuizState.Total;
-
-			return PartialView(model);
 		}
 
 		private QuizModel GuestQuiz(QuizSlide slide, string courseId)
@@ -519,7 +640,7 @@ namespace uLearn.Web.Controllers
 			return maxDropCount == 0 ? MAX_DROPS_COUNT : maxDropCount;
 		}
 
-		private Dictionary<string, bool> GetResultForQuizes(string courseId, string userId, Guid slideId, QuizState state)
+		private Dictionary<string, int> GetResultForQuizes(string courseId, string userId, Guid slideId, QuizState state)
 		{
 			return userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId);
 		}
@@ -527,6 +648,11 @@ namespace uLearn.Web.Controllers
 		private Tuple<QuizState, int> GetQuizState(string courseId, string userId, Guid slideId, int maxDropCount)
 		{
 			var states = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).ToList();
+
+			var queueItem = userQuizzesRepo.FindManualQuizCheckQueueItem(courseId, slideId, userId);
+			if (queueItem != null)
+				return Tuple.Create(queueItem.IsLocked ? QuizState.IsChecking : QuizState.WaitForCheck, states.Count);
+			
 			if (states.Count > maxDropCount)
 				return Tuple.Create(QuizState.Total, states.Count);
 			if (states.Any(b => !b))

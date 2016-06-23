@@ -34,9 +34,9 @@ namespace uLearn.Web.Models
 			get
 			{
 				if (FirstName + LastName != "")
-					return FirstName + " " + LastName;
+					return (FirstName + " " + LastName).Trim();
 				if (!string.IsNullOrEmpty(UserName))
-					return UserName;
+					return UserName.Trim();
 				return "Пользователь";
 			}
 		}

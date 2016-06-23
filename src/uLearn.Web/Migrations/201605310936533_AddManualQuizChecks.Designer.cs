@@ -7,13 +7,13 @@ namespace uLearn.Web.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class Empty : IMigrationMetadata
+    public sealed partial class AddManualQuizChecks : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Empty));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddManualQuizChecks));
         
         string IMigrationMetadata.Id
         {
-            get { return "201605310807254_Empty"; }
+            get { return "201605310936533_AddManualQuizChecks"; }
         }
         
         string IMigrationMetadata.Source

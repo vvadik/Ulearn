@@ -18,6 +18,9 @@ namespace uLearn.Quizes
 		[XmlAttribute("maxDropCount")]
 		public int MaxDropCount;
 
+		[XmlAttribute("manualCheck")]
+		public bool ManualCheck;
+
 		[XmlElement("title")]
 		public string Title;
 
@@ -39,6 +42,11 @@ namespace uLearn.Quizes
 		public string NormalizedXml
 		{
 			get { return this.XmlSerialize(true); }
+		}
+
+		public int MaxScore
+		{
+			get { return Blocks.OfType<AbstractQuestionBlock>().Sum(b => b.MaxScore); }
 		}
 
 		public void Validate()
@@ -80,8 +88,17 @@ namespace uLearn.Quizes
 	
 	public abstract class AbstractQuestionBlock : SlideBlock
 	{
+		public AbstractQuestionBlock()
+		{
+			/* Default max score */
+			MaxScore = 1;
+		}
+
 		[XmlAttribute("id")]
 		public string Id;
+
+		[XmlAttribute("maxScore")]
+		public int MaxScore;
 
 		[XmlElement("text")]
 		public string Text;
@@ -95,6 +112,11 @@ namespace uLearn.Quizes
 		}
 
 		public abstract bool HasEqualStructureWith(SlideBlock other);
+
+		public bool IsScoring
+		{
+			get { return MaxScore > 0; }
+		}
 	}
 
 	public class ChoiceBlock : AbstractQuestionBlock
@@ -220,8 +242,15 @@ namespace uLearn.Quizes
 		[XmlAttribute("explanation")]
 		public string Explanation;
 
+		[XmlAttribute("multiline")]
+		public bool Multiline;
+
 		public override void Validate()
 		{
+			if (string.IsNullOrEmpty(Sample))
+				return;
+			if (Regexes == null)
+				return;
 			if (!Regexes.Any(re => re.Regex.IsMatch(Sample)))
 				throw new FormatException("Sample should match at least one regex. BlockId=" + Id);
 		}

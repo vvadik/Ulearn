@@ -86,7 +86,11 @@ WebViewPage.WriteTo(@__razor_helper_writer, SlideHtml.Slide(new BlockRenderConte
 							(b, i) => b is ExerciseBlock 
 								? new ExerciseBlockData { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true } 
 								: b is AbstractQuestionBlock 
-									? new QuizBlockData(new QuizModel() {AnswersToQuizes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<UserQuiz>())}, i, QuizState.Total) 
+									? new QuizBlockData(new QuizModel
+									{
+										AnswersToQuizes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<UserQuiz>()),
+										Slide = (QuizSlide) slide
+									}, i, QuizState.Total) 
 									: (dynamic)null
 							).ToArray(),
 							false,

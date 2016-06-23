@@ -30,20 +30,22 @@
 }
 @foreach (var quizVersion in Model.QuizVersions)
 {
-	var quizSlide = quizVersion.RestoredQuiz;
+	var quiz = quizVersion.RestoredQuiz;
+	var isManualCheck = quiz.ManualCheck;
 	<div>
-		@{ var maxQuestionIndex = quizSlide.Blocks.OfType<AbstractQuestionBlock>().Max(x => x.QuestionIndex); }
+		@{ var maxQuestionIndex = quiz.Blocks.OfType<AbstractQuestionBlock>().Max(x => x.QuestionIndex); }
 		<table class="analytics__user-answers tablesorter">
 			<thead>
 			<tr>
 				<th style="border-bottom: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа" data-sorter="true">наведи на меня!</th>
 				<th style="border-bottom: none">Группа</th>
 				<th style="border-bottom: none" data-sorter="false"></th>
-				@foreach (var block in quizSlide.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
+				@foreach (var block in quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
-					int count;
-					Model.RightAnswersCount.TryGetValue(block.QuestionIndex.ToString(), out count);
-					<th title="@block.Text" colspan="@GetColSpan(block)">@block.Text (@count/@Model.UserAnswers.Count)</th>
+					int rightAnswersCount;
+					Model.RightAnswersCount.TryGetValue(block.QuestionIndex.ToString(), out rightAnswersCount);
+					var colspan = isManualCheck ? 1 : GetColSpan(block);
+					<th title="@block.Text" colspan="@colspan">@block.Text (@rightAnswersCount/@Model.UserAnswers.Count)</th>
 					if (maxQuestionIndex == block.QuestionIndex)
 					{
 						break;
@@ -51,51 +53,54 @@
 					<th style="border-bottom: none" data-sorter="false"></th>
 				}
 			</tr>
-			<tr>
-				<th style="border-top: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа"></th>
-				<th style="border-top: none"></th>
-				<th style="border-top: none;border-bottom: none" data-sorter="false"></th>
-				@foreach (var block in quizSlide.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
-				{
-					if (block is ChoiceBlock)
-					{
-						var choiseBlock = ((ChoiceBlock)block);
-						foreach (var item in choiseBlock.Items.OrderBy(x => x.Id))
-						{
-							<th title="@item.Description">@GetSubstring(item.Description, 40)</th>
-						}
-					}
-					else if (block is FillInBlock)
-					{
-						<th>user answer</th>
-					}
-					else if (block is OrderingBlock)
-					{
-						var orderingBlock = (OrderingBlock)block;
-						foreach (var item in orderingBlock.Items.OrderBy(x => x.Id))
-						{
-							<th title="@item.Text">@GetSubstring(item.Text, 40)</th>
-						}
-					}
-					else if (block is MatchingBlock)
-					{
-						var matchingBlock = (MatchingBlock)block;
-						foreach (var text in matchingBlock.Matches.OrderBy(x => x.Id).Select(x => x.FixedItem))
-						{
-							<th title="@text">@GetSubstring(text, 40)</th>
-						}
-					}
-					else
-					{
-						<th>IsRight</th>
-					}
-					if (maxQuestionIndex == block.QuestionIndex)
-					{
-						break;
-					}
+			@if (!isManualCheck)
+			{
+				<tr>
+					<th style="border-top: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа"></th>
+					<th style="border-top: none"></th>
 					<th style="border-top: none;border-bottom: none" data-sorter="false"></th>
-				}
-			</tr>
+					@foreach (var block in quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
+					{
+						if (block is ChoiceBlock)
+						{
+							var choiseBlock = ((ChoiceBlock)block);
+							foreach (var item in choiseBlock.Items.OrderBy(x => x.Id))
+							{
+								<th title="@item.Description">@GetSubstring(item.Description, 40)</th>
+							}
+						}
+						else if (block is FillInBlock)
+						{
+							<th>user answer</th>
+						}
+						else if (block is OrderingBlock)
+						{
+							var orderingBlock = (OrderingBlock)block;
+							foreach (var item in orderingBlock.Items.OrderBy(x => x.Id))
+							{
+								<th title="@item.Text">@GetSubstring(item.Text, 40)</th>
+							}
+						}
+						else if (block is MatchingBlock)
+						{
+							var matchingBlock = (MatchingBlock)block;
+							foreach (var text in matchingBlock.Matches.OrderBy(x => x.Id).Select(x => x.FixedItem))
+							{
+								<th title="@text">@GetSubstring(text, 40)</th>
+							}
+						}
+						else
+						{
+							<th>IsRight</th>
+						}
+						if (maxQuestionIndex == block.QuestionIndex)
+						{
+							break;
+						}
+						<th style="border-top: none;border-bottom: none" data-sorter="false"></th>
+					}
+				</tr>
+			}
 			</thead>
 			<tbody>
 			@{
@@ -103,54 +108,69 @@
 			}
 			@foreach (var user in users)
 			{
-				var group = Model.Group[user];
+				var group = Model.GroupByUser[user];
 				<tr>
 					<td>@user</td>
-					<td data-sort-value="@(string.IsNullOrEmpty(group) ? "-" : group)">@group</td>
+					<td data-sort-value="@(string.IsNullOrEmpty(group) ? "—" : group)">@group</td>
 					<td style="border-top: none;border-bottom: none"></td>
 					@foreach (var ans in Model.UserAnswers[user])
 					{
-						if (ans is FillInBlockAnswerInfo)
+						if (isManualCheck)
 						{
-							var answer = ((FillInBlockAnswerInfo)ans);
-							var fillClass = answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer";
-							<td class="@fillClass">@(answer.Answer)</td>
-						}
-						else if (ans is IsTrueBlockAnswerInfo)
-						{
-							var answer = ((IsTrueBlockAnswerInfo)ans);
-							<td class="@(answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer")" data-sort-value="@answer.Answer"><i class="@(answer.Answer ? "glyphicon glyphicon-ok" : "")"></i></td>
-						}
-						else if (ans is OrderingBlockAnswerInfo)
-						{
-							var answer = (OrderingBlockAnswerInfo)ans;
-							for (var idx = 0; idx < answer.AnswersPositions.Count; idx++)
+							if (Model.UsersWaitsForManualCheck.Contains(user))
 							{
-								var userAnswerPosition = answer.AnswersPositions[idx];
-								var isRight = userAnswerPosition == idx;
-								<td class="@(isRight ? "rightQuizAnswer" : "falseQuizAnswer")">
-									@(isRight ? "" : (1 + userAnswerPosition).ToString())
-								</td>
+								<td class="manualQuizAnswer" data-sort-value="0" title="Ожидает проверки инструктором"></td>
 							}
-						}
-						else if (ans is MatchingBlockAnswerInfo)
-						{
-							var answer = (MatchingBlockAnswerInfo)ans;
-							foreach (var isRight in answer.IsRightMatches)
+							else
 							{
-								<td class="@(isRight ? "rightQuizAnswer" : "falseQuizAnswer")">
-								</td>
+								var fillClass = ans.Score == ans.MaxScore ? "rightQuizAnswer" : "falseQuizAnswer";
+								<td class="@fillClass" data-sort-value="@ans.Score">@ans.Score из @ans.MaxScore</td>
 							}
 						}
 						else
 						{
-							var answer = (ChoiceBlockAnswerInfo)ans;
-							foreach (var item in answer.AnswersId)
+							if (ans is FillInBlockAnswerInfo)
 							{
-								var isContain = answer.RealyRightAnswer.Contains(item.Key);
-								var classForCell = ((isContain && item.Value) || (!isContain && !item.Value)) ? "rightQuizAnswer" : "falseQuizAnswer";
-								var itemClass = item.Value ? "glyphicon glyphicon-ok" : "";
-								<td class="@classForCell" data-sort-value="@item.Value"><i class="@itemClass"></i></td>
+								var answer = (FillInBlockAnswerInfo)ans;
+								var fillClass = answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer";
+								<td class="@fillClass">@(answer.Answer)</td>
+							}
+							else if (ans is IsTrueBlockAnswerInfo)
+							{
+								var answer = (IsTrueBlockAnswerInfo)ans;
+								<td class="@(answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer")" data-sort-value="@answer.Answer"><i class="@(answer.Answer ? "glyphicon glyphicon-ok" : "")"></i></td>
+							}
+							else if (ans is OrderingBlockAnswerInfo)
+							{
+								var answer = (OrderingBlockAnswerInfo)ans;
+								for (var idx = 0; idx < answer.AnswersPositions.Count; idx++)
+								{
+									var userAnswerPosition = answer.AnswersPositions[idx];
+									var isRight = userAnswerPosition == idx;
+									<td class="@(isRight ? "rightQuizAnswer" : "falseQuizAnswer")">
+										@(isRight ? "" : (1 + userAnswerPosition).ToString())
+									</td>
+								}
+							}
+							else if (ans is MatchingBlockAnswerInfo)
+							{
+								var answer = (MatchingBlockAnswerInfo)ans;
+								foreach (var isRight in answer.IsRightMatches)
+								{
+									<td class="@(isRight ? "rightQuizAnswer" : "falseQuizAnswer")">
+									</td>
+								}
+							}
+							else
+							{
+								var answer = (ChoiceBlockAnswerInfo)ans;
+								foreach (var item in answer.AnswersId)
+								{
+									var isContain = answer.RealyRightAnswer.Contains(item.Key);
+									var classForCell = ((isContain && item.Value) || (!isContain && !item.Value)) ? "rightQuizAnswer" : "falseQuizAnswer";
+									var itemClass = item.Value ? "glyphicon glyphicon-ok" : "";
+									<td class="@classForCell" data-sort-value="@item.Value"><i class="@itemClass"></i></td>
+								}
 							}
 						}
 						if (maxQuestionIndex == int.Parse(ans.Id))

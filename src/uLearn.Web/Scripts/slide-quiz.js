@@ -1,12 +1,15 @@
 ﻿function submitQuiz(courseId, slideIndex, expectedCount, isLti) {
 	if (areAllAnswered(expectedCount)) {
+		/* Disable quiz submit button */
+		$('.quiz-submit-btn').prop('disabled', true);
+
 		var answers = [];
 		$(".quiz").each(function () {
-			var id = $(this).find('input').attr('id'); //id of quiz
+			var id = $(this).find('input, textarea').attr('id'); //id of quiz
 			var content = id.split('quizBlock');
 			var val;
 			if ($(this).hasClass('quiz-block-input')) {
-				val = $(this).find('input').val();
+				val = $(this).find('input, textarea').val();
 				answers.push(new QuizAnswer("Text", content[0], "", val));
 			}
 			if ($(this).hasClass('quiz-block-ordering__item')) {
@@ -35,7 +38,7 @@
 					isLti: isLti
 				}
 			}).success(function (ans) {
-				$("#quiz-status").text("Проверяется...");
+				$("#quiz-status").text("Отправляем...");
 				window.scrollTo(0, 0);
 				window.location.reload();
 			})
@@ -47,7 +50,7 @@
 		console.log(answers);
 		return answer;
 	} else
-		alert("Fill this quiz!");
+		alert("Выполните все задания перед отправкой теста");
 };
 
 
@@ -59,7 +62,7 @@ function areAllAnswered(needingCount) {
 		}
 	});
 	$(".quiz-block-input").each(function () {
-		if ($(this).find('input').val() != "") {
+		if ($(this).find('input, textarea').val() != "") {
 			realCount++;
 		}
 	});

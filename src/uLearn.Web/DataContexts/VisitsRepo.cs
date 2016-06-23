@@ -73,6 +73,15 @@ namespace uLearn.Web.DataContexts
 			});
 		}
 
+		public async Task SetScoreForAttempt(Guid slideId, string userId, int newScore)
+		{
+			await UpdateAttempts(slideId, userId, visit =>
+			{
+				visit.Score = newScore;
+				visit.IsPassed = true;
+			});
+		}
+
 		public async Task AddAttempt(Guid slideId, string userId, int score)
 		{
 			await UpdateAttempts(slideId, userId, visit =>

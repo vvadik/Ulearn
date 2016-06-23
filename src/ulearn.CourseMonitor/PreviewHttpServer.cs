@@ -229,7 +229,6 @@ namespace uLearn.CourseTool
 				{
 					course = ReloadCourse();
 					Console.WriteLine("Course reloaded. LastChangeTime: {0}", lastChangeTime);
-
 				}
 				return needReload;
 			}

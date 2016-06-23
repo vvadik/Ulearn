@@ -59,11 +59,20 @@ namespace uLearn.Web.Models
 
 
 		[Required]
-		//Корректный ли вариант ItemId
+		// Корректный ли вариант ItemId
 		public bool IsRightAnswer { get; set; }
 
 		[Required]
-		//Корректный ли весь ответ на вопрос? Отличается от IsRightAnswer для вопросов с множественным выбором
-		public bool IsRightQuizBlock { get; set; }
+		// Количество баллов за весь блок
+		public int QuizBlockScore { get; set; }
+
+		[Required]
+		// Максимально возможное количество баллов за весь блок
+		public int QuizBlockMaxScore { get; set; }
+
+		public bool IsQuizBlockScoredMaximum
+		{
+			get { return QuizBlockScore == QuizBlockMaxScore; }
+		}
 	}
 }

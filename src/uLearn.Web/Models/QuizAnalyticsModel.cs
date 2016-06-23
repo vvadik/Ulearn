@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using uLearn.Quizes;
 
 namespace uLearn.Web.Models
@@ -10,17 +11,19 @@ namespace uLearn.Web.Models
 		public Guid SlideId { get; set; }
 
 		public SortedDictionary<string, List<QuizAnswerInfo>> UserAnswers { get; set; }
-		public QuizSlide QuizSlide { get; set; }
 		public List<QuizVersion> QuizVersions { get; set; }
 		public Dictionary<int?, List<string>> UsersByQuizVersion { get; set; }
 		public Dictionary<string, int> RightAnswersCount { get; set; }
-		public Dictionary<string, string> Group { get; set; }
+		public Dictionary<string, string> GroupByUser { get; set; }
+		public ImmutableHashSet<string> UsersWaitsForManualCheck { get; set; }
 	}
 
 	public class QuizAnswerInfo
 	{
 		public string Id { get; set; }
 		public bool IsRight { get; set; }
+		public int Score { get; set; }
+		public int MaxScore { get; set; }
 	}
 
 	public class FillInBlockAnswerInfo : QuizAnswerInfo

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -24,6 +25,7 @@ namespace uLearn.Web.Controllers
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly QuizzesRepo quizzesRepo;
 		private readonly CoursesRepo coursesRepo;
+		private readonly UserQuizzesRepo userQuizzesRepo;
 
 		public AdminController()
 		{
@@ -34,6 +36,7 @@ namespace uLearn.Web.Controllers
 			userManager = new ULearnUserManager();
 			quizzesRepo = new QuizzesRepo(db);
 			coursesRepo = new CoursesRepo(db);
+			userQuizzesRepo = new UserQuizzesRepo(db);
 		}
 
 		public ActionResult CourseList(string courseCreationLastTry = null)
@@ -213,6 +216,86 @@ namespace uLearn.Web.Controllers
 								ContextParentComment = c.IsTopLevel() ? null : commentsById[c.ParentCommentId].Text,
 							}).ToList()
 			});
+		}
+
+		public ActionResult ManualQuizChecksQueue(string courseId, string message="")
+		{
+			var course = courseManager.GetCourse(courseId);
+			var checks = userQuizzesRepo.GetManualQuizCheckQueue(courseId).ToList();
+
+			if (!checks.Any() && ! string.IsNullOrEmpty(message))
+				return RedirectToAction("ManualQuizChecksQueue", new { courseId });
+
+			return View(new ManualQuizCheckQueueViewModel
+			{
+				CourseId = courseId,
+				Checks = checks.Select(c => new ManualQuizCheckQueueItemViewModel
+				{
+					QuizCheckQueueItem = c,
+					ContextSlideTitle = course.GetSlideById(c.SlideId).Title
+				}).ToList(),
+				Message = message,
+			});
+		}
+
+		private async Task<ActionResult> InternalCheckQuiz(int queueItemId, bool ignoreLock = false)
+		{
+			ManualQuizCheckQueueItem quizCheckQueueItem;
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				quizCheckQueueItem = userQuizzesRepo.GetManualQuizCheckQueueItemById(queueItemId);
+				if (!User.HasAccessFor(quizCheckQueueItem.CourseId, CourseRole.Instructor))
+					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+				if (quizCheckQueueItem.IsChecked)
+					return RedirectToAction("ManualQuizChecksQueue",
+						new
+						{
+							courseId = quizCheckQueueItem.CourseId,
+							message = "already_checked"
+						});
+				if (quizCheckQueueItem.IsLocked && !ignoreLock && !quizCheckQueueItem.IsLockedBy(User.Identity))
+					return RedirectToAction("ManualQuizChecksQueue",
+							new
+							{
+								courseId = quizCheckQueueItem.CourseId,
+								message = "locked"
+							});
+
+				await userQuizzesRepo.LockManualQuizCheckQueueItem(quizCheckQueueItem, User.Identity.GetUserId());
+				transaction.Commit();
+			}
+			return RedirectToRoute("Course.SlideById", new
+			{
+				CourseId = quizCheckQueueItem.CourseId,
+				SlideId = quizCheckQueueItem.SlideId,
+				CheckQueueItemId = quizCheckQueueItem.Id
+			});
+		}
+
+		public async Task<ActionResult> CheckQuiz(int id)
+		{
+			return await InternalCheckQuiz(id);
+		}
+
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		public async Task<ActionResult> CheckNextQuizForSlide(string courseId, Guid slideId)
+		{
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				var queueItems = userQuizzesRepo.GetManualQuizCheckQueue(courseId, slideId);
+				var itemToCheck = queueItems.FirstOrDefault(i => i.LockedById == null);
+				if (itemToCheck == null)
+					return RedirectToAction("ManualQuizChecksQueue", new { courseId = courseId, message = "slide_checked" });
+				
+				if (itemToCheck.CourseId != courseId)
+					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
+				await userQuizzesRepo.LockManualQuizCheckQueueItem(itemToCheck, User.Identity.GetUserId());
+
+				transaction.Commit();
+
+				return await InternalCheckQuiz(itemToCheck.Id, true);
+			}
 		}
 
 		[HttpPost]
@@ -413,6 +496,20 @@ namespace uLearn.Web.Controllers
 		public CommentModerationPolicy ModerationPolicy { get; set; }
 		public bool OnlyInstructorsCanReply { get; set; }
 		public List<CommentViewModel> Comments { get; set; }
+	}
+
+	public class ManualQuizCheckQueueViewModel
+	{
+		public string CourseId { get; set; }
+		public List<ManualQuizCheckQueueItemViewModel> Checks { get; set; }
+		public string Message { get; set; }
+	}
+
+	public class ManualQuizCheckQueueItemViewModel
+	{
+		public ManualQuizCheckQueueItem QuizCheckQueueItem { get; set; }
+
+		public string ContextSlideTitle { get; set; }
 	}
 
 	public class DiagnosticsModel

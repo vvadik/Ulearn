@@ -119,19 +119,19 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
  
 	var mark = "";
 	var style = "";
+	var blockScore = -1;
 	QuizBlockData model = context.GetBlockData(block);
-	if (model.QuizState != QuizState.NotPassed)
+	if (model.QuizState != QuizState.NotPassed && model.QuizState != QuizState.WaitForCheck && model.QuizState != QuizState.IsChecking)
 	{
 		if (model.QuizModel != null && model.QuizModel.ResultsForQuizes != null)
 		{
-			bool res;
-			res = model.QuizModel.ResultsForQuizes.TryGetValue(block.Id, out res) && res;
+			var res = model.QuizModel.ResultsForQuizes.TryGetValue(block.Id, out blockScore) && blockScore == block.MaxScore;
 			mark = "glyphicon " + (res ? "glyphicon-ok" : "glyphicon-remove");
 			style = "color: " + (res ? "green" : "red");
 		}
 	}
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<h4><i class=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<h4>\r\n\t\t<i class=\"");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, mark);
@@ -149,15 +149,79 @@ WebViewPage.WriteTo(@__razor_helper_writer, block.QuestionIndex);
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, ". ");
 
 
-                     WebViewPage.WriteTo(@__razor_helper_writer, block.Text.RenderTex());
+                  WebViewPage.WriteTo(@__razor_helper_writer, block.Text.RenderTex());
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</h4>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t<sup class=\"text-muted\">\r\n");
+
+
+ 			if (blockScore >= 0)
+			{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<span>\r\n\t\t\t\t\t");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, blockScore);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, " из ");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, block.MaxScore);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, " балл");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, block.MaxScore == 1 ? "а" : "ов");
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t</span>\r\n");
+
+
+			}
+			else
+			{
+				
+WebViewPage.WriteTo(@__razor_helper_writer, block.MaxScore.PluralizeInRussian(new RussianPluralizationOptions
+					{
+						One = "балл",
+						Two = "балла",
+						Five = "баллов",
+						smallNumbersAreWords = false,
+						hideNumberOne = false
+					}
+				));
+
+     
+			}
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t</sup>\r\n\t</h4>\r\n");
+
 
 
 	
 WebViewPage.WriteTo(@__razor_helper_writer, QuizBlock((dynamic)block, context));
 
                                     
+	if (context.ManualQuizCheckQueueItem != null)
+	{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<h4>Оцените от 0 до ");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, block.MaxScore);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</h4>\r\n");
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div>\r\n\t\t\t<input type=\"number\" class=\"form-control\" min=\"0\" max=\"");
+
+
+               WebViewPage.WriteTo(@__razor_helper_writer, block.MaxScore);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" name=\"quiz__score__@block.Id\" />\r\n\t\t</div>\r\n");
+
+
+	}
+
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<hr class=\"quiz-block-delimiter\" />\r\n");
 
@@ -568,6 +632,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\'>\r\n");
 			var ans = itemChecked ? "checked" : "";
 			var itemClass = "";
 			var title = "";
+			var readonlyAttr = context.CanUserFillQuiz ? "" : "readonly";
 			if (model.QuizState == QuizState.Total)
 			{
 				itemClass = item.IsCorrect ? "right-quiz" : itemChecked ? "wrong-quiz" : "";
@@ -599,6 +664,11 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" ");
 
                                                                       WebViewPage.WriteTo(@__razor_helper_writer, GetGuestDisable(context.IsGuest));
 
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, " ");
+
+
+                                                                                                        WebViewPage.WriteTo(@__razor_helper_writer, readonlyAttr);
+
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t\t<label class=\"");
 
 
@@ -627,7 +697,7 @@ WebViewPage.WriteTo(@__razor_helper_writer, item.Description.RenderTex());
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t</label>\r\n");
 
 
- 				if (model.QuizState == QuizState.Total && item.IsCorrect)
+ 				if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && item.IsCorrect)
 				{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t<i class=\"glyphicon glyphicon-ok\" style=\"color: green\" title=\"");
@@ -682,48 +752,104 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 		var answers = model.QuizModel.AnswersToQuizes[block.Id];
 		var userAnswer = answers.FirstOrDefault();
 		value = userAnswer.Text;
-		quizRes = (model.QuizState == QuizState.Total)
+		quizRes = model.QuizState == QuizState.Total
 			? (userAnswer.IsRightAnswer ? "right-quiz" : "wrong-quiz") : "";
 	}
 	var sample = block.Sample;
+	var readonlyAttr = context.CanUserFillQuiz ? "" : "readonly";
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"quiz quiz-block-input\">\r\n\t\t<label ");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, GetGuestOnclick(context.IsGuest));
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t<input autocomplete=\"off\" class=\"form-control ");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n");
 
 
-      WebViewPage.WriteTo(@__razor_helper_writer, quizRes);
+ 			if (block.Multiline)
+			{
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" value=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, " \t\t\t\t<textarea class=\"form-control ");
 
 
-                       WebViewPage.WriteTo(@__razor_helper_writer, value);
+WebViewPage.WriteTo(@__razor_helper_writer, quizRes);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" id=\'");
 
 
-                                    WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "quizBlock");
+       WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "quizBlock");
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' maxlength=\"");
 
 
-                                                                         WebViewPage.WriteTo(@__razor_helper_writer, QuizController.MAX_FILLINBLOCK_SIZE);
+                                            WebViewPage.WriteTo(@__razor_helper_writer, QuizController.MAX_FILLINBLOCK_SIZE);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" ");
 
 
-                                                                                                               WebViewPage.WriteTo(@__razor_helper_writer, GetGuestDisable(context.IsGuest));
+                                                                                  WebViewPage.WriteTo(@__razor_helper_writer, GetGuestDisable(context.IsGuest));
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t</label>\r\n\t</div>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, " ");
+
+
+                                                                                                                    WebViewPage.WriteTo(@__razor_helper_writer, readonlyAttr);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, " cols=\"70\" rows=\"5\">");
+
+
+                                                                                                                                                     WebViewPage.WriteTo(@__razor_helper_writer, value);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n");
+
+
+			}
+			else
+			{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<input autocomplete=\"off\" class=\"form-control ");
+
+
+       WebViewPage.WriteTo(@__razor_helper_writer, quizRes);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" value=\"");
+
+
+                        WebViewPage.WriteTo(@__razor_helper_writer, value);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" id=\'");
+
+
+                                     WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "quizBlock");
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' maxlength=\"");
+
+
+                                                                          WebViewPage.WriteTo(@__razor_helper_writer, QuizController.MAX_FILLINBLOCK_SIZE);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" ");
+
+
+                                                                                                                WebViewPage.WriteTo(@__razor_helper_writer, GetGuestDisable(context.IsGuest));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, " ");
+
+
+                                                                                                                                                  WebViewPage.WriteTo(@__razor_helper_writer, readonlyAttr);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "/>\r\n");
+
+
+			}
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t</label>\r\n\t</div>\r\n");
 
 
 	if (model.QuizState == QuizState.Total)
 	{
+		if (model.ShowCorrectAnswer)
+		{
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div>Правильный ответ: ");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<div>Правильный ответ: ");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, sample);
@@ -731,6 +857,7 @@ WebViewPage.WriteTo(@__razor_helper_writer, sample);
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</div>\r\n");
 
 
+		}
 		if (!string.IsNullOrEmpty(block.Explanation))
 		{
 
@@ -779,6 +906,7 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 		ttitle = (block.Answer ? "Правильный" : "Неправильный") + " вариант";
 		ftitle = (!block.Answer ? "Правильный" : "Неправильный") + " вариант";
 	}
+	var readonlyAttr = context.CanUserFillQuiz ? "" : "readonly";
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"radio quiz-block-mark\" id=\"");
 
@@ -805,6 +933,11 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' type=\"radio\" ");
 
                                                                               WebViewPage.WriteTo(@__razor_helper_writer, GetGuestDisable(context.IsGuest));
 
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, " ");
+
+
+                                                                                                                WebViewPage.WriteTo(@__razor_helper_writer, readonlyAttr);
+
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t<label class=\"");
 
 
@@ -828,7 +961,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" ");
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t\tВерно\r\n\t\t\t</label>\r\n");
 
 
- 			if (model.QuizState == QuizState.Total && block.Answer)
+ 			if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && block.Answer)
 			{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<i class=\"glyphicon glyphicon-ok\" style=\"color: green\" title=\"");
@@ -884,7 +1017,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" ");
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t\tНеверно\r\n\t\t\t</label>\r\n");
 
 
- 			if (model.QuizState == QuizState.Total && !block.Answer)
+ 			if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && !block.Answer)
 			{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<i class=\"glyphicon glyphicon-ok\" style=\"color: green\" title=\"");
@@ -936,17 +1069,17 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"quiz-block-ordering ");
 
 
-WebViewPage.WriteTo(@__razor_helper_writer, model.QuizState != QuizState.NotPassed ? "not-movable" : "");
+WebViewPage.WriteTo(@__razor_helper_writer, context.CanUserFillQuiz ? "" : "not-movable");
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" id=\'");
 
 
-                                                           WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "_quizBlock");
+                                            WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "_quizBlock");
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\'>\r\n");
 
 
- 		if (model.QuizState == QuizState.Total)
+ 		if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer)
 		{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<div class=\"quiz-block-ordering__correct-description row\">\r\n\t\t\t\t<div class=\"te" +
@@ -971,7 +1104,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<li class=\"row\">\r
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n");
 
 
- 						if (model.QuizState == QuizState.NotPassed)
+ 						if (context.CanUserFillQuiz)
 						{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t\t\t<div class=\"quiz-block-ordering__item__icons\">\r\n\t\t\t\t\t\t\t\t<span class=\"glyph" +
@@ -994,7 +1127,7 @@ WebViewPage.WriteTo(@__razor_helper_writer, item.Text.RenderTex());
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</div>\r\n\t\t\t\t\t</div>\r\n");
 
 
- 					if (model.QuizState == QuizState.Total)
+ 					if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer)
 					{
 						var correctItem = correctItems[itemIndex];
 
@@ -1055,12 +1188,12 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"quiz-block-matching ");
 
 
-WebViewPage.WriteTo(@__razor_helper_writer, model.QuizState != QuizState.NotPassed ? "not-movable" : "");
+WebViewPage.WriteTo(@__razor_helper_writer, context.CanUserFillQuiz ? "" : "not-movable");
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" id=\'");
 
 
-                                                           WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "_quizBlock");
+                                            WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "_quizBlock");
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\'>\r\n");
 
@@ -1079,8 +1212,19 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<div class=\"quiz-bloc
 		{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<div class=\"quiz-block-matching__correct-description row\">\r\n\t\t\t\t<div class=\"te" +
-"xt-muted col-sm-3 col-sm-offset-3\">Ваш вариант</div>\r\n\t\t\t\t<div class=\"text-succe" +
-"ss col-sm-3 col-sm-offset-1\">Правильный вариант</div>\r\n\t\t\t</div>\r\n");
+"xt-muted col-sm-3 col-sm-offset-3\">Ваш вариант</div>\r\n");
+
+
+ 				if (model.ShowCorrectAnswer)
+				{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t<div class=\"text-success col-sm-3 col-sm-offset-1\">Правильный вариант</div>\r" +
+"\n");
+
+
+				}
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t</div>\r\n");
 
 
 		}
@@ -1093,7 +1237,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<ul>\r\n");
 				var fixedItem = fixedItems[itemIndex];
 				var movableItem = movableItems[itemIndex];
 				var isRightClass = "";
-				if (model.QuizState == QuizState.Total)
+				if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer)
 				{
 					isRightClass = fixedItem.Id == movableItem.Id ? "right" : "wrong";
 				}
@@ -1183,6 +1327,11 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-item-id=\"");
 
                                                                WebViewPage.WriteTo(@__razor_helper_writer, fixedItem.GetHashForFixedItem());
 
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-movable-item-id=\"");
+
+
+                                                                                                                       WebViewPage.WriteTo(@__razor_helper_writer, movableItem.GetHashForMovableItem());
+
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\t\t\t\t<div class=\"quiz-block-matching__movable-item\" data-block-id=\"");
 
 
@@ -1201,7 +1350,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">");
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</div>\r\n\t\t\t\t\t\t\t</div>\r\n");
 
 
-							if (model.QuizState == QuizState.Total)
+							if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer)
 							{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t\t\t\t<div class=\"quiz-block-matching__fixed-item correct col-xs-3 col-sm-offse" +
@@ -1211,6 +1360,19 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t\t\t\t<div class=\
 WebViewPage.WriteTo(@__razor_helper_writer, fixedItem.MovableItem.RenderTex());
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t\t\t\t\t</div>\r\n");
+
+
+							}
+							if (context.CanUserFillQuiz)
+							{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t\t\t\t<div class=\"quiz-block-matching__source__droppable col-xs-3 col-sm-offset" +
+"-1\" data-block-id=\"");
+
+
+                                                         WebViewPage.WriteTo(@__razor_helper_writer, block.Id);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\t\t\t\t</div>\r\n");
 
 
 							}
