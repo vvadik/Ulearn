@@ -224,6 +224,7 @@ namespace uLearn.CourseTool
 		{
 			lock (locker)
 			{
+				// Именно так. Предотвращает частую перезагрузку. Все должно обновляться за счет needrefresh.
 				var needReload = lastChangeTime > requestTime.Add(TimeSpan.FromMilliseconds(500));
 				if (needReload || course == null)
 				{

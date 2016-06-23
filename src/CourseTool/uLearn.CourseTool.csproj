@@ -143,67 +143,14 @@
       <Link>renderer\styles\ulearn.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-diff.js">
-      <Link>renderer\scripts\slide-diff.js</Link>
+    <Content Include="..\uLearn.Web\Scripts\slide-*.js">
+      <Link>renderer\scripts\%(Filename).%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-editor.js">
-      <Link>renderer\scripts\slide-editor.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-gallery.js">
-      <Link>renderer\scripts\slide-gallery.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-guest.js">
-      <Link>renderer\scripts\slide-guest.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-hints.js">
-      <Link>renderer\scripts\slide-hints.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-localvisits.js">
-      <Link>renderer\scripts\slide-localvisits.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-modals.js">
-      <Link>renderer\scripts\slide-modals.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-nav.js">
-      <Link>renderer\scripts\slide-nav.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-popovers.js">
-      <Link>renderer\scripts\slide-popovers.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-quiz.js">
-      <Link>renderer\scripts\slide-quiz.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-run.js">
-      <Link>renderer\scripts\slide-run.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-solutions-like.js">
-      <Link>renderer\scripts\slide-solutions-like.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-stats.js">
-      <Link>renderer\scripts\slide-stats.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-tex.js">
-      <Link>renderer\scripts\slide-tex.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-utils.js">
-      <Link>renderer\scripts\slide-utils.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="examples\video.json">
+		<Content Include="renderer\scripts\slide-*.js">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="examples\video.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -220,10 +167,10 @@
     <Content Include="renderer\scripts\bootstrap.min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="renderer\scripts\clike.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\closebrackets.js">
+		<Content Include="renderer\scripts\clike.js">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="renderer\scripts\closebrackets.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="renderer\scripts\codemirror.js">
