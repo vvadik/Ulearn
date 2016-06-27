@@ -1,16 +1,38 @@
 ﻿using System;
 using System.IO;
 using System.Xml.Serialization;
+using ApprovalTests.Core;
 using ApprovalTests.Reporters;
 using NUnit.Framework;
 using uLearn.Model.Blocks;
 
 namespace uLearn.Quizes
 {
-	[TestFixture]
+    public class TeamCityFriendlyReporter : IEnvironmentAwareReporter
+    {
+        private readonly FrameworkAssertReporter ciReporter = new FrameworkAssertReporter();
+        private readonly DiffReporter uiReporter = new DiffReporter();
+        public void Report(string approved, string received)
+        {
+            if (Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME") != null)
+                ciReporter.Report(approved, received);
+            else
+            {
+                uiReporter.Report(approved, received);
+                //ciReporter.Report(approved, received);
+            }
+        }
+
+        public bool IsWorkingInThisEnvironment(string forFile)
+        {
+            return true;
+        }
+    }
+
+    [TestFixture]
 	public class Quiz_Test
 	{
-		[Test, UseReporter(typeof(DiffReporter))]
+		[Test, UseReporter(typeof(TeamCityFriendlyReporter))]
 		public void Test()
 		{
 			var serializer = new XmlSerializer(typeof(Quiz));
@@ -44,7 +66,7 @@ namespace uLearn.Quizes
 						{
 							new ChoiceItem {Description = "Apapapapa", IsCorrect = true},
 							new ChoiceItem {Description = "Ding ding ding", IsCorrect = true},
-							new ChoiceItem {Description = "Mew"},
+							new ChoiceItem {Description = "Mew!"},
 						}
 					},
 					new FillInBlock
