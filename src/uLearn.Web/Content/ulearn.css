@@ -992,6 +992,10 @@ li.li-success {
 	padding-left: 23px;
 }
 
+.quiz.quiz-block-input .form-control {
+	max-width: none;
+}
+
 /* Quiz Analytics */
 .analytics__quiz-version__info {
 	margin-top: 15px;	

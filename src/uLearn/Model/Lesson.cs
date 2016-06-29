@@ -12,8 +12,8 @@ namespace uLearn.Model
 		[XmlElement("id")]
 		public string Id;
 		
-		[XmlElement("default-include-file")]
-		public string DefaultIncludeFile;
+		[XmlElement("default-include-code-file")]
+		public string DefaultIncludeCodeFile;
 
 		[XmlElement(typeof(YoutubeBlock))]
 		[XmlElement(typeof(MdBlock))]

@@ -3,7 +3,7 @@
 	
 	<title>Первый шаг</title>
 	<id>{90BCB61E-57F0-4BAA-8BC9-10C9CFD27F59}</id>
-	<default-include-file>_FirstStep.cs</default-include-file>
+	<default-include-code-file>_FirstStep.cs</default-include-code-file>
 	
 	<md>
 		Любая, даже самая сложная дорога, начинается с первого шага.
@@ -13,7 +13,7 @@
 		Допишите код функции `Main`, а затем запустите и проверьте ваше решение с помощью кнопки Run.
 	</md>
 	
-	<execirse>
+	<exercise>
 		<inital-code>
 			static public void Main()
 			{
@@ -24,6 +24,6 @@
 		<solution>Main</solution>
 		<comment>Молодец</comment>
 		<expected>The first step!</expected>
-	</execirse>
+	</exercise>
 	
 </Lesson>

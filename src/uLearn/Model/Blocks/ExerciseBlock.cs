@@ -7,7 +7,7 @@ using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {
-	[XmlType("execirse")]
+	[XmlType("exercise")]
 	public class ExerciseBlock : IncludeCode
 	{
 		[XmlElement("inital-code")]

@@ -3,7 +3,7 @@
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://ulearn.azurewebsites.net/lesson">
 	<title>Фильтрация и преобразование</title>
 	<id>{E0114584-4500-40B2-B6D6-DB8AF455978B}</id>
-	<default-include-file>SelectWhereToArray.cs</default-include-file>
+	<default-include-code-file>SelectWhereToArray.cs</default-include-code-file>
 	<md>
 		<![CDATA[
 		В основе `LINQ` лежит интерфейс __последовательности__ `IEnumerable<T>`. 
