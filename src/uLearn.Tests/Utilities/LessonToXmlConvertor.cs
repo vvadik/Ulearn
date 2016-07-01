@@ -13,9 +13,10 @@ namespace uLearn.Utilities
 		private readonly XmlSerializer lessonSerializer = new XmlSerializer(typeof(Lesson));
 
 		[Test]
+		[Explicit]
 		public void ConvertSlidesFromDirectory()
 		{
-			var slidesDirectory = new DirectoryInfo(@"c:\work\edu\oop\OOP\OOP\Slides\L130 - FluentAPI");
+			var slidesDirectory = new DirectoryInfo(@"Your path to slides");
 			foreach (var slideFile in slidesDirectory.GetFiles("S*.cs"))
 			{
 				var slide = new CSharpSlideLoader().Load(slideFile, "unit", 0, CourseSettings.DefaultSettings);
@@ -27,7 +28,7 @@ namespace uLearn.Utilities
 		[Explicit]
 		public void CovertLessonSlidesToXml()
 		{
-			var coursesDirectory = new DirectoryInfo(@"c:\work\edu\oop\OOP\OOP\");
+			var coursesDirectory = new DirectoryInfo(@"Your path to course");
 			var courseDirectories = coursesDirectory.GetDirectories("Slides", SearchOption.AllDirectories);
 			foreach (var courseDirectory in courseDirectories)
 			{
