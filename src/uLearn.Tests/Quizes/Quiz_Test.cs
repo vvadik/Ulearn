@@ -8,31 +8,10 @@ using uLearn.Model.Blocks;
 
 namespace uLearn.Quizes
 {
-    public class TeamCityFriendlyReporter : IEnvironmentAwareReporter
-    {
-        private readonly FrameworkAssertReporter ciReporter = new FrameworkAssertReporter();
-        private readonly DiffReporter uiReporter = new DiffReporter();
-        public void Report(string approved, string received)
-        {
-            if (Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME") != null)
-                ciReporter.Report(approved, received);
-            else
-            {
-                uiReporter.Report(approved, received);
-                //ciReporter.Report(approved, received);
-            }
-        }
-
-        public bool IsWorkingInThisEnvironment(string forFile)
-        {
-            return true;
-        }
-    }
-
-    [TestFixture]
+	[TestFixture]
 	public class Quiz_Test
 	{
-		[Test, UseReporter(typeof(TeamCityFriendlyReporter))]
+		[Test, UseReporter(typeof(DiffReporter))]
 		public void Test()
 		{
 			var serializer = new XmlSerializer(typeof(Quiz));
@@ -66,7 +45,7 @@ namespace uLearn.Quizes
 						{
 							new ChoiceItem {Description = "Apapapapa", IsCorrect = true},
 							new ChoiceItem {Description = "Ding ding ding", IsCorrect = true},
-							new ChoiceItem {Description = "Mew!"},
+							new ChoiceItem {Description = "Mew"},
 						}
 					},
 					new FillInBlock
@@ -82,13 +61,6 @@ namespace uLearn.Quizes
 			ns.Add("x", "http://www.w3.org/2001/XMLSchema-instance");
 			serializer.Serialize(w1, quiz, ns);
 			ApprovalTests.Approvals.Verify(w1.ToString());
-			Console.WriteLine(w1.ToString());
-			Console.WriteLine();
-			var quiz2 = serializer.Deserialize(new StringReader(w1.ToString()));
-			var w2 = new StringWriter();
-			serializer.Serialize(w2, quiz2, ns);
-			Console.WriteLine(w2.ToString());
-			Assert.AreEqual(w1.ToString(), w2.ToString());
 		}
 	}
 }

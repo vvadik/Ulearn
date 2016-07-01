@@ -110,7 +110,9 @@ namespace uLearn.Model.Blocks
 
 		public void WriteXml(XmlWriter writer)
 		{
-			throw new System.NotImplementedException();
+			if (Hide)
+				writer.WriteAttributeString("hide", "true");
+			writer.WriteString(markdown);
 		}
 	}
 }

@@ -83,7 +83,6 @@
   <ItemGroup>
     <Compile Include="CourseTool\Config_Test.cs" />
     <Compile Include="CourseTool\Converter_should.cs" />
-    <Compile Include="LessonLoader_should.cs" />
     <Compile Include="Lesson_ShouldDeserialize.cs" />
     <Compile Include="Model\Md_should.cs" />
     <Compile Include="Quizes\CourseLoader_should.cs" />
