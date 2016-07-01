@@ -144,7 +144,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\uLearn.Web\Scripts\slide-*.js">
-      <Link>renderer\scripts\%(Filename).%(Extension)</Link>
+      <Link>renderer\scripts\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 		<Content Include="renderer\scripts\slide-*.js">
