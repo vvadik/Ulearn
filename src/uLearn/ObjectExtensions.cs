@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -8,6 +10,17 @@ namespace uLearn
 	{
 		private static readonly XmlWriterSettings defaultSettings = new XmlWriterSettings { OmitXmlDeclaration = true, Indent = true };
 		private static readonly XmlSerializerNamespaces ns = new XmlSerializerNamespaces(new[] { new XmlQualifiedName("", "") });
+
+		public static bool IsOneOf<T>(this T o, params T[] validValues)
+		{
+			return validValues.Contains(o);
+		}
+
+		public static T EnsureNotNull<T>(this T o, string exceptionMessageIfNull = "can't be null")
+		{
+			if (o == null) throw new ArgumentException(exceptionMessageIfNull);
+			return o;
+		}
 
 		public static string XmlSerialize(this object o, bool removeWhitespaces = false)
 		{
