@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -86,6 +87,11 @@ namespace uLearn.Web.DataContexts
 		public Group GetGroupById(int groupId)
 		{
 			return db.Groups.FirstOrDefault(g => g.Id == groupId && ! g.IsDeleted);
+		}
+
+		public Group FindGroupByInviteHash(Guid hash)
+		{
+			return db.Groups.FirstOrDefault(g => g.InviteHash == hash && !g.IsDeleted);
 		}
 
 		public List<Group> GetGroups(string courseId)

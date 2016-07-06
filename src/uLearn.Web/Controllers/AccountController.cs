@@ -6,7 +6,6 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -125,6 +124,21 @@ namespace uLearn.Web.Controllers
 				};
 			}
 			return user;
+		}
+
+		public async Task<ActionResult> JoinToGroup(Guid hash)
+		{
+			var group = groupsRepo.FindGroupByInviteHash(hash);
+			if (group == null)
+				return new HttpStatusCodeResult(HttpStatusCode.NotFound);
+
+			if (Request.HttpMethod == "POST")
+			{
+				await groupsRepo.AddUserToGroup(group.Id, User.Identity.GetUserId());
+				return Redirect("/");
+			}
+
+			return View("JoinToGroup");
 		}
 
 		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]

@@ -1068,3 +1068,12 @@ table.analytics__user-answers {
 .courses-versions .courses-versions__version .courses-versions__actions form {
 	display: inline-block;
 }
+
+/* Groups */
+.groups .group .group__title {
+	margin-bottom: 0;
+}
+
+.groups .group .members {
+	margin-top: 10px;
+}

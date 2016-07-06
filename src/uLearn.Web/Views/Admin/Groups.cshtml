@@ -21,7 +21,7 @@
 		@foreach (var group in Model.Groups.OrderBy(g => g.OwnerId != User.Identity.GetUserId()))
 		{
 			<div class="group" data-group-id="@group.Id">
-				<h3>
+				<h3 class="group__title">
 					@group.Name
 					@if (!group.IsPublic)
 					{
@@ -32,6 +32,9 @@
 						<small><span class="label label-primary">владелец: @group.Owner.VisibleName</span></small>
 					}
 				</h3>
+				<div class="text-muted" title="Отправьте эту ссылку студентам для присоединения к группе">
+					@Url.Action("JoinToGroup", "Account", new { hash = group.InviteHash }, protocol: Request.Url.Scheme)
+				</div>
 				<ol class="members">
 					@foreach (var member in group.Members.OrderBy(m => m.User.VisibleName))
 					{
