@@ -9,7 +9,7 @@
 
 <div class="slide-container">
 
-	<h1>Группы <small><a href="" onClick="$('#createGroupModal').modal(); return false;">создать</a></small></h1>
+	<h1>Группы <small><a href="" class="create-group-link  internal-page-link">создать</a></small></h1>
 	
 	<div class="groups">
 		@if (Model.Groups.Count == 0)
@@ -22,7 +22,8 @@
 		{
 			<div class="group" data-group-id="@group.Id">
 				<h3 class="group__title">
-					@group.Name
+					<a href="" class="edit-group-link  internal-page-link" title="Редактировать свойства" data-group-id="@group.Id" data-name="@group.Name" data-is-public="@group.IsPublic.ToString().ToLower()">@group.Name</a>					
+
 					@if (!group.IsPublic)
 					{
 						<small><span class="label label-danger">приватная</span></small>
@@ -33,7 +34,7 @@
 					}
 				</h3>
 				<div class="text-muted" title="Отправьте эту ссылку студентам для присоединения к группе">
-					@Url.Action("JoinGroup", "Account", new { hash = group.InviteHash }, protocol: Request.Url.Scheme)
+					@Url.Action("JoinGroup", "Account", new { hash = group.InviteHash }, Request.Url.Scheme)
 				</div>
 				<ol class="members">
 					@foreach (var member in group.Members.OrderBy(m => m.User.VisibleName))
@@ -64,17 +65,22 @@
 	</div>
 </div>
 
-<div class="modal fade" id="createGroupModal" role="dialog">
+<div class="modal fade" id="createOrUpdateGroupModal" role="dialog">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h4 class="modal-title">Создать группу</h4>
 			</div>
 			<div class="modal-body">
-				@using (Html.BeginForm("CreateGroup", "Admin", FormMethod.Post))
+				@using (Html.BeginForm("CreateGroup", "Admin", FormMethod.Post, new
+				{
+					data_create_group_url = Url.Action("CreateGroup", "Admin"),
+					data_update_group_url = Url.Action("UpdateGroup", "Admin")
+				}))
 				{
 					@Html.AntiForgeryToken()
-					<input type="hidden" name="courseId" value="@Model.CourseId" />
+					<input type="hidden" name="courseId" value="@Model.CourseId"/>
+					<input type="hidden" name="groupId" value="" />
 
 					<div class="form-group">
 						<input id="name" name="name" type="text" class="form-control" placeholder="Название новой группы">
@@ -90,7 +96,8 @@
 						</label>
 					</div>
 
-					<button class="btn btn-success">Создать</button>
+					<button class="action-button  btn btn-success">Создать</button>
+					<button class="remove-group-link  btn btn-danger" data-url="@Url.Action("RemoveGroup", "Admin")">Удалить группу</button>
 				}
 			</div>
 		</div>

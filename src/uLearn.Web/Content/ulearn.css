@@ -35,6 +35,19 @@
 	cursor: pointer;
 }
 
+.internal-page-link,
+.internal-page-link:hover,
+.internal-page-link:focus,
+.internal-page-link:active {
+	text-decoration: none;
+	border-bottom: 1px dashed #428bca;
+}
+
+.internal-page-link:hover,
+.internal-page-link:focus {
+	border-bottom-color: #2a6496;
+}
+
 .popover-trigger {
 	text-decoration: none;
 	border-bottom: 1px dashed black;

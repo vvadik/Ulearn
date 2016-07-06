@@ -36,10 +36,14 @@ namespace uLearn.Web.Models
 		public bool IsDeleted { get; set; }
 
 		[Required]
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		[Index("IDX_Group_GroupByInviteHash")]
 		public Guid InviteHash { get; set; }
 
 		public virtual ICollection<GroupMember> Members { get; set; }
+
+		public Group()
+		{
+			InviteHash = Guid.NewGuid();
+		}
 	}
 }

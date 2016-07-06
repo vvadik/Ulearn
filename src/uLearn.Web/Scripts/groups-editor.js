@@ -1,6 +1,7 @@
 ﻿$(document).ready(function () {
 	var addUserToGroupUrl = "/Admin/AddUserToGroup";
 	var removeUserFromGroupUrl = "/Admin/RemoveUserFromGroup";
+	var $form = $('#createOrUpdateGroupModal form');
 	var token = $('input[name="__RequestVerificationToken"]').val();
 
 	$('.add-user-to-group-input').each(function() {
@@ -56,5 +57,48 @@
 			alert('При удалении произошла какая-то ошибка');
 		});
 		$self.parent().remove();
+	});
+
+	$('.create-group-link').click(function (e) {
+		e.preventDefault();
+
+		$form.attr('action', $form.data('createGroupUrl'));
+		$form.find('button.action-button').text('Создать');
+		$form.find('.remove-group-link').hide();
+		$('#createOrUpdateGroupModal').modal(); 
+	});
+
+	$('.edit-group-link').click(function(e) {
+		e.preventDefault();
+
+		var $self = $(this);
+		var groupId = $self.data('groupId');
+		var name = $self.data('name');
+		var isPublic = $self.data('isPublic');
+
+		$form.attr('action', $form.data('updateGroupUrl'));
+		$form.find('[name="groupId"]').val(groupId);
+		$form.find('[name="name"]').val(name);
+		$form.find('[name="isPublic"]').prop('checked', isPublic);
+		$form.find('button.action-button').text('Сохранить');
+		$form.find('.remove-group-link').data('groupId', groupId).show();
+		$('#createOrUpdateGroupModal').modal();
+	});
+
+	$('.remove-group-link').click(function(e) {
+		e.preventDefault();
+
+		var $self = $(this);
+		var groupId = $self.data('groupId');
+		$.ajax({
+			type: 'post',
+			url: $self.data('url'),
+			data: {
+				__RequestVerificationToken: token,
+				groupId: groupId,
+			}
+		}).success(function() {
+			window.location.reload(true);
+		});
 	});
 })

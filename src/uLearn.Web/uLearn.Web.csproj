@@ -323,9 +323,9 @@
     <Compile Include="Migrations\201605310936533_AddManualQuizChecks.Designer.cs">
       <DependentUpon>201605310936533_AddManualQuizChecks.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201607051414493_AddGroups.cs" />
-    <Compile Include="Migrations\201607051414493_AddGroups.Designer.cs">
-      <DependentUpon>201607051414493_AddGroups.cs</DependentUpon>
+    <Compile Include="Migrations\201607060603109_AddGroups.cs" />
+    <Compile Include="Migrations\201607060603109_AddGroups.Designer.cs">
+      <DependentUpon>201607060603109_AddGroups.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\CommentLike.cs" />
@@ -738,8 +738,8 @@
     <EmbeddedResource Include="Migrations\201605310936533_AddManualQuizChecks.resx">
       <DependentUpon>201605310936533_AddManualQuizChecks.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201607051414493_AddGroups.resx">
-      <DependentUpon>201607051414493_AddGroups.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201607060603109_AddGroups.resx">
+      <DependentUpon>201607060603109_AddGroups.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

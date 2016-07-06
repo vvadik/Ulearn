@@ -493,6 +493,28 @@ namespace uLearn.Web.Controllers
 			return Json(new { removed="true" });
 		}
 
+		[HttpPost]
+		public async Task<ActionResult> UpdateGroup(int groupId, string name, bool isPublic)
+		{
+			var group = groupsRepo.GetGroupById(groupId);
+			if (!CanModifyGroup(group))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			await groupsRepo.ModifyGroup(groupId, name, isPublic);
+
+			return RedirectToAction("Groups", new { courseId = group.CourseId });
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> RemoveGroup(int groupId)
+		{
+			var group = groupsRepo.GetGroupById(groupId);
+			if (!CanModifyGroup(group))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			await groupsRepo.RemoveGroup(groupId);
+
+			return RedirectToAction("Groups", new { courseId = group.CourseId });
+		}
+
 		public ActionResult FindUsers(string term)
 		{
 			var query = new UserSearchQueryModel { NamePrefix = term };

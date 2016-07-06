@@ -42,6 +42,16 @@ namespace uLearn.Web.DataContexts
 			return group;
 		}
 
+		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsPublic)
+		{
+			var group = GetGroupById(groupId);
+			group.Name = newName;
+			group.IsPublic = newIsPublic;
+			await db.SaveChangesAsync();
+
+			return group;
+		}
+
 		public async Task RemoveGroup(int groupId)
 		{
 			var group = db.Groups.Find(groupId);
