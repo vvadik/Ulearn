@@ -1,4 +1,5 @@
-﻿@model UserListModel
+﻿@using uLearn
+@model UserListModel
 
 @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "AntiForgeryTokenContainer" }))
 {
@@ -8,12 +9,12 @@
 <table class="table table-condensed">
 	<tr>
 		<th>Имя</th>
-		<th>Группа</th>
-		@if (@Model.IsCourseAdmin)
+		<th>Группы</th>
+		@if (Model.IsCourseAdmin)
 		{
 			<th>Роли</th>
 		}
-		@if (@Model.ShowDangerEntities)
+		@if (Model.ShowDangerEntities)
 		{
 			<th>Удаление</th>
 		}
@@ -21,13 +22,13 @@
 	@foreach (var user in Model.Users)
 	{
 		<tr data-userid="@user.UserId">
-			<td>@Html.ActionLink(user.UserName, "Info", new { userName = user.UserName })</td>
-			<td>@user.GroupName</td>
-			@if (@Model.IsCourseAdmin)
+			<td>@Html.ActionLink(user.UserName, "Info", "Account", new { userName = user.UserName }, new {})</td>
+			<td>@Model.UsersGroups.Get(user.UserId, "")</td>
+			@if (Model.IsCourseAdmin)
 			{
 				<td>
 					<div class="btn-group">
-						@if (@Model.ShowDangerEntities)
+						@if (Model.ShowDangerEntities)
 						{
 							@RoleButton(user, LmsRoles.SysAdmin, "danger")
 						}

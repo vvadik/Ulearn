@@ -13,7 +13,7 @@ namespace uLearn.Web.DataContexts
 		{
 			return String.IsNullOrEmpty(namePrefix)
 				? applicationUsers
-				: applicationUsers.Where(u => u.UserName.StartsWith(namePrefix));
+				: applicationUsers.Where(u => u.UserName.StartsWith(namePrefix) || u.FirstName.StartsWith(namePrefix) || u.LastName.StartsWith(namePrefix));
 		}
 
 		public static IQueryable<ApplicationUser> FilterByRole(this IQueryable<ApplicationUser> applicationUsers, IdentityRole role, UserManager<ApplicationUser> userManager)
@@ -49,7 +49,7 @@ namespace uLearn.Web.DataContexts
 				{
 					UserId = user.Id,
 					UserName = user.UserName,
-					GroupName = user.GroupName,
+					UserVisibleName = user.VisibleName,
 					Roles = userManager.GetRoles(user.Id).ToList()
 				}).ToList();
 		}

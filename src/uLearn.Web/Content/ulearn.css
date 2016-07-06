@@ -23,6 +23,18 @@
 .load-content {
 }
 
+.visible-on-parent-hover {
+	display: none;
+}
+
+*:hover > .visible-on-parent-hover {
+	display: initial;
+}
+
+.cursor-pointer {
+	cursor: pointer;
+}
+
 .popover-trigger {
 	text-decoration: none;
 	border-bottom: 1px dashed black;

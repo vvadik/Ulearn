@@ -2,11 +2,11 @@
 @model uLearn.Web.Controllers.UserSolutionsViewModel
 
 @{
-	ViewBag.Title = "uLearn | Решения " + Model.User.UserName;
+	ViewBag.Title = "Решения " + Model.User.VisibleName + "(" + Model.User.UserName + ")";
 }
 
 <div class="wide-container">
-	<h2>Решения @Model.User.UserName @Model.User.GroupName
+	<h2>Решения @Model.User.VisibleName (@Model.User.UserName, @Model.GroupsNames)
 		<small>
 			@Html.ActionLink(Model.Slide.Title, "Slide", "Course", new { courseId = Model.Course.Id, slideIndex = Model.Slide.Index }, null)
 		</small>

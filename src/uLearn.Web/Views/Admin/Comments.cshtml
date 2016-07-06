@@ -1,14 +1,14 @@
 ﻿@model uLearn.Web.Controllers.AdminCommentsViewModel
 
 @{
-	ViewBag.Title = "Admin Comments";
+	ViewBag.Title = "Комментарии";
 }
 
 @Html.Action("ManageMenu")
 
 <div class="slide-container">
 
-	<h3>Комментарии</h3>
+	<h1>Комментарии</h1>
 
 	@using (Html.BeginForm("SaveCommentsPolicy", "Admin", FormMethod.Post, new { @class = "form-horizontal" }))
 	{

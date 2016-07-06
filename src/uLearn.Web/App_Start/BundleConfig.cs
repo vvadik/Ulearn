@@ -41,7 +41,8 @@ namespace uLearn.Web
 					"~/Scripts/buttons.js",
 					"~/Scripts/respond.js",
 					"~/Scripts/slide-*",
-					"~/Scripts/users-list.js"
+					"~/Scripts/users-list.js",
+					"~/Scripts/groups-editor.js"
 				);
 		}
 
@@ -60,6 +61,7 @@ namespace uLearn.Web
 				"~/Content/ulearn.css",
 				"~/Content/bounce.css",
 				"~/flexslider/flexslider.css",
+				"~/Content/jquery-ui.min.css",
 				"~/Content/site.css",
 				"~/Content/buttons.css");
 		}

@@ -7,7 +7,7 @@
 	<thead>
 		<tr>
 			<th>Имя</th>
-			<th>Группа</th>
+			<th>Группы</th>
 			@foreach (var slide in Model.Slides)
 			{
 				string text;
@@ -37,14 +37,14 @@
 				<td>
 					<h6>@user.UserName</h6>
 				</td>
-				<td data-sort-value="@(user.UserGroup??"")">
-					<input id="@(user.UserId)" onblur="changeGroup('@user.UserId')" data-url="@Url.Action("AddUserGroup", "Analytics")" type="text" value="@user.UserGroup" />
+				<td data-sort-value="@Model.GroupsNames.Get(user.UserId, "")">
+					@Model.GroupsNames.Get(user.UserId, "")
 				</td>
 				@for (var i = 0; i < user.SlidesSlideInfo.Length; i++)
 				{
 					if (Model.Slides[i] is ExerciseSlide)
 					{
-						var styleClass = @user.SlidesSlideInfo[i].IsExerciseSolved ? "green-stat" : "red-stat";
+						var styleClass = user.SlidesSlideInfo[i].IsExerciseSolved ? "green-stat" : "red-stat";
 						<td data-sort-value="@ToString(user.SlidesSlideInfo[i].AttemptsCount + 1000000)"
 						    class="@styleClass">
 							@Html.ActionLink(user.SlidesSlideInfo[i].AttemptsCount.ToString(), "ShowSolutions", new{courseId=Model.CourseId, userId=user.UserId, slideId=Model.Slides[i].Id})

@@ -38,7 +38,7 @@
 			<thead>
 			<tr>
 				<th style="border-bottom: none" title="при наведении на шапку таблицы, можно прочитать условие задания и вариант ответа" data-sorter="true">наведи на меня!</th>
-				<th style="border-bottom: none">Группа</th>
+				<th style="border-bottom: none">Группы</th>
 				<th style="border-bottom: none" data-sorter="false"></th>
 				@foreach (var block in quiz.Blocks.OfType<AbstractQuestionBlock>().OrderBy(x => x.QuestionIndex))
 				{
@@ -108,7 +108,7 @@
 			}
 			@foreach (var user in users)
 			{
-				var group = Model.GroupByUser[user];
+				var group = Model.GroupByUser.Get(user, "");
 				<tr>
 					<td>@user</td>
 					<td data-sort-value="@(string.IsNullOrEmpty(group) ? "—" : group)">@group</td>

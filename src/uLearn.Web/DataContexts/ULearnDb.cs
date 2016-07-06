@@ -20,6 +20,12 @@ namespace uLearn.Web.DataContexts
 				.WithMany(x => x.Likes)
 				.HasForeignKey(x => x.CommentId)
 				.WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<GroupMember>()
+				.HasRequired(m => m.Group)
+				.WithMany(g => g.Members)
+				.HasForeignKey(m => m.GroupId)
+				.WillCascadeOnDelete(false);
 		}
 
 		public DbSet<UserSolution> UserSolutions { get; set; }
@@ -41,5 +47,7 @@ namespace uLearn.Web.DataContexts
 		public DbSet<QuizVersion> QuizVersions { get; set; }
 		public DbSet<CourseVersion> CourseVersions { get; set; }
 		public DbSet<ManualQuizCheckQueueItem> ManualQuizCheckQueueItems { get; set; }
+		public DbSet<Group> Groups { get; set; }
+		public DbSet<GroupMember> GroupMembers { get; set; }
 	}
 }

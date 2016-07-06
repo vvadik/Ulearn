@@ -1,12 +1,12 @@
 ﻿@model UserInfoModel
 
 @{
-	ViewBag.Title = "User Info";
+	ViewBag.Title = Model.User.VisibleName;
 }
 
 <div class="container">
-	<h2>@Model.User.UserName</h2>
-	<p>@Model.User.GroupName</p>
+	<h2>@Model.User.VisibleName (@Model.User.UserName)</h2>
+	<p>@Model.GroupsNames</p>
 
 	<h3>Курсы</h3>
 	<ol>
