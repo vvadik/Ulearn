@@ -69,12 +69,14 @@
 		<xs:attribute name="hide" type="xs:boolean"/>
 	</xs:complexType>
 
-	<xs:complexType name="MdBlock">
-		<xs:simpleContent>
-			<xs:extension base="notEmptyString">
-				<xs:attribute name="hide" type="xs:boolean"/>
-			</xs:extension>
-		</xs:simpleContent>
+	<xs:complexType name="MdBlock" mixed="true">
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:choice>
+				<xs:element name="note" type="notEmptyString" />
+				<xs:element name="code" type="notEmptyString" />
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="hide" type="xs:boolean"/>
 	</xs:complexType>
 
 	<xs:complexType name="IncludeCodeBlock">
