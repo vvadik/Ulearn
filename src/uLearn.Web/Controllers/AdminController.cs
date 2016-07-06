@@ -498,7 +498,7 @@ namespace uLearn.Web.Controllers
 			var query = new UserSearchQueryModel { NamePrefix = term };
 			var users = usersRepo.FilterUsers(query, userManager)
 				.Take(10)
-				.Select(ur => new {id=ur.UserId, value=ur.UserVisibleName})
+				.Select(ur => new {id=ur.UserId, value=$"{ur.UserVisibleName} ({ur.UserName})" })
 				.ToList();
 			return Json(users, JsonRequestBehavior.AllowGet);
 		}

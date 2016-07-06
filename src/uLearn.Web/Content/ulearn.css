@@ -1074,6 +1074,12 @@ table.analytics__user-answers {
 	margin-bottom: 0;
 }
 
+.groups .group .group__title .label {
+	position: relative;
+	top: -3px;
+}
+
 .groups .group .members {
 	margin-top: 10px;
 }
+

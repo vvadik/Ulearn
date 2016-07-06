@@ -126,7 +126,7 @@ namespace uLearn.Web.Controllers
 			return user;
 		}
 
-		public async Task<ActionResult> JoinToGroup(Guid hash)
+		public async Task<ActionResult> JoinGroup(Guid hash)
 		{
 			var group = groupsRepo.FindGroupByInviteHash(hash);
 			if (group == null)
@@ -138,7 +138,7 @@ namespace uLearn.Web.Controllers
 				return Redirect("/");
 			}
 
-			return View("JoinToGroup");
+			return View("JoinGroup");
 		}
 
 		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]
