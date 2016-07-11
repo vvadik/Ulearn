@@ -37,7 +37,7 @@
 					var inviteLink = Url.Action("JoinGroup", "Account", new { hash = group.InviteHash }, Request.Url.Scheme);
 				}
 				<div class="@(group.IsInviteLinkEnabled ? "text-muted" : "text-danger")">
-					<span class="clipboard-link" data-clipboard-text="@inviteLink" title="Кликните, чтобы скопировать. Отправьте эту ссылку студентам для присоединения к группе">
+					<span class="clipboard-link" data-clipboard-text="@inviteLink" title="Отправьте эту ссылку студентам для присоединения к группе. Студенты увидят название группы">
 						@inviteLink
 					</span>
 					
@@ -105,7 +105,7 @@
 					<div class="form-group">
 						<input id="name" name="name" type="text" class="form-control" placeholder="Название новой группы">
 						<p class="help-block">
-							Студенты не увидят названия группы
+							Студенты увидят название группы, только если вы сами вышлите им ссылку для вступления
 						</p>
 					</div>
 

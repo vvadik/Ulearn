@@ -138,7 +138,7 @@ namespace uLearn.Web.Controllers
 				return Redirect("/");
 			}
 
-			return View("JoinGroup");
+			return View((object) group.Name);
 		}
 
 		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]
