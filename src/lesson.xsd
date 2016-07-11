@@ -16,7 +16,7 @@
 		<xs:sequence>
 			<xs:element name="title" type="notEmptyString" minOccurs="1" maxOccurs="1" />
 			<xs:element name="id" type="notEmptyString" minOccurs="1" maxOccurs="1" />
-			<xs:element name="default-include-file" type="notEmptyString" minOccurs="0" maxOccurs="1" />
+			<xs:element name="default-include-code-file" type="notEmptyString" minOccurs="0" maxOccurs="1" />
 			<xs:group ref="blocks" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
@@ -32,7 +32,7 @@
 			<xs:element name="include-md" type="Include" />
 			<xs:element name="gallery" type="notEmptyString" />
 			<xs:element name="include-blocks" type="Include" />
-			<xs:element name="execirse" type="Execirse" />
+			<xs:element name="exercise" type="Exercise" />
 		</xs:choice>
 	</xs:group>
 
@@ -69,12 +69,14 @@
 		<xs:attribute name="hide" type="xs:boolean"/>
 	</xs:complexType>
 
-	<xs:complexType name="MdBlock">
-		<xs:simpleContent>
-			<xs:extension base="notEmptyString">
-				<xs:attribute name="hide" type="xs:boolean"/>
-			</xs:extension>
-		</xs:simpleContent>
+	<xs:complexType name="MdBlock" mixed="true">
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:choice>
+				<xs:element name="note" type="notEmptyString" />
+				<xs:element name="code" type="notEmptyString" />
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="hide" type="xs:boolean"/>
 	</xs:complexType>
 
 	<xs:complexType name="IncludeCodeBlock">
@@ -104,7 +106,7 @@
 		</xs:simpleContent>
 	</xs:complexType>
 
-	<xs:complexType name="Execirse">
+	<xs:complexType name="Exercise">
 		<xs:complexContent>
 			<xs:extension base="IncludeCode">
 				<xs:sequence>

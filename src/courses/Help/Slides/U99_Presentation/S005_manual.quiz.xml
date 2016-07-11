@@ -11,7 +11,7 @@
 		<sample>42</sample>
 		<regex>\d+</regex>
 	</fillIn>
-
+	
 	<fillIn id="123a" multiline="true">
 		<text>Напишите сочинение</text>
 	</fillIn>

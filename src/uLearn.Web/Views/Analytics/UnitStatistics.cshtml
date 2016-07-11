@@ -30,7 +30,7 @@
 		<h2 id="timeline">Общая динамика прогресса</h2>
 		<div class="load-content" data-url="@Url.Action("DailyStatistics", args)"></div>
 
-		<h2 id="progress">Прогресс по студентам.</h2>
+		<h2 id="progress">Прогресс по студентам</h2>
 		@SwitchablePanel.TimePanel("progress-panel",
 			arg => Url.Action("UsersProgress", arg),
 			args,
