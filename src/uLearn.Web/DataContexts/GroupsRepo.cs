@@ -101,7 +101,7 @@ namespace uLearn.Web.DataContexts
 
 		public Group FindGroupByInviteHash(Guid hash)
 		{
-			return db.Groups.FirstOrDefault(g => g.InviteHash == hash && !g.IsDeleted);
+			return db.Groups.FirstOrDefault(g => g.InviteHash == hash && !g.IsDeleted && g.IsInviteLinkEnabled);
 		}
 
 		public List<Group> GetGroups(string courseId)
@@ -167,6 +167,13 @@ namespace uLearn.Web.DataContexts
 		public string GetUserGroupsNamesAsString(string courseId, string userId, IPrincipal currentUser, int maxCount = 3)
 		{
 			return GetUserGroupsNamesAsString(new List<string> { courseId }, userId, currentUser, maxCount);
+		}
+
+		public async Task EnableGroupInviteLink(int groupId, bool isEnabled)
+		{
+			var group = db.Groups.Find(groupId);
+			group.IsInviteLinkEnabled = isEnabled;
+			await db.SaveChangesAsync();
 		}
 	}
 }

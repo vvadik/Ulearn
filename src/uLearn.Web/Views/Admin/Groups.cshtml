@@ -15,14 +15,14 @@
 		@if (Model.Groups.Count == 0)
 		{
 			<div>
-				Для этого курса нет групп..
+				<a href="" class="create-group-link  internal-page-link">Создайте</a> группу, пригласите в неё студентов или добавьте их самостоятельно. Смотрите статистку только по своей группе.
 			</div>
 		}
 		@foreach (var group in Model.Groups.OrderBy(g => g.OwnerId != User.Identity.GetUserId()))
 		{
 			<div class="group" data-group-id="@group.Id">
 				<h3 class="group__title">
-					<a href="" class="edit-group-link  internal-page-link" title="Редактировать свойства" data-group-id="@group.Id" data-name="@group.Name" data-is-public="@group.IsPublic.ToString().ToLower()">@group.Name</a>					
+					<a href="" class="edit-group-link  internal-page-link" title="Редактировать свойства" data-group-id="@group.Id" data-name="@group.Name" data-is-public="@group.IsPublic.ToString().ToLower()">@group.Name</a>
 
 					@if (!group.IsPublic)
 					{
@@ -33,8 +33,28 @@
 						<small><span class="label label-primary">владелец: @group.Owner.VisibleName</span></small>
 					}
 				</h3>
-				<div class="text-muted" title="Отправьте эту ссылку студентам для присоединения к группе">
-					@Url.Action("JoinGroup", "Account", new { hash = group.InviteHash }, Request.Url.Scheme)
+				@{
+					var inviteLink = Url.Action("JoinGroup", "Account", new { hash = group.InviteHash }, Request.Url.Scheme);
+				}
+				<div class="@(group.IsInviteLinkEnabled ? "text-muted" : "text-danger")">
+					<span class="clipboard-link" data-clipboard-text="@inviteLink" title="Кликните, чтобы скопировать. Отправьте эту ссылку студентам для присоединения к группе">
+						@inviteLink
+					</span>
+					
+					@if (group.IsInviteLinkEnabled)
+					{
+						<button class="clipboard-link  btn btn-xs btn-primary" data-clipboard-text="@inviteLink" data-show-copied="true">
+							копировать
+						</button>
+					}
+
+					<form action="@Url.Action("EnableGroupInviteLink", "Admin", new { groupId = group.Id, isEnabled = !group.IsInviteLinkEnabled })" method="POST" class="ib">
+						@Html.AntiForgeryToken()
+						<button class="btn @(group.IsInviteLinkEnabled ? "btn-default" : "btn-primary") btn-xs">
+							@(group.IsInviteLinkEnabled ? "отключить ссылку" : "включить ссылку")
+						</button>
+					</form>
+
 				</div>
 				<ol class="members">
 					@foreach (var member in group.Members.OrderBy(m => m.User.VisibleName))

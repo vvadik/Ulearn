@@ -323,9 +323,9 @@
     <Compile Include="Migrations\201605310936533_AddManualQuizChecks.Designer.cs">
       <DependentUpon>201605310936533_AddManualQuizChecks.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201607060603109_AddGroups.cs" />
-    <Compile Include="Migrations\201607060603109_AddGroups.Designer.cs">
-      <DependentUpon>201607060603109_AddGroups.cs</DependentUpon>
+    <Compile Include="Migrations\201607110843430_AddGroups.cs" />
+    <Compile Include="Migrations\201607110843430_AddGroups.Designer.cs">
+      <DependentUpon>201607110843430_AddGroups.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\CommentLike.cs" />
@@ -738,8 +738,8 @@
     <EmbeddedResource Include="Migrations\201605310936533_AddManualQuizChecks.resx">
       <DependentUpon>201605310936533_AddManualQuizChecks.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201607060603109_AddGroups.resx">
-      <DependentUpon>201607060603109_AddGroups.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201607110843430_AddGroups.resx">
+      <DependentUpon>201607110843430_AddGroups.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -1037,6 +1037,7 @@
     <Content Include="Jsdifflib\jsdifflib.css" />
     <Content Include="katex\katex.min.css" />
     <Content Include="katex\katex.min.js" />
+    <Content Include="Scripts\activate-clipboard.js" />
     <Content Include="Scripts\bootstrap.file-input.js" />
     <Content Include="qunit\qunit-1.15.0.css" />
     <Content Include="qunit\qunit-1.15.0.js" />
@@ -1099,6 +1100,7 @@
     <Content Include="Properties\webjobs-list.json" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\buttons.js" />
+    <Content Include="Scripts\clipboard.min.js" />
     <Content Include="Scripts\groups-editor.js" />
     <Content Include="Scripts\jquery-ui.min.js" />
     <Content Include="Scripts\jquery.color-2.1.0.min.js" />

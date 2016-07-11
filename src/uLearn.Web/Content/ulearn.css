@@ -48,6 +48,14 @@
 	border-bottom-color: #2a6496;
 }
 
+.clipboard-link {
+	cursor: pointer;
+}
+
+.ib {
+	display: inline-block;
+}
+
 .popover-trigger {
 	text-decoration: none;
 	border-bottom: 1px dashed black;

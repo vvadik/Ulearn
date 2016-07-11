@@ -32,6 +32,7 @@ namespace uLearn.Web.Migrations
                         IsPublic = c.Boolean(nullable: false),
                         IsDeleted = c.Boolean(nullable: false),
                         InviteHash = c.Guid(nullable: false),
+                        IsInviteLinkEnabled = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.AspNetUsers", t => t.OwnerId, cascadeDelete: true)

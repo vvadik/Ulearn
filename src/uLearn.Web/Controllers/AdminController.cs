@@ -515,6 +515,17 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Groups", new { courseId = group.CourseId });
 		}
 
+		[HttpPost]
+		public async Task<ActionResult> EnableGroupInviteLink(int groupId, bool isEnabled)
+		{
+			var group = groupsRepo.GetGroupById(groupId);
+			if (!CanModifyGroup(group))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			await groupsRepo.EnableGroupInviteLink(groupId, isEnabled);
+
+			return RedirectToAction("Groups", new { courseId = group.CourseId });
+		}
+
 		public ActionResult FindUsers(string term)
 		{
 			var query = new UserSearchQueryModel { NamePrefix = term };

@@ -39,11 +39,15 @@ namespace uLearn.Web.Models
 		[Index("IDX_Group_GroupByInviteHash")]
 		public Guid InviteHash { get; set; }
 
+		[Required]
+		public bool IsInviteLinkEnabled { get; set; }
+
 		public virtual ICollection<GroupMember> Members { get; set; }
 
 		public Group()
 		{
 			InviteHash = Guid.NewGuid();
+			IsInviteLinkEnabled = true;
 		}
 	}
 }
