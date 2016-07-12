@@ -65,7 +65,7 @@ namespace uLearn.Web.Controllers
 			return PartialView(course.SpellCheck());
 		}
 
-		public ActionResult List(string courseId)
+		public ActionResult Units(string courseId)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var appearances = db.Units.Where(u => u.CourseId == course.Id).ToList();
@@ -93,7 +93,7 @@ namespace uLearn.Web.Controllers
 			};
 			db.Units.Add(unitAppearance);
 			await db.SaveChangesAsync();
-			return RedirectToAction("List", new { courseId });
+			return RedirectToAction("Units", new { courseId });
 		}
 
 		[HttpPost]
@@ -105,7 +105,7 @@ namespace uLearn.Web.Controllers
 				db.Units.Remove(unitAppearance);
 				await db.SaveChangesAsync();
 			}
-			return RedirectToAction("List", new { courseId });
+			return RedirectToAction("Units", new { courseId });
 		}
 
 		public ActionResult DownloadPackage(string courseId)
@@ -157,17 +157,7 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("CourseList", new { courseCreationLastTry = courseId });
 			return RedirectToAction("Users", new { courseId, onlyPrivileged = true });
 		}
-
-		public ActionResult ManageMenu(string courseId)
-		{
-			var course = courseManager.GetCourse(courseId);
-			return PartialView(new ManageMenuViewModel
-			{
-				CourseId = courseId,
-				Title = course.Title
-			});
-		}
-
+		
 		public ActionResult Packages(string courseId)
 		{
 			var hasPackage = courseManager.HasPackageFor(courseId);
@@ -567,13 +557,7 @@ namespace uLearn.Web.Controllers
 		public string Id { get; set; }
 		public DateTime LastWriteTime { get; set; }
 	}
-
-	public class ManageMenuViewModel
-	{
-		public string CourseId { get; set; }
-		public string Title { get; set; }
-	}
-
+	
 	public class PackagesViewModel
 	{
 		public string CourseId { get; set; }

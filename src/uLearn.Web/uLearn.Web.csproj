@@ -283,6 +283,7 @@
     <Compile Include="Controllers\AuthenticationManager.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
+    <Compile Include="Models\CourseInstructorNavbarViewModel.cs" />
     <Compile Include="DataContexts\CommentsRepo.cs" />
     <Compile Include="DataContexts\CoursesRepo.cs" />
     <Compile Include="DataContexts\GroupsRepo.cs" />
@@ -1285,7 +1286,7 @@
     <Content Include="Views\Hint\UseHint.cshtml" />
     <Content Include="Views\Quiz\Analytics.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
-    <Content Include="Views\Admin\List.cshtml" />
+    <Content Include="Views\Admin\Units.cshtml" />
     <Content Include="Views\Admin\CourseList.cshtml" />
     <Content Include="Views\Analytics\UnitStatistics.cshtml" />
     <Content Include="Views\Course\InstructorNote.cshtml" />
@@ -1337,7 +1338,6 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>SwitchablePanel.generated.cs</LastGenOutput>
     </Content>
-    <Content Include="Views\Admin\ManageMenu.cshtml" />
     <Content Include="Views\Admin\Packages.cshtml" />
     <Content Include="Views\Shared\_UserListPartial.cshtml" />
     <Content Include="Views\Admin\Users.cshtml" />
@@ -1353,6 +1353,7 @@
     <Content Include="Views\Admin\ManualQuizChecksQueue.cshtml" />
     <Content Include="Views\Admin\Groups.cshtml" />
     <Content Include="Views\Account\JoinGroup.cshtml" />
+    <Content Include="Views\Course\CourseInstructorNavbar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

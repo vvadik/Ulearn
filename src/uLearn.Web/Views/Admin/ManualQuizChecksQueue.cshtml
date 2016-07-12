@@ -4,11 +4,8 @@
 	ViewBag.Title = "Очередь на проверку";
 }
 
-@Html.Action("ManageMenu")
-
-
-<div class="slide-container">
-	<h3>Очередь на проверку</h3>
+<div class="container">
+	<h1>Очередь на проверку</h1>
 
 	@if (! string.IsNullOrEmpty(Model.Message) && Model.Checks.Count > 0)
 	{

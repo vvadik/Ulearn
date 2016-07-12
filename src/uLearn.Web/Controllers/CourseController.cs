@@ -378,5 +378,18 @@ namespace uLearn.Web.Controllers
 		{
 			dbSet.RemoveRange(dbSet.Where(s => s.UserId == userId && s.SlideId == slideId));
 		}
+
+		public ActionResult CourseInstructorNavbar(string courseId)
+		{
+			if (string.IsNullOrEmpty(courseId))
+				return PartialView((CourseInstructorNavbarViewModel)null);
+
+			var course = courseManager.GetCourse(courseId);
+			return PartialView(new CourseInstructorNavbarViewModel
+			{
+				CourseId = courseId,
+				CourseTitle = course.Title,
+			});
+		}
 	}
 }

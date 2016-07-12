@@ -7,12 +7,10 @@
 	ViewBag.Title = "Диагностика";
 }
 
-@Html.Action("ManageMenu")
-
-<div class="slide-container">
+<div class="container">
 	@if (Model.IsVersionPublished)
 	{
-		<h2>Курс обновлён, @Html.RouteLink("перейти к курсу →", "Course", new { courseId = Model.CourseId, action = "Slide" }, new {})</h2>
+		<h1>Курс обновлён, @Html.RouteLink("перейти к курсу →", "Course", new { courseId = Model.CourseId, action = "Slide" }, new {})</h1>
 
 		<div>
 			@Html.ActionLink("← Назад", "Packages", new { courseId = Model.CourseId }, new { @class = "btn btn-primary" })
@@ -52,7 +50,7 @@
 	}
 	else
 	{
-		<h2>
+		<h1>
 			Диагностики
 			@if (Model.IsDiagnosticsForVersion)
 			{
@@ -63,7 +61,7 @@
 					<button class="btn btn-xs btn-success">Опубликовать эту версию →</button>
 				}
 			}
-		</h2>
+		</h1>
 
 		<div>
 			<h3>Результат проверки орфографии:</h3>

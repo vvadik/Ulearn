@@ -4,9 +4,7 @@
 	ViewBag.Title = "Комментарии";
 }
 
-@Html.Action("ManageMenu")
-
-<div class="slide-container">
+<div class="container">
 
 	<h1>Комментарии</h1>
 
@@ -50,10 +48,14 @@
 	}
 
 	<div class="comments comments__feed">
-		<h4>Последние комментарии</h4>
+		<h1>Последние комментарии</h1>
 		@foreach (var comment in Model.Comments)
 		{
 			@Html.Partial("~/Views/Comments/_Comment.cshtml", comment)
+		}
+		@if (Model.Comments.Count == 0)
+		{
+			<p class="text-muted">Комментариев нет...</p>
 		}
 	</div>
 </div>

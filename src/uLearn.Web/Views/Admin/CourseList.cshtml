@@ -1,10 +1,10 @@
 ﻿@model uLearn.Web.Controllers.CourseListViewModel
 
 @{
-	ViewBag.Title = "Admin Courses";
+	ViewBag.Title = "Курсы";
 }
 <div class="container">
-	<h2>Управление курсами</h2>
+	<h2>Курсы</h2>
 	<ul>
 		@foreach (var course in Model.Courses)
 		{
@@ -14,7 +14,7 @@
 	
 	@if (User.IsSystemAdministrator())
 	{
-		<h3>Создать новый курс</h3>
+		<h2>Создать курс</h2>
 		using (Html.BeginForm("CreateCourse", "Admin", FormMethod.Post, new { @class = "form-inline" }))
 		{
 			@Html.AntiForgeryToken()

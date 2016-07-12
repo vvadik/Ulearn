@@ -1,13 +1,11 @@
 ﻿@model uLearn.Web.Controllers.PackagesViewModel
 
 @{
-	ViewBag.Title = "Управление пакетами";
+	ViewBag.Title = "Пакеты";
 }
 
-@Html.Action("ManageMenu")
-
-<div class="slide-container">
-	<h2>Управление пакетами</h2>
+<div class="container">
+	<h1>Пакеты</h1>
 
 	@if (Model.HasPackage)
 	{

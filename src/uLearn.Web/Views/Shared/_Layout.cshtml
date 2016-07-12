@@ -29,18 +29,35 @@
 			</div>
 			<div class="greeting-collapse-class navbar-collapse collapse">
 				<ul class="top-navigation nav navbar-nav">
-					@if (User.HasAccess(CourseRole.CourseAdmin))
-					{
-						<li>@Html.ActionLink("Курсы", "CourseList", "Admin")</li>
-					}
 					@if (User.IsSystemAdministrator())
 					{
-						<li>@Html.ActionLink("Статистика", "SystemStatistics", "Analytics")</li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Администрирование <span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li>@Html.ActionLink("Список курсов", "CourseList", "Admin")</li>
+								<li>@Html.ActionLink("Пользователи", "List", "Account", new { role = LmsRoles.SysAdmin }, null)</li>
+								<li>@Html.ActionLink("Статистика", "SystemStatistics", "Analytics")</li>
+								<li>@Html.ActionLink("Песочница C#", "Index", "Sandbox")</li>
+							</ul>
+						</li>
 					}
 					@if (User.HasAccess(CourseRole.Instructor))
 					{
-						<li>@Html.ActionLink("Пользователи", "List", "Account", new { role = LmsRoles.SysAdmin }, null)</li>
-						<li>@Html.ActionLink("CsSandbox", "Index", "Sandbox")</li>
+						string courseId = null;
+						try
+						{
+							courseId = Html.ViewContext.RouteData.Values["courseId"].ToString();
+						}
+						catch (Exception)
+						{
+							/* RouteData has no attribute 'courseId' */
+							if (Html.ViewContext.RouteData.Values["controller"].ToString() == "Admin" &&
+								Request.Params["courseId"] != null)
+							{
+								courseId = Request.Params["courseId"];
+							}
+						}
+						@Html.Action("CourseInstructorNavbar", "Course", new { courseId } );
 					}
 				</ul>
 				@Html.Partial("_LoginPartial")
