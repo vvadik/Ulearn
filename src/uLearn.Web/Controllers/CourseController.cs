@@ -161,28 +161,7 @@ namespace uLearn.Web.Controllers
 			}
 			return lastVisitedSlide;
 		}
-
-		[HttpGet]
-		public ActionResult SelectGroup()
-		{
-			var groups = db.Users.Select(u => u.GroupName).Distinct().OrderBy(g => g).ToArray();
-			return PartialView(groups);
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> SelectGroup(string groupName)
-		{
-			var userId = User.Identity.GetUserId();
-			var user = db.Users.FirstOrDefault(x => x.Id == userId);
-			if (user != null)
-			{
-				user.GroupName = groupName;
-				await db.SaveChangesAsync();
-				return Content("");
-			}
-			return HttpNotFound("User not found");
-		}
-
+		
 		private CoursePageModel CreateGuestCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits)
 		{
 			var course = courseManager.GetCourse(courseId);
@@ -197,7 +176,6 @@ namespace uLearn.Web.Controllers
 			var exerciseBlockData = new ExerciseBlockData(false, false);
 			return new CoursePageModel
 			{
-				IsFirstCourseVisit = false,
 				CourseId = course.Id,
 				CourseTitle = course.Title,
 				Slide = slide,
@@ -230,13 +208,11 @@ namespace uLearn.Web.Controllers
 			if (queueItem != null)
 				userId = queueItem.UserId;
 
-			var isFirstCourseVisit = !db.Visits.Any(x => x.UserId == userId);
 			var visiter = await VisitSlide(courseId, slideId, userId);
 			var score = Tuple.Create(visiter.Score, slide.MaxScore);
 			var model = new CoursePageModel
 			{
 				UserId = userId,
-				IsFirstCourseVisit = isFirstCourseVisit,
 				CourseId = course.Id,
 				CourseTitle = course.Title,
 				Slide = slide,

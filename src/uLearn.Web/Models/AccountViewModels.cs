@@ -80,10 +80,7 @@ namespace uLearn.Web.Models
 		[Required(ErrorMessage = "{0} должен быть у каждого пользователя")]
 		[Display(Name = "Логин")]
 		public string Name { get; set; }
-
-		[Display(Name = "Учебная группа")]
-		public string GroupName { get; set; }
-
+		
 		[Required(ErrorMessage = "{0} — это обязательное поле")]
 		[StringLength(100, ErrorMessage = "{0} не может быть короче {2} символов", MinimumLength = 6)]
 		[DataType(DataType.Password)]
@@ -117,9 +114,6 @@ namespace uLearn.Web.Models
 
 		[Display(Name = "Фамилия")]
 		public string LastName { get; set; }
-
-		[Display(Name = "Группа и вуз")]
-		public string GroupName { get; set; }
 
 		[Display(Name = "Email")]
 		public string Email { get; set; }

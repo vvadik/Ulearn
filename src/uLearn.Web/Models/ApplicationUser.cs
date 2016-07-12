@@ -15,7 +15,6 @@ namespace uLearn.Web.Models
 		public virtual ICollection<UserSolution> Solutions { get; set; }
 		public virtual ICollection<UserQuestion> Questions { get; set; }
 
-		public string GroupName { get; set; }
 		public string FirstName { get; set; }
 		public string LastName { get; set; }
 		public DateTime Registered { get; set; }

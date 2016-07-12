@@ -339,7 +339,6 @@ namespace uLearn.Web.Controllers
 				FirstName = user.FirstName,
 				LastName = user.LastName,
 				Email = user.Email,
-				GroupName = user.GroupName
 			});
 		}
 
@@ -352,7 +351,6 @@ namespace uLearn.Web.Controllers
 			user.FirstName = userInfo.FirstName;
 			user.LastName = userInfo.LastName;
 			user.Email = userInfo.Email;
-			user.GroupName = userInfo.GroupName;
 			user.LastEdit = DateTime.Now;
 			await userManager.UpdateAsync(user);
 			return RedirectToAction("StudentInfo");
@@ -391,8 +389,7 @@ namespace uLearn.Web.Controllers
 			var hasPassword = ControllerUtils.HasPassword(userManager, User);
 			return PartialView(new UserViewModel
 			{
-				Name = user.UserName, 
-				GroupName = user.GroupName, 
+				Name = user.UserName,
 				UserId = user.Id, 
 				HasPassword = hasPassword,
 				FirstName = user.FirstName,
@@ -415,7 +412,6 @@ namespace uLearn.Web.Controllers
 			if (nameChanged && await userManager.FindByNameAsync(userModel.Name) != null)
 				return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
 			user.UserName = userModel.Name;
-			user.GroupName = userModel.GroupName;
 			user.FirstName = userModel.FirstName;
 			user.LastName = userModel.LastName;
 			user.Email = userModel.Email;

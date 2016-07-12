@@ -327,6 +327,10 @@
     <Compile Include="Migrations\201607110843430_AddGroups.Designer.cs">
       <DependentUpon>201607110843430_AddGroups.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201607121102193_RemoveOldUserGroups.cs" />
+    <Compile Include="Migrations\201607121102193_RemoveOldUserGroups.Designer.cs">
+      <DependentUpon>201607121102193_RemoveOldUserGroups.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\CommentLike.cs" />
     <Compile Include="Models\CommentPolicy.cs" />
@@ -740,6 +744,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201607110843430_AddGroups.resx">
       <DependentUpon>201607110843430_AddGroups.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607121102193_RemoveOldUserGroups.resx">
+      <DependentUpon>201607121102193_RemoveOldUserGroups.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -1282,7 +1289,6 @@
     <Content Include="Views\Admin\CourseList.cshtml" />
     <Content Include="Views\Analytics\UnitStatistics.cshtml" />
     <Content Include="Views\Course\InstructorNote.cshtml" />
-    <Content Include="Views\Course\SelectGroup.cshtml" />
     <Content Include="Views\Questions\Items.cshtml" />
     <Content Include="Views\Analytics\DailyStatistics.cshtml" />
     <Content Include="Views\Analytics\UsersProgress.cshtml" />
