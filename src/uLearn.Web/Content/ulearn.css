@@ -40,7 +40,7 @@
 .internal-page-link:focus,
 .internal-page-link:active {
 	text-decoration: none;
-	border-bottom: 1px dashed #428bca;
+	border-bottom: 1px dotted rgba(66, 139, 202, 0.62);
 }
 
 .internal-page-link:hover,
