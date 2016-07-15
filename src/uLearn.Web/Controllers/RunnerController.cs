@@ -36,23 +36,41 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		private RunnerSubmition ToRunnerSubmition(UserSolution details)
-		{
-			return new RunnerSubmition
-			{
-				Id = details.Id.ToString(),
-				Code = Utils.GetSource(
-					details.CourseId, 
-					details.SlideId, 
-					courseManager, 
-					details.SolutionCode.Text
-					),
-				Input = "",
-				NeedRun = true
-			};
-		}
+	    private RunnerSubmition ToRunnerSubmition(UserSolution details)
+	    {
+	        var projectInfo = ((ExerciseSlide)courseManager.GetCourse(details.CourseId).GetSlideById(details.SlideId)).Exercise.ProjectInfo;
 
-		[HttpPost]
+	        if (projectInfo != null)
+	        {
+	            return new ProjRunnerSubmition
+	            {
+	                Id = details.Id.ToString(),
+	                ZipFileData = Utils.GetZipFileDataString(
+	                    details.CourseId,
+	                    details.SlideId,
+	                    courseManager,
+	                    details.SolutionCode.Text
+	                    ),
+	                ProjectName = projectInfo.ProjectName,
+	                Input = "",
+	                NeedRun = true
+	            };
+	        }
+	        return new FileRunnerSubmition
+	        {
+	            Id = details.Id.ToString(),
+	            Code = Utils.GetSource(
+	                details.CourseId,
+	                details.SlideId,
+	                courseManager,
+	                details.SolutionCode.Text
+	                ),
+	            Input = "",
+	            NeedRun = true
+	        };
+	    }
+
+	    [HttpPost]
 		[Route("PostResult")]
 		public async Task PostResult([FromUri]string token, RunningResults result)
 		{

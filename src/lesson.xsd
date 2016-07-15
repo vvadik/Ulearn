@@ -105,6 +105,12 @@
     </xs:simpleContent>
   </xs:complexType>
 
+  <xs:complexType name="ProjectInfo">
+    <xs:attribute name="project-name" type="notEmptyString" />
+    <xs:attribute name="project-path" type="notEmptyString" />
+  </xs:complexType>
+
+
   <xs:complexType name="Execirse">
     <xs:complexContent>
       <xs:extension base="IncludeCode">
@@ -112,6 +118,7 @@
           <xs:element name="inital-code" type="xs:string" />
           <xs:element name="hint" type="notEmptyString" minOccurs="0" maxOccurs="unbounded" />
           <xs:element name="solution" type="notEmptyString" />
+          <xs:element name="project-info" type="ProjectInfo" minOccurs="0" maxOccurs="1" />
           <xs:element name="remove" type="Label" minOccurs="0" maxOccurs="unbounded" />
           <xs:element name="comment" type="notEmptyString" minOccurs="0" />
           <xs:element name="expected" type="xs:string" />

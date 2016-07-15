@@ -133,7 +133,7 @@ namespace uLearn
 				FailOnError(slide, solution);
 			else
 			{
-				var submission = new RunnerSubmition
+				var submission = new FileRunnerSubmition
 				{
 					Code = solution.SourceCode,
 					Id = slide.NormalizedGuid,

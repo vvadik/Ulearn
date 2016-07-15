@@ -19,7 +19,10 @@ namespace uLearn.Model.Blocks
 		[XmlElement("solution")]
 		public Label SolutionLabel { get; set; }
 
-		[XmlElement("remove")]
+	    [XmlElement("project-info")]
+	    public ProjectInfo ProjectInfo { get; set; }
+
+	    [XmlElement("remove")]
 		public Label[] RemovedLabels { get; set; }
 
 		[XmlElement("comment")]
@@ -40,6 +43,7 @@ namespace uLearn.Model.Blocks
 
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
+            //todo научить вставлять в нужный файлик
 			FillProperties(context);
 			RemovedLabels = RemovedLabels ?? new Label[0];
 			if (PreludeFile == null)

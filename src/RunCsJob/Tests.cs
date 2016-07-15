@@ -224,7 +224,7 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 
 		private static RunningResults GetDetails(string code, string input)
 		{
-			var model = new RunnerSubmition
+			var model = new FileRunnerSubmition
 			{
 				Id = Utils.NewNormalizedGuid(),
 				Code = code,
@@ -232,7 +232,7 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 				NeedRun = true
 			};
 
-			var result = new SandboxRunner(model).Run();
+			var result = new SandboxRunner(model).RunCSC();
 			Assert.IsNotNull(result);
 			return result;
 		}

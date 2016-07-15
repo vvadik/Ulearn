@@ -174,7 +174,7 @@ namespace uLearn.CourseTool
 			if (buildResult.HasStyleIssues)
 				return new RunSolutionResult { IsStyleViolation = true, CompilationError = buildResult.StyleMessage, ExecutionServiceName = "uLearn" };
 			var solution = buildResult.SourceCode;
-			var submission = new RunnerSubmition
+			var submission = new FileRunnerSubmition
 			{
 				Code = solution,
 				Id = Utils.NewNormalizedGuid(),
