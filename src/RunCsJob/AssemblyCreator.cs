@@ -1,8 +1,9 @@
 ﻿using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using Microsoft.CSharp;
+using RunCsJob.Api;
 
-namespace RunCsJob.Api
+namespace RunCsJob
 {
     public class AssemblyCreator
     {

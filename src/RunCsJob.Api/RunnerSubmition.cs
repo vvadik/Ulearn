@@ -17,16 +17,9 @@
         public string Code;
     }
 
-
     public class ProjRunnerSubmition : RunnerSubmition
     {
-        public string ZipFileData;
-
-        public string ProjectFileName
-        {
-            get { return ProjectName + ".csproj"; }
-        }
-
-        public string ProjectName;
+        public byte[] ZipFileData;
+        public string ProjectFileName;
     }
 }

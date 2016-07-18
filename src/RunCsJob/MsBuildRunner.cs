@@ -1,17 +1,31 @@
-﻿using Microsoft.Build.Evaluation;
+﻿using System.IO;
+using System.Text;
+using Microsoft.Build.Evaluation;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Logging;
 using RunCsJob.Api;
 
 namespace RunCsJob
 {
-    public static class MsBuildRunner
+    public class MsBuildRunner
     {
-        public static string BuildProject(ProjRunnerSubmition submition)
+        public MSBuildResult BuildProject(ProjRunnerSubmition submition)
         {
-            var path = string.Format(@".\{0}\{1}", submition.Id, submition.ProjectFileName);
+            var result = new MSBuildResult();
+            var path = Path.Combine(".", submition.Id, submition.ProjectFileName);
             var proj = new Project(path);
-            //todo возможно добавить логгер
-            proj.Build();
-            return string.Format(@".\{0}\bin\Debug\{1}.exe", submition.Id, submition.ProjectName);
+            var logMessageBuilder = new StringBuilder();
+            var stringWriter = new StringWriter(logMessageBuilder);
+            var logger = new ConsoleLogger(LoggerVerbosity.Minimal, stringWriter.Write, color => { }, () => { });
+            result.Success = proj.Build(logger);
+            if (result.Success)
+            {
+                var exeFileName = Path.GetFileName(submition.ProjectFileName).Substring(0, submition.ProjectFileName.Length - 7);
+                result.PathToExe = Path.Combine(".", submition.Id, "bin", "debug", exeFileName);
+            }
+            else
+                result.ErrorMessage = logMessageBuilder.ToString();
+            return result;
         }
     }
 }

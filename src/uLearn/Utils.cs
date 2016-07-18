@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Microsoft.Build.Evaluation;
+using Ionic.Zip;
 
 namespace uLearn
 {
@@ -19,22 +17,32 @@ namespace uLearn
                     .SourceCode;
         }
 
-        public static string GetZipFileDataString(string courseId, Guid slideId, CourseManager courseManager, string code)
+        public static byte[] GetZipFileDataString(string courseId, Guid slideId, CourseManager courseManager, string code)
         {
             var exercise = ((ExerciseSlide)courseManager.GetCourse(courseId).GetSlideById(slideId)).Exercise;
-            var proj = new Project(exercise.ProjectInfo.Path);
-            var types = new[] { "Reference", "Compile", "None" };
-            var includes = proj.Items
-                .Where(pItem => types.Contains(pItem.ItemType))
-                .Select(pItem => pItem.EvaluatedInclude)
-                .ToList();
-            return ZipFiles(includes);
+            // для студ части
+            //var proj = new Project(exercise.CSProjFilePath);
+            //var types = new[] { "EmbeddedResource", "Compile", "None" };
+            //var includes = proj.Items
+            //    .Where(pItem => types.Contains(pItem.ItemType))
+            //    .Select(pItem => pItem.EvaluatedInclude)
+            //    .ToList();
+            File.WriteAllText(exercise.UserSlnFilePath, code);
+            return ZipFiles(exercise.CSProjFilePath, exercise.RemovedFiles);
         }
 
-        private static string ZipFiles(List<string> fileNames)
+        private static byte[] ZipFiles(string path, string[] removedFiles)
         {
-            //todo придумать как зипить список файлов
-            throw new NotImplementedException();
+            using (var zip = new ZipFile())
+            {
+                zip.AddDirectory(Path.GetDirectoryName(path));
+                zip.RemoveEntries(removedFiles);
+                using (var ms = new MemoryStream())
+                {
+                    zip.Save(ms);
+                    return ms.ToArray();
+                }
+            }
         }
 
         public static string NewNormalizedGuid()

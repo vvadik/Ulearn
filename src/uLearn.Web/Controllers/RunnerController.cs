@@ -38,9 +38,9 @@ namespace uLearn.Web.Controllers
 
 	    private RunnerSubmition ToRunnerSubmition(UserSolution details)
 	    {
-	        var projectInfo = ((ExerciseSlide)courseManager.GetCourse(details.CourseId).GetSlideById(details.SlideId)).Exercise.ProjectInfo;
+	        var csProjFilePath = ((ExerciseSlide)courseManager.GetCourse(details.CourseId).GetSlideById(details.SlideId)).Exercise.CSProjFilePath;
 
-	        if (projectInfo != null)
+	        if (csProjFilePath != null)
 	        {
 	            return new ProjRunnerSubmition
 	            {
@@ -51,7 +51,7 @@ namespace uLearn.Web.Controllers
 	                    courseManager,
 	                    details.SolutionCode.Text
 	                    ),
-	                ProjectName = projectInfo.ProjectName,
+	                ProjectFileName = csProjFilePath,
 	                Input = "",
 	                NeedRun = true
 	            };

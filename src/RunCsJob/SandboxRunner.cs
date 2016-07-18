@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Text;
-using Microsoft.Build.BuildEngine;
 using Newtonsoft.Json;
+using Ionic.Zip;
 using RunCsJob.Api;
 
 namespace RunCsJob
@@ -28,18 +27,23 @@ namespace RunCsJob
 
         public static RunningResults Run(RunnerSubmition submition)
         {
-            if (submition is ProjRunnerSubmition)
+            var runnerSubmition = submition as ProjRunnerSubmition;
+            if (runnerSubmition != null)
             {
-                var projSubmition = (ProjRunnerSubmition)submition;
+                var projSubmition = runnerSubmition;
                 UnpackZip(projSubmition);
                 try
                 {
-                    new SandboxRunner(submition).RunMSBuild();
+                    return new SandboxRunner(submition).RunMSBuild();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    
-                    throw;
+                    return new RunningResults
+                    {
+                        Id = runnerSubmition.Id,
+                        Verdict = Verdict.SandboxError,
+                        Error = ex.ToString()
+                    };
                 }
             }
             try
@@ -59,13 +63,21 @@ namespace RunCsJob
 
         private static void UnpackZip(ProjRunnerSubmition submition)
         {
-            var pathName = string.Format(@".\{0}", submition.Id);
-            var file = File.Open(pathName + ".zip", FileMode.Create);
-            new BinaryWriter(file).Write(submition.ZipFileData);
-            Directory.CreateDirectory(pathName);
-            ZipFile.ExtractToDirectory(pathName + ".zip", pathName);
-            file.Close();
-            Remove(pathName + ".zip");
+            var pathName = Path.Combine(".", submition.Id);
+            try
+            {
+                File.WriteAllBytes(pathName + ".zip", submition.ZipFileData);
+                using (var zip = ZipFile.Read(pathName + ".zip"))
+                {
+                    Directory.CreateDirectory(pathName);
+                    foreach (var file in zip)
+                        file.Extract(pathName, ExtractExistingFileAction.OverwriteSilently);
+                }
+            }
+            finally
+            {
+                Remove(pathName + ".zip");
+            }
         }
 
         public SandboxRunner(RunnerSubmition submition)
@@ -76,15 +88,24 @@ namespace RunCsJob
 
         public RunningResults RunMSBuild()
         {
+            var builder = new MsBuildRunner();
+            var result = builder.BuildProject((ProjRunnerSubmition)submition);
+            if (result.Success)
+                RunSandboxer(string.Format("\"{0}\" {1}", result.PathToExe, submition.Id));
+            else
+            {
+                _result.Verdict = Verdict.CompilationError;
+                _result.CompilationOutput = result.ErrorMessage;
+                return _result;
+            }
 
-            var pathToExe = MsBuildRunner.BuildProject((ProjRunnerSubmition)submition);
-            RunSandboxer(pathToExe);//todo add path to .exe
             return _result;
         }
 
         public RunningResults RunCSC()
         {
-            var assembly = AssemblyCreator.CreateAssembly((FileRunnerSubmition)submition);
+            var assemblyCreator = new AssemblyCreator();
+            var assembly = assemblyCreator.CreateAssembly((FileRunnerSubmition)submition);
 
             _result.Verdict = Verdict.Ok;
 

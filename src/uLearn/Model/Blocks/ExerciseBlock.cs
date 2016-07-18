@@ -7,151 +7,156 @@ using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {
-	[XmlType("execirse")]
-	public class ExerciseBlock : IncludeCode
-	{
-		[XmlElement("inital-code")]
-		public string ExerciseInitialCode { get; set; }
+    [XmlType("execirse")]
+    public class ExerciseBlock : IncludeCode
+    {
+        [XmlElement("inital-code")]
+        public string ExerciseInitialCode { get; set; }
 
-		[XmlElement("hint")]
-		public List<string> Hints { get; set; }
+        [XmlElement("hint")]
+        public List<string> Hints { get; set; }
 
-		[XmlElement("solution")]
-		public Label SolutionLabel { get; set; }
+        [XmlElement("solution")]
+        public Label SolutionLabel { get; set; }
 
-	    [XmlElement("project-info")]
-	    public ProjectInfo ProjectInfo { get; set; }
+        [XmlElement("csproj-file-path")]
+        public string CSProjFilePath { get; set; }
 
-	    [XmlElement("remove")]
-		public Label[] RemovedLabels { get; set; }
+        [XmlElement("user-sln-file-path")]
+        public string UserSlnFilePath { get; set; }
 
-		[XmlElement("comment")]
-		public string CommentAfterExerciseIsSolved { get; set; }
+        [XmlElement("remove-file-path")]
+        public string[] RemovedFiles { get; set; }
 
-		[XmlElement("expected")]
-		// Ожидаемый корректный вывод программы
-		public string ExpectedOutput { get; set; }
+        [XmlElement("remove")]
+        public Label[] RemovedLabels { get; set; }
 
-		[XmlElement("hide-expected-output")]
-		public bool HideExpectedOutputOnError { get; set; }
+        [XmlElement("comment")]
+        public string CommentAfterExerciseIsSolved { get; set; }
 
-		[XmlElement("validator")]
-		public string ValidatorName { get; set; }
+        [XmlElement("expected")]
+        // Ожидаемый корректный вывод программы
+        public string ExpectedOutput { get; set; }
 
-		[XmlElement("prelude")]
-		public string PreludeFile { get; set; }
+        [XmlElement("hide-expected-output")]
+        public bool HideExpectedOutputOnError { get; set; }
 
-		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
-		{
-            //todo научить вставлять в нужный файлик
-			FillProperties(context);
-			RemovedLabels = RemovedLabels ?? new Label[0];
-			if (PreludeFile == null)
-			{
-				PreludeFile = context.CourseSettings.GetPrelude(LangId);
-				if (PreludeFile != null)
-					PreludeFile = Path.Combine("..", PreludeFile);
-			}
+        [XmlElement("validator")]
+        public string ValidatorName { get; set; }
 
-			var code = context.FileSystem.GetContent(File);
-			var regionRemover = new RegionRemover(LangId);
-			var extractor = context.GetExtractor(File, LangId, code);
+        [XmlElement("prelude")]
+        public string PreludeFile { get; set; }
 
-			var prelude = "";
-			if (PreludeFile != null)
-				prelude = context.FileSystem.GetContent(PreludeFile);
+        public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
+        {
+            FillProperties(context);
+            RemovedLabels = RemovedLabels ?? new Label[0];
+            if (PreludeFile == null)
+            {
+                PreludeFile = context.CourseSettings.GetPrelude(LangId);
+                if (PreludeFile != null)
+                    PreludeFile = Path.Combine("..", PreludeFile);
+            }
 
-			var exerciseCode = regionRemover.Prepare(code);
-			IEnumerable<Label> notRemoved;
-			exerciseCode = regionRemover.Remove(exerciseCode, RemovedLabels, out notRemoved);
-			int index;
-			exerciseCode = regionRemover.RemoveSolution(exerciseCode, SolutionLabel, out index);
-			index += prelude.Length;
+            var code = context.FileSystem.GetContent(File);
+            var regionRemover = new RegionRemover(LangId);
+            var extractor = context.GetExtractor(File, LangId, code);
 
-			ExerciseInitialCode = ExerciseInitialCode.RemoveCommonNesting();
-			ExerciseCode = prelude + exerciseCode;
-			IndexToInsertSolution = index;
-			EthalonSolution = extractor.GetRegion(SolutionLabel);
-			ValidatorName = string.Join(" ", LangId, ValidatorName);
+            var prelude = "";
+            if (PreludeFile != null)
+                prelude = context.FileSystem.GetContent(PreludeFile);
 
-			yield return this;
-		}
+            var exerciseCode = regionRemover.Prepare(code);
+            IEnumerable<Label> notRemoved;
+            exerciseCode = regionRemover.Remove(exerciseCode, RemovedLabels, out notRemoved);
+            int index;
+            exerciseCode = regionRemover.RemoveSolution(exerciseCode, SolutionLabel, out index);
+            index += prelude.Length;
 
-		// То, что будет выполняться для проверки задания
-		public string ExerciseCode { get; set; }
-		// Индекс внутри ExerciseCode, куда нужно вставить код пользователя.
-		public int IndexToInsertSolution { get; set; }
-		// Если это вставить в ExerciseCode по индексу IndexToInsertSolution и выполнить полученный код, он должен вывести ExpectedOutput
-		public string EthalonSolution { get; set; }
+            ExerciseInitialCode = ExerciseInitialCode.RemoveCommonNesting();
+            ExerciseCode = prelude + exerciseCode;
+            IndexToInsertSolution = index;
+            EthalonSolution = extractor.GetRegion(SolutionLabel);
+            ValidatorName = string.Join(" ", LangId, ValidatorName);
 
-		public List<string> HintsMd
-		{
-			get { return Hints = Hints ?? new List<string>(); }
-			set { Hints = value; }
-		}
+            yield return this;
+        }
 
-		[XmlIgnore]
-		public SolutionBuilder Solution
-		{
-			get { return new SolutionBuilder(IndexToInsertSolution, ExerciseCode, ValidatorName); }
-		}
+        // То, что будет выполняться для проверки задания
+        public string ExerciseCode { get; set; }
+        // Индекс внутри ExerciseCode, куда нужно вставить код пользователя.
+        public int IndexToInsertSolution { get; set; }
+        // Если это вставить в ExerciseCode по индексу IndexToInsertSolution и выполнить полученный код, он должен вывести ExpectedOutput
+        public string EthalonSolution { get; set; }
 
-		#region equals
+        public List<string> HintsMd
+        {
+            get { return Hints = Hints ?? new List<string>(); }
+            set { Hints = value; }
+        }
 
-		protected bool Equals(ExerciseBlock other)
-		{
-			return Equals(ExerciseInitialCode, other.ExerciseInitialCode) && Equals(ExpectedOutput, other.ExpectedOutput) && Equals(HintsMd, other.HintsMd);
-		}
+        [XmlIgnore]
+        public SolutionBuilder Solution
+        {
+            get { return new SolutionBuilder(IndexToInsertSolution, ExerciseCode, ValidatorName); }
+        }
 
-		public override bool Equals(object obj)
-		{
-			if (ReferenceEquals(null, obj))
-				return false;
-			if (ReferenceEquals(this, obj))
-				return true;
-			if (obj.GetType() != GetType())
-				return false;
-			return Equals((ExerciseBlock)obj);
-		}
+        #region equals
 
-		public override int GetHashCode()
-		{
-			unchecked
-			{
-				int hashCode = (ExerciseInitialCode != null ? ExerciseInitialCode.GetHashCode() : 0);
-				hashCode = (hashCode * 397) ^ (ExpectedOutput != null ? ExpectedOutput.GetHashCode() : 0);
-				hashCode = (hashCode * 397) ^ (HintsMd != null ? HintsMd.GetHashCode() : 0);
-				return hashCode;
-			}
-		}
+        protected bool Equals(ExerciseBlock other)
+        {
+            return Equals(ExerciseInitialCode, other.ExerciseInitialCode) && Equals(ExpectedOutput, other.ExpectedOutput) && Equals(HintsMd, other.HintsMd);
+        }
 
-		#endregion
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
+            return Equals((ExerciseBlock)obj);
+        }
 
-		public override string ToString()
-		{
-			return string.Format("Exercise: {0}, Hints: {1}", ExerciseInitialCode, string.Join("; ", HintsMd));
-		}
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = (ExerciseInitialCode != null ? ExerciseInitialCode.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (ExpectedOutput != null ? ExpectedOutput.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (HintsMd != null ? HintsMd.GetHashCode() : 0);
+                return hashCode;
+            }
+        }
 
-		public Component GetSolutionsComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)
-		{
-			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex + 1, launchUrl, ltiId, false, 0, false);
-		}
+        #endregion
 
-		public Component GetExerciseComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)
-		{
-			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex, launchUrl, ltiId, true, 5, false);
-		}
+        public override string ToString()
+        {
+            return string.Format("Exercise: {0}, Hints: {1}", ExerciseInitialCode, string.Join("; ", HintsMd));
+        }
 
-		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
-		{
-			throw new NotImplementedException();
-		}
+        public Component GetSolutionsComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)
+        {
+            return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex + 1, launchUrl, ltiId, false, 0, false);
+        }
 
-		public override string TryGetText()
-		{
-			return (ExerciseInitialCode ?? "") + '\n' 
-				+ string.Join("\n", HintsMd) + '\n' 
-				+ (CommentAfterExerciseIsSolved ?? "");
-		}
-	}
+        public Component GetExerciseComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)
+        {
+            return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex, launchUrl, ltiId, true, 5, false);
+        }
+
+        public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string TryGetText()
+        {
+            return (ExerciseInitialCode ?? "") + '\n'
+                   + string.Join("\n", HintsMd) + '\n'
+                   + (CommentAfterExerciseIsSolved ?? "");
+        }
+    }
 }
