@@ -6,7 +6,6 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -21,6 +20,7 @@ namespace uLearn.Web.Controllers
 		private UserManager<ApplicationUser> userManager;
 		private readonly UsersRepo usersRepo;
 		private UserRolesRepo userRolesRepo;
+		private GroupsRepo groupsRepo;
 
 		public AccountController()
 			: this(new ULearnUserManager())
@@ -29,6 +29,7 @@ namespace uLearn.Web.Controllers
 			courseManager = WebCourseManager.Instance;
 			usersRepo = new UsersRepo(db);
 			userRolesRepo = new UserRolesRepo(db);
+			groupsRepo = new GroupsRepo(db);
 		}
 
 		public AccountController(UserManager<ApplicationUser> userManager)
@@ -74,12 +75,14 @@ namespace uLearn.Web.Controllers
 				);
 
 			var courses = User.GetControllableCoursesId().ToList();
+			var usersList = users.ToList();
 
 			var model = new UserListModel
 			{
 				IsCourseAdmin = User.HasAccess(CourseRole.CourseAdmin), 
 				ShowDangerEntities = User.IsSystemAdministrator(),
-				Users = users.Select(user => GetUserModel(user, coursesForUsers, courses)).ToList()
+				Users = usersList.Select(user => GetUserModel(user, coursesForUsers, courses)).ToList(),
+				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, usersList.Select(u => u.UserId), User)
 			};
 
 			return model;
@@ -121,6 +124,21 @@ namespace uLearn.Web.Controllers
 				};
 			}
 			return user;
+		}
+
+		public async Task<ActionResult> JoinGroup(Guid hash)
+		{
+			var group = groupsRepo.FindGroupByInviteHash(hash);
+			if (group == null)
+				return new HttpStatusCodeResult(HttpStatusCode.NotFound);
+
+			if (Request.HttpMethod == "POST")
+			{
+				await groupsRepo.AddUserToGroup(group.Id, User.Identity.GetUserId());
+				return Redirect("/");
+			}
+
+			return View((object) group.Name);
 		}
 
 		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]
@@ -167,7 +185,11 @@ namespace uLearn.Web.Controllers
 			if (user == null)
 				return RedirectToAction("List");
 			var courses = new HashSet<string>(db.Visits.Where(v => v.UserId == user.Id).Select(v => v.CourseId).Distinct());
-			return View(new UserInfoModel(user, courseManager.GetCourses().Where(c => courses.Contains(c.Id)).ToArray()));
+			return View(new UserInfoModel {
+				User = user,
+				GroupsNames = groupsRepo.GetUserGroupsNamesAsString(courses.ToList(), user.Id, User, 10),
+				Courses = courseManager.GetCourses().Where(c => courses.Contains(c.Id)).ToArray()
+			});
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]

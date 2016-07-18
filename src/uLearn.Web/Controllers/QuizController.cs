@@ -26,6 +26,7 @@ namespace uLearn.Web.Controllers
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly QuizzesRepo quizzesRepo = new QuizzesRepo();
+		private readonly GroupsRepo groupsRepo = new GroupsRepo();
 
 		public QuizController()
 			: this(WebCourseManager.Instance)
@@ -432,7 +433,6 @@ namespace uLearn.Web.Controllers
 			var quizSlide = (QuizSlide)course.Slides[slideIndex];
 			var quizVersions = quizzesRepo.GetQuizVersions(courseId, quizSlide.Id).ToList();
 			var dict = new SortedDictionary<string, List<QuizAnswerInfo>>();
-			var groups = new Dictionary<string, string>();
 			var passes = db.UserQuizzes
 				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped && periodStart <= q.Timestamp)
 				.GroupBy(q => q.UserId)
@@ -444,8 +444,10 @@ namespace uLearn.Web.Controllers
 				if (pass.QuizVersion != null)
 					slide = new QuizSlide(quizSlide.Info, pass.QuizVersion.RestoredQuiz);
 				dict[pass.UserName] = GetUserQuizAnswers(slide, pass.UserQuizzes).ToList();
-				groups[pass.UserName] = pass.GroupName;
 			}
+			var userIds = passes.Select(p => p.UserId).Distinct().ToList();
+			var userNameById = passes.ToDictionary(p => p.UserId, p => p.UserName);
+			var groups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User).ToDictionary(kv => userNameById[kv.Key], kv => kv.Value);
 			var rightAnswersCount = dict.Values
 				.SelectMany(list => list
 					.Where(info => info.Score == info.MaxScore))

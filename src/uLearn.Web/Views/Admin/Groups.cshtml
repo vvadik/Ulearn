@@ -1,0 +1,125 @@
+﻿@using Microsoft.AspNet.Identity
+@model uLearn.Web.Controllers.GroupsViewModel
+
+@{
+	ViewBag.Title = "Группы";
+}
+
+@Html.Action("ManageMenu")
+
+<div class="slide-container">
+
+	<h1>Группы <small><a href="" class="create-group-link  internal-page-link">создать</a></small></h1>
+	
+	<div class="groups">
+		@if (Model.Groups.Count == 0)
+		{
+			<div>
+				<a href="" class="create-group-link  internal-page-link">Создайте</a> группу, пригласите в неё студентов или добавьте их самостоятельно. Смотрите статистку только по своей группе.
+			</div>
+		}
+		@foreach (var group in Model.Groups.OrderBy(g => g.OwnerId != User.Identity.GetUserId()))
+		{
+			<div class="group" data-group-id="@group.Id">
+				<h3 class="group__title">
+					<a href="" class="edit-group-link  internal-page-link" title="Редактировать свойства" data-group-id="@group.Id" data-name="@group.Name" data-is-public="@group.IsPublic.ToString().ToLower()">@group.Name</a>
+
+					@if (!group.IsPublic)
+					{
+						<small><span class="label label-danger">приватная</span></small>
+					}
+					@if (group.OwnerId != User.Identity.GetUserId())
+					{
+						<small><span class="label label-primary">владелец: @group.Owner.VisibleName</span></small>
+					}
+				</h3>
+				@{
+					var inviteLink = Url.Action("JoinGroup", "Account", new { hash = group.InviteHash }, Request.Url.Scheme);
+				}
+				<div class="@(group.IsInviteLinkEnabled ? "text-muted" : "text-danger")">
+					<span class="clipboard-link" data-clipboard-text="@inviteLink" title="Отправьте эту ссылку студентам для присоединения к группе. Студенты увидят название группы">
+						@inviteLink
+					</span>
+					
+					@if (group.IsInviteLinkEnabled)
+					{
+						<button class="clipboard-link  btn btn-xs btn-primary" data-clipboard-text="@inviteLink" data-show-copied="true">
+							копировать
+						</button>
+					}
+
+					<form action="@Url.Action("EnableGroupInviteLink", "Admin", new { groupId = group.Id, isEnabled = !group.IsInviteLinkEnabled })" method="POST" class="ib">
+						@Html.AntiForgeryToken()
+						<button class="btn @(group.IsInviteLinkEnabled ? "btn-default" : "btn-primary") btn-xs">
+							@(group.IsInviteLinkEnabled ? "отключить ссылку" : "включить ссылку")
+						</button>
+					</form>
+
+				</div>
+				<ol class="members">
+					@foreach (var member in group.Members.OrderBy(m => m.User.VisibleName))
+					{
+						<li class="member">
+							@member.User.VisibleName (@member.User.UserName)
+							<span class="glyphicon glyphicon-remove  remove-user-from-group-link  text-danger visible-on-parent-hover  cursor-pointer" data-group-id="@group.Id" data-user-id="@member.User.Id" title="Удалить из группы"></span>
+						</li>
+					}
+				</ol>
+
+				@if (group.OwnerId == User.Identity.GetUserId() || User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
+				{
+					if (group.Members.Count == 0)
+					{
+						<div>В группе нет пользователей. Добавьте:</div>
+					}
+					else
+					{
+						<div>Добавить пользователя:</div>
+					}
+					<input type="text" class="add-user-to-group-input form-control" data-group-id="@group.Id" placeholder="Начните вводить имя или фамилию">
+				}
+			</div>
+
+			<hr/>
+		}
+	</div>
+</div>
+
+<div class="modal fade" id="createOrUpdateGroupModal" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Создать группу</h4>
+			</div>
+			<div class="modal-body">
+				@using (Html.BeginForm("CreateGroup", "Admin", FormMethod.Post, new
+				{
+					data_create_group_url = Url.Action("CreateGroup", "Admin"),
+					data_update_group_url = Url.Action("UpdateGroup", "Admin")
+				}))
+				{
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="courseId" value="@Model.CourseId"/>
+					<input type="hidden" name="groupId" value="" />
+
+					<div class="form-group">
+						<input id="name" name="name" type="text" class="form-control" placeholder="Название новой группы">
+						<p class="help-block">
+							Студенты увидят название группы, только если вы сами вышлите им ссылку для вступления
+						</p>
+					</div>
+
+					<div class="checkbox checkbox-default">
+						@Html.CheckBox("isPublic")
+						<label for="isPublic">
+							Видна другим инструкторам
+						</label>
+					</div>
+
+					<button class="action-button  btn btn-success">Создать</button>
+					<button class="remove-group-link  btn btn-danger" data-url="@Url.Action("RemoveGroup", "Admin")">Удалить группу</button>
+				}
+			</div>
+		</div>
+	</div>
+</div>

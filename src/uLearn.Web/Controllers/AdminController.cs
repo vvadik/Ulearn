@@ -26,6 +26,7 @@ namespace uLearn.Web.Controllers
 		private readonly QuizzesRepo quizzesRepo;
 		private readonly CoursesRepo coursesRepo;
 		private readonly UserQuizzesRepo userQuizzesRepo;
+		private readonly GroupsRepo groupsRepo;
 
 		public AdminController()
 		{
@@ -37,6 +38,7 @@ namespace uLearn.Web.Controllers
 			quizzesRepo = new QuizzesRepo(db);
 			coursesRepo = new CoursesRepo(db);
 			userQuizzesRepo = new UserQuizzesRepo(db);
+			groupsRepo = new GroupsRepo(db);
 		}
 
 		public ActionResult CourseList(string courseCreationLastTry = null)
@@ -369,6 +371,8 @@ namespace uLearn.Web.Controllers
 				model.Users.Add(user);
 			}
 
+			model.UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, model.Users.Select(u => u.UserId), User);
+
 			return model;
 		}
 
@@ -440,6 +444,96 @@ namespace uLearn.Web.Controllers
 			courseManager.GetCourseVersionFile(versionId).Delete();
 
 			return RedirectToAction("Packages", new { courseId });
+		}
+
+		public ActionResult Groups(string courseId)
+		{
+			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+
+			return View("Groups", new GroupsViewModel
+			{
+				CourseId = courseId,
+				Groups = groups,
+			});
+		}
+
+		public ActionResult CreateGroup(string courseId, string name, bool isPublic)
+		{
+			var group = groupsRepo.CreateGroup(courseId, name, User.Identity.GetUserId(), isPublic);
+			return RedirectToAction("Groups", new {courseId});
+		}
+
+		private bool CanModifyGroup(Group group)
+		{
+			var courseId = group.CourseId;
+			if (groupsRepo.CanUserSeeAllCourseGroups(User, courseId))
+				return true;
+			return group.OwnerId == User.Identity.GetUserId() || group.IsPublic;
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> AddUserToGroup(int groupId, string userId)
+		{
+			var group = groupsRepo.GetGroupById(groupId);
+			if (!CanModifyGroup(group))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			var added = await groupsRepo.AddUserToGroup(groupId, userId);
+
+			return Json(new {added});
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> RemoveUserFromGroup(int groupId, string userId)
+		{
+			var group = groupsRepo.GetGroupById(groupId);
+			if (!CanModifyGroup(group))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			await groupsRepo.RemoveUserFromGroup(groupId, userId);
+
+			return Json(new { removed="true" });
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> UpdateGroup(int groupId, string name, bool isPublic)
+		{
+			var group = groupsRepo.GetGroupById(groupId);
+			if (!CanModifyGroup(group))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			await groupsRepo.ModifyGroup(groupId, name, isPublic);
+
+			return RedirectToAction("Groups", new { courseId = group.CourseId });
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> RemoveGroup(int groupId)
+		{
+			var group = groupsRepo.GetGroupById(groupId);
+			if (!CanModifyGroup(group))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			await groupsRepo.RemoveGroup(groupId);
+
+			return RedirectToAction("Groups", new { courseId = group.CourseId });
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> EnableGroupInviteLink(int groupId, bool isEnabled)
+		{
+			var group = groupsRepo.GetGroupById(groupId);
+			if (!CanModifyGroup(group))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			await groupsRepo.EnableGroupInviteLink(groupId, isEnabled);
+
+			return RedirectToAction("Groups", new { courseId = group.CourseId });
+		}
+
+		public ActionResult FindUsers(string term)
+		{
+			var query = new UserSearchQueryModel { NamePrefix = term };
+			var users = usersRepo.FilterUsers(query, userManager)
+				.Take(10)
+				.Select(ur => new {id=ur.UserId, value=$"{ur.UserVisibleName} ({ur.UserName})" })
+				.ToList();
+			return Json(users, JsonRequestBehavior.AllowGet);
 		}
 	}
 
@@ -520,5 +614,12 @@ namespace uLearn.Web.Controllers
 		public bool IsVersionPublished { get; set; }
 		public Guid VersionId { get; set; }
 		public CourseDiff CourseDiff { get; set; }
+	}
+
+	public class GroupsViewModel
+	{
+		public string CourseId { get; set; }
+
+		public List<Group> Groups;
 	}
 }

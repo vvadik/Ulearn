@@ -33,6 +33,5 @@ namespace uLearn.Web.DataContexts
 				)
 				.GetUserRolesInfo(50, userManager);
 		}
- 
 	}
 }

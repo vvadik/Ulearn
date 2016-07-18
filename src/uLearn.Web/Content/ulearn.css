@@ -23,6 +23,39 @@
 .load-content {
 }
 
+.visible-on-parent-hover {
+	display: none;
+}
+
+*:hover > .visible-on-parent-hover {
+	display: initial;
+}
+
+.cursor-pointer {
+	cursor: pointer;
+}
+
+.internal-page-link,
+.internal-page-link:hover,
+.internal-page-link:focus,
+.internal-page-link:active {
+	text-decoration: none;
+	border-bottom: 1px dotted rgba(66, 139, 202, 0.62);
+}
+
+.internal-page-link:hover,
+.internal-page-link:focus {
+	border-bottom-color: #2a6496;
+}
+
+.clipboard-link {
+	cursor: pointer;
+}
+
+.ib {
+	display: inline-block;
+}
+
 .popover-trigger {
 	text-decoration: none;
 	border-bottom: 1px dashed black;
@@ -1056,3 +1089,18 @@ table.analytics__user-answers {
 .courses-versions .courses-versions__version .courses-versions__actions form {
 	display: inline-block;
 }
+
+/* Groups */
+.groups .group .group__title {
+	margin-bottom: 0;
+}
+
+.groups .group .group__title .label {
+	position: relative;
+	top: -3px;
+}
+
+.groups .group .members {
+	margin-top: 10px;
+}
+

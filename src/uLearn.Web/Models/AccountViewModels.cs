@@ -128,12 +128,7 @@ namespace uLearn.Web.Models
 	public class UserInfoModel
 	{
 		public ApplicationUser User { get; set; }
-		public Course[] Courses { get; private set; }
-
-		public UserInfoModel(ApplicationUser user, Course[] courses)
-		{
-			User = user;
-			Courses = courses;
-		}
+		public string GroupsNames { get; set; }
+		public Course[] Courses { get; set; }
 	}
 }
