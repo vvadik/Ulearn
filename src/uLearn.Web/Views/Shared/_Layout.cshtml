@@ -41,6 +41,13 @@
 							</ul>
 						</li>
 					}
+					else if (User.HasAccess(CourseRole.Instructor))
+					{
+						<li>
+							@Html.ActionLink("Мои курсы", "CourseList", "Admin")
+						</li>
+					}
+
 					@if (User.HasAccess(CourseRole.Instructor))
 					{
 						string courseId = null;

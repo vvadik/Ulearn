@@ -4,7 +4,7 @@
 	ViewBag.Title = "Курсы";
 }
 <div class="container">
-	<h2>Курсы</h2>
+	<h1>Курсы</h1>
 	<ul>
 		@foreach (var course in Model.Courses)
 		{
@@ -14,13 +14,13 @@
 	
 	@if (User.IsSystemAdministrator())
 	{
-		<h2>Создать курс</h2>
+		<h1>Создать курс</h1>
 		using (Html.BeginForm("CreateCourse", "Admin", FormMethod.Post, new { @class = "form-inline" }))
 		{
 			@Html.AntiForgeryToken()
 			<input type="text" class="form-control" name="courseId" value="@Model.CourseCreationLastTry" placeholder="CourseId"/>
 			<input type="submit" class="btn btn-danger" value="Создать" />
-			<p>CourseId используется как часть URL, имя файла, часть путей. Лучше использовать только латинские буквы и цифры.</p>
+			<p class="text-muted">CourseId используется как часть URL, имя файла, часть путей. Лучше использовать только латинские буквы и цифры.</p>
 		}
 		if (!string.IsNullOrEmpty(Model.CourseCreationLastTry))
 		{
