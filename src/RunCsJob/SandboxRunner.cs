@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 using Newtonsoft.Json;
 using Ionic.Zip;
 using RunCsJob.Api;
@@ -31,10 +32,11 @@ namespace RunCsJob
             if (runnerSubmition != null)
             {
                 var projSubmition = runnerSubmition;
-                UnpackZip(projSubmition);
+                var tempProjectDir = UnpackZip(projSubmition);
+
                 try
                 {
-                    return new SandboxRunner(submition).RunMSBuild();
+                    return new SandboxRunner(submition).RunMSBuild(tempProjectDir);
                 }
                 catch (Exception ex)
                 {
@@ -61,22 +63,18 @@ namespace RunCsJob
             }
         }
 
-        private static void UnpackZip(ProjRunnerSubmition submition)
+        private static DirectoryInfo UnpackZip(ProjRunnerSubmition submition)
         {
             var pathName = Path.Combine(".", submition.Id);
-            try
+            using (var ms = new MemoryStream(submition.ZipFileData))
             {
-                File.WriteAllBytes(pathName + ".zip", submition.ZipFileData);
-                using (var zip = ZipFile.Read(pathName + ".zip"))
+                using (var zip = ZipFile.Read(ms))
                 {
-                    Directory.CreateDirectory(pathName);
+                    var dir = Directory.CreateDirectory(pathName);
                     foreach (var file in zip)
                         file.Extract(pathName, ExtractExistingFileAction.OverwriteSilently);
+                    return dir;
                 }
-            }
-            finally
-            {
-                Remove(pathName + ".zip");
             }
         }
 
@@ -86,19 +84,22 @@ namespace RunCsJob
             _result.Id = submition.Id;
         }
 
-        public RunningResults RunMSBuild()
+        public RunningResults RunMSBuild(DirectoryInfo dir)
         {
             var builder = new MsBuildRunner();
-            var result = builder.BuildProject((ProjRunnerSubmition)submition);
-            if (result.Success)
-                RunSandboxer(string.Format("\"{0}\" {1}", result.PathToExe, submition.Id));
-            else
+            var builderResult = builder.BuildProject((ProjRunnerSubmition)submition, dir);
+            if (!builderResult.Success)
             {
                 _result.Verdict = Verdict.CompilationError;
-                _result.CompilationOutput = result.ErrorMessage;
+                _result.CompilationOutput = builderResult.ErrorMessage;
+                Remove(dir.FullName);
                 return _result;
             }
 
+            RunSandboxer(string.Format("\"{0}\" {1}", builderResult.PathToExe, submition.Id));
+            Remove(dir.FullName);
+            Console.WriteLine(_result.Output);
+            _result.Verdict = Verdict.Ok;
             return _result;
         }
 
@@ -123,7 +124,7 @@ namespace RunCsJob
                 return _result;
             }
             RunSandboxer(string.Format("\"{0}\" {1}", Path.GetFullPath(assembly.PathToAssembly), submition.Id));
-
+            
             Remove(assembly.PathToAssembly);
             return _result;
         }
@@ -132,9 +133,16 @@ namespace RunCsJob
         {
             try
             {
-                File.Delete(path);
+
+                Console.WriteLine(Path.GetExtension(path));
+                if (string.IsNullOrEmpty(Path.GetExtension(path)))
+                {
+                    Directory.Delete(path);
+                }
+                else
+                    File.Delete(path);
             }
-            catch
+            catch(Exception ex)
             {
             }
         }

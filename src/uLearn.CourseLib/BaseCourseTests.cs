@@ -125,36 +125,82 @@ namespace uLearn
 			new WebClient().DownloadData(url);
 		}
 
-		[TestCaseSource("GetSlidesTestCases")]
-		public void EthalonSolutions_for_Exercises(ExerciseSlide slide)
-		{
-			var solution = slide.Exercise.Solution.BuildSolution(slide.Exercise.EthalonSolution);
-			if (solution.HasErrors)
-				FailOnError(slide, solution);
-			else
-			{
-				var submission = new FileRunnerSubmition
-				{
-					Code = solution.SourceCode,
-					Id = slide.NormalizedGuid,
-					Input = "",
-					NeedRun = true
-				};
-				var result = SandboxRunner.Run(submission);
-				var output = result.GetOutput().NormalizeEoln();
-				var isRightAnswer = output.NormalizeEoln().Equals(slide.Exercise.ExpectedOutput.NormalizeEoln());
-				if (!isRightAnswer)
-				{
-					Assert.Fail("mistake in: " + slide.Info.UnitName + " - " + slide.Title + "\n" +
-								"\tActualOutput: " + output + "\n" +
-								"\tExpectedOutput: " + slide.Exercise.ExpectedOutput.NormalizeEoln() + "\n" +
-								"\tCompilationError: " + result.CompilationOutput + "\n" +
-								"\tSourceCode: " + solution.SourceCode + "\n\n");
-				}
-			}
-		}
+	    [TestCaseSource(nameof(GetSlidesTestCases))]
+	    public void EthalonSolutions_for_Exercises(ExerciseSlide slide)
+	    {
+	        var isProjExercise = slide.Exercise.CSProjFilePath != null;
+	        var sourceCode = "";
+	        RunnerSubmition submission;
+	        if (!isProjExercise)
+	        {
+	            var solution = slide.Exercise.Solution.BuildSolution(slide.Exercise.EthalonSolution);
+	            if (solution.HasErrors)
+	            {
+	                FailOnError(slide, solution);
+	                return;
+	            }
+	            submission = new FileRunnerSubmition
+	            {
+	                Code = solution.SourceCode,
+	                Id = slide.NormalizedGuid,
+	                Input = "",
+	                NeedRun = true
+	            };
+	            sourceCode = solution.SourceCode;
+	        }
+	        else
+	        {
+	            sourceCode = @"using System;
+namespace DistanceTask
+{
+    public class DistanceTask
+    {
+        public static double GetDistanceToSegment(double aX, double aY, double bX, double bY, double x, double y)
+        {
+            var wideAngleB = (x - bX) * (aX - bX) + (y - bY) * (aY - bY) <= 0;
+            var wideAngleA = (x - aX) * (bX - aX) + (y - aY) * (bY - aY) <= 0;
+            if (wideAngleA) return Len(x - aX, y - aY);
+            if (wideAngleB) return Len(x - bX, y - bY);
+            var triangleDoubleSquare = Math.Abs((x - aX) * (bY - aY) - (y - aY) * (bX - aX));
+            var distAB = Len(aX - bX, aY - bY);
+            return triangleDoubleSquare / distAB;
+        }
 
-		private static void FailOnError(ExerciseSlide slide, SolutionBuildResult solution)
+        private static double Len(double x, double y)
+        {
+            return Math.Sqrt(x * x + y * y);
+        }
+    }
+}";
+                var exercise = slide.Exercise;
+	            submission = new ProjRunnerSubmition
+	            {
+	                Id = slide.Id.ToString(),
+	                ZipFileData = Utils.GetZipFileBytes(
+	                    exercise,
+	                    sourceCode,
+                        slide.Info.Directory.FullName
+	                    ),
+	                ProjectFileName = exercise.CSProjFilePath,
+	                Input = "",
+	                NeedRun = true
+	            };
+	        }
+
+	        var result = SandboxRunner.Run(submission);
+	        var output = result.GetOutput().NormalizeEoln();
+	        var isRightAnswer = output.NormalizeEoln().Equals(slide.Exercise.ExpectedOutput.NormalizeEoln());
+	        if (!isRightAnswer)
+	        {
+	            Assert.Fail("mistake in: " + slide.Info.UnitName + " - " + slide.Title + "\n" +
+	                        "\tActualOutput: " + output.NormalizeEoln() + "\n" +
+	                        "\tExpectedOutput: " + slide.Exercise.ExpectedOutput.NormalizeEoln() + "\n" +
+	                        "\tCompilationError: " + result.CompilationOutput + "\n" +
+	                        "\tSourceCode: " + sourceCode + "\n\n");
+	        }
+	    }
+
+	    private static void FailOnError(ExerciseSlide slide, SolutionBuildResult solution)
 		{
 			Assert.Fail(@"Template solution: {0}
 

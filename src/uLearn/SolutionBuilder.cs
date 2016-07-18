@@ -1,6 +1,4 @@
-﻿using uLearn.CSharp;
-
-namespace uLearn
+﻿namespace uLearn
 {
 	public class SolutionBuilder
 	{
@@ -17,7 +15,7 @@ namespace uLearn
 		
 		public SolutionBuildResult BuildSolution(string usersExercise)
 		{
-			var solution = ExerciseCode.Insert(IndexForInsert, usersExercise + "\r\n");
+            var solution = ExerciseCode.Insert(IndexForInsert, usersExercise + "\r\n");
 			string message;
 			if ((message = Validator.FindFullSourceError(usersExercise)) != null)
 				return SolutionBuildResult.Error(message, usersExercise);

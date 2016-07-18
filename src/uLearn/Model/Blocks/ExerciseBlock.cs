@@ -22,8 +22,8 @@ namespace uLearn.Model.Blocks
         [XmlElement("csproj-file-path")]
         public string CSProjFilePath { get; set; }
 
-        [XmlElement("user-sln-file-path")]
-        public string UserSlnFilePath { get; set; }
+        [XmlElement("user-code-file-name")]
+        public string UserCodeFileName { get; set; }
 
         [XmlElement("remove-file-path")]
         public string[] RemovedFiles { get; set; }
@@ -49,36 +49,38 @@ namespace uLearn.Model.Blocks
 
         public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
         {
-            FillProperties(context);
-            RemovedLabels = RemovedLabels ?? new Label[0];
-            if (PreludeFile == null)
+            if (CSProjFilePath == null)
             {
-                PreludeFile = context.CourseSettings.GetPrelude(LangId);
+                FillProperties(context);
+                RemovedLabels = RemovedLabels ?? new Label[0];
+                if (PreludeFile == null)
+                {
+                    PreludeFile = context.CourseSettings.GetPrelude(LangId);
+                    if (PreludeFile != null)
+                        PreludeFile = Path.Combine("..", PreludeFile);
+                }
+
+                var code = context.FileSystem.GetContent(File);
+                var regionRemover = new RegionRemover(LangId);
+                var extractor = context.GetExtractor(File, LangId, code);
+
+                var prelude = "";
                 if (PreludeFile != null)
-                    PreludeFile = Path.Combine("..", PreludeFile);
+                    prelude = context.FileSystem.GetContent(PreludeFile);
+
+                var exerciseCode = regionRemover.Prepare(code);
+                IEnumerable<Label> notRemoved;
+                exerciseCode = regionRemover.Remove(exerciseCode, RemovedLabels, out notRemoved);
+                int index;
+                exerciseCode = regionRemover.RemoveSolution(exerciseCode, SolutionLabel, out index);
+                index += prelude.Length;
+
+                ExerciseInitialCode = ExerciseInitialCode.RemoveCommonNesting();
+                ExerciseCode = prelude + exerciseCode;
+                IndexToInsertSolution = index;
+                EthalonSolution = extractor.GetRegion(SolutionLabel);
+                ValidatorName = string.Join(" ", LangId, ValidatorName);
             }
-
-            var code = context.FileSystem.GetContent(File);
-            var regionRemover = new RegionRemover(LangId);
-            var extractor = context.GetExtractor(File, LangId, code);
-
-            var prelude = "";
-            if (PreludeFile != null)
-                prelude = context.FileSystem.GetContent(PreludeFile);
-
-            var exerciseCode = regionRemover.Prepare(code);
-            IEnumerable<Label> notRemoved;
-            exerciseCode = regionRemover.Remove(exerciseCode, RemovedLabels, out notRemoved);
-            int index;
-            exerciseCode = regionRemover.RemoveSolution(exerciseCode, SolutionLabel, out index);
-            index += prelude.Length;
-
-            ExerciseInitialCode = ExerciseInitialCode.RemoveCommonNesting();
-            ExerciseCode = prelude + exerciseCode;
-            IndexToInsertSolution = index;
-            EthalonSolution = extractor.GetRegion(SolutionLabel);
-            ValidatorName = string.Join(" ", LangId, ValidatorName);
-
             yield return this;
         }
 

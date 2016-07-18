@@ -42,15 +42,17 @@ namespace uLearn.Web.Controllers
 
 	        if (csProjFilePath != null)
 	        {
-	            return new ProjRunnerSubmition
+                var exercise = (ExerciseSlide)courseManager
+                           .GetCourse(details.CourseId)
+                           .GetSlideById(details.SlideId);
+                return new ProjRunnerSubmition
 	            {
-	                Id = details.Id.ToString(),
-	                ZipFileData = Utils.GetZipFileDataString(
-	                    details.CourseId,
-	                    details.SlideId,
-	                    courseManager,
-	                    details.SolutionCode.Text
-	                    ),
+                    Id = details.Id.ToString(),
+	                ZipFileData = Utils.GetZipFileBytes(
+                        exercise
+	                    .Exercise,
+	                    details.SolutionCode.Text,
+                        exercise.Info.DirectoryRelativePath),
 	                ProjectFileName = csProjFilePath,
 	                Input = "",
 	                NeedRun = true

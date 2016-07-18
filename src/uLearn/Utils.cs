@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Ionic.Zip;
+using uLearn.Model.Blocks;
 
 namespace uLearn
 {
@@ -17,9 +18,8 @@ namespace uLearn
                     .SourceCode;
         }
 
-        public static byte[] GetZipFileDataString(string courseId, Guid slideId, CourseManager courseManager, string code)
+        public static byte[] GetZipFileBytes(ExerciseBlock exercise, string code, string slideFolderPath)
         {
-            var exercise = ((ExerciseSlide)courseManager.GetCourse(courseId).GetSlideById(slideId)).Exercise;
             // для студ части
             //var proj = new Project(exercise.CSProjFilePath);
             //var types = new[] { "EmbeddedResource", "Compile", "None" };
@@ -27,16 +27,13 @@ namespace uLearn
             //    .Where(pItem => types.Contains(pItem.ItemType))
             //    .Select(pItem => pItem.EvaluatedInclude)
             //    .ToList();
-            File.WriteAllText(exercise.UserSlnFilePath, code);
-            return ZipFiles(exercise.CSProjFilePath, exercise.RemovedFiles);
-        }
 
-        private static byte[] ZipFiles(string path, string[] removedFiles)
-        {
             using (var zip = new ZipFile())
             {
-                zip.AddDirectory(Path.GetDirectoryName(path));
-                zip.RemoveEntries(removedFiles);
+                var path = Path.Combine(slideFolderPath, Path.GetDirectoryName(exercise.CSProjFilePath));
+                zip.AddDirectory(path);
+                zip.UpdateEntry(exercise.UserCodeFileName, code);
+                zip.RemoveEntries(exercise.RemovedFiles);
                 using (var ms = new MemoryStream())
                 {
                     zip.Save(ms);

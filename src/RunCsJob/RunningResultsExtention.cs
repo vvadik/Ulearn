@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Security;
@@ -31,7 +32,7 @@ namespace RunCsJob
 			results.CompilationOutput = sb.ToString();
 		}
 
-		public static void HandleException(this RunningResults results, Exception ex)
+        public static void HandleException(this RunningResults results, Exception ex)
 		{
 			HandleException(ref results, (dynamic)ex);
 		}
