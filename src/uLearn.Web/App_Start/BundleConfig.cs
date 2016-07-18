@@ -65,6 +65,7 @@ namespace uLearn.Web
 				"~/flexslider/flexslider.css",
 				"~/Content/jquery-ui.min.css",
 				"~/Content/site.css",
+				"~/Content/jquery-ui.min.css",
 				"~/Content/buttons.css");
 		}
 	}

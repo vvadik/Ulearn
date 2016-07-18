@@ -10,7 +10,7 @@
 		Для сортировки последовательности в `LINQ` имеется четыре метода:
 	</md>
 
-	<code lang="cs">
+	<code>
 		<![CDATA[
 		IOrderedEnumerable<T> OrderBy<T>(this IEnumerable<T> items, Func<T, K> keySelector)
 		IOrderedEnumerable<T> OrderByDescending<T>(this IEnumerable<T> items, Func<T, K> keySelector)

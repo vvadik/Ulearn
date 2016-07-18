@@ -146,7 +146,8 @@ namespace uLearn.Web.Controllers
 				return new HttpNotFoundResult();
 			var slideId = slide.Id;
 
-			var quizState = GetQuizState(courseId, userId, slideId, slide.MaxDropCount).Item1;
+			var maxDropCount = GetMaxDropCount(slide);
+			var quizState = GetQuizState(courseId, userId, slideId, maxDropCount).Item1;
 			if (! CanUserFillQuiz(quizState))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Already answered");
 
