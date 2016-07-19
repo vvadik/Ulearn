@@ -125,11 +125,11 @@ namespace uLearn
 			new WebClient().DownloadData(url);
 		}
 
-	    [TestCaseSource(nameof(GetSlidesTestCases))]
+	    [TestCaseSource("GetSlidesTestCases")]
 	    public void EthalonSolutions_for_Exercises(ExerciseSlide slide)
 	    {
-	        var isProjExercise = slide.Exercise.CSProjFilePath != null;
-	        var sourceCode = "";
+	        var isProjExercise = slide.Exercise.CsProjFilePath != null;
+	        string sourceCode;
 	        RunnerSubmition submission;
 	        if (!isProjExercise)
 	        {
@@ -150,38 +150,17 @@ namespace uLearn
 	        }
 	        else
 	        {
-	            sourceCode = @"using System;
-namespace DistanceTask
-{
-    public class DistanceTask
-    {
-        public static double GetDistanceToSegment(double aX, double aY, double bX, double bY, double x, double y)
-        {
-            var wideAngleB = (x - bX) * (aX - bX) + (y - bY) * (aY - bY) <= 0;
-            var wideAngleA = (x - aX) * (bX - aX) + (y - aY) * (bY - aY) <= 0;
-            if (wideAngleA) return Len(x - aX, y - aY);
-            if (wideAngleB) return Len(x - bX, y - bY);
-            var triangleDoubleSquare = Math.Abs((x - aX) * (bY - aY) - (y - aY) * (bX - aX));
-            var distAB = Len(aX - bX, aY - bY);
-            return triangleDoubleSquare / distAB;
-        }
-
-        private static double Len(double x, double y)
-        {
-            return Math.Sqrt(x * x + y * y);
-        }
-    }
-}";
-                var exercise = slide.Exercise;
+	            var exercise = slide.Exercise;
+	            sourceCode = exercise.ExerciseInitialCode;
 	            submission = new ProjRunnerSubmition
 	            {
 	                Id = slide.Id.ToString(),
 	                ZipFileData = Utils.GetZipFileBytes(
 	                    exercise,
 	                    sourceCode,
-                        slide.Info.Directory.FullName
+	                    slide.Info.Directory.FullName
 	                    ),
-	                ProjectFileName = exercise.CSProjFilePath,
+	                ProjectFileName = exercise.CsProjFilePath,
 	                Input = "",
 	                NeedRun = true
 	            };
@@ -189,14 +168,22 @@ namespace DistanceTask
 
 	        var result = SandboxRunner.Run(submission);
 	        var output = result.GetOutput().NormalizeEoln();
-	        var isRightAnswer = output.NormalizeEoln().Equals(slide.Exercise.ExpectedOutput.NormalizeEoln());
-	        if (!isRightAnswer)
+	        if (!isProjExercise)
 	        {
-	            Assert.Fail("mistake in: " + slide.Info.UnitName + " - " + slide.Title + "\n" +
-	                        "\tActualOutput: " + output.NormalizeEoln() + "\n" +
-	                        "\tExpectedOutput: " + slide.Exercise.ExpectedOutput.NormalizeEoln() + "\n" +
-	                        "\tCompilationError: " + result.CompilationOutput + "\n" +
-	                        "\tSourceCode: " + sourceCode + "\n\n");
+	            var isRightAnswer = output.NormalizeEoln().Equals(slide.Exercise.ExpectedOutput.NormalizeEoln());
+	            if (!isRightAnswer)
+	            {
+	                Assert.Fail("mistake in: " + slide.Info.UnitName + " - " + slide.Title + "\n" +
+	                            "\tActualOutput: " + output.NormalizeEoln() + "\n" +
+	                            "\tExpectedOutput: " + slide.Exercise.ExpectedOutput.NormalizeEoln() + "\n" +
+	                            "\tCompilationError: " + result.CompilationOutput + "\n" +
+	                            "\tSourceCode: " + sourceCode + "\n\n");
+	            }
+	        }
+	        else
+	        {
+	            Assert.AreEqual(Verdict.Ok, result.Verdict);
+                Assert.AreNotEqual(1.0, result.Score);
 	        }
 	    }
 

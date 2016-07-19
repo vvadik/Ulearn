@@ -122,6 +122,7 @@
     <Compile Include="CSharp\ICSharpSolutionValidator.cs" />
     <Compile Include="FileExtensions.cs" />
     <Compile Include="ISlideLoader.cs" />
+    <Compile Include="JsonConfig.cs" />
     <Compile Include="LruCache.cs" />
     <Compile Include="Model\Blocks\CodeBlock.cs" />
     <Compile Include="Model\Blocks\ExerciseBlock.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="Model\RegionRemover.cs" />
     <Compile Include="Model\RegionsExtractor.cs" />
     <Compile Include="RegionsParser.cs" />
+    <Compile Include="SerializationBinder.cs" />
     <Compile Include="SlideInfo.cs" />
     <Compile Include="Md.cs" />
     <Compile Include="ResourceLoader.cs" />

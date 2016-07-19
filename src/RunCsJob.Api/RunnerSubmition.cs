@@ -1,4 +1,6 @@
-﻿namespace RunCsJob.Api
+﻿using System.ComponentModel;
+
+namespace RunCsJob.Api
 {
     public abstract class RunnerSubmition
     {
@@ -12,11 +14,13 @@
         }
     }
 
+    [DisplayName("file")]
     public class FileRunnerSubmition : RunnerSubmition
     {
         public string Code;
     }
 
+    [DisplayName("proj")]
     public class ProjRunnerSubmition : RunnerSubmition
     {
         public byte[] ZipFileData;

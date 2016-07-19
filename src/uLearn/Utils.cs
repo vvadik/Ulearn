@@ -30,10 +30,14 @@ namespace uLearn
 
             using (var zip = new ZipFile())
             {
-                var path = Path.Combine(slideFolderPath, Path.GetDirectoryName(exercise.CSProjFilePath));
+                var path = Path.Combine(slideFolderPath, Path.GetDirectoryName(exercise.CsProjFilePath));
+                var dir = Directory.Exists(path);
                 zip.AddDirectory(path);
                 zip.UpdateEntry(exercise.UserCodeFileName, code);
-                zip.RemoveEntries(exercise.RemovedFiles);
+                foreach (var pathToExclude in exercise.PathsToExcludeForChecker ?? new string[0])
+                {
+                    zip.RemoveSelectedEntries(pathToExclude);
+                }
                 using (var ms = new MemoryStream())
                 {
                     zip.Save(ms);
@@ -41,6 +45,7 @@ namespace uLearn
                 }
             }
         }
+
 
         public static string NewNormalizedGuid()
         {

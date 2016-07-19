@@ -5,101 +5,103 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using RunCsJob.Api;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	public class RunnerController : ApiController
-	{
-		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
-		private readonly CourseManager courseManager = WebCourseManager.Instance;
+    public class RunnerController : ApiController
+    {
+        private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
+        private readonly CourseManager courseManager = WebCourseManager.Instance;
 
-		[HttpGet]
-		[Route("GetSubmissions")]
-		public async Task<List<RunnerSubmition>> GetSubmissions([FromUri] string token, [FromUri] int count)
-		{
-			CheckRunner(token);
-			var sw = Stopwatch.StartNew();
-			while (true)
-			{
-				var repo = new UserSolutionsRepo();
-				var submissions = repo.GetUnhandled(count);
-				if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
-				{
-					return submissions.Select(ToRunnerSubmition).ToList();
-				}
-				await repo.WaitUnhandled(TimeSpan.FromSeconds(10));
-			}
-		}
+        [HttpGet]
+        [Route("GetSubmissions")]
+        public async Task<List<RunnerSubmition>> GetSubmissions([FromUri] string token, [FromUri] int count)
+        {
+            CheckRunner(token);
+            var sw = Stopwatch.StartNew();
+            while (true)
+            {
+                var repo = new UserSolutionsRepo();
+                var submissions = repo.GetUnhandled(count);
+                if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
+                {
+                    return submissions.Select(ToRunnerSubmition).ToList();
+                }
+                await repo.WaitUnhandled(TimeSpan.FromSeconds(10));
+            }
+        }
 
-	    private RunnerSubmition ToRunnerSubmition(UserSolution details)
-	    {
-	        var csProjFilePath = ((ExerciseSlide)courseManager.GetCourse(details.CourseId).GetSlideById(details.SlideId)).Exercise.CSProjFilePath;
+        private RunnerSubmition ToRunnerSubmition(UserSolution details)
+        {
+            var csProjFilePath = ((ExerciseSlide)courseManager.GetCourse(details.CourseId).GetSlideById(details.SlideId)).Exercise.CsProjFilePath;
 
-	        if (csProjFilePath != null)
-	        {
+            if (csProjFilePath != null)
+            {
                 var exercise = (ExerciseSlide)courseManager
-                           .GetCourse(details.CourseId)
-                           .GetSlideById(details.SlideId);
+                    .GetCourse(details.CourseId)
+                    .GetSlideById(details.SlideId);
                 return new ProjRunnerSubmition
-	            {
+                {
                     Id = details.Id.ToString(),
-	                ZipFileData = Utils.GetZipFileBytes(
-                        exercise
-	                    .Exercise,
-	                    details.SolutionCode.Text,
-                        exercise.Info.DirectoryRelativePath),
-	                ProjectFileName = csProjFilePath,
-	                Input = "",
-	                NeedRun = true
-	            };
-	        }
-	        return new FileRunnerSubmition
-	        {
-	            Id = details.Id.ToString(),
-	            Code = Utils.GetSource(
-	                details.CourseId,
-	                details.SlideId,
-	                courseManager,
-	                details.SolutionCode.Text
-	                ),
-	            Input = "",
-	            NeedRun = true
-	        };
-	    }
+                    ZipFileData = Utils.GetZipFileBytes(
+                        exercise.Exercise,
+                        details.SolutionCode.Text,
+                        exercise.Info.Directory.FullName),
+                    ProjectFileName = csProjFilePath,
+                    Input = "",
+                    NeedRun = true
+                };
+            }
+            return new FileRunnerSubmition
+            {
+                Id = details.Id.ToString(),
+                Code = Utils.GetSource(
+                    details.CourseId,
+                    details.SlideId,
+                    courseManager,
+                    details.SolutionCode.Text
+                    ),
+                Input = "",
+                NeedRun = true
+            };
+        }
 
-	    [HttpPost]
-		[Route("PostResult")]
-		public async Task PostResult([FromUri]string token, RunningResults result)
-		{
-			if (!ModelState.IsValid)
-				throw new HttpResponseException(HttpStatusCode.BadRequest);
-			CheckRunner(token);
+        [HttpPost]
+        [Route("PostResult")]
+        public async Task PostResult([FromUri] string token, RunningResults result)
+        {
+            if (!ModelState.IsValid)
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            CheckRunner(token);
 
-			await userSolutionsRepo.SaveResults(result);
-		}
+            await userSolutionsRepo.SaveResults(result);
+        }
 
-		[HttpPost]
-		[Route("PostResults")]
-		public async Task PostResults([FromUri]string token, List<RunningResults> results)
-		{
-			if (!ModelState.IsValid)
-				throw new HttpResponseException(HttpStatusCode.BadRequest);
-			CheckRunner(token);
+        [HttpPost]
+        [Route("PostResults")]
+        public async Task PostResults([FromUri] string token, List<RunningResults> results)
+        {
+            if (!ModelState.IsValid)
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            CheckRunner(token);
 
-			await userSolutionsRepo.SaveAllResults(results);
-		}
+            await userSolutionsRepo.SaveAllResults(results);
+        }
 
 
-		private void CheckRunner(string token)
-		{
-			var expectedToken = ConfigurationManager.AppSettings["runnerToken"];
-			if (expectedToken != token)
-				throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Forbidden));
-		}
-	}
+        private void CheckRunner(string token)
+        {
+            var expectedToken = ConfigurationManager.AppSettings["runnerToken"];
+            if (expectedToken != token)
+                throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Forbidden));
+        }
+    }
 }

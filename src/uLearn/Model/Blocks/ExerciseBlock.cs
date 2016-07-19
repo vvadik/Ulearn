@@ -20,13 +20,13 @@ namespace uLearn.Model.Blocks
         public Label SolutionLabel { get; set; }
 
         [XmlElement("csproj-file-path")]
-        public string CSProjFilePath { get; set; }
+        public string CsProjFilePath { get; set; }
 
         [XmlElement("user-code-file-name")]
         public string UserCodeFileName { get; set; }
 
-        [XmlElement("remove-file-path")]
-        public string[] RemovedFiles { get; set; }
+        [XmlElement("exclude-path-for-checker")]
+        public string[] PathsToExcludeForChecker { get; set; }
 
         [XmlElement("remove")]
         public Label[] RemovedLabels { get; set; }
@@ -49,9 +49,9 @@ namespace uLearn.Model.Blocks
 
         public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
         {
-            if (CSProjFilePath == null)
+            FillProperties(context);
+            if (CsProjFilePath == null)
             {
-                FillProperties(context);
                 RemovedLabels = RemovedLabels ?? new Label[0];
                 if (PreludeFile == null)
                 {
@@ -79,8 +79,9 @@ namespace uLearn.Model.Blocks
                 ExerciseCode = prelude + exerciseCode;
                 IndexToInsertSolution = index;
                 EthalonSolution = extractor.GetRegion(SolutionLabel);
-                ValidatorName = string.Join(" ", LangId, ValidatorName);
             }
+            ValidatorName = string.Join(" ", LangId, ValidatorName);
+
             yield return this;
         }
 
@@ -95,6 +96,17 @@ namespace uLearn.Model.Blocks
         {
             get { return Hints = Hints ?? new List<string>(); }
             set { Hints = value; }
+        }
+
+        public SolutionBuildResult ValidateSolution(string usersExercise)
+        {
+            var validator = ValidatorsRepository.Get(ValidatorName);
+            string message;
+            if ((message = validator.FindSyntaxError(usersExercise)) != null)
+                return SolutionBuildResult.Error(message, usersExercise);
+            if ((message = validator.FindValidatorError(usersExercise, usersExercise)) != null)
+                return SolutionBuildResult.StyleIssue(message, usersExercise);
+            return SolutionBuildResult.Success(usersExercise);
         }
 
         [XmlIgnore]

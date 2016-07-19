@@ -114,7 +114,7 @@
           <xs:element name="solution" type="notEmptyString" />
           <xs:element name="csproj-file-path" type="notEmptyString" minOccurs="0" maxOccurs="1" />
           <xs:element name="user-code-file-name" type="notEmptyString" minOccurs="0" maxOccurs="1" />
-          <xs:element name="remove-file-path" type="notEmptyString" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="exclude-path-for-checker" type="notEmptyString" minOccurs="0" maxOccurs="unbounded" />
           <xs:element name="remove" type="Label" minOccurs="0" maxOccurs="unbounded" />
           <xs:element name="comment" type="notEmptyString" minOccurs="0" />
           <xs:element name="expected" type="xs:string" />

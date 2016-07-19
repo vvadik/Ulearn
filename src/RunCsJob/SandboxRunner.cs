@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Threading;
 using Newtonsoft.Json;
 using Ionic.Zip;
 using RunCsJob.Api;
@@ -97,9 +96,11 @@ namespace RunCsJob
             }
 
             RunSandboxer(string.Format("\"{0}\" {1}", builderResult.PathToExe, submition.Id));
+
             Remove(dir.FullName);
-            Console.WriteLine(_result.Output);
+
             _result.Verdict = Verdict.Ok;
+            _result.FillPassProgress();
             return _result;
         }
 
@@ -124,7 +125,7 @@ namespace RunCsJob
                 return _result;
             }
             RunSandboxer(string.Format("\"{0}\" {1}", Path.GetFullPath(assembly.PathToAssembly), submition.Id));
-            
+
             Remove(assembly.PathToAssembly);
             return _result;
         }
@@ -133,16 +134,12 @@ namespace RunCsJob
         {
             try
             {
-
-                Console.WriteLine(Path.GetExtension(path));
                 if (string.IsNullOrEmpty(Path.GetExtension(path)))
-                {
-                    Directory.Delete(path);
-                }
+                    Directory.Delete(path, true);
                 else
                     File.Delete(path);
             }
-            catch(Exception ex)
+            catch
             {
             }
         }
