@@ -214,6 +214,7 @@ namespace uLearn.Web.Controllers
 		// POST: /Account/Register
 		[HttpPost]
 		[AllowAnonymous]
+		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Register(RegisterViewModel model)
 		{
@@ -285,6 +286,7 @@ namespace uLearn.Web.Controllers
 		//
 		// POST: /Account/Manage
 		[HttpPost]
+		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Manage(ManageUserViewModel model)
 		{
@@ -344,6 +346,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
+		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> StudentInfo(LtiUserViewModel userInfo)
 		{
@@ -402,6 +405,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
+		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ChangeDetailsPartial(UserViewModel userModel)
 		{
