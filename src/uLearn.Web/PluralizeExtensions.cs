@@ -2,22 +2,8 @@
 {
 	public static class PluralizeExtensions
 	{
-		public static string PluralizeInRussian(this int number, RussianPluralizationOptions options)
+		public static string SelectPluralWordInRussian(this int number, RussianPluralizationOptions options)
 		{
-			if (options.smallNumbersAreWords)
-			{
-				switch (number)
-				{
-					case 1:
-						var one = options.Gender == Gender.Male ? "один" : "одна";
-						return string.Format("{0}{1}", options.hideNumberOne ? "" : one + " ", options.One);
-					case 2:
-						var two = options.Gender == Gender.Male ? "два" : "две";
-						return string.Format("{0} {1}", two, options.Two);
-					case 3:
-						return string.Format("три {0}", options.Two);
-				}
-			}
 			var lastDigit = number % 10;
 			var word = options.Five;
 			if (number % 100 < 10 || number % 100 > 20)
@@ -27,7 +13,27 @@
 				if (lastDigit >= 2 && lastDigit <= 4)
 					word = options.Two;
 			}
-			return string.Format("{0} {1}", number, word);
+			return word;
+		}
+
+		public static string PluralizeInRussian(this int number, RussianPluralizationOptions options)
+		{
+			if (options.smallNumbersAreWords)
+			{
+				switch (number)
+				{
+					case 1:
+						var one = options.Gender == Gender.Male ? "один" : "одна";
+						return $"{(options.hideNumberOne ? "" : one + " ")}{options.One}";
+					case 2:
+						var two = options.Gender == Gender.Male ? "два" : "две";
+						return $"{two} {options.Two}";
+					case 3:
+						return $"три {options.Two}";
+				}
+			}
+			var word = number.SelectPluralWordInRussian(options);
+			return $"{number} {word}";
 		}
 	}
 

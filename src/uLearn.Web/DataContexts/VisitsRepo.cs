@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using uLearn.Web.Models;
@@ -175,6 +176,29 @@ namespace uLearn.Web.DataContexts
 				db.Visits.Add(visit);
 			}
 			await db.SaveChangesAsync();
+		}
+
+		public IQueryable<Visit> GetVisitsInPeriod(IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
+		{
+			return db.Visits.Where(v => slidesIds.Contains(v.SlideId) && periodStart <= v.Timestamp && v.Timestamp <= periodFinish);
+		}
+
+		public Dictionary<Guid, List<Visit>> GetVisitsInPeriodForEachSlide(IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
+		{
+			return GetVisitsInPeriod(slidesIds, periodStart, periodFinish)
+				.GroupBy(v => v.SlideId)
+				.ToDictionary(g => g.Key, g => g.ToList());
+		}
+
+		public IEnumerable<string> GetUsersVisitedAllSlides(IImmutableSet<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
+		{
+			var slidesCount = slidesIds.Count;
+
+			return GetVisitsInPeriod(slidesIds, periodStart, periodFinish)
+				.DistinctBy(v => Tuple.Create(v.UserId, v.SlideId))
+				.GroupBy(v => v.UserId)
+				.Where(g => g.Count() == slidesCount)
+				.Select(g => g.Key);
 		}
 	}
 }

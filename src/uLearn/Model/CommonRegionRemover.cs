@@ -12,7 +12,7 @@ namespace uLearn.Model
 			var regions = RegionsParser.GetRegions(code);
 
 			var labelsList = labels.ToList();
-			var blocks = labelsList.Select(label => regions.Get(label.Name, null)).Where(region => region != null).OrderByDescending(region => region.fullStart + region.fullLength);
+			var blocks = labelsList.Select(label => regions.GetOrDefault(label.Name, null)).Where(region => region != null).OrderByDescending(region => region.fullStart + region.fullLength);
 			var prevStart = int.MaxValue;
 
 			foreach (var region in blocks)

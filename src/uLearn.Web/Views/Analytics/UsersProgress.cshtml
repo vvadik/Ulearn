@@ -37,8 +37,8 @@
 				<td>
 					<h6>@user.UserName</h6>
 				</td>
-				<td data-sort-value="@Model.GroupsNames.Get(user.UserId, "")">
-					@Model.GroupsNames.Get(user.UserId, "")
+				<td data-sort-value="@Model.GroupsNames.GetOrDefault(user.UserId, "")">
+					@Model.GroupsNames.GetOrDefault(user.UserId, "")
 				</td>
 				@for (var i = 0; i < user.SlidesSlideInfo.Length; i++)
 				{

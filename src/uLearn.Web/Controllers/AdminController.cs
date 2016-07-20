@@ -205,7 +205,7 @@ namespace uLearn.Web.Controllers
 							new CommentViewModel
 							{
 								Comment = c,
-								LikesCount = commentsLikes.Get(c.Id, 0),
+								LikesCount = commentsLikes.GetOrDefault(c.Id),
 								IsLikedByUser = commentsLikedByUser.Contains(c.Id),
 								Replies = new List<CommentViewModel>(),
 								CanEditAndDeleteComment = true,

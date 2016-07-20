@@ -11,12 +11,12 @@
 
 	private CommentViewModel BuildCommentViewModel(Comment comment)
 	{
-		var replies = Model.CommentsByParent.Get(comment.Id, new List<Comment>()).OrderByDescending(x => x.IsApproved).ThenBy(x => x.PublishTime);
+		var replies = Model.CommentsByParent.GetOrDefault(comment.Id, new List<Comment>()).OrderByDescending(x => x.IsApproved).ThenBy(x => x.PublishTime);
 		var isAuthor = comment.AuthorId == User.Identity.GetUserId();
 		return new CommentViewModel
 		{
 			Comment = comment,
-			LikesCount = Model.CommentsLikesCounts.Get(comment.Id, 0),
+			LikesCount = Model.CommentsLikesCounts.GetOrDefault(comment.Id),
 			IsLikedByUser = Model.CommentsLikedByUser.Contains(comment.Id),
 			Replies = replies.Select(BuildCommentViewModel),
 			CanReply = Model.CanReply,
@@ -51,7 +51,7 @@
 {
 	<div class="comments">
 		<h3>Комментарии</h3>
-		@foreach (var topLevelComment in @Model.TopLevelComments)
+		@foreach (var topLevelComment in Model.TopLevelComments)
 		{
 			@Html.Partial("_Comment", BuildCommentViewModel(topLevelComment))
 		}

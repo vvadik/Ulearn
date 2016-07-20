@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Data.Entity;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -198,6 +199,13 @@ namespace uLearn.Web.DataContexts
 		{
 			return db.ManualQuizCheckQueueItems
 				.Where(c => c.CourseId == courseId && c.SlideId == slideId && ! c.IsChecked)
+				.OrderBy(c => c.Timestamp);
+		}
+
+		public IEnumerable<ManualQuizCheckQueueItem> GetManualQuizCheckQueue(string courseId, IEnumerable<Guid> slidesIds)
+		{
+			return db.ManualQuizCheckQueueItems
+				.Where(c => c.CourseId == courseId && slidesIds.Contains(c.SlideId) && !c.IsChecked)
 				.OrderBy(c => c.Timestamp);
 		}
 

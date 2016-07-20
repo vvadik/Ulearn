@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace uLearn.Web.Models
 {
@@ -8,6 +9,28 @@ namespace uLearn.Web.Models
 	{
 		public string CourseId { get; set; }
 		public string UnitName { get; set; }
+		public List<string> UnitsNames { get; set; }
+
+		public DateTime PeriodStart { get; set; }
+		public DateTime PeriodFinish { get; set; }
+
+		public List<Slide> Slides { get; set; }
+		public Dictionary<Guid, List<Visit>> SlidesVisits { get; set; }
+
+		public List<string> UsersVisitedAllSlidesInPeriod { get; set; }
+		public List<string> UsersVisitedAllSlidesBeforePeriod { get; set; }
+		public List<string> UsersVisitedAllSlidesBeforePeriodFinished { get; set; }
+
+		public Dictionary<Guid, double> QuizzesAverageScore { get; set; }
+		public Dictionary<Guid, List<ManualQuizCheckQueueItem>> ManualQuizCheckQueueBySlide { get; set; }
+		public Dictionary<Guid, List<Comment>> CommentsBySlide { get; set; }
+
+		public Dictionary<Guid, List<UserSolution>> ExercisesSolutions { get; set; }
+		public Dictionary<Guid, List<UserSolution>> ExercisesAcceptedSolutions { get; set; }
+
+		public List<ApplicationUser> VisitedUsersIds { get; set; }
+		public Dictionary<string, ImmutableHashSet<Guid>> VisitedSlidesByUser { get; set; }
+		public Dictionary<string, ImmutableHashSet<Guid>> VisitedSlidesByUserAllTime { get; set; }
 	}
 
 	public class DailyStatistics

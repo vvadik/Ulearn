@@ -104,11 +104,11 @@
 			</thead>
 			<tbody>
 			@{
-				var users = Model.UsersByQuizVersion.Get(quizVersion.Id, new List<string>());
+				var users = Model.UsersByQuizVersion.GetOrDefault(quizVersion.Id, new List<string>());
 			}
 			@foreach (var user in users)
 			{
-				var group = Model.GroupByUser.Get(user, "");
+				var group = Model.GroupByUser.GetOrDefault(user, "");
 				<tr>
 					<td>@user</td>
 					<td data-sort-value="@(string.IsNullOrEmpty(group) ? "—" : group)">@group</td>

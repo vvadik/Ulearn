@@ -59,6 +59,11 @@ namespace uLearn.Web.DataContexts
 			return db.Comments.Where(x => x.SlideId == slideId && !x.IsDeleted);
 		}
 
+		public IEnumerable<Comment> GetSlidesComments(string courseId, IEnumerable<Guid> slidesIds)
+		{
+			return db.Comments.Where(x => slidesIds.Contains(x.SlideId) && !x.IsDeleted);
+		}
+
 		public IEnumerable<Comment> GetCourseComments(string courseId)
 		{
 			return db.Comments.Where(x => x.CourseId == courseId && !x.IsDeleted);

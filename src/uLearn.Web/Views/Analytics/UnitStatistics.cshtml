@@ -1,4 +1,6 @@
-﻿@using uLearn.Web.Views.Shared.Helpers
+﻿@using uLearn
+@using uLearn.Quizes
+
 @model UnitStatisticPageModel
 @{
 	ViewBag.Title = "Статистика и успеваемость";
@@ -6,36 +8,219 @@
 }
 
 <body>
-	<div class="wide-container">
-		<div class="pull-right">
-			<a href="#" data-toggle="collapse" data-target="#tocContainer">Оглавление курса</a>
-			<div class="collapse" id="tocContainer">
-				@Html.Action("TableOfContents", "SlideNavigation")
+	<div class="container">
+
+	<h1>Статистика</h1>
+
+	<div class="analytics__dashboard">
+			@using (Html.BeginForm("UnitStatistics", "Analytics", FormMethod.Get, new { @class="form-inline", @id="unit-statistics-filter-form" }))
+			{
+				var formSubmit = "$('#unit-statistics-filter-form').submit();";
+				@Html.Hidden("courseId", Model.CourseId)
+
+				<div class="form-group">
+					@* Avoiding quotes ' escaping in html attributes *@
+					@Html.Raw(HttpUtility.HtmlDecode(
+						Html.DropDownList("unitName",
+							Model.UnitsNames.Select(name => new SelectListItem { Text = name, Selected = name == Model.UnitName, Value = name }),
+							new { @class = "form-control", onchange = formSubmit })
+							.ToHtmlString()))
+				</div>
+
+				<div class="form-group">
+					@Html.Raw(HttpUtility.HtmlDecode(
+						Html.TextBox("periodStart", Model.PeriodStart.ToString("dd.MM.yyyy"), new { @class = "form-control form-control-date datetimepicker", onchange = formSubmit })
+							.ToHtmlString()))
+				</div>
+
+				<div class="form-group">
+					@Html.Raw(HttpUtility.HtmlDecode(
+						Html.TextBox("periodFinish", Model.PeriodFinish.ToString("dd.MM.yyyy"), new { @class = "form-control form-control-date datetimepicker", onchange = formSubmit })
+							.ToHtmlString()))
+				</div>
+			}
+
+			<div class="row">
+				<div class="col-xs-12 col-md-6">
+					<h2>Слайды</h2>
+					<div class="small-table__title">
+						<span class="navbar-label navbar-label-link glyphicon glyphicon-none"></span>
+						<span class="small-table__title__cell">слайд</span>
+						<div class="pull-right">
+							<span class="stat-title small-table__title__cell">просмотры</span>
+							<span class="stat-title small-table__title__cell"></span>
+						</div>
+					</div>
+					@foreach (var slide in Model.Slides)
+					{
+						<div>
+							@if (slide is QuizSlide)
+							{
+								<span class="navbar-label navbar-label-link glyphicon glyphicon-pushpin"></span>
+							}
+							else if (slide is ExerciseSlide)
+							{
+								<span class="navbar-label navbar-label-link glyphicon glyphicon-edit"></span>
+							}
+							else
+							{
+								<span class="navbar-label navbar-label-link glyphicon glyphicon-none"></span>
+							}
+
+							@Html.RouteLink(slide.Title.TruncateWithEllipsis(35), "Course.SlideById", new { Model.CourseId, SlideId = slide.Url }, new { })
+							<div class="pull-right">
+								<span class="slide-visits-count">
+									@Model.SlidesVisits.GetOrDefault(slide.Id, new List<Visit>()).Count
+								</span>
+
+								@if (slide is QuizSlide)
+								{
+									var average = Model.QuizzesAverageScore[slide.Id];
+									if (average < 0)
+									{
+										<span class="quiz-average">&ndash;</span>
+									}
+									else
+									{
+										<span class="quiz-average" title="Средний балл">@average/@(((QuizSlide)slide).Quiz.MaxScore)</span>
+									}
+								}
+								else if (slide is ExerciseSlide)
+								{
+									var tries = Model.ExercisesSolutions.GetOrDefault(slide.Id, new List<UserSolution>());
+									var acceptedTries = Model.ExercisesAcceptedSolutions.GetOrDefault(slide.Id, new List<UserSolution>());
+									if (tries.Count == 0)
+									{
+										<span class="exercise-tries" title="Нет попыток">&ndash;</span>
+									}
+									else
+									{
+										<span class="exercise-tries" title="Успешных попыток/всего">@acceptedTries.Count/@tries.Count</span>
+									}
+								}
+								else
+								{
+									<span class="lesson-slide-no-stat"></span>
+								}
+							</div>
+						</div>
+					}
+				</div>
+
+				<div class="col-xs-12 col-md-6">
+					<h2>Посетители</h2>
+					<div>
+						Посмотрели весь модуль за выбранный период: <strong>@Model.UsersVisitedAllSlidesInPeriod.Count</strong>
+					</div>
+					<div>
+						Всего посмотрели весь модуль к @Model.PeriodFinish.ToDatePrettyString(true):
+						<strong>
+							@(Model.UsersVisitedAllSlidesBeforePeriodFinished.Count - Model.UsersVisitedAllSlidesBeforePeriod.Count)
+						</strong>
+					</div>
+
+					<div class="vspace-20"></div>
+
+					<div class="row">
+						<a href="@Url.Action("Comments", "Admin", new { Model.CourseId })">
+							<div class="col-xs-6 col-md-4">
+								@{
+									var newCommentsCount = Model.CommentsBySlide.Select(p => p.Value.Count).Sum();
+								}
+								<div class="large-number">@newCommentsCount</div>
+								<div class="large-number__text">
+									@newCommentsCount.SelectPluralWordInRussian(new RussianPluralizationOptions
+										{
+											One = "комментарий",
+											Two = "комментариев",
+											Five = "комментариев",
+										})
+								</div>
+							</div>
+						</a>
+						<a href="@Url.Action("ManualQuizChecksQueue", "Admin", new { Model.CourseId })">
+							<div class="col-xs-6 col-md-6">
+								@{
+									var manualQuizCheckQueueLength = Model.ManualQuizCheckQueueBySlide.Select(p => p.Value.Count).Sum();
+								}
+								<div class="large-number">@manualQuizCheckQueueLength</div>
+								<div class="large-number__text">
+									тестов <br />
+									в очереди на проверку
+								</div>
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+	
+			<div class="vspace-20 hidden-xs hidden-sm"></div>
+
+			<div class="row">
+				<div class="col-xs-12">
+					<h2>Прогресс</h2>
+
+					@{
+						var exercisesAndQuizzes = Model.Slides.Where(s => s is QuizSlide || s is ExerciseSlide).OrderBy(s => s.Index);
+					}
+
+					<div class="small-table__title">
+						<div class="small-table__title__cell">пользователь</div>
+						<div class="pull-right">
+							@foreach (var slide in exercisesAndQuizzes)
+							{
+								if (slide is QuizSlide)
+								{
+									<span class="glyphicon glyphicon-pushpin small-table__title__cell" title="@slide.Title"></span>
+								}
+								else if (slide is ExerciseSlide)
+								{
+									<span class="glyphicon glyphicon-edit small-table__title__cell" title="@slide.Title"></span>
+								}
+							}
+						</div>
+					</div>
+
+					@foreach (var user in Model.VisitedUsersIds)
+					{
+						var visitedSlidesCount = Model.VisitedSlidesByUser[user.Id].Count;
+						var visitedSlidesCountAllTime = Model.VisitedSlidesByUserAllTime[user.Id].Count;
+						<div>
+							<div class="ib">@user.VisibleName.TruncateWithEllipsis(25)</div>
+							<div class="ib pull-right">
+								<div class="student-progress progress">
+									<div class="progress-bar progress-bar-warning" style="width: @(100 * (visitedSlidesCountAllTime - visitedSlidesCount) / Model.Slides.Count)%"></div>
+									<div class="progress-bar progress-bar-success"
+									     style="width: @(100 * visitedSlidesCount / Model.Slides.Count)%"
+									     title="Посмотрел(а) @visitedSlidesCount.PluralizeInRussian(new RussianPluralizationOptions
+									                         {
+										                         One = "слайд",
+										                         Two = "слайда",
+										                         Five = "слайдов",
+										                         Gender = Gender.Male
+									                         }) в указанный период">
+									</div>
+								</div>
+
+								@foreach (var exerciseOrQuiz in exercisesAndQuizzes)
+								{
+									var visit = Model.SlidesVisits.GetOrDefault(exerciseOrQuiz.Id, new List<Visit>()).FirstOrDefault(v => v.UserId == user.Id);
+									if (visit != null && visit.IsPassed)
+									{
+										<span class="small-table__right-cell" title="@visit.Timestamp.ToPrettyString()">@visit.Score</span>
+									}
+									else
+									{
+										<span class="small-table__right-cell">&nbsp;</span>
+									}
+								}
+							</div>
+						</div>
+					}
+				</div>
+				
 			</div>
 		</div>
-		<h1>Модуль &laquo;@Model.UnitName&raquo;</h1>
-		<ul>
-			<li><a href="#rate">Оценки слайдов</a></li>
-			<li><a href="#questions">Заданные вопросы</a></li>
-			<li><a href="#timeline">Общая динамика прогресса</a></li>
-			<li><a href="#progress">Прогресс по студентам</a></li>
-		</ul>
-
-		<h2 id="rate">Оценки слайдов</h2>
-		<div class="load-content" data-url="@Url.Action("SlideRatings", args)"></div>
-
-		<h2 id="questions">Заданные вопросы</h2>
-		<div class="load-content" data-url="@Url.Action("Items", "Questions", args)"></div>
-
-		<h2 id="timeline">Общая динамика прогресса</h2>
-		<div class="load-content" data-url="@Url.Action("DailyStatistics", args)"></div>
-
-		<h2 id="progress">Прогресс по студентам</h2>
-		@SwitchablePanel.TimePanel("progress-panel",
-			arg => Url.Action("UsersProgress", arg),
-			args,
-			Tuple.Create("За полгода", 365.0 / 2)
-		)
 	</div>
 </body>
 

@@ -161,7 +161,7 @@ namespace uLearn.Web.DataContexts
 		public string GetUserGroupsNamesAsString(List<string> courseIds, string userId, IPrincipal currentUser, int maxCount = 3)
 		{
 			var usersGroups = GetUsersGroupsNamesAsStrings(courseIds, new List<string> { userId } , currentUser, maxCount);
-			return usersGroups.Get(userId, "");
+			return usersGroups.GetOrDefault(userId, "");
 		}
 
 		public string GetUserGroupsNamesAsString(string courseId, string userId, IPrincipal currentUser, int maxCount = 3)

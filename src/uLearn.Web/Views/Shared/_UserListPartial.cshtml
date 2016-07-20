@@ -25,7 +25,7 @@
 		<tr data-userid="@user.UserId">
 			<td>@Html.ActionLink(user.UserName, "Info", "Account", new { userName = user.UserName }, new { })</td>
 			<td>@user.UserVisibleName</td>
-			<td>@Model.UsersGroups.Get(user.UserId, "")</td>
+			<td>@Model.UsersGroups.GetOrDefault(user.UserId, "")</td>
 			@if (Model.IsCourseAdmin)
 			{
 				<td>

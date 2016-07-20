@@ -262,7 +262,7 @@ namespace uLearn.Web.Controllers
 			var isPassed = visitsRepo.IsPassed(slide.Id, userId);
 			if (!isPassed)
 				await visitsRepo.SkipSlide(courseId, slide.Id, userId);
-			var solutions = solutionsRepo.GetAllAcceptedSolutions(courseId, slide.Id);
+			var solutions = solutionsRepo.GetBestTrendingAndNewAcceptedSolutions(courseId, slide.Id);
 			foreach (var solution in solutions)
 			{
 				solution.LikedAlready = solution.UsersWhoLike.Any(u => u == userId);

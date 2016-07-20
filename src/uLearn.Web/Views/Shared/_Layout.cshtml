@@ -58,7 +58,8 @@
 						catch (Exception)
 						{
 							/* RouteData has no attribute 'courseId' */
-							if (Html.ViewContext.RouteData.Values["controller"].ToString() == "Admin" &&
+							var controller = Html.ViewContext.RouteData.Values["controller"].ToString();
+							if ((controller == "Admin" || controller == "Analytics") &&
 								Request.Params["courseId"] != null)
 							{
 								courseId = Request.Params["courseId"];

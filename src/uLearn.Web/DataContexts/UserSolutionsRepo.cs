@@ -92,13 +92,27 @@ namespace uLearn.Web.DataContexts
 			return Tuple.Create(likesCount, !votedAlready);
 		}
 
-		public List<AcceptedSolutionInfo> GetAllAcceptedSolutions(string courseId, Guid slideId)
+		public IEnumerable<UserSolution> GetAllSolutions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
+		{
+			return db.UserSolutions.Where(x => x.CourseId == courseId &&
+											   slidesIds.Contains(x.SlideId) &&
+											   periodStart <= x.Timestamp &&
+											   x.Timestamp <= periodFinish
+			);
+		}
+
+		public IEnumerable<UserSolution> GetAllAcceptedSolutions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
+		{
+			return GetAllSolutions(courseId, slidesIds, periodStart, periodFinish).Where(s => s.IsRightAnswer);
+		}
+
+		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, IEnumerable<Guid> slidesIds)
 		{
 			var prepared = db.UserSolutions
-				.Where(x => x.IsRightAnswer && x.SlideId == slideId)
+				.Where(x => x.IsRightAnswer && slidesIds.Contains(x.SlideId))
 				.GroupBy(x => x.CodeHash, (codeHash, ss) => new { codeHash, timestamp = ss.Min(s => s.Timestamp) })
 				.Join(
-					db.UserSolutions.Where(x => x.IsRightAnswer && x.SlideId == slideId),
+					db.UserSolutions.Where(x => x.IsRightAnswer && slidesIds.Contains(x.SlideId)),
 					g => g,
 					s => new { codeHash = s.CodeHash, timestamp = s.Timestamp }, (k, s) => new { sol = s, k.timestamp })
 				.Select(x => new { x.sol.Id, likes = x.sol.Likes.Count, x.timestamp })
@@ -120,6 +134,11 @@ namespace uLearn.Web.DataContexts
 				.Select(x => new AcceptedSolutionInfo(x.Code, x.Id, x.Likes))
 				.OrderByDescending(info => info.UsersWhoLike.Count)
 				.ToList();
+		}
+
+		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, Guid slideId)
+		{
+			return GetBestTrendingAndNewAcceptedSolutions(courseId, new List<Guid> { slideId });
 		}
 
 		public string FindLatestAcceptedSolution(string courseId, Guid slideId, string userId)
