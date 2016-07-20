@@ -95,7 +95,9 @@ namespace uLearn.Web.Controllers
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
 			var course = courseManager.GetCourse(courseId);
-			var units = course.Slides.OrderBy(s => s.Index).Select(s => s.Info.UnitName).Distinct();
+			var units = course.Slides.OrderBy(s => s.Index).Select(s => s.Info.UnitName).Distinct().ToList();
+			if (string.IsNullOrEmpty(unitName) && units.Any())
+				unitName = units.First();
 			var slides = course.Slides.Where(s => s.Info.UnitName == unitName).ToList();
 			var slidesIds = slides.Select(s => s.Id).ToImmutableHashSet();
 			var quizzes = slides.OfType<QuizSlide>();
