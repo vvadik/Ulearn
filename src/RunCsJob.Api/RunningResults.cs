@@ -24,7 +24,7 @@ namespace RunCsJob.Api
             var valueText = Output
                 .Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
                 .Last();
-            Score = double.Parse(valueText, CultureInfo.InvariantCulture); //TODO культуру в чеккер
+            Score = double.Parse(valueText, CultureInfo.InvariantCulture);
             Output = string.Join("\r\n", Output
                 .Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
                 .DropLast());

@@ -58,7 +58,7 @@ namespace uLearn.Web.Models
 
 		[DataType(DataType.Password)]
 		[Display(Name = "Ещё раз")]
-		// Bug workaround. Details: http://stackoverflow.com/questions/19978239/custom-errormessage-for-compare-attribute-does-not-work
+		// Workaround. Details: http://stackoverflow.com/questions/19978239/custom-errormessage-for-compare-attribute-does-not-work
 #pragma warning disable 0618
 		// ReSharper disable once CSharpWarnings::CS0618
 		[System.Web.Mvc.Compare("Password", ErrorMessage = "Пароли отличаются")]
@@ -92,7 +92,7 @@ namespace uLearn.Web.Models
 
 		[DataType(DataType.Password)]
 		[Display(Name = "Ещё раз")]
-		// Bug workaround. Details: http://stackoverflow.com/questions/19978239/custom-errormessage-for-compare-attribute-does-not-work
+		// Workaround. Details: http://stackoverflow.com/questions/19978239/custom-errormessage-for-compare-attribute-does-not-work
 #pragma warning disable 0618
 		// ReSharper disable once CSharpWarnings::CS0618
 		[System.Web.Mvc.Compare("Password", ErrorMessage = "Пароли отличаются")]

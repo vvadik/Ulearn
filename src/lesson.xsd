@@ -111,7 +111,7 @@
         <xs:sequence>
           <xs:element name="inital-code" type="xs:string" />
           <xs:element name="hint" type="notEmptyString" minOccurs="0" maxOccurs="unbounded" />
-          <xs:element name="solution" type="notEmptyString" />
+          <xs:element name="solution" type="notEmptyString" minOccurs="0" maxOccurs="1" />
           <xs:element name="csproj-file-path" type="notEmptyString" minOccurs="0" maxOccurs="1" />
           <xs:element name="user-code-file-name" type="notEmptyString" minOccurs="0" maxOccurs="1" />
           <xs:element name="exclude-path-for-checker" type="notEmptyString" minOccurs="0" maxOccurs="unbounded" />

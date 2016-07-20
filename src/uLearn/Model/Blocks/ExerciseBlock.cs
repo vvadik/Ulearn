@@ -101,12 +101,7 @@ namespace uLearn.Model.Blocks
         public SolutionBuildResult ValidateSolution(string usersExercise)
         {
             var validator = ValidatorsRepository.Get(ValidatorName);
-            string message;
-            if ((message = validator.FindSyntaxError(usersExercise)) != null)
-                return SolutionBuildResult.Error(message, usersExercise);
-            if ((message = validator.FindValidatorError(usersExercise, usersExercise)) != null)
-                return SolutionBuildResult.StyleIssue(message, usersExercise);
-            return SolutionBuildResult.Success(usersExercise);
+            return validator.ValidateSolution(usersExercise);
         }
 
         [XmlIgnore]
@@ -163,7 +158,7 @@ namespace uLearn.Model.Blocks
 
         public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public override string TryGetText()

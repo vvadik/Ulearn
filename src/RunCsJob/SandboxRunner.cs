@@ -94,13 +94,13 @@ namespace RunCsJob
                 Remove(dir.FullName);
                 return _result;
             }
-
             RunSandboxer(string.Format("\"{0}\" {1}", builderResult.PathToExe, submition.Id));
 
             Remove(dir.FullName);
 
             _result.Verdict = Verdict.Ok;
             _result.FillPassProgress();
+
             return _result;
         }
 

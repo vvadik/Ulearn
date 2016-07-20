@@ -193,6 +193,7 @@
     <Compile Include="TexReplacer.cs" />
     <Compile Include="Urls.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="ValidatorExtention.cs" />
     <Compile Include="ValidatorsRepository.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -20,7 +20,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
-		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo(); //TODO use in statistics
+		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 
 		public AnalyticsController()
 			: this(WebCourseManager.Instance)

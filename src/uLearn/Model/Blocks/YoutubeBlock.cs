@@ -34,7 +34,7 @@ namespace uLearn.Model.Blocks
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
-			throw new NotImplementedException();
-		}
-	}
+            throw new NotSupportedException();
+        }
+    }
 }

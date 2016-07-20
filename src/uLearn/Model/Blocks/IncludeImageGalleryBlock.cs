@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Xml.Serialization;
 using uLearn.Model.Edx.EdxComponents;
@@ -27,7 +28,7 @@ namespace uLearn.Model.Blocks
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
-			throw new System.NotImplementedException();
+			throw new NotSupportedException();
 		}
 	}
 }

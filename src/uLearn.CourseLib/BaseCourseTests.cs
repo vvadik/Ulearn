@@ -129,9 +129,10 @@ namespace uLearn
 	    public void EthalonSolutions_for_Exercises(ExerciseSlide slide)
 	    {
 	        var isProjExercise = slide.Exercise.CsProjFilePath != null;
-	        string sourceCode;
+            string sourceCode;
 	        RunnerSubmition submission;
-	        if (!isProjExercise)
+
+            if (!isProjExercise)
 	        {
 	            var solution = slide.Exercise.Solution.BuildSolution(slide.Exercise.EthalonSolution);
 	            if (solution.HasErrors)

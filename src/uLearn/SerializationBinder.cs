@@ -32,7 +32,7 @@ namespace uLearn
 
         public override void BindToName(Type serializedType, out string assemblyName, out string typeName)
         {
-            if (false == typeToName.ContainsKey(serializedType))
+            if (!typeToName.ContainsKey(serializedType))
             {
                 base.BindToName(serializedType, out assemblyName, out typeName);
                 return;

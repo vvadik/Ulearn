@@ -10,7 +10,6 @@ using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {
-	[XmlRoot("md")]
 	public class MdBlock : SlideBlock, IXmlSerializable
 	{
 		private string markdown;

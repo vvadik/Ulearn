@@ -26,7 +26,6 @@ namespace RunCsJob
         public static async Task<T> ReadAsAsync<T>(this HttpContent content)
         {
             var s = await content.ReadAsStringAsync();
-            Console.WriteLine(s);
             return JsonConvert.DeserializeObject<T>(s, JsonConfig.GetSettings());
         }
     }

@@ -141,12 +141,13 @@ while(true) ++a;
 }}",
 			TestName = "Infinty loop")]
 		[TestCase(@"using System.Threading; class Program{ private static void Main() { 
-Thread.Sleep(15000);
+Thread.Sleep(20000);
 }}",
 			TestName = "Thread.Sleep")]
 		[TestCase(@"using System; using System.Collections.Generic; class Program { static void Main() { 
 const int memory = 63 * 1024 * 1024; 
 var a = new byte[memory]; 
+for (var j = 0; j < 2; j++)
 for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 }}",
 			TestName = "many assignation")]
@@ -196,10 +197,10 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 		[TestCase(@"class A { static void Main() { switch(true) {} } }",
 			TestName = "empty switch")]
 		[TestCase(@"using System; class A { static void Main() { Console.WriteLine(0l); } }",
-			TestName = "L")]
+			TestName = "lower case L for long literal")]
 		public static void TestWarnings(string code)
 		{
-			var details = GetDetails(code, "");
+            var details = GetDetails(code, "");
 			Assert.AreEqual(Verdict.Ok, details.Verdict);
 			Assert.IsNotNullOrEmpty(details.CompilationOutput);
 		}
