@@ -11,14 +11,13 @@ namespace uLearn
         {
             return courseId == "web" && slideId == Guid.Empty
                 ? code
-                : ((ExerciseSlide)courseManager.GetCourse(courseId).GetSlideById(slideId))
-                    .Exercise
-                    .Solution
+                : ((SingleFileExerciseBlock)((ExerciseSlide)courseManager.GetCourse(courseId).GetSlideById(slideId))
+                    .Exercise)
                     .BuildSolution(code)
                     .SourceCode;
         }
 
-        public static byte[] GetZipFileBytes(ExerciseBlock exercise, string code, string slideFolderPath)
+        public static byte[] GetZipFileBytes(ProjectExerciseBlock exercise, string code, string slideFolderPath)
         {
             // для студ части
             //var proj = new Project(exercise.CSProjFilePath);

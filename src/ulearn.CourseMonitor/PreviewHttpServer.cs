@@ -168,7 +168,7 @@ namespace uLearn.CourseTool
 
 		private static RunSolutionResult GetRunResult(ExerciseBlock exercise, string code)
 		{
-			var buildResult = exercise.Solution.BuildSolution(code);
+			var buildResult = exercise.BuildSolution(code);
 			if (buildResult.HasErrors)
 				return new RunSolutionResult { IsCompileError = true, CompilationError = buildResult.ErrorMessage, ExecutionServiceName = "uLearn" };
 			if (buildResult.HasStyleIssues)

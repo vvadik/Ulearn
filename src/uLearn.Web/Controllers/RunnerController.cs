@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using RunCsJob.Api;
+using uLearn.Model.Blocks;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 
@@ -38,21 +39,20 @@ namespace uLearn.Web.Controllers
 
         private RunnerSubmition ToRunnerSubmition(UserSolution details)
         {
-            var csProjFilePath = ((ExerciseSlide)courseManager.GetCourse(details.CourseId).GetSlideById(details.SlideId)).Exercise.CsProjFilePath;
-
-            if (csProjFilePath != null)
+            if (((ExerciseSlide)courseManager.GetCourse(details.CourseId).GetSlideById(details.SlideId)).Exercise is ProjectExerciseBlock)
             {
-                var exercise = (ExerciseSlide)courseManager
+                var exerciseSlide = (ExerciseSlide)courseManager
                     .GetCourse(details.CourseId)
                     .GetSlideById(details.SlideId);
+                var exercise = (ProjectExerciseBlock)exerciseSlide.Exercise;
                 return new ProjRunnerSubmition
                 {
                     Id = details.Id.ToString(),
                     ZipFileData = Utils.GetZipFileBytes(
-                        exercise.Exercise,
+                        exercise,
                         details.SolutionCode.Text,
-                        exercise.Info.Directory.FullName),
-                    ProjectFileName = csProjFilePath,
+                        exerciseSlide.Info.Directory.FullName),
+                    ProjectFileName = exercise.CsProjFilePath,
                     Input = "",
                     NeedRun = true
                 };

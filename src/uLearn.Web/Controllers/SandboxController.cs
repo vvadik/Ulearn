@@ -56,15 +56,13 @@ namespace uLearn.Web.Controllers
         public ActionResult GetDetails(int id)
         {
             var details = solutionsRepo.GetDetails(id);
-            var csProjFilePath = ((ExerciseSlide)courseManager.GetCourse(details.CourseId).GetSlideById(details.SlideId)).Exercise.CsProjFilePath;
-            if (csProjFilePath == null)
-            {
-                details.SolutionCode.Text = Utils.GetSource(
-                    details.CourseId,
-                    details.SlideId,
-                    courseManager,
-                    details.SolutionCode.Text);
-            }
+
+            details.SolutionCode.Text = ((ExerciseSlide)courseManager
+                .GetCourse(details.CourseId)
+                .GetSlideById(details.SlideId))
+                .Exercise
+                .GetSourceCode(details.SolutionCode.Text);
+
             return View(solutionsRepo.GetDetails(id));
         }
     }

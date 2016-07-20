@@ -15,7 +15,7 @@ namespace uLearn.CSharp
 		{
 			var slide =
 				(ExerciseSlide)GenerateSlideFromFile(@"..\..\..\courses\BasicProgramming\Slides\U03_Cycles\S041_PowerOfTwo.cs");
-			Console.WriteLine(slide.Exercise.Solution.BuildSolution("public void T(){}"));
+			Console.WriteLine(slide.Exercise.BuildSolution("public void T(){}"));
 		}
 
 		[Test]
@@ -121,7 +121,7 @@ namespace uLearn.CSharp
 		public void remove_Excluded_members_from_solution()
 		{
 			var slide = (ExerciseSlide) GenerateSlide("NestedClass.cs");
-			var solution = slide.Exercise.Solution.BuildSolution("");
+			var solution = slide.Exercise.BuildSolution("");
 			Assert.That(solution, Is.Not.StringContaining("["));
 			Assert.That(solution, Is.Not.StringContaining("]"));
 			Assert.That(solution, Is.Not.StringContaining("public int X, Y"));
@@ -241,7 +241,7 @@ namespace uLearn.CSharp
 		{
 			var slide = (ExerciseSlide) GenerateSlide("HelloWorld.cs");
 			var userSolution = "/* no solution */";
-			var res = slide.Exercise.Solution.BuildSolution(userSolution);
+			var res = slide.Exercise.BuildSolution(userSolution);
 			Console.WriteLine(res.ErrorMessage);
 			var ans = res.SourceCode;
 			StringAssert.DoesNotContain("[", ans);
@@ -289,7 +289,7 @@ namespace uLearn.CSharp
 		public void insert_userSolution_outside_class_if_exercise_is_under_class()
 		{
 			var slide = (ExerciseSlide)GenerateSlide("ExerciseWithoutExerciseMethod.cs");
-			var sol = slide.Exercise.Solution.BuildSolution("public class MyClass{}").SourceCode;
+			var sol = slide.Exercise.BuildSolution("public class MyClass{}").SourceCode;
 			Assert.IsNotNull(sol);
 			var indexOfMainClass = sol.IndexOf("ExerciseWithoutExerciseMethod");
 			var indexOfSolutionClass = sol.IndexOf("class MyClass");

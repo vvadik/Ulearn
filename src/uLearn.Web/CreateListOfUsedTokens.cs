@@ -3,6 +3,7 @@ using System.CodeDom.Compiler;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
+using uLearn.Model.Blocks;
 
 namespace uLearn.Web
 {
@@ -12,10 +13,13 @@ namespace uLearn.Web
 		[Test]
 		public static void CreateList()
 		{
-			var solutions = WebCourseManager.Instance
-				.GetCourses()
-				.SelectMany(course => course.Slides.OfType<ExerciseSlide>())
-				.Select(slide => slide.Exercise.EthalonSolution);
+		    var solutions = WebCourseManager.Instance
+		        .GetCourses()
+		        .SelectMany(course => course.Slides.OfType<ExerciseSlide>())
+		        .Where(slide => slide.Exercise is SingleFileExerciseBlock)
+		        .Select(slide => slide.Exercise)
+		        .Cast<SingleFileExerciseBlock>()
+		        .Select(exercise => exercise.EthalonSolution);
 			var domProvider = CodeDomProvider.CreateProvider("C#");
 			var tokensDict = solutions
 				.SelectMany(s => CSharpSyntaxTree
@@ -24,7 +28,7 @@ namespace uLearn.Web
 					.DescendantTokens())
 				.Select(token => token.Text)
 				.Where(domProvider.IsValidIdentifier)
-				.Where(s => Char.IsUpper(s[0]))
+				.Where(s => char.IsUpper(s[0]))
 				.GroupBy(token => token)
 				.ToDictionary(grouping => grouping.Key, grouping => grouping.Count());
 			Console.Out.WriteLine("var date = '{0}';", DateTime.Now.ToString("dd.MM.yy"));

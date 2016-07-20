@@ -1,35 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
 using System.Xml.Serialization;
 using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {
-    [XmlType("execirse")]
-    public class ExerciseBlock : IncludeCode
+    public abstract class ExerciseBlock : IncludeCode
     {
         [XmlElement("inital-code")]
         public string ExerciseInitialCode { get; set; }
 
         [XmlElement("hint")]
         public List<string> Hints { get; set; }
-
-        [XmlElement("solution")]
-        public Label SolutionLabel { get; set; }
-
-        [XmlElement("csproj-file-path")]
-        public string CsProjFilePath { get; set; }
-
-        [XmlElement("user-code-file-name")]
-        public string UserCodeFileName { get; set; }
-
-        [XmlElement("exclude-path-for-checker")]
-        public string[] PathsToExcludeForChecker { get; set; }
-
-        [XmlElement("remove")]
-        public Label[] RemovedLabels { get; set; }
 
         [XmlElement("comment")]
         public string CommentAfterExerciseIsSolved { get; set; }
@@ -44,53 +26,8 @@ namespace uLearn.Model.Blocks
         [XmlElement("validator")]
         public string ValidatorName { get; set; }
 
-        [XmlElement("prelude")]
-        public string PreludeFile { get; set; }
-
-        public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
-        {
-            FillProperties(context);
-            if (CsProjFilePath == null)
-            {
-                RemovedLabels = RemovedLabels ?? new Label[0];
-                if (PreludeFile == null)
-                {
-                    PreludeFile = context.CourseSettings.GetPrelude(LangId);
-                    if (PreludeFile != null)
-                        PreludeFile = Path.Combine("..", PreludeFile);
-                }
-
-                var code = context.FileSystem.GetContent(File);
-                var regionRemover = new RegionRemover(LangId);
-                var extractor = context.GetExtractor(File, LangId, code);
-
-                var prelude = "";
-                if (PreludeFile != null)
-                    prelude = context.FileSystem.GetContent(PreludeFile);
-
-                var exerciseCode = regionRemover.Prepare(code);
-                IEnumerable<Label> notRemoved;
-                exerciseCode = regionRemover.Remove(exerciseCode, RemovedLabels, out notRemoved);
-                int index;
-                exerciseCode = regionRemover.RemoveSolution(exerciseCode, SolutionLabel, out index);
-                index += prelude.Length;
-
-                ExerciseInitialCode = ExerciseInitialCode.RemoveCommonNesting();
-                ExerciseCode = prelude + exerciseCode;
-                IndexToInsertSolution = index;
-                EthalonSolution = extractor.GetRegion(SolutionLabel);
-            }
-            ValidatorName = string.Join(" ", LangId, ValidatorName);
-
-            yield return this;
-        }
-
-        // То, что будет выполняться для проверки задания
-        public string ExerciseCode { get; set; }
-        // Индекс внутри ExerciseCode, куда нужно вставить код пользователя.
-        public int IndexToInsertSolution { get; set; }
-        // Если это вставить в ExerciseCode по индексу IndexToInsertSolution и выполнить полученный код, он должен вывести ExpectedOutput
-        public string EthalonSolution { get; set; }
+        [XmlElement("hide-show-solutions-button")]
+        public bool HideShowSolutionsButton { get; set; }
 
         public List<string> HintsMd
         {
@@ -98,18 +35,10 @@ namespace uLearn.Model.Blocks
             set { Hints = value; }
         }
 
-        public SolutionBuildResult ValidateSolution(string usersExercise)
-        {
-            var validator = ValidatorsRepository.Get(ValidatorName);
-            return validator.ValidateSolution(usersExercise);
-        }
+        public abstract string GetSourceCode(string code);
 
-        [XmlIgnore]
-        public SolutionBuilder Solution
-        {
-            get { return new SolutionBuilder(IndexToInsertSolution, ExerciseCode, ValidatorName); }
-        }
-
+        public abstract SolutionBuildResult BuildSolution(string code);
+        
         #region equals
 
         protected bool Equals(ExerciseBlock other)
