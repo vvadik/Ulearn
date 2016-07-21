@@ -14,7 +14,7 @@ namespace uLearn.CourseTool
 	{
 		private Course course;
 		private readonly Slide aTextSlide = new Slide(new[] { new MdBlock("hello"), }, new SlideInfo("u1", new FileInfo("file"), 0), "title", Guid.NewGuid());
-		private readonly Slide exerciseSlide = new Slide(new[] { new ProjectExerciseBlock() }, new SlideInfo("u1", new FileInfo("file"), 0), "title", slideIdFromCourse);
+		private readonly Slide exerciseSlide = new Slide(new ExerciseBlock[] { new ProjectExerciseBlock(), new SingleFileExerciseBlock()  }, new SlideInfo("u1", new FileInfo("file"), 0), "title", slideIdFromCourse);
 		private const string youtubeIdFromCourse = "GZS36w_fxdg";
 		private static readonly Guid slideIdFromCourse = Guid.Parse("108C89D9-36F0-45E3-BBEE-B93AC971063F");
 		private const string slideUrl = "https://192.168.33.1:44300/Course/{0}/LtiSlide/{1}";

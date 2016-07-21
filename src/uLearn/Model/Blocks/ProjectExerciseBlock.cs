@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Xml.Serialization;
+using Ionic.Zip;
+using RunCsJob.Api;
 
 namespace uLearn.Model.Blocks
 {
@@ -16,8 +19,8 @@ namespace uLearn.Model.Blocks
         [XmlElement("exclude-path-for-checker")]
         public string[] PathsToExcludeForChecker { get; set; }
 
-        [XmlElement("publish-in-rb")]
-        public bool PublishInRb { get; set; }
+        [XmlElement("require-review")]
+        public bool RequireReview { get; set; }
 
         public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
         {
@@ -35,6 +38,37 @@ namespace uLearn.Model.Blocks
         {
             var validator = ValidatorsRepository.Get(ValidatorName);
             return validator.ValidateSolution(code);
+        }
+
+        public override RunnerSubmition CreateSubmition(string submitionId, string code, string slideFolderPath)
+        {
+            return new ProjRunnerSubmition
+            {
+                Id = submitionId,
+                ZipFileData = GetZipFileBytes(code, slideFolderPath),
+                ProjectFileName = CsProjFilePath,
+                Input = "",
+                NeedRun = true
+            }; ;
+        }
+
+        private byte[] GetZipFileBytes(string code, string slideFolderPath)
+        {
+            using (var zip = new ZipFile())
+            {
+                var path = Path.Combine(slideFolderPath, Path.GetDirectoryName(CsProjFilePath));
+                zip.AddDirectory(path);
+                zip.UpdateEntry(UserCodeFileName, code);
+                foreach (var pathToExclude in PathsToExcludeForChecker ?? new string[0])
+                {
+                    zip.RemoveSelectedEntries(pathToExclude);
+                }
+                using (var ms = new MemoryStream())
+                {
+                    zip.Save(ms);
+                    return ms.ToArray();
+                }
+            }
         }
     }
 }

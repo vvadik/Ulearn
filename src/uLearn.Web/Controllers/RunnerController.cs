@@ -39,36 +39,13 @@ namespace uLearn.Web.Controllers
 
         private RunnerSubmition ToRunnerSubmition(UserSolution details)
         {
-            if (((ExerciseSlide)courseManager.GetCourse(details.CourseId).GetSlideById(details.SlideId)).Exercise is ProjectExerciseBlock)
-            {
-                var exerciseSlide = (ExerciseSlide)courseManager
-                    .GetCourse(details.CourseId)
-                    .GetSlideById(details.SlideId);
-                var exercise = (ProjectExerciseBlock)exerciseSlide.Exercise;
-                return new ProjRunnerSubmition
-                {
-                    Id = details.Id.ToString(),
-                    ZipFileData = Utils.GetZipFileBytes(
-                        exercise,
-                        details.SolutionCode.Text,
-                        exerciseSlide.Info.Directory.FullName),
-                    ProjectFileName = exercise.CsProjFilePath,
-                    Input = "",
-                    NeedRun = true
-                };
-            }
-            return new FileRunnerSubmition
-            {
-                Id = details.Id.ToString(),
-                Code = Utils.GetSource(
-                    details.CourseId,
-                    details.SlideId,
-                    courseManager,
-                    details.SolutionCode.Text
-                    ),
-                Input = "",
-                NeedRun = true
-            };
+            var exerciseSlide = (ExerciseSlide)courseManager
+                .GetCourse(details.CourseId)
+                .GetSlideById(details.SlideId);
+            return exerciseSlide.Exercise.CreateSubmition(
+                details.Id.ToString(),
+                details.SolutionCode.Text,
+                exerciseSlide.Info.Directory.FullName);
         }
 
         [HttpPost]

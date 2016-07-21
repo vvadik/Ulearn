@@ -23,8 +23,8 @@ namespace uLearn.Model
 		[XmlElement(typeof(IncludeCodeBlock))]
 		[XmlElement(typeof(IncludeMdBlock))]
 		[XmlElement(typeof(IncludeImageGalleryBlock))]
-		[XmlElement(typeof(ProjectExerciseBlock))]
-        [XmlElement(typeof(SingleFileExerciseBlock))]
+		[XmlElement("exercise", Type = typeof(ProjectExerciseBlock))]
+        [XmlElement("single-file-exercise", Type = typeof(SingleFileExerciseBlock))]
 		public SlideBlock[] Blocks;
 
 		public Lesson()

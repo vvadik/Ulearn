@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using RunCsJob.Api;
 using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Blocks
@@ -26,7 +27,7 @@ namespace uLearn.Model.Blocks
         [XmlElement("validator")]
         public string ValidatorName { get; set; }
 
-        [XmlElement("hide-show-solutions-button")]
+        [XmlElement("dont-show-solutions")]
         public bool HideShowSolutionsButton { get; set; }
 
         public List<string> HintsMd
@@ -38,7 +39,9 @@ namespace uLearn.Model.Blocks
         public abstract string GetSourceCode(string code);
 
         public abstract SolutionBuildResult BuildSolution(string code);
-        
+
+        public abstract RunnerSubmition CreateSubmition(string submitionId, string code, string slideFolderPath);
+
         #region equals
 
         protected bool Equals(ExerciseBlock other)

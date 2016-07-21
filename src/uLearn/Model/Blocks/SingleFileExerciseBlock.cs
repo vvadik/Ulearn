@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.IO;
 using System.Xml.Serialization;
+using RunCsJob.Api;
 
 namespace uLearn.Model.Blocks
 {
@@ -63,10 +64,21 @@ namespace uLearn.Model.Blocks
         {
             return BuildSolution(code).SourceCode;
         }
-
+    
         public override SolutionBuildResult BuildSolution(string code)
         {
             return new SolutionBuilder(IndexToInsertSolution, ExerciseCode, ValidatorName).BuildSolution(code);
+        }
+
+        public override RunnerSubmition CreateSubmition(string submitionId, string code, string slideFolderPath)
+        {
+            return new FileRunnerSubmition
+            {
+                Id = submitionId,
+                Code = GetSourceCode(code),
+                Input = "",
+                NeedRun = true
+            }; ;
         }
     }
 }

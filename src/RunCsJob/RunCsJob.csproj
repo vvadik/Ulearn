@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="AssemblyCreator.cs" />
     <Compile Include="AsyncReader.cs" />
+    <Compile Include="Json_Test.cs" />
     <Compile Include="MsBuildRunner.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="SandboxRunner.cs" />

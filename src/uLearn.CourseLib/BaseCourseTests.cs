@@ -125,29 +125,20 @@ namespace uLearn
             new WebClient().DownloadData(url);
         }
 
-        private void EthalonSolutionForProjExercises(ExerciseSlide slide)
+        private static void InitialCodeIsNotSolutionForProjExercise(ExerciseSlide slide)
         {
             var exercise = slide.Exercise as ProjectExerciseBlock;
-            var submition = new ProjRunnerSubmition
-            {
-                Id = slide.Id.ToString(),
-                ZipFileData = Utils.GetZipFileBytes(
-                    exercise,
-                    exercise.ExerciseInitialCode,
-                    slide.Info.Directory.FullName
-                    ),
-                ProjectFileName = exercise.CsProjFilePath,
-                Input = "",
-                NeedRun = true
-            };
 
-            var result = SandboxRunner.Run(submition);
+            var result = SandboxRunner.Run(exercise.CreateSubmition(
+                slide.Id.ToString(),
+                exercise.ExerciseInitialCode,
+                slide.Info.Directory.FullName));
 
             Assert.AreEqual(Verdict.Ok, result.Verdict);
             Assert.AreNotEqual(1.0, result.Score);
         }
 
-        private void EthalonSolutionForSingleFileExercises(ExerciseSlide slide)
+        private static void EthalonSolutionForSingleFileExercises(ExerciseSlide slide)
         {
             var exercise = slide.Exercise as SingleFileExerciseBlock;
             var solution = exercise.BuildSolution(exercise.EthalonSolution);
@@ -156,15 +147,12 @@ namespace uLearn
                 FailOnError(slide, solution, exercise.EthalonSolution);
                 return;
             }
-            var submition = new FileRunnerSubmition
-            {
-                Code = solution.SourceCode,
-                Id = slide.NormalizedGuid,
-                Input = "",
-                NeedRun = true
-            };
 
-            var result = SandboxRunner.Run(submition);
+            var result = SandboxRunner.Run(exercise.CreateSubmition(
+                slide.Id.ToString(),
+                solution.SourceCode,
+                slide.Info.Directory.FullName));
+
             var output = result.GetOutput().NormalizeEoln();
 
             var isRightAnswer = output.NormalizeEoln().Equals(slide.Exercise.ExpectedOutput.NormalizeEoln());
@@ -182,7 +170,7 @@ namespace uLearn
         public void EthalonSolutionsForExercises(ExerciseSlide slide)
         {
             if (slide.Exercise is ProjectExerciseBlock)
-                EthalonSolutionForProjExercises(slide);
+                InitialCodeIsNotSolutionForProjExercise(slide);
             else
                 EthalonSolutionForSingleFileExercises(slide);
         }
