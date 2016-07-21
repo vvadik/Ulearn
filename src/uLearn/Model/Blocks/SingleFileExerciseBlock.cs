@@ -6,7 +6,6 @@ using RunCsJob.Api;
 
 namespace uLearn.Model.Blocks
 {
-    [XmlType("single-file-exercise")]
     public class SingleFileExerciseBlock : ExerciseBlock
     {
         [XmlElement("solution")]

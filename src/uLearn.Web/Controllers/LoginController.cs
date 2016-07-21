@@ -39,6 +39,7 @@ namespace uLearn.Web.Controllers
 		//
 		// POST: /Login
 		[HttpPost]
+		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Index(LoginViewModel model, string returnUrl)
 		{
@@ -101,6 +102,7 @@ namespace uLearn.Web.Controllers
 		//
 		// POST: /Login/ExternalLoginConfirmation
 		[HttpPost]
+		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
 		{

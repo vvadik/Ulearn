@@ -285,6 +285,7 @@
     <Compile Include="Controllers\ControllerUtils.cs" />
     <Compile Include="DataContexts\CommentsRepo.cs" />
     <Compile Include="DataContexts\CoursesRepo.cs" />
+    <Compile Include="DataContexts\GroupsRepo.cs" />
     <Compile Include="DataContexts\QuizzesRepo.cs" />
     <Compile Include="DataContexts\ULearnUserManager.cs" />
     <Compile Include="DataContexts\UsersRepo.cs" />
@@ -322,11 +323,17 @@
     <Compile Include="Migrations\201605310936533_AddManualQuizChecks.Designer.cs">
       <DependentUpon>201605310936533_AddManualQuizChecks.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201607110843430_AddGroups.cs" />
+    <Compile Include="Migrations\201607110843430_AddGroups.Designer.cs">
+      <DependentUpon>201607110843430_AddGroups.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\CommentLike.cs" />
     <Compile Include="Models\CommentPolicy.cs" />
     <Compile Include="Models\CommentViewModel.cs" />
     <Compile Include="Models\CourseVersion.cs" />
+    <Compile Include="Models\Group.cs" />
+    <Compile Include="Models\GroupMember.cs" />
     <Compile Include="Models\ManualQuizCheckQueueItem.cs" />
     <Compile Include="Models\QuizVersion.cs" />
     <Compile Include="Models\UserSearchQueryModel.cs" />
@@ -731,6 +738,9 @@
     <EmbeddedResource Include="Migrations\201605310936533_AddManualQuizChecks.resx">
       <DependentUpon>201605310936533_AddManualQuizChecks.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607110843430_AddGroups.resx">
+      <DependentUpon>201607110843430_AddGroups.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="codemirror\addon\comment\comment.js" />
@@ -1012,6 +1022,7 @@
     <Content Include="Content\buttons.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\fonts\fontawesome-webfont.svg" />
+    <Content Include="Content\jquery-ui.min.css" />
     <Content Include="Content\logo.png" />
     <Content Include="Content\tablesorter.css" />
     <Content Include="Content\ulearn.css" />
@@ -1027,6 +1038,7 @@
     <Content Include="Jsdifflib\jsdifflib.css" />
     <Content Include="katex\katex.min.css" />
     <Content Include="katex\katex.min.js" />
+    <Content Include="Scripts\activate-clipboard.js" />
     <Content Include="Scripts\bootstrap.file-input.js" />
     <Content Include="qunit\qunit-1.15.0.css" />
     <Content Include="qunit\qunit-1.15.0.js" />
@@ -1089,6 +1101,8 @@
     <Content Include="Properties\webjobs-list.json" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\buttons.js" />
+    <Content Include="Scripts\clipboard.min.js" />
+    <Content Include="Scripts\groups-editor.js" />
     <Content Include="Scripts\jquery-ui.min.js" />
     <Content Include="Scripts\jquery.color-2.1.0.min.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
@@ -1332,6 +1346,8 @@
     <Content Include="Views\Comments\_CommentText.cshtml" />
     <Content Include="Views\Admin\Comments.cshtml" />
     <Content Include="Views\Admin\ManualQuizChecksQueue.cshtml" />
+    <Content Include="Views\Admin\Groups.cshtml" />
+    <Content Include="Views\Account\JoinGroup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

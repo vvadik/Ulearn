@@ -1,0 +1,15 @@
+﻿@model string
+
+@{
+	ViewBag.Title = "Присоединться к группе";
+}
+
+<div class="container">
+	<h1>Присоединиться к группе «@Model»</h1>
+
+	<form method="POST" action="">
+		@Html.AntiForgeryToken()
+		<button class="btn btn-success btn-large">Присоединиться</button>
+	</form>
+</div>
+

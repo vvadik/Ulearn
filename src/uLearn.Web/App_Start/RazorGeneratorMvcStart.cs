@@ -3,9 +3,9 @@ using System.Web.Mvc;
 using System.Web.WebPages;
 using RazorGenerator.Mvc;
 
-[assembly: WebActivatorEx.PostApplicationStartMethod(typeof(uLearn.Web.RazorGeneratorMvcStart), "Start")]
+[assembly: WebActivatorEx.PostApplicationStartMethod(typeof(uLearn.Web.App_Start.RazorGeneratorMvcStart), "Start")]
 
-namespace uLearn.Web {
+namespace uLearn.Web.App_Start {
     public static class RazorGeneratorMvcStart {
         public static void Start() {
             var engine = new PrecompiledMvcEngine(typeof(RazorGeneratorMvcStart).Assembly) {

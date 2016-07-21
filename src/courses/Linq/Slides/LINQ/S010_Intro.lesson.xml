@@ -3,7 +3,7 @@
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://ulearn.azurewebsites.net/lesson">
 	<title>Введение</title>
 	<id>{3446FAB2-15DF-4045-AB40-ABC1F3DC87C8}</id>
-	<default-include-file>Intro.cs</default-include-file>
+	<default-include-code-file>Intro.cs</default-include-code-file>
 	<md>
 		`LINQ` — это встроенный в C# механизм для удобной работы с коллекциями.
 

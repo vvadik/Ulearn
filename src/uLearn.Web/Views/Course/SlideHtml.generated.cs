@@ -806,35 +806,35 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n");
 			else
 			{
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<input autocomplete=\"off\" class=\"form-control ");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<input\r\n\t\t\t\t\tautocomplete=\"off\"\r\n\t\t\t\t\tclass=\"form-control ");
 
 
-       WebViewPage.WriteTo(@__razor_helper_writer, quizRes);
+WebViewPage.WriteTo(@__razor_helper_writer, quizRes);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" value=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t\t\tvalue=\"");
 
 
-                        WebViewPage.WriteTo(@__razor_helper_writer, value);
+WebViewPage.WriteTo(@__razor_helper_writer, value);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" id=\'");
 
 
-                                     WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "quizBlock");
+WebViewPage.WriteTo(@__razor_helper_writer, block.Id + "quizBlock");
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\' maxlength=\"");
-
-
-                                                                          WebViewPage.WriteTo(@__razor_helper_writer, QuizController.MAX_FILLINBLOCK_SIZE);
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" ");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\'\r\n\t\t\t\t\tmaxlength=\"");
 
 
-                                                                                                                WebViewPage.WriteTo(@__razor_helper_writer, GetGuestDisable(context.IsGuest));
+WebViewPage.WriteTo(@__razor_helper_writer, QuizController.MAX_FILLINBLOCK_SIZE);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, " ");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t\t\tsize=\"68\"\r\n\t\t\t\t\t");
 
 
-                                                                                                                                                  WebViewPage.WriteTo(@__razor_helper_writer, readonlyAttr);
+WebViewPage.WriteTo(@__razor_helper_writer, GetGuestDisable(context.IsGuest));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t\t");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, readonlyAttr);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "/>\r\n");
 

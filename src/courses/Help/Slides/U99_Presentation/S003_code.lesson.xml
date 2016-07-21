@@ -2,7 +2,7 @@
 <Lesson xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://ulearn.azurewebsites.net/lesson">
 	<title>Код</title>
 	<id>C1DA3BA7256142D58F245CCEF2B176A0</id>
-	<default-include-file>_Code.cs</default-include-file>
+	<default-include-code-file>_Code.cs</default-include-code-file>
 	
 	<md>###Весь файл</md>
 	<include-code />

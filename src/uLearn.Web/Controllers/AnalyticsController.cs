@@ -20,7 +20,8 @@ namespace uLearn.Web.Controllers
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
-		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
+		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo(); 
+		private readonly GroupsRepo groupsRepo = new GroupsRepo();
 
 		public AnalyticsController()
 			: this(WebCourseManager.Instance)
@@ -123,7 +124,13 @@ namespace uLearn.Web.Controllers
 			var slides = course.Slides
 				.Where(s => s.Info.UnitName == unitName).ToArray();
 			var users = GetUserInfos(slides, periodStart).OrderByDescending(GetRating).ToArray();
-			return PartialView(new UserProgressViewModel { Slides = slides, Users = users, CourseId = courseId });
+			return PartialView(new UserProgressViewModel
+			{
+				Slides = slides,
+				Users = users,
+				GroupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, users.Select(u => u.UserId), User),
+				CourseId = courseId
+			});
 		}
 
 		private DailyStatistics[] GetDailyStatistics(IEnumerable<Slide> slides = null)
@@ -294,6 +301,7 @@ namespace uLearn.Web.Controllers
 			{
 				User = user,
 				Course = course,
+				GroupsNames = groupsRepo.GetUserGroupsNamesAsString(course.Id, userId, User),
 				Slide = slide,
 				Solutions = solutions
 			};
@@ -305,6 +313,7 @@ namespace uLearn.Web.Controllers
 	{
 		public ApplicationUser User { get; set; }
 		public Course Course { get; set; }
+		public string GroupsNames;
 		public List<UserSolution> Solutions { get; set; }
 		public ExerciseSlide Slide { get; set; }
 	}
@@ -313,6 +322,7 @@ namespace uLearn.Web.Controllers
 	{
 		public string CourseId;
 		public UserInfo[] Users;
+		public Dictionary<string, string> GroupsNames;
 		public Slide[] Slides;
 	}
 }

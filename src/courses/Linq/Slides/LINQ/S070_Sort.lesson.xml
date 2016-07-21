@@ -5,12 +5,12 @@
 	xmlns="https://ulearn.azurewebsites.net/lesson">
 	<title>OrderBy и Distinct</title>
 	<id>{CA6CAD1F-8352-4041-9233-DFF70ED3AB05}</id>
-	<default-include-file>Sort.cs</default-include-file>
+	<default-include-code-file>Sort.cs</default-include-code-file>
 	<md>
 		Для сортировки последовательности в `LINQ` имеется четыре метода:
 	</md>
 
-	<code lang="cs">
+	<code>
 		<![CDATA[
 		IOrderedEnumerable<T> OrderBy<T>(this IEnumerable<T> items, Func<T, K> keySelector)
 		IOrderedEnumerable<T> OrderByDescending<T>(this IEnumerable<T> items, Func<T, K> keySelector)
