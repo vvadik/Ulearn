@@ -5,32 +5,36 @@ using uLearn.Model.Blocks;
 
 namespace uLearn.Model
 {
-	[XmlType(IncludeInSchema = false)]
-	public enum BlockTypes
-	{
-		[XmlEnum("youtube")]
-		YouTube,
-		[XmlEnum("md")]
-		Md,
-		[XmlEnum("code")]
-		Code,
-		[XmlEnum("tex")]
-		Tex,
-		[XmlEnum("gallery-images")]
-		GalleryImages,
-		[XmlEnum("include-code")]
-		IncludeCode,
-		[XmlEnum("include-md")]
-		IncludeMd,
-		[XmlEnum("gallery")]
-		IncludeImageGalleryBlock,
-		[XmlEnum("exercise")]
-		ExerciseBlock,
-		[XmlEnum("execirse")]
-		ExecirseBlock
-	}
+    [XmlType(IncludeInSchema = false)]
+    public enum BlockTypes
+    {
+        [XmlEnum("youtube")]
+        YouTube,
+        [XmlEnum("md")]
+        Md,
+        [XmlEnum("code")]
+        Code,
+        [XmlEnum("tex")]
+        Tex,
+        [XmlEnum("gallery-images")]
+        GalleryImages,
+        [XmlEnum("include-code")]
+        IncludeCode,
+        [XmlEnum("include-md")]
+        IncludeMd,
+        [XmlEnum("gallery")]
+        IncludeImageGalleryBlock,
+        [XmlEnum("exercise")]
+        SingleFileExerciseBlok,
+        [XmlEnum("execirse")]
+        SingleFileExerciseBlo,
+        [XmlEnum("single-file-exercise")]
+        SingleFileExerciseBlock,
+        [XmlEnum("proj-exercise")]
+        ProjectExerciseBlock
+    }
 
-	[XmlRoot("Lesson", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/lesson")]
+    [XmlRoot("Lesson", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/lesson")]
 	public class Lesson
 	{
 		[XmlElement("title")]
@@ -49,19 +53,20 @@ namespace uLearn.Model
 			set { DefaultInclideFile = value;  }
 		}
 
-		[XmlElement(typeof(YoutubeBlock))]
-		[XmlElement("md", typeof(MdBlock))]
-		[XmlElement(typeof(CodeBlock))]
-		[XmlElement(typeof(TexBlock))]
-		[XmlElement(typeof(ImageGaleryBlock))]
-		[XmlElement(typeof(IncludeCodeBlock))]
-		[XmlElement(typeof(IncludeMdBlock))]
-		[XmlElement(typeof(IncludeImageGalleryBlock))]
-		[XmlElement(typeof(ProjectExerciseBlock))]
-        [XmlElement("single-file-exercise", Type = typeof(SingleFileExerciseBlock))]
-		[XmlElement("execirse", typeof(SingleFileExerciseBlock))]
-		[XmlChoiceIdentifier("DefineBlockType")]
-		public SlideBlock[] Blocks;
+        [XmlElement(typeof(YoutubeBlock))]
+        [XmlElement("md", typeof(MdBlock))]
+        [XmlElement(typeof(CodeBlock))]
+        [XmlElement(typeof(TexBlock))]
+        [XmlElement(typeof(ImageGaleryBlock))]
+        [XmlElement(typeof(IncludeCodeBlock))]
+        [XmlElement(typeof(IncludeMdBlock))]
+        [XmlElement(typeof(IncludeImageGalleryBlock))]
+        [XmlElement(typeof(ProjectExerciseBlock))]
+        [XmlElement(typeof(SingleFileExerciseBlock))]
+        [XmlElement("exercise", typeof(SingleFileExerciseBlock))]
+        [XmlElement("execirse", typeof(SingleFileExerciseBlock))]
+        [XmlChoiceIdentifier("DefineBlockType")]
+        public SlideBlock[] Blocks;
 
 		[XmlIgnore]
 		public BlockTypes[] DefineBlockType;

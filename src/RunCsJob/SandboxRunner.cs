@@ -99,7 +99,7 @@ namespace RunCsJob
             Remove(dir.FullName);
 
             _result.Verdict = Verdict.Ok;
-//            _result.FillPassProgress();
+            _result.FillPassProgress();
 
             return _result;
         }

@@ -34,7 +34,7 @@
       <xs:element name="gallery" type="notEmptyString" />
       <xs:element name="include-blocks" type="Include" />
       <xs:element name="proj-exercise" type="ProjectExercise" />
-      <xs:element name="exercise" type="SingleFileExercise" />
+      <xs:element name="execirse" type="SingleFileExercise" />
       <xs:element name="single-file-exercise" type="SingleFileExercise" />
     </xs:choice>
   </xs:group>
