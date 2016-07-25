@@ -16,7 +16,7 @@ namespace RunCsJob
         private static readonly TimeSpan TimeLimit = TimeSpan.FromSeconds(TimeLimitInSeconds);
         private static readonly TimeSpan IdleTimeLimit = TimeSpan.FromSeconds(2 * TimeLimitInSeconds);
 
-        private const int MemoryLimit = 64 * 1024 * 1024;
+        private const int MemoryLimit = 256 * 1024 * 1024;
         private const int OutputLimit = 10 * 1024 * 1024;
 
         private bool _hasTimeLimit;
@@ -99,7 +99,7 @@ namespace RunCsJob
             Remove(dir.FullName);
 
             _result.Verdict = Verdict.Ok;
-//            _result.FillPassProgress();
+            _result.FillPassProgress();
 
             return _result;
         }

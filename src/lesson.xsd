@@ -142,6 +142,7 @@
           <xs:element name="csproj-file-path" type="notEmptyString" />
           <xs:element name="user-code-file-name" type="notEmptyString" />
           <xs:element name="exclude-path-for-checker" type="notEmptyString" minOccurs="0" maxOccurs="unbounded" />
+          
           <xs:element name="require-review" type="xs:boolean" minOccurs="0" maxOccurs="1" />
         </xs:sequence>
       </xs:extension>
