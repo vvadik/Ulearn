@@ -12,10 +12,10 @@ namespace RunCsJob
 	{
 		private const int OutputLimit = 10 * 1024 * 1024;
 
-		[TestCase(@"namespace Test { public class Program { static public void Main() { return ; } } }",
-			"", "", "",
-			TestName = "Public class and Main")]
-		[TestCase(@"using System; public class M{static public void Main(){Console.WriteLine(42);}}",
+        [TestCase(@"namespace Test { public class Program { static public void Main() { return ; } } }",
+            "", "", "",
+            TestName = "Public class and Main")]
+        [TestCase(@"using System; public class M{static public void Main(){Console.WriteLine(42);}}",
 			"", "42\r\n", "",
 			TestName = "Output")]
 		[TestCase(@"using System; public class M{static public void Main(){Console.WriteLine(4.2);}}",
@@ -94,10 +94,12 @@ namespace RunCsJob
 			TestName = "Method in sandboxer")]
 		[TestCase("using System; using System.Threading; using System.Linq; using System.Reflection; using System.Security; [SecurityCritical] class A { static void Main() { var assemblies = Thread.GetDomain().GetAssemblies(); var ass = assemblies.FirstOrDefault(assembly => assembly.ToString().Contains(\"CsSandbox\")); var type = ass.GetType(\"CsSandboxer.Sandboxer\", true, true); if(type == null) Console.WriteLine(\"lol\"); else type.InvokeMember(\"Secret\", BindingFlags.GetField, null, null, null);; }}",
 			TestName = "Field in sandboxer")]
-		public static void TestSecurityException(string code)
+        [TestCase("namespace Test { public class Program { static Program(){ System.IO.Directory.GetFiles(@\"c:\\\"); } static public void Main() { return ; } } }",
+            TestName = "static ctor")]
+        public static void TestSecurityException(string code)
 		{
 			var details = GetDetails(code, "");
-			Assert.AreEqual(Verdict.SecurityException, details.Verdict);
+            Assert.AreEqual(Verdict.SecurityException, details.Verdict);
 			Assert.IsNotNullOrEmpty(details.Error);
 		}
 
@@ -233,7 +235,7 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 				NeedRun = true
 			};
 
-			var result = new SandboxRunner(model).RunCSC();
+			var result = new SandboxRunner(model).RunCsc();
 			Assert.IsNotNull(result);
 			return result;
 		}

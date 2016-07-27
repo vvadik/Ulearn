@@ -28,7 +28,7 @@ namespace uLearn.Model.Blocks
 
 			if (DisplayLabels.Length == 0)
 			{
-				var content = context.FileSystem.GetContent(File);
+				var content = context.Dir.GetContent(File);
 				yield return new CodeBlock(content, LangId, LangVer);
 				yield break;
 			}

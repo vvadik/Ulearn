@@ -9,10 +9,10 @@ namespace CsSandboxer
 	public class Sandboxer : MarshalByRefObject
 	{
 
-		public void ExecuteUntrustedCode(MethodInfo entryPoint)
+		public void ExecuteUntrustedCode(MethodInfo entryPoint, object[] parameters = null)
 		{
-			(new PermissionSet(PermissionState.Unrestricted)).Assert();
-			var parameters = entryPoint.GetParameters().Length != 0 ? new object[] { new[] { "" } } : null;
+			new PermissionSet(PermissionState.Unrestricted).Assert();
+//			var parameters = entryPoint.GetParameters().Length != 0 ? new object[] { new[] { "" } } : null;
 			entryPoint.Invoke(null, parameters);
 
 			CodeAccessPermission.RevertAssert();

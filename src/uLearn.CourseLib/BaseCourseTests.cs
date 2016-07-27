@@ -134,7 +134,9 @@ namespace uLearn
                 exercise.ExerciseInitialCode,
                 slide.Info.Directory.FullName));
 
+            Console.WriteLine(result.Error);
             Assert.AreEqual(Verdict.Ok, result.Verdict);
+            
             Assert.AreNotEqual(1.0, result.Score);
         }
 
@@ -150,7 +152,7 @@ namespace uLearn
 
             var result = SandboxRunner.Run(exercise.CreateSubmition(
                 slide.Id.ToString(),
-                solution.SourceCode,
+                exercise.EthalonSolution,
                 slide.Info.Directory.FullName));
 
             var output = result.GetOutput().NormalizeEoln();

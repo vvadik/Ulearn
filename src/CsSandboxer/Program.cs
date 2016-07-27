@@ -13,103 +13,130 @@ using Newtonsoft.Json;
 
 namespace CsSandboxer
 {
-	static class Program
-	{
-		private static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
-		{
-			TypeNameHandling = TypeNameHandling.All
-		};
+    static class Program
+    {
+        private static readonly JsonSerializerSettings settings = new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.All
+        };
 
-		static void Main(string[] args)
-		{
-			Console.OutputEncoding = Encoding.UTF8;
-			SetErrorMode(ErrorModes.SEM_NOGPFAULTERRORBOX); // WinOnly StackOverflow handling fix
-			Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-//			Console.InputEncoding = Encoding.UTF8;
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = Encoding.UTF8;
+            SetErrorMode(ErrorModes.SEM_NOGPFAULTERRORBOX); // WinOnly StackOverflow handling fix
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            //			Console.InputEncoding = Encoding.UTF8;
+            var assemblyPath = args[0];
+            var id = args[1];
+            var className = "";
+            var methodName = "";
+            if (args.Length == 4)
+            {
+                className = args[2];
+                methodName = args[3];
+            }
+            Assembly assembly = null;
+            Sandboxer sandboxer = null;
 
-			var assemblyPath = args[0];
-			var id = args[1];
-			Assembly assembly = null;
-			Sandboxer sandboxer = null;
+            try
+            {
+                assembly = Assembly.LoadFrom(assemblyPath);
+                var domain = CreateDomain(id, assemblyPath);
+                sandboxer = CreateSandboxer(domain);
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex);
+            }
 
-			try
-			{
-				assembly = Assembly.LoadFile(assemblyPath);
-				var domain = CreateDomain(id, assemblyPath);
-				sandboxer = CreateSandboxer(domain);
-			}
-			catch (Exception ex)
-			{
-				HandleException(ex);
-			}
+            if (assembly == null || sandboxer == null)
+                Environment.Exit(1);
 
-			if (assembly == null || sandboxer == null)
-				Environment.Exit(1);
+            GC.Collect();
 
-			GC.Collect();
+            Console.Out.WriteLine("Ready");
+            var runCommand = Console.In.ReadLineAsync();
+            if (!runCommand.Wait(1000) || runCommand.Result != "Run")
+                Environment.Exit(1);
 
-			Console.Out.WriteLine("Ready");
-			var runCommand = Console.In.ReadLineAsync();
-			if (!runCommand.Wait(1000) || runCommand.Result != "Run")
-				Environment.Exit(1);
+            try
+            {
+                var entryMethod = string.IsNullOrEmpty(className) ?
+                    assembly.EntryPoint :
+                    Assembly.GetExecutingAssembly()
+                        .GetType("CsSandboxer.Program")
+                        .GetMethod("GetCustomEntryPoint", BindingFlags.NonPublic | BindingFlags.Static);
+                var parameters = string.IsNullOrEmpty(className) ?
+                    null :
+                    new object[] { assembly, className, methodName };
 
-			try
-			{
-				sandboxer.ExecuteUntrustedCode(assembly.EntryPoint);
-			}
-			catch (Exception ex)
-			{
-				HandleException(ex);
-			}
-		}
+                sandboxer.ExecuteUntrustedCode(entryMethod, parameters);
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex);
+            }
+        }
 
-		private static void HandleException(Exception ex)
-		{
-			Console.Error.WriteLine();
-			Console.Error.Write(JsonConvert.SerializeObject(ex, Settings));
-			Console.Error.Close();
-			Environment.Exit(1);
-		}
+        private static void GetCustomEntryPoint(Assembly assembly, string className, string methodName)
+        {
+            //Todo мб при апкасте сборка выгружается
+            var method = assembly
+                .GetTypes()
+                .Single(t => t.Name == className || t.FullName == className)
+                .GetMethod(methodName);
 
-		private static AppDomain CreateDomain(string id, string assemblyPath)
-		{
-			var permSet = new PermissionSet(PermissionState.None);
-			permSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.Execution));
-			var evidence = new Evidence();
-			evidence.AddHostEvidence(new Zone(SecurityZone.Untrusted));
-			var fullTrustAssembly = typeof(Sandboxer).Assembly.Evidence.GetHostEvidence<StrongName>();
+            var parameters = method.GetParameters().Length != 0 ? new object[] { new[] { "" } } : null;
+            method.Invoke(null, parameters);
+        }
 
-			var adSetup = new AppDomainSetup
-			{
-				ApplicationBase = Path.GetDirectoryName(assemblyPath),
-			};
+        private static void HandleException(Exception ex)
+        {
+            Console.Error.WriteLine();
+            Console.Error.Write(JsonConvert.SerializeObject(ex, settings));
+            Console.Error.Close();
+            Environment.Exit(1);
+        }
 
-			var domain = AppDomain.CreateDomain(id, evidence, adSetup, permSet, fullTrustAssembly);
-			return domain;
-		}
+        private static AppDomain CreateDomain(string id, string assemblyPath)
+        {
+            var permSet = new PermissionSet(PermissionState.None);
+            permSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.Execution));
+            var evidence = new Evidence();
+            evidence.AddHostEvidence(new Zone(SecurityZone.Untrusted));
+            var fullTrustAssembly = typeof(Sandboxer).Assembly.Evidence.GetHostEvidence<StrongName>();
 
-		private static Sandboxer CreateSandboxer(AppDomain domain)
-		{
-			var handle = Activator.CreateInstanceFrom(
-				domain,
-				typeof(Sandboxer).Assembly.ManifestModule.FullyQualifiedName,
-				typeof(Sandboxer).FullName
-				);
-			var sandboxer = (Sandboxer)handle.Unwrap();
-			return sandboxer;
-		}
+            var adSetup = new AppDomainSetup
+            {
+                ApplicationBase = Path.GetDirectoryName(assemblyPath),
+            };
 
-		[DllImport("kernel32.dll")]
-		static extern ErrorModes SetErrorMode(ErrorModes uMode);
+            var domain = AppDomain.CreateDomain(id, evidence, adSetup, permSet, fullTrustAssembly);
+            return domain;
+        }
 
-		[Flags]
-		private enum ErrorModes : uint
-		{
-			SYSTEM_DEFAULT = 0x0,
-			SEM_FAILCRITICALERRORS = 0x0001,
-			SEM_NOALIGNMENTFAULTEXCEPT = 0x0004,
-			SEM_NOGPFAULTERRORBOX = 0x0002,
-			SEM_NOOPENFILEERRORBOX = 0x8000
-		}
-	}
+        private static Sandboxer CreateSandboxer(AppDomain domain)
+        {
+            var handle = Activator.CreateInstanceFrom(
+                domain,
+                typeof(Sandboxer).Assembly.ManifestModule.FullyQualifiedName,
+                typeof(Sandboxer).FullName
+                );
+            var sandboxer = (Sandboxer)handle.Unwrap();
+            return sandboxer;
+        }
+
+        [DllImport("kernel32.dll")]
+        static extern ErrorModes SetErrorMode(ErrorModes uMode);
+
+        [Flags]
+        private enum ErrorModes : uint
+        {
+            SYSTEM_DEFAULT = 0x0,
+            SEM_FAILCRITICALERRORS = 0x0001,
+            SEM_NOALIGNMENTFAULTEXCEPT = 0x0004,
+            SEM_NOGPFAULTERRORBOX = 0x0002,
+            SEM_NOOPENFILEERRORBOX = 0x8000
+        }
+    }
 }

@@ -29,13 +29,13 @@ namespace uLearn.Model.Blocks
                     PreludeFile = Path.Combine("..", PreludeFile);
             }
 
-            var code = context.FileSystem.GetContent(File);
+            var code = context.Dir.GetContent(File);
             var regionRemover = new RegionRemover(LangId);
             var extractor = context.GetExtractor(File, LangId, code);
 
             var prelude = "";
             if (PreludeFile != null)
-                prelude = context.FileSystem.GetContent(PreludeFile);
+                prelude = context.Dir.GetContent(PreludeFile);
 
             var exerciseCode = regionRemover.Prepare(code);
             IEnumerable<Label> notRemoved;

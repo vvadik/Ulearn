@@ -111,7 +111,7 @@
     <Compile Include="CSharp\ExerciseBuilder.cs" />
     <Compile Include="CSharp\BlocksBuilder.cs" />
     <Compile Include="CSharp\ExerciseAttribute.cs" />
-    <Compile Include="FileSystem.cs" />
+    <Compile Include="DirectoryExtensions.cs" />
     <Compile Include="CSharp\NamingCaseStyleValidator.cs" />
     <Compile Include="CSharp\RedundantIfStyleValidator.cs" />
     <Compile Include="CSharp\CsMembersRemover.cs" />
@@ -162,6 +162,7 @@
     <Compile Include="Markdown2.cs" />
     <Compile Include="NullValidator.cs" />
     <Compile Include="ObjectExtensions.cs" />
+    <Compile Include="ProjModifier.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -195,8 +196,9 @@
     <Compile Include="TexReplacer.cs" />
     <Compile Include="Urls.cs" />
     <Compile Include="Utils.cs" />
-    <Compile Include="ValidatorExtention.cs" />
+    <Compile Include="ValidatorExtension.cs" />
     <Compile Include="ValidatorsRepository.cs" />
+    <Compile Include="ZipExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CSharp\README.md" />

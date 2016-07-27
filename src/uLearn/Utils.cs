@@ -17,35 +17,6 @@ namespace uLearn
                     .SourceCode;
         }
 
-        public static byte[] GetZipFileBytes(ProjectExerciseBlock exercise, string code, string slideFolderPath)
-        {
-            // для студ части
-            //var proj = new Project(exercise.CSProjFilePath);
-            //var types = new[] { "EmbeddedResource", "Compile", "None" };
-            //var includes = proj.Items
-            //    .Where(pItem => types.Contains(pItem.ItemType))
-            //    .Select(pItem => pItem.EvaluatedInclude)
-            //    .ToList();
-
-            using (var zip = new ZipFile())
-            {
-                var path = Path.Combine(slideFolderPath, Path.GetDirectoryName(exercise.CsProjFilePath));
-                var dir = Directory.Exists(path);
-                zip.AddDirectory(path);
-                zip.UpdateEntry(exercise.UserCodeFileName, code);
-                foreach (var pathToExclude in exercise.PathsToExcludeForChecker ?? new string[0])
-                {
-                    zip.RemoveSelectedEntries(pathToExclude);
-                }
-                using (var ms = new MemoryStream())
-                {
-                    zip.Save(ms);
-                    return ms.ToArray();
-                }
-            }
-        }
-
-
         public static string NewNormalizedGuid()
         {
             return Guid.NewGuid().ToString("D");

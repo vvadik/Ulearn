@@ -2,7 +2,7 @@
 
 namespace RunCsJob.Api
 {
-    public static class EnumerableExtention
+    public static class EnumerableExtensions
     {
         public static IEnumerable<T> DropLast<T>(this IEnumerable<T> source)
         {

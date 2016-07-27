@@ -1,6 +1,5 @@
 ﻿using System;
 using System.CodeDom.Compiler;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Security;
@@ -9,7 +8,7 @@ using RunCsJob.Api;
 
 namespace RunCsJob
 {
-	internal static class RunningResultsExtention
+	internal static class RunningResultsExtensions
 	{
 		public static void AddCompilationInfo(this RunningResults results, CompilerResults assembly)
 		{
@@ -60,6 +59,12 @@ namespace RunCsJob
 		}
 
 		private static void HandleInnerException(ref RunningResults results, MemberAccessException ex)
+		{
+			results.Verdict = Verdict.SecurityException;
+			results.Error = ex.ToString();
+		}
+
+        private static void HandleInnerException(ref RunningResults results, TypeInitializationException ex)
 		{
 			results.Verdict = Verdict.SecurityException;
 			results.Error = ex.ToString();

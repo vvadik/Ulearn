@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Xml.Serialization;
-using Ionic.Zip;
 using RunCsJob.Api;
 
 namespace uLearn.Model.Blocks
@@ -19,13 +20,30 @@ namespace uLearn.Model.Blocks
         [XmlElement("exclude-path-for-checker")]
         public string[] PathsToExcludeForChecker { get; set; }
 
+        [XmlElement("exclude-path-for-student")]
+        public string[] PathsToExcludeForStudent { get; set; }
+
         [XmlElement("require-review")]
         public bool RequireReview { get; set; }
+
+        private string ExerciseDir => Path.GetDirectoryName(CsProjFilePath).EnsureNotNull("csproj должен быть в поддиректории");
 
         public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
         {
             FillProperties(context);
             ValidatorName = string.Join(" ", LangId, ValidatorName);
+            var directoryName = Path.Combine(context.Dir.FullName, ExerciseDir);
+            var excluded = (PathsToExcludeForStudent ?? new string[0]).Concat(new[] { "checker/", "bin/", "obj/" });
+            var csprojFileName = Path.GetFileName(CsProjFilePath);
+            var zipData = context.Dir.GetSubdir(ExerciseDir).ZipTo(excluded, new[]
+            {
+                new ZipUpdateData
+                {
+                    Path = csprojFileName,
+                    Data = ProjModifier.ModifyCsProj(context.Dir.GetBytes(CsProjFilePath))
+                }
+            });
+            System.IO.File.WriteAllBytes(directoryName + ".zip", zipData);
             yield return this;
         }
 
@@ -45,30 +63,23 @@ namespace uLearn.Model.Blocks
             return new ProjRunnerSubmition
             {
                 Id = submitionId,
-                ZipFileData = GetZipFileBytes(code, slideFolderPath),
+                ZipFileData = GetZipBytesForChecker(code, slideFolderPath),
                 ProjectFileName = CsProjFilePath,
                 Input = "",
                 NeedRun = true
-            }; ;
+            };
+            ;
         }
 
-        private byte[] GetZipFileBytes(string code, string slideFolderPath)
+        private byte[] GetZipBytesForChecker(string code, string slideFolderPath)
         {
-            using (var zip = new ZipFile())
-            {
-                var path = Path.Combine(slideFolderPath, Path.GetDirectoryName(CsProjFilePath));
-                zip.AddDirectory(path);
-                zip.UpdateEntry(UserCodeFileName, code);
-                foreach (var pathToExclude in PathsToExcludeForChecker ?? new string[0])
+            var directoryName = Path.Combine(slideFolderPath, ExerciseDir);
+            var excluded = (PathsToExcludeForChecker ?? new string[0]).Concat(new[] { "bin/", "obj/" });
+            return new DirectoryInfo(directoryName).ZipTo(excluded,
+                new[]
                 {
-                    zip.RemoveSelectedEntries(pathToExclude);
-                }
-                using (var ms = new MemoryStream())
-                {
-                    zip.Save(ms);
-                    return ms.ToArray();
-                }
-            }
+                    new ZipUpdateData { Path = UserCodeFileName, Data = Encoding.UTF8.GetBytes(code) }
+                });
         }
     }
 }

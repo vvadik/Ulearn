@@ -16,7 +16,7 @@ namespace RunCsJob
         private static readonly TimeSpan TimeLimit = TimeSpan.FromSeconds(TimeLimitInSeconds);
         private static readonly TimeSpan IdleTimeLimit = TimeSpan.FromSeconds(2 * TimeLimitInSeconds);
 
-        private const int MemoryLimit = 256 * 1024 * 1024;
+        private const int MemoryLimit = 64 * 1024 * 1024;
         private const int OutputLimit = 10 * 1024 * 1024;
 
         private bool _hasTimeLimit;
@@ -49,7 +49,7 @@ namespace RunCsJob
             }
             try
             {
-                return new SandboxRunner(submition).RunCSC();
+                return new SandboxRunner(submition).RunCsc();
             }
             catch (Exception ex)
             {
@@ -87,6 +87,8 @@ namespace RunCsJob
         {
             var builder = new MsBuildRunner();
             var builderResult = builder.BuildProject((ProjRunnerSubmition)submition, dir);
+            _result.Verdict = Verdict.Ok;
+
             if (!builderResult.Success)
             {
                 _result.Verdict = Verdict.CompilationError;
@@ -94,17 +96,17 @@ namespace RunCsJob
                 Remove(dir.FullName);
                 return _result;
             }
-            RunSandboxer(string.Format("\"{0}\" {1}", builderResult.PathToExe, submition.Id));
+            RunSandboxer(string.Format("\"{0}\" {1} {2}", builderResult.PathToExe, submition.Id, "CheckerRunner Run"));
 
             Remove(dir.FullName);
 
-            _result.Verdict = Verdict.Ok;
-            _result.FillPassProgress();
+            if(_result.Verdict == Verdict.Ok)
+                _result.FillPassProgress();
 
             return _result;
         }
 
-        public RunningResults RunCSC()
+        public RunningResults RunCsc()
         {
             var assemblyCreator = new AssemblyCreator();
             var assembly = assemblyCreator.CreateAssembly((FileRunnerSubmition)submition);
@@ -146,6 +148,7 @@ namespace RunCsJob
 
         private void RunSandboxer(string args)
         {
+            Console.WriteLine(args);
             var startInfo = new ProcessStartInfo(
                 "CsSandboxer.exe", args)
             {

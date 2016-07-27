@@ -1,6 +1,6 @@
 ﻿namespace uLearn
 {
-    internal static class ValidatorExtention
+    internal static class ValidatorExtension
     {
         public static SolutionBuildResult ValidateSolution(this ISolutionValidator validator, string code)
         {

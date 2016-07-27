@@ -75,7 +75,7 @@
     <Compile Include="MsBuildRunner.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="SandboxRunner.cs" />
-    <Compile Include="RunningResultsExtention.cs" />
+    <Compile Include="RunningResultsExtensions.cs" />
     <Compile Include="HttpClientExtensions.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="RunCsJobProgram.cs" />

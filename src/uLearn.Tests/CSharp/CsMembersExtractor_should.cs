@@ -9,11 +9,11 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class CsMembersExtractor_should
 	{
-		private readonly FileSystem fs = new FileSystem(new DirectoryInfo("tests"));
+		private readonly DirectoryInfo dir = new DirectoryInfo("tests");
 
 		private string GetRegion(string region, bool onlyBody = false, string fileName = "OverloadedMethods.cs")
 		{
-			var code = fs.GetContent(fileName).LineEndingsToUnixStyle();
+			var code = dir.GetContent(fileName).LineEndingsToUnixStyle();
 			var extractor = new CsMembersExtractor(code);
 			return extractor.GetRegion(new Label
 			{

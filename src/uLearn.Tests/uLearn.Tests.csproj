@@ -49,6 +49,9 @@
       <HintPath>..\packages\FluentAssertions.4.9.1\lib\net45\FluentAssertions.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\packages\DotNetZip.1.9.3\lib\net20\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="MarkdownDeep, Version=1.5.5383.24027, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\External\MarkdownDeep\MarkdownDeep.dll</HintPath>
@@ -86,6 +89,9 @@
     <Compile Include="Lesson_ShouldDeserialize.cs" />
     <Compile Include="Quizes\CourseLoader_should.cs" />
     <Compile Include="SpellChecking_Tests.cs" />
+    <Compile Include="tests\stub\_HelloWorld.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="Utilities\LessonToXmlConvertor.cs" />
     <Compile Include="CSharp\CsMembersExtractor_should.cs" />
     <Compile Include="CSharp\CsMembersRemover_should.cs" />
@@ -160,11 +166,19 @@
     <Compile Include="tests\WrongIdentationOfEmptyLines.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="ZipTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="tests\regions.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="toZip\notForRemove.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="toZip\toRemove\r1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="toZip\toRemove\toRemove1\r2.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\" />
