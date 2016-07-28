@@ -28,19 +28,21 @@ namespace uLearn.Model.Blocks
 
         private string ExerciseDir => Path.GetDirectoryName(CsProjFilePath).EnsureNotNull("csproj должен быть в поддиректории");
 
+        private string CsprojFileName => Path.GetFileName(CsProjFilePath);
+
         public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
         {
             FillProperties(context);
             ValidatorName = string.Join(" ", LangId, ValidatorName);
             var directoryName = Path.Combine(context.Dir.FullName, ExerciseDir);
             var excluded = (PathsToExcludeForStudent ?? new string[0]).Concat(new[] { "checker/", "bin/", "obj/" });
-            var csprojFileName = Path.GetFileName(CsProjFilePath);
+            var csprojFileName = CsprojFileName;
             var zipData = context.Dir.GetSubdir(ExerciseDir).ZipTo(excluded, new[]
             {
                 new ZipUpdateData
                 {
                     Path = csprojFileName,
-                    Data = ProjModifier.ModifyCsProj(context.Dir.GetBytes(CsProjFilePath))
+                    Data = ProjModifier.ModifyCsproj(context.Dir.GetBytes(CsProjFilePath), ProjModifier.RemoveCheckingFromCsproj)
                 }
             });
             System.IO.File.WriteAllBytes(directoryName + ".zip", zipData);
@@ -68,17 +70,18 @@ namespace uLearn.Model.Blocks
                 Input = "",
                 NeedRun = true
             };
-            ;
         }
 
         private byte[] GetZipBytesForChecker(string code, string slideFolderPath)
         {
             var directoryName = Path.Combine(slideFolderPath, ExerciseDir);
             var excluded = (PathsToExcludeForChecker ?? new string[0]).Concat(new[] { "bin/", "obj/" });
-            return new DirectoryInfo(directoryName).ZipTo(excluded,
+            var exerciseDir = new DirectoryInfo(directoryName);
+            return exerciseDir.ZipTo(excluded,
                 new[]
                 {
-                    new ZipUpdateData { Path = UserCodeFileName, Data = Encoding.UTF8.GetBytes(code) }
+                    new ZipUpdateData { Path = CsprojFileName, Data = Encoding.UTF8.GetBytes(code) },
+                    new ZipUpdateData { Path = CsprojFileName, Data = ProjModifier.ModifyCsproj(exerciseDir.GetBytes(CsprojFileName), ProjModifier.ChangeEntryPointToCheckingCheckerMain) }
                 });
         }
     }

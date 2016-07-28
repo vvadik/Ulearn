@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
@@ -8,15 +9,25 @@ namespace uLearn
 {
     public class ProjModifier
     {
-        public static byte[] ModifyCsProj(byte[] content)
+        public static void RemoveCheckingFromCsproj(Project proj)
+        {
+            var toRemove = proj.Items.Where(pItem => pItem.EvaluatedInclude.StartsWith("checking" + Path.DirectorySeparatorChar)).ToList();
+            foreach (var pItem in toRemove)
+                proj.RemoveItem(pItem);
+        }
+
+        public static void ChangeEntryPointToCheckingCheckerMain(Project proj)
+        {
+            proj.SetProperty("StartupObject", "checking.CheckerRunner");
+        }
+
+        public static byte[] ModifyCsproj(byte[] content, Action<Project> changingAction)
         {
             using (var inputMs = new MemoryStream(content))
             {
                 var reader = XmlReader.Create(inputMs);
                 var proj = new Project(reader);
-                var toRemove = proj.Items.Where(pItem => pItem.EvaluatedInclude.StartsWith("checker" + Path.DirectorySeparatorChar)).ToList(); //TODO
-                foreach (var pItem in toRemove)
-                    proj.RemoveItem(pItem);
+                changingAction.Invoke(proj);
                 using (var memoryStream = new MemoryStream())
                 using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
                 {

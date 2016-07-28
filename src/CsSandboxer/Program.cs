@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -28,13 +27,6 @@ namespace CsSandboxer
             //			Console.InputEncoding = Encoding.UTF8;
             var assemblyPath = args[0];
             var id = args[1];
-            var className = "";
-            var methodName = "";
-            if (args.Length == 4)
-            {
-                className = args[2];
-                methodName = args[3];
-            }
             Assembly assembly = null;
             Sandboxer sandboxer = null;
 
@@ -61,33 +53,12 @@ namespace CsSandboxer
 
             try
             {
-                var entryMethod = string.IsNullOrEmpty(className) ?
-                    assembly.EntryPoint :
-                    Assembly.GetExecutingAssembly()
-                        .GetType("CsSandboxer.Program")
-                        .GetMethod("GetCustomEntryPoint", BindingFlags.NonPublic | BindingFlags.Static);
-                var parameters = string.IsNullOrEmpty(className) ?
-                    null :
-                    new object[] { assembly, className, methodName };
-
-                sandboxer.ExecuteUntrustedCode(entryMethod, parameters);
+                sandboxer.ExecuteUntrustedCode(assembly.EntryPoint);
             }
             catch (Exception ex)
             {
                 HandleException(ex);
             }
-        }
-
-        private static void GetCustomEntryPoint(Assembly assembly, string className, string methodName)
-        {
-            //Todo мб при апкасте сборка выгружается
-            var method = assembly
-                .GetTypes()
-                .Single(t => t.Name == className || t.FullName == className)
-                .GetMethod(methodName);
-
-            var parameters = method.GetParameters().Length != 0 ? new object[] { new[] { "" } } : null;
-            method.Invoke(null, parameters);
         }
 
         private static void HandleException(Exception ex)
@@ -140,3 +111,4 @@ namespace CsSandboxer
         }
     }
 }
+

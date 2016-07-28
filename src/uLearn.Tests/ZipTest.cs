@@ -14,7 +14,7 @@ namespace uLearn
             using (var zip = new ZipFile())
             {
                 zip.AddDirectory(dir.FullName);
-                zip.RemoveDirectory("toRemove");
+                zip.RemoveDirectory("toRemove/");
                 Assert.That(zip.Entries.Count, Is.EqualTo(1));
             }
         }

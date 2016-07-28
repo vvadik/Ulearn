@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 using Newtonsoft.Json;
 using Ionic.Zip;
 using RunCsJob.Api;
@@ -35,7 +36,7 @@ namespace RunCsJob
 
                 try
                 {
-                    return new SandboxRunner(submition).RunMSBuild(tempProjectDir);
+                    return new SandboxRunner(submition).RunMsBuild(tempProjectDir);
                 }
                 catch (Exception ex)
                 {
@@ -83,7 +84,7 @@ namespace RunCsJob
             _result.Id = submition.Id;
         }
 
-        public RunningResults RunMSBuild(DirectoryInfo dir)
+        public RunningResults RunMsBuild(DirectoryInfo dir)
         {
             var builder = new MsBuildRunner();
             var builderResult = builder.BuildProject((ProjRunnerSubmition)submition, dir);
@@ -96,11 +97,13 @@ namespace RunCsJob
                 Remove(dir.FullName);
                 return _result;
             }
-            RunSandboxer(string.Format("\"{0}\" {1} {2}", builderResult.PathToExe, submition.Id, "CheckerRunner Run"));
 
+            RunSandboxer(string.Format("\"{0}\" {1}", builderResult.PathToExe, submition.Id));
+
+            Thread.Sleep(1000);
             Remove(dir.FullName);
 
-            if(_result.Verdict == Verdict.Ok)
+            if (_result.Verdict == Verdict.Ok)
                 _result.FillPassProgress();
 
             return _result;
@@ -148,7 +151,6 @@ namespace RunCsJob
 
         private void RunSandboxer(string args)
         {
-            Console.WriteLine(args);
             var startInfo = new ProcessStartInfo(
                 "CsSandboxer.exe", args)
             {
