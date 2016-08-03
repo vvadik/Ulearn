@@ -70,7 +70,7 @@ namespace uLearn.Model.Blocks
             return new SolutionBuilder(IndexToInsertSolution, ExerciseCode, ValidatorName).BuildSolution(code);
         }
 
-        public override RunnerSubmition CreateSubmition(string submitionId, string code, string slideFolderPath)
+        public override RunnerSubmition CreateSubmition(string submitionId, string code)
         {
             return new FileRunnerSubmition
             {

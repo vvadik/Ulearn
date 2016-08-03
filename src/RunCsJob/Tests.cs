@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Threading;
 using NUnit.Framework;
 using RunCsJob.Api;
@@ -8,7 +9,7 @@ using uLearn;
 
 namespace RunCsJob
 {
-    internal static class Tests
+    internal static class RunCscTests
     {
         private const int OutputLimit = 10 * 1024 * 1024;
 
@@ -241,4 +242,17 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
             return result;
         }
     }
+
+	[TestFixture]
+	public class RunMsBuildTests
+	{
+		[Test]
+		public void SimpleProjTest()
+		{
+			var dir = new DirectoryInfo(@"..\..\testProj");
+			var buildingResult = new MsBuildRunner().BuildProject("TestProj.csproj", dir);
+			Assert.That(buildingResult.Success, Is.True);
+			Assert.That(buildingResult.ErrorMessage, Is.Null);
+		}
+	}
 }

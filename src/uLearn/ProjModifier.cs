@@ -12,8 +12,7 @@ namespace uLearn
         public static void RemoveCheckingFromCsproj(Project proj)
         {
             var toRemove = proj.Items.Where(pItem => pItem.EvaluatedInclude.StartsWith("checking" + Path.DirectorySeparatorChar)).ToList();
-            foreach (var pItem in toRemove)
-                proj.RemoveItem(pItem);
+            proj.RemoveItems(toRemove);
         }
 
         public static void ChangeEntryPointToCheckingCheckerMain(Project proj)
@@ -27,7 +26,7 @@ namespace uLearn
             {
                 var reader = XmlReader.Create(inputMs);
                 var proj = new Project(reader);
-                changingAction.Invoke(proj);
+	            changingAction(proj);
                 using (var memoryStream = new MemoryStream())
                 using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
                 {

@@ -27,7 +27,7 @@ namespace uLearn.Model.Blocks
         [XmlElement("validator")]
         public string ValidatorName { get; set; }
 
-        [XmlElement("dont-show-solutions")]
+        [XmlElement("hide-solutions")]
         public bool HideShowSolutionsButton { get; set; }
 
         public List<string> HintsMd
@@ -40,7 +40,7 @@ namespace uLearn.Model.Blocks
 
         public abstract SolutionBuildResult BuildSolution(string code);
 
-        public abstract RunnerSubmition CreateSubmition(string submitionId, string code, string slideFolderPath);
+        public abstract RunnerSubmition CreateSubmition(string submitionId, string code);
 
         #region equals
 

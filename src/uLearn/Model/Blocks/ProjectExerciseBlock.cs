@@ -30,16 +30,19 @@ namespace uLearn.Model.Blocks
 
         private string CsprojFileName => Path.GetFileName(CsProjFilePath);
 
-        public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
+	    public string SlideFolderPath { get; set; }
+
+	    public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
         {
             FillProperties(context);
             ValidatorName = string.Join(" ", LangId, ValidatorName);
-            var directoryName = Path.Combine(context.Dir.FullName, ExerciseDir);
-            var excluded = (PathsToExcludeForStudent ?? new string[0]).Concat(new[] { "checker/", "bin/", "obj/" });
+		    SlideFolderPath = context.Dir.FullName;
+            var directoryName = Path.Combine(SlideFolderPath, ExerciseDir);
+            var excluded = (PathsToExcludeForStudent ?? new string[0]).Concat(new[] { "checking/*", "bin/*", "obj/*" }).ToList();
             var csprojFileName = CsprojFileName;
-            var zipData = context.Dir.GetSubdir(ExerciseDir).ZipTo(excluded, new[]
+            var zipData = context.Dir.GetSubdir(ExerciseDir).ToZip(excluded, new[]
             {
-                new ZipUpdateData
+                new FileContent
                 {
                     Path = csprojFileName,
                     Data = ProjModifier.ModifyCsproj(context.Dir.GetBytes(CsProjFilePath), ProjModifier.RemoveCheckingFromCsproj)
@@ -60,28 +63,28 @@ namespace uLearn.Model.Blocks
             return validator.ValidateSolution(code);
         }
 
-        public override RunnerSubmition CreateSubmition(string submitionId, string code, string slideFolderPath)
+        public override RunnerSubmition CreateSubmition(string submitionId, string code)
         {
             return new ProjRunnerSubmition
             {
                 Id = submitionId,
-                ZipFileData = GetZipBytesForChecker(code, slideFolderPath),
-                ProjectFileName = CsProjFilePath,
+                ZipFileData = GetZipBytesForChecker(code),
+                ProjectFileName = CsprojFileName,
                 Input = "",
                 NeedRun = true
             };
         }
 
-        private byte[] GetZipBytesForChecker(string code, string slideFolderPath)
+        private byte[] GetZipBytesForChecker(string code)
         {
-            var directoryName = Path.Combine(slideFolderPath, ExerciseDir);
-            var excluded = (PathsToExcludeForChecker ?? new string[0]).Concat(new[] { "bin/", "obj/" });
+            var directoryName = Path.Combine(SlideFolderPath, ExerciseDir);
+            var excluded = (PathsToExcludeForChecker ?? new string[0]).Concat(new[] { "bin/*", "obj/*" }).ToList();
             var exerciseDir = new DirectoryInfo(directoryName);
-            return exerciseDir.ZipTo(excluded,
+            return exerciseDir.ToZip(excluded,
                 new[]
                 {
-                    new ZipUpdateData { Path = CsprojFileName, Data = Encoding.UTF8.GetBytes(code) },
-                    new ZipUpdateData { Path = CsprojFileName, Data = ProjModifier.ModifyCsproj(exerciseDir.GetBytes(CsprojFileName), ProjModifier.ChangeEntryPointToCheckingCheckerMain) }
+                    new FileContent { Path = UserCodeFileName, Data = Encoding.UTF8.GetBytes(code) },
+                    new FileContent { Path = CsprojFileName, Data = ProjModifier.ModifyCsproj(exerciseDir.GetBytes(CsprojFileName), ProjModifier.ChangeEntryPointToCheckingCheckerMain) }
                 });
         }
     }

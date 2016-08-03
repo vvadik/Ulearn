@@ -44,8 +44,7 @@ namespace uLearn.Web.Controllers
                 .GetSlideById(details.SlideId);
             return exerciseSlide.Exercise.CreateSubmition(
                 details.Id.ToString(),
-                details.SolutionCode.Text,
-                exerciseSlide.Info.Directory.FullName);
+                details.SolutionCode.Text);
         }
 
         [HttpPost]

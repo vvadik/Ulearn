@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using FluentAssertions;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using RunCsJob.Api;
@@ -7,7 +8,7 @@ using uLearn;
 namespace RunCsJob
 {
     [TestFixture]
-    public class Json_Test
+    public class SubmitionSerialization_Test
     {
         [Test]
         public void Test_Serialization_and_Deserialization()
@@ -32,9 +33,7 @@ namespace RunCsJob
             };
             var json = JsonConvert.SerializeObject(inputList, JsonConfig.GetSettings());
             var deserializedList = JsonConvert.DeserializeObject<List<RunnerSubmition>>(json, JsonConfig.GetSettings());
-            Assert.That(deserializedList.Count, Is.EqualTo(inputList.Count));
-            for (var i = 0; i < inputList.Count; i++)
-                Assert.That(deserializedList[i].GetType(), Is.EqualTo(inputList[i].GetType()));
+			deserializedList.ShouldAllBeEquivalentTo(inputList);
         }
 
         [Test]

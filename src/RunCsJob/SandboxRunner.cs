@@ -2,326 +2,317 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Threading;
 using Newtonsoft.Json;
-using Ionic.Zip;
 using RunCsJob.Api;
+using uLearn;
 
 namespace RunCsJob
 {
-    public class SandboxRunner
-    {
-        private readonly RunnerSubmition submition;
+	public class SandboxRunner
+	{
+		private readonly RunnerSubmition submition;
 
-        private const int TimeLimitInSeconds = 10;
-        private static readonly TimeSpan TimeLimit = TimeSpan.FromSeconds(TimeLimitInSeconds);
-        private static readonly TimeSpan IdleTimeLimit = TimeSpan.FromSeconds(2 * TimeLimitInSeconds);
+		private const int timeLimitInSeconds = 10;
+		private static readonly TimeSpan timeLimit = TimeSpan.FromSeconds(timeLimitInSeconds);
+		private static readonly TimeSpan idleTimeLimit = TimeSpan.FromSeconds(2 * timeLimitInSeconds);
 
-        private const int MemoryLimit = 64 * 1024 * 1024;
-        private const int OutputLimit = 10 * 1024 * 1024;
+		private const int memoryLimit = 64 * 1024 * 1024;
+		private const int outputLimit = 10 * 1024 * 1024;
 
-        private bool _hasTimeLimit;
-        private bool _hasMemoryLimit;
-        private bool _hasOutputLimit;
+		private bool hasTimeLimit;
+		private bool hasMemoryLimit;
+		private bool hasOutputLimit;
 
-        private readonly RunningResults _result = new RunningResults();
+		private readonly RunningResults result = new RunningResults();
 
-        public static RunningResults Run(RunnerSubmition submition)
-        {
-            var runnerSubmition = submition as ProjRunnerSubmition;
-            if (runnerSubmition != null)
-            {
-                var projSubmition = runnerSubmition;
-                var tempProjectDir = UnpackZip(projSubmition);
+		public static RunningResults Run(RunnerSubmition submition)
+		{
+			try
+			{
+				if (submition is ProjRunnerSubmition)
+					return new SandboxRunner(submition).RunMsBuild();
+				return new SandboxRunner(submition).RunCsc();
+			}
+			catch (Exception ex)
+			{
+				return new RunningResults
+				{
+					Id = submition.Id,
+					Verdict = Verdict.SandboxError,
+					Error = ex.ToString()
+				};
+			}
+		}
 
-                try
-                {
-                    return new SandboxRunner(submition).RunMsBuild(tempProjectDir);
-                }
-                catch (Exception ex)
-                {
-                    return new RunningResults
-                    {
-                        Id = runnerSubmition.Id,
-                        Verdict = Verdict.SandboxError,
-                        Error = ex.ToString()
-                    };
-                }
-            }
-            try
-            {
-                return new SandboxRunner(submition).RunCsc();
-            }
-            catch (Exception ex)
-            {
-                return new RunningResults
-                {
-                    Id = submition.Id,
-                    Verdict = Verdict.SandboxError,
-                    Error = ex.ToString()
-                };
-            }
-        }
+		public SandboxRunner(RunnerSubmition submition)
+		{
+			this.submition = submition;
+			result.Id = submition.Id;
+		}
 
-        private static DirectoryInfo UnpackZip(ProjRunnerSubmition submition)
-        {
-            var pathName = Path.Combine(".", submition.Id);
-            using (var ms = new MemoryStream(submition.ZipFileData))
-            {
-                using (var zip = ZipFile.Read(ms))
-                {
-                    var dir = Directory.CreateDirectory(pathName);
-                    foreach (var file in zip)
-                        file.Extract(pathName, ExtractExistingFileAction.OverwriteSilently);
-                    return dir;
-                }
-            }
-        }
+		public RunningResults RunMsBuild()
+		{
+			var projSubmition = (ProjRunnerSubmition)submition;
+			var dir = Directory.CreateDirectory(Path.Combine(".", submition.Id));
+			try
+			{
+				Utils.UnpackZip(projSubmition.ZipFileData, dir.FullName);
+			}
+			catch (Exception ex)
+			{
+				SafeRemoveDirectory(dir.FullName);
+				return new RunningResults
+				{
+					Id = submition.Id,
+					Verdict = Verdict.SandboxError,
+					Error = ex.ToString()
+				};
+			}
 
-        public SandboxRunner(RunnerSubmition submition)
-        {
-            this.submition = submition;
-            _result.Id = submition.Id;
-        }
 
-        public RunningResults RunMsBuild(DirectoryInfo dir)
-        {
-            var builder = new MsBuildRunner();
-            var builderResult = builder.BuildProject((ProjRunnerSubmition)submition, dir);
-            _result.Verdict = Verdict.Ok;
+			var builder = new MsBuildRunner();
+			var builderResult = builder.BuildProject(projSubmition.ProjectFileName, dir);
+			result.Verdict = Verdict.Ok;
 
-            if (!builderResult.Success)
-            {
-                _result.Verdict = Verdict.CompilationError;
-                _result.CompilationOutput = builderResult.ErrorMessage;
-                Remove(dir.FullName);
-                return _result;
-            }
+			if (!builderResult.Success)
+			{
+				result.Verdict = Verdict.CompilationError;
+				result.CompilationOutput = builderResult.ErrorMessage;
+				SafeRemoveDirectory(dir.FullName);
+				return result;
+			}
 
-            RunSandboxer(string.Format("\"{0}\" {1}", builderResult.PathToExe, submition.Id));
+			RunSandboxer(string.Format("\"{0}\" {1}", builderResult.PathToExe, submition.Id));
 
-            Thread.Sleep(1000);
-            Remove(dir.FullName);
+			SafeRemoveDirectory(dir.FullName);
 
-            if (_result.Verdict == Verdict.Ok)
-                _result.FillPassProgress();
+			if (result.Verdict == Verdict.Ok)
+				result.FillPassProgress();
 
-            return _result;
-        }
+			return result;
+		}
 
-        public RunningResults RunCsc()
-        {
-            var assemblyCreator = new AssemblyCreator();
-            var assembly = assemblyCreator.CreateAssembly((FileRunnerSubmition)submition);
+		public RunningResults RunCsc()
+		{
+			var assemblyCreator = new AssemblyCreator();
+			var assembly = assemblyCreator.CreateAssembly((FileRunnerSubmition)submition);
 
-            _result.Verdict = Verdict.Ok;
+			result.Verdict = Verdict.Ok;
 
-            _result.AddCompilationInfo(assembly);
+			result.AddCompilationInfo(assembly);
 
-            if (_result.IsCompilationError())
-            {
-                Remove(assembly.PathToAssembly);
-                return _result;
-            }
+			if (result.IsCompilationError())
+			{
+				SafeRemoveFile(assembly.PathToAssembly);
+				return result;
+			}
 
-            if (!submition.NeedRun)
-            {
-                Remove(assembly.PathToAssembly);
-                return _result;
-            }
-            RunSandboxer(string.Format("\"{0}\" {1}", Path.GetFullPath(assembly.PathToAssembly), submition.Id));
+			if (!submition.NeedRun)
+			{
+				SafeRemoveFile(assembly.PathToAssembly);
+				return result;
+			}
+			RunSandboxer(string.Format("\"{0}\" {1}", Path.GetFullPath(assembly.PathToAssembly), submition.Id));
 
-            Remove(assembly.PathToAssembly);
-            return _result;
-        }
+			SafeRemoveFile(assembly.PathToAssembly);
+			return result;
+		}
 
-        private static void Remove(string path)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(Path.GetExtension(path)))
-                    Directory.Delete(path, true);
-                else
-                    File.Delete(path);
-            }
-            catch
-            {
-            }
-        }
+		private static void SafeRemoveDirectory(string path)
+		{
+			try
+			{
+				Directory.Delete(path, true);
+			}
+			catch
+			{
+			}
+		}
 
-        private void RunSandboxer(string args)
-        {
-            var startInfo = new ProcessStartInfo(
-                "CsSandboxer.exe", args)
-            {
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                StandardOutputEncoding = Encoding.UTF8,
-                StandardErrorEncoding = Encoding.UTF8
-            };
-            var sandboxer = Process.Start(startInfo);
+		private static void SafeRemoveFile(string path)
+		{
+			try
+			{
+				File.Delete(path);
+			}
+			catch
+			{
+			}
+		}
 
-            if (sandboxer == null)
-            {
-                _result.Verdict = Verdict.SandboxError;
-                _result.Error = "Can't start proces";
-                return;
-            }
+		private void RunSandboxer(string args)
+		{
+			var startInfo = new ProcessStartInfo(
+				"CsSandboxer.exe", args)
+			{
+				RedirectStandardInput = true,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+				UseShellExecute = false,
+				CreateNoWindow = true,
+				StandardOutputEncoding = Encoding.UTF8,
+				StandardErrorEncoding = Encoding.UTF8
+			};
+			var sandboxer = Process.Start(startInfo);
 
-            var stderrReader = new AsyncReader(sandboxer.StandardError, OutputLimit + 1);
+			if (sandboxer == null)
+			{
+				result.Verdict = Verdict.SandboxError;
+				result.Error = "Can't start proces";
+				return;
+			}
 
-            var readyState = sandboxer.StandardOutput.ReadLineAsync();
-            if (!readyState.Wait(TimeLimit) || readyState.Result != "Ready")
-            {
-                if (!sandboxer.HasExited)
-                {
-                    sandboxer.Kill();
-                    _result.Verdict = Verdict.SandboxError;
-                    _result.Error = "Sandbox does not respond";
-                    return;
-                }
-                if (sandboxer.ExitCode != 0)
-                {
-                    HandleNonZeroExitCode(stderrReader.GetData(), sandboxer.ExitCode);
-                    return;
-                }
-                _result.Verdict = Verdict.SandboxError;
-                _result.Error = "Sandbox exit before respond";
-                return;
-            }
+			var stderrReader = new AsyncReader(sandboxer.StandardError, outputLimit + 1);
 
-            sandboxer.Refresh();
-            var startUsedMemory = sandboxer.WorkingSet64;
-            var startUsedTime = sandboxer.TotalProcessorTime;
-            var startTime = DateTime.Now;
+			var readyState = sandboxer.StandardOutput.ReadLineAsync();
+			if (!readyState.Wait(timeLimit) || readyState.Result != "Ready")
+			{
+				if (!sandboxer.HasExited)
+				{
+					sandboxer.Kill();
+					result.Verdict = Verdict.SandboxError;
+					result.Error = "Sandbox does not respond";
+					return;
+				}
+				if (sandboxer.ExitCode != 0)
+				{
+					HandleNonZeroExitCode(stderrReader.GetData(), sandboxer.ExitCode);
+					return;
+				}
+				result.Verdict = Verdict.SandboxError;
+				result.Error = "Sandbox exit before respond";
+				return;
+			}
 
-            sandboxer.StandardInput.WriteLine("Run");
-            sandboxer.StandardInput.WriteLineAsync(submition.Input);
+			sandboxer.Refresh();
+			var startUsedMemory = sandboxer.WorkingSet64;
+			var startUsedTime = sandboxer.TotalProcessorTime;
+			var startTime = DateTime.Now;
 
-            var stdoutReader = new AsyncReader(sandboxer.StandardOutput, OutputLimit + 1);
-            while (!sandboxer.HasExited
-                   && !IsTimeLimitExpected(sandboxer, startTime, startUsedTime)
-                   && !IsMemoryLimitExpected(sandboxer, startUsedMemory)
-                   && !IsOutputLimit(stdoutReader)
-                   && !IsOutputLimit(stderrReader))
-            {
-            }
+			sandboxer.StandardInput.WriteLine("Run");
+			sandboxer.StandardInput.WriteLineAsync(submition.Input);
 
-            if (!sandboxer.HasExited)
-                sandboxer.Kill();
+			var stdoutReader = new AsyncReader(sandboxer.StandardOutput, outputLimit + 1);
+			while (!sandboxer.HasExited
+					&& !IsTimeLimitExpected(sandboxer, startTime, startUsedTime)
+					&& !IsMemoryLimitExpected(sandboxer, startUsedMemory)
+					&& !IsOutputLimit(stdoutReader)
+					&& !IsOutputLimit(stderrReader))
+			{
+			}
 
-            if (_hasOutputLimit)
-            {
-                _result.Verdict = Verdict.OutputLimit;
-                return;
-            }
+			if (!sandboxer.HasExited)
+				sandboxer.Kill();
 
-            if (_hasTimeLimit)
-            {
-                _result.Verdict = Verdict.TimeLimit;
-                return;
-            }
+			if (hasOutputLimit)
+			{
+				result.Verdict = Verdict.OutputLimit;
+				return;
+			}
 
-            if (_hasMemoryLimit)
-            {
-                _result.Verdict = Verdict.MemoryLimit;
-                return;
-            }
+			if (hasTimeLimit)
+			{
+				result.Verdict = Verdict.TimeLimit;
+				return;
+			}
 
-            sandboxer.WaitForExit();
-            if (sandboxer.ExitCode != 0)
-            {
-                HandleNonZeroExitCode(stderrReader.GetData(), sandboxer.ExitCode);
-                return;
-            }
+			if (hasMemoryLimit)
+			{
+				result.Verdict = Verdict.MemoryLimit;
+				return;
+			}
 
-            _result.Output = stdoutReader.GetData();
-            _result.Error = stderrReader.GetData();
-        }
+			sandboxer.WaitForExit();
+			if (sandboxer.ExitCode != 0)
+			{
+				HandleNonZeroExitCode(stderrReader.GetData(), sandboxer.ExitCode);
+				return;
+			}
 
-        private void HandleNonZeroExitCode(string error, int exitCode)
-        {
-            var obj = FindSerializedException(error);
+			result.Output = stdoutReader.GetData();
+			result.Error = stderrReader.GetData();
+		}
 
-            if (obj != null)
-                _result.HandleException(obj);
-            else
-                HandleNtStatus(exitCode, error);
-        }
+		private void HandleNonZeroExitCode(string error, int exitCode)
+		{
+			var obj = FindSerializedException(error);
 
-        private void HandleNtStatus(int exitCode, string error)
-        {
-            switch ((uint)exitCode)
-            {
-                case 0xC00000FD:
-                    _result.Verdict = Verdict.RuntimeError;
-                    _result.Error = "Stack overflow exception.";
-                    break;
-                default:
-                    _result.Verdict = Verdict.SandboxError;
-                    _result.Error = string.IsNullOrWhiteSpace(error) ? "Non-zero exit code" : error;
-                    _result.Error += string.Format("\nExit code: 0x{0:X8}", exitCode);
-                    break;
-            }
-        }
+			if (obj != null)
+				result.HandleException(obj);
+			else
+				HandleNtStatus(exitCode, error);
+		}
 
-        private bool IsOutputLimit(AsyncReader reader)
-        {
-            return _hasOutputLimit = _hasOutputLimit
-                                     || (reader.ReadedLength > OutputLimit);
-        }
+		private void HandleNtStatus(int exitCode, string error)
+		{
+			switch ((uint)exitCode)
+			{
+				case 0xC00000FD:
+					result.Verdict = Verdict.RuntimeError;
+					result.Error = "Stack overflow exception.";
+					break;
+				default:
+					result.Verdict = Verdict.SandboxError;
+					result.Error = string.IsNullOrWhiteSpace(error) ? "Non-zero exit code" : error;
+					result.Error += string.Format("\nExit code: 0x{0:X8}", exitCode);
+					break;
+			}
+		}
 
-        private bool IsMemoryLimitExpected(Process sandboxer, long startUsedMemory)
-        {
-            sandboxer.Refresh();
-            long mem;
-            try
-            {
-                mem = sandboxer.PeakWorkingSet64;
-            }
-            catch
-            {
-                return _hasMemoryLimit;
-            }
+		private bool IsOutputLimit(AsyncReader reader)
+		{
+			return hasOutputLimit = hasOutputLimit
+									|| (reader.ReadedLength > outputLimit);
+		}
 
-            return _hasMemoryLimit = _hasMemoryLimit
-                                     || startUsedMemory + MemoryLimit < mem;
-        }
+		private bool IsMemoryLimitExpected(Process sandboxer, long startUsedMemory)
+		{
+			sandboxer.Refresh();
+			long mem;
+			try
+			{
+				mem = sandboxer.PeakWorkingSet64;
+			}
+			catch
+			{
+				return hasMemoryLimit;
+			}
 
-        private bool IsTimeLimitExpected(Process sandboxer, DateTime startTime, TimeSpan startUsedTime)
-        {
-            return _hasTimeLimit = _hasTimeLimit
-                                   || TimeLimit.Add(startUsedTime).CompareTo(sandboxer.TotalProcessorTime) < 0
-                                   || startTime.Add(IdleTimeLimit).CompareTo(DateTime.Now) < 0;
-        }
+			return hasMemoryLimit = hasMemoryLimit
+									|| startUsedMemory + memoryLimit < mem;
+		}
 
-        private static Exception FindSerializedException(string str)
-        {
-            if (!str.EndsWith("}"))
-                return null;
+		private bool IsTimeLimitExpected(Process sandboxer, DateTime startTime, TimeSpan startUsedTime)
+		{
+			return hasTimeLimit = hasTimeLimit
+								|| timeLimit.Add(startUsedTime).CompareTo(sandboxer.TotalProcessorTime) < 0
+								|| startTime.Add(idleTimeLimit).CompareTo(DateTime.Now) < 0;
+		}
 
-            var pos = str.LastIndexOf(Environment.NewLine, StringComparison.Ordinal);
+		private static Exception FindSerializedException(string str)
+		{
+			if (!str.EndsWith("}"))
+				return null;
 
-            if (pos == -1)
-                return null;
+			var pos = str.LastIndexOf(Environment.NewLine, StringComparison.Ordinal);
 
-            var jsonSettings = new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.All
-            };
+			if (pos == -1)
+				return null;
 
-            try
-            {
-                var obj = JsonConvert.DeserializeObject(str.Substring(pos), jsonSettings);
-                return obj as Exception;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-    }
+			var jsonSettings = new JsonSerializerSettings
+			{
+				TypeNameHandling = TypeNameHandling.All
+			};
+
+			try
+			{
+				var obj = JsonConvert.DeserializeObject(str.Substring(pos), jsonSettings);
+				return obj as Exception;
+			}
+			catch
+			{
+				return null;
+			}
+		}
+	}
 }

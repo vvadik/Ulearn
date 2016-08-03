@@ -115,7 +115,7 @@
           <xs:element name="hint" type="notEmptyString" minOccurs="0" maxOccurs="unbounded" />
           <xs:element name="comment" type="notEmptyString" minOccurs="0" />
           <xs:element name="expected" type="xs:string" />
-          <xs:element name="dont-show-solutions" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+          <xs:element name="hide-solutions" type="xs:boolean" minOccurs="0" maxOccurs="1" />
           <xs:element name="hide-expected-output" type="xs:boolean" minOccurs="0" />
           <xs:element name="validator" type="notEmptyString" minOccurs="0" />
         </xs:sequence>

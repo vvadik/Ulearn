@@ -166,7 +166,6 @@
     <Compile Include="tests\WrongIdentationOfEmptyLines.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="ZipTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="tests\regions.txt">
