@@ -31,7 +31,7 @@ namespace RunCsJob
 			results.CompilationOutput = sb.ToString();
 		}
 
-        public static void HandleException(this RunningResults results, Exception ex)
+		public static void HandleException(this RunningResults results, Exception ex)
 		{
 			HandleException(ref results, (dynamic)ex);
 		}
@@ -64,7 +64,7 @@ namespace RunCsJob
 			results.Error = ex.ToString();
 		}
 
-        private static void HandleInnerException(ref RunningResults results, TypeInitializationException ex)
+		private static void HandleInnerException(ref RunningResults results, TypeInitializationException ex)
 		{
 			results.Verdict = Verdict.SecurityException;
 			results.Error = ex.ToString();

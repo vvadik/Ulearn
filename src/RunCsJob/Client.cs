@@ -44,7 +44,8 @@ namespace RunCsJob
 			var uri = GetUri("PostResult");
 			var responce = await httpClient.PostAsJsonAsync(uri, result);
 
-			if (responce.IsSuccessStatusCode) return;
+			if (responce.IsSuccessStatusCode)
+				return;
 
 			Console.Error.WriteLine(DateTime.Now.ToString("HH:mm:ss"));
 			Console.Error.WriteLine(responce.ToString());
@@ -56,7 +57,8 @@ namespace RunCsJob
 			var uri = GetUri("PostResults");
 			var response = await httpClient.PostAsJsonAsync(uri, results);
 
-			if (response.IsSuccessStatusCode) return;
+			if (response.IsSuccessStatusCode)
+				return;
 
 			Console.Error.WriteLine("can't send " + DateTime.Now.ToString("HH:mm:ss"));
 			Console.Error.WriteLine(response.ToString());

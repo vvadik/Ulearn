@@ -1,12 +1,13 @@
 ﻿using System;
 
-namespace ConsoleApplication2
+namespace TestProj
 {
-	internal class Program
+	internal static class Program
 	{
 		private static void Main()
 		{
-			Console.WriteLine("Hello world!");
+			var a = 1;
+			Console.WriteLine($"Hello world!{a}");
 		}
 	}
 }

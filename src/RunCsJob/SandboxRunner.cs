@@ -50,7 +50,7 @@ namespace RunCsJob
 			result.Id = submition.Id;
 		}
 
-		public RunningResults RunMsBuild()
+		private RunningResults RunMsBuild()
 		{
 			var projSubmition = (ProjRunnerSubmition)submition;
 			var dir = Directory.CreateDirectory(Path.Combine(".", submition.Id));
@@ -69,9 +69,7 @@ namespace RunCsJob
 				};
 			}
 
-
-			var builder = new MsBuildRunner();
-			var builderResult = builder.BuildProject(projSubmition.ProjectFileName, dir);
+			var builderResult = MsBuildRunner.BuildProject(projSubmition.ProjectFileName, dir);
 			result.Verdict = Verdict.Ok;
 
 			if (!builderResult.Success)
@@ -94,8 +92,7 @@ namespace RunCsJob
 
 		public RunningResults RunCsc()
 		{
-			var assemblyCreator = new AssemblyCreator();
-			var assembly = assemblyCreator.CreateAssembly((FileRunnerSubmition)submition);
+			var assembly = AssemblyCreator.CreateAssembly((FileRunnerSubmition)submition);
 
 			result.Verdict = Verdict.Ok;
 

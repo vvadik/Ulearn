@@ -14,7 +14,7 @@ namespace RunCsJob
 		private readonly TimeSpan sleep;
 		private readonly int jobsToRequest;
 
-		public RunCsJobProgram()
+		private RunCsJobProgram()
 		{
 			address = ConfigurationManager.AppSettings["submissionsUrl"];
 			token = ConfigurationManager.AppSettings["runnerToken"];
