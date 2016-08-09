@@ -251,6 +251,7 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 		{
 			var dir = new DirectoryInfo(@"..\..\testProj");
 			var buildingResult = MsBuildRunner.BuildProject("TestProj.csproj", dir);
+			Console.WriteLine(buildingResult.ErrorMessage);
 			Assert.That(buildingResult.Success, Is.True);
 			Assert.That(buildingResult.ErrorMessage, Is.Null);
 		}
