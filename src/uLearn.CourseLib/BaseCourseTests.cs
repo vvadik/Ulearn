@@ -42,6 +42,11 @@ namespace uLearn
 		}
 
 		[Test]
+		public void LoadCourse()
+		{
+			new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
+		}
+		[Test]
 		public void NoSpellCheckErrors()
 		{
 			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));

@@ -52,8 +52,12 @@ namespace uLearn.CourseTool
 
 		private void FileWatcherOnChanged(object sender, FileSystemEventArgs args)
 		{
-			Console.WriteLine($"{DateTime.Now.ToString("T")} {args.Name} was {args.ChangeType.ToString().ToLower()}.");
-			server.MarkCourseAsChanged();
+			var extensions = new[] { ".cs", ".gif", ".bmp", ".sln", ".xml", ".png", ".csproj", ".txt", ".md" };
+			if (extensions.Any(ext => args.Name.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase)))
+			{
+				Console.WriteLine($"{DateTime.Now.ToString("T")} {args.Name} was {args.ChangeType.ToString().ToLower()}.");
+				server.MarkCourseAsChanged();
+			}
 		}
 	}
 }
