@@ -48,7 +48,7 @@ namespace uLearn.Model.Blocks
 					Data = ProjModifier.ModifyCsproj(context.Dir.GetBytes(CsProjFilePath), ProjModifier.RemoveCheckingFromCsproj)
 				}
 			});
-			System.IO.File.WriteAllBytes(directoryName + ".zip", zipData);
+			System.IO.File.WriteAllBytes(directoryName + ".exercise.zip", zipData);
 			yield return this;
 		}
 

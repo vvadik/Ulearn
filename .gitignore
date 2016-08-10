@@ -183,3 +183,6 @@ FakesAssemblies/
 *.received.txt
 private.settings
 /src/.vs/config
+
+# Exercises projects zips
+*.exercise.zip
