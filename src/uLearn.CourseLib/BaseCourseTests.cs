@@ -48,21 +48,21 @@ namespace uLearn
 			Assert.IsEmpty(course.SpellCheck());
 		}
 
-		[TestCaseSource("GetExerciseSlidesTestCases")]
+		[TestCaseSource(nameof(GetExerciseSlidesTestCases))]
 		public void Slide(Type slideType)
 		{
 			Assert.IsTrue(typeof(SlideTestBase).IsAssignableFrom(slideType), slideType + " does not inherit from SlideTestBase");
 		}
 
-		public IEnumerable<TestCaseData> GetExerciseSlidesTestCases()
+		private IEnumerable<TestCaseData> GetExerciseSlidesTestCases()
 		{
 			return GetSlideTypes()
-				.Select(type_attr => type_attr.Item1)
+				.Select(typeAttr => typeAttr.Item1)
 				.Where(type => GetExpectedOutputAttributes(type).Any())
 				.Select(type => new TestCaseData(type).SetName(type.Name + ".Main"));
 		}
 
-		public IEnumerable<Tuple<Type, SlideAttribute>> GetSlideTypes()
+		private IEnumerable<Tuple<Type, SlideAttribute>> GetSlideTypes()
 		{
 			return someSlideClass.Assembly
 				.GetTypes()
@@ -100,14 +100,14 @@ namespace uLearn
 			return string.Join("\n", output.Trim().SplitToLines());
 		}
 
-		public static IEnumerable<ExpectedOutputAttribute> GetExpectedOutputAttributes(Type declaringType)
+		private static IEnumerable<ExpectedOutputAttribute> GetExpectedOutputAttributes(Type declaringType)
 		{
 			return declaringType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)
 				.SelectMany(m => m.GetCustomAttributes(typeof(ExpectedOutputAttribute)))
 				.Cast<ExpectedOutputAttribute>();
 		}
 
-		public IEnumerable<TestCaseData> GetVideos()
+		private static IEnumerable<TestCaseData> GetVideos()
 		{
 			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
 			Assert.That(course.Slides.Length, Is.GreaterThan(0));
@@ -117,7 +117,7 @@ namespace uLearn
 						.Select(b => new TestCaseData(slide.Info.SlideFile.Name, b.VideoId)));
 		}
 
-		[TestCaseSource("GetVideos")]
+		[TestCaseSource(nameof(GetVideos))]
 		[Category("Long")]
 		public void CheckAllYoutubeVideos(string slideName, string videoId)
 		{
@@ -129,11 +129,12 @@ namespace uLearn
 		{
 			var exercise = slide.Exercise as ProjectExerciseBlock;
 
-			var result = SandboxRunner.Run(exercise.CreateSubmition(
-				slide.Id.ToString(),
-				exercise.ExerciseInitialCode));
+			var result = SandboxRunner.Run(
+				Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2", "tools"), exercise.CreateSubmition(
+					slide.Id.ToString(),
+					exercise.ExerciseInitialCode));
 
-			Console.WriteLine(result.Error);
+			Console.WriteLine(result.Output);
 			Assert.AreEqual(Verdict.Ok, result.Verdict);
 
 			Assert.AreNotEqual(1.0, result.Score);
@@ -149,9 +150,10 @@ namespace uLearn
 				return;
 			}
 
-			var result = SandboxRunner.Run(exercise.CreateSubmition(
-				slide.Id.ToString(),
-				exercise.EthalonSolution));
+			var result = SandboxRunner.Run(Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2", "tools"),
+				exercise.CreateSubmition(
+					slide.Id.ToString(),
+					exercise.EthalonSolution));
 
 			var output = result.GetOutput().NormalizeEoln();
 
@@ -166,7 +168,7 @@ namespace uLearn
 			}
 		}
 
-		[TestCaseSource("GetSlidesTestCases")]
+		[TestCaseSource(nameof(GetSlidesTestCases))]
 		public void EthalonSolutionsForExercises(ExerciseSlide slide)
 		{
 			if (slide.Exercise is ProjectExerciseBlock)
@@ -177,17 +179,16 @@ namespace uLearn
 
 		private static void FailOnError(ExerciseSlide slide, SolutionBuildResult solution, string ethalonSolution)
 		{
-			Assert.Fail(@"Template solution: {0}
+			Assert.Fail($@"Template solution: {ethalonSolution}
 
-source code: {1}
+source code: {solution.SourceCode}
 
-solution has error in: {2} - {3}
+solution has error in: {slide.Info.UnitName} - {slide.Title}
 
-error: {4}",
-				ethalonSolution, solution.SourceCode, slide.Info.UnitName, slide.Title, solution.ErrorMessage);
+error: {solution.ErrorMessage}");
 		}
 
-		public IEnumerable<TestCaseData> GetSlidesTestCases()
+		private static IEnumerable<TestCaseData> GetSlidesTestCases()
 		{
 			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
 			return

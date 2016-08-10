@@ -11,7 +11,7 @@ namespace RunCsJob
 {
 	internal static class RunCscTests
 	{
-		private const int OutputLimit = 10 * 1024 * 1024;
+		private const int outputLimit = 10 * 1024 * 1024;
 
 		[TestCase(@"namespace Test { public class Program { static public void Main() { return ; } } }",
 			"", "", "",
@@ -126,7 +126,7 @@ namespace RunCsJob
 			TestName = "Output + newline explicit")]
 		public static void TestOutputLimitError(string code)
 		{
-			var details = GetDetails(code.Replace("$limit", OutputLimit.ToString(CultureInfo.InvariantCulture)), "");
+			var details = GetDetails(code.Replace("$limit", outputLimit.ToString(CultureInfo.InvariantCulture)), "");
 			Assert.AreEqual(Verdict.OutputLimit, details.Verdict);
 		}
 
@@ -134,9 +134,9 @@ namespace RunCsJob
 			TestName = "Output")]
 		public static void TestOutputLimit(string code)
 		{
-			var details = GetDetails(code.Replace("$limit", OutputLimit.ToString(CultureInfo.InvariantCulture)), "");
+			var details = GetDetails(code.Replace("$limit", outputLimit.ToString(CultureInfo.InvariantCulture)), "");
 			Assert.AreEqual(Verdict.Ok, details.Verdict);
-			Assert.AreEqual(new string('*', OutputLimit), details.Output);
+			Assert.AreEqual(new string('*', outputLimit), details.Output);
 		}
 
 		[TestCase(@"using System; class Program { static void Main() { 
@@ -223,7 +223,7 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 			for (var i = 0; i < threads; ++i)
 			{
 				Thread.Sleep(1000);
-				Console.Out.WriteLine("{0}", Process.GetCurrentProcess().Threads.Count - a);
+				Console.Out.WriteLine($"{Process.GetCurrentProcess().Threads.Count - a}");
 			}
 		}
 
@@ -249,8 +249,9 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 		[Test]
 		public void SimpleProjTest()
 		{
-			var dir = new DirectoryInfo(@"..\..\testProj");
-			var buildingResult = MsBuildRunner.BuildProject("TestProj.csproj", dir);
+			var dir = new DirectoryInfo(@"..\..\test");
+			var buildingResult = MsBuildRunner.BuildProject(
+				Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2", "tools"), "test.csproj", dir);
 			Console.WriteLine(buildingResult.ErrorMessage);
 			Assert.That(buildingResult.Success, Is.True);
 			Assert.That(buildingResult.ErrorMessage, Is.Null);

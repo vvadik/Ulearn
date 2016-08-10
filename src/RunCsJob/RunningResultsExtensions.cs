@@ -22,7 +22,7 @@ namespace RunCsJob
 				.ToList();
 			foreach (var error in errors)
 			{
-				sb.Append(String.Format("({2},{3}): {0} {1}: {4}\n", error.IsWarning ? "warning" : "error", error.ErrorNumber,
+				sb.Append(string.Format("({2},{3}): {0} {1}: {4}\n", error.IsWarning ? "warning" : "error", error.ErrorNumber,
 					error.Line, error.Column,
 					error.ErrorText));
 			}

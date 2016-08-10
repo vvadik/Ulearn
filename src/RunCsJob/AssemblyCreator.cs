@@ -5,7 +5,7 @@ using RunCsJob.Api;
 
 namespace RunCsJob
 {
-	public class AssemblyCreator
+	public static class AssemblyCreator
 	{
 		private static readonly string[] UsesAssemblies =
 		{

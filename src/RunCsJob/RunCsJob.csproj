@@ -43,6 +43,10 @@
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Escapist, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Escapist.0.0.1\lib\net46\Escapist.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FluentAssertions, Version=4.12.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.4.12.0\lib\net45\FluentAssertions.dll</HintPath>
       <Private>True</Private>
@@ -76,6 +80,7 @@
   <ItemGroup>
     <Compile Include="AssemblyCreator.cs" />
     <Compile Include="AsyncReader.cs" />
+    <Compile Include="MSBuildResult.cs" />
     <Compile Include="SubmitionSerialization_Test.cs" />
     <Compile Include="MsBuildRunner.cs" />
     <Compile Include="Tests.cs" />
@@ -88,6 +93,35 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <Content Include="Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\Microsoft.Net.Compilers.1.3.2.nupkg" />
+    <Content Include="Microsoft.Net.Compilers.1.3.2\ThirdPartyNotices.rtf" />
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\csc.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\csc.rsp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\csi.rsp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\Microsoft.CSharp.Core.targets">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\Microsoft.VisualBasic.Core.targets">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\vbc.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\vbc.rsp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\VBCSCompiler.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <None Include="Properties\webjob-publish-settings.json" />
     <None Include="run.cmd">
@@ -113,6 +147,60 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Ionic.Zip.xml" />
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\csc.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\csi.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\Microsoft.Build.Tasks.CodeAnalysis.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\Microsoft.CodeAnalysis.CSharp.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\Microsoft.CodeAnalysis.CSharp.Scripting.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\Microsoft.CodeAnalysis.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\Microsoft.CodeAnalysis.Scripting.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\Microsoft.CodeAnalysis.VisualBasic.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\Microsoft.DiaSymReader.Native.amd64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\Microsoft.DiaSymReader.Native.x86.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\System.AppContext.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\System.Collections.Immutable.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\System.Diagnostics.StackTrace.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\System.IO.FileSystem.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\System.IO.FileSystem.Primitives.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\System.Reflection.Metadata.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\vbc.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.Net.Compilers.1.3.2\tools\VBCSCompiler.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

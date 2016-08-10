@@ -18,19 +18,18 @@ namespace RunCsJob
 
 		private const int memoryLimit = 64 * 1024 * 1024;
 		private const int outputLimit = 10 * 1024 * 1024;
-
 		private bool hasTimeLimit;
 		private bool hasMemoryLimit;
 		private bool hasOutputLimit;
 
 		private readonly RunningResults result = new RunningResults();
 
-		public static RunningResults Run(RunnerSubmition submition)
+		public static RunningResults Run(string pathToCompiler, RunnerSubmition submition)
 		{
 			try
 			{
 				if (submition is ProjRunnerSubmition)
-					return new SandboxRunner(submition).RunMsBuild();
+					return new SandboxRunner(submition).RunMsBuild(pathToCompiler);
 				return new SandboxRunner(submition).RunCsc();
 			}
 			catch (Exception ex)
@@ -50,7 +49,7 @@ namespace RunCsJob
 			result.Id = submition.Id;
 		}
 
-		private RunningResults RunMsBuild()
+		private RunningResults RunMsBuild(string pathToCompiler)
 		{
 			var projSubmition = (ProjRunnerSubmition)submition;
 			var dir = Directory.CreateDirectory(Path.Combine(".", submition.Id));
@@ -69,18 +68,18 @@ namespace RunCsJob
 				};
 			}
 
-			var builderResult = MsBuildRunner.BuildProject(projSubmition.ProjectFileName, dir);
+			var builderResult = MsBuildRunner.BuildProject(pathToCompiler, projSubmition.ProjectFileName, dir);
 			result.Verdict = Verdict.Ok;
 
 			if (!builderResult.Success)
 			{
 				result.Verdict = Verdict.CompilationError;
-				result.CompilationOutput = builderResult.ErrorMessage;
+				result.CompilationOutput = builderResult.ToString();
 				SafeRemoveDirectory(dir.FullName);
 				return result;
 			}
 
-			RunSandboxer(string.Format("\"{0}\" {1}", builderResult.PathToExe, submition.Id));
+			RunSandboxer($"\"{builderResult.PathToExe}\" {submition.Id}");
 
 			SafeRemoveDirectory(dir.FullName);
 
@@ -95,7 +94,6 @@ namespace RunCsJob
 			var assembly = AssemblyCreator.CreateAssembly((FileRunnerSubmition)submition);
 
 			result.Verdict = Verdict.Ok;
-
 			result.AddCompilationInfo(assembly);
 
 			if (result.IsCompilationError())
@@ -109,7 +107,7 @@ namespace RunCsJob
 				SafeRemoveFile(assembly.PathToAssembly);
 				return result;
 			}
-			RunSandboxer(string.Format("\"{0}\" {1}", Path.GetFullPath(assembly.PathToAssembly), submition.Id));
+			RunSandboxer($"\"{Path.GetFullPath(assembly.PathToAssembly)}\" {submition.Id}");
 
 			SafeRemoveFile(assembly.PathToAssembly);
 			return result;
@@ -251,7 +249,7 @@ namespace RunCsJob
 				default:
 					result.Verdict = Verdict.SandboxError;
 					result.Error = string.IsNullOrWhiteSpace(error) ? "Non-zero exit code" : error;
-					result.Error += string.Format("\nExit code: 0x{0:X8}", exitCode);
+					result.Error += $"\nExit code: 0x{exitCode:X8}";
 					break;
 			}
 		}

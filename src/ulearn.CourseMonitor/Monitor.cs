@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Security.Permissions;
-using System.Threading;
 
 namespace uLearn.CourseTool
 {
-	class Monitor
+	internal class Monitor
 	{
 		private readonly PreviewHttpServer server;
 		private readonly string courseDir;
 
-    	public static void Start(string homeDir, string courseId)
+		public static void Start(string homeDir, string courseId)
 		{
 			// ReSharper disable once ObjectCreationAsStatement
 			new Monitor(homeDir, courseId);
@@ -24,17 +21,17 @@ namespace uLearn.CourseTool
 			server = new PreviewHttpServer(courseDir, Path.Combine(homeDir, "html"), 1337);
 			server.Start();
 			StartWatchingCourseDir();
-			Console.WriteLine("Started monitoring {0}", courseDir);
+			Console.WriteLine($"Started monitoring {courseDir}");
 			OpenInBrowser();
 			while (true)
 			{
-				var key = Console.ReadKey(intercept:true).Key;
+				var key = Console.ReadKey(intercept: true).Key;
 				if (key == ConsoleKey.Q)
 					break;
 				else if (key == ConsoleKey.O)
 					OpenInBrowser();
 				else
-					Console.WriteLine("Press 'Q' to exit. Press 'O' to open course in browser");
+					Console.WriteLine(@"Press 'Q' to exit. Press 'O' to open course in browser");
 			}
 		}
 
@@ -55,7 +52,7 @@ namespace uLearn.CourseTool
 
 		private void FileWatcherOnChanged(object sender, FileSystemEventArgs args)
 		{
-			Console.WriteLine("{0} {1} was {2}.", DateTime.Now.ToString("T"), args.Name, args.ChangeType.ToString().ToLower());
+			Console.WriteLine($"{DateTime.Now.ToString("T")} {args.Name} was {args.ChangeType.ToString().ToLower()}.");
 			server.MarkCourseAsChanged();
 		}
 	}
