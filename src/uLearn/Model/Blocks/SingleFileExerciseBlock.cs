@@ -79,7 +79,6 @@ namespace uLearn.Model.Blocks
 				Input = "",
 				NeedRun = true
 			};
-			;
 		}
 	}
 }
