@@ -177,7 +177,7 @@ namespace uLearn.CourseTool
 				return new RunSolutionResult { IsStyleViolation = true, CompilationError = buildResult.StyleMessage, ExecutionServiceName = "uLearn" };
 			var solution = buildResult.SourceCode;
 
-			var pathToCompiler = Path.Combine(Assembly.GetEntryAssembly().Location, "Microsoft.Net.Compilers.1.3.2", "tools");
+			var pathToCompiler = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Microsoft.Net.Compilers.1.3.2");
 			Console.WriteLine(pathToCompiler);
 			var result = SandboxRunner.Run(pathToCompiler, 
 				exercise.CreateSubmition(Utils.NewNormalizedGuid(), solution));

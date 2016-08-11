@@ -251,7 +251,7 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 		{
 			var dir = new DirectoryInfo(@"..\..\test");
 			var buildingResult = MsBuildRunner.BuildProject(
-				Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2", "tools"), 
+				Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2"), 
 				"test.csproj", 
 				dir);
 			Console.WriteLine(buildingResult.ErrorMessage);

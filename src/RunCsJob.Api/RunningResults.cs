@@ -21,13 +21,13 @@ namespace RunCsJob.Api
 
 		public void FillPassProgress()
 		{
-			var valueText = Output
+			var splittedOutput = Output
 				.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
-				.Last();
+				.ToList();
+			var valueText = splittedOutput.Last();
 			Score = double.Parse(valueText, CultureInfo.InvariantCulture);
-			Output = string.Join("\r\n", Output
-				.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
-				.Take(Output.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).Length - 2));
+			Output = string.Join("\r\n", splittedOutput
+				.Take(splittedOutput.Count - 1));
 		}
 
 		public string GetOutput()
