@@ -131,11 +131,27 @@ namespace uLearn
 		private static void InitialCodeIsNotSolutionForProjExercise(ExerciseSlide slide)
 		{
 			var exercise = slide.Exercise as ProjectExerciseBlock;
-
+			var directoryName = Path.Combine(exercise.SlideFolderPath, exercise.ExerciseDir);
+			var excluded = (exercise.PathsToExcludeForChecker ?? new string[0]).Concat(new[] { "bin/*", "obj/*" }).ToList();
+			var exerciseDir = new DirectoryInfo(directoryName);
+			var bytes = exerciseDir.ToZip(excluded, new[]
+			{
+				new FileContent
+				{
+					Path = exercise.CsprojFileName,
+					Data = ProjModifier.ModifyCsproj(exerciseDir.GetBytes(exercise.CsprojFileName),
+						ProjModifier.PrepareCsprojBeforeZipping)
+				}
+			});
 			var result = SandboxRunner.Run(Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2"),
-				exercise.CreateSubmition(
-					slide.Id.ToString(),
-					exercise.ExerciseInitialCode));
+				new ProjRunnerSubmition
+				{
+					Id = slide.Id.ToString(),
+					ZipFileData = bytes,
+					ProjectFileName = exercise.CsprojFileName,
+					Input = "",
+					NeedRun = true
+				});
 
 			Console.WriteLine(result.Error);
 			Assert.AreEqual(Verdict.Ok, result.Verdict);

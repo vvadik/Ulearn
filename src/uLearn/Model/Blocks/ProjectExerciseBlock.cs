@@ -26,11 +26,11 @@ namespace uLearn.Model.Blocks
 		[XmlElement("require-review")]
 		public bool RequireReview { get; set; }
 
-		private string ExerciseDir => Path.GetDirectoryName(CsProjFilePath).EnsureNotNull("csproj должен быть в поддиректории");
+		public string ExerciseDir => Path.GetDirectoryName(CsProjFilePath).EnsureNotNull("csproj должен быть в поддиректории");
 
-		private string CsprojFileName => Path.GetFileName(CsProjFilePath);
-
-		private string SlideFolderPath { get; set; }
+		public string CsprojFileName => Path.GetFileName(CsProjFilePath);
+		[XmlIgnore]
+		public string SlideFolderPath { get; private set; }
 
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
@@ -84,7 +84,9 @@ namespace uLearn.Model.Blocks
 				new[]
 				{
 					new FileContent { Path = UserCodeFileName, Data = Encoding.UTF8.GetBytes(code) },
-					new FileContent { Path = CsprojFileName, Data = ProjModifier.ModifyCsproj(exerciseDir.GetBytes(CsprojFileName), ProjModifier.PrepareCsprojBeforeZipping) }
+					new FileContent { Path = CsprojFileName,
+						Data = ProjModifier.ModifyCsproj(exerciseDir.GetBytes(CsprojFileName), 
+						ProjModifier.PrepareCsprojBeforeZipping) }
 				});
 		}
 	}
