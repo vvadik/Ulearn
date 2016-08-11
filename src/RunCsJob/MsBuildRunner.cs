@@ -1,10 +1,7 @@
-﻿using System;
-using System.IO;
-using FluentAssertions.Common;
+﻿using System.IO;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Logging;
-using System.Reflection;
 
 namespace RunCsJob
 {

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -175,14 +176,11 @@ namespace uLearn.CourseTool
 			if (buildResult.HasStyleIssues)
 				return new RunSolutionResult { IsStyleViolation = true, CompilationError = buildResult.StyleMessage, ExecutionServiceName = "uLearn" };
 			var solution = buildResult.SourceCode;
-			var submission = new FileRunnerSubmition
-			{
-				Code = solution,
-				Id = Utils.NewNormalizedGuid(),
-				Input = "",
-				NeedRun = true
-			};
-			var result = SandboxRunner.Run(Path.Combine(new DirectoryInfo(".").FullName, "Microsoft.Net.Compilers.1.3.2", "tools"), submission);
+
+			var pathToCompiler = Path.Combine(Assembly.GetEntryAssembly().Location, "Microsoft.Net.Compilers.1.3.2", "tools");
+			Console.WriteLine(pathToCompiler);
+			var result = SandboxRunner.Run(pathToCompiler, 
+				exercise.CreateSubmition(Utils.NewNormalizedGuid(), solution));
 			return new RunSolutionResult
 			{
 				IsRightAnswer = result.Verdict == Verdict.Ok && result.GetOutput().NormalizeEoln() == exercise.ExpectedOutput.NormalizeEoln(),

@@ -11,6 +11,9 @@ using RunCsJob;
 using RunCsJob.Api;
 using uLearn.Model.Blocks;
 
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeMadeStatic.Global
+
 namespace uLearn
 {
 	[TestFixture]
@@ -42,11 +45,6 @@ namespace uLearn
 		}
 
 		[Test]
-		public void LoadCourse()
-		{
-			new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
-		}
-		[Test]
 		public void NoSpellCheckErrors()
 		{
 			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
@@ -59,7 +57,7 @@ namespace uLearn
 			Assert.IsTrue(typeof(SlideTestBase).IsAssignableFrom(slideType), slideType + " does not inherit from SlideTestBase");
 		}
 
-		private IEnumerable<TestCaseData> GetExerciseSlidesTestCases()
+		public IEnumerable<TestCaseData> GetExerciseSlidesTestCases()
 		{
 			return GetSlideTypes()
 				.Select(typeAttr => typeAttr.Item1)
@@ -67,7 +65,7 @@ namespace uLearn
 				.Select(type => new TestCaseData(type).SetName(type.Name + ".Main"));
 		}
 
-		private IEnumerable<Tuple<Type, SlideAttribute>> GetSlideTypes()
+		public IEnumerable<Tuple<Type, SlideAttribute>> GetSlideTypes()
 		{
 			return someSlideClass.Assembly
 				.GetTypes()
@@ -105,14 +103,14 @@ namespace uLearn
 			return string.Join("\n", output.Trim().SplitToLines());
 		}
 
-		private static IEnumerable<ExpectedOutputAttribute> GetExpectedOutputAttributes(Type declaringType)
+		public static IEnumerable<ExpectedOutputAttribute> GetExpectedOutputAttributes(Type declaringType)
 		{
 			return declaringType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)
 				.SelectMany(m => m.GetCustomAttributes(typeof(ExpectedOutputAttribute)))
 				.Cast<ExpectedOutputAttribute>();
 		}
 
-		private static IEnumerable<TestCaseData> GetVideos()
+		public IEnumerable<TestCaseData> GetVideos()
 		{
 			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
 			Assert.That(course.Slides.Length, Is.GreaterThan(0));
@@ -134,12 +132,12 @@ namespace uLearn
 		{
 			var exercise = slide.Exercise as ProjectExerciseBlock;
 
-			var result = SandboxRunner.Run(
-				Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2", "tools"), exercise.CreateSubmition(
+			var result = SandboxRunner.Run(Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2"),
+				exercise.CreateSubmition(
 					slide.Id.ToString(),
 					exercise.ExerciseInitialCode));
 
-			Console.WriteLine(result.Output);
+			Console.WriteLine(result.Error);
 			Assert.AreEqual(Verdict.Ok, result.Verdict);
 
 			Assert.AreNotEqual(1.0, result.Score);
@@ -155,10 +153,9 @@ namespace uLearn
 				return;
 			}
 
-			var result = SandboxRunner.Run(Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2", "tools"),
-				exercise.CreateSubmition(
-					slide.Id.ToString(),
-					exercise.EthalonSolution));
+			var result = SandboxRunner.Run("", exercise.CreateSubmition(
+				slide.Id.ToString(),
+				exercise.EthalonSolution));
 
 			var output = result.GetOutput().NormalizeEoln();
 
@@ -185,15 +182,15 @@ namespace uLearn
 		private static void FailOnError(ExerciseSlide slide, SolutionBuildResult solution, string ethalonSolution)
 		{
 			Assert.Fail($@"Template solution: {ethalonSolution}
-
-source code: {solution.SourceCode}
-
-solution has error in: {slide.Info.UnitName} - {slide.Title}
-
-error: {solution.ErrorMessage}");
+  
+  source code: {solution.SourceCode}
+  
+  solution has error in: {slide.Info.UnitName} - {slide.Title}
+  
+  error: {solution.ErrorMessage}");
 		}
 
-		private static IEnumerable<TestCaseData> GetSlidesTestCases()
+		public IEnumerable<TestCaseData> GetSlidesTestCases()
 		{
 			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
 			return

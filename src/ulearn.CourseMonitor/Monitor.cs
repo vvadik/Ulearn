@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace uLearn.CourseTool
 {
@@ -25,10 +26,10 @@ namespace uLearn.CourseTool
 			OpenInBrowser();
 			while (true)
 			{
-				var key = Console.ReadKey(intercept: true).Key;
+				var key = Console.ReadKey(true).Key;
 				if (key == ConsoleKey.Q)
 					break;
-				else if (key == ConsoleKey.O)
+				if (key == ConsoleKey.O)
 					OpenInBrowser();
 				else
 					Console.WriteLine(@"Press 'Q' to exit. Press 'O' to open course in browser");
