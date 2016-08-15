@@ -24,10 +24,12 @@ namespace uLearn.Web.Models
 		{
 			UserName = userRoles.UserName;
 			UserId = userRoles.UserId;
+			UserVisibleName = userRoles.UserVisibleName;
 		}
 
 		public string UserId { get; private set; }
 		public string UserName { get; private set; }
+		public string UserVisibleName { get; private set; }
 		public Dictionary<string, ICoursesAccessListModel> CoursesAccess { get; set; }
 	}
 

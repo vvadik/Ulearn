@@ -15,7 +15,7 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+	[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 	public class AdminController : Controller
 	{
 		private readonly CourseManager courseManager;
@@ -59,13 +59,15 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult SpellingErrors(string courseId)
 		{
 			var course = courseManager.GetCourse(courseId);
 			return PartialView(course.SpellCheck());
 		}
 
-		public ActionResult List(string courseId)
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		public ActionResult Units(string courseId)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var appearances = db.Units.Where(u => u.CourseId == course.Id).ToList();
@@ -79,6 +81,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<RedirectToRouteResult> SetPublishTime(string courseId, string unitName, string publishTime)
 		{
 
@@ -93,10 +96,11 @@ namespace uLearn.Web.Controllers
 			};
 			db.Units.Add(unitAppearance);
 			await db.SaveChangesAsync();
-			return RedirectToAction("List", new { courseId });
+			return RedirectToAction("Units", new { courseId });
 		}
 
 		[HttpPost]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<RedirectToRouteResult> RemovePublishTime(string courseId, string unitName)
 		{
 			var unitAppearance = await db.Units.FirstOrDefaultAsync(u => u.CourseId == courseId && u.UnitName == unitName);
@@ -105,15 +109,17 @@ namespace uLearn.Web.Controllers
 				db.Units.Remove(unitAppearance);
 				await db.SaveChangesAsync();
 			}
-			return RedirectToAction("List", new { courseId });
+			return RedirectToAction("Units", new { courseId });
 		}
 
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult DownloadPackage(string courseId)
 		{
 			var packageName = courseManager.GetPackageName(courseId);
 			return File(courseManager.GetStagingCoursePath(courseId), "application/zip", packageName);
 		}
 
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult DownloadVersion(string courseId, Guid versionId)
 		{
 			var packageName = courseManager.GetPackageName(courseId);
@@ -127,6 +133,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> UploadCourse(string courseId, HttpPostedFileBase file)
 		{
 			if (file == null || file.ContentLength <= 0)
@@ -158,16 +165,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Users", new { courseId, onlyPrivileged = true });
 		}
 
-		public ActionResult ManageMenu(string courseId)
-		{
-			var course = courseManager.GetCourse(courseId);
-			return PartialView(new ManageMenuViewModel
-			{
-				CourseId = courseId,
-				Title = course.Title
-			});
-		}
-
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult Packages(string courseId)
 		{
 			var hasPackage = courseManager.HasPackageFor(courseId);
@@ -278,8 +276,7 @@ namespace uLearn.Web.Controllers
 		{
 			return await InternalCheckQuiz(id);
 		}
-
-		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		
 		public async Task<ActionResult> CheckNextQuizForSlide(string courseId, Guid slideId)
 		{
 			using (var transaction = db.Database.BeginTransaction())
@@ -302,6 +299,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> SaveCommentsPolicy(AdminCommentsViewModel model)
 		{
 			var courseId = model.CourseId;
@@ -316,6 +314,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Comments", new { courseId });
 		}
 
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult Users(UserSearchQueryModel queryModel)
 		{
 			if (string.IsNullOrEmpty(queryModel.CourseId))
@@ -376,6 +375,7 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult Diagnostics(string courseId, Guid? versionId)
 		{
 			if (versionId == null)
@@ -403,6 +403,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> PublishVersion(string courseId, Guid versionId)
 		{
 			var versionFile = courseManager.GetCourseVersionFile(versionId);
@@ -435,6 +436,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> DeleteVersion(string courseId, Guid versionId)
 		{
 			/* Remove information from database */
@@ -567,13 +569,7 @@ namespace uLearn.Web.Controllers
 		public string Id { get; set; }
 		public DateTime LastWriteTime { get; set; }
 	}
-
-	public class ManageMenuViewModel
-	{
-		public string CourseId { get; set; }
-		public string Title { get; set; }
-	}
-
+	
 	public class PackagesViewModel
 	{
 		public string CourseId { get; set; }

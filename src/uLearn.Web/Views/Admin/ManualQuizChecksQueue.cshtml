@@ -4,11 +4,8 @@
 	ViewBag.Title = "Очередь на проверку";
 }
 
-@Html.Action("ManageMenu")
-
-
-<div class="slide-container">
-	<h3>Очередь на проверку</h3>
+<div class="container">
+	<h1>Очередь на проверку</h1>
 
 	@if (! string.IsNullOrEmpty(Model.Message) && Model.Checks.Count > 0)
 	{
@@ -35,7 +32,7 @@
 	@if (Model.Checks.Count == 0)
 	{
 		<div class="alert alert-success">Поздравляем, очередь пуста! Работ для проверки нет</div>
-		<div>Здесь будут появляться ответы студентов на тесты, которые должны быть проверены инструктором вручную.</div>
+		<div class="text-muted">Здесь будут появляться ответы студентов на тесты, которые должны быть проверены инструктором вручную.</div>
 	}
 
 	@foreach (var checkModel in Model.Checks)

@@ -4,7 +4,6 @@ namespace uLearn.Web.Models
 {
 	public class CoursePageModel
 	{
-		public bool IsFirstCourseVisit { get; set; }
 		public string CourseId;
 		public string UserId { get; set; }
 		public string CourseTitle;
