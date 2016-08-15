@@ -47,7 +47,7 @@ namespace uLearn.Model.Blocks
 				new FileContent
 				{
 					Path = csprojFileName,
-					Data = ProjModifier.ModifyCsproj(context.Dir.GetBytes(CsProjFilePath), ProjModifier.RemoveCheckingFromCsproj)
+					Data = ProjModifier.ModifyCsproj(context.Dir.GetFile(CsProjFilePath), ProjModifier.RemoveCheckingFromCsproj)
 				}
 			});
 			System.IO.File.WriteAllBytes(directoryName + ".exercise.zip", zipData);
@@ -87,7 +87,7 @@ namespace uLearn.Model.Blocks
 				{
 					new FileContent { Path = UserCodeFileName, Data = Encoding.UTF8.GetBytes(code) },
 					new FileContent { Path = CsprojFileName,
-						Data = ProjModifier.ModifyCsproj(exerciseDir.GetBytes(CsprojFileName), 
+						Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(CsprojFileName), 
 						ProjModifier.PrepareCsprojBeforeZipping) }
 				});
 		}

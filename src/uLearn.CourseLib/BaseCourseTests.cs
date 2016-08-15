@@ -132,7 +132,7 @@ namespace uLearn
 				new FileContent
 				{
 					Path = exercise.CsprojFileName,
-					Data = ProjModifier.ModifyCsproj(exerciseDir.GetBytes(exercise.CsprojFileName),
+					Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(exercise.CsprojFileName),
 						ProjModifier.PrepareCsprojBeforeZipping)
 				}
 			});

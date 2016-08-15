@@ -54,7 +54,9 @@ namespace uLearn.CourseTool
 		private void FileWatcherOnChanged(object sender, FileSystemEventArgs args)
 		{
 			var extensions = new[] { ".cs", ".gif", ".bmp", ".sln", ".xml", ".png", ".csproj", ".txt", ".md" };
-			if (extensions.Any(ext => args.Name.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase)))
+			var monitoredExtension = extensions.Any(ext => args.Name.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase));
+			var insideCheckingDir = args.FullPath.ToLower().Contains("\\checking\\");
+			if (!insideCheckingDir && monitoredExtension)
 			{
 				Console.WriteLine($"{DateTime.Now.ToString("T")} {args.Name} was {args.ChangeType.ToString().ToLower()}.");
 				server.MarkCourseAsChanged();
