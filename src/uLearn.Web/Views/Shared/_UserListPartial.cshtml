@@ -8,6 +8,7 @@
 
 <table class="table table-condensed">
 	<tr>
+		<th>Логин</th>
 		<th>Имя</th>
 		<th>Группы</th>
 		@if (Model.IsCourseAdmin)
@@ -22,7 +23,8 @@
 	@foreach (var user in Model.Users)
 	{
 		<tr data-userid="@user.UserId">
-			<td>@Html.ActionLink(user.UserName, "Info", "Account", new { userName = user.UserName }, new {})</td>
+			<td>@Html.ActionLink(user.UserName, "Info", "Account", new { userName = user.UserName }, new { })</td>
+			<td>@user.UserVisibleName</td>
 			<td>@Model.UsersGroups.Get(user.UserId, "")</td>
 			@if (Model.IsCourseAdmin)
 			{

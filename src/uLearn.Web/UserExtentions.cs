@@ -67,7 +67,7 @@ namespace uLearn.Web
 		public static IEnumerable<string> GetControllableCoursesId(this IPrincipal principal)
 		{
 			if (!principal.IsSystemAdministrator())
-				return principal.GetCoursesIdFor(CourseRole.CourseAdmin);
+				return principal.GetCoursesIdFor(CourseRole.Instructor);
 			var courseManager = WebCourseManager.Instance;
 			return courseManager.GetCourses().Select(course => course.Id);
 		}

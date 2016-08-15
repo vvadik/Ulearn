@@ -38,13 +38,6 @@
 				</div>
 			</div>
 			<div class="form-group">
-				@Html.LabelFor(m => m.GroupName, new { @class = "col-md-1 control-label" })
-				<div class="col-md-10">
-					@Html.TextBoxFor(m => m.GroupName, new { @class = "form-control", list = "groupsList" })
-					@Html.Partial("_GroupsPrompt")
-				</div>
-			</div>
-			<div class="form-group">
 				<div class="col-md-offset-1 col-md-10">
 					<input type="submit" value="Сохранить изменения" class="btn btn-default" />
 				</div>

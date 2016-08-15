@@ -436,7 +436,7 @@ namespace uLearn.Web.Controllers
 			var passes = db.UserQuizzes
 				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped && periodStart <= q.Timestamp)
 				.GroupBy(q => q.UserId)
-				.Join(db.Users, g => g.Key, user => user.Id, (g, user) => new { UserId = user.Id, user.UserName, user.GroupName, UserQuizzes = g.ToList(), QuizVersion = g.FirstOrDefault().QuizVersion })
+				.Join(db.Users, g => g.Key, user => user.Id, (g, user) => new { UserId = user.Id, user.UserName, UserQuizzes = g.ToList(), QuizVersion = g.FirstOrDefault().QuizVersion })
 				.ToList();
 			foreach (var pass in passes)
 			{

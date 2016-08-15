@@ -243,17 +243,16 @@ namespace uLearn.Web.Controllers
 				.Distinct()
 				.Join(db.Visits, s => s, v => v.UserId, (s, visiters) => visiters)
 				.Where(v => slideIds.Contains(v.SlideId))
-				.Select(v => new { v.UserId, v.User.UserName, v.User.GroupName, v.SlideId, v.IsPassed, v.Score, v.AttemptsCount })
+				.Select(v => new { v.UserId, v.User.UserName, v.SlideId, v.IsPassed, v.Score, v.AttemptsCount })
 				.ToList();
 
 			var r = from v in dq
-					group v by new { v.UserId, v.UserName, v.GroupName }
+					group v by new { v.UserId, v.UserName }
 				into u
 					select new UserInfo
 					{
 						UserId = u.Key.UserId,
 						UserName = u.Key.UserName,
-						UserGroup = u.Key.GroupName,
 						SlidesSlideInfo = GetSlideInfo(slides, u.Select(arg => Tuple.Create(arg.SlideId, arg.IsPassed, arg.Score, arg.AttemptsCount)))
 					};
 
@@ -281,6 +280,7 @@ namespace uLearn.Web.Controllers
 				.ToArray();
 		}
 
+		/*
 		[HttpPost]
 		public async Task<ActionResult> AddUserGroup(string groupName, string userId)
 		{
@@ -288,6 +288,7 @@ namespace uLearn.Web.Controllers
 			await db.SaveChangesAsync();
 			return null;
 		}
+		*/
 
 		public ActionResult ShowSolutions(string courseId, string userId, Guid slideId)
 		{
