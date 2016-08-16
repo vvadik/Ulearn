@@ -131,9 +131,6 @@ namespace uLearn.CourseTool
 				Console.WriteLine($"{requestTime.ToString("T")} {context.Request.HttpMethod} {context.Request.Url}");
 			switch (query)
 			{
-				case "check":
-					response = Encoding.UTF8.GetBytes(ServeCheck());
-					break;
 				case "needRefresh":
 					response = await ServeNeedRefresh(reloaded, requestTime);
 					break;
@@ -146,20 +143,6 @@ namespace uLearn.CourseTool
 			}
 			await context.Response.OutputStream.WriteAsync(response, 0, response.Length);
 			context.Response.OutputStream.Close();
-		}
-
-		private string ServeCheck()
-		{
-			try
-			{
-				var v = new CourseValidator(course, AppDomain.CurrentDomain.BaseDirectory);
-				v.AllExercisesAreOk();
-				v.VideosAreOk();
-				return "OK";
-			}catch(Exception e)
-			{
-				return e.ToString();
-			}
 		}
 
 		private async Task<byte[]> ServeNeedRefresh(bool reloaded, DateTime requestTime)

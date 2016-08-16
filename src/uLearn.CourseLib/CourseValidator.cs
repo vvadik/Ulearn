@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Reflection;
-using System.Threading;
-using NUnit.Framework;
 using RunCsJob;
 using RunCsJob.Api;
 using uLearn.Model.Blocks;
@@ -18,27 +14,58 @@ namespace uLearn
 		private readonly Course course;
 		private readonly string workDir;
 
+		public event Action<string> InfoMessage;
+		public event Action<string> Error;
+
 		public CourseValidator(Course course, string workDir)
 		{
 			this.course = course;
 			this.workDir = workDir;
 		}
 
-		public void VideosAreOk()
+		public void ValidateExercises()
 		{
-			var videos = GetVideos().ToLookup(d => d.Item2, d => d.Item1.Info.SlideFile.Name);
-			foreach (var g in videos.Where(g => g.Count() > 1))
-				Error("Duplicate videos on slides " + string.Join(", ", g));
-			foreach (var g in videos)
+			foreach (var slide in course.Slides.OfType<ExerciseSlide>())
 			{
-				var url = "https://www.youtube.com/oembed?format=json&url=http://www.youtube.com/watch?v=" + g.Key;
-				new WebClient().DownloadData(url);
+				LogSlideProcessing("Validate exercise", slide);
+				EthalonSolutionsForExercises(slide);
 			}
 		}
 
-		private void Error(string message)
+		private void LogSlideProcessing(string prefix, Slide slide)
 		{
-			throw new Exception(message);
+			InfoMessage?.Invoke(prefix + " " + slide.Info.UnitName + " - " + slide.Title);
+		}
+
+		public void ValidateVideos()
+		{
+			var videos = GetVideos().ToLookup(d => d.Item2, d => d.Item1);
+			foreach (var g in videos.Where(g => g.Count() > 1))
+				ReportError("Duplicate videos on slides " + string.Join(", ", g));
+			foreach (var g in videos)
+			{
+				Slide slide = g.First();
+				LogSlideProcessing("Validate video", slide);
+				var url = "https://www.youtube.com/oembed?format=json&url=http://www.youtube.com/watch?v=" + g.Key;
+				try
+				{
+					new WebClient().DownloadData(url);
+				}
+				catch (Exception e)
+				{
+					ReportError("Slide " + slide + " contains not accessible video. " + e.Message);
+				}
+			}
+		}
+
+		private void ReportSlideError(Slide slide, string error)
+		{
+			ReportError(slide.Info.UnitName + ": " + slide.Title + ". " + error);
+		}
+
+		private void ReportError(string message)
+		{
+			Error?.Invoke(message);
 		}
 
 		public IEnumerable<Tuple<Slide, string>> GetVideos()
@@ -65,7 +92,6 @@ namespace uLearn
 				}
 			});
 			var pathToCompiler = Path.Combine(workDir, "Microsoft.Net.Compilers.1.3.2");
-			Console.WriteLine("pathToCompiler = " + pathToCompiler);
 			var result = SandboxRunner.Run(pathToCompiler,
 				new ProjRunnerSubmition
 				{
@@ -75,11 +101,10 @@ namespace uLearn
 					Input = "",
 					NeedRun = true
 				});
-
-			Console.WriteLine("Result = " + result);
-			Assert.AreEqual(Verdict.Ok, result.Verdict);
-
-			Assert.AreNotEqual(1.0, result.Score);
+			if (result.Verdict != Verdict.Ok)
+				ReportSlideError(slide, "Exercise initial code verdict is not OK. RunResult = " + result);
+			else if (result.Score >= 0.5)
+				ReportSlideError(slide, "Exercise initial code (available to students) is solution!");
 		}
 
 		private void EthalonSolutionForSingleFileExercises(ExerciseSlide slide)
@@ -101,22 +126,15 @@ namespace uLearn
 			var isRightAnswer = output.NormalizeEoln().Equals(slide.Exercise.ExpectedOutput.NormalizeEoln());
 			if (!isRightAnswer)
 			{
-				Assert.Fail("mistake in: " + slide.Info.UnitName + " - " + slide.Title + "\n" +
-							"\tActualOutput: " + output.NormalizeEoln() + "\n" +
-							"\tExpectedOutput: " + slide.Exercise.ExpectedOutput.NormalizeEoln() + "\n" +
-							"\tCompilationError: " + result.CompilationOutput + "\n" +
-							"\tSourceCode: " + solution.SourceCode + "\n\n");
+				ReportSlideError(slide,
+					"ActualOutput: " + output.NormalizeEoln() + "\n" +
+					"ExpectedOutput: " + slide.Exercise.ExpectedOutput.NormalizeEoln() + "\n" +
+					"CompilationError: " + result.CompilationOutput + "\n" +
+					"SourceCode: " + solution.SourceCode + "\n\n");
 			}
 		}
 
-		public void AllExercisesAreOk()
-		{
-			foreach (var slide in course.Slides.OfType<ExerciseSlide>())
-			{
-				EthalonSolutionsForExercises(slide);
-			}
-		}
-		public void EthalonSolutionsForExercises(ExerciseSlide slide)
+		private void EthalonSolutionsForExercises(ExerciseSlide slide)
 		{
 			if (slide.Exercise is ProjectExerciseBlock)
 				InitialCodeIsNotSolutionForProjExercise(slide);
@@ -124,15 +142,11 @@ namespace uLearn
 				EthalonSolutionForSingleFileExercises(slide);
 		}
 
-		private static void FailOnError(ExerciseSlide slide, SolutionBuildResult solution, string ethalonSolution)
+		private void FailOnError(ExerciseSlide slide, SolutionBuildResult solution, string ethalonSolution)
 		{
-			Assert.Fail($@"Template solution: {ethalonSolution}
-  
-  source code: {solution.SourceCode}
-  
-  solution has error in: {slide.Info.UnitName} - {slide.Title}
-  
-  error: {solution.ErrorMessage}");
+			ReportSlideError(slide, $@"Template solution: {ethalonSolution}
+source code: {solution.SourceCode}
+error: {solution.ErrorMessage}");
 		}
 	}
 }

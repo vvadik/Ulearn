@@ -9,7 +9,7 @@ namespace uLearn.CourseTool
 		public static int Main(string[] args)
 		{
 			return Parser.Default
-				.ParseArguments<ConvertOptions, DownloadOlxOption, UploadOlxOption, ULearnPatchOptions, VideoPatchOptions, SampleCustomPatchOptions, MonitorOptions, ULearnOptions>(args)
+				.ParseArguments<ConvertOptions, DownloadOlxOption, UploadOlxOption, ULearnPatchOptions, VideoPatchOptions, SampleCustomPatchOptions, MonitorOptions, ULearnOptions, TestCourseOptions>(args)
 				.Return(
 					(AbstractOptions options) => ExecuteOption(options),
 					_ => -1

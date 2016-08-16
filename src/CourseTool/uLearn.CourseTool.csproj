@@ -131,6 +131,7 @@
     <Compile Include="PatchOptions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestCourseOptions.cs" />
     <Compile Include="ULearnInteractor.cs" />
     <Compile Include="ULearnOptions.cs" />
     <Compile Include="ULearnPatchOptions.cs" />
@@ -317,6 +318,10 @@
     <ProjectReference Include="..\RunCsJob\RunCsJob.csproj">
       <Project>{77B16F9D-3CDF-4CC6-BE5F-B6BADFAC5394}</Project>
       <Name>RunCsJob</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\uLearn.CourseLib\uLearn.CourseLib.csproj">
+      <Project>{70f83ad9-235d-4675-8585-608eb089ef94}</Project>
+      <Name>uLearn.CourseLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\ulearn.CourseMonitor\ulearn.CourseMonitor.csproj">
       <Project>{4db64ea3-a557-492a-adea-38831df52962}</Project>
