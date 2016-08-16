@@ -27,11 +27,11 @@ namespace uLearn
 	}
 
 	[TestFixture]
-	public abstract class BaseCourseTests
+	public class BaseCourseTests
 	{
 		private readonly Type someSlideClass;
 
-		protected BaseCourseTests(Type someSlideClass)
+		public BaseCourseTests(Type someSlideClass)
 		{
 			this.someSlideClass = someSlideClass;
 		}
@@ -136,7 +136,10 @@ namespace uLearn
 						ProjModifier.PrepareCsprojBeforeZipping)
 				}
 			});
-			var result = SandboxRunner.Run(Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2"),
+			var pathToCompiler = Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2");
+			Console.WriteLine("pathToCompiler = " + pathToCompiler);
+			Assume.That(Directory.Exists(pathToCompiler));
+			var result = SandboxRunner.Run(pathToCompiler,
 				new ProjRunnerSubmition
 				{
 					Id = slide.Id.ToString(),
@@ -146,7 +149,7 @@ namespace uLearn
 					NeedRun = true
 				});
 
-			Console.WriteLine(result.Error);
+			Console.WriteLine("Result = " + result);
 			Assert.AreEqual(Verdict.Ok, result.Verdict);
 
 			Assert.AreNotEqual(1.0, result.Score);
@@ -154,7 +157,7 @@ namespace uLearn
 
 		private static void EthalonSolutionForSingleFileExercises(ExerciseSlide slide)
 		{
-			var exercise = slide.Exercise as SingleFileExerciseBlock;
+			var exercise = (SingleFileExerciseBlock)slide.Exercise;
 			var solution = exercise.BuildSolution(exercise.EthalonSolution);
 			if (solution.HasErrors)
 			{

@@ -54,7 +54,7 @@ namespace uLearn
 			var linkedItems = (from item in project.Items
 							   let meta = item.DirectMetadata.FirstOrDefault(md => md.Name == "Link")
 							   where meta != null
-							   select new { item, newPath = meta.EvaluatedValue }).ToList();
+							   select new { item, newPath = RenameToGitIgnored(meta.EvaluatedValue) }).ToList();
 			var copies = new List<FileToCopy>();
 			foreach (var link in linkedItems)
 			{
@@ -63,6 +63,13 @@ namespace uLearn
 				link.item.RemoveMetadata("Link");
 			}
 			return copies;
+		}
+
+		private static string RenameToGitIgnored(string filename)
+		{
+			var d = Path.GetDirectoryName(filename) ?? "";
+			var fn = Path.GetFileName(filename);
+			return Path.Combine(d, "~$" + fn);
 		}
 
 		public static byte[] ModifyCsproj(byte[] content, Action<Project> changingAction)

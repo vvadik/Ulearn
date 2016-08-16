@@ -11,10 +11,10 @@ using uLearn.Model.Blocks;
 
 namespace uLearn.CSharp
 {
-	[NUnit.Framework.TestFixture]
+	[TestFixture]
 	public class ProjModifier_Should
 	{
-		[NUnit.Framework.Test]
+		[Test]
 		public void ReplaceLinksWithItems()
 		{
 			var project = new Project("CSharp/TestProject/ProjDir/test.csproj");
@@ -27,6 +27,7 @@ namespace uLearn.CSharp
 			}
 			project.Save(writer);
 			Approvals.Verify(writer.ToString());
+			project.Save(Path.Combine(project.DirectoryPath, "res.csproj"));
 		}
 	}
 }

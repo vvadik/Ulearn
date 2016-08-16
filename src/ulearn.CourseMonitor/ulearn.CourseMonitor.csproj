@@ -121,6 +121,10 @@
       <Project>{77b16f9d-3cdf-4cc6-be5f-b6badfac5394}</Project>
       <Name>RunCsJob</Name>
     </ProjectReference>
+    <ProjectReference Include="..\uLearn.CourseLib\uLearn.CourseLib.csproj">
+      <Project>{70f83ad9-235d-4675-8585-608eb089ef94}</Project>
+      <Name>uLearn.CourseLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\uLearn.Web\uLearn.Web.csproj">
       <Project>{b3701d2e-d001-4e0a-ab2f-7acb5a89589b}</Project>
       <Name>uLearn.Web</Name>
