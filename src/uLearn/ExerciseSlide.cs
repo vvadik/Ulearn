@@ -9,7 +9,7 @@ namespace uLearn
 	{
 		public override bool ShouldBeSolved { get { return true; } }
 
-		public ExerciseBlock Exercise { get; set; }
+		public ExerciseBlock Exercise { get; }
 		
 		public ExerciseSlide(
 			List<SlideBlock> blocks,
@@ -17,8 +17,8 @@ namespace uLearn
 			string title, Guid id)
 			: base(blocks, slideInfo, title, id)
 		{
-			MaxScore = 5;
-			Exercise = blocks.OfType<ExerciseBlock>().SingleOrDefault();
+			Exercise = blocks.OfType<ExerciseBlock>().Single();
+			MaxScore = Exercise.MaxScore;
 		}
 
 		public override string ToString()

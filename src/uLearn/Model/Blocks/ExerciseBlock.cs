@@ -8,6 +8,14 @@ namespace uLearn.Model.Blocks
 {
 	public abstract class ExerciseBlock : IncludeCode
 	{
+		protected ExerciseBlock()
+		{
+			MaxScore = 5;
+		}
+
+		[XmlElement("max-score")]
+		public int MaxScore { get; set; }
+
 		[XmlElement("inital-code")]
 		public string ExerciseInitialCode { get; set; }
 

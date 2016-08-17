@@ -113,6 +113,7 @@
     <xs:complexContent>
       <xs:extension base="IncludeCode">
         <xs:sequence>
+          <xs:element name="max-score" type="xs:integer" minOccurs="0" maxOccurs="1" />
           <xs:element name="inital-code" type="xs:string" minOccurs="0" maxOccurs="1" />
           <xs:element name="hint" type="notEmptyString" minOccurs="0" maxOccurs="unbounded" />
           <xs:element name="comment" type="notEmptyString" minOccurs="0" />
