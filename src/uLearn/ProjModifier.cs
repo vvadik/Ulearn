@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using Microsoft.Build.Evaluation;
+using uLearn.Model.Blocks;
 
 namespace uLearn
 {
@@ -28,9 +29,9 @@ namespace uLearn
 			proj.RemoveItems(toRemove);
 		}
 
-		public static void PrepareCsprojBeforeZipping(Project proj)
+		public static void PrepareCsprojBeforeZipping(Project proj, ProjectExerciseBlock exerciseBlock)
 		{
-			proj.SetProperty("StartupObject", "checking.CheckerRunner");
+			proj.SetProperty("StartupObject", exerciseBlock.StartupObject);
 			proj.SetProperty("OutputType", "Exe");
 			proj.SetProperty("UseVSHostingProcess", "false");
 			ResolveLinks(proj);

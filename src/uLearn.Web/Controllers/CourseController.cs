@@ -349,7 +349,7 @@ namespace uLearn.Web.Controllers
 				if (visit != null)
 				{
 					visit.IsPassed = db.UserSolutions.Any(s => s.UserId == solution.UserId && s.SlideId == solution.SlideId && s.IsRightAnswer && s.Id != solutionId);
-					visit.Score = visit.IsSkipped ? 0 : visit.IsPassed ? 5 : 0;
+					visit.Score = visit.IsSkipped ? 0 : visit.IsPassed ? 5 : 0; //TODO fix 5 to Score from UserSolution
 					visit.AttemptsCount--;
 				}
 				db.UserSolutions.Remove(solution);

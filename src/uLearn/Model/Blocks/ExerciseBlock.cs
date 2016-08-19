@@ -11,6 +11,7 @@ namespace uLearn.Model.Blocks
 		protected ExerciseBlock()
 		{
 			MaxScore = 5;
+			MaxReviewAttempts = 2;
 		}
 
 		[XmlElement("max-score")]
@@ -37,6 +38,15 @@ namespace uLearn.Model.Blocks
 
 		[XmlElement("hide-solutions")]
 		public bool HideShowSolutionsButton { get; set; }
+
+		[XmlElement("require-review")]
+		public bool RequireReview { get; set; }
+
+		[XmlElement("correctness-score")]
+		public int CorrectnessScore { get; set; }
+
+		[XmlElement("max-review-attempts")]
+		public int MaxReviewAttempts { get; set; }
 
 		public List<string> HintsMd
 		{
@@ -91,7 +101,7 @@ namespace uLearn.Model.Blocks
 
 		public Component GetExerciseComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)
 		{
-			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex, launchUrl, ltiId, true, 5, false);
+			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex, launchUrl, ltiId, true, MaxScore, false);
 		}
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)

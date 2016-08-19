@@ -101,15 +101,14 @@ namespace uLearn.Web.DataContexts
 			});
 		}
 
-		public async Task AddSolutionAttempt(Guid slideId, string userId, bool isRightAnswer)
+		public async Task AddSolutionAttempt(Guid slideId, string userId, int score)
 		{
 			await UpdateAttempts(slideId, userId, visit =>
 			{
-				visit.IsPassed = visit.IsPassed || isRightAnswer;
+				visit.IsPassed = visit.IsPassed || score > 0;
 				visit.AttemptsCount++;
-				var newScore = isRightAnswer && !visit.IsSkipped ? 5 : 0;
-				if (newScore > visit.Score)
-					visit.Score = newScore;
+				if (!visit.IsSkipped && score > visit.Score)
+					visit.Score = score;
 			});
 		}
 
