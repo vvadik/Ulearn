@@ -108,7 +108,7 @@ namespace uLearn.Web.Controllers
 			if (groupId.HasValue)
 			{
 				if (!groupsRepo.IsGroupAvailableForUser(groupId.Value, User))
-					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+					groupId = null;
 				filteredUsersIds = groupsRepo.GetGroupMembers(groupId.Value).Select(u => u.Id).ToList();
 			}
 
@@ -163,14 +163,19 @@ namespace uLearn.Web.Controllers
 				CourseId = courseId,
 				UnitName = unitName,
 				UnitsNames = units.ToList(),
+				GroupId = groupId,
+				Groups = groups,
+
 				PeriodStart = periodStart,
 				PeriodFinish = periodFinish,
-				Groups = groups,
+
 				Slides = slides,
 				SlidesVisits = slidesVisits,
+
 				UsersVisitedAllSlidesBeforePeriod = usersVisitedAllSlidesBeforePeriod.ToList(),
 				UsersVisitedAllSlidesInPeriod = usersVisitedAllSlidesInPeriod.ToList(),
 				UsersVisitedAllSlidesBeforePeriodFinished = usersVisitedAllSlidesBeforePeriodFinished.ToList(),
+
 				QuizzesAverageScore = quizzesAverageScore,
 				ManualQuizCheckQueueBySlide = manualQuizCheckQueueBySlide,
 				CommentsBySlide = commentsBySlide,

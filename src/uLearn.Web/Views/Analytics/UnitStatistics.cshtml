@@ -62,9 +62,9 @@
 
 				<div class="form-group">
 					@{
-						var groupsListItems = new List<SelectListItem> { new SelectListItem { Text = "Все пользователи", Value = ""} };
+						var groupsListItems = new List<SelectListItem> { new SelectListItem { Text = "Все пользователи", Value = "", Selected = ! Model.GroupId.HasValue } };
 						groupsListItems.AddRange(
-							Model.Groups.Select(group => new SelectListItem { Text = group.Name, Value = group.Id.ToString() })
+							Model.Groups.Select(group => new SelectListItem { Text = group.Name, Value = group.Id.ToString(), Selected = group.Id == Model.GroupId })
 						);
 					}
 					@Html.Raw(HttpUtility.HtmlDecode(
