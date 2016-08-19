@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Net;
 using System.Web.Mvc;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -103,19 +102,29 @@ namespace uLearn.Web.Controllers
 			var quizzes = slides.OfType<QuizSlide>();
 			var exersices = slides.OfType<ExerciseSlide>();
 
-			/* Dictionary<SlideId, List<Visit>> */
-			var slidesVisits = visitsRepo.GetVisitsInPeriodForEachSlide(slidesIds, periodStart, realPeriodFinish);
+			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+			var groupId = param.Group;
+			List<string> filteredUsersIds = null;
+			if (groupId.HasValue)
+			{
+				if (!groupsRepo.IsGroupAvailableForUser(groupId.Value, User))
+					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+				filteredUsersIds = groupsRepo.GetGroupMembers(groupId.Value).Select(u => u.Id).ToList();
+			}
 
-			var usersVisitedAllSlidesBeforePeriod = visitsRepo.GetUsersVisitedAllSlides(slidesIds, DateTime.MinValue, periodStart);
-			var usersVisitedAllSlidesInPeriod = visitsRepo.GetUsersVisitedAllSlides(slidesIds, periodStart, realPeriodFinish);
-			var usersVisitedAllSlidesBeforePeriodFinished = visitsRepo.GetUsersVisitedAllSlides(slidesIds, DateTime.MinValue, realPeriodFinish);
+			/* Dictionary<SlideId, List<Visit>> */
+			var slidesVisits = visitsRepo.GetVisitsInPeriodForEachSlide(slidesIds, periodStart, realPeriodFinish, filteredUsersIds);
+
+			var usersVisitedAllSlidesBeforePeriod = visitsRepo.GetUsersVisitedAllSlides(slidesIds, DateTime.MinValue, periodStart, filteredUsersIds);
+			var usersVisitedAllSlidesInPeriod = visitsRepo.GetUsersVisitedAllSlides(slidesIds, periodStart, realPeriodFinish, filteredUsersIds);
+			var usersVisitedAllSlidesBeforePeriodFinished = visitsRepo.GetUsersVisitedAllSlides(slidesIds, DateTime.MinValue, realPeriodFinish, filteredUsersIds);
 
 			var quizzesAverageScore = quizzes.ToDictionary(q => q.Id,
-				q => slidesVisits.GetOrDefault(q.Id, new List<Visit>())
-								 .Where(v => v.IsPassed)
-								 .Select(v => v.Score)
-								 .DefaultIfEmpty(-1)
-								 .Average()
+				q => (int) slidesVisits.GetOrDefault(q.Id, new List<Visit>())
+									   .Where(v => v.IsPassed)
+									   .Select(v => 100 * Math.Min(v.Score, q.MaxScore) / q.MaxScore)
+									   .DefaultIfEmpty(-1)
+									   .Average()
 			);
 
 			/* Dictionary<SlideId, List<UserSolution> (distinct by user)> */
@@ -137,15 +146,15 @@ namespace uLearn.Web.Controllers
 				.GroupBy(c => c.SlideId)
 				.ToDictionary(g => g.Key, g => g.ToList());
 
-			var visitedUsersIds = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, realPeriodFinish)
+			var visitedUsersIds = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, realPeriodFinish, filteredUsersIds)
 				.ToList()
 				.DistinctBy(v => v.UserId)
 				.Select(v => v.User);
 
-			var visitedSlidesByUser = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, realPeriodFinish)
+			var visitedSlidesByUser = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, realPeriodFinish, filteredUsersIds)
 				.GroupBy(v => v.UserId)
 				.ToDictionary(g => g.Key, g => g.Select(v => v.SlideId).ToImmutableHashSet());
-			var visitedSlidesByUserAllTime = visitsRepo.GetVisitsInPeriod(slidesIds, DateTime.MinValue, DateTime.MaxValue)
+			var visitedSlidesByUserAllTime = visitsRepo.GetVisitsInPeriod(slidesIds, DateTime.MinValue, DateTime.MaxValue, filteredUsersIds)
 				.GroupBy(v => v.UserId)
 				.ToDictionary(g => g.Key, g => g.Select(v => v.SlideId).ToImmutableHashSet());
 
@@ -156,6 +165,7 @@ namespace uLearn.Web.Controllers
 				UnitsNames = units.ToList(),
 				PeriodStart = periodStart,
 				PeriodFinish = periodFinish,
+				Groups = groups,
 				Slides = slides,
 				SlidesVisits = slidesVisits,
 				UsersVisitedAllSlidesBeforePeriod = usersVisitedAllSlidesBeforePeriod.ToList(),
@@ -388,6 +398,8 @@ namespace uLearn.Web.Controllers
 		
 		public string PeriodStart { get; set; }
 		public string PeriodFinish { get; set; }
+
+		public int? Group { get; set; }
 
 		private static readonly string[] dateFormats = { "dd.MM.yyyy" };
 

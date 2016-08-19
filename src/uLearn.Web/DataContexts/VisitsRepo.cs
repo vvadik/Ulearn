@@ -178,23 +178,26 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public IQueryable<Visit> GetVisitsInPeriod(IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
+		public IQueryable<Visit> GetVisitsInPeriod(IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds=null)
 		{
-			return db.Visits.Where(v => slidesIds.Contains(v.SlideId) && periodStart <= v.Timestamp && v.Timestamp <= periodFinish);
+			var filteredVisits = db.Visits.Where(v => slidesIds.Contains(v.SlideId) && periodStart <= v.Timestamp && v.Timestamp <= periodFinish);
+			if (usersIds != null)
+				filteredVisits = filteredVisits.Where(v => usersIds.Contains(v.UserId));
+			return filteredVisits;
 		}
 
-		public Dictionary<Guid, List<Visit>> GetVisitsInPeriodForEachSlide(IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
+		public Dictionary<Guid, List<Visit>> GetVisitsInPeriodForEachSlide(IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds=null)
 		{
-			return GetVisitsInPeriod(slidesIds, periodStart, periodFinish)
+			return GetVisitsInPeriod(slidesIds, periodStart, periodFinish, usersIds)
 				.GroupBy(v => v.SlideId)
 				.ToDictionary(g => g.Key, g => g.ToList());
 		}
 
-		public IEnumerable<string> GetUsersVisitedAllSlides(IImmutableSet<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
+		public IEnumerable<string> GetUsersVisitedAllSlides(IImmutableSet<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null)
 		{
 			var slidesCount = slidesIds.Count;
 
-			return GetVisitsInPeriod(slidesIds, periodStart, periodFinish)
+			return GetVisitsInPeriod(slidesIds, periodStart, periodFinish, usersIds)
 				.DistinctBy(v => Tuple.Create(v.UserId, v.SlideId))
 				.GroupBy(v => v.UserId)
 				.Where(g => g.Count() == slidesCount)

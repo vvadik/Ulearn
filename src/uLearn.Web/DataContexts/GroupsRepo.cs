@@ -109,11 +109,28 @@ namespace uLearn.Web.DataContexts
 			return db.Groups.Where(g => g.CourseId == courseId && ! g.IsDeleted).ToList();
 		}
 
+		public bool IsGroupAvailableForUser(int groupId, IPrincipal user)
+		{
+			var group = GetGroupById(groupId);
+			/* Course admins can see all groups */
+			if (CanUserSeeAllCourseGroups(user, group.CourseId))
+				return true;
+
+			if (!user.HasAccessFor(group.CourseId, CourseRole.Instructor))
+				return false;
+
+			var userId = user.Identity.GetUserId();
+			return !group.IsDeleted && (group.OwnerId == userId || group.IsPublic);
+		}
+
 		public List<Group> GetAvailableForUserGroups(string courseId, IPrincipal user)
 		{
 			/* Course admins can see all groups */
 			if (CanUserSeeAllCourseGroups(user, courseId))
 				return GetGroups(courseId);
+
+			if (!user.HasAccessFor(courseId, CourseRole.Instructor))
+				return new List<Group>();
 
 			var userId = user.Identity.GetUserId();
 			return db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || g.IsPublic)).ToList();

@@ -49,7 +49,8 @@ namespace uLearn.Web
 					"~/Scripts/respond.js",
 					"~/Scripts/slide-*",
 					"~/Scripts/users-list.js",
-					"~/Scripts/groups-editor.js"
+					"~/Scripts/groups-editor.js",
+					"~/Scripts/analytics-highcharts.js"
 				);
 		}
 

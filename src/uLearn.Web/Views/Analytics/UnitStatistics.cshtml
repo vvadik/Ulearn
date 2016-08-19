@@ -7,13 +7,34 @@
 	var args = new {courseId = Model.CourseId, unitName = Model.UnitName};
 }
 
+@helper UsersByCountVisitedSlidesTable(string id, Dictionary<int, int> data)
+{
+	<table id="@id" class="hidden">
+		<thead>
+			<tr>
+				<th>Просмотренных слайдов</th>
+				<th>Количество человек</th>
+			</tr>
+		</thead>
+		<tbody>
+			@for (var countVisitedSlides = 0; countVisitedSlides <= Model.Slides.Count; countVisitedSlides++)
+			{
+				<tr>
+					<td>@countVisitedSlides</td>
+					<td>@data.GetOrDefault(countVisitedSlides, 0)</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
 <body>
 	<div class="container">
 
 	<h1>Статистика</h1>
 
 	<div class="analytics__dashboard">
-			@using (Html.BeginForm("UnitStatistics", "Analytics", FormMethod.Get, new { @class="form-inline", @id="unit-statistics-filter-form" }))
+			@using (Html.BeginForm("UnitStatistics", "Analytics", FormMethod.Get, new { @class="form-inline", id="unit-statistics-filter-form" }))
 			{
 				var formSubmit = "$('#unit-statistics-filter-form').submit();";
 				@Html.Hidden("courseId", Model.CourseId)
@@ -37,6 +58,21 @@
 					@Html.Raw(HttpUtility.HtmlDecode(
 						Html.TextBox("periodFinish", Model.PeriodFinish.ToString("dd.MM.yyyy"), new { @class = "form-control form-control-date datetimepicker", onchange = formSubmit })
 							.ToHtmlString()))
+				</div>
+
+				<div class="form-group">
+					@{
+						var groupsListItems = new List<SelectListItem> { new SelectListItem { Text = "Все пользователи", Value = ""} };
+						groupsListItems.AddRange(
+							Model.Groups.Select(group => new SelectListItem { Text = group.Name, Value = group.Id.ToString() })
+						);
+					}
+					@Html.Raw(HttpUtility.HtmlDecode(
+						Html.DropDownList("group",
+							groupsListItems,
+							new { @class = "form-control", onchange = formSubmit }
+							).ToHtmlString())
+						)
 				</div>
 			}
 
@@ -82,7 +118,7 @@
 									}
 									else
 									{
-										<span class="quiz-average" title="Средний балл">@average/@(((QuizSlide)slide).Quiz.MaxScore)</span>
+										<span class="quiz-average" title="Средний процент полученных баллов">@average%</span>
 									}
 								}
 								else if (slide is ExerciseSlide)
@@ -118,6 +154,27 @@
 							@(Model.UsersVisitedAllSlidesBeforePeriodFinished.Count - Model.UsersVisitedAllSlidesBeforePeriod.Count)
 						</strong>
 					</div>
+
+					<div class="vspace-20"></div>
+
+					@{
+						var usersByCountVisitedSlides = Model.VisitedSlidesByUser
+							.GroupBy(p => p.Value.Count, p => p.Key)
+							.ToDictionary(g => g.Key, g => g.Count());
+						var usersByCountVisitedSlidesAllTime = Model.VisitedSlidesByUserAllTime
+							.GroupBy(p => p.Value.Count, p => p.Key)
+							.ToDictionary(g => g.Key, g => g.Count());
+					}
+					@UsersByCountVisitedSlidesTable("usersByCountVisitedSlides", usersByCountVisitedSlides)
+					@UsersByCountVisitedSlidesTable("usersByCountVisitedSlidesAllTime", usersByCountVisitedSlidesAllTime)
+
+					<div class="analytics__chart__toggles">
+						Показать график:
+						<a href="#usersByCountVisitedSlides" class="analytics__chart__toggle selected">за выбранный период</a>
+						<a href="#usersByCountVisitedSlidesAllTime" class="analytics__chart__toggle">за всё время</a>
+					</div>
+
+					<div id="usersByCountVisitedSlidesChart"></div>
 
 					<div class="vspace-20"></div>
 
@@ -167,10 +224,11 @@
 					<div class="small-table__title">
 						<div class="small-table__title__cell">пользователь</div>
 						<div class="pull-right">
+							<div class="small-table__title__cell">прогресс</div>
 							@foreach (var slide in exercisesAndQuizzes)
-							{
-								if (slide is QuizSlide)
-								{
+					{
+						if (slide is QuizSlide)
+						{
 									<span class="glyphicon glyphicon-pushpin small-table__title__cell" title="@slide.Title"></span>
 								}
 								else if (slide is ExerciseSlide)
@@ -227,5 +285,5 @@
 @section scripts{
 <script src="//code.highcharts.com/highcharts.js"></script>
 <script src="//code.highcharts.com/modules/data.js"></script>
-<script src="~/Scripts/user-group-name-change.js"></script>
+<script src="~/Scripts/analytics-highcharts.js"></script>
 }

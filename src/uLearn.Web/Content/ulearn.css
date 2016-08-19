@@ -1159,3 +1159,24 @@ table.analytics__user-answers {
 .analytics__dashboard .large-number__text {
 	text-align: center;
 }
+
+.analytics__chart__toggles {
+	font-size: 10pt;
+}
+
+.analytics__chart__toggles .analytics__chart__toggle {
+	margin-right: 10px;
+}
+
+.analytics__chart__toggles .analytics__chart__toggle.selected {
+	pointer-events: none;
+	color: black;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.analytics__chart__toggles .analytics__chart__toggle.selected:hover,
+.analytics__chart__toggles .analytics__chart__toggle.selected:focus,
+.analytics__chart__toggles .analytics__chart__toggle.selected:active {
+	text-decoration: none;
+}
