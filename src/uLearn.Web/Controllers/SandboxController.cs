@@ -15,7 +15,7 @@ namespace uLearn.Web.Controllers
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
-		private readonly static TimeSpan timeout = TimeSpan.FromSeconds(30);
+		private static readonly TimeSpan timeout = TimeSpan.FromSeconds(30);
 
 		public ActionResult Index(int max = 200, int skip = 0)
 		{
@@ -24,7 +24,7 @@ namespace uLearn.Web.Controllers
 			return View(new SubmissionsListModel
 			{
 				Submissions = submissions
-			}); 
+			});
 		}
 
 		public ActionResult RunCode()
@@ -38,17 +38,17 @@ namespace uLearn.Web.Controllers
 			var code = Request.InputStream.GetString();
 
 			var solution = await solutionsRepo.RunUserSolution(
-				"web", Guid.Empty, User.Identity.GetUserId(), 
-				code, null, null, false, "null", 
+				"web", Guid.Empty, User.Identity.GetUserId(),
+				code, null, null, false, "null",
 				User.Identity.Name + ": CsSandbox Web Executor", timeout
-			);
+				);
 
 			return Json(new RunSolutionResult
 			{
-				ActualOutput = solution.Output.Text, 
-				CompilationError = solution.CompilationError.Text, 
-				ExecutionServiceName = solution.ExecutionServiceName, 
-				IsCompileError = solution.IsCompilationError, 
+				ActualOutput = solution.Output.Text,
+				CompilationError = solution.CompilationError.Text,
+				ExecutionServiceName = solution.ExecutionServiceName,
+				IsCompileError = solution.IsCompilationError,
 				IsRightAnswer = solution.IsRightAnswer
 			});
 		}
@@ -56,11 +56,13 @@ namespace uLearn.Web.Controllers
 		public ActionResult GetDetails(int id)
 		{
 			var details = solutionsRepo.GetDetails(id);
-			details.SolutionCode.Text = Utils.GetSource(
-				details.CourseId, 
-				details.SlideId, 
-				courseManager, 
-				details.SolutionCode.Text);
+
+			details.SolutionCode.Text = ((ExerciseSlide)courseManager
+				.GetCourse(details.CourseId)
+				.GetSlideById(details.SlideId))
+				.Exercise
+				.GetSourceCode(details.SolutionCode.Text);
+
 			return View(solutionsRepo.GetDetails(id));
 		}
 	}

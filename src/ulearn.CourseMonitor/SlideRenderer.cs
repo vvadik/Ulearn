@@ -19,13 +19,13 @@ namespace uLearn.CourseTool
 			this.course = course;
 		}
 
-		public void CopyLocalFiles(string md, string slideDir)
+		private void CopyLocalFiles(string md, string slideDir)
 		{
 			var urls = md.GetHtmlWithUrls("/static/").Item2;
 			try
 			{
 				foreach (var url in urls)
-					File.Copy(string.Format("{0}/{1}", slideDir, url), string.Format("{0}/static/{1}", htmlDirectory.FullName, url));
+					File.Copy($"{slideDir}/{url}", $"{htmlDirectory.FullName}/static/{url}");
 			}
 			catch (Exception)
 			{
@@ -38,7 +38,7 @@ namespace uLearn.CourseTool
 			File.WriteAllText(Path.Combine(directory, GetSlideUrl(slide)), RenderSlide(slide));
 		}
 
-		public string RenderSlide(Slide slide)
+		private string RenderSlide(Slide slide)
 		{
 			var page = StandaloneLayout.Page(course, slide, CreateToc(slide), GetCssFiles(), GetJsFiles());
 			foreach (var block in slide.Blocks.OfType<MdBlock>())
@@ -51,7 +51,7 @@ namespace uLearn.CourseTool
 			File.WriteAllText(Path.Combine(directory, GetInstructorNotesFilename(unitName)), RenderInstructorsNote(unitName));
 		}
 
-		public string RenderInstructorsNote(string unitName)
+		private string RenderInstructorsNote(string unitName)
 		{
 			var note = course.FindInstructorNote(unitName);
 			if (note == null)
@@ -77,15 +77,15 @@ namespace uLearn.CourseTool
 		private string GetInstructorNotesFilename(string unitName)
 		{
 			var units = course.GetUnits().Select((unit, index) => new { name = unit, index });
-			return string.Format("InstructorNotes.{0}.html", units.First(u => u.name == unitName).index);
+			return $"InstructorNotes.{units.First(u => u.name == unitName).index}.html";
 		}
 
-		private string GetSlideUrl(Slide slide)
+		private static string GetSlideUrl(Slide slide)
 		{
 			return slide.Index.ToString("000") + ".html";
 		}
 
-		public IEnumerable<string> GetCssFiles()
+		private IEnumerable<string> GetCssFiles()
 		{
 			return Directory.EnumerateFiles(htmlDirectory.FullName + "/styles").Select(x => "styles/" + new FileInfo(x).Name);
 		}

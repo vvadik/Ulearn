@@ -16,7 +16,7 @@ namespace uLearn.Web.Controllers
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 
-		private readonly static TimeSpan executionTimeout = TimeSpan.FromSeconds(30);
+		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(30);
 
 		public ExerciseController()
 			: this(WebCourseManager.Instance)
@@ -52,13 +52,12 @@ namespace uLearn.Web.Controllers
 		private async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string code)
 		{
 			var exerciseBlock = exerciseSlide.Exercise;
-			var solution = exerciseBlock.Solution.BuildSolution(code);
-			if (solution.HasErrors)
-				return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
-			if (solution.HasStyleIssues)
-				return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage, ExecutionServiceName = "uLearn" };
-
-			var submissionDetails = await solutionsRepo.RunUserSolution(
+		    var solution = exerciseBlock.BuildSolution(code);
+		    if (solution.HasErrors)
+		            return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
+		        if (solution.HasStyleIssues)
+		            return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage, ExecutionServiceName = "uLearn" };
+		    var submissionDetails = await solutionsRepo.RunUserSolution(
 				courseId, exerciseSlide.Id, User.Identity.GetUserId(), 
 				code, null, null, false, "uLearn", 
 				GenerateSubmissionName(exerciseSlide), executionTimeout

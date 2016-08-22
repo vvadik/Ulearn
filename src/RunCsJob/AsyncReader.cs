@@ -20,14 +20,8 @@ namespace RunCsJob
 			return new string(_buffer, 0, _readerTask.Result);
 		}
 
-		private bool IsCompleted
-		{
-			get { return _readerTask.IsCompleted; }
-		}
+		private bool IsCompleted => _readerTask.IsCompleted;
 
-		public int ReadedLength
-		{
-			get { return IsCompleted ? _readerTask.Result : -1; }
-		}
+		public int ReadedLength => IsCompleted ? _readerTask.Result : -1;
 	}
 }

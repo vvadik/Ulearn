@@ -36,7 +36,7 @@ function codeMirrorClass(c, editable, guest) {
 				}
 			},
 			readOnly: !editable,
-			//autoCloseBrackets: true, // bug: autoCloseBracket breakes indentation after for|while|...
+			//autoCloseBrackets: true, // workaround: autoCloseBracket breakes indentation after for|while|...
 			styleActiveLine: editable,
 			matchBrackets: true,
 		});

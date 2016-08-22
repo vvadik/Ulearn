@@ -22,7 +22,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
-		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo(); //TODO use in statistics
+		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 		private readonly CommentsRepo commentsRepo = new CommentsRepo();
 		private readonly GroupsRepo groupsRepo = new GroupsRepo();
 

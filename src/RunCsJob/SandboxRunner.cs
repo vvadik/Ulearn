@@ -1,120 +1,144 @@
 ﻿using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using Microsoft.CSharp;
 using Newtonsoft.Json;
 using RunCsJob.Api;
+using uLearn;
 
 namespace RunCsJob
 {
 	public class SandboxRunner
 	{
-		private readonly RunnerSubmition _submission;
+		private readonly RunnerSubmition submition;
 
-		private const int TimeLimitInSeconds = 10;
-		private static readonly TimeSpan TimeLimit = TimeSpan.FromSeconds(TimeLimitInSeconds);
-		private static readonly TimeSpan IdleTimeLimit = TimeSpan.FromSeconds(2*TimeLimitInSeconds);
+		private const int timeLimitInSeconds = 10;
+		private static readonly TimeSpan timeLimit = TimeSpan.FromSeconds(timeLimitInSeconds);
+		private static readonly TimeSpan idleTimeLimit = TimeSpan.FromSeconds(2 * timeLimitInSeconds);
 
-		private const int MemoryLimit = 64 * 1024 * 1024;
-		private const int OutputLimit = 10 * 1024 * 1024;
+		private const int memoryLimit = 64 * 1024 * 1024;
+		private const int outputLimit = 10 * 1024 * 1024;
+		private bool hasTimeLimit;
+		private bool hasMemoryLimit;
+		private bool hasOutputLimit;
 
-		private bool _hasTimeLimit;
-		private bool _hasMemoryLimit;
-		private bool _hasOutputLimit;
+		private readonly RunningResults result = new RunningResults();
 
-		private readonly RunningResults _result = new RunningResults();
-
-		private static readonly string[] UsesAssemblies =
-		{
-			"System.dll", 
-			"System.Core.dll",
-			"System.Linq.dll", 
-			"mscorlib.dll"
-		};
-
-		public static RunningResults Run(RunnerSubmition submission)
+		public static RunningResults Run(string pathToCompiler, RunnerSubmition submition)
 		{
 			try
 			{
-				return new SandboxRunner(submission).Run();
+				if (submition is ProjRunnerSubmition)
+					return new SandboxRunner(submition).RunMsBuild(pathToCompiler);
+				return new SandboxRunner(submition).RunCsc();
 			}
 			catch (Exception ex)
 			{
 				return new RunningResults
 				{
-					Id = submission.Id,
+					Id = submition.Id,
 					Verdict = Verdict.SandboxError,
 					Error = ex.ToString()
 				};
 			}
 		}
 
-		public SandboxRunner(RunnerSubmition submission)
+		public SandboxRunner(RunnerSubmition submition)
 		{
-			_submission = submission;
-			_result.Id = submission.Id;
+			this.submition = submition;
+			result.Id = submition.Id;
 		}
 
-		public RunningResults Run()
+		private RunningResults RunMsBuild(string pathToCompiler)
 		{
-			var assembly = CreateAssemby();
-
-			_result.Verdict = Verdict.Ok;
-
-			_result.AddCompilationInfo(assembly);
-
-			if (_result.IsCompilationError())
+			var projSubmition = (ProjRunnerSubmition)submition;
+			var dir = Directory.CreateDirectory(Path.Combine(".", submition.Id));
+			try
 			{
-				Remove(assembly);
-				return _result;
+				Utils.UnpackZip(projSubmition.ZipFileData, dir.FullName);
+			}
+			catch (Exception ex)
+			{
+				SafeRemoveDirectory(dir.FullName);
+				return new RunningResults
+				{
+					Id = submition.Id,
+					Verdict = Verdict.SandboxError,
+					Error = ex.ToString()
+				};
 			}
 
-			if (!_submission.NeedRun)
-			{
-				Remove(assembly);
-				return _result;
-			}
-			RunSandboxer(assembly);
+			var builderResult = MsBuildRunner.BuildProject(pathToCompiler, projSubmition.ProjectFileName, dir);
+			result.Verdict = Verdict.Ok;
 
-			Remove(assembly);
-			return _result;
+			if (!builderResult.Success)
+			{
+				result.Verdict = Verdict.CompilationError;
+				result.CompilationOutput = builderResult.ToString();
+				SafeRemoveDirectory(dir.FullName);
+				return result;
+			}
+
+			RunSandboxer($"\"{builderResult.PathToExe}\" {submition.Id}");
+
+			SafeRemoveDirectory(dir.FullName);
+
+			if (result.Verdict == Verdict.Ok)
+				result.FillPassProgress();
+
+			return result;
 		}
 
-		private void Remove(CompilerResults assembly)
+		public RunningResults RunCsc()
+		{
+			var assembly = AssemblyCreator.CreateAssembly((FileRunnerSubmition)submition);
+
+			result.Verdict = Verdict.Ok;
+			result.AddCompilationInfo(assembly);
+
+			if (result.IsCompilationError())
+			{
+				SafeRemoveFile(assembly.PathToAssembly);
+				return result;
+			}
+
+			if (!submition.NeedRun)
+			{
+				SafeRemoveFile(assembly.PathToAssembly);
+				return result;
+			}
+			RunSandboxer($"\"{Path.GetFullPath(assembly.PathToAssembly)}\" {submition.Id}");
+
+			SafeRemoveFile(assembly.PathToAssembly);
+			return result;
+		}
+
+		private static void SafeRemoveDirectory(string path)
 		{
 			try
 			{
-				File.Delete(assembly.PathToAssembly);
+				Directory.Delete(path, true);
 			}
 			catch
 			{
 			}
 		}
 
-
-		private CompilerResults CreateAssemby()
+		private static void SafeRemoveFile(string path)
 		{
-			var provider = new CSharpCodeProvider(new Dictionary<string, string> { { "CompilerVersion", "v4.0" } });
-			var compilerParameters = new CompilerParameters(UsesAssemblies)
+			try
 			{
-				GenerateExecutable = true,
-				IncludeDebugInformation = true,
-				WarningLevel = 4,
-			};
-
-			var assembly = provider.CompileAssemblyFromSource(compilerParameters, _submission.Code);
-
-			return assembly;
+				File.Delete(path);
+			}
+			catch
+			{
+			}
 		}
 
-		private void RunSandboxer(CompilerResults assembly)
+		private void RunSandboxer(string args)
 		{
 			var startInfo = new ProcessStartInfo(
-				"CsSandboxer.exe", 
-				string.Format("\"{0}\" {1}", Path.GetFullPath(assembly.PathToAssembly), _submission.Id))
+				"CsSandboxer.exe", args)
 			{
 				RedirectStandardInput = true,
 				RedirectStandardOutput = true,
@@ -128,21 +152,21 @@ namespace RunCsJob
 
 			if (sandboxer == null)
 			{
-				_result.Verdict = Verdict.SandboxError;
-				_result.Error = "Can't start proces";
+				result.Verdict = Verdict.SandboxError;
+				result.Error = "Can't start proces";
 				return;
 			}
 
-			var stderrReader = new AsyncReader(sandboxer.StandardError, OutputLimit + 1);
+			var stderrReader = new AsyncReader(sandboxer.StandardError, outputLimit + 1);
 
 			var readyState = sandboxer.StandardOutput.ReadLineAsync();
-			if (!readyState.Wait(TimeLimit) || readyState.Result != "Ready")
+			if (!readyState.Wait(timeLimit) || readyState.Result != "Ready")
 			{
 				if (!sandboxer.HasExited)
 				{
 					sandboxer.Kill();
-					_result.Verdict = Verdict.SandboxError;
-					_result.Error = "Sandbox does not respond";
+					result.Verdict = Verdict.SandboxError;
+					result.Error = "Sandbox does not respond";
 					return;
 				}
 				if (sandboxer.ExitCode != 0)
@@ -150,8 +174,8 @@ namespace RunCsJob
 					HandleNonZeroExitCode(stderrReader.GetData(), sandboxer.ExitCode);
 					return;
 				}
-				_result.Verdict = Verdict.SandboxError;
-				_result.Error = "Sandbox exit before respond";
+				result.Verdict = Verdict.SandboxError;
+				result.Error = "Sandbox exit before respond";
 				return;
 			}
 
@@ -161,35 +185,35 @@ namespace RunCsJob
 			var startTime = DateTime.Now;
 
 			sandboxer.StandardInput.WriteLine("Run");
-			sandboxer.StandardInput.WriteLineAsync(_submission.Input);
+			sandboxer.StandardInput.WriteLineAsync(submition.Input);
 
-			var stdoutReader = new AsyncReader(sandboxer.StandardOutput, OutputLimit + 1);
+			var stdoutReader = new AsyncReader(sandboxer.StandardOutput, outputLimit + 1);
 			while (!sandboxer.HasExited
-				   && !IsTimeLimitExpected(sandboxer, startTime, startUsedTime)
-				   && !IsMemoryLimitExpected(sandboxer, startUsedMemory)
-				   && !IsOutputLimit(stdoutReader)
-				   && !IsOutputLimit(stderrReader))
+					&& !IsTimeLimitExpected(sandboxer, startTime, startUsedTime)
+					&& !IsMemoryLimitExpected(sandboxer, startUsedMemory)
+					&& !IsOutputLimit(stdoutReader)
+					&& !IsOutputLimit(stderrReader))
 			{
 			}
 
 			if (!sandboxer.HasExited)
 				sandboxer.Kill();
 
-			if (_hasOutputLimit)
+			if (hasOutputLimit)
 			{
-				_result.Verdict = Verdict.OutputLimit;
+				result.Verdict = Verdict.OutputLimit;
 				return;
 			}
 
-			if (_hasTimeLimit)
+			if (hasTimeLimit)
 			{
-				_result.Verdict = Verdict.TimeLimit;
+				result.Verdict = Verdict.TimeLimit;
 				return;
 			}
 
-			if (_hasMemoryLimit)
+			if (hasMemoryLimit)
 			{
-				_result.Verdict = Verdict.MemoryLimit;
+				result.Verdict = Verdict.MemoryLimit;
 				return;
 			}
 
@@ -200,8 +224,8 @@ namespace RunCsJob
 				return;
 			}
 
-			_result.Output = stdoutReader.GetData();
-			_result.Error = stderrReader.GetData();
+			result.Output = stdoutReader.GetData();
+			result.Error = stderrReader.GetData();
 		}
 
 		private void HandleNonZeroExitCode(string error, int exitCode)
@@ -209,7 +233,7 @@ namespace RunCsJob
 			var obj = FindSerializedException(error);
 
 			if (obj != null)
-				_result.HandleException(obj);
+				result.HandleException(obj);
 			else
 				HandleNtStatus(exitCode, error);
 		}
@@ -219,21 +243,21 @@ namespace RunCsJob
 			switch ((uint)exitCode)
 			{
 				case 0xC00000FD:
-					_result.Verdict = Verdict.RuntimeError;
-					_result.Error = "Stack overflow exception.";
+					result.Verdict = Verdict.RuntimeError;
+					result.Error = "Stack overflow exception.";
 					break;
 				default:
-					_result.Verdict = Verdict.SandboxError;
-					_result.Error = string.IsNullOrWhiteSpace(error) ? "Non-zero exit code" : error;
-					_result.Error += string.Format("\nExit code: 0x{0:X8}", exitCode);
+					result.Verdict = Verdict.SandboxError;
+					result.Error = string.IsNullOrWhiteSpace(error) ? "Non-zero exit code" : error;
+					result.Error += $"\nExit code: 0x{exitCode:X8}";
 					break;
 			}
 		}
 
 		private bool IsOutputLimit(AsyncReader reader)
 		{
-			return _hasOutputLimit = _hasOutputLimit
-									 || (reader.ReadedLength > OutputLimit);
+			return hasOutputLimit = hasOutputLimit
+									|| (reader.ReadedLength > outputLimit);
 		}
 
 		private bool IsMemoryLimitExpected(Process sandboxer, long startUsedMemory)
@@ -246,18 +270,18 @@ namespace RunCsJob
 			}
 			catch
 			{
-				return _hasMemoryLimit;
+				return hasMemoryLimit;
 			}
 
-			return _hasMemoryLimit = _hasMemoryLimit
-									 || startUsedMemory + MemoryLimit < mem;
+			return hasMemoryLimit = hasMemoryLimit
+									|| startUsedMemory + memoryLimit < mem;
 		}
 
 		private bool IsTimeLimitExpected(Process sandboxer, DateTime startTime, TimeSpan startUsedTime)
 		{
-			return _hasTimeLimit = _hasTimeLimit
-								   || TimeLimit.Add(startUsedTime).CompareTo(sandboxer.TotalProcessorTime) < 0
-								   || startTime.Add(IdleTimeLimit).CompareTo(DateTime.Now) < 0;
+			return hasTimeLimit = hasTimeLimit
+								|| timeLimit.Add(startUsedTime).CompareTo(sandboxer.TotalProcessorTime) < 0
+								|| startTime.Add(idleTimeLimit).CompareTo(DateTime.Now) < 0;
 		}
 
 		private static Exception FindSerializedException(string str)

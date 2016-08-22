@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -10,7 +9,6 @@ using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Blocks
 {
-	[XmlRoot("md")]
 	public class MdBlock : SlideBlock, IXmlSerializable
 	{
 		private string markdown;

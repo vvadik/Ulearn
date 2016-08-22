@@ -136,18 +136,6 @@ namespace uLearn.Web.DataContexts
 			return db.UserQuizzes.Where(x => x.SlideId == slideId).Select(x => x.User).Distinct().Count();
 		}
 
-		// TODO: Deprecated? This method is never used
-		public int GetQuizSuccessful(string courseId, Guid slideId, string userId)
-		{
-			return (int)(db.UserQuizzes
-				.Where(x => x.SlideId == slideId && x.UserId == userId)
-				.GroupBy(y => y.QuizId)
-				.Select(y => y.All(z => z.QuizBlockScore == z.QuizBlockMaxScore))
-				.Select(y => y ? 1 : 0)
-				.DefaultIfEmpty()
-				.Average() * 100);
-		}
-
 		public async Task RemoveAnswers(string userId, Guid slideId)
 		{
 			var answersToRemove = db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId).ToList();

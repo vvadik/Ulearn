@@ -12,11 +12,11 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class CsMembersRemover_should
 	{
-		private readonly FileSystem fs = new FileSystem(new DirectoryInfo("tests"));
+		private readonly DirectoryInfo dir = new DirectoryInfo("tests");
 
 		private string LoadCode(string file = "OverloadedMethods.cs")
 		{
-			return fs.GetContent(file).LineEndingsToUnixStyle();
+			return dir.GetContent(file).LineEndingsToUnixStyle();
 		}
 
 		private string RemoveRegion(string region, bool onlyBody = false)

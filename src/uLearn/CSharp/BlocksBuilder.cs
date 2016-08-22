@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -12,14 +13,14 @@ namespace uLearn.CSharp
 	public class SlideBuilder : CSharpSyntaxRewriter
 	{
 		public const string LangId = "cs";
-		private readonly IFileSystem fs;
+		private readonly DirectoryInfo di;
 		public readonly List<SlideBlock> Blocks = new List<SlideBlock>();
 		public string Title;
 		public Guid Id;
 
-		public SlideBuilder(IFileSystem fs) : base(false)
+		public SlideBuilder(DirectoryInfo di) : base(false)
 		{
-			this.fs = fs;
+			this.di = di;
 		}
 
 		private SyntaxNode VisitMemberDeclaration(MemberDeclarationSyntax node, SyntaxNode newNode)
@@ -110,13 +111,13 @@ namespace uLearn.CSharp
 
 	    private void EmbedPara(string filename)
 	    {
-	        Blocks.Add(new MdBlock(fs.GetContent(filename)));
+	        Blocks.Add(new MdBlock(di.GetContent(filename)));
 //			Blocks.Add(new IncludeMdBlock(filename));
 	    }
 
 	    private void EmbedGallery(string folderName)
 		{
-			string[] images = fs.GetFilenames(folderName);
+			string[] images = di.GetFilenames(folderName);
 			Blocks.Add(new ImageGaleryBlock(images));
 //			Blocks.Add(new IncludeImageGalleryBlock(folderName));
 		}
@@ -176,7 +177,7 @@ namespace uLearn.CSharp
 
 		private void EmbedCode(string filename)
 		{
-			Blocks.Add(new CodeBlock(fs.GetContent(filename), LangId));
+			Blocks.Add(new CodeBlock(di.GetContent(filename), LangId));
 //			Blocks.Add(new IncludeCodeBlock(filename));
 		}
 

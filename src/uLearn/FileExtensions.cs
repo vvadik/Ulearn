@@ -1,6 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+using Ionic.Zip;
 
 namespace uLearn
 {
@@ -29,7 +33,8 @@ namespace uLearn
 		public static DirectoryInfo GetOrCreateSubdir(this DirectoryInfo dir, string name)
 		{
 			var subdir = dir.GetSubdir(name);
-			if (!subdir.Exists) subdir.Create();
+			if (!subdir.Exists)
+				subdir.Create();
 			return subdir;
 		}
 
@@ -40,9 +45,9 @@ namespace uLearn
 
 		public static T DeserializeXml<T>(this FileInfo file)
 		{
-			var serializer = new XmlSerializer(typeof (T));
-			using(var stream = file.OpenRead())
-				return (T) serializer.Deserialize(stream);
+			var serializer = new XmlSerializer(typeof(T));
+			using (var stream = file.OpenRead())
+				return (T)serializer.Deserialize(stream);
 		}
 
 		public static T DeserializeXml<T>(this string content)
@@ -50,6 +55,48 @@ namespace uLearn
 			var serializer = new XmlSerializer(typeof(T));
 			using (var stream = new StringReader(content))
 				return (T)serializer.Deserialize(stream);
+		}
+
+		public static string GetContent(this DirectoryInfo di, string filepath)
+		{
+			return di.GetBytes(filepath).AsUtf8();
+		}
+
+		public static byte[] GetBytes(this DirectoryInfo di, string filepath)
+		{
+			var fileInfo = di.GetFile(filepath);
+			if (fileInfo.Exists)
+				return File.ReadAllBytes(fileInfo.FullName);
+			throw new Exception("No " + filepath + " in " + di.Name);
+		}
+
+		public static string[] GetFilenames(this DirectoryInfo di, string dirPath)
+		{
+			var dir = di.GetSubdir(dirPath);
+			if (!dir.Exists)
+				throw new Exception("No " + dirPath + " in " + di.Name);
+			return dir.GetFiles().Select(f => Path.Combine(dirPath, f.Name)).ToArray();
+		}
+
+		/// <param name="excludeCriterias"><see cref="M:Ionic.Zip.ZipFile.AddSelectedFiles(System.String)" /></param>
+		public static byte[] ToZip(this DirectoryInfo dirInfo, IEnumerable<string> excludeCriterias, IEnumerable<FileContent> toUpdate = null)
+		{
+			using (var zip = new ZipFile())
+			{
+				zip.AddDirectory(dirInfo.FullName);
+				var entriesToRemove = excludeCriterias
+					.Select(zip.SelectEntries)
+					.SelectMany(x => x)
+					.ToList();
+				zip.RemoveEntries(entriesToRemove);
+				foreach (var zipUpdateData in toUpdate ?? new List<FileContent>())
+					zip.UpdateEntry(zipUpdateData.Path, zipUpdateData.Data);
+				using (var ms = new MemoryStream())
+				{
+					zip.Save(ms);
+					return ms.ToArray();
+				}
+			}
 		}
 	}
 }

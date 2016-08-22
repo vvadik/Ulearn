@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
@@ -12,50 +11,49 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web
 {
-	public partial class Startup
-	{
-		// For more information on configuring authentication, please visit http://go.microsoft.com/fwlink/?LinkId=301864
-		public void ConfigureAuth(IAppBuilder app)
-		{
-			app.CreatePerOwinContext(() => new ULearnUserManager());
+    public partial class Startup
+    {
+        // For more information on configuring authentication, please visit http://go.microsoft.com/fwlink/?LinkId=301864
+        public void ConfigureAuth(IAppBuilder app)
+        {
+            app.CreatePerOwinContext(() => new ULearnUserManager());
 
-			// Enable the application to use a cookie to store information for the signed in user
-			app.UseCookieAuthentication(new CookieAuthenticationOptions
-			{
-				AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
-				LoginPath = new PathString("/Login"),
-				Provider = new CookieAuthenticationProvider
-				{
-					OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<UserManager<ApplicationUser>, ApplicationUser, String>(
-						validateInterval: TimeSpan.FromMinutes(30),
-						regenerateIdentityCallback: (manager, user) => user.GenerateUserIdentityAsync(manager),
-						getUserIdCallback: identity => identity.GetUserId()
-					)
-				}
-			});
-			// Use a cookie to temporarily store information about a user logging in with a third party login provider
-			app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
+            // Enable the application to use a cookie to store information for the signed in user
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
+                LoginPath = new PathString("/Login"),
+                Provider = new CookieAuthenticationProvider
+                {
+                    OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<UserManager<ApplicationUser>, ApplicationUser, String>(
+                        validateInterval: TimeSpan.FromMinutes(30),
+                        regenerateIdentityCallback: (manager, user) => user.GenerateUserIdentityAsync(manager),
+                        getUserIdCallback: identity => identity.GetUserId()
+                        )
+                }
+            });
+            // Use a cookie to temporarily store information about a user logging in with a third party login provider
+            app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
-			// Uncomment the following lines to enable logging in with third party login providers
-			//app.UseMicrosoftAccountAuthentication(
-			//    clientId: "",
-			//    clientSecret: "");
+            // Uncomment the following lines to enable logging in with third party login providers
+            //app.UseMicrosoftAccountAuthentication(
+            //    clientId: "",
+            //    clientSecret: "");
 
+            //			app.UseTwitterAuthentication(
+            //				consumerKey: "hC6XpJy0OPVkbvGzRIOJRA",
+            //				consumerSecret: "cEDewTtU7RKHimj2D1IpD75HUKnjVeobdSNhjAAQ");
 
-//			app.UseTwitterAuthentication(
-//				consumerKey: "hC6XpJy0OPVkbvGzRIOJRA",
-//				consumerSecret: "cEDewTtU7RKHimj2D1IpD75HUKnjVeobdSNhjAAQ");
+            app.UseVkAuthentication(
+                appId: "4381546",
+                appSecret: "rqrWfJMYUT6Y3io91B3B");
 
-			app.UseVkAuthentication(
-				appId: "4381546",
-				appSecret: "rqrWfJMYUT6Y3io91B3B");
+            //app.UseFacebookAuthentication(
+            //   appId: "",
+            //   appSecret: "");
 
-			//app.UseFacebookAuthentication(
-			//   appId: "",
-			//   appSecret: "");
-
-//			app.UseGoogleAuthentication();
-			app.UseLtiAuthentication();
-		}
-	}
+            //			app.UseGoogleAuthentication();
+            app.UseLtiAuthentication();
+        }
+    }
 }

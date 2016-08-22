@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -13,20 +14,20 @@ using uLearn.Web.Models;
 
 namespace uLearn.CourseTool
 {
-	class PreviewHttpServer
+	internal class PreviewHttpServer
 	{
 		private readonly HttpListener listener;
 		private readonly string courseDir;
 		private readonly string htmlDir;
 		private readonly int port;
 		private DateTime lastChangeTime = DateTime.MinValue;
-		public volatile Course course;
+		private volatile Course course;
 		private readonly object locker = new object();
 
 		public PreviewHttpServer(string courseDir, string htmlDir, int port)
 		{
 			listener = new HttpListener();
-			listener.Prefixes.Add(string.Format("http://+:{0}/", port));
+			listener.Prefixes.Add($"http://+:{port}/");
 			this.courseDir = courseDir;
 			this.htmlDir = htmlDir;
 			this.port = port;
@@ -61,12 +62,12 @@ namespace uLearn.CourseTool
 			}
 			catch (HttpListenerException e)
 			{
-				Console.WriteLine("HttpListener Start Error: {0}", e.Message);
+				Console.WriteLine($"HttpListener Start Error: {e.Message}");
 				Console.WriteLine();
-				Console.WriteLine("On 'access is denied' error do one of the following:");
-				Console.WriteLine("1. Run this application with admin rights.");
-				Console.WriteLine("2. OR run this command in command line ('Everyone' may be some specific user):");
-				Console.WriteLine("   netsh http add urlacl url=http://+:{0}/ user=Everyone", port);
+				Console.WriteLine(@"On 'access is denied' error do one of the following:");
+				Console.WriteLine(@"1. Run this application with admin rights.");
+				Console.WriteLine(@"2. OR run this command in command line ('Everyone' may be some specific user):");
+				Console.WriteLine($"   netsh http add urlacl url=http://+:{port}/ user=Everyone");
 			}
 			StartListen();
 		}
@@ -77,7 +78,7 @@ namespace uLearn.CourseTool
 				lastChangeTime = DateTime.Now;
 		}
 
-		public async void StartListen()
+		private async void StartListen()
 		{
 			while (true)
 			{
@@ -91,6 +92,7 @@ namespace uLearn.CourseTool
 					Console.WriteLine(e);
 				}
 			}
+			// ReSharper disable once FunctionNeverReturns
 		}
 
 		private void StartHandle(HttpListenerContext context)
@@ -104,7 +106,8 @@ namespace uLearn.CourseTool
 				}
 				catch (HttpListenerException e)
 				{
-					if (e.ErrorCode != 1229) throw;
+					if (e.ErrorCode != 1229)
+						throw;
 				}
 				catch (Exception e)
 				{
@@ -124,8 +127,8 @@ namespace uLearn.CourseTool
 			byte[] response;
 			var requestTime = DateTime.Now;
 			var reloaded = ReloadCourseIfChanged(requestTime);
-			if (!new[]{".js", ".css", ".png", ".jpg", ".woff"}.Any(ext => path.EndsWith(ext)))
-				Console.WriteLine("{0} {1} {2}", requestTime.ToString("T"), context.Request.HttpMethod, context.Request.Url);
+			if (!new[] { ".js", ".css", ".png", ".jpg", ".woff" }.Any(ext => path.EndsWith(ext)))
+				Console.WriteLine($"{requestTime.ToString("T")} {context.Request.HttpMethod} {context.Request.Url}");
 			switch (query)
 			{
 				case "needRefresh":
@@ -149,7 +152,7 @@ namespace uLearn.CourseTool
 			{
 				if (reloaded || sw.Elapsed > TimeSpan.FromSeconds(20))
 				{
-					Console.WriteLine("needRefresh:{0}, LastChanged:{1}", reloaded, lastChangeTime);
+					Console.WriteLine($@"needRefresh:{reloaded}, LastChanged:{lastChangeTime}");
 					return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(reloaded));
 				}
 				await Task.Delay(1000);
@@ -168,20 +171,14 @@ namespace uLearn.CourseTool
 
 		private static RunSolutionResult GetRunResult(ExerciseBlock exercise, string code)
 		{
-			var buildResult = exercise.Solution.BuildSolution(code);
+			var buildResult = exercise.BuildSolution(code);
 			if (buildResult.HasErrors)
 				return new RunSolutionResult { IsCompileError = true, CompilationError = buildResult.ErrorMessage, ExecutionServiceName = "uLearn" };
 			if (buildResult.HasStyleIssues)
 				return new RunSolutionResult { IsStyleViolation = true, CompilationError = buildResult.StyleMessage, ExecutionServiceName = "uLearn" };
-			var solution = buildResult.SourceCode;
-			var submission = new RunnerSubmition
-			{
-				Code = solution,
-				Id = Utils.NewNormalizedGuid(),
-				Input = "",
-				NeedRun = true
-			};
-			var result = SandboxRunner.Run(submission);
+
+			var pathToCompiler = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Microsoft.Net.Compilers.1.3.2");
+			var result = SandboxRunner.Run(pathToCompiler, exercise.CreateSubmition(Utils.NewNormalizedGuid(), code));
 			return new RunSolutionResult
 			{
 				IsRightAnswer = result.Verdict == Verdict.Ok && result.GetOutput().NormalizeEoln() == exercise.ExpectedOutput.NormalizeEoln(),
@@ -229,7 +226,7 @@ namespace uLearn.CourseTool
 				if (needReload || course == null)
 				{
 					course = ReloadCourse();
-					Console.WriteLine("Course reloaded. LastChangeTime: {0}", lastChangeTime);
+					Console.WriteLine($"Course reloaded. LastChangeTime: {lastChangeTime}");
 				}
 				return needReload;
 			}

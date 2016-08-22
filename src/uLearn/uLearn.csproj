@@ -13,6 +13,8 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>1573</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -46,6 +49,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\External\MarkdownDeep\MarkdownDeep.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Build" />
+    <Reference Include="Microsoft.Build.Engine" />
     <Reference Include="Microsoft.CodeAnalysis, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeAnalysis.Common.1.1.1\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
       <Private>True</Private>
@@ -107,7 +112,6 @@
     <Compile Include="CSharp\ExerciseBuilder.cs" />
     <Compile Include="CSharp\BlocksBuilder.cs" />
     <Compile Include="CSharp\ExerciseAttribute.cs" />
-    <Compile Include="FileSystem.cs" />
     <Compile Include="CSharp\NamingCaseStyleValidator.cs" />
     <Compile Include="CSharp\RedundantIfStyleValidator.cs" />
     <Compile Include="CSharp\CsMembersRemover.cs" />
@@ -118,6 +122,7 @@
     <Compile Include="CSharp\ICSharpSolutionValidator.cs" />
     <Compile Include="FileExtensions.cs" />
     <Compile Include="ISlideLoader.cs" />
+    <Compile Include="JsonConfig.cs" />
     <Compile Include="LruCache.cs" />
     <Compile Include="Model\Blocks\CodeBlock.cs" />
     <Compile Include="Model\Blocks\ExerciseBlock.cs" />
@@ -129,6 +134,8 @@
     <Compile Include="Model\Blocks\IncludeMdBlock.cs" />
     <Compile Include="Model\Blocks\Label.cs" />
     <Compile Include="Model\Blocks\MdBlock.cs" />
+    <Compile Include="Model\Blocks\ProjectExerciseBlock.cs" />
+    <Compile Include="Model\Blocks\SingleFileExerciseBlock.cs" />
     <Compile Include="Model\Blocks\SlideBlockExtensions.cs" />
     <Compile Include="Model\Blocks\TexBlock.cs" />
     <Compile Include="Model\Blocks\YoutubeBlock.cs" />
@@ -155,6 +162,7 @@
     <Compile Include="Markdown2.cs" />
     <Compile Include="NullValidator.cs" />
     <Compile Include="ObjectExtensions.cs" />
+    <Compile Include="ProjModifier.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -166,6 +174,7 @@
     <Compile Include="Model\RegionRemover.cs" />
     <Compile Include="Model\RegionsExtractor.cs" />
     <Compile Include="RegionsParser.cs" />
+    <Compile Include="SerializationBinder.cs" />
     <Compile Include="SlideInfo.cs" />
     <Compile Include="Md.cs" />
     <Compile Include="ResourceLoader.cs" />
@@ -187,7 +196,9 @@
     <Compile Include="TexReplacer.cs" />
     <Compile Include="Urls.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="ValidatorExtension.cs" />
     <Compile Include="ValidatorsRepository.cs" />
+    <Compile Include="FileContent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CSharp\README.md" />
@@ -228,7 +239,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
   </Target>
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

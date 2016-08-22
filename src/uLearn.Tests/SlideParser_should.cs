@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using uLearn.Model.Blocks;
@@ -8,14 +9,13 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class SlideParser_should
 	{
-
 		[Test]
 		[Explicit("Для отладки на конкретных слайдах из курсов")]
 		public void Test()
 		{
 			var slide =
 				(ExerciseSlide)GenerateSlideFromFile(@"..\..\..\courses\BasicProgramming\Slides\U03_Cycles\S041_PowerOfTwo.cs");
-			Console.WriteLine(slide.Exercise.Solution.BuildSolution("public void T(){}"));
+			Console.WriteLine(slide.Exercise.BuildSolution("public void T(){}"));
 		}
 
 		[Test]
@@ -120,15 +120,15 @@ namespace uLearn.CSharp
 		[Test]
 		public void remove_Excluded_members_from_solution()
 		{
-			var slide = (ExerciseSlide) GenerateSlide("NestedClass.cs");
-			var solution = slide.Exercise.Solution.BuildSolution("");
+			var slide = (ExerciseSlide)GenerateSlide("NestedClass.cs");
+			var solution = slide.Exercise.BuildSolution("");
 			Assert.That(solution, Is.Not.StringContaining("["));
 			Assert.That(solution, Is.Not.StringContaining("]"));
 			Assert.That(solution, Is.Not.StringContaining("public int X, Y"));
 			Assert.That(solution, Is.Not.StringContaining("public Point(int x, int y)"));
 		}
 
-		
+
 		[Test]
 		public void make_code_block_with_method_signature_if_specified()
 		{
@@ -198,7 +198,7 @@ namespace uLearn.CSharp
 		[Test]
 		public void make_excercise_slide_from_method_with_exercise_attribute()
 		{
-			var slide = (ExerciseSlide) GenerateSlide("Exercise.cs");
+			var slide = (ExerciseSlide)GenerateSlide("Exercise.cs");
 			Assert.That(slide.Blocks.First().Text(), Is.EqualTo("Add 2 and 3 please!"));
 			Assert.That(slide.Blocks.Skip(1).Single(), Is.InstanceOf<ExerciseBlock>());
 			Assert.That(slide.Exercise.ExerciseInitialCode, Is.StringStarting("public void Add_2_and_3()"));
@@ -216,14 +216,14 @@ namespace uLearn.CSharp
 		[Test]
 		public void extract_ExpectedOutput()
 		{
-			var slide = (ExerciseSlide) GenerateSlide("Exercise.cs");
+			var slide = (ExerciseSlide)GenerateSlide("Exercise.cs");
 			Assert.That(slide.Exercise.ExpectedOutput, Is.EqualTo("5"));
 		}
 
 		[Test]
 		public void uncomment_special_comments_with_starter_code()
 		{
-			var slide = (ExerciseSlide) GenerateSlide("ExerciseWithStarterCode.cs");
+			var slide = (ExerciseSlide)GenerateSlide("ExerciseWithStarterCode.cs");
 			var exerciseLines = slide.Exercise.ExerciseInitialCode.SplitToLines();
 			Assert.That(exerciseLines.Length, Is.EqualTo(4), slide.Exercise.ExerciseInitialCode);
 			Assert.That(exerciseLines[2], Is.EqualTo("	return x + y;"));
@@ -232,16 +232,16 @@ namespace uLearn.CSharp
 		[Test]
 		public void make_hints_from_hint_attributes()
 		{
-			var slide = (ExerciseSlide) GenerateSlide("ExerciseWithHints.cs");
+			var slide = (ExerciseSlide)GenerateSlide("ExerciseWithHints.cs");
 			Assert.That(slide.Exercise.HintsMd, Is.EqualTo(new[] { "hint1", "hint2" }).AsCollection);
 		}
 
 		[Test]
 		public void provide_solution_for_server()
 		{
-			var slide = (ExerciseSlide) GenerateSlide("HelloWorld.cs");
+			var slide = (ExerciseSlide)GenerateSlide("HelloWorld.cs");
 			var userSolution = "/* no solution */";
-			var res = slide.Exercise.Solution.BuildSolution(userSolution);
+			var res = slide.Exercise.BuildSolution(userSolution);
 			Console.WriteLine(res.ErrorMessage);
 			var ans = res.SourceCode;
 			StringAssert.DoesNotContain("[", ans);
@@ -263,7 +263,7 @@ namespace uLearn.CSharp
 		{
 			var slide = GenerateSlide("Includes.cs");
 			var renderedText = ((CodeBlock)slide.Blocks[1]).Code;
-			var expected = "included(_HelloWorld.cs)";
+			var expected = "//included(_HelloWorld.cs)";
 			Assert.That(renderedText, Contains.Substring(expected));
 		}
 
@@ -285,11 +285,12 @@ namespace uLearn.CSharp
 			var slide = (ExerciseSlide)GenerateSlide("ExerciseWithoutExerciseMethod.cs");
 			Assert.That(slide.Exercise.ExerciseInitialCode.Trim(), Is.StringStarting("class MyClass"));
 		}
+
 		[Test]
 		public void insert_userSolution_outside_class_if_exercise_is_under_class()
 		{
 			var slide = (ExerciseSlide)GenerateSlide("ExerciseWithoutExerciseMethod.cs");
-			var sol = slide.Exercise.Solution.BuildSolution("public class MyClass{}").SourceCode;
+			var sol = slide.Exercise.BuildSolution("public class MyClass{}").SourceCode;
 			Assert.IsNotNull(sol);
 			var indexOfMainClass = sol.IndexOf("ExerciseWithoutExerciseMethod");
 			var indexOfSolutionClass = sol.IndexOf("class MyClass");
@@ -301,26 +302,12 @@ namespace uLearn.CSharp
 
 		private static Slide GenerateSlide(string name)
 		{
-			return SlideParser.ParseSlide(@".\tests\" + name, null, new StubFS());
+			return SlideParser.ParseSlide(@".\tests\" + name, null, new DirectoryInfo(@".\tests\stub"));
 		}
-		
+
 		private static Slide GenerateSlideFromFile(string path)
 		{
-			return SlideParser.ParseSlide(path, null, new StubFS());
-		}
-
-		private class StubFS : IFileSystem
-		{
-			public string GetContent(string filepath)
-			{
-				return "included(" + filepath + ")";
-			}
-
-			public string[] GetFilenames(string dirPath)
-			{
-				return new[] { "a.png", "b.png" };
-			}
+			return SlideParser.ParseSlide(path, null, new DirectoryInfo(path));
 		}
 	}
-
 }

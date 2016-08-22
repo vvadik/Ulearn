@@ -1,18 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace uLearn.Model
 {
 	public class BuildUpContext
 	{
-		public IFileSystem FileSystem { get; private set; }
+		public DirectoryInfo Dir { get; }
 		public CourseSettings CourseSettings { get; private set; }
 		public Lesson Lesson { get; private set; }
-		private List<RegionsExtractor> Extractors { get; set; }
+		private List<RegionsExtractor> Extractors { get; }
 
-		public BuildUpContext(IFileSystem fileSystem, CourseSettings courseSettings, Lesson lesson)
+		public BuildUpContext(DirectoryInfo dir, CourseSettings courseSettings, Lesson lesson)
 		{
-			FileSystem = fileSystem;
+			Dir = dir;
 			CourseSettings = courseSettings;
 			Lesson = lesson;
 			Extractors = new List<RegionsExtractor>();
@@ -25,7 +26,7 @@ namespace uLearn.Model
 				return extractor;
 
 			if (code == null)
-				code = FileSystem.GetContent(file);
+				code = Dir.GetContent(file);
 			extractor = new RegionsExtractor(code, langId, file);
 			Extractors.Add(extractor);
 			return extractor;

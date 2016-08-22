@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using RunCsJob.Api;
@@ -14,7 +15,7 @@ namespace RunCsJob
 		private readonly TimeSpan sleep;
 		private readonly int jobsToRequest;
 
-		public RunCsJobProgram()
+		private RunCsJobProgram()
 		{
 			address = ConfigurationManager.AppSettings["submissionsUrl"];
 			token = ConfigurationManager.AppSettings["runnerToken"];
@@ -24,31 +25,35 @@ namespace RunCsJob
 
 		public static void Main(string[] args)
 		{
+			var pathToCompiler = args.Any(x => x.StartsWith("-p:"))
+				? args.FirstOrDefault(x => x.StartsWith("-p:"))?.Substring(3)
+				: Path.Combine(new DirectoryInfo(".").FullName, "Microsoft.Net.Compilers.1.3.2");
+
 			if (args.Contains("--selfcheck"))
-				SelfCheck();
+				SelfCheck(pathToCompiler);
 			else
-				new RunCsJobProgram().Run();
+				new RunCsJobProgram().Run(pathToCompiler);
 		}
 
-		private void Run()
+		private void Run(string pathToCompiler)
 		{
 			AppDomain.MonitoringIsEnabled = true;
-			Console.WriteLine("Listen {0}", address);
+			Console.WriteLine($"Listen {address}");
 			var client = new Client(address, token);
-			MainLoop(client);
+			MainLoop(pathToCompiler, client);
 		}
 
-		private void MainLoop(Client client)
+		private void MainLoop(string pathToCompiler, Client client)
 		{
 			while (true)
 			{
 				var newUnhandled = client.TryGetSubmissions(jobsToRequest).Result;
-				Console.WriteLine("Received {0} submissions: [{1}]", newUnhandled.Count, string.Join(", ", newUnhandled.Select(s => s.Id)));
+				Console.WriteLine($"Received {newUnhandled.Count} submissions: [{string.Join(", ", newUnhandled.Select(s => s.Id))}]");
 
 				if (newUnhandled.Any())
 				{
-					var results = newUnhandled.Select(SandboxRunner.Run).ToList();
-					Console.WriteLine("Results: [{0}]", string.Join(", ", results.Select(r => r.Verdict)));
+					var results = newUnhandled.Select(unhandled => SandboxRunner.Run(pathToCompiler, unhandled)).ToList();
+					Console.WriteLine($"Results: [{string.Join(", ", results.Select(r => r.Verdict))}]");
 					client.SendResults(results);
 				}
 				Thread.Sleep(sleep);
@@ -56,14 +61,15 @@ namespace RunCsJob
 			// ReSharper disable once FunctionNeverReturns
 		}
 
-		private static void SelfCheck()
+		private static void SelfCheck(string pathToCompiler)
 		{
-			var res = SandboxRunner.Run(new RunnerSubmition
-			{
-				Id = Utils.NewNormalizedGuid(),
-				NeedRun = true,
-				Code = "class C { static void Main(){ System.Console.WriteLine(\"Привет мир!\");}}"
-			});
+			var res = SandboxRunner.Run(pathToCompiler,
+				new FileRunnerSubmition
+				{
+					Id = Utils.NewNormalizedGuid(),
+					NeedRun = true,
+					Code = "class C { static void Main(){ System.Console.WriteLine(\"Привет мир!\");}}"
+				});
 			Console.WriteLine(res);
 		}
 	}

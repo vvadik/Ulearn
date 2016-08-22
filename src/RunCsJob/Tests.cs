@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Threading;
 using NUnit.Framework;
 using RunCsJob.Api;
@@ -8,9 +9,9 @@ using uLearn;
 
 namespace RunCsJob
 {
-	internal static class Tests
+	internal static class RunCscTests
 	{
-		private const int OutputLimit = 10 * 1024 * 1024;
+		private const int outputLimit = 10 * 1024 * 1024;
 
 		[TestCase(@"namespace Test { public class Program { static public void Main() { return ; } } }",
 			"", "", "",
@@ -72,6 +73,7 @@ namespace RunCsJob
 		public static void TestOk(string code, string input, string output, string error)
 		{
 			var details = GetDetails(code, input);
+			Console.WriteLine(details.Error);
 			Assert.AreEqual(Verdict.Ok, details.Verdict);
 			Assert.AreEqual(output, details.Output);
 			Assert.AreEqual(error, details.Error);
@@ -94,6 +96,8 @@ namespace RunCsJob
 			TestName = "Method in sandboxer")]
 		[TestCase("using System; using System.Threading; using System.Linq; using System.Reflection; using System.Security; [SecurityCritical] class A { static void Main() { var assemblies = Thread.GetDomain().GetAssemblies(); var ass = assemblies.FirstOrDefault(assembly => assembly.ToString().Contains(\"CsSandbox\")); var type = ass.GetType(\"CsSandboxer.Sandboxer\", true, true); if(type == null) Console.WriteLine(\"lol\"); else type.InvokeMember(\"Secret\", BindingFlags.GetField, null, null, null);; }}",
 			TestName = "Field in sandboxer")]
+		[TestCase("namespace Test { public class Program { static Program(){ System.IO.Directory.GetFiles(@\"c:\\\"); } static public void Main() { return ; } } }",
+			TestName = "static ctor")]
 		public static void TestSecurityException(string code)
 		{
 			var details = GetDetails(code, "");
@@ -122,7 +126,7 @@ namespace RunCsJob
 			TestName = "Output + newline explicit")]
 		public static void TestOutputLimitError(string code)
 		{
-			var details = GetDetails(code.Replace("$limit", OutputLimit.ToString(CultureInfo.InvariantCulture)), "");
+			var details = GetDetails(code.Replace("$limit", outputLimit.ToString(CultureInfo.InvariantCulture)), "");
 			Assert.AreEqual(Verdict.OutputLimit, details.Verdict);
 		}
 
@@ -130,9 +134,9 @@ namespace RunCsJob
 			TestName = "Output")]
 		public static void TestOutputLimit(string code)
 		{
-			var details = GetDetails(code.Replace("$limit", OutputLimit.ToString(CultureInfo.InvariantCulture)), "");
+			var details = GetDetails(code.Replace("$limit", outputLimit.ToString(CultureInfo.InvariantCulture)), "");
 			Assert.AreEqual(Verdict.Ok, details.Verdict);
-			Assert.AreEqual(new string('*', OutputLimit), details.Output);
+			Assert.AreEqual(new string('*', outputLimit), details.Output);
 		}
 
 		[TestCase(@"using System; class Program { static void Main() { 
@@ -141,12 +145,13 @@ while(true) ++a;
 }}",
 			TestName = "Infinty loop")]
 		[TestCase(@"using System.Threading; class Program{ private static void Main() { 
-Thread.Sleep(15000);
+Thread.Sleep(20000);
 }}",
 			TestName = "Thread.Sleep")]
 		[TestCase(@"using System; using System.Collections.Generic; class Program { static void Main() { 
 const int memory = 63 * 1024 * 1024; 
 var a = new byte[memory]; 
+for (var j = 0; j < 2; j++)
 for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 }}",
 			TestName = "many assignation")]
@@ -196,7 +201,7 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 		[TestCase(@"class A { static void Main() { switch(true) {} } }",
 			TestName = "empty switch")]
 		[TestCase(@"using System; class A { static void Main() { Console.WriteLine(0l); } }",
-			TestName = "L")]
+			TestName = "lower case L for long literal")]
 		public static void TestWarnings(string code)
 		{
 			var details = GetDetails(code, "");
@@ -218,13 +223,13 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 			for (var i = 0; i < threads; ++i)
 			{
 				Thread.Sleep(1000);
-				Console.Out.WriteLine("{0}", Process.GetCurrentProcess().Threads.Count - a);
+				Console.Out.WriteLine($"{Process.GetCurrentProcess().Threads.Count - a}");
 			}
 		}
 
 		private static RunningResults GetDetails(string code, string input)
 		{
-			var model = new RunnerSubmition
+			var model = new FileRunnerSubmition
 			{
 				Id = Utils.NewNormalizedGuid(),
 				Code = code,
@@ -232,9 +237,26 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 				NeedRun = true
 			};
 
-			var result = new SandboxRunner(model).Run();
+			var result = new SandboxRunner(model).RunCsc();
 			Assert.IsNotNull(result);
 			return result;
+		}
+	}
+
+	[TestFixture]
+	public class RunMsBuildTests
+	{
+		[Test]
+		public void SimpleProjTest()
+		{
+			var dir = new DirectoryInfo(@"..\..\test");
+			var buildingResult = MsBuildRunner.BuildProject(
+				Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2"), 
+				"test.csproj", 
+				dir);
+			Console.WriteLine(buildingResult.ErrorMessage);
+			Assert.That(buildingResult.Success, Is.True);
+			Assert.That(buildingResult.ErrorMessage, Is.Null);
 		}
 	}
 }

@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Reflection;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using uLearn.Model.Blocks;
 
 namespace uLearn.Model
@@ -25,9 +23,13 @@ namespace uLearn.Model
 		[XmlEnum("gallery")]
 		IncludeImageGalleryBlock,
 		[XmlEnum("exercise")]
-		ExerciseBlock,
+		SingleFileExerciseBlok,
 		[XmlEnum("execirse")]
-		ExecirseBlock
+		SingleFileExerciseBlo,
+		[XmlEnum("single-file-exercise")]
+		SingleFileExerciseBlock,
+		[XmlEnum("proj-exercise")]
+		ProjectExerciseBlock
 	}
 
 	[XmlRoot("Lesson", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/lesson")]
@@ -38,15 +40,15 @@ namespace uLearn.Model
 
 		[XmlElement("id")]
 		public string Id;
-		
+
 		[XmlElement("default-include-file")]
 		public string DefaultInclideFile;
 
 		[XmlElement("default-include-code-file")]
 		public string DefaultIncludeCodeFile
 		{
-			get { return DefaultInclideFile;  }
-			set { DefaultInclideFile = value;  }
+			get { return DefaultInclideFile; }
+			set { DefaultInclideFile = value; }
 		}
 
 		[XmlElement(typeof(YoutubeBlock))]
@@ -57,8 +59,10 @@ namespace uLearn.Model
 		[XmlElement(typeof(IncludeCodeBlock))]
 		[XmlElement(typeof(IncludeMdBlock))]
 		[XmlElement(typeof(IncludeImageGalleryBlock))]
-		[XmlElement(typeof(ExerciseBlock))]
-		[XmlElement("execirse", typeof(ExerciseBlock))]
+		[XmlElement(typeof(ProjectExerciseBlock))]
+		[XmlElement(typeof(SingleFileExerciseBlock))]
+		[XmlElement("exercise", typeof(SingleFileExerciseBlock))]
+		[XmlElement("execirse", typeof(SingleFileExerciseBlock))]
 		[XmlChoiceIdentifier("DefineBlockType")]
 		public SlideBlock[] Blocks;
 

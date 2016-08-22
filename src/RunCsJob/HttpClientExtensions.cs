@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using uLearn;
 
 namespace RunCsJob
 {
@@ -20,7 +21,7 @@ namespace RunCsJob
 		public static async Task<T> ReadAsAsync<T>(this HttpContent content)
 		{
 			var s = await content.ReadAsStringAsync();
-			return JsonConvert.DeserializeObject<T>(s);
+			return JsonConvert.DeserializeObject<T>(s, JsonConfig.GetSettings());
 		}
 	}
 }

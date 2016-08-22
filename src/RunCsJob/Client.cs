@@ -22,7 +22,6 @@ namespace RunCsJob
 			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 		}
 
-
 		public async Task<List<RunnerSubmition>> TryGetSubmissions(int threadsCount)
 		{
 			var uri = GetUri("GetSubmissions", new[] { "count", threadsCount.ToString(CultureInfo.InvariantCulture) });
@@ -34,7 +33,7 @@ namespace RunCsJob
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("Cant connect to {0}. {1}", uri, e.Message);
+				Console.WriteLine($@"Cant connect to {uri}. {e.Message}");
 			}
 			return new List<RunnerSubmition>();
 		}
@@ -44,7 +43,8 @@ namespace RunCsJob
 			var uri = GetUri("PostResult");
 			var responce = await httpClient.PostAsJsonAsync(uri, result);
 
-			if (responce.IsSuccessStatusCode) return;
+			if (responce.IsSuccessStatusCode)
+				return;
 
 			Console.Error.WriteLine(DateTime.Now.ToString("HH:mm:ss"));
 			Console.Error.WriteLine(responce.ToString());
@@ -56,7 +56,8 @@ namespace RunCsJob
 			var uri = GetUri("PostResults");
 			var response = await httpClient.PostAsJsonAsync(uri, results);
 
-			if (response.IsSuccessStatusCode) return;
+			if (response.IsSuccessStatusCode)
+				return;
 
 			Console.Error.WriteLine("can't send " + DateTime.Now.ToString("HH:mm:ss"));
 			Console.Error.WriteLine(response.ToString());

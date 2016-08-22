@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using Ionic.Zip;
+using uLearn.Model.Blocks;
 
 namespace uLearn
 {
@@ -9,11 +11,22 @@ namespace uLearn
 		{
 			return courseId == "web" && slideId == Guid.Empty
 				? code
-				: ((ExerciseSlide)courseManager.GetCourse(courseId).GetSlideById(slideId))
-					.Exercise
-					.Solution
+				: ((SingleFileExerciseBlock)((ExerciseSlide)courseManager.GetCourse(courseId).GetSlideById(slideId))
+					.Exercise)
 					.BuildSolution(code)
 					.SourceCode;
+		}
+
+		public static void UnpackZip(byte[] data, string pathToExtractDir)
+		{
+			using (var ms = new MemoryStream(data))
+			{
+				using (var zip = ZipFile.Read(ms))
+				{
+					foreach (var file in zip)
+						file.Extract(pathToExtractDir, ExtractExistingFileAction.OverwriteSilently);
+				}
+			}
 		}
 
 		public static string NewNormalizedGuid()

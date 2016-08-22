@@ -38,23 +38,17 @@ namespace uLearn.Web.Controllers
 
 		private RunnerSubmition ToRunnerSubmition(UserSolution details)
 		{
-			return new RunnerSubmition
-			{
-				Id = details.Id.ToString(),
-				Code = Utils.GetSource(
-					details.CourseId, 
-					details.SlideId, 
-					courseManager, 
-					details.SolutionCode.Text
-					),
-				Input = "",
-				NeedRun = true
-			};
+			var exerciseSlide = (ExerciseSlide)courseManager
+				.GetCourse(details.CourseId)
+				.GetSlideById(details.SlideId);
+			return exerciseSlide.Exercise.CreateSubmition(
+				details.Id.ToString(),
+				details.SolutionCode.Text);
 		}
 
 		[HttpPost]
 		[Route("PostResult")]
-		public async Task PostResult([FromUri]string token, RunningResults result)
+		public async Task PostResult([FromUri] string token, RunningResults result)
 		{
 			if (!ModelState.IsValid)
 				throw new HttpResponseException(HttpStatusCode.BadRequest);
@@ -65,7 +59,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[Route("PostResults")]
-		public async Task PostResults([FromUri]string token, List<RunningResults> results)
+		public async Task PostResults([FromUri] string token, List<RunningResults> results)
 		{
 			if (!ModelState.IsValid)
 				throw new HttpResponseException(HttpStatusCode.BadRequest);

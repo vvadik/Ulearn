@@ -12,15 +12,17 @@ namespace uLearn.CSharp
 		private readonly string prelude;
 		public string ExerciseClassName { get; set; }
 
-		public ExerciseBlock Exercise { get; private set; }
+		public SingleFileExerciseBlock Exercise { get; private set; }
 
 		public ExerciseBuilder(string langId, string prelude)
 			: base(false)
 		{
 			this.prelude = prelude;
-			Exercise = new ExerciseBlock();
-			Exercise.ValidatorName = "cs";
-			Exercise.LangId = langId;
+		    Exercise = new SingleFileExerciseBlock
+		    {
+		        ValidatorName = "cs",
+		        LangId = langId
+		    };
 		}
 
 		public ExerciseBlock BuildBlockFrom(SyntaxTree tree)

@@ -60,7 +60,7 @@ namespace uLearn.Web.FilterAttributes
 
 		public new string Users
 		{
-			set { throw new NotImplementedException(); }
+			set { throw new NotSupportedException(); }
 		}
 
 		private static readonly char[] delims = { ',' };

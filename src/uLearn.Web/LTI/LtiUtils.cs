@@ -20,7 +20,6 @@ namespace uLearn.Web.LTI
 
 			var score = visitsRepo.GetScore(slide.Id, userId);
 
-			// TODO: fix outcome address in local edx (no localhost and no https)
 			var uri = new UriBuilder(ltiRequest.LisOutcomeServiceUrl);
 			if (uri.Host == "localhost")
 			{

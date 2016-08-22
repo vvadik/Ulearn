@@ -50,10 +50,10 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		public override string AsHtmlString()
 		{
-			throw new NotImplementedException();
-		}
+            throw new NotSupportedException();
+        }
 
-		public static LtiComponent Load(string folderName, string urlName)
+        public static LtiComponent Load(string folderName, string urlName)
 		{
 			try
 			{

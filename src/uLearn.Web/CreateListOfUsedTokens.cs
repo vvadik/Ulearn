@@ -3,6 +3,7 @@ using System.CodeDom.Compiler;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
+using uLearn.Model.Blocks;
 
 namespace uLearn.Web
 {
@@ -15,7 +16,10 @@ namespace uLearn.Web
 			var solutions = WebCourseManager.Instance
 				.GetCourses()
 				.SelectMany(course => course.Slides.OfType<ExerciseSlide>())
-				.Select(slide => slide.Exercise.EthalonSolution);
+				.Where(slide => slide.Exercise is SingleFileExerciseBlock)
+				.Select(slide => slide.Exercise)
+				.Cast<SingleFileExerciseBlock>()
+				.Select(exercise => exercise.EthalonSolution);
 			var domProvider = CodeDomProvider.CreateProvider("C#");
 			var tokensDict = solutions
 				.SelectMany(s => CSharpSyntaxTree
@@ -24,13 +28,13 @@ namespace uLearn.Web
 					.DescendantTokens())
 				.Select(token => token.Text)
 				.Where(domProvider.IsValidIdentifier)
-				.Where(s => Char.IsUpper(s[0]))
+				.Where(s => char.IsUpper(s[0]))
 				.GroupBy(token => token)
 				.ToDictionary(grouping => grouping.Key, grouping => grouping.Count());
 			Console.Out.WriteLine("var date = '{0}';", DateTime.Now.ToString("dd.MM.yy"));
 			Console.Out.WriteLine("var tokens = {");
 			var output = "\t";
-			foreach (var str in tokensDict.Select(pair => String.Format("'{0}': {1}", pair.Key, pair.Value)))
+			foreach (var str in tokensDict.Select(pair => string.Format("'{0}': {1}", pair.Key, pair.Value)))
 			{
 				if (output.Length > 100)
 				{

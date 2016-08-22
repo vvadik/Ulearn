@@ -1,9 +1,10 @@
-﻿namespace RunCsJob.Api
+﻿using System.ComponentModel;
+
+namespace RunCsJob.Api
 {
-	public class RunnerSubmition
+	public abstract class RunnerSubmition
 	{
 		public string Id;
-		public string Code;
 		public string Input;
 		public bool NeedRun;
 
@@ -11,5 +12,18 @@
 		{
 			return string.Format("Id: {0}, NeedRun: {1}", Id, NeedRun);
 		}
+	}
+
+	[DisplayName("file")]
+	public class FileRunnerSubmition : RunnerSubmition
+	{
+		public string Code;
+	}
+
+	[DisplayName("proj")]
+	public class ProjRunnerSubmition : RunnerSubmition
+	{
+		public byte[] ZipFileData;
+		public string ProjectFileName;
 	}
 }

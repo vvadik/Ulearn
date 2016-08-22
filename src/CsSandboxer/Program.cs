@@ -14,7 +14,7 @@ namespace CsSandboxer
 {
 	static class Program
 	{
-		private static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
+		private static readonly JsonSerializerSettings settings = new JsonSerializerSettings
 		{
 			TypeNameHandling = TypeNameHandling.All
 		};
@@ -24,8 +24,7 @@ namespace CsSandboxer
 			Console.OutputEncoding = Encoding.UTF8;
 			SetErrorMode(ErrorModes.SEM_NOGPFAULTERRORBOX); // WinOnly StackOverflow handling fix
 			Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-//			Console.InputEncoding = Encoding.UTF8;
-
+			//			Console.InputEncoding = Encoding.UTF8;
 			var assemblyPath = args[0];
 			var id = args[1];
 			Assembly assembly = null;
@@ -33,7 +32,7 @@ namespace CsSandboxer
 
 			try
 			{
-				assembly = Assembly.LoadFile(assemblyPath);
+				assembly = Assembly.LoadFrom(assemblyPath);
 				var domain = CreateDomain(id, assemblyPath);
 				sandboxer = CreateSandboxer(domain);
 			}
@@ -65,7 +64,7 @@ namespace CsSandboxer
 		private static void HandleException(Exception ex)
 		{
 			Console.Error.WriteLine();
-			Console.Error.Write(JsonConvert.SerializeObject(ex, Settings));
+			Console.Error.Write(JsonConvert.SerializeObject(ex, settings));
 			Console.Error.Close();
 			Environment.Exit(1);
 		}

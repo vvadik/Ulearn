@@ -28,7 +28,7 @@ namespace uLearn.Model.Blocks
 			if (filesInProgress.Contains(File))
 				throw new Exception("Cyclic dependency");
 
-			var xmlStream = new StringReader(context.FileSystem.GetContent(File));
+			var xmlStream = new StringReader(context.Dir.GetContent(File));
 			var serializer = new XmlSerializer(typeof(SlideBlock[]));
 			var slideBlocks = (SlideBlock[])serializer.Deserialize(xmlStream);
 			var newInProgress = filesInProgress.Add(File);
@@ -37,7 +37,7 @@ namespace uLearn.Model.Blocks
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
-			throw new NotImplementedException();
+			throw new NotSupportedException();
 		}
 	}
 }

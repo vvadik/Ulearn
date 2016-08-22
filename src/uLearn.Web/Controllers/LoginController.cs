@@ -39,6 +39,7 @@ namespace uLearn.Web.Controllers
 		//
 		// POST: /Login
 		[HttpPost]
+		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Index(LoginViewModel model, string returnUrl)
 		{
@@ -101,6 +102,7 @@ namespace uLearn.Web.Controllers
 		//
 		// POST: /Login/ExternalLoginConfirmation
 		[HttpPost]
+		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
 		{
@@ -189,8 +191,6 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Index", "Home");
 		}
 
-		// TODO: may be need change?
-		// Used for XSRF protection when adding external logins
 		private const string XsrfKey = "XsrfId";
 
 		private class ChallengeResult : HttpUnauthorizedResult

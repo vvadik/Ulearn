@@ -11,8 +11,8 @@ namespace uLearn.CSharp
 		{
 			var sourceCode = file.ContentAsUtf8();
 			var prelude = GetPrelude(file.Directory);
-			var fs = new FileSystem(file.Directory);
-			return SlideParser.ParseCode(sourceCode, new SlideInfo(unitName, file, slideIndex), prelude, fs);
+			var di = file.Directory;
+			return SlideParser.ParseCode(sourceCode, new SlideInfo(unitName, file, slideIndex), prelude, di);
 		}
 
 		private static string GetPrelude(DirectoryInfo dir)
