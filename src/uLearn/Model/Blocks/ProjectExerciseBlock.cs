@@ -11,8 +11,16 @@ namespace uLearn.Model.Blocks
 	[XmlType("proj-exercise")]
 	public class ProjectExerciseBlock : ExerciseBlock
 	{
+		public ProjectExerciseBlock()
+		{
+			StartupObject = "checking.CheckerRunner";
+		}
+
 		[XmlElement("csproj-file-path")]
 		public string CsProjFilePath { get; set; }
+
+		[XmlElement("startup-object")]
+		public string StartupObject { get; set; }
 
 		[XmlElement("user-code-file-name")]
 		public string UserCodeFileName { get; set; }
@@ -22,10 +30,6 @@ namespace uLearn.Model.Blocks
 
 		[XmlElement("exclude-path-for-student")]
 		public string[] PathsToExcludeForStudent { get; set; }
-
-		[XmlElement("require-review")]
-		public bool RequireReview { get; set; }
-
 		public string ExerciseDir => Path.GetDirectoryName(CsProjFilePath).EnsureNotNull("csproj должен быть в поддиректории");
 
 		public string CsprojFileName => Path.GetFileName(CsProjFilePath);
@@ -88,7 +92,7 @@ namespace uLearn.Model.Blocks
 					new FileContent { Path = UserCodeFileName, Data = Encoding.UTF8.GetBytes(code) },
 					new FileContent { Path = CsprojFileName,
 						Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(CsprojFileName), 
-						ProjModifier.PrepareCsprojBeforeZipping) }
+						p => ProjModifier.PrepareCsprojBeforeZipping(p, this)) }
 				});
 		}
 	}

@@ -74,7 +74,7 @@ namespace uLearn.Web.Controllers
 			var expectedOutput = exerciseBlock.ExpectedOutput.NormalizeEoln();
 			var isRightAnswer = submissionDetails.GetVerdict() == "Accepted" && output.Equals(expectedOutput);
 
-			await visitsRepo.AddSolutionAttempt(exerciseSlide.Id, User.Identity.GetUserId(), isRightAnswer);
+			await visitsRepo.AddSolutionAttempt(exerciseSlide.Id, User.Identity.GetUserId(), isRightAnswer ? exerciseBlock.MaxScore : 0);
 
 			return new RunSolutionResult
 			{
