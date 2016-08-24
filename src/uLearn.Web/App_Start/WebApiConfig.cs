@@ -1,4 +1,6 @@
-﻿using System.Web.Http;
+﻿using System.Linq;
+using System.Web.Http;
+using System.Net.Http;
 using Microsoft.Owin.Security.OAuth;
 
 namespace uLearn.Web
@@ -7,9 +9,11 @@ namespace uLearn.Web
     {
         public static void Register(HttpConfiguration config)
         {
-			config.SuppressDefaultHostAuthentication();
-			config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
+            config.SuppressDefaultHostAuthentication();
+            config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
             config.MapHttpAttributeRoutes();
+            config.Formatters.Where(f => f != config.Formatters.JsonFormatter).ToList()
+                .ForEach(f => config.Formatters.Remove(f));
             config.Formatters.JsonFormatter.SerializerSettings = JsonConfig.GetSettings();
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
