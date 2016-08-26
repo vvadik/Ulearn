@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using CommandLine;
@@ -9,12 +10,24 @@ namespace uLearn.CourseTool
 	[Verb("test", HelpText = "Run tests on course")]
 	class TestCourseOptions : AbstractOptions
 	{
+		[Option('s', "slide", HelpText = "SlideId to test only one specific slide")]
+		public string SlideId { get; set; }
+
 		public override void DoExecute()
 		{
 			var ulearnDir = new DirectoryInfo(string.Format("{0}/{1}", Dir, Config.ULearnCourseId));
-			Console.WriteLine("Loading Ulearn course from {0}", ulearnDir.Name);
+			Console.Write("Loading Ulearn course from {0} ... ", ulearnDir.Name);
+			var sw = Stopwatch.StartNew();
 			var course = new CourseLoader().LoadCourse(ulearnDir);
-			var validator = new CourseValidator(course, AppDomain.CurrentDomain.BaseDirectory);
+			Console.WriteLine(sw.ElapsedMilliseconds + " ms");
+			var slides = course.Slides;
+			if (SlideId != null)
+			{
+				slides = course.Slides.Where(s => s.Id == Guid.Parse(SlideId)).ToArray();
+				Console.WriteLine("Only slide " + SlideId);
+			}
+			
+			var validator = new CourseValidator(slides, AppDomain.CurrentDomain.BaseDirectory);
 			validator.InfoMessage += m => Write(ConsoleColor.Gray, m);
 			var errors = new List<string>();
 			validator.Error += m => {
