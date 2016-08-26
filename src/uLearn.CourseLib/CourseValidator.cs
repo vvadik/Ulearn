@@ -11,21 +11,21 @@ namespace uLearn
 {
 	public class CourseValidator
 	{
-		private readonly Course course;
+		private readonly Slide[] slides;
 		private readonly string workDir;
 
 		public event Action<string> InfoMessage;
 		public event Action<string> Error;
 
-		public CourseValidator(Course course, string workDir)
+		public CourseValidator(Slide[] slides, string workDir)
 		{
-			this.course = course;
+			this.slides = slides;
 			this.workDir = workDir;
 		}
 
 		public void ValidateExercises()
 		{
-			foreach (var slide in course.Slides.OfType<ExerciseSlide>())
+			foreach (var slide in slides.OfType<ExerciseSlide>())
 			{
 				LogSlideProcessing("Validate exercise", slide);
 				EthalonSolutionsForExercises(slide);
@@ -70,7 +70,7 @@ namespace uLearn
 
 		public IEnumerable<Tuple<Slide, string>> GetVideos()
 		{
-			return course.Slides
+			return slides
 				.SelectMany(slide =>
 					slide.Blocks.OfType<YoutubeBlock>()
 						.Select(b => Tuple.Create(slide, b.VideoId)));
@@ -88,7 +88,7 @@ namespace uLearn
 				{
 					Path = exercise.CsprojFileName,
 					Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(exercise.CsprojFileName),
-						proj => ProjModifier.PrepareCsprojBeforeZipping(proj, exercise))
+						proj => ProjModifier.PrepareForChecking(proj, exercise))
 				}
 			});
 			var pathToCompiler = Path.Combine(workDir, "Microsoft.Net.Compilers.1.3.2");
@@ -103,7 +103,7 @@ namespace uLearn
 				});
 			if (result.Verdict != Verdict.Ok)
 				ReportSlideError(slide, "Exercise initial code verdict is not OK. RunResult = " + result);
-			else if (result.Score >= 0.5)
+			else if (result.Output == "")
 				ReportSlideError(slide, "Exercise initial code (available to students) is solution!");
 		}
 

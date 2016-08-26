@@ -14,6 +14,9 @@ namespace uLearn.Model.Blocks
 		public ProjectExerciseBlock()
 		{
 			StartupObject = "checking.CheckerRunner";
+			HideExpectedOutputOnError = true;
+			HideShowSolutionsButton = true;
+			MaxScore = 50;
 		}
 
 		[XmlElement("csproj-file-path")]
@@ -43,7 +46,14 @@ namespace uLearn.Model.Blocks
 			ExpectedOutput = ExpectedOutput ?? "";
 			ValidatorName = string.Join(" ", LangId, ValidatorName);
 			SlideFolderPath = context.Dir.FullName;
-			var directoryName = Path.Combine(SlideFolderPath, ExerciseDir);
+			var exercisePath = context.Dir.GetSubdir(ExerciseDir).FullName;
+			if (context.ZippedProjectExercises.Add(exercisePath))
+				CreateZipForStudent(context);
+			yield return this;
+		}
+
+		private void CreateZipForStudent(BuildUpContext context)
+		{
 			var excluded = (PathsToExcludeForStudent ?? new string[0]).Concat(new[] { "checking/*", "bin/*", "obj/*" }).ToList();
 			var csprojFileName = CsprojFileName;
 			var zipData = context.Dir.GetSubdir(ExerciseDir).ToZip(excluded, new[]
@@ -54,8 +64,8 @@ namespace uLearn.Model.Blocks
 					Data = ProjModifier.ModifyCsproj(context.Dir.GetFile(CsProjFilePath), ProjModifier.RemoveCheckingFromCsproj)
 				}
 			});
+			var directoryName = Path.Combine(SlideFolderPath, ExerciseDir);
 			System.IO.File.WriteAllBytes(directoryName + ".exercise.zip", zipData);
-			yield return this;
 		}
 
 		public override string GetSourceCode(string code)
@@ -92,7 +102,7 @@ namespace uLearn.Model.Blocks
 					new FileContent { Path = UserCodeFileName, Data = Encoding.UTF8.GetBytes(code) },
 					new FileContent { Path = CsprojFileName,
 						Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(CsprojFileName), 
-						p => ProjModifier.PrepareCsprojBeforeZipping(p, this)) }
+						p => ProjModifier.PrepareForChecking(p, this)) }
 				});
 		}
 	}

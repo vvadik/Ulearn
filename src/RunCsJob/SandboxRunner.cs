@@ -83,9 +83,6 @@ namespace RunCsJob
 
 			SafeRemoveDirectory(dir.FullName);
 
-			if (result.Verdict == Verdict.Ok)
-				result.FillPassProgress();
-
 			return result;
 		}
 

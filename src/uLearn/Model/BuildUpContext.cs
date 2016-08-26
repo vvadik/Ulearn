@@ -9,6 +9,7 @@ namespace uLearn.Model
 		public DirectoryInfo Dir { get; }
 		public CourseSettings CourseSettings { get; private set; }
 		public Lesson Lesson { get; private set; }
+		public HashSet<string> ZippedProjectExercises = new HashSet<string>();
 		private List<RegionsExtractor> Extractors { get; }
 
 		public BuildUpContext(DirectoryInfo dir, CourseSettings courseSettings, Lesson lesson)

@@ -133,7 +133,7 @@ namespace uLearn
 				{
 					Path = exercise.CsprojFileName,
 					Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(exercise.CsprojFileName),
-						proj => ProjModifier.PrepareCsprojBeforeZipping(proj, exercise))
+						proj => ProjModifier.PrepareForChecking(proj, exercise))
 				}
 			});
 			var pathToCompiler = Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2");
@@ -152,7 +152,7 @@ namespace uLearn
 			Console.WriteLine("Result = " + result);
 			Assert.AreEqual(Verdict.Ok, result.Verdict);
 
-			Assert.AreNotEqual(1.0, result.Score);
+			Assert.AreNotEqual("", result.Output);
 		}
 
 		private static void EthalonSolutionForSingleFileExercises(ExerciseSlide slide)

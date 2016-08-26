@@ -11,23 +11,11 @@ namespace RunCsJob.Api
 		public Verdict Verdict { get; set; }
 		public string Output { get; set; }
 		public string Error { get; set; }
-		public double Score { get; set; }
 
 		public override string ToString()
 		{
 			return string.Format("Id: {0}, Verdict: {1}: {2}", Id, Verdict,
 				Verdict == Verdict.SandboxError ? Error : Verdict == Verdict.CompilationError ? CompilationOutput : Output);
-		}
-
-		public void FillPassProgress()
-		{
-			var splittedOutput = Output
-				.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
-				.ToList();
-			var valueText = splittedOutput.Last();
-			Score = double.Parse(valueText, CultureInfo.InvariantCulture);
-			Output = string.Join("\r\n", splittedOutput
-				.Take(splittedOutput.Count - 1));
 		}
 
 		public string GetOutput()
