@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Serialization;
 using RunCsJob.Api;
@@ -39,6 +41,8 @@ namespace uLearn.Model.Blocks
 		[XmlIgnore]
 		public string SlideFolderPath { get; private set; }
 
+		public FileInfo StudentsZip => new DirectoryInfo(SlideFolderPath).GetFile(ExerciseDir + ".exercise.zip");
+
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
 			FillProperties(context);
@@ -48,24 +52,22 @@ namespace uLearn.Model.Blocks
 			SlideFolderPath = context.Dir.FullName;
 			var exercisePath = context.Dir.GetSubdir(ExerciseDir).FullName;
 			if (context.ZippedProjectExercises.Add(exercisePath))
-				CreateZipForStudent(context);
+				CreateZipForStudent();
 			yield return this;
 		}
 
-		private void CreateZipForStudent(BuildUpContext context)
+		private void CreateZipForStudent()
 		{
-			var excluded = (PathsToExcludeForStudent ?? new string[0]).Concat(new[] { "checking/*", "bin/*", "obj/*" }).ToList();
-			var csprojFileName = CsprojFileName;
-			var zipData = context.Dir.GetSubdir(ExerciseDir).ToZip(excluded, new[]
-			{
-				new FileContent
-				{
-					Path = csprojFileName,
-					Data = ProjModifier.ModifyCsproj(context.Dir.GetFile(CsProjFilePath), ProjModifier.RemoveCheckingFromCsproj)
-				}
-			});
-			var directoryName = Path.Combine(SlideFolderPath, ExerciseDir);
-			System.IO.File.WriteAllBytes(directoryName + ".exercise.zip", zipData);
+			var directoryName = new DirectoryInfo(Path.Combine(SlideFolderPath, ExerciseDir));
+			var zip = new LazilyUpdatingZip(directoryName, new[] { "checking", "bin", "obj" }, ReplaceCsproj, StudentsZip);
+			zip.UpdateZip();
+		}
+
+		private byte[] ReplaceCsproj(FileInfo file)
+		{
+			if (!file.Name.Equals(CsprojFileName, StringComparison.InvariantCultureIgnoreCase))
+				return null;
+			return ProjModifier.ModifyCsproj(file, ProjModifier.RemoveCheckingFromCsproj);
 		}
 
 		public override string GetSourceCode(string code)

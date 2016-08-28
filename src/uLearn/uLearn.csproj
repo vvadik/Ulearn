@@ -126,6 +126,7 @@
     <Compile Include="LruCache.cs" />
     <Compile Include="Model\Blocks\CodeBlock.cs" />
     <Compile Include="Model\Blocks\ExerciseBlock.cs" />
+    <Compile Include="Model\Blocks\LazilyUpdatingZip.cs" />
     <Compile Include="Model\Blocks\ImageGaleryBlock.cs" />
     <Compile Include="Model\Blocks\IncludeBlocksBlock.cs" />
     <Compile Include="Model\Blocks\IncludeCode.cs" />

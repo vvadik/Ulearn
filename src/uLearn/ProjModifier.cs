@@ -25,8 +25,15 @@ namespace uLearn
 	{
 		public static void RemoveCheckingFromCsproj(Project proj)
 		{
-			var toRemove = proj.Items.Where(pItem => pItem.EvaluatedInclude.StartsWith("checking" + Path.DirectorySeparatorChar)).ToList();
+			var toRemove = proj.Items.Where(IsChecking).ToList();
 			proj.RemoveItems(toRemove);
+		}
+
+		private static bool IsChecking(ProjectItem item)
+		{
+			return
+				item.EvaluatedInclude.StartsWith("checking" + Path.DirectorySeparatorChar) 
+				|| item.DirectMetadata.Any(md => md.Name == "Link" && md.EvaluatedValue.StartsWith("checking" + Path.DirectorySeparatorChar));
 		}
 
 		public static void PrepareForChecking(Project proj, ProjectExerciseBlock exerciseBlock)

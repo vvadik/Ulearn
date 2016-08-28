@@ -43,6 +43,11 @@ namespace uLearn
 			return File.ReadAllText(file.FullName, Encoding.UTF8);
 		}
 
+		public static byte[] Content(this FileInfo file)
+		{
+			return File.ReadAllBytes(file.FullName);
+		}
+
 		public static T DeserializeXml<T>(this FileInfo file)
 		{
 			var serializer = new XmlSerializer(typeof(T));
@@ -68,6 +73,15 @@ namespace uLearn
 			if (fileInfo.Exists)
 				return File.ReadAllBytes(fileInfo.FullName);
 			throw new Exception("No " + filepath + " in " + di.Name);
+		}
+
+		public static string GetRelativePath(this FileInfo file, string folder)
+		{
+			var pathUri = new Uri(file.FullName);
+			if (!folder.EndsWith(Path.DirectorySeparatorChar.ToString()))
+				folder += Path.DirectorySeparatorChar;
+			var folderUri = new Uri(folder);
+			return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
 		}
 
 		public static string[] GetFilenames(this DirectoryInfo di, string dirPath)
