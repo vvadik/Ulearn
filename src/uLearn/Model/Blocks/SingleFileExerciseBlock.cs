@@ -65,9 +65,9 @@ namespace uLearn.Model.Blocks
 			return BuildSolution(code).SourceCode;
 		}
 
-		public override SolutionBuildResult BuildSolution(string code)
+		public override SolutionBuildResult BuildSolution(string userWrittenCode)
 		{
-			return new SolutionBuilder(IndexToInsertSolution, ExerciseCode, ValidatorName).BuildSolution(code);
+			return new SolutionBuilder(IndexToInsertSolution, ExerciseCode, ValidatorName).BuildSolution(userWrittenCode);
 		}
 
 		public override RunnerSubmition CreateSubmition(string submitionId, string code)

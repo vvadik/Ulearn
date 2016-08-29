@@ -2,23 +2,23 @@
 {
 	internal static class ValidatorExtension
 	{
-		public static SolutionBuildResult ValidateSolution(this ISolutionValidator validator, string code)
+		public static SolutionBuildResult ValidateSolution(this ISolutionValidator validator, string userWrittenCode, string fullCodeFile)
 		{
 			string message;
 
-			if ((message = validator.FindSyntaxError(code)) != null)
-				return SolutionBuildResult.Error(message, code);
-			if ((message = validator.FindValidatorError(code, code)) != null)
-				return SolutionBuildResult.StyleIssue(message, code);
-			return SolutionBuildResult.Success(code);
+			if ((message = validator.FindSyntaxError(fullCodeFile)) != null)
+				return SolutionBuildResult.Error(message, fullCodeFile);
+			if ((message = validator.FindValidatorError(userWrittenCode, fullCodeFile)) != null)
+				return SolutionBuildResult.StyleIssue(message, fullCodeFile);
+			return SolutionBuildResult.Success(fullCodeFile);
 		}
 
-		public static SolutionBuildResult ValidateFileSolution(this ISolutionValidator validator, string code)
+		public static SolutionBuildResult ValidateSingleFileSolution(this ISolutionValidator validator, string userWrittenCode, string fullCodeFile)
 		{
 			string message;
-			if ((message = validator.FindFullSourceError(code)) != null)
-				return SolutionBuildResult.Error(message, code);
-			return validator.ValidateSolution(code);
+			if ((message = validator.FindFullSourceError(userWrittenCode)) != null)
+				return SolutionBuildResult.Error(message, fullCodeFile);
+			return validator.ValidateSolution(userWrittenCode, fullCodeFile);
 		}
 	}
 }

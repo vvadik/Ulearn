@@ -16,7 +16,7 @@
 		public SolutionBuildResult BuildSolution(string usersExercise)
 		{
 			var solution = ExerciseCode.Insert(IndexForInsert, usersExercise + "\r\n");
-			return Validator.ValidateFileSolution(solution);
+			return Validator.ValidateSingleFileSolution(usersExercise, solution);
 		}
 	}
 }

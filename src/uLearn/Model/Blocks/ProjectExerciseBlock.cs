@@ -75,10 +75,10 @@ namespace uLearn.Model.Blocks
 			return code;
 		}
 
-		public override SolutionBuildResult BuildSolution(string code)
+		public override SolutionBuildResult BuildSolution(string userWrittenCodeFile)
 		{
 			var validator = ValidatorsRepository.Get(ValidatorName);
-			return validator.ValidateSolution(code);
+			return validator.ValidateSolution(userWrittenCodeFile, userWrittenCodeFile);
 		}
 
 		public override RunnerSubmition CreateSubmition(string submitionId, string code)
