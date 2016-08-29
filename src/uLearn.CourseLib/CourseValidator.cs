@@ -11,24 +11,42 @@ namespace uLearn
 {
 	public class CourseValidator
 	{
-		private readonly Course course;
-		private readonly string workDir;
+		private readonly Slide[] slides;
+		private readonly string pathToCompiler;
 
 		public event Action<string> InfoMessage;
 		public event Action<string> Error;
 
-		public CourseValidator(Course course, string workDir)
+		public CourseValidator(Slide[] slides, string workDir)
 		{
-			this.course = course;
-			this.workDir = workDir;
+			this.slides = slides;
+			pathToCompiler = Path.Combine(workDir, "Microsoft.Net.Compilers.1.3.2");
 		}
 
 		public void ValidateExercises()
 		{
-			foreach (var slide in course.Slides.OfType<ExerciseSlide>())
+			foreach (var slide in slides.OfType<ExerciseSlide>())
 			{
 				LogSlideProcessing("Validate exercise", slide);
 				EthalonSolutionsForExercises(slide);
+				if (slide.Exercise is ProjectExerciseBlock)
+					StudentsZipIsBuildingOk(slide, (ProjectExerciseBlock)slide.Exercise);
+			}
+		}
+
+		private void StudentsZipIsBuildingOk(Slide slide, ProjectExerciseBlock ex)
+		{
+			var tempDir = new DirectoryInfo("./temp");
+			try
+			{
+				Utils.UnpackZip(ex.StudentsZip.Content(), "./temp");
+				var res = MsBuildRunner.BuildProject(pathToCompiler, tempDir.GetFile(ex.CsprojFileName).FullName, tempDir);
+				if (!res.Success)
+					ReportSlideError(slide, ex.CsprojFileName + " not building! " + res);
+			}
+			finally
+			{
+				tempDir.Delete(true);
 			}
 		}
 
@@ -70,7 +88,7 @@ namespace uLearn
 
 		public IEnumerable<Tuple<Slide, string>> GetVideos()
 		{
-			return course.Slides
+			return slides
 				.SelectMany(slide =>
 					slide.Blocks.OfType<YoutubeBlock>()
 						.Select(b => Tuple.Create(slide, b.VideoId)));
@@ -88,10 +106,9 @@ namespace uLearn
 				{
 					Path = exercise.CsprojFileName,
 					Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(exercise.CsprojFileName),
-						proj => ProjModifier.PrepareCsprojBeforeZipping(proj, exercise))
+						proj => ProjModifier.PrepareForChecking(proj, exercise))
 				}
 			});
-			var pathToCompiler = Path.Combine(workDir, "Microsoft.Net.Compilers.1.3.2");
 			var result = SandboxRunner.Run(pathToCompiler,
 				new ProjRunnerSubmition
 				{
@@ -103,7 +120,7 @@ namespace uLearn
 				});
 			if (result.Verdict != Verdict.Ok)
 				ReportSlideError(slide, "Exercise initial code verdict is not OK. RunResult = " + result);
-			else if (result.Score >= 0.5)
+			else if (result.Output == "")
 				ReportSlideError(slide, "Exercise initial code (available to students) is solution!");
 		}
 

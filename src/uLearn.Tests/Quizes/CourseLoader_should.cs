@@ -9,7 +9,12 @@ using NUnit.Framework;
 namespace uLearn.Quizes
 {
 	[TestFixture]
-	class CourseLoader_should
+	public class CourseLoader_should
 	{
+		[Test, Explicit("Для профилирования загрузки курса")]
+		public void LoadCourse()
+		{
+			new CourseLoader().LoadCourse(new DirectoryInfo(@"c:\work\edu\BasicProgramming\Part01\BasicProgramming\Slides"));
+		}
 	}
 }

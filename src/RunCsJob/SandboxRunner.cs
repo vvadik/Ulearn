@@ -52,41 +52,39 @@ namespace RunCsJob
 		private RunningResults RunMsBuild(string pathToCompiler)
 		{
 			var projSubmition = (ProjRunnerSubmition)submition;
-			var dir = Directory.CreateDirectory(Path.Combine(".", submition.Id));
+			var dir = Directory.CreateDirectory(Path.Combine(".", "submitions", submition.Id));
 			try
 			{
-				Utils.UnpackZip(projSubmition.ZipFileData, dir.FullName);
-			}
-			catch (Exception ex)
-			{
-				SafeRemoveDirectory(dir.FullName);
-				return new RunningResults
+				try
 				{
-					Id = submition.Id,
-					Verdict = Verdict.SandboxError,
-					Error = ex.ToString()
-				};
-			}
+					Utils.UnpackZip(projSubmition.ZipFileData, dir.FullName);
+				}
+				catch (Exception ex)
+				{
+					return new RunningResults
+					{
+						Id = submition.Id,
+						Verdict = Verdict.SandboxError,
+						Error = ex.ToString()
+					};
+				}
 
-			var builderResult = MsBuildRunner.BuildProject(pathToCompiler, projSubmition.ProjectFileName, dir);
-			result.Verdict = Verdict.Ok;
+				var builderResult = MsBuildRunner.BuildProject(pathToCompiler, projSubmition.ProjectFileName, dir);
+				result.Verdict = Verdict.Ok;
 
-			if (!builderResult.Success)
-			{
-				result.Verdict = Verdict.CompilationError;
-				result.CompilationOutput = builderResult.ToString();
-				SafeRemoveDirectory(dir.FullName);
+				if (!builderResult.Success)
+				{
+					result.Verdict = Verdict.CompilationError;
+					result.CompilationOutput = builderResult.ToString();
+					return result;
+				}
+				RunSandboxer($"\"{builderResult.PathToExe}\" {submition.Id}");
 				return result;
 			}
-
-			RunSandboxer($"\"{builderResult.PathToExe}\" {submition.Id}");
-
-			SafeRemoveDirectory(dir.FullName);
-
-			if (result.Verdict == Verdict.Ok)
-				result.FillPassProgress();
-
-			return result;
+			finally
+			{
+				SafeRemoveDirectory(dir.FullName);
+			}
 		}
 
 		public RunningResults RunCsc()

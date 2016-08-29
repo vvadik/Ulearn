@@ -15,6 +15,15 @@ namespace uLearn.CSharp
 	public class ProjModifier_Should
 	{
 		[Test]
+		public void NotChangeFile_OnModify()
+		{
+			var res = ProjModifier.ModifyCsproj(
+				new FileInfo("CSharp/TestProject/ProjDir/test.csproj"), 
+				p => ProjModifier.PrepareForChecking(p, "AAA"));
+			var project = new Project("CSharp/TestProject/ProjDir/test.csproj");
+			Assert.AreNotEqual("AAA", project.GetProperty("StartupObject"));
+		}
+		[Test]
 		public void ReplaceLinksWithItems()
 		{
 			var project = new Project("CSharp/TestProject/ProjDir/test.csproj");

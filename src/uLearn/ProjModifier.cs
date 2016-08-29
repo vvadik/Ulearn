@@ -25,13 +25,25 @@ namespace uLearn
 	{
 		public static void RemoveCheckingFromCsproj(Project proj)
 		{
-			var toRemove = proj.Items.Where(pItem => pItem.EvaluatedInclude.StartsWith("checking" + Path.DirectorySeparatorChar)).ToList();
+			var toRemove = proj.Items.Where(IsChecking).ToList();
 			proj.RemoveItems(toRemove);
 		}
 
-		public static void PrepareCsprojBeforeZipping(Project proj, ProjectExerciseBlock exerciseBlock)
+		private static bool IsChecking(ProjectItem item)
 		{
-			proj.SetProperty("StartupObject", exerciseBlock.StartupObject);
+			return
+				item.EvaluatedInclude.StartsWith("checking" + Path.DirectorySeparatorChar) 
+				|| item.DirectMetadata.Any(md => md.Name == "Link" && md.EvaluatedValue.StartsWith("checking" + Path.DirectorySeparatorChar));
+		}
+
+		public static void PrepareForChecking(Project proj, ProjectExerciseBlock exerciseBlock)
+		{
+			PrepareForChecking(proj, exerciseBlock.StartupObject);
+		}
+
+		public static void PrepareForChecking(Project proj, string startupObject)
+		{
+			proj.SetProperty("StartupObject", startupObject);
 			proj.SetProperty("OutputType", "Exe");
 			proj.SetProperty("UseVSHostingProcess", "false");
 			ResolveLinks(proj);
@@ -55,7 +67,7 @@ namespace uLearn
 			var linkedItems = (from item in project.Items
 							   let meta = item.DirectMetadata.FirstOrDefault(md => md.Name == "Link")
 							   where meta != null
-							   select new { item, newPath = RenameToGitIgnored(meta.EvaluatedValue) }).ToList();
+							   select new { item, newPath = ChangeNameToGitIgnored(meta.EvaluatedValue) }).ToList();
 			var copies = new List<FileToCopy>();
 			foreach (var link in linkedItems)
 			{
@@ -66,22 +78,13 @@ namespace uLearn
 			return copies;
 		}
 
-		private static string RenameToGitIgnored(string filename)
+		private static string ChangeNameToGitIgnored(string filename)
 		{
 			var d = Path.GetDirectoryName(filename) ?? "";
 			var fn = Path.GetFileName(filename);
 			return Path.Combine(d, "~$" + fn);
 		}
 
-		public static byte[] ModifyCsproj(byte[] content, Action<Project> changingAction)
-		{
-			using (var inputMs = new MemoryStream(content))
-			{
-				var reader = XmlReader.Create(inputMs);
-				var proj = new Project(reader);
-				return ModifyCsproj(changingAction, proj);
-			}
-		}
 		public static byte[] ModifyCsproj(FileInfo csproj, Action<Project> changingAction)
 		{
 			var proj = new Project(csproj.FullName, null, null, new ProjectCollection());

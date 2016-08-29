@@ -24,7 +24,14 @@ namespace uLearn
 				using (var zip = ZipFile.Read(ms))
 				{
 					foreach (var file in zip)
-						file.Extract(pathToExtractDir, ExtractExistingFileAction.OverwriteSilently);
+						try
+						{
+							file.Extract(pathToExtractDir, ExtractExistingFileAction.OverwriteSilently);
+						}
+						catch (Exception e)
+						{
+							throw new IOException("File " + file.FileName, e);
+						}
 				}
 			}
 		}
