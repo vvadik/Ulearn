@@ -65,7 +65,7 @@
 
 		<div>
 			<h3>Результат проверки орфографии:</h3>
-			<div class="load-content" data-url="@Url.Action("SpellingErrors", new { courseId = Model.CourseId })"> processing... </div>
+			<div class="load-content" data-url="@Url.Action("SpellingErrors", new { Model.VersionId })"> processing... </div>
 		</div>
 
 		if (Model.IsDiagnosticsForVersion)
