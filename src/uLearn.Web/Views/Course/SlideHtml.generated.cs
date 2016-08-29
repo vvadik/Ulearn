@@ -89,7 +89,7 @@ WebViewPage.WriteTo(@__razor_helper_writer, Block((dynamic)block, context));
 		{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<div class=\'revealed\' data-toggle=\"tooltip\" data-placement=\"left\" title=\"Этот " +
-"блок студенты не видят\">\r\n\t\t\t\t<h4>Инструктору</h4>\r\n");
+"блок студенты не видят\">\r\n");
 
 
  				foreach (var block in blockRange)
