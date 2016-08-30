@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace uLearn.Web.Models
+namespace uLearn
 {
 	public class AcceptedSolutionInfo
 	{

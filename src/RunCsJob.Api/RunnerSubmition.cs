@@ -10,7 +10,7 @@ namespace RunCsJob.Api
 
 		public override string ToString()
 		{
-			return string.Format("Id: {0}, NeedRun: {1}", Id, NeedRun);
+			return $"Id: {Id}, NeedRun: {NeedRun}";
 		}
 	}
 

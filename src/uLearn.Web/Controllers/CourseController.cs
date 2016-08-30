@@ -24,7 +24,7 @@ namespace uLearn.Web.Controllers
 		private readonly UnitsRepo unitsRepo = new UnitsRepo();
 		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly LtiRequestsRepo ltiRequestsRepo = new LtiRequestsRepo();
-		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
+		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
 
 		public CourseController()
 			: this(WebCourseManager.Instance)
@@ -61,10 +61,10 @@ namespace uLearn.Web.Controllers
 			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
 			var isGuest = !User.Identity.IsAuthenticated;
 
-			ManualQuizCheckQueueItem queueItem = null;
+			ManualQuizChecking queueItem = null;
 			if (User.HasAccessFor(courseId, CourseRole.Instructor) && checkQueueItemId != null)
 			{
-				queueItem = userQuizzesRepo.GetManualQuizCheckQueueItemById(checkQueueItemId.Value);
+				queueItem = slideCheckingsRepo.GetManualCheckingById<ManualQuizChecking>(checkQueueItemId.Value);
 				/* If lock time is finished or some mistake happened */
 				if (!queueItem.IsLockedBy(User.Identity))
 					return RedirectToAction("ManualQuizChecksQueue", "Admin", new { CourseId = courseId, message = "time_is_over" });
@@ -190,7 +190,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits, ManualQuizCheckQueueItem queueItem)
+		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits, ManualQuizChecking queueItem)
 		{
 			var course = courseManager.GetCourse(courseId);
 
@@ -224,7 +224,7 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, Visit visit, bool isLti = false, ManualQuizCheckQueueItem manualQuizCheckQueueItem=null)
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, Visit visit, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem=null)
 		{
 			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visit, isLti)).ToArray();
 			return new BlockRenderContext(
@@ -342,17 +342,18 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public async Task<ActionResult> RemoveSolution(string courseId, int slideIndex, int solutionId)
 		{
-			var solution = await db.UserSolutions.FirstOrDefaultAsync(s => s.Id == solutionId);
-			if (solution != null)
+			var submission = await db.UserExerciseSubmissions.FirstOrDefaultAsync(s => s.Id == solutionId);
+			if (submission != null)
 			{
-				var visit = await db.Visits.FirstOrDefaultAsync(v => v.UserId == solution.UserId && v.SlideId == solution.SlideId);
+				var visit = await db.Visits.FirstOrDefaultAsync(v => v.UserId == submission.UserId && v.SlideId == submission.SlideId);
 				if (visit != null)
 				{
-					visit.IsPassed = db.UserSolutions.Any(s => s.UserId == solution.UserId && s.SlideId == solution.SlideId && s.IsRightAnswer && s.Id != solutionId);
+					/* TODO(andgein): Replace to UpdateScoreForVisit() */
+					visit.IsPassed = db.UserExerciseSubmissions.Any(s => s.UserId == submission.UserId && s.SlideId == submission.SlideId && s.AutomaticChecking.IsRightAnswer && s.Id != solutionId);
 					visit.Score = visit.IsSkipped ? 0 : visit.IsPassed ? 5 : 0; //TODO fix 5 to Score from UserSolution
 					visit.AttemptsCount--;
 				}
-				db.UserSolutions.Remove(solution);
+				db.UserExerciseSubmissions.Remove(submission);
 				await db.SaveChangesAsync();
 			}
 			return RedirectToAction("AcceptedSolutions", new { courseId, slideIndex });
@@ -363,8 +364,9 @@ namespace uLearn.Web.Controllers
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			var userId = User.Identity.GetUserId();
-			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.UserSolution.SlideId == slideId));
-			RemoveFrom(db.UserSolutions, slideId, userId);
+			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.Submission.SlideId == slideId));
+
+			RemoveFrom(db.UserExerciseSubmissions, slideId, userId);
 			RemoveFrom(db.UserQuizzes, slideId, userId);
 			RemoveFrom(db.Visits, slideId, userId);
 			db.UserQuestions.RemoveRange(db.UserQuestions.Where(q => q.UserId == userId && q.SlideId == slideId));
@@ -393,3 +395,4 @@ namespace uLearn.Web.Controllers
 		}
 	}
 }
+ 

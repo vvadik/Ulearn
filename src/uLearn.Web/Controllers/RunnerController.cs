@@ -27,23 +27,33 @@ namespace uLearn.Web.Controllers
 			while (true)
 			{
 				var repo = new UserSolutionsRepo();
-				var submissions = repo.GetUnhandled(count);
-				if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
+				var exerciseCheckings = repo.GetUnhandledSubmissions(count);
+				if (exerciseCheckings.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
 				{
-					return submissions.Select(ToRunnerSubmition).ToList();
+					return exerciseCheckings.Select(ToRunnerSubmition).ToList();
 				}
 				await repo.WaitUnhandled(TimeSpan.FromSeconds(10));
 			}
 		}
 
-		private RunnerSubmition ToRunnerSubmition(UserSolution details)
+		private RunnerSubmition ToRunnerSubmition(UserExerciseSubmission submission)
 		{
+			if (submission.IsWebSubmission)
+			{
+				return new FileRunnerSubmition
+				{
+					Id = submission.Id.ToString(),
+					Code = submission.SolutionCode.Text,
+					Input = "",
+					NeedRun = true
+				};
+			}
 			var exerciseSlide = (ExerciseSlide)courseManager
-				.GetCourse(details.CourseId)
-				.GetSlideById(details.SlideId);
+				.GetCourse(submission.CourseId)
+				.GetSlideById(submission.SlideId);
 			return exerciseSlide.Exercise.CreateSubmition(
-				details.Id.ToString(),
-				details.SolutionCode.Text);
+				submission.Id.ToString(),
+				submission.SolutionCode.Text);
 		}
 
 		[HttpPost]

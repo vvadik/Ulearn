@@ -23,11 +23,11 @@ namespace uLearn.Web.Models
 		public List<string> UsersVisitedAllSlidesBeforePeriodFinished { get; set; }
 
 		public Dictionary<Guid, int> QuizzesAverageScore { get; set; }
-		public Dictionary<Guid, List<ManualQuizCheckQueueItem>> ManualQuizCheckQueueBySlide { get; set; }
+		public Dictionary<Guid, List<ManualQuizChecking>> ManualQuizCheckQueueBySlide { get; set; }
 		public Dictionary<Guid, List<Comment>> CommentsBySlide { get; set; }
 
-		public Dictionary<Guid, List<UserSolution>> ExercisesSolutions { get; set; }
-		public Dictionary<Guid, List<UserSolution>> ExercisesAcceptedSolutions { get; set; }
+		public Dictionary<Guid, List<UserExerciseSubmission>> ExercisesSolutions { get; set; }
+		public Dictionary<Guid, List<UserExerciseSubmission>> ExercisesAcceptedSolutions { get; set; }
 
 		public List<ApplicationUser> VisitedUsersIds { get; set; }
 		public Dictionary<string, ImmutableHashSet<Guid>> VisitedSlidesByUser { get; set; }

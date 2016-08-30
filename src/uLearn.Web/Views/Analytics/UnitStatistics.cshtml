@@ -123,8 +123,8 @@
 								}
 								else if (slide is ExerciseSlide)
 								{
-									var tries = Model.ExercisesSolutions.GetOrDefault(slide.Id, new List<UserSolution>());
-									var acceptedTries = Model.ExercisesAcceptedSolutions.GetOrDefault(slide.Id, new List<UserSolution>());
+									var tries = Model.ExercisesSolutions.GetOrDefault(slide.Id, new List<UserExerciseSubmission>());
+									var acceptedTries = Model.ExercisesAcceptedSolutions.GetOrDefault(slide.Id, new List<UserExerciseSubmission>());
 									if (tries.Count == 0)
 									{
 										<span class="exercise-tries" title="Нет попыток">&ndash;</span>

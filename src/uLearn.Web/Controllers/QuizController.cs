@@ -27,6 +27,7 @@ namespace uLearn.Web.Controllers
 		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly QuizzesRepo quizzesRepo = new QuizzesRepo();
 		private readonly GroupsRepo groupsRepo = new GroupsRepo();
+		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
 
 		public QuizController()
 			: this(WebCourseManager.Instance)
@@ -72,7 +73,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[AllowAnonymous]
-		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizCheckQueueItem manualQuizCheckQueueItem = null)
+		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem = null)
 		{
 			if (isGuest)
 				return PartialView(GuestQuiz(slide, courseId));
@@ -179,14 +180,15 @@ namespace uLearn.Web.Controllers
 			{
 				/* If this quiz is already queued for checking for this user, don't add it to queue again */
 				if (quizState != QuizState.WaitForCheck)
-					await userQuizzesRepo.QueueForManualCheck(courseId, slideId, userId);
+					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, slideId, userId);
 			}
 			else
 			{
 				var score = allQuizInfos
 					.DistinctBy(forDb => forDb.QuizId)
 					.Sum(forDb => forDb.QuizBlockScore);
-				await visitsRepo.AddAttempt(slideId, userId, score);
+				await slideCheckingsRepo.AddQuizAttemptWithAutomaticChecking(courseId, slideId, userId, score);
+				await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 				if (isLti)
 					LtiUtils.SubmitScore(slide, userId);
 			}
@@ -203,7 +205,7 @@ namespace uLearn.Web.Controllers
 
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var queueItem = userQuizzesRepo.GetManualQuizCheckQueueItemById(id);
+				var queueItem = slideCheckingsRepo.GetManualCheckingById<ManualQuizChecking>(id);
 
 				if (queueItem.IsChecked)
 					return Redirect(errorUrl + "Эта работа уже была проверена");
@@ -245,8 +247,8 @@ namespace uLearn.Web.Controllers
 					totalScore += score;
 				}
 
-				await userQuizzesRepo.MarkManualQuizCheckQueueItemAsChecked(queueItem);
-				await visitsRepo.SetScoreForAttempt(queueItem.SlideId, queueItem.UserId, totalScore);
+				await slideCheckingsRepo.MarkManualCheckingAsChecked(queueItem, totalScore);
+				await visitsRepo.UpdateScoreForVisit(queueItem.CourseId, queueItem.SlideId, queueItem.UserId);
 				transaction.Commit();
 			}
 
@@ -455,7 +457,7 @@ namespace uLearn.Web.Controllers
 				.ToDictionary(grouping => grouping.Key, grouping => grouping.Count());
 
 			var usersByQuizVersion = passes.GroupBy(p => p.QuizVersion?.Id).ToDictionary(g => g.Key, g => g.Select(u => u.UserName).ToList());
-			var usersWaitsForManualCheck = userQuizzesRepo.GetManualQuizCheckQueue(courseId, quizSlide.Id).ToList().Select(i => i.User.UserName).ToImmutableHashSet();
+			var usersWaitsForManualCheck = slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(courseId, quizSlide.Id).ToList().Select(i => i.User.UserName).ToImmutableHashSet();
 
 			return PartialView(new QuizAnalyticsModel
 			{
@@ -613,7 +615,8 @@ namespace uLearn.Web.Controllers
 					!userQuizzesRepo.IsQuizScoredMaximum(courseId, userId, slideId))
 				{
 					await userQuizzesRepo.DropQuiz(userId, slideId);
-					await visitsRepo.DropAttempt(slideId, userId);
+					await slideCheckingsRepo.RemoveAttempts(courseId, slideId, userId);
+					await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 					if (isLti)
 						LtiUtils.SubmitScore(slide, userId);
 				}
@@ -652,7 +655,7 @@ namespace uLearn.Web.Controllers
 		{
 			var states = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).ToList();
 
-			var queueItem = userQuizzesRepo.FindManualQuizCheckQueueItem(courseId, slideId, userId);
+			var queueItem = userQuizzesRepo.FindManualQuizChecking(courseId, slideId, userId);
 			if (queueItem != null)
 				return Tuple.Create(queueItem.IsLocked ? QuizState.IsChecking : QuizState.WaitForCheck, states.Count);
 			

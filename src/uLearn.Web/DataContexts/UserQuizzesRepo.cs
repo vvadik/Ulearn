@@ -47,24 +47,10 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 			return userQuiz;
 		}
-
-		public async Task<ManualQuizCheckQueueItem> QueueForManualCheck(string courseId, Guid slideId, string userId)
-		{
-			var check = new ManualQuizCheckQueueItem
-			{
-				CourseId = courseId,
-				SlideId = slideId,
-				Timestamp = DateTime.Now,
-				UserId = userId,
-			};
-			db.ManualQuizCheckQueueItems.Add(check);
-			await db.SaveChangesAsync();
-			return check;
-		}
-
+		
 		public bool IsWaitingForManualCheck(string courseId, Guid slideId, string userId)
 		{
-			return db.ManualQuizCheckQueueItems.Any(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId && ! c.IsChecked);
+			return db.ManualQuizCheckings.Any(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId && ! c.IsChecked);
 		}
 
 		public bool IsQuizSlidePassed(string courseId, string userId, Guid slideId)
@@ -176,60 +162,19 @@ namespace uLearn.Web.DataContexts
 				.ToDictionary(g => g.Key, g => g.ToList());
 		}
 
-		public IEnumerable<ManualQuizCheckQueueItem> GetManualQuizCheckQueue(string courseId)
+		public ManualQuizChecking FindManualQuizChecking(string courseId, Guid slideId, string userId)
 		{
-			return db.ManualQuizCheckQueueItems
-				.Where(c => c.CourseId == courseId && ! c.IsChecked)
-				.OrderBy(c => c.Timestamp);
-		}
-
-		public IEnumerable<ManualQuizCheckQueueItem> GetManualQuizCheckQueue(string courseId, Guid slideId)
-		{
-			return db.ManualQuizCheckQueueItems
-				.Where(c => c.CourseId == courseId && c.SlideId == slideId && ! c.IsChecked)
-				.OrderBy(c => c.Timestamp);
-		}
-
-		public IEnumerable<ManualQuizCheckQueueItem> GetManualQuizCheckQueue(string courseId, IEnumerable<Guid> slidesIds)
-		{
-			return db.ManualQuizCheckQueueItems
-				.Where(c => c.CourseId == courseId && slidesIds.Contains(c.SlideId) && !c.IsChecked)
-				.OrderBy(c => c.Timestamp);
-		}
-
-		public ManualQuizCheckQueueItem GetManualQuizCheckQueueItemById(int id)
-		{
-			return db.ManualQuizCheckQueueItems.Find(id);
-		}
-
-		public ManualQuizCheckQueueItem FindManualQuizCheckQueueItem(string courseId, Guid slideId, string userId)
-		{
-			return db.ManualQuizCheckQueueItems
+			return db.ManualQuizCheckings
 				.Where(i => i.CourseId == courseId && i.SlideId == slideId && i.UserId == userId && ! i.IsChecked)
 				.OrderByDescending(i => i.Timestamp)
 				.FirstOrDefault();
 		}
-
-		public async Task LockManualQuizCheckQueueItem(ManualQuizCheckQueueItem quizCheckQueueItem, string lockedById)
-		{
-			quizCheckQueueItem.LockedById = lockedById;
-			quizCheckQueueItem.LockedUntil = DateTime.Now.Add(TimeSpan.FromMinutes(30));
-			await db.SaveChangesAsync();
-		}
-
+		
 		public async Task SetScoreForQuizBlock(string userId, Guid slideId, string blockId, int score)
 		{
 			db.UserQuizzes
 				.Where(q => q.UserId == userId && q.SlideId == slideId && q.QuizId == blockId)
 				.ForEach(q => q.QuizBlockScore = score);
-			await db.SaveChangesAsync();
-		}
-
-		public async Task MarkManualQuizCheckQueueItemAsChecked(ManualQuizCheckQueueItem queueItem)
-		{
-			queueItem.LockedBy = null;
-			queueItem.LockedUntil = null;
-			queueItem.IsChecked = true;
 			await db.SaveChangesAsync();
 		}
 

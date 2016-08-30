@@ -10,6 +10,7 @@ namespace uLearn.Web.DataContexts
 	public class VisitsRepo
 	{
 		private readonly ULearnDb db;
+		private readonly SlideCheckingsRepo slideCheckingsRepo;
 
 		public VisitsRepo() : this(new ULearnDb())
 		{
@@ -19,6 +20,7 @@ namespace uLearn.Web.DataContexts
 		public VisitsRepo(ULearnDb db)
 		{
 			this.db = db;
+			this.slideCheckingsRepo = new SlideCheckingsRepo(db);
 		}
 
 		public async Task AddVisit(string courseId, Guid slideId, string userId)
@@ -55,6 +57,18 @@ namespace uLearn.Web.DataContexts
 			return db.Visits.Any(x => x.UserId == userId && x.CourseId == courseId);
 		}
 
+		public async Task UpdateScoreForVisit(string courseId, Guid slideId, string userId)
+		{
+			var newScore = slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId) +
+							slideCheckingsRepo.GetAutomaticScoreForSlide(courseId, slideId, userId);
+			var isPassed = slideCheckingsRepo.IsSlidePassed(courseId, slideId, userId);
+			await UpdateAttempts(slideId, userId, visit =>
+			{
+				visit.Score = newScore;
+				visit.IsPassed = isPassed;
+			});
+		}
+
 		private async Task UpdateAttempts(Guid slideId, string userId, Action<Visit> action)
 		{
 			var visit = db.Visits.FirstOrDefault(v => v.SlideId == slideId && v.UserId == userId);
@@ -73,46 +87,7 @@ namespace uLearn.Web.DataContexts
 				visit.IsPassed = false;
 			});
 		}
-
-		public async Task SetScoreForAttempt(Guid slideId, string userId, int newScore)
-		{
-			await UpdateAttempts(slideId, userId, visit =>
-			{
-				visit.Score = newScore;
-				visit.IsPassed = true;
-			});
-		}
-
-		public async Task AddAttempt(Guid slideId, string userId, int score)
-		{
-			await UpdateAttempts(slideId, userId, visit =>
-			{
-				visit.AttemptsCount++;
-				visit.Score = score;
-				visit.IsPassed = true;
-			});
-		}
-
-		public async Task DropAttempt(Guid slideId, string userId)
-		{
-			await UpdateAttempts(slideId, userId, visit =>
-			{
-				visit.Score = 0;
-				visit.IsPassed = false;
-			});
-		}
-
-		public async Task AddSolutionAttempt(Guid slideId, string userId, int score)
-		{
-			await UpdateAttempts(slideId, userId, visit =>
-			{
-				visit.IsPassed = visit.IsPassed || score > 0;
-				visit.AttemptsCount++;
-				if (!visit.IsSkipped && score > visit.Score)
-					visit.Score = score;
-			});
-		}
-
+		
 		public Dictionary<Guid, int> GetScoresForSlides(string courseId, string userId)
 		{
 			return db.Visits

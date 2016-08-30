@@ -15,6 +15,7 @@ namespace uLearn.Web.Controllers
 		private readonly CourseManager courseManager;
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly VisitsRepo visitsRepo = new VisitsRepo();
+		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
 
 		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(30);
 
@@ -45,6 +46,7 @@ namespace uLearn.Web.Controllers
 			var result = await CheckSolution(courseId, exerciseSlide, code);
 			if (isLti)
 				LtiUtils.SubmitScore(exerciseSlide, User.Identity.GetUserId());
+
 			return Json(result);
 		}
 
@@ -53,37 +55,38 @@ namespace uLearn.Web.Controllers
 		{
 			var exerciseBlock = exerciseSlide.Exercise;
 		    var solution = exerciseBlock.BuildSolution(code);
-		    if (solution.HasErrors)
-		            return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
-		        if (solution.HasStyleIssues)
-		            return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage, ExecutionServiceName = "uLearn" };
-		    var submissionDetails = await solutionsRepo.RunUserSolution(
-				courseId, exerciseSlide.Id, User.Identity.GetUserId(), 
+			var userId = User.Identity.GetUserId();
+			if (solution.HasErrors)
+		        return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage, ExecutionServiceName = "uLearn"};
+		    if (solution.HasStyleIssues)
+		        return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage, ExecutionServiceName = "uLearn" };
+			var automaticExerciseChecking = await solutionsRepo.RunUserSolution(
+				courseId, exerciseSlide.Id, userId, 
 				code, null, null, false, "uLearn", 
 				GenerateSubmissionName(exerciseSlide), executionTimeout
 			);
 
-			if (submissionDetails == null)
+			if (automaticExerciseChecking == null)
 				return new RunSolutionResult
 				{
 					IsCompillerFailure = true,
-					CompilationError = "Ой-ой, штуковина, которая проверяет решения сломалась (или просто устала). Попробуйте отправить решение позже (когда она немного отдохнет).",
+					CompilationError = "Ой-ой, штуковина, которая проверяет решения, сломалась (или просто устала).\nПопробуйте отправить решение позже — когда она немного отдохнет.",
 					ExecutionServiceName = "uLearn"
 				};
-			var output = submissionDetails.Output.Text;
-			var expectedOutput = exerciseBlock.ExpectedOutput.NormalizeEoln();
-			var isRightAnswer = submissionDetails.GetVerdict() == "Accepted" && output.Equals(expectedOutput);
-
-			await visitsRepo.AddSolutionAttempt(exerciseSlide.Id, User.Identity.GetUserId(), isRightAnswer ? exerciseBlock.MaxScore : 0);
+			
+			var sendToReview = exerciseBlock.RequireReview && automaticExerciseChecking.IsRightAnswer;
+			if (sendToReview)
+				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId);
+			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, userId);
 
 			return new RunSolutionResult
 			{
-				IsCompileError = submissionDetails.IsCompilationError,
-				CompilationError = submissionDetails.CompilationError.Text,
-				IsRightAnswer = isRightAnswer,
-				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : expectedOutput,
-				ActualOutput = output,
-				ExecutionServiceName = submissionDetails.ExecutionServiceName
+				IsCompileError = automaticExerciseChecking.IsCompilationError,
+				CompilationError = automaticExerciseChecking.CompilationError.Text,
+				IsRightAnswer = automaticExerciseChecking.IsRightAnswer,
+				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseSlide.Exercise.ExpectedOutput.NormalizeEoln(),
+				ActualOutput = automaticExerciseChecking.Output.Text,
+				ExecutionServiceName = automaticExerciseChecking.ExecutionServiceName
 			};
 		}
 

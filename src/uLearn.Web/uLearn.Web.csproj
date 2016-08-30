@@ -284,6 +284,17 @@
     <Compile Include="Controllers\AuthenticationManager.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
+    <Compile Include="DataContexts\SlideCheckingsRepo.cs" />
+    <Compile Include="Migrations\201608231750470_SlideChecking.cs" />
+    <Compile Include="Migrations\201608231750470_SlideChecking.Designer.cs">
+      <DependentUpon>201608231750470_SlideChecking.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608301626429_ExerciseChecking.cs" />
+    <Compile Include="Migrations\201608301626429_ExerciseChecking.Designer.cs">
+      <DependentUpon>201608301626429_ExerciseChecking.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ExerciseCodeReview.cs" />
+    <Compile Include="Models\SlideChecking.cs" />
     <Compile Include="Models\CourseInstructorNavbarViewModel.cs" />
     <Compile Include="DataContexts\CommentsRepo.cs" />
     <Compile Include="DataContexts\CoursesRepo.cs" />
@@ -340,7 +351,6 @@
     <Compile Include="Models\CourseVersion.cs" />
     <Compile Include="Models\Group.cs" />
     <Compile Include="Models\GroupMember.cs" />
-    <Compile Include="Models\ManualQuizCheckQueueItem.cs" />
     <Compile Include="Models\QuizVersion.cs" />
     <Compile Include="Models\UserSearchQueryModel.cs" />
     <Compile Include="Controllers\LoginController.cs" />
@@ -611,7 +621,7 @@
     <Compile Include="Models\LmsRoles.cs" />
     <Compile Include="Models\RunSolutionResult.cs" />
     <Compile Include="Models\UserQuiz.cs" />
-    <Compile Include="Models\UserSolution.cs" />
+    <Compile Include="Models\UserExerciseSubmission.cs" />
     <Compile Include="Models\UsersStatsPageModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -749,6 +759,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201607121102193_RemoveOldUserGroups.resx">
       <DependentUpon>201607121102193_RemoveOldUserGroups.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608231750470_SlideChecking.resx">
+      <DependentUpon>201608231750470_SlideChecking.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608301626429_ExerciseChecking.resx">
+      <DependentUpon>201608301626429_ExerciseChecking.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -217,7 +217,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div>\r\n\t\t\t<input ty
 
                WebViewPage.WriteTo(@__razor_helper_writer, block.MaxScore);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" name=\"quiz__score__@block.Id\" />\r\n\t\t</div>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" name=\"quiz__score__");
+
+
+                                                    WebViewPage.WriteTo(@__razor_helper_writer, block.Id);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" />\r\n\t\t</div>\r\n");
 
 
 	}

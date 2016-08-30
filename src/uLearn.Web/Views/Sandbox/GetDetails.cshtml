@@ -1,14 +1,14 @@
-﻿@model UserSolution
+﻿@model UserExerciseSubmission
 @{
 	Layout = null;
 	var texts = new[]
 	{
 		new {text = Model.SolutionCode.Text, type = "code", name = "Код"},
-		new {text = Model.CompilationError.Text, type = "compilationInfo", name = "Сообщения компилятора"},
+		new {text = Model.AutomaticChecking.CompilationError.Text, type = "compilationInfo", name = "Сообщения компилятора"},
 		new {text = "", type = "input", name = "Ввод"},
-		new {text = Model.Output.Text, type = "output", name = "Вывод"},
+		new {text = Model.AutomaticChecking.Output.Text, type = "output", name = "Вывод"},
 	}
-	.Where(arg => !String.IsNullOrWhiteSpace(arg.text));
+	.Where(arg => !string.IsNullOrWhiteSpace(arg.text));
 }
 
 <h4>
@@ -18,10 +18,10 @@
 	Время отправки: @Html.Encode(Model.Timestamp.ToString("dd-MM-yy HH:mm:ss"))
 </h4>
 <h4>
-	Статус: @Html.Encode(Model.Status.ToString())
+	Статус: @Html.Encode(Model.AutomaticChecking.Status.ToString())
 </h4>
 <h4>
-	Вердикт: @Html.Encode(Model.GetVerdict())
+	Вердикт: @Html.Encode(Model.AutomaticChecking.GetVerdict())
 </h4>
 
 @foreach (var text in texts)

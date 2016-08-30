@@ -12,6 +12,7 @@ namespace uLearn.Model.Blocks
 		{
 			MaxScore = 5;
 			MaxReviewAttempts = 2;
+			CorrectnessScore = MaxScore;
 		}
 
 		[XmlElement("max-score")]

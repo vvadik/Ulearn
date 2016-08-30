@@ -33,7 +33,9 @@ namespace RunCsJob
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine($@"Cant connect to {uri}. {e.Message}");
+				Console.WriteLine($@"Cant connect to {httpClient.BaseAddress}{uri}. {e.Message}");
+				if (e.InnerException != null)
+					Console.WriteLine(e.InnerException.Message);
 			}
 			return new List<RunnerSubmition>();
 		}

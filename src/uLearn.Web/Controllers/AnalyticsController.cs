@@ -25,6 +25,7 @@ namespace uLearn.Web.Controllers
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 		private readonly CommentsRepo commentsRepo = new CommentsRepo();
 		private readonly GroupsRepo groupsRepo = new GroupsRepo();
+		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
 
 		public AnalyticsController()
 			: this(WebCourseManager.Instance)
@@ -136,7 +137,7 @@ namespace uLearn.Web.Controllers
 				.GroupBy(s => s.SlideId)
 				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).ToList());
 
-			var manualQuizCheckQueueBySlide = userQuizzesRepo.GetManualQuizCheckQueue(courseId, slidesIds)
+			var manualQuizCheckQueueBySlide = slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(courseId, slidesIds)
 				.Where(i => periodStart <= i.Timestamp && i.Timestamp <= realPeriodFinish)
 				.GroupBy(i => i.SlideId)
 				.ToDictionary(g => g.Key, g => g.ToList());
@@ -282,7 +283,7 @@ namespace uLearn.Web.Controllers
 
 		private Dictionary<DateTime, int> GetTasksSolvedStats(IEnumerable<Guid> slideIds, DateTime firstDay, DateTime lastDay)
 		{
-			return GroupByDays(FilterByTime(FilterBySlides(db.UserSolutions, slideIds), firstDay, lastDay).Where(s => s.IsRightAnswer));
+			return GroupByDays(FilterByTime(FilterBySlides(db.UserExerciseSubmissions, slideIds), firstDay, lastDay).Where(s => s.AutomaticChecking.IsRightAnswer));
 		}
 
 		private Dictionary<DateTime, int> GetQuizPassedStats(IEnumerable<Guid> slideIds, DateTime firstDay, DateTime lastDay)
@@ -378,7 +379,7 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult ShowSolutions(string courseId, string userId, Guid slideId)
 		{
-			var solutions = db.UserSolutions.Where(s => s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
+			var solutions = db.UserExerciseSubmissions.Where(s => s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
 			var user = db.Users.Find(userId);
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.FindSlideById(slideId);
@@ -442,7 +443,7 @@ namespace uLearn.Web.Controllers
 		public ApplicationUser User { get; set; }
 		public Course Course { get; set; }
 		public string GroupsNames;
-		public List<UserSolution> Solutions { get; set; }
+		public List<UserExerciseSubmission> Solutions { get; set; }
 		public ExerciseSlide Slide { get; set; }
 	}
 

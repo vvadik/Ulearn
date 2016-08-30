@@ -51,7 +51,7 @@ $runButton.click(function () {
 	var code = $(".code-exercise")[0].codeMirrorEditor.getValue();
 	if (code.length == 0)
 		code = " ";
-	$runButton.text("...running...").addClass("active");
+	$runButton.text("Running...").addClass("active");
 	$runResults.hide();
 
 		$.ajax(

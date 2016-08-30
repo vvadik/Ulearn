@@ -14,7 +14,7 @@
 	@foreach (var userSolution in Model.Solutions)
 	{
 		var code = new CodeBlock(userSolution.SolutionCode.Text, Model.Slide.Exercise.LangId);
-		<label>@userSolution.GetVerdict()</label> @userSolution.Timestamp
+		<label>@userSolution.AutomaticChecking.GetVerdict()</label> @userSolution.Timestamp
 		@Html.DisplayFor(m => code)
 		<hr/>
 	}

@@ -9,15 +9,15 @@ namespace uLearn.Web.Models
 		[Key]
 		public int Id { get; set; }
 
-		public virtual UserSolution UserSolution { get; set; }
+		public virtual UserExerciseSubmission Submission { get; set; }
 		
 		[Required]
-		[Index("UserAndSolution", 2)]
-		public int UserSolutionId { get; set; }
+		[Index("IDX_Like_ByUserAndSubmission", 2)]
+		public int SubmissionId { get; set; }
 
 		[Required]
 		[StringLength(64)]
-		[Index("UserAndSolution", 1)]
+		[Index("IDX_Like_ByUserAndSubmission", 1)]
 		public string UserId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
