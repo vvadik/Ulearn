@@ -1180,3 +1180,22 @@ table.analytics__user-answers {
 .analytics__chart__toggles .analytics__chart__toggle.selected:active {
 	text-decoration: none;
 }
+
+/* Code review */
+.exercise__add-review {
+	position: absolute;
+	z-index: 10;
+	background-color: white;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.exercise__add-review > * {
+	display: block;
+	margin-top: 5px;
+}
+
+.code-review + .CodeMirror {
+	width: 600px;
+}

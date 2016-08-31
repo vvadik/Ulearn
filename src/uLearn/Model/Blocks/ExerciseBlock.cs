@@ -49,6 +49,8 @@ namespace uLearn.Model.Blocks
 		[XmlElement("max-review-attempts")]
 		public int MaxReviewAttempts { get; set; }
 
+		public int MaxReviewScore => MaxScore - CorrectnessScore;
+
 		public List<string> HintsMd
 		{
 			get { return Hints = Hints ?? new List<string>(); }

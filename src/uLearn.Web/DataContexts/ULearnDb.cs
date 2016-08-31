@@ -44,6 +44,12 @@ namespace uLearn.Web.DataContexts
 				.HasRequired(s => s.AutomaticChecking)
 				.WithMany()
 				.WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<ManualExerciseChecking>()
+				.HasRequired(c => c.Submission)
+				.WithMany(s => s.ManualCheckings)
+				.HasForeignKey(c => c.SubmissionId)
+				.WillCascadeOnDelete(false);
 		}
 		
 		public DbSet<UserQuestion> UserQuestions { get; set; }

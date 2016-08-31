@@ -16,7 +16,13 @@ namespace uLearn.Web.Models
 		public virtual ManualExerciseChecking ExerciseChecking { get; set; }
 
 		[Required]
+		public int StartLine { get; set; }
+
+		[Required]
 		public int StartPosition { get; set; }
+
+		[Required]
+		public int FinishLine { get; set; }
 
 		[Required]
 		public int FinishPosition { get; set; }

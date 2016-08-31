@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Threading.Tasks;
 using uLearn.Web.Models;
@@ -49,7 +50,7 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public async Task AddManualExerciseChecking(string courseId, Guid slideId, string userId)
+		public async Task AddManualExerciseChecking(string courseId, Guid slideId, string userId, UserExerciseSubmission submission)
 		{
 			var manualChecking = new ManualExerciseChecking
 			{
@@ -57,10 +58,22 @@ namespace uLearn.Web.DataContexts
 				SlideId = slideId,
 				UserId = userId,
 				Timestamp = DateTime.Now,
+
+				SubmissionId = submission.Id,
 			};
 			db.ManualExerciseCheckings.Add(manualChecking);
 
-			await db.SaveChangesAsync();
+			try
+			{
+				await db.SaveChangesAsync();
+			}
+			catch (DbEntityValidationException e)
+			{
+				throw new Exception(
+					string.Join("\r\n", e.EntityValidationErrors.Select(v => v.Entry.Entity.ToString())) + 
+					string.Join("\r\n",
+					e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
+			}
 		}
 
 		private IEnumerable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId) where T: AbstractSlideChecking
@@ -120,7 +133,7 @@ namespace uLearn.Web.DataContexts
 			return GetManualCheckingQueue<T>(courseId, new List<Guid> { slideId });
 		}
 
-		public T GetManualCheckingById<T>(int id) where T : AbstractManualSlideChecking
+		public T FindManualCheckingById<T>(int id) where T : AbstractManualSlideChecking
 		{
 			return db.Set<T>().Find(id);
 		}
@@ -138,6 +151,42 @@ namespace uLearn.Web.DataContexts
 			queueItem.LockedUntil = null;
 			queueItem.IsChecked = true;
 			queueItem.Score = score;
+			await db.SaveChangesAsync();
+		}
+
+		public async Task AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment)
+		{
+			db.ExerciseCodeReviews.Add(new ExerciseCodeReview
+			{
+				AuthorId = userId,
+				Comment = comment,
+				ExerciseCheckingId = checking.Id,
+				StartLine = startLine,
+				StartPosition = startPosition,
+				FinishLine = finishLine,
+				FinishPosition = finishPosition,
+			});
+
+			try
+			{
+				await db.SaveChangesAsync();
+			}
+			catch (DbEntityValidationException e)
+			{
+				throw new Exception(
+					string.Join("\r\n",
+						e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
+			}
+		}
+
+		public ExerciseCodeReview FindExerciseCodeReviewById(int reviewId)
+		{
+			return db.ExerciseCodeReviews.Find(reviewId);
+		}
+
+		public async Task DeleteExerciseCodeReview(ExerciseCodeReview review)
+		{
+			review.IsDeleted = true;
 			await db.SaveChangesAsync();
 		}
 	}

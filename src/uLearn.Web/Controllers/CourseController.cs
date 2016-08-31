@@ -61,13 +61,23 @@ namespace uLearn.Web.Controllers
 			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
 			var isGuest = !User.Identity.IsAuthenticated;
 
-			ManualQuizChecking queueItem = null;
+			AbstractManualSlideChecking queueItem = null;
 			if (User.HasAccessFor(courseId, CourseRole.Instructor) && checkQueueItemId != null)
 			{
-				queueItem = slideCheckingsRepo.GetManualCheckingById<ManualQuizChecking>(checkQueueItemId.Value);
+				var course = courseManager.GetCourse(courseId);
+				var slide = course.GetSlideById(slideGuid);
+
+				if (slide is QuizSlide)
+					queueItem = slideCheckingsRepo.FindManualCheckingById<ManualQuizChecking>(checkQueueItemId.Value);
+				if (slide is ExerciseSlide)
+					queueItem = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(checkQueueItemId.Value);
+
+				if (queueItem == null)
+					return HttpNotFound();
+
 				/* If lock time is finished or some mistake happened */
 				if (!queueItem.IsLockedBy(User.Identity))
-					return RedirectToAction("ManualQuizChecksQueue", "Admin", new { CourseId = courseId, message = "time_is_over" });
+					return RedirectToAction(GetAdminQueueActionName(queueItem), "Admin", new { CourseId = courseId, message = "time_is_over" });
 			}
 			var model = isGuest ?
 				CreateGuestCoursePageModel(courseId, slideGuid, visibleUnits) :
@@ -75,6 +85,15 @@ namespace uLearn.Web.Controllers
 			if (!visibleUnits.Contains(model.Slide.Info.UnitName))
 				throw new Exception("Slide is hidden " + slideGuid);
 			return View("Slide", model);
+		}
+
+		private string GetAdminQueueActionName(AbstractManualSlideChecking queueItem)
+		{
+			if (queueItem is ManualQuizChecking)
+				return "ManualQuizCheckingQueue";
+			if (queueItem is ManualExerciseChecking)
+				return "ManualExerciseCheckingQueue";
+			return "";
 		}
 
 		[AllowAnonymous]
@@ -190,7 +209,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits, ManualQuizChecking queueItem)
+		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits, AbstractManualSlideChecking manualChecking)
 		{
 			var course = courseManager.GetCourse(courseId);
 
@@ -205,8 +224,8 @@ namespace uLearn.Web.Controllers
 
 			var userId = User.Identity.GetUserId();
 
-			if (queueItem != null)
-				userId = queueItem.UserId;
+			if (manualChecking != null)
+				userId = manualChecking.UserId;
 
 			var visiter = await VisitSlide(courseId, slideId, userId);
 			var score = Tuple.Create(visiter.Score, slide.MaxScore);
@@ -218,13 +237,13 @@ namespace uLearn.Web.Controllers
 				Slide = slide,
 				Rate = GetRate(course.Id, slideId),
 				Score = score,
-				BlockRenderContext = CreateRenderContext(course, slide, visiter, false, queueItem),
+				BlockRenderContext = CreateRenderContext(course, slide, visiter, false, manualChecking),
 				IsGuest = false,
 			};
 			return model;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, Visit visit, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem=null)
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, Visit visit, bool isLti = false, AbstractManualSlideChecking manualChecking=null)
 		{
 			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visit, isLti)).ToArray();
 			return new BlockRenderContext(
@@ -234,7 +253,7 @@ namespace uLearn.Web.Controllers
 				blockData,
 				false,
 				User.HasAccessFor(course.Id, CourseRole.Instructor),
-				manualQuizCheckQueueItem
+				manualChecking
 				);
 		}
 

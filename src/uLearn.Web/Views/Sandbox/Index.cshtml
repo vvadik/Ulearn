@@ -65,9 +65,9 @@
 	}
 }
 
-@helper SubmissionClass(SubmissionStatus status, Verdict verdict)
+@helper SubmissionClass(AutomaticExerciseCheckingStatus status, Verdict verdict)
 {
-	if (status != SubmissionStatus.Done || verdict == Verdict.SandboxError)
+	if (status != AutomaticExerciseCheckingStatus.Done || verdict == Verdict.SandboxError)
 	{
 		@("danger")
 	}

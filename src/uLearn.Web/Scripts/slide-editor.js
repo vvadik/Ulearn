@@ -14,7 +14,9 @@ function getMode(lang) {
 	return "text/" + langIds[lang];
 }
 
-function codeMirrorClass(c, editable, guest) {
+var editorLastRange = null;
+
+function codeMirrorClass(c, editable, guest, review) {
 	var codes = document.getElementsByClassName(c);
 	for (var i = 0; i < codes.length; i++) {
 		var element = codes[i];
@@ -40,6 +42,24 @@ function codeMirrorClass(c, editable, guest) {
 			styleActiveLine: editable,
 			matchBrackets: true,
 		});
+
+		if (review)
+			editor.on("beforeSelectionChange",
+				function (cm, params) {
+					if (params.ranges < 1)
+						return;
+					var range = params.ranges[0];
+					editorLastRange = range;
+					var maxLine = Math.max(range.anchor.line, range.head.line);
+					var coords = cm.cursorCoords({ line: maxLine + 1, ch: 1 }, 'page');
+
+					var $addReviewPopup = $('.exercise__add-review').first();
+					$addReviewPopup.offset({ top: coords.top, left: coords.left });
+					$addReviewPopup.show();
+
+					$addReviewPopup.find('.exercise__add-review__comment').trigger('input');
+				});
+
 		element.codeMirrorEditor = editor;
 		if (editable)
 			editor.focus();
@@ -48,9 +68,49 @@ function codeMirrorClass(c, editable, guest) {
 	}
 }
 
-codeMirrorClass("code-exercise", true, false);
-codeMirrorClass("code-sample", false, false);
-codeMirrorClass("code-guest", false, true);
+codeMirrorClass("code-exercise", true, false, false);
+codeMirrorClass("code-sample", false, false, false);
+codeMirrorClass("code-guest", false, true, false);
+codeMirrorClass("code-review", false, false, true);
+
+$('.exercise__add-review')
+	.each(function() {
+		var $self = $(this);
+		var addReviewUrl = $self.data('url');
+
+		$self.find('.exercise__add-review__comment')
+			.on('input',
+				function () {
+					if ($(this).val() === '')
+						$self.find('.exercise__add-review__button').attr('disabled', 'disabled');
+					else
+						$self.find('.exercise__add-review__button').removeAttr('disabled');
+				});
+
+		$self.find('.exercise__add-review__button')
+			.click(function() {
+				var comment = $self.find('.exercise__add-review__comment').val();
+				var params = {
+					StartLine: editorLastRange.anchor.line,
+					StartPosition: editorLastRange.anchor.ch,
+					FinishLine: editorLastRange.head.line,
+					FinishPosition: editorLastRange.head.ch,
+					Comment: comment,
+				}
+				$.post(addReviewUrl,
+					params,
+					function(data) {
+						if (data.status !== 'ok') {
+							console.log(data);
+							alert('Can\'t save comment: error');
+						} else {
+							$self.find('.exercise__add-review__comment').val('');
+							$self.hide();
+						}
+					},
+					'json');
+			});
+	});
 
 function refreshPreviousDraft(ac, id) {
     window.onbeforeunload = function () {

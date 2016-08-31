@@ -42,7 +42,7 @@ namespace uLearn.Web.Models
 		[Required]
 		public virtual AutomaticExerciseChecking AutomaticChecking { get; set; }
 
-		public virtual ManualExerciseChecking ManualChecking { get; set; }
+		public virtual IList<ManualExerciseChecking> ManualCheckings { get; set; }
 
 		public bool IsWebSubmission => CourseId == "web" && SlideId == Guid.Empty;
 	}

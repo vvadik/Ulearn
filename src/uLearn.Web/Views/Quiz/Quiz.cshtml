@@ -64,7 +64,7 @@
 		{
 			@Html.Hidden("id", Model.ManualQuizCheckQueueItem.Id)
 			@Html.Hidden("errorUrl", Url.RouteUrl("Course.SlideById", new { courseId = Model.CourseId, slideId = Model.Slide.Url, CheckQueueItemId = Model.ManualQuizCheckQueueItem.Id }) + "&error=")
-			@Html.Hidden("nextUrl", Url.Action("ManualQuizChecksQueue", "Admin", new { courseId = Model.CourseId }))
+			@Html.Hidden("nextUrl", Url.Action("ManualQuizCheckingQueue", "Admin", new { courseId = Model.CourseId }))
 		}
 		@SlideHtml.Blocks(context)
 	}

@@ -36,28 +36,28 @@ namespace uLearn.Web.Controllers
 		{
 			var code = Request.InputStream.GetString();
 
-			var automaticExerciseChecking = await solutionsRepo.RunUserSolution(
+			var submission = await solutionsRepo.RunUserSolution(
 				"web", Guid.Empty, User.Identity.GetUserId(),
 				code, null, null, false, "null",
 				User.Identity.Name + ": CsSandbox Web Executor", timeout
 				);
 
-			if (automaticExerciseChecking == null)
-			{
+			if (submission == null)
 				return Json(new RunSolutionResult
 				{
 					CompilationError = "Что-то пошло не так :(",
 					IsCompileError = true,
 				});
-			}
+
+			var automaticChecking = submission.AutomaticChecking;
 
 			return Json(new RunSolutionResult
 			{
-				ActualOutput = automaticExerciseChecking.Output.Text,
-				CompilationError = automaticExerciseChecking.CompilationError.Text,
-				ExecutionServiceName = automaticExerciseChecking.ExecutionServiceName,
-				IsCompileError = automaticExerciseChecking.IsCompilationError,
-				IsRightAnswer = automaticExerciseChecking.IsRightAnswer
+				ActualOutput = automaticChecking.Output.Text,
+				CompilationError = automaticChecking.CompilationError.Text,
+				ExecutionServiceName = automaticChecking.ExecutionServiceName,
+				IsCompileError = automaticChecking.IsCompilationError,
+				IsRightAnswer = automaticChecking.IsRightAnswer
 			});
 		}
 

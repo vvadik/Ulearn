@@ -195,7 +195,7 @@
 								</div>
 							</div>
 						</a>
-						<a href="@Url.Action("ManualQuizChecksQueue", "Admin", new { Model.CourseId })">
+						<a href="@Url.Action("ManualQuizCheckingQueue", "Admin", new { Model.CourseId })">
 							<div class="col-xs-6 col-md-6">
 								@{
 									var manualQuizCheckQueueLength = Model.ManualQuizCheckQueueBySlide.Select(p => p.Value.Count).Sum();

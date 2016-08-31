@@ -47,7 +47,7 @@ namespace uLearn.Web.DataContexts
 				OutputHash = outputHash,
 				ExecutionServiceName = executionServiceName,
 				DisplayName = displayName,
-				Status = SubmissionStatus.Waiting,
+				Status = AutomaticExerciseCheckingStatus.Waiting,
 				IsRightAnswer = isRightAnswer,
 			};
 
@@ -85,8 +85,7 @@ namespace uLearn.Web.DataContexts
 		public void DeleteSubmission(UserExerciseSubmission submission)
 		{
 			db.AutomaticExerciseCheckings.Remove(submission.AutomaticChecking);
-			if (submission.ManualChecking != null)
-				db.ManualExerciseCheckings.Remove(submission.ManualChecking);
+			db.ManualExerciseCheckings.RemoveRange(submission.ManualCheckings);
 			db.UserExerciseSubmissions.Remove(submission);
 			db.SaveChanges();
 		}
@@ -210,10 +209,10 @@ namespace uLearn.Web.DataContexts
 			var submissions = db.UserExerciseSubmissions
 				.Where(s =>
 					s.Timestamp > hourAgo
-					&& s.AutomaticChecking.Status == SubmissionStatus.Waiting)
+					&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting)
 				.Take(count).ToList();
 			foreach (var submission in submissions)
-				submission.AutomaticChecking.Status = SubmissionStatus.Running;
+				submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
 			SaveAll(submissions.Select(s => s.AutomaticChecking));
 			return submissions;
 		}
@@ -294,7 +293,7 @@ namespace uLearn.Web.DataContexts
 				IsCompilationError = result.Verdict == Verdict.CompilationError,
 				OutputHash = outputHash,
 				ExecutionServiceName = checking.ExecutionServiceName,
-				Status = SubmissionStatus.Done,
+				Status = AutomaticExerciseCheckingStatus.Done,
 				DisplayName = checking.DisplayName,
 				Elapsed = DateTime.Now - checking.Timestamp,
 				IsRightAnswer = isRightAnswer,
@@ -304,7 +303,7 @@ namespace uLearn.Web.DataContexts
 			return newChecking;
 		}
 
-		public async Task<AutomaticExerciseChecking> RunUserSolution(
+		public async Task<UserExerciseSubmission> RunUserSolution(
 			string courseId, Guid slideId, string userId, string code,
 			string compilationError, string output, bool isRightAnswer,
 			string executionServiceName, string displayName, TimeSpan timeout)
@@ -320,8 +319,8 @@ namespace uLearn.Web.DataContexts
 			{
 				await WaitHandled(TimeSpan.FromSeconds(2));
 				var updatedSubmission = GetSubmission(submission.Id);
-				if (updatedSubmission.AutomaticChecking.Status == SubmissionStatus.Done)
-					return updatedSubmission.AutomaticChecking;
+				if (updatedSubmission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Done)
+					return updatedSubmission;
 			}
 			return null;
 		}

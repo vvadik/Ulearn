@@ -60,7 +60,7 @@ namespace uLearn.Web.Models
 	{
 	}
 	
-	public enum SubmissionStatus
+	public enum AutomaticExerciseCheckingStatus
 	{
 		Done = 0,
 		Waiting = 1,
@@ -73,7 +73,7 @@ namespace uLearn.Web.Models
 
 	public class AutomaticExerciseChecking : AbstractAutomaticSlideChecking
 	{
-		public SubmissionStatus Status { get; set; }
+		public AutomaticExerciseCheckingStatus Status { get; set; }
 
 		public TimeSpan? Elapsed { get; set; }
 
@@ -109,7 +109,12 @@ namespace uLearn.Web.Models
 
 	public class ManualExerciseChecking : AbstractManualSlideChecking
 	{
-		public List<ExerciseCodeReview> Reviews { get; set; }
+		[Required]
+		public int SubmissionId { get; set; }
+
+		public virtual UserExerciseSubmission Submission { get; set; }
+
+		public virtual IList<ExerciseCodeReview> Reviews { get; set; }
 	}
 
 	public class AutomaticQuizChecking : AbstractAutomaticSlideChecking

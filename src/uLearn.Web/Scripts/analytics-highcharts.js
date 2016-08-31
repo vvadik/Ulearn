@@ -3,6 +3,8 @@
 
 	function showChartByDataFrom(id) {
 		var $element = $(id)[0];
+		if (!$element)
+			return;
 		$chart.highcharts({
 			data: {
 				table: document.getElementById($element.id)

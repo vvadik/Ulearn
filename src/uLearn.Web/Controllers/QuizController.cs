@@ -205,7 +205,7 @@ namespace uLearn.Web.Controllers
 
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var queueItem = slideCheckingsRepo.GetManualCheckingById<ManualQuizChecking>(id);
+				var queueItem = slideCheckingsRepo.FindManualCheckingById<ManualQuizChecking>(id);
 
 				if (queueItem.IsChecked)
 					return Redirect(errorUrl + "Эта работа уже была проверена");

@@ -293,6 +293,14 @@
     <Compile Include="Migrations\201608301626429_ExerciseChecking.Designer.cs">
       <DependentUpon>201608301626429_ExerciseChecking.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201608301843391_MultipleManualExerciseCheckings.cs" />
+    <Compile Include="Migrations\201608301843391_MultipleManualExerciseCheckings.Designer.cs">
+      <DependentUpon>201608301843391_MultipleManualExerciseCheckings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608310552232_ChangeExerciseCodeReview.cs" />
+    <Compile Include="Migrations\201608310552232_ChangeExerciseCodeReview.Designer.cs">
+      <DependentUpon>201608310552232_ChangeExerciseCodeReview.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\ExerciseCodeReview.cs" />
     <Compile Include="Models\SlideChecking.cs" />
     <Compile Include="Models\CourseInstructorNavbarViewModel.cs" />
@@ -765,6 +773,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201608301626429_ExerciseChecking.resx">
       <DependentUpon>201608301626429_ExerciseChecking.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608301843391_MultipleManualExerciseCheckings.resx">
+      <DependentUpon>201608301843391_MultipleManualExerciseCheckings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608310552232_ChangeExerciseCodeReview.resx">
+      <DependentUpon>201608310552232_ChangeExerciseCodeReview.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -1373,10 +1387,11 @@
     </Content>
     <Content Include="Views\Comments\_CommentText.cshtml" />
     <Content Include="Views\Admin\Comments.cshtml" />
-    <Content Include="Views\Admin\ManualQuizChecksQueue.cshtml" />
+    <Content Include="Views\Admin\ManualQuizCheckingQueue.cshtml" />
     <Content Include="Views\Admin\Groups.cshtml" />
     <Content Include="Views\Account\JoinGroup.cshtml" />
     <Content Include="Views\Course\CourseInstructorNavbar.cshtml" />
+    <Content Include="Views\Admin\ManualExerciseCheckingQueue.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
