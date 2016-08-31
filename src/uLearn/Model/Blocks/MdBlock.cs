@@ -76,6 +76,11 @@ namespace uLearn.Model.Blocks
 		private IEnumerable<SlideBlock> ReadBlocks(bool hide, XmlReader reader)
 		{
 			var tagName = reader.Name;
+			if (reader.IsEmptyElement)
+			{
+				reader.Read();
+				yield break;
+			}
 			reader.Read();
 			while (!(reader.NodeType == XmlNodeType.EndElement && reader.Name == tagName))
 			{
@@ -85,7 +90,7 @@ namespace uLearn.Model.Blocks
 				}
 				else if (reader.NodeType == XmlNodeType.Element)
 				{
-					if (reader.Name == "note")
+					if (reader.LocalName == "note")
 					{
 						yield return new MdBlock
 						{
@@ -93,12 +98,12 @@ namespace uLearn.Model.Blocks
 							Markdown = reader.ReadElementContentAsString()
 						};
 					}
-					else if (reader.Name == "code")
+					else if (reader.LocalName == "code")
 					{
 						yield return new CodeBlock(reader.ReadElementContentAsString(), null) { Hide = hide };
 					}
 					else
-						throw new NotSupportedException(reader.Name);
+						throw new NotSupportedException(reader.LocalName);
 				}
 				else
 					reader.Read();

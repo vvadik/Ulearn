@@ -62,9 +62,9 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		public ActionResult SpellingErrors(string courseId)
+		public ActionResult SpellingErrors(Guid versionId)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var course = courseManager.GetVersion(versionId);
 			return PartialView(course.SpellCheck());
 		}
 

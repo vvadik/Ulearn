@@ -123,6 +123,10 @@
     </Compile>
     <Compile Include="Lesson_ShouldDeserialize.cs" />
     <Compile Include="Quizes\CourseLoader_should.cs" />
+    <Content Include="Quizes\normalizedQuiz.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Compile Include="SpellChecking_Tests.cs" />
     <Compile Include="tests\stub\_HelloWorld.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

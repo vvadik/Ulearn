@@ -3,6 +3,7 @@ using System.IO;
 using System.Xml.Serialization;
 using ApprovalTests.Core;
 using ApprovalTests.Reporters;
+using FluentAssertions;
 using NUnit.Framework;
 using uLearn.Model.Blocks;
 
@@ -61,6 +62,14 @@ namespace uLearn.Quizes
 			ns.Add("x", "http://www.w3.org/2001/XMLSchema-instance");
 			serializer.Serialize(w1, quiz, ns);
 			ApprovalTests.Approvals.Verify(w1.ToString());
+			w1.ToString().DeserializeXml<Quiz>();
+		}
+
+		[Test]
+		public void DoSomething_WhenSomething()
+		{
+			var q = File.ReadAllText("Quizes/normalizedQuiz.xml").DeserializeXml<Quiz>();
+			q.Blocks.Length.Should().Be(8);
 		}
 	}
 }

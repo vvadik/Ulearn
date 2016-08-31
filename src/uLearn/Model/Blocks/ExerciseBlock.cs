@@ -59,7 +59,7 @@ namespace uLearn.Model.Blocks
 
 		public abstract string GetSourceCode(string code);
 
-		public abstract SolutionBuildResult BuildSolution(string code);
+		public abstract SolutionBuildResult BuildSolution(string userWrittenCode);
 
 		public abstract RunnerSubmition CreateSubmition(string submitionId, string code);
 

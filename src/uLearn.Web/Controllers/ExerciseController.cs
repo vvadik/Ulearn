@@ -54,18 +54,18 @@ namespace uLearn.Web.Controllers
 		}
 
 
-		private async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string code)
+		private async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string userCode)
 		{
 			var exerciseBlock = exerciseSlide.Exercise;
-		    var solution = exerciseBlock.BuildSolution(code);
 			var userId = User.Identity.GetUserId();
-			if (solution.HasErrors)
-		        return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage, ExecutionServiceName = "uLearn"};
+		    var solution = exerciseBlock.BuildSolution(userCode);
+		    if (solution.HasErrors)
+		        return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
 		    if (solution.HasStyleIssues)
 		        return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage, ExecutionServiceName = "uLearn" };
-			var submission = await solutionsRepo.RunUserSolution(
+		    var submission = await solutionsRepo.RunUserSolution(
 				courseId, exerciseSlide.Id, userId, 
-				code, null, null, false, "uLearn", 
+				userCode, null, null, false, "uLearn", 
 				GenerateSubmissionName(exerciseSlide), executionTimeout
 			);
 
