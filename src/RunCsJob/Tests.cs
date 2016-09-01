@@ -70,6 +70,9 @@ namespace RunCsJob
 		[TestCase(@"class A { static void Main(string[] args) {} }",
 			"", "", "",
 			TestName = "args")]
+		[TestCase(@"class A { static void Main(string[] args) {var s = $""2+2={2+2}"";} }",
+			"", "", "",
+			TestName = "String interpolation")]
 		public static void TestOk(string code, string input, string output, string error)
 		{
 			var details = GetDetails(code, input);
@@ -237,8 +240,9 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 				NeedRun = true
 			};
 
-			var result = new SandboxRunner(model).RunCsc();
+			var result = new SandboxRunner(model).RunCsc60();
 			Assert.IsNotNull(result);
+			Console.WriteLine(result);
 			return result;
 		}
 	}
