@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using uLearn.Model;
 using uLearn.Quizes;
 
 namespace uLearn.Web.Models
@@ -33,14 +35,7 @@ namespace uLearn.Web.Models
 		{
 			get
 			{
-				var quiz = NormalizedXml.DeserializeXml<Quiz>();
-
-				/* Restore question indices */
-				var index = 1;
-				foreach (var b in quiz.Blocks.OfType<AbstractQuestionBlock>())
-					b.QuestionIndex = index++;
-
-				return quiz;
+				return NormalizedXml.DeserializeXml<Quiz>().InitQuestionIndices();
 			}
 		}
 	}

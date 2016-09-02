@@ -12,6 +12,14 @@ namespace uLearn.Quizes
 	[XmlRootAttribute("Quiz", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/quiz")]
 	public class Quiz
 	{
+		public Quiz InitQuestionIndices()
+		{
+			var index = 1;
+			foreach (var b in Blocks.OfType<AbstractQuestionBlock>())
+				b.QuestionIndex = index++;
+			return this;
+		}
+
 		[XmlAttribute("id")]
 		public string Id;
 

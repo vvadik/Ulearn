@@ -10,10 +10,10 @@ using uLearn.Model.Blocks;
 namespace uLearn.Quizes
 {
 	[TestFixture]
-	public class Quiz_Test
+	public class Quiz_should
 	{
 		[Test, UseReporter(typeof(DiffReporter))]
-		public void Test()
+		public void BeSerializable()
 		{
 			var serializer = new XmlSerializer(typeof(Quiz));
 			var quiz = new Quiz
@@ -66,7 +66,29 @@ namespace uLearn.Quizes
 		}
 
 		[Test]
-		public void DoSomething_WhenSomething()
+		public void BeDeserializable()
+		{
+			var q = File.ReadAllText("Quizes/test.quiz.xml").DeserializeXml<Quiz>();
+			QuizSlideLoader.BuildUp(q, null, CourseSettings.DefaultSettings);
+			q.ShouldBeEquivalentTo(new Quiz
+			{
+				Id = "{DB95DA10-7DD2-46CA-BFB2-6D0D7554B83F}",
+				Title = "title",
+				Blocks = new SlideBlock[]
+				{
+					new MdBlock("para"),
+					new CodeBlock("code", null),
+					new MdBlock("para2"),
+					new CodeBlock("code2", null),
+					new MdBlock("para3"),
+					new MdBlock("note") {Hide=true},
+					new MdBlock("hidden") {Hide=true},
+				}
+			});
+		}
+
+		[Test]
+		public void DeserializeNormalizedXml()
 		{
 			var q = File.ReadAllText("Quizes/normalizedQuiz.xml").DeserializeXml<Quiz>();
 			q.Blocks.Length.Should().Be(8);

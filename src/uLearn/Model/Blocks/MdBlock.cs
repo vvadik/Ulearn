@@ -68,7 +68,12 @@ namespace uLearn.Model.Blocks
 		{
 			reader.MoveToContent();
 			Hide = reader.GetAttribute("hide").IsOneOf("true", "1");
-			InnerBlocks = ReadBlocks(Hide, reader).ToArray();
+			var blocks = ReadBlocks(Hide, reader).ToArray();
+			if (blocks.Length == 1 && blocks[0].GetType() == typeof(MdBlock))
+				Markdown = ((MdBlock)blocks[0]).Markdown;
+			else
+				InnerBlocks = blocks;
+
 		}
 
 		public SlideBlock[] InnerBlocks { get; set; }
