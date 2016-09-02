@@ -254,11 +254,13 @@ namespace uLearn.Web.Controllers
 			return null;
 		}
 
-		public async Task<ViewResult> AcceptedSolutions(string courseId, int slideIndex = 0, bool isLti = false)
+		public async Task<ActionResult> AcceptedSolutions(string courseId, int slideIndex = 0, bool isLti = false)
 		{
 			var userId = User.Identity.GetUserId();
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.Slides[slideIndex];
+			if (slide.Exercise.HideShowSolutionsButton)
+				return RedirectToAction("Slide", new { courseId, slideIndex });
 			var isPassed = visitsRepo.IsPassed(slide.Id, userId);
 			if (!isPassed)
 				await visitsRepo.SkipSlide(courseId, slide.Id, userId);

@@ -520,7 +520,7 @@ WebViewPage.WriteTo(@__razor_helper_writer, data.GetHintUrl);
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\tGet hint\r\n\t\t\t\t</button>\r\n");
 
 
-				if (!data.IsLti)
+				if (!data.IsLti && !block.HideShowSolutionsButton)
 				{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t<button type=\"button\" class=\"btn btn-default giveup-btn\" onclick=\"");

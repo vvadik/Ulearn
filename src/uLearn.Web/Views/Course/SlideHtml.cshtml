@@ -187,7 +187,7 @@
 						data-url="@data.GetHintUrl">
 					Get hint
 				</button>
-				if (!data.IsLti)
+				if (!data.IsLti && !block.HideShowSolutionsButton)
 				{
 					<button type="button" class="btn btn-default giveup-btn" onclick="@action">
 						Show solutions
