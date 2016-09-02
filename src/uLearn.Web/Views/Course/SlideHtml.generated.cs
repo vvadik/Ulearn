@@ -339,10 +339,10 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" frameborder=\"0\" allowfu
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"	<div>
 		<a href=""javascript://"" class=""popover-trigger pull-right""
 		   title=""Как ускорить видео?""
-		   data-content=""Если по иконке с шестеренкой нет возможности ускорить видео, то вам нужно &lt;a target='blank' href='http://youtube.com/html5'>вручную включить&lt;/a> использование HTML5-плеера.""
-		   data-placement=""left"">
+		   data-content=""Выберите скорость в иконке с шестеренкой или используйте горячие клавиши Shift+> и Shift+<""
+		   data-placement=""bottom"">
 			<span class=""glyphicon glyphicon-question-sign""></span>
-			Как ускорить видео?
+			Ускорить видео?
 		</a>
 	</div>
 ");
