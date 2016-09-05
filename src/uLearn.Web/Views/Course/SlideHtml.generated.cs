@@ -89,7 +89,7 @@ WebViewPage.WriteTo(@__razor_helper_writer, Block((dynamic)block, context));
 		{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<div class=\'revealed\' data-toggle=\"tooltip\" data-placement=\"left\" title=\"Этот " +
-"блок студенты не видят\">\r\n");
+"блок студенты не видят\">\r\n\t\t\t\t<h4>Инструктору</h4>\r\n");
 
 
  				foreach (var block in blockRange)
@@ -451,6 +451,10 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 		classString = "code-review";
 	}
 
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"exercise__reviews\">\r\n\t</div>\r\n");
+
+
+
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea id=\"secretCodeExercise\" class=\"hide\">");
 
 
@@ -621,21 +625,18 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t<div>Добав
 
 
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<h4>Оцените от 0 до ");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<form method=\"POST\">\r\n\t\t\t<h4>Оцените от 0 до ");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, block.MaxReviewScore);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</h4>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</h4>\r\n\t\t\t<div>\r\n\t\t\t\t<input type=\"number\" class=\"form-control\" min=\"0\" max=\"");
 
 
+                WebViewPage.WriteTo(@__razor_helper_writer, block.MaxReviewScore);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div>\r\n\t\t\t<input type=\"number\" class=\"form-control\" min=\"0\" max=\"");
-
-
-               WebViewPage.WriteTo(@__razor_helper_writer, block.MaxReviewScore);
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" name=\"exercise__score\" />\r\n\t\t</div>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" name=\"exercise__score\"/>\r\n\t\t\t</div>\r\n\r\n\t\t\t<input type=\"submit\" class=\"btn btn-d" +
+"efault\" value=\"Сохранить и вернуться\">\r\n\t\t</form>\r\n");
 
 
 	}

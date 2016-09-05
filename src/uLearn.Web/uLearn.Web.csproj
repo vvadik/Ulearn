@@ -519,7 +519,6 @@
     <Compile Include="DataContexts\SlideRateRepo.cs" />
     <Compile Include="DataContexts\UserQuestionsRepo.cs" />
     <Compile Include="DataContexts\UserQuizzesRepo.cs" />
-    <Compile Include="DataContexts\UserSolutionsRepo_should.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo.cs" />
     <Compile Include="DataContexts\VisitsRepo.cs" />
     <Compile Include="Migrations\201407111234255_InitialCreate.cs" />

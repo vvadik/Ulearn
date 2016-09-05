@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace uLearn.Web.Models
 {
 	public class ExerciseBlockData
@@ -21,5 +23,7 @@ namespace uLearn.Web.Models
 		public bool IsSkippedOrPassed { get; set; }
 		public string CourseId { get; set; }
 		public int SlideIndex { get; set; }
+
+		public List<ExerciseCodeReview> Reviews { get; set; }
 	}
 }
