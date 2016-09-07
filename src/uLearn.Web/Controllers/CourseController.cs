@@ -5,7 +5,9 @@ using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web.DynamicData;
 using System.Web.Mvc;
+using System.Web.Routing;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -25,6 +27,7 @@ namespace uLearn.Web.Controllers
 		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly LtiRequestsRepo ltiRequestsRepo = new LtiRequestsRepo();
 		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
+		private readonly GroupsRepo groupsRepo = new GroupsRepo();
 
 		public CourseController()
 			: this(WebCourseManager.Instance)
@@ -79,9 +82,16 @@ namespace uLearn.Web.Controllers
 				if (!queueItem.IsLockedBy(User.Identity))
 					return RedirectToAction(GetAdminQueueActionName(queueItem), "Admin", new { CourseId = courseId, message = "time_is_over" });
 			}
+
+			var fillExerciseAgain = Request.QueryString["again"] == "true";
+
 			var model = isGuest ?
 				CreateGuestCoursePageModel(courseId, slideGuid, visibleUnits) :
-				await CreateCoursePageModel(courseId, slideGuid, visibleUnits, queueItem);
+				await CreateCoursePageModel(courseId, slideGuid, visibleUnits, queueItem, fillExerciseAgain);
+
+			if (!string.IsNullOrEmpty(Request.QueryString["error"]))
+				model.Error = Request.QueryString["error"];
+
 			if (!visibleUnits.Contains(model.Slide.Info.UnitName))
 				throw new Exception("Slide is hidden " + slideGuid);
 			return View("Slide", model);
@@ -192,7 +202,8 @@ namespace uLearn.Web.Controllers
 			}
 			else
 				slide = course.GetSlideById(slideId);
-			var exerciseBlockData = new ExerciseBlockData(false, false);
+			var exerciseBlockData = new ExerciseBlockData(courseId, slide.Index, false, false) { Url = Url };
+
 			return new CoursePageModel
 			{
 				CourseId = course.Id,
@@ -209,7 +220,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits, AbstractManualSlideChecking manualChecking)
+		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits, AbstractManualSlideChecking manualChecking, bool fillExerciseAgain=false)
 		{
 			var course = courseManager.GetCourse(courseId);
 
@@ -237,15 +248,17 @@ namespace uLearn.Web.Controllers
 				Slide = slide,
 				Rate = GetRate(course.Id, slideId),
 				Score = score,
-				BlockRenderContext = CreateRenderContext(course, slide, visiter, false, manualChecking),
+				BlockRenderContext = CreateRenderContext(course, slide, visiter, false, manualChecking, fillExerciseAgain),
+				ManualChecking = manualChecking,
+				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
 				IsGuest = false,
 			};
 			return model;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, Visit visit, bool isLti = false, AbstractManualSlideChecking manualChecking=null)
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, Visit visit, bool isLti = false, AbstractManualSlideChecking manualChecking=null, bool fillExerciseAgain=false)
 		{
-			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visit, isLti)).ToArray();
+			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visit, isLti, fillExerciseAgain)).ToArray();
 			return new BlockRenderContext(
 				course,
 				slide,
@@ -257,17 +270,28 @@ namespace uLearn.Web.Controllers
 				);
 		}
 
-		private dynamic CreateBlockData(Course course, Slide slide, SlideBlock slideBlock, Visit visit, bool isLti)
+		private dynamic CreateBlockData(Course course, Slide slide, SlideBlock slideBlock, Visit visit, bool isLti, bool fillExerciseAgain=false)
 		{
 			if (slideBlock is ExerciseBlock)
 			{
-				var lastAcceptedSolution = solutionsRepo.FindLatestAcceptedSolution(course.Id, slide.Id, visit.UserId);
-				return new ExerciseBlockData(true, visit.IsSkipped, lastAcceptedSolution)
+				var lastAcceptedSubmission = solutionsRepo.FindLatestAcceptedSubmission(course.Id, slide.Id, visit.UserId);
+				var lastAcceptedSolution = lastAcceptedSubmission?.SolutionCode.Text;
+				var lastAcceptedSubmissionReviews = lastAcceptedSubmission?.ManualCheckings.LastOrDefault()?.Reviews.Where(r => ! r.IsDeleted);
+
+				var hasUncheckedReview = lastAcceptedSubmission?.ManualCheckings.Any(c => !c.IsChecked) ?? false;
+				var hasCheckedReview = lastAcceptedSubmission?.ManualCheckings.Any(c => c.IsChecked) ?? false;
+				var reviewState = hasCheckedReview ? ExerciseReviewState.Reviewed :
+					hasUncheckedReview ? ExerciseReviewState.WaitingForReview :
+						ExerciseReviewState.NotReviewed;
+				if (fillExerciseAgain)
+					reviewState = ExerciseReviewState.NotReviewed;
+
+				return new ExerciseBlockData(course.Id, slide.Index, true, visit.IsSkipped, lastAcceptedSolution)
 				{
-					RunSolutionUrl = Url.Action("RunSolution", "Exercise", new { courseId = course.Id, slideIndex = slide.Index, isLti }),
-					AcceptedSolutionUrl = Url.Action("AcceptedSolutions", "Course", new { courseId = course.Id, slideIndex = slide.Index }),
-					GetHintUrl = Url.Action("UseHint", "Hint"),
-					IsLti = isLti
+					Url = Url,
+					Reviews = lastAcceptedSubmissionReviews?.ToList(),
+					IsLti = isLti,
+					ReviewState = reviewState,
 				};
 			}
 			return null;
@@ -308,11 +332,11 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.Slides[slideIndex];
 			var isSkippedOrPassed = visitsRepo.IsSkippedOrPassed(slide.Id, userId);
-			var model = new ExerciseBlockData
+			var model = new ExerciseBlockData(courseId, slide.Index)
 			{
 				IsSkippedOrPassed = isSkippedOrPassed,
-				AcceptedSolutionUrl = Url.Action("AcceptedSolutions", "Course", new { courseId, slideIndex, isLti = true }),
 				CourseId = courseId,
+				Url = Url,
 				SlideIndex = slideIndex
 			};
 			return View(model);
@@ -388,10 +412,12 @@ namespace uLearn.Web.Controllers
 			RemoveFrom(db.UserExerciseSubmissions, slideId, userId);
 			RemoveFrom(db.UserQuizzes, slideId, userId);
 			RemoveFrom(db.Visits, slideId, userId);
+			await slideCheckingsRepo.RemoveAttempts(courseId, slideId, userId, false);
 			db.UserQuestions.RemoveRange(db.UserQuestions.Where(q => q.UserId == userId && q.SlideId == slideId));
 			db.SlideRates.RemoveRange(db.SlideRates.Where(q => q.UserId == userId && q.SlideId == slideId));
 			db.Hints.RemoveRange(db.Hints.Where(q => q.UserId == userId && q.SlideId == slideId));
 			await db.SaveChangesAsync();
+
 			return RedirectToAction("Slide", new { courseId, slideIndex = slide.Index });
 		}
 

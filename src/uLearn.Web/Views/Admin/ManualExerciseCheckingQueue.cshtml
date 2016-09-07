@@ -24,7 +24,7 @@
 			}
 			@if (Model.Message == "time_is_over")
 			{
-				<p>Время проверки работы вышло. Выберите другую</p>
+				<p>Время проверки вышло. Выберите другую работу</p>
 			}
 		</div>
 	}
@@ -40,7 +40,7 @@
 		var check = checkModel.CheckingQueueItem;
 		<div>
 			<div>
-				@check.User.VisibleName заполнил тест «@checkModel.ContextSlideTitle»
+				@check.User.VisibleName решил задание «@checkModel.ContextSlideTitle»
 			</div>
 			<div>
 				@if (check.IsLocked)

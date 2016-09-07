@@ -16,6 +16,7 @@ namespace uLearn.Web.Controllers
 	public class ExerciseController : Controller
 	{
 		private readonly CourseManager courseManager;
+		private readonly ULearnDb db = new ULearnDb();
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
@@ -101,7 +102,7 @@ namespace uLearn.Web.Controllers
 
 		[System.Web.Mvc.HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public async Task<ActionResult> AddExerciseCodeReview(string courseId, int checkingId, [FromBody] ReviewInfo review)
+		public async Task<ActionResult> AddExerciseCodeReview(string courseId, int checkingId, [FromBody] ReviewInfo reviewInfo)
 		{
 			var checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(checkingId);
 			if (checking.CourseId != courseId)
@@ -110,9 +111,21 @@ namespace uLearn.Web.Controllers
 			if (!checking.IsLockedBy(User.Identity))
 				return RedirectToAction("ManualExerciseCheckingQueue", "Admin", new { courseId, message = "time_is_over" });
 
-			await slideCheckingsRepo.AddExerciseCodeReview(checking, User.Identity.GetUserId(), review.StartLine, review.StartPosition, review.FinishLine, review.FinishPosition, review.Comment);
+			/* Make start position less than finish position */
+			if (reviewInfo.StartLine > reviewInfo.FinishLine || (reviewInfo.StartLine == reviewInfo.FinishLine && reviewInfo.StartPosition > reviewInfo.FinishPosition))
+			{
+				var tmp = reviewInfo.StartLine;
+				reviewInfo.StartLine = reviewInfo.FinishLine;
+				reviewInfo.FinishLine = tmp;
 
-			return Json(new { status = "ok" });
+				tmp = reviewInfo.StartPosition;
+				reviewInfo.StartPosition = reviewInfo.FinishPosition;
+				reviewInfo.FinishPosition = tmp;
+			}
+
+			await slideCheckingsRepo.AddExerciseCodeReview(checking, User.Identity.GetUserId(), reviewInfo.StartLine, reviewInfo.StartPosition, reviewInfo.FinishLine, reviewInfo.FinishPosition, reviewInfo.Comment);
+
+			return Json(new { status = "ok", review = reviewInfo });
 		}
 
 		[System.Web.Mvc.HttpPost]
@@ -120,12 +133,67 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> DeleteExerciseCodeReview(string courseId, int reviewId)
 		{
 			var review = slideCheckingsRepo.FindExerciseCodeReviewById(reviewId);
+			if (review.ExerciseChecking.CourseId != courseId)
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			if (review.AuthorId != User.Identity.GetUserId())
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			await slideCheckingsRepo.DeleteExerciseCodeReview(review);
 
 			return Json(new { status = "ok" });
+		}
+
+		[System.Web.Mvc.HttpPost]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		public async Task<ActionResult> UpdateExerciseCodeReview(string courseId, int reviewId, string comment)
+		{
+			var review = slideCheckingsRepo.FindExerciseCodeReviewById(reviewId);
+			if (review.ExerciseChecking.CourseId != courseId)
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			if (review.AuthorId != User.Identity.GetUserId())
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
+			await slideCheckingsRepo.UpdateExerciseCodeReview(review, comment);
+
+			return Json(new { status = "ok" });
+		}
+
+		[System.Web.Mvc.HttpPost]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		public async Task<ActionResult> ScoreExercise(int id, string nextUrl, string errorUrl = "")
+		{
+			if (string.IsNullOrEmpty(errorUrl))
+				errorUrl = nextUrl;
+
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				var checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(id);
+
+				if (checking.IsChecked)
+					return Redirect(errorUrl + "Эта работа уже была проверена");
+
+				if (!checking.IsLockedBy(User.Identity))
+					return Redirect(errorUrl + "Эта работа проверяется другим инструктором");
+
+				var course = courseManager.GetCourse(checking.CourseId);
+				var slide = (ExerciseSlide) course.GetSlideById(checking.SlideId);
+				var exercise = slide.Exercise;
+
+				var scoreStr = Request.Form["exercise__score"];
+				int score;
+				/* Invalid form: score isn't integer */
+				if (!int.TryParse(scoreStr, out score))
+					return Redirect(errorUrl + "Неверное количество баллов.");
+				/* Invalid form: score isn't from range 0..MAX_SCORE */
+				if (score < 0 || score > exercise.MaxReviewScore)
+					return Redirect(errorUrl + $"Неверное количество баллов: {score}");
+				
+				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, score);
+				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, checking.UserId);
+				transaction.Commit();
+			}
+
+			return Redirect(nextUrl);
 		}
 	}
 

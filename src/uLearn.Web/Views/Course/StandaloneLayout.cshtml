@@ -29,7 +29,7 @@
 					@SlideHtml.Slide(new BlockRenderContext(course, slide, "/static/", 
 						slide.Blocks.Select(
 							(b, i) => b is ExerciseBlock 
-								? new ExerciseBlockData { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true } 
+								? new ExerciseBlockData(course.Id, slide.Index) { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true } 
 								: b is AbstractQuestionBlock 
 									? new QuizBlockData(new QuizModel
 									{

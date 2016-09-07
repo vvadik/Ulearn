@@ -14,7 +14,31 @@ function getMode(lang) {
 	return "text/" + langIds[lang];
 }
 
+function unselectAllReviews() {
+	$('.exercise__review.selected').removeClass('selected');
+	if (currentReviewTextMarker) {
+		currentReviewTextMarker.clear();
+		currentReviewTextMarker = null;
+	}
+}
+
+function selectReview($review) {
+	var startLine = $review.data('start-line');
+	var startPosition = $review.data('start-position');
+	var finishLine = $review.data('finish-line');
+	var finishPosition = $review.data('finish-position');
+
+	unselectAllReviews();
+
+	$review.addClass('selected');
+	currentReviewTextMarker = exerciseCodeDoc.markText({ line: startLine, ch: startPosition }, { line: finishLine, ch: finishPosition }, {
+		className: 'exercise__code__reviewed-fragment__selected'
+	});
+}
+
 var editorLastRange = null;
+var currentReviewTextMarker = null;
+var reviewsTextMarkers = {};
 
 function codeMirrorClass(c, editable, guest, review) {
 	var codes = document.getElementsByClassName(c);
@@ -44,21 +68,48 @@ function codeMirrorClass(c, editable, guest, review) {
 		});
 
 		if (review)
-			editor.on("beforeSelectionChange",
-				function (cm, params) {
-					if (params.ranges < 1)
-						return;
-					var range = params.ranges[0];
-					editorLastRange = range;
-					var maxLine = Math.max(range.anchor.line, range.head.line);
-					var coords = cm.cursorCoords({ line: maxLine + 1, ch: 1 }, 'page');
+			editor.on("beforeSelectionChange", function (cm, params) {
+				unselectAllReviews();
 
-					var $addReviewPopup = $('.exercise__add-review').first();
-					$addReviewPopup.offset({ top: coords.top, left: coords.left });
-					$addReviewPopup.show();
+				if (params.ranges < 1)
+					return;
 
-					$addReviewPopup.find('.exercise__add-review__comment').trigger('input');
-				});
+				var range = params.ranges[0];
+				editorLastRange = range;
+				var maxLine = Math.max(range.anchor.line, range.head.line);
+				var coords = cm.cursorCoords({ line: maxLine + 1, ch: 1 }, 'page');
+
+				var $addReviewPopup = $('.exercise__add-review').first();
+				if (range.anchor == range.head) {
+					$addReviewPopup.hide();
+					return;
+				}
+				$addReviewPopup.show();
+				$addReviewPopup.offset({ top: coords.top, left: coords.left });
+
+				$addReviewPopup.find('.exercise__add-review__comment').trigger('input');
+			});
+
+		editor.on('cursorActivity', function(cm) {
+			var cursor = cm.getDoc().getCursor();
+			var $foundReview = false;
+			$('.exercise__reviews .exercise__review').each(function () {
+				if ($foundReview !== false)
+					return;
+				var $review = $(this);
+				var startLine = $review.data('start-line');
+				var startPosition = $review.data('start-position');
+				var finishLine = $review.data('finish-line');
+				var finishPosition = $review.data('finish-position');
+				if (startLine > cursor.line || (startLine == cursor.line && startPosition > cursor.ch))
+					return;
+				if (finishLine < cursor.line || (finishLine == cursor.line && finishPosition < cursor.ch))
+					return;
+				$foundReview = $review;
+			});
+			if ($foundReview !== false)
+				selectReview($foundReview);
+		});
 
 		element.codeMirrorEditor = editor;
 		if (editable)
@@ -72,45 +123,97 @@ codeMirrorClass("code-exercise", true, false, false);
 codeMirrorClass("code-sample", false, false, false);
 codeMirrorClass("code-guest", false, true, false);
 codeMirrorClass("code-review", false, false, true);
+codeMirrorClass("code-reviewed", false, false, false);
 
-$('.exercise__add-review')
-	.each(function() {
-		var $self = $(this);
-		var addReviewUrl = $self.data('url');
+var $exerciseCodeBlock;
+if ($('.code-review').length > 0)
+	$exerciseCodeBlock = $('.code-review')[0];
+else
+	$exerciseCodeBlock = $('.code-reviewed')[0];
 
-		$self.find('.exercise__add-review__comment')
-			.on('input',
-				function () {
-					if ($(this).val() === '')
-						$self.find('.exercise__add-review__button').attr('disabled', 'disabled');
-					else
-						$self.find('.exercise__add-review__button').removeAttr('disabled');
-				});
+if ($exerciseCodeBlock) {
+	var exerciseCodeEditor = $exerciseCodeBlock.codeMirrorEditor;
+	var exerciseCodeDoc = exerciseCodeEditor.getDoc();
+}
 
-		$self.find('.exercise__add-review__button')
-			.click(function() {
-				var comment = $self.find('.exercise__add-review__comment').val();
-				var params = {
-					StartLine: editorLastRange.anchor.line,
-					StartPosition: editorLastRange.anchor.ch,
-					FinishLine: editorLastRange.head.line,
-					FinishPosition: editorLastRange.head.ch,
-					Comment: comment,
-				}
-				$.post(addReviewUrl,
-					params,
-					function(data) {
-						if (data.status !== 'ok') {
-							console.log(data);
-							alert('Can\'t save comment: error');
-						} else {
-							$self.find('.exercise__add-review__comment').val('');
-							$self.hide();
-						}
-					},
-					'json');
-			});
+$('.exercise__add-review').each(function() {
+	var $self = $(this);
+	var addReviewUrl = $self.data('url');
+
+	$self.find('.exercise__add-review__comment').on('input', function () {
+		if ($(this).val() === '')
+			$self.find('.exercise__add-review__button').attr('disabled', 'disabled');
+		else
+			$self.find('.exercise__add-review__button').removeAttr('disabled');
 	});
+
+	$self.find('.exercise__add-review__button').click(function() {
+		var comment = $self.find('.exercise__add-review__comment').val();
+		var params = {
+			StartLine: editorLastRange.anchor.line,
+			StartPosition: editorLastRange.anchor.ch,
+			FinishLine: editorLastRange.head.line,
+			FinishPosition: editorLastRange.head.ch,
+			Comment: comment,
+		}
+		$.post(addReviewUrl, params, function(data) {
+			if (data.status !== 'ok') {
+				console.log(data);
+				alert('Can\'t save comment: error');
+			} else {
+				addExerciseCodeReview(data.review);
+				$self.find('.exercise__add-review__comment').val('');
+				$self.hide();
+			}
+		},
+		'json');
+	});
+});
+
+$('.exercise__reviews').on('click', '.exercise__review', function () {
+	if (!$exerciseCodeBlock)
+		return;
+
+	var $review = $(this).closest('.exercise__review');
+	selectReview($review);
+});
+
+$('.exercise__reviews').on('click', '.exercise__delete-review', function () {
+	var $self = $(this);
+	var $review = $self.closest('.exercise__review');
+	var token = $('input[name="__RequestVerificationToken"]').val();
+	var reviewId = $self.data('id');
+	var url = $self.data('url');
+	$.post(url, {
+		__RequestVerificationToken: token
+	}, function(data) {
+		if (data.status !== 'ok') {
+			console.log(data);
+			alert('Can\'t delete comment: error');
+		} else {
+			$review.slideUp('fast', function() { $(this).remove(); });
+			reviewsTextMarkers[reviewId].clear();
+			unselectAllReviews();
+		}
+	}, 'json');
+});
+
+$('.exercise__reviews .exercise__review').each(function () {
+	var $review = $(this);
+	var reviewId = $review.data('id');
+	var startLine = $review.data('start-line');
+	var startPosition = $review.data('start-position');
+	var finishLine = $review.data('finish-line');
+	var finishPosition = $review.data('finish-position');
+
+	reviewsTextMarkers[reviewId] = exerciseCodeDoc.markText({ line: startLine, ch: startPosition }, { line: finishLine, ch: finishPosition }, {
+		className: 'exercise__code__reviewed-fragment'
+	});
+});
+
+function addExerciseCodeReview(review) {
+	console.log(review);
+}
 
 function refreshPreviousDraft(ac, id) {
     window.onbeforeunload = function () {

@@ -301,6 +301,10 @@
     <Compile Include="Migrations\201608310552232_ChangeExerciseCodeReview.Designer.cs">
       <DependentUpon>201608310552232_ChangeExerciseCodeReview.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201609070626183_ChangeCascadeDeletions.cs" />
+    <Compile Include="Migrations\201609070626183_ChangeCascadeDeletions.Designer.cs">
+      <DependentUpon>201609070626183_ChangeCascadeDeletions.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\ExerciseCodeReview.cs" />
     <Compile Include="Models\SlideChecking.cs" />
     <Compile Include="Models\CourseInstructorNavbarViewModel.cs" />
@@ -778,6 +782,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201608310552232_ChangeExerciseCodeReview.resx">
       <DependentUpon>201608310552232_ChangeExerciseCodeReview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609070626183_ChangeCascadeDeletions.resx">
+      <DependentUpon>201609070626183_ChangeCascadeDeletions.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

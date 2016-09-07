@@ -8,10 +8,7 @@ namespace uLearn.Model
 {
 	public class LessonSlideLoader : ISlideLoader
 	{
-		public string Extension
-		{
-			get { return "lesson.xml"; }
-		}
+		public string Extension => "lesson.xml";
 
 		public Slide Load(FileInfo file, string unitName, int slideIndex, CourseSettings settings)
 		{

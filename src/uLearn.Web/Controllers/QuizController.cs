@@ -205,26 +205,26 @@ namespace uLearn.Web.Controllers
 
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var queueItem = slideCheckingsRepo.FindManualCheckingById<ManualQuizChecking>(id);
+				var checking = slideCheckingsRepo.FindManualCheckingById<ManualQuizChecking>(id);
 
-				if (queueItem.IsChecked)
+				if (checking.IsChecked)
 					return Redirect(errorUrl + "Эта работа уже была проверена");
 
-				if (! queueItem.IsLockedBy(User.Identity))
+				if (! checking.IsLockedBy(User.Identity))
 					return Redirect(errorUrl + "Эта работа проверяется другим инструктором");
 
-				var answers = userQuizzesRepo.GetAnswersForUser(queueItem.SlideId, queueItem.UserId);
+				var answers = userQuizzesRepo.GetAnswersForUser(checking.SlideId, checking.UserId);
 
 				QuizVersion quizVersion;
-				/* If there is no user's answers for quiz, get the latest quiz versoin*/
+				/* If there is no user's answers for quiz, get the latest quiz version */
 				if (answers.Count == 0)
-					quizVersion = quizzesRepo.GetLastQuizVersion(queueItem.CourseId, queueItem.SlideId);
+					quizVersion = quizzesRepo.GetLastQuizVersion(checking.CourseId, checking.SlideId);
 				else
 				{
 					var firstAnswer = answers.FirstOrDefault().Value.FirstOrDefault();
 					quizVersion = firstAnswer != null
 						? firstAnswer.QuizVersion
-						: quizzesRepo.GetFirstQuizVersion(queueItem.CourseId, queueItem.SlideId);
+						: quizzesRepo.GetFirstQuizVersion(checking.CourseId, checking.SlideId);
 				}
 
 				int totalScore = 0;
@@ -236,19 +236,17 @@ namespace uLearn.Web.Controllers
 					int score;
 					/* Invalid form: score isn't integer */
 					if (!int.TryParse(scoreStr, out score))
-						return Redirect(errorUrl + string.Format("Неверное количество баллов в задании «{0}. {1}»",
-							question.QuestionIndex, question.Text.TruncateWithEllipsis(50)));
+						return Redirect(errorUrl + $"Неверное количество баллов в задании «{question.QuestionIndex}. {question.Text.TruncateWithEllipsis(50)}»");
 					/* Invalid form: score isn't from range 0..MAX_SCORE */
 					if (score < 0 || score > question.MaxScore)
-						return Redirect(errorUrl + string.Format("Неверное количество баллов в задании «{0}. {1}»: {2}",
-							question.QuestionIndex, question.Text.TruncateWithEllipsis(50), score));
+						return Redirect(errorUrl + $"Неверное количество баллов в задании «{question.QuestionIndex}. {question.Text.TruncateWithEllipsis(50)}»: {score}");
 
-					await userQuizzesRepo.SetScoreForQuizBlock(queueItem.UserId, queueItem.SlideId, question.Id, score);
+					await userQuizzesRepo.SetScoreForQuizBlock(checking.UserId, checking.SlideId, question.Id, score);
 					totalScore += score;
 				}
 
-				await slideCheckingsRepo.MarkManualCheckingAsChecked(queueItem, totalScore);
-				await visitsRepo.UpdateScoreForVisit(queueItem.CourseId, queueItem.SlideId, queueItem.UserId);
+				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, totalScore);
+				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, checking.UserId);
 				transaction.Commit();
 			}
 

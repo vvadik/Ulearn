@@ -161,12 +161,69 @@
 
 @helper Block(ExerciseBlock block, BlockRenderContext context)
 {
-	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData();
-	var action = data.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", data.AcceptedSolutionUrl);
+	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData(context.Course.Id, context.Slide.Index);
+	var acceptedSolutionUrl = data.Url.Action("AcceptedSolutions", "Course", new { courseId = context.Course.Id, slideIndex = context.Slide.Index });
+	var action = data.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", acceptedSolutionUrl);
 	var classString = context.IsGuest ? "code-guest" : "code-exercise";
 	if (context.ManualChecking != null)
 	{
 		classString = "code-review";
+	}
+
+	var status = "";
+	if (data.ReviewState == ExerciseReviewState.WaitingForReview)
+	{
+		status = "Все тесты пройдены, код ожидает проверки преподавателем";
+	}
+	else if (data.ReviewState == ExerciseReviewState.Reviewed)
+	{
+		status = "Все тесты пройдены, код проверен преподаваталем";
+		classString = "code-reviewed";
+	}
+	if (! string.IsNullOrEmpty(status))
+	{
+		<p class="exercise-status">@status</p>
+	}
+
+	if (data.ReviewState == ExerciseReviewState.Reviewed || context.ManualChecking != null)
+	{
+		<div class="exercise__reviews">
+			@foreach (var review in data.Reviews.OrderBy(r => r.StartLine))
+			{
+				<div class="exercise__review"
+					 data-id="@review.Id"
+				     data-start-line="@review.StartLine"
+				     data-start-position="@review.StartPosition"
+				     data-finish-line="@review.FinishLine"
+				     data-finish-position="@review.FinishPosition">
+					<div class="exercise__review__header">
+						<span class="author">@review.Author.VisibleName</span>,
+						@if (review.StartLine != review.FinishLine)
+						{
+							<span>
+								строки @(review.StartLine + 1)&ndash;@(review.FinishLine + 1)
+							</span>
+						}
+						else
+						{
+							<span>
+								строка @(review.StartLine + 1)
+							</span>
+						}
+						@if (context.ManualChecking != null)
+						{
+							<span class="close exercise__delete-review"
+								  title="Удалить комментарий"
+								  data-id="@review.Id"
+								  data-url="@data.Url.Action("DeleteExerciseCodeReview", "Exercise", new { courseId = context.Course.Id, reviewId = review.Id })">&times;</span>
+						}
+					</div>
+					<div class="exercise__review__comment">
+						@review.Comment
+					</div>
+				</div>
+			}
+		</div>
 	}
 	<textarea id="secretCodeExercise" class="hide">@block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
 	<textarea class="code @classString" data-lang="@block.LangId">@(data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
@@ -179,16 +236,24 @@
 	if (data.ShowControls && context.ManualChecking == null)
 	{
 		<div class="solution-control btn-group ctrl-group">
-			<button type="button" class="run-solution-button btn btn-primary no-rounds @(data.IsLti ? "run-solution-button-lti" : "")" data-url="@data.RunSolutionUrl">
-				Run
-			</button>
-
+			@if (data.ReviewState == ExerciseReviewState.Reviewed)
+			{
+				<a href="?again=true" class="try-again-button btn btn-primary no-rounds">
+					Try again
+				</a>
+			}
+			else
+			{
+				<button type="button" class="run-solution-button btn btn-primary no-rounds @(data.IsLti ? "run-solution-button-lti" : "")" data-url="@data.RunSolutionUrl">
+					Run
+				</button>
+			}
 			@if (!data.DebugView)
 			{
 				var e = ((ExerciseSlide)context.Slide).Exercise.HintsMd;
 				<button id="GetHintButton" type="button" class="btn btn-default hints-btn"
-						data-course-id="@context.Course.Id" data-slide-index="@context.Slide.Index" data-hints-count="@e.Count"
-						data-url="@data.GetHintUrl">
+				        data-course-id="@context.Course.Id" data-slide-index="@context.Slide.Index" data-hints-count="@e.Count"
+				        data-url="@data.Url.Action("UseHint", "Hint")">
 					Get hint
 				</button>
 				if (!data.IsLti)
@@ -228,21 +293,33 @@
 			<h3>Комментарий после решения</h3>
 			<p>@block.CommentAfterExerciseIsSolved</p>
 		</div>
-}
+	}
 
 	if (context.ManualChecking != null)
 	{
-		//<div class="exercise__add-review" style="display: none" data-url="@(new UrlHelper().Action("AddExerciseCodeReview", "Exercise", new { courseId = context.Course.Id }))">
-		<div class="exercise__add-review" style="display: none" data-url="/Exercise/AddExerciseCodeReview?courseId=@context.Course.Id&amp;checkingId=@context.ManualChecking.Id">
+		<div class="text-muted">Выделите участок кода, чтобы оставить комментарий</div>
+
+		<div class="exercise__add-review" style="display: none" data-url="@data.Url.Action("AddExerciseCodeReview", "Exercise", new { courseId = context.Course.Id, checkingId = context.ManualChecking.Id })">
 			<div>Добавить комментарий</div>
 			<textarea class="exercise__add-review__comment"></textarea>
 			<button class="exercise__add-review__button btn btn-success btn-sm">Сохранить</button>
 		</div>
 
-		<h4>Оцените от 0 до @block.MaxReviewScore</h4>
-		<div>
-			<input type="number" class="form-control" min="0" max="@block.MaxReviewScore" name="exercise__score" />
-		</div>
+		<form method="POST" action="@data.Url.Action("ScoreExercise", "Exercise")">
+			<input type="hidden" name="id" value="@context.ManualChecking.Id"/>
+			<input type="hidden" name="errorUrl" value="@data.Url.RouteUrl("Course.SlideById", new { courseId = context.Course.Id, slideId = context.Slide.Url, CheckQueueItemId = context.ManualChecking.Id })&amp;error=" />
+			<input type="hidden" name="nextUrl" value="@data.Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId = context.Course.Id })"/>
+
+			<h4>Оцените от 0 до @block.MaxReviewScore</h4>
+			<div>
+				<input type="number" class="form-control" min="0" max="@block.MaxReviewScore" name="exercise__score"/>
+			</div>
+
+			<input type="submit" class="btn btn-default" value="Сохранить и вернуться">
+			<input type="submit" class="btn btn-primary" value="Сохранить и перейти к следующему"
+			       data-url="@data.Url.Action("CheckNextExerciseForSlide", "Admin", new { courseID = context.Course.Id, slideId = context.Slide.Id })"
+			       onclick="$('[name=nextUrl]').val($(this).data('url'))">
+		</form>
 	}
 }
 
@@ -564,7 +641,7 @@
 					<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
 				</div>
 				<div class="modal-footer">
-					<a class="btn btn-default" href="@data.AcceptedSolutionUrl">Продолжить</a>
+					<a class="btn btn-default" href="@data.Url.Action("AcceptedSolutions", "Course", new { data.CourseId, data.SlideIndex })">Продолжить</a>
 					<button type="button" class="btn btn-primary" data-dismiss="modal">Отмена</button>
 				</div>
 			</div>

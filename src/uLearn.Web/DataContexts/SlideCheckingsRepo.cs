@@ -81,14 +81,15 @@ namespace uLearn.Web.DataContexts
 			return db.Set<T>().Where(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId);
 		}
 
-		public async Task RemoveAttempts(string courseId, Guid slideId, string userId)
+		public async Task RemoveAttempts(string courseId, Guid slideId, string userId, bool saveChanges=true)
 		{
 			db.ManualQuizCheckings.RemoveRange(GetSlideCheckingsByUser<ManualQuizChecking>(courseId, slideId, userId));
 			db.AutomaticQuizCheckings.RemoveRange(GetSlideCheckingsByUser<AutomaticQuizChecking>(courseId, slideId, userId));
 			db.ManualExerciseCheckings.RemoveRange(GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId));
 			db.AutomaticExerciseCheckings.RemoveRange(GetSlideCheckingsByUser<AutomaticExerciseChecking>(courseId, slideId, userId));
 
-			await db.SaveChangesAsync();
+			if (saveChanges)
+				await db.SaveChangesAsync();
 		}
 
 		public bool IsSlidePassed(string courseId, Guid slideId, string userId)
@@ -154,9 +155,9 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public async Task AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment)
+		public async Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment)
 		{
-			db.ExerciseCodeReviews.Add(new ExerciseCodeReview
+			var review = db.ExerciseCodeReviews.Add(new ExerciseCodeReview
 			{
 				AuthorId = userId,
 				Comment = comment,
@@ -177,6 +178,8 @@ namespace uLearn.Web.DataContexts
 					string.Join("\r\n",
 						e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
 			}
+
+			return review;
 		}
 
 		public ExerciseCodeReview FindExerciseCodeReviewById(int reviewId)
@@ -187,6 +190,12 @@ namespace uLearn.Web.DataContexts
 		public async Task DeleteExerciseCodeReview(ExerciseCodeReview review)
 		{
 			review.IsDeleted = true;
+			await db.SaveChangesAsync();
+		}
+
+		public async Task UpdateExerciseCodeReview(ExerciseCodeReview review, string newComment)
+		{
+			review.Comment = newComment;
 			await db.SaveChangesAsync();
 		}
 	}

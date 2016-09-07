@@ -11,6 +11,9 @@ namespace uLearn.Web.Models
 		public string Rate {get; set;}
 		public Tuple<int, int> Score { get; set; }
 		public BlockRenderContext BlockRenderContext { get; set; }
+		public AbstractManualSlideChecking ManualChecking { get; set; }
+		public string ContextManualCheckingUserGroups { get; set; }
 		public bool IsGuest { get; set; }
+		public string Error { get; set; }
 	}
 }

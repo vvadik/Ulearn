@@ -161,16 +161,16 @@ namespace uLearn.Web.DataContexts
 			return GetBestTrendingAndNewAcceptedSolutions(courseId, new List<Guid> { slideId });
 		}
 
-		public string FindLatestAcceptedSolution(string courseId, Guid slideId, string userId)
+		public UserExerciseSubmission FindLatestAcceptedSubmission(string courseId, Guid slideId, string userId)
 		{
 			var allUserSolutionOnThisTask = db.UserExerciseSubmissions
-				.Where(x => x.SlideId == slideId && x.UserId == userId && x.AutomaticChecking.IsRightAnswer).ToList();
-			var answer = allUserSolutionOnThisTask
+				.Where(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId && x.AutomaticChecking.IsRightAnswer);
+			var latest = allUserSolutionOnThisTask
 				.OrderByDescending(x => x.Timestamp)
 				.FirstOrDefault();
-			return answer?.SolutionCode.Text;
+			return latest;
 		}
-
+		
 		public int GetAcceptedSolutionsCount(Guid slideId, string courseId)
 		{
 			return db.AutomaticExerciseCheckings.Where(x => x.SlideId == slideId && x.IsRightAnswer).Select(x => x.UserId).Distinct().Count();

@@ -29,9 +29,9 @@ namespace uLearn.Web.DataContexts
 				.WillCascadeOnDelete(false);
 
 			modelBuilder.Entity<ExerciseCodeReview>()
-				.HasRequired(r => r.ExerciseChecking)
-				.WithMany(x => x.Reviews)
-				.HasForeignKey(r => r.ExerciseCheckingId)
+				.HasRequired(r => r.Author)
+				.WithMany()
+				.HasForeignKey(r => r.AuthorId)
 				.WillCascadeOnDelete(false);
 
 			modelBuilder.Entity<Like>()
@@ -41,14 +41,15 @@ namespace uLearn.Web.DataContexts
 				.WillCascadeOnDelete(false);
 
 			modelBuilder.Entity<UserExerciseSubmission>()
-				.HasRequired(s => s.AutomaticChecking)
+				.HasRequired(s => s.User)
 				.WithMany()
+				.HasForeignKey(s => s.UserId)
 				.WillCascadeOnDelete(false);
 
 			modelBuilder.Entity<ManualExerciseChecking>()
-				.HasRequired(c => c.Submission)
-				.WithMany(s => s.ManualCheckings)
-				.HasForeignKey(c => c.SubmissionId)
+				.HasRequired(c => c.User)
+				.WithMany()
+				.HasForeignKey(c => c.UserId)
 				.WillCascadeOnDelete(false);
 		}
 		

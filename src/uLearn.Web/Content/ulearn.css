@@ -330,6 +330,10 @@
 	width: 50% !important;
 }
 
+.try-again-button {
+	width: 25%;
+}
+
 
 .rates-bar {
 	width: 100%;
@@ -350,7 +354,8 @@
 	margin-bottom: 5px;
 }
 
-#quiz-status {
+.quiz-status,
+.exercise-status {
     background-color: #d9edf7;
 	padding: 15px 18px;
 	color: #333;
@@ -1186,7 +1191,7 @@ table.analytics__user-answers {
 	position: absolute;
 	z-index: 10;
 	background-color: white;
-    padding: 5px 10px;
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 3px;
 }
@@ -1196,6 +1201,62 @@ table.analytics__user-answers {
 	margin-top: 5px;
 }
 
+.exercise__add-review > *:first-child {
+	margin-top: 0;
+	margin-bottom: 5px;
+}
+
+.exercise__add-review .exercise__add-review__comment {
+	width: 250px;
+}
+
 .code-review + .CodeMirror {
 	width: 600px;
+}
+
+.exercise__reviews {
+    float: right;
+    width: 250px;
+	margin-left: 10px;
+	margin-bottom: 25px;
+}
+
+.exercise__review {
+	border-left: 3px solid #fdd;
+    margin: 10px 0;
+    padding: 2px 5px;
+	cursor: pointer;
+}
+
+.exercise__review.selected {
+	border-left-color: #d66;
+	margin-left: -10px;
+}
+
+.exercise__review .exercise__review__header {
+    background-color: #fdf5f5;
+    margin: -2px -5px;
+    padding: 2px 5px;
+    color: #aaa;
+    font-size: 9pt;
+}
+
+.exercise__review .exercise__review__header .author {
+	color: #b99;
+}
+
+.exercise__review .exercise__review__header .close {
+	font-size: 13pt;
+}
+
+.exercise__review .exercise__review__comment {
+    padding: 4px 0;
+}
+
+.exercise__code__reviewed-fragment {
+	background-color: #fdd5d5;
+}
+
+.exercise__code__reviewed-fragment__selected {
+	background-color: #f7b7b7;
 }

@@ -94,7 +94,7 @@ namespace uLearn.Model.Blocks
 
 		public override string ToString()
 		{
-			return string.Format("Exercise: {0}, Hints: {1}", ExerciseInitialCode, string.Join("; ", HintsMd));
+			return $"Exercise: {ExerciseInitialCode}, Hints: {string.Join("; ", HintsMd)}";
 		}
 
 		public Component GetSolutionsComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)
