@@ -10,5 +10,6 @@ namespace uLearn.Web.Models
 		public string ActualOutput { get; set; }
 		public string CompilationError { get; set; }
 		public string ExecutionServiceName { get; set; }
+		public bool SentToReview { get; set; }
 	}
 }

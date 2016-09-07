@@ -76,6 +76,11 @@ namespace uLearn.Web.DataContexts
 			}
 		}
 
+		public int GetCountCheckedManualExerciseCheckings(string courseId, Guid slideId, string userId)
+		{
+			return GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).Count(c => c.IsChecked);
+		}
+
 		private IEnumerable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId) where T: AbstractSlideChecking
 		{
 			return db.Set<T>().Where(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId);

@@ -147,6 +147,13 @@
 	margin-top: 10px;
 }
 
+.run-review-status {
+	color: white;
+    text-align: center;
+    font-size: 13pt;
+    padding: 2px 0;
+}
+
 .no-rounds {
 	-ms-border-radius: 0;
 	-webkit-border-radius: 0;

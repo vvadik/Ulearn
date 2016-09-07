@@ -79,7 +79,8 @@ namespace uLearn.Web.Controllers
 				};
 
 			var automaticChecking = submission.AutomaticChecking;
-			var sendToReview = exerciseBlock.RequireReview && automaticChecking.IsRightAnswer;
+			var countAlreadyDoneReviews = slideCheckingsRepo.GetCountCheckedManualExerciseCheckings(courseId, exerciseSlide.Id, userId);
+			var sendToReview = exerciseBlock.RequireReview && automaticChecking.IsRightAnswer && countAlreadyDoneReviews <= exerciseBlock.MaxReviewAttempts;
 			if (sendToReview)
 				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission);
 			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, userId);
@@ -91,7 +92,8 @@ namespace uLearn.Web.Controllers
 				IsRightAnswer = automaticChecking.IsRightAnswer,
 				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseSlide.Exercise.ExpectedOutput.NormalizeEoln(),
 				ActualOutput = automaticChecking.Output.Text,
-				ExecutionServiceName = automaticChecking.ExecutionServiceName
+				ExecutionServiceName = automaticChecking.ExecutionServiceName,
+				SentToReview = sendToReview,
 			};
 		}
 

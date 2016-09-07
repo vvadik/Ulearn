@@ -180,7 +180,7 @@
 		status = "Все тесты пройдены, код проверен преподаваталем";
 		classString = "code-reviewed";
 	}
-	if (! string.IsNullOrEmpty(status))
+	if (! string.IsNullOrEmpty(status) && context.ManualChecking == null)
 	{
 		<p class="exercise-status">@status</p>
 	}
@@ -622,6 +622,7 @@
 
 	<div class="run-result run-success">
 		<div class="run-verdict label-success clearfix">Успех!</div>
+		<div class="run-review-status label-info clearfix">Ваше решение отправлено на проверку преподавателю</div>
 		<pre class="no-rounds"><code class="run-details"></code></pre>
 	</div>
 }

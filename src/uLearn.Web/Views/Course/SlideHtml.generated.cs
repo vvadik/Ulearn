@@ -462,7 +462,7 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 		status = "Все тесты пройдены, код проверен преподаваталем";
 		classString = "code-reviewed";
 	}
-	if (! string.IsNullOrEmpty(status))
+	if (! string.IsNullOrEmpty(status) && context.ManualChecking == null)
 	{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<p class=\"exercise-status\">");
@@ -1670,9 +1670,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"run-result ru
 
 
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"run-result run-success\">\r\n\t\t<div class=\"run-verdict label-success cl" +
-"earfix\">Успех!</div>\r\n\t\t<pre class=\"no-rounds\"><code class=\"run-details\"></code>" +
-"</pre>\r\n\t</div>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"	<div class=""run-result run-success"">
+		<div class=""run-verdict label-success clearfix"">Успех!</div>
+		<div class=""run-review-status label-info clearfix"">Ваше решение отправлено на проверку преподавателю</div>
+		<pre class=""no-rounds""><code class=""run-details""></code></pre>
+	</div>
+");
 
 
 
