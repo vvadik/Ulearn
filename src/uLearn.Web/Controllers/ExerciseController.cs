@@ -130,19 +130,11 @@ namespace uLearn.Web.Controllers
 			}
 			
 			var review = await slideCheckingsRepo.AddExerciseCodeReview(checking, User.Identity.GetUserId(), reviewInfo.StartLine, reviewInfo.StartPosition, reviewInfo.FinishLine, reviewInfo.FinishPosition, reviewInfo.Comment);
-			var author = usersRepo.FindUserById(User.Identity.GetUserId());
 
-			return Json(new {
-				status = "ok",
-				review = new {
-					review.Id,
-					review.Comment,
-					review.StartLine,
-					review.StartPosition,
-					review.FinishLine,
-					review.FinishPosition,
-					AuthorName = author.VisibleName,
-				}
+			return PartialView("~/Views/Course/_ExerciseReview.cshtml", new ExerciseCodeReviewModel
+			{
+				Review = review,
+				ManualChecking = checking,
 			});
 		}
 
@@ -202,7 +194,7 @@ namespace uLearn.Web.Controllers
 					return Redirect(errorUrl + $"Неверное количество баллов: {exerciseScore}");
 				
 				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, exerciseScore);
-				if (prohibitFurtherReview.HasValue)
+				if (prohibitFurtherReview.HasValue && prohibitFurtherReview.Value)
 					await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking);
 				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, checking.UserId);
 

@@ -483,98 +483,14 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"exercise__r
 
  			foreach (var review in data.Reviews.OrderBy(r => r.StartLine))
 			{
+				
+WebViewPage.WriteTo(@__razor_helper_writer, Html.Partial("_ExerciseReview", new ExerciseCodeReviewModel
+				{
+					Review = review,
+					ManualChecking = (ManualExerciseChecking) context.ManualChecking,
+				}));
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<div class=\"exercise__review\"\r\n\t\t\t\t\t data-id=\"");
-
-
-WebViewPage.WriteTo(@__razor_helper_writer, review.Id);
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t\t     data-start-line=\"");
-
-
-WebViewPage.WriteTo(@__razor_helper_writer, review.StartLine);
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t\t     data-start-position=\"");
-
-
-WebViewPage.WriteTo(@__razor_helper_writer, review.StartPosition);
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t\t     data-finish-line=\"");
-
-
-WebViewPage.WriteTo(@__razor_helper_writer, review.FinishLine);
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t\t     data-finish-position=\"");
-
-
-WebViewPage.WriteTo(@__razor_helper_writer, review.FinishPosition);
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\t<div class=\"exercise__review__header\">\r\n\t\t\t\t\t\t<span class=\"author\">");
-
-
-WebViewPage.WriteTo(@__razor_helper_writer, review.Author.VisibleName);
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</span>,\r\n");
-
-
- 						if (review.StartLine != review.FinishLine)
-						{
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t\t\t<span>\r\n\t\t\t\t\t\t\t\tстроки ");
-
-
-WebViewPage.WriteTo(@__razor_helper_writer, review.StartLine + 1);
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "&ndash;");
-
-
-   WebViewPage.WriteTo(@__razor_helper_writer, review.FinishLine + 1);
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t\t\t\t</span>\r\n");
-
-
-						}
-						else
-						{
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t\t\t<span>\r\n\t\t\t\t\t\t\t\tстрока ");
-
-
-WebViewPage.WriteTo(@__razor_helper_writer, review.StartLine + 1);
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t\t\t\t</span>\r\n");
-
-
-						}
-
-
- 						if (context.ManualChecking != null)
-						{
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t\t\t<span class=\"close exercise__delete-review\"\r\n\t\t\t\t\t\t\t\t  title=\"Удалить комм" +
-"ентарий\"\r\n\t\t\t\t\t\t\t\t  data-id=\"");
-
-
-WebViewPage.WriteTo(@__razor_helper_writer, review.Id);
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t\t\t\t\t\t  data-url=\"");
-
-
-WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("DeleteExerciseCodeReview", "Exercise", new { courseId = context.Course.Id, reviewId = review.Id }));
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">&times;</span>\r\n");
-
-
-						}
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"exercise__review__comment\">\r\n\t\t\t\t\t\t");
-
-
-WebViewPage.WriteTo(@__razor_helper_writer, Html.Raw(Html.EncodeMultiLineText(review.Comment)));
-
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n");
-
-
+      
 			}
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t</div>\r\n");
@@ -801,7 +717,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, @""" name=""exerciseScore""/>
 			</div>
 
 			<div class=""checkbox checkbox-default"">
-				<input data-val=""true"" id=""prohibitFurtherReview"" name=""prohibitFurtherReview"" type=""checkbox"" value=""false"">
+				<input data-val=""true"" id=""prohibitFurtherReview"" name=""prohibitFurtherReview"" type=""checkbox"" value=""true"" checked>
 				<label for=""prohibitFurtherReview"">
 					Не принимать больше код ревью у этого студента
 				</label>

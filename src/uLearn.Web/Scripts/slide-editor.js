@@ -24,31 +24,7 @@
 		var exerciseCodeEditor = $exerciseCodeBlock.codeMirrorEditor;
 		exerciseCodeDoc = exerciseCodeEditor.getDoc();
 	}
-
-	String.prototype.br2nl = function () {
-		return this.replace(/<br\s*\/?>/gi, "\n");
-	}
-
-	String.prototype.nl2br = function () {
-		return this.replace(/\n/g, "<br>");
-	}
-
-	String.prototype.encodeMultiLineText = function () {
-		return $.encodeHtmlEntities(this).nl2br();
-	}
-
-	String.prototype.decodeMultiLineText = function () {
-		return $.decodeHtmlEntities(this.br2nl());
-	}
-
-	jQuery.encodeHtmlEntities = function (text) {
-		return $('<span>').text(text).html();
-	}
-
-	jQuery.decodeHtmlEntities = function (html) {
-		return $('<span>').html(html).text();
-	}
-
+	
 	function getMode(lang) {
 		// see http://codemirror.net/mode/
 
@@ -187,17 +163,11 @@
 				FinishPosition: editorLastRange.head.ch,
 				Comment: comment,
 			}
-			$.post(addReviewUrl, params, function(data) {
-				if (data.status !== 'ok') {
-					console.log(data);
-					alert('Can\'t save comment: error');
-				} else {
-					addExerciseCodeReview(data.review);
-					$self.find('.exercise__add-review__comment').val('');
-					$self.hide();
-				}
-			},
-			'json');
+			$.post(addReviewUrl, params, function(renderedReview) {
+				addExerciseCodeReview(renderedReview);
+				$self.find('.exercise__add-review__comment').val('');
+				$self.hide();
+			});
 		});
 	});
 
@@ -246,25 +216,9 @@
 		createMarkTextForReview($review);
 	});
 
-	function getReviewLines(review) {
-		if (review.StartLine !== review.FinishLine)
-			return "строки " + (review.StartLine + 1) + "–" + (review.FinishLine + 1);
-		return "строка " + (review.StartLine + 1);
-	}
-
-	function addExerciseCodeReview(review) {
+	function addExerciseCodeReview(renderedReview) {
 		var $reviews = $('.exercise__reviews');
-		var $newReview =
-			$('<div class="exercise__review"><div class="exercise__review__header"><span class="author"></span>, <span class="lines"></span></div><div class="exercise__review__comment"></div></div>');
-		$newReview.find('.exercise__review__header .author').text(review.AuthorName);
-		$newReview.find('.exercise__review__header .lines').text(getReviewLines(review));
-		$newReview.find('.exercise__review__comment').html(review.Comment.encodeMultiLineText());
-		$newReview.data('id', review.Id)
-			.data('start-line', review.StartLine)
-			.data('start-position', review.StartPosition)
-			.data('finish-line', review.FinishLine)
-			.data('finish-position', review.FinishPosition);
-
+		var $newReview = $(renderedReview);
 		createMarkTextForReview($newReview);
 		$reviews.append($newReview);
 	}

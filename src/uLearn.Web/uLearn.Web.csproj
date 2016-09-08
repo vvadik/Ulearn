@@ -310,6 +310,7 @@
       <DependentUpon>201609081814377_AddFutherCheckingProhibitionAndIndexes.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\ExerciseCodeReview.cs" />
+    <Compile Include="Models\ExerciseCodeReviewModel.cs" />
     <Compile Include="Models\SlideChecking.cs" />
     <Compile Include="Models\CourseInstructorNavbarViewModel.cs" />
     <Compile Include="DataContexts\CommentsRepo.cs" />
@@ -1406,6 +1407,7 @@
     <Content Include="Views\Course\CourseInstructorNavbar.cshtml" />
     <Content Include="Views\Admin\ManualExerciseCheckingQueue.cshtml" />
     <Content Include="Views\Admin\_ManualCheckingQueueFilterForm.cshtml" />
+    <Content Include="Views\Course\_ExerciseReview.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -212,7 +212,8 @@ namespace uLearn.Web.DataContexts
 						e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
 			}
 
-			return review;
+			/* Extract review from database to fill review.Author by EF's DynamicProxy */
+			return db.ExerciseCodeReviews.AsNoTracking().FirstOrDefault(r => r.Id == review.Id);
 		}
 
 		public ExerciseCodeReview FindExerciseCodeReviewById(int reviewId)

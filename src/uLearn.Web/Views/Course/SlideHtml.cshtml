@@ -190,38 +190,11 @@
 		<div class="exercise__reviews">
 			@foreach (var review in data.Reviews.OrderBy(r => r.StartLine))
 			{
-				<div class="exercise__review"
-					 data-id="@review.Id"
-				     data-start-line="@review.StartLine"
-				     data-start-position="@review.StartPosition"
-				     data-finish-line="@review.FinishLine"
-				     data-finish-position="@review.FinishPosition">
-					<div class="exercise__review__header">
-						<span class="author">@review.Author.VisibleName</span>,
-						@if (review.StartLine != review.FinishLine)
-						{
-							<span>
-								строки @(review.StartLine + 1)&ndash;@(review.FinishLine + 1)
-							</span>
-						}
-						else
-						{
-							<span>
-								строка @(review.StartLine + 1)
-							</span>
-						}
-						@if (context.ManualChecking != null)
-						{
-							<span class="close exercise__delete-review"
-								  title="Удалить комментарий"
-								  data-id="@review.Id"
-								  data-url="@data.Url.Action("DeleteExerciseCodeReview", "Exercise", new { courseId = context.Course.Id, reviewId = review.Id })">&times;</span>
-						}
-					</div>
-					<div class="exercise__review__comment">
-						@Html.Raw(Html.EncodeMultiLineText(review.Comment))
-					</div>
-				</div>
+				@Html.Partial("_ExerciseReview", new ExerciseCodeReviewModel
+				{
+					Review = review,
+					ManualChecking = (ManualExerciseChecking) context.ManualChecking,
+				})
 			}
 		</div>
 	}
@@ -316,7 +289,7 @@
 			</div>
 
 			<div class="checkbox checkbox-default">
-				<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="false">
+				<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" checked>
 				<label for="prohibitFurtherReview">
 					Не принимать больше код ревью у этого студента
 				</label>
