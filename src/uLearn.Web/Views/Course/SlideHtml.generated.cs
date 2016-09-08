@@ -797,9 +797,19 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</h4>\r\n\t\t\t<div>\r\n\t\t
 
                 WebViewPage.WriteTo(@__razor_helper_writer, block.MaxReviewScore);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" name=\"exercise__score\"/>\r\n\t\t\t</div>\r\n\r\n\t\t\t<input type=\"submit\" class=\"btn btn-d" +
-"efault\" value=\"Сохранить и вернуться\">\r\n\t\t\t<input type=\"submit\" class=\"btn btn-p" +
-"rimary\" value=\"Сохранить и перейти к следующему\"\r\n\t\t\t       data-url=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, @""" name=""exerciseScore""/>
+			</div>
+
+			<div class=""checkbox checkbox-default"">
+				<input data-val=""true"" id=""prohibitFurtherReview"" name=""prohibitFurtherReview"" type=""checkbox"" value=""false"">
+				<label for=""prohibitFurtherReview"">
+					Не принимать больше код ревью у этого студента
+				</label>
+			</div>
+
+			<input type=""submit"" class=""btn btn-default"" value=""Сохранить и вернуться"">
+			<input type=""submit"" class=""btn btn-primary"" value=""Сохранить и перейти к следующему""
+			       data-url=""");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("CheckNextExerciseForSlide", "Admin", new { courseID = context.Course.Id, slideId = context.Slide.Id, context.GroupId }));

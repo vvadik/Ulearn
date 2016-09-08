@@ -75,12 +75,7 @@ namespace uLearn.Web.DataContexts
 					e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
 			}
 		}
-
-		public int GetCountCheckedOrLockedManualExerciseCheckings(string courseId, Guid slideId, string userId)
-		{
-			return GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).Count(c => c.IsChecked || c.IsLocked);
-		}
-
+		
 		public async Task RemoveWaitingManualExerciseCheckings(string courseId, Guid slideId, string userId)
 		{
 			using (var transaction = db.Database.BeginTransaction())
@@ -165,6 +160,11 @@ namespace uLearn.Web.DataContexts
 		{
 			return db.Set<T>().Find(id);
 		}
+		
+		public bool IsProhibitedToSendExerciseToManualChecking(string courseId, Guid slideId, string userId)
+		{
+			return GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).Any(c => c.ProhibitFurtherManualCheckings);
+		}
 
 		public async Task LockManualChecking<T>(T checkingItem, string lockedById) where T : AbstractManualSlideChecking
 		{
@@ -179,6 +179,12 @@ namespace uLearn.Web.DataContexts
 			queueItem.LockedUntil = null;
 			queueItem.IsChecked = true;
 			queueItem.Score = score;
+			await db.SaveChangesAsync();
+		}
+
+		public async Task ProhibitFurtherExerciseManualChecking(ManualExerciseChecking checking)
+		{
+			checking.ProhibitFurtherManualCheckings = true;
 			await db.SaveChangesAsync();
 		}
 

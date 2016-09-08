@@ -305,9 +305,9 @@
     <Compile Include="Migrations\201609070626183_ChangeCascadeDeletions.Designer.cs">
       <DependentUpon>201609070626183_ChangeCascadeDeletions.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201609081254216_AddAllowUserToTryAgain.cs" />
-    <Compile Include="Migrations\201609081254216_AddAllowUserToTryAgain.Designer.cs">
-      <DependentUpon>201609081254216_AddAllowUserToTryAgain.cs</DependentUpon>
+    <Compile Include="Migrations\201609081814377_AddFutherCheckingProhibitionAndIndexes.cs" />
+    <Compile Include="Migrations\201609081814377_AddFutherCheckingProhibitionAndIndexes.Designer.cs">
+      <DependentUpon>201609081814377_AddFutherCheckingProhibitionAndIndexes.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\ExerciseCodeReview.cs" />
     <Compile Include="Models\SlideChecking.cs" />
@@ -790,8 +790,8 @@
     <EmbeddedResource Include="Migrations\201609070626183_ChangeCascadeDeletions.resx">
       <DependentUpon>201609070626183_ChangeCascadeDeletions.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201609081254216_AddAllowUserToTryAgain.resx">
-      <DependentUpon>201609081254216_AddAllowUserToTryAgain.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201609081814377_AddFutherCheckingProhibitionAndIndexes.resx">
+      <DependentUpon>201609081814377_AddFutherCheckingProhibitionAndIndexes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

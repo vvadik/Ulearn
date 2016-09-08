@@ -110,6 +110,7 @@ namespace uLearn.Web.Models
 		}
 	}
 
+	/* Manual Exercise Checking is Code Review */
 	public class ManualExerciseChecking : AbstractManualSlideChecking
 	{
 		[Required]
@@ -117,7 +118,7 @@ namespace uLearn.Web.Models
 
 		[Required]
 		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser", 4)]
-		public bool AllowUserToTryAgain { get; set; }
+		public bool ProhibitFurtherManualCheckings { get; set; }
 
 		public virtual UserExerciseSubmission Submission { get; set; }
 

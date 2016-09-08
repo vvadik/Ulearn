@@ -80,8 +80,8 @@ namespace uLearn.Web.Controllers
 				};
 
 			var automaticChecking = submission.AutomaticChecking;
-			var countAlreadyDoneReviews = slideCheckingsRepo.GetCountCheckedOrLockedManualExerciseCheckings(courseId, exerciseSlide.Id, userId);
-			var sendToReview = exerciseBlock.RequireReview && automaticChecking.IsRightAnswer && countAlreadyDoneReviews < exerciseBlock.MaxReviewAttempts;
+			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
+			var sendToReview = exerciseBlock.RequireReview && automaticChecking.IsRightAnswer && ! isProhibitedUserToSendForReview;
 			if (sendToReview)
 			{
 				await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, exerciseSlide.Id, userId);
@@ -178,7 +178,7 @@ namespace uLearn.Web.Controllers
 
 		[System.Web.Mvc.HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public async Task<ActionResult> ScoreExercise(int id, string nextUrl, string errorUrl = "")
+		public async Task<ActionResult> ScoreExercise(int id, string nextUrl, int exerciseScore, bool? prohibitFurtherReview, string errorUrl = "")
 		{
 			if (string.IsNullOrEmpty(errorUrl))
 				errorUrl = nextUrl;
@@ -197,17 +197,15 @@ namespace uLearn.Web.Controllers
 				var slide = (ExerciseSlide) course.GetSlideById(checking.SlideId);
 				var exercise = slide.Exercise;
 
-				var scoreStr = Request.Form["exercise__score"];
-				int score;
-				/* Invalid form: score isn't integer */
-				if (!int.TryParse(scoreStr, out score))
-					return Redirect(errorUrl + "Неверное количество баллов.");
 				/* Invalid form: score isn't from range 0..MAX_SCORE */
-				if (score < 0 || score > exercise.MaxReviewScore)
-					return Redirect(errorUrl + $"Неверное количество баллов: {score}");
+				if (exerciseScore < 0 || exerciseScore > exercise.MaxReviewScore)
+					return Redirect(errorUrl + $"Неверное количество баллов: {exerciseScore}");
 				
-				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, score);
+				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, exerciseScore);
+				if (prohibitFurtherReview.HasValue)
+					await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking);
 				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, checking.UserId);
+
 				transaction.Commit();
 			}
 

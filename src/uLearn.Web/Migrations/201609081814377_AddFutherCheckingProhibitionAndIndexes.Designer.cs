@@ -7,13 +7,13 @@ namespace uLearn.Web.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddAllowUserToTryAgain : IMigrationMetadata
+    public sealed partial class AddFutherCheckingProhibitionAndIndexes : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddAllowUserToTryAgain));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddFutherCheckingProhibitionAndIndexes));
         
         string IMigrationMetadata.Id
         {
-            get { return "201609081254216_AddAllowUserToTryAgain"; }
+            get { return "201609081814377_AddFutherCheckingProhibitionAndIndexes"; }
         }
         
         string IMigrationMetadata.Source

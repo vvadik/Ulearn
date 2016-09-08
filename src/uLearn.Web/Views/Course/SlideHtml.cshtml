@@ -312,7 +312,14 @@
 
 			<h4>Оцените от 0 до @block.MaxReviewScore</h4>
 			<div>
-				<input type="number" class="form-control" min="0" max="@block.MaxReviewScore" name="exercise__score"/>
+				<input type="number" class="form-control" min="0" max="@block.MaxReviewScore" name="exerciseScore"/>
+			</div>
+
+			<div class="checkbox checkbox-default">
+				<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="false">
+				<label for="prohibitFurtherReview">
+					Не принимать больше код ревью у этого студента
+				</label>
 			</div>
 
 			<input type="submit" class="btn btn-default" value="Сохранить и вернуться">
