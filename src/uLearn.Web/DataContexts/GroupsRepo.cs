@@ -136,6 +136,12 @@ namespace uLearn.Web.DataContexts
 			return db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || g.IsPublic)).OrderBy(g => g.OwnerId == userId).ToList();
 		}
 
+		public List<Group> GetGroupsOwnedByUser(string courseId, IPrincipal user)
+		{
+			var userId = user.Identity.GetUserId();
+			return db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && g.OwnerId == userId).ToList();
+		}
+
 		public List<ApplicationUser> GetGroupMembers(int groupId)
 		{
 			return db.GroupMembers.Where(m => m.GroupId == groupId).Select(m => m.User).ToList();

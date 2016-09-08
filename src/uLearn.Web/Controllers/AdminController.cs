@@ -218,10 +218,24 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		private IEnumerable<string> FindGroupMembers(int? groupId)
+		private IEnumerable<string> FindGroupMembers(string courseId, int? groupId)
 		{
 			if (!groupId.HasValue)
 				return null;
+
+			/* if groupId <  get members of all own groups */
+			if (groupId.Value < 0)
+			{
+				var ownGroupsIds = groupsRepo.GetGroupsOwnedByUser(courseId, User).Select(g => g.Id).ToList();
+				List<string> usersIds = new List<string>();
+				foreach (var ownGroupId in ownGroupsIds)
+				{
+					var groupUsersIds = groupsRepo.GetGroupMembers(ownGroupId).Select(u => u.Id).ToList();
+					usersIds.AddRange(groupUsersIds);
+				}
+				return usersIds;
+			}
+
 			var group = groupsRepo.FindGroupById(groupId.Value);
 			if (group != null && groupsRepo.IsGroupAvailableForUser(group.Id, User))
 				return groupsRepo.GetGroupMembers(group.Id).Select(u => u.Id);
@@ -233,7 +247,7 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 
 			List<T> checkings = null;
-			var usersIds = FindGroupMembers(groupId);
+			var usersIds = FindGroupMembers(courseId, groupId);
 			if (usersIds == null)
 			{
 				groupId = null;
@@ -321,7 +335,7 @@ namespace uLearn.Web.Controllers
 			using (var transaction = db.Database.BeginTransaction())
 			{
 				IEnumerable<T> checkings;
-				var usersIds = FindGroupMembers(groupId);
+				var usersIds = FindGroupMembers(courseId, groupId);
 				if (usersIds == null)
 				{
 					groupId = null;

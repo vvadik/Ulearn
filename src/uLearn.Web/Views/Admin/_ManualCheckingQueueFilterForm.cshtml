@@ -7,7 +7,11 @@
 
 	<div class="form-group">
 		@{
-			var groupsListItems = new List<SelectListItem> { new SelectListItem { Text = "Все пользователи", Value = "", Selected = !Model.GroupId.HasValue } };
+			var groupsListItems = new List<SelectListItem>
+			{
+				new SelectListItem { Text = "Все пользователи", Value = "", Selected = !Model.GroupId.HasValue },
+				new SelectListItem { Text = "Мои группы", Value = "-1", Selected = Model.GroupId == -1 }
+			};
 			groupsListItems.AddRange(
 				Model.Groups.Select(group => new SelectListItem { Text = group.Name, Value = group.Id.ToString(), Selected = group.Id == Model.GroupId })
 				);
