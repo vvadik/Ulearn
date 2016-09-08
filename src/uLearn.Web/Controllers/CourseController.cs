@@ -337,7 +337,7 @@ namespace uLearn.Web.Controllers
 			InstructorNote instructorNote = courseManager.GetCourse(courseId).FindInstructorNote(unitName);
 			if (instructorNote == null)
 				return HttpNotFound("no instructor note for this unit");
-			return View(instructorNote);
+			return View(new IntructorNoteModel(courseId, instructorNote));
 		}
 
 		[HttpPost]

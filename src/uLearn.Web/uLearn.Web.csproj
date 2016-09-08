@@ -340,6 +340,7 @@
     <Compile Include="Models\CourseVersion.cs" />
     <Compile Include="Models\Group.cs" />
     <Compile Include="Models\GroupMember.cs" />
+    <Compile Include="Models\IntructorNoteModel.cs" />
     <Compile Include="Models\ManualQuizCheckQueueItem.cs" />
     <Compile Include="Models\QuizVersion.cs" />
     <Compile Include="Models\UserSearchQueryModel.cs" />
