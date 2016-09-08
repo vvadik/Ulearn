@@ -15,21 +15,24 @@ namespace uLearn.Web.Models
 
 		[Required]
 		[StringLength(64)]
+		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlide", 1)]
+		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndTime", 1)]
+		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser", 1)]
 		public string CourseId { get; set; }
 
 		[Required]
-		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlide")]
-		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndTime", 1)]
-		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser", 1)]
+		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlide", 2)]
+		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndTime", 2)]
+		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser", 2)]
 		public Guid SlideId { get; set; }
 
 		[Required]
-		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndTime", 2)]
+		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndTime", 3)]
 		public DateTime Timestamp { get; set; }
 
 		[Required]
 		[StringLength(64)]
-		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser", 2)]
+		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser", 3)]
 		public string UserId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
@@ -111,6 +114,10 @@ namespace uLearn.Web.Models
 	{
 		[Required]
 		public int SubmissionId { get; set; }
+
+		[Required]
+		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser", 4)]
+		public bool AllowUserToTryAgain { get; set; }
 
 		public virtual UserExerciseSubmission Submission { get; set; }
 

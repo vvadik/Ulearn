@@ -12,7 +12,11 @@ namespace uLearn.Web.Migrations
             DropForeignKey("dbo.UserSolutions", "UserId", "dbo.AspNetUsers");
 			RenameTable(name: "dbo.UserSolutions", newName: "AutomaticExerciseCheckings");
 			DropIndex("dbo.AutomaticExerciseCheckings", "AcceptedList");
-            DropIndex("dbo.AutomaticExerciseCheckings", new[] { "UserId" });
+
+			/* Remove nulled userids before index destruction */
+			Sql("DELETE FROM dbo.AutomaticExerciseCheckings WHERE UserId IS NULL");
+
+			DropIndex("dbo.AutomaticExerciseCheckings", new[] { "UserId" });
             DropIndex("dbo.AutomaticExerciseCheckings", new[] { "SolutionCodeHash" });
             DropIndex("dbo.AutomaticExerciseCheckings", "IDX_UserSolution_Timestamp");
             DropIndex("dbo.Likes", "UserAndSolution");
@@ -82,6 +86,7 @@ namespace uLearn.Web.Migrations
             
             AddColumn("dbo.AutomaticExerciseCheckings", "Score", c => c.Int(nullable: false));
             AddColumn("dbo.Likes", "SubmissionId", c => c.Int(nullable: false));
+
             AlterColumn("dbo.AutomaticExerciseCheckings", "UserId", c => c.String(nullable: false, maxLength: 128));
             CreateIndex("dbo.AutomaticExerciseCheckings", "SlideId", name: "IDX_AbstractSlideChecking_AbstractSlideCheckingBySlide");
             CreateIndex("dbo.AutomaticExerciseCheckings", new[] { "SlideId", "Timestamp" }, name: "IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndTime");
