@@ -220,14 +220,15 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<string> FindGroupMembers(string courseId, int? groupId)
 		{
-			if (!groupId.HasValue)
+			/* if groupId < 0, get all users */
+			if (groupId.HasValue && groupId.Value < 0)
 				return null;
 
-			/* if groupId <  get members of all own groups */
-			if (groupId.Value < 0)
+			/* if groupId is null, get memers of all own groups */
+			if (! groupId.HasValue)
 			{
 				var ownGroupsIds = groupsRepo.GetGroupsOwnedByUser(courseId, User).Select(g => g.Id).ToList();
-				List<string> usersIds = new List<string>();
+				var usersIds = new List<string>();
 				foreach (var ownGroupId in ownGroupsIds)
 				{
 					var groupUsersIds = groupsRepo.GetGroupMembers(ownGroupId).Select(u => u.Id).ToList();
