@@ -20,6 +20,9 @@ namespace uLearn.Web.Models
 		public ManualQuizChecking ManualQuizCheckQueueItem { get; set; }
 		public bool CanUserFillQuiz { get; set; }
 
+		/* GroupId != null if instructor filtered users by group and see their works */
+		public int? GroupId { get; set; }
+
 		public int Score
 		{
 			get { return ResultsForQuizes == null ? 0 : ResultsForQuizes.AsEnumerable().Sum(res => res.Value); }

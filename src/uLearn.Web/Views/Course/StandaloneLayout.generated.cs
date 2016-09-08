@@ -95,7 +95,8 @@ WebViewPage.WriteTo(@__razor_helper_writer, SlideHtml.Slide(new BlockRenderConte
 							).ToArray(),
 							false,
 							true
-						)
+						),
+						null
 					));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n");

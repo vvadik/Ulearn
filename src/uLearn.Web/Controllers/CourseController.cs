@@ -5,9 +5,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web.DynamicData;
 using System.Web.Mvc;
-using System.Web.Routing;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -40,7 +38,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[AllowAnonymous]
-		public async Task<ActionResult> SlideById(string courseId, string slideId="", int? checkQueueItemId=null)
+		public async Task<ActionResult> SlideById(string courseId, string slideId="", int? checkQueueItemId=null, int? groupId=null)
 		{
 			if (slideId.Contains("_"))
 				slideId = slideId.Substring(slideId.LastIndexOf('_') + 1);
@@ -87,7 +85,7 @@ namespace uLearn.Web.Controllers
 
 			var model = isGuest ?
 				CreateGuestCoursePageModel(courseId, slideGuid, visibleUnits) :
-				await CreateCoursePageModel(courseId, slideGuid, visibleUnits, queueItem, fillExerciseAgain);
+				await CreateCoursePageModel(courseId, slideGuid, visibleUnits, queueItem, fillExerciseAgain, groupId);
 
 			if (!string.IsNullOrEmpty(Request.QueryString["error"]))
 				model.Error = Request.QueryString["error"];
@@ -220,7 +218,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits, AbstractManualSlideChecking manualChecking, bool fillExerciseAgain=false)
+		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits, AbstractManualSlideChecking manualChecking, bool fillExerciseAgain=false, int? groupId=null)
 		{
 			var course = courseManager.GetCourse(courseId);
 
@@ -248,7 +246,7 @@ namespace uLearn.Web.Controllers
 				Slide = slide,
 				Rate = GetRate(course.Id, slideId),
 				Score = score,
-				BlockRenderContext = CreateRenderContext(course, slide, visiter, false, manualChecking, fillExerciseAgain),
+				BlockRenderContext = CreateRenderContext(course, slide, visiter, false, manualChecking, fillExerciseAgain, groupId),
 				ManualChecking = manualChecking,
 				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
 				IsGuest = false,
@@ -256,9 +254,9 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, Visit visit, bool isLti = false, AbstractManualSlideChecking manualChecking=null, bool fillExerciseAgain=false)
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, Visit visit, bool isLti = false, AbstractManualSlideChecking manualChecking=null, bool fillExerciseAgain=false, int? groupId=null)
 		{
-			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visit, isLti, fillExerciseAgain)).ToArray();
+			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visit, isLti, manualChecking, fillExerciseAgain)).ToArray();
 			return new BlockRenderContext(
 				course,
 				slide,
@@ -266,30 +264,34 @@ namespace uLearn.Web.Controllers
 				blockData,
 				false,
 				User.HasAccessFor(course.Id, CourseRole.Instructor),
-				manualChecking
+				manualChecking,
+				false,
+				groupId
 				);
 		}
 
-		private dynamic CreateBlockData(Course course, Slide slide, SlideBlock slideBlock, Visit visit, bool isLti, bool fillExerciseAgain=false)
+		private dynamic CreateBlockData(Course course, Slide slide, SlideBlock slideBlock, Visit visit, bool isLti, AbstractManualSlideChecking manualChecking, bool fillExerciseAgain = false)
 		{
 			if (slideBlock is ExerciseBlock)
 			{
-				var lastAcceptedSubmission = solutionsRepo.FindLatestAcceptedSubmission(course.Id, slide.Id, visit.UserId);
-				var lastAcceptedSolution = lastAcceptedSubmission?.SolutionCode.Text;
-				var lastAcceptedSubmissionReviews = lastAcceptedSubmission?.ManualCheckings.LastOrDefault()?.Reviews.Where(r => ! r.IsDeleted);
+				var submission = manualChecking != null ?
+					((ManualExerciseChecking)manualChecking).Submission :
+					solutionsRepo.FindLatestAcceptedSubmission(course.Id, slide.Id, visit.UserId);
+				var solution = submission?.SolutionCode.Text;
+				var submissionReviews = submission?.ManualCheckings.LastOrDefault()?.Reviews.Where(r => ! r.IsDeleted);
 
-				var hasUncheckedReview = lastAcceptedSubmission?.ManualCheckings.Any(c => !c.IsChecked) ?? false;
-				var hasCheckedReview = lastAcceptedSubmission?.ManualCheckings.Any(c => c.IsChecked) ?? false;
+				var hasUncheckedReview = submission?.ManualCheckings.Any(c => !c.IsChecked) ?? false;
+				var hasCheckedReview = submission?.ManualCheckings.Any(c => c.IsChecked) ?? false;
 				var reviewState = hasCheckedReview ? ExerciseReviewState.Reviewed :
 					hasUncheckedReview ? ExerciseReviewState.WaitingForReview :
 						ExerciseReviewState.NotReviewed;
 				if (fillExerciseAgain)
 					reviewState = ExerciseReviewState.NotReviewed;
 
-				return new ExerciseBlockData(course.Id, slide.Index, true, visit.IsSkipped, lastAcceptedSolution)
+				return new ExerciseBlockData(course.Id, slide.Index, true, visit.IsSkipped, solution)
 				{
 					Url = Url,
-					Reviews = lastAcceptedSubmissionReviews?.ToList(),
+					Reviews = submissionReviews?.ToList() ?? new List<ExerciseCodeReview>(),
 					IsLti = isLti,
 					ReviewState = reviewState,
 				};

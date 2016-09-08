@@ -41,7 +41,7 @@
 							@Model.ManualChecking.Timestamp.ToPrettyString()
 						</p>
 					}
-					@SlideHtml.Blocks(Model.BlockRenderContext)
+					@SlideHtml.Blocks(Model.BlockRenderContext, Html)
 				}
 
 			</div>
@@ -92,7 +92,7 @@
 		<script>
 			getHints("@Model.CourseId", "@Model.Slide.Index", '@e.Exercise.HintsMd.Count')
 		</script>
-		<script> refreshPreviousDraft('@(data.LatestAcceptedSolution != null)', '@e.Id') </script>
+		<script> refreshPreviousDraft('@(data.Solution != null)', '@e.Id') </script>
 	}
 
 

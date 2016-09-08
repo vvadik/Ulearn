@@ -25,7 +25,6 @@ namespace uLearn.Web.Controllers
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly QuizzesRepo quizzesRepo;
 		private readonly CoursesRepo coursesRepo;
-		private readonly UserQuizzesRepo userQuizzesRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 
@@ -38,7 +37,6 @@ namespace uLearn.Web.Controllers
 			userManager = new ULearnUserManager();
 			quizzesRepo = new QuizzesRepo(db);
 			coursesRepo = new CoursesRepo(db);
-			userQuizzesRepo = new UserQuizzesRepo(db);
 			groupsRepo = new GroupsRepo(db);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 		}
@@ -220,14 +218,34 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		private ActionResult ManualCheckingQueue<T>(string actionName, string viewName, string courseId, string message = "") where T : AbstractManualSlideChecking
+		private IEnumerable<string> FindGroupMembers(int? groupId)
+		{
+			if (!groupId.HasValue)
+				return null;
+			var group = groupsRepo.FindGroupById(groupId.Value);
+			if (group != null && groupsRepo.IsGroupAvailableForUser(group.Id, User))
+				return groupsRepo.GetGroupMembers(group.Id).Select(u => u.Id);
+			return null;
+		}
+
+		private ActionResult ManualCheckingQueue<T>(string actionName, string viewName, string courseId, int? groupId, string message = "") where T : AbstractManualSlideChecking
 		{
 			var course = courseManager.GetCourse(courseId);
-			var checkings = slideCheckingsRepo.GetManualCheckingQueue<T>(courseId).ToList();
+
+			List<T> checkings = null;
+			var usersIds = FindGroupMembers(groupId);
+			if (usersIds == null)
+			{
+				groupId = null;
+				checkings = slideCheckingsRepo.GetManualCheckingQueue<T>(courseId).ToList();
+			}
+			else
+				checkings = slideCheckingsRepo.GetManualCheckingQueue<T>(courseId, usersIds).ToList();
 
 			if (!checkings.Any() && !string.IsNullOrEmpty(message))
-				return RedirectToAction(actionName, new { courseId });
+				return RedirectToAction(actionName, new { courseId, groupId });
 
+			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
 			return View(viewName, new ManualCheckingQueueViewModel
 			{
 				CourseId = courseId,
@@ -236,26 +254,36 @@ namespace uLearn.Web.Controllers
 					CheckingQueueItem = c,
 					ContextSlideTitle = course.GetSlideById(c.SlideId).Title
 				}).ToList(),
+				Groups = groups,
+				GroupId = groupId,
 				Message = message,
 			});
 		}
 
-		public ActionResult ManualQuizCheckingQueue(string courseId, string message="")
+		public ActionResult ManualQuizCheckingQueue(string courseId, int? groupId, string message="")
 		{
-			return ManualCheckingQueue<ManualQuizChecking>("ManualQuizCheckingQueue", "ManualQuizCheckingQueue", courseId, message);
+			return ManualCheckingQueue<ManualQuizChecking>("ManualQuizCheckingQueue", "ManualQuizCheckingQueue", courseId, groupId, message);
 		}
 
-		public ActionResult ManualExerciseCheckingQueue(string courseId, string message="")
+		public ActionResult ManualExerciseCheckingQueue(string courseId, int? groupId, string message="")
 		{
-			return ManualCheckingQueue<ManualExerciseChecking>("ManualExerciseCheckingQueue", "ManualExerciseCheckingQueue", courseId, message);
+			return ManualCheckingQueue<ManualExerciseChecking>("ManualExerciseCheckingQueue", "ManualExerciseCheckingQueue", courseId, groupId, message);
 		}
 
-		private async Task<ActionResult> InternalManualCheck<T>(string actionName, int queueItemId, bool ignoreLock = false) where T : AbstractManualSlideChecking
+		private async Task<ActionResult> InternalManualCheck<T>(string courseId, string actionName, int queueItemId, bool ignoreLock = false, int? groupId = null) where T : AbstractManualSlideChecking
 		{
 			T checking;
 			using (var transaction = db.Database.BeginTransaction())
 			{
 				checking = slideCheckingsRepo.FindManualCheckingById<T>(queueItemId);
+				if (checking == null)
+					return RedirectToAction(actionName,
+						new
+						{
+							courseId = courseId,
+							message = "already_checked"
+						});
+
 				if (!User.HasAccessFor(checking.CourseId, CourseRole.Instructor))
 					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
@@ -269,11 +297,11 @@ namespace uLearn.Web.Controllers
 
 				if (checking.IsLocked && !ignoreLock && !checking.IsLockedBy(User.Identity))
 					return RedirectToAction(actionName,
-							new
-							{
-								courseId = checking.CourseId,
-								message = "locked"
-							});
+						new
+						{
+							courseId = checking.CourseId,
+							message = "locked"
+						});
 
 				await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId());
 				transaction.Commit();
@@ -283,48 +311,55 @@ namespace uLearn.Web.Controllers
 			{
 				checking.CourseId,
 				checking.SlideId,
-				CheckQueueItemId = checking.Id
+				CheckQueueItemId = checking.Id,
+				GroupId = groupId,
 			});
 		}
 
-		public async Task<ActionResult> CheckNextManualCheckingForSlide<T>(string actionName, string courseId, Guid slideId) where T : AbstractManualSlideChecking
+		public async Task<ActionResult> CheckNextManualCheckingForSlide<T>(string actionName, string courseId, Guid slideId, int? groupId) where T : AbstractManualSlideChecking
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var queueItems = slideCheckingsRepo.GetManualCheckingQueue<T>(courseId, slideId);
-				var itemToCheck = queueItems.FirstOrDefault(i => i.LockedById == null);
+				IEnumerable<T> checkings;
+				var usersIds = FindGroupMembers(groupId);
+				if (usersIds == null)
+				{
+					groupId = null;
+					checkings = slideCheckingsRepo.GetManualCheckingQueue<T>(courseId, slideId);
+				}
+				else
+					checkings = slideCheckingsRepo.GetManualCheckingQueue<T>(courseId, slideId, usersIds);
+
+				var itemToCheck = checkings.FirstOrDefault(i => ! i.IsLocked);
 				if (itemToCheck == null)
-					return RedirectToAction(actionName, new { courseId, message = "slide_checked" });
-
-				if (itemToCheck.CourseId != courseId)
-					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-
+					return RedirectToAction(actionName, new { courseId, groupId, message = "slide_checked" });
+				
 				await slideCheckingsRepo.LockManualChecking(itemToCheck, User.Identity.GetUserId());
 
 				transaction.Commit();
 
-				return await InternalManualCheck<T>(actionName, itemToCheck.Id, true);
+				return await InternalManualCheck<T>(courseId, actionName, itemToCheck.Id, true, groupId);
 			}
 		}
 
-		public async Task<ActionResult> CheckQuiz(int id)
+		public async Task<ActionResult> CheckQuiz(string courseId, int id, int? groupId)
 		{
-			return await InternalManualCheck<ManualQuizChecking>("ManualQuizCheckingQueue", id);
+			return await InternalManualCheck<ManualQuizChecking>(courseId, "ManualQuizCheckingQueue", id, false, groupId);
 		}
 
-		public async Task<ActionResult> CheckExercise(int id)
+		public async Task<ActionResult> CheckExercise(string courseId, int id, int? groupId)
 		{
-			return await InternalManualCheck<ManualExerciseChecking>("ManualExerciseCheckingQueue", id);
+			return await InternalManualCheck<ManualExerciseChecking>(courseId, "ManualExerciseCheckingQueue", id, false, groupId);
 		}
 
-		public async Task<ActionResult> CheckNextQuizForSlide(string courseId, Guid slideId)
+		public async Task<ActionResult> CheckNextQuizForSlide(string courseId, Guid slideId, int? groupId)
 		{
-			return await CheckNextManualCheckingForSlide<ManualQuizChecking>("ManualQuizCheckingQueue", courseId, slideId);
+			return await CheckNextManualCheckingForSlide<ManualQuizChecking>("ManualQuizCheckingQueue", courseId, slideId, groupId);
 		}
 
-		public async Task<ActionResult> CheckNextExerciseForSlide(string courseId, Guid slideId)
+		public async Task<ActionResult> CheckNextExerciseForSlide(string courseId, Guid slideId, int? groupId)
 		{
-			return await CheckNextManualCheckingForSlide<ManualExerciseChecking>("ManualExerciseCheckingQueue", courseId, slideId);
+			return await CheckNextManualCheckingForSlide<ManualExerciseChecking>("ManualExerciseCheckingQueue", courseId, slideId, groupId);
 		}
 
 		[HttpPost]
@@ -495,7 +530,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Groups", new {courseId});
 		}
 
-		private bool CanModifyGroup(Group group)
+		private bool CanSeeAndModifyGroup(Group group)
 		{
 			var courseId = group.CourseId;
 			if (groupsRepo.CanUserSeeAllCourseGroups(User, courseId))
@@ -506,8 +541,8 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		public async Task<ActionResult> AddUserToGroup(int groupId, string userId)
 		{
-			var group = groupsRepo.GetGroupById(groupId);
-			if (!CanModifyGroup(group))
+			var group = groupsRepo.FindGroupById(groupId);
+			if (!CanSeeAndModifyGroup(group))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			var added = await groupsRepo.AddUserToGroup(groupId, userId);
 
@@ -517,8 +552,8 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		public async Task<ActionResult> RemoveUserFromGroup(int groupId, string userId)
 		{
-			var group = groupsRepo.GetGroupById(groupId);
-			if (!CanModifyGroup(group))
+			var group = groupsRepo.FindGroupById(groupId);
+			if (!CanSeeAndModifyGroup(group))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			await groupsRepo.RemoveUserFromGroup(groupId, userId);
 
@@ -528,8 +563,8 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		public async Task<ActionResult> UpdateGroup(int groupId, string name, bool isPublic)
 		{
-			var group = groupsRepo.GetGroupById(groupId);
-			if (!CanModifyGroup(group))
+			var group = groupsRepo.FindGroupById(groupId);
+			if (!CanSeeAndModifyGroup(group))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			await groupsRepo.ModifyGroup(groupId, name, isPublic);
 
@@ -539,8 +574,8 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		public async Task<ActionResult> RemoveGroup(int groupId)
 		{
-			var group = groupsRepo.GetGroupById(groupId);
-			if (!CanModifyGroup(group))
+			var group = groupsRepo.FindGroupById(groupId);
+			if (!CanSeeAndModifyGroup(group))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			await groupsRepo.RemoveGroup(groupId);
 
@@ -550,8 +585,8 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		public async Task<ActionResult> EnableGroupInviteLink(int groupId, bool isEnabled)
 		{
-			var group = groupsRepo.GetGroupById(groupId);
-			if (!CanModifyGroup(group))
+			var group = groupsRepo.FindGroupById(groupId);
+			if (!CanSeeAndModifyGroup(group))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			await groupsRepo.EnableGroupInviteLink(groupId, isEnabled);
 
@@ -623,6 +658,8 @@ namespace uLearn.Web.Controllers
 		public string CourseId { get; set; }
 		public List<ManualCheckingQueueItemViewModel> Checkings { get; set; }
 		public string Message { get; set; }
+		public List<Group> Groups { get; set; }
+		public int? GroupId { get; set; }
 	}
 
 	public class ManualCheckingQueueItemViewModel

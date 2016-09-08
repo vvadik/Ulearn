@@ -17,6 +17,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
+		private readonly UsersRepo usersRepo = new UsersRepo();
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
@@ -79,10 +80,13 @@ namespace uLearn.Web.Controllers
 				};
 
 			var automaticChecking = submission.AutomaticChecking;
-			var countAlreadyDoneReviews = slideCheckingsRepo.GetCountCheckedManualExerciseCheckings(courseId, exerciseSlide.Id, userId);
-			var sendToReview = exerciseBlock.RequireReview && automaticChecking.IsRightAnswer && countAlreadyDoneReviews <= exerciseBlock.MaxReviewAttempts;
+			var countAlreadyDoneReviews = slideCheckingsRepo.GetCountCheckedOrLockedManualExerciseCheckings(courseId, exerciseSlide.Id, userId);
+			var sendToReview = exerciseBlock.RequireReview && automaticChecking.IsRightAnswer && countAlreadyDoneReviews < exerciseBlock.MaxReviewAttempts;
 			if (sendToReview)
+			{
+				await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, exerciseSlide.Id, userId);
 				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission);
+			}
 			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, userId);
 
 			return new RunSolutionResult
@@ -124,10 +128,22 @@ namespace uLearn.Web.Controllers
 				reviewInfo.StartPosition = reviewInfo.FinishPosition;
 				reviewInfo.FinishPosition = tmp;
 			}
+			
+			var review = await slideCheckingsRepo.AddExerciseCodeReview(checking, User.Identity.GetUserId(), reviewInfo.StartLine, reviewInfo.StartPosition, reviewInfo.FinishLine, reviewInfo.FinishPosition, reviewInfo.Comment);
+			var author = usersRepo.FindUserById(User.Identity.GetUserId());
 
-			await slideCheckingsRepo.AddExerciseCodeReview(checking, User.Identity.GetUserId(), reviewInfo.StartLine, reviewInfo.StartPosition, reviewInfo.FinishLine, reviewInfo.FinishPosition, reviewInfo.Comment);
-
-			return Json(new { status = "ok", review = reviewInfo });
+			return Json(new {
+				status = "ok",
+				review = new {
+					review.Id,
+					review.Comment,
+					review.StartLine,
+					review.StartPosition,
+					review.FinishLine,
+					review.FinishPosition,
+					AuthorName = author.VisibleName,
+				}
+			});
 		}
 
 		[System.Web.Mvc.HttpPost]

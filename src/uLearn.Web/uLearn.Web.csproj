@@ -1398,6 +1398,7 @@
     <Content Include="Views\Account\JoinGroup.cshtml" />
     <Content Include="Views\Course\CourseInstructorNavbar.cshtml" />
     <Content Include="Views\Admin\ManualExerciseCheckingQueue.cshtml" />
+    <Content Include="Views\Admin\_ManualCheckingQueueFilterForm.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

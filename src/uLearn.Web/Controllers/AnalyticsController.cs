@@ -110,7 +110,8 @@ namespace uLearn.Web.Controllers
 			{
 				if (!groupsRepo.IsGroupAvailableForUser(groupId.Value, User))
 					groupId = null;
-				filteredUsersIds = groupsRepo.GetGroupMembers(groupId.Value).Select(u => u.Id).ToList();
+				else
+					filteredUsersIds = groupsRepo.GetGroupMembers(groupId.Value).Select(u => u.Id).ToList();
 			}
 
 			/* Dictionary<SlideId, List<Visit>> */

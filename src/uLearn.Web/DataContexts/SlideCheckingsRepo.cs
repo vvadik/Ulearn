@@ -76,9 +76,21 @@ namespace uLearn.Web.DataContexts
 			}
 		}
 
-		public int GetCountCheckedManualExerciseCheckings(string courseId, Guid slideId, string userId)
+		public int GetCountCheckedOrLockedManualExerciseCheckings(string courseId, Guid slideId, string userId)
 		{
-			return GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).Count(c => c.IsChecked);
+			return GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).Count(c => c.IsChecked || c.IsLocked);
+		}
+
+		public async Task RemoveWaitingManualExerciseCheckings(string courseId, Guid slideId, string userId)
+		{
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				var checkings = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).Where(c => !c.IsChecked && !c.IsLocked);
+				foreach (var checking in checkings)
+					db.ManualExerciseCheckings.Remove(checking);
+				await db.SaveChangesAsync();
+				transaction.Commit();
+			}
 		}
 
 		private IEnumerable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId) where T: AbstractSlideChecking
@@ -133,10 +145,20 @@ namespace uLearn.Web.DataContexts
 				query = query.Where(c => slidesIds.Contains(c.SlideId));
 			return query.OrderBy(c => c.Timestamp);
 		}
-
+		
 		public IEnumerable<T> GetManualCheckingQueue<T>(string courseId, Guid slideId) where T : AbstractManualSlideChecking
 		{
 			return GetManualCheckingQueue<T>(courseId, new List<Guid> { slideId });
+		}
+
+		public IEnumerable<T> GetManualCheckingQueue<T>(string courseId, IEnumerable<string> usersIds) where T : AbstractManualSlideChecking
+		{
+			return GetManualCheckingQueue<T>(courseId).Where(c => usersIds.Contains(c.UserId));
+		}
+
+		public IEnumerable<T> GetManualCheckingQueue<T>(string courseId, Guid slideId, IEnumerable<string> usersIds) where T : AbstractManualSlideChecking
+		{
+			return GetManualCheckingQueue<T>(courseId, slideId).Where(c => usersIds.Contains(c.UserId));
 		}
 
 		public T FindManualCheckingById<T>(int id) where T : AbstractManualSlideChecking

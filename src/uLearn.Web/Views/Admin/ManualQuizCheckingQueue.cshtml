@@ -7,6 +7,8 @@
 <div class="container">
 	<h1>Очередь на проверку</h1>
 
+	@Html.Partial("_ManualCheckingQueueFilterForm", Model)
+
 	@if (! string.IsNullOrEmpty(Model.Message) && Model.Checkings.Count > 0)
 	{
 		<div class="alert alert-danger">
@@ -60,12 +62,12 @@
 					</p>
 					if (check.IsLockedBy(User.Identity))
 					{
-						@Html.ActionLink("Вернуться к проверке →", "CheckQuiz", new { id = check.Id }, new { @class = "btn btn-sm btn-primary" })
+						@Html.ActionLink("Вернуться к проверке →", "CheckQuiz", new { Model.CourseId, check.Id, Model.GroupId }, new { @class = "btn btn-sm btn-primary" })
 					}
 				}
 				else
 				{
-					@Html.ActionLink("Перейти к проверке →", "CheckQuiz", new { id = check.Id }, new { @class = "btn btn-sm btn-success" })
+					@Html.ActionLink("Перейти к проверке →", "CheckQuiz", new { Model.CourseId, check.Id, Model.GroupId }, new { @class = "btn btn-sm btn-success" })
 				}
 			</div>
 			<hr/>

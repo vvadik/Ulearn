@@ -8,18 +8,18 @@
 @* ReSharper restore RedundantUsingDirective *@
 
 
-@helper Slide(BlockRenderContext context, int currentScore = 0)
+@helper Slide(BlockRenderContext context, HtmlHelper Html, int currentScore = 0)
 {
 	<div class="slide">
 		<h1>
 			@context.Slide.Title
 			<span class="score">@Score(currentScore, context.Slide.MaxScore)</span>
 		</h1>
-		@Blocks(context)
+		@Blocks(context, Html)
 	</div>
 }
 
-@helper Blocks(BlockRenderContext context)
+@helper Blocks(BlockRenderContext context, HtmlHelper Html)
 {
 	foreach (var blockRange in context.Slide.GetBlocksRangesWithSameVisibility())
 	{
@@ -27,7 +27,7 @@
 		{
 			foreach (var block in blockRange)
 			{
-				@Block((dynamic)block, context)
+				@Block((dynamic)block, context, Html)
 			}
 		}
 		else if (context.RevealHidden)
@@ -35,14 +35,14 @@
 			<div class='revealed' data-toggle="tooltip" data-placement="left" title="Этот блок студенты не видят">
 				@foreach (var block in blockRange)
 				{
-					@Block((dynamic)block, context)
+					@Block((dynamic)block, context, Html)
 				}
 			</div>
 		}
 	}
 }
 
-@helper Block(AbstractQuestionBlock block, BlockRenderContext context)
+@helper Block(AbstractQuestionBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	var mark = "";
 	var style = "";
@@ -99,17 +99,17 @@
 	@(maxScore == 0 ? "" : string.Format("{0}/{1}", currentScore, maxScore))
 }
 
-@helper Block(MdBlock block, BlockRenderContext context)
+@helper Block(MdBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	@MvcHtmlString.Create(block.Markdown.RenderMd(context.BaseUrl))
 }
 
-@helper Block(CodeBlock block, BlockRenderContext context)
+@helper Block(CodeBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	<textarea class="code code-sample" data-lang="@block.LangId" data-ver="@block.LangVer">@block.Code</textarea>
 }
 
-@helper Block(TexBlock block, BlockRenderContext context)
+@helper Block(TexBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	foreach (var texLine in block.TexLines)
 	{
@@ -117,7 +117,7 @@
 	}
 }
 
-@helper Block(YoutubeBlock block, BlockRenderContext context)
+@helper Block(YoutubeBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	<div class="video-container">
 		<iframe class="embedded-video" width="864" height="480" src="https://www.youtube.com/embed/@block.VideoId" frameborder="0" allowfullscreen></iframe>
@@ -133,7 +133,7 @@
 	</div>
 }
 
-@helper Block(ImageGaleryBlock block, BlockRenderContext context)
+@helper Block(ImageGaleryBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	<div class="flexslider">
 		<ul class="slides">
@@ -159,7 +159,7 @@
 	@RunErrors()
 }
 
-@helper Block(ExerciseBlock block, BlockRenderContext context)
+@helper Block(ExerciseBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData(context.Course.Id, context.Slide.Index);
 	var acceptedSolutionUrl = data.Url.Action("AcceptedSolutions", "Course", new { courseId = context.Course.Id, slideIndex = context.Slide.Index });
@@ -219,14 +219,14 @@
 						}
 					</div>
 					<div class="exercise__review__comment">
-						@review.Comment
+						@Html.Raw(Html.EncodeMultiLineText(review.Comment))
 					</div>
 				</div>
 			}
 		</div>
 	}
 	<textarea id="secretCodeExercise" class="hide">@block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
-	<textarea class="code @classString" data-lang="@block.LangId">@(data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+	<textarea class="code @classString" data-lang="@block.LangId">@(data.Solution ?? block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 	<script type="text/javascript">
 		function cleanUserCode() {
 			var $secretCodeExercise = $('#secretCodeExercise');
@@ -307,8 +307,8 @@
 
 		<form method="POST" action="@data.Url.Action("ScoreExercise", "Exercise")">
 			<input type="hidden" name="id" value="@context.ManualChecking.Id"/>
-			<input type="hidden" name="errorUrl" value="@data.Url.RouteUrl("Course.SlideById", new { courseId = context.Course.Id, slideId = context.Slide.Url, CheckQueueItemId = context.ManualChecking.Id })&amp;error=" />
-			<input type="hidden" name="nextUrl" value="@data.Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId = context.Course.Id })"/>
+			<input type="hidden" name="errorUrl" value="@data.Url.RouteUrl("Course.SlideById", new { courseId = context.Course.Id, slideId = context.Slide.Url, CheckQueueItemId = context.ManualChecking.Id, context.GroupId })&amp;error=" />
+			<input type="hidden" name="nextUrl" value="@data.Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId = context.Course.Id, context.GroupId })"/>
 
 			<h4>Оцените от 0 до @block.MaxReviewScore</h4>
 			<div>
@@ -317,7 +317,7 @@
 
 			<input type="submit" class="btn btn-default" value="Сохранить и вернуться">
 			<input type="submit" class="btn btn-primary" value="Сохранить и перейти к следующему"
-			       data-url="@data.Url.Action("CheckNextExerciseForSlide", "Admin", new { courseID = context.Course.Id, slideId = context.Slide.Id })"
+			       data-url="@data.Url.Action("CheckNextExerciseForSlide", "Admin", new { courseID = context.Course.Id, slideId = context.Slide.Id, context.GroupId })"
 			       onclick="$('[name=nextUrl]').val($(this).data('url'))">
 		</form>
 	}

@@ -73,7 +73,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[AllowAnonymous]
-		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem = null)
+		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem = null, int? groupId=null)
 		{
 			if (isGuest)
 				return PartialView(GuestQuiz(slide, courseId));
@@ -110,7 +110,8 @@ namespace uLearn.Web.Controllers
 				AnswersToQuizes = userAnswers,
 				IsLti = isLti,
 				ManualQuizCheckQueueItem = manualQuizCheckQueueItem,
-				CanUserFillQuiz = canUserFillQuiz
+				CanUserFillQuiz = canUserFillQuiz,
+				GroupId = groupId,
 			};
 
 			if (model.QuizState != QuizState.NotPassed && model.Score == quiz.MaxScore)

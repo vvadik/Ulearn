@@ -7,7 +7,9 @@
 <div class="container">
 	<h1>Очередь на код ревью</h1>
 
-	@if (! string.IsNullOrEmpty(Model.Message) && Model.Checkings.Count > 0)
+	@Html.Partial("_ManualCheckingQueueFilterForm", Model)
+
+	@if (!string.IsNullOrEmpty(Model.Message) && Model.Checkings.Count > 0)
 	{
 		<div class="alert alert-danger">
 			@if (Model.Message == "already_checked")
@@ -60,12 +62,12 @@
 					</p>
 					if (check.IsLockedBy(User.Identity))
 					{
-						@Html.ActionLink("Вернуться к проверке →", "CheckExercise", new { id = check.Id }, new { @class = "btn btn-sm btn-primary" })
+						@Html.ActionLink("Вернуться к проверке →", "CheckExercise", new { Model.CourseId, check.Id, Model.GroupId }, new { @class = "btn btn-sm btn-primary" })
 					}
 				}
 				else
 				{
-					@Html.ActionLink("Перейти к проверке →", "CheckExercise", new { id = check.Id }, new { @class = "btn btn-sm btn-success" })
+					@Html.ActionLink("Перейти к проверке →", "CheckExercise", new { Model.CourseId, check.Id, Model.GroupId }, new { @class = "btn btn-sm btn-success" })
 				}
 			</div>
 			<hr/>

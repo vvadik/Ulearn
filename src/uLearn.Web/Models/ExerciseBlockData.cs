@@ -5,20 +5,21 @@ namespace uLearn.Web.Models
 {
 	public class ExerciseBlockData
 	{
-		public ExerciseBlockData(string courseId, int slideIndex, bool showControls = true, bool isSkipped = true, string latestAcceptedSolution = null)
+		public ExerciseBlockData(string courseId, int slideIndex, bool showControls = true, bool isSkipped = true, string solution = null)
 		{
 			CourseId = courseId;
 			SlideIndex = slideIndex;
 			ShowControls = showControls;
-			LatestAcceptedSolution = latestAcceptedSolution;
-			CanSkip = !isSkipped && LatestAcceptedSolution == null;
+			Solution = solution;
+			CanSkip = !isSkipped && Solution == null;
 			ReviewState = ExerciseReviewState.NotReviewed;
 		}
 
 		public bool ShowControls { get; private set; }
 		public bool CanSkip { get; private set; }
-		public string LatestAcceptedSolution { get; private set; }
+		public string Solution { get; private set; }
 		public UrlHelper Url { get; set; }
+		public HtmlHelper Help { get; set; }
 		private string runSolutionUrl;
 		public string RunSolutionUrl {
 			get

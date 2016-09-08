@@ -44,7 +44,7 @@ namespace uLearn.Web.DataContexts
 
 		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsPublic)
 		{
-			var group = GetGroupById(groupId);
+			var group = FindGroupById(groupId);
 			group.Name = newName;
 			group.IsPublic = newIsPublic;
 			await db.SaveChangesAsync();
@@ -94,7 +94,7 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public Group GetGroupById(int groupId)
+		public Group FindGroupById(int groupId)
 		{
 			return db.Groups.FirstOrDefault(g => g.Id == groupId && ! g.IsDeleted);
 		}
@@ -111,7 +111,7 @@ namespace uLearn.Web.DataContexts
 
 		public bool IsGroupAvailableForUser(int groupId, IPrincipal user)
 		{
-			var group = GetGroupById(groupId);
+			var group = FindGroupById(groupId);
 			/* Course admins can see all groups */
 			if (CanUserSeeAllCourseGroups(user, group.CourseId))
 				return true;
@@ -133,7 +133,7 @@ namespace uLearn.Web.DataContexts
 				return new List<Group>();
 
 			var userId = user.Identity.GetUserId();
-			return db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || g.IsPublic)).ToList();
+			return db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || g.IsPublic)).OrderBy(g => g.OwnerId == userId).ToList();
 		}
 
 		public List<ApplicationUser> GetGroupMembers(int groupId)
