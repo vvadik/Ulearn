@@ -170,7 +170,7 @@ namespace uLearn.Web.Controllers
 
 		[System.Web.Mvc.HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public async Task<ActionResult> ScoreExercise(int id, string nextUrl, int exerciseScore, bool? prohibitFurtherReview, string errorUrl = "")
+		public async Task<ActionResult> ScoreExercise(int id, string nextUrl, int exerciseScore, bool? prohibitFurtherReview, string errorUrl = "", bool recheck = false)
 		{
 			if (string.IsNullOrEmpty(errorUrl))
 				errorUrl = nextUrl;
@@ -179,7 +179,7 @@ namespace uLearn.Web.Controllers
 			{
 				var checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(id);
 
-				if (checking.IsChecked)
+				if (checking.IsChecked && ! recheck)
 					return Redirect(errorUrl + "Эта работа уже была проверена");
 
 				if (!checking.IsLockedBy(User.Identity))
@@ -192,7 +192,8 @@ namespace uLearn.Web.Controllers
 				/* Invalid form: score isn't from range 0..MAX_SCORE */
 				if (exerciseScore < 0 || exerciseScore > exercise.MaxReviewScore)
 					return Redirect(errorUrl + $"Неверное количество баллов: {exerciseScore}");
-				
+
+				checking.ProhibitFurtherManualCheckings = false;
 				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, exerciseScore);
 				if (prohibitFurtherReview.HasValue && prohibitFurtherReview.Value)
 					await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking);

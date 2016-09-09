@@ -9,6 +9,17 @@
 
 	@Html.Partial("_ManualCheckingQueueFilterForm", Model)
 
+	<p>
+		@if (! Model.AlreadyChecked)
+		{
+			@Html.ActionLink("Проверенные работы", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId, done = true }, new { @class="btn btn-xs btn-info" })
+		}
+		else
+		{
+			@Html.ActionLink("← Вернуться в очередь", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId }, new { @class="btn btn-xs btn-info" })
+		}
+	</p>
+
 	@if (!string.IsNullOrEmpty(Model.Message) && Model.Checkings.Count > 0)
 	{
 		<div class="alert alert-danger">
@@ -22,7 +33,7 @@
 			}
 			@if (Model.Message == "slide_checked")
 			{
-				<p>Для этого слайда больше нет непроверенных работ</p>
+				<p>Для этого задания больше нет непроверенных работ</p>
 			}
 			@if (Model.Message == "time_is_over")
 			{
@@ -34,7 +45,7 @@
 	@if (Model.Checkings.Count == 0)
 	{
 		<div class="alert alert-success">Поздравляем, очередь пуста! Работ для проверки нет</div>
-		<div class="text-muted">Здесь будут появляться программы студентов, которые должны быть проверены инструктором вручную.</div>
+		<div class="text-muted">Здесь будут появляться программы студентов, которые должны быть проверены преподавателем вручную.</div>
 	}
 
 	@foreach (var checkModel in Model.Checkings)
@@ -45,20 +56,29 @@
 				@check.User.VisibleName решил задание «@checkModel.ContextSlideTitle»
 			</div>
 			<div>
-				@if (check.IsLocked)
+				@if (Model.AlreadyChecked)
 				{
 					<p>
-						Проверяется инструктором <b>@check.LockedBy.VisibleName</b>,
+						Последний раз проверялась преподавателем <b>@check.LockedBy.VisibleName</b>.
+					</p>
+					<p>
+						@Html.ActionLink("Посмотреть", "CheckExercise", new { Model.CourseId, check.Id, Model.GroupId, recheck = true }, new { })
+					</p>
+				}
+				else if (check.IsLocked)
+				{
+					<p>
+						Проверяется преподавателем <b>@check.LockedBy.VisibleName</b>,
 						заблокирована ещё на @{
-							var minutes = (int)(check.LockedUntil.Value - DateTime.Now).TotalMinutes;
-							@minutes.PluralizeInRussian(new RussianPluralizationOptions
-							{
-								One = "минуту",
-								Two = "минуты",
-								Five = "минут",
-								Gender = Gender.Female,
-							})
-						}
+							                     var minutes = (int)(check.LockedUntil.Value - DateTime.Now).TotalMinutes;
+							                     @minutes.PluralizeInRussian(new RussianPluralizationOptions
+							                     {
+								                     One = "минуту",
+								                     Two = "минуты",
+								                     Five = "минут",
+								                     Gender = Gender.Female,
+							                     })
+						                     }
 					</p>
 					if (check.IsLockedBy(User.Identity))
 					{

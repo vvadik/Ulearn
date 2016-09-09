@@ -133,29 +133,17 @@ namespace uLearn.Web.DataContexts
 			return Math.Max(quizScore, exerciseScore);
 		}
 
-		public IEnumerable<T> GetManualCheckingQueue<T>(string courseId, IEnumerable<Guid> slidesIds=null) where T : AbstractManualSlideChecking
+		public IEnumerable<T> GetManualCheckingQueue<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
 		{
-			var query = db.Set<T>().Where(c => c.CourseId == courseId && !c.IsChecked);
-			if (slidesIds != null)
-				query = query.Where(c => slidesIds.Contains(c.SlideId));
+			var query = db.Set<T>().Where(c => c.CourseId == options.CourseId);
+			query = options.OnlyChecked ? query.Where(c => c.IsChecked) : query.Where(c => !c.IsChecked);
+			if (options.SlidesIds != null)
+				query = query.Where(c => options.SlidesIds.Contains(c.SlideId));
+			if (options.UsersIds != null)
+				query = query.Where(c => options.UsersIds.Contains(c.UserId));
 			return query.OrderBy(c => c.Timestamp);
 		}
 		
-		public IEnumerable<T> GetManualCheckingQueue<T>(string courseId, Guid slideId) where T : AbstractManualSlideChecking
-		{
-			return GetManualCheckingQueue<T>(courseId, new List<Guid> { slideId });
-		}
-
-		public IEnumerable<T> GetManualCheckingQueue<T>(string courseId, IEnumerable<string> usersIds) where T : AbstractManualSlideChecking
-		{
-			return GetManualCheckingQueue<T>(courseId).Where(c => usersIds.Contains(c.UserId));
-		}
-
-		public IEnumerable<T> GetManualCheckingQueue<T>(string courseId, Guid slideId, IEnumerable<string> usersIds) where T : AbstractManualSlideChecking
-		{
-			return GetManualCheckingQueue<T>(courseId, slideId).Where(c => usersIds.Contains(c.UserId));
-		}
-
 		public T FindManualCheckingById<T>(int id) where T : AbstractManualSlideChecking
 		{
 			return db.Set<T>().Find(id);
@@ -232,5 +220,13 @@ namespace uLearn.Web.DataContexts
 			review.Comment = newComment;
 			await db.SaveChangesAsync();
 		}
+	}
+
+	public class ManualCheckingQueueFilterOptions
+	{
+		public string CourseId { get; set; }
+		public IEnumerable<string> UsersIds { get; set; }
+		public IEnumerable<Guid> SlidesIds { get; set; }
+		public bool OnlyChecked { get; set; }
 	}
 }

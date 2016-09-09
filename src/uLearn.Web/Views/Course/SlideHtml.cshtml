@@ -270,35 +270,43 @@
 
 	if (context.ManualChecking != null)
 	{
+		var checking = (ManualExerciseChecking)context.ManualChecking;
+		
 		<div class="text-muted">Выделите участок кода, чтобы оставить комментарий</div>
 
-		<div class="exercise__add-review" style="display: none" data-url="@data.Url.Action("AddExerciseCodeReview", "Exercise", new { courseId = context.Course.Id, checkingId = context.ManualChecking.Id })">
+		<div class="exercise__add-review" style="display: none" data-url="@data.Url.Action("AddExerciseCodeReview", "Exercise", new { courseId = context.Course.Id, checkingId = checking.Id })">
 			<div>Добавить комментарий</div>
 			<textarea class="exercise__add-review__comment"></textarea>
 			<button class="exercise__add-review__button btn btn-success btn-sm">Сохранить</button>
 		</div>
 
-		<form method="POST" action="@data.Url.Action("ScoreExercise", "Exercise")">
-			<input type="hidden" name="id" value="@context.ManualChecking.Id"/>
-			<input type="hidden" name="errorUrl" value="@data.Url.RouteUrl("Course.SlideById", new { courseId = context.Course.Id, slideId = context.Slide.Url, CheckQueueItemId = context.ManualChecking.Id, context.GroupId })&amp;error=" />
-			<input type="hidden" name="nextUrl" value="@data.Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId = context.Course.Id, context.GroupId })"/>
+		<form method="POST" action="@data.Url.Action("ScoreExercise", "Exercise", new { recheck = checking.IsChecked })">
+			<input type="hidden" name="id" value="@checking.Id"/>
+			<input type="hidden" name="errorUrl" value="@data.Url.RouteUrl("Course.SlideById", new { courseId = context.Course.Id, slideId = context.Slide.Url, CheckQueueItemId = checking.Id, context.GroupId })&amp;error="/>
+			<input type="hidden" name="nextUrl" value="@data.Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId = context.Course.Id, context.GroupId, done = checking.IsChecked })"/>
 
 			<h4>Оцените от 0 до @block.MaxReviewScore</h4>
 			<div>
-				<input type="number" class="form-control" min="0" max="@block.MaxReviewScore" name="exerciseScore"/>
+				
+				<input type="number" class="form-control" min="0" max="@block.MaxReviewScore" name="exerciseScore"
+					   value="@(checking.IsChecked ? checking.Score.ToString() : "")"/>
 			</div>
 
 			<div class="checkbox checkbox-default">
-				<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" checked>
+				<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" @(checking.IsChecked && !checking.ProhibitFurtherManualCheckings ? "" : "checked")/>
 				<label for="prohibitFurtherReview">
 					Не принимать больше код ревью у этого студента
 				</label>
 			</div>
 
-			<input type="submit" class="btn btn-default" value="Сохранить и вернуться">
-			<input type="submit" class="btn btn-primary" value="Сохранить и перейти к следующему"
-			       data-url="@data.Url.Action("CheckNextExerciseForSlide", "Admin", new { courseID = context.Course.Id, slideId = context.Slide.Id, context.GroupId })"
-			       onclick="$('[name=nextUrl]').val($(this).data('url'))">
+			<input type="submit" class="btn @(checking.IsChecked ? "btn-primary" : "btn-default")" value="Сохранить и вернуться"/>
+
+			@if (!checking.IsChecked)
+			{
+				<input type="submit" class="btn btn-primary" value="Сохранить и перейти к следующему"
+				       data-url="@data.Url.Action("CheckNextExerciseForSlide", "Admin", new { courseID = context.Course.Id, slideId = context.Slide.Id, context.GroupId })"
+				       onclick="$('[name=nextUrl]').val($(this).data('url'))"/>
+			}
 		</form>
 	}
 }

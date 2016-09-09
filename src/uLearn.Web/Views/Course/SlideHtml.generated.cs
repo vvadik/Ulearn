@@ -664,6 +664,8 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</p>\r\n\t\t</div>\r\n");
 
 	if (context.ManualChecking != null)
 	{
+		var checking = (ManualExerciseChecking)context.ManualChecking;
+		
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"text-muted\">Выделите участок кода, чтобы оставить комментарий</div>" +
 "\r\n");
@@ -674,7 +676,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"text-muted\
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"exercise__add-review\" style=\"display: none\" data-url=\"");
 
 
-                         WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("AddExerciseCodeReview", "Exercise", new { courseId = context.Course.Id, checkingId = context.ManualChecking.Id }));
+                         WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("AddExerciseCodeReview", "Exercise", new { courseId = context.Course.Id, checkingId = checking.Id }));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t<div>Добавить комментарий</div>\r\n\t\t\t<textarea class=\"exercise__add-review_" +
 "_comment\"></textarea>\r\n\t\t\t<button class=\"exercise__add-review__button btn btn-su" +
@@ -686,52 +688,70 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t<div>Добав
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<form method=\"POST\" action=\"");
 
 
-WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("ScoreExercise", "Exercise"));
+WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("ScoreExercise", "Exercise", new { recheck = checking.IsChecked }));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t<input type=\"hidden\" name=\"id\" value=\"");
 
 
-WebViewPage.WriteTo(@__razor_helper_writer, context.ManualChecking.Id);
+WebViewPage.WriteTo(@__razor_helper_writer, checking.Id);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"/>\r\n\t\t\t<input type=\"hidden\" name=\"errorUrl\" value=\"");
 
 
-    WebViewPage.WriteTo(@__razor_helper_writer, data.Url.RouteUrl("Course.SlideById", new { courseId = context.Course.Id, slideId = context.Slide.Url, CheckQueueItemId = context.ManualChecking.Id, context.GroupId }));
+    WebViewPage.WriteTo(@__razor_helper_writer, data.Url.RouteUrl("Course.SlideById", new { courseId = context.Course.Id, slideId = context.Slide.Url, CheckQueueItemId = checking.Id, context.GroupId }));
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "&amp;error=\" />\r\n\t\t\t<input type=\"hidden\" name=\"nextUrl\" value=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "&amp;error=\"/>\r\n\t\t\t<input type=\"hidden\" name=\"nextUrl\" value=\"");
 
 
-   WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId = context.Course.Id, context.GroupId }));
+   WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId = context.Course.Id, context.GroupId, done = checking.IsChecked }));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"/>\r\n\r\n\t\t\t<h4>Оцените от 0 до ");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, block.MaxReviewScore);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</h4>\r\n\t\t\t<div>\r\n\t\t\t\t<input type=\"number\" class=\"form-control\" min=\"0\" max=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</h4>\r\n\t\t\t<div>\r\n\t\t\t\t\r\n\t\t\t\t<input type=\"number\" class=\"form-control\" min=\"0\" max=" +
+"\"");
 
 
                 WebViewPage.WriteTo(@__razor_helper_writer, block.MaxReviewScore);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, @""" name=""exerciseScore""/>
-			</div>
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" name=\"exerciseScore\"\r\n\t\t\t\t\t   value=\"");
 
-			<div class=""checkbox checkbox-default"">
-				<input data-val=""true"" id=""prohibitFurtherReview"" name=""prohibitFurtherReview"" type=""checkbox"" value=""true"" checked>
-				<label for=""prohibitFurtherReview"">
-					Не принимать больше код ревью у этого студента
-				</label>
-			</div>
 
-			<input type=""submit"" class=""btn btn-default"" value=""Сохранить и вернуться"">
-			<input type=""submit"" class=""btn btn-primary"" value=""Сохранить и перейти к следующему""
-			       data-url=""");
+WebViewPage.WriteTo(@__razor_helper_writer, checking.IsChecked ? checking.Score.ToString() : "");
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"/>\r\n\t\t\t</div>\r\n\r\n\t\t\t<div class=\"checkbox checkbox-default\">\r\n\t\t\t\t<input data-val" +
+"=\"true\" id=\"prohibitFurtherReview\" name=\"prohibitFurtherReview\" type=\"checkbox\" " +
+"value=\"true\" ");
+
+
+                                                                      WebViewPage.WriteTo(@__razor_helper_writer, checking.IsChecked && !checking.ProhibitFurtherManualCheckings ? "" : "checked");
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "/>\r\n\t\t\t\t<label for=\"prohibitFurtherReview\">\r\n\t\t\t\t\tНе принимать больше код ревью у" +
+" этого студента\r\n\t\t\t\t</label>\r\n\t\t\t</div>\r\n\r\n\t\t\t<input type=\"submit\" class=\"btn ");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, checking.IsChecked ? "btn-primary" : "btn-default");
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" value=\"Сохранить и вернуться\"/>\r\n\r\n");
+
+
+ 			if (!checking.IsChecked)
+			{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<input type=\"submit\" class=\"btn btn-primary\" value=\"Сохранить и перейти к сле" +
+"дующему\"\r\n\t\t\t\t       data-url=\"");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("CheckNextExerciseForSlide", "Admin", new { courseID = context.Course.Id, slideId = context.Slide.Id, context.GroupId }));
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t       onclick=\"$(\'[name=nextUrl]\').val($(this).data(\'url\'))\">\r\n\t\t</form>\r\n" +
-"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t\t       onclick=\"$(\'[name=nextUrl]\').val($(this).data(\'url\'))\"/>\r\n");
+
+
+			}
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t</form>\r\n");
 
 
 	}

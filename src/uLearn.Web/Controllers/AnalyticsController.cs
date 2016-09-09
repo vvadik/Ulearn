@@ -138,7 +138,8 @@ namespace uLearn.Web.Controllers
 				.GroupBy(s => s.SlideId)
 				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).ToList());
 
-			var manualQuizCheckQueueBySlide = slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(courseId, slidesIds)
+			var manualQuizCheckQueueBySlide = slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(
+				new ManualCheckingQueueFilterOptions { CourseId = courseId, SlidesIds = slidesIds })
 				.Where(i => periodStart <= i.Timestamp && i.Timestamp <= realPeriodFinish)
 				.GroupBy(i => i.SlideId)
 				.ToDictionary(g => g.Key, g => g.ToList());
