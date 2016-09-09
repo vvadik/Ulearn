@@ -95,7 +95,9 @@ namespace uLearn.Web.Migrations
 			Sql("INSERT INTO dbo.UserExerciseSubmissions" +
 				"      ([SlideId], [CourseId], [UserId], [Timestamp], [SolutionCodeHash], [CodeHash], [AutomaticChecking_Id]) " +
 				"SELECT [SlideId], [CourseId], [UserId], [Timestamp], [SolutionCodeHash], [CodeHash], [Id] FROM dbo.AutomaticExerciseCheckings");
-	        Sql("Update dbo.AutomaticExerciseCheckings SET [Score] = 5 WHERE [IsRightAnswer] = 'true'");
+	        Sql("UPDATE dbo.AutomaticExerciseCheckings SET [Score] = 5 WHERE [IsRightAnswer] = 'true'");
+			Sql("UPDATE dbo.Likes SET Likes.SubmissionId = UserExerciseSubmissions.Id FROM dbo.Likes JOIN dbo.UserExerciseSubmissions ON Likes.UserSolutionId = UserExerciseSubmissions.AutomaticChecking_Id");
+	        Sql("DELETE FROM dbo.Likes WHERE SubmissionId = 0");
 
 			CreateIndex("dbo.Likes", new[] { "UserId", "SubmissionId" }, name: "IDX_Like_ByUserAndSubmission");
             AddForeignKey("dbo.Likes", "SubmissionId", "dbo.UserExerciseSubmissions", "Id");
