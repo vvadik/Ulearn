@@ -166,12 +166,13 @@ namespace uLearn.Web.DataContexts
 
 		public List<UserSolution> GetUnhandled(int count)
 		{
-			var hourAgo = DateTime.Now - TimeSpan.FromHours(1);
+			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 			var result = db.UserSolutions
 				.Where(s =>
-					s.Timestamp > hourAgo
+					s.Timestamp > notSoLongAgo
 					&& s.Status == SubmissionStatus.Waiting)
-				.Take(count).ToList();
+					.OrderByDescending(s => s.Timestamp)
+					.Take(count).ToList();
 			foreach (var details in result)
 				details.Status = SubmissionStatus.Running;
 			SaveAll(result);
