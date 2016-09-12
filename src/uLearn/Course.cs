@@ -74,16 +74,14 @@ namespace uLearn
 
 	public class InstructorNote
 	{
-		public InstructorNote(string markdown, string courseId, string unitName, FileInfo file)
+		public InstructorNote(string markdown, string unitName, FileInfo file)
 		{
 			Markdown = markdown;
-			CourseId = courseId;
 			UnitName = unitName;
 			File = file;
 		}
 
 		public string Markdown;
-		public string CourseId;
 		public string UnitName;
 		public FileInfo File;
 	}

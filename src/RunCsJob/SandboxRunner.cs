@@ -30,7 +30,7 @@ namespace RunCsJob
 			{
 				if (submition is ProjRunnerSubmition)
 					return new SandboxRunner(submition).RunMsBuild(pathToCompiler);
-				return new SandboxRunner(submition).RunCsc();
+				return new SandboxRunner(submition).RunCsc60();
 			}
 			catch (Exception ex)
 			{
@@ -108,6 +108,30 @@ namespace RunCsJob
 			RunSandboxer($"\"{Path.GetFullPath(assembly.PathToAssembly)}\" {submition.Id}");
 
 			SafeRemoveFile(assembly.PathToAssembly);
+			return result;
+		}
+
+		public RunningResults RunCsc60()
+		{
+			var res = AssemblyCreator.CreateAssemblyWithRoslyn((FileRunnerSubmition)submition);
+
+			result.Verdict = Verdict.Ok;
+			result.AddCompilationInfo(res.EmitResult.Diagnostics);
+
+			if (result.IsCompilationError())
+			{
+				SafeRemoveFile(res.PathToAssembly);
+				return result;
+			}
+
+			if (!submition.NeedRun)
+			{
+				SafeRemoveFile(res.PathToAssembly);
+				return result;
+			}
+			RunSandboxer($"\"{Path.GetFullPath(res.PathToAssembly)}\" {submition.Id}");
+
+			SafeRemoveFile(res.PathToAssembly);
 			return result;
 		}
 

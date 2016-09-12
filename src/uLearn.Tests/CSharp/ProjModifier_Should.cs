@@ -5,6 +5,7 @@ using System.Text;
 using ApprovalTests;
 using ApprovalTests.Reporters;
 using FluentAssertions;
+using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using NUnit.Framework;
 using uLearn.Model.Blocks;
@@ -14,19 +15,21 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class ProjModifier_Should
 	{
+		private Project CreateTestProject() => new Project(TestProjectFilename, null, null, new ProjectCollection());
+		private string TestProjectFilename => "CSharp/TestProject/ProjDir/test.csproj";
+
 		[Test]
 		public void NotChangeFile_OnModify()
 		{
-			var res = ProjModifier.ModifyCsproj(
-				new FileInfo("CSharp/TestProject/ProjDir/test.csproj"), 
+			ProjModifier.ModifyCsproj(
+				new FileInfo(TestProjectFilename), 
 				p => ProjModifier.PrepareForChecking(p, "AAA"));
-			var project = new Project("CSharp/TestProject/ProjDir/test.csproj");
-			Assert.AreNotEqual("AAA", project.GetProperty("StartupObject"));
+			Assert.AreNotEqual("AAA", CreateTestProject().GetProperty("StartupObject"));
 		}
 		[Test]
 		public void ReplaceLinksWithItems()
 		{
-			var project = new Project("CSharp/TestProject/ProjDir/test.csproj");
+			var project = CreateTestProject();
 			var copies = ProjModifier.ReplaceLinksWithItemsCopiedToProjectDir(project);
 			copies.Should().HaveCount(1);
 			var writer = new StringWriter();

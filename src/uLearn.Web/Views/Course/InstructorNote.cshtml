@@ -1,5 +1,5 @@
 ﻿@using uLearn
-@model InstructorNote
+@model IntructorNoteModel
 
 @{
 	ViewBag.Title = "Заметки преподавателю";
@@ -12,9 +12,9 @@
 	<div class="container body-content">
 		<div class="row">
 			<div class='slide'>
-				<h1>Заметки преподавателю <small>@Model.UnitName</small></h1>
+				<h1>Заметки преподавателю <small>@Model.Note.UnitName</small></h1>
 				<hr/>
-				@Html.Raw(Model.Markdown.RenderMd(Model.File))
+				@Html.Raw(Model.Note.Markdown.RenderMd(Model.Note.File))
 			</div>
 		</div>
 	</div>

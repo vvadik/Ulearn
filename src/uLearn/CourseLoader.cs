@@ -47,7 +47,7 @@ namespace uLearn
 					notes = unitDir.GetFile("InstructorNotes.md")
 				})
 				.Where(unit => unit.notes.Exists)
-				.Select(unit => new InstructorNote(unit.notes.ContentAsUtf8(), courseId, GetTitle(unit.unitDir), unit.notes))
+				.Select(unit => new InstructorNote(unit.notes.ContentAsUtf8(), GetTitle(unit.unitDir), unit.notes))
 				.ToArray();
 		}
 

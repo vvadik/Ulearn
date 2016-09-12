@@ -1,5 +1,7 @@
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using uLearn.Model;
 
 namespace uLearn.Quizes
 {
@@ -7,16 +9,21 @@ namespace uLearn.Quizes
 	{
 		public string Extension => ".quiz.xml";
 
+
 		public Slide Load(FileInfo file, string unitName, int slideIndex, CourseSettings settings)
 		{
 			var quiz = file.DeserializeXml<Quiz>();
-			int index = 1;
-			foreach (var b in quiz.Blocks.OfType<AbstractQuestionBlock>())
-			{
-				b.QuestionIndex = index++;
-			}
+			BuildUp(quiz, file.Directory, settings);
+			quiz.InitQuestionIndices();
 			var slideInfo = new SlideInfo(unitName, file, slideIndex);
 			return new QuizSlide(slideInfo, quiz);
+		}
+
+		public static void BuildUp(Quiz quiz, DirectoryInfo slideDir, CourseSettings settings)
+		{
+			var context = new BuildUpContext(slideDir, settings, null);
+			var blocks = quiz.Blocks.SelectMany(b => b.BuildUp(context, ImmutableHashSet<string>.Empty));
+			quiz.Blocks = blocks.ToArray();
 		}
 	}
 }

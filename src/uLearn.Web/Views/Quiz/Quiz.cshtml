@@ -111,13 +111,13 @@
 		</div>
 	}
 	
-	if (User.HasAccessFor(Model.CourseId, CourseRole.Instructor))
-	{
-		<h2>Статистика ответов</h2>
-		@SwitchablePanel.TimePanel("quiz-statistic",
-			args => Url.Action("Analytics", "Quiz", args),
-			new { courseId = Model.CourseId, slideIndex = Model.Slide.Index },
-			Tuple.Create("За полгода", 365.0 / 2)
-		)
-	}
+@*	if (User.HasAccessFor(Model.CourseId, CourseRole.Instructor))*@
+@*	{*@
+@*		<h2>Статистика ответов</h2>*@
+@*		@SwitchablePanel.TimePanel("quiz-statistic",*@
+@*			args => Url.Action("Analytics", "Quiz", args),*@
+@*			new { courseId = Model.CourseId, slideIndex = Model.Slide.Index },*@
+@*			Tuple.Create("За полгода", 365.0 / 2)*@
+@*		)*@
+@*	}*@
 }

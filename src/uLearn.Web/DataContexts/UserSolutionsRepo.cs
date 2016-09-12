@@ -205,11 +205,12 @@ namespace uLearn.Web.DataContexts
 
 		public List<UserExerciseSubmission> GetUnhandledSubmissions(int count)
 		{
-			var hourAgo = DateTime.Now - TimeSpan.FromHours(1);
+			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 			var submissions = db.UserExerciseSubmissions
 				.Where(s =>
-					s.Timestamp > hourAgo
+					s.Timestamp > notSoLongAgo
 					&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting)
+				.OrderByDescending(s => s.Timestamp)
 				.Take(count).ToList();
 			foreach (var submission in submissions)
 				submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
