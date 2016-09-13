@@ -130,11 +130,11 @@ namespace uLearn.Web.Controllers
 			);
 
 			/* Dictionary<SlideId, List<UserSolution> (distinct by user)> */
-			var exercisesSolutions = userSolutionsRepo.GetAllAcceptedSolutions(courseId, slidesIds, periodStart, realPeriodFinish)
+			var exercisesSolutions = userSolutionsRepo.GetAllSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
 				.GroupBy(s => s.SlideId)
 				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).ToList());
 
-			var exercisesAcceptedSolutions = userSolutionsRepo.GetAllAcceptedSolutions(courseId, slidesIds, periodStart, realPeriodFinish)
+			var exercisesAcceptedSolutions = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
 				.GroupBy(s => s.SlideId)
 				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).ToList());
 

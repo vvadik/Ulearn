@@ -121,7 +121,7 @@ namespace uLearn.Web.DataContexts
 			);
 		}
 
-		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSolutions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
+		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
 		{
 			return GetAllSubmissions(courseId, slidesIds, periodStart, periodFinish).Where(s => s.AutomaticChecking.IsRightAnswer);
 		}
