@@ -19,8 +19,7 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult Index(int max = 200, int skip = 0)
 		{
-			var submissions = solutionsRepo
-				.GetAllSolutions(max, skip).ToList();
+			var submissions = solutionsRepo.GetAllSubmissions(max, skip).ToList();
 			return View(new SubmissionsListModel
 			{
 				Submissions = submissions
@@ -37,33 +36,45 @@ namespace uLearn.Web.Controllers
 		{
 			var code = Request.InputStream.GetString();
 
-			var solution = await solutionsRepo.RunUserSolution(
+			var submission = await solutionsRepo.RunUserSolution(
 				"web", Guid.Empty, User.Identity.GetUserId(),
 				code, null, null, false, "null",
 				User.Identity.Name + ": CsSandbox Web Executor", timeout
 				);
 
+			if (submission == null)
+				return Json(new RunSolutionResult
+				{
+					CompilationError = "Что-то пошло не так :(",
+					IsCompileError = true,
+				});
+
+			var automaticChecking = submission.AutomaticChecking;
+
 			return Json(new RunSolutionResult
 			{
-				ActualOutput = solution.Output.Text,
-				CompilationError = solution.CompilationError.Text,
-				ExecutionServiceName = solution.ExecutionServiceName,
-				IsCompileError = solution.IsCompilationError,
-				IsRightAnswer = solution.IsRightAnswer
+				ActualOutput = automaticChecking.Output.Text,
+				CompilationError = automaticChecking.CompilationError.Text,
+				ExecutionServiceName = automaticChecking.ExecutionServiceName,
+				IsCompileError = automaticChecking.IsCompilationError,
+				IsRightAnswer = automaticChecking.IsRightAnswer
 			});
 		}
 
 		public ActionResult GetDetails(int id)
 		{
-			var details = solutionsRepo.GetDetails(id);
+			var submission = solutionsRepo.FindSubmission(id);
 
-			details.SolutionCode.Text = ((ExerciseSlide)courseManager
-				.GetCourse(details.CourseId)
-				.GetSlideById(details.SlideId))
+			if (submission == null)
+				return HttpNotFound();
+
+			submission.SolutionCode.Text = ((ExerciseSlide)courseManager
+				.GetCourse(submission.CourseId)
+				.GetSlideById(submission.SlideId))
 				.Exercise
-				.GetSourceCode(details.SolutionCode.Text);
+				.GetSourceCode(submission.SolutionCode.Text);
 
-			return View(solutionsRepo.GetDetails(id));
+			return View(submission);
 		}
 	}
 }

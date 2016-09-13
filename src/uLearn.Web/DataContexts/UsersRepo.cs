@@ -21,6 +21,11 @@ namespace uLearn.Web.DataContexts
             userRolesRepo = new UserRolesRepo(db);
         }
 
+	    public ApplicationUser FindUserById(string id)
+	    {
+		    return db.Users.Find(id);
+	    }
+
         public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager)
         {
             var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);

@@ -16,6 +16,10 @@
 		<div class="row">
 			<div class='slide'>
 				<h1>@Model.Slide.Title <span class="score">@GetScore(Model.Score)</span></h1>
+				@if (!string.IsNullOrEmpty(Model.Error))
+				{
+					<p class="alert alert-danger">@Model.Error</p>
+				}
 				@if (Model.Slide is QuizSlide)
 				{
 					@Html.Action("Quiz", "Quiz", new
@@ -24,12 +28,20 @@
 						   courseId = Model.CourseId,
 						   userId = Model.UserId,
 						   isGuest = Model.IsGuest,
-						   manualQuizCheckQueueItem = Model.BlockRenderContext.ManualQuizCheckQueueItem
+						   manualQuizCheckQueueItem = (ManualQuizChecking) Model.ManualChecking
 					   })
 				}
 				else
 				{
-					@SlideHtml.Blocks(Model.BlockRenderContext)
+					if (Model.ManualChecking != null)
+					{
+						<p class="exercise-status">
+							@Model.ManualChecking.User.VisibleName
+							(@Model.ContextManualCheckingUserGroups),
+							@Model.ManualChecking.Timestamp.ToPrettyString()
+						</p>
+					}
+					@SlideHtml.Blocks(Model.BlockRenderContext, Html)
 				}
 
 			</div>
@@ -80,7 +92,7 @@
 		<script>
 			getHints("@Model.CourseId", "@Model.Slide.Index", '@e.Exercise.HintsMd.Count')
 		</script>
-		<script> refreshPreviousDraft('@(data.LatestAcceptedSolution != null)', '@e.Id') </script>
+		<script> refreshPreviousDraft('@(data.Solution != null)', '@e.Id') </script>
 	}
 
 

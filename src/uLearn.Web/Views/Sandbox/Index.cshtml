@@ -20,15 +20,15 @@
 	</thead>
 	@for (var i = 0; i < Model.Submissions.Count; i++)
 	{
-		var detail = Model.Submissions[i];
-		var name = detail.DisplayName ?? detail.Id.ToString();
-		<tr class="@SubmissionClass(detail.GetVerdict()) submitions-item" data-id="@detail.Id">
-			<td>@i</td>
-			<td>@detail.Timestamp.ToString("dd.MM.yy HH:mm:ss")</td>
-			<td>@detail.Elapsed</td>
+		var submission = Model.Submissions[i];
+		var name = submission.AutomaticChecking.DisplayName ?? submission.Id.ToString();
+		<tr class="@SubmissionClass(submission.AutomaticChecking.GetVerdict()) submitions-item" data-id="@submission.Id">
+			<td>@submission.Id</td>
+			<td>@submission.Timestamp.ToPrettyString()</td>
+			<td>@submission.AutomaticChecking.Elapsed</td>
 			<td>@name</td>
-			<td>@detail.Status</td>
-			<td>@detail.GetVerdict()</td>
+			<td>@submission.AutomaticChecking.Status</td>
+			<td>@submission.AutomaticChecking.GetVerdict()</td>
 		</tr>
 	}
 </table>
@@ -65,9 +65,9 @@
 	}
 }
 
-@helper SubmissionClass(SubmissionStatus status, Verdict verdict)
+@helper SubmissionClass(AutomaticExerciseCheckingStatus status, Verdict verdict)
 {
-	if (status != SubmissionStatus.Done || verdict == Verdict.SandboxError)
+	if (status != AutomaticExerciseCheckingStatus.Done || verdict == Verdict.SandboxError)
 	{
 		@("danger")
 	}

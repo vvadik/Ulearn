@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Web.Http;
-using System.Net.Http;
 using Microsoft.Owin.Security.OAuth;
 
 namespace uLearn.Web

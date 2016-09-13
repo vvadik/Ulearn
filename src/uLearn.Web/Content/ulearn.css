@@ -147,6 +147,13 @@
 	margin-top: 10px;
 }
 
+.run-review-status {
+	color: white;
+    text-align: center;
+    font-size: 13pt;
+    padding: 2px 0;
+}
+
 .no-rounds {
 	-ms-border-radius: 0;
 	-webkit-border-radius: 0;
@@ -267,6 +274,7 @@
 	float: left;
 	margin-right: 8px;
 	width: 14px;
+	min-height: 1px;
 }
 
 .navbar-label-privileged {
@@ -284,6 +292,10 @@
 
 .navbar-label-danger {
 	color: lightcoral;
+}
+
+.navbar-label-link {
+	color: #0d395f;
 }
 /* ReSharper restore Html.CssClassElementsNotFound */
 
@@ -325,6 +337,10 @@
 	width: 50% !important;
 }
 
+.try-again-button {
+	width: 25%;
+}
+
 
 .rates-bar {
 	width: 100%;
@@ -345,7 +361,8 @@
 	margin-bottom: 5px;
 }
 
-#quiz-status {
+.quiz-status,
+.exercise-status {
     background-color: #d9edf7;
 	padding: 15px 18px;
 	color: #333;
@@ -1104,3 +1121,149 @@ table.analytics__user-answers {
 	margin-top: 10px;
 }
 
+/* Analytics dashboard */
+.form-control-date {
+	width: 100px;
+}
+
+.analytics__dashboard .slide-visits-count,
+.analytics__dashboard .quiz-average,
+.analytics__dashboard .exercise-tries,
+.analytics__dashboard .lesson-slide-no-stat,
+.analytics__dashboard .stat-title,
+.analytics__dashboard .small-table__right-cell
+ {
+    width: 50px;
+    display: inline-block;
+    text-align: right;
+}
+
+.analytics__dashboard .small-table__title {
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 0 0 2px;
+	margin-bottom: 3px;
+}
+
+.analytics__dashboard .small-table__title__cell
+{
+	display: inline-block;
+	color: #ccc;
+	font-size: 8pt;
+	text-align: right;
+	width: 50px;
+}
+
+.analytics__dashboard .student-progress {
+	display: inline-block;
+	width: 150px;
+	height: 10px;
+	border-radius: 0;
+	box-shadow: none;
+	margin-bottom: 0;
+}
+
+.analytics__dashboard .large-number {
+    text-align: center;
+    font-size: 40pt;
+}
+
+.analytics__dashboard .large-number__text {
+	text-align: center;
+}
+
+.analytics__chart__toggles {
+	font-size: 10pt;
+}
+
+.analytics__chart__toggles .analytics__chart__toggle {
+	margin-right: 10px;
+}
+
+.analytics__chart__toggles .analytics__chart__toggle.selected {
+	pointer-events: none;
+	color: black;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.analytics__chart__toggles .analytics__chart__toggle.selected:hover,
+.analytics__chart__toggles .analytics__chart__toggle.selected:focus,
+.analytics__chart__toggles .analytics__chart__toggle.selected:active {
+	text-decoration: none;
+}
+
+/* Code review */
+.exercise__add-review {
+	position: absolute;
+	z-index: 10;
+	background-color: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.exercise__add-review > * {
+	display: block;
+	margin-top: 5px;
+}
+
+.exercise__add-review > *:first-child {
+	margin-top: 0;
+	margin-bottom: 5px;
+}
+
+.exercise__add-review .exercise__add-review__comment {
+	width: 250px;
+}
+
+.code-review + .CodeMirror {
+	width: 600px;
+}
+
+.exercise__reviews {
+    float: right;
+    width: 250px;
+	margin-left: 10px;
+	margin-bottom: 25px;
+}
+
+.exercise__review {
+	border-left: 3px solid #fdd;
+    margin: 10px 0;
+    padding: 2px 5px;
+	cursor: pointer;
+}
+
+.exercise__review.selected {
+	border-left-color: #d66;
+	margin-left: -10px;
+}
+
+.exercise__review .exercise__review__header {
+    background-color: #fdf5f5;
+    margin: -2px -5px;
+    padding: 2px 5px;
+    color: #aaa;
+    font-size: 9pt;
+}
+
+.exercise__review .exercise__review__header .author {
+	color: #b99;
+}
+
+.exercise__review .exercise__review__header .close {
+	font-size: 13pt;
+}
+
+.exercise__review .exercise__review__comment {
+    padding: 4px 0;
+}
+
+.exercise__code__reviewed-fragment {
+	background-color: #fdd5d5;
+}
+
+.exercise__code__reviewed-fragment__selected {
+	background-color: #f7b7b7;
+}

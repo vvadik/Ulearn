@@ -24,7 +24,11 @@ namespace uLearn.Web
 					"~/Scripts/jquery.unobtrusive-ajax*",
 					"~/Scripts/notify-custom.min.js",
 					"~/Scripts/jquery.validate.js",
+					"~/Scripts/jquery.validate-vsdoc.js",
 					"~/Scripts/jquery.validate.unobtrusive.js",
+					"~/Scripts/jquery.validate.date.js",
+					"~/Scripts/jquery.datetimepicker.full.min.js",
+					"~/Scripts/jquery.datetimepicker.unobtrusive.js",
 					"~/flexslider/jquery.flexslider.js",
 					"~/katex/katex.min.js",
 //					"~/Jsdifflib/jsdifflib.js",
@@ -45,7 +49,8 @@ namespace uLearn.Web
 					"~/Scripts/respond.js",
 					"~/Scripts/slide-*",
 					"~/Scripts/users-list.js",
-					"~/Scripts/groups-editor.js"
+					"~/Scripts/groups-editor.js",
+					"~/Scripts/analytics-highcharts.js"
 				);
 		}
 
@@ -56,6 +61,7 @@ namespace uLearn.Web
 				"~/Content/bootstrap.css",
 				"~/Content/font-awesome.css",
 				"~/Content/awesome-bootstrap-checkbox.css",
+				"~/Content/jquery.datetimepicker.min.css",
 				"~/codemirror/lib/codemirror.css",
 				"~/codemirror/theme/cobalt.css",
 				"~/codemirror/addon/hint/show-hint.css",

@@ -13,9 +13,9 @@ namespace uLearn
 			{
 				Binder = new DisplayNameSerializationBinder(
 					Assembly
-						.GetAssembly(typeof(RunnerSubmition))
+						.GetAssembly(typeof(RunnerSubmission))
 						.GetTypes()
-						.Where(type => type.IsClass && !type.IsAbstract && type.IsSubclassOf(typeof(RunnerSubmition)))),
+						.Where(type => type.IsClass && !type.IsAbstract && type.IsSubclassOf(typeof(RunnerSubmission)))),
 				TypeNameHandling = TypeNameHandling.Auto,
 			};
 		}

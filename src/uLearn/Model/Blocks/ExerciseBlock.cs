@@ -12,6 +12,7 @@ namespace uLearn.Model.Blocks
 		{
 			MaxScore = 5;
 			MaxReviewAttempts = 2;
+			CorrectnessScore = MaxScore;
 		}
 
 		[XmlElement("max-score")]
@@ -48,6 +49,8 @@ namespace uLearn.Model.Blocks
 		[XmlElement("max-review-attempts")]
 		public int MaxReviewAttempts { get; set; }
 
+		public int MaxReviewScore => MaxScore - CorrectnessScore;
+
 		public List<string> HintsMd
 		{
 			get { return Hints = Hints ?? new List<string>(); }
@@ -58,7 +61,7 @@ namespace uLearn.Model.Blocks
 
 		public abstract SolutionBuildResult BuildSolution(string userWrittenCode);
 
-		public abstract RunnerSubmition CreateSubmition(string submitionId, string code);
+		public abstract RunnerSubmission CreateSubmition(string submissionId, string code);
 
 		#region equals
 
@@ -91,7 +94,7 @@ namespace uLearn.Model.Blocks
 
 		public override string ToString()
 		{
-			return string.Format("Exercise: {0}, Hints: {1}", ExerciseInitialCode, string.Join("; ", HintsMd));
+			return $"Exercise: {ExerciseInitialCode}, Hints: {string.Join("; ", HintsMd)}";
 		}
 
 		public Component GetSolutionsComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)

@@ -17,8 +17,11 @@ namespace uLearn.Web.Models
 		public int MaxDropCount { get; set; }
 		public bool IsLti { get; set; }
 		public bool IsGuest { get; set; }
-		public ManualQuizCheckQueueItem ManualQuizCheckQueueItem { get; set; }
+		public ManualQuizChecking ManualQuizCheckQueueItem { get; set; }
 		public bool CanUserFillQuiz { get; set; }
+
+		/* GroupId != null if instructor filtered users by group and see their works */
+		public int? GroupId { get; set; }
 
 		public int Score
 		{

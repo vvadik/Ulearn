@@ -1,0 +1,96 @@
+﻿@model uLearn.Web.Controllers.ManualCheckingQueueViewModel
+
+@{
+	ViewBag.Title = "Очередь на код ревью";
+}
+
+<div class="container">
+	<h1>Очередь на код ревью</h1>
+
+	@Html.Partial("_ManualCheckingQueueFilterForm", Model)
+
+	<p>
+		@if (! Model.AlreadyChecked)
+		{
+			@Html.ActionLink("Проверенные работы", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId, done = true }, new { @class="btn btn-xs btn-info" })
+		}
+		else
+		{
+			@Html.ActionLink("← Вернуться в очередь", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId }, new { @class="btn btn-xs btn-info" })
+		}
+	</p>
+
+	@if (!string.IsNullOrEmpty(Model.Message) && Model.Checkings.Count > 0)
+	{
+		<div class="alert alert-danger">
+			@if (Model.Message == "already_checked")
+			{
+				<p>Эта работа уже проверена, выберите другую</p>
+			}
+			@if (Model.Message == "locked")
+			{
+				<p>Эта работа проверяется другим инструктором, выберите другую</p>
+			}
+			@if (Model.Message == "slide_checked")
+			{
+				<p>Для этого задания больше нет непроверенных работ</p>
+			}
+			@if (Model.Message == "time_is_over")
+			{
+				<p>Время проверки вышло. Выберите другую работу</p>
+			}
+		</div>
+	}
+
+	@if (Model.Checkings.Count == 0)
+	{
+		<div class="alert alert-success">Поздравляем, очередь пуста! Работ для проверки нет</div>
+		<div class="text-muted">Здесь будут появляться программы студентов, которые должны быть проверены преподавателем вручную.</div>
+	}
+
+	@foreach (var checkModel in Model.Checkings)
+	{
+		var check = checkModel.CheckingQueueItem;
+		<div>
+			<div>
+				@check.User.VisibleName решил задание «@checkModel.ContextSlideTitle»
+			</div>
+			<div>
+				@if (Model.AlreadyChecked)
+				{
+					<p>
+						Последний раз проверялась преподавателем <b>@check.LockedBy.VisibleName</b>.
+					</p>
+					<p>
+						@Html.ActionLink("Посмотреть", "CheckExercise", new { Model.CourseId, check.Id, Model.GroupId, recheck = true }, new { })
+					</p>
+				}
+				else if (check.IsLocked)
+				{
+					<p>
+						Проверяется преподавателем <b>@check.LockedBy.VisibleName</b>,
+						заблокирована ещё на @{
+							                     var minutes = (int)(check.LockedUntil.Value - DateTime.Now).TotalMinutes;
+							                     @minutes.PluralizeInRussian(new RussianPluralizationOptions
+							                     {
+								                     One = "минуту",
+								                     Two = "минуты",
+								                     Five = "минут",
+								                     Gender = Gender.Female,
+							                     })
+						                     }
+					</p>
+					if (check.IsLockedBy(User.Identity))
+					{
+						@Html.ActionLink("Вернуться к проверке →", "CheckExercise", new { Model.CourseId, check.Id, Model.GroupId }, new { @class = "btn btn-sm btn-primary" })
+					}
+				}
+				else
+				{
+					@Html.ActionLink("Перейти к проверке →", "CheckExercise", new { Model.CourseId, check.Id, Model.GroupId }, new { @class = "btn btn-sm btn-success" })
+				}
+			</div>
+			<hr/>
+		</div>
+	}
+</div>

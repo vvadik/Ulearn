@@ -5,7 +5,7 @@ namespace uLearn.CSharp
 {
 	public class CSharpSlideLoader : ISlideLoader
 	{
-		public string Extension { get { return ".cs"; } }
+		public string Extension => ".cs";
 
 		public Slide Load(FileInfo file, string unitName, int slideIndex, CourseSettings settings)
 		{

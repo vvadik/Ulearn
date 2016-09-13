@@ -1,0 +1,27 @@
+﻿@model uLearn.Web.Controllers.ManualCheckingQueueViewModel
+
+@using (Html.BeginForm(Url.RequestContext.RouteData.GetRequiredString("Action"), "Admin", FormMethod.Get, new { id = "manual-checking-queue-filter-form" }))
+{
+	var formSubmit = "$('#manual-checking-queue-filter-form').submit();";
+	@Html.Hidden("courseId", Model.CourseId)
+
+	<div class="form-group">
+		@{
+			var groupsListItems = new List<SelectListItem>
+			{
+				new SelectListItem { Text = "Все пользователи", Value = "-1", Selected = Model.GroupId == -1 },
+				new SelectListItem { Text = "Мои группы", Value = "", Selected = !Model.GroupId.HasValue }
+			};
+			groupsListItems.AddRange(
+				Model.Groups.Select(group => new SelectListItem { Text = group.Name, Value = group.Id.ToString(), Selected = group.Id == Model.GroupId })
+				);
+		}
+		@* Avoiding quotes ' escaping in html attributes *@
+		@Html.Raw(HttpUtility.HtmlDecode(
+			Html.DropDownList("groupId",
+				groupsListItems,
+				new { @class = "form-control", onchange = formSubmit }
+				).ToHtmlString())
+			)
+	</div>
+}

@@ -81,11 +81,11 @@ namespace uLearn.Model.Blocks
 			return validator.ValidateSolution(userWrittenCodeFile, userWrittenCodeFile);
 		}
 
-		public override RunnerSubmition CreateSubmition(string submitionId, string code)
+		public override RunnerSubmission CreateSubmition(string submissionId, string code)
 		{
-			return new ProjRunnerSubmition
+			return new ProjRunnerSubmission
 			{
-				Id = submitionId,
+				Id = submissionId,
 				ZipFileData = GetZipBytesForChecker(code),
 				ProjectFileName = CsprojFileName,
 				Input = "",

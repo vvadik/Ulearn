@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Net;
 using System.Web.Mvc;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -20,8 +22,10 @@ namespace uLearn.Web.Controllers
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
-		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo(); 
+		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
+		private readonly CommentsRepo commentsRepo = new CommentsRepo();
 		private readonly GroupsRepo groupsRepo = new GroupsRepo();
+		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
 
 		public AnalyticsController()
 			: this(WebCourseManager.Instance)
@@ -56,11 +60,11 @@ namespace uLearn.Web.Controllers
 			var tableInfo = new Dictionary<string, AnalyticsTableInfo>();
 			foreach (var slide in course.Slides)
 			{
-				var exerciseSlide = (slide as ExerciseSlide);
-				var quizSlide = (slide as QuizSlide);
+				var exerciseSlide = slide as ExerciseSlide;
+				var quizSlide = slide as QuizSlide;
 				var isExercise = exerciseSlide != null;
 				var isQuiz = quizSlide != null;
-				var hintsCountOnSlide = isExercise ? exerciseSlide.Exercise.HintsMd.Count() : 0;
+				var hintsCountOnSlide = isExercise ? exerciseSlide.Exercise.HintsMd.Count : 0;
 				var visitersCount = visitsRepo.GetVisitsCount(slide.Id, course.Id);
 				tableInfo.Add(slide.Index + ". " + slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
 				{
@@ -69,7 +73,7 @@ namespace uLearn.Web.Controllers
 					IsExercise = isExercise,
 					IsQuiz = isQuiz,
 					SolversPercent = isExercise
-						? (visitersCount == 0 ? 0 : (int)((double)userSolutionsRepo.GetAcceptedSolutionsCount(slide.Id, course.Id) / visitersCount) * 100)
+						? (visitersCount == 0 ? 0 : (int)((double)userSolutionsRepo.GetAcceptedSolutionsCount(course.Id, slide.Id) / visitersCount) * 100)
 						: isQuiz
 							? (visitersCount == 0 ? 0 : (int)((double)userQuizzesRepo.GetSubmitQuizCount(slide.Id, course.Id) / visitersCount) * 100)
 							: 0,
@@ -81,12 +85,108 @@ namespace uLearn.Web.Controllers
 			return tableInfo;
 		}
 
-		public ActionResult UnitStatistics(string courseId, string unitName)
+		public ActionResult UnitStatistics(UnitStatisticsParams param)
 		{
+			var courseId = param.CourseId;
+			var unitName = param.UnitName;
+			var periodStart = param.PeriodStartDate;
+			var periodFinish = param.PeriodFinishDate;
+
+			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
+
+			var course = courseManager.GetCourse(courseId);
+			var units = course.Slides.OrderBy(s => s.Index).Select(s => s.Info.UnitName).Distinct().ToList();
+			if (string.IsNullOrEmpty(unitName) && units.Any())
+				unitName = units.First();
+			var slides = course.Slides.Where(s => s.Info.UnitName == unitName).ToList();
+			var slidesIds = slides.Select(s => s.Id).ToImmutableHashSet();
+			var quizzes = slides.OfType<QuizSlide>();
+			var exersices = slides.OfType<ExerciseSlide>();
+
+			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+			var groupId = param.Group;
+			List<string> filteredUsersIds = null;
+			if (groupId.HasValue)
+			{
+				if (!groupsRepo.IsGroupAvailableForUser(groupId.Value, User))
+					groupId = null;
+				else
+					filteredUsersIds = groupsRepo.GetGroupMembers(groupId.Value).Select(u => u.Id).ToList();
+			}
+
+			/* Dictionary<SlideId, List<Visit>> */
+			var slidesVisits = visitsRepo.GetVisitsInPeriodForEachSlide(slidesIds, periodStart, realPeriodFinish, filteredUsersIds);
+
+			var usersVisitedAllSlidesBeforePeriod = visitsRepo.GetUsersVisitedAllSlides(slidesIds, DateTime.MinValue, periodStart, filteredUsersIds);
+			var usersVisitedAllSlidesInPeriod = visitsRepo.GetUsersVisitedAllSlides(slidesIds, periodStart, realPeriodFinish, filteredUsersIds);
+			var usersVisitedAllSlidesBeforePeriodFinished = visitsRepo.GetUsersVisitedAllSlides(slidesIds, DateTime.MinValue, realPeriodFinish, filteredUsersIds);
+
+			var quizzesAverageScore = quizzes.ToDictionary(q => q.Id,
+				q => (int) slidesVisits.GetOrDefault(q.Id, new List<Visit>())
+									   .Where(v => v.IsPassed)
+									   .Select(v => 100 * Math.Min(v.Score, q.MaxScore) / q.MaxScore)
+									   .DefaultIfEmpty(-1)
+									   .Average()
+			);
+
+			/* Dictionary<SlideId, List<UserSolution> (distinct by user)> */
+			var exercisesSolutions = userSolutionsRepo.GetAllSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
+				.GroupBy(s => s.SlideId)
+				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).ToList());
+
+			var exercisesAcceptedSolutions = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
+				.GroupBy(s => s.SlideId)
+				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).ToList());
+
+			var manualQuizCheckQueueBySlide = slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(
+				new ManualCheckingQueueFilterOptions { CourseId = courseId, SlidesIds = slidesIds })
+				.Where(i => periodStart <= i.Timestamp && i.Timestamp <= realPeriodFinish)
+				.GroupBy(i => i.SlideId)
+				.ToDictionary(g => g.Key, g => g.ToList());
+
+			var commentsBySlide = commentsRepo.GetSlidesComments(courseId, slidesIds)
+				.Where(c => periodStart <= c.PublishTime && c.PublishTime <= realPeriodFinish)
+				.GroupBy(c => c.SlideId)
+				.ToDictionary(g => g.Key, g => g.ToList());
+
+			var visitedUsersIds = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, realPeriodFinish, filteredUsersIds)
+				.ToList()
+				.DistinctBy(v => v.UserId)
+				.Select(v => v.User);
+
+			var visitedSlidesByUser = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, realPeriodFinish, filteredUsersIds)
+				.GroupBy(v => v.UserId)
+				.ToDictionary(g => g.Key, g => g.Select(v => v.SlideId).ToImmutableHashSet());
+			var visitedSlidesByUserAllTime = visitsRepo.GetVisitsInPeriod(slidesIds, DateTime.MinValue, DateTime.MaxValue, filteredUsersIds)
+				.GroupBy(v => v.UserId)
+				.ToDictionary(g => g.Key, g => g.Select(v => v.SlideId).ToImmutableHashSet());
+
 			var model = new UnitStatisticPageModel
 			{
 				CourseId = courseId,
-				UnitName = unitName
+				UnitName = unitName,
+				UnitsNames = units.ToList(),
+				GroupId = groupId,
+				Groups = groups,
+
+				PeriodStart = periodStart,
+				PeriodFinish = periodFinish,
+
+				Slides = slides,
+				SlidesVisits = slidesVisits,
+
+				UsersVisitedAllSlidesBeforePeriod = usersVisitedAllSlidesBeforePeriod.ToList(),
+				UsersVisitedAllSlidesInPeriod = usersVisitedAllSlidesInPeriod.ToList(),
+				UsersVisitedAllSlidesBeforePeriodFinished = usersVisitedAllSlidesBeforePeriodFinished.ToList(),
+
+				QuizzesAverageScore = quizzesAverageScore,
+				ManualQuizCheckQueueBySlide = manualQuizCheckQueueBySlide,
+				CommentsBySlide = commentsBySlide,
+				ExercisesSolutions = exercisesSolutions,
+				ExercisesAcceptedSolutions = exercisesAcceptedSolutions,
+				VisitedUsersIds = visitedUsersIds.ToList(),
+				VisitedSlidesByUser = visitedSlidesByUser,
+				VisitedSlidesByUserAllTime = visitedSlidesByUserAllTime,
 			};
 			return View(model);
 		}
@@ -135,7 +235,7 @@ namespace uLearn.Web.Controllers
 
 		private DailyStatistics[] GetDailyStatistics(IEnumerable<Slide> slides = null)
 		{
-			var slideIds = slides == null ? null : slides.Select(s => s.Id).ToArray();
+			var slideIds = slides?.Select(s => s.Id).ToArray();
 			var lastDay = DateTime.Now.Date.Add(new TimeSpan(0, 23, 59, 59, 999));
 			var firstDay = lastDay.Date.AddDays(-14);
 			var tasks = GetTasksSolvedStats(slideIds, firstDay, lastDay);
@@ -147,9 +247,9 @@ namespace uLearn.Web.Controllers
 					.Select(date => new DailyStatistics
 					{
 						Day = date,
-						TasksSolved = tasks.Get(date, 0) + quizes.Get(date, 0),
-						SlidesVisited = visits.Get(date, Tuple.Create(0, 0)).Item1,
-						Score = visits.Get(date, Tuple.Create(0, 0)).Item2
+						TasksSolved = tasks.GetOrDefault(date, 0) + quizes.GetOrDefault(date, 0),
+						SlidesVisited = visits.GetOrDefault(date, Tuple.Create(0, 0)).Item1,
+						Score = visits.GetOrDefault(date, Tuple.Create(0, 0)).Item2
 					})
 					.ToArray();
 			return result;
@@ -185,7 +285,7 @@ namespace uLearn.Web.Controllers
 
 		private Dictionary<DateTime, int> GetTasksSolvedStats(IEnumerable<Guid> slideIds, DateTime firstDay, DateTime lastDay)
 		{
-			return GroupByDays(FilterByTime(FilterBySlides(db.UserSolutions, slideIds), firstDay, lastDay).Where(s => s.IsRightAnswer));
+			return GroupByDays(FilterByTime(FilterBySlides(db.UserExerciseSubmissions, slideIds), firstDay, lastDay).Where(s => s.AutomaticChecking.IsRightAnswer));
 		}
 
 		private Dictionary<DateTime, int> GetQuizPassedStats(IEnumerable<Guid> slideIds, DateTime firstDay, DateTime lastDay)
@@ -233,28 +333,27 @@ namespace uLearn.Web.Controllers
 						+ (s.IsQuizPassed ? s.QuizPercentage / 100.0 : 0));
 		}
 
-		private IEnumerable<UserInfo> GetUserInfos(Slide[] slides, DateTime periodStart)
+		private IEnumerable<UserInfo> GetUserInfos(Slide[] slides, DateTime periodStart, DateTime? periodFinish=null)
 		{
-			var slideIds = slides.Select(s => s.Id).ToArray();
+			if (!periodFinish.HasValue)
+				periodFinish = DateTime.Now;
 
-			var dq = db.Visits
-				.Where(v => slideIds.Contains(v.SlideId) && periodStart <= v.Timestamp)
+			var slidesIds = slides.Select(s => s.Id).ToImmutableHashSet();
+
+			var dq = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, periodFinish.Value)
 				.Select(v => v.UserId)
 				.Distinct()
 				.Join(db.Visits, s => s, v => v.UserId, (s, visiters) => visiters)
-				.Where(v => slideIds.Contains(v.SlideId))
+				.Where(v => slidesIds.Contains(v.SlideId))
 				.Select(v => new { v.UserId, v.User.UserName, v.SlideId, v.IsPassed, v.Score, v.AttemptsCount })
 				.ToList();
 
-			var r = from v in dq
-					group v by new { v.UserId, v.UserName }
-				into u
-					select new UserInfo
-					{
-						UserId = u.Key.UserId,
-						UserName = u.Key.UserName,
-						SlidesSlideInfo = GetSlideInfo(slides, u.Select(arg => Tuple.Create(arg.SlideId, arg.IsPassed, arg.Score, arg.AttemptsCount)))
-					};
+			var r = dq.GroupBy(v => new { v.UserId, v.UserName }).Select(u => new UserInfo
+			{
+				UserId = u.Key.UserId,
+				UserName = u.Key.UserName,
+				SlidesSlideInfo = GetSlideInfo(slides, u.Select(arg => Tuple.Create(arg.SlideId, arg.IsPassed, arg.Score, arg.AttemptsCount)))
+			});
 
 			return r;
 		}
@@ -267,7 +366,7 @@ namespace uLearn.Web.Controllers
 				.Select(slide => new
 				{
 					slide,
-					result = results.Get(slide.Id, defaultValue)
+					result = results.GetOrDefault(slide.Id, defaultValue)
 				})
 				.Select(r => new UserSlideInfo
 				{
@@ -280,19 +379,9 @@ namespace uLearn.Web.Controllers
 				.ToArray();
 		}
 
-		/*
-		[HttpPost]
-		public async Task<ActionResult> AddUserGroup(string groupName, string userId)
-		{
-			db.Users.First(x => x.Id == userId).GroupName = groupName;
-			await db.SaveChangesAsync();
-			return null;
-		}
-		*/
-
 		public ActionResult ShowSolutions(string courseId, string userId, Guid slideId)
 		{
-			var solutions = db.UserSolutions.Where(s => s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
+			var solutions = db.UserExerciseSubmissions.Where(s => s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
 			var user = db.Users.Find(userId);
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.FindSlideById(slideId);
@@ -310,12 +399,53 @@ namespace uLearn.Web.Controllers
 		}
 	}
 
+	public class UnitStatisticsParams
+	{
+		public string CourseId { get; set; }
+		public string UnitName { get; set; }
+		
+		public string PeriodStart { get; set; }
+		public string PeriodFinish { get; set; }
+
+		public int? Group { get; set; }
+
+		private static readonly string[] dateFormats = { "dd.MM.yyyy" };
+
+		public DateTime PeriodStartDate
+		{
+			get
+			{
+				var defaultPeriodStart = DateTime.Now.Subtract(TimeSpan.FromDays(7)).Date;
+				if (string.IsNullOrEmpty(PeriodStart))
+					return defaultPeriodStart;
+				DateTime result;
+				if (!DateTime.TryParseExact(PeriodStart, dateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out result))
+					return defaultPeriodStart;
+				return result;
+			}
+		}
+
+		public DateTime PeriodFinishDate
+		{
+			get
+			{
+				var defaultPeriodFinish = DateTime.Now.Date;
+				if (string.IsNullOrEmpty(PeriodFinish))
+					return defaultPeriodFinish;
+				DateTime result;
+				if (!DateTime.TryParseExact(PeriodFinish, dateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out result))
+					return defaultPeriodFinish;
+				return result;
+			}
+		}
+	}
+
 	public class UserSolutionsViewModel
 	{
 		public ApplicationUser User { get; set; }
 		public Course Course { get; set; }
 		public string GroupsNames;
-		public List<UserSolution> Solutions { get; set; }
+		public List<UserExerciseSubmission> Solutions { get; set; }
 		public ExerciseSlide Slide { get; set; }
 	}
 

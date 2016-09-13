@@ -4,6 +4,6 @@ namespace uLearn.Web.Models
 {
 	public class SubmissionsListModel
 	{
-		public List<UserSolution> Submissions;
+		public List<UserExerciseSubmission> Submissions;
 	}
 }

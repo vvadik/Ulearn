@@ -110,7 +110,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" method=\"POST\" novalidat
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t");
 
 
-WebViewPage.WriteTo(@__razor_helper_writer, SlideHtml.Block(code, null));
+WebViewPage.WriteTo(@__razor_helper_writer, SlideHtml.Block(code, null, null));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t</div>\r\n");
 

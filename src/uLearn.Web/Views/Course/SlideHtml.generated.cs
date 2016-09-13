@@ -36,7 +36,7 @@ namespace uLearn.Web.Views.Course
     public static class SlideHtml
     {
 
-public static System.Web.WebPages.HelperResult Slide(BlockRenderContext context, int currentScore = 0)
+public static System.Web.WebPages.HelperResult Slide(BlockRenderContext context, HtmlHelper Html, int currentScore = 0)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
@@ -56,7 +56,7 @@ WebViewPage.WriteTo(@__razor_helper_writer, Score(currentScore, context.Slide.Ma
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</span>\r\n\t\t</h1>\r\n\t\t");
 
 
-WebViewPage.WriteTo(@__razor_helper_writer, Blocks(context));
+WebViewPage.WriteTo(@__razor_helper_writer, Blocks(context, Html));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t</div>\r\n");
 
@@ -67,7 +67,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t</div>\r\n");
 }
 
 
-public static System.Web.WebPages.HelperResult Blocks(BlockRenderContext context)
+public static System.Web.WebPages.HelperResult Blocks(BlockRenderContext context, HtmlHelper Html)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
@@ -80,9 +80,9 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 			foreach (var block in blockRange)
 			{
 				
-WebViewPage.WriteTo(@__razor_helper_writer, Block((dynamic)block, context));
+WebViewPage.WriteTo(@__razor_helper_writer, Block((dynamic)block, context, Html));
 
-                                   
+                                         
 			}
 		}
 		else if (context.RevealHidden)
@@ -95,9 +95,9 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<div class=\'revealed\
  				foreach (var block in blockRange)
 				{
 					
-WebViewPage.WriteTo(@__razor_helper_writer, Block((dynamic)block, context));
+WebViewPage.WriteTo(@__razor_helper_writer, Block((dynamic)block, context, Html));
 
-                                    
+                                          
 				}
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t</div>\r\n");
@@ -111,7 +111,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t</div>\r\n");
 }
 
 
-public static System.Web.WebPages.HelperResult Block(AbstractQuestionBlock block, BlockRenderContext context)
+public static System.Web.WebPages.HelperResult Block(AbstractQuestionBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
@@ -200,7 +200,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t</sup>\r\n\t</h4>\r\n");
 WebViewPage.WriteTo(@__razor_helper_writer, QuizBlock((dynamic)block, context));
 
                                     
-	if (context.ManualQuizCheckQueueItem != null)
+	if (context.ManualChecking != null)
 	{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<h4>Оцените от 0 до ");
@@ -217,7 +217,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div>\r\n\t\t\t<input ty
 
                WebViewPage.WriteTo(@__razor_helper_writer, block.MaxScore);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" name=\"quiz__score__@block.Id\" />\r\n\t\t</div>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" name=\"quiz__score__");
+
+
+                                                    WebViewPage.WriteTo(@__razor_helper_writer, block.Id);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" />\r\n\t\t</div>\r\n");
 
 
 	}
@@ -248,7 +253,7 @@ WebViewPage.WriteTo(@__razor_helper_writer, maxScore == 0 ? "" : string.Format("
 }
 
 
-public static System.Web.WebPages.HelperResult Block(MdBlock block, BlockRenderContext context)
+public static System.Web.WebPages.HelperResult Block(MdBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
@@ -264,7 +269,7 @@ WebViewPage.WriteTo(@__razor_helper_writer, MvcHtmlString.Create(block.Markdown.
 }
 
 
-public static System.Web.WebPages.HelperResult Block(CodeBlock block, BlockRenderContext context)
+public static System.Web.WebPages.HelperResult Block(CodeBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
@@ -295,7 +300,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n");
 }
 
 
-public static System.Web.WebPages.HelperResult Block(TexBlock block, BlockRenderContext context)
+public static System.Web.WebPages.HelperResult Block(TexBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
@@ -319,7 +324,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</div>\r\n");
 }
 
 
-public static System.Web.WebPages.HelperResult Block(YoutubeBlock block, BlockRenderContext context)
+public static System.Web.WebPages.HelperResult Block(YoutubeBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
@@ -354,7 +359,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"	<div>
 }
 
 
-public static System.Web.WebPages.HelperResult Block(ImageGaleryBlock block, BlockRenderContext context)
+public static System.Web.WebPages.HelperResult Block(ImageGaleryBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
@@ -432,15 +437,68 @@ WebViewPage.WriteTo(@__razor_helper_writer, RunErrors());
 }
 
 
-public static System.Web.WebPages.HelperResult Block(ExerciseBlock block, BlockRenderContext context)
+public static System.Web.WebPages.HelperResult Block(ExerciseBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 
  
-	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData();
-	var action = data.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", data.AcceptedSolutionUrl);
+	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData(context.Course.Id, context.Slide.Index);
+	var acceptedSolutionUrl = data.Url != null
+		? data.Url.Action("AcceptedSolutions", "Course", new { courseId = context.Course.Id, slideIndex = context.Slide.Index })
+		: "";
+	var action = data.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", acceptedSolutionUrl);
 	var classString = context.IsGuest ? "code-guest" : "code-exercise";
+	if (context.ManualChecking != null)
+	{
+		classString = "code-review";
+	}
+
+	var status = "";
+	if (data.ReviewState == ExerciseReviewState.WaitingForReview)
+	{
+		status = "Все тесты пройдены, код ожидает проверки преподавателем";
+	}
+	else if (data.ReviewState == ExerciseReviewState.Reviewed)
+	{
+		status = "Все тесты пройдены, код проверен преподаваталем";
+		classString = "code-reviewed";
+	}
+	if (! string.IsNullOrEmpty(status) && context.ManualChecking == null)
+	{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<p class=\"exercise-status\">");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, status);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</p>\r\n");
+
+
+	}
+
+	if (data.ReviewState == ExerciseReviewState.Reviewed || context.ManualChecking != null)
+	{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"exercise__reviews\">\r\n");
+
+
+ 			foreach (var review in data.Reviews.OrderBy(r => r.StartLine))
+			{
+				
+WebViewPage.WriteTo(@__razor_helper_writer, Html.Partial("_ExerciseReview", new ExerciseCodeReviewModel
+				{
+					Review = review,
+					ManualChecking = (ManualExerciseChecking) context.ManualChecking,
+				}));
+
+      
+			}
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t</div>\r\n");
+
+
+	}
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<textarea id=\"secretCodeExercise\" class=\"hide\">");
 
@@ -464,7 +522,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-lang=\"");
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">");
 
 
-                     WebViewPage.WriteTo(@__razor_helper_writer, data.LatestAcceptedSolution ?? block.ExerciseInitialCode.EnsureEnoughLines(4));
+                     WebViewPage.WriteTo(@__razor_helper_writer, data.Solution ?? block.ExerciseInitialCode.EnsureEnoughLines(4));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n");
 
@@ -475,21 +533,37 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<script type=\"text/javasc
 "r.setValue($secretCodeExercise.text());\r\n\t\t}\r\n\t</script>\r\n");
 
 
-	if (data.ShowControls)
+	if (data.ShowControls && context.ManualChecking == null)
 	{
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"solution-control btn-group ctrl-group\">\r\n\t\t\t<button type=\"button\" c" +
-"lass=\"run-solution-button btn btn-primary no-rounds ");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"solution-control btn-group ctrl-group\">\r\n");
 
 
-                                    WebViewPage.WriteTo(@__razor_helper_writer, data.IsLti ? "run-solution-button-lti" : "");
+ 			if (data.ReviewState == ExerciseReviewState.Reviewed)
+			{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<a href=\"?again=true\" class=\"try-again-button btn btn-primary no-rounds\">\r\n\t\t" +
+"\t\t\tTry again\r\n\t\t\t\t</a>\r\n");
+
+
+			}
+			else
+			{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<button type=\"button\" class=\"run-solution-button btn btn-primary no-rounds ");
+
+
+                                     WebViewPage.WriteTo(@__razor_helper_writer, data.IsLti ? "run-solution-button-lti" : "");
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-url=\"");
 
 
-                                                                                             WebViewPage.WriteTo(@__razor_helper_writer, data.RunSolutionUrl);
+                                                                                              WebViewPage.WriteTo(@__razor_helper_writer, data.RunSolutionUrl);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tRun\r\n\t\t\t</button>\r\n\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\tRun\r\n\t\t\t\t</button>\r\n");
+
+
+			}
 
 
  			if (!data.DebugView)
@@ -497,7 +571,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tRun\r\n\t\t\t
 				var e = ((ExerciseSlide)context.Slide).Exercise.HintsMd;
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<button id=\"GetHintButton\" type=\"button\" class=\"btn btn-default hints-btn\"\r\n\t" +
-"\t\t\t\t\tdata-course-id=\"");
+"\t\t\t        data-course-id=\"");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, context.Course.Id);
@@ -505,17 +579,17 @@ WebViewPage.WriteTo(@__razor_helper_writer, context.Course.Id);
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-slide-index=\"");
 
 
-                 WebViewPage.WriteTo(@__razor_helper_writer, context.Slide.Index);
+                       WebViewPage.WriteTo(@__razor_helper_writer, context.Slide.Index);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-hints-count=\"");
 
 
-                                                         WebViewPage.WriteTo(@__razor_helper_writer, e.Count);
+                                                               WebViewPage.WriteTo(@__razor_helper_writer, e.Count);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t\t\t\tdata-url=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t\t        data-url=\"");
 
 
-WebViewPage.WriteTo(@__razor_helper_writer, data.GetHintUrl);
+WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("UseHint", "Hint"));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\tGet hint\r\n\t\t\t\t</button>\r\n");
 
@@ -586,6 +660,100 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t</ol>\r\n\t\t\t<h3>К�
 WebViewPage.WriteTo(@__razor_helper_writer, block.CommentAfterExerciseIsSolved);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</p>\r\n\t\t</div>\r\n");
+
+
+	}
+
+	if (context.ManualChecking != null)
+	{
+		var checking = (ManualExerciseChecking)context.ManualChecking;
+		
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"text-muted\">Выделите участок кода, чтобы оставить комментарий</div>" +
+"\r\n");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<div class=\"exercise__add-review\" style=\"display: none\" data-url=\"");
+
+
+                         WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("AddExerciseCodeReview", "Exercise", new { courseId = context.Course.Id, checkingId = checking.Id }));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t<div>Добавить комментарий</div>\r\n\t\t\t<textarea class=\"exercise__add-review_" +
+"_comment\"></textarea>\r\n\t\t\t<button class=\"exercise__add-review__button btn btn-su" +
+"ccess btn-sm\">Сохранить</button>\r\n\t\t</div>\r\n");
+
+
+
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t<form method=\"POST\" action=\"");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("ScoreExercise", "Exercise", new { recheck = checking.IsChecked }));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t<input type=\"hidden\" name=\"id\" value=\"");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, checking.Id);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"/>\r\n\t\t\t<input type=\"hidden\" name=\"errorUrl\" value=\"");
+
+
+    WebViewPage.WriteTo(@__razor_helper_writer, data.Url.RouteUrl("Course.SlideById", new { courseId = context.Course.Id, slideId = context.Slide.Url, CheckQueueItemId = checking.Id, context.GroupId }));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "&amp;error=\"/>\r\n\t\t\t<input type=\"hidden\" name=\"nextUrl\" value=\"");
+
+
+   WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId = context.Course.Id, context.GroupId, done = checking.IsChecked }));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"/>\r\n\r\n\t\t\t<h4>Оцените от 0 до ");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, block.MaxReviewScore);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</h4>\r\n\t\t\t<div>\r\n\t\t\t\t\r\n\t\t\t\t<input type=\"number\" class=\"form-control\" min=\"0\" max=" +
+"\"");
+
+
+                WebViewPage.WriteTo(@__razor_helper_writer, block.MaxReviewScore);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" name=\"exerciseScore\"\r\n\t\t\t\t\t   value=\"");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, checking.IsChecked ? checking.Score.ToString() : "");
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"/>\r\n\t\t\t</div>\r\n\r\n\t\t\t<div class=\"checkbox checkbox-default\">\r\n\t\t\t\t<input data-val" +
+"=\"true\" id=\"prohibitFurtherReview\" name=\"prohibitFurtherReview\" type=\"checkbox\" " +
+"value=\"true\" ");
+
+
+                                                                      WebViewPage.WriteTo(@__razor_helper_writer, checking.IsChecked && !checking.ProhibitFurtherManualCheckings ? "" : "checked");
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "/>\r\n\t\t\t\t<label for=\"prohibitFurtherReview\">\r\n\t\t\t\t\tНе принимать больше код ревью у" +
+" этого студента\r\n\t\t\t\t</label>\r\n\t\t\t</div>\r\n\r\n\t\t\t<input type=\"submit\" class=\"btn ");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, checking.IsChecked ? "btn-primary" : "btn-default");
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" value=\"Сохранить и вернуться\"/>\r\n\r\n");
+
+
+ 			if (!checking.IsChecked)
+			{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<input type=\"submit\" class=\"btn btn-primary\" value=\"Сохранить и перейти к сле" +
+"дующему\"\r\n\t\t\t\t       data-url=\"");
+
+
+WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("CheckNextExerciseForSlide", "Admin", new { courseID = context.Course.Id, slideId = context.Slide.Id, context.GroupId }));
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"\r\n\t\t\t\t       onclick=\"$(\'[name=nextUrl]\').val($(this).data(\'url\'))\"/>\r\n");
+
+
+			}
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t</form>\r\n");
 
 
 	}
@@ -1450,9 +1618,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"run-result ru
 
 
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"run-result run-success\">\r\n\t\t<div class=\"run-verdict label-success cl" +
-"earfix\">Успех!</div>\r\n\t\t<pre class=\"no-rounds\"><code class=\"run-details\"></code>" +
-"</pre>\r\n\t</div>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"	<div class=""run-result run-success"">
+		<div class=""run-verdict label-success clearfix"">Успех!</div>
+		<div class=""run-review-status label-info clearfix"">Ваше решение отправлено на проверку преподавателю</div>
+		<pre class=""no-rounds""><code class=""run-details""></code></pre>
+	</div>
+");
 
 
 
@@ -1467,6 +1638,9 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 
  
+	var acceptedSolutionsUrl = data.Url != null
+		? data.Url.Action("AcceptedSolutions", "Course", new { data.CourseId, data.SlideIndex })
+		: "";
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"	<div class=""modal fade"" id=""ShowSolutionsAlert"" tabindex=""-1"" role=""dialog"" aria-labelledby=""myModalLabel"" aria-hidden=""true"">
 		<div class=""modal-dialog"">
@@ -1484,7 +1658,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"	<div class=""modal fade"" 
 					<a class=""btn btn-default"" href=""");
 
 
-WebViewPage.WriteTo(@__razor_helper_writer, data.AcceptedSolutionUrl);
+WebViewPage.WriteTo(@__razor_helper_writer, acceptedSolutionsUrl);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">Продолжить</a>\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary\" data-dismiss" +
 "=\"modal\">Отмена</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n");

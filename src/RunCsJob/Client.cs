@@ -22,20 +22,22 @@ namespace RunCsJob
 			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 		}
 
-		public async Task<List<RunnerSubmition>> TryGetSubmissions(int threadsCount)
+		public async Task<List<RunnerSubmission>> TryGetSubmissions(int threadsCount)
 		{
 			var uri = GetUri("GetSubmissions", new[] { "count", threadsCount.ToString(CultureInfo.InvariantCulture) });
 			try
 			{
 				var response = await httpClient.GetAsync(uri);
 				if (response.IsSuccessStatusCode)
-					return await response.Content.ReadAsAsync<List<RunnerSubmition>>();
+					return await response.Content.ReadAsAsync<List<RunnerSubmission>>();
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine($@"Cant connect to {uri}. {e.Message}");
+				Console.WriteLine($@"Cant connect to {httpClient.BaseAddress}{uri}. {e.Message}");
+				if (e.InnerException != null)
+					Console.WriteLine(e.InnerException.Message);
 			}
-			return new List<RunnerSubmition>();
+			return new List<RunnerSubmission>();
 		}
 
 		public async void SendResult(RunningResults result)

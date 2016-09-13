@@ -185,6 +185,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Entity" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net" />
     <Reference Include="System.Net.Http" />
@@ -284,6 +285,34 @@
     <Compile Include="Controllers\AuthenticationManager.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
+    <Compile Include="DataContexts\SlideCheckingsRepo.cs" />
+    <Compile Include="Migrations\201608231750470_SlideChecking.cs" />
+    <Compile Include="Migrations\201608231750470_SlideChecking.Designer.cs">
+      <DependentUpon>201608231750470_SlideChecking.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608301626429_ExerciseChecking.cs" />
+    <Compile Include="Migrations\201608301626429_ExerciseChecking.Designer.cs">
+      <DependentUpon>201608301626429_ExerciseChecking.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608301843391_MultipleManualExerciseCheckings.cs" />
+    <Compile Include="Migrations\201608301843391_MultipleManualExerciseCheckings.Designer.cs">
+      <DependentUpon>201608301843391_MultipleManualExerciseCheckings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608310552232_ChangeExerciseCodeReview.cs" />
+    <Compile Include="Migrations\201608310552232_ChangeExerciseCodeReview.Designer.cs">
+      <DependentUpon>201608310552232_ChangeExerciseCodeReview.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609070626183_ChangeCascadeDeletions.cs" />
+    <Compile Include="Migrations\201609070626183_ChangeCascadeDeletions.Designer.cs">
+      <DependentUpon>201609070626183_ChangeCascadeDeletions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609081814377_AddFutherCheckingProhibitionAndIndexes.cs" />
+    <Compile Include="Migrations\201609081814377_AddFutherCheckingProhibitionAndIndexes.Designer.cs">
+      <DependentUpon>201609081814377_AddFutherCheckingProhibitionAndIndexes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ExerciseCodeReview.cs" />
+    <Compile Include="Models\ExerciseCodeReviewModel.cs" />
+    <Compile Include="Models\SlideChecking.cs" />
     <Compile Include="Models\CourseInstructorNavbarViewModel.cs" />
     <Compile Include="DataContexts\CommentsRepo.cs" />
     <Compile Include="DataContexts\CoursesRepo.cs" />
@@ -341,7 +370,6 @@
     <Compile Include="Models\Group.cs" />
     <Compile Include="Models\GroupMember.cs" />
     <Compile Include="Models\IntructorNoteModel.cs" />
-    <Compile Include="Models\ManualQuizCheckQueueItem.cs" />
     <Compile Include="Models\QuizVersion.cs" />
     <Compile Include="Models\UserSearchQueryModel.cs" />
     <Compile Include="Controllers\LoginController.cs" />
@@ -502,7 +530,6 @@
     <Compile Include="DataContexts\SlideRateRepo.cs" />
     <Compile Include="DataContexts\UserQuestionsRepo.cs" />
     <Compile Include="DataContexts\UserQuizzesRepo.cs" />
-    <Compile Include="DataContexts\UserSolutionsRepo_should.cs" />
     <Compile Include="DataContexts\UserSolutionsRepo.cs" />
     <Compile Include="DataContexts\VisitsRepo.cs" />
     <Compile Include="Migrations\201407111234255_InitialCreate.cs" />
@@ -612,7 +639,7 @@
     <Compile Include="Models\LmsRoles.cs" />
     <Compile Include="Models\RunSolutionResult.cs" />
     <Compile Include="Models\UserQuiz.cs" />
-    <Compile Include="Models\UserSolution.cs" />
+    <Compile Include="Models\UserExerciseSubmission.cs" />
     <Compile Include="Models\UsersStatsPageModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -750,6 +777,24 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201607121102193_RemoveOldUserGroups.resx">
       <DependentUpon>201607121102193_RemoveOldUserGroups.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608231750470_SlideChecking.resx">
+      <DependentUpon>201608231750470_SlideChecking.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608301626429_ExerciseChecking.resx">
+      <DependentUpon>201608301626429_ExerciseChecking.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608301843391_MultipleManualExerciseCheckings.resx">
+      <DependentUpon>201608301843391_MultipleManualExerciseCheckings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608310552232_ChangeExerciseCodeReview.resx">
+      <DependentUpon>201608310552232_ChangeExerciseCodeReview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609070626183_ChangeCascadeDeletions.resx">
+      <DependentUpon>201609070626183_ChangeCascadeDeletions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609081814377_AddFutherCheckingProhibitionAndIndexes.resx">
+      <DependentUpon>201609081814377_AddFutherCheckingProhibitionAndIndexes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -1033,6 +1078,7 @@
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\jquery-ui.min.css" />
+    <Content Include="Content\jquery.datetimepicker.min.css" />
     <Content Include="Content\logo.png" />
     <Content Include="Content\tablesorter.css" />
     <Content Include="Content\ulearn.css" />
@@ -1049,6 +1095,7 @@
     <Content Include="katex\katex.min.css" />
     <Content Include="katex\katex.min.js" />
     <Content Include="Scripts\activate-clipboard.js" />
+    <Content Include="Scripts\analytics-highcharts.js" />
     <Content Include="Scripts\bootstrap.file-input.js" />
     <Content Include="qunit\qunit-1.15.0.css" />
     <Content Include="qunit\qunit-1.15.0.js" />
@@ -1115,8 +1162,11 @@
     <Content Include="Scripts\groups-editor.js" />
     <Content Include="Scripts\jquery-ui.min.js" />
     <Content Include="Scripts\jquery.color-2.1.0.min.js" />
+    <Content Include="Scripts\jquery.datetimepicker.full.min.js" />
+    <Content Include="Scripts\jquery.datetimepicker.unobtrusive.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
+    <Content Include="Scripts\jquery.validate.date.js" />
     <Content Include="Scripts\notify-custom.min.js" />
     <Content Include="Scripts\slide-comments.js" />
     <Content Include="Scripts\slide-diff.js" />
@@ -1353,10 +1403,13 @@
     </Content>
     <Content Include="Views\Comments\_CommentText.cshtml" />
     <Content Include="Views\Admin\Comments.cshtml" />
-    <Content Include="Views\Admin\ManualQuizChecksQueue.cshtml" />
+    <Content Include="Views\Admin\ManualQuizCheckingQueue.cshtml" />
     <Content Include="Views\Admin\Groups.cshtml" />
     <Content Include="Views\Account\JoinGroup.cshtml" />
     <Content Include="Views\Course\CourseInstructorNavbar.cshtml" />
+    <Content Include="Views\Admin\ManualExerciseCheckingQueue.cshtml" />
+    <Content Include="Views\Admin\_ManualCheckingQueueFilterForm.cshtml" />
+    <Content Include="Views\Course\_ExerciseReview.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

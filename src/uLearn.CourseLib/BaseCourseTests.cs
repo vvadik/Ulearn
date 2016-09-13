@@ -140,7 +140,7 @@ namespace uLearn
 			Console.WriteLine("pathToCompiler = " + pathToCompiler);
 			Assume.That(Directory.Exists(pathToCompiler));
 			var result = SandboxRunner.Run(pathToCompiler,
-				new ProjRunnerSubmition
+				new ProjRunnerSubmission
 				{
 					Id = slide.Id.ToString(),
 					ZipFileData = bytes,

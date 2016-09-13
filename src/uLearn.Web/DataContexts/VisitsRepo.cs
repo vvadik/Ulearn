@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using uLearn.Web.Models;
@@ -9,6 +10,7 @@ namespace uLearn.Web.DataContexts
 	public class VisitsRepo
 	{
 		private readonly ULearnDb db;
+		private readonly SlideCheckingsRepo slideCheckingsRepo;
 
 		public VisitsRepo() : this(new ULearnDb())
 		{
@@ -18,6 +20,7 @@ namespace uLearn.Web.DataContexts
 		public VisitsRepo(ULearnDb db)
 		{
 			this.db = db;
+			this.slideCheckingsRepo = new SlideCheckingsRepo(db);
 		}
 
 		public async Task AddVisit(string courseId, Guid slideId, string userId)
@@ -54,6 +57,18 @@ namespace uLearn.Web.DataContexts
 			return db.Visits.Any(x => x.UserId == userId && x.CourseId == courseId);
 		}
 
+		public async Task UpdateScoreForVisit(string courseId, Guid slideId, string userId)
+		{
+			var newScore = slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId) +
+							slideCheckingsRepo.GetAutomaticScoreForSlide(courseId, slideId, userId);
+			var isPassed = slideCheckingsRepo.IsSlidePassed(courseId, slideId, userId);
+			await UpdateAttempts(slideId, userId, visit =>
+			{
+				visit.Score = newScore;
+				visit.IsPassed = isPassed;
+			});
+		}
+
 		private async Task UpdateAttempts(Guid slideId, string userId, Action<Visit> action)
 		{
 			var visit = db.Visits.FirstOrDefault(v => v.SlideId == slideId && v.UserId == userId);
@@ -72,46 +87,7 @@ namespace uLearn.Web.DataContexts
 				visit.IsPassed = false;
 			});
 		}
-
-		public async Task SetScoreForAttempt(Guid slideId, string userId, int newScore)
-		{
-			await UpdateAttempts(slideId, userId, visit =>
-			{
-				visit.Score = newScore;
-				visit.IsPassed = true;
-			});
-		}
-
-		public async Task AddAttempt(Guid slideId, string userId, int score)
-		{
-			await UpdateAttempts(slideId, userId, visit =>
-			{
-				visit.AttemptsCount++;
-				visit.Score = score;
-				visit.IsPassed = true;
-			});
-		}
-
-		public async Task DropAttempt(Guid slideId, string userId)
-		{
-			await UpdateAttempts(slideId, userId, visit =>
-			{
-				visit.Score = 0;
-				visit.IsPassed = false;
-			});
-		}
-
-		public async Task AddSolutionAttempt(Guid slideId, string userId, int score)
-		{
-			await UpdateAttempts(slideId, userId, visit =>
-			{
-				visit.IsPassed = visit.IsPassed || score > 0;
-				visit.AttemptsCount++;
-				if (!visit.IsSkipped && score > visit.Score)
-					visit.Score = score;
-			});
-		}
-
+		
 		public Dictionary<Guid, int> GetScoresForSlides(string courseId, string userId)
 		{
 			return db.Visits
@@ -174,6 +150,32 @@ namespace uLearn.Web.DataContexts
 				db.Visits.Add(visit);
 			}
 			await db.SaveChangesAsync();
+		}
+
+		public IQueryable<Visit> GetVisitsInPeriod(IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds=null)
+		{
+			var filteredVisits = db.Visits.Where(v => slidesIds.Contains(v.SlideId) && periodStart <= v.Timestamp && v.Timestamp <= periodFinish);
+			if (usersIds != null)
+				filteredVisits = filteredVisits.Where(v => usersIds.Contains(v.UserId));
+			return filteredVisits;
+		}
+
+		public Dictionary<Guid, List<Visit>> GetVisitsInPeriodForEachSlide(IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds=null)
+		{
+			return GetVisitsInPeriod(slidesIds, periodStart, periodFinish, usersIds)
+				.GroupBy(v => v.SlideId)
+				.ToDictionary(g => g.Key, g => g.ToList());
+		}
+
+		public IEnumerable<string> GetUsersVisitedAllSlides(IImmutableSet<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null)
+		{
+			var slidesCount = slidesIds.Count;
+
+			return GetVisitsInPeriod(slidesIds, periodStart, periodFinish, usersIds)
+				.DistinctBy(v => Tuple.Create(v.UserId, v.SlideId))
+				.GroupBy(v => v.UserId)
+				.Where(g => g.Count() == slidesCount)
+				.Select(g => g.Key);
 		}
 	}
 }

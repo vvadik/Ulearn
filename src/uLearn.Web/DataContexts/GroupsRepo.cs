@@ -44,7 +44,7 @@ namespace uLearn.Web.DataContexts
 
 		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsPublic)
 		{
-			var group = GetGroupById(groupId);
+			var group = FindGroupById(groupId);
 			group.Name = newName;
 			group.IsPublic = newIsPublic;
 			await db.SaveChangesAsync();
@@ -94,7 +94,7 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public Group GetGroupById(int groupId)
+		public Group FindGroupById(int groupId)
 		{
 			return db.Groups.FirstOrDefault(g => g.Id == groupId && ! g.IsDeleted);
 		}
@@ -109,14 +109,37 @@ namespace uLearn.Web.DataContexts
 			return db.Groups.Where(g => g.CourseId == courseId && ! g.IsDeleted).ToList();
 		}
 
+		public bool IsGroupAvailableForUser(int groupId, IPrincipal user)
+		{
+			var group = FindGroupById(groupId);
+			/* Course admins can see all groups */
+			if (CanUserSeeAllCourseGroups(user, group.CourseId))
+				return true;
+
+			if (!user.HasAccessFor(group.CourseId, CourseRole.Instructor))
+				return false;
+
+			var userId = user.Identity.GetUserId();
+			return !group.IsDeleted && (group.OwnerId == userId || group.IsPublic);
+		}
+
 		public List<Group> GetAvailableForUserGroups(string courseId, IPrincipal user)
 		{
 			/* Course admins can see all groups */
 			if (CanUserSeeAllCourseGroups(user, courseId))
 				return GetGroups(courseId);
 
+			if (!user.HasAccessFor(courseId, CourseRole.Instructor))
+				return new List<Group>();
+
 			var userId = user.Identity.GetUserId();
-			return db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || g.IsPublic)).ToList();
+			return db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || g.IsPublic)).OrderBy(g => g.OwnerId == userId).ToList();
+		}
+
+		public List<Group> GetGroupsOwnedByUser(string courseId, IPrincipal user)
+		{
+			var userId = user.Identity.GetUserId();
+			return db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && g.OwnerId == userId).ToList();
 		}
 
 		public List<ApplicationUser> GetGroupMembers(int groupId)
@@ -161,7 +184,7 @@ namespace uLearn.Web.DataContexts
 		public string GetUserGroupsNamesAsString(List<string> courseIds, string userId, IPrincipal currentUser, int maxCount = 3)
 		{
 			var usersGroups = GetUsersGroupsNamesAsStrings(courseIds, new List<string> { userId } , currentUser, maxCount);
-			return usersGroups.Get(userId, "");
+			return usersGroups.GetOrDefault(userId, "");
 		}
 
 		public string GetUserGroupsNamesAsString(string courseId, string userId, IPrincipal currentUser, int maxCount = 3)

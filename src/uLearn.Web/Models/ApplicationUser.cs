@@ -12,7 +12,7 @@ namespace uLearn.Web.Models
 			Registered = DateTime.Now;
 		}
 
-		public virtual ICollection<UserSolution> Solutions { get; set; }
+		public virtual ICollection<UserExerciseSubmission> Solutions { get; set; }
 		public virtual ICollection<UserQuestion> Questions { get; set; }
 
 		public string FirstName { get; set; }

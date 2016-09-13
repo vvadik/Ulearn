@@ -20,30 +20,40 @@ namespace uLearn.Web.Controllers
 
 		[HttpGet]
 		[Route("GetSubmissions")]
-		public async Task<List<RunnerSubmition>> GetSubmissions([FromUri] string token, [FromUri] int count)
+		public async Task<List<RunnerSubmission>> GetSubmissions([FromUri] string token, [FromUri] int count)
 		{
 			CheckRunner(token);
 			var sw = Stopwatch.StartNew();
 			while (true)
 			{
 				var repo = new UserSolutionsRepo();
-				var submissions = repo.GetUnhandled(count);
-				if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
+				var exerciseCheckings = repo.GetUnhandledSubmissions(count);
+				if (exerciseCheckings.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
 				{
-					return submissions.Select(ToRunnerSubmition).ToList();
+					return exerciseCheckings.Select(ToRunnerSubmition).ToList();
 				}
 				await repo.WaitUnhandled(TimeSpan.FromSeconds(10));
 			}
 		}
 
-		private RunnerSubmition ToRunnerSubmition(UserSolution details)
+		private RunnerSubmission ToRunnerSubmition(UserExerciseSubmission submission)
 		{
+			if (submission.IsWebSubmission)
+			{
+				return new FileRunnerSubmission
+				{
+					Id = submission.Id.ToString(),
+					Code = submission.SolutionCode.Text,
+					Input = "",
+					NeedRun = true
+				};
+			}
 			var exerciseSlide = (ExerciseSlide)courseManager
-				.GetCourse(details.CourseId)
-				.GetSlideById(details.SlideId);
+				.GetCourse(submission.CourseId)
+				.GetSlideById(submission.SlideId);
 			return exerciseSlide.Exercise.CreateSubmition(
-				details.Id.ToString(),
-				details.SolutionCode.Text);
+				submission.Id.ToString(),
+				submission.SolutionCode.Text);
 		}
 
 		[HttpPost]

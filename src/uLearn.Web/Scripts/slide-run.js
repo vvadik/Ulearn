@@ -28,6 +28,7 @@ function RunSolutionResult() {
 	this.ExpectedOutput = "";
 	this.ActualOutput = "";
 	this.CompilationError = "";
+	this.SentToReview = false;
 }
 
 function setResults(ans) {
@@ -36,6 +37,7 @@ function setResults(ans) {
 	else if (ans.IsCompileError) setSimpleResult($compileError, ans.CompilationError);
 	else if (ans.IsStyleViolation) setSimpleResult($styleError, ans.CompilationError);
 	else if (ans.IsRightAnswer) {
+		$success.find('.run-review-status').toggle(ans.SentToReview);
 		setSimpleResult($success, ans.ActualOutput);
 		slideNavigation.makeShowSolutionsNext();
 	}
@@ -51,20 +53,20 @@ $runButton.click(function () {
 	var code = $(".code-exercise")[0].codeMirrorEditor.getValue();
 	if (code.length == 0)
 		code = " ";
-	$runButton.text("...running...").addClass("active");
+	$runButton.text("Running...").addClass("active");
 	$runResults.hide();
 
-		$.ajax(
-		{
-			type: "POST",
-			url: $runButton.data("url"),
-			data: code
-		}).success(setResults)
-		.fail(function (req) {
-			setSimpleResult($serviceError, req.status + " " + req.statusText);
-			console.log(req.responseText);
-		})
-		.always(function () {
-			$runButton.text("Run").removeClass("active");
-		});
+	$.ajax(
+	{
+		type: "POST",
+		url: $runButton.data("url"),
+		data: code
+	}).success(setResults)
+	.fail(function (req) {
+		setSimpleResult($serviceError, req.status + " " + req.statusText);
+		console.log(req.responseText);
+	})
+	.always(function () {
+		$runButton.text("Run").removeClass("active");
+	});
 });

@@ -16,7 +16,7 @@ namespace uLearn.Model
 
 		public string GetRegion(Label label)
 		{
-			var region = regions.Get(label.Name, null);
+			var region = regions.GetOrDefault(label.Name, null);
 			if (region == null)
 				return null;
 			return code.Substring(region.dataStart, region.dataLength).RemoveCommonNesting();

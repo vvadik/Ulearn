@@ -27,6 +27,7 @@ namespace uLearn.Web.Controllers
 		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly QuizzesRepo quizzesRepo = new QuizzesRepo();
 		private readonly GroupsRepo groupsRepo = new GroupsRepo();
+		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
 
 		public QuizController()
 			: this(WebCourseManager.Instance)
@@ -72,7 +73,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[AllowAnonymous]
-		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizCheckQueueItem manualQuizCheckQueueItem = null)
+		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem = null, int? groupId=null)
 		{
 			if (isGuest)
 				return PartialView(GuestQuiz(slide, courseId));
@@ -109,7 +110,8 @@ namespace uLearn.Web.Controllers
 				AnswersToQuizes = userAnswers,
 				IsLti = isLti,
 				ManualQuizCheckQueueItem = manualQuizCheckQueueItem,
-				CanUserFillQuiz = canUserFillQuiz
+				CanUserFillQuiz = canUserFillQuiz,
+				GroupId = groupId,
 			};
 
 			if (model.QuizState != QuizState.NotPassed && model.Score == quiz.MaxScore)
@@ -179,14 +181,15 @@ namespace uLearn.Web.Controllers
 			{
 				/* If this quiz is already queued for checking for this user, don't add it to queue again */
 				if (quizState != QuizState.WaitForCheck)
-					await userQuizzesRepo.QueueForManualCheck(courseId, slideId, userId);
+					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, slideId, userId);
 			}
 			else
 			{
 				var score = allQuizInfos
 					.DistinctBy(forDb => forDb.QuizId)
 					.Sum(forDb => forDb.QuizBlockScore);
-				await visitsRepo.AddAttempt(slideId, userId, score);
+				await slideCheckingsRepo.AddQuizAttemptWithAutomaticChecking(courseId, slideId, userId, score);
+				await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 				if (isLti)
 					LtiUtils.SubmitScore(slide, userId);
 			}
@@ -203,26 +206,26 @@ namespace uLearn.Web.Controllers
 
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var queueItem = userQuizzesRepo.GetManualQuizCheckQueueItemById(id);
+				var checking = slideCheckingsRepo.FindManualCheckingById<ManualQuizChecking>(id);
 
-				if (queueItem.IsChecked)
+				if (checking.IsChecked)
 					return Redirect(errorUrl + "Эта работа уже была проверена");
 
-				if (! queueItem.IsLockedBy(User.Identity))
+				if (! checking.IsLockedBy(User.Identity))
 					return Redirect(errorUrl + "Эта работа проверяется другим инструктором");
 
-				var answers = userQuizzesRepo.GetAnswersForUser(queueItem.SlideId, queueItem.UserId);
+				var answers = userQuizzesRepo.GetAnswersForUser(checking.SlideId, checking.UserId);
 
 				QuizVersion quizVersion;
-				/* If there is no user's answers for quiz, get the latest quiz versoin*/
+				/* If there is no user's answers for quiz, get the latest quiz version */
 				if (answers.Count == 0)
-					quizVersion = quizzesRepo.GetLastQuizVersion(queueItem.CourseId, queueItem.SlideId);
+					quizVersion = quizzesRepo.GetLastQuizVersion(checking.CourseId, checking.SlideId);
 				else
 				{
 					var firstAnswer = answers.FirstOrDefault().Value.FirstOrDefault();
 					quizVersion = firstAnswer != null
 						? firstAnswer.QuizVersion
-						: quizzesRepo.GetFirstQuizVersion(queueItem.CourseId, queueItem.SlideId);
+						: quizzesRepo.GetFirstQuizVersion(checking.CourseId, checking.SlideId);
 				}
 
 				int totalScore = 0;
@@ -234,19 +237,17 @@ namespace uLearn.Web.Controllers
 					int score;
 					/* Invalid form: score isn't integer */
 					if (!int.TryParse(scoreStr, out score))
-						return Redirect(errorUrl + string.Format("Неверное количество баллов в задании «{0}. {1}»",
-							question.QuestionIndex, question.Text.TruncateWithEllipsis(50)));
+						return Redirect(errorUrl + $"Неверное количество баллов в задании «{question.QuestionIndex}. {question.Text.TruncateWithEllipsis(50)}»");
 					/* Invalid form: score isn't from range 0..MAX_SCORE */
 					if (score < 0 || score > question.MaxScore)
-						return Redirect(errorUrl + string.Format("Неверное количество баллов в задании «{0}. {1}»: {2}",
-							question.QuestionIndex, question.Text.TruncateWithEllipsis(50), score));
+						return Redirect(errorUrl + $"Неверное количество баллов в задании «{question.QuestionIndex}. {question.Text.TruncateWithEllipsis(50)}»: {score}");
 
-					await userQuizzesRepo.SetScoreForQuizBlock(queueItem.UserId, queueItem.SlideId, question.Id, score);
+					await userQuizzesRepo.SetScoreForQuizBlock(checking.UserId, checking.SlideId, question.Id, score);
 					totalScore += score;
 				}
 
-				await userQuizzesRepo.MarkManualQuizCheckQueueItemAsChecked(queueItem);
-				await visitsRepo.SetScoreForAttempt(queueItem.SlideId, queueItem.UserId, totalScore);
+				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, totalScore);
+				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, checking.UserId);
 				transaction.Commit();
 			}
 
@@ -455,7 +456,9 @@ namespace uLearn.Web.Controllers
 				.ToDictionary(grouping => grouping.Key, grouping => grouping.Count());
 
 			var usersByQuizVersion = passes.GroupBy(p => p.QuizVersion?.Id).ToDictionary(g => g.Key, g => g.Select(u => u.UserName).ToList());
-			var usersWaitsForManualCheck = userQuizzesRepo.GetManualQuizCheckQueue(courseId, quizSlide.Id).ToList().Select(i => i.User.UserName).ToImmutableHashSet();
+			var usersWaitsForManualCheck = slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(
+				new ManualCheckingQueueFilterOptions { CourseId = courseId, SlidesIds = new List<Guid> { quizSlide.Id } }
+			).ToList().Select(i => i.User.UserName).ToImmutableHashSet();
 
 			return PartialView(new QuizAnalyticsModel
 			{
@@ -613,7 +616,8 @@ namespace uLearn.Web.Controllers
 					!userQuizzesRepo.IsQuizScoredMaximum(courseId, userId, slideId))
 				{
 					await userQuizzesRepo.DropQuiz(userId, slideId);
-					await visitsRepo.DropAttempt(slideId, userId);
+					await slideCheckingsRepo.RemoveAttempts(courseId, slideId, userId);
+					await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 					if (isLti)
 						LtiUtils.SubmitScore(slide, userId);
 				}
@@ -652,7 +656,7 @@ namespace uLearn.Web.Controllers
 		{
 			var states = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).ToList();
 
-			var queueItem = userQuizzesRepo.FindManualQuizCheckQueueItem(courseId, slideId, userId);
+			var queueItem = userQuizzesRepo.FindManualQuizChecking(courseId, slideId, userId);
 			if (queueItem != null)
 				return Tuple.Create(queueItem.IsLocked ? QuizState.IsChecking : QuizState.WaitForCheck, states.Count);
 			

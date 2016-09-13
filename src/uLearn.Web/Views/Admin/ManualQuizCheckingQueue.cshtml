@@ -1,4 +1,4 @@
-﻿@model uLearn.Web.Controllers.ManualQuizCheckQueueViewModel
+﻿@model uLearn.Web.Controllers.ManualCheckingQueueViewModel
 
 @{
 	ViewBag.Title = "Очередь на проверку";
@@ -7,7 +7,9 @@
 <div class="container">
 	<h1>Очередь на проверку</h1>
 
-	@if (! string.IsNullOrEmpty(Model.Message) && Model.Checks.Count > 0)
+	@Html.Partial("_ManualCheckingQueueFilterForm", Model)
+
+	@if (! string.IsNullOrEmpty(Model.Message) && Model.Checkings.Count > 0)
 	{
 		<div class="alert alert-danger">
 			@if (Model.Message == "already_checked")
@@ -16,7 +18,7 @@
 			}
 			@if (Model.Message == "locked")
 			{
-				<p>Эта работа проверяется другим инструктором, выберите другую</p>
+				<p>Эта работа проверяется другим преподаваталем, выберите другую</p>
 			}
 			@if (Model.Message == "slide_checked")
 			{
@@ -24,20 +26,20 @@
 			}
 			@if (Model.Message == "time_is_over")
 			{
-				<p>Время проверки работы вышло. Выберите другую</p>
+				<p>Время проверки вышло. Выберите другую работу</p>
 			}
 		</div>
 	}
 
-	@if (Model.Checks.Count == 0)
+	@if (Model.Checkings.Count == 0)
 	{
 		<div class="alert alert-success">Поздравляем, очередь пуста! Работ для проверки нет</div>
-		<div class="text-muted">Здесь будут появляться ответы студентов на тесты, которые должны быть проверены инструктором вручную.</div>
+		<div class="text-muted">Здесь будут появляться ответы студентов на тесты, которые должны быть проверены преподавателем вручную.</div>
 	}
 
-	@foreach (var checkModel in Model.Checks)
+	@foreach (var checkModel in Model.Checkings)
 	{
-		var check = checkModel.QuizCheckQueueItem;
+		var check = checkModel.CheckingQueueItem;
 		<div>
 			<div>
 				@check.User.VisibleName заполнил тест «@checkModel.ContextSlideTitle»
@@ -46,7 +48,7 @@
 				@if (check.IsLocked)
 				{
 					<p>
-						Проверяется инструктором <b>@check.LockedBy.VisibleName</b>,
+						Проверяется преподавателем <b>@check.LockedBy.VisibleName</b>,
 						заблокирована ещё на @{
 							var minutes = (int)(check.LockedUntil.Value - DateTime.Now).TotalMinutes;
 							@minutes.PluralizeInRussian(new RussianPluralizationOptions
@@ -60,12 +62,12 @@
 					</p>
 					if (check.IsLockedBy(User.Identity))
 					{
-						@Html.ActionLink("Вернуться к проверке →", "CheckQuiz", new { id = check.Id }, new { @class = "btn btn-sm btn-primary" })
+						@Html.ActionLink("Вернуться к проверке →", "CheckQuiz", new { Model.CourseId, check.Id, Model.GroupId }, new { @class = "btn btn-sm btn-primary" })
 					}
 				}
 				else
 				{
-					@Html.ActionLink("Перейти к проверке →", "CheckQuiz", new { id = check.Id }, new { @class = "btn btn-sm btn-success" })
+					@Html.ActionLink("Перейти к проверке →", "CheckQuiz", new { Model.CourseId, check.Id, Model.GroupId }, new { @class = "btn btn-sm btn-success" })
 				}
 			</div>
 			<hr/>
