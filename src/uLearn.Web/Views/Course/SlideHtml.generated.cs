@@ -444,7 +444,9 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
  
 	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData(context.Course.Id, context.Slide.Index);
-	var acceptedSolutionUrl = data.Url.Action("AcceptedSolutions", "Course", new { courseId = context.Course.Id, slideIndex = context.Slide.Index });
+	var acceptedSolutionUrl = data.Url != null
+		? data.Url.Action("AcceptedSolutions", "Course", new { courseId = context.Course.Id, slideIndex = context.Slide.Index })
+		: "";
 	var action = data.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", acceptedSolutionUrl);
 	var classString = context.IsGuest ? "code-guest" : "code-exercise";
 	if (context.ManualChecking != null)
@@ -1636,6 +1638,9 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 
  
+	var acceptedSolutionsUrl = data.Url != null
+		? data.Url.Action("AcceptedSolutions", "Course", new { data.CourseId, data.SlideIndex })
+		: "";
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"	<div class=""modal fade"" id=""ShowSolutionsAlert"" tabindex=""-1"" role=""dialog"" aria-labelledby=""myModalLabel"" aria-hidden=""true"">
 		<div class=""modal-dialog"">
@@ -1653,7 +1658,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, @"	<div class=""modal fade"" 
 					<a class=""btn btn-default"" href=""");
 
 
-WebViewPage.WriteTo(@__razor_helper_writer, data.Url.Action("AcceptedSolutions", "Course", new { data.CourseId, data.SlideIndex }));
+WebViewPage.WriteTo(@__razor_helper_writer, acceptedSolutionsUrl);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">Продолжить</a>\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary\" data-dismiss" +
 "=\"modal\">Отмена</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n");

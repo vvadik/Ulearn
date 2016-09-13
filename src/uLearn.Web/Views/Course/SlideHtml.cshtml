@@ -162,7 +162,9 @@
 @helper Block(ExerciseBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData(context.Course.Id, context.Slide.Index);
-	var acceptedSolutionUrl = data.Url.Action("AcceptedSolutions", "Course", new { courseId = context.Course.Id, slideIndex = context.Slide.Index });
+	var acceptedSolutionUrl = data.Url != null
+		? data.Url.Action("AcceptedSolutions", "Course", new { courseId = context.Course.Id, slideIndex = context.Slide.Index })
+		: "";
 	var action = data.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", acceptedSolutionUrl);
 	var classString = context.IsGuest ? "code-guest" : "code-exercise";
 	if (context.ManualChecking != null)
@@ -617,6 +619,9 @@
 
 @helper YouWillLoseScoresDialog(ExerciseBlockData data)
 {
+	var acceptedSolutionsUrl = data.Url != null
+		? data.Url.Action("AcceptedSolutions", "Course", new { data.CourseId, data.SlideIndex })
+		: "";
 	<div class="modal fade" id="ShowSolutionsAlert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -630,7 +635,7 @@
 					<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
 				</div>
 				<div class="modal-footer">
-					<a class="btn btn-default" href="@data.Url.Action("AcceptedSolutions", "Course", new { data.CourseId, data.SlideIndex })">Продолжить</a>
+					<a class="btn btn-default" href="@acceptedSolutionsUrl">Продолжить</a>
 					<button type="button" class="btn btn-primary" data-dismiss="modal">Отмена</button>
 				</div>
 			</div>
