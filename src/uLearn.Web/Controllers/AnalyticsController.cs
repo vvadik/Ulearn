@@ -73,7 +73,7 @@ namespace uLearn.Web.Controllers
 					IsExercise = isExercise,
 					IsQuiz = isQuiz,
 					SolversPercent = isExercise
-						? (visitersCount == 0 ? 0 : (int)((double)userSolutionsRepo.GetAcceptedSolutionsCount(slide.Id, course.Id) / visitersCount) * 100)
+						? (visitersCount == 0 ? 0 : (int)((double)userSolutionsRepo.GetAcceptedSolutionsCount(course.Id, slide.Id) / visitersCount) * 100)
 						: isQuiz
 							? (visitersCount == 0 ? 0 : (int)((double)userQuizzesRepo.GetSubmitQuizCount(slide.Id, course.Id) / visitersCount) * 100)
 							: 0,
@@ -130,11 +130,11 @@ namespace uLearn.Web.Controllers
 			);
 
 			/* Dictionary<SlideId, List<UserSolution> (distinct by user)> */
-			var exercisesSolutions = userSolutionsRepo.GetAllAcceptedSolutions(courseId, slidesIds, periodStart, realPeriodFinish)
+			var exercisesSolutions = userSolutionsRepo.GetAllSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
 				.GroupBy(s => s.SlideId)
 				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).ToList());
 
-			var exercisesAcceptedSolutions = userSolutionsRepo.GetAllAcceptedSolutions(courseId, slidesIds, periodStart, realPeriodFinish)
+			var exercisesAcceptedSolutions = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
 				.GroupBy(s => s.SlideId)
 				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).ToList());
 
