@@ -113,13 +113,20 @@ namespace uLearn.Web.DataContexts
 			return Tuple.Create(likesCount, !votedAlready);
 		}
 
-		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
+		public IEnumerable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds)
 		{
 			return db.UserExerciseSubmissions
 				.Include(s => s.AutomaticChecking)
-				.Where(
-					x => x.CourseId == courseId &&
-					slidesIds.Contains(x.SlideId) &&
+				.Where(x =>
+					x.CourseId == courseId &&
+					slidesIds.Contains(x.SlideId)
+				);
+		}
+
+		public IEnumerable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
+		{
+			return GetAllSubmissions(courseId, slidesIds)
+				.Where(x => 
 					periodStart <= x.Timestamp &&
 					x.Timestamp <= periodFinish
 				);
@@ -130,13 +137,17 @@ namespace uLearn.Web.DataContexts
 			return GetAllSubmissions(courseId, slidesIds, periodStart, periodFinish).Where(s => s.AutomaticChecking.IsRightAnswer);
 		}
 
-		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, IEnumerable<Guid> slidesIds)
+		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId, IEnumerable<Guid> slidesIds)
 		{
-			var prepared = db.UserExerciseSubmissions
-				.Where(x => x.AutomaticChecking.IsRightAnswer && slidesIds.Contains(x.SlideId))
+			return GetAllSubmissions(courseId, slidesIds).Where(s => s.AutomaticChecking.IsRightAnswer);
+		}
+
+		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, List<Guid> slidesIds)
+		{
+			var prepared = GetAllAcceptedSubmissions(courseId, slidesIds)
 				.GroupBy(x => x.CodeHash, (codeHash, ss) => new { codeHash, timestamp = ss.Min(s => s.Timestamp) })
 				.Join(
-					db.UserExerciseSubmissions.Where(x => x.AutomaticChecking.IsRightAnswer && slidesIds.Contains(x.SlideId)),
+					GetAllAcceptedSubmissions(courseId, slidesIds),
 					g => g,
 					s => new { codeHash = s.CodeHash, timestamp = s.Timestamp }, (k, s) => new { submission = s, k.timestamp })
 				.Select(x => new { x.submission.Id, likes = x.submission.Likes.Count, x.timestamp })
@@ -149,13 +160,14 @@ namespace uLearn.Web.DataContexts
 				.OrderByDescending(x => (x.likes + 1) / timeNow.Subtract(x.timestamp).TotalMilliseconds);
 			var newest = prepared
 				.OrderByDescending(x => x.timestamp);
-			var answer = best.Take(3).Concat(trending.Take(3)).Concat(newest).Distinct().Take(10).Select(x => x.Id);
-			var result = db.UserExerciseSubmissions
-				.Where(solution => answer.Contains(solution.Id))
-				.Select(solution => new { solution.Id, Code = solution.SolutionCode.Text, Likes = solution.Likes.Select(y => y.UserId) })
+			var selectedSubmissionsIds = best.Take(3).Concat(trending.Take(3)).Concat(newest).Distinct().Take(10).Select(x => x.Id);
+
+			var selectedSubmissions = db.UserExerciseSubmissions
+				.Where(s => selectedSubmissionsIds.Contains(s.Id))
+				.Select(s => new { s.Id, Code = s.SolutionCode.Text, Likes = s.Likes.Select(y => y.UserId) })
 				.ToList();
-			return result
-				.Select(x => new AcceptedSolutionInfo(x.Code, x.Id, x.Likes))
+			return selectedSubmissions
+				.Select(s => new AcceptedSolutionInfo(s.Code, s.Id, s.Likes))
 				.OrderByDescending(info => info.UsersWhoLike.Count)
 				.ToList();
 		}
@@ -175,9 +187,9 @@ namespace uLearn.Web.DataContexts
 			return latest;
 		}
 		
-		public int GetAcceptedSolutionsCount(Guid slideId, string courseId)
+		public int GetAcceptedSolutionsCount(string courseId, Guid slideId)
 		{
-			return db.AutomaticExerciseCheckings.Where(x => x.SlideId == slideId && x.IsRightAnswer).Select(x => x.UserId).Distinct().Count();
+			return GetAllAcceptedSubmissions(courseId, new List<Guid> { slideId }).DistinctBy(x => x.UserId).Count();
 		}
 
 		public HashSet<Guid> GetIdOfPassedSlides(string courseId, string userId)
@@ -196,7 +208,7 @@ namespace uLearn.Web.DataContexts
 				.Take(max);
 		}
 
-		public UserExerciseSubmission GetSubmission(int id)
+		public UserExerciseSubmission FindSubmission(int id)
 		{
 			var submission = db.UserExerciseSubmissions.AsNoTracking().SingleOrDefault(x => x.Id == id);
 			if (submission == null)
@@ -323,7 +335,10 @@ namespace uLearn.Web.DataContexts
 			while (sw.Elapsed < timeout)
 			{
 				await WaitHandled(TimeSpan.FromSeconds(2));
-				var updatedSubmission = GetSubmission(submission.Id);
+				var updatedSubmission = FindSubmission(submission.Id);
+				if (updatedSubmission == null)
+					return null;
+
 				if (updatedSubmission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Done)
 					return updatedSubmission;
 			}

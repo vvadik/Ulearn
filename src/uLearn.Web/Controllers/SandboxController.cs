@@ -63,7 +63,10 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult GetDetails(int id)
 		{
-			var submission = solutionsRepo.GetSubmission(id);
+			var submission = solutionsRepo.FindSubmission(id);
+
+			if (submission == null)
+				return HttpNotFound();
 
 			submission.SolutionCode.Text = ((ExerciseSlide)courseManager
 				.GetCourse(submission.CourseId)

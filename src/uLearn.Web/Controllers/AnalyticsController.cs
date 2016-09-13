@@ -73,7 +73,7 @@ namespace uLearn.Web.Controllers
 					IsExercise = isExercise,
 					IsQuiz = isQuiz,
 					SolversPercent = isExercise
-						? (visitersCount == 0 ? 0 : (int)((double)userSolutionsRepo.GetAcceptedSolutionsCount(slide.Id, course.Id) / visitersCount) * 100)
+						? (visitersCount == 0 ? 0 : (int)((double)userSolutionsRepo.GetAcceptedSolutionsCount(course.Id, slide.Id) / visitersCount) * 100)
 						: isQuiz
 							? (visitersCount == 0 ? 0 : (int)((double)userQuizzesRepo.GetSubmitQuizCount(slide.Id, course.Id) / visitersCount) * 100)
 							: 0,
