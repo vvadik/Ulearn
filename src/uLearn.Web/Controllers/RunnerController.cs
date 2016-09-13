@@ -20,7 +20,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpGet]
 		[Route("GetSubmissions")]
-		public async Task<List<RunnerSubmition>> GetSubmissions([FromUri] string token, [FromUri] int count)
+		public async Task<List<RunnerSubmission>> GetSubmissions([FromUri] string token, [FromUri] int count)
 		{
 			CheckRunner(token);
 			var sw = Stopwatch.StartNew();
@@ -36,11 +36,11 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		private RunnerSubmition ToRunnerSubmition(UserExerciseSubmission submission)
+		private RunnerSubmission ToRunnerSubmition(UserExerciseSubmission submission)
 		{
 			if (submission.IsWebSubmission)
 			{
-				return new FileRunnerSubmition
+				return new FileRunnerSubmission
 				{
 					Id = submission.Id.ToString(),
 					Code = submission.SolutionCode.Text,

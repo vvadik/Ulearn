@@ -10,7 +10,7 @@ namespace RunCsJob
 {
 	public class SandboxRunner
 	{
-		private readonly RunnerSubmition submition;
+		private readonly RunnerSubmission submission;
 
 		private const int timeLimitInSeconds = 10;
 		private static readonly TimeSpan timeLimit = TimeSpan.FromSeconds(timeLimitInSeconds);
@@ -24,35 +24,35 @@ namespace RunCsJob
 
 		private readonly RunningResults result = new RunningResults();
 
-		public static RunningResults Run(string pathToCompiler, RunnerSubmition submition)
+		public static RunningResults Run(string pathToCompiler, RunnerSubmission submission)
 		{
 			try
 			{
-				if (submition is ProjRunnerSubmition)
-					return new SandboxRunner(submition).RunMsBuild(pathToCompiler);
-				return new SandboxRunner(submition).RunCsc60();
+				if (submission is ProjRunnerSubmission)
+					return new SandboxRunner(submission).RunMsBuild(pathToCompiler);
+				return new SandboxRunner(submission).RunCsc60();
 			}
 			catch (Exception ex)
 			{
 				return new RunningResults
 				{
-					Id = submition.Id,
+					Id = submission.Id,
 					Verdict = Verdict.SandboxError,
 					Error = ex.ToString()
 				};
 			}
 		}
 
-		public SandboxRunner(RunnerSubmition submition)
+		public SandboxRunner(RunnerSubmission submission)
 		{
-			this.submition = submition;
-			result.Id = submition.Id;
+			this.submission = submission;
+			result.Id = submission.Id;
 		}
 
 		private RunningResults RunMsBuild(string pathToCompiler)
 		{
-			var projSubmition = (ProjRunnerSubmition)submition;
-			var dir = Directory.CreateDirectory(Path.Combine(".", "submitions", submition.Id));
+			var projSubmition = (ProjRunnerSubmission)submission;
+			var dir = Directory.CreateDirectory(Path.Combine(".", "submitions", submission.Id));
 			try
 			{
 				try
@@ -63,7 +63,7 @@ namespace RunCsJob
 				{
 					return new RunningResults
 					{
-						Id = submition.Id,
+						Id = submission.Id,
 						Verdict = Verdict.SandboxError,
 						Error = ex.ToString()
 					};
@@ -78,7 +78,7 @@ namespace RunCsJob
 					result.CompilationOutput = builderResult.ToString();
 					return result;
 				}
-				RunSandboxer($"\"{builderResult.PathToExe}\" {submition.Id}");
+				RunSandboxer($"\"{builderResult.PathToExe}\" {submission.Id}");
 				return result;
 			}
 			finally
@@ -89,7 +89,7 @@ namespace RunCsJob
 
 		public RunningResults RunCsc()
 		{
-			var assembly = AssemblyCreator.CreateAssembly((FileRunnerSubmition)submition);
+			var assembly = AssemblyCreator.CreateAssembly((FileRunnerSubmission)submission);
 
 			result.Verdict = Verdict.Ok;
 			result.AddCompilationInfo(assembly);
@@ -100,12 +100,12 @@ namespace RunCsJob
 				return result;
 			}
 
-			if (!submition.NeedRun)
+			if (!submission.NeedRun)
 			{
 				SafeRemoveFile(assembly.PathToAssembly);
 				return result;
 			}
-			RunSandboxer($"\"{Path.GetFullPath(assembly.PathToAssembly)}\" {submition.Id}");
+			RunSandboxer($"\"{Path.GetFullPath(assembly.PathToAssembly)}\" {submission.Id}");
 
 			SafeRemoveFile(assembly.PathToAssembly);
 			return result;
@@ -113,7 +113,7 @@ namespace RunCsJob
 
 		public RunningResults RunCsc60()
 		{
-			var res = AssemblyCreator.CreateAssemblyWithRoslyn((FileRunnerSubmition)submition);
+			var res = AssemblyCreator.CreateAssemblyWithRoslyn((FileRunnerSubmission)submission);
 
 			result.Verdict = Verdict.Ok;
 			result.AddCompilationInfo(res.EmitResult.Diagnostics);
@@ -124,12 +124,12 @@ namespace RunCsJob
 				return result;
 			}
 
-			if (!submition.NeedRun)
+			if (!submission.NeedRun)
 			{
 				SafeRemoveFile(res.PathToAssembly);
 				return result;
 			}
-			RunSandboxer($"\"{Path.GetFullPath(res.PathToAssembly)}\" {submition.Id}");
+			RunSandboxer($"\"{Path.GetFullPath(res.PathToAssembly)}\" {submission.Id}");
 
 			SafeRemoveFile(res.PathToAssembly);
 			return result;
@@ -207,7 +207,7 @@ namespace RunCsJob
 			var startTime = DateTime.Now;
 
 			sandboxer.StandardInput.WriteLine("Run");
-			sandboxer.StandardInput.WriteLineAsync(submition.Input);
+			sandboxer.StandardInput.WriteLineAsync(submission.Input);
 
 			var stdoutReader = new AsyncReader(sandboxer.StandardOutput, outputLimit + 1);
 			while (!sandboxer.HasExited

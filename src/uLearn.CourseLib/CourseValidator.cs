@@ -110,7 +110,7 @@ namespace uLearn
 				}
 			});
 			var result = SandboxRunner.Run(pathToCompiler,
-				new ProjRunnerSubmition
+				new ProjRunnerSubmission
 				{
 					Id = slide.Id.ToString(),
 					ZipFileData = bytes,

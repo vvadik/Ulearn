@@ -82,12 +82,15 @@ namespace uLearn.Web.DataContexts
 			return submission;
 		}
 
-		public void DeleteSubmission(UserExerciseSubmission submission)
+		public async Task RemoveSubmission(UserExerciseSubmission submission)
 		{
-			db.AutomaticExerciseCheckings.Remove(submission.AutomaticChecking);
-			db.ManualExerciseCheckings.RemoveRange(submission.ManualCheckings);
+			if (submission.AutomaticChecking != null)
+				db.AutomaticExerciseCheckings.Remove(submission.AutomaticChecking);
+			if (submission.ManualCheckings != null)
+				db.ManualExerciseCheckings.RemoveRange(submission.ManualCheckings);
+
 			db.UserExerciseSubmissions.Remove(submission);
-			db.SaveChanges();
+			await db.SaveChangesAsync();
 		}
 
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
@@ -218,7 +221,12 @@ namespace uLearn.Web.DataContexts
 			return submissions;
 		}
 
-		protected UserExerciseSubmission FindSubmissionById(string id)
+		public UserExerciseSubmission FindSubmissionById(int id)
+		{
+			return db.UserExerciseSubmissions.Find(id);
+		}
+
+		public UserExerciseSubmission FindSubmissionById(string id)
 		{
 			return db.UserExerciseSubmissions.Find(id);
 		}

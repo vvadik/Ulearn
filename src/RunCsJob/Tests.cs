@@ -232,7 +232,7 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 
 		private static RunningResults GetDetails(string code, string input)
 		{
-			var model = new FileRunnerSubmition
+			var model = new FileRunnerSubmission
 			{
 				Id = Utils.NewNormalizedGuid(),
 				Code = code,

@@ -21,7 +21,7 @@ namespace RunCsJob
 			"mscorlib.dll"
 		};
 
-		public static CompilerResults CreateAssembly(FileRunnerSubmition submission)
+		public static CompilerResults CreateAssembly(FileRunnerSubmission submission)
 		{
 			var provider = new CSharpCodeProvider(new Dictionary<string, string> { { "CompilerVersion", "v4.0" } });
 			var compilerParameters = new CompilerParameters(UsesAssemblies)
@@ -38,7 +38,7 @@ namespace RunCsJob
 
 		public static IEnumerable<int> x = Enumerable.Range(1, 1);
 
-		public static CompileResult CreateAssemblyWithRoslyn(FileRunnerSubmition submission)
+		public static CompileResult CreateAssemblyWithRoslyn(FileRunnerSubmission submission)
 		{
 			IEnumerable<int> x = null;
 			SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(submission.Code);

@@ -64,7 +64,7 @@ namespace RunCsJob
 		private static void SelfCheck(string pathToCompiler)
 		{
 			var res = SandboxRunner.Run(pathToCompiler,
-				new FileRunnerSubmition
+				new FileRunnerSubmission
 				{
 					Id = Utils.NewNormalizedGuid(),
 					NeedRun = true,

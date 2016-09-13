@@ -309,11 +309,11 @@ namespace uLearn.Web.Controllers
 			var isPassed = visitsRepo.IsPassed(slide.Id, userId);
 			if (!isPassed)
 				await visitsRepo.SkipSlide(courseId, slide.Id, userId);
-			var solutions = solutionsRepo.GetBestTrendingAndNewAcceptedSolutions(courseId, slide.Id);
-			foreach (var solution in solutions)
+			var submissions = solutionsRepo.GetBestTrendingAndNewAcceptedSolutions(courseId, slide.Id);
+			foreach (var submission in submissions)
 			{
-				solution.LikedAlready = solution.UsersWhoLike.Any(u => u == userId);
-				solution.RemoveSolutionUrl = Url.Action("RemoveSolution", "Course", new { courseId, slideIndex = slide.Index, solutionId = solution.Id });
+				submission.LikedAlready = submission.UsersWhoLike.Any(u => u == userId);
+				submission.RemoveSolutionUrl = Url.Action("RemoveSubmission", "Course", new { courseId, slideIndex = slide.Index, submissionId = submission.Id });
 			}
 
 			var model = new AcceptedSolutionsPageModel
@@ -321,7 +321,7 @@ namespace uLearn.Web.Controllers
 				CourseId = courseId,
 				CourseTitle = course.Title,
 				Slide = slide,
-				AcceptedSolutions = solutions,
+				AcceptedSolutions = submissions,
 				User = User,
 				LikeSolutionUrl = Url.Action("LikeSolution"),
 				IsLti = isLti,
@@ -387,21 +387,13 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public async Task<ActionResult> RemoveSolution(string courseId, int slideIndex, int solutionId)
+		public async Task<ActionResult> RemoveSubmission(string courseId, int slideIndex, int submissionId)
 		{
-			var submission = await db.UserExerciseSubmissions.FirstOrDefaultAsync(s => s.Id == solutionId);
+			var submission = solutionsRepo.FindSubmissionById(submissionId);
 			if (submission != null)
 			{
-				var visit = await db.Visits.FirstOrDefaultAsync(v => v.UserId == submission.UserId && v.SlideId == submission.SlideId);
-				if (visit != null)
-				{
-					/* TODO(andgein): Replace to UpdateScoreForVisit() */
-					visit.IsPassed = db.UserExerciseSubmissions.Any(s => s.UserId == submission.UserId && s.SlideId == submission.SlideId && s.AutomaticChecking.IsRightAnswer && s.Id != solutionId);
-					visit.Score = visit.IsSkipped ? 0 : visit.IsPassed ? 5 : 0; //TODO fix 5 to Score from UserSolution
-					visit.AttemptsCount--;
-				}
-				db.UserExerciseSubmissions.Remove(submission);
-				await db.SaveChangesAsync();
+				await solutionsRepo.RemoveSubmission(submission);
+				await visitsRepo.UpdateScoreForVisit(courseId, submission.SlideId, submission.UserId);
 			}
 			return RedirectToAction("AcceptedSolutions", new { courseId, slideIndex });
 		}
