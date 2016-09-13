@@ -1,6 +1,7 @@
 ﻿using RunCsJob.Api;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
@@ -112,13 +113,16 @@ namespace uLearn.Web.DataContexts
 			return Tuple.Create(likesCount, !votedAlready);
 		}
 
-		public IEnumerable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
+		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
 		{
-			return db.UserExerciseSubmissions.Where(x => x.CourseId == courseId &&
-													slidesIds.Contains(x.SlideId) &&
-													periodStart <= x.Timestamp &&
-													x.Timestamp <= periodFinish
-			);
+			return db.UserExerciseSubmissions
+				.Include(s => s.AutomaticChecking)
+				.Where(
+					x => x.CourseId == courseId &&
+					slidesIds.Contains(x.SlideId) &&
+					periodStart <= x.Timestamp &&
+					x.Timestamp <= periodFinish
+				);
 		}
 
 		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
