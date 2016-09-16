@@ -162,6 +162,8 @@
 @helper Block(ExerciseBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData(context.Course.Id, context.Slide.Index);
+
+	/* data.Url is unavailable in course monitor but no needs to show accepted solution there */
 	var acceptedSolutionUrl = data.Url != null
 		? data.Url.Action("AcceptedSolutions", "Course", new { courseId = context.Course.Id, slideIndex = context.Slide.Index })
 		: "";
@@ -171,6 +173,15 @@
 	{
 		classString = "code-review";
 	}
+	else if (data.SubmissionSelectedByUser != null)
+	{
+		classString = "code-reviewed";
+	}
+
+	@Html.Partial("_ExerciseSubmissionsPanel", new ExerciseSubmissionsPanelModel(context.Course.Id, context.Slide)
+	{
+		Submissions = data.Submissions
+	})
 
 	var status = "";
 	if (data.ReviewState == ExerciseReviewState.WaitingForReview)
@@ -180,9 +191,8 @@
 	else if (data.ReviewState == ExerciseReviewState.Reviewed)
 	{
 		status = "Все тесты пройдены, код проверен преподаваталем";
-		classString = "code-reviewed";
 	}
-	if (! string.IsNullOrEmpty(status) && context.ManualChecking == null)
+	if (!string.IsNullOrEmpty(status) && context.ManualChecking == null)
 	{
 		<p class="exercise-status">@status</p>
 	}
@@ -211,16 +221,16 @@
 	if (data.ShowControls && context.ManualChecking == null)
 	{
 		<div class="solution-control btn-group ctrl-group">
-			@if (data.ReviewState == ExerciseReviewState.Reviewed)
+			@if (data.SubmissionSelectedByUser != null)
 			{
-				<a href="?again=true" class="try-again-button btn btn-primary no-rounds">
-					Try again
+				<a href="?version=-1" class="try-again-button btn btn-primary no-rounds">
+					Ещё раз
 				</a>
 			}
 			else
 			{
 				<button type="button" class="run-solution-button btn btn-primary no-rounds @(data.IsLti ? "run-solution-button-lti" : "")" data-url="@data.RunSolutionUrl">
-					Run
+					Отправить
 				</button>
 			}
 			@if (!data.DebugView)
@@ -229,16 +239,16 @@
 				<button id="GetHintButton" type="button" class="btn btn-default hints-btn"
 				        data-course-id="@context.Course.Id" data-slide-index="@context.Slide.Index" data-hints-count="@e.Count"
 				        data-url="@data.Url.Action("UseHint", "Hint")">
-					Get hint
+					Взять подсказку
 				</button>
 				if (!data.IsLti && !block.HideShowSolutionsButton)
 				{
 					<button type="button" class="btn btn-default giveup-btn" onclick="@action">
-						Show solutions
+						Показать решения
 					</button>
 				}
 				<button type="button" class="btn btn-default reset-btn no-rounds" onclick="cleanUserCode()">
-					Reset
+					Начать с начала
 				</button>
 			}
 		</div>

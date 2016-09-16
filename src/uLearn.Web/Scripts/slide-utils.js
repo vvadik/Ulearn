@@ -10,3 +10,9 @@
 		div.load(div.data('url'));
 	div.css('display', 'block');
 }
+
+$(document).ready(function() {
+	$('.js__onchange-send-form').change(function () {
+		$(this).closest('form').submit();
+	});
+})

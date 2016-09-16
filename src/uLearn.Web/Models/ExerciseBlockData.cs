@@ -13,13 +13,14 @@ namespace uLearn.Web.Models
 			Solution = solution;
 			CanSkip = !isSkipped && Solution == null;
 			ReviewState = ExerciseReviewState.NotReviewed;
+			Submissions = new List<UserExerciseSubmission>();
 		}
 
 		public bool ShowControls { get; private set; }
 		public bool CanSkip { get; private set; }
 		public string Solution { get; private set; }
+
 		public UrlHelper Url { get; set; }
-		public HtmlHelper Help { get; set; }
 		private string runSolutionUrl;
 		public string RunSolutionUrl {
 			get
@@ -39,6 +40,8 @@ namespace uLearn.Web.Models
 
 		public ExerciseReviewState ReviewState { get; set; }
 		public List<ExerciseCodeReview> Reviews { get; set; }
+		public UserExerciseSubmission SubmissionSelectedByUser { get; set; }
+		public List<UserExerciseSubmission> Submissions { get; set; }
 	}
 
 	public enum ExerciseReviewState

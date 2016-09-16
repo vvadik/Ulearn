@@ -25,7 +25,7 @@ namespace uLearn.Web.Models
 			return BlockData[index];
 		}
 
-		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData, bool isGuest = false, bool revealHidden = false, AbstractManualSlideChecking manualChecking = null, bool canUserFillQuiz = false, int? groupId=null)
+		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData, bool isGuest = false, bool revealHidden = false, AbstractManualSlideChecking manualChecking = null, bool canUserFillQuiz = false, int? groupId = null)
 		{
 			if (blockData.Length != slide.Blocks.Length)
 				throw new ArgumentException("BlockData.Length should be slide.Blocks.Length");

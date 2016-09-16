@@ -53,7 +53,7 @@ $runButton.click(function () {
 	var code = $(".code-exercise")[0].codeMirrorEditor.getValue();
 	if (code.length == 0)
 		code = " ";
-	$runButton.text("Running...").addClass("active");
+	$runButton.text("Выполняется...").addClass("active");
 	$runResults.hide();
 
 	$.ajax(
@@ -67,6 +67,6 @@ $runButton.click(function () {
 		console.log(req.responseText);
 	})
 	.always(function () {
-		$runButton.text("Run").removeClass("active");
+		$runButton.text("Отправить").removeClass("active");
 	});
 });

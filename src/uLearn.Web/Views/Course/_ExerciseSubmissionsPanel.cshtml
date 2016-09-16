@@ -1,0 +1,60 @@
+﻿@model uLearn.Web.Controllers.ExerciseSubmissionsPanelModel
+
+@functions
+{
+	private static string GetSubmissionDescription(UserExerciseSubmission submission)
+	{
+		if (submission.ManualCheckings != null && submission.ManualCheckings.Count > 0)
+			if (submission.ManualCheckings.Any(s => s.IsChecked))
+				return ", проверено преподавателем";
+			else
+				return ", ожидает код-ревью";
+		return "";
+	}
+}
+
+<div class="exercise__submissions-panel">
+	@if (Model.Submissions.Count > 0)
+	{
+		var buttonClasses = "btn btn-xs btn-info";
+		var disabledButtonClasses = "btn btn-xs btn-default";
+
+		var currentSubmissionIndex = Model.Submissions.FindIndex(s => s.Id == Model.CurrentSubmissionId);
+		if (currentSubmissionIndex > 0)
+		{
+			var previousSubmission = Model.Submissions[currentSubmissionIndex - 1];
+			@Html.RouteLink("← Предыдущая версия", "Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, version = previousSubmission.Id }, new { @class = buttonClasses })
+		}
+		else
+		{
+			@Html.RouteLink("← Предыдущая версия", "Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url }, new { @class = disabledButtonClasses, disabled = "disabled" })
+		}
+
+		var listItems = Model.Submissions.Select(s => new SelectListItem
+		{
+			Text = s.Timestamp.ToPrettyString() + GetSubmissionDescription(s),
+			Value = s.Id.ToString(),
+			Selected = s.Id == Model.CurrentSubmissionId,
+		}).ToList();
+		listItems.Add(new SelectListItem { Text = "Сдать ещё раз", Value = "-1", Selected = !Model.CurrentSubmissionId.HasValue });
+		using (Html.BeginForm(null, null, FormMethod.Get, new { @class = "ib" }))
+		{
+			@Html.DropDownList("version", listItems, new { @class = "inline-select js__onchange-send-form" })
+		}
+
+		if (currentSubmissionIndex >= 0 && currentSubmissionIndex < Model.Submissions.Count - 1)
+		{
+			var nextSubmission = Model.Submissions[currentSubmissionIndex + 1];
+			@Html.RouteLink("Следующая версия →", "Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, version = nextSubmission.Id }, new { @class = buttonClasses })
+		}
+		else if (currentSubmissionIndex >= 0)
+		{
+			@Html.RouteLink("Сдать ещё раз", "Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, version = Model.CurrentSubmissionId }, new { @class = buttonClasses })
+		}
+		else
+		{
+			@Html.RouteLink("Следующая версия →", "Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url }, new { @class = disabledButtonClasses, disabled = "disabled" })
+		}
+
+	}
+</div>

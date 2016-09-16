@@ -249,7 +249,7 @@ namespace uLearn.Web.Controllers
 
 			var usersIds = FindGroupMembers(courseId, groupId);
 			if (usersIds == null)
-				groupId = null;
+				groupId = -1;
 			var checkings = slideCheckingsRepo.GetManualCheckingQueue<T>(
 				new ManualCheckingQueueFilterOptions { CourseId = courseId, OnlyChecked = done, UsersIds = usersIds }
 				).ToList();
@@ -335,7 +335,7 @@ namespace uLearn.Web.Controllers
 			{
 				var usersIds = FindGroupMembers(courseId, groupId);
 				if (usersIds == null)
-					groupId = null;
+					groupId = -1;
 				var checkings = slideCheckingsRepo.GetManualCheckingQueue<T>(
 					new ManualCheckingQueueFilterOptions { CourseId = courseId, SlidesIds = new List<Guid> { slideId }, UsersIds = usersIds }
 					).ToList();

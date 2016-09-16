@@ -12,7 +12,7 @@
 	<p>
 		@if (! Model.AlreadyChecked)
 		{
-			@Html.ActionLink("Проверенные работы", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId, done = true }, new { @class="btn btn-xs btn-info" })
+			@Html.ActionLink("Проверенные работы →", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId, done = true }, new { @class="btn btn-xs btn-info" })
 		}
 		else
 		{
@@ -44,8 +44,15 @@
 
 	@if (Model.Checkings.Count == 0)
 	{
-		<div class="alert alert-success">Поздравляем, очередь пуста! Работ для проверки нет</div>
-		<div class="text-muted">Здесь будут появляться программы студентов, которые должны быть проверены преподавателем вручную.</div>
+		if (Model.AlreadyChecked)
+		{
+			<div class="text-muted">Здесь будут проверенные преподавателями программы студентов</div>
+		}
+		else
+		{
+			<div class="alert alert-success">Поздравляем, очередь пуста! Работ для проверки нет</div>
+			<div class="text-muted">Здесь будут появляться программы студентов, которые должны быть проверены преподавателем вручную.</div>
+		}
 	}
 
 	@foreach (var checkModel in Model.Checkings)

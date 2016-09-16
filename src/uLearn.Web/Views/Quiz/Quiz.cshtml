@@ -43,8 +43,8 @@
 		CourseUnitUtils.GetDirectoryRelativeWebPath(quizSlide.Info.SlideFile),
 		Enumerable.Range(0, Model.Slide.Blocks.Length)
 			.Select(x => quizSlide.Blocks[x] is AbstractQuestionBlock
-					? new QuizBlockData(Model, x, Model.QuizState)
-					: null)
+				? new QuizBlockData(Model, x, Model.QuizState)
+				: null)
 			.ToArray<dynamic>(),
 		Model.IsGuest,
 		true,

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web;
@@ -204,6 +206,24 @@ namespace uLearn.Web.Controllers
 
 			return Redirect(nextUrl);
 		}
+
+		public ActionResult SubmissionsPanel(string courseId, Guid slideId, string userId="")
+		{
+			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
+				userId = "";
+
+			if (userId == "")
+				userId = User.Identity.GetUserId();
+
+			var slide = courseManager.GetCourse(courseId).FindSlideById(slideId);
+			var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
+
+			return PartialView("~/Views/Course/_ExerciseSubmissionsPanel.cshtml", new ExerciseSubmissionsPanelModel(courseId, slide)
+			{
+				Submissions = submissions,
+			});
+		}
+
 	}
 
 	public class ReviewInfo
@@ -213,6 +233,23 @@ namespace uLearn.Web.Controllers
 		public int StartPosition { get; set; }
 		public int FinishLine { get; set; }
 		public int FinishPosition { get; set; }
+	}
+
+	public class ExerciseSubmissionsPanelModel
+	{
+		public ExerciseSubmissionsPanelModel(string courseId, Slide slide)
+		{
+			CourseId = courseId;
+			Slide = slide;
+
+			Submissions = new List<UserExerciseSubmission>();
+			CurrentSubmissionId = null;
+		}
+
+		public string CourseId { get; set; }
+		public Slide Slide { get; set; }
+		public List<UserExerciseSubmission> Submissions { get; set; }
+		public int? CurrentSubmissionId { get; set; }
 	}
 }
 

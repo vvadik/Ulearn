@@ -38,7 +38,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[AllowAnonymous]
-		public async Task<ActionResult> SlideById(string courseId, string slideId="", int? checkQueueItemId=null, int? groupId=null)
+		public async Task<ActionResult> SlideById(string courseId, string slideId="", int? checkQueueItemId=null, int? groupId=null, int? version=null)
 		{
 			if (slideId.Contains("_"))
 				slideId = slideId.Substring(slideId.LastIndexOf('_') + 1);
@@ -81,11 +81,9 @@ namespace uLearn.Web.Controllers
 					return RedirectToAction(GetAdminQueueActionName(queueItem), "Admin", new { CourseId = courseId, message = "time_is_over" });
 			}
 
-			var fillExerciseAgain = Request.QueryString["again"] == "true";
-
 			var model = isGuest ?
 				CreateGuestCoursePageModel(courseId, slideGuid, visibleUnits) :
-				await CreateCoursePageModel(courseId, slideGuid, visibleUnits, queueItem, fillExerciseAgain, groupId);
+				await CreateCoursePageModel(courseId, slideGuid, visibleUnits, queueItem, version, groupId);
 
 			if (!string.IsNullOrEmpty(Request.QueryString["error"]))
 				model.Error = Request.QueryString["error"];
@@ -218,7 +216,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits, AbstractManualSlideChecking manualChecking, bool fillExerciseAgain=false, int? groupId=null)
+		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits, AbstractManualSlideChecking manualChecking, int? exerciseSubmissionId=null, int? groupId = null)
 		{
 			var course = courseManager.GetCourse(courseId);
 
@@ -236,6 +234,18 @@ namespace uLearn.Web.Controllers
 			if (manualChecking != null)
 				userId = manualChecking.UserId;
 
+			UserExerciseSubmission exerciseSubmission = null;
+			if (exerciseSubmissionId.HasValue && exerciseSubmissionId.Value >= 0)
+			{
+				exerciseSubmission = solutionsRepo.FindSubmissionById(exerciseSubmissionId.Value);
+				if (exerciseSubmission.CourseId != courseId || exerciseSubmission.SlideId != slideId || exerciseSubmission.UserId != userId)
+					exerciseSubmission = null;
+			}
+			else if (!exerciseSubmissionId.HasValue)
+			{
+				exerciseSubmission = GetExerciseSubmissionShownByDefault(courseId, slideId, userId);
+			}
+
 			var visiter = await VisitSlide(courseId, slideId, userId);
 			var score = Tuple.Create(visiter.Score, slide.MaxScore);
 			var model = new CoursePageModel
@@ -246,7 +256,7 @@ namespace uLearn.Web.Controllers
 				Slide = slide,
 				Rate = GetRate(course.Id, slideId),
 				Score = score,
-				BlockRenderContext = CreateRenderContext(course, slide, visiter, false, manualChecking, fillExerciseAgain, groupId),
+				BlockRenderContext = CreateRenderContext(course, slide, visiter, false, manualChecking, exerciseSubmission, groupId),
 				ManualChecking = manualChecking,
 				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
 				IsGuest = false,
@@ -254,9 +264,16 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, Visit visit, bool isLti = false, AbstractManualSlideChecking manualChecking=null, bool fillExerciseAgain=false, int? groupId=null)
+		private UserExerciseSubmission GetExerciseSubmissionShownByDefault(string courseId, Guid slideId, string userId)
 		{
-			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visit, isLti, manualChecking, fillExerciseAgain)).ToArray();
+			var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
+			return submissions.LastOrDefault(s => s.ManualCheckings != null && s.ManualCheckings.Any()) ??
+					submissions.LastOrDefault(s => s.AutomaticChecking != null && s.AutomaticChecking.IsRightAnswer);
+		}
+
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, Visit visit, bool isLti = false, AbstractManualSlideChecking manualChecking = null, UserExerciseSubmission exerciseSubmission = null, int? groupId = null)
+		{
+			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visit, isLti, manualChecking, exerciseSubmission)).ToArray();
 			return new BlockRenderContext(
 				course,
 				slide,
@@ -270,12 +287,13 @@ namespace uLearn.Web.Controllers
 				);
 		}
 
-		private dynamic CreateBlockData(Course course, Slide slide, SlideBlock slideBlock, Visit visit, bool isLti, AbstractManualSlideChecking manualChecking, bool fillExerciseAgain = false)
+		private dynamic CreateBlockData(Course course, Slide slide, SlideBlock slideBlock, Visit visit, bool isLti, AbstractManualSlideChecking manualChecking, UserExerciseSubmission exerciseSubmission)
 		{
 			if (slideBlock is ExerciseBlock)
 			{
 				var submission = manualChecking != null ?
 					((ManualExerciseChecking)manualChecking).Submission :
+					exerciseSubmission ?? 
 					solutionsRepo.FindLatestAcceptedSubmission(course.Id, slide.Id, visit.UserId);
 				var solution = submission?.SolutionCode.Text;
 				var submissionReviews = submission?.ManualCheckings.LastOrDefault()?.Reviews.Where(r => ! r.IsDeleted);
@@ -285,8 +303,10 @@ namespace uLearn.Web.Controllers
 				var reviewState = hasCheckedReview ? ExerciseReviewState.Reviewed :
 					hasUncheckedReview ? ExerciseReviewState.WaitingForReview :
 						ExerciseReviewState.NotReviewed;
-				if (fillExerciseAgain)
+				if (exerciseSubmission == null)
 					reviewState = ExerciseReviewState.NotReviewed;
+
+				var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, slide.Id, visit.UserId);
 
 				return new ExerciseBlockData(course.Id, slide.Index, true, visit.IsSkipped, solution)
 				{
@@ -294,6 +314,8 @@ namespace uLearn.Web.Controllers
 					Reviews = submissionReviews?.ToList() ?? new List<ExerciseCodeReview>(),
 					IsLti = isLti,
 					ReviewState = reviewState,
+					SubmissionSelectedByUser = exerciseSubmission,
+					Submissions = submissions.ToList(),
 				};
 			}
 			return null;
@@ -373,7 +395,7 @@ namespace uLearn.Web.Controllers
 			if (string.IsNullOrEmpty(userId))
 				return null;
 			await visitsRepo.AddVisit(courseId, slideId, userId);
-			return visitsRepo.GetVisiter(slideId, userId);
+			return visitsRepo.FindVisiter(courseId, slideId, userId);
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
