@@ -463,7 +463,8 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 	
 WebViewPage.WriteTo(@__razor_helper_writer, Html.Partial("_ExerciseSubmissionsPanel", new ExerciseSubmissionsPanelModel(context.Course.Id, context.Slide)
 	{
-		Submissions = data.Submissions
+		Submissions = data.Submissions,
+		CurrentSubmissionId = data.SubmissionSelectedByUser != null ? (int?)data.SubmissionSelectedByUser.Id : null
 	}));
 
    

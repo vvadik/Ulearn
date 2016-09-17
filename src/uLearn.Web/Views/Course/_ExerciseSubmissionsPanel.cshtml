@@ -13,7 +13,9 @@
 	}
 }
 
-<div class="exercise__submissions-panel">
+<div class="exercise__submissions-panel js__auto-update"
+     data-update-url="@Url.Action("SubmissionsPanel", "Exercise", new { Model.CourseId, slideId = Model.Slide.Id, currentSubmissionId = Model.CurrentSubmissionId })"
+	 data-update-interval="1000">
 	@if (Model.Submissions.Count > 0)
 	{
 		var buttonClasses = "btn btn-xs btn-info";
@@ -27,7 +29,7 @@
 		}
 		else
 		{
-			@Html.RouteLink("← Предыдущая версия", "Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url }, new { @class = disabledButtonClasses, disabled = "disabled" })
+			@Html.RouteLink("← Предыдущая версия", "Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, version = Model.Submissions[Model.Submissions.Count - 1].Id }, new { @class = buttonClasses })
 		}
 
 		var listItems = Model.Submissions.Select(s => new SelectListItem
@@ -36,10 +38,10 @@
 			Value = s.Id.ToString(),
 			Selected = s.Id == Model.CurrentSubmissionId,
 		}).ToList();
-		listItems.Add(new SelectListItem { Text = "Сдать ещё раз", Value = "-1", Selected = !Model.CurrentSubmissionId.HasValue });
-		using (Html.BeginForm(null, null, FormMethod.Get, new { @class = "ib" }))
+		listItems.Add(new SelectListItem { Text = "Новая попытка", Value = "-1", Selected = !Model.CurrentSubmissionId.HasValue });
+		using (Html.BeginRouteForm("Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url }, FormMethod.Get, new { @class = "ib" }))
 		{
-			@Html.DropDownList("version", listItems, new { @class = "inline-select js__onchange-send-form" })
+			@Html.DropDownList("version", listItems, new { @class = "inline-select select-auto-width js__onchange-send-form" })
 		}
 
 		if (currentSubmissionIndex >= 0 && currentSubmissionIndex < Model.Submissions.Count - 1)
@@ -49,7 +51,7 @@
 		}
 		else if (currentSubmissionIndex >= 0)
 		{
-			@Html.RouteLink("Сдать ещё раз", "Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, version = Model.CurrentSubmissionId }, new { @class = buttonClasses })
+			@Html.RouteLink("Сдать ещё раз »", "Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, version = -1 }, new { @class = buttonClasses })
 		}
 		else
 		{

@@ -207,7 +207,7 @@ namespace uLearn.Web.Controllers
 			return Redirect(nextUrl);
 		}
 
-		public ActionResult SubmissionsPanel(string courseId, Guid slideId, string userId="")
+		public ActionResult SubmissionsPanel(string courseId, Guid slideId, string userId="", int? currentSubmissionId=null)
 		{
 			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
 				userId = "";
@@ -221,6 +221,7 @@ namespace uLearn.Web.Controllers
 			return PartialView("~/Views/Course/_ExerciseSubmissionsPanel.cshtml", new ExerciseSubmissionsPanelModel(courseId, slide)
 			{
 				Submissions = submissions,
+				CurrentSubmissionId = currentSubmissionId,
 			});
 		}
 
