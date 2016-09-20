@@ -23,6 +23,7 @@ namespace uLearn.Web
 					"~/Scripts/jquery-ui.min.js",
 					"~/Scripts/jquery.unobtrusive-ajax*",
 					"~/Scripts/notify-custom.min.js",
+					"~/Scripts/jquery.query-object.js",
 					"~/Scripts/jquery.validate.js",
 					"~/Scripts/jquery.validate-vsdoc.js",
 					"~/Scripts/jquery.validate.unobtrusive.js",

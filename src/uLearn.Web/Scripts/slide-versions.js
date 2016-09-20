@@ -1,4 +1,11 @@
-﻿function setExerciseVersion(versionId) {
+﻿function updateExerciseVersionUrl(versionId) {
+	var newSearch = $.query.set('version', versionId).toString();
+	var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + newSearch;
+	if (history.pushState)
+		window.history.pushState({ path: newurl }, '', newurl);
+}
+
+function setExerciseVersion(versionId) {
 	var url = $('.exercise__submission').data('version-update-url');
 	url = url.replace('VERSION_ID', versionId);
 
@@ -11,6 +18,8 @@
 		selectSetAutoWidth($submission.find('.select-auto-width'));
 		setAutoUpdater($submission.find('.js__auto-update'));
 		refreshPreviousDraft();
+
+		updateExerciseVersionUrl(versionId);
 	});
 }
 
