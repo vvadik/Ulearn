@@ -234,12 +234,24 @@ function addExerciseCodeReview(renderedReview) {
 	$reviews.append($newReview);
 }
 
-function refreshPreviousDraft(ac, id) {
+var refreshPreviousDraftLastId = undefined;
+function refreshPreviousDraft(id) {
+	if (id == undefined)
+		id = refreshPreviousDraftLastId;
+	refreshPreviousDraftLastId = id;
+
 	window.onbeforeunload = function () {
-		if (ac == 'False')
-			localStorage[id] = $('.code-exercise')[0].codeMirrorEditor.getValue();
+		saveExerciseCodeDraft(id);
 	}
-	if (localStorage[id] != undefined && ac == 'False') {
+	if (localStorage[id] != undefined && $('.code-exercise').length > 0) {
 		$('.code-exercise')[0].codeMirrorEditor.setValue(localStorage[id]);
 	}
+}
+
+function saveExerciseCodeDraft(id) {
+	if (id == undefined)
+		id = refreshPreviousDraftLastId;
+
+	if ($('.code-exercise').length > 0)
+		localStorage[id] = $('.code-exercise')[0].codeMirrorEditor.getValue();
 }

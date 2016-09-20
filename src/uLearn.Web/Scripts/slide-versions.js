@@ -1,12 +1,16 @@
 ﻿function setExerciseVersion(versionId) {
 	var url = $('.exercise__submission').data('version-update-url');
 	url = url.replace('VERSION_ID', versionId);
+
+	saveExerciseCodeDraft();
+
 	$.get(url, function(data) {
 		var $submission = $('.exercise__submission');
 		$submission.html($(data).html());
 		initCodeEditor($submission);
 		selectSetAutoWidth($submission.find('.select-auto-width'));
 		setAutoUpdater($submission.find('.js__auto-update'));
+		refreshPreviousDraft();
 	});
 }
 
