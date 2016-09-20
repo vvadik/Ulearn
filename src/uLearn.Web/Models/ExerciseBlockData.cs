@@ -1,22 +1,32 @@
 using System.Collections.Generic;
 using System.Web.Mvc;
+using uLearn.Model.Blocks;
 
 namespace uLearn.Web.Models
 {
 	public class ExerciseBlockData
 	{
-		public ExerciseBlockData(string courseId, int slideIndex, bool showControls = true, bool isSkipped = true, string solution = null)
+		public ExerciseBlockData(string courseId, ExerciseSlide slide, bool isSkipped = true, string solution = null)
 		{
 			CourseId = courseId;
-			SlideIndex = slideIndex;
-			ShowControls = showControls;
+			Slide = slide;
 			Solution = solution;
 			CanSkip = !isSkipped && Solution == null;
+			IsGuest = true;
 			ReviewState = ExerciseReviewState.NotReviewed;
 			Submissions = new List<UserExerciseSubmission>();
 		}
 
-		public bool ShowControls { get; private set; }
+		public string CourseId { get; set; }
+		public ExerciseSlide Slide { get; set; }
+		public ExerciseBlock Block => Slide.Exercise;
+
+		public bool IsLti { get; set; }
+		public bool IsGuest { get; set; }
+		public bool DebugView { get; set; }
+		public bool IsSkippedOrPassed { get; set; }
+
+		public bool ShowControls => !IsGuest;
 		public bool CanSkip { get; private set; }
 		public string Solution { get; private set; }
 
@@ -27,21 +37,16 @@ namespace uLearn.Web.Models
 			{
 				if (! string.IsNullOrEmpty(runSolutionUrl) || Url == null)
 					return runSolutionUrl ?? "";
-				return Url.Action("RunSolution", "Exercise", new { CourseId, SlideIndex, IsLti });
+				return Url.Action("RunSolution", "Exercise", new { CourseId, slideId = Slide.Id, IsLti });
 			}
 			set { runSolutionUrl = value; }
 		}
-
-		public bool IsLti { get; set; }
-		public bool DebugView { get; set; }
-		public bool IsSkippedOrPassed { get; set; }
-		public string CourseId { get; set; }
-		public int SlideIndex { get; set; }
 
 		public ExerciseReviewState ReviewState { get; set; }
 		public List<ExerciseCodeReview> Reviews { get; set; }
 		public UserExerciseSubmission SubmissionSelectedByUser { get; set; }
 		public List<UserExerciseSubmission> Submissions { get; set; }
+		public ManualExerciseChecking ManualChecking { get; set; }
 	}
 
 	public enum ExerciseReviewState

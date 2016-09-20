@@ -92,7 +92,7 @@
 		<script>
 			getHints("@Model.CourseId", "@Model.Slide.Index", '@e.Exercise.HintsMd.Count')
 		</script>
-		<script> refreshPreviousDraft('@(data.Solution != null)', '@e.Id') </script>
+		<script> refreshPreviousDraft('@(data != null && ! string.IsNullOrEmpty(data.Solution))', '@e.Id') </script>
 	}
 
 

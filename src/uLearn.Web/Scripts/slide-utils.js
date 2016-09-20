@@ -25,11 +25,15 @@ function selectSetAutoWidth($select) {
 function setAutoUpdater($element) {
 	var interval = $element.data('update-interval') || 1000;
 	var url = $element.data('update-url') || console.log('Invalid data-update-url on ', $element);
-	setInterval(function() {
+	var timer = setInterval(function () {
+		/* If element has been removed from DOM then stop */
+		if ($element.parent().length === 0) {
+			clearInterval(timer);
+			return;
+		}
 		$.get(url, function (answer) {
 			var $answer = $(answer);
 			if ($answer.text() !== $element.text()) {
-				console.log('Update value for ', $element);
 				$element.html($answer.html());
 			}
 		});

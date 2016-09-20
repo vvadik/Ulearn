@@ -1203,6 +1203,7 @@
     <Content Include="Scripts\slide-tex.js" />
     <Content Include="Scripts\slide-stats.js" />
     <Content Include="Scripts\slide-utils.js" />
+    <Content Include="Scripts\slide-versions.js" />
     <Content Include="Scripts\table-configurator.js" />
     <Content Include="Scripts\user-group-name-change.js" />
     <Content Include="Scripts\users-list.js" />
@@ -1416,8 +1417,10 @@
     <Content Include="Views\Course\CourseInstructorNavbar.cshtml" />
     <Content Include="Views\Admin\ManualExerciseCheckingQueue.cshtml" />
     <Content Include="Views\Admin\_ManualCheckingQueueFilterForm.cshtml" />
-    <Content Include="Views\Course\_ExerciseReview.cshtml" />
-    <Content Include="Views\Course\_ExerciseSubmissionsPanel.cshtml" />
+    <Content Include="Views\Exercise\_ExerciseReview.cshtml" />
+    <Content Include="Views\Exercise\SubmissionsPanel.cshtml" />
+    <Content Include="Views\Exercise\Submission.cshtml" />
+    <Content Include="Views\Exercise\_ExerciseScoreForm.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

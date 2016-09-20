@@ -84,7 +84,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t</div>\r\n\r\n\t\t<d
 WebViewPage.WriteTo(@__razor_helper_writer, SlideHtml.Slide(new BlockRenderContext(course, slide, "/static/", 
 						slide.Blocks.Select(
 							(b, i) => b is ExerciseBlock 
-								? new ExerciseBlockData(course.Id, slide.Index) { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true } 
+								? new ExerciseBlockData(course.Id, (ExerciseSlide) slide) { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true, IsGuest = false } 
 								: b is AbstractQuestionBlock 
 									? new QuizBlockData(new QuizModel
 									{

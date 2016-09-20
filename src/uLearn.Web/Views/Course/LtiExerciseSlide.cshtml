@@ -14,7 +14,7 @@
 <body class="lti-component">
 	@if (Model != null)
 	{
-		@SlideHtml.Block(Model.ExerciseBlock, Model.Context)
+		@SlideHtml.Block(Model.ExerciseBlock, Model.Context, Html)
 
 		@Scripts.Render("~/main-js")
 		<script> getHints("@Model.CourseId", "@Model.SlideIndex", '@Model.ExerciseBlock.HintsMd.Count') </script>

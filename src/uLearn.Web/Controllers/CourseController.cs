@@ -138,7 +138,7 @@ namespace uLearn.Web.Controllers
 					SlideIndex = slideIndex,
 					SlideId = exerciseSlide.Id,
 					ExerciseBlock = exerciseSlide.Exercise,
-					Context = CreateRenderContext(course, exerciseSlide, visiter, true)
+					Context = CreateRenderContext(course, exerciseSlide)
 				};
 				return View("LtiExerciseSlide", model);
 			}
@@ -198,7 +198,6 @@ namespace uLearn.Web.Controllers
 			}
 			else
 				slide = course.GetSlideById(slideId);
-			var exerciseBlockData = new ExerciseBlockData(courseId, slide.Index, false, false) { Url = Url };
 
 			return new CoursePageModel
 			{
@@ -210,7 +209,7 @@ namespace uLearn.Web.Controllers
 					course,
 					slide,
 					slide.Info.DirectoryRelativePath,
-					slide.Blocks.Select(block => block is ExerciseBlock ? exerciseBlockData : (dynamic)null).ToArray(),
+					slide.Blocks.Select(block => block is ExerciseBlock ? new ExerciseBlockData(courseId, (ExerciseSlide) slide, false) { Url = Url } : (dynamic)null).ToArray(),
 					true),
 				IsGuest = true,
 			};
@@ -233,19 +232,7 @@ namespace uLearn.Web.Controllers
 
 			if (manualChecking != null)
 				userId = manualChecking.UserId;
-
-			UserExerciseSubmission exerciseSubmission = null;
-			if (exerciseSubmissionId.HasValue && exerciseSubmissionId.Value >= 0)
-			{
-				exerciseSubmission = solutionsRepo.FindSubmissionById(exerciseSubmissionId.Value);
-				if (exerciseSubmission.CourseId != courseId || exerciseSubmission.SlideId != slideId || exerciseSubmission.UserId != userId)
-					exerciseSubmission = null;
-			}
-			else if (!exerciseSubmissionId.HasValue)
-			{
-				exerciseSubmission = GetExerciseSubmissionShownByDefault(courseId, slideId, userId);
-			}
-
+			
 			var visiter = await VisitSlide(courseId, slideId, userId);
 			var score = Tuple.Create(visiter.Score, slide.MaxScore);
 			var model = new CoursePageModel
@@ -256,7 +243,7 @@ namespace uLearn.Web.Controllers
 				Slide = slide,
 				Rate = GetRate(course.Id, slideId),
 				Score = score,
-				BlockRenderContext = CreateRenderContext(course, slide, visiter, false, manualChecking, exerciseSubmission, groupId),
+				BlockRenderContext = CreateRenderContext(course, slide, manualChecking, exerciseSubmissionId, groupId),
 				ManualChecking = manualChecking,
 				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
 				IsGuest = false,
@@ -264,16 +251,10 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		private UserExerciseSubmission GetExerciseSubmissionShownByDefault(string courseId, Guid slideId, string userId)
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, AbstractManualSlideChecking manualChecking = null, int? exerciseSubmissionId = null, int? groupId = null)
 		{
-			var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
-			return submissions.LastOrDefault(s => s.ManualCheckings != null && s.ManualCheckings.Any()) ??
-					submissions.LastOrDefault(s => s.AutomaticChecking != null && s.AutomaticChecking.IsRightAnswer);
-		}
-
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, Visit visit, bool isLti = false, AbstractManualSlideChecking manualChecking = null, UserExerciseSubmission exerciseSubmission = null, int? groupId = null)
-		{
-			var blockData = slide.Blocks.Select(b => CreateBlockData(course, slide, b, visit, isLti, manualChecking, exerciseSubmission)).ToArray();
+			/* ExerciseController will fill blockDatas later */
+			var blockData = slide.Blocks.Select(b => (dynamic) null).ToArray();
 			return new BlockRenderContext(
 				course,
 				slide,
@@ -284,41 +265,10 @@ namespace uLearn.Web.Controllers
 				manualChecking,
 				false,
 				groupId
-				);
-		}
-
-		private dynamic CreateBlockData(Course course, Slide slide, SlideBlock slideBlock, Visit visit, bool isLti, AbstractManualSlideChecking manualChecking, UserExerciseSubmission exerciseSubmission)
-		{
-			if (slideBlock is ExerciseBlock)
+				)
 			{
-				var submission = manualChecking != null ?
-					((ManualExerciseChecking)manualChecking).Submission :
-					exerciseSubmission ?? 
-					solutionsRepo.FindLatestAcceptedSubmission(course.Id, slide.Id, visit.UserId);
-				var solution = submission?.SolutionCode.Text;
-				var submissionReviews = submission?.ManualCheckings.LastOrDefault()?.Reviews.Where(r => ! r.IsDeleted);
-
-				var hasUncheckedReview = submission?.ManualCheckings.Any(c => !c.IsChecked) ?? false;
-				var hasCheckedReview = submission?.ManualCheckings.Any(c => c.IsChecked) ?? false;
-				var reviewState = hasCheckedReview ? ExerciseReviewState.Reviewed :
-					hasUncheckedReview ? ExerciseReviewState.WaitingForReview :
-						ExerciseReviewState.NotReviewed;
-				if (exerciseSubmission == null)
-					reviewState = ExerciseReviewState.NotReviewed;
-
-				var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, slide.Id, visit.UserId);
-
-				return new ExerciseBlockData(course.Id, slide.Index, true, visit.IsSkipped, solution)
-				{
-					Url = Url,
-					Reviews = submissionReviews?.ToList() ?? new List<ExerciseCodeReview>(),
-					IsLti = isLti,
-					ReviewState = reviewState,
-					SubmissionSelectedByUser = exerciseSubmission,
-					Submissions = submissions.ToList(),
-				};
-			}
-			return null;
+				VersionId = exerciseSubmissionId
+			};
 		}
 
 		public async Task<ActionResult> AcceptedSolutions(string courseId, int slideIndex = 0, bool isLti = false)
@@ -358,12 +308,13 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.Slides[slideIndex];
 			var isSkippedOrPassed = visitsRepo.IsSkippedOrPassed(slide.Id, userId);
-			var model = new ExerciseBlockData(courseId, slide.Index)
+			/* TODO: It's not nesessary create ExerciseBlockData here */
+			var model = new ExerciseBlockData(courseId, slide)
 			{
 				IsSkippedOrPassed = isSkippedOrPassed,
 				CourseId = courseId,
+				IsGuest = ! User.Identity.IsAuthenticated,
 				Url = Url,
-				SlideIndex = slideIndex
 			};
 			return View(model);
 		}
