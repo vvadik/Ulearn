@@ -161,156 +161,56 @@
 
 @helper Block(ExerciseBlock block, BlockRenderContext context, HtmlHelper Html)
 {
-	ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData(context.Course.Id, context.Slide.Index);
-	var acceptedSolutionUrl = data.Url != null
-		? data.Url.Action("AcceptedSolutions", "Course", new { courseId = context.Course.Id, slideIndex = context.Slide.Index })
-		: "";
-	var action = data.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", acceptedSolutionUrl);
-	var classString = context.IsGuest ? "code-guest" : "code-exercise";
-	if (context.ManualChecking != null)
-	{
-		classString = "code-review";
-	}
+	<div class="exercise">
+		@{
+			ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData(context.Course.Id, context.Slide as ExerciseSlide) { IsGuest = context.IsGuest };
+			var manualCheckingId = context.ManualChecking != null ? (int?)context.ManualChecking.Id : null;
 
-	var status = "";
-	if (data.ReviewState == ExerciseReviewState.WaitingForReview)
-	{
-		status = "Все тесты пройдены, код ожидает проверки преподавателем";
-	}
-	else if (data.ReviewState == ExerciseReviewState.Reviewed)
-	{
-		status = "Все тесты пройдены, код проверен преподаваталем";
-		classString = "code-reviewed";
-	}
-	if (! string.IsNullOrEmpty(status) && context.ManualChecking == null)
-	{
-		<p class="exercise-status">@status</p>
-	}
-
-	if (data.ReviewState == ExerciseReviewState.Reviewed || context.ManualChecking != null)
-	{
-		<div class="exercise__reviews">
-			@foreach (var review in data.Reviews.OrderBy(r => r.StartLine))
+			if (Html != null)
 			{
-				@Html.Partial("_ExerciseReview", new ExerciseCodeReviewModel
-				{
-					Review = review,
-					ManualChecking = (ManualExerciseChecking) context.ManualChecking,
-				})
-			}
-		</div>
-	}
-	<textarea id="secretCodeExercise" class="hide">@block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
-	<textarea class="code @classString" data-lang="@block.LangId">@(data.Solution ?? block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
-	<script type="text/javascript">
-		function cleanUserCode() {
-			var $secretCodeExercise = $('#secretCodeExercise');
-			$('.code-exercise')[0].codeMirrorEditor.setValue($secretCodeExercise.text());
-		}
-	</script>
-	if (data.ShowControls && context.ManualChecking == null)
-	{
-		<div class="solution-control btn-group ctrl-group">
-			@if (data.ReviewState == ExerciseReviewState.Reviewed)
-			{
-				<a href="?again=true" class="try-again-button btn btn-primary no-rounds">
-					Try again
-				</a>
+				@Html.Action("Submission", "Exercise", new { courseId = context.Course.Id, slideId = context.Slide.Id, submissionId = context.VersionId, manualCheckingId = manualCheckingId, isLti = data.IsLti })
 			}
 			else
 			{
-				<button type="button" class="run-solution-button btn btn-primary no-rounds @(data.IsLti ? "run-solution-button-lti" : "")" data-url="@data.RunSolutionUrl">
-					Run
-				</button>
-			}
-			@if (!data.DebugView)
-			{
-				var e = ((ExerciseSlide)context.Slide).Exercise.HintsMd;
-				<button id="GetHintButton" type="button" class="btn btn-default hints-btn"
-				        data-course-id="@context.Course.Id" data-slide-index="@context.Slide.Index" data-hints-count="@e.Count"
-				        data-url="@data.Url.Action("UseHint", "Hint")">
-					Get hint
-				</button>
-				if (!data.IsLti && !block.HideShowSolutionsButton)
-				{
-					<button type="button" class="btn btn-default giveup-btn" onclick="@action">
-						Show solutions
-					</button>
-				}
-				<button type="button" class="btn btn-default reset-btn no-rounds" onclick="cleanUserCode()">
-					Reset
-				</button>
-			}
-		</div>
+				<div class="exercise__submission">
+					<textarea class="code code-exercise" data-lang="@block.LangId">@(block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+					@ExerciseControls(new ExerciseControlsModel(context.Course.Id, (ExerciseSlide)context.Slide)
+				   {
+					   IsCodeEditableAndSendable = true,
+					   DebugView = data.DebugView,
+					   RunSolutionUrl = data.RunSolutionUrl,
+				   })
 
-		@RunErrors()
-
-		<div class="panel-group ctrl-group" id="hints-accordion">
-			<div id="hints-place"></div>
-		</div>
-		if (!data.IsLti)
-		{
-			@YouWillLoseScoresDialog(data)
+					@RunErrors()
+			</div>
+			}
 		}
-	}
-	if (data.DebugView)
-	{
-		<div>
-			<h3>Подсказки</h3>
-			<ol>
-				@foreach (var hint in block.HintsMd)
-				{
-					<li>
-						@MvcHtmlString.Create(hint.RenderMd(context.BaseUrl))
-					</li>
-				}
-			</ol>
-			<h3>Комментарий после решения</h3>
-			<p>@block.CommentAfterExerciseIsSolved</p>
-		</div>
-	}
-
-	if (context.ManualChecking != null)
-	{
-		var checking = (ManualExerciseChecking)context.ManualChecking;
 		
-		<div class="text-muted">Выделите участок кода, чтобы оставить комментарий</div>
 
-		<div class="exercise__add-review" style="display: none" data-url="@data.Url.Action("AddExerciseCodeReview", "Exercise", new { courseId = context.Course.Id, checkingId = checking.Id })">
-			<div>Добавить комментарий</div>
-			<textarea class="exercise__add-review__comment"></textarea>
-			<button class="exercise__add-review__button btn btn-success btn-sm">Сохранить</button>
-		</div>
-
-		<form method="POST" action="@data.Url.Action("ScoreExercise", "Exercise", new { recheck = checking.IsChecked })">
-			<input type="hidden" name="id" value="@checking.Id"/>
-			<input type="hidden" name="errorUrl" value="@data.Url.RouteUrl("Course.SlideById", new { courseId = context.Course.Id, slideId = context.Slide.Url, CheckQueueItemId = checking.Id, context.GroupId })&amp;error="/>
-			<input type="hidden" name="nextUrl" value="@data.Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId = context.Course.Id, context.GroupId, done = checking.IsChecked })"/>
-
-			<h4>Оцените от 0 до @block.MaxReviewScore</h4>
+		@if (data.DebugView)
+		{
 			<div>
-				
-				<input type="number" class="form-control" min="0" max="@block.MaxReviewScore" name="exerciseScore"
-					   value="@(checking.IsChecked ? checking.Score.ToString() : "")"/>
+				<h3>Подсказки</h3>
+				<ol>
+					@foreach (var hint in data.Block.HintsMd)
+					{
+						<li>
+							@MvcHtmlString.Create(hint.RenderMd(context.BaseUrl))
+						</li>
+					}
+				</ol>
+				<h3>Комментарий после решения</h3>
+				<p>@data.Block.CommentAfterExerciseIsSolved</p>
 			</div>
+		}
 
-			<div class="checkbox checkbox-default">
-				<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" @(checking.IsChecked && !checking.ProhibitFurtherManualCheckings ? "" : "checked")/>
-				<label for="prohibitFurtherReview">
-					Не принимать больше код ревью у этого студента
-				</label>
-			</div>
+		@if (context.ManualChecking != null)
+		{
+			var checking = (ManualExerciseChecking)context.ManualChecking;
 
-			<input type="submit" class="btn @(checking.IsChecked ? "btn-primary" : "btn-default")" value="Сохранить и вернуться"/>
-
-			@if (!checking.IsChecked)
-			{
-				<input type="submit" class="btn btn-primary" value="Сохранить и перейти к следующему"
-				       data-url="@data.Url.Action("CheckNextExerciseForSlide", "Admin", new { courseID = context.Course.Id, slideId = context.Slide.Id, context.GroupId })"
-				       onclick="$('[name=nextUrl]').val($(this).data('url'))"/>
-			}
-		</form>
-	}
+			@Html.Partial("~/Views/Exercise/_ExerciseScoreForm.cshtml", new ExerciseScoreFormModel(context.Course.Id, (ExerciseSlide) context.Slide, checking, context.GroupId))
+		}
+	</div>
 }
 
 @helper QuizBlock(ChoiceBlock block, BlockRenderContext context)
@@ -617,29 +517,41 @@
 	</div>
 }
 
-@helper YouWillLoseScoresDialog(ExerciseBlockData data)
+
+@helper ExerciseControls(ExerciseControlsModel model)
 {
-	var acceptedSolutionsUrl = data.Url != null
-		? data.Url.Action("AcceptedSolutions", "Course", new { data.CourseId, data.SlideIndex })
-		: "";
-	<div class="modal fade" id="ShowSolutionsAlert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-					<h4 class="modal-title">Внимание</h4>
-				</div>
-				<div class="modal-body">
-					<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
-				</div>
-				<div class="modal-footer">
-					<a class="btn btn-default" href="@acceptedSolutionsUrl">Продолжить</a>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">Отмена</button>
-				</div>
-			</div>
-		</div>
+	<div class="solution-control btn-group ctrl-group">
+		@if (! model.IsCodeEditableAndSendable)
+		{
+			<a href="#" class="try-again-button btn btn-primary no-rounds exercise-version-link" data-version-id="-1">
+				Ещё раз
+			</a>
+		}
+		else
+		{
+			<button type="button" class="run-solution-button btn btn-primary no-rounds @(model.IsLti ? "run-solution-button-lti" : "")" data-url="@(model.RunSolutionUrl)">
+					Отправить
+			</button>
+		}
+		@if (!model.DebugView)
+		{
+			var hints = model.Block.HintsMd;
+			<button id="GetHintButton" type="button" class="btn btn-default hints-btn" data-course-id="@(model.CourseId)" data-slide-index="@(model.Slide.Index)" data-hints-count="@(hints.Count)" data-url="@(model.UseHintUrl)">
+				Взять подсказку
+			</button>
+			if (!model.IsLti && !model.HideShowSolutionsButton)
+			{
+				<button type="button" class="btn btn-default giveup-btn" onclick="@(model.AcceptedSolutionsAction)">
+					Показать решения
+				</button>
+			}
+			if (model.IsCodeEditableAndSendable)
+			{
+				<button type="button" class="btn btn-default reset-btn no-rounds" onclick="cleanUserCode()">
+					Начать с начала
+				</button>
+			}
+		}
 	</div>
 }
 

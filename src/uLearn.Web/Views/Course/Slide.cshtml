@@ -87,12 +87,13 @@
 	}
 	@if (Model.Slide is ExerciseSlide)
 	{
-		var e = (ExerciseSlide)Model.Slide;
-		ExerciseBlockData data = Model.BlockRenderContext.GetBlockData(e.Exercise);
+		var slide = (ExerciseSlide)Model.Slide;
 		<script>
-			getHints("@Model.CourseId", "@Model.Slide.Index", '@e.Exercise.HintsMd.Count')
+			getHints("@Model.CourseId", "@Model.Slide.Index", '@slide.Exercise.HintsMd.Count')
 		</script>
-		<script> refreshPreviousDraft('@(data.Solution != null)', '@e.Id') </script>
+		<script>
+			refreshPreviousDraft('@Model.Slide.Id');
+		</script>
 	}
 
 

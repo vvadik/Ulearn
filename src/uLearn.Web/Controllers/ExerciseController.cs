@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using uLearn.Model.Blocks;
 using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
@@ -35,7 +38,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[System.Web.Mvc.HttpPost]
-		public async Task<ActionResult> RunSolution(string courseId, int slideIndex = 0, bool isLti = false)
+		public async Task<ActionResult> RunSolution(string courseId, Guid slideId, bool isLti = false)
 		{
 			var code = Request.InputStream.GetString();
 			if (code.Length > TextsRepo.MaxTextSize)
@@ -46,8 +49,10 @@ namespace uLearn.Web.Controllers
 					CompilationError = "Слишком большой код."
 				});
 			}
-			var exerciseSlide = (ExerciseSlide)courseManager.GetCourse(courseId).Slides[slideIndex];
-			
+			var exerciseSlide = courseManager.GetCourse(courseId).FindSlideById(slideId) as ExerciseSlide;
+			if (exerciseSlide == null)
+				return HttpNotFound();
+
 			var result = await CheckSolution(courseId, exerciseSlide, code);
 			if (isLti)
 				LtiUtils.SubmitScore(exerciseSlide, User.Identity.GetUserId());
@@ -60,16 +65,16 @@ namespace uLearn.Web.Controllers
 		{
 			var exerciseBlock = exerciseSlide.Exercise;
 			var userId = User.Identity.GetUserId();
-		    var solution = exerciseBlock.BuildSolution(userCode);
-		    if (solution.HasErrors)
-		        return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
-		    if (solution.HasStyleIssues)
-		        return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage, ExecutionServiceName = "uLearn" };
-		    var submission = await solutionsRepo.RunUserSolution(
-				courseId, exerciseSlide.Id, userId, 
-				userCode, null, null, false, "uLearn", 
+			var solution = exerciseBlock.BuildSolution(userCode);
+			if (solution.HasErrors)
+				return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
+			if (solution.HasStyleIssues)
+				return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage, ExecutionServiceName = "uLearn" };
+			var submission = await solutionsRepo.RunUserSolution(
+				courseId, exerciseSlide.Id, userId,
+				userCode, null, null, false, "uLearn",
 				GenerateSubmissionName(exerciseSlide), executionTimeout
-			);
+				);
 
 			if (submission == null)
 				return new RunSolutionResult
@@ -81,7 +86,7 @@ namespace uLearn.Web.Controllers
 
 			var automaticChecking = submission.AutomaticChecking;
 			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
-			var sendToReview = exerciseBlock.RequireReview && automaticChecking.IsRightAnswer && ! isProhibitedUserToSendForReview;
+			var sendToReview = exerciseBlock.RequireReview && automaticChecking.IsRightAnswer && !isProhibitedUserToSendForReview;
 			if (sendToReview)
 			{
 				await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, exerciseSlide.Id, userId);
@@ -128,10 +133,10 @@ namespace uLearn.Web.Controllers
 				reviewInfo.StartPosition = reviewInfo.FinishPosition;
 				reviewInfo.FinishPosition = tmp;
 			}
-			
+
 			var review = await slideCheckingsRepo.AddExerciseCodeReview(checking, User.Identity.GetUserId(), reviewInfo.StartLine, reviewInfo.StartPosition, reviewInfo.FinishLine, reviewInfo.FinishPosition, reviewInfo.Comment);
 
-			return PartialView("~/Views/Course/_ExerciseReview.cshtml", new ExerciseCodeReviewModel
+			return PartialView("_ExerciseReview", new ExerciseCodeReviewModel
 			{
 				Review = review,
 				ManualChecking = checking,
@@ -179,14 +184,14 @@ namespace uLearn.Web.Controllers
 			{
 				var checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(id);
 
-				if (checking.IsChecked && ! recheck)
+				if (checking.IsChecked && !recheck)
 					return Redirect(errorUrl + "Эта работа уже была проверена");
 
 				if (!checking.IsLockedBy(User.Identity))
 					return Redirect(errorUrl + "Эта работа проверяется другим инструктором");
 
 				var course = courseManager.GetCourse(checking.CourseId);
-				var slide = (ExerciseSlide) course.GetSlideById(checking.SlideId);
+				var slide = (ExerciseSlide)course.GetSlideById(checking.SlideId);
 				var exercise = slide.Exercise;
 
 				/* Invalid form: score isn't from range 0..MAX_SCORE */
@@ -204,6 +209,96 @@ namespace uLearn.Web.Controllers
 
 			return Redirect(nextUrl);
 		}
+
+		public ActionResult SubmissionsPanel(string courseId, Guid slideId, string userId = "", int? currentSubmissionId = null, bool canTryAgain=true)
+		{
+			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
+				userId = "";
+
+			if (userId == "")
+				userId = User.Identity.GetUserId();
+
+			var slide = courseManager.GetCourse(courseId).FindSlideById(slideId);
+			var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
+
+			return PartialView(new ExerciseSubmissionsPanelModel(courseId, slide)
+			{
+				Submissions = submissions,
+				CurrentSubmissionId = currentSubmissionId,
+				CanTryAgain = canTryAgain,
+			});
+		}
+
+		private ExerciseBlockData CreateExerciseBlockData(Course course, Slide slide, UserExerciseSubmission submission)
+		{
+			var userId = submission?.UserId ?? User.Identity.GetUserId();
+			var visit = visitsRepo.FindVisiter(course.Id, slide.Id, userId);
+
+			var solution = submission?.SolutionCode.Text;
+			var submissionReviews = submission?.ManualCheckings.LastOrDefault()?.Reviews.Where(r => !r.IsDeleted);
+
+			var hasUncheckedReview = submission?.ManualCheckings.Any(c => !c.IsChecked) ?? false;
+			var hasCheckedReview = submission?.ManualCheckings.Any(c => c.IsChecked) ?? false;
+			var reviewState = hasCheckedReview ? ExerciseReviewState.Reviewed :
+				hasUncheckedReview ? ExerciseReviewState.WaitingForReview :
+					ExerciseReviewState.NotReviewed;
+
+			var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, slide.Id, userId);
+
+			return new ExerciseBlockData(course.Id, (ExerciseSlide) slide, visit?.IsSkipped ?? false, solution)
+			{
+				Url = Url,
+				Reviews = submissionReviews?.ToList() ?? new List<ExerciseCodeReview>(),
+				ReviewState = reviewState,
+				IsGuest = false,
+				SubmissionSelectedByUser = submission,
+				Submissions = submissions.ToList(),
+			};
+		}
+
+		private UserExerciseSubmission GetExerciseSubmissionShownByDefault(string courseId, Guid slideId, string userId)
+		{
+			var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
+			return submissions.LastOrDefault(s => s.ManualCheckings != null && s.ManualCheckings.Any()) ??
+					submissions.LastOrDefault(s => s.AutomaticChecking != null && s.AutomaticChecking.IsRightAnswer);
+		}
+
+		public ActionResult Submission(string courseId, Guid slideId, int? submissionId=null, int? manualCheckingId = null, bool isLti = false)
+		{
+			var currentUserId = User.Identity.GetUserId();
+			UserExerciseSubmission submission = null;
+			if (submissionId.HasValue && submissionId.Value > 0)
+			{
+				submission = solutionsRepo.FindSubmissionById(submissionId.Value);
+				if (submission == null)
+					return HttpNotFound();
+				if (courseId != submission.CourseId)
+					return HttpNotFound();
+				if (slideId != submission.SlideId)
+					return HttpNotFound();
+				if (!User.HasAccessFor(courseId, CourseRole.Instructor) && submission.UserId != currentUserId)
+					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			}
+			else if (! submissionId.HasValue)
+			{
+				submission = GetExerciseSubmissionShownByDefault(courseId, slideId, currentUserId);
+			}
+
+			var course = courseManager.GetCourse(courseId);
+			var slide = course.FindSlideById(slideId);
+			if (slide == null)
+				return HttpNotFound();
+			var model = CreateExerciseBlockData(course, slide, submission);
+			model.IsLti = isLti;
+			if (User.HasAccessFor(courseId, CourseRole.Instructor) && manualCheckingId.HasValue)
+			{
+				var manualChecking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(manualCheckingId.Value);
+				if (manualChecking.CourseId == courseId)
+					model.ManualChecking = manualChecking;
+			}
+
+			return PartialView(model);
+		}
 	}
 
 	public class ReviewInfo
@@ -213,6 +308,63 @@ namespace uLearn.Web.Controllers
 		public int StartPosition { get; set; }
 		public int FinishLine { get; set; }
 		public int FinishPosition { get; set; }
+	}
+
+	public class ExerciseSubmissionsPanelModel
+	{
+		public ExerciseSubmissionsPanelModel(string courseId, Slide slide)
+		{
+			CourseId = courseId;
+			Slide = slide;
+
+			Submissions = new List<UserExerciseSubmission>();
+			CurrentSubmissionId = null;
+			CanTryAgain = true;
+		}
+
+		public string CourseId { get; set; }
+		public Slide Slide { get; set; }
+		public List<UserExerciseSubmission> Submissions { get; set; }
+		public int? CurrentSubmissionId { get; set; }
+		public bool CanTryAgain { get; set; }
+	}
+
+	public class ExerciseControlsModel
+	{
+		public ExerciseControlsModel(string courseId, ExerciseSlide slide)
+		{
+			CourseId = courseId;
+			Slide = slide;
+		}
+
+		public string CourseId;
+		public ExerciseSlide Slide;
+		public ExerciseBlock Block => Slide.Exercise;
+
+		public bool IsLti = false;
+		public bool IsCodeEditableAndSendable = true;
+		public bool DebugView = false;
+		public string AcceptedSolutionsAction = "";
+		public string RunSolutionUrl = "";
+		public string UseHintUrl = "";
+
+		public bool HideShowSolutionsButton => Block.HideShowSolutionsButton;
+	}
+
+	public class ExerciseScoreFormModel
+	{
+		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking, int? groupId = null)
+		{
+			CourseId = courseId;
+			Slide = slide;
+			Checking = checking;
+			GroupId = groupId;
+		}
+
+		public string CourseId { get; set; }
+		public ExerciseSlide Slide { get; set; }
+		public ManualExerciseChecking Checking { get; set; }
+		public int? GroupId { get; set; }
 	}
 }
 

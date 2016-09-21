@@ -13,21 +13,24 @@ namespace uLearn.Web.Models
 
 		[StringLength(64)]
 		[Required]
-		[Index("IDX_Visits_UserAndSlide", 1)]
+		[Index("IDX_Visits_BySlideAndUser", 1)]
+		[Index("IDX_Visits_ByCourseSlideAndUser", 3)]
 		public string UserId { get; set; }
 
 		[Required]
 		[StringLength(64)]
+		[Index("IDX_Visits_ByCourseSlideAndUser", 1)]
 		public string CourseId { get; set; }
 
 		[Required]
-		[Index("IDX_Visits_UserAndSlide", 2)]
-		[Index("IDX_Visits_SlideAndTime", 1)]
+		[Index("IDX_Visits_BySlideAndUser", 2)]
+		[Index("IDX_Visits_BySlideAndTime", 1)]
+		[Index("IDX_Visits_ByCourseSlideAndUser", 2)]
 		public Guid SlideId { get; set; }
 
 		///<summary>Первый заход на слайд</summary>
 		[Required]
-		[Index("IDX_Visits_SlideAndTime", 2)]
+		[Index("IDX_Visits_BySlideAndTime", 2)]
 		public DateTime Timestamp { get; set; }
 
 		public int Score { get; set; }

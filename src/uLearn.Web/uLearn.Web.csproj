@@ -310,6 +310,10 @@
     <Compile Include="Migrations\201609081814377_AddFutherCheckingProhibitionAndIndexes.Designer.cs">
       <DependentUpon>201609081814377_AddFutherCheckingProhibitionAndIndexes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201609151039376_AddIndexes.cs" />
+    <Compile Include="Migrations\201609151039376_AddIndexes.Designer.cs">
+      <DependentUpon>201609151039376_AddIndexes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\ExerciseCodeReview.cs" />
     <Compile Include="Models\ExerciseCodeReviewModel.cs" />
     <Compile Include="Models\SlideChecking.cs" />
@@ -796,6 +800,9 @@
     <EmbeddedResource Include="Migrations\201609081814377_AddFutherCheckingProhibitionAndIndexes.resx">
       <DependentUpon>201609081814377_AddFutherCheckingProhibitionAndIndexes.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609151039376_AddIndexes.resx">
+      <DependentUpon>201609151039376_AddIndexes.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="codemirror\addon\comment\comment.js" />
@@ -1196,6 +1203,7 @@
     <Content Include="Scripts\slide-tex.js" />
     <Content Include="Scripts\slide-stats.js" />
     <Content Include="Scripts\slide-utils.js" />
+    <Content Include="Scripts\slide-versions.js" />
     <Content Include="Scripts\table-configurator.js" />
     <Content Include="Scripts\user-group-name-change.js" />
     <Content Include="Scripts\users-list.js" />
@@ -1409,7 +1417,10 @@
     <Content Include="Views\Course\CourseInstructorNavbar.cshtml" />
     <Content Include="Views\Admin\ManualExerciseCheckingQueue.cshtml" />
     <Content Include="Views\Admin\_ManualCheckingQueueFilterForm.cshtml" />
-    <Content Include="Views\Course\_ExerciseReview.cshtml" />
+    <Content Include="Views\Exercise\_ExerciseReview.cshtml" />
+    <Content Include="Views\Exercise\SubmissionsPanel.cshtml" />
+    <Content Include="Views\Exercise\Submission.cshtml" />
+    <Content Include="Views\Exercise\_ExerciseScoreForm.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

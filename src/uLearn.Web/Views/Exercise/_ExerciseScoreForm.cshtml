@@ -1,0 +1,42 @@
+﻿@model uLearn.Web.Controllers.ExerciseScoreFormModel
+
+@{
+	var block = Model.Slide.Exercise;
+}
+
+<div class="text-muted">Выделите участок кода, чтобы оставить комментарий</div>
+
+<div class="exercise__add-review" style="display: none" data-url="@Url.Action("AddExerciseCodeReview", "Exercise", new { courseId = Model.CourseId, checkingId = Model.Checking.Id })">
+	<div>Добавить комментарий</div>
+	<textarea class="exercise__add-review__comment"></textarea>
+	<button class="exercise__add-review__button btn btn-success btn-sm">Сохранить</button>
+</div>
+
+<form method="POST" action="@Url.Action("ScoreExercise", "Exercise", new { recheck = Model.Checking.IsChecked })">
+	<input type="hidden" name="id" value="@Model.Checking.Id" />
+	<input type="hidden" name="errorUrl" value="@Url.RouteUrl("Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, CheckQueueItemId = Model.Checking.Id, Model.GroupId })&amp;error=" />
+	<input type="hidden" name="nextUrl" value="@Url.Action("ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId, done = Model.Checking.IsChecked })" />
+
+	<h4>Оцените от 0 до @block.MaxReviewScore</h4>
+	<div>
+
+		<input type="number" class="form-control" min="0" max="@block.MaxReviewScore" name="exerciseScore"
+			   value="@(Model.Checking.IsChecked ? Model.Checking.Score.ToString() : "")" />
+	</div>
+
+	<div class="checkbox checkbox-default">
+		<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" @(Model.Checking.IsChecked && !Model.Checking.ProhibitFurtherManualCheckings ? "" : "checked") />
+		<label for="prohibitFurtherReview">
+			Не принимать больше код ревью у этого студента
+		</label>
+	</div>
+
+	<input type="submit" class="btn @(Model.Checking.IsChecked ? "btn-primary" : "btn-default")" value="Сохранить и вернуться" />
+
+	@if (! Model.Checking.IsChecked)
+	{
+		<input type="submit" class="btn btn-primary" value="Сохранить и перейти к следующему"
+			   data-url="@Url.Action("CheckNextExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, Model.GroupId })"
+			   onclick="$('[name=nextUrl]').val($(this).data('url'))" />
+	}
+</form>

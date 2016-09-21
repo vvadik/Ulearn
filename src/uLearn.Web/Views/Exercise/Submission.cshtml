@@ -1,0 +1,119 @@
+﻿@using uLearn
+@using uLearn.Web.Controllers
+@using uLearn.Web.Views.Course
+
+@model ExerciseBlockData
+
+@{
+	var manualCheckingId = Model.ManualChecking != null ? (int?)Model.ManualChecking.Id : null;
+}
+
+<div class="exercise__submission" data-version-update-url="@Url.Action("Submission", new { Model.CourseId, slideId = Model.Slide.Id, submissionId = "VERSION_ID", manualCheckingId = manualCheckingId, isLti = Model.IsLti})">
+	@{
+		var currentSubmissionId = Model.SubmissionSelectedByUser != null ? (int?)Model.SubmissionSelectedByUser.Id : null;
+
+		@Html.Partial("SubmissionsPanel", new ExerciseSubmissionsPanelModel(Model.CourseId, Model.Slide)
+		{
+			Submissions = Model.Submissions,
+			CurrentSubmissionId = currentSubmissionId,
+			CanTryAgain = Model.ManualChecking == null,
+		})
+
+		var classString = Model.IsGuest ? "code-guest" : "code-exercise";
+		if (Model.ManualChecking != null && Model.ManualChecking.SubmissionId == currentSubmissionId)
+		{
+			classString = "code-review";
+		}
+		else if (Model.SubmissionSelectedByUser != null)
+		{
+			classString = "code-reviewed";
+		}
+
+		var status = "";
+		if (Model.ReviewState == ExerciseReviewState.WaitingForReview)
+		{
+			status = "Все тесты пройдены, код ожидает проверки преподавателем";
+		}
+		else if (Model.ReviewState == ExerciseReviewState.Reviewed)
+		{
+			status = "Все тесты пройдены, код проверен преподаваталем";
+		}
+		if (!string.IsNullOrEmpty(status) && Model.ManualChecking == null)
+		{
+			<p class="exercise-status">@status</p>
+		}
+
+		if (Model.ReviewState == ExerciseReviewState.Reviewed || Model.ManualChecking != null)
+		{
+			<div class="exercise__reviews">
+				@foreach (var review in Model.Reviews.OrderBy(r => r.StartLine))
+				{
+					@Html.Partial("_ExerciseReview", new ExerciseCodeReviewModel
+					{
+						Review = review,
+						ManualChecking = Model.ManualChecking,
+					})
+				}
+			</div>
+		}
+		<textarea id="secretCodeExercise" class="hide">@Model.Block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
+		<textarea class="code @classString" data-lang="@Model.Block.LangId">@(Model.Solution ?? Model.Block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+		<script type="text/javascript">
+			function cleanUserCode() {
+				var $secretCodeExercise = $('#secretCodeExercise');
+				$('.code-exercise')[0].codeMirrorEditor.setValue($secretCodeExercise.text());
+			}
+		</script>
+
+		if (Model.ShowControls && Model.ManualChecking == null)
+		{
+			var acceptedSolutionsUrl = Model.Url != null
+				? Model.Url.Action("AcceptedSolutions", "Course", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
+				: "";
+			var acceptedSolutionsAction = Model.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", acceptedSolutionsUrl);
+			@SlideHtml.ExerciseControls(new ExerciseControlsModel(Model.CourseId, Model.Slide)
+			{
+				IsCodeEditableAndSendable = Model.SubmissionSelectedByUser == null,
+				AcceptedSolutionsAction = acceptedSolutionsAction,
+				RunSolutionUrl = Model.RunSolutionUrl,
+				UseHintUrl = Url.Action("UseHint", "Hint"),
+			})
+
+			@SlideHtml.RunErrors()
+
+			<div class="panel-group ctrl-group" id="hints-accordion">
+				<div id="hints-place"></div>
+			</div>
+			if (!Model.IsLti)
+			{
+				@YouWillLoseScoresDialog(Model)
+			}
+		}
+	}
+</div>
+
+@helper YouWillLoseScoresDialog(ExerciseBlockData data)
+{
+	var acceptedSolutionsUrl = data.Url != null
+		? data.Url.Action("AcceptedSolutions", "Course", new { data.CourseId, data.Slide.Index })
+		: "";
+	<div class="modal fade" id="ShowSolutionsAlert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Внимание</h4>
+				</div>
+				<div class="modal-body">
+					<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
+				</div>
+				<div class="modal-footer">
+					<a class="btn btn-default" href="@acceptedSolutionsUrl">Продолжить</a>
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Отмена</button>
+				</div>
+			</div>
+		</div>
+	</div>
+}

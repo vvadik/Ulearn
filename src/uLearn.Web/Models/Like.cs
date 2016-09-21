@@ -13,6 +13,7 @@ namespace uLearn.Web.Models
 		
 		[Required]
 		[Index("IDX_Like_ByUserAndSubmission", 2)]
+		[Index("IDX_Like_BySubmission")]
 		public int SubmissionId { get; set; }
 
 		[Required]

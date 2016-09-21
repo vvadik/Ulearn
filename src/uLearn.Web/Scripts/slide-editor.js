@@ -1,10 +1,45 @@
-﻿$(document).ready(function() {
-	var editorLastRange = null;
-	var currentReviewTextMarker = null;
-	var reviewsTextMarkers = {};
-	var exerciseCodeDoc = null;
+﻿$(document).ready(function () {
+	initCodeEditor();
 
-	var $exerciseCodeBlock;
+	$('.exercise__add-review').each(function () {
+		var $self = $(this);
+		var addReviewUrl = $self.data('url');
+
+		$self.find('.exercise__add-review__comment').on('input', function () {
+			if ($(this).val() === '')
+				$self.find('.exercise__add-review__button').attr('disabled', 'disabled');
+			else
+				$self.find('.exercise__add-review__button').removeAttr('disabled');
+		});
+
+		$self.find('.exercise__add-review__button').click(function () {
+			var comment = $self.find('.exercise__add-review__comment').val();
+			var params = {
+				StartLine: editorLastRange.anchor.line,
+				StartPosition: editorLastRange.anchor.ch,
+				FinishLine: editorLastRange.head.line,
+				FinishPosition: editorLastRange.head.ch,
+				Comment: comment,
+			}
+			$.post(addReviewUrl, params, function (renderedReview) {
+				addExerciseCodeReview(renderedReview);
+				$self.find('.exercise__add-review__comment').val('');
+				$self.hide();
+			});
+		});
+	});
+});
+
+var editorLastRange, currentReviewTextMarker, reviewsTextMarkers, exerciseCodeDoc, $exerciseCodeBlock;
+
+function initCodeEditor($parent) {
+	if (!$parent)
+		$parent = $(document);
+	editorLastRange = null;
+	currentReviewTextMarker = null;
+	reviewsTextMarkers = {};
+	exerciseCodeDoc = null;
+
 	if ($('.code-review').length > 0)
 		$exerciseCodeBlock = $('.code-review')[0];
 	else
@@ -14,17 +49,17 @@
 		cm.showHint({ hint: CodeMirror.hint.csharp });
 	}
 
-	codeMirrorClass("code-exercise", true, false, false);
-	codeMirrorClass("code-sample", false, false, false);
-	codeMirrorClass("code-guest", false, true, false);
-	codeMirrorClass("code-review", false, false, true);
-	codeMirrorClass("code-reviewed", false, false, false);
+	codeMirrorClass($parent.find('.code-exercise'), true, false, false);
+	codeMirrorClass($parent.find('.code-sample'), false, false, false);
+	codeMirrorClass($parent.find('.code-guest'), false, true, false);
+	codeMirrorClass($parent.find('.code-review'), false, false, true);
+	codeMirrorClass($parent.find('.code-reviewed'), false, false, false);
 
 	if ($exerciseCodeBlock) {
 		var exerciseCodeEditor = $exerciseCodeBlock.codeMirrorEditor;
 		exerciseCodeDoc = exerciseCodeEditor.getDoc();
 	}
-	
+
 	function getMode(lang) {
 		// see http://codemirror.net/mode/
 
@@ -59,10 +94,9 @@
 		});
 	}
 
-	function codeMirrorClass(c, editable, guest, review) {
-		var codes = document.getElementsByClassName(c);
-		for (var i = 0; i < codes.length; i++) {
-			var element = codes[i];
+	function codeMirrorClass($objects, editable, guest, review) {
+		$objects.each(function () {
+			var element = this;
 			var $el = $(element);
 			var langId = $el.data("lang");
 			var editor = CodeMirror.fromTextArea(element,
@@ -87,89 +121,65 @@
 			});
 
 			if (review)
-				editor.on("beforeSelectionChange", function (cm, params) {
-					unselectAllReviews();
+				editor.on("beforeSelectionChange",
+					function(cm, params) {
+						unselectAllReviews();
 
-					if (params.ranges < 1)
-						return;
+						if (params.ranges < 1)
+							return;
 
-					var range = params.ranges[0];
-					editorLastRange = range;
-					var maxLine = Math.max(range.anchor.line, range.head.line);
-					var coords = cm.cursorCoords({ line: maxLine + 1, ch: 1 }, 'page');
+						var range = params.ranges[0];
+						editorLastRange = range;
+						var maxLine = Math.max(range.anchor.line, range.head.line);
+						var coords = cm.cursorCoords({ line: maxLine + 1, ch: 1 }, 'page');
 
-					var $addReviewPopup = $('.exercise__add-review').first();
-					if (range.anchor == range.head) {
-						$addReviewPopup.hide();
-						return;
-					}
-					$addReviewPopup.show();
-					$addReviewPopup.offset({ top: coords.top, left: coords.left });
+						var $addReviewPopup = $('.exercise__add-review').first();
+						if (range.anchor == range.head) {
+							$addReviewPopup.hide();
+							return;
+						}
+						$addReviewPopup.show();
+						$addReviewPopup.offset({ top: coords.top, left: coords.left });
 
-					$addReviewPopup.find('.exercise__add-review__comment').trigger('input');
+						$addReviewPopup.find('.exercise__add-review__comment').trigger('input');
 
-					// Focusing on something from an event handler that, itself, grants focus, is problematic
-					setTimeout(function() {
-						$addReviewPopup.find('.exercise__add-review__comment').focus();
-					}, 100);
-				});
+						// Focusing on something from an event handler that, itself, grants focus, is problematic
+						setTimeout(function() {
+								$addReviewPopup.find('.exercise__add-review__comment').focus();
+							},
+							100);
+					});
 
-			editor.on('cursorActivity', function(cm) {
-				var cursor = cm.getDoc().getCursor();
-				var $foundReview = false;
-				$('.exercise__reviews .exercise__review').each(function () {
+			editor.on('cursorActivity',
+				function(cm) {
+					var cursor = cm.getDoc().getCursor();
+					var $foundReview = false;
+					$('.exercise__reviews .exercise__review')
+						.each(function() {
+							if ($foundReview !== false)
+								return;
+							var $review = $(this);
+							var startLine = $review.data('start-line');
+							var startPosition = $review.data('start-position');
+							var finishLine = $review.data('finish-line');
+							var finishPosition = $review.data('finish-position');
+							if (startLine > cursor.line || (startLine == cursor.line && startPosition > cursor.ch))
+								return;
+							if (finishLine < cursor.line || (finishLine == cursor.line && finishPosition < cursor.ch))
+								return;
+							$foundReview = $review;
+						});
 					if ($foundReview !== false)
-						return;
-					var $review = $(this);
-					var startLine = $review.data('start-line');
-					var startPosition = $review.data('start-position');
-					var finishLine = $review.data('finish-line');
-					var finishPosition = $review.data('finish-position');
-					if (startLine > cursor.line || (startLine == cursor.line && startPosition > cursor.ch))
-						return;
-					if (finishLine < cursor.line || (finishLine == cursor.line && finishPosition < cursor.ch))
-						return;
-					$foundReview = $review;
+						selectReview($foundReview);
 				});
-				if ($foundReview !== false)
-					selectReview($foundReview);
-			});
 
 			element.codeMirrorEditor = editor;
 			if (editable)
 				editor.focus();
 			if (guest)
 				editor.on("mousedown", function(cm) { loginForContinue(); });
-		}
+		});
 	}
-
-	$('.exercise__add-review').each(function() {
-		var $self = $(this);
-		var addReviewUrl = $self.data('url');
-
-		$self.find('.exercise__add-review__comment').on('input', function () {
-			if ($(this).val() === '')
-				$self.find('.exercise__add-review__button').attr('disabled', 'disabled');
-			else
-				$self.find('.exercise__add-review__button').removeAttr('disabled');
-		});
-
-		$self.find('.exercise__add-review__button').click(function() {
-			var comment = $self.find('.exercise__add-review__comment').val();
-			var params = {
-				StartLine: editorLastRange.anchor.line,
-				StartPosition: editorLastRange.anchor.ch,
-				FinishLine: editorLastRange.head.line,
-				FinishPosition: editorLastRange.head.ch,
-				Comment: comment,
-			}
-			$.post(addReviewUrl, params, function(renderedReview) {
-				addExerciseCodeReview(renderedReview);
-				$self.find('.exercise__add-review__comment').val('');
-				$self.hide();
-			});
-		});
-	});
 
 	$('.exercise__reviews').on('click', '.exercise__review', function () {
 		if (!$exerciseCodeBlock)
@@ -187,49 +197,61 @@
 		var url = $self.data('url');
 		$.post(url, {
 			__RequestVerificationToken: token
-		}, function(data) {
+		}, function (data) {
 			if (data.status !== 'ok') {
 				console.log(data);
 				alert('Can\'t delete comment: error');
 			} else {
-				$review.slideUp('fast', function() { $(this).remove(); });
+				$review.slideUp('fast', function () { $(this).remove(); });
 				reviewsTextMarkers[reviewId].clear();
 				unselectAllReviews();
 			}
 		}, 'json');
 	});
-	
-	var createMarkTextForReview = function($review) {
-		var reviewId = $review.data('id');
-		var startLine = $review.data('start-line');
-		var startPosition = $review.data('start-position');
-		var finishLine = $review.data('finish-line');
-		var finishPosition = $review.data('finish-position');
-
-		reviewsTextMarkers[reviewId] = exerciseCodeDoc.markText({ line: startLine, ch: startPosition }, { line: finishLine, ch: finishPosition }, {
-			className: 'exercise__code__reviewed-fragment'
-		});
-	}
 
 	$('.exercise__reviews .exercise__review').each(function () {
 		var $review = $(this);
 		createMarkTextForReview($review);
 	});
+}
 
-	function addExerciseCodeReview(renderedReview) {
-		var $reviews = $('.exercise__reviews');
-		var $newReview = $(renderedReview);
-		createMarkTextForReview($newReview);
-		$reviews.append($newReview);
-	}
-});
+function createMarkTextForReview($review) {
+	var reviewId = $review.data('id');
+	var startLine = $review.data('start-line');
+	var startPosition = $review.data('start-position');
+	var finishLine = $review.data('finish-line');
+	var finishPosition = $review.data('finish-position');
 
-function refreshPreviousDraft(ac, id) {
+	reviewsTextMarkers[reviewId] = exerciseCodeDoc.markText({ line: startLine, ch: startPosition }, { line: finishLine, ch: finishPosition }, {
+		className: 'exercise__code__reviewed-fragment'
+	});
+}
+
+function addExerciseCodeReview(renderedReview) {
+	var $reviews = $('.exercise__reviews');
+	var $newReview = $(renderedReview);
+	createMarkTextForReview($newReview);
+	$reviews.append($newReview);
+}
+
+var refreshPreviousDraftLastId = undefined;
+function refreshPreviousDraft(id) {
+	if (id == undefined)
+		id = refreshPreviousDraftLastId;
+	refreshPreviousDraftLastId = id;
+
 	window.onbeforeunload = function () {
-		if (ac == 'False')
-			localStorage[id] = $('.code-exercise')[0].codeMirrorEditor.getValue();
+		saveExerciseCodeDraft(id);
 	}
-	if (localStorage[id] != undefined && ac == 'False') {
+	if (localStorage[id] != undefined && $('.code-exercise').length > 0) {
 		$('.code-exercise')[0].codeMirrorEditor.setValue(localStorage[id]);
 	}
+}
+
+function saveExerciseCodeDraft(id) {
+	if (id == undefined)
+		id = refreshPreviousDraftLastId;
+
+	if ($('.code-exercise').length > 0)
+		localStorage[id] = $('.code-exercise')[0].codeMirrorEditor.getValue();
 }

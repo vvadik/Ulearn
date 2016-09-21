@@ -17,6 +17,9 @@ namespace uLearn.Web.Models
 		/* GroupId != null if instructor filtered users by group and see their works */
 		public int? GroupId { get; private set; }
 
+		/* User's version of slide, i.e. for exercises */
+		public int? VersionId { get; set; }
+
 		public dynamic GetBlockData(SlideBlock block)
 		{
 			var index = Array.IndexOf(Slide.Blocks, block);
@@ -25,7 +28,7 @@ namespace uLearn.Web.Models
 			return BlockData[index];
 		}
 
-		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData, bool isGuest = false, bool revealHidden = false, AbstractManualSlideChecking manualChecking = null, bool canUserFillQuiz = false, int? groupId=null)
+		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData, bool isGuest = false, bool revealHidden = false, AbstractManualSlideChecking manualChecking = null, bool canUserFillQuiz = false, int? groupId = null)
 		{
 			if (blockData.Length != slide.Blocks.Length)
 				throw new ArgumentException("BlockData.Length should be slide.Blocks.Length");

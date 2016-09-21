@@ -25,7 +25,7 @@ namespace uLearn.Web.DataContexts
 
 		public async Task AddVisit(string courseId, Guid slideId, string userId)
 		{
-			if (db.Visits.Any(x => x.UserId == userId && x.SlideId == slideId))
+			if (IsUserVisitedSlide(courseId, slideId, userId))
 				return;
 			db.Visits.Add(new Visit
 			{
@@ -39,22 +39,22 @@ namespace uLearn.Web.DataContexts
 
 		public int GetVisitsCount(Guid slideId, string courseId)
 		{
-			return db.Visits.Count(x => x.SlideId == slideId);
+			return db.Visits.Count(x => x.CourseId == courseId && x.SlideId == slideId);
 		}
 
-		public bool IsUserVisit(string courseId, Guid slideId, string userId)
+		public bool IsUserVisitedSlide(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits.Any(x => x.SlideId == slideId && x.UserId == userId);
+			return db.Visits.Any(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId);
 		}
 
 		public HashSet<Guid> GetIdOfVisitedSlides(string courseId, string userId)
 		{
-			return new HashSet<Guid>(db.Visits.Where(x => x.UserId == userId && x.CourseId == courseId).Select(x => x.SlideId));
+			return new HashSet<Guid>(db.Visits.Where(v => v.UserId == userId && v.CourseId == courseId).Select(x => x.SlideId));
 		}
 		
 		public bool HasVisitedSlides(string courseId, string userId)
 		{
-			return db.Visits.Any(x => x.UserId == userId && x.CourseId == courseId);
+			return db.Visits.Any(v => v.CourseId == courseId && v.UserId == userId);
 		}
 
 		public async Task UpdateScoreForVisit(string courseId, Guid slideId, string userId)
@@ -104,14 +104,14 @@ namespace uLearn.Web.DataContexts
 				.FirstOrDefault();
 		}
 
-		public Visit GetVisiter(Guid slideId, string userId)
+		public Visit FindVisiter(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits.FirstOrDefault(v => v.SlideId == slideId && v.UserId == userId);
+			return db.Visits.FirstOrDefault(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId);
 		}
 
 		public async Task SkipSlide(string courseId, Guid slideId, string userId)
 		{
-			var visiter = db.Visits.FirstOrDefault(v => v.SlideId == slideId && v.UserId == userId);
+			var visiter = FindVisiter(courseId, slideId, userId);
 			if (visiter != null)
 				visiter.IsSkipped = true;
 			else
@@ -126,9 +126,9 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public bool IsSkipped(Guid slideId, string userId)
+		public bool IsSkipped(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits.Any(v => v.SlideId == slideId && v.UserId == userId && v.IsSkipped);
+			return db.Visits.Any(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && v.IsSkipped);
 		}
 
 		public bool IsPassed(Guid slideId, string userId)

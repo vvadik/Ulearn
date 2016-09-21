@@ -1,11 +1,14 @@
-﻿var $runResults = $(".run-result");
-var $serviceError = $runResults.filter(".run-service-error");
-var $compileError = $runResults.filter(".run-compile-error");
-var $styleError = $runResults.filter(".run-style-error");
-var $waError = $runResults.filter(".run-wa");
-var $waErrorNoDiff = $runResults.filter(".run-wa-no-diff");
-var $success = $runResults.filter(".run-success");
+﻿var $runResults, $serviceError, $compileError, $styleError, $waError, $waErrorNoDiff, $success;
 
+function initErrorsBlocks() {
+	$runResults = $(".run-result");
+	$serviceError = $runResults.filter(".run-service-error");
+	$compileError = $runResults.filter(".run-compile-error");
+	$styleError = $runResults.filter(".run-style-error");
+	$waError = $runResults.filter(".run-wa");
+	$waErrorNoDiff = $runResults.filter(".run-wa-no-diff");
+	$success = $runResults.filter(".run-success");
+}
 
 function setSimpleResult($block, details) {
 	$block.find(".run-details").text(details);
@@ -47,13 +50,13 @@ function setResults(ans) {
 		setWA(ans.ExpectedOutput, ans.ActualOutput);
 }
 
-var $runButton = $(".run-solution-button");
-
-$runButton.click(function () {
+$('.exercise__submission').on('click', '.run-solution-button', function () {
+	var $runButton = $(this);
+	initErrorsBlocks();
 	var code = $(".code-exercise")[0].codeMirrorEditor.getValue();
 	if (code.length == 0)
 		code = " ";
-	$runButton.text("Running...").addClass("active");
+	$runButton.text("Выполняется...").addClass("active");
 	$runResults.hide();
 
 	$.ajax(
@@ -67,6 +70,10 @@ $runButton.click(function () {
 		console.log(req.responseText);
 	})
 	.always(function () {
-		$runButton.text("Run").removeClass("active");
+		$runButton.text("Отправить").removeClass("active");
 	});
+});
+
+$(document).ready(function() {
+	initErrorsBlocks();
 });

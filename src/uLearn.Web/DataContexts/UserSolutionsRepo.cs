@@ -120,6 +120,7 @@ namespace uLearn.Web.DataContexts
 		{
 			return db.UserExerciseSubmissions
 				.Include(s => s.AutomaticChecking)
+				.Include(s => s.ManualCheckings)
 				.Where(x =>
 					x.CourseId == courseId &&
 					slidesIds.Contains(x.SlideId)
@@ -143,6 +144,11 @@ namespace uLearn.Web.DataContexts
 		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId, IEnumerable<Guid> slidesIds)
 		{
 			return GetAllSubmissions(courseId, slidesIds).Where(s => s.AutomaticChecking.IsRightAnswer);
+		}
+
+		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSubmissionsByUser(string courseId, Guid slideId, string userId)
+		{
+			return GetAllAcceptedSubmissions(courseId, new List<Guid> { slideId }).Where(s => s.UserId == userId);
 		}
 
 		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, List<Guid> slidesIds)

@@ -11,10 +11,10 @@ function showHintForUser($button) {
         data: { courseId: $button.data("course-id"), slideIndex: $button.data("slide-index"), isNeedNewHint: true }
     }).success(function(ans) {
         if (ans.Text === "Для слайда нет подсказок") {
-            $("#GetHintButton").notify("Для слайда нет подсказок", "noHints");
+        	$("#GetHintButton").notify(ans.Text, "noHints");
             return;
         } else if (ans.Text === "Подсказок больше нет") {
-            $("#GetHintButton").notify("Подсказок больше нет :(", "noHints");
+        	$("#GetHintButton").notify(ans.Text, "noHints");
             return;
         } else {
             $('#hints-place').html(ans);
@@ -48,11 +48,11 @@ function getHints(courseId, slideIndex, hintsCount) {
         data: { courseId: courseId, slideIndex: slideIndex, isNeedNewHint: false }
     }).success(function (ans) {
         if (ans.Text === "Для слайда нет подсказок") {
-            $("#GetHintButton").text("No hints");
+        	$("#GetHintButton").text(ans.Text);
             $("#GetHintButton").attr('disabled', 'disabled');
             return;
         } else if (ans.Text === "Подсказок больше нет") {
-            $("#GetHintButton").text("No more hints");
+        	$("#GetHintButton").text(ans.Text);
             return;
         } else {
             $('#hints-place').html(ans);
@@ -72,9 +72,9 @@ function buttonNameChange(hintsCount) {
         showedHintsCount++;
     });
     if (showedHintsCount < hintsCount && showedHintsCount != 0)
-        $("#GetHintButton").text("Next hint");
+        $("#GetHintButton").text("Следующая подсказка");
     else if (showedHintsCount != 0) {
-    	$("#GetHintButton").text("No more hints");
+    	$("#GetHintButton").text("Подсказок больше нет");
         $("#GetHintButton").attr('disabled', 'disabled');
     }
 }

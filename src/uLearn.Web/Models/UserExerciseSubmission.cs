@@ -14,15 +14,18 @@ namespace uLearn.Web.Models
 
 		[Required]
 		[StringLength(40)]
+		[Index("IDX_UserExerciseSubmissions_BySlideAndUser", 3)]
 		public string UserId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
 
 		[Required]
 		[StringLength(40)]
+		[Index("IDX_UserExerciseSubmissions_BySlideAndUser", 1)]
 		public string CourseId { get; set; }
 
 		[Required]
+		[Index("IDX_UserExerciseSubmissions_BySlideAndUser", 2)]
 		public Guid SlideId { get; set; }
 
 		[Required]

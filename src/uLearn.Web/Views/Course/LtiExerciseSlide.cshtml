@@ -14,12 +14,11 @@
 <body class="lti-component">
 	@if (Model != null)
 	{
-		@SlideHtml.Block(Model.ExerciseBlock, Model.Context)
+		@SlideHtml.Block(Model.ExerciseBlock, Model.Context, Html)
 
 		@Scripts.Render("~/main-js")
 		<script> getHints("@Model.CourseId", "@Model.SlideIndex", '@Model.ExerciseBlock.HintsMd.Count') </script>
-		ExerciseBlockData data = Model.Context.GetBlockData(Model.ExerciseBlock);
-		<script> refreshPreviousDraft('@(data.Solution != null)', '@Model.SlideId') </script>
+		<script> refreshPreviousDraft('@Model.SlideId') </script>
 	}
 </body>
 
