@@ -260,7 +260,7 @@ namespace uLearn.Web.Controllers
 		{
 			var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
 			return submissions.LastOrDefault(s => s.ManualCheckings != null && s.ManualCheckings.Any()) ??
-					submissions.LastOrDefault(s => s.AutomaticChecking != null && s.AutomaticChecking.IsRightAnswer);
+					submissions.LastOrDefault(s => s.AutomaticCheckingIsRightAnswer);
 		}
 
 		public ActionResult Submission(string courseId, Guid slideId, int? submissionId=null, int? manualCheckingId = null, bool isLti = false)
