@@ -7,6 +7,7 @@ using System.Data.Entity.Validation;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using ApprovalUtilities.Utilities;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts
@@ -65,6 +66,7 @@ namespace uLearn.Web.DataContexts
 				CodeHash = code.Split('\n').Select(x => x.Trim()).Aggregate("", (x, y) => x + y).GetHashCode(),
 				Likes = new List<Like>(),
 				AutomaticChecking = automaticChecking,
+				AutomaticCheckingIsRightAnswer = isRightAnswer,
 			};
 			
 			db.UserExerciseSubmissions.Add(submission);
@@ -119,7 +121,6 @@ namespace uLearn.Web.DataContexts
 		public IEnumerable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds)
 		{
 			return db.UserExerciseSubmissions
-				.Include(s => s.AutomaticChecking)
 				.Include(s => s.ManualCheckings)
 				.Where(x =>
 					x.CourseId == courseId &&
@@ -138,12 +139,12 @@ namespace uLearn.Web.DataContexts
 
 		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
 		{
-			return GetAllSubmissions(courseId, slidesIds, periodStart, periodFinish).Where(s => s.AutomaticChecking.IsRightAnswer);
+			return GetAllSubmissions(courseId, slidesIds, periodStart, periodFinish).Where(s => s.AutomaticCheckingIsRightAnswer);
 		}
 
 		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId, IEnumerable<Guid> slidesIds)
 		{
-			return GetAllSubmissions(courseId, slidesIds).Where(s => s.AutomaticChecking.IsRightAnswer);
+			return GetAllSubmissions(courseId, slidesIds).Where(s => s.AutomaticCheckingIsRightAnswer);
 		}
 
 		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSubmissionsByUser(string courseId, Guid slideId, string userId)
@@ -184,16 +185,6 @@ namespace uLearn.Web.DataContexts
 		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, Guid slideId)
 		{
 			return GetBestTrendingAndNewAcceptedSolutions(courseId, new List<Guid> { slideId });
-		}
-
-		public UserExerciseSubmission FindLatestAcceptedSubmission(string courseId, Guid slideId, string userId)
-		{
-			var allUserSolutionOnThisTask = db.UserExerciseSubmissions
-				.Where(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId && x.AutomaticChecking.IsRightAnswer);
-			var latest = allUserSolutionOnThisTask
-				.OrderByDescending(x => x.Timestamp)
-				.FirstOrDefault();
-			return latest;
 		}
 		
 		public int GetAcceptedSolutionsCount(string courseId, Guid slideId)
@@ -258,16 +249,27 @@ namespace uLearn.Web.DataContexts
 			return db.UserExerciseSubmissions.Where(c => checkingsIds.Contains(c.Id.ToString())).ToList();
 		}
 
+		private void UpdateIsRightAnswerForSubmission(AutomaticExerciseChecking checking)
+		{
+			db.UserExerciseSubmissions
+				.Where(s => s.AutomaticCheckingId == checking.Id)
+				.ForEach(s => s.AutomaticCheckingIsRightAnswer = checking.IsRightAnswer);
+		}
+
 		protected void Save(AutomaticExerciseChecking checking)
 		{
 			db.AutomaticExerciseCheckings.AddOrUpdate(checking);
+			UpdateIsRightAnswerForSubmission(checking);
 			db.SaveChanges();
 		}
 
 		protected void SaveAll(IEnumerable<AutomaticExerciseChecking> checkings)
 		{
 			foreach (var checking in checkings)
+			{
 				db.AutomaticExerciseCheckings.AddOrUpdate(checking);
+				UpdateIsRightAnswerForSubmission(checking);
+			}
 			try
 			{
 				db.SaveChanges();
