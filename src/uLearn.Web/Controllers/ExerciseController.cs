@@ -279,7 +279,7 @@ namespace uLearn.Web.Controllers
 				if (!User.HasAccessFor(courseId, CourseRole.Instructor) && submission.UserId != currentUserId)
 					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			}
-			else if (! submissionId.HasValue)
+			else if (! submissionId.HasValue && ! manualCheckingId.HasValue)
 			{
 				submission = GetExerciseSubmissionShownByDefault(courseId, slideId, currentUserId);
 			}
@@ -288,11 +288,18 @@ namespace uLearn.Web.Controllers
 			var slide = course.FindSlideById(slideId);
 			if (slide == null)
 				return HttpNotFound();
-			var model = CreateExerciseBlockData(course, slide, submission);
-			model.IsLti = isLti;
+
+			ManualExerciseChecking manualChecking = null;
 			if (User.HasAccessFor(courseId, CourseRole.Instructor) && manualCheckingId.HasValue)
 			{
-				var manualChecking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(manualCheckingId.Value);
+				manualChecking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(manualCheckingId.Value);
+				submission = manualChecking.Submission;
+			}
+
+			var model = CreateExerciseBlockData(course, slide, submission);
+			model.IsLti = isLti;
+			if (manualChecking != null)
+			{
 				if (manualChecking.CourseId == courseId)
 					model.ManualChecking = manualChecking;
 			}

@@ -13,9 +13,8 @@
 	}
 }
 
-<div class="exercise__submissions-panel js__auto-update"
-     data-update-url="@Url.Action("SubmissionsPanel", "Exercise", new { Model.CourseId, slideId = Model.Slide.Id, currentSubmissionId = Model.CurrentSubmissionId, canTryAgain = Model.CanTryAgain })"
-	 data-update-interval="10000">
+<div class="exercise__submissions-panel"
+     data-update-url="@Url.Action("SubmissionsPanel", "Exercise", new { Model.CourseId, slideId = Model.Slide.Id, currentSubmissionId = Model.CurrentSubmissionId, canTryAgain = Model.CanTryAgain })">
 	@if (Model.Submissions.Count > 0)
 	{
 		var buttonClasses = "btn btn-xs btn-info exercise-version-link";
