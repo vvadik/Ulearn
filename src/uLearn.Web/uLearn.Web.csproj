@@ -314,6 +314,10 @@
     <Compile Include="Migrations\201609151039376_AddIndexes.Designer.cs">
       <DependentUpon>201609151039376_AddIndexes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201609210830542_AddUserExerciseSolutionIndexes.cs" />
+    <Compile Include="Migrations\201609210830542_AddUserExerciseSolutionIndexes.Designer.cs">
+      <DependentUpon>201609210830542_AddUserExerciseSolutionIndexes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\ExerciseCodeReview.cs" />
     <Compile Include="Models\ExerciseCodeReviewModel.cs" />
     <Compile Include="Models\SlideChecking.cs" />
@@ -802,6 +806,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201609151039376_AddIndexes.resx">
       <DependentUpon>201609151039376_AddIndexes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609210830542_AddUserExerciseSolutionIndexes.resx">
+      <DependentUpon>201609210830542_AddUserExerciseSolutionIndexes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

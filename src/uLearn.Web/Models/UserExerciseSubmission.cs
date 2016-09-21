@@ -22,13 +22,18 @@ namespace uLearn.Web.Models
 		[Required]
 		[StringLength(40)]
 		[Index("IDX_UserExerciseSubmissions_BySlideAndUser", 1)]
+		[Index("IDX_UserExerciseSubmissions_ByCourseAndSlide", 1)]
+		[Index("IDX_UserExerciseSubmissions_BySlideAndTime", 1)]
 		public string CourseId { get; set; }
 
 		[Required]
 		[Index("IDX_UserExerciseSubmissions_BySlideAndUser", 2)]
+		[Index("IDX_UserExerciseSubmissions_ByCourseAndSlide", 2)]
+		[Index("IDX_UserExerciseSubmissions_BySlideAndTime", 2)]
 		public Guid SlideId { get; set; }
 
 		[Required]
+		[Index("IDX_UserExerciseSubmissions_BySlideAndTime", 3)]
 		public DateTime Timestamp { get; set; }
 
 		[Required]
