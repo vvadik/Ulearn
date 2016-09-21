@@ -15,8 +15,9 @@ function setExerciseVersion(versionId) {
 		var $submission = $('.exercise__submission');
 		$submission.html($(data).html());
 		initCodeEditor($submission);
-		selectSetAutoWidth($submission.find('.select-auto-width'));
-		setAutoUpdater($submission.find('.js__auto-update'));
+		$submission.find('.select-auto-width').each(function() {
+			selectSetAutoWidth($(this));
+		});
 		refreshPreviousDraft();
 
 		updateExerciseVersionUrl(versionId);

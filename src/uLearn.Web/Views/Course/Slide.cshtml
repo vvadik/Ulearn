@@ -92,7 +92,9 @@
 			getHints("@Model.CourseId", "@Model.Slide.Index", '@slide.Exercise.HintsMd.Count')
 		</script>
 		<script>
-			refreshPreviousDraft('@Model.Slide.Id');
+			$(document).ready(function() {
+				refreshPreviousDraft('@Model.Slide.Id');
+			});
 		</script>
 	}
 

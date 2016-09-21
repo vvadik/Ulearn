@@ -57,7 +57,8 @@ namespace uLearn.Web.Controllers
 				CompilationError = automaticChecking.CompilationError.Text,
 				ExecutionServiceName = automaticChecking.ExecutionServiceName,
 				IsCompileError = automaticChecking.IsCompilationError,
-				IsRightAnswer = automaticChecking.IsRightAnswer
+				IsRightAnswer = automaticChecking.IsRightAnswer,
+				SubmissionId = submission.Id,
 			});
 		}
 

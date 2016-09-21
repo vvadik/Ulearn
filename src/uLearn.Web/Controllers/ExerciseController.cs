@@ -103,6 +103,7 @@ namespace uLearn.Web.Controllers
 				ActualOutput = automaticChecking.Output.Text,
 				ExecutionServiceName = automaticChecking.ExecutionServiceName,
 				SentToReview = sendToReview,
+				SubmissionId = submission.Id,
 			};
 		}
 
@@ -293,8 +294,9 @@ namespace uLearn.Web.Controllers
 			if (User.HasAccessFor(courseId, CourseRole.Instructor) && manualCheckingId.HasValue)
 			{
 				manualChecking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(manualCheckingId.Value);
-				submission = manualChecking.Submission;
 			}
+			if (manualChecking != null && !submissionId.HasValue)
+				submission = manualChecking.Submission;
 
 			var model = CreateExerciseBlockData(course, slide, submission);
 			model.IsLti = isLti;

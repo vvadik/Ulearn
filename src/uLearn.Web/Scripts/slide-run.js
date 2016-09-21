@@ -40,9 +40,9 @@ function setResults(ans) {
 	else if (ans.IsCompileError) setSimpleResult($compileError, ans.CompilationError);
 	else if (ans.IsStyleViolation) setSimpleResult($styleError, ans.CompilationError);
 	else if (ans.IsRightAnswer) {
-		$success.find('.run-review-status').toggle(ans.SentToReview);
-		setSimpleResult($success, ans.ActualOutput);
 		slideNavigation.makeShowSolutionsNext();
+		if (ans.SubmissionId > 0)
+			setExerciseVersion(ans.SubmissionId);
 	}
 	else if (ans.ExpectedOutput === null)
 		setSimpleResult($waErrorNoDiff, ans.ActualOutput);

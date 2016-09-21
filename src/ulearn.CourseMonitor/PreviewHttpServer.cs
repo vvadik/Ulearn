@@ -186,7 +186,8 @@ namespace uLearn.CourseTool
 				CompilationError = result.CompilationOutput,
 				ExecutionServiceName = "this",
 				IsCompileError = result.Verdict == Verdict.CompilationError,
-				ExpectedOutput = exercise.ExpectedOutput.NormalizeEoln()
+				ExpectedOutput = exercise.ExpectedOutput.NormalizeEoln(),
+				SubmissionId = 0,
 			};
 		}
 

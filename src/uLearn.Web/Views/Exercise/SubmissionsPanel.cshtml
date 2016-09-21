@@ -13,8 +13,7 @@
 	}
 }
 
-<div class="exercise__submissions-panel"
-     data-update-url="@Url.Action("SubmissionsPanel", "Exercise", new { Model.CourseId, slideId = Model.Slide.Id, currentSubmissionId = Model.CurrentSubmissionId, canTryAgain = Model.CanTryAgain })">
+<div class="exercise__submissions-panel">
 	@if (Model.Submissions.Count > 0)
 	{
 		var buttonClasses = "btn btn-xs btn-info exercise-version-link";
@@ -25,6 +24,10 @@
 		{
 			var previousSubmission = Model.Submissions[currentSubmissionIndex - 1];
 			@Html.RouteLink("← Предыдущая версия", "Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, version = previousSubmission.Id }, new { @class = buttonClasses, data_version_id = previousSubmission.Id })
+		}
+		else if (currentSubmissionIndex == 0)
+		{
+			@Html.RouteLink("← Предыдущая версия", "Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, version = Model.CurrentSubmissionId }, new { @class = disabledButtonClasses })
 		}
 		else
 		{
