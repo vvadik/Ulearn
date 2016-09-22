@@ -133,7 +133,11 @@ namespace uLearn.Web.DataContexts
 				return new List<Group>();
 
 			var userId = user.Identity.GetUserId();
-			return db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || g.IsPublic)).OrderBy(g => g.OwnerId == userId).ToList();
+			return db.Groups
+				.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || g.IsPublic))
+				.OrderBy(g => g.OwnerId == userId)
+				.ThenBy(g => g.Name)
+				.ToList();
 		}
 
 		public List<Group> GetGroupsOwnedByUser(string courseId, IPrincipal user)

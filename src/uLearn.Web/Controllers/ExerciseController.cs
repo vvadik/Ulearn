@@ -40,13 +40,24 @@ namespace uLearn.Web.Controllers
 		[System.Web.Mvc.HttpPost]
 		public async Task<ActionResult> RunSolution(string courseId, Guid slideId, bool isLti = false)
 		{
+			/* Check that no checking solution by this user in last 2 minutes */
+			var twoMinutesAgo = DateTime.Now.Subtract(TimeSpan.FromMinutes(2));
+			if (solutionsRepo.IsCheckingSubmissionByUser(courseId, slideId, User.Identity.GetUserId(), twoMinutesAgo, DateTime.MaxValue))
+			{
+				return Json(new RunSolutionResult
+				{
+					Ignored = true,
+					ErrorMessage = "Ваше решение по этой задаче уже проверяется. Дождитесь окончания проверки"
+				});
+			}
+
 			var code = Request.InputStream.GetString();
 			if (code.Length > TextsRepo.MaxTextSize)
 			{
 				return Json(new RunSolutionResult
 				{
 					IsCompileError = true,
-					CompilationError = "Слишком большой код."
+					ErrorMessage = "Слишком большой код."
 				});
 			}
 			var exerciseSlide = courseManager.GetCourse(courseId).FindSlideById(slideId) as ExerciseSlide;
@@ -67,9 +78,9 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			var solution = exerciseBlock.BuildSolution(userCode);
 			if (solution.HasErrors)
-				return new RunSolutionResult { IsCompileError = true, CompilationError = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
+				return new RunSolutionResult { IsCompileError = true, ErrorMessage = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
 			if (solution.HasStyleIssues)
-				return new RunSolutionResult { IsStyleViolation = true, CompilationError = solution.StyleMessage, ExecutionServiceName = "uLearn" };
+				return new RunSolutionResult { IsStyleViolation = true, ErrorMessage = solution.StyleMessage, ExecutionServiceName = "uLearn" };
 			var submission = await solutionsRepo.RunUserSolution(
 				courseId, exerciseSlide.Id, userId,
 				userCode, null, null, false, "uLearn",
@@ -80,7 +91,7 @@ namespace uLearn.Web.Controllers
 				return new RunSolutionResult
 				{
 					IsCompillerFailure = true,
-					CompilationError = "Ой-ой, штуковина, которая проверяет решения, сломалась (или просто устала).\nПопробуйте отправить решение позже — когда она немного отдохнет.",
+					ErrorMessage = "Ой-ой, штуковина, которая проверяет решения, сломалась (или просто устала).\nПопробуйте отправить решение позже — когда она немного отдохнет.",
 					ExecutionServiceName = "uLearn"
 				};
 
@@ -97,7 +108,7 @@ namespace uLearn.Web.Controllers
 			return new RunSolutionResult
 			{
 				IsCompileError = automaticChecking.IsCompilationError,
-				CompilationError = automaticChecking.CompilationError.Text,
+				ErrorMessage = automaticChecking.CompilationError.Text,
 				IsRightAnswer = automaticChecking.IsRightAnswer,
 				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseSlide.Exercise.ExpectedOutput.NormalizeEoln(),
 				ActualOutput = automaticChecking.Output.Text,
@@ -176,7 +187,7 @@ namespace uLearn.Web.Controllers
 
 		[System.Web.Mvc.HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public async Task<ActionResult> ScoreExercise(int id, string nextUrl, int exerciseScore, bool? prohibitFurtherReview, string errorUrl = "", bool recheck = false)
+		public async Task<ActionResult> ScoreExercise(int id, string nextUrl, string exerciseScore, bool? prohibitFurtherReview, string errorUrl = "", bool recheck = false)
 		{
 			if (string.IsNullOrEmpty(errorUrl))
 				errorUrl = nextUrl;
@@ -195,12 +206,17 @@ namespace uLearn.Web.Controllers
 				var slide = (ExerciseSlide)course.GetSlideById(checking.SlideId);
 				var exercise = slide.Exercise;
 
+				int score;
+				/* Invalid form: score isn't integer */
+				if (!int.TryParse(exerciseScore, out score))
+					return Redirect(errorUrl + "Неверное количество баллов");
+
 				/* Invalid form: score isn't from range 0..MAX_SCORE */
-				if (exerciseScore < 0 || exerciseScore > exercise.MaxReviewScore)
-					return Redirect(errorUrl + $"Неверное количество баллов: {exerciseScore}");
+				if (score < 0 || score > exercise.MaxReviewScore)
+					return Redirect(errorUrl + $"Неверное количество баллов: {score}");
 
 				checking.ProhibitFurtherManualCheckings = false;
-				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, exerciseScore);
+				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, score);
 				if (prohibitFurtherReview.HasValue && prohibitFurtherReview.Value)
 					await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking);
 				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, checking.UserId);

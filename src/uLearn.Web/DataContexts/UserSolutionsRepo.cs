@@ -192,6 +192,15 @@ namespace uLearn.Web.DataContexts
 			return GetAllAcceptedSubmissions(courseId, new List<Guid> { slideId }).DistinctBy(x => x.UserId).Count();
 		}
 
+		public bool IsCheckingSubmissionByUser(string courseId, Guid slideId, string userId, DateTime periodStart, DateTime periodFinish)
+		{
+			var automaticCheckingsIds = GetAllSubmissions(courseId, new List<Guid> { slideId }, periodStart, periodFinish)
+				.Where(s => s.UserId == userId)
+				.Select(s => s.AutomaticCheckingId)
+				.ToList();
+			return db.AutomaticExerciseCheckings.Any(c => automaticCheckingsIds.Contains(c.Id) && c.Status != AutomaticExerciseCheckingStatus.Done);
+		}
+
 		public HashSet<Guid> GetIdOfPassedSlides(string courseId, string userId)
 		{
 			return new HashSet<Guid>(db.AutomaticExerciseCheckings

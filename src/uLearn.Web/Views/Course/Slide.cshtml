@@ -37,7 +37,10 @@
 					{
 						<p class="exercise-status">
 							@Model.ManualChecking.User.VisibleName
-							(@Model.ContextManualCheckingUserGroups),
+							@if (!string.IsNullOrEmpty(Model.ContextManualCheckingUserGroups))
+							{
+								<span>(@Model.ContextManualCheckingUserGroups),</span>
+							}
 							@Model.ManualChecking.Timestamp.ToPrettyString()
 						</p>
 					}

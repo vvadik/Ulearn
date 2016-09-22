@@ -17,34 +17,34 @@ function setSimpleResult($block, details) {
 
 function setWA(expected, actual) {
 	var $difTable = $waError.find(".diff-table");
-	//	var solutionsDiff = diffUsingJS(actual, expected);
 	var solutionsDiff = diffHtml(actual, expected);
 	$difTable.html(solutionsDiff);
 	$waError.show();
 }
 
 function RunSolutionResult() {
+	this.Ignored = false;
 	this.IsCompillerFailure = false;
 	this.IsCompileError = false;
 	this.IsStyleViolation = false;
 	this.IsRightAnswer = false;
 	this.ExpectedOutput = "";
 	this.ActualOutput = "";
-	this.CompilationError = "";
+	this.ErrorMessage = "";
 	this.SentToReview = false;
 }
 
 function setResults(ans) {
 	///<param name="ans" type="RunSolutionResult"></param>
-	if (ans.IsCompillerFailure) setSimpleResult($serviceError, ans.CompilationError);
-	else if (ans.IsCompileError) setSimpleResult($compileError, ans.CompilationError);
-	else if (ans.IsStyleViolation) setSimpleResult($styleError, ans.CompilationError);
+	if (ans.Ignored) $('.run-solution-button').notify(ans.ErrorMessage);
+	else if (ans.IsCompillerFailure) setSimpleResult($serviceError, ans.ErrorMessage);
+	else if (ans.IsCompileError) setSimpleResult($compileError, ans.ErrorMessage);
+	else if (ans.IsStyleViolation) setSimpleResult($styleError, ans.ErrorMessage);
 	else if (ans.IsRightAnswer) {
 		slideNavigation.makeShowSolutionsNext();
 		if (ans.SubmissionId > 0)
 			setExerciseVersion(ans.SubmissionId);
-	}
-	else if (ans.ExpectedOutput === null)
+	} else if (ans.ExpectedOutput === null)
 		setSimpleResult($waErrorNoDiff, ans.ActualOutput);
 	else
 		setWA(ans.ExpectedOutput, ans.ActualOutput);
