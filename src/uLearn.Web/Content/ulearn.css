@@ -39,6 +39,10 @@ p {
 	margin: 10px 0;
 }
 
+.alert > p {
+	margin: 0;
+}
+
 .internal-page-link,
 .internal-page-link:hover,
 .internal-page-link:focus,
