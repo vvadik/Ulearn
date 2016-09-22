@@ -20,6 +20,9 @@
 	<h4>Оцените работу (максимальный балл @block.MaxReviewScore)</h4>
 	<div class="exercise__score">
 		<div class="btn-group" role="group">
+			@{
+				var isPercentScoreActive = false;
+			}
 			@foreach (var scorePercent in new[] { 0, 25, 50, 75, 100 })
 			{
 				var score = block.MaxReviewScore * scorePercent / 100;
@@ -27,11 +30,12 @@
 				 * because they are the same (0% of 2 is equal to 25% of 2)
 				 */
 				var isActive = Model.Checking.IsChecked && Model.Checking.Score == score && block.MaxReviewScore >= 4;
+				isPercentScoreActive = isPercentScoreActive || isActive;
 				<button type="button" class="btn btn-default @(isActive ? "active" : "")" data-value="@score">@scorePercent%</button>
 			}
 		</div>
 		<div class="ib">
-			<a href="#" class="exercise__other-score-link internal-page-link">Другая оценка</a>
+			<a href="#" class="exercise__other-score-link internal-page-link @(! isPercentScoreActive ? "active" : "")">Другая оценка</a>
 			@{
 				var otherScoreInputDisplay = Model.Checking.IsChecked ? "" : "display: none";
 			}

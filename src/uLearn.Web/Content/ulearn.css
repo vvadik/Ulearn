@@ -56,6 +56,13 @@ p {
 	border-bottom-color: #2a6496;
 }
 
+.internal-page-link.active {
+    color: black;
+    border-bottom: none;
+    font-weight: bold;
+    pointer-events: none;
+}
+
 .inline-select {
     border-width: 0;
     padding: 0;
@@ -1275,6 +1282,7 @@ table.analytics__user-answers {
 .exercise__review.selected {
 	border-left-color: #d66;
 	margin-left: -10px;
+	margin-right: 10px;
 }
 
 .exercise__review .exercise__review__header {
@@ -1312,6 +1320,14 @@ table.analytics__user-answers {
 
 .exercise__submissions-panel .inline-select {
 	margin: 0 10px;
+}
+
+.exercise__submissions-panel .btn-xs {
+	border-radius: 5px;
+}
+
+.exercise__submissions-panel .btn-group .btn-xs:not(:first-child) {
+	margin-left: 2px;
 }
 
 .exercise__score .exercise__other-score-link {
