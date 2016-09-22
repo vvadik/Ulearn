@@ -258,13 +258,16 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction(actionName, new { courseId, groupId });
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+			var reviews = slideCheckingsRepo.GetExerciseCodeReviewForCheckings(checkings.Select(c => c.Id));
 			return View(viewName, new ManualCheckingQueueViewModel
 			{
 				CourseId = courseId,
 				Checkings = checkings.Select(c => new ManualCheckingQueueItemViewModel
 				{
 					CheckingQueueItem = c,
-					ContextSlideTitle = course.GetSlideById(c.SlideId).Title
+					ContextSlideTitle = course.GetSlideById(c.SlideId).Title,
+					ContextMaxScore = course.GetSlideById(c.SlideId).MaxScore,
+					ContextReviewsComments = reviews.GetOrDefault(c.Id, new List<string>()),
 				}).ToList(),
 				Groups = groups,
 				GroupId = groupId,
@@ -294,7 +297,9 @@ namespace uLearn.Web.Controllers
 						new
 						{
 							courseId = courseId,
-							message = "already_checked"
+							groupId = groupId,
+							done = recheck,
+							message = "already_checked",
 						});
 
 				if (!User.HasAccessFor(checking.CourseId, CourseRole.Instructor))
@@ -305,7 +310,9 @@ namespace uLearn.Web.Controllers
 						new
 						{
 							courseId = checking.CourseId,
-							message = "already_checked"
+							groupId = groupId,
+							done = recheck,
+							message = "already_checked",
 						});
 
 				if (checking.IsLocked && !ignoreLock && !checking.IsLockedBy(User.Identity))
@@ -313,7 +320,9 @@ namespace uLearn.Web.Controllers
 						new
 						{
 							courseId = checking.CourseId,
-							message = "locked"
+							groupId = groupId,
+							done = recheck,
+							message = "locked",
 						});
 
 				await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId());
@@ -678,6 +687,8 @@ namespace uLearn.Web.Controllers
 		public AbstractManualSlideChecking CheckingQueueItem { get; set; }
 
 		public string ContextSlideTitle { get; set; }
+		public int ContextMaxScore { get; set; }
+		public List<string> ContextReviewsComments { get; set; }
 	}
 
 	public class DiagnosticsModel

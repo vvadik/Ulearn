@@ -220,6 +220,14 @@ namespace uLearn.Web.DataContexts
 			review.Comment = newComment;
 			await db.SaveChangesAsync();
 		}
+
+		public Dictionary<int, List<string>> GetExerciseCodeReviewForCheckings(IEnumerable<int> checkingsIds)
+		{
+			return db.ExerciseCodeReviews
+				.Where(r => checkingsIds.Contains(r.ExerciseCheckingId) && ! r.IsDeleted)
+				.GroupBy(r => r.ExerciseCheckingId)
+				.ToDictionary(g => g.Key, g => g.Select(r => r.Comment).ToList());
+		}
 	}
 
 	public class ManualCheckingQueueFilterOptions

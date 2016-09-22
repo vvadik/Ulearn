@@ -228,7 +228,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" />\r\n\t\t</div>\r\n");
 	}
 
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<hr class=\"quiz-block-delimiter\" />\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"quiz-block-delimiter\"></div>\r\n");
 
 
 

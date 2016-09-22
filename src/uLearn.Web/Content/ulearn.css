@@ -35,6 +35,10 @@
 	cursor: pointer;
 }
 
+p {
+	margin: 10px 0;
+}
+
 .internal-page-link,
 .internal-page-link:hover,
 .internal-page-link:focus,
@@ -97,6 +101,10 @@
 	border-radius: 5px;
 }
 
+.revealed p:last-child {
+	margin: 0;
+}
+
 .statistic-container {
 }
 
@@ -115,10 +123,14 @@
 	max-width: 864px;
 }
 
+.slide {
+	padding-bottom: 10px;
+}
+
 /* ReSharper disable Html.CssClassElementsNotFound */
 .CodeMirror {
 	height: auto;
-	margin-bottom: 20px;
+	margin-bottom: 15px;
 	line-height: 1.3em;
 	font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
 }
@@ -382,6 +394,7 @@
 	padding: 15px 18px;
 	color: #333;
 	font-size: 13pt;
+	margin-bottom: 30px;
 }
 
 .exercise-status {
@@ -394,10 +407,8 @@
 }
 
 .quiz-block-delimiter {
-	margin-bottom: 40px;
-	margin-top: 40px;
-	color: gray;
-	align-self: center;
+	margin-bottom: 30px;
+	margin-top: 30px;
 }
 
 .hide-side-bar-button {
@@ -1295,4 +1306,14 @@ table.analytics__user-answers {
 
 .exercise__submissions-panel .inline-select {
 	margin: 0 10px;
+}
+
+.exercise__score .exercise__other-score-link {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+.exercise__score input {
+	display: inline-block;
+	width: auto;
 }

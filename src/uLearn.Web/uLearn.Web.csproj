@@ -1190,6 +1190,7 @@
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.date.js" />
     <Content Include="Scripts\notify-custom.min.js" />
+    <Content Include="Scripts\slide-checking.js" />
     <Content Include="Scripts\slide-comments.js" />
     <Content Include="Scripts\slide-diff.js" />
     <Content Include="Scripts\slide-guest.js" />

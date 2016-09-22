@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Security.Principal;
 using Microsoft.AspNet.Identity;
 
@@ -126,6 +127,9 @@ namespace uLearn.Web.Models
 		public virtual UserExerciseSubmission Submission { get; set; }
 
 		public virtual IList<ExerciseCodeReview> Reviews { get; set; }
+
+		[NotMapped]
+		public List<ExerciseCodeReview> NotDeletedReviews => Reviews.Where(r => !r.IsDeleted).ToList();
 	}
 
 	public class AutomaticQuizChecking : AbstractAutomaticSlideChecking
