@@ -213,7 +213,7 @@ namespace uLearn.Web.Controllers
 								IsCommentVisibleForUser = true,
 								ShowContextInformation = true,
 								ContextSlideTitle = slide.Title,
-								ContextParentComment = c.IsTopLevel() ? null : commentsById[c.ParentCommentId].Text,
+								ContextParentComment = c.IsTopLevel() ? null : commentsById.ContainsKey(c.ParentCommentId) ? commentsById[c.ParentCommentId].Text : null,
 							}).ToList()
 			});
 		}
