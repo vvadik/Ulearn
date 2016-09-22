@@ -393,7 +393,8 @@ p {
 }
 
 .quiz-status,
-.exercise-status {
+.exercise-status,
+.exercise-loading {
     background-color: #d9edf7;
 	padding: 15px 18px;
 	color: #333;
@@ -401,7 +402,8 @@ p {
 	margin-bottom: 30px;
 }
 
-.exercise-status {
+.exercise-status,
+.exercise-loading {
     margin-bottom: 0;
     margin-top: 10px;
 }

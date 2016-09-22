@@ -11,8 +11,15 @@ function setExerciseVersion(versionId) {
 
 	saveExerciseCodeDraft();
 
+	var $hints = $('#hints-accordion');
+	$('.exercise__submission > *:not(.exercise__submissions-panel)').hide();
+	var $loadingPanel = $('<p class="exercise-loading">Загрузка...</p>');
+	$('.exercise__submission').append($loadingPanel);
+	$hints.hide();
+
 	$.get(url, function(data) {
 		var $submission = $('.exercise__submission');
+		$loadingPanel.hide();
 		$submission.html($(data).html());
 		initCodeEditor($submission);
 		$submission.find('.select-auto-width').each(function() {
@@ -21,6 +28,7 @@ function setExerciseVersion(versionId) {
 		refreshPreviousDraft();
 
 		updateExerciseVersionUrl(versionId);
+		$hints.show();
 	});
 }
 
