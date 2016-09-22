@@ -12,7 +12,7 @@
 	<button class="exercise__add-review__button btn btn-success btn-sm">Сохранить</button>
 </div>
 
-<form method="POST" action="@Url.Action("ScoreExercise", "Exercise", new { recheck = Model.Checking.IsChecked })">
+<form method="POST" action="@Url.Action("ScoreExercise", "Exercise", new { recheck = Model.Checking.IsChecked })" class="exercise__score-form">
 	<input type="hidden" name="id" value="@Model.Checking.Id"/>
 	<input type="hidden" name="errorUrl" value="@Url.RouteUrl("Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, CheckQueueItemId = Model.Checking.Id, Model.GroupId })&amp;error="/>
 	<input type="hidden" name="nextUrl" value="@Url.Action("ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId, done = Model.Checking.IsChecked })"/>
@@ -22,12 +22,20 @@
 		<div class="btn-group" role="group">
 			@foreach (var scorePercent in new[] { 0, 25, 50, 75, 100 })
 			{
-				<button type="button" class="btn btn-default" data-value="@(block.MaxReviewScore * scorePercent / 100)">@scorePercent%</button>
+				var score = block.MaxReviewScore * scorePercent / 100;
+				/* For max review score < 4 we can not define percentage score,
+				 * because they are the same (0% of 2 is equal to 25% of 2)
+				 */
+				var isActive = Model.Checking.IsChecked && Model.Checking.Score == score && block.MaxReviewScore >= 4;
+				<button type="button" class="btn btn-default @(isActive ? "active" : "")" data-value="@score">@scorePercent%</button>
 			}
 		</div>
 		<div class="ib">
 			<a href="#" class="exercise__other-score-link internal-page-link">Другая оценка</a>
-			<input type="number" class="form-control" style="display: none" min="0" max="@block.MaxReviewScore" name="exerciseScore" required="required"
+			@{
+				var otherScoreInputDisplay = Model.Checking.IsChecked ? "" : "display: none";
+			}
+			<input type="number" class="form-control" style="@otherScoreInputDisplay" min="0" max="@block.MaxReviewScore" name="exerciseScore" required="required"
 			       value="@(Model.Checking.IsChecked ? Model.Checking.Score.ToString() : "")"/>
 		</div>
 	</div>
