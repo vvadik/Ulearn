@@ -28,4 +28,21 @@
 			$otherScoreLink.addClass('active');
 		}
 	});
+
+	$('.exercise__add-review').each(function () {
+		var $topReviewComments = $('.exercise__top-review-comments');
+		if ($topReviewComments.find('.comment').length == 0) {
+			$(this).addClass('without-comments');
+			return;
+		}
+		var $topComments = $topReviewComments.clone(true).removeClass('hidden');
+		$('.exercise__add-review__top-comments').append($topComments);
+	});
+
+	$('.exercise__top-review-comments .comment a').click(function(e) {
+		e.preventDefault();
+		$('.exercise__add-review__comment')
+			.val($(this).data('value'))
+			.trigger('input');
+	});
 });

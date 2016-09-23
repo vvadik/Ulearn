@@ -1245,6 +1245,7 @@ table.analytics__user-answers {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 3px;
+	width: 520px;
 }
 
 .exercise__add-review > * {
@@ -1257,8 +1258,22 @@ table.analytics__user-answers {
 	margin-bottom: 5px;
 }
 
+.exercise__add-review h4 {
+	margin-left: 15px;
+	margin-top: 0;
+}
+
 .exercise__add-review .exercise__add-review__comment {
 	width: 250px;
+	height: 120px;
+}
+
+.exercise__add-review.without-comments {
+	width: 270px;
+}
+
+.exercise__add-review.without-comments .exercise__add-review__top-comments {
+	display: none;
 }
 
 .code-review + .CodeMirror {

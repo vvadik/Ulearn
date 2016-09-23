@@ -13,6 +13,7 @@ function setExerciseVersion(versionId) {
 
 	var $hints = $('#hints-accordion');
 	$('.exercise__submission > *:not(.exercise__submissions-panel)').hide();
+	$('.exercise__add-review').hide();
 	var $loadingPanel = $('<p class="exercise-loading">Загрузка...</p>');
 	$('.exercise__submission').append($loadingPanel);
 	$hints.hide();

@@ -7,8 +7,16 @@
 <div class="text-muted">Выделите участок кода, чтобы оставить комментарий</div>
 
 <div class="exercise__add-review" style="display: none" data-url="@Url.Action("AddExerciseCodeReview", "Exercise", new { courseId = Model.CourseId, checkingId = Model.Checking.Id })">
-	<div>Добавить комментарий</div>
-	<textarea class="exercise__add-review__comment"></textarea>
+	<div class="row">
+		<h4>Добавить комментарий</h4>
+		<div class="col-sm-6">
+			<textarea class="exercise__add-review__comment"></textarea>
+		</div>
+		<div class="col-sm-6 exercise__add-review__top-comments">
+			<b>Популярные комментарии</b>
+
+		</div>
+	</div>
 	<button class="exercise__add-review__button btn btn-success btn-sm">Сохранить</button>
 </div>
 

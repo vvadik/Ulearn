@@ -9,7 +9,7 @@
 }
 
 <div class="exercise__submission"
-	 data-version-update-url="@Url.Action("Submission", new { Model.CourseId, slideId = Model.Slide.Id, submissionId = "VERSION_ID", manualCheckingId = manualCheckingId, isLti = Model.IsLti })">
+     data-version-update-url="@Url.Action("Submission", new { Model.CourseId, slideId = Model.Slide.Id, submissionId = "VERSION_ID", manualCheckingId = manualCheckingId, isLti = Model.IsLti })">
 	@{
 		var currentSubmissionId = Model.SubmissionSelectedByUser != null ? (int?)Model.SubmissionSelectedByUser.Id : null;
 
@@ -40,7 +40,7 @@
 			else if (Model.ReviewState == ExerciseReviewState.Reviewed)
 			{
 				var score = Model.SubmissionSelectedByUser.ManualCheckings.Max(c => c.Score);
-				status = string.Format("Все тесты пройдены, код проверен преподавателем ({0})", 
+				status = string.Format("Все тесты пройдены, код проверен преподавателем ({0})",
 					score.PluralizeInRussian(new RussianPluralizationOptions
 					{
 						One = "балл",
@@ -109,6 +109,13 @@
 
 <div class="panel-group ctrl-group" id="hints-accordion">
 	<div id="hints-place"></div>
+</div>
+
+<div class="exercise__top-review-comments hidden">
+	@foreach (var comment in Model.TopUserReviewComments)
+	{
+		<div class="comment"><a href="#" class="internal-page-link" title="@comment.TruncateWithEllipsis(200)" data-value="@comment">@comment.TruncateWithEllipsis(35)</a></div>
+	}
 </div>
 
 @helper YouWillLoseScoresDialog(ExerciseBlockData data)

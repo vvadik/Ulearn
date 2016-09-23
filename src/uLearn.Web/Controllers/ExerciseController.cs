@@ -248,7 +248,8 @@ namespace uLearn.Web.Controllers
 
 		private ExerciseBlockData CreateExerciseBlockData(Course course, Slide slide, UserExerciseSubmission submission)
 		{
-			var userId = submission?.UserId ?? User.Identity.GetUserId();
+			var currentUserId = User.Identity.GetUserId();
+			var userId = submission?.UserId ?? currentUserId;
 			var visit = visitsRepo.FindVisiter(course.Id, slide.Id, userId);
 
 			var solution = submission?.SolutionCode.Text;
@@ -261,6 +262,7 @@ namespace uLearn.Web.Controllers
 					ExerciseReviewState.NotReviewed;
 
 			var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, slide.Id, userId);
+			var topUserReviewComments = slideCheckingsRepo.GetTopUserReviewComments(course.Id, slide.Id, currentUserId, 5);
 
 			return new ExerciseBlockData(course.Id, (ExerciseSlide) slide, visit?.IsSkipped ?? false, solution)
 			{
@@ -270,6 +272,7 @@ namespace uLearn.Web.Controllers
 				IsGuest = false,
 				SubmissionSelectedByUser = submission,
 				Submissions = submissions.ToList(),
+				TopUserReviewComments = topUserReviewComments,
 			};
 		}
 

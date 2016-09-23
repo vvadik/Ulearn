@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
 using System.Threading.Tasks;
@@ -227,6 +228,18 @@ namespace uLearn.Web.DataContexts
 				.Where(r => checkingsIds.Contains(r.ExerciseCheckingId) && ! r.IsDeleted)
 				.GroupBy(r => r.ExerciseCheckingId)
 				.ToDictionary(g => g.Key, g => g.Select(r => r.Comment).ToList());
+		}
+
+		public List<string> GetTopUserReviewComments(string courseId, Guid slideId, string userId, int count)
+		{
+			return db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
+				.Where(r => r.ExerciseChecking.CourseId == courseId && r.ExerciseChecking.SlideId == slideId && r.AuthorId == userId && ! r.IsDeleted)
+				.GroupBy(r => r.Comment)
+				.OrderByDescending(g => g.Count())
+				.ThenByDescending(g => g.Max(r => r.ExerciseChecking.Timestamp))
+				.Take(count)
+				.Select(g => g.Key)
+				.ToList();
 		}
 	}
 

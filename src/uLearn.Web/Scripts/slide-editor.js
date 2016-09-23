@@ -150,7 +150,6 @@ function initCodeEditor($parent) {
 						$addReviewPopup.offset({ top: coords.top, left: coords.left });
 
 						$addReviewPopupInput.trigger('input');
-
 						$addReviewPopupInput.focus();
 					});
 			}

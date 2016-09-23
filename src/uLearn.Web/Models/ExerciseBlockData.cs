@@ -15,6 +15,7 @@ namespace uLearn.Web.Models
 			IsGuest = true;
 			ReviewState = ExerciseReviewState.NotReviewed;
 			Submissions = new List<UserExerciseSubmission>();
+			TopUserReviewComments = new List<string>();
 		}
 
 		public string CourseId { get; set; }
@@ -47,6 +48,7 @@ namespace uLearn.Web.Models
 		public UserExerciseSubmission SubmissionSelectedByUser { get; set; }
 		public List<UserExerciseSubmission> Submissions { get; set; }
 		public ManualExerciseChecking ManualChecking { get; set; }
+		public List<string> TopUserReviewComments { get; set; }
 	}
 
 	public enum ExerciseReviewState

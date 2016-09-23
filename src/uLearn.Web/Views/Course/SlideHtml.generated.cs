@@ -1484,10 +1484,10 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tВзять п
 			if (!model.IsLti && !model.HideShowSolutionsButton)
 			{
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<button type=\"button\" class=\"btn btn-default giveup-btn\" onclick=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<button type=\"button\" class=\"btn btn-default giveup-btn no-rounds\" onclick=\"");
 
 
-                            WebViewPage.WriteTo(@__razor_helper_writer, model.AcceptedSolutionsAction);
+                                      WebViewPage.WriteTo(@__razor_helper_writer, model.AcceptedSolutionsAction);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\tПоказать решения\r\n\t\t\t\t</button>\r\n");
 
