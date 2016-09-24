@@ -104,9 +104,9 @@ namespace uLearn.Web.DataContexts
 			return db.Groups.FirstOrDefault(g => g.InviteHash == hash && !g.IsDeleted && g.IsInviteLinkEnabled);
 		}
 
-		public List<Group> GetGroups(string courseId)
+		public IEnumerable<Group> GetGroups(string courseId)
 		{
-			return db.Groups.Where(g => g.CourseId == courseId && ! g.IsDeleted).ToList();
+			return db.Groups.Where(g => g.CourseId == courseId && ! g.IsDeleted);
 		}
 
 		public bool IsGroupAvailableForUser(int groupId, IPrincipal user)
@@ -125,16 +125,20 @@ namespace uLearn.Web.DataContexts
 
 		public List<Group> GetAvailableForUserGroups(string courseId, IPrincipal user)
 		{
-			/* Course admins can see all groups */
-			if (CanUserSeeAllCourseGroups(user, courseId))
-				return GetGroups(courseId);
-
 			if (!user.HasAccessFor(courseId, CourseRole.Instructor))
 				return new List<Group>();
 
+			IEnumerable<Group> groups;
 			var userId = user.Identity.GetUserId();
-			return db.Groups
-				.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || g.IsPublic))
+
+			/* Course admins can see all groups */
+			if (CanUserSeeAllCourseGroups(user, courseId))
+				groups = GetGroups(courseId);
+			else
+				/* Other instructor can see only public or own groups */
+				groups = db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || g.IsPublic));
+			
+			return groups
 				.OrderBy(g => g.OwnerId == userId)
 				.ThenBy(g => g.Name)
 				.ToList();
