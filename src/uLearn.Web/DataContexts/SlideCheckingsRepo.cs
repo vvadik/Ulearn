@@ -142,7 +142,10 @@ namespace uLearn.Web.DataContexts
 				query = query.Where(c => options.SlidesIds.Contains(c.SlideId));
 			if (options.UsersIds != null)
 				query = query.Where(c => options.UsersIds.Contains(c.UserId));
-			return query.OrderByDescending(c => c.Timestamp);
+			query = query.OrderByDescending(c => c.Timestamp);
+			if (options.Count > 0)
+				query = query.Take(options.Count);
+			return query;
 		}
 		
 		public T FindManualCheckingById<T>(int id) where T : AbstractManualSlideChecking
@@ -249,5 +252,6 @@ namespace uLearn.Web.DataContexts
 		public IEnumerable<string> UsersIds { get; set; }
 		public IEnumerable<Guid> SlidesIds { get; set; }
 		public bool OnlyChecked { get; set; }
+		public int Count { get; set; }
 	}
 }

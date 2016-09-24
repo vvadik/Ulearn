@@ -245,14 +245,19 @@ namespace uLearn.Web.Controllers
 
 		private ActionResult ManualCheckingQueue<T>(string actionName, string viewName, string courseId, int? groupId, bool done, string message = "") where T : AbstractManualSlideChecking
 		{
+			var MaxShownQueueSize = 50;
 			var course = courseManager.GetCourse(courseId);
 
 			var usersIds = FindGroupMembers(courseId, groupId);
 			if (usersIds == null)
 				groupId = -1;
 			var checkings = slideCheckingsRepo.GetManualCheckingQueue<T>(
-				new ManualCheckingQueueFilterOptions { CourseId = courseId, OnlyChecked = done, UsersIds = usersIds }
-				).ToList();
+				new ManualCheckingQueueFilterOptions {
+					CourseId = courseId,
+					OnlyChecked = done,
+					UsersIds = usersIds,
+					Count = MaxShownQueueSize + 1,
+				}).ToList();
 
 			if (!checkings.Any() && !string.IsNullOrEmpty(message))
 				return RedirectToAction(actionName, new { courseId, groupId });
@@ -262,7 +267,7 @@ namespace uLearn.Web.Controllers
 			return View(viewName, new ManualCheckingQueueViewModel
 			{
 				CourseId = courseId,
-				Checkings = checkings.Select(c => new ManualCheckingQueueItemViewModel
+				Checkings = checkings.Take(MaxShownQueueSize).Select(c => new ManualCheckingQueueItemViewModel
 				{
 					CheckingQueueItem = c,
 					ContextSlideTitle = course.GetSlideById(c.SlideId).Title,
@@ -273,6 +278,7 @@ namespace uLearn.Web.Controllers
 				GroupId = groupId,
 				Message = message,
 				AlreadyChecked = done,
+				ExistsMore = checkings.Count > MaxShownQueueSize
 			});
 		}
 
@@ -680,6 +686,7 @@ namespace uLearn.Web.Controllers
 		public List<Group> Groups { get; set; }
 		public int? GroupId { get; set; }
 		public bool AlreadyChecked { get; set; }
+		public bool ExistsMore { get; set; }
 	}
 
 	public class ManualCheckingQueueItemViewModel

@@ -170,7 +170,6 @@ p {
 
 .diff-table {
 	width: 100%;
-	margin-top: 25px;
 	word-wrap: break-word;
 	margin-bottom: 10px;
 }
@@ -345,7 +344,7 @@ p {
 
 .solution-control {
 	width: 100%;
-	margin-top: -20px;
+	margin-top: -15px;
 	margin-left: 0 !important;
 }
 
