@@ -36,11 +36,13 @@
 					if (Model.ManualChecking != null)
 					{
 						<p class="exercise-status">
-							@Model.ManualChecking.User.VisibleName
-							@if (!string.IsNullOrEmpty(Model.ContextManualCheckingUserGroups))
-							{
-								<span>(@Model.ContextManualCheckingUserGroups),</span>
-							}
+							@Model.ManualChecking.User.VisibleName@*												 
+							*@@if (!string.IsNullOrEmpty(Model.ContextManualCheckingUserGroups))
+							  {
+								  <span>(@Model.ContextManualCheckingUserGroups),</span>
+							  }
+							  else
+							  {<span>,</span>}
 							@Model.ManualChecking.Timestamp.ToPrettyString()
 						</p>
 					}

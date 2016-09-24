@@ -43,7 +43,7 @@ function setResults(ans) {
 	else if (ans.IsRightAnswer) {
 		slideNavigation.makeShowSolutionsNext();
 		if (ans.SubmissionId > 0)
-			setExerciseVersion(ans.SubmissionId);
+			setExerciseVersion(ans.SubmissionId, true);
 	} else if (ans.ExpectedOutput === null)
 		setSimpleResult($waErrorNoDiff, ans.ActualOutput);
 	else

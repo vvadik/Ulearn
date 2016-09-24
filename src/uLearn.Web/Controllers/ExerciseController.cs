@@ -283,7 +283,7 @@ namespace uLearn.Web.Controllers
 					submissions.LastOrDefault(s => s.AutomaticCheckingIsRightAnswer);
 		}
 
-		public ActionResult Submission(string courseId, Guid slideId, int? submissionId=null, int? manualCheckingId = null, bool isLti = false)
+		public ActionResult Submission(string courseId, Guid slideId, int? submissionId=null, int? manualCheckingId = null, bool isLti = false, bool showOutput = false)
 		{
 			var currentUserId = User.Identity.GetUserId();
 			UserExerciseSubmission submission = null;
@@ -319,6 +319,7 @@ namespace uLearn.Web.Controllers
 
 			var model = CreateExerciseBlockData(course, slide, submission);
 			model.IsLti = isLti;
+			model.ShowOutputImmediately = showOutput;
 			if (manualChecking != null)
 			{
 				if (manualChecking.CourseId == courseId)
@@ -372,6 +373,8 @@ namespace uLearn.Web.Controllers
 		public bool IsLti = false;
 		public bool IsCodeEditableAndSendable = true;
 		public bool DebugView = false;
+		public bool CanShowOutput = false;
+		public bool IsShowOutputButtonActive = false;
 		public string AcceptedSolutionsAction = "";
 		public string RunSolutionUrl = "";
 		public string UseHintUrl = "";

@@ -9,7 +9,7 @@
 }
 
 <div class="exercise__submission"
-     data-version-update-url="@Url.Action("Submission", new { Model.CourseId, slideId = Model.Slide.Id, submissionId = "VERSION_ID", manualCheckingId = manualCheckingId, isLti = Model.IsLti })">
+     data-version-update-url="@Url.Action("Submission", new { Model.CourseId, slideId = Model.Slide.Id, submissionId = "VERSION_ID", manualCheckingId = manualCheckingId, isLti = Model.IsLti, showOutput = "SHOW_OUTPUT" })">
 	@{
 		var currentSubmissionId = Model.SubmissionSelectedByUser != null ? (int?)Model.SubmissionSelectedByUser.Id : null;
 
@@ -92,6 +92,8 @@
 			@SlideHtml.ExerciseControls(new ExerciseControlsModel(Model.CourseId, Model.Slide)
 			{
 				IsCodeEditableAndSendable = Model.SubmissionSelectedByUser == null,
+				CanShowOutput = Model.SubmissionSelectedByUser != null,
+				IsShowOutputButtonActive = Model.ShowOutputImmediately,
 				AcceptedSolutionsAction = acceptedSolutionsAction,
 				RunSolutionUrl = Model.RunSolutionUrl,
 				UseHintUrl = Url.Action("UseHint", "Hint"),
@@ -103,6 +105,14 @@
 			{
 				@YouWillLoseScoresDialog(Model)
 			}
+
+			if (Model.SubmissionSelectedByUser != null && Model.SubmissionSelectedByUser.AutomaticChecking != null)
+			{
+				var style = Model.ShowOutputImmediately ? "" : "display: none";
+				<div id="exercise__submission__output" style="@style">
+					@Html.EncodeMultiLineText(Model.SubmissionSelectedByUser.AutomaticChecking.Output.Text)
+				</div>
+			}
 		}
 	}
 </div>
@@ -111,12 +121,16 @@
 	<div id="hints-place"></div>
 </div>
 
-<div class="exercise__top-review-comments hidden">
-	@foreach (var comment in Model.TopUserReviewComments)
-	{
-		<div class="comment"><a href="#" class="internal-page-link" title="@comment.TruncateWithEllipsis(200)" data-value="@comment">@comment.TruncateWithEllipsis(35)</a></div>
-	}
-</div>
+@if (Model.ManualChecking != null)
+{
+	<div class="exercise__top-review-comments hidden">
+		@foreach (var comment in Model.TopUserReviewComments)
+		{
+			<div class="comment"><a href="#" class="internal-page-link" title="@comment.TruncateWithEllipsis(200)" data-value="@comment">@comment.TruncateWithEllipsis(35)</a>
+			</div>
+		}
+	</div>
+}
 
 @helper YouWillLoseScoresDialog(ExerciseBlockData data)
 {

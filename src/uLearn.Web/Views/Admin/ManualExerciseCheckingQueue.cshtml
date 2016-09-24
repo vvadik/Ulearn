@@ -68,10 +68,8 @@
 				@if (Model.AlreadyChecked)
 				{
 					<p>
-						Последний раз проверялась преподавателем <b>@checking.LockedBy.VisibleName</b>.
-					</p>
-					<p>
-						<b>
+						Последний раз проверялась преподавателем <b>@checking.LockedBy.VisibleName</b>
+						<span class="label label-xs label-default">
 							@checking.Score из @checkModel.ContextMaxScore.PluralizeInRussian(new RussianPluralizationOptions
 							                   {
 								                   One = "балл",
@@ -81,19 +79,19 @@
 								                   hideNumberOne = false,
 								                   smallNumbersAreWords = false,
 							                   })
-						</b>
+						</span>
 					</p>
-					if (checkModel.ContextReviewsComments.Any())
-					{
-						<p>
-							<b>Комментарии:</b>
-							@for (var i = 0; i < checkModel.ContextReviewsComments.Count; i++)
-							{
-								var comment = checkModel.ContextReviewsComments[i];
-								<span title="@comment.TruncateWithEllipsis(200)">@comment.TruncateWithEllipsis(100)</span>@(i < checkModel.ContextReviewsComments.Count - 1 ? ", " : "") 
-							}
-						</p>
-					}
+					<p>
+						@if (checkModel.ContextReviewsComments.Any())
+						{
+								<b>Комментарии:</b>
+								for (var i = 0; i < checkModel.ContextReviewsComments.Count; i++)
+								{
+									var comment = checkModel.ContextReviewsComments[i];
+									<span title="@comment.TruncateWithEllipsis(200)">@comment.TruncateWithEllipsis(100)</span>@(i < checkModel.ContextReviewsComments.Count - 1 ? ", " : "") 
+								}
+						}
+					</p>
 					<p>
 						@Html.ActionLink("Посмотреть", "CheckExercise", new { Model.CourseId, checking.Id, Model.GroupId, recheck = true }, new { @class = "btn btn-sm btn-info" })
 					</p>
@@ -126,8 +124,5 @@
 		</div>
 	}
 
-	@if (Model.ExistsMore)
-	{
-		<div class="alert alert-info">Показаны последние 50 работ</div>
-	}
+
 </div>

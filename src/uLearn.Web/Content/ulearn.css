@@ -344,7 +344,7 @@ p {
 
 .solution-control {
 	width: 100%;
-	margin-top: -15px;
+	margin-top: -16px;
 	margin-left: 0 !important;
 }
 
@@ -374,7 +374,8 @@ p {
 	width: 50% !important;
 }
 
-.try-again-button {
+.try-again-button,
+.show-output-button {
 	width: 25%;
 }
 
@@ -1352,4 +1353,18 @@ table.analytics__user-answers {
 .exercise__score input {
 	display: inline-block;
 	width: auto;
+}
+
+#exercise__submission__output {
+    margin-top: 10px;
+    font-family: monospace;
+    border-left: 4px solid #8c8c8c;
+    padding-left:  10px;
+}
+
+#exercise__submission__output::before {
+	content: "Вывод программы:";
+	display: block;
+	font-weight: bold;
+	font-family: sans-serif;
 }

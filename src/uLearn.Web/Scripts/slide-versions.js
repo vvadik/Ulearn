@@ -5,9 +5,11 @@
 		window.history.pushState({ path: newurl }, '', newurl);
 }
 
-function setExerciseVersion(versionId) {
+function setExerciseVersion(versionId, showOutput) {
+	showOutput = showOutput || false;
 	var url = $('.exercise__submission').data('version-update-url');
 	url = url.replace('VERSION_ID', versionId);
+	url = url.replace('SHOW_OUTPUT', showOutput);
 
 	saveExerciseCodeDraft();
 

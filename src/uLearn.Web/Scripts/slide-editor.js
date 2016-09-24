@@ -28,6 +28,11 @@
 			});
 		});
 	});
+
+	$('.exercise__submission').on('click', '.show-output-button', function () {
+		$('#exercise__submission__output').slideToggle();
+		$(this).toggleClass('active');
+	});
 });
 
 var editorLastRange, currentReviewTextMarker, reviewsTextMarkers, exerciseCodeDoc, $exerciseCodeBlock;
@@ -157,6 +162,7 @@ function initCodeEditor($parent) {
 			editor.on('cursorActivity',
 				function(cm) {
 					var cursor = cm.getDoc().getCursor();
+					unselectAllReviews();
 					var $foundReview = false;
 					$('.exercise__reviews .exercise__review')
 						.each(function() {
