@@ -45,7 +45,7 @@ namespace uLearn.Web.Controllers
 			if (submission == null)
 				return Json(new RunSolutionResult
 				{
-					CompilationError = "Что-то пошло не так :(",
+					ErrorMessage = "Что-то пошло не так :(",
 					IsCompileError = true,
 				});
 
@@ -54,10 +54,11 @@ namespace uLearn.Web.Controllers
 			return Json(new RunSolutionResult
 			{
 				ActualOutput = automaticChecking.Output.Text,
-				CompilationError = automaticChecking.CompilationError.Text,
+				ErrorMessage = automaticChecking.CompilationError.Text,
 				ExecutionServiceName = automaticChecking.ExecutionServiceName,
 				IsCompileError = automaticChecking.IsCompilationError,
-				IsRightAnswer = automaticChecking.IsRightAnswer
+				IsRightAnswer = automaticChecking.IsRightAnswer,
+				SubmissionId = submission.Id,
 			});
 		}
 

@@ -173,9 +173,9 @@ namespace uLearn.CourseTool
 		{
 			var buildResult = exercise.BuildSolution(code);
 			if (buildResult.HasErrors)
-				return new RunSolutionResult { IsCompileError = true, CompilationError = buildResult.ErrorMessage, ExecutionServiceName = "uLearn" };
+				return new RunSolutionResult { IsCompileError = true, ErrorMessage = buildResult.ErrorMessage, ExecutionServiceName = "uLearn" };
 			if (buildResult.HasStyleIssues)
-				return new RunSolutionResult { IsStyleViolation = true, CompilationError = buildResult.StyleMessage, ExecutionServiceName = "uLearn" };
+				return new RunSolutionResult { IsStyleViolation = true, ErrorMessage = buildResult.StyleMessage, ExecutionServiceName = "uLearn" };
 
 			var pathToCompiler = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Microsoft.Net.Compilers.1.3.2");
 			var result = SandboxRunner.Run(pathToCompiler, exercise.CreateSubmition(Utils.NewNormalizedGuid(), code));
@@ -183,10 +183,11 @@ namespace uLearn.CourseTool
 			{
 				IsRightAnswer = result.Verdict == Verdict.Ok && result.GetOutput().NormalizeEoln() == exercise.ExpectedOutput.NormalizeEoln(),
 				ActualOutput = result.GetOutput().NormalizeEoln(),
-				CompilationError = result.CompilationOutput,
+				ErrorMessage = result.CompilationOutput,
 				ExecutionServiceName = "this",
 				IsCompileError = result.Verdict == Verdict.CompilationError,
-				ExpectedOutput = exercise.ExpectedOutput.NormalizeEoln()
+				ExpectedOutput = exercise.ExpectedOutput.NormalizeEoln(),
+				SubmissionId = 0,
 			};
 		}
 

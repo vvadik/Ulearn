@@ -36,8 +36,13 @@
 					if (Model.ManualChecking != null)
 					{
 						<p class="exercise-status">
-							@Model.ManualChecking.User.VisibleName
-							(@Model.ContextManualCheckingUserGroups),
+							@Model.ManualChecking.User.VisibleName@*												 
+							*@@if (!string.IsNullOrEmpty(Model.ContextManualCheckingUserGroups))
+							  {
+								  <span>(@Model.ContextManualCheckingUserGroups),</span>
+							  }
+							  else
+							  {<span>,</span>}
 							@Model.ManualChecking.Timestamp.ToPrettyString()
 						</p>
 					}
@@ -51,7 +56,8 @@
 				{
 					<input type="hidden" name="slideId" value="@Model.Slide.Id" />
 					<input type="hidden" name="courseId" value="@Model.CourseId" />
-					<button class="btn btn-danger" type="submit">Удалить прогресс</button>
+					<button class="btn btn-danger" type="submit">Удалить мой прогресс</button>
+					<span class="text-danger">(для тестеров и преподавателей)</span>
 				}
 			}
 			@if (!Model.IsGuest)
@@ -92,7 +98,9 @@
 			getHints("@Model.CourseId", "@Model.Slide.Index", '@slide.Exercise.HintsMd.Count')
 		</script>
 		<script>
-			refreshPreviousDraft('@Model.Slide.Id');
+			$(document).ready(function() {
+				refreshPreviousDraft('@Model.Slide.Id');
+			});
 		</script>
 	}
 

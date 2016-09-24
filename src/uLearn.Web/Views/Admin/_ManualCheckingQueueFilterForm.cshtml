@@ -4,6 +4,7 @@
 {
 	var formSubmit = "$('#manual-checking-queue-filter-form').submit();";
 	@Html.Hidden("courseId", Model.CourseId)
+	@Html.Hidden("done", Model.AlreadyChecked)
 
 	<div class="form-group">
 		@{

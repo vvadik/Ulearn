@@ -1,4 +1,5 @@
-﻿@model uLearn.Web.Controllers.ManualCheckingQueueViewModel
+﻿@using ApprovalUtilities.Utilities
+@model uLearn.Web.Controllers.ManualCheckingQueueViewModel
 
 @{
 	ViewBag.Title = "Очередь на код ревью";
@@ -57,27 +58,50 @@
 
 	@foreach (var checkModel in Model.Checkings)
 	{
-		var check = checkModel.CheckingQueueItem;
+		var checking = (ManualExerciseChecking)checkModel.CheckingQueueItem;
+		<hr />
 		<div>
 			<div>
-				@check.User.VisibleName решил задание «@checkModel.ContextSlideTitle»
+				<b>@checking.User.VisibleName</b> решил задание «@checkModel.ContextSlideTitle»
 			</div>
 			<div>
 				@if (Model.AlreadyChecked)
 				{
 					<p>
-						Последний раз проверялась преподавателем <b>@check.LockedBy.VisibleName</b>.
+						Последний раз проверялась преподавателем <b>@checking.LockedBy.VisibleName</b>
+						<span class="label label-xs label-default">
+							@checking.Score из @checkModel.ContextMaxScore.PluralizeInRussian(new RussianPluralizationOptions
+							                   {
+								                   One = "балл",
+								                   Two = "балла",
+								                   Five = "баллов",
+								                   Gender = Gender.Male,
+								                   hideNumberOne = false,
+								                   smallNumbersAreWords = false,
+							                   })
+						</span>
 					</p>
 					<p>
-						@Html.ActionLink("Посмотреть", "CheckExercise", new { Model.CourseId, check.Id, Model.GroupId, recheck = true }, new { })
+						@if (checkModel.ContextReviewsComments.Any())
+						{
+								<b>Комментарии:</b>
+								for (var i = 0; i < checkModel.ContextReviewsComments.Count; i++)
+								{
+									var comment = checkModel.ContextReviewsComments[i];
+									<span title="@comment.TruncateWithEllipsis(200)">@comment.TruncateWithEllipsis(100)</span>@(i < checkModel.ContextReviewsComments.Count - 1 ? ", " : "") 
+								}
+						}
+					</p>
+					<p>
+						@Html.ActionLink("Посмотреть", "CheckExercise", new { Model.CourseId, checking.Id, Model.GroupId, recheck = true }, new { @class = "btn btn-sm btn-info" })
 					</p>
 				}
-				else if (check.IsLocked)
+				else if (checking.IsLocked)
 				{
 					<p>
-						Проверяется преподавателем <b>@check.LockedBy.VisibleName</b>,
+						Проверяется преподавателем <b>@checking.LockedBy.VisibleName</b>,
 						заблокирована ещё на @{
-							                     var minutes = (int)(check.LockedUntil.Value - DateTime.Now).TotalMinutes;
+							                     var minutes = (int)(checking.LockedUntil.Value - DateTime.Now).TotalMinutes;
 							                     @minutes.PluralizeInRussian(new RussianPluralizationOptions
 							                     {
 								                     One = "минуту",
@@ -87,17 +111,18 @@
 							                     })
 						                     }
 					</p>
-					if (check.IsLockedBy(User.Identity))
+					if (checking.IsLockedBy(User.Identity))
 					{
-						@Html.ActionLink("Вернуться к проверке →", "CheckExercise", new { Model.CourseId, check.Id, Model.GroupId }, new { @class = "btn btn-sm btn-primary" })
+						@Html.ActionLink("Вернуться к проверке →", "CheckExercise", new { Model.CourseId, checking.Id, Model.GroupId }, new { @class = "btn btn-sm btn-primary" })
 					}
 				}
 				else
 				{
-					@Html.ActionLink("Перейти к проверке →", "CheckExercise", new { Model.CourseId, check.Id, Model.GroupId }, new { @class = "btn btn-sm btn-success" })
+					@Html.ActionLink("Перейти к проверке →", "CheckExercise", new { Model.CourseId, checking.Id, Model.GroupId }, new { @class = "btn btn-sm btn-success" })
 				}
 			</div>
-			<hr/>
 		</div>
 	}
+
+
 </div>

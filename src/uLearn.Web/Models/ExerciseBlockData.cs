@@ -15,6 +15,7 @@ namespace uLearn.Web.Models
 			IsGuest = true;
 			ReviewState = ExerciseReviewState.NotReviewed;
 			Submissions = new List<UserExerciseSubmission>();
+			TopUserReviewComments = new List<string>();
 		}
 
 		public string CourseId { get; set; }
@@ -25,6 +26,7 @@ namespace uLearn.Web.Models
 		public bool IsGuest { get; set; }
 		public bool DebugView { get; set; }
 		public bool IsSkippedOrPassed { get; set; }
+		public bool ShowOutputImmediately { get; set; }
 
 		public bool ShowControls => !IsGuest;
 		public bool CanSkip { get; private set; }
@@ -47,6 +49,7 @@ namespace uLearn.Web.Models
 		public UserExerciseSubmission SubmissionSelectedByUser { get; set; }
 		public List<UserExerciseSubmission> Submissions { get; set; }
 		public ManualExerciseChecking ManualChecking { get; set; }
+		public List<string> TopUserReviewComments { get; set; }
 	}
 
 	public enum ExerciseReviewState

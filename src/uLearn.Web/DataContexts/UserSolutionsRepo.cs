@@ -87,6 +87,8 @@ namespace uLearn.Web.DataContexts
 
 		public async Task RemoveSubmission(UserExerciseSubmission submission)
 		{
+			if (submission.Likes != null)
+				db.SolutionLikes.RemoveRange(submission.Likes);
 			if (submission.AutomaticChecking != null)
 				db.AutomaticExerciseCheckings.Remove(submission.AutomaticChecking);
 			if (submission.ManualCheckings != null)
@@ -190,6 +192,15 @@ namespace uLearn.Web.DataContexts
 		public int GetAcceptedSolutionsCount(string courseId, Guid slideId)
 		{
 			return GetAllAcceptedSubmissions(courseId, new List<Guid> { slideId }).DistinctBy(x => x.UserId).Count();
+		}
+
+		public bool IsCheckingSubmissionByUser(string courseId, Guid slideId, string userId, DateTime periodStart, DateTime periodFinish)
+		{
+			var automaticCheckingsIds = GetAllSubmissions(courseId, new List<Guid> { slideId }, periodStart, periodFinish)
+				.Where(s => s.UserId == userId)
+				.Select(s => s.AutomaticCheckingId)
+				.ToList();
+			return db.AutomaticExerciseCheckings.Any(c => automaticCheckingsIds.Contains(c.Id) && c.Status != AutomaticExerciseCheckingStatus.Done);
 		}
 
 		public HashSet<Guid> GetIdOfPassedSlides(string courseId, string userId)

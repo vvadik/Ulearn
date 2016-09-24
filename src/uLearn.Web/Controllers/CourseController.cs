@@ -78,7 +78,13 @@ namespace uLearn.Web.Controllers
 
 				/* If lock time is finished or some mistake happened */
 				if (!queueItem.IsLockedBy(User.Identity))
-					return RedirectToAction(GetAdminQueueActionName(queueItem), "Admin", new { CourseId = courseId, message = "time_is_over" });
+					return RedirectToAction(GetAdminQueueActionName(queueItem), "Admin", new
+					{
+						CourseId = courseId,
+						groupId = groupId,
+						done = queueItem.IsChecked,
+						message = "time_is_over",
+					});
 			}
 
 			var model = isGuest ?

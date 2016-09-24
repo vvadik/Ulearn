@@ -228,7 +228,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" />\r\n\t\t</div>\r\n");
 	}
 
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<hr class=\"quiz-block-delimiter\" />\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"quiz-block-delimiter\"></div>\r\n");
 
 
 
@@ -1429,8 +1429,8 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"solution-cont
  		if (! model.IsCodeEditableAndSendable)
 		{
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<a href=\"#\" class=\"try-again-button btn btn-primary no-rounds exercise-version" +
-"-link\" data-version-id=\"-1\">\r\n\t\t\t\tЕщё раз\r\n\t\t\t</a>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<button type=\"button\" class=\"try-again-button btn btn-primary no-rounds exerci" +
+"se-version-link\" data-version-id=\"-1\">\r\n\t\t\t\tЕщё раз\r\n\t\t\t</button>\r\n");
 
 
 		}
@@ -1447,7 +1447,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-url=\"");
 
                                                                                                WebViewPage.WriteTo(@__razor_helper_writer, model.RunSolutionUrl);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\tОтправить\r\n\t\t\t</button>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tОтправить\r\n\t\t\t</button>\r\n");
 
 
 		}
@@ -1481,15 +1481,27 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-url=\"");
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tВзять подсказку\r\n\t\t\t</button>\r\n");
 
 
+			if (model.CanShowOutput)
+			{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<button type=\"button\" class=\"show-output-button btn btn-default no-rounds ");
+
+
+                                    WebViewPage.WriteTo(@__razor_helper_writer, model.IsShowOutputButtonActive ? "active" : "");
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\tПоказать вывод\r\n\t\t\t\t</button>\r\n");
+
+
+			}
 			if (!model.IsLti && !model.HideShowSolutionsButton)
 			{
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<button type=\"button\" class=\"btn btn-default giveup-btn\" onclick=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t\t<button type=\"button\" class=\"btn btn-default giveup-btn no-rounds\" onclick=\"");
 
 
-                            WebViewPage.WriteTo(@__razor_helper_writer, model.AcceptedSolutionsAction);
+                                      WebViewPage.WriteTo(@__razor_helper_writer, model.AcceptedSolutionsAction);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\tПоказать решения\r\n\t\t\t\t</button>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\t\tЧужие решения\r\n\t\t\t\t</button>\r\n");
 
 
 			}

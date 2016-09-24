@@ -35,6 +35,14 @@
 	cursor: pointer;
 }
 
+p {
+	margin: 10px 0;
+}
+
+.alert > p {
+	margin: 0;
+}
+
 .internal-page-link,
 .internal-page-link:hover,
 .internal-page-link:focus,
@@ -46,6 +54,13 @@
 .internal-page-link:hover,
 .internal-page-link:focus {
 	border-bottom-color: #2a6496;
+}
+
+.internal-page-link.active {
+    color: black;
+    border-bottom: none;
+    font-weight: bold;
+    pointer-events: none;
 }
 
 .inline-select {
@@ -97,6 +112,10 @@
 	border-radius: 5px;
 }
 
+.revealed p:last-child {
+	margin: 0;
+}
+
 .statistic-container {
 }
 
@@ -115,10 +134,14 @@
 	max-width: 864px;
 }
 
+.slide {
+	padding-bottom: 10px;
+}
+
 /* ReSharper disable Html.CssClassElementsNotFound */
 .CodeMirror {
 	height: auto;
-	margin-bottom: 20px;
+	margin-bottom: 15px;
 	line-height: 1.3em;
 	font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
 }
@@ -147,7 +170,6 @@
 
 .diff-table {
 	width: 100%;
-	margin-top: 25px;
 	word-wrap: break-word;
 	margin-bottom: 10px;
 }
@@ -322,7 +344,7 @@
 
 .solution-control {
 	width: 100%;
-	margin-top: -20px;
+	margin-top: -16px;
 	margin-left: 0 !important;
 }
 
@@ -352,7 +374,8 @@
 	width: 50% !important;
 }
 
-.try-again-button {
+.try-again-button,
+.show-output-button {
 	width: 25%;
 }
 
@@ -377,14 +400,17 @@
 }
 
 .quiz-status,
-.exercise-status {
+.exercise-status,
+.exercise-loading {
     background-color: #d9edf7;
 	padding: 15px 18px;
 	color: #333;
 	font-size: 13pt;
+	margin-bottom: 30px;
 }
 
-.exercise-status {
+.exercise-status,
+.exercise-loading {
     margin-bottom: 0;
     margin-top: 10px;
 }
@@ -394,10 +420,8 @@
 }
 
 .quiz-block-delimiter {
-	margin-bottom: 40px;
-	margin-top: 40px;
-	color: gray;
-	align-self: center;
+	margin-bottom: 30px;
+	margin-top: 30px;
 }
 
 .hide-side-bar-button {
@@ -1221,6 +1245,7 @@ table.analytics__user-answers {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 3px;
+	width: 520px;
 }
 
 .exercise__add-review > * {
@@ -1233,8 +1258,22 @@ table.analytics__user-answers {
 	margin-bottom: 5px;
 }
 
+.exercise__add-review h4 {
+	margin-left: 15px;
+	margin-top: 0;
+}
+
 .exercise__add-review .exercise__add-review__comment {
 	width: 250px;
+	height: 120px;
+}
+
+.exercise__add-review.without-comments {
+	width: 270px;
+}
+
+.exercise__add-review.without-comments .exercise__add-review__top-comments {
+	display: none;
 }
 
 .code-review + .CodeMirror {
@@ -1258,6 +1297,7 @@ table.analytics__user-answers {
 .exercise__review.selected {
 	border-left-color: #d66;
 	margin-left: -10px;
+	margin-right: 10px;
 }
 
 .exercise__review .exercise__review__header {
@@ -1295,4 +1335,36 @@ table.analytics__user-answers {
 
 .exercise__submissions-panel .inline-select {
 	margin: 0 10px;
+}
+
+.exercise__submissions-panel .btn-xs {
+	border-radius: 5px;
+}
+
+.exercise__submissions-panel .btn-group .btn-xs:not(:first-child) {
+	margin-left: 2px;
+}
+
+.exercise__score .exercise__other-score-link {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+.exercise__score input {
+	display: inline-block;
+	width: auto;
+}
+
+#exercise__submission__output {
+    margin-top: 10px;
+    font-family: monospace;
+    border-left: 4px solid #8c8c8c;
+    padding-left:  10px;
+}
+
+#exercise__submission__output::before {
+	content: "Вывод программы:";
+	display: block;
+	font-weight: bold;
+	font-family: sans-serif;
 }

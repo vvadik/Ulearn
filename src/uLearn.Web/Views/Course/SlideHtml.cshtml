@@ -90,7 +90,7 @@
 		</div>
 	}
 
-	<hr class="quiz-block-delimiter" />
+	<div class="quiz-block-delimiter"></div>
 }
 
 
@@ -523,14 +523,14 @@
 	<div class="solution-control btn-group ctrl-group">
 		@if (! model.IsCodeEditableAndSendable)
 		{
-			<a href="#" class="try-again-button btn btn-primary no-rounds exercise-version-link" data-version-id="-1">
+			<button type="button" class="try-again-button btn btn-primary no-rounds exercise-version-link" data-version-id="-1">
 				Ещё раз
-			</a>
+			</button>
 		}
 		else
 		{
 			<button type="button" class="run-solution-button btn btn-primary no-rounds @(model.IsLti ? "run-solution-button-lti" : "")" data-url="@(model.RunSolutionUrl)">
-					Отправить
+				Отправить
 			</button>
 		}
 		@if (!model.DebugView)
@@ -539,10 +539,16 @@
 			<button id="GetHintButton" type="button" class="btn btn-default hints-btn" data-course-id="@(model.CourseId)" data-slide-index="@(model.Slide.Index)" data-hints-count="@(hints.Count)" data-url="@(model.UseHintUrl)">
 				Взять подсказку
 			</button>
+			if (model.CanShowOutput)
+			{
+				<button type="button" class="show-output-button btn btn-default no-rounds @(model.IsShowOutputButtonActive ? "active" : "")">
+					Показать вывод
+				</button>
+			}
 			if (!model.IsLti && !model.HideShowSolutionsButton)
 			{
-				<button type="button" class="btn btn-default giveup-btn" onclick="@(model.AcceptedSolutionsAction)">
-					Показать решения
+				<button type="button" class="btn btn-default giveup-btn no-rounds" onclick="@(model.AcceptedSolutionsAction)">
+					Чужие решения
 				</button>
 			}
 			if (model.IsCodeEditableAndSendable)

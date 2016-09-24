@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
 using System.Threading.Tasks;
@@ -141,7 +142,10 @@ namespace uLearn.Web.DataContexts
 				query = query.Where(c => options.SlidesIds.Contains(c.SlideId));
 			if (options.UsersIds != null)
 				query = query.Where(c => options.UsersIds.Contains(c.UserId));
-			return query.OrderBy(c => c.Timestamp);
+			query = query.OrderByDescending(c => c.Timestamp);
+			if (options.Count > 0)
+				query = query.Take(options.Count);
+			return query;
 		}
 		
 		public T FindManualCheckingById<T>(int id) where T : AbstractManualSlideChecking
@@ -220,6 +224,26 @@ namespace uLearn.Web.DataContexts
 			review.Comment = newComment;
 			await db.SaveChangesAsync();
 		}
+
+		public Dictionary<int, List<string>> GetExerciseCodeReviewForCheckings(IEnumerable<int> checkingsIds)
+		{
+			return db.ExerciseCodeReviews
+				.Where(r => checkingsIds.Contains(r.ExerciseCheckingId) && ! r.IsDeleted)
+				.GroupBy(r => r.ExerciseCheckingId)
+				.ToDictionary(g => g.Key, g => g.Select(r => r.Comment).ToList());
+		}
+
+		public List<string> GetTopUserReviewComments(string courseId, Guid slideId, string userId, int count)
+		{
+			return db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
+				.Where(r => r.ExerciseChecking.CourseId == courseId && r.ExerciseChecking.SlideId == slideId && r.AuthorId == userId && ! r.IsDeleted)
+				.GroupBy(r => r.Comment)
+				.OrderByDescending(g => g.Count())
+				.ThenByDescending(g => g.Max(r => r.ExerciseChecking.Timestamp))
+				.Take(count)
+				.Select(g => g.Key)
+				.ToList();
+		}
 	}
 
 	public class ManualCheckingQueueFilterOptions
@@ -228,5 +252,6 @@ namespace uLearn.Web.DataContexts
 		public IEnumerable<string> UsersIds { get; set; }
 		public IEnumerable<Guid> SlidesIds { get; set; }
 		public bool OnlyChecked { get; set; }
+		public int Count { get; set; }
 	}
 }

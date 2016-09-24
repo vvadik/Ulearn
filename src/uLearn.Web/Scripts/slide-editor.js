@@ -28,6 +28,11 @@
 			});
 		});
 	});
+
+	$('.exercise__submission').on('click', '.show-output-button', function () {
+		$('#exercise__submission__output').slideToggle();
+		$(this).toggleClass('active');
+	});
 });
 
 var editorLastRange, currentReviewTextMarker, reviewsTextMarkers, exerciseCodeDoc, $exerciseCodeBlock;
@@ -120,9 +125,18 @@ function initCodeEditor($parent) {
 				matchBrackets: true,
 			});
 
-			if (review)
+			if (review) {
+				var $addReviewPopup = $('.exercise__add-review').first();
+				var $addReviewPopupInput = $addReviewPopup.find('.exercise__add-review__comment');
+				
+				/* Hack: focus review input just on blur */
+				$addReviewPopupInput.blur(function () {
+					if ($addReviewPopupInput.is(':visible')) {
+						$addReviewPopupInput.focus();
+					}
+				});
 				editor.on("beforeSelectionChange",
-					function(cm, params) {
+					function (cm, params) {
 						unselectAllReviews();
 
 						if (params.ranges < 1)
@@ -133,7 +147,6 @@ function initCodeEditor($parent) {
 						var maxLine = Math.max(range.anchor.line, range.head.line);
 						var coords = cm.cursorCoords({ line: maxLine + 1, ch: 1 }, 'page');
 
-						var $addReviewPopup = $('.exercise__add-review').first();
 						if (range.anchor == range.head) {
 							$addReviewPopup.hide();
 							return;
@@ -141,18 +154,15 @@ function initCodeEditor($parent) {
 						$addReviewPopup.show();
 						$addReviewPopup.offset({ top: coords.top, left: coords.left });
 
-						$addReviewPopup.find('.exercise__add-review__comment').trigger('input');
-
-						// Focusing on something from an event handler that, itself, grants focus, is problematic
-						setTimeout(function() {
-								$addReviewPopup.find('.exercise__add-review__comment').focus();
-							},
-							100);
+						$addReviewPopupInput.trigger('input');
+						$addReviewPopupInput.focus();
 					});
+			}
 
 			editor.on('cursorActivity',
 				function(cm) {
 					var cursor = cm.getDoc().getCursor();
+					unselectAllReviews();
 					var $foundReview = false;
 					$('.exercise__reviews .exercise__review')
 						.each(function() {

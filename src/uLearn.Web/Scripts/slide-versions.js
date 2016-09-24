@@ -5,21 +5,33 @@
 		window.history.pushState({ path: newurl }, '', newurl);
 }
 
-function setExerciseVersion(versionId) {
+function setExerciseVersion(versionId, showOutput) {
+	showOutput = showOutput || false;
 	var url = $('.exercise__submission').data('version-update-url');
 	url = url.replace('VERSION_ID', versionId);
+	url = url.replace('SHOW_OUTPUT', showOutput);
 
 	saveExerciseCodeDraft();
 
+	var $hints = $('#hints-accordion');
+	$('.exercise__submission > *:not(.exercise__submissions-panel)').hide();
+	$('.exercise__add-review').hide();
+	var $loadingPanel = $('<p class="exercise-loading">Загрузка...</p>');
+	$('.exercise__submission').append($loadingPanel);
+	$hints.hide();
+
 	$.get(url, function(data) {
 		var $submission = $('.exercise__submission');
+		$loadingPanel.hide();
 		$submission.html($(data).html());
 		initCodeEditor($submission);
-		selectSetAutoWidth($submission.find('.select-auto-width'));
-		setAutoUpdater($submission.find('.js__auto-update'));
+		$submission.find('.select-auto-width').each(function() {
+			selectSetAutoWidth($(this));
+		});
 		refreshPreviousDraft();
 
 		updateExerciseVersionUrl(versionId);
+		$hints.show();
 	});
 }
 

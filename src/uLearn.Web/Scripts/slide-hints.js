@@ -1,6 +1,6 @@
 ﻿$(function() {
-	$("#GetHintButton").click(function(item) {
-		showHintForUser($(item.target));
+	$(".exercise__submission").on('click', '#GetHintButton', function() {
+		showHintForUser($(this));
 	});
 });
 
@@ -42,6 +42,9 @@ function isScrolledIntoView(elem) {
 }
 
 function getHints(courseId, slideIndex, hintsCount) {
+	/* Exit if no hint button */
+	if (!$('#GetHintButton').length)
+		return;
     $.ajax({
         type: "POST",
         url: $("#GetHintButton").data("url"),

@@ -8,7 +8,8 @@
 	var manualCheckingId = Model.ManualChecking != null ? (int?)Model.ManualChecking.Id : null;
 }
 
-<div class="exercise__submission" data-version-update-url="@Url.Action("Submission", new { Model.CourseId, slideId = Model.Slide.Id, submissionId = "VERSION_ID", manualCheckingId = manualCheckingId, isLti = Model.IsLti})">
+<div class="exercise__submission"
+     data-version-update-url="@Url.Action("Submission", new { Model.CourseId, slideId = Model.Slide.Id, submissionId = "VERSION_ID", manualCheckingId = manualCheckingId, isLti = Model.IsLti, showOutput = "SHOW_OUTPUT" })">
 	@{
 		var currentSubmissionId = Model.SubmissionSelectedByUser != null ? (int?)Model.SubmissionSelectedByUser.Id : null;
 
@@ -29,18 +30,35 @@
 			classString = "code-reviewed";
 		}
 
-		var status = "";
-		if (Model.ReviewState == ExerciseReviewState.WaitingForReview)
+		if (Model.SubmissionSelectedByUser != null)
 		{
-			status = "Все тесты пройдены, код ожидает проверки преподавателем";
-		}
-		else if (Model.ReviewState == ExerciseReviewState.Reviewed)
-		{
-			status = "Все тесты пройдены, код проверен преподаваталем";
-		}
-		if (!string.IsNullOrEmpty(status) && Model.ManualChecking == null)
-		{
-			<p class="exercise-status">@status</p>
+			var status = "";
+			if (Model.ReviewState == ExerciseReviewState.WaitingForReview)
+			{
+				status = "Все тесты пройдены, код ожидает проверки преподавателем";
+			}
+			else if (Model.ReviewState == ExerciseReviewState.Reviewed)
+			{
+				var score = Model.SubmissionSelectedByUser.ManualCheckings.Max(c => c.Score);
+				status = string.Format("Все тесты пройдены, код проверен преподавателем ({0})",
+					score.PluralizeInRussian(new RussianPluralizationOptions
+					{
+						One = "балл",
+						Two = "балла",
+						Five = "баллов",
+						Gender = Gender.Male,
+						hideNumberOne = false,
+						smallNumbersAreWords = false,
+					}));
+			}
+			else
+			{
+				status = "Все тесты пройдены, задача сдана";
+			}
+			if (!string.IsNullOrEmpty(status) && Model.ManualChecking == null)
+			{
+				<p class="exercise-status">@status</p>
+			}
 		}
 
 		if (Model.ReviewState == ExerciseReviewState.Reviewed || Model.ManualChecking != null)
@@ -74,6 +92,8 @@
 			@SlideHtml.ExerciseControls(new ExerciseControlsModel(Model.CourseId, Model.Slide)
 			{
 				IsCodeEditableAndSendable = Model.SubmissionSelectedByUser == null,
+				CanShowOutput = Model.SubmissionSelectedByUser != null,
+				IsShowOutputButtonActive = Model.ShowOutputImmediately,
 				AcceptedSolutionsAction = acceptedSolutionsAction,
 				RunSolutionUrl = Model.RunSolutionUrl,
 				UseHintUrl = Url.Action("UseHint", "Hint"),
@@ -81,16 +101,36 @@
 
 			@SlideHtml.RunErrors()
 
-			<div class="panel-group ctrl-group" id="hints-accordion">
-				<div id="hints-place"></div>
-			</div>
 			if (!Model.IsLti)
 			{
 				@YouWillLoseScoresDialog(Model)
 			}
+
+			if (Model.SubmissionSelectedByUser != null && Model.SubmissionSelectedByUser.AutomaticChecking != null)
+			{
+				var style = Model.ShowOutputImmediately ? "" : "display: none";
+				<div id="exercise__submission__output" style="@style">
+					@Html.EncodeMultiLineText(Model.SubmissionSelectedByUser.AutomaticChecking.Output.Text)
+				</div>
+			}
 		}
 	}
 </div>
+
+<div class="panel-group ctrl-group" id="hints-accordion">
+	<div id="hints-place"></div>
+</div>
+
+@if (Model.ManualChecking != null)
+{
+	<div class="exercise__top-review-comments hidden">
+		@foreach (var comment in Model.TopUserReviewComments)
+		{
+			<div class="comment"><a href="#" class="internal-page-link" title="@comment.TruncateWithEllipsis(200)" data-value="@comment">@comment.TruncateWithEllipsis(35)</a>
+			</div>
+		}
+	</div>
+}
 
 @helper YouWillLoseScoresDialog(ExerciseBlockData data)
 {
