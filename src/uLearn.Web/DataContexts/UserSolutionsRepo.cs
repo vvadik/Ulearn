@@ -87,6 +87,8 @@ namespace uLearn.Web.DataContexts
 
 		public async Task RemoveSubmission(UserExerciseSubmission submission)
 		{
+			if (submission.Likes != null)
+				db.SolutionLikes.RemoveRange(submission.Likes);
 			if (submission.AutomaticChecking != null)
 				db.AutomaticExerciseCheckings.Remove(submission.AutomaticChecking);
 			if (submission.ManualCheckings != null)
