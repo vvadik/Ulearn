@@ -47,7 +47,7 @@ namespace uLearn
 			return courses.Values;
 		}
 
-		public Course GetCourse(string courseId)
+		public virtual Course GetCourse(string courseId)
 		{
 			LoadCoursesIfNotYet();
 			return courses.Get(courseId);
@@ -75,6 +75,16 @@ namespace uLearn
 			return stagedDirectory.GetFile(packageName);
 		}
 
+		public DirectoryInfo GetExtractedCourseDirectory(string courseId)
+		{
+			return coursesDirectory.GetSubdir(courseId);
+		}
+
+		public DirectoryInfo GetExtractedVersionDirectory(Guid versionId)
+		{
+			return GetExtractedCourseDirectory(Utils.GetNormalizedGuid(versionId));
+		}
+
 		public FileInfo GetCourseVersionFile(Guid versionId)
 		{
 			var packageName = GetPackageName(versionId);
@@ -100,7 +110,8 @@ namespace uLearn
 				{
 					try
 					{
-						ReloadCourseFromZip(zipFile);
+						var courseId = GetCourseId(zipFile.FullName);
+						ReloadCourse(courseId);
 					}
 					catch (Exception e)
 					{
@@ -115,13 +126,29 @@ namespace uLearn
 
 		public Course ReloadCourse(string courseId)
 		{
-			var file = stagedDirectory.GetFile(GetPackageName(courseId));
-			return ReloadCourseFromZip(file);
+			/* First try load course from directory */
+			try
+			{
+				var courseDir = GetExtractedCourseDirectory(courseId);
+				return ReloadCourseFromDirectory(courseDir);
+			}
+			catch (Exception)
+			{
+				var zipFile = GetStagingCourseFile(courseId);
+				return ReloadCourseFromZip(zipFile);
+			}
 		}
 
 		private Course ReloadCourseFromZip(FileInfo zipFile)
 		{
 			var course = LoadCourseFromZip(zipFile);
+			courses[course.Id] = course;
+			return course;
+		}
+
+		private Course ReloadCourseFromDirectory(DirectoryInfo directory)
+		{
+			var course = LoadCourseFromDirectory(directory);
 			courses[course.Id] = course;
 			return course;
 		}
@@ -140,16 +167,15 @@ namespace uLearn
 
 		private Course LoadCourseFromZip(FileInfo zipFile)
 		{
-			var dir = coursesDirectory;
-			return LoadCourseFromZip(zipFile, dir);
+			return LoadCourseFromZip(zipFile, coursesDirectory);
 		}
 
-		public static Course LoadCourseFromZip(FileInfo zipFile, DirectoryInfo dir)
+		public static Course LoadCourseFromZip(FileInfo zipFile, DirectoryInfo coursesDirectory)
 		{
 			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
 			{
 				var courseOrVersionId = GetCourseId(zipFile.Name);
-				var courseDir = dir.CreateSubdirectory(courseOrVersionId);
+				var courseDir = coursesDirectory.CreateSubdirectory(courseOrVersionId);
 
 				ClearDirectory(courseDir);
 				zip.ExtractAll(courseDir.FullName, ExtractExistingFileAction.OverwriteSilently);

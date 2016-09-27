@@ -18,7 +18,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 	public class AdminController : Controller
 	{
-		private readonly CourseManager courseManager;
+		private readonly WebCourseManager courseManager;
 		private readonly ULearnDb db;
 		private readonly UsersRepo usersRepo;
 		private readonly CommentsRepo commentsRepo;
@@ -492,6 +492,18 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
+		public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
+		{
+			/* Check that one directory is not a parent of another one */
+			if (source.FullName.StartsWith(target.FullName) || target.FullName.StartsWith(source.FullName))
+				throw new Exception("Can\'t copy files recursifely from parent to child directory or from child to parent");
+
+			foreach (var subDirectory in source.GetDirectories())
+				CopyFilesRecursively(subDirectory, target.CreateSubdirectory(subDirectory.Name));
+			foreach (var file in source.GetFiles())
+				file.CopyTo(Path.Combine(target.FullName, file.Name), true);
+		}
+
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> PublishVersion(string courseId, Guid versionId)
@@ -503,8 +515,11 @@ namespace uLearn.Web.Controllers
 			/* First, try to load course from LRU-cache or zip file */
 			var version = courseManager.GetVersion(versionId);
 
-			/* Copy version's zip file to course's zip file, overwrite if need */
+			/* Copy version's zip file to course's zip archive, overwrite if need */
 			versionFile.CopyTo(courseFile.FullName, true);
+			/* Copy files extracted from zip archive */
+			CopyFilesRecursively(courseManager.GetExtractedVersionDirectory(versionId),
+								 courseManager.GetExtractedCourseDirectory(courseId));
 
 			/* Replace courseId */
 			version.Id = courseId;
@@ -512,6 +527,7 @@ namespace uLearn.Web.Controllers
 
 			CreateQuizVersionsForSlides(courseId, version.Slides);
 			await coursesRepo.MarkCourseVersionAsPublished(versionId);
+			courseManager.UpdateCourseVersion(courseId, versionId);
 
 			var courseDiff = new CourseDiff(oldCourse, version);
 

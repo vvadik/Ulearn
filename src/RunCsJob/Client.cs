@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -13,13 +14,25 @@ namespace RunCsJob
 	{
 		private readonly string token;
 		private readonly HttpClient httpClient;
+		private const string instanceIdEnvironmentVariableName = "WEBSITE_INSTANCE_ID";
+		private const string arrAffinityCookieName = "ARRAffinity";
 
 		public Client(string address, string token)
 		{
 			this.token = token;
-			httpClient = new HttpClient { BaseAddress = new Uri(address + "/") };
+
+			var cookieContainer = new CookieContainer();
+			var httpClientHandler = new HttpClientHandler { CookieContainer = cookieContainer };
+			var baseAddress = new Uri(address + "/");
+
+			httpClient = new HttpClient(httpClientHandler) { BaseAddress = baseAddress };
 			httpClient.DefaultRequestHeaders.Accept.Clear();
 			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+			/* Select instanceId for multiple azure instances */
+			var instanceId = Environment.GetEnvironmentVariable(instanceIdEnvironmentVariableName);
+			if (!string.IsNullOrEmpty(instanceId))
+				cookieContainer.Add(baseAddress, new Cookie(arrAffinityCookieName, instanceId));
 		}
 
 		public async Task<List<RunnerSubmission>> TryGetSubmissions(int threadsCount)
