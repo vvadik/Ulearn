@@ -384,9 +384,9 @@ namespace uLearn.Web.Controllers
 			var solutions = db.UserExerciseSubmissions.Where(s => s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
 			var user = db.Users.Find(userId);
 			var course = courseManager.GetCourse(courseId);
-			var slide = (ExerciseSlide)course.FindSlideById(slideId);
+			var slide = course.FindSlideById(slideId) as ExerciseSlide;
 			if (slide == null)
-				return HttpNotFound($"No slide with id {slideId}");
+				return RedirectToAction("CourseInfo", "Account", new {userName = userId, courseId});
 			var model = new UserSolutionsViewModel
 			{
 				User = user,

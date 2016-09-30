@@ -11,6 +11,9 @@
 			@Html.ActionLink(Model.Slide.Title, "Slide", "Course", new { courseId = Model.Course.Id, slideIndex = Model.Slide.Index }, null)
 		</small>
 	</h2>
+	<p>
+		@Html.ActionLink("статистика пользователя по курсу", "CourseInfo", "Account", new { userName = Model.User.Id, courseId = Model.Course.Id }, null)
+	</p>
 	@foreach (var userSolution in Model.Solutions)
 	{
 		var code = new CodeBlock(userSolution.SolutionCode.Text, Model.Slide.Exercise.LangId);

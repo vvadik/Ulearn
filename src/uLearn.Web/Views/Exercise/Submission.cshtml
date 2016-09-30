@@ -110,7 +110,7 @@
 			{
 				var style = Model.ShowOutputImmediately ? "" : "display: none";
 				<div id="exercise__submission__output" style="@style">
-					@Html.EncodeMultiLineText(Model.SubmissionSelectedByUser.AutomaticChecking.Output.Text)
+					@Html.Raw(Html.EncodeMultiLineText(Model.SubmissionSelectedByUser.AutomaticChecking.Output.Text))
 				</div>
 			}
 		}
