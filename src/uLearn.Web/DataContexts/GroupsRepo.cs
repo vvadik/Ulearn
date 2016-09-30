@@ -139,7 +139,7 @@ namespace uLearn.Web.DataContexts
 				groups = db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || g.IsPublic));
 			
 			return groups
-				.OrderBy(g => g.OwnerId == userId)
+				.OrderBy(g => g.OwnerId != userId)
 				.ThenBy(g => g.Name)
 				.ToList();
 		}
