@@ -18,20 +18,18 @@ namespace uLearn.Web.Models
 		public List<Slide> Slides { get; set; }
 		public Dictionary<Guid, List<Visit>> SlidesVisits { get; set; }
 
-		public List<string> UsersVisitedAllSlidesInPeriod { get; set; }
-		public List<string> UsersVisitedAllSlidesBeforePeriod { get; set; }
-		public List<string> UsersVisitedAllSlidesBeforePeriodFinished { get; set; }
+		public int UsersVisitedAllSlidesInPeriodCount { get; set; }
+		public int UsersVisitedAllSlidesBeforePeriodCount { get; set; }
+		public int UsersVisitedAllSlidesBeforePeriodFinishedCount { get; set; }
 
 		public Dictionary<Guid, int> QuizzesAverageScore { get; set; }
-		public Dictionary<Guid, List<ManualQuizChecking>> ManualQuizCheckQueueBySlide { get; set; }
-		public Dictionary<Guid, List<Comment>> CommentsBySlide { get; set; }
 
 		public Dictionary<Guid, List<UserExerciseSubmission>> ExercisesSolutions { get; set; }
 		public Dictionary<Guid, List<UserExerciseSubmission>> ExercisesAcceptedSolutions { get; set; }
 
 		public List<ApplicationUser> VisitedUsersIds { get; set; }
-		public Dictionary<string, ImmutableHashSet<Guid>> VisitedSlidesByUser { get; set; }
-		public Dictionary<string, ImmutableHashSet<Guid>> VisitedSlidesByUserAllTime { get; set; }
+		public Dictionary<string, int> VisitedSlidesCountByUser { get; set; }
+		public Dictionary<string, int> VisitedSlidesCountByUserAllTime { get; set; }
 	}
 
 	public class DailyStatistics

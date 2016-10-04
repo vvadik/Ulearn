@@ -117,9 +117,9 @@ namespace uLearn.Web.Controllers
 			/* Dictionary<SlideId, List<Visit>> */
 			var slidesVisits = visitsRepo.GetVisitsInPeriodForEachSlide(slidesIds, periodStart, realPeriodFinish, filteredUsersIds);
 
-			var usersVisitedAllSlidesBeforePeriod = visitsRepo.GetUsersVisitedAllSlides(slidesIds, DateTime.MinValue, periodStart, filteredUsersIds);
-			var usersVisitedAllSlidesInPeriod = visitsRepo.GetUsersVisitedAllSlides(slidesIds, periodStart, realPeriodFinish, filteredUsersIds);
-			var usersVisitedAllSlidesBeforePeriodFinished = visitsRepo.GetUsersVisitedAllSlides(slidesIds, DateTime.MinValue, realPeriodFinish, filteredUsersIds);
+			var usersVisitedAllSlidesBeforePeriodCount = visitsRepo.GetUsersVisitedAllSlides(slidesIds, DateTime.MinValue, periodStart, filteredUsersIds).Count();
+			var usersVisitedAllSlidesInPeriodCount = visitsRepo.GetUsersVisitedAllSlides(slidesIds, periodStart, realPeriodFinish, filteredUsersIds).Count();
+			var usersVisitedAllSlidesBeforePeriodFinishedCount = visitsRepo.GetUsersVisitedAllSlides(slidesIds, DateTime.MinValue, realPeriodFinish, filteredUsersIds).Count();
 
 			var quizzesAverageScore = quizzes.ToDictionary(q => q.Id,
 				q => (int) slidesVisits.GetOrDefault(q.Id, new List<Visit>())
@@ -137,29 +137,18 @@ namespace uLearn.Web.Controllers
 			var exercisesAcceptedSolutions = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
 				.GroupBy(s => s.SlideId)
 				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).ToList());
-
-			var manualQuizCheckQueueBySlide = slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(
-				new ManualCheckingQueueFilterOptions { CourseId = courseId, SlidesIds = slidesIds })
-				.Where(i => periodStart <= i.Timestamp && i.Timestamp <= realPeriodFinish)
-				.GroupBy(i => i.SlideId)
-				.ToDictionary(g => g.Key, g => g.ToList());
-
-			var commentsBySlide = commentsRepo.GetSlidesComments(courseId, slidesIds)
-				.Where(c => periodStart <= c.PublishTime && c.PublishTime <= realPeriodFinish)
-				.GroupBy(c => c.SlideId)
-				.ToDictionary(g => g.Key, g => g.ToList());
-
+			
 			var visitedUsersIds = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, realPeriodFinish, filteredUsersIds)
 				.ToList()
 				.DistinctBy(v => v.UserId)
 				.Select(v => v.User);
 
-			var visitedSlidesByUser = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, realPeriodFinish, filteredUsersIds)
+			var visitedSlidesCountByUser = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, realPeriodFinish, filteredUsersIds)
 				.GroupBy(v => v.UserId)
-				.ToDictionary(g => g.Key, g => g.Select(v => v.SlideId).ToImmutableHashSet());
-			var visitedSlidesByUserAllTime = visitsRepo.GetVisitsInPeriod(slidesIds, DateTime.MinValue, DateTime.MaxValue, filteredUsersIds)
+				.ToDictionary(g => g.Key, g => g.Count());
+			var visitedSlidesCountByUserAllTime = visitsRepo.GetVisitsInPeriod(slidesIds, DateTime.MinValue, DateTime.MaxValue, filteredUsersIds)
 				.GroupBy(v => v.UserId)
-				.ToDictionary(g => g.Key, g => g.Select(v => v.SlideId).ToImmutableHashSet());
+				.ToDictionary(g => g.Key, g => g.Count());
 
 			var model = new UnitStatisticPageModel
 			{
@@ -175,18 +164,16 @@ namespace uLearn.Web.Controllers
 				Slides = slides,
 				SlidesVisits = slidesVisits,
 
-				UsersVisitedAllSlidesBeforePeriod = usersVisitedAllSlidesBeforePeriod.ToList(),
-				UsersVisitedAllSlidesInPeriod = usersVisitedAllSlidesInPeriod.ToList(),
-				UsersVisitedAllSlidesBeforePeriodFinished = usersVisitedAllSlidesBeforePeriodFinished.ToList(),
+				UsersVisitedAllSlidesBeforePeriodCount = usersVisitedAllSlidesBeforePeriodCount,
+				UsersVisitedAllSlidesInPeriodCount = usersVisitedAllSlidesInPeriodCount,
+				UsersVisitedAllSlidesBeforePeriodFinishedCount = usersVisitedAllSlidesBeforePeriodFinishedCount,
 
 				QuizzesAverageScore = quizzesAverageScore,
-				ManualQuizCheckQueueBySlide = manualQuizCheckQueueBySlide,
-				CommentsBySlide = commentsBySlide,
 				ExercisesSolutions = exercisesSolutions,
 				ExercisesAcceptedSolutions = exercisesAcceptedSolutions,
 				VisitedUsersIds = visitedUsersIds.ToList(),
-				VisitedSlidesByUser = visitedSlidesByUser,
-				VisitedSlidesByUserAllTime = visitedSlidesByUserAllTime,
+				VisitedSlidesCountByUser = visitedSlidesCountByUser,
+				VisitedSlidesCountByUserAllTime = visitedSlidesCountByUserAllTime,
 			};
 			return View(model);
 		}
