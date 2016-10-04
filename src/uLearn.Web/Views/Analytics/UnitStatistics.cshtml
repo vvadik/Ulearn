@@ -113,15 +113,15 @@
 								}
 								else if (slide is ExerciseSlide)
 								{
-									var tries = Model.ExercisesSolutions.GetOrDefault(slide.Id, new List<UserExerciseSubmission>());
-									var acceptedTries = Model.ExercisesAcceptedSolutions.GetOrDefault(slide.Id, new List<UserExerciseSubmission>());
-									if (tries.Count == 0)
+									var tries = Model.ExercisesSolutionsCount.GetOrDefault(slide.Id, 0);
+									var acceptedTries = Model.ExercisesAcceptedSolutionsCount.GetOrDefault(slide.Id, 0);
+									if (tries == 0)
 									{
 										<span class="exercise-tries" title="Нет попыток">&ndash;</span>
 									}
 									else
 									{
-										<span class="exercise-tries" title="Успешных попыток/всего">@acceptedTries.Count/@tries.Count</span>
+										<span class="exercise-tries" title="Успешных попыток/всего">@acceptedTries/@tries</span>
 									}
 								}
 								else
@@ -196,12 +196,12 @@
 						</div>
 					</div>
 
-					@foreach (var user in Model.VisitedUsersIds)
+					@foreach (var userInfo in Model.VisitedUsers)
 					{
-						var visitedSlidesCount = Model.VisitedSlidesCountByUser[user.Id];
-						var visitedSlidesCountAllTime = Model.VisitedSlidesCountByUserAllTime[user.Id];
+						var visitedSlidesCount = Model.VisitedSlidesCountByUser[userInfo.UserId];
+						var visitedSlidesCountAllTime = Model.VisitedSlidesCountByUserAllTime[userInfo.UserId];
 						<div>
-							<div class="ib">@user.VisibleName.TruncateWithEllipsis(25)</div>
+							<div class="ib" title="@userInfo.UserName">@(userInfo.UserVisibleName != "" ? userInfo.UserVisibleName : userInfo.UserName).TruncateWithEllipsis(25)</div>
 							<div class="ib pull-right">
 								<div class="student-progress progress">
 									<div class="progress-bar progress-bar-warning"
@@ -227,7 +227,7 @@
 
 								@foreach (var exerciseOrQuiz in exercisesAndQuizzes)
 								{
-									var visit = Model.SlidesVisits.GetOrDefault(exerciseOrQuiz.Id, new List<Visit>()).FirstOrDefault(v => v.UserId == user.Id);
+									var visit = Model.SlidesVisits.GetOrDefault(exerciseOrQuiz.Id, new List<Visit>()).FirstOrDefault(v => v.UserId == userInfo.UserId);
 									if (visit != null && visit.IsPassed)
 									{
 										<span class="small-table__right-cell" title="@visit.Timestamp.ToPrettyString()">@visit.Score</span>

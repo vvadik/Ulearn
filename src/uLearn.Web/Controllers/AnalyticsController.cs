@@ -18,14 +18,12 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly CourseManager courseManager;
-		private readonly VisitsRepo visitsRepo = new VisitsRepo();
+		private readonly VisitsRepo visitsRepo;
 		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
-		private readonly CommentsRepo commentsRepo = new CommentsRepo();
 		private readonly GroupsRepo groupsRepo = new GroupsRepo();
-		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
 
 		public AnalyticsController()
 			: this(WebCourseManager.Instance)
@@ -35,6 +33,7 @@ namespace uLearn.Web.Controllers
 		public AnalyticsController(CourseManager courseManager)
 		{
 			this.courseManager = courseManager;
+			visitsRepo = new VisitsRepo(db);
 		}
 
 		private ActionResult TotalStatistics(string courseId)
@@ -129,19 +128,19 @@ namespace uLearn.Web.Controllers
 									   .Average()
 			);
 
-			/* Dictionary<SlideId, List<UserSolution> (distinct by user)> */
-			var exercisesSolutions = userSolutionsRepo.GetAllSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
+			/* Dictionary<SlideId, count (distinct by user)> */
+			var exercisesSolutionsCount = userSolutionsRepo.GetAllSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
 				.GroupBy(s => s.SlideId)
-				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).ToList());
+				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).Count());
 
-			var exercisesAcceptedSolutions = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
+			var exercisesAcceptedSolutionsCount = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
 				.GroupBy(s => s.SlideId)
-				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).ToList());
-			
-			var visitedUsersIds = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, realPeriodFinish, filteredUsersIds)
-				.ToList()
+				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).Count());
+
+			var visitedUsers = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, realPeriodFinish, filteredUsersIds)
 				.DistinctBy(v => v.UserId)
-				.Select(v => v.User);
+				.Join(db.Users, v => v.UserId, u => u.Id, (v, u) => new UnitStatisticUserInfo { UserId = u.Id, UserName = u.UserName, UserVisibleName = (u.FirstName + " " + u.LastName).Trim() })
+				.ToList();
 
 			var visitedSlidesCountByUser = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, realPeriodFinish, filteredUsersIds)
 				.GroupBy(v => v.UserId)
@@ -169,9 +168,9 @@ namespace uLearn.Web.Controllers
 				UsersVisitedAllSlidesBeforePeriodFinishedCount = usersVisitedAllSlidesBeforePeriodFinishedCount,
 
 				QuizzesAverageScore = quizzesAverageScore,
-				ExercisesSolutions = exercisesSolutions,
-				ExercisesAcceptedSolutions = exercisesAcceptedSolutions,
-				VisitedUsersIds = visitedUsersIds.ToList(),
+				ExercisesSolutionsCount = exercisesSolutionsCount,
+				ExercisesAcceptedSolutionsCount = exercisesAcceptedSolutionsCount,
+				VisitedUsers = visitedUsers,
 				VisitedSlidesCountByUser = visitedSlidesCountByUser,
 				VisitedSlidesCountByUserAllTime = visitedSlidesCountByUserAllTime,
 			};

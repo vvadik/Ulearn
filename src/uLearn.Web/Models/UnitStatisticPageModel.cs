@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 
 namespace uLearn.Web.Models
 {
@@ -24,12 +23,19 @@ namespace uLearn.Web.Models
 
 		public Dictionary<Guid, int> QuizzesAverageScore { get; set; }
 
-		public Dictionary<Guid, List<UserExerciseSubmission>> ExercisesSolutions { get; set; }
-		public Dictionary<Guid, List<UserExerciseSubmission>> ExercisesAcceptedSolutions { get; set; }
+		public Dictionary<Guid, int> ExercisesSolutionsCount { get; set; }
+		public Dictionary<Guid, int> ExercisesAcceptedSolutionsCount { get; set; }
 
-		public List<ApplicationUser> VisitedUsersIds { get; set; }
+		public List<UnitStatisticUserInfo> VisitedUsers { get; set; }
 		public Dictionary<string, int> VisitedSlidesCountByUser { get; set; }
 		public Dictionary<string, int> VisitedSlidesCountByUserAllTime { get; set; }
+	}
+
+	public class UnitStatisticUserInfo
+	{
+		public string UserId { get; set; }
+		public string UserVisibleName { get; set; }
+		public string UserName { get; set; }
 	}
 
 	public class DailyStatistics
