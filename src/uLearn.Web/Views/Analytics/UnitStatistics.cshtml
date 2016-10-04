@@ -115,13 +115,14 @@
 								{
 									var tries = Model.ExercisesSolutionsCount.GetOrDefault(slide.Id, 0);
 									var acceptedTries = Model.ExercisesAcceptedSolutionsCount.GetOrDefault(slide.Id, 0);
+									var acceptedPercent = acceptedTries * 100 / tries;
 									if (tries == 0)
 									{
 										<span class="exercise-tries" title="Нет попыток">&ndash;</span>
 									}
 									else
 									{
-										<span class="exercise-tries" title="Успешных попыток/всего">@acceptedTries/@tries</span>
+										<span class="exercise-tries" title="Успешных попыток: @acceptedTries/@tries">@acceptedPercent%</span>
 									}
 								}
 								else
@@ -200,8 +201,9 @@
 					{
 						var visitedSlidesCount = Model.VisitedSlidesCountByUser[userInfo.UserId];
 						var visitedSlidesCountAllTime = Model.VisitedSlidesCountByUserAllTime[userInfo.UserId];
+						var userVisibleName = userInfo.UserVisibleName != "" ? userInfo.UserVisibleName : userInfo.UserName;
 						<div>
-							<div class="ib" title="@userInfo.UserName">@(userInfo.UserVisibleName != "" ? userInfo.UserVisibleName : userInfo.UserName).TruncateWithEllipsis(25)</div>
+							<div class="ib" title="@userInfo.UserName">@userVisibleName.TruncateWithEllipsis(25)</div>
 							<div class="ib pull-right">
 								<div class="student-progress progress">
 									<div class="progress-bar progress-bar-warning"

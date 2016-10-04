@@ -8,7 +8,14 @@
 	<ul>
 		@foreach (var course in Model.Courses)
 		{
-			<li>@Html.ActionLink(course.Title, "Users", new { courseId = course.Id, onlyPrivileged = true })</li>
+			if (User.IsSystemAdministrator())
+			{
+				<li>@Html.ActionLink(course.Title, "Users", new { courseId = course.Id, onlyPrivileged = true })</li>
+			}
+			else
+			{
+				<li>@Html.ActionLink(course.Title, "UnitStatistics", "Analytics", new { courseId = course.Id }, new {})</li>
+			}
 		}
 	</ul>
 	
