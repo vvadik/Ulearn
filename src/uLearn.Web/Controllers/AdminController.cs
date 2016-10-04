@@ -245,7 +245,7 @@ namespace uLearn.Web.Controllers
 
 		private ActionResult ManualCheckingQueue<T>(string actionName, string viewName, string courseId, int? groupId, bool done, string message = "") where T : AbstractManualSlideChecking
 		{
-			var MaxShownQueueSize = 50;
+			var MaxShownQueueSize = 500;
 			var course = courseManager.GetCourse(courseId);
 
 			var usersIds = FindGroupMembers(courseId, groupId);
