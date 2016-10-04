@@ -4,7 +4,6 @@
 @model UnitStatisticPageModel
 @{
 	ViewBag.Title = "Статистика и успеваемость";
-	var args = new {courseId = Model.CourseId, unitName = Model.UnitName};
 }
 
 @helper UsersByCountVisitedSlidesTable(string id, Dictionary<int, int> data)
@@ -31,48 +30,39 @@
 <body>
 	<div class="container">
 
-	<h1>Статистика</h1>
+		<h1>Статистика</h1>
 
-	<div class="analytics__dashboard">
+		<div class="analytics__dashboard">
 			@using (Html.BeginForm("UnitStatistics", "Analytics", FormMethod.Get, new { @class="form-inline", id="unit-statistics-filter-form" }))
 			{
-				var formSubmit = "$('#unit-statistics-filter-form').submit();";
 				@Html.Hidden("courseId", Model.CourseId)
 
 				<div class="form-group">
-					@* Avoiding quotes ' escaping in html attributes *@
-					@Html.Raw(HttpUtility.HtmlDecode(
-						Html.DropDownList("unitName",
+						@Html.DropDownList("unitName",
 							Model.UnitsNames.Select(name => new SelectListItem { Text = name, Selected = name == Model.UnitName, Value = name }),
-							new { @class = "form-control", onchange = formSubmit })
-							.ToHtmlString()))
+							new { @class = "form-control" })
+				</div>
+
+				<div class="form-group ml10">
+					с @Html.TextBox("periodStart", Model.PeriodStart.ToString("dd.MM.yyyy"), new { @class = "form-control form-control-date datetimepicker" })
 				</div>
 
 				<div class="form-group">
-					@Html.Raw(HttpUtility.HtmlDecode(
-						Html.TextBox("periodStart", Model.PeriodStart.ToString("dd.MM.yyyy"), new { @class = "form-control form-control-date datetimepicker", onchange = formSubmit })
-							.ToHtmlString()))
-				</div>
-
-				<div class="form-group">
-					@Html.Raw(HttpUtility.HtmlDecode(
-						Html.TextBox("periodFinish", Model.PeriodFinish.ToString("dd.MM.yyyy"), new { @class = "form-control form-control-date datetimepicker", onchange = formSubmit })
-							.ToHtmlString()))
+					по @Html.TextBox("periodFinish", Model.PeriodFinish.ToString("dd.MM.yyyy"), new { @class = "form-control form-control-date datetimepicker" })
 				</div>
 
 				<div class="form-group">
 					@{
-						var groupsListItems = new List<SelectListItem> { new SelectListItem { Text = "Все пользователи", Value = "", Selected = ! Model.GroupId.HasValue } };
+						var groupsListItems = new List<SelectListItem> { new SelectListItem { Text = "Все пользователи", Value = "", Selected = !Model.GroupId.HasValue } };
 						groupsListItems.AddRange(
 							Model.Groups.Select(group => new SelectListItem { Text = group.Name, Value = group.Id.ToString(), Selected = group.Id == Model.GroupId })
-						);
+							);
 					}
-					@Html.Raw(HttpUtility.HtmlDecode(
-						Html.DropDownList("group",
-							groupsListItems,
-							new { @class = "form-control", onchange = formSubmit }
-							).ToHtmlString())
-						)
+					@Html.DropDownList("group", groupsListItems, new { @class = "form-control" })
+				</div>
+
+				<div class="form-group">
+					<button role="button" class="btn btn-primary">Отфильтровать</button>
 				</div>
 			}
 
@@ -146,23 +136,23 @@
 				<div class="col-xs-12 col-md-6">
 					<h2>Посетители</h2>
 					<div>
-						Посмотрели весь модуль за выбранный период: <strong>@Model.UsersVisitedAllSlidesInPeriod.Count</strong>
+						Посмотрели весь модуль за выбранный период: <strong>@Model.UsersVisitedAllSlidesInPeriodCount</strong>
 					</div>
 					<div>
 						Всего посмотрели весь модуль к @Model.PeriodFinish.ToDatePrettyString(true):
 						<strong>
-							@(Model.UsersVisitedAllSlidesBeforePeriodFinished.Count - Model.UsersVisitedAllSlidesBeforePeriod.Count)
+							@(Model.UsersVisitedAllSlidesBeforePeriodFinishedCount - Model.UsersVisitedAllSlidesBeforePeriodCount)
 						</strong>
 					</div>
 
 					<div class="vspace-20"></div>
 
 					@{
-						var usersByCountVisitedSlides = Model.VisitedSlidesByUser
-							.GroupBy(p => p.Value.Count, p => p.Key)
+						var usersByCountVisitedSlides = Model.VisitedSlidesCountByUser
+							.GroupBy(p => p.Value, p => p.Key)
 							.ToDictionary(g => g.Key, g => g.Count());
-						var usersByCountVisitedSlidesAllTime = Model.VisitedSlidesByUserAllTime
-							.GroupBy(p => p.Value.Count, p => p.Key)
+						var usersByCountVisitedSlidesAllTime = Model.VisitedSlidesCountByUserAllTime
+							.GroupBy(p => p.Value, p => p.Key)
 							.ToDictionary(g => g.Key, g => g.Count());
 					}
 					@UsersByCountVisitedSlidesTable("usersByCountVisitedSlides", usersByCountVisitedSlides)
@@ -170,44 +160,11 @@
 
 					<div class="analytics__chart__toggles">
 						Показать график:
-						<a href="#usersByCountVisitedSlides" class="analytics__chart__toggle selected">за выбранный период</a>
-						<a href="#usersByCountVisitedSlidesAllTime" class="analytics__chart__toggle">за всё время</a>
+						<a href="#usersByCountVisitedSlides" class="analytics__chart__toggle internal-page-link active">за выбранный период</a>
+						<a href="#usersByCountVisitedSlidesAllTime" class="analytics__chart__toggle internal-page-link">за всё время</a>
 					</div>
 
 					<div id="usersByCountVisitedSlidesChart"></div>
-
-					<div class="vspace-20"></div>
-
-					<div class="row">
-						<a href="@Url.Action("Comments", "Admin", new { Model.CourseId })">
-							<div class="col-xs-6 col-md-4">
-								@{
-									var newCommentsCount = Model.CommentsBySlide.Select(p => p.Value.Count).Sum();
-								}
-								<div class="large-number">@newCommentsCount</div>
-								<div class="large-number__text">
-									@newCommentsCount.SelectPluralWordInRussian(new RussianPluralizationOptions
-										{
-											One = "комментарий",
-											Two = "комментариев",
-											Five = "комментариев",
-										})
-								</div>
-							</div>
-						</a>
-						<a href="@Url.Action("ManualQuizCheckingQueue", "Admin", new { Model.CourseId })">
-							<div class="col-xs-6 col-md-6">
-								@{
-									var manualQuizCheckQueueLength = Model.ManualQuizCheckQueueBySlide.Select(p => p.Value.Count).Sum();
-								}
-								<div class="large-number">@manualQuizCheckQueueLength</div>
-								<div class="large-number__text">
-									тестов <br />
-									в очереди на проверку
-								</div>
-							</div>
-						</a>
-					</div>
 				</div>
 			</div>
 	
@@ -226,9 +183,9 @@
 						<div class="pull-right">
 							<div class="small-table__title__cell">прогресс</div>
 							@foreach (var slide in exercisesAndQuizzes)
-					{
-						if (slide is QuizSlide)
-						{
+							{
+								if (slide is QuizSlide)
+								{
 									<span class="glyphicon glyphicon-pushpin small-table__title__cell" title="@slide.Title"></span>
 								}
 								else if (slide is ExerciseSlide)
@@ -241,13 +198,21 @@
 
 					@foreach (var user in Model.VisitedUsersIds)
 					{
-						var visitedSlidesCount = Model.VisitedSlidesByUser[user.Id].Count;
-						var visitedSlidesCountAllTime = Model.VisitedSlidesByUserAllTime[user.Id].Count;
+						var visitedSlidesCount = Model.VisitedSlidesCountByUser[user.Id];
+						var visitedSlidesCountAllTime = Model.VisitedSlidesCountByUserAllTime[user.Id];
 						<div>
 							<div class="ib">@user.VisibleName.TruncateWithEllipsis(25)</div>
 							<div class="ib pull-right">
 								<div class="student-progress progress">
-									<div class="progress-bar progress-bar-warning" style="width: @(100 * (visitedSlidesCountAllTime - visitedSlidesCount) / Model.Slides.Count)%"></div>
+									<div class="progress-bar progress-bar-warning"
+									     style="width: @(100 * (visitedSlidesCountAllTime - visitedSlidesCount) / Model.Slides.Count)%"
+										 title="Посмотрел(а) @((visitedSlidesCountAllTime - visitedSlidesCount).PluralizeInRussian(new RussianPluralizationOptions
+									                         {
+										                         One = "слайд",
+										                         Two = "слайда",
+										                         Five = "слайдов",
+										                         Gender = Gender.Male
+									                         })) вне указанного период"></div>
 									<div class="progress-bar progress-bar-success"
 									     style="width: @(100 * visitedSlidesCount / Model.Slides.Count)%"
 									     title="Посмотрел(а) @visitedSlidesCount.PluralizeInRussian(new RussianPluralizationOptions

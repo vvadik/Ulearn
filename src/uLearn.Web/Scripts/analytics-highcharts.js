@@ -60,8 +60,8 @@
 
 			var $target = $(e.target);
 
-			$('.analytics__chart__toggle').removeClass('selected');
-			$target.addClass('selected');
+			$('.analytics__chart__toggle').removeClass('active');
+			$target.addClass('active');
 			var href = $target.attr('href');
 			showChartByDataFrom(href);
 
