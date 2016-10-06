@@ -110,7 +110,7 @@
 			{
 				var style = Model.ShowOutputImmediately ? "" : "display: none";
 				<div id="exercise__submission__output" style="@style">
-					@Html.EncodeMultiLineText(Model.SubmissionSelectedByUser.AutomaticChecking.Output.Text)
+					@Html.Raw(Html.EncodeMultiLineText(Model.SubmissionSelectedByUser.AutomaticChecking.Output.Text))
 				</div>
 			}
 		}
@@ -135,7 +135,7 @@
 @helper YouWillLoseScoresDialog(ExerciseBlockData data)
 {
 	var acceptedSolutionsUrl = data.Url != null
-		? data.Url.Action("AcceptedSolutions", "Course", new { data.CourseId, data.Slide.Index })
+		? data.Url.Action("AcceptedSolutions", "Course", new { data.CourseId, slideIndex = data.Slide.Index })
 		: "";
 	<div class="modal fade" id="ShowSolutionsAlert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog">

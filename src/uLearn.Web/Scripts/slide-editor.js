@@ -5,6 +5,11 @@
 		var $self = $(this);
 		var addReviewUrl = $self.data('url');
 
+		$self.find('.exercise__close-review')
+			.click(function(e) {
+				$self.hide();
+				e.preventDefault();
+			});
 		$self.find('.exercise__add-review__comment').on('input', function () {
 			if ($(this).val() === '')
 				$self.find('.exercise__add-review__button').attr('disabled', 'disabled');

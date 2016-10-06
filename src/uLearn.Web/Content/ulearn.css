@@ -1,3 +1,4 @@
+
 /*#region js-classes */
 /* ReSharper disable DeclarationIsEmpty */
 /* ReSharper disable Html.CssClassElementsNotFound */
@@ -1224,16 +1225,16 @@ table.analytics__user-answers {
 	margin-right: 10px;
 }
 
-.analytics__chart__toggles .analytics__chart__toggle.selected {
+.analytics__chart__toggles .analytics__chart__toggle.active {
 	pointer-events: none;
 	color: black;
 	font-weight: bold;
 	text-decoration: none;
 }
 
-.analytics__chart__toggles .analytics__chart__toggle.selected:hover,
-.analytics__chart__toggles .analytics__chart__toggle.selected:focus,
-.analytics__chart__toggles .analytics__chart__toggle.selected:active {
+.analytics__chart__toggles .analytics__chart__toggle.active:hover,
+.analytics__chart__toggles .analytics__chart__toggle.active:focus,
+.analytics__chart__toggles .analytics__chart__toggle.active:active {
 	text-decoration: none;
 }
 
@@ -1259,7 +1260,6 @@ table.analytics__user-answers {
 }
 
 .exercise__add-review h4 {
-	margin-left: 15px;
 	margin-top: 0;
 }
 

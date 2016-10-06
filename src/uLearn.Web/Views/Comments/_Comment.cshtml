@@ -27,15 +27,30 @@
 		 @(Model.Comment.IsPinnedToTop ? "is-pinned" : "")
 		 @(Model.Comment.IsCorrectAnswer ? "is-correct-answer" : "")
 		 media"
-	     data-comment-id="@Model.Comment.Id">
-		
+		 data-comment-id="@Model.Comment.Id">
+
 		<a class="pull-left" href="#">
 			@UserAvatar.Avatar(Model.Comment.Author, "comment__author-avatar media-object")
 		</a>
 		<div class="media-body">
 			<div class="comment__header media-heading">
 				<div class="comment__author-name">
-					@Model.Comment.Author.VisibleName
+					@if (Model.CanEditAndDeleteComment)
+					{
+						@Html.ActionLink(
+								 Model.Comment.Author.VisibleName,
+								 "ShowSolutions", "Analytics",
+								 new
+								 {
+									 courseId = Model.Comment.CourseId,
+									 slideId = Model.Comment.SlideId,
+									 userId = Model.Comment.AuthorId
+								 }, null)
+					}
+					else
+					{
+						@Model.Comment.Author.VisibleName
+					}
 				</div>@if (Model.ShowContextInformation)
 				{
 					<div> — слайд
@@ -47,20 +62,19 @@
 					</div><!--
 					-->if (! string.IsNullOrEmpty(Model.ContextParentComment))
 					{<div>
-						, в ответ на <a href="@Url.Action("SlideById", "Course", new
+					, в ответ на <a href="@Url.Action("SlideById", "Course", new
 												{
 													courseId = Model.Comment.CourseId,
 													slideId = Model.Comment.SlideId,
 												})#comment-@Model.Comment.ParentCommentId"
-						                title="@Html.AttributeEncode(Model.ContextParentComment.TruncateWithEllipsis(200))"
-										>«@(Model.ContextParentComment.TruncateWithEllipsis(40))»</a>
-					 </div>	 
+									title="@Html.AttributeEncode(Model.ContextParentComment.TruncateWithEllipsis(200))">«@(Model.ContextParentComment.TruncateWithEllipsis(40))»</a>
+								</div>
 					}
 				}
 				@if (Model.CanModerateComment || !Model.Comment.IsApproved)
 				{
 					<div class="comment__not-approved @(Model.CanModerateComment ? "label-switcher" : "") label label-as-badge label-default"
-					     data-url="@Url.Action("ApproveComment", "Comments", new { commentId = Model.Comment.Id })">
+						 data-url="@Url.Action("ApproveComment", "Comments", new { commentId = Model.Comment.Id })">
 						@if (Model.CanModerateComment)
 						{
 							<span class="hide-on-parent-hover">не опубликовано</span>
@@ -79,7 +93,7 @@
 					if (Model.CanModerateComment || Model.Comment.IsPinnedToTop)
 					{
 						<div class="comment__pinned @(Model.CanModerateComment ? "label-switcher" : "") label label-as-badge label-success show-on-comment-hover"
-						     data-url="@Url.Action("PinComment", "Comments", new { commentId = Model.Comment.Id })">
+							 data-url="@Url.Action("PinComment", "Comments", new { commentId = Model.Comment.Id })">
 
 							@if (Model.CanModerateComment)
 							{
@@ -101,7 +115,7 @@
 					if (Model.CanModerateComment || Model.Comment.IsCorrectAnswer)
 					{
 						<div class="comment__correct-answer @(Model.CanModerateComment ? "label-switcher" : "") label label-as-badge label-primary show-on-comment-hover"
-						     data-url="@Url.Action("MarkAsCorrectAnswer", "Comments", new { commentId = Model.Comment.Id })">
+							 data-url="@Url.Action("MarkAsCorrectAnswer", "Comments", new { commentId = Model.Comment.Id })">
 							правильный ответ
 							@if (Model.CanModerateComment)
 							{
@@ -120,15 +134,15 @@
 					var likesCount = Model.LikesCount;
 				}
 				<div class="comment__likes-count @(Model.IsLikedByUser ? "is-liked" : "")"
-				     data-url="@Url.Action("LikeComment", "Comments", new { commentId = Model.Comment.Id })">
+					 data-url="@Url.Action("LikeComment", "Comments", new { commentId = Model.Comment.Id })">
 					@Html.AntiForgeryToken()
 					<span class="glyphicon glyphicon-heart"></span>
 					<span class="comment__likes-count__counter">
-					@if (likesCount > 0)
-					{
-						@likesCount
-					}
-				</span>
+						@if (likesCount > 0)
+						{
+							@likesCount
+						}
+					</span>
 				</div>
 				<div class="comment__publish-time" title="@Model.Comment.PublishTime.ToPrettyString()">
 					<a href="@Url.Action("SlideById", "Course", new
@@ -149,7 +163,7 @@
 				@if (Model.CanEditAndDeleteComment)
 				{
 					<div class="comment__edit-link show-on-comment-hover"
-					     data-url="@Url.Action("EditCommentText", "Comments", new { commentId = Model.Comment.Id })">
+						 data-url="@Url.Action("EditCommentText", "Comments", new { commentId = Model.Comment.Id })">
 						<a href="">редактировать<span class="glyphicon glyphicon-pencil"></span></a>
 						@Html.AntiForgeryToken()
 					</div>
@@ -166,8 +180,8 @@
 				@if (Model.CanEditAndDeleteComment)
 				{
 					<div class="comment__delete-link show-on-comment-hover"
-					     data-url="@Url.Action("DeleteComment", "Comments", new { commentId = Model.Comment.Id })"
-					     data-restore-url="@Url.Action("RestoreComment", "Comments", new { commentId = Model.Comment.Id })">
+						 data-url="@Url.Action("DeleteComment", "Comments", new { commentId = Model.Comment.Id })"
+						 data-restore-url="@Url.Action("RestoreComment", "Comments", new { commentId = Model.Comment.Id })">
 						<a href="" title="удалить комментарий">удалить<span class="glyphicon glyphicon-remove"></span></a>
 						@Html.AntiForgeryToken()
 					</div>
@@ -184,7 +198,7 @@
 
 	if (Model.Comment.IsTopLevel() && Model.CanReply)
 	{
-		@ReplyForm(Model.Comment,  ! Model.Replies.Any())
+		@ReplyForm(Model.Comment, !Model.Replies.Any())
 	}
 
 }
