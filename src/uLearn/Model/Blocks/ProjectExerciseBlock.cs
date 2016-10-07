@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Serialization;
 using RunCsJob.Api;
@@ -39,9 +38,9 @@ namespace uLearn.Model.Blocks
 
 		public string CsprojFileName => Path.GetFileName(CsProjFilePath);
 		[XmlIgnore]
-		public string SlideFolderPath { get; private set; }
+		public DirectoryInfo SlideFolderPath { get; set; }
 
-		public FileInfo StudentsZip => new DirectoryInfo(SlideFolderPath).GetFile(ExerciseDir + ".exercise.zip");
+		public FileInfo StudentsZip => SlideFolderPath.GetFile(ExerciseDir + ".exercise.zip");
 
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
@@ -49,7 +48,7 @@ namespace uLearn.Model.Blocks
 			ExerciseInitialCode = ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFileName;
 			ExpectedOutput = ExpectedOutput ?? "";
 			ValidatorName = string.Join(" ", LangId, ValidatorName);
-			SlideFolderPath = context.Dir.FullName;
+			SlideFolderPath = context.Dir;
 			var exercisePath = context.Dir.GetSubdir(ExerciseDir).FullName;
 			if (context.ZippedProjectExercises.Add(exercisePath))
 				CreateZipForStudent();
@@ -58,7 +57,7 @@ namespace uLearn.Model.Blocks
 
 		private void CreateZipForStudent()
 		{
-			var directoryName = new DirectoryInfo(Path.Combine(SlideFolderPath, ExerciseDir));
+			var directoryName = new DirectoryInfo(Path.Combine(SlideFolderPath.FullName, ExerciseDir));
 			var zip = new LazilyUpdatingZip(directoryName, new[] { "checking", "bin", "obj" }, ReplaceCsproj, StudentsZip);
 			zip.UpdateZip();
 		}
@@ -95,7 +94,7 @@ namespace uLearn.Model.Blocks
 
 		private byte[] GetZipBytesForChecker(string code)
 		{
-			var directoryName = Path.Combine(SlideFolderPath, ExerciseDir);
+			var directoryName = Path.Combine(SlideFolderPath.FullName, ExerciseDir);
 			var excluded = (PathsToExcludeForChecker ?? new string[0]).Concat(new[] { "bin/*", "obj/*" }).ToList();
 			var exerciseDir = new DirectoryInfo(directoryName);
 			return exerciseDir.ToZip(excluded,

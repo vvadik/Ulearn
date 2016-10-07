@@ -35,25 +35,25 @@ namespace uLearn.Web
             // Use a cookie to temporarily store information about a user logging in with a third party login provider
             app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
-            // Uncomment the following lines to enable logging in with third party login providers
-            //app.UseMicrosoftAccountAuthentication(
-            //    clientId: "",
-            //    clientSecret: "");
+			// Uncomment the following lines to enable logging in with third party login providers
+			//app.UseMicrosoftAccountAuthentication(
+			//    clientId: "",
+			//    clientSecret: "");
 
-            //			app.UseTwitterAuthentication(
-            //				consumerKey: "hC6XpJy0OPVkbvGzRIOJRA",
-            //				consumerSecret: "cEDewTtU7RKHimj2D1IpD75HUKnjVeobdSNhjAAQ");
+			//			app.UseTwitterAuthentication(
+			//				consumerKey: "hC6XpJy0OPVkbvGzRIOJRA",
+			//				consumerSecret: "cEDewTtU7RKHimj2D1IpD75HUKnjVeobdSNhjAAQ");
 
-            app.UseVkAuthentication(
-                appId: "4381546",
-                appSecret: "rqrWfJMYUT6Y3io91B3B");
+			app.UseVkAuthentication(
+				appId: "5333292",
+				appSecret: "b1j1H7Yqbn2USgl6VYPt");
 
-            //app.UseFacebookAuthentication(
-            //   appId: "",
-            //   appSecret: "");
+			//app.UseFacebookAuthentication(
+			//   appId: "",
+			//   appSecret: "");
 
-            //			app.UseGoogleAuthentication();
-            app.UseLtiAuthentication();
+			//			app.UseGoogleAuthentication();
+			app.UseLtiAuthentication();
         }
     }
 }

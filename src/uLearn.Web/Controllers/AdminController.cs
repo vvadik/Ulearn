@@ -517,13 +517,16 @@ namespace uLearn.Web.Controllers
 
 			/* Copy version's zip file to course's zip archive, overwrite if need */
 			versionFile.CopyTo(courseFile.FullName, true);
-			/* Copy files extracted from zip archive */
-			CopyFilesRecursively(courseManager.GetExtractedVersionDirectory(versionId),
-								 courseManager.GetExtractedCourseDirectory(courseId));
+			courseManager.EnsureVersionIsExtracted(versionId);
 
 			/* Replace courseId */
 			version.Id = courseId;
-			courseManager.UpdateCourse(version);
+
+			/* and move course from version's directory to courses's directory */
+			courseManager.MoveCourse(
+				version,
+				courseManager.GetExtractedVersionDirectory(versionId),
+				courseManager.GetExtractedCourseDirectory(courseId));
 
 			CreateQuizVersionsForSlides(courseId, version.Slides);
 			await coursesRepo.MarkCourseVersionAsPublished(versionId);

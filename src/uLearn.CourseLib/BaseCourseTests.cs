@@ -124,7 +124,7 @@ namespace uLearn
 		private static void InitialCodeIsNotSolutionForProjExercise(ExerciseSlide slide)
 		{
 			var exercise = slide.Exercise as ProjectExerciseBlock;
-			var directoryName = Path.Combine(exercise.SlideFolderPath, exercise.ExerciseDir);
+			var directoryName = Path.Combine(exercise.SlideFolderPath.FullName, exercise.ExerciseDir);
 			var excluded = (exercise.PathsToExcludeForChecker ?? new string[0]).Concat(new[] { "bin/*", "obj/*" }).ToList();
 			var exerciseDir = new DirectoryInfo(directoryName);
 			var bytes = exerciseDir.ToZip(excluded, new[]

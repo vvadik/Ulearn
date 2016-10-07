@@ -27,9 +27,12 @@ namespace uLearn.Web
 		public override Course GetCourse(string courseId)
 		{
 			var course = base.GetCourse(courseId);
-			if (IsCourseVersionWasUpdatedSoon(courseId))
+			if (IsCourseVersionWasUpdatedRecent(courseId))
 				return course;
 			var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
+			if (publishedVersion == null)
+				return course;
+
 			courseVersionFetchTime[courseId] = DateTime.Now;
 			lock (@lock)
 			{
@@ -42,7 +45,7 @@ namespace uLearn.Web
 			return course;
 		}
 
-		private bool IsCourseVersionWasUpdatedSoon(string courseId)
+		private bool IsCourseVersionWasUpdatedRecent(string courseId)
 		{
 			DateTime lastFetchTime;
 			if (courseVersionFetchTime.TryGetValue(courseId, out lastFetchTime))

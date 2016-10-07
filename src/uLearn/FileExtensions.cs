@@ -75,7 +75,7 @@ namespace uLearn
 			throw new Exception("No " + filepath + " in " + di.Name);
 		}
 
-		public static string GetRelativePath(this FileInfo file, string folder)
+		public static string GetRelativePath(this FileSystemInfo file, string folder)
 		{
 			var pathUri = new Uri(file.FullName);
 			if (!folder.EndsWith(Path.DirectorySeparatorChar.ToString()))
@@ -111,6 +111,11 @@ namespace uLearn
 					return ms.ToArray();
 				}
 			}
+		}
+
+		public static bool IsInDirectory(this FileSystemInfo fileOrDirectory, DirectoryInfo directory)
+		{
+			return fileOrDirectory.FullName.ToLower().StartsWith(directory.FullName.ToLower());
 		}
 	}
 }
