@@ -8,6 +8,7 @@
 		$self.find('.exercise__close-review')
 			.click(function(e) {
 				$self.hide();
+				$self.closest('.exercise').find('.code')[0].codeMirrorEditor.focus();
 				e.preventDefault();
 			});
 		$self.find('.exercise__add-review__comment').on('input', function () {
@@ -18,6 +19,7 @@
 		});
 
 		$self.find('.exercise__add-review__button').click(function () {
+			var $button = $(this);
 			var comment = $self.find('.exercise__add-review__comment').val();
 			var params = {
 				StartLine: editorLastRange.anchor.line,
@@ -26,10 +28,12 @@
 				FinishPosition: editorLastRange.head.ch,
 				Comment: comment,
 			}
+			$button.text('Сохранение..').attr('disabled', 'disabled');
 			$.post(addReviewUrl, params, function (renderedReview) {
 				addExerciseCodeReview(renderedReview);
 				$self.find('.exercise__add-review__comment').val('');
 				$self.hide();
+				$button.text('Сохранить').removeAttr('disabled');
 			});
 		});
 	});

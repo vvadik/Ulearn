@@ -345,7 +345,7 @@ p {
 
 .solution-control {
 	width: 100%;
-	margin-top: -16px;
+	margin-top: -15px;
 	margin-left: 0 !important;
 }
 
@@ -1276,6 +1276,12 @@ table.analytics__user-answers {
 	display: none;
 }
 
+.exercise__top-review-comments .comment {
+	white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 .code-review + .CodeMirror {
 	width: 600px;
 }
@@ -1367,4 +1373,8 @@ table.analytics__user-answers {
 	display: block;
 	font-weight: bold;
 	font-family: sans-serif;
+}
+
+#exercise__submission__output.empty::before {
+	content: "Нет вывода программы"
 }
