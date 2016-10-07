@@ -51,6 +51,7 @@ namespace uLearn.Web.Controllers
 			var exerciseSlide = (ExerciseSlide)courseManager
 				.GetCourse(submission.CourseId)
 				.GetSlideById(submission.SlideId);
+			courseManager.WaitWhileCourseIsLocked(submission.CourseId);
 			return exerciseSlide.Exercise.CreateSubmition(
 				submission.Id.ToString(),
 				submission.SolutionCode.Text);

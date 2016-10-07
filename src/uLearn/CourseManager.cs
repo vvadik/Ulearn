@@ -1,25 +1,28 @@
 using Ionic.Zip;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using uLearn.Model.Blocks;
 
 namespace uLearn
 {
 	public class CourseManager
 	{
-		public const string HelpPackageName = "Help";
+		private const string helpPackageName = "Help";
 
 		private readonly DirectoryInfo stagedDirectory;
 		private readonly DirectoryInfo coursesDirectory;
 		private readonly DirectoryInfo coursesVersionsDirectory;
 
-		private readonly Dictionary<string, Course> courses = new Dictionary<string, Course>(StringComparer.InvariantCultureIgnoreCase);
+		private readonly ConcurrentDictionary<string, Course> courses = new ConcurrentDictionary<string, Course>(StringComparer.InvariantCultureIgnoreCase);
 		/* LRU-cache for course versions. 50 is a capactiy of the cache. */
 		private readonly LruCache<Guid, Course> versionsCache = new LruCache<Guid, Course>(50);
 
@@ -153,7 +156,7 @@ namespace uLearn
 			return course;
 		}
 
-		private static void ClearDirectory(DirectoryInfo directory)
+		private static void ClearDirectory(DirectoryInfo directory, bool deleteDirectory=false)
 		{
 			foreach (var file in directory.GetFiles())
 				file.Delete();
@@ -163,6 +166,17 @@ namespace uLearn
 				ClearDirectory(subDirectory);
 				subDirectory.Delete();
 			}
+			if (deleteDirectory)
+				directory.Delete();
+		}
+
+		private void UnzipFile(FileInfo zipFile, DirectoryInfo unpackDirectory)
+		{
+			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
+			{
+				ClearDirectory(unpackDirectory);
+				zip.ExtractAll(unpackDirectory.FullName, ExtractExistingFileAction.OverwriteSilently);
+			}
 		}
 
 		private Course LoadCourseFromZip(FileInfo zipFile)
@@ -170,22 +184,17 @@ namespace uLearn
 			return LoadCourseFromZip(zipFile, coursesDirectory);
 		}
 
-		public static Course LoadCourseFromZip(FileInfo zipFile, DirectoryInfo coursesDirectory)
+		public Course LoadCourseFromZip(FileInfo zipFile, DirectoryInfo coursesDirectory)
 		{
-			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
-			{
-				var courseOrVersionId = GetCourseId(zipFile.Name);
-				var courseDir = coursesDirectory.CreateSubdirectory(courseOrVersionId);
-
-				ClearDirectory(courseDir);
-				zip.ExtractAll(courseDir.FullName, ExtractExistingFileAction.OverwriteSilently);
-
-				return LoadCourseFromDirectory(courseDir);
-			}
+			var courseOrVersionId = GetCourseId(zipFile.Name);
+			var courseDir = coursesDirectory.CreateSubdirectory(courseOrVersionId);
+			UnzipFile(zipFile, courseDir);
+			return LoadCourseFromDirectory(courseDir);
 		}
 
-		public static Course LoadCourseFromDirectory(DirectoryInfo dir)
+		public Course LoadCourseFromDirectory(DirectoryInfo dir)
 		{
+			WaitWhileCourseIsLocked(GetCourseId(dir.Name));
 			return loader.LoadCourse(dir);
 		}
 
@@ -218,7 +227,7 @@ namespace uLearn
 			if (package.Exists)
 				return true;
 
-			var helpPackage = stagedDirectory.GetFile(GetPackageName(HelpPackageName));
+			var helpPackage = stagedDirectory.GetFile(GetPackageName(helpPackageName));
 			if (!helpPackage.Exists)
 				CreateEmptyCourse(courseId, package.FullName);
 			else
@@ -226,6 +235,16 @@ namespace uLearn
 
 			ReloadCourseFromZip(package);
 			return true;
+		}
+
+		public void EnsureVersionIsExtracted(Guid versionId)
+		{
+			var versionDirectory = GetExtractedVersionDirectory(versionId);
+			if (!versionDirectory.Exists)
+			{
+				Directory.CreateDirectory(versionDirectory.FullName);
+				UnzipFile(GetCourseVersionFile(versionId), versionDirectory);
+			}
 		}
 
 		private static void CreateEmptyCourse(string courseId, string path)
@@ -318,6 +337,136 @@ namespace uLearn
 			if (!courses.ContainsKey(course.Id))
 				return;
 			courses[course.Id] = course;
+		}
+
+		private readonly TimeSpan waitBetweenLockTries = TimeSpan.FromSeconds(0.1);
+		private readonly TimeSpan lockLifeTime = TimeSpan.FromMinutes(20);
+		private int updateCourseEachOperarionTriesCount = 5;
+
+		private FileInfo GetCourseLockFile(string courseId)
+		{
+			return coursesDirectory.GetFile("~" + courseId + ".lock");
+		}
+
+		private static bool TryCreateLockFile(FileInfo lockFile)
+		{
+			var tempFileName = Path.GetTempFileName();
+			try
+			{
+				new FileInfo(tempFileName).MoveTo(lockFile.FullName);
+				return true;
+			}
+			catch (IOException)
+			{
+				return false;
+			}
+		}
+
+		public void LockCourse(string courseId)
+		{
+			var lockFile = GetCourseLockFile(courseId);
+			while (true)
+			{
+				if (TryCreateLockFile(lockFile))
+					return;
+
+				Thread.Sleep(waitBetweenLockTries);
+
+				try
+				{
+					lockFile.Refresh();
+					/* If lock-file has been created ago, just delete it */
+					if (lockFile.Exists && lockFile.LastWriteTime < DateTime.Now.Subtract(lockLifeTime))
+						lockFile.Delete();
+				}
+				catch (IOException)
+				{
+				}
+			}
+		}
+
+		public void ReleaseCourse(string courseId)
+		{
+			GetCourseLockFile(courseId).Delete();
+		}
+
+		public void WaitWhileCourseIsLocked(string courseId)
+		{
+			LockCourse(courseId);
+			ReleaseCourse(courseId);
+		}
+
+		public void TrySeveralTimes(Action function)
+		{
+			Exception lastException = null;
+			for (int tryNumber = 1; tryNumber <= updateCourseEachOperarionTriesCount; tryNumber++)
+			{
+				try
+				{
+					function.Invoke();
+					return;
+				}
+				catch (Exception e)
+				{
+					lastException = e;
+				}
+			}
+			if (lastException != null)
+				throw lastException;
+		}
+
+		public void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
+		{
+			LockCourse(course.Id);
+
+			try
+			{
+				var tempDirectoryName = coursesDirectory.GetSubdir(Path.GetRandomFileName());
+				TrySeveralTimes(() => Directory.Move(destinationDirectory.FullName, tempDirectoryName.FullName));
+				
+				try
+				{
+					TrySeveralTimes(() => Directory.Move(sourceDirectory.FullName, destinationDirectory.FullName));
+				}
+				catch (IOException)
+				{
+					/* In case of any file system's error rollback previous operation */
+					TrySeveralTimes(() => Directory.Move(tempDirectoryName.FullName, destinationDirectory.FullName));
+					throw;
+				}
+				FixFileReferencesInCourse(course, sourceDirectory, destinationDirectory);
+				TrySeveralTimes(() => ClearDirectory(tempDirectoryName, true));
+
+				UpdateCourse(course);
+			}
+			finally
+			{
+				ReleaseCourse(course.Id);
+			}
+		}
+
+		private void FixFileReferencesInCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
+		{
+			foreach (var slide in course.Slides)
+			{
+				slide.Info.SlideFile = (FileInfo) GetNewPathForFileAfterMoving(slide.Info.SlideFile, sourceDirectory, destinationDirectory);
+
+				foreach (var exerciseBlock in slide.Blocks.OfType<ProjectExerciseBlock>())
+					exerciseBlock.SlideFolderPath = (DirectoryInfo) GetNewPathForFileAfterMoving(exerciseBlock.SlideFolderPath, sourceDirectory, destinationDirectory);
+			}
+		}
+
+		private FileSystemInfo GetNewPathForFileAfterMoving(FileSystemInfo file, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
+		{
+			if (!file.IsInDirectory(sourceDirectory))
+				return file;
+
+			var relativePath = file.GetRelativePath(sourceDirectory.FullName);
+			var newPath = Path.Combine(destinationDirectory.FullName, relativePath);
+
+			if (file is DirectoryInfo)
+				return new DirectoryInfo(newPath);
+			return new FileInfo(newPath);
 		}
 	}
 }
