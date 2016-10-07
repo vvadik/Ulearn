@@ -20,6 +20,9 @@ function setExerciseVersion(versionId, showOutput) {
 	$('.exercise__submission').append($loadingPanel);
 	$hints.hide();
 
+	/* Disabled version switching */
+	$('.exercise-version-link').attr('disabled', 'disabled');
+
 	$.get(url, function(data) {
 		var $submission = $('.exercise__submission');
 		$loadingPanel.hide();
@@ -32,6 +35,8 @@ function setExerciseVersion(versionId, showOutput) {
 
 		updateExerciseVersionUrl(versionId);
 		$hints.show();
+
+		$('.exercise-version-link').removeAttr('disabled');
 	});
 }
 

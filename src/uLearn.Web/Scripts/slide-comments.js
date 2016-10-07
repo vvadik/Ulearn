@@ -12,6 +12,30 @@
 		}, duration);
 	}
 
+	String.prototype.br2nl = function () {
+		return this.replace(/<br\s*\/?>/gi, "\n");
+	}
+
+	String.prototype.nl2br = function () {
+		return this.replace(/\n/g, "<br>");
+	}
+
+	String.prototype.encodeMultiLineText = function () {
+		return $.encodeHtmlEntities(this).nl2br();
+	}
+
+	String.prototype.decodeMultiLineText = function () {
+		return $.decodeHtmlEntities(this.br2nl());
+	}
+
+	jQuery.encodeHtmlEntities = function (text) {
+		return $('<span>').text(text).html();
+	}
+
+	jQuery.decodeHtmlEntities = function (html) {
+		return $('<span>').html(html).text();
+	}
+
 	var likeComment = function () {
 		var $self = $(this);
 		var url = $self.data('url');

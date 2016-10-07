@@ -1,3 +1,4 @@
+
 /*#region js-classes */
 /* ReSharper disable DeclarationIsEmpty */
 /* ReSharper disable Html.CssClassElementsNotFound */
@@ -344,7 +345,7 @@ p {
 
 .solution-control {
 	width: 100%;
-	margin-top: -16px;
+	margin-top: -15px;
 	margin-left: 0 !important;
 }
 
@@ -1259,7 +1260,6 @@ table.analytics__user-answers {
 }
 
 .exercise__add-review h4 {
-	margin-left: 15px;
 	margin-top: 0;
 }
 
@@ -1274,6 +1274,12 @@ table.analytics__user-answers {
 
 .exercise__add-review.without-comments .exercise__add-review__top-comments {
 	display: none;
+}
+
+.exercise__top-review-comments .comment {
+	white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .code-review + .CodeMirror {
@@ -1367,4 +1373,8 @@ table.analytics__user-answers {
 	display: block;
 	font-weight: bold;
 	font-family: sans-serif;
+}
+
+#exercise__submission__output.empty::before {
+	content: "Нет вывода программы"
 }

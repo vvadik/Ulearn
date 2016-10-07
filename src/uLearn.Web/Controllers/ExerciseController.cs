@@ -262,7 +262,7 @@ namespace uLearn.Web.Controllers
 					ExerciseReviewState.NotReviewed;
 
 			var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, slide.Id, userId);
-			var topUserReviewComments = slideCheckingsRepo.GetTopUserReviewComments(course.Id, slide.Id, currentUserId, 5);
+			var topUserReviewComments = slideCheckingsRepo.GetTopUserReviewComments(course.Id, slide.Id, currentUserId, 10);
 
 			return new ExerciseBlockData(course.Id, (ExerciseSlide) slide, visit?.IsSkipped ?? false, solution)
 			{

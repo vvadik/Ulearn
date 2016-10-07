@@ -114,14 +114,14 @@
 								else if (slide is ExerciseSlide)
 								{
 									var tries = Model.ExercisesSolutionsCount.GetOrDefault(slide.Id, 0);
-									var acceptedTries = Model.ExercisesAcceptedSolutionsCount.GetOrDefault(slide.Id, 0);
-									var acceptedPercent = acceptedTries * 100 / tries;
+									var acceptedTries = Model.ExercisesAcceptedSolutionsCount.GetOrDefault(slide.Id, 0);									
 									if (tries == 0)
 									{
 										<span class="exercise-tries" title="Нет попыток">&ndash;</span>
 									}
 									else
 									{
+										var acceptedPercent = acceptedTries * 100 / tries;
 										<span class="exercise-tries" title="Успешных попыток: @acceptedTries/@tries">@acceptedPercent%</span>
 									}
 								}
