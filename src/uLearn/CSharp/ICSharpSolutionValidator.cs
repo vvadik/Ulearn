@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -13,8 +13,8 @@ namespace uLearn.CSharp
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 	public class IsStaticMethodAttribute : Attribute, ICSharpSolutionValidator
 	{
-		public const string ShouldBeMethod = "Решение должно быть корректным определением статического метода";
-		public const string ShouldBeSingleMethod = "Решение должно состоять ровно из одного метода";
+		public const string ShouldBeMethod = "Р РµС€РµРЅРёРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РєРѕСЂСЂРµРєС‚РЅС‹Рј РѕРїСЂРµРґРµР»РµРЅРёРµРј СЃС‚Р°С‚РёС‡РµСЃРєРѕРіРѕ РјРµС‚РѕРґР°";
+		public const string ShouldBeSingleMethod = "Р РµС€РµРЅРёРµ РґРѕР»Р¶РЅРѕ СЃРѕСЃС‚РѕСЏС‚СЊ СЂРѕРІРЅРѕ РёР· РѕРґРЅРѕРіРѕ РјРµС‚РѕРґР°";
 
 		public string FindError(SyntaxTree userSolution)
 		{
@@ -35,7 +35,7 @@ namespace uLearn.CSharp
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 	public class SingleStatementMethodAttribute : IsStaticMethodAttribute
 	{
-		public const string ShouldBeSingleMethodMessage = "Решение этой задачи должно быть в одно выражение 'return ...'";
+		public const string ShouldBeSingleMethodMessage = "Р РµС€РµРЅРёРµ СЌС‚РѕР№ Р·Р°РґР°С‡Рё РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РІ РѕРґРЅРѕ РІС‹СЂР°Р¶РµРЅРёРµ 'return ...'";
 
 		protected override string FindError(MethodDeclarationSyntax method)
 		{

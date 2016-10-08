@@ -1,14 +1,14 @@
-namespace uLearn
+п»їnamespace uLearn
 {
 	public interface ISolutionValidator
 	{
-		///<summary>Проверка того, что код не является полным исходником</summary>>
+		///<summary>РџСЂРѕРІРµСЂРєР° С‚РѕРіРѕ, С‡С‚Рѕ РєРѕРґ РЅРµ СЏРІР»СЏРµС‚СЃСЏ РїРѕР»РЅС‹Рј РёСЃС…РѕРґРЅРёРєРѕРј</summary>>
 		string FindFullSourceError(string userCode);
 
-		///<summary>Проверка всего решения на компилируемость</summary>
+		///<summary>РџСЂРѕРІРµСЂРєР° РІСЃРµРіРѕ СЂРµС€РµРЅРёСЏ РЅР° РєРѕРјРїРёР»РёСЂСѓРµРјРѕСЃС‚СЊ</summary>
 		string FindSyntaxError(string solution);
 
-		///<summary>Проверка валидаторами кода, который написал студент</summary>
+		///<summary>РџСЂРѕРІРµСЂРєР° РІР°Р»РёРґР°С‚РѕСЂР°РјРё РєРѕРґР°, РєРѕС‚РѕСЂС‹Р№ РЅР°РїРёСЃР°Р» СЃС‚СѓРґРµРЅС‚</summary>
 		string FindValidatorError(string userCode, string solution);
 	}
 }

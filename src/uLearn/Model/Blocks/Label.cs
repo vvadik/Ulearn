@@ -1,8 +1,8 @@
-using System.Xml.Serialization;
+п»їusing System.Xml.Serialization;
 
 namespace uLearn.Model.Blocks
 {
-	///<summary>Отметка в коде</summary>
+	///<summary>РћС‚РјРµС‚РєР° РІ РєРѕРґРµ</summary>
 	public class Label
 	{
 		[XmlText]

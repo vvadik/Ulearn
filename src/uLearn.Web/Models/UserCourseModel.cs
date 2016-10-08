@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -100,7 +100,7 @@ namespace uLearn.Web.Models
 		{
 			if (Progress.HasValue)
 				return Progress.Value.ToString("0%");
-			return "�";
+			return "—";
 		}
 
 		public void Add(ProgressModel progress)

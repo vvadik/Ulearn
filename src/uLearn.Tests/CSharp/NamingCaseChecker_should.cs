@@ -1,4 +1,4 @@
-using NUnit.Framework;
+ï»¿using NUnit.Framework;
 
 namespace uLearn.CSharp
 {
@@ -87,7 +87,7 @@ namespace uLearn.CSharp
 
 		private void CheckIncorrect(string incorrectCode)
 		{
-			Assert.That(FindErrors(incorrectCode), Is.StringContaining("Ñòðîêà 1"), incorrectCode);
+			Assert.That(FindErrors(incorrectCode), Is.StringContaining("Ð¡Ñ‚Ñ€Ð¾ÐºÐ° 1"), incorrectCode);
 		}
 
 		private static string FindErrors(string code)

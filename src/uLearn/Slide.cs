@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.Linq;
 using uLearn.Model.Blocks;
@@ -104,7 +104,7 @@ namespace uLearn
 
 				var exerciseBlock = slide.Blocks[componentIndex] as ExerciseBlock;
 				var otherComponent = exerciseBlock != null
-					? exerciseBlock.GetExerciseComponent(componentIndex == 0 ? slide.Title : "Упражнение", slide, componentIndex, string.Format(slideUrl, courseId, slide.Index), ltiId)
+					? exerciseBlock.GetExerciseComponent(componentIndex == 0 ? slide.Title : "РЈРїСЂР°Р¶РЅРµРЅРёРµ", slide, componentIndex, string.Format(slideUrl, courseId, slide.Index), ltiId)
 					: ((YoutubeBlock)slide.Blocks[componentIndex]).GetVideoComponent(componentIndex == 0 ? slide.Title : "", slide, componentIndex, videoGuids);
 
 				components.Add(otherComponent);
@@ -114,14 +114,14 @@ namespace uLearn
 			var solutionComponents = new List<Component>();
 			foreach (var result in slide.Blocks.OfType<ExerciseBlock>())
 			{
-				var comp = result.GetSolutionsComponent("Решения", slide, componentIndex, string.Format(solutionsUrl, courseId, slide.Index), ltiId);
+				var comp = result.GetSolutionsComponent("Р РµС€РµРЅРёСЏ", slide, componentIndex, string.Format(solutionsUrl, courseId, slide.Index), ltiId);
 				solutionComponents.Add(comp);
 				componentIndex++;
 			}
 
 			yield return new Vertical(slide.NormalizedGuid, slide.Title, components.ToArray());
 			if (solutionComponents.Count != 0)
-				yield return new Vertical(slide.NormalizedGuid + "0", "Решения", solutionComponents.ToArray());
+				yield return new Vertical(slide.NormalizedGuid + "0", "Р РµС€РµРЅРёСЏ", solutionComponents.ToArray());
 		}
 
 		private static IEnumerable<Vertical> QuizToVerticals(string courseId, QuizSlide slide, string slideUrl, string ltiId)

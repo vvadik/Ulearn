@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -10,7 +10,7 @@ namespace uLearn.CSharp
 	public class SlideParser_should
 	{
 		[Test]
-		[Explicit("Для отладки на конкретных слайдах из курсов")]
+		[Explicit("Р”Р»СЏ РѕС‚Р»Р°РґРєРё РЅР° РєРѕРЅРєСЂРµС‚РЅС‹С… СЃР»Р°Р№РґР°С… РёР· РєСѓСЂСЃРѕРІ")]
 		public void Test()
 		{
 			var slide =

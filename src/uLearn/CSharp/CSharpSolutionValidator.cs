@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -23,7 +23,7 @@ namespace uLearn.CSharp
 		{
 			userCode = userCode.Trim();
 			if (userCode.StartsWith("using") || userCode.StartsWith("namespace"))
-				return "Не нужно писать весь исходный файл целиком — пишите только метод / класс, который необходим в задаче.";
+				return "РќРµ РЅСѓР¶РЅРѕ РїРёСЃР°С‚СЊ РІРµСЃСЊ РёСЃС…РѕРґРЅС‹Р№ С„Р°Р№Р» С†РµР»РёРєРѕРј вЂ” РїРёС€РёС‚Рµ С‚РѕР»СЊРєРѕ РјРµС‚РѕРґ / РєР»Р°СЃСЃ, РєРѕС‚РѕСЂС‹Р№ РЅРµРѕР±С…РѕРґРёРј РІ Р·Р°РґР°С‡Рµ.";
 			return null;
 		}
 
