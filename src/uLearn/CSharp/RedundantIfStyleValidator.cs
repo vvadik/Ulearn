@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+п»їusing System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -31,7 +31,7 @@ namespace uLearn.CSharp
 									.Call(r => r.Expression as LiteralExpressionSyntax)
 									.Call(IsBoolLiteral, false);
 			if (trueStatementIsReturnBoolLiteral && falseStatementIsReturnBoolLiteral == true)
-				yield return Report(ifElseStatement, "Используйте return вместо if");
+				yield return Report(ifElseStatement, "РСЃРїРѕР»СЊР·СѓР№С‚Рµ return РІРјРµСЃС‚Рѕ if");
 		}
 
 		private static bool IsBoolLiteral(LiteralExpressionSyntax node)
