@@ -417,11 +417,12 @@ namespace uLearn
 
 		public void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
 		{
+			var tempDirectoryName = coursesDirectory.GetSubdir(Path.GetRandomFileName());
 			LockCourse(course.Id);
-
+			
 			try
 			{
-				var tempDirectoryName = coursesDirectory.GetSubdir(Path.GetRandomFileName());
+				
 				TrySeveralTimes(() => Directory.Move(destinationDirectory.FullName, tempDirectoryName.FullName));
 				
 				try
@@ -435,7 +436,6 @@ namespace uLearn
 					throw;
 				}
 				FixFileReferencesInCourse(course, sourceDirectory, destinationDirectory);
-				TrySeveralTimes(() => ClearDirectory(tempDirectoryName, true));
 
 				UpdateCourse(course);
 			}
@@ -443,6 +443,7 @@ namespace uLearn
 			{
 				ReleaseCourse(course.Id);
 			}
+			TrySeveralTimes(() => ClearDirectory(tempDirectoryName, true));
 		}
 
 		private void FixFileReferencesInCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)

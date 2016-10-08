@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Web.Hosting;
@@ -10,7 +11,7 @@ namespace uLearn.Web
 	{
 		private readonly CoursesRepo coursesRepo = new CoursesRepo();
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
-		private readonly Dictionary<string, DateTime> courseVersionFetchTime = new Dictionary<string, DateTime>();
+		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
 		private readonly TimeSpan fetchCourseVersionEvery = TimeSpan.FromMinutes(1);
 
 		public WebCourseManager() 
@@ -29,11 +30,12 @@ namespace uLearn.Web
 			var course = base.GetCourse(courseId);
 			if (IsCourseVersionWasUpdatedRecent(courseId))
 				return course;
+
+			courseVersionFetchTime[courseId] = DateTime.Now;
 			var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
 			if (publishedVersion == null)
 				return course;
-
-			courseVersionFetchTime[courseId] = DateTime.Now;
+			
 			lock (@lock)
 			{
 				Guid loadedVersionId;
