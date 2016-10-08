@@ -63,6 +63,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult SpellingErrors(Guid versionId)
 		{
 			var course = courseManager.GetVersion(versionId);
+			courseManager.EnsureVersionIsExtracted(versionId);
 			return PartialView(course.SpellCheck());
 		}
 
