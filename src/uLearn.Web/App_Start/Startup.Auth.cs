@@ -45,9 +45,8 @@ namespace uLearn.Web
 			//				consumerSecret: "cEDewTtU7RKHimj2D1IpD75HUKnjVeobdSNhjAAQ");
 
 			app.UseVkAuthentication(
-				appId: "5333292",
-				appSecret: "b1j1H7Yqbn2USgl6VYPt");
-
+                appId: "4381546",
+                appSecret: "rqrWfJMYUT6Y3io91B3B");
 			//app.UseFacebookAuthentication(
 			//   appId: "",
 			//   appSecret: "");
