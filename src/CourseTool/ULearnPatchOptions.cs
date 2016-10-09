@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -57,7 +57,7 @@ namespace uLearn.CourseTool
 				if (chapterNote == null)
 					continue;
 				var unitIndex = ulearnUnits.IndexOf(chapterNote.UnitName);
-				var displayName = "Заметки преподавателю";
+				var displayName = "Р—Р°РјРµС‚РєРё РїСЂРµРїРѕРґР°РІР°С‚РµР»СЋ";
 				var sequentialId = string.Format("{0}-{1}-{2}", ulearnCourse.Id, unitIndex, "note-seq");
 				var verticalId = string.Format("{0}-{1}-{2}", ulearnCourse.Id, unitIndex, "note-vert");
 				var mdBlockId = string.Format("{0}-{1}-{2}", ulearnCourse.Id, unitIndex, "note-md");

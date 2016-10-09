@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -34,7 +34,7 @@ namespace uLearn
 		{
 			var result = texDivRegex.Replace(md ?? "", m => MakeInsertId(m, InsertionType.Div), int.MaxValue);
 			result = texSpanRegex.Replace(result, m => MakeInsertId(m, InsertionType.Span));
-			result = result.Replace(" -- ", " � ");
+			result = result.Replace(" -- ", " — ");
 			return result;
 		}
 

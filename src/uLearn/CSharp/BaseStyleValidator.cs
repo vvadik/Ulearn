@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -21,7 +21,7 @@ namespace uLearn.CSharp
 		private static string Report(FileLinePositionSpan span, string message)
 		{
 			var linePosition = span.StartLinePosition;
-			return "Ñòðîêà {0}: {1}".WithArgs(linePosition.Line + 1, message);
+			return "Ð¡Ñ‚Ñ€Ð¾ÐºÐ° {0}: {1}".WithArgs(linePosition.Line + 1, message);
 		}
 
 		protected IEnumerable<string> InspectAll<TNode>(SyntaxTree userSolution, Func<TNode, IEnumerable<string>> inspect)
