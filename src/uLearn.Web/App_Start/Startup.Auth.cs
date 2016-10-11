@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web.Configuration;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
@@ -40,18 +41,18 @@ namespace uLearn.Web
 			//    clientId: "",
 			//    clientSecret: "");
 
-			//			app.UseTwitterAuthentication(
-			//				consumerKey: "hC6XpJy0OPVkbvGzRIOJRA",
-			//				consumerSecret: "cEDewTtU7RKHimj2D1IpD75HUKnjVeobdSNhjAAQ");
+			//app.UseTwitterAuthentication(
+			//    consumerKey: "hC6XpJy0OPVkbvGzRIOJRA",
+			//	  consumerSecret: "cEDewTtU7RKHimj2D1IpD75HUKnjVeobdSNhjAAQ");
 
-			app.UseVkAuthentication(
-                appId: "4381546",
-                appSecret: "rqrWfJMYUT6Y3io91B3B");
+			var vkAppId = WebConfigurationManager.AppSettings["owin.vk.appId"];
+			var vkAppSecret = WebConfigurationManager.AppSettings["owin.vk.appSecret"];
+			app.UseVkAuthentication(vkAppId, vkAppSecret);
 			//app.UseFacebookAuthentication(
 			//   appId: "",
 			//   appSecret: "");
 
-			//			app.UseGoogleAuthentication();
+			//app.UseGoogleAuthentication();
 			app.UseLtiAuthentication();
         }
     }

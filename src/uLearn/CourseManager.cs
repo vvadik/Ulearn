@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -179,16 +180,17 @@ namespace uLearn
 			}
 		}
 
-		private Course LoadCourseFromZip(FileInfo zipFile)
-		{
-			return LoadCourseFromZip(zipFile, coursesDirectory);
-		}
-
-		public Course LoadCourseFromZip(FileInfo zipFile, DirectoryInfo coursesDirectory)
+		private DirectoryInfo UnzipCourseFile(FileInfo zipFile)
 		{
 			var courseOrVersionId = GetCourseId(zipFile.Name);
 			var courseDir = coursesDirectory.CreateSubdirectory(courseOrVersionId);
 			UnzipFile(zipFile, courseDir);
+			return courseDir;
+		}
+
+		public Course LoadCourseFromZip(FileInfo zipFile)
+		{
+			var courseDir = UnzipCourseFile(zipFile);
 			return LoadCourseFromDirectory(courseDir);
 		}
 
@@ -375,9 +377,12 @@ namespace uLearn
 				try
 				{
 					lockFile.Refresh();
-					/* If lock-file has been created ago, just delete it */
+					/* If lock-file has been created ago, just delete it and unzip course again */
 					if (lockFile.Exists && lockFile.LastWriteTime < DateTime.Now.Subtract(lockLifeTime))
+					{
 						lockFile.Delete();
+						UnzipCourseFile(GetStagingCourseFile(courseId));
+					}
 				}
 				catch (IOException)
 				{
@@ -396,10 +401,10 @@ namespace uLearn
 			ReleaseCourse(courseId);
 		}
 
-		public void TrySeveralTimes(Action function)
+		private void TrySeveralTimes(Action function)
 		{
 			Exception lastException = null;
-			for (int tryNumber = 1; tryNumber <= updateCourseEachOperarionTriesCount; tryNumber++)
+			for (var tryNumber = 1; tryNumber <= updateCourseEachOperarionTriesCount; tryNumber++)
 			{
 				try
 				{

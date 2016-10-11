@@ -41,7 +41,7 @@ namespace uLearn
 		{
 			var slide = Slides.FirstOrDefault(x => x.Id == slideId);
 			if (slide == null)
-				throw new Exception($"No slide with id {slideId}");
+				throw new SlideNotFoundException($"No slide with id {slideId}");
 			return slide;
 		}
 
