@@ -52,22 +52,36 @@ namespace uLearn.Web.Controllers
 				if (string.IsNullOrWhiteSpace(slideId))
 					return RedirectToAction("Index", "Home");
 
-				var course = courseManager.FindCourseBySlideById(slideGuid);
-				if (course == null)
-					return HttpNotFound();
-				var slide = course.GetSlideById(slideGuid);
-				return RedirectToRoute("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
+				return RedirectToSlideById(slideGuid);
 			}
 
 			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
 			var isGuest = !User.Identity.IsAuthenticated;
 
+			var course = courseManager.GetCourse(courseId);
+			Slide slide = null;
+			if (slideGuid == Guid.Empty)
+			{
+				var slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
+				slide = course.FindSlide(slideIndex);
+			}
+			else
+			{
+				try
+				{
+					slide = course.GetSlideById(slideGuid);
+				}
+				catch (SlideNotFoundException)
+				{
+				}
+			}
+
+			if (slide == null)
+				return HttpNotFound();
+
 			AbstractManualSlideChecking queueItem = null;
 			if (User.HasAccessFor(courseId, CourseRole.Instructor) && checkQueueItemId != null)
 			{
-				var course = courseManager.GetCourse(courseId);
-				var slide = course.GetSlideById(slideGuid);
-
 				if (slide is QuizSlide)
 					queueItem = slideCheckingsRepo.FindManualCheckingById<ManualQuizChecking>(checkQueueItemId.Value);
 				if (slide is ExerciseSlide)
@@ -88,8 +102,8 @@ namespace uLearn.Web.Controllers
 			}
 
 			var model = isGuest ?
-				CreateGuestCoursePageModel(courseId, slideGuid, visibleUnits) :
-				await CreateCoursePageModel(courseId, slideGuid, visibleUnits, queueItem, version, groupId);
+				CreateGuestCoursePageModel(course, slide, visibleUnits) :
+				await CreateCoursePageModel(course, slide, visibleUnits, queueItem, version, groupId);
 
 			if (!string.IsNullOrEmpty(Request.QueryString["error"]))
 				model.Error = Request.QueryString["error"];
@@ -97,6 +111,15 @@ namespace uLearn.Web.Controllers
 			if (!visibleUnits.Contains(model.Slide.Info.UnitName))
 				throw new Exception("Slide is hidden " + slideGuid);
 			return View("Slide", model);
+		}
+
+		private ActionResult RedirectToSlideById(Guid slideGuid)
+		{
+			var course = courseManager.FindCourseBySlideById(slideGuid);
+			if (course == null)
+				return HttpNotFound();
+			var slide = course.GetSlideById(slideGuid);
+			return RedirectToRoute("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
 		}
 
 		private string GetAdminQueueActionName(AbstractManualSlideChecking queueItem)
@@ -133,7 +156,7 @@ namespace uLearn.Web.Controllers
 			if (!string.IsNullOrWhiteSpace(ltiRequestJson))
 				await ltiRequestsRepo.Update(userId, slide.Id, ltiRequestJson);
 
-			var visiter = await VisitSlide(courseId, slide.Id, userId);
+			await VisitSlide(courseId, slide.Id, userId);
 
 			var exerciseSlide = slide as ExerciseSlide;
 			if (exerciseSlide != null)
@@ -193,18 +216,8 @@ namespace uLearn.Web.Controllers
 			return lastVisitedSlide;
 		}
 		
-		private CoursePageModel CreateGuestCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits)
+		private CoursePageModel CreateGuestCoursePageModel(Course course, Slide slide, List<string> visibleUnits)
 		{
-			var course = courseManager.GetCourse(courseId);
-			Slide slide;
-			if (slideId == Guid.Empty)
-			{
-				var slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
-				slide = course.Slides[slideIndex];
-			}
-			else
-				slide = course.GetSlideById(slideId);
-
 			return new CoursePageModel
 			{
 				CourseId = course.Id,
@@ -215,31 +228,20 @@ namespace uLearn.Web.Controllers
 					course,
 					slide,
 					slide.Info.DirectoryRelativePath,
-					slide.Blocks.Select(block => block is ExerciseBlock ? new ExerciseBlockData(courseId, (ExerciseSlide) slide, false) { Url = Url } : (dynamic)null).ToArray(),
+					slide.Blocks.Select(block => block is ExerciseBlock ? new ExerciseBlockData(course.Id, (ExerciseSlide) slide, false) { Url = Url } : (dynamic)null).ToArray(),
 					true),
 				IsGuest = true,
 			};
 		}
 
-		private async Task<CoursePageModel> CreateCoursePageModel(string courseId, Guid slideId, List<string> visibleUnits, AbstractManualSlideChecking manualChecking, int? exerciseSubmissionId=null, int? groupId = null)
+		private async Task<CoursePageModel> CreateCoursePageModel(Course course, Slide slide, List<string> visibleUnits, AbstractManualSlideChecking manualChecking, int? exerciseSubmissionId=null, int? groupId = null)
 		{
-			var course = courseManager.GetCourse(courseId);
-
-			Slide slide;
-			if (slideId == Guid.Empty)
-			{
-				var slideIndex = GetInitialIndexForStartup(courseId, course, visibleUnits);
-				slide = course.Slides[slideIndex];
-			}
-			else
-				slide = course.GetSlideById(slideId);
-
 			var userId = User.Identity.GetUserId();
 
 			if (manualChecking != null)
 				userId = manualChecking.UserId;
 			
-			var visiter = await VisitSlide(courseId, slideId, userId);
+			var visiter = await VisitSlide(course.Id, slide.Id, userId);
 			var score = Tuple.Create(visiter.Score, slide.MaxScore);
 			var model = new CoursePageModel
 			{
@@ -247,7 +249,7 @@ namespace uLearn.Web.Controllers
 				CourseId = course.Id,
 				CourseTitle = course.Title,
 				Slide = slide,
-				Rate = GetRate(course.Id, slideId),
+				Rate = GetRate(course.Id, slide.Id),
 				Score = score,
 				BlockRenderContext = CreateRenderContext(course, slide, manualChecking, exerciseSubmissionId, groupId),
 				ManualChecking = manualChecking,

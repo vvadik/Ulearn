@@ -11,9 +11,15 @@ namespace uLearn.Web.DataContexts
 	{
 		public static IQueryable<ApplicationUser> FilterByName(this IQueryable<ApplicationUser> applicationUsers, string namePrefix)
 		{
-			return String.IsNullOrEmpty(namePrefix)
+			return string.IsNullOrEmpty(namePrefix)
 				? applicationUsers
-				: applicationUsers.Where(u => u.UserName.StartsWith(namePrefix) || u.FirstName.StartsWith(namePrefix) || u.LastName.StartsWith(namePrefix));
+				: applicationUsers.Where(
+					u => u.UserName.StartsWith(namePrefix) ||
+						 u.FirstName.StartsWith(namePrefix) ||
+						 u.LastName.StartsWith(namePrefix) ||
+						 (u.FirstName + " " + u.LastName).StartsWith(namePrefix) ||
+						 (u.LastName + " " + u.FirstName).StartsWith(namePrefix)
+				);
 		}
 
 		public static IQueryable<ApplicationUser> FilterByRole(this IQueryable<ApplicationUser> applicationUsers, IdentityRole role, UserManager<ApplicationUser> userManager)

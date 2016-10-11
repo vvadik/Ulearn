@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Web.Hosting;
 using uLearn.Web.DataContexts;
+using uLearn.Web.Models;
 
 namespace uLearn.Web
 {
@@ -32,7 +33,15 @@ namespace uLearn.Web
 				return course;
 
 			courseVersionFetchTime[courseId] = DateTime.Now;
-			var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
+			CourseVersion publishedVersion = null;
+			try
+			{
+				publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
+			}
+			catch (InvalidOperationException)
+			{
+				/* Sometimes we can't get published course version. Ok, just try later */
+			}
 			if (publishedVersion == null)
 				return course;
 			
