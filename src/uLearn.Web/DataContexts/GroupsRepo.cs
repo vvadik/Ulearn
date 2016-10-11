@@ -206,5 +206,11 @@ namespace uLearn.Web.DataContexts
 			group.IsInviteLinkEnabled = isEnabled;
 			await db.SaveChangesAsync();
 		}
+
+		public IEnumerable<string> GetUsersIdsForAllGroups(string courseId)
+		{
+			var groupsIds = GetGroups(courseId).Select(g => g.Id);
+			return db.GroupMembers.Where(m => groupsIds.Contains(m.GroupId)).Select(m => m.UserId);
+		}
 	}
 }
