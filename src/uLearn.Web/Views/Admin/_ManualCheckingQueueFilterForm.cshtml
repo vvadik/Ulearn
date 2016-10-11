@@ -10,11 +10,15 @@
 		@{
 			var groupsListItems = new List<SelectListItem>
 			{
-				new SelectListItem { Text = "Все пользователи", Value = "-1", Selected = Model.GroupId == -1 },
-				new SelectListItem { Text = "Мои группы", Value = "", Selected = !Model.GroupId.HasValue }
+				new SelectListItem { Text = "Все пользователи", Value = "all", Selected = Model.GroupId == "all" },
+				new SelectListItem { Text = "Мои группы", Value = "", Selected = string.IsNullOrEmpty(Model.GroupId) }
 			};
+			if (User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
+			{
+				groupsListItems.Insert(1, new SelectListItem { Text = "Ни в одной группе", Value = "not-in-group", Selected = Model.GroupId == "not-in-group" });
+			}
 			groupsListItems.AddRange(
-				Model.Groups.Select(group => new SelectListItem { Text = group.Name, Value = group.Id.ToString(), Selected = group.Id == Model.GroupId })
+				Model.Groups.Select(group => new SelectListItem { Text = group.Name, Value = group.Id.ToString(), Selected = group.Id.ToString() == Model.GroupId })
 				);
 		}
 		@* Avoiding quotes ' escaping in html attributes *@

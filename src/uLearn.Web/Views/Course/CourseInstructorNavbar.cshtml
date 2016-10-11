@@ -16,8 +16,8 @@
 			}
 			<li class="divider" role="separator"></li>
 			<li>@Html.ActionLink("Комментарии", "Comments", "Admin", new { Model.CourseId }, new { })</li>
-			<li>@Html.ActionLink("Очередь на проверку", "ManualQuizCheckingQueue", "Admin", new { Model.CourseId }, new { })</li>
-			<li>@Html.ActionLink("Очередь на код ревью", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId }, new { })</li>
+			<li>@Html.ActionLink("Проверка тестов", "ManualQuizCheckingQueue", "Admin", new { Model.CourseId }, new { })</li>
+			<li>@Html.ActionLink("Код ревью", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId }, new { })</li>
 		</ul>
 	</li>
 }

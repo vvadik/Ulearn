@@ -141,7 +141,12 @@ namespace uLearn.Web.DataContexts
 			if (options.SlidesIds != null)
 				query = query.Where(c => options.SlidesIds.Contains(c.SlideId));
 			if (options.UsersIds != null)
-				query = query.Where(c => options.UsersIds.Contains(c.UserId));
+			{
+				if (options.IsUserIdsSupplement)
+					query = query.Where(c => ! options.UsersIds.Contains(c.UserId));
+				else
+					query = query.Where(c => options.UsersIds.Contains(c.UserId));
+			}
 			query = query.OrderByDescending(c => c.Timestamp);
 			if (options.Count > 0)
 				query = query.Take(options.Count);
@@ -248,7 +253,16 @@ namespace uLearn.Web.DataContexts
 
 	public class ManualCheckingQueueFilterOptions
 	{
+		public ManualCheckingQueueFilterOptions(string courseId, IEnumerable<string> usersIds = null, bool isUserIdsSupplement = false)
+		{
+			CourseId = courseId;
+			UsersIds = usersIds;
+			IsUserIdsSupplement = isUserIdsSupplement;
+		}
+
 		public string CourseId { get; set; }
+		/* If true, search only users which ids IS NOT in UsersIds*/
+		public bool IsUserIdsSupplement { get; set; }
 		public IEnumerable<string> UsersIds { get; set; }
 		public IEnumerable<Guid> SlidesIds { get; set; }
 		public bool OnlyChecked { get; set; }
