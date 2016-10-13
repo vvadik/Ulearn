@@ -322,6 +322,10 @@
     <Compile Include="Migrations\201609211423088_ExtractAutomaticCheckingIsRightAnswer.Designer.cs">
       <DependentUpon>201609211423088_ExtractAutomaticCheckingIsRightAnswer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610132201527_AddComputedColumnsForUser.cs" />
+    <Compile Include="Migrations\201610132201527_AddComputedColumnsForUser.Designer.cs">
+      <DependentUpon>201610132201527_AddComputedColumnsForUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\ExerciseCodeReview.cs" />
     <Compile Include="Models\ExerciseCodeReviewModel.cs" />
     <Compile Include="Models\SlideChecking.cs" />
@@ -816,6 +820,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201609211423088_ExtractAutomaticCheckingIsRightAnswer.resx">
       <DependentUpon>201609211423088_ExtractAutomaticCheckingIsRightAnswer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610132201527_AddComputedColumnsForUser.resx">
+      <DependentUpon>201610132201527_AddComputedColumnsForUser.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
