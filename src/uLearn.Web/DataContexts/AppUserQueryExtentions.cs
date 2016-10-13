@@ -17,8 +17,8 @@ namespace uLearn.Web.DataContexts
 					u => u.UserName.StartsWith(namePrefix) ||
 						 u.FirstName.StartsWith(namePrefix) ||
 						 u.LastName.StartsWith(namePrefix) ||
-						 (u.FirstName + " " + u.LastName).StartsWith(namePrefix) ||
-						 (u.LastName + " " + u.FirstName).StartsWith(namePrefix)
+						 u.FirstAndLastName.StartsWith(namePrefix) ||
+						 u.LastAndFirstName.StartsWith(namePrefix)
 				);
 		}
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace uLearn.Web.Models
@@ -22,6 +23,20 @@ namespace uLearn.Web.Models
 
 		// AvatarUrl is empty if user has no avatar
 		public string AvatarUrl { get; set; }
+
+		[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+		public string FirstAndLastName
+		{
+			get { return FirstName + " " + LastName; }
+			private set { /* Empty for EF */ }
+		}
+
+		[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+		public string LastAndFirstName
+		{
+			get { return LastName + " " + FirstName; }
+			private set { /* Empty for EF */ }
+		}
 
 		public bool HasAvatar
 		{

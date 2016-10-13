@@ -10,7 +10,6 @@ namespace uLearn.Web
 {
 	public class WebCourseManager : CourseManager
 	{
-		private readonly CoursesRepo coursesRepo = new CoursesRepo();
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
 		private readonly TimeSpan fetchCourseVersionEvery = TimeSpan.FromMinutes(1);
@@ -33,15 +32,9 @@ namespace uLearn.Web
 				return course;
 
 			courseVersionFetchTime[courseId] = DateTime.Now;
-			CourseVersion publishedVersion = null;
-			try
-			{
-				publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
-			}
-			catch (InvalidOperationException)
-			{
-				/* Sometimes we can't get published course version. Ok, just try later */
-			}
+			var coursesRepo = new CoursesRepo();
+			var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
+
 			if (publishedVersion == null)
 				return course;
 			

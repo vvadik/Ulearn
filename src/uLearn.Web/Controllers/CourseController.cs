@@ -66,15 +66,7 @@ namespace uLearn.Web.Controllers
 				slide = course.FindSlide(slideIndex);
 			}
 			else
-			{
-				try
-				{
-					slide = course.GetSlideById(slideGuid);
-				}
-				catch (SlideNotFoundException)
-				{
-				}
-			}
+				slide = course.FindSlideById(slideGuid);
 
 			if (slide == null)
 				return HttpNotFound();
