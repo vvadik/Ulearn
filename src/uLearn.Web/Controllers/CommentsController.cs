@@ -16,11 +16,13 @@ namespace uLearn.Web.Controllers
 {
 	public class CommentsController : Controller
 	{
+		private readonly CourseManager courseManager = WebCourseManager.Instance;
 		private readonly CommentsRepo commentsRepo = new CommentsRepo();
 		private readonly UserManager<ApplicationUser> userManager = new ULearnUserManager();
 
 		public ActionResult SlideComments(string courseId, Guid slideId)
 		{
+			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			var comments = commentsRepo.GetSlideComments(courseId, slideId).ToList();
 			var commentsPolicy = commentsRepo.GetCommentsPolicy(courseId);
 
@@ -48,7 +50,7 @@ namespace uLearn.Web.Controllers
 			var model = new SlideCommentsModel
 			{
 				CourseId = courseId,
-				SlideId = slideId,
+				Slide = slide,
 				IsAuthorizedAndCanComment = isAuthorizedAndCanComment,
 				CanReply = canReply,
 				CanModerateComments = canModerateComments,
@@ -233,7 +235,7 @@ namespace uLearn.Web.Controllers
 	public class SlideCommentsModel
 	{
 		public string CourseId { get; set; }
-		public Guid SlideId { get; set; }
+		public Slide Slide { get; set; }
 		public bool IsAuthorizedAndCanComment { get; set; }
 		public bool CanReply { get; set; }
 		public bool CanModerateComments { get; set; }

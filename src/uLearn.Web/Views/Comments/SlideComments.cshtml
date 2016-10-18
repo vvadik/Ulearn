@@ -9,7 +9,7 @@
 @functions
 {
 
-	private CommentViewModel BuildCommentViewModel(Comment comment)
+	private CommentViewModel BuildCommentViewModel(Comment comment, Slide slide)
 	{
 		var replies = Model.CommentsByParent.GetOrDefault(comment.Id, new List<Comment>()).OrderByDescending(x => x.IsApproved).ThenBy(x => x.PublishTime);
 		var isAuthor = comment.AuthorId == User.Identity.GetUserId();
@@ -18,11 +18,12 @@
 			Comment = comment,
 			LikesCount = Model.CommentsLikesCounts.GetOrDefault(comment.Id),
 			IsLikedByUser = Model.CommentsLikedByUser.Contains(comment.Id),
-			Replies = replies.Select(BuildCommentViewModel),
+			Replies = replies.Select(r => BuildCommentViewModel(r, slide)),
 			CanReply = Model.CanReply,
 			CanModerateComment = Model.CanModerateComments,
 			IsCommentVisibleForUser = comment.IsApproved || Model.CanSeeNotApprovedComments || isAuthor,
 			CanEditAndDeleteComment = Model.CanModerateComments || isAuthor,
+			CanViewAuthorSubmissions = slide is ExerciseSlide && Model.CanModerateComments,
 			CurrentUser = Model.CurrentUser,
 		};
 	}
@@ -35,7 +36,7 @@
 		{
 			@Html.AntiForgeryToken()
 			@Html.Hidden("courseId", Model.CourseId)
-			@Html.Hidden("slideId", Model.SlideId)
+			@Html.Hidden("slideId", Model.Slide.Id)
 			<div class="pull-left">
 				@UserAvatar.SmallAvatar(Model.CurrentUser)
 			</div>
@@ -53,7 +54,7 @@
 		<h3>Комментарии</h3>
 		@foreach (var topLevelComment in Model.TopLevelComments)
 		{
-			@Html.Partial("_Comment", BuildCommentViewModel(topLevelComment))
+			@Html.Partial("_Comment", BuildCommentViewModel(topLevelComment, Model.Slide))
 		}
 
 		@if (Model.IsAuthorizedAndCanComment)

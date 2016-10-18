@@ -36,11 +36,11 @@
 			<div class="comment__header media-heading">
 				<div class="comment__author-name">
 					@Model.Comment.Author.VisibleName
-					@if (User.HasAccessFor(Model.Comment.CourseId, CourseRole.Instructor))
+					@if (Model.CanViewAuthorSubmissions)
 					{
 						<sup>
 							@Html.ActionLink(
-							"смотреть решения",
+							"решения",
 							"UserSolutions", "Analytics",
 							new
 							{
