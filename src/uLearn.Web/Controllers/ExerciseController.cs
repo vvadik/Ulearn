@@ -246,7 +246,7 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		private ExerciseBlockData CreateExerciseBlockData(Course course, Slide slide, UserExerciseSubmission submission)
+		private ExerciseBlockData CreateExerciseBlockData(Course course, Slide slide, UserExerciseSubmission submission, bool onlyAccepted)
 		{
 			var currentUserId = User.Identity.GetUserId();
 			var userId = submission?.UserId ?? currentUserId;
@@ -261,7 +261,9 @@ namespace uLearn.Web.Controllers
 				hasUncheckedReview ? ExerciseReviewState.WaitingForReview :
 					ExerciseReviewState.NotReviewed;
 
-			var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, slide.Id, userId);
+			var submissions = onlyAccepted ?
+				solutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, slide.Id, userId) :
+				solutionsRepo.GetAllSubmissionsByUser(course.Id, slide.Id, userId);
 			var topUserReviewComments = slideCheckingsRepo.GetTopUserReviewComments(course.Id, slide.Id, currentUserId, 10);
 
 			return new ExerciseBlockData(course.Id, (ExerciseSlide) slide, visit?.IsSkipped ?? false, solution)
@@ -283,8 +285,11 @@ namespace uLearn.Web.Controllers
 					submissions.LastOrDefault(s => s.AutomaticCheckingIsRightAnswer);
 		}
 
-		public ActionResult Submission(string courseId, Guid slideId, int? submissionId=null, int? manualCheckingId = null, bool isLti = false, bool showOutput = false)
+		public ActionResult Submission(string courseId, Guid slideId, int? submissionId=null, int? manualCheckingId = null, bool isLti = false, bool showOutput = false, bool instructorView = false, bool onlyAccepted = true)
 		{
+			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
+				instructorView = false;
+
 			var currentUserId = User.Identity.GetUserId();
 			UserExerciseSubmission submission = null;
 			if (submissionId.HasValue && submissionId.Value > 0)
@@ -317,9 +322,11 @@ namespace uLearn.Web.Controllers
 			if (manualChecking != null && !submissionId.HasValue)
 				submission = manualChecking.Submission;
 
-			var model = CreateExerciseBlockData(course, slide, submission);
+			var model = CreateExerciseBlockData(course, slide, submission, onlyAccepted);
 			model.IsLti = isLti;
 			model.ShowOutputImmediately = showOutput;
+			model.InstructorView = instructorView;
+			model.ShowOnlyAccepted = onlyAccepted;
 			if (manualChecking != null)
 			{
 				if (manualChecking.CourseId == courseId)

@@ -27,6 +27,8 @@ namespace uLearn.Web.Models
 		public bool DebugView { get; set; }
 		public bool IsSkippedOrPassed { get; set; }
 		public bool ShowOutputImmediately { get; set; }
+		public bool InstructorView { get; set; }
+		public bool ShowOnlyAccepted { get; set; }
 
 		public bool ShowControls => !IsGuest;
 		public bool CanSkip { get; private set; }

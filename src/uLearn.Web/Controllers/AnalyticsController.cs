@@ -365,7 +365,7 @@ namespace uLearn.Web.Controllers
 				.ToArray();
 		}
 
-		public ActionResult ShowSolutions(string courseId, string userId, Guid slideId)
+		public ActionResult UserSolutions(string courseId, string userId, Guid slideId)
 		{
 			var solutions = db.UserExerciseSubmissions.Where(s => s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
 			var user = db.Users.Find(userId);
@@ -381,7 +381,7 @@ namespace uLearn.Web.Controllers
 				Slide = slide,
 				Solutions = solutions
 			};
-			return View("UserSolutions", model);
+			return View(model);
 		}
 	}
 

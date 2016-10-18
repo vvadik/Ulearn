@@ -47,8 +47,8 @@
 						var styleClass = user.SlidesSlideInfo[i].IsExerciseSolved ? "green-stat" : "red-stat";
 						<td data-sort-value="@ToString(user.SlidesSlideInfo[i].AttemptsCount + 1000000)"
 						    class="@styleClass">
-							@Html.ActionLink(user.SlidesSlideInfo[i].AttemptsCount.ToString(), "ShowSolutions", new{courseId=Model.CourseId, userId=user.UserId, slideId=Model.Slides[i].Id})
-							
+							@Html.ActionLink(user.SlidesSlideInfo[i].AttemptsCount.ToString(), "UserSolutions", new{courseId=Model.CourseId, userId=user.UserId, slideId=Model.Slides[i].Id})
+
 						</td>
 					}
 					else if (Model.Slides[i] is QuizSlide)

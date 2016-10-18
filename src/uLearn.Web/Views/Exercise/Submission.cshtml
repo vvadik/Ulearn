@@ -9,7 +9,7 @@
 }
 
 <div class="exercise__submission"
-     data-version-update-url="@Url.Action("Submission", new { Model.CourseId, slideId = Model.Slide.Id, submissionId = "VERSION_ID", manualCheckingId = manualCheckingId, isLti = Model.IsLti, showOutput = "SHOW_OUTPUT" })">
+     data-version-update-url="@Url.Action("Submission", new { Model.CourseId, slideId = Model.Slide.Id, submissionId = "VERSION_ID", manualCheckingId = manualCheckingId, isLti = Model.IsLti, showOutput = Model.InstructorView ? "true" : "SHOW_OUTPUT", instructorView = Model.InstructorView, onlyAccepted = Model.ShowOnlyAccepted })">
 	@{
 		var currentSubmissionId = Model.SubmissionSelectedByUser != null ? (int?)Model.SubmissionSelectedByUser.Id : null;
 
@@ -17,7 +17,7 @@
 		{
 			Submissions = Model.Submissions,
 			CurrentSubmissionId = currentSubmissionId,
-			CanTryAgain = Model.ManualChecking == null,
+			CanTryAgain = !Model.InstructorView,
 		})
 
 		var classString = Model.IsGuest ? "code-guest" : "code-exercise";
@@ -33,6 +33,7 @@
 		if (Model.SubmissionSelectedByUser != null)
 		{
 			var status = "";
+			var statusClass = "";
 			if (Model.ReviewState == ExerciseReviewState.WaitingForReview)
 			{
 				status = "Все тесты пройдены, код ожидает проверки преподавателем";
@@ -51,17 +52,27 @@
 						smallNumbersAreWords = false,
 					}));
 			}
-			else
+			else if (Model.SubmissionSelectedByUser.AutomaticCheckingIsRightAnswer)
 			{
 				status = "Все тесты пройдены, задача сдана";
 			}
+			else if (Model.SubmissionSelectedByUser.AutomaticChecking != null && Model.SubmissionSelectedByUser.AutomaticChecking.Status != AutomaticExerciseCheckingStatus.Done)
+			{
+				status = "Проверяется: " + Model.SubmissionSelectedByUser.AutomaticChecking.Status;
+				statusClass = "waiting";
+			}
+			else if (Model.SubmissionSelectedByUser.AutomaticChecking != null)
+			{
+				status = "Результат проверки: " + Model.SubmissionSelectedByUser.AutomaticChecking.GetVerdict();
+				statusClass = "wrong";
+			}
 			if (!string.IsNullOrEmpty(status) && Model.ManualChecking == null)
 			{
-				<p class="exercise-status">@status</p>
+				<p class="exercise-status @statusClass">@status</p>
 			}
 		}
 
-		if (Model.ReviewState == ExerciseReviewState.Reviewed || Model.ManualChecking != null)
+		if (Model.ReviewState == ExerciseReviewState.Reviewed || Model.InstructorView)
 		{
 			<div class="exercise__reviews">
 				@foreach (var review in Model.Reviews.OrderBy(r => r.StartLine))
@@ -83,30 +94,35 @@
 			}
 		</script>
 
-		if (Model.ShowControls && Model.ManualChecking == null)
+		if (Model.ShowControls)
 		{
-			var acceptedSolutionsUrl = Model.Url != null
-				? Model.Url.Action("AcceptedSolutions", "Course", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
-				: "";
-			var acceptedSolutionsAction = Model.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", acceptedSolutionsUrl);
-			@SlideHtml.ExerciseControls(new ExerciseControlsModel(Model.CourseId, Model.Slide)
+			if (!Model.InstructorView)
 			{
-				IsCodeEditableAndSendable = Model.SubmissionSelectedByUser == null,
-				CanShowOutput = Model.SubmissionSelectedByUser != null,
-				IsShowOutputButtonActive = Model.ShowOutputImmediately,
-				AcceptedSolutionsAction = acceptedSolutionsAction,
-				RunSolutionUrl = Model.RunSolutionUrl,
-				UseHintUrl = Url.Action("UseHint", "Hint"),
-			})
+				var acceptedSolutionsUrl = Model.Url != null
+					? Model.Url.Action("AcceptedSolutions", "Course", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
+					: "";
+				var acceptedSolutionsAction = Model.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", acceptedSolutionsUrl);
+				@SlideHtml.ExerciseControls(new ExerciseControlsModel(Model.CourseId, Model.Slide)
+				{
+					IsCodeEditableAndSendable = Model.SubmissionSelectedByUser == null,
+					CanShowOutput = Model.SubmissionSelectedByUser != null,
+					IsShowOutputButtonActive = Model.ShowOutputImmediately,
+					AcceptedSolutionsAction = acceptedSolutionsAction,
+					RunSolutionUrl = Model.RunSolutionUrl,
+					UseHintUrl = Url.Action("UseHint", "Hint"),
+				})
 
-			@SlideHtml.RunErrors()
+				@SlideHtml.RunErrors()
 
-			if (!Model.IsLti)
-			{
-				@YouWillLoseScoresDialog(Model)
+				if (!Model.IsLti)
+				{
+					@YouWillLoseScoresDialog(Model)
+				}
 			}
 
-			if (Model.SubmissionSelectedByUser != null && Model.SubmissionSelectedByUser.AutomaticChecking != null)
+			if (Model.SubmissionSelectedByUser != null &&
+				Model.SubmissionSelectedByUser.AutomaticChecking != null &&
+				Model.SubmissionSelectedByUser.AutomaticChecking.Output != null)
 			{
 				var style = Model.ShowOutputImmediately ? "" : "display: none";
 				var isEmpty = string.IsNullOrEmpty(Model.SubmissionSelectedByUser.AutomaticChecking.Output.Text);
@@ -158,3 +174,4 @@
 		</div>
 	</div>
 }
+

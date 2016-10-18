@@ -131,7 +131,7 @@ p {
 	margin-bottom: 0;
 }
 
-.container {
+.slide-container .container {
 	max-width: 864px;
 }
 
@@ -416,6 +416,14 @@ p {
     margin-top: 10px;
 }
 
+.exercise-status.wrong {
+	background-color: #fd989c;
+}
+
+.exercise-status.waiting {
+	background-color: #fdfa98;
+}
+
 .no-display {
 	display: none;
 }
@@ -658,6 +666,10 @@ li.li-success {
 	font-size: 10pt;
 	font-weight: bold;
 	color: #060;
+}
+
+.comments .comment .comment__author-name sup {
+	font-weight: normal;
 }
 
 .comments .comment .comment__footer > :not(:first-child) {
