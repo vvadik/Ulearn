@@ -154,6 +154,11 @@ namespace uLearn.Web.DataContexts
 			return GetAllAcceptedSubmissions(courseId, new List<Guid> { slideId }).Where(s => s.UserId == userId);
 		}
 
+		public IEnumerable<UserExerciseSubmission> GetAllSubmissionsByUser(string courseId, Guid slideId, string userId)
+		{
+			return GetAllSubmissions(courseId, new List<Guid> { slideId }).Where(s => s.UserId == userId);
+		}
+
 		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, List<Guid> slidesIds)
 		{
 			var prepared = GetAllAcceptedSubmissions(courseId, slidesIds)

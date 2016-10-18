@@ -35,21 +35,20 @@
 		<div class="media-body">
 			<div class="comment__header media-heading">
 				<div class="comment__author-name">
-					@if (Model.CanEditAndDeleteComment)
+					@Model.Comment.Author.VisibleName
+					@if (User.HasAccessFor(Model.Comment.CourseId, CourseRole.Instructor))
 					{
-						@Html.ActionLink(
-								 Model.Comment.Author.VisibleName,
-								 "ShowSolutions", "Analytics",
-								 new
-								 {
-									 courseId = Model.Comment.CourseId,
-									 slideId = Model.Comment.SlideId,
-									 userId = Model.Comment.AuthorId
-								 }, null)
-					}
-					else
-					{
-						@Model.Comment.Author.VisibleName
+						<sup>
+							@Html.ActionLink(
+							"смотреть решения",
+							"UserSolutions", "Analytics",
+							new
+							{
+								courseId = Model.Comment.CourseId,
+								slideId = Model.Comment.SlideId,
+								userId = Model.Comment.AuthorId
+							}, null)
+						</sup>
 					}
 				</div>@if (Model.ShowContextInformation)
 				{

@@ -88,7 +88,7 @@ WebViewPage.WriteTo(@__razor_helper_writer, Block((dynamic)block, context, Html)
 		else if (context.RevealHidden)
 		{
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<div class=\'revealed\' data-toggle=\"tooltip\" data-placement=\"left\" title=\"Этот " +
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<div class=\"revealed\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"Этот " +
 "блок студенты не видят\">\r\n");
 
 
@@ -454,9 +454,9 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"exercise\">\r
 			if (Html != null)
 			{
 				
-WebViewPage.WriteTo(@__razor_helper_writer, Html.Action("Submission", "Exercise", new { courseId = context.Course.Id, slideId = context.Slide.Id, submissionId = context.VersionId, manualCheckingId = manualCheckingId, isLti = data.IsLti }));
+WebViewPage.WriteTo(@__razor_helper_writer, Html.Action("Submission", "Exercise", new { courseId = context.Course.Id, slideId = context.Slide.Id, submissionId = context.VersionId, manualCheckingId = manualCheckingId, isLti = data.IsLti, instructionView = manualCheckingId != null }));
 
-                                                                                                                                                                                                       
+                                                                                                                                                                                                                                                   
 			}
 			else
 			{

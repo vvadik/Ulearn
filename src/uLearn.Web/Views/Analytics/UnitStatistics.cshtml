@@ -3,7 +3,7 @@
 
 @model UnitStatisticPageModel
 @{
-	ViewBag.Title = "Статистика и успеваемость";
+	ViewBag.Title = "Аналитика";
 }
 
 @helper UsersByCountVisitedSlidesTable(string id, Dictionary<int, int> data)
@@ -30,7 +30,7 @@
 <body>
 	<div class="container">
 
-		<h1>Статистика</h1>
+		<h1>Аналитика</h1>
 
 		<div class="analytics__dashboard">
 			@using (Html.BeginForm("UnitStatistics", "Analytics", FormMethod.Get, new { @class="form-inline", id="unit-statistics-filter-form" }))
@@ -232,7 +232,21 @@
 									var visit = Model.SlidesVisits.GetOrDefault(exerciseOrQuiz.Id, new List<Visit>()).FirstOrDefault(v => v.UserId == userInfo.UserId);
 									if (visit != null && visit.IsPassed)
 									{
-										<span class="small-table__right-cell" title="@visit.Timestamp.ToPrettyString()">@visit.Score</span>
+										<span class="small-table__right-cell" title="@visit.Timestamp.ToPrettyString()">
+											@if (exerciseOrQuiz is ExerciseSlide)
+											{
+												@Html.ActionLink(
+													visit.Score.ToString(),
+													"UserSolutions",
+													"Analytics",
+													new { courseId = Model.CourseId, slideId = exerciseOrQuiz.Id, userId = userInfo.UserId },
+													new { title = "Посмотреть решения", target = "_blank" })
+											}
+											else
+											{
+												@visit.Score
+											}
+										</span>
 									}
 									else
 									{

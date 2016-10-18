@@ -4,6 +4,11 @@
 {
 	private static string GetSubmissionDescription(UserExerciseSubmission submission)
 	{
+		if (submission.AutomaticChecking != null && submission.AutomaticChecking.Status != AutomaticExerciseCheckingStatus.Done)
+			return ", (" + submission.AutomaticChecking.Status + ")";
+		if (submission.AutomaticChecking != null && !submission.AutomaticChecking.IsRightAnswer)
+			return ", " + submission.AutomaticChecking.GetVerdict();
+
 		if (submission.ManualCheckings != null && submission.ManualCheckings.Count > 0)
 			if (submission.ManualCheckings.Any(s => s.IsChecked))
 				return ", проверено преподавателем";
