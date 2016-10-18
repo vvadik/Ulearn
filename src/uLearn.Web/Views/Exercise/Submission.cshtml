@@ -87,6 +87,9 @@
 		}
 		<textarea id="secretCodeExercise" class="hide">@Model.Block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
 		<textarea class="code @classString hidden" data-lang="@Model.Block.LangId">@(Model.Solution ?? Model.Block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+		<div class="loading-spinner">
+			<img src="/Content/loading.gif" />
+		</div>
 		<script type="text/javascript">
 			function cleanUserCode() {
 				var $secretCodeExercise = $('#secretCodeExercise');
