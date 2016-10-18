@@ -168,12 +168,12 @@
 
 			if (Html != null)
 			{
-				@Html.Action("Submission", "Exercise", new { courseId = context.Course.Id, slideId = context.Slide.Id, submissionId = context.VersionId, manualCheckingId = manualCheckingId, isLti = data.IsLti, instructionView = manualCheckingId != null })
+				@Html.Action("Submission", "Exercise", new { courseId = context.Course.Id, slideId = context.Slide.Id, submissionId = context.VersionId, manualCheckingId = manualCheckingId, isLti = data.IsLti, instructorView = manualCheckingId != null })
 			}
 			else
 			{
 				<div class="exercise__submission">
-					<textarea class="code code-exercise" data-lang="@block.LangId">@(block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+					<textarea class="code code-exercise hidden" data-lang="@block.LangId">@(block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 					@ExerciseControls(new ExerciseControlsModel(context.Course.Id, (ExerciseSlide)context.Slide)
 				   {
 					   IsCodeEditableAndSendable = true,

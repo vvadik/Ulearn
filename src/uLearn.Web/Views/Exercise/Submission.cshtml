@@ -120,7 +120,8 @@
 				}
 			}
 
-			if (Model.SubmissionSelectedByUser != null &&
+			if (Model.ManualChecking == null && 
+				Model.SubmissionSelectedByUser != null &&
 				Model.SubmissionSelectedByUser.AutomaticChecking != null &&
 				Model.SubmissionSelectedByUser.AutomaticChecking.Output != null)
 			{

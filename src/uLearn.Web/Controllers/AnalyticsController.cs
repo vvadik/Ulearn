@@ -365,9 +365,8 @@ namespace uLearn.Web.Controllers
 				.ToArray();
 		}
 
-		public ActionResult UserSolutions(string courseId, string userId, Guid slideId)
+		public ActionResult UserSolutions(string courseId, string userId, Guid slideId, int? version=null)
 		{
-			var solutions = db.UserExerciseSubmissions.Where(s => s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).Take(10).ToList();
 			var user = db.Users.Find(userId);
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.FindSlideById(slideId) as ExerciseSlide;
@@ -379,7 +378,7 @@ namespace uLearn.Web.Controllers
 				Course = course,
 				GroupsNames = groupsRepo.GetUserGroupsNamesAsString(course.Id, userId, User),
 				Slide = slide,
-				Solutions = solutions
+				SubmissionId = version
 			};
 			return View(model);
 		}
@@ -428,11 +427,11 @@ namespace uLearn.Web.Controllers
 
 	public class UserSolutionsViewModel
 	{
+		public ExerciseSlide Slide { get; set; }
 		public ApplicationUser User { get; set; }
 		public Course Course { get; set; }
-		public string GroupsNames;
-		public List<UserExerciseSubmission> Solutions { get; set; }
-		public ExerciseSlide Slide { get; set; }
+		public string GroupsNames { get; set; }
+		public int? SubmissionId { get; set; }
 	}
 
 	public class UserProgressViewModel

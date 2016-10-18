@@ -7,15 +7,32 @@
 @{
 	ViewBag.Title = Model.CourseTitle;
 	ViewBag.Slide = Model.Slide;
+
+	var mainDivClass = "";
 }
 
-@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
 
-<div class="slide-container">
+@if (Model.ManualChecking == null)
+{
+	mainDivClass = "slide-container";
+	@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
+}
+
+<div class="@mainDivClass">
 	<div class="container body-content">
 		<div class="row">
 			<div class='slide'>
-				<h1>@Model.Slide.Title <span class="score">@GetScore(Model.Score)</span></h1>
+				<h1>
+					@if (Model.ManualChecking != null)
+					{
+						@Html.RouteLink(Model.Slide.Title, "Course.SlideById", new { courseId = Model.CourseId, slideId = Model.Slide.Url }, new { title = "Перейти к слайду" })
+					}
+					else
+					{
+						@Model.Slide.Title
+					}
+					<span class="score">@GetScore(Model.Score)</span>
+				</h1>
 				@if (!string.IsNullOrEmpty(Model.Error))
 				{
 					<p class="alert alert-danger">@Model.Error</p>
@@ -50,27 +67,31 @@
 				}
 
 			</div>
-			@if (User.HasAccessFor(Model.CourseId, CourseRole.Tester))
+			@if (Model.ManualChecking == null)
 			{
-				using (Html.BeginForm("ForgetAll", "Course"))
+				if (User.HasAccessFor(Model.CourseId, CourseRole.Tester))
 				{
-					<input type="hidden" name="slideId" value="@Model.Slide.Id" />
-					<input type="hidden" name="courseId" value="@Model.CourseId" />
-					<button class="btn btn-danger" type="submit">Удалить мой прогресс</button>
-					<span class="text-danger">(для тестеров и преподавателей)</span>
+					using (Html.BeginForm("ForgetAll", "Course"))
+					{
+						<input type="hidden" name="slideId" value="@Model.Slide.Id" />
+						<input type="hidden" name="courseId" value="@Model.CourseId" />
+						<button class="btn btn-danger" type="submit">Удалить мой прогресс</button>
+						<span class="text-danger">(для тестеров и преподавателей)</span>
+					}
 				}
-			}
-			@if (!Model.IsGuest)
-			{
-				@Html.Partial("_RatesBar")
-			}
-			else
-			{
-				@Html.Partial("_LoginForContinue")
-			}
-			@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false })
+				if (!Model.IsGuest)
+				{
+					@Html.Partial("_RatesBar")
+				}
+				else
+				{
+					@Html.Partial("_LoginForContinue")
+				}
 
-			@Html.Action("SlideComments", "Comments", new { courseId = Model.CourseId, slideId = Model.Slide.Id})
+				@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false })
+
+				@Html.Action("SlideComments", "Comments", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
+			}
 		</div>
 	</div>
 </div>
