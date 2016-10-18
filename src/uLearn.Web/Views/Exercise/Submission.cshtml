@@ -86,7 +86,7 @@
 			</div>
 		}
 		<textarea id="secretCodeExercise" class="hide">@Model.Block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
-		<textarea class="code @classString" data-lang="@Model.Block.LangId">@(Model.Solution ?? Model.Block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+		<textarea class="code @classString hidden" data-lang="@Model.Block.LangId">@(Model.Solution ?? Model.Block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 		<script type="text/javascript">
 			function cleanUserCode() {
 				var $secretCodeExercise = $('#secretCodeExercise');
