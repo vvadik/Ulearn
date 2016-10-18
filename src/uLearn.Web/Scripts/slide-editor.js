@@ -113,6 +113,7 @@ function initCodeEditor($parent) {
 			var element = this;
 			var $el = $(element);
 			var langId = $el.data("lang");
+			$el.parent().find('.loading-spinner').hide();
 			var editor = CodeMirror.fromTextArea(element,
 			{
 				mode: getMode(langId),

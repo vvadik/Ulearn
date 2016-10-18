@@ -472,7 +472,8 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">");
 
                                  WebViewPage.WriteTo(@__razor_helper_writer, block.ExerciseInitialCode.EnsureEnoughLines(4));
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n\t\t\t\t\t");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n\t\t\t\t\t<div class=\"loading-spinner\">\r\n\t\t\t\t\t\t<img src=\"/Content/loading" +
+".gif\" />\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t");
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, ExerciseControls(new ExerciseControlsModel(context.Course.Id, (ExerciseSlide)context.Slide)

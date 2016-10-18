@@ -1390,3 +1390,20 @@ table.analytics__user-answers {
 #exercise__submission__output.empty::before {
 	content: "Нет вывода программы"
 }
+
+/* Loading spinner */
+.loading-spinner {
+	text-align: center;
+	padding: 10px 0;
+}
+
+.loading-spinner img {
+	height: 60px;
+	width: auto;
+}
+
+.exercise__submission .loading-spinner {
+	position: relative;
+	top: -10px;
+	padding: 30px 0;
+}
