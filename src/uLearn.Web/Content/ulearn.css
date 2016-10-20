@@ -131,7 +131,8 @@ p {
 	margin-bottom: 0;
 }
 
-.slide-container .container {
+.slide-container .container,
+.main-page .container {
 	max-width: 864px;
 }
 
