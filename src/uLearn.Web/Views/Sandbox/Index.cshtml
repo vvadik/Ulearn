@@ -18,17 +18,17 @@
 			<th>Verdict</th>
 		</tr>
 	</thead>
-	@for (var i = 0; i < Model.Submissions.Count; i++)
+	@foreach (var submission in Model.Submissions)
 	{
-		var submission = Model.Submissions[i];
-		var name = submission.AutomaticChecking.DisplayName ?? submission.Id.ToString();
-		<tr class="@SubmissionClass(submission.AutomaticChecking.GetVerdict()) submitions-item" data-id="@submission.Id">
+		var automaticChecking = submission.AutomaticChecking ?? new AutomaticExerciseChecking();
+		var name = automaticChecking.DisplayName ?? submission.Id.ToString();
+		<tr class="@SubmissionClass(automaticChecking.GetVerdict()) submitions-item" data-id="@submission.Id">
 			<td>@submission.Id</td>
 			<td>@submission.Timestamp.ToPrettyString()</td>
-			<td>@submission.AutomaticChecking.Elapsed</td>
+			<td>@automaticChecking.Elapsed</td>
 			<td>@name</td>
-			<td>@submission.AutomaticChecking.Status</td>
-			<td>@submission.AutomaticChecking.GetVerdict()</td>
+			<td>@automaticChecking.Status</td>
+			<td>@automaticChecking.GetVerdict()</td>
 		</tr>
 	}
 </table>
