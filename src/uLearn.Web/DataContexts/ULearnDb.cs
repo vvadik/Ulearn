@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using EntityFramework.Functions;
 using Microsoft.AspNet.Identity.EntityFramework;
 using uLearn.Web.Migrations;
 using uLearn.Web.Models;
@@ -16,6 +17,11 @@ namespace uLearn.Web.DataContexts
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
+
+			/* See https://weblogs.asp.net/dixin/entityframework.functions
+			 * for detailed description about working with stored functions and procedures */
+			modelBuilder.AddFunctions<UsersRepo>();
+
 			modelBuilder.Entity<CommentLike>()
 				.HasRequired(x => x.Comment)
 				.WithMany(x => x.Likes)

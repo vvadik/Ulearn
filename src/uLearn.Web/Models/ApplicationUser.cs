@@ -25,23 +25,13 @@ namespace uLearn.Web.Models
 		public string AvatarUrl { get; set; }
 
 		[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-		public string FirstAndLastName
+		public string Names
 		{
-			get { return FirstName + " " + LastName; }
+			get { return UserName + " " + FirstName + " " + LastName; }
 			private set { /* Empty for EF */ }
 		}
 
-		[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-		public string LastAndFirstName
-		{
-			get { return LastName + " " + FirstName; }
-			private set { /* Empty for EF */ }
-		}
-
-		public bool HasAvatar
-		{
-			get { return ! string.IsNullOrEmpty(AvatarUrl); }
-		}
+		public bool HasAvatar => ! string.IsNullOrEmpty(AvatarUrl);
 
 		public string VisibleName
 		{

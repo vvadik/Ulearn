@@ -16,7 +16,7 @@
 	<p>
 		@using (Html.BeginForm("List", "Account", FormMethod.Get, new { @class = "form-inline" }))
 		{
-			<input class="form-control" type="text" name="namePrefix" />
+			<input class="form-control" type="text" name="namePrefix" value="@Model.NamePrefix"/>
 			<button class="btn btn-primary button" type="submit">Фильтровать по имени</button>
 		}
 	</p>
