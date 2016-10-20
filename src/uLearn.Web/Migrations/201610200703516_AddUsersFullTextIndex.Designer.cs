@@ -7,13 +7,13 @@ namespace uLearn.Web.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddComputedColumnsForUser : IMigrationMetadata
+    public sealed partial class AddUsersFullTextIndex : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddComputedColumnsForUser));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddUsersFullTextIndex));
         
         string IMigrationMetadata.Id
         {
-            get { return "201610132201527_AddComputedColumnsForUser"; }
+            get { return "201610200703516_AddUsersFullTextIndex"; }
         }
         
         string IMigrationMetadata.Source

@@ -9,22 +9,8 @@ namespace uLearn.Web.DataContexts
 {
 	public static class AppUserQueryExtentions
 	{
-		public static IQueryable<ApplicationUser> FilterByName(this IQueryable<ApplicationUser> applicationUsers, string namePrefix)
-		{
-			return string.IsNullOrEmpty(namePrefix)
-				? applicationUsers
-				: applicationUsers.Where(
-					u => u.UserName.StartsWith(namePrefix) ||
-						 u.FirstName.StartsWith(namePrefix) ||
-						 u.LastName.StartsWith(namePrefix) ||
-						 u.FirstAndLastName.StartsWith(namePrefix) ||
-						 u.LastAndFirstName.StartsWith(namePrefix)
-				);
-		}
-
 		public static IQueryable<ApplicationUser> FilterByRole(this IQueryable<ApplicationUser> applicationUsers, IdentityRole role, UserManager<ApplicationUser> userManager)
 		{
-			
 			return role == null
 				? applicationUsers
 				: applicationUsers.Where(u => u.Roles.Any(r => r.RoleId == role.Id));
@@ -59,6 +45,5 @@ namespace uLearn.Web.DataContexts
 					Roles = userManager.GetRoles(user.Id).ToList()
 				}).ToList();
 		}
-
 	}
 }
