@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using EntityFramework.Functions;
 using Microsoft.AspNet.Identity;
@@ -54,6 +52,7 @@ namespace uLearn.Web.DataContexts
 	    private const string dbo = nameof(dbo);
 
 		[TableValuedFunction(nameof(GetUsersByNamePrefix), nameSpace, Schema = dbo)]
+		// ReSharper disable once MemberCanBePrivate.Global
 		public IQueryable<UserIdWrapper> GetUsersByNamePrefix(string name)
 		{
 			if (string.IsNullOrEmpty(name))

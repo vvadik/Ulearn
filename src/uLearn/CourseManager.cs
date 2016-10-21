@@ -157,7 +157,7 @@ namespace uLearn
 			return course;
 		}
 
-		private static void ClearDirectory(DirectoryInfo directory, bool deleteDirectory=false)
+		private static void ClearDirectory(DirectoryInfo directory, bool deleteDirectory = false)
 		{
 			foreach (var file in directory.GetFiles())
 				file.Delete();
@@ -424,12 +424,12 @@ namespace uLearn
 		{
 			var tempDirectoryName = coursesDirectory.GetSubdir(Path.GetRandomFileName());
 			LockCourse(course.Id);
-			
+
 			try
 			{
-				
+
 				TrySeveralTimes(() => Directory.Move(destinationDirectory.FullName, tempDirectoryName.FullName));
-				
+
 				try
 				{
 					TrySeveralTimes(() => Directory.Move(sourceDirectory.FullName, destinationDirectory.FullName));
@@ -453,12 +453,14 @@ namespace uLearn
 
 		private void FixFileReferencesInCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
 		{
+			foreach (var instructorNote in course.InstructorNotes)
+				instructorNote.File = (FileInfo)GetNewPathForFileAfterMoving(instructorNote.File, sourceDirectory, destinationDirectory);
 			foreach (var slide in course.Slides)
 			{
-				slide.Info.SlideFile = (FileInfo) GetNewPathForFileAfterMoving(slide.Info.SlideFile, sourceDirectory, destinationDirectory);
+				slide.Info.SlideFile = (FileInfo)GetNewPathForFileAfterMoving(slide.Info.SlideFile, sourceDirectory, destinationDirectory);
 
 				foreach (var exerciseBlock in slide.Blocks.OfType<ProjectExerciseBlock>())
-					exerciseBlock.SlideFolderPath = (DirectoryInfo) GetNewPathForFileAfterMoving(exerciseBlock.SlideFolderPath, sourceDirectory, destinationDirectory);
+					exerciseBlock.SlideFolderPath = (DirectoryInfo)GetNewPathForFileAfterMoving(exerciseBlock.SlideFolderPath, sourceDirectory, destinationDirectory);
 			}
 		}
 

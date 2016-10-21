@@ -56,7 +56,7 @@ namespace uLearn.Web
 
 		public static IEnumerable<string> GetCoursesIdFor(this IPrincipal principal, CourseRole role)
 		{
-			return principal.GetAllRoles().Where(t => t.Item2 == role).Select(t => t.Item1);
+			return principal.GetAllRoles().Where(t => t.Item2 <= role).Select(t => t.Item1);
 		}
 
 		private static ClaimsPrincipal ToClaimsPrincipal(this IPrincipal principal)

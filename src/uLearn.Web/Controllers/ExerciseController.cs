@@ -285,12 +285,12 @@ namespace uLearn.Web.Controllers
 					submissions.LastOrDefault(s => s.AutomaticCheckingIsRightAnswer);
 		}
 
-		public ActionResult Submission(string courseId, Guid slideId, int? submissionId=null, int? manualCheckingId = null, bool isLti = false, bool showOutput = false, bool instructorView = false, bool onlyAccepted = true)
+		public ActionResult Submission(string courseId, Guid slideId, string userId=null, int? submissionId=null, int? manualCheckingId = null, bool isLti = false, bool showOutput = false, bool instructorView = false, bool onlyAccepted = true)
 		{
 			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
 				instructorView = false;
-
-			var currentUserId = User.Identity.GetUserId();
+			
+			var currentUserId = userId ?? User.Identity.GetUserId();
 			UserExerciseSubmission submission = null;
 			if (submissionId.HasValue && submissionId.Value > 0)
 			{
