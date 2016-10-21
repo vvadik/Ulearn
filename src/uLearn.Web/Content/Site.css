@@ -95,6 +95,25 @@ a.no-underline:focus {
 	text-decoration: none;
 }
 
+.dropdown-menu .dropdown-header > a {
+	display: initial;
+	color: #428bca;
+}
+
+.dropdown-menu .dropdown-header > a .glyphicon {
+	font-size: 80%;
+	margin-left: 5px;
+}
+
+.dropdown-menu .dropdown-header > a:hover,
+.dropdown-menu .dropdown-header > a:focus,
+.dropdown-menu .dropdown-header > a:active {
+	height: auto;
+	background-color: initial;
+	color: #2a6496;
+	text-decoration: underline;
+}
+
 .vspace-20 {
 	display: inline-block;
 	height: 20px;
