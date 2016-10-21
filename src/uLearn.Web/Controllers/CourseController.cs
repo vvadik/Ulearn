@@ -397,7 +397,7 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult CourseInstructorNavbar(string courseId)
 		{
-			if (string.IsNullOrEmpty(courseId))
+			if (string.IsNullOrEmpty(courseId) || !User.HasAccessFor(courseId, CourseRole.Instructor))
 				return PartialView((CourseInstructorNavbarViewModel)null);
 
 			var course = courseManager.GetCourse(courseId);
