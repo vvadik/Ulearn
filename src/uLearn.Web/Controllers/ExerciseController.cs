@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -225,6 +224,58 @@ namespace uLearn.Web.Controllers
 			}
 
 			return Redirect(nextUrl);
+		}
+
+		[System.Web.Mvc.HttpPost]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		public async Task<ActionResult> SimpleScoreExercise(int submissionId, int exerciseScore, bool ignoreNewestSubmission=false)
+		{
+			var submission = solutionsRepo.FindSubmissionById(submissionId);
+			var courseId = submission.CourseId;
+			var slideId = submission.SlideId;
+			var userId = submission.UserId;
+
+			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
+			if (!ignoreNewestSubmission)
+			{
+				var lastAcceptedSubmission = solutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).OrderByDescending(s => s.Timestamp).FirstOrDefault();
+				if (lastAcceptedSubmission != null && lastAcceptedSubmission.Id != submission.Id)
+					return Json(
+						new {
+							status = "error",
+							error = "has_newest_submission",
+							submissionId = lastAcceptedSubmission.Id,
+							submissionDate = lastAcceptedSubmission.Timestamp.ToAgoPrettyString(true)
+						});
+			}
+
+			var manualScore = slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId);
+			if (exerciseScore < manualScore)
+				return Json(
+					new
+					{
+						status = "error",
+						error = "has_greatest_score",
+						score = manualScore,
+						checkedQueueUrl = Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId, done = true})
+					});
+
+			/* TODO: check if 0 <= exercisScore <= exercise.MaxReviewScore */
+
+			await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, slideId, userId);
+			var checking = await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, submission);
+			await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId());
+			await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, exerciseScore);
+			await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
+
+			return Json(
+				new
+				{
+					status = "ok",
+					score = exerciseScore.PluralizeInRussian(new RussianPluralizationOptions { One = "балл", Two = "балла", Five = "баллов", Gender = Gender.Male, hideNumberOne = false, smallNumbersAreWords = false})
+				});
 		}
 
 		public ActionResult SubmissionsPanel(string courseId, Guid slideId, string userId = "", int? currentSubmissionId = null, bool canTryAgain=true)

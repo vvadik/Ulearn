@@ -51,7 +51,7 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public async Task AddManualExerciseChecking(string courseId, Guid slideId, string userId, UserExerciseSubmission submission)
+		public async Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, UserExerciseSubmission submission)
 		{
 			var manualChecking = new ManualExerciseChecking
 			{
@@ -75,6 +75,8 @@ namespace uLearn.Web.DataContexts
 					string.Join("\r\n",
 					e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
 			}
+
+			return manualChecking;
 		}
 		
 		public async Task RemoveWaitingManualExerciseCheckings(string courseId, Guid slideId, string userId)

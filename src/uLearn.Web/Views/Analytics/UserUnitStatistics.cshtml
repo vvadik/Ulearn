@@ -1,0 +1,48 @@
+﻿@using uLearn
+@model uLearn.Web.Controllers.UserUnitStatisticsPageModel
+
+@{
+	ViewBag.Title = Model.User.VisibleName + ", " + Model.UnitName;
+}
+
+<div class="container">
+	<h2>«@Model.UnitName», @Model.User.VisibleName</h2>
+	<div class="user-submissions">
+		@foreach (var submission in Model.Submissions)
+		{
+			var slide = (ExerciseSlide)Model.Slides[submission.SlideId];
+			var block = slide.Exercise;
+			if (!block.RequireReview)
+			{
+				continue;
+			}
+			<div class="user-submission">
+				<div class="user-submission__info">
+					<h3 class="title">@slide.Title</h3>
+					<div class="date">
+						Сдана <span title="@submission.Timestamp.ToPrettyString(true)">@submission.Timestamp.ToAgoPrettyString(true)</span>,
+						@Html.ActionLink("смотреть код", "UserSolutions", "Analytics", new { courseId = submission.CourseId, slideId = slide.Id, userId = submission.UserId }, new { target = "_blank" })
+					</div>
+					<div class="hint">смахните вправо для оценки &rarr;</div>
+				</div>
+
+				<form method="POST" action="@Url.Action("SimpleScoreExercise", "Exercise")" class="exercise__simple-score-form">
+					<input type="hidden" name="submissionId" value="@submission.Id"/>
+
+					<h4>Код-ревью (максимальный балл @block.MaxReviewScore)</h4>
+					<div class="exercise__score">
+						<input type="hidden" name="exerciseScore"/>
+						<div class="btn-group" role="group">
+							@foreach (var scorePercent in new[] { 0, 25, 50, 75, 100 })
+							{
+								var score = block.MaxReviewScore * scorePercent / 100;
+								<button type="button" class="btn btn-default" data-value="@score">@scorePercent%</button>
+							}
+						</div>
+						<div class="status"></div>
+					</div>
+				</form>
+			</div>
+		}
+	</div>
+</div>

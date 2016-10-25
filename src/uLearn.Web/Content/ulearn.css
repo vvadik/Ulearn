@@ -1296,7 +1296,7 @@ table.analytics__user-answers {
 }
 
 .code-review + .CodeMirror {
-	width: 600px;
+	width: 900px;
 }
 
 .exercise__reviews {
@@ -1374,6 +1374,14 @@ table.analytics__user-answers {
 	width: auto;
 }
 
+.exercise__score .status {
+	padding: 5px 0;
+}
+
+.exercise__score .status.waiting { color: #a0932b; }
+.exercise__score .status.error { color: #a0372b }
+.exercise__score .status.success { color: #2ca02b }
+
 #exercise__submission__output {
     margin-top: 10px;
     font-family: monospace;
@@ -1390,6 +1398,45 @@ table.analytics__user-answers {
 
 #exercise__submission__output.empty::before {
 	content: "Нет вывода программы"
+}
+
+.user-submission + .user-submission {
+	margin-top: 15px;
+}
+
+.user-submission__info {
+	background-color: #c8ffd1;
+	margin-left: -15px;
+	padding: 12px 15px;
+}
+
+.user-submission__info h3 {
+	margin-top: 0;
+}
+
+.user-submission__info .hint {
+	display: none;
+}
+
+@media (max-width: 1000px) {
+	.user-submission {
+		overflow: hidden;
+		min-height: 110px;
+	}
+
+	.user-submission__info {
+		position: fixed;
+		z-index: 2;
+		width: 100%;
+		height: 110px;
+	}
+
+	.user-submission__info .hint {
+		display: block;
+		font-size: 12px;
+		color: #696;
+		margin-top: 10px;
+	}
 }
 
 /* Loading spinner */
