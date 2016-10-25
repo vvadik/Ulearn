@@ -24,6 +24,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 		private readonly GroupsRepo groupsRepo = new GroupsRepo();
+		private readonly UsersRepo usersRepo = new UsersRepo();
 
 		public AnalyticsController()
 			: this(WebCourseManager.Instance)
@@ -174,6 +175,32 @@ namespace uLearn.Web.Controllers
 				VisitedSlidesCountByUser = visitedSlidesCountByUser,
 				VisitedSlidesCountByUserAllTime = visitedSlidesCountByUserAllTime,
 			};
+			return View(model);
+		}
+
+		public ActionResult UserUnitStatistics(string courseId, string unitName, string userId)
+		{
+			var course = courseManager.GetCourse(courseId);
+			var user = usersRepo.FindUserById(userId);
+			if (user == null)
+				return HttpNotFound();
+
+			var slides = course.Slides.Where(s => s.Info.UnitName == unitName).ToList();
+			var exercises = slides.OfType<ExerciseSlide>();
+			var acceptedSubmissions = userSolutionsRepo
+				.GetAllAcceptedSubmissionsByUser(courseId, exercises.Select(s => s.Id), userId)
+				.OrderByDescending(s => s.Timestamp)
+				.DistinctBy(u => u.SlideId);
+
+			var model = new UserUnitStatisticsPageModel
+			{
+				Course = course,
+				UnitName = unitName,
+				User = user,
+				Slides = slides.ToDictionary(s => s.Id),
+				Submissions = acceptedSubmissions.ToList()
+			};
+
 			return View(model);
 		}
 
@@ -423,6 +450,15 @@ namespace uLearn.Web.Controllers
 				return result;
 			}
 		}
+	}
+	
+	public class UserUnitStatisticsPageModel
+	{
+		public Course Course { get; set; }
+		public string UnitName { get; set; }
+		public ApplicationUser User { get; set; }
+		public List<UserExerciseSubmission> Submissions { get; set; }
+		public Dictionary<Guid, Slide> Slides { get; set; }
 	}
 
 	public class UserSolutionsViewModel

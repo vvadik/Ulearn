@@ -203,7 +203,9 @@
 						var visitedSlidesCountAllTime = Model.VisitedSlidesCountByUserAllTime[userInfo.UserId];
 						var userVisibleName = userInfo.UserVisibleName != "" ? userInfo.UserVisibleName : userInfo.UserName;
 						<div>
-							<div class="ib" title="@userInfo.UserName">@userVisibleName.TruncateWithEllipsis(25)</div>
+							<div class="ib" title="@userInfo.UserName">
+								@Html.ActionLink(userVisibleName.TruncateWithEllipsis(25), "UserUnitStatistics", new { courseId = Model.CourseId, unitName = Model.UnitName, userId = userInfo.UserId}, new { title = "Посмотреть статистику пользователя " + userInfo.UserName })
+							</div>
 							<div class="ib pull-right">
 								<div class="student-progress progress">
 									<div class="progress-bar progress-bar-warning"
@@ -214,7 +216,7 @@
 										                         Two = "слайда",
 										                         Five = "слайдов",
 										                         Gender = Gender.Male
-									                         })) вне указанного период"></div>
+								})) вне указанного период"></div>
 									<div class="progress-bar progress-bar-success"
 									     style="width: @(100 * visitedSlidesCount / Model.Slides.Count)%"
 									     title="Посмотрел(а) @visitedSlidesCount.PluralizeInRussian(new RussianPluralizationOptions
