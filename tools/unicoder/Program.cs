@@ -13,6 +13,7 @@ namespace unicoder
 	{
 		static void Main(string[] args)
 		{
+			Console.WriteLine("Usage: unicoder <path> <file-pattern>");
 			var files = Directory.GetFiles(args[0], args[1], SearchOption.AllDirectories);
 			foreach (var file in files)
 			{
