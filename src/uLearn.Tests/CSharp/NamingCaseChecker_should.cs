@@ -11,14 +11,14 @@ namespace uLearn.CSharp
 			CheckCorrect("public class A{}");
 			CheckIncorrect("internal class a{}");
 		}
-		
+
 		[Test]
 		public void inspect_structName()
 		{
 			CheckCorrect("public struct A{}");
 			CheckIncorrect("internal struct a{}");
 		}
-		
+
 		[Test]
 		public void inspect_enumName()
 		{

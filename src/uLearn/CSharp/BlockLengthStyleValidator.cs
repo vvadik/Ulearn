@@ -16,9 +16,9 @@ namespace uLearn.CSharp
 	{
 		private readonly int maxLen;
 
-		public BlockLengthStyleValidator(int maxLen)
+		public BlockLengthStyleValidator(int maxLen = 25)
 		{
-			this.maxLen = maxLen > 0 ? maxLen : 25;
+			this.maxLen = maxLen;
 		}
 
 		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)

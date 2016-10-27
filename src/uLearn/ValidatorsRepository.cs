@@ -21,10 +21,9 @@ namespace uLearn
 					if (subValidator == "singlestaticmethod")
 						validator.AddValidator(new IsStaticMethodAttribute());
 					if (subValidator == "blocklen")
-					{
-						int maxLen = int.TryParse(pp[1], out maxLen) ? maxLen : -1;
-						validator.AddValidator(new BlockLengthStyleValidator(maxLen));
-					}
+						validator.AddValidator(new BlockLengthStyleValidator(int.Parse(pp[1])));
+					if (subValidator == "linelen")
+						validator.AddValidator(new LineLengthStyleValidator(int.Parse(pp[1])));
 					if (subValidator == "recursion")
 						validator.AddValidator(new RecursionStyleValidator());
 				}

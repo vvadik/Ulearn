@@ -113,7 +113,11 @@
     <Compile Include="CSharp\ExerciseBuilder.cs" />
     <Compile Include="CSharp\BlocksBuilder.cs" />
     <Compile Include="CSharp\ExerciseAttribute.cs" />
+    <Compile Include="CSharp\LineLengthStyleValidator.cs" />
+    <Compile Include="CSharp\NameStylePrimitives.cs" />
     <Compile Include="CSharp\NamingCaseStyleValidator.cs" />
+    <Compile Include="CSharp\NamingStyleValidator.cs" />
+    <Compile Include="CSharp\NotEmptyCodeValidator.cs" />
     <Compile Include="CSharp\RecursionStyleValidator.cs" />
     <Compile Include="CSharp\RedundantIfStyleValidator.cs" />
     <Compile Include="CSharp\CsMembersRemover.cs" />

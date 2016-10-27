@@ -2,12 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace uLearn.CSharp
 {
 	public static class SyntaxExtensions
 	{
+		public static bool IsVoid(this MethodDeclarationSyntax method)
+		{
+			var predefinedTypeSyntax = method.ReturnType as PredefinedTypeSyntax;
+			return predefinedTypeSyntax != null && predefinedTypeSyntax.Keyword.IsKind(SyntaxKind.VoidKeyword);
+		}
+
 		public static IEnumerable<MemberDeclarationSyntax> GetMembers(this SyntaxNode node)
 		{
 			return node.DescendantNodes()

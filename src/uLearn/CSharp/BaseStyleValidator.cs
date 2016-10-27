@@ -21,13 +21,12 @@ namespace uLearn.CSharp
 		{
 			return Report(GetSpan(syntaxNode), message);
 		}
-
 		protected string Report(SyntaxToken syntaxToken, string message)
 		{
 			return Report(GetSpan(syntaxToken), message);
 		}
 
-		private static string Report(FileLinePositionSpan span, string message)
+		public static string Report(FileLinePositionSpan span, string message)
 		{
 			var linePosition = span.StartLinePosition;
 			return "Строка {0}, позиция {1}: {2}".WithArgs(linePosition.Line + 1, linePosition.Character, message);
