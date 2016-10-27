@@ -106,6 +106,7 @@
     <Compile Include="CourseManager.cs" />
     <Compile Include="CSharp\BaseNamingChecker.cs" />
     <Compile Include="CSharp\BaseStyleValidator.cs" />
+    <Compile Include="CSharp\BlockLengthStyleValidator.cs" />
     <Compile Include="CSharp\CSharpSlideLoader.cs" />
     <Compile Include="CSharp\CSharpSolutionValidator.cs" />
     <Compile Include="CSharp\CsMembersExtractor.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="CSharp\BlocksBuilder.cs" />
     <Compile Include="CSharp\ExerciseAttribute.cs" />
     <Compile Include="CSharp\NamingCaseStyleValidator.cs" />
+    <Compile Include="CSharp\RecursionStyleValidator.cs" />
     <Compile Include="CSharp\RedundantIfStyleValidator.cs" />
     <Compile Include="CSharp\CsMembersRemover.cs" />
     <Compile Include="EnumerableExtensions.cs" />

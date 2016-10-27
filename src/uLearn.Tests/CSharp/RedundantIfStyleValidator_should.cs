@@ -67,8 +67,8 @@ namespace uLearn.CSharp
 void A(){ if (true) return true; else return false; }
 void B(){ if (false) return true; return false; }
 ");
-			Assert.That(errors, Is.StringContaining("Строка 2:"));
-			Assert.That(errors, Is.StringContaining("Строка 3:"));
+			Assert.That(errors, Is.StringContaining("Строка 2"));
+			Assert.That(errors, Is.StringContaining("Строка 3"));
 		}
 
 		private static string FindErrors(string code)
