@@ -13,6 +13,7 @@ namespace unicoder
 	{
 		static void Main(string[] args)
 		{
+			Console.WriteLine("Usage: unicoder <path> <file-pattern>");
 			var files = Directory.GetFiles(args[0], args[1], SearchOption.AllDirectories);
 			foreach (var file in files)
 			{
@@ -34,6 +35,7 @@ namespace unicoder
 			
 			var encoding = Encoding.UTF8;
 			if (utf8DetectionResult == ProbingState.NotMe) encoding = Encoding.GetEncoding(1251);
+			else return;
 			Console.WriteLine("Converting {0}. {1}", file, encoding.EncodingName);
 			var content = File.ReadAllText(file, encoding);
 			var firstNonAscii = content.Zip(Enumerable.Range(0, int.MaxValue), Tuple.Create)

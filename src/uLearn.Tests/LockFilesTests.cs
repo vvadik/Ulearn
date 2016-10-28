@@ -22,7 +22,7 @@ namespace uLearn
 			catch (IOException)
 			{
 			}
-			File.ReadAllText(lockFileName).ShouldBeEquivalentTo("temp");
+			File.ReadAllText(lockFileName).ShouldBeEquivalentTo("test");
 		}
 
 		private string CreateTempFile()
