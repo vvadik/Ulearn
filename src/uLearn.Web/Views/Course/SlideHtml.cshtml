@@ -211,7 +211,7 @@
 		{
 			var checking = (ManualExerciseChecking)context.ManualChecking;
 
-			@Html.Partial("~/Views/Exercise/_ExerciseScoreForm.cshtml", new ExerciseScoreFormModel(context.Course.Id, (ExerciseSlide) context.Slide, checking, context.GroupId))
+			@Html.Partial("~/Views/Exercise/_ExerciseScoreForm.cshtml", new ExerciseScoreFormModel(context.Course.Id, (ExerciseSlide) context.Slide, checking, context.GroupId, context.VersionId == null || checking.Submission.Id == context.VersionId))
 		}
 	</div>
 }

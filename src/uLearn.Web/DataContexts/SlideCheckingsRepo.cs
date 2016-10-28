@@ -252,22 +252,4 @@ namespace uLearn.Web.DataContexts
 				.ToList();
 		}
 	}
-
-	public class ManualCheckingQueueFilterOptions
-	{
-		public ManualCheckingQueueFilterOptions(string courseId, IEnumerable<string> usersIds = null, bool isUserIdsSupplement = false)
-		{
-			CourseId = courseId;
-			UsersIds = usersIds;
-			IsUserIdsSupplement = isUserIdsSupplement;
-		}
-
-		public string CourseId { get; set; }
-		/* If true, search only users which ids IS NOT in UsersIds*/
-		public bool IsUserIdsSupplement { get; set; }
-		public IEnumerable<string> UsersIds { get; set; }
-		public IEnumerable<Guid> SlidesIds { get; set; }
-		public bool OnlyChecked { get; set; }
-		public int Count { get; set; }
-	}
 }

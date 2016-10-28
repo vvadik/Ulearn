@@ -8,7 +8,7 @@ namespace uLearn.Web.Models
 		public string CourseId { get; set; }
 		public string UnitName { get; set; }
 		public List<string> UnitsNames { get; set; }
-		public int? GroupId { get; set; }
+		public string GroupId { get; set; }
 		public List<Group> Groups { get; set; }
 
 		public DateTime PeriodStart { get; set; }

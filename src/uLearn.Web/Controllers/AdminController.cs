@@ -221,40 +221,7 @@ namespace uLearn.Web.Controllers
 
 		private ManualCheckingQueueFilterOptions GetManualCheckingFilterOptionsByGroup(string courseId, string groupId)
 		{
-			/* if groupId = "all", get all users */
-			if (groupId == "all")
-				return new ManualCheckingQueueFilterOptions(courseId);
-			/* if groupId = "not-group", get all users not in any groups, available only for course admins */
-			if (groupId == "not-in-group" && User.HasAccessFor(courseId, CourseRole.CourseAdmin))
-			{
-				var usersInGroups = groupsRepo.GetUsersIdsForAllGroups(courseId);
-				return new ManualCheckingQueueFilterOptions(courseId, usersInGroups, true);
-			}
-
-			/* if groupId is null, get memers of all own groups */
-			if (string.IsNullOrEmpty(groupId))
-			{
-				var ownGroupsIds = groupsRepo.GetGroupsOwnedByUser(courseId, User).Select(g => g.Id).ToList();
-				var usersIds = new List<string>();
-				foreach (var ownGroupId in ownGroupsIds)
-				{
-					var groupUsersIds = groupsRepo.GetGroupMembers(ownGroupId).Select(u => u.Id).ToList();
-					usersIds.AddRange(groupUsersIds);
-				}
-				return new ManualCheckingQueueFilterOptions(courseId, usersIds);
-			}
-
-			int groupIdInt;
-			if (int.TryParse(groupId, out groupIdInt))
-			{
-				var group = groupsRepo.FindGroupById(groupIdInt);
-				if (group != null && groupsRepo.IsGroupAvailableForUser(group.Id, User))
-				{
-					var usersIds = groupsRepo.GetGroupMembers(group.Id).Select(u => u.Id);
-					return new ManualCheckingQueueFilterOptions(courseId, usersIds);
-				}
-			}
-			return new ManualCheckingQueueFilterOptions(courseId);
+			return ControllerUtils.GetFilterOptionsByGroup<ManualCheckingQueueFilterOptions>(groupsRepo, User, courseId, groupId);
 		}
 
 		private ActionResult ManualCheckingQueue<T>(string actionName, string viewName, string courseId, string groupId, bool done, string message = "") where T : AbstractManualSlideChecking

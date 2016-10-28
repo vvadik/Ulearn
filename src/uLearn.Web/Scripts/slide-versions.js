@@ -37,6 +37,19 @@ function setExerciseVersion(versionId, showOutput) {
 		$hints.show();
 
 		$('.exercise-version-link').removeAttr('disabled');
+
+		/* Disable scoring form if need */
+		var $scoreForm = $('.exercise__score-form');
+		if ($scoreForm.length > 0) {
+			var submissionId = parseInt($scoreForm.data('submissionId'));
+			if (submissionId != versionId) {
+				$scoreForm.find('input, .btn').attr('disabled', 'disabled');
+				$scoreForm.find('h4, a').addClass('text-muted');
+			} else {
+				$scoreForm.find('input, .btn').removeAttr('disabled');
+				$scoreForm.find('h4, a').removeClass('text-muted');
+			}
+		}
 	});
 }
 

@@ -87,12 +87,14 @@ namespace uLearn.Web.DataContexts
 				visit.IsPassed = false;
 			});
 		}
-		
-		public Dictionary<Guid, int> GetScoresForSlides(string courseId, string userId)
+
+		public Dictionary<Guid, int> GetScoresForSlides(string courseId, string userId, IEnumerable<Guid> slidesIds=null)
 		{
-			return db.Visits
-				.Where(v => v.CourseId == courseId && v.UserId == userId)
-				.GroupBy(v => v.SlideId, (s, visits) => new { Key = s, Value = visits.FirstOrDefault()})
+			var visits = db.Visits.Where(v => v.CourseId == courseId && v.UserId == userId);
+			if (slidesIds != null)
+				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
+			return visits
+				.GroupBy(v => v.SlideId, (s, v) => new { Key = s, Value = v.FirstOrDefault() })
 				.ToDictionary(g => g.Key, g => g.Value.Score);
 		}
 
@@ -160,9 +162,24 @@ namespace uLearn.Web.DataContexts
 			return filteredVisits;
 		}
 
-		public Dictionary<Guid, List<Visit>> GetVisitsInPeriodForEachSlide(IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds=null)
+		public IQueryable<Visit> GetVisitsInPeriod(VisitsFilterOptions options)
 		{
-			return GetVisitsInPeriod(slidesIds, periodStart, periodFinish, usersIds)
+			var filteredVisits = db.Visits.Where(v => options.PeriodStart <= v.Timestamp && v.Timestamp <= options.PeriodFinish);
+			if (options.SlidesIds != null)
+				filteredVisits = filteredVisits.Where(v => options.SlidesIds.Contains(v.SlideId));
+			if (options.UsersIds != null)
+			{
+				if (options.IsUserIdsSupplement)
+					filteredVisits = filteredVisits.Where(v => ! options.UsersIds.Contains(v.UserId));
+				else
+					filteredVisits = filteredVisits.Where(v => options.UsersIds.Contains(v.UserId));
+			}
+			return filteredVisits;
+		}
+
+		public Dictionary<Guid, List<Visit>> GetVisitsInPeriodForEachSlide(VisitsFilterOptions options)
+		{
+			return GetVisitsInPeriod(options)
 				.GroupBy(v => v.SlideId)
 				.ToDictionary(g => g.Key, g => g.ToList());
 		}
@@ -172,6 +189,20 @@ namespace uLearn.Web.DataContexts
 			var slidesCount = slidesIds.Count;
 
 			return GetVisitsInPeriod(slidesIds, periodStart, periodFinish, usersIds)
+				.DistinctBy(v => Tuple.Create(v.UserId, v.SlideId))
+				.GroupBy(v => v.UserId)
+				.Where(g => g.Count() == slidesCount)
+				.Select(g => g.Key);
+		}
+
+		public IEnumerable<string> GetUsersVisitedAllSlides(VisitsFilterOptions options)
+		{
+			if (options.SlidesIds == null)
+				throw new ArgumentNullException(nameof(options.SlidesIds));
+
+			var slidesCount = options.SlidesIds.Count();
+
+			return GetVisitsInPeriod(options)
 				.DistinctBy(v => Tuple.Create(v.UserId, v.SlideId))
 				.GroupBy(v => v.UserId)
 				.Where(g => g.Count() == slidesCount)

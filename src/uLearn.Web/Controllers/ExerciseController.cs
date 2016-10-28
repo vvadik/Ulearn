@@ -228,7 +228,7 @@ namespace uLearn.Web.Controllers
 
 		[System.Web.Mvc.HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public async Task<ActionResult> SimpleScoreExercise(int submissionId, int exerciseScore, bool ignoreNewestSubmission=false)
+		public async Task<ActionResult> SimpleScoreExercise(int submissionId, int exerciseScore, bool ignoreNewestSubmission=false, int? updateCheckingId = null)
 		{
 			var submission = solutionsRepo.FindSubmissionById(submissionId);
 			var courseId = submission.CourseId;
@@ -238,7 +238,7 @@ namespace uLearn.Web.Controllers
 			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
-			if (!ignoreNewestSubmission)
+			if (!ignoreNewestSubmission && !updateCheckingId.HasValue)
 			{
 				var lastAcceptedSubmission = solutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).OrderByDescending(s => s.Timestamp).FirstOrDefault();
 				if (lastAcceptedSubmission != null && lastAcceptedSubmission.Id != submission.Id)
@@ -252,7 +252,7 @@ namespace uLearn.Web.Controllers
 			}
 
 			var manualScore = slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId);
-			if (exerciseScore < manualScore)
+			if (exerciseScore < manualScore && !updateCheckingId.HasValue)
 				return Json(
 					new
 					{
@@ -265,7 +265,11 @@ namespace uLearn.Web.Controllers
 			/* TODO: check if 0 <= exercisScore <= exercise.MaxReviewScore */
 
 			await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, slideId, userId);
-			var checking = await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, submission);
+			ManualExerciseChecking checking;
+			if (updateCheckingId.HasValue)
+				checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(updateCheckingId.Value);
+			else
+				checking = await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, submission);
 			await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId());
 			await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, exerciseScore);
 			await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
@@ -274,7 +278,9 @@ namespace uLearn.Web.Controllers
 				new
 				{
 					status = "ok",
-					score = exerciseScore.PluralizeInRussian(new RussianPluralizationOptions { One = "балл", Two = "балла", Five = "баллов", Gender = Gender.Male, hideNumberOne = false, smallNumbersAreWords = false})
+					score = exerciseScore.PluralizeInRussian(new RussianPluralizationOptions { One = "балл", Two = "балла", Five = "баллов", Gender = Gender.Male, hideNumberOne = false, smallNumbersAreWords = false}),
+					totalScore = visitsRepo.GetScore(slideId, userId),
+					checkingId = checking.Id,
 				});
 		}
 
@@ -442,18 +448,20 @@ namespace uLearn.Web.Controllers
 
 	public class ExerciseScoreFormModel
 	{
-		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking, int? groupId = null)
+		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking, int? groupId = null, bool isCurrentSubmissionChecking = false)
 		{
 			CourseId = courseId;
 			Slide = slide;
 			Checking = checking;
 			GroupId = groupId;
+			IsCurrentSubmissionChecking = isCurrentSubmissionChecking;
 		}
 
 		public string CourseId { get; set; }
 		public ExerciseSlide Slide { get; set; }
 		public ManualExerciseChecking Checking { get; set; }
 		public int? GroupId { get; set; }
+		public bool IsCurrentSubmissionChecking { get; set; }
 	}
 }
 
