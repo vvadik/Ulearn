@@ -1,6 +1,7 @@
 ﻿$(document).ready(function () {
 	var $exerciseScoreForm = $('.exercise__score-form');
 	var $exerciseSimpleScoreForm = $('.exercise__simple-score-form');
+	var isSimpleScoreForm = $exerciseSimpleScoreForm.length > 0;
 	var $scoreBlock = $('.exercise__score');
 	var $otherScoreLink = $scoreBlock.find('.exercise__other-score-link');
 	// TODO: multiple $otherScoreInput on page with simple score forms
@@ -9,11 +10,14 @@
 	var sendSimpleScore = function ($scoreForm, ignoreNewestSubmission) {
 		ignoreNewestSubmission = ignoreNewestSubmission || false;
 		var $status = $scoreForm.find('.status');
+		var $userSubmissionInfo = $scoreForm.closest('.user-submission').find('.user-submission__info');
 		$status.removeClass('success').removeClass('error').text('Сохраняем..').addClass('waiting');
 
 		var postData = $scoreForm.serialize();
 		if (ignoreNewestSubmission)
 			postData += "&ignoreNewestSubmission=true";
+		if ($scoreForm.data('checkingId'))
+			postData += "&updateCheckingId=" + parseInt($scoreForm.data('checkingId'));
 
 		$.ajax({
 			type: 'post',
@@ -32,12 +36,20 @@
 						.replace('{NEW_SUBMISSION}', data.submissionId)
 						.replace('{NEW_SUBMISSION_DATE}', data.submissionDate);
 				} else if (data.error === 'has_greatest_score') {
-					error = 'Пользователь имеет за код-ревью по этой задаче больше баллов: {SCORE}. Новыми баллами вы не понизите его суммарную оценку. Если вы хотите исправить ошибочную оценку, <a href="{URL}" target="_blank">пройдите по ссылке</a>.';
+					error =
+						'Пользователь имеет за код-ревью по этой задаче больше баллов: {SCORE}. Новыми баллами вы не понизите его суммарную оценку. <a href="{URL}" target="_blank">Предыдущие код-ревью</a>.';
 					error = error.replace('{SCORE}', data.score).replace('{URL}', data.checkedQueueUrl);
 				}
 				$status.html(error);
 			} else {
 				$status.addClass('success').text('Сохранено: ' + data.score);
+				$scoreForm.data('checkingId', data.checkingId);
+				$userSubmissionInfo.find('.total-score').text(data.totalScore);
+				/* Lock after one second */
+				setTimeout(function () {
+					$status.text('');
+					$userSubmissionInfo.animate({ left: 15 });
+				}, 1000);
 			}
 		}).always(function() {
 			$status.removeClass('waiting');
@@ -69,15 +81,22 @@
 	$scoreBlock.find('.btn-group').on('click', '.btn', function () {
 		var $self = $(this);
 		var wasActive = $self.hasClass('active');
-		$scoreBlock.find('.btn-group .btn').removeClass('active');
-		$self.toggleClass('active', !wasActive);
+		var $btnGroup = $self.closest('.btn-group');
 
-		$otherScoreInput.hide();
-		$otherScoreLink.removeClass('active');
-		$otherScoreInput.val(wasActive ? "" : $self.data('value'));
+		$btnGroup.find('.btn').removeClass('active');
+		if (isSimpleScoreForm) {
+			$otherScoreInput.val($self.data('value'));
+			$self.addClass('active');
 
-		if ($exerciseSimpleScoreForm.length)
-			sendSimpleScore($self.closest('.exercise__simple-score-form'));
+			var $scoreForm = $self.closest('.exercise__simple-score-form');
+			sendSimpleScore($scoreForm);
+		} else {
+			$self.toggleClass('active', !wasActive);
+
+			$otherScoreInput.hide();
+			$otherScoreLink.removeClass('active');
+			$otherScoreInput.val(wasActive ? "" : $self.data('value'));
+		}
 	});
 
 	$exerciseScoreForm.find('input[type=submit]').click(function() {
@@ -110,9 +129,16 @@
 		$self.css({ left: left + e.deltaX });
 	}).bind('moveend', function(e) {
 		var $self = $(this);
-		if (2 * e.distX < $self.width())
+		if (e.distX < 50)
 			$self.animate({ left: 15 });
-		else
+		else {
+			/* Unlock */
 			$self.animate({ left: $(window).width() + 15 });
+			/* And lock after 30 seconds */
+			setTimeout(function () {
+				$self.closest('.user-submission').find('.status').text('')
+				$self.animate({ left: 15 });
+			}, 30000);
+		}
 	});
 });

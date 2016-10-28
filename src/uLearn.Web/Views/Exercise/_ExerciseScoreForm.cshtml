@@ -4,6 +4,11 @@
 	var block = Model.Slide.Exercise;
 }
 
+@helper IsScoreFormActive()
+{
+	@(Model.IsCurrentSubmissionChecking ? "" : " disabled=\"disabled\" ")
+}
+
 <div class="text-muted">Выделите участок кода, чтобы оставить комментарий</div>
 
 <div class="exercise__add-review" style="display: none"
@@ -27,12 +32,12 @@
 	</div>
 </div>
 
-<form method="POST" action="@Url.Action("ScoreExercise", "Exercise", new { recheck = Model.Checking.IsChecked })" class="exercise__score-form">
+<form method="POST" action="@Url.Action("ScoreExercise", "Exercise", new { recheck = Model.Checking.IsChecked })" class="exercise__score-form" data-submission-id="@Model.Checking.Submission.Id">
 	<input type="hidden" name="id" value="@Model.Checking.Id" />
 	<input type="hidden" name="errorUrl" value="@Url.RouteUrl("Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, CheckQueueItemId = Model.Checking.Id, Model.GroupId })&amp;error=" />
 	<input type="hidden" name="nextUrl" value="@Url.Action("ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId, done = Model.Checking.IsChecked })" />
 
-	<h4>Оцените работу (максимальный балл @block.MaxReviewScore)</h4>
+	<h4 class="@(Model.IsCurrentSubmissionChecking ? "" : "text-muted")">Оцените работу (максимальный балл @block.MaxReviewScore)</h4>
 	<div class="exercise__score">
 		<div class="btn-group" role="group">
 			@{
@@ -46,13 +51,13 @@
 				 */
 				var isActive = Model.Checking.IsChecked && Model.Checking.Score == score && block.MaxReviewScore >= 4;
 				isPercentScoreActive = isPercentScoreActive || isActive;
-				<button type="button" class="btn btn-default @(isActive ? "active" : "")" data-value="@score">@scorePercent%</button>
+				<button type="button" class="btn btn-default @(isActive ? "active" : "")" data-value="@score" @IsScoreFormActive()>@scorePercent%</button>
 			}
 		</div>
 		<div class="ib">
-			<a href="#" class="exercise__other-score-link internal-page-link @(! isPercentScoreActive ? "active" : "")">Другая оценка</a>
+			<a href="#" class="exercise__other-score-link internal-page-link @(isPercentScoreActive ? "" : "active") @(Model.IsCurrentSubmissionChecking ? "" : "text-muted")">Другая оценка</a>
 			@{
-				var otherScoreInputDisplay = Model.Checking.IsChecked ? "" : "display: none";
+				var otherScoreInputDisplay = Model.Checking.IsChecked && !isPercentScoreActive ? "" : "display: none";
 			}
 			<input type="number" class="form-control" style="@otherScoreInputDisplay" min="0" max="@block.MaxReviewScore" name="exerciseScore" required="required"
 				   value="@(Model.Checking.IsChecked ? Model.Checking.Score.ToString() : "")" />
@@ -60,18 +65,18 @@
 	</div>
 
 	<div class="checkbox checkbox-default">
-		<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" @(Model.Checking.IsChecked && !Model.Checking.ProhibitFurtherManualCheckings ? "" : "checked") />
+		<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" @(Model.Checking.IsChecked && !Model.Checking.ProhibitFurtherManualCheckings ? "" : "checked") @IsScoreFormActive()/>
 		<label for="prohibitFurtherReview">
 			Не принимать больше код ревью у этого студента
 		</label>
 	</div>
 
-	<input type="submit" class="btn @(Model.Checking.IsChecked ? "btn-primary" : "btn-default")" value="Сохранить и вернуться" />
+	<input type="submit" class="btn @(Model.Checking.IsChecked ? "btn-primary" : "btn-default")" value="Сохранить и вернуться" @IsScoreFormActive()/>
 
 	@if (!Model.Checking.IsChecked)
 	{
 		<input type="submit" class="btn btn-primary" value="Сохранить и перейти к следующему"
 			   data-url="@Url.Action("CheckNextExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, Model.GroupId })"
-			   onclick="$('[name=nextUrl]').val($(this).data('url'))" />
+			   onclick="$('[name=nextUrl]').val($(this).data('url'))" @IsScoreFormActive()/>
 	}
 </form>

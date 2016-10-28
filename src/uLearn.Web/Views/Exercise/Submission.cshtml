@@ -36,12 +36,16 @@
 			var statusClass = "";
 			if (Model.ReviewState == ExerciseReviewState.WaitingForReview)
 			{
-				status = "Все тесты пройдены, код ожидает проверки преподавателем";
+				status = string.Format(
+					"Все тесты пройдены, код ожидает <a href=\"{0}\" title=\"Перейти к проверке\">проверки преподавателем</a>",
+					Url.Action("CheckExercise", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.Last().Id })
+					);
 			}
 			else if (Model.ReviewState == ExerciseReviewState.Reviewed)
 			{
 				var score = Model.SubmissionSelectedByUser.ManualCheckings.Max(c => c.Score);
-				status = string.Format("Все тесты пройдены, код проверен преподавателем ({0})",
+				status = string.Format("Все тесты пройдены, код <a href=\"{0}\" title=\"Проверить заново\">проверен преподавателем</a> ({1})",
+					Url.Action("CheckExercise", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.Last().Id, recheck = true }),
 					score.PluralizeInRussian(new RussianPluralizationOptions
 					{
 						One = "балл",
@@ -54,7 +58,11 @@
 			}
 			else if (Model.SubmissionSelectedByUser.AutomaticCheckingIsRightAnswer)
 			{
-				status = "Все тесты пройдены, задача сдана";
+				status = "Все тесты пройдены";
+				if (!Model.Slide.Exercise.RequireReview)
+				{
+					status += ", задача сдана";
+				}
 			}
 			else if (Model.SubmissionSelectedByUser.AutomaticChecking != null && Model.SubmissionSelectedByUser.AutomaticChecking.Status != AutomaticExerciseCheckingStatus.Done)
 			{
@@ -66,9 +74,9 @@
 				status = "Результат проверки: " + Model.SubmissionSelectedByUser.AutomaticChecking.GetVerdict();
 				statusClass = "wrong";
 			}
-			if (!string.IsNullOrEmpty(status) && Model.ManualChecking == null)
+			if (!string.IsNullOrEmpty(status) && (Model.ManualChecking == null || Model.ManualChecking.SubmissionId != Model.SubmissionSelectedByUser.Id))
 			{
-				<p class="exercise-status @statusClass">@status</p>
+				<p class="exercise-status @statusClass">@Html.Raw(status)</p>
 			}
 		}
 

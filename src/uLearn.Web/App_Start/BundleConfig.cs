@@ -31,6 +31,7 @@ namespace uLearn.Web
 					"~/Scripts/jquery.datetimepicker.full.min.js",
 					"~/Scripts/jquery.datetimepicker.unobtrusive.js",
 					"~/Scripts/jquery.event.move.js",
+					"~/Scripts/jquery.smooth-scrolling.js",
 					"~/flexslider/jquery.flexslider.js",
 					"~/katex/katex.min.js",
 //					"~/Jsdifflib/jsdifflib.js",
