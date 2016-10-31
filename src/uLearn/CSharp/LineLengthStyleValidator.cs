@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+п»їusing System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -21,7 +21,7 @@ namespace uLearn.CSharp
 			var position = userSolution.GetLineSpan(longLines[0].Span);
 			yield return Report(
 				position, 
-				"Слишком длинная строка. Не заставляйте людей использовать горизонтальный скролл");
+				"РЎР»РёС€РєРѕРј РґР»РёРЅРЅР°СЏ СЃС‚СЂРѕРєР°. РќРµ Р·Р°СЃС‚Р°РІР»СЏР№С‚Рµ Р»СЋРґРµР№ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Р№ СЃРєСЂРѕР»Р»");
 		}
 	}
 }

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+п»їusing System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -31,7 +31,7 @@ namespace uLearn.CSharp
 			var startLine = GetSpan(block.OpenBraceToken).StartLinePosition.Line;
 			var endLine = GetSpan(block.CloseBraceToken).EndLinePosition.Line;
 			if (endLine - startLine >= maxLen)
-				yield return Report(block.OpenBraceToken, "Слишком блинный блок инструкций. Попытайтесь разбить его на вспомогательные методы");
+				yield return Report(block.OpenBraceToken, "РЎР»РёС€РєРѕРј Р±Р»РёРЅРЅС‹Р№ Р±Р»РѕРє РёРЅСЃС‚СЂСѓРєС†РёР№. РџРѕРїС‹С‚Р°Р№С‚РµСЃСЊ СЂР°Р·Р±РёС‚СЊ РµРіРѕ РЅР° РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹");
 		}
 	}
 }
