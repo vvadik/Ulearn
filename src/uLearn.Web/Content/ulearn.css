@@ -58,10 +58,17 @@ p {
 }
 
 .internal-page-link.active {
-    color: black;
     border-bottom: none;
     font-weight: bold;
     pointer-events: none;
+}
+
+.internal-page-link.active:not(.text-muted) {
+	color: black;
+}
+
+.internal-page-menu a {
+	margin: 0 5px;
 }
 
 .inline-select {
@@ -1221,6 +1228,12 @@ table.analytics__user-answers {
 	margin-bottom: 0;
 }
 
+@media (max-width:768px) {
+	.analytics__dashboard .student-progress {
+		width: 90px;
+	}
+}
+
 .analytics__dashboard .large-number {
     text-align: center;
     font-size: 40pt;
@@ -1296,7 +1309,7 @@ table.analytics__user-answers {
 }
 
 .code-review + .CodeMirror {
-	width: 600px;
+	width: 900px;
 }
 
 .exercise__reviews {
@@ -1374,6 +1387,14 @@ table.analytics__user-answers {
 	width: auto;
 }
 
+.exercise__score .status {
+	padding: 5px 0;
+}
+
+.exercise__score .status.waiting { color: #a0932b; }
+.exercise__score .status.error { color: #a0372b }
+.exercise__score .status.success { color: #2ca02b }
+
 #exercise__submission__output {
     margin-top: 10px;
     font-family: monospace;
@@ -1390,6 +1411,72 @@ table.analytics__user-answers {
 
 #exercise__submission__output.empty::before {
 	content: "Нет вывода программы"
+}
+
+.user-submission {
+	margin-top: 20px;
+}
+
+.user-submission__info {
+	background-color: #c8ffd1;
+	margin-left: -15px;
+	padding: 12px 15px;
+}
+
+.user-submission__info h3 {
+	margin-top: 0;
+}
+
+.user-submission__info .hint {
+	display: none;
+}
+
+@media (max-width: 1000px) {
+	.user-submission {
+		overflow: hidden;
+		min-height: 110px;
+		position: relative;
+		margin-left: -15px;
+		margin-right: -15px;
+		padding: 0 15px;
+	}
+
+	.user-submission__info {
+		position: absolute;
+		z-index: 3;
+		width: 100%;
+		min-height: 110px;
+		padding-top: 20px;
+	}
+
+	.user-submission__info h3 {
+		font-size: 15px;
+		font-weight: 700;
+		height: 16px;
+		max-height: 16px;
+		overflow: hidden;
+		-moz-text-overflow: ellipsis;
+		text-overflow: ellipsis;
+	}
+
+	.user-submission__info .hint {
+		display: block;
+		font-size: 12px;
+		color: #696;
+		margin-top: 10px;
+	}
+
+	.user-submission h4 {
+		font-size: 16px;
+	}
+
+	.user-submission .exercise__simple-score-form {
+		border-top: 1px solid #9c9;
+		border-bottom: 1px solid #9c9;
+		padding: 0 15px;
+		margin: 0 -15px;
+		min-height: 110px;
+	}
 }
 
 /* Loading spinner */

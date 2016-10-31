@@ -24,6 +24,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 		private readonly GroupsRepo groupsRepo = new GroupsRepo();
+		private readonly UsersRepo usersRepo = new UsersRepo();
 
 		public AnalyticsController()
 			: this(WebCourseManager.Instance)
@@ -98,27 +99,23 @@ namespace uLearn.Web.Controllers
 			if (string.IsNullOrEmpty(unitName) && units.Any())
 				unitName = units.First();
 			var slides = course.Slides.Where(s => s.Info.UnitName == unitName).ToList();
-			var slidesIds = slides.Select(s => s.Id).ToImmutableHashSet();
+			var slidesIds = slides.Select(s => s.Id).ToList();
 			var quizzes = slides.OfType<QuizSlide>();
 			var exersices = slides.OfType<ExerciseSlide>();
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
 			var groupId = param.Group;
-			List<string> filteredUsersIds = null;
-			if (groupId.HasValue)
-			{
-				if (!groupsRepo.IsGroupAvailableForUser(groupId.Value, User))
-					groupId = null;
-				else
-					filteredUsersIds = groupsRepo.GetGroupMembers(groupId.Value).Select(u => u.Id).ToList();
-			}
+			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupId);
+			filterOptions.SlidesIds = slidesIds;
+			filterOptions.PeriodStart = periodStart;
+			filterOptions.PeriodFinish = realPeriodFinish;
 
 			/* Dictionary<SlideId, List<Visit>> */
-			var slidesVisits = visitsRepo.GetVisitsInPeriodForEachSlide(slidesIds, periodStart, realPeriodFinish, filteredUsersIds);
+			var slidesVisits = visitsRepo.GetVisitsInPeriodForEachSlide(filterOptions);
 
-			var usersVisitedAllSlidesBeforePeriodCount = visitsRepo.GetUsersVisitedAllSlides(slidesIds, DateTime.MinValue, periodStart, filteredUsersIds).Count();
-			var usersVisitedAllSlidesInPeriodCount = visitsRepo.GetUsersVisitedAllSlides(slidesIds, periodStart, realPeriodFinish, filteredUsersIds).Count();
-			var usersVisitedAllSlidesBeforePeriodFinishedCount = visitsRepo.GetUsersVisitedAllSlides(slidesIds, DateTime.MinValue, realPeriodFinish, filteredUsersIds).Count();
+			var usersVisitedAllSlidesBeforePeriodCount = visitsRepo.GetUsersVisitedAllSlides(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(periodStart)).Count();
+			var usersVisitedAllSlidesInPeriodCount = visitsRepo.GetUsersVisitedAllSlides(filterOptions).Count();
+			var usersVisitedAllSlidesBeforePeriodFinishedCount = visitsRepo.GetUsersVisitedAllSlides(filterOptions.WithPeriodStart(DateTime.MinValue)).Count();
 
 			var quizzesAverageScore = quizzes.ToDictionary(q => q.Id,
 				q => (int) slidesVisits.GetOrDefault(q.Id, new List<Visit>())
@@ -137,15 +134,16 @@ namespace uLearn.Web.Controllers
 				.GroupBy(s => s.SlideId)
 				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).Count());
 
-			var visitedUsers = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, realPeriodFinish, filteredUsersIds)
+			var visitedUsers = visitsRepo.GetVisitsInPeriod(filterOptions)
 				.DistinctBy(v => v.UserId)
 				.Join(db.Users, v => v.UserId, u => u.Id, (v, u) => new UnitStatisticUserInfo { UserId = u.Id, UserName = u.UserName, UserVisibleName = (u.FirstName + " " + u.LastName).Trim() })
+				.OrderBy(u => u.UserVisibleName)
 				.ToList();
 
-			var visitedSlidesCountByUser = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, realPeriodFinish, filteredUsersIds)
+			var visitedSlidesCountByUser = visitsRepo.GetVisitsInPeriod(filterOptions)
 				.GroupBy(v => v.UserId)
 				.ToDictionary(g => g.Key, g => g.Count());
-			var visitedSlidesCountByUserAllTime = visitsRepo.GetVisitsInPeriod(slidesIds, DateTime.MinValue, DateTime.MaxValue, filteredUsersIds)
+			var visitedSlidesCountByUserAllTime = visitsRepo.GetVisitsInPeriod(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(DateTime.MaxValue))
 				.GroupBy(v => v.UserId)
 				.ToDictionary(g => g.Key, g => g.Count());
 
@@ -174,6 +172,34 @@ namespace uLearn.Web.Controllers
 				VisitedSlidesCountByUser = visitedSlidesCountByUser,
 				VisitedSlidesCountByUserAllTime = visitedSlidesCountByUserAllTime,
 			};
+			return View(model);
+		}
+
+		public ActionResult UserUnitStatistics(string courseId, string unitName, string userId)
+		{
+			var course = courseManager.GetCourse(courseId);
+			var user = usersRepo.FindUserById(userId);
+			if (user == null)
+				return HttpNotFound();
+
+			var slides = course.Slides.Where(s => s.Info.UnitName == unitName).ToList();
+			var exercises = slides.OfType<ExerciseSlide>();
+			var acceptedSubmissions = userSolutionsRepo
+				.GetAllAcceptedSubmissionsByUser(courseId, exercises.Select(s => s.Id), userId)
+				.OrderByDescending(s => s.Timestamp)
+				.DistinctBy(u => u.SlideId);
+			var userScores = visitsRepo.GetScoresForSlides(courseId, userId, slides.Select(s => s.Id));
+
+			var model = new UserUnitStatisticsPageModel
+			{
+				Course = course,
+				UnitName = unitName,
+				User = user,
+				Slides = slides.ToDictionary(s => s.Id),
+				Submissions = acceptedSubmissions.ToList(),
+				Scores = userScores,
+			};
+
 			return View(model);
 		}
 
@@ -392,7 +418,7 @@ namespace uLearn.Web.Controllers
 		public string PeriodStart { get; set; }
 		public string PeriodFinish { get; set; }
 
-		public int? Group { get; set; }
+		public string Group { get; set; }
 
 		private static readonly string[] dateFormats = { "dd.MM.yyyy" };
 
@@ -423,6 +449,16 @@ namespace uLearn.Web.Controllers
 				return result;
 			}
 		}
+	}
+	
+	public class UserUnitStatisticsPageModel
+	{
+		public Course Course { get; set; }
+		public string UnitName { get; set; }
+		public ApplicationUser User { get; set; }
+		public List<UserExerciseSubmission> Submissions { get; set; }
+		public Dictionary<Guid, Slide> Slides { get; set; }
+		public Dictionary<Guid, int> Scores { get; set; }
 	}
 
 	public class UserSolutionsViewModel

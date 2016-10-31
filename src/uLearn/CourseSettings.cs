@@ -14,6 +14,17 @@ namespace uLearn
 		[XmlElement("language")]
 		public Language[] DefaultLanguageVersions { get; set; }
 
+		[XmlIgnore]
+		public string DefaultLanguage
+		{
+			get
+			{
+				if (DefaultLanguageVersions == null || DefaultLanguageVersions.Length == 0)
+					return this == DefaultSettings ? "cs" : DefaultSettings.DefaultLanguage;
+				return DefaultLanguageVersions[0].Name;
+			}
+		}
+
 		[XmlElement("prelude")]
 		public PreludeFile[] Preludes { get; set; }
 
@@ -21,9 +32,9 @@ namespace uLearn
 		public string DictionaryFile { get; set; }
 
 		public static readonly CourseSettings DefaultSettings = new CourseSettings(
-			null, 
-			new[] { new Language("py", "3") }, 
-			new [] {new PreludeFile("cs", "Prelude.cs")},
+			null,
+			new[] { new Language("cs", "6"), new Language("py", "3") },
+			new[] { new PreludeFile("cs", "Prelude.cs") },
 			"dictionary.txt"
 		);
 
@@ -55,7 +66,7 @@ namespace uLearn
 		public string GetLanguageVersion(string langId)
 		{
 			var res = DefaultLanguageVersions.FirstOrDefault(lang => lang.Name == langId);
-			if (res == null && Title != null)
+			if (res == null && Title != null && this != DefaultSettings)
 				return DefaultSettings.GetLanguageVersion(langId);
 			return res == null ? null : res.Version;
 		}
@@ -63,7 +74,7 @@ namespace uLearn
 		public string GetPrelude(string langId)
 		{
 			var res = Preludes.FirstOrDefault(file => file.LangId == langId);
-			if (res == null && Title != null)
+			if (res == null && Title != null && this != DefaultSettings)
 				return DefaultSettings.GetPrelude(langId);
 			return res == null ? null : res.File;
 		}

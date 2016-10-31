@@ -289,6 +289,7 @@
     <Compile Include="Controllers\AuthenticationManager.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
+    <Compile Include="Models\FilterOptions.cs" />
     <Compile Include="DataContexts\SlideCheckingsRepo.cs" />
     <Compile Include="Migrations\201608231750470_SlideChecking.cs" />
     <Compile Include="Migrations\201608231750470_SlideChecking.Designer.cs">
@@ -1197,7 +1198,9 @@
     <Content Include="Scripts\jquery.color-2.1.0.min.js" />
     <Content Include="Scripts\jquery.datetimepicker.full.min.js" />
     <Content Include="Scripts\jquery.datetimepicker.unobtrusive.js" />
+    <Content Include="Scripts\jquery.event.move.js" />
     <Content Include="Scripts\jquery.query-object.js" />
+    <Content Include="Scripts\jquery.smooth-scrolling.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.date.js" />
@@ -1449,6 +1452,7 @@
     <Content Include="Views\Exercise\SubmissionsPanel.cshtml" />
     <Content Include="Views\Exercise\Submission.cshtml" />
     <Content Include="Views\Exercise\_ExerciseScoreForm.cshtml" />
+    <Content Include="Views\Analytics\UserUnitStatistics.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

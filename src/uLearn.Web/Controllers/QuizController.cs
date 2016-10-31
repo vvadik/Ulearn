@@ -457,7 +457,7 @@ namespace uLearn.Web.Controllers
 
 			var usersByQuizVersion = passes.GroupBy(p => p.QuizVersion?.Id).ToDictionary(g => g.Key, g => g.Select(u => u.UserName).ToList());
 			var usersWaitsForManualCheck = slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(
-				new ManualCheckingQueueFilterOptions(courseId) { SlidesIds = new List<Guid> { quizSlide.Id } }
+				new ManualCheckingQueueFilterOptions { CourseId = courseId, SlidesIds = new List<Guid> { quizSlide.Id } }
 			).ToList().Select(i => i.User.UserName).ToImmutableHashSet();
 
 			return PartialView(new QuizAnalyticsModel

@@ -118,9 +118,10 @@ namespace uLearn
 					Input = "",
 					NeedRun = true
 				});
-			if (result.Verdict != Verdict.Ok)
+			var isOk = result.Verdict.IsOneOf(Verdict.Ok, Verdict.MemoryLimit, Verdict.TimeLimit);
+			if (!isOk)
 				ReportSlideError(slide, "Exercise initial code verdict is not OK. RunResult = " + result);
-			else if (result.Output == "")
+			else if (result.Verdict == Verdict.Ok && result.Output == "")
 				ReportSlideError(slide, "Exercise initial code (available to students) is solution!");
 		}
 
@@ -132,6 +133,10 @@ namespace uLearn
 			{
 				FailOnError(slide, solution, exercise.EthalonSolution);
 				return;
+			}
+			if (solution.HasStyleIssues)
+			{
+				Console.WriteLine("Style issue: " + solution.StyleMessage);
 			}
 
 			var result = SandboxRunner.Run("", exercise.CreateSubmition(

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using uLearn.CSharp;
 
@@ -5,20 +6,32 @@ namespace uLearn
 {
 	public class ValidatorsRepository
 	{
-		public static ISolutionValidator NullValidator = new NullValidator();
-		public static ISolutionValidator CSharpValidator = new CSharpSolutionValidator();
-		public static ISolutionValidator CSharpSingleStatementValidator = new CSharpSolutionValidator().AddValidator(new SingleStatementMethodAttribute());
-
 		public static ISolutionValidator Get(string name)
 		{
 			var parts = name.ToLower().Split(' ');
 			if (parts.Contains("cs"))
 			{
-				if (parts.Contains("singlestatementmethod"))
-					return CSharpSingleStatementValidator;
-				return CSharpValidator;
+				var validator = new CSharpSolutionValidator();
+				foreach (var part in parts)
+				{
+					var pp = part.Split('-');
+					var subValidator = pp[0];
+					if (subValidator == "singlestatementmethod")
+						validator.AddValidator(new SingleStatementMethodAttribute());
+					if (subValidator == "singlestaticmethod")
+						validator.AddValidator(new IsStaticMethodAttribute());
+					if (subValidator == "blocklen")
+						validator.AddValidator(new BlockLengthStyleValidator(int.Parse(pp[1])));
+					if (subValidator == "linelen")
+						validator.AddValidator(new LineLengthStyleValidator(int.Parse(pp[1])));
+                    if (subValidator == "recursion")
+                        validator.AddValidator(new RecursionStyleValidator(true));
+                    if (subValidator == "norecursion")
+                        validator.AddValidator(new RecursionStyleValidator(false));
+                }
+                return validator;
 			}
-			return NullValidator;
+			return new NullValidator();
 		}
 	}
 }

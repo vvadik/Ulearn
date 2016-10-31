@@ -30,45 +30,65 @@
 <body>
 	<div class="container">
 
-		<h1>Аналитика</h1>
+		<h1 class="hidden-xs">Аналитика</h1>
+		<h2>
+			@Model.UnitName.TruncateWithEllipsis(25)
 
+			<small><a href="#filters" class="internal-page-link visible-xs-inline ml10">ред.</a></small>
+			<br class="visible-xs"/>
+			<small class="visible-xs">с @Model.PeriodStart.ToShortDateString() по @Model.PeriodFinish.ToShortDateString()</small>
+		</h2>
 		<div class="analytics__dashboard">
 			@using (Html.BeginForm("UnitStatistics", "Analytics", FormMethod.Get, new { @class="form-inline", id="unit-statistics-filter-form" }))
 			{
 				@Html.Hidden("courseId", Model.CourseId)
 
-				<div class="form-group">
+				<div id="filters" class="hidden-xs-inline">
+					<div class="form-group">
 						@Html.DropDownList("unitName",
 							Model.UnitsNames.Select(name => new SelectListItem { Text = name, Selected = name == Model.UnitName, Value = name }),
 							new { @class = "form-control" })
-				</div>
+					</div>
 
-				<div class="form-group ml10">
-					с @Html.TextBox("periodStart", Model.PeriodStart.ToString("dd.MM.yyyy"), new { @class = "form-control form-control-date datetimepicker" })
-				</div>
+					<div class="form-group sm-ml10 ib">
+						с @Html.TextBox("periodStart", Model.PeriodStart.ToString("dd.MM.yyyy"), new { @class = "form-control form-control-date datetimepicker ib" })
+					</div>
 
-				<div class="form-group">
-					по @Html.TextBox("periodFinish", Model.PeriodFinish.ToString("dd.MM.yyyy"), new { @class = "form-control form-control-date datetimepicker" })
-				</div>
+					<div class="form-group ib">
+						по @Html.TextBox("periodFinish", Model.PeriodFinish.ToString("dd.MM.yyyy"), new { @class = "form-control form-control-date datetimepicker ib" })
+					</div>
 
-				<div class="form-group">
-					@{
-						var groupsListItems = new List<SelectListItem> { new SelectListItem { Text = "Все пользователи", Value = "", Selected = !Model.GroupId.HasValue } };
-						groupsListItems.AddRange(
-							Model.Groups.Select(group => new SelectListItem { Text = group.Name, Value = group.Id.ToString(), Selected = group.Id == Model.GroupId })
-							);
-					}
-					@Html.DropDownList("group", groupsListItems, new { @class = "form-control" })
-				</div>
+					<div class="form-group">
+						@{
+							var groupsListItems = new List<SelectListItem>
+							{
+								new SelectListItem { Text = "Все пользователи", Value = "all", Selected = Model.GroupId == "all" },
+								new SelectListItem { Text = "Мои группы", Value = "", Selected = string.IsNullOrEmpty(Model.GroupId) }
+							};
+							if (User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
+							{
+								groupsListItems.Insert(1, new SelectListItem { Text = "Ни в одной группе", Value = "not-in-group", Selected = Model.GroupId == "not-in-group" });
+							}
+							groupsListItems.AddRange(
+								Model.Groups.Select(group => new SelectListItem { Text = group.Name, Value = group.Id.ToString(), Selected = group.Id.ToString() == Model.GroupId })
+								);
+						}
+						@Html.DropDownList("group", groupsListItems, new { @class = "form-control" })
+					</div>
 
-				<div class="form-group">
-					<button role="button" class="btn btn-primary">Отфильтровать</button>
+					<div class="form-group">
+						<button role="button" class="btn btn-primary">Отфильтровать</button>
+					</div>
 				</div>
 			}
 
 			<div class="row">
 				<div class="col-xs-12 col-md-6">
-					<h2>Слайды</h2>
+					<h2 class="internal-page-menu">
+						Слайды
+						<a href="#statistics" class="internal-page-link visible-xs-inline">Статистика</a>
+						<a href="#students" class="internal-page-link visible-xs-inline">Студенты</a>
+					</h2>
 					<div class="small-table__title">
 						<span class="navbar-label navbar-label-link glyphicon glyphicon-none"></span>
 						<span class="small-table__title__cell">слайд</span>
@@ -134,13 +154,13 @@
 					}
 				</div>
 
-				<div class="col-xs-12 col-md-6">
-					<h2>Посетители</h2>
+				<div class="col-xs-12 col-md-6" id="statistics">
+					<h2>Статистика</h2>
 					<div>
-						Посмотрели весь модуль за выбранный период: <strong>@Model.UsersVisitedAllSlidesInPeriodCount</strong>
+						Посмотрели весь модуль за&nbsp;выбранный период: <strong>@Model.UsersVisitedAllSlidesInPeriodCount</strong>
 					</div>
 					<div>
-						Всего посмотрели весь модуль к @Model.PeriodFinish.ToDatePrettyString(true):
+						Всего посмотрели весь модуль к&nbsp;@Model.PeriodFinish.ToDatePrettyString(true):
 						<strong>
 							@(Model.UsersVisitedAllSlidesBeforePeriodFinishedCount - Model.UsersVisitedAllSlidesBeforePeriodCount)
 						</strong>
@@ -161,8 +181,8 @@
 
 					<div class="analytics__chart__toggles">
 						Показать график:
-						<a href="#usersByCountVisitedSlides" class="analytics__chart__toggle internal-page-link active">за выбранный период</a>
-						<a href="#usersByCountVisitedSlidesAllTime" class="analytics__chart__toggle internal-page-link">за всё время</a>
+						<a href="#usersByCountVisitedSlides" class="analytics__chart__toggle internal-page-link active">за&nbsp;выбранный период</a>
+						<a href="#usersByCountVisitedSlidesAllTime" class="analytics__chart__toggle internal-page-link">за&nbsp;всё время</a>
 					</div>
 
 					<div id="usersByCountVisitedSlidesChart"></div>
@@ -171,9 +191,9 @@
 	
 			<div class="vspace-20 hidden-xs hidden-sm"></div>
 
-			<div class="row">
+			<div class="row" id="students">
 				<div class="col-xs-12">
-					<h2>Прогресс</h2>
+					<h2>Студенты</h2>
 
 					@{
 						var exercisesAndQuizzes = Model.Slides.Where(s => s is QuizSlide || s is ExerciseSlide).OrderBy(s => s.Index);
@@ -187,11 +207,11 @@
 							{
 								if (slide is QuizSlide)
 								{
-									<span class="glyphicon glyphicon-pushpin small-table__title__cell" title="@slide.Title"></span>
+									<span class="glyphicon glyphicon-pushpin small-table__title__cell hidden-xs-inline" title="@slide.Title"></span>
 								}
 								else if (slide is ExerciseSlide)
 								{
-									<span class="glyphicon glyphicon-edit small-table__title__cell" title="@slide.Title"></span>
+									<span class="glyphicon glyphicon-edit small-table__title__cell hidden-xs-inline" title="@slide.Title"></span>
 								}
 							}
 						</div>
@@ -203,7 +223,9 @@
 						var visitedSlidesCountAllTime = Model.VisitedSlidesCountByUserAllTime[userInfo.UserId];
 						var userVisibleName = userInfo.UserVisibleName != "" ? userInfo.UserVisibleName : userInfo.UserName;
 						<div>
-							<div class="ib" title="@userInfo.UserName">@userVisibleName.TruncateWithEllipsis(25)</div>
+							<div class="ib" title="@userInfo.UserName">
+								@Html.ActionLink(userVisibleName.TruncateWithEllipsis(25), "UserUnitStatistics", new { courseId = Model.CourseId, unitName = Model.UnitName, userId = userInfo.UserId}, new { title = "Посмотреть статистику пользователя " + userInfo.UserName })
+							</div>
 							<div class="ib pull-right">
 								<div class="student-progress progress">
 									<div class="progress-bar progress-bar-warning"
@@ -214,7 +236,7 @@
 										                         Two = "слайда",
 										                         Five = "слайдов",
 										                         Gender = Gender.Male
-									                         })) вне указанного период"></div>
+								})) вне указанного период"></div>
 									<div class="progress-bar progress-bar-success"
 									     style="width: @(100 * visitedSlidesCount / Model.Slides.Count)%"
 									     title="Посмотрел(а) @visitedSlidesCount.PluralizeInRussian(new RussianPluralizationOptions
@@ -232,7 +254,7 @@
 									var visit = Model.SlidesVisits.GetOrDefault(exerciseOrQuiz.Id, new List<Visit>()).FirstOrDefault(v => v.UserId == userInfo.UserId);
 									if (visit != null && visit.IsPassed)
 									{
-										<span class="small-table__right-cell" title="@visit.Timestamp.ToPrettyString()">
+										<span class="small-table__right-cell hidden-xs-inline" title="@visit.Timestamp.ToPrettyString()">
 											@if (exerciseOrQuiz is ExerciseSlide)
 											{
 												@Html.ActionLink(
@@ -250,7 +272,7 @@
 									}
 									else
 									{
-										<span class="small-table__right-cell">&nbsp;</span>
+										<span class="small-table__right-cell hidden-xs-inline">&nbsp;</span>
 									}
 								}
 							</div>

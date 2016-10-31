@@ -149,9 +149,14 @@ namespace uLearn.Web.DataContexts
 			return GetAllSubmissions(courseId, slidesIds).Where(s => s.AutomaticCheckingIsRightAnswer);
 		}
 
+		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSubmissionsByUser(string courseId, IEnumerable<Guid> slideIds, string userId)
+		{
+			return GetAllAcceptedSubmissions(courseId, slideIds).Where(s => s.UserId == userId);
+		}
+		
 		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSubmissionsByUser(string courseId, Guid slideId, string userId)
 		{
-			return GetAllAcceptedSubmissions(courseId, new List<Guid> { slideId }).Where(s => s.UserId == userId);
+			return GetAllAcceptedSubmissionsByUser(courseId, new List<Guid> { slideId }, userId);
 		}
 
 		public IEnumerable<UserExerciseSubmission> GetAllSubmissionsByUser(string courseId, Guid slideId, string userId)

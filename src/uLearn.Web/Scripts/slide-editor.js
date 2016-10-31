@@ -107,7 +107,7 @@ function initCodeEditor($parent) {
 			className: 'exercise__code__reviewed-fragment__selected'
 		});
 	}
-
+	
 	function codeMirrorClass($objects, editable, guest, review) {
 		$objects.each(function () {
 			var element = this;
@@ -122,6 +122,7 @@ function initCodeEditor($parent) {
 				indentWithTabs: true,
 				tabSize: 4,
 				indentUnit: 4,
+				lineWrapping: true,
 				extraKeys: {
 					"Ctrl-Space": "autocomplete",
 					".": function(cm) {
