@@ -24,10 +24,12 @@ namespace uLearn
 						validator.AddValidator(new BlockLengthStyleValidator(int.Parse(pp[1])));
 					if (subValidator == "linelen")
 						validator.AddValidator(new LineLengthStyleValidator(int.Parse(pp[1])));
-					if (subValidator == "recursion")
-						validator.AddValidator(new RecursionStyleValidator());
-				}
-				return validator;
+                    if (subValidator == "recursion")
+                        validator.AddValidator(new RecursionStyleValidator(true));
+                    if (subValidator == "norecursion")
+                        validator.AddValidator(new RecursionStyleValidator(false));
+                }
+                return validator;
 			}
 			return new NullValidator();
 		}

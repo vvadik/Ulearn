@@ -8,7 +8,7 @@ namespace uLearn.CSharp
 	{
 		private readonly int maxLineLen;
 
-		public LineLengthStyleValidator(int maxLineLen = 100)
+		public LineLengthStyleValidator(int maxLineLen = 120)
 		{
 			this.maxLineLen = maxLineLen;
 		}
