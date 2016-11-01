@@ -6,8 +6,11 @@
 }
 
 <div class="container">
-	<h2>«@Model.UnitName», @Model.User.VisibleName</h2>
+	<h2>@Model.User.VisibleName, «@Model.UnitName»</h2>
 	<div class="user-submissions">
+		@{
+			var shownAnySubmission = false;
+		}
 		@foreach (var submission in Model.Submissions)
 		{
 			var slide = (ExerciseSlide)Model.Slides[submission.SlideId];
@@ -17,9 +20,11 @@
 			{
 				continue;
 			}
+			shownAnySubmission = true;
 			<div class="user-submission">
 				<div class="user-submission__info">
-					<h3 class="title">@slide.Title.TruncateWithEllipsis(30) (<span class="total-score">@Model.Scores[slide.Id]</span> из @block.MaxScore)</h3>
+					<h3 class="title">@slide.Title.TruncateWithEllipsis(30) (<span class="total-score">@Model.Scores[slide.Id]</span> из @block.MaxScore)
+					</h3>
 					<div class="date">
 						Сдана <span title="@submission.Timestamp.ToPrettyString(true)">@submission.Timestamp.ToAgoPrettyString(true)</span>,
 						<a href="@Url.Action("UserSolutions", "Analytics", new { courseId = submission.CourseId, slideId = slide.Id, userId = submission.UserId })" target="_blank">
@@ -56,6 +61,12 @@
 						<div class="status"></div>
 					</div>
 				</form>
+			</div>
+		}
+		@if (!shownAnySubmission)
+		{
+			<div>
+				Нет сданных задач, требующих код-ревью
 			</div>
 		}
 	</div>

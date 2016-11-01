@@ -44,7 +44,7 @@
 			else if (Model.ReviewState == ExerciseReviewState.Reviewed)
 			{
 				var score = Model.SubmissionSelectedByUser.ManualCheckings.Max(c => c.Score);
-				status = string.Format("Все тесты пройдены, код <a href=\"{0}\" title=\"Проверить заново\">проверен преподавателем</a> ({1})",
+				status = string.Format("Все тесты пройдены, код <a href=\"{0}\" title=\"Отредактировать код-ревью\">проверен преподавателем</a> ({1})",
 					Url.Action("CheckExercise", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.Last().Id, recheck = true }),
 					score.PluralizeInRussian(new RussianPluralizationOptions
 					{

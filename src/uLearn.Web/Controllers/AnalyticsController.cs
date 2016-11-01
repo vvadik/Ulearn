@@ -136,7 +136,7 @@ namespace uLearn.Web.Controllers
 
 			var visitedUsers = visitsRepo.GetVisitsInPeriod(filterOptions)
 				.DistinctBy(v => v.UserId)
-				.Join(db.Users, v => v.UserId, u => u.Id, (v, u) => new UnitStatisticUserInfo { UserId = u.Id, UserName = u.UserName, UserVisibleName = (u.FirstName + " " + u.LastName).Trim() })
+				.Join(db.Users, v => v.UserId, u => u.Id, (v, u) => new UnitStatisticUserInfo { UserId = u.Id, UserName = u.UserName, UserVisibleName = (u.LastName + u.FirstName != "" ? u.LastName + " " + u.FirstName : u.UserName).Trim() })
 				.OrderBy(u => u.UserVisibleName)
 				.ToList();
 

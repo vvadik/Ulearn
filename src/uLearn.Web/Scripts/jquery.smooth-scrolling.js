@@ -1,5 +1,5 @@
 ﻿$(function() {
-    $.fn.smoothScroll = function (callback) {
+    $.fn.smoothScroll = function (callback, $link) {
     	var $object = this;
     	if ($object.length) {
     		var scrollTo = function() {
@@ -11,10 +11,16 @@
 					complete: callback
 				});
     		}
-    		if (!$object.is(':visible')) {
-			    $object.removeClass('hidden').removeClass('hidden-xs').removeClass('hidden-xs-inline');
-			    $object.fadeIn(400, 'linear', scrollTo);
-		    } else
+    		if ($link && $link.data('toggle')) {
+    			if (!$object.is(':visible')) {
+				    $object.data('originalClasses', $object.attr('class'));
+				    $object.removeClass('hidden').removeClass('hidden-xs').removeClass('hidden-xs-inline');
+				    $object.fadeIn(200, 'linear', scrollTo);
+    			} else {
+				    $object.attr('class', $object.data('originalClasses'));
+			    }
+		    }
+    		if ($object.is(':visible'))
 			    scrollTo();
 		    return true;
         } 
@@ -25,7 +31,7 @@
         if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
             var $target = $(this.hash);
             $target = $target.length ? $target : $('[name=' + this.hash.slice(1) +']');
-            return ! $target.smoothScroll();
+            return ! $target.smoothScroll(null, $(this));
         }
     });
 });

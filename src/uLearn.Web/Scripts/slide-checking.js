@@ -28,7 +28,7 @@
 				$status.addClass('error');
 				var error = '';
 				if (data.error === 'has_newest_submission') {
-					error = 'Пользователь успел отправить ещё одно решение по этой задаче {NEW_SUBMISSION_DATE}. Поставить баллы ' +
+					error = 'Пользователь успел отправить ещё одно решение по&nbsp;этой задаче {NEW_SUBMISSION_DATE}. Поставить баллы ' +
 						'<a href="#" data-submission-id="{SUBMISSION}" class="simple-score-link internal-page-link">старому решению</a>, ' +
 						'<a href="#" data-submission-id="{NEW_SUBMISSION}" class="simple-score-link internal-page-link">новому</a> ' +
 						'или <a href="#" class="cancel-link internal-page-link">отменить</a>?';
@@ -37,7 +37,7 @@
 						.replace('{NEW_SUBMISSION_DATE}', data.submissionDate);
 				} else if (data.error === 'has_greatest_score') {
 					error =
-						'Пользователь имеет за код-ревью по этой задаче больше баллов: {SCORE}. Новыми баллами вы не понизите его суммарную оценку. <a href="{URL}" target="_blank">Предыдущие код-ревью</a>.';
+						'Пользователь имеет за&nbsp;код-ревью по&nbsp;этой задаче больше баллов: {SCORE}. Новыми баллами вы&nbsp;<strong>не&nbsp;понизите</strong> его суммарную оценку. <a href="{URL}" target="_blank">Предыдущие код-ревью</a>.';
 					error = error.replace('{SCORE}', data.score).replace('{URL}', data.checkedQueueUrl);
 				}
 				$status.html(error);
@@ -61,6 +61,9 @@
 		var $self = $(this);
 		var submissionId = $self.data('submissionId');
 		var $form = $self.closest('.exercise__simple-score-form');
+		var lockTimeout = $self.closest('.user-submission').find('.user-submission__info')[0].lockTimeout;
+		if (lockTimeout)
+			clearTimeout(lockTimeout);
 		$form.find('[name=submissionId]').val(submissionId);
 		sendSimpleScore($form, true);
 	});
@@ -134,11 +137,11 @@
 		else {
 			/* Unlock */
 			$self.animate({ left: $(window).width() + 15 });
-			/* And lock after 30 seconds */
-			setTimeout(function () {
-				$self.closest('.user-submission').find('.status').text('')
+			/* And lock after 8 seconds */
+			$self[0].lockTimeout = setTimeout(function () {
 				$self.animate({ left: 15 });
-			}, 30000);
+				$self.closest('.user-submission').find('.status').text('');
+			}, 8000);
 		}
 	});
 });
