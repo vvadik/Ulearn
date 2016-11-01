@@ -8,15 +8,20 @@ namespace uLearn.CSharp
 {
 	public class CSharpSolutionValidator : ISolutionValidator
 	{
-		private static readonly ICSharpSolutionValidator redundantIf = new RedundantIfStyleValidator();
-		private static readonly ICSharpSolutionValidator namingCase = new NamingCaseStyleValidator();
-
-		private readonly List<ICSharpSolutionValidator> validators = new List<ICSharpSolutionValidator> { redundantIf, namingCase };
-
-		public CSharpSolutionValidator AddValidator(ICSharpSolutionValidator validator)
+		private readonly List<ICSharpSolutionValidator> validators = new List<ICSharpSolutionValidator>
 		{
+			new NotEmptyCodeValidator(),
+			new BlockLengthStyleValidator(),
+			new LineLengthStyleValidator(),
+			new NamingCaseStyleValidator(),
+			new RedundantIfStyleValidator(),
+			new NamingStyleValidator(),
+		};
+
+		public void AddValidator(ICSharpSolutionValidator validator)
+		{
+			validators.RemoveAll(item => item.GetType() == validator.GetType());
 			validators.Add(validator);
-			return this;
 		}
 
 		public string FindFullSourceError(string userCode)
@@ -31,7 +36,7 @@ namespace uLearn.CSharp
 		{
 			IEnumerable<Diagnostic> diagnostics = CSharpSyntaxTree.ParseText(solution).GetDiagnostics();
 			var error = diagnostics.FirstOrDefault();
-			return error != null ? error.ToString() : null;
+			return error?.ToString();
 		}
 
 		public string FindValidatorError(string userCode, string solution)

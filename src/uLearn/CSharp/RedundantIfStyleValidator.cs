@@ -26,7 +26,7 @@ namespace uLearn.CSharp
 					.Call(e => (bool?)IsBoolLiteral(e), null);
 
 			var nextSibling = ifElseStatement.Parent.ChildNodes().SkipWhile(n => n != ifElseStatement).Skip(1).FirstOrDefault();
-			falseStatementIsReturnBoolLiteral = falseStatementIsReturnBoolLiteral ?? 
+			falseStatementIsReturnBoolLiteral = falseStatementIsReturnBoolLiteral ??
 								(nextSibling as ReturnStatementSyntax)
 									.Call(r => r.Expression as LiteralExpressionSyntax)
 									.Call(IsBoolLiteral, false);
