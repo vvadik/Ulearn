@@ -31,7 +31,7 @@ namespace uLearn.CSharp
 			var startLine = GetSpan(block.OpenBraceToken).StartLinePosition.Line;
 			var endLine = GetSpan(block.CloseBraceToken).EndLinePosition.Line;
 			if (endLine - startLine >= maxLen)
-				yield return Report(block.OpenBraceToken, "Слишком блинный блок инструкций. Попытайтесь разбить его на вспомогательные методы");
+				yield return Report(block.OpenBraceToken, "Слишком длинный блок инструкций. Попытайтесь разбить его на вспомогательные методы");
 		}
 	}
 }
