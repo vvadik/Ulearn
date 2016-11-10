@@ -106,7 +106,7 @@ namespace uLearn
 				{
 					Path = exercise.CsprojFileName,
 					Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(exercise.CsprojFileName),
-						proj => ProjModifier.PrepareForChecking(proj, exercise))
+						proj => ProjModifier.PrepareForChecking(proj, exercise, excluded))
 				}
 			});
 			var result = SandboxRunner.Run(pathToCompiler,

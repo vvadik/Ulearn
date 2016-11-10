@@ -133,7 +133,7 @@ namespace uLearn
 				{
 					Path = exercise.CsprojFileName,
 					Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(exercise.CsprojFileName),
-						proj => ProjModifier.PrepareForChecking(proj, exercise))
+						proj => ProjModifier.PrepareForChecking(proj, exercise, excluded))
 				}
 			});
 			var pathToCompiler = Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2");

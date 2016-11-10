@@ -23,7 +23,7 @@ namespace uLearn.CSharp
 		{
 			ProjModifier.ModifyCsproj(
 				new FileInfo(TestProjectFilename), 
-				p => ProjModifier.PrepareForChecking(p, "AAA"));
+				p => ProjModifier.PrepareForChecking(p, "AAA", new string[0]));
 			Assert.AreNotEqual("AAA", CreateTestProject().GetProperty("StartupObject"));
 		}
 		[Test]

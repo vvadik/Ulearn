@@ -36,20 +36,27 @@ namespace uLearn
 				|| item.DirectMetadata.Any(md => md.Name == "Link" && md.EvaluatedValue.StartsWith("checking" + Path.DirectorySeparatorChar));
 		}
 
-		public static void PrepareForChecking(Project proj, ProjectExerciseBlock exerciseBlock)
+		public static void PrepareForChecking(Project proj, ProjectExerciseBlock exerciseBlock, IReadOnlyList<string> excludedPaths)
 		{
-			PrepareForChecking(proj, exerciseBlock.StartupObject);
+			PrepareForChecking(proj, exerciseBlock.StartupObject, excludedPaths);
 		}
 
-		public static void PrepareForChecking(Project proj, string startupObject)
-		{
+		public static void PrepareForChecking(Project proj, string startupObject, IReadOnlyList<string> excludedPaths)
+        {
 			proj.SetProperty("StartupObject", startupObject);
 			proj.SetProperty("OutputType", "Exe");
 			proj.SetProperty("UseVSHostingProcess", "false");
 			ResolveLinks(proj);
-		}
+		    ExcludePaths(proj, excludedPaths);
+        }
 
-		private static void ResolveLinks(Project project)
+	    private static void ExcludePaths(Project proj, IReadOnlyList<string> excludedPaths)
+	    {
+	        var toRemove = proj.Items.Where(item => excludedPaths.Contains(item.UnevaluatedInclude)).ToList();
+	        proj.RemoveItems(toRemove);
+        }
+
+        private static void ResolveLinks(Project project)
 		{
 			var files = ReplaceLinksWithItemsCopiedToProjectDir(project);
 			foreach (var file in files)
