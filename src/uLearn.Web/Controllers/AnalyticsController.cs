@@ -96,8 +96,12 @@ namespace uLearn.Web.Controllers
 
 			var course = courseManager.GetCourse(courseId);
 			var units = course.Slides.OrderBy(s => s.Index).Select(s => s.Info.UnitName).Distinct().ToList();
-			if (string.IsNullOrEmpty(unitName) && units.Any())
-				unitName = units.First();
+			if (string.IsNullOrEmpty(unitName))
+				return View("UnitStatisticsList", new UnitStatisticPageModel
+				{
+					CourseId = courseId,
+					UnitsNames = units.ToList(),
+				});
 			var slides = course.Slides.Where(s => s.Info.UnitName == unitName).ToList();
 			var slidesIds = slides.Select(s => s.Id).ToList();
 			var quizzes = slides.OfType<QuizSlide>();
@@ -426,7 +430,7 @@ namespace uLearn.Web.Controllers
 		{
 			get
 			{
-				var defaultPeriodStart = DateTime.Now.Subtract(TimeSpan.FromDays(7)).Date;
+				var defaultPeriodStart = GetDefaultPeriodStart();
 				if (string.IsNullOrEmpty(PeriodStart))
 					return defaultPeriodStart;
 				DateTime result;
@@ -434,6 +438,13 @@ namespace uLearn.Web.Controllers
 					return defaultPeriodStart;
 				return result;
 			}
+		}
+
+		private static DateTime GetDefaultPeriodStart()
+		{
+			/* Select between January, 1 and September, 1 */
+			var now = DateTime.Now;
+			return 1 < now.Month && now.Month < 9 ? new DateTime(now.Year, 1, 1) : new DateTime(now.Year, 9, 1);
 		}
 
 		public DateTime PeriodFinishDate

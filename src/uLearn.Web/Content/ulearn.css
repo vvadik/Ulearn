@@ -1232,6 +1232,10 @@ table.analytics__user-answers {
 	.analytics__dashboard .student-progress {
 		width: 90px;
 	}
+
+	.analytics__dashboard #students .student {
+		margin-bottom: 10px;
+	}
 }
 
 .analytics__dashboard .large-number {
@@ -1431,6 +1435,17 @@ table.analytics__user-answers {
 	display: none;
 }
 
+.user-submission .last-review-comments .commented-code {
+	background-color: #f7b7b7;
+	padding: 0 5px;
+	font-family: monospace;
+}
+
+.user-submission .exercise__score button.disabled {
+	pointer-events: initial;
+	cursor: initial;
+}
+
 @media (max-width: 1000px) {
 	.user-submission {
 		overflow: hidden;
@@ -1476,6 +1491,10 @@ table.analytics__user-answers {
 		padding: 0 15px;
 		margin: 0 -15px;
 		min-height: 110px;
+	}
+
+	.user-submission .last-review-comments {
+		margin-top: 10px;
 	}
 }
 

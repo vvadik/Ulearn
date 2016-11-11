@@ -16,5 +16,10 @@ namespace uLearn.Web.Controllers
 				return View();
 			return RedirectToAction("Manage", "Account");
 		}
+
+		public ActionResult Terms()
+		{
+			return View();
+		}
 	}
 }

@@ -55,17 +55,44 @@
 							{
 								var score = block.MaxReviewScore * scorePercent / 100;
 								var isActive = block.MaxReviewScore > 4 && score == manualScore ? "active" : "";
-								<button type="button" class="btn btn-default @isActive" data-value="@score">@scorePercent%</button>
+								var isDisabled = score < manualScore ? "disabled" : "";
+								<button type="button"
+								        class="btn btn-default @isActive @isDisabled"
+								        data-value="@score"
+										>@scorePercent%</button>
 							}
 						</div>
 						<div class="status"></div>
 					</div>
 				</form>
+
+				@{
+					var lastManualChecking = submission.ManualCheckings.LastOrDefault(c => c.IsChecked);
+					var solution = submission.SolutionCode.Text;
+				}
+				@if (lastManualChecking != null && lastManualChecking.NotDeletedReviews.Any())
+				{
+					<div class="last-review-comments">
+						<div>
+							<strong>Комментари@(lastManualChecking.NotDeletedReviews.Count > 1 ? "и" : "й") последнего код-ревью:</strong>
+						</div>
+
+						@foreach (var review in lastManualChecking.NotDeletedReviews)
+						{
+							var startPosition = solution.FindPositionByLineAndCharacted(review.StartLine, review.StartPosition);
+							var finishPosition = solution.FindPositionByLineAndCharacted(review.FinishLine, review.FinishPosition);
+							<div>
+								<span class="commented-code">@solution.Substring(startPosition, finishPosition - startPosition).TruncateWithEllipsis(30)</span>
+								@review.Comment
+							</div>
+						}
+					</div>
+				}
 			</div>
 		}
 		@if (!shownAnySubmission)
 		{
-			<div>
+			<div class="text-muted">
 				Нет сданных задач, требующих код-ревью
 			</div>
 		}
