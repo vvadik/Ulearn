@@ -18,7 +18,7 @@ namespace uLearn.Web.Controllers
                     return;
                 var api = new Telegram.Bot.TelegramBotClient(token);
                 var url = "https://ulearn.me/Course/" + comment.CourseId + "/" + comment.SlideId;
-                var text = "«" + comment.Text + "»\nîò " + comment.Author.VisibleName + "\n" + url; 
+                var text = "«" + comment.Text + "»\nauthor: " + comment.Author.VisibleName + "\n" + url; 
                 await api.SendTextMessageAsync("@ulearncomments", text);
             }
             catch (Exception e)
