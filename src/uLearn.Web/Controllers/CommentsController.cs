@@ -19,8 +19,9 @@ namespace uLearn.Web.Controllers
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 		private readonly CommentsRepo commentsRepo = new CommentsRepo();
 		private readonly UserManager<ApplicationUser> userManager = new ULearnUserManager();
+	    private CommentsBot commentsBot = new CommentsBot();
 
-		public ActionResult SlideComments(string courseId, Guid slideId)
+	    public ActionResult SlideComments(string courseId, Guid slideId)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			var comments = commentsRepo.GetSlideComments(courseId, slideId).ToList();
@@ -126,6 +127,7 @@ namespace uLearn.Web.Controllers
 			}
 
 			var comment = await commentsRepo.AddComment(User, courseId, slideId, parentCommentIdInt, commentText);
+		    await commentsBot.PostToChannel(comment);
 			var canReply = CanAddCommentHere(User, courseId, true);
 
 			return PartialView("_Comment", new CommentViewModel
@@ -232,7 +234,7 @@ namespace uLearn.Web.Controllers
 		}
 	}
 
-	public class SlideCommentsModel
+    public class SlideCommentsModel
 	{
 		public string CourseId { get; set; }
 		public Slide Slide { get; set; }
