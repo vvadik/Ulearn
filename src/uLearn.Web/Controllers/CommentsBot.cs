@@ -9,17 +9,25 @@ namespace uLearn.Web.Controllers
 {
     public class CommentsBot
     {
+        private string token;
+        private string channel;
+
+        public CommentsBot()
+        {
+            token = WebConfigurationManager.AppSettings["telegram-commentsbot-token"];
+            channel = WebConfigurationManager.AppSettings["telegram-commentsbot-channel"];
+        }
+
         public async Task PostToChannel(Comment comment)
         {
             try
             {
-                var token = WebConfigurationManager.AppSettings["telegram-commentsbot-token"];
                 if (string.IsNullOrWhiteSpace(token))
                     return;
                 var api = new Telegram.Bot.TelegramBotClient(token);
                 var url = "https://ulearn.me/Course/" + comment.CourseId + "/" + comment.SlideId;
-                var text = "«" + comment.Text + "»\nauthor: " + comment.Author.VisibleName + "\n" + url; 
-                await api.SendTextMessageAsync("@ulearncomments", text);
+                var text = "«" + comment.Text.Trim() + "»\nauthor: " + comment.Author.VisibleName + "\n" + url; 
+                await api.SendTextMessageAsync(channel, text);
             }
             catch (Exception e)
             {
