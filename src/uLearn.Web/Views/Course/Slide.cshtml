@@ -40,13 +40,13 @@
 				@if (Model.Slide is QuizSlide)
 				{
 					@Html.Action("Quiz", "Quiz", new
-					   {
-						   slide = (QuizSlide)Model.Slide,
-						   courseId = Model.CourseId,
-						   userId = Model.UserId,
-						   isGuest = Model.IsGuest,
-						   manualQuizCheckQueueItem = (ManualQuizChecking) Model.ManualChecking
-					   })
+					{
+						slide = (QuizSlide)Model.Slide,
+						courseId = Model.CourseId,
+						userId = Model.UserId,
+						isGuest = Model.IsGuest,
+						manualQuizCheckQueueItem = (ManualQuizChecking)Model.ManualChecking
+					})
 				}
 				else
 				{
@@ -73,8 +73,8 @@
 				{
 					using (Html.BeginForm("ForgetAll", "Course"))
 					{
-						<input type="hidden" name="slideId" value="@Model.Slide.Id" />
-						<input type="hidden" name="courseId" value="@Model.CourseId" />
+						<input type="hidden" name="slideId" value="@Model.Slide.Id"/>
+						<input type="hidden" name="courseId" value="@Model.CourseId"/>
 						<button class="btn btn-danger" type="submit">Удалить мой прогресс</button>
 						<span class="text-danger">(для тестеров и преподавателей)</span>
 					}
@@ -92,6 +92,18 @@
 
 				@Html.Action("SlideComments", "Comments", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
 			}
+
+			<footer>
+				<div>
+					<p>
+						Это ulearn — платформа с интерактивными онлайн-курсам по программированию.
+					</p>
+					<p>
+						Сделано в <a href="https://kontur.ru">СКБ Контур</a>.
+						@Html.ActionLink("Условия использования", "Terms", "Home").
+					</p>
+				</div>
+			</footer>
 		</div>
 	</div>
 </div>

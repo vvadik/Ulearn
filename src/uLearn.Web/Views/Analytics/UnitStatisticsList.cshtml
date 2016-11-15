@@ -1,0 +1,21 @@
+﻿@model UnitStatisticPageModel
+
+@{
+	ViewBag.Title = "Аналитика";
+}
+
+<body>
+	<div class="container">
+
+		<h1 class="hidden-xs">Аналитика</h1>
+
+		<h3>Выберите модуль</h3>
+
+		@foreach (var unitName in Model.UnitsNames)
+		{
+			<div>
+				@Html.ActionLink(unitName, "UnitStatistics", new { courseId = Model.CourseId, unitName = unitName })
+			</div>
+		}
+	</div>
+</body>

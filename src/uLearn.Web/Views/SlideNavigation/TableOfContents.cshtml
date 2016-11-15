@@ -36,7 +36,7 @@
 {
 	var collapseOption = unit.IsCurrent ? "collapse in" : "collapse";
 	<li class="units-list-item full-width">
-		<a data-toggle="collapse" href=@("#N" + index) class="units-list-item-text" data-score="@SlideHtml.Score(unit.Score, unit.MaxScore)">@unit.UnitName</a>
+		<a data-toggle="collapse" href=@("#N" + index) class="units-list-item-text no-smooth-scrolling" data-score="@SlideHtml.Score(unit.Score, unit.MaxScore)">@unit.UnitName</a>
 		<ul id=@("N" + index) class="slides-list @collapseOption">
 			@foreach (var page in unit.Pages)
 			{

@@ -1232,6 +1232,10 @@ table.analytics__user-answers {
 	.analytics__dashboard .student-progress {
 		width: 90px;
 	}
+
+	.analytics__dashboard #students .student {
+		margin-bottom: 10px;
+	}
 }
 
 .analytics__dashboard .large-number {
@@ -1317,6 +1321,10 @@ table.analytics__user-answers {
     width: 250px;
 	margin-left: 10px;
 	margin-bottom: 25px;
+}
+
+.exercise__reviews.empty {
+	display: none;
 }
 
 .exercise__review {
@@ -1431,6 +1439,11 @@ table.analytics__user-answers {
 	display: none;
 }
 
+.user-submission .exercise__score button.disabled {
+	pointer-events: initial;
+	cursor: initial;
+}
+
 @media (max-width: 1000px) {
 	.user-submission {
 		overflow: hidden;
@@ -1477,6 +1490,16 @@ table.analytics__user-answers {
 		margin: 0 -15px;
 		min-height: 110px;
 	}
+
+	.user-submission .last-review-comments {
+		margin-top: 10px;
+	}
+}
+
+.commented-code {
+	background-color: #fbdddd;
+	padding: 0 5px;
+	font-family: monospace;
 }
 
 /* Loading spinner */

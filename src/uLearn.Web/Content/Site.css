@@ -75,6 +75,10 @@ input[type="checkbox"].input-validation-error {
 	color: #D8D8D8;
 }
 
+.navbar .dropdown .glyphicon {
+	height: 20px;
+}
+
 @media (max-width: 767px) {
 	h1 {
 		font-size: 25px;
@@ -140,7 +144,8 @@ a.no-underline:focus {
 .ml10 { margin-left: 10px; }
 .mt10 { margin-top: 10px; }
 
-.hidden-xs-inline { display: inline-block !important; }
+.hidden-xs-inline { display: inline !important; }
+.hidden-xs-inline-block { display: inline-block !important; }
 .visible-xs-inline { display: none !important; }
 
 @media (min-width: 768px) {
@@ -150,5 +155,19 @@ a.no-underline:focus {
 
 @media (max-width: 767px) {
 	.hidden-xs-inline { display: none !important; }
+	.hidden-xs-inline-block { display: none !important; }
 	.visible-xs-inline { display: inline-block !important; }
+}
+
+footer {
+	margin-top: 60px;
+	color: #888;
+}
+
+footer p {
+	margin: 3px 0;
+}
+
+footer:hover {
+	color: #111;
 }
