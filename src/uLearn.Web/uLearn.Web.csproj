@@ -1458,6 +1458,8 @@
     <Content Include="Views\Exercise\Submission.cshtml" />
     <Content Include="Views\Exercise\_ExerciseScoreForm.cshtml" />
     <Content Include="Views\Analytics\UserUnitStatistics.cshtml" />
+    <Content Include="Views\Analytics\UnitStatisticsList.cshtml" />
+    <Content Include="Views\Home\Terms.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

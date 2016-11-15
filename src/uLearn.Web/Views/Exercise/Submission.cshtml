@@ -21,9 +21,11 @@
 		})
 
 		var classString = Model.IsGuest ? "code-guest" : "code-exercise";
+		var canAddReviews = false;
 		if (Model.ManualChecking != null && Model.ManualChecking.SubmissionId == currentSubmissionId)
 		{
 			classString = "code-review";
+			canAddReviews = true;
 		}
 		else if (Model.SubmissionSelectedByUser != null)
 		{
@@ -82,7 +84,9 @@
 
 		if (Model.ReviewState == ExerciseReviewState.Reviewed || Model.InstructorView)
 		{
-			<div class="exercise__reviews">
+			/* For reviewed submission without reviews don't show reviews panel at all*/
+			var isEmpty = Model.Reviews.Count == 0 && ! canAddReviews ? "empty" : "";
+			<div class="exercise__reviews @isEmpty">
 				@foreach (var review in Model.Reviews.OrderBy(r => r.StartLine))
 				{
 					@Html.Partial("_ExerciseReview", new ExerciseCodeReviewModel

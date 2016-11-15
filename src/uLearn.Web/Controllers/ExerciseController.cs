@@ -56,7 +56,7 @@ namespace uLearn.Web.Controllers
 				return Json(new RunSolutionResult
 				{
 					IsCompileError = true,
-					ErrorMessage = "Слишком большой код."
+					ErrorMessage = "Слишком большой код"
 				});
 			}
 			var exerciseSlide = courseManager.GetCourse(courseId).FindSlideById(slideId) as ExerciseSlide;
@@ -122,8 +122,9 @@ namespace uLearn.Web.Controllers
 			return $"{User.Identity.Name}: {exerciseSlide.Info.UnitName} - {exerciseSlide.Title}";
 		}
 
-		[System.Web.Mvc.HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		[System.Web.Mvc.HttpPost]
+		[ValidateInput(false)]
 		public async Task<ActionResult> AddExerciseCodeReview(string courseId, int checkingId, [FromBody] ReviewInfo reviewInfo)
 		{
 			var checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(checkingId);
@@ -169,8 +170,9 @@ namespace uLearn.Web.Controllers
 			return Json(new { status = "ok" });
 		}
 
-		[System.Web.Mvc.HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		[System.Web.Mvc.HttpPost]
+		[ValidateInput(false)]
 		public async Task<ActionResult> UpdateExerciseCodeReview(string courseId, int reviewId, string comment)
 		{
 			var review = slideCheckingsRepo.FindExerciseCodeReviewById(reviewId);
@@ -259,7 +261,7 @@ namespace uLearn.Web.Controllers
 						status = "error",
 						error = "has_greatest_score",
 						score = manualScore,
-						checkedQueueUrl = Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId, done = true})
+						checkedQueueUrl = Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId, done = true, userId, slideId})
 					});
 
 			/* TODO: check if 0 <= exercisScore <= exercise.MaxReviewScore */
@@ -310,7 +312,7 @@ namespace uLearn.Web.Controllers
 			var visit = visitsRepo.FindVisiter(course.Id, slide.Id, userId);
 
 			var solution = submission?.SolutionCode.Text;
-			var submissionReviews = submission?.ManualCheckings.LastOrDefault()?.Reviews.Where(r => !r.IsDeleted);
+			var submissionReviews = submission?.ManualCheckings.LastOrDefault()?.NotDeletedReviews;
 
 			var hasUncheckedReview = submission?.ManualCheckings.Any(c => !c.IsChecked) ?? false;
 			var hasCheckedReview = submission?.ManualCheckings.Any(c => c.IsChecked) ?? false;
@@ -387,7 +389,10 @@ namespace uLearn.Web.Controllers
 			if (manualChecking != null)
 			{
 				if (manualChecking.CourseId == courseId)
+				{
 					model.ManualChecking = manualChecking;
+					model.Reviews = manualChecking.NotDeletedReviews;
+				}
 			}
 
 			return PartialView(model);
@@ -396,6 +401,7 @@ namespace uLearn.Web.Controllers
 
 	public class ReviewInfo
 	{
+		[AllowHtml]
 		public string Comment { get; set; }
 		public int StartLine { get; set; }
 		public int StartPosition { get; set; }

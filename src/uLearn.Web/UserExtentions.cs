@@ -19,11 +19,9 @@ namespace uLearn.Web
 			if (principal.IsSystemAdministrator())
 				return true;
 
-			var courseRole = principal.GetAllRoles().FirstOrDefault(t => t.Item1 == courseId);
-			if (courseRole == null)
-				return false;
+			var courseRole = principal.GetAllRoles().FirstOrDefault(t => string.Compare(t.Item1, courseId, StringComparison.OrdinalIgnoreCase) == 0);
 
-			return courseRole.Item2 <= minAccessLevel;
+			return courseRole?.Item2 <= minAccessLevel;
 		}
 
 		public static bool HasAccess(this IPrincipal principal, CourseRole minAccessLevel)

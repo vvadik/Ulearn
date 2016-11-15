@@ -115,5 +115,9 @@
 	if (courses.Count > 10)
 	{
 		<li><b>@Html.ActionLink("Все курсы", "CourseList", "Admin")</b></li>
+}
+	if (courses.Count == 0)
+	{
+		<li>Нет курсов. @Html.ActionLink("Создать", "CourseList", "Admin").</li>
 	}
 }
