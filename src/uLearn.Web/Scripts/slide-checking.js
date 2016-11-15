@@ -7,6 +7,19 @@
 	// TODO: multiple $otherScoreInput on page with simple score forms
 	var $otherScoreInput = $scoreBlock.find('[name=exerciseScore]');
 
+	var setLockTimeout = function ($lock) {
+		$lock[0].lockTimeout = setTimeout(function () {
+			$lock.animate({ left: 15 });
+			$lock.closest('.user-submission').find('.status').text('');
+		}, 8000);
+	}
+
+	var clearLockTimeout = function ($lock) {
+		var lockTimeout = $lock[0].lockTimeout;
+		if (lockTimeout)
+			clearTimeout(lockTimeout);
+	}
+
 	var sendSimpleScore = function ($scoreForm, ignoreNewestSubmission) {
 		ignoreNewestSubmission = ignoreNewestSubmission || false;
 		var $status = $scoreForm.find('.status');
@@ -18,6 +31,8 @@
 			postData += "&ignoreNewestSubmission=true";
 		if ($scoreForm.data('checkingId'))
 			postData += "&updateCheckingId=" + parseInt($scoreForm.data('checkingId'));
+
+		clearLockTimeout($userSubmissionInfo);
 
 		$.ajax({
 			type: 'post',
@@ -54,19 +69,6 @@
 		}).always(function() {
 			$status.removeClass('waiting');
 		});
-	}
-
-	var setLockTimeout = function($lock) {
-		$lock[0].lockTimeout = setTimeout(function () {
-			$lock.animate({ left: 15 });
-			$lock.closest('.user-submission').find('.status').text('');
-		}, 8000);
-	}
-
-	var clearLockTimeout = function ($lock) {
-		var lockTimeout = $lock[0].lockTimeout;
-		if (lockTimeout)
-			clearTimeout(lockTimeout);
 	}
 
 	$scoreBlock.on('click', '.simple-score-link', function(e) {
@@ -164,7 +166,9 @@
 		if (Math.abs(e.distX) < 50) {
 			$submissionInfo.animate({ left: $(window).width() + 15 });
 			setLockTimeout($submissionInfo);
-		} else
+		} else {
 			$submissionInfo.animate({ left: 15 });
+			$submissionInfo.closest('.user-submission').find('.status').text('');
+		}
 	});
 });
