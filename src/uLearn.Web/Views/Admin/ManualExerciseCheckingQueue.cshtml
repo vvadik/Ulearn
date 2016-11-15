@@ -6,20 +6,24 @@
 }
 
 <div class="container">
-	<h1>Очередь на код ревью</h1>
+	<h1>Код-ревью</h1>
 
-	@Html.Partial("_ManualCheckingQueueFilterForm", Model)
+	@if (Model.ShowFilterForm)
+	{
 
-	<p>
-		@if (! Model.AlreadyChecked)
-		{
-			@Html.ActionLink("Проверенные работы →", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId, done = true }, new { @class="btn btn-xs btn-info" })
-		}
-		else
-		{
-			@Html.ActionLink("← Вернуться в очередь", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId }, new { @class="btn btn-xs btn-info" })
-		}
-	</p>
+		@Html.Partial("_ManualCheckingQueueFilterForm", Model)
+
+		<p>
+			@if (!Model.AlreadyChecked)
+			{
+				@Html.ActionLink("Проверенные работы →", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId, done = true }, new { @class = "btn btn-xs btn-info" })
+			}
+			else
+			{
+				@Html.ActionLink("← Вернуться в очередь", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId }, new { @class = "btn btn-xs btn-info" })
+			}
+		</p>
+	}
 
 	@if (!string.IsNullOrEmpty(Model.Message) && Model.Checkings.Count > 0)
 	{
@@ -82,13 +86,18 @@
 						</span>
 					</p>
 					<p>
-						@if (checkModel.ContextReviewsComments.Any())
+						@if (checkModel.ContextReviews.Any())
 						{
 								<b>Комментарии:</b>
-								for (var i = 0; i < checkModel.ContextReviewsComments.Count; i++)
+								foreach (var review in checkModel.ContextReviews)
 								{
-									var comment = checkModel.ContextReviewsComments[i];
-									<span title="@comment.TruncateWithEllipsis(200)">@comment.TruncateWithEllipsis(100)</span>@(i < checkModel.ContextReviewsComments.Count - 1 ? ", " : "") 
+									 var solution = checkModel.ContextExerciseSolution;
+									 var startPosition = solution.FindPositionByLineAndCharacted(review.StartLine, review.StartPosition);
+									 var finishPosition = solution.FindPositionByLineAndCharacted(review.FinishLine, review.FinishPosition);
+									<div>
+										<span class="commented-code">@solution.Substring(startPosition, finishPosition - startPosition).TruncateWithEllipsis(30)</span>
+										@review.Comment
+									</div>
 								}
 						}
 					</p>

@@ -33,8 +33,15 @@
 				addExerciseCodeReview(renderedReview);
 				$self.find('.exercise__add-review__comment').val('');
 				$self.hide();
-				$button.text('Сохранить').removeAttr('disabled');
+				$button.text('Сохранить (Ctrl+Enter)').removeAttr('disabled');
 			});
+		});
+
+		/* Trigger button clock on Ctrl + Enter */
+		$self.find('.exercise__add-review__comment').keydown(function(e) {
+			if (e.ctrlKey && e.keyCode === 13) {
+				$self.find('.exercise__add-review__button').trigger('click');
+			}
 		});
 	});
 

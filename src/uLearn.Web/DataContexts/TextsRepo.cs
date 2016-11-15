@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
 using System.Linq;
@@ -76,6 +77,11 @@ namespace uLearn.Web.DataContexts
 					Text = null
 				};
 			return db.Texts.Find(hash);
+		}
+
+		public Dictionary<string, string> GetTextsByHashes(IEnumerable<string> hashes)
+		{
+			return db.Texts.Where(t => hashes.Contains(t.Hash)).ToDictionary(t => t.Hash, t => t.Text);
 		}
 	}
 }

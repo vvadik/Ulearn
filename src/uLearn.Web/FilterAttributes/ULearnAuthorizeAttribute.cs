@@ -25,7 +25,7 @@ namespace uLearn.Web.FilterAttributes
 		protected override bool AuthorizeCore(HttpContextBase httpContext)
 		{
 			if (httpContext == null)
-				throw new ArgumentNullException("httpContext");
+				throw new ArgumentNullException(nameof(httpContext));
 
 			var user = httpContext.User;
 			if (!user.Identity.IsAuthenticated)
@@ -40,7 +40,7 @@ namespace uLearn.Web.FilterAttributes
 			if (MinAccessLevel == CourseRole.Student)
 				return false;
 
-			var courseIds = httpContext.Request.Params.GetValues("courseId"); 
+			var courseIds = httpContext.Request.Unvalidated.QueryString.GetValues("courseId");
 			if (courseIds == null)
 				return user.HasAccess(MinAccessLevel);
 

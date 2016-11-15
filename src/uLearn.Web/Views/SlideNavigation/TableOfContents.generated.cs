@@ -90,15 +90,15 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<li class=\"units-list-ite
 
 WebViewPage.WriteTo(@__razor_helper_writer, "#N" + index);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, " class=\"units-list-item-text\" data-score=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, " class=\"units-list-item-text no-smooth-scrolling\" data-score=\"");
 
 
-                                               WebViewPage.WriteTo(@__razor_helper_writer, SlideHtml.Score(unit.Score, unit.MaxScore));
+                                                                   WebViewPage.WriteTo(@__razor_helper_writer, SlideHtml.Score(unit.Score, unit.MaxScore));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">");
 
 
-                                                                                            WebViewPage.WriteTo(@__razor_helper_writer, unit.UnitName);
+                                                                                                                WebViewPage.WriteTo(@__razor_helper_writer, unit.UnitName);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</a>\r\n\t\t<ul id=");
 

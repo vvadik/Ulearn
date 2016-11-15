@@ -444,7 +444,13 @@ namespace uLearn.Web.Controllers
 		{
 			/* Select between January, 1 and September, 1 */
 			var now = DateTime.Now;
-			return 1 < now.Month && now.Month < 9 ? new DateTime(now.Year, 1, 1) : new DateTime(now.Year, 9, 1);
+			var periodStart = 1 < now.Month && now.Month < 9 ? new DateTime(now.Year, 1, 1) : new DateTime(now.Year, 9, 1);
+
+			/* At least one month should be passed before now */
+			var monthAgo = now.AddMonths(-1);
+			if (periodStart > monthAgo)
+				periodStart = monthAgo;
+			return periodStart;
 		}
 
 		public DateTime PeriodFinishDate

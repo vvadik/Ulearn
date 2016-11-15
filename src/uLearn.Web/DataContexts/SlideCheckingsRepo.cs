@@ -232,12 +232,12 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public Dictionary<int, List<string>> GetExerciseCodeReviewForCheckings(IEnumerable<int> checkingsIds)
+		public Dictionary<int, List<ExerciseCodeReview>> GetExerciseCodeReviewForCheckings(IEnumerable<int> checkingsIds)
 		{
 			return db.ExerciseCodeReviews
 				.Where(r => checkingsIds.Contains(r.ExerciseCheckingId) && ! r.IsDeleted)
 				.GroupBy(r => r.ExerciseCheckingId)
-				.ToDictionary(g => g.Key, g => g.Select(r => r.Comment).ToList());
+				.ToDictionary(g => g.Key, g => g.ToList());
 		}
 
 		public List<string> GetTopUserReviewComments(string courseId, Guid slideId, string userId, int count)

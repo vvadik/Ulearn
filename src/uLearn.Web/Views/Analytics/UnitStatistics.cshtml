@@ -159,7 +159,7 @@
 					<div>
 						Всего посмотрели весь модуль к&nbsp;@Model.PeriodFinish.ToDatePrettyString(true):
 						<strong>
-							@(Model.UsersVisitedAllSlidesBeforePeriodFinishedCount - Model.UsersVisitedAllSlidesBeforePeriodCount)
+							@Model.UsersVisitedAllSlidesBeforePeriodFinishedCount
 						</strong>
 					</div>
 					<div>
@@ -207,11 +207,11 @@
 							{
 								if (slide is QuizSlide)
 								{
-									<span class="glyphicon glyphicon-pushpin small-table__title__cell hidden-xs-inline" title="@slide.Title"></span>
+									<span class="glyphicon glyphicon-pushpin small-table__title__cell hidden-xs-inline-block" title="@slide.Title"></span>
 								}
 								else if (slide is ExerciseSlide)
 								{
-									<span class="glyphicon glyphicon-edit small-table__title__cell hidden-xs-inline" title="@slide.Title"></span>
+									<span class="glyphicon glyphicon-edit small-table__title__cell hidden-xs-inline-block" title="@slide.Title"></span>
 								}
 							}
 						</div>
@@ -259,7 +259,7 @@
 									var visit = Model.SlidesVisits.GetOrDefault(exerciseOrQuiz.Id, new List<Visit>()).FirstOrDefault(v => v.UserId == userInfo.UserId);
 									if (visit != null && visit.IsPassed)
 									{
-										<span class="small-table__right-cell hidden-xs-inline" title="@visit.Timestamp.ToPrettyString()">
+										<span class="small-table__right-cell hidden-xs-inline-block" title="@visit.Timestamp.ToPrettyString()">
 											@if (exerciseOrQuiz is ExerciseSlide)
 											{
 												@Html.ActionLink(
@@ -277,7 +277,7 @@
 									}
 									else
 									{
-										<span class="small-table__right-cell hidden-xs-inline">&nbsp;</span>
+										<span class="small-table__right-cell hidden-xs-inline-block">&nbsp;</span>
 									}
 								}
 							</div>

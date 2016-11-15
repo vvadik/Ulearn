@@ -56,14 +56,25 @@
 		});
 	}
 
+	var setLockTimeout = function($lock) {
+		$lock[0].lockTimeout = setTimeout(function () {
+			$lock.animate({ left: 15 });
+			$lock.closest('.user-submission').find('.status').text('');
+		}, 8000);
+	}
+
+	var clearLockTimeout = function ($lock) {
+		var lockTimeout = $lock[0].lockTimeout;
+		if (lockTimeout)
+			clearTimeout(lockTimeout);
+	}
+
 	$scoreBlock.on('click', '.simple-score-link', function(e) {
 		e.preventDefault();
 		var $self = $(this);
 		var submissionId = $self.data('submissionId');
 		var $form = $self.closest('.exercise__simple-score-form');
-		var lockTimeout = $self.closest('.user-submission').find('.user-submission__info')[0].lockTimeout;
-		if (lockTimeout)
-			clearTimeout(lockTimeout);
+		clearLockTimeout($self.closest('.user-submission').find('.user-submission__info'));
 		$form.find('[name=submissionId]').val(submissionId);
 		sendSimpleScore($form, true);
 	});
@@ -138,10 +149,22 @@
 			/* Unlock */
 			$self.animate({ left: $(window).width() + 15 });
 			/* And lock after 8 seconds */
-			$self[0].lockTimeout = setTimeout(function () {
-				$self.animate({ left: 15 });
-				$self.closest('.user-submission').find('.status').text('');
-			}, 8000);
+			setLockTimeout($self);
 		}
+	});
+
+	$('.exercise__simple-score-form').bind('move', function(e) {
+		var $submissionInfo = $(this).closest('.user-submission').find('.user-submission__info');
+		var left = parseInt($submissionInfo.css('left'));
+		$submissionInfo.css({ left: left + e.deltaX });
+	}).bind('moveend', function (e) {
+		var $submissionInfo = $(this).closest('.user-submission').find('.user-submission__info');
+		clearLockTimeout($submissionInfo);
+		/* Unlock or lock */
+		if (Math.abs(e.distX) < 50) {
+			$submissionInfo.animate({ left: $(window).width() + 15 });
+			setLockTimeout($submissionInfo);
+		} else
+			$submissionInfo.animate({ left: 15 });
 	});
 });

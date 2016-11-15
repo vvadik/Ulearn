@@ -1323,6 +1323,10 @@ table.analytics__user-answers {
 	margin-bottom: 25px;
 }
 
+.exercise__reviews.empty {
+	display: none;
+}
+
 .exercise__review {
 	border-left: 3px solid #fdd;
     margin: 10px 0;
@@ -1435,12 +1439,6 @@ table.analytics__user-answers {
 	display: none;
 }
 
-.user-submission .last-review-comments .commented-code {
-	background-color: #f7b7b7;
-	padding: 0 5px;
-	font-family: monospace;
-}
-
 .user-submission .exercise__score button.disabled {
 	pointer-events: initial;
 	cursor: initial;
@@ -1496,6 +1494,12 @@ table.analytics__user-answers {
 	.user-submission .last-review-comments {
 		margin-top: 10px;
 	}
+}
+
+.commented-code {
+	background-color: #fbdddd;
+	padding: 0 5px;
+	font-family: monospace;
 }
 
 /* Loading spinner */

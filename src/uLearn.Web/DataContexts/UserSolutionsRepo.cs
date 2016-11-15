@@ -381,6 +381,15 @@ namespace uLearn.Web.DataContexts
 			}
 			return null;
 		}
+		
+		public Dictionary<int, string> GetSolutionsForSubmissions(IEnumerable<int> submissionsIds)
+		{
+			var solutionsHashes = db.UserExerciseSubmissions
+				.Where(s => submissionsIds.Contains(s.Id))
+				.Select(s => new { Hash=s.SolutionCodeHash, SubmissionId=s.Id }).ToList();
+			var textsByHash = textsRepo.GetTextsByHashes(solutionsHashes.Select(s => s.Hash));
+			return solutionsHashes.ToDictionary(s => s.SubmissionId, s => textsByHash.GetOrDefault(s.Hash, ""));
+		}
 
 		public async Task WaitUnhandled(TimeSpan timeout)
 		{

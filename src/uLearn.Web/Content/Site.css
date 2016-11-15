@@ -76,7 +76,7 @@ input[type="checkbox"].input-validation-error {
 }
 
 .navbar .dropdown .glyphicon {
-	line-height: inherit;
+	height: 20px;
 }
 
 @media (max-width: 767px) {
@@ -145,6 +145,7 @@ a.no-underline:focus {
 .mt10 { margin-top: 10px; }
 
 .hidden-xs-inline { display: inline !important; }
+.hidden-xs-inline-block { display: inline-block !important; }
 .visible-xs-inline { display: none !important; }
 
 @media (min-width: 768px) {
@@ -154,6 +155,7 @@ a.no-underline:focus {
 
 @media (max-width: 767px) {
 	.hidden-xs-inline { display: none !important; }
+	.hidden-xs-inline-block { display: none !important; }
 	.visible-xs-inline { display: inline-block !important; }
 }
 
