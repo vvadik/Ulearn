@@ -10,7 +10,8 @@ namespace uLearn.CourseTool
 		[Test]
 		public void ConfigTemplate_IsOk()
 		{
-			var config = new FileInfo("templates\\config.xml").DeserializeXml<Config>();
+			var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "templates", "config.xml");
+			var config = new FileInfo(path).DeserializeXml<Config>();
 			config.IgnoredUlearnSlides = new[] { "1", "2" };
 			Approvals.VerifyXml(config.XmlSerialize());
 		}

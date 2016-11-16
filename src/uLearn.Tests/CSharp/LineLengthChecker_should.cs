@@ -26,7 +26,7 @@ namespace uLearn.CSharp
 		}
 		private void CheckIncorrect(string incorrectCode, string messageSubstring)
 		{
-			Assert.That(FindErrors(incorrectCode), Is.StringContaining("Строка 1").And.StringContaining(messageSubstring), incorrectCode);
+			Assert.That(FindErrors(incorrectCode), Does.Contain("Строка 1").And.Contain(messageSubstring), incorrectCode);
 		}
 
 		private static string FindErrors(string code)

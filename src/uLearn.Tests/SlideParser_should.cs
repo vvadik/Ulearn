@@ -9,6 +9,12 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class SlideParser_should
 	{
+		[SetUp]
+		public void SetUp()
+		{
+			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
+		}
+
 		[Test]
 		[Explicit("Для отладки на конкретных слайдах из курсов")]
 		public void Test()
@@ -74,28 +80,28 @@ namespace uLearn.CSharp
 		{
 			Slide slide = GenerateSlide("NestedClass.cs");
 			Assert.That(slide.Blocks[0].IsCode());
-			Assert.That(((CodeBlock)slide.Blocks[0]).Code, Is.StringContaining("class Point"));
+			Assert.That(((CodeBlock)slide.Blocks[0]).Code, Does.Contain("class Point"));
 		}
 
 		[Test]
 		public void remove_attributes_from_nested_class_members()
 		{
 			Slide slide = GenerateSlide("NestedClass.cs");
-			Assert.That(slide.Blocks[0].Text(), Is.Not.StringContaining("["));
+			Assert.That(slide.Blocks[0].Text(), Does.Not.Contain("["));
 		}
 
 		[Test]
 		public void remove_hidden_members_of_nested_class()
 		{
 			Slide slide = GenerateSlide("NestedClass.cs");
-			Assert.That(slide.Blocks[0].Text(), Is.Not.StringContaining("Hidden"));
+			Assert.That(slide.Blocks[0].Text(), Does.Not.Contain("Hidden"));
 		}
 
 		[Test]
 		public void remove_common_nesting_of_nested_class()
 		{
 			Slide slide = GenerateSlide("NestedClass.cs");
-			Assert.That(slide.Blocks[0].Text(), Is.StringStarting("public class Point"));
+			Assert.That(slide.Blocks[0].Text(), Does.Contain("public class Point"));
 		}
 
 		[Test]
@@ -121,11 +127,11 @@ namespace uLearn.CSharp
 		public void remove_Excluded_members_from_solution()
 		{
 			var slide = (ExerciseSlide)GenerateSlide("NestedClass.cs");
-			var solution = slide.Exercise.BuildSolution("");
-			Assert.That(solution, Is.Not.StringContaining("["));
-			Assert.That(solution, Is.Not.StringContaining("]"));
-			Assert.That(solution, Is.Not.StringContaining("public int X, Y"));
-			Assert.That(solution, Is.Not.StringContaining("public Point(int x, int y)"));
+			var solution = slide.Exercise.BuildSolution("").ToString();
+			Assert.That(solution, Does.Not.Contain("["));
+			Assert.That(solution, Does.Not.Contain("]"));
+			Assert.That(solution, Does.Not.Contain("public int X, Y"));
+			Assert.That(solution, Does.Not.Contain("public Point(int x, int y)"));
 		}
 
 
@@ -133,21 +139,21 @@ namespace uLearn.CSharp
 		public void make_code_block_with_method_signature_if_specified()
 		{
 			Slide slide = GenerateSlide("Simple.cs");
-			Assert.That(slide.Blocks[0].Text(), Is.StringContaining("public void Method()"));
+			Assert.That(slide.Blocks[0].Text(), Does.Contain("public void Method()"));
 		}
 
 		[Test]
 		public void remove_common_nesting_in_method_body()
 		{
 			Slide slide = GenerateSlide("Simple.cs");
-			Assert.That(slide.Blocks[0].Text(), Is.StringStarting("Console.WriteLine(42);"));
+			Assert.That(slide.Blocks[0].Text(), Does.Contain("Console.WriteLine(42);"));
 		}
 
 		[Test]
 		public void remove_common_nesting_in_method_with_header()
 		{
 			Slide slide = GenerateSlide("Simple.cs");
-			Assert.That(slide.Blocks[0].Text(), Is.StringContaining("\npublic void Method()"));
+			Assert.That(slide.Blocks[0].Text(), Does.Contain("\npublic void Method()"));
 		}
 
 		[Test]
@@ -155,8 +161,8 @@ namespace uLearn.CSharp
 		{
 			Slide slide = GenerateSlide("Simple.cs");
 			var blockText = slide.Blocks[0].Text();
-			Assert.That(blockText, Is.StringContaining("Console.WriteLine(42);"));
-			Assert.That(blockText, Is.Not.StringContaining("HiddenMethodHeader"));
+			Assert.That(blockText, Does.Contain("Console.WriteLine(42);"));
+			Assert.That(blockText, Does.Not.Contain("HiddenMethodHeader"));
 		}
 
 		[Test]
@@ -164,7 +170,7 @@ namespace uLearn.CSharp
 		{
 			Slide slide = GenerateSlide("Simple.cs");
 			var blockText = slide.Blocks[0].Text();
-			Assert.That(blockText, Is.Not.StringContaining("Hidden"));
+			Assert.That(blockText, Does.Not.Contain("Hidden"));
 		}
 
 		[Test]
@@ -172,7 +178,7 @@ namespace uLearn.CSharp
 		{
 			Slide slide = GenerateSlide("HiddenNestedClass.cs");
 			var blockText = slide.Blocks[0].Text();
-			Assert.That(blockText, Is.Not.StringContaining("Hidden"));
+			Assert.That(blockText, Does.Not.Contain("Hidden"));
 		}
 
 		[Test]
@@ -189,9 +195,9 @@ namespace uLearn.CSharp
 		public void preserve_blocks_order_as_in_source_file()
 		{
 			Slide slide = GenerateSlide("SlideWithComments.cs");
-			Assert.That(slide.Blocks[0].Text(), Is.StringStarting("Comment"));
+			Assert.That(slide.Blocks[0].Text(), Does.Contain("Comment"));
 			Assert.That(slide.Blocks[1].IsCode());
-			Assert.That(slide.Blocks[2].Text(), Is.StringStarting("Final"));
+			Assert.That(slide.Blocks[2].Text(), Does.Contain("Final"));
 			Assert.That(slide.Blocks.Length, Is.EqualTo(3));
 		}
 
@@ -201,8 +207,8 @@ namespace uLearn.CSharp
 			var slide = (ExerciseSlide)GenerateSlide("Exercise.cs");
 			Assert.That(slide.Blocks.First().Text(), Is.EqualTo("Add 2 and 3 please!"));
 			Assert.That(slide.Blocks.Skip(1).Single(), Is.InstanceOf<ExerciseBlock>());
-			Assert.That(slide.Exercise.ExerciseInitialCode, Is.StringStarting("public void Add_2_and_3()"));
-			Assert.That(slide.Exercise.ExerciseInitialCode, Is.Not.StringContaining("NotImplementedException"));
+			Assert.That(slide.Exercise.ExerciseInitialCode, Does.Contain("public void Add_2_and_3()"));
+			Assert.That(slide.Exercise.ExerciseInitialCode, Does.Not.Contain("NotImplementedException"));
 			Assert.That(slide.Exercise.HintsMd.Count, Is.EqualTo(0));
 		}
 
@@ -272,18 +278,18 @@ namespace uLearn.CSharp
 		{
 			var slide = GenerateSlide("ManyClasses.cs");
 			var code = slide.Blocks[0].Text();
-			Assert.That(code, Is.StringContaining("M0()"));
-			Assert.That(code, Is.StringContaining("M()"));
-			Assert.That(code, Is.StringContaining("ManyClasses3"));
-			Assert.That(code, Is.Not.StringContaining("ManyClasses1"));
-			Assert.That(code, Is.Not.StringContaining("ManyClasses2"));
+			Assert.That(code, Does.Contain("M0()"));
+			Assert.That(code, Does.Contain("M()"));
+			Assert.That(code, Does.Contain("ManyClasses3"));
+			Assert.That(code, Does.Not.Contain("ManyClasses1"));
+			Assert.That(code, Does.Not.Contain("ManyClasses2"));
 		}
 
 		[Test]
 		public void set_initial_exercise_code_even_if_no_exercise_method()
 		{
 			var slide = (ExerciseSlide)GenerateSlide("ExerciseWithoutExerciseMethod.cs");
-			Assert.That(slide.Exercise.ExerciseInitialCode.Trim(), Is.StringStarting("class MyClass"));
+			Assert.That(slide.Exercise.ExerciseInitialCode.Trim(), Does.Contain("class MyClass"));
 		}
 
 		[Test]

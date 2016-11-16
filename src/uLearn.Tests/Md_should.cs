@@ -9,10 +9,10 @@ namespace uLearn
 		[Test]
 		public void qualify_urls()
 		{
-			Assert.That("[a](a.html)".RenderMd("/Course"), Is.StringContaining("href=\"/Course/a.html\""));
-			Assert.That("[a](a.html)".RenderMd("/Course/"), Is.StringContaining("href=\"/Course/a.html\""));
-			Assert.That("[a](a.html)".RenderMd(), Is.StringContaining("href=\"a.html\""));
-			Assert.That("[a](/a.html)".RenderMd(), Is.StringContaining("href=\"/a.html\""));
+			Assert.That("[a](a.html)".RenderMd("/Course"), Does.Contain("href=\"/Course/a.html\""));
+			Assert.That("[a](a.html)".RenderMd("/Course/"), Does.Contain("href=\"/Course/a.html\""));
+			Assert.That("[a](a.html)".RenderMd(), Does.Contain("href=\"a.html\""));
+			Assert.That("[a](/a.html)".RenderMd(), Does.Contain("href=\"/a.html\""));
 		}
 
 		[Test]

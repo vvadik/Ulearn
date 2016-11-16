@@ -25,6 +25,7 @@ namespace uLearn.CourseTool
 		[SetUp]
 		public void SetUp()
 		{
+			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
 			if (!Directory.Exists(testFolderName))
 				Directory.CreateDirectory(testFolderName);
 			var courseManager = new CourseManager(new DirectoryInfo("."));

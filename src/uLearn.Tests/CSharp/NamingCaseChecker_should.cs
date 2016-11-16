@@ -87,7 +87,7 @@ namespace uLearn.CSharp
 
 		private void CheckIncorrect(string incorrectCode)
 		{
-			Assert.That(FindErrors(incorrectCode), Is.StringContaining("Строка 1"), incorrectCode);
+			Assert.That(FindErrors(incorrectCode), Does.Contain("Строка 1"), incorrectCode);
 		}
 
 		private static string FindErrors(string code)

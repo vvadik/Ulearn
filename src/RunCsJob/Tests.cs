@@ -13,6 +13,13 @@ namespace RunCsJob
 	{
 		private const int outputLimit = 10 * 1024 * 1024;
 
+		[SetUp]
+		public static void SetUp()
+		{
+			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
+		}
+
+
 		[TestCase(@"namespace Test { public class Program { static public void Main() { return ; } } }",
 			"", "", "",
 			TestName = "Public class and Main")]
@@ -88,7 +95,7 @@ namespace RunCsJob
 		{
 			var details = GetDetails(code, "");
 			Assert.AreEqual(Verdict.CompilationError, details.Verdict);
-			Assert.IsNotNullOrEmpty(details.CompilationOutput);
+			Assert.That(details.CompilationOutput, Is.Not.Null.And.Not.Empty);
 		}
 
 		[TestCase("using System; using System.IO; namespace UntrustedCode { public class UntrustedClass { public static void Main() { Directory.GetFiles(@\"c:\\\"); }}}",
@@ -105,7 +112,7 @@ namespace RunCsJob
 		{
 			var details = GetDetails(code, "");
 			Assert.AreEqual(Verdict.SecurityException, details.Verdict);
-			Assert.IsNotNullOrEmpty(details.Error);
+			Assert.That(details.Error, Is.Not.Null.And.Not.Empty);
 		}
 
 		[TestCase("using System; namespace Test { public class Program { static public void Main() { throw new Exception(); }}}",
@@ -118,7 +125,7 @@ namespace RunCsJob
 		{
 			var details = GetDetails(code, "");
 			Assert.AreEqual(Verdict.RuntimeError, details.Verdict);
-			Assert.IsNotNullOrEmpty(details.Error);
+			Assert.That(details.Error, Is.Not.Null.And.Not.Empty);
 		}
 
 		[TestCase("using System; class Program { static void Main() { var s = new string('*', $limit + 1); Console.Write(s); }}",
@@ -148,7 +155,7 @@ while(true) ++a;
 }}",
 			TestName = "Infinty loop")]
 		[TestCase(@"using System.Threading; class Program{ private static void Main() { 
-Thread.Sleep(20000);
+Thread.Sleep(50000);
 }}",
 			TestName = "Thread.Sleep")]
 		[TestCase(@"using System; using System.Collections.Generic; class Program { static void Main() { 
@@ -209,7 +216,7 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 		{
 			var details = GetDetails(code, "");
 			Assert.AreEqual(Verdict.Ok, details.Verdict);
-			Assert.IsNotNullOrEmpty(details.CompilationOutput);
+			Assert.That(details.CompilationOutput, Is.Not.Null.And.Not.Empty);
 		}
 
 		[Test]
@@ -250,6 +257,12 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 	[TestFixture]
 	public class RunMsBuildTests
 	{
+		[SetUp]
+		public void SetUp()
+		{
+			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
+		}
+
 		[Test]
 		public void SimpleProjTest()
 		{
