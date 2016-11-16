@@ -10,6 +10,7 @@ using uLearn.Model.Edx.EdxComponents;
 namespace uLearn.CourseTool
 {
 	[TestFixture]
+	[Explicit]
 	public class Converter_should
 	{
 		private Course course;
