@@ -9,7 +9,6 @@ namespace uLearn.Web.Models
 		[StringLength(40)]
 		public string Hash { get; set; }
 
-		[StringLength(4000)]
 		public string Text { get; set; }
 	}
 }

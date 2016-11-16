@@ -294,6 +294,10 @@
     <Compile Include="Controllers\CommentsBot.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
+    <Compile Include="Migrations\201611161930289_RemoveTextBlobLimits.cs" />
+    <Compile Include="Migrations\201611161930289_RemoveTextBlobLimits.Designer.cs">
+      <DependentUpon>201611161930289_RemoveTextBlobLimits.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\FilterOptions.cs" />
     <Compile Include="DataContexts\SlideCheckingsRepo.cs" />
     <Compile Include="Migrations\201608231750470_SlideChecking.cs" />
@@ -833,6 +837,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610200703516_AddUsersFullTextIndex.resx">
       <DependentUpon>201610200703516_AddUsersFullTextIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611161930289_RemoveTextBlobLimits.resx">
+      <DependentUpon>201611161930289_RemoveTextBlobLimits.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
