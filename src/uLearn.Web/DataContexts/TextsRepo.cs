@@ -13,7 +13,7 @@ namespace uLearn.Web.DataContexts
 	public class TextsRepo
 	{
 		private readonly ULearnDb db;
-		public const int MaxTextSize = 4000;
+		public const int MaxTextSize = 20000;
 
 		public TextsRepo() : this(new ULearnDb())
 		{
