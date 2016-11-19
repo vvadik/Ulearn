@@ -305,9 +305,8 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		private ExerciseBlockData CreateExerciseBlockData(Course course, Slide slide, UserExerciseSubmission submission, bool onlyAccepted)
+		private ExerciseBlockData CreateExerciseBlockData(Course course, Slide slide, UserExerciseSubmission submission, bool onlyAccepted, string currentUserId)
 		{
-			var currentUserId = User.Identity.GetUserId();
 			var userId = submission?.UserId ?? currentUserId;
 			var visit = visitsRepo.FindVisiter(course.Id, slide.Id, userId);
 
@@ -381,7 +380,7 @@ namespace uLearn.Web.Controllers
 			if (manualChecking != null && !submissionId.HasValue)
 				submission = manualChecking.Submission;
 
-			var model = CreateExerciseBlockData(course, slide, submission, onlyAccepted);
+			var model = CreateExerciseBlockData(course, slide, submission, onlyAccepted, currentUserId);
 			model.IsLti = isLti;
 			model.ShowOutputImmediately = showOutput;
 			model.InstructorView = instructorView;
