@@ -207,6 +207,15 @@ namespace uLearn.CourseTool
 			return response;
 		}
 
+		public void ForceReloadCourse()
+		{
+			lock (locker)
+			{
+				course = ReloadCourse();
+				Console.WriteLine($"Course reloaded. LastChangeTime: {lastChangeTime}");
+			}
+		}
+
 		Course ReloadCourse()
 		{
 			var loadedCourse = new CourseLoader().LoadCourse(new DirectoryInfo(courseDir));

@@ -31,9 +31,16 @@ namespace uLearn.CourseTool
 					break;
 				if (key == ConsoleKey.O)
 					OpenInBrowser();
+				if (key == ConsoleKey.R)
+					ReloadCourse();
 				else
 					Console.WriteLine(@"Press 'Q' to exit. Press 'O' to open course in browser");
 			}
+		}
+
+		private void ReloadCourse()
+		{
+			server.ForceReloadCourse();
 		}
 
 		private void StartWatchingCourseDir()
