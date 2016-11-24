@@ -16,6 +16,10 @@
     <dependencies>
       <dependency id="Kontur.Ulearn.RunCsJob.Api" version="(1.0,)" />
       <dependency id="Kontur.Ulearn" version="(1.0,)" />
-    </dependencies>
+    </dependencies>    
   </metadata>
+  <files>
+    <file src="App.config" target="content\RunCsJob.exe.config" />
+    <file src="bin\*\RunCsJob.exe" target="content" />
+  </files>
 </package>
