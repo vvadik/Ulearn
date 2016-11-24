@@ -20,6 +20,6 @@
   </metadata>
   <files>
     <file src="App.config" target="content\RunCsJob.exe.config" />
-    <file src="bin\*\RunCsJob.exe" target="content" />
+    <file src="bin\Release\RunCsJob.exe" target="content" />
   </files>
 </package>
