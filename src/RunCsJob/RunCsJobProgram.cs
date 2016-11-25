@@ -8,15 +8,18 @@ using uLearn;
 
 namespace RunCsJob
 {
-	internal class RunCsJobProgram
+	public class RunCsJobProgram
 	{
 		private readonly string address;
 		private readonly string token;
 		private readonly TimeSpan sleep;
 		private readonly int jobsToRequest;
+		private readonly ManualResetEvent shutdownEvent = new ManualResetEvent(false);
 
-		private RunCsJobProgram()
+		public RunCsJobProgram(ManualResetEvent externalShutdownEvent=null)
 		{
+			if (externalShutdownEvent != null)
+				shutdownEvent = externalShutdownEvent;
 			address = ConfigurationManager.AppSettings["submissionsUrl"];
 			token = ConfigurationManager.AppSettings["runnerToken"];
 			sleep = TimeSpan.FromSeconds(int.Parse(ConfigurationManager.AppSettings["sleepSeconds"] ?? "1"));
@@ -35,7 +38,7 @@ namespace RunCsJob
 				new RunCsJobProgram().Run(pathToCompiler);
 		}
 
-		private void Run(string pathToCompiler)
+		public void Run(string pathToCompiler)
 		{
 			AppDomain.MonitoringIsEnabled = true;
 			Console.WriteLine($"Listen {address}");
@@ -45,7 +48,7 @@ namespace RunCsJob
 
 		private void MainLoop(string pathToCompiler, Client client)
 		{
-			while (true)
+			while (!shutdownEvent.WaitOne(0))
 			{
 				var newUnhandled = client.TryGetSubmissions(jobsToRequest).Result;
 				Console.WriteLine($"Received {newUnhandled.Count} submissions: [{string.Join(", ", newUnhandled.Select(s => s.Id))}]");
@@ -58,7 +61,6 @@ namespace RunCsJob
 				}
 				Thread.Sleep(sleep);
 			}
-			// ReSharper disable once FunctionNeverReturns
 		}
 
 		private static void SelfCheck(string pathToCompiler)

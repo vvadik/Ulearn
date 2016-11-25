@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Kontur.Ulearn.RunCsJob</id>
+    <id>Kontur.Ulearn.RunCsJob.Service</id>
     <version>$version$</version>
     <title>$title$</title>
     <authors>SKB Kontur</authors>
@@ -13,11 +13,5 @@
     <releaseNotes></releaseNotes>
     <copyright>Copyright 2014–2016 SKB Kontur</copyright>
     <tags>ulearn education mooc</tags>
-    <!--
-    <dependencies>
-      <dependency id="Kontur.Ulearn.RunCsJob.Api" version="(1.0,)" />
-      <dependency id="Kontur.Ulearn" version="(1.0,)" />
-    </dependencies>
-    -->    
   </metadata>
 </package>
