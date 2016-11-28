@@ -83,7 +83,7 @@ namespace RunCsJob
 			}
 			finally
 			{
-				SafeRemoveDirectory(dir.FullName);
+				//SafeRemoveDirectory(dir.FullName);
 			}
 		}
 

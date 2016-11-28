@@ -45,6 +45,7 @@ namespace RunCsJob
 
 		private void MainLoop(string pathToCompiler, Client client)
 		{
+			Console.WriteLine("Path to compiller " + pathToCompiler + " " + Directory.Exists(pathToCompiler));
 			while (true)
 			{
 				var newUnhandled = client.TryGetSubmissions(jobsToRequest).Result;
