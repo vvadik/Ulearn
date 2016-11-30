@@ -165,7 +165,7 @@
 		/* Unlock or lock */
 		if (Math.abs(e.distX) < 50) {
 			$submissionInfo.animate({ left: $(window).width() + 15 });
-			setLockTimeout($submissionInfo);
+			setLockTimeout($submissionInfo); 
 		} else {
 			$submissionInfo.animate({ left: 15 });
 			$submissionInfo.closest('.user-submission').find('.status').text('');

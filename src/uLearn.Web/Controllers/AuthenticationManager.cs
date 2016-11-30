@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.Web;
+using log4net;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -11,6 +12,7 @@ namespace uLearn.Web.Controllers
 {
 	public class AuthenticationManager
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(AuthenticationManager));
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly UserRolesRepo userRoles = new UserRolesRepo();
 
@@ -21,6 +23,7 @@ namespace uLearn.Web.Controllers
 
 		public static async Task LoginAsync(HttpContextBase context, ApplicationUser user, bool isPersistent)
 		{
+			log.Info($"Пользователь {user.VisibleName} (логин = {user.UserName}, id = {user.Id}) залогинился");
 			await new AuthenticationManager().InternalLoginAsync(context, user, isPersistent);
 		}
 

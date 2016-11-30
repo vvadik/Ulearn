@@ -103,6 +103,10 @@
       <HintPath>..\packages\JetBrains.Annotations.10.1.4\lib\net20\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="LtiLibrary.Core">
       <HintPath>..\packages\LtiLibrary.Core.1.5.4\lib\net45\LtiLibrary.Core.dll</HintPath>
     </Reference>
@@ -429,6 +433,7 @@
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="PluralizeExtensions.cs" />
     <Compile Include="StringExtensions.cs" />
+    <Compile Include="App_Start\UlearnLogger.cs" />
     <Compile Include="UserExtentions.cs" />
     <Compile Include="LTI\LtiAuthenticationExtensions.cs" />
     <Compile Include="LTI\LtiUtils.cs" />

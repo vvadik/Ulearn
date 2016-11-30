@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using log4net;
 using uLearn.Model.Blocks;
 
 namespace uLearn
@@ -18,6 +18,8 @@ namespace uLearn
 	public class CourseManager
 	{
 		private const string helpPackageName = "Help";
+
+		private static readonly ILog log = LogManager.GetLogger(typeof(CourseManager));
 
 		private readonly DirectoryInfo stagedDirectory;
 		private readonly DirectoryInfo coursesDirectory;
@@ -109,9 +111,11 @@ namespace uLearn
 			{
 				if (courses.Count != 0)
 					return;
+				log.Info($"Загружаю курсы из {stagedDirectory.FullName}");
 				var courseZips = stagedDirectory.GetFiles("*.zip");
 				foreach (var zipFile in courseZips)
 				{
+					log.Info($"Обновляю курс из {zipFile.Name}");
 					try
 					{
 						var courseId = GetCourseId(zipFile.FullName);
@@ -119,6 +123,7 @@ namespace uLearn
 					}
 					catch (Exception e)
 					{
+						log.Error($"Не могу загрузить курс из {zipFile.FullName}", e);
 						if (firstException == null)
 							firstException = new Exception("Error loading course from " + zipFile.Name, e);
 					}
@@ -128,17 +133,19 @@ namespace uLearn
 				throw firstException;
 		}
 
-		public Course ReloadCourse(string courseId)
+		protected Course ReloadCourse(string courseId)
 		{
 			/* First try load course from directory */
 			try
 			{
 				var courseDir = GetExtractedCourseDirectory(courseId);
+				log.Info($"Сначала попробую загрузить уже распакованный курс из {courseDir.FullName}");
 				return ReloadCourseFromDirectory(courseDir);
 			}
 			catch (Exception)
 			{
 				var zipFile = GetStagingCourseFile(courseId);
+				log.Info($"Неудача. Загружаю из zip-архива: {zipFile.FullName}");
 				return ReloadCourseFromZip(zipFile);
 			}
 		}
@@ -147,6 +154,7 @@ namespace uLearn
 		{
 			var course = LoadCourseFromZip(zipFile);
 			courses[course.Id] = course;
+			log.Info($"Курс {course.Id} загружен из {zipFile.FullName} и сохранён в памяти");
 			return course;
 		}
 
@@ -154,6 +162,7 @@ namespace uLearn
 		{
 			var course = LoadCourseFromDirectory(directory);
 			courses[course.Id] = course;
+			log.Info($"Курс {course.Id} загружен из {directory.FullName} и сохранён в памяти");
 			return course;
 		}
 
@@ -184,6 +193,7 @@ namespace uLearn
 		{
 			var courseOrVersionId = GetCourseId(zipFile.Name);
 			var courseDir = coursesDirectory.CreateSubdirectory(courseOrVersionId);
+			log.Info($"Распаковываю архив с курсом из {zipFile.FullName} в {courseDir.FullName}");
 			UnzipFile(zipFile, courseDir);
 			return courseDir;
 		}
@@ -372,6 +382,8 @@ namespace uLearn
 				if (TryCreateLockFile(lockFile))
 					return;
 
+				log.Info($"Курс {courseId} заблокирован, жду {waitBetweenLockTries.TotalSeconds} секунд");
+
 				Thread.Sleep(waitBetweenLockTries);
 
 				try
@@ -380,6 +392,8 @@ namespace uLearn
 					/* If lock-file has been created ago, just delete it and unzip course again */
 					if (lockFile.Exists && lockFile.LastWriteTime < DateTime.Now.Subtract(lockLifeTime))
 					{
+						log.Info($"Курс {courseId} заблокирован слишком давно, снимаю блокировку");
+
 						lockFile.Delete();
 						UnzipCourseFile(GetStagingCourseFile(courseId));
 					}

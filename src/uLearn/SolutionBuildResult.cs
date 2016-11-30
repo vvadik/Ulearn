@@ -15,11 +15,11 @@ namespace uLearn
 
 		public override string ToString()
 		{
-			return string.Format("ErrorMessage: {0}, SourceCode:\r\n{1}", ErrorMessage ?? StyleMessage, SourceCode);
+			return $"ErrorMessage: {ErrorMessage ?? StyleMessage}, SourceCode:\r\n{SourceCode}";
 		}
 
-		public bool HasErrors { get { return ErrorMessage != null; } }
-		public bool HasStyleIssues { get { return StyleMessage != null; } }
+		public bool HasErrors => ErrorMessage != null;
+		public bool HasStyleIssues => StyleMessage != null;
 
 		public readonly string ErrorMessage;
 		public readonly string StyleMessage;

@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Mvc;
+using log4net;
 using Microsoft.AspNet.Identity;
 using uLearn.Model.Blocks;
 using uLearn.Web.DataContexts;
@@ -17,6 +18,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class ExerciseController : Controller
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(ExerciseController));
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly UsersRepo usersRepo = new UsersRepo();
@@ -87,12 +89,15 @@ namespace uLearn.Web.Controllers
 				);
 
 			if (submission == null)
+			{
+				log.Error($"Не смог запустить проверку решения, никто не взял его на проверку.\nКурс: {courseId}, слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})");
 				return new RunSolutionResult
 				{
 					IsCompillerFailure = true,
 					ErrorMessage = "Ой-ой, штуковина, которая проверяет решения, сломалась (или просто устала).\nПопробуйте отправить решение позже — когда она немного отдохнет.",
 					ExecutionServiceName = "uLearn"
 				};
+			}
 
 			var automaticChecking = submission.AutomaticChecking;
 			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);

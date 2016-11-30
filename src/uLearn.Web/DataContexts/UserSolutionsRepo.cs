@@ -8,12 +8,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using ApprovalUtilities.Utilities;
+using log4net;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts
 {
 	public class UserSolutionsRepo
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(UserSolutionsRepo));
 		private readonly ULearnDb db;
 		private readonly TextsRepo textsRepo = new TextsRepo();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
@@ -77,6 +79,7 @@ namespace uLearn.Web.DataContexts
 			}
 			catch (DbEntityValidationException e)
 			{
+				log.Error(e);
 				throw new Exception(
 					string.Join("\r\n",
 						e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
@@ -368,6 +371,8 @@ namespace uLearn.Web.DataContexts
 				userId, executionServiceName, displayName);
 			hasUnhandled = true;
 
+			log.Info($"Запускаю проверку решения. ID посылки: {submission.Id}");
+
 			var sw = Stopwatch.StartNew();
 			while (sw.Elapsed < timeout)
 			{
@@ -377,7 +382,10 @@ namespace uLearn.Web.DataContexts
 					return null;
 
 				if (updatedSubmission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Done)
+				{
+					log.Info($"Посылка {submission.Id} проверена. Результат: {updatedSubmission.AutomaticChecking.GetVerdict()}");
 					return updatedSubmission;
+				}
 			}
 			return null;
 		}

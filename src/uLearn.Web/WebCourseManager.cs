@@ -2,26 +2,38 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Web.Configuration;
 using System.Web.Hosting;
+using log4net;
 using uLearn.Web.DataContexts;
-using uLearn.Web.Models;
 
 namespace uLearn.Web
 {
 	public class WebCourseManager : CourseManager
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(WebCourseManager));
+
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
 		private readonly TimeSpan fetchCourseVersionEvery = TimeSpan.FromMinutes(1);
 
-		public WebCourseManager() 
-			: base(new DirectoryInfo(GetAppPath()))
+		private WebCourseManager() 
+			: base(GetCoursesDirectory())
 		{
 		}
 
 		private static string GetAppPath()
 		{
 			return HostingEnvironment.ApplicationPhysicalPath ?? "..";
+		}
+
+		private static DirectoryInfo GetCoursesDirectory()
+		{
+			var coursesDirectory = WebConfigurationManager.AppSettings["ulearn.coursesDirectory"];
+			if (string.IsNullOrEmpty(coursesDirectory))
+				coursesDirectory = GetAppPath();
+
+			return new DirectoryInfo(coursesDirectory);
 		}
 
 		private readonly object @lock = new object();
@@ -43,7 +55,10 @@ namespace uLearn.Web
 				Guid loadedVersionId;
 				if (loadedCourseVersions.TryGetValue(courseId, out loadedVersionId)
 					&& loadedVersionId != publishedVersion.Id)
+				{
+					log.Info($"Загруженная версия курса {courseId} отличается от актуальной. Обновляю курс.");
 					course = ReloadCourse(courseId);
+				}
 				loadedCourseVersions[courseId] = publishedVersion.Id;
 			}
 			return course;

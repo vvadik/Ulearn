@@ -232,10 +232,6 @@ namespace uLearn.Web.Controllers
 						model.ReturnUrl = this.FixRedirectUrl(model.ReturnUrl);
 
 					model.RegistrationFinished = true;
-					
-//					if (string.IsNullOrWhiteSpace(model.ReturnUrl))
-//						return RedirectToAction("Index", "Home");
-//					return Redirect(this.FixRedirectUrl(model.ReturnUrl));
 				}
 				else
 					this.AddErrors(result);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.Identity;
+﻿using log4net;
+using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -18,6 +19,8 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 	public class AdminController : Controller
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(AdminController));
+
 		private readonly WebCourseManager courseManager;
 		private readonly ULearnDb db;
 		private readonly UsersRepo usersRepo;
@@ -498,14 +501,17 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> PublishVersion(string courseId, Guid versionId)
 		{
+			log.Info($"Публикую версию курса {courseId}. ID версии: {versionId}");
 			var versionFile = courseManager.GetCourseVersionFile(versionId);
 			var courseFile = courseManager.GetStagingCourseFile(courseId);
 			var oldCourse = courseManager.GetCourse(courseId);
 
 			/* First, try to load course from LRU-cache or zip file */
+			log.Info($"Загружаю версию {versionId}");
 			var version = courseManager.GetVersion(versionId);
 
 			/* Copy version's zip file to course's zip archive, overwrite if need */
+			log.Info($"Копирую архив с версий в архив с курсом: {versionFile.FullName} → {courseFile.FullName}");
 			versionFile.CopyTo(courseFile.FullName, true);
 			courseManager.EnsureVersionIsExtracted(versionId);
 
@@ -513,13 +519,19 @@ namespace uLearn.Web.Controllers
 			version.Id = courseId;
 
 			/* and move course from version's directory to courses's directory */
+			var extractedVersionDirectory = courseManager.GetExtractedVersionDirectory(versionId);
+			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
+			log.Info($"Перемещаю паку с версий в папку с курсом: {extractedVersionDirectory.FullName} → {extractedCourseDirectory.FullName}");
 			courseManager.MoveCourse(
 				version,
-				courseManager.GetExtractedVersionDirectory(versionId),
-				courseManager.GetExtractedCourseDirectory(courseId));
+				extractedVersionDirectory,
+				extractedCourseDirectory);
 
+			log.Info($"Создаю версии тестов для курса {courseId}");
 			CreateQuizVersionsForSlides(courseId, version.Slides);
+			log.Info($"Помечаю версию {versionId} как опубликованную версию курса {courseId}");
 			await coursesRepo.MarkCourseVersionAsPublished(versionId);
+			log.Info($"Обновляю курс {courseId} в оперативной памяти");
 			courseManager.UpdateCourseVersion(courseId, versionId);
 
 			var courseDiff = new CourseDiff(oldCourse, version);

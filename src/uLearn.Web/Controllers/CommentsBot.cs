@@ -25,7 +25,7 @@ namespace uLearn.Web.Controllers
                 if (string.IsNullOrWhiteSpace(token))
                     return;
                 var api = new Telegram.Bot.TelegramBotClient(token);
-                var url = "https://ulearn.me/Course/" + comment.CourseId + "/" + comment.SlideId;
+                var url = "https://ulearn.me/Course/" + comment.CourseId + "/" + comment.SlideId + "#comment-" + comment.Id;
                 var text = "«" + comment.Text.Trim() + "»\nauthor: " + comment.Author.VisibleName + "\n" + url; 
                 await api.SendTextMessageAsync(channel, text);
             }

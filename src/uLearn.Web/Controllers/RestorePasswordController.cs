@@ -7,8 +7,8 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Exceptions;
+using log4net;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using SendGrid;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
@@ -17,6 +17,7 @@ namespace uLearn.Web.Controllers
 {
 	public class RestorePasswordController : Controller
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(RestorePasswordController));
 		private readonly RestoreRequestRepo requestRepo = new RestoreRequestRepo();
 		private readonly UserManager<ApplicationUser> userManager = new ULearnUserManager();
 		private readonly ULearnDb db = new ULearnDb();
@@ -95,6 +96,7 @@ namespace uLearn.Web.Controllers
 			}
 			catch (InvalidApiRequestException ex)
 			{
+				log.Error("Произошла ошибка при отправке письма", ex);
 				throw new Exception(ex.Message + ":\n\n" + string.Join("\n", ex.Errors), ex);
 			}
 		}
