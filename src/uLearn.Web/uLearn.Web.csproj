@@ -1472,7 +1472,9 @@
     <Content Include="Views\Analytics\UserUnitStatistics.cshtml" />
     <Content Include="Views\Analytics\UnitStatisticsList.cshtml" />
     <Content Include="Views\Home\Terms.cshtml" />
-    <Content Include="Web.Kontur.config" />
+    <Content Include="Web.Kontur.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
