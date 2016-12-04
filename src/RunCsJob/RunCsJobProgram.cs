@@ -45,6 +45,7 @@ namespace RunCsJob
 			var pathToCompiler = args.Any(x => x.StartsWith("-p:"))
 				? args.FirstOrDefault(x => x.StartsWith("-p:"))?.Substring(3)
 				: Path.Combine(new DirectoryInfo(".").FullName, "Microsoft.Net.Compilers.1.3.2");
+			Console.WriteLine("Path to compiller " + pathToCompiler + " " + Directory.Exists(pathToCompiler));
 
 			if (args.Contains("--selfcheck"))
 				SelfCheck(pathToCompiler);

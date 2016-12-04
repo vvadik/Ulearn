@@ -13,6 +13,7 @@ namespace RunCsJob
 			var path = Path.Combine(dir.FullName, projectFileName);
 			var proj = new Project(path, null, null, new ProjectCollection());
 			proj.SetProperty("CscToolPath", pathToCompiler);
+			proj.Save();
 			using (var stringWriter = new StringWriter())
 			{
 				var logger = new ConsoleLogger(LoggerVerbosity.Minimal, stringWriter.Write, color => { }, () => { });
