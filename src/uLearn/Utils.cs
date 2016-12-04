@@ -9,7 +9,7 @@ namespace uLearn
 	{
 		public static string GetSource(string courseId, Guid slideId, CourseManager courseManager, string code)
 		{
-			return courseId == "web" && slideId == Guid.Empty
+			return string.Compare(courseId, "web", StringComparison.OrdinalIgnoreCase) == 0 && slideId == Guid.Empty
 				? code
 				: ((SingleFileExerciseBlock)((ExerciseSlide)courseManager.GetCourse(courseId).GetSlideById(slideId))
 					.Exercise)

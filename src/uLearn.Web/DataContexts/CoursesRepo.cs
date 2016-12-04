@@ -62,7 +62,7 @@ namespace uLearn.Web.DataContexts
 			if (courseVersion == null)
 				return;
 
-			if (courseVersion.CourseId != courseId)
+			if (string.Compare(courseVersion.CourseId, courseId, StringComparison.OrdinalIgnoreCase) != 0)
 				return;
 
 			db.CourseVersions.Remove(courseVersion);
