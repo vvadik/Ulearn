@@ -69,7 +69,7 @@ namespace uLearn.Web.Controllers
 						.ToDictionary(
 							gg => gg.Key,
 							gg => gg
-								.Select(userRole => userRole.CourseId)
+								.Select(userRole => userRole.CourseId.ToLower())
 								.ToList()
 						)
 				);
@@ -117,7 +117,7 @@ namespace uLearn.Web.Controllers
 						.Select(s => new CourseAccessModel
 						{
 							CourseId = s,
-							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s),
+							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s.ToLower()),
 							ToggleUrl = Url.Action("ToggleRole", new { courseId = s, userId = user.UserId, role })
 						})
 						.ToList()

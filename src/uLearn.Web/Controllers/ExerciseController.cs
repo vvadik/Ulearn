@@ -181,7 +181,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> UpdateExerciseCodeReview(string courseId, int reviewId, string comment)
 		{
 			var review = slideCheckingsRepo.FindExerciseCodeReviewById(reviewId);
-			if (review.ExerciseChecking.CourseId != courseId)
+			if (string.Compare(review.ExerciseChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase) != 0)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			if (review.AuthorId != User.Identity.GetUserId())
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);

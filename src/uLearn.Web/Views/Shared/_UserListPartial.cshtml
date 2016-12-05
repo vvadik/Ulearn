@@ -40,7 +40,7 @@
 					</div>
 				</td>
 			}
-			@if (@Model.ShowDangerEntities)
+			@if (Model.ShowDangerEntities)
 			{
 				<td>
 					@using (Html.BeginForm("DeleteUser", "Account", new { userId = user.UserId }, FormMethod.Post))
