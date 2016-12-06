@@ -133,7 +133,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> AddExerciseCodeReview(string courseId, int checkingId, [FromBody] ReviewInfo reviewInfo)
 		{
 			var checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(checkingId);
-			if (string.Compare(checking.CourseId, courseId, StringComparison.OrdinalIgnoreCase) != 0)
+			if (! string.Equals(checking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			if (!checking.IsLockedBy(User.Identity))
@@ -165,7 +165,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> DeleteExerciseCodeReview(string courseId, int reviewId)
 		{
 			var review = slideCheckingsRepo.FindExerciseCodeReviewById(reviewId);
-			if (string.Compare(review.ExerciseChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase) != 0)
+			if (! string.Equals(review.ExerciseChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			if (review.AuthorId != User.Identity.GetUserId())
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
@@ -181,7 +181,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> UpdateExerciseCodeReview(string courseId, int reviewId, string comment)
 		{
 			var review = slideCheckingsRepo.FindExerciseCodeReviewById(reviewId);
-			if (string.Compare(review.ExerciseChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase) != 0)
+			if (! string.Equals(review.ExerciseChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			if (review.AuthorId != User.Identity.GetUserId())
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
@@ -360,7 +360,7 @@ namespace uLearn.Web.Controllers
 				submission = solutionsRepo.FindSubmissionById(submissionId.Value);
 				if (submission == null)
 					return HttpNotFound();
-				if (string.Compare(courseId, submission.CourseId, StringComparison.OrdinalIgnoreCase) != 0)
+				if (! string.Equals(courseId, submission.CourseId, StringComparison.OrdinalIgnoreCase))
 					return HttpNotFound();
 				if (slideId != submission.SlideId)
 					return HttpNotFound();
@@ -392,7 +392,7 @@ namespace uLearn.Web.Controllers
 			model.ShowOnlyAccepted = onlyAccepted;
 			if (manualChecking != null)
 			{
-				if (string.Compare(manualChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase) == 0)
+				if (string.Equals(manualChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
 				{
 					model.ManualChecking = manualChecking;
 					model.Reviews = manualChecking.NotDeletedReviews;
