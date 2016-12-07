@@ -13,7 +13,7 @@ namespace RunCsJob
 {
 	public class RunCsJobProgram
 	{
-		public static readonly string CompilersFolderName = "Microsoft.Net.Compilers.1.3.2";
+		private const string CompilersFolderName = "Microsoft.Net.Compilers.1.3.2";
 
 		private readonly string address;
 		private readonly string token;
@@ -36,8 +36,13 @@ namespace RunCsJob
 				sleep = TimeSpan.FromSeconds(int.Parse(ConfigurationManager.AppSettings["sleepSeconds"] ?? "1"));
 				jobsToRequest = int.Parse(ConfigurationManager.AppSettings["jobsToRequest"] ?? "5");
 
-				var currentDirectory = Directory.GetCurrentDirectory();
-				pathToCompiler = Path.Combine(currentDirectory, CompilersFolderName);
+				var baseDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
+				if (string.IsNullOrEmpty(baseDirectory))
+				{
+					log.Error($"Не могу определить текущую директорию. System.Reflection.Assembly.GetExecutingAssembly().CodeBase вернул {System.Reflection.Assembly.GetExecutingAssembly().CodeBase}");
+					Environment.Exit(1);
+				}
+				pathToCompiler = Path.Combine(baseDirectory, CompilersFolderName);
 			}
 			catch (Exception e)
 			{
