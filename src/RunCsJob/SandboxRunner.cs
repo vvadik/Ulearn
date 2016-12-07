@@ -64,19 +64,27 @@ namespace RunCsJob
 
 			try
 			{
-				if (submission is ProjRunnerSubmission)
-					return new SandboxRunner(submission).RunMsBuild(pathToCompiler, submissionCompilationDirectory);
-				return new SandboxRunner(submission).RunCsc60(submissionCompilationDirectory);
-			}
-			catch (Exception ex)
-			{
-			    log.Error(ex);
-				return new RunningResults
+				try
 				{
-					Id = submission.Id,
-					Verdict = Verdict.SandboxError,
-					Error = ex.ToString()
-				};
+					if (submission is ProjRunnerSubmission)
+						return new SandboxRunner(submission).RunMsBuild(pathToCompiler, submissionCompilationDirectory);
+					return new SandboxRunner(submission).RunCsc60(submissionCompilationDirectory);
+				}
+				catch (Exception ex)
+				{
+					log.Error(ex);
+					return new RunningResults
+					{
+						Id = submission.Id,
+						Verdict = Verdict.SandboxError,
+						Error = ex.ToString()
+					};
+				}
+			}
+			finally
+			{
+				log.Info($"Удаляю папку с решением: {submissionCompilationDirectory}");
+				SafeRemoveDirectory(submissionCompilationDirectory);
 			}
 		}
 
@@ -89,45 +97,38 @@ namespace RunCsJob
 		private RunningResults RunMsBuild(string pathToCompiler, string submissionCompilationDirectory)
 		{
 			var projSubmission = (ProjRunnerSubmission)submission;
-			log.Error($"Запускаю проверку C#-решения {projSubmission.Id} с помощью MsSuild");
+			log.Error($"Запускаю проверку C#-решения {projSubmission.Id} с помощью MsBuild");
 			var dir = new DirectoryInfo(submissionCompilationDirectory);
+
 			try
 			{
-				try
+				Utils.UnpackZip(projSubmission.ZipFileData, dir.FullName);
+			}
+			catch (Exception ex)
+			{
+				log.Error("Не могу распаковать решение", ex);
+				return new RunningResults
 				{
-					Utils.UnpackZip(projSubmission.ZipFileData, dir.FullName);
-				}
-				catch (Exception ex)
-				{
-					log.Error("Не могу распаковать решение", ex);
-					return new RunningResults
-					{
-						Id = submission.Id,
-						Verdict = Verdict.SandboxError,
-						Error = ex.ToString()
-					};
-				}
+					Id = submission.Id,
+					Verdict = Verdict.SandboxError,
+					Error = ex.ToString()
+				};
+			}
 
-				log.Info($"Компилирую решение {submission.Id}: {projSubmission.ProjectFileName} в папке {dir.FullName}");
+			log.Info($"Компилирую решение {submission.Id}: {projSubmission.ProjectFileName} в папке {dir.FullName}");
 
-				var builderResult = MsBuildRunner.BuildProject(pathToCompiler, projSubmission.ProjectFileName, dir);
-				result.Verdict = Verdict.Ok;
+			var builderResult = MsBuildRunner.BuildProject(pathToCompiler, projSubmission.ProjectFileName, dir);
+			result.Verdict = Verdict.Ok;
 
-				if (!builderResult.Success)
-				{
-					log.Info($"Решение {submission.Id} не скомпилировалось: {builderResult.ToString().RemoveNewLines()}");
-					result.Verdict = Verdict.CompilationError;
-					result.CompilationOutput = builderResult.ToString();
-					return result;
-				}
-				RunSandboxer($"\"{builderResult.PathToExe}\" {submission.Id}");
+			if (!builderResult.Success)
+			{
+				log.Info($"Решение {submission.Id} не скомпилировалось: {builderResult.ToString().RemoveNewLines()}");
+				result.Verdict = Verdict.CompilationError;
+				result.CompilationOutput = builderResult.ToString();
 				return result;
 			}
-			finally
-			{
-				log.Info($"Удаляю папку с решением: {dir.FullName}");
-				SafeRemoveDirectory(dir.FullName);
-			}
+			RunSandboxer($"\"{builderResult.PathToExe}\" {submission.Id}");
+			return result;
 		}
 
 		public RunningResults RunCsc60(string submissionCompilationDirectory)
