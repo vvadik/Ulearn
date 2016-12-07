@@ -25,6 +25,17 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 			_logger = logger;
 		}
 
+		private const string xSchemeHeaderName = "X-Scheme";
+
+		private static string GetRequestScheme(IOwinRequest request)
+		{
+			var scheme = request.Scheme;
+			if (request.Headers.ContainsKey(xSchemeHeaderName) && 
+				(request.Headers[xSchemeHeaderName] == "http" || request.Headers[xSchemeHeaderName] == "https"))
+				scheme = request.Headers[xSchemeHeaderName];
+			return scheme;
+		}
+
 		protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
 		{
 			_logger.WriteVerbose("AuthenticateCore");
@@ -133,7 +144,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 
 			if (challenge != null)
 			{
-				string requestPrefix = Request.Scheme + "://" + Request.Host;
+				string requestPrefix = GetRequestScheme(Request) + "://" + Request.Host;
 
 				QueryString currentQueryString = Request.QueryString;
 				string currentUri = !currentQueryString.HasValue
