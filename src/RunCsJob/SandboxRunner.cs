@@ -42,15 +42,31 @@ namespace RunCsJob
 				}
 				catch (Exception e)
 				{
-					log.Error($"Не могу создать директорию для компиляции решения: {workingDirectory}", e);
+					log.Error($"Не могу создать директорию для компиляции решений: {workingDirectory}", e);
 				}
 			}
+
 			var submissionCompilationDirectory = Path.Combine(workingDirectory, submission.Id);
+			try
+			{
+				Directory.CreateDirectory(submissionCompilationDirectory);
+			}
+			catch (Exception e)
+			{
+				log.Error($"Не могу создать директорию для компиляции решения: {submissionCompilationDirectory}", e);
+				return new RunningResults
+				{
+					Id = submission.Id,
+					Verdict = Verdict.SandboxError,
+					Error = e.ToString()
+				};
+			}
+
 			try
 			{
 				if (submission is ProjRunnerSubmission)
 					return new SandboxRunner(submission).RunMsBuild(pathToCompiler, submissionCompilationDirectory);
-				return new SandboxRunner(submission).RunCsc60();
+				return new SandboxRunner(submission).RunCsc60(submissionCompilationDirectory);
 			}
 			catch (Exception ex)
 			{
@@ -71,28 +87,14 @@ namespace RunCsJob
 
 		private RunningResults RunMsBuild(string pathToCompiler, string submissionCompilationDirectory)
 		{
-			var projSubmition = (ProjRunnerSubmission)submission;
-			log.Error($"Запускаю проверку C#-решения {projSubmition.Id} с помощью msbuild");
-			DirectoryInfo dir;
-			try
-			{
-				dir = Directory.CreateDirectory(submissionCompilationDirectory);
-			}
-			catch (Exception e)
-			{
-				log.Error($"Не могу создать директорию для компиляции решения: {submissionCompilationDirectory}", e);
-				return new RunningResults
-				{
-					Id = submission.Id,
-					Verdict = Verdict.SandboxError,
-					Error = e.ToString()
-				};
-			}
+			var projSubmission = (ProjRunnerSubmission)submission;
+			log.Error($"Запускаю проверку C#-решения {projSubmission.Id} с помощью MsSuild");
+			var dir = new DirectoryInfo(submissionCompilationDirectory);
 			try
 			{
 				try
 				{
-					Utils.UnpackZip(projSubmition.ZipFileData, dir.FullName);
+					Utils.UnpackZip(projSubmission.ZipFileData, dir.FullName);
 				}
 				catch (Exception ex)
 				{
@@ -105,9 +107,9 @@ namespace RunCsJob
 					};
 				}
 
-				log.Info($"Компилирую решение {submission.Id}: {projSubmition.ProjectFileName} в папке {dir.FullName}");
+				log.Info($"Компилирую решение {submission.Id}: {projSubmission.ProjectFileName} в папке {dir.FullName}");
 
-				var builderResult = MsBuildRunner.BuildProject(pathToCompiler, projSubmition.ProjectFileName, dir);
+				var builderResult = MsBuildRunner.BuildProject(pathToCompiler, projSubmission.ProjectFileName, dir);
 				result.Verdict = Verdict.Ok;
 
 				if (!builderResult.Success)
@@ -127,34 +129,10 @@ namespace RunCsJob
 			}
 		}
 
-		public RunningResults RunCsc()
+		public RunningResults RunCsc60(string submissionCompilationDirectory)
 		{
-			var assembly = AssemblyCreator.CreateAssembly((FileRunnerSubmission)submission);
-
-			result.Verdict = Verdict.Ok;
-			result.AddCompilationInfo(assembly);
-
-			if (result.IsCompilationError())
-			{
-				SafeRemoveFile(assembly.PathToAssembly);
-				return result;
-			}
-
-			if (!submission.NeedRun)
-			{
-				SafeRemoveFile(assembly.PathToAssembly);
-				return result;
-			}
-			RunSandboxer($"\"{Path.GetFullPath(assembly.PathToAssembly)}\" {submission.Id}");
-
-			SafeRemoveFile(assembly.PathToAssembly);
-			return result;
-		}
-
-		public RunningResults RunCsc60()
-		{
-			log.Error($"Запускаю проверку C#-решения {submission.Id} с помощью Roslyn");
-			var res = AssemblyCreator.CreateAssemblyWithRoslyn((FileRunnerSubmission)submission);
+			log.Error($"Запускаю проверку C#-решения {submission.Id}, компилирую с помощью Roslyn");
+			var res = AssemblyCreator.CreateAssemblyWithRoslyn((FileRunnerSubmission)submission, submissionCompilationDirectory);
 
 			result.Verdict = Verdict.Ok;
 			result.AddCompilationInfo(res.EmitResult.Diagnostics);

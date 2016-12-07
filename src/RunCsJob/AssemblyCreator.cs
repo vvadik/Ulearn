@@ -2,6 +2,7 @@
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -38,11 +39,15 @@ namespace RunCsJob
 
 		public static IEnumerable<int> x = Enumerable.Range(1, 1);
 
-		public static CompileResult CreateAssemblyWithRoslyn(FileRunnerSubmission submission)
+		public static CompileResult CreateAssemblyWithRoslyn(FileRunnerSubmission submission, string workingDirectory)
 		{
+			var currentDirectory = Directory.GetCurrentDirectory();
+			Directory.SetCurrentDirectory(workingDirectory);
+
 			IEnumerable<int> x = null;
 			SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(submission.Code);
-			var compilation = CSharpCompilation.Create(submission.Id, new[] { syntaxTree },
+			var assemblyName = submission.Id;
+			var compilation = CSharpCompilation.Create(assemblyName, new[] { syntaxTree },
 				new MetadataReference[]
 				{
 					MetadataReference.CreateFromFile(typeof(object).Assembly.Location), // mscorlib
@@ -51,7 +56,8 @@ namespace RunCsJob
 					MetadataReference.CreateFromFile(typeof(Point).Assembly.Location), //System.Drawing
 				}, new CSharpCompilationOptions(OutputKind.ConsoleApplication));
 
-			var assemblyFilename = submission.Id + ".exe";
+			var assemblyFilename = Path.Combine(workingDirectory, assemblyName + ".exe");
+			Directory.SetCurrentDirectory(currentDirectory);
 			return new CompileResult(compilation.Emit(assemblyFilename), assemblyFilename);
 		}
 
