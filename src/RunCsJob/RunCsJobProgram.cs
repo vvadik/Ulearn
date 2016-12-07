@@ -36,12 +36,7 @@ namespace RunCsJob
 				sleep = TimeSpan.FromSeconds(int.Parse(ConfigurationManager.AppSettings["sleepSeconds"] ?? "1"));
 				jobsToRequest = int.Parse(ConfigurationManager.AppSettings["jobsToRequest"] ?? "5");
 
-				var baseDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
-				if (string.IsNullOrEmpty(baseDirectory))
-				{
-					log.Error($"Не могу определить текущую директорию. System.Reflection.Assembly.GetExecutingAssembly().CodeBase вернул {System.Reflection.Assembly.GetExecutingAssembly().CodeBase}");
-					Environment.Exit(1);
-				}
+				var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 				pathToCompiler = Path.Combine(baseDirectory, CompilersFolderName);
 			}
 			catch (Exception e)
