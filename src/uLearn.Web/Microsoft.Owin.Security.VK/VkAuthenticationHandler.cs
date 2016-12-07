@@ -67,7 +67,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 
 				string tokenEndpoint = "https://oauth.vk.com/access_token";
 
-				string requestPrefix = Request.Scheme + "://" + Request.Host;
+				string requestPrefix = GetRequestScheme(Request) + "://" + Request.Host;
 				string redirectUri = requestPrefix + Request.PathBase + Options.ReturnEndpointPath;
 
 				string tokenRequest =
