@@ -13,10 +13,14 @@ namespace RunCsJob
 {
 	public class RunCsJobProgram
 	{
+		public static readonly string CompilersFolderName = "Microsoft.Net.Compilers.1.3.2";
+
 		private readonly string address;
 		private readonly string token;
 		private readonly TimeSpan sleep;
 		private readonly int jobsToRequest;
+		private static string pathToCompiler;
+
 		private readonly ManualResetEvent shutdownEvent = new ManualResetEvent(false);
 		private static readonly ILog log = LogManager.GetLogger(typeof(RunCsJobProgram));
 
@@ -24,12 +28,16 @@ namespace RunCsJob
 		{
 			if (externalShutdownEvent != null)
 				shutdownEvent = externalShutdownEvent;
+
 			try
 			{
 				address = ConfigurationManager.AppSettings["submissionsUrl"];
 				token = ConfigurationManager.AppSettings["runnerToken"];
 				sleep = TimeSpan.FromSeconds(int.Parse(ConfigurationManager.AppSettings["sleepSeconds"] ?? "1"));
 				jobsToRequest = int.Parse(ConfigurationManager.AppSettings["jobsToRequest"] ?? "5");
+
+				var currentDirectory = Directory.GetCurrentDirectory();
+				pathToCompiler = Path.Combine(currentDirectory, CompilersFolderName);
 			}
 			catch (Exception e)
 			{
@@ -42,21 +50,26 @@ namespace RunCsJob
 		{
 			XmlConfigurator.Configure();
 
-			var pathToCompiler = args.Any(x => x.StartsWith("-p:"))
-				? args.FirstOrDefault(x => x.StartsWith("-p:"))?.Substring(3)
-				: Path.Combine(new DirectoryInfo(".").FullName, "Microsoft.Net.Compilers.1.3.2");
-			Console.WriteLine("Path to compiller " + pathToCompiler + " " + Directory.Exists(pathToCompiler));
+			if (args.Any(x => x.StartsWith("-p:")))
+				pathToCompiler = args.FirstOrDefault(x => x.StartsWith("-p:"))?.Substring(3);
 
 			if (args.Contains("--selfcheck"))
 				SelfCheck(pathToCompiler);
 			else
-				new RunCsJobProgram().Run(pathToCompiler);
+				new RunCsJobProgram().Run();
 		}
 
-		public void Run(string pathToCompiler)
+		public void Run()
 		{
+			if (!Directory.Exists(pathToCompiler))
+			{
+				log.Error($"Не найдена папка с компиляторами: {pathToCompiler}");
+				Environment.Exit(1);
+			}
+			log.Info($"Путь до компиляторов: {pathToCompiler}");
+
 			AppDomain.MonitoringIsEnabled = true;
-			log.Info($"Monitoring {address} for new submissions");
+			log.Info($"Отправляю запросы на {address} для получения новых решений");
 
 			Client client;
 			try
@@ -65,7 +78,7 @@ namespace RunCsJob
 			}
 			catch (Exception e)
 			{
-				log.Error("Can't create Client for monitoring ulearn", e);
+				log.Error("Не могу создать HTTP-клиента для отправки запроса на ulearn", e);
 				throw;
 			}
 			MainLoop(pathToCompiler, client);
@@ -82,24 +95,24 @@ namespace RunCsJob
 				}
 				catch (Exception e)
 				{
-					log.Error($"Can't get new submissions from ulearn. Try again after {sleep.TotalSeconds} seconds", e);
+					log.Error($"Не могу получить решения из ulearn. Следующая попытка через {sleep.TotalSeconds} секунд", e);
 					Thread.Sleep(sleep);
 					continue;
 				}
 
-				log.Info($"Received {newUnhandled.Count} submissions: [{string.Join(", ", newUnhandled.Select(s => s.Id))}]");
+				log.Info($"Получил {newUnhandled.Count} решение(й) со следующими ID: [{string.Join(", ", newUnhandled.Select(s => s.Id))}]");
 
 				if (newUnhandled.Any())
 				{
-					var results = newUnhandled.Select(unhandled => SandboxRunner.Run(pathToCompiler, unhandled)).ToList();
-					log.Info($"Results: [{string.Join(", ", results.Select(r => r.Verdict))}]");
+					var results = newUnhandled.Select(unhandled => SandboxRunner.Run(unhandled, pathToCompiler)).ToList();
+					log.Info($"Результаты проверки: [{string.Join(", ", results.Select(r => r.Verdict))}]");
 					try
 					{
 						client.SendResults(results);
 					}
 					catch (Exception e)
 					{
-						log.Error("Can't send run results back to ulearn", e);
+						log.Error("Не могу отправить результаты проверки на ulearn", e);
 					}
 				}
 				Thread.Sleep(sleep);
@@ -108,14 +121,13 @@ namespace RunCsJob
 
 		private static void SelfCheck(string pathToCompiler)
 		{
-			var res = SandboxRunner.Run(pathToCompiler,
-				new FileRunnerSubmission
-				{
-					Id = Utils.NewNormalizedGuid(),
-					NeedRun = true,
-					Code = "class C { static void Main(){ System.Console.WriteLine(\"Привет мир!\");}}"
-				});
-			Console.WriteLine(res);
+			var res = SandboxRunner.Run(new FileRunnerSubmission
+			{
+				Id = Utils.NewNormalizedGuid(),
+				NeedRun = true,
+				Code = "class C { static void Main(){ System.Console.WriteLine(\"Привет мир!\");}}"
+			}, pathToCompiler);
+			log.Info(res);
 		}
 	}
 }

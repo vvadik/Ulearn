@@ -139,15 +139,14 @@ namespace uLearn
 			var pathToCompiler = Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2");
 			Console.WriteLine("pathToCompiler = " + pathToCompiler);
 			Assume.That(Directory.Exists(pathToCompiler));
-			var result = SandboxRunner.Run(pathToCompiler,
-				new ProjRunnerSubmission
-				{
-					Id = slide.Id.ToString(),
-					ZipFileData = bytes,
-					ProjectFileName = exercise.CsprojFileName,
-					Input = "",
-					NeedRun = true
-				});
+			var result = SandboxRunner.Run(new ProjRunnerSubmission
+			{
+			    Id = slide.Id.ToString(),
+			    ZipFileData = bytes,
+			    ProjectFileName = exercise.CsprojFileName,
+			    Input = "",
+			    NeedRun = true
+			}, pathToCompiler);
 
 			Console.WriteLine("Result = " + result);
 			Assert.AreEqual(Verdict.Ok, result.Verdict);
@@ -165,9 +164,9 @@ namespace uLearn
 				return;
 			}
 
-			var result = SandboxRunner.Run("", exercise.CreateSubmition(
-				slide.Id.ToString(),
-				exercise.EthalonSolution));
+			var result = SandboxRunner.Run(exercise.CreateSubmition(
+			    slide.Id.ToString(),
+			    exercise.EthalonSolution), "");
 
 			var output = result.GetOutput().NormalizeEoln();
 

@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Security.AccessControl;
 using System.Text;
+using FluentAssertions.Common;
+using log4net;
 using Newtonsoft.Json;
 using RunCsJob.Api;
 using uLearn;
@@ -10,6 +14,8 @@ namespace RunCsJob
 {
 	public class SandboxRunner
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(SandboxRunner));
+
 		private readonly RunnerSubmission submission;
 
 		private const int timeLimitInSeconds = 10;
@@ -24,12 +30,27 @@ namespace RunCsJob
 
 		private readonly RunningResults result = new RunningResults();
 
-		public static RunningResults Run(string pathToCompiler, RunnerSubmission submission)
+		public static RunningResults Run(RunnerSubmission submission, string pathToCompiler)
 		{
+			var workingDirectory = ConfigurationManager.AppSettings["ulearn.runcsjob.submissionsWorkingDirectory"];
+			if (string.IsNullOrEmpty(workingDirectory))
+				workingDirectory = Path.Combine(".", "submissions");
+			if (!Directory.Exists(workingDirectory))
+			{
+				try
+				{
+					Directory.CreateDirectory(workingDirectory);
+				}
+				catch (Exception e)
+				{
+					log.Error($"Не могу создать директорию для компиляции решения: {workingDirectory}", e);
+				}
+			}
+			var submissionCompilationDirectory = Path.Combine(workingDirectory, submission.Id);
 			try
 			{
 				if (submission is ProjRunnerSubmission)
-					return new SandboxRunner(submission).RunMsBuild(pathToCompiler);
+					return new SandboxRunner(submission).RunMsBuild(pathToCompiler, submissionCompilationDirectory);
 				return new SandboxRunner(submission).RunCsc60();
 			}
 			catch (Exception ex)
@@ -49,10 +70,25 @@ namespace RunCsJob
 			result.Id = submission.Id;
 		}
 
-		private RunningResults RunMsBuild(string pathToCompiler)
+		private RunningResults RunMsBuild(string pathToCompiler, string submissionCompilationDirectory)
 		{
 			var projSubmition = (ProjRunnerSubmission)submission;
-			var dir = Directory.CreateDirectory(Path.Combine(".", "submitions", submission.Id));
+			log.Error($"Запускаю проверку C#-решения {projSubmition.Id} с помощью msbuild");
+			DirectoryInfo dir;
+			try
+			{
+				dir = Directory.CreateDirectory(submissionCompilationDirectory);
+			}
+			catch (Exception e)
+			{
+				log.Error($"Не могу создать директорию для компиляции решения: {submissionCompilationDirectory}", e);
+				return new RunningResults
+				{
+					Id = submission.Id,
+					Verdict = Verdict.SandboxError,
+					Error = e.ToString()
+				};
+			}
 			try
 			{
 				try
@@ -61,6 +97,7 @@ namespace RunCsJob
 				}
 				catch (Exception ex)
 				{
+					log.Error("Не могу распаковать решение", ex);
 					return new RunningResults
 					{
 						Id = submission.Id,
@@ -69,11 +106,14 @@ namespace RunCsJob
 					};
 				}
 
+				log.Info($"Компилирую решение {submission.Id}: {projSubmition.ProjectFileName} в папке {dir.FullName}");
+
 				var builderResult = MsBuildRunner.BuildProject(pathToCompiler, projSubmition.ProjectFileName, dir);
 				result.Verdict = Verdict.Ok;
 
 				if (!builderResult.Success)
 				{
+					log.Info($"Решение {submission.Id} не скомпилировалось: {builderResult.ToString().RemoveNewLines()}");
 					result.Verdict = Verdict.CompilationError;
 					result.CompilationOutput = builderResult.ToString();
 					return result;
@@ -83,6 +123,7 @@ namespace RunCsJob
 			}
 			finally
 			{
+				log.Info($"Удаляю папку с решением: {dir.FullName}");
 				SafeRemoveDirectory(dir.FullName);
 			}
 		}
@@ -113,6 +154,7 @@ namespace RunCsJob
 
 		public RunningResults RunCsc60()
 		{
+			log.Error($"Запускаю проверку C#-решения {submission.Id} с помощью Roslyn");
 			var res = AssemblyCreator.CreateAssemblyWithRoslyn((FileRunnerSubmission)submission);
 
 			result.Verdict = Verdict.Ok;
@@ -120,6 +162,7 @@ namespace RunCsJob
 
 			if (result.IsCompilationError())
 			{
+				log.Error($"Ошибка компиляции:\n{result.CompilationOutput}");
 				SafeRemoveFile(res.PathToAssembly);
 				return result;
 			}
@@ -159,8 +202,8 @@ namespace RunCsJob
 
 		private void RunSandboxer(string args)
 		{
-			var startInfo = new ProcessStartInfo(
-				"CsSandboxer.exe", args)
+			log.Info($"Запускаю C#-песочницу с аргументами: {args}");
+			var startInfo = new ProcessStartInfo("CsSandboxer.exe", args)
 			{
 				RedirectStandardInput = true,
 				RedirectStandardOutput = true,
@@ -174,6 +217,7 @@ namespace RunCsJob
 
 			if (sandboxer == null)
 			{
+				log.Error("Не могу запустить C#-песочницу. Process.Start() вернул NULL");
 				result.Verdict = Verdict.SandboxError;
 				result.Error = "Can't start proces";
 				return;
@@ -186,6 +230,7 @@ namespace RunCsJob
 			{
 				if (!sandboxer.HasExited)
 				{
+					log.Error($"Песочница не завершилась через {timeLimit.TotalSeconds} секунд, убиваю её");
 					sandboxer.Kill();
 					result.Verdict = Verdict.SandboxError;
 					result.Error = "Sandbox does not respond";
@@ -229,12 +274,14 @@ namespace RunCsJob
 
 			if (hasTimeLimit)
 			{
+				log.Error("Программа превысила ограничение по времени");
 				result.Verdict = Verdict.TimeLimit;
 				return;
 			}
 
 			if (hasMemoryLimit)
 			{
+				log.Error("Программа превысила ограничение по памяти");
 				result.Verdict = Verdict.MemoryLimit;
 				return;
 			}

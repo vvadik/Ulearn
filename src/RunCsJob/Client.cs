@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
+using log4net;
 using RunCsJob.Api;
 
 namespace RunCsJob
@@ -16,6 +17,7 @@ namespace RunCsJob
 		private readonly HttpClient httpClient;
 		private const string instanceIdEnvironmentVariableName = "WEBSITE_INSTANCE_ID";
 		private const string arrAffinityCookieName = "ARRAffinity";
+		private static readonly ILog log = LogManager.GetLogger(typeof(Client));
 
 		public Client(string address, string token)
 		{
@@ -46,24 +48,11 @@ namespace RunCsJob
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine($@"Cant connect to {httpClient.BaseAddress}{uri}. {e.Message}");
+				log.Error($"Не могу подключиться к {httpClient.BaseAddress}{uri}", e);
 				if (e.InnerException != null)
-					Console.WriteLine(e.InnerException.Message);
+					log.Error(e.InnerException.Message);
 			}
 			return new List<RunnerSubmission>();
-		}
-
-		public async void SendResult(RunningResults result)
-		{
-			var uri = GetUri("PostResult");
-			var responce = await httpClient.PostAsJsonAsync(uri, result);
-
-			if (responce.IsSuccessStatusCode)
-				return;
-
-			Console.Error.WriteLine(DateTime.Now.ToString("HH:mm:ss"));
-			Console.Error.WriteLine(responce.ToString());
-			Console.Error.WriteLine(result);
 		}
 
 		public async void SendResults(List<RunningResults> results)
@@ -74,12 +63,10 @@ namespace RunCsJob
 			if (response.IsSuccessStatusCode)
 				return;
 
-			Console.Error.WriteLine("can't send " + DateTime.Now.ToString("HH:mm:ss"));
-			Console.Error.WriteLine(response.ToString());
-			Console.Error.WriteLine(response.Content.ReadAsStringAsync().Result);
+			log.Error($"Не могу отправить результаты проверки (они ниже) на сервер: {response}\n{response.Content.ReadAsStringAsync().Result}");
 			foreach (var result in results)
 			{
-				Console.Error.WriteLine(result);
+				log.Info($"Результат: {result}");
 			}
 		}
 
@@ -91,7 +78,7 @@ namespace RunCsJob
 			{
 				query[parameter[0]] = parameter[1];
 			}
-			return path + "/?" + query;
+			return $"{path}/?{query}";
 		}
 	}
 }

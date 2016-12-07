@@ -109,15 +109,14 @@ namespace uLearn
 						proj => ProjModifier.PrepareForChecking(proj, exercise, excluded))
 				}
 			});
-			var result = SandboxRunner.Run(pathToCompiler,
-				new ProjRunnerSubmission
-				{
-					Id = slide.Id.ToString(),
-					ZipFileData = bytes,
-					ProjectFileName = exercise.CsprojFileName,
-					Input = "",
-					NeedRun = true
-				});
+			var result = SandboxRunner.Run(new ProjRunnerSubmission
+			{
+			    Id = slide.Id.ToString(),
+			    ZipFileData = bytes,
+			    ProjectFileName = exercise.CsprojFileName,
+			    Input = "",
+			    NeedRun = true
+			}, pathToCompiler);
 			var isOk = result.Verdict.IsOneOf(Verdict.Ok, Verdict.MemoryLimit, Verdict.TimeLimit);
 			if (!isOk)
 				ReportSlideError(slide, "Exercise initial code verdict is not OK. RunResult = " + result);
@@ -139,9 +138,9 @@ namespace uLearn
 				Console.WriteLine("Style issue: " + solution.StyleMessage);
 			}
 
-			var result = SandboxRunner.Run("", exercise.CreateSubmition(
-				slide.Id.ToString(),
-				exercise.EthalonSolution));
+			var result = SandboxRunner.Run(exercise.CreateSubmition(
+			    slide.Id.ToString(),
+			    exercise.EthalonSolution), "");
 
 			var output = result.GetOutput().NormalizeEoln();
 

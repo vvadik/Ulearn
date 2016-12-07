@@ -45,7 +45,7 @@ namespace uLearn.Model.Edx
 
 		public override void Save(string folderName)
 		{
-			var courseFile = string.Format("{0}/{1}/{2}.xml", folderName, SubfolderName, UrlName);
+			var courseFile = $"{folderName}/{SubfolderName}/{UrlName}.xml";
 			if (File.Exists(courseFile))
 			{
 				var doc = new XmlDocument();

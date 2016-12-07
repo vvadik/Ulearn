@@ -24,10 +24,13 @@ namespace RunCsJob.Service
 		{
 			XmlConfigurator.Configure();
 
-			var threadsCount = int.Parse(ConfigurationManager.AppSettings["threadsCount"] ?? "1");
+			var threadsCount = int.Parse(ConfigurationManager.AppSettings["ulearn.runcsjob.threadsCount"] ?? "1");
 			if (threadsCount < 1)
+			{
+				log.Error($"Не могу определить количество потоков для запуска из конфигурации: ${threadsCount}. Количество потоков должно быть положительно");
 				throw new ArgumentOutOfRangeException(nameof(threadsCount), "Number of threads (appSettings/threadsCount) should be positive");
-			log.Info($"Start {threadsCount} threads");
+			}
+			log.Info($"Запускаю {threadsCount} потока(ов)");
 			for (var i = 0; i < threadsCount; i++)
 			{
 				threads.Add(new Thread(WorkerThread)
@@ -42,14 +45,14 @@ namespace RunCsJob.Service
 		protected override void OnStop()
 		{
 			shutdownEvent.Set();
-			log.Info("Received signal for stopping");
+			log.Info("Получен сигнал остановки");
 
 			foreach (var thread in threads)
 			{
-				log.Info($"Try to stop {thread.Name}");
+				log.Info($"Пробую остановить поток {thread.Name}");
 				if (!thread.Join(10000))
 				{
-					log.Info($"Abort {thread.Name}");
+					log.Info($"Вызываю Abort() для потока {thread.Name}");
 					thread.Abort();
 				}
 			}
@@ -57,9 +60,8 @@ namespace RunCsJob.Service
 
 		private void WorkerThread()
 		{
-			log.Info($"{Thread.CurrentThread.Name} is starting");
-			var pathToCompilers = Path.Combine(new DirectoryInfo(".").FullName, "Microsoft.Net.Compilers.1.3.2");
-			new RunCsJobProgram(shutdownEvent).Run(pathToCompilers);
+			log.Info($"Поток {Thread.CurrentThread.Name} запускается");
+			new RunCsJobProgram(shutdownEvent).Run();
 		}
 	}
 }
