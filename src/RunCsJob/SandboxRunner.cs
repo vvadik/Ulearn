@@ -70,6 +70,7 @@ namespace RunCsJob
 			}
 			catch (Exception ex)
 			{
+			    log.Error(ex);
 				return new RunningResults
 				{
 					Id = submission.Id,
@@ -179,8 +180,10 @@ namespace RunCsJob
 
 		private void RunSandboxer(string args)
 		{
-			log.Info($"Запускаю C#-песочницу с аргументами: {args}");
-			var startInfo = new ProcessStartInfo("CsSandboxer.exe", args)
+		    var workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            log.Info($"Запускаю C#-песочницу с аргументами: {args}\nРабочая директория: {workingDirectory}");
+
+            var startInfo = new ProcessStartInfo(Path.Combine(workingDirectory, "CsSandboxer.exe"), args)
 			{
 				RedirectStandardInput = true,
 				RedirectStandardOutput = true,
@@ -190,13 +193,25 @@ namespace RunCsJob
 				StandardOutputEncoding = Encoding.UTF8,
 				StandardErrorEncoding = Encoding.UTF8
 			};
-			var sandboxer = Process.Start(startInfo);
+
+		    Process sandboxer;
+		    try
+		    {
+                sandboxer = Process.Start(startInfo);
+            }
+		    catch (Exception e)
+		    {
+                log.Error("Не могу запустить C#-песочницу", e);
+                result.Verdict = Verdict.SandboxError;
+                result.Error = "Can't start process";
+                return;
+            }
 
 			if (sandboxer == null)
 			{
 				log.Error("Не могу запустить C#-песочницу. Process.Start() вернул NULL");
 				result.Verdict = Verdict.SandboxError;
-				result.Error = "Can't start proces";
+				result.Error = "Can't start process";
 				return;
 			}
 
