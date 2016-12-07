@@ -69,6 +69,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CsSandboxer\CsSandboxer.csproj">
+      <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
+      <Name>CsSandboxer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RunCsJob\RunCsJob.csproj">
       <Project>{77b16f9d-3cdf-4cc6-be5f-b6badfac5394}</Project>
       <Name>RunCsJob</Name>
