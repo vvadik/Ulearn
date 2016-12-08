@@ -12,6 +12,11 @@
 		}, duration);
 	}
 
+	var addAntiForgeryToken = function (data) {
+		data.__RequestVerificationToken = $('#__AjaxAntiForgeryForm input[name=__RequestVerificationToken]').val();
+		return data;
+	};
+
 	String.prototype.br2nl = function () {
 		return this.replace(/<br\s*\/?>/gi, "\n");
 	}
@@ -39,12 +44,11 @@
 	var likeComment = function () {
 		var $self = $(this);
 		var url = $self.data('url');
-		var token = $self.find('input[name="__RequestVerificationToken"]').val();
 		var $counter = $self.find('.comment__likes-count__counter');
 		$.ajax({
 			type: 'post',
 			url: url,
-			data: { __RequestVerificationToken: token },
+			data: addAntiForgeryToken({}),
 			dataType: 'json'
 		}).success(function (data) {
 			$self.toggleClass('is-liked', data.liked);
@@ -132,17 +136,15 @@
 
 		var $self = $(this);
 		var url = $self.data('url');
-		var token = $self.find('input[name="__RequestVerificationToken"]').val();
 		var $comment = $self.closest('.comment');
 		var isApproved = ! $comment.is('.not-approved');
 
 		$.ajax({
 			type: 'post',
 			url: url,
-			data: {
-				__RequestVerificationToken: token,
+			data: addAntiForgeryToken({
 				isApproved: ! isApproved,
-			}
+			})
 		}).success(function () {
 			$comment.toggleClass('not-approved', isApproved);
 		});
@@ -154,13 +156,12 @@
 		var $self = $(this);
 		var url = $self.data('url');
 		var restoreUrl = $self.data('restore-url');
-		var token = $self.find('input[name="__RequestVerificationToken"]').val();
 		var $comment = $self.closest('.comment');
 
 		$.ajax({
 			type: 'post',
 			url: url,
-			data: { __RequestVerificationToken: token }
+			data: addAntiForgeryToken({})
 		}).success(function() {
 			var $commentReplacement = $('<div class="comment__removed">Комментарий удалён. <a href="">Восстановить</a></div>')
 				.attr('class', $comment.attr('class'));
@@ -169,7 +170,7 @@
 				$.ajax({
 					type: 'post',
 					url: restoreUrl,
-					data: { __RequestVerificationToken: token }
+					data: addAntiForgeryToken({})
 				}).success(function() {
 					$commentReplacement.remove();
 					$comment.show();
@@ -184,17 +185,15 @@
 
 		var $self = $(this);
 		var url = $self.data('url');
-		var token = $self.find('input[name="__RequestVerificationToken"]').val();
 		var $comment = $self.closest('.comment');
 		var isPinned = $comment.is('.is-pinned');
 
 		$.ajax({
 			type: 'post',
 			url: url,
-			data: {
-				__RequestVerificationToken: token,
+			data: addAntiForgeryToken({
 				isPinned: ! isPinned,
-			}
+			})
 		}).success(function () {
 			$comment.toggleClass('is-pinned', ! isPinned);
 		});
@@ -205,17 +204,15 @@
 
 		var $self = $(this);
 		var url = $self.data('url');
-		var token = $self.find('input[name="__RequestVerificationToken"]').val();
 		var $comment = $self.closest('.comment');
 		var isCorrect = $comment.is('.is-correct-answer');
 
 		$.ajax({
 			type: 'post',
 			url: url,
-			data: {
-				__RequestVerificationToken: token,
+			data: addAntiForgeryToken({
 				isCorrect: ! isCorrect,
-			}
+			})
 		}).success(function () {
 			$comment.toggleClass('is-correct-answer', ! isCorrect);
 		});
@@ -225,7 +222,6 @@
 		e.preventDefault();
 		var $self = $(this);
 		var url = $self.data('url');
-		var token = $self.find('input[name="__RequestVerificationToken"]').val();
 		var $comment = $self.closest('.comment');
 		var $commentText = $comment.find('.comment__text');
 		var $commentFooter = $comment.find('.comment__footer');
@@ -245,10 +241,9 @@
 			$.ajax({
 				type: 'post',
 				url: url,
-				data: {
-					__RequestVerificationToken: token,
+				data: addAntiForgeryToken({
 					newText: newText,
-				}
+				})
 			}).success(function (renderedCommentText) {
 				$commentText.replaceWith($(renderedCommentText));
 				// Remove form, restore comment view (see below)

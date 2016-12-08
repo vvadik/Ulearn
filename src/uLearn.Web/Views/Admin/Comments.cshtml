@@ -66,6 +66,9 @@
 		</div>
 	}
 
+	@* Used for ajax in AddAntiForgeryToken() *@
+	<form id="__AjaxAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form> 
+
 	<div class="comments comments__feed">
 		<h1>Последние комментарии</h1>
 		@foreach (var comment in Model.Comments)

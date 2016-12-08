@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
+using System.Xml.Linq;
 using Elmah;
 using log4net;
 using Telegram.Bot.Types.Enums;
@@ -15,6 +16,7 @@ namespace uLearn.Web.Controllers
         private readonly string token;
         private readonly string channel;
         private readonly ILog log = LogManager.GetLogger(typeof(CommentsBot));
+        private readonly CourseManager courseManager = WebCourseManager.Instance;
 
         public CommentsBot()
         {
@@ -22,9 +24,14 @@ namespace uLearn.Web.Controllers
             channel = WebConfigurationManager.AppSettings["telegram-commentsbot-channel"];
         }
 
-        private string EscapeMarkdown(string text)
+        private static string EscapeMarkdown(string text)
         {
             return Regex.Replace(text, @"([\[\]|\*_`])", @"\$1");
+        }
+
+        private static string MakeNestedQuotes(string text)
+        {
+            return Regex.Replace(text, "(\\s|^)[\"«]", @"$1„").Replace("[\"»]", @"“");
         }
 
         public async Task PostToChannel(Comment comment)
@@ -33,9 +40,10 @@ namespace uLearn.Web.Controllers
             {
                 if (string.IsNullOrWhiteSpace(token))
                     return;
+
                 var api = new Telegram.Bot.TelegramBotClient(token);
-                var url = "https://ulearn.me/Course/" + comment.CourseId + "/" + comment.SlideId + "#comment-" + comment.Id;
-                var text = $"*{EscapeMarkdown(comment.Author.VisibleName)}:*\n{EscapeMarkdown(comment.Text.Trim())}\n\n{url}";
+                
+                var text = GetChannelPostText(comment);
                 await api.SendTextMessageAsync(channel, text, parseMode: ParseMode.Markdown, disableWebPagePreview: true);
             }
             catch (Exception e)
@@ -43,6 +51,20 @@ namespace uLearn.Web.Controllers
                 log.Error(e);
                 ErrorLog.GetDefault(HttpContext.Current).Log(new Error(e));
             }
+        }
+
+        private string GetChannelPostText(Comment comment)
+        {
+            var course = courseManager.GetCourse(comment.CourseId);
+            var slide = course.FindSlideById(comment.SlideId);
+            if (slide == null)
+                return "";
+
+            var slideTitle = $"{MakeNestedQuotes(course.Title)}: {MakeNestedQuotes(slide.Title)}";
+
+            var url = "https://ulearn.me/Course/" + comment.CourseId + "/" + slide.Url + "#comment-" + comment.Id;
+            var text = $"*{EscapeMarkdown(comment.Author.VisibleName)} â «{EscapeMarkdown(slideTitle)}»*\n{EscapeMarkdown(comment.Text.Trim())}\n\n{EscapeMarkdown(url)}";
+            return text;
         }
     }
 }

@@ -48,6 +48,9 @@
 	</div>
 }
 
+@* Used for ajax in addAntiForgeryToken() *@
+<form id="__AjaxAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form>
+
 @if (Model.TopLevelComments.Any() || Model.IsAuthorizedAndCanComment)
 {
 	<div class="comments">

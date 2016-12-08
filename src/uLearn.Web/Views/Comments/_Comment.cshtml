@@ -6,7 +6,6 @@
 	<div class="reply-form is-reply media @(isFormHidden ? "collapse" : "")">
 		@using (Html.BeginForm("AddComment", "Comments", FormMethod.Post))
 		{
-			@Html.AntiForgeryToken()
 			@Html.Hidden("courseId", comment.CourseId)
 			@Html.Hidden("slideId", comment.SlideId)
 			@Html.Hidden("parentCommentId", comment.Id)
@@ -78,7 +77,6 @@
 						{
 							<span class="hide-on-parent-hover">не опубликовано</span>
 							<span class="show-on-parent-hover">опубликовать <span class="glyphicon glyphicon-ok"></span></span>
-							@Html.AntiForgeryToken()
 						}
 						else
 						{
@@ -104,7 +102,6 @@
 							{
 								<text>закреплено</text>
 							}
-							@Html.AntiForgeryToken()
 						</div>
 					}
 				}
@@ -120,7 +117,6 @@
 							{
 								<span class="glyphicon glyphicon-remove"></span>
 							}
-							@Html.AntiForgeryToken()
 						</div>
 					}
 				}
@@ -134,7 +130,6 @@
 				}
 				<div class="comment__likes-count @(Model.IsLikedByUser ? "is-liked" : "")"
 					 data-url="@Url.Action("LikeComment", "Comments", new { commentId = Model.Comment.Id })">
-					@Html.AntiForgeryToken()
 					<span class="glyphicon glyphicon-heart"></span>
 					<span class="comment__likes-count__counter">
 						@if (likesCount > 0)
@@ -164,7 +159,6 @@
 					<div class="comment__edit-link show-on-comment-hover"
 						 data-url="@Url.Action("EditCommentText", "Comments", new { commentId = Model.Comment.Id })">
 						<a href="">редактировать<span class="glyphicon glyphicon-pencil"></span></a>
-						@Html.AntiForgeryToken()
 					</div>
 				}
 
@@ -172,7 +166,6 @@
 				{
 					<div class="comment__hide-link show-on-comment-hover" data-url="@Url.Action("ApproveComment", "Comments", new { commentId = Model.Comment.Id })">
 						<a href="">скрыть<span class="glyphicon glyphicon-eye-close"></span></a>
-						@Html.AntiForgeryToken()
 					</div>
 				}
 
@@ -182,7 +175,6 @@
 						 data-url="@Url.Action("DeleteComment", "Comments", new { commentId = Model.Comment.Id })"
 						 data-restore-url="@Url.Action("RestoreComment", "Comments", new { commentId = Model.Comment.Id })">
 						<a href="" title="удалить комментарий">удалить<span class="glyphicon glyphicon-remove"></span></a>
-						@Html.AntiForgeryToken()
 					</div>
 				}
 
