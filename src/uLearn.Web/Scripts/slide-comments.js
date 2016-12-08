@@ -13,8 +13,14 @@
 	}
 
 	var addAntiForgeryToken = function (data) {
-		data.__RequestVerificationToken = $('#__AjaxAntiForgeryForm input[name=__RequestVerificationToken]').val();
-		return data;
+		var token = $('#__AjaxAntiForgeryForm input[name=__RequestVerificationToken]').val();
+        if (typeof(data) === "string")
+            return data + "&__RequestVerificationToken=" + token
+        else
+        {
+            data.__RequestVerificationToken = token;
+    		return data;
+        }
 	};
 
 	String.prototype.br2nl = function () {
@@ -91,7 +97,7 @@
 		$.ajax({
 			type: 'post',
 			url: $form.attr('action'),
-			data: $form.serialize()
+			data: addAntiForgeryToken($form.serialize())
 		}).success(function (data) {
 			if (data.status && data.status !== 'ok') {
 				var $button = $form.find('.reply-form__send-button');
