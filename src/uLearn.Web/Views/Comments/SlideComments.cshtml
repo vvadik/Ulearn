@@ -34,7 +34,6 @@
 	<div class="reply-form media">
 		@using (Html.BeginForm("AddComment", "Comments", FormMethod.Post))
 		{
-			@Html.AntiForgeryToken()
 			@Html.Hidden("courseId", Model.CourseId)
 			@Html.Hidden("slideId", Model.Slide.Id)
 			<div class="pull-left">
