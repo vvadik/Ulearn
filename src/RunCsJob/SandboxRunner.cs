@@ -97,7 +97,7 @@ namespace RunCsJob
 		private RunningResults RunMsBuild(string pathToCompiler, string submissionCompilationDirectory)
 		{
 			var projSubmission = (ProjRunnerSubmission)submission;
-			log.Error($"Запускаю проверку C#-решения {projSubmission.Id} с помощью MsBuild");
+			log.Info($"Запускаю проверку C#-решения {projSubmission.Id} с помощью MsBuild");
 			var dir = new DirectoryInfo(submissionCompilationDirectory);
 
 			try
@@ -133,7 +133,7 @@ namespace RunCsJob
 
 		public RunningResults RunCsc60(string submissionCompilationDirectory)
 		{
-			log.Error($"Запускаю проверку C#-решения {submission.Id}, компилирую с помощью Roslyn");
+			log.Info($"Запускаю проверку C#-решения {submission.Id}, компилирую с помощью Roslyn");
 			var res = AssemblyCreator.CreateAssemblyWithRoslyn((FileRunnerSubmission)submission, submissionCompilationDirectory);
 
 			result.Verdict = Verdict.Ok;

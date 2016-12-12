@@ -15,7 +15,9 @@
 	var addAntiForgeryToken = function (data) {
 		var token = $('#__AjaxAntiForgeryForm input[name=__RequestVerificationToken]').val();
         if (typeof(data) === "string")
+        {
             return data + "&__RequestVerificationToken=" + token
+        }
         else
         {
             data.__RequestVerificationToken = token;

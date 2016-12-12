@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web.Configuration;
 using System.Web.Mvc;
 
 namespace uLearn.Web
@@ -8,7 +9,9 @@ namespace uLearn.Web
 		public static void RegisterGlobalFilters(GlobalFilterCollection filters)
 		{
 			filters.Add(new HandleErrorAttribute());
-			filters.Add(new RequireHttpsForCloudFlareAttribute());
+			var requireHttps = Convert.ToBoolean(WebConfigurationManager.AppSettings["ulearn.requireHttps"] ?? "true");
+			if (requireHttps)
+				filters.Add(new RequireHttpsForCloudFlareAttribute());
 			filters.Add(new AntiForgeryTokenFilter());
 		}
 	}
@@ -24,20 +27,21 @@ namespace uLearn.Web
 		}
 	}
 
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class RequireHttpsForCloudFlareAttribute : RequireHttpsAttribute
-    {
-        private readonly string xSchemeHeaderName = "X-Scheme";
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+	public class RequireHttpsForCloudFlareAttribute : RequireHttpsAttribute
+	{
+		private readonly string xSchemeHeaderName = "X-Scheme";
 
-        /* Additionally view X-Scheme header. If it equals to "HTTPS", continue work */
-        protected override void HandleNonHttpsRequest(AuthorizationContext filterContext)
-        {
-	        if (string.Equals(filterContext.HttpContext.Request.Headers[xSchemeHeaderName], "HTTPS", StringComparison.OrdinalIgnoreCase))
-		        return;
-	        if (!string.Equals(filterContext.HttpContext.Request.HttpMethod, "GET", StringComparison.OrdinalIgnoreCase))
-                throw new InvalidOperationException("Require HTTPS");
-            var url = "https://" + filterContext.HttpContext.Request.Url?.Host + filterContext.HttpContext.Request.RawUrl;
-            filterContext.Result = new RedirectResult(url);
-        }
-    }
+		/* Additionally view X-Scheme header. If it equals to "HTTPS", continue work */
+		protected override void HandleNonHttpsRequest(AuthorizationContext filterContext)
+		{
+			if (string.Equals(filterContext.HttpContext.Request.Headers[xSchemeHeaderName], "HTTPS", StringComparison.OrdinalIgnoreCase))
+				return;
+			if (!string.Equals(filterContext.HttpContext.Request.HttpMethod, "GET", StringComparison.OrdinalIgnoreCase) && 
+				!string.Equals(filterContext.HttpContext.Request.HttpMethod, "HEAD", StringComparison.OrdinalIgnoreCase))
+				throw new InvalidOperationException("Require HTTPS");
+			var url = "https://" + filterContext.HttpContext.Request.Url?.Host + filterContext.HttpContext.Request.RawUrl;
+			filterContext.Result = new RedirectResult(url);
+		}
+	}
 }
