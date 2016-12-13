@@ -1228,6 +1228,19 @@ table.analytics__user-answers {
 	margin-bottom: 0;
 }
 
+.analytics__dashboard .score.full-score a {
+	color: green;
+	font-weight: 700;
+}
+
+.analytics__dashboard .score.zero-score a {
+	color: rgb(246, 127, 127);
+}
+
+.analytics__dashboard .score:not(.full-score):not(.zero-score) a {
+	color: #b9b90e;
+}
+
 @media (max-width:768px) {
 	.analytics__dashboard .student-progress {
 		width: 90px;
@@ -1235,6 +1248,20 @@ table.analytics__user-answers {
 
 	.analytics__dashboard #students .student {
 		margin-bottom: 10px;
+	}
+
+	.analytics__dashboard .small-table__title__cell,
+	.analytics__dashboard .small-table__right-cell
+	 {
+		width: 40px;
+	}
+
+	.analytics__dashboard .score.zero-score {
+		background-color: #ffd4d4;
+	}
+
+	.analytics__dashboard .score.zero-score a {
+		color: white;
 	}
 }
 

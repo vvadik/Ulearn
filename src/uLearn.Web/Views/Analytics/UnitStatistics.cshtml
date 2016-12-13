@@ -6,6 +6,21 @@
 	ViewBag.Title = "Аналитика";
 }
 
+@functions
+{
+
+	bool IsSlideHiddenOnSmallScreens(Slide slide)
+	{
+		if (slide is QuizSlide)
+			return !((QuizSlide)slide).Quiz.ManualCheck;
+
+		if (slide is ExerciseSlide)
+			return !((ExerciseSlide)slide).Exercise.RequireReview;
+		return true;
+	}
+
+}
+
 @helper UsersByCountVisitedSlidesTable(string id, Dictionary<int, int> data)
 {
 	<table id="@id" class="hidden">
@@ -205,13 +220,14 @@
 							<div class="small-table__title__cell">прогресс</div>
 							@foreach (var slide in exercisesAndQuizzes)
 							{
+								var isHiddenOnSmallScreens = IsSlideHiddenOnSmallScreens(slide);
 								if (slide is QuizSlide)
 								{
-									<span class="glyphicon glyphicon-pushpin small-table__title__cell hidden-xs-inline-block" title="@slide.Title"></span>
+									<span class="glyphicon glyphicon-pushpin small-table__title__cell @(isHiddenOnSmallScreens ? "hidden-xs-inline-block" : "")" title="@slide.Title"></span>
 								}
 								else if (slide is ExerciseSlide)
 								{
-									<span class="glyphicon glyphicon-edit small-table__title__cell hidden-xs-inline-block" title="@slide.Title"></span>
+									<span class="glyphicon glyphicon-edit small-table__title__cell @(isHiddenOnSmallScreens ? "hidden-xs-inline-block" : "")" title="@slide.Title"></span>
 								}
 							}
 						</div>
@@ -257,9 +273,11 @@
 								@foreach (var exerciseOrQuiz in exercisesAndQuizzes)
 								{
 									var visit = Model.SlidesVisits.GetOrDefault(exerciseOrQuiz.Id, new List<Visit>()).FirstOrDefault(v => v.UserId == userInfo.UserId);
+									var isHiddenOnSmallScreens = IsSlideHiddenOnSmallScreens(exerciseOrQuiz);
 									if (visit != null && visit.IsPassed)
 									{
-										<span class="small-table__right-cell hidden-xs-inline-block" title="@visit.Timestamp.ToPrettyString()">
+										var isFullScore = visit.Score == exerciseOrQuiz.MaxScore;
+										<span class="small-table__right-cell score @(isHiddenOnSmallScreens ? "hidden-xs-inline-block" : "") @(isFullScore ? "full-score" : "") @(visit.Score == 0 ? "zero-score" : "")" title="@visit.Timestamp.ToPrettyString()">
 											@if (exerciseOrQuiz is ExerciseSlide)
 											{
 												@Html.ActionLink(
@@ -277,7 +295,7 @@
 									}
 									else
 									{
-										<span class="small-table__right-cell hidden-xs-inline-block">&nbsp;</span>
+										<span class="small-table__right-cell score @(isHiddenOnSmallScreens ? "hidden-xs-inline-block" : "") zero-score">&nbsp;</span>
 									}
 								}
 							</div>
