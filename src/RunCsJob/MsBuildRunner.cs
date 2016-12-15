@@ -11,19 +11,29 @@ namespace RunCsJob
 		{
 			var result = new MSbuildResult();
 			var path = Path.Combine(dir.FullName, projectFileName);
-			var proj = new Project(path, null, null, new ProjectCollection());
-			proj.SetProperty("CscToolPath", pathToCompiler);
-			proj.Save();
+			var project = new Project(path, null, null, new ProjectCollection());
+			project.SetProperty("CscToolPath", pathToCompiler);
+			project.Save();
 			using (var stringWriter = new StringWriter())
 			{
 				var logger = new ConsoleLogger(LoggerVerbosity.Minimal, stringWriter.Write, color => { }, () => { });
-				result.Success = proj.Build(logger);
+				result.Success = SyncBuild(project, logger);
 				if (result.Success)
-					result.PathToExe = Path.Combine(proj.DirectoryPath, proj.GetPropertyValue("OutputPath"), proj.GetPropertyValue("AssemblyName") + ".exe");
+					result.PathToExe = Path.Combine(project.DirectoryPath,
+													project.GetPropertyValue("OutputPath"),
+													project.GetPropertyValue("AssemblyName") + ".exe");
 				else
 					result.ErrorMessage = stringWriter.ToString();
 				return result;
 			}
+		}
+
+		private static readonly object buildLock = new object();
+
+		private static bool SyncBuild(Project project, ILogger logger)
+		{
+			lock (buildLock)
+				return project.Build(logger);
 		}
 	}
 }

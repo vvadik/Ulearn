@@ -46,7 +46,9 @@ namespace RunCsJob
 				}
 			}
 
-			var submissionCompilationDirectory = Path.Combine(workingDirectory, submission.Id);
+			var randomSuffix = Guid.NewGuid().ToString("D");
+			randomSuffix = randomSuffix.Substring(randomSuffix.Length - 8);
+			var submissionCompilationDirectory = Path.Combine(workingDirectory, $"{submission.Id}-{randomSuffix}");
 			try
 			{
 				Directory.CreateDirectory(submissionCompilationDirectory);
@@ -97,7 +99,7 @@ namespace RunCsJob
 		private RunningResults RunMsBuild(string pathToCompiler, string submissionCompilationDirectory)
 		{
 			var projSubmission = (ProjRunnerSubmission)submission;
-			log.Info($"Запускаю проверку C#-решения {projSubmission.Id} с помощью MsBuild");
+			log.Info($"Запускаю проверку C#-решения {projSubmission.Id}, компилирую с помощью MsBuild");
 			var dir = new DirectoryInfo(submissionCompilationDirectory);
 
 			try

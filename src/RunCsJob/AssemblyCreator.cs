@@ -45,7 +45,7 @@ namespace RunCsJob
 			Directory.SetCurrentDirectory(workingDirectory);
 
 			IEnumerable<int> x = null;
-			SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(submission.Code);
+			var syntaxTree = CSharpSyntaxTree.ParseText(submission.Code);
 			var assemblyName = submission.Id;
 			var compilation = CSharpCompilation.Create(assemblyName, new[] { syntaxTree },
 				new MetadataReference[]
@@ -70,8 +70,8 @@ namespace RunCsJob
 			PathToAssembly = pathToAssembly;
 		}
 
-		public EmitResult EmitResult;
-		public string PathToAssembly;
+		public readonly EmitResult EmitResult;
+		public readonly string PathToAssembly;
 
 	}
 

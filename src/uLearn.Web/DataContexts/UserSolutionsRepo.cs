@@ -246,15 +246,21 @@ namespace uLearn.Web.DataContexts
 		public List<UserExerciseSubmission> GetUnhandledSubmissions(int count)
 		{
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
-			var submissions = db.UserExerciseSubmissions
-				.Where(s =>
-					s.Timestamp > notSoLongAgo
-					&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting)
-				.OrderByDescending(s => s.Timestamp)
-				.Take(count).ToList();
-			foreach (var submission in submissions)
-				submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
-			SaveAll(submissions.Select(s => s.AutomaticChecking));
+			List<UserExerciseSubmission> submissions;
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				submissions = db.UserExerciseSubmissions
+					.Where(s =>
+						s.Timestamp > notSoLongAgo
+						&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting)
+					.OrderByDescending(s => s.Timestamp)
+					.Take(count).ToList();
+				foreach (var submission in submissions)
+					submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
+				SaveAll(submissions.Select(s => s.AutomaticChecking));
+
+				transaction.Commit();
+			}
 			return submissions;
 		}
 
