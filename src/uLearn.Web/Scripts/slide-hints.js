@@ -5,10 +5,12 @@
 });
 
 function showHintForUser($button) {
-    $.ajax({
+	var slideId = $button.data("slide-id");
+	console.log("request hint for " + slideId);
+	$.ajax({
         type: "POST",
         url: $button.data("url"),
-        data: { courseId: $button.data("course-id"), slideIndex: $button.data("slide-index"), isNeedNewHint: true }
+        data: { courseId: $button.data("course-id"), slideId: slideId, isNeedNewHint: true }
     }).success(function(ans) {
         if (ans.Text === "Для слайда нет подсказок") {
         	$("#GetHintButton").notify(ans.Text, "noHints");
@@ -41,14 +43,14 @@ function isScrolledIntoView(elem) {
     return ((elemBottom < docViewBottom) && (elemTop > docViewTop));
 }
 
-function getHints(courseId, slideIndex, hintsCount) {
+function getHints(courseId, slideId, hintsCount) {
 	/* Exit if no hint button */
 	if (!$('#GetHintButton').length)
 		return;
     $.ajax({
         type: "POST",
         url: $("#GetHintButton").data("url"),
-        data: { courseId: courseId, slideIndex: slideIndex, isNeedNewHint: false }
+        data: { courseId: courseId, slideId: slideId, isNeedNewHint: false }
     }).success(function (ans) {
         if (ans.Text === "Для слайда нет подсказок") {
         	$("#GetHintButton").text(ans.Text);
@@ -62,8 +64,9 @@ function getHints(courseId, slideIndex, hintsCount) {
         }
         buttonNameChange(hintsCount);
     }).fail(function (req) {
-        console.log(req.responseText);
+        console.log("FAIL: " + req.responseText);
     }).always(function (ans) {
+	    console.log(ans);
     });
 
 }

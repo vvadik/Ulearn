@@ -10,7 +10,7 @@ namespace uLearn.Web.Models
 		private readonly Func<Slide, string> getSlideUrl;
 		private readonly Func<Slide, int> getSlideScore;
 		private readonly Course course;
-		private readonly int currentSlideIndex;
+		private readonly Guid? currentSlideId;
 		public Func<string, string> GetUnitStatisticsUrl;
 		public Func<string, string> GetUnitInstructionNotesUrl;
 		public Func<Slide, bool> IsSolved = s => false;
@@ -18,12 +18,12 @@ namespace uLearn.Web.Models
 		public Func<string, bool> IsUnitVisible = u => true;
 		public bool IsInstructor;
 
-		public TocModelBuilder(Func<Slide, string> getSlideUrl, Func<Slide, int> getSlideScore, Course course, int currentSlideIndex)
+		public TocModelBuilder(Func<Slide, string> getSlideUrl, Func<Slide, int> getSlideScore, Course course, Guid? currentSlideId)
 		{
 			this.getSlideUrl = getSlideUrl;
 			this.getSlideScore = getSlideScore;
 			this.course = course;
-			this.currentSlideIndex = currentSlideIndex;
+			this.currentSlideId = currentSlideId;
 		}
 
 		public TocModel CreateTocModel()
@@ -57,7 +57,7 @@ namespace uLearn.Web.Models
 			}
 			return new TocUnitModel
 			{
-				IsCurrent = slides.Any(s => s.Index == currentSlideIndex),
+				IsCurrent = slides.Any(s => s.Id == currentSlideId),
 				UnitName = unitName,
 				Pages = pages
 			};
@@ -73,7 +73,7 @@ namespace uLearn.Web.Models
 				ShouldBeSolved = slide.ShouldBeSolved, 
 				MaxScore = slide.MaxScore, 
 				Score = getSlideScore(slide), 
-				IsCurrent = slide.Index == currentSlideIndex, 
+				IsCurrent = slide.Id == currentSlideId, 
 				IsSolved = IsSolved(slide), 
 				IsVisited = IsVisited(slide), 
 				PageType = GetPageType(slide)

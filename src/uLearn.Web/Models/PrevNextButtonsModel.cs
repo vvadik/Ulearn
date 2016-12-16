@@ -1,11 +1,13 @@
-﻿namespace uLearn.Web.Models
+﻿using System;
+
+namespace uLearn.Web.Models
 {
 	public class PrevNextButtonsModel
 	{
-		public PrevNextButtonsModel(Course course, int slideIndex, bool nextIsAcceptedSolutions, Slide nextSlide, Slide prevSlide, bool isGuest)
+		public PrevNextButtonsModel(Course course, Guid slideId, bool nextIsAcceptedSolutions, Slide nextSlide, Slide prevSlide, bool isGuest)
 		{
 			this.course = course;
-			SlideIndex = slideIndex;
+			SlideId = slideId;
 			NextIsAcceptedSolutions = nextIsAcceptedSolutions;
 			NextSlide = nextSlide;
 			PrevSlide = prevSlide;
@@ -13,7 +15,6 @@
 		}
 		private readonly Course course;
 	
-		public int SlideIndex { get; set; }
 		public bool NextIsAcceptedSolutions { get; set; }
 		public string CourseId { get { return course.Id; }}
 
@@ -23,5 +24,6 @@
 		public bool HasPrevSlide { get { return PrevSlide != null;  } }
 
 		public bool IsGuest { get; set; }
+		public Guid SlideId { get; set; }
 	}
 }

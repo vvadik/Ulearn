@@ -65,7 +65,7 @@ namespace uLearn.CourseTool
 
 		private TocModel CreateToc(Slide slide)
 		{
-			var builder = new TocModelBuilder(GetSlideUrl, s => 0, course, slide.Index)
+			var builder = new TocModelBuilder(GetSlideUrl, s => 0, course, slide.Id)
 			{
 				IsInstructor = true,
 				GetUnitInstructionNotesUrl = unitName => GetInstructorNotesFilename(unitName),

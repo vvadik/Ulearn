@@ -24,7 +24,7 @@
 					text = "Посещаемость:";
 				}
 				<th>
-					<p>@Html.ActionLink(slide.Title, "Slide", "Course", new{courseId=Model.CourseId, slideIndex = slide.Index}, null)</p>
+					<p>@Html.ActionLink(slide.Title, "SlideById", "Course", new{courseId=Model.CourseId, slideId = slide.Id}, null)</p>
 					<p>@text</p>
 				</th>
 			}

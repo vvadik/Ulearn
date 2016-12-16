@@ -16,13 +16,13 @@
 		<div>
 			@if (Model.IsSkippedOrPassed)
 			{
-				@Html.Action("AcceptedSolutions", "Course", new { Model.CourseId, slideIndex = Model.Slide.Index, isLti = true })
+				@Html.Action("AcceptedSolutions", "Course", new { Model.CourseId, slideId = Model.Slide.Id, isLti = true })
 			}
 			else
 			{
 				<h4 class="modal-title">Внимание</h4>
 				<p class="modal-body">Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
-				<a class="btn btn-default" href="@Model.Url.Action("AcceptedSolutions", "Course", new { Model.CourseId, slideIndex = Model.Slide.Index, isLti = true })">Продолжить</a>
+				<a class="btn btn-default" href="@Model.Url.Action("AcceptedSolutions", "Course", new { Model.CourseId, slideId = Model.Slide.Id, isLti = true })">Продолжить</a>
 			}
 		</div>
 	</body>

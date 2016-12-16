@@ -533,7 +533,7 @@
 		@if (!model.DebugView)
 		{
 			var hints = model.Block.HintsMd;
-			<button id="GetHintButton" type="button" class="btn btn-default hints-btn" data-course-id="@(model.CourseId)" data-slide-index="@(model.Slide.Index)" data-hints-count="@(hints.Count)" data-url="@(model.UseHintUrl)">
+			<button id="GetHintButton" type="button" class="btn btn-default hints-btn" data-course-id="@(model.CourseId)" data-slide-id="@(model.Slide.Id)" data-hints-count="@(hints.Count)" data-url="@(model.UseHintUrl)">
 				Взять подсказку
 			</button>
 			if (model.CanShowOutput)

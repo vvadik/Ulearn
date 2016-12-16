@@ -104,7 +104,7 @@ namespace uLearn
 
 				var exerciseBlock = slide.Blocks[componentIndex] as ExerciseBlock;
 				var otherComponent = exerciseBlock != null
-					? exerciseBlock.GetExerciseComponent(componentIndex == 0 ? slide.Title : "Упражнение", slide, componentIndex, string.Format(slideUrl, courseId, slide.Index), ltiId)
+					? exerciseBlock.GetExerciseComponent(componentIndex == 0 ? slide.Title : "Упражнение", slide, componentIndex, string.Format(slideUrl, courseId, slide.Id), ltiId)
 					: ((YoutubeBlock)slide.Blocks[componentIndex]).GetVideoComponent(componentIndex == 0 ? slide.Title : "", slide, componentIndex, videoGuids);
 
 				components.Add(otherComponent);
@@ -114,7 +114,9 @@ namespace uLearn
 			var solutionComponents = new List<Component>();
 			foreach (var result in slide.Blocks.OfType<ExerciseBlock>())
 			{
-				var comp = result.GetSolutionsComponent("Решения", slide, componentIndex, string.Format(solutionsUrl, courseId, slide.Index), ltiId);
+				var comp = result.GetSolutionsComponent("Решения", 
+					slide, componentIndex, 
+					string.Format(solutionsUrl, courseId, slide.Id), ltiId);
 				solutionComponents.Add(comp);
 				componentIndex++;
 			}
@@ -127,7 +129,7 @@ namespace uLearn
 		private static IEnumerable<Vertical> QuizToVerticals(string courseId, QuizSlide slide, string slideUrl, string ltiId)
 		{
 			var ltiComponent = 
-				new LtiComponent(slide.Title, slide.NormalizedGuid + "-quiz", string.Format(slideUrl, courseId, slide.Index), ltiId, true, slide.MaxScore, false);
+				new LtiComponent(slide.Title, slide.NormalizedGuid + "-quiz", string.Format(slideUrl, courseId, slide.Id), ltiId, true, slide.MaxScore, false);
 			yield return new Vertical(slide.NormalizedGuid, slide.Title, new Component[] { ltiComponent });
 		}
 

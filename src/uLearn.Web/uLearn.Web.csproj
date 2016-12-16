@@ -554,7 +554,6 @@
     <Compile Include="Models\ChoiceGroupPageModel.cs" />
     <Compile Include="Models\CoursePageModel.cs" />
     <Compile Include="Models\HintPageModel.cs" />
-    <Compile Include="Models\PersonalStatisticPageModel.cs" />
     <Compile Include="Models\QuizAnalyticsModel.cs" />
     <Compile Include="Models\QuizBlockData.cs" />
     <Compile Include="Models\QuizModel.cs" />
@@ -1380,10 +1379,8 @@
     <Content Include="Views\Course\Slide.cshtml" />
     <Content Include="Views\SlideNavigation\PrevNextButtons.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
-    <Content Include="Views\Analytics\TotalStatistics.cshtml" />
     <Content Include="Views\Course\_RatesBar.cshtml" />
     <Content Include="Views\Analytics\UsersStatistics.cshtml" />
-    <Content Include="Views\Analytics\PersonalStatistics.cshtml" />
     <Content Include="Views\SlideNavigation\TableOfContents.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>TableOfContents.generated.cs</LastGenOutput>

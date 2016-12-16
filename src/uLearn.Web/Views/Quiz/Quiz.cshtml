@@ -1,7 +1,6 @@
 ﻿@using uLearn
 @using uLearn.Quizes
 @using uLearn.Web.Views.Course
-@using uLearn.Web.Views.Shared.Helpers
 @model QuizModel
 @{
 	var quizSlide = Model.Slide;
@@ -74,11 +73,11 @@
 		<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
 			@if (Model.QuizState == QuizState.NotPassed)
 			{
-				<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString) ">Готово!</button>
+				<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Id', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString) ">Готово!</button>
 			}
 			else if (Model.QuizState == QuizState.WaitForCheck && Model.ManualQuizCheckQueueItem == null)
 			{
-				<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Index', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString) ">Переотправить ответы</button>
+				<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Id', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString) ">Переотправить ответы</button>
 			}
 			else if (Model.QuizState == QuizState.IsChecking && Model.ManualQuizCheckQueueItem != null)
 			{
@@ -110,14 +109,4 @@
 			}
 		</div>
 	}
-	
-@*	if (User.HasAccessFor(Model.CourseId, CourseRole.Instructor))*@
-@*	{*@
-@*		<h2>Статистика ответов</h2>*@
-@*		@SwitchablePanel.TimePanel("quiz-statistic",*@
-@*			args => Url.Action("Analytics", "Quiz", args),*@
-@*			new { courseId = Model.CourseId, slideIndex = Model.Slide.Index },*@
-@*			Tuple.Create("За полгода", 365.0 / 2)*@
-@*		)*@
-@*	}*@
 }

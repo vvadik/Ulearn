@@ -1,4 +1,4 @@
-﻿function submitQuiz(courseId, slideIndex, expectedCount, isLti) {
+﻿function submitQuiz(courseId, slideId, expectedCount, isLti) {
 	if (areAllAnswered(expectedCount)) {
 		/* Disable quiz submit button */
 		$('.quiz-submit-btn').prop('disabled', true);
@@ -33,7 +33,7 @@
 				url: $("#SubmitQuiz").data("url"),
 				data: {
 					courseId: courseId,
-					slideIndex: slideIndex,
+					slideId: slideId,
 					answer: answer,
 					isLti: isLti
 				}
