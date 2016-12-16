@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
-using System.Net;
 using System.Web.Mvc;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -19,10 +18,7 @@ namespace uLearn.Web.Controllers
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly CourseManager courseManager;
 		private readonly VisitsRepo visitsRepo;
-		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
-		private readonly SlideHintRepo slideHintRepo = new SlideHintRepo();
-		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 		private readonly GroupsRepo groupsRepo = new GroupsRepo();
 		private readonly UsersRepo usersRepo = new UsersRepo();
 
@@ -35,54 +31,6 @@ namespace uLearn.Web.Controllers
 		{
 			this.courseManager = courseManager;
 			visitsRepo = new VisitsRepo(db);
-		}
-
-		private ActionResult TotalStatistics(string courseId)
-		{
-			var model = CreateTotalStatistics(courseId);
-			return View(model);
-		}
-
-		private AnalyticsTablePageModel CreateTotalStatistics(string courseId)
-		{
-			var course = courseManager.GetCourse(courseId);
-			var tableInfo = CreateTotalStatisticsInfo(course);
-			var model = new AnalyticsTablePageModel
-			{
-				TableInfo = tableInfo,
-				CourseId = courseId
-			};
-			return model;
-		}
-
-		private Dictionary<string, AnalyticsTableInfo> CreateTotalStatisticsInfo(Course course)
-		{
-			var tableInfo = new Dictionary<string, AnalyticsTableInfo>();
-			foreach (var slide in course.Slides)
-			{
-				var exerciseSlide = slide as ExerciseSlide;
-				var quizSlide = slide as QuizSlide;
-				var isExercise = exerciseSlide != null;
-				var isQuiz = quizSlide != null;
-				var hintsCountOnSlide = isExercise ? exerciseSlide.Exercise.HintsMd.Count : 0;
-				var visitersCount = visitsRepo.GetVisitsCount(slide.Id, course.Id);
-				tableInfo.Add(slide.Index + ". " + slide.Info.UnitName + ": " + slide.Title, new AnalyticsTableInfo
-				{
-					Rates = slideRateRepo.GetRates(slide.Id, course.Id),
-					VisitersCount = visitersCount,
-					IsExercise = isExercise,
-					IsQuiz = isQuiz,
-					SolversPercent = isExercise
-						? (visitersCount == 0 ? 0 : (int)((double)userSolutionsRepo.GetAcceptedSolutionsCount(course.Id, slide.Id) / visitersCount) * 100)
-						: isQuiz
-							? (visitersCount == 0 ? 0 : (int)((double)userQuizzesRepo.GetSubmitQuizCount(slide.Id, course.Id) / visitersCount) * 100)
-							: 0,
-					SuccessQuizPercentage = isQuiz ? userQuizzesRepo.GetAverageStatistics(slide.Id, course.Id) : 0,
-					TotalHintCount = hintsCountOnSlide,
-					HintUsedPercent = isExercise ? slideHintRepo.GetHintUsedPercent(slide.Id, course.Id, hintsCountOnSlide, db.Users.Count()) : 0
-				});
-			}
-			return tableInfo;
 		}
 
 		public ActionResult UnitStatistics(UnitStatisticsParams param)
