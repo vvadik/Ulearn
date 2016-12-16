@@ -239,9 +239,7 @@
 			}
 			<div class="quiz">
 				<input @ans autocomplete="off" id='@(block.Id + "quizBlock" + item.Id)' name=@("group" + id) type="@typeInp" @GetGuestDisable(context.IsGuest) @readonlyAttr>
-				<label class="@itemClass" title="@title" for="@(block.Id + "quizBlock" + item.Id)" @GetGuestOnclick(context.IsGuest)>
-					@item.Description.RenderTex()
-				</label>
+				<label class="@itemClass" title="@title" for="@(block.Id + "quizBlock" + item.Id)" @GetGuestOnclick(context.IsGuest)>@item.Description.Trim().RenderTex()</label>
 				@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && item.IsCorrect)
 				{
 					<i class="glyphicon glyphicon-ok" style="color: green" title="@title"></i>
@@ -331,9 +329,7 @@
 	<div class="radio quiz-block-mark" id="@(block.Id + "_quizBlock")">
 		<div class="quiz">
 			<input autocomplete="off" @tchecked id='@(block.Id + "quizBlock" + "True")' name='@(block.Id + "group")' type="radio" @GetGuestDisable(context.IsGuest) @readonlyAttr>
-			<label class="@trueItemClass" title="@ttitle" for="@(block.Id + "quizBlock" + "True")" @GetGuestOnclick(context.IsGuest)>
-				Верно
-			</label>
+			<label class="@trueItemClass" title="@ttitle" for="@(block.Id + "quizBlock" + "True")" @GetGuestOnclick(context.IsGuest)>Верно</label>
 			@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && block.Answer)
 			{
 				<i class="glyphicon glyphicon-ok" style="color: green" title="@ttitle"></i>
@@ -341,9 +337,7 @@
 		</div>
 		<div class="quiz">
 			<input autocomplete="off" @fchecked id='@(block.Id + "quizBlock" + "False")' name='@(block.Id + "group")' type="radio" @GetGuestDisable(context.IsGuest)>
-			<label class="@falseItemClass" title="@ftitle" for="@(block.Id + "quizBlock" + "False")" @GetGuestOnclick(context.IsGuest)>
-				Неверно
-			</label>
+			<label class="@falseItemClass" title="@ftitle" for="@(block.Id + "quizBlock" + "False")" @GetGuestOnclick(context.IsGuest)>Неверно</label>
 			@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && !block.Answer)
 			{
 				<i class="glyphicon glyphicon-ok" style="color: green" title="@ftitle"></i>

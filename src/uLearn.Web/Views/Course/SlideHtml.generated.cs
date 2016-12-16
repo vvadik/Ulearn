@@ -642,12 +642,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" ");
 
                                             WebViewPage.WriteTo(@__razor_helper_writer, GetGuestOnclick(context.IsGuest));
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t\t\t");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">");
 
 
-WebViewPage.WriteTo(@__razor_helper_writer, item.Description.RenderTex());
+                                                                              WebViewPage.WriteTo(@__razor_helper_writer, item.Description.Trim().RenderTex());
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t\t</label>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</label>\r\n");
 
 
  				if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && item.IsCorrect)
@@ -911,7 +911,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" ");
 
                                                WebViewPage.WriteTo(@__razor_helper_writer, GetGuestOnclick(context.IsGuest));
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t\tВерно\r\n\t\t\t</label>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">Верно</label>\r\n");
 
 
  			if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && block.Answer)
@@ -967,7 +967,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" ");
 
                                                  WebViewPage.WriteTo(@__razor_helper_writer, GetGuestOnclick(context.IsGuest));
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">\r\n\t\t\t\tНеверно\r\n\t\t\t</label>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, ">Неверно</label>\r\n");
 
 
  			if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && !block.Answer)

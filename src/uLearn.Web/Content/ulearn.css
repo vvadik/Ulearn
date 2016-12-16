@@ -961,6 +961,10 @@ li.li-success {
     margin-left: 10px;
 }
 
+.quiz-block-mark .quiz label {
+    white-space: pre-wrap;
+}
+
 /* Ordering quizes */
 .quiz-block-ordering ul {
 	list-style: none;
