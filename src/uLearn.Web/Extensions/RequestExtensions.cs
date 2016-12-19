@@ -14,5 +14,12 @@ namespace uLearn.Web.Extensions
                 scheme = request.Headers[xSchemeHeaderName];
             return scheme;
         }
+
+        public static int GetRealRequestPort(this IOwinRequest request)
+        {
+            if (request.Scheme == "http" && request.LocalPort == 80 && request.GetRealRequestScheme() == "https")
+                return 443;
+            return request.LocalPort ?? 80;
+        }
     }
 }

@@ -61,7 +61,8 @@ namespace uLearn.Web.LTI
 						/* Substitute http(s) scheme with real scheme from header */
 						var uriBuilder = new UriBuilder(context.LtiRequest.Url)
 						{
-							Scheme = context.OwinContext.Request.GetRealRequestScheme()
+							Scheme = context.OwinContext.Request.GetRealRequestScheme(),
+                            Port = context.OwinContext.Request.GetRealRequestPort()
 						};
 						context.LtiRequest.Url = uriBuilder.Uri;
 
