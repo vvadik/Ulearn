@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
-namespace uLearn.Web
+namespace uLearn.Web.Extensions
 {
 	public static class StringExtensions
 	{

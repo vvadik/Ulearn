@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Web.Mvc;
 
-namespace uLearn.Web
+namespace uLearn.Web.Extensions
 {
 	public static class ControllerExtensions
 	{

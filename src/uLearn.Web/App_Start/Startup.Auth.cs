@@ -6,6 +6,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Owin;
 using uLearn.Web.DataContexts;
+using uLearn.Web.Extensions;
 using uLearn.Web.LTI;
 using uLearn.Web.Microsoft.Owin.Security.VK;
 using uLearn.Web.Models;

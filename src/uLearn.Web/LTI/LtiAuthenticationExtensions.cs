@@ -7,6 +7,7 @@ using LtiLibrary.Owin.Security.Lti.Provider;
 using Microsoft.AspNet.Identity;
 using Owin;
 using uLearn.Web.DataContexts;
+using uLearn.Web.Extensions;
 
 namespace uLearn.Web.LTI
 {
@@ -35,6 +36,13 @@ namespace uLearn.Web.LTI
 						{
 							throw new LtiException("Invalid " + OAuthConstants.ConsumerKeyParameter + " " + context.LtiRequest.ConsumerKey);
 						}
+
+                        /* Substitute http(s) scheme with real scheme from header */
+					    var uriBuilder = new UriBuilder(context.LtiRequest.Url)
+					    {
+					        Scheme = context.OwinContext.Request.GetRealRequestScheme()
+					    };
+					    context.LtiRequest.Url = uriBuilder.Uri;
 
 						var signature = context.LtiRequest.GenerateSignature(consumer.Secret);
 						if (!signature.Equals(context.LtiRequest.Signature))

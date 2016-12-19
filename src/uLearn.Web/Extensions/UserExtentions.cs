@@ -8,7 +8,7 @@ using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 
-namespace uLearn.Web
+namespace uLearn.Web.Extensions
 {
 	public static class UserExtentions
 	{

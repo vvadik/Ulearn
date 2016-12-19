@@ -44,7 +44,7 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override void SaveAdditional(string folderName)
 		{
 			File.WriteAllText(
-				string.Format("{0}/static/code_{1}.html", folderName, UrlName),
+				string.Format("{0}/assets/code_{1}.html", folderName, UrlName),
 				File.ReadAllText(string.Format("{0}/templates/code.html", Utils.GetRootDirectory())).Replace("{0}", LangId).Replace("{1}", Source)
 			);
 		}

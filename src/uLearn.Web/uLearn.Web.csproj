@@ -293,11 +293,12 @@
     <Compile Include="App_Start\RazorGeneratorMvcStart.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="codemirror\CsCompleterGenerator.cs" />
-    <Compile Include="ControllerExtensions.cs" />
+    <Compile Include="Extensions\ControllerExtensions.cs" />
     <Compile Include="Controllers\AuthenticationManager.cs" />
     <Compile Include="Controllers\CommentsBot.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
+    <Compile Include="Extensions\RequestExtensions.cs" />
     <Compile Include="Migrations\201611161930289_RemoveTextBlobLimits.cs" />
     <Compile Include="Migrations\201611161930289_RemoveTextBlobLimits.Designer.cs">
       <DependentUpon>201611161930289_RemoveTextBlobLimits.cs</DependentUpon>
@@ -354,8 +355,8 @@
     <Compile Include="DataContexts\QuizzesRepo.cs" />
     <Compile Include="DataContexts\ULearnUserManager.cs" />
     <Compile Include="DataContexts\UsersRepo.cs" />
-    <Compile Include="DateTimeExtensions.cs" />
-    <Compile Include="HtmlExtensions.cs" />
+    <Compile Include="Extensions\DateTimeExtensions.cs" />
+    <Compile Include="Extensions\HtmlExtensions.cs" />
     <Compile Include="Migrations\201602090753330_UpgradeToAspNetEFIdentity2.cs" />
     <Compile Include="Migrations\201602090753330_UpgradeToAspNetEFIdentity2.Designer.cs">
       <DependentUpon>201602090753330_UpgradeToAspNetEFIdentity2.cs</DependentUpon>
@@ -431,10 +432,10 @@
       <DependentUpon>201512240735282_CustomRoleSystem.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\UserModel.cs" />
-    <Compile Include="PluralizeExtensions.cs" />
-    <Compile Include="StringExtensions.cs" />
+    <Compile Include="Extensions\PluralizeExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="App_Start\UlearnLogger.cs" />
-    <Compile Include="UserExtentions.cs" />
+    <Compile Include="Extensions\UserExtentions.cs" />
     <Compile Include="LTI\LtiAuthenticationExtensions.cs" />
     <Compile Include="LTI\LtiUtils.cs" />
     <Compile Include="LTI\SecurityHandler.cs" />

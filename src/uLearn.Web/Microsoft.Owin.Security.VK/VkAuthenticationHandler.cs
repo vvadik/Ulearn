@@ -9,6 +9,7 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using uLearn.Web.Extensions;
 using uLearn.Web.Microsoft.Owin.Security.VK.Provider;
 
 namespace uLearn.Web.Microsoft.Owin.Security.VK
@@ -23,17 +24,6 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 		{
 			_httpClient = httpClient;
 			_logger = logger;
-		}
-
-		private const string xSchemeHeaderName = "X-Scheme";
-
-		private static string GetRequestScheme(IOwinRequest request)
-		{
-			var scheme = request.Scheme;
-			if (request.Headers.ContainsKey(xSchemeHeaderName) && 
-				(request.Headers[xSchemeHeaderName] == "http" || request.Headers[xSchemeHeaderName] == "https"))
-				scheme = request.Headers[xSchemeHeaderName];
-			return scheme;
 		}
 
 		protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
@@ -67,7 +57,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 
 				string tokenEndpoint = "https://oauth.vk.com/access_token";
 
-				string requestPrefix = GetRequestScheme(Request) + "://" + Request.Host;
+				string requestPrefix = Request.GetRealRequestScheme() + "://" + Request.Host;
 				string redirectUri = requestPrefix + Request.PathBase + Options.ReturnEndpointPath;
 
 				string tokenRequest =
@@ -144,7 +134,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 
 			if (challenge != null)
 			{
-				string requestPrefix = GetRequestScheme(Request) + "://" + Request.Host;
+				string requestPrefix = Request.GetRealRequestScheme() + "://" + Request.Host;
 
 				QueryString currentQueryString = Request.QueryString;
 				string currentUri = !currentQueryString.HasValue

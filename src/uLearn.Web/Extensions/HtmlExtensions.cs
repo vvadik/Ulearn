@@ -2,7 +2,7 @@
 using System.Web;
 using System.Web.Mvc;
 
-namespace uLearn.Web
+namespace uLearn.Web.Extensions
 {
 	public static class HtmlExtensions
 	{
@@ -59,7 +59,7 @@ namespace uLearn.Web
 				else
 					fullUrl = "http://" + url;
 			}
-			return string.Format("<a href=\"{0}\">{1}</a>", helper.AttributeEncode(HttpUtility.HtmlDecode(fullUrl)), url);
+			return $"<a href=\"{helper.AttributeEncode(HttpUtility.HtmlDecode(fullUrl))}\">{url}</a>";
 		}
 
 		/// <summary>

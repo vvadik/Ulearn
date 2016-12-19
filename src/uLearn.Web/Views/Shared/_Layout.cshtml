@@ -1,5 +1,6 @@
 ﻿@using uLearn
 @using uLearn.Web.DataContexts
+@using uLearn.Web.Extensions
 <!DOCTYPE html>
 <html>
 <head>
@@ -114,10 +115,10 @@
 	}
 	if (courses.Count > 10)
 	{
-		<li><b>@Html.ActionLink("Все курсы", "CourseList", "Admin")</b></li>
-}
+	    <li><a href="@Url.Action("CourseList", "Admin")"><b>Все курсы</b></a></li>
+    }
 	if (courses.Count == 0)
 	{
-		<li>Нет курсов. @Html.ActionLink("Создать", "CourseList", "Admin").</li>
+	    <li><b>Нет курсов.</b> @Html.ActionLink("Создать", "CourseList", "Admin")</li>
 	}
 }

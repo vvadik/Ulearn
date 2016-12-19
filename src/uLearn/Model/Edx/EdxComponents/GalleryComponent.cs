@@ -44,8 +44,8 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override void SaveAdditional(string folderName)
 		{
 			foreach (var image in Images)
-				File.Copy(string.Format("{0}/{1}", LocalFolder, image), string.Format("{0}/static/{1}_{2}", folderName, UrlName, image.Replace("/", "_")));
-			File.WriteAllText(string.Format("{0}/static/gallery_{1}.html", folderName, UrlName),
+				File.Copy(string.Format("{0}/{1}", LocalFolder, image), string.Format("{0}/assets/{1}_{2}", folderName, UrlName, image.Replace("/", "_")));
+			File.WriteAllText(string.Format("{0}/assets/gallery_{1}.html", folderName, UrlName),
 				File.ReadAllText(string.Format("{0}/templates/gallery.html", Utils.GetRootDirectory()))
 					.Replace("{0}", string.Join("", Images.Select(x => "<li><img src='" + UrlName + "_" + x.Replace("/", "_") + "' alt=''/></li>"))));
 		}

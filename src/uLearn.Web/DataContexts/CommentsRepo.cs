@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
+using uLearn.Web.Extensions;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts

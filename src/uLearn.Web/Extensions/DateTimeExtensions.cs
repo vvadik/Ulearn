@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace uLearn.Web
+namespace uLearn.Web.Extensions
 {
 	public static class DateTimeExtensions
 	{

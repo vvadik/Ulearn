@@ -6,6 +6,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using uLearn.Web.DataContexts;
+using uLearn.Web.Extensions;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers

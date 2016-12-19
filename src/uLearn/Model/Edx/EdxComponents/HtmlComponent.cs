@@ -67,7 +67,7 @@ namespace uLearn.Model.Edx.EdxComponents
 				foreach (var localFile in LocalFiles ?? new List<string>())
 					File.Copy(
 						Path.Combine(LocalFolder, localFile), 
-						string.Format("{0}/static/{1}_{2}", folderName, UrlName, localFile.Replace("/", "_")), 
+						string.Format("{0}/assets/{1}_{2}", folderName, UrlName, localFile.Replace("/", "_")), 
 						overwrite:true);
 			}
 			catch (Exception e)

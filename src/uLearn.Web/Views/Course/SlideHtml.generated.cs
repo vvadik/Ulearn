@@ -30,6 +30,7 @@ namespace uLearn.Web.Views.Course
     using uLearn.Model.Blocks;
     using uLearn.Quizes;
     using uLearn.Web.Controllers;
+    using uLearn.Web.Extensions;
     using uLearn.Web.Models;
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "2.0.0.0")]

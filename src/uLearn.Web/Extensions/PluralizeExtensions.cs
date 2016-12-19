@@ -1,4 +1,4 @@
-﻿namespace uLearn.Web
+﻿namespace uLearn.Web.Extensions
 {
 	public static class PluralizeExtensions
 	{

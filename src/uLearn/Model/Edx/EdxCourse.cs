@@ -49,9 +49,9 @@ namespace uLearn.Model.Edx
 
 		public void Save(string folderName)
 		{
-			CreateDirectories(folderName, "course", "chapter", "sequential", "vertical", "video", "html", "lti", "static", "problem");
+			CreateDirectories(folderName, "assets", "course", "chapter", "sequential", "vertical", "video", "html", "lti", "problem");
 			foreach (var file in StaticFiles)
-				File.Copy(file, string.Format("{0}/static/{1}", folderName, Path.GetFileName(file)), true);
+				File.Copy(file, string.Format("{0}/assets/{1}", folderName, Path.GetFileName(file)), true);
 
 			var courseFile = string.Format("{0}/course.xml", folderName);
 			if (File.Exists(courseFile))
@@ -65,7 +65,7 @@ namespace uLearn.Model.Edx
 		public static EdxCourse Load(string folderName)
 		{
 			var course = new FileInfo(string.Format("{0}/course.xml", folderName)).DeserializeXml<EdxCourse>();
-			course.StaticFiles = Directory.GetFiles(string.Format("{0}/static", folderName));
+			course.StaticFiles = Directory.GetFiles(string.Format("{0}/assets", folderName));
 			course.CourseWithChapters = CourseWithChapters.Load(folderName, course.UrlName);
 			return course;
 		}

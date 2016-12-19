@@ -30,7 +30,7 @@ namespace uLearn.CourseTool
 
 		private static void Download(string edxStudioUrl, string email, string password, string organization, string course, string time, string filename)
 		{
-			var downloadUrl = string.Format("{0}/export/{1}/{2}/{3}?_accept=application/x-tgz", edxStudioUrl, organization, course, time);
+			var downloadUrl = $"{edxStudioUrl}/export/course-v1:{organization}+{course}+{time}?_accept=application/x-tgz";
 			var client = LogIn(edxStudioUrl, email, password);
 			client.TryDownloadFile(downloadUrl, filename);
 		}
@@ -43,12 +43,12 @@ namespace uLearn.CourseTool
 			ArchiveManager.ExtractTar(baseDir + "/" + config.CourseRun + ".tar.gz", baseDir);
 			Utils.DeleteFileIfExists(baseDir + "/" + config.CourseRun + ".tar.gz");
 			Utils.DeleteDirectoryIfExists(baseDir + "/olx");
-			Directory.Move(baseDir + "/" + config.CourseRun, baseDir + "/olx");
+			Directory.Move(baseDir + "/course", baseDir + "/olx");
 		}
 
 		private static void Upload(string edxStudioUrl, string email, string password, string organization, string course, string time, string filename)
 		{
-			var uploadUrl = string.Format("{0}/import/{1}/{2}/{3}", edxStudioUrl, organization, course, time);
+			var uploadUrl = string.Format("{0}/import/course-v1:{1}+{2}+{3}", edxStudioUrl, organization, course, time);
 			var client = LogIn(edxStudioUrl, email, password);
 
 			var boundary = "---" + DateTime.Now.Ticks.ToString("x");
