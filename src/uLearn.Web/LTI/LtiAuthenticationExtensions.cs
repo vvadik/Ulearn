@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Data.Entity;
+using log4net;
 using LtiLibrary.Core.Common;
 using LtiLibrary.Core.OAuth;
 using LtiLibrary.Owin.Security.Lti;
@@ -13,6 +15,25 @@ namespace uLearn.Web.LTI
 {
 	public static class LtiAuthenticationExtensions
 	{
+		private static ILog log = LogManager.GetLogger(typeof(LtiAuthenticationExtensions));
+
+		private static string LogSignatureGeneration(string httpMethod, Uri url, NameValueCollection parameters, string consumerSecret)
+		{
+			log.Info($"HTTP method: {httpMethod}");
+			log.Info($"Url: {url}");
+			log.Info($"Parameters: {parameters}");
+			log.Info($"Consumer secret: {consumerSecret}");
+
+			UrlEncodingParser urlEncodingParser = new UrlEncodingParser(Uri.UnescapeDataString(url.Query));
+			parameters.Add((NameValueCollection)urlEncodingParser);
+			log.Info("Run OAuthUtility.GenerateSignature(httpMethod, url, parameters, consumerSecret)");
+			string signature = OAuthUtility.GenerateSignature(httpMethod, url, parameters, consumerSecret);
+			foreach (string allKey in urlEncodingParser.AllKeys)
+				parameters.Remove(allKey);
+			log.Info($"signature: {signature}");
+			return signature;
+		}
+
 		public static IAppBuilder UseLtiAuthentication(this IAppBuilder app)
 		{
 			app.UseLtiAuthentication(new LtiAuthenticationOptions
@@ -37,14 +58,20 @@ namespace uLearn.Web.LTI
 							throw new LtiException("Invalid " + OAuthConstants.ConsumerKeyParameter + " " + context.LtiRequest.ConsumerKey);
 						}
 
-                        /* Substitute http(s) scheme with real scheme from header */
-					    var uriBuilder = new UriBuilder(context.LtiRequest.Url)
-					    {
-					        Scheme = context.OwinContext.Request.GetRealRequestScheme()
-					    };
-					    context.LtiRequest.Url = uriBuilder.Uri;
+						/* Substitute http(s) scheme with real scheme from header */
+						var uriBuilder = new UriBuilder(context.LtiRequest.Url)
+						{
+							Scheme = context.OwinContext.Request.GetRealRequestScheme()
+						};
+						context.LtiRequest.Url = uriBuilder.Uri;
+
+						LogSignatureGeneration(context.LtiRequest.HttpMethod, context.LtiRequest.Url,
+							new NameValueCollection(context.LtiRequest.Parameters), consumer.Secret);
 
 						var signature = context.LtiRequest.GenerateSignature(consumer.Secret);
+
+						log.Info($"Signature from request: {context.LtiRequest.Signature}");
+
 						if (!signature.Equals(context.LtiRequest.Signature))
 						{
 							throw new LtiException("Invalid " + OAuthConstants.SignatureParameter);
