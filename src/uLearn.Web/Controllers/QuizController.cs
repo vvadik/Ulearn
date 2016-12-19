@@ -129,26 +129,24 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			await userQuizzesRepo.RemoveAnswers(userId, slideId);
 			await visitsRepo.RemoveAttempts(slideId, userId);
-			var model = new { courseId, slideIndex = slide.Index };
+			var model = new { courseId, slideId = slide.Id };
 			if (isLti)
 			{
 				LtiUtils.SubmitScore(slide, userId);
 				return RedirectToAction("LtiSlide", "Course", model);
 			}
-			return RedirectToAction("Slide", "Course", model);
+			return RedirectToAction("SlideById", "Course", model);
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> SubmitQuiz(string courseId, string slideIndex, string answer, bool isLti)
+		public async Task<ActionResult> SubmitQuiz(string courseId, Guid slideId, string answer, bool isLti)
 		{
-			var intSlideIndex = int.Parse(slideIndex);
 			var course = courseManager.GetCourse(courseId);
-			var userId = User.Identity.GetUserId();
-			var slide = (QuizSlide) course.Slides[intSlideIndex];
+			var slide = (QuizSlide) course.FindSlideById(slideId);
 			if (slide == null)
 				return new HttpNotFoundResult();
-			var slideId = slide.Id;
 
+			var userId = User.Identity.GetUserId();
 			var maxDropCount = GetMaxDropCount(slide);
 			var quizState = GetQuizState(courseId, userId, slideId, maxDropCount).Item1;
 			if (! CanUserFillQuiz(quizState))
@@ -156,11 +154,11 @@ namespace uLearn.Web.Controllers
 
 			var time = DateTime.Now;
 			var answers = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.QuizId);
-			var quizBlockWithTaskCount = course.Slides[intSlideIndex].Blocks.Count(x => x is AbstractQuestionBlock);
+			var quizBlockWithTaskCount = slide.Blocks.Count(x => x is AbstractQuestionBlock);
 			var allQuizInfos = new List<QuizInfoForDb>();
 			foreach (var ans in answers)
 			{
-				var quizInfos = CreateQuizInfo(course, intSlideIndex, ans);
+				var quizInfos = CreateQuizInfo(slide, ans);
 				allQuizInfos.AddRange(quizInfos);
 			}
 			var blocksInAnswerCount = allQuizInfos.Select(x => x.QuizId).Distinct().Count();
@@ -255,9 +253,8 @@ namespace uLearn.Web.Controllers
 			return Redirect(nextUrl);
 		}
 
-		private IEnumerable<QuizInfoForDb> CreateQuizInfo(Course course, int slideIndex, IGrouping<string, QuizAnswer> answer)
+		private IEnumerable<QuizInfoForDb> CreateQuizInfo(QuizSlide slide, IGrouping<string, QuizAnswer> answer)
 		{
-			var slide = (QuizSlide)course.Slides[slideIndex];
 			var block = slide.GetBlockById(answer.Key);
 			if (block is FillInBlock)
 				return CreateQuizInfoForDb(block as FillInBlock, answer.First().Text);
@@ -429,10 +426,10 @@ namespace uLearn.Web.Controllers
 
 		[HttpGet]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public ActionResult Analytics(string courseId, int slideIndex, DateTime periodStart)
+		public ActionResult Analytics(string courseId, Guid slideId, DateTime periodStart)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var quizSlide = (QuizSlide)course.Slides[slideIndex];
+			var quizSlide = (QuizSlide)course.GetSlideById(slideId);
 			var quizVersions = quizzesRepo.GetQuizVersions(courseId, quizSlide.Id).ToList();
 			var dict = new SortedDictionary<string, List<QuizAnswerInfo>>();
 			var passes = db.UserQuizzes
@@ -623,10 +620,10 @@ namespace uLearn.Web.Controllers
 						LtiUtils.SubmitScore(slide, userId);
 				}
 			}
-			var model = new { courseId, slideIndex = slide.Index, isLti };
+			var model = new { courseId, slideId = slide.Id, isLti };
 			if (isLti)
 				return RedirectToAction("LtiSlide", "Course", model);
-			return RedirectToAction("Slide", "Course", model);
+			return RedirectToAction("SlideById", "Course", model);
 		}
 
 		private QuizModel GuestQuiz(QuizSlide slide, string courseId)

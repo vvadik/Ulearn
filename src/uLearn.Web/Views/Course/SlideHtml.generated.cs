@@ -1465,20 +1465,20 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<button id=\"GetHintBu
 
                                                     WebViewPage.WriteTo(@__razor_helper_writer, model.CourseId);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-slide-index=\"");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-slide-id=\"");
 
 
-                                                                                         WebViewPage.WriteTo(@__razor_helper_writer, model.Slide.Index);
+                                                                                      WebViewPage.WriteTo(@__razor_helper_writer, model.Slide.Id);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-hints-count=\"");
 
 
-                                                                                                                                 WebViewPage.WriteTo(@__razor_helper_writer, hints.Count);
+                                                                                                                           WebViewPage.WriteTo(@__razor_helper_writer, hints.Count);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-url=\"");
 
 
-                                                                                                                                                           WebViewPage.WriteTo(@__razor_helper_writer, model.UseHintUrl);
+                                                                                                                                                     WebViewPage.WriteTo(@__razor_helper_writer, model.UseHintUrl);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tВзять подсказку\r\n\t\t\t</button>\r\n");
 

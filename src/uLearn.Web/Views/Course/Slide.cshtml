@@ -16,7 +16,7 @@
 @if (Model.ManualChecking == null)
 {
 	mainDivClass = "slide-container";
-	@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
+	@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
 }
 
 <div class="@mainDivClass">
@@ -89,7 +89,7 @@
 					@Html.Partial("_LoginForContinue")
 				}
 
-				@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index, onSolutionsSlide = false })
+				@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideId = Model.Slide.Id, onSolutionsSlide = false })
 
 				@Html.Action("SlideComments", "Comments", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
 			}
@@ -130,7 +130,7 @@
 	{
 		var slide = (ExerciseSlide)Model.Slide;
 		<script>
-			getHints("@Model.CourseId", "@Model.Slide.Index", '@slide.Exercise.HintsMd.Count')
+			getHints("@Model.CourseId", "@Model.Slide.Id", '@slide.Exercise.HintsMd.Count')
 		</script>
 		<script>
 			$(document).ready(function() {

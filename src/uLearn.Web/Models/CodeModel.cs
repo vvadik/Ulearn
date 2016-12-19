@@ -7,7 +7,6 @@ namespace uLearn.Web.Models
 	{
 		public ExerciseBlock ExerciseBlock;
 		public string CourseId;
-		public int SlideIndex;
 		public BlockRenderContext Context;
 		public Guid SlideId;
 	}

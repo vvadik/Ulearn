@@ -5,7 +5,7 @@ using uLearn.Model.Blocks;
 
 namespace uLearn
 {
-	public class Utils
+	public static class Utils
 	{
 		public static string GetSource(string courseId, Guid slideId, CourseManager courseManager, string code)
 		{
@@ -46,7 +46,7 @@ namespace uLearn
 			return Guid.Parse(guid).ToString("D");
 		}
 
-		public static string GetNormalizedGuid(Guid guid)
+		public static string GetNormalizedGuid(this Guid guid)
 		{
 			return guid.ToString("D");
 		}

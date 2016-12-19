@@ -26,9 +26,9 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> UseHint(string courseId, int slideIndex, bool isNeedNewHint)
+		public async Task<ActionResult> UseHint(string courseId, Guid slideId, bool isNeedNewHint)
 		{
-			var slide = courseManager.GetCourse(courseId).Slides[slideIndex];
+			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			if (!(slide is ExerciseSlide))
 				return Json(new { Text = "Для слайда нет подсказок" });
 			var exerciseSlide = (ExerciseSlide) slide;

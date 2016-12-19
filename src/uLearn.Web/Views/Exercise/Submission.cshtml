@@ -115,7 +115,7 @@
 			if (!Model.InstructorView)
 			{
 				var acceptedSolutionsUrl = Model.Url != null
-					? Model.Url.Action("AcceptedSolutions", "Course", new { courseId = Model.CourseId, slideIndex = Model.Slide.Index })
+					? Model.Url.Action("AcceptedSolutions", "Course", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
 					: "";
 				var acceptedSolutionsAction = Model.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", acceptedSolutionsUrl);
 				@SlideHtml.ExerciseControls(new ExerciseControlsModel(Model.CourseId, Model.Slide)
@@ -169,7 +169,7 @@
 @helper YouWillLoseScoresDialog(ExerciseBlockData data)
 {
 	var acceptedSolutionsUrl = data.Url != null
-		? data.Url.Action("AcceptedSolutions", "Course", new { data.CourseId, slideIndex = data.Slide.Index })
+		? data.Url.Action("AcceptedSolutions", "Course", new { data.CourseId, slideId = data.Slide.Id })
 		: "";
 	<div class="modal fade" id="ShowSolutionsAlert" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog">

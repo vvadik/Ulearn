@@ -8,7 +8,7 @@
 		<span>
 			@if (q.Slide != null)
 			{
-				@Html.ActionLink(q.SlideTitle, "Slide", "Course", new { courseId = q.Question.CourseId, slideIndex = q.Slide.Index }, null);
+				@Html.ActionLink(q.SlideTitle, "SlideById", "Course", new { courseId = q.Question.CourseId, slideId = q.Slide.Id }, null);
 			}
 			else
 			{
