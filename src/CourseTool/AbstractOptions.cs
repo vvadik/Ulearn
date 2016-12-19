@@ -14,8 +14,8 @@ namespace uLearn.CourseTool
 
 		private string dir;
 		private string profile;
-		protected const string SlideUrlFormat = "/Course/{0}/LtiSlide/{1}";
-		protected const string SolutionsUrlFormat = "/Course/{0}/AcceptedAlert/{1}";
+		protected const string SlideUrlFormat = "/Course/{0}/LtiSlide?slideId={1}";
+		protected const string SolutionsUrlFormat = "/Course/{0}/AcceptedAlert?slideId={1}";
 
 		[Option('d', "dir", HelpText = "Working directory for the project")]
 		public string Dir
