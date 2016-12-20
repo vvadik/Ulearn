@@ -88,8 +88,7 @@ namespace uLearn.Web.Controllers
 			var tryNumber = state.Item2;
 			var resultsForQuizes = GetResultForQuizes(courseId, userId, slideId, state.Item1);
 
-			log.Debug($"Create quiz for {userId} at {courseId}:{slide.Id}, isLti = {isLti}");
-			log.Debug($"ManualQuizCheckQueueItem: {manualQuizCheckQueueItem}");
+			log.Info($"Создаю тест для пользователя {userId} в слайде {courseId}:{slide.Id}, isLti = {isLti}");
 
 			var quizVersion = quizzesRepo.GetLastQuizVersion(courseId, slideId);
 			if (quizState != QuizState.NotPassed)

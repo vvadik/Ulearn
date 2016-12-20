@@ -342,11 +342,14 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private UserExerciseSubmission GetExerciseSubmissionShownByDefault(string courseId, Guid slideId, string userId)
+		private UserExerciseSubmission GetExerciseSubmissionShownByDefault(string courseId, Guid slideId, string userId, bool allowNotAccepted=false)
 		{
 			var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
-			return submissions.LastOrDefault(s => s.ManualCheckings != null && s.ManualCheckings.Any()) ??
+			var lastSubmission = submissions.LastOrDefault(s => s.ManualCheckings != null && s.ManualCheckings.Any()) ??
 					submissions.LastOrDefault(s => s.AutomaticCheckingIsRightAnswer);
+			if (lastSubmission == null && allowNotAccepted)
+				lastSubmission = solutionsRepo.GetAllSubmissionsByUser(courseId, slideId, userId).LastOrDefault();
+			return lastSubmission;
 		}
 
 		public ActionResult Submission(string courseId, Guid slideId, string userId=null, int? submissionId=null, int? manualCheckingId = null, bool isLti = false, bool showOutput = false, bool instructorView = false, bool onlyAccepted = true)
@@ -370,7 +373,7 @@ namespace uLearn.Web.Controllers
 			}
 			else if (! submissionId.HasValue && ! manualCheckingId.HasValue)
 			{
-				submission = GetExerciseSubmissionShownByDefault(courseId, slideId, currentUserId);
+				submission = GetExerciseSubmissionShownByDefault(courseId, slideId, currentUserId, instructorView);
 			}
 
 			var course = courseManager.GetCourse(courseId);
