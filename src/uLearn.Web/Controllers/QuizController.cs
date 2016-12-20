@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using log4net;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
@@ -19,6 +20,8 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class QuizController : Controller
 	{
+		private static ILog log = LogManager.GetLogger(typeof(QuizController));
+
 		private const int MAX_DROPS_COUNT = 1;
 		public const int MAX_FILLINBLOCK_SIZE = 1024;
 
@@ -74,7 +77,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[AllowAnonymous]
-		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem = null, int? groupId=null)
+		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem = null, int? groupId = null)
 		{
 			if (isGuest)
 				return PartialView(GuestQuiz(slide, courseId));
@@ -84,6 +87,9 @@ namespace uLearn.Web.Controllers
 			var quizState = state.Item1;
 			var tryNumber = state.Item2;
 			var resultsForQuizes = GetResultForQuizes(courseId, userId, slideId, state.Item1);
+
+			log.Debug($"Create quiz for {userId} at {courseId}:{slide.Id}, isLti = {isLti}");
+			log.Debug($"ManualQuizCheckQueueItem: {manualQuizCheckQueueItem}");
 
 			var quizVersion = quizzesRepo.GetLastQuizVersion(courseId, slideId);
 			if (quizState != QuizState.NotPassed)

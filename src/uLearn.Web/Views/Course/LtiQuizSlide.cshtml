@@ -13,7 +13,15 @@
 <body class="lti-component">
 	@if (Model != null)
 	{
-		@Html.Action("Quiz", "Quiz", new { slide = Model.Slide, courseId = Model.CourseId, userId = Model.UserId, isLti = true, isGuest = false });
+		@Html.Action("Quiz", "Quiz", new
+           {
+               slide = Model.Slide,
+               courseId = Model.CourseId,
+               userId = Model.UserId,
+               isLti = true,
+               isGuest = false,
+               manualQuizCheckQueueItem = (ManualQuizChecking) null,
+           })
 		@Scripts.Render("~/main-js")
 	}
 </body>
