@@ -57,18 +57,12 @@ namespace uLearn
 
 		public override string ToString()
 		{
-			return string.Format("Title: {0}, Id: {1}, MaxScore: {2}", Title, NormalizedGuid, MaxScore);
+			return $"Title: {Title}, Id: {NormalizedGuid}, MaxScore: {MaxScore}";
 		}
 
-		public string LatinTitle
-		{
-			get { return Title.ToLatin(); }
-		}
+		public string LatinTitle => Title.ToLatin();
 
-		public string Url
-		{
-			get { return LatinTitle + "_" + NormalizedGuid;  }
-		}
+		public string Url => LatinTitle + "_" + NormalizedGuid;
 
 		private static IEnumerable<Vertical> OrdinarySlideToVerticals(string courseId, Slide slide, string slideUrl, string solutionsUrl, Dictionary<string, string> videoGuids, string ltiId)
 		{

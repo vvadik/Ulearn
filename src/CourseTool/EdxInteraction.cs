@@ -39,16 +39,22 @@ namespace uLearn.CourseTool
 		{
 			Console.WriteLine("Downloading {0}.tar.gz from {1}", config.CourseRun, edxStudioUrl);
 			Download(edxStudioUrl, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, baseDir + "/" + config.CourseRun + ".tar.gz");
+		}
 
-			ArchiveManager.ExtractTar(baseDir + "/" + config.CourseRun + ".tar.gz", baseDir);
-			Utils.DeleteFileIfExists(baseDir + "/" + config.CourseRun + ".tar.gz");
+		public static void ExtractEdxCourseArchive(string baseDir, string courseId)
+		{
+			var filename = baseDir + "/" + courseId + ".tar.gz";
+			Console.WriteLine($"Extracting {filename}");
+			
+			ArchiveManager.ExtractTar(filename, baseDir);
+			Utils.DeleteFileIfExists(filename);
 			Utils.DeleteDirectoryIfExists(baseDir + "/olx");
 			Directory.Move(baseDir + "/course", baseDir + "/olx");
 		}
 
 		private static void Upload(string edxStudioUrl, string email, string password, string organization, string course, string time, string filename)
 		{
-			var uploadUrl = string.Format("{0}/import/course-v1:{1}+{2}+{3}", edxStudioUrl, organization, course, time);
+			var uploadUrl = $"{edxStudioUrl}/import/course-v1:{organization}+{course}+{time}";
 			var client = LogIn(edxStudioUrl, email, password);
 
 			var boundary = "---" + DateTime.Now.Ticks.ToString("x");
@@ -88,23 +94,28 @@ namespace uLearn.CourseTool
 
 		public static void Upload(string baseDir, string courseName, Config config, string edxStudioUrl, Credentials credentials)
 		{
+			Console.WriteLine("Uploading {0}.tar.gz to {1}", courseName, edxStudioUrl);
+			Upload(edxStudioUrl, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, courseName + ".tar.gz");
+			Utils.DeleteFileIfExists(courseName + ".tar.gz");
+		}
+
+		public static void CreateEdxCourseArchive(string baseDir, string courseName)
+		{
 			Environment.CurrentDirectory = baseDir;
+			var outputTarFilename = $"{courseName}.tar.gz";
+			Console.WriteLine($"Creating archive {outputTarFilename}");
+
 			Utils.DeleteDirectoryIfExists("temp");
 			if (Directory.Exists(courseName))
 				Directory.Move(courseName, "temp");
 			Utils.DirectoryCopy("olx", courseName, true);
-			Utils.DeleteFileIfExists(courseName + ".tar.gz");
+			Utils.DeleteFileIfExists(outputTarFilename);
 
-			Console.WriteLine("Creating {0}.tar.gz...", courseName);
-			ArchiveManager.CreateTar(courseName + ".tar.gz", courseName);
+			ArchiveManager.CreateTar(outputTarFilename, courseName);
 
 			Utils.DeleteDirectoryIfExists(courseName);
 			if (Directory.Exists("temp"))
 				Directory.Move("temp", courseName);
-
-			Console.WriteLine("Uploading {0}.tar.gz to {1}", courseName, edxStudioUrl);
-			Upload(edxStudioUrl, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, courseName + ".tar.gz");
-			Utils.DeleteFileIfExists(courseName + ".tar.gz");
 		}
 	}
 }

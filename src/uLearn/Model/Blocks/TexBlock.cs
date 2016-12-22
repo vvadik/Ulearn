@@ -21,13 +21,18 @@ namespace uLearn.Model.Blocks
 
 		public override string ToString()
 		{
-			return string.Format("Tex {0}", string.Join("\n", TexLines));
+			return $"Tex {string.Join("\n", TexLines)}";
 		}
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
 			var urlName = slide.NormalizedGuid + componentIndex;
-			return new HtmlComponent(urlName, displayName, urlName, string.Join("\n", TexLines.Select(x => "$$" + x + "$$")).GetHtmlWithUrls("/static").Item1);
+			return new HtmlComponent(
+				urlName,
+				displayName,
+				urlName,
+				string.Join("\n", TexLines.Select(x => "$$" + x + "$$")).GetHtmlWithUrls("/assets").Item1
+				);
 		}
 
 		public override string TryGetText()

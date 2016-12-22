@@ -17,10 +17,7 @@ namespace uLearn.Model.Edx.EdxComponents
 		public string Filename;
 
 		[XmlIgnore]
-		public override string SubfolderName
-		{
-			get { return "html"; }
-		}
+		public override string SubfolderName => "html";
 
 		public GalleryComponent()
 		{
@@ -38,15 +35,15 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override void Save(string folderName)
 		{
 			base.Save(folderName);
-			File.WriteAllText(string.Format("{0}/{1}/{2}.html", folderName, SubfolderName, UrlName), AsHtmlString());
+			File.WriteAllText($"{folderName}/{SubfolderName}/{UrlName}.html", AsHtmlString());
 		}
 
 		public override void SaveAdditional(string folderName)
 		{
 			foreach (var image in Images)
-				File.Copy(string.Format("{0}/{1}", LocalFolder, image), string.Format("{0}/assets/{1}_{2}", folderName, UrlName, image.Replace("/", "_")));
-			File.WriteAllText(string.Format("{0}/assets/gallery_{1}.html", folderName, UrlName),
-				File.ReadAllText(string.Format("{0}/templates/gallery.html", Utils.GetRootDirectory()))
+				File.Copy($"{LocalFolder}/{image}", $"{folderName}/assets/{UrlName}_{image.Replace("/", "_")}");
+			File.WriteAllText($"{folderName}/assets/gallery_{UrlName}.html",
+				File.ReadAllText($"{Utils.GetRootDirectory()}/templates/gallery.html")
 					.Replace("{0}", string.Join("", Images.Select(x => "<li><img src='" + UrlName + "_" + x.Replace("/", "_") + "' alt=''/></li>"))));
 		}
 
@@ -57,7 +54,7 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		public override string AsHtmlString()
 		{
-			return File.ReadAllText(string.Format("{0}/templates/iframe.html", Utils.GetRootDirectory()))
+			return File.ReadAllText($"{Utils.GetRootDirectory()}/templates/iframe.html")
 				.Replace("{0}", "gallery_" + UrlName)
 				.Replace("{1}", "(function (obj) { obj.style.height = '600px'; })(this);");
 		}

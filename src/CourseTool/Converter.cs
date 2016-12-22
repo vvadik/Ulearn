@@ -12,7 +12,7 @@ namespace uLearn.CourseTool
 		{
 			var result = new List<Sequential>
 			{
-				new Sequential(string.Format("{0}-{1}-{2}", course.Id, unitIndex, 0), units[unitIndex],
+				new Sequential($"{course.Id}-{unitIndex}-{0}", units[unitIndex],
 					course.Slides
 						.Where(s => !config.IgnoredUlearnSlides.Select(Guid.Parse).Contains(s.Id))
 						.Where(y => y.Info.UnitName == units[unitIndex])
@@ -23,9 +23,9 @@ namespace uLearn.CourseTool
 			if (note != null)
 			{
 				var displayName = "Заметки преподавателю";
-				var sequentialId = string.Format("{0}-{1}-{2}", course.Id, unitIndex, "note-seq");
-				var verticalId = string.Format("{0}-{1}-{2}", course.Id, unitIndex, "note-vert");
-				var mdBlockId = string.Format("{0}-{1}-{2}", course.Id, unitIndex, "note-md");
+				var sequentialId = $"{course.Id}-{unitIndex}-note-seq";
+				var verticalId = $"{course.Id}-{unitIndex}-note-vert";
+				var mdBlockId = $"{course.Id}-{unitIndex}-note-md";
 				result.Add(new Sequential(sequentialId, displayName,
 					new[]
 					{
@@ -41,7 +41,7 @@ namespace uLearn.CourseTool
 			return Enumerable
 				.Range(0, units.Count)
 				.Select(x => new Chapter(
-					string.Format("{0}-{1}", course.Id, x), 
+					$"{course.Id}-{x}", 
 					units[x], 
 					null,
 					UnitToSequentials(course, config, units, x, exerciseUrl, solutionsUrl, videoGuids)))

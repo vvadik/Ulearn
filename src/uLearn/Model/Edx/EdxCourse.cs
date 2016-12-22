@@ -36,14 +36,14 @@ namespace uLearn.Model.Edx
 			UrlName = courseId;
 			Organization = organization;
 			CourseWithChapters = new CourseWithChapters(courseId, courseTitle, advancedModules, ltiPassports, true, chapters);
-			StaticFiles = Directory.GetFiles(string.Format("{0}/static", Utils.GetRootDirectory()));
+			StaticFiles = Directory.GetFiles($"{Utils.GetRootDirectory()}/assets");
 		}
 
 		private void CreateDirectories(string rootDir, params string[] subDirs)
 		{
 			if (!Directory.Exists(rootDir))
 				Directory.CreateDirectory(rootDir);
-			foreach (var subdir in subDirs.Select(subDir => string.Format("{0}/{1}", rootDir, subDir)).Where(subdir => !Directory.Exists(subdir)))
+			foreach (var subdir in subDirs.Select(subDir => $"{rootDir}/{subDir}").Where(subdir => !Directory.Exists(subdir)))
 				Directory.CreateDirectory(subdir);
 		}
 
@@ -51,9 +51,9 @@ namespace uLearn.Model.Edx
 		{
 			CreateDirectories(folderName, "assets", "course", "chapter", "sequential", "vertical", "video", "html", "lti", "problem");
 			foreach (var file in StaticFiles)
-				File.Copy(file, string.Format("{0}/assets/{1}", folderName, Path.GetFileName(file)), true);
+				File.Copy(file, $"{folderName}/assets/{Path.GetFileName(file)}", true);
 
-			var courseFile = string.Format("{0}/course.xml", folderName);
+			var courseFile = $"{folderName}/course.xml";
 			if (File.Exists(courseFile))
 				CourseWithChapters.UrlName = new FileInfo(courseFile).DeserializeXml<EdxCourse>().UrlName;
 			else
@@ -64,8 +64,8 @@ namespace uLearn.Model.Edx
 
 		public static EdxCourse Load(string folderName)
 		{
-			var course = new FileInfo(string.Format("{0}/course.xml", folderName)).DeserializeXml<EdxCourse>();
-			course.StaticFiles = Directory.GetFiles(string.Format("{0}/assets", folderName));
+			var course = new FileInfo($"{folderName}/course.xml").DeserializeXml<EdxCourse>();
+			course.StaticFiles = Directory.GetFiles($"{folderName}/assets");
 			course.CourseWithChapters = CourseWithChapters.Load(folderName, course.UrlName);
 			return course;
 		}

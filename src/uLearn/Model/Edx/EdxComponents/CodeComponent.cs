@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Resources;
 using System.Xml.Serialization;
 
 namespace uLearn.Model.Edx.EdxComponents
@@ -17,10 +16,7 @@ namespace uLearn.Model.Edx.EdxComponents
 		public string Filename;
 
 		[XmlIgnore]
-		public override string SubfolderName
-		{
-			get { return "html"; }
-		}
+		public override string SubfolderName => "html";
 
 		public CodeComponent()
 		{
@@ -38,14 +34,14 @@ namespace uLearn.Model.Edx.EdxComponents
 		public override void Save(string folderName)
 		{
 			base.Save(folderName);
-			File.WriteAllText(string.Format("{0}/{1}/{2}.html", folderName, SubfolderName, UrlName), AsHtmlString());
+			File.WriteAllText($"{folderName}/{SubfolderName}/{UrlName}.html", AsHtmlString());
 		}
 
 		public override void SaveAdditional(string folderName)
 		{
 			File.WriteAllText(
-				string.Format("{0}/assets/code_{1}.html", folderName, UrlName),
-				File.ReadAllText(string.Format("{0}/templates/code.html", Utils.GetRootDirectory())).Replace("{0}", LangId).Replace("{1}", Source)
+				$"{folderName}/assets/code_{UrlName}.html",
+				File.ReadAllText($"{Utils.GetRootDirectory()}/templates/code.html").Replace("{0}", LangId).Replace("{1}", Source)
 			);
 		}
 
@@ -56,7 +52,7 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		public override string AsHtmlString()
 		{
-			return File.ReadAllText(string.Format("{0}/templates/iframe.html", Utils.GetRootDirectory()))
+			return File.ReadAllText($"{Utils.GetRootDirectory()}/templates/iframe.html")
 				.Replace("{0}", "code_" + UrlName)
 				.Replace("{1}", "(function (obj) { obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px'; })(this);");
 		}
