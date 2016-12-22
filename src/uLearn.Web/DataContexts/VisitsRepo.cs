@@ -98,6 +98,14 @@ namespace uLearn.Web.DataContexts
 				.ToDictionary(g => g.Key, g => g.Value.Score);
 		}
 
+		public List<Guid> GetSlidesWithUsersManualChecking(string courseId, string userId)
+		{
+			return db.Visits.Where(v => v.CourseId == courseId && v.UserId == userId)
+				.Where(v => v.HasManualChecking)
+				.Select(v => v.SlideId)
+				.ToList();
+		}
+
 		public int GetScore(Guid slideId, string userId)
 		{
 			return db.Visits

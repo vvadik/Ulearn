@@ -1,12 +1,11 @@
-﻿@using System
-@using uLearn
+﻿@using uLearn
 @using uLearn.Quizes
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Course
 @model CoursePageModel
 
 @{
-	ViewBag.Title = Model.CourseTitle;
+	ViewBag.Title = string.Format("{0}: {1}", Model.CourseTitle, Model.Slide.Title);
 	ViewBag.Slide = Model.Slide;
 
 	var mainDivClass = "";

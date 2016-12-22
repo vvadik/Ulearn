@@ -9,6 +9,7 @@ namespace uLearn.Web.Models
 	{
 		private readonly Func<Slide, string> getSlideUrl;
 		private readonly Func<Slide, int> getSlideScore;
+		private readonly Func<Slide, int> getSlideMaxScore;
 		private readonly Course course;
 		private readonly Guid? currentSlideId;
 		public Func<string, string> GetUnitStatisticsUrl;
@@ -16,12 +17,14 @@ namespace uLearn.Web.Models
 		public Func<Slide, bool> IsSolved = s => false;
 		public Func<Slide, bool> IsVisited = s => false;
 		public Func<string, bool> IsUnitVisible = u => true;
+		public Func<Slide, bool> IsSlideHidden = s => true;
 		public bool IsInstructor;
 
-		public TocModelBuilder(Func<Slide, string> getSlideUrl, Func<Slide, int> getSlideScore, Course course, Guid? currentSlideId)
+		public TocModelBuilder(Func<Slide, string> getSlideUrl, Func<Slide, int> getSlideScore, Func<Slide, int> getSlideMaxScore, Course course, Guid? currentSlideId)
 		{
 			this.getSlideUrl = getSlideUrl;
 			this.getSlideScore = getSlideScore;
+			this.getSlideMaxScore = getSlideMaxScore;
 			this.course = course;
 			this.currentSlideId = currentSlideId;
 		}
@@ -33,7 +36,12 @@ namespace uLearn.Web.Models
 
 		private TocUnitModel[] CreateUnits()
 		{
-			return course.Slides.GroupBy(s => s.Info.UnitName).Where(g => IsUnitVisible(g.Key)).Select(g => CreateUnit(g.Key, g.ToList())).ToArray();
+			return course.Slides
+				.Where(s => ! IsSlideHidden(s))
+				.GroupBy(s => s.Info.UnitName)
+				.Where(g => IsUnitVisible(g.Key))
+				.Select(g => CreateUnit(g.Key, g.ToList()))
+				.ToArray();
 		}
 
 		private TocUnitModel CreateUnit(string unitName, List<Slide> slides)
@@ -71,7 +79,7 @@ namespace uLearn.Web.Models
 				Url = getSlideUrl(slide), 
 				Name = slide.Title, 
 				ShouldBeSolved = slide.ShouldBeSolved, 
-				MaxScore = slide.MaxScore, 
+				MaxScore = getSlideMaxScore(slide),
 				Score = getSlideScore(slide), 
 				IsCurrent = slide.Id == currentSlideId, 
 				IsSolved = IsSolved(slide), 

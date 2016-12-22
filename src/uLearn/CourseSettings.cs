@@ -14,6 +14,9 @@ namespace uLearn
 		[XmlElement("language")]
 		public Language[] DefaultLanguageVersions { get; set; }
 
+		[XmlElement("manual-checking")]
+		public bool IsManualCheckingEnabled { get; set; }
+
 		[XmlIgnore]
 		public string DefaultLanguage
 		{
@@ -68,7 +71,7 @@ namespace uLearn
 			var res = DefaultLanguageVersions.FirstOrDefault(lang => lang.Name == langId);
 			if (res == null && Title != null && this != DefaultSettings)
 				return DefaultSettings.GetLanguageVersion(langId);
-			return res == null ? null : res.Version;
+			return res?.Version;
 		}
 
 		public string GetPrelude(string langId)
@@ -76,7 +79,7 @@ namespace uLearn
 			var res = Preludes.FirstOrDefault(file => file.LangId == langId);
 			if (res == null && Title != null && this != DefaultSettings)
 				return DefaultSettings.GetPrelude(langId);
-			return res == null ? null : res.File;
+			return res?.File;
 		}
 
 		public string GetDictionaryFile()

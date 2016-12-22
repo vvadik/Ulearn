@@ -34,6 +34,7 @@ namespace uLearn.Web.Models
 		public DateTime Timestamp { get; set; }
 
 		public int Score { get; set; }
+		public bool HasManualChecking { get; set; }
 		public int AttemptsCount { get; set; }
 		public bool IsSkipped { get; set; }
 		public bool IsPassed { get; set; }

@@ -7,7 +7,7 @@
 	var quizSlide = Model.Slide;
 
 	var status = "";
-	if (Model.QuizState == QuizState.NotPassed)
+	if (!Model.IsGuest && Model.QuizState == QuizState.NotPassed)
 	{
 		status = string.Format("Попытка {0} из {1}", Model.TryNumber + 1, Model.MaxDropCount + 1);
 	}
@@ -95,7 +95,7 @@
 					<input type="hidden" name="courseId" value="@Model.CourseId"/>
 					<input type="hidden" name="isLti" value="@Model.IsLtiToString">
 					<button class="btn btn-danger" type="submit">Пройти тест повторно</button>
-					<small>У вас остал@(remains == 1 ? "а" : "о")сь @remains из @(Model.MaxDropCount + 1) попыток</small>
+					<small class="quiz__remains">У вас остал@(remains == 1 ? "а" : "о")сь @remains из @(Model.MaxDropCount + 1) попыток</small>
 			}
 			}
 			else if (User.HasAccessFor(Model.CourseId, CourseRole.Tester))

@@ -42,6 +42,9 @@ namespace uLearn.Web.Models
 		[Required]
 		public bool IsInviteLinkEnabled { get; set; }
 
+		[Required]
+		public bool IsManualCheckingEnabled { get; set; }
+
 		public virtual ICollection<GroupMember> Members { get; set; }
 
 		public Group()

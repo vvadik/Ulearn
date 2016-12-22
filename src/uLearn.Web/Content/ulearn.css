@@ -432,6 +432,10 @@ p {
 	background-color: #fdfa98;
 }
 
+.quiz__remains {
+	margin-left: 10px;
+}
+
 .no-display {
 	display: none;
 }

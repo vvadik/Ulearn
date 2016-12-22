@@ -28,14 +28,15 @@ namespace uLearn.Web.DataContexts
 			return user.HasAccessFor(courseId, CourseRole.CourseAdmin);
 		}
 
-		public async Task<Group> CreateGroup(string courseId, string name, string ownerId, bool isPublic=false)
+		public async Task<Group> CreateGroup(string courseId, string name, string ownerId, bool isPublic=false, bool isManualCheckingEnabled=false)
 		{
 			var group = new Group
 			{
 				CourseId = courseId,
 				Name = name,
 				IsPublic = isPublic,
-				OwnerId = ownerId
+				OwnerId = ownerId,
+				IsManualCheckingEnabled = isManualCheckingEnabled,
 			};
 			db.Groups.Add(group);
 			await db.SaveChangesAsync();
@@ -43,11 +44,12 @@ namespace uLearn.Web.DataContexts
 			return group;
 		}
 
-		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsPublic)
+		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsPublic, bool newIsManualCheckingEnabled)
 		{
 			var group = FindGroupById(groupId);
 			group.Name = newName;
 			group.IsPublic = newIsPublic;
+			group.IsManualCheckingEnabled = newIsManualCheckingEnabled;
 			await db.SaveChangesAsync();
 
 			return group;
@@ -212,6 +214,20 @@ namespace uLearn.Web.DataContexts
 		{
 			var groupsIds = GetGroups(courseId).Select(g => g.Id);
 			return db.GroupMembers.Where(m => groupsIds.Contains(m.GroupId)).Select(m => m.UserId);
+		}
+
+		public bool IsManualCheckingEnabledForUser(Course course, string userId)
+		{
+			if (course.Settings.IsManualCheckingEnabled)
+				return true;
+
+			var userGroupsIds = db.GroupMembers
+				.Where(m => m.Group.CourseId == course.Id && m.UserId == userId && !m.Group.IsDeleted)
+				.DistinctBy(m => m.GroupId)
+				.Select(m => m.GroupId)
+				.ToList();
+			var userGroups = db.Groups.Where(g => userGroupsIds.Contains(g.Id)).ToList();
+			return userGroups.Any(g => g.IsManualCheckingEnabled);
 		}
 	}
 }

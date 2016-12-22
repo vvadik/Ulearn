@@ -563,17 +563,19 @@ namespace uLearn.Web.Controllers
 		public ActionResult Groups(string courseId)
 		{
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+			var course = courseManager.GetCourse(courseId);
 
 			return View("Groups", new GroupsViewModel
 			{
 				CourseId = courseId,
+				CourseManualCheckingEnabled = course.Settings.IsManualCheckingEnabled,
 				Groups = groups,
 			});
 		}
 
-		public ActionResult CreateGroup(string courseId, string name, bool isPublic)
+		public ActionResult CreateGroup(string courseId, string name, bool isPublic, bool manualChecking)
 		{
-			var group = groupsRepo.CreateGroup(courseId, name, User.Identity.GetUserId(), isPublic);
+			var group = groupsRepo.CreateGroup(courseId, name, User.Identity.GetUserId(), isPublic, manualChecking);
 			return RedirectToAction("Groups", new {courseId});
 		}
 
@@ -608,12 +610,12 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> UpdateGroup(int groupId, string name, bool isPublic)
+		public async Task<ActionResult> UpdateGroup(int groupId, string name, bool isPublic, bool manualChecking)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
 			if (!CanSeeAndModifyGroup(group))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-			await groupsRepo.ModifyGroup(groupId, name, isPublic);
+			await groupsRepo.ModifyGroup(groupId, name, isPublic, manualChecking);
 
 			return RedirectToAction("Groups", new { courseId = group.CourseId });
 		}
@@ -735,6 +737,7 @@ namespace uLearn.Web.Controllers
 	public class GroupsViewModel
 	{
 		public string CourseId { get; set; }
+		public bool CourseManualCheckingEnabled { get; set; }
 
 		public List<Group> Groups;
 	}

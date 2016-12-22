@@ -22,7 +22,7 @@ namespace uLearn.Web.Controllers
 		private static readonly ILog log = LogManager.GetLogger(typeof(ExerciseController));
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
-		private readonly UsersRepo usersRepo = new UsersRepo();
+		private readonly GroupsRepo groupsRepo = new GroupsRepo();
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
@@ -100,9 +100,14 @@ namespace uLearn.Web.Controllers
 				};
 			}
 
+			var course = courseManager.GetCourse(courseId);
+
 			var automaticChecking = submission.AutomaticChecking;
 			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
-			var sendToReview = exerciseBlock.RequireReview && automaticChecking.IsRightAnswer && !isProhibitedUserToSendForReview;
+			var sendToReview = exerciseBlock.RequireReview &&
+				automaticChecking.IsRightAnswer &&
+				!isProhibitedUserToSendForReview &&
+				groupsRepo.IsManualCheckingEnabledForUser(course, userId);
 			if (sendToReview)
 			{
 				await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, exerciseSlide.Id, userId);

@@ -63,6 +63,10 @@
 		e.preventDefault();
 
 		$form.attr('action', $form.data('createGroupUrl'));
+		$form.find('[name="groupId"]').val("");
+		$form.find('[name="name"]').val("");
+		$form.find('[name="isPublic"]').prop('checked', false);
+		$form.find('[name="manualChecking"]').prop('checked', $form.find('[name="manualChecking"]').data('defaultValue'));
 		$form.find('button.action-button').text('Создать');
 		$form.find('.remove-group-link').hide();
 		$('#createOrUpdateGroupModal').modal(); 
@@ -75,11 +79,13 @@
 		var groupId = $self.data('groupId');
 		var name = $self.data('name');
 		var isPublic = $self.data('isPublic');
+		var manualChecking = $self.data('manualChecking');
 
 		$form.attr('action', $form.data('updateGroupUrl'));
 		$form.find('[name="groupId"]').val(groupId);
 		$form.find('[name="name"]').val(name);
 		$form.find('[name="isPublic"]').prop('checked', isPublic);
+		$form.find('[name="manualChecking"]').prop('checked', manualChecking);
 		$form.find('button.action-button').text('Сохранить');
 		$form.find('.remove-group-link').data('groupId', groupId).show();
 		$('#createOrUpdateGroupModal').modal();

@@ -21,7 +21,13 @@
 		{
 			<div class="group" data-group-id="@group.Id">
 				<h3 class="group__title">
-					<a href="" class="edit-group-link  internal-page-link" title="Редактировать свойства" data-group-id="@group.Id" data-name="@group.Name" data-is-public="@group.IsPublic.ToString().ToLower()">@group.Name</a>
+					<a href=""
+					   class="edit-group-link  internal-page-link"
+					   title="Редактировать свойства"
+					   data-group-id="@group.Id"
+					   data-name="@group.Name"
+					   data-is-public="@group.IsPublic.ToString().ToLower()"
+					   data-manual-checking="@group.IsManualCheckingEnabled.ToString().ToLower()">@group.Name</a>
 
 					@if (!group.IsPublic)
 					{
@@ -112,6 +118,14 @@
 						@Html.CheckBox("isPublic")
 						<label for="isPublic">
 							Видна другим инструкторам
+						</label>
+					</div>
+
+					<div class="checkbox checkbox-default @(Model.CourseManualCheckingEnabled ? "hidden" : "")"
+						 data-default-value="@((! Model.CourseManualCheckingEnabled).ToString().ToLower())">
+						@Html.CheckBox("manualChecking")
+						<label for="manualChecking">
+							Включить код-ревью и ручную проверку тестов для участников группы
 						</label>
 					</div>
 

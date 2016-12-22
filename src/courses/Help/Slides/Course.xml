@@ -2,4 +2,5 @@
 <Course xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://ulearn.azurewebsites.net/course">
 	<title>Справка для авторов курсов (xml)</title>
 	<language name="cs" version="4.5" />
+	<manual-checking>false</manual-checking>
 </Course>

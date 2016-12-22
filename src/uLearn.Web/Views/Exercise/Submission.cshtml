@@ -39,25 +39,37 @@
 			var statusClass = "";
 			if (Model.ReviewState == ExerciseReviewState.WaitingForReview)
 			{
-				status = string.Format(
-					"Все тесты пройдены, код ожидает <a href=\"{0}\" title=\"Перейти к проверке\">проверки преподавателем</a>",
-					Url.Action("CheckExercise", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.Last().Id })
-					);
+				status = "Все тесты пройдены, код ожидает проверки преподавателем";
+				if (Model.InstructorView)
+				{
+					status = string.Format(
+						"Все тесты пройдены, код ожидает <a href=\"{0}\" title=\"Перейти к проверке\">проверки преподавателем</a>",
+						Url.Action("CheckExercise", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.Last().Id })
+						);
+				}
 			}
 			else if (Model.ReviewState == ExerciseReviewState.Reviewed)
 			{
 				var score = Model.SubmissionSelectedByUser.ManualCheckings.Max(c => c.Score);
-				status = string.Format("Все тесты пройдены, код <a href=\"{0}\" title=\"Отредактировать код-ревью\">проверен преподавателем</a> ({1})",
-					Url.Action("CheckExercise", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.Last().Id, recheck = true }),
-					score.PluralizeInRussian(new RussianPluralizationOptions
-					{
-						One = "балл",
-						Two = "балла",
-						Five = "баллов",
-						Gender = Gender.Male,
-						hideNumberOne = false,
-						smallNumbersAreWords = false,
-					}));
+				var pluralizedScore = score.PluralizeInRussian(new RussianPluralizationOptions
+				{
+					One = "балл",
+					Two = "балла",
+					Five = "баллов",
+					Gender = Gender.Male,
+					hideNumberOne = false,
+					smallNumbersAreWords = false,
+				});
+				if (Model.InstructorView)
+				{
+					status = string.Format("Все тесты пройдены, код <a href=\"{0}\" title=\"Отредактировать код-ревью\">проверен преподавателем</a> ({1})",
+						Url.Action("CheckExercise", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.Last().Id, recheck = true }),
+						pluralizedScore);
+				}
+				else
+				{
+					status = string.Format("Все тесты пройдены, код проверен преподавателем ({0})", pluralizedScore);
+				}
 			}
 			else if (Model.SubmissionSelectedByUser.AutomaticCheckingIsRightAnswer)
 			{

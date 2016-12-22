@@ -157,6 +157,9 @@ namespace uLearn.Web.Controllers
 			if (! CanUserFillQuiz(quizState))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Already answered");
 
+			if (slide.Quiz.ManualCheck && groupsRepo.IsManualCheckingEnabledForUser(course, userId))
+				return new HttpStatusCodeResult(HttpStatusCode.OK, "Manual checking is disabled for you");
+
 			var time = DateTime.Now;
 			var answers = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.QuizId);
 			var quizBlockWithTaskCount = slide.Blocks.Count(x => x is AbstractQuestionBlock);

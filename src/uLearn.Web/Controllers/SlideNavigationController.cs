@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
 using uLearn.Web.Models;
@@ -16,6 +18,7 @@ namespace uLearn.Web.Controllers
 		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
 		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
+		private readonly GroupsRepo groupsRepo = new GroupsRepo();
 		
 		public ActionResult TableOfContents(string courseId, Guid? slideId = null)
 		{
@@ -30,6 +33,7 @@ namespace uLearn.Web.Controllers
 			var visibleUnits = unitsRepo.GetVisibleUnits(course.Id, User);
 			var builder = new TocModelBuilder(
 				s => Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = s.Url }),
+				s => 0,
 				s => 0,
 				course,
 				currentSlideId);
@@ -48,23 +52,54 @@ namespace uLearn.Web.Controllers
 			return solvedSlides;
 		}
 
+		private int GetMaxScoreForUsersSlide(Slide slide, bool isSolved, bool hasManualChecking, bool enabledManualCheckingForUser)
+		{
+			var isExerciseOrQuiz = slide is ExerciseSlide || slide is QuizSlide;
+
+			if (!isExerciseOrQuiz)
+				return slide.MaxScore;
+
+			if (isSolved)
+				return hasManualChecking ? slide.MaxScore : GetMaxScoreWithoutManualChecking(slide);
+			else
+				return enabledManualCheckingForUser ? slide.MaxScore : GetMaxScoreWithoutManualChecking(slide);
+		}
+
+		private int GetMaxScoreWithoutManualChecking(Slide slide)
+		{
+			if (slide is ExerciseSlide)
+				return (slide as ExerciseSlide).Exercise.CorrectnessScore;
+			if (slide is QuizSlide)
+				return (slide as QuizSlide).Quiz.ManualCheck ? 0 : slide.MaxScore;
+			return slide.MaxScore;
+		}
+
 		private TocModel CreateTocModel(Course course, Guid? currentSlideId, string userId)
 		{
 			var visibleUnits = unitsRepo.GetVisibleUnits(course.Id, User);
-			var solved = GetSolvedSlides(course, userId);
+			var solvedSlidesIds = GetSolvedSlides(course, userId);
 			var visited = visitsRepo.GetIdOfVisitedSlides(course.Id, userId);
 			var scoresForSlides = visitsRepo.GetScoresForSlides(course.Id, userId);
+			var slidesWithUsersManualChecking = visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId).ToImmutableHashSet();
+			var enabledManualCheckingForUser = groupsRepo.IsManualCheckingEnabledForUser(course, userId);
+
 			var builder = new TocModelBuilder(
 				s => Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = s.Url }),
 				s => scoresForSlides.ContainsKey(s.Id) ? scoresForSlides[s.Id] : 0,
+				s => GetMaxScoreForUsersSlide(s, solvedSlidesIds.Contains(s.Id), slidesWithUsersManualChecking.Contains(s.Id), enabledManualCheckingForUser),
 				course,
-				currentSlideId);
-			builder.GetUnitInstructionNotesUrl = unitName => Url.Action("InstructorNote", "Course", new { courseId = course.Id, unitName });
-			builder.GetUnitStatisticsUrl = unitName => Url.Action("UnitStatistics", "Analytics", new { courseId = course.Id, unitName });
-			builder.IsInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor);
-			builder.IsSolved = s => solved.Contains(s.Id);
-			builder.IsVisited = s => visited.Contains(s.Id);
-			builder.IsUnitVisible = visibleUnits.Contains;
+				currentSlideId)
+			{
+				GetUnitInstructionNotesUrl = unitName => Url.Action("InstructorNote", "Course", new { courseId = course.Id, unitName }),
+				GetUnitStatisticsUrl = unitName => Url.Action("UnitStatistics", "Analytics", new { courseId = course.Id, unitName }),
+				IsInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor),
+				IsSolved = s => solvedSlidesIds.Contains(s.Id),
+				IsVisited = s => visited.Contains(s.Id),
+				IsUnitVisible = visibleUnits.Contains,
+				IsSlideHidden = s => s is QuizSlide && ((QuizSlide)s).Quiz.ManualCheck &&
+									!enabledManualCheckingForUser && !solvedSlidesIds.Contains(s.Id)
+			};
+
 			var toc = builder.CreateTocModel();
 			toc.NextUnitTime = unitsRepo.GetNextUnitPublishTime(course.Id);
 			return toc;
