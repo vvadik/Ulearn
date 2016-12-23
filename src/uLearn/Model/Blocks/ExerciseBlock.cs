@@ -83,9 +83,9 @@ namespace uLearn.Model.Blocks
 		{
 			unchecked
 			{
-				int hashCode = (ExerciseInitialCode != null ? ExerciseInitialCode.GetHashCode() : 0);
-				hashCode = (hashCode * 397) ^ (ExpectedOutput != null ? ExpectedOutput.GetHashCode() : 0);
-				hashCode = (hashCode * 397) ^ (HintsMd != null ? HintsMd.GetHashCode() : 0);
+				var hashCode = ExerciseInitialCode?.GetHashCode() ?? 0;
+				hashCode = (hashCode * 397) ^ (ExpectedOutput?.GetHashCode() ?? 0);
+				hashCode = (hashCode * 397) ^ (HintsMd?.GetHashCode() ?? 0);
 				return hashCode;
 			}
 		}
@@ -104,7 +104,7 @@ namespace uLearn.Model.Blocks
 
 		public Component GetExerciseComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)
 		{
-			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex, launchUrl, ltiId, true, MaxScore, false);
+			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex, launchUrl, ltiId, true, CorrectnessScore, false);
 		}
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)

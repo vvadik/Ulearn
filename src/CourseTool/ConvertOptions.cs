@@ -63,7 +63,7 @@ namespace uLearn.CourseTool
 			EdxInteraction.CreateEdxCourseArchive(Dir, course.Id);
 
 			if (InteractWithEdx)
-				EdxInteraction.Upload(Dir, course.Id, Config, profile.EdxStudioUrl, credentials);
+				EdxInteraction.Upload(course.Id, Config, profile.EdxStudioUrl, credentials);
 			else
 			{
 				Console.WriteLine($"Now you can upload {course.Id}.tar.gz to edx via Tools → Import menu");

@@ -28,8 +28,12 @@ namespace uLearn.Web.LTI
 				uri.Scheme = "http";
 			}
 
+			var outputScore = score / (double)slide.MaxScore;
+			/* Sometimes score is bigger then slide's MaxScore, i.e. in case of manual checking */
+			if (score > slide.MaxScore)
+				outputScore = 1;
 			var result = OutcomesClient.PostScore(uri.ToString(), ltiRequest.ConsumerKey, consumerSecret,
-				ltiRequest.LisResultSourcedId, score / (double)slide.MaxScore);
+				ltiRequest.LisResultSourcedId, outputScore);
 
 			if (!result.IsValid)
 				throw new Exception(uri + "\r\n\r\n" + result.Message);
