@@ -26,7 +26,7 @@ namespace uLearn.CourseTool
 			var credentials = Credentials.GetCredentials(Dir, Profile);
 			Console.WriteLine("Loading OLX");
 			var edxCourse = EdxCourse.Load(Dir + "/olx");
-			EdxInteraction.Upload(Dir, edxCourse.CourseName, Config, profile.EdxStudioUrl, credentials);
+			EdxInteraction.Upload(edxCourse.CourseName, Config, profile.EdxStudioUrl, credentials);
 		}
 	}
 	
@@ -75,7 +75,7 @@ namespace uLearn.CourseTool
 			}
 
 			if (UploadOlx || FullProcessingOlx)
-				EdxInteraction.Upload(Dir, edxCourse.CourseName, Config, profile.EdxStudioUrl, credentials);
+				EdxInteraction.Upload(edxCourse.CourseName, Config, profile.EdxStudioUrl, credentials);
 		}
 
 		public abstract void Patch(OlxPatcher patcher, Config config, Profile profile, EdxCourse edxCourse);
