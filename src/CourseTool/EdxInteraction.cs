@@ -37,8 +37,8 @@ namespace uLearn.CourseTool
 
 		public static void Download(string baseDir, Config config, string edxStudioUrl, Credentials credentials)
 		{
-			Console.WriteLine("Downloading {0}.tar.gz from {1}", config.CourseRun, edxStudioUrl);
-			Download(edxStudioUrl, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, baseDir + "/" + config.CourseRun + ".tar.gz");
+			Console.WriteLine($"Downloading {config.ULearnCourseId}.tar.gz from {edxStudioUrl}");
+			Download(edxStudioUrl, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, baseDir + "/" + config.ULearnCourseId + ".tar.gz");
 		}
 
 		public static void ExtractEdxCourseArchive(string baseDir, string courseId)
@@ -92,9 +92,9 @@ namespace uLearn.CourseTool
 			}
 		}
 
-		public static void Upload(string baseDir, string courseName, Config config, string edxStudioUrl, Credentials credentials)
+		public static void Upload(string courseName, Config config, string edxStudioUrl, Credentials credentials)
 		{
-			Console.WriteLine("Uploading {0}.tar.gz to {1}", courseName, edxStudioUrl);
+			Console.WriteLine($"Uploading {courseName}.tar.gz to {edxStudioUrl}");
 			Upload(edxStudioUrl, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, courseName + ".tar.gz");
 			Utils.DeleteFileIfExists(courseName + ".tar.gz");
 		}
