@@ -49,7 +49,9 @@
 		Model.IsGuest,
 		true,
 		Model.ManualQuizCheckQueueItem,
-		Model.CanUserFillQuiz
+		Model.CanUserFillQuiz,
+		null,
+		Model.IsLti
 	);
 
 	MvcForm form = null;
@@ -84,7 +86,7 @@
 			{
 				<input type="submit" class="btn btn-default" form="quiz__score-form" value="Сохранить и вернуться">
 				<input type="submit" class="btn btn-primary" form="quiz__score-form" value="Сохранить и перейти к следующему"
-				       data-url="@Url.Action("CheckNextQuizForSlide", "Admin", new { courseId = Model.CourseId, slideId = Model.Slide.Id, Model.GroupId })"
+					   data-url="@Url.Action("CheckNextQuizForSlide", "Admin", new { courseId = Model.CourseId, slideId = Model.Slide.Id, Model.GroupId })"
 					   onclick="$('[name=nextUrl]').val($(this).data('url'))">
 			}
 			else if (Model.QuizState == QuizState.Subtotal)

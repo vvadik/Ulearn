@@ -150,7 +150,7 @@ namespace uLearn.Web.Controllers
 					CourseId = courseId,
 					SlideId = exerciseSlide.Id,
 					ExerciseBlock = exerciseSlide.Exercise,
-					Context = CreateRenderContext(course, exerciseSlide)
+					Context = CreateRenderContext(course, exerciseSlide, isLti: true)
 				};
 				return View("LtiExerciseSlide", model);
 			}
@@ -242,7 +242,7 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, AbstractManualSlideChecking manualChecking = null, int? exerciseSubmissionId = null, int? groupId = null)
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, AbstractManualSlideChecking manualChecking = null, int? exerciseSubmissionId = null, int? groupId = null, bool isLti = false)
 		{
 			/* ExerciseController will fill blockDatas later */
 			var blockData = slide.Blocks.Select(b => (dynamic)null).ToArray();
@@ -255,7 +255,8 @@ namespace uLearn.Web.Controllers
 				User.HasAccessFor(course.Id, CourseRole.Instructor),
 				manualChecking,
 				false,
-				groupId
+				groupId,
+				isLti
 				)
 			{
 				VersionId = exerciseSubmissionId

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using log4net;
 using LtiLibrary.Owin.Security.Lti.Provider;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
@@ -16,6 +16,8 @@ namespace uLearn.Web.LTI
 {
 	public static class SecurityHandler
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(SecurityHandler));
+
 		/// <summary>
 		/// Invoked after the LTI request has been authenticated so the application can sign in the application user.
 		/// </summary>
@@ -24,52 +26,65 @@ namespace uLearn.Web.LTI
 		/// <returns>A <see cref="Task"/> representing the completed operation.</returns>
 		public static async Task OnAuthenticated(LtiAuthenticatedContext context, IEnumerable<Claim> claims = null)
 		{
+			log.Info($"Lti вызвал OnAuthenticated: {context.Request.Uri}");
+
 			ClaimsIdentity identity;
 			if (!IsAuthenticated(context.OwinContext))
 			{
 				// Find existing pairing between LTI user and application user
 				var userManager = new ULearnUserManager();
-				var loginProvider = string.Join(":", new[] { context.Options.AuthenticationType, context.LtiRequest.ConsumerKey });
+				var loginProvider = string.Join(":", context.Options.AuthenticationType, context.LtiRequest.ConsumerKey);
 				var providerKey = context.LtiRequest.UserId;
 				var login = new UserLoginInfo(loginProvider, providerKey);
 				var user = await userManager.FindAsync(login);
+				log.Info($"Ищу пользователя: провайдер {loginProvider}, идентификатор {providerKey}");
 				if (user == null)
 				{
+					log.Info("Не нашёл пользователя");
 					var usernameContext = new LtiGenerateUserNameContext(context.OwinContext, context.LtiRequest);
+					log.Info("Генерирую имя пользователя для LTI-пользователя");
 					await context.Options.Provider.GenerateUserName(usernameContext);
 					if (string.IsNullOrEmpty(usernameContext.UserName))
 					{
 						throw new Exception("Can't generate username");
 					}
+					log.Info($"Сгенерировал: {usernameContext.UserName}, ищу пользователя по этому имени");
 					user = await userManager.FindByNameAsync(usernameContext.UserName);
 					if (user == null)
 					{
+						log.Info("Не нашёл пользователя с таким именем, создаю нового");
 						user = new ApplicationUser { UserName = usernameContext.UserName };
 						var result = await userManager.CreateAsync(user);
 						if (!result.Succeeded)
 						{
-							var errors = String.Join("\n\n", result.Errors);
+							var errors = string.Join("\n\n", result.Errors);
 							throw new Exception("Can't create user: " + errors);
 						}
 					}
+					log.Info($"Добавляю LTI-логин {login} к пользователю {user.VisibleName} (Id = {user.Id})");
 					// Save the pairing between LTI user and application user
 					await userManager.AddLoginAsync(user.Id, login);
 				}
 
+				log.Info($"Подготавливаю identity для пользователя {user.VisibleName} (Id = {user.Id})");
 				// Create the application identity, add the LTI request as a claim, and sign in
 				identity = await userManager.CreateIdentityAsync(user, context.Options.SignInAsAuthenticationType);
 			}
 			else
 			{
+				log.Info($"Пришёл LTI-запрос на аутенфикацию, но пользователь уже аутенфицирован на ulearn: {context.OwinContext.Authentication.User.Identity}");
 				identity = (ClaimsIdentity)context.OwinContext.Authentication.User.Identity;
 			}
 
 			var json = JsonConvert.SerializeObject(context.LtiRequest, Formatting.None,
 				new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+
+			log.Info($"LTI-запрос: {json}");
 			
 			var claimsToRemove = identity.Claims.Where(c => c.Type.Equals("LtiRequest"));
 			foreach (var claim in claimsToRemove)
 			{
+				log.Info($"Требование в LTI-запросе: {claim}");
 				identity.RemoveClaim(claim);
 			}
 
@@ -81,6 +96,7 @@ namespace uLearn.Web.LTI
 					identity.AddClaim(claim);
 				}
 			}
+			log.Info($"Аутенфицирую identity: {identity}");
 			context.OwinContext.Authentication.SignIn(new AuthenticationProperties { IsPersistent = false }, identity);
 
 			// Redirect to original URL so the new identity takes affect
@@ -121,9 +137,7 @@ namespace uLearn.Web.LTI
 		private static bool IsAuthenticated(IOwinContext context)
 		{
 			var auth = context.Authentication;
-			return auth.User != null
-					&& auth.User.Identity != null
-					&& auth.User.Identity.IsAuthenticated;
+			return auth.User?.Identity != null && auth.User.Identity.IsAuthenticated;
 		}
 	}
 }

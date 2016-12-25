@@ -449,7 +449,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"exercise\">\r
 
 
   		
-			ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData(context.Course.Id, context.Slide as ExerciseSlide) { IsGuest = context.IsGuest };
+			ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData(context.Course.Id, context.Slide as ExerciseSlide) { IsGuest = context.IsGuest, IsLti = context.IsLti };
 			var manualCheckingId = context.ManualChecking != null ? (int?)context.ManualChecking.Id : null;
 
 			if (Html != null)
