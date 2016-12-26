@@ -26,7 +26,7 @@ namespace uLearn.Web.LTI
 		/// <returns>A <see cref="Task"/> representing the completed operation.</returns>
 		public static async Task OnAuthenticated(LtiAuthenticatedContext context, IEnumerable<Claim> claims = null)
 		{
-			log.Info($"Lti вызвал OnAuthenticated: {context.Request.Uri}");
+			log.Info($"LTI вызвал событие OnAuthenticated при запросе на {context.Request.Uri}");
 
 			ClaimsIdentity identity;
 			if (!IsAuthenticated(context.OwinContext))
@@ -96,7 +96,7 @@ namespace uLearn.Web.LTI
 					identity.AddClaim(claim);
 				}
 			}
-			log.Info($"Аутенфицирую identity: {identity}");
+			log.Info($"Аутенфицирую identity: {identity.Name}");
 			context.OwinContext.Authentication.SignIn(new AuthenticationProperties { IsPersistent = false }, identity);
 
 			// Redirect to original URL so the new identity takes affect
