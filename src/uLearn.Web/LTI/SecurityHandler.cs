@@ -72,7 +72,7 @@ namespace uLearn.Web.LTI
 			}
 			else
 			{
-				log.Info($"Пришёл LTI-запрос на аутенфикацию, но пользователь уже аутенфицирован на ulearn: {context.OwinContext.Authentication.User.Identity}");
+				log.Info($"Пришёл LTI-запрос на аутенфикацию, но пользователь уже аутенфицирован на ulearn: {context.OwinContext.Authentication.User.Identity.Name}");
 				identity = (ClaimsIdentity)context.OwinContext.Authentication.User.Identity;
 			}
 
