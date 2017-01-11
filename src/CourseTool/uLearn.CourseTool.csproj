@@ -116,6 +116,7 @@
     <Compile Include="AbstractOptions.cs" />
     <Compile Include="ArchiveManager.cs" />
     <Compile Include="MonitorOptions.cs" />
+    <Compile Include="OlxSquasher.cs" />
     <Compile Include="OperationFailedGracefully.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="ConvertOptions.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="PatchOptions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SquashChapters.cs" />
     <Compile Include="TestCourseOptions.cs" />
     <Compile Include="ULearnInteractor.cs" />
     <Compile Include="ULearnOptions.cs" />

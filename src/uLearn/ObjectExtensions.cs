@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
+using JetBrains.Annotations;
 
 namespace uLearn
 {
@@ -16,6 +17,7 @@ namespace uLearn
 			return validValues.Contains(o);
 		}
 
+		[NotNull]
 		public static T EnsureNotNull<T>(this T o, string exceptionMessageIfNull = "can't be null")
 		{
 			if (o == null) throw new ArgumentException(exceptionMessageIfNull);

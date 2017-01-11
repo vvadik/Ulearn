@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,6 +10,29 @@ namespace uLearn
 {
 	public static class StringExtensions
 	{
+		public static string[] GetFiles(this string directoryPath)
+		{
+			return Directory.Exists(directoryPath) ? Directory.GetFiles(directoryPath) : new string[0];
+		}
+		public static string PathCombine(this string directoryPath, string subdirectoryPath)
+		{
+			return Path.Combine(directoryPath, subdirectoryPath);
+		}
+
+		public static string[] GetFiles(this string directoryPath, string pattern)
+		{
+			return Directory.Exists(directoryPath) ? Directory.GetFiles(directoryPath, pattern) : new string[0];
+		}
+
+		public static string GetSingleFile(this string directoryPath, string pattern)
+		{
+			var files = Directory.GetFiles(directoryPath, pattern);
+			if (files.Length == 0)
+				throw new Exception($"No such file {directoryPath}/{pattern}");
+			if (files.Length > 1)
+				throw new Exception($"More than one file {directoryPath}/{pattern}: {string.Join(", ", files)}");
+			return files[0];
+		}
 
 		public static string ExcludeLinesWith(this string s, params string[] args)
 		{

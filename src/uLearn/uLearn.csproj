@@ -206,6 +206,7 @@
     <Compile Include="SpellChecking\SpellChecker.cs" />
     <Compile Include="StagingPackage.cs" />
     <Compile Include="StreamExtensions.cs" />
+    <Compile Include="Result.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="CSharp\SyntaxExtensions.cs" />
     <Compile Include="SlideAttribute.cs" />
