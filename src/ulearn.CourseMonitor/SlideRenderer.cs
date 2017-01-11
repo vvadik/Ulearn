@@ -70,7 +70,8 @@ namespace uLearn.CourseTool
 			{
 				IsInstructor = true,
 				GetUnitInstructionNotesUrl = unitName => GetInstructorNotesFilename(unitName),
-				GetUnitStatisticsUrl = unitName => "404.html"
+				GetUnitStatisticsUrl = unitName => "404.html",
+				IsSlideHidden = s => false
 			};
 			return builder.CreateTocModel();
 		}
