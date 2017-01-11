@@ -12,15 +12,15 @@ namespace uLearn
 	public class CourseValidator
 	{
 		private readonly Slide[] slides;
-		private readonly string pathToCompiler;
+		private readonly SandboxRunnerSettings settings;
 
 		public event Action<string> InfoMessage;
 		public event Action<string> Error;
 
-		public CourseValidator(Slide[] slides, string workDir)
+		public CourseValidator(Slide[] slides, SandboxRunnerSettings settings)
 		{
 			this.slides = slides;
-			pathToCompiler = Path.Combine(workDir, "Microsoft.Net.Compilers.1.3.2");
+			this.settings = settings;
 		}
 
 		public void ValidateExercises()
@@ -40,7 +40,7 @@ namespace uLearn
 			try
 			{
 				Utils.UnpackZip(ex.StudentsZip.Content(), "./temp");
-				var res = MsBuildRunner.BuildProject(pathToCompiler, tempDir.GetFile(ex.CsprojFileName).FullName, tempDir);
+				var res = MsBuildRunner.BuildProject(settings.MsBuildSettings, tempDir.GetFile(ex.CsprojFileName).FullName, tempDir);
 				if (!res.Success)
 					ReportSlideError(slide, ex.CsprojFileName + " not building! " + res);
 			}
@@ -116,7 +116,7 @@ namespace uLearn
 			    ProjectFileName = exercise.CsprojFileName,
 			    Input = "",
 			    NeedRun = true
-			}, pathToCompiler);
+			});
 			var isOk = result.Verdict.IsOneOf(Verdict.Ok, Verdict.MemoryLimit, Verdict.TimeLimit);
 			if (!isOk)
 				ReportSlideError(slide, "Exercise initial code verdict is not OK. RunResult = " + result);
@@ -140,7 +140,7 @@ namespace uLearn
 
 			var result = SandboxRunner.Run(exercise.CreateSubmition(
 			    slide.Id.ToString(),
-			    exercise.EthalonSolution), "");
+			    exercise.EthalonSolution), settings);
 
 			var output = result.GetOutput().NormalizeEoln();
 
