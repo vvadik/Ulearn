@@ -19,4 +19,5 @@
     <SlideId>1</SlideId>
     <SlideId>2</SlideId>
   </IgnoredUlearnSlides>
+  <EmitSequentialsForInstructorNotes>false</EmitSequentialsForInstructorNotes>
 </Config>
