@@ -3,20 +3,20 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using NHttp;
 using RunCsJob;
 using RunCsJob.Api;
 using uLearn.Model.Blocks;
 using uLearn.Web.Models;
 
-namespace uLearn.CourseTool
+namespace uLearn.CourseTool.Monitoring
 {
 	internal class PreviewHttpServer
 	{
-		private readonly HttpListener listener;
+		private readonly HttpServer server;
 		private readonly string courseDir;
 		private readonly string htmlDir;
 		private readonly int port;
@@ -26,8 +26,10 @@ namespace uLearn.CourseTool
 
 		public PreviewHttpServer(string courseDir, string htmlDir, int port)
 		{
-			listener = new HttpListener();
-			listener.Prefixes.Add($"http://+:{port}/");
+			server = new HttpServer
+			{
+				EndPoint = new IPEndPoint(IPAddress.Loopback, port),
+			};
 			this.courseDir = courseDir;
 			this.htmlDir = htmlDir;
 			this.port = port;
@@ -58,9 +60,11 @@ namespace uLearn.CourseTool
 		{
 			try
 			{
-				listener.Start();
+				server.RequestReceived += OnHttpRequest;
+				server.UnhandledException += OnException;
+				server.Start();
 			}
-			catch (HttpListenerException e)
+			catch (Exception e)
 			{
 				Console.WriteLine($"HttpListener Start Error: {e.Message}");
 				Console.WriteLine();
@@ -69,7 +73,14 @@ namespace uLearn.CourseTool
 				Console.WriteLine(@"2. OR run this command in command line ('Everyone' may be some specific user):");
 				Console.WriteLine($"   netsh http add urlacl url=http://+:{port}/ user=Everyone");
 			}
-			StartListen();
+		}
+
+		private void OnException(object sender, HttpExceptionEventArgs e)
+		{
+			e.Handled = true;
+			var buffer = Encoding.UTF8.GetBytes(e.Exception.ToString());
+			e.Response.ContentType = "text/plain";
+			e.Response.OutputStream.Write(buffer, 0, buffer.Length);
 		}
 
 		public void MarkCourseAsChanged()
@@ -78,49 +89,7 @@ namespace uLearn.CourseTool
 				lastChangeTime = DateTime.Now;
 		}
 
-		private async void StartListen()
-		{
-			while (true)
-			{
-				try
-				{
-					var context = await listener.GetContextAsync();
-					StartHandle(context);
-				}
-				catch (Exception e)
-				{
-					Console.WriteLine(e);
-				}
-			}
-			// ReSharper disable once FunctionNeverReturns
-		}
-
-		private void StartHandle(HttpListenerContext context)
-		{
-			Task.Run(async () =>
-			{
-				var ctx = context;
-				try
-				{
-					await OnContextAsync(ctx);
-				}
-				catch (HttpListenerException e)
-				{
-					if (e.ErrorCode != 1229)
-						throw;
-				}
-				catch (Exception e)
-				{
-					Console.WriteLine(e);
-				}
-				finally
-				{
-					ctx.Response.Close();
-				}
-			});
-		}
-
-		private async Task OnContextAsync(HttpListenerContext context)
+		private void OnHttpRequest(object sender, HttpRequestEventArgs context)
 		{
 			var query = context.Request.QueryString["query"];
 			var path = context.Request.Url.LocalPath;
@@ -132,7 +101,7 @@ namespace uLearn.CourseTool
 			switch (query)
 			{
 				case "needRefresh":
-					response = await ServeNeedRefresh(reloaded, requestTime);
+					response = ServeNeedRefresh(reloaded, requestTime).Result;
 					break;
 				case "submit":
 					response = ServeRunExercise(context, path);
@@ -141,7 +110,7 @@ namespace uLearn.CourseTool
 					response = ServeStatic(context, path);
 					break;
 			}
-			await context.Response.OutputStream.WriteAsync(response, 0, response.Length);
+			context.Response.OutputStream.WriteAsync(response, 0, response.Length).Wait();
 			context.Response.OutputStream.Close();
 		}
 
@@ -160,12 +129,13 @@ namespace uLearn.CourseTool
 			}
 		}
 
-		private byte[] ServeRunExercise(HttpListenerContext context, string path)
+		private byte[] ServeRunExercise(HttpRequestEventArgs context, string path)
 		{
 			var code = context.Request.InputStream.GetString();
-			var exercise = ((ExerciseSlide)course.Slides[int.Parse(path.Substring(1, 3))]).Exercise;
+			var index = int.Parse(path.Substring(1, 3));
+			var exercise = ((ExerciseSlide)course.Slides[index]).Exercise;
 			var runResult = GetRunResult(exercise, code);
-			context.Response.Headers["Content-Type"] = "application/json; charset=utf-8";
+			context.Response.ContentType = "application/json; charset=utf-8";
 			return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(runResult));
 		}
 
@@ -189,12 +159,16 @@ namespace uLearn.CourseTool
 			};
 		}
 
-		private byte[] ServeStatic(HttpListenerContext context, string path)
+		private byte[] ServeStatic(HttpRequestEventArgs context, string path)
 		{
 			byte[] response;
 			try
 			{
 				response = File.ReadAllBytes(htmlDir + "/" + path);
+				if (path.EndsWith(".css"))
+					context.Response.ContentType = "text/css; charset=utf-8";
+				if (path.EndsWith(".js"))
+					context.Response.ContentType = "application/x-javascript; charset=utf-8";
 			}
 			catch (IOException e)
 			{

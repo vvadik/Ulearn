@@ -6,7 +6,7 @@ using uLearn.Model.Blocks;
 using uLearn.Web.Models;
 using uLearn.Web.Views.Course;
 
-namespace uLearn.CourseTool
+namespace uLearn.CourseTool.Monitoring
 {
 	public class SlideRenderer
 	{

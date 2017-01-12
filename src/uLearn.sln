@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Linq", "courses\linq\Linq.csproj", "{0BD679E4-9ACB-4B02-835B-CBCA1DE8B817}"
 EndProject
@@ -52,8 +52,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{471914
 	ProjectSection(SolutionItems) = preProject
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ulearn.CourseMonitor", "ulearn.CourseMonitor\ulearn.CourseMonitor.csproj", "{4DB64EA3-A557-492A-ADEA-38831DF52962}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunCsJob.Service", "RunCsJob.Service\RunCsJob.Service.csproj", "{76897BE1-6FB1-4E29-9593-D1851549B00B}"
 EndProject
@@ -119,10 +117,6 @@ Global
 		{26580595-F4DC-41EE-BA66-0EF4692243AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26580595-F4DC-41EE-BA66-0EF4692243AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26580595-F4DC-41EE-BA66-0EF4692243AF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4DB64EA3-A557-492A-ADEA-38831DF52962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4DB64EA3-A557-492A-ADEA-38831DF52962}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4DB64EA3-A557-492A-ADEA-38831DF52962}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4DB64EA3-A557-492A-ADEA-38831DF52962}.Release|Any CPU.Build.0 = Release|Any CPU
 		{76897BE1-6FB1-4E29-9593-D1851549B00B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{76897BE1-6FB1-4E29-9593-D1851549B00B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76897BE1-6FB1-4E29-9593-D1851549B00B}.Release|Any CPU.ActiveCfg = Release|Any CPU

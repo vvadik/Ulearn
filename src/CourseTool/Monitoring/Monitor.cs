@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-namespace uLearn.CourseTool
+namespace uLearn.CourseTool.Monitoring
 {
 	internal class Monitor
 	{
