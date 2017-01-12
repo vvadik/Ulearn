@@ -269,7 +269,7 @@ namespace uLearn.Web.Controllers
 			var slide = (ExerciseSlide)course.GetSlideById(slideId);
 			// Test redirect to SlideId if disabled
 			if (slide.Exercise.HideShowSolutionsButton)
-				return RedirectToAction("SlideById", new { courseId = course.Id, slideId = slide.Id });
+				return RedirectToRoute("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
 			var model = await CreateAcceptedSolutionsModel(course, slide, isLti);
 			return View("AcceptedSolutions", model);
 		}

@@ -21,7 +21,17 @@ namespace uLearn.Web.Extensions
 
 				return sw.GetStringBuilder().ToString();
 			}
-
 		}
-	}
+
+        public static string GetRedirectToUrlWithTrailingSlash(this Controller controller)
+        {
+            var requestUrl = controller.Request.Url?.AbsolutePath ?? "";
+            if (requestUrl != "" && requestUrl != "/" && !requestUrl.EndsWith("/"))
+            {
+                var redirectUrl = requestUrl + "/";
+                return redirectUrl;
+            }
+            return null;
+        }
+    }
 }

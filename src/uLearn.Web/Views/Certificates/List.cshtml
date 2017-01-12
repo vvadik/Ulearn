@@ -1,0 +1,37 @@
+﻿@using Microsoft.AspNet.Identity
+@using uLearn
+@model uLearn.Web.Controllers.UserCertificatesViewModel
+
+@{
+	ViewBag.Title = "Сертификаты пользователя " + Model.User.VisibleName;
+}
+
+<div class="container">
+	<h1>Сертификаты пользователя @Model.User.VisibleName</h1>
+
+	@if (!Model.Certificates.Any())
+	{
+		if (Model.User.Id == User.Identity.GetUserId())
+		{
+			<div>
+				Вы пока не получили ни одного сертификата за прохождение курсов.
+			</div>
+		}
+		else
+		{
+			<div>
+				@Model.User.VisibleName
+				<span>пока не получил(а) ни одного сертификата за прохождение курсов.</span>
+			</div>
+		}
+	}
+	
+	@foreach (var certificate in Model.Certificates)
+	{
+		<h3>@Html.RouteLink(
+		   "Сертификат за курс «" + Model.CoursesTitles.GetOrDefault(certificate.Template.CourseId, "") + "»",
+		   "Certificate",
+		   new {certificateId = certificate.Id}
+		   )</h3>
+	}
+</div>

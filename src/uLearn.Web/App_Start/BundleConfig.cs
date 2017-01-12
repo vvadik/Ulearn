@@ -53,6 +53,7 @@ namespace uLearn.Web
 					"~/Scripts/slide-*",
 					"~/Scripts/users-list.js",
 					"~/Scripts/groups-editor.js",
+					"~/Scripts/certificates-editor.js",
 					"~/Scripts/analytics-highcharts.js"
 				);
 		}

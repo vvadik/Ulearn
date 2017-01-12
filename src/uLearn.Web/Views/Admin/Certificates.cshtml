@@ -1,0 +1,134 @@
+﻿@using uLearn
+@using uLearn.Web.Extensions
+@model uLearn.Web.Controllers.CertificatesViewModel
+
+@{
+	ViewBag.Title = "Сертификаты курса " + Model.Course.Title;
+}
+
+@{
+	var canEditTemplates = User.HasAccessFor(Model.Course.Id, CourseRole.CourseAdmin);
+}
+
+<div class="container">
+	<h1>
+		Сертификаты
+		@if (canEditTemplates)
+		{
+			<small><a href="" class="create-template-link  internal-page-link">загрузить шаблон</a></small>
+		}
+	</h1>
+
+	@if (!Model.Templates.Any())
+	{
+		if (canEditTemplates)
+		{
+			<div>Загрузите первый шаблон, чтобы выдавать сертификаты отличившимся студентам.</div>
+		}
+		else
+		{
+			<div>Администраторы курса могут загрузить шаблон сертификата.</div>
+		}
+	}
+
+	@foreach (var template in Model.Templates.Values)
+	{
+		<div class="certificate-template">
+			<h3 class="certificate-template__title">
+				<a href=""
+				   class="edit-template-link  internal-page-link"
+				   title="Редактировать шаблон"
+				   data-template-id="@template.Id"
+				   data-template-name="@template.Name">
+					@template.Name</a>
+				&nbsp;
+				<span class="text-muted">
+					@Model.Certificates.GetOrDefault(template.Id, new List<Certificate>()).Count.PluralizeInRussian(new RussianPluralizationOptions
+					   {
+						   One = "сертификат",
+						   Two = "сертификата",
+						   Five = "сертификатов",
+						   Gender = Gender.Male,
+						   hideNumberOne = false,
+						   smallNumbersAreWords = false,
+					   })
+				</span>
+			</h3>
+
+			@using (var form = Html.BeginForm("AddCertificate", "Admin", FormMethod.Post, new { @class = "form form-horizontal" }))
+			{
+				@Html.Hidden("courseId", Model.Course.Id)
+				@Html.Hidden("templateId", template.Id)
+				@Html.Hidden("userId")
+				<input type="text"
+					   class="add-certificate-input form-control"
+					   data-url="@Url.Action("FindUsers", "Admin")"
+					   placeholder="Начните вводить имя или фамилию">
+				foreach (var parameter in Model.TemplateParameters[template.Id])
+				{
+					<div class="certificate-template__parameter">
+						<p>
+							@Html.TextBox("parameter-" + parameter, "", new { @class = "form-control", placeholder = "Параметр: " + parameter })
+						</p>
+					</div>
+				}
+				<button class="btn btn-success  add-certificate-button">Выдать сертификат</button>
+			}
+
+			<div class="certificates">
+				@{
+					var certificateIndex = 0;
+				}
+				@foreach (var certificate in Model.Certificates.GetOrDefault(template.Id, new List<Certificate>()))
+				{
+					certificateIndex++;
+					<div class="certificate">
+						@certificateIndex.
+						<b>
+							@Html.RouteLink(certificate.User.VisibleName, "Certificate", new { certificateId = certificate.Id }),
+						</b>
+						выдан @certificate.Instructor.VisibleName @certificate.Timestamp.ToAgoPrettyString()
+					</div>
+				}
+			</div>
+		</div>
+	}
+</div>
+
+<div class="modal fade" id="createOrUpdateCertificateTemplateModal" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Загрузить шаблон</h4>
+			</div>
+			<div class="modal-body">
+				@using (Html.BeginForm("CreateCertificateTemplate", "Admin", FormMethod.Post, new
+				{
+					data_create_template_url = Url.Action("CreateCertificateTemplate", "Admin"),
+					data_edit_template_url = Url.Action("EditCertificateTemplate", "Admin"),
+					enctype = "multipart/form-data"
+				}))
+				{
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="courseId" value="@Model.Course.Id" />
+					<input type="hidden" name="templateId" value="" />
+
+					<div class="form-group">
+						<input id="name" name="name" type="text" class="form-control" placeholder="Название для шаблона" required="required">
+					</div>
+
+					<div class="form-group">
+						<input id="archive" name="archive" type="file" class="form-control" required="required"/>
+						Zip-архив с шаблоном
+						<div class="help-block">
+							Архив должен содержать файл index.html. Дополнительно в нём могут быть изображения, стили, шрифты и другие файлы.
+						</div>
+					</div>
+
+					<button class="action-button  btn btn-success">Загрузить</button>
+					<button class="remove-template-link  btn btn-danger" data-url="@Url.Action("RemoveTemplate", "Admin")">Удалить шаблон</button>
+				}
+			</div>
+		</div>
+	</div>
+</div>

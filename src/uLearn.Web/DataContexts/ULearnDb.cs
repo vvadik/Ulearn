@@ -57,6 +57,17 @@ namespace uLearn.Web.DataContexts
 				.WithMany()
 				.HasForeignKey(c => c.UserId)
 				.WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<Certificate>()
+				.HasRequired(c => c.User)
+				.WithMany()
+				.HasForeignKey(c => c.UserId)
+				.WillCascadeOnDelete(false);
+			modelBuilder.Entity<Certificate>()
+				.HasRequired(c => c.Instructor)
+				.WithMany()
+				.HasForeignKey(c => c.InstructorId)
+				.WillCascadeOnDelete(false);
 		}
 		
 		public DbSet<UserQuestion> UserQuestions { get; set; }
@@ -88,5 +99,8 @@ namespace uLearn.Web.DataContexts
 
 		public DbSet<Group> Groups { get; set; }
 		public DbSet<GroupMember> GroupMembers { get; set; }
+
+		public DbSet<CertificateTemplate> CertificateTemplates { get; set; }
+		public DbSet<Certificate> Certificates { get; set; }
 	}
 }

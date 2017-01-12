@@ -1553,3 +1553,14 @@ table.analytics__user-answers {
 	top: -10px;
 	padding: 30px 0;
 }
+
+/* Certificates editor */
+.certificate-template__parameter,
+.add-certificate-button {
+    display: none;
+}
+
+.certificates {
+    margin: 15px 0;
+}
+/* End of certificates editor */

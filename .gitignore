@@ -178,6 +178,7 @@ FakesAssemblies/
 /src/uLearn.Web/Courses/
 /src/uLearn.Web/Courses.Staging/*.zip
 /src/uLearn.Web/Courses.Versions/*.zip
+/src/uLearn.Web/Certificates/
 /src/UI.Tests/screenshots
 /src/courses/Linq/Generated
 *.received.txt

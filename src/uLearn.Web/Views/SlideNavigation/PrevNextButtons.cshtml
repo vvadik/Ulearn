@@ -9,7 +9,7 @@
 		href="@Url.RouteUrl("Course.SlideById", new {courseId = Model.CourseId, slideId = Model.PrevSlide != null ? Model.PrevSlide.Url : ""})">Назад</a>
 	<a class="btn btn-default @(Model.IsGuest ? "" : "block-next") no-rounds ctrl-group next_button"
 		id="next_solutions_button"
-		href="@Url.Action("AcceptedSolutions", "Course", new {courseId = Model.CourseId, slideId= Model.SlideId})">Далее</a>
+		href="@Url.Action("AcceptedSolutions", "Course", new {courseId = Model.CourseId, slideId = Model.SlideId})">Далее</a>
 	<a class="btn btn-default @(Model.IsGuest ? "" : "block-next") no-rounds ctrl-group next_button"
 		id="next_slide_button"
 		href="@Url.RouteUrl("Course.SlideById", new {courseId = Model.CourseId, slideId = Model.NextSlide != null ? Model.NextSlide.Url : ""})">Далее</a>

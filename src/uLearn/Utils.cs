@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Web.Hosting;
 using Ionic.Zip;
 using uLearn.Model.Blocks;
 
@@ -9,7 +10,7 @@ namespace uLearn
 	{
 		public static string GetSource(string courseId, Guid slideId, CourseManager courseManager, string code)
 		{
-			return string.Equals(courseId, "web", StringComparison.OrdinalIgnoreCase) && slideId == Guid.Empty
+			return String.Equals(courseId, "web", StringComparison.OrdinalIgnoreCase) && slideId == Guid.Empty
 				? code
 				: ((SingleFileExerciseBlock)((ExerciseSlide)courseManager.GetCourse(courseId).GetSlideById(slideId))
 					.Exercise)
@@ -75,7 +76,7 @@ namespace uLearn
 			while ((info = Console.ReadKey(true)).Key != ConsoleKey.Enter)
 				if (info.Key != ConsoleKey.Backspace)
 					password += info.KeyChar;
-				else if (!string.IsNullOrEmpty(password))
+				else if (!String.IsNullOrEmpty(password))
 					password = password.Substring(0, password.Length - 1);
 			return password;
 		}
@@ -106,5 +107,10 @@ namespace uLearn
 				}
 			}
 		}
+
+	    public static string GetAppPath()
+	    {
+	        return HostingEnvironment.ApplicationPhysicalPath ?? "..";
+	    }
 	}
 }

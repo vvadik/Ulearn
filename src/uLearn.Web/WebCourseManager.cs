@@ -22,16 +22,11 @@ namespace uLearn.Web
 		{
 		}
 
-		private static string GetAppPath()
-		{
-			return HostingEnvironment.ApplicationPhysicalPath ?? "..";
-		}
-
 		private static DirectoryInfo GetCoursesDirectory()
 		{
 			var coursesDirectory = WebConfigurationManager.AppSettings["ulearn.coursesDirectory"];
 			if (string.IsNullOrEmpty(coursesDirectory))
-				coursesDirectory = GetAppPath();
+				coursesDirectory = Utils.GetAppPath();
 
 			return new DirectoryInfo(coursesDirectory);
 		}

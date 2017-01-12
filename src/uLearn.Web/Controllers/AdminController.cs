@@ -32,6 +32,7 @@ namespace uLearn.Web.Controllers
 		private readonly GroupsRepo groupsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly UserSolutionsRepo userSolutionsRepo;
+		private readonly CertificatesRepo certificatesRepo;
 
 		public AdminController()
 		{
@@ -45,6 +46,7 @@ namespace uLearn.Web.Controllers
 			groupsRepo = new GroupsRepo(db);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 			userSolutionsRepo = new UserSolutionsRepo(db);
+			certificatesRepo = new CertificatesRepo(db);
 		}
 
 		public ActionResult CourseList(string courseCreationLastTry = null)
@@ -651,6 +653,119 @@ namespace uLearn.Web.Controllers
 				.ToList();
 			return Json(users, JsonRequestBehavior.AllowGet);
 		}
+
+		public ActionResult Certificates(string courseId)
+		{
+			var course = courseManager.GetCourse(courseId);
+			var certificateTemplates = certificatesRepo.GetTemplates(courseId).ToDictionary(t => t.Id);
+			var certificates = certificatesRepo.GetCertificates(courseId);
+			var templateParameters = certificateTemplates.ToDictionary(
+				kv => kv.Key,
+				kv => certificatesRepo.GetTemplateParameters(kv.Value).ToList()
+			);
+
+			return View(new CertificatesViewModel
+			{
+				Course = course,
+				Templates = certificateTemplates,
+				TemplateParameters = templateParameters,
+				Certificates = certificates
+			});
+		}
+
+		[HttpPost]
+		[ULearnAuthorize(MinAccessLevel=CourseRole.CourseAdmin)]
+		public async Task<ActionResult> CreateCertificateTemplate(string courseId, string name, HttpPostedFileBase archive)
+		{
+			if (archive == null || archive.ContentLength <= 0)
+			{
+				log.Error("Создание шаблона сертификата: ошибка загрузки архива");
+				throw new Exception("Ошибка загрузки архива");
+			}
+			
+			var archiveName = SaveUploadedTemplate(archive);
+			await certificatesRepo.AddTemplate(courseId, name, archiveName);
+
+			return RedirectToAction("Certificates", new { courseId });
+		}
+
+		private string SaveUploadedTemplate(HttpPostedFileBase archive)
+		{
+			var archiveName = Utils.NewNormalizedGuid();
+			var templateArchivePath = certificatesRepo.GetTemplateArchivePath(archiveName);
+			try
+			{
+				archive.SaveAs(templateArchivePath.FullName);
+			}
+			catch (Exception e)
+			{
+				log.Error("Создание шаблона сертификата: не могу сохранить архив", e);
+				throw;
+			}
+			return archiveName;
+		}
+
+		[HttpPost]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		public async Task<ActionResult> EditCertificateTemplate(string courseId, Guid templateId, string name, HttpPostedFileBase archive)
+		{
+			var template = certificatesRepo.FindTemplateById(templateId);
+			if (template == null || template.CourseId != courseId)
+				return HttpNotFound();
+
+			if (archive != null && archive.ContentLength > 0)
+			{
+				var archiveName = SaveUploadedTemplate(archive);
+				await certificatesRepo.ChangeTemplateArchiveName(templateId, archiveName);
+			}
+
+			await certificatesRepo.ChangeTemplateName(templateId, name);
+
+			return RedirectToAction("Certificates", new { courseId });
+		}
+
+		[HttpPost]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		public async Task<ActionResult> RemoveTemplate(string courseId, Guid templateId)
+		{
+			var template = certificatesRepo.FindTemplateById(templateId);
+			if (template == null || template.CourseId != courseId)
+				return HttpNotFound();
+
+			await certificatesRepo.RemoveTemplate(template);
+
+			return RedirectToAction("Certificates", new { courseId });
+		}
+		
+		[HttpPost]
+		public async Task<ActionResult> AddCertificate(string courseId, Guid templateId, string userId)
+		{
+			var template = certificatesRepo.FindTemplateById(templateId);
+			if (template == null || template.CourseId != courseId)
+				return HttpNotFound();
+
+			var templateParameters = certificatesRepo.GetTemplateParameters(template);
+			var certificateParameters = new Dictionary<string, string>();
+			foreach (var parameter in templateParameters)
+			{
+				if (Request.Form["parameter-" + parameter] == null)
+					return RedirectToAction("Certificates", new { courseId });
+				certificateParameters[parameter] = Request.Form["parameter-" + parameter];
+			}
+
+			await certificatesRepo.AddCertificate(templateId, userId, User.Identity.GetUserId(), certificateParameters);
+
+			return RedirectToAction("Certificates", new { courseId });
+		}
+	}
+
+	public class CertificatesViewModel
+	{
+		public Course Course { get; set; }
+
+		public Dictionary<Guid, CertificateTemplate> Templates { get; set; }
+		public Dictionary<Guid, List<Certificate>> Certificates { get; set; }
+		public Dictionary<Guid, List<string>> TemplateParameters { get; set; }
 	}
 
 	public class UnitsListViewModel

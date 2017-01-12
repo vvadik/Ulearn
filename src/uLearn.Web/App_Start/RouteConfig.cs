@@ -34,6 +34,21 @@ namespace uLearn.Web
 				defaults: new { controller = "Course", action = "Slide", slideIndex = -1 }
 			);
 			routes.MapRoute(
+				name: "Certificates",
+				url: "CertificatesList",
+				defaults: new { controller = "Certificates", action = "Index" }
+			);
+			routes.MapRoute(
+				name: "Certificate",
+				url: "Certificate/{certificateId}",
+				defaults: new { controller = "Certificates", action = "CertificateById" }
+			);
+			routes.MapRoute(
+				name: "CertificateFile",
+				url: "Certificate/{certificateId}/{*path}",
+				defaults: new { controller = "Certificates", action = "CertificateFile" }
+			);
+			routes.MapRoute(
 				name: "Default",
 				url: "{controller}/{action}",
 				defaults: new { controller = "Home", action = "Index" }

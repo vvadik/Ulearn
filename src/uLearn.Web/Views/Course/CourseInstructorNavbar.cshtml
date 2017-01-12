@@ -9,6 +9,7 @@
 		<ul class="dropdown-menu">
 			<li>@Html.ActionLink("Группы", "Groups", "Admin", new { Model.CourseId }, new { })</li>
 			<li>@Html.ActionLink("Аналитика", "UnitStatistics", "Analytics", new { Model.CourseId }, new { })</li>
+			<li>@Html.ActionLink("Сертификаты", "Certificates", "Admin", new { Model.CourseId }, new { })</li>
 			@if (User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
 			{
 				<li>@Html.ActionLink("Пользователи", "Users", "Admin", new { Model.CourseId }, new { })</li>
