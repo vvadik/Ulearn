@@ -72,6 +72,9 @@ namespace CsSandboxer
 		private static AppDomain CreateDomain(string id, string assemblyPath)
 		{
 			var permSet = new PermissionSet(PermissionState.None);
+			//permSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, Path.GetDirectoryName(assemblyPath)));
+			//permSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.PathDiscovery, Path.GetDirectoryName(assemblyPath)));
+			permSet.AddPermission(new EnvironmentPermission(EnvironmentPermissionAccess.Read, "InsideSandbox"));
 			permSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.Execution));
 			var evidence = new Evidence();
 			evidence.AddHostEvidence(new Zone(SecurityZone.Untrusted));

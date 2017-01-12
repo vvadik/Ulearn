@@ -183,6 +183,10 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <EmbeddedResource Include=".\WellKnownLibs\*.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <AdditionalFiles Include=".\WellKnownLibs\README.md" />
     <None Include="Properties\webjob-publish-settings.json" />
     <None Include="run.cmd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

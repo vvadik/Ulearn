@@ -80,6 +80,9 @@ namespace RunCsJob
 		[TestCase(@"class A { static void Main(string[] args) {var s = $""2+2={2+2}"";} }",
 			"", "", "",
 			TestName = "String interpolation")]
+		[TestCase(@"class A { static void Main() {System.Console.Write($""InsideSandbox: {System.Environment.GetEnvironmentVariable(""InsideSandbox"")}"");} }",
+			"", "InsideSandbox: true", "",
+			TestName = "InsideSandbox Env var")]
 		public static void TestOk(string code, string input, string output, string error)
 		{
 			var details = GetDetails(code, input);
@@ -268,7 +271,7 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 		{
 			var dir = new DirectoryInfo(@"..\..\test");
 			var buildingResult = MsBuildRunner.BuildProject(
-				Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2"), 
+				new MsBuildSettings(), 
 				"test.csproj", 
 				dir);
 			Console.WriteLine(buildingResult.ErrorMessage);

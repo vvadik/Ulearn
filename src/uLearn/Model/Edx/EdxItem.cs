@@ -6,7 +6,7 @@ namespace uLearn.Model.Edx
 {
 	public abstract class EdxItem
 	{
-		[XmlIgnore]
+		[XmlAttribute("url_name")]
 		public string UrlName { get; set; }
 
 		[XmlAttribute("display_name")]
@@ -17,7 +17,10 @@ namespace uLearn.Model.Edx
 
 		public virtual void Save(string folderName)
 		{
-			File.WriteAllText(string.Format("{0}/{1}/{2}.xml", folderName, SubfolderName, UrlName), this.XmlSerialize());
+			var path = Path.Combine(folderName, SubfolderName);
+			if (!Directory.Exists(path))
+				Directory.CreateDirectory(path);
+			File.WriteAllText(Path.Combine(path, UrlName + ".xml"), this.XmlSerialize());
 			SaveAdditional(folderName);
 		}
 

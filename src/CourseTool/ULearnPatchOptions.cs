@@ -18,17 +18,17 @@ namespace uLearn.CourseTool
 			var ulearnDir = new DirectoryInfo(string.Format("{0}/{1}", Dir, config.ULearnCourseId));
 			Console.WriteLine("Loading Ulearn course from {0}", ulearnDir.Name);
 			var ulearnCourse = new CourseLoader().LoadCourse(ulearnDir);
-
+			Console.WriteLine("Patching");
 			var videoJson = string.Format("{0}/{1}", Dir, config.Video);
 			var video = File.Exists(videoJson)
 				? JsonConvert.DeserializeObject<Video>(File.ReadAllText(videoJson))
 				: new Video { Records = new Record[0] };
 			var videoHistory = VideoHistory.UpdateHistory(Dir, video);
 			var videoGuids = videoHistory.Records
-				.SelectMany(x => x.Data.Select(y => Tuple.Create(y.Id, Utils.GetNormalizedGuid(x.Guid))))
+				.SelectMany(x => x.Data.Select(y => Tuple.Create(y.Id, x.Guid.GetNormalizedGuid())))
 				.ToDictionary(x => x.Item1, x => x.Item2);
 
-			var guids = Guids == null ? null : Guids.Split(',').Select(Utils.GetNormalizedGuid).ToList();
+			var guids = Guids?.Split(',').Select(Utils.GetNormalizedGuid).ToList();
 			
 			patcher.PatchVerticals(
 				edxCourse, 
@@ -44,8 +44,8 @@ namespace uLearn.CourseTool
 						).ToArray()),
 				guids != null || !SkipExistingGuids
 				);
-
-			PatchInstructorsNotes(edxCourse, ulearnCourse, patcher.OlxPath);
+			if (Config.EmitSequentialsForInstructorNotes)
+				PatchInstructorsNotes(edxCourse, ulearnCourse, patcher.OlxPath);
 		}
 
 		private void PatchInstructorsNotes(EdxCourse edxCourse, Course ulearnCourse, string olxPath)

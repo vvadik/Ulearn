@@ -40,6 +40,7 @@ namespace uLearn.Web.Controllers
 			builder.IsInstructor = false;
 			builder.IsVisited = s => false;
 			builder.IsUnitVisible = visibleUnits.Contains;
+			builder.IsSlideHidden = s => s is QuizSlide && ((QuizSlide)s).Quiz.ManualCheck;
 			var toc = builder.CreateTocModel();
 			toc.NextUnitTime = unitsRepo.GetNextUnitPublishTime(course.Id);
 			return toc;

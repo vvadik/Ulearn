@@ -10,19 +10,22 @@ namespace uLearn.Model.Edx
 	public class Vertical : EdxItem
 	{
 		[XmlIgnore]
-		public override string SubfolderName
-		{
-			get { return "vertical"; }
-		}
+		public override string SubfolderName => "vertical";
 
 		[XmlIgnore]
 		public Component[] Components;
+
+		private EdxReference[] componentReferences;
 
 		[XmlElement("video", Type = typeof(VideoComponentReference))]
 		[XmlElement("html", Type = typeof(HtmlComponentReference))]
 		[XmlElement("problem", Type = typeof(ProblemComponentReference))]
 		[XmlElement("lti", Type = typeof(LtiComponentReference))]
-		public EdxReference[] ComponentReferences = new EdxReference[0];
+		public EdxReference[] ComponentReferences
+		{
+			get { return componentReferences = componentReferences ?? new EdxReference[0]; }
+			set { componentReferences = value; }
+		}
 
 		public Vertical()
 		{

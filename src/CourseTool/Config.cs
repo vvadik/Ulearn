@@ -16,6 +16,8 @@ namespace uLearn.CourseTool
 		[XmlArrayItem("SlideId")]
 		public string[] IgnoredUlearnSlides = new string[0];
 
+		public bool EmitSequentialsForInstructorNotes { get; set; }
+
 		public Profile GetProfile(string profile)
 		{
 			return Profiles.SingleVerbose(x => x.Name == profile, "profile name = " + profile);

@@ -11,22 +11,19 @@ namespace uLearn.CourseTool
 	[Verb("convert", HelpText = "Convert uLearn course to Edx course")]
 	class ConvertOptions : AbstractOptions
 	{
-		[Option('i', "interact-with-edx", Default = false, HelpText = "If set, download and upload course from edx")]
-		public bool InteractWithEdx { get; set; }
+		[Option('t', "tar-gz", HelpText = "Filepath of course tar.gz file")]
+		public string CourseTarGz{ get; set; }
 
 		public override void DoExecute()
 		{
 			var profile = Config.GetProfile(Profile);
-			var credentials = Credentials.GetCredentials(Dir, Profile);
 
-			if (InteractWithEdx)
-				EdxInteraction.Download(Dir, Config, profile.EdxStudioUrl, credentials);
-			else
-			{
-				Console.WriteLine($"Please, download course from Edx ({Config.ULearnCourseId}.tar.gz from Tools → Export menu) and save it in working directory");
-			}
+			Console.WriteLine("Please, download course from Edx (tar.gz from Tools - Export menu) and save it in working directory");
 
-			EdxInteraction.ExtractEdxCourseArchive(Dir, Config.ULearnCourseId);
+
+			var tarGzPath = Dir.GetSingleFile(CourseTarGz ?? "*.tar.gz");
+
+			EdxInteraction.ExtractEdxCourseArchive(Dir, tarGzPath);
 
 			Console.WriteLine("Loading edx course...");
 			var edxCourse = EdxCourse.Load(Dir + "/olx");
@@ -62,12 +59,7 @@ namespace uLearn.CourseTool
 
 			EdxInteraction.CreateEdxCourseArchive(Dir, course.Id);
 
-			if (InteractWithEdx)
-				EdxInteraction.Upload(course.Id, Config, profile.EdxStudioUrl, credentials);
-			else
-			{
-				Console.WriteLine($"Now you can upload {course.Id}.tar.gz to edx via Tools → Import menu");
-			}
+			Console.WriteLine($"Now you can upload {course.Id}.tar.gz to edx via Tools - Import menu");
 		}
 
 		private Video LoadVideoInfo()

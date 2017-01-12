@@ -8,7 +8,7 @@ using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.CourseTool
 {
-	[Verb("patch_video", HelpText = "Patch Edx course with videos from json file")]
+	[Verb("patch-video", HelpText = "Patch Edx course with videos from json file")]
 	class VideoPatchOptions : PatchOptions
 	{
 		public override void Patch(OlxPatcher patcher, Config config, Profile profile, EdxCourse edxCourse)
