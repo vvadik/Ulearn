@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.DataContexts;
@@ -53,8 +54,9 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(certificate.Template.CourseId);
 
 			certificatesRepo.EnsureCertificateTemplateIsUnpacked(certificate.Template);
-			
-			var renderedCertificate = certificatesRepo.RenderCertificate(certificate, course);
+
+			var certificateUrl = Url.RouteUrl("Certificate", new { certificateId = certificate.Id }, Request.Url?.Scheme ?? "https");
+			var renderedCertificate = certificatesRepo.RenderCertificate(certificate, course, certificateUrl);
 
 			return View("Certificate", new CertificateViewModel
 			{
@@ -73,6 +75,24 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			return RedirectPermanent($"/Certificates/{certificate.Template.ArchiveName}/{path}");
+		}
+		
+		[HttpPost]
+		public async Task<ActionResult> Remove(Guid certificateId)
+		{
+			var certificate = certificatesRepo.FindCertificateById(certificateId);
+			if (certificate == null)
+				return HttpNotFound();
+
+			if (! User.HasAccessFor(certificate.Template.CourseId, CourseRole.Instructor))
+				return HttpNotFound();
+
+			if (!User.HasAccessFor(certificate.Template.CourseId, CourseRole.CourseAdmin) &&
+				certificate.InstructorId != User.Identity.GetUserId())
+				return HttpNotFound();
+
+			await certificatesRepo.RemoveCertificate(certificate);
+			return Json(new { status = "ok" });
 		}
 	}
 

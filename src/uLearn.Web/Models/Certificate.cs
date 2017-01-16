@@ -16,10 +16,12 @@ namespace uLearn.Web.Models
 
 		[Required]
 		[Index("IDX_Certificate_ByUser")]
+		[StringLength(64)]
 		public string UserId { get; set; }
 		public virtual ApplicationUser User { get; set; }
 
 		[Required]
+		[StringLength(64)]
 		public string InstructorId { get; set; }
 		public virtual ApplicationUser Instructor { get; set; }
 

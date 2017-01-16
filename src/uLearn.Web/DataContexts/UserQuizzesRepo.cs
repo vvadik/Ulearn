@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Data.Entity;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using uLearn.Quizes;
 using uLearn.Web.Models;
@@ -69,6 +66,14 @@ namespace uLearn.Web.DataContexts
 		public HashSet<Guid> GetIdOfQuizPassedSlides(string courseId, string userId)
 		{
 			return new HashSet<Guid>(db.UserQuizzes.Where(x => x.CourseId == courseId && x.UserId == userId).Select(x => x.SlideId).Distinct());
+		}
+
+		public HashSet<Guid> GetIdOfQuizSlidesScoredMaximum(string courseId, string userId)
+		{
+			var passedQuizzes = GetIdOfQuizPassedSlides(courseId, userId);
+			var notScoredMaximumQuizzes = db.UserQuizzes.Where(x => x.CourseId == courseId && x.UserId == userId && x.QuizBlockScore != x.QuizBlockMaxScore).Select(x => x.SlideId).Distinct();
+			passedQuizzes.ExceptWith(notScoredMaximumQuizzes);
+			return passedQuizzes;
 		}
 
 		public Dictionary<string, List<UserQuiz>> GetAnswersForShowOnSlide(string courseId, QuizSlide slide, string userId)

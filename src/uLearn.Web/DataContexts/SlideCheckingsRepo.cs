@@ -51,6 +51,11 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
+		public IEnumerable<ManualExerciseChecking> GetUsersPassedManualExerciseCheckings(string courseId, string userId)
+		{
+			return db.ManualExerciseCheckings.Where(c => c.CourseId == courseId && c.UserId == userId && c.IsChecked).DistinctBy(c => c.SlideId);
+		}
+
 		public async Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, UserExerciseSubmission submission)
 		{
 			var manualChecking = new ManualExerciseChecking

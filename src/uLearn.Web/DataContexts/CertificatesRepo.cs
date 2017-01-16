@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.Mvc;
 using Ionic.Zip;
 using log4net;
 using Newtonsoft.Json;
@@ -19,6 +20,11 @@ namespace uLearn.Web.DataContexts
 	{
 		private readonly ULearnDb db;
 
+		private readonly VisitsRepo visitsRepo = new VisitsRepo();
+		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
+		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
+		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
+
 		private static readonly ILog log = LogManager.GetLogger(typeof(CertificatesController));
 
 		public const string TemplateIndexFile = "index.html";
@@ -29,6 +35,11 @@ namespace uLearn.Web.DataContexts
 			"instructor.last_name", "instructor.first_name", "instructor.name",
 			"course.id", "course.title",
 			"date", "date.year", "date.month", "date.day",
+			"certificate.id", "certificate.url",
+			"score",
+			"codereviews.passed", "codereviews.passed_maxscore",
+			"quizzes.passed", "quizzes.passed_maxscore",
+			"exercises.accepted",
 		};
 
 		public CertificatesRepo() : this(new ULearnDb())
@@ -186,25 +197,30 @@ namespace uLearn.Web.DataContexts
 				yield break;
 			}
 
+			var parameters = new HashSet<string>();
+
 			var matches = templateParameterRegex.Matches(File.ReadAllText(indexFile.FullName));
 			foreach (Match match in matches)
 			{
 				var parameter = match.Groups[1].Value;
-				if (! builtInParameters.Contains(parameter))
+				if (!builtInParameters.Contains(parameter) && !parameters.Contains(parameter))
+				{
 					yield return parameter;
+					parameters.Add(parameter);
+				}
 			}
 		}
 
-		public string RenderCertificate(Certificate certificate, Course course)
+		public string RenderCertificate(Certificate certificate, Course course, string certificateUrl)
 		{
 			var templateDirectory = GetTemplateDirectory(certificate.Template);
 			var indexFile = templateDirectory.GetFile(TemplateIndexFile);
 			var content = File.ReadAllText(indexFile.FullName);
 
-			return SubstituteParameters(content, certificate, course);
+			return SubstituteParameters(content, certificate, course, certificateUrl);
 		}
 
-		private string SubstituteParameters(string content, Certificate certificate, Course course)
+		private string SubstituteParameters(string content, Certificate certificate, Course course, string certificateUrl)
 		{
 			var parameters = JsonConvert.DeserializeObject<Dictionary<string, string>>(certificate.Parameters);
 			foreach (var kv in parameters)
@@ -212,12 +228,31 @@ namespace uLearn.Web.DataContexts
 				content = content.Replace($"%{kv.Key}%", kv.Value);
 			}
 
-			content = SubstituteBuiltinParameters(content, certificate, course);
+			content = SubstituteBuiltinParameters(content, certificate, course, certificateUrl);
 
 			return content;
 		}
 
-		private string SubstituteBuiltinParameters(string content, Certificate certificate, Course course)
+		private string SubstituteBuiltinParameters(string content, Certificate certificate, Course course, string certificateUrl)
+		{
+			content = ReplaceBasicBuiltinParameters(content, certificate, course, certificateUrl);
+
+			/* Replace %score% for total course score */
+			var userScore = visitsRepo.GetScoresForSlides(course.Id, certificate.UserId).Sum(p => p.Value);
+			content = content.Replace("%score%", userScore.ToString());
+
+			/* Replace %codereviews.*% */
+			content = ReplaceCodeReviewsBuiltinParameters(content, certificate, course);
+			/* Replace %quizzes.*% */
+			content = ReplaceQuizzesBuiltinParameters(content, certificate, course);
+
+			var acceptedSolutionsCount = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, course.Slides.Select(s => s.Id), certificate.UserId).DistinctBy(s => s.SlideId).Count();
+			content = content.Replace("%exercises.accepted%", acceptedSolutionsCount.ToString());
+
+			return content;
+		}
+
+		private string ReplaceBasicBuiltinParameters(string content, Certificate certificate, Course course, string certificateUrl)
 		{
 			content = content.Replace("%user.first_name%", certificate.User.FirstName);
 			content = content.Replace("%user.last_name%", certificate.User.LastName);
@@ -232,9 +267,37 @@ namespace uLearn.Web.DataContexts
 
 			content = content.Replace("%date%", certificate.Timestamp.ToLongDateString());
 			content = content.Replace("%date.day%", certificate.Timestamp.Day.ToString());
-			content = content.Replace("%date.month%", certificate.Timestamp.Month.ToString("%02d"));
+			content = content.Replace("%date.month%", certificate.Timestamp.Month.ToString("D2"));
 			content = content.Replace("%date.year%", certificate.Timestamp.Year.ToString());
 
+			content = content.Replace("%certificate.id%", certificate.Id.ToString());
+			content = content.Replace("%certificate.url%", certificateUrl);
+
+			return content;
+		}
+
+		private string ReplaceQuizzesBuiltinParameters(string content, Certificate certificate, Course course)
+		{
+			var passedQuizzesCount = userQuizzesRepo.GetIdOfQuizPassedSlides(course.Id, certificate.UserId).Count;
+			var scoredMaximumQuizzesCount = userQuizzesRepo.GetIdOfQuizSlidesScoredMaximum(course.Id, certificate.UserId).Count;
+
+			content = content.Replace("%quizzes.passed%", passedQuizzesCount.ToString());
+			content = content.Replace("%quizzes.passed_maxscore%", scoredMaximumQuizzesCount.ToString());
+			return content;
+		}
+
+		private string ReplaceCodeReviewsBuiltinParameters(string content, Certificate certificate, Course course)
+		{
+			var codeReviewsCount = slideCheckingsRepo.GetUsersPassedManualExerciseCheckings(course.Id, certificate.UserId).Count();
+			var exercisesMaxReviewScores = course.Slides
+				.OfType<ExerciseSlide>().
+				ToDictionary(s => s.Id, s => s.Exercise.MaxReviewScore);
+			var codeReviewsFullCount = slideCheckingsRepo
+				.GetUsersPassedManualExerciseCheckings(course.Id, certificate.UserId)
+				.Count(s => s.Score == exercisesMaxReviewScores.GetOrDefault(s.SlideId, -1));
+
+			content = content.Replace("%codereviews.passed%", codeReviewsCount.ToString());
+			content = content.Replace("%codereviews.passed_maxscore%", codeReviewsFullCount.ToString());
 			return content;
 		}
 
@@ -247,6 +310,12 @@ namespace uLearn.Web.DataContexts
 		public List<Certificate> GetUserCertificates(string userId)
 		{
 			return db.Certificates.Where(c => c.UserId == userId && !c.IsDeleted).ToList();
+		}
+
+		public async Task RemoveCertificate(Certificate certificate)
+		{
+			certificate.IsDeleted = true;
+			await db.SaveChangesAsync();
 		}
 	}
 }
