@@ -51,6 +51,9 @@ namespace uLearn.Web.Controllers
 			if (certificate == null)
 				return HttpNotFound();
 
+			if (certificate.IsPreview && !User.HasAccessFor(certificate.Template.CourseId, CourseRole.Instructor))
+				return HttpNotFound();
+
 			var course = courseManager.GetCourse(certificate.Template.CourseId);
 
 			certificatesRepo.EnsureCertificateTemplateIsUnpacked(certificate.Template);
@@ -61,6 +64,7 @@ namespace uLearn.Web.Controllers
 			return View("Certificate", new CertificateViewModel
 			{
 				Course = course,
+				Certificate = certificate,
 				RenderedCertificate = renderedCertificate,
 			});
 		}
@@ -76,24 +80,6 @@ namespace uLearn.Web.Controllers
 
 			return RedirectPermanent($"/Certificates/{certificate.Template.ArchiveName}/{path}");
 		}
-		
-		[HttpPost]
-		public async Task<ActionResult> Remove(Guid certificateId)
-		{
-			var certificate = certificatesRepo.FindCertificateById(certificateId);
-			if (certificate == null)
-				return HttpNotFound();
-
-			if (! User.HasAccessFor(certificate.Template.CourseId, CourseRole.Instructor))
-				return HttpNotFound();
-
-			if (!User.HasAccessFor(certificate.Template.CourseId, CourseRole.CourseAdmin) &&
-				certificate.InstructorId != User.Identity.GetUserId())
-				return HttpNotFound();
-
-			await certificatesRepo.RemoveCertificate(certificate);
-			return Json(new { status = "ok" });
-		}
 	}
 
 	public class UserCertificatesViewModel
@@ -106,6 +92,7 @@ namespace uLearn.Web.Controllers
 	public class CertificateViewModel
 	{
 		public Course Course { get; set; }
+		public Certificate Certificate { get; set; }
 		public string RenderedCertificate { get; set; }
 	}
 }

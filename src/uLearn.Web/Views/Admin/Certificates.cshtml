@@ -16,7 +16,7 @@
 		Сертификаты
 		@if (canEditTemplates)
 		{
-			<small><a href="" class="create-template-link  internal-page-link">загрузить шаблон</a></small>
+			<small><a href="" class="create-template-link  internal-page-link">новый шаблон</a></small>
 		}
 	</h1>
 
@@ -36,30 +36,39 @@
 	{
 		<div class="certificate-template">
 			<h3 class="certificate-template__title">
-				<a href=""
-				   class="edit-template-link  internal-page-link"
-				   title="Редактировать шаблон"
-				   data-template-id="@template.Id"
-				   data-template-name="@template.Name">
-					@template.Name</a>
+				@if (canEditTemplates)
+				{
+					<a href=""
+					   class="edit-template-link  internal-page-link"
+					   title="Редактировать шаблон"
+					   data-template-id="@template.Id"
+					   data-template-name="@template.Name"
+					   data-template-url="@Url.Action("DownloadCertificateTemplate", new { courseId = template.CourseId, templateId = template.Id })">
+						@template.Name</a>
+				}
+				else
+				{
+					<span>@template.Name</span>
+				}
 				&nbsp;
 				<span class="text-muted">
 					@Model.Certificates.GetOrDefault(template.Id, new List<Certificate>()).Count.PluralizeInRussian(new RussianPluralizationOptions
-					   {
-						   One = "сертификат",
-						   Two = "сертификата",
-						   Five = "сертификатов",
-						   Gender = Gender.Male,
-						   hideNumberOne = false,
-						   smallNumbersAreWords = false,
-					   })
+					{
+						One = "сертификат",
+						Two = "сертификата",
+						Five = "сертификатов",
+						Gender = Gender.Male,
+						hideNumberOne = false,
+						smallNumbersAreWords = false,
+					})
 				</span>
 			</h3>
 
-			@using (var form = Html.BeginForm("AddCertificate", "Admin", FormMethod.Post, new { @class = "form form-horizontal" }))
+			@using (Html.BeginForm("AddCertificate", "Admin", FormMethod.Post, new { @class = "form form-horizontal" }))
 			{
 				@Html.Hidden("courseId", Model.Course.Id)
 				@Html.Hidden("templateId", template.Id)
+				@Html.Hidden("isPreview", false)
 				@Html.Hidden("userId")
 				<input type="text"
 					   class="add-certificate-input form-control"
@@ -74,6 +83,7 @@
 					</div>
 				}
 				<button class="btn btn-success  add-certificate-button">Выдать сертификат</button>
+				<button class="btn btn-default  preview-certificate-button"><i class="glyphicon glyphicon-eye-open"></i> Предпросмотр</button>
 			}
 
 			<div class="certificates">
@@ -95,7 +105,7 @@
 						{
 							<span class="glyphicon glyphicon-remove  remove-certificate-link  text-danger visible-on-parent-hover  cursor-pointer"
 							  data-certificate-id="@certificate.Id"
-							  data-url="@Url.Action("Remove", "Certificates")"
+							  data-url="@Url.Action("RemoveCertificate", new { courseId = certificate.Template.CourseId, certificateId = certificate.Id })"
 							  title="Отозвать сертификат"></span>
 						}
 					</div>
@@ -109,7 +119,7 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">Загрузить шаблон</h4>
+				<h4 class="modal-title">Новый шаблон</h4>
 			</div>
 			<div class="modal-body">
 				@using (Html.BeginForm("CreateCertificateTemplate", "Admin", FormMethod.Post, new
@@ -128,15 +138,21 @@
 					</div>
 
 					<div class="form-group">
-						<input id="archive" name="archive" type="file" class="form-control" required="required"/>
+						<input id="archive" name="archive" type="file" required="required"/>
 						Zip-архив с шаблоном
 						<div class="help-block">
+							<div class="current-archive-download">
+								<a class="current-archive-download-link" href="">Скачать текущий архив</a>.
+								<br />
+							</div>
 							Архив должен содержать файл index.html. Дополнительно в нём могут быть изображения, стили, шрифты и другие файлы.
+							<br/>
+							<a href="/Content/certificate-template.zip">Скачайте пример архива со всеми инструкциями</a>.
 						</div>
 					</div>
 
 					<button class="action-button  btn btn-success">Загрузить</button>
-					<button class="remove-template-link  btn btn-danger" data-url="@Url.Action("RemoveTemplate", "Admin")">Удалить шаблон</button>
+					<button class="remove-template-link  btn btn-danger" data-url="@Url.Action("RemoveCertificateTemplate", "Admin")">Удалить шаблон</button>
 				}
 			</div>
 		</div>

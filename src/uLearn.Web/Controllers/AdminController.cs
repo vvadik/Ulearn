@@ -706,7 +706,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		[ULearnAuthorize(MinAccessLevel=CourseRole.CourseAdmin)]
 		public async Task<ActionResult> EditCertificateTemplate(string courseId, Guid templateId, string name, HttpPostedFileBase archive)
 		{
 			var template = certificatesRepo.FindTemplateById(templateId);
@@ -725,8 +725,8 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		public async Task<ActionResult> RemoveTemplate(string courseId, Guid templateId)
+		[ULearnAuthorize(MinAccessLevel=CourseRole.CourseAdmin)]
+		public async Task<ActionResult> RemoveCertificateTemplate(string courseId, Guid templateId)
 		{
 			var template = certificatesRepo.FindTemplateById(templateId);
 			if (template == null || template.CourseId != courseId)
@@ -738,24 +738,56 @@ namespace uLearn.Web.Controllers
 		}
 		
 		[HttpPost]
-		public async Task<ActionResult> AddCertificate(string courseId, Guid templateId, string userId)
+		public async Task<ActionResult> AddCertificate(string courseId, Guid templateId, string userId, bool isPreview=false)
 		{
 			var template = certificatesRepo.FindTemplateById(templateId);
 			if (template == null || template.CourseId != courseId)
 				return HttpNotFound();
 
+			var certificateParameters = GetCertificateParametersFromRequest(template);
+			if (certificateParameters == null)
+				return RedirectToAction("Certificates", new { courseId });
+
+			var certificate = await certificatesRepo.AddCertificate(templateId, userId, User.Identity.GetUserId(), certificateParameters, isPreview);
+
+			return RedirectToRoute("Certificate", new { certificateId = certificate.Id });
+		}
+
+		private Dictionary<string, string> GetCertificateParametersFromRequest(CertificateTemplate template)
+		{
 			var templateParameters = certificatesRepo.GetTemplateParameters(template);
 			var certificateParameters = new Dictionary<string, string>();
 			foreach (var parameter in templateParameters)
 			{
 				if (Request.Form["parameter-" + parameter] == null)
-					return RedirectToAction("Certificates", new { courseId });
+					return null;
 				certificateParameters[parameter] = Request.Form["parameter-" + parameter];
 			}
+			return certificateParameters;
+		}
 
-			await certificatesRepo.AddCertificate(templateId, userId, User.Identity.GetUserId(), certificateParameters);
+		[HttpPost]
+		public async Task<ActionResult> RemoveCertificate(string courseId, Guid certificateId)
+		{
+			var certificate = certificatesRepo.FindCertificateById(certificateId);
+			if (certificate == null)
+				return HttpNotFound();
 
-			return RedirectToAction("Certificates", new { courseId });
+			if (!User.HasAccessFor(certificate.Template.CourseId, CourseRole.CourseAdmin) &&
+				certificate.InstructorId != User.Identity.GetUserId())
+				return HttpNotFound();
+
+			await certificatesRepo.RemoveCertificate(certificate);
+			return Json(new { status = "ok" });
+		}
+
+		public ActionResult DownloadCertificateTemplate(string courseId, Guid templateId)
+		{
+			var template = certificatesRepo.FindTemplateById(templateId);
+			if (template == null || template.CourseId != courseId)
+				return HttpNotFound();
+
+			return RedirectPermanent($"/Certificates/{template.ArchiveName}.zip");
 		}
 	}
 

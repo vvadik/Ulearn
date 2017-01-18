@@ -316,6 +316,10 @@
     <Compile Include="Migrations\201612262110312_AddCertificates.Designer.cs">
       <DependentUpon>201612262110312_AddCertificates.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201701180912464_AddPreviewedCertificates.cs" />
+    <Compile Include="Migrations\201701180912464_AddPreviewedCertificates.Designer.cs">
+      <DependentUpon>201701180912464_AddPreviewedCertificates.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Certificate.cs" />
     <Compile Include="Models\CertificateTemplate.cs" />
     <Compile Include="Models\FilterOptions.cs" />
@@ -867,6 +871,9 @@
     <EmbeddedResource Include="Migrations\201612262110312_AddCertificates.resx">
       <DependentUpon>201612262110312_AddCertificates.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701180912464_AddPreviewedCertificates.resx">
+      <DependentUpon>201701180912464_AddPreviewedCertificates.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="codemirror\addon\comment\comment.js" />
@@ -1150,6 +1157,7 @@
     <Content Include="Content\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\jquery-ui.min.css" />
     <Content Include="Content\jquery.datetimepicker.min.css" />
+    <Content Include="Content\likely.css" />
     <Content Include="Content\loading.gif" />
     <Content Include="Content\logo.png" />
     <Content Include="Content\tablesorter.css" />
@@ -1244,6 +1252,7 @@
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.date.js" />
+    <Content Include="Scripts\likely.js" />
     <Content Include="Scripts\notify-custom.min.js" />
     <Content Include="Scripts\slide-checking.js" />
     <Content Include="Scripts\slide-comments.js" />

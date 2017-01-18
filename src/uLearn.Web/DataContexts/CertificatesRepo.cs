@@ -87,7 +87,7 @@ namespace uLearn.Web.DataContexts
 			return template;
 		}
 
-		public async Task<Certificate> AddCertificate(Guid templateId, string userId, string instructorId, Dictionary<string, string> parameters)
+		public async Task<Certificate> AddCertificate(Guid templateId, string userId, string instructorId, Dictionary<string, string> parameters, bool isPreview=false)
 		{
 			var certificate = new Certificate
 			{
@@ -97,6 +97,7 @@ namespace uLearn.Web.DataContexts
 				InstructorId = instructorId,
 				Parameters = JsonConvert.SerializeObject(parameters),
 				Timestamp = DateTime.Now,
+				IsPreview = isPreview,
 			};
 			db.Certificates.Add(certificate);
 			await db.SaveChangesAsync();
@@ -123,10 +124,13 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public Dictionary<Guid, List<Certificate>> GetCertificates(string courseId)
+		public Dictionary<Guid, List<Certificate>> GetCertificates(string courseId, bool includePreviewes=false)
 		{
-			return db.Certificates
-				.Where(c => c.Template.CourseId == courseId && !c.IsDeleted)
+			var certificates = db.Certificates
+				.Where(c => c.Template.CourseId == courseId && !c.IsDeleted);
+			if (!includePreviewes)
+				certificates = certificates.Where(c => !c.IsPreview);
+			return certificates
 				.Include(c => c.User)
 				.Include(c => c.Instructor)
 				.GroupBy(c => c.TemplateId)

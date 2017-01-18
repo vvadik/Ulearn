@@ -33,5 +33,9 @@ namespace uLearn.Web.Models
 		
 		[Required]
 		public bool IsDeleted { get; set; }
+
+		/* Previewed certifcates are visible only for instructors and not listed in the any list */
+		[Required]
+		public bool IsPreview { get; set; }
 	}
 }
