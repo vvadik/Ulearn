@@ -738,6 +738,7 @@ namespace uLearn.Web.Controllers
 		}
 		
 		[HttpPost]
+		[ValidateInput(false)]
 		public async Task<ActionResult> AddCertificate(string courseId, Guid templateId, string userId, bool isPreview=false)
 		{
 			var template = certificatesRepo.FindTemplateById(templateId);
@@ -759,9 +760,9 @@ namespace uLearn.Web.Controllers
 			var certificateParameters = new Dictionary<string, string>();
 			foreach (var parameter in templateParameters)
 			{
-				if (Request.Form["parameter-" + parameter] == null)
+				if (Request.Unvalidated.Form["parameter-" + parameter] == null)
 					return null;
-				certificateParameters[parameter] = Request.Form["parameter-" + parameter];
+				certificateParameters[parameter] = Request.Unvalidated.Form["parameter-" + parameter];
 			}
 			return certificateParameters;
 		}

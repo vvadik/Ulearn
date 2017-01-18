@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web.Mvc;
 using Ionic.Zip;
 using log4net;
 using Newtonsoft.Json;
@@ -28,7 +27,7 @@ namespace uLearn.Web.DataContexts
 		private static readonly ILog log = LogManager.GetLogger(typeof(CertificatesController));
 
 		public const string TemplateIndexFile = "index.html";
-		private readonly Regex templateParameterRegex = new Regex(@"%([-a-z0-9_.]+)%", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private readonly Regex templateParameterRegex = new Regex(@"%([-a-z0-9_.]+)(\|(raw|in_quotes|in_html))?%", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 		private readonly HashSet<string> builtInParameters = new HashSet<string>
 		{
 			"user.last_name", "user.first_name", "user.name",
@@ -224,12 +223,29 @@ namespace uLearn.Web.DataContexts
 			return SubstituteParameters(content, certificate, course, certificateUrl);
 		}
 
+		private string SubstituteOneParameter(string content, string parameterName, string parameterValue)
+		{
+			if (parameterValue == null)
+				parameterValue = "";
+
+			content = content.Replace($"%{parameterName}|raw%", parameterValue);
+
+			var htmlEncodedValue = parameterValue.Replace("&", "&amp;").Replace(">", "&gt;").Replace("<", "&lt;");
+			content = content.Replace($"%{parameterName}|in_html%", htmlEncodedValue);
+			content = content.Replace($"%{parameterName}%", htmlEncodedValue);
+
+			var quotesEncodedValue = parameterValue.Replace(@"\", @"\\").Replace("\"", "\\\"").Replace("'", @"\'");
+			content = content.Replace($"%{parameterName}|in_quotes%", quotesEncodedValue);
+
+			return content;
+		}
+
 		private string SubstituteParameters(string content, Certificate certificate, Course course, string certificateUrl)
 		{
 			var parameters = JsonConvert.DeserializeObject<Dictionary<string, string>>(certificate.Parameters);
 			foreach (var kv in parameters)
 			{
-				content = content.Replace($"%{kv.Key}%", kv.Value);
+				content = SubstituteOneParameter(content, kv.Key, kv.Value);
 			}
 
 			content = SubstituteBuiltinParameters(content, certificate, course, certificateUrl);
@@ -243,7 +259,7 @@ namespace uLearn.Web.DataContexts
 
 			/* Replace %score% for total course score */
 			var userScore = visitsRepo.GetScoresForSlides(course.Id, certificate.UserId).Sum(p => p.Value);
-			content = content.Replace("%score%", userScore.ToString());
+			content = SubstituteOneParameter(content, "score", userScore.ToString());
 
 			/* Replace %codereviews.*% */
 			content = ReplaceCodeReviewsBuiltinParameters(content, certificate, course);
@@ -251,31 +267,31 @@ namespace uLearn.Web.DataContexts
 			content = ReplaceQuizzesBuiltinParameters(content, certificate, course);
 
 			var acceptedSolutionsCount = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, course.Slides.Select(s => s.Id), certificate.UserId).DistinctBy(s => s.SlideId).Count();
-			content = content.Replace("%exercises.accepted%", acceptedSolutionsCount.ToString());
+			content = SubstituteOneParameter(content, "exercises.accepted", acceptedSolutionsCount.ToString());
 
 			return content;
 		}
 
 		private string ReplaceBasicBuiltinParameters(string content, Certificate certificate, Course course, string certificateUrl)
 		{
-			content = content.Replace("%user.first_name%", certificate.User.FirstName);
-			content = content.Replace("%user.last_name%", certificate.User.LastName);
-			content = content.Replace("%user.name%", certificate.User.VisibleName);
+			content = SubstituteOneParameter(content, "user.first_name", certificate.User.FirstName);
+			content = SubstituteOneParameter(content, "user.last_name", certificate.User.LastName);
+			content = SubstituteOneParameter(content, "user.name", certificate.User.VisibleName);
 
-			content = content.Replace("%instructor.first_name%", certificate.Instructor.FirstName);
-			content = content.Replace("%instructor.last_name%", certificate.Instructor.LastName);
-			content = content.Replace("%instructor.name%", certificate.Instructor.VisibleName);
+			content = SubstituteOneParameter(content, "instructor.first_name", certificate.Instructor.FirstName);
+			content = SubstituteOneParameter(content, "instructor.last_name", certificate.Instructor.LastName);
+			content = SubstituteOneParameter(content, "instructor.name", certificate.Instructor.VisibleName);
 
-			content = content.Replace("%course.id%", course.Id);
-			content = content.Replace("%course.title%", course.Title);
+			content = SubstituteOneParameter(content, "course.id", course.Id);
+			content = SubstituteOneParameter(content, "course.title", course.Title);
 
-			content = content.Replace("%date%", certificate.Timestamp.ToLongDateString());
-			content = content.Replace("%date.day%", certificate.Timestamp.Day.ToString());
-			content = content.Replace("%date.month%", certificate.Timestamp.Month.ToString("D2"));
-			content = content.Replace("%date.year%", certificate.Timestamp.Year.ToString());
+			content = SubstituteOneParameter(content, "date", certificate.Timestamp.ToLongDateString());
+			content = SubstituteOneParameter(content, "date.day", certificate.Timestamp.Day.ToString());
+			content = SubstituteOneParameter(content, "date.month", certificate.Timestamp.Month.ToString("D2"));
+			content = SubstituteOneParameter(content, "date.year", certificate.Timestamp.Year.ToString());
 
-			content = content.Replace("%certificate.id%", certificate.Id.ToString());
-			content = content.Replace("%certificate.url%", certificateUrl);
+			content = SubstituteOneParameter(content, "certificate.id", certificate.Id.ToString());
+			content = SubstituteOneParameter(content, "certificate.url", certificateUrl);
 
 			return content;
 		}
@@ -285,8 +301,8 @@ namespace uLearn.Web.DataContexts
 			var passedQuizzesCount = userQuizzesRepo.GetIdOfQuizPassedSlides(course.Id, certificate.UserId).Count;
 			var scoredMaximumQuizzesCount = userQuizzesRepo.GetIdOfQuizSlidesScoredMaximum(course.Id, certificate.UserId).Count;
 
-			content = content.Replace("%quizzes.passed%", passedQuizzesCount.ToString());
-			content = content.Replace("%quizzes.passed_maxscore%", scoredMaximumQuizzesCount.ToString());
+			content = SubstituteOneParameter(content, "quizzes.passed", passedQuizzesCount.ToString());
+			content = SubstituteOneParameter(content, "quizzes.passed_maxscore", scoredMaximumQuizzesCount.ToString());
 			return content;
 		}
 
@@ -300,8 +316,8 @@ namespace uLearn.Web.DataContexts
 				.GetUsersPassedManualExerciseCheckings(course.Id, certificate.UserId)
 				.Count(s => s.Score == exercisesMaxReviewScores.GetOrDefault(s.SlideId, -1));
 
-			content = content.Replace("%codereviews.passed%", codeReviewsCount.ToString());
-			content = content.Replace("%codereviews.passed_maxscore%", codeReviewsFullCount.ToString());
+			content = SubstituteOneParameter(content, "codereviews.passed", codeReviewsCount.ToString());
+			content = SubstituteOneParameter(content, "codereviews.passed_maxscore", codeReviewsFullCount.ToString());
 			return content;
 		}
 
