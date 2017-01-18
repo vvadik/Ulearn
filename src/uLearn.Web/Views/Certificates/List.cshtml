@@ -7,31 +7,58 @@
 }
 
 <div class="container">
-	<h1>Сертификаты пользователя @Model.User.VisibleName</h1>
+	<h1 class="breathing-page-header">Сертификаты пользователя @Model.User.VisibleName</h1>
 
 	@if (!Model.Certificates.Any())
 	{
 		if (Model.User.Id == User.Identity.GetUserId())
 		{
-			<div>
-				Вы пока не получили ни одного сертификата за прохождение курсов.
+			<div class="certificates-list__info">
+				<p>
+					Вы пока не&nbsp;получили ни&nbsp;одного сертификата за&nbsp;прохождение курсов.
+				</p>
+				<p>
+					Преподаватели выдают сертификаты отличившимся студентам.
+				</p>
 			</div>
 		}
 		else
 		{
-			<div>
+			<div class="certificates-list__info">
 				@Model.User.VisibleName
-				<span>пока не получил(а) ни одного сертификата за прохождение курсов.</span>
+				<span>пока не&nbsp;получил(а) ни&nbsp;одного сертификата за&nbsp;прохождение курсов.</span>
 			</div>
 		}
 	}
-	
+	else
+	{
+		<div class="certificates-list__info">
+			<div>
+				Вы можете поделиться ссылкой на&nbsp;эту страницу или отдельный сертификат с&nbsp;друзьями:
+			</div>
+			<div class="likely">
+				<div class="vkontakte">Поделиться</div>
+				<div class="telegram">Отправить</div>
+				<div class="twitter">Твитнуть</div>
+				<div class="facebook">Поделиться</div>
+				<div class="gplus">Плюсануть</div>
+				<div class="linkedin">Линкануть</div>
+			</div>
+		</div>
+	}
+
+	@{ var certificateIndex = 1;}
 	@foreach (var certificate in Model.Certificates)
 	{
-		<h3>@Html.RouteLink(
-		   "Сертификат за курс «" + Model.CoursesTitles.GetOrDefault(certificate.Template.CourseId, "") + "»",
-		   "Certificate",
-		   new {certificateId = certificate.Id}
-		   )</h3>
+		<h3>@certificateIndex. @Html.RouteLink(
+				"Сертификат за курс «" + Model.CoursesTitles.GetOrDefault(certificate.Template.CourseId, "") + "»",
+				"Certificate",
+				new { certificateId = certificate.Id }
+				)</h3>
+		<div>
+			<strong>@certificate.Timestamp.ToLongDateString()</strong>,
+			преподаватель: @certificate.Instructor.VisibleName
+		</div>
+		certificateIndex++;
 	}
 </div>

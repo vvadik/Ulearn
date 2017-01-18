@@ -114,10 +114,10 @@
 	}
 	if (courses.Count > 10)
 	{
-	    <li><a href="@Url.Action("CourseList", "Admin")"><b>Все курсы</b></a></li>
-    }
+		<li><a href="@Url.Action("CourseList", "Admin")"><b>Все курсы</b></a></li>
+	}
 	if (courses.Count == 0)
 	{
-	    <li><b>Нет курсов.</b> @Html.ActionLink("Создать", "CourseList", "Admin")</li>
+		<li><b>Нет курсов.</b> @Html.ActionLink("Создать", "CourseList", "Admin")</li>
 	}
 }

@@ -20,8 +20,10 @@ namespace uLearn.Web.Controllers
 		private readonly CourseManager courseManager;
 		private UserManager<ApplicationUser> userManager;
 		private readonly UsersRepo usersRepo;
-		private UserRolesRepo userRolesRepo;
-		private GroupsRepo groupsRepo;
+		private readonly UserRolesRepo userRolesRepo;
+		private readonly GroupsRepo groupsRepo;
+		private readonly CertificatesRepo certificatesRepo;
+		private readonly VisitsRepo visitsRepo;
 
 		public AccountController()
 			: this(new ULearnUserManager())
@@ -31,6 +33,8 @@ namespace uLearn.Web.Controllers
 			usersRepo = new UsersRepo(db);
 			userRolesRepo = new UserRolesRepo(db);
 			groupsRepo = new GroupsRepo(db);
+			certificatesRepo = new CertificatesRepo(db);
+			visitsRepo = new VisitsRepo(db);
 		}
 
 		public AccountController(UserManager<ApplicationUser> userManager)
@@ -185,11 +189,18 @@ namespace uLearn.Web.Controllers
 			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
 			if (user == null)
 				return RedirectToAction("List");
-			var courses = new HashSet<string>(db.Visits.Where(v => v.UserId == user.Id).Select(v => v.CourseId).Distinct());
+
+			var userCoursesIds = visitsRepo.GetUserCourses(user.Id);
+			var userCourses = courseManager.GetCourses().Where(c => userCoursesIds.Contains(c.Id)).ToList();
+
+			var certificates = certificatesRepo.GetUserCertificates(user.Id);
+
 			return View(new UserInfoModel {
 				User = user,
-				GroupsNames = groupsRepo.GetUserGroupsNamesAsString(courses.ToList(), user.Id, User, 10),
-				Courses = courseManager.GetCourses().Where(c => courses.Contains(c.Id)).ToArray()
+				GroupsNames = groupsRepo.GetUserGroupsNamesAsString(userCoursesIds.ToList(), user.Id, User, 10),
+				Certificates = certificates,
+				Courses = courseManager.GetCourses().ToDictionary(c => c.Id, c => c),
+				UserCourses = userCourses,
 			});
 		}
 

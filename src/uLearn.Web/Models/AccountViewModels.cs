@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 
 namespace uLearn.Web.Models
@@ -123,6 +124,8 @@ namespace uLearn.Web.Models
 	{
 		public ApplicationUser User { get; set; }
 		public string GroupsNames { get; set; }
-		public Course[] Courses { get; set; }
+		public Dictionary<string, Course> Courses { get; set; }
+		public List<Course> UserCourses { get; set; }
+		public List<Certificate> Certificates { get; set; }
 	}
 }

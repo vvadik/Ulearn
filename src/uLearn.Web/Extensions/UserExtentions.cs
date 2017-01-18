@@ -13,6 +13,7 @@ namespace uLearn.Web.Extensions
 	public static class UserExtentions
 	{
 		private const string courseRoleClaimType = "CourseRole";
+		private static ULearnUserManager userManager = new ULearnUserManager();
 
 		public static bool HasAccessFor(this IPrincipal principal, string courseId, CourseRole minAccessLevel)
 		{
@@ -97,6 +98,12 @@ namespace uLearn.Web.Extensions
 		{
 			var userRoles = new UserRolesRepo();
 			return await user.GenerateUserIdentityAsync(manager, userRoles);
+		}
+
+		public static string GetUserVisibleName(this IIdentity identity)
+		{
+			var user = userManager.FindById(identity.GetUserId());
+			return user.VisibleName;
 		}
 	}
 }

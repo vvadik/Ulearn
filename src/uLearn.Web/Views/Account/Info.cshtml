@@ -11,30 +11,50 @@
 
 	<h3>Курсы</h3>
 	<ol>
-		@foreach (var courseInfo in Model.Courses)
+		@foreach (var course in Model.UserCourses)
 		{
-			<li>@Html.ActionLink(courseInfo.Title, "CourseInfo", new { userName = Model.User.Id, courseId = courseInfo.Id })</li>
+			<li>@Html.ActionLink(course.Title, "CourseInfo", new { userName = Model.User.Id, courseId = course.Id })</li>
 		}
 	</ol>
 
-	<h3 id="questions">Заданные вопросы</h3>
-	<div class="load-content" data-url="@Url.Action("ItemsOfUser", "Questions", new{userId=Model.User.Id})"></div>
-
 	<h3>Логины</h3>
+	@if (Model.User.Logins.Count == 0)
+	{
+		<p>Нет внешних логинов</p>
+	}
 	<ol>
 		@foreach (var login in Model.User.Logins)
 		{
-			<p>@login.LoginProvider @login.ProviderKey</p>
+			<li>@login.LoginProvider @login.ProviderKey</li>
 		}
 	</ol>
+
+	<h3>
+		@Html.ActionLink("Список сертификатов пользователя", "Index", "Certificates", new { userId = Model.User.Id }, new { })
+	</h3>
+	@if (Model.Certificates.Count == 0)
+	{
+		<p>Нет сертификатов</p>
+	}
+	<ol>
+		@foreach (var certificate in Model.Certificates)
+		{
+			<li>
+				@Html.RouteLink(Model.Courses[certificate.Template.CourseId].Title, "Certificate", new { certificateId = certificate.Id }),
+				@certificate.Timestamp.ToAgoPrettyString()
+			</li>
+		}
+	</ol>
+	
+
 	@if (User.IsSystemAdministrator())
 	{
 		var newPassword = (DateTime.Now.Ticks % 1000000).ToString();
-		<h3>Сброс пароля</h3>
-		using(Html.BeginForm("ResetPassword", "Account", new { newPassword, userId = Model.User.Id }))
+		using (Html.BeginForm("ResetPassword", "Account", new { newPassword, userId = Model.User.Id }))
 		{
 			@Html.AntiForgeryToken()
-			<button class="btn btn-danger"> Сбросить пароль в @newPassword </button>
+			<h3>Сброс пароля</h3>
+			<button class="btn btn-danger"> Установить пользователю пароль: @newPassword </button>
 		}
 	}
 

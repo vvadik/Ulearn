@@ -54,7 +54,8 @@ namespace uLearn.Web
 					"~/Scripts/users-list.js",
 					"~/Scripts/groups-editor.js",
 					"~/Scripts/certificates-editor.js",
-					"~/Scripts/analytics-highcharts.js"
+					"~/Scripts/analytics-highcharts.js",
+					"~/Scripts/likely.js"
 				);
 		}
 
@@ -76,7 +77,9 @@ namespace uLearn.Web
 				"~/flexslider/flexslider.css",
 				"~/Content/jquery-ui.min.css",
 				"~/Content/site.css",
-				"~/Content/buttons.css");
+				"~/Content/buttons.css",
+				"~/Content/likely.css"
+				);
 		}
 	}
 }

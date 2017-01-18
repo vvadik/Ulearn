@@ -216,5 +216,10 @@ namespace uLearn.Web.DataContexts
 				.Where(g => g.Count() == slidesCount)
 				.Select(g => g.Key);
 		}
+
+		public HashSet<string> GetUserCourses(string userId)
+		{
+			return new HashSet<string>(db.Visits.Where(v => v.UserId == userId).Select(v => v.CourseId).Distinct());
+		}
 	}
 }

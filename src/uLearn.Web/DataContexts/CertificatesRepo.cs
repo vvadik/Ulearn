@@ -124,11 +124,11 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public Dictionary<Guid, List<Certificate>> GetCertificates(string courseId, bool includePreviewes=false)
+		public Dictionary<Guid, List<Certificate>> GetCertificates(string courseId, bool includePreviews=false)
 		{
 			var certificates = db.Certificates
 				.Where(c => c.Template.CourseId == courseId && !c.IsDeleted);
-			if (!includePreviewes)
+			if (!includePreviews)
 				certificates = certificates.Where(c => !c.IsPreview);
 			return certificates
 				.Include(c => c.User)
@@ -311,9 +311,12 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public List<Certificate> GetUserCertificates(string userId)
+		public List<Certificate> GetUserCertificates(string userId, bool includePreviews=false)
 		{
-			return db.Certificates.Where(c => c.UserId == userId && !c.IsDeleted).ToList();
+			var certificates = db.Certificates.Where(c => c.UserId == userId && !c.IsDeleted);
+			if (!includePreviews)
+				certificates = certificates.Where(c => !c.IsPreview);
+			return certificates.ToList();
 		}
 
 		public async Task RemoveCertificate(Certificate certificate)
