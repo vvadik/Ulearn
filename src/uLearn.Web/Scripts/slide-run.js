@@ -62,6 +62,7 @@ $('.exercise__submission').on('click', '.run-solution-button', function () {
 	$.ajax(
 	{
 		type: "POST",
+		contentType:"text/plain",
 		url: $runButton.data("url"),
 		data: code
 	}).success(setResults)

@@ -5,7 +5,7 @@ using CommandLine;
 
 namespace uLearn.CourseTool
 {
-	abstract class AbstractOptions
+	public abstract class AbstractOptions
 	{
 		protected AbstractOptions()
 		{

@@ -20,7 +20,7 @@ namespace uLearn.CourseTool
 						.ToArray())
 			};
 			var note = course.FindInstructorNote(units[unitIndex]);
-			if (note != null)
+			if (note != null && config.EmitSequentialsForInstructorNotes)
 			{
 				var displayName = "Заметки преподавателю";
 				var sequentialId = $"{course.Id}-{unitIndex}-note-seq";

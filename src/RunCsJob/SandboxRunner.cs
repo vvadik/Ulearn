@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -11,34 +10,45 @@ using uLearn;
 
 namespace RunCsJob
 {
+	public class SandboxRunnerSettings
+	{
+		public SandboxRunnerSettings()
+		{
+			var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+			WorkingDirectory = new DirectoryInfo(Path.Combine(baseDirectory, "submissions"));
+		}
+
+		private const int timeLimitInSeconds = 10;
+		public TimeSpan TimeLimit = TimeSpan.FromSeconds(timeLimitInSeconds);
+		public TimeSpan IdleTimeLimit = TimeSpan.FromSeconds(2 * timeLimitInSeconds);
+		public int MemoryLimit = 64 * 1024 * 1024;
+		public int OutputLimit = 10 * 1024 * 1024;
+		public MsBuildSettings MsBuildSettings = new MsBuildSettings();
+		public DirectoryInfo WorkingDirectory;
+	}
+
 	public class SandboxRunner
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(SandboxRunner));
 
 		private readonly RunnerSubmission submission;
+		private readonly SandboxRunnerSettings settings;
 
-		private const int timeLimitInSeconds = 10;
-		private static readonly TimeSpan timeLimit = TimeSpan.FromSeconds(timeLimitInSeconds);
-		private static readonly TimeSpan idleTimeLimit = TimeSpan.FromSeconds(2 * timeLimitInSeconds);
-
-		private const int memoryLimit = 64 * 1024 * 1024;
-		private const int outputLimit = 10 * 1024 * 1024;
 		private bool hasTimeLimit;
 		private bool hasMemoryLimit;
 		private bool hasOutputLimit;
 
 		private readonly RunningResults result = new RunningResults();
 
-		public static RunningResults Run(RunnerSubmission submission, string pathToCompiler)
+		public static RunningResults Run(RunnerSubmission submission, SandboxRunnerSettings settings = null)
 		{
-			var workingDirectory = ConfigurationManager.AppSettings["ulearn.runcsjob.submissionsWorkingDirectory"];
-			if (string.IsNullOrEmpty(workingDirectory))
-				workingDirectory = Path.Combine(".", "submissions");
-			if (!Directory.Exists(workingDirectory))
+			settings = settings ?? new SandboxRunnerSettings();
+			var workingDirectory = settings.WorkingDirectory;
+			if (!workingDirectory.Exists)
 			{
 				try
 				{
-					Directory.CreateDirectory(workingDirectory);
+					workingDirectory.Create();
 				}
 				catch (Exception e)
 				{
@@ -48,14 +58,14 @@ namespace RunCsJob
 
 			var randomSuffix = Guid.NewGuid().ToString("D");
 			randomSuffix = randomSuffix.Substring(randomSuffix.Length - 8);
-			var submissionCompilationDirectory = Path.Combine(workingDirectory, $"{submission.Id}-{randomSuffix}");
+			var submissionCompilationDirectory = workingDirectory.GetSubdir($"{submission.Id}-{randomSuffix}");
 			try
 			{
-				Directory.CreateDirectory(submissionCompilationDirectory);
+				submissionCompilationDirectory.Create();
 			}
 			catch (Exception e)
 			{
-				log.Error($"Не могу создать директорию для компиляции решения: {submissionCompilationDirectory}", e);
+				log.Error($"Не могу создать директорию для компиляции решения: {submissionCompilationDirectory.FullName}", e);
 				return new RunningResults
 				{
 					Id = submission.Id,
@@ -69,8 +79,8 @@ namespace RunCsJob
 				try
 				{
 					if (submission is ProjRunnerSubmission)
-						return new SandboxRunner(submission).RunMsBuild(pathToCompiler, submissionCompilationDirectory);
-					return new SandboxRunner(submission).RunCsc60(submissionCompilationDirectory);
+						return new SandboxRunner(submission, settings).RunMsBuild(submissionCompilationDirectory.FullName);
+					return new SandboxRunner(submission, settings).RunCsc60(submissionCompilationDirectory.FullName);
 				}
 				catch (Exception ex)
 				{
@@ -86,17 +96,18 @@ namespace RunCsJob
 			finally
 			{
 				log.Info($"Удаляю папку с решением: {submissionCompilationDirectory}");
-				SafeRemoveDirectory(submissionCompilationDirectory);
+				SafeRemoveDirectory(submissionCompilationDirectory.FullName);
 			}
 		}
 
-		public SandboxRunner(RunnerSubmission submission)
+		public SandboxRunner(RunnerSubmission submission, SandboxRunnerSettings settings = null)
 		{
 			this.submission = submission;
+			this.settings = settings ?? new SandboxRunnerSettings();
 			result.Id = submission.Id;
 		}
 
-		private RunningResults RunMsBuild(string pathToCompiler, string submissionCompilationDirectory)
+		private RunningResults RunMsBuild(string submissionCompilationDirectory)
 		{
 			var projSubmission = (ProjRunnerSubmission)submission;
 			log.Info($"Запускаю проверку C#-решения {projSubmission.Id}, компилирую с помощью MsBuild");
@@ -119,7 +130,7 @@ namespace RunCsJob
 
 			log.Info($"Компилирую решение {submission.Id}: {projSubmission.ProjectFileName} в папке {dir.FullName}");
 
-			var builderResult = MsBuildRunner.BuildProject(pathToCompiler, projSubmission.ProjectFileName, dir);
+			var builderResult = MsBuildRunner.BuildProject(settings.MsBuildSettings, projSubmission.ProjectFileName, dir);
 			result.Verdict = Verdict.Ok;
 
 			if (!builderResult.Success)
@@ -183,10 +194,10 @@ namespace RunCsJob
 
 		private void RunSandboxer(string args)
 		{
-		    var workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            log.Info($"Запускаю C#-песочницу с аргументами: {args}\nРабочая директория: {workingDirectory}");
+			var workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
+			log.Info($"Запускаю C#-песочницу с аргументами: {args}\nРабочая директория: {workingDirectory}");
 
-            var startInfo = new ProcessStartInfo(Path.Combine(workingDirectory, "CsSandboxer.exe"), args)
+			var startInfo = new ProcessStartInfo(Path.Combine(workingDirectory, "CsSandboxer.exe"), args)
 			{
 				RedirectStandardInput = true,
 				RedirectStandardOutput = true,
@@ -196,19 +207,20 @@ namespace RunCsJob
 				StandardOutputEncoding = Encoding.UTF8,
 				StandardErrorEncoding = Encoding.UTF8
 			};
+			startInfo.EnvironmentVariables.Add("InsideSandbox", "true");
 
-		    Process sandboxer;
-		    try
-		    {
-                sandboxer = Process.Start(startInfo);
-            }
-		    catch (Exception e)
-		    {
-                log.Error("Не могу запустить C#-песочницу", e);
-                result.Verdict = Verdict.SandboxError;
-                result.Error = "Can't start process";
-                return;
-            }
+			Process sandboxer;
+			try
+			{
+				sandboxer = Process.Start(startInfo);
+			}
+			catch (Exception e)
+			{
+				log.Error("Не могу запустить C#-песочницу", e);
+				result.Verdict = Verdict.SandboxError;
+				result.Error = "Can't start process";
+				return;
+			}
 
 			if (sandboxer == null)
 			{
@@ -218,14 +230,14 @@ namespace RunCsJob
 				return;
 			}
 
-			var stderrReader = new AsyncReader(sandboxer.StandardError, outputLimit + 1);
+			var stderrReader = new AsyncReader(sandboxer.StandardError, settings.OutputLimit + 1);
 
 			var readyState = sandboxer.StandardOutput.ReadLineAsync();
-			if (!readyState.Wait(timeLimit) || readyState.Result != "Ready")
+			if (!readyState.Wait(settings.TimeLimit) || readyState.Result != "Ready")
 			{
 				if (!sandboxer.HasExited)
 				{
-					log.Error($"Песочница не завершилась через {timeLimit.TotalSeconds} секунд, убиваю её");
+					log.Error($"Песочница не завершилась через {settings.TimeLimit.TotalSeconds} секунд, убиваю её");
 					sandboxer.Kill();
 					result.Verdict = Verdict.SandboxError;
 					result.Error = "Sandbox does not respond";
@@ -249,7 +261,7 @@ namespace RunCsJob
 			sandboxer.StandardInput.WriteLine("Run");
 			sandboxer.StandardInput.WriteLineAsync(submission.Input);
 
-			var stdoutReader = new AsyncReader(sandboxer.StandardOutput, outputLimit + 1);
+			var stdoutReader = new AsyncReader(sandboxer.StandardOutput, settings.OutputLimit + 1);
 			while (!sandboxer.HasExited
 					&& !IsTimeLimitExpected(sandboxer, startTime, startUsedTime)
 					&& !IsMemoryLimitExpected(sandboxer, startUsedMemory)
@@ -321,7 +333,7 @@ namespace RunCsJob
 		private bool IsOutputLimit(AsyncReader reader)
 		{
 			return hasOutputLimit = hasOutputLimit
-									|| (reader.ReadedLength > outputLimit);
+									|| (reader.ReadedLength > settings.OutputLimit);
 		}
 
 		private bool IsMemoryLimitExpected(Process sandboxer, long startUsedMemory)
@@ -338,14 +350,14 @@ namespace RunCsJob
 			}
 
 			return hasMemoryLimit = hasMemoryLimit
-									|| startUsedMemory + memoryLimit < mem;
+									|| startUsedMemory + settings.MemoryLimit < mem;
 		}
 
 		private bool IsTimeLimitExpected(Process sandboxer, DateTime startTime, TimeSpan startUsedTime)
 		{
 			return hasTimeLimit = hasTimeLimit
-								|| timeLimit.Add(startUsedTime).CompareTo(sandboxer.TotalProcessorTime) < 0
-								|| startTime.Add(idleTimeLimit).CompareTo(DateTime.Now) < 0;
+								|| settings.TimeLimit.Add(startUsedTime).CompareTo(sandboxer.TotalProcessorTime) < 0
+								|| startTime.Add(settings.IdleTimeLimit).CompareTo(DateTime.Now) < 0;
 		}
 
 		private static Exception FindSerializedException(string str)

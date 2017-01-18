@@ -1,18 +1,41 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Logging;
 
 namespace RunCsJob
 {
+	public class MsBuildSettings
+	{
+		private const string CompilersFolderName = "Microsoft.Net.Compilers.1.3.2";
+		private const string WellKnownLibsFolderName = "WellKnownLibs";
+		public MsBuildSettings()
+		{
+			var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+			CompilerDirectory = new DirectoryInfo(Path.Combine(baseDirectory, CompilersFolderName));
+			WellKnownLibsDirectory = new DirectoryInfo(Path.Combine(baseDirectory, WellKnownLibsFolderName));
+		}
+		public DirectoryInfo CompilerDirectory;
+		public DirectoryInfo WellKnownLibsDirectory;
+	}
 	public static class MsBuildRunner
 	{
-		public static MSbuildResult BuildProject(string pathToCompiler,string projectFileName, DirectoryInfo dir)
+		public static MSbuildResult BuildProject(MsBuildSettings settings, string projectFileName, DirectoryInfo dir)
 		{
 			var result = new MSbuildResult();
 			var path = Path.Combine(dir.FullName, projectFileName);
 			var project = new Project(path, null, null, new ProjectCollection());
-			project.SetProperty("CscToolPath", pathToCompiler);
+			project.SetProperty("CscToolPath", settings.CompilerDirectory.FullName);
+			var includes = new HashSet<string>(
+				project.AllEvaluatedItems
+				.Where(i => i.ItemType == "None" || i.ItemType == "Content")
+				.Select(i => Path.GetFileName(i.EvaluatedInclude.ToLowerInvariant())));
+			foreach (var dll in settings.WellKnownLibsDirectory.GetFiles("*.dll"))
+				if (!includes.Contains(dll.Name.ToLowerInvariant()))
+					project.AddItem("None", dll.FullName);
 			project.Save();
 			using (var stringWriter = new StringWriter())
 			{

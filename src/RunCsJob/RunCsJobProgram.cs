@@ -13,16 +13,14 @@ namespace RunCsJob
 {
 	public class RunCsJobProgram
 	{
-		private const string CompilersFolderName = "Microsoft.Net.Compilers.1.3.2";
-
 		private readonly string address;
 		private readonly string token;
 		private readonly TimeSpan sleep;
 		private readonly int jobsToRequest;
-		private static string pathToCompiler;
 
 		private readonly ManualResetEvent shutdownEvent = new ManualResetEvent(false);
 		private static readonly ILog log = LogManager.GetLogger(typeof(RunCsJobProgram));
+		public readonly SandboxRunnerSettings Settings;
 
 		public RunCsJobProgram(ManualResetEvent externalShutdownEvent=null)
 		{
@@ -35,9 +33,10 @@ namespace RunCsJob
 				token = ConfigurationManager.AppSettings["runnerToken"];
 				sleep = TimeSpan.FromSeconds(int.Parse(ConfigurationManager.AppSettings["sleepSeconds"] ?? "1"));
 				jobsToRequest = int.Parse(ConfigurationManager.AppSettings["jobsToRequest"] ?? "5");
-
-				var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-				pathToCompiler = Path.Combine(baseDirectory, CompilersFolderName);
+				Settings = new SandboxRunnerSettings();
+				var workingDirectory = ConfigurationManager.AppSettings["ulearn.runcsjob.submissionsWorkingDirectory"];
+				if (!string.IsNullOrWhiteSpace(workingDirectory))
+					Settings.WorkingDirectory = new DirectoryInfo(workingDirectory);
 			}
 			catch (Exception e)
 			{
@@ -50,23 +49,27 @@ namespace RunCsJob
 		{
 			XmlConfigurator.Configure();
 
+			var program = new RunCsJobProgram();
 			if (args.Any(x => x.StartsWith("-p:")))
-				pathToCompiler = args.FirstOrDefault(x => x.StartsWith("-p:"))?.Substring(3);
-
+			{
+				var path = args.FirstOrDefault(x => x.StartsWith("-p:"))?.Substring(3);
+				if (path != null)
+					program.Settings.MsBuildSettings.CompilerDirectory = new DirectoryInfo(path);
+			}
 			if (args.Contains("--selfcheck"))
-				SelfCheck(pathToCompiler);
+				program.SelfCheck();
 			else
-				new RunCsJobProgram().Run();
+				program.Run();
 		}
 
 		public void Run()
 		{
-			if (!Directory.Exists(pathToCompiler))
+			if (!Settings.MsBuildSettings.CompilerDirectory.Exists)
 			{
-				log.Error($"Не найдена папка с компиляторами: {pathToCompiler}");
+				log.Error($"Не найдена папка с компиляторами: {Settings.MsBuildSettings.CompilerDirectory}");
 				Environment.Exit(1);
 			}
-			log.Info($"Путь до компиляторов: {pathToCompiler}");
+			log.Info($"Путь до компиляторов: {Settings.MsBuildSettings.CompilerDirectory}");
 
 			AppDomain.MonitoringIsEnabled = true;
 			log.Info($"Отправляю запросы на {address} для получения новых решений");
@@ -81,10 +84,10 @@ namespace RunCsJob
 				log.Error("Не могу создать HTTP-клиента для отправки запроса на ulearn", e);
 				throw;
 			}
-			MainLoop(pathToCompiler, client);
+			MainLoop(client);
 		}
 
-		private void MainLoop(string pathToCompiler, Client client)
+		private void MainLoop(Client client)
 		{
 			while (!shutdownEvent.WaitOne(0))
 			{
@@ -104,7 +107,7 @@ namespace RunCsJob
 
 				if (newUnhandled.Any())
 				{
-					var results = newUnhandled.Select(unhandled => SandboxRunner.Run(unhandled, pathToCompiler)).ToList();
+					var results = newUnhandled.Select(unhandled => SandboxRunner.Run(unhandled, Settings)).ToList();
 					log.Info($"Результаты проверки: [{string.Join(", ", results.Select(r => r.Verdict))}]");
 					try
 					{
@@ -119,14 +122,14 @@ namespace RunCsJob
 			}
 		}
 
-		private static void SelfCheck(string pathToCompiler)
+		private void SelfCheck()
 		{
 			var res = SandboxRunner.Run(new FileRunnerSubmission
 			{
 				Id = Utils.NewNormalizedGuid(),
 				NeedRun = true,
 				Code = "class C { static void Main(){ System.Console.WriteLine(\"Привет мир!\");}}"
-			}, pathToCompiler);
+			}, Settings);
 			log.Info(res);
 		}
 	}

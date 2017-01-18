@@ -41,6 +41,10 @@
       <HintPath>..\packages\CommandLineParser.2.0.119-alpha\lib\net45\CommandLine.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Common.Logging, Version=2.0.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.2.0.0\lib\2.0\Common.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
@@ -67,6 +71,10 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NHttp, Version=0.1.9.0, Culture=neutral, PublicKeyToken=156364e4f7b202d9, processorArchitecture=MSIL">
+      <HintPath>..\packages\NHttp.0.1.9.0\lib\net20\NHttp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -115,7 +123,11 @@
   <ItemGroup>
     <Compile Include="AbstractOptions.cs" />
     <Compile Include="ArchiveManager.cs" />
+    <Compile Include="Monitoring\Monitor.cs" />
+    <Compile Include="Monitoring\PreviewHttpServer.cs" />
+    <Compile Include="Monitoring\SlideRenderer.cs" />
     <Compile Include="MonitorOptions.cs" />
+    <Compile Include="OlxSquasher.cs" />
     <Compile Include="OperationFailedGracefully.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="ConvertOptions.cs" />
@@ -131,6 +143,7 @@
     <Compile Include="PatchOptions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SquashChapters.cs" />
     <Compile Include="TestCourseOptions.cs" />
     <Compile Include="ULearnInteractor.cs" />
     <Compile Include="ULearnOptions.cs" />
@@ -322,10 +335,6 @@
     <ProjectReference Include="..\uLearn.CourseLib\uLearn.CourseLib.csproj">
       <Project>{70f83ad9-235d-4675-8585-608eb089ef94}</Project>
       <Name>uLearn.CourseLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ulearn.CourseMonitor\ulearn.CourseMonitor.csproj">
-      <Project>{4db64ea3-a557-492a-adea-38831df52962}</Project>
-      <Name>ulearn.CourseMonitor</Name>
     </ProjectReference>
     <ProjectReference Include="..\uLearn.Web\uLearn.Web.csproj">
       <Project>{B3701D2E-D001-4E0A-AB2F-7ACB5A89589B}</Project>

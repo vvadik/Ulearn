@@ -136,9 +136,6 @@ namespace uLearn
 						proj => ProjModifier.PrepareForChecking(proj, exercise, excluded))
 				}
 			});
-			var pathToCompiler = Path.Combine(TestContext.CurrentContext.TestDirectory, "Microsoft.Net.Compilers.1.3.2");
-			Console.WriteLine("pathToCompiler = " + pathToCompiler);
-			Assume.That(Directory.Exists(pathToCompiler));
 			var result = SandboxRunner.Run(new ProjRunnerSubmission
 			{
 			    Id = slide.Id.ToString(),
@@ -146,7 +143,7 @@ namespace uLearn
 			    ProjectFileName = exercise.CsprojFileName,
 			    Input = "",
 			    NeedRun = true
-			}, pathToCompiler);
+			});
 
 			Console.WriteLine("Result = " + result);
 			Assert.AreEqual(Verdict.Ok, result.Verdict);
@@ -166,7 +163,7 @@ namespace uLearn
 
 			var result = SandboxRunner.Run(exercise.CreateSubmition(
 			    slide.Id.ToString(),
-			    exercise.EthalonSolution), "");
+			    exercise.EthalonSolution), new SandboxRunnerSettings());
 
 			var output = result.GetOutput().NormalizeEoln();
 

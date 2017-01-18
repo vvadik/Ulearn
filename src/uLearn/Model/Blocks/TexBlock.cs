@@ -31,7 +31,7 @@ namespace uLearn.Model.Blocks
 				urlName,
 				displayName,
 				urlName,
-				string.Join("\n", TexLines.Select(x => "$$" + x + "$$")).GetHtmlWithUrls("/assets").Item1
+				string.Join("\n", TexLines.Select(x => "$$" + x + "$$")).GetHtmlWithUrls("/static").Item1
 				);
 		}
 

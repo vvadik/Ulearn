@@ -6,7 +6,7 @@ using uLearn.Model.Blocks;
 using uLearn.Web.Models;
 using uLearn.Web.Views.Course;
 
-namespace uLearn.CourseTool
+namespace uLearn.CourseTool.Monitoring
 {
 	public class SlideRenderer
 	{
@@ -70,7 +70,8 @@ namespace uLearn.CourseTool
 			{
 				IsInstructor = true,
 				GetUnitInstructionNotesUrl = unitName => GetInstructorNotesFilename(unitName),
-				GetUnitStatisticsUrl = unitName => "404.html"
+				GetUnitStatisticsUrl = unitName => "404.html",
+				IsSlideHidden = s => false
 			};
 			return builder.CreateTocModel();
 		}

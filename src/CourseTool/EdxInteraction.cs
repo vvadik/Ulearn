@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using Newtonsoft.Json;
@@ -41,15 +42,26 @@ namespace uLearn.CourseTool
 			Download(edxStudioUrl, credentials.Email, credentials.GetPassword(), config.Organization, config.CourseNumber, config.CourseRun, baseDir + "/" + config.ULearnCourseId + ".tar.gz");
 		}
 
-		public static void ExtractEdxCourseArchive(string baseDir, string courseId)
+		public static string GetTarGzFile(string dir)
 		{
-			var filename = baseDir + "/" + courseId + ".tar.gz";
+			var archives = dir.GetFiles("*.tar.gz");
+			if (archives.Length == 1)
+				return archives[0];
+			throw new Exception($"Can't decide which archive to extract! Remove all other tar.gz files. Found: {string.Join(", ", archives)}");
+		}
+
+		public static void ExtractEdxCourseArchive(string baseDir, string tarGzFilepath)
+		{
+			var filename = tarGzFilepath;
 			Console.WriteLine($"Extracting {filename}");
-			
-			ArchiveManager.ExtractTar(filename, baseDir);
-			Utils.DeleteFileIfExists(filename);
+
+			var extractedTarDirectory = Path.Combine(baseDir, ".extracted-" + Path.GetFileName(filename).Replace(".tar.gz", ""));
+			ArchiveManager.ExtractTar(filename, extractedTarDirectory);
+			//Utils.DeleteFileIfExists(filename);
+			var extractedOlxDirectory = Directory.GetDirectories(extractedTarDirectory).Single();
 			Utils.DeleteDirectoryIfExists(baseDir + "/olx");
-			Directory.Move(baseDir + "/course", baseDir + "/olx");
+			Directory.Move(extractedOlxDirectory, baseDir + "/olx");
+			Directory.Delete(extractedTarDirectory);
 		}
 
 		private static void Upload(string edxStudioUrl, string email, string password, string organization, string course, string time, string filename)

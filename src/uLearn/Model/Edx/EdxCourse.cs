@@ -36,7 +36,7 @@ namespace uLearn.Model.Edx
 			UrlName = courseId;
 			Organization = organization;
 			CourseWithChapters = new CourseWithChapters(courseId, courseTitle, advancedModules, ltiPassports, true, chapters);
-			StaticFiles = Directory.GetFiles($"{Utils.GetRootDirectory()}/assets");
+			StaticFiles = Directory.GetFiles($"{Utils.GetRootDirectory()}/static");
 		}
 
 		private void CreateDirectories(string rootDir, params string[] subDirs)
@@ -49,9 +49,9 @@ namespace uLearn.Model.Edx
 
 		public void Save(string folderName)
 		{
-			CreateDirectories(folderName, "assets", "course", "chapter", "sequential", "vertical", "video", "html", "lti", "problem");
+			CreateDirectories(folderName, "static", "course", "chapter", "sequential", "vertical", "video", "html", "lti", "problem");
 			foreach (var file in StaticFiles)
-				File.Copy(file, $"{folderName}/assets/{Path.GetFileName(file)}", true);
+				File.Copy(file, $"{folderName}/static/{Path.GetFileName(file)}", true);
 
 			var courseFile = $"{folderName}/course.xml";
 			if (File.Exists(courseFile))
@@ -65,7 +65,7 @@ namespace uLearn.Model.Edx
 		public static EdxCourse Load(string folderName)
 		{
 			var course = new FileInfo($"{folderName}/course.xml").DeserializeXml<EdxCourse>();
-			course.StaticFiles = Directory.GetFiles($"{folderName}/assets");
+			course.StaticFiles = $"{folderName}/static".GetFiles();
 			course.CourseWithChapters = CourseWithChapters.Load(folderName, course.UrlName);
 			return course;
 		}
@@ -96,8 +96,6 @@ namespace uLearn.Model.Edx
 			}
 		}
 
-
-
 		public Sequential GetSequentialContainingVertical(string verticalId)
 		{
 			var sequentials = CourseWithChapters.Chapters.SelectMany(
@@ -107,6 +105,11 @@ namespace uLearn.Model.Edx
 					string.Format("Vertical {0} are in several sequentials {1}",
 					verticalId,
 					string.Join(", ", sequentials.Select(s => s.UrlName))));
+			if (sequentials.Count == 0)
+				throw new Exception(
+					string.Format("Vertical {0} are not in any sequential!",
+					verticalId));
+
 			return sequentials.Single();
 		}
 

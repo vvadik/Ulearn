@@ -10,10 +10,7 @@ namespace uLearn.Model.Edx
 	public class Chapter : EdxItem
 	{
 		[XmlIgnore]
-		public override string SubfolderName
-		{
-			get { return "chapter"; }
-		}
+		public override string SubfolderName => "chapter";
 
 		[XmlAttribute("start")]
 		public string StartDateAsString { get; set; }
@@ -22,7 +19,7 @@ namespace uLearn.Model.Edx
 		public DateTime? Start
 		{
 			get { return StartDateAsString == null ? null : (DateTime?)DateTime.Parse(StartDateAsString, CultureInfo.InvariantCulture); }
-			set { StartDateAsString = value.HasValue ? value.Value.ToString("O") : null; }
+			set { StartDateAsString = value?.ToString("O"); }
 		}
 
 		[XmlElement("sequential")]

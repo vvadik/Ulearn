@@ -11,7 +11,7 @@ namespace uLearn.Model.Edx
 	public class CourseWithChapters : EdxItem
 	{
 		[XmlIgnore]
-		public override string SubfolderName { get { return "course"; } }
+		public override string SubfolderName => "course";
 
 		[XmlAttribute("advanced_modules")]
 		public string AdvancedModules;
@@ -23,13 +23,23 @@ namespace uLearn.Model.Edx
 		public bool UseLatexCompiler;
 
 		[XmlElement("chapter")]
-		public ChapterReference[] ChapterReferences { get; set; }
+		public ChapterReference[] ChapterReferences
+		{
+			get
+			{
+				return chapterReferences = chapterReferences ?? new ChapterReference[0];
+			}
+			set { chapterReferences = value; }
+		}
 
 		[XmlIgnore]
 		public Chapter[] Chapters;
 
+		private ChapterReference[] chapterReferences;
+
 		public CourseWithChapters()
 		{
+			ChapterReferences = new ChapterReference[0];
 		}
 
 		public CourseWithChapters(string urlName, string displayName, string[] advancedModules, string[] ltiPassports, bool useLatexCompiler, Chapter[] chapters)
@@ -65,12 +75,12 @@ namespace uLearn.Model.Edx
 					elem.SetAttribute("url_name", chapter.UrlName);
 					root.AppendChild(elem);
 				}
-				Console.WriteLine(doc.XmlSerialize());
+				//Console.WriteLine(doc.XmlSerialize());
 
 				File.WriteAllText(courseFile, doc.XmlSerialize());
 				SaveAdditional(folderName);
 			}
-			else 
+			else
 				base.Save(folderName);
 		}
 
@@ -85,6 +95,8 @@ namespace uLearn.Model.Edx
 			try
 			{
 				var courseWithChapters = new FileInfo(string.Format("{0}/course/{1}.xml", folderName, urlName)).DeserializeXml<CourseWithChapters>();
+				if (courseWithChapters.ChapterReferences == null)
+					courseWithChapters.ChapterReferences = new ChapterReference[0];
 				courseWithChapters.UrlName = urlName;
 				courseWithChapters.Chapters = courseWithChapters.ChapterReferences.Select(x => Chapter.Load(folderName, x.UrlName)).ToArray();
 				return courseWithChapters;

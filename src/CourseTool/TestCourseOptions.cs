@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using CommandLine;
+using RunCsJob;
 
 namespace uLearn.CourseTool
 {
@@ -27,7 +28,7 @@ namespace uLearn.CourseTool
 				Console.WriteLine("Only slide " + SlideId);
 			}
 			
-			var validator = new CourseValidator(slides, AppDomain.CurrentDomain.BaseDirectory);
+			var validator = new CourseValidator(slides, new SandboxRunnerSettings());
 			validator.InfoMessage += m => Write(ConsoleColor.Gray, m);
 			var errors = new List<string>();
 			validator.Error += m => {

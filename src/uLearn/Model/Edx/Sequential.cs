@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Security.Policy;
@@ -10,19 +11,17 @@ namespace uLearn.Model.Edx
 	public class Sequential : EdxItem
 	{
 		[XmlIgnore]
-		public override string SubfolderName
-		{
-			get { return "sequential"; }
-		}
+		public override string SubfolderName => "sequential";
 
 		private VerticalReference[] verticalReferences;
 
 		[XmlElement("vertical")]
 		public VerticalReference[] VerticalReferences {
-			get { return verticalReferences ?? new VerticalReference[0]; }
+			get { return verticalReferences = verticalReferences ?? new VerticalReference[0]; }
 			set { verticalReferences = value; } }
 
 		[XmlAttribute("visible_to_staff_only")]
+		[DefaultValue(false)]
 		public bool VisibleToStaffOnly { get; set; }
 
 
