@@ -1506,7 +1506,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Views\Certificates\Certificate.cshtml" />
-    <None Include="Views\Admin\Certificates.cshtml" />
+    <Content Include="Views\Admin\Certificates.cshtml" />
     <Content Include="Views\Certificates\List.cshtml" />
   </ItemGroup>
   <ItemGroup>
