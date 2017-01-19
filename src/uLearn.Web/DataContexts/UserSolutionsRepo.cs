@@ -123,7 +123,7 @@ namespace uLearn.Web.DataContexts
 			return Tuple.Create(likesCount, !votedAlready);
 		}
 
-		public IEnumerable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds)
+		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds)
 		{
 			return db.UserExerciseSubmissions
 				.Include(s => s.ManualCheckings)
@@ -133,7 +133,7 @@ namespace uLearn.Web.DataContexts
 				);
 		}
 
-		public IEnumerable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
+		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
 		{
 			return GetAllSubmissions(courseId, slidesIds)
 				.Where(x => 
@@ -142,27 +142,27 @@ namespace uLearn.Web.DataContexts
 				);
 		}
 
-		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
+		public IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
 		{
 			return GetAllSubmissions(courseId, slidesIds, periodStart, periodFinish).Where(s => s.AutomaticCheckingIsRightAnswer);
 		}
 
-		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId, IEnumerable<Guid> slidesIds)
+		public IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId, IEnumerable<Guid> slidesIds)
 		{
 			return GetAllSubmissions(courseId, slidesIds).Where(s => s.AutomaticCheckingIsRightAnswer);
 		}
 
-		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSubmissionsByUser(string courseId, IEnumerable<Guid> slideIds, string userId)
+		public IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissionsByUser(string courseId, IEnumerable<Guid> slideIds, string userId)
 		{
 			return GetAllAcceptedSubmissions(courseId, slideIds).Where(s => s.UserId == userId);
 		}
 		
-		public IEnumerable<UserExerciseSubmission> GetAllAcceptedSubmissionsByUser(string courseId, Guid slideId, string userId)
+		public IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissionsByUser(string courseId, Guid slideId, string userId)
 		{
 			return GetAllAcceptedSubmissionsByUser(courseId, new List<Guid> { slideId }, userId);
 		}
 
-		public IEnumerable<UserExerciseSubmission> GetAllSubmissionsByUser(string courseId, Guid slideId, string userId)
+		public IQueryable<UserExerciseSubmission> GetAllSubmissionsByUser(string courseId, Guid slideId, string userId)
 		{
 			return GetAllSubmissions(courseId, new List<Guid> { slideId }).Where(s => s.UserId == userId);
 		}
@@ -224,7 +224,7 @@ namespace uLearn.Web.DataContexts
 				.Distinct());
 		}
 
-		public IEnumerable<UserExerciseSubmission> GetAllSubmissions(int max, int skip)
+		public IQueryable<UserExerciseSubmission> GetAllSubmissions(int max, int skip)
 		{
 			return db.UserExerciseSubmissions
 				.OrderByDescending(x => x.Timestamp)
