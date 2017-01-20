@@ -456,6 +456,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Info", new { user.UserName });
 		}
 
+		[AllowAnonymous]
 		public ActionResult UserMenuPartial()
 		{
 			var isAuthenticated = Request.IsAuthenticated;
