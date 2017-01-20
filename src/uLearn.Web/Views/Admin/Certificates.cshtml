@@ -32,9 +32,9 @@
 		}
 	}
 
-	@foreach (var template in Model.Templates.Values)
+	@foreach (var template in Model.Templates.Values.OrderByDescending(t => t.Timestamp))
 	{
-		<div class="certificate-template">
+		<div class="certificate-template" id="template-@template.Id">
 			<h3 class="certificate-template__title">
 				@if (canEditTemplates)
 				{

@@ -751,7 +751,9 @@ namespace uLearn.Web.Controllers
 
 			var certificate = await certificatesRepo.AddCertificate(templateId, userId, User.Identity.GetUserId(), certificateParameters, isPreview);
 
-			return RedirectToRoute("Certificate", new { certificateId = certificate.Id });
+			if (isPreview)
+				return RedirectToRoute("Certificate", new { certificateId = certificate.Id });
+			return Redirect(Url.Action("Certificates", new { courseId }) + "#template-" + templateId);
 		}
 
 		private Dictionary<string, string> GetCertificateParametersFromRequest(CertificateTemplate template)
