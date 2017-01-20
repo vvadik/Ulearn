@@ -1,12 +1,13 @@
-﻿@using Microsoft.AspNet.Identity
-@using uLearn.Web.Extensions
+﻿@model UserMenuPartialViewModel
 
-@if (Request.IsAuthenticated)
+@using Microsoft.AspNet.Identity
+
+@if (Model.IsAuthenticated)
 {
 	using (Html.BeginForm("LogOff", "Login", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
 	{
 		@Html.AntiForgeryToken()
-		var profileMenuTitle = User.Identity.GetUserVisibleName();
+		var profileMenuTitle = Model.UserVisibleName;
 		if (string.IsNullOrEmpty(profileMenuTitle))
 		{
 			profileMenuTitle = "Меню";
@@ -17,11 +18,11 @@
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">@profileMenuTitle <span class="caret"></span></a>
 				<ul class="dropdown-menu">
 					<li>@Html.ActionLink("Профиль", "Manage", "Account", null, new { title = "Редактировать профиль" })</li>
-					<li>@Html.ActionLink("Сертификаты", "Index", "Certificates", new { userId = User.Identity.GetUserId() }, new {})</li>
+					<li>@Html.ActionLink("Сертификаты", "Index", "Certificates", new { userId = User.Identity.GetUserId() }, new { })</li>
 					<li><a href="#" onclick="document.getElementById('logoutForm').submit(); return false;">Выход</a></li>
 				</ul>
 			</li>
-			
+
 		</ul>
 	}
 }

@@ -128,4 +128,10 @@ namespace uLearn.Web.Models
 		public List<Course> UserCourses { get; set; }
 		public List<Certificate> Certificates { get; set; }
 	}
+
+	public class UserMenuPartialViewModel
+	{
+		public bool IsAuthenticated { get; set; }
+		public string UserVisibleName { get; set; }
+	}
 }

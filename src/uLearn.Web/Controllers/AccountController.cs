@@ -455,5 +455,17 @@ namespace uLearn.Web.Controllers
 			await userManager.AddPasswordAsync(userId, newPassword);
 			return RedirectToAction("Info", new { user.UserName });
 		}
+
+		public ActionResult UserMenuPartial()
+		{
+			var isAuthenticated = Request.IsAuthenticated;
+			var user = userManager.FindById(User.Identity.GetUserId());
+			var userVisibleName = isAuthenticated ? user.VisibleName : "";
+			return PartialView(new UserMenuPartialViewModel
+			{
+				IsAuthenticated = isAuthenticated,
+				UserVisibleName = userVisibleName,
+			});
+		}
 	}
 }

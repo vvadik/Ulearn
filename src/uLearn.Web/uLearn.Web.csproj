@@ -1408,7 +1408,6 @@
     <Content Include="Views\Login\Index.cshtml" />
     <Content Include="Views\Account\Manage.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
-    <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Course\Slide.cshtml" />
     <Content Include="Views\SlideNavigation\PrevNextButtons.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
@@ -1508,6 +1507,7 @@
     <Content Include="Views\Certificates\Certificate.cshtml" />
     <Content Include="Views\Admin\Certificates.cshtml" />
     <Content Include="Views\Certificates\List.cshtml" />
+    <Content Include="Views\Account\UserMenuPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
