@@ -112,20 +112,20 @@
 	<xs:complexType name="Exercise">
 		<xs:complexContent>
 			<xs:extension base="IncludeCode">
-					<xs:choice minOccurs="0" maxOccurs="unbounded">
-						<xs:element name="startup-object" type="xs:string" minOccurs="1" maxOccurs="1" />
-						<xs:element name="max-score" type="xs:integer" minOccurs="1" maxOccurs="1" />
-						<xs:element name="correctness-score" type="xs:integer" minOccurs="1" maxOccurs="1" />
-						<xs:element name="max-review-attempts" type="xs:integer" minOccurs="1" maxOccurs="1" />
-						<xs:element name="inital-code" type="xs:string" minOccurs="1" maxOccurs="1" />
-						<xs:element name="hint" type="notEmptyString" minOccurs="1" maxOccurs="1" />
-						<xs:element name="comment" type="notEmptyString" minOccurs="1"  maxOccurs="1"/>
-						<xs:element name="expected" type="xs:string" minOccurs="1" maxOccurs="1" />
-						<xs:element name="hide-solutions" type="xs:boolean" minOccurs="1" maxOccurs="1" />
-						<xs:element name="require-review" type="xs:boolean" minOccurs="1" maxOccurs="1" />
-						<xs:element name="hide-expected-output" type="xs:boolean" minOccurs="1" maxOccurs="1" />
-						<xs:element name="validator" type="notEmptyString" minOccurs="1" maxOccurs="1" />
-					</xs:choice>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="startup-object" type="xs:string" minOccurs="1" maxOccurs="1" />
+					<xs:element name="max-score" type="xs:integer" minOccurs="1" maxOccurs="1" />
+					<xs:element name="correctness-score" type="xs:integer" minOccurs="1" maxOccurs="1" />
+					<xs:element name="max-review-attempts" type="xs:integer" minOccurs="1" maxOccurs="1" />
+					<xs:element name="inital-code" type="xs:string" minOccurs="1" maxOccurs="1" />
+					<xs:element name="hint" type="notEmptyString" minOccurs="1" maxOccurs="1" />
+					<xs:element name="comment" type="notEmptyString" minOccurs="1"  maxOccurs="1"/>
+					<xs:element name="expected" type="xs:string" minOccurs="1" maxOccurs="1" />
+					<xs:element name="hide-solutions" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+					<xs:element name="require-review" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+					<xs:element name="hide-expected-output" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+					<xs:element name="validator" type="notEmptyString" minOccurs="1" maxOccurs="1" />
+				</xs:choice>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -146,10 +146,28 @@
 		<xs:complexContent>
 			<xs:extension base="Exercise">
 				<xs:sequence>
-					<xs:element name="csproj-file-path" type="notEmptyString" />
-					<xs:element name="user-code-file-name" type="notEmptyString" />
-					<xs:element name="exclude-path-for-checker" type="notEmptyString" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="exclude-path-for-student " type="notEmptyString" minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="csproj-file-path" type="notEmptyString" >
+						<xs:annotation>
+							<xs:documentation>
+								Путь до csproj-файла относительно директории с xml-файлом описания слайда.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="user-code-file-name" type="notEmptyString" >
+						<xs:annotation>
+							<xs:documentation>
+								Путь относительно директории, в котором лежит csproj-file-path.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="exclude-path-for-checker" type="notEmptyString" minOccurs="0" maxOccurs="unbounded" >
+						<xs:annotation>
+							<xs:documentation>
+								Путь относительно директории, в котором лежит csproj-file-path. Этот файл будет исключён из проекта при сборке для проверки.
+								Обычно это файл с эталонным решением.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 					<xs:element name="require-review" type="xs:boolean" minOccurs="0" maxOccurs="1" />
 				</xs:sequence>
 			</xs:extension>
