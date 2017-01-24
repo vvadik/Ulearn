@@ -1572,4 +1572,8 @@ table.analytics__user-answers {
 .certificates-list__info {
 	padding: 10px 0;
 }
+
+.preview-certificates .select-another-user-block:not(.shown-by-default) {
+    display: none;
+}
 /* End of certificates */

@@ -104,4 +104,73 @@
 		$form.attr('target', '_blank');
 		return true;
 	});
+
+	$('.generate-multiple-certificates-link').click(function () {
+		var $modal = $('#multipleCertificatesGenerationModal');
+		$modal.find('[name=templateId]').val($(this).data('templateId'));
+		$modal.modal();
+	});
+
+	$('.preview-certificates .select-another-user-link').click(function (e) {
+		e.preventDefault();
+
+		var $self = $(this);
+		var $parent = $self.closest('.certificate__user');
+		var $selectUserBlock = $parent.find('.select-another-user-block');
+		$selectUserBlock.find('input').val('');
+		$parent.children().not($selectUserBlock).hide();
+		$selectUserBlock.show();
+	});
+
+	var hideAnotherUserSelection = function($certificateUserBlock) {
+		// TODO: copy-paste with previous method
+		var $selectUserBlock = $certificateUserBlock.find('.select-another-user-block');
+		$certificateUserBlock.children().not($selectUserBlock).show();
+		$selectUserBlock.hide();
+	}
+
+	$('.preview-certificates .cancel-select-another-user-link').click(function(e) {
+		e.preventDefault();
+
+		var $self = $(this);
+		hideAnotherUserSelection($self.closest('.certificate__user'));
+	});
+
+	$('.preview-certificates .select-another-user-input').each(function () {
+		var $self = $(this);
+		var $certificateUserBlock = $self.closest('.certificate__user');
+		var $userIdInput = $certificateUserBlock.find('.user-id');
+		var $userNameDiv = $certificateUserBlock.find('.user-name');
+		var url = $self.data('url');
+		$self.autocomplete({
+			source: url,
+			select: function (event, ui) {
+				var item = ui.item;
+				$userIdInput.val(item.id);
+				$userNameDiv.text(item.value);
+				$certificateUserBlock.find('.select-another-user-predefined-select').remove();
+				$certificateUserBlock.find('.nobody-found').remove();
+
+				hideAnotherUserSelection($certificateUserBlock);
+				return false;
+			}
+		});
+	});
+
+	$('.preview-certificates .select-another-user-predefined-select').change(function(e) {
+		var $self = $(this);
+		var $certificateUserBlock = $self.closest('.certificate__user');
+		var $userIdInput = $certificateUserBlock.find('.user-id');
+		var $userNameDiv = $certificateUserBlock.find('.user-name');
+
+		var $selected = $self.find('option:selected');
+		var userId = $selected.attr('value');
+		var userName = $selected.text();
+		if (userId !== '') {
+			$userIdInput.val(userId);
+			$userNameDiv.text(userName);
+			$certificateUserBlock.find('.select-another-user-predefined-select').remove();
+			hideAnotherUserSelection($certificateUserBlock);
+		}
+	});
 });

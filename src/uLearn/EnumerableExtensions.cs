@@ -60,5 +60,10 @@ namespace System.Linq
 
 			return -1;
 		}
+
+		public static int FindIndex<T>(this IEnumerable<T> items, T element) where T: IEquatable<T>
+		{
+			return FindIndex(items, item => item.Equals(element));
+		}
 	}
 }

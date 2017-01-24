@@ -9,6 +9,8 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using ApprovalUtilities.Reflection;
+using Microsoft.VisualBasic.FileIO;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
@@ -791,6 +793,169 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			return RedirectPermanent($"/Certificates/{template.ArchiveName}.zip");
+		}
+
+		public ActionResult PreviewCertificates(string courseId, Guid templateId, HttpPostedFileBase certificatesData)
+		{
+			const string namesColumnName = "Фамилия Имя";
+
+			var template = certificatesRepo.FindTemplateById(templateId);
+			if (template == null || template.CourseId != courseId)
+				return HttpNotFound();
+
+			var templateParameters = certificatesRepo.GetTemplateParameters(template).ToList();
+
+			var model = new PreviewCertificatesViewModel
+			{
+				CourseId = courseId,
+				Template = template,
+				TemplateParameters = templateParameters,
+				Certificates = new List<PreviewCertificatesCertificateModel>(),
+			};
+
+			if (certificatesData == null || certificatesData.ContentLength <= 0)
+			{
+				return View(model.WithError("Ошибка загрузки файла с данными для сертификатов"));
+			}
+			
+			using (var parser = new TextFieldParser(new StreamReader(certificatesData.InputStream)))
+			{
+				parser.TextFieldType = FieldType.Delimited;
+				parser.SetDelimiters(",");
+				if (parser.EndOfData)
+					return View(model.WithError("Пустой файл? В файле с данными должна присутствовать строка к заголовком"));
+
+				string[] headers;
+				try
+				{
+					headers = parser.ReadFields();
+				}
+				catch (MalformedLineException e)
+				{
+					return View(model.WithError($"Ошибка в файле с данными: в строке {parser.ErrorLineNumber}: \"{parser.ErrorLine}\". {e}"));
+				}
+				var namesColumnIndex = headers.FindIndex(namesColumnName);
+				if (namesColumnIndex < 0)
+					return View(model.WithError($"Одно из полей должно иметь имя \"{namesColumnName}\", в нём должны содержаться фамилия и имя студента. Смотрите пример файла с данными"));
+
+				var parametersIndeces = new Dictionary<string, int>();
+				foreach (var parameter in templateParameters)
+				{
+					parametersIndeces[parameter] = headers.FindIndex(parameter);
+					if (parametersIndeces[parameter] < 0)
+						return View(model.WithError($"Одно из полей должно иметь имя \"{parameter}\", в нём должна содержаться подстановка для шаблона. Смотрите пример файла с данными"));
+				}
+
+				while (!parser.EndOfData)
+				{
+					string[] fields;
+					try
+					{
+						fields = parser.ReadFields();
+					}
+					catch (MalformedLineException e)
+					{
+						return View(model.WithError($"Ошибка в файле с данными: в строке {parser.ErrorLineNumber}: \"{parser.ErrorLine}\". {e}"));
+					}
+					if (fields.Length != headers.Length)
+					{
+						return View(model.WithError($"Ошибка в файле с данными: в строке {parser.ErrorLineNumber}: \"{parser.ErrorLine}\". Количество ячеек в строке не совпадает с количеством столбцов в заголовке"));
+					}
+
+					var userNames = fields[namesColumnIndex];
+
+					var query = new UserSearchQueryModel { NamePrefix = userNames };
+					var users = usersRepo.FilterUsers(query, userManager)
+						.Take(10)
+						.ToList();
+
+					var certificateModel = new PreviewCertificatesCertificateModel
+					{
+						UserNames = userNames,
+						Users = users,
+						Parameters = parametersIndeces.ToDictionary(kv => kv.Key, kv => fields[kv.Value]),
+					};
+					model.Certificates.Add(certificateModel);
+				}
+			}
+
+			return View(model);
+		}
+
+		public async Task<ActionResult> GenerateCertificates(string courseId, Guid templateId)
+		{
+			var template = certificatesRepo.FindTemplateById(templateId);
+			if (template == null || template.CourseId != courseId)
+				return HttpNotFound();
+
+			var templateParameters = certificatesRepo.GetTemplateParameters(template).ToList();
+			var certificateRequests = new List<CertificateRequest>();
+
+			var certificateIndex = 1;
+			while (! string.IsNullOrEmpty(Request.Form.Get($"user-{certificateIndex}")))
+			{
+				var userId = Request.Form.Get($"user-{certificateIndex}");
+				if (string.IsNullOrEmpty(userId))
+				{
+					return View("GenerateCertificatesError", "Не все пользователи выбраны");
+				}
+
+				var parameters = new Dictionary<string, string>();
+				foreach (var parameterName in templateParameters)
+				{
+					var parameterValue = Request.Unvalidated.Form.Get($"parameter-{certificateIndex}-{parameterName}");
+					parameters[parameterName] = parameterValue;
+				}
+
+				certificateRequests.Add(new CertificateRequest
+				{
+					UserId = userId,
+					Parameters = parameters,
+				});
+
+				certificateIndex++;
+			}
+
+			foreach (var certificateRequest in certificateRequests)
+			{
+				await certificatesRepo.AddCertificate(templateId, certificateRequest.UserId, User.Identity.GetUserId(), certificateRequest.Parameters);
+			}
+
+			return Redirect(Url.Action("Certificates", new { courseId }) + "#template-" + templateId);
+		}
+
+	}
+
+	public class CertificateRequest
+	{
+		public string UserId;
+		public Dictionary<string, string> Parameters;
+	}
+
+	public class PreviewCertificatesCertificateModel
+	{
+		public string UserNames { get; set; }
+		public List<UserRolesInfo> Users { get; set; }
+		public Dictionary<string, string> Parameters { get; set; }
+	}
+
+	public class PreviewCertificatesViewModel
+	{
+		public string Error { get; set; }
+		
+		public string CourseId { get; set; }
+		public CertificateTemplate Template { get; set; }
+		public List<string> TemplateParameters { get; set; }
+		public List<PreviewCertificatesCertificateModel> Certificates { get; set; }
+
+		public PreviewCertificatesViewModel WithError(string error)
+		{
+			return new PreviewCertificatesViewModel
+			{
+				CourseId = CourseId,
+				Template = Template,
+				Error = error,
+			};
 		}
 	}
 

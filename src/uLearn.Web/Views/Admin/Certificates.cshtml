@@ -70,10 +70,18 @@
 				@Html.Hidden("templateId", template.Id)
 				@Html.Hidden("isPreview", false)
 				@Html.Hidden("userId")
-				<input type="text"
-					   class="add-certificate-input form-control"
-					   data-url="@Url.Action("FindUsers", "Admin")"
-					   placeholder="Начните вводить имя или фамилию">
+				<div>
+					<input type="text"
+						   class="add-certificate-input form-control ib"
+						   data-url="@Url.Action("FindUsers", "Admin")"
+						   placeholder="Начните вводить имя или фамилию">
+					или
+					<a href="#"
+					   class="generate-multiple-certificates-link internal-page-link"
+					   data-template-id="@template.Id"
+					   >сгенерируйте много сертификатов</a>
+				</div>
+
 				foreach (var parameter in Model.TemplateParameters[template.Id])
 				{
 					<div class="certificate-template__parameter">
@@ -130,8 +138,8 @@
 				}))
 				{
 					@Html.AntiForgeryToken()
-					<input type="hidden" name="courseId" value="@Model.Course.Id" />
-					<input type="hidden" name="templateId" value="" />
+					<input type="hidden" name="courseId" value="@Model.Course.Id"/>
+					<input type="hidden" name="templateId" value=""/>
 
 					<div class="form-group">
 						<input id="name" name="name" type="text" class="form-control" placeholder="Название для шаблона" required="required">
@@ -143,7 +151,7 @@
 						<div class="help-block">
 							<div class="current-archive-download">
 								<a class="current-archive-download-link" href="">Скачать текущий архив</a>.
-								<br />
+								<br/>
 							</div>
 							Архив должен содержать файл index.html. Дополнительно в нём могут быть изображения, стили, шрифты и другие файлы.
 							<br/>
@@ -153,6 +161,63 @@
 
 					<button class="action-button  btn btn-success">Загрузить</button>
 					<button class="remove-template-link  btn btn-danger" data-url="@Url.Action("RemoveCertificateTemplate", "Admin")">Удалить шаблон</button>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade" id="multipleCertificatesGenerationModal" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Выберите файл с данными</h4>
+			</div>
+			<div class="modal-body">
+				@using (Html.BeginForm("PreviewCertificates", "Admin", FormMethod.Post, new
+				{
+					enctype = "multipart/form-data"
+				}))
+				{
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="courseId" value="@Model.Course.Id" />
+					<input type="hidden" name="templateId" value="" />
+
+					<div>
+						<p>
+							Чтобы сгенерировать сразу много сертификатов, подготовьте CSV-файл с данными.
+						</p>
+						<p>
+							Вот пример такого файла:
+							<pre>Фамилия Имя,mark,instructor_notes
+Иванов Иван,отлично,
+Петров Петр,хорошо,Учился неплохо, но мог лучше</pre>
+						</p>
+						<p>
+							В первой строке файла должны находиться заголовки столбцов.
+							Столбец с фамилией и именем студента должен называться «Фамилия Имя».
+							Кроме того, должны существовать столбцы для каждой из подстановки в шаблоне (в данном случае
+							это mark и instructor_notes&nbsp;— на значения из этих столбцов заменятся подстановки
+							%mark% и %instructor_notes% в шаблоне сертификата).
+							<br/><em>Остальные столбцы будут проигнорированы.</em>
+						</p>
+						<p>
+							Кодировка файла&nbsp;— <strong>UTF-8</strong>.
+						</p>
+						<p>
+							Чтобы сгенерировать такой файл из гугл-таблицы, выберите в меню <br/>
+							<strong>Файл → Скачать как → CSV-файл (текущий лист)</strong>
+							/ File → Download as → CSV file (Sheet page)
+						</p>
+					</div>
+
+					<div class="form-group">
+						<input id="certificatesData" name="certificatesData" type="file" required="required" />
+						CSV-файл с данными
+					</div>
+
+					<button class="action-button  btn btn-success">Загрузить</button>
 				}
 			</div>
 		</div>
