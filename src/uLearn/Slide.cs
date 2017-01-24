@@ -13,7 +13,7 @@ namespace uLearn
 		public readonly string Title;
 		public readonly SlideBlock[] Blocks;
 		public readonly SlideInfo Info;
-		public int Index { get { return Info.Index; }}
+		public int Index { get { return Info.Index; } }
 		public readonly Guid Id;
 		public string NormalizedGuid { get { return Utils.GetNormalizedGuid(Id); } }
 		public virtual bool ShouldBeSolved { get { return false; } }
@@ -23,7 +23,7 @@ namespace uLearn
 		{
 			if (Blocks.Length == 0)
 				yield break;
-			var range = new List<SlideBlock> {Blocks[0]};
+			var range = new List<SlideBlock> { Blocks[0] };
 			foreach (var block in Blocks.Skip(1))
 			{
 				if (block.Hide != range.Last().Hide)
@@ -105,24 +105,22 @@ namespace uLearn
 				componentIndex++;
 			}
 
-			var solutionComponents = new List<Component>();
-			foreach (var result in slide.Blocks.OfType<ExerciseBlock>())
-			{
-				var comp = result.GetSolutionsComponent("Решения", 
-					slide, componentIndex, 
-					string.Format(solutionsUrl, courseId, slide.Id), ltiId);
-				solutionComponents.Add(comp);
-				componentIndex++;
-			}
-
 			yield return new Vertical(slide.NormalizedGuid, slide.Title, components.ToArray());
-			if (solutionComponents.Count != 0)
-				yield return new Vertical(slide.NormalizedGuid + "0", "Решения", solutionComponents.ToArray());
+
+			var exerciseWithSolutionsToShow = slide.Blocks.OfType<ExerciseBlock>().FirstOrDefault(e => !e.HideShowSolutionsButton);
+			if (exerciseWithSolutionsToShow != null)
+			{
+				var comp = exerciseWithSolutionsToShow.GetSolutionsComponent(
+					"Решения",
+					slide, componentIndex,
+					string.Format(solutionsUrl, courseId, slide.Id), ltiId);
+				yield return new Vertical(slide.NormalizedGuid + "0", "Решения", new[] { comp });
+			}
 		}
 
 		private static IEnumerable<Vertical> QuizToVerticals(string courseId, QuizSlide slide, string slideUrl, string ltiId)
 		{
-			var ltiComponent = 
+			var ltiComponent =
 				new LtiComponent(slide.Title, slide.NormalizedGuid + "-quiz", string.Format(slideUrl, courseId, slide.Id), ltiId, true, slide.MaxScore, false);
 			yield return new Vertical(slide.NormalizedGuid, slide.Title, new Component[] { ltiComponent });
 		}

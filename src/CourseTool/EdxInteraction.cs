@@ -116,18 +116,8 @@ namespace uLearn.CourseTool
 			Environment.CurrentDirectory = baseDir;
 			var outputTarFilename = $"{courseName}.tar.gz";
 			Console.WriteLine($"Creating archive {outputTarFilename}");
-
-			Utils.DeleteDirectoryIfExists("temp");
-			if (Directory.Exists(courseName))
-				Directory.Move(courseName, "temp");
-			Utils.DirectoryCopy("olx", courseName, true);
 			Utils.DeleteFileIfExists(outputTarFilename);
-
-			ArchiveManager.CreateTar(outputTarFilename, courseName);
-
-			Utils.DeleteDirectoryIfExists(courseName);
-			if (Directory.Exists("temp"))
-				Directory.Move("temp", courseName);
+			ArchiveManager.CreateTar(outputTarFilename, "olx");
 		}
 	}
 }
