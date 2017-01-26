@@ -179,11 +179,12 @@
 						<img src="/Content/loading.gif" />
 					</div>
 					@ExerciseControls(new ExerciseControlsModel(context.Course.Id, (ExerciseSlide)context.Slide)
-				   {
-					   IsCodeEditableAndSendable = true,
-					   DebugView = data.DebugView,
-					   RunSolutionUrl = data.RunSolutionUrl,
-				   })
+					{
+						IsLti = context.IsLti,
+						IsCodeEditableAndSendable = true,
+						DebugView = data.DebugView,
+						RunSolutionUrl = data.RunSolutionUrl,
+					})
 
 					@RunErrors()
 			</div>

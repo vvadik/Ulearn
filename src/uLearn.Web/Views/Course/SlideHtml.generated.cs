@@ -478,11 +478,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</textarea>\r\n\t\t\t\t\t<di
 
 
 WebViewPage.WriteTo(@__razor_helper_writer, ExerciseControls(new ExerciseControlsModel(context.Course.Id, (ExerciseSlide)context.Slide)
-				   {
-					   IsCodeEditableAndSendable = true,
-					   DebugView = data.DebugView,
-					   RunSolutionUrl = data.RunSolutionUrl,
-				   }));
+					{
+						IsLti = context.IsLti,
+						IsCodeEditableAndSendable = true,
+						DebugView = data.DebugView,
+						RunSolutionUrl = data.RunSolutionUrl,
+					}));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\r\n\t\t\t\t\t");
 

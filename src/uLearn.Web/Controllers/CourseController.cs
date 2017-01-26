@@ -242,7 +242,11 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, AbstractManualSlideChecking manualChecking = null, int? exerciseSubmissionId = null, int? groupId = null, bool isLti = false)
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, 
+			AbstractManualSlideChecking manualChecking = null, 
+			int? exerciseSubmissionId = null, 
+			int? groupId = null, 
+			bool isLti = false)
 		{
 			/* ExerciseController will fill blockDatas later */
 			var blockData = slide.Blocks.Select(b => (dynamic)null).ToArray();

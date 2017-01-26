@@ -132,6 +132,7 @@
 				var acceptedSolutionsAction = Model.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", acceptedSolutionsUrl);
 				@SlideHtml.ExerciseControls(new ExerciseControlsModel(Model.CourseId, Model.Slide)
 				{
+					IsLti = Model.IsLti,
 					IsCodeEditableAndSendable = Model.SubmissionSelectedByUser == null,
 					CanShowOutput = Model.SubmissionSelectedByUser != null,
 					IsShowOutputButtonActive = Model.ShowOutputImmediately,
