@@ -366,6 +366,8 @@ namespace uLearn
 			var tempFileName = Path.GetTempFileName();
 			try
 			{
+				if (!lockFile.Directory.Exists)
+					lockFile.Directory.Create();
 				new FileInfo(tempFileName).MoveTo(lockFile.FullName);
 				return true;
 			}

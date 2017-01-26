@@ -72,7 +72,7 @@ namespace uLearn
 			var fileInfo = di.GetFile(filepath);
 			if (fileInfo.Exists)
 				return File.ReadAllBytes(fileInfo.FullName);
-			throw new Exception("No " + filepath + " in " + di.Name);
+			throw new Exception("No " + filepath + " in " + di.FullName);
 		}
 
 		public static string GetRelativePath(this FileSystemInfo file, string folder)

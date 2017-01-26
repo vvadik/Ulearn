@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using ApprovalTests;
 using ApprovalTests.Reporters;
 using NUnit.Framework;
@@ -9,7 +10,7 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class CsMembersExtractor_should
 	{
-		private readonly DirectoryInfo dir = new DirectoryInfo("tests");
+		private readonly DirectoryInfo dir = new DirectoryInfo(TestContext.CurrentContext.TestDirectory).GetSubdir("tests");
 
 		private string GetRegion(string region, bool onlyBody = false, string fileName = "OverloadedMethods.cs")
 		{

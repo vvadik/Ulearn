@@ -12,7 +12,7 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class CsMembersRemover_should
 	{
-		private readonly DirectoryInfo dir = new DirectoryInfo("tests");
+		private readonly DirectoryInfo dir = new DirectoryInfo(TestContext.CurrentContext.TestDirectory).GetSubdir("tests");
 
 		private string LoadCode(string file = "OverloadedMethods.cs")
 		{

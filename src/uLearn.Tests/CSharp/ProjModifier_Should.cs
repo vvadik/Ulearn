@@ -16,7 +16,7 @@ namespace uLearn.CSharp
 	public class ProjModifier_Should
 	{
 		private Project CreateTestProject() => new Project(TestProjectFilename, null, null, new ProjectCollection());
-		private string TestProjectFilename => "CSharp/TestProject/ProjDir/test.csproj";
+		private string TestProjectFilename => Path.Combine(TestContext.CurrentContext.TestDirectory, "CSharp", "TestProject", "ProjDir", "test.csproj");
 
 		[Test]
 		public void NotChangeFile_OnModify()
