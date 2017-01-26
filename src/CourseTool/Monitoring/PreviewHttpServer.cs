@@ -161,22 +161,30 @@ namespace uLearn.CourseTool.Monitoring
 
 		private byte[] ServeStatic(HttpRequestEventArgs context, string path)
 		{
-			byte[] response;
 			try
 			{
-				response = File.ReadAllBytes(htmlDir + "/" + path);
-				if (path.EndsWith(".css"))
-					context.Response.ContentType = "text/css; charset=utf-8";
-				if (path.EndsWith(".js"))
-					context.Response.ContentType = "application/x-javascript; charset=utf-8";
+				context.Response.ContentType = null;
+				/*
+				Explanation: 
+				Default ContentType in NHttp is text/html. It is better to make browser guess it!
+
+				RFC2616:
+				«Any HTTP/1.1 message containing an entity-body SHOULD include a
+				Content-Type header field defining the media type of that body. If
+				and only if the media type is not given by a Content-Type field, the
+				recipient MAY attempt to guess the media type via inspection of its
+				content and/or the name extension(s) of the URI used to identify the
+				resource. If the media type remains unknown, the recipient SHOULD
+				treat it as type "application/octet-stream"»
+				*/
+				return File.ReadAllBytes(htmlDir + "/" + path);
 			}
 			catch (IOException e)
 			{
 				context.Response.StatusCode = 404;
-				context.Response.Headers["Content-Type"] = "text/plain; charset=utf-8";
-				response = Encoding.UTF8.GetBytes(e.ToString());
+				context.Response.ContentType = "text/plain; charset=utf-8";
+				return Encoding.UTF8.GetBytes(e.ToString());
 			}
-			return response;
 		}
 
 		public void ForceReloadCourse()
