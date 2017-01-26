@@ -91,6 +91,10 @@ p {
 	outline: none;
 }
 
+.min-width-200 { width: 200px; min-width: 200px; }
+.min-width-300 { width: 300px; min-width: 300px; }
+.min-width-400 { width: 400px; min-width: 400px; }
+
 .clipboard-link {
 	cursor: pointer;
 }
@@ -1575,5 +1579,33 @@ table.analytics__user-answers {
 
 .preview-certificates .select-another-user-block:not(.shown-by-default) {
 	display: none;
+}
+
+.preview-certificates .remove-certificate-preview-link,
+.preview-certificates .remove-certificate-preview-link * {
+	color: #933;
+	font-size: 12px;
+}
+
+.preview-certificates .remove-certificate-preview-parameter-link,
+.preview-certificates .remove-certificate-preview-parameter-link * {
+	color: #933;
+	font-size: 10px;
+}
+
+.loading-spinner-template {
+	display: none;
+}
+
+.preview-certificates .loading-spinner img {
+	height: 22px;
+	width: auto;
+}
+
+.generate-certificates-status {
+	padding-top: 10px;
+	max-width: 350px;
+	font-size: 14px;
+	color: #c33;
 }
 /* End of certificates */

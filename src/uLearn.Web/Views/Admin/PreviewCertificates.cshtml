@@ -1,4 +1,5 @@
-﻿@model uLearn.Web.Controllers.PreviewCertificatesViewModel
+﻿@using ApprovalUtilities.Utilities
+@model uLearn.Web.Controllers.PreviewCertificatesViewModel
 
 @{
 	ViewBag.Title = "Предпросмотр сертификатов " + Model.Template.Name;
@@ -17,26 +18,39 @@
 
 	@using (Html.BeginForm("GenerateCertificates", "Admin", new { courseId = Model.CourseId, templateId = Model.Template.Id }))
 	{
-		var certificateIndex = 1;
+		@Html.Hidden("maxCertificateId", Model.Certificates.Count)
+		var certificateIndex = 0;
 
-		<table class="table table-striped  preview-certificates">
+		<div class="loading-spinner loading-spinner-template"><img src="~/Content/loading-ring.gif"/></div>
+
+		<table class="table table-striped  preview-certificates" data-builtin-parameters-value-url="@Url.Action("GetBuiltinCertificateParametersForUser", new { Model.CourseId, templateId = Model.Template.Id, userId = "USER_ID"})">
 			<thead>
 			<tr>
+				<th></th>
 				<th>№</th>
-				<th>Фамилия и Имя</th>
-				<th>Пользователь</th>
-				@foreach (var parameter in Model.TemplateParameters)
+				<th class="min-width-200">Фамилия и Имя</th>
+				<th class="min-width-400">Пользователь</th>
+				@foreach (var parameter in Model.NotBuiltinTemplateParameters)
 				{
 					<th>
 						%@parameter%
 					</th>
+				}
+				@foreach (var parameter in Model.BuiltinTemplateParameters)
+				{
+					<th data-parameter="@parameter">
+						%@parameter%<nobr>
+							<a href="#" class="remove-certificate-preview-parameter-link" title="Не показывать эту подстановку"><i class="glyphicon glyphicon-remove"></i></a>
+						</nobr>
+					</th>  
 				}
 			</tr>
 			</thead>
 			@foreach (var certificate in Model.Certificates)
 			{
 				<tr class="certificate">
-					<td>@certificateIndex</td>
+					<td><a href="#" class="remove-certificate-preview-link" title="Не выдавать сертификат"><i class="glyphicon glyphicon-remove"></i></a></td>
+					<td>@(certificateIndex + 1)</td>
 					<td>@certificate.UserNames</td>
 					<td>
 						@if (certificate.Users.Count == 1)
@@ -99,11 +113,16 @@
 							</div>
 						}
 					</td>
-					@foreach (var parameter in Model.TemplateParameters)
+					@foreach (var parameter in Model.NotBuiltinTemplateParameters)
 					{
 						<td>
 							@certificate.Parameters[parameter]
 							@Html.Hidden("parameter-" + certificateIndex + "-" + parameter, certificate.Parameters[parameter])
+						</td>
+					}
+					@foreach (var parameter in Model.BuiltinTemplateParameters)
+					{
+						<td data-parameter="@parameter">
 						</td>
 					}
 				</tr>
@@ -112,6 +131,9 @@
 			}
 		</table>
 
-		<button class="btn btn-lg btn-success">Генерировать</button>
+		<button class="btn btn-lg btn-success  generate-certificates-button" disabled="disabled">Генерировать</button>
+		<div class="generate-certificates-status">
+			Выберите пользователя для&nbsp;каждого сертификата или&nbsp;нажмите крестик слева от&nbsp;него
+		</div>
 	}
 </div>

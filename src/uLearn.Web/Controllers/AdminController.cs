@@ -9,7 +9,6 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using ApprovalUtilities.Reflection;
 using Microsoft.VisualBasic.FileIO;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -663,7 +662,7 @@ namespace uLearn.Web.Controllers
 			var certificates = certificatesRepo.GetCertificates(courseId);
 			var templateParameters = certificateTemplates.ToDictionary(
 				kv => kv.Key,
-				kv => certificatesRepo.GetTemplateParameters(kv.Value).ToList()
+				kv => certificatesRepo.GetTemplateParametersWithoutBuiltins(kv.Value).ToList()
 			);
 
 			return View(new CertificatesViewModel
@@ -760,7 +759,7 @@ namespace uLearn.Web.Controllers
 
 		private Dictionary<string, string> GetCertificateParametersFromRequest(CertificateTemplate template)
 		{
-			var templateParameters = certificatesRepo.GetTemplateParameters(template);
+			var templateParameters = certificatesRepo.GetTemplateParametersWithoutBuiltins(template);
 			var certificateParameters = new Dictionary<string, string>();
 			foreach (var parameter in templateParameters)
 			{
@@ -803,13 +802,16 @@ namespace uLearn.Web.Controllers
 			if (template == null || template.CourseId != courseId)
 				return HttpNotFound();
 
-			var templateParameters = certificatesRepo.GetTemplateParameters(template).ToList();
+			var notBuiltinTemplateParameters = certificatesRepo.GetTemplateParametersWithoutBuiltins(template).ToList();
+			var builtinTemplateParameters = certificatesRepo.GetBuiltinTemplateParameters(template).ToList();
+			builtinTemplateParameters.Sort();
 
 			var model = new PreviewCertificatesViewModel
 			{
 				CourseId = courseId,
 				Template = template,
-				TemplateParameters = templateParameters,
+				NotBuiltinTemplateParameters = notBuiltinTemplateParameters,
+				BuiltinTemplateParameters = builtinTemplateParameters,
 				Certificates = new List<PreviewCertificatesCertificateModel>(),
 			};
 
@@ -839,7 +841,7 @@ namespace uLearn.Web.Controllers
 					return View(model.WithError($"Одно из полей должно иметь имя \"{namesColumnName}\", в нём должны содержаться фамилия и имя студента. Смотрите пример файла с данными"));
 
 				var parametersIndeces = new Dictionary<string, int>();
-				foreach (var parameter in templateParameters)
+				foreach (var parameter in notBuiltinTemplateParameters)
 				{
 					parametersIndeces[parameter] = headers.FindIndex(parameter);
 					if (parametersIndeces[parameter] < 0)
@@ -869,11 +871,12 @@ namespace uLearn.Web.Controllers
 						.Take(10)
 						.ToList();
 
+					var exportedParameters = parametersIndeces.ToDictionary(kv => kv.Key, kv => fields[kv.Value]);
 					var certificateModel = new PreviewCertificatesCertificateModel
 					{
 						UserNames = userNames,
 						Users = users,
-						Parameters = parametersIndeces.ToDictionary(kv => kv.Key, kv => fields[kv.Value]),
+						Parameters = exportedParameters,
 					};
 					model.Certificates.Add(certificateModel);
 				}
@@ -882,22 +885,23 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 
-		public async Task<ActionResult> GenerateCertificates(string courseId, Guid templateId)
+		public async Task<ActionResult> GenerateCertificates(string courseId, Guid templateId, int maxCertificateId)
 		{
 			var template = certificatesRepo.FindTemplateById(templateId);
 			if (template == null || template.CourseId != courseId)
 				return HttpNotFound();
 
-			var templateParameters = certificatesRepo.GetTemplateParameters(template).ToList();
+			var templateParameters = certificatesRepo.GetTemplateParametersWithoutBuiltins(template).ToList();
 			var certificateRequests = new List<CertificateRequest>();
 
-			var certificateIndex = 1;
-			while (! string.IsNullOrEmpty(Request.Form.Get($"user-{certificateIndex}")))
+			for (var certificateIndex = 0; certificateIndex < maxCertificateId; certificateIndex++)
 			{
 				var userId = Request.Form.Get($"user-{certificateIndex}");
+				if (userId == null)
+					continue;
 				if (string.IsNullOrEmpty(userId))
 				{
-					return View("GenerateCertificatesError", "Не все пользователи выбраны");
+					return View("GenerateCertificatesError", (object) "Не все пользователи выбраны");
 				}
 
 				var parameters = new Dictionary<string, string>();
@@ -912,8 +916,6 @@ namespace uLearn.Web.Controllers
 					UserId = userId,
 					Parameters = parameters,
 				});
-
-				certificateIndex++;
 			}
 
 			foreach (var certificateRequest in certificateRequests)
@@ -924,6 +926,24 @@ namespace uLearn.Web.Controllers
 			return Redirect(Url.Action("Certificates", new { courseId }) + "#template-" + templateId);
 		}
 
+		public async Task<ActionResult> GetBuiltinCertificateParametersForUser(string courseId, Guid templateId, string userId)
+		{
+			var template = certificatesRepo.FindTemplateById(templateId);
+			if (template == null || template.CourseId != courseId)
+				return HttpNotFound();
+
+			var user = await userManager.FindByIdAsync(userId);
+			var instructor = await userManager.FindByIdAsync(User.Identity.GetUserId());
+			var course = courseManager.GetCourse(courseId);
+
+			var builtinParameters = certificatesRepo.GetBuiltinTemplateParameters(template);
+			var builtinParametersValues = builtinParameters.ToDictionary(
+				p => p,
+				p => certificatesRepo.GetTemplateBuiltinParameterForUser(template, course, user, instructor, p)
+			);
+
+			return Json(builtinParametersValues, JsonRequestBehavior.AllowGet);
+		}
 	}
 
 	public class CertificateRequest
@@ -945,8 +965,9 @@ namespace uLearn.Web.Controllers
 		
 		public string CourseId { get; set; }
 		public CertificateTemplate Template { get; set; }
-		public List<string> TemplateParameters { get; set; }
 		public List<PreviewCertificatesCertificateModel> Certificates { get; set; }
+		public List<string> NotBuiltinTemplateParameters { get; set; }
+		public List<string> BuiltinTemplateParameters { get; set; }
 
 		public PreviewCertificatesViewModel WithError(string error)
 		{

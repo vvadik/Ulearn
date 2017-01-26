@@ -3,6 +3,37 @@
 	var $form = $('#createOrUpdateCertificateTemplateModal form');
 	var token = $('input[name="__RequestVerificationToken"]').val();
 
+	var loadBuiltinParametersValuesForUser = function ($certificateRow, userId) {
+		var url = $('.preview-certificates').data('builtinParametersValueUrl');
+		url = url.replace('USER_ID', userId);
+
+		$certificateRow.find('[data-parameter]').each(function() {
+			$(this).text('');
+			$('.loading-spinner-template').clone().removeClass('loading-spinner-template').appendTo($(this)).show();
+		});
+
+		$.getJSON(url, function (data) {
+			for (var parameterName in data)
+				$certificateRow.find('[data-parameter="' + parameterName + '"]').text(data[parameterName]);
+		});
+	}
+
+	var validateIfAllUsersFilled = function () {
+		var allFilled = true;
+		$('.preview-certificates .user-id').each(function() {
+			if ($(this).val() === '')
+				allFilled = false;
+		});
+
+		if (allFilled) {
+			$('.generate-certificates-button').removeAttr('disabled');
+			$('.generate-certificates-status').hide();
+		} else {
+			$('.generate-certificates-button').attr('disabled', 'disabled');
+			$('.generate-certificates-status').show();
+		}
+	}
+
 	$('.create-template-link').click(function (e) {
 		e.preventDefault();
 
@@ -123,7 +154,6 @@
 	});
 
 	var hideAnotherUserSelection = function($certificateUserBlock) {
-		// TODO: copy-paste with previous method
 		var $selectUserBlock = $certificateUserBlock.find('.select-another-user-block');
 		$certificateUserBlock.children().not($selectUserBlock).show();
 		$selectUserBlock.hide();
@@ -146,18 +176,20 @@
 			source: url,
 			select: function (event, ui) {
 				var item = ui.item;
-				$userIdInput.val(item.id);
+				var userId = item.id;
+				$userIdInput.val(userId);
 				$userNameDiv.text(item.value);
 				$certificateUserBlock.find('.select-another-user-predefined-select').remove();
 				$certificateUserBlock.find('.nobody-found').remove();
-
+				loadBuiltinParametersValuesForUser($certificateUserBlock.closest('.certificate'), userId);
+				validateIfAllUsersFilled();
 				hideAnotherUserSelection($certificateUserBlock);
 				return false;
 			}
 		});
 	});
 
-	$('.preview-certificates .select-another-user-predefined-select').change(function(e) {
+	$('.preview-certificates .select-another-user-predefined-select').change(function() {
 		var $self = $(this);
 		var $certificateUserBlock = $self.closest('.certificate__user');
 		var $userIdInput = $certificateUserBlock.find('.user-id');
@@ -170,7 +202,33 @@
 			$userIdInput.val(userId);
 			$userNameDiv.text(userName);
 			$certificateUserBlock.find('.select-another-user-predefined-select').remove();
+			loadBuiltinParametersValuesForUser($certificateUserBlock.closest('.certificate'), userId);
+			validateIfAllUsersFilled();
 			hideAnotherUserSelection($certificateUserBlock);
 		}
 	});
+
+	$('.preview-certificates .remove-certificate-preview-link').click(function(e) {
+		e.preventDefault();
+		$(this).closest('.certificate').remove();
+		validateIfAllUsersFilled();
+	});
+
+	$('.preview-certificates .remove-certificate-preview-parameter-link').click(function(e) {
+		e.preventDefault();
+		var parameter = $(this).closest('th').data('parameter');
+		$('[data-parameter="' + parameter + '"]').remove();
+	});
+
+	var initBuiltinParametersValues = function () {
+		$('.preview-certificates .certificate').each(function () {
+			var $self = $(this);
+			var userId = $self.find('.user-id').val();
+			if (userId)
+				loadBuiltinParametersValuesForUser($self, userId);
+		});
+	}
+
+	initBuiltinParametersValues();
+	validateIfAllUsersFilled();
 });

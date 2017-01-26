@@ -1159,6 +1159,7 @@
     <Content Include="Content\jquery-ui.min.css" />
     <Content Include="Content\jquery.datetimepicker.min.css" />
     <Content Include="Content\likely.css" />
+    <Content Include="Content\loading-ring.gif" />
     <Content Include="Content\loading.gif" />
     <Content Include="Content\logo.png" />
     <Content Include="Content\tablesorter.css" />

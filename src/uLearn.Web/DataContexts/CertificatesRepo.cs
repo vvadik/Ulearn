@@ -200,18 +200,44 @@ namespace uLearn.Web.DataContexts
 				yield break;
 			}
 
-			var parameters = new HashSet<string>();
+			var foundParameters = new HashSet<string>();
 
 			var matches = templateParameterRegex.Matches(File.ReadAllText(indexFile.FullName));
 			foreach (Match match in matches)
 			{
 				var parameter = match.Groups[1].Value;
-				if (!builtInParameters.Contains(parameter) && !parameters.Contains(parameter))
+				if (!foundParameters.Contains(parameter))
 				{
 					yield return parameter;
-					parameters.Add(parameter);
+					foundParameters.Add(parameter);
 				}
 			}
+		}
+
+		public IEnumerable<string> GetTemplateParametersWithoutBuiltins(CertificateTemplate template)
+		{
+			return GetTemplateParameters(template).Where(p => ! builtInParameters.Contains(p)).Distinct();
+		}
+
+		public IEnumerable<string> GetBuiltinTemplateParameters(CertificateTemplate template)
+		{
+			return GetTemplateParameters(template).Where(p => builtInParameters.Contains(p)).Distinct();
+		}
+
+		public string GetTemplateBuiltinParameterForUser(CertificateTemplate template, Course course, ApplicationUser user, ApplicationUser instructor, string parameterName)
+		{
+			var mockCertificate = new Certificate
+			{
+				Id = Guid.Empty,
+				User = user,
+				UserId = user.Id,
+				Instructor = instructor,
+				InstructorId = instructor.Id,
+				Template = template,
+				TemplateId = template.Id,
+				Timestamp = DateTime.Now,
+			};
+			return SubstituteBuiltinParameters($"%{parameterName}|raw%", mockCertificate, course, "<адрес сертификата>");
 		}
 
 		public string RenderCertificate(Certificate certificate, Course course, string certificateUrl)
