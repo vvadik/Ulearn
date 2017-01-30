@@ -29,6 +29,9 @@ namespace uLearn.Quizes
 		[XmlAttribute("manualCheck")]
 		public bool ManualCheck;
 
+		[XmlAttribute("scoringGroup")]
+		public string ScoringGroup;
+
 		[XmlElement("title")]
 		public string Title;
 

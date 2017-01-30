@@ -6,8 +6,8 @@ namespace uLearn.Web.Models
 	public class UnitStatisticPageModel
 	{
 		public string CourseId { get; set; }
-		public string UnitName { get; set; }
-		public List<string> UnitsNames { get; set; }
+		public Unit Unit { get; set; }
+		public List<Unit> Units { get; set; }
 		public string GroupId { get; set; }
 		public List<Group> Groups { get; set; }
 

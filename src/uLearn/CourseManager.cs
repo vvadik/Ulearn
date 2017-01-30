@@ -286,11 +286,11 @@ namespace uLearn
 			{
 				if (zip.ContainsEntry("Course.xml"))
 					UpdateXmlElement(zip["Course.xml"], "//course:Course/course:title", courseId, zip, nsResolver);
-				foreach (var entry in zip.SelectEntries("name = *.lesson.xml").Where(entry => CourseLoader.IsSlideFile(Path.GetFileName(entry.FileName))))
+				foreach (var entry in zip.SelectEntries("name = *.lesson.xml").Where(entry => UnitLoader.IsSlideFile(Path.GetFileName(entry.FileName))))
 					UpdateXmlElement(entry, "//lesson:Lesson/lesson:id", Guid.NewGuid().ToString(), zip, nsResolver);
-				foreach (var entry in zip.SelectEntries("name = *.quiz.xml").Where(entry => CourseLoader.IsSlideFile(Path.GetFileName(entry.FileName))))
+				foreach (var entry in zip.SelectEntries("name = *.quiz.xml").Where(entry => UnitLoader.IsSlideFile(Path.GetFileName(entry.FileName))))
 					UpdateXmlAttribute(entry, "//quiz:Quiz", "id", Guid.NewGuid().ToString(), zip, nsResolver);
-				foreach (var entry in zip.SelectEntries("name = *.cs").Where(entry => CourseLoader.IsSlideFile(Path.GetFileName(entry.FileName))))
+				foreach (var entry in zip.SelectEntries("name = *.cs").Where(entry => UnitLoader.IsSlideFile(Path.GetFileName(entry.FileName))))
 					UpdateCsFiles(entry, Guid.NewGuid().ToString(), zip);
 			}
 		}
@@ -470,8 +470,9 @@ namespace uLearn
 
 		private void FixFileReferencesInCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
 		{
-			foreach (var instructorNote in course.InstructorNotes)
+			foreach (var instructorNote in course.Units.Select(u => u.InstructorNote).Where(n => n != null))
 				instructorNote.File = (FileInfo)GetNewPathForFileAfterMoving(instructorNote.File, sourceDirectory, destinationDirectory);
+
 			foreach (var slide in course.Slides)
 			{
 				slide.Info.SlideFile = (FileInfo)GetNewPathForFileAfterMoving(slide.Info.SlideFile, sourceDirectory, destinationDirectory);

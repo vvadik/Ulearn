@@ -3,11 +3,11 @@
 @model uLearn.Web.Controllers.UserUnitStatisticsPageModel
 
 @{
-	ViewBag.Title = Model.User.VisibleName + ", " + Model.UnitName;
+	ViewBag.Title = Model.User.VisibleName + ", " + Model.Unit.Title;
 }
 
 <div class="container">
-	<h2>@Model.User.VisibleName, «@Model.UnitName»</h2>
+	<h2>@Model.User.VisibleName, «@Model.Unit.Title»</h2>
 	<div class="user-submissions">
 		@{
 			var shownAnySubmission = false;

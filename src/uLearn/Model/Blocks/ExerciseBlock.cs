@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 using RunCsJob.Api;
 using uLearn.Model.Edx.EdxComponents;
@@ -48,6 +49,9 @@ namespace uLearn.Model.Blocks
 
 		[XmlElement("max-review-attempts")]
 		public int MaxReviewAttempts { get; set; }
+
+		[XmlElement("scoring-group")]
+		public string ScoringGroup { get; set; }
 
 		public int MaxReviewScore => MaxScore - CorrectnessScore;
 
@@ -117,6 +121,17 @@ namespace uLearn.Model.Blocks
 			return (ExerciseInitialCode ?? "") + '\n'
 					+ string.Join("\n", HintsMd) + '\n'
 					+ (CommentAfterExerciseIsSolved ?? "");
+		}
+
+		protected void CheckScoringGroup(BuildUpContext context)
+		{
+			var scoringGroups = context.CourseSettings.Scoring.Groups.Select(g => g.Id).ToList();
+			if (!string.IsNullOrEmpty(ScoringGroup) && scoringGroups.Contains(ScoringGroup))
+				throw new CourseLoadingException($"Неизвестная группа оценки у задания {context.Lesson.Title}: {ScoringGroup}\n" +
+												 "Возможные значения: " + string.Join(", ", scoringGroups));
+
+			if (string.IsNullOrEmpty(ScoringGroup))
+				ScoringGroup = context.CourseSettings.Scoring.DefaultScoringGroupForExercise;
 		}
 	}
 }

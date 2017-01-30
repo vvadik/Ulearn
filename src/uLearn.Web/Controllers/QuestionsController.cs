@@ -22,7 +22,6 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
-		private readonly UserQuestionsRepo userQuestionsRepo = new UserQuestionsRepo();
 
 		public QuestionsController()
 			: this(WebCourseManager.Instance)
@@ -68,25 +67,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public ActionResult Items(string courseId, string unitName = null)
-		{
-			IQueryable<UserQuestion> questions = db.UserQuestions;
-			if (unitName != null)
-			{
-				var slideIds = courseManager.GetCourse(courseId).Slides.Where(s => s.Info.UnitName == unitName).Select(s => s.Id).ToArray();
-				questions = questions.Where(q => q.CourseId == courseId && slideIds.Contains(q.SlideId));
-			}
-			var result = questions.OrderByDescending(q => q.Time).Take(20).ToList()
-				.Select(q => new QuestionViewModel
-				{
-					Question = q,
-					Slide = courseManager.GetCourse(q.CourseId).GetSlideById(q.SlideId)
-				})
-				.ToList();
-			return PartialView(result);
-		}
-
-		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult ItemsOfUser(string userId, string courseId = null)
 		{
 			IQueryable<UserQuestion> questions = db.UserQuestions.Where(q => q.UserId == userId);
@@ -101,17 +81,6 @@ namespace uLearn.Web.Controllers
 				.Where(m => m.Slide != null)
 				.ToList();
 			return PartialView("Items", result);
-		}
-
-		[HttpPost]
-		[ValidateInput(false)]
-		public async Task<string> AddQuestion(string courseId, Guid slideId, string question)
-		{
-			var user = User.Identity;
-			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
-			if (!string.IsNullOrWhiteSpace(question))
-				await userQuestionsRepo.AddUserQuestion(question, courseId, slide, user.GetUserId(), user.Name, DateTime.Now);
-			return "Success!";
 		}
 	}
 }

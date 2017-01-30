@@ -56,10 +56,11 @@ namespace uLearn.Web.Controllers
 				return RedirectToSlideById(slideGuid);
 			}
 
-			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
+			var course = courseManager.GetCourse(courseId);
+
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			var isGuest = !User.Identity.IsAuthenticated;
 
-			var course = courseManager.GetCourse(courseId);
 			var slide = slideGuid == Guid.Empty ? GetInitialSlideForStartup(courseId, course, visibleUnits) : course.FindSlideById(slideGuid);
 
 			if (slide == null)
@@ -88,13 +89,13 @@ namespace uLearn.Web.Controllers
 			}
 
 			var model = isGuest ?
-				CreateGuestCoursePageModel(course, slide, visibleUnits) :
-				await CreateCoursePageModel(course, slide, visibleUnits, queueItem, version, groupId);
+				CreateGuestCoursePageModel(course, slide) :
+				await CreateCoursePageModel(course, slide, queueItem, version, groupId);
 
 			if (!string.IsNullOrEmpty(Request.QueryString["error"]))
 				model.Error = Request.QueryString["error"];
 
-			if (!visibleUnits.Contains(model.Slide.Info.UnitName))
+			if (!visibleUnits.Contains(model.Slide.Info.Unit))
 				throw new Exception("Slide is hidden " + slideGuid);
 			return View("Slide", model);
 		}
@@ -121,7 +122,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult Slide(string courseId, int slideIndex = -1)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			var slide = slideIndex == -1 ? GetInitialSlideForStartup(courseId, course, visibleUnits) : course.Slides[slideIndex];
 			return RedirectToRoute("Course.SlideById", new { courseId, slideId = slide.Url });
 		}
@@ -177,19 +178,19 @@ namespace uLearn.Web.Controllers
 			return claim?.Value;
 		}
 
-		private Slide GetInitialSlideForStartup(string courseId, Course course, List<string> visibleUnits)
+		private Slide GetInitialSlideForStartup(string courseId, Course course, List<Unit> visibleUnits)
 		{
 			var userId = User.Identity.GetUserId();
 			var visitedIds = visitsRepo.GetIdOfVisitedSlides(courseId, userId);
-			var visibleSlides = course.Slides.Where(slide => visibleUnits.Contains(slide.Info.UnitName)).OrderBy(slide => slide.Index).ToList();
+			var visibleSlides = visibleUnits.SelectMany(u => u.Slides).ToList();
 			var lastVisited = visibleSlides.LastOrDefault(slide => visitedIds.Contains(slide.Id));
 			if (lastVisited == null)
 				return visibleSlides.First();
 
-			var slides = visibleSlides.Where(slide => lastVisited.Info.UnitName == slide.Info.UnitName).ToList();
+			var unitSlides = lastVisited.Info.Unit.Slides.Where(s => visibleSlides.Contains(s)).ToList();
 
-			var lastVisitedSlide = slides.First();
-			foreach (var slide in slides)
+			var lastVisitedSlide = unitSlides.First();
+			foreach (var slide in unitSlides)
 			{
 				if (visitedIds.Contains(slide.Id))
 					lastVisitedSlide = slide;
@@ -199,7 +200,7 @@ namespace uLearn.Web.Controllers
 			return lastVisitedSlide;
 		}
 
-		private CoursePageModel CreateGuestCoursePageModel(Course course, Slide slide, List<string> visibleUnits)
+		private CoursePageModel CreateGuestCoursePageModel(Course course, Slide slide)
 		{
 			return new CoursePageModel
 			{
@@ -217,7 +218,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private async Task<CoursePageModel> CreateCoursePageModel(Course course, Slide slide, List<string> visibleUnits, AbstractManualSlideChecking manualChecking, int? exerciseSubmissionId = null, int? groupId = null)
+		private async Task<CoursePageModel> CreateCoursePageModel(Course course, Slide slide, AbstractManualSlideChecking manualChecking, int? exerciseSubmissionId = null, int? groupId = null)
 		{
 			var userId = User.Identity.GetUserId();
 
@@ -359,11 +360,12 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public ActionResult InstructorNote(string courseId, string unitName)
+		public ActionResult InstructorNote(string courseId, Guid unitId)
 		{
-			InstructorNote instructorNote = courseManager.GetCourse(courseId).FindInstructorNote(unitName);
+			var course = courseManager.GetCourse(courseId);
+			var instructorNote = course.GetUnitById(unitId).InstructorNote;
 			if (instructorNote == null)
-				return HttpNotFound("no instructor note for this unit");
+				return HttpNotFound("No instructor note for this unit");
 			return View(new IntructorNoteModel(courseId, instructorNote));
 		}
 

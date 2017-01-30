@@ -81,43 +81,40 @@ namespace uLearn.Web.Controllers
 		public ActionResult Units(string courseId)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var appearances = db.Units.Where(u => u.CourseId == course.Id).ToList();
-			var unitAppearances =
-				course.Slides
-					.Select(s => s.Info.UnitName)
-					.Distinct()
-					.Select(unitName => Tuple.Create(unitName, appearances.FirstOrDefault(a => a.UnitName.RemoveBom() == unitName)))
-					.ToList();
+			var appearances = db.UnitAppearances.Where(u => u.CourseId == course.Id).ToList();
+			var unitAppearances = course.Units
+				.Select(unit => Tuple.Create(unit, appearances.FirstOrDefault(a => a.UnitId == unit.Id)))
+				.ToList();
 			return View(new UnitsListViewModel(course.Id, course.Title, unitAppearances, DateTime.Now));
 		}
 
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		public async Task<RedirectToRouteResult> SetPublishTime(string courseId, string unitName, string publishTime)
+		public async Task<RedirectToRouteResult> SetPublishTime(string courseId, Guid unitId, string publishTime)
 		{
 
-			var oldInfo = await db.Units.Where(u => u.CourseId == courseId && u.UnitName == unitName).ToListAsync();
-			db.Units.RemoveRange(oldInfo);
+			var oldInfo = await db.UnitAppearances.Where(u => u.CourseId == courseId && u.UnitId == unitId).ToListAsync();
+			db.UnitAppearances.RemoveRange(oldInfo);
 			var unitAppearance = new UnitAppearance
 			{
 				CourseId = courseId,
-				UnitName = unitName,
+				UnitId = unitId,
 				UserName = User.Identity.Name,
 				PublishTime = DateTime.Parse(publishTime),
 			};
-			db.Units.Add(unitAppearance);
+			db.UnitAppearances.Add(unitAppearance);
 			await db.SaveChangesAsync();
 			return RedirectToAction("Units", new { courseId });
 		}
 
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		public async Task<RedirectToRouteResult> RemovePublishTime(string courseId, string unitName)
+		public async Task<RedirectToRouteResult> RemovePublishTime(string courseId, Guid unitId)
 		{
-			var unitAppearance = await db.Units.FirstOrDefaultAsync(u => u.CourseId == courseId && u.UnitName == unitName);
+			var unitAppearance = await db.UnitAppearances.FirstOrDefaultAsync(u => u.CourseId == courseId && u.UnitId == unitId);
 			if (unitAppearance != null)
 			{
-				db.Units.Remove(unitAppearance);
+				db.UnitAppearances.Remove(unitAppearance);
 				await db.SaveChangesAsync();
 			}
 			return RedirectToAction("Units", new { courseId });
@@ -1017,9 +1014,9 @@ namespace uLearn.Web.Controllers
 		public string CourseId;
 		public string CourseTitle;
 		public DateTime CurrentDateTime;
-		public List<Tuple<string, UnitAppearance>> Units;
+		public List<Tuple<Unit, UnitAppearance>> Units;
 
-		public UnitsListViewModel(string courseId, string courseTitle, List<Tuple<string, UnitAppearance>> units,
+		public UnitsListViewModel(string courseId, string courseTitle, List<Tuple<Unit, UnitAppearance>> units,
 			DateTime currentDateTime)
 		{
 			CourseId = courseId;

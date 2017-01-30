@@ -130,7 +130,7 @@ namespace uLearn.Web.Controllers
 
 		private string GenerateSubmissionName(Slide exerciseSlide)
 		{
-			return $"{User.Identity.Name}: {exerciseSlide.Info.UnitName} - {exerciseSlide.Title}";
+			return $"{User.Identity.Name}: {exerciseSlide.Info.Unit.Title} - {exerciseSlide.Title}";
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]

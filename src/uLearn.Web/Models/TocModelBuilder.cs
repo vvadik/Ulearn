@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using uLearn.Quizes;
 
@@ -12,11 +11,11 @@ namespace uLearn.Web.Models
 		private readonly Func<Slide, int> getSlideMaxScore;
 		private readonly Course course;
 		private readonly Guid? currentSlideId;
-		public Func<string, string> GetUnitStatisticsUrl;
-		public Func<string, string> GetUnitInstructionNotesUrl;
+		public Func<Unit, string> GetUnitStatisticsUrl;
+		public Func<Unit, string> GetUnitInstructionNotesUrl;
 		public Func<Slide, bool> IsSolved = s => false;
 		public Func<Slide, bool> IsVisited = s => false;
-		public Func<string, bool> IsUnitVisible = u => true;
+		public Func<Unit, bool> IsUnitVisible = u => true;
 		public Func<Slide, bool> IsSlideHidden = s => true;
 		public bool IsInstructor;
 
@@ -36,37 +35,35 @@ namespace uLearn.Web.Models
 
 		private TocUnitModel[] CreateUnits()
 		{
-			return course.Slides
-				.Where(s => ! IsSlideHidden(s))
-				.GroupBy(s => s.Info.UnitName)
-				.Where(g => IsUnitVisible(g.Key))
-				.Select(g => CreateUnit(g.Key, g.ToList()))
+			return course.Units
+				.Where(u => u.Slides.Any(s => !IsSlideHidden(s)))
+				.Select(u => CreateUnit(u))
 				.ToArray();
 		}
 
-		private TocUnitModel CreateUnit(string unitName, List<Slide> slides)
+		private TocUnitModel CreateUnit(Unit unit)
 		{
-			var pages = slides.Select(CreatePage).ToList();
+			var pages = unit.Slides.Select(CreatePage).ToList();
 			if (IsInstructor)
 			{
-				if (course.FindInstructorNote(unitName) != null)
+				if (unit.InstructorNote != null)
 					pages.Add(new TocPageInfo
 					{
-						Url = GetUnitInstructionNotesUrl(unitName),
+						Url = GetUnitInstructionNotesUrl(unit),
 						Name = "Заметки преподавателю",
 						PageType = TocPageType.InstructorNotes,
 					});
 				pages.Add(new TocPageInfo
 				{
-					Url = GetUnitStatisticsUrl(unitName),
+					Url = GetUnitStatisticsUrl(unit),
 					Name = "Статистика и успеваемость",
 					PageType = TocPageType.Statistics,
 				});
 			}
 			return new TocUnitModel
 			{
-				IsCurrent = slides.Any(s => s.Id == currentSlideId),
-				UnitName = unitName,
+				IsCurrent = unit.Slides.Any(s => s.Id == currentSlideId),
+				UnitName = unit.Title,
 				Pages = pages
 			};
 		}

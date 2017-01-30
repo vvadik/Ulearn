@@ -30,7 +30,7 @@ namespace uLearn.Web.Controllers
 
 		private TocModel CreateGuestTocModel(Course course, Guid? currentSlideId)
 		{
-			var visibleUnits = unitsRepo.GetVisibleUnits(course.Id, User);
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			var builder = new TocModelBuilder(
 				s => Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = s.Url }),
 				s => 0,
@@ -77,7 +77,7 @@ namespace uLearn.Web.Controllers
 
 		private TocModel CreateTocModel(Course course, Guid? currentSlideId, string userId)
 		{
-			var visibleUnits = unitsRepo.GetVisibleUnits(course.Id, User);
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			var solvedSlidesIds = GetSolvedSlides(course, userId);
 			var visited = visitsRepo.GetIdOfVisitedSlides(course.Id, userId);
 			var scoresForSlides = visitsRepo.GetScoresForSlides(course.Id, userId);
@@ -91,8 +91,8 @@ namespace uLearn.Web.Controllers
 				course,
 				currentSlideId)
 			{
-				GetUnitInstructionNotesUrl = unitName => Url.Action("InstructorNote", "Course", new { courseId = course.Id, unitName }),
-				GetUnitStatisticsUrl = unitName => Url.Action("UnitStatistics", "Analytics", new { courseId = course.Id, unitName }),
+				GetUnitInstructionNotesUrl = unit => Url.Action("InstructorNote", "Course", new { courseId = course.Id, unitId = unit.Id }),
+				GetUnitStatisticsUrl = unit => Url.Action("UnitStatistics", "Analytics", new { courseId = course.Id, unitId = unit.Id }),
 				IsInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor),
 				IsSolved = s => solvedSlidesIds.Contains(s.Id),
 				IsVisited = s => visited.Contains(s.Id),
@@ -112,9 +112,9 @@ namespace uLearn.Web.Controllers
 			var slide = course.GetSlideById(slideId);
 			var userId = User.Identity.GetUserId();
 			var nextIsAcceptedSolutions = !onSolutionsSlide && slide is ExerciseSlide && visitsRepo.IsSkippedOrPassed(slide.Id, userId) && !((ExerciseSlide)slide).Exercise.HideShowSolutionsButton;
-			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
-			var nextSlide = course.Slides.FirstOrDefault(s => s.Index > slide.Index && visibleUnits.Contains(s.Info.UnitName));
-			var prevSlide = course.Slides.LastOrDefault(s => s.Index < slide.Index && visibleUnits.Contains(s.Info.UnitName));
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			var nextSlide = course.Slides.FirstOrDefault(s => s.Index > slide.Index && visibleUnits.Contains(s.Info.Unit));
+			var prevSlide = course.Slides.LastOrDefault(s => s.Index < slide.Index && visibleUnits.Contains(s.Info.Unit));
 			
 			var model = new PrevNextButtonsModel(
 				course, 

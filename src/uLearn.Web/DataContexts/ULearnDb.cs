@@ -76,7 +76,7 @@ namespace uLearn.Web.DataContexts
 		public DbSet<SlideHint> Hints { get; set; }
 		public DbSet<Like> SolutionLikes { get; set; }
 		public DbSet<UserQuiz> UserQuizzes { get; set; }
-		public DbSet<UnitAppearance> Units { get; set; }
+		public DbSet<UnitAppearance> UnitAppearances { get; set; }
 		public DbSet<TextBlob> Texts { get; set; }
 		public DbSet<LtiConsumer> Consumers { get; set; }
 		public DbSet<LtiSlideRequest> LtiRequests { get; set; }

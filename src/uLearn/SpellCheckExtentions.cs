@@ -27,12 +27,16 @@ namespace uLearn
 			var titleErrors = spellchecker.SpellCheckString(course.Title).Select(e => e.ToPrettyString()).ToList();
 			var titleError = ToPrettyMessage("Заголовок курса:", titleErrors);
 
-			var unitsErrors = course.GetUnits().SelectMany(spellchecker.SpellCheckString).Select(e => e.ToPrettyString()).ToList();
-			var unitsError = ToPrettyMessage("Заголовки модулей:", unitsErrors);
+			var unitsTitlesErrors = course.Units
+				.Select(u => u.Title)
+				.SelectMany(spellchecker.SpellCheckString)
+				.Select(e => e.ToPrettyString())
+				.ToList();
+			var unitsTitlesError = ToPrettyMessage("Заголовки модулей:", unitsTitlesErrors);
 
 			var slidesErrors = course.Slides.Select(spellchecker.SpellCheckSlide).Where(s => !string.IsNullOrWhiteSpace(s));
 
-			var res = new List<string> { titleError, unitsError };
+			var res = new List<string> { titleError, unitsTitlesError };
 			res.AddRange(slidesErrors);
 			return res.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
 		}

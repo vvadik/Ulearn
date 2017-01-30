@@ -15,7 +15,7 @@ namespace uLearn.Web.Models
 		public string CourseId { get; set; }
 
 		[Required]
-		public string UnitName { get; set; }
+		public Guid UnitId { get; set; }
 
 		[Required]
 		public string UserName { get; set; }

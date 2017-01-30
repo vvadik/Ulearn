@@ -17,6 +17,9 @@ namespace uLearn
 		[XmlElement("manual-checking")]
 		public bool IsManualCheckingEnabled { get; set; }
 
+		[XmlElement("scoring")]
+		public CourseScoring Scoring { get; set; }
+
 		[XmlIgnore]
 		public string DefaultLanguage
 		{
@@ -43,6 +46,7 @@ namespace uLearn
 
 		public CourseSettings()
 		{
+			Scoring = new CourseScoring();
 		}
 
 		public CourseSettings(string title, Language[] defaultLanguageVersions, PreludeFile[] preludes, string dictionaryFile)
@@ -51,6 +55,7 @@ namespace uLearn
 			DefaultLanguageVersions = defaultLanguageVersions;
 			Preludes = preludes;
 			DictionaryFile = dictionaryFile;
+			Scoring = new CourseScoring();
 		}
 
 		public static CourseSettings Load(DirectoryInfo dir)
@@ -125,5 +130,47 @@ namespace uLearn
 
 		[XmlAttribute("version")]
 		public string Version { get; set; }
+	}
+
+	public class CourseScoring
+	{
+		public CourseScoring()
+		{
+			Groups = new CourseScoringGroup[0];
+		}
+
+		[XmlAttribute("defaultQuiz")]
+		private string defaultScoringGroupForQuiz { get; set; }
+
+		[XmlIgnore]
+		public string DefaultScoringGroupForQuiz =>
+			string.IsNullOrEmpty(defaultScoringGroupForQuiz) ? DefaultScoringGroup : defaultScoringGroupForQuiz;
+
+		[XmlAttribute("defaultExercise")]
+		private string defaultScoringGroupForExercise { get; set; }
+
+		[XmlIgnore]
+		public string DefaultScoringGroupForExercise =>
+			string.IsNullOrEmpty(defaultScoringGroupForExercise) ? DefaultScoringGroup : defaultScoringGroupForExercise;
+
+		[XmlAttribute("default")]
+		public string DefaultScoringGroup { get; set; }
+
+		public CourseScoringGroup[] Groups { get; set; }
+	}
+
+	public class CourseScoringGroup
+	{
+		[XmlAttribute("id")]
+		public string Id { get; set; }
+
+		[XmlAttribute("abbr")]
+		public string Abbreviation { get; set; }
+
+		[XmlAttribute("set_by_instructor")]
+		public bool CanBeSetByInstructor { get; set; }
+
+		[XmlText]
+		public string Name { get; set; }
 	}
 }

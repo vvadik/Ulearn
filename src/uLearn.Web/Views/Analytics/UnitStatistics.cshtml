@@ -48,7 +48,7 @@
 
 		<h1 class="hidden-xs">Аналитика</h1>
 		<h2>
-			@Model.UnitName.TruncateWithEllipsis(25)
+			@Model.Unit.Title.TruncateWithEllipsis(25)
 
 			<small><a href="#filters" class="visible-xs-inline ml10" data-toggle="true"><span class="no-underline glyphicon glyphicon-filter"></span></a></small>
 			<br class="visible-xs"/>
@@ -61,8 +61,8 @@
 
 				<div id="filters" class="hidden-xs-inline">
 					<div class="form-group">
-						@Html.DropDownList("unitName",
-							Model.UnitsNames.Select(name => new SelectListItem { Text = name, Selected = name == Model.UnitName, Value = name }),
+						@Html.DropDownList("unitId",
+							Model.Units.Select(unit => new SelectListItem { Text = unit.Title, Selected = unit == Model.Unit, Value = unit.Id.ToString() }),
 							new { @class = "form-control" })
 					</div>
 
@@ -246,7 +246,7 @@
 						var userVisibleName = userInfo.UserVisibleName != "" ? userInfo.UserVisibleName : userInfo.UserName;
 						<div class="student">
 							<div class="ib" title="@userInfo.UserName">
-								@Html.ActionLink(userVisibleName.TruncateWithEllipsis(25), "UserUnitStatistics", new { courseId = Model.CourseId, unitName = Model.UnitName, userId = userInfo.UserId}, new { title = "Посмотреть статистику пользователя " + userInfo.UserName })
+								@Html.ActionLink(userVisibleName.TruncateWithEllipsis(25), "UserUnitStatistics", new { courseId = Model.CourseId, unitId = Model.Unit.Id, userId = userInfo.UserId}, new { title = "Посмотреть статистику пользователя " + userInfo.UserName })
 							</div>
 							<div class="ib pull-right">
 								<div class="student-progress progress">

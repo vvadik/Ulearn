@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
 using RunCsJob.Api;
 
@@ -49,6 +50,8 @@ namespace uLearn.Model.Blocks
 			IndexToInsertSolution = index;
 			EthalonSolution = extractor.GetRegion(SolutionLabel);
 			ValidatorName = string.Join(" ", LangId, ValidatorName);
+
+			CheckScoringGroup(context);
 
 			yield return this;
 		}

@@ -11,13 +11,13 @@ namespace uLearn
 {
 	public class CourseValidator
 	{
-		private readonly Slide[] slides;
+		private readonly List<Slide> slides;
 		private readonly SandboxRunnerSettings settings;
 
 		public event Action<string> InfoMessage;
 		public event Action<string> Error;
 
-		public CourseValidator(Slide[] slides, SandboxRunnerSettings settings)
+		public CourseValidator(List<Slide> slides, SandboxRunnerSettings settings)
 		{
 			this.slides = slides;
 			this.settings = settings;
@@ -52,7 +52,7 @@ namespace uLearn
 
 		private void LogSlideProcessing(string prefix, Slide slide)
 		{
-			InfoMessage?.Invoke(prefix + " " + slide.Info.UnitName + " - " + slide.Title);
+			InfoMessage?.Invoke(prefix + " " + slide.Info.Unit.Title + " - " + slide.Title);
 		}
 
 		public void ValidateVideos()
@@ -62,7 +62,7 @@ namespace uLearn
 				ReportError("Duplicate videos on slides " + string.Join(", ", g));
 			foreach (var g in videos)
 			{
-				Slide slide = g.First();
+				var slide = g.First();
 				LogSlideProcessing("Validate video", slide);
 				var url = "https://www.youtube.com/oembed?format=json&url=http://www.youtube.com/watch?v=" + g.Key;
 				try
@@ -78,7 +78,7 @@ namespace uLearn
 
 		private void ReportSlideError(Slide slide, string error)
 		{
-			ReportError(slide.Info.UnitName + ": " + slide.Title + ". " + error);
+			ReportError(slide.Info.Unit.Title + ": " + slide.Title + ". " + error);
 		}
 
 		private void ReportError(string message)

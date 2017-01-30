@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using BinaryAnalysis.UnidecodeSharp;
@@ -123,6 +124,15 @@ namespace uLearn
 					result += nonLatinCharsReplacement;
 			}
 			return result;
+		}
+
+		public static Guid ToDeterministicGuid(this string arg)
+		{
+			using (var md5 = MD5.Create())
+			{
+				var hash = md5.ComputeHash(Encoding.Default.GetBytes(arg));
+				return new Guid(hash);
+			}
 		}
 	}
 }

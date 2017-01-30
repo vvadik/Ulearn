@@ -16,7 +16,7 @@ namespace uLearn.CourseTool
 
 		public override void DoExecute()
 		{
-			var ulearnDir = new DirectoryInfo(string.Format("{0}/{1}", Dir, Config.ULearnCourseId));
+			var ulearnDir = new DirectoryInfo($"{Dir}/{Config.ULearnCourseId}");
 			Console.Write("Loading Ulearn course from {0} ... ", ulearnDir.Name);
 			var sw = Stopwatch.StartNew();
 			var course = new CourseLoader().LoadCourse(ulearnDir);
@@ -24,7 +24,7 @@ namespace uLearn.CourseTool
 			var slides = course.Slides;
 			if (SlideId != null)
 			{
-				slides = course.Slides.Where(s => s.Id == Guid.Parse(SlideId)).ToArray();
+				slides = course.Slides.Where(s => s.Id == Guid.Parse(SlideId)).ToList();
 				Console.WriteLine("Only slide " + SlideId);
 			}
 			

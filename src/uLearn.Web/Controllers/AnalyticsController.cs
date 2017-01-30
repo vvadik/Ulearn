@@ -36,21 +36,21 @@ namespace uLearn.Web.Controllers
 		public ActionResult UnitStatistics(UnitStatisticsParams param)
 		{
 			var courseId = param.CourseId;
-			var unitName = param.UnitName;
+			var unitId = param.UnitId;
 			var periodStart = param.PeriodStartDate;
 			var periodFinish = param.PeriodFinishDate;
 
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
 			var course = courseManager.GetCourse(courseId);
-			var units = course.Slides.OrderBy(s => s.Index).Select(s => s.Info.UnitName).Distinct().ToList();
-			if (string.IsNullOrEmpty(unitName))
+			if (! unitId.HasValue)
 				return View("UnitStatisticsList", new UnitStatisticPageModel
 				{
 					CourseId = courseId,
-					UnitsNames = units.ToList(),
+					Units = course.Units,
 				});
-			var slides = course.Slides.Where(s => s.Info.UnitName == unitName).ToList();
+			var selectedUnit = course.GetUnitById(unitId.Value);
+			var slides = selectedUnit.Slides;
 			var slidesIds = slides.Select(s => s.Id).ToList();
 			var quizzes = slides.OfType<QuizSlide>();
 			var exersices = slides.OfType<ExerciseSlide>();
@@ -102,8 +102,8 @@ namespace uLearn.Web.Controllers
 			var model = new UnitStatisticPageModel
 			{
 				CourseId = courseId,
-				UnitName = unitName,
-				UnitsNames = units.ToList(),
+				Units = course.Units,
+				Unit = selectedUnit,
 				GroupId = groupId,
 				Groups = groups,
 
@@ -127,14 +127,15 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 
-		public ActionResult UserUnitStatistics(string courseId, string unitName, string userId)
+		public ActionResult UserUnitStatistics(string courseId, Guid unitId, string userId)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var user = usersRepo.FindUserById(userId);
 			if (user == null)
 				return HttpNotFound();
 
-			var slides = course.Slides.Where(s => s.Info.UnitName == unitName).ToList();
+			var unit = course.GetUnitById(unitId);
+			var slides = unit.Slides;
 			var exercises = slides.OfType<ExerciseSlide>();
 			var acceptedSubmissions = userSolutionsRepo
 				.GetAllAcceptedSubmissionsByUser(courseId, exercises.Select(s => s.Id), userId)
@@ -145,7 +146,7 @@ namespace uLearn.Web.Controllers
 			var model = new UserUnitStatisticsPageModel
 			{
 				Course = course,
-				UnitName = unitName,
+				Unit = unit,
 				User = user,
 				Slides = slides.ToDictionary(s => s.Id),
 				Submissions = acceptedSubmissions.ToList(),
@@ -155,22 +156,24 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 
-		public ActionResult SlideRatings(string courseId, string unitName)
+		public ActionResult SlideRatings(string courseId, Guid unitId)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var slides = course.Slides
-				.Where(s => s.Info.UnitName == unitName).ToArray();
+			var unit = course.GetUnitById(unitId);
+			var slides = unit.Slides.ToArray();
 			var model = GetSlideRateStats(course, slides);
 			return PartialView(model);
 		}
 
-		public ActionResult DailyStatistics(string courseId, string unitName)
+		public ActionResult DailyStatistics(string courseId, Guid? unitId)
 		{
 			IEnumerable<Slide> slides = null;
-			if (courseId != null)
+			if (courseId != null && unitId.HasValue)
 			{
 				var course = courseManager.GetCourse(courseId);
-				slides = course.Slides.Where(s => unitName == null || s.Info.UnitName == unitName);
+
+				var unit = course.GetUnitById(unitId.Value);
+				slides = unit.Slides.ToArray();
 			}
 			var model = GetDailyStatistics(slides);
 			return PartialView(model);
@@ -182,11 +185,11 @@ namespace uLearn.Web.Controllers
 			return View();
 		}
 
-		public ActionResult UsersProgress(string courseId, string unitName, DateTime periodStart)
+		public ActionResult UsersProgress(string courseId, Guid unitId, DateTime periodStart)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var slides = course.Slides
-				.Where(s => s.Info.UnitName == unitName).ToArray();
+			var unit = course.GetUnitById(unitId);
+			var slides = unit.Slides.ToArray();
 			var users = GetUserInfos(slides, periodStart).OrderByDescending(GetRating).ToArray();
 			return PartialView(new UserProgressViewModel
 			{
@@ -365,7 +368,7 @@ namespace uLearn.Web.Controllers
 	public class UnitStatisticsParams
 	{
 		public string CourseId { get; set; }
-		public string UnitName { get; set; }
+		public Guid? UnitId { get; set; }
 		
 		public string PeriodStart { get; set; }
 		public string PeriodFinish { get; set; }
@@ -419,7 +422,7 @@ namespace uLearn.Web.Controllers
 	public class UserUnitStatisticsPageModel
 	{
 		public Course Course { get; set; }
-		public string UnitName { get; set; }
+		public Unit Unit { get; set; }
 		public ApplicationUser User { get; set; }
 		public List<UserExerciseSubmission> Submissions { get; set; }
 		public Dictionary<Guid, Slide> Slides { get; set; }

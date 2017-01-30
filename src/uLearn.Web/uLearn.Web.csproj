@@ -321,6 +321,10 @@
     <Compile Include="Migrations\201701180912464_AddPreviewedCertificates.Designer.cs">
       <DependentUpon>201701180912464_AddPreviewedCertificates.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201701302151207_CreateUnits.cs" />
+    <Compile Include="Migrations\201701302151207_CreateUnits.Designer.cs">
+      <DependentUpon>201701302151207_CreateUnits.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Certificate.cs" />
     <Compile Include="Models\CertificateTemplate.cs" />
     <Compile Include="Models\FilterOptions.cs" />
@@ -874,6 +878,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201701180912464_AddPreviewedCertificates.resx">
       <DependentUpon>201701180912464_AddPreviewedCertificates.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701302151207_CreateUnits.resx">
+      <DependentUpon>201701302151207_CreateUnits.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

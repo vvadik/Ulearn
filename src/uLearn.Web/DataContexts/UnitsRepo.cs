@@ -10,30 +10,34 @@ namespace uLearn.Web.DataContexts
 	public class UnitsRepo
 	{
 		private readonly ULearnDb db;
-		private readonly CourseManager courseManager;
 
-		public UnitsRepo() : this(new ULearnDb(), WebCourseManager.Instance)
+		public UnitsRepo() : this(new ULearnDb())
 		{
 
 		}
 
-		public UnitsRepo(ULearnDb db, CourseManager courseManager)
+		public UnitsRepo(ULearnDb db)
 		{
 			this.db = db;
-			this.courseManager = courseManager;
 		}
 
-		public List<string> GetVisibleUnits(string courseId, IPrincipal user)
+		public List<Unit> GetVisibleUnits(Course course, IPrincipal user)
 		{
-			var canSeeEverything = user.HasAccessFor(courseId, CourseRole.Tester);
+			var canSeeEverything = user.HasAccessFor(course.Id, CourseRole.Tester);
 			if (canSeeEverything)
-				return courseManager.GetCourse(courseId).Slides.Select(s => s.Info.UnitName).Distinct().ToList();
-			return db.Units.Where(u => u.CourseId == courseId && u.PublishTime <= DateTime.Now).Select(u => u.UnitName).ToList();
+				return course.Units;
+
+			var visibleUnitsIds = new HashSet<Guid>(db.UnitAppearances
+				.Where(u => u.CourseId == course.Id && u.PublishTime <= DateTime.Now)
+				.Select(u => u.UnitId));
+			return course.Units.Where(u => visibleUnitsIds.Contains(u.Id)).ToList();
 		}
 
 		public DateTime GetNextUnitPublishTime(string courseId)
 		{
-			return db.Units.Where(u => u.CourseId == courseId && u.PublishTime > DateTime.Now).Select(u => u.PublishTime).Concat(new[] { DateTime.MaxValue }).Min();
+			return db.UnitAppearances.Where(u => u.CourseId == courseId && u.PublishTime > DateTime.Now)
+				.Select(u => u.PublishTime)
+				.Concat(new[] { DateTime.MaxValue }).Min();
 		}
 	}
 }
