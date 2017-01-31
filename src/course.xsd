@@ -18,6 +18,7 @@
 			<xs:element name="language" type="Language" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="prelude" type="Prelude" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="manual-checking" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+			<xs:element name="scoring" type="Scoring" minOccurs="0" maxOccurs="1" />
 		</xs:sequence>
 	</xs:complexType>
 
@@ -36,6 +37,25 @@
 		<xs:simpleContent>
 			<xs:extension base="notEmptyString">
 				<xs:attribute name="language" type="notEmptyString" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="Scoring">
+		<xs:sequence>
+			<xs:element name="group" type="ScoringGroup" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="defaultQuiz" type="notEmptyString" />
+		<xs:attribute name="defaultExercise" type="notEmptyString" />
+		<xs:attribute name="default" type="notEmptyString" />
+	</xs:complexType>
+
+	<xs:complexType name="ScoringGroup">
+		<xs:simpleContent>
+			<xs:extension base="notEmptyString">
+				<xs:attribute name="id" type="notEmptyString" use="required" />
+				<xs:attribute name="abbr" type="notEmptyString" use="required" />
+				<xs:attribute name="set_by_instructor" type="xs:boolean" use="optional" />
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>

@@ -50,6 +50,7 @@
 		<xs:attribute name="id" type="notEmptyString" use="required" />
 		<xs:attribute name="maxDropCount" type="xs:int" use="optional" />
 		<xs:attribute name="manualCheck" type="xs:boolean" use="optional" />
+		<xs:attribute name="scoringGroup" type="notEmptyString" use="optional" />
 	</xs:complexType>
 
 	<xs:complexType name="IsTrueBlock">

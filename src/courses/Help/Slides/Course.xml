@@ -3,8 +3,8 @@
 	<title>Справка для авторов курсов (xml)</title>
 	<language name="cs" version="4.5" />
 	<manual-checking>false</manual-checking>
-    <scoring defaultQuiz="laboratory" defaultExercise="homework" default="laboratory">
-        <group id="laboratory" abbr="ЛЗ">Лабораторные занятия</group>
-        <group id="homework" abbr="ДЗ" set_by_instructor="true">Домашняя работа</group>
-    </scoring>
+	<scoring defaultQuiz="laboratory" defaultExercise="homework" default="laboratory">
+		<group id="laboratory" abbr="ЛЗ">Лабораторные занятия</group>
+		<group id="homework" abbr="ДЗ" set_by_instructor="true">Домашняя работа</group>
+	</scoring>
 </Course>
