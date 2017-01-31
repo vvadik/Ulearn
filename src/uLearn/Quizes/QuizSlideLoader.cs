@@ -16,7 +16,7 @@ namespace uLearn.Quizes
 			var quiz = file.DeserializeXml<Quiz>();
 
 			var scoringGroups = settings.Scoring.Groups.Select(g => g.Id).ToList();
-			if (! string.IsNullOrEmpty(quiz.ScoringGroup) && scoringGroups.Contains(quiz.ScoringGroup))
+			if (! string.IsNullOrEmpty(quiz.ScoringGroup) && ! scoringGroups.Contains(quiz.ScoringGroup))
 				throw new CourseLoadingException($"Неизвестная группа оценки у теста {file.Name}: {quiz.ScoringGroup}\n" + 
 					"Возможные значения: " + string.Join(", ", scoringGroups));
 

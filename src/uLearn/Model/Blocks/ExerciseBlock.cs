@@ -126,7 +126,7 @@ namespace uLearn.Model.Blocks
 		protected void CheckScoringGroup(BuildUpContext context)
 		{
 			var scoringGroups = context.CourseSettings.Scoring.Groups.Select(g => g.Id).ToList();
-			if (!string.IsNullOrEmpty(ScoringGroup) && scoringGroups.Contains(ScoringGroup))
+			if (!string.IsNullOrEmpty(ScoringGroup) && ! scoringGroups.Contains(ScoringGroup))
 				throw new CourseLoadingException($"Неизвестная группа оценки у задания {context.Lesson.Title}: {ScoringGroup}\n" +
 												 "Возможные значения: " + string.Join(", ", scoringGroups));
 

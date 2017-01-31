@@ -57,7 +57,7 @@
 		<div class="analytics__dashboard">
 			@using (Html.BeginForm("UnitStatistics", "Analytics", FormMethod.Get, new { @class="form-inline", id="unit-statistics-filter-form" }))
 			{
-				@Html.Hidden("courseId", Model.CourseId)
+				@Html.Hidden("courseId", Model.Course.Id)
 
 				<div id="filters" class="hidden-xs-inline">
 					<div class="form-group">
@@ -81,7 +81,7 @@
 								new SelectListItem { Text = "Все пользователи", Value = "all", Selected = Model.GroupId == "all" },
 								new SelectListItem { Text = "Мои группы", Value = "", Selected = string.IsNullOrEmpty(Model.GroupId) }
 							};
-							if (User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
+							if (User.HasAccessFor(Model.Course.Id, CourseRole.CourseAdmin))
 							{
 								groupsListItems.Insert(1, new SelectListItem { Text = "Ни в одной группе", Value = "not-in-group", Selected = Model.GroupId == "not-in-group" });
 							}
@@ -129,7 +129,7 @@
 								<span class="navbar-label navbar-label-link glyphicon glyphicon-none"></span>
 							}
 
-							@Html.RouteLink(slide.Title.TruncateWithEllipsis(35), "Course.SlideById", new { Model.CourseId, SlideId = slide.Url }, new { })
+							@Html.RouteLink(slide.Title.TruncateWithEllipsis(35), "Course.SlideById", new { Model.Course.Id, SlideId = slide.Url }, new { })
 							<div class="pull-right">
 								<span class="slide-visits-count">
 									@Model.SlidesVisits.GetOrDefault(slide.Id, new List<Visit>()).Count
@@ -231,6 +231,10 @@
 									<span class="glyphicon glyphicon-edit small-table__title__cell @(isHiddenOnSmallScreens ? "hidden-xs-inline-block" : "")" title="@slide.Title"></span>
 								}
 							}
+							@foreach (var scoringGroup in Model.Course.Settings.Scoring.Groups.Where(g => g.CanBeSetByInstructor))
+							{
+								<span class="small-table__title__cell" title="@scoringGroup.Name">@scoringGroup.Abbreviation</span>
+							}
 						</div>
 					</div>
 
@@ -246,7 +250,7 @@
 						var userVisibleName = userInfo.UserVisibleName != "" ? userInfo.UserVisibleName : userInfo.UserName;
 						<div class="student">
 							<div class="ib" title="@userInfo.UserName">
-								@Html.ActionLink(userVisibleName.TruncateWithEllipsis(25), "UserUnitStatistics", new { courseId = Model.CourseId, unitId = Model.Unit.Id, userId = userInfo.UserId}, new { title = "Посмотреть статистику пользователя " + userInfo.UserName })
+								@Html.ActionLink(userVisibleName.TruncateWithEllipsis(25), "UserUnitStatistics", new { courseId = Model.Course.Id, unitId = Model.Unit.Id, userId = userInfo.UserId}, new { title = "Посмотреть статистику пользователя " + userInfo.UserName })
 							</div>
 							<div class="ib pull-right">
 								<div class="student-progress progress">
@@ -285,7 +289,7 @@
 													visit.Score.ToString(),
 													"UserSolutions",
 													"Analytics",
-													new { courseId = Model.CourseId, slideId = exerciseOrQuiz.Id, userId = userInfo.UserId },
+													new { courseId = Model.Course.Id, slideId = exerciseOrQuiz.Id, userId = userInfo.UserId },
 													new { title = "Посмотреть решения", target = "_blank" })
 											}
 											else

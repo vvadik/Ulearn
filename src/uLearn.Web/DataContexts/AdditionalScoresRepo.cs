@@ -44,9 +44,24 @@ namespace uLearn.Web.DataContexts
 			}
 		}
 
-		public void GetAdditionalScoresForUser(string courseId, string userId)
+		public List<AdditionalScore> GetAdditionalScoresForUser(string courseId, string userId)
 		{
-			var scores = db.AdditionalScores.Where(s => s.CourseId == courseId && s.UserId == userId);
+			return db.AdditionalScores.Where(s => s.CourseId == courseId && s.UserId == userId).ToList();
+		}
+
+		public Dictionary<string, AdditionalScore> GetAdditionalScoresForUser(string courseId, Guid unitId, string userId)
+		{
+			return db.AdditionalScores
+				.Where(s => s.CourseId == courseId && s.UnitId == unitId && s.UserId == userId)
+				.ToDictionary(s => s.ScoringGroupId, s => s);
+		}
+
+		/* Dictionary<(userId, scoringGroupId), additionalScore> */
+		public Dictionary<Tuple<string, string>, AdditionalScore> GetAdditionalScoresForUsers(string courseId, Guid unitId, IEnumerable<string> usersIds)
+		{
+			return db.AdditionalScores
+				.Where(s => s.CourseId == courseId && s.UnitId == unitId && usersIds.Contains(s.UserId))
+				.ToDictionary(s => Tuple.Create(s.UserId, s.ScoringGroupId), s => s);
 		}
 	}
 }

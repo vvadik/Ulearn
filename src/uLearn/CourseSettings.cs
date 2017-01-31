@@ -140,14 +140,14 @@ namespace uLearn
 		}
 
 		[XmlAttribute("defaultQuiz")]
-		private string defaultScoringGroupForQuiz { get; set; }
+		public string defaultScoringGroupForQuiz { get; set; }
 
 		[XmlIgnore]
 		public string DefaultScoringGroupForQuiz =>
 			string.IsNullOrEmpty(defaultScoringGroupForQuiz) ? DefaultScoringGroup : defaultScoringGroupForQuiz;
 
 		[XmlAttribute("defaultExercise")]
-		private string defaultScoringGroupForExercise { get; set; }
+		public string defaultScoringGroupForExercise { get; set; }
 
 		[XmlIgnore]
 		public string DefaultScoringGroupForExercise =>
@@ -156,6 +156,7 @@ namespace uLearn
 		[XmlAttribute("default")]
 		public string DefaultScoringGroup { get; set; }
 
+		[XmlElement("group")]
 		public CourseScoringGroup[] Groups { get; set; }
 	}
 

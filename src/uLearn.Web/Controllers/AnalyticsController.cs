@@ -46,7 +46,7 @@ namespace uLearn.Web.Controllers
 			if (! unitId.HasValue)
 				return View("UnitStatisticsList", new UnitStatisticPageModel
 				{
-					CourseId = courseId,
+					Course = course,
 					Units = course.Units,
 				});
 			var selectedUnit = course.GetUnitById(unitId.Value);
@@ -101,7 +101,7 @@ namespace uLearn.Web.Controllers
 
 			var model = new UnitStatisticPageModel
 			{
-				CourseId = courseId,
+				Course = course,
 				Units = course.Units,
 				Unit = selectedUnit,
 				GroupId = groupId,
