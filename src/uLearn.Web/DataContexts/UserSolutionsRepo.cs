@@ -18,6 +18,7 @@ namespace uLearn.Web.DataContexts
 		private static readonly ILog log = LogManager.GetLogger(typeof(UserSolutionsRepo));
 		private readonly ULearnDb db;
 		private readonly TextsRepo textsRepo = new TextsRepo();
+		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
 		public UserSolutionsRepo() : this(new ULearnDb())
@@ -343,6 +344,10 @@ namespace uLearn.Web.DataContexts
 			var expectedOutput = exerciseSlide?.Exercise.ExpectedOutput.NormalizeEoln();
 			var isRightAnswer = result.Verdict == Verdict.Ok && output.Equals(expectedOutput);
 			var score = isRightAnswer ? exerciseSlide.Exercise.CorrectnessScore : 0;
+
+			/* For skipped slides score is always 0 */
+			if (visitsRepo.IsSkipped(checking.CourseId, checking.SlideId, checking.UserId))
+				score = 0;
 
 			var newChecking = new AutomaticExerciseChecking
 			{
