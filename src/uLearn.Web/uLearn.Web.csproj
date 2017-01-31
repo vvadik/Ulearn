@@ -298,6 +298,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="codemirror\CsCompleterGenerator.cs" />
     <Compile Include="Controllers\CertificatesController.cs" />
+    <Compile Include="DataContexts\AdditionalScoresRepo.cs" />
     <Compile Include="DataContexts\CertificatesRepo.cs" />
     <Compile Include="Extensions\ControllerExtensions.cs" />
     <Compile Include="Controllers\AuthenticationManager.cs" />
@@ -325,6 +326,11 @@
     <Compile Include="Migrations\201701302151207_CreateUnits.Designer.cs">
       <DependentUpon>201701302151207_CreateUnits.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201701310057267_AddAdditionalScores.cs" />
+    <Compile Include="Migrations\201701310057267_AddAdditionalScores.Designer.cs">
+      <DependentUpon>201701310057267_AddAdditionalScores.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\Certificate.cs" />
     <Compile Include="Models\CertificateTemplate.cs" />
     <Compile Include="Models\FilterOptions.cs" />
@@ -881,6 +887,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201701302151207_CreateUnits.resx">
       <DependentUpon>201701302151207_CreateUnits.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701310057267_AddAdditionalScores.resx">
+      <DependentUpon>201701310057267_AddAdditionalScores.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

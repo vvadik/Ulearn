@@ -52,6 +52,10 @@ namespace uLearn
 		public static UnitSettings Load(FileInfo file)
 		{
 			var unitSettings = file.DeserializeXml<UnitSettings>();
+
+			if (string.IsNullOrEmpty(unitSettings.Title))
+				throw new CourseLoadingException($"Заголовок модуля не может быть пустым. Файл {file.FullName}");
+
 			if (string.IsNullOrEmpty(unitSettings.Url))
 				unitSettings.Url = unitSettings.Title.ToLatin();
 

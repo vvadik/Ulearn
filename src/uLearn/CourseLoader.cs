@@ -22,14 +22,25 @@ namespace uLearn
 
 		private static IEnumerable<Unit> LoadUnits(DirectoryInfo dir, CourseSettings settings)
 		{
-			var unitDirs = dir
-				.GetDirectories()
-				.OrderBy(d => d.Name);
+			var unitsDirectories = dir.GetDirectories().OrderBy(d => d.Name);
+
+			var unitsIds = new HashSet<Guid>();
+			var unitsUrls = new HashSet<string>();
 			var slideIndex = 0;
-			foreach (var unitDir in unitDirs)
+			foreach (var unitDirectory in unitsDirectories)
 			{
-				var unit = UnitLoader.Load(unitDir, settings, slideIndex);
+				var unit = UnitLoader.Load(unitDirectory, settings, slideIndex);
+
+				if (unitsIds.Contains(unit.Id))
+					throw new CourseLoadingException($"Ошибка в курсе \"{settings.Title}\". Повторяющийся идентификатор модуля: {unit.Id}. Идентификаторы модулей должны быть уникальными");
+				unitsIds.Add(unit.Id);
+
+				if (unitsUrls.Contains(unit.Url))
+					throw new CourseLoadingException($"Ошибка в курсе \"{settings.Title}\". Повторяющийся url-адрес модуля: {unit.Url}. Url-адреса модулей должны быть уникальными");
+				unitsUrls.Add(unit.Url);
+
 				yield return unit;
+
 				slideIndex += unit.Slides.Count;
 			}
 		}
@@ -48,8 +59,8 @@ namespace uLearn
 					.ToList();
 			if (badSlides.Any())
 				throw new CourseLoadingException(
-					"�������������� ������� (SlideId) ������ ���� �����������.\n" + 
-					"������ � �������������� ����������������:\n" +
+					"Идентификаторы слайдов (SlideId) должны быть уникальными.\n" + 
+					"Слайды с повторяющимися идентификаторами:\n" +
 					string.Join("\n", badSlides.Select(x => string.Join("\n", x))));
 		}
 	}
