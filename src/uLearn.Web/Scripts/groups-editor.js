@@ -8,7 +8,7 @@
 		var $self = $(this);
 		var groupId = $self.data('groupId');
 		$self.autocomplete({
-			source: "/Admin/FindUsers",
+			source: $self.data('url'),
 			select: function (event, ui) {
 				var item = ui.item;
 				$.ajax({

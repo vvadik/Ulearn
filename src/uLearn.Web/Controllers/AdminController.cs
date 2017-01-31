@@ -9,6 +9,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using ApprovalUtilities.Utilities;
 using Microsoft.VisualBasic.FileIO;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -645,14 +646,32 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Groups", new { courseId = group.CourseId });
 		}
 
-		public ActionResult FindUsers(string term)
+		public class UserSearchResultModel
+		{
+			public string id { get; set; }
+			public string value { get; set; }
+		}
+
+		public ActionResult FindUsers(string courseId, string term, bool withGroups=true)
 		{
 			var query = new UserSearchQueryModel { NamePrefix = term };
-			var users = usersRepo.FilterUsers(query, userManager)
-				.Take(10)
-				.Select(ur => new { id=ur.UserId, value=$"{ur.UserVisibleName} ({ur.UserName})" })
-				.ToList();
-			return Json(users, JsonRequestBehavior.AllowGet);
+			var users = usersRepo.FilterUsers(query, userManager).Take(10).ToList();
+			var usersList = users.Select(ur => new UserSearchResultModel
+			{
+				id = ur.UserId,
+				value = $"{ur.UserVisibleName} ({ur.UserName})"
+			}).ToList();
+
+			if (withGroups)
+			{
+				var usersIds = users.Select(u => u.UserId);
+				var groupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, usersIds, User);
+				foreach (var user in usersList)
+					if (groupsNames.ContainsKey(user.id) && !string.IsNullOrEmpty(groupsNames[user.id]))
+						user.value += $": {groupsNames[user.id]}";
+			}
+
+			return Json(usersList, JsonRequestBehavior.AllowGet);
 		}
 
 		public ActionResult Certificates(string courseId)
@@ -819,6 +838,8 @@ namespace uLearn.Web.Controllers
 			{
 				return View(model.WithError("Ошибка загрузки файла с данными для сертификатов"));
 			}
+
+			var allUsersIds = new HashSet<string>();
 			
 			using (var parser = new TextFieldParser(new StreamReader(certificatesData.InputStream)))
 			{
@@ -867,9 +888,7 @@ namespace uLearn.Web.Controllers
 					var userNames = fields[namesColumnIndex];
 
 					var query = new UserSearchQueryModel { NamePrefix = userNames };
-					var users = usersRepo.FilterUsers(query, userManager)
-						.Take(10)
-						.ToList();
+					var users = usersRepo.FilterUsers(query, userManager).Take(10).ToList();
 
 					var exportedParameters = parametersIndeces.ToDictionary(kv => kv.Key, kv => fields[kv.Value]);
 					var certificateModel = new PreviewCertificatesCertificateModel
@@ -878,9 +897,12 @@ namespace uLearn.Web.Controllers
 						Users = users,
 						Parameters = exportedParameters,
 					};
+					allUsersIds.AddAll(users.Select(u => u.UserId));
 					model.Certificates.Add(certificateModel);
 				}
 			}
+
+			model.GroupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, allUsersIds, User);
 
 			return View(model);
 		}
@@ -968,6 +990,7 @@ namespace uLearn.Web.Controllers
 		public List<PreviewCertificatesCertificateModel> Certificates { get; set; }
 		public List<string> NotBuiltinTemplateParameters { get; set; }
 		public List<string> BuiltinTemplateParameters { get; set; }
+		public Dictionary<string, string> GroupsNames { get; set; }
 
 		public PreviewCertificatesViewModel WithError(string error)
 		{

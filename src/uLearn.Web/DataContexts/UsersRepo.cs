@@ -9,47 +9,47 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts
 {
-    public class UsersRepo
-    {
-        private readonly ULearnDb db;
-        private readonly UserRolesRepo userRolesRepo;
+	public class UsersRepo
+	{
+		private readonly ULearnDb db;
+		private readonly UserRolesRepo userRolesRepo;
 
-        public UsersRepo()
-            : this(new ULearnDb())
-        {
-        }
+		public UsersRepo()
+			: this(new ULearnDb())
+		{
+		}
 
-        public UsersRepo(ULearnDb db)
-        {
-            this.db = db;
-            userRolesRepo = new UserRolesRepo(db);
-        }
+		public UsersRepo(ULearnDb db)
+		{
+			this.db = db;
+			userRolesRepo = new UserRolesRepo(db);
+		}
 
-	    public ApplicationUser FindUserById(string id)
-	    {
-		    return db.Users.Find(id);
-	    }
+		public ApplicationUser FindUserById(string id)
+		{
+			return db.Users.Find(id);
+		}
 
-        public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager)
-        {
-            var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
-	        IQueryable<ApplicationUser> users = db.Users;
-	        if (!string.IsNullOrEmpty(query.NamePrefix))
-	        {
-		        var usersIds = GetUsersByNamePrefix(query.NamePrefix).Select(u => u.Id);
-		        users = users.Where(u => usersIds.Contains(u.Id));
-	        }
-	        return users
-                .FilterByRole(role, userManager)
-                .FilterByUserIds(
-                    userRolesRepo.GetListOfUsersWithCourseRole(query.CourseRole, query.CourseId),
-                    userRolesRepo.GetListOfUsersByPrivilege(query.OnlyPrivileged, query.CourseId)
-                )
-                .GetUserRolesInfo(50, userManager);
-        }
+		public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager)
+		{
+			var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
+			IQueryable<ApplicationUser> users = db.Users;
+			if (!string.IsNullOrEmpty(query.NamePrefix))
+			{
+				var usersIds = GetUsersByNamePrefix(query.NamePrefix).Select(u => u.Id);
+				users = users.Where(u => usersIds.Contains(u.Id));
+			}
+			return users
+				.FilterByRole(role, userManager)
+				.FilterByUserIds(
+					userRolesRepo.GetListOfUsersWithCourseRole(query.CourseRole, query.CourseId),
+					userRolesRepo.GetListOfUsersByPrivilege(query.OnlyPrivileged, query.CourseId)
+				)
+				.GetUserRolesInfo(50, userManager);
+		}
 
-	    private const string nameSpace = nameof(UsersRepo);
-	    private const string dbo = nameof(dbo);
+		private const string nameSpace = nameof(UsersRepo);
+		private const string dbo = nameof(dbo);
 
 		[TableValuedFunction(nameof(GetUsersByNamePrefix), nameSpace, Schema = dbo)]
 		// ReSharper disable once MemberCanBePrivate.Global

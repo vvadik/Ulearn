@@ -251,23 +251,23 @@
 							<div class="ib pull-right">
 								<div class="student-progress progress">
 									<div class="progress-bar progress-bar-warning"
-									     style="width: @(100 * (visitedSlidesCountAllTime - visitedSlidesCount) / Model.Slides.Count)%"
+										 style="width: @(100 * (visitedSlidesCountAllTime - visitedSlidesCount) / Model.Slides.Count)%"
 										 title="Посмотрел(а) @((visitedSlidesCountAllTime - visitedSlidesCount).PluralizeInRussian(new RussianPluralizationOptions
-									                         {
-										                         One = "слайд",
-										                         Two = "слайда",
-										                         Five = "слайдов",
-										                         Gender = Gender.Male
+															 {
+																 One = "слайд",
+																 Two = "слайда",
+																 Five = "слайдов",
+																 Gender = Gender.Male
 								})) вне указанного период"></div>
 									<div class="progress-bar progress-bar-success"
-									     style="width: @(100 * visitedSlidesCount / Model.Slides.Count)%"
-									     title="Посмотрел(а) @visitedSlidesCount.PluralizeInRussian(new RussianPluralizationOptions
-									                         {
-										                         One = "слайд",
-										                         Two = "слайда",
-										                         Five = "слайдов",
-										                         Gender = Gender.Male
-									                         }) в указанный период">
+										 style="width: @(100 * visitedSlidesCount / Model.Slides.Count)%"
+										 title="Посмотрел(а) @visitedSlidesCount.PluralizeInRussian(new RussianPluralizationOptions
+															 {
+																 One = "слайд",
+																 Two = "слайда",
+																 Five = "слайдов",
+																 Gender = Gender.Male
+															 }) в указанный период">
 									</div>
 								</div>
 

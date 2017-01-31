@@ -73,7 +73,7 @@
 				<div>
 					<input type="text"
 						   class="add-certificate-input form-control ib"
-						   data-url="@Url.Action("FindUsers", "Admin")"
+						   data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.Course.Id })"
 						   placeholder="Начните вводить имя или фамилию">
 					или
 					<a href="#"

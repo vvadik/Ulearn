@@ -300,10 +300,10 @@ namespace uLearn.Quizes
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
-            throw new NotSupportedException();
-        }
+			throw new NotSupportedException();
+		}
 
-        public OrderingItem[] ShuffledItems()
+		public OrderingItem[] ShuffledItems()
 		{
 			return Items.Shuffle().ToArray();
 		}
@@ -340,10 +340,10 @@ namespace uLearn.Quizes
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
-            throw new NotSupportedException();
-        }
+			throw new NotSupportedException();
+		}
 
-        public override bool HasEqualStructureWith(SlideBlock other)
+		public override bool HasEqualStructureWith(SlideBlock other)
 		{
 			var block = other as MatchingBlock;
 			if (block == null)

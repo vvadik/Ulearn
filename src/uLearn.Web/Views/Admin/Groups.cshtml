@@ -81,7 +81,11 @@
 					{
 						<div>Добавить пользователя:</div>
 					}
-					<input type="text" class="add-user-to-group-input form-control" data-group-id="@group.Id" placeholder="Начните вводить имя или фамилию">
+					<input type="text"
+						   class="add-user-to-group-input form-control"
+						   data-group-id="@group.Id"
+						   data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.CourseId })"
+						   placeholder="Начните вводить имя или фамилию">
 				}
 			</div>
 

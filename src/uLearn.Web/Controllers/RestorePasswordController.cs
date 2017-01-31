@@ -39,7 +39,7 @@ namespace uLearn.Web.Controllers
 
 			if (!users.Any())
 			{
-				answer.Messages.Add(new Message(string.Format("Пользователь {0} не найден", username)));
+				answer.Messages.Add(new Message($"Пользователь {username} не найден"));
 				return View(answer);
 			}
 
@@ -47,7 +47,7 @@ namespace uLearn.Web.Controllers
 			{
 				if (string.IsNullOrWhiteSpace(user.Email))
 				{
-					answer.Messages.Add(new Message(string.Format("У пользователя {0} не указан email", user.UserName)));
+					answer.Messages.Add(new Message($"У пользователя {user.UserName} не указан email"));
 					continue;
 				}
 
@@ -55,12 +55,12 @@ namespace uLearn.Web.Controllers
 
 				if (requestId == null)
 				{
-					answer.Messages.Add(new Message(string.Format("Слишком частые запросы для пользователя {0}. Попробуйте ещё раз через несколько минут", user.UserName)));
+					answer.Messages.Add(new Message($"Слишком частые запросы для пользователя {user.UserName}. Попробуйте ещё раз через несколько минут"));
 					continue;
 				}
 
 				await SendRestorePasswordEmail(requestId, user);
-				answer.Messages.Add(new Message(string.Format("Письмо с инструкцией по восстановлению пароля для пользователя {0} отправлено на Ваш email", user.UserName), false));
+				answer.Messages.Add(new Message($"Письмо с инструкцией по восстановлению пароля для пользователя {user.UserName} отправлено на Ваш email", false));
 			}
 
 			return View(answer);

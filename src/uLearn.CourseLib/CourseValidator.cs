@@ -111,11 +111,11 @@ namespace uLearn
 			});
 			var result = SandboxRunner.Run(new ProjRunnerSubmission
 			{
-			    Id = slide.Id.ToString(),
-			    ZipFileData = bytes,
-			    ProjectFileName = exercise.CsprojFileName,
-			    Input = "",
-			    NeedRun = true
+				Id = slide.Id.ToString(),
+				ZipFileData = bytes,
+				ProjectFileName = exercise.CsprojFileName,
+				Input = "",
+				NeedRun = true
 			});
 			var isOk = result.Verdict.IsOneOf(Verdict.Ok, Verdict.MemoryLimit, Verdict.TimeLimit);
 			if (!isOk)
@@ -139,8 +139,8 @@ namespace uLearn
 			}
 
 			var result = SandboxRunner.Run(exercise.CreateSubmition(
-			    slide.Id.ToString(),
-			    exercise.EthalonSolution), settings);
+				slide.Id.ToString(),
+				exercise.EthalonSolution), settings);
 
 			var output = result.GetOutput().NormalizeEoln();
 

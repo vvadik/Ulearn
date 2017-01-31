@@ -55,16 +55,18 @@
 					<td>
 						@if (certificate.Users.Count == 1)
 						{
+							var user = certificate.Users[0];
 							<div class="certificate__user">
 								@Html.Hidden("user-" + certificateIndex, certificate.Users[0].UserId, new { @class = "user-id" })
 								<span class="user-name">
-									@certificate.Users[0].UserVisibleName (@certificate.Users[0].UserName)
+									@user.UserVisibleName
+									(@user.UserName)@(Model.GroupsNames.ContainsKey(user.UserId) ? ": " + Model.GroupsNames[user.UserId] : "")
 								</span>
 								<a href="#" class="select-another-user-link internal-page-link">другой</a>
 								<div class="select-another-user-block ib">
 									<input type="text"
 										   class="select-another-user-input form-control ib"
-										   data-url="@Url.Action("FindUsers", "Admin")"
+										   data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.CourseId })"
 										   placeholder="Начните вводить имя или фамилию">
 									<a href="#" class="cancel-select-another-user-link internal-page-link">отмена</a>
 								</div>
@@ -79,14 +81,16 @@
 									<option value="">Выберите пользователя</option>
 									@foreach (var user in certificate.Users)
 									{
-										<option value="@user.UserId">@user.UserVisibleName (@user.UserName)</option>
+										<option value="@user.UserId">
+											@user.UserVisibleName (@user.UserName)@(Model.GroupsNames.ContainsKey(user.UserId) ? ": " + Model.GroupsNames[user.UserId] : "")
+										</option>
 									}
 								</select>
 								<a href="#" class="select-another-user-link internal-page-link">другой</a>
 								<div class="select-another-user-block ib">
 									<input type="text"
 										   class="select-another-user-input form-control ib"
-										   data-url="@Url.Action("FindUsers", "Admin")"
+										   data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.CourseId })"
 										   placeholder="Начните вводить имя или фамилию">
 									<a href="#" class="cancel-select-another-user-link internal-page-link">отмена</a>
 								</div>
@@ -107,7 +111,7 @@
 								<div class="select-another-user-block shown-by-default">
 									<input type="text"
 										   class="select-another-user-input form-control ib"
-										   data-url="@Url.Action("FindUsers", "Admin")"
+										   data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.CourseId })"
 										   placeholder="Начните вводить имя или фамилию">
 								</div>
 							</div>
