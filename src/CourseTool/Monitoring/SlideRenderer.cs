@@ -74,7 +74,7 @@ namespace uLearn.CourseTool.Monitoring
 
 		private TocModel CreateToc(Slide slide)
 		{
-			var builder = new TocModelBuilder(GetSlideUrl, s => 0, s => s.MaxScore, course, slide.Id)
+			var builder = new TocModelBuilder(GetSlideUrl, s => 0, s => s.MaxScore, (u, g) => 0, course, slide.Id)
 			{
 				IsInstructor = true,
 				GetUnitInstructionNotesUrl = unit => GetInstructorNotesFilename(unit),

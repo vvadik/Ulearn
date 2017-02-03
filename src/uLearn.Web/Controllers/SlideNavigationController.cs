@@ -19,6 +19,7 @@ namespace uLearn.Web.Controllers
 		private readonly VisitsRepo visitsRepo = new VisitsRepo();
 		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
 		private readonly GroupsRepo groupsRepo = new GroupsRepo();
+		private readonly AdditionalScoresRepo additionalScoresRepo = new AdditionalScoresRepo();
 		
 		public ActionResult TableOfContents(string courseId, Guid? slideId = null)
 		{
@@ -35,6 +36,7 @@ namespace uLearn.Web.Controllers
 				s => Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = s.Url }),
 				s => 0,
 				s => 0,
+				(u, g) => 0,
 				course,
 				currentSlideId);
 			builder.IsInstructor = false;
@@ -83,11 +85,13 @@ namespace uLearn.Web.Controllers
 			var scoresForSlides = visitsRepo.GetScoresForSlides(course.Id, userId);
 			var slidesWithUsersManualChecking = visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId).ToImmutableHashSet();
 			var enabledManualCheckingForUser = groupsRepo.IsManualCheckingEnabledForUser(course, userId);
+			var additionalScores = additionalScoresRepo.GetAdditionalScoresForUser(course.Id, userId);
 
 			var builder = new TocModelBuilder(
 				s => Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = s.Url }),
 				s => scoresForSlides.ContainsKey(s.Id) ? scoresForSlides[s.Id] : 0,
 				s => GetMaxScoreForUsersSlide(s, solvedSlidesIds.Contains(s.Id), slidesWithUsersManualChecking.Contains(s.Id), enabledManualCheckingForUser),
+				(u, g) => additionalScores.GetOrDefault(Tuple.Create(u.Id, g.Id), 0),
 				course,
 				currentSlideId)
 			{

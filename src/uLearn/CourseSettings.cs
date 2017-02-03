@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 
@@ -18,7 +19,7 @@ namespace uLearn
 		public bool IsManualCheckingEnabled { get; set; }
 
 		[XmlElement("scoring")]
-		public CourseScoring Scoring { get; set; }
+		public ScoringSettings Scoring { get; set; }
 
 		[XmlIgnore]
 		public string DefaultLanguage
@@ -46,28 +47,48 @@ namespace uLearn
 
 		public CourseSettings()
 		{
-			Scoring = new CourseScoring();
+			Scoring = new ScoringSettings();
 		}
 
-		public CourseSettings(string title, Language[] defaultLanguageVersions, PreludeFile[] preludes, string dictionaryFile)
+		public CourseSettings(string title, Language[] defaultLanguageVersions, PreludeFile[] preludes, string dictionaryFile) : this()
 		{
 			Title = title;
 			DefaultLanguageVersions = defaultLanguageVersions;
 			Preludes = preludes;
 			DictionaryFile = dictionaryFile;
-			Scoring = new CourseScoring();
+		}
+
+		public CourseSettings(CourseSettings other) : this()
+		{
+			Title = other.Title;
+			DefaultLanguageVersions = (Language[]) other.DefaultLanguageVersions.Clone();
+			Preludes = (PreludeFile[]) other.Preludes.Clone();
+			DictionaryFile = other.DictionaryFile;
 		}
 
 		public static CourseSettings Load(DirectoryInfo dir)
 		{
 			var file = dir.GetFile("Course.xml");
 			if (!file.Exists)
-				return DefaultSettings;
+				return new CourseSettings(DefaultSettings);
+
 			var settings = file.DeserializeXml<CourseSettings>();
 			if (settings.DefaultLanguageVersions == null)
 				settings.DefaultLanguageVersions = new Language[0];
 			if (settings.Preludes == null)
 				settings.Preludes = new PreludeFile[0];
+
+			foreach (var scoringGroup in settings.Scoring.Groups.Values)
+			{
+				if (scoringGroup.IsMaxAdditionalScoreSpecified &&
+					(!scoringGroup.IsCanBeSetByInstructorSpecified || !scoringGroup.CanBeSetByInstructor))
+					throw new CourseLoadingException(
+						$"Чтобы выставлять дополнительные баллы в группу {scoringGroup.Id}, установите у неё атрибут set_by_instructor=\"true\" в настройках курса (файл Course.xml). " +
+						$"В противном случае атрибут max_additional_score=\"{scoringGroup.MaxAdditionalScore}\" не действует"
+					);
+
+			}
+
 			return settings;
 		}
 
@@ -132,46 +153,123 @@ namespace uLearn
 		public string Version { get; set; }
 	}
 
-	public class CourseScoring
+	public class ScoringSettings
 	{
-		public CourseScoring()
+		public ScoringSettings()
 		{
-			Groups = new CourseScoringGroup[0];
+			_groups = new ScoringGroup[0];
 		}
 
 		[XmlAttribute("defaultQuiz")]
-		public string defaultScoringGroupForQuiz { get; set; }
+		public string _defaultScoringGroupForQuiz { get; set; }
 
 		[XmlIgnore]
 		public string DefaultScoringGroupForQuiz =>
-			string.IsNullOrEmpty(defaultScoringGroupForQuiz) ? DefaultScoringGroup : defaultScoringGroupForQuiz;
+			string.IsNullOrEmpty(_defaultScoringGroupForQuiz) ? DefaultScoringGroup : _defaultScoringGroupForQuiz;
 
 		[XmlAttribute("defaultExercise")]
-		public string defaultScoringGroupForExercise { get; set; }
+		public string _defaultScoringGroupForExercise { get; set; }
 
 		[XmlIgnore]
 		public string DefaultScoringGroupForExercise =>
-			string.IsNullOrEmpty(defaultScoringGroupForExercise) ? DefaultScoringGroup : defaultScoringGroupForExercise;
+			string.IsNullOrEmpty(_defaultScoringGroupForExercise) ? DefaultScoringGroup : _defaultScoringGroupForExercise;
 
 		[XmlAttribute("default")]
 		public string DefaultScoringGroup { get; set; }
 
 		[XmlElement("group")]
-		public CourseScoringGroup[] Groups { get; set; }
+		public ScoringGroup[] _groups { get; set; }
+
+		private Dictionary<string, ScoringGroup> groupsCache;
+		[XmlIgnore]
+		public Dictionary<string, ScoringGroup> Groups
+		{
+			get { return groupsCache ?? (groupsCache = _groups.ToDictionary(g => g.Id, g => g)); }
+		}
+
+		public void CopySettingsFrom(ScoringSettings otherScoringSettings)
+		{
+			_defaultScoringGroupForQuiz = string.IsNullOrEmpty(_defaultScoringGroupForQuiz) && string.IsNullOrEmpty(DefaultScoringGroup)
+				? otherScoringSettings.DefaultScoringGroupForQuiz
+				: _defaultScoringGroupForQuiz;
+			_defaultScoringGroupForExercise = string.IsNullOrEmpty(_defaultScoringGroupForExercise) && string.IsNullOrEmpty(DefaultScoringGroup)
+				? otherScoringSettings.DefaultScoringGroupForExercise
+				: _defaultScoringGroupForExercise;
+			DefaultScoringGroup = string.IsNullOrEmpty(DefaultScoringGroup) ? otherScoringSettings.DefaultScoringGroup : DefaultScoringGroup;
+
+			/* Copy missing scoring groups */
+			foreach (var scoringGroupId in otherScoringSettings.Groups.Keys)
+				if (!Groups.ContainsKey(scoringGroupId))
+					Groups[scoringGroupId] = otherScoringSettings.Groups[scoringGroupId];
+		}
+
+		public int GetMaxAdditionalScore()
+		{
+			return Groups.Values.Where(g => g.CanBeSetByInstructor).Sum(g => g.MaxAdditionalScore);
+		}
 	}
 
-	public class CourseScoringGroup
+	public class ScoringGroup
 	{
+		public const bool DefaultCanBeSetByInstructor = false;
+		public const int DefaultMaxAdditionalScore = 10;
+
 		[XmlAttribute("id")]
 		public string Id { get; set; }
 
 		[XmlAttribute("abbr")]
 		public string Abbreviation { get; set; }
 
+		/* Hack to handle empty integer attribute, because standart XmlSerializer doesn't work with nullable (bool?) fields */
 		[XmlAttribute("set_by_instructor")]
-		public bool CanBeSetByInstructor { get; set; }
+		public string _canBeSetByInstructor;
+
+		[XmlIgnore]
+		public bool CanBeSetByInstructor {
+			get
+			{
+				if (string.IsNullOrEmpty(_canBeSetByInstructor) || _canBeSetByInstructor.Trim().Length == 0)
+					return DefaultCanBeSetByInstructor;
+
+				bool value;
+				if (bool.TryParse(_canBeSetByInstructor, out value))
+					return value;
+				return DefaultCanBeSetByInstructor;
+			}
+			set { _canBeSetByInstructor = value.ToString();  }
+		}
+
+		[XmlIgnore]
+		public bool IsCanBeSetByInstructorSpecified => !string.IsNullOrEmpty(_canBeSetByInstructor);
+		
+		[XmlAttribute("max_additional_score")]
+		public string _maxAdditionalScore { get; set; }
+
+		[XmlIgnore]
+		public int MaxAdditionalScore {
+			get
+			{
+				if (string.IsNullOrEmpty(_maxAdditionalScore) || _maxAdditionalScore.Trim().Length == 0)
+					return DefaultMaxAdditionalScore;
+
+				int result;
+				return int.TryParse(_maxAdditionalScore, out result) ? result : DefaultMaxAdditionalScore;
+			}
+			set { _maxAdditionalScore = value.ToString(); }
+		}
+
+		[XmlIgnore]
+		public bool IsMaxAdditionalScoreSpecified => !string.IsNullOrEmpty(_maxAdditionalScore);
 
 		[XmlText]
 		public string Name { get; set; }
+
+		public void CopySettingsFrom(ScoringGroup otherScoringGroup)
+		{
+			_canBeSetByInstructor = string.IsNullOrEmpty(_canBeSetByInstructor) ? otherScoringGroup._canBeSetByInstructor : _canBeSetByInstructor;
+			_maxAdditionalScore = string.IsNullOrEmpty(_maxAdditionalScore) ? otherScoringGroup._maxAdditionalScore : _maxAdditionalScore;
+			Abbreviation = Abbreviation ?? otherScoringGroup.Abbreviation;
+			Name = string.IsNullOrEmpty(Name) ? otherScoringGroup.Name : Name;
+		}
 	}
 }

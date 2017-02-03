@@ -209,11 +209,19 @@
 
 			<div class="row" id="students">
 				<div class="col-xs-12">
-					<h2>Студенты</h2>
-
 					@{
 						var exercisesAndQuizzes = Model.Slides.Where(s => s is QuizSlide || s is ExerciseSlide).OrderBy(s => s.Index);
+						var modifiableScoringGroups = Model.Unit.Scoring.Groups.Values.Where(g => g.CanBeSetByInstructor).ToList();
 					}
+
+					@if (modifiableScoringGroups.Count > 0)
+					{
+						<div class="additional-scores__edit-mode__control pull-right">
+							<a href="#" class="internal-page-link  additional-scores__edit-mode__link">Редактировать все баллы</a>
+							<button class="btn btn-success btn-sm additional-scores__edit-mode__save-button">Сохранить баллы</button>
+						</div>
+					}
+					<h2>Студенты</h2>
 
 					<div class="small-table__title">
 						<div class="small-table__title__cell">пользователь</div>
@@ -231,9 +239,12 @@
 									<span class="glyphicon glyphicon-edit small-table__title__cell @(isHiddenOnSmallScreens ? "hidden-xs-inline-block" : "")" title="@slide.Title"></span>
 								}
 							}
-							@foreach (var scoringGroup in Model.Course.Settings.Scoring.Groups.Where(g => g.CanBeSetByInstructor))
+
+							@foreach (var scoringGroup in modifiableScoringGroups)
 							{
-								<span class="small-table__title__cell" title="@scoringGroup.Name">@scoringGroup.Abbreviation</span>
+								<span class="small-table__title__cell" title="@scoringGroup.Name — @scoringGroup.MaxAdditionalScore.PluralizeInRussian(new RussianPluralizationOptions { One = "балл", Two = "балла", Five = "баллов", Gender = Gender.Male, hideNumberOne = false, smallNumbersAreWords = false })">
+									@scoringGroup.Abbreviation (@scoringGroup.MaxAdditionalScore)
+								</span>
 							}
 						</div>
 					</div>
@@ -303,7 +314,37 @@
 										<span class="small-table__right-cell score @(isHiddenOnSmallScreens ? "hidden-xs-inline-block" : "") zero-score">&nbsp;</span>
 									}
 								}
+
+								@foreach (var scoringGroup in modifiableScoringGroups)
+								{
+									var userAndScoringGroup = Tuple.Create(userInfo.UserId, scoringGroup.Id);
+									<span class="small-table__title__cell">
+										<a href="#" class="internal-page-link additional-score-link" title="Изменить оценку «@scoringGroup.Name»" data-scoring-type="@scoringGroup.Id">
+											@if (Model.AdditionalScores.ContainsKey(userAndScoringGroup))
+											{
+												@Model.AdditionalScores[userAndScoringGroup]
+											}
+											else
+											{
+												<span>&mdash;</span>
+											}
+										</a>
+										<input name="additional-score"
+											   class="form-control input-sm additional-score-input"
+											   min="0"
+											   max="@scoringGroup.MaxAdditionalScore"
+											   value="@(Model.AdditionalScores.ContainsKey(userAndScoringGroup) ? Model.AdditionalScores[userAndScoringGroup].ToString() : "")"
+											   data-scoring-type="@scoringGroup.Id"
+											   data-url="@Url.Action("SetAdditionalScore", "Admin", new { courseId = Model.Course.Id, unitId = Model.Unit.Id, userId = userInfo.UserId, scoringGroupId = scoringGroup.Id})"/>
+									</span>
+								}
 							</div>
+						</div>
+					}
+					@if (modifiableScoringGroups.Count > 0)
+					{
+						<div class="additional-scores__edit-mode__control pull-right">
+							<button class="btn btn-success btn-sm additional-scores__edit-mode__save-button">Сохранить баллы</button>
 						</div>
 					}
 				</div>

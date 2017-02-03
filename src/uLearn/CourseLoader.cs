@@ -7,17 +7,19 @@ namespace uLearn
 {
 	public class CourseLoader
 	{
-		
 		public Course LoadCourse(DirectoryInfo dir)
 		{
 			var courseId = dir.Name;
 
 			dir = dir.HasSubdirectory("Slides") ? dir.Subdirectory("Slides") : dir;
 			var settings = CourseSettings.Load(dir);
+			if (string.IsNullOrEmpty(settings.Title))
+				settings.Title = GetCourseTitleFromFile(dir);
+
 			var units = LoadUnits(dir, settings).ToList();
 			CheckDuplicateSlideIds(units.SelectMany(u => u.Slides));
-			var title = settings.Title ?? GetTitle(dir);
-			return new Course(courseId, title, units, settings, dir);
+
+			return new Course(courseId, units, settings, dir);
 		}
 
 		private static IEnumerable<Unit> LoadUnits(DirectoryInfo dir, CourseSettings settings)
@@ -29,7 +31,7 @@ namespace uLearn
 			var slideIndex = 0;
 			foreach (var unitDirectory in unitsDirectories)
 			{
-				var unit = UnitLoader.Load(unitDirectory, settings, slideIndex);
+				var unit = UnitLoader.LoadUnit(unitDirectory, settings, slideIndex);
 
 				if (unitsIds.Contains(unit.Id))
 					throw new CourseLoadingException($"Ошибка в курсе \"{settings.Title}\". Повторяющийся идентификатор модуля: {unit.Id}. Идентификаторы модулей должны быть уникальными");
@@ -45,7 +47,7 @@ namespace uLearn
 			}
 		}
 
-		private static string GetTitle(DirectoryInfo dir)
+		private static string GetCourseTitleFromFile(DirectoryInfo dir)
 		{
 			return dir.GetFile("Title.txt").ContentAsUtf8();
 		}
@@ -71,8 +73,8 @@ namespace uLearn
 		{
 		}
 
-		public CourseLoadingException(string message, Exception e)
-			: base(message, e)
+		public CourseLoadingException(string message, Exception innerException)
+			: base(message, innerException)
 		{
 		}
 	}

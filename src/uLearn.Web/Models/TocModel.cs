@@ -24,8 +24,10 @@ namespace uLearn.Web.Models
 		public string UnitName;
 		public List<TocPageInfo> Pages;
 		public bool IsCurrent;
-		public int MaxScore { get { return Pages.Sum(p => p.MaxScore); } }
-		public int Score { get { return Pages.Sum(p => p.Score); } }
+		public Dictionary<ScoringGroup, int> AdditionalScores;
+		public int Score => Pages.Sum(p => p.Score) + AdditionalScores.Values.Sum();
+		public int MaxScore => Pages.Sum(p => p.MaxScore) + AdditionalScores.Keys.Sum(g => g.MaxAdditionalScore);
+
 	}
 
 

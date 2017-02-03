@@ -8,17 +8,16 @@ namespace uLearn
 {
 	public class Course
 	{
-		public Course(string id, string title, List<Unit> units, CourseSettings settings, DirectoryInfo directory)
+		public Course(string id, List<Unit> units, CourseSettings settings, DirectoryInfo directory)
 		{
 			Id = id;
-			Title = title;
 			Units = units;
 			Settings = settings;
 			Directory = directory;
 		}
 
 		public string Id { get; set; }
-		public string Title { get; }
+		public string Title => Settings.Title;
 		public CourseSettings Settings { get; private set; }
 		public DirectoryInfo Directory { get; private set; }
 		public List<Unit> Units { get; private set; }

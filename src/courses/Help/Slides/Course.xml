@@ -5,6 +5,6 @@
 	<manual-checking>false</manual-checking>
 	<scoring defaultQuiz="laboratory" defaultExercise="homework" default="laboratory">
 		<group id="laboratory" abbr="ЛЗ">Лабораторные занятия</group>
-		<group id="homework" abbr="ДЗ" set_by_instructor="true">Домашняя работа</group>
+		<group id="homework" abbr="ДЗ" set_by_instructor="true" max_additional_score="20">Домашняя работа</group>
 	</scoring>
 </Course>

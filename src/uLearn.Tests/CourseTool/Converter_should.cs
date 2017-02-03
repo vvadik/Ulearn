@@ -14,7 +14,7 @@ namespace uLearn.CourseTool
 	public class Converter_should
 	{
 		private Course course;
-		private static readonly Unit unit = new Unit(UnitSettings.CreateByTitle("u1"), new DirectoryInfo("u1"));
+		private static readonly Unit unit = new Unit(UnitSettings.CreateByTitle("u1", CourseSettings.DefaultSettings), new DirectoryInfo("u1"));
 		private readonly Slide aTextSlide = new Slide(new[] { new MdBlock("hello"), }, new SlideInfo(unit, new FileInfo("file"), 0), "title", Guid.NewGuid());
 		private readonly Slide exerciseSlide = new Slide(new ExerciseBlock[] { new ProjectExerciseBlock(), new SingleFileExerciseBlock()  }, new SlideInfo(unit, new FileInfo("file"), 0), "title", slideIdFromCourse);
 		private const string youtubeIdFromCourse = "GZS36w_fxdg";

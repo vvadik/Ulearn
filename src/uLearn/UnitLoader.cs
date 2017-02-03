@@ -17,17 +17,19 @@ namespace uLearn
 			new QuizSlideLoader()
 		};
 
-		public static Unit Load(DirectoryInfo unitDir, CourseSettings courseSettings, int firstSlideIndex)
+		public static Unit LoadUnit(DirectoryInfo unitDir, CourseSettings courseSettings, int firstSlideIndex)
 		{
 			var unitFile = unitDir.GetFile("Unit.xml");
-			var unitSettings = unitFile.Exists ? UnitSettings.Load(unitFile) : UnitSettings.CreateByTitle(GetTitle(unitDir));
+			var unitSettings = unitFile.Exists
+				? UnitSettings.Load(unitFile, courseSettings)
+				: UnitSettings.CreateByTitle(GetUnitTitleFromFile(unitDir), courseSettings);
 
 			var unit = new Unit(unitSettings, unitDir);
 
 			unit.Slides = unitDir.GetFiles()
 				.Where(f => IsSlideFile(f.Name))
 				.OrderBy(f => f.Name)
-				.Select<FileInfo, Slide>((f, internalIndex) => LoadSlide(f, unit, firstSlideIndex + internalIndex, courseSettings))
+				.Select((f, internalIndex) => LoadSlide(f, unit, firstSlideIndex + internalIndex, courseSettings))
 				.ToList();
 
 			unit.LoadInstructorNote();
@@ -61,7 +63,7 @@ namespace uLearn
 				   && id.Skip(1).All(char.IsDigit);
 		}
 
-		private static string GetTitle(DirectoryInfo dir)
+		private static string GetUnitTitleFromFile(DirectoryInfo dir)
 		{
 			return dir.GetFile("Title.txt").ContentAsUtf8();
 		}

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts
@@ -21,11 +20,11 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		public async Task SetAdditionalScore(string courseId, Guid unitId, string userId, int score, string instructorId)
+		public async Task SetAdditionalScore(string courseId, Guid unitId, string userId, string scoringGroupId, int score, string instructorId)
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var scores = db.AdditionalScores.Where(s => s.CourseId == courseId && s.UnitId == unitId && s.UserId == userId);
+				var scores = db.AdditionalScores.Where(s => s.CourseId == courseId && s.UnitId == unitId && s.UserId == userId && s.ScoringGroupId == scoringGroupId);
 				db.AdditionalScores.RemoveRange(scores);
 
 				var additionalScore = new AdditionalScore
@@ -33,6 +32,7 @@ namespace uLearn.Web.DataContexts
 					CourseId = courseId,
 					UnitId = unitId,
 					UserId = userId,
+					ScoringGroupId = scoringGroupId,
 					Score = score,
 					InstructorId = instructorId,
 					Timestamp = DateTime.Now,
@@ -44,9 +44,12 @@ namespace uLearn.Web.DataContexts
 			}
 		}
 
-		public List<AdditionalScore> GetAdditionalScoresForUser(string courseId, string userId)
+		/* Dictionary<(unitId, scoringGroupId), additionalScore> */
+		public Dictionary<Tuple<Guid, string>, int> GetAdditionalScoresForUser(string courseId, string userId)
 		{
-			return db.AdditionalScores.Where(s => s.CourseId == courseId && s.UserId == userId).ToList();
+			return db.AdditionalScores
+				.Where(s => s.CourseId == courseId && s.UserId == userId)
+				.ToDictionary(s => Tuple.Create(s.UnitId, s.ScoringGroupId), s => s.Score);
 		}
 
 		public Dictionary<string, AdditionalScore> GetAdditionalScoresForUser(string courseId, Guid unitId, string userId)
@@ -62,6 +65,13 @@ namespace uLearn.Web.DataContexts
 			return db.AdditionalScores
 				.Where(s => s.CourseId == courseId && s.UnitId == unitId && usersIds.Contains(s.UserId))
 				.ToDictionary(s => Tuple.Create(s.UserId, s.ScoringGroupId), s => s);
+		}
+
+		public async Task RemoveAdditionalScores(string courseId, Guid unitId, string userId, string scoringGroupId)
+		{
+			var scores = db.AdditionalScores.Where(s => s.CourseId == courseId && s.UnitId == unitId && s.UserId == userId && s.ScoringGroupId == scoringGroupId);
+			db.AdditionalScores.RemoveRange(scores);
+			await db.SaveChangesAsync();
 		}
 	}
 }

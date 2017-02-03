@@ -6,4 +6,8 @@
     <id>d4492182-fe1c-4531-900c-3a509c9e6c16</id>
     <url>Features</url>
     <title>Возможности ulearn</title>    
+    <scoring defaultExercise="homework">
+		<group id="homework" max_additional_score="20" />
+	</scoring>
+
 </Unit>

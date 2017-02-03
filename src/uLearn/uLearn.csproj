@@ -214,6 +214,7 @@
     <Compile Include="TexReplacer.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="UnitLoader.cs" />
+    <Compile Include="UnitSettings.cs" />
     <Compile Include="Urls.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="ValidatorExtension.cs" />

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml.Serialization;
+using System.Linq;
 
 namespace uLearn
 {
@@ -27,6 +27,8 @@ namespace uLearn
 
 		public string Url => Settings.Url;
 
+		public ScoringSettings Scoring => Settings.Scoring;
+
 		public void LoadInstructorNote()
 		{
 			var instructorNoteFile = Directory.GetFile("InstructorNotes.md");
@@ -34,42 +36,6 @@ namespace uLearn
 			{
 				InstructorNote = InstructorNote.Load(instructorNoteFile, this);
 			}
-		}
-	}
-
-	[XmlRoot("Unit", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/unit")]
-	public class UnitSettings
-	{
-		[XmlElement("id")]
-		public Guid Id { get; set; }
-
-		[XmlElement("url")]
-		public string Url { get; set; }
-
-		[XmlElement("title")]
-		public string Title { get; set; }
-
-		public static UnitSettings Load(FileInfo file)
-		{
-			var unitSettings = file.DeserializeXml<UnitSettings>();
-
-			if (string.IsNullOrEmpty(unitSettings.Title))
-				throw new CourseLoadingException($"Заголовок модуля не может быть пустым. Файл {file.FullName}");
-
-			if (string.IsNullOrEmpty(unitSettings.Url))
-				unitSettings.Url = unitSettings.Title.ToLatin();
-
-			return unitSettings;
-		}
-
-		public static UnitSettings CreateByTitle(string title)
-		{
-			return new UnitSettings
-			{
-				Id = title.ToDeterministicGuid(),
-				Url = title.ToLatin(),
-				Title = title,
-			};
 		}
 	}
 }

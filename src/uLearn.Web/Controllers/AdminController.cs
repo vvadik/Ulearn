@@ -35,6 +35,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly CertificatesRepo certificatesRepo;
+		private readonly AdditionalScoresRepo additionalScoresRepo;
 
 		public AdminController()
 		{
@@ -49,6 +50,7 @@ namespace uLearn.Web.Controllers
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 			userSolutionsRepo = new UserSolutionsRepo(db);
 			certificatesRepo = new CertificatesRepo(db);
+			additionalScoresRepo = new AdditionalScoresRepo(db);
 		}
 
 		public ActionResult CourseList(string courseCreationLastTry = null)
@@ -962,6 +964,34 @@ namespace uLearn.Web.Controllers
 			);
 
 			return Json(builtinParametersValues, JsonRequestBehavior.AllowGet);
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> SetAdditionalScore(string courseId, Guid unitId, string userId, string scoringGroupId, string score)
+		{
+			var course = courseManager.GetCourse(courseId);
+			if (!course.Settings.Scoring.Groups.ContainsKey(scoringGroupId))
+				return HttpNotFound();
+			var unit = course.Units.FirstOrDefault(u => u.Id == unitId);
+			if (unit == null)
+				return HttpNotFound();
+
+			var scoringGroup = unit.Scoring.Groups[scoringGroupId];
+			if (string.IsNullOrEmpty(score))
+			{
+				await additionalScoresRepo.RemoveAdditionalScores(courseId, unitId, userId, scoringGroupId);
+				return Json(new { status = "ok", score = "" });
+			}
+			
+			int scoreInt;
+			if (! int.TryParse(score, out scoreInt))
+				return Json(new { status = "error", error = "Введите целое число" });
+			if (scoreInt < 0 || scoreInt > scoringGroup.MaxAdditionalScore)
+				return Json(new { status = "error", error = $"Баллы должны быть от 0 до {scoringGroup.MaxAdditionalScore}" });
+
+			await additionalScoresRepo.SetAdditionalScore(courseId, unitId, userId, scoringGroupId, scoreInt, User.Identity.GetUserId());
+			
+			return Json(new { status = "ok", score = scoreInt });
 		}
 	}
 

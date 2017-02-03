@@ -1194,6 +1194,7 @@
     <Content Include="katex\katex.min.js" />
     <Content Include="Scripts\activate-clipboard.js" />
     <Content Include="Scripts\analytics-highcharts.js" />
+    <Content Include="Scripts\analytics.js" />
     <Content Include="Scripts\bootstrap.file-input.js" />
     <Content Include="qunit\qunit-1.15.0.css" />
     <Content Include="qunit\qunit-1.15.0.js" />

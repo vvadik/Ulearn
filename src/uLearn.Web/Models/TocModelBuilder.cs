@@ -8,6 +8,7 @@ namespace uLearn.Web.Models
 	{
 		private readonly Func<Slide, string> getSlideUrl;
 		private readonly Func<Slide, int> getSlideScore;
+		private readonly Func<Unit, ScoringGroup, int> getAdditionalScore;
 		private readonly Func<Slide, int> getSlideMaxScore;
 		private readonly Course course;
 		private readonly Guid? currentSlideId;
@@ -19,11 +20,12 @@ namespace uLearn.Web.Models
 		public Func<Slide, bool> IsSlideHidden = s => true;
 		public bool IsInstructor;
 
-		public TocModelBuilder(Func<Slide, string> getSlideUrl, Func<Slide, int> getSlideScore, Func<Slide, int> getSlideMaxScore, Course course, Guid? currentSlideId)
+		public TocModelBuilder(Func<Slide, string> getSlideUrl, Func<Slide, int> getSlideScore, Func<Slide, int> getSlideMaxScore, Func<Unit, ScoringGroup, int> getAdditionalScore, Course course, Guid? currentSlideId)
 		{
 			this.getSlideUrl = getSlideUrl;
 			this.getSlideScore = getSlideScore;
 			this.getSlideMaxScore = getSlideMaxScore;
+			this.getAdditionalScore = getAdditionalScore;
 			this.course = course;
 			this.currentSlideId = currentSlideId;
 		}
@@ -37,7 +39,7 @@ namespace uLearn.Web.Models
 		{
 			return course.Units
 				.Where(u => u.Slides.Any(s => !IsSlideHidden(s)))
-				.Select(u => CreateUnit(u))
+				.Select(CreateUnit)
 				.ToArray();
 		}
 
@@ -60,11 +62,14 @@ namespace uLearn.Web.Models
 					PageType = TocPageType.Statistics,
 				});
 			}
+
+			var additionalScores = unit.Scoring.Groups.Values.Where(g => g.CanBeSetByInstructor).ToDictionary(g => g, g => getAdditionalScore(unit, g));
 			return new TocUnitModel
 			{
 				IsCurrent = unit.Slides.Any(s => s.Id == currentSlideId),
 				UnitName = unit.Title,
-				Pages = pages
+				Pages = pages,
+				AdditionalScores = additionalScores,
 			};
 		}
 

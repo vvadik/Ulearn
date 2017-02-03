@@ -21,6 +21,7 @@ namespace uLearn.Web.Controllers
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
 		private readonly GroupsRepo groupsRepo = new GroupsRepo();
 		private readonly UsersRepo usersRepo = new UsersRepo();
+		private readonly AdditionalScoresRepo additionalScoresRepo = new AdditionalScoresRepo();
 
 		public AnalyticsController()
 			: this(WebCourseManager.Instance)
@@ -99,6 +100,10 @@ namespace uLearn.Web.Controllers
 				.GroupBy(v => v.UserId)
 				.ToDictionary(g => g.Key, g => g.Count());
 
+			var additionalScores = additionalScoresRepo
+				.GetAdditionalScoresForUsers(courseId, unitId.Value, visitedUsers.Select(v => v.UserId))
+				.ToDictionary(kv => kv.Key, kv => kv.Value.Score);
+
 			var model = new UnitStatisticPageModel
 			{
 				Course = course,
@@ -123,6 +128,8 @@ namespace uLearn.Web.Controllers
 				VisitedUsers = visitedUsers,
 				VisitedSlidesCountByUser = visitedSlidesCountByUser,
 				VisitedSlidesCountByUserAllTime = visitedSlidesCountByUserAllTime,
+
+				AdditionalScores = additionalScores,
 			};
 			return View(model);
 		}
