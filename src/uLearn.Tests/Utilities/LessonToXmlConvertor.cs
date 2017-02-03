@@ -17,7 +17,7 @@ namespace uLearn.Utilities
 		public void ConvertSlidesFromDirectory()
 		{
 			var slidesDirectory = new DirectoryInfo(@"Your path to slides");
-			var unit = new Unit(UnitSettings.CreateByTitle("u1"), slidesDirectory.GetSubdir("u1"));
+			var unit = new Unit(UnitSettings.CreateByTitle("u1", CourseSettings.DefaultSettings), slidesDirectory.GetSubdir("u1"));
 			foreach (var slideFile in slidesDirectory.GetFiles("S*.cs"))
 			{
 				var slide = new CSharpSlideLoader().Load(slideFile, unit, 0, CourseSettings.DefaultSettings);
