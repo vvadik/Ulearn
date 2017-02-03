@@ -69,7 +69,7 @@
 			.success(function(data) {
 				if (data.status === 'ok') {
 					var $link = $input.parent().find('.additional-score-link');
-					$link.text(data.score || "—");
+					$link.text(data.score === '' ? '—' : data.score);
 					hideAdditionalScoreInput($input);
 
 					/* Close edit mode if all scores has been accepted */
