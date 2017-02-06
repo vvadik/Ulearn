@@ -568,6 +568,7 @@ namespace uLearn.Web.Controllers
 			return course.Units
 				.SelectMany(u => u.Scoring.Groups.Values)
 				.Where(g => g.CanBeSetByInstructor && !g.EnabledForEveryone)
+				.DistinctBy(g => g.Id)
 				.ToList();
 		}
 
