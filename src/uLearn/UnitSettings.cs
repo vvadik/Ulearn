@@ -31,7 +31,7 @@ namespace uLearn
 			var unitSettings = file.DeserializeXml<UnitSettings>();
 
 			if (string.IsNullOrEmpty(unitSettings.Title))
-				throw new CourseLoadingException($"Заголовок модуля не может быть пустым. Файл {file.FullName}");
+				throw new CourseLoadingException($"Р—Р°РіРѕР»РѕРІРѕРє РјРѕРґСѓР»СЏ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј. Р¤Р°Р№Р» {file.FullName}");
 
 			if (string.IsNullOrEmpty(unitSettings.Url))
 				unitSettings.Url = unitSettings.Title.ToLatin();
@@ -41,8 +41,8 @@ namespace uLearn
 			{
 				if (!courseScoringGroupsIds.Contains(scoringGroup.Id))
 					throw new CourseLoadingException(
-						$"Неизвестная группа баллов описана в модуле: {scoringGroup.Id}. Файл {file.FullName}. " +
-						$"Для курса определены только следующие группы баллов: {string.Join(", ", courseScoringGroupsIds)}"
+						$"РќРµРёР·РІРµСЃС‚РЅР°СЏ РіСЂСѓРїРїР° Р±Р°Р»Р»РѕРІ РѕРїРёСЃР°РЅР° РІ РјРѕРґСѓР»Рµ: {scoringGroup.Id}. Р¤Р°Р№Р» {file.FullName}. " +
+						$"Р”Р»СЏ РєСѓСЂСЃР° РѕРїСЂРµРґРµР»РµРЅС‹ С‚РѕР»СЊРєРѕ СЃР»РµРґСѓСЋС‰РёРµ РіСЂСѓРїРїС‹ Р±Р°Р»Р»РѕРІ: {string.Join(", ", courseScoringGroupsIds)}"
 						);
 
 				/* By default set unit's scoring settings from course's scoring settings */
@@ -53,9 +53,15 @@ namespace uLearn
 				if (scoringGroup.IsMaxAdditionalScoreSpecified &&
 					(!scoringGroup.IsCanBeSetByInstructorSpecified || !scoringGroup.CanBeSetByInstructor))
 					throw new CourseLoadingException(
-						$"Чтобы выставлять дополнительные баллы в группу {scoringGroup.Id}, установите у неё атрибут set_by_instructor=\"true\" в настройках модуля (файл Unit.xml) или курса (файл Course.xml). " +
-						$"В противном случае атрибут max_additional_score=\"{scoringGroup.MaxAdditionalScore}\" не действует"
+						$"РњРѕРґСѓР»СЊ В«{unitSettings.Title}В»: С‡С‚РѕР±С‹ РІС‹СЃС‚Р°РІР»СЏС‚СЊ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ Р±Р°Р»Р»С‹ РІ РіСЂСѓРїРїСѓ {scoringGroup.Id}, СѓСЃС‚Р°РЅРѕРІРёС‚Рµ Сѓ РЅРµС‘ Р°С‚СЂРёР±СѓС‚ set_by_instructor=\"true\" " +
+						$"РІ РЅР°СЃС‚СЂРѕР№РєР°С… РјРѕРґСѓР»СЏ (С„Р°Р№Р» {file.Directory?.Name}/Unit.xml) РёР»Рё РєСѓСЂСЃР° (С„Р°Р№Р» Course.xml). " +
+						$"Р’ РїСЂРѕС‚РёРІРЅРѕРј СЃР»СѓС‡Р°Рµ Р°С‚СЂРёР±СѓС‚ max_additional_score=\"{scoringGroup.MaxAdditionalScore}\" РЅРµ РґРµР№СЃС‚РІСѓРµС‚"
 						);
+
+				if (scoringGroup.IsEnabledForEveryoneSpecified)
+					throw new CourseLoadingException(
+						$"Р’ РЅР°СЃС‚СЂРѕР№РєР°С… РјРѕРґСѓР»СЏ В«{unitSettings.Title}В» РґР»СЏ РіСЂСѓРїРїС‹ Р±Р°Р»Р»РѕРІ {scoringGroup.Id} СѓРєР°Р·Р°РЅР° РѕРїС†РёСЏ enable_for_everyone=\"{scoringGroup._enabledForEveryone}\" (С„Р°Р№Р» {file.Directory?.Name}/Unit.xml). " +
+						"Р­С‚Сѓ РѕРїС†РёСЋ РјРѕР¶РЅРѕ СѓРєР°Р·С‹РІР°С‚СЊ С‚РѕР»СЊРєРѕ РІ РЅР°СЃС‚СЂРѕР№РєР°С… РІСЃРµРіРѕ РєСѓСЂСЃР° (С„Р°Р№Р» Course.xml)");
 			}
 
 			/* Copy other scoring groups and scoring settings from course settings */

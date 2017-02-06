@@ -1279,7 +1279,9 @@ table.analytics__user-answers {
 .analytics__dashboard .additional-score-input {
 	display: none;
 	height: 25px;
+	width: 45px;
 	font-size: 12px;
+	text-align: right;
 }
 
 @media (max-width:768px) {

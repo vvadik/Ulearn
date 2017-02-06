@@ -89,6 +89,24 @@
 			});
 		openNext($input);
 	}
+
+	var searchUntilHasChild = function ($item, selector, nextFunction) {
+		$item = nextFunction($item);
+		while ($item.length) {
+			if ($item.find(selector).length)
+				return $item;
+			$item = nextFunction($item);
+		}
+		return false;
+	}
+
+	var nextUntilHasChild = function($item, selector) {
+		return searchUntilHasChild($item, selector, function($item) { return $item.next(); });
+	}
+
+	var prevUntilHasChild = function($item, selector) {
+		return searchUntilHasChild($item, selector, function($item) { return $item.prev(); });
+	}
 	
 	$('.additional-score-link').click(function(e) {
 		e.preventDefault();
@@ -103,7 +121,7 @@
 		
 		var $input = $self.parent().find('.additional-score-input');
 		$self.hide();
-		$input.show().focus();
+		$input.show().focus().select();
 	});
 
 	$('.additional-score-input').blur(function () {
@@ -119,26 +137,52 @@
 
 	$('.additional-score-input').keydown(function (e) {
 		var $self = $(this);
-		if (e.which === 13) // Enter
-			$self.blur();
-		if (e.which === 9) // Tab
+		var $next = undefined;
+		var $studentRow = $self.closest('.student');
+		var $nextStudentRow;
+		if (e.which === 9) // Tab or Shift+Tab
 		{
-			var $studentRow = $self.closest('.student');
-			var $nextStudentRow = $studentRow.next();
+			var $additionalScore = $self.closest('.additional-score');
+			var $nextAdditionalScore = nextUntilHasChild($additionalScore, '.additional-score-link');
 			if (e.shiftKey)
-				$nextStudentRow = $studentRow.prev();
+				$nextAdditionalScore = prevUntilHasChild($additionalScore, '.additional-score-link');
+			if ($nextAdditionalScore) {
+				$next = $nextAdditionalScore.find('.additional-score-link');
+			} else {
+				/* Jump to next (or previous) row if current cell is last (or first) */
+				if (!e.shiftKey) {
+					$nextStudentRow = nextUntilHasChild($studentRow, '.additional-score-link');
+					if ($nextStudentRow)
+						$next = $nextStudentRow.find('.additional-score-link').first();
+				} else {
+					$nextStudentRow = prevUntilHasChild($studentRow, '.additional-score-link');
+					if ($nextStudentRow)
+						$next = $nextStudentRow.find('.additional-score-link').last();
+				}
+			}
+		}
+		if (e.which === 13 || e.which === 38 || e.which === 40) // Enter, Up or Down
+		{
+			var scoringType = $self.data('scoringType');
+			var selector = '.additional-score-link[data-scoring-type=' + scoringType + ']';
+			$nextStudentRow = nextUntilHasChild($studentRow, selector);
+			if (e.which === 38)
+				$nextStudentRow = prevUntilHasChild($studentRow, selector);
 			if ($nextStudentRow.hasClass('student')) {
-				e.preventDefault();
-				var scoringType = $self.data('scoringType');
-				var $next;
 				if (editMode) {
 					$next = $nextStudentRow.find('.additional-score-input[data-scoring-type=' + scoringType + ']');
-					$next.focus();
 				} else {
-					$next = $nextStudentRow.find('.additional-score-link[data-scoring-type=' + scoringType + ']');
-					$self.data('openNext', $next);
-					$self.blur();
+					$next = $nextStudentRow.find(selector);
 				}
+			}
+		}
+		if ($next && $next.length) {
+			e.preventDefault();
+			if (editMode)
+				$next.focus();
+			else {
+				$self.data('openNext', $next);
+				$self.blur();
 			}
 		}
 	});

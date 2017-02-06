@@ -85,6 +85,12 @@ namespace uLearn.Web.Controllers
 			var scoresForSlides = visitsRepo.GetScoresForSlides(course.Id, userId);
 			var slidesWithUsersManualChecking = visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId).ToImmutableHashSet();
 			var enabledManualCheckingForUser = groupsRepo.IsManualCheckingEnabledForUser(course, userId);
+
+			var userGroupsIds = groupsRepo.GetUserGroupsIds(course.Id, userId);
+			var enabledScoringGroupsIds = groupsRepo.GetEnabledAdditionalScoringGroups(course.Id)
+				.Where(e => userGroupsIds.Contains(e.GroupId))
+				.Select(e => e.ScoringGroupId)
+				.ToList();
 			var additionalScores = additionalScoresRepo.GetAdditionalScoresForUser(course.Id, userId);
 
 			var builder = new TocModelBuilder(
@@ -102,7 +108,8 @@ namespace uLearn.Web.Controllers
 				IsVisited = s => visited.Contains(s.Id),
 				IsUnitVisible = visibleUnits.Contains,
 				IsSlideHidden = s => s is QuizSlide && ((QuizSlide)s).Quiz.ManualCheck &&
-									!enabledManualCheckingForUser && !solvedSlidesIds.Contains(s.Id)
+									!enabledManualCheckingForUser && !solvedSlidesIds.Contains(s.Id),
+				EnabledScoringGroupsIds = enabledScoringGroupsIds,
 			};
 
 			var toc = builder.CreateTocModel();

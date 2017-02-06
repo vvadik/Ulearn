@@ -1,8 +1,11 @@
 ﻿$(function() {
     $.fn.smoothScroll = function (callback, $link) {
-    	var $object = this;
+        var $object = this;
+        var needScroll =  $link.data('scroll') !== false;
     	if ($object.length) {
-    		var scrollTo = function() {
+    	    var scrollTo = function () {
+	            if (!needScroll)
+	                return;
 			    $('body').animate({
 					scrollTop: $object.offset().top - $('.navbar').height()
 				},

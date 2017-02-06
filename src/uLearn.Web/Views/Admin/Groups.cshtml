@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNet.Identity
+@using uLearn
 @using uLearn.Web.Extensions
 @model uLearn.Web.Controllers.GroupsViewModel
 
@@ -19,6 +20,7 @@
 		}
 		@foreach (var group in Model.Groups.OrderBy(g => g.OwnerId != User.Identity.GetUserId()))
 		{
+			var enabledScoringGroupsIds = Model.EnabledScoringGroups.GetOrDefault(group.Id, new List<string>());
 			<div class="group" data-group-id="@group.Id">
 				<h3 class="group__title">
 					<a href=""
@@ -27,7 +29,8 @@
 					   data-group-id="@group.Id"
 					   data-name="@group.Name"
 					   data-is-public="@group.IsPublic.ToString().ToLower()"
-					   data-manual-checking="@group.IsManualCheckingEnabled.ToString().ToLower()">@group.Name</a>
+					   data-manual-checking="@group.IsManualCheckingEnabled.ToString().ToLower()"
+					   data-scoring-groups="@string.Join(",", enabledScoringGroupsIds)">@group.Name</a>
 
 					@if (!group.IsPublic)
 					{
@@ -118,6 +121,8 @@
 						</p>
 					</div>
 
+					<h3>Настройки</h3>
+
 					<div class="checkbox checkbox-default">
 						@Html.CheckBox("isPublic")
 						<label for="isPublic">
@@ -126,12 +131,29 @@
 					</div>
 
 					<div class="checkbox checkbox-default @(Model.CourseManualCheckingEnabled ? "hidden" : "")"
-						 data-default-value="@((! Model.CourseManualCheckingEnabled).ToString().ToLower())">
+						 data-default-value="@((!Model.CourseManualCheckingEnabled).ToString().ToLower())">
 						@Html.CheckBox("manualChecking")
 						<label for="manualChecking">
 							Включить код-ревью и ручную проверку тестов для участников группы
 						</label>
 					</div>
+
+					if (Model.ScoringGroupsCanBeSetInSomeUnit.Count > 0)
+					{
+						<h3>Баллы</h3>
+						<div>
+							 Преподаватели могут выставлять студентам группы следующие баллы:
+							 @foreach (var scoringGroup in Model.ScoringGroupsCanBeSetInSomeUnit)
+							 {
+								<div class="checkbox checkbox-default scoring-group-checkbox">
+									@Html.CheckBox("scoring-group__" + scoringGroup.Id)
+									<label for="scoring-group__@scoringGroup.Id">
+										@scoringGroup.Name
+									</label>
+								</div>
+							 }
+						</div>
+					}
 
 					<button class="action-button  btn btn-success">Создать</button>
 					<button class="remove-group-link  btn btn-danger" data-url="@Url.Action("RemoveGroup", "Admin")">Удалить группу</button>

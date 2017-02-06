@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using uLearn.Quizes;
 
@@ -18,6 +19,7 @@ namespace uLearn.Web.Models
 		public Func<Slide, bool> IsVisited = s => false;
 		public Func<Unit, bool> IsUnitVisible = u => true;
 		public Func<Slide, bool> IsSlideHidden = s => true;
+		public List<string> EnabledScoringGroupsIds { get; set; }
 		public bool IsInstructor;
 
 		public TocModelBuilder(Func<Slide, string> getSlideUrl, Func<Slide, int> getSlideScore, Func<Slide, int> getSlideMaxScore, Func<Unit, ScoringGroup, int> getAdditionalScore, Course course, Guid? currentSlideId)
@@ -63,7 +65,9 @@ namespace uLearn.Web.Models
 				});
 			}
 
-			var additionalScores = unit.Scoring.Groups.Values.Where(g => g.CanBeSetByInstructor).ToDictionary(g => g, g => getAdditionalScore(unit, g));
+			var additionalScores = unit.Scoring.Groups.Values
+				.Where(g => g.CanBeSetByInstructor && (g.EnabledForEveryone || EnabledScoringGroupsIds.Contains(g.Id)))
+				.ToDictionary(g => g, g => getAdditionalScore(unit, g));
 			return new TocUnitModel
 			{
 				IsCurrent = unit.Slides.Any(s => s.Id == currentSlideId),

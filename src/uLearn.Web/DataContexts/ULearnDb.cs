@@ -99,5 +99,6 @@ namespace uLearn.Web.DataContexts
 		public DbSet<Certificate> Certificates { get; set; }
 
 		public DbSet<AdditionalScore> AdditionalScores { get; set; }
+		public DbSet<EnabledAdditionalScoringGroup> EnabledAdditionalScoringGroups { get; set; }
 	}
 }

@@ -4,7 +4,7 @@
 
 @model UnitStatisticPageModel
 @{
-	ViewBag.Title = "Аналитика";
+	ViewBag.Title = Model.Unit.Title;
 }
 
 @functions
@@ -46,11 +46,10 @@
 <body>
 	<div class="container">
 
-		<h1 class="hidden-xs">Аналитика</h1>
 		<h2>
-			@Model.Unit.Title.TruncateWithEllipsis(25)
+			@Model.Unit.Title.TruncateWithEllipsis(35)
 
-			<small><a href="#filters" class="visible-xs-inline ml10" data-toggle="true"><span class="no-underline glyphicon glyphicon-filter"></span></a></small>
+			<small><a href="#filters" class="visible-xs-inline ml10" data-toggle="true" data-scroll="false"><span class="no-underline glyphicon glyphicon-filter"></span></a></small>
 			<br class="visible-xs"/>
 			<small class="visible-xs">с @Model.PeriodStart.ToShortDateString() по @Model.PeriodFinish.ToShortDateString()</small>
 		</h2>
@@ -259,6 +258,12 @@
 						var visitedSlidesCount = Model.VisitedSlidesCountByUser[userInfo.UserId];
 						var visitedSlidesCountAllTime = Model.VisitedSlidesCountByUserAllTime[userInfo.UserId];
 						var userVisibleName = userInfo.UserVisibleName != "" ? userInfo.UserVisibleName : userInfo.UserName;
+						var userGroupsIds = Model.UsersGroupsIds.GetOrDefault(userInfo.UserId, new List<int>());
+						var userModifiableScoringGroupsIds = Model.EnabledAdditionalScoringGroupsForGroups
+							.Where(kv => userGroupsIds.Contains(kv.Key))
+							.SelectMany(kv => kv.Value)
+							.ToList();
+
 						<div class="student">
 							<div class="ib" title="@userInfo.UserName">
 								@Html.ActionLink(userVisibleName.TruncateWithEllipsis(25), "UserUnitStatistics", new { courseId = Model.Course.Id, unitId = Model.Unit.Id, userId = userInfo.UserId}, new { title = "Посмотреть статистику пользователя " + userInfo.UserName })
@@ -318,24 +323,28 @@
 								@foreach (var scoringGroup in modifiableScoringGroups)
 								{
 									var userAndScoringGroup = Tuple.Create(userInfo.UserId, scoringGroup.Id);
-									<span class="small-table__title__cell">
-										<a href="#" class="internal-page-link additional-score-link" title="Изменить оценку «@scoringGroup.Name»" data-scoring-type="@scoringGroup.Id">
-											@if (Model.AdditionalScores.ContainsKey(userAndScoringGroup))
-											{
-												@Model.AdditionalScores[userAndScoringGroup]
-											}
-											else
-											{
-												<span>&mdash;</span>
-											}
-										</a>
-										<input name="additional-score"
+									var isModifiableForUser = scoringGroup.EnabledForEveryone || userModifiableScoringGroupsIds.Contains(scoringGroup.Id);
+									<span class="small-table__title__cell additional-score">
+										@if (isModifiableForUser)
+										{
+											<a href="#" class="internal-page-link additional-score-link" title="Изменить оценку «@scoringGroup.Name»" data-scoring-type="@scoringGroup.Id">
+												@if (Model.AdditionalScores.ContainsKey(userAndScoringGroup))
+												{
+													@Model.AdditionalScores[userAndScoringGroup]
+												}
+												else
+												{
+													<span>&mdash;</span>
+												}
+											</a>
+											<input name="additional-score"
 											   class="form-control input-sm additional-score-input"
 											   min="0"
 											   max="@scoringGroup.MaxAdditionalScore"
 											   value="@(Model.AdditionalScores.ContainsKey(userAndScoringGroup) ? Model.AdditionalScores[userAndScoringGroup].ToString() : "")"
 											   data-scoring-type="@scoringGroup.Id"
-											   data-url="@Url.Action("SetAdditionalScore", "Admin", new { courseId = Model.Course.Id, unitId = Model.Unit.Id, userId = userInfo.UserId, scoringGroupId = scoringGroup.Id})"/>
+											   data-url="@Url.Action("SetAdditionalScore", "Admin", new { courseId = Model.Course.Id, unitId = Model.Unit.Id, userId = userInfo.UserId, scoringGroupId = scoringGroup.Id })"/>
+										}
 									</span>
 								}
 							</div>

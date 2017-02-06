@@ -29,7 +29,10 @@ namespace uLearn.Web.Models
 		public List<UnitStatisticUserInfo> VisitedUsers { get; set; }
 		public Dictionary<string, int> VisitedSlidesCountByUser { get; set; }
 		public Dictionary<string, int> VisitedSlidesCountByUserAllTime { get; set; }
+
 		public Dictionary<Tuple<string, string>, int> AdditionalScores { get; set; }
+		public Dictionary<string, List<int>> UsersGroupsIds { get; set; }
+		public Dictionary<int, List<string>> EnabledAdditionalScoringGroupsForGroups { get; set; }
 	}
 
 	public class UnitStatisticUserInfo

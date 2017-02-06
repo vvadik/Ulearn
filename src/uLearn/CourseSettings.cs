@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
 namespace uLearn
@@ -45,6 +46,9 @@ namespace uLearn
 			"dictionary.txt"
 		);
 
+		[XmlIgnore]
+		private static readonly Regex scoringGroupIdRegex = new Regex("^[a-z0-9_]+$", RegexOptions.IgnoreCase);
+
 		public CourseSettings()
 		{
 			Scoring = new ScoringSettings();
@@ -80,13 +84,24 @@ namespace uLearn
 
 			foreach (var scoringGroup in settings.Scoring.Groups.Values)
 			{
+				if (! scoringGroupIdRegex.IsMatch(scoringGroup.Id))
+					throw new CourseLoadingException(
+						$"Некорректный идентификатор группы баллов <group id={scoringGroup.Id}> (файл Course.xml). " +
+						"Идентификатор группы баллов может состоить только из латинских букв, цифр и подчёркивания, а также не может быть пустым. Понятное человеку название используйте в аббревиатуре и имени группы."
+					);
+
 				if (scoringGroup.IsMaxAdditionalScoreSpecified &&
 					(!scoringGroup.IsCanBeSetByInstructorSpecified || !scoringGroup.CanBeSetByInstructor))
 					throw new CourseLoadingException(
 						$"Чтобы выставлять дополнительные баллы в группу {scoringGroup.Id}, установите у неё атрибут set_by_instructor=\"true\" в настройках курса (файл Course.xml). " +
-						$"В противном случае атрибут max_additional_score=\"{scoringGroup.MaxAdditionalScore}\" не действует"
+						$"В противном случае атрибут max_additional_score=\"{scoringGroup.MaxAdditionalScore}\" не действует."
 					);
 
+				if (! scoringGroup.CanBeSetByInstructor && scoringGroup.IsEnabledForEveryoneSpecified)
+					throw new CourseLoadingException(
+						$"Неправильные параметры для группы баллов {scoringGroup.Id} в файле Course.xml. " + 
+						"Опция enable_for_everyone доступна только при установке опции set_by_instructor=\"true\"."
+					);
 			}
 
 			return settings;
@@ -213,6 +228,7 @@ namespace uLearn
 	{
 		public const bool DefaultCanBeSetByInstructor = false;
 		public const int DefaultMaxAdditionalScore = 10;
+		public const bool DefaultEnabledForEveryone = false;
 
 		[XmlAttribute("id")]
 		public string Id { get; set; }
@@ -220,7 +236,8 @@ namespace uLearn
 		[XmlAttribute("abbr")]
 		public string Abbreviation { get; set; }
 
-		/* Hack to handle empty integer attribute, because standart XmlSerializer doesn't work with nullable (bool?) fields */
+		/* Hack to handle empty bool and integer attributes,
+		 * because standart XmlSerializer doesn't work with nullable (i.e. int? and bool?) fields */
 		[XmlAttribute("set_by_instructor")]
 		public string _canBeSetByInstructor;
 
@@ -232,9 +249,7 @@ namespace uLearn
 					return DefaultCanBeSetByInstructor;
 
 				bool value;
-				if (bool.TryParse(_canBeSetByInstructor, out value))
-					return value;
-				return DefaultCanBeSetByInstructor;
+				return bool.TryParse(_canBeSetByInstructor, out value) ? value : DefaultCanBeSetByInstructor;
 			}
 			set { _canBeSetByInstructor = value.ToString();  }
 		}
@@ -261,6 +276,26 @@ namespace uLearn
 		[XmlIgnore]
 		public bool IsMaxAdditionalScoreSpecified => !string.IsNullOrEmpty(_maxAdditionalScore);
 
+		[XmlAttribute("enable_for_everyone")]
+		public string _enabledForEveryone;
+
+		[XmlIgnore]
+		public bool EnabledForEveryone
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(_enabledForEveryone) || _enabledForEveryone.Trim().Length == 0)
+					return DefaultEnabledForEveryone;
+
+				bool value;
+				return bool.TryParse(_enabledForEveryone, out value) ? value : DefaultEnabledForEveryone;
+			}
+			set { _enabledForEveryone = value.ToString(); }
+		}
+
+		[XmlIgnore]
+		public bool IsEnabledForEveryoneSpecified => !string.IsNullOrEmpty(_enabledForEveryone);
+
 		[XmlText]
 		public string Name { get; set; }
 
@@ -268,6 +303,7 @@ namespace uLearn
 		{
 			_canBeSetByInstructor = string.IsNullOrEmpty(_canBeSetByInstructor) ? otherScoringGroup._canBeSetByInstructor : _canBeSetByInstructor;
 			_maxAdditionalScore = string.IsNullOrEmpty(_maxAdditionalScore) ? otherScoringGroup._maxAdditionalScore : _maxAdditionalScore;
+			_enabledForEveryone = string.IsNullOrEmpty(_enabledForEveryone) ? otherScoringGroup._enabledForEveryone : _enabledForEveryone;
 			Abbreviation = Abbreviation ?? otherScoringGroup.Abbreviation;
 			Name = string.IsNullOrEmpty(Name) ? otherScoringGroup.Name : Name;
 		}

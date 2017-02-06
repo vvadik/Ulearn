@@ -100,9 +100,14 @@ namespace uLearn.Web.Controllers
 				.GroupBy(v => v.UserId)
 				.ToDictionary(g => g.Key, g => g.Count());
 
+			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();
 			var additionalScores = additionalScoresRepo
-				.GetAdditionalScoresForUsers(courseId, unitId.Value, visitedUsers.Select(v => v.UserId))
+				.GetAdditionalScoresForUsers(courseId, unitId.Value, visitedUsersIds)
 				.ToDictionary(kv => kv.Key, kv => kv.Value.Score);
+			var usersGroupsIds = groupsRepo.GetUsersGroupsIds(courseId, visitedUsersIds);
+			var enabledAdditionalScoringGroupsForGroups = groupsRepo.GetEnabledAdditionalScoringGroups(courseId)
+				.GroupBy(e => e.GroupId)
+				.ToDictionary(g => g.Key, g => g.Select(e => e.ScoringGroupId).ToList());
 
 			var model = new UnitStatisticPageModel
 			{
@@ -130,6 +135,8 @@ namespace uLearn.Web.Controllers
 				VisitedSlidesCountByUserAllTime = visitedSlidesCountByUserAllTime,
 
 				AdditionalScores = additionalScores,
+				UsersGroupsIds = usersGroupsIds,
+				EnabledAdditionalScoringGroupsForGroups = enabledAdditionalScoringGroupsForGroups,
 			};
 			return View(model);
 		}

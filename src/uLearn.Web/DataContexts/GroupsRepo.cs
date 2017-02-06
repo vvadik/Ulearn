@@ -216,6 +216,20 @@ namespace uLearn.Web.DataContexts
 			return db.GroupMembers.Where(m => groupsIds.Contains(m.GroupId)).Select(m => m.UserId);
 		}
 
+		public Dictionary<string, List<int>> GetUsersGroupsIds(string courseId, IEnumerable<string> usersIds)
+		{
+			var groupsIds = GetGroups(courseId).Select(g => g.Id);
+			return db.GroupMembers
+				.Where(m => groupsIds.Contains(m.GroupId) && usersIds.Contains(m.UserId))
+				.GroupBy(m => m.UserId)
+				.ToDictionary(g => g.Key, g => g.Select(m => m.GroupId).ToList());
+		}
+
+		public List<int> GetUserGroupsIds(string courseId, string userId)
+		{
+			return GetUsersGroupsIds(courseId, new List<string> { userId }).GetOrDefault(userId, new List<int>());
+		}
+
 		public bool IsManualCheckingEnabledForUser(Course course, string userId)
 		{
 			if (course.Settings.IsManualCheckingEnabled)
@@ -228,6 +242,33 @@ namespace uLearn.Web.DataContexts
 				.ToList();
 			var userGroups = db.Groups.Where(g => userGroupsIds.Contains(g.Id)).ToList();
 			return userGroups.Any(g => g.IsManualCheckingEnabled);
+		}
+
+		public async Task EnableAdditionalScoringGroupsForGroup(int groupId, IEnumerable<string> scoringGroupsIds)
+		{
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				db.EnabledAdditionalScoringGroups.RemoveRange(
+					db.EnabledAdditionalScoringGroups.Where(e => e.GroupId == groupId)
+				);
+
+				foreach (var scoringGroupId in scoringGroupsIds)
+					db.EnabledAdditionalScoringGroups.Add(new EnabledAdditionalScoringGroup
+					{
+						GroupId = groupId,
+						ScoringGroupId = scoringGroupId
+					});
+
+				await db.SaveChangesAsync();
+
+				transaction.Commit();
+			}
+		}
+
+		public List<EnabledAdditionalScoringGroup> GetEnabledAdditionalScoringGroups(string courseId)
+		{
+			var groupsIds = GetGroups(courseId).Select(g => g.Id);
+			return db.EnabledAdditionalScoringGroups.Where(e => groupsIds.Contains(e.GroupId)).ToList();
 		}
 	}
 }

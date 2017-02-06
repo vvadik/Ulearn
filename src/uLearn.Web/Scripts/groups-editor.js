@@ -67,6 +67,7 @@
 		$form.find('[name="name"]').val("");
 		$form.find('[name="isPublic"]').prop('checked', false);
 		$form.find('[name="manualChecking"]').prop('checked', $form.find('[name="manualChecking"]').data('defaultValue'));
+		$form.find('.scoring-group-checkbox input').prop('checked', false);
 		$form.find('button.action-button').text('Создать');
 		$form.find('.remove-group-link').hide();
 		$('#createOrUpdateGroupModal').modal(); 
@@ -80,12 +81,17 @@
 		var name = $self.data('name');
 		var isPublic = $self.data('isPublic');
 		var manualChecking = $self.data('manualChecking');
+		var scoringGroupsIds = $self.data('scoringGroups').split(',');
 
 		$form.attr('action', $form.data('updateGroupUrl'));
 		$form.find('[name="groupId"]').val(groupId);
 		$form.find('[name="name"]').val(name);
 		$form.find('[name="isPublic"]').prop('checked', isPublic);
 		$form.find('[name="manualChecking"]').prop('checked', manualChecking);
+		$form.find('.scoring-group-checkbox input').prop('checked', false);
+		scoringGroupsIds.forEach(function (scoringGroupId) {
+			$form.find('.scoring-group-checkbox [name="scoring-group__' + scoringGroupId + '"]').prop('checked', true);
+		});
 		$form.find('button.action-button').text('Сохранить');
 		$form.find('.remove-group-link').data('groupId', groupId).show();
 		$('#createOrUpdateGroupModal').modal();

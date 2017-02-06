@@ -563,22 +563,40 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Packages", new { courseId });
 		}
 
+		private static List<ScoringGroup> GetScoringGroupsCanBeSetInSomeUnit(Course course)
+		{
+			return course.Units
+				.SelectMany(u => u.Scoring.Groups.Values)
+				.Where(g => g.CanBeSetByInstructor && !g.EnabledForEveryone)
+				.ToList();
+		}
+
 		public ActionResult Groups(string courseId)
 		{
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
 			var course = courseManager.GetCourse(courseId);
+			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course);
+			var enabledScoringGroups = groupsRepo.GetEnabledAdditionalScoringGroups(courseId)
+				.GroupBy(e => e.GroupId)
+				.ToDictionary(g => g.Key, g => g.Select(e => e.ScoringGroupId).ToList());
 
 			return View("Groups", new GroupsViewModel
 			{
 				CourseId = courseId,
 				CourseManualCheckingEnabled = course.Settings.IsManualCheckingEnabled,
 				Groups = groups,
+				ScoringGroupsCanBeSetInSomeUnit = scoringGroupsCanBeSetInSomeUnit,
+				EnabledScoringGroups = enabledScoringGroups,
 			});
 		}
 
-		public ActionResult CreateGroup(string courseId, string name, bool isPublic, bool manualChecking)
+		public async Task<ActionResult> CreateGroup(string courseId, string name, bool isPublic, bool manualChecking)
 		{
-			var group = groupsRepo.CreateGroup(courseId, name, User.Identity.GetUserId(), isPublic, manualChecking);
+			var group = await groupsRepo.CreateGroup(courseId, name, User.Identity.GetUserId(), isPublic, manualChecking);
+
+			var course = courseManager.GetCourse(courseId);
+			await UpdateEnabledScoringGroupsForGroup(course, group.Id);
+
 			return RedirectToAction("Groups", new {courseId});
 		}
 
@@ -618,9 +636,26 @@ namespace uLearn.Web.Controllers
 			var group = groupsRepo.FindGroupById(groupId);
 			if (!CanSeeAndModifyGroup(group))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
 			await groupsRepo.ModifyGroup(groupId, name, isPublic, manualChecking);
 
+			var course = courseManager.GetCourse(group.CourseId);
+			await UpdateEnabledScoringGroupsForGroup(course, groupId);
+
 			return RedirectToAction("Groups", new { courseId = group.CourseId });
+		}
+
+		private async Task UpdateEnabledScoringGroupsForGroup(Course course, int groupId)
+		{
+			var scoringGroups = GetScoringGroupsCanBeSetInSomeUnit(course);
+			var enabledScoringGroupsIds = new List<string>();
+			foreach (var scoringGroup in scoringGroups)
+			{
+				var checkboxName = "scoring-group__" + scoringGroup.Id;
+				if (!string.IsNullOrEmpty(Request.Form[checkboxName]) && Request.Form[checkboxName] != "false")
+					enabledScoringGroupsIds.Add(scoringGroup.Id);
+			}
+			await groupsRepo.EnableAdditionalScoringGroupsForGroup(groupId, enabledScoringGroupsIds);
 		}
 
 		[HttpPost]
@@ -1125,6 +1160,8 @@ namespace uLearn.Web.Controllers
 		public string CourseId { get; set; }
 		public bool CourseManualCheckingEnabled { get; set; }
 
-		public List<Group> Groups;
+		public List<Group> Groups { get; set; }
+		public List<ScoringGroup> ScoringGroupsCanBeSetInSomeUnit { get; set; }
+		public Dictionary<int, List<string>> EnabledScoringGroups { get; set; }
 	}
 }

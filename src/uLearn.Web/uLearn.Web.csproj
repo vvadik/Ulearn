@@ -330,9 +330,14 @@
     <Compile Include="Migrations\201701310057267_AddAdditionalScores.Designer.cs">
       <DependentUpon>201701310057267_AddAdditionalScores.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201702061047104_AddEnabledAdditionalScoringGroups.cs" />
+    <Compile Include="Migrations\201702061047104_AddEnabledAdditionalScoringGroups.Designer.cs">
+      <DependentUpon>201702061047104_AddEnabledAdditionalScoringGroups.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\Certificate.cs" />
     <Compile Include="Models\CertificateTemplate.cs" />
+    <Compile Include="Models\EnabledAdditionalScoringGroup.cs" />
     <Compile Include="Models\FilterOptions.cs" />
     <Compile Include="DataContexts\SlideCheckingsRepo.cs" />
     <Compile Include="Migrations\201608231750470_SlideChecking.cs" />
@@ -890,6 +895,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201701310057267_AddAdditionalScores.resx">
       <DependentUpon>201701310057267_AddAdditionalScores.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702061047104_AddEnabledAdditionalScoringGroups.resx">
+      <DependentUpon>201702061047104_AddEnabledAdditionalScoringGroups.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
