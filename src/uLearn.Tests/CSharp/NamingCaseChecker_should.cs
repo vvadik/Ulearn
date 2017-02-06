@@ -54,6 +54,19 @@ namespace uLearn.CSharp
 		}
 
 		[Test]
+		public void inspect_constName()
+		{
+			CheckCorrect("class A{ const int A; }");
+			CheckCorrect("class A{ private const int Abc; }");
+			CheckCorrect("class A{ public const int AbcDef; }");
+			CheckIncorrect("class A{ const int a; }");
+			CheckIncorrect("class A{ private const int abc; }");
+			CheckIncorrect("class A{ public const int abcDef; }");
+			CheckIncorrect("class A{ public const int _a; }");
+			CheckIncorrect("class A{ public const int _b; }");
+
+		}
+		[Test]
 		public void inspect_fieldName()
 		{
 			CheckCorrect("class A{ int A; }");
