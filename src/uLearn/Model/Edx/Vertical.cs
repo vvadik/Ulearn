@@ -50,19 +50,12 @@ namespace uLearn.Model.Edx
 				component.Save(folderName);
 		}
 
-		public static Vertical Load(string folderName, string urlName)
+		public static Vertical Load(string folderName, string urlName, EdxLoadOptions options)
 		{
-			try
+			return Load<Vertical>(folderName, "vertical", urlName, options, v =>
 			{
-				var vertical = new FileInfo(string.Format("{0}/vertical/{1}.xml", folderName, urlName)).DeserializeXml<Vertical>();
-				vertical.UrlName = urlName;
-				vertical.Components = vertical.ComponentReferences.Select(x => x.GetComponent(folderName, x.UrlName)).ToArray();
-				return vertical;
-			}
-			catch (Exception e)
-			{
-				throw new Exception(string.Format("Vertical {0} load error", urlName), e);
-			}
+				v.Components = v.ComponentReferences.Select(x => x.LoadComponent(folderName, x.UrlName, options)).ExceptNulls().ToArray();
+			});
 		}
 	}
 }

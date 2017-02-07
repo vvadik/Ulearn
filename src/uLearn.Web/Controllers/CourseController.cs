@@ -392,6 +392,7 @@ namespace uLearn.Web.Controllers
 			RemoveFrom(db.UserExerciseSubmissions, slideId, userId);
 			RemoveFrom(db.UserQuizzes, slideId, userId);
 			RemoveFrom(db.Visits, slideId, userId);
+
 			await slideCheckingsRepo.RemoveAttempts(courseId, slideId, userId, false);
 			db.UserQuestions.RemoveRange(db.UserQuestions.Where(q => q.UserId == userId && q.SlideId == slideId));
 			db.SlideRates.RemoveRange(db.SlideRates.Where(q => q.UserId == userId && q.SlideId == slideId));

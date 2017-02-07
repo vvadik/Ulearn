@@ -52,19 +52,12 @@ namespace uLearn.Model.Edx
 				sequential.Save(folderName);
 		}
 
-		public static Chapter Load(string folderName, string urlName)
+		public static Chapter Load(string folderName, string urlName, EdxLoadOptions options)
 		{
-			try
+			return Load<Chapter>(folderName, "chapter", urlName, options, c =>
 			{
-				var chapter = new FileInfo(string.Format("{0}/chapter/{1}.xml", folderName, urlName)).DeserializeXml<Chapter>();
-				chapter.UrlName = urlName;
-				chapter.Sequentials = chapter.SequentialReferences.Select(x => Sequential.Load(folderName, x.UrlName)).ToArray();
-				return chapter;
-			}
-			catch (Exception e)
-			{
-				throw new Exception(string.Format("Chapter {0} load error", urlName), e);
-			}
+				c.Sequentials = c.SequentialReferences.Select(x => Sequential.Load(folderName, x.UrlName, options)).ExceptNulls().ToArray();
+			});
 		}
 	}
 }

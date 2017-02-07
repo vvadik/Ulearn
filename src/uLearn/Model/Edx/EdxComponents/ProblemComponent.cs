@@ -2,6 +2,7 @@
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using static uLearn.Model.Edx.EdxItem;
 
 namespace uLearn.Model.Edx.EdxComponents
 {
@@ -60,12 +61,8 @@ namespace uLearn.Model.Edx.EdxComponents
 					subcomponent.SaveAdditional(folderName);
 		}
 
-		public static SlideProblemComponent Load(string folderName, string urlName)
-		{
-			var component = new FileInfo(string.Format("{0}/problem/{1}.xml", folderName, urlName)).DeserializeXml<SlideProblemComponent>();
-			component.UrlName = urlName;
-			return component;
-		}
+		public static SlideProblemComponent Load(string folderName, string urlName, EdxLoadOptions options) 
+			=> Load<SlideProblemComponent>(folderName, "problem", urlName, options);
 	}
 
 	[XmlRoot("problem")]

@@ -105,8 +105,7 @@ namespace uLearn
 				componentIndex++;
 			}
 
-			yield return new Vertical(slide.NormalizedGuid, slide.Title, components.ToArray());
-
+			
 			var exerciseWithSolutionsToShow = slide.Blocks.OfType<ExerciseBlock>().FirstOrDefault(e => !e.HideShowSolutionsButton);
 			if (exerciseWithSolutionsToShow != null)
 			{
@@ -114,8 +113,11 @@ namespace uLearn
 					"Решения",
 					slide, componentIndex,
 					string.Format(solutionsUrl, courseId, slide.Id), ltiId);
-				yield return new Vertical(slide.NormalizedGuid + "0", "Решения", new[] { comp });
+				components.Add(comp);
+				//yield return new Vertical(slide.NormalizedGuid + "0", "Решения", new[] { comp });
 			}
+			yield return new Vertical(slide.NormalizedGuid, slide.Title, components.ToArray());
+
 		}
 
 		private static IEnumerable<Vertical> QuizToVerticals(string courseId, QuizSlide slide, string slideUrl, string ltiId)

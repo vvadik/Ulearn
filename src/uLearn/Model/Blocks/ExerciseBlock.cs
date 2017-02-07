@@ -103,7 +103,7 @@ namespace uLearn.Model.Blocks
 
 		public Component GetSolutionsComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)
 		{
-			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex + 1, launchUrl, ltiId, false, 0, false);
+			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex + "-solutions", launchUrl, ltiId, false, 0, false);
 		}
 
 		public Component GetExerciseComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)

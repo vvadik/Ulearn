@@ -1,9 +1,26 @@
 ﻿using System;
 using System.IO;
 using CommandLine;
+using uLearn.Model.Edx;
 
 namespace uLearn.CourseTool
 {
+	[Verb("clear-olx", HelpText = "Remove not existent items from course")]
+	public class ClearOlx : AbstractOptions
+	{
+		public override void DoExecute()
+		{
+			var loadOptions = new EdxLoadOptions();
+			loadOptions.FailOnNonExistingItem = false;
+			loadOptions.HandleNonExistentItemTypeName = (type, url) => Console.WriteLine($"Skipped non existent item  type:{type} urlName:{url}");
+			var folderName = Path.Combine(Dir, "olx");
+			Console.WriteLine("Loading");
+			var course = EdxCourse.Load(folderName, loadOptions);
+			Console.WriteLine("Saving");
+			course.Save(folderName);
+		}
+	}
+
 	[Verb("squash-olx-chapters", HelpText = "Move sequentials to chapters")]
 	public class SquashOlxChapters : AbstractOptions
 	{
