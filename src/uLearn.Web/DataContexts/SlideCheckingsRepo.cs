@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
 using System.Threading.Tasks;
+using uLearn.Web.Extensions;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts
@@ -11,11 +12,6 @@ namespace uLearn.Web.DataContexts
 	public class SlideCheckingsRepo
 	{
 		private readonly ULearnDb db;
-
-		public SlideCheckingsRepo() : this(new ULearnDb())
-		{
-
-		}
 
 		public SlideCheckingsRepo(ULearnDb db)
 		{
@@ -98,16 +94,16 @@ namespace uLearn.Web.DataContexts
 
 		private IEnumerable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId) where T: AbstractSlideChecking
 		{
-			return db.Set<T>().Where(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId);
+			var items = db.Set<T>().AsNoTracking().Where(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId).ToList();
+			return items;
 		}
 
 		public async Task RemoveAttempts(string courseId, Guid slideId, string userId, bool saveChanges=true)
 		{
-			db.ManualQuizCheckings.RemoveRange(GetSlideCheckingsByUser<ManualQuizChecking>(courseId, slideId, userId));
-			db.AutomaticQuizCheckings.RemoveRange(GetSlideCheckingsByUser<AutomaticQuizChecking>(courseId, slideId, userId));
-			db.ManualExerciseCheckings.RemoveRange(GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId));
-			db.AutomaticExerciseCheckings.RemoveRange(GetSlideCheckingsByUser<AutomaticExerciseChecking>(courseId, slideId, userId));
-
+			db.ManualQuizCheckings.RemoveSlideAction(slideId, userId);
+			db.AutomaticQuizCheckings.RemoveSlideAction(slideId, userId);
+			db.ManualExerciseCheckings.RemoveSlideAction(slideId, userId);
+			db.AutomaticExerciseCheckings.RemoveSlideAction(slideId, userId);
 			if (saveChanges)
 				await db.SaveChangesAsync();
 		}

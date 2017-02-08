@@ -95,7 +95,7 @@ namespace uLearn.Web.Extensions
 
 		public static async Task<ClaimsIdentity> GenerateUserIdentityAsync(this ApplicationUser user, UserManager<ApplicationUser> manager)
 		{
-			var userRoles = new UserRolesRepo();
+			var userRoles = new UserRolesRepo(new ULearnDb());
 			return await user.GenerateUserIdentityAsync(manager, userRoles);
 		}
 	}

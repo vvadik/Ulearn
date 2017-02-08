@@ -10,11 +10,6 @@ namespace uLearn.Web.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		public AdditionalScoresRepo() : this(new ULearnDb())
-		{
-
-		}
-
 		public AdditionalScoresRepo(ULearnDb db)
 		{
 			this.db = db;

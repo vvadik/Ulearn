@@ -13,11 +13,6 @@ namespace uLearn.Web.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		public GroupsRepo() : this(new ULearnDb())
-		{
-
-		}
-
 		public GroupsRepo(ULearnDb db)
 		{
 			this.db = db;

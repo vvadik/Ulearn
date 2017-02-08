@@ -9,12 +9,6 @@ namespace uLearn.Web.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		public UserRolesRepo()
-			: this(new ULearnDb())
-		{
-
-		}
-
 		public UserRolesRepo(ULearnDb db)
 		{
 			this.db = db;

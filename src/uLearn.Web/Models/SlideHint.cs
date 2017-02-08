@@ -7,7 +7,7 @@ using System.Web;
 
 namespace uLearn.Web.Models
 {
-	public class SlideHint
+	public class SlideHint : ISlideAction
 	{
 		[Key]
 		public int Id { get; set; }

@@ -13,12 +13,15 @@ namespace uLearn.Web.Controllers
 {
 	public class CertificatesController : Controller
 	{
-		private readonly CertificatesRepo certificatesRepo = new CertificatesRepo();
-		private readonly ULearnUserManager userManager = new ULearnUserManager();
+		private readonly CertificatesRepo certificatesRepo;
+		private readonly ULearnUserManager userManager;
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
 		public CertificatesController()
 		{
+			var db = new ULearnDb();
+			certificatesRepo = new CertificatesRepo(db);
+			userManager = new ULearnUserManager(db);
 		}
 
 		[AllowAnonymous]

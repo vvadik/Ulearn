@@ -43,7 +43,7 @@ namespace uLearn.Web.Controllers
 			courseManager = WebCourseManager.Instance;
 			usersRepo = new UsersRepo(db);
 			commentsRepo = new CommentsRepo(db);
-			userManager = new ULearnUserManager();
+			userManager = new ULearnUserManager(db);
 			quizzesRepo = new QuizzesRepo(db);
 			coursesRepo = new CoursesRepo(db);
 			groupsRepo = new GroupsRepo(db);

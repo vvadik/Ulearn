@@ -300,6 +300,7 @@
     <Compile Include="Controllers\CertificatesController.cs" />
     <Compile Include="DataContexts\AdditionalScoresRepo.cs" />
     <Compile Include="DataContexts\CertificatesRepo.cs" />
+    <Compile Include="Extensions\EfDbExtensions.cs" />
     <Compile Include="Extensions\ControllerExtensions.cs" />
     <Compile Include="Controllers\AuthenticationManager.cs" />
     <Compile Include="Controllers\CommentsBot.cs" />
@@ -382,6 +383,7 @@
     </Compile>
     <Compile Include="Models\ExerciseCodeReview.cs" />
     <Compile Include="Models\ExerciseCodeReviewModel.cs" />
+    <Compile Include="Models\ISlideAction.cs" />
     <Compile Include="Models\SlideChecking.cs" />
     <Compile Include="Models\CourseInstructorNavbarViewModel.cs" />
     <Compile Include="DataContexts\CommentsRepo.cs" />

@@ -17,18 +17,15 @@ namespace uLearn.Web.DataContexts
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(UserSolutionsRepo));
 		private readonly ULearnDb db;
-		private readonly TextsRepo textsRepo = new TextsRepo();
-		private readonly VisitsRepo visitsRepo = new VisitsRepo();
+		private readonly TextsRepo textsRepo;
+		private readonly VisitsRepo visitsRepo;
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
-
-		public UserSolutionsRepo() : this(new ULearnDb())
-		{
-
-		}
 
 		public UserSolutionsRepo(ULearnDb db)
 		{
 			this.db = db;
+			textsRepo = new TextsRepo(db);
+			visitsRepo = new VisitsRepo(db);
 		}
 
 		/* TODO(andgein): Remove isRightAnswer? */

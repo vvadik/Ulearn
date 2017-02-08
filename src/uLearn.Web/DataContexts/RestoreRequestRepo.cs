@@ -10,12 +10,6 @@ namespace uLearn.Web.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		public RestoreRequestRepo()
-			: this(new ULearnDb())
-		{
-
-		}
-
 		public RestoreRequestRepo(ULearnDb db)
 		{
 			this.db = db;

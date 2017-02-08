@@ -2,7 +2,6 @@
 using System.Web;
 using log4net;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using uLearn.Web.DataContexts;
@@ -15,11 +14,13 @@ namespace uLearn.Web.Controllers
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(AuthenticationManager));
 		private readonly UserManager<ApplicationUser> userManager;
-		private readonly UserRolesRepo userRoles = new UserRolesRepo();
+		private readonly UserRolesRepo userRoles;
 
 		private AuthenticationManager()
 		{
-			userManager = new ULearnUserManager();
+			var db = new ULearnDb();
+			userRoles = new UserRolesRepo(db);
+			userManager = new ULearnUserManager(db);
 		}
 
 		public static async Task LoginAsync(HttpContextBase context, ApplicationUser user, bool isPersistent)

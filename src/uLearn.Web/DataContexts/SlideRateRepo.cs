@@ -11,11 +11,6 @@ namespace uLearn.Web.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		public SlideRateRepo() : this(new ULearnDb())
-		{
-			
-		}
-
 		public SlideRateRepo(ULearnDb db)
 		{
 			this.db = db;

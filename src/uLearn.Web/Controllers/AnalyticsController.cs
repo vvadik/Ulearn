@@ -18,10 +18,10 @@ namespace uLearn.Web.Controllers
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly CourseManager courseManager;
 		private readonly VisitsRepo visitsRepo;
-		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
-		private readonly GroupsRepo groupsRepo = new GroupsRepo();
-		private readonly UsersRepo usersRepo = new UsersRepo();
-		private readonly AdditionalScoresRepo additionalScoresRepo = new AdditionalScoresRepo();
+		private readonly UserSolutionsRepo userSolutionsRepo;
+		private readonly GroupsRepo groupsRepo;
+		private readonly UsersRepo usersRepo;
+		private readonly AdditionalScoresRepo additionalScoresRepo;
 
 		public AnalyticsController()
 			: this(WebCourseManager.Instance)
@@ -31,6 +31,10 @@ namespace uLearn.Web.Controllers
 		public AnalyticsController(CourseManager courseManager)
 		{
 			this.courseManager = courseManager;
+			additionalScoresRepo = new AdditionalScoresRepo(db);
+			userSolutionsRepo = new UserSolutionsRepo(db);
+			groupsRepo = new GroupsRepo(db);
+			usersRepo = new UsersRepo(db);
 			visitsRepo = new VisitsRepo(db);
 		}
 
@@ -250,12 +254,12 @@ namespace uLearn.Web.Controllers
 			return slideIds == null ? source : source.Where(s => slideIds.Contains(s.SlideId));
 		}
 
-		private IQueryable<T> FilterByTime<T>(IQueryable<T> source, DateTime firstDay, DateTime lastDay) where T : class, ISlideAction
+		private IQueryable<T> FilterByTime<T>(IQueryable<T> source, DateTime firstDay, DateTime lastDay) where T : class, ITimedSlideAction
 		{
 			return source.Where(s => s.Timestamp > firstDay && s.Timestamp <= lastDay);
 		}
 
-		private Dictionary<DateTime, int> GroupByDays<T>(IQueryable<T> actions) where T : class, ISlideAction
+		private Dictionary<DateTime, int> GroupByDays<T>(IQueryable<T> actions) where T : class, ITimedSlideAction
 		{
 			var q = from s in actions
 					group s by DbFunctions.TruncateTime(s.Timestamp)

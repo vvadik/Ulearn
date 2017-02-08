@@ -11,11 +11,6 @@ namespace uLearn.Web.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		public UnitsRepo() : this(new ULearnDb())
-		{
-
-		}
-
 		public UnitsRepo(ULearnDb db)
 		{
 			this.db = db;

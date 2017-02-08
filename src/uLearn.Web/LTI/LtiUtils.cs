@@ -8,9 +8,10 @@ namespace uLearn.Web.LTI
 	{
 		public static void SubmitScore(Slide slide, string userId)
 		{
-			var ltiRequestsRepo = new LtiRequestsRepo();
-			var consumersRepo = new ConsumersRepo();
-			var visitsRepo = new VisitsRepo();
+			var db = new ULearnDb();
+			var ltiRequestsRepo = new LtiRequestsRepo(db);
+			var consumersRepo = new ConsumersRepo(db);
+			var visitsRepo = new VisitsRepo(db);
 
 			var ltiRequest = ltiRequestsRepo.Find(userId, slide.Id);
 			if (ltiRequest == null)

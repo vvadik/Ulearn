@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace uLearn.Web.Models
 {
-	public class UserExerciseSubmission : ISlideAction
+	public class UserExerciseSubmission : ITimedSlideAction
 	{
 		[Required]
 		[Key]

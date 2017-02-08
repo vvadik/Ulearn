@@ -20,13 +20,13 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
-		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
-		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
-		private readonly UnitsRepo unitsRepo = new UnitsRepo();
-		private readonly VisitsRepo visitsRepo = new VisitsRepo();
-		private readonly LtiRequestsRepo ltiRequestsRepo = new LtiRequestsRepo();
-		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
-		private readonly GroupsRepo groupsRepo = new GroupsRepo();
+		private readonly SlideRateRepo slideRateRepo;
+		private readonly UserSolutionsRepo solutionsRepo;
+		private readonly UnitsRepo unitsRepo;
+		private readonly VisitsRepo visitsRepo;
+		private readonly LtiRequestsRepo ltiRequestsRepo;
+		private readonly SlideCheckingsRepo slideCheckingsRepo;
+		private readonly GroupsRepo groupsRepo;
 
 		public CourseController()
 			: this(WebCourseManager.Instance)
@@ -35,6 +35,13 @@ namespace uLearn.Web.Controllers
 
 		public CourseController(CourseManager courseManager)
 		{
+			slideCheckingsRepo = new SlideCheckingsRepo(db);
+			visitsRepo = new VisitsRepo(db);
+			unitsRepo = new UnitsRepo(db);
+			slideRateRepo = new SlideRateRepo(db);
+			solutionsRepo = new UserSolutionsRepo(db);
+			ltiRequestsRepo = new LtiRequestsRepo(db);
+			groupsRepo = new GroupsRepo(db);
 			this.courseManager = courseManager;
 		}
 
@@ -389,22 +396,17 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.Submission.SlideId == slideId));
 
-			RemoveFrom(db.UserExerciseSubmissions, slideId, userId);
-			RemoveFrom(db.UserQuizzes, slideId, userId);
-			RemoveFrom(db.Visits, slideId, userId);
-
+			db.UserExerciseSubmissions.RemoveSlideAction(slideId, userId);
+			db.UserQuizzes.RemoveSlideAction(slideId, userId);
+			db.Visits.RemoveSlideAction(slideId, userId);
 			await slideCheckingsRepo.RemoveAttempts(courseId, slideId, userId, false);
-			db.UserQuestions.RemoveRange(db.UserQuestions.Where(q => q.UserId == userId && q.SlideId == slideId));
-			db.SlideRates.RemoveRange(db.SlideRates.Where(q => q.UserId == userId && q.SlideId == slideId));
-			db.Hints.RemoveRange(db.Hints.Where(q => q.UserId == userId && q.SlideId == slideId));
+
+			db.UserQuestions.RemoveSlideAction(slideId, userId);
+			db.SlideRates.RemoveSlideAction(slideId, userId);
+			db.Hints.RemoveSlideAction(slideId, userId);
 			await db.SaveChangesAsync();
 
 			return RedirectToAction("SlideById", new { courseId, slideId = slide.Id});
-		}
-
-		private static void RemoveFrom<T>(DbSet<T> dbSet, Guid slideId, string userId) where T : class, ISlideAction
-		{
-			dbSet.RemoveRange(dbSet.Where(s => s.UserId == userId && s.SlideId == slideId));
 		}
 
 		public ActionResult CourseInstructorNavbar(string courseId)

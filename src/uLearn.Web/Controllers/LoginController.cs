@@ -19,7 +19,7 @@ namespace uLearn.Web.Controllers
 
 
 		public LoginController()
-			: this(new ULearnUserManager())
+			: this(new ULearnUserManager(new ULearnDb()))
 		{
 		}
 

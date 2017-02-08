@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace uLearn.Web.Models
 {
-	public class Visit : ISlideAction
+	public class Visit : ITimedSlideAction
 	{
 		[Key]
 		public int Id { get; set; }

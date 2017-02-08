@@ -11,11 +11,6 @@ namespace uLearn.Web.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		public SlideHintRepo() : this(new ULearnDb())
-		{
-			
-		}
-
 		public SlideHintRepo(ULearnDb db)
 		{
 			this.db = db;

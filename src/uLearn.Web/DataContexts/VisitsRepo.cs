@@ -12,15 +12,10 @@ namespace uLearn.Web.DataContexts
 		private readonly ULearnDb db;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 
-		public VisitsRepo() : this(new ULearnDb())
-		{
-			
-		}
-
 		public VisitsRepo(ULearnDb db)
 		{
 			this.db = db;
-			this.slideCheckingsRepo = new SlideCheckingsRepo(db);
+			slideCheckingsRepo = new SlideCheckingsRepo(db);
 		}
 
 		public async Task AddVisit(string courseId, Guid slideId, string userId)
@@ -93,6 +88,7 @@ namespace uLearn.Web.DataContexts
 			var visits = db.Visits.Where(v => v.CourseId == courseId && v.UserId == userId);
 			if (slidesIds != null)
 				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
+			var vs = visits.Select(v => v.SlideId + " " + v.Score + " " + v.IsSkipped).ToList();
 			return visits
 				.GroupBy(v => v.SlideId, (s, v) => new { Key = s, Value = v.FirstOrDefault() })
 				.ToDictionary(g => g.Key, g => g.Value.Score);

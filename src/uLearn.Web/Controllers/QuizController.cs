@@ -27,11 +27,11 @@ namespace uLearn.Web.Controllers
 
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
-		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
-		private readonly VisitsRepo visitsRepo = new VisitsRepo();
-		private readonly QuizzesRepo quizzesRepo = new QuizzesRepo();
-		private readonly GroupsRepo groupsRepo = new GroupsRepo();
-		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
+		private readonly UserQuizzesRepo userQuizzesRepo;
+		private readonly VisitsRepo visitsRepo;
+		private readonly QuizzesRepo quizzesRepo;
+		private readonly GroupsRepo groupsRepo;
+		private readonly SlideCheckingsRepo slideCheckingsRepo;
 
 		public QuizController()
 			: this(WebCourseManager.Instance)
@@ -41,6 +41,11 @@ namespace uLearn.Web.Controllers
 		public QuizController(CourseManager courseManager)
 		{
 			this.courseManager = courseManager;
+			userQuizzesRepo = new UserQuizzesRepo(db);
+			visitsRepo = new VisitsRepo(db);
+			quizzesRepo = new QuizzesRepo(db);
+			groupsRepo = new GroupsRepo(db);
+			slideCheckingsRepo = new SlideCheckingsRepo(db);
 		}
 
 		internal class QuizAnswer

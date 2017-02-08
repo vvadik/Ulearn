@@ -14,13 +14,24 @@ namespace uLearn.Web.Controllers
 	public class SlideNavigationController : Controller
 	{
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
-		private readonly UnitsRepo unitsRepo = new UnitsRepo();
-		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
-		private readonly VisitsRepo visitsRepo = new VisitsRepo();
-		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
-		private readonly GroupsRepo groupsRepo = new GroupsRepo();
-		private readonly AdditionalScoresRepo additionalScoresRepo = new AdditionalScoresRepo();
-		
+		private readonly UnitsRepo unitsRepo;
+		private readonly UserSolutionsRepo solutionsRepo;
+		private readonly VisitsRepo visitsRepo;
+		private readonly UserQuizzesRepo userQuizzesRepo;
+		private readonly GroupsRepo groupsRepo;
+		private readonly AdditionalScoresRepo additionalScoresRepo;
+
+		public SlideNavigationController()
+		{
+			var db = new ULearnDb();
+			unitsRepo = new UnitsRepo(db);
+			solutionsRepo = new UserSolutionsRepo(db);
+			visitsRepo = new VisitsRepo(db);
+			userQuizzesRepo = new UserQuizzesRepo(db);
+			groupsRepo = new GroupsRepo(db);
+			additionalScoresRepo = new AdditionalScoresRepo(db);
+		}
+
 		public ActionResult TableOfContents(string courseId, Guid? slideId = null)
 		{
 			var course = courseManager.GetCourse(courseId);

@@ -15,7 +15,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideHintRepo slideHintRepo;
 
 		public HintController()
-			: this(WebCourseManager.Instance, new SlideHintRepo())
+			: this(WebCourseManager.Instance, new SlideHintRepo(new ULearnDb()))
 		{
 		}
 

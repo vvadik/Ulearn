@@ -22,10 +22,10 @@ namespace uLearn.Web.Controllers
 		private static readonly ILog log = LogManager.GetLogger(typeof(ExerciseController));
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
-		private readonly GroupsRepo groupsRepo = new GroupsRepo();
-		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
-		private readonly VisitsRepo visitsRepo = new VisitsRepo();
-		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
+		private readonly GroupsRepo groupsRepo;
+		private readonly UserSolutionsRepo solutionsRepo;
+		private readonly VisitsRepo visitsRepo;
+		private readonly SlideCheckingsRepo slideCheckingsRepo;
 
 		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(30);
 
@@ -37,6 +37,10 @@ namespace uLearn.Web.Controllers
 		public ExerciseController(CourseManager courseManager)
 		{
 			this.courseManager = courseManager;
+			groupsRepo = new GroupsRepo(db);
+			solutionsRepo = new UserSolutionsRepo(db);
+			visitsRepo = new VisitsRepo(db);
+			slideCheckingsRepo = new SlideCheckingsRepo(db);
 		}
 
 		[System.Web.Mvc.HttpPost]

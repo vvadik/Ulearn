@@ -8,7 +8,7 @@ using Microsoft.AspNet.Identity;
 
 namespace uLearn.Web.Models
 {
-	public class AbstractSlideChecking
+	public class AbstractSlideChecking : ITimedSlideAction
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]

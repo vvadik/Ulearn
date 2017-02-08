@@ -32,7 +32,7 @@ namespace uLearn.Web.LTI
 			if (!IsAuthenticated(context.OwinContext))
 			{
 				// Find existing pairing between LTI user and application user
-				var userManager = new ULearnUserManager();
+				var userManager = new ULearnUserManager(new ULearnDb());
 				var loginProvider = string.Join(":", context.Options.AuthenticationType, context.LtiRequest.ConsumerKey);
 				var providerKey = context.LtiRequest.UserId;
 				var login = new UserLoginInfo(loginProvider, providerKey);

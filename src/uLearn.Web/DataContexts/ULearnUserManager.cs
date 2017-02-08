@@ -15,8 +15,8 @@ namespace uLearn.Web.DataContexts
 			};
 		}
 
-		public ULearnUserManager()
-			: this(new UserStore<ApplicationUser>(new ULearnDb()))
+		public ULearnUserManager(ULearnDb db)
+			: this(new UserStore<ApplicationUser>(db))
 		{
 		}
 	}
