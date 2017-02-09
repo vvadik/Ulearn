@@ -149,14 +149,20 @@
 					</div>
 
 					<h3>Настройки</h3>
+					var instructorsList = Model.Instructors.Select(i => new SelectListItem
+					{
+						Value = i.UserId,
+						Text = i.UserVisibleName,
+					}).ToList();
+					/* Add myself if I am not an instructor (SysAdmin i.e.) */
+					if (Model.Instructors.All(i => i.UserId != User.Identity.GetUserId()))
+					{
+						instructorsList.Insert(0, new SelectListItem { Value = User.Identity.GetUserId(), Text = "Вы" });
+					}
 
 					<div>
 						Владелец&nbsp;
-						@Html.DropDownList("ownerId", Model.Instructors.Select(i => new SelectListItem
-						{
-							Value = i.UserId,
-							Text = i.UserVisibleName,
-						}), new { @class = "form-control ib input-sm", data_default_value = User.Identity.GetUserId() })
+						@Html.DropDownList("ownerId", instructorsList, new { @class = "form-control ib input-sm", data_default_value = User.Identity.GetUserId() })
 					</div>
 
 					<div class="checkbox checkbox-default">

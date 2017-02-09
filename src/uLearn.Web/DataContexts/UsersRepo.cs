@@ -43,6 +43,13 @@ namespace uLearn.Web.DataContexts
 				.GetUserRolesInfo(limit, userManager);
 		}
 
+		public List<UserRolesInfo> GetCourseInstructors(string courseId, UserManager<ApplicationUser> userManager, int limit=50)
+		{
+			return db.Users
+				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, courseId, includeHighRoles: true))
+				.GetUserRolesInfo(limit, userManager);
+		}
+
 		private const string nameSpace = nameof(UsersRepo);
 		private const string dbo = nameof(dbo);
 

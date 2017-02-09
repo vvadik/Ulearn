@@ -580,10 +580,7 @@ namespace uLearn.Web.Controllers
 			var enabledScoringGroups = groupsRepo.GetEnabledAdditionalScoringGroups(courseId)
 				.GroupBy(e => e.GroupId)
 				.ToDictionary(g => g.Key, g => g.Select(e => e.ScoringGroupId).ToList());
-			var instructors = usersRepo.FilterUsers(new UserSearchQueryModel
-			{
-				CourseId = courseId,
-			}, userManager, limit: 100);
+			var instructors = usersRepo.GetCourseInstructors(courseId, userManager, limit: 100);
 			var coursesIds = User.GetControllableCoursesId().ToList();
 			var groupsMayBeCopied = groupsRepo.GetAvailableForUserGroups(coursesIds, User).Where(g => !g.IsArchived).ToList();
 
