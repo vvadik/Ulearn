@@ -213,13 +213,6 @@
 						var modifiableScoringGroups = Model.Unit.Scoring.Groups.Values.Where(g => g.CanBeSetByInstructor).ToList();
 					}
 
-					@if (modifiableScoringGroups.Count > 0)
-					{
-						<div class="additional-scores__edit-mode__control pull-right">
-							<a href="#" class="internal-page-link  additional-scores__edit-mode__link">Редактировать все баллы</a>
-							<button class="btn btn-success btn-sm additional-scores__edit-mode__save-button">Сохранить баллы</button>
-						</div>
-					}
 					<h2>Студенты</h2>
 
 					<div class="small-table__title">
