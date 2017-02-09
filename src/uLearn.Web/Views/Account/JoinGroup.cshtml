@@ -5,10 +5,13 @@
 }
 
 <div class="container">
-	<h1>Присоединиться к группе «@Model»</h1>
+	<h1>Вступить в&nbsp;группу</h1>
 
 	<form method="POST" action="">
 		@Html.AntiForgeryToken()
+		<p>
+			Вас пригласили присоединиться к&nbsp;группе «@Model».
+		</p>
 		<button class="btn btn-success btn-large">Присоединиться</button>
 	</form>
 </div>

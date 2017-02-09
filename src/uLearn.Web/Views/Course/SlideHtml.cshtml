@@ -522,13 +522,13 @@
 	<div class="solution-control btn-group ctrl-group">
 		@if (! model.IsCodeEditableAndSendable)
 		{
-			<button type="button" class="try-again-button btn btn-primary no-rounds exercise-version-link" data-version-id="-1">
+			<button type="button" class="try-again-button btn btn-primary no-rounds exercise-version-link @(model.IsLti ? "exercise-controls_button-long" : "")" data-version-id="-1">
 				Ещё раз
 			</button>
 		}
 		else
 		{
-			<button type="button" class="run-solution-button btn btn-primary no-rounds @(model.IsLti ? "run-solution-button-lti" : "")" data-url="@(model.RunSolutionUrl)">
+			<button type="button" class="run-solution-button btn btn-primary no-rounds @(model.IsLti ? "exercise-controls_button-long" : "")" data-url="@(model.RunSolutionUrl)">
 				Отправить
 			</button>
 		}

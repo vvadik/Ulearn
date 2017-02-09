@@ -67,6 +67,8 @@
 		$form.find('[name="name"]').val("");
 		$form.find('[name="isPublic"]').prop('checked', false);
 		$form.find('[name="manualChecking"]').prop('checked', $form.find('[name="manualChecking"]').data('defaultValue'));
+		$form.find('[name="isArchived"]').prop('checked', false).closest('.checkbox').hide();
+		$form.find('[name="ownerId"]').val($form.find('[name="ownerId"]').data('defaultValue'));
 		$form.find('.scoring-group-checkbox input').prop('checked', false);
 		$form.find('button.action-button').text('Создать');
 		$form.find('.remove-group-link').hide();
@@ -81,6 +83,8 @@
 		var name = $self.data('name');
 		var isPublic = $self.data('isPublic');
 		var manualChecking = $self.data('manualChecking');
+		var isArchived = $self.data('isArchived');
+		var ownerId = $self.data('ownerId');
 		var scoringGroupsIds = $self.data('scoringGroups').split(',');
 
 		$form.attr('action', $form.data('updateGroupUrl'));
@@ -88,6 +92,8 @@
 		$form.find('[name="name"]').val(name);
 		$form.find('[name="isPublic"]').prop('checked', isPublic);
 		$form.find('[name="manualChecking"]').prop('checked', manualChecking);
+		$form.find('[name="isArchived"]').prop('checked', isArchived).closest('.checkbox').show();
+		$form.find('[name="ownerId"]').val(ownerId);
 		$form.find('.scoring-group-checkbox input').prop('checked', false);
 		scoringGroupsIds.forEach(function (scoringGroupId) {
 			$form.find('.scoring-group-checkbox [name="scoring-group__' + scoringGroupId + '"]').prop('checked', true);
@@ -112,5 +118,23 @@
 		}).success(function() {
 			window.location.reload(true);
 		});
+	});
+
+	$('.copy-group-link').click(function(e) {
+		e.preventDefault();
+
+		var $form = $('#copyGroupModal form');
+		$form.find('button').attr('disabled', true);
+
+		$('#copyGroupModal').modal();
+	});
+
+	$('#copyGroupModal form select').change(function() {
+		var $form = $('#copyGroupModal form');
+		var canSubmit = $(this).val() !== "-1";
+		if (canSubmit)
+			$form.find('button').removeAttr('disabled');
+		else
+			$form.find('button').attr('disabled', true);
 	});
 })

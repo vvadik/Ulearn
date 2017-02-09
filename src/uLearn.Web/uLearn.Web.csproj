@@ -1314,6 +1314,7 @@
     <Content Include="Scripts\slide-utils.js" />
     <Content Include="Scripts\slide-versions.js" />
     <Content Include="Scripts\table-configurator.js" />
+    <Content Include="Scripts\tooltips.js" />
     <Content Include="Scripts\user-group-name-change.js" />
     <Content Include="Scripts\users-list.js" />
     <Content Include="Scripts\_references.js" />

@@ -135,6 +135,11 @@ p {
 .statistic-container {
 }
 
+.with-long-tooltip + .tooltip .tooltip-inner {
+	width: 350px;
+	max-width: 350px;
+}
+
 /* ReSharper restore Html.CssClassElementsNotFound */
 /* ReSharper restore DeclarationIsEmpty */
 /*#endregion */
@@ -394,7 +399,7 @@ p {
 	margin-left: 0 !important;
 }
 
-.run-solution-button-lti {
+.exercise-controls_button-long {
 	width: 50% !important;
 }
 
@@ -1196,6 +1201,19 @@ table.analytics__user-answers {
 }
 
 /* Groups */
+h1 .create-group-link,
+h1 .copy-group-link {
+	margin-left: 10px;
+}
+
+.groups .group {
+	margin-top: 25px;
+}
+
+.groups .group.collapsing .group__title {
+	margin-top: 0;
+}
+
 .groups .group .group__title {
 	margin-bottom: 0;
 }

@@ -255,8 +255,8 @@
 
 					@foreach (var userInfo in Model.VisitedUsers)
 					{
-						var visitedSlidesCount = Model.VisitedSlidesCountByUser[userInfo.UserId];
-						var visitedSlidesCountAllTime = Model.VisitedSlidesCountByUserAllTime[userInfo.UserId];
+						var visitedSlidesCount = Model.VisitedSlidesCountByUser.GetOrDefault(userInfo.UserId, 0);
+						var visitedSlidesCountAllTime = Model.VisitedSlidesCountByUserAllTime.GetOrDefault(userInfo.UserId, 0);
 						var userVisibleName = userInfo.UserVisibleName != "" ? userInfo.UserVisibleName : userInfo.UserName;
 						var userGroupsIds = Model.UsersGroupsIds.GetOrDefault(userInfo.UserId, new List<int>());
 						var userModifiableScoringGroupsIds = Model.EnabledAdditionalScoringGroupsForGroups

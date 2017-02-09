@@ -90,10 +90,12 @@ namespace uLearn.Web.Controllers
 			var exercisesAcceptedSolutionsCount = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
 				.GroupBy(s => s.SlideId)
 				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).Count());
-
-			var visitedUsers = visitsRepo.GetVisitsInPeriod(filterOptions)
-				.DistinctBy(v => v.UserId)
-				.Join(db.Users, v => v.UserId, u => u.Id, (v, u) => new UnitStatisticUserInfo { UserId = u.Id, UserName = u.UserName, UserVisibleName = (u.LastName + u.FirstName != "" ? u.LastName + " " + u.FirstName : u.UserName).Trim() })
+			
+			var usersIds = visitsRepo.GetVisitsInPeriod(filterOptions).DistinctBy(v => v.UserId).Select(v => v.UserId);
+			if (filterOptions.UsersIds != null && !filterOptions.IsUserIdsSupplement)
+				usersIds = filterOptions.UsersIds;
+			var visitedUsers = usersIds
+				.Join(db.Users, v => v, u => u.Id, (v, u) => new UnitStatisticUserInfo { UserId = u.Id, UserName = u.UserName, UserVisibleName = (u.LastName + u.FirstName != "" ? u.LastName + " " + u.FirstName : u.UserName).Trim() })
 				.OrderBy(u => u.UserVisibleName)
 				.ToList();
 

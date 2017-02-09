@@ -20,6 +20,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
+
 		private readonly SlideRateRepo slideRateRepo;
 		private readonly UserSolutionsRepo solutionsRepo;
 		private readonly UnitsRepo unitsRepo;
@@ -27,6 +28,7 @@ namespace uLearn.Web.Controllers
 		private readonly LtiRequestsRepo ltiRequestsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly GroupsRepo groupsRepo;
+		private readonly UserQuizzesRepo userQuizzesRepo;
 
 		public CourseController()
 			: this(WebCourseManager.Instance)
@@ -42,6 +44,7 @@ namespace uLearn.Web.Controllers
 			solutionsRepo = new UserSolutionsRepo(db);
 			ltiRequestsRepo = new LtiRequestsRepo(db);
 			groupsRepo = new GroupsRepo(db);
+            userQuizzesRepo = new UserQuizzesRepo(db);
 			this.courseManager = courseManager;
 		}
 
@@ -233,7 +236,9 @@ namespace uLearn.Web.Controllers
 				userId = manualChecking.UserId;
 
 			var visiter = await VisitSlide(course.Id, slide.Id, userId);
-			var score = Tuple.Create(visiter.Score, slide.MaxScore);
+			var maxSlideScore = GetMaxSlideScoreForUser(course, slide, userId);
+
+			var score = Tuple.Create(visiter.Score, maxSlideScore);
 			var model = new CoursePageModel
 			{
 				UserId = userId,
@@ -248,6 +253,15 @@ namespace uLearn.Web.Controllers
 				IsGuest = false,
 			};
 			return model;
+		}
+
+		private int GetMaxSlideScoreForUser(Course course, Slide slide, string userId)
+		{
+			var solvedSlidesIds = ControllerUtils.GetSolvedSlides(solutionsRepo, userQuizzesRepo, course, userId);
+			var slidesWithUsersManualChecking = new HashSet<Guid>(visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId));
+			var enabledManualCheckingForUser = groupsRepo.IsManualCheckingEnabledForUser(course, userId);
+			var maxSlideScore = ControllerUtils.GetMaxScoreForUsersSlide(slide, solvedSlidesIds.Contains(slide.Id), slidesWithUsersManualChecking.Contains(slide.Id), enabledManualCheckingForUser);
+			return maxSlideScore;
 		}
 
 		private BlockRenderContext CreateRenderContext(Course course, Slide slide, 

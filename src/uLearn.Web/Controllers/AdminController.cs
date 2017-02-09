@@ -580,6 +580,12 @@ namespace uLearn.Web.Controllers
 			var enabledScoringGroups = groupsRepo.GetEnabledAdditionalScoringGroups(courseId)
 				.GroupBy(e => e.GroupId)
 				.ToDictionary(g => g.Key, g => g.Select(e => e.ScoringGroupId).ToList());
+			var instructors = usersRepo.FilterUsers(new UserSearchQueryModel
+			{
+				CourseId = courseId,
+			}, userManager, limit: 100);
+			var coursesIds = User.GetControllableCoursesId().ToList();
+			var groupsMayBeCopied = groupsRepo.GetAvailableForUserGroups(coursesIds, User).Where(g => !g.IsArchived).ToList();
 
 			return View("Groups", new GroupsViewModel
 			{
@@ -588,21 +594,41 @@ namespace uLearn.Web.Controllers
 				Groups = groups,
 				ScoringGroupsCanBeSetInSomeUnit = scoringGroupsCanBeSetInSomeUnit,
 				EnabledScoringGroups = enabledScoringGroups,
+				Instructors = instructors,
+				GroupsMayBeCopied = groupsMayBeCopied,
+				CoursesNames = courseManager.GetCourses().ToDictionary(c => c.Id, c => c.Title),
 			});
 		}
 
-		public async Task<ActionResult> CreateGroup(string courseId, string name, bool isPublic, bool manualChecking)
+		public async Task<ActionResult> CreateGroup(string courseId, string name, bool isPublic, bool manualChecking, string ownerId)
 		{
-			var group = await groupsRepo.CreateGroup(courseId, name, User.Identity.GetUserId(), isPublic, manualChecking);
+			if (string.IsNullOrEmpty(ownerId))
+				ownerId = User.Identity.GetUserId();
+
+			var group = await groupsRepo.CreateGroup(courseId, name, ownerId, isPublic, manualChecking);
 
 			var course = courseManager.GetCourse(courseId);
 			await UpdateEnabledScoringGroupsForGroup(course, group.Id);
 
-			return RedirectToAction("Groups", new {courseId});
+			return RedirectToAction("Groups", new { courseId });
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> CopyGroup(string courseId, int groupId)
+		{
+			var group = groupsRepo.FindGroupById(groupId);
+			if (!CanSeeAndModifyGroup(group))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
+			await groupsRepo.CopyGroup(group, courseId);
+
+			return RedirectToAction("Groups", new { courseId });
 		}
 
 		private bool CanSeeAndModifyGroup(Group group)
 		{
+			if (group == null)
+				return false;
 			var courseId = group.CourseId;
 			if (groupsRepo.CanUserSeeAllCourseGroups(User, courseId))
 				return true;
@@ -632,13 +658,13 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> UpdateGroup(int groupId, string name, bool isPublic, bool manualChecking)
+		public async Task<ActionResult> UpdateGroup(int groupId, string name, bool isPublic, bool manualChecking, bool isArchived, string ownerId)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
 			if (!CanSeeAndModifyGroup(group))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
-			await groupsRepo.ModifyGroup(groupId, name, isPublic, manualChecking);
+			await groupsRepo.ModifyGroup(groupId, name, isPublic, manualChecking, isArchived, ownerId);
 
 			var course = courseManager.GetCourse(group.CourseId);
 			await UpdateEnabledScoringGroupsForGroup(course, groupId);
@@ -1164,5 +1190,9 @@ namespace uLearn.Web.Controllers
 		public List<Group> Groups { get; set; }
 		public List<ScoringGroup> ScoringGroupsCanBeSetInSomeUnit { get; set; }
 		public Dictionary<int, List<string>> EnabledScoringGroups { get; set; }
+
+		public List<UserRolesInfo> Instructors { get; set; }
+		public List<Group> GroupsMayBeCopied { get; set; }
+		public Dictionary<string, string> CoursesNames { get; set; }
 	}
 }

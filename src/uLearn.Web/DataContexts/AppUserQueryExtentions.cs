@@ -36,7 +36,8 @@ namespace uLearn.Web.DataContexts
 		{
 			return applicationUsers
 				.OrderBy(u => u.UserName)
-				.Take(count).ToList()
+				.Take(count)
+				.ToList()
 				.Select(user => new UserRolesInfo
 				{
 					UserId = user.Id,

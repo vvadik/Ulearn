@@ -14,6 +14,7 @@ namespace uLearn.Web.Controllers
 	public class SlideNavigationController : Controller
 	{
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
+
 		private readonly UnitsRepo unitsRepo;
 		private readonly UserSolutionsRepo solutionsRepo;
 		private readonly VisitsRepo visitsRepo;
@@ -59,43 +60,16 @@ namespace uLearn.Web.Controllers
 			return toc;
 		}
 
-		private HashSet<Guid> GetSolvedSlides(Course course, string userId)
-		{
-			var solvedSlides = solutionsRepo.GetIdOfPassedSlides(course.Id, userId);
-			solvedSlides.UnionWith(userQuizzesRepo.GetIdOfQuizPassedSlides(course.Id, userId));
-			return solvedSlides;
-		}
-
-		private int GetMaxScoreForUsersSlide(Slide slide, bool isSolved, bool hasManualChecking, bool enabledManualCheckingForUser)
-		{
-			var isExerciseOrQuiz = slide is ExerciseSlide || slide is QuizSlide;
-
-			if (!isExerciseOrQuiz)
-				return slide.MaxScore;
-
-			if (isSolved)
-				return hasManualChecking ? slide.MaxScore : GetMaxScoreWithoutManualChecking(slide);
-			else
-				return enabledManualCheckingForUser ? slide.MaxScore : GetMaxScoreWithoutManualChecking(slide);
-		}
-
-		private int GetMaxScoreWithoutManualChecking(Slide slide)
-		{
-			if (slide is ExerciseSlide)
-				return (slide as ExerciseSlide).Exercise.CorrectnessScore;
-			if (slide is QuizSlide)
-				return (slide as QuizSlide).Quiz.ManualCheck ? 0 : slide.MaxScore;
-			return slide.MaxScore;
-		}
-
 		private TocModel CreateTocModel(Course course, Guid? currentSlideId, string userId)
 		{
 			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
-			var solvedSlidesIds = GetSolvedSlides(course, userId);
 			var visited = visitsRepo.GetIdOfVisitedSlides(course.Id, userId);
 			var scoresForSlides = visitsRepo.GetScoresForSlides(course.Id, userId);
+
+			var solvedSlidesIds = ControllerUtils.GetSolvedSlides(solutionsRepo, userQuizzesRepo, course, userId);
 			var slidesWithUsersManualChecking = visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId).ToImmutableHashSet();
 			var enabledManualCheckingForUser = groupsRepo.IsManualCheckingEnabledForUser(course, userId);
+			Func<Slide, int> getSlideMaxScoreFunc = s => ControllerUtils.GetMaxScoreForUsersSlide(s, solvedSlidesIds.Contains(s.Id), slidesWithUsersManualChecking.Contains(s.Id), enabledManualCheckingForUser);
 
 			var userGroupsIds = groupsRepo.GetUserGroupsIds(course.Id, userId);
 			var enabledScoringGroupsIds = groupsRepo.GetEnabledAdditionalScoringGroups(course.Id)
@@ -107,7 +81,7 @@ namespace uLearn.Web.Controllers
 			var builder = new TocModelBuilder(
 				s => Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = s.Url }),
 				s => scoresForSlides.ContainsKey(s.Id) ? scoresForSlides[s.Id] : 0,
-				s => GetMaxScoreForUsersSlide(s, solvedSlidesIds.Contains(s.Id), slidesWithUsersManualChecking.Contains(s.Id), enabledManualCheckingForUser),
+				getSlideMaxScoreFunc,
 				(u, g) => additionalScores.GetOrDefault(Tuple.Create(u.Id, g.Id), 0),
 				course,
 				currentSlideId)

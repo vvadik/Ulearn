@@ -46,6 +46,7 @@ namespace uLearn.Web
 					"~/codemirror/addon/selection/active-line.js",
 					"~/Scripts/bootstrap.js",
 					"~/Scripts/bootstrap.file-input.js",
+					"~/Scripts/tooltips.js",
 					"~/Scripts/clipboard.min.js",
 					"~/Scripts/activate-clipboard.js",
 					"~/Scripts/buttons.js",

@@ -39,12 +39,50 @@ namespace uLearn.Web.DataContexts
 			return group;
 		}
 
-		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsPublic, bool newIsManualCheckingEnabled)
+		public async Task<Group> CopyGroup(Group group, string courseId)
+		{
+			var newGroup = await CopyGroupWithoutMembers(group, courseId);
+			await CopyGroupMembers(group, newGroup);
+			return newGroup;
+		}
+
+		private async Task<Group> CopyGroupWithoutMembers(Group group, string courseId)
+		{
+			var newGroup = new Group
+			{
+				CourseId = courseId,
+				OwnerId = group.OwnerId,
+				Name = group.Name,
+				CanUsersSeeGroupProgress = group.CanUsersSeeGroupProgress,
+				IsManualCheckingEnabled = group.IsManualCheckingEnabled,
+				IsInviteLinkEnabled = group.IsInviteLinkEnabled,
+				IsPublic = group.IsPublic,
+				InviteHash = Guid.NewGuid(),
+			};
+			db.Groups.Add(newGroup);
+			await db.SaveChangesAsync();
+			return newGroup;
+		}
+
+		private async Task CopyGroupMembers(Group group, Group newGroup)
+		{
+			var members = @group.Members.Select(m => new GroupMember
+			{
+				UserId = m.UserId,
+				GroupId = newGroup.Id,
+			});
+			db.GroupMembers.AddRange(members);
+			await db.SaveChangesAsync();
+		}
+
+		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsPublic, bool newIsManualCheckingEnabled, bool newIsArchived, string newOwnerId)
 		{
 			var group = FindGroupById(groupId);
 			group.Name = newName;
 			group.IsPublic = newIsPublic;
 			group.IsManualCheckingEnabled = newIsManualCheckingEnabled;
+			group.IsArchived = newIsArchived;
+			group.OwnerId = newOwnerId;
 			await db.SaveChangesAsync();
 
 			return group;
@@ -126,26 +164,38 @@ namespace uLearn.Web.DataContexts
 			if (!user.HasAccessFor(courseId, CourseRole.Instructor))
 				return new List<Group>();
 
-			IEnumerable<Group> groups;
-			var userId = user.Identity.GetUserId();
+			return GetAvailableForUserGroups(new List<string> { courseId }, user);
+		}
 
-			/* Course admins can see all groups */
-			if (CanUserSeeAllCourseGroups(user, courseId))
-				groups = GetGroups(courseId);
-			else
-				/* Other instructor can see only public or own groups */
-				groups = db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || g.IsPublic));
-			
+		public List<Group> GetAvailableForUserGroups(List<string> coursesIds, IPrincipal user)
+		{
+			var coursesWhereUserCanSeeAllGroups = coursesIds.Where(id => CanUserSeeAllCourseGroups(user, id)).ToList();
+			var otherCourses = new HashSet<string>(coursesIds).Except(coursesWhereUserCanSeeAllGroups).ToList();
+
+			var userId = user.Identity.GetUserId();
+			var groups = db.Groups.Where(g => !g.IsDeleted &&
+				(
+					/* Course admins can see all groups */
+					coursesWhereUserCanSeeAllGroups.Contains(g.CourseId) || 
+					/* Other instructor can see only public or own groups */
+					(otherCourses.Contains(g.CourseId) && (g.OwnerId == userId || g.IsPublic))
+				)
+			);
+
 			return groups
-				.OrderBy(g => g.OwnerId != userId)
+				.OrderBy(g => g.IsArchived)
+				.ThenBy(g => g.OwnerId != userId)
 				.ThenBy(g => g.Name)
 				.ToList();
 		}
 
-		public List<Group> GetGroupsOwnedByUser(string courseId, IPrincipal user)
+		public List<Group> GetGroupsOwnedByUser(string courseId, IPrincipal user, bool includeArchived=true)
 		{
 			var userId = user.Identity.GetUserId();
-			return db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && g.OwnerId == userId).ToList();
+			var groups = db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && g.OwnerId == userId);
+			if (!includeArchived)
+				groups = groups.Where(g => !g.IsArchived);
+			return groups.ToList();
 		}
 
 		public List<ApplicationUser> GetGroupMembers(int groupId)
