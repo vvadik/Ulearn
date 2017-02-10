@@ -40,6 +40,8 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult UnitStatistics(UnitStatisticsParams param)
 		{
+			const int usersLimit = 200;
+
 			var courseId = param.CourseId;
 			var unitId = param.UnitId;
 			var periodStart = param.PeriodStartDate;
@@ -96,8 +98,8 @@ namespace uLearn.Web.Controllers
 				usersIds = filterOptions.UsersIds;
 			var visitedUsers = usersIds
 				.Join(db.Users, v => v, u => u.Id, (v, u) => new UnitStatisticUserInfo { UserId = u.Id, UserName = u.UserName, UserVisibleName = (u.LastName + u.FirstName != "" ? u.LastName + " " + u.FirstName : u.UserName).Trim() })
-				.OrderBy(u => u.UserVisibleName)
 				.ToList();
+			var isMore = visitedUsers.Count > usersLimit;
 
 			var visitedSlidesCountByUser = visitsRepo.GetVisitsInPeriod(filterOptions)
 				.GroupBy(v => v.UserId)
@@ -105,6 +107,13 @@ namespace uLearn.Web.Controllers
 			var visitedSlidesCountByUserAllTime = visitsRepo.GetVisitsInPeriod(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(DateTime.MaxValue))
 				.GroupBy(v => v.UserId)
 				.ToDictionary(g => g.Key, g => g.Count());
+
+			/* Get `usersLimit` best by slides count and order them by name */
+			visitedUsers = visitedUsers
+				.OrderBy(u => visitedSlidesCountByUserAllTime[u.UserId])
+				.Take(usersLimit)
+				.OrderBy(u => u.UserVisibleName)
+				.ToList();
 
 			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();
 			var additionalScores = additionalScoresRepo
@@ -137,6 +146,7 @@ namespace uLearn.Web.Controllers
 				ExercisesSolutionsCount = exercisesSolutionsCount,
 				ExercisesAcceptedSolutionsCount = exercisesAcceptedSolutionsCount,
 				VisitedUsers = visitedUsers,
+				VisitedUsersIsMore = isMore,
 				VisitedSlidesCountByUser = visitedSlidesCountByUser,
 				VisitedSlidesCountByUserAllTime = visitedSlidesCountByUserAllTime,
 

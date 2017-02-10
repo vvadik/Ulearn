@@ -27,6 +27,7 @@ namespace uLearn.Web.Models
 		public Dictionary<Guid, int> ExercisesAcceptedSolutionsCount { get; set; }
 
 		public List<UnitStatisticUserInfo> VisitedUsers { get; set; }
+		public bool VisitedUsersIsMore { get; set; }
 		public Dictionary<string, int> VisitedSlidesCountByUser { get; set; }
 		public Dictionary<string, int> VisitedSlidesCountByUserAllTime { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
 
@@ -27,15 +28,24 @@ namespace uLearn.Web
 		}
 	}
 
+	public static class HttpRequestExtensions
+	{
+		private static readonly string xSchemeHeaderName = "X-Scheme";
+
+		/* Return scheme from request of from header X-Scheme if request has been proxied by cloudflare or nginx or ... */
+		public static string GetRealScheme(this HttpRequestBase request)
+		{
+			return request.Headers[xSchemeHeaderName] ?? request.Url?.Scheme;
+		}
+	}
+
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 	public class RequireHttpsForCloudFlareAttribute : RequireHttpsAttribute
 	{
-		private readonly string xSchemeHeaderName = "X-Scheme";
-
-		/* Additionally view X-Scheme header. If it equals to "HTTPS", continue work */
+		/* Additionally view real scheme from headers. If it equals to "HTTPS", continue work */
 		protected override void HandleNonHttpsRequest(AuthorizationContext filterContext)
 		{
-			if (string.Equals(filterContext.HttpContext.Request.Headers[xSchemeHeaderName], "HTTPS", StringComparison.OrdinalIgnoreCase))
+			if (string.Equals(filterContext.HttpContext.Request.GetRealScheme(), "HTTPS", StringComparison.OrdinalIgnoreCase))
 				return;
 			if (!string.Equals(filterContext.HttpContext.Request.HttpMethod, "GET", StringComparison.OrdinalIgnoreCase) && 
 				!string.Equals(filterContext.HttpContext.Request.HttpMethod, "HEAD", StringComparison.OrdinalIgnoreCase))

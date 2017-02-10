@@ -61,7 +61,7 @@ namespace uLearn.Web.Controllers
 
 			certificatesRepo.EnsureCertificateTemplateIsUnpacked(certificate.Template);
 
-			var certificateUrl = Url.RouteUrl("Certificate", new { certificateId = certificate.Id }, Request.Url?.Scheme ?? "https");
+			var certificateUrl = Url.RouteUrl("Certificate", new { certificateId = certificate.Id }, Request.GetRealScheme());
 			var renderedCertificate = certificatesRepo.RenderCertificate(certificate, course, certificateUrl);
 
 			return View("Certificate", new CertificateViewModel
