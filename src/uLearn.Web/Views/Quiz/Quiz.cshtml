@@ -40,7 +40,7 @@
 	var context = new BlockRenderContext(
 		null,
 		Model.Slide,
-		CourseUnitUtils.GetDirectoryRelativeWebPath(quizSlide.Info.SlideFile),
+		quizSlide.Info.DirectoryRelativePath,
 		Enumerable.Range(0, Model.Slide.Blocks.Length)
 			.Select(x => quizSlide.Blocks[x] is AbstractQuestionBlock
 				? new QuizBlockData(Model, x, Model.QuizState)

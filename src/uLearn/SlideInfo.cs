@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace uLearn
 {
@@ -23,11 +24,16 @@ namespace uLearn
 	{
 		public static string GetDirectoryRelativeWebPath(FileInfo file)
 		{
-			// ReSharper disable PossibleNullReferenceException
-			var courseDir = file.Directory.Parent.Name;
-			var unitDir = file.Directory.Name;
-			// ReSharper restore PossibleNullReferenceException
-			return string.Format("/Courses/{0}/{1}", courseDir, unitDir);
+			var path = "/";
+			var d = file.Directory;
+			while (d != null)
+			{
+				path = $"/{d.Name}{path}";
+				if (d.Name.Equals("Courses", StringComparison.OrdinalIgnoreCase))
+					return path;
+				d = d.Parent;
+			}
+			throw new FileNotFoundException("Courses folder not found", file.FullName);
 		}
 	}
 }
