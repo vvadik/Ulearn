@@ -353,7 +353,7 @@ namespace uLearn.Web.Controllers
 			var lastSubmission = submissions.LastOrDefault(s => s.ManualCheckings != null && s.ManualCheckings.Any()) ??
 					submissions.LastOrDefault(s => s.AutomaticCheckingIsRightAnswer);
 			if (lastSubmission == null && allowNotAccepted)
-				lastSubmission = solutionsRepo.GetAllSubmissionsByUser(courseId, slideId, userId).LastOrDefault();
+				lastSubmission = solutionsRepo.GetAllSubmissionsByUser(courseId, slideId, userId).ToList().LastOrDefault();
 			return lastSubmission;
 		}
 
