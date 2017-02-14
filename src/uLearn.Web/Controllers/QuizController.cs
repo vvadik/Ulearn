@@ -162,7 +162,7 @@ namespace uLearn.Web.Controllers
 			if (! CanUserFillQuiz(quizState))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Already answered");
 
-			if (slide.Quiz.ManualCheck && groupsRepo.IsManualCheckingEnabledForUser(course, userId))
+			if (slide.Quiz.ManualCheck && ! groupsRepo.IsManualCheckingEnabledForUser(course, userId))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Manual checking is disabled for you");
 
 			var time = DateTime.Now;
