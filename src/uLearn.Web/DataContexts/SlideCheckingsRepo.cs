@@ -84,7 +84,7 @@ namespace uLearn.Web.DataContexts
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var checkings = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).Where(c => !c.IsChecked && !c.IsLocked);
+				var checkings = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId, false).Where(c => !c.IsChecked && !c.IsLocked);
 				foreach (var checking in checkings)
 					db.ManualExerciseCheckings.Remove(checking);
 				await db.SaveChangesAsync();
@@ -92,9 +92,12 @@ namespace uLearn.Web.DataContexts
 			}
 		}
 
-		private IEnumerable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId) where T: AbstractSlideChecking
+		private IEnumerable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId, bool noTracking = true) where T: AbstractSlideChecking
 		{
-			var items = db.Set<T>().AsNoTracking().Where(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId).ToList();
+			IQueryable<T> dbRef = db.Set<T>();
+			if (noTracking)
+				dbRef = dbRef.AsNoTracking();
+			var items = dbRef.Where(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId).ToList();
 			return items;
 		}
 
