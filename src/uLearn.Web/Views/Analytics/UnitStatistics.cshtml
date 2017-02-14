@@ -4,7 +4,7 @@
 
 @model UnitStatisticPageModel
 @{
-	ViewBag.Title = "Аналитика";
+	ViewBag.Title = Model.Unit.Title;
 }
 
 @functions
@@ -46,23 +46,22 @@
 <body>
 	<div class="container">
 
-		<h1 class="hidden-xs">Аналитика</h1>
 		<h2>
-			@Model.UnitName.TruncateWithEllipsis(25)
+			@Model.Unit.Title.TruncateWithEllipsis(35)
 
-			<small><a href="#filters" class="visible-xs-inline ml10" data-toggle="true"><span class="no-underline glyphicon glyphicon-filter"></span></a></small>
+			<small><a href="#filters" class="visible-xs-inline ml10" data-toggle="true" data-scroll="false"><span class="no-underline glyphicon glyphicon-filter"></span></a></small>
 			<br class="visible-xs"/>
 			<small class="visible-xs">с @Model.PeriodStart.ToShortDateString() по @Model.PeriodFinish.ToShortDateString()</small>
 		</h2>
 		<div class="analytics__dashboard">
 			@using (Html.BeginForm("UnitStatistics", "Analytics", FormMethod.Get, new { @class="form-inline", id="unit-statistics-filter-form" }))
 			{
-				@Html.Hidden("courseId", Model.CourseId)
+				@Html.Hidden("courseId", Model.Course.Id)
 
 				<div id="filters" class="hidden-xs-inline">
 					<div class="form-group">
-						@Html.DropDownList("unitName",
-							Model.UnitsNames.Select(name => new SelectListItem { Text = name, Selected = name == Model.UnitName, Value = name }),
+						@Html.DropDownList("unitId",
+							Model.Units.Select(unit => new SelectListItem { Text = unit.Title, Selected = unit == Model.Unit, Value = unit.Id.ToString() }),
 							new { @class = "form-control" })
 					</div>
 
@@ -81,7 +80,7 @@
 								new SelectListItem { Text = "Все пользователи", Value = "all", Selected = Model.GroupId == "all" },
 								new SelectListItem { Text = "Мои группы", Value = "", Selected = string.IsNullOrEmpty(Model.GroupId) }
 							};
-							if (User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
+							if (User.HasAccessFor(Model.Course.Id, CourseRole.CourseAdmin))
 							{
 								groupsListItems.Insert(1, new SelectListItem { Text = "Ни в одной группе", Value = "not-in-group", Selected = Model.GroupId == "not-in-group" });
 							}
@@ -129,7 +128,7 @@
 								<span class="navbar-label navbar-label-link glyphicon glyphicon-none"></span>
 							}
 
-							@Html.RouteLink(slide.Title.TruncateWithEllipsis(35), "Course.SlideById", new { Model.CourseId, SlideId = slide.Url }, new { })
+							@Html.RouteLink(slide.Title.TruncateWithEllipsis(35), "Course.SlideById", new { Model.Course.Id, SlideId = slide.Url }, new { })
 							<div class="pull-right">
 								<span class="slide-visits-count">
 									@Model.SlidesVisits.GetOrDefault(slide.Id, new List<Visit>()).Count
@@ -209,11 +208,12 @@
 
 			<div class="row" id="students">
 				<div class="col-xs-12">
-					<h2>Студенты</h2>
-
 					@{
 						var exercisesAndQuizzes = Model.Slides.Where(s => s is QuizSlide || s is ExerciseSlide).OrderBy(s => s.Index);
+						var modifiableScoringGroups = Model.Unit.Scoring.Groups.Values.Where(g => g.CanBeSetByInstructor).ToList();
 					}
+
+					<h2>Студенты</h2>
 
 					<div class="small-table__title">
 						<div class="small-table__title__cell">пользователь</div>
@@ -231,6 +231,13 @@
 									<span class="glyphicon glyphicon-edit small-table__title__cell @(isHiddenOnSmallScreens ? "hidden-xs-inline-block" : "")" title="@slide.Title"></span>
 								}
 							}
+
+							@foreach (var scoringGroup in modifiableScoringGroups)
+							{
+								<span class="small-table__title__cell" title="@scoringGroup.Name — @scoringGroup.MaxAdditionalScore.PluralizeInRussian(new RussianPluralizationOptions { One = "балл", Two = "балла", Five = "баллов", Gender = Gender.Male, hideNumberOne = false, smallNumbersAreWords = false })">
+									@scoringGroup.Abbreviation (@scoringGroup.MaxAdditionalScore)
+								</span>
+							}
 						</div>
 					</div>
 
@@ -241,24 +248,30 @@
 
 					@foreach (var userInfo in Model.VisitedUsers)
 					{
-						var visitedSlidesCount = Model.VisitedSlidesCountByUser[userInfo.UserId];
-						var visitedSlidesCountAllTime = Model.VisitedSlidesCountByUserAllTime[userInfo.UserId];
+						var visitedSlidesCount = Model.VisitedSlidesCountByUser.GetOrDefault(userInfo.UserId, 0);
+						var visitedSlidesCountAllTime = Model.VisitedSlidesCountByUserAllTime.GetOrDefault(userInfo.UserId, 0);
 						var userVisibleName = userInfo.UserVisibleName != "" ? userInfo.UserVisibleName : userInfo.UserName;
+						var userGroupsIds = Model.UsersGroupsIds.GetOrDefault(userInfo.UserId, new List<int>());
+						var userModifiableScoringGroupsIds = Model.EnabledAdditionalScoringGroupsForGroups
+							.Where(kv => userGroupsIds.Contains(kv.Key))
+							.SelectMany(kv => kv.Value)
+							.ToList();
+
 						<div class="student">
 							<div class="ib" title="@userInfo.UserName">
-								@Html.ActionLink(userVisibleName.TruncateWithEllipsis(25), "UserUnitStatistics", new { courseId = Model.CourseId, unitName = Model.UnitName, userId = userInfo.UserId}, new { title = "Посмотреть статистику пользователя " + userInfo.UserName })
+								@Html.ActionLink(userVisibleName.TruncateWithEllipsis(25), "UserUnitStatistics", new { courseId = Model.Course.Id, unitId = Model.Unit.Id, userId = userInfo.UserId }, new { title = "Посмотреть статистику пользователя " + userInfo.UserName })
 							</div>
 							<div class="ib pull-right">
 								<div class="student-progress progress">
 									<div class="progress-bar progress-bar-warning"
 										 style="width: @(100 * (visitedSlidesCountAllTime - visitedSlidesCount) / Model.Slides.Count)%"
 										 title="Посмотрел(а) @((visitedSlidesCountAllTime - visitedSlidesCount).PluralizeInRussian(new RussianPluralizationOptions
-															 {
-																 One = "слайд",
-																 Two = "слайда",
-																 Five = "слайдов",
-																 Gender = Gender.Male
-								})) вне указанного период"></div>
+															   {
+																   One = "слайд",
+																   Two = "слайда",
+																   Five = "слайдов",
+																   Gender = Gender.Male
+															   })) вне указанного период"></div>
 									<div class="progress-bar progress-bar-success"
 										 style="width: @(100 * visitedSlidesCount / Model.Slides.Count)%"
 										 title="Посмотрел(а) @visitedSlidesCount.PluralizeInRussian(new RussianPluralizationOptions
@@ -279,32 +292,73 @@
 									{
 										var isFullScore = visit.Score == exerciseOrQuiz.MaxScore;
 										<span class="small-table__right-cell score @(isHiddenOnSmallScreens ? "hidden-xs-inline-block" : "") @(isFullScore ? "full-score" : "") @(visit.Score == 0 ? "zero-score" : "")" title="@visit.Timestamp.ToPrettyString()">
-											@if (exerciseOrQuiz is ExerciseSlide)
-											{
-												@Html.ActionLink(
-													visit.Score.ToString(),
-													"UserSolutions",
-													"Analytics",
-													new { courseId = Model.CourseId, slideId = exerciseOrQuiz.Id, userId = userInfo.UserId },
-													new { title = "Посмотреть решения", target = "_blank" })
-											}
-											else
-											{
-												@visit.Score
-											}
-										</span>
+												@if (exerciseOrQuiz is ExerciseSlide)
+												{
+													@Html.ActionLink(
+														visit.Score.ToString(),
+														"UserSolutions",
+														"Analytics",
+														new { courseId = Model.Course.Id, slideId = exerciseOrQuiz.Id, userId = userInfo.UserId },
+														new { title = "Посмотреть решения", target = "_blank" })
+												}
+												else
+												{
+													@visit.Score
+												}
+											</span>
 									}
 									else
 									{
 										<span class="small-table__right-cell score @(isHiddenOnSmallScreens ? "hidden-xs-inline-block" : "") zero-score">&nbsp;</span>
 									}
 								}
+
+								@foreach (var scoringGroup in modifiableScoringGroups)
+								{
+									var userAndScoringGroup = Tuple.Create(userInfo.UserId, scoringGroup.Id);
+									var isModifiableForUser = scoringGroup.EnabledForEveryone || userModifiableScoringGroupsIds.Contains(scoringGroup.Id);
+									<span class="small-table__title__cell additional-score">
+											@if (isModifiableForUser)
+											{
+												<a href="#" class="internal-page-link additional-score-link" title="Изменить оценку «@scoringGroup.Name»" data-scoring-type="@scoringGroup.Id">
+													@if (Model.AdditionalScores.ContainsKey(userAndScoringGroup))
+													{
+														@Model.AdditionalScores[userAndScoringGroup]
+													}
+													else
+													{
+														<span>&mdash;</span>
+													}
+												</a>
+												<input name="additional-score"
+												   class="form-control input-sm additional-score-input"
+												   min="0"
+												   max="@scoringGroup.MaxAdditionalScore"
+												   value="@(Model.AdditionalScores.ContainsKey(userAndScoringGroup) ? Model.AdditionalScores[userAndScoringGroup].ToString() : "")"
+												   data-scoring-type="@scoringGroup.Id"
+												   data-url="@Url.Action("SetAdditionalScore", "Admin", new { courseId = Model.Course.Id, unitId = Model.Unit.Id, userId = userInfo.UserId, scoringGroupId = scoringGroup.Id })"/>
+											}
+										</span>
+								}
 							</div>
 						</div>
 					}
+					@if (modifiableScoringGroups.Count > 0)
+					{
+						<div class="additional-scores__edit-mode__control pull-right">
+							<button class="btn btn-success btn-sm additional-scores__edit-mode__save-button">Сохранить баллы</button>
+						</div>
+					}
 				</div>
-				
+
 			</div>
+
+			@if (Model.VisitedUsersIsMore)
+			{
+				<div class="text-muted">
+					Показаны <b>200</b> лучших студентов
+				</div>
+			}
 		</div>
 	</div>
 </body>

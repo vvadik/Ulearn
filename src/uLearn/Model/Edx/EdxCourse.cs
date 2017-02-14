@@ -8,6 +8,15 @@ using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Model.Edx
 {
+	public delegate void NonExistentItemHandler(string type, string urlName);
+
+	public class EdxLoadOptions
+	{
+		public bool FailOnNonExistingItem = true;
+		public NonExistentItemHandler HandleNonExistentItemTypeName;
+
+	}
+
 	[XmlRoot("course")]
 	public class EdxCourse
 	{
@@ -51,7 +60,11 @@ namespace uLearn.Model.Edx
 		{
 			CreateDirectories(folderName, "static", "course", "chapter", "sequential", "vertical", "video", "html", "lti", "problem");
 			foreach (var file in StaticFiles)
-				File.Copy(file, $"{folderName}/static/{Path.GetFileName(file)}", true);
+			{
+				var newName = $"{folderName}/static/{Path.GetFileName(file)}";
+				if (!Path.GetFullPath(file).Equals(Path.GetFullPath(newName), StringComparison.OrdinalIgnoreCase))
+					File.Copy(file, newName, true);
+			}
 
 			var courseFile = $"{folderName}/course.xml";
 			if (File.Exists(courseFile))
@@ -62,11 +75,12 @@ namespace uLearn.Model.Edx
 			CourseWithChapters.Save(folderName);
 		}
 
-		public static EdxCourse Load(string folderName)
+		public static EdxCourse Load(string folderName, EdxLoadOptions options = null)
 		{
+			options = options ?? new EdxLoadOptions();
 			var course = new FileInfo($"{folderName}/course.xml").DeserializeXml<EdxCourse>();
 			course.StaticFiles = $"{folderName}/static".GetFiles();
-			course.CourseWithChapters = CourseWithChapters.Load(folderName, course.UrlName);
+			course.CourseWithChapters = CourseWithChapters.Load(folderName, course.UrlName, options);
 			return course;
 		}
 

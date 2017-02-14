@@ -7,7 +7,6 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
@@ -18,11 +17,18 @@ namespace uLearn.Web.Controllers
 	public class CommentsController : Controller
 	{
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
-		private readonly CommentsRepo commentsRepo = new CommentsRepo();
-		private readonly UserManager<ApplicationUser> userManager = new ULearnUserManager();
-	    private CommentsBot commentsBot = new CommentsBot();
+		private readonly CommentsRepo commentsRepo;
+		private readonly UserManager<ApplicationUser> userManager;
+		private readonly CommentsBot commentsBot = new CommentsBot();
 
-	    public ActionResult SlideComments(string courseId, Guid slideId)
+		public CommentsController()
+		{
+			var db = new ULearnDb();
+			commentsRepo = new CommentsRepo(db);
+			userManager = new ULearnUserManager(db);
+		}
+
+		public ActionResult SlideComments(string courseId, Guid slideId)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			var comments = commentsRepo.GetSlideComments(courseId, slideId).ToList();
@@ -30,13 +36,13 @@ namespace uLearn.Web.Controllers
 
 			var commentsByParent = comments.GroupBy(x => x.ParentCommentId)
 				.ToDictionary(x => x.Key, x => x.OrderBy(c => c.PublishTime).ToList());
-			
+
 			/* Top-level comments (with ParentCommentId = -1)
 			   are sorting by publish time, but pinned comments are always higher */
 			List<Comment> topLevelComments;
 			if (commentsByParent.ContainsKey(-1))
 				topLevelComments = commentsByParent.Get(-1)
-					.OrderBy(x => ! x.IsPinnedToTop).ThenBy(x => x.PublishTime).ToList();
+					.OrderBy(x => !x.IsPinnedToTop).ThenBy(x => x.PublishTime).ToList();
 			else
 				topLevelComments = new List<Comment>();
 
@@ -48,7 +54,7 @@ namespace uLearn.Web.Controllers
 			var canReply = CanAddCommentHere(User, courseId, true);
 			var canModerateComments = User.Identity.IsAuthenticated && isInstructor;
 			var canSeeNotApprovedComments = User.Identity.IsAuthenticated && isInstructor;
-			
+
 			var model = new SlideCommentsModel
 			{
 				CourseId = courseId,
@@ -91,7 +97,7 @@ namespace uLearn.Web.Controllers
 				return true;
 
 			var commentsPolicy = commentsRepo.GetCommentsPolicy(courseId);
-			return ! commentsRepo.IsUserAddedMaxCommentsInLastTime(user.Identity.GetUserId(),
+			return !commentsRepo.IsUserAddedMaxCommentsInLastTime(user.Identity.GetUserId(),
 				commentsPolicy.MaxCommentsCountInLastTime,
 				commentsPolicy.LastTimeForMaxCommentsLimit);
 		}
@@ -128,7 +134,7 @@ namespace uLearn.Web.Controllers
 			}
 
 			var comment = await commentsRepo.AddComment(User, courseId, slideId, parentCommentIdInt, commentText);
-		    await commentsBot.PostToChannel(comment);
+			await commentsBot.PostToChannel(comment);
 			var canReply = CanAddCommentHere(User, courseId, true);
 
 			return PartialView("_Comment", new CommentViewModel
@@ -154,10 +160,10 @@ namespace uLearn.Web.Controllers
 			var res = await commentsRepo.LikeComment(commentId, userId);
 			return Json(new { likesCount = res.Item1, liked = res.Item2 });
 		}
-		
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> ApproveComment(int commentId, bool isApproved=true)
+		public async Task<ActionResult> ApproveComment(int commentId, bool isApproved = true)
 		{
 			var comment = commentsRepo.GetCommentById(commentId);
 			if (!User.HasAccessFor(comment.CourseId, CourseRole.Instructor))
@@ -174,7 +180,7 @@ namespace uLearn.Web.Controllers
 			var comment = commentsRepo.GetCommentById(commentId);
 			if (!User.HasAccessFor(comment.CourseId, CourseRole.Instructor))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-			
+
 			await commentsRepo.PinComment(commentId, isPinned);
 			return new HttpStatusCodeResult(HttpStatusCode.OK);
 		}
@@ -184,19 +190,19 @@ namespace uLearn.Web.Controllers
 			return user.HasAccessFor(comment.CourseId, CourseRole.Instructor) ||
 					user.Identity.GetUserId() == comment.AuthorId;
 		}
-		
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> DeleteComment(int commentId)
 		{
 			var comment = commentsRepo.GetCommentById(commentId);
-			if (! CanEditAndDeleteComment(User, comment))
+			if (!CanEditAndDeleteComment(User, comment))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			await commentsRepo.DeleteComment(commentId);
 			return new HttpStatusCodeResult(HttpStatusCode.OK);
 		}
-		
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> RestoreComment(int commentId)
@@ -224,7 +230,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> MarkAsCorrectAnswer(int commentId, bool isCorrect=true)
+		public async Task<ActionResult> MarkAsCorrectAnswer(int commentId, bool isCorrect = true)
 		{
 			var comment = commentsRepo.GetCommentById(commentId);
 			if (!CanEditAndDeleteComment(User, comment))
@@ -235,7 +241,7 @@ namespace uLearn.Web.Controllers
 		}
 	}
 
-    public class SlideCommentsModel
+	public class SlideCommentsModel
 	{
 		public string CourseId { get; set; }
 		public Slide Slide { get; set; }

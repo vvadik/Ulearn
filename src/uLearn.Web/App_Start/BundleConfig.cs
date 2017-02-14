@@ -46,6 +46,7 @@ namespace uLearn.Web
 					"~/codemirror/addon/selection/active-line.js",
 					"~/Scripts/bootstrap.js",
 					"~/Scripts/bootstrap.file-input.js",
+					"~/Scripts/tooltips.js",
 					"~/Scripts/clipboard.min.js",
 					"~/Scripts/activate-clipboard.js",
 					"~/Scripts/buttons.js",
@@ -55,7 +56,9 @@ namespace uLearn.Web
 					"~/Scripts/groups-editor.js",
 					"~/Scripts/certificates-editor.js",
 					"~/Scripts/analytics-highcharts.js",
-					"~/Scripts/likely.js"
+					"~/Scripts/likely.js",
+					"~/Scripts/analytics.js",
+					"~/Scripts/ulearn-updates-invitation.js"
 				);
 		}
 

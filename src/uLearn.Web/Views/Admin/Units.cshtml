@@ -1,4 +1,5 @@
-﻿@model uLearn.Web.Controllers.UnitsListViewModel
+﻿@using uLearn.Web.Extensions
+@model uLearn.Web.Controllers.UnitsListViewModel
 
 @{
 	ViewBag.Title = "Модули";
@@ -11,33 +12,37 @@
 		<tr>
 			<th>Модуль</th>
 			<th>Время публикации</th>
-			<th>Автор</th>
-			<th>Изменение времени публикации</th>
+			<th>Кем опубликовано</th>
+			<th>Измененить время публикации</th>
 			<th>Скрыть</th>
 		</tr>
 		@foreach (var unit in Model.Units)
 		{
 			<tr>
-				<td>@unit.Item1</td>
+				<td>@unit.Item1.Title</td>
 				<td>
-					@(unit.Item2 == null ? "Не опубликован" : unit.Item2.PublishTime.ToString("s"))
+					@(unit.Item2 == null ? "Не опубликован" : unit.Item2.PublishTime.ToPrettyString())
 				</td>
 				<td>
 					@(unit.Item2 == null ? "" : unit.Item2.UserName)
 				</td>
 				<td>
-					@using (Html.BeginForm("SetPublishTime", "Admin", new { courseId = Model.CourseId, unitName = unit.Item1 }, FormMethod.Post))
+					@using (Html.BeginForm("SetPublishTime", "Admin", new { courseId = Model.CourseId, unitId = unit.Item1.Id }, FormMethod.Post))
 					{
-						<input type="text" name="publishTime" value="@Model.CurrentDateTime.ToString("s")" />
-						<button type="submit" class="btn btn-sm btn-info" title="Установить новое время публикации"><i class="glyphicon glyphicon-edit"></i></button>
+						<div class="input-group">
+							<input type="text" name="publishTime" value="@Model.CurrentDateTime.ToString("s")" class="form-control ib" />
+							<span class="input-group-btn">
+								<button type="submit" class="btn btn-info" title="Установить новое время публикации"><i class="glyphicon glyphicon-edit"></i></button>
+							</span>
+						</div>
 					}
 				</td>
 				<td>
 					@if (unit.Item2 != null)
 					{
-						using (Html.BeginForm("RemovePublishTime", "Admin", new { courseId = Model.CourseId, unitName = unit.Item1 }, FormMethod.Post))
+						using (Html.BeginForm("RemovePublishTime", "Admin", new { courseId = Model.CourseId, unitId = unit.Item1.Id }, FormMethod.Post))
 						{
-							<button type="submit" class="btn btn-sm btn-danger" title="Удалить публикацию"><i class="glyphicon glyphicon-remove"></i></button>
+							<button type="submit" class="btn btn-danger" title="Отменить публикацию"><i class="glyphicon glyphicon-remove"></i></button>
 						}
 					}
 				</td>

@@ -14,9 +14,9 @@ namespace uLearn.Web.DataContexts
 		private readonly ULearnDb db;
 		private readonly JsonSerializer serializer;
 
-		public LtiRequestsRepo()
+		public LtiRequestsRepo(ULearnDb db)
 		{
-			db = new ULearnDb();
+			this.db = db;
 			serializer = new JsonSerializer();
 		}
 

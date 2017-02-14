@@ -11,7 +11,7 @@ namespace uLearn.Web.Models
 		Trivial,
 		NotWatched
 	}
-	public class SlideRate
+	public class SlideRate : ISlideAction
 	{
 		[Key]
 		public int Id { get; set; }

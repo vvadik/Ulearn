@@ -298,7 +298,9 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="codemirror\CsCompleterGenerator.cs" />
     <Compile Include="Controllers\CertificatesController.cs" />
+    <Compile Include="DataContexts\AdditionalScoresRepo.cs" />
     <Compile Include="DataContexts\CertificatesRepo.cs" />
+    <Compile Include="Extensions\EfDbExtensions.cs" />
     <Compile Include="Extensions\ControllerExtensions.cs" />
     <Compile Include="Controllers\AuthenticationManager.cs" />
     <Compile Include="Controllers\CommentsBot.cs" />
@@ -321,8 +323,22 @@
     <Compile Include="Migrations\201701180912464_AddPreviewedCertificates.Designer.cs">
       <DependentUpon>201701180912464_AddPreviewedCertificates.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201701302151207_CreateUnits.cs" />
+    <Compile Include="Migrations\201701302151207_CreateUnits.Designer.cs">
+      <DependentUpon>201701302151207_CreateUnits.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701310057267_AddAdditionalScores.cs" />
+    <Compile Include="Migrations\201701310057267_AddAdditionalScores.Designer.cs">
+      <DependentUpon>201701310057267_AddAdditionalScores.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201702061047104_AddEnabledAdditionalScoringGroups.cs" />
+    <Compile Include="Migrations\201702061047104_AddEnabledAdditionalScoringGroups.Designer.cs">
+      <DependentUpon>201702061047104_AddEnabledAdditionalScoringGroups.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\Certificate.cs" />
     <Compile Include="Models\CertificateTemplate.cs" />
+    <Compile Include="Models\EnabledAdditionalScoringGroup.cs" />
     <Compile Include="Models\FilterOptions.cs" />
     <Compile Include="DataContexts\SlideCheckingsRepo.cs" />
     <Compile Include="Migrations\201608231750470_SlideChecking.cs" />
@@ -367,6 +383,7 @@
     </Compile>
     <Compile Include="Models\ExerciseCodeReview.cs" />
     <Compile Include="Models\ExerciseCodeReviewModel.cs" />
+    <Compile Include="Models\ISlideAction.cs" />
     <Compile Include="Models\SlideChecking.cs" />
     <Compile Include="Models\CourseInstructorNavbarViewModel.cs" />
     <Compile Include="DataContexts\CommentsRepo.cs" />
@@ -875,6 +892,15 @@
     <EmbeddedResource Include="Migrations\201701180912464_AddPreviewedCertificates.resx">
       <DependentUpon>201701180912464_AddPreviewedCertificates.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701302151207_CreateUnits.resx">
+      <DependentUpon>201701302151207_CreateUnits.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701310057267_AddAdditionalScores.resx">
+      <DependentUpon>201701310057267_AddAdditionalScores.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702061047104_AddEnabledAdditionalScoringGroups.resx">
+      <DependentUpon>201702061047104_AddEnabledAdditionalScoringGroups.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="codemirror\addon\comment\comment.js" />
@@ -1178,6 +1204,7 @@
     <Content Include="katex\katex.min.js" />
     <Content Include="Scripts\activate-clipboard.js" />
     <Content Include="Scripts\analytics-highcharts.js" />
+    <Content Include="Scripts\analytics.js" />
     <Content Include="Scripts\bootstrap.file-input.js" />
     <Content Include="qunit\qunit-1.15.0.css" />
     <Content Include="qunit\qunit-1.15.0.js" />
@@ -1287,6 +1314,8 @@
     <Content Include="Scripts\slide-utils.js" />
     <Content Include="Scripts\slide-versions.js" />
     <Content Include="Scripts\table-configurator.js" />
+    <Content Include="Scripts\tooltips.js" />
+    <Content Include="Scripts\ulearn-updates-invitation.js" />
     <Content Include="Scripts\user-group-name-change.js" />
     <Content Include="Scripts\users-list.js" />
     <Content Include="Scripts\_references.js" />
@@ -1512,6 +1541,7 @@
     <Content Include="Views\Account\UserMenuPartial.cshtml" />
     <Content Include="Views\Admin\PreviewCertificates.cshtml" />
     <Content Include="Views\Admin\GenerateCertificatesError.cshtml" />
+    <Content Include="Views\Shared\_UlearnUpdatesInvitation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

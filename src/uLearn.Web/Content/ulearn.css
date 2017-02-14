@@ -135,6 +135,11 @@ p {
 .statistic-container {
 }
 
+.with-long-tooltip + .tooltip .tooltip-inner {
+	width: 350px;
+	max-width: 350px;
+}
+
 /* ReSharper restore Html.CssClassElementsNotFound */
 /* ReSharper restore DeclarationIsEmpty */
 /*#endregion */
@@ -240,6 +245,10 @@ p {
 	color: #838383;
 }
 
+.nav .score {
+	padding-top: 0.2em;
+}
+
 .units-list-item > a:before {
 	content: attr(data-score);
 	float: right;
@@ -254,9 +263,12 @@ p {
 .slide-list-item {
 	list-style-type: none;
 	padding: 0.5em 0.5em 0.5em;
+	display: flex;
+}
+
+.slide-list-item.clickable {
 	cursor: pointer;
 	color: #428bca;
-	display: flex;
 }
 
 .slide-list-item.selected {
@@ -387,7 +399,7 @@ p {
 	margin-left: 0 !important;
 }
 
-.run-solution-button-lti {
+.exercise-controls_button-long {
 	width: 50% !important;
 }
 
@@ -1189,6 +1201,19 @@ table.analytics__user-answers {
 }
 
 /* Groups */
+h1 .create-group-link,
+h1 .copy-group-link {
+	margin-left: 10px;
+}
+
+.groups .group {
+	margin-top: 25px;
+}
+
+.groups .group.collapsing .group__title {
+	margin-top: 0;
+}
+
 .groups .group .group__title {
 	margin-bottom: 0;
 }
@@ -1199,6 +1224,22 @@ table.analytics__user-answers {
 }
 
 .groups .group .members {
+	margin-top: 10px;
+}
+
+.copy-group__change-owner-block {
+	display: none;
+}
+
+.copy-group__change-owner-block .owner-name {
+	font-weight: bold;
+}
+
+.groups .group.archived-group {
+	display: none;
+}
+
+.groups .show-archived-groups-selector {
 	margin-top: 10px;
 }
 
@@ -1235,6 +1276,14 @@ table.analytics__user-answers {
 	width: 50px;
 }
 
+.analytics__dashboard .additional-scores__edit-mode__save-button {
+	display: none;
+}
+
+.analytics__dashboard .student {
+	height: 30px;
+}
+
 .analytics__dashboard .student-progress {
 	display: inline-block;
 	width: 150px;
@@ -1255,6 +1304,18 @@ table.analytics__user-answers {
 
 .analytics__dashboard .score:not(.full-score):not(.zero-score) a {
 	color: #b9b90e;
+}
+
+.analytics__dashboard .additional-score-link {
+	font-size: 12px;
+}
+
+.analytics__dashboard .additional-score-input {
+	display: none;
+	height: 25px;
+	width: 45px;
+	font-size: 12px;
+	text-align: right;
 }
 
 @media (max-width:768px) {

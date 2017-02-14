@@ -1136,7 +1136,8 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
 	{
 		var userAnswers = model.QuizModel.AnswersToQuizes[block.Id];
-		fixedItems = block.GetMatches().OrderBy(item => userAnswers.FindIndex(answer => item.GetHashForFixedItem() == answer.ItemId)).ToList();
+		fixedItems = GetFixedItemsAccordingToUserAnswers(userAnswers, fixedItems)
+						.OrderBy(item => userAnswers.FindIndex(answer => item.GetHashForFixedItem() == answer.ItemId)).ToList();
 		movableItems = GetMovableItemsAccordingToUserAnswers(userAnswers, fixedItems);
 	}
 
@@ -1433,7 +1434,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"solution-cont
 		{
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<button type=\"button\" class=\"try-again-button btn btn-primary no-rounds exerci" +
-"se-version-link\" data-version-id=\"-1\">\r\n\t\t\t\tЕщё раз\r\n\t\t\t</button>\r\n");
+"se-version-link ");
+
+
+                                                       WebViewPage.WriteTo(@__razor_helper_writer, model.IsLti ? "exercise-controls_button-long" : "");
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-version-id=\"-1\">\r\n\t\t\t\tЕщё раз\r\n\t\t\t</button>\r\n");
 
 
 		}
@@ -1443,12 +1449,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<button type=\"button\
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<button type=\"button\" class=\"run-solution-button btn btn-primary no-rounds ");
 
 
-                                    WebViewPage.WriteTo(@__razor_helper_writer, model.IsLti ? "run-solution-button-lti" : "");
+                                    WebViewPage.WriteTo(@__razor_helper_writer, model.IsLti ? "exercise-controls_button-long" : "");
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-url=\"");
 
 
-                                                                                               WebViewPage.WriteTo(@__razor_helper_writer, model.RunSolutionUrl);
+                                                                                                     WebViewPage.WriteTo(@__razor_helper_writer, model.RunSolutionUrl);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">\r\n\t\t\t\tОтправить\r\n\t\t\t</button>\r\n");
 
@@ -1537,15 +1543,26 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t</div>\r\n");
 		return isGuest ? "disabled" : null;
 	}
 
+	private static List<MatchingMatch> GetFixedItemsAccordingToUserAnswers(List<UserQuiz> userAnswers, List<MatchingMatch> fixedItems)
+	{
+		var filteredFixedItems = new List<MatchingMatch>();
+		foreach (var fixedItem in fixedItems)
+		{
+			var userAnswered = userAnswers.Any(answer => answer.ItemId == fixedItem.GetHashForFixedItem());
+			if (userAnswered)
+				filteredFixedItems.Add(fixedItem);
+		}
+		return filteredFixedItems;
+	}
+
 	private static List<MatchingMatch> GetMovableItemsAccordingToUserAnswers(List<UserQuiz> userAnswers, List<MatchingMatch> fixedItems)
 	{
 		var movableItems = new List<MatchingMatch>();
 		foreach (var fixedItem in fixedItems)
 		{
 			var userAnswer = userAnswers.FirstOrDefault(answer => answer.ItemId == fixedItem.GetHashForFixedItem());
-			if (userAnswer == null)
-				continue;
-			movableItems.Add(fixedItems.FirstOrDefault(item => item.GetHashForMovableItem() == userAnswer.Text));
+			if (userAnswer != null)
+				movableItems.Add(fixedItems.FirstOrDefault(item => item.GetHashForMovableItem() == userAnswer.Text));
 		}
 		return movableItems;
 	}

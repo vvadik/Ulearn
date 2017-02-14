@@ -106,7 +106,7 @@ namespace uLearn
 		public IEnumerable<TestCaseData> GetVideos()
 		{
 			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
-			Assert.That(course.Slides.Length, Is.GreaterThan(0));
+			Assert.That(course.Slides.Count, Is.GreaterThan(0));
 			return course.Slides
 				.SelectMany(slide =>
 					slide.Blocks.OfType<YoutubeBlock>()
@@ -170,7 +170,7 @@ namespace uLearn
 			var isRightAnswer = output.NormalizeEoln().Equals(slide.Exercise.ExpectedOutput.NormalizeEoln());
 			if (!isRightAnswer)
 			{
-				Assert.Fail("mistake in: " + slide.Info.UnitName + " - " + slide.Title + "\n" +
+				Assert.Fail("mistake in: " + slide.Info.Unit.Title + " - " + slide.Title + "\n" +
 							"\tActualOutput: " + output.NormalizeEoln() + "\n" +
 							"\tExpectedOutput: " + slide.Exercise.ExpectedOutput.NormalizeEoln() + "\n" +
 							"\tCompilationError: " + result.CompilationOutput + "\n" +
@@ -193,7 +193,7 @@ namespace uLearn
   
   source code: {solution.SourceCode}
   
-  solution has error in: {slide.Info.UnitName} - {slide.Title}
+  solution has error in: {slide.Info.Unit.Title} - {slide.Title}
   
   error: {solution.ErrorMessage}");
 		}
@@ -203,7 +203,7 @@ namespace uLearn
 			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
 			return
 				from slide in course.Slides.OfType<ExerciseSlide>()
-				select new TestCaseData(slide).SetName(course.Id + " - " + slide.Info.UnitName + " - " + slide.Title);
+				select new TestCaseData(slide).SetName(course.Id + " - " + slide.Info.Unit.Title + " - " + slide.Title);
 		}
 	}
 }

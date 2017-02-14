@@ -19,10 +19,10 @@ namespace uLearn.Web.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		private readonly VisitsRepo visitsRepo = new VisitsRepo();
-		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
-		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
-		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
+		private readonly VisitsRepo visitsRepo;
+		private readonly UserQuizzesRepo userQuizzesRepo;
+		private readonly UserSolutionsRepo userSolutionsRepo;
+		private readonly SlideCheckingsRepo slideCheckingsRepo;
 
 		private static readonly ILog log = LogManager.GetLogger(typeof(CertificatesController));
 
@@ -41,14 +41,13 @@ namespace uLearn.Web.DataContexts
 			"exercises.accepted",
 		};
 
-		public CertificatesRepo() : this(new ULearnDb())
-		{
-
-		}
-
 		public CertificatesRepo(ULearnDb db)
 		{
 			this.db = db;
+			visitsRepo = new VisitsRepo(db);
+			userQuizzesRepo = new UserQuizzesRepo(db);
+			userSolutionsRepo = new UserSolutionsRepo(db);
+			slideCheckingsRepo = new SlideCheckingsRepo(db);
 		}
 
 		public List<CertificateTemplate> GetTemplates(string courseId)

@@ -13,12 +13,15 @@ namespace uLearn.Web.Controllers
 {
 	public class CertificatesController : Controller
 	{
-		private readonly CertificatesRepo certificatesRepo = new CertificatesRepo();
-		private readonly ULearnUserManager userManager = new ULearnUserManager();
+		private readonly CertificatesRepo certificatesRepo;
+		private readonly ULearnUserManager userManager;
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
 		public CertificatesController()
 		{
+			var db = new ULearnDb();
+			certificatesRepo = new CertificatesRepo(db);
+			userManager = new ULearnUserManager(db);
 		}
 
 		[AllowAnonymous]
@@ -58,7 +61,7 @@ namespace uLearn.Web.Controllers
 
 			certificatesRepo.EnsureCertificateTemplateIsUnpacked(certificate.Template);
 
-			var certificateUrl = Url.RouteUrl("Certificate", new { certificateId = certificate.Id }, Request.Url?.Scheme ?? "https");
+			var certificateUrl = Url.RouteUrl("Certificate", new { certificateId = certificate.Id }, Request.GetRealScheme());
 			var renderedCertificate = certificatesRepo.RenderCertificate(certificate, course, certificateUrl);
 
 			return View("Certificate", new CertificateViewModel

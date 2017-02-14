@@ -9,12 +9,6 @@ namespace uLearn.Web.DataContexts
 	public class QuizzesRepo
 	{
 		private readonly ULearnDb db;
-		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
-
-		public QuizzesRepo() : this(new ULearnDb())
-		{
-
-		}
 
 		public QuizzesRepo(ULearnDb db)
 		{

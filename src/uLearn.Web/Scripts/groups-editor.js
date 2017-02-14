@@ -4,6 +4,10 @@
 	var $form = $('#createOrUpdateGroupModal form');
 	var token = $('input[name="__RequestVerificationToken"]').val();
 
+	$('#createOrUpdateGroupModal').on('shown.bs.modal', function() {
+		$(this).find('[name="name"]').focus();
+	});
+
 	$('.add-user-to-group-input').each(function() {
 		var $self = $(this);
 		var groupId = $self.data('groupId');
@@ -67,9 +71,12 @@
 		$form.find('[name="name"]').val("");
 		$form.find('[name="isPublic"]').prop('checked', false);
 		$form.find('[name="manualChecking"]').prop('checked', $form.find('[name="manualChecking"]').data('defaultValue'));
+		$form.find('[name="isArchived"]').prop('checked', false).closest('.checkbox').hide();
+		$form.find('[name="ownerId"]').val($form.find('[name="ownerId"]').data('defaultValue'));
+		$form.find('.scoring-group-checkbox input').prop('checked', false);
 		$form.find('button.action-button').text('Создать');
 		$form.find('.remove-group-link').hide();
-		$('#createOrUpdateGroupModal').modal(); 
+		$('#createOrUpdateGroupModal').modal();
 	});
 
 	$('.edit-group-link').click(function(e) {
@@ -80,12 +87,21 @@
 		var name = $self.data('name');
 		var isPublic = $self.data('isPublic');
 		var manualChecking = $self.data('manualChecking');
+		var isArchived = $self.data('isArchived');
+		var ownerId = $self.data('ownerId');
+		var scoringGroupsIds = $self.data('scoringGroups').split(',');
 
 		$form.attr('action', $form.data('updateGroupUrl'));
 		$form.find('[name="groupId"]').val(groupId);
 		$form.find('[name="name"]').val(name);
 		$form.find('[name="isPublic"]').prop('checked', isPublic);
 		$form.find('[name="manualChecking"]').prop('checked', manualChecking);
+		$form.find('[name="isArchived"]').prop('checked', isArchived).closest('.checkbox').show();
+		$form.find('[name="ownerId"]').val(ownerId);
+		$form.find('.scoring-group-checkbox input').prop('checked', false);
+		scoringGroupsIds.forEach(function (scoringGroupId) {
+			$form.find('.scoring-group-checkbox [name="scoring-group__' + scoringGroupId + '"]').prop('checked', true);
+		});
 		$form.find('button.action-button').text('Сохранить');
 		$form.find('.remove-group-link').data('groupId', groupId).show();
 		$('#createOrUpdateGroupModal').modal();
@@ -106,5 +122,55 @@
 		}).success(function() {
 			window.location.reload(true);
 		});
+	});
+
+	var toggleCopyGroupButton = function (canSubmit) {
+		var $form = $('#copyGroupModal form');
+		if (canSubmit)
+			$form.find('.copy-group-button').removeAttr('disabled');
+		else
+			$form.find('.copy-group-button').attr('disabled', true);
+	}
+
+	$('.copy-group-link').click(function(e) {
+		e.preventDefault();
+
+		var $form = $('#copyGroupModal form');
+		$form.find('select').val('-1');
+		toggleCopyGroupButton(false);
+
+		$('#copyGroupModal').modal();
+	});
+
+	$('#copyGroupModal form select').change(function() {
+		var $form = $('#copyGroupModal form');
+		var $self = $(this);
+		var $option = $self.find('option:selected');
+
+		var $changeOwnerBlock = $form.find('.copy-group__change-owner-block');
+		var needToChangeOwner = $option.data('needToChangeOwner');
+		$changeOwnerBlock.find('input[name="changeOwner"]').prop('checked', false);
+		$changeOwnerBlock.find('.owner-name').text($option.data('owner'));
+		$changeOwnerBlock.toggle(needToChangeOwner);
+
+		var canSubmit = $self.val() !== '-1' && !needToChangeOwner;
+		toggleCopyGroupButton(canSubmit);
+	});
+
+	$('#copyGroupModal form [name="changeOwner"]').change(function() {
+		toggleCopyGroupButton($(this).prop('checked'));
+	});
+
+
+	$('.show-archived-groups-selector > .btn').click(function(e) {
+		var $self = $(this);
+		if ($self.hasClass('active')) {
+			e.preventDefault();
+			return false;
+		}
+
+		$self.parent().find('.btn').removeClass('active');
+		$self.addClass('active');
+		$('.groups .group').toggle();
 	});
 })

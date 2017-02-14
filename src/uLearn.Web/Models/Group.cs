@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 
 namespace uLearn.Web.Models
 {
@@ -43,7 +41,16 @@ namespace uLearn.Web.Models
 		public bool IsInviteLinkEnabled { get; set; }
 
 		[Required]
+		/* Если в курсе выключена ручная проверка, то можно включить её для этой группы */
 		public bool IsManualCheckingEnabled { get; set; }
+
+		[Required]
+		/* Могут ли студенты этой группы видеть сводную таблицу прогресса по курсу всех студентов группы */
+		public bool CanUsersSeeGroupProgress { get; set; }
+
+		[Required]
+		/* Архивная группа не учитываются в фильтрах «Мои группы» и всегда показывается позже неархивных */
+		public bool IsArchived { get; set; }
 
 		public virtual ICollection<GroupMember> Members { get; set; }
 

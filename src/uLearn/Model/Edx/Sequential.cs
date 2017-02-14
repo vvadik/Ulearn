@@ -51,19 +51,12 @@ namespace uLearn.Model.Edx
 				vertical.Save(folderName);
 		}
 
-		public static Sequential Load(string folderName, string urlName)
+		public static Sequential Load(string folderName, string urlName, EdxLoadOptions options)
 		{
-			try
+			return Load<Sequential>(folderName, "sequential", urlName, options, seq =>
 			{
-				var sequential = new FileInfo(string.Format("{0}/sequential/{1}.xml", folderName, urlName)).DeserializeXml<Sequential>();
-				sequential.UrlName = urlName;
-				sequential.Verticals = sequential.VerticalReferences.Select(x => Vertical.Load(folderName, x.UrlName)).ToArray();
-				return sequential;
-			}
-			catch (Exception e)
-			{
-				throw new Exception(string.Format("Sequential {0} load error", urlName), e);
-			}
+				seq.Verticals= seq.VerticalReferences.Select(x => Vertical.Load(folderName, x.UrlName, options)).ExceptNulls().ToArray();
+			});
 		}
 	}
 }

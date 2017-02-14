@@ -66,9 +66,9 @@ namespace uLearn.Model.Edx.EdxComponents
 			{
 				foreach (var localFile in LocalFiles ?? new List<string>())
 					File.Copy(
-						Path.Combine(LocalFolder, localFile), 
-						string.Format("{0}/static/{1}_{2}", folderName, UrlName, localFile.Replace("/", "_")), 
-						overwrite:true);
+						Path.Combine(LocalFolder, localFile),
+						string.Format("{0}/static/{1}_{2}", folderName, UrlName, localFile.Replace("/", "_")),
+						overwrite: true);
 			}
 			catch (Exception e)
 			{
@@ -86,19 +86,10 @@ namespace uLearn.Model.Edx.EdxComponents
 			return Source;
 		}
 
-		public static HtmlComponent Load(string folderName, string urlName)
+		public static HtmlComponent Load(string folderName, string urlName, EdxLoadOptions options)
 		{
-			try
-			{
-				var component = new FileInfo(string.Format("{0}/html/{1}.xml", folderName, urlName)).DeserializeXml<HtmlComponent>();
-				component.UrlName = urlName;
-				component.Source = File.ReadAllText(string.Format("{0}/html/{1}.html", folderName, component.Filename));
-				return component;
-			}
-			catch (Exception e)
-			{
-				throw new Exception(string.Format("Html {0} load error", urlName), e);
-			}
+			return Load<HtmlComponent>(folderName, "html", urlName, options,
+				c => { c.Source = File.ReadAllText(string.Format("{0}/html/{1}.html", folderName, c.Filename)); });
 		}
 	}
 }

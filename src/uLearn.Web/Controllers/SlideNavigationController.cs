@@ -14,12 +14,25 @@ namespace uLearn.Web.Controllers
 	public class SlideNavigationController : Controller
 	{
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
-		private readonly UnitsRepo unitsRepo = new UnitsRepo();
-		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
-		private readonly VisitsRepo visitsRepo = new VisitsRepo();
-		private readonly UserQuizzesRepo userQuizzesRepo = new UserQuizzesRepo();
-		private readonly GroupsRepo groupsRepo = new GroupsRepo();
-		
+
+		private readonly UnitsRepo unitsRepo;
+		private readonly UserSolutionsRepo solutionsRepo;
+		private readonly VisitsRepo visitsRepo;
+		private readonly UserQuizzesRepo userQuizzesRepo;
+		private readonly GroupsRepo groupsRepo;
+		private readonly AdditionalScoresRepo additionalScoresRepo;
+
+		public SlideNavigationController()
+		{
+			var db = new ULearnDb();
+			unitsRepo = new UnitsRepo(db);
+			solutionsRepo = new UserSolutionsRepo(db);
+			visitsRepo = new VisitsRepo(db);
+			userQuizzesRepo = new UserQuizzesRepo(db);
+			groupsRepo = new GroupsRepo(db);
+			additionalScoresRepo = new AdditionalScoresRepo(db);
+		}
+
 		public ActionResult TableOfContents(string courseId, Guid? slideId = null)
 		{
 			var course = courseManager.GetCourse(courseId);
@@ -30,11 +43,12 @@ namespace uLearn.Web.Controllers
 
 		private TocModel CreateGuestTocModel(Course course, Guid? currentSlideId)
 		{
-			var visibleUnits = unitsRepo.GetVisibleUnits(course.Id, User);
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			var builder = new TocModelBuilder(
 				s => Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = s.Url }),
 				s => 0,
 				s => 0,
+				(u, g) => 0,
 				course,
 				currentSlideId);
 			builder.IsInstructor = false;
@@ -46,59 +60,41 @@ namespace uLearn.Web.Controllers
 			return toc;
 		}
 
-		private HashSet<Guid> GetSolvedSlides(Course course, string userId)
-		{
-			var solvedSlides = solutionsRepo.GetIdOfPassedSlides(course.Id, userId);
-			solvedSlides.UnionWith(userQuizzesRepo.GetIdOfQuizPassedSlides(course.Id, userId));
-			return solvedSlides;
-		}
-
-		private int GetMaxScoreForUsersSlide(Slide slide, bool isSolved, bool hasManualChecking, bool enabledManualCheckingForUser)
-		{
-			var isExerciseOrQuiz = slide is ExerciseSlide || slide is QuizSlide;
-
-			if (!isExerciseOrQuiz)
-				return slide.MaxScore;
-
-			if (isSolved)
-				return hasManualChecking ? slide.MaxScore : GetMaxScoreWithoutManualChecking(slide);
-			else
-				return enabledManualCheckingForUser ? slide.MaxScore : GetMaxScoreWithoutManualChecking(slide);
-		}
-
-		private int GetMaxScoreWithoutManualChecking(Slide slide)
-		{
-			if (slide is ExerciseSlide)
-				return (slide as ExerciseSlide).Exercise.CorrectnessScore;
-			if (slide is QuizSlide)
-				return (slide as QuizSlide).Quiz.ManualCheck ? 0 : slide.MaxScore;
-			return slide.MaxScore;
-		}
-
 		private TocModel CreateTocModel(Course course, Guid? currentSlideId, string userId)
 		{
-			var visibleUnits = unitsRepo.GetVisibleUnits(course.Id, User);
-			var solvedSlidesIds = GetSolvedSlides(course, userId);
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			var visited = visitsRepo.GetIdOfVisitedSlides(course.Id, userId);
 			var scoresForSlides = visitsRepo.GetScoresForSlides(course.Id, userId);
+
+			var solvedSlidesIds = ControllerUtils.GetSolvedSlides(solutionsRepo, userQuizzesRepo, course, userId);
 			var slidesWithUsersManualChecking = visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId).ToImmutableHashSet();
 			var enabledManualCheckingForUser = groupsRepo.IsManualCheckingEnabledForUser(course, userId);
+			Func<Slide, int> getSlideMaxScoreFunc = s => ControllerUtils.GetMaxScoreForUsersSlide(s, solvedSlidesIds.Contains(s.Id), slidesWithUsersManualChecking.Contains(s.Id), enabledManualCheckingForUser);
+
+			var userGroupsIds = groupsRepo.GetUserGroupsIds(course.Id, userId);
+			var enabledScoringGroupsIds = groupsRepo.GetEnabledAdditionalScoringGroups(course.Id)
+				.Where(e => userGroupsIds.Contains(e.GroupId))
+				.Select(e => e.ScoringGroupId)
+				.ToList();
+			var additionalScores = additionalScoresRepo.GetAdditionalScoresForUser(course.Id, userId);
 
 			var builder = new TocModelBuilder(
 				s => Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = s.Url }),
 				s => scoresForSlides.ContainsKey(s.Id) ? scoresForSlides[s.Id] : 0,
-				s => GetMaxScoreForUsersSlide(s, solvedSlidesIds.Contains(s.Id), slidesWithUsersManualChecking.Contains(s.Id), enabledManualCheckingForUser),
+				getSlideMaxScoreFunc,
+				(u, g) => additionalScores.GetOrDefault(Tuple.Create(u.Id, g.Id), 0),
 				course,
 				currentSlideId)
 			{
-				GetUnitInstructionNotesUrl = unitName => Url.Action("InstructorNote", "Course", new { courseId = course.Id, unitName }),
-				GetUnitStatisticsUrl = unitName => Url.Action("UnitStatistics", "Analytics", new { courseId = course.Id, unitName }),
+				GetUnitInstructionNotesUrl = unit => Url.Action("InstructorNote", "Course", new { courseId = course.Id, unitId = unit.Id }),
+				GetUnitStatisticsUrl = unit => Url.Action("UnitStatistics", "Analytics", new { courseId = course.Id, unitId = unit.Id }),
 				IsInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor),
 				IsSolved = s => solvedSlidesIds.Contains(s.Id),
 				IsVisited = s => visited.Contains(s.Id),
 				IsUnitVisible = visibleUnits.Contains,
 				IsSlideHidden = s => s is QuizSlide && ((QuizSlide)s).Quiz.ManualCheck &&
-									!enabledManualCheckingForUser && !solvedSlidesIds.Contains(s.Id)
+									!enabledManualCheckingForUser && !solvedSlidesIds.Contains(s.Id),
+				EnabledScoringGroupsIds = enabledScoringGroupsIds,
 			};
 
 			var toc = builder.CreateTocModel();
@@ -112,9 +108,9 @@ namespace uLearn.Web.Controllers
 			var slide = course.GetSlideById(slideId);
 			var userId = User.Identity.GetUserId();
 			var nextIsAcceptedSolutions = !onSolutionsSlide && slide is ExerciseSlide && visitsRepo.IsSkippedOrPassed(slide.Id, userId) && !((ExerciseSlide)slide).Exercise.HideShowSolutionsButton;
-			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
-			var nextSlide = course.Slides.FirstOrDefault(s => s.Index > slide.Index && visibleUnits.Contains(s.Info.UnitName));
-			var prevSlide = course.Slides.LastOrDefault(s => s.Index < slide.Index && visibleUnits.Contains(s.Info.UnitName));
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			var nextSlide = course.Slides.FirstOrDefault(s => s.Index > slide.Index && visibleUnits.Contains(s.Info.Unit));
+			var prevSlide = course.Slides.LastOrDefault(s => s.Index < slide.Index && visibleUnits.Contains(s.Info.Unit));
 			
 			var model = new PrevNextButtonsModel(
 				course, 

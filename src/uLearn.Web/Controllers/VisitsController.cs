@@ -15,7 +15,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class VisitsController : Controller
 	{
-		private readonly VisitsRepo visitsRepo = new VisitsRepo();
+		private readonly VisitsRepo visitsRepo = new VisitsRepo(new ULearnDb());
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
 		[HttpPost]

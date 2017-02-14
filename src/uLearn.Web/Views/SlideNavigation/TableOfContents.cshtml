@@ -1,6 +1,8 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
 
 @using System.Globalization
+@using uLearn
+@using uLearn.Web.Models
 @using uLearn.Web.Views.Course
 @model TocModel
 
@@ -35,25 +37,39 @@
 @helper TocUnit(TocUnitModel unit, int index)
 {
 	var collapseOption = unit.IsCurrent ? "collapse in" : "collapse";
-	<li class="units-list-item full-width">
+	<li class="units-list-item clickable full-width">
 		<a data-toggle="collapse" href=@("#N" + index) class="units-list-item-text no-smooth-scrolling" data-score="@SlideHtml.Score(unit.Score, unit.MaxScore)">@unit.UnitName</a>
 		<ul id=@("N" + index) class="slides-list @collapseOption">
 			@foreach (var page in unit.Pages)
 			{
 				@TocItem(page)
 			}
+			@foreach (var kv in unit.AdditionalScores)
+			{
+				var scoringGroup = kv.Key;
+				var score = kv.Value;
+				@TocAdditionalScore(scoringGroup, score)
+			}
 		</ul>
 	</li>
 }
 
 
-
 @helper TocItem(TocPageInfo page)
 {
-	<li class="slide-list-item @(page.IsCurrent ? "selected" : "") full-size" onclick="window.location.href='@page.Url'" data-slide-id="@page.SlideId">
+	<li class="slide-list-item clickable @(page.IsCurrent ? "selected" : "") full-size" onclick="window.location.href='@page.Url'" data-slide-id="@page.SlideId">
 		<i class="@GetPageIconClass(page) navbar-label" title="@GetTocPageTytle(page.PageType)"></i>
 		<a href="@page.Url" style="margin-right: 5px">@page.Name</a>
 		<span class="score right">@SlideHtml.Score(page.Score, page.MaxScore)</span>
+	</li>
+}
+
+@helper TocAdditionalScore(ScoringGroup group, int score)
+{
+	<li class="slide-list-item full-size">
+		<i class="navbar-label" title=""></i>
+		<span style="margin-right: 5px">@group.Name</span>
+		<span class="score right">@SlideHtml.Score(score, group.MaxAdditionalScore)</span>
 	</li>
 }
 

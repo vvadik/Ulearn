@@ -90,21 +90,12 @@ namespace uLearn.Model.Edx
 				chapter.Save(folderName);
 		}
 
-		public static CourseWithChapters Load(string folderName, string urlName)
+		public static CourseWithChapters Load(string folderName, string urlName, EdxLoadOptions options)
 		{
-			try
+			return Load<CourseWithChapters>(folderName, "course", urlName, options, v =>
 			{
-				var courseWithChapters = new FileInfo(string.Format("{0}/course/{1}.xml", folderName, urlName)).DeserializeXml<CourseWithChapters>();
-				if (courseWithChapters.ChapterReferences == null)
-					courseWithChapters.ChapterReferences = new ChapterReference[0];
-				courseWithChapters.UrlName = urlName;
-				courseWithChapters.Chapters = courseWithChapters.ChapterReferences.Select(x => Chapter.Load(folderName, x.UrlName)).ToArray();
-				return courseWithChapters;
-			}
-			catch (Exception e)
-			{
-				throw new Exception(string.Format("Course {0} load error", urlName), e);
-			}
+				v.Chapters = v.ChapterReferences.Select(x => Chapter.Load(folderName, x.UrlName, options)).ExceptNulls().ToArray();
+			});
 		}
 	}
 }

@@ -2,7 +2,8 @@
 
 <Quiz
 	xmlns="https://ulearn.azurewebsites.net/quiz"
-	id="41138C54848F4F49856BB738B7E39D28">
+	id="41138C54848F4F49856BB738B7E39D28"
+	scoringGroup="laboratory">
 	<title>Пример теста</title>
 	
 	<p xml:space="preserve">
@@ -35,10 +36,10 @@ Header 1				| h2
 
 	<choice id="choiceQuestion" multiple="false" shuffle="true" maxScore="3">
 		<text>Выберите вариант</text>
-    	<item id="1" isCorrect="true">
+		<item id="1" isCorrect="true">
 Первый вариант
 Вторая строка первого варианта
-        </item>
+		</item>
 		<item id="2" isCorrect="false">Второй вариант. Формула TeX: $a \times b$</item>
 		<item id="3" isCorrect="false">Третий вариант</item>
 		<item id="4" isCorrect="false">Четвёртый вариант</item>

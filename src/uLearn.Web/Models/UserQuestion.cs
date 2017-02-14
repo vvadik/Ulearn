@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace uLearn.Web.Models
 {
-	public class UserQuestion
+	public class UserQuestion : ISlideAction
 	{
 		[Key]
 		[Required]
@@ -27,6 +27,8 @@ namespace uLearn.Web.Models
 
 		[Required]
 		public string UnitName { get; set; }
+
+		int ISlideAction.Id { get { return QuestionId; } }
 
 		[Required]
 		public Guid SlideId { get; set; }

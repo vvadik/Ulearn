@@ -14,11 +14,6 @@ namespace uLearn.Web.DataContexts
 		private readonly ULearnDb db;
 		private readonly UserRolesRepo userRolesRepo;
 
-		public UsersRepo()
-			: this(new ULearnDb())
-		{
-		}
-
 		public UsersRepo(ULearnDb db)
 		{
 			this.db = db;
@@ -30,7 +25,7 @@ namespace uLearn.Web.DataContexts
 			return db.Users.Find(id);
 		}
 
-		public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager)
+		public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager, int limit=50)
 		{
 			var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
 			IQueryable<ApplicationUser> users = db.Users;
@@ -45,7 +40,14 @@ namespace uLearn.Web.DataContexts
 					userRolesRepo.GetListOfUsersWithCourseRole(query.CourseRole, query.CourseId),
 					userRolesRepo.GetListOfUsersByPrivilege(query.OnlyPrivileged, query.CourseId)
 				)
-				.GetUserRolesInfo(50, userManager);
+				.GetUserRolesInfo(limit, userManager);
+		}
+
+		public List<UserRolesInfo> GetCourseInstructors(string courseId, UserManager<ApplicationUser> userManager, int limit=50)
+		{
+			return db.Users
+				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, courseId, includeHighRoles: true))
+				.GetUserRolesInfo(limit, userManager);
 		}
 
 		private const string nameSpace = nameof(UsersRepo);

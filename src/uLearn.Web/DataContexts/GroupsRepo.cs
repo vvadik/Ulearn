@@ -13,11 +13,6 @@ namespace uLearn.Web.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		public GroupsRepo() : this(new ULearnDb())
-		{
-
-		}
-
 		public GroupsRepo(ULearnDb db)
 		{
 			this.db = db;
@@ -44,12 +39,51 @@ namespace uLearn.Web.DataContexts
 			return group;
 		}
 
-		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsPublic, bool newIsManualCheckingEnabled)
+		/* Copy group from one course to another. Replaces owner only if newOwnerId is not empty */
+		public async Task<Group> CopyGroup(Group group, string courseId, string newOwnerId="")
+		{
+			var newGroup = await CopyGroupWithoutMembers(group, courseId, newOwnerId);
+			await CopyGroupMembers(group, newGroup);
+			return newGroup;
+		}
+
+		private async Task<Group> CopyGroupWithoutMembers(Group group, string courseId, string newOwnerId)
+		{
+			var newGroup = new Group
+			{
+				CourseId = courseId,
+				OwnerId = string.IsNullOrEmpty(newOwnerId) ? group.OwnerId : newOwnerId,
+				Name = group.Name,
+				CanUsersSeeGroupProgress = group.CanUsersSeeGroupProgress,
+				IsManualCheckingEnabled = group.IsManualCheckingEnabled,
+				IsInviteLinkEnabled = group.IsInviteLinkEnabled,
+				IsPublic = group.IsPublic,
+				InviteHash = Guid.NewGuid(),
+			};
+			db.Groups.Add(newGroup);
+			await db.SaveChangesAsync();
+			return newGroup;
+		}
+
+		private async Task CopyGroupMembers(Group group, Group newGroup)
+		{
+			var members = @group.Members.Select(m => new GroupMember
+			{
+				UserId = m.UserId,
+				GroupId = newGroup.Id,
+			});
+			db.GroupMembers.AddRange(members);
+			await db.SaveChangesAsync();
+		}
+
+		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsPublic, bool newIsManualCheckingEnabled, bool newIsArchived, string newOwnerId)
 		{
 			var group = FindGroupById(groupId);
 			group.Name = newName;
 			group.IsPublic = newIsPublic;
 			group.IsManualCheckingEnabled = newIsManualCheckingEnabled;
+			group.IsArchived = newIsArchived;
+			group.OwnerId = newOwnerId;
 			await db.SaveChangesAsync();
 
 			return group;
@@ -131,26 +165,38 @@ namespace uLearn.Web.DataContexts
 			if (!user.HasAccessFor(courseId, CourseRole.Instructor))
 				return new List<Group>();
 
-			IEnumerable<Group> groups;
-			var userId = user.Identity.GetUserId();
+			return GetAvailableForUserGroups(new List<string> { courseId }, user);
+		}
 
-			/* Course admins can see all groups */
-			if (CanUserSeeAllCourseGroups(user, courseId))
-				groups = GetGroups(courseId);
-			else
-				/* Other instructor can see only public or own groups */
-				groups = db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || g.IsPublic));
-			
+		public List<Group> GetAvailableForUserGroups(List<string> coursesIds, IPrincipal user)
+		{
+			var coursesWhereUserCanSeeAllGroups = coursesIds.Where(id => CanUserSeeAllCourseGroups(user, id)).ToList();
+			var otherCourses = new HashSet<string>(coursesIds).Except(coursesWhereUserCanSeeAllGroups).ToList();
+
+			var userId = user.Identity.GetUserId();
+			var groups = db.Groups.Where(g => !g.IsDeleted &&
+				(
+					/* Course admins can see all groups */
+					coursesWhereUserCanSeeAllGroups.Contains(g.CourseId) || 
+					/* Other instructor can see only public or own groups */
+					(otherCourses.Contains(g.CourseId) && (g.OwnerId == userId || g.IsPublic))
+				)
+			);
+
 			return groups
-				.OrderBy(g => g.OwnerId != userId)
+				.OrderBy(g => g.IsArchived)
+				.ThenBy(g => g.OwnerId != userId)
 				.ThenBy(g => g.Name)
 				.ToList();
 		}
 
-		public List<Group> GetGroupsOwnedByUser(string courseId, IPrincipal user)
+		public List<Group> GetGroupsOwnedByUser(string courseId, IPrincipal user, bool includeArchived=true)
 		{
 			var userId = user.Identity.GetUserId();
-			return db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && g.OwnerId == userId).ToList();
+			var groups = db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && g.OwnerId == userId);
+			if (!includeArchived)
+				groups = groups.Where(g => !g.IsArchived);
+			return groups.ToList();
 		}
 
 		public List<ApplicationUser> GetGroupMembers(int groupId)
@@ -216,6 +262,20 @@ namespace uLearn.Web.DataContexts
 			return db.GroupMembers.Where(m => groupsIds.Contains(m.GroupId)).Select(m => m.UserId);
 		}
 
+		public Dictionary<string, List<int>> GetUsersGroupsIds(string courseId, IEnumerable<string> usersIds)
+		{
+			var groupsIds = GetGroups(courseId).Select(g => g.Id);
+			return db.GroupMembers
+				.Where(m => groupsIds.Contains(m.GroupId) && usersIds.Contains(m.UserId))
+				.GroupBy(m => m.UserId)
+				.ToDictionary(g => g.Key, g => g.Select(m => m.GroupId).ToList());
+		}
+
+		public List<int> GetUserGroupsIds(string courseId, string userId)
+		{
+			return GetUsersGroupsIds(courseId, new List<string> { userId }).GetOrDefault(userId, new List<int>());
+		}
+
 		public bool IsManualCheckingEnabledForUser(Course course, string userId)
 		{
 			if (course.Settings.IsManualCheckingEnabled)
@@ -228,6 +288,33 @@ namespace uLearn.Web.DataContexts
 				.ToList();
 			var userGroups = db.Groups.Where(g => userGroupsIds.Contains(g.Id)).ToList();
 			return userGroups.Any(g => g.IsManualCheckingEnabled);
+		}
+
+		public async Task EnableAdditionalScoringGroupsForGroup(int groupId, IEnumerable<string> scoringGroupsIds)
+		{
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				db.EnabledAdditionalScoringGroups.RemoveRange(
+					db.EnabledAdditionalScoringGroups.Where(e => e.GroupId == groupId)
+				);
+
+				foreach (var scoringGroupId in scoringGroupsIds)
+					db.EnabledAdditionalScoringGroups.Add(new EnabledAdditionalScoringGroup
+					{
+						GroupId = groupId,
+						ScoringGroupId = scoringGroupId
+					});
+
+				await db.SaveChangesAsync();
+
+				transaction.Commit();
+			}
+		}
+
+		public List<EnabledAdditionalScoringGroup> GetEnabledAdditionalScoringGroups(string courseId)
+		{
+			var groupsIds = GetGroups(courseId).Select(g => g.Id);
+			return db.EnabledAdditionalScoringGroups.Where(e => groupsIds.Contains(e.GroupId)).ToList();
 		}
 	}
 }

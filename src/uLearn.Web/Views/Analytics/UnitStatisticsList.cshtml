@@ -11,10 +11,10 @@
 
 		<h3>Выберите модуль</h3>
 
-		@foreach (var unitName in Model.UnitsNames)
+		@foreach (var unit in Model.Units)
 		{
 			<div>
-				@Html.ActionLink(unitName, "UnitStatistics", new { courseId = Model.CourseId, unitName = unitName })
+				@Html.ActionLink(unit.Title, "UnitStatistics", new { courseId = Model.Course.Id, unitId = unit.Id })
 			</div>
 		}
 	</div>

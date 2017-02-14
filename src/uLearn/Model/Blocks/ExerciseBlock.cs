@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 using RunCsJob.Api;
 using uLearn.Model.Edx.EdxComponents;
@@ -48,6 +49,9 @@ namespace uLearn.Model.Blocks
 
 		[XmlElement("max-review-attempts")]
 		public int MaxReviewAttempts { get; set; }
+
+		[XmlElement("scoring-group")]
+		public string ScoringGroup { get; set; }
 
 		public int MaxReviewScore => MaxScore - CorrectnessScore;
 
@@ -99,7 +103,7 @@ namespace uLearn.Model.Blocks
 
 		public Component GetSolutionsComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)
 		{
-			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex + 1, launchUrl, ltiId, false, 0, false);
+			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex + "-solutions", launchUrl, ltiId, false, 0, false);
 		}
 
 		public Component GetExerciseComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)
@@ -117,6 +121,17 @@ namespace uLearn.Model.Blocks
 			return (ExerciseInitialCode ?? "") + '\n'
 					+ string.Join("\n", HintsMd) + '\n'
 					+ (CommentAfterExerciseIsSolved ?? "");
+		}
+
+		protected void CheckScoringGroup(BuildUpContext context)
+		{
+			var scoringGroupsIds = context.CourseSettings.Scoring.Groups.Keys;
+			if (!string.IsNullOrEmpty(ScoringGroup) && ! scoringGroupsIds.Contains(ScoringGroup))
+				throw new CourseLoadingException($"Неизвестная группа оценки у задания {context.Lesson.Title}: {ScoringGroup}\n" +
+												 "Возможные значения: " + string.Join(", ", scoringGroupsIds));
+
+			if (string.IsNullOrEmpty(ScoringGroup))
+				ScoringGroup = context.CourseSettings.Scoring.DefaultScoringGroupForExercise;
 		}
 	}
 }

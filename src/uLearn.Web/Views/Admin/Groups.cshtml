@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNet.Identity
+@using uLearn
 @using uLearn.Web.Extensions
 @model uLearn.Web.Controllers.GroupsViewModel
 
@@ -8,26 +9,54 @@
 
 <div class="container">
 
-	<h1>Группы <small><a href="" class="create-group-link  internal-page-link">создать</a></small></h1>
-	
+	<h1>Группы
+		<small>
+			<a href="" class="create-group-link  internal-page-link">создать</a>
+			@if (Model.GroupsMayBeCopied.Count > 0)
+			{
+				<a href="" class="copy-group-link  internal-page-link">скопировать из...</a>
+			}
+		</small>
+	</h1>
+
 	<div class="groups">
-		@if (Model.Groups.Count == 0)
+		@if (Model.Groups.Count(g => g.IsArchived) > 0)
+		{
+			<div class="btn-group show-archived-groups-selector">
+				<button class="btn btn-default btn-sm active">Активные группы</button>
+				<button class="btn btn-default btn-sm">Архив</button>
+			</div>
+		}
+		@if (Model.Groups.Count(g => !g.IsArchived) == 0)
 		{
 			<div>
 				<a href="" class="create-group-link  internal-page-link">Создайте</a> группу, пригласите в неё студентов или добавьте их самостоятельно. Смотрите статистку только по своей группе.
 			</div>
 		}
-		@foreach (var group in Model.Groups.OrderBy(g => g.OwnerId != User.Identity.GetUserId()))
+
+		@foreach (var group in Model.Groups)
 		{
-			<div class="group" data-group-id="@group.Id">
+			var enabledScoringGroupsIds = Model.EnabledScoringGroups.GetOrDefault(group.Id, new List<string>());
+			var canModifyGroup = Model.CanModifyGroup[group.Id];
+			<div class="group @(group.IsArchived ? "archived-group" : "nonarchived-group")" data-group-id="@group.Id">
 				<h3 class="group__title">
-					<a href=""
-					   class="edit-group-link  internal-page-link"
-					   title="Редактировать свойства"
-					   data-group-id="@group.Id"
-					   data-name="@group.Name"
-					   data-is-public="@group.IsPublic.ToString().ToLower()"
-					   data-manual-checking="@group.IsManualCheckingEnabled.ToString().ToLower()">@group.Name</a>
+					@if (canModifyGroup)
+					{
+						<a href=""
+						   class="edit-group-link  internal-page-link"
+						   title="Редактировать свойства"
+						   data-group-id="@group.Id"
+						   data-name="@group.Name"
+						   data-is-public="@group.IsPublic.ToString().ToLower()"
+						   data-is-archived="@group.IsArchived.ToString().ToLower()"
+						   data-manual-checking="@group.IsManualCheckingEnabled.ToString().ToLower()"
+						   data-scoring-groups="@string.Join(",", enabledScoringGroupsIds)"
+						   data-owner-id="@group.OwnerId">@group.Name</a>
+					}
+					else
+					{
+						@group.Name
+					}
 
 					@if (!group.IsPublic)
 					{
@@ -37,15 +66,19 @@
 					{
 						<small><span class="label label-primary">владелец: @group.Owner.VisibleName</span></small>
 					}
+					@if (group.IsArchived)
+					{
+						<small><span class="label label-warning">архивная группа</span></small>
+					}
 				</h3>
 				@{
-					var inviteLink = Url.Action("JoinGroup", "Account", new { hash = group.InviteHash }, Request.Url.Scheme);
+					var inviteLink = Url.Action("JoinGroup", "Account", new { hash = group.InviteHash }, Request.GetRealScheme());
 				}
 				<div class="@(group.IsInviteLinkEnabled ? "text-muted" : "text-danger")">
-					<span class="clipboard-link" data-clipboard-text="@inviteLink" title="Отправьте эту ссылку студентам для присоединения к группе. Студенты увидят название группы">
+					<span class="@(group.IsInviteLinkEnabled ? "clipboard-link" : "")" data-clipboard-text="@inviteLink" title="Отправьте эту ссылку студентам для присоединения к группе. Студенты увидят название группы">
 						@inviteLink
 					</span>
-					
+
 					@if (group.IsInviteLinkEnabled)
 					{
 						<button class="clipboard-link  btn btn-xs btn-primary" data-clipboard-text="@inviteLink" data-show-copied="true">
@@ -53,43 +86,52 @@
 						</button>
 					}
 
-					<form action="@Url.Action("EnableGroupInviteLink", "Admin", new { groupId = group.Id, isEnabled = !group.IsInviteLinkEnabled })" method="POST" class="ib">
-						@Html.AntiForgeryToken()
-						<button class="btn @(group.IsInviteLinkEnabled ? "btn-default" : "btn-primary") btn-xs">
-							@(group.IsInviteLinkEnabled ? "отключить ссылку" : "включить ссылку")
-						</button>
-					</form>
-
+					@if (canModifyGroup)
+					{
+						<form action="@Url.Action("EnableGroupInviteLink", "Admin", new { groupId = group.Id, isEnabled = !group.IsInviteLinkEnabled })" method="POST" class="ib">
+							@Html.AntiForgeryToken()
+							<button class="btn btn-default btn-xs">
+								@(group.IsInviteLinkEnabled ? "отключить ссылку" : "включить ссылку")
+							</button>
+						</form>
+					}
 				</div>
 				<ol class="members">
 					@foreach (var member in group.Members.OrderBy(m => m.User.VisibleName))
 					{
 						<li class="member">
 							@member.User.VisibleName (@member.User.UserName)
-							<span class="glyphicon glyphicon-remove  remove-user-from-group-link  text-danger visible-on-parent-hover  cursor-pointer" data-group-id="@group.Id" data-user-id="@member.User.Id" title="Удалить из группы"></span>
+							@if (canModifyGroup)
+							{
+								<span class="glyphicon glyphicon-remove  remove-user-from-group-link  text-danger visible-on-parent-hover  cursor-pointer" data-group-id="@group.Id" data-user-id="@member.User.Id" title="Удалить из группы"></span>
+							}
 						</li>
 					}
 				</ol>
 
-				@if (group.OwnerId == User.Identity.GetUserId() || User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
+				@if (canModifyGroup && !group.IsArchived)
 				{
 					if (group.Members.Count == 0)
 					{
-						<div>В группе нет пользователей. Добавьте:</div>
+						<div>В группе нет студентов. Добавьте:</div>
 					}
 					else
 					{
-						<div>Добавить пользователя:</div>
+						<div>Добавить студентов:</div>
 					}
 					<input type="text"
 						   class="add-user-to-group-input form-control"
 						   data-group-id="@group.Id"
-						   data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.CourseId })"
+						   data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.CourseId, withGroups = false })"
 						   placeholder="Начните вводить имя или фамилию">
 				}
+				@if ((group.IsArchived || ! canModifyGroup) && group.Members.Count == 0)
+				{
+					<div class="text-muted" title="@(group.IsArchived && canModifyGroup ? "Нельзя добавлять пользователей в архивные группы" : "")">
+						Нет студентов
+					</div>
+				}
 			</div>
-
-			<hr/>
 		}
 	</div>
 </div>
@@ -108,14 +150,31 @@
 				}))
 				{
 					@Html.AntiForgeryToken()
-					<input type="hidden" name="courseId" value="@Model.CourseId"/>
+					<input type="hidden" name="courseId" value="@Model.CourseId" />
 					<input type="hidden" name="groupId" value="" />
 
 					<div class="form-group">
 						<input id="name" name="name" type="text" class="form-control" placeholder="Название новой группы">
 						<p class="help-block">
-							Студенты увидят название группы, только если вы сами вышлете им ссылку для вступления
+							Студенты увидят название группы, только если вы сами вышлете им ссылку для&nbsp;вступления
 						</p>
+					</div>
+
+					<h3>Настройки</h3>
+					var instructorsList = Model.Instructors.Select(i => new SelectListItem
+					{
+						Value = i.UserId,
+						Text = i.UserVisibleName,
+					}).ToList();
+					/* Add myself if I am not an instructor (SysAdmin i.e.) */
+					if (Model.Instructors.All(i => i.UserId != User.Identity.GetUserId()))
+					{
+						instructorsList.Insert(0, new SelectListItem { Value = User.Identity.GetUserId(), Text = "Вы" });
+					}
+
+					<div>
+						Владелец&nbsp;
+						@Html.DropDownList("ownerId", instructorsList, new { @class = "form-control ib input-sm", data_default_value = User.Identity.GetUserId() })
 					</div>
 
 					<div class="checkbox checkbox-default">
@@ -125,16 +184,116 @@
 						</label>
 					</div>
 
-					<div class="checkbox checkbox-default @(Model.CourseManualCheckingEnabled ? "hidden" : "")"
-						 data-default-value="@((! Model.CourseManualCheckingEnabled).ToString().ToLower())">
-						@Html.CheckBox("manualChecking")
+					<div class="checkbox checkbox-default">
+						@Html.CheckBox("manualChecking",
+									   true,
+									   Model.CourseManualCheckingEnabled ? (object) new { disabled = "disabled"} : new { data_default_value = "true" })
 						<label for="manualChecking">
-							Включить код-ревью и ручную проверку тестов для участников группы
+							Включить код-ревью и ручную проверку тестов для участников группы <br/>
+							@if (Model.CourseManualCheckingEnabled)
+							{
+								<span>(включено для всего курса)</span>
+							}
 						</label>
 					</div>
 
+					<div class="checkbox checkbox-default">
+						@Html.CheckBox("isArchived")
+						<label for="isArchived">
+							Архивная группа
+							<span class="glyphicon glyphicon-question-sign with-long-tooltip"
+								  data-toggle="tooltip"
+								  data-placement="right"
+								  title="Студенты из архивных группы не показываются по фильтру «Мои группы», а сама группа не отвлекает вас от работы. Вы сможете вернуть группу из архива в любой момент">
+							</span>
+						</label>
+					</div>
+
+					if (Model.ScoringGroupsCanBeSetInSomeUnit.Count > 0)
+					{
+						<h3>Баллы</h3>
+						<div>
+							Преподаватели могут выставлять студентам группы следующие баллы:
+							@foreach (var scoringGroup in Model.ScoringGroupsCanBeSetInSomeUnit)
+							{
+								<div class="checkbox checkbox-default scoring-group-checkbox">
+									@Html.CheckBox("scoring-group__" + scoringGroup.Id)
+									<label for="scoring-group__@scoringGroup.Id">
+										@scoringGroup.Name
+									</label>
+								</div>
+							}
+						</div>
+					}
+
 					<button class="action-button  btn btn-success">Создать</button>
 					<button class="remove-group-link  btn btn-danger" data-url="@Url.Action("RemoveGroup", "Admin")">Удалить группу</button>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="copyGroupModal" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Скопировать группу</h4>
+			</div>
+			<div class="modal-body">
+				@using (Html.BeginForm("CopyGroup", "Admin", FormMethod.Post))
+				{
+					@Html.Hidden("courseId", Model.CourseId);
+					<div>
+						<p>
+							Новая группа будет создана для курса «@Model.CoursesNames[Model.CourseId]».
+							Скопируются все настройки группы (в том числе владелец), в неё автоматически добавятся участники из копируемой группы.
+						</p>
+					</div>
+					<div class="form-group input-group">
+						@{
+							var selectGroups = Model.CoursesNames.ToDictionary(kv => kv.Key, kv => new SelectListGroup { Name = kv.Value });
+							var instructorsUsersIds = new HashSet<string>(Model.Instructors.Select(i => i.UserId));
+							var copiedGroupsList = Model.GroupsMayBeCopied.Select(g => new SelectListItemWithAttributes
+							{
+								Value = g.Id.ToString(),
+								Text = g.Name + ": " + g.Members.Count.PluralizeInRussian(new RussianPluralizationOptions
+								{
+									One = "человек",
+									Two = "человека",
+									Five = "человек",
+									Gender = Gender.Male,
+									hideNumberOne = false
+								}),
+								Group = selectGroups.GetOrDefault(g.CourseId),
+								HtmlAttributes = new
+								{
+									data_owner = g.Owner.VisibleName,
+									data_need_to_change_owner = !instructorsUsersIds.Contains(g.OwnerId)
+								}
+							}).ToList();
+							copiedGroupsList.Insert(0, new SelectListItemWithAttributes { Value = "-1", Text = "Выберите группу", });
+						}
+
+						Группа, которую надо скопировать&nbsp;
+						@Html.DropDownListWithItemAttributes("groupId", copiedGroupsList, new { @class = "form-control" })
+					</div>
+					<div class="form-group copy-group__change-owner-block">
+						<p class="help-block">
+							Владелец этой группы <span class="owner-name"></span> не&nbsp;является преподавателем курса «@Model.CoursesNames[Model.CourseId]».
+							Вы&nbsp;можете @(User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin) ? "добавить его в список преподавателей или" : "")
+							сделать себя владельцем скопированной группы.
+						</p>
+						<div class="checkbox checkbox-default">
+							@Html.CheckBox("changeOwner")
+							<label for="changeOwner">
+								Сделать меня владельцем группы
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<button class="btn btn-success copy-group-button">Скопировать группу</button>
+					</div>
 				}
 			</div>
 		</div>

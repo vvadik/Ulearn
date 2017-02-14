@@ -3,4 +3,9 @@
 	<title>Справка для авторов курсов (xml)</title>
 	<language name="cs" version="4.5" />
 	<manual-checking>false</manual-checking>
+	<scoring defaultQuiz="laboratory" defaultExercise="homework" default="laboratory">
+		<group id="laboratory" abbr="ЛЗ" set_by_instructor="true">Лабораторные занятия</group>
+		<group id="homework" abbr="ДЗ" set_by_instructor="true" max_additional_score="20">Домашняя работа</group>
+		<group id="activity" abbr="Акт" set_by_instructor="true" enable_for_everyone="true">Активность на уроках</group>
+	</scoring>
 </Course>

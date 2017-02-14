@@ -15,7 +15,7 @@ namespace uLearn.Web.Controllers
 {
 	public class RunnerController : ApiController
 	{
-		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo();
+		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo(new ULearnDb());
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
 		[HttpGet]
@@ -26,7 +26,7 @@ namespace uLearn.Web.Controllers
 			var sw = Stopwatch.StartNew();
 			while (true)
 			{
-				var repo = new UserSolutionsRepo();
+				var repo = new UserSolutionsRepo(new ULearnDb());
 				var exerciseCheckings = repo.GetUnhandledSubmissions(count);
 				if (exerciseCheckings.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
 				{

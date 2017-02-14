@@ -19,7 +19,7 @@
 		@foreach (var unit in Model.Units)
 		{
 			<tr style="text-align: center">
-				<td style="text-align: left">@unit.UnitName</td>
+				<td style="text-align: left">@unit.Unit.Title</td>
 				<td title="@unit.SlideVisits.Earned of @unit.SlideVisits.Total">@unit.SlideVisits</td>
 				<td title="@unit.Exercises.Earned of @unit.Exercises.Total">@unit.Exercises</td>
 				<td title="@unit.Quizes.Earned of @unit.Quizes.Total">@unit.Quizes</td>

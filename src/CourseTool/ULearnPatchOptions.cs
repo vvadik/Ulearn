@@ -50,23 +50,25 @@ namespace uLearn.CourseTool
 
 		private void PatchInstructorsNotes(EdxCourse edxCourse, Course ulearnCourse, string olxPath)
 		{
-			var ulearnUnits = ulearnCourse.GetUnits().ToList();
+			var ulearnUnits = ulearnCourse.Units;
 			foreach (var chapter in edxCourse.CourseWithChapters.Chapters)
 			{
-				var chapterNote = ulearnCourse.InstructorNotes.FirstOrDefault(x => x.UnitName == chapter.DisplayName);
-				if (chapterNote == null)
+				var chapterUnit = ulearnCourse.Units.FirstOrDefault(u => u.Title == chapter.DisplayName);
+				var chapterNote = chapterUnit?.InstructorNote;
+				if (chapterUnit == null || chapterNote == null)
 					continue;
-				var unitIndex = ulearnUnits.IndexOf(chapterNote.UnitName);
+
+				var unitIndex = ulearnUnits.IndexOf(chapterUnit);
 				var displayName = "Заметки преподавателю";
-				var sequentialId = string.Format("{0}-{1}-{2}", ulearnCourse.Id, unitIndex, "note-seq");
-				var verticalId = string.Format("{0}-{1}-{2}", ulearnCourse.Id, unitIndex, "note-vert");
-				var mdBlockId = string.Format("{0}-{1}-{2}", ulearnCourse.Id, unitIndex, "note-md");
+				var sequentialId = $"{ulearnCourse.Id}-{unitIndex}-note-seq";
+				var verticalId = $"{ulearnCourse.Id}-{unitIndex}-note-vert";
+				var mdBlockId = $"{ulearnCourse.Id}-{unitIndex}-note-md";
 				var sequentialNote = new Sequential(sequentialId, displayName,
 					new[]
 					{
-						new Vertical(verticalId, displayName, new[] { new MdBlock(chapterNote.Markdown).ToEdxComponent(mdBlockId, displayName, ulearnCourse.GetDirectoryByUnitName(chapterNote.UnitName)) })
+						new Vertical(verticalId, displayName, new[] { new MdBlock(chapterNote.Markdown).ToEdxComponent(mdBlockId, displayName, chapterUnit.Directory.FullName) })
 					}) { VisibleToStaffOnly = true };
-				if (!File.Exists(string.Format("{0}/sequential/{1}.xml", olxPath, sequentialNote.UrlName)))
+				if (!File.Exists($"{olxPath}/sequential/{sequentialNote.UrlName}.xml"))
 				{
 					var sequentials = chapter.Sequentials.ToList();
 					sequentials.Add(sequentialNote);

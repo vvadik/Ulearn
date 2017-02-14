@@ -8,7 +8,7 @@ namespace uLearn.Model.Edx
 		[XmlAttribute("url_name")]
 		public string UrlName;
 
-		public virtual Component GetComponent(string folderName, string urlName)
+		public virtual Component LoadComponent(string folderName, string urlName, EdxLoadOptions options)
 		{
 			return null;
 		}
@@ -28,33 +28,33 @@ namespace uLearn.Model.Edx
 
 	public class HtmlComponentReference : EdxReference
 	{
-		public override Component GetComponent(string folderName, string urlName)
+		public override Component LoadComponent(string folderName, string urlName, EdxLoadOptions options)
 		{
-			return HtmlComponent.Load(folderName, urlName);
+			return HtmlComponent.Load(folderName, urlName, options);
 		}
 	}
 
 	public class LtiComponentReference : EdxReference
 	{
-		public override Component GetComponent(string folderName, string urlName)
+		public override Component LoadComponent(string folderName, string urlName, EdxLoadOptions options)
 		{
-			return LtiComponent.Load(folderName, urlName);
+			return LtiComponent.Load(folderName, urlName, options);
 		}
 	}
 
 	public class VideoComponentReference : EdxReference
 	{
-		public override Component GetComponent(string folderName, string urlName)
+		public override Component LoadComponent(string folderName, string urlName, EdxLoadOptions options)
 		{
-			return VideoComponent.Load(folderName, urlName);
+			return VideoComponent.Load(folderName, urlName, options);
 		}
 	}
 
 	public class ProblemComponentReference : EdxReference
 	{
-		public override Component GetComponent(string folderName, string urlName)
+		public override Component LoadComponent(string folderName, string urlName, EdxLoadOptions options)
 		{
-			return SlideProblemComponent.Load(folderName, urlName);
+			return SlideProblemComponent.Load(folderName, urlName, options);
 		}
 	}
 }

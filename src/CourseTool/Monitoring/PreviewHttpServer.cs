@@ -202,7 +202,7 @@ namespace uLearn.CourseTool.Monitoring
 			var renderer = new SlideRenderer(new DirectoryInfo(htmlDir), loadedCourse);
 			foreach (var slide in loadedCourse.Slides)
 				renderer.RenderSlideToFile(slide, htmlDir);
-			foreach (var unit in loadedCourse.GetUnits().Where(u => loadedCourse.FindInstructorNote(u) != null))
+			foreach (var unit in loadedCourse.Units.Where(u => u.InstructorNote != null))
 				renderer.RenderInstructorNotesToFile(unit, htmlDir);
 			return loadedCourse;
 		}

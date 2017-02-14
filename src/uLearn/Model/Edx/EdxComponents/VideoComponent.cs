@@ -41,18 +41,9 @@ namespace uLearn.Model.Edx.EdxComponents
 			return string.Format(@"<iframe class=""embedded-video"" width=""100%"" height=""530"" src=""//www.youtube.com/embed/{0}"" frameborder=""0"" allowfullscreen=""\""></iframe>", NormalSpeedVideoId);
 		}
 
-		public static VideoComponent Load(string folderName, string urlName)
+		public static VideoComponent Load(string folderName, string urlName, EdxLoadOptions options)
 		{
-			try
-			{
-				var component = new FileInfo(string.Format("{0}/video/{1}.xml", folderName, urlName)).DeserializeXml<VideoComponent>();
-				component.UrlName = urlName;
-				return component;
-			}
-			catch (Exception e)
-			{
-				throw new Exception(string.Format("Video {0} load error", urlName), e);
-			}
+			return Load<VideoComponent>(folderName, "video", urlName, options);
 		}
 	}
 }

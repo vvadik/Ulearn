@@ -130,6 +130,7 @@
     <Compile Include="CSharp\RedundantIfStyleValidator.cs" />
     <Compile Include="CSharp\CsMembersRemover.cs" />
     <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="FileSystemExtensions.cs" />
     <Compile Include="ISolutionValidator.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />
@@ -199,7 +200,7 @@
     <Compile Include="SampleAttribute.cs" />
     <Compile Include="Slide.cs" />
     <Compile Include="Model\Blocks\SlideBlock.cs" />
-    <Compile Include="SlideNotFoundException.cs" />
+    <Compile Include="NotFoundException.cs" />
     <Compile Include="SolutionBuildResult.cs" />
     <Compile Include="SolutionBuilder.cs" />
     <Compile Include="SpellCheckExtentions.cs" />
@@ -211,6 +212,9 @@
     <Compile Include="CSharp\SyntaxExtensions.cs" />
     <Compile Include="SlideAttribute.cs" />
     <Compile Include="TexReplacer.cs" />
+    <Compile Include="Unit.cs" />
+    <Compile Include="UnitLoader.cs" />
+    <Compile Include="UnitSettings.cs" />
     <Compile Include="Urls.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="ValidatorExtension.cs" />

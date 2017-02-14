@@ -20,24 +20,6 @@ namespace uLearn
 			File.WriteAllText(file.FullName, text.Substring(startIndex));
 		}
 
-		public static FileInfo GetFile(this DirectoryInfo dir, string filename)
-		{
-			return new FileInfo(Path.Combine(dir.FullName, filename));
-		}
-
-		public static DirectoryInfo GetSubdir(this DirectoryInfo dir, string name)
-		{
-			return new DirectoryInfo(Path.Combine(dir.FullName, name));
-		}
-
-		public static DirectoryInfo GetOrCreateSubdir(this DirectoryInfo dir, string name)
-		{
-			var subdir = dir.GetSubdir(name);
-			if (!subdir.Exists)
-				subdir.Create();
-			return subdir;
-		}
-
 		public static string ContentAsUtf8(this FileInfo file)
 		{
 			return File.ReadAllText(file.FullName, Encoding.UTF8);
@@ -73,23 +55,6 @@ namespace uLearn
 			if (fileInfo.Exists)
 				return File.ReadAllBytes(fileInfo.FullName);
 			throw new Exception("No " + filepath + " in " + di.FullName);
-		}
-
-		public static string GetRelativePath(this FileSystemInfo file, string folder)
-		{
-			var pathUri = new Uri(file.FullName);
-			if (!folder.EndsWith(Path.DirectorySeparatorChar.ToString()))
-				folder += Path.DirectorySeparatorChar;
-			var folderUri = new Uri(folder);
-			return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
-		}
-
-		public static string[] GetFilenames(this DirectoryInfo di, string dirPath)
-		{
-			var dir = di.GetSubdir(dirPath);
-			if (!dir.Exists)
-				throw new Exception("No " + dirPath + " in " + di.Name);
-			return dir.GetFiles().Select(f => Path.Combine(dirPath, f.Name)).ToArray();
 		}
 
 		/// <param name="excludeCriterias"><see cref="M:Ionic.Zip.ZipFile.AddSelectedFiles(System.String)" /></param>

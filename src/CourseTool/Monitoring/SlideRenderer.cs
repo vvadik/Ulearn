@@ -47,39 +47,46 @@ namespace uLearn.CourseTool.Monitoring
 			return "<!DOCTYPE html>\n" + page.ToHtmlString();
 		}
 
-		public void RenderInstructorNotesToFile(string unitName, string directory)
+		public void RenderInstructorNotesToFile(Unit unit, string directory)
 		{
-			File.WriteAllText(Path.Combine(directory, GetInstructorNotesFilename(unitName)), RenderInstructorsNote(unitName));
+			File.WriteAllText(
+				Path.Combine(directory, GetInstructorNotesFilename(unit)),
+				RenderInstructorsNote(unit)
+			);
 		}
 
-		private string RenderInstructorsNote(string unitName)
+		private string RenderInstructorsNote(Unit unit)
 		{
-			var note = course.FindInstructorNote(unitName);
+			var note = unit.InstructorNote;
 			if (note == null)
 				return null;
-			var similarSlide = course.Slides.First(x => x.Info.UnitName == unitName);
-			var slide = new Slide(new[] { new MdBlock(note.Markdown) }, new SlideInfo(unitName, similarSlide.Info.SlideFile, -1), "Заметки преподавателю", Guid.NewGuid());
+
+			var similarSlide = unit.Slides.First();
+			var slide = new Slide(
+				new[] { new MdBlock(note.Markdown) },
+				new SlideInfo(unit, similarSlide.Info.SlideFile, -1), "Заметки преподавателю", Guid.NewGuid()
+			);
 			var page = StandaloneLayout.Page(course, slide, CreateToc(slide), GetCssFiles(), GetJsFiles());
+
 			CopyLocalFiles(note.Markdown, similarSlide.Info.Directory.FullName);
 			return "<!DOCTYPE html>\n" + page.ToHtmlString();
 		}
 
 		private TocModel CreateToc(Slide slide)
 		{
-			var builder = new TocModelBuilder(GetSlideUrl, s => 0, s => s.MaxScore, course, slide.Id)
+			var builder = new TocModelBuilder(GetSlideUrl, s => 0, s => s.MaxScore, (u, g) => 0, course, slide.Id)
 			{
 				IsInstructor = true,
-				GetUnitInstructionNotesUrl = unitName => GetInstructorNotesFilename(unitName),
-				GetUnitStatisticsUrl = unitName => "404.html",
+				GetUnitInstructionNotesUrl = unit => GetInstructorNotesFilename(unit),
+				GetUnitStatisticsUrl = unit => "404.html",
 				IsSlideHidden = s => false
 			};
 			return builder.CreateTocModel();
 		}
 
-		private string GetInstructorNotesFilename(string unitName)
+		private string GetInstructorNotesFilename(Unit unit)
 		{
-			var units = course.GetUnits().Select((unit, index) => new { name = unit, index });
-			return $"InstructorNotes.{units.First(u => u.name == unitName).index}.html";
+			return $"InstructorNotes.{unit.Url}.html";
 		}
 
 		private static string GetSlideUrl(Slide slide)

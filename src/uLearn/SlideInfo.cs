@@ -6,14 +6,14 @@ namespace uLearn
 	public class SlideInfo
 	{
 		public int Index { get; set; }
-		public string UnitName { get; private set; }
+		public Unit Unit { get; private set; }
 		public FileInfo SlideFile { get; set; }
 		public DirectoryInfo Directory => SlideFile.Directory;
 
-		public SlideInfo(string unitName, FileInfo slideFile, int index)
+		public SlideInfo(Unit unit, FileInfo slideFile, int index)
 		{
 			Index = index;
-			UnitName = unitName;
+			Unit = unit;
 			SlideFile = slideFile;
 		}
 

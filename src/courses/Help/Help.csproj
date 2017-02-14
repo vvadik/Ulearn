@@ -60,7 +60,7 @@
     <Content Include="Slides\U99_Presentation\S003_code.lesson.xml" />
     <Content Include="Slides\U99_Presentation\S004_example.lesson.xml" />
     <Content Include="Slides\U99_Presentation\S005_manual.quiz.xml" />
-    <Content Include="Slides\U99_Presentation\Title.txt" />
+    <Content Include="Slides\U99_Presentation\Unit.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CsSandboxer\CsSandboxer.csproj">

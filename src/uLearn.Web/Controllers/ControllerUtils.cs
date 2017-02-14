@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
 using uLearn.Web.Models;
@@ -50,7 +52,7 @@ namespace uLearn.Web.Controllers
 			/* if groupId is null, get memers of all own groups */
 			if (string.IsNullOrEmpty(groupId))
 			{
-				var ownGroupsIds = groupsRepo.GetGroupsOwnedByUser(courseId, User).Select(g => g.Id).ToList();
+				var ownGroupsIds = groupsRepo.GetGroupsOwnedByUser(courseId, User, includeArchived: false).Select(g => g.Id).ToList();
 				var usersIds = new List<string>();
 				foreach (var ownGroupId in ownGroupsIds)
 				{
@@ -73,6 +75,35 @@ namespace uLearn.Web.Controllers
 				}
 			}
 			return result;
+		}
+
+		public static HashSet<Guid> GetSolvedSlides(UserSolutionsRepo solutionsRepo, UserQuizzesRepo userQuizzesRepo, Course course, string userId)
+		{
+			var solvedSlides = solutionsRepo.GetIdOfPassedSlides(course.Id, userId);
+			solvedSlides.UnionWith(userQuizzesRepo.GetIdOfQuizPassedSlides(course.Id, userId));
+			return solvedSlides;
+		}
+
+		public static int GetMaxScoreForUsersSlide(Slide slide, bool isSolved, bool hasManualChecking, bool enabledManualCheckingForUser)
+		{
+			var isExerciseOrQuiz = slide is ExerciseSlide || slide is QuizSlide;
+
+			if (!isExerciseOrQuiz)
+				return slide.MaxScore;
+
+			if (isSolved)
+				return hasManualChecking ? slide.MaxScore : GetMaxScoreWithoutManualChecking(slide);
+			else
+				return enabledManualCheckingForUser ? slide.MaxScore : GetMaxScoreWithoutManualChecking(slide);
+		}
+
+		private static int GetMaxScoreWithoutManualChecking(Slide slide)
+		{
+			if (slide is ExerciseSlide)
+				return (slide as ExerciseSlide).Exercise.CorrectnessScore;
+			if (slide is QuizSlide)
+				return (slide as QuizSlide).Quiz.ManualCheck ? 0 : slide.MaxScore;
+			return slide.MaxScore;
 		}
 	}
 }

@@ -20,13 +20,15 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
-		private readonly SlideRateRepo slideRateRepo = new SlideRateRepo();
-		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
-		private readonly UnitsRepo unitsRepo = new UnitsRepo();
-		private readonly VisitsRepo visitsRepo = new VisitsRepo();
-		private readonly LtiRequestsRepo ltiRequestsRepo = new LtiRequestsRepo();
-		private readonly SlideCheckingsRepo slideCheckingsRepo = new SlideCheckingsRepo();
-		private readonly GroupsRepo groupsRepo = new GroupsRepo();
+
+		private readonly SlideRateRepo slideRateRepo;
+		private readonly UserSolutionsRepo solutionsRepo;
+		private readonly UnitsRepo unitsRepo;
+		private readonly VisitsRepo visitsRepo;
+		private readonly LtiRequestsRepo ltiRequestsRepo;
+		private readonly SlideCheckingsRepo slideCheckingsRepo;
+		private readonly GroupsRepo groupsRepo;
+		private readonly UserQuizzesRepo userQuizzesRepo;
 
 		public CourseController()
 			: this(WebCourseManager.Instance)
@@ -35,6 +37,14 @@ namespace uLearn.Web.Controllers
 
 		public CourseController(CourseManager courseManager)
 		{
+			slideCheckingsRepo = new SlideCheckingsRepo(db);
+			visitsRepo = new VisitsRepo(db);
+			unitsRepo = new UnitsRepo(db);
+			slideRateRepo = new SlideRateRepo(db);
+			solutionsRepo = new UserSolutionsRepo(db);
+			ltiRequestsRepo = new LtiRequestsRepo(db);
+			groupsRepo = new GroupsRepo(db);
+            userQuizzesRepo = new UserQuizzesRepo(db);
 			this.courseManager = courseManager;
 		}
 
@@ -56,10 +66,11 @@ namespace uLearn.Web.Controllers
 				return RedirectToSlideById(slideGuid);
 			}
 
-			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
+			var course = courseManager.GetCourse(courseId);
+
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			var isGuest = !User.Identity.IsAuthenticated;
 
-			var course = courseManager.GetCourse(courseId);
 			var slide = slideGuid == Guid.Empty ? GetInitialSlideForStartup(courseId, course, visibleUnits) : course.FindSlideById(slideGuid);
 
 			if (slide == null)
@@ -88,13 +99,13 @@ namespace uLearn.Web.Controllers
 			}
 
 			var model = isGuest ?
-				CreateGuestCoursePageModel(course, slide, visibleUnits) :
-				await CreateCoursePageModel(course, slide, visibleUnits, queueItem, version, groupId);
+				CreateGuestCoursePageModel(course, slide) :
+				await CreateCoursePageModel(course, slide, queueItem, version, groupId);
 
 			if (!string.IsNullOrEmpty(Request.QueryString["error"]))
 				model.Error = Request.QueryString["error"];
 
-			if (!visibleUnits.Contains(model.Slide.Info.UnitName))
+			if (!visibleUnits.Contains(model.Slide.Info.Unit))
 				throw new Exception("Slide is hidden " + slideGuid);
 			return View("Slide", model);
 		}
@@ -121,7 +132,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult Slide(string courseId, int slideIndex = -1)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var visibleUnits = unitsRepo.GetVisibleUnits(courseId, User);
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			var slide = slideIndex == -1 ? GetInitialSlideForStartup(courseId, course, visibleUnits) : course.Slides[slideIndex];
 			return RedirectToRoute("Course.SlideById", new { courseId, slideId = slide.Url });
 		}
@@ -177,19 +188,19 @@ namespace uLearn.Web.Controllers
 			return claim?.Value;
 		}
 
-		private Slide GetInitialSlideForStartup(string courseId, Course course, List<string> visibleUnits)
+		private Slide GetInitialSlideForStartup(string courseId, Course course, List<Unit> visibleUnits)
 		{
 			var userId = User.Identity.GetUserId();
 			var visitedIds = visitsRepo.GetIdOfVisitedSlides(courseId, userId);
-			var visibleSlides = course.Slides.Where(slide => visibleUnits.Contains(slide.Info.UnitName)).OrderBy(slide => slide.Index).ToList();
+			var visibleSlides = visibleUnits.SelectMany(u => u.Slides).ToList();
 			var lastVisited = visibleSlides.LastOrDefault(slide => visitedIds.Contains(slide.Id));
 			if (lastVisited == null)
 				return visibleSlides.First();
 
-			var slides = visibleSlides.Where(slide => lastVisited.Info.UnitName == slide.Info.UnitName).ToList();
+			var unitSlides = lastVisited.Info.Unit.Slides.Where(s => visibleSlides.Contains(s)).ToList();
 
-			var lastVisitedSlide = slides.First();
-			foreach (var slide in slides)
+			var lastVisitedSlide = unitSlides.First();
+			foreach (var slide in unitSlides)
 			{
 				if (visitedIds.Contains(slide.Id))
 					lastVisitedSlide = slide;
@@ -199,7 +210,7 @@ namespace uLearn.Web.Controllers
 			return lastVisitedSlide;
 		}
 
-		private CoursePageModel CreateGuestCoursePageModel(Course course, Slide slide, List<string> visibleUnits)
+		private CoursePageModel CreateGuestCoursePageModel(Course course, Slide slide)
 		{
 			return new CoursePageModel
 			{
@@ -217,7 +228,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private async Task<CoursePageModel> CreateCoursePageModel(Course course, Slide slide, List<string> visibleUnits, AbstractManualSlideChecking manualChecking, int? exerciseSubmissionId = null, int? groupId = null)
+		private async Task<CoursePageModel> CreateCoursePageModel(Course course, Slide slide, AbstractManualSlideChecking manualChecking, int? exerciseSubmissionId = null, int? groupId = null)
 		{
 			var userId = User.Identity.GetUserId();
 
@@ -225,7 +236,9 @@ namespace uLearn.Web.Controllers
 				userId = manualChecking.UserId;
 
 			var visiter = await VisitSlide(course.Id, slide.Id, userId);
-			var score = Tuple.Create(visiter.Score, slide.MaxScore);
+			var maxSlideScore = GetMaxSlideScoreForUser(course, slide, userId);
+
+			var score = Tuple.Create(visiter.Score, maxSlideScore);
 			var model = new CoursePageModel
 			{
 				UserId = userId,
@@ -240,6 +253,15 @@ namespace uLearn.Web.Controllers
 				IsGuest = false,
 			};
 			return model;
+		}
+
+		private int GetMaxSlideScoreForUser(Course course, Slide slide, string userId)
+		{
+			var solvedSlidesIds = ControllerUtils.GetSolvedSlides(solutionsRepo, userQuizzesRepo, course, userId);
+			var slidesWithUsersManualChecking = new HashSet<Guid>(visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId));
+			var enabledManualCheckingForUser = groupsRepo.IsManualCheckingEnabledForUser(course, userId);
+			var maxSlideScore = ControllerUtils.GetMaxScoreForUsersSlide(slide, solvedSlidesIds.Contains(slide.Id), slidesWithUsersManualChecking.Contains(slide.Id), enabledManualCheckingForUser);
+			return maxSlideScore;
 		}
 
 		private BlockRenderContext CreateRenderContext(Course course, Slide slide, 
@@ -359,11 +381,12 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public ActionResult InstructorNote(string courseId, string unitName)
+		public ActionResult InstructorNote(string courseId, Guid unitId)
 		{
-			InstructorNote instructorNote = courseManager.GetCourse(courseId).FindInstructorNote(unitName);
+			var course = courseManager.GetCourse(courseId);
+			var instructorNote = course.GetUnitById(unitId).InstructorNote;
 			if (instructorNote == null)
-				return HttpNotFound("no instructor note for this unit");
+				return HttpNotFound("No instructor note for this unit");
 			return View(new IntructorNoteModel(courseId, instructorNote));
 		}
 
@@ -387,21 +410,17 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.Submission.SlideId == slideId));
 
-			RemoveFrom(db.UserExerciseSubmissions, slideId, userId);
-			RemoveFrom(db.UserQuizzes, slideId, userId);
-			RemoveFrom(db.Visits, slideId, userId);
+			db.UserExerciseSubmissions.RemoveSlideAction(slideId, userId);
+			db.UserQuizzes.RemoveSlideAction(slideId, userId);
+			db.Visits.RemoveSlideAction(slideId, userId);
 			await slideCheckingsRepo.RemoveAttempts(courseId, slideId, userId, false);
-			db.UserQuestions.RemoveRange(db.UserQuestions.Where(q => q.UserId == userId && q.SlideId == slideId));
-			db.SlideRates.RemoveRange(db.SlideRates.Where(q => q.UserId == userId && q.SlideId == slideId));
-			db.Hints.RemoveRange(db.Hints.Where(q => q.UserId == userId && q.SlideId == slideId));
+
+			db.UserQuestions.RemoveSlideAction(slideId, userId);
+			db.SlideRates.RemoveSlideAction(slideId, userId);
+			db.Hints.RemoveSlideAction(slideId, userId);
 			await db.SaveChangesAsync();
 
 			return RedirectToAction("SlideById", new { courseId, slideId = slide.Id});
-		}
-
-		private static void RemoveFrom<T>(DbSet<T> dbSet, Guid slideId, string userId) where T : class, ISlideAction
-		{
-			dbSet.RemoveRange(dbSet.Where(s => s.UserId == userId && s.SlideId == slideId));
 		}
 
 		public ActionResult CourseInstructorNavbar(string courseId)

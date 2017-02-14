@@ -29,10 +29,11 @@
 			}
 		</inital-code>
 		<hint>Вывод на консоль производится методом ```Console.WriteLine```</hint>
-		<solution>Main</solution>
 		<comment>Молодец</comment>
 		<expected>The first step!</expected>
-        <require-review>true</require-review>
+		<require-review>true</require-review>
+		<scoring-group>homework</scoring-group>
+		<solution>Main</solution>
 	</exercise>
 	
 </Lesson>

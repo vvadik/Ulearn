@@ -52,6 +52,9 @@ namespace uLearn.Model.Blocks
 			var exercisePath = context.Dir.GetSubdir(ExerciseDir).FullName;
 			if (context.ZippedProjectExercises.Add(exercisePath))
 				CreateZipForStudent();
+
+			CheckScoringGroup(context);
+
 			yield return this;
 		}
 

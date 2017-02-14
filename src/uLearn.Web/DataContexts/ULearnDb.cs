@@ -1,4 +1,6 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
+using System.Linq.Expressions;
 using EntityFramework.Functions;
 using Microsoft.AspNet.Identity.EntityFramework;
 using uLearn.Web.Migrations;
@@ -34,11 +36,7 @@ namespace uLearn.Web.DataContexts
 				.HasForeignKey(m => m.GroupId)
 				.WillCascadeOnDelete(false);
 
-			modelBuilder.Entity<ExerciseCodeReview>()
-				.HasRequired(r => r.Author)
-				.WithMany()
-				.HasForeignKey(r => r.AuthorId)
-				.WillCascadeOnDelete(false);
+			CancelCascaseDeleting<ExerciseCodeReview, ApplicationUser, string>(modelBuilder, c => c.Author, c => c.AuthorId);
 
 			modelBuilder.Entity<Like>()
 				.HasRequired(l => l.Submission)
@@ -46,27 +44,24 @@ namespace uLearn.Web.DataContexts
 				.HasForeignKey(l => l.SubmissionId)
 				.WillCascadeOnDelete(false);
 
-			modelBuilder.Entity<UserExerciseSubmission>()
-				.HasRequired(s => s.User)
-				.WithMany()
-				.HasForeignKey(s => s.UserId)
-				.WillCascadeOnDelete(false);
+			CancelCascaseDeleting<UserExerciseSubmission, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
+			CancelCascaseDeleting<ManualExerciseChecking, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 
-			modelBuilder.Entity<ManualExerciseChecking>()
-				.HasRequired(c => c.User)
-				.WithMany()
-				.HasForeignKey(c => c.UserId)
-				.WillCascadeOnDelete(false);
+			CancelCascaseDeleting<Certificate, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
+			CancelCascaseDeleting<Certificate, ApplicationUser, string>(modelBuilder, c => c.Instructor, c => c.InstructorId);
 
-			modelBuilder.Entity<Certificate>()
-				.HasRequired(c => c.User)
+			CancelCascaseDeleting<AdditionalScore, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
+			CancelCascaseDeleting<AdditionalScore, ApplicationUser, string>(modelBuilder, c => c.Instructor, c => c.InstructorId);
+		}
+
+		private static void CancelCascaseDeleting<T1, T2, T3>(DbModelBuilder modelBuilder, Expression<Func<T1, T2>> oneWay, Expression<Func<T1, T3>> secondWay)
+			where T1 : class
+			where T2 : class
+		{
+			modelBuilder.Entity<T1>()
+				.HasRequired(oneWay)
 				.WithMany()
-				.HasForeignKey(c => c.UserId)
-				.WillCascadeOnDelete(false);
-			modelBuilder.Entity<Certificate>()
-				.HasRequired(c => c.Instructor)
-				.WithMany()
-				.HasForeignKey(c => c.InstructorId)
+				.HasForeignKey(secondWay)
 				.WillCascadeOnDelete(false);
 		}
 		
@@ -76,7 +71,7 @@ namespace uLearn.Web.DataContexts
 		public DbSet<SlideHint> Hints { get; set; }
 		public DbSet<Like> SolutionLikes { get; set; }
 		public DbSet<UserQuiz> UserQuizzes { get; set; }
-		public DbSet<UnitAppearance> Units { get; set; }
+		public DbSet<UnitAppearance> UnitAppearances { get; set; }
 		public DbSet<TextBlob> Texts { get; set; }
 		public DbSet<LtiConsumer> Consumers { get; set; }
 		public DbSet<LtiSlideRequest> LtiRequests { get; set; }
@@ -102,5 +97,8 @@ namespace uLearn.Web.DataContexts
 
 		public DbSet<CertificateTemplate> CertificateTemplates { get; set; }
 		public DbSet<Certificate> Certificates { get; set; }
+
+		public DbSet<AdditionalScore> AdditionalScores { get; set; }
+		public DbSet<EnabledAdditionalScoringGroup> EnabledAdditionalScoringGroups { get; set; }
 	}
 }

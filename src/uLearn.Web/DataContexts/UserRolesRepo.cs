@@ -9,12 +9,6 @@ namespace uLearn.Web.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		public UserRolesRepo()
-			: this(new ULearnDb())
-		{
-
-		}
-
 		public UserRolesRepo(ULearnDb db)
 		{
 			this.db = db;
@@ -43,12 +37,16 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public List<string> GetListOfUsersWithCourseRole(CourseRole? courseRole, string courseId)
+		public List<string> GetListOfUsersWithCourseRole(CourseRole? courseRole, string courseId, bool includeHighRoles=false)
 		{
 			if (!courseRole.HasValue)
 				return null;
 
-			var usersQuery = db.UserRoles.Where(userRole => userRole.Role == courseRole);
+			var usersQuery = (IQueryable <UserRole>) db.UserRoles;
+			usersQuery = includeHighRoles
+				? usersQuery.Where(userRole => userRole.Role >= courseRole)
+				: usersQuery.Where(userRole => userRole.Role == courseRole);
+
 			if (!string.IsNullOrEmpty(courseId))
 				usersQuery = usersQuery.Where(userRole => userRole.CourseId == courseId);
 			return usersQuery.Select(user => user.UserId).Distinct().ToList();

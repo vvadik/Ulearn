@@ -26,20 +26,15 @@ namespace uLearn.Web.Controllers
 		private readonly VisitsRepo visitsRepo;
 
 		public AccountController()
-			: this(new ULearnUserManager())
 		{
 			db = new ULearnDb();
+			userManager = new ULearnUserManager(db);
 			courseManager = WebCourseManager.Instance;
 			usersRepo = new UsersRepo(db);
 			userRolesRepo = new UserRolesRepo(db);
 			groupsRepo = new GroupsRepo(db);
 			certificatesRepo = new CertificatesRepo(db);
 			visitsRepo = new VisitsRepo(db);
-		}
-
-		public AccountController(UserManager<ApplicationUser> userManager)
-		{
-			this.userManager = userManager;
 		}
 
 		[AllowAnonymous]

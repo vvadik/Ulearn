@@ -8,7 +8,7 @@ namespace uLearn.Web.Controllers
 {
 	public class HomeController : Controller
 	{
-		private readonly UserManager<ApplicationUser> userManager = new ULearnUserManager();
+		private readonly UserManager<ApplicationUser> userManager = new ULearnUserManager(new ULearnDb());
 
 		public ActionResult Index()
 		{

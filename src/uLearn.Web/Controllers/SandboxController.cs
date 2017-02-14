@@ -12,7 +12,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 	public class SandboxController : Controller
 	{
-		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo();
+		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo(new ULearnDb());
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
 		private static readonly TimeSpan timeout = TimeSpan.FromSeconds(30);

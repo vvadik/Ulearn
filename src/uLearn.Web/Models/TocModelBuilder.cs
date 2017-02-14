@@ -9,22 +9,25 @@ namespace uLearn.Web.Models
 	{
 		private readonly Func<Slide, string> getSlideUrl;
 		private readonly Func<Slide, int> getSlideScore;
+		private readonly Func<Unit, ScoringGroup, int> getAdditionalScore;
 		private readonly Func<Slide, int> getSlideMaxScore;
 		private readonly Course course;
 		private readonly Guid? currentSlideId;
-		public Func<string, string> GetUnitStatisticsUrl;
-		public Func<string, string> GetUnitInstructionNotesUrl;
+		public Func<Unit, string> GetUnitStatisticsUrl;
+		public Func<Unit, string> GetUnitInstructionNotesUrl;
 		public Func<Slide, bool> IsSolved = s => false;
 		public Func<Slide, bool> IsVisited = s => false;
-		public Func<string, bool> IsUnitVisible = u => true;
+		public Func<Unit, bool> IsUnitVisible = u => true;
 		public Func<Slide, bool> IsSlideHidden = s => true;
+		public List<string> EnabledScoringGroupsIds { get; set; }
 		public bool IsInstructor;
 
-		public TocModelBuilder(Func<Slide, string> getSlideUrl, Func<Slide, int> getSlideScore, Func<Slide, int> getSlideMaxScore, Course course, Guid? currentSlideId)
+		public TocModelBuilder(Func<Slide, string> getSlideUrl, Func<Slide, int> getSlideScore, Func<Slide, int> getSlideMaxScore, Func<Unit, ScoringGroup, int> getAdditionalScore, Course course, Guid? currentSlideId)
 		{
 			this.getSlideUrl = getSlideUrl;
 			this.getSlideScore = getSlideScore;
 			this.getSlideMaxScore = getSlideMaxScore;
+			this.getAdditionalScore = getAdditionalScore;
 			this.course = course;
 			this.currentSlideId = currentSlideId;
 		}
@@ -36,38 +39,41 @@ namespace uLearn.Web.Models
 
 		private TocUnitModel[] CreateUnits()
 		{
-			return course.Slides
-				.Where(s => ! IsSlideHidden(s))
-				.GroupBy(s => s.Info.UnitName)
-				.Where(g => IsUnitVisible(g.Key))
-				.Select(g => CreateUnit(g.Key, g.ToList()))
+			return course.Units
+				.Where(u => u.Slides.Any(s => !IsSlideHidden(s)))
+				.Select(CreateUnit)
 				.ToArray();
 		}
 
-		private TocUnitModel CreateUnit(string unitName, List<Slide> slides)
+		private TocUnitModel CreateUnit(Unit unit)
 		{
-			var pages = slides.Select(CreatePage).ToList();
+			var pages = unit.Slides.Select(CreatePage).ToList();
 			if (IsInstructor)
 			{
-				if (course.FindInstructorNote(unitName) != null)
+				if (unit.InstructorNote != null)
 					pages.Add(new TocPageInfo
 					{
-						Url = GetUnitInstructionNotesUrl(unitName),
+						Url = GetUnitInstructionNotesUrl(unit),
 						Name = "Заметки преподавателю",
 						PageType = TocPageType.InstructorNotes,
 					});
 				pages.Add(new TocPageInfo
 				{
-					Url = GetUnitStatisticsUrl(unitName),
+					Url = GetUnitStatisticsUrl(unit),
 					Name = "Статистика и успеваемость",
 					PageType = TocPageType.Statistics,
 				});
 			}
+
+			var additionalScores = unit.Scoring.Groups.Values
+				.Where(g => g.CanBeSetByInstructor && (g.EnabledForEveryone || EnabledScoringGroupsIds.Contains(g.Id)))
+				.ToDictionary(g => g, g => getAdditionalScore(unit, g));
 			return new TocUnitModel
 			{
-				IsCurrent = slides.Any(s => s.Id == currentSlideId),
-				UnitName = unitName,
-				Pages = pages
+				IsCurrent = unit.Slides.Any(s => s.Id == currentSlideId),
+				UnitName = unit.Title,
+				Pages = pages,
+				AdditionalScores = additionalScores,
 			};
 		}
 

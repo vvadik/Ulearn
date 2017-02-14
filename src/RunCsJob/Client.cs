@@ -45,6 +45,11 @@ namespace RunCsJob
 				var response = await httpClient.GetAsync(uri);
 				if (response.IsSuccessStatusCode)
 					return await response.Content.ReadAsAsync<List<RunnerSubmission>>();
+				else
+				{
+					var text = await response.Content.ReadAsStringAsync();
+					log.Error($"StatusCode {response.StatusCode}\n{text}");
+				}
 			}
 			catch (Exception e)
 			{

@@ -26,7 +26,7 @@ namespace uLearn.CSharp
 
 		private bool MustStartWithUpper(SyntaxNode node)
 		{
-			return 
+			return
 				node is BaseTypeDeclarationSyntax
 				|| node is TypeParameterSyntax
 				|| node is EnumMemberDeclarationSyntax
@@ -37,17 +37,21 @@ namespace uLearn.CSharp
 		private bool MustStartWithUpper(VariableDeclaratorSyntax variableDeclarator)
 		{
 			var field = AsField(variableDeclarator);
-			return field != null && field.Modifiers.Any(m => m.Kind() == SyntaxKind.PublicKeyword); // Публичное поле → с большой
+			// Публичные поля и константы → с большой
+			return field != null && field.Modifiers.Any(m => m.Kind() == SyntaxKind.PublicKeyword || m.Kind() == SyntaxKind.ConstKeyword);
 		}
 
 		private bool MustStartWithLower(VariableDeclaratorSyntax variableDeclarator)
 		{
 			var field = AsField(variableDeclarator);
-			return field == null || field.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword);
+			return field == null
+				|| field.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword)
+				&& field.Modifiers.All(m => m.Kind() != SyntaxKind.ConstKeyword);
 		}
 
 		private static FieldDeclarationSyntax AsField(VariableDeclaratorSyntax variableDeclarator)
 		{
+			// Первый родитель, но не выше блока.
 			var parent = variableDeclarator.GetParents().FirstOrDefault(p => (p is FieldDeclarationSyntax) || (p is BlockSyntax));
 			return parent as FieldDeclarationSyntax;
 		}

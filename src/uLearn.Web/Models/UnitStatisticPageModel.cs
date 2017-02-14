@@ -5,9 +5,9 @@ namespace uLearn.Web.Models
 {
 	public class UnitStatisticPageModel
 	{
-		public string CourseId { get; set; }
-		public string UnitName { get; set; }
-		public List<string> UnitsNames { get; set; }
+		public Course Course { get; set; }
+		public Unit Unit { get; set; }
+		public List<Unit> Units { get; set; }
 		public string GroupId { get; set; }
 		public List<Group> Groups { get; set; }
 
@@ -27,8 +27,13 @@ namespace uLearn.Web.Models
 		public Dictionary<Guid, int> ExercisesAcceptedSolutionsCount { get; set; }
 
 		public List<UnitStatisticUserInfo> VisitedUsers { get; set; }
+		public bool VisitedUsersIsMore { get; set; }
 		public Dictionary<string, int> VisitedSlidesCountByUser { get; set; }
 		public Dictionary<string, int> VisitedSlidesCountByUserAllTime { get; set; }
+
+		public Dictionary<Tuple<string, string>, int> AdditionalScores { get; set; }
+		public Dictionary<string, List<int>> UsersGroupsIds { get; set; }
+		public Dictionary<int, List<string>> EnabledAdditionalScoringGroupsForGroups { get; set; }
 	}
 
 	public class UnitStatisticUserInfo

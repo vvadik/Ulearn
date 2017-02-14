@@ -12,6 +12,11 @@ namespace System.Linq
 			return source.Where(p => hash.Add(keySelector(p)));
 		}
 
+		public static IEnumerable<TSource> ExceptNulls<TSource>(this IEnumerable<TSource> source)
+		{
+			return source.Where(i => i != null);
+		}
+
 		public static T SingleVerbose<T>(this IEnumerable<T> items, Func<T, bool> predicate, string predicateDescription = "")
 		{
 			var good = items.Where(predicate).Take(2).ToList();
@@ -38,7 +43,7 @@ namespace System.Linq
 		{
 			return enumerable.Where(item => !(item is TSearch));
 		}
-		
+
 		///<summary>Finds the index of the first item matching an expression in an enumerable.</summary>
 		///<param name="items">The enumerable to search.</param>
 		///<param name="predicate">The expression to test the items against.</param>
@@ -61,7 +66,7 @@ namespace System.Linq
 			return -1;
 		}
 
-		public static int FindIndex<T>(this IEnumerable<T> items, T element) where T: IEquatable<T>
+		public static int FindIndex<T>(this IEnumerable<T> items, T element) where T : IEquatable<T>
 		{
 			return FindIndex(items, item => item.Equals(element));
 		}

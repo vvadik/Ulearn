@@ -4,15 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace uLearn.Web.Models
 {
-	public interface ISlideAction
-	{
-		int Id { get; }
-		Guid SlideId { get; }
-		string UserId { get; }
-		DateTime Timestamp { get; }
-	}
-
-	public class UserQuiz : ISlideAction
+	public class UserQuiz : ITimedSlideAction
 	{
 		[Required]
 		[Key]
