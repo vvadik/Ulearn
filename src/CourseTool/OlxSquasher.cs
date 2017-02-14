@@ -80,7 +80,7 @@ namespace uLearn.CourseTool
 			foreach (var element in courseXml.Root.EnsureNotNull().XPathSelectElements("//" + elementType))
 			{
 				var urlName = element.Attribute("url_name")?.Value;
-				Console.WriteLine("squashing " + urlName);
+				Console.WriteLine("squashing " + elementType + " " + urlName);
 				if (element.HasElements || urlName == null) continue;
 				var root = LoadItem(elementType, urlName, olxDir).Root.EnsureNotNull();
 				//element.Add(root.Attributes());

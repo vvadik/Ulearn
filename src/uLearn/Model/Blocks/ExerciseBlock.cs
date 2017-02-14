@@ -123,15 +123,15 @@ namespace uLearn.Model.Blocks
 					+ (CommentAfterExerciseIsSolved ?? "");
 		}
 
-		protected void CheckScoringGroup(BuildUpContext context)
+		public void CheckScoringGroup(string slideDescriptionForErrorMessage, ScoringSettings scoring)
 		{
-			var scoringGroupsIds = context.CourseSettings.Scoring.Groups.Keys;
+			var scoringGroupsIds = scoring.Groups.Keys;
 			if (!string.IsNullOrEmpty(ScoringGroup) && ! scoringGroupsIds.Contains(ScoringGroup))
-				throw new CourseLoadingException($"Неизвестная группа оценки у задания {context.Lesson.Title}: {ScoringGroup}\n" +
+				throw new CourseLoadingException($"Неизвестная группа оценки у задания {slideDescriptionForErrorMessage}: {ScoringGroup}\n" +
 												 "Возможные значения: " + string.Join(", ", scoringGroupsIds));
 
 			if (string.IsNullOrEmpty(ScoringGroup))
-				ScoringGroup = context.CourseSettings.Scoring.DefaultScoringGroupForExercise;
+				ScoringGroup = scoring.DefaultScoringGroupForExercise;
 		}
 	}
 }

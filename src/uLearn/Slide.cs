@@ -105,7 +105,6 @@ namespace uLearn
 				componentIndex++;
 			}
 
-			
 			var exerciseWithSolutionsToShow = slide.Blocks.OfType<ExerciseBlock>().FirstOrDefault(e => !e.HideShowSolutionsButton);
 			if (exerciseWithSolutionsToShow != null)
 			{
@@ -116,15 +115,18 @@ namespace uLearn
 				components.Add(comp);
 				//yield return new Vertical(slide.NormalizedGuid + "0", "Решения", new[] { comp });
 			}
-			yield return new Vertical(slide.NormalizedGuid, slide.Title, components.ToArray());
-
+			var exBlock = slide.Blocks.OfType<ExerciseBlock>().FirstOrDefault();
+			if (exBlock == null)
+				yield return new Vertical(slide.NormalizedGuid, slide.Title, components.ToArray());
+			else
+				yield return new Vertical(slide.NormalizedGuid, slide.Title, components.ToArray(), EdxScoringGroupsHack.ToEdxName(exBlock.ScoringGroup), exBlock.MaxScore);
 		}
 
 		private static IEnumerable<Vertical> QuizToVerticals(string courseId, QuizSlide slide, string slideUrl, string ltiId)
 		{
 			var ltiComponent =
 				new LtiComponent(slide.Title, slide.NormalizedGuid + "-quiz", string.Format(slideUrl, courseId, slide.Id), ltiId, true, slide.MaxScore, false);
-			yield return new Vertical(slide.NormalizedGuid, slide.Title, new Component[] { ltiComponent });
+			yield return new Vertical(slide.NormalizedGuid, slide.Title, new Component[] { ltiComponent }, EdxScoringGroupsHack.ToEdxName(slide.Quiz.ScoringGroup), slide.Quiz.MaxScore);
 		}
 
 		public IEnumerable<Vertical> ToVerticals(string courseId, string slideUrl, string solutionsUrl, Dictionary<string, string> videoGuids, string ltiId)
@@ -133,6 +135,14 @@ namespace uLearn
 			if (quizSlide != null)
 				return QuizToVerticals(courseId, quizSlide, slideUrl, ltiId);
 			return OrdinarySlideToVerticals(courseId, this, slideUrl, solutionsUrl, videoGuids, ltiId);
+		}
+	}
+
+	class EdxScoringGroupsHack
+	{
+		public static string ToEdxName(string scoringGroup)
+		{
+			return scoringGroup == "homework" ? "Практика" : "Упражнения";
 		}
 	}
 }

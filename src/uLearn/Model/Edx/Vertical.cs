@@ -1,8 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-using uLearn.Model.Edx.EdxComponents;
+using Component = uLearn.Model.Edx.EdxComponents.Component;
 
 namespace uLearn.Model.Edx
 {
@@ -31,11 +32,25 @@ namespace uLearn.Model.Edx
 		{
 		}
 
-		public Vertical(string urlName, string displayName, Component[] components)
+		[XmlAttribute("format")]
+		[DefaultValue(null)]
+		public string ScoringGroup;
+
+		[XmlAttribute("graded")]
+		[DefaultValue(false)]
+		public bool Graded => !string.IsNullOrEmpty(ScoringGroup);
+
+		[XmlAttribute("weight")]
+		[DefaultValue(0.0)]
+		public double Weight;
+
+		public Vertical(string urlName, string displayName, Component[] components, string scoringGroup = null, double weight = 0)
 		{
 			UrlName = urlName;
 			DisplayName = displayName;
 			Components = components;
+			ScoringGroup = scoringGroup;
+			Weight = weight;
 			ComponentReferences = components.Select(x => x.GetReference()).ToArray();
 		}
 
@@ -55,6 +70,7 @@ namespace uLearn.Model.Edx
 			return Load<Vertical>(folderName, "vertical", urlName, options, v =>
 			{
 				v.Components = v.ComponentReferences.Select(x => x.LoadComponent(folderName, x.UrlName, options)).ExceptNulls().ToArray();
+				v.ComponentReferences = v.Components.Select(c => c.GetReference()).ToArray();
 			});
 		}
 	}
