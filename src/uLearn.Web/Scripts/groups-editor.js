@@ -137,6 +137,7 @@
 
 		var $form = $('#copyGroupModal form');
 		$form.find('select').val('-1');
+		$form.find('.copy-group__change-owner-block').hide();
 		toggleCopyGroupButton(false);
 
 		$('#copyGroupModal').modal();
