@@ -12,7 +12,7 @@
 	<div class="container body-content">
 		<div class="row">
 			<div class='slide'>
-				<h1>Заметки преподавателю <small>@Model.Note.UnitName</small></h1>
+				<h1>Заметки преподавателю <small>@Model.Note.Unit.Title</small></h1>
 				<hr/>
 				@Html.Raw(Model.Note.Markdown.RenderMd(Model.Note.File))
 			</div>
