@@ -11,7 +11,12 @@ namespace uLearn
 		{
 			var courseId = dir.Name;
 
-			dir = dir.HasSubdirectory("Slides") ? dir.Subdirectory("Slides") : dir;
+			var courseXmls = dir.GetFiles("course.xml", SearchOption.AllDirectories).ToList();
+			if (courseXmls.Count == 1)
+				dir = courseXmls[0].Directory;
+			else
+				dir = dir.HasSubdirectory("Slides") ? dir.Subdirectory("Slides") : dir;
+			
 			var settings = CourseSettings.Load(dir);
 			if (string.IsNullOrEmpty(settings.Title))
 				settings.Title = GetCourseTitleFromFile(dir);

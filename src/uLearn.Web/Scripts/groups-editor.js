@@ -4,6 +4,10 @@
 	var $form = $('#createOrUpdateGroupModal form');
 	var token = $('input[name="__RequestVerificationToken"]').val();
 
+	$('#createOrUpdateGroupModal').on('shown.bs.modal', function() {
+		$(this).find('[name="name"]').focus();
+	});
+
 	$('.add-user-to-group-input').each(function() {
 		var $self = $(this);
 		var groupId = $self.data('groupId');
@@ -72,7 +76,7 @@
 		$form.find('.scoring-group-checkbox input').prop('checked', false);
 		$form.find('button.action-button').text('Создать');
 		$form.find('.remove-group-link').hide();
-		$('#createOrUpdateGroupModal').modal(); 
+		$('#createOrUpdateGroupModal').modal();
 	});
 
 	$('.edit-group-link').click(function(e) {
@@ -120,21 +124,53 @@
 		});
 	});
 
+	var toggleCopyGroupButton = function (canSubmit) {
+		var $form = $('#copyGroupModal form');
+		if (canSubmit)
+			$form.find('.copy-group-button').removeAttr('disabled');
+		else
+			$form.find('.copy-group-button').attr('disabled', true);
+	}
+
 	$('.copy-group-link').click(function(e) {
 		e.preventDefault();
 
 		var $form = $('#copyGroupModal form');
-		$form.find('button').attr('disabled', true);
+		$form.find('select').val('-1');
+		toggleCopyGroupButton(false);
 
 		$('#copyGroupModal').modal();
 	});
 
 	$('#copyGroupModal form select').change(function() {
 		var $form = $('#copyGroupModal form');
-		var canSubmit = $(this).val() !== "-1";
-		if (canSubmit)
-			$form.find('button').removeAttr('disabled');
-		else
-			$form.find('button').attr('disabled', true);
+		var $self = $(this);
+		var $option = $self.find('option:selected');
+
+		var $changeOwnerBlock = $form.find('.copy-group__change-owner-block');
+		var needToChangeOwner = $option.data('needToChangeOwner');
+		$changeOwnerBlock.find('input[name="changeOwner"]').prop('checked', false);
+		$changeOwnerBlock.find('.owner-name').text($option.data('owner'));
+		$changeOwnerBlock.toggle(needToChangeOwner);
+
+		var canSubmit = $self.val() !== '-1' && !needToChangeOwner;
+		toggleCopyGroupButton(canSubmit);
+	});
+
+	$('#copyGroupModal form [name="changeOwner"]').change(function() {
+		toggleCopyGroupButton($(this).prop('checked'));
+	});
+
+
+	$('.show-archived-groups-selector > .btn').click(function(e) {
+		var $self = $(this);
+		if ($self.hasClass('active')) {
+			e.preventDefault();
+			return false;
+		}
+
+		$self.parent().find('.btn').removeClass('active');
+		$self.addClass('active');
+		$('.groups .group').toggle();
 	});
 })

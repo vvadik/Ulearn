@@ -46,9 +46,9 @@ namespace uLearn.Web.Controllers
 		[System.Web.Mvc.HttpPost]
 		public async Task<ActionResult> RunSolution(string courseId, Guid slideId, bool isLti = false)
 		{
-			/* Check that no checking solution by this user in last 2 minutes */
-			var twoMinutesAgo = DateTime.Now.Subtract(TimeSpan.FromMinutes(2));
-			if (solutionsRepo.IsCheckingSubmissionByUser(courseId, slideId, User.Identity.GetUserId(), twoMinutesAgo, DateTime.MaxValue))
+			/* Check that no checking solution by this user in last time */
+			var halfMinuteAgo = DateTime.Now.Subtract(TimeSpan.FromSeconds(30));
+			if (solutionsRepo.IsCheckingSubmissionByUser(courseId, slideId, User.Identity.GetUserId(), halfMinuteAgo, DateTime.MaxValue))
 			{
 				return Json(new RunSolutionResult
 				{
@@ -357,7 +357,7 @@ namespace uLearn.Web.Controllers
 			var lastSubmission = submissions.LastOrDefault(s => s.ManualCheckings != null && s.ManualCheckings.Any()) ??
 					submissions.LastOrDefault(s => s.AutomaticCheckingIsRightAnswer);
 			if (lastSubmission == null && allowNotAccepted)
-				lastSubmission = solutionsRepo.GetAllSubmissionsByUser(courseId, slideId, userId).LastOrDefault();
+				lastSubmission = solutionsRepo.GetAllSubmissionsByUser(courseId, slideId, userId).ToList().LastOrDefault();
 			return lastSubmission;
 		}
 
@@ -408,7 +408,7 @@ namespace uLearn.Web.Controllers
 				if (string.Equals(manualChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
 				{
 					model.ManualChecking = manualChecking;
-					model.Reviews = manualChecking.NotDeletedReviews;
+					model.Reviews = submission?.ManualCheckings.SelectMany(c => c.NotDeletedReviews).ToList() ?? new List<ExerciseCodeReview>();
 				}
 			}
 

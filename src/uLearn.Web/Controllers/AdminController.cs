@@ -589,6 +589,7 @@ namespace uLearn.Web.Controllers
 				CourseId = courseId,
 				CourseManualCheckingEnabled = course.Settings.IsManualCheckingEnabled,
 				Groups = groups,
+				CanModifyGroup = groups.ToDictionary(g => g.Id, g => CanModifyGroup(g)),
 				ScoringGroupsCanBeSetInSomeUnit = scoringGroupsCanBeSetInSomeUnit,
 				EnabledScoringGroups = enabledScoringGroups,
 				Instructors = instructors,
@@ -602,7 +603,10 @@ namespace uLearn.Web.Controllers
 			if (string.IsNullOrEmpty(ownerId))
 				ownerId = User.Identity.GetUserId();
 
+			log.Info($"Создаю группу «{name}» для курса {courseId} (id владельца {ownerId}, публичная = {isPublic})");
+
 			var group = await groupsRepo.CreateGroup(courseId, name, ownerId, isPublic, manualChecking);
+			log.Info($"Группа «{name}» (Id = {group.Id}) создана");
 
 			var course = courseManager.GetCourse(courseId);
 			await UpdateEnabledScoringGroupsForGroup(course, group.Id);
@@ -611,33 +615,46 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> CopyGroup(string courseId, int groupId)
+		public async Task<ActionResult> CopyGroup(string courseId, int groupId, bool changeOwner)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanSeeAndModifyGroup(group))
+			if (!CanSeeGroup(group))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
-			await groupsRepo.CopyGroup(group, courseId);
+			log.Info($"Копирую группу «{group.Name}» (Id = {group.Id}) в курс {courseId} (заменить владельца: {changeOwner})");
+
+			var newOwnerId = changeOwner ? User.Identity.GetUserId() : "";
+			var newGroup = await groupsRepo.CopyGroup(group, courseId, newOwnerId);
+			log.Info($"Скопировал группу, новый Id = {newGroup.Id}");
 
 			return RedirectToAction("Groups", new { courseId });
 		}
 
-		private bool CanSeeAndModifyGroup(Group group)
+		private bool CanSeeGroup(Group group)
+		{
+			if (group == null)
+				return false;
+			return CanModifyGroup(group) || group.IsPublic;
+		}
+
+		private bool CanModifyGroup(Group group)
 		{
 			if (group == null)
 				return false;
 			var courseId = group.CourseId;
 			if (groupsRepo.CanUserSeeAllCourseGroups(User, courseId))
 				return true;
-			return group.OwnerId == User.Identity.GetUserId() || group.IsPublic;
+			return group.OwnerId == User.Identity.GetUserId();
 		}
 
 		[HttpPost]
 		public async Task<ActionResult> AddUserToGroup(int groupId, string userId)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanSeeAndModifyGroup(group))
+			if (!CanModifyGroup(group))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
+			log.Info($"Добавляю пользователя Id = {userId} в группу «{group.Name}» (Id = {group.Id})");
 			var added = await groupsRepo.AddUserToGroup(groupId, userId);
 
 			return Json(new {added});
@@ -647,19 +664,22 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> RemoveUserFromGroup(int groupId, string userId)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanSeeAndModifyGroup(group))
+			if (!CanModifyGroup(group))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			log.Info($"Удаляю пользователя Id = {userId} из группы «{group.Name}» (Id = {group.Id})");
 			await groupsRepo.RemoveUserFromGroup(groupId, userId);
 
 			return Json(new { removed="true" });
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> UpdateGroup(int groupId, string name, bool isPublic, bool manualChecking, bool isArchived, string ownerId)
+		public async Task<ActionResult> UpdateGroup(string courseId, int groupId, string name, bool isPublic, bool manualChecking, bool isArchived, string ownerId)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanSeeAndModifyGroup(group))
+			if (!CanModifyGroup(group) || group.CourseId != courseId)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
+			log.Info($"Обновляю группу «{group.Name}» (Id = {group.Id}) для курса {courseId} (новое название «{name}», Id владельца {ownerId}, публичная = {isPublic})");
 
 			await groupsRepo.ModifyGroup(groupId, name, isPublic, manualChecking, isArchived, ownerId);
 
@@ -677,7 +697,10 @@ namespace uLearn.Web.Controllers
 			{
 				var checkboxName = "scoring-group__" + scoringGroup.Id;
 				if (!string.IsNullOrEmpty(Request.Form[checkboxName]) && Request.Form[checkboxName] != "false")
+				{
+					log.Info($"Включаю группу баллов «{scoringGroup.Name}» ({scoringGroup.Id}) для группы Id = {groupId}");
 					enabledScoringGroupsIds.Add(scoringGroup.Id);
+				}
 			}
 			await groupsRepo.EnableAdditionalScoringGroupsForGroup(groupId, enabledScoringGroupsIds);
 		}
@@ -686,8 +709,10 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> RemoveGroup(int groupId)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanSeeAndModifyGroup(group))
+			if (!CanModifyGroup(group))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
+			log.Info($"Удаляю группу «{group.Name}» (Id = {groupId})");
 			await groupsRepo.RemoveGroup(groupId);
 
 			return RedirectToAction("Groups", new { courseId = group.CourseId });
@@ -697,8 +722,10 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> EnableGroupInviteLink(int groupId, bool isEnabled)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanSeeAndModifyGroup(group))
+			if (!CanModifyGroup(group))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
+			log.Info($"В{(isEnabled ? "" : "ы")}ключаю инвайт-ссылку для группы «{group.Name}» (Id = {groupId})");
 			await groupsRepo.EnableGroupInviteLink(groupId, isEnabled);
 
 			return RedirectToAction("Groups", new { courseId = group.CourseId });
@@ -761,8 +788,10 @@ namespace uLearn.Web.Controllers
 				throw new Exception("Ошибка загрузки архива");
 			}
 			
+			log.Info($"Создаю шаблон сертификата «{name}» для курса {courseId}");
 			var archiveName = SaveUploadedTemplate(archive);
-			await certificatesRepo.AddTemplate(courseId, name, archiveName);
+			var template = await certificatesRepo.AddTemplate(courseId, name, archiveName);
+			log.Info($"Создал шаблон, Id = {template.Id}, путь к архиву {template.ArchiveName}");
 
 			return RedirectToAction("Certificates", new { courseId });
 		}
@@ -791,9 +820,12 @@ namespace uLearn.Web.Controllers
 			if (template == null || template.CourseId != courseId)
 				return HttpNotFound();
 
+			log.Info($"Обновляю шаблон сертификата «{template.Name}» (Id = {template.Id}) для курса {courseId}");
+
 			if (archive != null && archive.ContentLength > 0)
 			{
 				var archiveName = SaveUploadedTemplate(archive);
+				log.Info($"Загружен новый архив в {archiveName}");
 				await certificatesRepo.ChangeTemplateArchiveName(templateId, archiveName);
 			}
 
@@ -810,6 +842,7 @@ namespace uLearn.Web.Controllers
 			if (template == null || template.CourseId != courseId)
 				return HttpNotFound();
 
+			log.Info($"Удаляю шаблон сертификата «{template.Name}» (Id = {template.Id}) для курса {courseId}");
 			await certificatesRepo.RemoveTemplate(template);
 
 			return RedirectToAction("Certificates", new { courseId });
@@ -1185,11 +1218,13 @@ namespace uLearn.Web.Controllers
 		public bool CourseManualCheckingEnabled { get; set; }
 
 		public List<Group> Groups { get; set; }
+		public Dictionary<int, bool> CanModifyGroup { get; set; }
 		public List<ScoringGroup> ScoringGroupsCanBeSetInSomeUnit { get; set; }
 		public Dictionary<int, List<string>> EnabledScoringGroups { get; set; }
 
 		public List<UserRolesInfo> Instructors { get; set; }
 		public List<Group> GroupsMayBeCopied { get; set; }
 		public Dictionary<string, string> CoursesNames { get; set; }
+		
 	}
 }

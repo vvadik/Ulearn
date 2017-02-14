@@ -1227,6 +1227,22 @@ h1 .copy-group-link {
 	margin-top: 10px;
 }
 
+.copy-group__change-owner-block {
+	display: none;
+}
+
+.copy-group__change-owner-block .owner-name {
+	font-weight: bold;
+}
+
+.groups .group.archived-group {
+	display: none;
+}
+
+.groups .show-archived-groups-selector {
+	margin-top: 10px;
+}
+
 /* Analytics dashboard */
 .form-control-date {
 	width: 100px;

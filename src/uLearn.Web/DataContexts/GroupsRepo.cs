@@ -39,19 +39,20 @@ namespace uLearn.Web.DataContexts
 			return group;
 		}
 
-		public async Task<Group> CopyGroup(Group group, string courseId)
+		/* Copy group from one course to another. Replaces owner only if newOwnerId is not empty */
+		public async Task<Group> CopyGroup(Group group, string courseId, string newOwnerId="")
 		{
-			var newGroup = await CopyGroupWithoutMembers(group, courseId);
+			var newGroup = await CopyGroupWithoutMembers(group, courseId, newOwnerId);
 			await CopyGroupMembers(group, newGroup);
 			return newGroup;
 		}
 
-		private async Task<Group> CopyGroupWithoutMembers(Group group, string courseId)
+		private async Task<Group> CopyGroupWithoutMembers(Group group, string courseId, string newOwnerId)
 		{
 			var newGroup = new Group
 			{
 				CourseId = courseId,
-				OwnerId = group.OwnerId,
+				OwnerId = string.IsNullOrEmpty(newOwnerId) ? group.OwnerId : newOwnerId,
 				Name = group.Name,
 				CanUsersSeeGroupProgress = group.CanUsersSeeGroupProgress,
 				IsManualCheckingEnabled = group.IsManualCheckingEnabled,

@@ -1,6 +1,13 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Mvc.Html;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace uLearn.Web.Extensions
 {
@@ -72,5 +79,46 @@ namespace uLearn.Web.Extensions
 		{
 			return urlRegex.Replace(htmlEncodedText, match => helper.HighlightLink(match.Groups[0].Value));
 		}
+
+		/// <summary>
+		/// Creates `DropDownList` with item's data-attributes. Options are the same as for `SelectExtensions.DropdownList()`,
+		/// but `selectList` is a list of `SelectListItemWithAttributes`.
+		/// </summary>
+		public static MvcHtmlString DropDownListWithItemAttributes(this HtmlHelper htmlHelper, string name, IEnumerable<SelectListItemWithAttributes> selectList, IDictionary<string, object> htmlAttributes)
+		{
+			selectList = selectList.ToList();
+			var selectItems = selectList.ToDictionary(item => item.Value, item => item);
+			var selectDoc = XDocument.Parse(htmlHelper.DropDownList(name, selectList, htmlAttributes).ToString());
+
+			var selectElement = selectDoc.Element("select");
+			if (selectElement != null)
+			{
+				var options = selectElement.XPathSelectElements("*/option").ToList();
+
+				foreach (var option in options)
+				{
+					var optionValue = option.Attribute("value");
+					if (optionValue != null && selectItems.ContainsKey(optionValue.Value))
+					{
+						var listItem = selectItems[optionValue.Value];
+						foreach (var attribute in HtmlHelper.AnonymousObjectToHtmlAttributes(listItem.HtmlAttributes))
+							option.SetAttributeValue(attribute.Key, attribute.Value);
+					}
+				}
+			}
+
+			return MvcHtmlString.Create(selectDoc.ToString());
+		}
+
+		public static MvcHtmlString DropDownListWithItemAttributes(this HtmlHelper htmlHelper, string name, IEnumerable<SelectListItemWithAttributes> selectList, object htmlAttributes)
+		{
+			return DropDownListWithItemAttributes(htmlHelper, name, selectList, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
+		}
 	}
+
+	public class SelectListItemWithAttributes : SelectListItem
+	{
+		public object HtmlAttributes { get; set; }
+	}
+
 }

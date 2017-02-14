@@ -1315,6 +1315,7 @@
     <Content Include="Scripts\slide-versions.js" />
     <Content Include="Scripts\table-configurator.js" />
     <Content Include="Scripts\tooltips.js" />
+    <Content Include="Scripts\ulearn-updates-invitation.js" />
     <Content Include="Scripts\user-group-name-change.js" />
     <Content Include="Scripts\users-list.js" />
     <Content Include="Scripts\_references.js" />
@@ -1540,6 +1541,7 @@
     <Content Include="Views\Account\UserMenuPartial.cshtml" />
     <Content Include="Views\Admin\PreviewCertificates.cshtml" />
     <Content Include="Views\Admin\GenerateCertificatesError.cshtml" />
+    <Content Include="Views\Shared\_UlearnUpdatesInvitation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

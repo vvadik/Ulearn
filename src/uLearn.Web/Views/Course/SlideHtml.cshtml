@@ -411,7 +411,8 @@
 	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
 	{
 		var userAnswers = model.QuizModel.AnswersToQuizes[block.Id];
-		fixedItems = block.GetMatches().OrderBy(item => userAnswers.FindIndex(answer => item.GetHashForFixedItem() == answer.ItemId)).ToList();
+		fixedItems = GetFixedItemsAccordingToUserAnswers(userAnswers, fixedItems)
+						.OrderBy(item => userAnswers.FindIndex(answer => item.GetHashForFixedItem() == answer.ItemId)).ToList();
 		movableItems = GetMovableItemsAccordingToUserAnswers(userAnswers, fixedItems);
 	}
 	<div class="quiz-block-matching @(context.CanUserFillQuiz ? "" : "not-movable")" id='@(block.Id + "_quizBlock")'>
@@ -572,15 +573,26 @@
 		return isGuest ? "disabled" : null;
 	}
 
+	private static List<MatchingMatch> GetFixedItemsAccordingToUserAnswers(List<UserQuiz> userAnswers, List<MatchingMatch> fixedItems)
+	{
+		var filteredFixedItems = new List<MatchingMatch>();
+		foreach (var fixedItem in fixedItems)
+		{
+			var userAnswered = userAnswers.Any(answer => answer.ItemId == fixedItem.GetHashForFixedItem());
+			if (userAnswered)
+				filteredFixedItems.Add(fixedItem);
+		}
+		return filteredFixedItems;
+	}
+
 	private static List<MatchingMatch> GetMovableItemsAccordingToUserAnswers(List<UserQuiz> userAnswers, List<MatchingMatch> fixedItems)
 	{
 		var movableItems = new List<MatchingMatch>();
 		foreach (var fixedItem in fixedItems)
 		{
 			var userAnswer = userAnswers.FirstOrDefault(answer => answer.ItemId == fixedItem.GetHashForFixedItem());
-			if (userAnswer == null)
-				continue;
-			movableItems.Add(fixedItems.FirstOrDefault(item => item.GetHashForMovableItem() == userAnswer.Text));
+			if (userAnswer != null)
+				movableItems.Add(fixedItems.FirstOrDefault(item => item.GetHashForMovableItem() == userAnswer.Text));
 		}
 		return movableItems;
 	}
