@@ -25,6 +25,7 @@ namespace RunCsJob
 		public int OutputLimit = 10 * 1024 * 1024;
 		public MsBuildSettings MsBuildSettings = new MsBuildSettings();
 		public DirectoryInfo WorkingDirectory;
+		public bool DeleteSubmissionsAfterFinish;
 	}
 
 	public class SandboxRunner
@@ -95,8 +96,11 @@ namespace RunCsJob
 			}
 			finally
 			{
-				log.Info($"Удаляю папку с решением: {submissionCompilationDirectory}");
-				SafeRemoveDirectory(submissionCompilationDirectory.FullName);
+				if (settings.DeleteSubmissionsAfterFinish)
+				{
+					log.Info($"Удаляю папку с решением: {submissionCompilationDirectory}");
+					SafeRemoveDirectory(submissionCompilationDirectory.FullName);
+				}
 			}
 		}
 
