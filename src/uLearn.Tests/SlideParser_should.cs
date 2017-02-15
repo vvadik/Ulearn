@@ -308,12 +308,20 @@ namespace uLearn.CSharp
 
 		private static Slide GenerateSlide(string name)
 		{
-			return SlideParser.ParseSlide(@".\tests\" + name, null, new DirectoryInfo(@".\tests\stub"), CourseSettings.DefaultSettings);
+			var dir = new DirectoryInfo(@".\tests\stub");
+			return SlideParser.ParseSlide(
+				@".\tests\" + name, 
+				new SlideInfo(new Unit(new UnitSettings(), dir), dir.GetFile(name), 0), 
+				dir, CourseSettings.DefaultSettings);
 		}
 
 		private static Slide GenerateSlideFromFile(string path)
 		{
-			return SlideParser.ParseSlide(path, null, new DirectoryInfo(path), CourseSettings.DefaultSettings);
+			var file = new FileInfo(path);
+			return SlideParser.ParseSlide(
+				path, 
+				new SlideInfo(new Unit(new UnitSettings(), file.Directory), file, 0), 
+				file.Directory, CourseSettings.DefaultSettings);
 		}
 	}
 }
