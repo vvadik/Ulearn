@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using log4net;
+using LtiLibrary.Core.Lti1;
 using LtiLibrary.Owin.Security.Lti.Provider;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
@@ -76,6 +77,16 @@ namespace uLearn.Web.LTI
 				identity = (ClaimsIdentity)context.OwinContext.Authentication.User.Identity;
 			}
 
+			/* We need to ignore LTI requests without LisOutcomeServiceUrl.
+			   Otherwise we receive two or more requests if two or more LTI-blocks are on the same page
+			   and in this case we will remember only last LTI request.*/
+			if (string.IsNullOrEmpty(((LtiRequest)context.LtiRequest).LisOutcomeServiceUrl))
+			{
+				log.Info("Пропускаю LTI-запрос, так как он не содержит поля LisOutcomeServiceUrl");
+				context.RedirectUrl = context.LtiRequest.Url.ToString();
+				return;
+			}
+
 			var json = JsonConvert.SerializeObject(context.LtiRequest, Formatting.None,
 				new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 
@@ -84,7 +95,7 @@ namespace uLearn.Web.LTI
 			var claimsToRemove = identity.Claims.Where(c => c.Type.Equals("LtiRequest"));
 			foreach (var claim in claimsToRemove)
 			{
-				log.Info($"Требование в LTI-запросе: {claim}");
+				log.Info($"Удаляю старое требование: {claim}");
 				identity.RemoveClaim(claim);
 			}
 
@@ -93,6 +104,7 @@ namespace uLearn.Web.LTI
 			{
 				foreach (var claim in claims)
 				{
+					log.Info($"Добавляю новое требование из LTI-запроса: {claim}");
 					identity.AddClaim(claim);
 				}
 			}

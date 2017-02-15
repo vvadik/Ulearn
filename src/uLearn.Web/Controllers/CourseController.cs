@@ -44,7 +44,7 @@ namespace uLearn.Web.Controllers
 			solutionsRepo = new UserSolutionsRepo(db);
 			ltiRequestsRepo = new LtiRequestsRepo(db);
 			groupsRepo = new GroupsRepo(db);
-            userQuizzesRepo = new UserQuizzesRepo(db);
+			userQuizzesRepo = new UserQuizzesRepo(db);
 			this.courseManager = courseManager;
 		}
 
