@@ -1,11 +1,15 @@
 ﻿using System;
+using log4net;
 using LtiLibrary.Core.Outcomes.v1;
+using Newtonsoft.Json;
 using uLearn.Web.DataContexts;
 
 namespace uLearn.Web.LTI
 {
 	public static class LtiUtils
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(LtiUtils));
+
 		public static void SubmitScore(Slide slide, string userId)
 		{
 			var db = new ULearnDb();
@@ -21,7 +25,18 @@ namespace uLearn.Web.LTI
 
 			var score = visitsRepo.GetScore(slide.Id, userId);
 
-			var uri = new UriBuilder(ltiRequest.LisOutcomeServiceUrl);
+			log.Info($"Надо отправить результаты слайда {slide.Id} пользователя {userId} по LTI. Нашёл LtiRequest: {ltiRequest.JsonSerialize()}");
+			log.Info($"Отправляю результаты на {ltiRequest.LisOutcomeServiceUrl}");
+			UriBuilder uri;
+			try
+			{
+				uri = new UriBuilder(ltiRequest.LisOutcomeServiceUrl);
+			}
+			catch (Exception e)
+			{
+				log.Error($"Неверный адрес отправки результатов по LTI: {ltiRequest.LisOutcomeServiceUrl}", e);
+				throw;
+			}
 			if (uri.Host == "localhost")
 			{
 				uri.Host = "192.168.33.10";

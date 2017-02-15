@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace uLearn
 {
@@ -42,6 +44,18 @@ namespace uLearn
 				ms.Seek(0, SeekOrigin.Begin);
 				var sr = new StreamReader(ms);
 				return sr.ReadToEnd();
+			}
+		}
+
+		public static string JsonSerialize(this object o)
+		{
+			using (var stringWriter = new StringWriter())
+			using (var jsonWriter = new JsonTextWriter(stringWriter))
+			{
+				var serializer = new JsonSerializer();
+				serializer.Serialize(jsonWriter, o);
+				stringWriter.Flush();
+				return stringWriter.ToString();
 			}
 		}
 	}

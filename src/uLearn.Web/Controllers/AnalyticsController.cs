@@ -110,7 +110,7 @@ namespace uLearn.Web.Controllers
 
 			/* Get `usersLimit` best by slides count and order them by name */
 			visitedUsers = visitedUsers
-				.OrderByDescending(u => visitedSlidesCountByUserAllTime[u.UserId])
+				.OrderByDescending(u => visitedSlidesCountByUserAllTime.GetOrDefault(u.UserId, 0))
 				.Take(usersLimit)
 				.OrderBy(u => u.UserVisibleName)
 				.ToList();

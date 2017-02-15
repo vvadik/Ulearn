@@ -86,7 +86,8 @@ namespace uLearn.Web.DataContexts
 			{
 				var checkings = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).Where(c => !c.IsChecked && !c.IsLocked);
 				foreach (var checking in checkings)
-					db.ManualExerciseCheckings.Remove(checking);
+					// Use EntityState.Deleted because EF could don't know abount these checkings (they have been retrieved via AsNoTracking())
+					db.Entry(checking).State = EntityState.Deleted;
 				await db.SaveChangesAsync();
 				transaction.Commit();
 			}
