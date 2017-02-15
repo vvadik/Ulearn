@@ -51,7 +51,7 @@ namespace uLearn.Model.Blocks
 			EthalonSolution = extractor.GetRegion(SolutionLabel);
 			ValidatorName = string.Join(" ", LangId, ValidatorName);
 
-			CheckScoringGroup(context);
+			CheckScoringGroup(context.Lesson.Title, context.CourseSettings.Scoring);
 
 			yield return this;
 		}

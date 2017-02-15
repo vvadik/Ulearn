@@ -6,8 +6,11 @@ namespace uLearn.CourseTool
 {
 	abstract class PatchOptions : AbstractOptions
 	{
-		[Option('s', "skip-existing", Default=false, HelpText = "If set, patch skips uLearn slides if edx slide with the same id exists already")]
+		[Option('s', "skip-existing", Default = false, HelpText = "If set, patch skips uLearn slides if edx slide with the same id exists already")]
 		public bool SkipExistingGuids { get; set; }
+
+		[Option("skip-targz", Default = false, HelpText = "Load olx from 'olx' directory, skip extracting tar.gz file. Usefull after manual modifications of olx directory")]
+		public bool SkipExtractingTarGz { get; set; }
 
 		[Option('g', "guid", HelpText = "Specific guids to be patched separated by comma")]
 		public string Guids { get; set; }
@@ -20,8 +23,11 @@ namespace uLearn.CourseTool
 			Console.WriteLine("Profile {0}", Profile);
 			var profile = Config.GetProfile(Profile);
 
-			var tarGzPath = Dir.GetSingleFile(CourseTarGz ?? "*.tar.gz");
-			EdxInteraction.ExtractEdxCourseArchive(Dir, tarGzPath);
+			if (!SkipExtractingTarGz)
+			{
+				var tarGzPath = Dir.GetSingleFile(CourseTarGz ?? "*.tar.gz");
+				EdxInteraction.ExtractEdxCourseArchive(Dir, tarGzPath);
+			}
 
 			Console.WriteLine("Loading OLX");
 			var edxCourse = EdxCourse.Load(Dir + "/olx");

@@ -53,7 +53,7 @@ namespace uLearn.Model.Blocks
 			if (context.ZippedProjectExercises.Add(exercisePath))
 				CreateZipForStudent();
 
-			CheckScoringGroup(context);
+			CheckScoringGroup(context.Lesson.Title, context.CourseSettings.Scoring);
 
 			yield return this;
 		}

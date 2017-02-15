@@ -55,7 +55,8 @@ namespace uLearn.Model.Edx
 		{
 			return Load<Sequential>(folderName, "sequential", urlName, options, seq =>
 			{
-				seq.Verticals= seq.VerticalReferences.Select(x => Vertical.Load(folderName, x.UrlName, options)).ExceptNulls().ToArray();
+				seq.Verticals = seq.VerticalReferences.Select(x => Vertical.Load(folderName, x.UrlName, options)).ExceptNulls().ToArray();
+				seq.VerticalReferences = seq.Verticals.Select(v => v.GetReference()).ToArray();
 			});
 		}
 	}

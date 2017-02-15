@@ -22,8 +22,14 @@ namespace uLearn.Model.Edx
 			set { StartDateAsString = value?.ToString("O"); }
 		}
 
+		public SequentialReference[] sequentialReferences;
+
 		[XmlElement("sequential")]
-		public SequentialReference[] SequentialReferences;
+		public SequentialReference[] SequentialReferences
+		{
+			get { return sequentialReferences = sequentialReferences ?? new SequentialReference[0]; }
+			set { sequentialReferences = value; }
+		}
 
 		[XmlIgnore]
 		public Sequential[] Sequentials;
@@ -57,6 +63,7 @@ namespace uLearn.Model.Edx
 			return Load<Chapter>(folderName, "chapter", urlName, options, c =>
 			{
 				c.Sequentials = c.SequentialReferences.Select(x => Sequential.Load(folderName, x.UrlName, options)).ExceptNulls().ToArray();
+				c.SequentialReferences = c.Sequentials.Select(v => v.GetReference()).ToArray();
 			});
 		}
 	}

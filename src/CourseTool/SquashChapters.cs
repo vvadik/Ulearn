@@ -12,7 +12,7 @@ namespace uLearn.CourseTool
 		{
 			var loadOptions = new EdxLoadOptions();
 			loadOptions.FailOnNonExistingItem = false;
-			loadOptions.HandleNonExistentItemTypeName = (type, url) => Console.WriteLine($"Skipped non existent item  type:{type} urlName:{url}");
+			loadOptions.HandleNonExistentItemTypeName = (type, url) => Console.WriteLine($"Skipped non existent item type:{type} urlName:{url}");
 			var folderName = Path.Combine(Dir, "olx");
 			Console.WriteLine("Loading");
 			var course = EdxCourse.Load(folderName, loadOptions);

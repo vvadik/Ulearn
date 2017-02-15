@@ -92,9 +92,10 @@ namespace uLearn.Model.Edx
 
 		public static CourseWithChapters Load(string folderName, string urlName, EdxLoadOptions options)
 		{
-			return Load<CourseWithChapters>(folderName, "course", urlName, options, v =>
+			return Load<CourseWithChapters>(folderName, "course", urlName, options, c =>
 			{
-				v.Chapters = v.ChapterReferences.Select(x => Chapter.Load(folderName, x.UrlName, options)).ExceptNulls().ToArray();
+				c.Chapters = c.ChapterReferences.Select(x => Chapter.Load(folderName, x.UrlName, options)).ExceptNulls().ToArray();
+				c.ChapterReferences = c.Chapters.Select(v => v.GetReference()).ToArray();
 			});
 		}
 	}
