@@ -66,7 +66,9 @@ namespace uLearn.Web.Controllers
 				return RedirectToSlideById(slideGuid);
 			}
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseManager.FindCourse(courseId);
+			if (course == null)
+				return HttpNotFound();
 
 			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			var isGuest = !User.Identity.IsAuthenticated;
@@ -131,7 +133,9 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		public ActionResult Slide(string courseId, int slideIndex = -1)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var course = courseManager.FindCourse(courseId);
+			if (course == null)
+				return HttpNotFound();
 			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			var slide = slideIndex == -1 ? GetInitialSlideForStartup(courseId, course, visibleUnits) : course.Slides[slideIndex];
 			return RedirectToRoute("Course.SlideById", new { courseId, slideId = slide.Url });

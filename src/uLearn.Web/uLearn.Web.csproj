@@ -294,16 +294,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Start\ErrorLogModule.cs" />
     <Compile Include="App_Start\RazorGeneratorMvcStart.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="codemirror\CsCompleterGenerator.cs" />
     <Compile Include="Controllers\CertificatesController.cs" />
+    <Compile Include="Telegram\ErrorsBot.cs" />
+    <Compile Include="Telegram\TelegramBot.cs" />
     <Compile Include="DataContexts\AdditionalScoresRepo.cs" />
     <Compile Include="DataContexts\CertificatesRepo.cs" />
     <Compile Include="Extensions\EfDbExtensions.cs" />
     <Compile Include="Extensions\ControllerExtensions.cs" />
     <Compile Include="Controllers\AuthenticationManager.cs" />
-    <Compile Include="Controllers\CommentsBot.cs" />
+    <Compile Include="Telegram\CommentsBot.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
     <Compile Include="Extensions\RequestExtensions.cs" />

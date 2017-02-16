@@ -135,12 +135,10 @@ namespace uLearn.Web.DataContexts
 		public CommentsPolicy GetCommentsPolicy(string courseId)
 		{
 			var policy = db.CommentsPolicies.FirstOrDefault(x => x.CourseId == courseId);
-			if (policy == null)
-				policy = new CommentsPolicy
-				{
-					CourseId = courseId,
-				};
-			return policy;
+			return policy ?? new CommentsPolicy
+			{
+				CourseId = courseId,
+			};
 		}
 
 		public async Task SaveCommentsPolicy(CommentsPolicy policy)

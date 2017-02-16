@@ -11,6 +11,7 @@ using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
+using uLearn.Web.Telegram;
 
 namespace uLearn.Web.Controllers
 {
@@ -120,7 +121,7 @@ namespace uLearn.Web.Controllers
 				return Json(new
 				{
 					status = "too-fast",
-					message = "Вы комментируете слишком быстро. Подождите немного..",
+					message = "Вы комментируете слишком быстро. Подождите немного...",
 				});
 			}
 
@@ -129,7 +130,7 @@ namespace uLearn.Web.Controllers
 				return Json(new
 				{
 					status = "too-long",
-					message = "Слишком длинный комментарий. Попробуйте сократить мысль..",
+					message = "Слишком длинный комментарий. Попробуйте сократить мысль.",
 				});
 			}
 

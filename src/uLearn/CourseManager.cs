@@ -59,6 +59,19 @@ namespace uLearn
 			return courses.Get(courseId);
 		}
 
+
+		public Course FindCourse(string courseId)
+		{
+			try
+			{
+				return GetCourse(courseId);
+			}
+			catch (KeyNotFoundException)
+			{
+				return null;
+			}
+		}
+
 		public Course GetVersion(Guid versionId)
 		{
 			Course version;

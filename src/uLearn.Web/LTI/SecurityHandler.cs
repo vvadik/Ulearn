@@ -33,38 +33,46 @@ namespace uLearn.Web.LTI
 			if (!IsAuthenticated(context.OwinContext))
 			{
 				// Find existing pairing between LTI user and application user
-				var userManager = new ULearnUserManager(new ULearnDb());
+				var db = new ULearnDb();
+				var userManager = new ULearnUserManager(db);
 				var loginProvider = string.Join(":", context.Options.AuthenticationType, context.LtiRequest.ConsumerKey);
 				var providerKey = context.LtiRequest.UserId;
 				var login = new UserLoginInfo(loginProvider, providerKey);
-				var user = await userManager.FindAsync(login);
-				log.Info($"Ищу пользователя: провайдер {loginProvider}, идентификатор {providerKey}");
-				if (user == null)
+
+				ApplicationUser user;
+				using (var transaction = db.Database.BeginTransaction())
 				{
-					log.Info("Не нашёл пользователя");
-					var usernameContext = new LtiGenerateUserNameContext(context.OwinContext, context.LtiRequest);
-					log.Info("Генерирую имя пользователя для LTI-пользователя");
-					await context.Options.Provider.GenerateUserName(usernameContext);
-					if (string.IsNullOrEmpty(usernameContext.UserName))
-					{
-						throw new Exception("Can't generate username");
-					}
-					log.Info($"Сгенерировал: {usernameContext.UserName}, ищу пользователя по этому имени");
-					user = await userManager.FindByNameAsync(usernameContext.UserName);
+					user = await userManager.FindAsync(login);
+					log.Info($"Ищу LTI-логин: провайдер {loginProvider}, идентификатор {providerKey}");
 					if (user == null)
 					{
-						log.Info("Не нашёл пользователя с таким именем, создаю нового");
-						user = new ApplicationUser { UserName = usernameContext.UserName };
-						var result = await userManager.CreateAsync(user);
-						if (!result.Succeeded)
+						log.Info("Не нашёл LTI-логин");
+						var usernameContext = new LtiGenerateUserNameContext(context.OwinContext, context.LtiRequest);
+						log.Info("Генерирую имя пользователя для LTI-пользователя");
+						await context.Options.Provider.GenerateUserName(usernameContext);
+						if (string.IsNullOrEmpty(usernameContext.UserName))
 						{
-							var errors = string.Join("\n\n", result.Errors);
-							throw new Exception("Can't create user: " + errors);
+							throw new Exception("Can't generate username");
 						}
+						log.Info($"Сгенерировал: {usernameContext.UserName}, ищу пользователя по этому имени");
+						user = await userManager.FindByNameAsync(usernameContext.UserName);
+						if (user == null)
+						{
+							log.Info("Не нашёл пользователя с таким именем, создаю нового");
+							user = new ApplicationUser { UserName = usernameContext.UserName };
+							var result = await userManager.CreateAsync(user);
+							if (!result.Succeeded)
+							{
+								var errors = string.Join("\n\n", result.Errors);
+								throw new Exception("Can't create user: " + errors);
+							}
+						}
+
+						log.Info($"Добавляю LTI-логин {login} к пользователю {user.VisibleName} (Id = {user.Id})");
+						// Save the pairing between LTI user and application user
+						await userManager.AddLoginAsync(user.Id, login);
 					}
-					log.Info($"Добавляю LTI-логин {login} к пользователю {user.VisibleName} (Id = {user.Id})");
-					// Save the pairing between LTI user and application user
-					await userManager.AddLoginAsync(user.Id, login);
+					transaction.Commit();
 				}
 
 				log.Info($"Подготавливаю identity для пользователя {user.VisibleName} (Id = {user.Id})");
