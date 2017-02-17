@@ -6,7 +6,7 @@
 		<div class="jumbotron">
 			<img src="~/Content/logo.png" class="jumbotron-logo"/>
 			<h1>uLearn</h1>
-			<p class="lead">Интерактивные онлайн курсы по&nbsp;программированию</p>
+			<p class="lead">Интерактивные онлайн-курсы по&nbsp;программированию</p>
 			<div class="clearfix"></div>
 		</div>
 
@@ -22,18 +22,10 @@
 				</p>
 				<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "BasicProgramming" }, new { @class = "btn btn-primary" })</p>
 			</div>
-			<div class="course-tile col-md-6">
-				<h2>Практикум по языку запросов LINQ</h2>
-				<p>
-				Длительность курса: 2–4 часа.
-				<p>
-					Вы познакомитесь с основами LINQ
-					на тщательно подобранных примерах и задачах.
-				</p>
-				<p>
-					Полезно даже тем, кто поверхностно знаком с LINQ.
-				</p>
-				<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "Linq" }, new { @class = "btn btn-primary" })</p>
+			<div class="course-tile col-md-6 summer-practice">
+				<a href="https://kontur.ru/education/programs/intern/2017?utm_source=ulearn">
+					<img src="~/Content/summer-practice.png" width="400" title="Летняя стажировка 2017"/>
+				</a>
 			</div>
 		</div>
 		<div class="row">
@@ -57,15 +49,17 @@
 		</div>
 		<div class="row">
 			<div class="course-tile col-md-6">
-				<h2>The Clean Code Game</h2>
-				<p>Длительность: 10–20 минут</p>
+				<h2>Практикум по языку запросов LINQ</h2>
 				<p>
-					Небольшая игра-тренажер на интерактивных примерах знакомит с базовыми правилами хорошего кода.
-					Качественные имена, стиль именования, комментарии, разбиение кода на методы.
+					Длительность курса: 2–4 часа.
+				<p>
+					Вы познакомитесь с основами LINQ
+					на тщательно подобранных примерах и задачах.
 				</p>
 				<p>
-					<a class="btn btn-primary" href="https://cleancodegame.github.io">Поехали!</a>
+					Полезно даже тем, кто поверхностно знаком с LINQ.
 				</p>
+				<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "Linq" }, new { @class = "btn btn-primary" })</p>
 			</div>
 			<div class="course-tile col-md-6">
 				<h2>Основы компьютерной безопасности</h2>
@@ -75,6 +69,19 @@
 					Расcчитан на людей с минимальным опытом программирования.
 				</p>
 				<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "Hackerdom" }, new { @class = "btn btn-primary" })</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="course-tile col-md-6">
+				<h2>The Clean Code Game</h2>
+				<p>Длительность: 10–20 минут</p>
+				<p>
+					Небольшая игра-тренажер на интерактивных примерах знакомит с базовыми правилами хорошего кода.
+					Качественные имена, стиль именования, комментарии, разбиение кода на методы.
+				</p>
+				<p>
+					<a class="btn btn-primary" href="https://cleancodegame.github.io">Поехали!</a>
+				</p>
 			</div>
 		</div>
 	</div>
