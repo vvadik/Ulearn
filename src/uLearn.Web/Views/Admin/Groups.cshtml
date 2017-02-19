@@ -246,13 +246,13 @@
 					@Html.Hidden("courseId", Model.CourseId);
 					<div>
 						<p>
-							Новая группа будет создана для курса «@Model.CoursesNames[Model.CourseId]».
+							Новая группа будет создана для этого курса.
 							Скопируются все настройки группы (в том числе владелец), в неё автоматически добавятся участники из копируемой группы.
 						</p>
 					</div>
 					<div class="form-group input-group">
 						@{
-							var selectGroups = Model.CoursesNames.ToDictionary(kv => kv.Key, kv => new SelectListGroup { Name = kv.Value });
+							var selectGroups = Model.CoursesNames.ToDictionary(kv => kv.Key.ToLower(), kv => new SelectListGroup { Name = kv.Value });
 							var instructorsUsersIds = new HashSet<string>(Model.Instructors.Select(i => i.UserId));
 							var copiedGroupsList = Model.GroupsMayBeCopied.Select(g => new SelectListItemWithAttributes
 							{
@@ -265,7 +265,7 @@
 									Gender = Gender.Male,
 									hideNumberOne = false
 								}),
-								Group = selectGroups.GetOrDefault(g.CourseId),
+								Group = selectGroups.GetOrDefault(g.CourseId.ToLower()),
 								HtmlAttributes = new
 								{
 									data_owner = g.Owner.VisibleName,
@@ -280,7 +280,7 @@
 					</div>
 					<div class="form-group copy-group__change-owner-block">
 						<p class="help-block">
-							Владелец этой группы <span class="owner-name"></span> не&nbsp;является преподавателем курса «@Model.CoursesNames[Model.CourseId]».
+							Владелец этой группы <span class="owner-name"></span> не&nbsp;является преподавателем этого курса».
 							Вы&nbsp;можете @(User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin) ? "добавить его в список преподавателей или" : "")
 							сделать себя владельцем скопированной группы.
 						</p>
