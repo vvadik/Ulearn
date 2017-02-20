@@ -62,9 +62,6 @@ namespace uLearn.Web.LTI
 			
 			log.Info($"Аутенфицирую пользователя по identity: {identity.Name}");
 			context.OwinContext.Authentication.SignIn(new AuthenticationProperties { IsPersistent = false }, identity);
-
-			// Redirect to original URL so the new identity takes affect
-			context.RedirectUrl = context.LtiRequest.Url.ToString();
 		}
 
 		private static async Task<ClaimsIdentity> GetIdentityForLtiLogin(LtiAuthenticatedContext context, ULearnUserManager userManager, UserLoginInfo ltiLogin)
