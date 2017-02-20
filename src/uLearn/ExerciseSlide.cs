@@ -7,7 +7,7 @@ namespace uLearn
 {
 	public class ExerciseSlide : Slide
 	{
-		public override bool ShouldBeSolved { get { return true; } }
+		public override bool ShouldBeSolved => true;
 
 		public ExerciseBlock Exercise { get; }
 		
@@ -19,11 +19,12 @@ namespace uLearn
 		{
 			Exercise = blocks.OfType<ExerciseBlock>().Single();
 			MaxScore = Exercise.MaxScore;
+			ScoringGroup = Exercise.ScoringGroup;
 		}
 
 		public override string ToString()
 		{
-			return string.Format("ExerciseSlide: {0}", Exercise);
+			return $"ExerciseSlide: {Exercise}";
 		}
 	}
 }

@@ -10,14 +10,14 @@ namespace uLearn.Quizes
 	{
 		public string Extension => ".quiz.xml";
 
-
 		public Slide Load(FileInfo file, Unit unit, int slideIndex, CourseSettings settings)
 		{
 			var quiz = file.DeserializeXml<Quiz>();
 			
 			var scoringGroupsIds = settings.Scoring.Groups.Keys;
 			if (! string.IsNullOrEmpty(quiz.ScoringGroup) && ! scoringGroupsIds.Contains(quiz.ScoringGroup))
-				throw new CourseLoadingException($"Неизвестная группа оценки у теста {file.Name}: {quiz.ScoringGroup}\n" + 
+				throw new CourseLoadingException(
+					$"Неизвестная группа оценки у теста {quiz.Title}: {quiz.ScoringGroup}\n" + 
 					"Возможные значения: " + string.Join(", ", scoringGroupsIds));
 
 			if (string.IsNullOrEmpty(quiz.ScoringGroup))
@@ -31,7 +31,7 @@ namespace uLearn.Quizes
 
 		public static void BuildUp(Quiz quiz, DirectoryInfo slideDir, CourseSettings settings)
 		{
-			var context = new BuildUpContext(slideDir, settings, null);
+			var context = new BuildUpContext(slideDir, settings, null, quiz.Title);
 			var blocks = quiz.Blocks.SelectMany(b => b.BuildUp(context, ImmutableHashSet<string>.Empty));
 			quiz.Blocks = blocks.ToArray();
 		}

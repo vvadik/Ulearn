@@ -122,7 +122,7 @@
 					<input type="text"
 						   class="add-user-to-group-input form-control"
 						   data-group-id="@group.Id"
-						   data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.CourseId, withGroups = false })"
+						   data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.Course.Id, withGroups = false })"
 						   placeholder="Начните вводить имя или фамилию">
 				}
 				@if ((group.IsArchived || ! canModifyGroup) && group.Members.Count == 0)
@@ -150,7 +150,7 @@
 				}))
 				{
 					@Html.AntiForgeryToken()
-					<input type="hidden" name="courseId" value="@Model.CourseId" />
+					<input type="hidden" name="courseId" value="@Model.Course.Id" />
 					<input type="hidden" name="groupId" value="" />
 
 					<div class="form-group">
@@ -243,10 +243,10 @@
 			<div class="modal-body">
 				@using (Html.BeginForm("CopyGroup", "Admin", FormMethod.Post))
 				{
-					@Html.Hidden("courseId", Model.CourseId);
+					@Html.Hidden("courseId", Model.Course.Id)
 					<div>
 						<p>
-							Новая группа будет создана для этого курса.
+							Новая группа будет создана для курса «@Model.Course.Title».
 							Скопируются все настройки группы (в том числе владелец), в неё автоматически добавятся участники из копируемой группы.
 						</p>
 					</div>
@@ -280,8 +280,8 @@
 					</div>
 					<div class="form-group copy-group__change-owner-block">
 						<p class="help-block">
-							Владелец этой группы <span class="owner-name"></span> не&nbsp;является преподавателем этого курса».
-							Вы&nbsp;можете @(User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin) ? "добавить его в список преподавателей или" : "")
+							Владелец этой группы <span class="owner-name"></span> не&nbsp;является преподавателем курса «@Model.Course.Title».
+							Вы&nbsp;можете @(User.HasAccessFor(Model.Course.Id, CourseRole.CourseAdmin) ? "добавить его в список преподавателей или" : "")
 							сделать себя владельцем скопированной группы.
 						</p>
 						<div class="checkbox checkbox-default">

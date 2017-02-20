@@ -30,7 +30,7 @@ namespace uLearn.Web.Models
 			this.getAdditionalScore = getAdditionalScore;
 			this.course = course;
 			this.currentSlideId = currentSlideId;
-			this.EnabledScoringGroupsIds = new List<string>();
+			EnabledScoringGroupsIds = new List<string>();
 		}
 
 		public TocModel CreateTocModel()

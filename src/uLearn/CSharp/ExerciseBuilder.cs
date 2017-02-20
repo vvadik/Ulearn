@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -18,14 +19,14 @@ namespace uLearn.CSharp
 			: base(false)
 		{
 			this.prelude = prelude;
-		    Exercise = new SingleFileExerciseBlock
-		    {
-		        ValidatorName = "cs",
-		        LangId = langId
-		    };
+			Exercise = new SingleFileExerciseBlock
+			{
+				ValidatorName = "cs",
+				LangId = langId
+			};
 		}
 
-		public ExerciseBlock BuildBlockFrom(SyntaxTree tree)
+		public ExerciseBlock BuildBlockFrom(SyntaxTree tree, FileInfo slideFile)
 		{
 			ExerciseClassName = null;
 			Exercise.ExerciseInitialCode = GetUncomment(tree.GetRoot()) ?? ""; //for uncomment-comment without exercise method
@@ -34,6 +35,7 @@ namespace uLearn.CSharp
 			const string pragma = "\n#line 1\n";
 			Exercise.ExerciseCode = prelude + result.ToFullString().Insert(exerciseInsertIndex, pragma);
 			Exercise.IndexToInsertSolution = prelude.Length + exerciseInsertIndex + pragma.Length;
+			Exercise.File = slideFile.FullName;
 			return Exercise;
 		}
 
@@ -153,7 +155,7 @@ namespace uLearn.CSharp
 		private static string FindParentClassName(SyntaxNode node)
 		{
 			var parent = node.GetParents().OfType<ClassDeclarationSyntax>().FirstOrDefault();
-			return parent == null ? null : parent.Identifier.Text;
+			return parent?.Identifier.Text;
 		}
 
 		private string GetExerciseCode(MethodDeclarationSyntax method)

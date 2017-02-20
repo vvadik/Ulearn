@@ -9,7 +9,7 @@ using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Quizes
 {
-	[XmlRootAttribute("Quiz", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/quiz")]
+	[XmlRoot("Quiz", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/quiz")]
 	public class Quiz
 	{
 		public Quiz InitQuestionIndices()
@@ -27,7 +27,7 @@ namespace uLearn.Quizes
 		public int MaxDropCount;
 
 		[XmlAttribute("manualCheck")]
-		public bool ManualCheck;
+		public bool ManualChecking;
 
 		[XmlAttribute("scoringGroup")]
 		public string ScoringGroup;
@@ -50,10 +50,7 @@ namespace uLearn.Quizes
 			set { blocks = value; }
 		}
 
-		public string NormalizedXml
-		{
-			get { return this.XmlSerialize(true); }
-		}
+		public string NormalizedXml => this.XmlSerialize(true);
 
 		public int MaxScore
 		{
@@ -99,7 +96,7 @@ namespace uLearn.Quizes
 	
 	public abstract class AbstractQuestionBlock : SlideBlock
 	{
-		public AbstractQuestionBlock()
+		protected AbstractQuestionBlock()
 		{
 			/* Default max score */
 			MaxScore = 1;
@@ -124,10 +121,7 @@ namespace uLearn.Quizes
 
 		public abstract bool HasEqualStructureWith(SlideBlock other);
 
-		public bool IsScoring
-		{
-			get { return MaxScore > 0; }
-		}
+		public bool IsScoring => MaxScore > 0;
 	}
 
 	public class ChoiceBlock : AbstractQuestionBlock

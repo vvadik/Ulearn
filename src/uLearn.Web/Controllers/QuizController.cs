@@ -162,7 +162,7 @@ namespace uLearn.Web.Controllers
 			if (! CanUserFillQuiz(quizState))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Already answered");
 
-			if (slide.Quiz.ManualCheck && ! groupsRepo.IsManualCheckingEnabledForUser(course, userId))
+			if (slide.ManualChecking && ! groupsRepo.IsManualCheckingEnabledForUser(course, userId))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Manual checking is disabled for you");
 
 			var time = DateTime.Now;
@@ -189,7 +189,7 @@ namespace uLearn.Web.Controllers
 				transaction.Commit();
 			}
 
-			if (slide.Quiz.ManualCheck)
+			if (slide.ManualChecking)
 			{
 				/* If this quiz is already queued for checking for this user, don't add it to queue again */
 				if (quizState != QuizState.WaitForCheck)

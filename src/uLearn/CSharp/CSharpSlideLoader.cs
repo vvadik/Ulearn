@@ -9,10 +9,8 @@ namespace uLearn.CSharp
 
 		public Slide Load(FileInfo file, Unit unit, int slideIndex, CourseSettings settings)
 		{
-			var sourceCode = file.ContentAsUtf8();
 			var prelude = GetPrelude(file.Directory);
-			var di = file.Directory;
-			return SlideParser.ParseCode(sourceCode, new SlideInfo(unit, file, slideIndex), prelude, di, settings);
+			return SlideParser.ParseSlide(file, new SlideInfo(unit, file, slideIndex), prelude, file.Directory, settings);
 		}
 
 		private static string GetPrelude(DirectoryInfo dir)

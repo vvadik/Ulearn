@@ -61,7 +61,7 @@ namespace uLearn
 </Lesson>";
 			File.WriteAllText("temp.xml", input);
 			var fileInfo = new FileInfo("temp.xml");
-			var buildUpContext = new BuildUpContext(new DirectoryInfo("."), CourseSettings.DefaultSettings, null);
+			var buildUpContext = new BuildUpContext(new DirectoryInfo("."), CourseSettings.DefaultSettings, null, "Заголовок слайда");
 			return fileInfo.DeserializeXml<Lesson>().Blocks
 				.SelectMany(b => b.BuildUp(buildUpContext, ImmutableHashSet<string>.Empty))
 				.ToArray();

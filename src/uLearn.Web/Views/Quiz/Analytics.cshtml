@@ -31,7 +31,7 @@
 @foreach (var quizVersion in Model.QuizVersions)
 {
 	var quiz = quizVersion.RestoredQuiz;
-	var isManualCheck = quiz.ManualCheck;
+	var isManualCheck = quiz.ManualChecking;
 	<div>
 		@{ var maxQuestionIndex = quiz.Blocks.OfType<AbstractQuestionBlock>().Max(x => x.QuestionIndex); }
 		<table class="analytics__user-answers tablesorter">

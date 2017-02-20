@@ -13,10 +13,7 @@
 			QuizState = quizState;
 		}
 
-		public bool ShowCorrectAnswer
-		{
-			get { return QuizState == QuizState.Total && !QuizModel.Slide.Quiz.ManualCheck; }
-		}
+		public bool ShowCorrectAnswer => QuizState == QuizState.Total && !QuizModel.Slide.ManualChecking;
 	}
 
 }

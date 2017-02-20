@@ -13,7 +13,7 @@
 	bool IsSlideHiddenOnSmallScreens(Slide slide)
 	{
 		if (slide is QuizSlide)
-			return !((QuizSlide)slide).Quiz.ManualCheck;
+			return !((QuizSlide)slide).ManualChecking;
 
 		if (slide is ExerciseSlide)
 			return !((ExerciseSlide)slide).Exercise.RequireReview;

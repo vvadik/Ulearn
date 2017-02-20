@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using uLearn.Model;
 using uLearn.Model.Blocks;
 using uLearn.Model.Edx;
 using uLearn.Model.Edx.EdxComponents;
@@ -11,13 +13,14 @@ namespace uLearn
 	public class Slide
 	{
 		public readonly string Title;
-		public readonly SlideBlock[] Blocks;
+		public SlideBlock[] Blocks { get; private set; }
 		public readonly SlideInfo Info;
-		public int Index { get { return Info.Index; } }
+		public int Index => Info.Index;
 		public readonly Guid Id;
-		public string NormalizedGuid { get { return Utils.GetNormalizedGuid(Id); } }
-		public virtual bool ShouldBeSolved { get { return false; } }
+		public string NormalizedGuid => Id.GetNormalizedGuid();
+		public virtual bool ShouldBeSolved => false;
 		public int MaxScore { get; protected set; }
+		public string ScoringGroup { get; protected set; }
 
 		public IEnumerable<SlideBlock[]> GetBlocksRangesWithSameVisibility()
 		{
@@ -36,7 +39,6 @@ namespace uLearn
 			yield return range.ToArray();
 		}
 
-
 		public Slide(IEnumerable<SlideBlock> blocks, SlideInfo info, string title, Guid id)
 		{
 			try
@@ -51,10 +53,10 @@ namespace uLearn
 			}
 			catch (Exception e)
 			{
-				throw new FormatException(string.Format("Error in slide {0} (id: {1}). {2}", title, id, e.Message), e);
+				throw new FormatException($"Error in slide {title} (id: {id}). {e.Message}", e);
 			}
 		}
-
+		
 		public override string ToString()
 		{
 			return $"Title: {Title}, Id: {NormalizedGuid}, MaxScore: {MaxScore}";
@@ -126,7 +128,7 @@ namespace uLearn
 		{
 			var ltiComponent =
 				new LtiComponent(slide.Title, slide.NormalizedGuid + "-quiz", string.Format(slideUrl, courseId, slide.Id), ltiId, true, slide.MaxScore, false);
-			yield return new Vertical(slide.NormalizedGuid, slide.Title, new Component[] { ltiComponent }, EdxScoringGroupsHack.ToEdxName(slide.Quiz.ScoringGroup), slide.Quiz.MaxScore);
+			yield return new Vertical(slide.NormalizedGuid, slide.Title, new Component[] { ltiComponent }, EdxScoringGroupsHack.ToEdxName(slide.ScoringGroup), slide.MaxScore);
 		}
 
 		public IEnumerable<Vertical> ToVerticals(string courseId, string slideUrl, string solutionsUrl, Dictionary<string, string> videoGuids, string ltiId)

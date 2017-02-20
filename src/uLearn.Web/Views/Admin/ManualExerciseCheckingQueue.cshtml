@@ -76,14 +76,14 @@
 						Последний раз проверялась преподавателем <b>@checking.LockedBy.VisibleName</b>
 						<span class="label label-xs label-default">
 							@checking.Score из @checkModel.ContextMaxScore.PluralizeInRussian(new RussianPluralizationOptions
-							                   {
-								                   One = "балл",
-								                   Two = "балла",
-								                   Five = "баллов",
-								                   Gender = Gender.Male,
-								                   hideNumberOne = false,
-								                   smallNumbersAreWords = false,
-							                   })
+											   {
+												   One = "балл",
+												   Two = "балла",
+												   Five = "баллов",
+												   Gender = Gender.Male,
+												   hideNumberOne = false,
+												   smallNumbersAreWords = false,
+											   })
 						</span>
 					</p>
 					<p>
@@ -111,15 +111,15 @@
 					<p>
 						Проверяется преподавателем <b>@checking.LockedBy.VisibleName</b>,
 						заблокирована ещё на @{
-							                     var minutes = (int)(checking.LockedUntil.Value - DateTime.Now).TotalMinutes;
-							                     @minutes.PluralizeInRussian(new RussianPluralizationOptions
-							                     {
-								                     One = "минуту",
-								                     Two = "минуты",
-								                     Five = "минут",
-								                     Gender = Gender.Female,
-							                     })
-						                     }
+												 var minutes = (int)(checking.LockedUntil.Value - DateTime.Now).TotalMinutes;
+												 @minutes.PluralizeInRussian(new RussianPluralizationOptions
+												 {
+													 One = "минуту",
+													 Two = "минуты",
+													 Five = "минут",
+													 Gender = Gender.Female,
+												 })
+											 }
 					</p>
 					if (checking.IsLockedBy(User.Identity))
 					{

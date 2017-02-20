@@ -58,8 +58,8 @@
 								var isActive = block.MaxReviewScore > 4 && score == manualScore ? "active" : "";
 								var isDisabled = score < manualScore ? "disabled" : "";
 								<button type="button"
-								        class="btn btn-default @isActive @isDisabled"
-								        data-value="@score"
+										class="btn btn-default @isActive @isDisabled"
+										data-value="@score"
 										>@scorePercent%</button>
 							}
 						</div>

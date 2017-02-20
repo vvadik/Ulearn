@@ -15,7 +15,7 @@ namespace uLearn.Model
 			var lesson = file.DeserializeXml<Lesson>();
 
 			var dir = file.Directory;
-			var context = new BuildUpContext(dir, settings, lesson);
+			var context = new BuildUpContext(dir, settings, lesson, lesson.Title);
 			var blocks = lesson.Blocks.SelectMany(b => b.BuildUp(context, ImmutableHashSet<string>.Empty)).ToList();
 			var slideInfo = new SlideInfo(unit, file, slideIndex);
 

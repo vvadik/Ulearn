@@ -586,15 +586,15 @@ namespace uLearn.Web.Controllers
 
 			return View("Groups", new GroupsViewModel
 			{
-				CourseId = courseId,
+				Course = course,
 				CourseManualCheckingEnabled = course.Settings.IsManualCheckingEnabled,
 				Groups = groups,
-				CanModifyGroup = groups.ToDictionary(g => g.Id, g => CanModifyGroup(g)),
+				CanModifyGroup = groups.ToDictionary(g => g.Id, CanModifyGroup),
 				ScoringGroupsCanBeSetInSomeUnit = scoringGroupsCanBeSetInSomeUnit,
 				EnabledScoringGroups = enabledScoringGroups,
 				Instructors = instructors,
 				GroupsMayBeCopied = groupsMayBeCopied,
-				CoursesNames = courseManager.GetCourses().ToDictionary(c => c.Id, c => c.Title),
+				CoursesNames = courseManager.GetCourses().ToDictionary(c => c.Id.ToLower(), c => c.Title),
 			});
 		}
 
@@ -1214,7 +1214,7 @@ namespace uLearn.Web.Controllers
 
 	public class GroupsViewModel
 	{
-		public string CourseId { get; set; }
+		public Course Course { get; set; }
 		public bool CourseManualCheckingEnabled { get; set; }
 
 		public List<Group> Groups { get; set; }

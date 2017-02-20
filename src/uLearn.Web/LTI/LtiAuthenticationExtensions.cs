@@ -43,7 +43,7 @@ namespace uLearn.Web.LTI
 						var uriBuilder = new UriBuilder(context.LtiRequest.Url)
 						{
 							Scheme = context.OwinContext.Request.GetRealRequestScheme(),
-                            Port = context.OwinContext.Request.GetRealRequestPort()
+							Port = context.OwinContext.Request.GetRealRequestPort()
 						};
 						context.LtiRequest.Url = uriBuilder.Uri;
 

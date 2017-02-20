@@ -23,15 +23,15 @@ namespace uLearn.Web.Extensions
 			}
 		}
 
-        public static string GetRedirectToUrlWithTrailingSlash(this Controller controller)
-        {
-            var requestUrl = controller.Request.Url?.AbsolutePath ?? "";
-            if (requestUrl != "" && requestUrl != "/" && !requestUrl.EndsWith("/"))
-            {
-                var redirectUrl = requestUrl + "/";
-                return redirectUrl;
-            }
-            return null;
-        }
-    }
+		public static string GetRedirectToUrlWithTrailingSlash(this Controller controller)
+		{
+			var requestUrl = controller.Request.Url?.AbsolutePath ?? "";
+			if (requestUrl != "" && requestUrl != "/" && !requestUrl.EndsWith("/"))
+			{
+				var redirectUrl = requestUrl + "/";
+				return redirectUrl;
+			}
+			return null;
+		}
+	}
 }

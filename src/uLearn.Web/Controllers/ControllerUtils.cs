@@ -102,7 +102,7 @@ namespace uLearn.Web.Controllers
 			if (slide is ExerciseSlide)
 				return (slide as ExerciseSlide).Exercise.CorrectnessScore;
 			if (slide is QuizSlide)
-				return (slide as QuizSlide).Quiz.ManualCheck ? 0 : slide.MaxScore;
+				return (slide as QuizSlide).ManualChecking ? 0 : slide.MaxScore;
 			return slide.MaxScore;
 		}
 	}

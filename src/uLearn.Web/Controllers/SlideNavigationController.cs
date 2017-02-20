@@ -54,7 +54,7 @@ namespace uLearn.Web.Controllers
 			builder.IsInstructor = false;
 			builder.IsVisited = s => false;
 			builder.IsUnitVisible = visibleUnits.Contains;
-			builder.IsSlideHidden = s => s is QuizSlide && ((QuizSlide)s).Quiz.ManualCheck;
+			builder.IsSlideHidden = s => s is QuizSlide && ((QuizSlide)s).ManualChecking;
 			var toc = builder.CreateTocModel();
 			toc.NextUnitTime = unitsRepo.GetNextUnitPublishTime(course.Id);
 			return toc;
@@ -92,7 +92,7 @@ namespace uLearn.Web.Controllers
 				IsSolved = s => solvedSlidesIds.Contains(s.Id),
 				IsVisited = s => visited.Contains(s.Id),
 				IsUnitVisible = visibleUnits.Contains,
-				IsSlideHidden = s => s is QuizSlide && ((QuizSlide)s).Quiz.ManualCheck &&
+				IsSlideHidden = s => s is QuizSlide && ((QuizSlide)s).ManualChecking &&
 									!enabledManualCheckingForUser && !solvedSlidesIds.Contains(s.Id),
 				EnabledScoringGroupsIds = enabledScoringGroupsIds,
 			};
