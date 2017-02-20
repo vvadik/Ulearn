@@ -102,6 +102,14 @@ namespace uLearn.Web.DataContexts
 				.ToList();
 		}
 
+		public async Task MarkVisitsAsWithManualChecking(Guid slideId, string userId)
+		{
+			await UpdateAttempts(slideId, userId, visit =>
+			{
+				visit.HasManualChecking = true;
+			});
+		}
+
 		public int GetScore(Guid slideId, string userId)
 		{
 			return db.Visits

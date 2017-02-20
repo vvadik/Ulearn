@@ -116,6 +116,7 @@ namespace uLearn.Web.Controllers
 			{
 				await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, exerciseSlide.Id, userId);
 				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission);
+				await visitsRepo.MarkVisitsAsWithManualChecking(exerciseSlide.Id, userId);
 			}
 			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, userId);
 

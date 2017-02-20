@@ -22,9 +22,10 @@ namespace uLearn.Web.Telegram
 
 			var elmahUrl = "https://ulearn.me/elmah/detail?id=" + errorId;
 
-			var text = $"*Произошла ошибка {EscapeMarkdown(errorId)}*\n" + 
+			var text = $"*РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР° {EscapeMarkdown(errorId)}*\n" + 
 				$"{EscapeMarkdown(error.Exception.Message)}\n\n" + 
-				$"Подробности: {EscapeMarkdown(elmahUrl)}";
+				$"РџРѕРґСЂРѕР±РЅРѕСЃС‚Рё: {EscapeMarkdown(elmahUrl)}";
+			log.Info($"РћС‚РїСЂР°РІР»СЏСЋ РІ С‚РµР»РµРіСЂР°Рј-РєР°РЅР°Р» {channel} СЃРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС€РёР±РєРµ:\n{text}");
 			try
 			{
 				telegramClient.SendTextMessageAsync(channel, text, parseMode: ParseMode.Markdown, disableWebPagePreview: true)
@@ -33,9 +34,8 @@ namespace uLearn.Web.Telegram
 			}
 			catch (Exception e)
 			{
-				log.Error($"Не могу отправить сообщение в телеграм-канал {channel}", e);
+				log.Error($"РќРµ РјРѕРіСѓ РѕС‚РїСЂР°РІРёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РІ С‚РµР»РµРіСЂР°Рј-РєР°РЅР°Р» {channel}", e);
 			}
-
 		}
 	}
 }

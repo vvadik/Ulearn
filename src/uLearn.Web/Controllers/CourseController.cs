@@ -157,17 +157,19 @@ namespace uLearn.Web.Controllers
 			var slide = course.GetSlideById(slideId);
 
 			var owinRequest = Request.GetOwinContext().Request;
-			if (string.Equals(Request.HttpMethod, "POST", StringComparison.OrdinalIgnoreCase))
-			{
-				log.Info("Получил POST-запрос");
-			}
 			if (await owinRequest.IsAuthenticatedLtiRequestAsync())
 			{
 				var ltiRequest = await owinRequest.ParseLtiRequestAsync();
 				log.Info($"Нашёл LTI request в запросе: {ltiRequest.JsonSerialize()}");
 				await ltiRequestsRepo.Update(userId, slide.Id, ltiRequest.JsonSerialize());
 
-				return Redirect(ltiRequest.Url.AbsoluteUri);
+				/* Substitute http(s) scheme with real scheme from header */
+				var uriBuilder = new UriBuilder(ltiRequest.Url)
+				{
+					Scheme = owinRequest.GetRealRequestScheme(),
+					Port = owinRequest.GetRealRequestPort()
+				};
+				return Redirect(uriBuilder.Uri.AbsoluteUri);
 			}
 
 			await VisitSlide(courseId, slide.Id, userId);
@@ -311,7 +313,10 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> AcceptedSolutions(string courseId, Guid slideId, bool isLti = false)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var slide = (ExerciseSlide)course.GetSlideById(slideId);
+			var slide = course.GetSlideById(slideId) as ExerciseSlide;
+			if (slide == null)
+				return HttpNotFound();
+
 			// Test redirect to SlideId if disabled
 			if (slide.Exercise.HideShowSolutionsButton)
 				return RedirectToRoute("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });

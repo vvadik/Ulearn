@@ -45,7 +45,6 @@ namespace uLearn.Web.LTI
 						};
 						context.LtiRequest.Url = uriBuilder.Uri;
 
-
 						var signature = context.LtiRequest.GenerateSignature(consumer.Secret);
 						if (!signature.Equals(context.LtiRequest.Signature))
 						{

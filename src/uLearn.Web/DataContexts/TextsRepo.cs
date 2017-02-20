@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
 using System.Linq;
@@ -57,7 +58,13 @@ namespace uLearn.Web.DataContexts
 			{
 				throw new Exception(
 					string.Join("\r\n",
-					e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
+						e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
+			}
+			catch (DbUpdateException)
+			{
+				// It's ok, just tried to insert text with hash which already exists, try to find it
+				if (!db.Texts.AsNoTracking().Any(t => t.Hash == hash))
+					throw;
 			}
 			return blob;
 		}

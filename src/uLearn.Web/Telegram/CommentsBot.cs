@@ -26,11 +26,12 @@ namespace uLearn.Web.Telegram
 			try
 			{
 				var text = CreatePostText(comment);
+				log.Info($"Отправляю в телеграм-канал {channel} сообщение о комментарии:\n{text}");
 				await telegramClient.SendTextMessageAsync(channel, text, parseMode: ParseMode.Markdown, disableWebPagePreview: true);
 			}
 			catch (Exception e)
 			{
-				log.Error($"�� ���� ��������� ��������� � ��������-����� {channel}", e);
+				log.Error($"Не могу отправить сообщение в телеграм-канал {channel}", e);
 				ErrorLog.GetDefault(HttpContext.Current).Log(new Error(e));
 			}
 		}
@@ -45,7 +46,7 @@ namespace uLearn.Web.Telegram
 			var slideTitle = $"{MakeNestedQuotes(course.Title)}: {MakeNestedQuotes(slide.Title)}";
 
 			var url = "https://ulearn.me/Course/" + comment.CourseId + "/" + slide.Url + "#comment-" + comment.Id;
-			var text = $"*{EscapeMarkdown(comment.Author.VisibleName)} � �{EscapeMarkdown(slideTitle)}�*\n{EscapeMarkdown(comment.Text.Trim())}\n\n{EscapeMarkdown(url)}";
+			var text = $"*{EscapeMarkdown(comment.Author.VisibleName)} в «{EscapeMarkdown(slideTitle)}»*\n{EscapeMarkdown(comment.Text.Trim())}\n\n{EscapeMarkdown(url)}";
 			return text;
 		}
 	}
