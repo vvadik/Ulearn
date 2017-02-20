@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Data;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using log4net;
-using LtiLibrary.Core.Lti1;
 using LtiLibrary.Owin.Security.Lti.Provider;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
-using Newtonsoft.Json;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 
@@ -29,98 +27,89 @@ namespace uLearn.Web.LTI
 		{
 			log.Info($"LTI вызвал событие OnAuthenticated при запросе на {context.Request.Uri}");
 
-			ClaimsIdentity identity;
-			if (!IsAuthenticated(context.OwinContext))
+			ClaimsIdentity identity = null;
+			using (var db = new ULearnDb())
 			{
-				// Find existing pairing between LTI user and application user
-				var db = new ULearnDb();
 				var userManager = new ULearnUserManager(db);
 				var loginProvider = string.Join(":", context.Options.AuthenticationType, context.LtiRequest.ConsumerKey);
 				var providerKey = context.LtiRequest.UserId;
-				var login = new UserLoginInfo(loginProvider, providerKey);
+				var ltiLogin = new UserLoginInfo(loginProvider, providerKey);
 
-				ApplicationUser user;
-				using (var transaction = db.Database.BeginTransaction())
+				for (var tryIndex = 0; tryIndex < 3; tryIndex++)
 				{
-					user = await userManager.FindAsync(login);
-					log.Info($"Ищу LTI-логин: провайдер {loginProvider}, идентификатор {providerKey}");
-					if (user == null)
+					using (var transaction = db.Database.BeginTransaction(IsolationLevel.RepeatableRead))
 					{
-						log.Info("Не нашёл LTI-логин");
-						var usernameContext = new LtiGenerateUserNameContext(context.OwinContext, context.LtiRequest);
-						log.Info("Генерирую имя пользователя для LTI-пользователя");
-						await context.Options.Provider.GenerateUserName(usernameContext);
-						if (string.IsNullOrEmpty(usernameContext.UserName))
+						try
 						{
-							throw new Exception("Can't generate username");
+							identity = await GetIdentityForLtiLogin(context, userManager, ltiLogin);
+							transaction.Commit();
 						}
-						log.Info($"Сгенерировал: {usernameContext.UserName}, ищу пользователя по этому имени");
-						user = await userManager.FindByNameAsync(usernameContext.UserName);
-						if (user == null)
+						catch (Exception e)
 						{
-							log.Info("Не нашёл пользователя с таким именем, создаю нового");
-							user = new ApplicationUser { UserName = usernameContext.UserName };
-							var result = await userManager.CreateAsync(user);
-							if (!result.Succeeded)
-							{
-								var errors = string.Join("\n\n", result.Errors);
-								throw new Exception("Can't create user: " + errors);
-							}
+							log.Error("Произошла ошибка при определении или создании пользователя для LTI-запроса", e);
+							transaction.Rollback();
+							if (tryIndex == 2)
+								throw;
+							log.Info("Попробую ещё раз определить или создать пользователя для LTI-запроса");
 						}
-
-						log.Info($"Добавляю LTI-логин {login} к пользователю {user.VisibleName} (Id = {user.Id})");
-						// Save the pairing between LTI user and application user
-						await userManager.AddLoginAsync(user.Id, login);
 					}
-					transaction.Commit();
+					await Task.Delay(200);
 				}
-
-				log.Info($"Подготавливаю identity для пользователя {user.VisibleName} (Id = {user.Id})");
-				// Create the application identity, add the LTI request as a claim, and sign in
-				identity = await userManager.CreateIdentityAsync(user, context.Options.SignInAsAuthenticationType);
-			}
-			else
-			{
-				log.Info($"Пришёл LTI-запрос на аутенфикацию, но пользователь уже аутенфицирован на ulearn: {context.OwinContext.Authentication.User.Identity.Name}");
-				identity = (ClaimsIdentity)context.OwinContext.Authentication.User.Identity;
 			}
 
-			/* We need to ignore LTI requests without LisOutcomeServiceUrl.
-			   Otherwise we receive two or more requests if two or more LTI-blocks are on the same page
-			   and in this case we will remember only last LTI request.*/
-			if (string.IsNullOrEmpty(((LtiRequest)context.LtiRequest).LisOutcomeServiceUrl))
-			{
-				log.Info("Пропускаю LTI-запрос, так как он не содержит поля LisOutcomeServiceUrl");
-				context.RedirectUrl = context.LtiRequest.Url.ToString();
-				return;
-			}
-
-			var json = JsonConvert.SerializeObject(context.LtiRequest, Formatting.None,
-				new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-
-			log.Info($"LTI-запрос: {json}");
+			if (identity == null)
+				throw new Exception("Can\'t authenticate identity for LTI user");
 			
-			var claimsToRemove = identity.Claims.Where(c => c.Type.Equals("LtiRequest"));
-			foreach (var claim in claimsToRemove)
-			{
-				log.Info($"Удаляю старое требование: {claim}");
-				identity.RemoveClaim(claim);
-			}
-
-			identity.AddClaim(new Claim(context.Options.ClaimType, json, ClaimValueTypes.String, context.Options.AuthenticationType));
-			if (claims != null)
-			{
-				foreach (var claim in claims)
-				{
-					log.Info($"Добавляю новое требование из LTI-запроса: {claim}");
-					identity.AddClaim(claim);
-				}
-			}
-			log.Info($"Аутенфицирую identity: {identity.Name}");
+			log.Info($"Аутенфицирую пользователя по identity: {identity.Name}");
 			context.OwinContext.Authentication.SignIn(new AuthenticationProperties { IsPersistent = false }, identity);
 
 			// Redirect to original URL so the new identity takes affect
 			context.RedirectUrl = context.LtiRequest.Url.ToString();
+		}
+
+		private static async Task<ClaimsIdentity> GetIdentityForLtiLogin(LtiAuthenticatedContext context, ULearnUserManager userManager, UserLoginInfo ltiLogin)
+		{
+			var ltiLoginUser = await userManager.FindAsync(ltiLogin);
+			if (ltiLoginUser != null)
+			{
+				log.Info($"Нашёл LTI-логин: провайдер {ltiLogin.LoginProvider}, идентификатор {ltiLogin.ProviderKey}, он принадлежит пользователю {ltiLoginUser.UserName} (Id = {ltiLoginUser.Id})");
+				return await userManager.CreateIdentityAsync(ltiLoginUser, context.Options.SignInAsAuthenticationType);
+			}
+
+			log.Info($"Не нашёл LTI-логин: провайдер {ltiLogin.LoginProvider}, идентификатор {ltiLogin.ProviderKey}");
+
+			if (IsAuthenticated(context.OwinContext))
+			{
+				var ulearnPrincipal = context.OwinContext.Authentication.User;
+				log.Info($"Пришёл LTI-запрос на аутенфикацию, пользователь уже аутенфицирован на ulearn: {ulearnPrincipal.Identity.Name}. Прикрепляю к пользователю LTI-логин");
+				await userManager.AddLoginAsync(ulearnPrincipal.Identity.GetUserId(), ltiLogin);
+
+				return (ClaimsIdentity)ulearnPrincipal.Identity;
+			}
+
+			var usernameContext = new LtiGenerateUserNameContext(context.OwinContext, context.LtiRequest);
+			await context.Options.Provider.GenerateUserName(usernameContext);
+
+			if (string.IsNullOrEmpty(usernameContext.UserName))
+				throw new Exception("Can't generate username");
+			log.Info($"Сгенерировал имя пользователя для LTI-пользователя: {usernameContext.UserName}, ищу пользователя по этому имени");
+
+			var ulearnUser = await userManager.FindByNameAsync(usernameContext.UserName);
+			if (ulearnUser == null)
+			{
+				log.Info("Не нашёл пользователя с таким именем, создаю нового");
+				ulearnUser = new ApplicationUser { UserName = usernameContext.UserName };
+				var result = await userManager.CreateAsync(ulearnUser);
+				if (!result.Succeeded)
+				{
+					var errors = string.Join("\n\n", result.Errors);
+					throw new Exception("Can't create user for LTI: " + errors);
+				}
+			}
+
+			await userManager.AddLoginAsync(ulearnUser.Id, ltiLogin);
+
+			return await userManager.CreateIdentityAsync(ulearnUser, context.Options.SignInAsAuthenticationType);
 		}
 
 		/// <summary>

@@ -5,7 +5,9 @@ using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
+using LtiLibrary.Owin.Security.Lti;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -108,7 +110,7 @@ namespace uLearn.Web.Controllers
 				model.Error = Request.QueryString["error"];
 
 			if (!visibleUnits.Contains(model.Slide.Info.Unit))
-				throw new Exception("Slide is hidden " + slideGuid);
+				return HttpNotFound("Slide is hidden " + slideGuid);
 			return View("Slide", model);
 		}
 
@@ -148,12 +150,17 @@ namespace uLearn.Web.Controllers
 
 			var userId = User.Identity.GetUserId();
 
-			var ltiRequestJson = FindLtiRequestJson();
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.GetSlideById(slideId);
 
-			if (!string.IsNullOrWhiteSpace(ltiRequestJson))
-				await ltiRequestsRepo.Update(userId, slide.Id, ltiRequestJson);
+			var owinRequest = Request.GetOwinContext().Request;
+			if (await owinRequest.IsAuthenticatedLtiRequestAsync())
+			{
+				var ltiRequest = await owinRequest.ParseLtiRequestAsync();
+				await ltiRequestsRepo.Update(userId, slide.Id, ltiRequest.JsonSerialize());
+
+				return Redirect(ltiRequest.Url.AbsoluteUri);
+			}
 
 			await VisitSlide(courseId, slide.Id, userId);
 

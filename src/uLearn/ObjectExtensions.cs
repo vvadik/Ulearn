@@ -6,6 +6,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using Formatting = Newtonsoft.Json.Formatting;
 
 namespace uLearn
 {
@@ -47,16 +48,12 @@ namespace uLearn
 			}
 		}
 
-		public static string JsonSerialize(this object o)
+		public static string JsonSerialize(this object o, Formatting formatting = Formatting.None)
 		{
-			using (var stringWriter = new StringWriter())
-			using (var jsonWriter = new JsonTextWriter(stringWriter))
+			return JsonConvert.SerializeObject(o, formatting, new JsonSerializerSettings
 			{
-				var serializer = new JsonSerializer();
-				serializer.Serialize(jsonWriter, o);
-				stringWriter.Flush();
-				return stringWriter.ToString();
-			}
+				NullValueHandling = NullValueHandling.Ignore
+			});
 		}
 	}
 }
