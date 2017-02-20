@@ -2,6 +2,7 @@
 using log4net;
 using LtiLibrary.Core.Outcomes.v1;
 using Newtonsoft.Json;
+using uLearn.Web.Controllers;
 using uLearn.Web.DataContexts;
 
 namespace uLearn.Web.LTI
@@ -26,7 +27,6 @@ namespace uLearn.Web.LTI
 			var score = visitsRepo.GetScore(slide.Id, userId);
 
 			log.Info($"Надо отправить результаты слайда {slide.Id} пользователя {userId} по LTI. Нашёл LtiRequest: {ltiRequest.JsonSerialize()}");
-			log.Info($"Отправляю результаты на {ltiRequest.LisOutcomeServiceUrl}");
 			UriBuilder uri;
 			try
 			{
@@ -44,9 +44,12 @@ namespace uLearn.Web.LTI
 				uri.Scheme = "http";
 			}
 
-			var outputScore = score / (double)slide.MaxScore;
+			var maxScore = ControllerUtils.GetMaxScoreForUsersSlide(slide, true, false, false);
+			var outputScore = score / (double) maxScore;
+			log.Info($"Отправляю результаты на {ltiRequest.LisOutcomeServiceUrl}: {score} из {maxScore} ({outputScore})");
+
 			/* Sometimes score is bigger then slide's MaxScore, i.e. in case of manual checking */
-			if (score > slide.MaxScore)
+			if (score > maxScore)
 				outputScore = 1;
 			var result = OutcomesClient.PostScore(uri.ToString(), ltiRequest.ConsumerKey, consumerSecret,
 				ltiRequest.LisResultSourcedId, outputScore);
