@@ -33,7 +33,11 @@ namespace RunCsJob
 				token = ConfigurationManager.AppSettings["runnerToken"];
 				sleep = TimeSpan.FromSeconds(int.Parse(ConfigurationManager.AppSettings["sleepSeconds"] ?? "1"));
 				jobsToRequest = int.Parse(ConfigurationManager.AppSettings["jobsToRequest"] ?? "5");
-				Settings = new SandboxRunnerSettings();
+				var deleteSubmissions = bool.Parse(ConfigurationManager.AppSettings["ulearn.runcsjob.deleteSubmissions"] ?? "true");
+				Settings = new SandboxRunnerSettings
+				{
+					DeleteSubmissionsAfterFinish = deleteSubmissions,
+				};
 				var workingDirectory = ConfigurationManager.AppSettings["ulearn.runcsjob.submissionsWorkingDirectory"];
 				if (!string.IsNullOrWhiteSpace(workingDirectory))
 					Settings.WorkingDirectory = new DirectoryInfo(workingDirectory);
