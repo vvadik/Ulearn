@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using log4net;
 using LtiLibrary.Owin.Security.Lti;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
@@ -20,6 +21,8 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class CourseController : Controller
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(CourseController));
+
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
 
@@ -154,9 +157,14 @@ namespace uLearn.Web.Controllers
 			var slide = course.GetSlideById(slideId);
 
 			var owinRequest = Request.GetOwinContext().Request;
+			if (string.Equals(Request.HttpMethod, "POST", StringComparison.OrdinalIgnoreCase))
+			{
+				log.Info("Получил POST-запрос");
+			}
 			if (await owinRequest.IsAuthenticatedLtiRequestAsync())
 			{
 				var ltiRequest = await owinRequest.ParseLtiRequestAsync();
+				log.Info($"Нашёл LTI request в запросе: {ltiRequest.JsonSerialize()}");
 				await ltiRequestsRepo.Update(userId, slide.Id, ltiRequest.JsonSerialize());
 
 				return Redirect(ltiRequest.Url.AbsoluteUri);
