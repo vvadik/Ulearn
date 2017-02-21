@@ -202,13 +202,6 @@ namespace uLearn.Web.Controllers
 			return View();
 		}
 
-		private string FindLtiRequestJson()
-		{
-			var user = User.Identity as ClaimsIdentity;
-			var claim = user?.Claims.FirstOrDefault(c => c.Type.Equals("LtiRequest"));
-			return claim?.Value;
-		}
-
 		private Slide GetInitialSlideForStartup(string courseId, Course course, List<Unit> visibleUnits)
 		{
 			var userId = User.Identity.GetUserId();

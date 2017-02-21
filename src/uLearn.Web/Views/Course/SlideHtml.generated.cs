@@ -1533,12 +1533,12 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t</div>\r\n");
 }
 
 
-	private static string GetGuestOnclick(bool isGuest)
+	public static string GetGuestOnclick(bool isGuest)
 	{
 		return isGuest ? "onclick=loginForContinue()" : "";
 	}
 
-	private static string GetGuestDisable(bool isGuest)
+	public static string GetGuestDisable(bool isGuest)
 	{
 		return isGuest ? "disabled" : null;
 	}

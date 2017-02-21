@@ -345,7 +345,7 @@ namespace uLearn.Web.Controllers
 				Url = Url,
 				Reviews = submissionReviews?.ToList() ?? new List<ExerciseCodeReview>(),
 				ReviewState = reviewState,
-				IsGuest = false,
+				IsGuest = string.IsNullOrEmpty(currentUserId),
 				SubmissionSelectedByUser = submission,
 				Submissions = submissions.ToList(),
 				TopUserReviewComments = topUserReviewComments,
@@ -362,12 +362,13 @@ namespace uLearn.Web.Controllers
 			return lastSubmission;
 		}
 
+		[System.Web.Mvc.AllowAnonymous]
 		public ActionResult Submission(string courseId, Guid slideId, string userId=null, int? submissionId=null, int? manualCheckingId = null, bool isLti = false, bool showOutput = false, bool instructorView = false, bool onlyAccepted = true)
 		{
 			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
 				instructorView = false;
 			
-			var currentUserId = userId ?? User.Identity.GetUserId();
+			var currentUserId = userId ?? (User.Identity.IsAuthenticated ? User.Identity.GetUserId() : "");
 			UserExerciseSubmission submission = null;
 			if (submissionId.HasValue && submissionId.Value > 0)
 			{
