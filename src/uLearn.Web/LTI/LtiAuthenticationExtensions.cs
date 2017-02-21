@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Entity;
+using log4net;
 using LtiLibrary.Core.Common;
 using LtiLibrary.Core.OAuth;
 using LtiLibrary.Owin.Security.Lti;
@@ -13,6 +14,8 @@ namespace uLearn.Web.LTI
 {
 	public static class LtiAuthenticationExtensions
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(LtiAuthenticationExtensions));
+
 		public static IAppBuilder UseLtiAuthentication(this IAppBuilder app)
 		{
 			app.UseLtiAuthentication(new LtiAuthenticationOptions
@@ -27,6 +30,7 @@ namespace uLearn.Web.LTI
 						var oauthTimestampAbsolute = OAuthConstants.Epoch.AddSeconds(context.LtiRequest.Timestamp);
 						if (DateTime.UtcNow - oauthTimestampAbsolute > timeout)
 						{
+							log.Error($"Неправильное время у LTI-запроса: {context.LtiRequest.Timestamp}, сейчас {DateTime.UtcNow}, прошло больше 5 минут");
 							throw new LtiException("Expired " + OAuthConstants.TimestampParameter);
 						}
 

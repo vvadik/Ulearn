@@ -1546,6 +1546,7 @@
     <Content Include="Views\Admin\PreviewCertificates.cshtml" />
     <Content Include="Views\Admin\GenerateCertificatesError.cshtml" />
     <Content Include="Views\Shared\_UlearnUpdatesInvitation.cshtml" />
+    <Content Include="Views\Shared\_YandexMetrika.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
