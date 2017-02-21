@@ -299,6 +299,10 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="codemirror\CsCompleterGenerator.cs" />
     <Compile Include="Controllers\CertificatesController.cs" />
+    <Compile Include="Migrations\201702210620147_AddIsManualCheckingEnabledForOldSolutions.cs" />
+    <Compile Include="Migrations\201702210620147_AddIsManualCheckingEnabledForOldSolutions.Designer.cs">
+      <DependentUpon>201702210620147_AddIsManualCheckingEnabledForOldSolutions.cs</DependentUpon>
+    </Compile>
     <Compile Include="Telegram\ErrorsBot.cs" />
     <Compile Include="Telegram\TelegramBot.cs" />
     <Compile Include="DataContexts\AdditionalScoresRepo.cs" />
@@ -903,6 +907,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201702061047104_AddEnabledAdditionalScoringGroups.resx">
       <DependentUpon>201702061047104_AddEnabledAdditionalScoringGroups.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702210620147_AddIsManualCheckingEnabledForOldSolutions.resx">
+      <DependentUpon>201702210620147_AddIsManualCheckingEnabledForOldSolutions.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

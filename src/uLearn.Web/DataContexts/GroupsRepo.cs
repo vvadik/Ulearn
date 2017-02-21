@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using log4net;
 using Microsoft.AspNet.Identity;
+using uLearn.Quizes;
 using uLearn.Web.Extensions;
 using uLearn.Web.Models;
 
@@ -11,11 +13,21 @@ namespace uLearn.Web.DataContexts
 {
 	public class GroupsRepo
 	{
+		private readonly ILog log = LogManager.GetLogger(typeof(GroupsRepo));
+
 		private readonly ULearnDb db;
+		private readonly SlideCheckingsRepo slideCheckingsRepo;
+		private readonly UserSolutionsRepo userSolutionsRepo;
+		private readonly UserQuizzesRepo userQuizzesRepo;
+
+		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
 		public GroupsRepo(ULearnDb db)
 		{
 			this.db = db;
+			slideCheckingsRepo = new SlideCheckingsRepo(db);
+			userSolutionsRepo = new UserSolutionsRepo(db);
+			userQuizzesRepo = new UserQuizzesRepo(db);
 		}
 
 		public bool CanUserSeeAllCourseGroups(IPrincipal user, string courseId)
@@ -23,7 +35,7 @@ namespace uLearn.Web.DataContexts
 			return user.HasAccessFor(courseId, CourseRole.CourseAdmin);
 		}
 
-		public async Task<Group> CreateGroup(string courseId, string name, string ownerId, bool isPublic=false, bool isManualCheckingEnabled=false)
+		public async Task<Group> CreateGroup(string courseId, string name, string ownerId, bool isPublic=false, bool isManualCheckingEnabled=false, bool isManualCheckingEnabledForOldSolutions=false)
 		{
 			var group = new Group
 			{
@@ -32,6 +44,7 @@ namespace uLearn.Web.DataContexts
 				IsPublic = isPublic,
 				OwnerId = ownerId,
 				IsManualCheckingEnabled = isManualCheckingEnabled,
+				IsManualCheckingEnabledForOldSolutions = isManualCheckingEnabledForOldSolutions,
 			};
 			db.Groups.Add(group);
 			await db.SaveChangesAsync();
@@ -76,12 +89,17 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsPublic, bool newIsManualCheckingEnabled, bool newIsArchived, string newOwnerId)
+		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsPublic, bool newIsManualCheckingEnabled, bool newIsManualCheckingEnabledForOldSolutions, bool newIsArchived, string newOwnerId)
 		{
 			var group = FindGroupById(groupId);
 			group.Name = newName;
 			group.IsPublic = newIsPublic;
 			group.IsManualCheckingEnabled = newIsManualCheckingEnabled;
+
+			if (!group.IsManualCheckingEnabledForOldSolutions && newIsManualCheckingEnabledForOldSolutions)
+				await AddManualCheckingsForOldSolutions(group.CourseId, group.Members.Select(m => m.UserId).ToList());
+
+			group.IsManualCheckingEnabledForOldSolutions = newIsManualCheckingEnabledForOldSolutions;
 			group.IsArchived = newIsArchived;
 			group.OwnerId = newOwnerId;
 			await db.SaveChangesAsync();
@@ -115,7 +133,52 @@ namespace uLearn.Web.DataContexts
 
 				transaction.Commit();
 			}
+
+			var group = FindGroupById(groupId);
+			if (group != null && group.IsManualCheckingEnabledForOldSolutions)
+				await AddManualCheckingsForOldSolutions(group.CourseId, userId);
+
 			return true;
+		}
+
+		private async Task AddManualCheckingsForOldSolutions(string courseId, IEnumerable<string> usersIds)
+		{
+			foreach (var userId in usersIds)
+				await AddManualCheckingsForOldSolutions(courseId, userId);
+		}
+
+		private async Task AddManualCheckingsForOldSolutions(string courseId, string userId)
+		{
+			log.Info($"Создаю ручные проверки для всех решения пользователя {userId} в курсе {courseId}");
+
+			/* For exercises */
+			var acceptedSubmissionsBySlide = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, userId)
+				.GroupBy(s => s.SlideId)
+				.ToDictionary(g => g.Key, g => g.ToList());
+			foreach (var acceptedSubmissionsForSlide in acceptedSubmissionsBySlide.Values)
+				/* If exists at least one manual checking for at least one submissions on slide, then ignore this slide */
+				if (!acceptedSubmissionsForSlide.Any(s => s.ManualCheckings.Any()))
+				{
+					/* Otherwise found the latest accepted submission */
+					var lastSubmission = acceptedSubmissionsForSlide.OrderByDescending(s => s.Timestamp).First();
+					log.Info($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {lastSubmission.SlideId}");
+					await slideCheckingsRepo.AddManualExerciseChecking(courseId, lastSubmission.SlideId, userId, lastSubmission);
+				}
+
+			/* For quizzes */
+			var passedQuizzesIds = userQuizzesRepo.GetIdOfQuizPassedSlides(courseId, userId);
+			var course = courseManager.GetCourse(courseId);
+			foreach (var quizSlideId in passedQuizzesIds)
+			{
+				var slide = course.FindSlideById(quizSlideId) as QuizSlide;
+				if (slide == null || !slide.ManualChecking)
+					continue;
+				if (!userQuizzesRepo.IsWaitingForManualCheck(courseId, quizSlideId, userId))
+				{
+					log.Info($"Создаю ручную проверку для теста {slide.Id}");
+					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, quizSlideId, userId);
+				}
+			}
 		}
 
 		public async Task<bool> AddUserToGroup(int groupId, ApplicationUser user)

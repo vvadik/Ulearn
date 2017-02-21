@@ -70,7 +70,10 @@
 		$form.find('[name="groupId"]').val("");
 		$form.find('[name="name"]').val("");
 		$form.find('[name="isPublic"]').prop('checked', false);
-		$form.find('[name="manualChecking"]').prop('checked', $form.find('[name="manualChecking"]').data('defaultValue'));
+		var manualCheckingEnabled = $form.find('[name="manualChecking"]').data('defaultValue');
+		$form.find('[name="manualChecking"]').prop('checked', manualCheckingEnabled);
+		$form.find('[name="manualCheckingForOldSolutions"]').prop('checked', true)
+			.closest('.checkbox').toggle(manualCheckingEnabled);
 		$form.find('[name="isArchived"]').prop('checked', false).closest('.checkbox').hide();
 		$form.find('[name="ownerId"]').val($form.find('[name="ownerId"]').data('defaultValue'));
 		$form.find('.scoring-group-checkbox input').prop('checked', false);
@@ -87,6 +90,7 @@
 		var name = $self.data('name');
 		var isPublic = $self.data('isPublic');
 		var manualChecking = $self.data('manualChecking');
+		var manualCheckingForOldSolutions = $self.data('manualCheckingForOldSolutions');
 		var isArchived = $self.data('isArchived');
 		var ownerId = $self.data('ownerId');
 		var scoringGroupsIds = $self.data('scoringGroups').split(',');
@@ -96,6 +100,8 @@
 		$form.find('[name="name"]').val(name);
 		$form.find('[name="isPublic"]').prop('checked', isPublic);
 		$form.find('[name="manualChecking"]').prop('checked', manualChecking);
+		$form.find('[name="manualCheckingForOldSolutions"]').prop('checked', manualCheckingForOldSolutions)
+			.closest('.checkbox').toggle(manualChecking);
 		$form.find('[name="isArchived"]').prop('checked', isArchived).closest('.checkbox').show();
 		$form.find('[name="ownerId"]').val(ownerId);
 		$form.find('.scoring-group-checkbox input').prop('checked', false);
@@ -105,6 +111,13 @@
 		$form.find('button.action-button').text('Сохранить');
 		$form.find('.remove-group-link').data('groupId', groupId).show();
 		$('#createOrUpdateGroupModal').modal();
+	});
+
+	$('#createOrUpdateGroupModal').on('change', '[name=manualChecking]', function() {
+		var $form = $(this).closest('form');
+		var manualChecking = $(this).prop('checked');
+		$form.find('[name="manualCheckingForOldSolutions"]').prop('checked', manualChecking)
+			.closest('.checkbox').toggle(manualChecking);
 	});
 
 	$('.remove-group-link').click(function(e) {

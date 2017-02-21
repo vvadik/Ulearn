@@ -4,6 +4,8 @@ using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
 using System.Threading.Tasks;
+using log4net;
+using uLearn.Quizes;
 using uLearn.Web.Extensions;
 using uLearn.Web.Models;
 

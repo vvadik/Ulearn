@@ -598,14 +598,14 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		public async Task<ActionResult> CreateGroup(string courseId, string name, bool isPublic, bool manualChecking, string ownerId)
+		public async Task<ActionResult> CreateGroup(string courseId, string name, bool isPublic, bool manualChecking, bool manualCheckingForOldSolutions, string ownerId)
 		{
 			if (string.IsNullOrEmpty(ownerId))
 				ownerId = User.Identity.GetUserId();
 
 			log.Info($"Создаю группу «{name}» для курса {courseId} (id владельца {ownerId}, публичная = {isPublic})");
 
-			var group = await groupsRepo.CreateGroup(courseId, name, ownerId, isPublic, manualChecking);
+			var group = await groupsRepo.CreateGroup(courseId, name, ownerId, isPublic, manualChecking, manualCheckingForOldSolutions);
 			log.Info($"Группа «{name}» (Id = {group.Id}) создана");
 
 			var course = courseManager.GetCourse(courseId);
@@ -673,7 +673,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> UpdateGroup(string courseId, int groupId, string name, bool isPublic, bool manualChecking, bool isArchived, string ownerId)
+		public async Task<ActionResult> UpdateGroup(string courseId, int groupId, string name, bool isPublic, bool manualChecking, bool manualCheckingForOldSolutions, bool isArchived, string ownerId)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
 			if (!CanModifyGroup(group) || group.CourseId != courseId)
@@ -681,7 +681,7 @@ namespace uLearn.Web.Controllers
 
 			log.Info($"Обновляю группу «{group.Name}» (Id = {group.Id}) для курса {courseId} (новое название «{name}», Id владельца {ownerId}, публичная = {isPublic})");
 
-			await groupsRepo.ModifyGroup(groupId, name, isPublic, manualChecking, isArchived, ownerId);
+			await groupsRepo.ModifyGroup(groupId, name, isPublic, manualChecking, manualCheckingForOldSolutions, isArchived, ownerId);
 
 			var course = courseManager.GetCourse(group.CourseId);
 			await UpdateEnabledScoringGroupsForGroup(course, groupId);

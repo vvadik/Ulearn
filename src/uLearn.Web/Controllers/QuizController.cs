@@ -196,7 +196,10 @@ namespace uLearn.Web.Controllers
 			{
 				/* If this quiz is already queued for checking for this user, don't add it to queue again */
 				if (quizState != QuizState.WaitForCheck)
+				{
 					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, slideId, userId);
+					await visitsRepo.MarkVisitsAsWithManualChecking(slideId, userId);
+				}
 			}
 			else
 			{

@@ -45,6 +45,10 @@ namespace uLearn.Web.Models
 		public bool IsManualCheckingEnabled { get; set; }
 
 		[Required]
+		/* Если опция выключена, то старые решения не будут отправлены на код-ревью в момент вступления в группу */
+		public bool IsManualCheckingEnabledForOldSolutions { get; set; }
+
+		[Required]
 		/* Могут ли студенты этой группы видеть сводную таблицу прогресса по курсу всех студентов группы */
 		public bool CanUsersSeeGroupProgress { get; set; }
 

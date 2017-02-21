@@ -20,13 +20,14 @@ namespace uLearn.Web.DataContexts
 		private readonly ULearnDb db;
 		private readonly TextsRepo textsRepo;
 		private readonly VisitsRepo visitsRepo;
-		private readonly CourseManager courseManager = WebCourseManager.Instance;
+		private readonly CourseManager courseManager;
 
 		public UserSolutionsRepo(ULearnDb db)
 		{
 			this.db = db;
 			textsRepo = new TextsRepo(db);
 			visitsRepo = new VisitsRepo(db);
+			courseManager = WebCourseManager.Instance;
 		}
 
 		/* TODO(andgein): Remove isRightAnswer? */
@@ -122,14 +123,14 @@ namespace uLearn.Web.DataContexts
 			return Tuple.Create(likesCount, !votedAlready);
 		}
 
+		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId)
+		{
+			return db.UserExerciseSubmissions.Include(s => s.ManualCheckings).Where(x => x.CourseId == courseId);
+		}
+
 		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds)
 		{
-			return db.UserExerciseSubmissions
-				.Include(s => s.ManualCheckings)
-				.Where(x =>
-					x.CourseId == courseId &&
-					slidesIds.Contains(x.SlideId)
-				);
+			return GetAllSubmissions(courseId).Where(x => slidesIds.Contains(x.SlideId));
 		}
 
 		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish)
@@ -151,11 +152,21 @@ namespace uLearn.Web.DataContexts
 			return GetAllSubmissions(courseId, slidesIds).Where(s => s.AutomaticCheckingIsRightAnswer);
 		}
 
+		public IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId)
+		{
+			return GetAllSubmissions(courseId).Where(s => s.AutomaticCheckingIsRightAnswer);
+		}
+
 		public IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissionsByUser(string courseId, IEnumerable<Guid> slideIds, string userId)
 		{
 			return GetAllAcceptedSubmissions(courseId, slideIds).Where(s => s.UserId == userId);
 		}
-		
+
+		public IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissionsByUser(string courseId, string userId)
+		{
+			return GetAllAcceptedSubmissions(courseId).Where(s => s.UserId == userId);
+		}
+
 		public IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissionsByUser(string courseId, Guid slideId, string userId)
 		{
 			return GetAllAcceptedSubmissionsByUser(courseId, new List<Guid> { slideId }, userId);
