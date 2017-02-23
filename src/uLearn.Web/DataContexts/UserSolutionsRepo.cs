@@ -1,6 +1,7 @@
 ﻿using RunCsJob.Api;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
@@ -245,7 +246,7 @@ namespace uLearn.Web.DataContexts
 		{
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 			List<UserExerciseSubmission> submissions;
-			using (var transaction = db.Database.BeginTransaction())
+			using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
 			{
 				submissions = db.UserExerciseSubmissions
 					.Where(s =>
