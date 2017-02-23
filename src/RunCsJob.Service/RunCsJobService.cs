@@ -27,7 +27,7 @@ namespace RunCsJob.Service
 			if (threadsCount < 1)
 			{
 				log.Error($"Не могу определить количество потоков для запуска из конфигурации: ${threadsCount}. Количество потоков должно быть положительно");
-				throw new ArgumentOutOfRangeException(nameof(threadsCount), "Number of threads (appSettings/threadsCount) should be positive");
+				throw new ArgumentOutOfRangeException(nameof(threadsCount), "Number of threads (appSettings/ulearn.runcsjob.threadsCount) should be positive");
 			}
 			log.Info($"Запускаю {threadsCount} потока(ов)");
 			for (var i = 0; i < threadsCount; i++)

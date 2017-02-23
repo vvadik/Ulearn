@@ -8,7 +8,6 @@ namespace uLearn.Web.Migrations
         public override void Up()
         {
             AddColumn("dbo.Groups", "IsManualCheckingEnabledForOldSolutions", c => c.Boolean(nullable: false));
-            Sql("UPDATE dbo.Groups SET [IsManualCheckingEnabledForOldSolutions] = [IsManualCheckingEnabled]");
         }
         
         public override void Down()
