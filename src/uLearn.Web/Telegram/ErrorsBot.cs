@@ -15,6 +15,24 @@ namespace uLearn.Web.Telegram
 			channel = WebConfigurationManager.AppSettings["ulearn.telegram.errors.channel"];
 		}
 
+		public void PostToChannel(string message, ParseMode parseMode = ParseMode.Default)
+		{
+			if (!IsBotEnabled)
+				return;
+
+			log.Info($"Отправляю в телеграм-канал {channel} сообщение об ошибке:\n{message}");
+			try
+			{
+				telegramClient.SendTextMessageAsync(channel, message, parseMode: parseMode, disableWebPagePreview: true)
+					.GetAwaiter()
+					.GetResult();
+			}
+			catch (Exception e)
+			{
+				log.Error($"Не могу отправить сообщение в телеграм-канал {channel}", e);
+			}
+		}
+
 		public void PostToChannel(string errorId, Error error)
 		{
 			if (!IsBotEnabled)
@@ -25,17 +43,8 @@ namespace uLearn.Web.Telegram
 			var text = $"*Произошла ошибка {EscapeMarkdown(errorId)}*\n" + 
 				$"{EscapeMarkdown(error.Exception.Message)}\n\n" + 
 				$"Подробности: {EscapeMarkdown(elmahUrl)}";
-			log.Info($"Отправляю в телеграм-канал {channel} сообщение об ошибке:\n{text}");
-			try
-			{
-				telegramClient.SendTextMessageAsync(channel, text, parseMode: ParseMode.Markdown, disableWebPagePreview: true)
-					.GetAwaiter()
-					.GetResult();
-			}
-			catch (Exception e)
-			{
-				log.Error($"Не могу отправить сообщение в телеграм-канал {channel}", e);
-			}
+			
+			PostToChannel(text, ParseMode.Markdown);
 		}
 	}
 }

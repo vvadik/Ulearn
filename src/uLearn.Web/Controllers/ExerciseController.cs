@@ -13,6 +13,7 @@ using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
 using uLearn.Web.Models;
+using uLearn.Web.Telegram;
 
 namespace uLearn.Web.Controllers
 {
@@ -20,6 +21,8 @@ namespace uLearn.Web.Controllers
 	public class ExerciseController : Controller
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(ExerciseController));
+		private readonly ErrorsBot errorsBot = new ErrorsBot();
+
 		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly GroupsRepo groupsRepo;
@@ -77,7 +80,6 @@ namespace uLearn.Web.Controllers
 			return Json(result);
 		}
 
-
 		private async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string userCode)
 		{
 			var exerciseBlock = exerciseSlide.Exercise;
@@ -93,9 +95,12 @@ namespace uLearn.Web.Controllers
 				GenerateSubmissionName(exerciseSlide), executionTimeout
 				);
 
+			var course = courseManager.GetCourse(courseId);
+
 			if (submission == null)
 			{
-				log.Error($"Не смог запустить проверку решения, никто не взял его на проверку.\nКурс: {courseId}, слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})");
+				log.Error($"Не смог запустить проверку решения, никто не взял его на проверку.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})");
+				errorsBot.PostToChannel($"Не смог запустить проверку решения, никто не взял его на проверку.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})\n\nhttps://ulearn.me/Sandbox");
 				return new RunSolutionResult
 				{
 					IsCompillerFailure = true,
@@ -103,8 +108,6 @@ namespace uLearn.Web.Controllers
 					ExecutionServiceName = "uLearn"
 				};
 			}
-
-			var course = courseManager.GetCourse(courseId);
 
 			var automaticChecking = submission.AutomaticChecking;
 			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
