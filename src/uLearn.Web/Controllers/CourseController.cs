@@ -177,7 +177,8 @@ namespace uLearn.Web.Controllers
 			/* Try to send score via LTI immediately after slide visiting */
 			try
 			{
-				LtiUtils.SubmitScore(slide, userId, visit);
+				if (visit.IsPassed)
+					LtiUtils.SubmitScore(slide, userId, visit);
 			}
 			catch (Exception e)
 			{
