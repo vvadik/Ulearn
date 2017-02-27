@@ -52,7 +52,7 @@ namespace uLearn.Web.LTI
 		private static async Task<ClaimsIdentity> GetIdentityForLtiLogin(LtiAuthenticatedContext context, ULearnDb db, UserLoginInfo ltiLogin)
 		{
 			var userManager = new ULearnUserManager(db);
-			using (var transaction = db.Database.BeginTransaction(IsolationLevel.RepeatableRead))
+			using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
 			{
 				var ltiLoginUser = await userManager.FindAsync(ltiLogin);
 				if (ltiLoginUser != null)
