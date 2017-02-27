@@ -10,6 +10,7 @@ using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using JetBrains.Annotations;
 using log4net;
 using uLearn.Model.Blocks;
 
@@ -53,13 +54,14 @@ namespace uLearn
 			return courses.Values;
 		}
 
+		[NotNull]
 		public virtual Course GetCourse(string courseId)
 		{
 			LoadCoursesIfNotYet();
 			return courses.Get(courseId);
 		}
 
-
+		[CanBeNull]
 		public Course FindCourse(string courseId)
 		{
 			try
@@ -101,7 +103,7 @@ namespace uLearn
 
 		public DirectoryInfo GetExtractedVersionDirectory(Guid versionId)
 		{
-			return GetExtractedCourseDirectory(Utils.GetNormalizedGuid(versionId));
+			return GetExtractedCourseDirectory(versionId.GetNormalizedGuid());
 		}
 
 		public FileInfo GetCourseVersionFile(Guid versionId)
@@ -235,7 +237,7 @@ namespace uLearn
 
 		public string GetPackageName(Guid versionId)
 		{
-			return Utils.GetNormalizedGuid(versionId) + ".zip";
+			return versionId.GetNormalizedGuid() + ".zip";
 		}
 
 		public DateTime GetLastWriteTime(string courseId)
@@ -277,12 +279,9 @@ namespace uLearn
 			using (var zip = new ZipFile(Encoding.GetEncoding(866)))
 			{
 				zip.AddEntry("Course.xml",
-					string.Format(
-						"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
-						"<Course xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"https://ulearn.azurewebsites.net/course\">\n" +
-						"\t<title>{0}</title>\n" +
-						"</Course>",
-						courseId),
+					"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
+					"<Course xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"https://ulearn.azurewebsites.net/course\">\n" +
+					$"\t<title>{courseId}</title>\n" + "</Course>",
 					Encoding.UTF8);
 				zip.Save(path);
 			}

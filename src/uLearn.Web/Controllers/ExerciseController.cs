@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using log4net;
+using Elmah;
 using Microsoft.AspNet.Identity;
 using uLearn.Model.Blocks;
 using uLearn.Web.DataContexts;
@@ -69,13 +71,25 @@ namespace uLearn.Web.Controllers
 					ErrorMessage = "Слишком большой код"
 				});
 			}
-			var exerciseSlide = courseManager.GetCourse(courseId).FindSlideById(slideId) as ExerciseSlide;
+			var exerciseSlide = courseManager.FindCourse(courseId)?.FindSlideById(slideId) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return HttpNotFound();
 
 			var result = await CheckSolution(courseId, exerciseSlide, code);
 			if (isLti)
-				LtiUtils.SubmitScore(exerciseSlide, User.Identity.GetUserId());
+				try
+				{
+					LtiUtils.SubmitScore(exerciseSlide, User.Identity.GetUserId());
+				}
+				catch (Exception e)
+				{
+					ErrorLog.GetDefault(System.Web.HttpContext.Current).Log(new Error(e));
+					return Json(new RunSolutionResult
+					{
+						IsCompillerFailure = true,
+						ErrorMessage = "Мы не смогли отправить баллы на вашу образовательную платформу. Пожалуйста, попробуйте ещё раз."
+					});
+				}
 
 			return Json(result);
 		}

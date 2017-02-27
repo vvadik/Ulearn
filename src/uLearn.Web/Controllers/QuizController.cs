@@ -20,7 +20,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class QuizController : Controller
 	{
-		private static ILog log = LogManager.GetLogger(typeof(QuizController));
+		private readonly static ILog log = LogManager.GetLogger(typeof(QuizController));
 
 		private const int MAX_DROPS_COUNT = 1;
 		public const int MAX_FILLINBLOCK_SIZE = 1024;
@@ -135,7 +135,10 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Tester)]
 		public async Task<ActionResult> ClearAnswers(string courseId, Guid slideId, bool isLti)
 		{
-			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId) as QuizSlide;
+			if (slide == null)
+				return HttpNotFound();
+
 			var userId = User.Identity.GetUserId();
 			await userQuizzesRepo.RemoveAnswers(userId, slideId);
 			await visitsRepo.RemoveAttempts(slideId, userId);
@@ -152,7 +155,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> SubmitQuiz(string courseId, Guid slideId, string answer, bool isLti)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var slide = (QuizSlide) course.FindSlideById(slideId);
+			var slide = course.FindSlideById(slideId) as QuizSlide;
 			if (slide == null)
 				return new HttpNotFoundResult();
 
