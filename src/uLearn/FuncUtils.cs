@@ -13,7 +13,7 @@ namespace uLearn
 			for (var tryIndex = 0; tryIndex < triesCount; tryIndex++)
 				try
 				{
-					return func.Invoke();
+					return func();
 				}
 				catch (Exception e) when (e.GetType().IsSubclassOf(exceptionType))
 				{
