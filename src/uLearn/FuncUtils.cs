@@ -9,6 +9,7 @@ namespace uLearn
 
 		public static T TrySeveralTimes<T>(Func<T> func, int triesCount, Action runAfterFail, Type exceptionType)
 		{
+			log.Info($"Попытка 1 из {triesCount}");
 			for (var tryIndex = 0; tryIndex < triesCount; tryIndex++)
 				try
 				{
@@ -20,6 +21,11 @@ namespace uLearn
 						throw;
 					log.Warn($"Не удалось, попробую ещё раз (попытка {tryIndex + 2} из {triesCount})");
 					runAfterFail.Invoke();
+				}
+				catch (Exception e)
+				{
+					log.Info($"На попытке {tryIndex + 1} произошло исключение {e.Message}");
+					throw;
 				}
 			throw new Exception($"Can\'t run function {func} for {triesCount} times");
 		}
