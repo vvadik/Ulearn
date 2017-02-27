@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
@@ -65,6 +66,7 @@ namespace uLearn.Web.DataContexts
 				// It's ok, just tried to insert text with hash which already exists, try to find it
 				if (!db.Texts.AsNoTracking().Any(t => t.Hash == hash))
 					throw;
+				db.Entry(blob).State = EntityState.Unchanged;
 			}
 			return blob;
 		}

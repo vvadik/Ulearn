@@ -131,6 +131,7 @@
     <Compile Include="CSharp\CsMembersRemover.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="FileSystemExtensions.cs" />
+    <Compile Include="FuncUtils.cs" />
     <Compile Include="ISolutionValidator.cs" />
     <Compile Include="ExerciseSlide.cs" />
     <Compile Include="ExpectedOutput.cs" />

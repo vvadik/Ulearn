@@ -19,6 +19,7 @@ namespace uLearn.Web.DataContexts
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly UserQuizzesRepo userQuizzesRepo;
+		private readonly VisitsRepo visitsRepo;
 
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
@@ -28,6 +29,7 @@ namespace uLearn.Web.DataContexts
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 			userSolutionsRepo = new UserSolutionsRepo(db);
 			userQuizzesRepo = new UserQuizzesRepo(db);
+			visitsRepo = new VisitsRepo(db);
 		}
 
 		public bool CanUserSeeAllCourseGroups(IPrincipal user, string courseId)
@@ -163,6 +165,7 @@ namespace uLearn.Web.DataContexts
 					var lastSubmission = acceptedSubmissionsForSlide.OrderByDescending(s => s.Timestamp).First();
 					log.Info($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {lastSubmission.SlideId}");
 					await slideCheckingsRepo.AddManualExerciseChecking(courseId, lastSubmission.SlideId, userId, lastSubmission);
+					await visitsRepo.MarkVisitsAsWithManualChecking(lastSubmission.SlideId, userId);
 				}
 
 			/* For quizzes */
@@ -177,6 +180,7 @@ namespace uLearn.Web.DataContexts
 				{
 					log.Info($"Создаю ручную проверку для теста {slide.Id}");
 					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, quizSlideId, userId);
+					await visitsRepo.MarkVisitsAsWithManualChecking(quizSlideId, userId);
 				}
 			}
 		}

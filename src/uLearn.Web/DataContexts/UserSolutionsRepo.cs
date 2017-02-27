@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
@@ -254,6 +255,11 @@ namespace uLearn.Web.DataContexts
 		}
 
 		public List<UserExerciseSubmission> GetUnhandledSubmissions(int count)
+		{
+			return FuncUtils.TrySeveralTimes(() => TryGetExerciseSubmissions(count), 3, typeof(DbUpdateException));
+		}
+
+		private List<UserExerciseSubmission> TryGetExerciseSubmissions(int count)
 		{
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 			List<UserExerciseSubmission> submissions;
