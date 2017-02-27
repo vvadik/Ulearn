@@ -44,11 +44,17 @@ namespace uLearn.Web.Extensions
 										   ";
 		private static readonly Regex urlRegex = new Regex(urlRegexS, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-		public static string EncodeMultiLineText(this HtmlHelper helper, string text)
+		public static string EncodeMultiLineText(this HtmlHelper helper, string text, bool keepFirstSpaces=false)
 		{
 			if (string.IsNullOrEmpty(text))
 				return string.Empty;
-			return helper.Encode(text).Replace("\n", "<br />").Replace("\r", "");
+
+			text = helper.Encode(text);
+
+			if (keepFirstSpaces)
+				text = Regex.Replace(text, @"^\s+", m => string.Concat(Enumerable.Repeat("&nbsp;", m.Value.Length)), RegexOptions.Multiline);
+
+			return text.Replace("\n", "<br/>").Replace("\r", "");
 		}
 
 		private static bool IsEmailUrl(string url)

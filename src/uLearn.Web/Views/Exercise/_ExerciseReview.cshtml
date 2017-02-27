@@ -30,6 +30,6 @@
 		}
 	</div>
 	<div class="exercise__review__comment">
-		@Html.Raw(Html.EncodeMultiLineText(Model.Review.Comment))
+		@Html.Raw(Html.EncodeMultiLineText(Model.Review.Comment, keepFirstSpaces: true))
 	</div>
 </div>
