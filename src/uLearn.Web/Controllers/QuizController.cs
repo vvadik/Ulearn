@@ -20,7 +20,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class QuizController : Controller
 	{
-		private readonly static ILog log = LogManager.GetLogger(typeof(QuizController));
+		private static readonly ILog log = LogManager.GetLogger(typeof(QuizController));
 
 		private const int MAX_DROPS_COUNT = 1;
 		public const int MAX_FILLINBLOCK_SIZE = 1024;

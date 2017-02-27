@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Elmah;
 using log4net;
 using LtiLibrary.Owin.Security.Lti;
 using uLearn.Model.Blocks;
@@ -14,6 +13,7 @@ using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
+using uLearn.Web.LTI;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -172,7 +172,17 @@ namespace uLearn.Web.Controllers
 				return Redirect(uriBuilder.Uri.AbsoluteUri);
 			}
 
-			await VisitSlide(courseId, slide.Id, userId);
+			var visit = await VisitSlide(courseId, slide.Id, userId);
+
+			/* Try to send score via LTI immediately after slide visiting */
+			try
+			{
+				LtiUtils.SubmitScore(slide, userId, visit);
+			}
+			catch (Exception e)
+			{
+				ErrorLog.GetDefault(System.Web.HttpContext.Current).Log(new Error(e));
+			}
 
 			var exerciseSlide = slide as ExerciseSlide;
 			if (exerciseSlide != null)

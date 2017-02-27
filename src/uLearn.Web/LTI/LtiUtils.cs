@@ -4,6 +4,7 @@ using LtiLibrary.Core.Outcomes.v1;
 using Newtonsoft.Json;
 using uLearn.Web.Controllers;
 using uLearn.Web.DataContexts;
+using uLearn.Web.Models;
 
 namespace uLearn.Web.LTI
 {
@@ -11,7 +12,7 @@ namespace uLearn.Web.LTI
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(LtiUtils));
 
-		public static void SubmitScore(Slide slide, string userId)
+		public static void SubmitScore(Slide slide, string userId, Visit visit=null)
 		{
 			var db = new ULearnDb();
 			var ltiRequestsRepo = new LtiRequestsRepo(db);
@@ -24,7 +25,7 @@ namespace uLearn.Web.LTI
 
 			var consumerSecret = consumersRepo.Find(ltiRequest.ConsumerKey).Secret;
 
-			var score = visitsRepo.GetScore(slide.Id, userId);
+			var score = visit?.Score ?? visitsRepo.GetScore(slide.Id, userId);
 
 			log.Info($"Надо отправить результаты слайда {slide.Id} пользователя {userId} по LTI. Нашёл LtiRequest: {ltiRequest.JsonSerialize()}");
 			UriBuilder uri;
