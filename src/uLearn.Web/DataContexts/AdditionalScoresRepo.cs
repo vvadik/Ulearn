@@ -62,6 +62,14 @@ namespace uLearn.Web.DataContexts
 				.ToDictionary(s => Tuple.Create(s.UserId, s.ScoringGroupId), s => s);
 		}
 
+		/* Dictionary<(userId, unitId, scoringGroupId), additionalScore> */
+		public Dictionary<Tuple<string, Guid, string>, AdditionalScore> GetAdditionalScoresForUsers(string courseId, IEnumerable<string> usersIds)
+		{
+			return db.AdditionalScores
+				.Where(s => s.CourseId == courseId && usersIds.Contains(s.UserId))
+				.ToDictionary(s => Tuple.Create(s.UserId, s.UnitId, s.ScoringGroupId), s => s);
+		}
+
 		public async Task RemoveAdditionalScores(string courseId, Guid unitId, string userId, string scoringGroupId)
 		{
 			var scores = db.AdditionalScores.Where(s => s.CourseId == courseId && s.UnitId == unitId && s.UserId == userId && s.ScoringGroupId == scoringGroupId);

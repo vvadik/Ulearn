@@ -3,16 +3,36 @@ using System.Collections.Generic;
 
 namespace uLearn.Web.Models
 {
-	public class UnitStatisticPageModel
+	public class StatisticPageModel
 	{
 		public Course Course { get; set; }
-		public Unit Unit { get; set; }
-		public List<Unit> Units { get; set; }
 		public string GroupId { get; set; }
 		public List<Group> Groups { get; set; }
 
 		public DateTime PeriodStart { get; set; }
 		public DateTime PeriodFinish { get; set; }
+
+		public List<UnitStatisticUserInfo> VisitedUsers { get; set; }
+		public bool VisitedUsersIsMore { get; set; }
+
+		public Dictionary<string, List<int>> UsersGroupsIds { get; set; }
+		public Dictionary<int, List<string>> EnabledAdditionalScoringGroupsForGroups { get; set; }
+	}
+
+	public class CourseStatisticPageModel : StatisticPageModel
+	{
+		/* Dictionary<(userId, unitId, scoringGroupId), additionalScore> */
+		public Dictionary<Tuple<string, Guid, string>, int> AdditionalScores { get; set; }
+
+		public Dictionary<string, ScoringGroup> ScoringGroups { get; set; }
+		/* Dictionary<(userId, unitId, scoringGroupId), visitScore> */
+		public Dictionary<Tuple<string, Guid, string>, int> ScoreByUserUnitScoringGroup { get; set; }
+	}
+
+	public class UnitStatisticPageModel : StatisticPageModel
+	{
+		public Unit Unit { get; set; }
+		public List<Unit> Units { get; set; }
 
 		public List<Slide> Slides { get; set; }
 		public Dictionary<Guid, List<Visit>> SlidesVisits { get; set; }
@@ -26,14 +46,11 @@ namespace uLearn.Web.Models
 		public Dictionary<Guid, int> ExercisesSolutionsCount { get; set; }
 		public Dictionary<Guid, int> ExercisesAcceptedSolutionsCount { get; set; }
 
-		public List<UnitStatisticUserInfo> VisitedUsers { get; set; }
-		public bool VisitedUsersIsMore { get; set; }
 		public Dictionary<string, int> VisitedSlidesCountByUser { get; set; }
 		public Dictionary<string, int> VisitedSlidesCountByUserAllTime { get; set; }
 
+		/* Dictionary<(userId, scoringGroupId), additionalScore> */
 		public Dictionary<Tuple<string, string>, int> AdditionalScores { get; set; }
-		public Dictionary<string, List<int>> UsersGroupsIds { get; set; }
-		public Dictionary<int, List<string>> EnabledAdditionalScoringGroupsForGroups { get; set; }
 	}
 
 	public class UnitStatisticUserInfo

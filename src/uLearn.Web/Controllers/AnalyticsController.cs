@@ -94,6 +94,7 @@ namespace uLearn.Web.Controllers
 				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).Count());
 			
 			var usersIds = visitsRepo.GetVisitsInPeriod(filterOptions).DistinctBy(v => v.UserId).Select(v => v.UserId);
+			/* If we filtered out users from one or several groups show them all */
 			if (filterOptions.UsersIds != null && !filterOptions.IsUserIdsSupplement)
 				usersIds = filterOptions.UsersIds;
 			var visitedUsers = usersIds
@@ -150,6 +151,84 @@ namespace uLearn.Web.Controllers
 				VisitedSlidesCountByUser = visitedSlidesCountByUser,
 				VisitedSlidesCountByUserAllTime = visitedSlidesCountByUserAllTime,
 
+				AdditionalScores = additionalScores,
+				UsersGroupsIds = usersGroupsIds,
+				EnabledAdditionalScoringGroupsForGroups = enabledAdditionalScoringGroupsForGroups,
+			};
+			return View(model);
+		}
+
+		/*TODO: extract copy-paste */
+		public ActionResult CourseStatistics(CourseStatisticsParams param)
+		{
+			const int usersLimit = 200;
+
+			var courseId = param.CourseId;
+			var periodStart = param.PeriodStartDate;
+			var periodFinish = param.PeriodFinishDate;
+			var groupId = param.Group;
+
+			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
+
+			var course = courseManager.GetCourse(courseId);
+			var slidesIds = course.Slides.Select(s => s.Id).ToList();
+
+			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupId);
+			filterOptions.SlidesIds = slidesIds;
+			filterOptions.PeriodStart = periodStart;
+			filterOptions.PeriodFinish = realPeriodFinish;
+
+			var usersIds = visitsRepo.GetVisitsInPeriod(filterOptions).DistinctBy(v => v.UserId).Select(v => v.UserId);
+			/* If we filtered out users from one or several groups show them all */
+			if (filterOptions.UsersIds != null && !filterOptions.IsUserIdsSupplement)
+				usersIds = filterOptions.UsersIds;
+
+			var visitedUsers = usersIds
+				.Join(db.Users, v => v, u => u.Id, (v, u) => new UnitStatisticUserInfo { UserId = u.Id, UserName = u.UserName, UserVisibleName = (u.LastName + u.FirstName != "" ? u.LastName + " " + u.FirstName : u.UserName).Trim() })
+				.ToList();
+			var isMore = visitedUsers.Count > usersLimit;
+
+			var unitBySlide = course.Units.SelectMany(u => u.Slides.Select(s => Tuple.Create(u.Id, s.Id))).ToDictionary(p => p.Item2, p => p.Item1);
+			var scoringGroups = course.Settings.Scoring.Groups;
+			var scoreByUserUnitScoringGroup = ((IEnumerable<Visit>) visitsRepo.GetVisitsInPeriod(filterOptions))
+				.GroupBy(v => Tuple.Create(v.UserId, unitBySlide[v.SlideId], course.FindSlideById(v.SlideId).ScoringGroup))
+				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score));
+
+			var visitedSlidesCountByUserAllTime = visitsRepo.GetVisitsInPeriod(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(DateTime.MaxValue))
+				.GroupBy(v => v.UserId)
+				.ToDictionary(g => g.Key, g => g.Count());
+
+			/* Get `usersLimit` best by slides count and order them by name */
+			visitedUsers = visitedUsers
+				.OrderByDescending(u => visitedSlidesCountByUserAllTime.GetOrDefault(u.UserId, 0))
+				.Take(usersLimit)
+				.OrderBy(u => u.UserVisibleName)
+				.ToList();
+
+			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();
+			var additionalScores = additionalScoresRepo
+				.GetAdditionalScoresForUsers(courseId, visitedUsersIds)
+				.ToDictionary(kv => kv.Key, kv => kv.Value.Score);
+			var usersGroupsIds = groupsRepo.GetUsersGroupsIds(courseId, visitedUsersIds);
+			var enabledAdditionalScoringGroupsForGroups = groupsRepo.GetEnabledAdditionalScoringGroups(courseId)
+				.GroupBy(e => e.GroupId)
+				.ToDictionary(g => g.Key, g => g.Select(e => e.ScoringGroupId).ToList());
+
+			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+			var model = new CourseStatisticPageModel
+			{
+				Course = course,
+				GroupId = groupId,
+				Groups = groups,
+
+				PeriodStart = periodStart,
+				PeriodFinish = periodFinish,
+
+				VisitedUsers = visitedUsers,
+				VisitedUsersIsMore = isMore,
+
+				ScoringGroups = scoringGroups,
+				ScoreByUserUnitScoringGroup = scoreByUserUnitScoringGroup,
 				AdditionalScores = additionalScores,
 				UsersGroupsIds = usersGroupsIds,
 				EnabledAdditionalScoringGroupsForGroups = enabledAdditionalScoringGroupsForGroups,
@@ -256,7 +335,7 @@ namespace uLearn.Web.Controllers
 		{
 			var q = from s in actions
 					group s by DbFunctions.TruncateTime(s.Timestamp)
-				into day
+					into day
 					select new { day.Key, sum = day.Sum(v => v.Score), count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
 			return q.ToDictionary(d => d.Key.Value, d => Tuple.Create(d.count, d.sum));
 		}
@@ -275,7 +354,7 @@ namespace uLearn.Web.Controllers
 		{
 			var q = from s in actions
 					group s by DbFunctions.TruncateTime(s.Timestamp)
-				into day
+					into day
 					select new { day.Key, count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
 			return q.ToDictionary(d => d.Key.Value, d => d.count);
 		}
@@ -395,10 +474,9 @@ namespace uLearn.Web.Controllers
 		}
 	}
 
-	public class UnitStatisticsParams
+	public class StatisticsParams
 	{
 		public string CourseId { get; set; }
-		public Guid? UnitId { get; set; }
 		
 		public string PeriodStart { get; set; }
 		public string PeriodFinish { get; set; }
@@ -447,6 +525,15 @@ namespace uLearn.Web.Controllers
 				return result;
 			}
 		}
+	}
+
+	public class CourseStatisticsParams : StatisticsParams
+	{
+	}
+
+	public class UnitStatisticsParams : StatisticsParams
+	{
+		public Guid? UnitId { get; set; }
 	}
 	
 	public class UserUnitStatisticsPageModel

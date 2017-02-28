@@ -1,0 +1,100 @@
+﻿@using uLearn
+@using uLearn.Web.Extensions
+@model CourseStatisticPageModel
+
+@{
+	ViewBag.Title = Model.Course.Title;
+}
+
+<body>
+<div class="container">
+	<h2>@Model.Course.Title</h2>
+
+	<div class="analytics__dashboard">
+		@using (Html.BeginForm("CourseStatistics", "Analytics", FormMethod.Get, new { @class = "form-inline", id = "unit-statistics-filter-form" }))
+		{
+			@Html.Hidden("courseId", Model.Course.Id)
+
+			<div id="filters" class="hidden-xs-inline">
+				<div class="form-group sm-ml10 ib">
+					с @Html.TextBox("periodStart", Model.PeriodStart.ToString("dd.MM.yyyy"), new { @class = "form-control form-control-date datetimepicker ib" })
+				</div>
+
+				<div class="form-group ib">
+					по @Html.TextBox("periodFinish", Model.PeriodFinish.ToString("dd.MM.yyyy"), new { @class = "form-control form-control-date datetimepicker ib" })
+				</div>
+
+				<div class="form-group">
+					@{
+						var groupsListItems = new List<SelectListItem>
+						{
+							new SelectListItem { Text = "Все пользователи", Value = "all", Selected = Model.GroupId == "all" },
+							new SelectListItem { Text = "Мои группы", Value = "", Selected = string.IsNullOrEmpty(Model.GroupId) }
+						};
+						if (User.HasAccessFor(Model.Course.Id, CourseRole.CourseAdmin))
+						{
+							groupsListItems.Insert(1, new SelectListItem { Text = "Ни в одной группе", Value = "not-in-group", Selected = Model.GroupId == "not-in-group" });
+						}
+						groupsListItems.AddRange(
+							Model.Groups.Select(group => new SelectListItem { Text = group.Name, Value = group.Id.ToString(), Selected = group.Id.ToString() == Model.GroupId })
+							);
+					}
+					@Html.DropDownList("group", groupsListItems, new { @class = "form-control" })
+				</div>
+
+				<div class="form-group">
+					<button role="button" class="btn btn-primary">Отфильтровать</button>
+				</div>
+			</div>
+		}
+
+		<table>
+			<thead>
+			<tr>
+				<th rowspan="2">Пользователь</th>
+				@foreach (var unit in Model.Course.Units)
+				{
+					<th colspan="@Model.ScoringGroups.Count" title="@unit.Title">@unit.Title.TruncateWithEllipsis(10)</th>
+				}
+			</tr>
+			<tr>
+				@foreach (var unit in Model.Course.Units)
+				{
+					foreach (var scoringGroup in Model.ScoringGroups.Values)
+					{
+						<th>@scoringGroup.Abbreviation</th>
+					}
+				}
+			</tr>
+			</thead>
+			<tbody>
+				@foreach (var user in Model.VisitedUsers)
+				{
+					<tr>
+						<td title="@user.UserName">@user.UserVisibleName</td>
+						@foreach (var unit in Model.Course.Units)
+						{
+							foreach (var scoringGroup in Model.ScoringGroups.Values)
+							{
+								<td>
+								@(
+									Model.ScoreByUserUnitScoringGroup.GetOrDefault(
+										Tuple.Create(user.UserId, unit.Id, scoringGroup.Id),
+										0
+										)
+									+
+									Model.AdditionalScores.GetOrDefault(
+										Tuple.Create(user.UserId, unit.Id, scoringGroup.Id),
+										0
+									)
+								)
+								</td>
+							}
+						}
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+</body>
