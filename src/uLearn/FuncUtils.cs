@@ -16,14 +16,14 @@ namespace uLearn
 			for (var tryIndex = 0; tryIndex < triesCount; tryIndex++)
 				try
 				{
-					return await func();
+					return await func().ConfigureAwait(false);
 				}
 				catch (Exception e) when (exceptionType.IsInstanceOfType(e))
 				{
 					if (tryIndex >= triesCount - 1)
 						throw;
 					log.Warn($"Не удалось, попробую ещё раз (попытка {tryIndex + 2} из {triesCount})");
-					await runAfterFail();
+					await runAfterFail().ConfigureAwait(false);
 				}
 				catch (Exception e)
 				{
