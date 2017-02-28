@@ -34,11 +34,11 @@ namespace uLearn.Web.LTI
 				var providerKey = context.LtiRequest.UserId;
 				var ltiLogin = new UserLoginInfo(loginProvider, providerKey);
 
-				identity = await FuncUtils.TrySeveralTimes(
+				identity = await FuncUtils.TrySeveralTimesAsync(
 					// ReSharper disable once AccessToDisposedClosure
-					async () => await GetIdentityForLtiLogin(context, db, ltiLogin),
+					() => GetIdentityForLtiLogin(context, db, ltiLogin),
 					3,
-					async () => await Task.Delay(200)
+					() => Task.Delay(200)
 				);
 			}
 

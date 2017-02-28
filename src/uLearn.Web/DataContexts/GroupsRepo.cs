@@ -153,6 +153,8 @@ namespace uLearn.Web.DataContexts
 		{
 			log.Info($"Создаю ручные проверки для всех решения пользователя {userId} в курсе {courseId}");
 
+			var course = courseManager.GetCourse(courseId);
+
 			/* For exercises */
 			var acceptedSubmissionsBySlide = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, userId)
 				.GroupBy(s => s.SlideId)
@@ -163,14 +165,19 @@ namespace uLearn.Web.DataContexts
 				{
 					/* Otherwise found the latest accepted submission */
 					var lastSubmission = acceptedSubmissionsForSlide.OrderByDescending(s => s.Timestamp).First();
-					log.Info($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {lastSubmission.SlideId}");
-					await slideCheckingsRepo.AddManualExerciseChecking(courseId, lastSubmission.SlideId, userId, lastSubmission);
-					await visitsRepo.MarkVisitsAsWithManualChecking(lastSubmission.SlideId, userId);
+
+					var slideId = lastSubmission.SlideId;
+					var slide = course.FindSlideById(slideId) as ExerciseSlide;
+					if (slide == null || !slide.Exercise.RequireReview)
+						continue;
+
+					log.Info($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {slideId}");
+					await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, lastSubmission);
+					await visitsRepo.MarkVisitsAsWithManualChecking(slideId, userId);
 				}
 
 			/* For quizzes */
 			var passedQuizzesIds = userQuizzesRepo.GetIdOfQuizPassedSlides(courseId, userId);
-			var course = courseManager.GetCourse(courseId);
 			foreach (var quizSlideId in passedQuizzesIds)
 			{
 				var slide = course.FindSlideById(quizSlideId) as QuizSlide;
