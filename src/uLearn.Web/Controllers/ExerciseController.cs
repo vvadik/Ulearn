@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using log4net;
@@ -103,6 +102,7 @@ namespace uLearn.Web.Controllers
 				return new RunSolutionResult { IsCompileError = true, ErrorMessage = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
 			if (solution.HasStyleIssues)
 				return new RunSolutionResult { IsStyleViolation = true, ErrorMessage = solution.StyleMessage, ExecutionServiceName = "uLearn" };
+
 			var submission = await solutionsRepo.RunUserSolution(
 				courseId, exerciseSlide.Id, userId,
 				userCode, null, null, false, "uLearn",

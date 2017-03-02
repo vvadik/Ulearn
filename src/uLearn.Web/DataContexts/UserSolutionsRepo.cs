@@ -25,8 +25,8 @@ namespace uLearn.Web.DataContexts
 		private readonly CourseManager courseManager;
 
 		/* Use ConcurrentDictionary as ConcurrentHashSet */
-		private static ConcurrentDictionary<int, byte> unhandledSubmissionsIds = new ConcurrentDictionary<int, byte>();
-		private static ConcurrentDictionary<int, byte> handledSubmissionsIds = new ConcurrentDictionary<int, byte>();
+		private static readonly ConcurrentDictionary<int, byte> unhandledSubmissionsIds = new ConcurrentDictionary<int, byte>();
+		private static readonly ConcurrentDictionary<int, byte> handledSubmissionsIds = new ConcurrentDictionary<int, byte>();
 
 		public UserSolutionsRepo(ULearnDb db)
 		{
@@ -261,7 +261,6 @@ namespace uLearn.Web.DataContexts
 
 		public List<UserExerciseSubmission> GetUnhandledSubmissions(int count)
 		{
-			log.Info("Пытаюсь получить непроверенные решения");
 			return FuncUtils.TrySeveralTimes(() => TryGetExerciseSubmissions(count), 3, typeof(DbUpdateException));
 		}
 
@@ -276,7 +275,8 @@ namespace uLearn.Web.DataContexts
 						s.Timestamp > notSoLongAgo
 						&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting)
 					.OrderByDescending(s => s.Timestamp)
-					.Take(count).ToList();
+					.Take(count)
+					.ToList();
 				foreach (var submission in submissions)
 					submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
 				SaveAll(submissions.Select(s => s.AutomaticChecking));
@@ -312,14 +312,7 @@ namespace uLearn.Web.DataContexts
 				.Where(s => s.AutomaticCheckingId == checking.Id)
 				.ForEach(s => s.AutomaticCheckingIsRightAnswer = checking.IsRightAnswer);
 		}
-
-		protected void Save(AutomaticExerciseChecking checking)
-		{
-			db.AutomaticExerciseCheckings.AddOrUpdate(checking);
-			UpdateIsRightAnswerForSubmission(checking);
-			db.SaveChanges();
-		}
-
+		
 		protected void SaveAll(IEnumerable<AutomaticExerciseChecking> checkings)
 		{
 			foreach (var checking in checkings)
@@ -342,14 +335,19 @@ namespace uLearn.Web.DataContexts
 		public async Task SaveResults(List<RunningResults> results)
 		{
 			var resultsDict = results.ToDictionary(result => result.Id);
-			var submissions = FindSubmissionsByIds(results.Select(result => result.Id).ToList());
-			var res = new List<AutomaticExerciseChecking>();
-			foreach (var submission in submissions)
-				res.Add(await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, resultsDict[submission.Id.ToString()]));
-			SaveAll(res);
+			using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
+			{
+				var submissions = FindSubmissionsByIds(results.Select(result => result.Id).ToList());
+				var res = new List<AutomaticExerciseChecking>();
+				foreach (var submission in submissions)
+					res.Add(await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, resultsDict[submission.Id.ToString()]));
+				SaveAll(res);
 
-			foreach (var submission in submissions)
-				handledSubmissionsIds.TryAdd(submission.Id, 1);
+				foreach (var submission in submissions)
+					handledSubmissionsIds.TryAdd(submission.Id, 1);
+
+				transaction.Commit();
+			}
 		}
 
 		private async Task<AutomaticExerciseChecking> UpdateAutomaticExerciseChecking(AutomaticExerciseChecking checking, RunningResults result)
@@ -410,7 +408,7 @@ namespace uLearn.Web.DataContexts
 				await WaitUntilSubmissionHandled(TimeSpan.FromSeconds(2), submission.Id);
 				var updatedSubmission = FindSubmission(submission.Id);
 				if (updatedSubmission == null)
-					return null;
+					break;
 
 				if (updatedSubmission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Done)
 				{
@@ -418,6 +416,8 @@ namespace uLearn.Web.DataContexts
 					return updatedSubmission;
 				}
 			}
+			byte value;
+			unhandledSubmissionsIds.TryRemove(submission.Id, out value);
 			return null;
 		}
 		
@@ -436,7 +436,10 @@ namespace uLearn.Web.DataContexts
 			while (sw.Elapsed < timeout)
 			{
 				if (unhandledSubmissionsIds.Count > 0)
+				{
+					log.Info($"Список невзятых пока на проверку решений: [{string.Join(", ", unhandledSubmissionsIds.Keys)}]");
 					return;
+				}
 				await Task.Delay(TimeSpan.FromMilliseconds(100));
 			}
 		}

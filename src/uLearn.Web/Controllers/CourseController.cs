@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -146,6 +147,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToRoute("Course.SlideById", new { courseId, slideId = slide.Url });
 		}
 
+		[AllowAnonymous]
 		public async Task<ActionResult> LtiSlide(string courseId, Guid slideId)
 		{
 			if (string.IsNullOrWhiteSpace(courseId))
@@ -171,6 +173,10 @@ namespace uLearn.Web.Controllers
 				};
 				return Redirect(uriBuilder.Uri.AbsoluteUri);
 			}
+
+			/* For now user should be authenticated */
+			if (! User.Identity.IsAuthenticated)
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			var visit = await VisitSlide(courseId, slide.Id, userId);
 

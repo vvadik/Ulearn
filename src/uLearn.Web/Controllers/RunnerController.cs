@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using log4net;
 using RunCsJob.Api;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
@@ -15,6 +16,8 @@ namespace uLearn.Web.Controllers
 {
 	public class RunnerController : ApiController
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(RunnerController));
+
 		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo(new ULearnDb());
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
@@ -27,10 +30,11 @@ namespace uLearn.Web.Controllers
 			while (true)
 			{
 				var repo = new UserSolutionsRepo(new ULearnDb());
-				var exerciseCheckings = repo.GetUnhandledSubmissions(count);
-				if (exerciseCheckings.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
+				var submissions = repo.GetUnhandledSubmissions(count);
+				if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
 				{
-					return exerciseCheckings.Select(ToRunnerSubmission).ToList();
+					log.Info($"Отдаю на проверку решения: [{string.Join(",", submissions.Select(c => c.Id))}]");
+					return submissions.Select(ToRunnerSubmission).ToList();
 				}
 				await repo.WaitAnyUnhandledSubmissions(TimeSpan.FromSeconds(10));
 			}
@@ -64,8 +68,8 @@ namespace uLearn.Web.Controllers
 			if (!ModelState.IsValid)
 				throw new HttpResponseException(HttpStatusCode.BadRequest);
 			CheckRunner(token);
-
-			await userSolutionsRepo.SaveResults(results);
+			log.Info($"Получил от RunCsJob информацию о проверке решений: [{string.Join(", ", results.Select(r => r.Id))}]");
+			await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResults(results), 3);
 		}
 
 

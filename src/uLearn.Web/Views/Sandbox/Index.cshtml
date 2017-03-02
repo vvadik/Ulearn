@@ -25,7 +25,7 @@
 		var name = automaticChecking.DisplayName ?? submission.Id.ToString();
 		<tr class="@SubmissionClass(automaticChecking.GetVerdict()) submitions-item" data-id="@submission.Id">
 			<td>@submission.Id</td>
-			<td>@submission.Timestamp.ToPrettyString()</td>
+			<td title="@submission.Timestamp">@submission.Timestamp.ToPrettyString(true)</td>
 			<td>@automaticChecking.Elapsed</td>
 			<td>@name</td>
 			<td>@automaticChecking.Status</td>

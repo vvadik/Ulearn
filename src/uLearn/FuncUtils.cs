@@ -20,9 +20,10 @@ namespace uLearn
 				}
 				catch (Exception e) when (exceptionType.IsInstanceOfType(e))
 				{
+					log.Error("Исключение:", e);
 					if (tryIndex >= triesCount - 1)
 						throw;
-					log.Warn($"Не удалось, попробую ещё раз (попытка {tryIndex + 2} из {triesCount})");
+					log.Warn($"Попробую ещё раз (попытка {tryIndex + 2} из {triesCount})");
 					await runAfterFail().ConfigureAwait(false);
 				}
 				catch (Exception e)
@@ -40,12 +41,17 @@ namespace uLearn
 
 		public static async Task<T> TrySeveralTimesAsync<T>(Func<Task<T>> func, int triesCount, Type exceptionType)
 		{
-			return await TrySeveralTimesAsync(func, triesCount, () => Task.FromResult(0), exceptionType);
+			return await TrySeveralTimesAsync(func, triesCount, () => Task.Delay(100), exceptionType);
 		}
 
 		public static async Task<T> TrySeveralTimesAsync<T>(Func<Task<T>> func, int triesCount)
 		{
-			return await TrySeveralTimesAsync(func, triesCount, () => Task.FromResult(0));
+			return await TrySeveralTimesAsync(func, triesCount, () => Task.Delay(100));
+		}
+
+		public static async Task TrySeveralTimesAsync(Func<Task> func, int triesCount)
+		{
+			await TrySeveralTimesAsync(async () => { await func(); return 0;}, triesCount, () => Task.Delay(100));
 		}
 
 		public static T TrySeveralTimes<T>(Func<T> func, int triesCount, Action runAfterFail, Type exceptionType)
