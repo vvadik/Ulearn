@@ -30,13 +30,13 @@ namespace uLearn.Web.Controllers
 				var exerciseCheckings = repo.GetUnhandledSubmissions(count);
 				if (exerciseCheckings.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
 				{
-					return exerciseCheckings.Select(ToRunnerSubmition).ToList();
+					return exerciseCheckings.Select(ToRunnerSubmission).ToList();
 				}
-				await repo.WaitUnhandled(TimeSpan.FromSeconds(10));
+				await repo.WaitAnyUnhandledSubmissions(TimeSpan.FromSeconds(10));
 			}
 		}
 
-		private RunnerSubmission ToRunnerSubmition(UserExerciseSubmission submission)
+		private RunnerSubmission ToRunnerSubmission(UserExerciseSubmission submission)
 		{
 			if (submission.IsWebSubmission)
 			{
@@ -58,17 +58,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[Route("PostResult")]
-		public async Task PostResult([FromUri] string token, RunningResults result)
-		{
-			if (!ModelState.IsValid)
-				throw new HttpResponseException(HttpStatusCode.BadRequest);
-			CheckRunner(token);
-
-			await userSolutionsRepo.SaveResults(result);
-		}
-
-		[HttpPost]
 		[Route("PostResults")]
 		public async Task PostResults([FromUri] string token, List<RunningResults> results)
 		{
@@ -76,7 +65,7 @@ namespace uLearn.Web.Controllers
 				throw new HttpResponseException(HttpStatusCode.BadRequest);
 			CheckRunner(token);
 
-			await userSolutionsRepo.SaveAllResults(results);
+			await userSolutionsRepo.SaveResults(results);
 		}
 
 

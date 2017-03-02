@@ -1,5 +1,6 @@
 ﻿using RunCsJob.Api;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
@@ -22,6 +23,10 @@ namespace uLearn.Web.DataContexts
 		private readonly TextsRepo textsRepo;
 		private readonly VisitsRepo visitsRepo;
 		private readonly CourseManager courseManager;
+
+		/* Use ConcurrentDictionary as ConcurrentHashSet */
+		private static ConcurrentDictionary<int, byte> unhandledSubmissionsIds = new ConcurrentDictionary<int, byte>();
+		private static ConcurrentDictionary<int, byte> handledSubmissionsIds = new ConcurrentDictionary<int, byte>();
 
 		public UserSolutionsRepo(ULearnDb db)
 		{
@@ -256,6 +261,7 @@ namespace uLearn.Web.DataContexts
 
 		public List<UserExerciseSubmission> GetUnhandledSubmissions(int count)
 		{
+			log.Info("Пытаюсь получить непроверенные решения");
 			return FuncUtils.TrySeveralTimes(() => TryGetExerciseSubmissions(count), 3, typeof(DbUpdateException));
 		}
 
@@ -277,6 +283,11 @@ namespace uLearn.Web.DataContexts
 
 				transaction.Commit();
 			}
+
+			byte value;
+			foreach (var submission in submissions)
+				unhandledSubmissionsIds.TryRemove(submission.Id, out value);
+
 			return submissions;
 		}
 
@@ -327,16 +338,8 @@ namespace uLearn.Web.DataContexts
 					e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
 			}
 		}
-
-		public async Task SaveResults(RunningResults result)
-		{
-			var submission = FindSubmissionById(result.Id);
-			var updatedChecking = await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, result);
-			Save(updatedChecking);
-			hasHandled = true;
-		}
-
-		public async Task SaveAllResults(List<RunningResults> results)
+		
+		public async Task SaveResults(List<RunningResults> results)
 		{
 			var resultsDict = results.ToDictionary(result => result.Id);
 			var submissions = FindSubmissionsByIds(results.Select(result => result.Id).ToList());
@@ -344,7 +347,9 @@ namespace uLearn.Web.DataContexts
 			foreach (var submission in submissions)
 				res.Add(await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, resultsDict[submission.Id.ToString()]));
 			SaveAll(res);
-			hasHandled = true;
+
+			foreach (var submission in submissions)
+				handledSubmissionsIds.TryAdd(submission.Id, 1);
 		}
 
 		private async Task<AutomaticExerciseChecking> UpdateAutomaticExerciseChecking(AutomaticExerciseChecking checking, RunningResults result)
@@ -395,14 +400,14 @@ namespace uLearn.Web.DataContexts
 				courseId, slideId,
 				code, isRightAnswer, compilationError, output,
 				userId, executionServiceName, displayName);
-			hasUnhandled = true;
-
+			
 			log.Info($"Запускаю проверку решения. ID посылки: {submission.Id}");
+			unhandledSubmissionsIds.TryAdd(submission.Id, 1);
 
 			var sw = Stopwatch.StartNew();
 			while (sw.Elapsed < timeout)
 			{
-				await WaitHandled(TimeSpan.FromSeconds(2));
+				await WaitUntilSubmissionHandled(TimeSpan.FromSeconds(2), submission.Id);
 				var updatedSubmission = FindSubmission(submission.Id);
 				if (updatedSubmission == null)
 					return null;
@@ -425,35 +430,30 @@ namespace uLearn.Web.DataContexts
 			return solutionsHashes.ToDictionary(s => s.SubmissionId, s => textsByHash.GetOrDefault(s.Hash, ""));
 		}
 
-		public async Task WaitUnhandled(TimeSpan timeout)
+		public async Task WaitAnyUnhandledSubmissions(TimeSpan timeout)
 		{
 			var sw = Stopwatch.StartNew();
 			while (sw.Elapsed < timeout)
 			{
-				if (hasUnhandled)
+				if (unhandledSubmissionsIds.Count > 0)
+					return;
+				await Task.Delay(TimeSpan.FromMilliseconds(100));
+			}
+		}
+
+		public async Task WaitUntilSubmissionHandled(TimeSpan timeout, int submissionId)
+		{
+			var sw = Stopwatch.StartNew();
+			while (sw.Elapsed < timeout)
+			{
+				if (handledSubmissionsIds.ContainsKey(submissionId))
 				{
-					hasUnhandled = false;
+					byte value;
+					handledSubmissionsIds.TryRemove(submissionId, out value);
 					return;
 				}
 				await Task.Delay(TimeSpan.FromMilliseconds(100));
 			}
 		}
-
-		public async Task WaitHandled(TimeSpan timeout)
-		{
-			var sw = Stopwatch.StartNew();
-			while (sw.Elapsed < timeout)
-			{
-				if (hasHandled)
-				{
-					hasHandled = false;
-					return;
-				}
-				await Task.Delay(TimeSpan.FromMilliseconds(100));
-			}
-		}
-
-		private static volatile bool hasUnhandled;
-		private static volatile bool hasHandled;
 	}
 }
