@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
-using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
@@ -26,9 +25,9 @@ namespace uLearn.Web.DataContexts
 		private readonly VisitsRepo visitsRepo;
 		private readonly CourseManager courseManager;
 
-		/* Use ConcurrentDictionary as ConcurrentHashSet */
-		private static readonly ConcurrentDictionary<int, byte> unhandledSubmissionsIds = new ConcurrentDictionary<int, byte>();
-		private static readonly ConcurrentDictionary<int, byte> handledSubmissionsIds = new ConcurrentDictionary<int, byte>();
+		private static readonly ConcurrentDictionary<int, DateTime> unhandledSubmissions = new ConcurrentDictionary<int, DateTime>();
+		private static readonly ConcurrentDictionary<int, DateTime> handledSubmissions = new ConcurrentDictionary<int, DateTime>();
+		private static readonly TimeSpan handleTimeout = TimeSpan.FromMinutes(3);
 
 		public UserSolutionsRepo(ULearnDb db)
 		{
@@ -263,7 +262,7 @@ namespace uLearn.Web.DataContexts
 
 		public async Task<List<UserExerciseSubmission>> GetUnhandledSubmissions(int count)
 		{
-			return await FuncUtils.TrySeveralTimesAsync(() => TryGetExerciseSubmissions(count), 3, typeof(DbUpdateException));
+			return await FuncUtils.TrySeveralTimesAsync(() => TryGetExerciseSubmissions(count), 3);
 		}
 
 		private async Task<List<UserExerciseSubmission>> TryGetExerciseSubmissions(int count)
@@ -289,9 +288,9 @@ namespace uLearn.Web.DataContexts
 				db.ObjectContext().AcceptAllChanges();
 			}
 
-			byte value;
+			DateTime value;
 			foreach (var submission in submissions)
-				unhandledSubmissionsIds.TryRemove(submission.Id, out value);
+				unhandledSubmissions.TryRemove(submission.Id, out value);
 
 			return submissions;
 		}
@@ -355,10 +354,10 @@ namespace uLearn.Web.DataContexts
 				await SaveAll(res);
 
 				foreach (var submission in submissions)
-					if (!handledSubmissionsIds.TryAdd(submission.Id, 1))
+					if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
 						log.Warn($"Не удалось запомнить, что проверка {submission.Id} проверена, а результат сохранен в базу");
 
-				log.Info($"Есть информация о следующих проверках, которые ещё не забраны клиентом: [{string.Join(", ", handledSubmissionsIds.Keys)}]");
+				log.Info($"Есть информация о следующих проверках, которые ещё не забраны клиентом: [{string.Join(", ", handledSubmissions.Keys)}]");
 
 				transaction.Commit();
 
@@ -416,7 +415,7 @@ namespace uLearn.Web.DataContexts
 				userId, executionServiceName, displayName);
 			
 			log.Info($"Запускаю проверку решения. ID посылки: {submission.Id}");
-			unhandledSubmissionsIds.TryAdd(submission.Id, 1);
+			unhandledSubmissions.TryAdd(submission.Id, DateTime.Now);
 
 			var sw = Stopwatch.StartNew();
 			while (sw.Elapsed < timeout)
@@ -432,8 +431,8 @@ namespace uLearn.Web.DataContexts
 					return updatedSubmission;
 				}
 			}
-			byte value;
-			unhandledSubmissionsIds.TryRemove(submission.Id, out value);
+			DateTime value;
+			unhandledSubmissions.TryRemove(submission.Id, out value);
 			return null;
 		}
 		
@@ -451,9 +450,10 @@ namespace uLearn.Web.DataContexts
 			var sw = Stopwatch.StartNew();
 			while (sw.Elapsed < timeout)
 			{
-				if (unhandledSubmissionsIds.Count > 0)
+				if (unhandledSubmissions.Count > 0)
 				{
-					log.Info($"Список невзятых пока на проверку решений: [{string.Join(", ", unhandledSubmissionsIds.Keys)}]");
+					log.Info($"Список невзятых пока на проверку решений: [{string.Join(", ", unhandledSubmissions.Keys)}]");
+					ClearHandleDictionaries();
 					return;
 				}
 				await Task.Delay(TimeSpan.FromMilliseconds(100));
@@ -466,13 +466,30 @@ namespace uLearn.Web.DataContexts
 			var sw = Stopwatch.StartNew();
 			while (sw.Elapsed < timeout)
 			{
-				if (handledSubmissionsIds.ContainsKey(submissionId))
+				if (handledSubmissions.ContainsKey(submissionId))
 				{
-					byte value;
-					handledSubmissionsIds.TryRemove(submissionId, out value);
+					DateTime value;
+					handledSubmissions.TryRemove(submissionId, out value);
 					return;
 				}
 				await Task.Delay(TimeSpan.FromMilliseconds(100));
+			}
+		}
+
+		private static void ClearHandleDictionaries()
+		{
+			var timeout = DateTime.Now.Subtract(handleTimeout);
+			ClearHandleDictionary(handledSubmissions, timeout);
+			ClearHandleDictionary(unhandledSubmissions, timeout);
+		}
+
+		private static void ClearHandleDictionary(ConcurrentDictionary<int, DateTime> dictionary, DateTime timeout)
+		{
+			foreach (var key in dictionary.Keys)
+			{
+				DateTime value;
+				if (dictionary.TryGetValue(key, out value) && value < timeout)
+					dictionary.TryRemove(key, out value);
 			}
 		}
 	}
