@@ -361,8 +361,26 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		public ViewResult AcceptedAlert(string courseId, Guid slideId)
+		[AllowAnonymous]
+		public async Task<ActionResult> AcceptedAlert(string courseId, Guid slideId)
 		{
+			var owinRequest = Request.GetOwinContext().Request;
+			if (await owinRequest.IsAuthenticatedLtiRequestAsync())
+			{
+				var ltiRequest = await owinRequest.ParseLtiRequestAsync();
+				/* Substitute http(s) scheme with real scheme from header */
+				var uriBuilder = new UriBuilder(ltiRequest.Url)
+				{
+					Scheme = owinRequest.GetRealRequestScheme(),
+					Port = owinRequest.GetRealRequestPort()
+				};
+				return Redirect(uriBuilder.Uri.AbsoluteUri);
+			}
+
+			/* For now user should be authenticated */
+			if (!User.Identity.IsAuthenticated)
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
 			var course = courseManager.GetCourse(courseId);
 			var slide = (ExerciseSlide)course.GetSlideById(slideId);
 			var model = CreateAcceptedAlertModel(slide, course);

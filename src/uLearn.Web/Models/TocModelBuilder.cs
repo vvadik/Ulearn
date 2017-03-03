@@ -41,7 +41,7 @@ namespace uLearn.Web.Models
 		private TocUnitModel[] CreateUnits()
 		{
 			return course.Units
-				.Where(u => u.Slides.Any(s => !IsSlideHidden(s)))
+				.Where(u => IsUnitVisible(u) && u.Slides.Any(s => !IsSlideHidden(s)))
 				.Select(CreateUnit)
 				.ToArray();
 		}
