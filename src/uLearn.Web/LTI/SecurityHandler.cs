@@ -25,7 +25,7 @@ namespace uLearn.Web.LTI
 		/// <returns>A <see cref="Task"/> representing the completed operation.</returns>
 		public static async Task OnAuthenticated(LtiAuthenticatedContext context, IEnumerable<Claim> claims = null)
 		{
-			log.Info($"LTI вызвал событие OnAuthenticated при запросе на {context.Request.Uri}");
+			log.Info($"LTI обрабатывает запрос на {context.Request.Uri}");
 
 			ClaimsIdentity identity = null;
 			using (var db = new ULearnDb())

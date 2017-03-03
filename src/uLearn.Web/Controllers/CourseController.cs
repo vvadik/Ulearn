@@ -152,17 +152,17 @@ namespace uLearn.Web.Controllers
 		{
 			if (string.IsNullOrWhiteSpace(courseId))
 				return RedirectToAction("Index", "Home");
-
-			var userId = User.Identity.GetUserId();
-
+			
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.GetSlideById(slideId);
 
+			string userId;
 			var owinRequest = Request.GetOwinContext().Request;
 			if (await owinRequest.IsAuthenticatedLtiRequestAsync())
 			{
 				var ltiRequest = await owinRequest.ParseLtiRequestAsync();
 				log.Info($"Нашёл LTI request в запросе: {ltiRequest.JsonSerialize()}");
+				userId = Request.GetOwinContext().Authentication.AuthenticationResponseGrant.Identity.GetUserId();
 				await ltiRequestsRepo.Update(userId, slide.Id, ltiRequest.JsonSerialize());
 
 				/* Substitute http(s) scheme with real scheme from header */
@@ -178,6 +178,7 @@ namespace uLearn.Web.Controllers
 			if (! User.Identity.IsAuthenticated)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
+			userId = User.Identity.GetUserId();
 			var visit = await VisitSlide(courseId, slide.Id, userId);
 
 			/* Try to send score via LTI immediately after slide visiting */
