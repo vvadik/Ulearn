@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
@@ -11,6 +12,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using ApprovalUtilities.Utilities;
+using EntityFramework.Functions;
 using log4net;
 using uLearn.Web.Models;
 
@@ -286,6 +288,8 @@ namespace uLearn.Web.DataContexts
 				await SaveAll(submissions.Select(s => s.AutomaticChecking));
 
 				transaction.Commit();
+
+				db.ObjectContext().AcceptAllChanges();
 			}
 
 			byte value;
@@ -327,7 +331,7 @@ namespace uLearn.Web.DataContexts
 			}
 			try
 			{
-				await db.SaveChangesAsync();
+				await db.ObjectContext().SaveChangesAsync(SaveOptions.DetectChangesBeforeSave);
 			}
 			catch (DbEntityValidationException e)
 			{
@@ -360,6 +364,8 @@ namespace uLearn.Web.DataContexts
 				log.Info($"Есть информация о следующих проверках, которые ещё не забраны клиентом: [{string.Join(", ", handledSubmissionsIds.Keys)}]");
 
 				transaction.Commit();
+
+				db.ObjectContext().AcceptAllChanges();
 			}
 		}
 
