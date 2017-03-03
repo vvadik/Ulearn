@@ -30,7 +30,7 @@ namespace uLearn.Web.Controllers
 			while (true)
 			{
 				var repo = new UserSolutionsRepo(new ULearnDb());
-				var submissions = repo.GetUnhandledSubmissions(count);
+				var submissions = await repo.GetUnhandledSubmissions(count);
 				if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
 				{
 					if (submissions.Any())

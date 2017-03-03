@@ -262,18 +262,19 @@ namespace uLearn.Web.DataContexts
 			return submission;
 		}
 
-		public List<UserExerciseSubmission> GetUnhandledSubmissions(int count)
+		public async Task<List<UserExerciseSubmission>> GetUnhandledSubmissions(int count)
 		{
-			return FuncUtils.TrySeveralTimes(() => TryGetExerciseSubmissions(count), 3, typeof(DbUpdateException));
+			return await FuncUtils.TrySeveralTimesAsync(() => TryGetExerciseSubmissions(count), 3, typeof(DbUpdateException));
 		}
 
-		private List<UserExerciseSubmission> TryGetExerciseSubmissions(int count)
+		private async Task<List<UserExerciseSubmission>> TryGetExerciseSubmissions(int count)
 		{
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 			List<UserExerciseSubmission> submissions;
 			using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
 			{
 				submissions = db.UserExerciseSubmissions
+					.AsNoTracking()
 					.Where(s =>
 						s.Timestamp > notSoLongAgo
 						&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting)
@@ -282,7 +283,7 @@ namespace uLearn.Web.DataContexts
 					.ToList();
 				foreach (var submission in submissions)
 					submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
-				SaveAll(submissions.Select(s => s.AutomaticChecking));
+				await SaveAll(submissions.Select(s => s.AutomaticChecking));
 
 				transaction.Commit();
 			}
@@ -316,16 +317,17 @@ namespace uLearn.Web.DataContexts
 				.ForEach(s => s.AutomaticCheckingIsRightAnswer = checking.IsRightAnswer);
 		}
 		
-		protected void SaveAll(IEnumerable<AutomaticExerciseChecking> checkings)
+		protected async Task SaveAll(IEnumerable<AutomaticExerciseChecking> checkings)
 		{
 			foreach (var checking in checkings)
 			{
+				log.Info($"Обновляю статус автоматической проверки #{checking.Id}: {checking.Status}");
 				db.AutomaticExerciseCheckings.AddOrUpdate(checking);
 				UpdateIsRightAnswerForSubmission(checking);
 			}
 			try
 			{
-				db.SaveChanges();
+				await db.SaveChangesAsync();
 			}
 			catch (DbEntityValidationException e)
 			{
@@ -349,7 +351,7 @@ namespace uLearn.Web.DataContexts
 				var res = new List<AutomaticExerciseChecking>();
 				foreach (var submission in submissions)
 					res.Add(await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, resultsDict[submission.Id.ToString()]));
-				SaveAll(res);
+				await SaveAll(res);
 
 				foreach (var submission in submissions)
 					if (!handledSubmissionsIds.TryAdd(submission.Id, 1))
