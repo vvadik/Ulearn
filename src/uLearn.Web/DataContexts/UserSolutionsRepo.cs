@@ -252,10 +252,7 @@ namespace uLearn.Web.DataContexts
 
 		public UserExerciseSubmission FindSubmission(int id)
 		{
-			var submission = db.UserExerciseSubmissions
-				.Include(s => s.AutomaticChecking)
-				.AsNoTracking()
-				.SingleOrDefault(x => x.Id == id);
+			var submission = db.UserExerciseSubmissions.AsNoTracking().SingleOrDefault(x => x.Id == id);
 			if (submission == null)
 				return null;
 			submission.SolutionCode = textsRepo.GetText(submission.SolutionCodeHash);
