@@ -250,7 +250,10 @@ namespace uLearn.Web.DataContexts
 
 		public UserExerciseSubmission FindSubmission(int id)
 		{
-			var submission = db.UserExerciseSubmissions.AsNoTracking().SingleOrDefault(x => x.Id == id);
+			var submission = db.UserExerciseSubmissions
+				.Include(s => s.AutomaticChecking)
+				.AsNoTracking()
+				.SingleOrDefault(x => x.Id == id);
 			if (submission == null)
 				return null;
 			submission.SolutionCode = textsRepo.GetText(submission.SolutionCodeHash);
@@ -413,7 +416,7 @@ namespace uLearn.Web.DataContexts
 			var sw = Stopwatch.StartNew();
 			while (sw.Elapsed < timeout)
 			{
-				await WaitUntilSubmissionHandled(TimeSpan.FromSeconds(2), submission.Id);
+				await WaitUntilSubmissionHandled(TimeSpan.FromSeconds(5), submission.Id);
 				var updatedSubmission = FindSubmission(submission.Id);
 				if (updatedSubmission == null)
 					break;
