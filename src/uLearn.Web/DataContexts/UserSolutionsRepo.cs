@@ -9,6 +9,7 @@ using System.Data.Entity.Migrations;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ApprovalUtilities.Utilities;
 using EntityFramework.Functions;
@@ -260,9 +261,19 @@ namespace uLearn.Web.DataContexts
 			return submission;
 		}
 
+		private static readonly SemaphoreSlim getSubmissionsSemaphore = new SemaphoreSlim(1, 1);
+
 		public async Task<List<UserExerciseSubmission>> GetUnhandledSubmissions(int count)
 		{
-			return await FuncUtils.TrySeveralTimesAsync(() => TryGetExerciseSubmissions(count), 3);
+			await getSubmissionsSemaphore.WaitAsync();
+			try
+			{
+				return await FuncUtils.TrySeveralTimesAsync(() => TryGetExerciseSubmissions(count), 3);
+			}
+			finally
+			{
+				getSubmissionsSemaphore.Release();
+			}
 		}
 
 		private async Task<List<UserExerciseSubmission>> TryGetExerciseSubmissions(int count)
