@@ -349,7 +349,10 @@ namespace uLearn.Web.DataContexts
 				SaveAll(res);
 
 				foreach (var submission in submissions)
-					handledSubmissionsIds.TryAdd(submission.Id, 1);
+					if (!handledSubmissionsIds.TryAdd(submission.Id, 1))
+						log.Warn($"Не удалось запомнить, что проверка {submission.Id} проверена, а результат сохранен в базу");
+
+				log.Info($"Есть информация о следующих проверках, которые ещё не забраны клиентом: [{string.Join(", ", handledSubmissionsIds.Keys)}]");
 
 				transaction.Commit();
 			}
@@ -451,6 +454,7 @@ namespace uLearn.Web.DataContexts
 
 		public async Task WaitUntilSubmissionHandled(TimeSpan timeout, int submissionId)
 		{
+			log.Info($"Вхожу в цикл ожидания результатов проверки решения {submissionId}. Жду {timeout.TotalSeconds} секунд");
 			var sw = Stopwatch.StartNew();
 			while (sw.Elapsed < timeout)
 			{
