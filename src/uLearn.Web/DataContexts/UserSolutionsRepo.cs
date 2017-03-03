@@ -335,9 +335,14 @@ namespace uLearn.Web.DataContexts
 		public async Task SaveResults(List<RunningResults> results)
 		{
 			var resultsDict = results.ToDictionary(result => result.Id);
-			using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
+			using (var transaction = db.Database.BeginTransaction())
 			{
+				log.Info($"Сохраняю информацию о проверке решений: [{string.Join(", ", results.Select(r => r.Id))}]");
 				var submissions = FindSubmissionsByIds(results.Select(result => result.Id).ToList());
+				if (submissions.Count != results.Count)
+				{
+					log.Warn($"Нашёл в базе данных не все решения. Искал: [{string.Join(", ", results.Select(r => r.Id))}]. Нашёл: [{string.Join(", ", submissions.Select(s => s.Id))}]");
+				}
 				var res = new List<AutomaticExerciseChecking>();
 				foreach (var submission in submissions)
 					res.Add(await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, resultsDict[submission.Id.ToString()]));

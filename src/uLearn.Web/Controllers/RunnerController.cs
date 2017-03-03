@@ -33,7 +33,8 @@ namespace uLearn.Web.Controllers
 				var submissions = repo.GetUnhandledSubmissions(count);
 				if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
 				{
-					log.Info($"Отдаю на проверку решения: [{string.Join(",", submissions.Select(c => c.Id))}]");
+					if (submissions.Any())
+						log.Info($"Отдаю на проверку решения: [{string.Join(",", submissions.Select(c => c.Id))}]");
 					return submissions.Select(ToRunnerSubmission).ToList();
 				}
 				await repo.WaitAnyUnhandledSubmissions(TimeSpan.FromSeconds(10));
