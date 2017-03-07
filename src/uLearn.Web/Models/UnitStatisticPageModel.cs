@@ -22,11 +22,16 @@ namespace uLearn.Web.Models
 	public class CourseStatisticPageModel : StatisticPageModel
 	{
 		/* Dictionary<(userId, unitId, scoringGroupId), additionalScore> */
-		public Dictionary<Tuple<string, Guid, string>, int> AdditionalScores { get; set; }
+		public DefaultDictionary<Tuple<string, Guid, string>, int> AdditionalScores { get; set; }
+
+		/* Dictionary<(unitId, scoringGroupId), List<Slide>> */
+		public DefaultDictionary<Tuple<Guid, string>, List<Slide>> ShouldBeSolvedSlidesByUnitScoringGroup { get; set; }
 
 		public Dictionary<string, ScoringGroup> ScoringGroups { get; set; }
 		/* Dictionary<(userId, unitId, scoringGroupId), visitScore> */
-		public Dictionary<Tuple<string, Guid, string>, int> ScoreByUserUnitScoringGroup { get; set; }
+		public DefaultDictionary<Tuple<string, Guid, string>, int> ScoreByUserUnitScoringGroup { get; set; }
+		/* Dictionary<(userId, slideId), visitScore> */
+		public DefaultDictionary<Tuple<string, Guid>, int> ScoreByUserAndSlide { get; set; }
 	}
 
 	public class UnitStatisticPageModel : StatisticPageModel

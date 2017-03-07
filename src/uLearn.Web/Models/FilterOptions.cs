@@ -37,5 +37,12 @@ namespace uLearn.Web.Models
 			copy.PeriodFinish = newPeriodFinish;
 			return copy;
 		}
+
+		public VisitsFilterOptions WithSlidesIds(List<Guid> newSlidesIds)
+		{
+			var copy = (VisitsFilterOptions)MemberwiseClone();
+			copy.SlidesIds = newSlidesIds;
+			return copy;
+		}
 	}
 }

@@ -58,6 +58,7 @@ namespace uLearn.Web
 					"~/Scripts/analytics-highcharts.js",
 					"~/Scripts/likely.js",
 					"~/Scripts/analytics.js",
+					"~/Scripts/course-statistics.js",
 					"~/Scripts/ulearn-updates-invitation.js"
 				);
 		}

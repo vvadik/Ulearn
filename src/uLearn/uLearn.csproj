@@ -129,6 +129,7 @@
     <Compile Include="CSharp\RecursionStyleValidator.cs" />
     <Compile Include="CSharp\RedundantIfStyleValidator.cs" />
     <Compile Include="CSharp\CsMembersRemover.cs" />
+    <Compile Include="DefaultDictionary.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="FileSystemExtensions.cs" />
     <Compile Include="FuncUtils.cs" />

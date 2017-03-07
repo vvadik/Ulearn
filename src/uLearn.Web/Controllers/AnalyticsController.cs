@@ -190,9 +190,6 @@ namespace uLearn.Web.Controllers
 
 			var unitBySlide = course.Units.SelectMany(u => u.Slides.Select(s => Tuple.Create(u.Id, s.Id))).ToDictionary(p => p.Item2, p => p.Item1);
 			var scoringGroups = course.Settings.Scoring.Groups;
-			var scoreByUserUnitScoringGroup = ((IEnumerable<Visit>) visitsRepo.GetVisitsInPeriod(filterOptions))
-				.GroupBy(v => Tuple.Create(v.UserId, unitBySlide[v.SlideId], course.FindSlideById(v.SlideId).ScoringGroup))
-				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score));
 
 			var visitedSlidesCountByUserAllTime = visitsRepo.GetVisitsInPeriod(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(DateTime.MaxValue))
 				.GroupBy(v => v.UserId)
@@ -206,9 +203,30 @@ namespace uLearn.Web.Controllers
 				.ToList();
 
 			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();
+
+			/* From now fetch only filtered users' statistics */
+			filterOptions.UsersIds = visitedUsersIds;
+			filterOptions.IsUserIdsSupplement = false;
+			var scoreByUserUnitScoringGroup = ((IEnumerable<Visit>)visitsRepo.GetVisitsInPeriod(filterOptions))
+				.GroupBy(v => Tuple.Create(v.UserId, unitBySlide[v.SlideId], course.FindSlideById(v.SlideId)?.ScoringGroup))
+				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score))
+				.ToDefaultDictionary();
+
+			var shouldBeSolvedSlides = course.Slides.Where(s => s.ShouldBeSolved).ToList();
+			var shouldBeSolvedSlidesIds = shouldBeSolvedSlides.Select(s => s.Id).ToList();
+			var shouldBeSolvedSlidesByUnitScoringGroup = shouldBeSolvedSlides
+				.GroupBy(s => Tuple.Create(unitBySlide[s.Id], s.ScoringGroup))
+				.ToDictionary(g => g.Key, g => g.ToList())
+				.ToDefaultDictionary();
+			var scoreByUserAndSlide = ((IEnumerable<Visit>)visitsRepo.GetVisitsInPeriod(filterOptions.WithSlidesIds(shouldBeSolvedSlidesIds)))
+				.GroupBy(v => Tuple.Create(v.UserId, v.SlideId))
+				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score))
+				.ToDefaultDictionary();
+
 			var additionalScores = additionalScoresRepo
 				.GetAdditionalScoresForUsers(courseId, visitedUsersIds)
-				.ToDictionary(kv => kv.Key, kv => kv.Value.Score);
+				.ToDictionary(kv => kv.Key, kv => kv.Value.Score)
+				.ToDefaultDictionary();
 			var usersGroupsIds = groupsRepo.GetUsersGroupsIds(courseId, visitedUsersIds);
 			var enabledAdditionalScoringGroupsForGroups = groupsRepo.GetEnabledAdditionalScoringGroups(courseId)
 				.GroupBy(e => e.GroupId)
@@ -227,8 +245,11 @@ namespace uLearn.Web.Controllers
 				VisitedUsers = visitedUsers,
 				VisitedUsersIsMore = isMore,
 
+				ShouldBeSolvedSlidesByUnitScoringGroup = shouldBeSolvedSlidesByUnitScoringGroup,
+
 				ScoringGroups = scoringGroups,
 				ScoreByUserUnitScoringGroup = scoreByUserUnitScoringGroup,
+				ScoreByUserAndSlide = scoreByUserAndSlide,
 				AdditionalScores = additionalScores,
 				UsersGroupsIds = usersGroupsIds,
 				EnabledAdditionalScoringGroupsForGroups = enabledAdditionalScoringGroupsForGroups,
@@ -529,6 +550,9 @@ namespace uLearn.Web.Controllers
 
 	public class CourseStatisticsParams : StatisticsParams
 	{
+		/* Course statistics can't be filtered by dates */
+		public new DateTime PeriodStartDate => DateTime.MinValue;
+		public new DateTime PeriodFinishDate => DateTime.MaxValue.Subtract(TimeSpan.FromDays(2));
 	}
 
 	public class UnitStatisticsParams : StatisticsParams
