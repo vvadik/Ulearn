@@ -140,7 +140,7 @@
 						if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
 						{
 							<th class="slide-max-score" data-slide-id="additional" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
-								scoringGroup.MaxAdditionalScore
+								@scoringGroup.MaxAdditionalScore
 							</th>
 						}
 					}
@@ -155,7 +155,7 @@
 
 						@foreach (var scoringGroup in Model.ScoringGroups.Values)
 						{
-							<td class="score">
+							<td class="score scoring-group-score" data-scoring-group="@scoringGroup.Id">
 								@Model.Course.Units.Sum(unit => GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup))
 							</td>
 						}
