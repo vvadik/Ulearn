@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 
 namespace uLearn.CSharp
 {
@@ -80,6 +81,8 @@ namespace uLearn.CSharp
 			CheckCorrect("class A{ public int A, B, C; }");
 			CheckIncorrect("class A{ public int A, B, c; }");
 			CheckIncorrect("class A{ private int a, b, C; }");
+			CheckCorrect("class A{ public event Action A, B, C; }");
+			CheckIncorrect("class A{ public event Action A, b, C; }");
 		}
 
 		[Test]
