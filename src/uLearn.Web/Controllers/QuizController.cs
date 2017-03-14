@@ -125,7 +125,7 @@ namespace uLearn.Web.Controllers
 				GroupId = groupId,
 			};
 
-			if (model.QuizState != QuizState.NotPassed && model.Score == quiz.MaxScore)
+			if (model.QuizState == QuizState.Subtotal && model.Score == quiz.MaxScore)
 				model.QuizState = QuizState.Total;
 
 			return PartialView(model);
