@@ -49,11 +49,11 @@ namespace uLearn.CSharp
 				&& field.Modifiers.All(m => m.Kind() != SyntaxKind.ConstKeyword);
 		}
 
-		private static FieldDeclarationSyntax AsField(VariableDeclaratorSyntax variableDeclarator)
+		private static BaseFieldDeclarationSyntax AsField(VariableDeclaratorSyntax variableDeclarator)
 		{
 			// Первый родитель, но не выше блока.
-			var parent = variableDeclarator.GetParents().FirstOrDefault(p => (p is FieldDeclarationSyntax) || (p is BlockSyntax));
-			return parent as FieldDeclarationSyntax;
+			var parent = variableDeclarator.GetParents().FirstOrDefault(p => (p is BaseFieldDeclarationSyntax) || (p is BlockSyntax));
+			return parent as BaseFieldDeclarationSyntax;
 		}
 
 		private bool MustStartWithLower(SyntaxNode node)
