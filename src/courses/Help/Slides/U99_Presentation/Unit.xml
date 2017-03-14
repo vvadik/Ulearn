@@ -2,7 +2,7 @@
 <Unit
 		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xmlns="https://ulearn.azurewebsites.net/unit">
+		xmlns="https://ulearn.azurewebsites.net/unit:https://ulearn.azurewebsites.net/types">
 		<id>d4492182-fe1c-4531-900c-3a509c9e6c16</id>
 		<url>Features</url>
 		<title>Возможности ulearn</title>

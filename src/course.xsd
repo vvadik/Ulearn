@@ -1,11 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:types="https://ulearn.azurewebsites.net/types"
 	xmlns="https://ulearn.azurewebsites.net/course"
-	xmlns:x="http://www.w3.org/2001/XMLSchema-instance"
 	elementFormDefault="qualified"
 	targetNamespace="https://ulearn.azurewebsites.net/course">
-	
-	<xs:element name="Course" type="Course">
+
+  <xs:import schemaLocation="types.xsd" namespace="https://ulearn.azurewebsites.net/types"/>
+  
+  <xs:element name="Course" type="Course">
 		<xs:unique name="UniqueBlockId">
 			<xs:selector xpath="*" />
 			<xs:field xpath="@id" />
@@ -14,52 +16,11 @@
 
 	<xs:complexType name="Course">
 		<xs:sequence>
-			<xs:element name="title" type="notEmptyString" />
-			<xs:element name="language" type="Language" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="prelude" type="Prelude" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="title" type="types:notEmptyString" />
+			<xs:element name="language" type="types:Language" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="prelude" type="types:Prelude" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="manual-checking" type="xs:boolean" minOccurs="0" maxOccurs="1" />
-			<xs:element name="scoring" type="Scoring" minOccurs="0" maxOccurs="1" />
+			<xs:element name="scoring" type="types:Scoring" minOccurs="0" maxOccurs="1" />
 		</xs:sequence>
 	</xs:complexType>
-
-	<xs:simpleType name="notEmptyString">
-		<xs:restriction base="xs:string">
-			<xs:minLength value="1"/>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:complexType name="Language">
-		<xs:attribute name="name" use="required" type="notEmptyString" />
-		<xs:attribute name="version" use="required" type="notEmptyString" />
-	</xs:complexType>
-
-	<xs:complexType name="Prelude">
-		<xs:simpleContent>
-			<xs:extension base="notEmptyString">
-				<xs:attribute name="language" type="notEmptyString" />
-			</xs:extension>
-		</xs:simpleContent>
-	</xs:complexType>
-
-	<xs:complexType name="Scoring">
-		<xs:sequence>
-			<xs:element name="group" type="ScoringGroup" minOccurs="0" maxOccurs="unbounded" />
-		</xs:sequence>
-		<xs:attribute name="defaultQuiz" type="notEmptyString" />
-		<xs:attribute name="defaultExercise" type="notEmptyString" />
-		<xs:attribute name="default" type="notEmptyString" />
-	</xs:complexType>
-
-	<xs:complexType name="ScoringGroup">
-		<xs:simpleContent>
-			<xs:extension base="notEmptyString">
-				<xs:attribute name="id" type="notEmptyString" use="required" />
-				<xs:attribute name="abbr" type="notEmptyString" use="required" />
-				<xs:attribute name="set_by_instructor" type="xs:boolean" use="optional" />
-				<xs:attribute name="max_additional_score" type="xs:integer" use="optional" />
-				<xs:attribute name="enable_for_everyone" type="xs:boolean" use="optional" />
-			</xs:extension>
-		</xs:simpleContent>
-	</xs:complexType>
-	
 </xs:schema>

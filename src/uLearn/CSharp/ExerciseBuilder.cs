@@ -30,12 +30,11 @@ namespace uLearn.CSharp
 		{
 			ExerciseClassName = null;
 			Exercise.ExerciseInitialCode = GetUncomment(tree.GetRoot()) ?? ""; //for uncomment-comment without exercise method
-			SyntaxNode result = Visit(tree.GetRoot());
+			var result = Visit(tree.GetRoot());
 			var exerciseInsertIndex = GetExerciseInsertIndex(result);
 			const string pragma = "\n#line 1\n";
 			Exercise.ExerciseCode = prelude + result.ToFullString().Insert(exerciseInsertIndex, pragma);
 			Exercise.IndexToInsertSolution = prelude.Length + exerciseInsertIndex + pragma.Length;
-			Exercise.File = slideFile.FullName;
 			return Exercise;
 		}
 

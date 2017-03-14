@@ -27,11 +27,12 @@ namespace uLearn.Web.Models
 		/* Dictionary<(unitId, scoringGroupId), List<Slide>> */
 		public DefaultDictionary<Tuple<Guid, string>, List<Slide>> ShouldBeSolvedSlidesByUnitScoringGroup { get; set; }
 
-		public Dictionary<string, ScoringGroup> ScoringGroups { get; set; }
+		public SortedDictionary<string, ScoringGroup> ScoringGroups { get; set; }
 		/* Dictionary<(userId, unitId, scoringGroupId), visitScore> */
 		public DefaultDictionary<Tuple<string, Guid, string>, int> ScoreByUserUnitScoringGroup { get; set; }
 		/* Dictionary<(userId, slideId), visitScore> */
 		public DefaultDictionary<Tuple<string, Guid>, int> ScoreByUserAndSlide { get; set; }
+		public DefaultDictionary<string, string> VisiterUsersGroups { get; set; }
 	}
 
 	public class UnitStatisticPageModel : StatisticPageModel

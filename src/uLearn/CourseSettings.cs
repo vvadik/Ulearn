@@ -195,11 +195,11 @@ namespace uLearn
 		[XmlElement("group")]
 		public ScoringGroup[] _groups { get; set; }
 
-		private Dictionary<string, ScoringGroup> groupsCache;
+		private SortedDictionary<string, ScoringGroup> groupsCache;
 		[XmlIgnore]
-		public Dictionary<string, ScoringGroup> Groups
+		public SortedDictionary<string, ScoringGroup> Groups
 		{
-			get { return groupsCache ?? (groupsCache = _groups.ToDictionary(g => g.Id, g => g)); }
+			get { return groupsCache ?? (groupsCache = _groups.ToDictionary(g => g.Id, g => g).ToSortedDictionary()); }
 		}
 
 		public void CopySettingsFrom(ScoringSettings otherScoringSettings)

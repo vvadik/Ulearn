@@ -32,6 +32,10 @@ namespace uLearn.Web
 					"~/Scripts/jquery.datetimepicker.unobtrusive.js",
 					"~/Scripts/jquery.event.move.js",
 					"~/Scripts/jquery.smooth-scrolling.js",
+					"~/tablesorter-master/js/jquery.tablesorter.min.js",
+					"~/tablesorter-master/js/jquery.tablesorter.widgets.min.js",
+					"~/tablesorter-master/js/widgets/widget-grouping.js",
+					"~/Scripts/table-configurator.js",
 					"~/flexslider/jquery.flexslider.js",
 					"~/katex/katex.min.js",
 //					"~/Jsdifflib/jsdifflib.js",
@@ -59,7 +63,8 @@ namespace uLearn.Web
 					"~/Scripts/likely.js",
 					"~/Scripts/analytics.js",
 					"~/Scripts/course-statistics.js",
-					"~/Scripts/ulearn-updates-invitation.js"
+					"~/Scripts/ulearn-updates-invitation.js",
+					"~/Scripts/diagnostics.js"
 				);
 		}
 
@@ -76,6 +81,7 @@ namespace uLearn.Web
 				"~/codemirror/addon/hint/show-hint.css",
 //				"~/Jsdifflib/jsdifflib.css",
 				"~/Content/tablesorter.css",
+				"~/tablesorter-master/css/widget.grouping.css",
 				"~/Content/ulearn.css",
 				"~/Content/bounce.css",
 				"~/flexslider/flexslider.css",

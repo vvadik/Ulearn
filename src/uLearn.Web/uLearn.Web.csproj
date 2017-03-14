@@ -1282,6 +1282,7 @@
     <Content Include="Scripts\certificates-editor.js" />
     <Content Include="Scripts\clipboard.min.js" />
     <Content Include="Scripts\course-statistics.js" />
+    <Content Include="Scripts\diagnostics.js" />
     <Content Include="Scripts\groups-editor.js" />
     <Content Include="Scripts\jquery-ui.min.js" />
     <Content Include="Scripts\jquery.color-2.1.0.min.js" />

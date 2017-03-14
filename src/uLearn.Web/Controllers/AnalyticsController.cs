@@ -233,6 +233,7 @@ namespace uLearn.Web.Controllers
 				.ToDictionary(g => g.Key, g => g.Select(e => e.ScoringGroupId).ToList());
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+			var visiterUsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, visitedUsersIds, User).ToDefaultDictionary();
 			var model = new CourseStatisticPageModel
 			{
 				Course = course,
@@ -244,6 +245,7 @@ namespace uLearn.Web.Controllers
 
 				VisitedUsers = visitedUsers,
 				VisitedUsersIsMore = isMore,
+				VisiterUsersGroups = visiterUsersGroups,
 
 				ShouldBeSolvedSlidesByUnitScoringGroup = shouldBeSolvedSlidesByUnitScoringGroup,
 

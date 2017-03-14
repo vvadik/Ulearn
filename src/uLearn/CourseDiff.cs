@@ -46,15 +46,9 @@ namespace uLearn
 			InsertedSlides.AddRange(ChangedCourse.Slides.Where(slide => !originalSlidesIds.Contains(slide.Id)));
 		}
 
-		public bool IsTitleChanged
-		{
-			get { return OriginalCourse.Title != ChangedCourse.Title; }
-		}
+		public bool IsTitleChanged => OriginalCourse.Title != ChangedCourse.Title;
 
-		public bool IsEmptyChangeset
-		{
-			get { return !IsTitleChanged && RemovedSlides.Count + InsertedSlides.Count + SlideDiffs.Count == 0; }
-		}
+		public bool IsEmptyChangeset => !IsTitleChanged && RemovedSlides.Count + InsertedSlides.Count + SlideDiffs.Count == 0;
 	}
 
 	public class SlideDiff
@@ -121,15 +115,11 @@ namespace uLearn
 			InsertedBlocks.AddRange(changedBlocks.Where(b => !originalBlocksIds.Contains(b.Id)));
 		}
 
-		public bool IsTitleChanged
-		{
-			get { return OriginalSlide.Title != ChangedSlide.Title; }
-		}
+		public bool IsTitleChanged => OriginalSlide.Title != ChangedSlide.Title;
 
-		public bool IsEmptyChangeset
-		{
-			get { return !IsTitleChanged && RemovedBlocks.Count + InsertedBlocks.Count + SlideBlockDiffs.Count == 0; }
-		}
+		public bool IsAtLeastOneBlockChanged => RemovedBlocks.Count + InsertedBlocks.Count + SlideBlockDiffs.Count != 0;
+
+		public bool IsEmptyChangeset => !IsTitleChanged && !IsAtLeastOneBlockChanged;
 	}
 
 	public class SlideBlockDiff

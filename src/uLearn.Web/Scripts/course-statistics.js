@@ -46,5 +46,37 @@
 		$courseStatistics.find('.scoring-group-title' + filterByScoringGroup).toggle(isChecked);
 		$courseStatistics.find('.scoring-group-score' + filterByScoringGroup).toggle(isChecked);
 		$courseStatistics.find('.scoring-group-max-score' + filterByScoringGroup).toggle(isChecked);
+
+		var countChecked = $('.course-statistics__enable-scoring-group__checkbox:checked').length;
+		if (countChecked <= 1)
+			$('.course-statistics__enable-scoring-group__checkbox:checked').attr('disabled', 'disabled');
+		else
+			$('.course-statistics__enable-scoring-group__checkbox').removeAttr('disabled');
 	});
+	
+	/*
+	$courseStatistics.tablesorter({
+		widgets: ['zebra', 'stickyHeaders', 'group', 'scroller'],
+		sortInitialOrder: $courseStatistics.data('initial-order') || 'asc',
+
+		selectorHeaders: 'thead th',
+
+		cssAsc: "headerSortUp",
+		cssDesc: "headerSortDown",
+		cssHeader: "header",
+		tableClass: 'tablesorter',
+
+		widgetOptions: {
+			columns: ["primary", "secondary", "tertiary"],
+			stickyHeaders_offset: "#header",
+			group_forceColumn: [1],
+			group_enforceSort: false,
+			//scroller_height : 300,
+			scroller_fixedColumns : 1,
+			scroller_rowHighlight : 'hover',
+		},
+
+		textAttribute: 'data-sort-value'
+	});
+	*/
 });

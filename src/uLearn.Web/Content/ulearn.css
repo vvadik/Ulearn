@@ -567,7 +567,6 @@ table.diff {
 		font-weight: normal;
 		border: 1px solid lightblue /*#BBC*/;
 		text-align: center !important;
-		vertical-align: top;
 	}
 
 	table.diff tbody th {
@@ -597,6 +596,18 @@ table.diff {
 	table.diff .equals:nth-child(even) td {
 		background-color: #AFA;
 	}
+
+.expand-slide-diff-link {
+	display: inline-block;
+	margin-left: 20px;
+	font-size: 13px;
+	color: #999;
+	border-color: #ccc;
+}
+
+.slide-diff-table {
+	margin-top: 5px;
+}
 
 body.lti-component {
 	padding-top: 0;
@@ -1424,12 +1435,6 @@ h1 .copy-group-link {
 	width: 900px;
 }
 
-.code-review + .CodeMirror .cm-tab {
-	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
-	background-position: right;
-	background-repeat: no-repeat;
-}
-
 .exercise__reviews {
 	float: right;
 	width: 250px;
@@ -1709,6 +1714,12 @@ h1 .copy-group-link {
 	text-align: center;
 }
 
+.course-statistics .scoring-group-max-score,
+.course-statistics .slide-max-score {
+	white-space: nowrap;
+	cursor: pointer;
+}
+
 .course-statistics .slide-title {
 	height: 60px;
 	min-height: 60px;
@@ -1743,11 +1754,33 @@ h1 .copy-group-link {
 	border-bottom: 1px solid rgba(100, 100, 100, 0.4);
 }
 
-.course-statistics tbody tr:nth-child(even) td {
-	background-color: #eee;
-}
-
 .course-statistics td.score {
 	text-align: center;
+	color: #666;
+}
+
+.course-statistics .expand-scoring-group__link .expand-icon {
+	font-size: 8px;
+}
+
+.course-statistics .score.grade-1 { background-color: #FFC0C0; }
+.course-statistics .score.grade-2 { background-color: #FFC8C0; }
+.course-statistics .score.grade-3 { background-color: #FFD0C0; }
+.course-statistics .score.grade-4 { background-color: #FFD8C0; }
+.course-statistics .score.grade-5 { background-color: #FFE0C0; }
+.course-statistics .score.grade-6 { background-color: #FFE8C0; }
+.course-statistics .score.grade-7 { background-color: #FFF0C0; }
+.course-statistics .score.grade-8 { background-color: #FFF8C0; }
+.course-statistics .score.grade-9 { background-color: #F0FFC0; }
+.course-statistics .score.grade-10 { background-color: #E8FFC0; }
+.course-statistics .score.grade-11 { background-color: #E0FFC0; }
+.course-statistics .score.grade-12 { background-color: #D8FFC0; }
+.course-statistics .score.grade-13 { background-color: #D0FFC0; }
+.course-statistics .score.grade-14 { background-color: #C8FFC0; }
+.course-statistics .score.grade-15 { background-color: #C0FFC0; }
+
+.student-group, 
+.student-group-title {
+	
 }
 /* End of course statistics*/

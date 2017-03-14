@@ -57,5 +57,10 @@ namespace uLearn
 		{
 			return new DefaultDictionary<TKey, TValue>(dict);
 		}
+
+		public static SortedDictionary<TKey, TValue> ToSortedDictionary<TKey, TValue>(this IDictionary<TKey, TValue> dict)
+		{
+			return new SortedDictionary<TKey, TValue>(dict);
+		}
 	}
 }
