@@ -671,12 +671,16 @@ namespace uLearn.Web.Controllers
 
 		private Tuple<QuizState, int> GetQuizState(string courseId, string userId, Guid slideId, int maxDropCount)
 		{
+			log.Info($"Ищу статус прохождения теста {courseId}:{slideId} для пользователя {userId}");
 			var states = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).ToList();
 
 			var queueItem = userQuizzesRepo.FindManualQuizChecking(courseId, slideId, userId);
 			if (queueItem != null)
+			{
+				log.Info($"Статус прохождения теста {courseId}:{slideId} для пользователя {userId}: есть ручная проверка №{queueItem.Id}, проверяется ли сейчас: {queueItem.IsLocked}");
 				return Tuple.Create(queueItem.IsLocked ? QuizState.IsChecking : QuizState.WaitForCheck, states.Count);
-			
+			}
+
 			if (states.Count > maxDropCount)
 				return Tuple.Create(QuizState.Total, states.Count);
 			if (states.Any(b => !b))
