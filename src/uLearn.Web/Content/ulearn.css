@@ -1714,6 +1714,10 @@ h1 .copy-group-link {
 	text-align: center;
 }
 
+.course-statistics .scoring-group-title {
+	height: 60px;
+}
+
 .course-statistics .scoring-group-max-score,
 .course-statistics .slide-max-score {
 	white-space: nowrap;

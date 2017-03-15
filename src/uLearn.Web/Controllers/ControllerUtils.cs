@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
+using System.Web;
 using System.Web.Mvc;
+using ApprovalUtilities.Utilities;
 using Microsoft.AspNet.Identity;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
@@ -33,15 +35,15 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		public static T GetFilterOptionsByGroup<T>(GroupsRepo groupsRepo, IPrincipal User, string courseId, string groupId) where T : AbstractFilterOptionByCourseAndUsers, new()
+		public static T GetFilterOptionsByGroup<T>(GroupsRepo groupsRepo, IPrincipal User, string courseId, List<string> groupsIds) where T : AbstractFilterOptionByCourseAndUsers, new()
 		{
 			var result = new T { CourseId = courseId };
 
-			/* if groupId = "all", get all users */
-			if (groupId == "all")
+			/* if groupsIds contains "all" (it should be exclusive), get all users */
+			if (groupsIds.Contains("all"))
 				return result;
-			/* if groupId = "not-group", get all users not in any groups, available only for course admins */
-			if (groupId == "not-in-group" && User.HasAccessFor(courseId, CourseRole.CourseAdmin))
+			/* if groupsIds contains "not-group" (it should be exclusive), get all users not in any groups, available only for course admins */
+			if (groupsIds.Contains("not-in-group") && User.HasAccessFor(courseId, CourseRole.CourseAdmin))
 			{
 				var usersInGroups = groupsRepo.GetUsersIdsForAllGroups(courseId);
 				result.UsersIds = usersInGroups.ToList();
@@ -49,31 +51,33 @@ namespace uLearn.Web.Controllers
 				return result;
 			}
 
-			/* if groupId is null, get memers of all own groups */
-			if (string.IsNullOrEmpty(groupId))
+			result.UsersIds = new List<string>();
+			var usersIds = new HashSet<string>();
+
+			/* if groupsIds is empty, get members of all own groups */
+			if (groupsIds.Count == 0 || groupsIds.Any(string.IsNullOrEmpty))
 			{
 				var ownGroupsIds = groupsRepo.GetGroupsOwnedByUser(courseId, User, includeArchived: false).Select(g => g.Id).ToList();
-				var usersIds = new List<string>();
 				foreach (var ownGroupId in ownGroupsIds)
 				{
-					var groupUsersIds = groupsRepo.GetGroupMembers(ownGroupId).Select(u => u.Id).ToList();
-					usersIds.AddRange(groupUsersIds);
+					var groupUsersIds = groupsRepo.GetGroupMembers(ownGroupId).Select(u => u.Id);
+					usersIds.AddAll(groupUsersIds);
 				}
-				result.UsersIds = usersIds;
+				result.UsersIds = usersIds.ToList();
 				return result;
 			}
-
-			int groupIdInt;
-			if (int.TryParse(groupId, out groupIdInt))
+			
+			foreach (var groupId in groupsIds)
 			{
-				var group = groupsRepo.FindGroupById(groupIdInt);
-				if (group != null && groupsRepo.IsGroupAvailableForUser(group.Id, User))
+				int groupIdInt;
+				if (int.TryParse(groupId, out groupIdInt))
 				{
-					var usersIds = groupsRepo.GetGroupMembers(group.Id).Select(u => u.Id);
-					result.UsersIds = usersIds.ToList();
-					return result;
+					var group = groupsRepo.FindGroupById(groupIdInt);
+					if (group != null && groupsRepo.IsGroupAvailableForUser(group.Id, User))
+						usersIds.AddAll(groupsRepo.GetGroupMembers(group.Id).Select(u => u.Id));
 				}
 			}
+			result.UsersIds = usersIds.ToList();
 			return result;
 		}
 

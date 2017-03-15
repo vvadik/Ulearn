@@ -4,9 +4,11 @@ using System.Collections.Immutable;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Web.Mvc;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
+using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 
@@ -46,6 +48,7 @@ namespace uLearn.Web.Controllers
 			var unitId = param.UnitId;
 			var periodStart = param.PeriodStartDate;
 			var periodFinish = param.PeriodFinishDate;
+			var groupsIds = Request.GetMultipleValues("group");
 
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
@@ -63,8 +66,7 @@ namespace uLearn.Web.Controllers
 			var exersices = slides.OfType<ExerciseSlide>();
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
-			var groupId = param.Group;
-			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupId);
+			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupsIds);
 			filterOptions.SlidesIds = slidesIds;
 			filterOptions.PeriodStart = periodStart;
 			filterOptions.PeriodFinish = realPeriodFinish;
@@ -130,7 +132,7 @@ namespace uLearn.Web.Controllers
 				Course = course,
 				Units = course.Units,
 				Unit = selectedUnit,
-				GroupId = groupId,
+				SelectedGroupsIds = groupsIds,
 				Groups = groups,
 
 				PeriodStart = periodStart,
@@ -166,14 +168,14 @@ namespace uLearn.Web.Controllers
 			var courseId = param.CourseId;
 			var periodStart = param.PeriodStartDate;
 			var periodFinish = param.PeriodFinishDate;
-			var groupId = param.Group;
+			var groupsIds = Request.GetMultipleValues("group");
 
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
 			var course = courseManager.GetCourse(courseId);
 			var slidesIds = course.Slides.Select(s => s.Id).ToList();
 
-			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupId);
+			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupsIds);
 			filterOptions.SlidesIds = slidesIds;
 			filterOptions.PeriodStart = periodStart;
 			filterOptions.PeriodFinish = realPeriodFinish;
@@ -237,7 +239,7 @@ namespace uLearn.Web.Controllers
 			var model = new CourseStatisticPageModel
 			{
 				Course = course,
-				GroupId = groupId,
+				SelectedGroupsIds = groupsIds,
 				Groups = groups,
 
 				PeriodStart = periodStart,
@@ -496,15 +498,13 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 	}
-
+	
 	public class StatisticsParams
 	{
 		public string CourseId { get; set; }
 		
 		public string PeriodStart { get; set; }
 		public string PeriodFinish { get; set; }
-
-		public string Group { get; set; }
 
 		private static readonly string[] dateFormats = { "dd.MM.yyyy" };
 

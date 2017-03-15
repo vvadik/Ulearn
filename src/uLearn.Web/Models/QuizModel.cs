@@ -20,12 +20,13 @@ namespace uLearn.Web.Models
 		public ManualQuizChecking ManualQuizCheckQueueItem { get; set; }
 		public bool CanUserFillQuiz { get; set; }
 
-		/* GroupId != null if instructor filtered users by group and see their works */
-		public int? GroupId { get; set; }
+		/* GroupsIds != null if instructor filtered users by group and see their works */
+		public List<string> GroupsIds { get; set; }
+		public string GroupsIdsJoined => string.Join(",", GroupsIds ?? new List<string>());
 
 		public int Score
 		{
-			get { return ResultsForQuizes == null ? 0 : ResultsForQuizes.AsEnumerable().Sum(res => res.Value); }
+			get { return ResultsForQuizes?.AsEnumerable().Sum(res => res.Value) ?? 0; }
 		}
 
 		public int QuestionsCount

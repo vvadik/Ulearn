@@ -1,33 +1,18 @@
-﻿@using uLearn.Web.Extensions
-@model uLearn.Web.Controllers.ManualCheckingQueueViewModel
+﻿@model uLearn.Web.Controllers.ManualCheckingQueueViewModel
 
-@using (Html.BeginForm(Url.RequestContext.RouteData.GetRequiredString("Action"), "Admin", FormMethod.Get, new { id = "manual-checking-queue-filter-form" }))
+@using (Html.BeginForm(Url.RequestContext.RouteData.GetRequiredString("Action"), "Admin", FormMethod.Get, new { @class = "form-inline", id = "manual-checking-queue-filter-form" }))
 {
-	var formSubmit = "$('#manual-checking-queue-filter-form').submit();";
 	@Html.Hidden("courseId", Model.CourseId)
 	@Html.Hidden("done", Model.AlreadyChecked)
 
+	@Html.Partial("~/Views/Shared/_GroupsFilter.cshtml", new GroupsFilterViewModel
+	{
+		CourseId = Model.CourseId,
+		SelectedGroupsIds = Model.SelectedGroupsIds,
+		Groups = Model.Groups,
+	})
+
 	<div class="form-group">
-		@{
-			var groupsListItems = new List<SelectListItem>
-			{
-				new SelectListItem { Text = "Все пользователи", Value = "all", Selected = Model.GroupId == "all" },
-				new SelectListItem { Text = "Мои группы", Value = "", Selected = string.IsNullOrEmpty(Model.GroupId) }
-			};
-			if (User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
-			{
-				groupsListItems.Insert(1, new SelectListItem { Text = "Ни в одной группе", Value = "not-in-group", Selected = Model.GroupId == "not-in-group" });
-			}
-			groupsListItems.AddRange(
-				Model.Groups.Select(group => new SelectListItem { Text = group.Name, Value = group.Id.ToString(), Selected = group.Id.ToString() == Model.GroupId })
-				);
-		}
-		@* Avoiding quotes ' escaping in html attributes *@
-		@Html.Raw(HttpUtility.HtmlDecode(
-			Html.DropDownList("groupId",
-				groupsListItems,
-				new { @class = "form-control", onchange = formSubmit }
-				).ToHtmlString())
-			)
+		<button role="button" class="btn btn-primary">Отфильтровать</button>
 	</div>
 }

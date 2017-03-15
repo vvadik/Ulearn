@@ -62,7 +62,7 @@
 					<div class="form-group">
 						@Html.DropDownList("unitId",
 							Model.Units.Select(unit => new SelectListItem { Text = unit.Title, Selected = unit == Model.Unit, Value = unit.Id.ToString() }),
-							new { @class = "form-control" })
+							new { @class = "form-control selectpicker show-tick" })
 					</div>
 
 					<div class="form-group sm-ml10 ib">
@@ -73,23 +73,12 @@
 						по @Html.TextBox("periodFinish", Model.PeriodFinish.ToString("dd.MM.yyyy"), new { @class = "form-control form-control-date datetimepicker ib" })
 					</div>
 
-					<div class="form-group">
-						@{
-							var groupsListItems = new List<SelectListItem>
-							{
-								new SelectListItem { Text = "Все пользователи", Value = "all", Selected = Model.GroupId == "all" },
-								new SelectListItem { Text = "Мои группы", Value = "", Selected = string.IsNullOrEmpty(Model.GroupId) }
-							};
-							if (User.HasAccessFor(Model.Course.Id, CourseRole.CourseAdmin))
-							{
-								groupsListItems.Insert(1, new SelectListItem { Text = "Ни в одной группе", Value = "not-in-group", Selected = Model.GroupId == "not-in-group" });
-							}
-							groupsListItems.AddRange(
-								Model.Groups.Select(group => new SelectListItem { Text = group.Name, Value = group.Id.ToString(), Selected = group.Id.ToString() == Model.GroupId })
-								);
-						}
-						@Html.DropDownList("group", groupsListItems, new { @class = "form-control" })
-					</div>
+					@Html.Partial("~/Views/Shared/_GroupsFilter.cshtml", new GroupsFilterViewModel
+					{
+						CourseId = Model.Course.Id,
+						SelectedGroupsIds = Model.SelectedGroupsIds,
+						Groups = Model.Groups,
+					})
 
 					<div class="form-group">
 						<button role="button" class="btn btn-primary">Отфильтровать</button>

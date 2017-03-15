@@ -6,7 +6,8 @@ namespace uLearn.Web.Models
 	public class StatisticPageModel
 	{
 		public Course Course { get; set; }
-		public string GroupId { get; set; }
+		public List<string> SelectedGroupsIds { get; set; }
+		public string SelectedGroupsIdsJoined => string.Join(",", SelectedGroupsIds);
 		public List<Group> Groups { get; set; }
 
 		public DateTime PeriodStart { get; set; }

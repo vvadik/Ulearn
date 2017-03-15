@@ -43,7 +43,9 @@
 		var check = checkModel.CheckingQueueItem;
 		<div>
 			<div>
-				<b>@check.User.VisibleName</b> заполнил тест «@checkModel.ContextSlideTitle»
+				<p>
+					<b>@check.User.VisibleName</b> заполнил(а) тест «@checkModel.ContextSlideTitle»
+				</p>
 			</div>
 			<div>
 				@if (check.IsLocked)
@@ -63,12 +65,12 @@
 					</p>
 					if (check.IsLockedBy(User.Identity))
 					{
-						@Html.ActionLink("Вернуться к проверке →", "CheckQuiz", new { Model.CourseId, check.Id, Model.GroupId }, new { @class = "btn btn-sm btn-primary" })
+						@Html.ActionLink("Вернуться к проверке →", "CheckQuiz", new { Model.CourseId, check.Id, Group = Model.SelectedGroupsIdsJoined }, new { @class = "btn btn-sm btn-primary" })
 					}
 				}
 				else
 				{
-					@Html.ActionLink("Перейти к проверке →", "CheckQuiz", new { Model.CourseId, check.Id, Model.GroupId }, new { @class = "btn btn-sm btn-success" })
+					@Html.ActionLink("Перейти к проверке →", "CheckQuiz", new { Model.CourseId, check.Id, Group = Model.SelectedGroupsIdsJoined }, new { @class = "btn btn-sm btn-success" })
 				}
 			</div>
 			<hr/>

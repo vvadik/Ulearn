@@ -13,6 +13,7 @@ namespace uLearn
 	public static class ObjectExtensions
 	{
 		private static readonly XmlWriterSettings defaultSettings = new XmlWriterSettings { OmitXmlDeclaration = true, Indent = true };
+		private static readonly XmlWriterSettings withoutSpacesSettings = new XmlWriterSettings { OmitXmlDeclaration = true, Indent = false, NewLineHandling = NewLineHandling.None };
 		private static readonly XmlSerializerNamespaces ns = new XmlSerializerNamespaces(new[] { new XmlQualifiedName("", "") });
 
 		public static bool IsOneOf<T>(this T o, params T[] validValues)
@@ -29,12 +30,7 @@ namespace uLearn
 
 		public static string XmlSerialize(this object o, bool removeWhitespaces = false)
 		{
-			var settings = defaultSettings;
-			if (removeWhitespaces)
-			{
-				settings.Indent = false;
-				settings.NewLineHandling = NewLineHandling.None;
-			}
+			var settings = removeWhitespaces ? withoutSpacesSettings : defaultSettings;
 
 			using (var ms = new MemoryStream())
 			using (var writer = XmlWriter.Create(ms, settings))

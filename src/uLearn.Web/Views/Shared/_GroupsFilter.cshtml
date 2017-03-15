@@ -1,0 +1,61 @@
+﻿@using uLearn.Web.Extensions
+
+@model GroupsFilterViewModel
+
+<div class="form-group">
+	@{
+		var groupsListItems = new List<SelectListItemWithAttributes>
+		{
+			new SelectListItemWithAttributes {
+				Text = "Все пользователи",
+				Value = "all",
+				Selected = Model.SelectedGroupsIds.Contains("all"),
+				HtmlAttributes = new { data_exclusive = "true" }
+			},
+			new SelectListItemWithAttributes
+			{
+				Text = "Мои группы",
+				Value = "",
+				Selected = Model.SelectedGroupsIds.Count == 0 || Model.SelectedGroupsIds.Any(string.IsNullOrEmpty),
+				HtmlAttributes = new { data_exclusive = "true" }
+			}
+		};
+		if (User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
+		{
+			groupsListItems.Insert(1, new SelectListItemWithAttributes
+			{
+				Text = "Ни в одной группе",
+				Value = "not-in-group",
+				Selected = Model.SelectedGroupsIds.Contains("not-in-group"),
+				HtmlAttributes = new { data_exclusive = "true" }
+			});
+		}
+		groupsListItems.Add(new SelectListItemWithAttributes
+		{
+			Value = "-",
+			HtmlAttributes = new { data_divider = "true", data_exclusive = "true" }
+		});
+		groupsListItems.AddRange(
+			Model.Groups.Select(
+				group => new SelectListItemWithAttributes
+				{
+					Text = group.Name,
+					Value = group.Id.ToString(),
+					Selected = Model.SelectedGroupsIds.Contains(group.Id.ToString())
+				})
+			);
+	}
+	
+	@Html.DropDownListWithItemAttributes(
+		"group",
+		groupsListItems,
+		new {
+			@class = "form-control selectpicker",
+			size = "1",
+			multiple = "true",
+			title = "Выберите группу",
+			data_selected_text_format = "count > 2",
+			data_count_selected_text = "Выбрано {0} групп(ы)",
+		})
+</div>
+

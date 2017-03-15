@@ -34,8 +34,8 @@
 
 <form method="POST" action="@Url.Action("ScoreExercise", "Exercise", new { recheck = Model.Checking.IsChecked })" class="exercise__score-form" data-submission-id="@Model.Checking.Submission.Id">
 	<input type="hidden" name="id" value="@Model.Checking.Id" />
-	<input type="hidden" name="errorUrl" value="@Url.RouteUrl("Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, CheckQueueItemId = Model.Checking.Id, Model.GroupId })&amp;error=" />
-	<input type="hidden" name="nextUrl" value="@Url.Action("ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId, done = Model.Checking.IsChecked })" />
+	<input type="hidden" name="errorUrl" value="@Url.RouteUrl("Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, CheckQueueItemId = Model.Checking.Id, group = Model.GroupsIdsJoined })&amp;error=" />
+	<input type="hidden" name="nextUrl" value="@Url.Action("ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, group = Model.GroupsIdsJoined, done = Model.Checking.IsChecked })" />
 
 	<h4 class="@(Model.IsCurrentSubmissionChecking ? "" : "text-muted")">Оцените работу (максимальный балл @block.MaxReviewScore)</h4>
 	<div class="exercise__score">
@@ -76,7 +76,7 @@
 	@if (!Model.Checking.IsChecked)
 	{
 		<input type="submit" class="btn btn-primary" value="Сохранить и перейти к следующему"
-			   data-url="@Url.Action("CheckNextExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, Model.GroupId })"
+			   data-url="@Url.Action("CheckNextExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
 			   onclick="$('[name=nextUrl]').val($(this).data('url'))" @IsScoreFormActive()/>
 	}
 </form>

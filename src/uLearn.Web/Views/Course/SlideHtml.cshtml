@@ -190,7 +190,6 @@
 			</div>
 			}
 		}
-		
 
 		@if (data.DebugView)
 		{
@@ -213,7 +212,9 @@
 		{
 			var checking = (ManualExerciseChecking)context.ManualChecking;
 
-			@Html.Partial("~/Views/Exercise/_ExerciseScoreForm.cshtml", new ExerciseScoreFormModel(context.Course.Id, (ExerciseSlide) context.Slide, checking, context.GroupId, context.VersionId == null || checking.Submission.Id == context.VersionId))
+			@Html.Partial(
+				"~/Views/Exercise/_ExerciseScoreForm.cshtml",
+				new ExerciseScoreFormModel(context.Course.Id, (ExerciseSlide) context.Slide, checking, context.GroupsIds, context.VersionId == null || checking.Submission.Id == context.VersionId))
 		}
 	</div>
 }

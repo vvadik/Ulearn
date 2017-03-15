@@ -55,10 +55,12 @@ namespace uLearn.Web.Controllers
 		}
 
 		[AllowAnonymous]
-		public async Task<ActionResult> SlideById(string courseId, string slideId = "", int? checkQueueItemId = null, int? groupId = null, int? version = null)
+		public async Task<ActionResult> SlideById(string courseId, string slideId = "", int? checkQueueItemId = null, int? version = null)
 		{
 			if (slideId.Contains("_"))
 				slideId = slideId.Substring(slideId.LastIndexOf('_') + 1);
+
+			var groupsIds = Request.GetMultipleValues("group");
 
 			Guid slideGuid;
 			if (!Guid.TryParse(slideId, out slideGuid))
@@ -100,7 +102,7 @@ namespace uLearn.Web.Controllers
 					return RedirectToAction(GetAdminQueueActionName(queueItem), "Admin", new
 					{
 						CourseId = courseId,
-						groupId = groupId,
+						group = string.Join(",", groupsIds),
 						done = queueItem.IsChecked,
 						message = "time_is_over",
 					});
@@ -108,7 +110,7 @@ namespace uLearn.Web.Controllers
 
 			var model = isGuest ?
 				CreateGuestCoursePageModel(course, slide) :
-				await CreateCoursePageModel(course, slide, queueItem, version, groupId);
+				await CreateCoursePageModel(course, slide, queueItem, version, groupsIds);
 
 			if (!string.IsNullOrEmpty(Request.QueryString["error"]))
 				model.Error = Request.QueryString["error"];
@@ -260,7 +262,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private async Task<CoursePageModel> CreateCoursePageModel(Course course, Slide slide, AbstractManualSlideChecking manualChecking, int? exerciseSubmissionId = null, int? groupId = null)
+		private async Task<CoursePageModel> CreateCoursePageModel(Course course, Slide slide, AbstractManualSlideChecking manualChecking, int? exerciseSubmissionId = null, List<string> groupsIds = null)
 		{
 			var userId = User.Identity.GetUserId();
 
@@ -279,7 +281,7 @@ namespace uLearn.Web.Controllers
 				Slide = slide,
 				Rate = GetRate(course.Id, slide.Id),
 				Score = score,
-				BlockRenderContext = CreateRenderContext(course, slide, manualChecking, exerciseSubmissionId, groupId),
+				BlockRenderContext = CreateRenderContext(course, slide, manualChecking, exerciseSubmissionId, groupsIds),
 				ManualChecking = manualChecking,
 				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
 				IsGuest = false,
@@ -299,7 +301,7 @@ namespace uLearn.Web.Controllers
 		private BlockRenderContext CreateRenderContext(Course course, Slide slide, 
 			AbstractManualSlideChecking manualChecking = null, 
 			int? exerciseSubmissionId = null, 
-			int? groupId = null, 
+			List<string> groupsIds = null, 
 			bool isLti = false)
 		{
 			/* ExerciseController will fill blockDatas later */
@@ -313,7 +315,7 @@ namespace uLearn.Web.Controllers
 				User.HasAccessFor(course.Id, CourseRole.Instructor),
 				manualChecking,
 				false,
-				groupId,
+				groupsIds,
 				isLti
 				)
 			{

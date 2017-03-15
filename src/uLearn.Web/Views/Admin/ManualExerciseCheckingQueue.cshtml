@@ -17,11 +17,11 @@
 		<p>
 			@if (!Model.AlreadyChecked)
 			{
-				@Html.ActionLink("Проверенные работы →", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId, done = true }, new { @class = "btn btn-xs btn-info" })
+				@Html.ActionLink("Проверенные работы →", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Group = Model.SelectedGroupsIdsJoined, done = true }, new { @class = "btn btn-xs btn-info" })
 			}
 			else
 			{
-				@Html.ActionLink("← Вернуться в очередь", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Model.GroupId }, new { @class = "btn btn-xs btn-info" })
+				@Html.ActionLink("← Вернуться в очередь", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Group = Model.SelectedGroupsIdsJoined }, new { @class = "btn btn-xs btn-info" })
 			}
 		</p>
 	}
@@ -67,7 +67,9 @@
 		<hr />
 		<div>
 			<div>
-				<b>@checking.User.VisibleName</b> решил задание «@checkModel.ContextSlideTitle»
+				<p>
+					<b>@checking.User.VisibleName</b> решил(а) задание «@checkModel.ContextSlideTitle»
+				</p>
 			</div>
 			<div>
 				@if (Model.AlreadyChecked)
@@ -103,7 +105,7 @@
 						}
 					</p>
 					<p>
-						@Html.ActionLink("Посмотреть", "CheckExercise", new { Model.CourseId, checking.Id, Model.GroupId, recheck = true }, new { @class = "btn btn-sm btn-info" })
+						@Html.ActionLink("Посмотреть", "CheckExercise", new { Model.CourseId, checking.Id, Group = Model.SelectedGroupsIdsJoined, recheck = true }, new { @class = "btn btn-sm btn-info" })
 					</p>
 				}
 				else if (checking.IsLocked)
@@ -123,12 +125,12 @@
 					</p>
 					if (checking.IsLockedBy(User.Identity))
 					{
-						@Html.ActionLink("Вернуться к проверке →", "CheckExercise", new { Model.CourseId, checking.Id, Model.GroupId }, new { @class = "btn btn-sm btn-primary" })
+						@Html.ActionLink("Вернуться к проверке →", "CheckExercise", new { Model.CourseId, checking.Id, Group = Model.SelectedGroupsIdsJoined }, new { @class = "btn btn-sm btn-primary" })
 					}
 				}
 				else
 				{
-					@Html.ActionLink("Перейти к проверке →", "CheckExercise", new { Model.CourseId, checking.Id, Model.GroupId }, new { @class = "btn btn-sm btn-success" })
+					@Html.ActionLink("Перейти к проверке →", "CheckExercise", new { Model.CourseId, checking.Id, Group = Model.SelectedGroupsIdsJoined }, new { @class = "btn btn-sm btn-success" })
 				}
 			</div>
 		</div>

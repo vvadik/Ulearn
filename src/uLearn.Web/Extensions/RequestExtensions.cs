@@ -1,4 +1,8 @@
-﻿using Microsoft.Owin;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using Microsoft.Owin;
 
 namespace uLearn.Web.Extensions
 {
@@ -20,6 +24,19 @@ namespace uLearn.Web.Extensions
 			if (request.Scheme == "http" && request.LocalPort == 80 && request.GetRealRequestScheme() == "https")
 				return 443;
 			return request.LocalPort ?? 80;
+		}
+
+		public static List<string> GetMultipleValues(this HttpRequestBase request, string key, bool splitCommaSeparated=true)
+		{
+			var values = request.QueryString.GetValues(key);
+			if (values == null)
+				return new List<string>();
+
+			var valuesList = new List<string>(values);
+			if (splitCommaSeparated)
+				valuesList = valuesList.SelectMany(s => s.Split(',')).ToList();
+
+			return valuesList;
 		}
 	}
 }

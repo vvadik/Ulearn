@@ -37,10 +37,7 @@ namespace uLearn
 				if (TryGetValue(key, out value))
 					return value;
 
-				if (DefaultSelector != null)
-					value = DefaultSelector();
-				else
-					value = typeof(TValue).IsValueType ? default(TValue) : Activator.CreateInstance<TValue>();
+				value = DefaultSelector != null ? DefaultSelector() : GetEmptyValue();
 				Add(key, value);
 				return value;
 			}
@@ -48,6 +45,13 @@ namespace uLearn
 			{
 				base[key] = value;
 			}
+		}
+
+		private static TValue GetEmptyValue()
+		{
+			if (typeof(TValue) == typeof(string))
+				return default(TValue);
+			return typeof(TValue).IsValueType ? default(TValue) : Activator.CreateInstance<TValue>();
 		}
 	}
 

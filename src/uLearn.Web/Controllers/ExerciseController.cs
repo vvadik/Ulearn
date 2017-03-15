@@ -490,19 +490,20 @@ namespace uLearn.Web.Controllers
 
 	public class ExerciseScoreFormModel
 	{
-		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking, int? groupId = null, bool isCurrentSubmissionChecking = false)
+		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking, List<string> groupsIds = null, bool isCurrentSubmissionChecking = false)
 		{
 			CourseId = courseId;
 			Slide = slide;
 			Checking = checking;
-			GroupId = groupId;
+			GroupsIds = groupsIds;
 			IsCurrentSubmissionChecking = isCurrentSubmissionChecking;
 		}
 
 		public string CourseId { get; set; }
 		public ExerciseSlide Slide { get; set; }
 		public ManualExerciseChecking Checking { get; set; }
-		public int? GroupId { get; set; }
+		public List<string> GroupsIds { get; set; }
+		public string GroupsIdsJoined => string.Join(",", GroupsIds ?? new List<string>());
 		public bool IsCurrentSubmissionChecking { get; set; }
 	}
 }

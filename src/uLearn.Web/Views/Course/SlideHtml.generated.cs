@@ -496,7 +496,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n\t\t\t</div>\r\n");
 			}
 		
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\r\n\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n");
 
 
  		if (data.DebugView)
@@ -536,9 +536,11 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n");
 			var checking = (ManualExerciseChecking)context.ManualChecking;
 
 			
-WebViewPage.WriteTo(@__razor_helper_writer, Html.Partial("~/Views/Exercise/_ExerciseScoreForm.cshtml", new ExerciseScoreFormModel(context.Course.Id, (ExerciseSlide) context.Slide, checking, context.GroupId, context.VersionId == null || checking.Submission.Id == context.VersionId)));
+WebViewPage.WriteTo(@__razor_helper_writer, Html.Partial(
+				"~/Views/Exercise/_ExerciseScoreForm.cshtml",
+				new ExerciseScoreFormModel(context.Course.Id, (ExerciseSlide) context.Slide, checking, context.GroupsIds, context.VersionId == null || checking.Submission.Id == context.VersionId)));
 
-                                                                                                                                                                                                                                                 
+                                                                                                                                                                                        
 		}
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t</div>\r\n");

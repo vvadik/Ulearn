@@ -303,6 +303,7 @@
     <Compile Include="Migrations\201702210620147_AddIsManualCheckingEnabledForOldSolutions.Designer.cs">
       <DependentUpon>201702210620147_AddIsManualCheckingEnabledForOldSolutions.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\GroupsFilterViewModel.cs" />
     <Compile Include="Telegram\ErrorsBot.cs" />
     <Compile Include="Telegram\TelegramBot.cs" />
     <Compile Include="DataContexts\AdditionalScoresRepo.cs" />
@@ -1186,6 +1187,7 @@
     <Content Include="codemirror\theme\xq-dark.css" />
     <Content Include="codemirror\theme\xq-light.css" />
     <Content Include="Content\awesome-bootstrap-checkbox.css" />
+    <Content Include="Content\bootstrap-select.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bounce.css" />
@@ -1216,6 +1218,8 @@
     <Content Include="Scripts\activate-clipboard.js" />
     <Content Include="Scripts\analytics-highcharts.js" />
     <Content Include="Scripts\analytics.js" />
+    <Content Include="Scripts\bootstrap-select.additional.js" />
+    <Content Include="Scripts\bootstrap-select.min.js" />
     <Content Include="Scripts\bootstrap.file-input.js" />
     <Content Include="qunit\qunit-1.15.0.css" />
     <Content Include="qunit\qunit-1.15.0.js" />
@@ -1557,6 +1561,7 @@
     <Content Include="Views\Shared\_UlearnUpdatesInvitation.cshtml" />
     <Content Include="Views\Shared\_YandexMetrika.cshtml" />
     <Content Include="Views\Analytics\CourseStatistics.cshtml" />
+    <Content Include="Views\Shared\_GroupsFilter.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

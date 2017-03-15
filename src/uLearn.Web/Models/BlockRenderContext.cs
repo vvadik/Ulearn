@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using uLearn.Model.Blocks;
 
 namespace uLearn.Web.Models
@@ -15,8 +16,8 @@ namespace uLearn.Web.Models
 		public bool CanUserFillQuiz { get; set; }
 		public bool RevealHidden { get; private set; }
 
-		/* GroupId != null if instructor filtered users by group and see their works */
-		public int? GroupId { get; private set; }
+		/* GroupsIds != null if instructor filtered users by group and see their works */
+		public List<string> GroupsIds { get; set; }
 
 		/* User's version of slide, i.e. for exercises */
 		public int? VersionId { get; set; }
@@ -29,7 +30,7 @@ namespace uLearn.Web.Models
 			return BlockData[index];
 		}
 
-		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData, bool isGuest = false, bool revealHidden = false, AbstractManualSlideChecking manualChecking = null, bool canUserFillQuiz = false, int? groupId = null, bool isLti = false)
+		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData, bool isGuest = false, bool revealHidden = false, AbstractManualSlideChecking manualChecking = null, bool canUserFillQuiz = false, List<string> groupsIds = null, bool isLti = false)
 		{
 			if (blockData.Length != slide.Blocks.Length)
 				throw new ArgumentException("BlockData.Length should be slide.Blocks.Length");
@@ -41,7 +42,7 @@ namespace uLearn.Web.Models
 			RevealHidden = revealHidden;
 			ManualChecking = manualChecking;
 			CanUserFillQuiz = canUserFillQuiz;
-			GroupId = groupId;
+			GroupsIds = groupsIds;
 			IsLti = isLti;
 		}
 	}

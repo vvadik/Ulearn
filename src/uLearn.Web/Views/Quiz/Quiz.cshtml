@@ -28,7 +28,7 @@
 	}
 
 	if (! string.IsNullOrEmpty(status))
-	{
+	{	
 		<p class="quiz-status">@status</p>
 	}
 	if (! string.IsNullOrEmpty(Request.QueryString["error"]))
@@ -65,8 +65,8 @@
 		if (Model.ManualQuizCheckQueueItem != null)
 		{
 			@Html.Hidden("id", Model.ManualQuizCheckQueueItem.Id)
-			@Html.Hidden("errorUrl", Url.RouteUrl("Course.SlideById", new { courseId = Model.CourseId, slideId = Model.Slide.Url, CheckQueueItemId = Model.ManualQuizCheckQueueItem.Id, Model.GroupId }) + "&error=")
-			@Html.Hidden("nextUrl", Url.Action("ManualQuizCheckingQueue", "Admin", new { courseId = Model.CourseId, Model.GroupId }))
+			@Html.Hidden("errorUrl", Url.RouteUrl("Course.SlideById", new { courseId = Model.CourseId, slideId = Model.Slide.Url, CheckQueueItemId = Model.ManualQuizCheckQueueItem.Id, group = Model.GroupsIdsJoined }) + "&error=")
+			@Html.Hidden("nextUrl", Url.Action("ManualQuizCheckingQueue", "Admin", new { courseId = Model.CourseId, group = Model.GroupsIdsJoined }))
 		}
 		@SlideHtml.Blocks(context, Html)
 	}
@@ -86,7 +86,7 @@
 			{
 				<input type="submit" class="btn btn-default" form="quiz__score-form" value="Сохранить и вернуться">
 				<input type="submit" class="btn btn-primary" form="quiz__score-form" value="Сохранить и перейти к следующему"
-					   data-url="@Url.Action("CheckNextQuizForSlide", "Admin", new { courseId = Model.CourseId, slideId = Model.Slide.Id, Model.GroupId })"
+					   data-url="@Url.Action("CheckNextQuizForSlide", "Admin", new { courseId = Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
 					   onclick="$('[name=nextUrl]').val($(this).data('url'))">
 			}
 			else if (Model.QuizState == QuizState.Subtotal)
