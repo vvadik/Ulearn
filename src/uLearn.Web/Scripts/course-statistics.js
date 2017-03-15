@@ -110,6 +110,7 @@
 					$groupHeader.find('td').text(currentGroupingValue ? currentGroupingValue : 'Вне групп');
 					$tbody.append($groupHeader);
 				}
+				prevGroupingValue = currentGroupingValue;
 			}
 			$tbody.append(row);
 		});
