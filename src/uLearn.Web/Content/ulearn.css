@@ -1694,6 +1694,18 @@ h1 .copy-group-link {
 	font-size: 12px;
 }
 
+.course-statistics thead th.sorted {
+	background-color: #8dbdd8;
+}
+
+.course-statistics thead th.sorted.sorted-desc:after {
+	content: " ↑";
+}
+
+.course-statistics thead th.sorted.sorted-asc:after {
+	content: " ↓";
+}
+
 .course-statistics .unit-title {
 	max-height: 18px;
 	line-height: 12px;
@@ -1758,10 +1770,28 @@ h1 .copy-group-link {
 	border-bottom: 1px solid rgba(100, 100, 100, 0.4);
 }
 
+.course-statistics.with-expanded-scoring-group td:not(.in-expanded-scoring-group):not(.student-name):not(.scoring-group-sum-score):not(:first-child),
+.course-statistics.with-expanded-scoring-group th:not(.in-expanded-scoring-group):not([data-unit-id="sum"]):not(:first-child) {
+	-ms-opacity: 0.3;
+	opacity: 0.3;
+}
+
+.course-statistics.with-expanded-scoring-group .in-expanded-scoring-group.scoring-group-score,
+.course-statistics.with-expanded-scoring-group .in-expanded-scoring-group.scoring-group-max-score,
+.course-statistics.with-expanded-scoring-group .in-expanded-scoring-group.scoring-group-title {
+	font-weight: 700;
+	color: #333;
+}
+
 .course-statistics td.score {
 	text-align: center;
 	color: #666;
 }
+
+.course-statistics td.scoring-group-sum-score {
+	color: #333;
+	font-weight: 700;
+} 
 
 .course-statistics .expand-scoring-group__link .expand-icon {
 	font-size: 8px;
