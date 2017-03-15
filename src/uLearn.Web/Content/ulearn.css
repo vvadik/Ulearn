@@ -1797,6 +1797,12 @@ h1 .copy-group-link {
 	font-size: 8px;
 }
 
+.course-statistics .group-header {
+	background-color: #fec;
+	font-size: 12px;
+	padding-top: 3px;
+}
+
 .course-statistics .score.grade-1 { background-color: #FFC0C0; }
 .course-statistics .score.grade-2 { background-color: #FFC8C0; }
 .course-statistics .score.grade-3 { background-color: #FFD0C0; }

@@ -65,17 +65,34 @@
 			$('.course-statistics__enable-scoring-group__checkbox').removeAttr('disabled');
 	});
 
+	var compareByKeyFunction = function ($first, $second, keyFunction, order) {
+		var firstValue = keyFunction($first);
+		var secondValue = keyFunction($second);
+		if (firstValue < secondValue)
+			return order === 'asc' ? -1 : 1;
+		if (firstValue > secondValue)
+			return order === 'asc' ? 1 : -1;
+		return 0;
+	}
+
 	/* Table sorting */
-	var sortTable = function ($table, sortingFunctions) {
+	var sortTable = function ($table, sortingFunctions, groupingFunction) {
+		$table.find('tbody .group-header-row').remove();
 		var $rows = $table.find('tbody tr').get();
 
 		$rows.sort(function (first, second) {
 			var $firstRow = $(first);
 			var $secondRow = $(second);
+			var compare;
+			if (groupingFunction) {
+				compare = compareByKeyFunction($firstRow, $secondRow, groupingFunction);
+				if (compare !== 0)
+					return compare;
+			}
 			for (var idx in sortingFunctions) {
 				if (sortingFunctions.hasOwnProperty(idx)) {
 					var sortingFunction = sortingFunctions[idx];
-					var compare = sortingFunction($firstRow, $secondRow);
+					compare = sortingFunction($firstRow, $secondRow);
 					if (compare !== 0)
 						return compare;
 				}
@@ -83,8 +100,18 @@
 			return 0;
 		});
 
+		var $tbody = $table.children('tbody');
+		var prevGroupingValue = undefined;
 		$.each($rows, function (index, row) {
-			$table.children('tbody').append(row);
+			if (groupingFunction) {
+				var currentGroupingValue = groupingFunction($(row));
+				if (prevGroupingValue !== currentGroupingValue) {
+					var $groupHeader = $('<tr class="group-header-row"><td colspan="1000" class="group-header"></td></tr>');
+					$groupHeader.find('td').text(currentGroupingValue ? currentGroupingValue : 'Вне групп');
+					$tbody.append($groupHeader);
+				}
+			}
+			$tbody.append(row);
 		});
 	}
 
@@ -115,6 +142,26 @@
 
 		return getCompareFunction(filter, order);
 	}
+
+	var getCurrentSortingFunctions = function() {
+		var $oldSortingThs = $courseStatistics.find('thead th[data-sorter="true"].sorted');
+		$oldSortingThs.sort(function (first, second) {
+			var firstValue = $(first).data('sorting-index');
+			var secondValue = $(second).data('sorting-index');
+			if (firstValue < secondValue) return -1;
+			if (firstValue > secondValue) return 1;
+			return 0;
+		});
+		return $.map($oldSortingThs, function (el) { return getSortingFunction($(el), $(el).data('order')); });
+	}
+
+	var groupingFunction = function ($row) { return $row.data('groups'); };
+
+	$('#grouping-by-group').change(function() {
+		var isGrouppingEnabled = $(this).is(':checked');
+		var sortingFunctions = getCurrentSortingFunctions();
+		sortTable($courseStatistics, sortingFunctions, isGrouppingEnabled ? groupingFunction : undefined);
+	});
 	
 	$courseStatistics.find('thead th[data-sorter="true"]').click(function (e) {
 		e.preventDefault();
@@ -124,17 +171,11 @@
 		/* Exclude current column from sorting */
 		$self.removeClass('sorted sorted-asc sorted-desc');
 
+		var isGrouppingEnabled = $('#grouping-by-group').is(':checked');
+
 		var sortingFunctions = [];
 		if (e.shiftKey) {
-			var $oldSortingThs = $courseStatistics.find('thead th[data-sorter="true"].sorted');
-			$oldSortingThs.sort(function(first, second) {
-				var firstValue = $(first).data('sorting-index');
-				var secondValue = $(second).data('sorting-index');
-				if (firstValue < secondValue) return -1;
-				if (firstValue > secondValue) return 1;
-				return 0;
-			});
-			sortingFunctions = $.map($oldSortingThs, function(el) { return getSortingFunction($(el), $(el).data('order')); });
+			sortingFunctions = getCurrentSortingFunctions();
 		} else {
 			$courseStatistics.find('thead th[data-sorter="true"].sorted').data('order', undefined).removeClass('sorted sorted-asc sorted-desc');
 		}
@@ -148,7 +189,7 @@
 		var order = changeOrder($self.data('order'));
 		sortingFunctions.push(getSortingFunction($self, order));
 		$self.data('order', order).data('sorting-index', maxSortingIndex + 1).addClass('sorted sorted-' + order);
-
-		sortTable($courseStatistics, sortingFunctions);
+		
+		sortTable($courseStatistics, sortingFunctions, isGrouppingEnabled ? groupingFunction : undefined);
 	});
 });

@@ -50,17 +50,30 @@
 			</div>
 		}
 
-		<div class="scoring-groups-filters">
-			<h3>Показывать баллы:</h3>
-			@foreach (var scoringGroup in Model.ScoringGroups.Values)
-			{
+		<div class="row">
+			<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+				<div class="scoring-groups-filters">
+					<h3>Показывать баллы:</h3>
+					@foreach (var scoringGroup in Model.ScoringGroups.Values)
+					{
+						<div class="checkbox checkbox-default">
+							@Html.CheckBox("scoring-group__" + scoringGroup.Id, true, new { @class = "course-statistics__enable-scoring-group__checkbox", data_scoring_group = scoringGroup.Id })
+							<label for="scoring-group__@scoringGroup.Id">
+								@scoringGroup.Name (@scoringGroup.Abbreviation)
+							</label>
+						</div>
+					}
+				</div>
+			</div>
+			<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+				<h3>Группировать</h3>
 				<div class="checkbox checkbox-default">
-					@Html.CheckBox("scoring-group__" + scoringGroup.Id, true, new { @class="course-statistics__enable-scoring-group__checkbox", data_scoring_group=scoringGroup.Id })
-					<label for="scoring-group__@scoringGroup.Id">
-						@scoringGroup.Name (@scoringGroup.Abbreviation)
+					@Html.CheckBox("grouping-by-group", false)
+					<label for="grouping-by-group">
+						По группам
 					</label>
 				</div>
-			}
+			</div>
 		</div>
 
 		@{
@@ -156,8 +169,8 @@
 			<tbody>
 			@foreach (var user in Model.VisitedUsers)
 			{
-				<tr class="student" data-user-id="@user.UserId" data-group-id="@Model.VisiterUsersGroups[user.UserId]">
-					<td title="@user.UserName @user.UserId" class="student-name">@user.UserVisibleName</td>
+				<tr class="student" data-user-id="@user.UserId" data-groups="@Model.VisiterUsersGroups[user.UserId]">
+					<td title="@user.UserName" class="student-name">@user.UserVisibleName</td>
 
 					@foreach (var scoringGroup in Model.ScoringGroups.Values)
 					{
