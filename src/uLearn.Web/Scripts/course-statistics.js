@@ -45,7 +45,7 @@
 		
 		$('.scoring-group-title[data-scoring-group="' + scoringGroupId + '"]').each(function () {
 			/* Collapse if expanded */
-			if ($(this).data('isExpanded'))
+			if ($(this).data('expanded'))
 				toggleUnitScoringGroup($(this));
 
 			var unitId = $(this).data('unitId');
@@ -66,13 +66,6 @@
 	});
 
 	/* Table sorting */
-
-	/**
-	 * Sort rows in table
-	 * @param {} filter: jquery filter for fetching sorting cell from row
-	 * @param {} order: 'asc' or 'desc'. Default: 'asc'
-	 * @returns {} 
-	 */
 	var sortTable = function ($table, sortingFunctions) {
 		var $rows = $table.find('tbody tr').get();
 
