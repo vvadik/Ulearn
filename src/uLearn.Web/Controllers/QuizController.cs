@@ -175,7 +175,8 @@ namespace uLearn.Web.Controllers
 			foreach (var ans in answers)
 			{
 				var quizInfos = CreateQuizInfo(slide, ans);
-				allQuizInfos.AddRange(quizInfos);
+				if (quizInfos != null)
+					allQuizInfos.AddRange(quizInfos);
 			}
 			var blocksInAnswerCount = allQuizInfos.Select(x => x.QuizId).Distinct().Count();
 			if (blocksInAnswerCount != quizBlockWithTaskCount)
@@ -283,7 +284,9 @@ namespace uLearn.Web.Controllers
 				return CreateQuizInfoForDb(block as OrderingBlock, answer);
 			if (block is MatchingBlock)
 				return CreateQuizInfoForDb(block as MatchingBlock, answer);
-			return CreateQuizInfoForDb(block as IsTrueBlock, answer);
+			if (block is IsTrueBlock)
+				return CreateQuizInfoForDb(block as IsTrueBlock, answer);
+			return null;
 		}
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(IsTrueBlock isTrueBlock, IGrouping<string, QuizAnswer> data)

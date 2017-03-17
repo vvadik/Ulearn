@@ -81,7 +81,7 @@ namespace uLearn.Web.Controllers
 			var quizzesAverageScore = quizzes.ToDictionary(q => q.Id,
 				q => (int) slidesVisits.GetOrDefault(q.Id, new List<Visit>())
 									   .Where(v => v.IsPassed)
-									   .Select(v => 100 * Math.Min(v.Score, q.MaxScore) / q.MaxScore)
+									   .Select(v => 100 * Math.Min(v.Score, q.MaxScore) / (q.MaxScore != 0 ? q.MaxScore : 1))
 									   .DefaultIfEmpty(-1)
 									   .Average()
 			);
