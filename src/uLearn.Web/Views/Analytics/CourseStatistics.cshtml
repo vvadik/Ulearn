@@ -53,7 +53,7 @@
 		<div class="row">
 			<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
 				<div class="scoring-groups-filters">
-					<h3>Показывать баллы:</h3>
+					<h3>Баллы</h3>
 					@foreach (var scoringGroup in Model.ScoringGroups.Values)
 					{
 						<div class="checkbox checkbox-default">
@@ -68,7 +68,7 @@
 			<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
 				<h3>Группировать</h3>
 				<div class="checkbox checkbox-default">
-					@Html.CheckBox("grouping-by-group", false)
+					@Html.CheckBox("grouping-by-group", true)
 					<label for="grouping-by-group">
 						По группам
 					</label>
@@ -78,12 +78,13 @@
 
 		@{
 			var orderingHint = "Нажмите для сортироки по этому полю. Нажмите с зажатым Shift, чтобы сортировать по нескольким столбцам";
+			string previousUserGroups = null;
 		}
 		<table class="course-statistics" data-initial-order="desc">
 			<thead>
 			<tr>
 				<th rowspan="2">Фамилия Имя</th>
-				<th colspan="@Model.ScoringGroups.Count">
+				<th colspan="@Model.ScoringGroups.Count" data-unit-id="sum">
 					<div class="unit-title" data-unit-id="sum">Сумма</div>
 				</th>
 				@foreach (var unit in Model.Course.Units)
@@ -98,7 +99,7 @@
 			<tr>
 				@foreach (var scoringGroup in Model.ScoringGroups.Values)
 				{
-					<th class="scoring-group-title" title="@scoringGroup.Name"
+					<th class="scoring-group-title" title="@orderingHint" data-sorter="true"
 					    data-unit-id="sum" data-scoring-group="@scoringGroup.Id">@scoringGroup.Abbreviation</th>
 				}
 				@foreach (var unit in Model.Course.Units)
@@ -106,7 +107,7 @@
 					foreach (var scoringGroup in unit.Scoring.Groups.Values)
 					{
 						var shouldBeSolvedSlides = Model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
-						<th class="scoring-group-title"
+						<th class="scoring-group-title" title="@orderingHint" data-sorter="true"
 						    data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id" data-expanded="false">
 							@if (shouldBeSolvedSlides.Count > 0)
 							{
@@ -119,14 +120,14 @@
 						</th>
 						foreach (var slide in shouldBeSolvedSlides)
 						{
-							<th class="slide-title" title="@slide.Title"
+							<th class="slide-title" title="@slide.Title" data-sorter="true"
 							    data-slide-id="@slide.Id" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
 								<div class="slide-title__content">@slide.Title.TruncateWithEllipsis(8, "")</div>
 							</th>
 						}
 						if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
 						{
-							<th class="slide-title"
+							<th class="slide-title" title="@orderingHint" data-sorter="true"
 							    data-slide-id="additional" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
 								<div class="slide-title__content">Доп</div>
 							</th>
@@ -138,26 +139,26 @@
 				<th class="scoring-group-max-score" style="text-align: right">Максимум:</th>
 				@foreach (var scoringGroup in Model.ScoringGroups.Values)
 				{
-					<th class="scoring-group-max-score" title="@orderingHint" data-sorter="true"
+					<th class="scoring-group-max-score"
 						 data-unit-id="sum" data-scoring-group="@scoringGroup.Id">@Model.Course.Units.Sum(unit => GetMaxScoreForUnitByScoringGroup(unit, scoringGroup))</th>
 				}
 				@foreach (var unit in Model.Course.Units)
 				{
 					foreach (var scoringGroup in unit.Scoring.Groups.Values)
 					{
-						<th class="scoring-group-max-score" title="@orderingHint" data-sorter="true"
+						<th class="scoring-group-max-score"
 							data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">@GetMaxScoreForUnitByScoringGroup(unit, scoringGroup)</th>
 						var shouldBeSolvedSlides = Model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
 						foreach (var slide in shouldBeSolvedSlides)
 						{
-							<th class="slide-max-score" title="@orderingHint" data-sorter="true"
+							<th class="slide-max-score"
 								data-slide-id="@slide.Id" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
 								@slide.MaxScore
 							</th>
 						}
 						if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
 						{
-							<th class="slide-max-score" title="@orderingHint" data-sorter="true"
+							<th class="slide-max-score"
 								data-slide-id="additional" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
 								@scoringGroup.MaxAdditionalScore
 							</th>
@@ -169,6 +170,15 @@
 			<tbody>
 			@foreach (var user in Model.VisitedUsers)
 			{
+				if (previousUserGroups != Model.VisiterUsersGroups[user.UserId])
+				{
+					<tr class="group-header-row">
+						<td colspan="1000" class="group-header">
+							@Model.VisiterUsersGroups[user.UserId]
+						</td>
+					</tr>
+					previousUserGroups = Model.VisiterUsersGroups[user.UserId];
+				}
 				<tr class="student" data-user-id="@user.UserId" data-groups="@Model.VisiterUsersGroups[user.UserId]">
 					<td title="@user.UserName" class="student-name">@user.UserVisibleName</td>
 

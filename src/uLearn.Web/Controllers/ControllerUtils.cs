@@ -57,7 +57,7 @@ namespace uLearn.Web.Controllers
 			/* if groupsIds is empty, get members of all own groups */
 			if (groupsIds.Count == 0 || groupsIds.Any(string.IsNullOrEmpty))
 			{
-				var ownGroupsIds = groupsRepo.GetGroupsOwnedByUser(courseId, User, includeArchived: false).Select(g => g.Id).ToList();
+				var ownGroupsIds = groupsRepo.GetGroupsOwnedByUser(courseId, User).Select(g => g.Id).ToList();
 				foreach (var ownGroupId in ownGroupsIds)
 				{
 					var groupUsersIds = groupsRepo.GetGroupMembers(ownGroupId).Select(u => u.Id);
@@ -66,7 +66,7 @@ namespace uLearn.Web.Controllers
 				result.UsersIds = usersIds.ToList();
 				return result;
 			}
-			
+
 			foreach (var groupId in groupsIds)
 			{
 				int groupIdInt;

@@ -144,6 +144,15 @@ p {
 	margin-top: 24px;
 }
 
+.bootstrap-select.without-backdrop .dropdown-backdrop {
+	display: none;
+}
+
+.selectpicker.form-control[multiple="true"] option {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
 /* ReSharper restore Html.CssClassElementsNotFound */
 /* ReSharper restore DeclarationIsEmpty */
 /*#endregion */
@@ -1692,10 +1701,20 @@ h1 .copy-group-link {
 .course-statistics thead th {
 	font-weight: 100;
 	font-size: 12px;
+	background-color: #ebf4f9;
 }
 
 .course-statistics thead th.sorted {
 	background-color: #8dbdd8;
+}
+
+.course-statistics thead th.slide-title.sorted:after {
+	position: absolute;
+	bottom: 0;
+}
+
+.course-statistics thead th.slide-title.sorted .slide-title__content {
+	top: 8px;
 }
 
 .course-statistics thead th.sorted.sorted-desc:after {
@@ -1730,8 +1749,8 @@ h1 .copy-group-link {
 	height: 60px;
 }
 
-.course-statistics .scoring-group-max-score,
-.course-statistics .slide-max-score {
+.course-statistics .scoring-group-title,
+.course-statistics .slide-title {
 	white-space: nowrap;
 	cursor: pointer;
 }
@@ -1739,6 +1758,7 @@ h1 .copy-group-link {
 .course-statistics .slide-title {
 	height: 60px;
 	min-height: 60px;
+	position: relative;
 }
 
 .course-statistics .slide-title__content {
@@ -1760,14 +1780,32 @@ h1 .copy-group-link {
 	display: none;
 }
 
+.course-statistics .slide-max-score,
+.course-statistics .slide-score {
+	position: relative;
+}
+
+.course-statistics .slide-max-score:before,
+.course-statistics .slide-score:before {
+	content: "=";
+	position: absolute;
+	left: -5px;
+}
+
+.course-statistics .slide-max-score:before {
+	left: -4px;
+}
+
+.course-statistics .slide-max-score + .slide-max-score:before,
+.course-statistics .slide-score + .slide-score:before {
+	content: "+";
+}
+
 .course-statistics th,
 .course-statistics td {
 	border-right: 1px solid rgba(100, 100, 100, 0.2);
 	border-bottom: 1px solid rgba(100, 100, 100, 0.2);
-}
-
-.course-statistics th {
-	border-bottom: 1px solid rgba(100, 100, 100, 0.4);
+	padding: 0 3px;
 }
 
 .course-statistics.with-expanded-scoring-group td:not(.in-expanded-scoring-group):not(.student-name):not(.scoring-group-sum-score):not(:first-child),
@@ -1781,6 +1819,17 @@ h1 .copy-group-link {
 .course-statistics.with-expanded-scoring-group .in-expanded-scoring-group.scoring-group-title {
 	font-weight: 700;
 	color: #333;
+	border-right-width: 0;
+}
+
+.course-statistics.with-expanded-scoring-group .in-expanded-scoring-group {
+	border-right-width: 0;
+}
+
+.course-statistics.with-expanded-scoring-group .in-expanded-scoring-group + .scoring-group-score,
+.course-statistics.with-expanded-scoring-group .in-expanded-scoring-group + .scoring-group-max-score,
+.course-statistics.with-expanded-scoring-group .in-expanded-scoring-group + .scoring-group-title {
+	border-left: 1px solid rgba(100, 100, 100, 0.2);
 }
 
 .course-statistics td.score {
@@ -1788,7 +1837,9 @@ h1 .copy-group-link {
 	color: #666;
 }
 
-.course-statistics td.scoring-group-sum-score {
+.course-statistics td.scoring-group-sum-score,
+.course-statistics th.scoring-group-max-score[data-unit-id="sum"],
+.course-statistics th.scoring-group-title[data-unit-id="sum"] {
 	color: #333;
 	font-weight: 700;
 } 

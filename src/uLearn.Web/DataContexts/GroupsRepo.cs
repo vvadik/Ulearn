@@ -215,9 +215,12 @@ namespace uLearn.Web.DataContexts
 			return db.Groups.FirstOrDefault(g => g.InviteHash == hash && !g.IsDeleted && g.IsInviteLinkEnabled);
 		}
 
-		public IEnumerable<Group> GetGroups(string courseId)
+		public IEnumerable<Group> GetGroups(string courseId, bool includeArchived=false)
 		{
-			return db.Groups.Where(g => g.CourseId == courseId && ! g.IsDeleted);
+			var groups = db.Groups.Where(g => g.CourseId == courseId && ! g.IsDeleted);
+			if (!includeArchived)
+				groups = groups.Where(g => !g.IsArchived);
+			return groups;
 		}
 
 		public bool IsGroupAvailableForUser(int groupId, IPrincipal user)
@@ -234,21 +237,21 @@ namespace uLearn.Web.DataContexts
 			return !group.IsDeleted && (group.OwnerId == userId || group.IsPublic);
 		}
 
-		public List<Group> GetAvailableForUserGroups(string courseId, IPrincipal user)
+		public List<Group> GetAvailableForUserGroups(string courseId, IPrincipal user, bool includeArchived=false)
 		{
 			if (!user.HasAccessFor(courseId, CourseRole.Instructor))
 				return new List<Group>();
 
-			return GetAvailableForUserGroups(new List<string> { courseId }, user);
+			return GetAvailableForUserGroups(new List<string> { courseId }, user, includeArchived);
 		}
 
-		public List<Group> GetAvailableForUserGroups(List<string> coursesIds, IPrincipal user)
+		public List<Group> GetAvailableForUserGroups(List<string> coursesIds, IPrincipal user, bool includeArchived=false)
 		{
 			var coursesWhereUserCanSeeAllGroups = coursesIds.Where(id => CanUserSeeAllCourseGroups(user, id)).ToList();
 			var otherCourses = new HashSet<string>(coursesIds).Except(coursesWhereUserCanSeeAllGroups).ToList();
 
 			var userId = user.Identity.GetUserId();
-			var groups = db.Groups.Where(g => !g.IsDeleted &&
+			var groups = db.Groups.Where(g => !g.IsDeleted && (includeArchived || !g.IsArchived) &&
 				(
 					/* Course admins can see all groups */
 					coursesWhereUserCanSeeAllGroups.Contains(g.CourseId) || 
@@ -264,7 +267,7 @@ namespace uLearn.Web.DataContexts
 				.ToList();
 		}
 
-		public List<Group> GetGroupsOwnedByUser(string courseId, IPrincipal user, bool includeArchived=true)
+		public List<Group> GetGroupsOwnedByUser(string courseId, IPrincipal user, bool includeArchived=false)
 		{
 			var userId = user.Identity.GetUserId();
 			var groups = db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && g.OwnerId == userId);
@@ -291,7 +294,7 @@ namespace uLearn.Web.DataContexts
 					kv => kv.Key,
 					kv => kv.Value.Select(m => m.Group)
 						.Distinct()
-						.Where(g => (g.OwnerId == currentUserId || g.IsPublic || canSeeAllGroups[g.CourseId]) && !g.IsDeleted)
+						.Where(g => (g.OwnerId == currentUserId || g.IsPublic || canSeeAllGroups[g.CourseId]) && !g.IsDeleted && !g.IsArchived)
 						.OrderBy(g => g.OwnerId != currentUserId)
 						.Take(maxCount + 1)
 						.Select((g, idx) => idx >= maxCount ? "..." : g.Name)

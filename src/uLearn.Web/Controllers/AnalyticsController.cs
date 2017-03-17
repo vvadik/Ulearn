@@ -197,14 +197,17 @@ namespace uLearn.Web.Controllers
 				.GroupBy(v => v.UserId)
 				.ToDictionary(g => g.Key, g => g.Count());
 
-			/* Get `usersLimit` best by slides count and order them by name */
+			/* Get `usersLimit` best by slides count */
 			visitedUsers = visitedUsers
 				.OrderByDescending(u => visitedSlidesCountByUserAllTime.GetOrDefault(u.UserId, 0))
 				.Take(usersLimit)
-				.OrderBy(u => u.UserVisibleName)
 				.ToList();
-
 			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();
+
+			var visiterUsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, visitedUsersIds, User, 10).ToDefaultDictionary();
+
+			/* Order users by groups and name*/
+			visitedUsers= visitedUsers.OrderBy(u => Tuple.Create(visiterUsersGroups[u.UserId], u.UserVisibleName)).ToList();
 
 			/* From now fetch only filtered users' statistics */
 			filterOptions.UsersIds = visitedUsersIds;
@@ -235,7 +238,6 @@ namespace uLearn.Web.Controllers
 				.ToDictionary(g => g.Key, g => g.Select(e => e.ScoringGroupId).ToList());
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
-			var visiterUsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, visitedUsersIds, User, 10).ToDefaultDictionary();
 			var model = new CourseStatisticPageModel
 			{
 				Course = course,

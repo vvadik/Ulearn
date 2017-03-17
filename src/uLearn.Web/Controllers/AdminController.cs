@@ -581,7 +581,7 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult Groups(string courseId)
 		{
-			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User, includeArchived: true);
 			var course = courseManager.GetCourse(courseId);
 			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course);
 			var enabledScoringGroups = groupsRepo.GetEnabledAdditionalScoringGroups(courseId)
@@ -589,7 +589,7 @@ namespace uLearn.Web.Controllers
 				.ToDictionary(g => g.Key, g => g.Select(e => e.ScoringGroupId).ToList());
 			var instructors = usersRepo.GetCourseInstructors(courseId, userManager, limit: 100);
 			var coursesIds = User.GetControllableCoursesId().ToList();
-			var groupsMayBeCopied = groupsRepo.GetAvailableForUserGroups(coursesIds, User).Where(g => !g.IsArchived).ToList();
+			var groupsMayBeCopied = groupsRepo.GetAvailableForUserGroups(coursesIds, User).ToList();
 
 			return View("Groups", new GroupsViewModel
 			{

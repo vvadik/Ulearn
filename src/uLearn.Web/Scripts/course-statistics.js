@@ -30,6 +30,7 @@
 		addColspan($unitTitleTh, isExpanded ? slidesCount : -slidesCount);
 		
 		$courseStatistics.find(filterByUnitAndScoringGroup).toggleClass('in-expanded-scoring-group', isExpanded);
+		$unitTitleTh.toggleClass('in-expanded-scoring-group', $courseStatistics.find('td.in-expanded-scoring-group[data-unit-id="' + unitId + '"]').length > 0);
 		$courseStatistics.toggleClass('with-expanded-scoring-group', $courseStatistics.find('.in-expanded-scoring-group').length > 0);
 	}
 
@@ -65,14 +66,20 @@
 			$('.course-statistics__enable-scoring-group__checkbox').removeAttr('disabled');
 	});
 
+	var compareAsIntsAndStrings = function (firstValue, secondValue, order) {
+		var firstValueInt = parseInt(firstValue);
+		var secondValueInt = parseInt(secondValue);
+		if (firstValueInt < secondValueInt) return order === 'asc' ? -1 : 1;
+		if (firstValueInt > secondValueInt) return order === 'asc' ? 1 : -1;
+		if (firstValue < secondValue) return order === 'asc' ? -1 : 1;
+		if (firstValue > secondValue) return order === 'asc' ? 1 : -1;
+		return 0;
+	}
+
 	var compareByKeyFunction = function ($first, $second, keyFunction, order) {
 		var firstValue = keyFunction($first);
 		var secondValue = keyFunction($second);
-		if (firstValue < secondValue)
-			return order === 'asc' ? -1 : 1;
-		if (firstValue > secondValue)
-			return order === 'asc' ? 1 : -1;
-		return 0;
+		return compareAsIntsAndStrings(firstValue, secondValue, order);
 	}
 
 	/* Table sorting */
@@ -85,7 +92,7 @@
 			var $secondRow = $(second);
 			var compare;
 			if (groupingFunction) {
-				compare = compareByKeyFunction($firstRow, $secondRow, groupingFunction);
+				compare = compareByKeyFunction($firstRow, $secondRow, groupingFunction, 'asc');
 				if (compare !== 0)
 					return compare;
 			}
@@ -121,11 +128,7 @@
 			var firstValue = $firstRow.children('td' + filter).text().toUpperCase();
 			var secondValue = $secondRow.children('td' + filter).text().toUpperCase();
 
-			if (firstValue < secondValue)
-				return order === 'asc' ? -1 : 1;
-			if (firstValue > secondValue)
-				return order === 'asc' ? 1 : -1;
-			return 0;
+			return compareAsIntsAndStrings(firstValue, secondValue, order);
 		}
 	}
 
@@ -165,6 +168,10 @@
 	});
 	
 	$courseStatistics.find('thead th[data-sorter="true"]').click(function (e) {
+		/* Cancel event if user clicked on link */
+		if ($(e.target).closest('a').length > 0)
+			return;
+
 		e.preventDefault();
 		window.getSelection().removeAllRanges();
 

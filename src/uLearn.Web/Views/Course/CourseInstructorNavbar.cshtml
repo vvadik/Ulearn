@@ -8,7 +8,7 @@
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-cog hidden-xs visible-sm"></span><span class="visible-xs">Преподавателю <span class="caret"></span></span></a>
 		<ul class="dropdown-menu">
 			<li>@Html.ActionLink("Группы", "Groups", "Admin", new { Model.CourseId }, new { })</li>
-			<li>@Html.ActionLink("Статистика курса", "CourseStatistics", "Analytics", new { Model.CourseId }, new { })</li>
+			<li><a href="@Url.Action("CourseStatistics", "Analytics", new { Model.CourseId })">Статистика курса <sup>&beta;</sup></a></li>
 			<li>@Html.ActionLink("Статистика модулей", "UnitStatistics", "Analytics", new { Model.CourseId }, new { })</li>
 			<li>@Html.ActionLink("Сертификаты", "Certificates", "Admin", new { Model.CourseId }, new { })</li>
 			@if (User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))

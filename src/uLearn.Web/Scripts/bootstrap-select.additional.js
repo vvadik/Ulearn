@@ -1,5 +1,7 @@
 ﻿$(document).ready(function () {
-	$('.selectpicker').removeClass('form-control');
+	$('.selectpicker').on('rendered.bs.select', function() {
+		$(this).removeClass('form-control');
+	});
 
 	$('.selectpicker').on('changed.bs.select', function(e, index, newValue, oldValue) {
 		var $self = $(this);
@@ -9,7 +11,8 @@
 			$self.selectpicker('deselectAll');
 			$self.val($selectedOption.val());
 			$self.selectpicker('render');
-			$self.selectpicker('hide');
+			/* Close menu */
+			$self.trigger('click');
 		};
 
 		if (!$selectedOption.data('exclusive') && newValue) {
