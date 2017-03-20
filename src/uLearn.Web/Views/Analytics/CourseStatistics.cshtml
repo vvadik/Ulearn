@@ -1,4 +1,5 @@
-﻿@using uLearn
+﻿@using LtiLibrary.Core.Extensions
+@using uLearn
 @using uLearn.Web.Extensions
 @model CourseStatisticPageModel
 
@@ -168,57 +169,78 @@
 			</tr>
 			</thead>
 			<tbody>
-			@foreach (var user in Model.VisitedUsers)
-			{
-				if (previousUserGroups != Model.VisiterUsersGroups[user.UserId])
+			@{
+				var groupsNames = Model.Groups.ToDictionary(g => g.Id, g => g.Name);
+				var differentGroupsIds = new HashSet<int>(
+					Model.VisitedUsersGroups
+						.SelectMany(pair => pair.Value)
+						.ToList()
+						.OrderBy(groupId => groupsNames.GetOrDefault(groupId, ""))
+					)
+				.ToList();
+
+				/* Special group with Id = -1 for users not in any group */
+				if (Model.VisitedUsers.Any(user => Model.VisitedUsersGroups[user.UserId].Count == 0))
 				{
-					<tr class="group-header-row">
-						<td colspan="1000" class="group-header">
-							@Model.VisiterUsersGroups[user.UserId]
-						</td>
-					</tr>
-					previousUserGroups = Model.VisiterUsersGroups[user.UserId];
+					differentGroupsIds.Add(-1);
 				}
-				<tr class="student" data-user-id="@user.UserId" data-groups="@Model.VisiterUsersGroups[user.UserId]">
-					<td title="@user.UserName" class="student-name">@user.UserVisibleName</td>
+			}
+			@foreach (var groupId in differentGroupsIds)
+			{
+				var groupUsers = Model.VisitedUsers.Where(user => Model.VisitedUsersGroups[user.UserId].Contains(groupId)).ToList();
+				if (groupId == -1)
+				{
+					var usersWithoutGroup = Model.VisitedUsersGroups.Where(kv => kv.Value.Count == 0).Select(kv => kv.Key).ToList();
+					groupUsers = Model.VisitedUsers.Where(user => usersWithoutGroup.Contains(user.UserId)).ToList();
+				}
+				<tr class="group-header-row" data-group="@groupId">
+					<td colspan="1000" class="group-header">
+						@groupsNames.GetOrDefault(groupId, "Не в группах")
+					</td>
+				</tr>
+				foreach (var user in groupUsers.OrderBy(user => user.UserVisibleName))
+				{
+					<tr class="student" data-user-id="@user.UserId" data-group="@groupId">
+						<td title="@user.UserName" class="student-name">@user.UserVisibleName</td>
 
-					@foreach (var scoringGroup in Model.ScoringGroups.Values)
-					{
-						var scoringGroupScore = Model.Course.Units.Sum(unit => GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
-						<td class="score scoring-group-score scoring-group-sum-score" data-unit-id="sum" data-scoring-group="@scoringGroup.Id">
-							@scoringGroupScore
-						</td>
-					}
-
-					@foreach (var unit in Model.Course.Units)
-					{
-						foreach (var scoringGroup in Model.ScoringGroups.Values)
+						@foreach (var scoringGroup in Model.ScoringGroups.Values)
 						{
-							var scoringGroupScore = GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup);
-							<td class="score scoring-group-score @GradeCssClass(scoringGroupScore, GetMaxScoreForUnitByScoringGroup(unit, scoringGroup))"
-							    data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
+							var scoringGroupScore = Model.Course.Units.Sum(unit => GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
+							<td class="score scoring-group-score scoring-group-sum-score" data-unit-id="sum" data-scoring-group="@scoringGroup.Id">
 								@scoringGroupScore
 							</td>
-							var shouldBeSolvedSlides = Model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
-							foreach (var slide in shouldBeSolvedSlides)
+						}
+
+						@foreach (var unit in Model.Course.Units)
+						{
+							foreach (var scoringGroup in unit.Scoring.Groups.Values)
 							{
-								var slideScore = Model.ScoreByUserAndSlide.GetOrDefault(Tuple.Create(user.UserId, slide.Id), 0);
-								<td class="score slide-score @GradeCssClass(slideScore, slide.MaxScore)"
-								    data-slide-id="@slide.Id" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
-									@slideScore
+								var scoringGroupScore = GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup);
+								<td class="score scoring-group-score @GradeCssClass(scoringGroupScore, GetMaxScoreForUnitByScoringGroup(unit, scoringGroup))"
+								    data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
+									@scoringGroupScore
 								</td>
-							}
-							if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
-							{
-								var slideScore = Model.AdditionalScores[Tuple.Create(user.UserId, unit.Id, scoringGroup.Id)];
-								<td class="score slide-score @GradeCssClass(slideScore, scoringGroup.MaxAdditionalScore)"
-								    data-slide-id="additional" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
-									@slideScore
-								</td>
+								var shouldBeSolvedSlides = Model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
+								foreach (var slide in shouldBeSolvedSlides)
+								{
+									var slideScore = Model.ScoreByUserAndSlide.GetOrDefault(Tuple.Create(user.UserId, slide.Id), 0);
+									<td class="score slide-score @GradeCssClass(slideScore, slide.MaxScore)"
+									    data-slide-id="@slide.Id" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
+										@slideScore
+									</td>
+								}
+								if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
+								{
+									var slideScore = Model.AdditionalScores[Tuple.Create(user.UserId, unit.Id, scoringGroup.Id)];
+									<td class="score slide-score @GradeCssClass(slideScore, scoringGroup.MaxAdditionalScore)"
+									    data-slide-id="additional" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
+										@slideScore
+									</td>
+								}
 							}
 						}
-					}
-				</tr>
+					</tr>
+				}
 			}
 			</tbody>
 		</table>
@@ -227,6 +249,13 @@
 		{
 			<div class="text-muted">
 				Показаны <b>200</b> лучших студентов
+			</div>
+		}
+
+		@if (Model.VisitedUsers.Count == 0)
+		{
+			<div class="text-muted">
+				Нет студентов
 			</div>
 		}
 	</div>

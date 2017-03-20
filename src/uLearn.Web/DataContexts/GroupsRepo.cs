@@ -281,7 +281,7 @@ namespace uLearn.Web.DataContexts
 			return db.GroupMembers.Where(m => m.GroupId == groupId).Select(m => m.User).ToList();
 		}
 
-		public Dictionary<string, List<string>> GetUsersGroupsNames(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)
+		public Dictionary<string, List<Group>> GetUsersGroups(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)
 		{
 			var canSeeAllGroups = courseIds.ToDictionary(c => c, c => CanUserSeeAllCourseGroups(currentUser, c));
 			var currentUserId = currentUser.Identity.GetUserId();
@@ -296,12 +296,27 @@ namespace uLearn.Web.DataContexts
 						.Distinct()
 						.Where(g => (g.OwnerId == currentUserId || g.IsPublic || canSeeAllGroups[g.CourseId]) && !g.IsDeleted && !g.IsArchived)
 						.OrderBy(g => g.OwnerId != currentUserId)
-						.Take(maxCount + 1)
-						.Select((g, idx) => idx >= maxCount ? "..." : g.Name)
+						.Take(maxCount)
 						.ToList()
 				);
 
 			return usersGroups;
+		}
+
+		public Dictionary<string, List<string>> GetUsersGroupsNames(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)
+		{
+			var usersGroups = GetUsersGroups(courseIds, userIds, currentUser, maxCount + 1);
+			return usersGroups.ToDictionary(
+				kv => kv.Key,
+				kv => kv.Value.Select((g, idx) => idx >= maxCount ? "..." : g.Name).ToList());
+		}
+
+		public Dictionary<string, List<int>> GetUsersGroupsIds(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)
+		{
+			var usersGroups = GetUsersGroups(courseIds, userIds, currentUser, maxCount);
+			return usersGroups.ToDictionary(
+				kv => kv.Key,
+				kv => kv.Value.Select(g => g.Id).ToList());
 		}
 
 		public Dictionary<string, string> GetUsersGroupsNamesAsStrings(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)

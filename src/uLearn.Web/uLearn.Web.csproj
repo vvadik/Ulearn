@@ -713,7 +713,7 @@
     <Compile Include="Models\PrevNextButtonsModel.cs" />
     <Compile Include="Models\SlideHint.cs" />
     <Compile Include="Models\SlideRate.cs" />
-    <Compile Include="Models\UnitStatisticPageModel.cs" />
+    <Compile Include="Models\StatisticPagesModels.cs" />
     <Compile Include="Models\UserQuestion.cs" />
     <Compile Include="Models\Like.cs" />
     <Compile Include="Models\LmsRoles.cs" />

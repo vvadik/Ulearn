@@ -33,7 +33,7 @@ namespace uLearn.Web.Models
 		public DefaultDictionary<Tuple<string, Guid, string>, int> ScoreByUserUnitScoringGroup { get; set; }
 		/* Dictionary<(userId, slideId), visitScore> */
 		public DefaultDictionary<Tuple<string, Guid>, int> ScoreByUserAndSlide { get; set; }
-		public DefaultDictionary<string, string> VisiterUsersGroups { get; set; }
+		public DefaultDictionary<string, List<int>> VisitedUsersGroups { get; set; }
 	}
 
 	public class UnitStatisticPageModel : StatisticPageModel

@@ -204,11 +204,8 @@ namespace uLearn.Web.Controllers
 				.ToList();
 			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();
 
-			var visiterUsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, visitedUsersIds, User, 10).ToDefaultDictionary();
-
-			/* Order users by groups and name*/
-			visitedUsers= visitedUsers.OrderBy(u => Tuple.Create(visiterUsersGroups[u.UserId], u.UserVisibleName)).ToList();
-
+			var visitedUsersGroups = groupsRepo.GetUsersGroupsIds(new List<string> { courseId }, visitedUsersIds, User, 10).ToDefaultDictionary();
+			
 			/* From now fetch only filtered users' statistics */
 			filterOptions.UsersIds = visitedUsersIds;
 			filterOptions.IsUserIdsSupplement = false;
@@ -249,7 +246,7 @@ namespace uLearn.Web.Controllers
 
 				VisitedUsers = visitedUsers,
 				VisitedUsersIsMore = isMore,
-				VisiterUsersGroups = visiterUsersGroups,
+				VisitedUsersGroups = visitedUsersGroups,
 
 				ShouldBeSolvedSlidesByUnitScoringGroup = shouldBeSolvedSlidesByUnitScoringGroup,
 

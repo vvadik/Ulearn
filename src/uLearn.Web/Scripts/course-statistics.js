@@ -1,12 +1,144 @@
 ﻿$(document).ready(function () {
 	var $courseStatistics = $('.course-statistics');
 
+	/* Sticky header functions */
+	var createTableHeaderCopy = function ($table, minTopOffset) {
+		var $thead = $table.find('thead');
+		var $copy = $thead.clone(true, true);
+		$thead.find('tr').each(function (rowId, tr) {
+			var $rowCopy = $copy.find('tr').eq(rowId);
+			var $thsCopy = $rowCopy.find('th');
+			$(tr).find('th').each(function (cellId, th) {
+				var $th = $(th);
+				var $thCopy = $thsCopy.eq(cellId);
+				var width = $th.outerWidth();
+				
+				/* Put equals randomId to cell and it's copy to easy find pair
+				   We use .attr() instead of .data() here because in other case '[data-random-id=1]' will not work */
+				var randomId = Math.floor(Math.random() * 10000000);
+				$th.css({ 'maxWidth': width, 'minWidth': width, 'width': width }).attr('data-random-id', randomId);
+				$thCopy.css({ 'maxWidth': width, 'minWidth': width, 'width': width }).attr('data-random-id', randomId);
+			});
+		});
+
+		/* Add <table></table> tags around copied thead */
+		var $tableForHeader = $('<table></table>')
+			.addClass($table.attr('class'))
+			.css({
+				'position': 'fixed',
+				'left': $table.position().left,
+				'top': minTopOffset,
+				'z-index': 2
+			});
+		$tableForHeader.append($copy);
+		return $tableForHeader;
+	};
+
+	var createTableFirstColumnCopy = function ($table) {
+		var $tbody = $table.find('tbody');
+		var $copy = $tbody.clone(true, true);
+		$copy.find('td:not(:first-child)').remove();
+		$copy.find('tr').each(function (rowId, tr) {
+			var $originalRow = $tbody.find('tr').eq(rowId);
+			var $originalCells = $originalRow.find('td');
+			$(tr).find('td').each(function (cellId, td) {
+				var $td = $(td);
+				var $originalTd = $originalCells.eq(cellId);
+				var width = $originalTd.outerWidth();
+				var height = $originalTd.outerHeight();
+
+				/* Put equals randomId to cell and it's copy to easy find pair
+				   We use .attr() instead of .data() here because in other case '[data-random-id=1]' will not work */
+				var randomId = Math.floor(Math.random() * 10000000);
+				$td.css({ 'maxWidth': width, 'minWidth': width, 'width': width, 'maxHeight': height, 'minHeight': height, 'height': height })
+					.attr('data-random-id', randomId);
+				$originalTd.css({ 'maxWidth': width, 'minWidth': width, 'width': width, 'maxHeight': height, 'minHeight': height, 'height': height })
+					.attr('data-random-id', randomId);
+			});
+		});
+
+		/* Add <table></table> tags around copied thead */
+		var $tableAround = $('<table></table>')
+			.addClass($table.attr('class'))
+			.addClass('sticky-column')
+			.css({
+				'position': 'fixed',
+				'left': 0,
+				'top': $table.offset().top,
+				'z-index': 1
+			});
+		$tableAround.append($copy);
+		return $tableAround;
+	};
+
+	var documentHeaderHeight = $('#header').outerHeight();
+	var $stickyHeader;
+	var $stickyColumn;
+
+	/* Call this function each time when table header position is changed */
+	var relocateStickyHeaderAndColumn = function ($table, $stickyHeader, $stickyColumn, minTopOffset) {
+		var $tbody = $table.find('tbody');
+
+		var scrollTop = $(document).scrollTop() + minTopOffset;
+		var tableTopOffset = $table.offset().top;
+		var isStickyHeaderVisible = tableTopOffset < scrollTop;
+		$stickyHeader.toggle(isStickyHeaderVisible);
+
+		var scrollLeft = $(document).scrollLeft();
+		var tableLeftOffset = $table.offset().left;
+		var isStickyColumnVisible = tableLeftOffset < scrollLeft;
+		$stickyColumn.toggle(isStickyColumnVisible);
+
+		$stickyHeader.css('left', $table.position().left - scrollLeft);
+		$stickyColumn.css('top', $tbody.position().top - scrollTop + minTopOffset);
+	}
+
+	/* Call this function each time when rows order has been changed */
+	var rerenderStickyColumn = function ($table, minTopOffset) {
+		if ($stickyColumn)
+			$stickyColumn.remove();
+
+		$stickyColumn = createTableFirstColumnCopy($table);
+		$stickyColumn.hide();
+		$('body').append($stickyColumn);
+
+		relocateStickyHeaderAndColumn($table, $stickyHeader, $stickyColumn, minTopOffset);
+	}
+
+	var rerenderStickyHeaderAndColumn = function ($table, minTopOffset) {
+		if ($stickyHeader)
+			$stickyHeader.remove();
+
+		$stickyHeader = createTableHeaderCopy($table, minTopOffset);
+		$stickyHeader.hide();
+		$('body').append($stickyHeader);
+
+		rerenderStickyColumn($table, minTopOffset);
+	}
+
+	$(document).scroll(function() {
+		relocateStickyHeaderAndColumn($courseStatistics, $stickyHeader, $stickyColumn, documentHeaderHeight);
+	});
+
+	/* Call func() for this cell and paired cell from sticky header */
+	var callFunctionForPairedCells = function(func, $cell) {
+		var randomId = $cell.data('randomId');
+		$('.course-statistics').find('thead th').filter('[data-random-id=' + randomId + ']').each(function() {
+			func($(this));
+		});
+	};
+
+	/* End of sticky header functions */
+
 	var addColspan = function($td, diff) {
 		var colspan = parseInt($td.attr('colspan'));
 		$td.attr('colspan', colspan + diff);
 	}
 
-	var toggleUnitScoringGroup = function ($scoringGroupTitle) {
+	var _toggleUnitScoringGroup = function ($scoringGroupTitle) {
+		/* It's needed for sticky header. For sticky header $courseStatisticsParent is not equal to $courseStatistics */
+		var $courseStatisticsParent = $scoringGroupTitle.closest('.course-statistics');
+
 		var unitId = $scoringGroupTitle.data('unitId');
 		var scoringGroupId = $scoringGroupTitle.data('scoringGroup');
 		var isExpanded = !$scoringGroupTitle.data('expanded');
@@ -21,17 +153,21 @@
 			$scoringGroupTitle.find('a').append($expandIcon);
 
 		var filterByUnitAndScoringGroup = '[data-unit-id="' + unitId + '"][data-scoring-group="' + scoringGroupId + '"]';
-		$courseStatistics.find('.slide-score' + filterByUnitAndScoringGroup).toggle(isExpanded);
-		$courseStatistics.find('.slide-title' + filterByUnitAndScoringGroup).toggle(isExpanded);
-		$courseStatistics.find('.slide-max-score' + filterByUnitAndScoringGroup).toggle(isExpanded);
+		$courseStatisticsParent.find('.slide-score' + filterByUnitAndScoringGroup).toggle(isExpanded);
+		$courseStatisticsParent.find('.slide-title' + filterByUnitAndScoringGroup).toggle(isExpanded);
+		$courseStatisticsParent.find('.slide-max-score' + filterByUnitAndScoringGroup).toggle(isExpanded);
 		var slidesCount = $courseStatistics.find('.slide-title' + filterByUnitAndScoringGroup).length;
 
-		var $unitTitleTh = $courseStatistics.find('.unit-title[data-unit-id="' + unitId + '"]').closest('th');
+		var $unitTitleTh = $courseStatisticsParent.find('.unit-title[data-unit-id="' + unitId + '"]').closest('th');
 		addColspan($unitTitleTh, isExpanded ? slidesCount : -slidesCount);
 		
-		$courseStatistics.find(filterByUnitAndScoringGroup).toggleClass('in-expanded-scoring-group', isExpanded);
+		$courseStatisticsParent.find(filterByUnitAndScoringGroup).toggleClass('in-expanded-scoring-group', isExpanded);
 		$unitTitleTh.toggleClass('in-expanded-scoring-group', $courseStatistics.find('td.in-expanded-scoring-group[data-unit-id="' + unitId + '"]').length > 0);
-		$courseStatistics.toggleClass('with-expanded-scoring-group', $courseStatistics.find('.in-expanded-scoring-group').length > 0);
+		$courseStatisticsParent.toggleClass('with-expanded-scoring-group', $courseStatistics.find('.in-expanded-scoring-group').length > 0);
+	}
+
+	var toggleUnitScoringGroup = function ($scoringGroupTitle) {
+		callFunctionForPairedCells(_toggleUnitScoringGroup, $scoringGroupTitle);
 	}
 
 	$courseStatistics.find('.expand-scoring-group__link').click(function(e) {
@@ -40,24 +176,24 @@
 		toggleUnitScoringGroup($parent);
 	});
 
-	$('.course-statistics__enable-scoring-group__checkbox').change(function() {
+	$('.course-statistics__enable-scoring-group__checkbox').change(function () {
 		var isChecked = $(this).prop('checked');
 		var scoringGroupId = $(this).data('scoringGroup');
 		
-		$('.scoring-group-title[data-scoring-group="' + scoringGroupId + '"]').each(function () {
+		$courseStatistics.find('.scoring-group-title[data-scoring-group="' + scoringGroupId + '"]').each(function () {
 			/* Collapse if expanded */
 			if ($(this).data('expanded'))
 				toggleUnitScoringGroup($(this));
 
 			var unitId = $(this).data('unitId');
-			var $unitTitleTh = $('.unit-title[data-unit-id="' + unitId + '"]').closest('th');
+			var $unitTitleTh = $('.course-statistics .unit-title[data-unit-id="' + unitId + '"]').closest('th');
 			addColspan($unitTitleTh, isChecked ? 1 : -1);
 		});
 
 		var filterByScoringGroup = '[data-scoring-group="' + scoringGroupId + '"]';
-		$courseStatistics.find('.scoring-group-title' + filterByScoringGroup).toggle(isChecked);
-		$courseStatistics.find('.scoring-group-score' + filterByScoringGroup).toggle(isChecked);
-		$courseStatistics.find('.scoring-group-max-score' + filterByScoringGroup).toggle(isChecked);
+		$('.course-statistics .scoring-group-title' + filterByScoringGroup).toggle(isChecked);
+		$('.course-statistics .scoring-group-score' + filterByScoringGroup).toggle(isChecked);
+		$('.course-statistics .scoring-group-max-score' + filterByScoringGroup).toggle(isChecked);
 
 		var countChecked = $('.course-statistics__enable-scoring-group__checkbox:checked').length;
 		if (countChecked <= 1)
@@ -84,15 +220,28 @@
 
 	/* Table sorting */
 	var sortTable = function ($table, sortingFunctions, groupingFunction) {
-		$table.find('tbody .group-header-row').remove();
-		var $rows = $table.find('tbody tr').get();
+		var $groupHeaders = $table.find('tbody tr.group-header-row');
+		var groupHeadersByFunctionValue = {};
+		if (groupingFunction) {
+			$groupHeaders.show();
+			$groupHeaders.each(function() {
+				groupHeadersByFunctionValue[groupingFunction($(this))] = this;
+			});
+		} else {
+			/* Hide group headers if grouping is disabled */
+			$groupHeaders.hide();
+		}
+		var rows = $table.find('tbody tr.student').get();
 
-		$rows.sort(function (first, second) {
+		rows.sort(function (first, second) {
 			var $firstRow = $(first);
 			var $secondRow = $(second);
 			var compare;
 			if (groupingFunction) {
-				compare = compareByKeyFunction($firstRow, $secondRow, groupingFunction, 'asc');
+				var valueGroupingFunction = function(element) {
+					return $(groupHeadersByFunctionValue[groupingFunction(element)]).text();
+				}
+				compare = compareByKeyFunction($firstRow, $secondRow, valueGroupingFunction, 'asc');
 				if (compare !== 0)
 					return compare;
 			}
@@ -109,18 +258,36 @@
 
 		var $tbody = $table.children('tbody');
 		var prevGroupingValue = undefined;
-		$.each($rows, function (index, row) {
+		var alreadyInsertedRowsIds = [];
+		$.each(rows, function (index, row) {
+			var $row = $(row);
+			/*
+			var randomId = $row.find('td:first-child').data('randomId');
+			var $stickyColumnRow = $('.sticky-column').find('[data-random-id=' + randomId + ']').closest('td');
+			*/
 			if (groupingFunction) {
-				var currentGroupingValue = groupingFunction($(row));
+				var currentGroupingValue = groupingFunction($row);
 				if (prevGroupingValue !== currentGroupingValue) {
-					var $groupHeader = $('<tr class="group-header-row"><td colspan="1000" class="group-header"></td></tr>');
-					$groupHeader.find('td').text(currentGroupingValue ? currentGroupingValue : 'Вне групп');
-					$tbody.append($groupHeader);
+					$tbody.append(groupHeadersByFunctionValue[currentGroupingValue]);
 				}
 				prevGroupingValue = currentGroupingValue;
 			}
+
+			/* If grouping is enabled, hide and ignore duplicate rows */
+			var rowId = $row.data('user-id');
+			if (!groupingFunction && alreadyInsertedRowsIds.indexOf(rowId) >= 0) {
+				$row.hide();
+				// $stickyColumnRow.hide();
+				return;
+			}
+			alreadyInsertedRowsIds.push(rowId);
+
+			/* If all ok append row to sorted table and make it visible */
 			$tbody.append(row);
+			$row.show();
 		});
+
+		rerenderStickyColumn($courseStatistics, documentHeaderHeight);
 	}
 
 	var getCompareFunction = function(filter, order) {
@@ -159,7 +326,7 @@
 		return $.map($oldSortingThs, function (el) { return getSortingFunction($(el), $(el).data('order')); });
 	}
 
-	var groupingFunction = function ($row) { return $row.data('groups'); };
+	var groupingFunction = function ($row) { return $row.data('group'); };
 
 	$('#grouping-by-group').change(function() {
 		var isGrouppingEnabled = $(this).is(':checked');
@@ -168,6 +335,9 @@
 	});
 	
 	$courseStatistics.find('thead th[data-sorter="true"]').click(function (e) {
+		/* Original $courseStatistics and it's pair from sticky header */
+		var $courseStatisticsAll = $('.course-statistics');
+
 		/* Cancel event if user clicked on link */
 		if ($(e.target).closest('a').length > 0)
 			return;
@@ -176,8 +346,9 @@
 		window.getSelection().removeAllRanges();
 
 		var $self = $(this);
+		var $selfWithPair = $self.add($('.course-statistics thead th').filter('[data-random-id=' + $self.data('randomId') + ']'))
 		/* Exclude current column from sorting */
-		$self.removeClass('sorted sorted-asc sorted-desc');
+		$selfWithPair.removeClass('sorted sorted-asc sorted-desc');
 
 		var isGrouppingEnabled = $('#grouping-by-group').is(':checked');
 
@@ -185,7 +356,7 @@
 		if (e.shiftKey) {
 			sortingFunctions = getCurrentSortingFunctions();
 		} else {
-			$courseStatistics.find('thead th[data-sorter="true"].sorted').data('order', undefined).removeClass('sorted sorted-asc sorted-desc');
+			$courseStatisticsAll.find('thead th[data-sorter="true"].sorted').data('order', undefined).removeClass('sorted sorted-asc sorted-desc');
 		}
 		/* Find maximum of sorting index of current sorting columns */
 		var maxSortingIndex = 0;
@@ -196,8 +367,11 @@
 
 		var order = changeOrder($self.data('order'));
 		sortingFunctions.push(getSortingFunction($self, order));
-		$self.data('order', order).data('sorting-index', maxSortingIndex + 1).addClass('sorted sorted-' + order);
+		$selfWithPair.data('order', order).data('sorting-index', maxSortingIndex + 1).addClass('sorted sorted-' + order);
 		
 		sortTable($courseStatistics, sortingFunctions, isGrouppingEnabled ? groupingFunction : undefined);
 	});
+
+	/* Init sticky header. Should be at the end of the file because all event listeners should be set already */
+	rerenderStickyHeaderAndColumn($courseStatistics, documentHeaderHeight);
 });
