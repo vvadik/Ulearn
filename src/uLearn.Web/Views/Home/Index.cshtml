@@ -4,7 +4,7 @@
 <div class="main-page">
 	<div class="container body-content">
 		<div class="jumbotron">
-			<img src="~/Content/logo.png" class="jumbotron-logo"/>
+			<img src="~/Content/logo.png" class="jumbotron-logo" />
 			<h1>uLearn</h1>
 			<p class="lead">Интерактивные онлайн-курсы по&nbsp;программированию</p>
 			<div class="clearfix"></div>
@@ -22,10 +22,13 @@
 				</p>
 				<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "BasicProgramming" }, new { @class = "btn btn-primary" })</p>
 			</div>
-			<div class="course-tile col-md-6 summer-practice">
-				<a href="https://kontur.ru/education/programs/intern/2017?utm_source=ulearn">
-					<img src="~/Content/summer-practice.png" width="400" title="Летняя стажировка 2017"/>
-				</a>
+			<div class="course-tile col-md-6">
+				<h2>Искусственный интеллект и машинное обучение</h2>
+				<p>Длительность: 1 семестр, 1-2 часа в неделю</p>
+				<p>
+
+				</p>
+				<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "AIML" }, new { @class = "btn btn-primary" })</p>
 			</div>
 		</div>
 		<div class="row">
@@ -39,12 +42,13 @@
 				<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "BasicProgramming2" }, new { @class = "btn btn-primary" })</p>
 			</div>
 			<div class="course-tile col-md-6">
-				<h2>Искусственный интеллект и машинное обучение</h2>
-				<p>Длительность: 1 семестр, 1-2 часа в неделю</p>
+				<h2>Основы компьютерной безопасности</h2>
+				<p>Длительность: 1 семестр, 2–6 часов в неделю</p>
 				<p>
-
+					Курс разработан для студентов первого и второго года обучения компьютерных специальностей ИМКН УрФУ.
+					Расcчитан на людей с минимальным опытом программирования.
 				</p>
-				<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "AIML" }, new { @class = "btn btn-primary" })</p>
+				<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "Hackerdom" }, new { @class = "btn btn-primary" })</p>
 			</div>
 		</div>
 		<div class="row">
@@ -62,14 +66,17 @@
 				<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "CS2" }, new { @class = "btn btn-primary" })</p>
 			</div>
 			<div class="course-tile col-md-6">
-				<h2>Основы компьютерной безопасности</h2>
-				<p>Длительность: 1 семестр, 2–6 часов в неделю</p>
+				<h2>The Clean Code Game</h2>
+				<p>Длительность: 10–20 минут</p>
 				<p>
-					Курс разработан для студентов первого и второго года обучения компьютерных специальностей ИМКН УрФУ.
-					Расcчитан на людей с минимальным опытом программирования.
+					Небольшая игра-тренажер на интерактивных примерах знакомит с базовыми правилами хорошего кода.
+					Качественные имена, стиль именования, комментарии, разбиение кода на методы.
 				</p>
-				<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "Hackerdom" }, new { @class = "btn btn-primary" })</p>
+				<p>
+					<a class="btn btn-primary" href="https://cleancodegame.github.io">Поехали!</a>
+				</p>
 			</div>
+
 		</div>
 		<div class="row">
 			<div class="course-tile col-md-6">
@@ -84,17 +91,6 @@
 					Полезно даже тем, кто поверхностно знаком с LINQ.
 				</p>
 				<p>@Html.ActionLink("Поехали!", "Slide", "Course", new { courseId = "Linq" }, new { @class = "btn btn-primary" })</p>
-			</div>
-			<div class="course-tile col-md-6">
-				<h2>The Clean Code Game</h2>
-				<p>Длительность: 10–20 минут</p>
-				<p>
-					Небольшая игра-тренажер на интерактивных примерах знакомит с базовыми правилами хорошего кода.
-					Качественные имена, стиль именования, комментарии, разбиение кода на методы.
-				</p>
-				<p>
-					<a class="btn btn-primary" href="https://cleancodegame.github.io">Поехали!</a>
-				</p>
 			</div>
 		</div>
 	</div>

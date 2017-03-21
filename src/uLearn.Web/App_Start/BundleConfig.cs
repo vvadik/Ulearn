@@ -77,6 +77,7 @@ namespace uLearn.Web
 				"~/Content/font-awesome.css",
 				"~/Content/awesome-bootstrap-checkbox.css",
 				"~/Content/bootstrap-select.min.css",
+				"~/Content/bootstrap.refresh-animate.css",
 				"~/Content/jquery.datetimepicker.min.css",
 				"~/codemirror/lib/codemirror.css",
 				"~/codemirror/theme/cobalt.css",
