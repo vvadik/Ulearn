@@ -35,8 +35,8 @@
 				<ul class="top-navigation nav navbar-nav">
 					@{
 						var courseManager = WebCourseManager.Instance;
-						var coursesIds = new HashSet<string>(User.GetControllableCoursesId());
-						var courses = courseManager.GetCourses().Where(course => coursesIds.Contains(course.Id)).OrderBy(c => c.Title).ToList();
+						var coursesIds = new HashSet<string>(User.GetControllableCoursesId().Select(c => c.ToLower()));
+						var courses = courseManager.GetCourses().Where(course => coursesIds.Contains(course.Id.ToLower())).OrderBy(c => c.Title).ToList();
 					}
 					@if (User.IsSystemAdministrator())
 					{
