@@ -119,6 +119,12 @@
 	}
 	if (courses.Count == 0)
 	{
-		<li><b>Нет курсов.</b> @Html.ActionLink("Создать", "CourseList", "Admin")</li>
+		<li>
+			<b>Нет курсов.</b>
+			@if (User.IsSystemAdministrator())
+			{
+				@Html.ActionLink("Создать", "CourseList", "Admin")
+			}
+		</li>
 	}
 }

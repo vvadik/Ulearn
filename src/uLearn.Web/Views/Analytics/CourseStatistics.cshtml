@@ -92,7 +92,7 @@
 				</th>
 				@foreach (var unit in Model.Course.Units)
 				{
-					<th colspan="@unit.Scoring.Groups.Count" title="Посмотреть статистику по модулю «@unit.Title»" data-unit-id="@unit.Id">
+					<th colspan="@unit.Scoring.Groups.Count" title="Посмотреть ведомость по модулю «@unit.Title»" data-unit-id="@unit.Id">
 						<div class="unit-title" data-unit-id="@unit.Id">
 							@Html.ActionLink(unit.Title.TruncateWithEllipsis(20), "UnitStatistics", "Analytics", new { courseId = Model.Course.Id, unitId = unit.Id, group = Model.SelectedGroupsIdsJoined }, new { })
 						</div>
