@@ -265,7 +265,7 @@ namespace uLearn.Web.DataContexts
 
 		public async Task<List<UserExerciseSubmission>> GetUnhandledSubmissions(int count)
 		{
-			await getSubmissionsSemaphore.WaitAsync();
+			await getSubmissionsSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
 			try
 			{
 				return await FuncUtils.TrySeveralTimesAsync(() => TryGetExerciseSubmissions(count), 3);

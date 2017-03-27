@@ -31,7 +31,7 @@ namespace uLearn.Web.Controllers
 			{
 				var repo = new UserSolutionsRepo(new ULearnDb());
 				var submissions = await repo.GetUnhandledSubmissions(count);
-				if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(30))
+				if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(15))
 				{
 					if (submissions.Any())
 						log.Info($"Отдаю на проверку решения: [{string.Join(",", submissions.Select(c => c.Id))}]");

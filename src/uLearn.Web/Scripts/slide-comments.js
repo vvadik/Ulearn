@@ -95,6 +95,8 @@
 		var $form = $(this).closest('form');
 		var $formWrapper = $form.closest('.reply-form');
 		var $textarea = $form.find('[name=commentText]');
+		var $button = $form.find('.reply-form__send-button');
+		$button.attr('disabled', 'disabled');
 
 		$.ajax({
 			type: 'post',
@@ -102,7 +104,7 @@
 			data: addAntiForgeryToken($form.serialize())
 		}).success(function (data) {
 			if (data.status && data.status !== 'ok') {
-				var $button = $form.find('.reply-form__send-button');
+				$button.removeAttr('disabled');
 				var $errorMessage = $('<div>').addClass('comment__error-message').text(data.message);
 				$button.after($errorMessage);
 				$errorMessage.delay(1500).fadeOut(1000);

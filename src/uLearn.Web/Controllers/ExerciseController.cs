@@ -31,7 +31,7 @@ namespace uLearn.Web.Controllers
 		private readonly VisitsRepo visitsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 
-		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(30);
+		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(45);
 
 		public ExerciseController()
 			: this(WebCourseManager.Instance)
@@ -86,7 +86,7 @@ namespace uLearn.Web.Controllers
 					return Json(new RunSolutionResult
 					{
 						IsCompillerFailure = true,
-						ErrorMessage = "Мы не смогли отправить баллы на вашу образовательную платформу. Пожалуйста, попробуйте ещё раз."
+						ErrorMessage = "Мы не смогли отправить баллы на вашу образовательную платформу. Пожалуйста, обновите страницу — мы попробуем сделать это ещё раз."
 					});
 				}
 
@@ -113,12 +113,13 @@ namespace uLearn.Web.Controllers
 
 			if (submission == null)
 			{
-				log.Error($"Не смог запустить проверку решения, никто не взял его на проверку.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})");
-				errorsBot.PostToChannel($"Не смог запустить проверку решения, никто не взял его на проверку.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})\n\nhttps://ulearn.me/Sandbox");
+				log.Error($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})");
+				errorsBot.PostToChannel($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})\n\nhttps://ulearn.me/Sandbox");
 				return new RunSolutionResult
 				{
 					IsCompillerFailure = true,
-					ErrorMessage = "Ой-ой, штуковина, которая проверяет решения, сломалась (или просто устала).\nПопробуйте отправить решение позже — когда она немного отдохнет.",
+					ErrorMessage = "К сожалению, из-за большой нагрузки мы не смогли оперативно проверить ваше решение. " +
+								   "Мы попробуем проверить его позже, просто подождите и обновите страницу. ",
 					ExecutionServiceName = "uLearn"
 				};
 			}
