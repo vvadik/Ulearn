@@ -270,7 +270,7 @@ p {
 }
 
 .nav .group-statistics-link a {
-	text-decoration: underline;
+	text-decoration: none;
     display: inline-block;
 	padding: 0;
 	margin-left: 18px;
@@ -280,6 +280,7 @@ p {
 .nav .group-statistics-link a:hover,
 .nav .group-statistics-link a:focus {
 	background-color: initial;
+	text-decoration: underline;
 }
 
 .nav .group-statistics-link a .fa {
