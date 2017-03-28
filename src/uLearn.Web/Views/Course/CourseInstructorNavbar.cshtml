@@ -3,10 +3,9 @@
 
 @if (Model != null)
 {
-
 	<li class="dropdown">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span>@Model.CourseTitle.TruncateWithEllipsis(40) <span class="caret"></span></span></a>
-		<ul class="dropdown-menu pull-right">
+		<ul class="dropdown-menu pull-left min-width-300">
 			<li>@Html.RouteLink("Просмотр курса", "Course.Slide", new { Model.CourseId }, new { })</li>
 			<li class="divider" role="separator"></li>
 			<li>@Html.ActionLink("Группы", "Groups", "Admin", new { Model.CourseId }, new { })</li>

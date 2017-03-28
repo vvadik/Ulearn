@@ -12,7 +12,7 @@ namespace uLearn.Quizes
 			MaxScore = quiz.MaxScore;
 			ManualChecking = quiz.ManualChecking;
 			QuizNormalizedXml = quiz.NormalizedXml;
-			ScoringGroup = quiz.ScoringGroup;
+			ScoringGroup = quiz.ScoringGroup ?? "";
 		}
 
 		public override bool ShouldBeSolved => true;

@@ -35,12 +35,12 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		public static T GetFilterOptionsByGroup<T>(GroupsRepo groupsRepo, IPrincipal User, string courseId, List<string> groupsIds) where T : AbstractFilterOptionByCourseAndUsers, new()
+		public static T GetFilterOptionsByGroup<T>(GroupsRepo groupsRepo, IPrincipal User, string courseId, List<string> groupsIds, bool allowSeeGroupForAnyMember=false) where T : AbstractFilterOptionByCourseAndUsers, new()
 		{
 			var result = new T { CourseId = courseId };
 
-			/* if groupsIds contains "all" (it should be exclusive), get all users */
-			if (groupsIds.Contains("all"))
+			/* if groupsIds contains "all" (it should be exclusive), get all users. Available only for instructors  */
+			if (groupsIds.Contains("all") && User.HasAccessFor(courseId, CourseRole.Instructor))
 				return result;
 			/* if groupsIds contains "not-group" (it should be exclusive), get all users not in any groups, available only for course admins */
 			if (groupsIds.Contains("not-in-group") && User.HasAccessFor(courseId, CourseRole.CourseAdmin))
@@ -54,8 +54,8 @@ namespace uLearn.Web.Controllers
 			result.UsersIds = new List<string>();
 			var usersIds = new HashSet<string>();
 
-			/* if groupsIds is empty, get members of all own groups */
-			if (groupsIds.Count == 0 || groupsIds.Any(string.IsNullOrEmpty))
+			/* if groupsIds is empty, get members of all own groups. Available for instructors */
+			if ((groupsIds.Count == 0 || groupsIds.Any(string.IsNullOrEmpty)) && User.HasAccessFor(courseId, CourseRole.Instructor))
 			{
 				var ownGroupsIds = groupsRepo.GetGroupsOwnedByUser(courseId, User).Select(g => g.Id).ToList();
 				foreach (var ownGroupId in ownGroupsIds)
@@ -73,11 +73,46 @@ namespace uLearn.Web.Controllers
 				if (int.TryParse(groupId, out groupIdInt))
 				{
 					var group = groupsRepo.FindGroupById(groupIdInt);
-					if (group != null && groupsRepo.IsGroupAvailableForUser(group.Id, User))
-						usersIds.AddAll(groupsRepo.GetGroupMembers(group.Id).Select(u => u.Id));
+					if (group != null)
+					{
+						var groupMembersIds = groupsRepo.GetGroupMembers(group.Id).Select(u => u.Id).ToList();
+						var hasAccessToGroup = allowSeeGroupForAnyMember
+							? groupMembersIds.Contains(User.Identity.GetUserId())
+							: groupsRepo.IsGroupAvailableForUser(group.Id, User);
+
+						if (hasAccessToGroup)
+							usersIds.AddAll(groupMembersIds);
+					}
 				}
 			}
 			result.UsersIds = usersIds.ToList();
+			return result;
+		}
+
+
+		public static List<string> GetEnabledAdditionalScoringGroupsForGroups(GroupsRepo groupsRepo, Course course, List<string> groupsIds, IPrincipal User)
+		{
+			if (groupsIds.Contains("all") || groupsIds.Contains("not-in-group"))
+				return course.Settings.Scoring.Groups.Keys.ToList();
+
+			var enabledAdditionalScoringGroupsForGroups = groupsRepo.GetEnabledAdditionalScoringGroups(course.Id)
+				.GroupBy(e => e.GroupId)
+				.ToDictionary(g => g.Key, g => g.Select(e => e.ScoringGroupId).ToList());
+
+			/* if groupsIds is empty, get members of all own groups. Available for instructors */
+			if (groupsIds.Count == 0 || groupsIds.Any(string.IsNullOrEmpty))
+			{
+				var ownGroupsIds = groupsRepo.GetGroupsOwnedByUser(course.Id, User).Select(g => g.Id).ToList();
+				return enabledAdditionalScoringGroupsForGroups.Where(kv => ownGroupsIds.Contains(kv.Key)).SelectMany(kv => kv.Value).ToList();
+			}
+
+			var result = new List<string>();
+			foreach (var groupId in groupsIds)
+			{
+				int groupIdInt;
+				if (int.TryParse(groupId, out groupIdInt))
+					result.AddRange(enabledAdditionalScoringGroupsForGroups.GetOrDefault(groupIdInt, new List<string>()));
+			}
 			return result;
 		}
 

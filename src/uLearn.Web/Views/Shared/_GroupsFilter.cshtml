@@ -30,11 +30,14 @@
 				HtmlAttributes = new { data_exclusive = "true" }
 			});
 		}
-		groupsListItems.Add(new SelectListItemWithAttributes
+		if (Model.Groups.Any())
 		{
-			Value = "-",
-			HtmlAttributes = new { data_divider = "true", data_exclusive = "true" }
-		});
+			groupsListItems.Add(new SelectListItemWithAttributes
+			{
+				Value = "-",
+				HtmlAttributes = new { data_divider = "true", data_exclusive = "true" }
+			});
+		}
 		groupsListItems.AddRange(
 			Model.Groups.Select(
 				group => new SelectListItemWithAttributes

@@ -368,6 +368,12 @@ namespace uLearn.Web.DataContexts
 			return GetUsersGroupsIds(courseId, new List<string> { userId }).GetOrDefault(userId, new List<int>());
 		}
 
+		public List<Group> GetUserGroups(string courseId, string userId)
+		{
+			var userGroupsIds = GetUserGroupsIds(courseId, userId);
+			return GetGroups(courseId).Where(g => userGroupsIds.Contains(g.Id)).ToList();
+		}
+
 		public bool IsManualCheckingEnabledForUser(Course course, string userId)
 		{
 			if (course.Settings.IsManualCheckingEnabled)

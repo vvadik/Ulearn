@@ -99,7 +99,13 @@ namespace uLearn.Web.Controllers
 				EnabledScoringGroupsIds = enabledScoringGroupsIds,
 			};
 
-			var toc = builder.CreateTocModel();
+			var userGroups = groupsRepo.GetUserGroups(course.Id, User.Identity.GetUserId());
+			var tocGroupsForStatistics = userGroups.Select(g => new TocGroupForStatistics
+			{
+				GroupName = g.Name,
+				StatisticsUrl = Url.Action("CourseStatistics", "Analytics", new { courseId = course.Id, group = g.Id})
+			});
+			var toc = builder.CreateTocModel(tocGroupsForStatistics.ToList());
 			toc.NextUnitTime = unitsRepo.GetNextUnitPublishTime(course.Id);
 			return toc;
 		}

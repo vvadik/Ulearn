@@ -56,6 +56,25 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\">");
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</a></li>\r\n");
 
 
+ 		foreach (var group in toc.GroupsForStatistics)
+		{
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t\t\t<li class=\"full-width group-statistics-link\"><a href=\"");
+
+
+              WebViewPage.WriteTo(@__razor_helper_writer, group.StatisticsUrl);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"><span class=\"fa fa-list\"></span>Ведомость ");
+
+
+                                                                              WebViewPage.WriteTo(@__razor_helper_writer, group.GroupName);
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</a></li>\r\n");
+
+
+		}
+
+
   		
 			int iUnit = 0;
 			foreach (var unit in toc.Units)
@@ -243,7 +262,7 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
  
 	string progressClass;
 	string typeClass;
-	if (page.PageType == TocPageType.InstructorNotes || page.PageType == TocPageType.Statistics)
+	if (page.PageType == TocPageType.InstructorNotes || page.PageType == TocPageType.UnitStatistics)
 	{
 		typeClass = "glyphicon-eye-close";
 		progressClass = "navbar-label-privileged";

@@ -22,6 +22,8 @@ namespace uLearn.Web.Models
 
 	public class CourseStatisticPageModel : StatisticPageModel
 	{
+		public bool IsInstructor { get; set; }
+
 		/* Dictionary<(userId, unitId, scoringGroupId), additionalScore> */
 		public DefaultDictionary<Tuple<string, Guid, string>, int> AdditionalScores { get; set; }
 

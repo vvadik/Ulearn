@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-using uLearn.Model;
+using JetBrains.Annotations;
 using uLearn.Model.Blocks;
 using uLearn.Model.Edx;
 using uLearn.Model.Edx.EdxComponents;
@@ -20,6 +19,8 @@ namespace uLearn
 		public string NormalizedGuid => Id.GetNormalizedGuid();
 		public virtual bool ShouldBeSolved => false;
 		public int MaxScore { get; protected set; }
+
+		[NotNull]
 		public string ScoringGroup { get; protected set; }
 
 		public IEnumerable<SlideBlock[]> GetBlocksRangesWithSameVisibility()
@@ -48,6 +49,7 @@ namespace uLearn
 				Id = id;
 				MaxScore = 0;
 				Blocks = blocks.ToArray();
+				ScoringGroup = "";
 				foreach (var block in Blocks)
 					block.Validate();
 			}

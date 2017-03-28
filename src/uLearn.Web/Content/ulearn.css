@@ -269,6 +269,23 @@ p {
 	padding-top: 0.1em;
 }
 
+.nav .group-statistics-link a {
+	text-decoration: underline;
+    display: inline-block;
+	padding: 0;
+	margin-left: 18px;
+	margin-bottom: 15px;
+}
+
+.nav .group-statistics-link a:hover,
+.nav .group-statistics-link a:focus {
+	background-color: initial;
+}
+
+.nav .group-statistics-link a .fa {
+	margin-right: 5px;
+}
+
 .right {
 	margin-left: auto;
 }
@@ -530,6 +547,12 @@ p {
 
 .wide-container {
 	margin: 0 50px;
+}
+
+@media (max-width: 768px) {
+	.wide-container{
+		margin: 0 10px;
+	}
 }
 
 .table.table-autowidth {
@@ -1539,14 +1562,14 @@ h1 .copy-group-link {
 }
 
 #exercise__submission__output::before {
-	content: "Вывод программы:";
+	content: "Ð’Ñ‹Ð²Ð¾Ð´ Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ñ‹:";
 	display: block;
 	font-weight: bold;
 	font-family: sans-serif;
 }
 
 #exercise__submission__output.empty::before {
-	content: "Нет вывода программы"
+	content: "ÐÐµÑ‚ Ð²Ñ‹Ð²Ð¾Ð´Ð° Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ñ‹"
 }
 
 .user-submission {
@@ -1696,7 +1719,14 @@ h1 .copy-group-link {
 /* End of certificates */
 
 /* Course statistics */
-.course-statistics {}
+.course-statistics__wrapper {
+	width: 100%;
+	max-width: 100%;
+}
+
+.course-statistics:not(.sticky-column):not(.sticky-header) {
+	margin-top: 15px;
+}
 
 .course-statistics thead th {
 	font-weight: 100;

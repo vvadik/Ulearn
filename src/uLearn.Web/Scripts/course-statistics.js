@@ -24,6 +24,7 @@
 		/* Add <table></table> tags around copied thead */
 		var $tableForHeader = $('<table></table>')
 			.addClass($table.attr('class'))
+			.addClass('sticky-header')
 			.css({
 				'position': 'fixed',
 				'left': $table.position().left,
@@ -57,7 +58,7 @@
 			});
 		});
 
-		/* Add <table></table> tags around copied thead */
+		/* Add <table></table> tags around copied column */
 		var $tableAround = $('<table></table>')
 			.addClass($table.attr('class'))
 			.addClass('sticky-column')
@@ -116,10 +117,6 @@
 		rerenderStickyColumn($table, minTopOffset);
 	}
 
-	$(document).scroll(function() {
-		relocateStickyHeaderAndColumn($courseStatistics, $stickyHeader, $stickyColumn, documentHeaderHeight);
-	});
-
 	/* Call func() for this cell and paired cell from sticky header */
 	var callFunctionForPairedCells = function(func, $cell) {
 		var randomId = $cell.data('randomId');
@@ -176,6 +173,14 @@
 		toggleUnitScoringGroup($parent);
 	});
 
+	var disableScoringGroupFilterIfNeeded = function() {
+		var countChecked = $('.course-statistics__enable-scoring-group__checkbox:checked').length;
+		if (countChecked <= 1)
+			$('.course-statistics__enable-scoring-group__checkbox:checked').attr('disabled', 'disabled');
+		else
+			$('.course-statistics__enable-scoring-group__checkbox').removeAttr('disabled');
+	}
+
 	$('.course-statistics__enable-scoring-group__checkbox').change(function () {
 		var isChecked = $(this).prop('checked');
 		var scoringGroupId = $(this).data('scoringGroup');
@@ -197,12 +202,7 @@
 		$('.course-statistics .scoring-group-score' + filterByScoringGroup).toggle(isChecked);
 		$('.course-statistics .scoring-group-max-score' + filterByScoringGroup).toggle(isChecked);
 
-		var countChecked = $('.course-statistics__enable-scoring-group__checkbox:checked').length;
-		if (countChecked <= 1)
-			$('.course-statistics__enable-scoring-group__checkbox:checked').attr('disabled', 'disabled');
-		else
-			$('.course-statistics__enable-scoring-group__checkbox').removeAttr('disabled');
-
+		disableScoringGroupFilterIfNeeded();
 		$loadingIcon.hide();
 	});
 
@@ -265,10 +265,7 @@
 		var alreadyInsertedRowsIds = [];
 		$.each(rows, function (index, row) {
 			var $row = $(row);
-			/*
-			var randomId = $row.find('td:first-child').data('randomId');
-			var $stickyColumnRow = $('.sticky-column').find('[data-random-id=' + randomId + ']').closest('td');
-			*/
+
 			if (groupingFunction) {
 				var currentGroupingValue = groupingFunction($row);
 				if (prevGroupingValue !== currentGroupingValue) {
@@ -377,10 +374,22 @@
 		sortingFunctions.push(getSortingFunction($self, order));
 		$selfWithPair.data('order', order).data('sorting-index', maxSortingIndex + 1).addClass('sorted sorted-' + order);
 		
-		sortTable($courseStatistics, sortingFunctions, isGrouppingEnabled ? groupingFunction : undefined);
+		/* Run in another thread */
+		setTimeout(function() {
+			sortTable($courseStatistics, sortingFunctions, isGrouppingEnabled ? groupingFunction : undefined);
+		}, 0);
 	});
 
-	if ($courseStatistics.length > 0)
-		/* Init sticky header. Should be at the end of the file because all event listeners should be set already */
-		rerenderStickyHeaderAndColumn($courseStatistics, documentHeaderHeight);
+	if ($courseStatistics.length > 0) {
+		disableScoringGroupFilterIfNeeded();
+
+		setTimeout(function() {
+			/* Init sticky header. Should be at the end of the file because all event listeners should be set already */
+			rerenderStickyHeaderAndColumn($courseStatistics, documentHeaderHeight);
+
+			$(document).scroll(function () {
+				relocateStickyHeaderAndColumn($courseStatistics, $stickyHeader, $stickyColumn, documentHeaderHeight);
+			});
+		}, 0);
+	}
 });

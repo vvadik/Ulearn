@@ -22,9 +22,42 @@ namespace uLearn
 				settings.Title = GetCourseTitleFromFile(dir);
 
 			var units = LoadUnits(dir, settings).ToList();
-			CheckDuplicateSlideIds(units.SelectMany(u => u.Slides));
+			var slides = units.SelectMany(u => u.Slides).ToList();
+			CheckDuplicateSlideIds(slides);
+			AddDefaultScoringGroupIfNeeded(units, slides, settings);
+			CalculateScoringGroupScores(units, settings);
 
 			return new Course(courseId, units, settings, dir);
+		}
+
+		private static void CalculateScoringGroupScores(IEnumerable<Unit> units, CourseSettings settings)
+		{
+			foreach (var unit in units)
+			{
+				foreach (var slide in unit.Slides.Where(s => s.ShouldBeSolved))
+				{
+					unit.Scoring.Groups[slide.ScoringGroup].MaxNotAdditionalScore += slide.MaxScore;
+					settings.Scoring.Groups[slide.ScoringGroup].MaxNotAdditionalScore += slide.MaxScore;
+				}
+			}
+		}
+
+		private static void AddDefaultScoringGroupIfNeeded(IEnumerable<Unit> units, IEnumerable<Slide> slides, CourseSettings settings)
+		{
+			if (slides.Any(s => s.ShouldBeSolved && string.IsNullOrEmpty(s.ScoringGroup)))
+			{
+				var defaultScoringGroup = new ScoringGroup
+				{
+					Id = "",
+					Abbreviation = "Баллы",
+					Name = "Упражнения и тесты",
+				};
+				settings.Scoring.Groups.Add(defaultScoringGroup.Id, defaultScoringGroup);
+
+				/* Add default scoring group to each unit */
+				foreach (var unit in units)
+					unit.Scoring.Groups.Add(defaultScoringGroup.Id, defaultScoringGroup);
+			}
 		}
 
 		private static IEnumerable<Unit> LoadUnits(DirectoryInfo dir, CourseSettings settings)

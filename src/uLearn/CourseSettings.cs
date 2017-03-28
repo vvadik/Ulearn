@@ -274,6 +274,10 @@ namespace uLearn
 		}
 
 		[XmlIgnore]
+		/* Calculates automatically by slides's scores */
+		public int MaxNotAdditionalScore { get; set; }
+
+		[XmlIgnore]
 		public bool IsMaxAdditionalScoreSpecified => !string.IsNullOrEmpty(_maxAdditionalScore);
 
 		[XmlAttribute("enable_for_everyone")]

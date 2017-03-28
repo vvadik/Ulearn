@@ -19,7 +19,7 @@ namespace uLearn
 		{
 			Exercise = blocks.OfType<ExerciseBlock>().Single();
 			MaxScore = Exercise.MaxScore;
-			ScoringGroup = Exercise.ScoringGroup;
+			ScoringGroup = Exercise.ScoringGroup ?? "";
 		}
 
 		public override string ToString()

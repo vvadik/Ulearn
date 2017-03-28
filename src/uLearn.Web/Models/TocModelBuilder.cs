@@ -33,9 +33,14 @@ namespace uLearn.Web.Models
 			EnabledScoringGroupsIds = new List<string>();
 		}
 
+		public TocModel CreateTocModel(List<TocGroupForStatistics> groupsForStatistics)
+		{
+			return new TocModel(course, CreateUnits(), groupsForStatistics);
+		}
+
 		public TocModel CreateTocModel()
 		{
-			return new TocModel(course, CreateUnits());
+			return new TocModel(course, CreateUnits(), new List<TocGroupForStatistics>());
 		}
 
 		private TocUnitModel[] CreateUnits()
@@ -62,7 +67,7 @@ namespace uLearn.Web.Models
 				{
 					Url = GetUnitStatisticsUrl(unit),
 					Name = "Статистика и успеваемость",
-					PageType = TocPageType.Statistics,
+					PageType = TocPageType.UnitStatistics,
 				});
 			}
 

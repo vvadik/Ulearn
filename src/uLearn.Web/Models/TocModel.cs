@@ -6,10 +6,11 @@ namespace uLearn.Web.Models
 {
 	public class TocModel
 	{
-		public TocModel(Course course, TocUnitModel[] units)
+		public TocModel(Course course, TocUnitModel[] units, List<TocGroupForStatistics> groupsForStatistics)
 		{
 			Course = course;
 			Units = units;
+			GroupsForStatistics = groupsForStatistics;
 		}
 
 		public readonly Course Course;
@@ -17,6 +18,7 @@ namespace uLearn.Web.Models
 		public int MaxScore { get { return Units.Sum(u => u.MaxScore); } }
 		public int Score { get { return Units.Sum(p => p.Score); } }
 		public DateTime NextUnitTime;
+		public List<TocGroupForStatistics> GroupsForStatistics;
 	}
 
 	public class TocUnitModel
@@ -51,6 +53,13 @@ namespace uLearn.Web.Models
 		Exercise,
 		Quiz,
 		InstructorNotes,
-		Statistics
+		UnitStatistics,
+		GroupStatistics,
+	}
+
+	public class TocGroupForStatistics
+	{
+		public string GroupName;
+		public string StatisticsUrl;
 	}
 }
