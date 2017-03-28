@@ -69,7 +69,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"><span class=\"fa fa-list\
 
                                                                               WebViewPage.WriteTo(@__razor_helper_writer, group.GroupName);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</a></li>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, " <span class=\"beta\">&beta;</span></a></li>\r\n");
 
 
 		}

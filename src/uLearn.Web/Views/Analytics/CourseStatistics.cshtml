@@ -282,7 +282,7 @@
 
 								@foreach (var unit in Model.Course.Units)
 								{
-									foreach (var scoringGroup in unit.Scoring.Groups.Values)
+									foreach (var scoringGroup in GetUsingUnitScoringGroups(unit, Model.ScoringGroups).Values)
 									{
 										var scoringGroupScore = GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup);
 										<td class="score scoring-group-score @GradeCssClass(scoringGroupScore, GetMaxScoreForUnitByScoringGroup(unit, scoringGroup))"

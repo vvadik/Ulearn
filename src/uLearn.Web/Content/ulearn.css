@@ -286,6 +286,14 @@ p {
 	margin-right: 5px;
 }
 
+.nav .group-statistics-link a .beta {
+	font-size: 80%;
+	position: relative;
+	top: -4px;
+	text-decoration: none;
+	display: inline-block;
+}
+
 .right {
 	margin-left: auto;
 }
