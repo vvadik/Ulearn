@@ -10,6 +10,18 @@
 				Model.AdditionalScores[Tuple.Create(userId, unit.Id, scoringGroup.Id)];
 	}
 
+	private int GetTotalOnlyFullScoreForUserInUnitByScoringGroup(string userId, Unit unit, ScoringGroup scoringGroup)
+	{
+		var shouldBeSolvedSlides = Model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
+		var onlyFullScore = 0;
+		foreach (var slide in shouldBeSolvedSlides)
+		{
+			var slideScore = Model.ScoreByUserAndSlide[Tuple.Create(userId, slide.Id)];
+			onlyFullScore +=  GetOnlyFullScore(slideScore, slide.MaxScore);
+		}
+		return onlyFullScore + Model.AdditionalScores[Tuple.Create(userId, unit.Id, scoringGroup.Id)];
+	}
+
 	private int GetMaxScoreForUnitByScoringGroup(Unit unit, ScoringGroup scoringGroup)
 	{
 		var unitScoringGroup = unit.Scoring.Groups.Values.FirstOrDefault(g => g.Id == scoringGroup.Id);
@@ -18,20 +30,33 @@
 	}
 
 	/* Returns css class from grade-0 to grade-15*/
-	private string GradeCssClass(int score, int maxScore)
+	private string GradeCssClass(int score, int maxScore, bool zerosWithoutClass=true)
 	{
 		if (score > maxScore)
 			score = maxScore;
 
-		return score == 0 ? "" : "grade-" + Math.Round(15.0 * score / maxScore);
+		return (score == 0 && zerosWithoutClass) ? "" : "grade-" + Math.Round(15.0 * score / maxScore);
+	}
+
+	/* Returns css class from only-full__grade-0 to only-full__grade-15 */
+	private string OnlyFullGradeCssClass(int score, int maxScore)
+	{
+		return "only-full__" + GradeCssClass(score, maxScore, false);
 	}
 
 	private SortedDictionary<string, ScoringGroup> GetUsingUnitScoringGroups(Unit unit, SortedDictionary<string, ScoringGroup> courseScoringGroups)
 	{
 		return unit.Scoring.Groups
 			.Where(kv => courseScoringGroups.ContainsKey(kv.Key))
+			/* Filter out only scoring groups with should-be-solved slides or with additional scores by instructor */
+			.Where(kv => Model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, kv.Key)].Count > 0 || kv.Value.CanBeSetByInstructor)
 			.ToDictionary(kv => kv.Key, kv => kv.Value)
 			.ToSortedDictionary();
+	}
+
+	private int GetOnlyFullScore(int score, int maxScore)
+	{
+		return score == maxScore ? score : 0;
 	}
 }
 
@@ -100,19 +125,33 @@
 				</div>
 			}
 
-			@if (Model.IsInstructor)
-			{
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-					<h3>Группировать</h3>
+
+			<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+				@if (Model.IsInstructor)
+				{
+					<h3>&nbsp;</h3>
 					<div class="checkbox checkbox-default">
 						@Html.CheckBox("grouping-by-group", true)
 						<label for="grouping-by-group">
-							По группам
+							Группировать по&nbsp;группам
 						</label>
 						<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate loading-icon" style="display: none"></span>
 					</div>
+				}
+
+				@if (!Model.IsInstructor)
+				{
+					<h3>Показывать</h3>
+				}
+				<div class="checkbox checkbox-default">
+					@Html.CheckBox("only-full-scores")
+					<label for="only-full-scores">
+						@(Model.IsInstructor ? "Показывать только полные баллы" : "Только полные баллы") 
+					</label>
+					<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate loading-icon" style="display: none"></span>
 				</div>
-			}
+			</div>
+			
 
 			@{
 				var grouppingByGroup = Model.IsInstructor;
@@ -198,9 +237,10 @@
 						{
 							foreach (var scoringGroup in GetUsingUnitScoringGroups(unit, Model.ScoringGroups).Values)
 							{
+								var shouldBeSolvedSlides = Model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
 								<th class="scoring-group-max-score"
 									data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">@GetMaxScoreForUnitByScoringGroup(unit, scoringGroup)</th>
-								var shouldBeSolvedSlides = Model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
+
 								foreach (var slide in shouldBeSolvedSlides)
 								{
 									<th class="slide-max-score"
@@ -276,7 +316,10 @@
 								@foreach (var scoringGroup in Model.ScoringGroups.Values)
 								{
 									var scoringGroupScore = Model.Course.Units.Sum(unit => GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
-									<td class="score scoring-group-score scoring-group-sum-score" data-unit-id="sum" data-scoring-group="@scoringGroup.Id">
+									var scoringGroupOnlyFullScore = Model.Course.Units.Sum(unit => GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
+									<td class="score scoring-group-score scoring-group-sum-score"
+									    data-unit-id="sum" data-scoring-group="@scoringGroup.Id"
+										data-only-full-value="@scoringGroupOnlyFullScore">
 										@scoringGroupScore
 									</td>
 								}
@@ -285,26 +328,31 @@
 								{
 									foreach (var scoringGroup in GetUsingUnitScoringGroups(unit, Model.ScoringGroups).Values)
 									{
+										var shouldBeSolvedSlides = Model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
 										var scoringGroupScore = GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup);
-										<td class="score scoring-group-score @GradeCssClass(scoringGroupScore, GetMaxScoreForUnitByScoringGroup(unit, scoringGroup))"
-											data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
+										var onlyFullScore = GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup);
+										var maxScore = GetMaxScoreForUnitByScoringGroup(unit, scoringGroup);
+										<td class="score scoring-group-score @GradeCssClass(scoringGroupScore, maxScore) @OnlyFullGradeCssClass(onlyFullScore, maxScore)"
+										    data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id"
+											data-only-full-value="@onlyFullScore">
 											@scoringGroupScore
 										</td>
-										var shouldBeSolvedSlides = Model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
+
 										foreach (var slide in shouldBeSolvedSlides)
 										{
-											var slideScore = Model.ScoreByUserAndSlide.GetOrDefault(Tuple.Create(user.UserId, slide.Id), 0);
-											<td class="score slide-score @GradeCssClass(slideScore, slide.MaxScore)"
-												data-slide-id="@slide.Id" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
+											var slideScore = Model.ScoreByUserAndSlide[Tuple.Create(user.UserId, slide.Id)];
+											<td class="score slide-score @GradeCssClass(slideScore, slide.MaxScore) @OnlyFullGradeCssClass(GetOnlyFullScore(slideScore, slide.MaxScore), slide.MaxScore)"
+											    data-slide-id="@slide.Id" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id"
+												data-only-full-value="@GetOnlyFullScore(slideScore, slide.MaxScore)">
 												@slideScore
 											</td>
 										}
 										if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
 										{
-											var slideScore = Model.AdditionalScores[Tuple.Create(user.UserId, unit.Id, scoringGroup.Id)];
-											<td class="score slide-score @GradeCssClass(slideScore, scoringGroup.MaxAdditionalScore)"
-												data-slide-id="additional" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
-												@slideScore
+											var additionalScore = Model.AdditionalScores[Tuple.Create(user.UserId, unit.Id, scoringGroup.Id)];
+											<td class="score slide-score @GradeCssClass(additionalScore, scoringGroup.MaxAdditionalScore)"
+											    data-slide-id="additional" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id">
+												@additionalScore
 											</td>
 										}
 									}

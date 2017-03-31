@@ -182,28 +182,33 @@
 	}
 
 	$('.course-statistics__enable-scoring-group__checkbox').change(function () {
-		var isChecked = $(this).prop('checked');
-		var scoringGroupId = $(this).data('scoringGroup');
-		var $loadingIcon = $(this).closest('.checkbox').find('.loading-icon');
+		var $self = $(this);
+		$self.attr('disabled', 'disabled');
+		var isChecked = $self.prop('checked');
+		var scoringGroupId = $self.data('scoringGroup');
+		var $loadingIcon = $self.closest('.checkbox').find('.loading-icon');
 		$loadingIcon.show();
-		
-		$courseStatistics.find('.scoring-group-title[data-scoring-group="' + scoringGroupId + '"]').each(function () {
-			/* Collapse if expanded */
-			if ($(this).data('expanded'))
-				toggleUnitScoringGroup($(this));
 
-			var unitId = $(this).data('unitId');
-			var $unitTitleTh = $('.course-statistics .unit-title[data-unit-id="' + unitId + '"]').closest('th');
-			addColspan($unitTitleTh, isChecked ? 1 : -1);
-		});
+		setTimeout(function() {
+			$courseStatistics.find('.scoring-group-title[data-scoring-group="' + scoringGroupId + '"]').each(function() {
+				/* Collapse if expanded */
+				if ($(this).data('expanded'))
+					toggleUnitScoringGroup($(this));
 
-		var filterByScoringGroup = '[data-scoring-group="' + scoringGroupId + '"]';
-		$('.course-statistics .scoring-group-title' + filterByScoringGroup).toggle(isChecked);
-		$('.course-statistics .scoring-group-score' + filterByScoringGroup).toggle(isChecked);
-		$('.course-statistics .scoring-group-max-score' + filterByScoringGroup).toggle(isChecked);
+				var unitId = $(this).data('unitId');
+				var $unitTitleTh = $('.course-statistics .unit-title[data-unit-id="' + unitId + '"]').closest('th');
+				addColspan($unitTitleTh, isChecked ? 1 : -1);
+			});
 
-		disableScoringGroupFilterIfNeeded();
-		$loadingIcon.hide();
+			var filterByScoringGroup = '[data-scoring-group="' + scoringGroupId + '"]';
+			$('.course-statistics .scoring-group-title' + filterByScoringGroup).toggle(isChecked);
+			$('.course-statistics .scoring-group-score' + filterByScoringGroup).toggle(isChecked);
+			$('.course-statistics .scoring-group-max-score' + filterByScoringGroup).toggle(isChecked);
+
+			disableScoringGroupFilterIfNeeded();
+			$loadingIcon.hide();
+			$self.removeAttr('disabled');
+		}, 0);
 	});
 
 	var compareAsIntsAndStrings = function (firstValue, secondValue, order) {
@@ -331,12 +336,34 @@
 
 	var groupingFunction = function ($row) { return $row.data('group'); };
 
-	$('#grouping-by-group').change(function() {
-		var isGrouppingEnabled = $(this).is(':checked');
-		var $loadingIcon = $(this).closest('.checkbox').find('.loading-icon').show();
+	$('#grouping-by-group').change(function () {
+		var $self = $(this);
+		$self.attr('disabled', 'disabled');
+		var isGrouppingEnabled = $self.is(':checked');
+		var $loadingIcon = $self.closest('.checkbox').find('.loading-icon').show();
 		var sortingFunctions = getCurrentSortingFunctions();
-		sortTable($courseStatistics, sortingFunctions, isGrouppingEnabled ? groupingFunction : undefined);
-		$loadingIcon.hide();
+		setTimeout(function() {
+			sortTable($courseStatistics, sortingFunctions, isGrouppingEnabled ? groupingFunction : undefined);
+			$loadingIcon.hide();
+			$self.removeAttr('disabled');
+		}, 0);
+	});
+
+	$('#only-full-scores').change(function () {
+		var $self = $(this);
+		var $loadingIcon = $self.closest('.checkbox').find('.loading-icon').show();
+		$self.attr('disabled', 'disabled');
+		setTimeout(function() {
+			$courseStatistics.toggleClass('only-full-scores', $self.is(':checked'));
+			$courseStatistics.find('[data-only-full-value]').each(function() {
+				var $self = $(this);
+				var text = $self.text();
+				$self.text($self.data('onlyFullValue'));
+				$self.data('onlyFullValue', text);
+			});
+			$self.removeAttr('disabled');
+			$loadingIcon.hide();
+		},  0);
 	});
 	
 	$courseStatistics.find('thead th[data-sorter="true"]').click(function (e) {

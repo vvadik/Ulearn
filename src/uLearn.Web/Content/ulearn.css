@@ -1925,6 +1925,24 @@ h1 .copy-group-link {
 .course-statistics .score.grade-14 { background-color: #C8FFC0; }
 .course-statistics .score.grade-15 { background-color: #C0FFC0; }
 
+.course-statistics.only-full-scores .score.only-full__grade-0 { background-color: white !important; }
+.course-statistics.only-full-scores .score.only-full__grade-1 { background-color: #FFC0C0 !important; }
+.course-statistics.only-full-scores .score.only-full__grade-2 { background-color: #FFC8C0 !important; }
+.course-statistics.only-full-scores .score.only-full__grade-3 { background-color: #FFD0C0 !important; }
+.course-statistics.only-full-scores .score.only-full__grade-4 { background-color: #FFD8C0 !important; }
+.course-statistics.only-full-scores .score.only-full__grade-5 { background-color: #FFE0C0 !important; }
+.course-statistics.only-full-scores .score.only-full__grade-6 { background-color: #FFE8C0 !important; }
+.course-statistics.only-full-scores .score.only-full__grade-7 { background-color: #FFF0C0 !important; }
+.course-statistics.only-full-scores .score.only-full__grade-8 { background-color: #FFF8C0 !important; }
+.course-statistics.only-full-scores .score.only-full__grade-9 { background-color: #F0FFC0 !important; }
+.course-statistics.only-full-scores .score.only-full__grade-10 { background-color: #E8FFC0 !important; }
+.course-statistics.only-full-scores .score.only-full__grade-11 { background-color: #E0FFC0 !important; }
+.course-statistics.only-full-scores .score.only-full__grade-12 { background-color: #D8FFC0 !important; }
+.course-statistics.only-full-scores .score.only-full__grade-13 { background-color: #D0FFC0 !important; }
+.course-statistics.only-full-scores .score.only-full__grade-14 { background-color: #C8FFC0 !important; }
+.course-statistics.only-full-scores .score.only-full__grade-15 { background-color: #C0FFC0 !important; }
+
+
 .student-group, 
 .student-group-title {
 	
