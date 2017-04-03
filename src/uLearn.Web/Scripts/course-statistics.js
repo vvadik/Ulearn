@@ -129,7 +129,9 @@
 
 	var addColspan = function($td, diff) {
 		var colspan = parseInt($td.attr('colspan'));
-		$td.attr('colspan', colspan + diff);
+		var newColspan = colspan + diff;
+		$td.attr('colspan', newColspan);
+		$td.toggle(newColspan > 0);
 	}
 
 	var _toggleUnitScoringGroup = function ($scoringGroupTitle) {
