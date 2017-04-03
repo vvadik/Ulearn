@@ -76,9 +76,9 @@ namespace uLearn.Web.Controllers
 					if (group != null)
 					{
 						var groupMembersIds = groupsRepo.GetGroupMembers(group.Id).Select(u => u.Id).ToList();
-						var hasAccessToGroup = allowSeeGroupForAnyMember
-							? groupMembersIds.Contains(User.Identity.GetUserId())
-							: groupsRepo.IsGroupAvailableForUser(group.Id, User);
+						var hasAccessToGroup = groupsRepo.IsGroupAvailableForUser(group.Id, User);
+						if (allowSeeGroupForAnyMember)
+							hasAccessToGroup |= groupMembersIds.Contains(User.Identity.GetUserId());
 
 						if (hasAccessToGroup)
 							usersIds.AddAll(groupMembersIds);

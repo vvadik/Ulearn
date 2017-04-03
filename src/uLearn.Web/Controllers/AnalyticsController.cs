@@ -5,6 +5,7 @@ using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Web.Http;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using uLearn.Quizes;
@@ -178,9 +179,13 @@ namespace uLearn.Web.Controllers
 
 		/*TODO: extract copy-paste */
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Student)]
-		public ActionResult CourseStatistics(CourseStatisticsParams param)
+		public ActionResult CourseStatistics(CourseStatisticsParams param, int max=200)
 		{
-			const int usersLimit = 300;
+			var usersLimit = max;
+			if (usersLimit > 300)
+				usersLimit = 300;
+			if (usersLimit < 0)
+				usersLimit = 200;
 
 			var courseId = param.CourseId;
 			var periodStart = param.PeriodStartDate;

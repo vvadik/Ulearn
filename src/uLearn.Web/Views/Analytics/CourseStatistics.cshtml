@@ -125,11 +125,11 @@
 				</div>
 			}
 
-
 			<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
 				@if (Model.IsInstructor)
 				{
-					<h3>&nbsp;</h3>
+					<h3 class="hidden-xs">&nbsp;</h3>
+					<h3 class="visible-xs">Опции</h3>
 					<div class="checkbox checkbox-default">
 						@Html.CheckBox("grouping-by-group", true)
 						<label for="grouping-by-group">
@@ -151,7 +151,6 @@
 					<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate loading-icon" style="display: none"></span>
 				</div>
 			</div>
-			
 
 			@{
 				var grouppingByGroup = Model.IsInstructor;
@@ -311,7 +310,7 @@
 						foreach (var user in groupUsers.OrderBy(user => user.UserVisibleName))
 						{
 							<tr class="student" data-user-id="@user.UserId" data-group="@groupId">
-								<td title="@user.UserName" class="student-name">@user.UserVisibleName</td>
+								<td title="@user.UserName" class="student-name">@user.UserVisibleName.TruncateWithEllipsis(30)</td>
 
 								@foreach (var scoringGroup in Model.ScoringGroups.Values)
 								{
@@ -366,7 +365,7 @@
 		@if (Model.VisitedUsersIsMore)
 		{
 			<div class="text-muted">
-				Показаны <b>300</b> лучших студентов
+				Показаны <b>@Model.VisitedUsers.Count</b> лучших студентов
 			</div>
 		}
 
