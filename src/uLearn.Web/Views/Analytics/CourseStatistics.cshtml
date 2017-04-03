@@ -170,20 +170,24 @@
 						</th>
 						@foreach (var unit in Model.Course.Units)
 						{
-							<th colspan="@(GetUsingUnitScoringGroups(unit, Model.ScoringGroups).Count)"
-							    title="@(Model.IsInstructor ? "Посмотреть ведомость по модулю «@unit.Title»" : "" )"
-							    data-unit-id="@unit.Id">
-								<div class="unit-title" data-unit-id="@unit.Id">
-									@if (Model.IsInstructor)
-									{
-										@Html.ActionLink(unit.Title.TruncateWithEllipsis(20), "UnitStatistics", "Analytics", new { courseId = Model.Course.Id, unitId = unit.Id, group = Model.SelectedGroupsIdsJoined }, new { })
-									}
-									else
-									{
-										@unit.Title.TruncateWithEllipsis(20)
-									}
-								</div>
-							</th>
+							var scoringGroupsCount = GetUsingUnitScoringGroups(unit, Model.ScoringGroups).Count;
+							if (scoringGroupsCount > 0)
+							{
+								<th colspan="@scoringGroupsCount"
+								    title="@(Model.IsInstructor ? "Посмотреть ведомость по модулю «@unit.Title»" : "" )"
+								    data-unit-id="@unit.Id">
+									<div class="unit-title" data-unit-id="@unit.Id">
+										@if (Model.IsInstructor)
+										{
+											@Html.ActionLink(unit.Title.TruncateWithEllipsis(20), "UnitStatistics", "Analytics", new { courseId = Model.Course.Id, unitId = unit.Id, group = Model.SelectedGroupsIdsJoined }, new { })
+										}
+										else
+										{
+											@unit.Title.TruncateWithEllipsis(20)
+										}
+									</div>
+								</th>
+							}
 						}
 					</tr>
 					<tr>
