@@ -1571,14 +1571,14 @@ h1 .copy-group-link {
 }
 
 #exercise__submission__output::before {
-	content: "Ð’Ñ‹Ð²Ð¾Ð´ Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ñ‹:";
+	content: "Вывод программы:";
 	display: block;
 	font-weight: bold;
 	font-family: sans-serif;
 }
 
 #exercise__submission__output.empty::before {
-	content: "ÐÐµÑ‚ Ð²Ñ‹Ð²Ð¾Ð´Ð° Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ñ‹"
+	content: "Нет вывода программы"
 }
 
 .user-submission {
