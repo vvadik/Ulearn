@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace uLearn.Web.Models
 {
@@ -36,6 +37,46 @@ namespace uLearn.Web.Models
 		/* Dictionary<(userId, slideId), visitScore> */
 		public DefaultDictionary<Tuple<string, Guid>, int> ScoreByUserAndSlide { get; set; }
 		public DefaultDictionary<string, List<int>> VisitedUsersGroups { get; set; }
+
+		public SortedDictionary<string, ScoringGroup> GetUsingUnitScoringGroups(Unit unit, SortedDictionary<string, ScoringGroup> courseScoringGroups)
+		{
+			return unit.Scoring.Groups
+				.Where(kv => courseScoringGroups.ContainsKey(kv.Key))
+				/* Filter out only scoring groups with should-be-solved slides or with additional scores by instructor */
+				.Where(kv => ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, kv.Key)].Count > 0 || kv.Value.CanBeSetByInstructor)
+				.ToDictionary(kv => kv.Key, kv => kv.Value)
+				.ToSortedDictionary();
+		}
+
+		public int GetMaxScoreForUnitByScoringGroup(Unit unit, ScoringGroup scoringGroup)
+		{
+			var unitScoringGroup = unit.Scoring.Groups.Values.FirstOrDefault(g => g.Id == scoringGroup.Id);
+			var maxAdditionalScore = unitScoringGroup != null && unitScoringGroup.CanBeSetByInstructor ? unitScoringGroup.MaxAdditionalScore : 0;
+			return unit.Slides.Where(s => s.ScoringGroup == scoringGroup.Id).Sum(s => s.MaxScore) + maxAdditionalScore;
+		}
+
+		public int GetTotalScoreForUserInUnitByScoringGroup(string userId, Unit unit, ScoringGroup scoringGroup)
+		{
+			return ScoreByUserUnitScoringGroup[Tuple.Create(userId, unit.Id, scoringGroup.Id)] +
+					AdditionalScores[Tuple.Create(userId, unit.Id, scoringGroup.Id)];
+		}
+
+		public int GetTotalOnlyFullScoreForUserInUnitByScoringGroup(string userId, Unit unit, ScoringGroup scoringGroup)
+		{
+			var shouldBeSolvedSlides = ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
+			var onlyFullScore = 0;
+			foreach (var slide in shouldBeSolvedSlides)
+			{
+				var slideScore = ScoreByUserAndSlide[Tuple.Create(userId, slide.Id)];
+				onlyFullScore += GetOnlyFullScore(slideScore, slide.MaxScore);
+			}
+			return onlyFullScore + AdditionalScores[Tuple.Create(userId, unit.Id, scoringGroup.Id)];
+		}
+
+		public int GetOnlyFullScore(int score, int maxScore)
+		{
+			return score == maxScore ? score : 0;
+		}
 	}
 
 	public class UnitStatisticPageModel : StatisticPageModel

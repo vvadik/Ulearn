@@ -5,13 +5,17 @@ using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using uLearn.Quizes;
 using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
+using uLearn.Web.Helpers;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -176,8 +180,122 @@ namespace uLearn.Web.Controllers
 			}
 			return true;
 		}
+		
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		public ActionResult ExportCourseStatistics(CourseStatisticsParams param)
+		{
+			var model = GetCourseStatisticsModel(param, 3000);
 
-		/*TODO: extract copy-paste */
+			var package = new ExcelPackage();
+			FillCourseStatisticsExcelWorksheet(
+				package.Workbook.Worksheets.Add(model.Course.Title),
+				model
+			);
+			FillCourseStatisticsExcelWorksheet(
+				package.Workbook.Worksheets.Add("Только полные баллы"),
+				model,
+				onlyFullScores: true
+			);
+
+			var filename = model.Course.Id + ".xlsx";
+			Response.AddHeader("Content-Disposition", "attachment;filename=" + filename);
+			Response.Charset = "";
+			Response.Cache.SetCacheability(HttpCacheability.NoCache);
+			Response.ContentType = "application/vnd.ms-excel";
+			package.SaveAs(Response.OutputStream);
+			Response.End();
+			return new EmptyResult();
+		}
+
+		private void FillCourseStatisticsExcelWorksheet(ExcelWorksheet worksheet, CourseStatisticPageModel model, bool onlyFullScores=false)
+		{
+			var builder = new ExcelWorksheetBuilder(worksheet);
+
+			builder.AddStyleRule(s => s.Font.Bold = true);
+
+			builder.AddCell("Фамилия Имя");
+			builder.AddCell("Сумма", model.ScoringGroups.Count);
+			foreach (var unit in model.Course.Units)
+			{
+				var scoringGroupsCount = model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Count;
+				builder.AddCell(unit.Title, scoringGroupsCount);
+			}
+			builder.GoToNewLine();
+
+			builder.AddCell("");
+			foreach (var scoringGroup in model.ScoringGroups.Values)
+				builder.AddCell(scoringGroup.Abbreviation);
+			foreach (var unit in model.Course.Units)
+			{
+				foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
+				{
+					var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
+					builder.AddCell(scoringGroup.Abbreviation);
+
+					builder.AddStyleRule(s => s.TextRotation = 90);
+					builder.AddStyleRule(s => s.Font.Bold = false);
+					foreach (var slide in shouldBeSolvedSlides)
+						builder.AddCell(slide.Title);
+					if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
+						builder.AddCell("Доп");
+					builder.PopStyleRule();
+					builder.PopStyleRule();
+				}
+			}
+			builder.GoToNewLine();
+
+			builder.AddCell("Максимум:");
+			foreach (var scoringGroup in model.ScoringGroups.Values)
+				builder.AddCell(model.Course.Units.Sum(unit => model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup)));
+			foreach (var unit in model.Course.Units)
+			{
+				foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
+				{
+					var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
+					builder.AddCell(model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup));
+					foreach (var slide in shouldBeSolvedSlides)
+						builder.AddCell(slide.MaxScore);
+					if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
+						builder.AddCell(scoringGroup.MaxAdditionalScore);
+				}
+			}
+			builder.GoToNewLine();
+
+			builder.AddStyleRule(s => s.Font.Bold = false);
+
+			foreach (var user in model.VisitedUsers)
+			{
+				builder.AddCell(user.UserVisibleName);
+				foreach (var scoringGroup in model.ScoringGroups.Values)
+				{
+					var scoringGroupScore = model.Course.Units.Sum(unit => model.GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
+					var scoringGroupOnlyFullScore = model.Course.Units.Sum(unit => model.GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
+					builder.AddCell(onlyFullScores ? scoringGroupOnlyFullScore : scoringGroupScore);
+				}
+				foreach (var unit in model.Course.Units)
+				{
+					foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
+					{
+						var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
+						var scoringGroupScore = model.GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup);
+						var scoringGroupOnlyFullScore = model.GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup);
+						builder.AddCell(onlyFullScores ? scoringGroupOnlyFullScore : scoringGroupScore);
+						foreach (var slide in shouldBeSolvedSlides)
+						{
+							var slideScore = model.ScoreByUserAndSlide[Tuple.Create(user.UserId, slide.Id)];
+							builder.AddCell(onlyFullScores ? model.GetOnlyFullScore(slideScore, slide.MaxScore) : slideScore);
+						}
+						if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
+							builder.AddCell(model.AdditionalScores[Tuple.Create(user.UserId, unit.Id, scoringGroup.Id)]);
+					}
+				}
+				builder.GoToNewLine();
+			}
+
+			for (var column = 1; column <= builder.ColumnsCount; column++)
+				worksheet.Column(column).AutoFit(0.1);
+		}
+
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Student)]
 		public ActionResult CourseStatistics(CourseStatisticsParams param, int max=200)
 		{
@@ -187,6 +305,15 @@ namespace uLearn.Web.Controllers
 			if (usersLimit < 0)
 				usersLimit = 200;
 
+			var model = GetCourseStatisticsModel(param, usersLimit);
+			if (model == null)
+				return HttpNotFound();
+			return View(model);
+		}
+
+		/*TODO: extract copy-paste */
+		private CourseStatisticPageModel GetCourseStatisticsModel(CourseStatisticsParams param, int usersLimit)
+		{
 			var courseId = param.CourseId;
 			var periodStart = param.PeriodStartDate;
 			var periodFinish = param.PeriodFinishDate;
@@ -196,7 +323,7 @@ namespace uLearn.Web.Controllers
 
 			var currentUserId = User.Identity.GetUserId();
 			if (isStudent && !CanStudentViewGroupsStatistics(currentUserId, groupsIds))
-				return HttpNotFound();
+				return null;
 
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
@@ -220,7 +347,7 @@ namespace uLearn.Web.Controllers
 
 			var unitBySlide = course.Units.SelectMany(u => u.Slides.Select(s => Tuple.Create(u.Id, s.Id))).ToDictionary(p => p.Item2, p => p.Item1);
 			var scoringGroups = course.Settings.Scoring.Groups;
-			
+
 			var visitedSlidesCountByUserAllTime = visitsRepo.GetVisitsInPeriod(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(DateTime.MaxValue))
 				.GroupBy(v => v.UserId)
 				.ToDictionary(g => g.Key, g => g.Count());
@@ -233,7 +360,7 @@ namespace uLearn.Web.Controllers
 			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();
 
 			var visitedUsersGroups = groupsRepo.GetUsersGroupsIds(new List<string> { courseId }, visitedUsersIds, User, 10).ToDefaultDictionary();
-			
+
 			/* From now fetch only filtered users' statistics */
 			filterOptions.UsersIds = visitedUsersIds;
 			filterOptions.IsUserIdsSupplement = false;
@@ -275,20 +402,15 @@ namespace uLearn.Web.Controllers
 			var model = new CourseStatisticPageModel
 			{
 				IsInstructor = isInstructor,
-
 				Course = course,
 				SelectedGroupsIds = groupsIds,
 				Groups = groups,
-
 				PeriodStart = periodStart,
 				PeriodFinish = periodFinish,
-
 				VisitedUsers = visitedUsers,
 				VisitedUsersIsMore = isMore,
 				VisitedUsersGroups = visitedUsersGroups,
-
 				ShouldBeSolvedSlidesByUnitScoringGroup = shouldBeSolvedSlidesByUnitScoringGroup,
-
 				ScoringGroups = scoringGroups,
 				ScoreByUserUnitScoringGroup = scoreByUserUnitScoringGroup,
 				ScoreByUserAndSlide = scoreByUserAndSlide,
@@ -296,7 +418,7 @@ namespace uLearn.Web.Controllers
 				UsersGroupsIds = usersGroupsIds,
 				EnabledAdditionalScoringGroupsForGroups = enabledAdditionalScoringGroupsForGroups,
 			};
-			return View(model);
+			return model;
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
