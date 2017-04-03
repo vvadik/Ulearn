@@ -310,7 +310,7 @@
 						foreach (var user in groupUsers.OrderBy(user => user.UserVisibleName))
 						{
 							<tr class="student" data-user-id="@user.UserId" data-group="@groupId">
-								<td title="@user.UserName" class="student-name">@user.UserVisibleName.TruncateWithEllipsis(30)</td>
+								<td title="@(Model.IsInstructor ? user.UserName : user.UserVisibleName)" class="student-name">@user.UserVisibleName.TruncateWithEllipsis(30)</td>
 
 								@foreach (var scoringGroup in Model.ScoringGroups.Values)
 								{
