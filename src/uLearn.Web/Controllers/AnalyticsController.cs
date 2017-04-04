@@ -217,8 +217,15 @@ namespace uLearn.Web.Controllers
 			builder.AddCell("Сумма", model.ScoringGroups.Count);
 			foreach (var unit in model.Course.Units)
 			{
-				var scoringGroupsCount = model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Count;
-				builder.AddCell(unit.Title, scoringGroupsCount);
+				var colspan = 0;
+				foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
+				{
+					var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
+					colspan += shouldBeSolvedSlides.Count + 1;
+					if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
+						colspan++;
+				}
+				builder.AddCell(unit.Title, colspan);
 			}
 			builder.GoToNewLine();
 
@@ -227,6 +234,7 @@ namespace uLearn.Web.Controllers
 				builder.AddCell(scoringGroup.Abbreviation);
 			foreach (var unit in model.Course.Units)
 			{
+				builder.AddStyleRuleForOneCell(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
 				foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
 				{
 					var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
@@ -244,11 +252,13 @@ namespace uLearn.Web.Controllers
 			}
 			builder.GoToNewLine();
 
+			builder.AddStyleRule(s => s.Border.Bottom.Style = ExcelBorderStyle.Thin);
 			builder.AddCell("Максимум:");
 			foreach (var scoringGroup in model.ScoringGroups.Values)
 				builder.AddCell(model.Course.Units.Sum(unit => model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup)));
 			foreach (var unit in model.Course.Units)
 			{
+				builder.AddStyleRuleForOneCell(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
 				foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
 				{
 					var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
@@ -259,6 +269,7 @@ namespace uLearn.Web.Controllers
 						builder.AddCell(scoringGroup.MaxAdditionalScore);
 				}
 			}
+			builder.PopStyleRule(); // Bottom.Border
 			builder.GoToNewLine();
 
 			builder.AddStyleRule(s => s.Font.Bold = false);
@@ -274,6 +285,7 @@ namespace uLearn.Web.Controllers
 				}
 				foreach (var unit in model.Course.Units)
 				{
+					builder.AddStyleRuleForOneCell(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
 					foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
 					{
 						var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];

@@ -13,6 +13,7 @@ namespace uLearn.Web.Helpers
 		private int currentRow;
 		private int currentColumn;
 		private readonly List<Action<ExcelStyle>> styleRules = new List<Action<ExcelStyle>>();
+		private bool isLastStyleRuleForOneCellOnly = false;
 
 		public int ColumnsCount;
 
@@ -31,8 +32,12 @@ namespace uLearn.Web.Helpers
 
 			var cell = worksheet.Cells[currentRow, currentColumn];
 			cell.Value = value;
+
 			foreach (var styleRule in styleRules)
 				styleRule(cell.Style);
+			if (isLastStyleRuleForOneCellOnly)
+				PopStyleRule();
+
 			if (colspan > 1)
 				worksheet.Cells[currentRow, currentColumn, currentRow, currentColumn + colspan - 1].Merge = true;
 			currentColumn += colspan;
@@ -48,11 +53,19 @@ namespace uLearn.Web.Helpers
 		public void AddStyleRule(Action<ExcelStyle> styleFunction)
 		{
 			styleRules.Add(styleFunction);
+			isLastStyleRuleForOneCellOnly = false;
 		}
 
 		public void PopStyleRule()
 		{
 			styleRules.RemoveAt(styleRules.Count - 1);
+			isLastStyleRuleForOneCellOnly = false;
+		}
+
+		public void AddStyleRuleForOneCell(Action<ExcelStyle> styleFunction)
+		{
+			AddStyleRule(styleFunction);
+			isLastStyleRuleForOneCellOnly = true;
 		}
 	}
 }
