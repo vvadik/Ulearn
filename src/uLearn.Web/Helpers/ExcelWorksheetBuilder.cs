@@ -33,13 +33,15 @@ namespace uLearn.Web.Helpers
 			var cell = worksheet.Cells[currentRow, currentColumn];
 			cell.Value = value;
 
+			var range = worksheet.Cells[currentRow, currentColumn, currentRow, currentColumn + colspan - 1];
+			if (colspan > 1)
+				range.Merge = true;
+			
 			foreach (var styleRule in styleRules)
-				styleRule(cell.Style);
+				styleRule(range.Style);
 			if (isLastStyleRuleForOneCellOnly)
 				PopStyleRule();
 
-			if (colspan > 1)
-				worksheet.Cells[currentRow, currentColumn, currentRow, currentColumn + colspan - 1].Merge = true;
 			currentColumn += colspan;
 			ColumnsCount = Math.Max(ColumnsCount, currentColumn);
 		}

@@ -213,8 +213,10 @@ namespace uLearn.Web.Controllers
 
 			builder.AddStyleRule(s => s.Font.Bold = true);
 
-			builder.AddCell("Фамилия Имя");
-			builder.AddCell("Сумма", model.ScoringGroups.Count);
+			builder.AddCell("");
+			builder.AddCell("");
+			builder.AddCell("За весь курс", model.ScoringGroups.Count);
+			builder.AddStyleRule(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
 			foreach (var unit in model.Course.Units)
 			{
 				var colspan = 0;
@@ -227,9 +229,11 @@ namespace uLearn.Web.Controllers
 				}
 				builder.AddCell(unit.Title, colspan);
 			}
+			builder.PopStyleRule(); // Border.Left
 			builder.GoToNewLine();
 
-			builder.AddCell("");
+			builder.AddCell("Фамилия Имя");
+			builder.AddCell("Группа");
 			foreach (var scoringGroup in model.ScoringGroups.Values)
 				builder.AddCell(scoringGroup.Abbreviation);
 			foreach (var unit in model.Course.Units)
@@ -243,7 +247,7 @@ namespace uLearn.Web.Controllers
 					builder.AddStyleRule(s => s.TextRotation = 90);
 					builder.AddStyleRule(s => s.Font.Bold = false);
 					foreach (var slide in shouldBeSolvedSlides)
-						builder.AddCell(slide.Title);
+						builder.AddCell($"{scoringGroup.Abbreviation}: {slide.Title}");
 					if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
 						builder.AddCell("Доп");
 					builder.PopStyleRule();
@@ -251,9 +255,14 @@ namespace uLearn.Web.Controllers
 				}
 			}
 			builder.GoToNewLine();
-
+			
 			builder.AddStyleRule(s => s.Border.Bottom.Style = ExcelBorderStyle.Thin);
-			builder.AddCell("Максимум:");
+			builder.AddStyleRuleForOneCell(s =>
+			{
+				s.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+				s.Font.Size = 10;
+			});
+			builder.AddCell("Максимум:", 2);
 			foreach (var scoringGroup in model.ScoringGroups.Values)
 				builder.AddCell(model.Course.Units.Sum(unit => model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup)));
 			foreach (var unit in model.Course.Units)
@@ -277,6 +286,8 @@ namespace uLearn.Web.Controllers
 			foreach (var user in model.VisitedUsers)
 			{
 				builder.AddCell(user.UserVisibleName);
+				var userGroups = model.Groups.Where(g => model.VisitedUsersGroups[user.UserId].Contains(g.Id)).Select(g => g.Name).ToList();
+				builder.AddCell(string.Join(", ", userGroups));
 				foreach (var scoringGroup in model.ScoringGroups.Values)
 				{
 					var scoringGroupScore = model.Course.Units.Sum(unit => model.GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
