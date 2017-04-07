@@ -308,6 +308,10 @@
     <Compile Include="Migrations\201702210620147_AddIsManualCheckingEnabledForOldSolutions.Designer.cs">
       <DependentUpon>201702210620147_AddIsManualCheckingEnabledForOldSolutions.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201704061850482_AddHiddenFromTopComments.cs" />
+    <Compile Include="Migrations\201704061850482_AddHiddenFromTopComments.Designer.cs">
+      <DependentUpon>201704061850482_AddHiddenFromTopComments.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\GroupsFilterViewModel.cs" />
     <Compile Include="Telegram\ErrorsBot.cs" />
     <Compile Include="Telegram\TelegramBot.cs" />
@@ -917,6 +921,9 @@
     <EmbeddedResource Include="Migrations\201702210620147_AddIsManualCheckingEnabledForOldSolutions.resx">
       <DependentUpon>201702210620147_AddIsManualCheckingEnabledForOldSolutions.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704061850482_AddHiddenFromTopComments.resx">
+      <DependentUpon>201704061850482_AddHiddenFromTopComments.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="codemirror\addon\comment\comment.js" />
@@ -1305,6 +1312,7 @@
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.date.js" />
+    <Content Include="Scripts\js.cookie.js" />
     <Content Include="Scripts\likely.js" />
     <Content Include="Scripts\notify-custom.min.js" />
     <Content Include="Scripts\slide-checking.js" />
@@ -1334,9 +1342,9 @@
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\slide-tex.js" />
-    <Content Include="Scripts\slide-stats.js" />
     <Content Include="Scripts\slide-utils.js" />
     <Content Include="Scripts\slide-versions.js" />
+    <Content Include="Scripts\slide-video.js" />
     <Content Include="Scripts\table-configurator.js" />
     <Content Include="Scripts\tooltips.js" />
     <Content Include="Scripts\ulearn-updates-invitation.js" />
@@ -1466,7 +1474,6 @@
     <Content Include="Views\Course\Slide.cshtml" />
     <Content Include="Views\SlideNavigation\PrevNextButtons.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
-    <Content Include="Views\Course\_RatesBar.cshtml" />
     <Content Include="Views\Analytics\UsersStatistics.cshtml" />
     <Content Include="Views\SlideNavigation\TableOfContents.cshtml">
       <Generator>RazorGenerator</Generator>
@@ -1569,6 +1576,8 @@
     <Content Include="Views\Shared\_YandexMetrika.cshtml" />
     <Content Include="Views\Analytics\CourseStatistics.cshtml" />
     <Content Include="Views\Shared\_GroupsFilter.cshtml" />
+    <Content Include="Views\Exercise\_TopUserReviewComments.cshtml" />
+    <Content Include="Views\Exercise\_SlideCodeReviewComments.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

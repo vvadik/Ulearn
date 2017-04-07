@@ -373,7 +373,7 @@ namespace uLearn.Web.Controllers
 			return await InternalManualCheck<ManualQuizChecking>(courseId, "ManualQuizCheckingQueue", id, false, groupsIds, recheck);
 		}
 
-		public async Task<ActionResult> CheckExercise(string courseId, int id, bool recheck=false)
+		public async Task<ActionResult> CheckExercise(string courseId, int id, bool recheck = false)
 		{
 			var groupsIds = Request.GetMultipleValues("group");
 			return await InternalManualCheck<ManualExerciseChecking>(courseId, "ManualExerciseCheckingQueue", id, false, groupsIds, recheck);

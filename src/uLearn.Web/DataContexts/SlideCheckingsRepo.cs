@@ -238,7 +238,7 @@ namespace uLearn.Web.DataContexts
 			review.Comment = newComment;
 			await db.SaveChangesAsync();
 		}
-
+		
 		public Dictionary<int, List<ExerciseCodeReview>> GetExerciseCodeReviewForCheckings(IEnumerable<int> checkingsIds)
 		{
 			return db.ExerciseCodeReviews
@@ -250,13 +250,40 @@ namespace uLearn.Web.DataContexts
 		public List<string> GetTopUserReviewComments(string courseId, Guid slideId, string userId, int count)
 		{
 			return db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
-				.Where(r => r.ExerciseChecking.CourseId == courseId && r.ExerciseChecking.SlideId == slideId && r.AuthorId == userId && ! r.IsDeleted)
+				.Where(r => r.ExerciseChecking.CourseId == courseId &&
+							r.ExerciseChecking.SlideId == slideId &&
+							r.AuthorId == userId &&
+							! r.HiddenFromTopComments &&
+							! r.IsDeleted)
 				.GroupBy(r => r.Comment)
 				.OrderByDescending(g => g.Count())
 				.ThenByDescending(g => g.Max(r => r.ExerciseChecking.Timestamp))
 				.Take(count)
 				.Select(g => g.Key)
 				.ToList();
+		}
+
+		public async Task HideFromTopCodeReviewComments(string courseId, Guid slideId, string userId, string comment)
+		{
+			var reviews = db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
+				.Where(r => r.ExerciseChecking.CourseId == courseId &&
+							r.ExerciseChecking.SlideId == slideId &&
+							r.AuthorId == userId &&
+							r.Comment == comment && 
+							!r.IsDeleted);
+
+			foreach (var review in reviews)
+				review.HiddenFromTopComments = true;
+			await db.SaveChangesAsync();
+		}
+
+		public List<ExerciseCodeReview> GetAllReviewComments(string courseId, Guid slideId)
+		{
+			return db.ExerciseCodeReviews.Where(
+				r => r.ExerciseChecking.CourseId == courseId &&
+					r.ExerciseChecking.SlideId == slideId &&
+					!r.IsDeleted
+				).ToList();
 		}
 	}
 }

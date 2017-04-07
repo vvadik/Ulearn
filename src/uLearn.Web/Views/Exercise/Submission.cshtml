@@ -101,7 +101,7 @@
 			/* For reviewed submission without reviews don't show reviews panel at all*/
 			var isEmpty = Model.Reviews.Count == 0 && ! canAddReviews ? "empty" : "";
 			<div class="exercise__reviews @isEmpty">
-				@foreach (var review in Model.Reviews.OrderBy(r => r.StartLine))
+				@foreach (var review in Model.Reviews.OrderBy(r => r.StartLine).ThenBy(r => r.StartPosition))
 				{
 					@Html.Partial("_ExerciseReview", new ExerciseCodeReviewModel
 					{
@@ -171,13 +171,12 @@
 
 @if (Model.ManualChecking != null)
 {
-	<div class="exercise__top-review-comments hidden">
-		@foreach (var comment in Model.TopUserReviewComments)
-		{
-			<div class="comment"><a href="#" class="internal-page-link" title="@comment.TruncateWithEllipsis(200)" data-value="@comment">@comment.TruncateWithEllipsis(35)</a>
-			</div>
-		}
-	</div>
+	@Html.Partial("_TopUserReviewComments", Model)
+}
+
+@if (Model.ManualChecking == null && User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
+{
+	@Html.Action("SlideCodeReviewComments", "Exercise", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
 }
 
 @helper YouWillLoseScoresDialog(ExerciseBlockData data)

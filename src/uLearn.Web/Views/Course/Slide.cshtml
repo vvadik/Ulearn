@@ -79,11 +79,7 @@
 						<span class="text-danger">(для тестеров и преподавателей)</span>
 					}
 				}
-				if (!Model.IsGuest)
-				{
-					@Html.Partial("_RatesBar")
-				}
-				else
+				if (Model.IsGuest)
 				{
 					@Html.Partial("_LoginForContinue")
 				}
@@ -112,7 +108,6 @@
 	@if (!Model.IsGuest)
 	{
 		<script>
-			fillRate('@Model.Rate');
 			$("#selectGroupModal").modal();
 			displayVisits();
 			uploadVisits("@Url.Action("Upload", "Visits")");

@@ -164,10 +164,7 @@ namespace uLearn.Web.Controllers
 			var checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(checkingId);
 			if (! string.Equals(checking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-
-			if (!checking.IsLockedBy(User.Identity))
-				return RedirectToAction("ManualExerciseCheckingQueue", "Admin", new { courseId, message = "time_is_over" });
-
+			
 			/* Make start position less than finish position */
 			if (reviewInfo.StartLine > reviewInfo.FinishLine || (reviewInfo.StartLine == reviewInfo.FinishLine && reviewInfo.StartPosition > reviewInfo.FinishPosition))
 			{
@@ -196,7 +193,7 @@ namespace uLearn.Web.Controllers
 			var review = slideCheckingsRepo.FindExerciseCodeReviewById(reviewId);
 			if (! string.Equals(review.ExerciseChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-			if (review.AuthorId != User.Identity.GetUserId())
+			if (review.AuthorId != User.Identity.GetUserId() && ! User.HasAccessFor(courseId, CourseRole.CourseAdmin))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			await slideCheckingsRepo.DeleteExerciseCodeReview(review);
@@ -218,6 +215,31 @@ namespace uLearn.Web.Controllers
 			await slideCheckingsRepo.UpdateExerciseCodeReview(review, comment);
 
 			return Json(new { status = "ok" });
+		}
+
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		[System.Web.Mvc.HttpPost]
+		[ValidateInput(false)]
+		public async Task<ActionResult> HideFromTopCodeReviewComments(string courseId, Guid slideId, string comment)
+		{
+			var slide = courseManager.GetCourse(courseId).FindSlideById(slideId) as ExerciseSlide;
+			if (slide == null)
+				return HttpNotFound();
+
+			var userId = User.Identity.GetUserId();
+			await slideCheckingsRepo.HideFromTopCodeReviewComments(courseId, slideId, userId, comment);
+
+			return PartialView("_TopUserReviewComments", new ExerciseBlockData(courseId, slide)
+			{
+				TopUserReviewComments = slideCheckingsRepo.GetTopUserReviewComments(courseId, slideId, userId, 10)
+			});
+		}
+
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		public ActionResult SlideCodeReviewComments(string courseId, Guid slideId)
+		{
+			var comments = slideCheckingsRepo.GetAllReviewComments(courseId, slideId);
+			return PartialView("_SlideCodeReviewComments", comments);
 		}
 
 		[System.Web.Mvc.HttpPost]

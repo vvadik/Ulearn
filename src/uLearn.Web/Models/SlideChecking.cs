@@ -60,6 +60,11 @@ namespace uLearn.Web.Models
 		{
 			return IsLocked && LockedById == identity.GetUserId();
 		}
+
+		public bool HasLastLockedBy(IIdentity identity)
+		{
+			return LockedById == identity.GetUserId();
+		}
 	}
 
 	public class AbstractAutomaticSlideChecking : AbstractSlideChecking

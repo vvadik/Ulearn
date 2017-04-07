@@ -5,12 +5,11 @@
 		var $self = $(this);
 		var addReviewUrl = $self.data('url');
 
-		$self.find('.exercise__close-review')
-			.click(function(e) {
-				$self.hide();
-				$self.closest('.exercise').find('.code')[0].codeMirrorEditor.focus();
-				e.preventDefault();
-			});
+		$self.find('.exercise__close-review').click(function(e) {
+			$self.hide();
+			$self.closest('.exercise').find('.code')[0].codeMirrorEditor.focus();
+			e.preventDefault();
+		});
 		$self.find('.exercise__add-review__comment').on('input', function () {
 			if ($(this).val() === '')
 				$self.find('.exercise__add-review__button').attr('disabled', 'disabled');
@@ -49,6 +48,9 @@
 		$('#exercise__submission__output').slideToggle();
 		$(this).toggleClass('active');
 	});
+
+	if ($('.exercise__reviews').length > 0)
+		placeCodeReviews();
 });
 
 var editorLastRange, currentReviewTextMarker, reviewsTextMarkers, exerciseCodeDoc, $exerciseCodeBlock;
@@ -191,9 +193,9 @@ function initCodeEditor($parent) {
 							var startPosition = $review.data('start-position');
 							var finishLine = $review.data('finish-line');
 							var finishPosition = $review.data('finish-position');
-							if (startLine > cursor.line || (startLine == cursor.line && startPosition > cursor.ch))
+							if (startLine > cursor.line || (startLine === cursor.line && startPosition > cursor.ch))
 								return;
-							if (finishLine < cursor.line || (finishLine == cursor.line && finishPosition < cursor.ch))
+							if (finishLine < cursor.line || (finishLine === cursor.line && finishPosition < cursor.ch))
 								return;
 							$foundReview = $review;
 						});
@@ -217,7 +219,9 @@ function initCodeEditor($parent) {
 		selectReview($review);
 	});
 
-	$('.exercise__reviews').on('click', '.exercise__delete-review', function () {
+	$('.exercise__reviews').on('click', '.exercise__delete-review', function (e) {
+		e.preventDefault();
+
 		var $self = $(this);
 		var $review = $self.closest('.exercise__review');
 		var token = $('input[name="__RequestVerificationToken"]').val();
@@ -230,11 +234,15 @@ function initCodeEditor($parent) {
 				console.log(data);
 				alert('Can\'t delete comment: error');
 			} else {
-				$review.slideUp('fast', function () { $(this).remove(); });
+				$review.remove();
+				placeCodeReviews();
+
 				reviewsTextMarkers[reviewId].clear();
 				unselectAllReviews();
 			}
 		}, 'json');
+
+		return false;
 	});
 
 	$('.exercise__reviews .exercise__review').each(function () {
@@ -255,11 +263,44 @@ function createMarkTextForReview($review) {
 	});
 }
 
+function placeCodeReviews() {
+	var $reviews = $('.exercise__reviews .exercise__review');
+
+	var startHeight = $('.exercise__reviews').offset().top;
+	var lastReviewBottomHeight = 0;
+	$reviews.each(function() {
+		var $review = $(this);
+		var startLine = $review.data('startLine');
+		var startPosition = $review.data('startPosition');
+		var minHeight = exerciseCodeDoc.cm.charCoords({ line: startLine, ch: startPosition }, 'local').top;
+		var offset = Math.max(5, minHeight - lastReviewBottomHeight);
+		$review.css('marginTop', offset + 'px');
+
+		lastReviewBottomHeight = $review.offset().top + $review.outerHeight() - startHeight;
+	});
+}
+
+function orderByStartLineAndPosition(first, second) {
+	var firstStartLine = $(first).data('startLine');
+	var firstStartPosition = $(first).data('startPosition');
+	var secondStartLine = $(second).data('startLine');
+	var secondStartPosition = $(second).data('startPosition');
+	if (firstStartLine !== secondStartLine)
+		return firstStartLine < secondStartLine ? -1 : 1;
+	return firstStartPosition < secondStartPosition ? -1 : 1;
+}
+
 function addExerciseCodeReview(renderedReview) {
-	var $reviews = $('.exercise__reviews');
+	var $reviewsBlock = $('.exercise__reviews');
 	var $newReview = $(renderedReview);
 	createMarkTextForReview($newReview);
-	$reviews.append($newReview);
+	$reviewsBlock.append($newReview);
+
+	var $reviews = $reviewsBlock.find('.exercise__review').get();
+	$reviews.sort(orderByStartLineAndPosition);
+	$.each($reviews, function (idx, $item) { $reviewsBlock.append($item); });
+
+	placeCodeReviews();
 }
 
 var refreshPreviousDraftLastId = undefined;

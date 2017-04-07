@@ -38,5 +38,8 @@ namespace uLearn.Web.Models
 
 		[Required]
 		public bool IsDeleted { get; set; }
+
+		[Required]
+		public bool HiddenFromTopComments { get; set; }
 	}
 }

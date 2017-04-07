@@ -332,13 +332,18 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
  
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"video-container\">\r\n\t\t<iframe class=\"embedded-video\" width=\"864\" heig" +
-"ht=\"480\" src=\"https://www.youtube.com/embed/");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t<div class=\"video-container\">\r\n\t\t<div class=\"youtube-video\" data-width=\"864\" dat" +
+"a-height=\"480\" data-video-id=\"");
 
 
-                                                  WebViewPage.WriteTo(@__razor_helper_writer, block.VideoId);
+                                    WebViewPage.WriteTo(@__razor_helper_writer, block.VideoId);
 
-WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" frameborder=\"0\" allowfullscreen></iframe>\r\n\t</div>\r\n");
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\" data-autoplay=\"");
+
+
+                                                                   WebViewPage.WriteTo(@__razor_helper_writer, context.Autoplay.ToString().ToLower());
+
+WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"></div>\r\n\t</div>\r\n");
 
 
 
@@ -538,9 +543,9 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n");
 			
 WebViewPage.WriteTo(@__razor_helper_writer, Html.Partial(
 				"~/Views/Exercise/_ExerciseScoreForm.cshtml",
-				new ExerciseScoreFormModel(context.Course.Id, (ExerciseSlide) context.Slide, checking, context.GroupsIds, context.VersionId == null || checking.Submission.Id == context.VersionId)));
+				new ExerciseScoreFormModel(context.Course.Id, (ExerciseSlide) context.Slide, checking, context.GroupsIds, context.VersionId == null || checking.Submission.Id == context.VersionId && ! context.IsManualCheckingReadonly)));
 
-                                                                                                                                                                                        
+                                                                                                                                                                                                                              
 		}
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t</div>\r\n");

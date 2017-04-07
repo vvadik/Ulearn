@@ -122,21 +122,46 @@
 		}
 	});
 
-	$('.exercise__add-review').each(function () {
-		var $topReviewComments = $('.exercise__top-review-comments');
-		if ($topReviewComments.find('.comment').length == 0) {
-			$(this).addClass('without-comments');
+	function updateTopReviewComments($exerciseAddReviewBlock) {
+		var $topReviewComments = $('.exercise__top-review-comments.hidden');
+		if ($topReviewComments.find('.comment').length === 0) {
+			$exerciseAddReviewBlock.addClass('without-comments');
 			return;
 		}
 		var $topComments = $topReviewComments.clone(true).removeClass('hidden');
+
+		$('.exercise__add-review__top-comments').find('.exercise__top-review-comments').remove();
 		$('.exercise__add-review__top-comments').append($topComments);
+	}
+
+	$('.exercise__add-review').each(function () {
+		updateTopReviewComments($(this));
 	});
 
-	$('.exercise__top-review-comments .comment a').click(function(e) {
+	$('.exercise__top-review-comments').on('click', '.comment .copy-comment-link', function(e) {
 		e.preventDefault();
 		$('.exercise__add-review__comment')
 			.val($(this).data('value'))
 			.trigger('input');
+	});
+
+	$('.exercise__top-review-comments .comment .remove-link').click(function (e) {
+		e.preventDefault();
+
+		var $self = $(this);
+		var url = $self.data('url');
+		var comment = $self.data('value');
+		var $exerciseAddReviewBlock = $self.closest('.exercise__add-review');
+
+		$.post(url, {comment: comment}).success(function(data) {
+			var $data = $(data);
+			$('.exercise__top-review-comments.hidden').html($data.html());
+			updateTopReviewComments($exerciseAddReviewBlock);
+		}).error(function() {
+			alert('Произошла ошибка при удалении комментария. Попробуйте повторить позже');
+		});
+
+		return false;
 	});
 	
 	$('.user-submission__info').bind('move', function (e) {

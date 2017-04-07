@@ -55,7 +55,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[AllowAnonymous]
-		public async Task<ActionResult> SlideById(string courseId, string slideId = "", int? checkQueueItemId = null, int? version = null)
+		public async Task<ActionResult> SlideById(string courseId, string slideId = "", int? checkQueueItemId = null, int? version = null, int autoplay = 0)
 		{
 			if (slideId.Contains("_"))
 				slideId = slideId.Substring(slideId.LastIndexOf('_') + 1);
@@ -87,6 +87,7 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			AbstractManualSlideChecking queueItem = null;
+			var isManualCheckingReadonly = false;
 			if (User.HasAccessFor(courseId, CourseRole.Instructor) && checkQueueItemId != null)
 			{
 				if (slide is QuizSlide)
@@ -97,8 +98,8 @@ namespace uLearn.Web.Controllers
 				if (queueItem == null)
 					return HttpNotFound();
 
-				/* If lock time is finished or some mistake happened */
-				if (!queueItem.IsLockedBy(User.Identity))
+				/* If lock time is finished */
+				if (!queueItem.IsLockedBy(User.Identity) && queueItem.HasLastLockedBy(User.Identity))
 					return RedirectToAction(GetAdminQueueActionName(queueItem), "Admin", new
 					{
 						CourseId = courseId,
@@ -106,11 +107,26 @@ namespace uLearn.Web.Controllers
 						done = queueItem.IsChecked,
 						message = "time_is_over",
 					});
+
+				/* If it's not locked then lock them! */
+				if (!queueItem.IsLocked)
+					return RedirectToAction(GetAdminCheckActionName(queueItem), "Admin", new
+					{
+						CourseId = courseId,
+						group = string.Join(",", groupsIds),
+						id = queueItem.Id,
+						recheck = true
+					});
+
+				if (queueItem.IsLocked && !queueItem.IsLockedBy(User.Identity))
+				{
+					isManualCheckingReadonly = true;
+				}
 			}
 
 			var model = isGuest ?
-				CreateGuestCoursePageModel(course, slide) :
-				await CreateCoursePageModel(course, slide, queueItem, version, groupsIds);
+				CreateGuestCoursePageModel(course, slide, autoplay > 0) :
+				await CreateCoursePageModel(course, slide, queueItem, version, groupsIds, autoplay > 0, isManualCheckingReadonly);
 
 			if (!string.IsNullOrEmpty(Request.QueryString["error"]))
 				model.Error = Request.QueryString["error"];
@@ -135,6 +151,15 @@ namespace uLearn.Web.Controllers
 				return "ManualQuizCheckingQueue";
 			if (queueItem is ManualExerciseChecking)
 				return "ManualExerciseCheckingQueue";
+			return "";
+		}
+
+		private string GetAdminCheckActionName(AbstractManualSlideChecking queueItem)
+		{
+			if (queueItem is ManualQuizChecking)
+				return "CheckQuiz";
+			if (queueItem is ManualExerciseChecking)
+				return "CheckExercise";
 			return "";
 		}
 
@@ -244,7 +269,7 @@ namespace uLearn.Web.Controllers
 			return lastVisitedSlide;
 		}
 
-		private CoursePageModel CreateGuestCoursePageModel(Course course, Slide slide)
+		private CoursePageModel CreateGuestCoursePageModel(Course course, Slide slide, bool autoplay)
 		{
 			return new CoursePageModel
 			{
@@ -257,12 +282,18 @@ namespace uLearn.Web.Controllers
 					slide,
 					slide.Info.DirectoryRelativePath,
 					slide.Blocks.Select(block => block is ExerciseBlock ? new ExerciseBlockData(course.Id, (ExerciseSlide)slide, false) { Url = Url } : (dynamic)null).ToArray(),
-					true),
+					true,
+					autoplay: autoplay),
 				IsGuest = true,
 			};
 		}
 
-		private async Task<CoursePageModel> CreateCoursePageModel(Course course, Slide slide, AbstractManualSlideChecking manualChecking, int? exerciseSubmissionId = null, List<string> groupsIds = null)
+		private async Task<CoursePageModel> CreateCoursePageModel(
+			Course course, Slide slide,
+			AbstractManualSlideChecking manualChecking, int? exerciseSubmissionId = null,
+			List<string> groupsIds = null,
+			bool autoplay = false,
+			bool isManualCheckingReadonly = false)
 		{
 			var userId = User.Identity.GetUserId();
 
@@ -279,12 +310,11 @@ namespace uLearn.Web.Controllers
 				CourseId = course.Id,
 				CourseTitle = course.Title,
 				Slide = slide,
-				Rate = GetRate(course.Id, slide.Id),
 				Score = score,
-				BlockRenderContext = CreateRenderContext(course, slide, manualChecking, exerciseSubmissionId, groupsIds),
+				BlockRenderContext = CreateRenderContext(course, slide, manualChecking, exerciseSubmissionId, groupsIds, autoplay: autoplay, isManualCheckingReadonly: isManualCheckingReadonly),
 				ManualChecking = manualChecking,
 				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
-				IsGuest = false,
+				IsGuest = false
 			};
 			return model;
 		}
@@ -302,7 +332,9 @@ namespace uLearn.Web.Controllers
 			AbstractManualSlideChecking manualChecking = null, 
 			int? exerciseSubmissionId = null, 
 			List<string> groupsIds = null, 
-			bool isLti = false)
+			bool isLti = false,
+			bool autoplay = false,
+			bool isManualCheckingReadonly = false)
 		{
 			/* ExerciseController will fill blockDatas later */
 			var blockData = slide.Blocks.Select(b => (dynamic)null).ToArray();
@@ -316,7 +348,9 @@ namespace uLearn.Web.Controllers
 				manualChecking,
 				false,
 				groupsIds,
-				isLti
+				isLti,
+				autoplay,
+				isManualCheckingReadonly
 				)
 			{
 				VersionId = exerciseSubmissionId
@@ -405,6 +439,7 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
+		/* Slide rating don't used anymore */
 		[HttpPost]
 		public async Task<string> ApplyRate(string courseId, Guid slideId, string rate)
 		{

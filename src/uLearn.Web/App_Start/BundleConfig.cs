@@ -32,6 +32,7 @@ namespace uLearn.Web
 					"~/Scripts/jquery.datetimepicker.unobtrusive.js",
 					"~/Scripts/jquery.event.move.js",
 					"~/Scripts/jquery.smooth-scrolling.js",
+					"~/Scripts/js.cookie.js",
 					"~/tablesorter-master/js/jquery.tablesorter.min.js",
 					"~/tablesorter-master/js/jquery.tablesorter.widgets.min.js",
 					"~/tablesorter-master/js/widgets/widget-grouping.js",
