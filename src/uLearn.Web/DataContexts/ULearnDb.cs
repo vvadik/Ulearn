@@ -52,6 +52,8 @@ namespace uLearn.Web.DataContexts
 
 			CancelCascaseDeleting<AdditionalScore, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 			CancelCascaseDeleting<AdditionalScore, ApplicationUser, string>(modelBuilder, c => c.Instructor, c => c.InstructorId);
+
+			CancelCascaseDeleting<GraderClient, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 		}
 
 		private static void CancelCascaseDeleting<T1, T2, T3>(DbModelBuilder modelBuilder, Expression<Func<T1, T2>> oneWay, Expression<Func<T1, T3>> secondWay)
@@ -100,5 +102,8 @@ namespace uLearn.Web.DataContexts
 
 		public DbSet<AdditionalScore> AdditionalScores { get; set; }
 		public DbSet<EnabledAdditionalScoringGroup> EnabledAdditionalScoringGroups { get; set; }
+
+		public DbSet<GraderClient> GraderClients { get; set; }
+		public DbSet<ExerciseSolutionByGrader> ExerciseSolutionsByGrader { get; set; }
 	}
 }

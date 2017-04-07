@@ -1,0 +1,23 @@
+﻿@model uLearn.Web.Controllers.GradesListViewModel
+
+@{
+	ViewBag.Title = "Клиенты грейдера";
+}
+
+<h2>Клиенты грейдера</h2>
+
+@foreach (var client in Model.Clients)
+{
+	<div class="grader-client">
+		<div>@client.Name</div>
+		<p>Id: @client.Id</p>
+	</div>
+}
+
+@using (Html.BeginForm("AddClient", "Grader", new { courseId = Model.CourseId }))
+{
+	@Html.AntiForgeryToken()
+	<h3>Добавить клиента</h3>
+	<input type="text" class="form-control" name="name" placeholder="Имя клиента, например «Stepik.org»"/>
+	<button role="button">Добавить</button>
+}

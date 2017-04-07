@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Mvc;
-using log4net;
 using Elmah;
 using Microsoft.AspNet.Identity;
 using uLearn.Model.Blocks;
@@ -14,37 +13,19 @@ using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
 using uLearn.Web.Models;
-using uLearn.Web.Telegram;
 
 namespace uLearn.Web.Controllers
 {
 	[ULearnAuthorize]
-	public class ExerciseController : Controller
+	public class ExerciseController : BaseExerciseController
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(ExerciseController));
-		private readonly ErrorsBot errorsBot = new ErrorsBot();
-
-		private readonly CourseManager courseManager;
-		private readonly ULearnDb db = new ULearnDb();
-		private readonly GroupsRepo groupsRepo;
-		private readonly UserSolutionsRepo solutionsRepo;
-		private readonly VisitsRepo visitsRepo;
-		private readonly SlideCheckingsRepo slideCheckingsRepo;
-
-		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(45);
-
 		public ExerciseController()
 			: this(WebCourseManager.Instance)
 		{
 		}
 
-		public ExerciseController(CourseManager courseManager)
+		public ExerciseController(CourseManager courseManager) : base(courseManager)
 		{
-			this.courseManager = courseManager;
-			groupsRepo = new GroupsRepo(db);
-			solutionsRepo = new UserSolutionsRepo(db);
-			visitsRepo = new VisitsRepo(db);
-			slideCheckingsRepo = new SlideCheckingsRepo(db);
 		}
 
 		[System.Web.Mvc.HttpPost]
@@ -52,7 +33,7 @@ namespace uLearn.Web.Controllers
 		{
 			/* Check that no checking solution by this user in last time */
 			var halfMinuteAgo = DateTime.Now.Subtract(TimeSpan.FromSeconds(30));
-			if (solutionsRepo.IsCheckingSubmissionByUser(courseId, slideId, User.Identity.GetUserId(), halfMinuteAgo, DateTime.MaxValue))
+			if (userSolutionsRepo.IsCheckingSubmissionByUser(courseId, slideId, User.Identity.GetUserId(), halfMinuteAgo, DateTime.MaxValue))
 			{
 				return Json(new RunSolutionResult
 				{
@@ -74,7 +55,7 @@ namespace uLearn.Web.Controllers
 			if (exerciseSlide == null)
 				return HttpNotFound();
 
-			var result = await CheckSolution(courseId, exerciseSlide, code);
+			var result = await CheckSolution(courseId, exerciseSlide, code, User.Identity.GetUserId(), User.Identity.Name);
 			if (isLti)
 				try
 				{
@@ -92,70 +73,7 @@ namespace uLearn.Web.Controllers
 
 			return Json(result);
 		}
-
-		private async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string userCode)
-		{
-			var exerciseBlock = exerciseSlide.Exercise;
-			var userId = User.Identity.GetUserId();
-			var solution = exerciseBlock.BuildSolution(userCode);
-			if (solution.HasErrors)
-				return new RunSolutionResult { IsCompileError = true, ErrorMessage = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
-			if (solution.HasStyleIssues)
-				return new RunSolutionResult { IsStyleViolation = true, ErrorMessage = solution.StyleMessage, ExecutionServiceName = "uLearn" };
-
-			var submission = await solutionsRepo.RunUserSolution(
-				courseId, exerciseSlide.Id, userId,
-				userCode, null, null, false, "uLearn",
-				GenerateSubmissionName(exerciseSlide), executionTimeout
-				);
-
-			var course = courseManager.GetCourse(courseId);
-
-			if (submission == null)
-			{
-				log.Error($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})");
-				errorsBot.PostToChannel($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})\n\nhttps://ulearn.me/Sandbox");
-				return new RunSolutionResult
-				{
-					IsCompillerFailure = true,
-					ErrorMessage = "К сожалению, из-за большой нагрузки мы не смогли оперативно проверить ваше решение. " +
-								   "Мы попробуем проверить его позже, просто подождите и обновите страницу. ",
-					ExecutionServiceName = "uLearn"
-				};
-			}
-
-			var automaticChecking = submission.AutomaticChecking;
-			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
-			var sendToReview = exerciseBlock.RequireReview &&
-				automaticChecking.IsRightAnswer &&
-				!isProhibitedUserToSendForReview &&
-				groupsRepo.IsManualCheckingEnabledForUser(course, userId);
-			if (sendToReview)
-			{
-				await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, exerciseSlide.Id, userId);
-				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission);
-				await visitsRepo.MarkVisitsAsWithManualChecking(exerciseSlide.Id, userId);
-			}
-			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, userId);
-
-			return new RunSolutionResult
-			{
-				IsCompileError = automaticChecking.IsCompilationError,
-				ErrorMessage = automaticChecking.CompilationError.Text,
-				IsRightAnswer = automaticChecking.IsRightAnswer,
-				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseSlide.Exercise.ExpectedOutput.NormalizeEoln(),
-				ActualOutput = automaticChecking.Output.Text,
-				ExecutionServiceName = automaticChecking.ExecutionServiceName,
-				SentToReview = sendToReview,
-				SubmissionId = submission.Id,
-			};
-		}
-
-		private string GenerateSubmissionName(Slide exerciseSlide)
-		{
-			return $"{User.Identity.Name}: {exerciseSlide.Info.Unit.Title} - {exerciseSlide.Title}";
-		}
-
+		
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		[System.Web.Mvc.HttpPost]
 		[ValidateInput(false)]
@@ -222,7 +140,7 @@ namespace uLearn.Web.Controllers
 		[ValidateInput(false)]
 		public async Task<ActionResult> HideFromTopCodeReviewComments(string courseId, Guid slideId, string comment)
 		{
-			var slide = courseManager.GetCourse(courseId).FindSlideById(slideId) as ExerciseSlide;
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId) as ExerciseSlide;
 			if (slide == null)
 				return HttpNotFound();
 
@@ -288,7 +206,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public async Task<ActionResult> SimpleScoreExercise(int submissionId, int exerciseScore, bool ignoreNewestSubmission=false, int? updateCheckingId = null)
 		{
-			var submission = solutionsRepo.FindSubmissionById(submissionId);
+			var submission = userSolutionsRepo.FindSubmissionById(submissionId);
 			var courseId = submission.CourseId;
 			var slideId = submission.SlideId;
 			var userId = submission.UserId;
@@ -298,7 +216,7 @@ namespace uLearn.Web.Controllers
 
 			if (!ignoreNewestSubmission && !updateCheckingId.HasValue)
 			{
-				var lastAcceptedSubmission = solutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).OrderByDescending(s => s.Timestamp).FirstOrDefault();
+				var lastAcceptedSubmission = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).OrderByDescending(s => s.Timestamp).FirstOrDefault();
 				if (lastAcceptedSubmission != null && lastAcceptedSubmission.Id != submission.Id)
 					return Json(
 						new {
@@ -351,7 +269,7 @@ namespace uLearn.Web.Controllers
 				userId = User.Identity.GetUserId();
 
 			var slide = courseManager.GetCourse(courseId).FindSlideById(slideId);
-			var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
+			var submissions = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
 
 			return PartialView(new ExerciseSubmissionsPanelModel(courseId, slide)
 			{
@@ -376,8 +294,8 @@ namespace uLearn.Web.Controllers
 					ExerciseReviewState.NotReviewed;
 
 			var submissions = onlyAccepted ?
-				solutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, slide.Id, userId) :
-				solutionsRepo.GetAllSubmissionsByUser(course.Id, slide.Id, userId);
+				userSolutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, slide.Id, userId) :
+				userSolutionsRepo.GetAllSubmissionsByUser(course.Id, slide.Id, userId);
 			var topUserReviewComments = slideCheckingsRepo.GetTopUserReviewComments(course.Id, slide.Id, currentUserId, 10);
 
 			return new ExerciseBlockData(course.Id, (ExerciseSlide) slide, visit?.IsSkipped ?? false, solution)
@@ -394,11 +312,11 @@ namespace uLearn.Web.Controllers
 
 		private UserExerciseSubmission GetExerciseSubmissionShownByDefault(string courseId, Guid slideId, string userId, bool allowNotAccepted=false)
 		{
-			var submissions = solutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
+			var submissions = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
 			var lastSubmission = submissions.LastOrDefault(s => s.ManualCheckings != null && s.ManualCheckings.Any()) ??
 					submissions.LastOrDefault(s => s.AutomaticCheckingIsRightAnswer);
 			if (lastSubmission == null && allowNotAccepted)
-				lastSubmission = solutionsRepo.GetAllSubmissionsByUser(courseId, slideId, userId).ToList().LastOrDefault();
+				lastSubmission = userSolutionsRepo.GetAllSubmissionsByUser(courseId, slideId, userId).ToList().LastOrDefault();
 			return lastSubmission;
 		}
 
@@ -412,7 +330,7 @@ namespace uLearn.Web.Controllers
 			UserExerciseSubmission submission = null;
 			if (submissionId.HasValue && submissionId.Value > 0)
 			{
-				submission = solutionsRepo.FindSubmissionById(submissionId.Value);
+				submission = userSolutionsRepo.FindSubmissionById(submissionId.Value);
 				if (submission == null)
 					return HttpNotFound();
 				if (! string.Equals(courseId, submission.CourseId, StringComparison.OrdinalIgnoreCase))
