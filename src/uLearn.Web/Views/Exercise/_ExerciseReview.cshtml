@@ -22,15 +22,16 @@
 				строка @(Model.Review.StartLine + 1)
 			</span>
 		}
-		@{
-			var canDelete = Model.Review.AuthorId == User.Identity.GetUserId() || User.HasAccessFor(Model.ManualChecking.CourseId, CourseRole.CourseAdmin);
-		}
-		@if (Model.ManualChecking != null && canDelete)
+		@if (Model.ManualChecking != null)
 		{
-			<span class="close exercise__delete-review"
-				  title="Удалить комментарий"
-				  data-id="@Model.Review.Id"
-				  data-url="@Url.Action("DeleteExerciseCodeReview", "Exercise", new { Model.ManualChecking.CourseId, reviewId = Model.Review.Id })">&times;</span>
+            var canDelete = Model.Review.AuthorId == User.Identity.GetUserId() || User.HasAccessFor(Model.ManualChecking.CourseId, CourseRole.CourseAdmin);
+            if (canDelete)
+            {
+    			<span class="close exercise__delete-review"
+    				  title="Удалить комментарий"
+    				  data-id="@Model.Review.Id"
+    				  data-url="@Url.Action("DeleteExerciseCodeReview", "Exercise", new { Model.ManualChecking.CourseId, reviewId = Model.Review.Id })">&times;</span>
+            }
 		}
 	</div>
 	<div class="exercise__review__comment">
