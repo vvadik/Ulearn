@@ -543,9 +543,9 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\r\n");
 			
 WebViewPage.WriteTo(@__razor_helper_writer, Html.Partial(
 				"~/Views/Exercise/_ExerciseScoreForm.cshtml",
-				new ExerciseScoreFormModel(context.Course.Id, (ExerciseSlide) context.Slide, checking, context.GroupsIds, context.VersionId == null || checking.Submission.Id == context.VersionId && ! context.IsManualCheckingReadonly)));
+				new ExerciseScoreFormModel(context.Course.Id, (ExerciseSlide) context.Slide, checking, context.GroupsIds, (context.VersionId == null || checking.Submission.Id == context.VersionId) && ! context.IsManualCheckingReadonly)));
 
-                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                
 		}
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\t</div>\r\n");

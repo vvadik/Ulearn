@@ -295,6 +295,10 @@ p {
 	display: inline-block;
 }
 
+#nav_arrows {
+	margin-top: 10px;
+}
+
 .right {
 	margin-left: auto;
 }
@@ -449,7 +453,6 @@ p {
 
 
 .ctrl-group {
-	margin-top: 10px;
 	margin-left: 0 !important;
 }
 
