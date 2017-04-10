@@ -55,7 +55,11 @@ namespace uLearn.Web.Controllers
 			if (exerciseSlide == null)
 				return HttpNotFound();
 
-			var result = await CheckSolution(courseId, exerciseSlide, code, User.Identity.GetUserId(), User.Identity.Name);
+			var result = await CheckSolution(
+				courseId, exerciseSlide, code, User.Identity.GetUserId(), User.Identity.Name,
+				waitUntilChecked: true, compileOnWebServer: true
+			);
+
 			if (isLti)
 				try
 				{

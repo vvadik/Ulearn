@@ -38,20 +38,28 @@ namespace uLearn.Web.Controllers
 			return $"{userName}: {exerciseSlide.Info.Unit.Title} - {exerciseSlide.Title}";
 		}
 
-		protected async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string userCode, string userId, string userName)
+		protected async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string userCode, string userId, string userName, bool waitUntilChecked, bool compileOnWebServer)
 		{
 			var exerciseBlock = exerciseSlide.Exercise;
-			var solution = exerciseBlock.BuildSolution(userCode);
-			if (solution.HasErrors)
-				return new RunSolutionResult { IsCompileError = true, ErrorMessage = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
-			if (solution.HasStyleIssues)
-				return new RunSolutionResult { IsStyleViolation = true, ErrorMessage = solution.StyleMessage, ExecutionServiceName = "uLearn" };
+
+			if (compileOnWebServer)
+			{
+				var solution = exerciseBlock.BuildSolution(userCode);
+				if (solution.HasErrors)
+					return new RunSolutionResult { IsCompileError = true, ErrorMessage = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
+				if (solution.HasStyleIssues)
+					return new RunSolutionResult { IsStyleViolation = true, ErrorMessage = solution.StyleMessage, ExecutionServiceName = "uLearn" };
+			}
 
 			var submission = await userSolutionsRepo.RunUserSolution(
 				courseId, exerciseSlide.Id, userId,
-				userCode, null, null, false, "uLearn",
-				GenerateSubmissionName(exerciseSlide, userName), executionTimeout
-				);
+				userCode, null, null, "uLearn",
+				GenerateSubmissionName(exerciseSlide, userName), executionTimeout,
+				waitUntilChecked
+			);
+
+			if (!waitUntilChecked)
+				return new RunSolutionResult { SubmissionId = submission.Id };
 
 			var course = courseManager.GetCourse(courseId);
 
@@ -63,7 +71,7 @@ namespace uLearn.Web.Controllers
 				{
 					IsCompillerFailure = true,
 					ErrorMessage = "  сожалению, из-за большой нагрузки мы не смогли оперативно проверить ваше решение. " +
-									"ћы попробуем проверить его позже, просто подождите и обновите страницу. ",
+					               "ћы попробуем проверить его позже, просто подождите и обновите страницу. ",
 					ExecutionServiceName = "uLearn"
 				};
 			}

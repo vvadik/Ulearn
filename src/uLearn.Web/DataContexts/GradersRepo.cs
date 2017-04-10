@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -65,7 +66,15 @@ namespace uLearn.Web.DataContexts
 				ClientUserId = clientUserId,
 			};
 			db.ExerciseSolutionsByGrader.Add(exerciseSolutionByGrader);
-			await db.SaveChangesAsync();
+			try
+			{
+				await db.SaveChangesAsync();
+			}
+			catch (DbEntityValidationException e)
+			{
+				var errors = string.Join(", ", e.EntityValidationErrors.SelectMany(err => err.ValidationErrors.Select(error => error.ErrorMessage)));
+				throw new Exception(errors);
+			}
 
 			return exerciseSolutionByGrader;
 		}
@@ -73,6 +82,19 @@ namespace uLearn.Web.DataContexts
 		public ExerciseSolutionByGrader FindSolutionFromGraderClient(int solutionId)
 		{
 			return db.ExerciseSolutionsByGrader.Find(solutionId);
+		}
+
+		public List<ExerciseSolutionByGrader> GetClientSolutions(GraderClient client, string search, int count, int offset=0)
+		{
+			var solutions = db.ExerciseSolutionsByGrader.Where(s => s.ClientId == client.Id);
+			if (!string.IsNullOrEmpty(search))
+				solutions = solutions.Where(s => s.ClientUserId.Contains(search));
+
+			return solutions
+				.OrderByDescending(s => s.Id)
+				.Skip(offset)
+				.Take(count)
+				.ToList();
 		}
 	}
 }

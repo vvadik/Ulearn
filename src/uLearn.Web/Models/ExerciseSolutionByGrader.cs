@@ -21,7 +21,7 @@ namespace uLearn.Web.Models
 		public int SubmissionId { get; set; }
 		public virtual UserExerciseSubmission Submission { get; set; }
 
-		[Required]
+		[Required(AllowEmptyStrings = true)]
 		/* Some additional info about user from grader client */
 		public string ClientUserId { get; set; }
 	}

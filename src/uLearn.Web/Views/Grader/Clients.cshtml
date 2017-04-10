@@ -1,23 +1,46 @@
-﻿@model uLearn.Web.Controllers.GradesListViewModel
+﻿@model uLearn.Web.Controllers.GraderClientsViewModel
 
 @{
 	ViewBag.Title = "Клиенты грейдера";
 }
 
-<h2>Клиенты грейдера</h2>
+<div class="container">
+	<h2>Клиенты грейдера</h2>
 
-@foreach (var client in Model.Clients)
-{
-	<div class="grader-client">
-		<div>@client.Name</div>
-		<p>Id: @client.Id</p>
-	</div>
-}
+	@if (Model.Clients.Any())
+	{
+		<p class="text-muted">Клиенты нужны, чтобы внешние платформы могли проверять решения задач из&nbsp;курса через API грейдера на&nbsp;ulearn.me.</p>
+	}
+	else
+	{
+		<p class="text-muted">Нет клиентов. Создайте первого, и внешние платформы смогут проверять решения задач из&nbsp;курса через API грейдера на&nbsp;ulearn.me.</p>
+	}
 
-@using (Html.BeginForm("AddClient", "Grader", new { courseId = Model.CourseId }))
-{
-	@Html.AntiForgeryToken()
-	<h3>Добавить клиента</h3>
-	<input type="text" class="form-control" name="name" placeholder="Имя клиента, например «Stepik.org»"/>
-	<button role="button">Добавить</button>
-}
+	@foreach (var client in Model.Clients)
+	{
+		<div class="grader-client">
+			<h3>@client.Name</h3>
+			<div>
+				ClientId: <b>@client.Id</b>
+			</div>
+			<div class="text-muted">
+				Сообщите этот ключ разработчикам внешней платформы. Его нужно передавать в&nbsp;каждый запрос к&nbsp;API грейдера.
+			</div>
+			<div>
+				@Html.ActionLink("Смотреть решения →", "Submissions", "Grader", new { courseId = Model.CourseId, clientId = client.Id }, new {})
+			</div>
+		</div>
+	}
+
+	@using (Html.BeginForm("AddClient", "Grader", new { courseId = Model.CourseId }, FormMethod.Post, new { @class = "max-width-400" }))
+	{
+		@Html.AntiForgeryToken()
+		<h3>Добавить клиента</h3>
+		<div class="input-group">
+			<input type="text" class="form-control" name="name" placeholder="Имя клиента, например «Stepik.org»"/>
+			<span class="input-group-btn">
+				<button role="button" class="btn btn-primary">Добавить</button>
+			</span>
+		</div>
+	}
+</div>

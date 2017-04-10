@@ -38,9 +38,10 @@ namespace uLearn.Web.Controllers
 
 			var submission = await solutionsRepo.RunUserSolution(
 				"web", Guid.Empty, User.Identity.GetUserId(),
-				code, null, null, false, "null",
-				User.Identity.Name + ": CsSandbox Web Executor", timeout
-				);
+				code, null, null, "null",
+				User.Identity.Name + ": CsSandbox Web Executor", timeout,
+				waitUntilChecked: true
+			);
 
 			if (submission == null)
 				return Json(new RunSolutionResult

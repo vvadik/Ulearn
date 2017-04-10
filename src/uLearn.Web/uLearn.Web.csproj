@@ -305,6 +305,7 @@
     <Compile Include="Controllers\BaseExerciseController.cs" />
     <Compile Include="Controllers\CertificatesController.cs" />
     <Compile Include="Controllers\GraderController.cs" />
+    <Compile Include="Controllers\JsonDataContractResult.cs" />
     <Compile Include="DataContexts\GradersRepo.cs" />
     <Compile Include="Helpers\ExcelWorksheetBuilder.cs" />
     <Compile Include="Helpers\StringUtils.cs" />
@@ -1314,6 +1315,7 @@
     <Content Include="Scripts\course-statistics.js" />
     <Content Include="Scripts\diagnostics.js" />
     <Content Include="Scripts\forms.replace-action.js" />
+    <Content Include="Scripts\grader.js" />
     <Content Include="Scripts\groups-editor.js" />
     <Content Include="Scripts\jquery-ui.min.js" />
     <Content Include="Scripts\jquery.color-2.1.0.min.js" />
@@ -1592,6 +1594,7 @@
     <Content Include="Views\Exercise\_TopUserReviewComments.cshtml" />
     <Content Include="Views\Exercise\_SlideCodeReviewComments.cshtml" />
     <Content Include="Views\Grader\Clients.cshtml" />
+    <Content Include="Views\Grader\Submissions.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
