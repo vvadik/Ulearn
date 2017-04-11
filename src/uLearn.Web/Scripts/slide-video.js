@@ -2,13 +2,15 @@
 	var $videoBlocks = $('.youtube-video');
 	var rateCookieName = 'youtube-video-rate';
 
+	var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ? true : false;
+
 	$videoBlocks.each(function() {
 		var $videoBlock = $(this);
 
 		var width = $videoBlock.data('width') || '390';
 		var height = $videoBlock.data('height') || '640';
 		var videoId = $videoBlock.data('videoId');
-		var autoplay = $videoBlock.data('autoplay');
+		var autoplay = $videoBlock.data('autoplay') && ! isMobile;
 		var elementId = 'youtube-video__' + videoId;
 		$videoBlock.attr('id', elementId);
 
