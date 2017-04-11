@@ -145,7 +145,7 @@
 			.trigger('input');
 	});
 
-	$('.exercise__top-review-comments .comment .remove-link').click(function (e) {
+	$('.exercise__top-review-comments').on('click', '.comment .remove-link', function (e) {
 		e.preventDefault();
 
 		var $self = $(this);
