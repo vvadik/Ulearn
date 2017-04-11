@@ -34,12 +34,19 @@ namespace uLearn.Web.Migrations
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.AspNetUsers", t => t.UserId)
                 .Index(t => t.UserId);
-            
-        }
+
+			Sql("CREATE FULLTEXT CATALOG ExerciseSolutionByGradersFullTextCatalog WITH ACCENT_SENSITIVITY = OFF", true);
+			Sql("CREATE FULLTEXT INDEX ON dbo.ExerciseSolutionByGraders ([ClientUserId] LANGUAGE [Russian]) KEY INDEX [PK_dbo.ExerciseSolutionByGraders] ON (ExerciseSolutionByGradersFullTextCatalog, FILEGROUP[PRIMARY]) WITH (CHANGE_TRACKING = AUTO, STOPLIST = SYSTEM)", true);
+			Sql("CREATE FUNCTION dbo.GetGraderSolutionByClientUserId (@userId NVARCHAR(4000)) RETURNS TABLE RETURN SELECT [Id] FROM dbo.ExerciseSolutionByGraders WHERE CONTAINS([ClientUserId], @userId)");
+		}
         
         public override void Down()
         {
-            DropForeignKey("dbo.ExerciseSolutionByGraders", "SubmissionId", "dbo.UserExerciseSubmissions");
+			Sql("DROP FUNCTION dbo.GetGraderSolutionByClientUserId");
+			Sql("DROP FULLTEXT INDEX ON dbo.ExerciseSolutionByGraders", true);
+			Sql("DROP FULLTEXT CATALOG ExerciseSolutionByGradersFullTextCatalog", true);
+
+			DropForeignKey("dbo.ExerciseSolutionByGraders", "SubmissionId", "dbo.UserExerciseSubmissions");
             DropForeignKey("dbo.ExerciseSolutionByGraders", "ClientId", "dbo.GraderClients");
             DropForeignKey("dbo.GraderClients", "UserId", "dbo.AspNetUsers");
             DropIndex("dbo.GraderClients", new[] { "UserId" });

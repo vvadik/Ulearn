@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using log4net;
-using LtiLibrary.Core.Extensions;
 using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -40,9 +39,12 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		[HttpPost]
+		[System.Web.Mvc.HttpPost]
 		public async Task<ActionResult> Submit(GraderSubmitRequest request)
 		{
+			if (string.IsNullOrEmpty(request.ClientUserId))
+				request.ClientUserId = "";
+
 			log.Info($"Got new submission for grader: {request.JsonSerialize()}");
 
 			var client = gradersRepo.FindGraderClient(request.CourseId, request.ClientId);
@@ -68,7 +70,7 @@ namespace uLearn.Web.Controllers
 			log.Info("Send solution to checking, don't wait until it will be checked");
 
 			var result = await CheckSolution(
-				request.CourseId, slide, code, client.UserId, $"Grader client {client.Name}",
+				request.CourseId, slide, code, client.UserId, $"Grader client {client.Name}, user {request.ClientUserId}",
 				waitUntilChecked: false, compileOnWebServer: false
 			);
 
@@ -78,15 +80,17 @@ namespace uLearn.Web.Controllers
 				return Json(new ApiResult { Status = "error", Message = "Can\'t start solution checking, service is temporary unavailable. Try later" });
 
 			var submissionId = result.SubmissionId;
-			var solutionByGrader = await gradersRepo.AddSolutionFromGraderClient(request.ClientId, submissionId, "");
+			var solutionByGrader = await gradersRepo.AddSolutionFromGraderClient(request.ClientId, submissionId, request.ClientUserId);
 
 			log.Info($"Saved to database as grader solution #{solutionByGrader.Id}");
 
 			return Json(new SubmitResult { Status = "ok", SubmissionId = solutionByGrader.Id });
 		}
 
-		public ActionResult Submission(Guid clientId, int submissionId)
+		public ActionResult Submission(GraderSubmissionRequest request)
 		{
+			var clientId = request.ClientId;
+			var submissionId = request.SubmissionId;
 			log.Info($"Got a request about submission status. Submission id is {submissionId}, from client {clientId}");
 
 			var solution = gradersRepo.FindSolutionFromGraderClient(submissionId);
@@ -118,7 +122,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		[HttpPost]
+		[System.Web.Mvc.HttpPost]
 		public async Task<ActionResult> AddClient(string courseId, string name)
 		{
 			await gradersRepo.AddGraderClient(courseId, name);
@@ -156,7 +160,7 @@ namespace uLearn.Web.Controllers
 	[DataContract]
 	public class SubmitResult : ApiResult
 	{
-		[DataMember(Name = "submissionId")]
+		[DataMember(Name = "submission_id")]
 		public int SubmissionId { get; set; }
 	}
 
@@ -194,19 +198,29 @@ namespace uLearn.Web.Controllers
 	}
 
 	[DataContract]
+	[JsonDataContractModelBinder]
 	public class GraderSubmitRequest
 	{
-		[DataMember(Name = "clientId")]
+		[DataMember(Name = "client_id")]
 		public Guid ClientId { get; set; }
 
-		[DataMember(Name = "courseId")]
+		[DataMember(Name = "course_id")]
 		public string CourseId { get; set; }
 
-		[DataMember(Name = "slideId")]
+		[DataMember(Name = "slide_id")]
 		public Guid SlideId { get; set; }
 
 		[DataMember(Name = "solution")]
 		public string Solution { get; set; }
+
+		[DataMember(Name = "user_id")]
+		public string ClientUserId { get; set; }
+	}
+
+	public class GraderSubmissionRequest
+	{
+		public Guid ClientId { get; set; }
+		public int SubmissionId { get; set; }
 	}
 
 	public class GraderClientsViewModel 

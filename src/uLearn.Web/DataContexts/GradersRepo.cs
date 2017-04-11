@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Validation;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using EntityFramework.Functions;
 using JetBrains.Annotations;
 using log4net;
 using uLearn.Web.Models;
@@ -88,7 +91,10 @@ namespace uLearn.Web.DataContexts
 		{
 			var solutions = db.ExerciseSolutionsByGrader.Where(s => s.ClientId == client.Id);
 			if (!string.IsNullOrEmpty(search))
-				solutions = solutions.Where(s => s.ClientUserId.Contains(search));
+			{
+				var solutionIds = GetGraderSolutionByClientUserId(search).Select(w => w.Id);
+				solutions = solutions.Where(s => solutionIds.Contains(s.Id));
+			}
 
 			return solutions
 				.OrderByDescending(s => s.Id)
@@ -96,5 +102,33 @@ namespace uLearn.Web.DataContexts
 				.Take(count)
 				.ToList();
 		}
+
+		private const string nameSpace = nameof(GradersRepo);
+		private const string dbo = nameof(dbo);
+
+		[TableValuedFunction(nameof(GetGraderSolutionByClientUserId), nameSpace, Schema = dbo)]
+		// ReSharper disable once MemberCanBePrivate.Global
+		public IQueryable<SubmissionIdWrapper> GetGraderSolutionByClientUserId(string clientUserId)
+		{
+			if (string.IsNullOrEmpty(clientUserId))
+				return db.ExerciseSolutionsByGrader.Select(s => new SubmissionIdWrapper(s.Id));
+			
+			var splittedUserId = clientUserId.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+			var query = string.Join(" & ", splittedUserId.Select(s => "\"" + s.Trim().Replace("\"", "\\\"") + "*\""));
+			var parameter = new ObjectParameter("userId", query);
+			return db.ObjectContext().CreateQuery<SubmissionIdWrapper>($"[{nameof(GetGraderSolutionByClientUserId)}](@userId)", parameter);
+		}
+	}
+
+	/* System.String is not available for table-valued functions so we need to create ComplexTyped wrapper */
+	[ComplexType]
+	public class SubmissionIdWrapper
+	{
+		public SubmissionIdWrapper(int submissionId)
+		{
+			Id = submissionId;
+		}
+
+		public int Id { get; set; }
 	}
 }

@@ -305,7 +305,7 @@
     <Compile Include="Controllers\BaseExerciseController.cs" />
     <Compile Include="Controllers\CertificatesController.cs" />
     <Compile Include="Controllers\GraderController.cs" />
-    <Compile Include="Controllers\JsonDataContractResult.cs" />
+    <Compile Include="Controllers\JsonDataContractHelpers.cs" />
     <Compile Include="DataContexts\GradersRepo.cs" />
     <Compile Include="Helpers\ExcelWorksheetBuilder.cs" />
     <Compile Include="Helpers\StringUtils.cs" />
