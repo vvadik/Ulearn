@@ -88,6 +88,17 @@
 			}
 			</tbody>
 		</table>
+
+		if (Model.IsMore)
+		{
+			<div>
+				Показано @Model.Solutions.Count последних решений.
+				@if (Model.Solutions.Count < 2000)
+				{
+					@Html.ActionLink("Показать больше.", "Submissions", "Grader", new { courseId = Model.CourseId, clientId = Model.Client.Id, max = Model.Solutions.Count * 2, search = Model.Search }, new {})
+				}
+			</div>	 
+		}
 	}
 
 	<div class="grader-submissions__details__modal modal fade">

@@ -13,7 +13,7 @@
 	}
 	else
 	{
-		<p class="text-muted">Нет клиентов. Создайте первого, и внешние платформы смогут проверять решения задач из&nbsp;курса через API грейдера на&nbsp;ulearn.me.</p>
+		<p class="text-muted">Нет клиентов. Создайте первого, и внешние платформы смогут проверять решения задач из&nbsp;курса через API грейдера на&nbsp;@(Request.Url.Host).</p>
 	}
 
 	@foreach (var client in Model.Clients)
@@ -67,7 +67,7 @@
 						<h4>Примеры ответа</h4>
 						<pre>{
     "status": "IN_PROCESS",
-	"score": 0.0,
+    "score": 0.0,
     "compilation_log": null,
     "execution_log": null
 }</pre>
@@ -75,7 +75,7 @@
     "status": "READY",
     "score": 0.5, // Число от 0.0 до 1.0
     "compilation_log": "Информация о компиляции, в том числе ошибки компиляции", 
-    "execution_log": "" // всегда пустой
+    "execution_log": "Вывод программы"
 }</pre>
 					</div>
 					<div class="modal-footer">

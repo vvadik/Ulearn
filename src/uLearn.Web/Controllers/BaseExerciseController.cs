@@ -38,43 +38,56 @@ namespace uLearn.Web.Controllers
 			return $"{userName}: {exerciseSlide.Info.Unit.Title} - {exerciseSlide.Title}";
 		}
 
-		protected async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string userCode, string userId, string userName, bool waitUntilChecked, bool compileOnWebServer)
+		protected async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string userCode, string userId, string userName, bool waitUntilChecked, bool saveSubmissionOnCompileErrors)
 		{
+			var course = courseManager.GetCourse(courseId);
 			var exerciseBlock = exerciseSlide.Exercise;
+			var builtSolution = exerciseBlock.BuildSolution(userCode);
 
-			if (compileOnWebServer)
+			if (!saveSubmissionOnCompileErrors)
 			{
-				var solution = exerciseBlock.BuildSolution(userCode);
-				if (solution.HasErrors)
-					return new RunSolutionResult { IsCompileError = true, ErrorMessage = solution.ErrorMessage, ExecutionServiceName = "uLearn" };
-				if (solution.HasStyleIssues)
-					return new RunSolutionResult { IsStyleViolation = true, ErrorMessage = solution.StyleMessage, ExecutionServiceName = "uLearn" };
+				if (builtSolution.HasErrors)
+					return new RunSolutionResult { IsCompileError = true, ErrorMessage = builtSolution.ErrorMessage, ExecutionServiceName = "uLearn" };
+				if (builtSolution.HasStyleIssues)
+					return new RunSolutionResult { IsStyleViolation = true, ErrorMessage = builtSolution.StyleMessage, ExecutionServiceName = "uLearn" };
 			}
 
-			var submission = await userSolutionsRepo.RunUserSolution(
-				courseId, exerciseSlide.Id, userId,
-				userCode, null, null, "uLearn",
-				GenerateSubmissionName(exerciseSlide, userName), executionTimeout,
-				waitUntilChecked
+			var compilationErrorMessage = builtSolution.HasErrors ? builtSolution.ErrorMessage : (builtSolution.HasStyleIssues ? builtSolution.StyleMessage : null);
+			var dontRunSubmission = builtSolution.HasErrors || builtSolution.HasStyleIssues;
+			var submission = await userSolutionsRepo.AddUserExerciseSubmission(
+				courseId, exerciseSlide.Id,
+				userCode, compilationErrorMessage, null,
+				userId, "uLearn", GenerateSubmissionName(exerciseSlide, userName),
+				dontRunSubmission ? AutomaticExerciseCheckingStatus.Done : AutomaticExerciseCheckingStatus.Waiting
 			);
+
+			if (builtSolution.HasErrors)
+				return new RunSolutionResult { IsCompileError = true, ErrorMessage = builtSolution.ErrorMessage, SubmissionId = submission.Id, ExecutionServiceName = "uLearn" };
+			if (builtSolution.HasStyleIssues)
+				return new RunSolutionResult { IsStyleViolation = true, ErrorMessage = builtSolution.StyleMessage, SubmissionId = submission.Id, ExecutionServiceName = "uLearn" };
+
+			try
+			{
+				await userSolutionsRepo.RunSubmission(submission, executionTimeout, waitUntilChecked);
+			}
+			catch (SubmissionCheckingTimeout)
+			{
+				log.Error($"РќРµ СЃРјРѕРі Р·Р°РїСѓСЃС‚РёС‚СЊ РїСЂРѕРІРµСЂРєСѓ СЂРµС€РµРЅРёСЏ, РЅРёРєС‚Рѕ РЅРµ РІР·СЏР» РµРіРѕ РЅР° РїСЂРѕРІРµСЂРєСѓ Р·Р° {executionTimeout.TotalSeconds} СЃРµРєСѓРЅРґ.\nРљСѓСЂСЃ В«{course.Title}В», СЃР»Р°Р№Рґ В«{exerciseSlide.Title}В» ({exerciseSlide.Id})");
+				errorsBot.PostToChannel($"РќРµ СЃРјРѕРі Р·Р°РїСѓСЃС‚РёС‚СЊ РїСЂРѕРІРµСЂРєСѓ СЂРµС€РµРЅРёСЏ, РЅРёРєС‚Рѕ РЅРµ РІР·СЏР» РµРіРѕ РЅР° РїСЂРѕРІРµСЂРєСѓ Р·Р° {executionTimeout.TotalSeconds} СЃРµРєСѓРЅРґ.\nРљСѓСЂСЃ В«{course.Title}В», СЃР»Р°Р№Рґ В«{exerciseSlide.Title}В» ({exerciseSlide.Id})\n\nhttps://ulearn.me/Sandbox");
+				return new RunSolutionResult
+				{
+					IsCompillerFailure = true,
+					ErrorMessage = "Рљ СЃРѕР¶Р°Р»РµРЅРёСЋ, РёР·-Р·Р° Р±РѕР»СЊС€РѕР№ РЅР°РіСЂСѓР·РєРё РјС‹ РЅРµ СЃРјРѕРіР»Рё РѕРїРµСЂР°С‚РёРІРЅРѕ РїСЂРѕРІРµСЂРёС‚СЊ РІР°С€Рµ СЂРµС€РµРЅРёРµ. " +
+								   "РњС‹ РїРѕРїСЂРѕР±СѓРµРј РїСЂРѕРІРµСЂРёС‚СЊ РµРіРѕ РїРѕР·Р¶Рµ, РїСЂРѕСЃС‚Рѕ РїРѕРґРѕР¶РґРёС‚Рµ Рё РѕР±РЅРѕРІРёС‚Рµ СЃС‚СЂР°РЅРёС†Сѓ. ",
+					ExecutionServiceName = "uLearn"
+				};
+			}
 
 			if (!waitUntilChecked)
 				return new RunSolutionResult { SubmissionId = submission.Id };
 
-			var course = courseManager.GetCourse(courseId);
-
-			if (submission == null)
-			{
-				log.Error($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})");
-				errorsBot.PostToChannel($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})\n\nhttps://ulearn.me/Sandbox");
-				return new RunSolutionResult
-				{
-					IsCompillerFailure = true,
-					ErrorMessage = "К сожалению, из-за большой нагрузки мы не смогли оперативно проверить ваше решение. " +
-					               "Мы попробуем проверить его позже, просто подождите и обновите страницу. ",
-					ExecutionServiceName = "uLearn"
-				};
-			}
+			/* Update the submission */
+			submission = userSolutionsRepo.FindNoTrackingSubmission(submission.Id);
 
 			var automaticChecking = submission.AutomaticChecking;
 			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);

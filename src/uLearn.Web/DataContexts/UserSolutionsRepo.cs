@@ -38,7 +38,11 @@ namespace uLearn.Web.DataContexts
 			courseManager = WebCourseManager.Instance;
 		}
 
-		public async Task<UserExerciseSubmission> AddUserExerciseSubmission(string courseId, Guid slideId, string code, string compilationError, string output, string userId, string executionServiceName, string displayName)
+		public async Task<UserExerciseSubmission> AddUserExerciseSubmission(
+			string courseId, Guid slideId,
+			string code, string compilationError, string output,
+			string userId, string executionServiceName, string displayName,
+			AutomaticExerciseCheckingStatus status = AutomaticExerciseCheckingStatus.Waiting)
 		{
 			if (string.IsNullOrWhiteSpace(code))
 				code = "// no code";
@@ -58,7 +62,7 @@ namespace uLearn.Web.DataContexts
 				OutputHash = outputHash,
 				ExecutionServiceName = executionServiceName,
 				DisplayName = displayName,
-				Status = AutomaticExerciseCheckingStatus.Waiting,
+				Status = status,
 				IsRightAnswer = false,
 			};
 
@@ -249,7 +253,7 @@ namespace uLearn.Web.DataContexts
 				.Take(max);
 		}
 
-		public UserExerciseSubmission FindSubmission(int id)
+		public UserExerciseSubmission FindNoTrackingSubmission(int id)
 		{
 			var submission = db.UserExerciseSubmissions.AsNoTracking().SingleOrDefault(x => x.Id == id);
 			if (submission == null)
@@ -414,45 +418,36 @@ namespace uLearn.Web.DataContexts
 			return newChecking;
 		}
 
-		public async Task<UserExerciseSubmission> RunUserSolution(
-			string courseId, Guid slideId, string userId, string code,
-			string compilationError, string output, 
-			string executionServiceName, string displayName, TimeSpan timeout,
-			bool waitUntilChecked)
+		public async Task RunSubmission(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked)
 		{
-			var submission = await AddUserExerciseSubmission(
-				courseId, slideId,
-				code, compilationError, output,
-				userId, executionServiceName, displayName);
-			
 			log.Info($"Запускаю проверку решения. ID посылки: {submission.Id}");
 			unhandledSubmissions.TryAdd(submission.Id, DateTime.Now);
 
 			if (!waitUntilChecked)
 			{
 				log.Info($"Не буду ожидать результатов проверки посылки {submission.Id}");
-				return submission;
+				return;
 			}
 
 			var sw = Stopwatch.StartNew();
 			while (sw.Elapsed < timeout)
 			{
 				await WaitUntilSubmissionHandled(TimeSpan.FromSeconds(5), submission.Id);
-				var updatedSubmission = FindSubmission(submission.Id);
+				var updatedSubmission = FindNoTrackingSubmission(submission.Id);
 				if (updatedSubmission == null)
 					break;
 
 				if (updatedSubmission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Done)
 				{
 					log.Info($"Посылка {submission.Id} проверена. Результат: {updatedSubmission.AutomaticChecking.GetVerdict()}");
-					return updatedSubmission;
+					return;
 				}
 			}
 
-			/* If something went wrong */
+			/* If something is wrong */
 			DateTime value;
 			unhandledSubmissions.TryRemove(submission.Id, out value);
-			return null;
+			throw new SubmissionCheckingTimeout();
 		}
 		
 		public Dictionary<int, string> GetSolutionsForSubmissions(IEnumerable<int> submissionsIds)
@@ -511,5 +506,9 @@ namespace uLearn.Web.DataContexts
 					dictionary.TryRemove(key, out value);
 			}
 		}
+	}
+
+	public class SubmissionCheckingTimeout : Exception
+	{
 	}
 }

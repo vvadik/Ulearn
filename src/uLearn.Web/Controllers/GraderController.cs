@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 using System.Web.Mvc;
 using log4net;
 using uLearn.Web.DataContexts;
@@ -71,7 +73,7 @@ namespace uLearn.Web.Controllers
 
 			var result = await CheckSolution(
 				request.CourseId, slide, code, client.UserId, $"Grader client {client.Name}, user {request.ClientUserId}",
-				waitUntilChecked: false, compileOnWebServer: false
+				waitUntilChecked: false, saveSubmissionOnCompileErrors: true
 			);
 
 			log.Info($"Result of check starting: {result.JsonSerialize()}");
@@ -136,13 +138,16 @@ namespace uLearn.Web.Controllers
 			if (client == null)
 				return HttpNotFound();
 
-			var solutions = gradersRepo.GetClientSolutions(client, search, max);
+			var solutions = gradersRepo.GetClientSolutions(client, search, max + 1);
+			var isMore = solutions.Count > max;
+			solutions = solutions.Take(max).ToList();
 			return View(new GraderSolutionsViewModel
 			{
 				CourseId = courseId,
 				Client = client,
 				Solutions = solutions,
 				Search = search,
+				IsMore = isMore,
 			});
 		}
 	}
@@ -182,8 +187,8 @@ namespace uLearn.Web.Controllers
 			{
 				Status = "READY",
 				Result = score,
-				CompilationLog = automaticChecking.CompilationError.Text,
-				ExecutionLog = "",
+				CompilationLog = automaticChecking.CompilationError?.Text ?? "",
+				ExecutionLog = automaticChecking.Output?.Text ?? "",
 			};
 		}
 		
@@ -235,5 +240,6 @@ namespace uLearn.Web.Controllers
 		public GraderClient Client { get; set; }
 		public string Search { get; set; }
 		public List<ExerciseSolutionByGrader> Solutions { get; set; }
+		public bool IsMore { get; set; }
 	}
 }

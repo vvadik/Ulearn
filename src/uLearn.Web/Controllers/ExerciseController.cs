@@ -57,7 +57,7 @@ namespace uLearn.Web.Controllers
 
 			var result = await CheckSolution(
 				courseId, exerciseSlide, code, User.Identity.GetUserId(), User.Identity.Name,
-				waitUntilChecked: true, compileOnWebServer: true
+				waitUntilChecked: true, saveSubmissionOnCompileErrors: false
 			);
 
 			if (isLti)

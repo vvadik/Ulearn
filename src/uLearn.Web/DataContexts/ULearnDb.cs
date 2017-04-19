@@ -23,6 +23,7 @@ namespace uLearn.Web.DataContexts
 			/* See https://weblogs.asp.net/dixin/entityframework.functions
 			 * for detailed description about working with stored functions and procedures */
 			modelBuilder.AddFunctions<UsersRepo>();
+			modelBuilder.AddFunctions<GradersRepo>();
 
 			modelBuilder.Entity<CommentLike>()
 				.HasRequired(x => x.Comment)
