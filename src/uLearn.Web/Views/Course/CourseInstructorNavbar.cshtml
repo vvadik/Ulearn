@@ -14,6 +14,7 @@
 			<li>@Html.ActionLink("Сертификаты", "Certificates", "Admin", new { Model.CourseId }, new { })</li>
 			@if (User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
 			{
+				<li class="divider" role="separator"></li>
 				<li>@Html.ActionLink("Пользователи", "Users", "Admin", new { Model.CourseId }, new { })</li>
 				<li>@Html.ActionLink("Загрузить пакет", "Packages", "Admin", new { Model.CourseId }, new { })</li>
 				<li>@Html.ActionLink("Модули", "Units", "Admin", new { Model.CourseId }, new { })</li>
