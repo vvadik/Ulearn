@@ -190,7 +190,18 @@ namespace uLearn.Web.Controllers
 			var filename = model.Course.Id + ".json";
 			Response.AddHeader("Content-Disposition", "attachment;filename=" + filename);
 
-			return Json(new CourseStatisticsJsonModel(model), "application/json", Encoding.UTF8, JsonRequestBehavior.AllowGet);
+			return Json(new CourseStatisticsModel(model), JsonRequestBehavior.AllowGet);
+		}
+
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		public ActionResult ExportCourseStatisticsAsXml(CourseStatisticsParams param)
+		{
+			var model = GetCourseStatisticsModel(param, 3000);
+
+			var filename = model.Course.Id + ".xml";
+			Response.AddHeader("Content-Disposition", "attachment;filename=" + filename);
+
+			return Content(new CourseStatisticsModel(model).XmlSerialize(), "text/xml");
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
