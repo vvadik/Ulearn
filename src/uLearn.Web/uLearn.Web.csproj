@@ -305,6 +305,7 @@
     <Compile Include="Controllers\BaseExerciseController.cs" />
     <Compile Include="Controllers\CertificatesController.cs" />
     <Compile Include="Controllers\GraderController.cs" />
+    <Compile Include="Controllers\JsonDataContractController.cs" />
     <Compile Include="Controllers\JsonDataContractHelpers.cs" />
     <Compile Include="DataContexts\GradersRepo.cs" />
     <Compile Include="Helpers\ExcelWorksheetBuilder.cs" />
@@ -321,6 +322,7 @@
     <Compile Include="Migrations\201704070801464_AddGraderClients.Designer.cs">
       <DependentUpon>201704070801464_AddGraderClients.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\CourseStatisticsJsonModel.cs" />
     <Compile Include="Models\ExerciseSolutionByGrader.cs" />
     <Compile Include="Models\GraderClient.cs" />
     <Compile Include="Models\GroupsFilterViewModel.cs" />
