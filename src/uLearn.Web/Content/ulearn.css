@@ -1989,3 +1989,15 @@ h1 .copy-group-link {
 	display: inline-block;
 }
 /* End of grader */
+
+/* Notification settings */
+.notification-settings__table td,
+.notification-settings__table th {
+	border-right: 1px solid #ccc;
+	padding: 5px;
+}
+
+.notification-settings__table thead th {
+	border-bottom: 1px solid #ccc;
+}
+/* End of notification settings */

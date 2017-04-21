@@ -306,7 +306,9 @@
     <Compile Include="Controllers\CertificatesController.cs" />
     <Compile Include="Controllers\GraderController.cs" />
     <Compile Include="Controllers\JsonDataContractHelpers.cs" />
+    <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="DataContexts\GradersRepo.cs" />
+    <Compile Include="DataContexts\NotificationsRepo.cs" />
     <Compile Include="Helpers\ExcelWorksheetBuilder.cs" />
     <Compile Include="Helpers\StringUtils.cs" />
     <Compile Include="Migrations\201702210620147_AddIsManualCheckingEnabledForOldSolutions.cs" />
@@ -321,9 +323,14 @@
     <Compile Include="Migrations\201704070801464_AddGraderClients.Designer.cs">
       <DependentUpon>201704070801464_AddGraderClients.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201704201221554_AddNotifications.cs" />
+    <Compile Include="Migrations\201704201221554_AddNotifications.Designer.cs">
+      <DependentUpon>201704201221554_AddNotifications.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\ExerciseSolutionByGrader.cs" />
     <Compile Include="Models\GraderClient.cs" />
     <Compile Include="Models\GroupsFilterViewModel.cs" />
+    <Compile Include="Models\Notifications.cs" />
     <Compile Include="Telegram\ErrorsBot.cs" />
     <Compile Include="Telegram\TelegramBot.cs" />
     <Compile Include="DataContexts\AdditionalScoresRepo.cs" />
@@ -937,6 +944,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201704070801464_AddGraderClients.resx">
       <DependentUpon>201704070801464_AddGraderClients.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704201221554_AddNotifications.resx">
+      <DependentUpon>201704201221554_AddNotifications.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -1595,6 +1605,7 @@
     <Content Include="Views\Exercise\_SlideCodeReviewComments.cshtml" />
     <Content Include="Views\Grader\Clients.cshtml" />
     <Content Include="Views\Grader\Submissions.cshtml" />
+    <Content Include="Views\Notifications\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -37,14 +37,20 @@ namespace uLearn.Web.DataContexts
 				.HasForeignKey(m => m.GroupId)
 				.WillCascadeOnDelete(false);
 
-			CancelCascaseDeleting<ExerciseCodeReview, ApplicationUser, string>(modelBuilder, c => c.Author, c => c.AuthorId);
-
 			modelBuilder.Entity<Like>()
 				.HasRequired(l => l.Submission)
 				.WithMany(s => s.Likes)
 				.HasForeignKey(l => l.SubmissionId)
 				.WillCascadeOnDelete(false);
 
+			modelBuilder.Entity<NotificationDelivery>()
+				.HasRequired(d => d.Notification)
+				.WithMany(n => n.Deliveries)
+				.HasForeignKey(d => d.NotificationId)
+				.WillCascadeOnDelete(false);
+
+			CancelCascaseDeleting<ExerciseCodeReview, ApplicationUser, string>(modelBuilder, c => c.Author, c => c.AuthorId);
+			
 			CancelCascaseDeleting<UserExerciseSubmission, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 			CancelCascaseDeleting<ManualExerciseChecking, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 
@@ -106,5 +112,10 @@ namespace uLearn.Web.DataContexts
 
 		public DbSet<GraderClient> GraderClients { get; set; }
 		public DbSet<ExerciseSolutionByGrader> ExerciseSolutionsByGrader { get; set; }
+
+		public DbSet<NotificationTransport> NotificationTransports { get; set; }
+		public DbSet<NotificationTransportSettings> NotificationTransportSettings { get; set; }
+		public DbSet<NotificationDelivery> NotificationDeliveries { get; set; }
+		public DbSet<Notification> Notifications { get; set; }
 	}
 }
