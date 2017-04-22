@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -223,23 +224,22 @@ namespace uLearn.Web.Controllers
 				var lastAcceptedSubmission = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).OrderByDescending(s => s.Timestamp).FirstOrDefault();
 				if (lastAcceptedSubmission != null && lastAcceptedSubmission.Id != submission.Id)
 					return Json(
-						new {
-							status = "error",
-							error = "has_newest_submission",
-							submissionId = lastAcceptedSubmission.Id,
-							submissionDate = lastAcceptedSubmission.Timestamp.ToAgoPrettyString(true)
+						new SimpleScoreExerciseResult {
+							Status = "error",
+							Error = "has_newest_submission",
+							SubmissionId = lastAcceptedSubmission.Id,
+							SubmissionDate = lastAcceptedSubmission.Timestamp.ToAgoPrettyString(true)
 						});
 			}
 
 			var manualScore = slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId);
 			if (exerciseScore < manualScore && !updateCheckingId.HasValue)
 				return Json(
-					new
-					{
-						status = "error",
-						error = "has_greatest_score",
-						score = manualScore,
-						checkedQueueUrl = Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId, done = true, userId, slideId})
+					new SimpleScoreExerciseResult {
+						Status = "error",
+						Error = "has_greatest_score",
+						Score = manualScore.ToString(),
+						CheckedQueueUrl = Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId, done = true, userId, slideId})
 					});
 
 			/* TODO: check if 0 <= exercisScore <= exercise.MaxReviewScore */
@@ -255,12 +255,11 @@ namespace uLearn.Web.Controllers
 			await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 
 			return Json(
-				new
-				{
-					status = "ok",
-					score = exerciseScore.PluralizeInRussian(new RussianPluralizationOptions { One = "балл", Two = "балла", Five = "баллов", Gender = Gender.Male, hideNumberOne = false, smallNumbersAreWords = false}),
-					totalScore = visitsRepo.GetScore(slideId, userId),
-					checkingId = checking.Id,
+				new SimpleScoreExerciseResult {
+					Status = "ok",
+					Score = exerciseScore.PluralizeInRussian(new RussianPluralizationOptions { One = "балл", Two = "балла", Five = "баллов", Gender = Gender.Male, hideNumberOne = false, smallNumbersAreWords = false}),
+					TotalScore = visitsRepo.GetScore(slideId, userId),
+					CheckingId = checking.Id,
 				});
 		}
 
@@ -378,6 +377,34 @@ namespace uLearn.Web.Controllers
 
 			return PartialView(model);
 		}
+	}
+
+	[DataContract]
+	public class SimpleScoreExerciseResult
+	{
+		[DataMember(Name = "status")]
+		public string Status { get; set; }
+
+		[DataMember(Name = "error")]
+		public string Error { get; set; }
+
+		[DataMember(Name = "submissionId")]
+		public int SubmissionId { get; set; }
+
+		[DataMember(Name = "submissionDate")]
+		public string SubmissionDate { get; set; }
+
+		[DataMember(Name = "score")]
+		public string Score { get; set; }
+
+		[DataMember(Name = "totalScore")]
+		public int TotalScore { get; set; }
+
+		[DataMember(Name = "checkedQueueUrl")]
+		public string CheckedQueueUrl { get; set; }
+
+		[DataMember(Name = "checkingId")]
+		public int CheckingId { get; set; }
 	}
 
 	public class ReviewInfo
