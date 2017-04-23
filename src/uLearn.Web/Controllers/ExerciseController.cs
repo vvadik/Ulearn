@@ -121,7 +121,7 @@ namespace uLearn.Web.Controllers
 
 			await slideCheckingsRepo.DeleteExerciseCodeReview(review);
 
-			return Json(new { status = "ok" });
+			return Json(new CodeReviewOperationResult { Status = "ok" });
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
@@ -137,7 +137,7 @@ namespace uLearn.Web.Controllers
 
 			await slideCheckingsRepo.UpdateExerciseCodeReview(review, comment);
 
-			return Json(new { status = "ok" });
+			return Json(new CodeReviewOperationResult { Status = "ok" });
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
@@ -378,6 +378,13 @@ namespace uLearn.Web.Controllers
 			return PartialView(model);
 		}
 	}
+
+    [DataContract]
+    public class CodeReviewOperationResult
+    {
+        [DataMember(Name = "status")]
+        public string Status { get; set; }
+    }
 
 	[DataContract]
 	public class SimpleScoreExerciseResult
