@@ -29,18 +29,6 @@ namespace uLearn.Web.Controllers
 			gradersRepo = new GradersRepo(db);
 		}
 
-		/* Replace JsonResult with JsonDataContractResult */
-		protected override JsonResult Json(object data, string contentType, Encoding contentEncoding, JsonRequestBehavior behavior)
-		{
-			return new JsonDataContractResult
-			{
-				Data = data,
-				ContentType = contentType,
-				ContentEncoding = contentEncoding,
-				JsonRequestBehavior = behavior
-			};
-		}
-
 		[System.Web.Mvc.HttpPost]
 		public async Task<ActionResult> Submit(GraderSubmitRequest request)
 		{

@@ -9,7 +9,7 @@ using uLearn.Web.Telegram;
 
 namespace uLearn.Web.Controllers
 {
-	public class BaseExerciseController : Controller
+	public class BaseExerciseController : JsonDataContractController
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(BaseExerciseController));
 		private readonly ErrorsBot errorsBot = new ErrorsBot();

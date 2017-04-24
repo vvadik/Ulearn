@@ -305,6 +305,7 @@
     <Compile Include="Controllers\BaseExerciseController.cs" />
     <Compile Include="Controllers\CertificatesController.cs" />
     <Compile Include="Controllers\GraderController.cs" />
+    <Compile Include="Controllers\JsonDataContractController.cs" />
     <Compile Include="Controllers\JsonDataContractHelpers.cs" />
     <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="DataContexts\GradersRepo.cs" />
@@ -327,6 +328,7 @@
     <Compile Include="Migrations\201704201221554_AddNotifications.Designer.cs">
       <DependentUpon>201704201221554_AddNotifications.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\CourseStatisticsJsonModel.cs" />
     <Compile Include="Models\ExerciseSolutionByGrader.cs" />
     <Compile Include="Models\GraderClient.cs" />
     <Compile Include="Models\GroupsFilterViewModel.cs" />
