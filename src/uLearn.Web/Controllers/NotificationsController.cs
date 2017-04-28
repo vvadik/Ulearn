@@ -12,7 +12,7 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+	[ULearnAuthorize]
     public class NotificationsController : Controller
 	{
 		private readonly NotificationsRepo notificationsRepo;
@@ -31,10 +31,13 @@ namespace uLearn.Web.Controllers
 	        var transportsSettings = notificationsRepo.GetNotificationTransportsSettings(courseId, transports.Select(t => t.Id).ToList());
 			
 	        notificationTypes = notificationTypes
-				.Where(t => User.HasAccessFor(courseId, t.MinCourseRole))
-				.OrderByDescending(t => t.MinCourseRole)
-				.ThenBy(t => (int) t.Type)
+				.Where(t => User.HasAccessFor(courseId, t.GetMinCourseRole()))
+				.OrderByDescending(t => t.GetMinCourseRole())
+				.ThenBy(t => (int) t)
 				.ToList();
+
+	        if (!User.IsSystemAdministrator())
+		        notificationTypes = notificationTypes.Where(t => !t.IsForSysAdminsOnly()).ToList();
 
             return View(new NotificationSettingsViewModel
             {
@@ -55,12 +58,22 @@ namespace uLearn.Web.Controllers
 
 			return RedirectToAction("Index", "Notifications", new { courseId = courseId });
 		}
-    }
+
+		public async Task<ActionResult> AddTelegramTransport(Guid code)
+		{
+			await notificationsRepo.ConfirmNotificationTransport(code, User.Identity.GetUserId());
+
+
+
+			// TODO: Replace BasicProgramming or replace redirect to the feed page
+			return RedirectToAction("Index", new { courseId = "BasicProgramming" });
+		}
+	}
 
 	public class NotificationSettingsViewModel
 	{
 		public string CourseId { get; set; }
-		public List<NotificationTypeProperties> NotificationTypes { get; set; }
+		public List<NotificationType> NotificationTypes { get; set; }
 		public List<NotificationTransport> Transports { get; set; }
 		public DefaultDictionary<Tuple<int, NotificationType>, NotificationTransportSettings> TransportsSettings { get; set; }
 	}

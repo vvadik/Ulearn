@@ -308,10 +308,13 @@
     <Compile Include="Controllers\JsonDataContractController.cs" />
     <Compile Include="Controllers\JsonDataContractHelpers.cs" />
     <Compile Include="Controllers\NotificationsController.cs" />
+    <Compile Include="Controllers\TelegramController.cs" />
     <Compile Include="DataContexts\GradersRepo.cs" />
     <Compile Include="DataContexts\NotificationsRepo.cs" />
+    <Compile Include="Helpers\EnumExtensions.cs" />
     <Compile Include="Helpers\ExcelWorksheetBuilder.cs" />
     <Compile Include="Helpers\StringUtils.cs" />
+    <Compile Include="Helpers\TelegramHelper.cs" />
     <Compile Include="Migrations\201702210620147_AddIsManualCheckingEnabledForOldSolutions.cs" />
     <Compile Include="Migrations\201702210620147_AddIsManualCheckingEnabledForOldSolutions.Designer.cs">
       <DependentUpon>201702210620147_AddIsManualCheckingEnabledForOldSolutions.cs</DependentUpon>
@@ -327,6 +330,14 @@
     <Compile Include="Migrations\201704201221554_AddNotifications.cs" />
     <Compile Include="Migrations\201704201221554_AddNotifications.Designer.cs">
       <DependentUpon>201704201221554_AddNotifications.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704271654234_TelegramNotificationsAndIndexes.cs" />
+    <Compile Include="Migrations\201704271654234_TelegramNotificationsAndIndexes.Designer.cs">
+      <DependentUpon>201704271654234_TelegramNotificationsAndIndexes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704280544000_AddNotificationsFields.cs" />
+    <Compile Include="Migrations\201704280544000_AddNotificationsFields.Designer.cs">
+      <DependentUpon>201704280544000_AddNotificationsFields.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\CourseStatisticsJsonModel.cs" />
     <Compile Include="Models\ExerciseSolutionByGrader.cs" />
@@ -949,6 +960,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201704201221554_AddNotifications.resx">
       <DependentUpon>201704201221554_AddNotifications.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704271654234_TelegramNotificationsAndIndexes.resx">
+      <DependentUpon>201704271654234_TelegramNotificationsAndIndexes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704280544000_AddNotificationsFields.resx">
+      <DependentUpon>201704280544000_AddNotificationsFields.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -1613,6 +1630,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Courses\" />
     <Folder Include="tablesorter-master\docs\" />
+    <Folder Include="Views\Telegram\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

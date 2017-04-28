@@ -134,5 +134,29 @@ namespace uLearn
 				return new Guid(hash);
 			}
 		}
+
+		public static string MaskAsSecret(this string str)
+		{
+			if (str.Length < 5)
+				return string.Join("", Enumerable.Repeat("*", str.Length));
+
+			return str.Substring(0, 2) + string.Join("", Enumerable.Repeat("*", str.Length - 4)) + str.Substring(str.Length - 2);
+		}
+
+		public static string EscapeMarkdown(this string text)
+		{
+			return Regex.Replace(text, @"([\[\]|\*_`])", @"\$1");
+		}
+
+		public static string EscapeHtml(this string text)
+		{
+			return System.Security.SecurityElement.Escape(text);
+		}
+
+		public static string MakeNestedQuotes(this string text)
+		{
+			text = Regex.Replace(text, "(\\s|^)[\"«]", @"$1„");
+			return Regex.Replace(text, "[\"»]", @"“");
+		}
 	}
 }

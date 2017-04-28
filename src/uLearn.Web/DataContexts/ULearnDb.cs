@@ -61,6 +61,15 @@ namespace uLearn.Web.DataContexts
 			CancelCascaseDeleting<AdditionalScore, ApplicationUser, string>(modelBuilder, c => c.Instructor, c => c.InstructorId);
 
 			CancelCascaseDeleting<GraderClient, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
+
+			CancelCascaseDeleting<Notification, ApplicationUser, string>(modelBuilder, c => c.InitiatedBy, c => c.InitiatedById);
+			CancelCascaseDeleting<AddedInstructorNotification, ApplicationUser, string>(modelBuilder, c => c.AddedUser, c => c.AddedUserId);
+			CancelCascaseDeleting<LikedYourCommentNotification, ApplicationUser, string>(modelBuilder, c => c.LikedUser, c => c.LikedUserId);
+			CancelCascaseDeleting<JoinedToYourGroupNotification, ApplicationUser, string>(modelBuilder, c => c.JoinedUser, c => c.JoinedUserId);
+			CancelCascaseDeleting<JoinedToYourGroupNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
+			CancelCascaseDeleting<CreatedGroupNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
+			CancelCascaseDeleting<PassedManualExerciseCheckingNotification, ManualExerciseChecking, int>(modelBuilder, c => c.Checking, c => c.CheckingId);
+			CancelCascaseDeleting<PassedManualQuizCheckingNotification, ManualQuizChecking, int>(modelBuilder, c => c.Checking, c => c.CheckingId);
 		}
 
 		private static void CancelCascaseDeleting<T1, T2, T3>(DbModelBuilder modelBuilder, Expression<Func<T1, T2>> oneWay, Expression<Func<T1, T3>> secondWay)

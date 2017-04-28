@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
-using ApprovalUtilities.Reflection;
-using ApprovalUtilities.SimpleLogger;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.DataContexts
@@ -18,7 +13,6 @@ namespace uLearn.Web.DataContexts
 
 		public NotificationsRepo() : this(new ULearnDb())
 		{
-
 		}
 
 		public NotificationsRepo(ULearnDb db)
@@ -26,33 +20,20 @@ namespace uLearn.Web.DataContexts
 			this.db = db;
 		}
 
-		private static ConcurrentDictionary<NotificationType, NotificationTypeProperties> notificationTypesProperties;
+		private static List<NotificationType> notificationTypes;
 
 		private static void BuildNotificationTypesCache()
 		{
-			if (notificationTypesProperties != null)
+			if (notificationTypes != null)
 				return;
 
-
-			var allNotificationTypes = typeof(Notification).Assembly.GetTypes()
-				.Where(t => t.IsSubclassOf(typeof(Notification)))
-				.Select(t => (Notification) Activator.CreateInstance(t));
-			notificationTypesProperties = new ConcurrentDictionary<NotificationType, NotificationTypeProperties>(allNotificationTypes.ToDictionary(
-				t => t.Properties.Type,
-				t => t.Properties
-			));
+			notificationTypes = Enum.GetValues(typeof(NotificationType)).Cast<NotificationType>().ToList();
 		}
-
-		public static NotificationTypeProperties GetNotificationTypeProperties(NotificationType type)
+		
+		public static List<NotificationType> GetAllNotificationTypes()
 		{
 			BuildNotificationTypesCache();
-			return notificationTypesProperties[type];
-		}
-
-		public static List<NotificationTypeProperties> GetAllNotificationTypes()
-		{
-			BuildNotificationTypesCache();
-			return notificationTypesProperties.Values.ToList();
+			return notificationTypes;
 		}
 
 		public async Task AddNotificationTransport(NotificationTransport transport)
@@ -61,6 +42,35 @@ namespace uLearn.Web.DataContexts
 			transport.IsDeleted = false;
 			db.NotificationTransports.Add(transport);
 			await db.SaveChangesAsync();
+		}
+
+		public async Task<TelegramNotificationTransport> RequestNewTelegramTransport(long chatId, string chatTitle)
+		{
+			var transport = new TelegramNotificationTransport
+			{
+				ChatId = chatId,
+				ChatTitle = chatTitle.Substring(0, 200),
+				ConfirmationCode = Guid.NewGuid(),
+				IsConfirmed = false,
+				UserId = null
+			};
+			db.NotificationTransports.Add(transport);
+			await db.SaveChangesAsync().ConfigureAwait(false);
+
+			return transport;
+		}
+
+		public async Task<NotificationTransport> ConfirmNotificationTransport(Guid confirmationCode, string userId)
+		{
+			var transport = db.NotificationTransports.FirstOrDefault(c => c.ConfirmationCode == confirmationCode && !c.IsConfirmed);
+			if (transport == null)
+				return null;
+
+			transport.UserId = userId;
+			transport.IsConfirmed = true;
+			await db.SaveChangesAsync();
+
+			return transport;
 		}
 
 		public List<NotificationTransport> GetUsersNotificationTransports(string userId, bool includeDisabled = false)
@@ -119,7 +129,7 @@ namespace uLearn.Web.DataContexts
 			foreach (var recipientId in recipientsIds)
 			{
 				var transports = GetUsersNotificationTransports(recipientId);
-				var transportsSettings = GetNotificationTransportsSettings(courseId, notification.Properties.Type, transports.Select(t => t.Id).ToList());
+				var transportsSettings = GetNotificationTransportsSettings(courseId, notification.GetNotificationType(), transports.Select(t => t.Id).ToList());
 				foreach (var transport in transports)
 				{
 					var transportSettings = transportsSettings[transport.Id];
@@ -141,6 +151,37 @@ namespace uLearn.Web.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		
+		public List<NotificationDelivery> GetDeliveriesForSendingNow()
+		{
+			var now = DateTime.Now;
+			return db.NotificationDeliveries.Where(d => d.SendTime < now && d.Status == NotificationDeliveryStatus.NotSent).ToList();
+		}
+
+		public async Task MarkDeliveriesAsSent(List<int> deliveriesIds)
+		{
+			foreach (var d in db.NotificationDeliveries.Where(d => deliveriesIds.Contains(d.Id)))
+				d.Status = NotificationDeliveryStatus.Sent;
+			await db.SaveChangesAsync();
+		}
+
+		private async Task SetDeliveryStatus(int deliveryId, NotificationDeliveryStatus status)
+		{
+			var delivery = db.NotificationDeliveries.Find(deliveryId);
+			if (delivery == null)
+				return;
+
+			delivery.Status = status;
+			await db.SaveChangesAsync();
+		}
+
+		public async Task MarkDeliveryAsRead(int deliveryId)
+		{
+			await SetDeliveryStatus(deliveryId, NotificationDeliveryStatus.Read);
+		}
+
+		public async Task MarkDeliveriesAsWontSend(int deliveryId)
+		{
+			await SetDeliveryStatus(deliveryId, NotificationDeliveryStatus.WontSend);
+		}
 	}
 }

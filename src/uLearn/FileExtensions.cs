@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using Ionic.Zip;
+using Newtonsoft.Json;
 
 namespace uLearn
 {
@@ -42,6 +43,14 @@ namespace uLearn
 			var serializer = new XmlSerializer(typeof(T));
 			using (var stream = new StringReader(content))
 				return (T)serializer.Deserialize(stream);
+		}
+
+		public static T DeserializeJson<T>(this string content)
+		{
+			return JsonConvert.DeserializeObject<T>(content, new JsonSerializerSettings
+			{
+				NullValueHandling = NullValueHandling.Ignore
+			});
 		}
 
 		public static string GetContent(this DirectoryInfo di, string filepath)

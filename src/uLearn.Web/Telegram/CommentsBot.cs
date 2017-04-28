@@ -43,10 +43,10 @@ namespace uLearn.Web.Telegram
 			if (slide == null)
 				return "";
 
-			var slideTitle = $"{MakeNestedQuotes(course.Title)}: {MakeNestedQuotes(slide.Title)}";
+			var slideTitle = $"{course.Title.MakeNestedQuotes()}: {slide.Title.MakeNestedQuotes()}";
 
 			var url = "https://ulearn.me/Course/" + comment.CourseId + "/" + slide.Url + "#comment-" + comment.Id;
-			var text = $"*{EscapeMarkdown(comment.Author.VisibleName)} в «{EscapeMarkdown(slideTitle)}»*\n{EscapeMarkdown(comment.Text.Trim())}\n\n{EscapeMarkdown(url)}";
+			var text = $"*{comment.Author.VisibleName.EscapeMarkdown()} в «{slideTitle.EscapeMarkdown()}»*\n{comment.Text.Trim().EscapeMarkdown()}\n\n{url.EscapeMarkdown()}";
 			return text;
 		}
 	}
