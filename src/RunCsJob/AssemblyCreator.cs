@@ -17,6 +17,9 @@ namespace RunCsJob
 	{
 		public static IEnumerable<int> x = Enumerable.Range(1, 1);
 
+		private static readonly string AssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+		private static readonly string SystemRuntimeDllPath = Path.Combine(AssemblyDirectory, "System.Runtime.dll");
+
 		public static CompileResult CreateAssemblyWithRoslyn(FileRunnerSubmission submission, string workingDirectory)
 		{
 			var currentDirectory = Directory.GetCurrentDirectory();
