@@ -26,7 +26,7 @@
 		<li class="units-list-item full-width units-list-item-text course-name"><a data-score="@SlideHtml.Score(toc.Score, toc.MaxScore)">@toc.Course.Title</a></li>
 		@foreach (var group in toc.GroupsForStatistics)
 		{
-			<li class="full-width group-statistics-link"><a href="@group.StatisticsUrl"><span class="fa fa-list"></span>Ведомость @group.GroupName <span class="beta">&beta;</span></a></li>
+			<li class="full-width group-statistics-link"><a href="@group.StatisticsUrl"><span class="fa fa-list"></span>Ведомость @group.GroupName</a></li>
 		}
 		@{
 			int iUnit = 0;
