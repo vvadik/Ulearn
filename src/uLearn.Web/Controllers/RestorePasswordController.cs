@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Net;
-using System.Net.Mail;
 using System.Threading.Tasks;
+using System.Web.Configuration;
 using System.Web.Mvc;
 using Database.DataContexts;
 using Database.Models;
-using Exceptions;
 using log4net;
 using Microsoft.AspNet.Identity;
 using SendGrid;
+using SendGrid.Helpers.Mail;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -85,26 +85,26 @@ namespace uLearn.Web.Controllers
 		{
 			var url = Url.Action("SetNewPassword", "RestorePassword", new { requestId }, "https");
 
-			var message = new SendGridMessage();
-			message.AddTo(user.Email);
-			message.From = new MailAddress("noreply@ulearn.azurewebsites.net", "Добрый робот uLearn");
-			message.Subject = "Восстановление пароля uLearn";
-			message.Html = "Чтобы изменить пароль к аккаунту " + user.UserName + ", перейдите по ссылке: <a href=\"" + url + "\">" + url + "</a>";
+			var message = new SendGridMessage
+			{
+				From = new EmailAddress("noreply@ulearn.azurewebsites.net", "Добрый робот uLearn"),
+				Subject = "Восстановление пароля uLearn",
+				HtmlContent = "Чтобы изменить пароль к аккаунту " + user.UserName + ", перейдите по ссылке: <a href=\"" + url + "\">" + url + "</a>"
+			};
+			message.AddTo(new EmailAddress(user.Email));
 
-			var login = ConfigurationManager.AppSettings["SendGrid.Login"];
-			var password = ConfigurationManager.AppSettings["SendGrid.Password"];
-			var credentials = new NetworkCredential(login, password);
+			var apiKey = WebConfigurationManager.AppSettings["SendGrid.ApiKey"] ?? "";
 
-			var transport = new SendGrid.Web(credentials);
+			var transport = new SendGridClient(apiKey);
 
 			try
 			{
-				await transport.DeliverAsync(message);
+				await transport.SendEmailAsync(message);
 			}
-			catch (InvalidApiRequestException ex)
+			catch (Exception ex)
 			{
 				log.Error("Произошла ошибка при отправке письма", ex);
-				throw new Exception(ex.Message + ":\n\n" + string.Join("\n", ex.Errors), ex);
+				throw;
 			}
 		}
 
