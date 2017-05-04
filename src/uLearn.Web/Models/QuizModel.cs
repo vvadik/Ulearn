@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Database.Models;
 using uLearn.Quizes;
 
 namespace uLearn.Web.Models
@@ -29,14 +29,8 @@ namespace uLearn.Web.Models
 			get { return ResultsForQuizes?.AsEnumerable().Sum(res => res.Value) ?? 0; }
 		}
 
-		public int QuestionsCount
-		{
-			get { return ResultsForQuizes == null ? 0 : ResultsForQuizes.Count; }
-		}
+		public int QuestionsCount => ResultsForQuizes?.Count ?? 0;
 
-		public string IsLtiToString
-		{
-			get { return IsLti.ToString().ToLowerInvariant(); }
-		}
+		public string IsLtiToString => IsLti.ToString().ToLowerInvariant();
 	}
 }

@@ -1,12 +1,10 @@
-using Microsoft.AspNet.Identity;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Web.Mvc;
-using uLearn.Web.DataContexts;
+using CourseManager;
+using Database.DataContexts;
+using Database.Models;
 using uLearn.Web.FilterAttributes;
-using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {

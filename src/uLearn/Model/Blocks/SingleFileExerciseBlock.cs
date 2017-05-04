@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using RunCsJob.Api;
+using uLearn.Extensions;
 
 namespace uLearn.Model.Blocks
 {

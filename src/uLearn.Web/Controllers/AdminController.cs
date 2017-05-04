@@ -10,9 +10,14 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using ApprovalUtilities.Utilities;
+using CourseManager;
+using Database;
+using Database.DataContexts;
+using Database.Extensions;
+using Database.Models;
 using Microsoft.VisualBasic.FileIO;
+using uLearn.Extensions;
 using uLearn.Quizes;
-using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -24,7 +29,7 @@ namespace uLearn.Web.Controllers
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(AdminController));
 
-		private readonly WebCourseManager courseManager;
+		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
 		private readonly ULearnDb db;
 		private readonly UsersRepo usersRepo;
 		private readonly CommentsRepo commentsRepo;
@@ -40,16 +45,16 @@ namespace uLearn.Web.Controllers
 		public AdminController()
 		{
 			db = new ULearnDb();
-			courseManager = WebCourseManager.Instance;
+
 			usersRepo = new UsersRepo(db);
 			commentsRepo = new CommentsRepo(db);
 			userManager = new ULearnUserManager(db);
 			quizzesRepo = new QuizzesRepo(db);
 			coursesRepo = new CoursesRepo(db);
-			groupsRepo = new GroupsRepo(db);
+			groupsRepo = new GroupsRepo(db, courseManager);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
-			userSolutionsRepo = new UserSolutionsRepo(db);
-			certificatesRepo = new CertificatesRepo(db);
+			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
+			certificatesRepo = new CertificatesRepo(db, courseManager);
 			additionalScoresRepo = new AdditionalScoresRepo(db);
 		}
 

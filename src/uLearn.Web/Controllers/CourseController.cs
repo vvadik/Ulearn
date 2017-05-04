@@ -6,12 +6,15 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using CourseManager;
+using Database.DataContexts;
+using Database.Extensions;
+using Database.Models;
 using Elmah;
 using log4net;
 using LtiLibrary.Owin.Security.Lti;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
-using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
@@ -24,8 +27,8 @@ namespace uLearn.Web.Controllers
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(CourseController));
 
-		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
+		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
 		private readonly SlideRateRepo slideRateRepo;
 		private readonly UserSolutionsRepo solutionsRepo;
@@ -35,23 +38,17 @@ namespace uLearn.Web.Controllers
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly UserQuizzesRepo userQuizzesRepo;
-
+		
 		public CourseController()
-			: this(WebCourseManager.Instance)
-		{
-		}
-
-		public CourseController(CourseManager courseManager)
 		{
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 			visitsRepo = new VisitsRepo(db);
 			unitsRepo = new UnitsRepo(db);
 			slideRateRepo = new SlideRateRepo(db);
-			solutionsRepo = new UserSolutionsRepo(db);
+			solutionsRepo = new UserSolutionsRepo(db, courseManager);
 			ltiRequestsRepo = new LtiRequestsRepo(db);
-			groupsRepo = new GroupsRepo(db);
+			groupsRepo = new GroupsRepo(db, courseManager);
 			userQuizzesRepo = new UserQuizzesRepo(db);
-			this.courseManager = courseManager;
 		}
 
 		[AllowAnonymous]

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Ionic.Zip;
 using Ionic.Zlib;
+using uLearn.Extensions;
 
 namespace uLearn.Model.Blocks
 {

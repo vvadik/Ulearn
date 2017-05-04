@@ -59,6 +59,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunCsJob.Service", "RunCsJo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications", "Notifications\Notifications.csproj", "{0C7067B6-4AC8-46D4-AFCB-836F4BF66EBA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database", "Database\Database.csproj", "{95510835-0B21-4D99-A4D2-B8FC87761A3C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseManager", "CourseManager\CourseManager.csproj", "{FB7DB30C-4406-42F4-A771-6F708AD02762}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,6 +133,14 @@ Global
 		{0C7067B6-4AC8-46D4-AFCB-836F4BF66EBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C7067B6-4AC8-46D4-AFCB-836F4BF66EBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C7067B6-4AC8-46D4-AFCB-836F4BF66EBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95510835-0B21-4D99-A4D2-B8FC87761A3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95510835-0B21-4D99-A4D2-B8FC87761A3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95510835-0B21-4D99-A4D2-B8FC87761A3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95510835-0B21-4D99-A4D2-B8FC87761A3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB7DB30C-4406-42F4-A771-6F708AD02762}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB7DB30C-4406-42F4-A771-6F708AD02762}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB7DB30C-4406-42F4-A771-6F708AD02762}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB7DB30C-4406-42F4-A771-6F708AD02762}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

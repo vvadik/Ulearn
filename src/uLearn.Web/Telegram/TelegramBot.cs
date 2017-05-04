@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using System.Web.Configuration;
+﻿using System.Web.Configuration;
 using Telegram.Bot;
 
 namespace uLearn.Web.Telegram

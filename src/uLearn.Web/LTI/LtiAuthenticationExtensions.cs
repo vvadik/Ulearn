@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Entity;
+using Database.DataContexts;
 using log4net;
 using LtiLibrary.Core.Common;
 using LtiLibrary.Core.OAuth;
@@ -7,7 +8,6 @@ using LtiLibrary.Owin.Security.Lti;
 using LtiLibrary.Owin.Security.Lti.Provider;
 using Microsoft.AspNet.Identity;
 using Owin;
-using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
 
 namespace uLearn.Web.LTI

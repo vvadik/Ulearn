@@ -1,10 +1,9 @@
 ﻿using System;
+using Database.DataContexts;
+using Database.Models;
 using log4net;
 using LtiLibrary.Core.Outcomes.v1;
-using Newtonsoft.Json;
 using uLearn.Web.Controllers;
-using uLearn.Web.DataContexts;
-using uLearn.Web.Models;
 
 namespace uLearn.Web.LTI
 {

@@ -1,15 +1,8 @@
 ﻿using System.Collections.Generic;
+using Database;
 
 namespace uLearn.Web.Models
 {
-	public class UserRolesInfo
-	{
-		public string UserId { get; set; }
-		public string UserName { get; set; }
-		public string UserVisibleName { get; set; }
-		public List<string> Roles { get; set; }
-	}
-
 	public class UserListModel
 	{
 		public List<UserModel> Users { get; set; }

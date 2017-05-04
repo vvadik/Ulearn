@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
-using System.Web.Mvc;
+using CourseManager;
+using Database.DataContexts;
+using Database.Models;
 using log4net;
-using Microsoft.AspNet.Identity;
-using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 using uLearn.Web.Telegram;
 
@@ -13,10 +13,10 @@ namespace uLearn.Web.Controllers
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(BaseExerciseController));
 		private readonly ErrorsBot errorsBot = new ErrorsBot();
-		
-		protected readonly CourseManager courseManager;
 
-		protected readonly ULearnDb db = new ULearnDb();
+		protected readonly ULearnDb db;
+		protected readonly CourseManager courseManager;
+		
 		protected readonly UserSolutionsRepo userSolutionsRepo;
 		protected readonly SlideCheckingsRepo slideCheckingsRepo;
 		protected readonly GroupsRepo groupsRepo;
@@ -24,12 +24,19 @@ namespace uLearn.Web.Controllers
 
 		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(45);
 
-		public BaseExerciseController(CourseManager courseManager)
+		public BaseExerciseController()
+			: this(new ULearnDb(), WebCourseManager.Instance)
 		{
+		}
+
+		public BaseExerciseController(ULearnDb db, CourseManager courseManager)
+		{
+			this.db = db;
 			this.courseManager = courseManager;
-			userSolutionsRepo = new UserSolutionsRepo(db);
+
+			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
-			groupsRepo = new GroupsRepo(db);
+			groupsRepo = new GroupsRepo(db, courseManager);
 			visitsRepo = new VisitsRepo(db);
 		}
 		

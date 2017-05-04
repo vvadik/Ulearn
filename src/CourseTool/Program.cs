@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using CommandLine;
 
 namespace uLearn.CourseTool
@@ -10,7 +9,7 @@ namespace uLearn.CourseTool
 		{
 			return Parser.Default
 				.ParseArguments<ConvertOptions, ULearnPatchOptions, SquashOlxChapters, DesquashOlxChapters, ClearOlx, CreateOlx, CreateTarGz, VideoPatchOptions, MonitorOptions, ULearnOptions, TestCourseOptions>(args)
-				.Return(
+				.MapResult(
 					(AbstractOptions options) => ExecuteOption(options),
 					_ => -1
 				);

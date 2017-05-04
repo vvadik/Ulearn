@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using System.Web.Mvc;
+using CourseManager;
+using Database.DataContexts;
+using Database.Extensions;
+using Database.Models;
 using Microsoft.AspNet.Identity;
-using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
-using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
@@ -15,12 +15,18 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CertificatesRepo certificatesRepo;
 		private readonly ULearnUserManager userManager;
-		private readonly CourseManager courseManager = WebCourseManager.Instance;
+		private readonly CourseManager courseManager;
 
 		public CertificatesController()
+			: this(new ULearnDb(), WebCourseManager.Instance)
 		{
-			var db = new ULearnDb();
-			certificatesRepo = new CertificatesRepo(db);
+		}
+
+		public CertificatesController(ULearnDb db, CourseManager courseManager)
+		{
+			this.courseManager = courseManager;
+
+			certificatesRepo = new CertificatesRepo(db, courseManager);
 			userManager = new ULearnUserManager(db);
 		}
 

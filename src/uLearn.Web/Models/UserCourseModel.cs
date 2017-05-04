@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Database.DataContexts;
+using Database.Models;
 using uLearn.Quizes;
-using uLearn.Web.DataContexts;
 
 namespace uLearn.Web.Models
 {

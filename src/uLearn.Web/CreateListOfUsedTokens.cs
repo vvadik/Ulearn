@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom.Compiler;
 using System.Linq;
+using CourseManager;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
 using uLearn.Model.Blocks;

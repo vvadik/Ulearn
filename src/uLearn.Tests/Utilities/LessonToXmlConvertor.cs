@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml.Serialization;
 using NUnit.Framework;
 using uLearn.CSharp;
+using uLearn.Extensions;
 using uLearn.Model;
 
 namespace uLearn.Utilities

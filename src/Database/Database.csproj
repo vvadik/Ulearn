@@ -1,0 +1,673 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{95510835-0B21-4D99-A4D2-B8FC87761A3C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Database</RootNamespace>
+    <AssemblyName>Database</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ApprovalUtilities, Version=3.0.0.0, Culture=neutral, PublicKeyToken=11bd7d124fc62e0f, processorArchitecture=MSIL">
+      <HintPath>..\packages\ApprovalUtilities.3.0.13\lib\net45\ApprovalUtilities.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ApprovalUtilities.Net45, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ApprovalUtilities.3.0.13\lib\net45\ApprovalUtilities.Net45.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.Functions, Version=1.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.Functions.1.3.1\lib\net46\EntityFramework.Functions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="JetBrains.Annotations, Version=10.4.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.10.4.0\lib\net\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LtiLibrary.Core, Version=1.6.6154.21256, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LtiLibrary.Core.1.6.2\lib\net45\LtiLibrary.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.1.3.1\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DataContexts\AdditionalScoresRepo.cs" />
+    <Compile Include="DataContexts\AppUserQueryExtentions.cs" />
+    <Compile Include="DataContexts\CertificatesRepo.cs" />
+    <Compile Include="DataContexts\CommentsRepo.cs" />
+    <Compile Include="DataContexts\ConsumersRepo.cs" />
+    <Compile Include="DataContexts\CoursesRepo.cs" />
+    <Compile Include="DataContexts\GradersRepo.cs" />
+    <Compile Include="DataContexts\GroupsRepo.cs" />
+    <Compile Include="DataContexts\LtiRequestsRepo.cs" />
+    <Compile Include="DataContexts\NotificationsRepo.cs" />
+    <Compile Include="DataContexts\QuizzesRepo.cs" />
+    <Compile Include="DataContexts\RestoreRequestRepo.cs" />
+    <Compile Include="DataContexts\SlideCheckingsRepo.cs" />
+    <Compile Include="DataContexts\SlideHintRepo.cs" />
+    <Compile Include="DataContexts\SlideRateRepo.cs" />
+    <Compile Include="DataContexts\TextsRepo.cs" />
+    <Compile Include="DataContexts\ULearnDb.cs" />
+    <Compile Include="DataContexts\ULearnUserManager.cs" />
+    <Compile Include="DataContexts\UnitsRepo.cs" />
+    <Compile Include="DataContexts\UserQuestionsRepo.cs" />
+    <Compile Include="DataContexts\UserQuizzesRepo.cs" />
+    <Compile Include="DataContexts\UserRolesRepo.cs" />
+    <Compile Include="DataContexts\UserSolutionsRepo.cs" />
+    <Compile Include="DataContexts\UsersRepo.cs" />
+    <Compile Include="DataContexts\VisitsRepo.cs" />
+    <Compile Include="Extensions\EfDbExtensions.cs" />
+    <Compile Include="Extensions\UserExtentions.cs" />
+    <Compile Include="FilterOptions.cs" />
+    <Compile Include="Migrations\201407111234255_InitialCreate.cs" />
+    <Compile Include="Migrations\201407111234255_InitialCreate.Designer.cs">
+      <DependentUpon>201407111234255_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201407180649039_SolutionLikes.cs" />
+    <Compile Include="Migrations\201407180649039_SolutionLikes.Designer.cs">
+      <DependentUpon>201407180649039_SolutionLikes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201407180807286_AddQuestions.cs" />
+    <Compile Include="Migrations\201407180807286_AddQuestions.Designer.cs">
+      <DependentUpon>201407180807286_AddQuestions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201407261530409_NewAnalytics.cs" />
+    <Compile Include="Migrations\201407261530409_NewAnalytics.Designer.cs">
+      <DependentUpon>201407261530409_NewAnalytics.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201407290538592_ChangeSlideId.cs" />
+    <Compile Include="Migrations\201407290538592_ChangeSlideId.Designer.cs">
+      <DependentUpon>201407290538592_ChangeSlideId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201408031111210_MoreSpace_For_UserSolution_Fields.cs" />
+    <Compile Include="Migrations\201408031111210_MoreSpace_For_UserSolution_Fields.Designer.cs">
+      <DependentUpon>201408031111210_MoreSpace_For_UserSolution_Fields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201408050611273_AddQuizzes.cs" />
+    <Compile Include="Migrations\201408050611273_AddQuizzes.Designer.cs">
+      <DependentUpon>201408050611273_AddQuizzes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201408050909459_DeletedRequriedFieldsInQuizzes.cs" />
+    <Compile Include="Migrations\201408050909459_DeletedRequriedFieldsInQuizzes.Designer.cs">
+      <DependentUpon>201408050909459_DeletedRequriedFieldsInQuizzes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201408070554397_AddHintsLike.cs" />
+    <Compile Include="Migrations\201408070554397_AddHintsLike.Designer.cs">
+      <DependentUpon>201408070554397_AddHintsLike.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201408201208379_AddIsRightQuizBlock.cs" />
+    <Compile Include="Migrations\201408201208379_AddIsRightQuizBlock.Designer.cs">
+      <DependentUpon>201408201208379_AddIsRightQuizBlock.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201408220628510_AddUnitAppearance.cs" />
+    <Compile Include="Migrations\201408220628510_AddUnitAppearance.Designer.cs">
+      <DependentUpon>201408220628510_AddUnitAppearance.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201408250717469_AddUsersGroupName.cs" />
+    <Compile Include="Migrations\201408250717469_AddUsersGroupName.Designer.cs">
+      <DependentUpon>201408250717469_AddUsersGroupName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201408260518531_Cascading.cs" />
+    <Compile Include="Migrations\201408260518531_Cascading.Designer.cs">
+      <DependentUpon>201408260518531_Cascading.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201409031100489_VisitTimestamp.cs" />
+    <Compile Include="Migrations\201409031100489_VisitTimestamp.Designer.cs">
+      <DependentUpon>201409031100489_VisitTimestamp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201409260240008_AddQuestionSlideId.cs" />
+    <Compile Include="Migrations\201409260240008_AddQuestionSlideId.Designer.cs">
+      <DependentUpon>201409260240008_AddQuestionSlideId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201410192113426_AddUserQuizDroppedColumn.cs" />
+    <Compile Include="Migrations\201410192113426_AddUserQuizDroppedColumn.Designer.cs">
+      <DependentUpon>201410192113426_AddUserQuizDroppedColumn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201410221523323_add index.cs" />
+    <Compile Include="Migrations\201410221523323_add index.Designer.cs">
+      <DependentUpon>201410221523323_add index.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201410280605055_add index for Quizzes.cs" />
+    <Compile Include="Migrations\201410280605055_add index for Quizzes.Designer.cs">
+      <DependentUpon>201410280605055_add index for Quizzes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201411140847550_extract large text fields.cs" />
+    <Compile Include="Migrations\201411140847550_extract large text fields.Designer.cs">
+      <DependentUpon>201411140847550_extract large text fields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201412040905024_TextBlobLimits.cs" />
+    <Compile Include="Migrations\201412040905024_TextBlobLimits.Designer.cs">
+      <DependentUpon>201412040905024_TextBlobLimits.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201502041429186_AcceptedSolutionsIndex.cs" />
+    <Compile Include="Migrations\201502041429186_AcceptedSolutionsIndex.Designer.cs">
+      <DependentUpon>201502041429186_AcceptedSolutionsIndex.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503021039386_RemoveTextBlobTextRequired.cs" />
+    <Compile Include="Migrations\201503021039386_RemoveTextBlobTextRequired.Designer.cs">
+      <DependentUpon>201503021039386_RemoveTextBlobTextRequired.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503231319119_ExecutionServiceName.cs" />
+    <Compile Include="Migrations\201503231319119_ExecutionServiceName.Designer.cs">
+      <DependentUpon>201503231319119_ExecutionServiceName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504070546498_VisitResults.cs" />
+    <Compile Include="Migrations\201504070546498_VisitResults.Designer.cs">
+      <DependentUpon>201504070546498_VisitResults.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504070552041_AddIsPassed.cs" />
+    <Compile Include="Migrations\201504070552041_AddIsPassed.Designer.cs">
+      <DependentUpon>201504070552041_AddIsPassed.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201507291319398_Lti.cs" />
+    <Compile Include="Migrations\201507291319398_Lti.Designer.cs">
+      <DependentUpon>201507291319398_Lti.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508070803099_Sandbox.cs" />
+    <Compile Include="Migrations\201508070803099_Sandbox.Designer.cs">
+      <DependentUpon>201508070803099_Sandbox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508110641479_AddStatus.cs" />
+    <Compile Include="Migrations\201508110641479_AddStatus.Designer.cs">
+      <DependentUpon>201508110641479_AddStatus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508141111366_UserSolution_TimestampIndex.cs" />
+    <Compile Include="Migrations\201508141111366_UserSolution_TimestampIndex.Designer.cs">
+      <DependentUpon>201508141111366_UserSolution_TimestampIndex.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201509021133351_AddInfoAboutStudent.cs" />
+    <Compile Include="Migrations\201509021133351_AddInfoAboutStudent.Designer.cs">
+      <DependentUpon>201509021133351_AddInfoAboutStudent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201510071331139_RestorePassword.cs" />
+    <Compile Include="Migrations\201510071331139_RestorePassword.Designer.cs">
+      <DependentUpon>201510071331139_RestorePassword.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201512021145426_QuizStatisticsIndex.cs" />
+    <Compile Include="Migrations\201512021145426_QuizStatisticsIndex.Designer.cs">
+      <DependentUpon>201512021145426_QuizStatisticsIndex.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201512210801368_ChangeVisitsIndex.cs" />
+    <Compile Include="Migrations\201512210801368_ChangeVisitsIndex.Designer.cs">
+      <DependentUpon>201512210801368_ChangeVisitsIndex.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201512210814206_RenameTableVisitersToVisits.cs" />
+    <Compile Include="Migrations\201512210814206_RenameTableVisitersToVisits.Designer.cs">
+      <DependentUpon>201512210814206_RenameTableVisitersToVisits.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201512240735282_CustomRoleSystem.cs" />
+    <Compile Include="Migrations\201512240735282_CustomRoleSystem.Designer.cs">
+      <DependentUpon>201512240735282_CustomRoleSystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201602090753330_UpgradeToAspNetEFIdentity2.cs" />
+    <Compile Include="Migrations\201602090753330_UpgradeToAspNetEFIdentity2.Designer.cs">
+      <DependentUpon>201602090753330_UpgradeToAspNetEFIdentity2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201602291854260_AddComments.cs" />
+    <Compile Include="Migrations\201602291854260_AddComments.Designer.cs">
+      <DependentUpon>201602291854260_AddComments.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201602291950318_AddUserAvatars.cs" />
+    <Compile Include="Migrations\201602291950318_AddUserAvatars.Designer.cs">
+      <DependentUpon>201602291950318_AddUserAvatars.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201603210641239_AddUserRegistrationTimestamp.cs" />
+    <Compile Include="Migrations\201603210641239_AddUserRegistrationTimestamp.Designer.cs">
+      <DependentUpon>201603210641239_AddUserRegistrationTimestamp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201603230005459_SlideIdIsGuid.cs" />
+    <Compile Include="Migrations\201603230005459_SlideIdIsGuid.Designer.cs">
+      <DependentUpon>201603230005459_SlideIdIsGuid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604210836401_AddQuizVersions.cs" />
+    <Compile Include="Migrations\201604210836401_AddQuizVersions.Designer.cs">
+      <DependentUpon>201604210836401_AddQuizVersions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604280922514_AddCourseVersions.cs" />
+    <Compile Include="Migrations\201604280922514_AddCourseVersions.Designer.cs">
+      <DependentUpon>201604280922514_AddCourseVersions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201605310936533_AddManualQuizChecks.cs" />
+    <Compile Include="Migrations\201605310936533_AddManualQuizChecks.Designer.cs">
+      <DependentUpon>201605310936533_AddManualQuizChecks.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607110843430_AddGroups.cs" />
+    <Compile Include="Migrations\201607110843430_AddGroups.Designer.cs">
+      <DependentUpon>201607110843430_AddGroups.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607121102193_RemoveOldUserGroups.cs" />
+    <Compile Include="Migrations\201607121102193_RemoveOldUserGroups.Designer.cs">
+      <DependentUpon>201607121102193_RemoveOldUserGroups.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608231750470_SlideChecking.cs" />
+    <Compile Include="Migrations\201608231750470_SlideChecking.Designer.cs">
+      <DependentUpon>201608231750470_SlideChecking.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608301626429_ExerciseChecking.cs" />
+    <Compile Include="Migrations\201608301626429_ExerciseChecking.Designer.cs">
+      <DependentUpon>201608301626429_ExerciseChecking.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608301843391_MultipleManualExerciseCheckings.cs" />
+    <Compile Include="Migrations\201608301843391_MultipleManualExerciseCheckings.Designer.cs">
+      <DependentUpon>201608301843391_MultipleManualExerciseCheckings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608310552232_ChangeExerciseCodeReview.cs" />
+    <Compile Include="Migrations\201608310552232_ChangeExerciseCodeReview.Designer.cs">
+      <DependentUpon>201608310552232_ChangeExerciseCodeReview.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609070626183_ChangeCascadeDeletions.cs" />
+    <Compile Include="Migrations\201609070626183_ChangeCascadeDeletions.Designer.cs">
+      <DependentUpon>201609070626183_ChangeCascadeDeletions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609081814377_AddFutherCheckingProhibitionAndIndexes.cs" />
+    <Compile Include="Migrations\201609081814377_AddFutherCheckingProhibitionAndIndexes.Designer.cs">
+      <DependentUpon>201609081814377_AddFutherCheckingProhibitionAndIndexes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609151039376_AddIndexes.cs" />
+    <Compile Include="Migrations\201609151039376_AddIndexes.Designer.cs">
+      <DependentUpon>201609151039376_AddIndexes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609210830542_AddUserExerciseSolutionIndexes.cs" />
+    <Compile Include="Migrations\201609210830542_AddUserExerciseSolutionIndexes.Designer.cs">
+      <DependentUpon>201609210830542_AddUserExerciseSolutionIndexes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609211423088_ExtractAutomaticCheckingIsRightAnswer.cs" />
+    <Compile Include="Migrations\201609211423088_ExtractAutomaticCheckingIsRightAnswer.Designer.cs">
+      <DependentUpon>201609211423088_ExtractAutomaticCheckingIsRightAnswer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610200703516_AddUsersFullTextIndex.cs" />
+    <Compile Include="Migrations\201610200703516_AddUsersFullTextIndex.Designer.cs">
+      <DependentUpon>201610200703516_AddUsersFullTextIndex.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611161930289_RemoveTextBlobLimits.cs" />
+    <Compile Include="Migrations\201611161930289_RemoveTextBlobLimits.Designer.cs">
+      <DependentUpon>201611161930289_RemoveTextBlobLimits.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612200725559_EnablingManualCheckingForGroups.cs" />
+    <Compile Include="Migrations\201612200725559_EnablingManualCheckingForGroups.Designer.cs">
+      <DependentUpon>201612200725559_EnablingManualCheckingForGroups.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612262110312_AddCertificates.cs" />
+    <Compile Include="Migrations\201612262110312_AddCertificates.Designer.cs">
+      <DependentUpon>201612262110312_AddCertificates.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701180912464_AddPreviewedCertificates.cs" />
+    <Compile Include="Migrations\201701180912464_AddPreviewedCertificates.Designer.cs">
+      <DependentUpon>201701180912464_AddPreviewedCertificates.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701302151207_CreateUnits.cs" />
+    <Compile Include="Migrations\201701302151207_CreateUnits.Designer.cs">
+      <DependentUpon>201701302151207_CreateUnits.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701310057267_AddAdditionalScores.cs" />
+    <Compile Include="Migrations\201701310057267_AddAdditionalScores.Designer.cs">
+      <DependentUpon>201701310057267_AddAdditionalScores.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201702061047104_AddEnabledAdditionalScoringGroups.cs" />
+    <Compile Include="Migrations\201702061047104_AddEnabledAdditionalScoringGroups.Designer.cs">
+      <DependentUpon>201702061047104_AddEnabledAdditionalScoringGroups.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201702210620147_AddIsManualCheckingEnabledForOldSolutions.cs" />
+    <Compile Include="Migrations\201702210620147_AddIsManualCheckingEnabledForOldSolutions.Designer.cs">
+      <DependentUpon>201702210620147_AddIsManualCheckingEnabledForOldSolutions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704061850482_AddHiddenFromTopComments.cs" />
+    <Compile Include="Migrations\201704061850482_AddHiddenFromTopComments.Designer.cs">
+      <DependentUpon>201704061850482_AddHiddenFromTopComments.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704070801464_AddGraderClients.cs" />
+    <Compile Include="Migrations\201704070801464_AddGraderClients.Designer.cs">
+      <DependentUpon>201704070801464_AddGraderClients.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704201221554_AddNotifications.cs" />
+    <Compile Include="Migrations\201704201221554_AddNotifications.Designer.cs">
+      <DependentUpon>201704201221554_AddNotifications.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704271654234_TelegramNotificationsAndIndexes.cs" />
+    <Compile Include="Migrations\201704271654234_TelegramNotificationsAndIndexes.Designer.cs">
+      <DependentUpon>201704271654234_TelegramNotificationsAndIndexes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704280544000_AddNotificationsFields.cs" />
+    <Compile Include="Migrations\201704280544000_AddNotificationsFields.Designer.cs">
+      <DependentUpon>201704280544000_AddNotificationsFields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\AdditionalScore.cs" />
+    <Compile Include="Models\ApplicationUser.cs" />
+    <Compile Include="Models\Certificate.cs" />
+    <Compile Include="Models\CertificateTemplate.cs" />
+    <Compile Include="Models\Comment.cs" />
+    <Compile Include="Models\CommentLike.cs" />
+    <Compile Include="Models\CommentPolicy.cs" />
+    <Compile Include="Models\CourseVersion.cs" />
+    <Compile Include="Models\EnabledAdditionalScoringGroup.cs" />
+    <Compile Include="Models\ExerciseCodeReview.cs" />
+    <Compile Include="Models\ExerciseSolutionByGrader.cs" />
+    <Compile Include="Models\GraderClient.cs" />
+    <Compile Include="Models\Group.cs" />
+    <Compile Include="Models\GroupMember.cs" />
+    <Compile Include="Models\ISlideAction.cs" />
+    <Compile Include="Models\Like.cs" />
+    <Compile Include="Models\LmsRoles.cs" />
+    <Compile Include="Models\LtiConsumer.cs" />
+    <Compile Include="Models\LtiSlideRequest.cs" />
+    <Compile Include="Models\Notifications.cs" />
+    <Compile Include="Models\QuizVersion.cs" />
+    <Compile Include="Models\RestoreRequest.cs" />
+    <Compile Include="Models\SlideChecking.cs" />
+    <Compile Include="Models\SlideHint.cs" />
+    <Compile Include="Models\SlideRate.cs" />
+    <Compile Include="Models\TextBlob.cs" />
+    <Compile Include="Models\UnitAppearance.cs" />
+    <Compile Include="Models\UserExerciseSubmission.cs" />
+    <Compile Include="Models\UserQuestion.cs" />
+    <Compile Include="Models\UserQuiz.cs" />
+    <Compile Include="Models\UserRole.cs" />
+    <Compile Include="UserRolesInfo.cs" />
+    <Compile Include="UserSearchQueryModel.cs" />
+    <Compile Include="Models\Visit.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201407111234255_InitialCreate.resx">
+      <DependentUpon>201407111234255_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201407180649039_SolutionLikes.resx">
+      <DependentUpon>201407180649039_SolutionLikes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201407180807286_AddQuestions.resx">
+      <DependentUpon>201407180807286_AddQuestions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201407261530409_NewAnalytics.resx">
+      <DependentUpon>201407261530409_NewAnalytics.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201407290538592_ChangeSlideId.resx">
+      <DependentUpon>201407290538592_ChangeSlideId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408031111210_MoreSpace_For_UserSolution_Fields.resx">
+      <DependentUpon>201408031111210_MoreSpace_For_UserSolution_Fields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408050611273_AddQuizzes.resx">
+      <DependentUpon>201408050611273_AddQuizzes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408050909459_DeletedRequriedFieldsInQuizzes.resx">
+      <DependentUpon>201408050909459_DeletedRequriedFieldsInQuizzes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408070554397_AddHintsLike.resx">
+      <DependentUpon>201408070554397_AddHintsLike.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408201208379_AddIsRightQuizBlock.resx">
+      <DependentUpon>201408201208379_AddIsRightQuizBlock.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408220628510_AddUnitAppearance.resx">
+      <DependentUpon>201408220628510_AddUnitAppearance.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408250717469_AddUsersGroupName.resx">
+      <DependentUpon>201408250717469_AddUsersGroupName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408260518531_Cascading.resx">
+      <DependentUpon>201408260518531_Cascading.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201409031100489_VisitTimestamp.resx">
+      <DependentUpon>201409031100489_VisitTimestamp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201409260240008_AddQuestionSlideId.resx">
+      <DependentUpon>201409260240008_AddQuestionSlideId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410192113426_AddUserQuizDroppedColumn.resx">
+      <DependentUpon>201410192113426_AddUserQuizDroppedColumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410221523323_add index.resx">
+      <DependentUpon>201410221523323_add index.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410280605055_add index for Quizzes.resx">
+      <DependentUpon>201410280605055_add index for Quizzes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201411140847550_extract large text fields.resx">
+      <DependentUpon>201411140847550_extract large text fields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201412040905024_TextBlobLimits.resx">
+      <DependentUpon>201412040905024_TextBlobLimits.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201502041429186_AcceptedSolutionsIndex.resx">
+      <DependentUpon>201502041429186_AcceptedSolutionsIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503021039386_RemoveTextBlobTextRequired.resx">
+      <DependentUpon>201503021039386_RemoveTextBlobTextRequired.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503231319119_ExecutionServiceName.resx">
+      <DependentUpon>201503231319119_ExecutionServiceName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504070546498_VisitResults.resx">
+      <DependentUpon>201504070546498_VisitResults.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504070552041_AddIsPassed.resx">
+      <DependentUpon>201504070552041_AddIsPassed.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201507291319398_Lti.resx">
+      <DependentUpon>201507291319398_Lti.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508070803099_Sandbox.resx">
+      <DependentUpon>201508070803099_Sandbox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508110641479_AddStatus.resx">
+      <DependentUpon>201508110641479_AddStatus.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508141111366_UserSolution_TimestampIndex.resx">
+      <DependentUpon>201508141111366_UserSolution_TimestampIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201509021133351_AddInfoAboutStudent.resx">
+      <DependentUpon>201509021133351_AddInfoAboutStudent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201510071331139_RestorePassword.resx">
+      <DependentUpon>201510071331139_RestorePassword.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512021145426_QuizStatisticsIndex.resx">
+      <DependentUpon>201512021145426_QuizStatisticsIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512210801368_ChangeVisitsIndex.resx">
+      <DependentUpon>201512210801368_ChangeVisitsIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512210814206_RenameTableVisitersToVisits.resx">
+      <DependentUpon>201512210814206_RenameTableVisitersToVisits.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512240735282_CustomRoleSystem.resx">
+      <DependentUpon>201512240735282_CustomRoleSystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201602090753330_UpgradeToAspNetEFIdentity2.resx">
+      <DependentUpon>201602090753330_UpgradeToAspNetEFIdentity2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201602291854260_AddComments.resx">
+      <DependentUpon>201602291854260_AddComments.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201602291950318_AddUserAvatars.resx">
+      <DependentUpon>201602291950318_AddUserAvatars.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201603210641239_AddUserRegistrationTimestamp.resx">
+      <DependentUpon>201603210641239_AddUserRegistrationTimestamp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201603230005459_SlideIdIsGuid.resx">
+      <DependentUpon>201603230005459_SlideIdIsGuid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604210836401_AddQuizVersions.resx">
+      <DependentUpon>201604210836401_AddQuizVersions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604280922514_AddCourseVersions.resx">
+      <DependentUpon>201604280922514_AddCourseVersions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605310936533_AddManualQuizChecks.resx">
+      <DependentUpon>201605310936533_AddManualQuizChecks.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607110843430_AddGroups.resx">
+      <DependentUpon>201607110843430_AddGroups.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607121102193_RemoveOldUserGroups.resx">
+      <DependentUpon>201607121102193_RemoveOldUserGroups.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608231750470_SlideChecking.resx">
+      <DependentUpon>201608231750470_SlideChecking.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608301626429_ExerciseChecking.resx">
+      <DependentUpon>201608301626429_ExerciseChecking.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608301843391_MultipleManualExerciseCheckings.resx">
+      <DependentUpon>201608301843391_MultipleManualExerciseCheckings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608310552232_ChangeExerciseCodeReview.resx">
+      <DependentUpon>201608310552232_ChangeExerciseCodeReview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609070626183_ChangeCascadeDeletions.resx">
+      <DependentUpon>201609070626183_ChangeCascadeDeletions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609081814377_AddFutherCheckingProhibitionAndIndexes.resx">
+      <DependentUpon>201609081814377_AddFutherCheckingProhibitionAndIndexes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609151039376_AddIndexes.resx">
+      <DependentUpon>201609151039376_AddIndexes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609210830542_AddUserExerciseSolutionIndexes.resx">
+      <DependentUpon>201609210830542_AddUserExerciseSolutionIndexes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609211423088_ExtractAutomaticCheckingIsRightAnswer.resx">
+      <DependentUpon>201609211423088_ExtractAutomaticCheckingIsRightAnswer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610200703516_AddUsersFullTextIndex.resx">
+      <DependentUpon>201610200703516_AddUsersFullTextIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611161930289_RemoveTextBlobLimits.resx">
+      <DependentUpon>201611161930289_RemoveTextBlobLimits.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612200725559_EnablingManualCheckingForGroups.resx">
+      <DependentUpon>201612200725559_EnablingManualCheckingForGroups.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612262110312_AddCertificates.resx">
+      <DependentUpon>201612262110312_AddCertificates.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701180912464_AddPreviewedCertificates.resx">
+      <DependentUpon>201701180912464_AddPreviewedCertificates.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701302151207_CreateUnits.resx">
+      <DependentUpon>201701302151207_CreateUnits.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701310057267_AddAdditionalScores.resx">
+      <DependentUpon>201701310057267_AddAdditionalScores.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702061047104_AddEnabledAdditionalScoringGroups.resx">
+      <DependentUpon>201702061047104_AddEnabledAdditionalScoringGroups.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702210620147_AddIsManualCheckingEnabledForOldSolutions.resx">
+      <DependentUpon>201702210620147_AddIsManualCheckingEnabledForOldSolutions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704061850482_AddHiddenFromTopComments.resx">
+      <DependentUpon>201704061850482_AddHiddenFromTopComments.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704070801464_AddGraderClients.resx">
+      <DependentUpon>201704070801464_AddGraderClients.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704201221554_AddNotifications.resx">
+      <DependentUpon>201704201221554_AddNotifications.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704271654234_TelegramNotificationsAndIndexes.resx">
+      <DependentUpon>201704271654234_TelegramNotificationsAndIndexes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704280544000_AddNotificationsFields.resx">
+      <DependentUpon>201704280544000_AddNotificationsFields.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
+      <Project>{26580595-F4DC-41EE-BA66-0EF4692243AF}</Project>
+      <Name>RunCsJob.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\uLearn\uLearn.csproj">
+      <Project>{333DD5A7-9955-46CB-8905-79E800F2B435}</Project>
+      <Name>uLearn</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

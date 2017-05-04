@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using CommandLine;
+using uLearn.Extensions;
 
 namespace uLearn.CourseTool
 {
@@ -31,9 +32,9 @@ namespace uLearn.CourseTool
 			set { profile = value; }
 		}
 
-		public string ConfigFile { get { return Dir + "/config.xml"; } }
+		public string ConfigFile => Dir + "/config.xml";
 
-		public Config Config { get { return config.Value; } }
+		public Config Config => config.Value;
 		private readonly Lazy<Config> config;
 
 		public void InitializeDirectoryIfNotYet()

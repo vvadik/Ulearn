@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using RunCsJob.Api;
+using uLearn.Extensions;
 
 namespace uLearn.Model.Blocks
 {

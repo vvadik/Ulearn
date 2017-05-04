@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using ApprovalTests;
-using ApprovalTests.Reporters;
 using NUnit.Framework;
+using uLearn.Extensions;
 using uLearn.Model.Blocks;
 
 namespace uLearn.CSharp
@@ -79,7 +77,7 @@ namespace uLearn.CSharp
 			var code = LoadCode();
 			int index;
 			code = new CsMembersRemover().RemoveSolution(code, new Label { Name = "Main" }, out index);
-			Approvals.Verify(String.Format("solution index: {0}\r\nCode:\r\n{1}", index, code));
+			Approvals.Verify($"solution index: {index}\r\nCode:\r\n{code}");
 		}
 
 		[Test]
@@ -88,7 +86,7 @@ namespace uLearn.CSharp
 			var code = LoadCode();
 			int index;
 			code = new CsMembersRemover().RemoveSolution(code, new Label { Name = "Main", OnlyBody = true }, out index);
-			Approvals.Verify(String.Format("solution index: {0}\r\nCode:\r\n{1}", index, code));
+			Approvals.Verify($"solution index: {index}\r\nCode:\r\n{code}");
 		}
 
 		[Test]

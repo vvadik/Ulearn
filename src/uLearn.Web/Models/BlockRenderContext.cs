@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Database.Models;
 using uLearn.Model.Blocks;
 
 namespace uLearn.Web.Models

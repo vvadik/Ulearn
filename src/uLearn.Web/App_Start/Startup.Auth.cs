@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Web.Configuration;
+using Database.DataContexts;
+using Database.Extensions;
+using Database.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Owin;
-using uLearn.Web.DataContexts;
-using uLearn.Web.Extensions;
 using uLearn.Web.LTI;
 using uLearn.Web.Microsoft.Owin.Security.VK;
-using uLearn.Web.Models;
 
 namespace uLearn.Web
 {

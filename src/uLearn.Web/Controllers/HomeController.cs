@@ -1,8 +1,7 @@
 ﻿using System.Web.Mvc;
+using Database.DataContexts;
+using Database.Models;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using uLearn.Web.DataContexts;
-using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {

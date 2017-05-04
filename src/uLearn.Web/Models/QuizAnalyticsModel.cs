@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using uLearn.Quizes;
+using Database.Models;
 
 namespace uLearn.Web.Models
 {

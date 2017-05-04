@@ -4,12 +4,11 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Http;
 using System.Web.Mvc;
+using Database.DataContexts;
+using Database.Models;
 using log4net;
-using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
-using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
@@ -18,13 +17,8 @@ namespace uLearn.Web.Controllers
 		private static readonly ILog log = LogManager.GetLogger(typeof(GraderController));
 
 		public GradersRepo gradersRepo;
-
+		
 		public GraderController()
-			: this(WebCourseManager.Instance)
-		{
-		}
-
-		public GraderController(CourseManager courseManager) : base(courseManager)
 		{
 			gradersRepo = new GradersRepo(db);
 		}

@@ -6,11 +6,12 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using Database.DataContexts;
+using Database.Models;
 using Exceptions;
 using log4net;
 using Microsoft.AspNet.Identity;
 using SendGrid;
-using uLearn.Web.DataContexts;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers

@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Principal;
-using System.Web;
 using System.Web.Mvc;
 using ApprovalUtilities.Utilities;
+using Database;
+using Database.DataContexts;
+using Database.Extensions;
+using Database.Models;
 using Microsoft.AspNet.Identity;
+using uLearn.Extensions;
 using uLearn.Quizes;
-using uLearn.Web.DataContexts;
-using uLearn.Web.Extensions;
-using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {

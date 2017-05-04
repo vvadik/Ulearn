@@ -9,6 +9,7 @@ using System.Threading;
 using NUnit.Framework;
 using RunCsJob;
 using RunCsJob.Api;
+using uLearn.Extensions;
 using uLearn.Model.Blocks;
 
 // ReSharper disable MemberCanBePrivate.Global

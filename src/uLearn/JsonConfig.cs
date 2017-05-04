@@ -11,7 +11,7 @@ namespace uLearn
 		{
 			return new JsonSerializerSettings
 			{
-				Binder = new DisplayNameSerializationBinder(
+				SerializationBinder = new DisplayNameSerializationBinder(
 					Assembly
 						.GetAssembly(typeof(RunnerSubmission))
 						.GetTypes()

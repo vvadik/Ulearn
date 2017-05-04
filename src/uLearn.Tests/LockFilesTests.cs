@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using FluentAssertions;
 using NUnit.Framework;
+using uLearn.Extensions;
 
 namespace uLearn
 {

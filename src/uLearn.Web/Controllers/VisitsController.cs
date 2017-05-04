@@ -4,11 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using CourseManager;
+using Database.DataContexts;
+using Database.Models;
 using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
-using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
-using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {

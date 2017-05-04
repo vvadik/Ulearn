@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Web.Mvc;
+using CourseManager;
+using Database.DataContexts;
+using Database.Extensions;
+using Database.Models;
 using Microsoft.AspNet.Identity;
+using uLearn.Extensions;
 using uLearn.Quizes;
-using uLearn.Web.DataContexts;
-using uLearn.Web.Extensions;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -26,10 +29,10 @@ namespace uLearn.Web.Controllers
 		{
 			var db = new ULearnDb();
 			unitsRepo = new UnitsRepo(db);
-			solutionsRepo = new UserSolutionsRepo(db);
+			solutionsRepo = new UserSolutionsRepo(db, courseManager);
 			visitsRepo = new VisitsRepo(db);
 			userQuizzesRepo = new UserQuizzesRepo(db);
-			groupsRepo = new GroupsRepo(db);
+			groupsRepo = new GroupsRepo(db, courseManager);
 			additionalScoresRepo = new AdditionalScoresRepo(db);
 		}
 

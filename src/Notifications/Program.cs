@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
+using CourseManager;
+using Database.DataContexts;
+using Database.Models;
 using log4net;
 using Telegram.Bot;
-using uLearn;
-using uLearn.Web;
-using uLearn.Web.DataContexts;
-using uLearn.Web.Models;
 
 namespace Notifications
 {

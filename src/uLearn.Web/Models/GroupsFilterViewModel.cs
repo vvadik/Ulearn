@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Database.Models;
 
 namespace uLearn.Web.Models
 {

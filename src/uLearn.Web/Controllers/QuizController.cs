@@ -7,9 +7,12 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using CourseManager;
+using Database;
+using Database.DataContexts;
+using Database.Models;
 using log4net;
 using uLearn.Quizes;
-using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
@@ -25,26 +28,21 @@ namespace uLearn.Web.Controllers
 		private const int MAX_DROPS_COUNT = 1;
 		public const int MAX_FILLINBLOCK_SIZE = 1024;
 
-		private readonly CourseManager courseManager;
 		private readonly ULearnDb db = new ULearnDb();
+		private readonly CourseManager courseManager = WebCourseManager.Instance;
+		
 		private readonly UserQuizzesRepo userQuizzesRepo;
 		private readonly VisitsRepo visitsRepo;
 		private readonly QuizzesRepo quizzesRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
-
+		
 		public QuizController()
-			: this(WebCourseManager.Instance)
 		{
-		}
-
-		public QuizController(CourseManager courseManager)
-		{
-			this.courseManager = courseManager;
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			visitsRepo = new VisitsRepo(db);
 			quizzesRepo = new QuizzesRepo(db);
-			groupsRepo = new GroupsRepo(db);
+			groupsRepo = new GroupsRepo(db, courseManager);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 		}
 

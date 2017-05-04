@@ -69,8 +69,8 @@ namespace uLearn.CourseTool
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
 
-			var f1 = string.Format("{0}/{1}", testFolderName, 1);
-			var f2 = string.Format("{0}/{1}", testFolderName, 2);
+			var f1 = $"{testFolderName}/{1}";
+			var f2 = $"{testFolderName}/{2}";
 			edxCourse.Save(f1);
 			EdxCourse.Load(f1).Save(f2);
 
@@ -171,7 +171,7 @@ namespace uLearn.CourseTool
 		public void patch_createsUnsortedChapter_withNewSlides()
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
-			var olxPath = string.Format("{0}/{1}", testFolderName, course.Id);
+			var olxPath = $"{testFolderName}/{course.Id}";
 			edxCourse.Save(olxPath);
 
 			new OlxPatcher(olxPath).PatchVerticals(edxCourse, new[] { aTextSlide }

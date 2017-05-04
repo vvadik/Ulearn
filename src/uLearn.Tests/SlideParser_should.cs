@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using uLearn.Extensions;
 using uLearn.Model.Blocks;
 
 namespace uLearn.CSharp

@@ -26,6 +26,7 @@ namespace uLearn.Web.Views.Course
     using System.Web.Security;
     using System.Web.UI;
     using System.Web.WebPages;
+    using Database.Models;
     using uLearn;
     using uLearn.Model.Blocks;
     using uLearn.Quizes;

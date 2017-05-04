@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Database.DataContexts;
+using Database.Models;
 using log4net;
 using LtiLibrary.Owin.Security.Lti.Provider;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
-using uLearn.Web.DataContexts;
-using uLearn.Web.Models;
 
 namespace uLearn.Web.LTI
 {

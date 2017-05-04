@@ -64,7 +64,7 @@ namespace uLearn.CourseTool
 
 		private Video LoadVideoInfo()
 		{
-			var videoFile = string.Format("{0}/{1}", Dir, Config.Video);
+			var videoFile = $"{Dir}/{Config.Video}";
 			return File.Exists(videoFile)
 				? JsonConvert.DeserializeObject<Video>(File.ReadAllText(Config.Video))
 				: new Video { Records = new Record[0] };

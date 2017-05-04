@@ -1,6 +1,7 @@
 using System.IO;
 using ApprovalTests;
 using NUnit.Framework;
+using uLearn.Extensions;
 
 namespace uLearn.CourseTool
 {

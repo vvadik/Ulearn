@@ -5,8 +5,12 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using CourseManager;
+using Database;
+using Database.DataContexts;
+using Database.Extensions;
+using Database.Models;
 using Microsoft.AspNet.Identity;
-using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -17,7 +21,8 @@ namespace uLearn.Web.Controllers
 	public class AccountController : Controller
 	{
 		private readonly ULearnDb db;
-		private readonly CourseManager courseManager;
+		private readonly CourseManager courseManager = WebCourseManager.Instance;
+
 		private UserManager<ApplicationUser> userManager;
 		private readonly UsersRepo usersRepo;
 		private readonly UserRolesRepo userRolesRepo;
@@ -28,12 +33,12 @@ namespace uLearn.Web.Controllers
 		public AccountController()
 		{
 			db = new ULearnDb();
+
 			userManager = new ULearnUserManager(db);
-			courseManager = WebCourseManager.Instance;
 			usersRepo = new UsersRepo(db);
 			userRolesRepo = new UserRolesRepo(db);
-			groupsRepo = new GroupsRepo(db);
-			certificatesRepo = new CertificatesRepo(db);
+			groupsRepo = new GroupsRepo(db, courseManager);
+			certificatesRepo = new CertificatesRepo(db, courseManager);
 			visitsRepo = new VisitsRepo(db);
 		}
 

@@ -4,16 +4,18 @@ using System.Collections.Immutable;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Web;
-using System.Web.Http;
 using System.Web.Mvc;
+using CourseManager;
+using Database;
+using Database.DataContexts;
+using Database.Extensions;
+using Database.Models;
 using Microsoft.AspNet.Identity;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using uLearn.Extensions;
 using uLearn.Quizes;
-using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Helpers;
@@ -24,25 +26,27 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize(MinAccessLevel = CourseRole.Student)]
 	public class AnalyticsController : JsonDataContractController
 	{
-		private readonly ULearnDb db = new ULearnDb();
+		private readonly ULearnDb db;
 		private readonly CourseManager courseManager;
+
 		private readonly VisitsRepo visitsRepo;
 		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly UsersRepo usersRepo;
 		private readonly AdditionalScoresRepo additionalScoresRepo;
 
-		public AnalyticsController()
-			: this(WebCourseManager.Instance)
+		public AnalyticsController() : this(new ULearnDb(), WebCourseManager.Instance)
 		{
 		}
 
-		public AnalyticsController(CourseManager courseManager)
+		public AnalyticsController(ULearnDb db, CourseManager courseManager)
 		{
+			this.db = db;
 			this.courseManager = courseManager;
+
 			additionalScoresRepo = new AdditionalScoresRepo(db);
-			userSolutionsRepo = new UserSolutionsRepo(db);
-			groupsRepo = new GroupsRepo(db);
+			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
+			groupsRepo = new GroupsRepo(db, courseManager);
 			usersRepo = new UsersRepo(db);
 			visitsRepo = new VisitsRepo(db);
 		}

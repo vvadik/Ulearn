@@ -7,6 +7,7 @@ using log4net;
 using Newtonsoft.Json;
 using RunCsJob.Api;
 using uLearn;
+using uLearn.Extensions;
 
 namespace RunCsJob
 {

@@ -1,10 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Xml.Serialization;
-using ApprovalTests.Core;
 using ApprovalTests.Reporters;
 using FluentAssertions;
 using NUnit.Framework;
+using uLearn.Extensions;
 using uLearn.Model.Blocks;
 
 namespace uLearn.Quizes

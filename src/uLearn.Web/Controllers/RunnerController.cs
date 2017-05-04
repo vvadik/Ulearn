@@ -7,10 +7,11 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using CourseManager;
+using Database.DataContexts;
+using Database.Models;
 using log4net;
 using RunCsJob.Api;
-using uLearn.Web.DataContexts;
-using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
@@ -18,8 +19,13 @@ namespace uLearn.Web.Controllers
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(RunnerController));
 
-		private readonly UserSolutionsRepo userSolutionsRepo = new UserSolutionsRepo(new ULearnDb());
+		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
+
+		public RunnerController()
+		{
+			userSolutionsRepo = new UserSolutionsRepo(new ULearnDb(), courseManager);
+		}
 
 		[HttpGet]
 		[Route("GetSubmissions")]
@@ -29,7 +35,7 @@ namespace uLearn.Web.Controllers
 			var sw = Stopwatch.StartNew();
 			while (true)
 			{
-				var repo = new UserSolutionsRepo(new ULearnDb());
+				var repo = new UserSolutionsRepo(new ULearnDb(), courseManager);
 				var submissions = await repo.GetUnhandledSubmissions(count);
 				if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(15))
 				{

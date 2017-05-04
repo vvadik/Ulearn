@@ -2,8 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using CourseManager;
+using Database.DataContexts;
+using Database.Models;
 using Microsoft.AspNet.Identity;
-using uLearn.Web.DataContexts;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 
@@ -12,10 +14,15 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 	public class SandboxController : Controller
 	{
-		private readonly UserSolutionsRepo solutionsRepo = new UserSolutionsRepo(new ULearnDb());
+		private readonly UserSolutionsRepo solutionsRepo;
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
 		private static readonly TimeSpan timeout = TimeSpan.FromSeconds(30);
+
+		public SandboxController()
+		{
+			solutionsRepo = new UserSolutionsRepo(new ULearnDb(), courseManager);
+		}
 
 		public ActionResult Index(int max = 200, int skip = 0)
 		{

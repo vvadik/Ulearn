@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using System.Web;
+using Database.DataContexts;
+using Database.Extensions;
+using Database.Models;
 using log4net;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
-using uLearn.Web.DataContexts;
-using uLearn.Web.Extensions;
-using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {

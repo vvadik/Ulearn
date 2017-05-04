@@ -1,4 +1,6 @@
-﻿namespace uLearn.Web.Models
+﻿using Database.Models;
+
+namespace uLearn.Web.Models
 {
 	public class ExerciseCodeReviewModel
 	{

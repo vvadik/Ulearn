@@ -26,6 +26,7 @@ namespace uLearn.Web.Views.Shared
     using System.Web.Security;
     using System.Web.UI;
     using System.Web.WebPages;
+    using Database.Models;
     using uLearn.Web;
     using uLearn.Web.Extensions;
     using uLearn.Web.Models;

@@ -6,10 +6,12 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Mvc;
+using Database.DataContexts;
+using Database.Extensions;
+using Database.Models;
 using Elmah;
 using Microsoft.AspNet.Identity;
 using uLearn.Model.Blocks;
-using uLearn.Web.DataContexts;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
@@ -20,15 +22,6 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class ExerciseController : BaseExerciseController
 	{
-		public ExerciseController()
-			: this(WebCourseManager.Instance)
-		{
-		}
-
-		public ExerciseController(CourseManager courseManager) : base(courseManager)
-		{
-		}
-
 		[System.Web.Mvc.HttpPost]
 		public async Task<ActionResult> RunSolution(string courseId, Guid slideId, bool isLti = false)
 		{
