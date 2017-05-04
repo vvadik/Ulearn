@@ -14,7 +14,7 @@ function uploadVisits(url) {
 			url: url,
 			data: localStorage['visits']
 		})
-		.success(function(ans) {
+		.done(function(ans) {
 			localStorage.removeItem('visits');
 		})
 		.fail(function(req) {

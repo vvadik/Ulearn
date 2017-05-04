@@ -10,7 +10,7 @@
 				__RequestVerificationToken: token
 			}
 		})
-		.success(function() {
+		.done(function() {
 			toggleClass(obj);
 		});
 }

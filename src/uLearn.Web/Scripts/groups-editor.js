@@ -23,7 +23,7 @@
 						groupId: groupId,
 						userId: item.id
 					}
-				}).success(function (data) {
+				}).done(function (data) {
 					if (data.added) {
 						var $members = $('.group[data-group-id=' + groupId + '] .members');
 
@@ -132,7 +132,7 @@
 				__RequestVerificationToken: token,
 				groupId: groupId,
 			}
-		}).success(function() {
+		}).done(function() {
 			window.location.reload(true);
 		});
 	});

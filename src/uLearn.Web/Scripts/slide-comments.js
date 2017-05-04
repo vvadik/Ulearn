@@ -58,7 +58,7 @@
 			url: url,
 			data: addAntiForgeryToken({}),
 			dataType: 'json'
-		}).success(function (data) {
+		}).done(function (data) {
 			$self.toggleClass('is-liked', data.liked);
 			$counter.text(data.likesCount > 0 ? data.likesCount : '');
 		});
@@ -102,7 +102,7 @@
 			type: 'post',
 			url: $form.attr('action'),
 			data: addAntiForgeryToken($form.serialize())
-		}).success(function (data) {
+		}).done(function (data) {
 			if (data.status && data.status !== 'ok') {
 				$button.removeAttr('disabled');
 				var $errorMessage = $('<div>').addClass('comment__error-message').text(data.message);
@@ -155,7 +155,7 @@
 			data: addAntiForgeryToken({
 				isApproved: ! isApproved,
 			})
-		}).success(function () {
+		}).done(function () {
 			$comment.toggleClass('not-approved', isApproved);
 		});
 	};
@@ -172,7 +172,7 @@
 			type: 'post',
 			url: url,
 			data: addAntiForgeryToken({})
-		}).success(function() {
+		}).done(function() {
 			var $commentReplacement = $('<div class="comment__removed">Комментарий удалён. <a href="">Восстановить</a></div>')
 				.attr('class', $comment.attr('class'));
 			$commentReplacement.find('a').click(function(e) {
@@ -181,7 +181,7 @@
 					type: 'post',
 					url: restoreUrl,
 					data: addAntiForgeryToken({})
-				}).success(function() {
+				}).done(function() {
 					$commentReplacement.remove();
 					$comment.show();
 				});
@@ -204,7 +204,7 @@
 			data: addAntiForgeryToken({
 				isPinned: ! isPinned,
 			})
-		}).success(function () {
+		}).done(function () {
 			$comment.toggleClass('is-pinned', ! isPinned);
 		});
 	};
@@ -223,7 +223,7 @@
 			data: addAntiForgeryToken({
 				isCorrect: ! isCorrect,
 			})
-		}).success(function () {
+		}).done(function () {
 			$comment.toggleClass('is-correct-answer', ! isCorrect);
 		});
 	};
@@ -254,7 +254,7 @@
 				data: addAntiForgeryToken({
 					newText: newText,
 				})
-			}).success(function (renderedCommentText) {
+			}).done(function (renderedCommentText) {
 				$commentText.replaceWith($(renderedCommentText));
 				// Remove form, restore comment view (see below)
 				$cancelButton.trigger('click');

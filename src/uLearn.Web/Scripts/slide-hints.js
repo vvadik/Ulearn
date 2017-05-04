@@ -11,7 +11,7 @@ function showHintForUser($button) {
         type: "POST",
         url: $button.data("url"),
         data: { courseId: $button.data("course-id"), slideId: slideId, isNeedNewHint: true }
-    }).success(function(ans) {
+    }).done(function(ans) {
         if (ans.Text === "Для слайда нет подсказок") {
         	$("#GetHintButton").notify(ans.Text, "noHints");
             return;
@@ -51,7 +51,7 @@ function getHints(courseId, slideId, hintsCount) {
         type: "POST",
         url: $("#GetHintButton").data("url"),
         data: { courseId: courseId, slideId: slideId, isNeedNewHint: false }
-    }).success(function (ans) {
+    }).done(function (ans) {
         if (ans.Text === "Для слайда нет подсказок") {
         	$("#GetHintButton").text(ans.Text);
             $("#GetHintButton").attr('disabled', 'disabled');
@@ -90,7 +90,7 @@ function likeHint(courseId, slideId, hintId) {
         type: "POST",
         url: $("#" + hintId + "likeHint").data("url"),
         data: { courseId: courseId, slideId: slideId, hintId: hintId }
-    }).success(function (ans) {
+    }).done(function (ans) {
         if (ans == "success") {
             $("#" + hintId + "likeHint").removeClass("btn-default").addClass("btn-primary");
         }

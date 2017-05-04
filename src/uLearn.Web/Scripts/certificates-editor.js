@@ -82,7 +82,7 @@
 				courseId: courseId,
 				templateId: templateId,
 			}
-		}).success(function () {
+		}).done(function () {
 			window.location.reload(true);
 		});
 	});

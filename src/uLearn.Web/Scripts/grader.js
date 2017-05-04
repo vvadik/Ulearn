@@ -6,7 +6,7 @@
 		var $loadingIcon = $self.parent().find('.loading-icon');
 		$loadingIcon.css('visibility', 'visible');
 
-		$.get($self.data('url')).success(function (data) {
+		$.get($self.data('url')).done(function (data) {
 			$modal.find('.modal-body').html(data);
 			$modal.modal('show');
 		}).always(function() {

@@ -65,7 +65,7 @@ $('.exercise__submission').on('click', '.run-solution-button', function () {
 		contentType:"text/plain",
 		url: $runButton.data("url"),
 		data: code
-	}).success(setResults)
+	}).done(setResults)
 	.fail(function (req) {
 		setSimpleResult($serviceError, req.status + " " + req.statusText);
 		console.log(req.responseText);

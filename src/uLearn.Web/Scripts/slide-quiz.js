@@ -37,7 +37,7 @@
 					answer: answer,
 					isLti: isLti
 				}
-			}).success(function (ans) {
+			}).done(function (ans) {
 				$("#quiz-status").text("Отправляем...");
 				window.scrollTo(0, 0);
 				window.location.reload();

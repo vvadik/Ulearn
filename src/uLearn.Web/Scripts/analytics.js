@@ -57,7 +57,7 @@
 			{
 				score: newScore
 			}, 'json')
-			.success(function(data) {
+			.done(function(data) {
 				if (data.status === 'ok') {
 					var $link = $input.parent().find('.additional-score-link');
 					$link.text(data.score === '' ? '—' : data.score);
@@ -66,7 +66,7 @@
 					errorOnUpdateAdditionalScore($input, data.error);
 				}
 			})
-			.error(function() {
+			.fail(function() {
 				errorOnUpdateAdditionalScore($input);
 			})
 			.always(function() {

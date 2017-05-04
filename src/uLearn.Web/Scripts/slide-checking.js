@@ -38,7 +38,7 @@
 			type: 'post',
 			url: $scoreForm.attr('action'),
 			data: postData
-		}).success(function (data) {
+		}).done(function (data) {
 			if (data.status && data.status !== 'ok') {
 				$status.addClass('error');
 				var error = '';
@@ -153,11 +153,11 @@
 		var comment = $self.data('value');
 		var $exerciseAddReviewBlock = $self.closest('.exercise__add-review');
 
-		$.post(url, {comment: comment}).success(function(data) {
+		$.post(url, {comment: comment}).done(function(data) {
 			var $data = $(data);
 			$('.exercise__top-review-comments.hidden').html($data.html());
 			updateTopReviewComments($exerciseAddReviewBlock);
-		}).error(function() {
+		}).fail(function() {
 			alert('Произошла ошибка при удалении комментария. Попробуйте повторить позже');
 		});
 
