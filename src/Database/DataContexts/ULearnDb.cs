@@ -70,6 +70,8 @@ namespace Database.DataContexts
 			CancelCascaseDeleting<CreatedGroupNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
 			CancelCascaseDeleting<PassedManualExerciseCheckingNotification, ManualExerciseChecking, int>(modelBuilder, c => c.Checking, c => c.CheckingId);
 			CancelCascaseDeleting<PassedManualQuizCheckingNotification, ManualQuizChecking, int>(modelBuilder, c => c.Checking, c => c.CheckingId);
+
+			CancelCascaseDeleting<XQueueWatcher, ApplicationUser, string>(modelBuilder, w => w.User, w => w.UserId);
 		}
 
 		private static void CancelCascaseDeleting<T1, T2, T3>(DbModelBuilder modelBuilder, Expression<Func<T1, T2>> oneWay, Expression<Func<T1, T3>> secondWay)
@@ -126,5 +128,8 @@ namespace Database.DataContexts
 		public DbSet<NotificationTransportSettings> NotificationTransportSettings { get; set; }
 		public DbSet<NotificationDelivery> NotificationDeliveries { get; set; }
 		public DbSet<Notification> Notifications { get; set; }
+
+		public DbSet<XQueueWatcher> XQueueWatchers { get; set; }
+		public DbSet<XQueueExerciseSubmission> XQueueExerciseSubmissions { get; set; }
 	}
 }

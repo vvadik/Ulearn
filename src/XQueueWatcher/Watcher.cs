@@ -10,15 +10,15 @@ namespace XQueueWatcher
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(Watcher));
 
-		private readonly string queueName;
+		public readonly Database.Models.XQueueWatcher watcher;
 		private readonly XQueueClient client;
 
 		public EventHandler<SubmissionEventArgs> OnSubmission;
 
-		public Watcher(string baseUrl, string queueName, string username, string password)
+		public Watcher(Database.Models.XQueueWatcher watcher)
 		{
-			client = new XQueueClient(baseUrl, username, password);
-			this.queueName = queueName;
+			client = new XQueueClient(watcher.BaseUrl, watcher.UserName, watcher.Password);
+			this.watcher = watcher;
 		}
 
 		public async Task Loop()
@@ -45,7 +45,7 @@ namespace XQueueWatcher
 
 		private async Task OneStep()
 		{
-			var submission = await client.GetSubmission(queueName);
+			var submission = await client.GetSubmission(watcher.QueueName);
 			if (submission == null)
 			{
 				return;

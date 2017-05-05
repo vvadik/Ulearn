@@ -23,7 +23,7 @@ namespace uLearn.Web.Controllers
 			gradersRepo = new GradersRepo(db);
 		}
 
-		[System.Web.Mvc.HttpPost]
+		[HttpPost]
 		public async Task<ActionResult> Submit(GraderSubmitRequest request)
 		{
 			if (string.IsNullOrEmpty(request.ClientUserId))

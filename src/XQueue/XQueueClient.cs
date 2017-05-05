@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using log4net;
+using Newtonsoft.Json;
 using uLearn;
 using uLearn.Extensions;
 using XQueue.Models;
@@ -42,6 +41,11 @@ namespace XQueue
 			};
 		}
 
+	    public XQueueClient(string baseUrl)
+		    : this(baseUrl, "", "")
+	    {
+	    }
+
 		private async Task<bool> TryLogin()
 		{
 			if (string.IsNullOrEmpty(username))
@@ -59,6 +63,7 @@ namespace XQueue
 			if (response.IsSuccessStatusCode)
 			{
 				log.Warn($"Unexpected response status code for login: {response.StatusCode}");
+				throw new Exception($"Unexpected response status code for login: {response.StatusCode}");
 			}
 			return response.StatusCode == HttpStatusCode.OK;
 		}
@@ -108,5 +113,23 @@ namespace XQueue
 
 			return null;
 		}
+
+	    public async Task<bool> PutResult(XQueueResult result)
+	    {
+			return await FuncUtils.TrySeveralTimesAsync(() => TryPutResult(result), 5, () => Task.Delay(TimeSpan.FromMilliseconds(1)));
+	    }
+
+	    public async Task<bool> TryPutResult(XQueueResult result)
+	    {
+			var content = JsonConvert.SerializeObject(result);
+			var response = await client.PostAsync(putResultUrl, new StringContent(content));
+			if (response.IsSuccessStatusCode)
+			{
+				log.Warn($"Unexpected response status code while putting results to xqueue: {response.StatusCode}");
+				throw new Exception($"Unexpected response status code while putting results to xqueue: {response.StatusCode}");
+			}
+
+			return true;
+	    }
 	}
 }

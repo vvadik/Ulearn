@@ -19,7 +19,7 @@ namespace XQueue.Models
 		public bool IsCorrect { get; set; }
 
 		[DataMember(Name = "score")]
-		public float Score { get; set; }
+		public double Score { get; set; }
 
 		[DataMember(Name = "msg")]
 		public string Message { get; set; }

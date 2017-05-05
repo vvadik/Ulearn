@@ -320,7 +320,7 @@ namespace Database.DataContexts
 			return db.UserExerciseSubmissions.Find(id);
 		}
 
-		protected List<UserExerciseSubmission> FindSubmissionsByIds(List<string> checkingsIds)
+		public List<UserExerciseSubmission> FindSubmissionsByIds(List<string> checkingsIds)
 		{
 			return db.UserExerciseSubmissions.Where(c => checkingsIds.Contains(c.Id.ToString())).ToList();
 		}

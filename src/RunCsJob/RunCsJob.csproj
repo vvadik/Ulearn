@@ -189,7 +189,6 @@
     <Compile Include="Tests.cs" />
     <Compile Include="SandboxRunner.cs" />
     <Compile Include="RunningResultsExtensions.cs" />
-    <Compile Include="HttpClientExtensions.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="RunCsJobProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

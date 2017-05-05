@@ -3,9 +3,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using uLearn;
 
-namespace RunCsJob
+namespace uLearn.Extensions
 {
 	public static class HttpClientExtensions
 	{
