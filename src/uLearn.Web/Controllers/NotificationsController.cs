@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using CourseManager;
+using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;

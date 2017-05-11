@@ -89,10 +89,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CourseManager\CourseManager.csproj">
-      <Project>{FB7DB30C-4406-42F4-A771-6F708AD02762}</Project>
-      <Name>CourseManager</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Database\Database.csproj">
       <Project>{95510835-0b21-4d99-a4d2-b8fc87761a3c}</Project>
       <Name>Database</Name>

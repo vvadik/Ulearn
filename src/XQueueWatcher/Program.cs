@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using CourseManager;
+using Database;
 using Database.DataContexts;
 using log4net;
 using uLearn;
 using uLearn.Extensions;
-using XQueue;
 
 namespace XQueueWatcher
 {

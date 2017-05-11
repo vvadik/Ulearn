@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using ApprovalUtilities.Utilities;
-using CourseManager;
 using Database;
 using Database.DataContexts;
 using Database.Extensions;

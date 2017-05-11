@@ -6,7 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using CourseManager;
+using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
-using CourseManager;
+using Database;
 using Database.DataContexts;
 using Database.Models;
 using log4net;

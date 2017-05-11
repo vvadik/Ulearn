@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using CourseManager;
+using Database;
 using Database.DataContexts;
 using Database.Models;
 using Microsoft.AspNet.Identity;

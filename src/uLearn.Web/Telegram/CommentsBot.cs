@@ -2,12 +2,11 @@
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
-using CourseManager;
+using Database;
 using Database.Models;
 using Elmah;
 using log4net;
 using Telegram.Bot.Types.Enums;
-using uLearn.Web.Models;
 
 namespace uLearn.Web.Telegram
 {

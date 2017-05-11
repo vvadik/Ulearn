@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using CourseManager;
+using Database;
 using Database.DataContexts;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.FilterAttributes;

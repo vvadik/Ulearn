@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
-using CourseManager;
+using Database;
 using Database.Extensions;
 using Database.Models;
 

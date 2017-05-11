@@ -7,7 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using CourseManager;
+using Database;
 using Database.DataContexts;
 using Database.Models;
 using log4net;

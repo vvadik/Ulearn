@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Web.Mvc;
-using CourseManager;
+using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
