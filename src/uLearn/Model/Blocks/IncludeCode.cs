@@ -7,9 +7,9 @@ namespace uLearn.Model.Blocks
 {
 	public class IncludeCode : SlideBlock
 	{
-		protected IncludeCode(string file)
+		protected IncludeCode(string codeFile)
 		{
-			File = file;
+			CodeFile = codeFile;
 		}
 
 		public IncludeCode()
@@ -17,7 +17,7 @@ namespace uLearn.Model.Blocks
 		}
 
 		[XmlAttribute("file")]
-		public string File { get; set; }
+		public string CodeFile { get; set; }
 
 		[XmlAttribute("lang-id")]
 		public string LangId { get; set; }
@@ -27,14 +27,14 @@ namespace uLearn.Model.Blocks
 
 		protected void FillProperties(BuildUpContext context)
 		{
-			File = File ?? context.Lesson?.DefaultIncludeCodeFile;
-			LangId = LangId ?? Path.GetExtension(File)?.Trim('.') ?? context.CourseSettings.DefaultLanguage;
+			CodeFile = CodeFile ?? context.Lesson?.DefaultIncludeCodeFile;
+			LangId = LangId ?? Path.GetExtension(CodeFile)?.Trim('.') ?? context.CourseSettings.DefaultLanguage;
 			LangVer = LangVer ?? context.CourseSettings.GetLanguageVersion(LangId);
 		}
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
-			if (!string.IsNullOrEmpty(File))
+			if (!string.IsNullOrEmpty(CodeFile))
 				throw new Exception("IncludeCode.cs: File string is not empty.");
 			return new CodeComponent();
 		}

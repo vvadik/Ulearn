@@ -30,9 +30,9 @@ namespace uLearn.Model.Blocks
 					PreludeFile = Path.Combine("..", PreludeFile);
 			}
 
-			var code = context.Dir.GetContent(File);
+			var code = context.Dir.GetContent(CodeFile);
 			var regionRemover = new RegionRemover(LangId);
-			var extractor = context.GetExtractor(File, LangId, code);
+			var extractor = context.GetExtractor(CodeFile, LangId, code);
 
 			var prelude = "";
 			if (PreludeFile != null)

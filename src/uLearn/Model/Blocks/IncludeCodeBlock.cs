@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Xml.Serialization;
@@ -8,17 +7,18 @@ namespace uLearn.Model.Blocks
 	[XmlType("include-code")]
 	public class IncludeCodeBlock : IncludeCode
 	{
-		[XmlElement("display")]
-		public Label[] DisplayLabels { get; set; }
-
-		public IncludeCodeBlock(string file) : base(file)
+		public IncludeCodeBlock(string codeFile)
+			: base(codeFile)
 		{
-			File = file;
+			CodeFile = codeFile;
 		}
 
 		public IncludeCodeBlock()
 		{
 		}
+
+		[XmlElement("display")]
+		public Label[] DisplayLabels { get; set; }
 
 
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
@@ -28,12 +28,12 @@ namespace uLearn.Model.Blocks
 
 			if (DisplayLabels.Length == 0)
 			{
-				var content = context.Dir.GetContent(File);
-				yield return new CodeBlock(content, LangId, LangVer);
+				var content = context.Dir.GetContent(CodeFile);
+				yield return new CodeBlock(content, LangId, LangVer) { Hide = Hide };
 				yield break;
 			}
 
-			var extractor = context.GetExtractor(File, LangId);
+			var extractor = context.GetExtractor(CodeFile, LangId);
 			yield return new CodeBlock(string.Join("\r\n\r\n", extractor.GetRegions(DisplayLabels)), LangId, LangVer) { Hide = Hide };
 		}
 	}
