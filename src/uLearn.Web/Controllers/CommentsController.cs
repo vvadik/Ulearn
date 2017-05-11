@@ -22,6 +22,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 		private readonly CommentsRepo commentsRepo;
+	    private readonly NotificationsRepo notificationsRepo;
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly CommentsBot commentsBot = new CommentsBot();
 
@@ -30,6 +31,7 @@ namespace uLearn.Web.Controllers
 			var db = new ULearnDb();
 			commentsRepo = new CommentsRepo(db);
 			userManager = new ULearnUserManager(db);
+            notificationsRepo = new NotificationsRepo(db);
 		}
 
 		public ActionResult SlideComments(string courseId, Guid slideId)
@@ -139,7 +141,8 @@ namespace uLearn.Web.Controllers
 
 			var comment = await commentsRepo.AddComment(User, courseId, slideId, parentCommentIdInt, commentText);
 			await commentsBot.PostToChannel(comment);
-			var canReply = CanAddCommentHere(User, courseId, true);
+		    await NotifyAboutNewComment(comment);
+			var canReply = CanAddCommentHere(User, courseId, isReply: true);
 
 			return PartialView("_Comment", new CommentViewModel
 			{
@@ -155,7 +158,17 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		[ULearnAuthorize]
+	    private async Task NotifyAboutNewComment(Comment comment)
+	    {
+	        var courseId = comment.CourseId;
+	        var notification = new NewCommentNotification
+	        {
+	            Comment = comment,
+	        };
+	        await notificationsRepo.SendNotification(courseId, notification, comment.AuthorId);
+	    }
+
+	    [ULearnAuthorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> LikeComment(int commentId)

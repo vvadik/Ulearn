@@ -26,7 +26,7 @@ namespace Database
 		{
 			var coursesDirectory = ConfigurationManager.AppSettings["ulearn.coursesDirectory"];
 			if (string.IsNullOrEmpty(coursesDirectory))
-				coursesDirectory = Utils.GetAppPath();
+				coursesDirectory = Utils.GetAppPath() + @"\..\Courses\";
 
 			return new DirectoryInfo(coursesDirectory);
 		}

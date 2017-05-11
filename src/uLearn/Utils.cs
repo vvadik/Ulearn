@@ -110,7 +110,7 @@ namespace uLearn
 
 	    public static string GetAppPath()
 	    {
-	        return HostingEnvironment.ApplicationPhysicalPath ?? "..";
+	        return HostingEnvironment.ApplicationPhysicalPath ?? @"..\";
 	    }
 	}
 }

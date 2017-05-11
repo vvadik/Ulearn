@@ -121,6 +121,15 @@ namespace Database.DataContexts
 				.ToDefaultDictionary();
 		}
 
+		public async Task SendNotification(string courseId, Notification notification, string initiatedUserId)
+		{
+			var notificationType = notification.GetNotificationType();
+			var recipientsIds = db.NotificationTransportSettings
+				.Where(s => s.CourseId == courseId && s.NotificationType == notificationType)
+				.Select(s => s.NotificationTransport.UserId).ToList();
+			await SendNotification(courseId, notification, initiatedUserId, recipientsIds);
+		}
+		
 		public async Task SendNotification(string courseId, Notification notification, string initiatedUserId, IEnumerable<string> recipientsIds)
 		{
 			notification.CreateTime = DateTime.Now;
@@ -140,8 +149,9 @@ namespace Database.DataContexts
 
 					var sendTime = transportSettings.FindSendTime(DateTime.Now);
 
-					notification.Deliveries.Add(new NotificationDelivery
+					db.NotificationDeliveries.Add(new NotificationDelivery
 					{
+						Notification = notification,
 						NotificationTransportId = transport.Id,
 						CreateTime = DateTime.Now,
 						SendTime = sendTime,
@@ -181,9 +191,14 @@ namespace Database.DataContexts
 			await SetDeliveryStatus(deliveryId, NotificationDeliveryStatus.Read);
 		}
 
-		public async Task MarkDeliveriesAsWontSend(int deliveryId)
+		public async Task MarkDeliveryAsWontSend(int deliveryId)
 		{
 			await SetDeliveryStatus(deliveryId, NotificationDeliveryStatus.WontSend);
+		}
+
+		public async Task MarkDeliveryAsSent(int deliveryId)
+		{
+			await SetDeliveryStatus(deliveryId, NotificationDeliveryStatus.Sent);
 		}
 	}
 }

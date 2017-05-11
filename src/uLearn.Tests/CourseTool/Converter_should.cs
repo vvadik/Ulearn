@@ -31,7 +31,7 @@ namespace uLearn.CourseTool
 			if (!Directory.Exists(testFolderName))
 				Directory.CreateDirectory(testFolderName);
 			var courseManager = new CourseManager(new DirectoryInfo("."));
-			course = courseManager.LoadCourseFromDirectory(new DirectoryInfo(@"..\..\..\courses\ForTests\Slides"));
+			course = courseManager.LoadCourseFromDirectory(new DirectoryInfo(@"..\..\..\..\courses\ForTests\Slides"));
 		}
 
 		[TearDown]

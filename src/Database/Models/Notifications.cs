@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity.Core.Objects;
 using System.Reflection;
 using System.Threading.Tasks;
 using uLearn;
@@ -29,19 +30,12 @@ namespace Database.Models
 		public Guid ConfirmationCode { get; set; }
 
 		public bool IsConfirmed { get; set; }
-
-		public abstract Task SendHtmlMessage(string message);
 	}
 
 	public class MailNotificationTransport : NotificationTransport
 	{
 		[StringLength(200)]
 		public string Email { get; set; }
-
-		public override Task SendHtmlMessage(string message)
-		{
-			throw new NotImplementedException();
-		}
 	}
 
 	public class TelegramNotificationTransport : NotificationTransport
@@ -51,11 +45,6 @@ namespace Database.Models
 
 		[StringLength(200)]
 		public string ChatTitle { get; set; }
-
-		public override async Task SendHtmlMessage(string message)
-		{
-			// await TelegramHelper.SendHtmlMessage(ChatId, message);
-		}
 	}
 
 	public class NotificationTransportSettings
@@ -313,6 +302,7 @@ namespace Database.Models
 		public virtual ICollection<NotificationDelivery> Deliveries { get; set; }
 
 		public abstract string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course);
+		public abstract string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course);
 	}
 
 	public static class NotificationExtensions
@@ -328,7 +318,7 @@ namespace Database.Models
 
 		public static NotificationType GetNotificationType(this Notification notification)
 		{
-			return GetNotificationType(notification.GetType());
+            return GetNotificationType(ObjectContext.GetObjectType(notification.GetType()));
 		}
 	}
 
@@ -340,7 +330,12 @@ namespace Database.Models
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
 		{
-			return $"<b>Сообщение от ulearn.me:</b>\n\n{Text.EscapeHtml()}";
+			return $"<b>Сообщение от ulearn.me:</b><br/><br/>{Text.EscapeHtml()}";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		{
+			return $"Сообщение от ulearn.me:\n\n{Text}";
 		}
 	}
 
@@ -352,7 +347,12 @@ namespace Database.Models
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
 		{
-			return $"<b>Сообщение от преподавателя:</b>\n\n{Text.EscapeHtml()}";
+			return $"<b>Сообщение от преподавателя:</b><br/><br/>{Text.EscapeHtml()}";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		{
+			return $"Сообщение от преподавателя:\n\n{Text}";
 		}
 	}
 
@@ -362,7 +362,18 @@ namespace Database.Models
 		public int CommentId { get; set; }
 
 		public virtual Comment Comment { get; set; }
-	}
+
+        protected string GetSlideTitle(Course course, Slide slide)
+        {
+            return $"{course.Title.MakeNestedQuotes()}: {slide.Title.MakeNestedQuotes()}";
+        }
+        
+        protected string GetCommentUrl(Slide slide)
+        {
+            /* TODO (andgein): Build url from UrlHelper */
+            return "https://ulearn.me/Course/" + Comment.CourseId + "/" + slide.Url + "#comment-" + Comment.Id;
+        }
+    }
 
 	[NotificationType(NotificationType.NewComment)]
 	public class NewCommentNotification : AbstractCommentNotification
@@ -373,10 +384,16 @@ namespace Database.Models
 			if (slide == null)
 				return null;
 
-			var slideTitle = $"{course.Title.MakeNestedQuotes()}: {slide.Title.MakeNestedQuotes()}";
-			/* TODO (andgein): Build url from UrlHelper */
-			var url = "https://ulearn.me/Course/" + Comment.CourseId + "/" + slide.Url + "#comment-" + Comment.Id;
-			return $"<b>{Comment.Author.VisibleName.EscapeHtml()} в «{slideTitle.EscapeHtml()}»</b>\n\n{Comment.Text.Trim().EscapeHtml()}\n\n{url.EscapeMarkdown()}";
+			return $"<b>{Comment.Author.VisibleName.EscapeHtml()} в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>{Comment.Text.Trim().EscapeHtml()}<br/><br/>{GetCommentUrl(slide).EscapeHtml()}";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		{
+			var slide = course.FindSlideById(Comment.SlideId);
+			if (slide == null)
+				return null;
+
+			return $"{Comment.Author.VisibleName} в «{GetSlideTitle(course, slide)}»\n\n{Comment.Text.Trim()}\n\n{GetCommentUrl(slide)}";
 		}
 	}
 
@@ -384,6 +401,11 @@ namespace Database.Models
 	public class RepliedToYourCommentNotification : AbstractCommentNotification
 	{
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
 		{
 			throw new NotImplementedException();
 		}
@@ -402,6 +424,11 @@ namespace Database.Models
 		{
 			throw new NotImplementedException();
 		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		{
+			throw new NotImplementedException();
+		}
 	}
 
 	[NotificationType(NotificationType.PassedManualExerciseChecking)]
@@ -413,6 +440,11 @@ namespace Database.Models
 		public virtual ManualExerciseChecking Checking { get; set; }
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
 		{
 			throw new NotImplementedException();
 		}
@@ -430,6 +462,11 @@ namespace Database.Models
 		{
 			throw new NotImplementedException();
 		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		{
+			throw new NotImplementedException();
+		}
 	}
 
 	[NotificationType(NotificationType.ReceivedCertificate)]
@@ -444,6 +481,11 @@ namespace Database.Models
 		{
 			throw new NotImplementedException();
 		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		{
+			throw new NotImplementedException();
+		}
 	}
 
 	[NotificationType(NotificationType.ReceivedAdditionalScore)]
@@ -455,6 +497,11 @@ namespace Database.Models
 		public virtual AdditionalScore Score { get; set; }
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
 		{
 			throw new NotImplementedException();
 		}
@@ -478,6 +525,11 @@ namespace Database.Models
 		{
 			throw new NotImplementedException();
 		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		{
+			throw new NotImplementedException();
+		}
 	}
 
 	[NotificationType(NotificationType.AddedInstructor)]
@@ -490,6 +542,11 @@ namespace Database.Models
 		public virtual ApplicationUser AddedUser { get; set; }
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
 		{
 			throw new NotImplementedException();
 		}
@@ -507,6 +564,11 @@ namespace Database.Models
 		{
 			throw new NotImplementedException();
 		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		{
+			throw new NotImplementedException();
+		}
 	}
 
 	[NotificationType(NotificationType.UploadedPackage)]
@@ -518,6 +580,11 @@ namespace Database.Models
 		public virtual CourseVersion CourseVersion { get; set; }
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
 		{
 			throw new NotImplementedException();
 		}
@@ -535,6 +602,11 @@ namespace Database.Models
 		{
 			throw new NotImplementedException();
 		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		{
+			throw new NotImplementedException();
+		}
 	}
 
 	[NotificationType(NotificationType.OccuredError)]
@@ -547,6 +619,11 @@ namespace Database.Models
 		public string ErrorMessage { get; set; }
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
 		{
 			throw new NotImplementedException();
 		}

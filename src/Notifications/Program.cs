@@ -7,7 +7,7 @@ using Database;
 using Database.DataContexts;
 using Database.Models;
 using log4net;
-using Telegram.Bot;
+using log4net.Config;
 
 namespace Notifications
 {
@@ -15,23 +15,27 @@ namespace Notifications
 	{
 		private readonly NotificationsRepo notificationsRepo;
 		public volatile bool Stopped;
-		private readonly TelegramBotClient telegramBot;
 		private readonly WebCourseManager courseManager;
+		private readonly NotificationSender notificationSender;
 
 		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
 
-		public Program()
+		public Program(ULearnDb db, WebCourseManager courseManager)
 		{
-			var db = new ULearnDb();
 			notificationsRepo = new NotificationsRepo(db);
 
-			var botToken = ConfigurationManager.AppSettings["ulearn.telegram.botToken"];
-			telegramBot = new TelegramBotClient(botToken);
-			courseManager = WebCourseManager.Instance;
+			this.courseManager = courseManager;
+			notificationSender = new NotificationSender(courseManager);
 		}
+
+	    public Program()
+	        : this(new ULearnDb(), WebCourseManager.Instance)
+	    {
+	    }
 
 		static void Main(string[] args)
 		{
+		    XmlConfigurator.Configure();
 			new Program().MainLoop().Wait();
 		}
 
@@ -68,22 +72,23 @@ namespace Notifications
 				var course = courseManager.FindCourse(delivery.Notification.CourseId);
 				if (course == null)
 				{
-					await notificationsRepo.MarkDeliveriesAsWontSend(delivery.Id);
+					await notificationsRepo.MarkDeliveryAsWontSend(delivery.Id);
 					return;
 				}
 
-				var message = delivery.Notification.GetHtmlMessageForDelivery(transport, delivery, course);
-				if (message == null)
-				{
-					await notificationsRepo.MarkDeliveriesAsWontSend(delivery.Id);
-					return;
-				}
-
-				await transport.SendHtmlMessage(message);
+			    try
+			    {
+			        await notificationSender.SendAsync(delivery);
+			        await notificationsRepo.MarkDeliveryAsSent(delivery.Id);
+			    }
+			    catch (Exception e)
+			    {
+			        log.Warn($"Can\'t send notification {delivery.NotificationId} to {delivery.NotificationTransport}: {e}. Will try later");
+			    }
 			}
 			else
 			{
-				
+				throw new NotImplementedException();
 			}
 		}
 	}
