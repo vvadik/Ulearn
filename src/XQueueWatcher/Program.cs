@@ -70,7 +70,7 @@ namespace XQueueWatcher
 		[DataMember(Name = "course_id")]
 		public string CourseId;
 
-		[DataMember(Name = "slideId")]
+		[DataMember(Name = "slide_id")]
 		public Guid SlideId;
 	}
 }

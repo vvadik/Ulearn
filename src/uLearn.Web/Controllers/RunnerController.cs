@@ -36,8 +36,6 @@ namespace uLearn.Web.Controllers
 			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
 		}
 
-
-
 		public RunnerController()
 			: this(new ULearnDb(), WebCourseManager.Instance)
 		{
@@ -115,10 +113,10 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		private async Task SendResultToObservers(UserExerciseSubmission submission, RunningResults result)
+		private Task SendResultToObservers(UserExerciseSubmission submission, RunningResults result)
 		{
-			foreach (var observer in resultObserveres)
-				await observer.ProcessResult(submission, result);
+			var tasks = resultObserveres.Select(o => o.ProcessResult(submission, result));
+			return Task.WhenAll(tasks);
 		}
 
 		private void CheckRunner(string token)
