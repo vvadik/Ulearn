@@ -120,12 +120,12 @@ namespace Database.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
 
-		[Index("IDX_NotificationDelivery_ByNotificationAndTransport", 1, IsUnique = true)]
+		[Index("IDX_NotificationDelivery_ByNotificationAndTransport", 1)]
 		public int NotificationId { get; set; }
 
 		public virtual Notification Notification { get; set; }
 
-		[Index("IDX_NotificationDelivery_ByNotificationAndTransport", 2, IsUnique = true)]
+		[Index("IDX_NotificationDelivery_ByNotificationAndTransport", 2)]
 		public int NotificationTransportId { get; set; }
 
 		public virtual NotificationTransport NotificationTransport { get; set; }
@@ -318,7 +318,7 @@ namespace Database.Models
 
 		public static NotificationType GetNotificationType(this Notification notification)
 		{
-            return GetNotificationType(ObjectContext.GetObjectType(notification.GetType()));
+			return GetNotificationType(ObjectContext.GetObjectType(notification.GetType()));
 		}
 	}
 
@@ -363,17 +363,17 @@ namespace Database.Models
 
 		public virtual Comment Comment { get; set; }
 
-        protected string GetSlideTitle(Course course, Slide slide)
-        {
-            return $"{course.Title.MakeNestedQuotes()}: {slide.Title.MakeNestedQuotes()}";
-        }
-        
-        protected string GetCommentUrl(Slide slide)
-        {
-            /* TODO (andgein): Build url from UrlHelper */
-            return "https://ulearn.me/Course/" + Comment.CourseId + "/" + slide.Url + "#comment-" + Comment.Id;
-        }
-    }
+		protected string GetSlideTitle(Course course, Slide slide)
+		{
+			return $"{course.Title.MakeNestedQuotes()}: {slide.Title.MakeNestedQuotes()}";
+		}
+		
+		protected string GetCommentUrl(Slide slide)
+		{
+			/* TODO (andgein): Build url from UrlHelper */
+			return "https://ulearn.me/Course/" + Comment.CourseId + "/" + slide.Url + "#comment-" + Comment.Id;
+		}
+	}
 
 	[NotificationType(NotificationType.NewComment)]
 	public class NewCommentNotification : AbstractCommentNotification
@@ -400,14 +400,33 @@ namespace Database.Models
 	[NotificationType(NotificationType.RepliedToYourComment)]
 	public class RepliedToYourCommentNotification : AbstractCommentNotification
 	{
+		[Required]
+		public int ParentCommentId { get; set; }
+
+		public virtual Comment ParentComment { get; set; }
+
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
 		{
-			throw new NotImplementedException();
+			var slide = course.FindSlideById(Comment.SlideId);
+			if (slide == null)
+				return null;
+
+			return $"<b>{Comment.Author.VisibleName.EscapeHtml()} ответил(а) на ваш комментарий в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" + 
+				   $"<i>{ParentComment.Text.Trim().EscapeHtml()}</i><br>" +	
+				   $"{Comment.Text.Trim().EscapeHtml()}<br/><br/>" + 
+				   $"{GetCommentUrl(slide).EscapeHtml()}";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
 		{
-			throw new NotImplementedException();
+			var slide = course.FindSlideById(Comment.SlideId);
+			if (slide == null)
+				return null;
+
+			return $"{Comment.Author.VisibleName} ответил(а) на ваш комментарий в «{GetSlideTitle(course, slide)}»\n\n" +
+				   $"> {ParentComment.Text.Trim()}\n" +
+				   $"{Comment.Text.Trim()}\n\n" +
+				   $"{GetCommentUrl(slide)}";
 		}
 	}
 
@@ -422,12 +441,25 @@ namespace Database.Models
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
 		{
-			throw new NotImplementedException();
+			var slide = course.FindSlideById(Comment.SlideId);
+			if (slide == null)
+				return null;
+
+			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} оценил(а) ваш комментарий в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" +
+				   $"<i>{Comment.Text.Trim().EscapeHtml()}</i><br/><br/>" +
+				   $"{GetCommentUrl(slide).EscapeHtml()}";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
 		{
-			throw new NotImplementedException();
+			var slide = course.FindSlideById(Comment.SlideId);
+			if (slide == null)
+				return null;
+
+
+			return $"{InitiatedBy.VisibleName} оценил(а) ваш комментарий в «{GetSlideTitle(course, slide)}»\n\n" +
+				   $"> {Comment.Text.Trim()}\n\n" +
+				   $"{GetCommentUrl(slide)}";
 		}
 	}
 

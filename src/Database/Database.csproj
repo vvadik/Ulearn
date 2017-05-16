@@ -403,6 +403,14 @@
     <Compile Include="Migrations\201705050545060_AddXQueueModels.Designer.cs">
       <DependentUpon>201705050545060_AddXQueueModels.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201705160515474_AddParentCommentToReplyNotification.cs" />
+    <Compile Include="Migrations\201705160515474_AddParentCommentToReplyNotification.Designer.cs">
+      <DependentUpon>201705160515474_AddParentCommentToReplyNotification.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705160539376_RemoveUniqueFromNotificationDelivery.cs" />
+    <Compile Include="Migrations\201705160539376_RemoveUniqueFromNotificationDelivery.Designer.cs">
+      <DependentUpon>201705160539376_RemoveUniqueFromNotificationDelivery.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -650,6 +658,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201705050545060_AddXQueueModels.resx">
       <DependentUpon>201705050545060_AddXQueueModels.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705160515474_AddParentCommentToReplyNotification.resx">
+      <DependentUpon>201705160515474_AddParentCommentToReplyNotification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705160539376_RemoveUniqueFromNotificationDelivery.resx">
+      <DependentUpon>201705160539376_RemoveUniqueFromNotificationDelivery.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

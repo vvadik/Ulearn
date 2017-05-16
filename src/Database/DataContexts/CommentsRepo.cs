@@ -6,6 +6,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
+using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
 
 namespace Database.DataContexts
@@ -49,7 +50,8 @@ namespace Database.DataContexts
 			return db.Comments.Find(comment.Id);
 		}
 
-		public Comment GetCommentById(int commentId)
+		[CanBeNull]
+		public Comment FindCommentById(int commentId)
 		{
 			return db.Comments.Find(commentId);
 		}

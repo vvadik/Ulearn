@@ -14,7 +14,7 @@ using uLearn.Web.FilterAttributes;
 namespace uLearn.Web.Controllers
 {
 	[ULearnAuthorize]
-    public class NotificationsController : Controller
+	public class NotificationsController : Controller
 	{
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
@@ -25,29 +25,29 @@ namespace uLearn.Web.Controllers
 			notificationsRepo = new NotificationsRepo(db);
 		}
 
-        public ActionResult Index(string courseId)
-        {
-	        var notificationTypes = NotificationsRepo.GetAllNotificationTypes();
-	        var transports = notificationsRepo.GetUsersNotificationTransports(User.Identity.GetUserId(), includeDisabled: true);
-	        var transportsSettings = notificationsRepo.GetNotificationTransportsSettings(courseId, transports.Select(t => t.Id).ToList());
+		public ActionResult Index(string courseId)
+		{
+			var notificationTypes = NotificationsRepo.GetAllNotificationTypes();
+			var transports = notificationsRepo.GetUsersNotificationTransports(User.Identity.GetUserId(), includeDisabled: true);
+			var transportsSettings = notificationsRepo.GetNotificationTransportsSettings(courseId, transports.Select(t => t.Id).ToList());
 			
-	        notificationTypes = notificationTypes
+			notificationTypes = notificationTypes
 				.Where(t => User.HasAccessFor(courseId, t.GetMinCourseRole()))
 				.OrderByDescending(t => t.GetMinCourseRole())
 				.ThenBy(t => (int) t)
 				.ToList();
 
-	        if (!User.IsSystemAdministrator())
-		        notificationTypes = notificationTypes.Where(t => !t.IsForSysAdminsOnly()).ToList();
+			if (!User.IsSystemAdministrator())
+				notificationTypes = notificationTypes.Where(t => !t.IsForSysAdminsOnly()).ToList();
 
-            return View(new NotificationSettingsViewModel
-            {
+			return View(new NotificationSettingsViewModel
+			{
 				CourseId = courseId,
-	            NotificationTypes = notificationTypes,
+				NotificationTypes = notificationTypes,
 				Transports = transports,
 				TransportsSettings = transportsSettings
-            });
-        }
+			});
+		}
 
 		public async Task<ActionResult> AddMailTransport(string courseId, string email)
 		{

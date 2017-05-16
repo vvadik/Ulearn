@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
@@ -11,7 +10,7 @@ using log4net.Config;
 
 namespace Notifications
 {
-	class Program
+	public class Program
 	{
 		private readonly NotificationsRepo notificationsRepo;
 		public volatile bool Stopped;
@@ -28,14 +27,14 @@ namespace Notifications
 			notificationSender = new NotificationSender(courseManager);
 		}
 
-	    public Program()
-	        : this(new ULearnDb(), WebCourseManager.Instance)
-	    {
-	    }
+		public Program()
+			: this(new ULearnDb(), WebCourseManager.Instance)
+		{
+		}
 
 		static void Main(string[] args)
 		{
-		    XmlConfigurator.Configure();
+			XmlConfigurator.Configure();
 			new Program().MainLoop().Wait();
 		}
 
@@ -76,15 +75,15 @@ namespace Notifications
 					return;
 				}
 
-			    try
-			    {
-			        await notificationSender.SendAsync(delivery);
-			        await notificationsRepo.MarkDeliveryAsSent(delivery.Id);
-			    }
-			    catch (Exception e)
-			    {
-			        log.Warn($"Can\'t send notification {delivery.NotificationId} to {delivery.NotificationTransport}: {e}. Will try later");
-			    }
+				try
+				{
+					await notificationSender.SendAsync(delivery);
+					await notificationsRepo.MarkDeliveryAsSent(delivery.Id);
+				}
+				catch (Exception e)
+				{
+					log.Warn($"Can\'t send notification {delivery.NotificationId} to {delivery.NotificationTransport}: {e}. Will try later");
+				}
 			}
 			else
 			{

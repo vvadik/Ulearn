@@ -32,7 +32,7 @@ namespace Notifications
 			}
 
 			log.Info($"Initialized Spam.API client to {spamEndpoint}, login {spamLogin}, password {spamPassword.MaskAsSecret()}");
-			log.Info($"Use channel '{channelId}'");
+			log.Info($"Using channel '{channelId}'");
 		}
 
 		public async Task SendEmailAsync(string to, string subject, string textBody, string htmlBody=null)

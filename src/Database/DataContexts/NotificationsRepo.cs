@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -121,15 +122,11 @@ namespace Database.DataContexts
 				.ToDefaultDictionary();
 		}
 
-		public async Task SendNotification(string courseId, Notification notification, string initiatedUserId)
+		public async Task SendNotification(string courseId, Notification notification, string initiatedUserId, string recipientId)
 		{
-			var notificationType = notification.GetNotificationType();
-			var recipientsIds = db.NotificationTransportSettings
-				.Where(s => s.CourseId == courseId && s.NotificationType == notificationType)
-				.Select(s => s.NotificationTransport.UserId).ToList();
-			await SendNotification(courseId, notification, initiatedUserId, recipientsIds);
+			await SendNotification(courseId, notification, initiatedUserId, new List<string> { recipientId });
 		}
-		
+
 		public async Task SendNotification(string courseId, Notification notification, string initiatedUserId, IEnumerable<string> recipientsIds)
 		{
 			notification.CreateTime = DateTime.Now;
@@ -137,27 +134,51 @@ namespace Database.DataContexts
 			notification.CourseId = courseId;
 			db.Notifications.Add(notification);
 
-			foreach (var recipientId in recipientsIds)
+			var recipientsIdsSet = new HashSet<string>(recipientsIds);
+
+			var notificationType = notification.GetNotificationType();
+			var transportsSettings = db.NotificationTransportSettings
+				.Include(s => s.NotificationTransport)
+				.Where(s => s.CourseId == courseId && 
+							s.NotificationType == notificationType && 
+							recipientsIdsSet.Contains(s.NotificationTransport.UserId)).ToList();
+			var defaultFrequency = notificationType.GetDefaultFrequency();
+
+			if (defaultFrequency != NotificationSendingFrequency.Disabled)
 			{
-				var transports = GetUsersNotificationTransports(recipientId);
-				var transportsSettings = GetNotificationTransportsSettings(courseId, notification.GetNotificationType(), transports.Select(t => t.Id).ToList());
-				foreach (var transport in transports)
+				var recipientsTransports = db.NotificationTransports.Where(t => recipientsIdsSet.Contains(t.UserId) && t.IsEnabled).ToList();
+				var notFoundTransports = recipientsTransports.Except(transportsSettings.Select(c => c.NotificationTransport), new NotificationTransportIdComparer());
+
+				foreach (var transport in notFoundTransports)
 				{
-					var transportSettings = transportsSettings[transport.Id];
-					if (transportSettings == null || transportSettings.Frequency == NotificationSendingFrequency.Disabled)
-						continue;
-
-					var sendTime = transportSettings.FindSendTime(DateTime.Now);
-
-					db.NotificationDeliveries.Add(new NotificationDelivery
+					transportsSettings.Add(new NotificationTransportSettings
 					{
-						Notification = notification,
+						Frequency = defaultFrequency,
+						NotificationTransport = transport,
 						NotificationTransportId = transport.Id,
-						CreateTime = DateTime.Now,
-						SendTime = sendTime,
-						Status = NotificationDeliveryStatus.NotSent,
 					});
 				}
+			}
+
+			foreach (var transportSettings in transportsSettings)
+			{
+				if (transportSettings.Frequency == NotificationSendingFrequency.Disabled)
+					continue;
+
+				/* Always ignore to send notification to user initiated this notification */
+				if (transportSettings.NotificationTransport.UserId == initiatedUserId)
+					continue;
+
+				var sendTime = transportSettings.FindSendTime(DateTime.Now);
+
+				db.NotificationDeliveries.Add(new NotificationDelivery
+				{
+					Notification = notification,
+					NotificationTransportId = transportSettings.NotificationTransportId,
+					CreateTime = DateTime.Now,
+					SendTime = sendTime,
+					Status = NotificationDeliveryStatus.NotSent,
+				});
 			}
 
 			await db.SaveChangesAsync();
@@ -199,6 +220,18 @@ namespace Database.DataContexts
 		public async Task MarkDeliveryAsSent(int deliveryId)
 		{
 			await SetDeliveryStatus(deliveryId, NotificationDeliveryStatus.Sent);
+		}
+	}
+
+	class NotificationTransportIdComparer : IEqualityComparer<NotificationTransport>
+	{
+		public bool Equals(NotificationTransport first, NotificationTransport second)
+		{
+			return first.Id == second.Id;
+		}
+		public int GetHashCode(NotificationTransport transport)
+		{
+			return transport.Id.GetHashCode();
 		}
 	}
 }

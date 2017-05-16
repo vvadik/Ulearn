@@ -31,12 +31,14 @@ namespace Database.DataContexts
 				: applicationUsers.Where(user => goodIds.Contains(user.Id));
 		}
 
+		/* Pass count=0 to disable limiting */
 		public static List<UserRolesInfo> GetUserRolesInfo(this IQueryable<ApplicationUser> applicationUsers, int count, UserManager<ApplicationUser> userManager)
 		{
-			return applicationUsers
-				.OrderBy(u => u.UserName)
-				.Take(count)
-				.ToList()
+			IQueryable<ApplicationUser> users = applicationUsers.OrderBy(u => u.UserName);
+			if (count > 0)
+				users = users.Take(count);
+
+			return users.ToList()
 				.Select(user => new UserRolesInfo
 				{
 					UserId = user.Id,

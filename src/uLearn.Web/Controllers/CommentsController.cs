@@ -22,7 +22,8 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 		private readonly CommentsRepo commentsRepo;
-	    private readonly NotificationsRepo notificationsRepo;
+		private readonly NotificationsRepo notificationsRepo;
+		private readonly VisitsRepo visitsRepo;
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly CommentsBot commentsBot = new CommentsBot();
 
@@ -31,7 +32,8 @@ namespace uLearn.Web.Controllers
 			var db = new ULearnDb();
 			commentsRepo = new CommentsRepo(db);
 			userManager = new ULearnUserManager(db);
-            notificationsRepo = new NotificationsRepo(db);
+			notificationsRepo = new NotificationsRepo(db);
+			visitsRepo = new VisitsRepo(db);
 		}
 
 		public ActionResult SlideComments(string courseId, Guid slideId)
@@ -141,7 +143,7 @@ namespace uLearn.Web.Controllers
 
 			var comment = await commentsRepo.AddComment(User, courseId, slideId, parentCommentIdInt, commentText);
 			await commentsBot.PostToChannel(comment);
-		    await NotifyAboutNewComment(comment);
+			await NotifyAboutNewComment(comment);
 			var canReply = CanAddCommentHere(User, courseId, isReply: true);
 
 			return PartialView("_Comment", new CommentViewModel
@@ -158,31 +160,66 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-	    private async Task NotifyAboutNewComment(Comment comment)
-	    {
-	        var courseId = comment.CourseId;
-	        var notification = new NewCommentNotification
-	        {
-	            Comment = comment,
-	        };
-	        await notificationsRepo.SendNotification(courseId, notification, comment.AuthorId);
-	    }
+		private async Task NotifyAboutNewComment(Comment comment)
+		{
+			var courseId = comment.CourseId;
+			var notification = new NewCommentNotification
+			{
+				Comment = comment,
+			};
+			await notificationsRepo.SendNotification(courseId, notification, comment.AuthorId, visitsRepo.GetCourseUsers(comment.CourseId));
 
-	    [ULearnAuthorize]
+			if (!comment.IsTopLevel())
+			{
+				var parentComment = commentsRepo.FindCommentById(comment.ParentCommentId);
+				if (parentComment != null)
+				{
+					var replyNotification = new RepliedToYourCommentNotification
+					{
+						Comment = comment,
+						ParentComment = parentComment,
+					};
+					await notificationsRepo.SendNotification(courseId, replyNotification, comment.AuthorId, parentComment.AuthorId);
+				}
+			}
+		}
+
+		[ULearnAuthorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> LikeComment(int commentId)
 		{
 			var userId = User.Identity.GetUserId();
 			var res = await commentsRepo.LikeComment(commentId, userId);
+
+			await NotifyAboutLikedComment(commentId);
+
 			return Json(new { likesCount = res.Item1, liked = res.Item2 });
+		}
+
+		private async Task NotifyAboutLikedComment(int commentId)
+		{
+			var comment = commentsRepo.FindCommentById(commentId);
+			if (comment != null)
+			{
+				var userId = User.Identity.GetUserId();
+				var notification = new LikedYourCommentNotification
+				{
+					Comment = comment,
+					LikedUserId = userId,
+				};
+				await notificationsRepo.SendNotification(comment.CourseId, notification, userId, comment.AuthorId);
+			}
 		}
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ApproveComment(int commentId, bool isApproved = true)
 		{
-			var comment = commentsRepo.GetCommentById(commentId);
+			var comment = commentsRepo.FindCommentById(commentId);
+			if (comment == null)
+				return HttpNotFound();
+
 			if (!User.HasAccessFor(comment.CourseId, CourseRole.Instructor))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
@@ -194,7 +231,10 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> PinComment(int commentId, bool isPinned)
 		{
-			var comment = commentsRepo.GetCommentById(commentId);
+			var comment = commentsRepo.FindCommentById(commentId);
+			if (comment == null)
+				return HttpNotFound();
+
 			if (!User.HasAccessFor(comment.CourseId, CourseRole.Instructor))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
@@ -204,6 +244,9 @@ namespace uLearn.Web.Controllers
 
 		private bool CanEditAndDeleteComment(IPrincipal user, Comment comment)
 		{
+			if (comment == null)
+				return false;
+
 			return user.HasAccessFor(comment.CourseId, CourseRole.Instructor) ||
 					user.Identity.GetUserId() == comment.AuthorId;
 		}
@@ -212,7 +255,7 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> DeleteComment(int commentId)
 		{
-			var comment = commentsRepo.GetCommentById(commentId);
+			var comment = commentsRepo.FindCommentById(commentId);
 			if (!CanEditAndDeleteComment(User, comment))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
@@ -224,7 +267,7 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> RestoreComment(int commentId)
 		{
-			var comment = commentsRepo.GetCommentById(commentId);
+			var comment = commentsRepo.FindCommentById(commentId);
 			if (!CanEditAndDeleteComment(User, comment))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
@@ -237,7 +280,7 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> EditCommentText(int commentId, string newText)
 		{
-			var comment = commentsRepo.GetCommentById(commentId);
+			var comment = commentsRepo.FindCommentById(commentId);
 			if (!CanEditAndDeleteComment(User, comment))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
@@ -249,7 +292,7 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> MarkAsCorrectAnswer(int commentId, bool isCorrect = true)
 		{
-			var comment = commentsRepo.GetCommentById(commentId);
+			var comment = commentsRepo.FindCommentById(commentId);
 			if (!CanEditAndDeleteComment(User, comment))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 

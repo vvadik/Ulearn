@@ -12,16 +12,18 @@ namespace Notifications
 		private readonly ILog log = LogManager.GetLogger(typeof(NotificationSender));
 
 		private readonly IEmailSender emailSender;
+		private readonly ITelegramSender telegramSender;
 		private readonly CourseManager courseManager;
 
-		public NotificationSender(CourseManager courseManager, IEmailSender emailSender)
+		public NotificationSender(CourseManager courseManager, IEmailSender emailSender, ITelegramSender telegramSender)
 		{
 			this.emailSender = emailSender;
+			this.telegramSender = telegramSender;
 			this.courseManager = courseManager;
 		}
 
 		public NotificationSender(CourseManager courseManager)
-			: this(courseManager, new KonturSpamEmailSender())
+			: this(courseManager, new KonturSpamEmailSender(), new TelegramSender())
 		{
 		}
 
@@ -43,9 +45,15 @@ namespace Notifications
 			);
 		}
 
-		private Task SendAsync(TelegramNotificationTransport transport, NotificationDelivery notificationDelivery)
+		private async Task SendAsync(TelegramNotificationTransport transport, NotificationDelivery notificationDelivery)
 		{
-			throw new NotImplementedException();
+			var notification = notificationDelivery.Notification;
+			var course = courseManager.GetCourse(notification.CourseId);
+
+			await telegramSender.SendMessageAsync(
+				transport.ChatId,
+				notification.GetHtmlMessageForDelivery(transport, notificationDelivery, course)
+				);
 		}
 
 		public async Task SendAsync(NotificationDelivery notificationDelivery)

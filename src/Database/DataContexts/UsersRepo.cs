@@ -25,6 +25,7 @@ namespace Database.DataContexts
 			return db.Users.Find(id);
 		}
 
+		/* Pass limit=0 to disable limiting */
 		public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager, int limit = 50)
 		{
 			var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
@@ -43,10 +44,20 @@ namespace Database.DataContexts
 				.GetUserRolesInfo(limit, userManager);
 		}
 
+		/* Pass limit=0 to disable limiting */
 		public List<UserRolesInfo> GetCourseInstructors(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
 		{
 			return db.Users
 				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, courseId, includeHighRoles: true))
+				.GetUserRolesInfo(limit, userManager);
+		}
+
+		/* Pass limit=0 to disable limiting */
+
+		public List<UserRolesInfo> GetCourseAdmins(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
+		{
+			return db.Users
+				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, courseId, includeHighRoles: true))
 				.GetUserRolesInfo(limit, userManager);
 		}
 

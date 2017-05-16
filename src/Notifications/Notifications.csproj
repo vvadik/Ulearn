@@ -85,12 +85,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EmailSender.cs" />
+    <Compile Include="ITelegramSender.cs" />
+    <Compile Include="KonturSpamEmailSender.cs" />
     <Compile Include="IEmailSender.cs" />
     <Compile Include="INotificationSender.cs" />
     <Compile Include="NotificationSender.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TelegramSender.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
