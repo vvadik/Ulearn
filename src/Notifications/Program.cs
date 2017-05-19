@@ -39,11 +39,6 @@ namespace Notifications
 
 		public async Task MainLoop()
 		{
-			/* Hack to load EF.SqlClient.dll into program and services used Notifications as a library:
-			 * http://stackoverflow.com/questions/14033193/entity-framework-provider-type-could-not-be-loaded 
-			 */
-			var _ = typeof(System.Data.Entity.SqlServer.SqlProviderServices);
-
 			Stopped = false;
 			while (!Stopped)
 			{
