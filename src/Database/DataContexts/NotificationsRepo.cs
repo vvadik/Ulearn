@@ -3,14 +3,21 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Database.Models;
+using log4net;
 using uLearn;
 
 namespace Database.DataContexts
 {
 	public class NotificationsRepo
 	{
+		private const int maxNotificationsSendingFails = 15;
+
+		private readonly ILog log = LogManager.GetLogger(typeof(NotificationsRepo));
+
 		private readonly ULearnDb db;
 
 		public NotificationsRepo()
@@ -21,6 +28,13 @@ namespace Database.DataContexts
 		public NotificationsRepo(ULearnDb db)
 		{
 			this.db = db;
+		}
+
+		private static DateTime CalculateNextTryTime(DateTime createTime, int failsCount)
+		{
+			if (failsCount == 0)
+				return createTime;
+			return createTime.AddSeconds(Math.Pow(2, failsCount - 1));
 		}
 
 		private static List<NotificationType> notificationTypes;
@@ -39,43 +53,46 @@ namespace Database.DataContexts
 			return notificationTypes;
 		}
 
+		private void DeleteOldNotificationTransports<TransportType>(string userId) where TransportType : NotificationTransport
+		{
+			var transports = db.NotificationTransports
+				.Where(t => t.UserId == userId && !t.IsDeleted)
+				.OfType<TransportType>().ToList();
+			foreach (var transport in transports)
+				transport.IsDeleted = true;
+		}
+
 		public async Task AddNotificationTransport(NotificationTransport transport)
 		{
-			transport.IsEnabled = true;
-			transport.IsDeleted = false;
-			db.NotificationTransports.Add(transport);
-			await db.SaveChangesAsync();
-		}
-
-		public async Task<TelegramNotificationTransport> RequestNewTelegramTransport(long chatId, string chatTitle)
-		{
-			var transport = new TelegramNotificationTransport
+			using (var transaction = db.Database.BeginTransaction())
 			{
-				ChatId = chatId,
-				ChatTitle = chatTitle.Substring(0, 200),
-				ConfirmationCode = Guid.NewGuid(),
-				IsConfirmed = false,
-				UserId = null
-			};
-			db.NotificationTransports.Add(transport);
-			await db.SaveChangesAsync().ConfigureAwait(false);
+				if (transport is MailNotificationTransport)
+					DeleteOldNotificationTransports<MailNotificationTransport>(transport.UserId);
+				if (transport is TelegramNotificationTransport)
+					DeleteOldNotificationTransports<TelegramNotificationTransport>(transport.UserId);
 
-			return transport;
+				transport.IsDeleted = false;
+				db.NotificationTransports.Add(transport);
+
+				await db.SaveChangesAsync().ConfigureAwait(false);
+				transaction.Commit();
+			}
 		}
 
-		public async Task<NotificationTransport> ConfirmNotificationTransport(Guid confirmationCode, string userId)
+		public NotificationTransport FindNotificationTransport(int transportId)
 		{
-			var transport = db.NotificationTransports.FirstOrDefault(c => c.ConfirmationCode == confirmationCode && !c.IsConfirmed);
-			if (transport == null)
-				return null;
-
-			transport.UserId = userId;
-			transport.IsConfirmed = true;
-			await db.SaveChangesAsync();
-
-			return transport;
+			return db.NotificationTransports.Find(transportId);
 		}
+		public async Task EnableNotificationTransport(int transportId, bool isEnabled = true)
+		{
+			var transport = db.NotificationTransports.Find(transportId);
+			if (transport == null)
+				return;
 
+			transport.IsEnabled = isEnabled;
+			await db.SaveChangesAsync();
+		}
+		
 		public List<NotificationTransport> GetUsersNotificationTransports(string userId, bool includeDisabled = false)
 		{
 			var transports = db.NotificationTransports.Where(t => t.UserId == userId && !t.IsDeleted);
@@ -84,7 +101,7 @@ namespace Database.DataContexts
 			return transports.ToList();
 		}
 
-		public async Task SetNotificationFrequence(string courseId, int transportId, NotificationType type, NotificationSendingFrequency frequency)
+		public async Task SetNotificationTransportSettings(string courseId, int transportId, NotificationType type, bool isEnabled)
 		{
 			var settings = db.NotificationTransportSettings.FirstOrDefault(
 				s => s.CourseId == courseId && s.NotificationTransportId == transportId && s.NotificationType == type
@@ -96,11 +113,11 @@ namespace Database.DataContexts
 					CourseId = courseId,
 					NotificationTransportId = transportId,
 					NotificationType = type,
-					Frequency = frequency,
+					IsEnabled = isEnabled,
 				};
 			}
 			else
-				settings.Frequency = frequency;
+				settings.IsEnabled = isEnabled;
 
 			db.NotificationTransportSettings.AddOrUpdate(settings);
 			await db.SaveChangesAsync();
@@ -119,67 +136,15 @@ namespace Database.DataContexts
 			return db.NotificationTransportSettings
 				.Where(s => s.CourseId == courseId && transportIds.Contains(s.NotificationTransportId))
 				.ToDictionary(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s)
-				.ToDefaultDictionary();
+				.ToDefaultDictionary(() => null);
 		}
 
-		public async Task SendNotification(string courseId, Notification notification, string initiatedUserId, string recipientId)
-		{
-			await SendNotification(courseId, notification, initiatedUserId, new List<string> { recipientId });
-		}
-
-		public async Task SendNotification(string courseId, Notification notification, string initiatedUserId, IEnumerable<string> recipientsIds)
+		public async Task AddNotification(string courseId, Notification notification, string initiatedUserId)
 		{
 			notification.CreateTime = DateTime.Now;
 			notification.InitiatedById = initiatedUserId;
 			notification.CourseId = courseId;
 			db.Notifications.Add(notification);
-
-			var recipientsIdsSet = new HashSet<string>(recipientsIds);
-
-			var notificationType = notification.GetNotificationType();
-			var transportsSettings = db.NotificationTransportSettings
-				.Include(s => s.NotificationTransport)
-				.Where(s => s.CourseId == courseId && 
-							s.NotificationType == notificationType && 
-							recipientsIdsSet.Contains(s.NotificationTransport.UserId)).ToList();
-			var defaultFrequency = notificationType.GetDefaultFrequency();
-
-			if (defaultFrequency != NotificationSendingFrequency.Disabled)
-			{
-				var recipientsTransports = db.NotificationTransports.Where(t => recipientsIdsSet.Contains(t.UserId) && t.IsEnabled).ToList();
-				var notFoundTransports = recipientsTransports.Except(transportsSettings.Select(c => c.NotificationTransport), new NotificationTransportIdComparer());
-
-				foreach (var transport in notFoundTransports)
-				{
-					transportsSettings.Add(new NotificationTransportSettings
-					{
-						Frequency = defaultFrequency,
-						NotificationTransport = transport,
-						NotificationTransportId = transport.Id,
-					});
-				}
-			}
-
-			foreach (var transportSettings in transportsSettings)
-			{
-				if (transportSettings.Frequency == NotificationSendingFrequency.Disabled)
-					continue;
-
-				/* Always ignore to send notification to user initiated this notification */
-				if (transportSettings.NotificationTransport.UserId == initiatedUserId)
-					continue;
-
-				var sendTime = transportSettings.FindSendTime(DateTime.Now);
-
-				db.NotificationDeliveries.Add(new NotificationDelivery
-				{
-					Notification = notification,
-					NotificationTransportId = transportSettings.NotificationTransportId,
-					CreateTime = DateTime.Now,
-					SendTime = sendTime,
-					Status = NotificationDeliveryStatus.NotSent,
-				});
-			}
 
 			await db.SaveChangesAsync();
 		}
@@ -187,7 +152,11 @@ namespace Database.DataContexts
 		public List<NotificationDelivery> GetDeliveriesForSendingNow()
 		{
 			var now = DateTime.Now;
-			return db.NotificationDeliveries.Where(d => d.SendTime < now && d.Status == NotificationDeliveryStatus.NotSent).ToList();
+			return db.NotificationDeliveries.Where(
+				d => (d.NextTryTime < now || d.NextTryTime == null) && 
+				d.Status == NotificationDeliveryStatus.NotSent &&
+				d.FailsCount < maxNotificationsSendingFails
+			).ToList();
 		}
 
 		public async Task MarkDeliveriesAsSent(List<int> deliveriesIds)
@@ -220,6 +189,114 @@ namespace Database.DataContexts
 		public async Task MarkDeliveryAsSent(int deliveryId)
 		{
 			await SetDeliveryStatus(deliveryId, NotificationDeliveryStatus.Sent);
+		}
+
+		public async Task CreateDeliveries()
+		{
+			var notifications = db.Notifications.Where(
+				n => !n.AreDeliveriesCreated && n.CreateTime < DateTime.Now.Subtract(TimeSpan.FromMinutes(1))
+				).ToList();
+			foreach (var notification in notifications)
+			{
+				var notificationType = notification.GetNotificationType();
+				log.Info($"Found new notification {notificationType} #{notification.Id}");
+
+				if (!notification.IsActual())
+				{
+					log.Info($"Notification #{notification.Id}: is not actual more");
+					continue;
+				}
+
+				var recipientsIds = notification.GetRecipientsIds(db);
+				log.Info($"Recipients list for notifiction {notification.Id}: {recipientsIds.Count} user(s)");
+
+				if (recipientsIds.Count == 0)
+					continue;
+				
+				var transportsSettings = db.NotificationTransportSettings
+					.Include(s => s.NotificationTransport)
+					.Where(s => s.CourseId == notification.CourseId &&
+								s.NotificationType == notificationType &&
+								recipientsIds.Contains(s.NotificationTransport.UserId)).ToList();
+
+				var isEnabledByDefault = notificationType.IsEnabledByDefault();
+
+				if (isEnabledByDefault)
+				{
+					log.Info($"Notification #{notification.Id}. This notification type has enabled default sending, so collection data for it");
+
+					var recipientsTransports = db.NotificationTransports.Where(
+						t => recipientsIds.Contains(t.UserId) &&
+						t.IsEnabled
+					).ToList();
+					var notFoundTransports = recipientsTransports.Except(transportsSettings.Select(c => c.NotificationTransport), new NotificationTransportIdComparer());
+
+					foreach (var transport in notFoundTransports)
+					{
+						transportsSettings.Add(new NotificationTransportSettings
+						{
+							IsEnabled = true,
+							NotificationTransport = transport,
+							NotificationTransportId = transport.Id,
+						});
+					}
+				}
+				
+				var now = DateTime.Now;
+
+				foreach (var transportSettings in transportsSettings)
+				{
+					log.Info($"Notification #{notification.Id}: add delivery to {transportSettings.NotificationTransport}, isEnabled: {transportSettings.IsEnabled}");
+					if (!transportSettings.IsEnabled)
+						continue;
+
+					/* Always ignore to send notification to user initiated this notification */
+					if (transportSettings.NotificationTransport.UserId == notification.InitiatedById)
+						continue;
+
+					log.Info($"Notification #{notification.Id}: add delivery to {transportSettings.NotificationTransport}, sending at {now}");
+					db.NotificationDeliveries.Add(new NotificationDelivery
+					{
+						Notification = notification,
+						NotificationTransportId = transportSettings.NotificationTransportId,
+						CreateTime = now,
+						NextTryTime = now,
+						FailsCount = 0,
+						Status = NotificationDeliveryStatus.NotSent,
+					});
+				}
+
+				notification.AreDeliveriesCreated = true;
+			}
+
+			await db.SaveChangesAsync();
+		}
+
+		public async Task MarkDeliveriesAsFailed(List<NotificationDelivery> deliveries)
+		{
+			foreach (var delivery in deliveries)
+			{
+				delivery.FailsCount++;
+				delivery.NextTryTime = CalculateNextTryTime(delivery.CreateTime, delivery.FailsCount);
+			}
+			await db.SaveChangesAsync();
+		}
+
+		public Task MarkDeliveryAsFailed(NotificationDelivery delivery)
+		{
+			return MarkDeliveriesAsFailed(new List<NotificationDelivery> { delivery });
+		}
+
+		public string GetSecretHashForTelegramTransport(long chatId, string chatTitle, string key)
+		{
+			var hasher = MD5.Create();
+			var bytes = Encoding.UTF8.GetBytes(key + chatId + "&" + chatTitle + key);
+			var hash = hasher.ComputeHash(bytes);
+
+			var sb = new StringBuilder();
+			foreach (var b in hash)
+				sb.Append(b.ToString("x2"));
+			return sb.ToString();
 		}
 	}
 

@@ -13,8 +13,10 @@
 			<li>@Html.ActionLink("Группы", "Groups", "Admin", new { Model.CourseId }, new { })</li>
 			<li><a href="@Url.Action("CourseStatistics", "Analytics", new { Model.CourseId })">Ведомость курса <sup>&beta;</sup></a></li>
 			<li>@Html.ActionLink("Ведомость модуля", "UnitStatistics", "Analytics", new { Model.CourseId }, new { })</li>
-			<li>@Html.ActionLink("Сертификаты", "Certificates", "Admin", new { Model.CourseId }, new { })</li>
-			@if (User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
+		    <li>@Html.ActionLink("Сертификаты", "Certificates", "Admin", new { Model.CourseId }, new { })</li>
+            <li>@Html.ActionLink("Настроить уведомления", "Settings", "Notifications", new { Model.CourseId }, new { title = "Настроить уведомления" })</li>
+
+		    @if (User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
 			{
 				<li class="divider" role="separator"></li>
 				<li>@Html.ActionLink("Пользователи", "Users", "Admin", new { Model.CourseId }, new { })</li>

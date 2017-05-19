@@ -167,7 +167,7 @@ namespace uLearn.Web.Controllers
 			{
 				Comment = comment,
 			};
-			await notificationsRepo.SendNotification(courseId, notification, comment.AuthorId, visitsRepo.GetCourseUsers(comment.CourseId));
+			await notificationsRepo.AddNotification(courseId, notification, comment.AuthorId);
 
 			if (!comment.IsTopLevel())
 			{
@@ -179,7 +179,7 @@ namespace uLearn.Web.Controllers
 						Comment = comment,
 						ParentComment = parentComment,
 					};
-					await notificationsRepo.SendNotification(courseId, replyNotification, comment.AuthorId, parentComment.AuthorId);
+					await notificationsRepo.AddNotification(courseId, replyNotification, comment.AuthorId);
 				}
 			}
 		}
@@ -208,7 +208,7 @@ namespace uLearn.Web.Controllers
 					Comment = comment,
 					LikedUserId = userId,
 				};
-				await notificationsRepo.SendNotification(comment.CourseId, notification, userId, comment.AuthorId);
+				await notificationsRepo.AddNotification(comment.CourseId, notification, userId);
 			}
 		}
 

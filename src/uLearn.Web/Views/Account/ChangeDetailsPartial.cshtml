@@ -41,7 +41,15 @@
 				@Html.ValidationMessageFor(m => m.ConfirmPassword)
 			</div>
 		}
-		<div class="form-group">
+
+        if (Model.User.TelegramChatId.HasValue)
+        {
+             <div class="form-group">
+                 Телеграм-аккаунт: @Model.User.TelegramChatTitle
+             </div>
+        }
+
+	    <div class="form-group">
 			<input type="submit" value="Сохранить изменения" class="ph-btn ph-btn-blue btn-block" />
 		</div>
 	}

@@ -77,6 +77,9 @@ namespace uLearn.Web.Models
 		[HiddenInput]
 		public string UserId { get; set; }
 
+		[HiddenInput]
+		public ApplicationUser User { get; set; }
+
 		public bool HasPassword { get; set; }
 
 		[Required(ErrorMessage = "{0} должен быть у каждого пользователя")]

@@ -1,5 +1,7 @@
 ﻿@model UserMenuPartialViewModel
 
+@using Database.Extensions
+@using Database.Models
 @using Microsoft.AspNet.Identity
 
 @if (Model.IsAuthenticated)
@@ -17,8 +19,8 @@
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">@profileMenuTitle <span class="caret"></span></a>
 				<ul class="dropdown-menu">
-					<li>@Html.ActionLink("Профиль", "Manage", "Account", null, new { title = "Редактировать профиль" })</li>
-					<li>@Html.ActionLink("Сертификаты", "Index", "Certificates", new { userId = User.Identity.GetUserId() }, new { })</li>
+				    <li>@Html.ActionLink("Профиль", "Manage", "Account", null, new { title = "Редактировать профиль" })</li>
+                    <li>@Html.ActionLink("Сертификаты", "Index", "Certificates", new { userId = User.Identity.GetUserId() }, new { })</li>
 					<li><a href="#" onclick="document.getElementById('logoutForm').submit(); return false;">Выход</a></li>
 				</ul>
 			</li>

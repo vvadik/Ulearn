@@ -223,9 +223,9 @@ namespace Database.DataContexts
 			return new HashSet<string>(db.Visits.Where(v => v.UserId == userId).Select(v => v.CourseId).Distinct());
 		}
 
-		public HashSet<string> GetCourseUsers(string courseId)
+		public List<string> GetCourseUsers(string courseId)
 		{
-			return new HashSet<string>(db.Visits.Where(v => v.CourseId == courseId).Select(v => v.UserId).Distinct());
+			return db.Visits.Where(v => v.CourseId == courseId).Select(v => v.UserId).Distinct().ToList();
 		}
 	}
 }

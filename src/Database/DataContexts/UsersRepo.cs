@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Core.Objects;
 using System.Linq;
+using System.Threading.Tasks;
 using Database.Models;
 using EntityFramework.Functions;
 using Microsoft.AspNet.Identity;
@@ -53,12 +54,30 @@ namespace Database.DataContexts
 		}
 
 		/* Pass limit=0 to disable limiting */
-
 		public List<UserRolesInfo> GetCourseAdmins(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
 		{
 			return db.Users
 				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, courseId, includeHighRoles: true))
 				.GetUserRolesInfo(limit, userManager);
+		}
+
+		public List<string> GetSysAdminsIds(UserManager<ApplicationUser> userManager)
+		{
+			var role = db.Roles.FirstOrDefault(r => r.Name == LmsRoles.SysAdmin);
+			if (role == null)
+				return new List<string>();
+			return db.Users.FilterByRole(role, userManager).Select(u => u.Id).ToList();
+		}
+
+		public async Task ChangeTelegram(string userId, long chatId, string chatTitle)
+		{
+			var user = FindUserById(userId);
+			if (user == null)
+				return;
+
+			user.TelegramChatId = chatId;
+			user.TelegramChatTitle = chatTitle;
+			await db.SaveChangesAsync();
 		}
 
 		private const string nameSpace = nameof(UsersRepo);

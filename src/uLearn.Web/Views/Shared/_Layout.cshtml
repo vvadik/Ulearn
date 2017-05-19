@@ -76,7 +76,7 @@
 						{
 							/* RouteData has no attribute 'courseId' */
 							var controller = Html.ViewContext.RouteData.Values["controller"].ToString();
-							if ((controller == "Admin" || controller == "Analytics" || controller == "Grader") &&
+							if ((controller == "Admin" || controller == "Analytics" || controller == "Grader" || controller == "Notifications") &&
 								Request.Params["courseId"] != null)
 							{
 								courseId = Request.Params["courseId"];
@@ -92,6 +92,7 @@
 	@RenderBody()
 
 	@Html.Partial("_UlearnUpdatesInvitation")
+    @Html.Action("SuggestMailTransport", "Notifications")
 
 	@Scripts.Render("~/main-js")
 	@RenderSection("scripts", required: false)
@@ -121,7 +122,7 @@
 	if (courses.Count == 0)
 	{
 		<li>
-			<b>Нет курсов.</b>
+            <a><b>Нет курсов</b></a>
 			@if (User.IsSystemAdministrator())
 			{
 				@Html.ActionLink("Создать", "CourseList", "Admin")

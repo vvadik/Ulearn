@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Web.Configuration;
 using System.Web.Mvc;
 using Database;
 using Database.DataContexts;
@@ -28,6 +29,9 @@ namespace uLearn.Web.Controllers
 		private readonly GroupsRepo groupsRepo;
 		private readonly CertificatesRepo certificatesRepo;
 		private readonly VisitsRepo visitsRepo;
+		private readonly NotificationsRepo notificationsRepo;
+
+		private readonly string telegramSecret;
 
 		public AccountController()
 		{
@@ -39,6 +43,9 @@ namespace uLearn.Web.Controllers
 			groupsRepo = new GroupsRepo(db, courseManager);
 			certificatesRepo = new CertificatesRepo(db, courseManager);
 			visitsRepo = new VisitsRepo(db);
+			notificationsRepo = new NotificationsRepo(db);
+
+			telegramSecret = WebConfigurationManager.AppSettings["ulearn.telegram.webhook.secret"] ?? "";
 		}
 
 		[AllowAnonymous]
@@ -401,6 +408,7 @@ namespace uLearn.Web.Controllers
 			{
 				Name = user.UserName,
 				UserId = user.Id, 
+				User = user,
 				HasPassword = hasPassword,
 				FirstName = user.FirstName,
 				LastName = user.LastName,
@@ -466,6 +474,23 @@ namespace uLearn.Web.Controllers
 				IsAuthenticated = isAuthenticated,
 				UserVisibleName = userVisibleName,
 			});
+		}
+
+		public async Task<ActionResult> AddTelegram(long chatId, string chatTitle, string hash)
+		{
+			var correctHash = notificationsRepo.GetSecretHashForTelegramTransport(chatId, chatTitle, telegramSecret);
+			if (hash != correctHash)
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
+			var userId = User.Identity.GetUserId();
+			await usersRepo.ChangeTelegram(userId, chatId, chatTitle);
+			await notificationsRepo.AddNotificationTransport(new TelegramNotificationTransport
+			{
+				UserId = userId,
+				IsEnabled = true,
+			});
+
+			return RedirectToAction("Manage");
 		}
 	}
 }

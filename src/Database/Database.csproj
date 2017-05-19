@@ -411,6 +411,18 @@
     <Compile Include="Migrations\201705160539376_RemoveUniqueFromNotificationDelivery.Designer.cs">
       <DependentUpon>201705160539376_RemoveUniqueFromNotificationDelivery.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201705181249512_NotificationsRefactoring.cs" />
+    <Compile Include="Migrations\201705181249512_NotificationsRefactoring.Designer.cs">
+      <DependentUpon>201705181249512_NotificationsRefactoring.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705190404419_RemoveNotificationTransportsConfirmation.cs" />
+    <Compile Include="Migrations\201705190404419_RemoveNotificationTransportsConfirmation.Designer.cs">
+      <DependentUpon>201705190404419_RemoveNotificationTransportsConfirmation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705190647437_AddNotificationsIndicies.cs" />
+    <Compile Include="Migrations\201705190647437_AddNotificationsIndicies.Designer.cs">
+      <DependentUpon>201705190647437_AddNotificationsIndicies.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -664,6 +676,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201705160539376_RemoveUniqueFromNotificationDelivery.resx">
       <DependentUpon>201705160539376_RemoveUniqueFromNotificationDelivery.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705181249512_NotificationsRefactoring.resx">
+      <DependentUpon>201705181249512_NotificationsRefactoring.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705190404419_RemoveNotificationTransportsConfirmation.resx">
+      <DependentUpon>201705190404419_RemoveNotificationTransportsConfirmation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705190647437_AddNotificationsIndicies.resx">
+      <DependentUpon>201705190647437_AddNotificationsIndicies.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

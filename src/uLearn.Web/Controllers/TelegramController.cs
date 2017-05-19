@@ -86,10 +86,11 @@ namespace uLearn.Web.Controllers
 			var reply = "";
 			if (text == "/start" || text == "/connect")
 			{
-				var transport = await notificationsRepo.RequestNewTelegramTransport(chatId, GetChatTitle(message.Chat));
-				var requestTransportUrl = Url.Action("AddTelegramTransport", "Notifications", new { code = transport.ConfirmationCode }, protocol);
-
-				reply = $"Чтобы получать уведомления от ulearn в телеграм, перейдите по ссылке {requestTransportUrl}";
+				var chatTitle = GetChatTitle(message.Chat);
+				var secretHash = notificationsRepo.GetSecretHashForTelegramTransport(chatId, chatTitle, webhookSecret);
+				var createTransportUrl = Url.Action("AddTelegram", "Account", new { chatId = chatId, chatTitle = chatTitle, hash = secretHash }, "https");
+				
+				reply = $"Чтобы получать уведомления от ulearn.me в телеграм, перейдите по ссылке {createTransportUrl}";
 				if (text == "/start")
 					reply = "Добро пожаловать к боту ulearn.me!\n\n" + reply;
 			}

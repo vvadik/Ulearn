@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Core.Objects;
 using System.Reflection;
-using System.Threading.Tasks;
+using Database.DataContexts;
 using uLearn;
 using uLearn.Extensions;
 
@@ -18,33 +18,31 @@ namespace Database.Models
 
 		[StringLength(64)]
 		[Index("IDX_NotificationTransport_ByUser")]
+		[Index("IDX_NotificationTransport_ByUserAndDeleted", 1)]
 		public string UserId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
 
 		public bool IsEnabled { get; set; }
 
+		[Index("IDX_NotificationTransport_ByUserAndDeleted", 2)]
 		public bool IsDeleted { get; set; }
-
-		[Index("IDX_NotificationTransport_ByConfirmationCode")]
-		public Guid ConfirmationCode { get; set; }
-
-		public bool IsConfirmed { get; set; }
 	}
 
 	public class MailNotificationTransport : NotificationTransport
 	{
-		[StringLength(200)]
-		public string Email { get; set; }
+		public override string ToString()
+		{
+			return $"Email <{User.Email ?? User.Id}> (#{Id})";
+		}
 	}
 
 	public class TelegramNotificationTransport : NotificationTransport
 	{
-		[Index("IDX_TelegramNotificationTransport_ByChatId")]
-		public long ChatId { get; set; }
-
-		[StringLength(200)]
-		public string ChatTitle { get; set; }
+		public override string ToString()
+		{
+			return $"Telegram <{User.TelegramChatId?.ToString() ?? User.Id}> (#{Id})";
+		}
 	}
 
 	public class NotificationTransportSettings
@@ -67,51 +65,13 @@ namespace Database.Models
 		[Index("IDX_NotificationTransportSettings_ByCourseAndNofiticationType", 2)]
 		public NotificationType NotificationType { get; set; }
 
-		public NotificationSendingFrequency Frequency { get; set; }
+		public bool IsEnabled { get; set; }
 
 		public static DateTime GetNextWeekday(DateTime today, DayOfWeek day)
 		{
 			var daysToAdd = ((int)day - (int)today.DayOfWeek + 7) % 7;
 			return today.AddDays(daysToAdd);
 		}
-
-		public DateTime FindSendTime(DateTime now)
-		{
-			if (Frequency == NotificationSendingFrequency.OnceADay)
-			{
-				// Send at 21:00 each day
-				var today9Pm = new DateTime(now.Year, now.Month, now.Day, 21, 0, 0);
-				if (now.Hour < 21)
-					return today9Pm;
-				return today9Pm + TimeSpan.FromDays(1);
-			}
-
-			if (Frequency == NotificationSendingFrequency.OnceAWeek)
-			{
-				// Send at 9:00 each monday
-				var nearestMonday = GetNextWeekday(now, DayOfWeek.Monday);
-				if (now.DayOfWeek == DayOfWeek.Monday && now.Hour > 9)
-					nearestMonday = GetNextWeekday(now.AddDays(1), DayOfWeek.Monday);
-				return new DateTime(nearestMonday.Year, nearestMonday.Month, nearestMonday.Day, 9, 0, 0);
-			}
-
-			return now;
-		}
-	}
-
-	public enum NotificationSendingFrequency : byte
-	{
-		[Display(Name = "Выключено")]
-		Disabled = 0,
-
-		[Display(Name = "Сразу")]
-		AtOnce = 1,
-
-		[Display(Name = "Раз в день")]
-		OnceADay = 2,
-
-		[Display(Name = "Раз в неделю")]
-		OnceAWeek = 3,
 	}
 
 	public class NotificationDelivery
@@ -134,8 +94,10 @@ namespace Database.Models
 
 		public DateTime CreateTime { get; set; }
 
-		[Index("IDX_NotificationDelivery_BySendTime")]
-		public DateTime SendTime { get; set; }
+		[Index("IDX_NotificationDelivery_ByNextTryTime")]
+		public DateTime? NextTryTime { get; set; }
+
+		public int FailsCount { get; set; }
 	}
 
 	public enum NotificationDeliveryStatus : byte
@@ -170,81 +132,81 @@ namespace Database.Models
 	{
 	}
 
-	public class DefaultFrequencyAttribute : Attribute
+	public class IsEnabledByDefaultAttribute : Attribute
 	{
-		public NotificationSendingFrequency Frequency { get; }
+		public bool IsEnabled { get; }
 
-		public DefaultFrequencyAttribute(NotificationSendingFrequency frequency)
+		public IsEnabledByDefaultAttribute(bool isEnabled)
 		{
-			Frequency = frequency;
+			IsEnabled = isEnabled;
 		}
 	}
 
 	public enum NotificationType : short
 	{
 		// Everybody
-		[Display(Name = "Системное сообщение", GroupName = "Системные сообщения")]
+		[Display(Name = @"Системное сообщение", GroupName = @"Системные сообщения")]
 		SystemMessage = 1,
 
-		[Display(Name = "Сообщение от преподавателя", GroupName = "Сообщения от преподавателя")]
-		[DefaultFrequency(NotificationSendingFrequency.AtOnce)]
+		[Display(Name = @"Сообщение от преподавателя", GroupName = @"Сообщения от преподавателя")]
+		[IsEnabledByDefault(true)]
 		InstructorMessage = 2,
 
-		[Display(Name = "Новый комментарий", GroupName = "Новые комментарии")]
+		[Display(Name = @"Новый комментарий", GroupName = @"Новые комментарии")]
 		NewComment = 3,
 
-		[Display(Name = "Ответ на ваш комментарий", GroupName = "Ответы на ваши комментарии")]
-		[DefaultFrequency(NotificationSendingFrequency.AtOnce)]
+		[Display(Name = @"Ответ на ваш комментарий", GroupName = @"Ответы на ваши комментарии")]
+		[IsEnabledByDefault(true)]
 		RepliedToYourComment = 4,
 
-		[Display(Name = "Отметка «нравится» вашему комментарию", GroupName = "Отметки «нравится» вашим комментариям")]
-		[DefaultFrequency(NotificationSendingFrequency.AtOnce)]
+		[Display(Name = @"Отметка «нравится» вашему комментарию", GroupName = @"Отметки «нравится» вашим комментариям")]
+		[IsEnabledByDefault(true)]
 		LikedYourComment = 5,
 
-		[Display(Name = "Прохождение код-ревью", GroupName = "Прохождение код-ревью")]
-		[DefaultFrequency(NotificationSendingFrequency.AtOnce)]
+		[Display(Name = @"Прохождение код-ревью", GroupName = @"Прохождение код-ревью")]
+		[IsEnabledByDefault(true)]
 		PassedManualExerciseChecking = 6,
 
-		[Display(Name = "Тест проверен преподавателем", GroupName = "Тест проверен преподавателем")]
-		[DefaultFrequency(NotificationSendingFrequency.AtOnce)]
+		[Display(Name = @"Тест проверен преподавателем", GroupName = @"Тест проверен преподавателем")]
+		[IsEnabledByDefault(true)]
 		PassedManualQuizChecking = 7,
 
-		[Display(Name = "Получен сертификат", GroupName = "Полученные сертификаты")]
-		[DefaultFrequency(NotificationSendingFrequency.AtOnce)]
+		[Display(Name = @"Получен сертификат", GroupName = @"Полученные сертификаты")]
+		[IsEnabledByDefault(true)]
 		ReceivedCertificate = 8,
 
-		[Display(Name = "Преподаватель выставил дополнительные баллы", GroupName = "Дополнительные баллы, выставленные преподавателем")]
-		[DefaultFrequency(NotificationSendingFrequency.AtOnce)]
+		[Display(Name = @"Преподаватель выставил дополнительные баллы", GroupName = @"Дополнительные баллы, выставленные преподавателем")]
+		[IsEnabledByDefault(true)]
 		ReceivedAdditionalScore = 9,
 
 		// Instructors
-		[Display(Name = "Кто-то присоединился к вашей группе", GroupName = "Кто-то присоединился к вашей группе")]
+		[Display(Name = @"Кто-то присоединился к вашей группе", GroupName = @"Кто-то присоединился к вашей группе")]
 		[MinCourseRole(CourseRole.Instructor)]
-		[DefaultFrequency(NotificationSendingFrequency.OnceADay)]
+		[IsEnabledByDefault(true)]
 		JoinedToYourGroup = 101,
 
 		// Course admins
-		[Display(Name = "Новый преподаватель", GroupName = "Новые преподаватели")]
+		[Display(Name = @"Новый преподаватель", GroupName = @"Новые преподаватели")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
-		[DefaultFrequency(NotificationSendingFrequency.AtOnce)]
+		[IsEnabledByDefault(true)]
 		AddedInstructor = 201,
 
-		[Display(Name = "Новая группа", GroupName = "Новые группы")]
+		[Display(Name = @"Новая группа", GroupName = @"Новые группы")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
-		[DefaultFrequency(NotificationSendingFrequency.AtOnce)]
+		[IsEnabledByDefault(true)]
 		CreatedGroup = 202,
 
-		[Display(Name = "Загружен новый пакет", GroupName = "Загружен новый пакет")]
+		[Display(Name = @"Загружен новый пакет", GroupName = @"Загружен новый пакет")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		UploadedPackage = 203,
 
-		[Display(Name = "Опубликован новый пакет", GroupName = "Опубликован новый пакет")]
+		[Display(Name = @"Опубликован новый пакет", GroupName = @"Опубликован новый пакет")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		PublishedPackage = 204,
 
-		[Display(Name = "Произошла ошибка", GroupName = "Произошедшие ошибки")]
+		[Display(Name = @"Произошла ошибка", GroupName = @"Произошедшие ошибки")]
 		[SysAdminsOnly]
-		[DefaultFrequency(NotificationSendingFrequency.AtOnce)]
+		[IsEnabledByDefault(true)]
 		OccuredError = 301
 	}
 
@@ -271,10 +233,10 @@ namespace Database.Models
 			return type.GetAttribute<SysAdminsOnlyAttribute>() != null;
 		}
 
-		public static NotificationSendingFrequency GetDefaultFrequency(this NotificationType type)
+		public static bool IsEnabledByDefault(this NotificationType type)
 		{
-			var attribute = type.GetAttribute<DefaultFrequencyAttribute>();
-			return attribute?.Frequency ?? NotificationSendingFrequency.Disabled;
+			var attribute = type.GetAttribute<IsEnabledByDefaultAttribute>();
+			return attribute?.IsEnabled ?? false;
 		}
 	}
 
@@ -299,10 +261,18 @@ namespace Database.Models
 		[Index("IDX_Notification_ByCreateTime")]
 		public DateTime CreateTime { get; set; }
 
+		[Required]
+		[Index("IDX_Notification_ByAreDeliveriesCreated")]
+		public bool AreDeliveriesCreated { get; set; }
+
 		public virtual ICollection<NotificationDelivery> Deliveries { get; set; }
 
 		public abstract string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course);
 		public abstract string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course);
+
+		public abstract List<string> GetRecipientsIds(ULearnDb db);
+
+		public abstract bool IsActual();
 	}
 
 	public static class NotificationExtensions
@@ -337,6 +307,17 @@ namespace Database.Models
 		{
 			return $"Сообщение от ulearn.me:\n\n{Text}";
 		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			/* If you want to send system message you should create NotificationDelivery yourself. By default nobody receives it */
+			return new List<string>();
+		}
+
+		public override bool IsActual()
+		{
+			return true;
+		}
 	}
 
 	[NotificationType(NotificationType.InstructorMessage)]
@@ -353,6 +334,17 @@ namespace Database.Models
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
 		{
 			return $"Сообщение от преподавателя:\n\n{Text}";
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			/* If you want to send message you should create NotificationDelivery yourself. By default nobody receives it */
+			return new List<string>();
+		}
+
+		public override bool IsActual()
+		{
+			return true;
 		}
 	}
 
@@ -372,6 +364,11 @@ namespace Database.Models
 		{
 			/* TODO (andgein): Build url from UrlHelper */
 			return "https://ulearn.me/Course/" + Comment.CourseId + "/" + slide.Url + "#comment-" + Comment.Id;
+		}
+
+		public override bool IsActual()
+		{
+			return ! Comment.IsDeleted && Comment.IsApproved;
 		}
 	}
 
@@ -394,6 +391,11 @@ namespace Database.Models
 				return null;
 
 			return $"{Comment.Author.VisibleName} в «{GetSlideTitle(course, slide)}»\n\n{Comment.Text.Trim()}\n\n{GetCommentUrl(slide)}";
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new VisitsRepo(db).GetCourseUsers(CourseId);
 		}
 	}
 
@@ -428,6 +430,11 @@ namespace Database.Models
 				   $"{Comment.Text.Trim()}\n\n" +
 				   $"{GetCommentUrl(slide)}";
 		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new List<string> { ParentComment.AuthorId };
+		}
 	}
 
 	[NotificationType(NotificationType.LikedYourComment)]
@@ -461,6 +468,11 @@ namespace Database.Models
 				   $"> {Comment.Text.Trim()}\n\n" +
 				   $"{GetCommentUrl(slide)}";
 		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new List<string> { Comment.AuthorId };
+		}
 	}
 
 	[NotificationType(NotificationType.PassedManualExerciseChecking)]
@@ -479,6 +491,16 @@ namespace Database.Models
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
 		{
 			throw new NotImplementedException();
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new List<string> { Checking.UserId };
+		}
+
+		public override bool IsActual()
+		{
+			return true;
 		}
 	}
 
@@ -499,6 +521,16 @@ namespace Database.Models
 		{
 			throw new NotImplementedException();
 		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new List<string> { Checking.UserId };
+		}
+
+		public override bool IsActual()
+		{
+			return true;
+		}
 	}
 
 	[NotificationType(NotificationType.ReceivedCertificate)]
@@ -518,6 +550,16 @@ namespace Database.Models
 		{
 			throw new NotImplementedException();
 		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new List<string> { Certificate.UserId };
+		}
+
+		public override bool IsActual()
+		{
+			return !Certificate.IsDeleted;
+		}
 	}
 
 	[NotificationType(NotificationType.ReceivedAdditionalScore)]
@@ -536,6 +578,16 @@ namespace Database.Models
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
 		{
 			throw new NotImplementedException();
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new List<string> { Score.UserId };
+		}
+
+		public override bool IsActual()
+		{
+			return true;
 		}
 	}
 
@@ -562,6 +614,16 @@ namespace Database.Models
 		{
 			throw new NotImplementedException();
 		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new List<string> { Group.OwnerId };
+		}
+
+		public override bool IsActual()
+		{
+			return !Group.IsDeleted;
+		}
 	}
 
 	[NotificationType(NotificationType.AddedInstructor)]
@@ -582,6 +644,16 @@ namespace Database.Models
 		{
 			throw new NotImplementedException();
 		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+		}
+
+		public override bool IsActual()
+		{
+			return true;
+		}
 	}
 
 	[NotificationType(NotificationType.CreatedGroup)]
@@ -600,6 +672,16 @@ namespace Database.Models
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
 		{
 			throw new NotImplementedException();
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+		}
+
+		public override bool IsActual()
+		{
+			return !Group.IsDeleted;
 		}
 	}
 
@@ -620,6 +702,16 @@ namespace Database.Models
 		{
 			throw new NotImplementedException();
 		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+		}
+
+		public override bool IsActual()
+		{
+			return true;
+		}
 	}
 
 	[NotificationType(NotificationType.PublishedPackage)]
@@ -638,6 +730,16 @@ namespace Database.Models
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
 		{
 			throw new NotImplementedException();
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+		}
+
+		public override bool IsActual()
+		{
+			return true;
 		}
 	}
 
@@ -658,6 +760,17 @@ namespace Database.Models
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
 		{
 			throw new NotImplementedException();
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			var userManager = new ULearnUserManager(db);
+			return new UsersRepo(db).GetSysAdminsIds(userManager);
+		}
+
+		public override bool IsActual()
+		{
+			return true;
 		}
 	}
 }
