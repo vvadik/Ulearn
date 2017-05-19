@@ -34,6 +34,7 @@ namespace Notifications
 
 		public async Task SendMessageAsync(long chatId, string html)
 		{
+			html = html.Replace("<br>", "\n").Replace("<br/>", "\n");
 			log.Info($"Try to send message to telegram chat {chatId}, html: {html.Replace("\n", @" \\ ")}");
 			try
 			{
