@@ -104,7 +104,7 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		public async Task<ActionResult> EnableNotificationTransport(int transportId, bool enable = true)
+		public async Task<ActionResult> EnableNotificationTransport(int transportId, bool enable = true, string courseId = "")
 		{
 			var transport = notificationsRepo.FindNotificationTransport(transportId);
 			if (! User.Identity.IsAuthenticated || transport.UserId != User.Identity.GetUserId())
@@ -112,7 +112,9 @@ namespace uLearn.Web.Controllers
 
 			await notificationsRepo.EnableNotificationTransport(transportId, enable);
 
-			return RedirectToAction("Settings");
+			if (string.IsNullOrEmpty(courseId))
+				return RedirectToAction("Index", "Home");
+			return RedirectToAction("Settings", new { courseId = courseId });
 		}
 
 		public async Task<ActionResult> CreateMailTransport()

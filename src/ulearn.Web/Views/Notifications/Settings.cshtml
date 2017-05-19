@@ -59,14 +59,14 @@
                     {
                         <th>
                             Эл. почта <br/>
-                            @Html.ActionLink(Model.MailTransport.IsEnabled ? "выключить" : "включить", "EnableNotificationTransport", "Notifications", new { transportId = Model.MailTransport.Id, enable = ! Model.MailTransport.IsEnabled }, new { @class = "btn btn-danger btn-xs" })
+                            @Html.ActionLink(Model.MailTransport.IsEnabled ? "выключить" : "включить", "EnableNotificationTransport", "Notifications", new { transportId = Model.MailTransport.Id, enable = ! Model.MailTransport.IsEnabled, courseId = Model.Course.Id }, new { @class = "btn btn-xs " + (Model.MailTransport.IsEnabled ? "btn-danger" : "btn-success") })
                         </th>
                     }
                     @if (Model.TelegramTransport != null)
                     {
                         <th>
                             Телеграм <br/>
-                            @Html.ActionLink(Model.TelegramTransport.IsEnabled ? "выключить" : "включить", "EnableNotificationTransport", "Notifications", new { transportId = Model.TelegramTransport.Id, enable = !Model.TelegramTransport.IsEnabled }, new { @class = "btn btn-danger btn-xs" })
+                            @Html.ActionLink(Model.TelegramTransport.IsEnabled ? "выключить" : "включить", "EnableNotificationTransport", "Notifications", new { transportId = Model.TelegramTransport.Id, enable = !Model.TelegramTransport.IsEnabled, courseId = Model.Course.Id }, new { @class = "btn btn-xs " + (Model.TelegramTransport.IsEnabled ? "btn-danger" : "btn-success") })
                         </th>
                     }
                 </tr>
@@ -82,7 +82,7 @@
                         @foreach (var transport in transports)
                         {
                             <td class="text-center">
-                                @if (!transport.IsEnabled)
+                                @if (transport.IsEnabled)
                                 {
                                     var settings = Model.TransportsSettings[Tuple.Create(transport.Id, notificationType)];
                                     var isEnabled = settings != null ? settings.IsEnabled : notificationType.IsEnabledByDefault();
