@@ -193,8 +193,9 @@ namespace Database.DataContexts
 
 		public async Task CreateDeliveries()
 		{
+			var minuteAgo = DateTime.Now.Subtract(TimeSpan.FromMinutes(1));
 			var notifications = db.Notifications.Where(
-				n => !n.AreDeliveriesCreated && n.CreateTime < DateTime.Now.Subtract(TimeSpan.FromMinutes(1))
+				n => !n.AreDeliveriesCreated && n.CreateTime < minuteAgo
 				).ToList();
 			foreach (var notification in notifications)
 			{
