@@ -11,6 +11,9 @@
 
     @if (Model.MailTransport == null && Model.User.EmailConfirmed)
     {
+        <h3>
+            Электронная почта
+        </h3>
         if (string.IsNullOrEmpty(Model.User.Email))
         {
             <p>
@@ -32,6 +35,16 @@
         }
         <p>
             Вы сможете настроить, какие именно новости получать на&nbsp;почту. Обещаем не&nbsp;присылать лишнего.
+        </p>
+    }
+
+    @if (Model.TelegramTransport == null)
+    {
+        <h3>
+            Телеграм
+        </h3>
+        <p>
+            Вы можете получать уведомления себе в телеграм. Для этого напишите нашему боту <a href="https://t.me/ulearn_bot">@@ulearn_bot</a>.
         </p>
     }
 
