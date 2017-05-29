@@ -1,6 +1,7 @@
-﻿@using ApprovalUtilities.Utilities
-@using Database.Models
+﻿@using Database.Models
+@using uLearn.Extensions
 @using uLearn.Web.Extensions
+
 @model uLearn.Web.Controllers.ManualCheckingQueueViewModel
 
 @{
@@ -78,15 +79,7 @@
 					<p>
 						Последний раз проверялась преподавателем <b>@checking.LockedBy.VisibleName</b>
 						<span class="label label-xs label-default">
-							@checking.Score из @checkModel.ContextMaxScore.PluralizeInRussian(new RussianPluralizationOptions
-											   {
-												   One = "балл",
-												   Two = "балла",
-												   Five = "баллов",
-												   Gender = Gender.Male,
-												   hideNumberOne = false,
-												   smallNumbersAreWords = false,
-											   })
+							@checking.Score из @checkModel.ContextMaxScore.PluralizeInRussian(RussianPluralizationOptions.Score)
 						</span>
 					</p>
 					<p>
@@ -115,13 +108,7 @@
 						Проверяется преподавателем <b>@checking.LockedBy.VisibleName</b>,
 						заблокирована ещё на @{
 												 var minutes = (int)(checking.LockedUntil.Value - DateTime.Now).TotalMinutes;
-												 @minutes.PluralizeInRussian(new RussianPluralizationOptions
-												 {
-													 One = "минуту",
-													 Two = "минуты",
-													 Five = "минут",
-													 Gender = Gender.Female,
-												 })
+												 @minutes.PluralizeInRussian(RussianPluralizationOptions.MinuteDative)
 											 }
 					</p>
 					if (checking.IsLockedBy(User.Identity))

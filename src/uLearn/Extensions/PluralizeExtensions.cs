@@ -1,4 +1,4 @@
-﻿namespace uLearn.Web.Extensions
+﻿namespace uLearn.Extensions
 {
 	public static class PluralizeExtensions
 	{
@@ -47,6 +47,37 @@
 
 		public bool smallNumbersAreWords = true;
 		public bool hideNumberOne = true;
+
+		public static RussianPluralizationOptions Score = new RussianPluralizationOptions
+		{
+			One = "балл",
+			Two = "балла",
+			Five = "баллов",
+			smallNumbersAreWords = false,
+			hideNumberOne = false,
+		};
+
+		public static RussianPluralizationOptions MinuteDative = new RussianPluralizationOptions
+		{
+			One = "минуту",
+			Two = "минуты",
+			Five = "минут",
+			Gender = Gender.Female,
+		};
+
+		public static RussianPluralizationOptions Hour = new RussianPluralizationOptions
+		{
+			One = "час",
+			Two = "часа",
+			Five = "часов"
+		};
+
+		public static RussianPluralizationOptions Day = new RussianPluralizationOptions
+		{
+			One = "день",
+			Two = "дня",
+			Five = "дней"
+		};
 	}
 
 	public enum Gender

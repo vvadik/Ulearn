@@ -423,6 +423,10 @@
     <Compile Include="Migrations\201705190647437_AddNotificationsIndicies.Designer.cs">
       <DependentUpon>201705190647437_AddNotificationsIndicies.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201705292128067_ChangeNotificationIndexIntToGuid.cs" />
+    <Compile Include="Migrations\201705292128067_ChangeNotificationIndexIntToGuid.Designer.cs">
+      <DependentUpon>201705292128067_ChangeNotificationIndexIntToGuid.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -685,6 +689,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201705190647437_AddNotificationsIndicies.resx">
       <DependentUpon>201705190647437_AddNotificationsIndicies.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705292128067_ChangeNotificationIndexIntToGuid.resx">
+      <DependentUpon>201705292128067_ChangeNotificationIndexIntToGuid.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

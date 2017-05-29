@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 
 namespace uLearn.Web.Extensions
 {
@@ -46,6 +47,22 @@ namespace uLearn.Web.Extensions
 		public static int FindPositionByLineAndCharacted(this string s, int lineNumber, int charNumber)
 		{
 			return s.FindLineStartIndex(lineNumber) + charNumber;
+		}
+
+		/* TODO (andgein): Move to ControllerBase? */
+		public static bool IsLocalUrl(this string url, HttpRequestBase request)
+		{
+			if (string.IsNullOrEmpty(url))
+				return false;
+
+			Uri absoluteUri;
+			if (Uri.TryCreate(url, UriKind.Absolute, out absoluteUri))
+				return request.Url != null && string.Equals(request.Url.Host, absoluteUri.Host, StringComparison.OrdinalIgnoreCase);
+			
+			var isLocal = !url.StartsWith("http:", StringComparison.OrdinalIgnoreCase)
+						&& !url.StartsWith("https:", StringComparison.OrdinalIgnoreCase)
+						&& Uri.IsWellFormedUriString(url, UriKind.Relative);
+			return isLocal;
 		}
 	}
 }

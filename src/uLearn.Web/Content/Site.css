@@ -175,3 +175,10 @@ footer p {
 footer:hover {
 	color: #111;
 }
+
+/* Modals */
+@media (min-width: 1100px) {
+    .modal-dialog.wide {
+        width: 1000px;
+    }
+}

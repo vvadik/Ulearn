@@ -66,12 +66,6 @@ namespace Database.Models
 		public NotificationType NotificationType { get; set; }
 
 		public bool IsEnabled { get; set; }
-
-		public static DateTime GetNextWeekday(DateTime today, DayOfWeek day)
-		{
-			var daysToAdd = ((int)day - (int)today.DayOfWeek + 7) % 7;
-			return today.AddDays(daysToAdd);
-		}
 	}
 
 	public class NotificationDelivery
@@ -145,7 +139,7 @@ namespace Database.Models
 	public enum NotificationType : short
 	{
 		// Everybody
-		[Display(Name = @"Системное сообщение", GroupName = @"Системные сообщения")]
+		[Display(Name = @"Сообщение от платформы ulearn.me", GroupName = @"Сообщения от платформы ulearn.me")]
 		SystemMessage = 1,
 
 		[Display(Name = @"Сообщение от преподавателя", GroupName = @"Сообщения от преподавателя")]
@@ -163,7 +157,7 @@ namespace Database.Models
 		[IsEnabledByDefault(true)]
 		LikedYourComment = 5,
 
-		[Display(Name = @"Прохождение код-ревью", GroupName = @"Прохождение код-ревью")]
+		[Display(Name = @"Вы прошли код-ревью", GroupName = @"Вы прошли код-ревью")]
 		[IsEnabledByDefault(true)]
 		PassedManualExerciseChecking = 6,
 
@@ -171,7 +165,7 @@ namespace Database.Models
 		[IsEnabledByDefault(true)]
 		PassedManualQuizChecking = 7,
 
-		[Display(Name = @"Получен сертификат", GroupName = @"Полученные сертификаты")]
+		[Display(Name = @"Вы получили сертификат", GroupName = @"Вы получили сертификаты")]
 		[IsEnabledByDefault(true)]
 		ReceivedCertificate = 8,
 
@@ -186,25 +180,25 @@ namespace Database.Models
 		JoinedToYourGroup = 101,
 
 		// Course admins
-		[Display(Name = @"Новый преподаватель", GroupName = @"Новые преподаватели")]
+		[Display(Name = @"Добавлен новый преподаватель", GroupName = @"Добавлены новые преподаватели")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		AddedInstructor = 201,
 
-		[Display(Name = @"Новая группа", GroupName = @"Новые группы")]
+		[Display(Name = @"Создана новая группа", GroupName = @"Созданы новые группы")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		CreatedGroup = 202,
 
-		[Display(Name = @"Загружен новый пакет", GroupName = @"Загружен новый пакет")]
+		[Display(Name = @"Загружен новый пакет", GroupName = @"Загружены новые пакеты")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		UploadedPackage = 203,
 
-		[Display(Name = @"Опубликован новый пакет", GroupName = @"Опубликован новый пакет")]
+		[Display(Name = @"Опубликован новый пакет", GroupName = @"Опубликованы новые пакеты")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		PublishedPackage = 204,
 
-		[Display(Name = @"Произошла ошибка", GroupName = @"Произошедшие ошибки")]
+		[Display(Name = @"Произошла ошибка", GroupName = @"Произошли ошибки")]
 		[SysAdminsOnly]
 		[IsEnabledByDefault(true)]
 		OccuredError = 301
@@ -267,12 +261,32 @@ namespace Database.Models
 
 		public virtual ICollection<NotificationDelivery> Deliveries { get; set; }
 
-		public abstract string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course);
-		public abstract string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course);
+		public abstract string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl);
+		public abstract string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl);
 
 		public abstract List<string> GetRecipientsIds(ULearnDb db);
 
 		public abstract bool IsActual();
+
+		protected string GetSlideTitle(Course course, Slide slide)
+		{
+			return $"{course.Title.MakeNestedQuotes()}: {slide.Title.MakeNestedQuotes()}";
+		}
+
+		protected string GetUnitTitle(Course course, Unit unit)
+		{
+			return $"{course.Title.MakeNestedQuotes()}: {unit.Title.MakeNestedQuotes()}";
+		}
+
+		protected string GetSlideUrl(Course course, Slide slide, string baseUrl)
+		{
+			return baseUrl + $"/Course/{course.Id}/{slide.Url}";
+		}
+
+		protected string GetCourseUrl(Course course, string baseUrl)
+		{
+			return baseUrl + $"/Course/{course.Id}/";
+		}
 	}
 
 	public static class NotificationExtensions
@@ -298,12 +312,12 @@ namespace Database.Models
 		[Required]
 		public string Text { get; set; }
 
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			return $"<b>Сообщение от ulearn.me:</b><br/><br/>{Text.EscapeHtml()}";
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
 			return $"Сообщение от ulearn.me:\n\n{Text}";
 		}
@@ -326,12 +340,12 @@ namespace Database.Models
 		[Required]
 		public string Text { get; set; }
 
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			return $"<b>Сообщение от преподавателя:</b><br/><br/>{Text.EscapeHtml()}";
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
 			return $"Сообщение от преподавателя:\n\n{Text}";
 		}
@@ -354,16 +368,10 @@ namespace Database.Models
 		public int CommentId { get; set; }
 
 		public virtual Comment Comment { get; set; }
-
-		protected string GetSlideTitle(Course course, Slide slide)
-		{
-			return $"{course.Title.MakeNestedQuotes()}: {slide.Title.MakeNestedQuotes()}";
-		}
 		
-		protected string GetCommentUrl(Slide slide)
+		protected string GetCommentUrl(Course course, Slide slide, string baseUrl)
 		{
-			/* TODO (andgein): Build url from UrlHelper */
-			return "https://ulearn.me/Course/" + Comment.CourseId + "/" + slide.Url + "#comment-" + Comment.Id;
+			return GetSlideUrl(course, slide, baseUrl) + "#comment-" + Comment.Id;
 		}
 
 		public override bool IsActual()
@@ -375,22 +383,22 @@ namespace Database.Models
 	[NotificationType(NotificationType.NewComment)]
 	public class NewCommentNotification : AbstractCommentNotification
 	{
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			var slide = course.FindSlideById(Comment.SlideId);
 			if (slide == null)
 				return null;
 
-			return $"<b>{Comment.Author.VisibleName.EscapeHtml()} в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>{Comment.Text.Trim().EscapeHtml()}<br/><br/>{GetCommentUrl(slide).EscapeHtml()}";
+			return $"<b>{Comment.Author.VisibleName.EscapeHtml()} в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>{Comment.Text.Trim().EscapeHtml()}<br/><br/>{GetCommentUrl(course, slide, baseUrl).EscapeHtml()}";
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
 			var slide = course.FindSlideById(Comment.SlideId);
 			if (slide == null)
 				return null;
 
-			return $"{Comment.Author.VisibleName} в «{GetSlideTitle(course, slide)}»\n\n{Comment.Text.Trim()}\n\n{GetCommentUrl(slide)}";
+			return $"{Comment.Author.VisibleName} в «{GetSlideTitle(course, slide)}»\n\n{Comment.Text.Trim()}\n\n{GetCommentUrl(course, slide, baseUrl)}";
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -407,7 +415,7 @@ namespace Database.Models
 
 		public virtual Comment ParentComment { get; set; }
 
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			var slide = course.FindSlideById(Comment.SlideId);
 			if (slide == null)
@@ -416,10 +424,10 @@ namespace Database.Models
 			return $"<b>{Comment.Author.VisibleName.EscapeHtml()} ответил(а) на ваш комментарий в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" + 
 				   $"<i>{ParentComment.Text.Trim().EscapeHtml()}</i><br>" +	
 				   $"{Comment.Text.Trim().EscapeHtml()}<br/><br/>" + 
-				   $"{GetCommentUrl(slide).EscapeHtml()}";
+				   $"{GetCommentUrl(course, slide, baseUrl).EscapeHtml()}";
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
 			var slide = course.FindSlideById(Comment.SlideId);
 			if (slide == null)
@@ -428,7 +436,7 @@ namespace Database.Models
 			return $"{Comment.Author.VisibleName} ответил(а) на ваш комментарий в «{GetSlideTitle(course, slide)}»\n\n" +
 				   $"> {ParentComment.Text.Trim()}\n" +
 				   $"{Comment.Text.Trim()}\n\n" +
-				   $"{GetCommentUrl(slide)}";
+				   $"{GetCommentUrl(course, slide, baseUrl)}";
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -446,7 +454,7 @@ namespace Database.Models
 
 		public virtual ApplicationUser LikedUser { get; set; }
 
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			var slide = course.FindSlideById(Comment.SlideId);
 			if (slide == null)
@@ -454,19 +462,18 @@ namespace Database.Models
 
 			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} оценил(а) ваш комментарий в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" +
 				   $"<i>{Comment.Text.Trim().EscapeHtml()}</i><br/><br/>" +
-				   $"{GetCommentUrl(slide).EscapeHtml()}";
+				   $"{GetCommentUrl(course, slide, baseUrl).EscapeHtml()}";
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
 			var slide = course.FindSlideById(Comment.SlideId);
 			if (slide == null)
 				return null;
-
-
+			
 			return $"{InitiatedBy.VisibleName} оценил(а) ваш комментарий в «{GetSlideTitle(course, slide)}»\n\n" +
 				   $"> {Comment.Text.Trim()}\n\n" +
-				   $"{GetCommentUrl(slide)}";
+				   $"{GetCommentUrl(course, slide, baseUrl)}";
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -483,14 +490,51 @@ namespace Database.Models
 
 		public virtual ManualExerciseChecking Checking { get; set; }
 
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		private string GetReviewsText(bool html)
 		{
-			throw new NotImplementedException();
+			var commentsText = "";
+			if (Checking.NotDeletedReviews.Count > 0)
+			{
+				commentsText = html ? "<b>Комментарии:</b><br>" : "Комментарии:";
+				foreach (var review in Checking.NotDeletedReviews)
+				{
+					if (review.StartLine == review.FinishLine)
+						commentsText += $"Строка {review.StartLine}: ";
+					else
+						commentsText += $"Строки {review.StartLine}—{review.FinishLine}: ";
+
+					commentsText += html ? $"<i>{review.Comment.EscapeHtml()}</i><br>" : $"{review.Comment}";
+				}
+			}
+			return commentsText;
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			var slide = course.FindSlideById(Checking.SlideId);
+			if (slide == null)
+				return null;
+
+			var commentsText = GetReviewsText(html: true);
+
+			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} проверил(а) ваше решение в «{GetSlideTitle(course, slide).EscapeHtml()}»:</b><br/>" +
+				   $"вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}<br/><br/>" +
+				   commentsText + "<br/>" +
+				   $"{GetSlideUrl(course, slide, baseUrl).EscapeHtml()}";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			var slide = course.FindSlideById(Checking.SlideId);
+			if (slide == null)
+				return null;
+
+			var commentsText = GetReviewsText(html: false);
+
+			return $"{InitiatedBy.VisibleName} проверил(а) ваше решение в «{GetSlideTitle(course, slide)}»:\n" +
+				   $"вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}\n\n" +
+				   commentsText + "\n" +
+				   $"{GetSlideUrl(course, slide, baseUrl)}";
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -512,14 +556,26 @@ namespace Database.Models
 
 		public virtual ManualQuizChecking Checking { get; set; }
 
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			var slide = course.FindSlideById(Checking.SlideId);
+			if (slide == null)
+				return null;
+
+			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} проверил(а) ваш тест «{GetSlideTitle(course, slide).EscapeHtml()}»:</b><br/>" +
+				   $"вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}<br/><br/>" +
+				   $"{GetSlideUrl(course, slide, baseUrl).EscapeHtml()}";
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			var slide = course.FindSlideById(Checking.SlideId);
+			if (slide == null)
+				return null;
+
+			return $"{InitiatedBy.VisibleName} проверил(а) ваш тест «{GetSlideTitle(course, slide)}»:\n" +
+				   $"вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}\n\n" +
+				   $"{GetSlideUrl(course, slide, baseUrl)}";
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -541,14 +597,23 @@ namespace Database.Models
 
 		public virtual Certificate Certificate { get; set; }
 
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		private static string GetCertificateUrl(Certificate certificate, string baseUrl)
 		{
-			throw new NotImplementedException();
+			return baseUrl + $"/Certificates/{certificate.Id}";
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			return $"<b>Поздравляем! Вы получили сертификат по курсу «{course.Title.EscapeHtml()}».</b><br/><br/>" +
+				   $"Посмотреть сертификат можно по ссылке {GetCertificateUrl(Certificate, baseUrl).EscapeHtml()} или в любой момент на ulearn.me.<br/><br/>" +
+				   "Поделитесь ссылкой на сертификат с друзьями в социальных сетях — пусть ваше достижение увидят все!";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			return $"Поздравляем! Вы получили сертификат по курсу «{course.Title}».\n\n" +
+				   $"Посмотреть сертификат можно по ссылке {GetCertificateUrl(Certificate, baseUrl)} или в любой момент на ulearn.me.\n\n" +
+				   "Поделитесь ссылкой на сертификат с друзьями в социальных сетях — пусть ваше достижение увидят все!";
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -570,14 +635,26 @@ namespace Database.Models
 
 		public virtual AdditionalScore Score { get; set; }
 
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			var unit = course.FindUnitById(Score.UnitId);
+			if (unit == null)
+				return null;
+
+			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} поставил(а) вам баллы за модуль «{GetUnitTitle(course, unit).EscapeHtml()}»:</b><br/>" +
+				   $"вы получили {Score.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}<br/><br/>" +
+				   "Полную ведомость смотрите на ulearn.me.";
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			var unit = course.FindUnitById(Score.UnitId);
+			if (unit == null)
+				return null;
+
+			return $"{InitiatedBy.VisibleName} поставил(а) вам баллы за модуль «{GetUnitTitle(course, unit)}»:\n" +
+				   $"вы получили {Score.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}\n\n" +
+				   "Полную ведомость смотрите на ulearn.me.";
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -605,14 +682,21 @@ namespace Database.Models
 
 		public virtual ApplicationUser JoinedUser { get; set; }
 
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		private static string GetGroupsUrl(Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			return baseUrl + $"/Admin/Groups?courseId={course.Id.EscapeHtml()}";
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			return $"<b>{JoinedUser.VisibleName.EscapeHtml()}</b> присоединился(лась) к вашей группе «{Group.Name.EscapeHtml()}» по курсу «{course.Title.EscapeHtml()}».<br/><br/>" +
+				   $"Посмотреть участников группы можно по ссылке {GetGroupsUrl(course, baseUrl).EscapeHtml()}";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			return $"{JoinedUser.VisibleName} присоединился(лась) к вашей группе «{Group.Name}» по курсу «{course.Title}».\n\n" +
+				   $"Посмотреть участников группы можно по ссылке {GetGroupsUrl(course, baseUrl)}";
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -635,14 +719,14 @@ namespace Database.Models
 
 		public virtual ApplicationUser AddedUser { get; set; }
 
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			return $"<b>{AddedUser.VisibleName.EscapeHtml()}</b> стал(а) преподавателем курса «{course.Title.EscapeHtml()}».";
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			return $"{AddedUser.VisibleName} стал(а) преподавателем курса «{course.Title}».";
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -664,14 +748,21 @@ namespace Database.Models
 
 		public virtual Group Group { get; set; }
 
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		protected static string GetGroupsUrl(Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			return baseUrl + $"/Admin/Groups?courseId={course.Id.EscapeHtml()}";
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			return $"<b>{Group.Owner.VisibleName.EscapeHtml()}</b> создал(а) новую группу <b>«{Group.Name.EscapeHtml()}»</b> в курсе «{course.Title.EscapeHtml()}».<br/><br/>" +
+				   GetGroupsUrl(course, baseUrl);
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			return $"{Group.Owner.VisibleName} создал(а) новую группу «{Group.Name}» в курсе «{course.Title}».\n\n" +
+				   GetGroupsUrl(course, baseUrl);
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -685,22 +776,32 @@ namespace Database.Models
 		}
 	}
 
+	public abstract class AbstractPackageNotification : Notification
+	{
+		protected static string GetPackagesUrl(Course course, string baseUrl)
+		{
+			return baseUrl + $"/Admin/Packages?courseId={course.Id.EscapeHtml()}";
+		}
+	}
+
 	[NotificationType(NotificationType.UploadedPackage)]
-	public class UploadedPackageNotification : Notification
+	public class UploadedPackageNotification : AbstractPackageNotification
 	{
 		[Required]
-		public int CourseVersionId { get; set; }
+		public Guid CourseVersionId { get; set; }
 
 		public virtual CourseVersion CourseVersion { get; set; }
 
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			return $"Загружена новая версия курса <b>«{course.Title.EscapeHtml()}»</b>. Теперь её можно опубликовать.<br/><br/>" +
+				   GetPackagesUrl(course, baseUrl);
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			return $"Загружена новая версия курса «{course.Title.EscapeHtml()}». Теперь её можно опубликовать.\n\n" +
+				   GetPackagesUrl(course, baseUrl);
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -715,21 +816,25 @@ namespace Database.Models
 	}
 
 	[NotificationType(NotificationType.PublishedPackage)]
-	public class PublishedPackageNotification : Notification
+	public class PublishedPackageNotification : AbstractPackageNotification
 	{
 		[Required]
-		public int CourseVersionId { get; set; }
+		public Guid CourseVersionId { get; set; }
 
 		public virtual CourseVersion CourseVersion { get; set; }
 
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			return $"Опубликована новая версия курса <b>«{course.Title.EscapeHtml()}»</b>.<br/><br/>" +
+				   GetCourseUrl(course, baseUrl).EscapeHtml() + "<br/><br/>" + 
+				   "Предыдущие версии:<br>" + GetPackagesUrl(course, baseUrl).EscapeHtml();
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			throw new NotImplementedException();
+			return $"Опубликована новая версия курса «{course.Title.EscapeHtml()}».\n\n" +
+				   GetCourseUrl(course, baseUrl) + "\n\n" +
+				   "Предыдущие версии:\n" + GetPackagesUrl(course, baseUrl);
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -752,12 +857,12 @@ namespace Database.Models
 
 		public string ErrorMessage { get; set; }
 
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course)
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			throw new NotImplementedException();
 		}
 
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course)
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
 			throw new NotImplementedException();
 		}

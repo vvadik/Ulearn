@@ -35,6 +35,7 @@ namespace uLearn.Web.Controllers
 		private readonly QuizzesRepo quizzesRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
+		private readonly NotificationsRepo notificationsRepo;
 		
 		public QuizController()
 		{
@@ -43,6 +44,7 @@ namespace uLearn.Web.Controllers
 			quizzesRepo = new QuizzesRepo(db);
 			groupsRepo = new GroupsRepo(db, courseManager);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
+			notificationsRepo = new NotificationsRepo(db);
 		}
 
 		internal class QuizAnswer
@@ -213,6 +215,15 @@ namespace uLearn.Web.Controllers
 			return new HttpStatusCodeResult(HttpStatusCode.OK);
 		}
 
+		private async Task NotifyAboutManualQuizChecking(ManualQuizChecking checking)
+		{
+			var notification = new PassedManualQuizCheckingNotification
+			{
+				Checking = checking,
+			};
+			await notificationsRepo.AddNotification(checking.CourseId, notification, User.Identity.GetUserId());
+		}
+
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public async Task<ActionResult> ScoreQuiz(int id, string nextUrl, string errorUrl = "")
@@ -244,7 +255,7 @@ namespace uLearn.Web.Controllers
 						: quizzesRepo.GetFirstQuizVersion(checking.CourseId, checking.SlideId);
 				}
 
-				int totalScore = 0;
+				var totalScore = 0;
 
 				foreach (var question in quizVersion.RestoredQuiz.Blocks.OfType<AbstractQuestionBlock>())
 				{
@@ -265,6 +276,8 @@ namespace uLearn.Web.Controllers
 				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, totalScore);
 				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, checking.UserId);
 				transaction.Commit();
+
+				await NotifyAboutManualQuizChecking(checking);
 			}
 
 			return Redirect(nextUrl);

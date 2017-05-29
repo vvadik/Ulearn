@@ -214,6 +214,7 @@
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\FileSystemExtensions.cs" />
     <Compile Include="Extensions\HttpClientExtensions.cs" />
+    <Compile Include="Extensions\PluralizeExtensions.cs" />
     <Compile Include="FuncUtils.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="Helpers\StringUtils.cs" />

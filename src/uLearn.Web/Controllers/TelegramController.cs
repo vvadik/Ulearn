@@ -15,7 +15,7 @@ using uLearn.Extensions;
 namespace uLearn.Web.Controllers
 {
 	public class TelegramController : JsonDataContractController
-    {
+	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(TelegramController));
 
 		private readonly string webhookSecret;
@@ -24,8 +24,8 @@ namespace uLearn.Web.Controllers
 
 		private readonly NotificationsRepo notificationsRepo;
 
-	    public TelegramController()
-	    {
+		public TelegramController()
+		{
 			var db = new ULearnDb();
 			notificationsRepo = new NotificationsRepo(db);
 
@@ -34,17 +34,17 @@ namespace uLearn.Web.Controllers
 			if (botToken != null)
 				telegramBot = new TelegramBotClient(botToken);
 
-		    protocol = Convert.ToBoolean(WebConfigurationManager.AppSettings["ulearn.requireHttps"] ?? "true") ? "https" : "http";
-	    }
+			protocol = Convert.ToBoolean(WebConfigurationManager.AppSettings["ulearn.requireHttps"] ?? "true") ? "https" : "http";
+		}
 
 		[System.Web.Mvc.HttpPost]
 		public async Task<ActionResult> Webhook(string secret)
 		{
 			if (secret != webhookSecret)
-	        {
-		        log.Warn($"Пришёл запрос с неправильным секретом: «{secret}» вместо «{webhookSecret.MaskAsSecret()}»");
-		        return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-	        }
+			{
+				log.Warn($"Пришёл запрос с неправильным секретом: «{secret}» вместо «{webhookSecret.MaskAsSecret()}»");
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			}
 
 			var update = GetJsonObjectFromRequestBody<Update>();
 			if (update == null)
@@ -58,7 +58,7 @@ namespace uLearn.Web.Controllers
 			}
 
 			return new HttpStatusCodeResult(HttpStatusCode.OK);
-        }
+		}
 
 		private T GetJsonObjectFromRequestBody<T>()
 		{
@@ -106,7 +106,7 @@ namespace uLearn.Web.Controllers
 			}
 
 			if (! string.IsNullOrEmpty(reply))
-				telegramBot.SendTextMessageAsync(chatId, reply).Wait();
+				await telegramBot.SendTextMessageAsync(chatId, reply);
 		}
 
 		private static string GetChatTitle(Chat chat)
@@ -118,5 +118,5 @@ namespace uLearn.Web.Controllers
 				chatTitle = chat.Title;
 			return chatTitle;
 		}
-    }
+	}
 }

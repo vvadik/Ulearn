@@ -21,6 +21,7 @@ namespace uLearn.Web.Controllers
 		protected readonly SlideCheckingsRepo slideCheckingsRepo;
 		protected readonly GroupsRepo groupsRepo;
 		protected readonly VisitsRepo visitsRepo;
+		protected readonly NotificationsRepo notificationsRepo;
 
 		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(45);
 
@@ -38,6 +39,7 @@ namespace uLearn.Web.Controllers
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 			groupsRepo = new GroupsRepo(db, courseManager);
 			visitsRepo = new VisitsRepo(db);
+			notificationsRepo = new NotificationsRepo(db);
 		}
 		
 		private string GenerateSubmissionName(Slide exerciseSlide, string userName)

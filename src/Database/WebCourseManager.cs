@@ -9,7 +9,7 @@ using uLearn;
 
 namespace Database
 {
-    public class WebCourseManager : CourseManager
+	public class WebCourseManager : CourseManager
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(WebCourseManager));
 

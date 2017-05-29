@@ -4,8 +4,10 @@ using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using Database.Extensions;
 using Database.Models;
 using log4net;
 using uLearn;
@@ -37,27 +39,27 @@ namespace Database.DataContexts
 			return createTime.AddSeconds(Math.Pow(2, failsCount - 1));
 		}
 
-		private static List<NotificationType> notificationTypes;
+		private static List<NotificationType> notificationTypesCache;
 
 		private static void BuildNotificationTypesCache()
 		{
-			if (notificationTypes != null)
+			if (notificationTypesCache != null)
 				return;
 
-			notificationTypes = Enum.GetValues(typeof(NotificationType)).Cast<NotificationType>().ToList();
+			notificationTypesCache = Enum.GetValues(typeof(NotificationType)).Cast<NotificationType>().ToList();
 		}
 
 		public static List<NotificationType> GetAllNotificationTypes()
 		{
 			BuildNotificationTypesCache();
-			return notificationTypes;
+			return notificationTypesCache;
 		}
 
-		private void DeleteOldNotificationTransports<TransportType>(string userId) where TransportType : NotificationTransport
+		private void DeleteOldNotificationTransports<TTransport>(string userId) where TTransport : NotificationTransport
 		{
 			var transports = db.NotificationTransports
 				.Where(t => t.UserId == userId && !t.IsDeleted)
-				.OfType<TransportType>().ToList();
+				.OfType<TTransport>().ToList();
 			foreach (var transport in transports)
 				transport.IsDeleted = true;
 		}
@@ -83,6 +85,7 @@ namespace Database.DataContexts
 		{
 			return db.NotificationTransports.Find(transportId);
 		}
+
 		public async Task EnableNotificationTransport(int transportId, bool isEnabled = true)
 		{
 			var transport = db.NotificationTransports.Find(transportId);
@@ -93,12 +96,17 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync();
 		}
 		
-		public List<NotificationTransport> GetUsersNotificationTransports(string userId, bool includeDisabled = false)
+		public List<NotificationTransport> GetUsersNotificationTransports(string userId, bool includeDisabled=false)
 		{
 			var transports = db.NotificationTransports.Where(t => t.UserId == userId && !t.IsDeleted);
 			if (!includeDisabled)
 				transports = transports.Where(r => r.IsEnabled);
 			return transports.ToList();
+		}
+
+		public T FindUsersNotificationTransport<T>(string userId, bool includeDisabled=false) where T : NotificationTransport
+		{
+			return GetUsersNotificationTransports(userId, includeDisabled).OfType<T>().FirstOrDefault();
 		}
 
 		public async Task SetNotificationTransportSettings(string courseId, int transportId, NotificationType type, bool isEnabled)
@@ -131,10 +139,20 @@ namespace Database.DataContexts
 				.ToDefaultDictionary();
 		}
 
+		// Dictionary<(notificationTransportId, NotificationType), NotificationTransportSettings>
 		public DefaultDictionary<Tuple<int, NotificationType>, NotificationTransportSettings> GetNotificationTransportsSettings(string courseId, List<int> transportIds)
 		{
 			return db.NotificationTransportSettings
 				.Where(s => s.CourseId == courseId && transportIds.Contains(s.NotificationTransportId))
+				.ToDictionary(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s)
+				.ToDefaultDictionary(() => null);
+		}
+
+		// Dictionary<(notificationTransportId, NotificationType), NotificationTransportSettings>
+		public DefaultDictionary<Tuple<int, NotificationType>, NotificationTransportSettings> GetNotificationTransportsSettings(string courseId)
+		{
+			return db.NotificationTransportSettings
+				.Where(s => s.CourseId == courseId)
 				.ToDictionary(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s)
 				.ToDefaultDictionary(() => null);
 		}
@@ -199,78 +217,96 @@ namespace Database.DataContexts
 				).ToList();
 			foreach (var notification in notifications)
 			{
-				var notificationType = notification.GetNotificationType();
-				log.Info($"Found new notification {notificationType} #{notification.Id}");
-
-				if (!notification.IsActual())
+				try
 				{
-					log.Info($"Notification #{notification.Id}: is not actual more");
-					continue;
+					CreateDeliviesForNotification(notification);
 				}
-
-				var recipientsIds = notification.GetRecipientsIds(db);
-				log.Info($"Recipients list for notifiction {notification.Id}: {recipientsIds.Count} user(s)");
-
-				if (recipientsIds.Count == 0)
-					continue;
-				
-				var transportsSettings = db.NotificationTransportSettings
-					.Include(s => s.NotificationTransport)
-					.Where(s => s.CourseId == notification.CourseId &&
-								s.NotificationType == notificationType &&
-								recipientsIds.Contains(s.NotificationTransport.UserId)).ToList();
-
-				var isEnabledByDefault = notificationType.IsEnabledByDefault();
-
-				if (isEnabledByDefault)
+				finally
 				{
-					log.Info($"Notification #{notification.Id}. This notification type has enabled default sending, so collection data for it");
-
-					var recipientsTransports = db.NotificationTransports.Where(
-						t => recipientsIds.Contains(t.UserId) &&
-						t.IsEnabled
-					).ToList();
-					var notFoundTransports = recipientsTransports.Except(transportsSettings.Select(c => c.NotificationTransport), new NotificationTransportIdComparer());
-
-					foreach (var transport in notFoundTransports)
-					{
-						transportsSettings.Add(new NotificationTransportSettings
-						{
-							IsEnabled = true,
-							NotificationTransport = transport,
-							NotificationTransportId = transport.Id,
-						});
-					}
+					notification.AreDeliveriesCreated = true;
 				}
-				
-				var now = DateTime.Now;
-
-				foreach (var transportSettings in transportsSettings)
-				{
-					log.Info($"Notification #{notification.Id}: add delivery to {transportSettings.NotificationTransport}, isEnabled: {transportSettings.IsEnabled}");
-					if (!transportSettings.IsEnabled)
-						continue;
-
-					/* Always ignore to send notification to user initiated this notification */
-					if (transportSettings.NotificationTransport.UserId == notification.InitiatedById)
-						continue;
-
-					log.Info($"Notification #{notification.Id}: add delivery to {transportSettings.NotificationTransport}, sending at {now}");
-					db.NotificationDeliveries.Add(new NotificationDelivery
-					{
-						Notification = notification,
-						NotificationTransportId = transportSettings.NotificationTransportId,
-						CreateTime = now,
-						NextTryTime = now,
-						FailsCount = 0,
-						Status = NotificationDeliveryStatus.NotSent,
-					});
-				}
-
-				notification.AreDeliveriesCreated = true;
 			}
 
 			await db.SaveChangesAsync();
+		}
+
+		private void CreateDeliviesForNotification(Notification notification)
+		{
+			var notificationType = notification.GetNotificationType();
+			log.Info($"Found new notification {notificationType} #{notification.Id}");
+
+			if (!notification.IsActual())
+			{
+				log.Info($"Notification #{notification.Id}: is not actual more");
+				return;
+			}
+
+			var recipientsIds = notification.GetRecipientsIds(db);
+			log.Info($"Recipients list for notification {notification.Id}: {recipientsIds.Count} user(s)");
+
+			if (recipientsIds.Count == 0)
+				return;
+
+			var transportsSettings = db.NotificationTransportSettings
+				.Include(s => s.NotificationTransport)
+				.Where(s => s.CourseId == notification.CourseId &&
+							s.NotificationType == notificationType &&
+							! s.NotificationTransport.IsDeleted &&
+							recipientsIds.Contains(s.NotificationTransport.UserId)).ToList();
+
+			var isEnabledByDefault = notificationType.IsEnabledByDefault();
+
+			if (isEnabledByDefault)
+			{
+				log.Info($"Notification #{notification.Id}. This notification type is enabled by default, so collecting data for it");
+
+				var recipientsTransports = db.NotificationTransports.Where(
+					t => recipientsIds.Contains(t.UserId) &&
+						 ! t.IsDeleted &&
+						 t.IsEnabled
+				).ToList();
+				var notFoundTransports = recipientsTransports.Except(transportsSettings.Select(c => c.NotificationTransport), new NotificationTransportIdComparer());
+
+				foreach (var transport in notFoundTransports)
+				{
+					transportsSettings.Add(new NotificationTransportSettings
+					{
+						IsEnabled = true,
+						NotificationTransport = transport,
+						NotificationTransportId = transport.Id,
+					});
+				}
+			}
+
+			var now = DateTime.Now;
+
+			foreach (var transportSettings in transportsSettings)
+			{
+				log.Info($"Notification #{notification.Id}: add delivery to {transportSettings.NotificationTransport}, isEnabled: {transportSettings.IsEnabled}");
+				if (!transportSettings.IsEnabled)
+					continue;
+
+				if (! transportSettings.NotificationTransport.IsEnabled)
+				{
+					log.Info($"Transport {transportSettings.NotificationTransport} is fully disabled, ignore it");
+					continue;
+				}
+
+				/* Always ignore to send notification to user initiated this notification */
+				if (transportSettings.NotificationTransport.UserId == notification.InitiatedById)
+					continue;
+
+				log.Info($"Notification #{notification.Id}: add delivery to {transportSettings.NotificationTransport}, sending at {now}");
+				db.NotificationDeliveries.Add(new NotificationDelivery
+				{
+					Notification = notification,
+					NotificationTransportId = transportSettings.NotificationTransportId,
+					CreateTime = now,
+					NextTryTime = now,
+					FailsCount = 0,
+					Status = NotificationDeliveryStatus.NotSent,
+				});
+			}
 		}
 
 		public async Task MarkDeliveriesAsFailed(List<NotificationDelivery> deliveries)
@@ -298,6 +334,22 @@ namespace Database.DataContexts
 			foreach (var b in hash)
 				sb.Append(b.ToString("x2"));
 			return sb.ToString();
+		}
+
+		public List<NotificationType> GetNotificationTypes(IPrincipal user, string courseId)
+		{
+			var notificationTypes = GetAllNotificationTypes();
+
+			notificationTypes = notificationTypes
+				.Where(t => user.HasAccessFor(courseId, t.GetMinCourseRole()))
+				.OrderByDescending(t => t.GetMinCourseRole())
+				.ThenBy(t => (int)t)
+				.ToList();
+			
+			if (!user.IsSystemAdministrator())
+				notificationTypes = notificationTypes.Where(t => !t.IsForSysAdminsOnly()).ToList();
+
+			return notificationTypes;
 		}
 	}
 

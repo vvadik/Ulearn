@@ -108,9 +108,9 @@ namespace uLearn
 			}
 		}
 
-	    public static string GetAppPath()
-	    {
-	        return HostingEnvironment.ApplicationPhysicalPath ?? @"..\";
-	    }
+		public static string GetAppPath()
+		{
+			return HostingEnvironment.ApplicationPhysicalPath ?? @"..\";
+		}
 	}
 }

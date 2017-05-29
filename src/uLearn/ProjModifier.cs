@@ -42,21 +42,21 @@ namespace uLearn
 		}
 
 		public static void PrepareForChecking(Project proj, string startupObject, IReadOnlyList<string> excludedPaths)
-        {
+		{
 			proj.SetProperty("StartupObject", startupObject);
 			proj.SetProperty("OutputType", "Exe");
 			proj.SetProperty("UseVSHostingProcess", "false");
 			ResolveLinks(proj);
-		    ExcludePaths(proj, excludedPaths);
-        }
+			ExcludePaths(proj, excludedPaths);
+		}
 
-	    private static void ExcludePaths(Project proj, IReadOnlyList<string> excludedPaths)
-	    {
-	        var toRemove = proj.Items.Where(item => excludedPaths.Contains(item.UnevaluatedInclude)).ToList();
-	        proj.RemoveItems(toRemove);
-        }
+		private static void ExcludePaths(Project proj, IReadOnlyList<string> excludedPaths)
+		{
+			var toRemove = proj.Items.Where(item => excludedPaths.Contains(item.UnevaluatedInclude)).ToList();
+			proj.RemoveItems(toRemove);
+		}
 
-        private static void ResolveLinks(Project project)
+		private static void ResolveLinks(Project project)
 		{
 			var files = ReplaceLinksWithItemsCopiedToProjectDir(project);
 			foreach (var file in files)

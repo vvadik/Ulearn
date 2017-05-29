@@ -1991,13 +1991,79 @@ h1 .copy-group-link {
 /* End of grader */
 
 /* Notification settings */
-.notification-settings__table td,
-.notification-settings__table th {
-	border-right: 1px solid #ccc;
-	padding: 5px;
+#notifications__transport-settings__modal .modal-title {
+    padding-left: 10px;    
 }
 
-.notification-settings__table thead th {
-	border-bottom: 1px solid #ccc;
+#notifications__transport-settings__modal .modal-body h4 {
+    margin-left: 10px;
+    margin-bottom: 15px;
+}
+
+.notifications__transport-settings__course__panel {
+    border-right: 1px solid #ddd;
+    padding-right: 0;
+}
+
+.notifications__transport-settings__course__link {
+    display: block;
+    padding: 10px;
+    border-bottom: 1px solid rgba(30, 80, 30, 0.15);
+}
+
+.notifications__transport-settings__course__link.active {
+    background-color: #4c82b3;
+    color: white;
+    text-decoration: none;
+}
+
+*:last-child > .notifications__transport-settings__course__link {
+    border-bottom-width: 0;
+}
+
+.notifications__transport-settings__course__link:not(.active):hover {
+    text-decoration: none;
+    background-color: #efefff;
+}
+
+.notifications__transport-settings__panel:not(.active) {
+    visibility: hidden;
+}
+
+.notifications__transport-settings__course-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.notifications__transport-settings__panel .checkbox {
+    margin-left: 10px;
+}
+
+.notifications__transport-settings__panel .btn {
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.notifications__transport-settings__panel .btn + span {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.notifications__transport-settings__panel .status {
+    padding-left: 10px;
+    padding-top: 5px;
+}
+
+.notifications__transport-settings__panel .course-role {
+    margin-left: 10px;
+    margin-bottom: 0;
+}
+
+.notifications__transport-settings__panel .course-role + .checkbox {
+    margin-top: 5px;
 }
 /* End of notification settings */

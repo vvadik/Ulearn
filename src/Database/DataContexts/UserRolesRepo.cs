@@ -22,7 +22,7 @@ namespace Database.DataContexts
 				.ToDictionary(g => g.Key, g => g.Select(role => role.Role).Min());
 		}
 
-		public async Task ToggleRole(string courseId, string userId, CourseRole role)
+		public async Task<bool> ToggleRole(string courseId, string userId, CourseRole role)
 		{
 			var userRole = db.UserRoles.FirstOrDefault(u => u.UserId == userId && u.Role == role && u.CourseId == courseId);
 			if (userRole == null)
@@ -35,6 +35,8 @@ namespace Database.DataContexts
 			else
 				db.UserRoles.Remove(userRole);
 			await db.SaveChangesAsync();
+
+		    return userRole == null;
 		}
 
 		public List<string> GetListOfUsersWithCourseRole(CourseRole? courseRole, string courseId, bool includeHighRoles = false)

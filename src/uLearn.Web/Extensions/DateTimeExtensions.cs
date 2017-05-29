@@ -1,4 +1,5 @@
 ﻿using System;
+using uLearn.Extensions;
 
 namespace uLearn.Web.Extensions
 {
@@ -43,19 +44,19 @@ namespace uLearn.Web.Extensions
 				if (secondsAgo < secondsInHour)
 				{
 					var minutesAgo = secondsAgo / 60;
-					return $"{minutesAgo.PluralizeInRussian(new RussianPluralizationOptions { One = "минуту", Two = "минуты", Five = "минут", Gender = Gender.Female })} назад";
+					return $"{minutesAgo.PluralizeInRussian(RussianPluralizationOptions.MinuteDative)} назад";
 				}
 				if (secondsAgo < secondsInDay)
 				{
 					var hoursAgo = secondsAgo / secondsInHour;
-					return $"{hoursAgo.PluralizeInRussian(new RussianPluralizationOptions { One = "час", Two = "часа", Five = "часов" })} назад";
+					return $"{hoursAgo.PluralizeInRussian(RussianPluralizationOptions.Hour)} назад";
 				}
 			}
 
 			if (daysAgo == 1)
 				return "вчера";
 
-			return $"{daysAgo.PluralizeInRussian(new RussianPluralizationOptions { One = "день", Two = "дня", Five = "дней" })} назад";
+			return $"{daysAgo.PluralizeInRussian(RussianPluralizationOptions.Day)} назад";
 		}
 	}
 }

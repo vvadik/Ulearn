@@ -102,21 +102,21 @@ namespace uLearn.CSharp
 				{
 					var parts = comment.Split(new[] { ' ' }, 2);
 					if (parts[0] == "//#video") EmbedVideo(parts[1]);
-                    if (parts[0] == "//#include") EmbedCode(parts[1]);
-                    if (parts[0] == "//#para") EmbedPara(parts[1]);
-                    if (parts[0] == "//#gallery") EmbedGallery(parts[1]);
+					if (parts[0] == "//#include") EmbedCode(parts[1]);
+					if (parts[0] == "//#para") EmbedPara(parts[1]);
+					if (parts[0] == "//#gallery") EmbedGallery(parts[1]);
 				}
 			}
 			return base.VisitTrivia(trivia);
 		}
 
-	    private void EmbedPara(string filename)
-	    {
-	        Blocks.Add(new MdBlock(di.GetContent(filename)));
+		private void EmbedPara(string filename)
+		{
+			Blocks.Add(new MdBlock(di.GetContent(filename)));
 //			Blocks.Add(new IncludeMdBlock(filename));
-	    }
+		}
 
-	    private void EmbedGallery(string folderName)
+		private void EmbedGallery(string folderName)
 		{
 			string[] images = di.GetFilenames(folderName);
 			Blocks.Add(new ImageGaleryBlock(images));

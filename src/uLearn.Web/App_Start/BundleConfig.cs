@@ -69,7 +69,8 @@ namespace uLearn.Web
 					"~/Scripts/suggest-mail-notifications.js",
 					"~/Scripts/diagnostics.js",
 					"~/Scripts/forms.replace-action.js",
-					"~/Scripts/grader.js"
+					"~/Scripts/grader.js",
+					"~/Scripts/notifications-settings.js"
 				);
 		}
 

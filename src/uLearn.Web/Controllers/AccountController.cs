@@ -137,6 +137,16 @@ namespace uLearn.Web.Controllers
 			return user;
 		}
 
+		private async Task NotifyAbountUserJoinedToGroup(Group group, string userId)
+		{
+			var notification = new JoinedToYourGroupNotification
+			{
+				Group = group,
+				JoinedUserId = userId
+			};
+			await notificationsRepo.AddNotification(group.CourseId, notification, userId);
+		}
+
 		public async Task<ActionResult> JoinGroup(Guid hash)
 		{
 			var group = groupsRepo.FindGroupByInviteHash(hash);
@@ -146,6 +156,8 @@ namespace uLearn.Web.Controllers
 			if (Request.HttpMethod == "POST")
 			{
 				await groupsRepo.AddUserToGroup(group.Id, User.Identity.GetUserId());
+				await NotifyAbountUserJoinedToGroup(group, User.Identity.GetUserId());
+
 				return Redirect("/");
 			}
 
@@ -165,13 +177,26 @@ namespace uLearn.Web.Controllers
 			return Content(role);
 		}
 
+		private async Task NotifyAboutNewInstructor(string courseId, string userId, string initiatedUserId)
+		{
+			var notification = new AddedInstructorNotification
+			{
+				AddedUserId = userId,
+			};
+			await notificationsRepo.AddNotification(courseId, notification, initiatedUserId);
+		}
+
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ToggleRole(string courseId, string userId, CourseRole role)
 		{
 			if (userManager.FindById(userId) == null || userId == User.Identity.GetUserId())
 				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-			await userRolesRepo.ToggleRole(courseId, userId, role);
+			var enabledRole = await userRolesRepo.ToggleRole(courseId, userId, role);
+
+			if (enabledRole && (role == CourseRole.Instructor || role == CourseRole.CourseAdmin))
+				await NotifyAboutNewInstructor(courseId, userId, User.Identity.GetUserId());
+
 			return Content(role.ToString());
 		}
 
@@ -404,6 +429,21 @@ namespace uLearn.Web.Controllers
 		{
 			var user = userManager.FindByName(User.Identity.Name);
 			var hasPassword = ControllerUtils.HasPassword(userManager, User);
+			var telegramBotName = WebConfigurationManager.AppSettings["ulearn.telegram.botName"];
+
+			var mailTransport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(user.Id, includeDisabled: true);
+			var telegramTransport = notificationsRepo.FindUsersNotificationTransport<TelegramNotificationTransport>(user.Id, includeDisabled: true);
+
+			var courseTitles = courseManager.GetCourses().ToDictionary(c => c.Id, c => c.Title);
+			var notificationTypesByCourse = courseTitles.Keys.ToDictionary(c => c, c => notificationsRepo.GetNotificationTypes(User, c));
+			var allNotificationTypes = NotificationsRepo.GetAllNotificationTypes();
+
+			var notificationTransportsSettings = courseTitles.Keys.SelectMany(
+				c => notificationsRepo.GetNotificationTransportsSettings(c).Select(
+					kvp => Tuple.Create(Tuple.Create(c, kvp.Key.Item1, kvp.Key.Item2), kvp.Value.IsEnabled)
+				)
+			).ToDictionary(kvp => kvp.Item1, kvp => kvp.Item2);
+
 			return PartialView(new UserViewModel
 			{
 				Name = user.UserName,
@@ -412,7 +452,16 @@ namespace uLearn.Web.Controllers
 				HasPassword = hasPassword,
 				FirstName = user.FirstName,
 				LastName = user.LastName,
-				Email = user.Email
+				Email = user.Email,
+				TelegramBotName = telegramBotName,
+
+				MailTransport = mailTransport,
+				TelegramTransport = telegramTransport,
+
+				CourseTitles = courseTitles,
+				AllNotificationTypes = allNotificationTypes,
+				NotificationTypesByCourse = notificationTypesByCourse,
+				NotificationTransportsSettings = notificationTransportsSettings,
 			});
 		}
 

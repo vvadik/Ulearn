@@ -51,10 +51,10 @@ namespace uLearn.Model.Edx.EdxComponents
 
 		public override string AsHtmlString()
 		{
-            throw new NotSupportedException();
-        }
+			throw new NotSupportedException();
+		}
 
-        public override void SaveAdditional(string folderName)
+		public override void SaveAdditional(string folderName)
 		{
 			if (Subcomponents != null)
 				foreach (var subcomponent in Subcomponents)

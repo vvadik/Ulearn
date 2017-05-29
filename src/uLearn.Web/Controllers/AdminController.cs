@@ -40,6 +40,7 @@ namespace uLearn.Web.Controllers
 		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly CertificatesRepo certificatesRepo;
 		private readonly AdditionalScoresRepo additionalScoresRepo;
+		private readonly NotificationsRepo notificationsRepo;
 
 		public AdminController()
 		{
@@ -55,6 +56,7 @@ namespace uLearn.Web.Controllers
 			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
 			certificatesRepo = new CertificatesRepo(db, courseManager);
 			additionalScoresRepo = new AdditionalScoresRepo(db);
+			notificationsRepo = new NotificationsRepo(db);
 		}
 
 		public ActionResult CourseList(string courseCreationLastTry = null)
@@ -146,6 +148,15 @@ namespace uLearn.Web.Controllers
 				quizzesRepo.AddQuizVersionIfNeeded(courseId, slide);
 		}
 
+		private async Task NotifyAboutCourseVersion(string courseId, Guid versionId, string userId)
+		{
+			var notification = new UploadedPackageNotification
+			{
+				CourseVersionId = versionId,
+			};
+			await notificationsRepo.AddNotification(courseId, notification, userId);
+		}
+
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> UploadCourse(string courseId, HttpPostedFileBase file)
@@ -164,7 +175,9 @@ namespace uLearn.Web.Controllers
 
 			/* Load version and put it into LRU-cache */
 			courseManager.GetVersion(versionId);
-			await coursesRepo.AddCourseVersion(courseId, versionId, User.Identity.GetUserId());
+			var userId = User.Identity.GetUserId();
+			await coursesRepo.AddCourseVersion(courseId, versionId, userId);
+			await NotifyAboutCourseVersion(courseId, versionId, userId);
 
 			return RedirectToAction("Diagnostics", new { courseId, versionId });
 		}
@@ -512,6 +525,15 @@ namespace uLearn.Web.Controllers
 				file.CopyTo(Path.Combine(target.FullName, file.Name), true);
 		}
 
+		private async Task NotifyAboutPublishedCourseVersion(string courseId, Guid versionId, string userId)
+		{
+			var notification = new PublishedPackageNotification
+			{
+				CourseVersionId = versionId,
+			};
+			await notificationsRepo.AddNotification(courseId, notification, userId);
+		}
+
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> PublishVersion(string courseId, Guid versionId)
@@ -546,6 +568,8 @@ namespace uLearn.Web.Controllers
 			CreateQuizVersionsForSlides(courseId, version.Slides);
 			log.Info($"Помечаю версию {versionId} как опубликованную версию курса {courseId}");
 			await coursesRepo.MarkCourseVersionAsPublished(versionId);
+			await NotifyAboutPublishedCourseVersion(courseId, versionId, User.Identity.GetUserId());
+
 			log.Info($"Обновляю курс {courseId} в оперативной памяти");
 			courseManager.UpdateCourseVersion(courseId, versionId);
 
@@ -609,10 +633,20 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
+		private async Task NotifyAboutNewGroup(Group group, string initiatedUserId)
+		{
+			var notification = new CreatedGroupNotification
+			{
+				Group = group,
+			};
+			await notificationsRepo.AddNotification(group.CourseId, notification, initiatedUserId);
+		}
+
 		public async Task<ActionResult> CreateGroup(string courseId, string name, bool isPublic, bool manualChecking, bool manualCheckingForOldSolutions, string ownerId)
 		{
+			var currentUserId = User.Identity.GetUserId();
 			if (string.IsNullOrEmpty(ownerId))
-				ownerId = User.Identity.GetUserId();
+				ownerId = currentUserId;
 
 			log.Info($"Создаю группу «{name}» для курса {courseId} (id владельца {ownerId}, публичная = {isPublic})");
 
@@ -621,6 +655,7 @@ namespace uLearn.Web.Controllers
 
 			var course = courseManager.GetCourse(courseId);
 			await UpdateEnabledScoringGroupsForGroup(course, group.Id);
+			await NotifyAboutNewGroup(group, currentUserId);
 
 			return RedirectToAction("Groups", new { courseId });
 		}
@@ -858,7 +893,16 @@ namespace uLearn.Web.Controllers
 
 			return RedirectToAction("Certificates", new { courseId });
 		}
-		
+
+		private async Task NotifyAboutCertificate(Certificate certificate)
+		{
+			var notification = new ReceivedCertificateNotification
+			{
+				Certificate = certificate,
+			};
+			await notificationsRepo.AddNotification(certificate.Template.CourseId, notification, certificate.InstructorId);
+		}
+
 		[HttpPost]
 		[ValidateInput(false)]
 		public async Task<ActionResult> AddCertificate(string courseId, Guid templateId, string userId, bool isPreview=false)
@@ -875,6 +919,9 @@ namespace uLearn.Web.Controllers
 
 			if (isPreview)
 				return RedirectToRoute("Certificate", new { certificateId = certificate.Id });
+			
+			await NotifyAboutCertificate(certificate);
+
 			return Redirect(Url.Action("Certificates", new { courseId }) + "#template-" + templateId);
 		}
 

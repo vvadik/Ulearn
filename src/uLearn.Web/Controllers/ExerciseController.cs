@@ -11,6 +11,7 @@ using Database.Extensions;
 using Database.Models;
 using Elmah;
 using Microsoft.AspNet.Identity;
+using uLearn.Extensions;
 using uLearn.Model.Blocks;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
@@ -195,9 +196,20 @@ namespace uLearn.Web.Controllers
 				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, checking.UserId);
 
 				transaction.Commit();
+
+				await NotifyAboutManualExerciseChecking(checking);
 			}
 
 			return Redirect(nextUrl);
+		}
+
+		private async Task NotifyAboutManualExerciseChecking(ManualExerciseChecking checking)
+		{
+			var notification = new PassedManualExerciseCheckingNotification
+			{
+				Checking = checking,
+			};
+			await notificationsRepo.AddNotification(checking.CourseId, notification, User.Identity.GetUserId());
 		}
 
 		[System.Web.Mvc.HttpPost]
@@ -235,7 +247,7 @@ namespace uLearn.Web.Controllers
 						CheckedQueueUrl = Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId, done = true, userId, slideId})
 					});
 
-			/* TODO: check if 0 <= exercisScore <= exercise.MaxReviewScore */
+			/* TODO: check if 0 <= exerciseScore <= exercise.MaxReviewScore */
 
 			await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, slideId, userId);
 			ManualExerciseChecking checking;
@@ -247,10 +259,12 @@ namespace uLearn.Web.Controllers
 			await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, exerciseScore);
 			await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 
+			await NotifyAboutManualExerciseChecking(checking);
+
 			return Json(
 				new SimpleScoreExerciseResult {
 					Status = "ok",
-					Score = exerciseScore.PluralizeInRussian(new RussianPluralizationOptions { One = "балл", Two = "балла", Five = "баллов", Gender = Gender.Male, hideNumberOne = false, smallNumbersAreWords = false}),
+					Score = exerciseScore.PluralizeInRussian(RussianPluralizationOptions.Score),
 					TotalScore = visitsRepo.GetScore(slideId, userId),
 					CheckingId = checking.Id,
 				});
@@ -372,12 +386,12 @@ namespace uLearn.Web.Controllers
 		}
 	}
 
-    [DataContract]
-    public class CodeReviewOperationResult
-    {
-        [DataMember(Name = "status")]
-        public string Status { get; set; }
-    }
+	[DataContract]
+	public class CodeReviewOperationResult
+	{
+		[DataMember(Name = "status")]
+		public string Status { get; set; }
+	}
 
 	[DataContract]
 	public class SimpleScoreExerciseResult

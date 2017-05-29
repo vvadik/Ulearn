@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
@@ -15,12 +16,14 @@ namespace Notifications
 		private readonly IEmailSender emailSender;
 		private readonly ITelegramSender telegramSender;
 		private readonly CourseManager courseManager;
+		private readonly string baseUrl;
 
 		public NotificationSender(CourseManager courseManager, IEmailSender emailSender, ITelegramSender telegramSender)
 		{
 			this.emailSender = emailSender;
 			this.telegramSender = telegramSender;
 			this.courseManager = courseManager;
+			baseUrl = ConfigurationManager.AppSettings["ulearn.baseUrl"] ?? "";
 		}
 
 		public NotificationSender(CourseManager courseManager)
@@ -44,8 +47,8 @@ namespace Notifications
 			await emailSender.SendEmailAsync(
 				transport.User.Email,
 				notification.GetNotificationType().GetDisplayName(),
-				notification.GetTextMessageForDelivery(transport, notificationDelivery, course),
-				notification.GetHtmlMessageForDelivery(transport, notificationDelivery, course)
+				notification.GetTextMessageForDelivery(transport, notificationDelivery, course, baseUrl),
+				notification.GetHtmlMessageForDelivery(transport, notificationDelivery, course, baseUrl)
 			);
 		}
 
@@ -66,8 +69,8 @@ namespace Notifications
 				var notification = delivery.Notification;
 				var course = courseManager.GetCourse(notification.CourseId);
 
-				htmlBodies.Add(notification.GetHtmlMessageForDelivery(transport, delivery, course));
-				textBodies.Add(notification.GetTextMessageForDelivery(transport, delivery, course));
+				htmlBodies.Add(notification.GetHtmlMessageForDelivery(transport, delivery, course, baseUrl));
+				textBodies.Add(notification.GetTextMessageForDelivery(transport, delivery, course, baseUrl));
 			}
 
 			await emailSender.SendEmailAsync(
@@ -88,7 +91,7 @@ namespace Notifications
 
 			await telegramSender.SendMessageAsync(
 				transport.User.TelegramChatId.Value,
-				notification.GetHtmlMessageForDelivery(transport, notificationDelivery, course)
+				notification.GetHtmlMessageForDelivery(transport, notificationDelivery, course, baseUrl)
 				);
 		}
 
@@ -108,7 +111,7 @@ namespace Notifications
 				var notification = delivery.Notification;
 				var course = courseManager.GetCourse(notification.CourseId);
 
-				htmls.Add(notification.GetHtmlMessageForDelivery(transport, delivery, course));
+				htmls.Add(notification.GetHtmlMessageForDelivery(transport, delivery, course, baseUrl));
 			}
 
 			await telegramSender.SendMessageAsync(transport.User.TelegramChatId.Value, string.Join("<br><br>", htmls));

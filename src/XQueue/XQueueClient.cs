@@ -12,8 +12,8 @@ using XQueue.Models;
 
 namespace XQueue
 {
-    public class XQueueClient
-    {
+	public class XQueueClient
+	{
 		private const string loginUrl = "xqueue/login/";
 		private const string getSubmissionUrl = "xqueue/get_submission/";
 		private const string putResultUrl = "xqueue/put_result/";
@@ -41,10 +41,10 @@ namespace XQueue
 			};
 		}
 
-	    public XQueueClient(string baseUrl)
-		    : this(baseUrl, "", "")
-	    {
-	    }
+		public XQueueClient(string baseUrl)
+			: this(baseUrl, "", "")
+		{
+		}
 
 		private async Task<bool> TryLogin()
 		{
@@ -114,13 +114,13 @@ namespace XQueue
 			return null;
 		}
 
-	    public async Task<bool> PutResult(XQueueResult result)
-	    {
+		public async Task<bool> PutResult(XQueueResult result)
+		{
 			return await FuncUtils.TrySeveralTimesAsync(() => TryPutResult(result), 5, () => Task.Delay(TimeSpan.FromMilliseconds(1)));
-	    }
+		}
 
-	    public async Task<bool> TryPutResult(XQueueResult result)
-	    {
+		public async Task<bool> TryPutResult(XQueueResult result)
+		{
 			var content = JsonConvert.SerializeObject(result);
 			var response = await client.PostAsync(putResultUrl, new StringContent(content));
 			if (response.IsSuccessStatusCode)
@@ -130,6 +130,6 @@ namespace XQueue
 			}
 
 			return true;
-	    }
+		}
 	}
 }

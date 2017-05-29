@@ -9,6 +9,7 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
+using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 
 namespace uLearn.Web.Controllers
@@ -30,49 +31,6 @@ namespace uLearn.Web.Controllers
 
 		public NotificationsController() : this(new ULearnDb(), WebCourseManager.Instance)
 		{
-		}
-
-		public ActionResult Settings(string courseId)
-		{
-			if (string.IsNullOrEmpty(courseId))
-			{
-				var coursesTitles = courseManager.GetCourses().ToDictionary(c => c.Id, c => c.Title);
-				return View("SelectCourse", new NotificationsSelectCourseViewModel
-				{
-					CoursesTitles = coursesTitles,
-				});
-			}
-
-			var course = courseManager.GetCourse(courseId);
-			var notificationTypes = NotificationsRepo.GetAllNotificationTypes();
-			var userId = User.Identity.GetUserId();
-
-			var transports = notificationsRepo.GetUsersNotificationTransports(userId, includeDisabled: true);
-			var transportsSettings = notificationsRepo.GetNotificationTransportsSettings(courseId, transports.Select(t => t.Id).ToList());
-			
-			notificationTypes = notificationTypes
-				.Where(t => User.HasAccessFor(courseId, t.GetMinCourseRole()))
-				.OrderByDescending(t => t.GetMinCourseRole())
-				.ThenBy(t => (int) t)
-				.ToList();
-
-			if (!User.IsSystemAdministrator())
-				notificationTypes = notificationTypes.Where(t => !t.IsForSysAdminsOnly()).ToList();
-
-			var mailTransport = transports.FirstOrDefault(t => t is MailNotificationTransport) as MailNotificationTransport;
-			var telegramTransport = transports.FirstOrDefault(t => t is TelegramNotificationTransport) as TelegramNotificationTransport;
-
-			var user = usersRepo.FindUserById(userId);
-
-			return View(new NotificationSettingsViewModel
-			{
-				User = user,
-				Course = course,
-				NotificationTypes = notificationTypes,
-				TransportsSettings = transportsSettings,
-				MailTransport = mailTransport,
-				TelegramTransport = telegramTransport,
-			});
 		}
 		
 		[AllowAnonymous]
@@ -104,7 +62,8 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		public async Task<ActionResult> EnableNotificationTransport(int transportId, bool enable = true, string courseId = "")
+		/* TODO (andgein): Accept only POST with CSRF token */
+		public async Task<ActionResult> EnableNotificationTransport(int transportId, bool enable=true, string next="")
 		{
 			var transport = notificationsRepo.FindNotificationTransport(transportId);
 			if (! User.Identity.IsAuthenticated || transport.UserId != User.Identity.GetUserId())
@@ -112,9 +71,10 @@ namespace uLearn.Web.Controllers
 
 			await notificationsRepo.EnableNotificationTransport(transportId, enable);
 
-			if (string.IsNullOrEmpty(courseId))
-				return RedirectToAction("Index", "Home");
-			return RedirectToAction("Settings", new { courseId = courseId });
+			if (next.IsLocalUrl(Request))
+				return Redirect(next);
+
+			return RedirectToAction("Manage", "Account");
 		}
 
 		public async Task<ActionResult> CreateMailTransport()
@@ -127,31 +87,26 @@ namespace uLearn.Web.Controllers
 			};
 			await notificationsRepo.AddNotificationTransport(mailTransport);
 
-			return RedirectToAction("Settings");
+			return RedirectToAction("Manage", "Account");
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> SaveSettings(string courseId)
+		public async Task<ActionResult> SaveSettings(string courseId, int transportId)
 		{
 			var userId = User.Identity.GetUserId();
+			var transport = notificationsRepo.FindNotificationTransport(transportId);
+			if (transport == null || transport.UserId != userId)
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
 			foreach (var key in Request.Form.AllKeys)
 			{
 				var splittedKey = key.Split(new[] { "__" }, StringSplitOptions.None);
-				if (splittedKey.Length != 3 || splittedKey[0] != "notifications")
+				if (splittedKey.Length != 2 || splittedKey[0] != "notification-settings")
 					continue;
-
-				var transportIdStr = splittedKey[1];
-				int transportId;
-				if (!int.TryParse(transportIdStr, out transportId))
-					continue;
-
-				var notificationTypeStr = splittedKey[2];
+				
+				var notificationTypeStr = splittedKey[1];
 				int notificationTypeInt;
 				if (!int.TryParse(notificationTypeStr, out notificationTypeInt))
-					continue;
-
-				var transport = notificationsRepo.FindNotificationTransport(transportId);
-				if (transport == null || transport.UserId != userId)
 					continue;
 
 				NotificationType notificationType;
@@ -170,26 +125,21 @@ namespace uLearn.Web.Controllers
 				await notificationsRepo.SetNotificationTransportSettings(courseId, transportId, notificationType, isEnabled);
 			}
 
-			return RedirectToAction("Settings", new { courseId = courseId });
+			var notificationTransportsSettings = courseManager.GetCourses().SelectMany(
+				c => notificationsRepo.GetNotificationTransportsSettings(c.Id).Select(
+					kvp => new {
+						courseId = c.Id,
+						transportId = kvp.Key.Item1,
+						notificationType = kvp.Key.Item2,
+						isEnabled = kvp.Value.IsEnabled
+					}
+				)
+			);
+
+			return Json(new { status = "ok", notificationTransportsSettings = notificationTransportsSettings });
 		}
 	}
-
-	public class NotificationsSelectCourseViewModel
-	{
-		public Dictionary<string, string> CoursesTitles { get; set; }
-	}
-
-	public class NotificationSettingsViewModel
-	{
-		public ApplicationUser User { get; set; }
-		public Course Course { get; set; }
-
-		public List<NotificationType> NotificationTypes { get; set; }
-		public DefaultDictionary<Tuple<int, NotificationType>, NotificationTransportSettings> TransportsSettings { get; set; }
-		public MailNotificationTransport MailTransport { get; set; }
-		public TelegramNotificationTransport TelegramTransport { get; set; }
-	}
-
+	
 	public class SuggestMailTransportViewModel
 	{
 		public MailNotificationTransport Transport { get; set; }

@@ -75,10 +75,10 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 				var userId = (long) form["user_id"];
 
 				string graphApiEndpoint = "https://api.vk.com/method/users.get" +
-				                          "?user_id=" + userId +
-				                          "&fields=photo_100,screen_name" +
-				                          "&name_case=Nom" +
-				                          "&access_token=" + Uri.EscapeDataString(accessToken);
+										  "?user_id=" + userId +
+										  "&fields=photo_100,screen_name" +
+										  "&name_case=Nom" +
+										  "&access_token=" + Uri.EscapeDataString(accessToken);
 
 				HttpResponseMessage graphResponse = await _httpClient.GetAsync(graphApiEndpoint, Request.CallCancelled);
 				graphResponse.EnsureSuccessStatusCode();
@@ -181,7 +181,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 			_logger.WriteVerbose("InvokeReplyPath");
 
 			if (Options.ReturnEndpointPath != null &&
-			    String.Equals(Options.ReturnEndpointPath, Request.Path.Value, StringComparison.OrdinalIgnoreCase))
+				String.Equals(Options.ReturnEndpointPath, Request.Path.Value, StringComparison.OrdinalIgnoreCase))
 			{
 				// TODO: error responses
 
@@ -194,7 +194,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 				await Options.Provider.ReturnEndpoint(context);
 
 				if (context.SignInAsAuthenticationType != null &&
-				    context.Identity != null)
+					context.Identity != null)
 				{
 					ClaimsIdentity grantIdentity = context.Identity;
 					if (!string.Equals(grantIdentity.AuthenticationType, context.SignInAsAuthenticationType, StringComparison.Ordinal))

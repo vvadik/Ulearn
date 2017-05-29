@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using Database.Models;
@@ -110,6 +111,27 @@ namespace uLearn.Web.Models
 		[Display(Name = "Почта")]
 		public string Email { get; set; }
 
+		[HiddenInput]
+		public string TelegramBotName { get; set; }
+
+		[HiddenInput]
+		public MailNotificationTransport MailTransport { get; set; }
+
+		[HiddenInput]
+		public TelegramNotificationTransport TelegramTransport { get; set; }
+
+		[HiddenInput]
+		public Dictionary<string, string> CourseTitles { get; set; }
+
+		[HiddenInput]
+		public Dictionary<string, List<NotificationType>> NotificationTypesByCourse { get; set; }
+
+		[HiddenInput]
+		public List<NotificationType> AllNotificationTypes { get; set; }
+
+		[HiddenInput]
+		// Dictionary<(courseId, notificationTrnasportId, notificationType), isEnabled>
+		public Dictionary<Tuple<string, int, NotificationType>, bool> NotificationTransportsSettings { get; set; }
 	}
 
 	public class LtiUserViewModel

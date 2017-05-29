@@ -143,7 +143,8 @@ namespace uLearn.Web.Controllers
 
 			var comment = await commentsRepo.AddComment(User, courseId, slideId, parentCommentIdInt, commentText);
 			await commentsBot.PostToChannel(comment);
-			await NotifyAboutNewComment(comment);
+			if (comment.IsApproved)
+				await NotifyAboutNewComment(comment);
 			var canReply = CanAddCommentHere(User, courseId, isReply: true);
 
 			return PartialView("_Comment", new CommentViewModel
@@ -224,6 +225,8 @@ namespace uLearn.Web.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			await commentsRepo.ApproveComment(commentId, isApproved);
+			if (isApproved)
+				await NotifyAboutNewComment(comment);
 			return new HttpStatusCodeResult(HttpStatusCode.OK);
 		}
 

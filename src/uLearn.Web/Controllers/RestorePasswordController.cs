@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Web.Mvc;
 using Database.DataContexts;
 using Database.Models;
+using Kontur.Spam.Client;
 using log4net;
 using Microsoft.AspNet.Identity;
-using SendGrid;
-using SendGrid.Helpers.Mail;
 using uLearn.Web.Models;
+using Message = uLearn.Web.Models.Message;
 
 namespace uLearn.Web.Controllers
 {
@@ -21,12 +19,36 @@ namespace uLearn.Web.Controllers
 		private static readonly ILog log = LogManager.GetLogger(typeof(RestorePasswordController));
 		private readonly RestoreRequestRepo requestRepo;
 		private readonly UserManager<ApplicationUser> userManager;
-		private readonly ULearnDb db = new ULearnDb();
+		private readonly ULearnDb db;
 
-		public RestorePasswordController()
+		private readonly string spamChannelId;
+		private readonly SpamClient spamClient;
+
+		public RestorePasswordController(ULearnDb db)
 		{
+			this.db = db;
 			userManager = new ULearnUserManager(db);
 			requestRepo = new RestoreRequestRepo(db);
+
+			var spamEndpoint = WebConfigurationManager.AppSettings["ulearn.spam.endpoint"] ?? "";
+			var spamLogin = WebConfigurationManager.AppSettings["ulearn.spam.login"] ?? "ulearn";
+			var spamPassword = WebConfigurationManager.AppSettings["ulearn.spam.password"] ?? "";
+			spamChannelId = WebConfigurationManager.AppSettings["ulearn.spam.channels.password"] ?? "";
+			
+			try
+			{
+				spamClient = new SpamClient(new Uri(spamEndpoint), spamLogin, spamPassword);
+			}
+			catch (Exception e)
+			{
+				log.Error($"Can\'t initialize Spam.API client to {spamEndpoint}, login {spamLogin}, password {spamPassword.MaskAsSecret()}", e);
+				throw;
+			}
+		}
+
+		public RestorePasswordController()
+			: this(new ULearnDb())
+		{
 		}
 
 		public ActionResult Index()
@@ -85,25 +107,25 @@ namespace uLearn.Web.Controllers
 		{
 			var url = Url.Action("SetNewPassword", "RestorePassword", new { requestId }, "https");
 
-			var message = new SendGridMessage
+			var subject = "Восстановление пароля от ulearn.me";
+			var textBody = "Чтобы изменить пароль к аккаунту " + user.UserName + ", перейдите по ссылке: " + url + ".";
+			var htmlBody = "Чтобы изменить пароль к аккаунту " + user.UserName + ", перейдите по ссылке: <a href=\"" + url + "\">" + url + "</a>.";
+			var messageInfo = new MessageSentInfo
 			{
-				From = new EmailAddress("noreply@ulearn.azurewebsites.net", "Добрый робот uLearn"),
-				Subject = "Восстановление пароля uLearn",
-				HtmlContent = "Чтобы изменить пароль к аккаунту " + user.UserName + ", перейдите по ссылке: <a href=\"" + url + "\">" + url + "</a>"
+				RecipientAddress = user.Email,
+				Subject = subject,
+				Text = textBody,
+				Html = htmlBody
 			};
-			message.AddTo(new EmailAddress(user.Email));
 
-			var apiKey = WebConfigurationManager.AppSettings["SendGrid.ApiKey"] ?? "";
-
-			var transport = new SendGridClient(apiKey);
-
+			log.Info($"Пытаюсь отправить емэйл на {user.Email} с темой «{subject}», text: {textBody.Replace("\n", @" \\ ")}");
 			try
 			{
-				await transport.SendEmailAsync(message);
+				await spamClient.SentMessageAsync(spamChannelId, messageInfo);
 			}
-			catch (Exception ex)
+			catch (Exception e)
 			{
-				log.Error("Произошла ошибка при отправке письма", ex);
+				log.Error($"Не смог отправить емэйл через Spam.API на {user.Email} с темой «{subject}»", e);
 				throw;
 			}
 		}
