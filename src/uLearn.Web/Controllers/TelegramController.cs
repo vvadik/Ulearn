@@ -50,6 +50,10 @@ namespace uLearn.Web.Controllers
 			if (update == null)
 				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 
+            // Fix for bug: Telegram.Bot.Client doesn't know about some new messages types
+		    if (update.Message == null)
+		        return new HttpStatusCodeResult(HttpStatusCode.OK);
+
 			switch (update.Type)
 			{
 				case UpdateType.MessageUpdate:
