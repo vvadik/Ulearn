@@ -148,7 +148,7 @@
 							if (scoringGroupsCount > 0)
 							{
 								<th colspan="@scoringGroupsCount"
-								    title="@(Model.IsInstructor ? "Посмотреть ведомость по модулю «@unit.Title»" : "" )"
+								    title="@(Model.IsInstructor ? string.Format("Посмотреть ведомость по модулю «{0}»", unit.Title) : "")"
 								    data-unit-id="@unit.Id">
 									<div class="unit-title" data-unit-id="@unit.Id">
 										@if (Model.IsInstructor)

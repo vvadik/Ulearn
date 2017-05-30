@@ -38,7 +38,7 @@ namespace uLearn
 		}
 
 		[Test]
-		public void NoDuplicateVideos()
+		public static void NoDuplicateVideos()
 		{
 			var videos = GetVideos().ToLookup(d => d.Arguments[1], d => d.Arguments[0]);
 			foreach (var g in videos.Where(g => g.Count() > 1))
@@ -104,9 +104,9 @@ namespace uLearn
 				.Cast<ExpectedOutputAttribute>();
 		}
 
-		public IEnumerable<TestCaseData> GetVideos()
+		public static IEnumerable<TestCaseData> GetVideos()
 		{
-			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
+			var course = new CourseLoader().LoadCourse(new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\Slides")));
 			Assert.That(course.Slides.Count, Is.GreaterThan(0));
 			return course.Slides
 				.SelectMany(slide =>
@@ -116,6 +116,7 @@ namespace uLearn
 
 		[TestCaseSource(nameof(GetVideos))]
 		[Category("Long")]
+		[Explicit]
 		public void CheckAllYoutubeVideos(string slideName, string videoId)
 		{
 			var url = "https://www.youtube.com/oembed?format=json&url=http://www.youtube.com/watch?v=" + videoId;
@@ -199,9 +200,9 @@ namespace uLearn
   error: {solution.ErrorMessage}");
 		}
 
-		public IEnumerable<TestCaseData> GetSlidesTestCases()
+		public static IEnumerable<TestCaseData> GetSlidesTestCases()
 		{
-			var course = new CourseLoader().LoadCourse(new DirectoryInfo(@"..\..\Slides"));
+			var course = new CourseLoader().LoadCourse(new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\Slides")));
 			return
 				from slide in course.Slides.OfType<ExerciseSlide>()
 				select new TestCaseData(slide).SetName(course.Id + " - " + slide.Info.Unit.Title + " - " + slide.Title);

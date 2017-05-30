@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Xml.Serialization;
 using RunCsJob.Api;
@@ -29,6 +30,9 @@ namespace uLearn.Model.Blocks
 
 		[XmlElement("user-code-file-name")]
 		public string UserCodeFileName { get; set; }
+
+		[XmlElement("solution-file")]
+		public string SolutionFile { get; set; }
 
 		[XmlElement("exclude-path-for-checker")]
 		public string[] PathsToExcludeForChecker { get; set; }
@@ -57,6 +61,13 @@ namespace uLearn.Model.Blocks
 			CheckScoringGroup(context.SlideTitle, context.CourseSettings.Scoring);
 
 			yield return this;
+
+			if (!string.IsNullOrWhiteSpace(SolutionFile))
+			{
+				yield return new MdBlock("### Решение") { Hide = true };
+				var content = File.ReadAllText(Path.Combine(exercisePath, SolutionFile));
+				yield return new CodeBlock(content, LangId, LangVer) { Hide = true };
+			}
 		}
 
 		private void CreateZipForStudent()
