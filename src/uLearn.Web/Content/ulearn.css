@@ -2059,8 +2059,9 @@ h1 .copy-group-link {
 }
 
 .notifications__transport-settings__panel .course-role {
-    margin-left: 10px;
-    margin-bottom: 0;
+    margin-left: -20px;
+    margin-bottom: 5px;
+    margin-top: 15px;
 }
 
 .notifications__transport-settings__panel .course-role + .checkbox {

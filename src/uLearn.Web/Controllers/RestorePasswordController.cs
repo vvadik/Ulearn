@@ -33,7 +33,7 @@ namespace uLearn.Web.Controllers
 			var spamEndpoint = WebConfigurationManager.AppSettings["ulearn.spam.endpoint"] ?? "";
 			var spamLogin = WebConfigurationManager.AppSettings["ulearn.spam.login"] ?? "ulearn";
 			var spamPassword = WebConfigurationManager.AppSettings["ulearn.spam.password"] ?? "";
-			spamChannelId = WebConfigurationManager.AppSettings["ulearn.spam.channels.password"] ?? "";
+			spamChannelId = WebConfigurationManager.AppSettings["ulearn.spam.channels.passwords"] ?? "";
 			
 			try
 			{

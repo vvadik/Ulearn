@@ -1,5 +1,6 @@
 ﻿@using Database.Models
 @using System.Linq
+@using Database.Extensions
 @using uLearn
 
 @model UserViewModel
@@ -41,34 +42,36 @@
         var lastMinCourseRole = CourseRole.Student;
         foreach (var notificationType in Model.AllNotificationTypes)
         {
-            var checkBoxId = "notification-settings__" + (int)notificationType;
-            if (lastMinCourseRole != notificationType.GetMinCourseRole())
-            {
-                lastMinCourseRole = notificationType.GetMinCourseRole();
-                var courseRoleStr = "";
-                switch (lastMinCourseRole)
-                {
-                    case CourseRole.Tester:
-                        courseRoleStr = "Для тестировщиков";
-                        break;
-                    case CourseRole.Instructor:
-                        courseRoleStr = "Для преподавателей";
-                        break;
-                    case CourseRole.CourseAdmin:
-                        courseRoleStr = "Для владельцев курса";
-                        break;
-                }
-                if (notificationType.IsForSysAdminsOnly())
-                {
-                    courseRoleStr = "Для администраторов";
-                }
-                <div class="course-role text-muted">
-                    @(courseRoleStr):
-                </div>
-            }
-
             <div class="checkbox checkbox-default">
-                @Html.CheckBox(checkBoxId, false, new { data_default = notificationType.IsEnabledByDefault().ToString().ToLower(), data_notification_type = (int) notificationType })
+                @{
+                    var checkBoxId = "notification-settings__" + (int)notificationType;
+                    if (lastMinCourseRole != notificationType.GetMinCourseRole())
+                    {
+                        lastMinCourseRole = notificationType.GetMinCourseRole();
+                        var courseRoleStr = "";
+                        switch (lastMinCourseRole)
+                        {
+                            case CourseRole.Tester:
+                                courseRoleStr = "Для тестировщиков";
+                                break;
+                            case CourseRole.Instructor:
+                                courseRoleStr = "Для преподавателей";
+                                break;
+                            case CourseRole.CourseAdmin:
+                                courseRoleStr = "Для владельцев курса";
+                                break;
+                        }
+                        if (notificationType.IsForSysAdminsOnly())
+                        {
+                            courseRoleStr = "Для администраторов";
+                        }
+                        <div class="course-role text-muted">
+                            @(courseRoleStr):
+                        </div>
+                    }
+                }
+
+                @Html.CheckBox(checkBoxId, false, new { data_default = notificationType.IsEnabledByDefault().ToString().ToLower(), data_notification_type = (int)notificationType })
                 <label for="@checkBoxId">@notificationType.GetGroupName()</label>
             </div>
         }
@@ -137,7 +140,7 @@
                 @ShowNotificationsTransportSettings(Model.TelegramTransport, "в телеграм")
             </div>
         }
-        else
+        else if (User.HasAccess(CourseRole.Instructor))
         {
             <div class="form-group help-text text-muted">
                 Чтобы подключить телеграм, напишите <a href="https://t.me/@Model.TelegramBotName">нашему боту</a>.

@@ -341,7 +341,7 @@ namespace Database.DataContexts
 			var notificationTypes = GetAllNotificationTypes();
 
 			notificationTypes = notificationTypes
-				.Where(t => user.HasAccessFor(courseId, t.GetMinCourseRole()))
+				.Where(t => user.HasAccessFor(courseId, t.GetMinCourseRole()) || t.GetMinCourseRole() == CourseRole.Student)
 				.OrderByDescending(t => t.GetMinCourseRole())
 				.ThenBy(t => (int)t)
 				.ToList();
