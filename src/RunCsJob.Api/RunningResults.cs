@@ -1,8 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-
-namespace RunCsJob.Api
+﻿namespace RunCsJob.Api
 {
 	public class RunningResults
 	{
@@ -14,8 +10,7 @@ namespace RunCsJob.Api
 
 		public override string ToString()
 		{
-			return string.Format("Id: {0}, Verdict: {1}: {2}", Id, Verdict,
-				Verdict == Verdict.SandboxError ? Error : Verdict == Verdict.CompilationError ? CompilationOutput : Output);
+			return $"Id: {Id}, Verdict: {Verdict}: {(Verdict == Verdict.SandboxError ? Error : Verdict == Verdict.CompilationError ? CompilationOutput : Output)}";
 		}
 
 		public string GetOutput()
@@ -23,14 +18,16 @@ namespace RunCsJob.Api
 			var output = Output;
 			if (!string.IsNullOrEmpty(Error))
 				output += "\n" + Error;
-			if (Verdict != Verdict.Ok)
+
+			switch (Verdict)
 			{
-				if (Verdict == Verdict.TimeLimit)
-					output += "\n Time limit exceeded";
-				else
-					output += "\n" + Verdict;
+				case Verdict.Ok:
+					return output;
+				case Verdict.TimeLimit:
+					return output + "\n Time limit exceeded";
+				default:
+					return output + "\n" + Verdict;
 			}
-			return output;
 		}
 	}
 }

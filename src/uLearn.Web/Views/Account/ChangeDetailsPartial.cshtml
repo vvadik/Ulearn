@@ -7,191 +7,191 @@
 
 @helper ShowNotificationsTransportSettings(NotificationTransport transport, string notificationsDestination)
 {
-    if (transport != null)
-    {
-        <nobr>
-            <a href="@Url.Action("EnableNotificationTransport", "Notifications", new
-                     {
-                         transportId = transport.Id, enable = !transport.IsEnabled, next = Request.RawUrl
-                     })" class="btn btn-xs @(transport.IsEnabled ? "btn-default" : "btn-success")">
-                @(transport.IsEnabled ? "выключить" : "включить") уведомления
-            </a>
+	if (transport != null)
+	{
+		<nobr>
+			<a href="@Url.Action("EnableNotificationTransport", "Notifications", new
+					 {
+						 transportId = transport.Id, enable = !transport.IsEnabled, next = Request.RawUrl
+					 })" class="btn btn-xs @(transport.IsEnabled ? "btn-default" : "btn-success")">
+				@(transport.IsEnabled ? "выключить" : "включить") уведомления
+			</a>
 
-            @if (!transport.IsEnabled)
-            {
-                <span class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Вы сможете выбрать, какие новости получать @notificationsDestination"></span>
-            }
-        </nobr>
-        if (transport.IsEnabled)
-        {
-            <a href="#" class="notifications__transport-settings__link internal-page-link"
-               data-transport-id="@transport.Id"
-               data-modal-title="Настройка уведомлений @notificationsDestination">Настроить уведомления</a>
-        }
-    }
+			@if (!transport.IsEnabled)
+			{
+				<span class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Вы сможете выбрать, какие новости получать @notificationsDestination"></span>
+			}
+		</nobr>
+		if (transport.IsEnabled)
+		{
+			<a href="#" class="notifications__transport-settings__link internal-page-link"
+			   data-transport-id="@transport.Id"
+			   data-modal-title="Настройка уведомлений @notificationsDestination">Настроить уведомления</a>
+		}
+	}
 }
 
 @helper CourseNotificationsSettings()
 {
-    <h4 class="notifications__transport-settings__course-title">Курс «<span class="course-title"></span>»</h4>
-    using (Html.BeginForm("SaveSettings", "Notifications", FormMethod.Post))
-    {
-        @Html.Hidden("transportId")
-        @Html.Hidden("courseId")
+	<h4 class="notifications__transport-settings__course-title">Курс «<span class="course-title"></span>»</h4>
+	using (Html.BeginForm("SaveSettings", "Notifications", FormMethod.Post))
+	{
+		@Html.Hidden("transportId")
+		@Html.Hidden("courseId")
 
-        var lastMinCourseRole = CourseRole.Student;
-        foreach (var notificationType in Model.AllNotificationTypes)
-        {
-            <div class="checkbox checkbox-default">
-                @{
-                    var checkBoxId = "notification-settings__" + (int)notificationType;
-                    if (lastMinCourseRole != notificationType.GetMinCourseRole())
-                    {
-                        lastMinCourseRole = notificationType.GetMinCourseRole();
-                        var courseRoleStr = "";
-                        switch (lastMinCourseRole)
-                        {
-                            case CourseRole.Tester:
-                                courseRoleStr = "Для тестировщиков";
-                                break;
-                            case CourseRole.Instructor:
-                                courseRoleStr = "Для преподавателей";
-                                break;
-                            case CourseRole.CourseAdmin:
-                                courseRoleStr = "Для владельцев курса";
-                                break;
-                        }
-                        if (notificationType.IsForSysAdminsOnly())
-                        {
-                            courseRoleStr = "Для администраторов";
-                        }
-                        <div class="course-role text-muted">
-                            @(courseRoleStr):
-                        </div>
-                    }
-                }
+		var lastMinCourseRole = CourseRole.Student;
+		foreach (var notificationType in Model.AllNotificationTypes)
+		{
+			<div class="checkbox checkbox-default">
+				@{
+					var checkBoxId = "notification-settings__" + (int)notificationType;
+					if (lastMinCourseRole != notificationType.GetMinCourseRole())
+					{
+						lastMinCourseRole = notificationType.GetMinCourseRole();
+						var courseRoleStr = "";
+						switch (lastMinCourseRole)
+						{
+							case CourseRole.Tester:
+								courseRoleStr = "Для тестировщиков";
+								break;
+							case CourseRole.Instructor:
+								courseRoleStr = "Для преподавателей";
+								break;
+							case CourseRole.CourseAdmin:
+								courseRoleStr = "Для владельцев курса";
+								break;
+						}
+						if (notificationType.IsForSysAdminsOnly())
+						{
+							courseRoleStr = "Для администраторов";
+						}
+						<div class="course-role text-muted">
+							@(courseRoleStr):
+						</div>
+					}
+				}
 
-                @Html.CheckBox(checkBoxId, false, new { data_default = notificationType.IsEnabledByDefault().ToString().ToLower(), data_notification_type = (int)notificationType })
-                <label for="@checkBoxId">@notificationType.GetGroupName()</label>
-            </div>
-        }
+				@Html.CheckBox(checkBoxId, false, new { data_default = notificationType.IsEnabledByDefault().ToString().ToLower(), data_notification_type = (int)notificationType })
+				<label for="@checkBoxId">@notificationType.GetGroupName()</label>
+			</div>
+		}
 
-        <button type="submit" class="btn btn-success">Сохранить настройки</button> <span class="text-muted">для этого курса</span>
-        <div class="status"></div>
-    }
+		<button type="submit" class="btn btn-success">Сохранить настройки</button> <span class="text-muted">для этого курса</span>
+		<div class="status"></div>
+	}
 }
 
 <section class="login-and-registration-form">
-    @using (Html.BeginForm("ChangeDetailsPartial", "Account", FormMethod.Post, new { role = "form" }))
-    {
-        @Html.AntiForgeryToken()
+	@using (Html.BeginForm("ChangeDetailsPartial", "Account", FormMethod.Post, new { role = "form" }))
+	{
+		@Html.AntiForgeryToken()
 
-        @Html.ValidationSummary(true)
-        @Html.HiddenFor(m => m.UserId)
-        <div class="form-group">
-            @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Логин" })
-            @Html.ValidationMessageFor(m => m.Name)
-        </div>
-        <div class="form-group">
-            @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", placeholder = "Имя" })
-            @Html.ValidationMessageFor(m => m.FirstName)
+		@Html.ValidationSummary(true)
+		@Html.HiddenFor(m => m.UserId)
+		<div class="form-group">
+			@Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Логин" })
+			@Html.ValidationMessageFor(m => m.Name)
+		</div>
+		<div class="form-group">
+			@Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", placeholder = "Имя" })
+			@Html.ValidationMessageFor(m => m.FirstName)
 
-        </div>
-        <div class="form-group">
-            @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", placeholder = "Фамилия" })
-            @Html.ValidationMessageFor(m => m.LastName)
-        </div>
+		</div>
+		<div class="form-group">
+			@Html.TextBoxFor(m => m.LastName, new { @class = "form-control", placeholder = "Фамилия" })
+			@Html.ValidationMessageFor(m => m.LastName)
+		</div>
 
-        if (!Model.HasPassword)
-        {
-            <p class="text-info">
-                Задайте пароль, чтобы входить по логину
-            </p>
+		if (!Model.HasPassword)
+		{
+			<p class="text-info">
+				Задайте пароль, чтобы входить по логину
+			</p>
 
-            <div class="form-group">
-                @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Пароль" })
-                @Html.ValidationMessageFor(m => m.Password)
-            </div>
-            <div class="form-group">
-                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Ещё раз" })
-                @Html.ValidationMessageFor(m => m.ConfirmPassword)
-            </div>
-        }
+			<div class="form-group">
+				@Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Пароль" })
+				@Html.ValidationMessageFor(m => m.Password)
+			</div>
+			<div class="form-group">
+				@Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Ещё раз" })
+				@Html.ValidationMessageFor(m => m.ConfirmPassword)
+			</div>
+		}
 
-        if (Model.User.EmailConfirmed)
-        {
-            <div class="form-group">
-                <b>Эл. почта:</b> @Model.User.Email
-                @ShowNotificationsTransportSettings(Model.MailTransport, "на почту")
-            </div>
-        }
-        else
-        {
-            <div class="form-group">
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Эл. почта" })
-                @Html.ValidationMessageFor(m => m.Email)
-            </div>
-        }
+		if (Model.User.EmailConfirmed)
+		{
+			<div class="form-group">
+				<b>Эл. почта:</b> @Model.User.Email
+				@ShowNotificationsTransportSettings(Model.MailTransport, "на почту")
+			</div>
+		}
+		else
+		{
+			<div class="form-group">
+				@Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Эл. почта" })
+				@Html.ValidationMessageFor(m => m.Email)
+			</div>
+		}
 
-        if (Model.User.TelegramChatId.HasValue)
-        {
-            <div class="form-group">
-                <b>Телеграм:</b> @Model.User.TelegramChatTitle
-                @ShowNotificationsTransportSettings(Model.TelegramTransport, "в телеграм")
-            </div>
-        }
-        else if (User.HasAccess(CourseRole.Instructor))
-        {
-            <div class="form-group help-text text-muted">
-                Чтобы подключить телеграм, напишите <a href="https://t.me/@Model.TelegramBotName">нашему боту</a>.
-            </div>
-        }
+		if (Model.User.TelegramChatId.HasValue)
+		{
+			<div class="form-group">
+				<b>Телеграм:</b> @Model.User.TelegramChatTitle
+				@ShowNotificationsTransportSettings(Model.TelegramTransport, "в телеграм")
+			</div>
+		}
+		else if (User.HasAccess(CourseRole.Instructor))
+		{
+			<div class="form-group help-text text-muted">
+				Чтобы подключить телеграм, напишите <a href="https://t.me/@Model.TelegramBotName">нашему боту</a>.
+			</div>
+		}
 
-        <div class="form-group">
-            <input type="submit" value="Сохранить изменения" class="ph-btn ph-btn-blue btn-block"/>
-        </div>
-    }
+		<div class="form-group">
+			<input type="submit" value="Сохранить изменения" class="ph-btn ph-btn-blue btn-block"/>
+		</div>
+	}
 </section>
 
 <div id="notifications__transport-settings__modal" class="modal">
-    <div class="modal-dialog wide">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title"></h4>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="notifications__transport-settings__course__panel col-xs-12 col-md-5">
-                        <h4>Выберите курс</h4>
-                        @foreach (var courseId in Model.CourseTitles.Keys.OrderBy(courseId => Model.CourseTitles[courseId]))
-                        {
-                            var courseTitle = Model.CourseTitles[courseId];
-                            <div>
-                                <a href="#" class="notifications__transport-settings__course__link" data-course-id="@courseId" data-course-title="@courseTitle">@courseTitle</a>
-                            </div>
-                        }
-                    </div>
-                    <div class="notifications__transport-settings__panel col-xs-12 col-md-7">
-                        @CourseNotificationsSettings()
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog wide">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="notifications__transport-settings__course__panel col-xs-12 col-md-5">
+						<h4>Выберите курс</h4>
+						@foreach (var courseId in Model.CourseTitles.Keys.OrderBy(courseId => Model.CourseTitles[courseId]))
+						{
+							var courseTitle = Model.CourseTitles[courseId];
+							<div>
+								<a href="#" class="notifications__transport-settings__course__link" data-course-id="@courseId" data-course-title="@courseTitle">@courseTitle</a>
+							</div>
+						}
+					</div>
+					<div class="notifications__transport-settings__panel col-xs-12 col-md-7">
+						@CourseNotificationsSettings()
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script>
-    var notificationTypesByCourse = @Html.Raw(
-        Model.NotificationTypesByCourse.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Select(t => (int) t)).JsonSerialize()
-    );
+	var notificationTypesByCourse = @Html.Raw(
+		Model.NotificationTypesByCourse.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Select(t => (int) t)).JsonSerialize()
+	);
 
-    var notificationTransportsSettings = @Html.Raw(Model.NotificationTransportsSettings.Select(
-        kvp => new
-        {
-            courseId = kvp.Key.Item1,
-            transportId = kvp.Key.Item2,
-            notificationType = kvp.Key.Item3,
-            isEnabled = kvp.Value,
-        }
-    ).JsonSerialize());
+	var notificationTransportsSettings = @Html.Raw(Model.NotificationTransportsSettings.Select(
+		kvp => new
+		{
+			courseId = kvp.Key.Item1,
+			transportId = kvp.Key.Item2,
+			notificationType = kvp.Key.Item3,
+			isEnabled = kvp.Value,
+		}
+	).JsonSerialize());
 </script>

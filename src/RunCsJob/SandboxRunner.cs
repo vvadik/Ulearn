@@ -187,8 +187,9 @@ namespace RunCsJob
 				if(!File.Exists(destFilePath))
 					File.Copy(sourceFilePath, destFilePath);
 			}
-			catch
+			catch (Exception e)
 			{
+				log.Warn($"Произошла ошибка при копировании файла {sourceFilePath} в {destFilePath}, но я её проигнорирую", e);
 			}
 		}
 
@@ -198,8 +199,9 @@ namespace RunCsJob
 			{
 				Directory.Delete(path, true);
 			}
-			catch
+			catch (Exception e)
 			{
+				log.Warn($"Произошла ошибка при удалении директории {path}, но я её проигнорирую", e);
 			}
 		}
 
@@ -209,8 +211,9 @@ namespace RunCsJob
 			{
 				File.Delete(path);
 			}
-			catch
+			catch (Exception e)
 			{
+				log.Warn($"Произошла ошибка при удалении файла {path}, но я её проигнорирую", e);
 			}
 		}
 

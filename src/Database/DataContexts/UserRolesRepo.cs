@@ -36,7 +36,7 @@ namespace Database.DataContexts
 				db.UserRoles.Remove(userRole);
 			await db.SaveChangesAsync();
 
-		    return userRole == null;
+			return userRole == null;
 		}
 
 		public List<string> GetListOfUsersWithCourseRole(CourseRole? courseRole, string courseId, bool includeHighRoles = false)

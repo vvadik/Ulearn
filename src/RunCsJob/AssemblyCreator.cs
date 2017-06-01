@@ -1,14 +1,11 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
-using Microsoft.CSharp;
 using RunCsJob.Api;
 
 namespace RunCsJob
@@ -16,9 +13,6 @@ namespace RunCsJob
 	public static class AssemblyCreator
 	{
 		public static IEnumerable<int> x = Enumerable.Range(1, 1);
-
-		private static readonly string AssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-		private static readonly string SystemRuntimeDllPath = Path.Combine(AssemblyDirectory, "System.Runtime.dll");
 
 		public static CompileResult CreateAssemblyWithRoslyn(FileRunnerSubmission submission, string workingDirectory)
 		{
@@ -36,7 +30,7 @@ namespace RunCsJob
 					MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location), // System.Core
 					MetadataReference.CreateFromFile(typeof(Point).Assembly.Location), // System.Drawing,
 					MetadataReference.CreateFromFile(typeof(ValueTuple).Assembly.Location), // System.ValueTuple
-					MetadataReference.CreateFromFile(SystemRuntimeDllPath), // System.Runtime (defines ValueType type),
+					MetadataReference.CreateFromFile(typeof(ValueType).Assembly.Location), // System.Runtime
 				}, new CSharpCompilationOptions(OutputKind.ConsoleApplication));
 			
 			var assemblyFilename = Path.Combine(workingDirectory, assemblyName + ".exe");

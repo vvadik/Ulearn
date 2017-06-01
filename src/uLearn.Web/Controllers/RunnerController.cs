@@ -12,7 +12,9 @@ using Database.DataContexts;
 using Database.Models;
 using log4net;
 using RunCsJob.Api;
+using Telegram.Bot.Types.Enums;
 using uLearn.Extensions;
+using uLearn.Web.Telegram;
 using XQueue;
 using XQueue.Models;
 
@@ -27,7 +29,8 @@ namespace uLearn.Web.Controllers
 
 		private static readonly List<IResultObserver> resultObserveres = new List<IResultObserver>
 		{
-			new XQueueResultObserver()
+			new XQueueResultObserver(),
+			new SandboxErrorsResultObserver(),
 		};
 
 		public RunnerController(ULearnDb db, CourseManager courseManager)
@@ -168,6 +171,24 @@ namespace uLearn.Web.Controllers
 					Message = checking.CompilationError.Text + checking.Output.Text,
 				}
 			});
+		}
+	}
+
+	public class SandboxErrorsResultObserver : IResultObserver
+	{
+		private static readonly ErrorsBot bot = new ErrorsBot();
+		
+		public async Task ProcessResult(UserExerciseSubmission submission, RunningResults result)
+		{
+			/* Ignore all verdicts except SandboxError */
+			if (result.Verdict != Verdict.SandboxError)
+				return;
+
+			await bot.PostToChannelAsync(
+				"<b>Решение не запустилось в песочнице (ошибка SandboxError).</b>\nВывод:\n\n" +
+				result.Output.EscapeHtml(),
+				ParseMode.Html
+			);
 		}
 	}
 }

@@ -36,15 +36,15 @@ namespace Notifications
 		{
 		}
 
-	    private string GetEmailTextSignature()
-	    {
-	        return "\n\n—\nВсегда ваши,\nКоманда ulearn.me\n\nВы можете отписаться от получения уведомлений на почту в настройках вашего профиля.";
-	    }
+		private string GetEmailTextSignature()
+		{
+			return "\n\n—\nВсегда ваши,\nКоманда ulearn.me\n\nВы можете отписаться от получения уведомлений на почту в настройках вашего профиля.";
+		}
 
-	    private string GetEmailHtmlSignature()
-	    {
-	        return GetEmailTextSignature().Replace("\n", "<br/>");
-	    }
+		private string GetEmailHtmlSignature()
+		{
+			return GetEmailTextSignature().Replace("\n", "<br/>");
+		}
 
 		private async Task SendAsync(MailNotificationTransport transport, NotificationDelivery notificationDelivery)
 		{
@@ -54,12 +54,12 @@ namespace Notifications
 			var notification = notificationDelivery.Notification;
 			var course = courseManager.GetCourse(notification.CourseId);
 
-		    await emailSender.SendEmailAsync(
+			await emailSender.SendEmailAsync(
 				transport.User.Email,
 				notification.GetNotificationType().GetDisplayName(),
 				notification.GetTextMessageForDelivery(transport, notificationDelivery, course, baseUrl) + GetEmailTextSignature(),
 				notification.GetHtmlMessageForDelivery(transport, notificationDelivery, course, baseUrl) + GetEmailHtmlSignature()
-            );
+			);
 		}
 
 		private async Task SendAsync(MailNotificationTransport transport, List<NotificationDelivery> notificationDeliveries)

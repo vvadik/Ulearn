@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using System.Web.Configuration;
 using Elmah;
 using log4net;
@@ -15,7 +16,7 @@ namespace uLearn.Web.Telegram
 			channel = WebConfigurationManager.AppSettings["ulearn.telegram.errors.channel"];
 		}
 
-		public void PostToChannel(string message, ParseMode parseMode = ParseMode.Default)
+		public async Task PostToChannelAsync(string message, ParseMode parseMode = ParseMode.Default)
 		{
 			if (!IsBotEnabled)
 				return;
@@ -23,14 +24,17 @@ namespace uLearn.Web.Telegram
 			log.Info($"Отправляю в телеграм-канал {channel} сообщение об ошибке:\n{message}");
 			try
 			{
-				telegramClient.SendTextMessageAsync(channel, message, parseMode: parseMode, disableWebPagePreview: true)
-					.GetAwaiter()
-					.GetResult();
+				await telegramClient.SendTextMessageAsync(channel, message, parseMode: parseMode, disableWebPagePreview: true);
 			}
 			catch (Exception e)
 			{
 				log.Error($"Не могу отправить сообщение в телеграм-канал {channel}", e);
 			}
+		}
+
+		public void PostToChannel(string message, ParseMode parseMode = ParseMode.Default)
+		{
+			PostToChannelAsync(message, parseMode).GetAwaiter().GetResult();
 		}
 
 		public void PostToChannel(string errorId, Error error)

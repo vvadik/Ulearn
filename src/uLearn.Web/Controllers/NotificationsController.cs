@@ -21,7 +21,7 @@ namespace uLearn.Web.Controllers
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly UsersRepo usersRepo;
 		private readonly CourseManager courseManager;
-	    private readonly string telegramBotName;
+		private readonly string telegramBotName;
 
 		public NotificationsController(ULearnDb db, CourseManager courseManager)
 		{
@@ -29,7 +29,7 @@ namespace uLearn.Web.Controllers
 			usersRepo = new UsersRepo(db);
 
 			this.courseManager = courseManager;
-		    telegramBotName = WebConfigurationManager.AppSettings["ulearn.telegram.botName"];
+			telegramBotName = WebConfigurationManager.AppSettings["ulearn.telegram.botName"];
 		}
 
 		public NotificationsController() : this(new ULearnDb(), WebCourseManager.Instance)
@@ -62,7 +62,7 @@ namespace uLearn.Web.Controllers
 			return PartialView(new SuggestMailTransportViewModel
 			{
 				Transport = mailNotificationTransport,
-                TelegramBotName = telegramBotName,
+				TelegramBotName = telegramBotName,
 			});
 		}
 
@@ -147,6 +147,6 @@ namespace uLearn.Web.Controllers
 	public class SuggestMailTransportViewModel
 	{
 		public MailNotificationTransport Transport { get; set; }
-	    public string TelegramBotName { get; set; }
+		public string TelegramBotName { get; set; }
 	}
 }
