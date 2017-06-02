@@ -135,6 +135,18 @@ namespace uLearn
 			}
 		}
 
+		public static string CalculateMd5(this string arg)
+		{
+			byte[] hash;
+			using (var md5 = MD5.Create())
+				hash = md5.ComputeHash(Encoding.Default.GetBytes(arg));
+			
+			var sb = new StringBuilder();
+			foreach (var b in hash)
+				sb.Append(b.ToString("X2"));
+			return sb.ToString();
+		}
+
 		public static string MaskAsSecret(this string str)
 		{
 			if (str.Length < 5)

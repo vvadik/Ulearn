@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Threading.Tasks;
 using Kontur.Spam.Client;
@@ -13,6 +14,7 @@ namespace Notifications
 
 		private readonly ISpamClient client;
 		private readonly string channelId;
+		private readonly string templateId;
 
 		public KonturSpamEmailSender()
 		{
@@ -20,6 +22,7 @@ namespace Notifications
 			var spamLogin = ConfigurationManager.AppSettings["ulearn.spam.login"] ?? "ulearn";
 			var spamPassword = ConfigurationManager.AppSettings["ulearn.spam.password"] ?? "";
 			channelId = ConfigurationManager.AppSettings["ulearn.spam.channels.notifications"] ?? "";
+			templateId = ConfigurationManager.AppSettings["ulearn.spam.templates.withButton"];
 
 			try
 			{
@@ -35,18 +38,35 @@ namespace Notifications
 			log.Info($"Using channel '{channelId}'");
 		}
 
-		public async Task SendEmailAsync(string to, string subject, string textBody, string htmlBody=null)
+		public async Task SendEmailAsync(string to, string subject, string textContent=null, string htmlContent=null, EmailButton button=null, string textContentAfterButton=null, string htmlContentAfterButton=null)
 		{
 			var messageInfo = new MessageSentInfo
 			{
 				RecipientAddress = to,
 				Subject = subject,
-				Text = textBody,
 			};
-			if (!string.IsNullOrEmpty(htmlBody))
-				messageInfo.Html = htmlBody;
+			if (!string.IsNullOrEmpty(templateId))
+			{
+				messageInfo.TemplateId = templateId;
+				messageInfo.Variables = new Dictionary<string, object>
+				{
+					{ "title", subject },
+					{ "content", htmlContent },
+					{ "text_content", textContent },
+					{ "button", button != null },
+					{ "button_link", button?.Link },
+					{ "button_text", button?.Text },
+					{ "content_after_button", htmlContentAfterButton },
+					{ "text_content_after_button", textContentAfterButton },
+				};
+			}
+			else
+			{
+				messageInfo.Html = htmlContent;
+				messageInfo.Text = textContent;
+			}
 
-			log.Info($"Try to send message to {to} with subject {subject}, text: {textBody.Replace("\n", @" \\ ")}");
+			log.Info($"Try to send message to {to} with subject {subject}, text: {textContent?.Replace("\n", @" \\ ")}");
 			try
 			{
 				await client.SentMessageAsync(channelId, messageInfo);

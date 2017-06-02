@@ -989,6 +989,9 @@ li.li-success {
 	border-width: 2px;
 }
 
+.login-and-registration-form .notifications__transport-settings__panel .checkbox label::before {
+	border-width: 1px;
+}
 
 /* Account page */
 #externalLogins #socialLoginList .ph-btn {
@@ -2003,12 +2006,13 @@ h1 .copy-group-link {
 .notifications__transport-settings__course__panel {
 	border-right: 1px solid #ddd;
 	padding-right: 0;
+	min-height: 380px;
 }
 
 .notifications__transport-settings__course__link {
 	display: block;
 	padding: 10px;
-	border-bottom: 1px solid rgba(30, 80, 30, 0.15);
+	border-top: 1px solid rgba(30, 80, 30, 0.15);
 }
 
 .notifications__transport-settings__course__link.active {
@@ -2017,13 +2021,19 @@ h1 .copy-group-link {
 	text-decoration: none;
 }
 
-*:last-child > .notifications__transport-settings__course__link {
-	border-bottom-width: 0;
+h4 + div > .notifications__transport-settings__course__link {
+	border-top-width: 0;
 }
 
 .notifications__transport-settings__course__link:not(.active):hover {
 	text-decoration: none;
 	background-color: #efefff;
+}
+
+.notifications__transport-settings__courses-description {
+	font-size: 11px;
+	margin: 5px 10px;
+	color: #aaa;
 }
 
 .notifications__transport-settings__panel:not(.active) {
@@ -2054,8 +2064,10 @@ h1 .copy-group-link {
 }
 
 .notifications__transport-settings__panel .status {
-	padding-left: 10px;
-	padding-top: 5px;
+	margin-left: 15px;
+	display: inline-block;
+	font-size: 12px;
+	vertical-align: middle;
 }
 
 .notifications__transport-settings__panel .course-role {

@@ -140,6 +140,7 @@ namespace Database.Models
 	{
 		// Everybody
 		[Display(Name = @"Сообщение от платформы ulearn.me", GroupName = @"Сообщения от платформы ulearn.me")]
+		[IsEnabledByDefault(true)]
 		SystemMessage = 1,
 
 		[Display(Name = @"Сообщение от преподавателя", GroupName = @"Сообщения от преподавателя")]
@@ -197,11 +198,6 @@ namespace Database.Models
 		[Display(Name = @"Опубликован новый пакет", GroupName = @"Опубликованы новые пакеты")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		PublishedPackage = 204,
-
-		[Display(Name = @"Произошла ошибка", GroupName = @"Произошли ошибки")]
-		[SysAdminsOnly]
-		[IsEnabledByDefault(true)]
-		OccuredError = 301
 	}
 
 	public static class NotificationTypeExtensions
@@ -840,37 +836,6 @@ namespace Database.Models
 		public override List<string> GetRecipientsIds(ULearnDb db)
 		{
 			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
-		}
-
-		public override bool IsActual()
-		{
-			return true;
-		}
-	}
-
-	[NotificationType(NotificationType.OccuredError)]
-	public class OccuredErrorNotification : Notification
-	{
-		[Required]
-		[StringLength(100)]
-		public string ErrorId { get; set; }
-
-		public string ErrorMessage { get; set; }
-
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override List<string> GetRecipientsIds(ULearnDb db)
-		{
-			var userManager = new ULearnUserManager(db);
-			return new UsersRepo(db).GetSysAdminsIds(userManager);
 		}
 
 		public override bool IsActual()

@@ -351,6 +351,11 @@ namespace Database.DataContexts
 
 			return notificationTypes;
 		}
+
+		public static string GetNotificationTransportEnablingSignature(int transportId, long timestamp, string secret)
+		{
+			return $"{secret}transport={transportId}&timestamp={timestamp}{secret}".CalculateMd5();
+		}
 	}
 
 	class NotificationTransportIdComparer : IEqualityComparer<NotificationTransport>

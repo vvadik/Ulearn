@@ -429,20 +429,6 @@ namespace uLearn.Web.Controllers
 		{
 			var user = userManager.FindByName(User.Identity.Name);
 			var hasPassword = ControllerUtils.HasPassword(userManager, User);
-			var telegramBotName = WebConfigurationManager.AppSettings["ulearn.telegram.botName"];
-
-			var mailTransport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(user.Id, includeDisabled: true);
-			var telegramTransport = notificationsRepo.FindUsersNotificationTransport<TelegramNotificationTransport>(user.Id, includeDisabled: true);
-
-			var courseTitles = courseManager.GetCourses().ToDictionary(c => c.Id, c => c.Title);
-			var notificationTypesByCourse = courseTitles.Keys.ToDictionary(c => c, c => notificationsRepo.GetNotificationTypes(User, c));
-			var allNotificationTypes = NotificationsRepo.GetAllNotificationTypes();
-
-			var notificationTransportsSettings = courseTitles.Keys.SelectMany(
-				c => notificationsRepo.GetNotificationTransportsSettings(c).Select(
-					kvp => Tuple.Create(Tuple.Create(c, kvp.Key.Item1, kvp.Key.Item2), kvp.Value.IsEnabled)
-				)
-			).ToDictionary(kvp => kvp.Item1, kvp => kvp.Item2);
 
 			return PartialView(new UserViewModel
 			{
@@ -453,15 +439,6 @@ namespace uLearn.Web.Controllers
 				FirstName = user.FirstName,
 				LastName = user.LastName,
 				Email = user.Email,
-				TelegramBotName = telegramBotName,
-
-				MailTransport = mailTransport,
-				TelegramTransport = telegramTransport,
-
-				CourseTitles = courseTitles,
-				AllNotificationTypes = allNotificationTypes,
-				NotificationTypesByCourse = notificationTypesByCourse,
-				NotificationTransportsSettings = notificationTransportsSettings,
 			});
 		}
 

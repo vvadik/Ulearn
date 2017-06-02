@@ -427,6 +427,10 @@
     <Compile Include="Migrations\201705292128067_ChangeNotificationIndexIntToGuid.Designer.cs">
       <DependentUpon>201705292128067_ChangeNotificationIndexIntToGuid.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201706020525579_RemoveOccuredErrorNotification.cs" />
+    <Compile Include="Migrations\201706020525579_RemoveOccuredErrorNotification.Designer.cs">
+      <DependentUpon>201706020525579_RemoveOccuredErrorNotification.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -692,6 +696,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201705292128067_ChangeNotificationIndexIntToGuid.resx">
       <DependentUpon>201705292128067_ChangeNotificationIndexIntToGuid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706020525579_RemoveOccuredErrorNotification.resx">
+      <DependentUpon>201706020525579_RemoveOccuredErrorNotification.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

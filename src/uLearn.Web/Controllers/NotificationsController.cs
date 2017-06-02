@@ -21,15 +21,25 @@ namespace uLearn.Web.Controllers
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly UsersRepo usersRepo;
 		private readonly CourseManager courseManager;
+		private readonly VisitsRepo visitsRepo;
+
+		private readonly ULearnUserManager userManager;
+
 		private readonly string telegramBotName;
+		private readonly string secretForHashes;
+
+		private TimeSpan notificationEnablingLinkExpiration = TimeSpan.FromDays(7);
 
 		public NotificationsController(ULearnDb db, CourseManager courseManager)
 		{
 			notificationsRepo = new NotificationsRepo(db);
 			usersRepo = new UsersRepo(db);
+			visitsRepo = new VisitsRepo(db);
+			userManager = new ULearnUserManager(db);
 
 			this.courseManager = courseManager;
 			telegramBotName = WebConfigurationManager.AppSettings["ulearn.telegram.botName"];
+			secretForHashes = WebConfigurationManager.AppSettings["ulearn.secretForHashes"] ?? "";
 		}
 
 		public NotificationsController() : this(new ULearnDb(), WebCourseManager.Instance)
@@ -59,19 +69,42 @@ namespace uLearn.Web.Controllers
 			};
 			notificationsRepo.AddNotificationTransport(mailNotificationTransport).Wait(5000);
 
+			var timestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+			var signature = GetNotificationTransportEnablingSignature(mailNotificationTransport.Id, timestamp);
+
 			return PartialView(new SuggestMailTransportViewModel
 			{
 				Transport = mailNotificationTransport,
 				TelegramBotName = telegramBotName,
+				LinkTimestamp = timestamp,
+				LinkSignature = signature,
 			});
 		}
 
-		/* TODO (andgein): Accept only POST with CSRF token */
-		public async Task<ActionResult> EnableNotificationTransport(int transportId, bool enable=true, string next="")
+		public string GetNotificationTransportEnablingSignature(int transportId, long timestamp)
+		{
+			return NotificationsRepo.GetNotificationTransportEnablingSignature(transportId, timestamp, secretForHashes);
+		}
+
+		private bool ValidateNotificationTransportEnablingSignature(int transportId, long timestamp, string signature)
+		{
+			var currentTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+			var linkExpirationSeconds = notificationEnablingLinkExpiration.TotalSeconds;
+			if (currentTimestamp < timestamp || currentTimestamp > timestamp + linkExpirationSeconds)
+				return false;
+
+			var correctSignature = GetNotificationTransportEnablingSignature(transportId, timestamp);
+			return signature == correctSignature;
+		}
+
+		public async Task<ActionResult> EnableNotificationTransport(int transportId, long timestamp, string signature, bool enable=true, string next="")
 		{
 			var transport = notificationsRepo.FindNotificationTransport(transportId);
 			if (! User.Identity.IsAuthenticated || transport.UserId != User.Identity.GetUserId())
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
+			if (!ValidateNotificationTransportEnablingSignature(transportId, timestamp, signature))
+				return RedirectToAction("Manage", "Account");
 
 			await notificationsRepo.EnableNotificationTransport(transportId, enable);
 
@@ -94,59 +127,159 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Manage", "Account");
 		}
 
-		[HttpPost]
-		public async Task<ActionResult> SaveSettings(string courseId, int transportId)
+		public ActionResult Settings()
+		{
+			var user = userManager.FindByName(User.Identity.Name);
+
+			var mailTransport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(user.Id, includeDisabled: true);
+			var telegramTransport = notificationsRepo.FindUsersNotificationTransport<TelegramNotificationTransport>(user.Id, includeDisabled: true);
+
+			var courseIds = visitsRepo.GetUserCourses(user.Id).ToList();
+			var courseTitles = courseIds.ToDictionary(c => c, c => courseManager.GetCourse(c).Title);
+			var notificationTypesByCourse = courseIds.ToDictionary(c => c, c => notificationsRepo.GetNotificationTypes(User, c));
+			var allNotificationTypes = NotificationsRepo.GetAllNotificationTypes();
+
+			var notificationTransportsSettings = courseIds.SelectMany(
+				c => notificationsRepo.GetNotificationTransportsSettings(c).Select(
+					kvp => Tuple.Create(Tuple.Create(c, kvp.Key.Item1, kvp.Key.Item2), kvp.Value.IsEnabled)
+				)
+			).ToDictionary(kvp => kvp.Item1, kvp => kvp.Item2);
+
+			var selectedTransportIdStr = Request.QueryString["transportId"] ?? "";
+			int.TryParse(selectedTransportIdStr, out int selectedTransportId);
+
+			var timestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+			var getEnableLinkSignature = new Func<int, string>(transportId => GetNotificationTransportEnablingSignature(transportId, timestamp));
+
+			return PartialView(new NotificationSettingsViewModel
+			{
+				User = user,
+				TelegramBotName = telegramBotName,
+
+				MailTransport = mailTransport,
+				TelegramTransport = telegramTransport,
+				SelectedTransportId = selectedTransportId,
+
+				CourseTitles = courseTitles,
+				AllNotificationTypes = allNotificationTypes,
+				NotificationTypesByCourse = notificationTypesByCourse,
+				NotificationTransportsSettings = notificationTransportsSettings,
+
+				EnableLinkTimestamp = timestamp,
+				GetEnableLinkSignature = getEnableLinkSignature,
+			});
+		}
+
+		[HttpGet]
+		public async Task<ActionResult> SaveSettings(string courseId, int transportId, int notificationType, bool isEnabled, long timestamp, string signature)
 		{
 			var userId = User.Identity.GetUserId();
 			var transport = notificationsRepo.FindNotificationTransport(transportId);
 			if (transport == null || transport.UserId != userId)
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-
-			foreach (var key in Request.Form.AllKeys)
 			{
-				var splittedKey = key.Split(new[] { "__" }, StringSplitOptions.None);
-				if (splittedKey.Length != 2 || splittedKey[0] != "notification-settings")
-					continue;
-				
-				var notificationTypeStr = splittedKey[1];
-				int notificationTypeInt;
-				if (!int.TryParse(notificationTypeStr, out notificationTypeInt))
-					continue;
-
-				NotificationType notificationType;
-				try
-				{
-					notificationType = (NotificationType)notificationTypeInt;
-				}
-				catch (Exception)
-				{
-					continue;
-				}
-
-				var isEnabledStr = Request.Form[key];
-				var isEnabled = isEnabledStr.StartsWith("true");
-
-				await notificationsRepo.SetNotificationTransportSettings(courseId, transportId, notificationType, isEnabled);
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			}
 
+			// TODO (andgein): Add error message about link expiration
+			if (!ValidateNotificationTransportEnablingSignature(transportId, timestamp, signature))
+				return RedirectToAction("Manage", "Account");
+
+			NotificationType realNotificationType;
+			try
+			{
+				realNotificationType = (NotificationType)notificationType;
+			}
+			catch (Exception)
+			{
+				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+			}
+
+			await notificationsRepo.SetNotificationTransportSettings(courseId, transportId, realNotificationType, isEnabled);
+
+			return RedirectToAction("Manage", "Account");
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> SaveSettings(string courseId, int transportId, int notificationType, bool isEnabled)
+		{
+			var userId = User.Identity.GetUserId();
+			var transport = notificationsRepo.FindNotificationTransport(transportId);
+			if (transport == null || transport.UserId != userId)
+			{
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			}
+
+			NotificationType realNotificationType;
+			try
+			{
+				realNotificationType = (NotificationType)notificationType;
+			}
+			catch (Exception)
+			{
+				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+			}
+
+			await notificationsRepo.SetNotificationTransportSettings(courseId, transportId, realNotificationType, isEnabled);
+
+			return Json(new { status = "ok", notificationTransportsSettings = GetNotificationTransportsSettings() });
+		}
+		
+		private IEnumerable<NotificationTransportsSettingsViewModel> GetNotificationTransportsSettings()
+		{
 			var notificationTransportsSettings = courseManager.GetCourses().SelectMany(
 				c => notificationsRepo.GetNotificationTransportsSettings(c.Id).Select(
-					kvp => new {
+					kvp => new NotificationTransportsSettingsViewModel
+					{
 						courseId = c.Id,
 						transportId = kvp.Key.Item1,
-						notificationType = kvp.Key.Item2,
+						notificationType = (int) kvp.Key.Item2,
 						isEnabled = kvp.Value.IsEnabled
 					}
 				)
 			);
-
-			return Json(new { status = "ok", notificationTransportsSettings = notificationTransportsSettings });
+			return notificationTransportsSettings;
 		}
 	}
-	
+
+	public class NotificationSettingsViewModel
+	{
+		public ApplicationUser User { get; set; }
+
+		public string TelegramBotName { get; set; }
+
+		public MailNotificationTransport MailTransport { get; set; }
+
+		public TelegramNotificationTransport TelegramTransport { get; set; }
+
+		public int SelectedTransportId { get; set; }
+
+		public Dictionary<string, string> CourseTitles { get; set; }
+
+		public List<NotificationType> AllNotificationTypes { get; set; }
+
+		public Dictionary<string, List<NotificationType>> NotificationTypesByCourse { get; set; }
+
+		// Dictionary<(courseId, notificationTrnasportId, notificationType), isEnabled>
+		public Dictionary<Tuple<string, int, NotificationType>, bool> NotificationTransportsSettings { get; set; }
+
+		public long EnableLinkTimestamp { get; set; }
+
+		public Func<int, string> GetEnableLinkSignature { get; set; }
+	}
+
+	public class NotificationTransportsSettingsViewModel
+	{
+		public string courseId;
+		public int transportId;
+		public int notificationType;
+		public bool isEnabled;
+	}
+
 	public class SuggestMailTransportViewModel
 	{
 		public MailNotificationTransport Transport { get; set; }
 		public string TelegramBotName { get; set; }
+		public long LinkTimestamp { get; set; }
+		public string LinkSignature { get; set; }
 	}
 }

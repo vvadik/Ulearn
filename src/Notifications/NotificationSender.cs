@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Threading.Tasks;
 using Database;
+using Database.DataContexts;
 using Database.Models;
 using log4net;
 using uLearn;
@@ -17,6 +18,7 @@ namespace Notifications
 		private readonly ITelegramSender telegramSender;
 		private readonly CourseManager courseManager;
 		private readonly string baseUrl;
+		private readonly string secretForHashes;
 
 		public NotificationSender(CourseManager courseManager, IEmailSender emailSender, ITelegramSender telegramSender)
 		{
@@ -24,6 +26,7 @@ namespace Notifications
 			this.telegramSender = telegramSender;
 			this.courseManager = courseManager;
 			baseUrl = ConfigurationManager.AppSettings["ulearn.baseUrl"] ?? "";
+			secretForHashes = ConfigurationManager.AppSettings["ulearn.secretForHashes"] ?? "";
 		}
 
 		public NotificationSender(CourseManager courseManager)
@@ -41,9 +44,23 @@ namespace Notifications
 			return "\n\n—\nВсегда ваши,\nКоманда ulearn.me\n\nВы можете отписаться от получения уведомлений на почту в настройках вашего профиля.";
 		}
 
-		private string GetEmailHtmlSignature()
+		private string GetEmailHtmlSignature(int transportId, NotificationType notificationType, string courseId, string courseTitle)
 		{
-			return GetEmailTextSignature().Replace("\n", "<br/>");
+			var timestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+			var signature = NotificationsRepo.GetNotificationTransportEnablingSignature(transportId, timestamp, secretForHashes);
+			var transportUnsubscribeUrl = $"{baseUrl}/Notifications/SaveSettings?courseId={courseId}&transportId={transportId}&notificationType={(int) notificationType}&isEnabled=False&timestamp={timestamp}&signature={signature}";
+			return "<br/><br/>" +
+					"<div style=\"color: #999; font-size: 12px;\">" +
+					$"<a href=\"{transportUnsubscribeUrl}\">Нажмите здесь</a>, если вы не хотите получать такие уведомления от курса «{courseTitle}» на почту.<br/>" +
+					$"Если вы вовсе не хотите получать от нас уведомления на почту, выключите их <a href=\"{baseUrl}/Account/Manage\">в профиле</a>." +
+					"</div>";
+		}
+
+		private string GetEmailHtmlSignature(NotificationDelivery delivery)
+		{
+			var courseId = delivery.Notification.CourseId;
+			var courseTitle = courseManager.GetCourse(courseId).Title;
+			return GetEmailHtmlSignature(delivery.NotificationTransportId, delivery.Notification.GetNotificationType(), courseId, courseTitle);
 		}
 
 		private async Task SendAsync(MailNotificationTransport transport, NotificationDelivery notificationDelivery)
@@ -57,8 +74,10 @@ namespace Notifications
 			await emailSender.SendEmailAsync(
 				transport.User.Email,
 				notification.GetNotificationType().GetDisplayName(),
-				notification.GetTextMessageForDelivery(transport, notificationDelivery, course, baseUrl) + GetEmailTextSignature(),
-				notification.GetHtmlMessageForDelivery(transport, notificationDelivery, course, baseUrl) + GetEmailHtmlSignature()
+				notification.GetTextMessageForDelivery(transport, notificationDelivery, course, baseUrl),
+				notification.GetHtmlMessageForDelivery(transport, notificationDelivery, course, baseUrl),
+				textContentAfterButton: GetEmailTextSignature(),
+				htmlContentAfterButton: GetEmailHtmlSignature(notificationDelivery)
 			);
 		}
 
@@ -70,7 +89,8 @@ namespace Notifications
 			if (notificationDeliveries.Count <= 0)
 				return;
 
-			var subject = notificationDeliveries[0].Notification.GetNotificationType().GetGroupName();
+			var firstDelivery = notificationDeliveries[0];
+			var subject = firstDelivery.Notification.GetNotificationType().GetGroupName();
 
 			var htmlBodies = new List<string>();
 			var textBodies = new List<string>();
@@ -86,8 +106,10 @@ namespace Notifications
 			await emailSender.SendEmailAsync(
 				transport.User.Email,
 				subject,
-				string.Join("\n\n", textBodies) + GetEmailTextSignature(),
-				string.Join("<br/><br/>", htmlBodies) + GetEmailHtmlSignature()
+				string.Join("\n\n", textBodies),
+				string.Join("<br/><br/>", htmlBodies),
+				textContentAfterButton: GetEmailTextSignature(),
+				htmlContentAfterButton: GetEmailHtmlSignature(firstDelivery)
 			);
 		}
 

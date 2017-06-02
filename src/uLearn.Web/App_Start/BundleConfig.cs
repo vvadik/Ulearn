@@ -77,7 +77,6 @@ namespace uLearn.Web
 		public static Bundle CssBundle()
 		{
 			return new StyleBundle("~/css").Include(
-				"~/katex/katex.min.css",
 				"~/Content/bootstrap.css",
 				"~/Content/font-awesome.css",
 				"~/Content/awesome-bootstrap-checkbox.css",
@@ -87,7 +86,6 @@ namespace uLearn.Web
 				"~/codemirror/lib/codemirror.css",
 				"~/codemirror/theme/cobalt.css",
 				"~/codemirror/addon/hint/show-hint.css",
-//				"~/Jsdifflib/jsdifflib.css",
 				"~/Content/tablesorter.css",
 				"~/tablesorter-master/css/widget.grouping.css",
 				"~/Content/ulearn.css",
