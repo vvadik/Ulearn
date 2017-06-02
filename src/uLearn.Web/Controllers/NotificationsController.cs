@@ -134,7 +134,7 @@ namespace uLearn.Web.Controllers
 			var mailTransport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(user.Id, includeDisabled: true);
 			var telegramTransport = notificationsRepo.FindUsersNotificationTransport<TelegramNotificationTransport>(user.Id, includeDisabled: true);
 
-			var courseIds = visitsRepo.GetUserCourses(user.Id).ToList();
+			var courseIds = visitsRepo.GetUserCourses(user.Id).Where(c => courseManager.FindCourse(c) != null).ToList();
 			var courseTitles = courseIds.ToDictionary(c => c, c => courseManager.GetCourse(c).Title);
 			var notificationTypesByCourse = courseIds.ToDictionary(c => c, c => notificationsRepo.GetNotificationTypes(User, c));
 			var allNotificationTypes = NotificationsRepo.GetAllNotificationTypes();
