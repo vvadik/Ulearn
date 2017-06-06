@@ -14,13 +14,17 @@
 
 					<p class="strike-line grey">
 						<span>
-							Выберите себе логин
+							Выберите себе логин и укажите свою почту
 						</span>
 					</p>
 					@Html.ValidationSummary(true)
 					<div class="form-group">
-						@Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Логин", @autofocus = "autofocus" })
+						@Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Логин", autofocus = "autofocus" })
 						@Html.ValidationMessageFor(m => m.UserName)
+					</div>
+					<div class="form-group">
+						@Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Эл. почта" })
+						@Html.ValidationMessageFor(m => m.Email)
 					</div>
 					<div class="form-group">
 						<input type="submit" class="ph-btn ph-btn-green btn-block" value="Сохранить"/>

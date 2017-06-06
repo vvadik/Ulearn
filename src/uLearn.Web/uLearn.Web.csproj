@@ -331,6 +331,7 @@
     <Compile Include="Controllers\JsonDataContractHelpers.cs" />
     <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="Controllers\TelegramController.cs" />
+    <Compile Include="Controllers\UserControllerBase.cs" />
     <Compile Include="Extensions\UserExtensions.cs" />
     <Compile Include="Helpers\ExcelWorksheetBuilder.cs" />
     <Compile Include="Helpers\TelegramHelper.cs" />
@@ -830,6 +831,7 @@
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\notifications-settings.js" />
     <Content Include="Scripts\notify-custom.min.js" />
+    <Content Include="Scripts\profile.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
@@ -858,6 +860,7 @@
     <Content Include="Scripts\table-configurator.js" />
     <Content Include="Scripts\tooltips.js" />
     <Content Include="Scripts\suggest-mail-notifications.js" />
+    <Content Include="Scripts\email-is-not-confirmed.js" />
     <Content Include="Scripts\ulearn-updates-invitation.js" />
     <Content Include="Scripts\user-group-name-change.js" />
     <Content Include="Scripts\users-list.js" />
@@ -1094,6 +1097,7 @@
     <Content Include="Scripts\jquery-3.1.1.min.map" />
     <Content Include="Views\Notifications\SuggestMailTransport.cshtml" />
     <Content Include="Views\Notifications\Settings.cshtml" />
+    <Content Include="Views\Account\EmailIsNotConfirmedPopup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

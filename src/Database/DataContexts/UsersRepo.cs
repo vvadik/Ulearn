@@ -80,6 +80,16 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync();
 		}
 
+		public async Task ConfirmEmail(string userId, bool isConfirmed = true)
+		{
+			var user = FindUserById(userId);
+			if (user == null)
+				return;
+
+			user.EmailConfirmed = isConfirmed;
+			await db.SaveChangesAsync();
+		}
+
 		private const string nameSpace = nameof(UsersRepo);
 		private const string dbo = nameof(dbo);
 
@@ -94,6 +104,19 @@ namespace Database.DataContexts
 			var nameQuery = string.Join(" & ", splittedName.Select(s => "\"" + s.Trim().Replace("\"", "\\\"") + "*\""));
 			var nameParameter = new ObjectParameter("name", nameQuery);
 			return db.ObjectContext().CreateQuery<UserIdWrapper>($"[{nameof(GetUsersByNamePrefix)}](@name)", nameParameter);
+		}
+
+		public async Task UpdateLastConfirmationEmailTime(ApplicationUser user)
+		{
+			user.LastConfirmationEmailTime = DateTime.Now;
+			await db.SaveChangesAsync();
+		}
+
+		public async Task ChangeEmail(ApplicationUser user, string email)
+		{
+			user.Email = email;
+			user.EmailConfirmed = false;
+			await db.SaveChangesAsync();
 		}
 	}
 

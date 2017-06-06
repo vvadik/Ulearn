@@ -111,6 +111,10 @@ h2 > a:focus {
 	border-bottom: 1px solid;
 }
 
+h2.space-after {
+	padding-bottom: 15px;
+}
+
 a.no-underline {
 	color: inherit;
 }
@@ -181,4 +185,8 @@ footer:hover {
     .modal-dialog.wide {
         width: 1000px;
     }
+}
+
+.glyphicon.glyphicon-sm {
+	font-size: 10px;
 }

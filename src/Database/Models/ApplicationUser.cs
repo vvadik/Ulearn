@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNet.Identity.EntityFramework;
+using uLearn;
+using uLearn.Extensions;
 
 namespace Database.Models
 {
@@ -33,6 +35,10 @@ namespace Database.Models
 
 		[StringLength(200)]
 		public string TelegramChatTitle { get; set; }
+
+		public DateTime? LastConfirmationEmailTime { get; set; }
+
+		public Gender? Gender { get; set; }
 
 		[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
 		public string Names

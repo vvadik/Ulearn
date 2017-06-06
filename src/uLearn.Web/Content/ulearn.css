@@ -964,6 +964,17 @@ li.li-success {
 	font-size: 16px;
 }
 
+.login-and-registration-form .control-label {
+	font-size: 16px;
+	padding-top: 13px;
+}
+
+@media (max-width: 768px) {
+	.login-and-registration-form .control-label {
+		display: none;
+	}
+}
+
 .login-and-registration-form .field-validation-error {
 	display: inline-block;
 	padding: 4px 16px 4px;
@@ -991,6 +1002,10 @@ li.li-success {
 
 .login-and-registration-form .notifications__transport-settings__panel .checkbox label::before {
 	border-width: 1px;
+}
+
+hr.without-top-margin {
+	margin-top: 5px;
 }
 
 /* Account page */
@@ -2079,4 +2094,30 @@ h4 + div > .notifications__transport-settings__course__link {
 .notifications__transport-settings__panel .course-role + .checkbox {
 	margin-top: 5px;
 }
+
+.notifications__disable-transport__button {
+	margin-right: 10px;
+}
 /* End of notification settings */
+/* User menu */
+.user-menu__error {
+	color: #f77;
+	font-size: 12px;
+	padding-left: 20px;
+	padding-right: 10px;
+	padding-bottom: 5px;
+}
+
+.user-menu__error__icon {
+	color: #f99;
+	margin-right: 4px;
+}
+/* End of user menu */
+
+/* Profile */
+.profile__form-group-info {
+	margin-bottom: 7px;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+/* End of profile */

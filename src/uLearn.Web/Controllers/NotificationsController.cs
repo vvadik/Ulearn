@@ -53,10 +53,9 @@ namespace uLearn.Web.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.OK);
 
 			var userId = User.Identity.GetUserId();
-			var transports = notificationsRepo.GetUsersNotificationTransports(userId, includeDisabled: true);
-			foreach (var transport in transports)
-				if (transport is MailNotificationTransport)
-					return new HttpStatusCodeResult(HttpStatusCode.OK);
+			var transport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(userId, includeDisabled: true);
+			if (transport != null)
+				return new HttpStatusCodeResult(HttpStatusCode.OK);
 
 			var user = usersRepo.FindUserById(userId);
 			if (string.IsNullOrEmpty(user.Email) || ! user.EmailConfirmed)

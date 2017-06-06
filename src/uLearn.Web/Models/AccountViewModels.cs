@@ -11,6 +11,10 @@ namespace uLearn.Web.Models
 		[Required(ErrorMessage = "{0} есть у каждого пользователя")]
 		[Display(Name = "Логин")]
 		public string UserName { get; set; }
+		
+		[Required(ErrorMessage = "Укажите адрес эл. почты")]
+		[Display(Name = "Эл. почта")]
+		public string Email { get; set; }
 	}
 
 	public class ManageUserViewModel
@@ -67,7 +71,11 @@ namespace uLearn.Web.Models
 		[System.Web.Mvc.Compare("Password", ErrorMessage = "Пароли отличаются")]
 #pragma warning restore 0618
 		public string ConfirmPassword { get; set; }
-		
+
+		[Display(Name = "Эл. почта")]
+		[Required(ErrorMessage = "Укажите адрес эл. почты")]
+		public string Email { get; set; }
+
 		public string ReturnUrl { get; set; }
 
 		public bool RegistrationFinished { get; set; }
@@ -108,7 +116,8 @@ namespace uLearn.Web.Models
 		[Display(Name = "Фамилия")]
 		public string LastName { get; set; }
 
-		[Display(Name = "Почта")]
+		[Display(Name = "Эл. почта")]
+		[Required(ErrorMessage = "Укажите адрес эл. почты")]
 		public string Email { get; set; }
 	}
 
@@ -136,6 +145,6 @@ namespace uLearn.Web.Models
 	public class UserMenuPartialViewModel
 	{
 		public bool IsAuthenticated { get; set; }
-		public string UserVisibleName { get; set; }
+		public ApplicationUser User { get; set; }
 	}
 }

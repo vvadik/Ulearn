@@ -79,10 +79,4 @@
 			Five = "дней"
 		};
 	}
-
-	public enum Gender
-	{
-		Male,
-		Female
-	}
 }

@@ -217,6 +217,7 @@
     <Compile Include="DefaultDictionary.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\FileSystemExtensions.cs" />
+    <Compile Include="Gender.cs" />
     <Compile Include="Extensions\HttpClientExtensions.cs" />
     <Compile Include="Extensions\PluralizeExtensions.cs" />
     <Compile Include="FuncUtils.cs" />

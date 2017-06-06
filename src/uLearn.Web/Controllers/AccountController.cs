@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
@@ -10,7 +11,9 @@ using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
+using log4net;
 using Microsoft.AspNet.Identity;
+using uLearn.Extensions;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -18,13 +21,12 @@ using uLearn.Web.Models;
 namespace uLearn.Web.Controllers
 {
 	[ULearnAuthorize]
-	public class AccountController : Controller
+	public class AccountController : UserControllerBase
 	{
-		private readonly ULearnDb db;
+		private static readonly ILog log = LogManager.GetLogger(typeof(AccountController));
+
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
-		private UserManager<ApplicationUser> userManager;
-		private readonly UsersRepo usersRepo;
 		private readonly UserRolesRepo userRolesRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly CertificatesRepo certificatesRepo;
@@ -35,10 +37,6 @@ namespace uLearn.Web.Controllers
 
 		public AccountController()
 		{
-			db = new ULearnDb();
-
-			userManager = new ULearnUserManager(db);
-			usersRepo = new UsersRepo(db);
 			userRolesRepo = new UserRolesRepo(db);
 			groupsRepo = new GroupsRepo(db, courseManager);
 			certificatesRepo = new CertificatesRepo(db, courseManager);
@@ -116,8 +114,7 @@ namespace uLearn.Web.Controllers
 				}
 			};
 
-			Dictionary<CourseRole, List<string>> coursesForUser;
-			if (!coursesForUsers.TryGetValue(userRoles.UserId, out coursesForUser))
+			if (!coursesForUsers.TryGetValue(userRoles.UserId, out var coursesForUser))
 				coursesForUser = new Dictionary<CourseRole, List<string>>();
 
 			foreach (var role in Enum.GetValues(typeof(CourseRole)).Cast<CourseRole>().Where(roles => roles != CourseRole.Student))
@@ -244,17 +241,13 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			return View(new UserCourseModel(course, user, db));
 		}
-
-		//
-		// GET: /Account/Register
+		
 		[AllowAnonymous]
 		public ActionResult Register(string returnUrl = null)
 		{
 			return View(new RegisterViewModel { ReturnUrl = returnUrl });
 		}
 
-		//
-		// POST: /Account/Register
 		[HttpPost]
 		[AllowAnonymous]
 		[ValidateInput(false)]
@@ -263,13 +256,15 @@ namespace uLearn.Web.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var user = new ApplicationUser { UserName = model.UserName };
+				var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
 				var result = await userManager.CreateAsync(user, model.Password);
 				if (result.Succeeded)
 				{
 					await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
 
-					if (string.IsNullOrWhiteSpace(model.ReturnUrl))
+					if (!await SendConfirmationEmail(user))
+						model.ReturnUrl = Url.Action("Manage", "Account", new { Message = ManageMessageId.ErrorOccured });
+					else if (string.IsNullOrWhiteSpace(model.ReturnUrl))
 						model.ReturnUrl = Url.Action("Index", "Home");
 					else
 						model.ReturnUrl = this.FixRedirectUrl(model.ReturnUrl);
@@ -282,9 +277,7 @@ namespace uLearn.Web.Controllers
 
 			return View(model);
 		}
-
-		//
-		// POST: /Account/Disassociate
+		
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Disassociate(string loginProvider, string providerKey)
@@ -294,36 +287,23 @@ namespace uLearn.Web.Controllers
 				await userManager.RemoveLoginAsync(User.Identity.GetUserId(), new UserLoginInfo(loginProvider, providerKey));
 			if (result.Succeeded)
 			{
-				message = ManageMessageId.RemoveLoginSuccess;
+				message = ManageMessageId.LoginRemoved;
 			}
 			else
 			{
-				message = ManageMessageId.Error;
+				message = ManageMessageId.ErrorOccured;
 			}
 			return RedirectToAction("Manage", new { Message = message });
 		}
-
-		//
-		// GET: /Account/Manage
+		
 		public ActionResult Manage(ManageMessageId? message)
 		{
-			ViewBag.StatusMessage =
-				message == ManageMessageId.ChangePasswordSuccess
-					? "Пароль был изменен"
-					: message == ManageMessageId.SetPasswordSuccess
-						? "Пароль установлен"
-						: message == ManageMessageId.RemoveLoginSuccess
-							? "Внешний логин удален"
-							: message == ManageMessageId.Error
-								? "Ошибка"
-								: "";
+			ViewBag.StatusMessage = message?.GetAttribute<DisplayAttribute>().GetName();
 			ViewBag.HasLocalPassword = ControllerUtils.HasPassword(userManager, User);
 			ViewBag.ReturnUrl = Url.Action("Manage");
 			return View();
 		}
-
-		//
-		// POST: /Account/Manage
+		
 		[HttpPost]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
@@ -339,7 +319,7 @@ namespace uLearn.Web.Controllers
 					var result = await userManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
 					if (result.Succeeded)
 					{
-						return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
+						return RedirectToAction("Manage", new { Message = ManageMessageId.PasswordChanged });
 					}
 					this.AddErrors(result);
 				}
@@ -347,7 +327,7 @@ namespace uLearn.Web.Controllers
 			else
 			{
 				// User does not have a password so remove any validation errors caused by a missing OldPassword field
-				ModelState state = ModelState["OldPassword"];
+				var state = ModelState["OldPassword"];
 				if (state != null)
 				{
 					state.Errors.Clear();
@@ -355,15 +335,12 @@ namespace uLearn.Web.Controllers
 
 				if (ModelState.IsValid)
 				{
-					IdentityResult result = await userManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword);
+					var result = await userManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword);
 					if (result.Succeeded)
 					{
-						return RedirectToAction("Manage", new { Message = ManageMessageId.SetPasswordSuccess });
+						return RedirectToAction("Manage", new { Message = ManageMessageId.PasswordSet });
 					}
-					else
-					{
-						this.AddErrors(result);
-					}
+					this.AddErrors(result);
 				}
 			}
 
@@ -419,10 +396,32 @@ namespace uLearn.Web.Controllers
 
 		public enum ManageMessageId
 		{
-			ChangePasswordSuccess,
-			SetPasswordSuccess,
-			RemoveLoginSuccess,
-			Error
+			[Display(Name = "Пароль был изменен")]
+			PasswordChanged,
+
+			[Display(Name = "Пароль установлен")]
+			PasswordSet,
+
+			[Display(Name = "Внешний логин удален")]
+			LoginRemoved,
+
+			[Display(Name = "Ваша почта уже подтверждена")]
+			EmailAlreadyConfirmed,
+
+			[Display(Name = "Мы отправили вам письмо для подтверждения адреса")]
+			ConfirmationEmailSent,
+
+			[Display(Name = "Адрес электронной почты подтверждён")]
+			EmailConfirmed,
+
+			[Display(Name = "Аккаунт телеграма добавлен в ваш профиль")]
+			TelegramAdded,
+
+			[Display(Name = "У вас не указан адрес эл. почты")]
+			UserHasNoEmail,
+
+			[Display(Name = "Произошла ошибка. Если она будет повторяться, напишите нам на support@ulearn.me.")]
+			ErrorOccured,
 		}
 
 		public PartialViewResult ChangeDetailsPartial()
@@ -455,7 +454,9 @@ namespace uLearn.Web.Controllers
 			}
 			var nameChanged = user.UserName != userModel.Name;
 			if (nameChanged && await userManager.FindByNameAsync(userModel.Name) != null)
-				return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
+				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
+			var emailChanged = string.Compare(user.Email, userModel.Email, StringComparison.OrdinalIgnoreCase) != 0;
+
 			user.UserName = userModel.Name;
 			user.FirstName = userModel.FirstName;
 			user.LastName = userModel.LastName;
@@ -468,6 +469,8 @@ namespace uLearn.Web.Controllers
 			}
 			await userManager.UpdateAsync(user);
 
+			if (emailChanged)
+				await ChangeEmail(user, user.Email);
 			if (nameChanged)
 			{
 				AuthenticationManager.Logout(HttpContext);
@@ -494,11 +497,10 @@ namespace uLearn.Web.Controllers
 		{
 			var isAuthenticated = Request.IsAuthenticated;
 			var user = userManager.FindById(User.Identity.GetUserId());
-			var userVisibleName = isAuthenticated ? user.VisibleName : "";
 			return PartialView(new UserMenuPartialViewModel
 			{
 				IsAuthenticated = isAuthenticated,
-				UserVisibleName = userVisibleName,
+				User = user,
 			});
 		}
 
@@ -516,7 +518,78 @@ namespace uLearn.Web.Controllers
 				IsEnabled = true,
 			});
 
+			return RedirectToAction("Manage", new { Message = ManageMessageId.TelegramAdded });
+		}
+
+		public async Task<ActionResult> ConfirmEmail(string email, string signature)
+		{
+			var userId = User.Identity.GetUserId();
+			var user = await userManager.FindByIdAsync(userId);
+			if (user.Email != email || user.EmailConfirmed)
+				return RedirectToAction("Manage", new { Message = ManageMessageId.EmailAlreadyConfirmed });
+
+			var correctSignature = GetEmailConfirmationSignature(email);
+			if (signature != correctSignature)
+				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
+
+			await usersRepo.ConfirmEmail(userId);
+
+			/* Enable notification transport if it exists or create auto-enabled mail notification transport */
+			var mailNotificationTransport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(userId, includeDisabled: true);
+			if (mailNotificationTransport != null)
+				await notificationsRepo.EnableNotificationTransport(mailNotificationTransport.Id);
+			else
+				await notificationsRepo.AddNotificationTransport(new MailNotificationTransport
+				{
+					User = user,
+					IsEnabled = true,
+				});
+
+			return RedirectToAction("Manage", new { Message = ManageMessageId.EmailConfirmed });
+		}
+
+		public async Task<ActionResult> SendConfirmationEmail()
+		{
+			var userId = User.Identity.GetUserId();
+			var user = await userManager.FindByIdAsync(userId);
+			if (string.IsNullOrEmpty(user.Email))
+				return RedirectToAction("Manage", new { Message = ManageMessageId.UserHasNoEmail });
+
+			if (user.EmailConfirmed)
+				return RedirectToAction("Manage", new { Message = ManageMessageId.EmailAlreadyConfirmed });
+
+			if (!await SendConfirmationEmail(user))
+				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
+
 			return RedirectToAction("Manage");
+		}
+
+		public async Task ChangeEmail(ApplicationUser user, string email)
+		{ 
+			await usersRepo.ChangeEmail(user, email);
+			
+			/* Disable mail notification transport if exists */
+			var mailNotificationTransport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(user.Id);
+			if (mailNotificationTransport != null)
+				await notificationsRepo.EnableNotificationTransport(mailNotificationTransport.Id, isEnabled: false);
+
+			/* Send confirmation email to the new address */
+			await SendConfirmationEmail(user);
+		}
+
+		public ActionResult CheckIsEmailConfirmed()
+		{
+			var userId = User.Identity.GetUserId();
+			var user = usersRepo.FindUserById(userId);
+			if (user.EmailConfirmed || ! user.LastConfirmationEmailTime.HasValue)
+				return new HttpStatusCodeResult(HttpStatusCode.OK);
+
+			var sentAgo = DateTime.Now.Subtract(user.LastConfirmationEmailTime.Value);
+			if (sentAgo < TimeSpan.FromDays(1))
+				return new HttpStatusCodeResult(HttpStatusCode.OK);
+
+			/* If email has been sent less than 1 day ago, show popup. Double popup is disabled via cookies and javascript */
+			return PartialView("EmailIsNotConfirmedPopup");
 		}
 	}
 }

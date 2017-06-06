@@ -76,7 +76,13 @@ namespace uLearn.Web.Controllers
 			{
 				if (string.IsNullOrWhiteSpace(user.Email))
 				{
-					answer.Messages.Add(new Message($"У пользователя {user.UserName} не указан email"));
+					answer.Messages.Add(new Message($"У пользователя {user.UserName} не указана электронная почта"));
+					continue;
+				}
+
+				if (! user.EmailConfirmed)
+				{
+					answer.Messages.Add(new Message($"У пользователя {user.UserName} не подтверждёна электронная почта"));
 					continue;
 				}
 
@@ -89,7 +95,7 @@ namespace uLearn.Web.Controllers
 				}
 
 				await SendRestorePasswordEmail(requestId, user);
-				answer.Messages.Add(new Message($"Письмо с инструкцией по восстановлению пароля для пользователя {user.UserName} отправлено на Ваш email", false));
+				answer.Messages.Add(new Message($"Письмо с инструкцией по восстановлению пароля для пользователя {user.UserName} отправлено вам на почту", false));
 			}
 
 			return View(answer);

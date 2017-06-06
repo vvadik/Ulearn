@@ -94,6 +94,7 @@
 
 	@Html.Partial("_UlearnUpdatesInvitation")
 	@Html.Action("SuggestMailTransport", "Notifications")
+	@Html.Action("CheckIsEmailConfirmed", "Account")
 
 	@Scripts.Render("~/main-js")
 	@RenderSection("scripts", required: false)

@@ -8,29 +8,32 @@
 {
 	if (transport != null)
 	{
-		<nobr>
-			<a href="@Url.Action("EnableNotificationTransport", "Notifications", new
-			         {
-				         transportId = transport.Id,
-				         enable = !transport.IsEnabled,
-						 timestamp = Model.EnableLinkTimestamp,
-						 signature = Model.GetEnableLinkSignature(transport.Id),
-				         next = Url.Action("Manage", "Account")
-			         })" class="btn btn-xs @(transport.IsEnabled ? "btn-default" : "btn-success")">
-				@(transport.IsEnabled ? "выключить" : "включить") уведомления
-			</a>
-
+		<div class="pull-right">
 			@if (!transport.IsEnabled)
 			{
-				<span class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Вы сможете выбрать, какие новости получать @notificationsDestination"></span>
+				<nobr>
+					<a href="@Url.Action("EnableNotificationTransport", "Notifications", new
+					         {
+						         transportId = transport.Id,
+						         enable = true,
+						         timestamp = Model.EnableLinkTimestamp,
+						         signature = Model.GetEnableLinkSignature(transport.Id),
+						         next = Url.Action("Manage", "Account")
+					         })" class="btn btn-xs btn-success">
+						включить уведомления
+					</a>
+
+					<span class="fa fa-question-circle with-long-tooltip" data-toggle="tooltip" data-placement="top" title="Вы сможете выбрать, какие новости получать @notificationsDestination"></span>
+				</nobr>
 			}
-		</nobr>
-		if (transport.IsEnabled)
-		{
-			<a href="#" class="notifications__transport-settings__link internal-page-link @(Model.SelectedTransportId == transport.Id ? "auto-open" : "")"
-				data-transport-id="@transport.Id"
-				data-modal-title="Настройка уведомлений @notificationsDestination">Настроить уведомления</a>
-		}
+			else
+			{
+				<a href="#" class="notifications__transport-settings__link internal-page-link @(Model.SelectedTransportId == transport.Id ? "auto-open" : "")"
+					data-transport-id="@transport.Id"
+					data-transport-enable-signature="@Model.GetEnableLinkSignature(transport.Id)"
+					data-modal-title="Настройка уведомлений @notificationsDestination">Настроить уведомления</a>
+			}
+		</div>
 	}
 }
 
@@ -80,23 +83,33 @@
 
 @if (Model.User.EmailConfirmed)
 {
-	<div class="form-group">
-		<b>Эл. почта:</b> @Model.User.Email
+	<div class="form-group profile__form-group-info">
+		<b>Эл. почта:</b>
+		<a href="#" class="profile__change-email__link internal-page-link">
+			@if (string.IsNullOrEmpty(Model.User.Email))
+			{
+				<i>не указана</i>
+			}
+			else
+			{
+				@Model.User.Email
+			}
+		</a>&nbsp;<span class="glyphicon glyphicon-pencil glyphicon-sm"></span>
 		@ShowNotificationsTransportSettings(Model.MailTransport, "на почту")
 	</div>
 }
 
 @if (Model.User.TelegramChatId.HasValue)
 {
-	<div class="form-group">
+	<div class="form-group profile__form-group-info">
 		<b>Телеграм:</b> @Model.User.TelegramChatTitle
 		@ShowNotificationsTransportSettings(Model.TelegramTransport, "в телеграм")
 	</div>
 }
-else if (User.HasAccess(CourseRole.Instructor))
+else
 {
-	<div class="form-group help-text text-muted">
-		Чтобы подключить телеграм, напишите <a href="https://t.me/@Model.TelegramBotName">нашему боту</a>.
+	<div class="form-group profile__form-group-info help-text text-muted">
+		Чтобы получать уведомления в&nbsp;телеграм, напишите <a href="https://t.me/@Model.TelegramBotName">нашему боту</a>.
 	</div>
 }
 
@@ -105,12 +118,25 @@ else if (User.HasAccess(CourseRole.Instructor))
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title"></h4>
+				<h4 class="modal-title ib"></h4>
+				<div class="pull-right">
+					<a href="@Url.Action("EnableNotificationTransport", "Notifications", new
+					         {
+						         transportId = "TRANSPORT-ID",
+						         enable = false,
+						         timestamp = Model.EnableLinkTimestamp,
+						         signature = "TRANSPORT-ENABLE-SIGNATURE",
+						         next = Url.Action("Manage", "Account")
+					         })" class="notifications__disable-transport__button btn btn-xs btn-danger">
+						Выключить все уведомления
+					</a>
+				</div>
 			</div>
 			<div class="modal-body">
 				<div class="row">
 					<div class="notifications__transport-settings__course__panel col-xs-12 col-md-5">
 						<h4>Выберите курс</h4>
+						
 						@foreach (var courseId in Model.CourseTitles.Keys.OrderBy(courseId => Model.CourseTitles[courseId]))
 						{
 							var courseTitle = Model.CourseTitles[courseId];
@@ -118,9 +144,20 @@ else if (User.HasAccess(CourseRole.Instructor))
 								<a href="#" class="notifications__transport-settings__course__link" data-course-id="@courseId" data-course-title="@courseTitle">@courseTitle</a>
 							</div>
 						}
-						<div class="notifications__transport-settings__courses-description">
-							Здесь показываются только те курсы, в&nbsp;которых вы учились@(User.HasAccess(CourseRole.Instructor) ? " или преподавали" : "")
-						</div>
+						
+						@if (Model.CourseTitles.Count <= 0)
+						{
+							<div class="notifications__transport-settings__courses-description">
+								Вы пока не&nbsp;учитесь ни&nbsp;в&nbsp;одном курсе.
+								Чтобы начать учиться, выберите интересный вам курс <a href="@Url.Action("Index", "Home")">на&nbsp;главной странице</a>.
+							</div>
+						}
+						else
+						{
+							<div class="notifications__transport-settings__courses-description">
+								Здесь показываются только те курсы, в&nbsp;которых вы учились@(User.HasAccess(CourseRole.Instructor) ? " или преподавали" : "")
+							</div>
+						}
 					</div>
 					<div class="notifications__transport-settings__panel col-xs-12 col-md-7">
 						@CourseNotificationsSettings()

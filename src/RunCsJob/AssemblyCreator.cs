@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using log4net;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
@@ -12,6 +13,8 @@ namespace RunCsJob
 {
 	public static class AssemblyCreator
 	{
+		private static ILog log = LogManager.GetLogger(typeof(AssemblyCreator));
+
 		public static IEnumerable<int> x = Enumerable.Range(1, 1);
 
 		public static CompileResult CreateAssemblyWithRoslyn(FileRunnerSubmission submission, string workingDirectory)
@@ -22,6 +25,8 @@ namespace RunCsJob
 			IEnumerable<int> x = null;
 			var syntaxTree = CSharpSyntaxTree.ParseText(submission.Code);
 			var assemblyName = submission.Id;
+
+			log.Info($"ValueType assembly location: {typeof(ValueType).Assembly.Location}");
 			var compilation = CSharpCompilation.Create(assemblyName, new[] { syntaxTree },
 				new MetadataReference[]
 				{

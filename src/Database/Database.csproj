@@ -431,6 +431,10 @@
     <Compile Include="Migrations\201706020525579_RemoveOccuredErrorNotification.Designer.cs">
       <DependentUpon>201706020525579_RemoveOccuredErrorNotification.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201706051620308_AddLastConfirmaionEmailTimeAndGender.cs" />
+    <Compile Include="Migrations\201706051620308_AddLastConfirmaionEmailTimeAndGender.Designer.cs">
+      <DependentUpon>201706051620308_AddLastConfirmaionEmailTimeAndGender.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -699,6 +703,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201706020525579_RemoveOccuredErrorNotification.resx">
       <DependentUpon>201706020525579_RemoveOccuredErrorNotification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706051620308_AddLastConfirmaionEmailTimeAndGender.resx">
+      <DependentUpon>201706051620308_AddLastConfirmaionEmailTimeAndGender.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

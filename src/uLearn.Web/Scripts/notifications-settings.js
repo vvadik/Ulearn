@@ -2,6 +2,7 @@
 	var $modal = $('#notifications__transport-settings__modal');
 	var $panel = $modal.find('.notifications__transport-settings__panel');
 	var saveUrl = $modal.data('saveUrl');
+	var disableTransportUrlTemplate = $('.notifications__disable-transport__button').attr('href');
 
 	function getNotificationSettings(courseId, transportId, notificationType) {
 		for (var idx in window.notificationTransportsSettings) {
@@ -20,7 +21,12 @@
 	$('.notifications__transport-settings__link').click(function () {
 		var $self = $(this);
 		var transportId = $self.data('transportId');
+		var transportEnableSignature = $self.data('transportEnableSignature');
 		var modalTitle = $self.data('modalTitle');
+
+		var disableTransportUrl = disableTransportUrlTemplate.replace("TRANSPORT-ID", transportId)
+			.replace("TRANSPORT-ENABLE-SIGNATURE", transportEnableSignature);
+		$('.notifications__disable-transport__button').attr('href', disableTransportUrl);
 
 		$panel.find('[name="transportId"]').val(transportId);
 		$modal.find('.modal-title').text(modalTitle);

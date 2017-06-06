@@ -70,7 +70,9 @@ namespace uLearn.Web
 					"~/Scripts/diagnostics.js",
 					"~/Scripts/forms.replace-action.js",
 					"~/Scripts/grader.js",
-					"~/Scripts/notifications-settings.js"
+					"~/Scripts/notifications-settings.js",
+					"~/Scripts/profile.js",
+					"~/Scripts/email-is-not-confirmed.js"
 				);
 		}
 

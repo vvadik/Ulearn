@@ -25,15 +25,19 @@
 						@Html.HiddenFor(m => m.ReturnUrl)
 						@Html.AntiForgeryToken()
 						<div class="form-group">
-							@Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Логин", @autofocus = "autofocus" })
+							@Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Логин", autofocus = "autofocus" })
 							@Html.ValidationMessageFor(m => m.UserName)
 						</div>
 						<div class="form-group">
-							@Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "Пароль" })
+							@Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Эл. почта" })
+							@Html.ValidationMessageFor(m => m.Email)
+						</div>
+						<div class="form-group">
+							@Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Пароль" })
 							@Html.ValidationMessageFor(m => m.Password)
 						</div>
 						<div class="form-group">
-							@Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @placeholder = "Ещё раз" })
+							@Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Ещё раз" })
 							@Html.ValidationMessageFor(m => m.ConfirmPassword)
 						</div>
 

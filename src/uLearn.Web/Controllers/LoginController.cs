@@ -1,43 +1,25 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Database.DataContexts;
 using Database.Models;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	public class LoginController : Controller
+	public class LoginController : UserControllerBase
 	{
-		private readonly UserManager<ApplicationUser> userManager;
-
-
-		public LoginController()
-			: this(new ULearnUserManager(new ULearnDb()))
-		{
-		}
-
-		public LoginController(UserManager<ApplicationUser> userManager)
-		{
-			this.userManager = userManager;
-		}
-
-		//
-		// GET: /Login
 		public ActionResult Index(string returnUrl)
 		{
 			ViewBag.ReturnUrl = returnUrl;
 			return View();
 		}
-
-		//
-		// POST: /Login
+		
 		[HttpPost]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
@@ -49,6 +31,7 @@ namespace uLearn.Web.Controllers
 				if (user != null)
 				{
 					await AuthenticationManager.LoginAsync(HttpContext, user, model.RememberMe);
+					await SendConfirmationEmailAfterLogin(user);
 					return Redirect(this.FixRedirectUrl(returnUrl));
 				}
 				ModelState.AddModelError("", @"Неверное имя пользователя или пароль");
@@ -58,8 +41,18 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 
-		//
-		// POST: /Login/ExternalLogin
+		private async Task SendConfirmationEmailAfterLogin(ApplicationUser user)
+		{
+			if (string.IsNullOrEmpty(user.Email) || user.EmailConfirmed)
+				return;
+
+			/* Reset cookie and show popup with remainder if needed */
+			Response.Cookies.Add(new HttpCookie("emailIsNotConfirmed") { Value = null, Expires = DateTime.Now.AddDays(-1) });
+
+			if (user.LastConfirmationEmailTime == null)
+				await SendConfirmationEmail(user);
+		}
+		
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public ActionResult ExternalLogin(string provider, string returnUrl)
@@ -67,9 +60,7 @@ namespace uLearn.Web.Controllers
 			// Request a redirect to the external login provider
 			return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", new { ReturnUrl = returnUrl }));
 		}
-
-		//
-		// GET: /Login/ExternalLoginCallback
+		
 		public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
 		{
 			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext);
@@ -89,6 +80,7 @@ namespace uLearn.Web.Controllers
 					await userManager.UpdateAsync(user);
 				}
 				await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
+				await SendConfirmationEmailAfterLogin(user);
 				return Redirect(this.FixRedirectUrl(returnUrl));
 			}
 
@@ -98,9 +90,7 @@ namespace uLearn.Web.Controllers
 			return View("ExternalLoginConfirmation",
 				new ExternalLoginConfirmationViewModel { UserName = loginInfo.DefaultUserName });
 		}
-
-		//
-		// POST: /Login/ExternalLoginConfirmation
+		
 		[HttpPost]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
@@ -110,7 +100,7 @@ namespace uLearn.Web.Controllers
 			{
 				return RedirectToAction("Manage", "Account");
 			}
-			ExternalLoginInfo info = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext);
+			var info = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext);
 			if (info == null)
 			{
 				return View("ExternalLoginFailure");
@@ -127,6 +117,7 @@ namespace uLearn.Web.Controllers
 					FirstName = firstName,
 					LastName = lastName,
 					AvatarUrl = userAvatarUrl,
+					Email = model.Email,
 				};
 				var result = await userManager.CreateAsync(user);
 				if (result.Succeeded)
@@ -144,16 +135,12 @@ namespace uLearn.Web.Controllers
 			ViewBag.ReturnUrl = returnUrl;
 			return View(model);
 		}
-
-		//
-		// GET: /Login/ExternalLoginFailure
+		
 		public ActionResult ExternalLoginFailure()
 		{
 			return View();
 		}
-
-		//
-		// POST: /Login/LinkLogin
+		
 		[HttpPost]
 		[ULearnAuthorize]
 		[ValidateAntiForgeryToken]
@@ -162,27 +149,23 @@ namespace uLearn.Web.Controllers
 			// Request a redirect to the external login provider to link a login for the current user
 			return new ChallengeResult(provider, Url.Action("LinkLoginCallback"), User.Identity.GetUserId());
 		}
-
-		//
-		// GET: /Login/LinkLoginCallback
+		
 		[ULearnAuthorize]
 		public async Task<ActionResult> LinkLoginCallback()
 		{
 			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext, XsrfKey, User.Identity.GetUserId());
 			if (loginInfo == null)
 			{
-				return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.Error });
+				return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.ErrorOccured });
 			}
 			var result = await userManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login);
 			if (result.Succeeded)
 			{
 				return RedirectToAction("Manage", "Account");
 			}
-			return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.Error });
+			return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.ErrorOccured });
 		}
-
-		//
-		// POST: /Login/LogOff
+		
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public ActionResult LogOff()
