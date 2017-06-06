@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using log4net;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -15,6 +16,9 @@ namespace RunCsJob
 	{
 		private static ILog log = LogManager.GetLogger(typeof(AssemblyCreator));
 
+		private static readonly string assemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+		private static readonly string systemRuntimeDllPath = Path.Combine(assemblyDirectory, "System.Runtime.dll");
+
 		public static IEnumerable<int> x = Enumerable.Range(1, 1);
 
 		public static CompileResult CreateAssemblyWithRoslyn(FileRunnerSubmission submission, string workingDirectory)
@@ -26,7 +30,6 @@ namespace RunCsJob
 			var syntaxTree = CSharpSyntaxTree.ParseText(submission.Code);
 			var assemblyName = submission.Id;
 
-			log.Info($"ValueType assembly location: {typeof(ValueType).Assembly.Location}");
 			var compilation = CSharpCompilation.Create(assemblyName, new[] { syntaxTree },
 				new MetadataReference[]
 				{
@@ -36,6 +39,7 @@ namespace RunCsJob
 					MetadataReference.CreateFromFile(typeof(Point).Assembly.Location), // System.Drawing,
 					MetadataReference.CreateFromFile(typeof(ValueTuple).Assembly.Location), // System.ValueTuple
 					MetadataReference.CreateFromFile(typeof(ValueType).Assembly.Location), // System.Runtime
+					MetadataReference.CreateFromFile(systemRuntimeDllPath), // System.Runtime (because previous sometime is mscorlib)
 				}, new CSharpCompilationOptions(OutputKind.ConsoleApplication));
 			
 			var assemblyFilename = Path.Combine(workingDirectory, assemblyName + ".exe");

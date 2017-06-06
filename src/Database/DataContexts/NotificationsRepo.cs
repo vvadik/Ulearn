@@ -214,7 +214,7 @@ namespace Database.DataContexts
 			var minuteAgo = DateTime.Now.Subtract(TimeSpan.FromMinutes(1));
 			var notifications = db.Notifications.Where(
 				n => !n.AreDeliveriesCreated && n.CreateTime < minuteAgo
-				).ToList();
+			).ToList();
 			foreach (var notification in notifications)
 			{
 				try

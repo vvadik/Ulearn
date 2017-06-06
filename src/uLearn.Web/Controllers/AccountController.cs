@@ -577,8 +577,12 @@ namespace uLearn.Web.Controllers
 			await SendConfirmationEmail(user);
 		}
 
+		[AllowAnonymous]
 		public ActionResult CheckIsEmailConfirmed()
 		{
+			if (! Request.IsAuthenticated)
+				return new HttpStatusCodeResult(HttpStatusCode.OK);
+
 			var userId = User.Identity.GetUserId();
 			var user = usersRepo.FindUserById(userId);
 			if (user.EmailConfirmed || ! user.LastConfirmationEmailTime.HasValue)

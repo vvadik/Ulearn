@@ -456,7 +456,7 @@ namespace Database.Models
 			if (slide == null)
 				return null;
 
-			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} оценил(а) ваш комментарий в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" +
+			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} лайкнул(а) ваш комментарий в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" +
 				   $"<i>{Comment.Text.Trim().EscapeHtml()}</i><br/><br/>" +
 				   $"{GetCommentUrl(course, slide, baseUrl).EscapeHtml()}";
 		}
@@ -467,7 +467,7 @@ namespace Database.Models
 			if (slide == null)
 				return null;
 			
-			return $"{InitiatedBy.VisibleName} оценил(а) ваш комментарий в «{GetSlideTitle(course, slide)}»\n\n" +
+			return $"{InitiatedBy.VisibleName} лайкнул(а) ваш комментарий в «{GetSlideTitle(course, slide)}»\n\n" +
 				   $"> {Comment.Text.Trim()}\n\n" +
 				   $"{GetCommentUrl(course, slide, baseUrl)}";
 		}
