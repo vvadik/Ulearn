@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Database.Models;
+using uLearn.Extensions;
 
 namespace Notifications
 {
@@ -13,6 +14,8 @@ namespace Notifications
 		public EmailButton(NotificationButton notificationButton)
 		{
 			Link = notificationButton.Link;
+			Link = Link.AddQueryParameter("utm_source", "email");
+
 			Text = notificationButton.Text;
 		}
 

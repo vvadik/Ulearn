@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Database.Models;
+using uLearn.Extensions;
 
 namespace Notifications
 {
@@ -16,6 +18,8 @@ namespace Notifications
 
 			/* Telegram doesn't support links to localhost so replace domain */
 			Link = Link.Replace("localhost", "replace.to.localhost");
+
+			Link = Link.AddQueryParameter("utm_source", "telegram");
 
 			Text = notificationButton.Text;
 		}
