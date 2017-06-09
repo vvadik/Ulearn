@@ -8,7 +8,7 @@
 			@foreach (var account in Model)
 			{
 				<tr>
-					<td>@account.LoginProvider</td>
+					<td>@account.LoginProvider <span class="text-muted">id@(account.ProviderKey)</span></td>
 					<td>
 						@if (ViewBag.ShowRemoveButton)
 						{

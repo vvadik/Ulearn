@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Threading.Tasks;
 using Kontur.Spam.Client;
 using log4net;
+using Metrics;
 using uLearn;
 
 namespace Notifications
@@ -11,6 +12,8 @@ namespace Notifications
 	public class KonturSpamEmailSender : IEmailSender
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(KonturSpamEmailSender));
+
+		private readonly GraphiteMetricSender metricSender;
 
 		private readonly ISpamClient client;
 		private readonly string channelId;
@@ -23,6 +26,8 @@ namespace Notifications
 			var spamPassword = ConfigurationManager.AppSettings["ulearn.spam.password"] ?? "";
 			channelId = ConfigurationManager.AppSettings["ulearn.spam.channels.notifications"] ?? "";
 			templateId = ConfigurationManager.AppSettings["ulearn.spam.templates.withButton"];
+
+			metricSender = new GraphiteMetricSender("notifications");
 
 			try
 			{
@@ -40,6 +45,7 @@ namespace Notifications
 
 		public async Task SendEmailAsync(string to, string subject, string textContent=null, string htmlContent=null, EmailButton button=null, string textContentAfterButton=null, string htmlContentAfterButton=null)
 		{
+			metricSender.SendCount("send_email.try");
 			var messageInfo = new MessageSentInfo
 			{
 				RecipientAddress = to,
@@ -76,6 +82,8 @@ namespace Notifications
 				log.Error($"Can\'t send message via Spam.API to {to} with subject {subject}", e);
 				throw;
 			}
+
+			metricSender.SendCount("send_email.success");
 		}
 	}
 }

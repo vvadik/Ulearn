@@ -214,7 +214,7 @@ namespace Database.DataContexts
 			var minuteAgo = DateTime.Now.Subtract(TimeSpan.FromMinutes(1));
 			var notifications = db.Notifications.Where(
 				n => !n.AreDeliveriesCreated && n.CreateTime < minuteAgo
-			).ToList();
+			).OrderBy(n => n.Id).ToList();
 			foreach (var notification in notifications)
 			{
 				try
@@ -225,9 +225,9 @@ namespace Database.DataContexts
 				{
 					notification.AreDeliveriesCreated = true;
 				}
-			}
 
-			await db.SaveChangesAsync();
+				await db.SaveChangesAsync();
+			}
 		}
 
 		private void CreateDeliviesForNotification(Notification notification)
@@ -239,6 +239,15 @@ namespace Database.DataContexts
 			{
 				log.Info($"Notification #{notification.Id}: is not actual more");
 				return;
+			}
+
+			var blockerNotifications = notification.GetBlockerNotifications(db);
+			if (blockerNotifications.Count > 0)
+			{
+				log.Info(
+					$"There are blocker notifications (this one will not be send if blocker notifications has been already sent to the same transport): " +
+					$"{string.Join(", ", blockerNotifications.Select(n => $"{n.GetNotificationType()} #{n.Id}"))}"
+				);
 			}
 
 			var recipientsIds = notification.GetRecipientsIds(db);
@@ -278,6 +287,18 @@ namespace Database.DataContexts
 				}
 			}
 
+			var blockerNotificationsSentToTransports = new HashSet<int>(
+				GetNotificationsDeliveries(blockerNotifications.Select(n => n.Id), transportsSettings.Select(s => s.NotificationTransportId))
+					.Select(d => d.NotificationTransportId)
+			);
+			if (blockerNotificationsSentToTransports.Count > 0)
+			{
+				log.Info(
+					"Blocked notifications have been already sent to follow transports:" +
+					$"{string.Join(", ", blockerNotificationsSentToTransports)}"
+				);
+			}
+
 			var now = DateTime.Now;
 
 			foreach (var transportSettings in transportsSettings)
@@ -294,7 +315,16 @@ namespace Database.DataContexts
 
 				/* Always ignore to send notification to user initiated this notification */
 				if (transportSettings.NotificationTransport.UserId == notification.InitiatedById)
+				{
+					log.Info($"Don't sent notification to the transport {transportSettings.NotificationTransport} because it has been initiated by this user");
 					continue;
+				}
+
+				if (blockerNotificationsSentToTransports.Contains(transportSettings.NotificationTransportId))
+				{
+					log.Info($"Some blocker notification already has been sent to transport {transportSettings.NotificationTransport}, ignore it");
+					continue;
+				}
 
 				log.Info($"Notification #{notification.Id}: add delivery to {transportSettings.NotificationTransport}, sending at {now}");
 				db.NotificationDeliveries.Add(new NotificationDelivery
@@ -307,6 +337,11 @@ namespace Database.DataContexts
 					Status = NotificationDeliveryStatus.NotSent,
 				});
 			}
+		}
+
+		private IQueryable<NotificationDelivery> GetNotificationsDeliveries(IEnumerable<int> notificationsIds, IEnumerable<int> transportsIds)
+		{
+			return db.NotificationDeliveries.Where(d => notificationsIds.Contains(d.NotificationId) && transportsIds.Contains(d.NotificationTransportId));
 		}
 
 		public async Task MarkDeliveriesAsFailed(List<NotificationDelivery> deliveries)
@@ -355,6 +390,11 @@ namespace Database.DataContexts
 		public static string GetNotificationTransportEnablingSignature(int transportId, long timestamp, string secret)
 		{
 			return $"{secret}transport={transportId}&timestamp={timestamp}{secret}".CalculateMd5();
+		}
+
+		public List<T> FindNotifications<T>(Func<T, bool> func) where T : Notification
+		{
+			return db.Notifications.OfType<T>().Where(func).ToList();
 		}
 	}
 

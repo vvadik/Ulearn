@@ -8,6 +8,7 @@ using Database.DataContexts;
 using Database.Models;
 using Kontur.Spam.Client;
 using log4net;
+using Metrics;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.Models;
 using Message = uLearn.Web.Models.Message;
@@ -20,6 +21,7 @@ namespace uLearn.Web.Controllers
 		private readonly RestoreRequestRepo requestRepo;
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly ULearnDb db;
+		private readonly GraphiteMetricSender metricSender;
 
 		private readonly string spamChannelId;
 		private readonly SpamClient spamClient;
@@ -29,6 +31,7 @@ namespace uLearn.Web.Controllers
 			this.db = db;
 			userManager = new ULearnUserManager(db);
 			requestRepo = new RestoreRequestRepo(db);
+			metricSender = new GraphiteMetricSender("web");
 
 			var spamEndpoint = WebConfigurationManager.AppSettings["ulearn.spam.endpoint"] ?? "";
 			var spamLogin = WebConfigurationManager.AppSettings["ulearn.spam.login"] ?? "ulearn";
@@ -60,6 +63,7 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Index(string username)
 		{
+			metricSender.SendCount("restore_password.try");
 			var users = await FindUsers(username);
 			var answer = new RestorePasswordModel
 			{
@@ -72,6 +76,8 @@ namespace uLearn.Web.Controllers
 				return View(answer);
 			}
 
+			metricSender.SendCount("restore_password.found_users");
+
 			foreach (var user in users)
 			{
 				if (string.IsNullOrWhiteSpace(user.Email))
@@ -82,7 +88,7 @@ namespace uLearn.Web.Controllers
 
 				if (! user.EmailConfirmed)
 				{
-					answer.Messages.Add(new Message($"У пользователя {user.UserName} не подтверждёна электронная почта"));
+					answer.Messages.Add(new Message($"У пользователя {user.UserName} не подтверждена электронная почта"));
 					continue;
 				}
 
@@ -134,6 +140,8 @@ namespace uLearn.Web.Controllers
 				log.Error($"Не смог отправить емэйл через Spam.API на {user.Email} с темой «{subject}»", e);
 				throw;
 			}
+
+			metricSender.SendCount("restore_password.send_email");
 		}
 
 		public ActionResult SetNewPassword(string requestId)
@@ -186,6 +194,7 @@ namespace uLearn.Web.Controllers
 				answer.Errors = result.Errors.ToArray();
 				return View(answer);
 			}
+			metricSender.SendCount("restore_password.set_new_password");
 
 			await requestRepo.DeleteRequest(model.RequestId);
 

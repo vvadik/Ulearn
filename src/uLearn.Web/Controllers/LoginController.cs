@@ -12,7 +12,7 @@ using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
 {
-	public class LoginController : UserControllerBase
+	public class LoginController : BaseUserController
 	{
 		public ActionResult Index(string returnUrl)
 		{
@@ -74,15 +74,22 @@ namespace uLearn.Web.Controllers
 			if (user != null)
 			{
 				var avatarUrl = loginInfo.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == "AvatarUrl")?.Value;
+				var sex = loginInfo.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Gender)?.Value;
+				Gender? userSex = null;
+				if (Enum.TryParse(sex, out Gender parsedSex))
+					userSex = parsedSex;
 				if (!string.IsNullOrEmpty(avatarUrl))
-				{
 					user.AvatarUrl = avatarUrl;
-					await userManager.UpdateAsync(user);
-				}
+				if (userSex != null && user.Gender == null)
+					user.Gender = userSex;
+				await userManager.UpdateAsync(user);
+
 				await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
 				await SendConfirmationEmailAfterLogin(user);
 				return Redirect(this.FixRedirectUrl(returnUrl));
 			}
+
+			metricSender.SendCount("registration.via_vk.try");
 
 			// If the user does not have an account, then prompt the user to create an account
 			ViewBag.ReturnUrl = returnUrl;
@@ -111,6 +118,11 @@ namespace uLearn.Web.Controllers
 				var userAvatarUrl = info.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == "AvatarUrl")?.Value;
 				var firstName = info.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.GivenName)?.Value;
 				var lastName = info.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Surname)?.Value;
+				var sex = info.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Gender)?.Value;
+				Gender? userSex = null;
+				if (Enum.TryParse(sex, out Gender parsedSex))
+					userSex = parsedSex;
+				
 				var user = new ApplicationUser
 				{
 					UserName = model.UserName,
@@ -118,6 +130,7 @@ namespace uLearn.Web.Controllers
 					LastName = lastName,
 					AvatarUrl = userAvatarUrl,
 					Email = model.Email,
+					Gender = userSex,
 				};
 				var result = await userManager.CreateAsync(user);
 				if (result.Succeeded)
@@ -126,6 +139,12 @@ namespace uLearn.Web.Controllers
 					if (result.Succeeded)
 					{
 						await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
+						if (!await SendConfirmationEmail(user))
+							return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.ErrorOccured });
+
+						metricSender.SendCount("registration.success");
+						metricSender.SendCount("registration.via_vk.success");
+
 						return Redirect(this.FixRedirectUrl(returnUrl));
 					}
 				}

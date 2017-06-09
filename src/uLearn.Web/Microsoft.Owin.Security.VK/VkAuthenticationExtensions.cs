@@ -10,11 +10,11 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 		{
 			if (app == null)
 			{
-				throw new ArgumentNullException("app");
+				throw new ArgumentNullException(nameof(app));
 			}
 			if (options == null)
 			{
-				throw new ArgumentNullException("options");
+				throw new ArgumentNullException(nameof(options));
 			}
 
 			app.Use(typeof (VkAuthenticationMiddleware), app, options);

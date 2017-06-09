@@ -164,11 +164,6 @@ namespace uLearn.Web.Controllers
 		private async Task NotifyAboutNewComment(Comment comment)
 		{
 			var courseId = comment.CourseId;
-			var notification = new NewCommentNotification
-			{
-				Comment = comment,
-			};
-			await notificationsRepo.AddNotification(courseId, notification, comment.AuthorId);
 
 			if (!comment.IsTopLevel())
 			{
@@ -183,6 +178,14 @@ namespace uLearn.Web.Controllers
 					await notificationsRepo.AddNotification(courseId, replyNotification, comment.AuthorId);
 				}
 			}
+
+			/* Create NewCommentNotification later than RepliedToYourCommentNotification, because the last one is blocker for the first one.
+			 * We don't send NewCommentNotification if there is a RepliedToYouCommentNotification */
+			var notification = new NewCommentNotification
+			{
+				Comment = comment,
+			};
+			await notificationsRepo.AddNotification(courseId, notification, comment.AuthorId);
 		}
 
 		[ULearnAuthorize]
@@ -320,3 +323,4 @@ namespace uLearn.Web.Controllers
 		public CommentsPolicy CommentsPolicy { get; set; }
 	}
 }
+ 

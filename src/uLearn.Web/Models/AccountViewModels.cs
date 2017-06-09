@@ -72,6 +72,9 @@ namespace uLearn.Web.Models
 #pragma warning restore 0618
 		public string ConfirmPassword { get; set; }
 
+		[Display(Name = "Пол")]
+		public Gender? Gender { get; set; }
+
 		[Display(Name = "Эл. почта")]
 		[Required(ErrorMessage = "Укажите адрес эл. почты")]
 		public string Email { get; set; }
@@ -83,9 +86,6 @@ namespace uLearn.Web.Models
 
 	public class UserViewModel
 	{
-		[HiddenInput]
-		public string UserId { get; set; }
-
 		[HiddenInput]
 		public ApplicationUser User { get; set; }
 
@@ -115,6 +115,9 @@ namespace uLearn.Web.Models
 
 		[Display(Name = "Фамилия")]
 		public string LastName { get; set; }
+
+		[Display(Name = "Пол")]
+		public Gender? Gender { get; set; }
 
 		[Display(Name = "Эл. почта")]
 		[Required(ErrorMessage = "Укажите адрес эл. почты")]

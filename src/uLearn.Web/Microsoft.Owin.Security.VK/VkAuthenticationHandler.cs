@@ -76,7 +76,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 
 				string graphApiEndpoint = "https://api.vk.com/method/users.get" +
 										  "?user_id=" + userId +
-										  "&fields=photo_100,screen_name" +
+										  "&fields=sex,photo_100,screen_name" +
 										  "&name_case=Nom" +
 										  "&access_token=" + Uri.EscapeDataString(accessToken);
 
@@ -107,6 +107,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 					context.Identity.AddClaim(new Claim(ClaimTypes.Surname, context.LastName));
 				if (!string.IsNullOrEmpty(context.AvatarUrl))
 					context.Identity.AddClaim(new Claim("AvatarUrl", context.AvatarUrl));
+				context.Identity.AddClaim(new Claim(ClaimTypes.Gender, context.Sex.ToString()));
 				context.Properties = properties;
 
 				await Options.Provider.Authenticated(context);

@@ -1,6 +1,7 @@
 ﻿@using Database.Extensions
 @using Database.Models
 @using uLearn
+@using uLearn.Web.Extensions
 
 @model uLearn.Web.Controllers.NotificationSettingsViewModel
 
@@ -92,9 +93,8 @@
 			}
 			else
 			{
-				@Model.User.Email
-			}
-		</a>&nbsp;<span class="glyphicon glyphicon-pencil glyphicon-sm"></span>
+				@Model.User.Email.TruncateWithEllipsis(25)
+			}</a>&nbsp;<span class="glyphicon glyphicon-pencil glyphicon-sm"></span>
 		@ShowNotificationsTransportSettings(Model.MailTransport, "на почту")
 	</div>
 }

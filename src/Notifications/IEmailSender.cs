@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Database.Models;
 
 namespace Notifications
 {
@@ -10,8 +10,13 @@ namespace Notifications
 
 	public class EmailButton
 	{
-		public string Link;
+		public EmailButton(NotificationButton notificationButton)
+		{
+			Link = notificationButton.Link;
+			Text = notificationButton.Text;
+		}
 
-		public string Text;
+		public string Link { get; private set; }
+		public string Text { get; private set; }
 	}
 }

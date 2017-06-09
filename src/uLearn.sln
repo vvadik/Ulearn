@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn", "uLearn\uLearn.csproj", "{333DD5A7-9955-46CB-8905-79E800F2B435}"
 EndProject
@@ -47,6 +47,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XQueue", "XQueue\XQueue.csproj", "{4B227920-6EB6-476F-95C7-1CDBE02DAE3F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Service", "Notifications.Service\Notifications.Service.csproj", "{3F601596-995C-4B19-8FCA-A071CE7C4325}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metrics", "Metrics\Metrics.csproj", "{6BF55402-68F0-4BA3-9F03-E42C3912C9CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -110,6 +112,10 @@ Global
 		{3F601596-995C-4B19-8FCA-A071CE7C4325}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F601596-995C-4B19-8FCA-A071CE7C4325}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F601596-995C-4B19-8FCA-A071CE7C4325}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BF55402-68F0-4BA3-9F03-E42C3912C9CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BF55402-68F0-4BA3-9F03-E42C3912C9CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BF55402-68F0-4BA3-9F03-E42C3912C9CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BF55402-68F0-4BA3-9F03-E42C3912C9CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

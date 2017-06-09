@@ -9,7 +9,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK.Provider
 {
 	public class VkAuthenticatedContext : BaseContext
 	{
-		private Regex VkIdRegex = new Regex(@"^id\d+$", RegexOptions.Compiled);
+		private readonly Regex VkIdRegex = new Regex(@"^id\d+$", RegexOptions.Compiled);
 
 		public VkAuthenticatedContext(IOwinContext context, JObject user, string accessToken)
 			: base(context)
@@ -28,6 +28,11 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK.Provider
 				UserName = (FirstName + " " + LastName).Trim();
 
 			AvatarUrl = TryGetValue(user, "photo_100");
+			var sex = TryGetValue(user, "sex");
+			if (sex == "1")
+				Sex = Gender.Female;
+			else if (sex == "2")
+				Sex = Gender.Male;
 		}
 
 		public JObject User { get; private set; }
@@ -39,6 +44,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK.Provider
 		public string FirstName { get; private set; }
 		public string LastName { get; private set; }
 		public string AvatarUrl { get; private set; }
+		public Gender? Sex { get; private set; } 
 
 		public ClaimsIdentity Identity { get; set; }
 		public AuthenticationProperties Properties { get; set; }

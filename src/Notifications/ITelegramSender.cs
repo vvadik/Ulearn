@@ -1,9 +1,31 @@
 ﻿using System.Threading.Tasks;
+using Database.Models;
 
 namespace Notifications
 {
 	public interface ITelegramSender
 	{
-		Task SendMessageAsync(long chatId, string html);
+		Task SendMessageAsync(long chatId, string html, TelegramButton button = null);
+	}
+
+	public class TelegramButton
+	{
+		public TelegramButton(NotificationButton notificationButton)
+		{
+			Link = notificationButton.Link;
+
+			/* Telegram doesn't support links to localhost so replace domain */
+			Link = Link.Replace("localhost", "replace.to.localhost");
+
+			Text = notificationButton.Text;
+		}
+
+		public string Link { get; private set; }
+		public string Text { get; private set; }
+
+		public override string ToString()
+		{
+			return $"TelegramButton{{{Text}: <{Link}>}}";
+		}
 	}
 }

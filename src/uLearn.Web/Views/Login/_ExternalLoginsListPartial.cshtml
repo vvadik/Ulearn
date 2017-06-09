@@ -1,7 +1,6 @@
 ﻿@model ExternalLoginsListModel
 @using Microsoft.Owin.Security
 
-
 @{
 	var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes().Where(x => x.AuthenticationType != "LTI").ToList();
 	if (!loginProviders.Any())

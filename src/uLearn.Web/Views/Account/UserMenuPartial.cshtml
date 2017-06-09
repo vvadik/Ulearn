@@ -31,15 +31,13 @@
 					@if (string.IsNullOrEmpty(Model.User.Email))
 					{
 						<li class="user-menu__error">
-							Не&nbsp;указана эл.&nbsp;почта
-							<span class="fa fa-question-circle with-long-tooltip" data-toggle="tooltip" data-placement="bottom" title="Укажите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля"></span>
+							Не&nbsp;указана <nobr>эл.&nbsp;почта&nbsp;<span class="fa fa-question-circle with-long-tooltip" data-toggle="tooltip" data-placement="bottom" title="Укажите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля"></span></nobr>
 						</li>
 					}
 					@if (! string.IsNullOrEmpty(Model.User.Email) && ! Model.User.EmailConfirmed)
 					{
 						<li class="user-menu__error">
-							Эл.&nbsp;почта не&nbsp;подтверждена
-							<span class="fa fa-question-circle with-long-tooltip" data-toggle="tooltip" data-placement="bottom" title="Подтвердите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля"></span>
+							Эл.&nbsp;почта <nobr>не&nbsp;подтверждена&nbsp;<span class="fa fa-question-circle with-long-tooltip" data-toggle="tooltip" data-placement="bottom" title="Подтвердите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля"></span></nobr>
 						</li>
 					}
                     <li>@Html.ActionLink("Сертификаты", "Index", "Certificates", new { userId = Model.User.Id }, new { })</li>

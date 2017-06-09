@@ -1,4 +1,5 @@
 ﻿@using ApprovalUtilities.SimpleLogger
+@using uLearn
 @model RegisterViewModel
 @{
 	ViewBag.Title = "Регистрация";
@@ -16,11 +17,11 @@
 				</section>
 
 				<div class="strike-line grey">
-					<span>или придумайте логин и пароль</span>
+					<span>или введите логин, почту и пароль</span>
 				</div>
 
 				<section class="login-and-registration-form">
-					@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form" }))
+					@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form", @class = "form-horizontal" }))
 					{
 						@Html.HiddenFor(m => m.ReturnUrl)
 						@Html.AntiForgeryToken()
@@ -31,6 +32,18 @@
 						<div class="form-group">
 							@Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Эл. почта" })
 							@Html.ValidationMessageFor(m => m.Email)
+						</div>
+						<div class="form-group radio-form-group">
+							<div class="control-label for-non-text-fields ib">Пол</div>
+							<div class="pull-right">
+								<div class="radio radio-default ib">
+									@Html.RadioButtonFor(m => m.Gender, Gender.Male, new { id = "profile__gender__male" }) <label for="profile__gender__male">Мужской</label>
+								</div>
+								<div class="radio radio-default ib">
+									@Html.RadioButtonFor(m => m.Gender, Gender.Female, new { id = "profile__gender__female" }) <label for="profile__gender__female">Женский</label>
+								</div>
+							</div>
+							@Html.ValidationMessageFor(m => m.Gender)
 						</div>
 						<div class="form-group">
 							@Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Пароль" })

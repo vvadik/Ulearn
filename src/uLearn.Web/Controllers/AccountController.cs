@@ -21,7 +21,7 @@ using uLearn.Web.Models;
 namespace uLearn.Web.Controllers
 {
 	[ULearnAuthorize]
-	public class AccountController : UserControllerBase
+	public class AccountController : BaseUserController
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(AccountController));
 
@@ -256,7 +256,7 @@ namespace uLearn.Web.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
+				var user = new ApplicationUser { UserName = model.UserName, Email = model.Email, Gender = model.Gender };
 				var result = await userManager.CreateAsync(user, model.Password);
 				if (result.Succeeded)
 				{
@@ -268,6 +268,8 @@ namespace uLearn.Web.Controllers
 						model.ReturnUrl = Url.Action("Index", "Home");
 					else
 						model.ReturnUrl = this.FixRedirectUrl(model.ReturnUrl);
+
+					metricSender.SendCount("registration.success");
 
 					model.RegistrationFinished = true;
 				}
@@ -282,17 +284,8 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Disassociate(string loginProvider, string providerKey)
 		{
-			ManageMessageId? message;
-			IdentityResult result =
-				await userManager.RemoveLoginAsync(User.Identity.GetUserId(), new UserLoginInfo(loginProvider, providerKey));
-			if (result.Succeeded)
-			{
-				message = ManageMessageId.LoginRemoved;
-			}
-			else
-			{
-				message = ManageMessageId.ErrorOccured;
-			}
+			var result = await userManager.RemoveLoginAsync(User.Identity.GetUserId(), new UserLoginInfo(loginProvider, providerKey));
+			var message = result.Succeeded ? ManageMessageId.LoginRemoved : ManageMessageId.ErrorOccured;
 			return RedirectToAction("Manage", new { Message = message });
 		}
 		
@@ -309,7 +302,7 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Manage(ManageUserViewModel model)
 		{
-			bool hasPassword = ControllerUtils.HasPassword(userManager, User);
+			var hasPassword = ControllerUtils.HasPassword(userManager, User);
 			ViewBag.HasLocalPassword = hasPassword;
 			ViewBag.ReturnUrl = Url.Action("Manage");
 			if (hasPassword)
@@ -432,12 +425,12 @@ namespace uLearn.Web.Controllers
 			return PartialView(new UserViewModel
 			{
 				Name = user.UserName,
-				UserId = user.Id, 
 				User = user,
 				HasPassword = hasPassword,
 				FirstName = user.FirstName,
 				LastName = user.LastName,
 				Email = user.Email,
+				Gender = user.Gender,
 			});
 		}
 
@@ -446,7 +439,7 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ChangeDetailsPartial(UserViewModel userModel)
 		{
-			var user = await userManager.FindByIdAsync(userModel.UserId);
+			var user = await userManager.FindByIdAsync(User.Identity.GetUserId());
 			if (user == null)
 			{
 				AuthenticationManager.Logout(HttpContext);
@@ -461,6 +454,7 @@ namespace uLearn.Web.Controllers
 			user.FirstName = userModel.FirstName;
 			user.LastName = userModel.LastName;
 			user.Email = userModel.Email;
+			user.Gender = userModel.Gender;
 			user.LastEdit = DateTime.Now;
 			if (!string.IsNullOrEmpty(userModel.Password))
 			{
@@ -506,12 +500,14 @@ namespace uLearn.Web.Controllers
 
 		public async Task<ActionResult> AddTelegram(long chatId, string chatTitle, string hash)
 		{
+			metricSender.SendCount("connect_telegram.try");
 			var correctHash = notificationsRepo.GetSecretHashForTelegramTransport(chatId, chatTitle, telegramSecret);
 			if (hash != correctHash)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			var userId = User.Identity.GetUserId();
 			await usersRepo.ChangeTelegram(userId, chatId, chatTitle);
+			metricSender.SendCount("connect_telegram.success");
 			await notificationsRepo.AddNotificationTransport(new TelegramNotificationTransport
 			{
 				UserId = userId,
@@ -523,6 +519,8 @@ namespace uLearn.Web.Controllers
 
 		public async Task<ActionResult> ConfirmEmail(string email, string signature)
 		{
+			metricSender.SendCount("email_confirmation.go_by_link_from_email");
+
 			var userId = User.Identity.GetUserId();
 			var user = await userManager.FindByIdAsync(userId);
 			if (user.Email != email || user.EmailConfirmed)
@@ -533,6 +531,7 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
 
 			await usersRepo.ConfirmEmail(userId);
+			metricSender.SendCount("email_confirmation.confirmed");
 
 			/* Enable notification transport if it exists or create auto-enabled mail notification transport */
 			var mailNotificationTransport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(userId, includeDisabled: true);

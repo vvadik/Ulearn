@@ -964,9 +964,31 @@ li.li-success {
 	font-size: 16px;
 }
 
+.login-and-registration-form:not(.profile-form) > form > .form-group {
+	margin-left: 0;
+	margin-right: 0;
+}
+
 .login-and-registration-form .control-label {
 	font-size: 16px;
 	padding-top: 13px;
+}
+
+.login-and-registration-form .control-label.for-non-text-fields {
+	padding-top: 6px;
+}
+
+.login-and-registration-form .radio {
+	margin-right: 15px;
+}
+
+.login-and-registration-form .pull-right .radio {
+	margin-right: 0;
+	margin-left: 15px;
+}
+
+.login-and-registration-form .radio-form-group {
+	padding-bottom: 5px;
 }
 
 @media (max-width: 768px) {
@@ -996,7 +1018,8 @@ li.li-success {
 	margin-bottom: 15px;
 }
 
-.login-and-registration-form .checkbox label::before {
+.login-and-registration-form .checkbox label::before,
+.login-and-registration-form .radio label::before {
 	border-width: 2px;
 }
 
