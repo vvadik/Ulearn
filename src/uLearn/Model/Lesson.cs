@@ -47,8 +47,8 @@ namespace uLearn.Model
 		[XmlElement("default-include-code-file")]
 		public string DefaultIncludeCodeFile
 		{
-			get { return DefaultInclideFile; }
-			set { DefaultInclideFile = value; }
+			get => DefaultInclideFile;
+			set => DefaultInclideFile = value;
 		}
 
 		[XmlElement(typeof(YoutubeBlock))]

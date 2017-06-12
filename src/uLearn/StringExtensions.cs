@@ -99,10 +99,7 @@ namespace uLearn
 				var newLines = lines.Select(line => line.Length > nesting ? line.Substring(nesting) : line);
 				return newLines;
 			}
-			else
-			{
-				return Enumerable.Repeat("", lines.Count());
-			}
+			return Enumerable.Repeat("", lines.Count);
 		}
 
 		public static string FixExtraEolns(this string arg)

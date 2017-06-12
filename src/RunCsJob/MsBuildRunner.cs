@@ -10,7 +10,7 @@ namespace RunCsJob
 {
 	public class MsBuildSettings
 	{
-		private const string CompilersFolderName = "Microsoft.Net.Compilers.2.1.0";
+		private const string CompilersFolderName = "Microsoft.Net.Compilers.2.2.0";
 		private const string WellKnownLibsFolderName = "WellKnownLibs";
 
 		public MsBuildSettings()

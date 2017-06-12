@@ -13,8 +13,8 @@ namespace uLearn.Model.Blocks
 		[XmlText]
 		public string Code
 		{
-			get { return code; }
-			set { code = value.RemoveCommonNesting().TrimEnd(); }
+			get => code;
+			set => code = value.RemoveCommonNesting().TrimEnd();
 		}
 
 		[XmlAttribute("lang-id")]
@@ -49,7 +49,7 @@ namespace uLearn.Model.Blocks
 
 		public override string ToString()
 		{
-			return string.Format("{0} code {1}", LangId, Code);
+			return $"{LangId} code {Code}";
 		}
 
 		public override string TryGetText()

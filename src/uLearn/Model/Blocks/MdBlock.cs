@@ -16,8 +16,8 @@ namespace uLearn.Model.Blocks
 		[XmlText]
 		public string Markdown
 		{
-			get { return markdown; }
-			set { markdown = value.RemoveCommonNesting(); }
+			get => markdown;
+			set => markdown = value.RemoveCommonNesting();
 		}
 
 
