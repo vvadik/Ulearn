@@ -4,41 +4,41 @@ using log4net;
 
 namespace Metrics
 {
-    public class GraphiteMetricSender
-    {
-	    private readonly ILog log = LogManager.GetLogger(typeof(GraphiteMetricSender));
+	public class GraphiteMetricSender
+	{
+		private readonly ILog log = LogManager.GetLogger(typeof(GraphiteMetricSender));
 
-	    private readonly string service;
-	    private readonly string machineName;
+		private readonly string service;
+		private readonly string machineName;
 
-	    public GraphiteMetricSender(string service)
-	    {
-		    this.service = service;
-		    machineName = Environment.MachineName.Replace(".", "_").ToLower();
-	    }
+		public GraphiteMetricSender(string service)
+		{
+			this.service = service;
+			machineName = Environment.MachineName.Replace(".", "_").ToLower();
+		}
 
-	    private string BuildKey(string key)
-	    {
-		    return $"{service}.{machineName}.{key}";
-	    }
+		private string BuildKey(string key)
+		{
+			return $"{service}.{machineName}.{key}";
+		}
 
 		public void SendCount(string key, int value = 1, float sampling = 1)
 		{
 			var builtKey = BuildKey(key);
 			log.Info($"Send count metric {builtKey}, value {value}");
-		    try
-		    {
-			    MetricsPipe.Current.Count(builtKey, value, sampling);
-		    }
-		    catch (Exception e)
-		    {
-			    log.Warn($"Can't send count metric {builtKey}, value {value}", e);
-		    }
-	    }
+			try
+			{
+				MetricsPipe.Current.Count(builtKey, value, sampling);
+			}
+			catch (Exception e)
+			{
+				log.Warn($"Can't send count metric {builtKey}, value {value}", e);
+			}
+		}
 
-	    public void SendTiming(string key, int value)
-	    {
-		    var builtKey = BuildKey(key);
+		public void SendTiming(string key, int value)
+		{
+			var builtKey = BuildKey(key);
 			log.Info($"Send timing metric {builtKey}, value {value}");
 			try
 			{ 
@@ -50,9 +50,9 @@ namespace Metrics
 			}
 		}
 
-	    public void SendGauge(string key, int value)
-	    {
-		    var builtKey = BuildKey(key);
+		public void SendGauge(string key, int value)
+		{
+			var builtKey = BuildKey(key);
 			log.Info($"Send gauge metric {builtKey}, value {value}");
 			try
 			{ 
@@ -64,9 +64,9 @@ namespace Metrics
 			}
 		}
 
-	    public void SendRaw(string key, int value)
-	    {
-		    var builtKey = BuildKey(key);
+		public void SendRaw(string key, int value)
+		{
+			var builtKey = BuildKey(key);
 			log.Info($"Send raw metric {builtKey}, value {value}");
 			try
 			{ 

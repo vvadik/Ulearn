@@ -1,4 +1,6 @@
-﻿<div class="modal fade" id="emailIsNotConfirmedModal" role="dialog">
+﻿@model Database.Models.ApplicationUser
+
+<div class="modal fade" id="emailIsNotConfirmedModal" role="dialog">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -7,9 +9,9 @@
 			</div>
 			<div class="modal-body">
 				<p>
-					Мы отправили письмо для подтверждения адреса больше для назад. Не подтвердив адрес,
-					вы не сможете восстановить доступ к&nbsp;аккаунту, если потеряете пароль. Кроме того, вы не сможете получать
-					уведомления об ответах на ваши комментарии и других событиях в&nbsp;курсах.
+					Мы отправили письмо для подтверждения адреса на&nbsp;<b>@Model.Email</b> больше дня назад. Не&nbsp;подтвердив адрес,
+					вы не&nbsp;сможете восстановить доступ к&nbsp;аккаунту, если потеряете пароль. Кроме того, вы не&nbsp;сможете получать
+					уведомления об&nbsp;ответах на&nbsp;ваши комментарии и других событиях в&nbsp;курсах.
 				</p>
 				<p>
 					Мы не&nbsp;подпишем вас ни&nbsp;на&nbsp;какие периодические рассылки,
@@ -19,6 +21,7 @@
 					Если вы не&nbsp;получили письма от&nbsp;нас, мы можем <a href="@Url.Action("SendConfirmationEmail", "Account")">прислать ещё одно</a>.
 				</p>
 				<p>
+					<br />
 					Всегда ваши, <br/>команда ulearn.me. <br/>Пишите нам на <a href="mailto:support@ulearn.me">support@ulearn.me</a>.
 				</p>
 			</div>

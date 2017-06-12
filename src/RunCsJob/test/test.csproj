@@ -36,6 +36,12 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime">
+      <HintPath>C:\Users\andgein\Documents\Work\2016\02. uLearn\uLearn\src\RunCsJob\bin\Debug\System.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple">
+      <HintPath>C:\Users\andgein\AppData\Local\Temp\xn3rwtcs.bym\nsggihsp.pi4\RunCsJob\assembly\dl3\24395edb\00a6fa4f_04b9d201\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />

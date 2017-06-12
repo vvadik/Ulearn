@@ -592,7 +592,7 @@ namespace uLearn.Web.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.OK);
 
 			/* If email has been sent less than 1 day ago, show popup. Double popup is disabled via cookies and javascript */
-			return PartialView("EmailIsNotConfirmedPopup");
+			return PartialView("EmailIsNotConfirmedPopup", user);
 		}
 	}
 }
