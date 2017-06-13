@@ -68,23 +68,5 @@ namespace uLearn
 			var blocks = lesson.Blocks;
 			return blocks.SelectMany(b => b.BuildUp(buildUpContext, ImmutableHashSet<string>.Empty)).ToArray();
 		}
-
-		[Test]
-		public void TestSelectMany()
-		{
-			var input = "<Lesson xmlns='https://ulearn.azurewebsites.net/lesson'><md>1<note>secret</note>2<code>3</code>4</md></Lesson>";
-			File.WriteAllText("temp.xml", input);
-			var fileInfo = new FileInfo("temp.xml");
-			var buildUpContext = new BuildUpContext(new DirectoryInfo("."), CourseSettings.DefaultSettings, null, "Заголовок слайда");
-			var lesson = fileInfo.DeserializeXml<Lesson>();
-			var blocks = lesson.Blocks;
-			foreach (var block in blocks)
-				Console.WriteLine(block.BuildUp(buildUpContext, ImmutableHashSet<string>.Empty));
-			Console.WriteLine(blocks.Length);
-			
-			var numbers = Enumerable.Range(1, 10);
-			var numbersList = numbers.SelectMany(x => Enumerable.Range(x, x + 10)).ToArray();
-			Console.WriteLine(numbersList.Sum());
-		}
 	}
 }
