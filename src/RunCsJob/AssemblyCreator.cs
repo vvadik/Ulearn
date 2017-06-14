@@ -37,9 +37,8 @@ namespace RunCsJob
 					MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location), // System
 					MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location), // System.Core
 					MetadataReference.CreateFromFile(typeof(Point).Assembly.Location), // System.Drawing,
-					MetadataReference.CreateFromFile(typeof(ValueTuple).Assembly.Location), // System.ValueTuple
 					MetadataReference.CreateFromFile(typeof(ValueType).Assembly.Location), // System.Runtime
-					MetadataReference.CreateFromFile(systemRuntimeDllPath), // System.Runtime (because previous sometime is mscorlib)
+					//MetadataReference.CreateFromFile(systemRuntimeDllPath), // System.Runtime (because typeof(ValueType).Assembly.Location sometimes appeared to be in mscorlib)
 				}, new CSharpCompilationOptions(OutputKind.ConsoleApplication));
 			
 			var assemblyFilename = Path.Combine(workingDirectory, assemblyName + ".exe");

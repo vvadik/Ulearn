@@ -101,6 +101,9 @@
     <Reference Include="Graphite, Version=1.3.0.0, Culture=neutral, PublicKeyToken=db1870846884bbb9, processorArchitecture=MSIL">
       <HintPath>..\packages\Graphite.1.3.0.0\lib\net40-Client\Graphite.dll</HintPath>
     </Reference>
+    <Reference Include="Graphite.Web, Version=1.0.0.0, Culture=neutral, PublicKeyToken=db1870846884bbb9, processorArchitecture=MSIL">
+      <HintPath>..\ThirdParty\Graphite.Web.1.0.0.0\Graphite.Web.dll</HintPath>
+    </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.4.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.Annotations.10.4.0\lib\net\JetBrains.Annotations.dll</HintPath>
     </Reference>
@@ -332,6 +335,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\ErrorLogModule.cs" />
+    <Compile Include="App_Start\GraphiteMetricsPipeStart.cs" />
     <Compile Include="App_Start\RazorGeneratorMvcStart.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="codemirror\CsCompleterGenerator.cs" />

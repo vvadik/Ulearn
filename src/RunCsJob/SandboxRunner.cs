@@ -169,13 +169,10 @@ namespace RunCsJob
 				SafeRemoveFile(res.PathToAssembly);
 				return result;
 			}
-
-			var valueTupleDllPath = Path.Combine(submissionCompilationDirectory, "System.ValueTuple.dll");
-			SafeCopyFileIfNotExists(typeof(ValueTuple).Assembly.Location, valueTupleDllPath);
+			
 			RunSandboxer($"\"{Path.GetFullPath(res.PathToAssembly)}\" {submission.Id}");
 
 			SafeRemoveFile(res.PathToAssembly);
-			SafeRemoveFile(valueTupleDllPath);
 
 			return result;
 		}
@@ -341,6 +338,7 @@ namespace RunCsJob
 
 		private void HandleNtStatus(int exitCode, string error)
 		{
+			log.Warn($"Не вытащил информацию об эксепшене из строчки \"{error}\", проверяю код выхода");
 			switch ((uint)exitCode)
 			{
 				case 0xC00000FD:

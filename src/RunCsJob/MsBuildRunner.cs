@@ -26,19 +26,18 @@ namespace RunCsJob
 	}
 	public static class MsBuildRunner
 	{
-		private const string ValueTupleLibName = "System.ValueTuple";
+		//private const string ValueTupleLibName = "System.ValueTuple";
 		private const string SystemRuntimeLibName = "System.Runtime";
 
 		public static MSbuildResult BuildProject(MsBuildSettings settings, string projectFileName, DirectoryInfo dir)
 		{
-			
 			var result = new MSbuildResult();
 			var path = Path.Combine(dir.FullName, projectFileName);
 			var project = new Project(path, null, null, new ProjectCollection());
 			project.SetProperty("CscToolPath", settings.CompilerDirectory.FullName);
 
-			if (!project.HasReference(ValueTupleLibName))
-				project.AddReference(ValueTupleLibName, typeof(ValueTuple).Assembly.Location);
+			//if (!project.HasReference(ValueTupleLibName))
+			//	project.AddReference(ValueTupleLibName, typeof(ValueTuple).Assembly.Location);
 
 			if (!project.HasReference(SystemRuntimeLibName))
 				project.AddReference(SystemRuntimeLibName, Path.Combine(settings.BaseDirectory, $"{SystemRuntimeLibName}.dll"));
