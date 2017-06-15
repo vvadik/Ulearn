@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Graphite;
 using log4net;
 
@@ -9,17 +10,24 @@ namespace Metrics
 		private readonly ILog log = LogManager.GetLogger(typeof(GraphiteMetricSender));
 
 		private readonly string service;
-		private readonly string machineName;
+		private static string MachineName => Environment.MachineName.Replace(".", "_").ToLower();
 
 		public GraphiteMetricSender(string service)
 		{
 			this.service = service;
-			machineName = Environment.MachineName.Replace(".", "_").ToLower();
+		}
+
+		/* Builds key "{service}.{machine_name}.{key}" */
+		public static string BuildKey(string service, string key)
+		{
+			var parts = new[] { service, MachineName, key };
+			parts = parts.Where(s => !string.IsNullOrEmpty(s)).ToArray();
+			return string.Join(".", parts);
 		}
 
 		private string BuildKey(string key)
 		{
-			return $"{service}.{machineName}.{key}";
+			return BuildKey(service, key);
 		}
 
 		public void SendCount(string key, int value = 1, float sampling = 1)

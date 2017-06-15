@@ -1,5 +1,5 @@
-﻿using System.Diagnostics;
-using Graphite.Web;
+﻿using Graphite.Web;
+using Metrics;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(uLearn.Web.App_Start.GraphiteMetricsPipeStart), "PreStart")]
@@ -10,12 +10,11 @@ namespace uLearn.Web.App_Start
 	{
 		public static void PreStart()
 		{
-			Trace.WriteLine("GraphiteMetricsPipeStart.PreStart");
 			// Make sure MetricsPipe handles BeginRequest and EndRequest
 			DynamicModuleUtility.RegisterModule(typeof(MetricsPipeStartupModule));
 
 			MetricsPipeStartupModule.Settings.ReportRequestTime = true;
-			MetricsPipeStartupModule.Settings.RequestTimePrefix = "request.time";
+			MetricsPipeStartupModule.Settings.RequestTimePrefix = GraphiteMetricSender.BuildKey("web", "request.time");
 		}
 	}
 }
