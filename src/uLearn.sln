@@ -24,7 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6BAF40
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn.CourseTool", "CourseTool\uLearn.CourseTool.csproj", "{38660028-BD75-4281-84E9-B35CE3E338DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseTool", "CourseTool\CourseTool.csproj", "{38660028-BD75-4281-84E9-B35CE3E338DC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunCsJob", "RunCsJob\RunCsJob.csproj", "{77B16F9D-3CDF-4CC6-BE5F-B6BADFAC5394}"
 EndProject

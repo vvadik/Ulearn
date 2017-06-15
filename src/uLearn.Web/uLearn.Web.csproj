@@ -1124,9 +1124,6 @@
     <Folder Include="Views\Telegram\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Project_Readme.html" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Microsoft.Owin.Security.VK\Resources.resx" />
   </ItemGroup>
   <ItemGroup>
