@@ -95,7 +95,13 @@
 	@Html.Partial("_UlearnUpdatesInvitation")
 	@Html.Action("SuggestMailTransport", "Notifications")
 	@Html.Action("CheckIsEmailConfirmed", "Account")
-
+	
+	@Scripts.Render("~/libraries-js")
+	@* Add Sentry (https://sentry.io) script for error logging *@
+	<script src="https://cdn.ravenjs.com/3.16.0/raven.min.js" crossorigin="anonymous"></script>
+	<script>
+		Raven.config('https://992e1a5327ad4e48af004ae709b51aba@sentry.io/181214').install()
+	</script>
 	@Scripts.Render("~/main-js")
 	@RenderSection("scripts", required: false)
 

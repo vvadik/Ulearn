@@ -254,46 +254,51 @@ namespace RunCsJob
 
 			var stderrReader = new AsyncReader(sandboxer.StandardError, settings.OutputLimit + 1);
 
-			var readyState = sandboxer.StandardOutput.ReadLineAsync();
-			if (!readyState.Wait(settings.TimeLimit) || readyState.Result != "Ready")
+			try
+			{
+				var readyState = sandboxer.StandardOutput.ReadLineAsync();
+				if (!readyState.Wait(settings.TimeLimit) || readyState.Result != "Ready")
+				{
+					if (!sandboxer.HasExited)
+					{
+						log.Error($"Песочница не завершилась через {settings.TimeLimit.TotalSeconds} секунд, убиваю её");
+						sandboxer.Kill();
+						result.Verdict = Verdict.SandboxError;
+						result.Error = "Sandbox does not respond";
+						return;
+					}
+					if (sandboxer.ExitCode != 0)
+					{
+						HandleNonZeroExitCode(stderrReader.GetData(), sandboxer.ExitCode);
+						return;
+					}
+					result.Verdict = Verdict.SandboxError;
+					result.Error = "Sandbox exit before respond";
+					return;
+				}
+
+				sandboxer.Refresh();
+				var startUsedMemory = sandboxer.WorkingSet64;
+				var startUsedTime = sandboxer.TotalProcessorTime;
+				var startTime = DateTime.Now;
+
+				sandboxer.StandardInput.WriteLine("Run");
+				sandboxer.StandardInput.WriteLineAsync(submission.Input);
+
+				var stdoutReader = new AsyncReader(sandboxer.StandardOutput, settings.OutputLimit + 1);
+				while (!sandboxer.HasExited
+						&& !IsTimeLimitExpected(sandboxer, startTime, startUsedTime)
+						&& !IsMemoryLimitExpected(sandboxer, startUsedMemory)
+						&& !IsOutputLimit(stdoutReader)
+						&& !IsOutputLimit(stderrReader))
+				{
+				}
+			}
+			finally
 			{
 				if (!sandboxer.HasExited)
-				{
-					log.Error($"Песочница не завершилась через {settings.TimeLimit.TotalSeconds} секунд, убиваю её");
 					sandboxer.Kill();
-					result.Verdict = Verdict.SandboxError;
-					result.Error = "Sandbox does not respond";
-					return;
-				}
-				if (sandboxer.ExitCode != 0)
-				{
-					HandleNonZeroExitCode(stderrReader.GetData(), sandboxer.ExitCode);
-					return;
-				}
-				result.Verdict = Verdict.SandboxError;
-				result.Error = "Sandbox exit before respond";
-				return;
 			}
-
-			sandboxer.Refresh();
-			var startUsedMemory = sandboxer.WorkingSet64;
-			var startUsedTime = sandboxer.TotalProcessorTime;
-			var startTime = DateTime.Now;
-
-			sandboxer.StandardInput.WriteLine("Run");
-			sandboxer.StandardInput.WriteLineAsync(submission.Input);
-
-			var stdoutReader = new AsyncReader(sandboxer.StandardOutput, settings.OutputLimit + 1);
-			while (!sandboxer.HasExited
-					&& !IsTimeLimitExpected(sandboxer, startTime, startUsedTime)
-					&& !IsMemoryLimitExpected(sandboxer, startUsedMemory)
-					&& !IsOutputLimit(stdoutReader)
-					&& !IsOutputLimit(stderrReader))
-			{
-			}
-
-			if (!sandboxer.HasExited)
-				sandboxer.Kill();
 
 			if (hasOutputLimit)
 			{

@@ -1,4 +1,5 @@
-﻿using Graphite.Web;
+﻿using System.Web.Configuration;
+using Graphite.Web;
 using Metrics;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 
@@ -8,8 +9,13 @@ namespace uLearn.Web.App_Start
 {
 	public class GraphiteMetricsPipeStart
 	{
+		private static bool IsGraphiteSendingEnabled => !string.IsNullOrEmpty(WebConfigurationManager.ConnectionStrings["statsd"]?.ConnectionString);
+
 		public static void PreStart()
 		{
+			if (!IsGraphiteSendingEnabled)
+				return;
+
 			// Make sure MetricsPipe handles BeginRequest and EndRequest
 			DynamicModuleUtility.RegisterModule(typeof(MetricsPipeStartupModule));
 

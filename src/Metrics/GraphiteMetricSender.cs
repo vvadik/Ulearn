@@ -2,6 +2,7 @@
 using System.Linq;
 using Graphite;
 using log4net;
+using System.Configuration;
 
 namespace Metrics
 {
@@ -11,6 +12,7 @@ namespace Metrics
 
 		private readonly string service;
 		private static string MachineName => Environment.MachineName.Replace(".", "_").ToLower();
+		private static bool IsEnabled = !string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings["statd"]?.ConnectionString);
 
 		public GraphiteMetricSender(string service)
 		{
@@ -32,6 +34,9 @@ namespace Metrics
 
 		public void SendCount(string key, int value = 1, float sampling = 1)
 		{
+			if (!IsEnabled)
+				return;
+
 			var builtKey = BuildKey(key);
 			log.Info($"Send count metric {builtKey}, value {value}");
 			try
@@ -46,6 +51,9 @@ namespace Metrics
 
 		public void SendTiming(string key, int value)
 		{
+			if (!IsEnabled)
+				return;
+
 			var builtKey = BuildKey(key);
 			log.Info($"Send timing metric {builtKey}, value {value}");
 			try
@@ -60,6 +68,9 @@ namespace Metrics
 
 		public void SendGauge(string key, int value)
 		{
+			if (!IsEnabled)
+				return;
+
 			var builtKey = BuildKey(key);
 			log.Info($"Send gauge metric {builtKey}, value {value}");
 			try
@@ -74,6 +85,9 @@ namespace Metrics
 
 		public void SendRaw(string key, int value)
 		{
+			if (!IsEnabled)
+				return;
+
 			var builtKey = BuildKey(key);
 			log.Info($"Send raw metric {builtKey}, value {value}");
 			try
