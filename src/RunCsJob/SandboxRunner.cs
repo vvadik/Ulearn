@@ -254,6 +254,7 @@ namespace RunCsJob
 
 			var stderrReader = new AsyncReader(sandboxer.StandardError, settings.OutputLimit + 1);
 
+			AsyncReader stdoutReader;
 			try
 			{
 				var readyState = sandboxer.StandardOutput.ReadLineAsync();
@@ -285,7 +286,7 @@ namespace RunCsJob
 				sandboxer.StandardInput.WriteLine("Run");
 				sandboxer.StandardInput.WriteLineAsync(submission.Input);
 
-				var stdoutReader = new AsyncReader(sandboxer.StandardOutput, settings.OutputLimit + 1);
+				stdoutReader = new AsyncReader(sandboxer.StandardOutput, settings.OutputLimit + 1);
 				while (!sandboxer.HasExited
 						&& !IsTimeLimitExpected(sandboxer, startTime, startUsedTime)
 						&& !IsMemoryLimitExpected(sandboxer, startUsedMemory)
