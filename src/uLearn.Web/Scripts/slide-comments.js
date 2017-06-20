@@ -14,16 +14,15 @@
 
 	var addAntiForgeryToken = function (data) {
 		var token = $('#__AjaxAntiForgeryForm input[name=__RequestVerificationToken]').val();
-        if (typeof(data) === "string")
-        {
-            return data + "&__RequestVerificationToken=" + token
-        }
-        else
-        {
+        if (typeof(data) === "string") {
+	        return data + "&__RequestVerificationToken=" + token;
+        } else {
             data.__RequestVerificationToken = token;
     		return data;
         }
 	};
+
+	var $commentsRules = $('.comments__rules');
 
 	String.prototype.br2nl = function () {
 		return this.replace(/<br\s*\/?>/gi, "\n");
@@ -72,6 +71,24 @@
 		scrollTo($replyForm.find('[name=commentText]'));
 	}
 
+	var showCommentsRulesIfNeeded = function ($textarea) {
+		if ($('.comments__rules:visible').length === 0)
+			$textarea.after($commentsRules.clone());
+	}
+
+	var onTextareaFocus = function (e) {
+		var $textarea = $(this);
+		showCommentsRulesIfNeeded($textarea);
+	}
+
+	var hideCommentsRules = function(e) {
+		var $textarea = $(this);
+		var $replyForm = $textarea.closest('.reply-form');
+		var $localCommentsRules = $replyForm.find('.comments__rules');
+		if ($textarea.val() === '')
+			$localCommentsRules.remove();
+	}
+
 	var expandReplyForm = function (e) {
 		e.preventDefault();
 		var $textarea = $('<textarea>').attr('name', $(this).attr('name'))
@@ -80,13 +97,24 @@
 			.attr('disabled', true);
 
 		$(this).replaceWith($textarea);
-		$textarea.focus().after($button);
+		$textarea.after($button).focus();
 		scrollTo($textarea, 200);
 	}
 
-	var disableButtonForEmptyComment = function() {
-		var $button = $(this).next();
-		$button.attr('disabled', $(this).val().trim() === '');
+	var disableButtonForEmptyComment = function ($textarea) {
+		var $button = $textarea.closest('.reply-form').find('button');
+		$button.attr('disabled', $textarea.val().trim() === '');
+	}
+
+	var onTextareaKeyUp = function (e) {
+		var $textarea = $(this);
+		disableButtonForEmptyComment($textarea);
+
+		/* Send comment by Ctrl+Enter (or Cmd+Enter on Mac OS) */
+		if ((e.ctrlKey || e.metaKey) && (e.keyCode === 13 || e.keyCode === 10)) {
+			var $button = $textarea.closest('.reply-form').find('button');
+			$button.click();
+		}
 	}
 
 	var sendComment = function (e) {
@@ -128,13 +156,14 @@
 	}
 
 	var collapseReplyForm = function () {
-		var $button = $(this).next();
-		if ($(this).val() === '') {
-			var $replyForm = $(this).closest('.reply-form');
-			var $textInput = $('<input type="text">').attr('name', $(this).attr('name'))
-													 .attr('placeholder', $(this).attr('placeholder'));
+		var $self = $(this);
+		var $replyForm = $(this).closest('.reply-form');
+		var $button = $replyForm.find('button');
+		if ($self.val() === '') {
+			var $textInput = $('<input type="text">').attr('name', $self.attr('name'))
+													 .attr('placeholder', $self.attr('placeholder'));
 
-			$(this).replaceWith($textInput);
+			$self.replaceWith($textInput);
 			$button.remove();
 			if ($replyForm.hasClass('collapse'))
 				$replyForm.hide();
@@ -301,7 +330,8 @@
 
 	$('.comments').on('click', '.reply-form input[name=commentText]', expandReplyForm);
 	$('.comments').on('click', '.comment .comment__likes-count', likeComment);
-	$('.comments').on('keyup', 'textarea[name=commentText]', disableButtonForEmptyComment);
+	$('.comments').on('keyup', 'textarea[name=commentText]', onTextareaKeyUp);
+	$('.comments').on('blur', '.reply-form textarea[name=commentText]', hideCommentsRules);
 	$('.comments').on('blur', '.reply-form.is-reply textarea[name=commentText]', collapseReplyForm);
 	$('.comments').on('click', '.reply-form .reply-form__send-button', sendComment);
 	$('.comments').on('click', '.comment .comment__inline-reply', createReplyForm);
@@ -312,6 +342,7 @@
 	$('.comments').on('click', '.comment .comment__pinned.label-switcher', pinOrUnpinComment);
 	$('.comments').on('click', '.comment .comment__correct-answer.label-switcher', markCommentAsCorrect);
 	$('.comments').on('input', 'textarea[name=commentText]', autoEnlargeTextarea);
+	$('.comments').on('focus', 'textarea[name=commentText]', onTextareaFocus);
 
 	$(document).ready(function() {
 		scrollToCommentFromHash();

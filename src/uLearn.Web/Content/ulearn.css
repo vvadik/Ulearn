@@ -925,6 +925,22 @@ li.li-success {
 	color: #500F0F;
 }
 
+.comments__rules {
+	display: none;
+}
+
+.comments .comments__rules {
+	display: block;
+	margin-left: 7px;
+	margin-right: -7px;
+	margin-bottom: 3px;
+	margin-top: 5px;
+}
+
+.comments .comments__rules ul {
+	padding-left: 25px;	
+}
+
 /* User avatars */
 .user__avatar {
 	width: 54px;
