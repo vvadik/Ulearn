@@ -12,7 +12,7 @@ namespace Metrics
 
 		private readonly string service;
 		private static string MachineName => Environment.MachineName.Replace(".", "_").ToLower();
-		private static bool IsEnabled = !string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings["statd"]?.ConnectionString);
+		private static bool IsEnabled = !string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings["statsd"]?.ConnectionString);
 
 		public GraphiteMetricSender(string service)
 		{
