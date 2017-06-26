@@ -226,7 +226,7 @@ namespace RunCsJob
 					return new RunningResults(Verdict.SandboxError, error: e.Message);
 				}
 
-				log.Info("Песочника ответила Ready");
+				log.Info("Песочница ответила Ready");
 				WaitUntilSandboxExit(sandbox, out sandboxOutput, out sandboxError);
 			}
 			finally
@@ -276,17 +276,26 @@ namespace RunCsJob
 			var stderrReader = new AsyncReader(sandbox.StandardError, settings.OutputLimit + 1);
 			var stdoutReader = new AsyncReader(sandbox.StandardOutput, settings.OutputLimit + 1);
 			while (!sandbox.HasExited
-					&& !CheckIsTimeLimitExpected(sandbox, startTime, startUsedTime)
-					&& !CheckIsMemoryLimitExpected(sandbox, startUsedMemory)
+					&& !CheckIsTimeLimitExceeded(sandbox, startTime, startUsedTime)
+					&& !CheckIsMemoryLimitExceeded(sandbox, startUsedMemory)
 					&& !CheckIsOutputLimit(stdoutReader)
 					&& !CheckIsOutputLimit(stderrReader))
 			{
 			}
 
-			sandboxError = stderrReader.GetData();
-			sandboxOutput = stdoutReader.GetData();
-			CheckIsOutputLimit(stdoutReader);
-			CheckIsOutputLimit(stderrReader);
+			if (!hasTimeLimit && !hasMemoryLimit && !hasOutputLimit)
+			{
+				/* Read all data to the end of streams */
+				sandboxError = stderrReader.GetData();
+				sandboxOutput = stdoutReader.GetData();
+				CheckIsOutputLimit(stdoutReader);
+				CheckIsOutputLimit(stderrReader);
+			}
+			else
+			{
+				sandboxError = "";
+				sandboxOutput = "";
+			}
 		}
 
 		private void WaitUntilSandboxIsReady(Process sandbox)
@@ -367,13 +376,13 @@ namespace RunCsJob
 			return hasOutputLimit = hasOutputLimit || reader.ReadedLength > settings.OutputLimit;
 		}
 
-		private bool CheckIsMemoryLimitExpected(Process sandboxer, long startUsedMemory)
+		private bool CheckIsMemoryLimitExceeded(Process sandbox, long startUsedMemory)
 		{
-			sandboxer.Refresh();
+			sandbox.Refresh();
 			long mem;
 			try
 			{
-				mem = sandboxer.PeakWorkingSet64;
+				mem = sandbox.PeakWorkingSet64;
 			}
 			catch
 			{
@@ -383,10 +392,10 @@ namespace RunCsJob
 			return hasMemoryLimit = hasMemoryLimit || startUsedMemory + settings.MemoryLimit < mem;
 		}
 
-		private bool CheckIsTimeLimitExpected(Process sandboxer, DateTime startTime, TimeSpan startUsedTime)
+		private bool CheckIsTimeLimitExceeded(Process sandbox, DateTime startTime, TimeSpan startUsedTime)
 		{
 			return hasTimeLimit = hasTimeLimit
-				|| settings.TimeLimit.Add(startUsedTime).CompareTo(sandboxer.TotalProcessorTime) < 0
+				|| settings.TimeLimit.Add(startUsedTime).CompareTo(sandbox.TotalProcessorTime) < 0
 				|| startTime.Add(settings.IdleTimeLimit).CompareTo(DateTime.Now) < 0;
 		}
 
