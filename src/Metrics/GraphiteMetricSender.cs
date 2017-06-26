@@ -3,6 +3,7 @@ using System.Linq;
 using Graphite;
 using log4net;
 using System.Configuration;
+using System.Globalization;
 
 namespace Metrics
 {
@@ -11,8 +12,8 @@ namespace Metrics
 		private readonly ILog log = LogManager.GetLogger(typeof(GraphiteMetricSender));
 
 		private readonly string service;
-		private static string MachineName => Environment.MachineName.Replace(".", "_").ToLower();
-		private static bool IsEnabled = !string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings["statsd"]?.ConnectionString);
+		private static string MachineName { get; } = Environment.MachineName.Replace(".", "_").ToLower(CultureInfo.InvariantCulture);
+		private static readonly bool isEnabled = !string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings["statsd"]?.ConnectionString);
 
 		public GraphiteMetricSender(string service)
 		{
@@ -34,7 +35,7 @@ namespace Metrics
 
 		public void SendCount(string key, int value = 1, float sampling = 1)
 		{
-			if (!IsEnabled)
+			if (!isEnabled)
 				return;
 
 			var builtKey = BuildKey(key);
@@ -51,7 +52,7 @@ namespace Metrics
 
 		public void SendTiming(string key, int value)
 		{
-			if (!IsEnabled)
+			if (!isEnabled)
 				return;
 
 			var builtKey = BuildKey(key);
@@ -68,7 +69,7 @@ namespace Metrics
 
 		public void SendGauge(string key, int value)
 		{
-			if (!IsEnabled)
+			if (!isEnabled)
 				return;
 
 			var builtKey = BuildKey(key);
@@ -85,7 +86,7 @@ namespace Metrics
 
 		public void SendRaw(string key, int value)
 		{
-			if (!IsEnabled)
+			if (!isEnabled)
 				return;
 
 			var builtKey = BuildKey(key);
