@@ -1,4 +1,6 @@
-﻿using Elmah;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Elmah;
 using log4net;
 using uLearn.Web.Telegram;
 
@@ -9,10 +11,23 @@ namespace uLearn.Web
 		private readonly ErrorsBot errorsBot;
 		private static readonly ILog log = LogManager.GetLogger(typeof(ErrorLogModule));
 
+		private static readonly List<string> ignorableForTelegramChannelSubstrings = new List<string>
+		{
+			"The provided anti-forgery token was meant for user",
+			"The required anti-forgery cookie \"__RequestVerificationToken\" is not present.",
+			"Error executing child request for handler 'System.Web.Mvc.HttpHandlerUtil+ServerExecuteHttpHandlerAsyncWrapper'."
+		};
+
 		public ErrorLogModule()
 		{
 			Logged += OnLogged;
 			errorsBot = new ErrorsBot();
+		}
+
+		private bool IsErrorIgnoredForTelegramChannel(Error error)
+		{
+			var message = error.Exception.Message;
+			return ignorableForTelegramChannelSubstrings.Any(ignorableSubstring => message.Contains(ignorableSubstring));
 		}
 		
 		private void OnLogged(object sender, ErrorLoggedEventArgs args)
@@ -22,7 +37,9 @@ namespace uLearn.Web
 			log.Error($"Произошла ошибка {entryId} (код {error.StatusCode}, подробности в Elmah):\n" +
 					  $"Query string: {error.QueryString}",
 				error.Exception);
-			errorsBot.PostToChannel(entryId, error);
+
+			if (! IsErrorIgnoredForTelegramChannel(error))
+				errorsBot.PostToChannel(entryId, error);
 		}
 	}
 }

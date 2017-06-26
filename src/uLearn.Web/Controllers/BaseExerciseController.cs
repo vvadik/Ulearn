@@ -1,9 +1,11 @@
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Database;
 using Database.DataContexts;
 using Database.Models;
 using log4net;
+using Metrics;
 using uLearn.Web.Models;
 using uLearn.Web.Telegram;
 
@@ -16,6 +18,7 @@ namespace uLearn.Web.Controllers
 
 		protected readonly ULearnDb db;
 		protected readonly CourseManager courseManager;
+		protected readonly GraphiteMetricSender metricSender;
 		
 		protected readonly UserSolutionsRepo userSolutionsRepo;
 		protected readonly SlideCheckingsRepo slideCheckingsRepo;
@@ -26,14 +29,15 @@ namespace uLearn.Web.Controllers
 		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(45);
 
 		public BaseExerciseController()
-			: this(new ULearnDb(), WebCourseManager.Instance)
+			: this(new ULearnDb(), WebCourseManager.Instance, new GraphiteMetricSender("web"))
 		{
 		}
 
-		public BaseExerciseController(ULearnDb db, CourseManager courseManager)
+		public BaseExerciseController(ULearnDb db, CourseManager courseManager, GraphiteMetricSender metricSender)
 		{
 			this.db = db;
 			this.courseManager = courseManager;
+			this.metricSender = metricSender;
 
 			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
@@ -49,9 +53,17 @@ namespace uLearn.Web.Controllers
 
 		protected async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string userCode, string userId, string userName, bool waitUntilChecked, bool saveSubmissionOnCompileErrors)
 		{
+			var exerciseMetricId = $"{courseId.ToLower(CultureInfo.InvariantCulture)}.{exerciseSlide.Id}.{exerciseSlide.LatinTitle.Replace(".", "_")}";
+			metricSender.SendCount($"exercise.{exerciseMetricId}.try");
+
 			var course = courseManager.GetCourse(courseId);
 			var exerciseBlock = exerciseSlide.Exercise;
 			var builtSolution = exerciseBlock.BuildSolution(userCode);
+
+			if (builtSolution.HasErrors)
+				metricSender.SendCount($"exercise.{exerciseMetricId}.CompilationError");
+			if (builtSolution.HasStyleIssues)
+				metricSender.SendCount($"exercise.{exerciseMetricId}.StyleViolation");
 
 			if (!saveSubmissionOnCompileErrors)
 			{
@@ -93,7 +105,10 @@ namespace uLearn.Web.Controllers
 			}
 
 			if (!waitUntilChecked)
+			{
+				metricSender.SendCount($"exercise.{exerciseMetricId}.dont_wait_result");
 				return new RunSolutionResult { SubmissionId = submission.Id };
+			}
 
 			/* Update the submission */
 			submission = userSolutionsRepo.FindNoTrackingSubmission(submission.Id);
@@ -109,8 +124,12 @@ namespace uLearn.Web.Controllers
 				await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, exerciseSlide.Id, userId);
 				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission);
 				await visitsRepo.MarkVisitsAsWithManualChecking(exerciseSlide.Id, userId);
+				metricSender.SendCount($"exercise.{exerciseMetricId}.sent_to_review");
 			}
 			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, userId);
+
+			var verdictForMetric = automaticChecking.GetVerdict().Replace(" ", "");
+			metricSender.SendCount($"exercise.{exerciseMetricId}.{verdictForMetric}");
 
 			return new RunSolutionResult
 			{
