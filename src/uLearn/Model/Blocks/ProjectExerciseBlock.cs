@@ -95,7 +95,7 @@ namespace uLearn.Model.Blocks
 			return validator.ValidateSolution(userWrittenCodeFile, userWrittenCodeFile);
 		}
 
-		public override RunnerSubmission CreateSubmition(string submissionId, string code)
+		public override RunnerSubmission CreateSubmission(string submissionId, string code)
 		{
 			return new ProjRunnerSubmission
 			{

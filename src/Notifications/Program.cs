@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Database;
 using Database.DataContexts;
 using Database.Models;
+using Graphite;
 using log4net;
 using log4net.Config;
 
@@ -39,6 +40,8 @@ namespace Notifications
 
 		public async Task MainLoop()
 		{
+			StaticMetricsPipeProvider.Instance.Start();
+
 			Stopped = false;
 			while (!Stopped)
 			{
@@ -58,6 +61,8 @@ namespace Notifications
 
 				await Task.Delay(TimeSpan.FromSeconds(1));
 			}
+
+			StaticMetricsPipeProvider.Instance.Stop();
 		}
 
 		private async Task CreateDeliveries()

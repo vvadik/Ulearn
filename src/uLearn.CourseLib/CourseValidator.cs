@@ -139,7 +139,7 @@ namespace uLearn
 				Console.WriteLine("Style issue: " + solution.StyleMessage);
 			}
 
-			var result = SandboxRunner.Run(exercise.CreateSubmition(
+			var result = SandboxRunner.Run(exercise.CreateSubmission(
 				slide.Id.ToString(),
 				exercise.EthalonSolution), settings);
 

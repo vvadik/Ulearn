@@ -146,7 +146,7 @@ namespace uLearn.CourseTool.Monitoring
 				return new RunSolutionResult { IsCompileError = true, ErrorMessage = buildResult.ErrorMessage, ExecutionServiceName = "uLearn" };
 			if (buildResult.HasStyleIssues)
 				return new RunSolutionResult { IsStyleViolation = true, ErrorMessage = buildResult.StyleMessage, ExecutionServiceName = "uLearn" };
-			var result = SandboxRunner.Run(exercise.CreateSubmition(Utils.NewNormalizedGuid(), code));
+			var result = SandboxRunner.Run(exercise.CreateSubmission(Utils.NewNormalizedGuid(), code));
 			return new RunSolutionResult
 			{
 				IsRightAnswer = result.Verdict == Verdict.Ok && result.GetOutput().NormalizeEoln() == exercise.ExpectedOutput.NormalizeEoln(),

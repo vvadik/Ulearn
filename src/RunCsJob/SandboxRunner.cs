@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Security;
 using System.Text;
 using FluentAssertions.Common;
 using log4net;
@@ -24,6 +27,7 @@ namespace RunCsJob
 		public TimeSpan IdleTimeLimit = TimeSpan.FromSeconds(2 * timeLimitInSeconds);
 		public int MemoryLimit = 64 * 1024 * 1024;
 		public int OutputLimit = 10 * 1024 * 1024;
+		public TimeSpan WaitSandboxAfterKilling = TimeSpan.FromSeconds(5);
 		public MsBuildSettings MsBuildSettings = new MsBuildSettings();
 		public DirectoryInfo WorkingDirectory;
 		public bool DeleteSubmissionsAfterFinish;
@@ -40,8 +44,6 @@ namespace RunCsJob
 		private bool hasMemoryLimit;
 		private bool hasOutputLimit;
 
-		private readonly RunningResults result = new RunningResults();
-
 		public static RunningResults Run(RunnerSubmission submission, SandboxRunnerSettings settings = null)
 		{
 			settings = settings ?? new SandboxRunnerSettings();
@@ -55,6 +57,7 @@ namespace RunCsJob
 				catch (Exception e)
 				{
 					log.Error($"Не могу создать директорию для компиляции решений: {workingDirectory}", e);
+					return new RunningResults(submission.Id, Verdict.SandboxError, error: e.ToString());
 				}
 			}
 
@@ -68,32 +71,24 @@ namespace RunCsJob
 			catch (Exception e)
 			{
 				log.Error($"Не могу создать директорию для компиляции решения: {submissionCompilationDirectory.FullName}", e);
-				return new RunningResults
-				{
-					Id = submission.Id,
-					Verdict = Verdict.SandboxError,
-					Error = e.ToString()
-				};
+				return new RunningResults(submission.Id, Verdict.SandboxError, error: e.ToString());
 			}
 
 			try
 			{
-				try
-				{
-					if (submission is ProjRunnerSubmission)
-						return new SandboxRunner(submission, settings).RunMsBuild(submissionCompilationDirectory.FullName);
-					return new SandboxRunner(submission, settings).RunCsc60(submissionCompilationDirectory.FullName);
-				}
-				catch (Exception ex)
-				{
-					log.Error(ex);
-					return new RunningResults
-					{
-						Id = submission.Id,
-						Verdict = Verdict.SandboxError,
-						Error = ex.ToString()
-					};
-				}
+				RunningResults result;
+				var instance = new SandboxRunner(submission, settings);
+				if (submission is ProjRunnerSubmission)
+					result = instance.RunMsBuild(submissionCompilationDirectory.FullName);
+				else
+					result = instance.RunCsc60(submissionCompilationDirectory.FullName);
+				result.Id = submission.Id;
+				return result;
+			}
+			catch (Exception ex)
+			{
+				log.Error(ex);
+				return new RunningResults(submission.Id, Verdict.SandboxError, error: ex.ToString());
 			}
 			finally
 			{
@@ -109,7 +104,6 @@ namespace RunCsJob
 		{
 			this.submission = submission;
 			this.settings = settings ?? new SandboxRunnerSettings();
-			result.Id = submission.Id;
 		}
 
 		private RunningResults RunMsBuild(string submissionCompilationDirectory)
@@ -125,56 +119,47 @@ namespace RunCsJob
 			catch (Exception ex)
 			{
 				log.Error("Не могу распаковать решение", ex);
-				return new RunningResults
-				{
-					Id = submission.Id,
-					Verdict = Verdict.SandboxError,
-					Error = ex.ToString()
-				};
+				return new RunningResults(submission.Id, Verdict.SandboxError, error: ex.ToString());
 			}
 
 			log.Info($"Компилирую решение {submission.Id}: {projSubmission.ProjectFileName} в папке {dir.FullName}");
 
 			var builderResult = MsBuildRunner.BuildProject(settings.MsBuildSettings, projSubmission.ProjectFileName, dir);
-			result.Verdict = Verdict.Ok;
 
 			if (!builderResult.Success)
 			{
 				log.Info($"Решение {submission.Id} не скомпилировалось: {builderResult.ToString().RemoveNewLines()}");
-				result.Verdict = Verdict.CompilationError;
-				result.CompilationOutput = builderResult.ToString();
-				return result;
+				return new RunningResults(Verdict.CompilationError, compilationOutput: builderResult.ToString());
 			}
-			RunSandboxer($"\"{builderResult.PathToExe}\" {submission.Id}");
-			return result;
+
+			return RunSandbox($"\"{builderResult.PathToExe}\" {submission.Id}");
 		}
 
 		public RunningResults RunCsc60(string submissionCompilationDirectory)
 		{
 			log.Info($"Запускаю проверку C#-решения {submission.Id}, компилирую с помощью Roslyn");
+
 			var res = AssemblyCreator.CreateAssemblyWithRoslyn((FileRunnerSubmission)submission, submissionCompilationDirectory);
+			var diagnostics = res.EmitResult.Diagnostics;
+			var compilationOutput = diagnostics.DumpCompilationOutput();
 
-			result.Verdict = Verdict.Ok;
-			result.AddCompilationInfo(res.EmitResult.Diagnostics);
-
-			if (result.IsCompilationError())
+			try
 			{
-				log.Error($"Ошибка компиляции:\n{result.CompilationOutput}");
-				SafeRemoveFile(res.PathToAssembly);
-				return result;
-			}
+				if (diagnostics.HasErrors())
+				{
+					log.Error($"Ошибка компиляции:\n{compilationOutput}");
+					return new RunningResults(Verdict.CompilationError, compilationOutput: compilationOutput);
+				}
 
-			if (!submission.NeedRun)
+				if (!submission.NeedRun)
+					return new RunningResults(Verdict.Ok);
+
+				return RunSandbox($"\"{Path.GetFullPath(res.PathToAssembly)}\" {submission.Id}");
+			}
+			finally
 			{
 				SafeRemoveFile(res.PathToAssembly);
-				return result;
 			}
-			
-			RunSandboxer($"\"{Path.GetFullPath(res.PathToAssembly)}\" {submission.Id}");
-
-			SafeRemoveFile(res.PathToAssembly);
-
-			return result;
 		}
 
 		private static void SafeCopyFileIfNotExists(string sourceFilePath, string destFilePath)
@@ -214,12 +199,122 @@ namespace RunCsJob
 			}
 		}
 
-		private void RunSandboxer(string args)
+		private RunningResults RunSandbox(string sandboxArguments)
+		{
+			Process sandbox;
+			try
+			{
+				sandbox = StartSandboxProcess(sandboxArguments);
+			}
+			catch (SandboxErrorException e)
+			{
+				log.Error(e.Message, e.InnerException);
+				return new RunningResults(Verdict.SandboxError, error: e.Message);
+			}
+
+			string sandboxOutput;
+			string sandboxError;
+			try
+			{
+				try
+				{
+					WaitUntilSandboxIsReady(sandbox);
+				}
+				catch (SandboxErrorException e)
+				{
+					log.Error(e.Message, e.InnerException);
+					return new RunningResults(Verdict.SandboxError, error: e.Message);
+				}
+
+				log.Info("Песочника ответила Ready");
+				WaitUntilSandboxExit(sandbox, out sandboxOutput, out sandboxError);
+			}
+			finally
+			{
+				if (!sandbox.HasExited)
+					sandbox.Kill();
+			}
+
+			if (hasOutputLimit)
+			{
+				log.Warn("Программа вывела слишком много");
+				return new RunningResults(Verdict.OutputLimit);
+			}
+
+			if (hasTimeLimit)
+			{
+				log.Warn("Программа превысила ограничение по времени");
+				return new RunningResults(Verdict.TimeLimit);
+			}
+
+			if (hasMemoryLimit)
+			{
+				log.Warn("Программа превысила ограничение по памяти");
+				return new RunningResults(Verdict.MemoryLimit);
+			}
+
+			sandbox.WaitForExit((int) settings.WaitSandboxAfterKilling.TotalMilliseconds);
+			if (!sandbox.HasExited)
+				return new RunningResults(Verdict.SandboxError, error: "Can't kill sandbox");
+			if (sandbox.ExitCode != 0)
+				return GetResultForNonZeroExitCode(sandboxError, sandbox.ExitCode);
+
+			return new RunningResults(Verdict.Ok, output: sandboxOutput, error: sandboxError);
+		}
+
+		private void WaitUntilSandboxExit(Process sandbox, out string sandboxOutput, out string sandboxError)
+		{
+			sandbox.Refresh();
+			var startUsedMemory = sandbox.WorkingSet64;
+			var startUsedTime = sandbox.TotalProcessorTime;
+			var startTime = DateTime.Now;
+
+			sandbox.StandardInput.WriteLine("Run");
+			sandbox.StandardInput.Flush();
+			sandbox.StandardInput.WriteLineAsync(submission.Input);
+
+			var stderrReader = new AsyncReader(sandbox.StandardError, settings.OutputLimit + 1);
+			var stdoutReader = new AsyncReader(sandbox.StandardOutput, settings.OutputLimit + 1);
+			while (!sandbox.HasExited
+					&& !CheckIsTimeLimitExpected(sandbox, startTime, startUsedTime)
+					&& !CheckIsMemoryLimitExpected(sandbox, startUsedMemory)
+					&& !CheckIsOutputLimit(stdoutReader)
+					&& !CheckIsOutputLimit(stderrReader))
+			{
+			}
+
+			sandboxError = stderrReader.GetData();
+			sandboxOutput = stdoutReader.GetData();
+			CheckIsOutputLimit(stdoutReader);
+			CheckIsOutputLimit(stderrReader);
+		}
+
+		private void WaitUntilSandboxIsReady(Process sandbox)
+		{
+			var readyLineReadTask = sandbox.StandardOutput.ReadLineAsync();
+			if (readyLineReadTask.Wait(settings.TimeLimit) && readyLineReadTask.Result == "Ready")
+				return;
+
+			if (!sandbox.HasExited)
+				throw new SandboxErrorException($"Песочница не ответила «Ready» через {settings.TimeLimit.TotalSeconds} секунд после запуска, убиваю её");
+			
+			if (sandbox.ExitCode != 0)
+			{
+				log.Warn($"Песочница не ответила «Ready», а вышла с кодом {sandbox.ExitCode}");
+				var stderrReader = new AsyncReader(sandbox.StandardError, settings.OutputLimit + 1);
+				var result = GetResultForNonZeroExitCode(stderrReader.GetData(), sandbox.ExitCode);
+				throw new SandboxErrorException(result.Error);
+			}
+
+			throw new SandboxErrorException("Sandbox unexpectedly exited before respond");
+		}
+
+		private Process StartSandboxProcess(string sandboxArguments)
 		{
 			var workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
-			log.Info($"Запускаю C#-песочницу с аргументами: {args}\nРабочая директория: {workingDirectory}");
+			log.Info($"Запускаю C#-песочницу с аргументами: {sandboxArguments}\nРабочая директория: {workingDirectory}");
 
-			var startInfo = new ProcessStartInfo(Path.Combine(workingDirectory, "CsSandboxer.exe"), args)
+			var startInfo = new ProcessStartInfo(Path.Combine(workingDirectory, "CsSandboxer.exe"), sandboxArguments)
 			{
 				RedirectStandardInput = true,
 				RedirectStandardOutput = true,
@@ -231,141 +326,48 @@ namespace RunCsJob
 			};
 			startInfo.EnvironmentVariables.Add("InsideSandbox", "true");
 
-			Process sandboxer;
+			Process sandbox;
 			try
 			{
-				sandboxer = Process.Start(startInfo);
+				sandbox = Process.Start(startInfo);
 			}
 			catch (Exception e)
 			{
-				log.Error("Не могу запустить C#-песочницу", e);
-				result.Verdict = Verdict.SandboxError;
-				result.Error = "Can't start process";
-				return;
+				throw new SandboxErrorException("Не смог запустить C#-песочницу", e);
 			}
 
-			if (sandboxer == null)
-			{
-				log.Error("Не могу запустить C#-песочницу. Process.Start() вернул NULL");
-				result.Verdict = Verdict.SandboxError;
-				result.Error = "Can't start process";
-				return;
-			}
-
-			var stderrReader = new AsyncReader(sandboxer.StandardError, settings.OutputLimit + 1);
-
-			AsyncReader stdoutReader;
-			try
-			{
-				var readyState = sandboxer.StandardOutput.ReadLineAsync();
-				if (!readyState.Wait(settings.TimeLimit) || readyState.Result != "Ready")
-				{
-					if (!sandboxer.HasExited)
-					{
-						log.Error($"Песочница не завершилась через {settings.TimeLimit.TotalSeconds} секунд, убиваю её");
-						sandboxer.Kill();
-						result.Verdict = Verdict.SandboxError;
-						result.Error = "Sandbox does not respond";
-						return;
-					}
-					if (sandboxer.ExitCode != 0)
-					{
-						HandleNonZeroExitCode(stderrReader.GetData(), sandboxer.ExitCode);
-						return;
-					}
-					result.Verdict = Verdict.SandboxError;
-					result.Error = "Sandbox exit before respond";
-					return;
-				}
-
-				sandboxer.Refresh();
-				var startUsedMemory = sandboxer.WorkingSet64;
-				var startUsedTime = sandboxer.TotalProcessorTime;
-				var startTime = DateTime.Now;
-
-				sandboxer.StandardInput.WriteLine("Run");
-				sandboxer.StandardInput.WriteLineAsync(submission.Input);
-
-				stdoutReader = new AsyncReader(sandboxer.StandardOutput, settings.OutputLimit + 1);
-				while (!sandboxer.HasExited
-						&& !IsTimeLimitExpected(sandboxer, startTime, startUsedTime)
-						&& !IsMemoryLimitExpected(sandboxer, startUsedMemory)
-						&& !IsOutputLimit(stdoutReader)
-						&& !IsOutputLimit(stderrReader))
-				{
-				}
-			}
-			finally
-			{
-				if (!sandboxer.HasExited)
-					sandboxer.Kill();
-			}
-
-			if (hasOutputLimit)
-			{
-				result.Verdict = Verdict.OutputLimit;
-				return;
-			}
-
-			if (hasTimeLimit)
-			{
-				log.Error("Программа превысила ограничение по времени");
-				result.Verdict = Verdict.TimeLimit;
-				return;
-			}
-
-			if (hasMemoryLimit)
-			{
-				log.Error("Программа превысила ограничение по памяти");
-				result.Verdict = Verdict.MemoryLimit;
-				return;
-			}
-
-			sandboxer.WaitForExit();
-			if (sandboxer.ExitCode != 0)
-			{
-				HandleNonZeroExitCode(stderrReader.GetData(), sandboxer.ExitCode);
-				return;
-			}
-
-			result.Output = stdoutReader.GetData();
-			result.Error = stderrReader.GetData();
+			if (sandbox == null)
+				throw new SandboxErrorException("Не смог запустить C#-песочницу. Process.Start() вернул NULL");
+			
+			return sandbox;
 		}
 
-		private void HandleNonZeroExitCode(string error, int exitCode)
+		private RunningResults GetResultForNonZeroExitCode(string error, int exitCode)
 		{
-			var obj = FindSerializedException(error);
-
+			var obj = ParseSerializedException(error);
 			if (obj != null)
-				result.HandleException(obj);
-			else
-				HandleNtStatus(exitCode, error);
+				return GetResultFromException(obj);
+
+			log.Warn($"Не вытащил информацию об исключении из строчки \"{error}\", проверяю код выхода: {exitCode}");
+			return GetResultFromNtStatus(exitCode, error);
 		}
 
-		private void HandleNtStatus(int exitCode, string error)
+		private RunningResults GetResultFromNtStatus(int exitCode, string error)
 		{
-			log.Warn($"Не вытащил информацию об эксепшене из строчки \"{error}\", проверяю код выхода");
-			switch ((uint)exitCode)
-			{
-				case 0xC00000FD:
-					result.Verdict = Verdict.RuntimeError;
-					result.Error = "Stack overflow exception.";
-					break;
-				default:
-					result.Verdict = Verdict.SandboxError;
-					result.Error = string.IsNullOrWhiteSpace(error) ? "Non-zero exit code" : error;
-					result.Error += $"\nExit code: 0x{exitCode:X8}";
-					break;
-			}
+			if ((uint)exitCode == 0xC00000FD)
+				return new RunningResults(Verdict.RuntimeError, error: "Stack overflow exception");
+
+			var errorMessage = string.IsNullOrWhiteSpace(error) ? "Non-zero exit code" : error;
+			errorMessage += $"\nExit code: 0x{exitCode:X8}";
+			return new RunningResults(Verdict.SandboxError, error: errorMessage);
 		}
 
-		private bool IsOutputLimit(AsyncReader reader)
+		private bool CheckIsOutputLimit(AsyncReader reader)
 		{
-			return hasOutputLimit = hasOutputLimit
-									|| (reader.ReadedLength > settings.OutputLimit);
+			return hasOutputLimit = hasOutputLimit || reader.ReadedLength > settings.OutputLimit;
 		}
 
-		private bool IsMemoryLimitExpected(Process sandboxer, long startUsedMemory)
+		private bool CheckIsMemoryLimitExpected(Process sandboxer, long startUsedMemory)
 		{
 			sandboxer.Refresh();
 			long mem;
@@ -378,23 +380,22 @@ namespace RunCsJob
 				return hasMemoryLimit;
 			}
 
-			return hasMemoryLimit = hasMemoryLimit
-									|| startUsedMemory + settings.MemoryLimit < mem;
+			return hasMemoryLimit = hasMemoryLimit || startUsedMemory + settings.MemoryLimit < mem;
 		}
 
-		private bool IsTimeLimitExpected(Process sandboxer, DateTime startTime, TimeSpan startUsedTime)
+		private bool CheckIsTimeLimitExpected(Process sandboxer, DateTime startTime, TimeSpan startUsedTime)
 		{
 			return hasTimeLimit = hasTimeLimit
-								|| settings.TimeLimit.Add(startUsedTime).CompareTo(sandboxer.TotalProcessorTime) < 0
-								|| startTime.Add(settings.IdleTimeLimit).CompareTo(DateTime.Now) < 0;
+				|| settings.TimeLimit.Add(startUsedTime).CompareTo(sandboxer.TotalProcessorTime) < 0
+				|| startTime.Add(settings.IdleTimeLimit).CompareTo(DateTime.Now) < 0;
 		}
 
-		private static Exception FindSerializedException(string str)
+		private static Exception ParseSerializedException(string stderr)
 		{
-			if (!str.EndsWith("}"))
+			if (!stderr.EndsWith("}"))
 				return null;
 
-			var pos = str.LastIndexOf(Environment.NewLine, StringComparison.Ordinal);
+			var pos = stderr.LastIndexOf(Environment.NewLine, StringComparison.Ordinal);
 
 			if (pos == -1)
 				return null;
@@ -406,13 +407,68 @@ namespace RunCsJob
 
 			try
 			{
-				var obj = JsonConvert.DeserializeObject(str.Substring(pos), jsonSettings);
+				var obj = JsonConvert.DeserializeObject(stderr.Substring(pos), jsonSettings);
 				return obj as Exception;
 			}
 			catch
 			{
 				return null;
 			}
+		}
+
+		private static RunningResults GetResultFromException(Exception ex)
+		{
+			if (ex is TargetInvocationException)
+				return HandleTargetInvocationException((TargetInvocationException) ex);
+
+			return new RunningResults(Verdict.SandboxError, ex.ToString());
+		}
+
+		private static RunningResults HandleTargetInvocationException(TargetInvocationException ex)
+		{
+			return HandleInnerException((dynamic)ex.InnerException);
+		}
+
+		private static RunningResults HandleInnerException(SecurityException ex)
+		{
+			return new RunningResults(Verdict.SecurityException, ex.ToString());
+		}
+
+		private static RunningResults HandleInnerException(MemberAccessException ex)
+		{
+			return new RunningResults(Verdict.SecurityException, ex.ToString());
+		}
+
+		private static RunningResults HandleInnerException(TypeInitializationException ex)
+		{
+			return new RunningResults(Verdict.SecurityException, ex.ToString());
+		}
+
+		private static RunningResults HandleInnerException(Exception ex)
+		{
+			return new RunningResults(Verdict.RuntimeError, ex.ToString());
+		}
+	}
+
+	internal class SandboxErrorException : Exception
+	{
+		public SandboxErrorException()
+		{
+		}
+
+		public SandboxErrorException(string message)
+			: base(message)
+		{
+		}
+
+		public SandboxErrorException(string message, Exception innerException)
+			: base(message, innerException)
+		{
+		}
+
+		protected SandboxErrorException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
+		{
 		}
 	}
 }

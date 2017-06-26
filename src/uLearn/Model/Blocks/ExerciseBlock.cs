@@ -65,7 +65,7 @@ namespace uLearn.Model.Blocks
 
 		public abstract SolutionBuildResult BuildSolution(string userWrittenCode);
 
-		public abstract RunnerSubmission CreateSubmition(string submissionId, string code);
+		public abstract RunnerSubmission CreateSubmission(string submissionId, string code);
 
 		#region equals
 

@@ -88,7 +88,7 @@ namespace uLearn.Web.Controllers
 
 			courseManager.WaitWhileCourseIsLocked(submission.CourseId);
 
-			return exerciseSlide.Exercise.CreateSubmition(
+			return exerciseSlide.Exercise.CreateSubmission(
 				submission.Id.ToString(),
 				submission.SolutionCode.Text
 			);
@@ -99,9 +99,13 @@ namespace uLearn.Web.Controllers
 		public async Task PostResults([FromUri] string token, List<RunningResults> results)
 		{
 			if (!ModelState.IsValid)
+			{
+				var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+				log.Error($"Не могу принять от RunCsJob результаты проверки решений, ошибки: {string.Join(", ", errors)}");
 				throw new HttpResponseException(HttpStatusCode.BadRequest);
+			}
 			CheckRunner(token);
-			log.Info($"Получил от RunCsJob информацию о проверке решений: [{string.Join(", ", results.Select(r => r.Id))}]");
+			log.Info($"Получил от RunCsJob результаты проверки решений: [{string.Join(", ", results.Select(r => r.Id))}]");
 			await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResults(results), 3);
 
 			var submissionsByIds = userSolutionsRepo

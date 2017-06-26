@@ -24,7 +24,7 @@ namespace CsSandboxer
 			Console.OutputEncoding = Encoding.UTF8;
 			SetErrorMode(ErrorModes.SEM_NOGPFAULTERRORBOX); // WinOnly StackOverflow handling fix
 			Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-			//			Console.InputEncoding = Encoding.UTF8;
+			Console.InputEncoding = Encoding.UTF8;
 			var assemblyPath = args[0];
 			var id = args[1];
 			Assembly assembly = null;
@@ -49,7 +49,10 @@ namespace CsSandboxer
 			Console.Out.WriteLine("Ready");
 			var runCommand = Console.In.ReadLineAsync();
 			if (!runCommand.Wait(1000) || runCommand.Result != "Run")
-				Environment.Exit(1);
+			{
+				Console.Error.WriteLine($"Can't receive Run command: {runCommand.Result}");
+				Environment.Exit(2);
+			}
 
 			try
 			{
@@ -66,7 +69,7 @@ namespace CsSandboxer
 			Console.Error.WriteLine();
 			Console.Error.Write(JsonConvert.SerializeObject(ex, settings));
 			Console.Error.Close();
-			Environment.Exit(1);
+			Environment.Exit(3);
 		}
 
 		private static AppDomain CreateDomain(string id, string assemblyPath)

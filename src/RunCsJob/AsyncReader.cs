@@ -5,23 +5,23 @@ namespace RunCsJob
 {
 	public class AsyncReader
 	{
-		private readonly char[] _buffer;
-		private readonly Task<int> _readerTask;
+		private readonly char[] buffer;
+		private readonly Task<int> readerTask;
 
 		public AsyncReader(StreamReader reader, int length)
 		{
-			_buffer = new char[length];
-			_readerTask = reader.ReadBlockAsync(_buffer, 0, length);
+			buffer = new char[length];
+			readerTask = reader.ReadBlockAsync(buffer, 0, length);
 		}
 
 		public string GetData()
 		{
-			_readerTask.Wait();
-			return new string(_buffer, 0, _readerTask.Result);
+			readerTask.Wait();
+			return new string(buffer, 0, readerTask.Result);
 		}
 
-		private bool IsCompleted => _readerTask.IsCompleted;
+		private bool IsCompleted => readerTask.IsCompleted;
 
-		public int ReadedLength => IsCompleted ? _readerTask.Result : -1;
+		public int ReadedLength => IsCompleted ? readerTask.Result : -1;
 	}
 }
