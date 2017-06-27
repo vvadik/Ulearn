@@ -53,9 +53,10 @@ namespace uLearn.Web.Controllers
 
 		protected async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string userCode, string userId, string userName, bool waitUntilChecked, bool saveSubmissionOnCompileErrors)
 		{
-			var exerciseMetricId = $"{courseId.ToLower(CultureInfo.InvariantCulture)}.{exerciseSlide.Id}.{exerciseSlide.LatinTitle.Replace(".", "_")}";
-			metricSender.SendCount($"exercise.{exerciseMetricId}.try");
+			var exerciseMetricId = $"{courseId.ToLower(CultureInfo.InvariantCulture)}.{exerciseSlide.Id:N}.{exerciseSlide.LatinTitle.Replace(".", "_").ToLower(CultureInfo.InvariantCulture)}";
 			metricSender.SendCount("exercise.try");
+			metricSender.SendCount($"exercise.{courseId.ToLower(CultureInfo.InvariantCulture)}.try");
+			metricSender.SendCount($"exercise.{exerciseMetricId}.try");
 
 			var course = courseManager.GetCourse(courseId);
 			var exerciseBlock = exerciseSlide.Exercise;
