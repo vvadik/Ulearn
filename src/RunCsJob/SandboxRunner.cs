@@ -201,33 +201,14 @@ namespace RunCsJob
 
 		private RunningResults RunSandbox(string sandboxArguments)
 		{
-			Process sandbox;
-			try
-			{
-				sandbox = StartSandboxProcess(sandboxArguments);
-			}
-			catch (SandboxErrorException e)
-			{
-				log.Error(e.Message, e.InnerException);
-				return new RunningResults(Verdict.SandboxError, error: e.Message);
-			}
-
+			var sandbox = StartSandboxProcess(sandboxArguments);
 			string sandboxOutput;
 			string sandboxError;
 			try
 			{
-				try
-				{
-					WaitUntilSandboxIsReady(sandbox);
-				}
-				catch (SandboxErrorException e)
-				{
-					log.Error(e.Message, e.InnerException);
-					return new RunningResults(Verdict.SandboxError, error: e.Message);
-				}
-
+				WaitUntilSandboxIsReady(sandbox);
 				log.Info("Песочница ответила Ready");
-				WaitUntilSandboxExit(sandbox, out sandboxOutput, out sandboxError);
+				RunSolutionAndWaitUntilSandboxExit(sandbox, out sandboxOutput, out sandboxError);
 			}
 			finally
 			{
@@ -262,7 +243,7 @@ namespace RunCsJob
 			return new RunningResults(Verdict.Ok, output: sandboxOutput, error: sandboxError);
 		}
 
-		private void WaitUntilSandboxExit(Process sandbox, out string sandboxOutput, out string sandboxError)
+		private void RunSolutionAndWaitUntilSandboxExit(Process sandbox, out string sandboxOutput, out string sandboxError)
 		{
 			sandbox.Refresh();
 			var startUsedMemory = sandbox.WorkingSet64;
@@ -288,8 +269,8 @@ namespace RunCsJob
 				/* Read all data to the end of streams */
 				sandboxError = stderrReader.GetData();
 				sandboxOutput = stdoutReader.GetData();
-				CheckIsOutputLimit(stdoutReader);
-				CheckIsOutputLimit(stderrReader);
+				hasOutputLimit = CheckIsOutputLimit(stdoutReader);
+				hasOutputLimit = CheckIsOutputLimit(stderrReader);
 			}
 			else
 			{
