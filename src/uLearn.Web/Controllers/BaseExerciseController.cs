@@ -55,6 +55,7 @@ namespace uLearn.Web.Controllers
 		{
 			var exerciseMetricId = $"{courseId.ToLower(CultureInfo.InvariantCulture)}.{exerciseSlide.Id}.{exerciseSlide.LatinTitle.Replace(".", "_")}";
 			metricSender.SendCount($"exercise.{exerciseMetricId}.try");
+			metricSender.SendCount("exercise.try");
 
 			var course = courseManager.GetCourse(courseId);
 			var exerciseBlock = exerciseSlide.Exercise;
@@ -125,6 +126,7 @@ namespace uLearn.Web.Controllers
 				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission);
 				await visitsRepo.MarkVisitsAsWithManualChecking(exerciseSlide.Id, userId);
 				metricSender.SendCount($"exercise.{exerciseMetricId}.sent_to_review");
+				metricSender.SendCount("exercise.sent_to_review");
 			}
 			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, userId);
 
