@@ -140,5 +140,7 @@ namespace Database.DataContexts
 
 		public DbSet<XQueueWatcher> XQueueWatchers { get; set; }
 		public DbSet<XQueueExerciseSubmission> XQueueExerciseSubmissions { get; set; }
+
+		public DbSet<FeedUpdateTimestamp> FeedUpdateTimestamps { get; set;  }
 	}
 }

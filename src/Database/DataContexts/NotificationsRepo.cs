@@ -57,9 +57,24 @@ namespace Database.DataContexts
 
 		private void DeleteOldNotificationTransports<TTransport>(string userId) where TTransport : NotificationTransport
 		{
+			/*
 			var transports = db.NotificationTransports
 				.Where(t => t.UserId == userId && !t.IsDeleted)
 				.OfType<TTransport>().ToList();
+			foreach (var transport in transports)
+				transport.IsDeleted = true;
+			*/
+			DeleteOldNotificationTransports(typeof(TTransport), userId);
+		}
+
+		private void DeleteOldNotificationTransports(Type transportType, string userId)
+		{
+			if (!typeof(NotificationTransport).IsAssignableFrom(transportType))
+				throw new ArgumentException("Parameter 'transportType' is not a NotificationTransport", nameof(transportType));
+
+			var transports = db.NotificationTransports
+				.Where(t => t.UserId == userId && !t.IsDeleted && t.GetType() == transportType)
+				.ToList();
 			foreach (var transport in transports)
 				transport.IsDeleted = true;
 		}
@@ -68,10 +83,13 @@ namespace Database.DataContexts
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
+				DeleteOldNotificationTransports(transport.GetType(), transport.UserId);
+				/*
 				if (transport is MailNotificationTransport)
 					DeleteOldNotificationTransports<MailNotificationTransport>(transport.UserId);
 				if (transport is TelegramNotificationTransport)
 					DeleteOldNotificationTransports<TelegramNotificationTransport>(transport.UserId);
+				*/
 
 				transport.IsDeleted = false;
 				db.NotificationTransports.Add(transport);

@@ -46,6 +46,14 @@ namespace Database.Models
 		}
 	}
 
+	public class FeedNotificationTransport : NotificationTransport
+	{
+		public override string ToString()
+		{
+			return $"Feed <{User.Id}> (#{Id})";
+		}
+	}
+
 	public class NotificationTransportSettings
 	{
 		[Key]
