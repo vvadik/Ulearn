@@ -79,7 +79,8 @@ namespace uLearn.Web
 				"~/Scripts/grader.js",
 				"~/Scripts/notifications-settings.js",
 				"~/Scripts/profile.js",
-				"~/Scripts/email-is-not-confirmed.js"
+				"~/Scripts/email-is-not-confirmed.js",
+				"~/Scripts/notifications.js"
 			);
 		}
 
@@ -103,7 +104,8 @@ namespace uLearn.Web
 				"~/Content/jquery-ui.min.css",
 				"~/Content/site.css",
 				"~/Content/buttons.css",
-				"~/Content/likely.css"
+				"~/Content/likely.css",
+				"~/Content/notifications.css"
 				);
 		}
 	}

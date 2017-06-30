@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Web.Mvc;
 using Newtonsoft.Json;
@@ -29,7 +30,12 @@ namespace uLearn.Web.Controllers
 			if (Data != null)
 			{
 				// Use the DataContractJsonSerializer instead of the JavaScriptSerializer 
-				var serializer = new DataContractJsonSerializer(Data.GetType());
+				var serializer = new DataContractJsonSerializer(
+					Data.GetType(),
+					new DataContractJsonSerializerSettings {
+						DateTimeFormat = new DateTimeFormat("yyyy-MM-dd'T'HH:mm:ss")
+					}
+				);
 				serializer.WriteObject(response.OutputStream, Data);
 			}
 		}

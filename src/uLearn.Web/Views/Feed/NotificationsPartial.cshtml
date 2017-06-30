@@ -1,0 +1,93 @@
+﻿@using Database.Extensions
+@using Database.Models
+@using uLearn
+@using uLearn.Web.Extensions
+@using uLearn.Web.Views.Shared
+
+@model uLearn.Web.Controllers.NotificationsPartialModel
+
+@if (Model.Notifications.Count > 0)
+{
+	foreach (var notification in Model.Notifications)
+	{
+		<li class="notifications__notification">
+			@Notification((dynamic)notification, Model.CourseManager.FindCourse(notification.CourseId))
+		</li>
+	}
+}
+else
+{
+	<li class="notifications__notification">
+		Здесь появятся уведомления из&nbsp;курсов, в&nbsp;которых вы обучаетесь@(User.HasAccess(CourseRole.Instructor) ? " и преподаёте" : "")
+	</li>
+}
+
+@functions
+{
+	string GetSlideUrl(Course course, Slide slide)
+	{
+		return Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
+	}
+}
+
+@helper SlideLink(Course course, Slide slide)
+{
+	<a href="@GetSlideUrl(course, slide)">«@slide.Title.TruncateWithEllipsis(40)»</a>
+}
+
+@helper UserName(ApplicationUser user)
+{
+	<span class="notifications__notification__user">@user.VisibleName</span>
+}
+
+@*
+	SystemMessageNotification
+	InstructorMessageNotification
+*@
+
+@helper Notification(NewCommentNotification notification, Course course)
+{
+	var slide = course.FindSlideById(notification.Comment.SlideId);
+	<div class="notifications__new-comment-notification media" data-href="@GetSlideUrl(course, slide)#comment-@notification.Comment.Id">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.Comment.Author)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">@UserName(notification.Comment.Author) прокомментировал@(notification.Comment.Author.Gender.ChooseEnding()) @SlideLink(course, slide)</div>
+			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@notification.Comment.Text.TruncateWithEllipsis(100)</div>
+			<div class="notifications__notification__footer">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+	
+}
+
+@helper Notification(RepliedToYourCommentNotification notification, Course course)
+{
+	var slide = course.FindSlideById(notification.Comment.SlideId);
+	<div class="notifications__replied-to-your-comment-notification media" data-href="@GetSlideUrl(course, slide)#comment-@notification.Comment.Id">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.Comment.Author)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">@UserName(notification.Comment.Author) отвеетил@(notification.Comment.Author.Gender.ChooseEnding()) на&nbsp;ваш комментарий</div>
+			<div title="@notification.ParentComment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__cite">@notification.ParentComment.Text.TruncateWithEllipsis(50)</div>
+			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@notification.Comment.Text.TruncateWithEllipsis(100)</div>
+			<div class="notifications__notification__footer">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(LikedYourCommentNotification notification, Course course)
+{
+	var slide = course.FindSlideById(notification.Comment.SlideId);
+	<div class="notifications__liked-your-comment-notification media" data-href="@GetSlideUrl(course, slide)#comment-@notification.Comment.Id">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.LikedUser)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">@UserName(notification.LikedUser) лайкнул@(notification.LikedUser.Gender.ChooseEnding()) ваш комментарий</div>
+			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@notification.Comment.Text.TruncateWithEllipsis(100)</div>
+			<div class="notifications__notification__footer">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}

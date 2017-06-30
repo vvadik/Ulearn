@@ -1,0 +1,84 @@
+﻿.notifications__icon-link {
+}
+
+.notifications__icon {
+	font-size: 18px;
+}
+
+.notifications__dropdown {
+	width: 300px;
+	max-height: 300px;
+	overflow-y: scroll;
+}
+
+.notifications__counter {
+	position: relative;
+	font-size: 10px;
+	top: -10px;
+	left: -8px;
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	background-color: #fafffa;
+	text-align: center;
+	border-radius: 7px;
+	color: #393;
+	border: 1px solid rgba(50, 100, 50, 0.7);
+}
+
+@media (min-width: 900px) {
+	.notifications__dropdown {
+		width: 500px;
+	}
+}
+
+.notifications__dropdown::-webkit-scrollbar {
+	width: 7px;
+}
+ 
+.notifications__dropdown::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.notifications__dropdown::-webkit-scrollbar-thumb {
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	background: #eee;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+
+.notifications__notification {
+	padding: 7px 15px;
+}
+
+.notifications__notification:hover {
+	background-color: #f8f8ff;
+	cursor: pointer;
+}
+	
+.notifications__notification__header,
+.notifications__notification__footer {
+	font-size: 12px;
+}
+
+.notifications__notification__header {
+	margin-top: 3px;
+}
+.notifications__notification__footer {
+	color: #bbb;
+}
+
+.notifications__notification__user {
+	font-weight: bold;
+	color: #060;
+}
+
+.notifications__comment-notification__cite {
+	font-style: italic;
+}
+
+.notifications__comment-notification__text {
+	_font-weight: bold;
+}

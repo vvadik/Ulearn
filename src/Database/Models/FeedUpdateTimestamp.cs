@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Database.Models
 {
-	public class FeedUpdateTimestamp
+	public class FeedViewTimestamp
 	{
 		[Key]
 		[StringLength(64)]

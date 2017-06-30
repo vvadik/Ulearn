@@ -8,6 +8,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using Database.Extensions;
+using Database.Migrations;
 using Database.Models;
 using log4net;
 using uLearn;
@@ -73,7 +74,8 @@ namespace Database.DataContexts
 				throw new ArgumentException("Parameter 'transportType' is not a NotificationTransport", nameof(transportType));
 
 			var transports = db.NotificationTransports
-				.Where(t => t.UserId == userId && !t.IsDeleted && t.GetType() == transportType)
+				.Where(t => t.UserId == userId && !t.IsDeleted)
+				.DynamicOfType(transportType)
 				.ToList();
 			foreach (var transport in transports)
 				transport.IsDeleted = true;
@@ -281,6 +283,8 @@ namespace Database.DataContexts
 							! s.NotificationTransport.IsDeleted &&
 							recipientsIds.Contains(s.NotificationTransport.UserId)).ToList();
 
+			var commonTransports = db.NotificationTransports.Where(t => t.UserId == null && t.IsEnabled).ToList();
+
 			var isEnabledByDefault = notificationType.IsEnabledByDefault();
 
 			if (isEnabledByDefault)
@@ -301,6 +305,22 @@ namespace Database.DataContexts
 						IsEnabled = true,
 						NotificationTransport = transport,
 						NotificationTransportId = transport.Id,
+					});
+				}
+			}
+			else if (notification.IsNotificationForEveryone)
+			{
+				/* Add notification to all common transports */
+				/* It's used i.e. for new-commen- notification which should be sent to everyone in the course */
+				log.Info($"Notification #{notification.Id}. This notification type is sent to everyone, so add it to all common transports ({commonTransports.Count} transport(s)):");
+				foreach (var commonTransport in commonTransports)
+				{
+					log.Info($"Common transport {commonTransport}");
+					transportsSettings.Add(new NotificationTransportSettings
+					{
+						IsEnabled = true,
+						NotificationTransport = commonTransport,
+						NotificationTransportId = commonTransport.Id,
 					});
 				}
 			}
@@ -413,6 +433,24 @@ namespace Database.DataContexts
 		public List<T> FindNotifications<T>(Func<T, bool> func) where T : Notification
 		{
 			return db.Notifications.OfType<T>().Where(func).ToList();
+		}
+
+		public IQueryable<NotificationDelivery> GetTransportDeliveries(NotificationTransport notificationTransport, DateTime from)
+		{
+			return db.NotificationDeliveries.Where(d => d.NotificationTransportId == notificationTransport.Id && d.CreateTime > from);
+		}
+
+		public IQueryable<NotificationDelivery> GetTransportsDeliveries(List<int> notificationTransportsIds, DateTime from)
+		{
+			return db.NotificationDeliveries.Include(d => d.Notification).Where(d => notificationTransportsIds.Contains(d.NotificationTransportId) && d.CreateTime > from);
+		}
+
+		public DateTime? GetLastDeliveryTimestamp(NotificationTransport notificationTransport)
+		{
+			var lastNotification = db.NotificationDeliveries.Where(d => d.NotificationTransportId == notificationTransport.Id)
+				.OrderByDescending(d => d.CreateTime)
+				.FirstOrDefault();
+			return lastNotification?.CreateTime;
 		}
 	}
 

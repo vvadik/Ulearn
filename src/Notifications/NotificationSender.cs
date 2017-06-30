@@ -180,12 +180,8 @@ namespace Notifications
 
 			metricSender.SendCount($"send_notification.{notificationDelivery.Notification.GetNotificationType()}");
 
-			if (transport is MailNotificationTransport)
-				await SendAsync(transport as MailNotificationTransport, notificationDelivery);
-			else if (transport is TelegramNotificationTransport)
-				await SendAsync(transport as TelegramNotificationTransport, notificationDelivery);
-			else
-				throw new Exception($"Unknown notification transport: {transport.GetType()}");
+			if (transport is MailNotificationTransport || transport is TelegramNotificationTransport)
+				await SendAsync((dynamic) transport, notificationDelivery);
 		}
 
 		public async Task SendAsync(List<NotificationDelivery> notificationDeliveries)
@@ -205,12 +201,8 @@ namespace Notifications
 
 			metricSender.SendCount($"send_notification.{notificationType}", notificationDeliveries.Count);
 
-			if (transport is MailNotificationTransport)
-				await SendAsync(transport as MailNotificationTransport, notificationDeliveries);
-			else if (transport is TelegramNotificationTransport)
-				await SendAsync(transport as TelegramNotificationTransport, notificationDeliveries);
-			else
-				throw new Exception($"Unknown notification transport: {transport.GetType()}");
+			if (transport is MailNotificationTransport || transport is TelegramNotificationTransport)
+				await SendAsync((dynamic) transport , notificationDeliveries);
 		}
 	}
 }

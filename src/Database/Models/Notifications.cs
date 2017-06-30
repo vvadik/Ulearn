@@ -34,7 +34,7 @@ namespace Database.Models
 	{
 		public override string ToString()
 		{
-			return $"Email <{User.Email ?? User.Id}> (#{Id})";
+			return $"Email <{User?.Email ?? User?.Id}> (#{Id})";
 		}
 	}
 
@@ -42,7 +42,7 @@ namespace Database.Models
 	{
 		public override string ToString()
 		{
-			return $"Telegram <{User.TelegramChatId?.ToString() ?? User.Id}> (#{Id})";
+			return $"Telegram <{User?.TelegramChatId?.ToString() ?? User?.Id}> (#{Id})";
 		}
 	}
 
@@ -50,7 +50,7 @@ namespace Database.Models
 	{
 		public override string ToString()
 		{
-			return $"Feed <{User.Id}> (#{Id})";
+			return $"Feed <{User?.Id}> (#{Id})";
 		}
 	}
 
@@ -95,6 +95,7 @@ namespace Database.Models
 
 		public NotificationDeliveryStatus Status { get; set; }
 
+		[Index("IDX_NotificatoinDelivery_ByCreateTime")]
 		public DateTime CreateTime { get; set; }
 
 		[Index("IDX_NotificationDelivery_ByNextTryTime")]
@@ -202,10 +203,12 @@ namespace Database.Models
 
 		[Display(Name = @"Загружен новый пакет", GroupName = @"Загружены новые пакеты")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
+		[IsEnabledByDefault(true)]
 		UploadedPackage = 203,
 
 		[Display(Name = @"Опубликован новый пакет", GroupName = @"Опубликованы новые пакеты")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
+		[IsEnabledByDefault(true)]
 		PublishedPackage = 204,
 	}
 
@@ -283,6 +286,7 @@ namespace Database.Models
 		public abstract NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl);
 
 		public abstract List<string> GetRecipientsIds(ULearnDb db);
+		public virtual bool IsNotificationForEveryone => false;
 
 		public abstract bool IsActual();
 
@@ -449,6 +453,8 @@ namespace Database.Models
 		{
 			return new VisitsRepo(db).GetCourseUsers(CourseId);
 		}
+
+		public override bool IsNotificationForEveryone => true;
 
 		public override List<Notification> GetBlockerNotifications(ULearnDb db)
 		{

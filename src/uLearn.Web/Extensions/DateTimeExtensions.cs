@@ -58,5 +58,36 @@ namespace uLearn.Web.Extensions
 
 			return $"{daysAgo.PluralizeInRussian(RussianPluralizationOptions.Day)} назад";
 		}
+
+		public static DateTime MaxWith(this DateTime first, DateTime second)
+		{
+			return first > second ? first : second;
+		}
+
+		public static DateTime MinWith(this DateTime first, DateTime second)
+		{
+			return first < second ? first : second;
+		}
+
+		public static DateTime? MaxWith(this DateTime? first, DateTime? second)
+		{
+			if (!first.HasValue && !second.HasValue)
+				return null;
+
+			first = first ?? DateTime.MinValue;
+			second = second ?? DateTime.MinValue;
+			return first.Value.MaxWith(second.Value);
+		}
+
+		public static DateTime? MinWith(this DateTime? first, DateTime? second)
+		{
+			if (!first.HasValue && !second.HasValue)
+				return null;
+
+			first = first ?? DateTime.MinValue;
+			second = second ?? DateTime.MinValue;
+			return first.Value.MinWith(second.Value);
+		}
+
 	}
 }

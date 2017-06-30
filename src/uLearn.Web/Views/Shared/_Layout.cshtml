@@ -86,7 +86,13 @@
 						@Html.Action("CourseInstructorNavbar", "Course", new { courseId })
 					}
 				</ul>
-				@Html.Action("UserMenuPartial", "Account")
+				<ul class="nav navbar-nav navbar-right">
+					@if (User.Identity.IsAuthenticated)
+					{
+						@Html.Action("NotificationsTopbarPartial", "Feed")
+					}
+					@Html.Action("UserMenuPartial", "Account")
+				</ul>
 			</div>
 		</div>
 	</div>

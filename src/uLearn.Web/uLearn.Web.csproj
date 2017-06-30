@@ -344,6 +344,7 @@
     <Compile Include="codemirror\CsCompleterGenerator.cs" />
     <Compile Include="Controllers\BaseExerciseController.cs" />
     <Compile Include="Controllers\CertificatesController.cs" />
+    <Compile Include="Controllers\FeedController.cs" />
     <Compile Include="Controllers\GraderController.cs" />
     <Compile Include="Controllers\JsonDataContractController.cs" />
     <Compile Include="Controllers\JsonDataContractHelpers.cs" />
@@ -758,6 +759,7 @@
     <Content Include="Content\loading-ring.gif" />
     <Content Include="Content\loading.gif" />
     <Content Include="Content\logo.png" />
+    <Content Include="Content\notifications.css" />
     <Content Include="Content\summer-practice.png" />
     <Content Include="Content\tablesorter.css" />
     <Content Include="Content\ulearn.css" />
@@ -848,6 +850,7 @@
     <Content Include="Scripts\likely.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\notifications-settings.js" />
+    <Content Include="Scripts\notifications.js" />
     <Content Include="Scripts\notify-custom.min.js" />
     <Content Include="Scripts\profile.js" />
     <Content Include="Scripts\respond.js" />
@@ -1116,6 +1119,8 @@
     <Content Include="Views\Account\EmailIsNotConfirmedPopup.cshtml" />
     <Content Include="Scripts\jquery-3.1.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.1.1.min.map" />
+    <Content Include="Views\Feed\NotificationsTopbarPartial.cshtml" />
+    <Content Include="Views\Feed\NotificationsPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
