@@ -53,7 +53,10 @@ namespace uLearn.Web.Controllers
 
 		protected async Task<RunSolutionResult> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string userCode, string userId, string userName, bool waitUntilChecked, bool saveSubmissionOnCompileErrors)
 		{
-			var exerciseMetricId = $"{courseId.ToLower(CultureInfo.InvariantCulture)}.{exerciseSlide.Id:N}.{exerciseSlide.LatinTitle.Replace(".", "_").ToLower(CultureInfo.InvariantCulture)}";
+			var slideTitleForMetric = exerciseSlide.LatinTitle.Replace(".", "_").ToLower(CultureInfo.InvariantCulture);
+			if (slideTitleForMetric.Length > 25)
+				slideTitleForMetric = slideTitleForMetric.Substring(0, 25);
+			var exerciseMetricId = $"{courseId.ToLower(CultureInfo.InvariantCulture)}.{exerciseSlide.Id.ToString("N").Substring(32 - 25)}.{slideTitleForMetric}";
 			metricSender.SendCount("exercise.try");
 			metricSender.SendCount($"exercise.{courseId.ToLower(CultureInfo.InvariantCulture)}.try");
 			metricSender.SendCount($"exercise.{exerciseMetricId}.try");
