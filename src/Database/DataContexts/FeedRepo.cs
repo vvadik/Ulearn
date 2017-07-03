@@ -77,15 +77,20 @@ namespace Database.DataContexts
 		public int GetNotificationsCount(string userId, DateTime from, params FeedNotificationTransport[] transports)
 		{
 			var nextSecond = from.AddSeconds(1);
-			return GetFeedNotificationDeliveriesQueryable(userId, transports)
-				.Count(d => d.CreateTime >= nextSecond);
+			var deliveriesQueryable = GetFeedNotificationDeliveriesQueryable(userId, transports);
+
+			/* Each RepliedToYourCommentNotifications is duplicated by NewCommentNotifications in the feed. 
+			 * So to calculate correct number of unread notifications we will substract replies count from total notifications count */
+			var totalCount = deliveriesQueryable.Count(d => d.CreateTime >= nextSecond);
+			var repliesCount = deliveriesQueryable.Where(d => d.Notification is RepliedToYourCommentNotification).Count(d => d.CreateTime >= nextSecond);
+			return Math.Max(0, totalCount - repliesCount);
 		}
 
 		public List<NotificationDelivery> GetFeedNotificationDeliveries(string userId, params FeedNotificationTransport[] transports)
 		{
 			return GetFeedNotificationDeliveriesQueryable(userId, transports)
 				.OrderByDescending(d => d.CreateTime)
-				.Take(20)
+				.Take(99)
 				.ToList();
 		}
 

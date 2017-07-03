@@ -31,7 +31,8 @@
 				var unreadCount = data.count;
 				if (unreadCount > 0) {
 					var currentCount = parseInt($counter.text());
-					$counter.text(currentCount + unreadCount).show();
+					var newCount = Math.min(currentCount + unreadCount, 99);
+					$counter.text(newCount).show();
 					lastCountUpdateTimestamp = data.last_timestamp;
 				}
 			} else {
@@ -41,5 +42,5 @@
 	}
 
 	if ($('.notifications__icon-link').length > 0)
-		setInterval(updateNotificationUnreadCount, 10 * 1000);
+		setInterval(updateNotificationUnreadCount, 60 * 1000);
 });

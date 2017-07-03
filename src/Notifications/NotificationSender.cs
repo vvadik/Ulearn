@@ -166,7 +166,7 @@ namespace Notifications
 				var htmlMessage = notification.GetHtmlMessageForDelivery(transport, delivery, course, baseUrl);
 				var button = notification.GetNotificationButton(transport, delivery, course, baseUrl);
 				if (button != null)
-					htmlMessage += $"<br/></br><a href=\"{button.Link.EscapeHtml()}\">{button.Text.EscapeHtml()}</a>";
+					htmlMessage += $"<br/><br/><a href=\"{button.Link.EscapeHtml()}\">{button.Text.EscapeHtml()}</a>";
 
 				htmls.Add(htmlMessage);
 			}

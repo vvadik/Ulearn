@@ -20,6 +20,7 @@ namespace uLearn.Web.Controllers
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(FeedController));
 
+		private readonly ULearnDb db;
 		private readonly CourseManager courseManager;
 
 		private readonly NotificationsRepo notificationsRepo;
@@ -34,6 +35,7 @@ namespace uLearn.Web.Controllers
 
 		public FeedController(ULearnDb db, CourseManager courseManager)
 		{
+			this.db = db;
 			this.courseManager = courseManager;
 			notificationsRepo = new NotificationsRepo(db);
 			feedRepo = new FeedRepo(db);
@@ -103,12 +105,20 @@ namespace uLearn.Web.Controllers
 			var notifications = new List<Notification>();
 			if (notificationTransport != null)
 				notifications = feedRepo.GetFeedNotificationDeliveries(userId, commonFeedNotificationTransport, notificationTransport).Select(d => d.Notification).ToList();
+
+			notifications = RemoveBlockedNotifications(notifications);
+
 			await feedRepo.UpdateFeedViewTimestamp(userId, DateTime.Now);
 			return PartialView(new NotificationsPartialModel
 			{
 				Notifications = notifications,
 				CourseManager = courseManager,
 			});
+		}
+
+		private List<Notification> RemoveBlockedNotifications(IEnumerable<Notification> notifications)
+		{
+			return notifications.Where(notification => !notification.GetBlockerNotifications(db).Any()).ToList();
 		}
 
 		[DataContract]
