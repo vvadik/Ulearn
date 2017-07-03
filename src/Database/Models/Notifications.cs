@@ -201,12 +201,12 @@ namespace Database.Models
 		[IsEnabledByDefault(true)]
 		CreatedGroup = 202,
 
-		[Display(Name = @"Загружен новый пакет", GroupName = @"Загружены новые пакеты")]
+		[Display(Name = @"Загружена новая версия курса", GroupName = @"Загружены новые версии курса")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		UploadedPackage = 203,
 
-		[Display(Name = @"Опубликован новый пакет", GroupName = @"Опубликованы новые пакеты")]
+		[Display(Name = @"Опубликована новая версия курса", GroupName = @"Опубликованы новые версии курса")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		PublishedPackage = 204,
@@ -708,10 +708,11 @@ namespace Database.Models
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			var unit = course.FindUnitById(Score.UnitId);
-			if (unit == null)
+			var scoringGroup = unit?.Scoring.Groups.GetOrDefault(Score.ScoringGroupId, null);
+			if (scoringGroup == null)
 				return null;
 
-			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} поставил{InitiatedBy.Gender.ChooseEnding()} вам баллы за модуль «{GetUnitTitle(course, unit).EscapeHtml()}»:</b><br/>" +
+			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} поставил{InitiatedBy.Gender.ChooseEnding()} вам баллы <i>{scoringGroup.Name.EscapeHtml()}</i> в&nbsp;модуле «{GetUnitTitle(course, unit).EscapeHtml()}»:</b><br/>" +
 				   $"вы получили {Score.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}<br/><br/>" +
 				   "Полную ведомость смотрите на&nbsp;<a href=\"https://ulearn.me\">ulearn.me</a>.";
 		}
@@ -719,10 +720,11 @@ namespace Database.Models
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
 			var unit = course.FindUnitById(Score.UnitId);
-			if (unit == null)
+			var scoringGroup = unit?.Scoring.Groups.GetOrDefault(Score.ScoringGroupId, null);
+			if (scoringGroup == null)
 				return null;
 
-			return $"{InitiatedBy.VisibleName} поставил{InitiatedBy.Gender.ChooseEnding()} вам баллы за модуль «{GetUnitTitle(course, unit)}»:\n" +
+			return $"{InitiatedBy.VisibleName} поставил{InitiatedBy.Gender.ChooseEnding()} вам баллы {scoringGroup.Name} в модуле «{GetUnitTitle(course, unit)}»:\n" +
 				   $"вы получили {Score.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}\n\n" +
 				   "Полную ведомость смотрите на ulearn.me.";
 		}
@@ -739,7 +741,7 @@ namespace Database.Models
 
 		public override bool IsActual()
 		{
-			return true;
+			return Score != null;
 		}
 	}
 

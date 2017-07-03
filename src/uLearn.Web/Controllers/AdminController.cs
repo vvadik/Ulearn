@@ -1116,6 +1116,15 @@ namespace uLearn.Web.Controllers
 			return Json(builtinParametersValues, JsonRequestBehavior.AllowGet);
 		}
 
+		private async Task NotifyAboutAdditionalScore(AdditionalScore score)
+		{
+			var notification = new ReceivedAdditionalScoreNotification
+			{
+				Score = score
+			};
+			await notificationsRepo.AddNotification(score.CourseId, notification, score.InstructorId);
+		}
+
 		[HttpPost]
 		public async Task<ActionResult> SetAdditionalScore(string courseId, Guid unitId, string userId, string scoringGroupId, string score)
 		{
@@ -1139,7 +1148,8 @@ namespace uLearn.Web.Controllers
 			if (scoreInt < 0 || scoreInt > scoringGroup.MaxAdditionalScore)
 				return Json(new { status = "error", error = $"Баллы должны быть от 0 до {scoringGroup.MaxAdditionalScore}" });
 
-			await additionalScoresRepo.SetAdditionalScore(courseId, unitId, userId, scoringGroupId, scoreInt, User.Identity.GetUserId());
+			var additionalScore = await additionalScoresRepo.SetAdditionalScore(courseId, unitId, userId, scoringGroupId, scoreInt, User.Identity.GetUserId());
+			await NotifyAboutAdditionalScore(additionalScore);
 			
 			return Json(new { status = "ok", score = scoreInt });
 		}

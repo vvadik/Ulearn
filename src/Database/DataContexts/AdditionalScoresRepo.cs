@@ -15,7 +15,7 @@ namespace Database.DataContexts
 			this.db = db;
 		}
 
-		public async Task SetAdditionalScore(string courseId, Guid unitId, string userId, string scoringGroupId, int score, string instructorId)
+		public async Task<AdditionalScore> SetAdditionalScore(string courseId, Guid unitId, string userId, string scoringGroupId, int score, string instructorId)
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
@@ -36,6 +36,8 @@ namespace Database.DataContexts
 
 				transaction.Commit();
 				await db.SaveChangesAsync();
+
+				return additionalScore;
 			}
 		}
 
@@ -56,7 +58,6 @@ namespace Database.DataContexts
 		}
 
 		/* Dictionary<(userId, scoringGroupId), additionalScore> */
-
 		public Dictionary<Tuple<string, string>, AdditionalScore> GetAdditionalScoresForUsers(string courseId, Guid unitId, IEnumerable<string> usersIds)
 		{
 			return db.AdditionalScores
@@ -65,7 +66,6 @@ namespace Database.DataContexts
 		}
 
 		/* Dictionary<(userId, unitId, scoringGroupId), additionalScore> */
-
 		public Dictionary<Tuple<string, Guid, string>, AdditionalScore> GetAdditionalScoresForUsers(string courseId, IEnumerable<string> usersIds)
 		{
 			return db.AdditionalScores

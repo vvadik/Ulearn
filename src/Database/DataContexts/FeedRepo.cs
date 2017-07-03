@@ -30,13 +30,14 @@ namespace Database.DataContexts
 			return updateTimestamp?.Timestamp;
 		}
 
-		public void UpdateFeedViewTimestamp(string userId, DateTime timestamp)
+		public async Task UpdateFeedViewTimestamp(string userId, DateTime timestamp)
 		{
-			db.FeedViewTimestamps.AddOrUpdate(t => t.UserId == userId, new FeedViewTimestamp
+			db.FeedViewTimestamps.AddOrUpdate(t => t.UserId, new FeedViewTimestamp
 			{
 				UserId = userId,
 				Timestamp = timestamp
 			});
+			await db.SaveChangesAsync();
 		}
 
 		public async Task AddFeedNotificationTransportIfNeeded(string userId)
@@ -75,7 +76,9 @@ namespace Database.DataContexts
 
 		public int GetNotificationsCount(string userId, DateTime from, params FeedNotificationTransport[] transports)
 		{
-			return GetFeedNotificationDeliveriesQueryable(userId, transports).Count();
+			var nextSecond = from.AddSeconds(1);
+			return GetFeedNotificationDeliveriesQueryable(userId, transports)
+				.Count(d => d.CreateTime >= nextSecond);
 		}
 
 		public List<NotificationDelivery> GetFeedNotificationDeliveries(string userId, params FeedNotificationTransport[] transports)

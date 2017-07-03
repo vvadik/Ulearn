@@ -57,6 +57,15 @@
 			hideNumberOne = false,
 		};
 
+		public static RussianPluralizationOptions ScoreDative = new RussianPluralizationOptions
+		{
+			One = "балла",
+			Two = "баллов",
+			Five = "баллов",
+			smallNumbersAreWords = false,
+			hideNumberOne = false,
+		};
+
 		public static RussianPluralizationOptions MinuteDative = new RussianPluralizationOptions
 		{
 			One = "минуту",

@@ -8,14 +8,14 @@
 .notifications__dropdown {
 	width: 300px;
 	max-height: 300px;
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 
 .notifications__counter {
-	position: relative;
+	position: absolute;
 	font-size: 10px;
-	top: -10px;
-	left: -8px;
+	top: 3px;
+	left: 25px;
 	display: inline-block;
 	width: 20px;
 	height: 20px;
@@ -26,6 +26,10 @@
 	border: 1px solid rgba(50, 100, 50, 0.7);
 }
 
+.notifications__counter.collapse {
+	display: none;
+}
+	
 @media (min-width: 900px) {
 	.notifications__dropdown {
 		width: 500px;
@@ -49,7 +53,8 @@
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
 }
 
-.notifications__notification {
+.notifications__notification,
+.notifications__info {
 	padding: 7px 15px;
 }
 

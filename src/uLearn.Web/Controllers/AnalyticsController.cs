@@ -729,8 +729,7 @@ namespace uLearn.Web.Controllers
 				var defaultPeriodStart = GetDefaultPeriodStart();
 				if (string.IsNullOrEmpty(PeriodStart))
 					return defaultPeriodStart;
-				DateTime result;
-				if (!DateTime.TryParseExact(PeriodStart, dateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out result))
+				if (!DateTime.TryParseExact(PeriodStart, dateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime result))
 					return defaultPeriodStart;
 				return result;
 			}
@@ -756,8 +755,7 @@ namespace uLearn.Web.Controllers
 				var defaultPeriodFinish = DateTime.Now.Date;
 				if (string.IsNullOrEmpty(PeriodFinish))
 					return defaultPeriodFinish;
-				DateTime result;
-				if (!DateTime.TryParseExact(PeriodFinish, dateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out result))
+				if (!DateTime.TryParseExact(PeriodFinish, dateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime result))
 					return defaultPeriodFinish;
 				return result;
 			}

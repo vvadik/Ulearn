@@ -49,10 +49,14 @@ namespace uLearn.Web.Controllers
 			feedRepo.AddFeedNotificationTransportIfNeeded(userId).Wait();
 		}
 
-		public ActionResult UnreadCount(DateTime? lastTimestamp=null)
+		public ActionResult UnreadCount(string lastTimestamp)
 		{
 			var userId = User.Identity.GetUserId();
-			var unreadCountAndLastTimestamp = GetUnreadNotificationsCountAndLastTimestamp(userId, lastTimestamp);
+			DateTime? lastTimestampDateTime = null;
+			if (DateTime.TryParse(lastTimestamp, out var dt))
+				lastTimestampDateTime = dt;
+
+			var unreadCountAndLastTimestamp = GetUnreadNotificationsCountAndLastTimestamp(userId, lastTimestampDateTime);
 
 			return Json(new UnreadCountModel
 			{
@@ -65,6 +69,8 @@ namespace uLearn.Web.Controllers
 		private Tuple<int, DateTime?> GetUnreadNotificationsCountAndLastTimestamp(string userId, DateTime? from=null)
 		{
 			var notificationTransport = feedRepo.GetUsersFeedNotificationTransport(userId);
+			if (notificationTransport == null)
+				return Tuple.Create(0, (DateTime?) null);
 
 			var realFrom = from ?? feedRepo.GetFeedViewTimestamp(userId) ?? DateTime.MinValue;
 			var unreadCount = feedRepo.GetNotificationsCount(userId, realFrom, commonFeedNotificationTransport, notificationTransport);
@@ -89,11 +95,15 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		public ActionResult NotificationsPartial()
+		public async Task<ActionResult> NotificationsPartial()
 		{
 			var userId = User.Identity.GetUserId();
 			var notificationTransport = feedRepo.GetUsersFeedNotificationTransport(userId);
-			var notifications = feedRepo.GetFeedNotificationDeliveries(userId, commonFeedNotificationTransport, notificationTransport).Select(d => d.Notification).ToList();
+
+			var notifications = new List<Notification>();
+			if (notificationTransport != null)
+				notifications = feedRepo.GetFeedNotificationDeliveries(userId, commonFeedNotificationTransport, notificationTransport).Select(d => d.Notification).ToList();
+			await feedRepo.UpdateFeedViewTimestamp(userId, DateTime.Now);
 			return PartialView(new NotificationsPartialModel
 			{
 				Notifications = notifications,
