@@ -90,6 +90,10 @@
 	background-color: #f8f8ff;
 	cursor: pointer;
 }
+
+.notifications__notification.unread:hover {
+	background-color: #d3e3d3;
+}
 	
 .notifications__notification__header,
 .notifications__notification__footer {
