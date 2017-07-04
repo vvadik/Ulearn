@@ -49,7 +49,7 @@ namespace Database.DataContexts
 			{
 				UserId = userId,
 				IsEnabled = true,
-			});
+			}).ConfigureAwait(false);
 		}
 
 		public FeedNotificationTransport GetUsersFeedNotificationTransport(string userId)
