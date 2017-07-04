@@ -109,13 +109,13 @@ namespace uLearn.Web.Controllers
 
 			notifications = RemoveBlockedNotifications(notifications);
 
-			var unreadCountAndLastTimestamp = GetUnreadNotificationsCountAndLastTimestamp(userId);
-
+			var lastViewTimestamp = feedRepo.GetFeedViewTimestamp(userId);
 			await feedRepo.UpdateFeedViewTimestamp(userId, DateTime.Now);
+
 			return PartialView(new NotificationsPartialModel
 			{
 				Notifications = notifications,
-				LastViewTimestamp = unreadCountAndLastTimestamp.Item2,
+				LastViewTimestamp = lastViewTimestamp,
 				CourseManager = courseManager,
 			});
 		}
