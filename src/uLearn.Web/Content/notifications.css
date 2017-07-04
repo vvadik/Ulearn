@@ -82,6 +82,10 @@
 	padding: 7px 15px;
 }
 
+.notifications__notification.unread {
+	background-color: #e3ffe3;
+}
+
 .notifications__notification:hover {
 	background-color: #f8f8ff;
 	cursor: pointer;

@@ -12,7 +12,7 @@
 {
 	foreach (var notification in Model.Notifications)
 	{
-		<li class="notifications__notification">
+		<li class="notifications__notification @(notification.CreateTime >= Model.LastViewTimestamp ? "unread" : "")">
 			@try
 			{
 				@Notification((dynamic)notification, Model.CourseManager.FindCourse(notification.CourseId))
