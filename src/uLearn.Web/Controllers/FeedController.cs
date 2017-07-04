@@ -86,7 +86,7 @@ namespace uLearn.Web.Controllers
 			return Tuple.Create(unreadCount, from);
 		}
 
-		public ActionResult NotificationsTopbarPartial()
+		public ActionResult NotificationsTopbarPartial(bool isMobile=false)
 		{
 			var userId = User.Identity.GetUserId();
 			var unreadCountAndLastTimestamp = GetUnreadNotificationsCountAndLastTimestamp(userId);
@@ -94,6 +94,7 @@ namespace uLearn.Web.Controllers
 			{
 				UnreadCount = unreadCountAndLastTimestamp.Item1,
 				LastViewTimestamp = unreadCountAndLastTimestamp.Item2,
+				IsMobile = isMobile,
 			});
 		}
 
@@ -146,5 +147,7 @@ namespace uLearn.Web.Controllers
 		public int UnreadCount { get; set; }
 
 		public DateTime? LastViewTimestamp { get; set; }
+
+		public bool IsMobile { get; set; }
 	}
 }

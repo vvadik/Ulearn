@@ -1,6 +1,12 @@
 ﻿.notifications__icon-link {
 }
 
+@media (max-width: 768px) {
+	.notifications__icon-link {
+		margin-right: 19px;
+	}
+}
+
 .notifications__icon {
 	font-size: 18px;
 }
@@ -11,6 +17,24 @@
 	overflow-y: auto;
 }
 
+.notifications__dropdown.notifications__mobile-dropdown {
+	width: auto;
+	background-color: white;
+	list-style: none;
+	padding: 5px 0;
+	margin-bottom: 0;
+}
+
+.notifications__dropdown.notifications__mobile-dropdown.collapse:not(.in) {
+	display: none !important;
+}
+
+@media (min-width: 768px) {  
+	.notifications__dropdown.notifications__mobile-dropdown.visible-xs {
+		display: none !important;
+	}
+}
+	
 .notifications__counter {
 	position: absolute;
 	font-size: 10px;

@@ -1,6 +1,7 @@
 ﻿$(document).ready(function () {
 	var $notificaticationsIconLink = $('.notifications__icon-link');
 	var $counter = $('.notifications__counter');
+	var $dropdownContent = $('.notifications__dropdown');
 	var lastCountUpdateTimestamp = $notificaticationsIconLink.data('lastTimestamp');
 
 	$notificaticationsIconLink.click(function() {
@@ -8,9 +9,8 @@
 		var $dropdown = $self.closest('.dropdown');
 		if (!$dropdown.hasClass('open')) {
 			var loadUrl = $self.data('notificationsUrl');
-			var $dropdownMenu = $dropdown.find('.notifications__dropdown');
-			$dropdownMenu.html('<li class="notifications__info">Загружаю последние уведомления...</li>');
-			$dropdownMenu.load(loadUrl, function() {
+			$dropdownContent.html('<li class="notifications__info">Загружаю последние уведомления...</li>');
+			$dropdownContent.load(loadUrl, function() {
 				$counter.text('0').hide();
 			});
 		}

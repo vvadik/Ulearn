@@ -34,7 +34,18 @@
 					<span class="icon-bar"></span>
 				</button>
 				@Html.ActionLink("uLearn", "Index", "Home", null, new { @class = "navbar-brand" })
+				<ul class="nav navbar-nav pull-right visible-xs">
+					@if (User.Identity.IsAuthenticated && User.HasAccess(CourseRole.Instructor))
+					{
+						<li class="dropdown">
+							@Html.Action("NotificationsTopbarPartial", "Feed", new { isMobile = true })
+						</li>
+					}
+				</ul>
 			</div>
+			<ul class="notifications__mobile-dropdown notifications__dropdown navbar-collapse collapse visible-xs">
+
+			</ul>
 			<div class="greeting-collapse-class navbar-collapse collapse">
 				<ul class="top-navigation nav navbar-nav">
 					@{
@@ -89,7 +100,9 @@
 				<ul class="nav navbar-nav navbar-right">
 					@if (User.Identity.IsAuthenticated && User.HasAccess(CourseRole.Instructor))
 					{
-						@Html.Action("NotificationsTopbarPartial", "Feed")
+						<li class="dropdown hidden-xs">
+							@Html.Action("NotificationsTopbarPartial", "Feed")
+						</li>
 					}
 					@Html.Action("UserMenuPartial", "Account")
 				</ul>
