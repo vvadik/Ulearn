@@ -1,5 +1,6 @@
 ﻿@using ApprovalUtilities.SimpleLogger
 @using uLearn
+@using uLearn.Web.Extensions
 @model RegisterViewModel
 @{
 	ViewBag.Title = "Регистрация";
@@ -53,8 +54,18 @@
 							@Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Ещё раз" })
 							@Html.ValidationMessageFor(m => m.ConfirmPassword)
 						</div>
+						<div class="form-group">
+							<div class="checkbox checkbox-default">
+								@Html.CheckBoxFor(m => m.AgreeWithTerms)
+								@* We can't use Html.LabelFor() here because display name for AgreeWithTerms is HTML, but Html.LabelFor() doesn't support this *@
+								<label for="@Html.NameFor(m => m.AgreeWithTerms)">
+									@Html.Raw(HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.AgreeWithTerms).ToString()))
+								</label>
+								@Html.ValidationMessageFor(m => m.AgreeWithTerms)
+							</div>
+						</div>
 
-						@Html.ValidationSummary(true)
+						@Html.UlearnValidationSummary(true)
 
 						<div class="form-group">
 							<input type="submit" value="Поехали" class="ph-btn ph-btn-green btn-block"/>

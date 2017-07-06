@@ -1012,6 +1012,11 @@ li.li-success {
 	color: #E46463;
 }
 
+.login-and-registration-form .checkbox .field-validation-error {
+	padding-left: 0;
+	margin-left: -20px;
+}
+
 .login-and-registration-form .input-validation-error {
 	border-color: #EA8180;
 }

@@ -120,6 +120,23 @@ namespace uLearn.Web.Extensions
 		{
 			return DropDownListWithItemAttributes(htmlHelper, name, selectList, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
 		}
+
+		/* This method shows ValidationSummary() iff at least one error exists. Standard ValidationSummary() sometimes shows empty <div>.
+		 See https://stackoverflow.com/a/12111297 for details. */
+		public static MvcHtmlString UlearnValidationSummary(this HtmlHelper htmlHelper, bool excludePropertyErrors)
+		{
+			var htmlString = htmlHelper.ValidationSummary(excludePropertyErrors);
+
+			if (htmlString == null)
+				return null;
+
+			var xmlElement = XElement.Parse(htmlString.ToHtmlString());
+			var lis = xmlElement.Element("ul")?.Elements("li").ToList();
+			if (lis == null || lis.Count == 1 && lis.First().Value == "")
+				return null;
+
+			return htmlString;
+		}
 	}
 
 	public class SelectListItemWithAttributes : SelectListItem

@@ -138,6 +138,7 @@ namespace uLearn.Web.Controllers
 					result = await userManager.AddLoginAsync(user.Id, info.Login);
 					if (result.Succeeded)
 					{
+						await userManager.AddPasswordAsync(user.Id, model.Password);
 						await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
 						if (!await SendConfirmationEmail(user))
 							return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.ErrorOccured });

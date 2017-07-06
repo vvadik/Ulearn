@@ -6,15 +6,43 @@ using Database.Models;
 
 namespace uLearn.Web.Models
 {
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+	public class MustBeTrueAttribute : ValidationAttribute
+	{
+		public override bool IsValid(object value)
+		{
+			return value is bool && (bool)value;
+		}
+	}
+
 	public class ExternalLoginConfirmationViewModel
 	{
 		[Required(ErrorMessage = "{0} есть у каждого пользователя")]
 		[Display(Name = "Логин")]
 		public string UserName { get; set; }
 		
-		[Required(ErrorMessage = "Укажите адрес эл. почты")]
+		[Required(ErrorMessage = "Укажите адрес электронной почты")]
+		[EmailAddress(ErrorMessage = "Не похоже на электронную почту")]
 		[Display(Name = "Эл. почта")]
 		public string Email { get; set; }
+
+		[Required(ErrorMessage = "{0} обязателен")]
+		[StringLength(100, ErrorMessage = "{0} не может быть короче {2} символов", MinimumLength = 6)]
+		[DataType(DataType.Password)]
+		[Display(Name = "Пароль")]
+		public string Password { get; set; }
+
+		[DataType(DataType.Password)]
+		[Display(Name = "Ещё раз")]
+		// Workaround. Details: http://stackoverflow.com/questions/19978239/custom-errormessage-for-compare-attribute-does-not-work
+#pragma warning disable 0618
+		[System.Web.Mvc.Compare("Password", ErrorMessage = "Пароли отличаются")]
+#pragma warning restore 0618
+		public string ConfirmPassword { get; set; }
+
+		[Display(Name = "Согласен с&nbsp;<a href=\"/Home/Terms\">правилами использования</a> сайта")]
+		[MustBeTrue(ErrorMessage = "Нужно согласиться с правилами")]
+		public bool AgreeWithTerms { get; set; }
 	}
 
 	public class ManageUserViewModel
@@ -67,7 +95,6 @@ namespace uLearn.Web.Models
 		[Display(Name = "Ещё раз")]
 		// Workaround. Details: http://stackoverflow.com/questions/19978239/custom-errormessage-for-compare-attribute-does-not-work
 #pragma warning disable 0618
-		// ReSharper disable once CSharpWarnings::CS0618
 		[System.Web.Mvc.Compare("Password", ErrorMessage = "Пароли отличаются")]
 #pragma warning restore 0618
 		public string ConfirmPassword { get; set; }
@@ -76,8 +103,13 @@ namespace uLearn.Web.Models
 		public Gender? Gender { get; set; }
 
 		[Display(Name = "Эл. почта")]
-		[Required(ErrorMessage = "Укажите адрес эл. почты")]
+		[Required(ErrorMessage = "Укажите адрес электронной почты")]
+		[EmailAddress(ErrorMessage = "Не похоже на электронную почту")]
 		public string Email { get; set; }
+		
+		[Display(Name = "Согласен с&nbsp;<a href=\"/Home/Terms\">правилами использования</a> сайта")]
+		[MustBeTrue(ErrorMessage = "Нужно согласиться с правилами")]
+		public bool AgreeWithTerms { get; set; }
 
 		public string ReturnUrl { get; set; }
 
@@ -105,7 +137,6 @@ namespace uLearn.Web.Models
 		[Display(Name = "Ещё раз")]
 		// Workaround. Details: http://stackoverflow.com/questions/19978239/custom-errormessage-for-compare-attribute-does-not-work
 #pragma warning disable 0618
-		// ReSharper disable once CSharpWarnings::CS0618
 		[System.Web.Mvc.Compare("Password", ErrorMessage = "Пароли отличаются")]
 #pragma warning restore 0618
 		public string ConfirmPassword { get; set; }
@@ -120,7 +151,8 @@ namespace uLearn.Web.Models
 		public Gender? Gender { get; set; }
 
 		[Display(Name = "Эл. почта")]
-		[Required(ErrorMessage = "Укажите адрес эл. почты")]
+		[Required(ErrorMessage = "Укажите адрес электронной почты")]
+		[EmailAddress(ErrorMessage = "Не похоже на электронную почту")]
 		public string Email { get; set; }
 	}
 
