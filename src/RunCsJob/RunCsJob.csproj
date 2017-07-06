@@ -218,7 +218,6 @@
     </EmbeddedResource>
     <AdditionalFiles Include=".\WellKnownLibs\README.md" />
     <None Include="packages.config" />
-    <None Include="Properties\webjob-publish-settings.json" />
     <None Include="run.cmd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

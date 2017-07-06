@@ -9,7 +9,7 @@
 <html>
 <head>
 	<title>Quiz</title>
-	@Styles.Render("~/css")
+	@Styles.Render("~/ulearn.bundle.css")
 </head>
 <body class="lti-component">
 	@if (Model != null)
@@ -23,7 +23,8 @@
 			   isGuest = false,
 			   manualQuizCheckQueueItem = (ManualQuizChecking) null,
 		   })
-		@Scripts.Render("~/main-js")
+		@Scripts.Render("~/libraries.bundle.js")
+		@Scripts.Render("~/ulearn.bundle.js")
 	}
 
 	@Html.Partial("_YandexMetrika")

@@ -10,15 +10,15 @@
 <html>
 <head>
 	<title>Exercise</title>
-	@Styles.Render("~/css")
+	@Styles.Render("~/ulearn.bundle.css")
 </head>
 <body class="lti-component">
 	@if (Model != null)
 	{
 		@SlideHtml.Block(Model.ExerciseBlock, Model.Context, Html)
 
-		@Scripts.Render("~/libraries-js")
-		@Scripts.Render("~/main-js")
+		@Scripts.Render("~/libraries.bundle.js")
+		@Scripts.Render("~/ulearn.bundle.js")
 		<script> getHints("@Model.CourseId", "@Model.SlideId.GetNormalizedGuid()", '@Model.ExerciseBlock.HintsMd.Count') </script>
 		<script> refreshPreviousDraft('@Model.SlideId') </script>
 	}

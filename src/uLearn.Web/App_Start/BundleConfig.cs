@@ -1,4 +1,5 @@
 ﻿using System.Web.Optimization;
+using AspNetBundling;
 
 namespace uLearn.Web
 {
@@ -12,14 +13,14 @@ namespace uLearn.Web
 
 			// Use the development version of Modernizr to develop with and learn from. Then, when you're
 			// ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
-			bundles.Add(new ScriptBundle("~/modernizr-js").Include("~/Scripts/modernizr-*"));
+			bundles.Add(new ScriptBundle("~/modernizr.bundle.js").Include("~/Scripts/modernizr-*"));
 
 			bundles.Add(CssBundle());
 		}
 
-		public static Bundle JsLibrariesBundle()
+		private static Bundle JsLibrariesBundle()
 		{
-			return new ScriptBundle("~/libraries-js").Include(
+			return new ScriptWithSourceMapBundle("~/libraries.bundle.js").Include(
 				"~/Scripts/jquery-{version}.js",
 				"~/Scripts/jquery-ui.min.js",
 				"~/Scripts/jquery.unobtrusive-ajax*",
@@ -52,9 +53,9 @@ namespace uLearn.Web
 			);
 		}
 
-		public static Bundle JsUlearnBundle()
+		private static Bundle JsUlearnBundle()
 		{
-			return new ScriptBundle("~/main-js").Include(
+			return new ScriptWithSourceMapBundle("~/ulearn.bundle.js").Include(
 				"~/Scripts/bootstrap.js",
 				"~/Scripts/bootstrap.file-input.js",
 				"~/Scripts/bootstrap-select.min.js",
@@ -84,9 +85,9 @@ namespace uLearn.Web
 			);
 		}
 
-		public static Bundle CssBundle()
+		private static Bundle CssBundle()
 		{
-			return new StyleBundle("~/css").Include(
+			return new StyleBundle("~/ulearn.bundle.css").Include(
 				"~/Content/bootstrap.css",
 				"~/Content/font-awesome.css",
 				"~/Content/awesome-bootstrap-checkbox.css",

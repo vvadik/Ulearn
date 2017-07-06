@@ -15,9 +15,9 @@
 	<meta name="description" content="Интерактивные учебные онлайн-курсы по программированию" />
 	<link rel="image_src" href="~/Content/logo.png">
 	<link rel="shortcut icon" href="~/favicon.ico?v=4" />
-	@Styles.Render("~/css")
+	@Styles.Render("~/ulearn.bundle.css")
 	@Styles.Render("~/katex/katex.min.css")
-	@Scripts.Render("~/modernizr-js")
+	@Scripts.Render("~/modernizr.bundle.js")
 </head>
 <body>
 	<div id="header" class="navbar navbar-inverse navbar-fixed-top">
@@ -115,13 +115,13 @@
 	@Html.Action("SuggestMailTransport", "Notifications")
 	@Html.Action("CheckIsEmailConfirmed", "Account")
 	
-	@Scripts.Render("~/libraries-js")
+	@Scripts.Render("~/libraries.bundle.js")
 	@* Add Sentry (https://sentry.io) script for error logging *@
 	<script src="https://cdn.ravenjs.com/3.16.0/raven.min.js" crossorigin="anonymous"></script>
 	<script>
 		Raven.config('https://992e1a5327ad4e48af004ae709b51aba@sentry.io/181214').install()
 	</script>
-	@Scripts.Render("~/main-js")
+	@Scripts.Render("~/ulearn.bundle.js")
 	@RenderSection("scripts", required: false)
 
 	<script>

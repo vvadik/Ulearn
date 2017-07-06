@@ -109,37 +109,6 @@
 							<div class="diff-table slide-diff-table" data-original="@(block.XmlSerialize())" data-changed=""></div>
 						}
 					</div>
-
-					@*if (slideDiff.SlideBlockDiffs.Count > 0)
-					{
-						<h6>Изменённые задания</h6>
-						foreach (var blockDiff in slideDiff.SlideBlockDiffs)
-						{
-							<div class="row">
-								<div class="col-sm-6"><pre>@blockDiff.OriginalSlideBlock.TryGetText()</pre></div>
-								<div class="col-sm-6"><pre>@blockDiff.ChangedSlideBlock.TryGetText()</pre></div>
-							</div>
-						}
-					}
-
-					if (slideDiff.RemovedBlocks.Count > 0)
-					{
-						<h6>Удалённые задания</h6>
-						foreach (var block in slideDiff.RemovedBlocks)
-						{
-							<div>@block.TryGetText()</div>
-						}
-					}
-
-					if (slideDiff.InsertedBlocks.Count > 0)
-					{
-						<h6>Добавленные задания</h6>
-						foreach (var block in slideDiff.RemovedBlocks)
-						{
-							<div>@block.TryGetText()</div>
-						}
-					}*@
-
 				}
 			}
 			if (Model.CourseDiff.RemovedSlides.Count > 0)
