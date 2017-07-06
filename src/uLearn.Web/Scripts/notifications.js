@@ -4,16 +4,30 @@
 	var $dropdownContent = $('.notifications__dropdown');
 	var lastCountUpdateTimestamp = $notificaticationsIconLink.data('lastTimestamp');
 
-	$notificaticationsIconLink.click(function() {
+	/* On mobile layout close user menu on notification area showing */
+	var hideUserMenu = function() {
+		$('.greeting-collapse-class').removeClass('in');
+	};
+
+	/* On mobile layout close notification area on user menu showing */
+	$('.greeting-collapse-class').on('show.bs.collapse', function() {
+		$('.notifications__mobile-dropdown').removeClass('in');
+	});
+
+	$notificaticationsIconLink.click(function () {
 		var $self = $(this);
 		var $dropdown = $self.closest('.dropdown');
-		if (!$dropdown.hasClass('open')) {
+		var isDesktopVersionOpened = $dropdown.hasClass('open');
+		var isMobileVersionOpened = $('.notifications__mobile-dropdown').hasClass('in');
+		if (!isDesktopVersionOpened && !isMobileVersionOpened) {
 			var loadUrl = $self.data('notificationsUrl');
 			$dropdownContent.html('<li class="notifications__info">Загружаю последние уведомления...</li>');
 			$dropdownContent.load(loadUrl, function() {
 				$counter.text('0').hide();
 			});
 		}
+
+		hideUserMenu();
 	});
 	
 	$('.notifications__dropdown').on('click', '.notifications__notification', function(e) {

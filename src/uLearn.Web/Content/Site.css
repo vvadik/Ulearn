@@ -72,6 +72,7 @@ input[type="checkbox"].input-validation-error {
 .navbar-inverse {
 	background-color: #32383F;
 	border-color: #32383F;
+	border-bottom-width: 0;
 }
 
 .navbar-inverse .navbar-brand,
