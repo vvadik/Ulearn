@@ -2,12 +2,25 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Web;
+using System.Web.WebPages;
 using uLearn.Model.Blocks;
 using uLearn.Web.Models;
 using uLearn.Web.Views.Course;
 
 namespace uLearn.CourseTool.Monitoring
 {
+	/* RazorGenerator uses HelperPage which need a HelperPage.PageContext to be defined. 
+	   We create a fake web page for it. It's not used never but is passed to PageContext constructor. */
+	public class FakeWebPage : WebPage
+	{
+		public override void Execute()
+		{
+			/* Method Execute() is never called for fake web page */
+			throw new NotImplementedException();
+		}
+	}
+
 	public class SlideRenderer
 	{
 		private readonly DirectoryInfo htmlDirectory;
@@ -17,6 +30,8 @@ namespace uLearn.CourseTool.Monitoring
 		{
 			this.htmlDirectory = htmlDirectory;
 			this.course = course;
+			/* Create fake page context for Razor Generator */
+			HelperPage.PageContext = new WebPageContext(null, new FakeWebPage(), null);
 		}
 
 		private void CopyLocalFiles(string md, string slideDir)
@@ -30,7 +45,6 @@ namespace uLearn.CourseTool.Monitoring
 			catch (Exception e)
 			{
 				Console.WriteLine(e.Message);
-				// :(
 			}
 		}
 

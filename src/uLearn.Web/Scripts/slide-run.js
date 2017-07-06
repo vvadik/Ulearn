@@ -44,6 +44,8 @@ function setResults(ans) {
 		slideNavigation.makeShowSolutionsNext();
 		if (ans.SubmissionId > 0)
 			setExerciseVersion(ans.SubmissionId, true);
+		else /* for course monitor tool */
+			setSimpleResult($success, ans.ActualOutput);
 	} else if (ans.ExpectedOutput === null)
 		setSimpleResult($waErrorNoDiff, ans.ActualOutput);
 	else
@@ -54,7 +56,7 @@ $('.exercise__submission').on('click', '.run-solution-button', function () {
 	var $runButton = $(this);
 	initErrorsBlocks();
 	var code = $(".code-exercise")[0].codeMirrorEditor.getValue();
-	if (code.length == 0)
+	if (code.length === 0)
 		code = " ";
 	$runButton.text("Выполняется...").addClass("active");
 	$runResults.hide();

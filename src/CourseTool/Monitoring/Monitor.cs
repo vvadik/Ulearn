@@ -65,7 +65,7 @@ namespace uLearn.CourseTool.Monitoring
 			var insideCheckingDir = args.FullPath.ToLower().Contains("\\checking\\");
 			if (!insideCheckingDir && monitoredExtension)
 			{
-				Console.WriteLine($"{DateTime.Now.ToString("T")} {args.Name} was {args.ChangeType.ToString().ToLower()}.");
+				Console.WriteLine($"{DateTime.Now:T} {args.Name} was {args.ChangeType.ToString().ToLower()}.");
 				server.MarkCourseAsChanged();
 			}
 		}

@@ -97,7 +97,7 @@ namespace uLearn.CourseTool.Monitoring
 			var requestTime = DateTime.Now;
 			var reloaded = ReloadCourseIfChanged(requestTime);
 			if (!new[] { ".js", ".css", ".png", ".jpg", ".woff" }.Any(ext => path.EndsWith(ext)))
-				Console.WriteLine($"{requestTime.ToString("T")} {context.Request.HttpMethod} {context.Request.Url}");
+				Console.WriteLine($"{requestTime:T} {context.Request.HttpMethod} {context.Request.Url}");
 			switch (query)
 			{
 				case "needRefresh":
