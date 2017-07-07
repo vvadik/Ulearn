@@ -14,10 +14,10 @@ namespace Database.Migrations
 
 		public override void Down()
 		{
+		    DropColumn("dbo.AspNetUsers", "Names");
 			Sql("DROP FUNCTION dbo.GetUsersByNamePrefix");
 			Sql("DROP FULLTEXT INDEX ON dbo.AspNetUsers", true);
 			Sql("DROP FULLTEXT CATALOG AspNetUsersFullTextCatalog", true);
-			DropColumn("dbo.AspNetUsers", "Names");
 		}
 	}
 }

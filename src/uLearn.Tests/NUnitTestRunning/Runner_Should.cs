@@ -1,0 +1,110 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using NUnit.Framework;
+using NUnit.Framework.Interfaces;
+using uLearn.NUnitTestRunning.TestsToRun;
+
+namespace uLearn.NUnitTestRunning
+{
+	public class Runner_Should
+	{
+		private TestListener listener;
+
+		[SetUp]
+		public void SetUp()
+		{
+			listener = new TestListener();
+		}
+
+		[Test]
+		public void Run_SpecifiedTests()
+		{
+			var testsTuRun = typeof(ThreePassingTests).FullName;
+			const int expectedCount = 3;
+
+			NUnitTestRunner.RunAllTests(listener, Assembly.GetExecutingAssembly(), testsTuRun);
+			var finishedTestsCount = listener.GetNumberOfFinishedTests();
+
+			Assert.AreEqual(expectedCount, finishedTestsCount);
+		}
+
+		[Test]
+		public void Stop_On_FirstTestFailure()
+		{
+			var testsTuRun = typeof(ThreeTestsWithSecondFailing).FullName;
+			const int expectedCount = 2;
+
+			NUnitTestRunner.RunAllTests(listener, Assembly.GetExecutingAssembly(), testsTuRun);
+			var finishedTestsCount = listener.GetNumberOfFinishedTests();
+
+			Assert.AreEqual(expectedCount, finishedTestsCount);
+		}
+
+		[Test]
+		public void Run_Tests_InSpecifiedOrder()
+		{
+			string[] testsTuRun = { typeof(ThreeTestsWithSecondFailing).FullName, typeof(ThreePassingTests).FullName };
+			const int expectedCount = 2;
+
+			NUnitTestRunner.RunAllTests(listener, Assembly.GetExecutingAssembly(), testsTuRun);
+			var finishedTestsCount = listener.GetNumberOfFinishedTests();
+
+			Assert.AreEqual(expectedCount, finishedTestsCount);
+		}
+
+		[Test]
+		public void Support_SetUp_Feature()
+		{
+			ThreeTestsWithSetUp.Counter = 0;
+			var expectedCounterValue = 3;
+
+			NUnitTestRunner.RunAllTests(new TestListener(), Assembly.GetExecutingAssembly(), typeof(ThreeTestsWithSetUp).FullName);
+
+			Assert.AreEqual(expectedCounterValue, ThreeTestsWithSetUp.Counter);
+		}
+
+		[Test]
+		public void Support_TearDown_Feature()
+		{
+			ThreeTestsWithTearDown.Counter = 0;
+			var expectedCounterValue = 3;
+
+			NUnitTestRunner.RunAllTests(new TestListener(), Assembly.GetExecutingAssembly(), typeof(ThreeTestsWithTearDown).FullName);
+
+			Assert.AreEqual(expectedCounterValue, ThreeTestsWithTearDown.Counter);
+		}
+
+		[Test]
+		public void Support_TestCase_Feature()
+		{
+			var testsTuRun = typeof(FiveTestCases).FullName;
+			const int testCount = 5;
+
+			NUnitTestRunner.RunAllTests(listener, Assembly.GetExecutingAssembly(), testsTuRun);
+			var finishedTestsCount = listener.GetNumberOfFinishedTests();
+
+			Assert.AreEqual(testCount, finishedTestsCount);
+		}
+
+		[Test]
+		public void Support_Repeat_Feature()
+		{
+			ThreeTestsWithTearDown.Counter = 0;
+			var testsTuRun = typeof(TenRepeatTest).FullName;
+			const int expectedCounterValue = 10;
+
+			NUnitTestRunner.RunAllTests(listener, Assembly.GetExecutingAssembly(), testsTuRun);
+
+			Assert.AreEqual(expectedCounterValue, TenRepeatTest.Counter);
+		}
+	}
+
+	public static class TestListenerExtentions
+	{
+		public static int GetNumberOfFinishedTests(this TestListener listener)
+		{
+			return listener.Results.Count(x => x.HasChildren == false);
+		}
+	}
+}
