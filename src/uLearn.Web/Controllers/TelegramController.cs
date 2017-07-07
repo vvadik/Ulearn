@@ -73,12 +73,7 @@ namespace uLearn.Web.Controllers
 			using (var reader = new StreamReader(memstream))
 				return reader.ReadToEnd().DeserializeJson<T>();
 		}
-
-		public void OnMessage(object sender, MessageEventArgs e)
-		{
-			OnMessage(e.Message).Wait();
-		}
-
+		
 		public async Task OnMessage(Message message)
 		{
 			if (telegramBot == null)

@@ -58,7 +58,7 @@ namespace Database.DataContexts
 			var submission = await userSolutionsRepo.AddUserExerciseSubmission(
 				courseId, slideId, code, null, null, watcher.UserId,
 				"uLearn", $"XQueue watcher {watcher.Name}"
-			);
+			).ConfigureAwait(false);
 			db.XQueueExerciseSubmissions.Add(new XQueueExerciseSubmission
 			{
 				SubmissionId = submission.Id,
@@ -66,7 +66,7 @@ namespace Database.DataContexts
 				XQueueHeader = xQueueHeader,
 			});
 
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 	}
 }

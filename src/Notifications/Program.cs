@@ -50,8 +50,8 @@ namespace Notifications
 
 				try
 				{
-					await CreateDeliveries();
-					await SendDeliveries();
+					await CreateDeliveries().ConfigureAwait(false);
+					await SendDeliveries().ConfigureAwait(false);
 				}
 				catch (Exception e)
 				{
@@ -59,7 +59,7 @@ namespace Notifications
 					log.Info("Waiting one second and repeat");
 				}
 
-				await Task.Delay(TimeSpan.FromSeconds(1));
+				await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
 			}
 
 			StaticMetricsPipeProvider.Instance.Stop();
