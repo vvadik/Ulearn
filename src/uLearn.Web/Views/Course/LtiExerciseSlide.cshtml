@@ -17,8 +17,7 @@
 	{
 		@SlideHtml.Block(Model.ExerciseBlock, Model.Context, Html)
 
-		@Scripts.Render("~/libraries.bundle.js")
-		@Scripts.Render("~/ulearn.bundle.js")
+		@Scripts.Render("~/scripts.bundle.js")
 		<script> getHints("@Model.CourseId", "@Model.SlideId.GetNormalizedGuid()", '@Model.ExerciseBlock.HintsMd.Count') </script>
 		<script> refreshPreviousDraft('@Model.SlideId') </script>
 	}

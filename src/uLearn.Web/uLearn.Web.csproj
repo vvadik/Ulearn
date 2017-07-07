@@ -780,7 +780,7 @@
     <Content Include="Content\Site.css" />
     <Content Include="Jsdifflib\jsdifflib.css" />
     <Content Include="katex\*.css" />
-    <Content Include="katex\*.js" />
+    <Content Include="katex\katex.js" />
     <Content Include="Scripts\activate-clipboard.js" />
     <Content Include="Scripts\analytics-highcharts.js" />
     <Content Include="Scripts\analytics.js" />
@@ -819,9 +819,7 @@
     <None Include="Properties\PublishProfiles\ulearn-dev.pubxml" />
     <None Include="Properties\PublishProfiles\ulearn.pubxml" />
     <Content Include="Properties\webjobs-list.json" />
-    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
-    <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\buttons.js" />
     <Content Include="Scripts\certificates-editor.js" />
     <Content Include="Scripts\clipboard.min.js" />
@@ -832,9 +830,7 @@
     <Content Include="Scripts\groups-editor.js" />
     <None Include="Scripts\jquery-3.1.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.1.1.js" />
-    <Content Include="Scripts\jquery-3.1.1.min.js" />
     <Content Include="Scripts\jquery-3.1.1.slim.js" />
-    <Content Include="Scripts\jquery-3.1.1.slim.min.js" />
     <Content Include="Scripts\jquery-ui.min.js" />
     <Content Include="Scripts\jquery.color-2.1.0.min.js" />
     <Content Include="Scripts\jquery.datetimepicker.full.min.js" />
@@ -844,12 +840,9 @@
     <Content Include="Scripts\jquery.smooth-scrolling.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
-    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.date.js" />
     <Content Include="Scripts\jquery.validate.js" />
-    <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\js.cookie.js" />
     <Content Include="Scripts\likely.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
@@ -859,7 +852,6 @@
     <Content Include="Scripts\profile.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
-    <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\slide-checking.js" />
     <Content Include="Scripts\slide-comments.js" />
@@ -870,13 +862,11 @@
     <Content Include="Scripts\slide-popovers.js" />
     <Content Include="Scripts\slide-quiz.js" />
     <Content Include="Scripts\slide-hints.js" />
-    <Content Include="Scripts\jquery-2.1.1.min.js" />
     <Content Include="Jsdifflib\jsdifflib.js" />
     <Content Include="Scripts\slide-editor.js" />
     <Content Include="Scripts\slide-gallery.js" />
     <Content Include="Scripts\slide-run.js" />
     <Content Include="Scripts\slide-solutions-like.js" />
-    <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\slide-nav.js" />
     <Content Include="Scripts\slide-tex.js" />
     <Content Include="Scripts\slide-utils.js" />
@@ -1121,8 +1111,6 @@
     <Content Include="Views\Notifications\SuggestMailTransport.cshtml" />
     <Content Include="Views\Notifications\Settings.cshtml" />
     <Content Include="Views\Account\EmailIsNotConfirmedPopup.cshtml" />
-    <Content Include="Scripts\jquery-3.1.1.slim.min.map" />
-    <Content Include="Scripts\jquery-3.1.1.min.map" />
     <Content Include="Views\Feed\NotificationsTopbarPartial.cshtml" />
     <Content Include="Views\Feed\NotificationsPartial.cshtml" />
   </ItemGroup>

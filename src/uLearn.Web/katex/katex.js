@@ -524,7 +524,7 @@ function ParseError(message, token) {
         }
 
         // Underline token in question using combining underscores
-        var underlined = input.slice(start, end).replace(/[^]/g, "$&\u0332");
+        var underlined = input.slice(start, end).replace(/\^/g, "$&\u0332");
 
         // Extract some context from the input and add it to the error
         var left;

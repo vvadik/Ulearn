@@ -91,9 +91,9 @@
 .notifications__info {
 	color: #888;
 }
-	
+
 .notifications__notification.unread {
-	background-color: #e3ffe3;
+	background-color: #e8fff3;
 }
 
 .notifications__notification:hover {
@@ -102,7 +102,7 @@
 }
 
 .notifications__notification.unread:hover {
-	background-color: #d3e3d3;
+	background-color: #e0f3f3;
 }
 	
 .notifications__notification__header,
