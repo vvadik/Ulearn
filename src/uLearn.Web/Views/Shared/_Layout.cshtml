@@ -35,7 +35,7 @@
 				</button>
 				@Html.ActionLink("uLearn", "Index", "Home", null, new { @class = "navbar-brand" })
 				<ul class="notifications__mobile-nav nav navbar-nav pull-right visible-xs">
-					@if (User.Identity.IsAuthenticated && User.HasAccess(CourseRole.Instructor))
+					@if (User.Identity.IsAuthenticated)
 					{
 						<li class="dropdown">
 							@Html.Action("NotificationsTopbarPartial", "Feed", new { isMobile = true })
@@ -98,7 +98,7 @@
 					}
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
-					@if (User.Identity.IsAuthenticated && User.HasAccess(CourseRole.Instructor))
+					@if (User.Identity.IsAuthenticated)
 					{
 						<li class="dropdown hidden-xs">
 							@Html.Action("NotificationsTopbarPartial", "Feed")
