@@ -35,6 +35,9 @@ namespace uLearn.CourseTool
 				Write(ConsoleColor.Red, m);
 				errors.Add(m);
 			};
+			validator.Warning += m => {
+				Write(ConsoleColor.DarkYellow, m);
+			};
 			validator.ValidateExercises();
 			validator.ValidateVideos();
 			if (errors.Any())

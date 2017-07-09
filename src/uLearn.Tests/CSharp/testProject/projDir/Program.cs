@@ -7,7 +7,8 @@ namespace test
 		private static void Main()
 		{
 			new Link.L();
-			Console.WriteLine("OK");
+			if (MeaningOfLifeTask.GetIt() != 42)
+				Console.WriteLine("Not OK");
 		}
 	}
 }

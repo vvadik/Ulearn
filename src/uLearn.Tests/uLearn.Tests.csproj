@@ -81,6 +81,7 @@
     <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop, Version=1.0.168.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.Win32.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Win32.Primitives.4.3.0\lib\net46\Microsoft.Win32.Primitives.dll</HintPath>
     </Reference>
@@ -214,8 +215,33 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSharp\CourseValidator_ReportError_should.cs" />
+    <Compile Include="CSharp\CourseValidator_ReportWarning_should.cs" />
     <Compile Include="CSharp\LineLengthChecker_should.cs" />
     <Compile Include="CSharp\NamingChecker_should.cs" />
+    <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.WrongAnswer.27.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Compile Include="CSharp\LazilyUpdatingZip_should.cs" />
+    <Content Include="CSharp\testProject\projDir\secret_tests\MeaningOfLifeTask.WrongAnswer.25.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Compile Include="CSharp\ProjectExerciseBlock_Should.cs" />
+    <Content Include="CSharp\testProject\projDir\checking\MeaningOfLifeTask.Factory.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Compile Include="CSharp\testProject\projDir\MeaningOfLifeTask.Solution.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="CSharp\testProject\projDir\secret_tests\more_tests\MeaningOfLifeTask.WrongAnswer.Type.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.WrongAnswer.21.plus.21.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Compile Include="LockFilesTests.cs" />
     <Compile Include="CourseTool\Config_Test.cs" />
     <Compile Include="CourseTool\Converter_should.cs" />
@@ -343,6 +369,18 @@
     <ProjectReference Include="..\CourseTool\CourseTool.csproj">
       <Project>{38660028-bd75-4281-84e9-b35ce3e338dc}</Project>
       <Name>CourseTool</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CsSandboxer\CsSandboxer.csproj">
+      <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
+      <Name>CsSandboxer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RunCsJob\RunCsJob.csproj">
+      <Project>{77B16F9D-3CDF-4CC6-BE5F-B6BADFAC5394}</Project>
+      <Name>RunCsJob</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\uLearn.CourseLib\uLearn.CourseLib.csproj">
+      <Project>{70F83AD9-235D-4675-8585-608EB089EF94}</Project>
+      <Name>uLearn.CourseLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\uLearn\uLearn.csproj">
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>

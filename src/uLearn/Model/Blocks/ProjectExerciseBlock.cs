@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Xml.Serialization;
 using RunCsJob.Api;
@@ -31,21 +30,33 @@ namespace uLearn.Model.Blocks
 		[XmlElement("user-code-file-name")]
 		public string UserCodeFileName { get; set; }
 
-		[XmlElement("solution-file")]
-		public string SolutionFile { get; set; }
-
 		[XmlElement("exclude-path-for-checker")]
 		public string[] PathsToExcludeForChecker { get; set; }
 
 		[XmlElement("exclude-path-for-student")]
 		public string[] PathsToExcludeForStudent { get; set; }
-		public string ExerciseDir => Path.GetDirectoryName(CsProjFilePath).EnsureNotNull("csproj должен быть в поддиректории");
+		public string ExerciseDirName => Path.GetDirectoryName(CsProjFilePath).EnsureNotNull("csproj должен быть в поддиректории");
 
 		public string CsprojFileName => Path.GetFileName(CsProjFilePath);
+
+		public FileInfo CsprojFile => ExerciseFolder.GetFile(CsprojFileName);
+
+		public FileInfo UserCodeFile => ExerciseFolder.GetFile(UserCodeFileName);
+
+		public FileInfo SolutionFile => ExerciseFolder.GetFile(CorrectSolutionFileName);
+
+		public DirectoryInfo ExerciseFolder => new DirectoryInfo(Path.Combine(SlideFolderPath.FullName, ExerciseDirName));
+
+		public string UserCodeFileNameWithoutExt => Path.GetFileNameWithoutExtension(UserCodeFileName);
+
+		public string WrongAnswerPathRegexPattern => $"(.*){UserCodeFileNameWithoutExt}\\.WrongAnswer\\.(.+)\\.cs";
+
+		public string CorrectSolutionFileName => $"{UserCodeFileNameWithoutExt}.Solution.cs";
+
 		[XmlIgnore]
 		public DirectoryInfo SlideFolderPath { get; set; }
 
-		public FileInfo StudentsZip => SlideFolderPath.GetFile(ExerciseDir + ".exercise.zip");
+		public FileInfo StudentsZip => SlideFolderPath.GetFile(ExerciseDirName + ".exercise.zip");
 
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
@@ -54,7 +65,7 @@ namespace uLearn.Model.Blocks
 			ExpectedOutput = ExpectedOutput ?? "";
 			ValidatorName = string.Join(" ", LangId, ValidatorName);
 			SlideFolderPath = context.Dir;
-			var exercisePath = context.Dir.GetSubdir(ExerciseDir).FullName;
+			var exercisePath = context.Dir.GetSubdir(ExerciseDirName).FullName;
 			if (context.ZippedProjectExercises.Add(exercisePath))
 				CreateZipForStudent();
 
@@ -62,18 +73,20 @@ namespace uLearn.Model.Blocks
 
 			yield return this;
 
-			if (!string.IsNullOrWhiteSpace(SolutionFile))
+			if (SolutionFile.Exists)
 			{
 				yield return new MdBlock("### Решение") { Hide = true };
-				var content = File.ReadAllText(Path.Combine(exercisePath, SolutionFile));
-				yield return new CodeBlock(content, LangId, LangVer) { Hide = true };
+				yield return new CodeBlock(SolutionFile.ContentAsUtf8(), LangId, LangVer) { Hide = true };
 			}
 		}
 
 		private void CreateZipForStudent()
 		{
-			var directoryName = new DirectoryInfo(Path.Combine(SlideFolderPath.FullName, ExerciseDir));
-			var zip = new LazilyUpdatingZip(directoryName, new[] { "checking", "bin", "obj" }, ReplaceCsproj, StudentsZip);
+			var zip = new LazilyUpdatingZip(
+				ExerciseFolder, 
+				new[] { "checking", "bin", "obj" },
+				new[] { CorrectSolutionFileName },
+				WrongAnswerPathRegexPattern, ReplaceCsproj, StudentsZip);
 			zip.UpdateZip();
 		}
 
@@ -81,7 +94,7 @@ namespace uLearn.Model.Blocks
 		{
 			if (!file.Name.Equals(CsprojFileName, StringComparison.InvariantCultureIgnoreCase))
 				return null;
-			return ProjModifier.ModifyCsproj(file, ProjModifier.RemoveCheckingFromCsproj);
+			return ProjModifier.ModifyCsproj(file, proj => ProjModifier.PrepareForStudentZip(proj, this));
 		}
 
 		public override string GetSourceCode(string code)
@@ -107,19 +120,19 @@ namespace uLearn.Model.Blocks
 			};
 		}
 
-		private byte[] GetZipBytesForChecker(string code)
+		public byte[] GetZipBytesForChecker(string code)
 		{
-			var directoryName = Path.Combine(SlideFolderPath.FullName, ExerciseDir);
 			List<string> excluded = (PathsToExcludeForChecker ?? new string[0]).Concat(new[] { "bin/*", "obj/*" }).ToList();
-			var exerciseDir = new DirectoryInfo(directoryName);
-			return exerciseDir.ToZip(excluded,
+
+			return ExerciseFolder.ToZip(excluded,
 				new[]
 				{
 					new FileContent { Path = UserCodeFileName, Data = Encoding.UTF8.GetBytes(code) },
-					new FileContent { Path = CsprojFileName,
+					new FileContent { Path = CsprojFileName, // todo paatrofimov: проблема читаемости - в FileContent.Path везде пишется Name
 						Data = ProjModifier.ModifyCsproj(
-								exerciseDir.GetFile(CsprojFileName),
-								p => ProjModifier.PrepareForChecking(p, this, excluded)) }
+							CsprojFile,
+							p => ProjModifier.PrepareForCheckingUserCode(p, this, excluded))
+					}
 				});
 		}
 	}

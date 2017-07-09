@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml;
+using System.Text.RegularExpressions;
 using Microsoft.Build.Evaluation;
 using uLearn.Model.Blocks;
 
@@ -23,6 +23,17 @@ namespace uLearn
 
 	public static class ProjModifier
 	{
+		public static void PrepareForStudentZip(Project proj, ProjectExerciseBlock ex)
+		{
+			var toExclude = FindItemNamesByPattern(proj, ex.WrongAnswerPathRegexPattern)
+				.Concat(new[] { ex.CorrectSolutionFileName })
+				.ToList();
+
+			RemoveCheckingFromCsproj(proj);
+			SetFilenameItemTypeToCompile(proj, ex.UserCodeFileName);
+			ExcludePaths(proj, toExclude);
+		}
+
 		public static void RemoveCheckingFromCsproj(Project proj)
 		{
 			var toRemove = proj.Items.Where(IsChecking).ToList();
@@ -36,9 +47,30 @@ namespace uLearn
 				|| item.DirectMetadata.Any(md => md.Name == "Link" && md.EvaluatedValue.StartsWith("checking" + Path.DirectorySeparatorChar));
 		}
 
-		public static void PrepareForChecking(Project proj, ProjectExerciseBlock exerciseBlock, IReadOnlyList<string> excludedPaths)
+		public static void PrepareForCheckingUserCode(Project proj, ProjectExerciseBlock ex, IReadOnlyList<string> excludedPaths)
 		{
-			PrepareForChecking(proj, exerciseBlock.StartupObject, excludedPaths);
+			var toExclude = FindItemNamesByPattern(proj, ex.WrongAnswerPathRegexPattern)
+				.Concat(new[] { ex.CorrectSolutionFileName })
+				.ToList();
+
+			SetFilenameItemTypeToCompile(proj, ex.UserCodeFileName);
+			PrepareForChecking(proj, ex.StartupObject, excludedPaths.Concat(toExclude).ToList());
+		}
+
+		public static void SetFilenameItemTypeToCompile(Project proj, string fileName) => SetFilenameItemType(proj, fileName, "Compile");
+
+		public static void SetFilenameItemType(Project proj, string fileName, string type)
+		{
+			var item = proj.Items.SingleOrDefault(i => i.UnevaluatedInclude.EndsWith(fileName));
+			if (item != null)
+				item.ItemType = type;
+		}
+
+		private static IEnumerable<string> FindItemNamesByPattern(Project proj, string pattern)
+		{
+			return proj.Items
+				.Where(i => Regex.IsMatch(i.UnevaluatedInclude, pattern))
+				.Select(i => i.UnevaluatedInclude);
 		}
 
 		public static void PrepareForChecking(Project proj, string startupObject, IReadOnlyList<string> excludedPaths)

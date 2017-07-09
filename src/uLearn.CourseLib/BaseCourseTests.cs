@@ -126,7 +126,7 @@ namespace uLearn
 		private static void InitialCodeIsNotSolutionForProjExercise(ExerciseSlide slide)
 		{
 			var exercise = slide.Exercise as ProjectExerciseBlock;
-			var directoryName = Path.Combine(exercise.SlideFolderPath.FullName, exercise.ExerciseDir);
+			var directoryName = Path.Combine(exercise.SlideFolderPath.FullName, exercise.ExerciseDirName);
 			var excluded = (exercise.PathsToExcludeForChecker ?? new string[0]).Concat(new[] { "bin/*", "obj/*" }).ToList();
 			var exerciseDir = new DirectoryInfo(directoryName);
 			var bytes = exerciseDir.ToZip(excluded, new[]
@@ -135,7 +135,7 @@ namespace uLearn
 				{
 					Path = exercise.CsprojFileName,
 					Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(exercise.CsprojFileName),
-						proj => ProjModifier.PrepareForChecking(proj, exercise, excluded))
+						proj => ProjModifier.PrepareForCheckingUserCode(proj, exercise, excluded))
 				}
 			});
 			var result = SandboxRunner.Run(new ProjRunnerSubmission
