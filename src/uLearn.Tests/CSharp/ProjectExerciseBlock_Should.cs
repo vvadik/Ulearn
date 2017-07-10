@@ -87,22 +87,19 @@ namespace uLearn.CSharp
                 .ToList();
 
             itemNamesForCompile.Should().Contain(userCodeFileName);
-            itemNamesForCompile.Any(n => IsWrongAnswer(n) || IsSolution(n))
+            itemNamesForCompile.Any(IsWrongAnswerOrSoltion)
                 .Should().BeFalse();
         }
 
-        bool IsWrongAnswer(string name) => Regex.IsMatch(name, ex.WrongAnswersAndSolutionNameRegexPattern);
-
-        bool IsSolution(string name) => name.Equals(ex.CorrectSolutionFileName);
+        bool IsWrongAnswerOrSoltion(string name) => Regex.IsMatch(name, ex.WrongAnswersAndSolutionNameRegexPattern);
 
         [Test]
         public void When_CreateStudentZip_Have_ExerciseDirectory_With_CorrectFiles()
         {
             var projFiles = studentExerciseFolder.GetAllFiles();
 
-            projFiles.Should().NotContain(f => IsWrongAnswer(f.Name) || IsSolution(f.Name));
+            projFiles.Should().NotContain(f => IsWrongAnswerOrSoltion(f.Name));
         }
-
 
         [Test]
         public void When_CreateCheckerZip_Have_Csproj_WithCorrectItems_OfCompileType()
@@ -114,7 +111,7 @@ namespace uLearn.CSharp
                 .ToList();
 
             itemNamesForCompile.Should().Contain(userCodeFileName);
-            itemNamesForCompile.Any(n => IsWrongAnswer(n) || IsSolution(n))
+            itemNamesForCompile.Any(IsWrongAnswerOrSoltion)
                 .Should().BeFalse();
         }
 
@@ -123,7 +120,7 @@ namespace uLearn.CSharp
         {
             var projFiles = checkerExerciseFolder.GetAllFiles();
 
-            projFiles.Should().NotContain(f => IsWrongAnswer(f.Name) || IsSolution(f.Name));
+            projFiles.Should().NotContain(f => IsWrongAnswerOrSoltion(f.Name));
         }
     }
 }

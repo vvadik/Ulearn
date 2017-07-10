@@ -56,8 +56,8 @@ namespace uLearn
 	    public void ReportWarningIfWrongAnswersAreSolutionsOrNotOk(ExerciseSlide slide, ProjectExerciseBlock ex)
 	    {
 		    var filesWithWrongAnswer = FileSystem.GetFiles(ex.ExerciseFolder.FullName, SearchOption.SearchAllSubDirectories)
-			    .Where(IsWrongAnswer)
-			    .Select(name => new FileInfo(name));
+		        .Select(name => new FileInfo(name))
+                .Where(f => ex.IsWrongAnswer(f.Name));
 
 		    foreach (var waFile in filesWithWrongAnswer)
 		    {
@@ -74,8 +74,6 @@ namespace uLearn
 			    ReportWarningIfWrongAnswerVerdictIsNotOk(slide, waFile.Name, result);
 			    ReportWarningIfWrongAnswerIsSolution(slide, waFile.Name, result);
 		    }
-
-		    bool IsWrongAnswer(string path) => Regex.IsMatch(path, ex.WrongAnswersAndSolutionNameRegexPattern);
 		}
 
 		private byte[] GetZipBytesWithWrongAnswer(ProjectExerciseBlock ex, FileInfo waFile)
@@ -94,19 +92,19 @@ namespace uLearn
 		private void PrepareCsprojForCheckingWrongAnswer(Project proj, ProjectExerciseBlock ex, FileInfo waFile)
 		{
 			var toExclude = proj.Items
-				.Where(i => IsWrongAnswer(i) && NotCurrentWrongAnswer(i) || IsSolution(i))
+				.Where(i => IsWrongAnswerOrSolution(ex, i.UnevaluatedInclude) && NotCurrentWrongAnswer(i))
 				.Select(i => i.UnevaluatedInclude)
 				.ToList();
 
 			ProjModifier.SetFilenameItemTypeToCompile(proj, waFile.Name);
 			ProjModifier.PrepareForChecking(proj, ex.StartupObject, toExclude);
 			
-			bool IsWrongAnswer(ProjectItem i) => Regex.IsMatch(i.UnevaluatedInclude, ex.WrongAnswersAndSolutionNameRegexPattern);
 			bool NotCurrentWrongAnswer(ProjectItem i) => !i.UnevaluatedInclude.EndsWith(waFile.Name);
-			bool IsSolution(ProjectItem i) => i.UnevaluatedInclude.Equals(ex.CorrectSolutionFileName);
 		}
 
-		private void ReportWarningIfWrongAnswerVerdictIsNotOk(Slide slide, string waFileName, RunningResults waResult)
+	    bool IsWrongAnswerOrSolution(ProjectExerciseBlock ex, string name) => Regex.IsMatch(name, ex.WrongAnswersAndSolutionNameRegexPattern);
+
+        private void ReportWarningIfWrongAnswerVerdictIsNotOk(Slide slide, string waFileName, RunningResults waResult)
 	    {
 	        if (VerdictIsNotOk(waResult))
 	            ReportSlideWarning(slide, $"Code verdict of file with wrong answer ({waFileName}) is not OK. RunResult = " + waResult);
@@ -174,7 +172,7 @@ namespace uLearn
 		private void ReportErrorIfStudentZipHasWrongAnswerTests(Slide slide, ProjectExerciseBlock ex, DirectoryInfo unpackedZipDir)
 		{
 			var wrongAnswers = unpackedZipDir.GetAllFiles()
-				.Where(f => Regex.IsMatch(f.Name, ex.WrongAnswersAndSolutionNameRegexPattern))
+				.Where(f => IsWrongAnswerOrSolution(ex, f.Name))
 				.Select(f => f.Name);
 			var waNames = string.Join(", ", wrongAnswers);
 
@@ -206,7 +204,7 @@ namespace uLearn
 		{
 			var csproj = unpackedZipDir.GetFiles(ex.CsprojFileName).Single();
 			var wrongAnswerItems = new Project(csproj.FullName, null, null, new ProjectCollection()).Items
-				.Where(i => Regex.IsMatch(i.UnevaluatedInclude, ex.WrongAnswersAndSolutionNameRegexPattern))
+				.Where(i => IsWrongAnswerOrSolution(ex, i.UnevaluatedInclude))
 				.Select(i => i.UnevaluatedInclude);
 			var waItemNames = string.Join(", ", wrongAnswerItems);
 

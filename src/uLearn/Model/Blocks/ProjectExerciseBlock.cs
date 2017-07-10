@@ -59,6 +59,9 @@ namespace uLearn.Model.Blocks
 
 		public FileInfo StudentsZip => SlideFolderPath.GetFile(ExerciseDirName + ".exercise.zip");
 
+		public bool IsWrongAnswer(string name)
+			=> Regex.IsMatch(name, WrongAnswersAndSolutionNameRegexPattern) && !name.Equals(CorrectSolutionFileName);
+
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
 			FillProperties(context);
