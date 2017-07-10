@@ -44,8 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="secret_tests\MeaningOfLifeTask.WrongAnswer.25.cs" />
-    <Content Include="secret_tests\more_tests\MeaningOfLifeTask.WrongAnswer.Type.cs" />
+    <Content Include="MeaningOfLifeTask.WrongAnswer.Type.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="MeaningOfLifeTask.Solution.cs" />
     <Content Include="MeaningOfLifeTask.cs" />

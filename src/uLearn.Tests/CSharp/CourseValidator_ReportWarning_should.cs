@@ -79,13 +79,8 @@ namespace uLearn.CSharp
 		[Test]
 		public void Not_ReportWarning_If_WrongAnswer_IsWrongAnswer()
 		{
-			new[]
-				{
-					$"{exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.27.cs",
-					$"{exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.25.cs"
-				}
-				.All(validatorOut.ToString().Contains)
-				.Should().BeFalse();
+			validatorOut.ToString()
+				.Should().Contain($"{exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.27.cs");
 		}
 		
 	}

@@ -222,9 +222,6 @@
     <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.WrongAnswer.27.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="CSharp\testProject\projDir\secret_tests\MeaningOfLifeTask.WrongAnswer.25.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="CSharp\testProject\projDir\checking\MeaningOfLifeTask.Factory.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -234,7 +231,7 @@
     <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="CSharp\testProject\projDir\secret_tests\more_tests\MeaningOfLifeTask.WrongAnswer.Type.cs">
+    <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.WrongAnswer.Type.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.WrongAnswer.21.plus.21.cs">
