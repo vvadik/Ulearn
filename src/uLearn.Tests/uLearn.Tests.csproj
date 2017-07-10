@@ -227,7 +227,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Lesson_ShouldDeserialize.cs" />
-    <Compile Include="NUnitTestRunning\Runner_Should.cs" />
+    <Compile Include="NUnitTestRunning\NUnitTestRunner_Should.cs" />
     <Compile Include="NUnitTestRunning\TestsToRun\TenRepeatTest.cs" />
     <Compile Include="NUnitTestRunning\TestsToRun\FiveTestCases.cs" />
     <Compile Include="NUnitTestRunning\TestsToRun\ThreeTestsWithSetUp.cs" />

@@ -7,7 +7,7 @@ using uLearn.NUnitTestRunning.TestsToRun;
 
 namespace uLearn.NUnitTestRunning
 {
-	public class Runner_Should
+	public class NUnitTestRunner_Should
 	{
 		private NUnitTestRunner.TestListener listener;
 
