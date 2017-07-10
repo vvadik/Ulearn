@@ -134,20 +134,27 @@ namespace RunCsJob
 		{
 			var details = GetDetails(code, "");
 			Assert.AreEqual(Verdict.SecurityException, details.Verdict);
-			Assert.That(details.Error, Is.Not.Null.And.Not.Empty);
+			Assert.AreEqual(details.Error, string.Empty);
 		}
 
 		[TestCase("using System; namespace Test { public class Program { static public void Main() { throw new Exception(); }}}",
 			TestName = "throw")]
 		[TestCase("using System; namespace Test { public class Program { static public void Main() { Console.Error.Write('a'); throw new Exception(); }}}",
 			TestName = "write stderr + throw")]
-		[TestCase(@"class A { static void Main() { Main(); } }",
-			TestName = "stack overflow")]
 		public static void TestRuntimeError(string code)
 		{
 			var details = GetDetails(code, "");
 			Assert.AreEqual(Verdict.RuntimeError, details.Verdict);
-			Assert.That(details.Error, Is.Not.Null.And.Not.Empty);
+			Assert.AreEqual(details.Error, string.Empty);
+		}
+
+		[TestCase(@"class A { static void Main() { Main(); } }",
+			TestName = "stack overflow")]
+		public static void TestStackOverflowError(string code)
+		{
+			var details = GetDetails(code, "");
+			Assert.AreEqual(Verdict.RuntimeError, details.Verdict);
+			Assert.AreEqual(details.Error, "Stack overflow exception");
 		}
 
 		[TestCase("using System; class Program { static void Main() { var s = new string('*', $limit + 1); Console.Write(s); }}",
@@ -238,7 +245,7 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 		{
 			var details = GetDetails(code, "");
 			Assert.AreEqual(Verdict.Ok, details.Verdict);
-			Assert.That(details.CompilationOutput, Is.Not.Null.And.Not.Empty);
+			Assert.AreEqual(details.CompilationOutput, string.Empty);
 		}
 
 		[Test]
