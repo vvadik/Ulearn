@@ -6,8 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using Microsoft.Build.Evaluation;
 using RunCsJob.Api;
 using uLearn.Extensions;
+using uLearn.NUnitTestRunning;
+using uLearn.Properties;
 
 namespace uLearn.Model.Blocks
 {
@@ -33,6 +36,9 @@ namespace uLearn.Model.Blocks
 
 		[XmlElement("exclude-path-for-checker")]
 		public string[] PathsToExcludeForChecker { get; set; }
+
+		[XmlElement("nunit-test-class")]
+		public string[] NUnitTestClasses { get; set; }
 
 		[XmlElement("exclude-path-for-student")]
 		public string[] PathsToExcludeForStudent { get; set; }
@@ -135,16 +141,50 @@ namespace uLearn.Model.Blocks
                 .Concat(wrongAnswersAndSolution)
                 .ToList();
 
-			return ExerciseFolder.ToZip(excluded,
-				new[]
-				{
-					new FileContent { Path = UserCodeFileName, Data = Encoding.UTF8.GetBytes(code) },
-					new FileContent { Path = CsprojFileName,
-						Data = ProjModifier.ModifyCsproj(
-							CsprojFile,
-							p => ProjModifier.PrepareForCheckingUserCode(p, this, excluded))
-					}
-				});
+			return ExerciseFolder.ToZip(excluded, GetAdditionalFiles(code, ExerciseFolder, excluded));
+		}
+
+		private IEnumerable<FileContent> GetAdditionalFiles(string code, DirectoryInfo exerciseDir, List<string> excluded)
+		{
+			yield return new FileContent { Path = UserCodeFileName, Data = Encoding.UTF8.GetBytes(code) };
+
+			var useNUnitLauncher = NUnitTestClasses != null;
+			StartupObject = useNUnitLauncher ? typeof(NUnitTestRunner).FullName : StartupObject;
+
+			yield return new FileContent
+			{
+				Path = CsprojFileName,
+				Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(CsprojFileName), ModifyCsproj(excluded, useNUnitLauncher))
+			};
+
+			if (useNUnitLauncher)
+			{
+				yield return new FileContent { Path = GetNUnitTestRunnerFilename(), Data = CreateTestLauncherFile() };
+			}
+		}
+
+		private static string GetNUnitTestRunnerFilename()
+		{
+			return nameof(NUnitTestRunner)+".cs";
+		}
+
+		private Action<Project> ModifyCsproj(List<string> excluded, bool addNUnitLauncher)
+		{
+			return p =>
+			{
+				ProjModifier.PrepareForCheckingUserCode(p, this, excluded);
+				if (addNUnitLauncher)
+					p.AddItem("Compile", GetNUnitTestRunnerFilename());
+			};
+		}
+
+		private byte[] CreateTestLauncherFile()
+		{
+			var data = Resources.NUnitTestRunner;
+			var oldTestFilter = "\"SHOULD_BE_REPLACED\"";
+			var newTestFilter = string.Join(",", NUnitTestClasses.Select(x => $"\"{x}\""));
+			var newData = data.Replace(oldTestFilter, newTestFilter);
+			return Encoding.UTF8.GetBytes(newData);
 		}
 	}
 }

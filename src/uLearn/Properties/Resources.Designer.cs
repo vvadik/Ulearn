@@ -142,6 +142,35 @@ namespace uLearn.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///using System.Reflection;
+        ///using NUnit.Framework.Api;
+        ///using NUnit.Framework.Interfaces;
+        ///using NUnit.Framework.Internal.Filters;
+        ///
+        ///namespace uLearn.NUnitTestRunning
+        ///{
+        ///	public class NUnitTestRunner
+        ///	{
+        ///		public static void Main()
+        ///		{
+        ///			string[] testClassesToLaunch = { &quot;SHOULD_BE_REPLACED&quot; };
+        ///			RunAllTests(testClassesToLaunch);
+        ///		}
+        ///
+        ///		public static void RunAllTests(params string[] testClassesToLaunch)
+        ///		{
+        ///			var runner = new NUnitTe [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string NUnitTestRunner {
+            get {
+                return ResourceManager.GetString("NUnitTestRunner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
         internal static byte[] ru_RU_aff {

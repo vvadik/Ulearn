@@ -113,7 +113,6 @@
 		<xs:complexContent>
 			<xs:extension base="IncludeCode">
 					<xs:choice minOccurs="0" maxOccurs="unbounded">
-						<xs:element name="startup-object" type="xs:string" minOccurs="1" maxOccurs="1" />
 						<xs:element name="max-score" type="xs:integer" minOccurs="1" maxOccurs="1" />
 						<xs:element name="correctness-score" type="xs:integer" minOccurs="1" maxOccurs="1" />
 						<xs:element name="max-review-attempts" type="xs:integer" minOccurs="1" maxOccurs="1" />
@@ -154,6 +153,22 @@
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
+					<xs:choice>
+						<xs:element name="startup-object" type="xs:string" minOccurs="1" maxOccurs="1">
+							<xs:annotation>
+								<xs:documentation>
+									Полное имя класса, содержащего точку входа.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="nunit-test-class" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>
+									Имя класса с Nunit тестами, которые будут запущенны тест раннером.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
 					<xs:element name="user-code-file-name" type="notEmptyString" >
 						<xs:annotation>
 							<xs:documentation>
