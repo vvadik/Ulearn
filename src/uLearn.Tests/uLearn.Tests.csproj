@@ -234,6 +234,7 @@
     <Compile Include="NUnitTestRunning\TestsToRun\ThreeTestsWithTearDown.cs" />
     <Compile Include="NUnitTestRunning\TestsToRun\ThreePassingTests.cs" />
     <Compile Include="NUnitTestRunning\TestsToRun\ThreeTestsWithSecondFailing.cs" />
+    <Compile Include="NUnitTestRunning\TestsToRun\TwoTestWithOneTimeSetup.cs" />
     <Compile Include="Quizes\CourseLoader_should.cs" />
     <Content Include="Quizes\normalizedQuiz.xml">
       <SubType>Designer</SubType>

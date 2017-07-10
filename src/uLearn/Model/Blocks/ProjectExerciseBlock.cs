@@ -164,7 +164,4 @@ namespace uLearn.Model.Blocks
 			return Encoding.UTF8.GetBytes(newData);
 		}
 	}
-
-
-
 }

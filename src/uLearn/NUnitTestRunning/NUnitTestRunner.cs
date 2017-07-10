@@ -8,6 +8,10 @@ using NUnit.Framework.Internal.Filters;
 
 namespace uLearn.NUnitTestRunning
 {
+	/// <summary>
+	/// Этот файл включен в ресурсы и добавляется в пришедший на проверку проект с задачей, если у нее в качестве способа проверки 
+	/// установлен nunit-test-class, а не startup-object
+	/// </summary>
 	public class NUnitTestRunner
 	{
 		public static void Main()
@@ -35,31 +39,32 @@ namespace uLearn.NUnitTestRunning
 			var testFilter = new ClassNameFilter(testClass);
 			runner.Run(listener, testFilter);
 		}
-	}
 
-	public class TestListener : ITestListener
-	{
-		public IReadOnlyCollection<ITestResult> Results => results;
-
-		private readonly List<ITestResult> results = new List<ITestResult>();
-
-		public void TestStarted(ITest test)
+		// должен остаться в этом же файле
+		public class TestListener : ITestListener
 		{
-		}
+			public IReadOnlyCollection<ITestResult> Results => results;
 
-		public void TestFinished(ITestResult result)
-		{
-			results.Add(result);
+			private readonly List<ITestResult> results = new List<ITestResult>();
 
-			if (result.ResultState.Status == TestStatus.Failed && result.ResultState.Site != FailureSite.Child
-				&& result.ResultState.Label != "Cancelled")
+			public void TestStarted(ITest test)
 			{
-				Console.WriteLine($"Error on NUnit test: {result.Name} {result.Message} {result.StackTrace}");
 			}
-		}
 
-		public void TestOutput(TestOutput output)
-		{
+			public void TestFinished(ITestResult result)
+			{
+				results.Add(result);
+
+				if (result.ResultState.Status == TestStatus.Failed && result.ResultState.Site != FailureSite.Child
+					&& result.ResultState.Label != "Cancelled")
+				{
+					Console.WriteLine($"Error on NUnit test: {result.Name} {result.Message} {result.StackTrace}");
+				}
+			}
+
+			public void TestOutput(TestOutput output)
+			{
+			}
 		}
 	}
 }

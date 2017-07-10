@@ -2,16 +2,17 @@
 
 namespace uLearn.NUnitTestRunning.TestsToRun
 {
+	[TestFixture]
+	[Explicit]
 	public class ThreeTestsWithTearDown
 	{
 		public static int Counter { get; set; }
 
 		[TearDown]
-		public void SetUp()
+		public void TearDown()
 		{
 			Counter++;
 		}
-
 
 		[Test]
 		public void Test1()

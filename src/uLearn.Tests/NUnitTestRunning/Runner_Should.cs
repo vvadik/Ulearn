@@ -9,12 +9,12 @@ namespace uLearn.NUnitTestRunning
 {
 	public class Runner_Should
 	{
-		private TestListener listener;
+		private NUnitTestRunner.TestListener listener;
 
 		[SetUp]
 		public void SetUp()
 		{
-			listener = new TestListener();
+			listener = new NUnitTestRunner.TestListener();
 		}
 
 		[Test]
@@ -54,28 +54,43 @@ namespace uLearn.NUnitTestRunning
 		}
 
 		[Test]
+		[Repeat(2)]
 		public void Support_SetUp_Feature()
 		{
 			ThreeTestsWithSetUp.Counter = 0;
 			var expectedCounterValue = 3;
 
-			NUnitTestRunner.RunAllTests(new TestListener(), Assembly.GetExecutingAssembly(), typeof(ThreeTestsWithSetUp).FullName);
+			NUnitTestRunner.RunAllTests(new NUnitTestRunner.TestListener(), Assembly.GetExecutingAssembly(), typeof(ThreeTestsWithSetUp).FullName);
 
 			Assert.AreEqual(expectedCounterValue, ThreeTestsWithSetUp.Counter);
 		}
 
 		[Test]
+		[Repeat(2)]
+		public void Support_OneTimeSetUp_Feature()
+		{
+			TwoTestWithOneTimeSetup.Counter = 0;
+			var expectedCounterValue = 1;
+
+			NUnitTestRunner.RunAllTests(new NUnitTestRunner.TestListener(), Assembly.GetExecutingAssembly(), typeof(TwoTestWithOneTimeSetup).FullName);
+
+			Assert.AreEqual(expectedCounterValue, TwoTestWithOneTimeSetup.Counter);
+		}
+
+		[Test]
+		[Repeat(2)]
 		public void Support_TearDown_Feature()
 		{
 			ThreeTestsWithTearDown.Counter = 0;
 			var expectedCounterValue = 3;
 
-			NUnitTestRunner.RunAllTests(new TestListener(), Assembly.GetExecutingAssembly(), typeof(ThreeTestsWithTearDown).FullName);
+			NUnitTestRunner.RunAllTests(new NUnitTestRunner.TestListener(), Assembly.GetExecutingAssembly(), typeof(ThreeTestsWithTearDown).FullName);
 
 			Assert.AreEqual(expectedCounterValue, ThreeTestsWithTearDown.Counter);
 		}
 
 		[Test]
+		[Repeat(2)]
 		public void Support_TestCase_Feature()
 		{
 			var testsTuRun = typeof(FiveTestCases).FullName;
@@ -88,9 +103,10 @@ namespace uLearn.NUnitTestRunning
 		}
 
 		[Test]
+		[Repeat(2)]
 		public void Support_Repeat_Feature()
 		{
-			ThreeTestsWithTearDown.Counter = 0;
+			TenRepeatTest.Counter = 0;
 			var testsTuRun = typeof(TenRepeatTest).FullName;
 			const int expectedCounterValue = 10;
 
@@ -102,9 +118,9 @@ namespace uLearn.NUnitTestRunning
 
 	public static class TestListenerExtentions
 	{
-		public static int GetNumberOfFinishedTests(this TestListener listener)
+		public static int GetNumberOfFinishedTests(this NUnitTestRunner.TestListener listener)
 		{
-			return listener.Results.Count(x => x.HasChildren == false);
+			return listener.Results.Count(x => !x.HasChildren);
 		}
 	}
 }

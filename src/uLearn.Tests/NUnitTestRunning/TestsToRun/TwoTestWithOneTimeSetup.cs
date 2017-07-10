@@ -1,14 +1,14 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 
 namespace uLearn.NUnitTestRunning.TestsToRun
 {
 	[TestFixture]
 	[Explicit]
-	public class ThreeTestsWithSetUp
+	public class TwoTestWithOneTimeSetup
 	{
 		public static int Counter { get; set; }
 
-		[SetUp]
+		[OneTimeSetUp]
 		public void SetUp()
 		{
 			Counter++;
@@ -21,11 +21,6 @@ namespace uLearn.NUnitTestRunning.TestsToRun
 
 		[Test]
 		public void Test2()
-		{
-		}
-
-		[Test]
-		public void Test3()
 		{
 		}
 	}

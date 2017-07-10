@@ -2,6 +2,8 @@
 
 namespace uLearn.NUnitTestRunning.TestsToRun
 {
+	[TestFixture]
+	[Explicit]
 	public class TenRepeatTest
 	{
 		public static int Counter { get; set; }

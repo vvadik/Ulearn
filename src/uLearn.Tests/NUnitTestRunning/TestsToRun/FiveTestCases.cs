@@ -2,6 +2,8 @@
 
 namespace uLearn.NUnitTestRunning.TestsToRun
 {
+	[TestFixture]
+	[Explicit]
 	public class FiveTestCases
 	{
 		[TestCase(1)]

@@ -3,6 +3,7 @@
 namespace uLearn.NUnitTestRunning.TestsToRun
 {
 	[TestFixture]
+	[Explicit]
 	public class ThreeTestsWithSecondFailing
 	{
 		[Test]

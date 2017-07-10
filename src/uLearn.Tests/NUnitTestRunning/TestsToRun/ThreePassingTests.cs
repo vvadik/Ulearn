@@ -3,6 +3,7 @@ using NUnit.Framework;
 namespace uLearn.NUnitTestRunning.TestsToRun
 {
 	[TestFixture]
+	[Explicit]
 	public class ThreePassingTests
 	{
 		[Test]
