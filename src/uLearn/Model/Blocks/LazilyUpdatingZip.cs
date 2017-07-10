@@ -13,7 +13,6 @@ namespace uLearn.Model.Blocks
 	{
 		private readonly DirectoryInfo dir;
 		private readonly string[] excludedDirs;
-	    private readonly string[] excludedFiles;
 	    private readonly string excludedFilesNamePattern;
 		private readonly Func<FileInfo, byte[]> getFileContent;
 		private readonly FileInfo zipFile;
@@ -21,14 +20,12 @@ namespace uLearn.Model.Blocks
 	    public LazilyUpdatingZip(
 			DirectoryInfo dir, 
 			string[] excludedDirs, 
-			string[] excludedFiles, 
 			string excludedFilesNamePattern, 
 			Func<FileInfo, byte[]> getFileContent, 
 			FileInfo zipFile)
 		{
 			this.dir = dir;
 			this.excludedDirs = excludedDirs;
-			this.excludedFiles = excludedFiles;
 			this.excludedFilesNamePattern = excludedFilesNamePattern;
 			this.getFileContent = getFileContent;
 			this.zipFile = zipFile;
@@ -68,8 +65,7 @@ namespace uLearn.Model.Blocks
 		private IEnumerable<FileInfo> EnumerateFiles(DirectoryInfo aDir)
 		{
 			return aDir.GetAllFiles().Where(f =>
-				!(excludedDirs.Contains(f.Directory?.Name) || excludedFiles.Contains(f.Name)
-				|| Regex.IsMatch(f.Name, excludedFilesNamePattern)));
+				!(excludedDirs.Contains(f.Directory?.Name) || Regex.IsMatch(f.Name, excludedFilesNamePattern)));
 		}
 	}
 }

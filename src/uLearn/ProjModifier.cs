@@ -25,9 +25,7 @@ namespace uLearn
 	{
 		public static void PrepareForStudentZip(Project proj, ProjectExerciseBlock ex)
 		{
-			var toExclude = FindItemNamesByPattern(proj, ex.WrongAnswerPathRegexPattern)
-				.Concat(new[] { ex.CorrectSolutionFileName })
-				.ToList();
+			var toExclude = FindItemNamesByPattern(proj, ex.WrongAnswersAndSolutionNameRegexPattern).ToList();
 
 			RemoveCheckingFromCsproj(proj);
 			SetFilenameItemTypeToCompile(proj, ex.UserCodeFileName);
@@ -49,9 +47,7 @@ namespace uLearn
 
 		public static void PrepareForCheckingUserCode(Project proj, ProjectExerciseBlock ex, IReadOnlyList<string> excludedPaths)
 		{
-			var toExclude = FindItemNamesByPattern(proj, ex.WrongAnswerPathRegexPattern)
-				.Concat(new[] { ex.CorrectSolutionFileName })
-				.ToList();
+			var toExclude = FindItemNamesByPattern(proj, ex.WrongAnswersAndSolutionNameRegexPattern).ToList();
 
 			SetFilenameItemTypeToCompile(proj, ex.UserCodeFileName);
 			PrepareForChecking(proj, ex.StartupObject, excludedPaths.Concat(toExclude).ToList());
@@ -61,7 +57,7 @@ namespace uLearn
 
 		public static void SetFilenameItemType(Project proj, string fileName, string type)
 		{
-			var item = proj.Items.SingleOrDefault(i => i.UnevaluatedInclude.EndsWith(fileName));
+			var item = proj.Items.SingleOrDefault(i => i.UnevaluatedInclude.Equals(fileName));
 			if (item != null)
 				item.ItemType = type;
 		}

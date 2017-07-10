@@ -75,7 +75,7 @@ namespace uLearn
 			    ReportWarningIfWrongAnswerIsSolution(slide, waFile.Name, result);
 		    }
 
-		    bool IsWrongAnswer(string path) => Regex.IsMatch(path, ex.WrongAnswerPathRegexPattern);
+		    bool IsWrongAnswer(string path) => Regex.IsMatch(path, ex.WrongAnswersAndSolutionNameRegexPattern);
 		}
 
 		private byte[] GetZipBytesWithWrongAnswer(ProjectExerciseBlock ex, FileInfo waFile)
@@ -101,7 +101,7 @@ namespace uLearn
 			ProjModifier.SetFilenameItemTypeToCompile(proj, waFile.Name);
 			ProjModifier.PrepareForChecking(proj, ex.StartupObject, toExclude);
 			
-			bool IsWrongAnswer(ProjectItem i) => Regex.IsMatch(i.UnevaluatedInclude, ex.WrongAnswerPathRegexPattern);
+			bool IsWrongAnswer(ProjectItem i) => Regex.IsMatch(i.UnevaluatedInclude, ex.WrongAnswersAndSolutionNameRegexPattern);
 			bool NotCurrentWrongAnswer(ProjectItem i) => !i.UnevaluatedInclude.EndsWith(waFile.Name);
 			bool IsSolution(ProjectItem i) => i.UnevaluatedInclude.Equals(ex.CorrectSolutionFileName);
 		}
@@ -174,7 +174,7 @@ namespace uLearn
 		private void ReportErrorIfStudentZipHasWrongAnswerTests(Slide slide, ProjectExerciseBlock ex, DirectoryInfo unpackedZipDir)
 		{
 			var wrongAnswers = unpackedZipDir.GetAllFiles()
-				.Where(f => Regex.IsMatch(f.Name, ex.WrongAnswerPathRegexPattern))
+				.Where(f => Regex.IsMatch(f.Name, ex.WrongAnswersAndSolutionNameRegexPattern))
 				.Select(f => f.Name);
 			var waNames = string.Join(", ", wrongAnswers);
 
@@ -206,7 +206,7 @@ namespace uLearn
 		{
 			var csproj = unpackedZipDir.GetFiles(ex.CsprojFileName).Single();
 			var wrongAnswerItems = new Project(csproj.FullName, null, null, new ProjectCollection()).Items
-				.Where(i => Regex.IsMatch(i.UnevaluatedInclude, ex.WrongAnswerPathRegexPattern))
+				.Where(i => Regex.IsMatch(i.UnevaluatedInclude, ex.WrongAnswersAndSolutionNameRegexPattern))
 				.Select(i => i.UnevaluatedInclude);
 			var waItemNames = string.Join(", ", wrongAnswerItems);
 

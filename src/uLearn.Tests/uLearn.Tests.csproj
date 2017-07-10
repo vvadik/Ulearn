@@ -222,11 +222,9 @@
     <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.WrongAnswer.27.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Compile Include="CSharp\LazilyUpdatingZip_should.cs" />
     <Content Include="CSharp\testProject\projDir\secret_tests\MeaningOfLifeTask.WrongAnswer.25.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Compile Include="CSharp\ProjectExerciseBlock_Should.cs" />
     <Content Include="CSharp\testProject\projDir\checking\MeaningOfLifeTask.Factory.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -253,6 +251,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Lesson_ShouldDeserialize.cs" />
+    <Compile Include="CSharp\ProjectExerciseBlock_Should.cs" />
     <Compile Include="Quizes\CourseLoader_should.cs" />
     <Content Include="Quizes\normalizedQuiz.xml">
       <SubType>Designer</SubType>

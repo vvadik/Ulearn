@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using RunCsJob.Api;
 using uLearn.Extensions;
@@ -49,7 +50,7 @@ namespace uLearn.Model.Blocks
 
 		public string UserCodeFileNameWithoutExt => Path.GetFileNameWithoutExtension(UserCodeFileName);
 
-		public string WrongAnswerPathRegexPattern => $"(.*){UserCodeFileNameWithoutExt}\\.WrongAnswer\\.(.+)\\.cs";
+		public string WrongAnswersAndSolutionNameRegexPattern => $"{UserCodeFileNameWithoutExt}\\.(.+)\\.cs";
 
 		public string CorrectSolutionFileName => $"{UserCodeFileNameWithoutExt}.Solution.cs";
 
@@ -85,8 +86,8 @@ namespace uLearn.Model.Blocks
 			var zip = new LazilyUpdatingZip(
 				ExerciseFolder, 
 				new[] { "checking", "bin", "obj" },
-				new[] { CorrectSolutionFileName },
-				WrongAnswerPathRegexPattern, ReplaceCsproj, StudentsZip);
+				WrongAnswersAndSolutionNameRegexPattern, 
+                ReplaceCsproj, StudentsZip);
 			zip.UpdateZip();
 		}
 
@@ -122,13 +123,20 @@ namespace uLearn.Model.Blocks
 
 		public byte[] GetZipBytesForChecker(string code)
 		{
-			List<string> excluded = (PathsToExcludeForChecker ?? new string[0]).Concat(new[] { "bin/*", "obj/*" }).ToList();
+		    var wrongAnswersAndSolution = ExerciseFolder.GetAllFiles()
+                .Where(f => Regex.IsMatch(f.Name, WrongAnswersAndSolutionNameRegexPattern))
+                .Select(f => f.Name);
+
+            List<string> excluded = (PathsToExcludeForChecker ?? new string[0])
+                .Concat(new[] { "bin/*", "obj/*" })
+                .Concat(wrongAnswersAndSolution)
+                .ToList();
 
 			return ExerciseFolder.ToZip(excluded,
 				new[]
 				{
 					new FileContent { Path = UserCodeFileName, Data = Encoding.UTF8.GetBytes(code) },
-					new FileContent { Path = CsprojFileName, // todo paatrofimov: проблема читаемости - в FileContent.Path везде пишется Name
+					new FileContent { Path = CsprojFileName,
 						Data = ProjModifier.ModifyCsproj(
 							CsprojFile,
 							p => ProjModifier.PrepareForCheckingUserCode(p, this, excluded))

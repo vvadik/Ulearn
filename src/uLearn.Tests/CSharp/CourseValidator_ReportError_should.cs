@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using FluentAssertions;
@@ -9,7 +8,6 @@ using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
 using RunCsJob;
 using test;
-using uLearn.Extensions;
 using uLearn.Model.Blocks;
 // ReSharper disable AssignNullToNotNullAttribute
 
@@ -61,7 +59,7 @@ namespace uLearn.CSharp
 
 			new LazilyUpdatingZip(
 					projExerciseFolder,
-					new string[0], new string[0],
+					new string[0],
 					new Regex("[^\\s\\S]").ToString(),
 					_ => null, tempZipFile)
 				.UpdateZip();
