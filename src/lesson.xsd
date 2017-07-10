@@ -176,14 +176,6 @@
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="solution-file" type="notEmptyString" minOccurs="0" maxOccurs="1">
-						<xs:annotation>
-							<xs:documentation>
-								Путь до файла с эталонным авторским решением. Инструкторы увидят его после задачи и смогут ориентироваться на него при проверке работ. 
-								Студентам это решение не увидят.
-							</xs:documentation>
-						</xs:annotation>
-					</xs:element>
 					<xs:element name="exclude-path-for-checker" type="notEmptyString" minOccurs="0" maxOccurs="unbounded" >
 						<xs:annotation>
 							<xs:documentation>

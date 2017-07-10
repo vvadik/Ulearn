@@ -92,19 +92,18 @@ namespace uLearn
 		private void PrepareCsprojForCheckingWrongAnswer(Project proj, ProjectExerciseBlock ex, FileInfo waFile)
 		{
 			var toExclude = proj.Items
-				.Where(i => IsWrongAnswerOrSolution(ex, i.UnevaluatedInclude) && NotCurrentWrongAnswer(i))
+				.Where(i => IsWrongAnswerOrSolution(i.UnevaluatedInclude) && NotCurrentWrongAnswer(i))
 				.Select(i => i.UnevaluatedInclude)
 				.ToList();
 
 			ProjModifier.SetFilenameItemTypeToCompile(proj, waFile.Name);
 			ProjModifier.PrepareForChecking(proj, ex.StartupObject, toExclude);
-			
+
+			bool IsWrongAnswerOrSolution(string name) => Regex.IsMatch(name, ex.WrongAnswersAndSolutionNameRegexPattern);
 			bool NotCurrentWrongAnswer(ProjectItem i) => !i.UnevaluatedInclude.EndsWith(waFile.Name);
 		}
 
-	    bool IsWrongAnswerOrSolution(ProjectExerciseBlock ex, string name) => Regex.IsMatch(name, ex.WrongAnswersAndSolutionNameRegexPattern);
-
-        private void ReportWarningIfWrongAnswerVerdictIsNotOk(Slide slide, string waFileName, RunningResults waResult)
+		private void ReportWarningIfWrongAnswerVerdictIsNotOk(Slide slide, string waFileName, RunningResults waResult)
 	    {
 	        if (VerdictIsNotOk(waResult))
 	            ReportSlideWarning(slide, $"Code verdict of file with wrong answer ({waFileName}) is not OK. RunResult = " + waResult);
@@ -138,7 +137,7 @@ namespace uLearn
 
 		public void ReportIfStudentsZipHasErrors(Slide slide, ProjectExerciseBlock ex)
 		{
-			var tempDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "student_zip_unzipped"));
+			var tempDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp_student_zip_unzipped", ex.ExerciseFolder.Name));
 			try
 			{
 				Utils.UnpackZip(ex.StudentsZip.Content(), tempDir.FullName);
@@ -172,7 +171,7 @@ namespace uLearn
 		private void ReportErrorIfStudentZipHasWrongAnswerTests(Slide slide, ProjectExerciseBlock ex, DirectoryInfo unpackedZipDir)
 		{
 			var wrongAnswers = unpackedZipDir.GetAllFiles()
-				.Where(f => IsWrongAnswerOrSolution(ex, f.Name))
+				.Where(f => ex.IsWrongAnswer(f.Name))
 				.Select(f => f.Name);
 			var waNames = string.Join(", ", wrongAnswers);
 
@@ -204,7 +203,7 @@ namespace uLearn
 		{
 			var csproj = unpackedZipDir.GetFiles(ex.CsprojFileName).Single();
 			var wrongAnswerItems = new Project(csproj.FullName, null, null, new ProjectCollection()).Items
-				.Where(i => IsWrongAnswerOrSolution(ex, i.UnevaluatedInclude))
+				.Where(i => ex.IsWrongAnswer(i.UnevaluatedInclude))
 				.Select(i => i.UnevaluatedInclude);
 			var waItemNames = string.Join(", ", wrongAnswerItems);
 
