@@ -295,6 +295,7 @@ namespace uLearn
 			nsResolver.AddNamespace("course", "https://ulearn.azurewebsites.net/course");
 			nsResolver.AddNamespace("lesson", "https://ulearn.azurewebsites.net/lesson");
 			nsResolver.AddNamespace("quiz", "https://ulearn.azurewebsites.net/quiz");
+			nsResolver.AddNamespace("quiz", "https://ulearn.azurewebsites.net/types");
 			using (var zip = ZipFile.Read(path, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
 			{
 				if (zip.ContainsEntry("Course.xml"))
