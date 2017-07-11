@@ -44,12 +44,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="MeaningOfLifeTask.WrongAnswer.Type.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="MeaningOfLifeTask.Solution.cs" />
     <Content Include="MeaningOfLifeTask.cs" />
     <Content Include="MeaningOfLifeTask.WrongAnswer.27.cs" />
     <Content Include="MeaningOfLifeTask.WrongAnswer.21.plus.21.cs" />
-    <Content Include="checking\MeaningOfLifeTask.Factory.cs" />
+    <Content Include="AnotherTask.cs" />
+    <Content Include="AnotherTask.WrongAnswer.88.cs" />
+    <Compile Include="MeaningOfLifeTask.Solution.cs" />
+    <Compile Include="AnotherTask.Solution.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="..\Link.cs">
       <Link>Link.cs</Link>
     </Compile>

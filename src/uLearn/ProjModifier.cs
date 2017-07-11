@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.Build.Evaluation;
 using uLearn.Model.Blocks;
 
@@ -25,7 +24,7 @@ namespace uLearn
 	{
 		public static void PrepareForStudentZip(Project proj, ProjectExerciseBlock ex)
 		{
-			var toExclude = FindItemNamesByPattern(proj, ex.WrongAnswersAndSolutionNameRegexPattern).ToList();
+			var toExclude = FindItemNames(proj, ProjectExerciseBlock.IsAnyWrongAnswerOrSolution).ToList();
 
 			RemoveCheckingFromCsproj(proj);
 			SetFilenameItemTypeToCompile(proj, ex.UserCodeFileName);
@@ -47,10 +46,8 @@ namespace uLearn
 
 		public static void PrepareForCheckingUserCode(Project proj, ProjectExerciseBlock ex, IReadOnlyList<string> excludedPaths)
 		{
-			var toExclude = FindItemNamesByPattern(proj, ex.WrongAnswersAndSolutionNameRegexPattern).ToList();
-
 			SetFilenameItemTypeToCompile(proj, ex.UserCodeFileName);
-			PrepareForChecking(proj, ex.StartupObject, excludedPaths.Concat(toExclude).ToList());
+			PrepareForChecking(proj, ex.StartupObject, excludedPaths);
 		}
 
 		public static void SetFilenameItemTypeToCompile(Project proj, string fileName) => SetFilenameItemType(proj, fileName, "Compile");
@@ -62,11 +59,9 @@ namespace uLearn
 				item.ItemType = type;
 		}
 
-		private static IEnumerable<string> FindItemNamesByPattern(Project proj, string pattern)
+		private static IEnumerable<string> FindItemNames(Project proj, Func<string, bool> predicate)
 		{
-			return proj.Items
-				.Where(i => Regex.IsMatch(i.UnevaluatedInclude, pattern))
-				.Select(i => i.UnevaluatedInclude);
+			return proj.Items.Select(i => i.UnevaluatedInclude).Where(predicate);
 		}
 
 		public static void PrepareForChecking(Project proj, string startupObject, IReadOnlyList<string> excludedPaths)

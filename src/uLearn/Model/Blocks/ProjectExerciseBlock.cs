@@ -17,6 +17,10 @@ namespace uLearn.Model.Blocks
 	[XmlType("proj-exercise")]
 	public class ProjectExerciseBlock : ExerciseBlock
 	{
+		public static readonly string AnyWrongAnswerAndSolutionNameRegex = new Regex("(.+)\\.WrongAnswer\\.(.+)\\.cs|(.+)\\.Solution\\.cs").ToString();
+		
+		public static bool IsAnyWrongAnswerOrSolution(string name) => Regex.IsMatch(name, AnyWrongAnswerAndSolutionNameRegex); 
+
 		public ProjectExerciseBlock()
 		{
 			StartupObject = "checking.CheckerRunner";
@@ -65,9 +69,6 @@ namespace uLearn.Model.Blocks
 
 		public FileInfo StudentsZip => SlideFolderPath.GetFile(ExerciseDirName + ".exercise.zip");
 
-		public bool IsWrongAnswer(string name)
-			=> Regex.IsMatch(name, WrongAnswersAndSolutionNameRegexPattern) && !name.Equals(CorrectSolutionFileName);
-
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
 			FillProperties(context);
@@ -95,7 +96,7 @@ namespace uLearn.Model.Blocks
 			var zip = new LazilyUpdatingZip(
 				ExerciseFolder, 
 				new[] { "checking", "bin", "obj" },
-				WrongAnswersAndSolutionNameRegexPattern, 
+				AnyWrongAnswerAndSolutionNameRegex, 
                 ReplaceCsproj, StudentsZip);
 			zip.UpdateZip();
 		}
@@ -132,13 +133,13 @@ namespace uLearn.Model.Blocks
 
 		public byte[] GetZipBytesForChecker(string code)
 		{
-		    var wrongAnswersAndSolution = ExerciseFolder.GetAllFiles()
-                .Where(f => Regex.IsMatch(f.Name, WrongAnswersAndSolutionNameRegexPattern))
-                .Select(f => f.Name);
+		    var correctSolution = ExerciseFolder.GetAllFiles()
+				.Select(f => f.Name)
+				.Where(n => n.Equals(CorrectSolutionFileName));
 
-            List<string> excluded = (PathsToExcludeForChecker ?? new string[0])
+            var excluded = (PathsToExcludeForChecker ?? new string[0])
                 .Concat(new[] { "bin/*", "obj/*" })
-                .Concat(wrongAnswersAndSolution)
+                .Concat(correctSolution)
                 .ToList();
 
 			return ExerciseFolder.ToZip(excluded, GetAdditionalFiles(code, ExerciseFolder, excluded));

@@ -57,47 +57,34 @@ namespace uLearn.CSharp
 				FileSystem.DeleteDirectory(tempZipFile.DirectoryName, DeleteDirectoryOption.DeleteAllContents);
 			FileSystem.CreateDirectory(tempZipFile.DirectoryName);
 
+			var regexMatchingNothing = new Regex("[^\\s\\S]").ToString();
 			new LazilyUpdatingZip(
 					projExerciseFolder,
 					new string[0],
-					new Regex("[^\\s\\S]").ToString(),
+					regexMatchingNothing,
 					_ => null, tempZipFile)
 				.UpdateZip();
 		}
 
 		[Test]
-		public void ReportError_If_StudentZip_Has_Solution()
+		public void ReportError_If_StudentZip_Has_WrongAnswers_Or_Solution_Files()
 		{
 			validatorOut.ToString()
-				.Should().Contain($"Student zip exercise directory contains solution ({exBlock.CorrectSolutionFileName})");
+				.Should().Contain($"Student zip exercise directory has 'wrong answer' and/or solution files ({Helper.OrderedWrongAnswersAndSolutionNames})");
 		}
 
 		[Test]
-		public void ReportError_If_StudentZip_Has_WrongAnswers()
+		public void ReportError_If_Student_Csproj_Has_UserCodeFile_Of_Not_CompileType()
 		{
 			validatorOut.ToString()
-				.Should().Contain("Student zip exercise directory contains wrong answer tests");
+				.Should().Contain($"Student's csproj has user code item ({exBlock.UserCodeFileName}) of not compile type");
 		}
 
 		[Test]
-		public void ReportError_If_StudentZip_Csproj_UserCode_IsNotOf_Compile_ItemType()
+		public void ReportError_If_Student_Csproj_Has_WrongAnswers_Or_Solution_Items()
 		{
 			validatorOut.ToString()
-				.Should().Contain($"Student zip csproj has user code item ({exBlock.UserCodeFileName}) of not compile type");
-		}
-
-		[Test]
-		public void ReportError_If_StudentZip_Csproj_Has_Solution_Item()
-		{
-			validatorOut.ToString()
-				.Should().Contain($"Student zip csproj has solution item ({exBlock.CorrectSolutionFileName})");
-		}
-
-		[Test]
-		public void ReportError_If_StudentZip_Csproj_Has_WrongAnswer_Items()
-		{
-			validatorOut.ToString()
-				.Should().Contain("Student zip csproj has wrong answer items");
+				.Should().Contain($"Student's csproj has 'wrong answer' and/or solution items ({Helper.OrderedWrongAnswersAndSolutionNames})");
 		}
 	}
 }

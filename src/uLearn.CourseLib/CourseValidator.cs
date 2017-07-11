@@ -57,7 +57,7 @@ namespace uLearn
 	    {
 		    var filesWithWrongAnswer = FileSystem.GetFiles(ex.ExerciseFolder.FullName, SearchOption.SearchAllSubDirectories)
 		        .Select(name => new FileInfo(name))
-                .Where(f => ex.IsWrongAnswer(f.Name));
+				.Where(f => IsWrongAnswer(ex, f.Name));
 
 		    foreach (var waFile in filesWithWrongAnswer)
 		    {
@@ -89,18 +89,12 @@ namespace uLearn
 				});
 		}
 
-		private void PrepareCsprojForCheckingWrongAnswer(Project proj, ProjectExerciseBlock ex, FileInfo waFile)
+		private void PrepareCsprojForCheckingWrongAnswer(Project proj, ProjectExerciseBlock ex, FileInfo wrongAnswer)
 		{
-			var toExclude = proj.Items
-				.Where(i => IsWrongAnswerOrSolution(i.UnevaluatedInclude) && NotCurrentWrongAnswer(i))
-				.Select(i => i.UnevaluatedInclude)
-				.ToList();
+			var excludeSolution = proj.Items.Select(i => i.UnevaluatedInclude).Single(n=> IsSolution(ex, n));
 
-			ProjModifier.SetFilenameItemTypeToCompile(proj, waFile.Name);
-			ProjModifier.PrepareForChecking(proj, ex.StartupObject, toExclude);
-
-			bool IsWrongAnswerOrSolution(string name) => Regex.IsMatch(name, ex.WrongAnswersAndSolutionNameRegexPattern);
-			bool NotCurrentWrongAnswer(ProjectItem i) => !i.UnevaluatedInclude.EndsWith(waFile.Name);
+			ProjModifier.SetFilenameItemTypeToCompile(proj, wrongAnswer.Name);
+			ProjModifier.PrepareForChecking(proj, ex.StartupObject, new [] {excludeSolution});
 		}
 
 		private void ReportWarningIfWrongAnswerVerdictIsNotOk(Slide slide, string waFileName, RunningResults waResult)
@@ -144,11 +138,9 @@ namespace uLearn
 				var res = MsBuildRunner.BuildProject(settings.MsBuildSettings, tempDir.GetFile(ex.CsprojFileName).FullName, tempDir);
 
 				ReportErrorIfStudentsZipNotBuilding(slide, ex, res);
-				ReportErrorIfStudentZipHasSolution(slide, ex, tempDir);
-				ReportErrorIfStudentZipHasWrongAnswerTests(slide, ex, tempDir);
+				ReportErrorIfStudentsZipHasWrongAnswerOrSolutionFiles(slide, tempDir);
 				ReportErrorIfCsprojHasUserCodeOfNotCompileType(slide, ex, tempDir);
-				ReportErrorIfCsprojHasSolutionItem(slide, ex, tempDir);
-				ReportErrorIfCsprojHasWrongAnswerItems(slide, ex, tempDir);
+				ReportErrorIfCsprojHasWrongAnswerOrSolutionItems(slide, ex, tempDir);
 			}
 			finally
 			{
@@ -162,53 +154,45 @@ namespace uLearn
 				ReportSlideError(slide, ex.CsprojFileName + " not building! " + res);
 		}
 
-		private void ReportErrorIfStudentZipHasSolution(Slide slide, ProjectExerciseBlock ex, DirectoryInfo unpackedZipDir)
+		private void ReportErrorIfStudentsZipHasWrongAnswerOrSolutionFiles(Slide slide, DirectoryInfo unpackedZipDir)
 		{
-			if (unpackedZipDir.GetFiles().Any(f => f.Name.Equals(ex.CorrectSolutionFileName)))
-				ReportSlideError(slide, $"Student zip exercise directory contains solution ({ex.CorrectSolutionFileName})");
+			var wrongAnswersOrSolution = GetOrderedFileNames(unpackedZipDir, ProjectExerciseBlock.IsAnyWrongAnswerOrSolution);
+
+			if (wrongAnswersOrSolution.Any())
+				ReportSlideError(slide, $"Student zip exercise directory has 'wrong answer' and/or solution files ({string.Join(", ", wrongAnswersOrSolution)})");
 		}
 
-		private void ReportErrorIfStudentZipHasWrongAnswerTests(Slide slide, ProjectExerciseBlock ex, DirectoryInfo unpackedZipDir)
+		private string[] GetOrderedFileNames(DirectoryInfo dir, Func<string, bool> predicate)
 		{
-			var wrongAnswers = unpackedZipDir.GetAllFiles()
-				.Where(f => ex.IsWrongAnswer(f.Name))
-				.Select(f => f.Name);
-			var waNames = string.Join(", ", wrongAnswers);
-
-			if (waNames.Any())
-				ReportSlideError(slide, $"Student zip exercise directory contains wrong answer tests ({waNames})");
+			var allNames = dir.GetAllFiles().Select(f => f.Name);
+			return GetOrderedFileNames(allNames, predicate);
 		}
+
+		private string[] GetOrderedFileNames(IEnumerable<string> names, Func<string, bool> predicate)
+			=>
+				names.Where(predicate).OrderBy(n => n).ToArray();
 
 		private void ReportErrorIfCsprojHasUserCodeOfNotCompileType(Slide slide, ProjectExerciseBlock ex, DirectoryInfo unpackedZipDir)
 		{
 			var csproj = unpackedZipDir.GetFiles(ex.CsprojFileName).Single();
+
 			var userCode = new Project(csproj.FullName, null, null, new ProjectCollection()).Items
 				.Single(i => i.UnevaluatedInclude.Equals(ex.UserCodeFileName));
 
 			if (!userCode.ItemType.Equals("Compile"))
-				ReportSlideError(slide, $"Student zip csproj has user code item ({userCode.UnevaluatedInclude}) of not compile type");
+				ReportSlideError(slide, $"Student's csproj has user code item ({userCode.UnevaluatedInclude}) of not compile type");
 		}
 
-		private void ReportErrorIfCsprojHasSolutionItem(Slide slide, ProjectExerciseBlock ex, DirectoryInfo unpackedZipDir)
+		private void ReportErrorIfCsprojHasWrongAnswerOrSolutionItems(Slide slide, ProjectExerciseBlock ex, DirectoryInfo unpackedZipDir)
 		{
-			var csproj = unpackedZipDir.GetFiles(ex.CsprojFileName).Single();
-			var solution = new Project(csproj.FullName, null, null, new ProjectCollection()).Items
-				.SingleOrDefault(i => i.UnevaluatedInclude.Equals(ex.CorrectSolutionFileName));
+			var csprojFile = unpackedZipDir.GetFiles(ex.CsprojFileName).Single();
+			var csProj = new Project(csprojFile.FullName, null, null, new ProjectCollection());
+			var csProjItems = csProj.Items.Select(i => i.UnevaluatedInclude);
 
-			if (solution != null)
-				ReportSlideError(slide, $"Student zip csproj has solution item ({solution.UnevaluatedInclude})");
-		}
+			var wrongAnswersOrSolution = GetOrderedFileNames(csProjItems, ProjectExerciseBlock.IsAnyWrongAnswerOrSolution);
 
-		private void ReportErrorIfCsprojHasWrongAnswerItems(Slide slide, ProjectExerciseBlock ex, DirectoryInfo unpackedZipDir)
-		{
-			var csproj = unpackedZipDir.GetFiles(ex.CsprojFileName).Single();
-			var wrongAnswerItems = new Project(csproj.FullName, null, null, new ProjectCollection()).Items
-				.Where(i => ex.IsWrongAnswer(i.UnevaluatedInclude))
-				.Select(i => i.UnevaluatedInclude);
-			var waItemNames = string.Join(", ", wrongAnswerItems);
-
-			if (waItemNames.Any())
-				ReportSlideError(slide, $"Student zip csproj has wrong answer items ({waItemNames})");
+			if (wrongAnswersOrSolution.Any())
+				ReportSlideError(slide, $"Student's csproj has 'wrong answer' and/or solution items ({string.Join(", ", wrongAnswersOrSolution)})");
 		}
 
 		private void LogSlideProcessing(string prefix, Slide slide)
@@ -314,5 +298,10 @@ namespace uLearn
 source code: {solution.SourceCode}
 error: {solution.ErrorMessage}");
 		}
+
+		private bool IsWrongAnswer(ProjectExerciseBlock ex, string name) =>
+			Regex.IsMatch(name, ex.WrongAnswersAndSolutionNameRegexPattern) && !IsSolution(ex, name);
+
+		private bool IsSolution(ProjectExerciseBlock ex, string name) => name.Equals(ex.CorrectSolutionFileName);
 	}
 }

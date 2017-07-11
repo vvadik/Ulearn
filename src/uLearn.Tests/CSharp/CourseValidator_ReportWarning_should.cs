@@ -80,7 +80,7 @@ namespace uLearn.CSharp
 		public void Not_ReportWarning_If_WrongAnswer_IsWrongAnswer()
 		{
 			validatorOut.ToString()
-				.Should().Contain($"{exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.27.cs");
+				.Should().NotContain($"{exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.27.cs");
 		}
 		
 	}

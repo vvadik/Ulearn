@@ -2,6 +2,6 @@
 {
 	internal class MeaningOfLifeTask
 	{
-		public static int GetIt() => 42;
+		public static int GetIt() => AnotherTask.Return_27() + 15;
 	}
 }
