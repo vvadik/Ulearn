@@ -164,7 +164,7 @@ namespace uLearn
 
 		private string[] GetOrderedFileNames(DirectoryInfo dir, Func<string, bool> predicate)
 		{
-			var allNames = dir.GetAllFiles().Select(f => f.Name);
+			var allNames = dir.GetFiles().Select(f => f.Name);
 			return GetOrderedFileNames(allNames, predicate);
 		}
 

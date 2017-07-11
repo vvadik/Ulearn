@@ -64,8 +64,13 @@ namespace uLearn.Model.Blocks
 
 		private IEnumerable<FileInfo> EnumerateFiles(DirectoryInfo aDir)
 		{
-			return aDir.GetAllFiles().Where(f =>
-				!(excludedDirs.Contains(f.Directory?.Name) || Regex.IsMatch(f.Name, excludedFilesNamePattern)));
+			foreach (var f in aDir.GetFiles())
+				if (!Regex.IsMatch(f.Name, excludedFilesNamePattern))
+					yield return f;
+			var dirs = aDir.GetDirectories().Where(d => !excludedDirs.Contains(d.Name));
+			foreach (var subdir in dirs)
+			foreach (var f in EnumerateFiles(subdir))
+				yield return f;
 		}
 	}
 }

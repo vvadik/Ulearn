@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.VisualBasic.FileIO;
-using SearchOption = Microsoft.VisualBasic.FileIO.SearchOption;
 
 namespace uLearn.Extensions
 {
@@ -27,16 +24,6 @@ namespace uLearn.Extensions
 		public static DirectoryInfo GetSubdir(this DirectoryInfo dir, string name)
 		{
 			return new DirectoryInfo(Path.Combine(dir.FullName, name));
-		}
-
-		public static IEnumerable<FileInfo> GetAllFiles(this DirectoryInfo dir)
-		{
-			return dir.GetAllFilesPaths().Select(path => new FileInfo(path));
-		}
-
-		public static IEnumerable<string> GetAllFilesPaths(this DirectoryInfo dir)
-		{
-			return FileSystem.GetFiles(dir.FullName, SearchOption.SearchAllSubDirectories);
 		}
 
 		public static DirectoryInfo GetOrCreateSubdir(this DirectoryInfo dir, string name)

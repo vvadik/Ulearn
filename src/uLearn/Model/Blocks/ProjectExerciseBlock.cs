@@ -133,7 +133,7 @@ namespace uLearn.Model.Blocks
 
 		public byte[] GetZipBytesForChecker(string code)
 		{
-		    var correctSolution = ExerciseFolder.GetAllFiles()
+		    var correctSolution = ExerciseFolder.GetFiles()
 				.Select(f => f.Name)
 				.Where(n => n.Equals(CorrectSolutionFileName));
 

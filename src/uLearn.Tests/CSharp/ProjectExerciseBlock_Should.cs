@@ -95,7 +95,7 @@ namespace uLearn.CSharp
 		[Test]
 		public void When_CreateStudentZip_NotContain_AnyWrongAnswersOrSolution_Inside_ExerciseDirectory()
 		{
-			var projFiles = studentExerciseFolder.GetAllFiles().Select(f => f.Name);
+			var projFiles = studentExerciseFolder.GetFiles().Select(f => f.Name);
 
 			projFiles.Should().NotContain(Helper.WrongAnswersAndSolutionNames);
 		}
