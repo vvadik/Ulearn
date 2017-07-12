@@ -54,6 +54,10 @@ namespace uLearn.Model.Blocks
 
 		[XmlElement("exclude-path-for-student")]
 		public string[] PathsToExcludeForStudent { get; set; }
+
+		[XmlElement("supress-validator-messages")]
+		public bool SupressValidatorMessages { get; set; }
+
 		public string ExerciseDirName => Path.GetDirectoryName(CsProjFilePath).EnsureNotNull("csproj должен быть в поддиректории");
 
 		public string CsprojFileName => Path.GetFileName(CsProjFilePath);

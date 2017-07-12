@@ -37,10 +37,13 @@ namespace uLearn
 
 			    if (slide.Exercise is ProjectExerciseBlock exercise)
 			    {
-			        ReportWarningIfExerciseDirDoesntContainSolutionFile(slide, exercise);
-                    ReportWarningIfWrongAnswersAreSolutionsOrNotOk(slide, exercise);
-			        ReportErrorIfInitialCodeIsSolutionOrNotOk(slide, exercise);
-                    ReportIfStudentsZipHasErrors(slide, exercise);
+					if (!exercise.SupressValidatorMessages)
+					{
+						ReportWarningIfExerciseDirDoesntContainSolutionFile(slide, exercise);
+						ReportWarningIfWrongAnswersAreSolutionsOrNotOk(slide, exercise);
+						ReportErrorIfInitialCodeIsSolutionOrNotOk(slide, exercise);
+						ReportIfStudentsZipHasErrors(slide, exercise);
+					}
 			    }
 				else
 			        ReportErrorIfEthalonSolutionIsNotRight(slide);

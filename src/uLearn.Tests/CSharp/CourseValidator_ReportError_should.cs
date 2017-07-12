@@ -86,5 +86,19 @@ namespace uLearn.CSharp
 			validatorOut.ToString()
 				.Should().Contain($"Student's csproj has 'wrong answer' and/or solution items ({Helper.OrderedWrongAnswersAndSolutionNames})");
 		}
+
+		[Test]
+		public void Not_ReportError_When_Supress_Validator_Messages_Flag_Is_Set()
+		{
+			exBlock.SupressValidatorMessages = true;
+			var validatorOutStamp = new StringBuilder(validatorOut.ToString());
+
+			validator.ValidateExercises();
+
+			validatorOut.ToString()
+				.Should().Be(validatorOutStamp.ToString());
+
+			exBlock.SupressValidatorMessages = false;
+		}
 	}
 }
