@@ -63,9 +63,7 @@ namespace uLearn
 
 		public static void SetFilenameItemType(Project proj, string fileName, string type)
 		{
-			var item = proj.Items.SingleOrDefault(i => i.UnevaluatedInclude.Equals(fileName));
-			if (item != null)
-				item.ItemType = type;
+			proj.Items.Single(i => i.UnevaluatedInclude.Equals(fileName)).ItemType = type;
 		}
 
 		private static IEnumerable<string> FindItemNames(Project proj, Func<string, bool> predicate)

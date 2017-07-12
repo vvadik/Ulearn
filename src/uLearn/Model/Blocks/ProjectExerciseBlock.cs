@@ -149,11 +149,10 @@ namespace uLearn.Model.Blocks
 		{
 		    var correctSolution = ExerciseFolder.GetFiles()
 				.Select(f => f.Name)
-				.Where(n => n.Equals(CorrectSolutionFileName));
+				.SingleOrDefault(n => n.Equals(CorrectSolutionFileName));
 
             var excluded = (PathsToExcludeForChecker ?? new string[0])
-                .Concat(new[] { "bin/*", "obj/*" })
-                .Concat(correctSolution)
+                .Concat(new[] { "bin/*", "obj/*", correctSolution })
                 .ToList();
 
 			return ExerciseFolder.ToZip(excluded, GetAdditionalFiles(code, ExerciseFolder, excluded));

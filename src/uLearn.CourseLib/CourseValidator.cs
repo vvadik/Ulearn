@@ -81,7 +81,7 @@ namespace uLearn
 
 		private byte[] GetZipBytesWithWrongAnswer(ProjectExerciseBlock ex, FileInfo waFile)
 		{
-			return ex.ExerciseFolder.ToZip(new [] {ex.UserCodeFileName},
+			return ex.ExerciseFolder.ToZip(new [] {ex.UserCodeFileName}, // todo fail if !ex.exercisefolder.contains(ex.csprojfile)
 				new[]
 				{
 					new FileContent
@@ -94,9 +94,9 @@ namespace uLearn
 
 		private void PrepareCsprojForCheckingWrongAnswer(Project proj, ProjectExerciseBlock ex, FileInfo wrongAnswer)
 		{
-			var excludeSolution = proj.Items.Select(i => i.UnevaluatedInclude).Single(ex.IsCorrectSolution);
+			var excludeSolution = proj.Items.Select(i => i.UnevaluatedInclude).Single(ex.IsCorrectSolution); // todo fail if !ex.exercisefolder.contains(ex.correctsolution)
 
-			ProjModifier.SetFilenameItemTypeToCompile(proj, wrongAnswer.Name);
+			ProjModifier.SetFilenameItemTypeToCompile(proj, wrongAnswer.Name); // todo fail if !proj.items.Contains(wa.Name)
 			ProjModifier.PrepareForChecking(proj, ex.StartupObject, new [] {excludeSolution});
 		}
 
@@ -245,10 +245,10 @@ namespace uLearn
 	    public void ReportErrorIfInitialCodeIsSolutionOrNotOk(ExerciseSlide slide, ProjectExerciseBlock ex)
 		{
 		    var initialCode = ex.UserCodeFile.ContentAsUtf8();
-		    var submission = ex.CreateSubmission(slide.Id.ToString(), initialCode);
-			var result =  SandboxRunner.Run(submission);
+		    var submission = ex.CreateSubmission(slide.Id.ToString(), initialCode); // todo fail if !ex.exercisefolder.Contains(ex.UserCodeFile)
+			var result =  SandboxRunner.Run(submission); // todo and fail if !ex.csproj.Contains(ex.UserCodeFile)
 
-            ReportErrorIfInitialCodeVerdictIsNotOk(slide, result);
+			ReportErrorIfInitialCodeVerdictIsNotOk(slide, result);
             ReportErrorIfInitialCodeIsSolution(slide, result);
 		}
 
