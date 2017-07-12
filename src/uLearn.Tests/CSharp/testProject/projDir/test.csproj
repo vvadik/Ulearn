@@ -52,9 +52,9 @@
     <Compile Include="MeaningOfLifeTask.Solution.cs" />
     <Compile Include="AnotherTask.Solution.cs" />
     <Compile Include="Program.cs" />
-    <!--<Compile Include="..\Link.cs">
+    <Compile Include="..\Link.cs">
       <Link>Link.cs</Link>
-    </Compile>-->
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

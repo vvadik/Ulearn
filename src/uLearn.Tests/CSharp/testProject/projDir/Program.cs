@@ -6,7 +6,7 @@ namespace test
 	{
 		private static void Main()
 		{
-			//new Link.L();
+			new Link.L();
 			DependenceToOneClass();
 			DependenceToAnotherClass();
 		}

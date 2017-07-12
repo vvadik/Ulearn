@@ -86,15 +86,31 @@ namespace uLearn.CSharp
         [Test]
 		public void When_CreateStudentZip_Contain_UserCodeFile_OfCompileType_Inside_Csproj()
         {
-			var itemNamesForCompile = GetFromCsProjItemsForCompile(studentCsProjFilePath);
+			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(studentCsProjFilePath);
 
             itemNamesForCompile.Should().Contain(userCodeFileName);
+		}
+
+        [Test]
+		public void When_CreateStudentZip_Contain_Resolved_Links_Inside_Csproj()
+        {
+	        var itemNamesForCompile = GetFromCsProjItemsForCompile(checkerExerciseFilePath);
+
+	        itemNamesForCompile.Should().Contain(i => i.UnevaluatedInclude.Equals("~$Link.cs"));
+		}
+
+        [Test]
+		public void When_CreateStudentZip_Contain_Resolved_Link_Files_Inside_Csproj()
+        {
+	        var projFiles = studentExerciseFolder.GetFiles().Select(f => f.Name);
+
+	        projFiles.Should().Contain("~$Link.cs");
 		}
 
 		[Test]
 		public void When_CreateStudentZip_NotContain_AnyWrongAnswersOrSolution_OfCompileType_InsideCsproj()
 		{
-			var itemNamesForCompile = GetFromCsProjItemsForCompile(studentCsProjFilePath);
+			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(studentCsProjFilePath);
 
 			itemNamesForCompile.Should().NotContain(Helper.WrongAnswersAndSolutionNames);
 		}
@@ -128,7 +144,7 @@ namespace uLearn.CSharp
 		[Test]
 		public void When_CreateCheckerZip_Contain_UserCodeFile_OfCompileType_InsideCsproj()
 		{
-			var itemNamesForCompile = GetFromCsProjItemsForCompile(checkerExerciseFilePath);
+			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerExerciseFilePath);
 
 			itemNamesForCompile.Should().Contain(userCodeFileName);
 		}
@@ -136,7 +152,7 @@ namespace uLearn.CSharp
 		[Test]
 		public void When_CreateCheckerZip_NotContain_CorrectSolution_OfCompileType_InsideCsproj()
 		{
-			var itemNamesForCompile = GetFromCsProjItemsForCompile(checkerExerciseFilePath);
+			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerExerciseFilePath);
 
 			itemNamesForCompile.Should().NotContain(ex.CorrectSolutionFileName);
 		}
@@ -144,20 +160,23 @@ namespace uLearn.CSharp
 		[Test]
 		public void When_CreateCheckerZip_NotRemove_OtherSolutions_OfCompileType_FromCsproj()
 		{
-			var itemNamesForCompile = GetFromCsProjItemsForCompile(checkerExerciseFilePath);
+			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerExerciseFilePath);
 			var anotherSolutionReferencedByCurrentSolution = $"{nameof(AnotherTask)}.Solution.cs";
 
 			itemNamesForCompile.Should().Contain(anotherSolutionReferencedByCurrentSolution);
 		}
 
-		private List<string> GetFromCsProjItemsForCompile(string projectFile)
+		private List<string> GetFromCsProjItemsNamesForCompile(string projectFile)
+		{
+			return GetFromCsProjItemsForCompile(projectFile).Select(i => i.UnevaluatedInclude).ToList();
+		}
+
+		private List<ProjectItem> GetFromCsProjItemsForCompile(string projectFile)
 		{
 			var csproj = new Project(projectFile, null, null, new ProjectCollection());
-			var itemNamesForCompile = csproj.Items
+			return csproj.Items
 				.Where(i => i.ItemType.Equals("Compile"))
-				.Select(i => i.UnevaluatedInclude)
 				.ToList();
-			return itemNamesForCompile;
 		}
 	}
 }

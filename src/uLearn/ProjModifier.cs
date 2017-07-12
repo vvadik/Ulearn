@@ -30,6 +30,7 @@ namespace uLearn
 
 			RemoveCheckingFromCsproj(proj);
 			SetFilenameItemTypeToCompile(proj, namesOfOtherTasks.Concat(new[] { ex.UserCodeFileName }));
+			ResolveLinks(proj);
 			ExcludePaths(proj, toExclude);
 		}
 
