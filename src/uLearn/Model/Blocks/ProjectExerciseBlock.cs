@@ -17,9 +17,17 @@ namespace uLearn.Model.Blocks
 	[XmlType("proj-exercise")]
 	public class ProjectExerciseBlock : ExerciseBlock
 	{
-		public static readonly string AnyWrongAnswerAndSolutionNameRegex = new Regex("(.+)\\.WrongAnswer\\.(.+)\\.cs|(.+)\\.Solution\\.cs").ToString();
-		
-		public static bool IsAnyWrongAnswerOrSolution(string name) => Regex.IsMatch(name, AnyWrongAnswerAndSolutionNameRegex); 
+		public static readonly string AnySolutionNameRegex = new Regex("(.+)\\.Solution\\.cs").ToString();
+		public static readonly string AnyWrongAnswerNameRegex = new Regex("(.+)\\.WrongAnswer\\.(.+)\\.cs").ToString();
+		public static readonly string AnyWrongAnswerAndSolutionNameRegex = new Regex($"{AnySolutionNameRegex}|{AnyWrongAnswerNameRegex}").ToString();
+
+		public static bool IsAnyWrongAnswerOrAnySolution(string name) => Regex.IsMatch(name, AnyWrongAnswerAndSolutionNameRegex);
+		public static bool IsAnySolution(string name) => Regex.IsMatch(name, AnySolutionNameRegex);
+		public static string ParseNameCsFromSolutionCs(string name)
+		{
+			var nameWithoutExt = name.Split(new[] { ".Solution.cs" }, StringSplitOptions.RemoveEmptyEntries).First();
+			return $"{nameWithoutExt}.cs";
+		}
 
 		public ProjectExerciseBlock()
 		{
@@ -60,7 +68,7 @@ namespace uLearn.Model.Blocks
 
 		public string UserCodeFileNameWithoutExt => Path.GetFileNameWithoutExtension(UserCodeFileName);
 
-		public string WrongAnswersAndSolutionNameRegexPattern => $"{UserCodeFileNameWithoutExt}\\.(.+)\\.cs";
+		public string WrongAnswersAndSolutionNameRegexPattern => UserCodeFileNameWithoutExt + new Regex("\\.(.+)\\.cs");
 
 		public string CorrectSolutionFileName => $"{UserCodeFileNameWithoutExt}.Solution.cs";
 
@@ -68,6 +76,8 @@ namespace uLearn.Model.Blocks
 		public DirectoryInfo SlideFolderPath { get; set; }
 
 		public FileInfo StudentsZip => SlideFolderPath.GetFile(ExerciseDirName + ".exercise.zip");
+
+		public bool IsCorrectSolution(string name) => name.Equals(CorrectSolutionFileName);
 
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{

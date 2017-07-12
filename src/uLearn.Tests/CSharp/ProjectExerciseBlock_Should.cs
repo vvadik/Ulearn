@@ -7,6 +7,8 @@ using FluentAssertions;
 using Microsoft.Build.Evaluation;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
+using RunCsJob;
+using RunCsJob.Api;
 using test;
 using uLearn.Extensions;
 using uLearn.Model;
@@ -18,6 +20,7 @@ namespace uLearn.CSharp
     public class ProjectExerciseBlock_Should
     {
 		private DirectoryInfo slideFolder => new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "CSharp", "TestProject"));
+	    private string csProjFilename = "test.csproj";
         private string csProjFilePath => Path.Combine("ProjDir", "test.csproj");
         private string userCodeFileName = $"{nameof(MeaningOfLifeTask)}.cs";
         private ProjectExerciseBlock ex;
@@ -25,8 +28,8 @@ namespace uLearn.CSharp
 
         private DirectoryInfo studentExerciseFolder => new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "Student_SlideFolder"));
         private DirectoryInfo checkerExerciseFolder => new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "Checker_SlideFolder"));
-        private string studentCsProjFilePath => Path.Combine(studentExerciseFolder.FullName, "test.csproj");
-        private string checkerExerciseFilePath => Path.Combine(checkerExerciseFolder.FullName, "test.csproj");
+        private string studentCsProjFilePath => Path.Combine(studentExerciseFolder.FullName, csProjFilename);
+        private string checkerExerciseFilePath => Path.Combine(checkerExerciseFolder.FullName, csProjFilename);
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -36,6 +39,7 @@ namespace uLearn.CSharp
 
             ex = new ProjectExerciseBlock
             {
+				StartupObject = "test.Program",
                 UserCodeFileName = userCodeFileName,
                 SlideFolderPath = slideFolder,
                 CsProjFilePath = csProjFilePath
@@ -47,6 +51,9 @@ namespace uLearn.CSharp
 
         private void CreateStudentZip_AndUnpackResult()
         {
+			if (File.Exists(ex.StudentsZip.FullName))
+				File.Delete(ex.StudentsZip.FullName);
+
             var ctx = new BuildUpContext(ex.SlideFolderPath, CourseSettings.DefaultSettings, null, String.Empty);
             exBlocks = ex.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
 
@@ -98,6 +105,24 @@ namespace uLearn.CSharp
 			var projFiles = studentExerciseFolder.GetFiles().Select(f => f.Name);
 
 			projFiles.Should().NotContain(Helper.WrongAnswersAndSolutionNames);
+		}
+
+		[Test]
+		public void When_CreateStudentZip_Make_Project_Able_To_Compile_If_Project_Depends_On_Many_Tasks()
+		{
+			var submission = new ProjRunnerSubmission
+			{
+				Id = "my_id",
+				Input = "",
+				NeedRun = true,
+				ProjectFileName = "test.csproj",
+				ZipFileData = ex.StudentsZip.Content()
+			};
+			var result = SandboxRunner.Run(submission);
+
+			result.CompilationOutput.Should().Be("");
+			result.Error.Should().Be("");
+			result.Verdict.Should().Be(Verdict.Ok);
 		}
 
 		[Test]

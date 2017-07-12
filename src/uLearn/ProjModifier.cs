@@ -24,10 +24,12 @@ namespace uLearn
 	{
 		public static void PrepareForStudentZip(Project proj, ProjectExerciseBlock ex)
 		{
-			var toExclude = FindItemNames(proj, ProjectExerciseBlock.IsAnyWrongAnswerOrSolution).ToList();
+			var toExclude = FindItemNames(proj, ProjectExerciseBlock.IsAnyWrongAnswerOrAnySolution).ToList();
+			var solutionsOfOtherTasks = toExclude.Where(n => ProjectExerciseBlock.IsAnySolution(n) && !ex.IsCorrectSolution(n)).ToList();
+			var namesOfOtherTasks = solutionsOfOtherTasks.Select(ProjectExerciseBlock.ParseNameCsFromSolutionCs);
 
 			RemoveCheckingFromCsproj(proj);
-			SetFilenameItemTypeToCompile(proj, ex.UserCodeFileName);
+			SetFilenameItemTypeToCompile(proj, namesOfOtherTasks.Concat(new[] { ex.UserCodeFileName }));
 			ExcludePaths(proj, toExclude);
 		}
 
@@ -48,6 +50,12 @@ namespace uLearn
 		{
 			SetFilenameItemTypeToCompile(proj, ex.UserCodeFileName);
 			PrepareForChecking(proj, ex.StartupObject, excludedPaths);
+		}
+
+		public static void SetFilenameItemTypeToCompile(Project proj, IEnumerable<string> files)
+		{
+			foreach (var f in files)
+				SetFilenameItemType(proj, f, "Compile");
 		}
 
 		public static void SetFilenameItemTypeToCompile(Project proj, string fileName) => SetFilenameItemType(proj, fileName, "Compile");

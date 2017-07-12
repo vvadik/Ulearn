@@ -91,7 +91,7 @@ namespace uLearn
 
 		private void PrepareCsprojForCheckingWrongAnswer(Project proj, ProjectExerciseBlock ex, FileInfo wrongAnswer)
 		{
-			var excludeSolution = proj.Items.Select(i => i.UnevaluatedInclude).Single(n=> IsSolution(ex, n));
+			var excludeSolution = proj.Items.Select(i => i.UnevaluatedInclude).Single(ex.IsCorrectSolution);
 
 			ProjModifier.SetFilenameItemTypeToCompile(proj, wrongAnswer.Name);
 			ProjModifier.PrepareForChecking(proj, ex.StartupObject, new [] {excludeSolution});
@@ -156,7 +156,7 @@ namespace uLearn
 
 		private void ReportErrorIfStudentsZipHasWrongAnswerOrSolutionFiles(Slide slide, DirectoryInfo unpackedZipDir)
 		{
-			var wrongAnswersOrSolution = GetOrderedFileNames(unpackedZipDir, ProjectExerciseBlock.IsAnyWrongAnswerOrSolution);
+			var wrongAnswersOrSolution = GetOrderedFileNames(unpackedZipDir, ProjectExerciseBlock.IsAnyWrongAnswerOrAnySolution);
 
 			if (wrongAnswersOrSolution.Any())
 				ReportSlideError(slide, $"Student zip exercise directory has 'wrong answer' and/or solution files ({string.Join(", ", wrongAnswersOrSolution)})");
@@ -189,7 +189,7 @@ namespace uLearn
 			var csProj = new Project(csprojFile.FullName, null, null, new ProjectCollection());
 			var csProjItems = csProj.Items.Select(i => i.UnevaluatedInclude);
 
-			var wrongAnswersOrSolution = GetOrderedFileNames(csProjItems, ProjectExerciseBlock.IsAnyWrongAnswerOrSolution);
+			var wrongAnswersOrSolution = GetOrderedFileNames(csProjItems, ProjectExerciseBlock.IsAnyWrongAnswerOrAnySolution);
 
 			if (wrongAnswersOrSolution.Any())
 				ReportSlideError(slide, $"Student's csproj has 'wrong answer' and/or solution items ({string.Join(", ", wrongAnswersOrSolution)})");
@@ -300,8 +300,6 @@ error: {solution.ErrorMessage}");
 		}
 
 		private bool IsWrongAnswer(ProjectExerciseBlock ex, string name) =>
-			Regex.IsMatch(name, ex.WrongAnswersAndSolutionNameRegexPattern) && !IsSolution(ex, name);
-
-		private bool IsSolution(ProjectExerciseBlock ex, string name) => name.Equals(ex.CorrectSolutionFileName);
+			Regex.IsMatch(name, ex.WrongAnswersAndSolutionNameRegexPattern) && !ex.IsCorrectSolution(name);
 	}
 }
