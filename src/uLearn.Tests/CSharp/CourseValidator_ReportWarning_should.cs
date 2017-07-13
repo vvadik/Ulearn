@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
 using FluentAssertions;
-using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
-using RunCsJob;
 using test;
 using uLearn.Model.Blocks;
 using FileSystem = Microsoft.VisualBasic.FileIO.FileSystem;
@@ -21,43 +16,40 @@ namespace uLearn.CSharp
 
 		private string tempSlideFolderPath => Path.Combine(TestContext.CurrentContext.TestDirectory, "ReportWarningTests_Temp_SlideFolder");
 
-		private readonly StringBuilder validatorOut = new StringBuilder();
-		private CourseValidator validator;
-		private ExerciseSlide exSlide;
+		private StringBuilder validatorOut;
 		private ProjectExerciseBlock exBlock;
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
-			if (FileSystem.DirectoryExists(tempSlideFolderPath))
-				FileSystem.DeleteDirectory(tempSlideFolderPath, DeleteDirectoryOption.DeleteAllContents);
-			FileSystem.CopyDirectory(projSlideFolderPath, tempSlideFolderPath, true);
+			Helper.RecreateDirectory(tempSlideFolderPath);
+			FileSystem.CopyDirectory(projSlideFolderPath, tempSlideFolderPath);
 
-			var unit = new Unit(new UnitSettings { Title = "UnitTitle" }, null);
-			var slideInfo = new SlideInfo(unit, null, 0);
 			exBlock = new ProjectExerciseBlock
 			{
 				StartupObject = "test.Program",
 				UserCodeFileName = $"{nameof(MeaningOfLifeTask)}.cs",
 				SlideFolderPath = new DirectoryInfo(tempSlideFolderPath),
-				CsProjFilePath = csProjFilePath
+				CsProjFilePath = csProjFilePath,
+				SupressValidatorMessages = false
 			};
-			exSlide = new ExerciseSlide(new List<SlideBlock> { exBlock }, slideInfo, "SlideTitle", Guid.Empty);
 
-			validator = new CourseValidator(new List<Slide> { exSlide }, new SandboxRunnerSettings());
-			validator.Warning += msg => { validatorOut.Append(msg); };
-			validator.Error += msg => { validatorOut.Append(msg); };
-			
-			FileSystem.DeleteFile(exBlock.SolutionFile.FullName);
-			validator.ReportWarningIfExerciseDirDoesntContainSolutionFile(exSlide, exBlock);
-			validator.ReportWarningIfWrongAnswersAreSolutionsOrNotOk(exSlide, exBlock);
+			var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), validatorOut = new StringBuilder());
+			val.ValidateExercises();
 		}
 
 		[Test]
 		public void ReportWarning_If_ExerciseFolder_DoesntContain_SolutionFile()
 		{
+			Helper.RecreateDirectory(tempSlideFolderPath);
+			FileSystem.CopyDirectory(projSlideFolderPath, tempSlideFolderPath);
+			var valOut = new StringBuilder();
+			var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), valOut);
+			FileSystem.DeleteFile(exBlock.SolutionFile.FullName);
 
-			validatorOut.ToString()
+			val.ValidateExercises();
+
+			valOut.ToString()
 				.Should().Contain($"Exercise directory doesn't contain {exBlock.CorrectSolutionFileName}");
 		}
 
@@ -82,6 +74,5 @@ namespace uLearn.CSharp
 			validatorOut.ToString()
 				.Should().NotContain($"{exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.27.cs");
 		}
-		
 	}
 }

@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
-using RunCsJob;
 using test;
 using uLearn.Model.Blocks;
-// ReSharper disable AssignNullToNotNullAttribute
 
 namespace uLearn.CSharp
 {
@@ -22,9 +18,10 @@ namespace uLearn.CSharp
 		private string csProjFilePath => Path.Combine("ProjDir", "test.csproj");
 
 		private string tempSlideFolderPath => Path.Combine(TestContext.CurrentContext.TestDirectory, "ReportErrorTests_Temp_SlideFolder");
+		private DirectoryInfo tempSlideFolder => new DirectoryInfo(tempSlideFolderPath);
 		private FileInfo tempZipFile => new FileInfo(Path.Combine(tempSlideFolderPath, "ProjDir.exercise.zip"));
 
-		private readonly StringBuilder validatorOut = new StringBuilder();
+		private StringBuilder validatorOut;
 		private CourseValidator validator;
 		private ExerciseSlide exSlide;
 		private ProjectExerciseBlock exBlock;
@@ -32,38 +29,36 @@ namespace uLearn.CSharp
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
-			SaveTempZipFileWithFullProject();
-
-			var unit = new Unit(new UnitSettings { Title = "UnitTitle" }, null);
-			var slideInfo = new SlideInfo(unit, null, 0);
 			exBlock = new ProjectExerciseBlock
 			{
 				UserCodeFileName = $"{nameof(MeaningOfLifeTask)}.cs",
-				SlideFolderPath = tempZipFile.Directory,
-				CsProjFilePath = csProjFilePath
+				SlideFolderPath = tempSlideFolder,
+				CsProjFilePath = csProjFilePath,
 			};
-			exSlide = new ExerciseSlide(new List<SlideBlock> { exBlock }, slideInfo, "SlideTitle", Guid.Empty);
 
-			validator = new CourseValidator(new List<Slide> { exSlide }, new SandboxRunnerSettings());
-			validator.Warning += msg => { validatorOut.Append(msg); };
-			validator.Error += msg => { validatorOut.Append(msg); };
+			validator = Helper.BuildValidator(exSlide = Helper.BuildSlide(exBlock), validatorOut = new StringBuilder());
+
+			SaveTempZipFileWithFullProject();
 
 			validator.ReportIfStudentsZipHasErrors(exSlide, exBlock);
 		}
 
 		private void SaveTempZipFileWithFullProject()
 		{
-			if (FileSystem.DirectoryExists(tempZipFile.DirectoryName))
-				FileSystem.DeleteDirectory(tempZipFile.DirectoryName, DeleteDirectoryOption.DeleteAllContents);
-			FileSystem.CreateDirectory(tempZipFile.DirectoryName);
+			Helper.RecreateDirectory(tempZipFile.DirectoryName);
 
-			var regexMatchingNothing = new Regex("[^\\s\\S]").ToString();
+			var noExcludedFiles = new Regex("[^\\s\\S]").ToString();
+			var noExcludedDirs = new string[0];
 			new LazilyUpdatingZip(
 					projExerciseFolder,
-					new string[0],
-					regexMatchingNothing,
-					_ => null, tempZipFile)
+					noExcludedDirs,
+					noExcludedFiles,
+					ResolveCsprojLink,
+					tempZipFile)
 				.UpdateZip();
+
+			byte[] ResolveCsprojLink(FileInfo file)
+				=> file.Name.Equals(exBlock.CsprojFileName) ? ProjModifier.ModifyCsproj(file, ProjModifier.ResolveLinks) : null;
 		}
 
 		[Test]
@@ -90,15 +85,50 @@ namespace uLearn.CSharp
 		[Test]
 		public void Not_ReportError_When_Supress_Validator_Messages_Flag_Is_Set()
 		{
-			exBlock.SupressValidatorMessages = true;
-			var validatorOutStamp = new StringBuilder(validatorOut.ToString());
+			try
+			{
+				exBlock.SupressValidatorMessages = true;
+				var validatorOutStamp = new StringBuilder(validatorOut.ToString());
 
 			validator.ValidateExercises();
 
 			validatorOut.ToString()
 				.Should().Be(validatorOutStamp.ToString());
+			}
+			finally
+			{
+				exBlock.SupressValidatorMessages = false;
+			}
+		}
 
-			exBlock.SupressValidatorMessages = false;
+		[Test]
+		public void ReportError_If_ExerciseFolder_Doesnt_Contain_CsProj()
+		{
+			Helper.RecreateDirectory(tempSlideFolderPath);
+			FileSystem.CopyDirectory(projSlideFolderPath, tempSlideFolderPath);
+			var valOut = new StringBuilder();
+			var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), valOut);
+			File.Delete(Path.Combine(tempSlideFolderPath, exBlock.CsProjFilePath));
+
+			val.ValidateExercises();
+
+			valOut.ToString()
+				.Should().Contain($"Exercise folder ({exBlock.ExerciseFolder.Name}) doesn't contain ({exBlock.CsprojFileName})");
+		}
+
+		[Test]
+		public void ReportError_If_ExerciseFolder_Doesnt_Contain_UserCodeFile()
+		{
+			Helper.RecreateDirectory(tempSlideFolderPath);
+			FileSystem.CopyDirectory(projSlideFolderPath, tempSlideFolderPath);
+			var valOut = new StringBuilder();
+			var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), valOut);
+			File.Delete(exBlock.UserCodeFile.FullName);
+
+			val.ValidateExercises();
+
+			valOut.ToString()
+				.Should().Contain($"Exercise folder ({exBlock.ExerciseFolder.Name}) doesn't contain ({exBlock.UserCodeFileName})");
 		}
 	}
 }

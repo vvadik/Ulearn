@@ -147,13 +147,15 @@ namespace uLearn.Model.Blocks
 
 		public byte[] GetZipBytesForChecker(string code)
 		{
-		    var correctSolution = ExerciseFolder.GetFiles()
+		    var excluded = (PathsToExcludeForChecker ?? new string[0])
+                .Concat(new[] { "bin/*", "obj/*" })
+                .ToList();
+
+			var correctSolution = ExerciseFolder.GetFiles()
 				.Select(f => f.Name)
 				.SingleOrDefault(n => n.Equals(CorrectSolutionFileName));
-
-            var excluded = (PathsToExcludeForChecker ?? new string[0])
-                .Concat(new[] { "bin/*", "obj/*", correctSolution })
-                .ToList();
+			if (correctSolution != null)
+				excluded.Add(correctSolution);
 
 			return ExerciseFolder.ToZip(excluded, GetAdditionalFiles(code, ExerciseFolder, excluded));
 		}
