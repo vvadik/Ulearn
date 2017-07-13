@@ -86,7 +86,7 @@ namespace uLearn
 			proj.RemoveItems(toRemove);
 		}
 
-		private static void ResolveLinks(Project project)
+		public static void ResolveLinks(Project project)
 		{
 			var files = ReplaceLinksWithItemsCopiedToProjectDir(project);
 			foreach (var file in files)
