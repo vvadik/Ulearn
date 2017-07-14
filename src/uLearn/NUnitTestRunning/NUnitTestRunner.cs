@@ -21,7 +21,9 @@ namespace uLearn.NUnitTestRunning
 		{
 			string[] testClassesToLaunch = { "SHOULD_BE_REPLACED" };
 			var listener = new TestListener();
-			RunAllTests(listener, Assembly.GetExecutingAssembly(), testClassesToLaunch);
+			var assembly = Assembly.GetExecutingAssembly();
+			
+			RunAllTests(listener, assembly, testClassesToLaunch);
 		}
 
 		public static void RunAllTests(ITestListener testListener, Assembly executingAssembly, params string[] testClassesToLaunch)
@@ -41,6 +43,12 @@ namespace uLearn.NUnitTestRunning
 			var testFilter = new ClassNameFilter(testClass);
 			runner.Run(listener, testFilter);
 		}
+
+		private static bool CheckTestClassesExistance(Assembly executingAssembly, params string[] testClasses)
+		{
+			var classes = executingAssembly.GetTypes().Select(x => x.FullName).ToList();
+			return classes.Intersect(testClasses).Count() == testClasses.Length;
+		} 
 
 		// должен остаться в этом же файле
 		public class TestListener : ITestListener
