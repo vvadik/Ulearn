@@ -35,8 +35,8 @@ namespace uLearn
 			{
 				LogSlideProcessing("Validate exercise", slide);
 
-			    if (slide.Exercise is ProjectExerciseBlock exercise)
-			    {
+				if (slide.Exercise is ProjectExerciseBlock exercise)
+				{
 					if (exercise.SupressValidatorMessages || ExerciseFolderDoesntContainRequiredFiles(slide, exercise))
 						continue;
 
@@ -49,9 +49,9 @@ namespace uLearn
 					ReportIfStudentsZipHasErrors(slide, exercise);
 				}
 				else
-			        ReportErrorIfEthalonSolutionIsNotRight(slide);
-            }
-        }
+					ReportErrorIfEthalonSolutionIsNotRight(slide);
+			}
+		}
 
 		private bool ExerciseFolderDoesntContainRequiredFiles(ExerciseSlide slide, ProjectExerciseBlock ex)
 		{
@@ -82,26 +82,26 @@ namespace uLearn
 				.Select(name => new FileInfo(name))
 				.Where(f => IsWrongAnswer(ex, f.Name));
 
-		    foreach (var waFile in filesWithWrongAnswer)
-		    {
-			    var submission = new ProjRunnerSubmission
-			    {
-				    Id = slide.Id.ToString(),
-				    ZipFileData = GetZipBytesWithWrongAnswer(ex, waFile),
-				    ProjectFileName = ex.CsprojFileName,
-				    Input = "",
-				    NeedRun = true,
-			    };
-			    var result = SandboxRunner.Run(submission);
+			foreach (var waFile in filesWithWrongAnswer)
+			{
+				var submission = new ProjRunnerSubmission
+				{
+					Id = slide.Id.ToString(),
+					ZipFileData = GetZipBytesWithWrongAnswer(ex, waFile),
+					ProjectFileName = ex.CsprojFileName,
+					Input = "",
+					NeedRun = true,
+				};
+				var result = SandboxRunner.Run(submission);
 
-			    ReportWarningIfWrongAnswerVerdictIsNotOk(slide, waFile.Name, result);
-			    ReportWarningIfWrongAnswerIsSolution(slide, waFile.Name, result);
-		    }
+				ReportWarningIfWrongAnswerVerdictIsNotOk(slide, waFile.Name, result);
+				ReportWarningIfWrongAnswerIsSolution(slide, waFile.Name, result);
+			}
 		}
 
 		private byte[] GetZipBytesWithWrongAnswer(ProjectExerciseBlock ex, FileInfo waFile)
 		{
-			return ex.ExerciseFolder.ToZip(new [] {ex.UserCodeFileName},
+			return ex.ExerciseFolder.ToZip(new[] { ex.UserCodeFileName },
 				new[]
 				{
 					new FileContent
@@ -117,38 +117,38 @@ namespace uLearn
 			var excludeSolution = proj.Items.Select(i => i.UnevaluatedInclude).Single(ex.IsCorrectSolution);
 
 			ProjModifier.SetFilenameItemTypeToCompile(proj, wrongAnswer.Name);
-			ProjModifier.PrepareForChecking(proj, ex.StartupObject, new [] {excludeSolution});
+			ProjModifier.PrepareForChecking(proj, ex.StartupObject, new[] { excludeSolution });
 		}
 
 		private void ReportWarningIfWrongAnswerVerdictIsNotOk(Slide slide, string waFileName, RunningResults waResult)
-	    {
-	        if (VerdictIsNotOk(waResult))
-	            ReportSlideWarning(slide, $"Code verdict of file with wrong answer ({waFileName}) is not OK. RunResult = " + waResult);
-	    }
+		{
+			if (VerdictIsNotOk(waResult))
+				ReportSlideWarning(slide, $"Code verdict of file with wrong answer ({waFileName}) is not OK. RunResult = " + waResult);
+		}
 
-	    private static bool VerdictIsNotOk(RunningResults result)
-	    {
-	        return !result.Verdict.IsOneOf(Verdict.Ok, Verdict.MemoryLimit, Verdict.TimeLimit);
-	    }
+		private static bool VerdictIsNotOk(RunningResults result)
+		{
+			return !result.Verdict.IsOneOf(Verdict.Ok, Verdict.MemoryLimit, Verdict.TimeLimit);
+		}
 
-	    private void ReportWarningIfWrongAnswerIsSolution(Slide slide, string waFileName, RunningResults waResult)
-	    {
-	        if (IsSolution(waResult))
-	            ReportSlideWarning(slide, $"Code of file with wrong answer ({waFileName}) is solution!");
-        }
+		private void ReportWarningIfWrongAnswerIsSolution(Slide slide, string waFileName, RunningResults waResult)
+		{
+			if (IsSolution(waResult))
+				ReportSlideWarning(slide, $"Code of file with wrong answer ({waFileName}) is solution!");
+		}
 
-	    private static bool IsSolution(RunningResults result)
-	    {
-	        return result.Verdict == Verdict.Ok && result.Output == "";
-	    }
+		private static bool IsSolution(RunningResults result)
+		{
+			return result.Verdict == Verdict.Ok && result.Output == "";
+		}
 
-	    private void ReportSlideWarning(Slide slide, string warning)
-	    {
+		private void ReportSlideWarning(Slide slide, string warning)
+		{
 			ReportWarning(slide.Title + ". " + warning);
-	    }
+		}
 
-	    private void ReportWarning(string message)
-	    {
+		private void ReportWarning(string message)
+		{
 			Warning?.Invoke(message);
 		}
 
@@ -262,25 +262,25 @@ namespace uLearn
 						.Select(b => Tuple.Create(slide, b.VideoId)));
 		}
 
-	    public void ReportErrorIfInitialCodeIsSolutionOrNotOk(ExerciseSlide slide, ProjectExerciseBlock ex)
+		public void ReportErrorIfInitialCodeIsSolutionOrNotOk(ExerciseSlide slide, ProjectExerciseBlock ex)
 		{
-		    var initialCode = ex.UserCodeFile.ContentAsUtf8();
+			var initialCode = ex.UserCodeFile.ContentAsUtf8();
 			var submission = ex.CreateSubmission(slide.Id.ToString(), initialCode);
 			var result = SandboxRunner.Run(submission);
 
 			ReportErrorIfInitialCodeVerdictIsNotOk(slide, result);
-            ReportErrorIfInitialCodeIsSolution(slide, result);
+			ReportErrorIfInitialCodeIsSolution(slide, result);
 		}
 
 		private void ReportErrorIfInitialCodeVerdictIsNotOk(ExerciseSlide slide, RunningResults result)
 		{
-            if (VerdictIsNotOk(result))
+			if (VerdictIsNotOk(result))
 				ReportSlideError(slide, "Exercise initial code verdict is not OK. RunResult = " + result);
 		}
 
 		private void ReportErrorIfInitialCodeIsSolution(ExerciseSlide slide, RunningResults result)
 		{
-		    if (IsSolution(result))
+			if (IsSolution(result))
 				ReportSlideError(slide, "Exercise initial code (available to students) is solution!");
 		}
 
