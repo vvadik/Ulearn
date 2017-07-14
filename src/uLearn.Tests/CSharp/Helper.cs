@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.VisualBasic.FileIO;
+using NUnit.Framework;
 using RunCsJob;
 using test;
 using uLearn.Model.Blocks;
@@ -11,6 +13,16 @@ namespace uLearn.CSharp
 {
 	public static class Helper
 	{
+		public static readonly string ProjSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "CSharp", "TestProject");
+		public static readonly DirectoryInfo ProjSlideFolder = new DirectoryInfo(ProjSlideFolderPath);
+
+		public static readonly string ProjExerciseFolderPath = Path.Combine(ProjSlideFolderPath, "ProjDir");
+		public static readonly DirectoryInfo ProjExerciseFolder = new DirectoryInfo(ProjExerciseFolderPath);
+
+		public static readonly string CsProjFilename = "test.csproj";
+		public static readonly string CsProjFilePath = Path.Combine("ProjDir", CsProjFilename);
+		public static readonly string UserCodeFileName = $"{nameof(MeaningOfLifeTask)}.cs";
+
 		public static readonly string[] WrongAnswerNames =
 		{
 			$"{nameof(AnotherTask)}.WrongAnswer.88.cs",
@@ -40,6 +52,11 @@ namespace uLearn.CSharp
 			if (FileSystem.DirectoryExists(path))
 				FileSystem.DeleteDirectory(path, DeleteDirectoryOption.DeleteAllContents);
 			FileSystem.CreateDirectory(path);
+		}
+
+		public static ProjectExerciseValidator BuildProjectExerciseValidator(ProjectExerciseBlock exBlock, ExerciseSlide slide, StringBuilder valOut)
+		{
+			return new ProjectExerciseValidator(BuildValidator(slide, valOut), new SandboxRunnerSettings(), slide, exBlock);
 		}
 
 		public static CourseValidator BuildValidator(ExerciseSlide slide, StringBuilder valOut)

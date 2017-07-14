@@ -19,17 +19,13 @@ namespace uLearn.CSharp
     [TestFixture]
     public class ProjectExerciseBlock_Should
     {
-		private DirectoryInfo slideFolder => new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "CSharp", "TestProject"));
-	    private string csProjFilename = "test.csproj";
-        private string csProjFilePath => Path.Combine("ProjDir", "test.csproj");
-        private string userCodeFileName = $"{nameof(MeaningOfLifeTask)}.cs";
         private ProjectExerciseBlock ex;
         private List<SlideBlock> exBlocks;
 
-        private DirectoryInfo studentExerciseFolder => new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "Student_SlideFolder"));
-        private DirectoryInfo checkerExerciseFolder => new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "Checker_SlideFolder"));
-        private string studentCsProjFilePath => Path.Combine(studentExerciseFolder.FullName, csProjFilename);
-        private string checkerExerciseFilePath => Path.Combine(checkerExerciseFolder.FullName, csProjFilename);
+        private DirectoryInfo studentExerciseFolder => new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "Student_ExerciseFolder"));
+        private DirectoryInfo checkerExerciseFolder => new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "Checker_ExerciseFolder"));
+        private string studentCsProjFilePath => Path.Combine(studentExerciseFolder.FullName, Helper.CsProjFilename);
+        private string checkerCsprojFilePath => Path.Combine(checkerExerciseFolder.FullName, Helper.CsProjFilename);
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -40,9 +36,9 @@ namespace uLearn.CSharp
             ex = new ProjectExerciseBlock
             {
 				StartupObject = "test.Program",
-                UserCodeFileName = userCodeFileName,
-                SlideFolderPath = slideFolder,
-                CsProjFilePath = csProjFilePath
+                UserCodeFileName = Helper.UserCodeFileName,
+                SlideFolderPath = Helper.ProjSlideFolder,
+                CsProjFilePath = Helper.CsProjFilePath
             };
 
             CreateStudentZip_AndUnpackResult();
@@ -88,13 +84,13 @@ namespace uLearn.CSharp
         {
 			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(studentCsProjFilePath);
 
-            itemNamesForCompile.Should().Contain(userCodeFileName);
+            itemNamesForCompile.Should().Contain(Helper.UserCodeFileName);
 		}
 
         [Test]
 		public void When_CreateStudentZip_Contain_Resolved_Links_Inside_Csproj()
         {
-	        var itemNamesForCompile = GetFromCsProjItemsForCompile(checkerExerciseFilePath);
+	        var itemNamesForCompile = GetFromCsProjItemsForCompile(checkerCsprojFilePath);
 
 	        itemNamesForCompile.Should().Contain(i => i.UnevaluatedInclude.Equals("~$Link.cs"));
 		}
@@ -144,15 +140,15 @@ namespace uLearn.CSharp
 		[Test]
 		public void When_CreateCheckerZip_Contain_UserCodeFile_OfCompileType_InsideCsproj()
 		{
-			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerExerciseFilePath);
+			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerCsprojFilePath);
 
-			itemNamesForCompile.Should().Contain(userCodeFileName);
+			itemNamesForCompile.Should().Contain(Helper.UserCodeFileName);
 		}
 
 		[Test]
 		public void When_CreateCheckerZip_NotContain_CorrectSolution_OfCompileType_InsideCsproj()
 		{
-			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerExerciseFilePath);
+			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerCsprojFilePath);
 
 			itemNamesForCompile.Should().NotContain(ex.CorrectSolutionFileName);
 		}
@@ -160,7 +156,7 @@ namespace uLearn.CSharp
 		[Test]
 		public void When_CreateCheckerZip_NotRemove_OtherSolutions_OfCompileType_FromCsproj()
 		{
-			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerExerciseFilePath);
+			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerCsprojFilePath);
 			var anotherSolutionReferencedByCurrentSolution = $"{nameof(AnotherTask)}.Solution.cs";
 
 			itemNamesForCompile.Should().Contain(anotherSolutionReferencedByCurrentSolution);

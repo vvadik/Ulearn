@@ -50,7 +50,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseCourseTests.cs" />
+    <Compile Include="BaseValidator.cs" />
     <Compile Include="CourseValidator.cs" />
+    <Compile Include="ProjectExerciseValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
