@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using FluentAssertions;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
-using test;
 using uLearn.Model.Blocks;
 
 namespace uLearn.CSharp
@@ -12,17 +11,12 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class CourseValidator_ReportError_should
 	{
-		private string projSlideFolderPath => Path.Combine(TestContext.CurrentContext.TestDirectory, "CSharp", "TestProject");
-		private string projExerciseFolderPath => Path.Combine(projSlideFolderPath, "ProjDir");
-		private DirectoryInfo projExerciseFolder => new DirectoryInfo(projExerciseFolderPath);
-		private string csProjFilePath => Path.Combine("ProjDir", "test.csproj");
-
 		private string tempSlideFolderPath => Path.Combine(TestContext.CurrentContext.TestDirectory, "ReportErrorTests_Temp_SlideFolder");
 		private DirectoryInfo tempSlideFolder => new DirectoryInfo(tempSlideFolderPath);
 		private FileInfo tempZipFile => new FileInfo(Path.Combine(tempSlideFolderPath, "ProjDir.exercise.zip"));
 
 		private StringBuilder validatorOut;
-		private CourseValidator validator;
+		private ProjectExerciseValidator validator;
 		private ExerciseSlide exSlide;
 		private ProjectExerciseBlock exBlock;
 
@@ -31,16 +25,16 @@ namespace uLearn.CSharp
 		{
 			exBlock = new ProjectExerciseBlock
 			{
-				UserCodeFileName = $"{nameof(MeaningOfLifeTask)}.cs",
+				UserCodeFileName = Helper.UserCodeFileName,
 				SlideFolderPath = tempSlideFolder,
-				CsProjFilePath = csProjFilePath,
+				CsProjFilePath = Helper.CsProjFilePath,
 			};
 
-			validator = Helper.BuildValidator(exSlide = Helper.BuildSlide(exBlock), validatorOut = new StringBuilder());
+			validator = Helper.BuildProjectExerciseValidator(exBlock, exSlide = Helper.BuildSlide(exBlock), validatorOut = new StringBuilder());
 
 			SaveTempZipFileWithFullProject();
 
-			validator.ReportIfStudentsZipHasErrors(exSlide, exBlock);
+			validator.ReportIfStudentsZipHasErrors();
 		}
 
 		private void SaveTempZipFileWithFullProject()
@@ -50,7 +44,7 @@ namespace uLearn.CSharp
 			var noExcludedFiles = new Regex("[^\\s\\S]").ToString();
 			var noExcludedDirs = new string[0];
 			new LazilyUpdatingZip(
-					projExerciseFolder,
+					Helper.ProjExerciseFolder,
 					noExcludedDirs,
 					noExcludedFiles,
 					ResolveCsprojLink,
@@ -105,7 +99,7 @@ namespace uLearn.CSharp
 		public void ReportError_If_ExerciseFolder_Doesnt_Contain_CsProj()
 		{
 			Helper.RecreateDirectory(tempSlideFolderPath);
-			FileSystem.CopyDirectory(projSlideFolderPath, tempSlideFolderPath);
+			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
 			var valOut = new StringBuilder();
 			var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), valOut);
 			File.Delete(Path.Combine(tempSlideFolderPath, exBlock.CsProjFilePath));
@@ -120,7 +114,7 @@ namespace uLearn.CSharp
 		public void ReportError_If_ExerciseFolder_Doesnt_Contain_UserCodeFile()
 		{
 			Helper.RecreateDirectory(tempSlideFolderPath);
-			FileSystem.CopyDirectory(projSlideFolderPath, tempSlideFolderPath);
+			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
 			var valOut = new StringBuilder();
 			var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), valOut);
 			File.Delete(exBlock.UserCodeFile.FullName);

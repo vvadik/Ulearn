@@ -11,9 +11,6 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class CourseValidator_ReportWarning_should
 	{
-		private string projSlideFolderPath => Path.Combine(TestContext.CurrentContext.TestDirectory, "CSharp", "TestProject");
-		private string csProjFilePath => Path.Combine("ProjDir", "test.csproj");
-
 		private string tempSlideFolderPath => Path.Combine(TestContext.CurrentContext.TestDirectory, "ReportWarningTests_Temp_SlideFolder");
 
 		private StringBuilder validatorOut;
@@ -23,14 +20,14 @@ namespace uLearn.CSharp
 		public void OneTimeSetUp()
 		{
 			Helper.RecreateDirectory(tempSlideFolderPath);
-			FileSystem.CopyDirectory(projSlideFolderPath, tempSlideFolderPath);
+			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
 
 			exBlock = new ProjectExerciseBlock
 			{
 				StartupObject = "test.Program",
-				UserCodeFileName = $"{nameof(MeaningOfLifeTask)}.cs",
+				UserCodeFileName = Helper.UserCodeFileName,
 				SlideFolderPath = new DirectoryInfo(tempSlideFolderPath),
-				CsProjFilePath = csProjFilePath,
+				CsProjFilePath = Helper.CsProjFilePath,
 				SupressValidatorMessages = false
 			};
 
@@ -42,7 +39,7 @@ namespace uLearn.CSharp
 		public void ReportWarning_If_ExerciseFolder_DoesntContain_SolutionFile()
 		{
 			Helper.RecreateDirectory(tempSlideFolderPath);
-			FileSystem.CopyDirectory(projSlideFolderPath, tempSlideFolderPath);
+			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
 			var valOut = new StringBuilder();
 			var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), valOut);
 			FileSystem.DeleteFile(exBlock.SolutionFile.FullName);
