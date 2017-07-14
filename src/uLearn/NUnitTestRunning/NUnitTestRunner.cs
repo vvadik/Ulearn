@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using NUnit.Framework.Api;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal.Filters;
+
+[assembly: InternalsVisibleTo("NUnit.Framework")]
 
 namespace uLearn.NUnitTestRunning
 {
@@ -25,7 +28,6 @@ namespace uLearn.NUnitTestRunning
 		{
 			var runner = new NUnitTestAssemblyRunner(new DefaultTestAssemblyBuilder());
 			runner.Load(executingAssembly, new Dictionary<string, object> { { "StopOnError", true } });
-
 			foreach (var testClass in testClassesToLaunch)
 			{
 				RunTestBatch(testClass, runner, testListener);
