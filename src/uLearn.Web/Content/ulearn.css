@@ -1054,6 +1054,9 @@ hr.without-top-margin {
 	font-size: 14px;
 }
 
+#externalLogins #socialLoginList .btn {
+	margin-bottom: 5px;	
+}
 
 /* Strike line */
 .strike-line {

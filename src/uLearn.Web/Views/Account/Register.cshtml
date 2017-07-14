@@ -14,7 +14,7 @@
 				<h2>@ViewBag.Title</h2>
 
 				<section id="socialLoginForm">
-					@Html.Partial("../Login/_ExternalLoginsListPartial", new ExternalLoginsListModel { Action = "ExternalLogin", ReturnUrl = ViewBag.ReturnUrl })
+					@Html.Partial("../Login/ExternalLoginsListPartial", new ExternalLoginsListModel { Action = "ExternalLogin", ReturnUrl = ViewBag.ReturnUrl, Type = ExternalLoginListType.Registration })
 				</section>
 
 				<div class="strike-line grey">

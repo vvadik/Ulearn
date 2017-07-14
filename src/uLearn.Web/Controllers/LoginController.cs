@@ -8,6 +8,7 @@ using Database.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using uLearn.Web.FilterAttributes;
+using uLearn.Web.Kontur.Passport;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -78,6 +79,7 @@ namespace uLearn.Web.Controllers
 				Gender? userSex = null;
 				if (Enum.TryParse(sex, out Gender parsedSex))
 					userSex = parsedSex;
+
 				if (!string.IsNullOrEmpty(avatarUrl))
 					user.AvatarUrl = avatarUrl;
 				if (userSex != null && user.Gender == null)
@@ -160,7 +162,18 @@ namespace uLearn.Web.Controllers
 		{
 			return View();
 		}
-		
+
+		[HttpGet]
+		[ULearnAuthorize]
+		public ActionResult LinkLogin(string provider, string returnUrl)
+		{
+			return View(new LinkLoginViewModel
+			{
+				Provider = provider,
+				ReturnUrl = returnUrl,
+			});
+		}
+
 		[HttpPost]
 		[ULearnAuthorize]
 		[ValidateAntiForgeryToken]
@@ -194,6 +207,36 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Index", "Home");
 		}
 
+		public ActionResult ExternalLoginsListPartial(ExternalLoginsListModel model)
+		{
+			if (User.Identity.IsAuthenticated)
+			{
+				var userId = User.Identity.GetUserId();
+				var user = userManager.FindById(userId);
+				model.UserLogins = user.Logins.ToList();
+			}
+			return PartialView(model);
+		}
+
+		public ActionResult EnsureKonturProfileLogin(string returnUrl)
+		{
+			if (User.Identity.IsAuthenticated)
+			{
+				var userId = User.Identity.GetUserId();
+				var user = userManager.FindById(userId);
+				var hasKonturPassportLogin = user.Logins.Any(l => l.LoginProvider == KonturPassportConstants.AuthenticationType);
+				if (hasKonturPassportLogin)
+					return Redirect(this.FixRedirectUrl(returnUrl));
+
+				return View("AddKonturProfileLogin", model: returnUrl);
+			}
+			else
+			{
+				var newReturnUrl = Url.Action("EnsureKonturProfileLogin", "Login", new { returnUrl = returnUrl });
+				return View("EnsureKonturProfileLogin", model: newReturnUrl);
+			}
+		}
+
 		private const string XsrfKey = "XsrfId";
 
 		private class ChallengeResult : HttpUnauthorizedResult
@@ -219,5 +262,12 @@ namespace uLearn.Web.Controllers
 				context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
 			}
 		}
+	}
+
+	public class LinkLoginViewModel
+	{
+		public string Provider { get; set; }
+
+		public string ReturnUrl { get; set; }
 	}
 }
