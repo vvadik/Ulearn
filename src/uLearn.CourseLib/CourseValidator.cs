@@ -35,53 +35,73 @@ namespace uLearn
 			{
 				LogSlideProcessing("Validate exercise", slide);
 
-			    if (slide.Exercise is ProjectExerciseBlock exercise)
-			    {
-					if (!exercise.SupressValidatorMessages)
-					{
-						ReportWarningIfExerciseDirDoesntContainSolutionFile(slide, exercise);
+				if (slide.Exercise is ProjectExerciseBlock exercise)
+				{
+					if (exercise.SupressValidatorMessages || ExerciseFolderDoesntContainRequiredFiles(slide, exercise))
+						continue;
+
+					if (ExerciseDirectoryContainsSolutionFile(exercise))
 						ReportWarningIfWrongAnswersAreSolutionsOrNotOk(slide, exercise);
-						ReportErrorIfInitialCodeIsSolutionOrNotOk(slide, exercise);
-						ReportIfStudentsZipHasErrors(slide, exercise);
-					}
-			    }
+					else
+						ReportSlideWarning(slide, $"Exercise directory doesn't contain {exercise.CorrectSolutionFileName}");
+
+					ReportErrorIfInitialCodeIsSolutionOrNotOk(slide, exercise);
+					ReportIfStudentsZipHasErrors(slide, exercise);
+				}
 				else
-			        ReportErrorIfEthalonSolutionIsNotRight(slide);
-            }
-        }
+					ReportErrorIfEthalonSolutionIsNotRight(slide);
+			}
+		}
 
-	    public void ReportWarningIfExerciseDirDoesntContainSolutionFile(ExerciseSlide slide, ProjectExerciseBlock ex)
-	    {
-	        if (!ex.ExerciseFolder.GetFiles().Any(f => f.Name.Equals(ex.CorrectSolutionFileName)))
-	            ReportSlideWarning(slide, $"Exercise directory doesn't contain {ex.CorrectSolutionFileName}");
-	    }
+		private bool ExerciseFolderDoesntContainRequiredFiles(ExerciseSlide slide, ProjectExerciseBlock ex)
+		{
+			var exerciseFilesRelativePaths = FileSystem.GetFiles(ex.ExerciseFolder.FullName, SearchOption.SearchAllSubDirectories)
+				.Select(path => new FileInfo(path).GetRelativePath(ex.ExerciseFolder.FullName))
+				.ToList();
 
-	    public void ReportWarningIfWrongAnswersAreSolutionsOrNotOk(ExerciseSlide slide, ProjectExerciseBlock ex)
-	    {
-		    var filesWithWrongAnswer = FileSystem.GetFiles(ex.ExerciseFolder.FullName, SearchOption.SearchAllSubDirectories)
-		        .Select(name => new FileInfo(name))
+			return ExerciseFolderDoesntContainCsproj() || ExerciseFolderDoesntContainUserCodeFile();
+
+			bool ExerciseFolderDoesntContainUserCodeFile() => ReportErrorIfExerciseFolderDoesntContainFile(ex.UserCodeFileName);
+			bool ExerciseFolderDoesntContainCsproj() => ReportErrorIfExerciseFolderDoesntContainFile(ex.CsprojFileName);
+
+			bool ReportErrorIfExerciseFolderDoesntContainFile(string path)
+			{
+				if (exerciseFilesRelativePaths.Any(p => p.Equals(path, StringComparison.InvariantCultureIgnoreCase)))
+					return false;
+				ReportSlideError(slide, $"Exercise folder ({ex.ExerciseFolder.Name}) doesn't contain ({path})");
+				return true;
+			}
+		}
+
+		private bool ExerciseDirectoryContainsSolutionFile(ProjectExerciseBlock ex)
+			=> ex.ExerciseFolder.GetFiles().Any(f => f.Name.Equals(ex.CorrectSolutionFileName));
+
+		private void ReportWarningIfWrongAnswersAreSolutionsOrNotOk(ExerciseSlide slide, ProjectExerciseBlock ex)
+		{
+			var filesWithWrongAnswer = FileSystem.GetFiles(ex.ExerciseFolder.FullName, SearchOption.SearchAllSubDirectories)
+				.Select(name => new FileInfo(name))
 				.Where(f => IsWrongAnswer(ex, f.Name));
 
-		    foreach (var waFile in filesWithWrongAnswer)
-		    {
-			    var submission = new ProjRunnerSubmission
-			    {
-				    Id = slide.Id.ToString(),
-				    ZipFileData = GetZipBytesWithWrongAnswer(ex, waFile),
-				    ProjectFileName = ex.CsprojFileName,
-				    Input = "",
-				    NeedRun = true,
-			    };
-			    var result = SandboxRunner.Run(submission);
+			foreach (var waFile in filesWithWrongAnswer)
+			{
+				var submission = new ProjRunnerSubmission
+				{
+					Id = slide.Id.ToString(),
+					ZipFileData = GetZipBytesWithWrongAnswer(ex, waFile),
+					ProjectFileName = ex.CsprojFileName,
+					Input = "",
+					NeedRun = true,
+				};
+				var result = SandboxRunner.Run(submission);
 
-			    ReportWarningIfWrongAnswerVerdictIsNotOk(slide, waFile.Name, result);
-			    ReportWarningIfWrongAnswerIsSolution(slide, waFile.Name, result);
-		    }
+				ReportWarningIfWrongAnswerVerdictIsNotOk(slide, waFile.Name, result);
+				ReportWarningIfWrongAnswerIsSolution(slide, waFile.Name, result);
+			}
 		}
 
 		private byte[] GetZipBytesWithWrongAnswer(ProjectExerciseBlock ex, FileInfo waFile)
 		{
-			return ex.ExerciseFolder.ToZip(new [] {ex.UserCodeFileName}, // todo fail if !ex.exercisefolder.contains(ex.csprojfile)
+			return ex.ExerciseFolder.ToZip(new[] { ex.UserCodeFileName },
 				new[]
 				{
 					new FileContent
@@ -94,41 +114,41 @@ namespace uLearn
 
 		private void PrepareCsprojForCheckingWrongAnswer(Project proj, ProjectExerciseBlock ex, FileInfo wrongAnswer)
 		{
-			var excludeSolution = proj.Items.Select(i => i.UnevaluatedInclude).Single(ex.IsCorrectSolution); // todo fail if !ex.exercisefolder.contains(ex.correctsolution)
+			var excludeSolution = proj.Items.Select(i => i.UnevaluatedInclude).Single(ex.IsCorrectSolution);
 
-			ProjModifier.SetFilenameItemTypeToCompile(proj, wrongAnswer.Name); // todo fail if !proj.items.Contains(wa.Name)
-			ProjModifier.PrepareForChecking(proj, ex.StartupObject, new [] {excludeSolution});
+			ProjModifier.SetFilenameItemTypeToCompile(proj, wrongAnswer.Name);
+			ProjModifier.PrepareForChecking(proj, ex.StartupObject, new[] { excludeSolution });
 		}
 
 		private void ReportWarningIfWrongAnswerVerdictIsNotOk(Slide slide, string waFileName, RunningResults waResult)
-	    {
-	        if (VerdictIsNotOk(waResult))
-	            ReportSlideWarning(slide, $"Code verdict of file with wrong answer ({waFileName}) is not OK. RunResult = " + waResult);
-	    }
+		{
+			if (VerdictIsNotOk(waResult))
+				ReportSlideWarning(slide, $"Code verdict of file with wrong answer ({waFileName}) is not OK. RunResult = " + waResult);
+		}
 
-	    private static bool VerdictIsNotOk(RunningResults result)
-	    {
-	        return !result.Verdict.IsOneOf(Verdict.Ok, Verdict.MemoryLimit, Verdict.TimeLimit);
-	    }
+		private static bool VerdictIsNotOk(RunningResults result)
+		{
+			return !result.Verdict.IsOneOf(Verdict.Ok, Verdict.MemoryLimit, Verdict.TimeLimit);
+		}
 
-	    private void ReportWarningIfWrongAnswerIsSolution(Slide slide, string waFileName, RunningResults waResult)
-	    {
-	        if (IsSolution(waResult))
-	            ReportSlideWarning(slide, $"Code of file with wrong answer ({waFileName}) is solution!");
-        }
+		private void ReportWarningIfWrongAnswerIsSolution(Slide slide, string waFileName, RunningResults waResult)
+		{
+			if (IsSolution(waResult))
+				ReportSlideWarning(slide, $"Code of file with wrong answer ({waFileName}) is solution!");
+		}
 
-	    private static bool IsSolution(RunningResults result)
-	    {
-	        return result.Verdict == Verdict.Ok && result.Output == "";
-	    }
+		private static bool IsSolution(RunningResults result)
+		{
+			return result.Verdict == Verdict.Ok && result.Output == "";
+		}
 
-	    private void ReportSlideWarning(Slide slide, string warning)
-	    {
+		private void ReportSlideWarning(Slide slide, string warning)
+		{
 			ReportWarning(slide.Title + ". " + warning);
-	    }
+		}
 
-	    private void ReportWarning(string message)
-	    {
+		private void ReportWarning(string message)
+		{
 			Warning?.Invoke(message);
 		}
 
@@ -242,25 +262,25 @@ namespace uLearn
 						.Select(b => Tuple.Create(slide, b.VideoId)));
 		}
 
-	    public void ReportErrorIfInitialCodeIsSolutionOrNotOk(ExerciseSlide slide, ProjectExerciseBlock ex)
+		public void ReportErrorIfInitialCodeIsSolutionOrNotOk(ExerciseSlide slide, ProjectExerciseBlock ex)
 		{
-		    var initialCode = ex.UserCodeFile.ContentAsUtf8();
-		    var submission = ex.CreateSubmission(slide.Id.ToString(), initialCode); // todo fail if !ex.exercisefolder.Contains(ex.UserCodeFile)
-			var result =  SandboxRunner.Run(submission); // todo and fail if !ex.csproj.Contains(ex.UserCodeFile)
+			var initialCode = ex.UserCodeFile.ContentAsUtf8();
+			var submission = ex.CreateSubmission(slide.Id.ToString(), initialCode);
+			var result = SandboxRunner.Run(submission);
 
 			ReportErrorIfInitialCodeVerdictIsNotOk(slide, result);
-            ReportErrorIfInitialCodeIsSolution(slide, result);
+			ReportErrorIfInitialCodeIsSolution(slide, result);
 		}
 
 		private void ReportErrorIfInitialCodeVerdictIsNotOk(ExerciseSlide slide, RunningResults result)
 		{
-            if (VerdictIsNotOk(result))
+			if (VerdictIsNotOk(result))
 				ReportSlideError(slide, "Exercise initial code verdict is not OK. RunResult = " + result);
 		}
 
 		private void ReportErrorIfInitialCodeIsSolution(ExerciseSlide slide, RunningResults result)
 		{
-		    if (IsSolution(result))
+			if (IsSolution(result))
 				ReportSlideError(slide, "Exercise initial code (available to students) is solution!");
 		}
 
