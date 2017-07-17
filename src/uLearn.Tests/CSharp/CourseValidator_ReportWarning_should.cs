@@ -55,7 +55,7 @@ namespace uLearn.CSharp
 		{
 			validatorOut.ToString()
 				.Should().Contain($"Code verdict of file with wrong answer ({exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.Type.cs) is not OK. " +
-								"RunResult = Id: 00000000-0000-0000-0000-000000000000, Verdict: CompilationError");
+								$"RunResult = Id: {exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.Type.cs, Verdict: CompilationError");
 		}
 
 		[Test]

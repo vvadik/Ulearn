@@ -26,10 +26,10 @@ namespace uLearn
 		{
 			var toExclude = FindItemNames(proj, ProjectExerciseBlock.IsAnyWrongAnswerOrAnySolution).ToList();
 			var solutionsOfOtherTasks = toExclude.Where(n => ProjectExerciseBlock.IsAnySolution(n) && !ex.IsCorrectSolution(n)).ToList();
-			var namesOfOtherTasks = solutionsOfOtherTasks.Select(ProjectExerciseBlock.ParseNameCsFromSolutionCs);
+			var userCodeFilenamesOfOtherTasks = solutionsOfOtherTasks.Select(ProjectExerciseBlock.ParseUserCodeFilenameFromSolution);
 
 			RemoveCheckingFromCsproj(proj);
-			SetFilenameItemTypeToCompile(proj, namesOfOtherTasks.Concat(new[] { ex.UserCodeFileName }));
+			SetFilenameItemTypeToCompile(proj, userCodeFilenamesOfOtherTasks.Concat(new[] { ex.UserCodeFileName }));
 			ResolveLinks(proj);
 			ExcludePaths(proj, toExclude);
 		}

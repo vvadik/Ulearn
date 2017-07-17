@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using FluentAssertions;
@@ -123,6 +124,12 @@ namespace uLearn.CSharp
 
 			valOut.ToString()
 				.Should().Contain($"Exercise folder ({exBlock.ExerciseFolder.Name}) doesn't contain ({exBlock.UserCodeFileName})");
+		}
+
+		[Test]
+		public void ReportError_If_Ethalon_Solution_For_ProjectExerciseBlock_IsNot_Correct()
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

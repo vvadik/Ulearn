@@ -23,7 +23,7 @@ namespace uLearn.Model.Blocks
 
 		public static bool IsAnyWrongAnswerOrAnySolution(string name) => Regex.IsMatch(name, AnyWrongAnswerAndSolutionNameRegex);
 		public static bool IsAnySolution(string name) => Regex.IsMatch(name, AnySolutionNameRegex);
-		public static string ParseNameCsFromSolutionCs(string name)
+		public static string ParseUserCodeFilenameFromSolution(string name)
 		{
 			var nameWithoutExt = name.Split(new[] { ".Solution.cs" }, StringSplitOptions.RemoveEmptyEntries).First();
 			return $"{nameWithoutExt}.cs";

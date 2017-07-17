@@ -29,7 +29,7 @@ namespace uLearn
 
 		public void ValidateExercises()
 		{
-			if (ex.SupressValidatorMessages || ExerciseFolderDoesntContainRequiredFiles())
+			if (ex.SupressValidatorMessages || ExerciseFolderDoesntContainRequiredFiles()) // todo имя второго метода плохое, т.к. репортит
 				return;
 
 			if (ExerciseDirectoryContainsSolutionFile())
@@ -72,15 +72,7 @@ namespace uLearn
 
 			foreach (var waFile in filesWithWrongAnswer)
 			{
-				var submission = new ProjRunnerSubmission
-				{
-					Id = slide.Id.ToString(),
-					ZipFileData = GetZipBytesWithWrongAnswer(waFile),
-					ProjectFileName = ex.CsprojFileName,
-					Input = "",
-					NeedRun = true,
-				};
-				var result = SandboxRunner.Run(submission);
+				var result = SandboxRunner.Run(ex.CreateSubmission(waFile.Name, waFile.ContentAsUtf8()));
 
 				ReportWarningIfWrongAnswerVerdictIsNotOk(waFile.Name, result);
 				ReportWarningIfWrongAnswerIsSolution(waFile.Name, result);
@@ -89,27 +81,6 @@ namespace uLearn
 
 		private bool IsWrongAnswer(string name) =>
 			Regex.IsMatch(name, ex.WrongAnswersAndSolutionNameRegexPattern) && !ex.IsCorrectSolution(name);
-
-		private byte[] GetZipBytesWithWrongAnswer(FileInfo waFile)
-		{
-			return ex.ExerciseFolder.ToZip(new[] { ex.UserCodeFileName },
-				new[]
-				{
-					new FileContent
-					{
-						Path = ex.CsprojFileName,
-						Data = ProjModifier.ModifyCsproj(ex.CsprojFile, p => PrepareCsprojForCheckingWrongAnswer(p, waFile))
-					}
-				});
-		}
-
-		private void PrepareCsprojForCheckingWrongAnswer(Project proj, FileInfo wrongAnswer)
-		{
-			var excludeSolution = proj.Items.Select(i => i.UnevaluatedInclude).Single(ex.IsCorrectSolution);
-
-			ProjModifier.SetFilenameItemTypeToCompile(proj, wrongAnswer.Name);
-			ProjModifier.PrepareForChecking(proj, ex.StartupObject, new[] { excludeSolution });
-		}
 
 		private void ReportWarningIfWrongAnswerVerdictIsNotOk(string waFileName, RunningResults waResult)
 		{
