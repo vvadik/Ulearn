@@ -395,7 +395,7 @@ namespace uLearn.Web.Controllers
 			[Display(Name = "Пароль установлен")]
 			PasswordSet,
 
-			[Display(Name = "Внешний логин удален")]
+			[Display(Name = "Привязка удалена")]
 			LoginRemoved,
 
 			[Display(Name = "Ваша почта уже подтверждена")]

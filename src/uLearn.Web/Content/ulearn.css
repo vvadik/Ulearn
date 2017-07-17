@@ -1058,6 +1058,16 @@ hr.without-top-margin {
 	margin-bottom: 5px;	
 }
 
+#externalLogins table td {
+	border-top-width: 0;
+	padding: 10px 0 0 0;
+	vertical-align: middle;
+}
+
+#externalLogins table tr:first-child td {
+	border-top-width: 1px;
+}
+
 /* Strike line */
 .strike-line {
 	display: block;

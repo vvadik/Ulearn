@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -14,6 +15,7 @@ namespace uLearn.Web.Kontur.Passport
 {
 	public class KonturPassportAuthenticationHandler : AuthenticationHandler<KonturPassportAuthenticationOptions>
 	{
+		private const string xmlSchemaForStringType = "http://www.w3.org/2001/XMLSchema#string";
 		private const string konturStateCookieName = "kontur.passport.state";
 
 		private readonly PassportClient passportClient;
@@ -53,7 +55,32 @@ namespace uLearn.Web.Kontur.Passport
 					return null;
 				}
 				
-				var identity = new ClaimsIdentity(authenticationResult.UserClaims);
+				var identity = new ClaimsIdentity(Options.AuthenticationType);
+
+				var userClaims = authenticationResult.UserClaims.ToList();
+				log.Info($"Received follow user claims from Kontur.Passport server: {string.Join(", ", userClaims.Select(c => c.Type + ": " + c.Value))}");
+				var name = userClaims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+				var sid = userClaims.FirstOrDefault(c => c.Type == ClaimTypes.Sid)?.Value;
+				var email = userClaims.FirstOrDefault(c => c.Type == KonturPassportConstants.EmailClaimType)?.Value;
+				var avatarUrl = userClaims.FirstOrDefault(c => c.Type == KonturPassportConstants.AvatarUrlClaimType)?.Value;
+				var realNameParts = userClaims.FirstOrDefault(c => c.Type == KonturPassportConstants.NameClaimType)?.Value.Split(' ');
+				identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, sid, xmlSchemaForStringType, Options.AuthenticationType));
+				identity.AddClaim(new Claim(ClaimTypes.Email, email, xmlSchemaForStringType, Options.AuthenticationType));
+				identity.AddClaim(new Claim("AvatarUrl", avatarUrl, xmlSchemaForStringType, Options.AuthenticationType));
+				if (realNameParts != null && realNameParts.Length > 0)
+				{
+					/* Suppose that Гейн Андрей Александрович is Surname (Гейн), GiveName (Андрей) and other. So we splitted name from Kontur.Passport into parts */
+					identity.AddClaim(new Claim(ClaimTypes.Surname, realNameParts[0], xmlSchemaForStringType, Options.AuthenticationType));
+					if (realNameParts.Length > 1)
+						identity.AddClaim(new Claim(ClaimTypes.GivenName, realNameParts[1], xmlSchemaForStringType, Options.AuthenticationType));
+				}
+
+				/* Replace name from Kontur\andgein to andgein */
+				if (name != null && name.Contains(@"\"))
+					name = name.Substring(name.IndexOf('\\') + 1);
+
+				identity.AddClaim(new Claim(ClaimTypes.Name, name, xmlSchemaForStringType, Options.AuthenticationType));
+
 				var properties = Options.StateDataFormat.Unprotect(state);
 				return new AuthenticationTicket(identity, properties);
 			}
@@ -103,6 +130,7 @@ namespace uLearn.Web.Kontur.Passport
 				
 				var state = Options.StateDataFormat.Protect(properties);
 				var loginUri = passportClient.GetLoginUri(redirectUri, state);
+				log.Debug($"Login url: {loginUri}");
 				Response.Cookies.Append(konturStateCookieName, state);
 
 				Response.Redirect(loginUri.ToString());
@@ -139,8 +167,7 @@ namespace uLearn.Web.Kontur.Passport
 					var grantIdentity = context.Identity;
 					if (!string.Equals(grantIdentity.AuthenticationType, context.SignInAsAuthenticationType, StringComparison.Ordinal))
 					{
-						grantIdentity = new ClaimsIdentity(grantIdentity.Claims, context.SignInAsAuthenticationType,
-							grantIdentity.NameClaimType, grantIdentity.RoleClaimType);
+						grantIdentity = new ClaimsIdentity(grantIdentity.Claims, context.SignInAsAuthenticationType);
 					}
 					Context.Authentication.SignIn(context.Properties, grantIdentity);
 				}

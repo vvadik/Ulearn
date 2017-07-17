@@ -8,6 +8,7 @@ namespace uLearn.Web.Models
 		public ExternalLoginsListModel()
 		{
 			UserLogins = new List<IdentityUserLogin>();
+			AvailableProviders = new List<string>();
 		}
 
 		public string Action { get; set; }
@@ -18,7 +19,7 @@ namespace uLearn.Web.Models
 
 		public List<IdentityUserLogin> UserLogins { get; set; }
 
-		/* If null, all providers are available */
+		/* If empty, all providers are available */
 		public List<string> AvailableProviders { get; set; }
 	}
 
