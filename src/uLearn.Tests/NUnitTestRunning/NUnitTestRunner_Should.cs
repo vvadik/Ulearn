@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
@@ -113,6 +113,16 @@ namespace uLearn.NUnitTestRunning
 			NUnitTestRunner.RunAllTests(listener, Assembly.GetExecutingAssembly(), testsTuRun);
 
 			Assert.AreEqual(expectedCounterValue, TenRepeatTest.Counter);
+		}
+
+		[Test]
+		public void ReportOn_NonexistentTestClasses()
+		{
+			var expected = "Error in checking system: test class Nonexistent does not exist.";
+
+			var message = Assert.Throws<ArgumentException>(
+				() => NUnitTestRunner.ReportOnNonexistentTestClasses(Assembly.GetExecutingAssembly(), "Nonexistent"));
+			Assert.AreEqual(expected, message.Message);
 		}
 	}
 

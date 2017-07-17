@@ -22,7 +22,7 @@ namespace uLearn.NUnitTestRunning
 			string[] testClassesToLaunch = { "SHOULD_BE_REPLACED" };
 			var listener = new TestListener();
 			var assembly = Assembly.GetExecutingAssembly();
-			
+			ReportOnNonexistentTestClasses(assembly, testClassesToLaunch);
 			RunAllTests(listener, assembly, testClassesToLaunch);
 		}
 
@@ -44,10 +44,20 @@ namespace uLearn.NUnitTestRunning
 			runner.Run(listener, testFilter);
 		}
 
-		private static bool CheckTestClassesExistance(Assembly executingAssembly, params string[] testClasses)
+		public static void ReportOnNonexistentTestClasses(Assembly assembly, params string[] testClassesToLaunch)
+		{
+			foreach (var testClass in GetNonexistentTestClasses(assembly, testClassesToLaunch))
+			{
+				var errorMessage = $"Error in checking system: test class {testClass} does not exist.";
+				throw new ArgumentException(errorMessage);
+			}
+		}
+
+		private static IEnumerable<string> GetNonexistentTestClasses(Assembly executingAssembly, params string[] testClasses)
 		{
 			var classes = executingAssembly.GetTypes().Select(x => x.FullName).ToList();
-			return classes.Intersect(testClasses).Count() == testClasses.Length;
+			var intersection = classes.Intersect(testClasses);
+			return testClasses.Except(intersection);
 		} 
 
 		// должен остаться в этом же файле
