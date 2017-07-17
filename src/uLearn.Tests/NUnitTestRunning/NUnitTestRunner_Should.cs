@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
+using RunCsJob.Api;
 using uLearn.NUnitTestRunning.TestsToRun;
 
 namespace uLearn.NUnitTestRunning
@@ -113,6 +115,29 @@ namespace uLearn.NUnitTestRunning
 			NUnitTestRunner.RunAllTests(listener, Assembly.GetExecutingAssembly(), testsTuRun);
 
 			Assert.AreEqual(expectedCounterValue, TenRepeatTest.Counter);
+		}
+
+		[Test]
+		public void ReportOn_NonexistentTestClasses()
+		{
+			var testWriter = new TestTextWriter();
+
+			NUnitTestRunner.ReportOnNonexistentTestClasses(Assembly.GetExecutingAssembly(), testWriter, TestsNotFoundFlag.Flag, "Nonexistent");
+
+			Assert.AreEqual(TestsNotFoundFlag.Flag, testWriter.Buffer);
+		}
+	}
+
+	public class TestTextWriter : TextWriter
+	{
+		public string Buffer { get; private set; }
+
+		public override Encoding Encoding { get; }
+
+		public override void WriteLine(string value)
+		{
+			Buffer += value;
+			base.WriteLine();
 		}
 	}
 

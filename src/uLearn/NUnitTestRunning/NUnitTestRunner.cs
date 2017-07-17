@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -22,7 +23,8 @@ namespace uLearn.NUnitTestRunning
 			string[] testClassesToLaunch = { "SHOULD_BE_REPLACED" };
 			var listener = new TestListener();
 			var assembly = Assembly.GetExecutingAssembly();
-			
+			var errorMessage = "ERROR_MESSAGE_TO_BE_REPLACED";
+			ReportOnNonexistentTestClasses(assembly, Console.Out, errorMessage, testClassesToLaunch);
 			RunAllTests(listener, assembly, testClassesToLaunch);
 		}
 
@@ -44,10 +46,19 @@ namespace uLearn.NUnitTestRunning
 			runner.Run(listener, testFilter);
 		}
 
-		private static bool CheckTestClassesExistance(Assembly executingAssembly, params string[] testClasses)
+		public static void ReportOnNonexistentTestClasses(Assembly assembly, TextWriter writer, string errorMessage, params string[] testClassesToLaunch)
+		{
+			if (GetNonexistentTestClasses(assembly, testClassesToLaunch).Any())
+			{
+				writer.WriteLine(errorMessage);
+			}
+		}
+
+		private static IEnumerable<string> GetNonexistentTestClasses(Assembly executingAssembly, params string[] testClasses)
 		{
 			var classes = executingAssembly.GetTypes().Select(x => x.FullName).ToList();
-			return classes.Intersect(testClasses).Count() == testClasses.Length;
+			var intersection = classes.Intersect(testClasses);
+			return testClasses.Except(intersection);
 		} 
 
 		// должен остаться в этом же файле

@@ -199,8 +199,11 @@ namespace uLearn.Model.Blocks
 			var data = Resources.NUnitTestRunner;
 			var oldTestFilter = "\"SHOULD_BE_REPLACED\"";
 			var newTestFilter = string.Join(",", NUnitTestClasses.Select(x => $"\"{x}\""));
-			var newData = data.Replace(oldTestFilter, newTestFilter);
-			return Encoding.UTF8.GetBytes(newData);
+			var oldErrorMessage = "ERROR_MESSAGE_TO_BE_REPLACED";
+			var newErrorMessage = TestsNotFoundFlag.Flag;
+			var dataWithFilter = data.Replace(oldTestFilter, newTestFilter);
+			var dataWithErrorMessage = dataWithFilter.Replace(oldErrorMessage, newErrorMessage);
+			return Encoding.UTF8.GetBytes(dataWithErrorMessage);
 		}
 	}
 }
