@@ -11,7 +11,6 @@ using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
-using log4net;
 using Microsoft.AspNet.Identity;
 using uLearn.Extensions;
 using uLearn.Web.Extensions;
@@ -23,8 +22,6 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class AccountController : BaseUserController
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(AccountController));
-
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
 		private readonly UserRolesRepo userRolesRepo;
