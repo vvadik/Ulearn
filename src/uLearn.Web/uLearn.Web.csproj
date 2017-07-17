@@ -197,7 +197,7 @@
     <Reference Include="RestSharp, Version=105.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\RestSharp.105.0.1\lib\net4\RestSharp.dll</HintPath>
     </Reference>
-    <Reference Include="SkbKontur.Passport.Client, Version=2.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="SkbKontur.Passport.Client">
       <HintPath>..\ThirdParty\SkbKontur.Passport.Client.2.0.3\lib\net45\SkbKontur.Passport.Client.dll</HintPath>
     </Reference>
     <Reference Include="System" />
