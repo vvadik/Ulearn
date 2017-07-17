@@ -1,10 +1,8 @@
-﻿using System.IO;
+﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
-using RunCsJob.Api;
 using uLearn.NUnitTestRunning.TestsToRun;
 
 namespace uLearn.NUnitTestRunning
@@ -120,24 +118,11 @@ namespace uLearn.NUnitTestRunning
 		[Test]
 		public void ReportOn_NonexistentTestClasses()
 		{
-			var testWriter = new TestTextWriter();
+			var expected = "Error in checking system: test class Nonexistent does not exist.";
 
-			NUnitTestRunner.ReportOnNonexistentTestClasses(Assembly.GetExecutingAssembly(), testWriter, TestsNotFoundFlag.Flag, "Nonexistent");
-
-			Assert.AreEqual(TestsNotFoundFlag.Flag, testWriter.Buffer);
-		}
-	}
-
-	public class TestTextWriter : TextWriter
-	{
-		public string Buffer { get; private set; }
-
-		public override Encoding Encoding { get; }
-
-		public override void WriteLine(string value)
-		{
-			Buffer += value;
-			base.WriteLine();
+			var message = Assert.Throws<ArgumentException>(
+				() => NUnitTestRunner.ReportOnNonexistentTestClasses(Assembly.GetExecutingAssembly(), "Nonexistent"));
+			Assert.AreEqual(expected, message.Message);
 		}
 	}
 

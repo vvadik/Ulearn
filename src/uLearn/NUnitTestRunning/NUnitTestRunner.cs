@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -23,8 +22,7 @@ namespace uLearn.NUnitTestRunning
 			string[] testClassesToLaunch = { "SHOULD_BE_REPLACED" };
 			var listener = new TestListener();
 			var assembly = Assembly.GetExecutingAssembly();
-			var errorMessage = "ERROR_MESSAGE_TO_BE_REPLACED";
-			ReportOnNonexistentTestClasses(assembly, Console.Out, errorMessage, testClassesToLaunch);
+			ReportOnNonexistentTestClasses(assembly, testClassesToLaunch);
 			RunAllTests(listener, assembly, testClassesToLaunch);
 		}
 
@@ -46,11 +44,12 @@ namespace uLearn.NUnitTestRunning
 			runner.Run(listener, testFilter);
 		}
 
-		public static void ReportOnNonexistentTestClasses(Assembly assembly, TextWriter writer, string errorMessage, params string[] testClassesToLaunch)
+		public static void ReportOnNonexistentTestClasses(Assembly assembly, params string[] testClassesToLaunch)
 		{
-			if (GetNonexistentTestClasses(assembly, testClassesToLaunch).Any())
+			foreach (var testClass in GetNonexistentTestClasses(assembly, testClassesToLaunch))
 			{
-				writer.WriteLine(errorMessage);
+				var errorMessage = $"Error in checking system: test class {testClass} does not exist.";
+				throw new ArgumentException(errorMessage);
 			}
 		}
 
