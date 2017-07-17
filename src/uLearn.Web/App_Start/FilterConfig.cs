@@ -73,7 +73,7 @@ namespace uLearn.Web
 	public class KonturPassportRequiredFilter : ActionFilterAttribute
 	{
 		/* If query string contains &konturPassport=true then we need to check kontur.passport login */
-		private const string queryStringParameterName = "konturPassport";
+		private const string queryStringParameterName = "kontur";
 
 		private readonly ULearnUserManager userManager;
 
@@ -98,7 +98,7 @@ namespace uLearn.Web
 			if (!konturPassportRequired)
 				return;
 			
-			var currentUrl = httpContext.Request.Url?.ToString().RemoveQueryParameter(queryStringParameterName) ?? "";
+			var originalUrl = httpContext.Request.Url?.ToString().RemoveQueryParameter(queryStringParameterName) ?? "";
 
 			var isAuthenticated = httpContext.User.Identity.IsAuthenticated;
 			if (isAuthenticated)
@@ -107,21 +107,23 @@ namespace uLearn.Web
 				var user = userManager.FindById(userId);
 				var hasKonturPassportLogin = user.Logins.Any(l => l.LoginProvider == KonturPassportConstants.AuthenticationType);
 				if (hasKonturPassportLogin)
-					// TODO: May be redirect to the same url without &konturPassport=true?
+				{
+					filterContext.Result = new RedirectResult(originalUrl);
 					return;
+				}
 
 				/* Try to link Kontur.Passport account to current user */
 				filterContext.Result = RedirectToAction("LinkLogin", "Login", new
 				{
 					provider = KonturPassportConstants.AuthenticationType,
-					returnUrl = currentUrl,
+					returnUrl = originalUrl,
 				});
 			}
 			else
 			{
 				filterContext.Result = RedirectToAction("EnsureKonturProfileLogin", "Login", new
 				{
-					returnUrl = currentUrl
+					returnUrl = originalUrl
 				});
 			}
 		}
