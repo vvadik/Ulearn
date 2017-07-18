@@ -34,15 +34,23 @@ namespace uLearn
 
 			ReportWarningIfWrongAnswersAreSolutionsOrNotOk();
 
-			if (!ExerciseDirectoryContainsSolutionFile())
-				ReportSlideWarning(slide, $"Exercise directory doesn't contain {ex.CorrectSolutionFileName}");
+			if (!ReportWarningIfExerciseFolderDoesntContainSolutionFile())
+				ReportErrorIfSolutionNotBuildingOrNotPassesTests();
 
 			ReportErrorIfStudentsZipHasErrors();
 
 			if (ex.DisableUserCodeFileValidations)
 				return;
 
-			ReportErrorIfInitialCodeIsSolutionOrNotOk();
+			ReportErrorIfInitialCodeIsSolutionOrVerdictNotOk();
+		}
+
+		private bool ReportWarningIfExerciseFolderDoesntContainSolutionFile()
+		{
+			if (ExerciseDirectoryContainsSolutionFile())
+				return false;
+			ReportSlideWarning(slide, $"Exercise directory doesn't contain {ex.CorrectSolutionFileName}");
+			return true;
 		}
 
 		private bool ReportErrorIfExerciseFolderMissesRequiredFiles()
@@ -67,6 +75,17 @@ namespace uLearn
 
 		private bool ExerciseDirectoryContainsSolutionFile()
 			=> ex.ExerciseFolder.GetFiles().Any(f => f.Name.Equals(ex.CorrectSolutionFileName));
+
+		private void ReportErrorIfSolutionNotBuildingOrNotPassesTests()
+		{
+			var solutionCode = ex.CorrectSolution.ContentAsUtf8();
+			var submission = ex.CreateSubmission(ex.CsprojFileName, solutionCode);
+			var result = SandboxRunner.Run(submission, new SandboxRunnerSettings());
+
+			if (!IsSolution(result))
+				ReportError($"Correct solution file {ex.CorrectSolutionFileName} has errors:" +
+							$"{Environment.NewLine}{result.CompilationOutput}{Environment.NewLine}{result.Output}");
+		}
 
 		private void ReportWarningIfWrongAnswersAreSolutionsOrNotOk()
 		{
@@ -98,10 +117,10 @@ namespace uLearn
 				ReportSlideWarning(slide, $"Code of file with wrong answer ({waFileName}) is solution!");
 		}
 
-		private void ReportErrorIfInitialCodeIsSolutionOrNotOk()
+		private void ReportErrorIfInitialCodeIsSolutionOrVerdictNotOk()
 		{
 			var initialCode = ex.UserCodeFile.ContentAsUtf8();
-			var submission = ex.CreateSubmission(slide.Id.ToString(), initialCode);
+			var submission = ex.CreateSubmission(ex.CsprojFileName, initialCode);
 			var result = SandboxRunner.Run(submission);
 
 			ReportErrorIfInitialCodeVerdictIsNotOk(result);
@@ -120,7 +139,7 @@ namespace uLearn
 				ReportSlideError(slide, "Exercise initial code (available to students) is solution!");
 		}
 
-		public void ReportErrorIfStudentsZipHasErrors()
+		private void ReportErrorIfStudentsZipHasErrors()
 		{
 			var tempExFolder = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ExerciseFolder_From_StudentZip"));
 			Utils.UnpackZip(ex.StudentsZip.Content(), tempExFolder.FullName);

@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework">
+      <HintPath>.\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -51,6 +54,7 @@
     <Content Include="AnotherTask.WrongAnswer.88.cs" />
     <Compile Include="MeaningOfLifeTask.Solution.cs" />
     <Compile Include="AnotherTask.Solution.cs" />
+    <Compile Include="OneFailingTest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="..\Link.cs">
       <Link>Link.cs</Link>

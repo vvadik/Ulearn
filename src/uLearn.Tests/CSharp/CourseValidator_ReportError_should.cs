@@ -1,11 +1,10 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
-using uLearn.Extensions;
+using test;
 using uLearn.Model.Blocks;
 
 namespace uLearn.CSharp
@@ -13,36 +12,66 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class CourseValidator_ReportError_should
 	{
-		private string tempSlideFolderPath => Path.Combine(TestContext.CurrentContext.TestDirectory, "ReportErrorTests_Temp_SlideFolder");
-		private DirectoryInfo tempSlideFolder => new DirectoryInfo(tempSlideFolderPath);
-		private FileInfo tempZipFile => new FileInfo(Path.Combine(tempSlideFolderPath, "ProjDir.exercise.zip"));
+		private static string tempSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "ReportErrorTests_Temp_SlideFolder");
+		private static DirectoryInfo tempSlideFolder = new DirectoryInfo(tempSlideFolderPath);
+		private static FileInfo zipWithFullProj = new FileInfo(Path.Combine(tempSlideFolderPath, "ProjDir.exercise.zip"));
 
-		private StringBuilder validatorOut;
-		private ProjectExerciseValidator validator;
-		private ProjectExerciseBlock exBlock;
-
-		[OneTimeSetUp]
-		public void OneTimeSetUp()
+		private static ProjectExerciseBlock exBlock = new ProjectExerciseBlock
 		{
-			exBlock = new ProjectExerciseBlock
-			{
-				StartupObject = "test.Program",
-				UserCodeFileName = Helper.UserCodeFileName,
-				SlideFolderPath = tempSlideFolder,
-				CsProjFilePath = Helper.CsProjFilePath,
-			};
+			StartupObject = "test.Program",
+			UserCodeFileName = Helper.UserCodeFileName,
+			SlideFolderPath = tempSlideFolder,
+			CsProjFilePath = Helper.CsProjFilePath,
+		};
 
-			validator = Helper.BuildProjectExerciseValidator(exBlock, Helper.BuildSlide(exBlock), validatorOut = new StringBuilder());
+		[SetUp]
+		public void SetUp()
+		{
+			Helper.RecreateDirectory(tempSlideFolderPath);
+			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
+		}
 
+		[Test]
+		public void ReportError_If_StudentZip_Has_WrongAnswers_Or_Solution_Files()
+		{
 			SaveTempZipFileWithFullProject();
+			var valOut = new StringBuilder();
+			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
 
-			validator.ReportErrorIfStudentsZipHasErrors();
+			val.ValidateExercises();
+
+			valOut.ToString()
+				.Should().Contain($"Student zip exercise directory has 'wrong answer' and/or solution files ({Helper.OrderedWrongAnswersAndSolutionNames})");
+		}
+
+		[Test]
+		public void ReportError_If_Student_Csproj_Has_UserCodeFile_Of_Not_CompileType()
+		{
+			SaveTempZipFileWithFullProject();
+			var valOut = new StringBuilder();
+			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
+
+			val.ValidateExercises();
+
+			valOut.ToString()
+				.Should().Contain($"Student's csproj has user code item ({exBlock.UserCodeFileName}) of not compile type");
+		}
+
+		[Test]
+		public void ReportError_If_Student_Csproj_Has_WrongAnswers_Or_Solution_Items()
+		{
+			SaveTempZipFileWithFullProject();
+			var valOut = new StringBuilder();
+			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
+
+			val.ValidateExercises();
+
+			valOut.ToString()
+				.Should().Contain($"Student's csproj has 'wrong answer' and/or solution items ({Helper.OrderedWrongAnswersAndSolutionNames})");
 		}
 
 		private void SaveTempZipFileWithFullProject()
 		{
-			Helper.RecreateDirectory(tempZipFile.DirectoryName);
-
 			var noExcludedFiles = new Regex("[^\\s\\S]").ToString();
 			var noExcludedDirs = new string[0];
 			new LazilyUpdatingZip(
@@ -50,7 +79,7 @@ namespace uLearn.CSharp
 					noExcludedDirs,
 					noExcludedFiles,
 					ResolveCsprojLink,
-					tempZipFile)
+					zipWithFullProj)
 				.UpdateZip();
 
 			byte[] ResolveCsprojLink(FileInfo file)
@@ -58,79 +87,10 @@ namespace uLearn.CSharp
 		}
 
 		[Test]
-		public void ReportError_If_StudentZip_Has_WrongAnswers_Or_Solution_Files()
-		{
-			validatorOut.ToString()
-				.Should().Contain($"Student zip exercise directory has 'wrong answer' and/or solution files ({Helper.OrderedWrongAnswersAndSolutionNames})");
-		}
-
-		[Test]
-		public void ReportError_If_Student_Csproj_Has_UserCodeFile_Of_Not_CompileType()
-		{
-			validatorOut.ToString()
-				.Should().Contain($"Student's csproj has user code item ({exBlock.UserCodeFileName}) of not compile type");
-		}
-
-		[Test]
-		public void ReportError_If_Student_Csproj_Has_WrongAnswers_Or_Solution_Items()
-		{
-			validatorOut.ToString()
-				.Should().Contain($"Student's csproj has 'wrong answer' and/or solution items ({Helper.OrderedWrongAnswersAndSolutionNames})");
-		}
-
-		[Test]
-		public void Not_Report_InitialCodeIsSolution_Error_When_DisableUserCodeFileValidations_Flag_Is_On()
-		{
-			Helper.RecreateDirectory(tempSlideFolderPath);
-			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
-			var oldUserCode = exBlock.UserCodeFile.ContentAsUtf8();
-			var valOut = new StringBuilder();
-			exBlock.DisableUserCodeFileValidations = true;
-			try
-			{
-				File.WriteAllText(exBlock.UserCodeFile.FullName, exBlock.CorrectSolution.ContentAsUtf8());
-				var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), valOut);
-
-				val.ValidateExercises();
-
-				valOut.ToString().Should().NotContain("Exercise initial code (available to students) is solution!");
-			}
-			finally
-			{
-				File.WriteAllText(exBlock.UserCodeFile.FullName, oldUserCode);
-				exBlock.DisableUserCodeFileValidations = false;
-			}
-		}
-
-		[Test]
-		public void Report_InitialCodeIsSolution_Error_When_DisableUserCodeFileValidations_Flag_Is_Off()
-		{
-			Helper.RecreateDirectory(tempSlideFolderPath);
-			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
-			var oldUserCode = exBlock.UserCodeFile.ContentAsUtf8();
-			var valOut = new StringBuilder();
-			try
-			{
-				File.WriteAllText(exBlock.UserCodeFile.FullName, exBlock.CorrectSolution.ContentAsUtf8());
-				var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), valOut);
-
-				val.ValidateExercises();
-
-				valOut.ToString().Should().Contain("Exercise initial code (available to students) is solution!");
-			}
-			finally
-			{
-				File.WriteAllText(exBlock.UserCodeFile.FullName, oldUserCode);
-			}
-		}
-
-		[Test]
 		public void ReportError_If_ExerciseFolder_Doesnt_Contain_CsProj()
 		{
-			Helper.RecreateDirectory(tempSlideFolderPath);
-			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
 			var valOut = new StringBuilder();
-			var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), valOut);
+			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
 			File.Delete(Path.Combine(tempSlideFolderPath, exBlock.CsProjFilePath));
 
 			val.ValidateExercises();
@@ -142,10 +102,8 @@ namespace uLearn.CSharp
 		[Test]
 		public void ReportError_If_ExerciseFolder_Doesnt_Contain_UserCodeFile()
 		{
-			Helper.RecreateDirectory(tempSlideFolderPath);
-			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
 			var valOut = new StringBuilder();
-			var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), valOut);
+			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
 			File.Delete(exBlock.UserCodeFile.FullName);
 
 			val.ValidateExercises();
@@ -155,9 +113,62 @@ namespace uLearn.CSharp
 		}
 
 		[Test]
-		public void ReportError_If_Ethalon_Solution_For_ProjectExerciseBlock_IsNot_Correct()
+		public void ReportError_If_Solution_For_ProjectExerciseBlock_Not_Building()
 		{
-			throw new NotImplementedException();
+			var valOut = new StringBuilder();
+			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
+			File.WriteAllText(exBlock.CorrectSolution.FullName, "");
+
+			val.ValidateExercises();
+
+			valOut.ToString()
+				.Should().Contain($"Correct solution file {exBlock.CorrectSolutionFileName} has errors");
+		}
+
+		[Test]
+		public void ReportError_If_Solution_For_ProjectExerciseBlock_Not_Passes_NonExisting_Test()
+		{
+			var valOut = new StringBuilder();
+			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
+			try
+			{
+				exBlock.NUnitTestClasses = new[] { "non_existing.test_class", };
+
+				val.ValidateExercises();
+
+				valOut.ToString()
+					.Should()
+					.Contain($"Correct solution file {exBlock.CorrectSolutionFileName} has errors")
+					.And
+					.Contain($"test class {exBlock.NUnitTestClasses[0]} does not exist");
+			}
+			finally
+			{
+				exBlock.NUnitTestClasses = null;
+			}
+		}
+
+		[Test]
+		public void ReportError_If_Solution_For_ProjectExerciseBlock_Not_Passes_Test()
+		{
+			var valOut = new StringBuilder();
+			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
+			try
+			{
+				exBlock.NUnitTestClasses = new[] { $"test.{nameof(OneFailingTest)}" };
+
+				val.ValidateExercises();
+
+				valOut.ToString()
+					.Should()
+					.Contain($"Correct solution file {exBlock.CorrectSolutionFileName} has errors")
+					.And
+					.Contain("Error on NUnit test: I_am_a_failure");
+			}
+			finally
+			{
+				exBlock.NUnitTestClasses = null;
+			}
 		}
 	}
 }

@@ -244,6 +244,9 @@
     <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.WrongAnswer.21.plus.21.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Compile Include="CSharp\testProject\projDir\OneFailingTest.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="LockFilesTests.cs" />
     <Compile Include="CourseTool\Config_Test.cs" />
     <Compile Include="CourseTool\Converter_should.cs" />

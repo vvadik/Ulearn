@@ -22,8 +22,8 @@ namespace uLearn.CSharp
         private ProjectExerciseBlock ex;
         private List<SlideBlock> exBlocks;
 
-        private DirectoryInfo studentExerciseFolder => new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "Student_ExerciseFolder"));
-        private DirectoryInfo checkerExerciseFolder => new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "Checker_ExerciseFolder"));
+        private DirectoryInfo studentExerciseFolder => new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "ProjectExerciseBlockTests_Student_ExerciseFolder"));
+        private DirectoryInfo checkerExerciseFolder => new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "ProjectExerciseBlockTests_Checker_ExerciseFolder"));
         private string studentCsProjFilePath => Path.Combine(studentExerciseFolder.FullName, Helper.CsProjFilename);
         private string checkerCsprojFilePath => Path.Combine(checkerExerciseFolder.FullName, Helper.CsProjFilename);
 
