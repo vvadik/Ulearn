@@ -292,6 +292,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult Manage(ManageMessageId? message)
 		{
 			ViewBag.StatusMessage = message?.GetAttribute<DisplayAttribute>().GetName();
+			ViewBag.IsStatusError = message?.GetAttribute<IsErrorAttribute>()?.IsError ?? IsErrorAttribute.DefaultValue;
 			ViewBag.HasLocalPassword = ControllerUtils.HasPassword(userManager, User);
 			ViewBag.ReturnUrl = Url.Action("Manage");
 			return View();
@@ -401,7 +402,8 @@ namespace uLearn.Web.Controllers
 			[Display(Name = "Ваша почта уже подтверждена")]
 			EmailAlreadyConfirmed,
 
-			[Display(Name = "Этот аккаунт уже привязан к другому пользователю")]
+			[Display(Name = "Не получилось привязать аккаунт. ОН уже привязан к другому пользователю")]
+			[IsError(true)]
 			AlreadyLinkedToOtherUser,
 
 			[Display(Name = "Мы отправили вам письмо для подтверждения адреса")]
@@ -414,9 +416,11 @@ namespace uLearn.Web.Controllers
 			TelegramAdded,
 
 			[Display(Name = "У вас не указан адрес эл. почты")]
+			[IsError(true)]
 			UserHasNoEmail,
 
 			[Display(Name = "Произошла ошибка. Если она будет повторяться, напишите нам на support@ulearn.me.")]
+			[IsError(true)]
 			ErrorOccured,
 		}
 
@@ -605,6 +609,18 @@ namespace uLearn.Web.Controllers
 
 			/* If email has been sent less than 1 day ago, show popup. Double popup is disabled via cookies and javascript */
 			return PartialView("EmailIsNotConfirmedPopup", user);
+		}
+	}
+
+	public class IsErrorAttribute : Attribute
+	{
+		public static bool DefaultValue = false;
+
+		public readonly bool IsError;
+
+		public IsErrorAttribute(bool isError)
+		{
+			IsError = isError;
 		}
 	}
 }
