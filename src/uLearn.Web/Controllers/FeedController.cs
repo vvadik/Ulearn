@@ -139,7 +139,7 @@ namespace uLearn.Web.Controllers
 			{
 				var blockers = notification.GetBlockerNotifications(db);
 				if (blockers.Select(b => b.Id).Intersect(notificationsIds).Any())
-					break;
+					continue;
 				yield return notification;
 			}
 		}
