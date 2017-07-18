@@ -1,7 +1,4 @@
-﻿.notifications__icon-link {
-}
-
-@media (max-width: 768px) {
+﻿@media (max-width: 768px) {
 	.notifications__icon-link {
 		margin-right: 19px;
 	}
@@ -18,8 +15,8 @@
 
 .notifications__dropdown {
 	width: 300px;
-	max-height: 300px;
-	overflow-y: auto;
+	padding-top: 0;
+	padding-bottom: 0;
 }
 
 .notifications__dropdown.notifications__mobile-dropdown {
@@ -39,6 +36,11 @@
 	.notifications__dropdown.notifications__mobile-dropdown.visible-xs {
 		display: none !important;
 	}
+}
+
+.notifications__notifications-wrapper {
+	max-height: 300px;
+	overflow-y: auto;
 }
 	
 .notifications__counter {
@@ -66,17 +68,17 @@
 	}
 }
 
-.notifications__dropdown::-webkit-scrollbar {
+.notifications__notifications-wrapper::-webkit-scrollbar {
 	width: 7px;
 }
- 
-.notifications__dropdown::-webkit-scrollbar-track {
+
+.notifications__notifications-wrapper::-webkit-scrollbar-track {
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 }
 
-.notifications__dropdown::-webkit-scrollbar-thumb {
+.notifications__notifications-wrapper::-webkit-scrollbar-thumb {
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 	background: #eee;
@@ -86,6 +88,7 @@
 .notifications__notification,
 .notifications__info {
 	padding: 7px 15px;
+	position: relative;
 }
 
 .notifications__info {
@@ -97,7 +100,7 @@
 }
 
 .notifications__notification:hover {
-	background-color: #f8f8ff;
+	background-color: #eee;
 	cursor: pointer;
 }
 
@@ -105,21 +108,12 @@
 	background-color: #e0f3f3;
 }
 	
-.notifications__notification__header,
-.notifications__notification__footer {
-	font-size: 12px;
-}
-
-.notifications__notification__header {
-	margin-top: 3px;
-}
 .notifications__notification__footer {
 	color: #bbb;
 }
 
 .notifications__notification__user {
 	font-weight: bold;
-	color: #060;
 }
 
 .notifications__comment-notification__cite {
@@ -128,4 +122,36 @@
 
 .notifications__comment-notification__text {
 	_font-weight: bold;
+}
+
+.notifications__all-notifications-link {
+	text-align: center;
+	padding: 0px;
+	background-color: white;
+	color: #336;
+	border-top: 1px solid #eee;
+}
+
+.notifications__all-notifications-link:hover {
+	background-color: #eee;
+}
+	
+.notifications__all-notifications-link a {
+	display: inline-block;
+	width: 100%;
+	padding: 6px 0;
+	text-decoration: none;
+}
+
+.notifications__all-notifications-link a:hover {
+	text-decoration: none;
+}
+
+/* Notifications feed */
+.notifications-feed .notifications__notification {
+	padding-left: 0;
+}
+
+.notifications-feed .notifications__notification:hover {
+	background-color: initial;
 }

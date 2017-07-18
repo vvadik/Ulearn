@@ -464,6 +464,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SwitchablePanel.cshtml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Shared\Notifications.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Notifications.cshtml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Shared\UserAvatar.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1139,6 +1144,11 @@
     <Content Include="Views\Login\EnsureKonturProfileLogin.cshtml" />
     <Content Include="Views\Login\AddKonturProfileLogin.cshtml" />
     <Content Include="Views\Login\_LoginForm.cshtml" />
+    <Content Include="Views\Feed\Index.cshtml" />
+    <Content Include="Views\Shared\Notifications.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Notifications.generated.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

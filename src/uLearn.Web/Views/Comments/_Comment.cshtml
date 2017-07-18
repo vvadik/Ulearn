@@ -78,7 +78,7 @@
 						@if (Model.CanModerateComment)
 						{
 							<span class="hide-on-parent-hover">не опубликовано</span>
-							<span class="show-on-parent-hover">опубликовать <span class="glyphicon glyphicon-ok"></span></span>
+							<span class="show-on-parent-hover"><span class="glyphicon glyphicon-ok"></span>опубликовать</span>
 						}
 						else
 						{
@@ -97,8 +97,8 @@
 							@if (Model.CanModerateComment)
 							{
 								<span class="hide-on-parent-hover show__if_pinned">закреплено</span>
-								<span class="show-on-parent-hover__if-pinned">открепить <span class="glyphicon glyphicon-arrow-down"></span></span>
-								<span class="show-on-comment-hover__if-not-pinned">закрепить <span class="glyphicon glyphicon-arrow-up"></span></span>
+								<span class="show-on-parent-hover__if-pinned"><span class="glyphicon glyphicon-arrow-down"></span>открепить</span>
+								<span class="show-on-comment-hover__if-not-pinned"><span class="glyphicon glyphicon-arrow-up"></span>закрепить</span>
 							}
 							else
 							{
@@ -114,11 +114,11 @@
 					{
 						<div class="comment__correct-answer @(Model.CanModerateComment ? "label-switcher" : "") label label-as-badge label-primary show-on-comment-hover"
 							 data-url="@Url.Action("MarkAsCorrectAnswer", "Comments", new { commentId = Model.Comment.Id })">
-							правильный ответ
 							@if (Model.CanModerateComment)
 							{
 								<span class="glyphicon glyphicon-remove"></span>
 							}
+							правильный ответ
 						</div>
 					}
 				}
@@ -160,14 +160,14 @@
 				{
 					<div class="comment__edit-link show-on-comment-hover"
 						 data-url="@Url.Action("EditCommentText", "Comments", new { commentId = Model.Comment.Id })">
-						<a href="">редактировать<span class="glyphicon glyphicon-pencil"></span></a>
+						<a href=""><span class="glyphicon glyphicon-pencil"></span>редактировать</a>
 					</div>
 				}
 
 				@if (Model.CanModerateComment)
 				{
 					<div class="comment__hide-link show-on-comment-hover" data-url="@Url.Action("ApproveComment", "Comments", new { commentId = Model.Comment.Id })">
-						<a href="">скрыть<span class="glyphicon glyphicon-eye-close"></span></a>
+						<a href=""><span class="glyphicon glyphicon-eye-close"></span>скрыть</a>
 					</div>
 				}
 
@@ -176,7 +176,7 @@
 					<div class="comment__delete-link show-on-comment-hover"
 						 data-url="@Url.Action("DeleteComment", "Comments", new { commentId = Model.Comment.Id })"
 						 data-restore-url="@Url.Action("RestoreComment", "Comments", new { commentId = Model.Comment.Id })">
-						<a href="" title="удалить комментарий">удалить<span class="glyphicon glyphicon-remove"></span></a>
+						<a href="" title="удалить комментарий"><span class="glyphicon glyphicon-remove"></span>удалить</a>
 					</div>
 				}
 

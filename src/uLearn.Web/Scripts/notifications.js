@@ -30,8 +30,9 @@
 		hideUserMenu();
 	});
 	
-	$('.notifications__dropdown').on('click', '.notifications__notification', function(e) {
+	$(document).on('click', '.notifications__notification', function(e) {
 		e.preventDefault();
+		
 		var link = $(this).find('> *').data('href');
 		if (link) {
 			window.location.href = link;

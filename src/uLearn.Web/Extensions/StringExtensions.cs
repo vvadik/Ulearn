@@ -7,6 +7,9 @@ namespace uLearn.Web.Extensions
 	{
 		public static string TruncateWithEllipsis(this string s, int maxLength, string ellipsis="...")
 		{
+			if (maxLength < 0)
+				return s;
+
 			if (ellipsis.Length > maxLength)
 				throw new ArgumentOutOfRangeException("length", maxLength, "length must be at least as long as ellipsis.");
 
@@ -55,10 +58,9 @@ namespace uLearn.Web.Extensions
 			if (string.IsNullOrEmpty(url))
 				return false;
 
-			Uri absoluteUri;
-			if (Uri.TryCreate(url, UriKind.Absolute, out absoluteUri))
+			if (Uri.TryCreate(url, UriKind.Absolute, out Uri absoluteUri))
 				return request.Url != null && string.Equals(request.Url.Host, absoluteUri.Host, StringComparison.OrdinalIgnoreCase);
-			
+
 			var isLocal = !url.StartsWith("http:", StringComparison.OrdinalIgnoreCase)
 						&& !url.StartsWith("https:", StringComparison.OrdinalIgnoreCase)
 						&& Uri.IsWellFormedUriString(url, UriKind.Relative);

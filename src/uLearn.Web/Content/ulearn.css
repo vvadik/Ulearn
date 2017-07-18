@@ -692,7 +692,7 @@ li.li-success {
 .comments .comment .comment__header .glyphicon,
 .comments .comment .comment__footer .glyphicon:not(.glyphicon-heart){
 	font-size: 80%;
-	margin-left: 3px;
+	margin-right: 3px;
 }
 
 .comments .comment .comment__footer .glyphicon {
