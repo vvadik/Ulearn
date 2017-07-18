@@ -147,7 +147,10 @@ namespace uLearn.Web.Controllers
 						await userManager.AddPasswordAsync(user.Id, model.Password);
 						await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
 						if (!await SendConfirmationEmail(user))
+						{
+							log.Warn("ExternalLoginConfirmation(): can't send confirmation email");
 							return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.ErrorOccured });
+						}
 
 						metricSender.SendCount("registration.success");
 						if (info.ExternalIdentity.AuthenticationType == VkAuthenticationConstants.AuthenticationType)
@@ -204,7 +207,7 @@ namespace uLearn.Web.Controllers
 			{
 				return RedirectToAction("Manage", "Account");
 			}
-			return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.ErrorOccured });
+			return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.AlreadyLinkedToOtherUser });
 		}
 		
 		[HttpPost]

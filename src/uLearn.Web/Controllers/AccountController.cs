@@ -260,7 +260,10 @@ namespace uLearn.Web.Controllers
 					await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
 
 					if (!await SendConfirmationEmail(user))
+					{
+						log.Warn("Register(): can't send confirmation email");
 						model.ReturnUrl = Url.Action("Manage", "Account", new { Message = ManageMessageId.ErrorOccured });
+					}
 					else if (string.IsNullOrWhiteSpace(model.ReturnUrl))
 						model.ReturnUrl = Url.Action("Index", "Home");
 					else
@@ -398,6 +401,9 @@ namespace uLearn.Web.Controllers
 			[Display(Name = "Ваша почта уже подтверждена")]
 			EmailAlreadyConfirmed,
 
+			[Display(Name = "Этот аккаунт уже привязан к другому пользователю")]
+			AlreadyLinkedToOtherUser,
+
 			[Display(Name = "Мы отправили вам письмо для подтверждения адреса")]
 			ConfirmationEmailSent,
 
@@ -444,7 +450,10 @@ namespace uLearn.Web.Controllers
 			}
 			var nameChanged = user.UserName != userModel.Name;
 			if (nameChanged && await userManager.FindByNameAsync(userModel.Name) != null)
+			{
+				log.Warn("ChangeDetailsPartial(): this name is already taken");
 				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
+			}
 			var emailChanged = string.Compare(user.Email, userModel.Email, StringComparison.OrdinalIgnoreCase) != 0;
 
 			user.UserName = userModel.Name;
@@ -525,7 +534,10 @@ namespace uLearn.Web.Controllers
 
 			var correctSignature = GetEmailConfirmationSignature(email);
 			if (signature != correctSignature)
+			{
+				log.Warn("Invalid signature in confirmation email link");
 				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
+			}
 
 			await usersRepo.ConfirmEmail(userId);
 			metricSender.SendCount("email_confirmation.confirmed");
@@ -555,7 +567,10 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Manage", new { Message = ManageMessageId.EmailAlreadyConfirmed });
 
 			if (!await SendConfirmationEmail(user))
+			{
+				log.Warn($"SendConfirmationEmail(): can't send confirmation email to user {user}");
 				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
+			}
 
 			return RedirectToAction("Manage");
 		}
