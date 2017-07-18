@@ -83,13 +83,12 @@ namespace uLearn.CSharp
 		{
 			Helper.RecreateDirectory(tempSlideFolderPath);
 			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
-			var correctSolution = new FileInfo(Path.Combine(exBlock.ExerciseFolder.FullName, exBlock.CorrectSolutionFileName));
-			var tempUserCode = exBlock.UserCodeFile.ContentAsUtf8();
+			var oldUserCode = exBlock.UserCodeFile.ContentAsUtf8();
 			var valOut = new StringBuilder();
+			exBlock.DisableUserCodeFileValidations = true;
 			try
 			{
-				File.WriteAllText(exBlock.UserCodeFile.FullName, correctSolution.ContentAsUtf8());
-				exBlock.DisableUserCodeFileValidations = true;
+				File.WriteAllText(exBlock.UserCodeFile.FullName, exBlock.CorrectSolution.ContentAsUtf8());
 				var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), valOut);
 
 				val.ValidateExercises();
@@ -98,7 +97,7 @@ namespace uLearn.CSharp
 			}
 			finally
 			{
-				File.WriteAllText(exBlock.UserCodeFile.FullName, tempUserCode);
+				File.WriteAllText(exBlock.UserCodeFile.FullName, oldUserCode);
 				exBlock.DisableUserCodeFileValidations = false;
 			}
 		}
@@ -108,12 +107,11 @@ namespace uLearn.CSharp
 		{
 			Helper.RecreateDirectory(tempSlideFolderPath);
 			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
-			var correctSolution = new FileInfo(Path.Combine(exBlock.ExerciseFolder.FullName, exBlock.CorrectSolutionFileName));
-			var tempUserCode = exBlock.UserCodeFile.ContentAsUtf8();
+			var oldUserCode = exBlock.UserCodeFile.ContentAsUtf8();
 			var valOut = new StringBuilder();
 			try
 			{
-				File.WriteAllText(exBlock.UserCodeFile.FullName, correctSolution.ContentAsUtf8());
+				File.WriteAllText(exBlock.UserCodeFile.FullName, exBlock.CorrectSolution.ContentAsUtf8());
 				var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), valOut);
 
 				val.ValidateExercises();
@@ -122,7 +120,7 @@ namespace uLearn.CSharp
 			}
 			finally
 			{
-				File.WriteAllText(exBlock.UserCodeFile.FullName, tempUserCode);
+				File.WriteAllText(exBlock.UserCodeFile.FullName, oldUserCode);
 			}
 		}
 

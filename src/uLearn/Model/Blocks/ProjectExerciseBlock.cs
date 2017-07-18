@@ -76,6 +76,8 @@ namespace uLearn.Model.Blocks
 
 		public string CorrectSolutionFileName => $"{UserCodeFileNameWithoutExt}.Solution.cs";
 
+		public FileInfo CorrectSolution => ExerciseFolder.GetFile(CorrectSolutionFileName);
+
 		[XmlIgnore]
 		public DirectoryInfo SlideFolderPath { get; set; }
 

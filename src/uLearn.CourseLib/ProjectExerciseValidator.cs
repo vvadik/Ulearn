@@ -32,16 +32,17 @@ namespace uLearn
 			if (ReportErrorIfExerciseFolderMissesRequiredFiles())
 				return;
 
-			if (ExerciseDirectoryContainsSolutionFile())
-				ReportWarningIfWrongAnswersAreSolutionsOrNotOk();
-			else
+			ReportWarningIfWrongAnswersAreSolutionsOrNotOk();
+
+			if (!ExerciseDirectoryContainsSolutionFile())
 				ReportSlideWarning(slide, $"Exercise directory doesn't contain {ex.CorrectSolutionFileName}");
 
-			if (!ex.DisableUserCodeFileValidations)
-			{
-				ReportErrorIfInitialCodeIsSolutionOrNotOk();
-				ReportErrorIfStudentsZipHasErrors();
-			}
+			ReportErrorIfStudentsZipHasErrors();
+
+			if (ex.DisableUserCodeFileValidations)
+				return;
+
+			ReportErrorIfInitialCodeIsSolutionOrNotOk();
 		}
 
 		private bool ReportErrorIfExerciseFolderMissesRequiredFiles()
@@ -121,20 +122,23 @@ namespace uLearn
 
 		public void ReportErrorIfStudentsZipHasErrors()
 		{
-			var tempDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp_student_zip_unzipped", ex.ExerciseFolder.Name));
+			var tempExFolder = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ExerciseFolder_From_StudentZip"));
+			Utils.UnpackZip(ex.StudentsZip.Content(), tempExFolder.FullName);
 			try
 			{
-				Utils.UnpackZip(ex.StudentsZip.Content(), tempDir.FullName);
-				var res = MsBuildRunner.BuildProject(settings.MsBuildSettings, tempDir.GetFile(ex.CsprojFileName).FullName, tempDir);
+				ReportErrorIfStudentsZipHasWrongAnswerOrSolutionFiles(tempExFolder);
+				ReportErrorIfCsprojHasUserCodeOfNotCompileType(tempExFolder);
+				ReportErrorIfCsprojHasWrongAnswerOrSolutionItems(tempExFolder);
 
-				ReportErrorIfStudentsZipNotBuilding(res);
-				ReportErrorIfStudentsZipHasWrongAnswerOrSolutionFiles(tempDir);
-				ReportErrorIfCsprojHasUserCodeOfNotCompileType(tempDir);
-				ReportErrorIfCsprojHasWrongAnswerOrSolutionItems(tempDir);
+				if (ex.DisableUserCodeFileValidations)
+					return;
+
+				var buildResult = MsBuildRunner.BuildProject(settings.MsBuildSettings, ex.CsprojFile.Name, tempExFolder);
+				ReportErrorIfStudentsZipNotBuilding(buildResult);
 			}
 			finally
 			{
-				tempDir.Delete(true);
+				tempExFolder.Delete(true);
 			}
 		}
 
