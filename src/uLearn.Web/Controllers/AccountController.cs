@@ -402,7 +402,7 @@ namespace uLearn.Web.Controllers
 			[Display(Name = "Ваша почта уже подтверждена")]
 			EmailAlreadyConfirmed,
 
-			[Display(Name = "Не получилось привязать аккаунт. ОН уже привязан к другому пользователю")]
+			[Display(Name = "Не получилось привязать аккаунт. Он уже привязан к другому пользователю")]
 			[IsError(true)]
 			AlreadyLinkedToOtherUser,
 
