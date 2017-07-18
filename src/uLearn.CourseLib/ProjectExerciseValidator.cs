@@ -29,7 +29,7 @@ namespace uLearn
 
 		public void ValidateExercises()
 		{
-			if (ex.SupressValidatorMessages || ExerciseFolderDoesntContainRequiredFiles()) // todo имя второго метода плохое, т.к. репортит
+			if (ReportErrorIfExerciseFolderMissesRequiredFiles())
 				return;
 
 			if (ExerciseDirectoryContainsSolutionFile())
@@ -37,22 +37,25 @@ namespace uLearn
 			else
 				ReportSlideWarning(slide, $"Exercise directory doesn't contain {ex.CorrectSolutionFileName}");
 
-			ReportErrorIfInitialCodeIsSolutionOrNotOk();
-			ReportIfStudentsZipHasErrors();
+			if (!ex.DisableUserCodeFileValidations)
+			{
+				ReportErrorIfInitialCodeIsSolutionOrNotOk();
+				ReportErrorIfStudentsZipHasErrors();
+			}
 		}
 
-		private bool ExerciseFolderDoesntContainRequiredFiles()
+		private bool ReportErrorIfExerciseFolderMissesRequiredFiles()
 		{
 			var exerciseFilesRelativePaths = FileSystem.GetFiles(ex.ExerciseFolder.FullName, SearchOption.SearchAllSubDirectories)
 				.Select(path => new FileInfo(path).GetRelativePath(ex.ExerciseFolder.FullName))
 				.ToList();
 
-			return ExerciseFolderDoesntContainCsproj() || ExerciseFolderDoesntContainUserCodeFile();
+			return ReportErrorIfMissingCsproj() || ReportErrorIfMissingUserCodeFile();
 
-			bool ExerciseFolderDoesntContainUserCodeFile() => ReportErrorIfExerciseFolderDoesntContainFile(ex.UserCodeFileName);
-			bool ExerciseFolderDoesntContainCsproj() => ReportErrorIfExerciseFolderDoesntContainFile(ex.CsprojFileName);
+			bool ReportErrorIfMissingUserCodeFile() => ReportErrorIfMissingFile(ex.UserCodeFileName);
+			bool ReportErrorIfMissingCsproj() => ReportErrorIfMissingFile(ex.CsprojFileName);
 
-			bool ReportErrorIfExerciseFolderDoesntContainFile(string path)
+			bool ReportErrorIfMissingFile(string path)
 			{
 				if (exerciseFilesRelativePaths.Any(p => p.Equals(path, StringComparison.InvariantCultureIgnoreCase)))
 					return false;
@@ -116,7 +119,7 @@ namespace uLearn
 				ReportSlideError(slide, "Exercise initial code (available to students) is solution!");
 		}
 
-		public void ReportIfStudentsZipHasErrors()
+		public void ReportErrorIfStudentsZipHasErrors()
 		{
 			var tempDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp_student_zip_unzipped", ex.ExerciseFolder.Name));
 			try

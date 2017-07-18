@@ -168,10 +168,10 @@
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="supress-validator-messages" type="xs:boolean" minOccurs="0" maxOccurs="1">
+					<xs:element name="disable-user-code-file-validations" type="xs:boolean" minOccurs="0" maxOccurs="1">
 						<xs:annotation>
 							<xs:documentation>
-								Флаг для отключения всех ошибок и предупредеждений валидатора (course test).
+								Флаг для отключения ошибок и предупредеждений валидатора (course test) при проверке пользовательского файла с кодом (UserCodeFileName.cs).
 								Полезно поднимать для задач, которые не должны компилироваться у студента сразу после распаковки из Task.exercise.zip.
 							</xs:documentation>
 						</xs:annotation>

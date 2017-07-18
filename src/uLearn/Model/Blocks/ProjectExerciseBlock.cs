@@ -55,8 +55,8 @@ namespace uLearn.Model.Blocks
 		[XmlElement("exclude-path-for-student")]
 		public string[] PathsToExcludeForStudent { get; set; }
 
-		[XmlElement("supress-validator-messages")]
-		public bool SupressValidatorMessages { get; set; }
+		[XmlElement("disable-user-code-file-validations")]
+		public bool DisableUserCodeFileValidations { get; set; }
 
 		public string ExerciseDirName => Path.GetDirectoryName(CsProjFilePath).EnsureNotNull("csproj должен быть в поддиректории");
 
@@ -150,12 +150,6 @@ namespace uLearn.Model.Blocks
 		    var excluded = (PathsToExcludeForChecker ?? new string[0])
                 .Concat(new[] { "bin/*", "obj/*" })
                 .ToList();
-
-			var correctSolution = ExerciseFolder.GetFiles()
-				.Select(f => f.Name)
-				.SingleOrDefault(n => n.Equals(CorrectSolutionFileName));
-			if (correctSolution != null)
-				excluded.Add(correctSolution);
 
 			return ExerciseFolder.ToZip(excluded, GetAdditionalFiles(code, ExerciseFolder, excluded));
 		}

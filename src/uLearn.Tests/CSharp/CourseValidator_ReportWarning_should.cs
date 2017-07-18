@@ -27,8 +27,7 @@ namespace uLearn.CSharp
 				StartupObject = "test.Program",
 				UserCodeFileName = Helper.UserCodeFileName,
 				SlideFolderPath = new DirectoryInfo(tempSlideFolderPath),
-				CsProjFilePath = Helper.CsProjFilePath,
-				SupressValidatorMessages = false
+				CsProjFilePath = Helper.CsProjFilePath
 			};
 
 			var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), validatorOut = new StringBuilder());

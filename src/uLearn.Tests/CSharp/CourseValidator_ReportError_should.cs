@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using FluentAssertions;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
+using uLearn.Extensions;
 using uLearn.Model.Blocks;
 
 namespace uLearn.CSharp
@@ -18,7 +19,6 @@ namespace uLearn.CSharp
 
 		private StringBuilder validatorOut;
 		private ProjectExerciseValidator validator;
-		private ExerciseSlide exSlide;
 		private ProjectExerciseBlock exBlock;
 
 		[OneTimeSetUp]
@@ -26,16 +26,17 @@ namespace uLearn.CSharp
 		{
 			exBlock = new ProjectExerciseBlock
 			{
+				StartupObject = "test.Program",
 				UserCodeFileName = Helper.UserCodeFileName,
 				SlideFolderPath = tempSlideFolder,
 				CsProjFilePath = Helper.CsProjFilePath,
 			};
 
-			validator = Helper.BuildProjectExerciseValidator(exBlock, exSlide = Helper.BuildSlide(exBlock), validatorOut = new StringBuilder());
+			validator = Helper.BuildProjectExerciseValidator(exBlock, Helper.BuildSlide(exBlock), validatorOut = new StringBuilder());
 
 			SaveTempZipFileWithFullProject();
 
-			validator.ReportIfStudentsZipHasErrors();
+			validator.ReportErrorIfStudentsZipHasErrors();
 		}
 
 		private void SaveTempZipFileWithFullProject()
@@ -78,21 +79,50 @@ namespace uLearn.CSharp
 		}
 
 		[Test]
-		public void Not_ReportError_When_Supress_Validator_Messages_Flag_Is_Set()
+		public void Not_Report_InitialCodeIsSolution_Error_When_DisableUserCodeFileValidations_Flag_Is_On()
 		{
+			Helper.RecreateDirectory(tempSlideFolderPath);
+			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
+			var correctSolution = new FileInfo(Path.Combine(exBlock.ExerciseFolder.FullName, exBlock.CorrectSolutionFileName));
+			var tempUserCode = exBlock.UserCodeFile.ContentAsUtf8();
+			var valOut = new StringBuilder();
 			try
 			{
-				exBlock.SupressValidatorMessages = true;
-				var validatorOutStamp = new StringBuilder(validatorOut.ToString());
+				File.WriteAllText(exBlock.UserCodeFile.FullName, correctSolution.ContentAsUtf8());
+				exBlock.DisableUserCodeFileValidations = true;
+				var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), valOut);
 
-			validator.ValidateExercises();
+				val.ValidateExercises();
 
-			validatorOut.ToString()
-				.Should().Be(validatorOutStamp.ToString());
+				valOut.ToString().Should().NotContain("Exercise initial code (available to students) is solution!");
 			}
 			finally
 			{
-				exBlock.SupressValidatorMessages = false;
+				File.WriteAllText(exBlock.UserCodeFile.FullName, tempUserCode);
+				exBlock.DisableUserCodeFileValidations = false;
+			}
+		}
+
+		[Test]
+		public void Report_InitialCodeIsSolution_Error_When_DisableUserCodeFileValidations_Flag_Is_Off()
+		{
+			Helper.RecreateDirectory(tempSlideFolderPath);
+			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
+			var correctSolution = new FileInfo(Path.Combine(exBlock.ExerciseFolder.FullName, exBlock.CorrectSolutionFileName));
+			var tempUserCode = exBlock.UserCodeFile.ContentAsUtf8();
+			var valOut = new StringBuilder();
+			try
+			{
+				File.WriteAllText(exBlock.UserCodeFile.FullName, correctSolution.ContentAsUtf8());
+				var val = Helper.BuildValidator(Helper.BuildSlide(exBlock), valOut);
+
+				val.ValidateExercises();
+
+				valOut.ToString().Should().Contain("Exercise initial code (available to students) is solution!");
+			}
+			finally
+			{
+				File.WriteAllText(exBlock.UserCodeFile.FullName, tempUserCode);
 			}
 		}
 

@@ -47,8 +47,14 @@ namespace uLearn
 				|| item.DirectMetadata.Any(md => md.Name == "Link" && md.EvaluatedValue.StartsWith("checking" + Path.DirectorySeparatorChar));
 		}
 
-		public static void PrepareForCheckingUserCode(Project proj, ProjectExerciseBlock ex, IReadOnlyList<string> excludedPaths)
+		public static void PrepareForCheckingUserCode(Project proj, ProjectExerciseBlock ex, List<string> excludedPaths)
 		{
+			var correctSolution = ex.ExerciseFolder.GetFiles()
+				.Select(f => f.Name)
+				.SingleOrDefault(n => n.Equals(ex.CorrectSolutionFileName));
+			if (correctSolution != null)
+				excludedPaths.Add(correctSolution);
+
 			SetFilenameItemTypeToCompile(proj, ex.UserCodeFileName);
 			PrepareForChecking(proj, ex.StartupObject, excludedPaths);
 		}
