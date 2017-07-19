@@ -316,7 +316,12 @@ namespace uLearn
 
 		private static void UpdateXmlAttribute(ZipEntry entry, string selector, string attribute, string value, ZipFile zip, XmlNamespaceManager nsResolver)
 		{
-			UpdateXmlEntity(entry, selector, element => element.Attribute(attribute).Value = value, zip, nsResolver);
+			UpdateXmlEntity(entry, selector, element =>
+			{
+				var elementAttribute = element.Attribute(attribute);
+				if (elementAttribute != null)
+					elementAttribute.Value = value;
+			}, zip, nsResolver);
 		}
 
 		private static void UpdateCsFiles(ZipEntry entry, string slideId, ZipFile zip)
