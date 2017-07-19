@@ -422,6 +422,13 @@ namespace uLearn.Web.Controllers
 			[Display(Name = "Произошла ошибка. Если она будет повторяться, напишите нам на support@ulearn.me.")]
 			[IsError(true)]
 			ErrorOccured,
+
+			[Display(Name = "Аккаунт привязан")]
+			LoginAdded,
+
+			[Display(Name = "Это имя уже занято, выберите другое")]
+			[IsError(true)]
+			NameAlreadyTaken
 		}
 
 		public PartialViewResult ChangeDetailsPartial()
@@ -456,7 +463,7 @@ namespace uLearn.Web.Controllers
 			if (nameChanged && await userManager.FindByNameAsync(userModel.Name) != null)
 			{
 				log.Warn("ChangeDetailsPartial(): this name is already taken");
-				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
+				return RedirectToAction("Manage", new { Message = ManageMessageId.NameAlreadyTaken });
 			}
 			var emailChanged = string.Compare(user.Email, userModel.Email, StringComparison.OrdinalIgnoreCase) != 0;
 

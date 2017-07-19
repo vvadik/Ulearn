@@ -205,7 +205,7 @@ namespace uLearn.Web.Controllers
 			var result = await userManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login);
 			if (result.Succeeded)
 			{
-				return RedirectToAction("Manage", "Account");
+				return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.LoginAdded });
 			}
 			return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.AlreadyLinkedToOtherUser });
 		}

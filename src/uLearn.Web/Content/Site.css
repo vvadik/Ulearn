@@ -85,6 +85,10 @@ input[type="checkbox"].input-validation-error {
 	height: 20px;
 }
 
+.nav .dropdown-menu {
+	top: 49px;
+}
+
 @media (max-width: 767px) {
 	h1 {
 		font-size: 25px;
@@ -191,4 +195,9 @@ footer:hover {
 
 .glyphicon.glyphicon-sm {
 	font-size: 10px;
+}
+
+/* Small buttons*/
+.btn-group-xs > .btn, .btn-xs {
+	padding: 1px 7px 3px;
 }
