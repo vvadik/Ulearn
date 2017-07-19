@@ -11,7 +11,7 @@ namespace uLearn.CSharp
 	}
 
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-	public class IsStaticMethodAttribute : Attribute, ICSharpSolutionValidator
+	public class IsStaticMethodAttribute : Attribute, ICSharpSolutionValidator, IStrictValidator
 	{
 		public const string ShouldBeMethod = "Решение должно быть корректным определением статического метода";
 		public const string ShouldBeSingleMethod = "Решение должно состоять ровно из одного метода";

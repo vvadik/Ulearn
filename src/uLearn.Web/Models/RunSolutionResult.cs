@@ -11,6 +11,7 @@ namespace uLearn.Web.Models
 		public string ExpectedOutput { get; set; }
 		public string ActualOutput { get; set; }
 		public string ErrorMessage { get; set; }
+		public string StyleMessage { get; set; }
 		public string ExecutionServiceName { get; set; }
 		public bool SentToReview { get; set; }
 		public int SubmissionId { get; set; }

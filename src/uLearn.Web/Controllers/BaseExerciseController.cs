@@ -74,12 +74,10 @@ namespace uLearn.Web.Controllers
 			{
 				if (builtSolution.HasErrors)
 					return new RunSolutionResult { IsCompileError = true, ErrorMessage = builtSolution.ErrorMessage, ExecutionServiceName = "uLearn" };
-				if (builtSolution.HasStyleIssues)
-					return new RunSolutionResult { IsStyleViolation = true, ErrorMessage = builtSolution.StyleMessage, ExecutionServiceName = "uLearn" };
 			}
 
-			var compilationErrorMessage = builtSolution.HasErrors ? builtSolution.ErrorMessage : (builtSolution.HasStyleIssues ? builtSolution.StyleMessage : null);
-			var dontRunSubmission = builtSolution.HasErrors || builtSolution.HasStyleIssues;
+			var compilationErrorMessage = builtSolution.HasErrors ? builtSolution.ErrorMessage : null;
+			var dontRunSubmission = builtSolution.HasErrors;
 			var submission = await userSolutionsRepo.AddUserExerciseSubmission(
 				courseId, exerciseSlide.Id,
 				userCode, compilationErrorMessage, null,
@@ -89,8 +87,6 @@ namespace uLearn.Web.Controllers
 
 			if (builtSolution.HasErrors)
 				return new RunSolutionResult { IsCompileError = true, ErrorMessage = builtSolution.ErrorMessage, SubmissionId = submission.Id, ExecutionServiceName = "uLearn" };
-			if (builtSolution.HasStyleIssues)
-				return new RunSolutionResult { IsStyleViolation = true, ErrorMessage = builtSolution.StyleMessage, SubmissionId = submission.Id, ExecutionServiceName = "uLearn" };
 
 			try
 			{
@@ -137,7 +133,7 @@ namespace uLearn.Web.Controllers
 			var verdictForMetric = automaticChecking.GetVerdict().Replace(" ", "");
 			metricSender.SendCount($"exercise.{exerciseMetricId}.{verdictForMetric}");
 
-			return new RunSolutionResult
+			var result = new RunSolutionResult
 			{
 				IsCompileError = automaticChecking.IsCompilationError,
 				ErrorMessage = automaticChecking.CompilationError.Text,
@@ -148,6 +144,12 @@ namespace uLearn.Web.Controllers
 				SentToReview = sendToReview,
 				SubmissionId = submission.Id,
 			};
+			if (builtSolution.HasStyleIssues)
+			{
+				result.IsStyleViolation = true;
+				result.StyleMessage = builtSolution.StyleMessage;
+			}
+			return result;
 		}
 	}
 }

@@ -12,7 +12,12 @@ namespace uLearn
 			return null;
 		}
 
-		public string FindValidatorError(string userCode, string solution)
+		public string FindValidatorErrors(string userCode, string solution)
+		{
+			return null;
+		}
+
+		public string FindStrictValidatorErrors(string userCode, string solution)
 		{
 			return null;
 		}

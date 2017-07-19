@@ -25,9 +25,9 @@ namespace uLearn
 					if (subValidator == "linelen")
 						validator.AddValidator(new LineLengthStyleValidator(int.Parse(pp[1])));
 					if (subValidator == "recursion")
-						validator.AddValidator(new RecursionStyleValidator(true));
+						validator.AddValidator(new RecursionStyleValidatorAttribute(true));
 					if (subValidator == "norecursion")
-						validator.AddValidator(new RecursionStyleValidator(false));
+						validator.AddValidator(new RecursionStyleValidatorAttribute(false));
 				}
 				return validator;
 			}

@@ -39,12 +39,35 @@ namespace uLearn.CSharp
 			return error?.ToString();
 		}
 
-		public string FindValidatorError(string userCode, string solution)
+		public string FindValidatorErrors(string userCode, string solution)
 		{
 			try
 			{
-				SyntaxTree solutionTree = CSharpSyntaxTree.ParseText(userCode);
-				return validators.Select(v => v.FindError(solutionTree)).FirstOrDefault(err => err != null);
+				var solutionTree = CSharpSyntaxTree.ParseText(userCode);
+				var errors =  validators
+					.Where(v => !(v is IStrictValidator))
+					.Select(v => v.FindError(solutionTree))
+					.Where(err => err != null)
+					.OrderBy(s => s);
+				return errors.Any()
+					? errors.Aggregate((s1, s2) => $"{s1}{Environment.NewLine}{s2}")
+					: null;
+			}
+			catch (Exception e)
+			{
+				return e.Message;
+			}
+		}
+
+		public string FindStrictValidatorErrors(string userCode, string solution)
+		{
+			try
+			{
+				var solutionTree = CSharpSyntaxTree.ParseText(userCode);
+				return validators
+					.Where(v => v is IStrictValidator)
+					.Select(v => v.FindError(solutionTree))
+					.FirstOrDefault(err => err != null);
 			}
 			catch (Exception e)
 			{

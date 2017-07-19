@@ -180,6 +180,7 @@
   <ItemGroup>
     <Compile Include="AcceptedSolutionInfo.cs" />
     <Compile Include="AnalyticsTableInfo.cs" />
+    <Compile Include="CSharp\IStrictValidator.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="CommentAfterExerciseIsSolved.cs" />
     <Compile Include="Course.cs" />
@@ -201,7 +202,7 @@
     <Compile Include="CSharp\NamingCaseStyleValidator.cs" />
     <Compile Include="CSharp\NamingStyleValidator.cs" />
     <Compile Include="CSharp\NotEmptyCodeValidator.cs" />
-    <Compile Include="CSharp\RecursionStyleValidator.cs" />
+    <Compile Include="CSharp\RecursionStyleValidatorAttribute.cs" />
     <Compile Include="CSharp\RedundantIfStyleValidator.cs" />
     <Compile Include="CSharp\CsMembersRemover.cs" />
     <Compile Include="DefaultDictionary.cs" />

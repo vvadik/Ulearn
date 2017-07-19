@@ -6,10 +6,17 @@
 		{
 			string message;
 
-			if ((message = validator.FindSyntaxError(fullCodeFile)) != null)
+			if ((message = validator.FindSyntaxError(fullCodeFile)) != null ||
+				(message = validator.FindStrictValidatorErrors(userWrittenCode, fullCodeFile)) != null)
+			{
 				return SolutionBuildResult.Error(message, fullCodeFile);
-			if ((message = validator.FindValidatorError(userWrittenCode, fullCodeFile)) != null)
+			}
+
+			if ((message = validator.FindValidatorErrors(userWrittenCode, fullCodeFile)) != null)
+			{
 				return SolutionBuildResult.StyleIssue(message, fullCodeFile);
+			}
+
 			return SolutionBuildResult.Success(fullCodeFile);
 		}
 

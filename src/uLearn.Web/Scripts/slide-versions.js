@@ -5,7 +5,7 @@
 		window.history.pushState({ path: newurl }, '', newurl);
 }
 
-function setExerciseVersion(versionId, showOutput) {
+function setExerciseVersion(versionId, showOutput, styleMessage) {
 	showOutput = showOutput || false;
 	var url = $('.exercise__submission').data('version-update-url');
 	url = url.replace('VERSION_ID', versionId);
@@ -27,6 +27,13 @@ function setExerciseVersion(versionId, showOutput) {
 		var $submission = $('.exercise__submission');
 		$loadingPanel.hide();
 		$submission.html($(data).html());
+
+		if (styleMessage) {
+			var $styleErrorBlock = $('.run-style-error');
+			setSimpleResult($styleErrorBlock, styleMessage);
+			$styleErrorBlock.show();
+		}
+
 		initCodeEditor($submission);
 		$submission.find('.select-auto-width').each(function() {
 			selectSetAutoWidth($(this));
@@ -51,6 +58,11 @@ function setExerciseVersion(versionId, showOutput) {
 			}
 		}
 	});
+}
+
+function setSimpleResult($block, details) {
+	$block.find(".run-details").text(details);
+	$block.show();
 }
 
 $(document).ready(function () {

@@ -1711,7 +1711,7 @@ WriteLiteralTo(__razor_helper_writer, " class=\"run-result run-style-error\"");
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t<div");
 
-WriteLiteralTo(__razor_helper_writer, " class=\"run-verdict label-danger\"");
+WriteLiteralTo(__razor_helper_writer, " class=\"run-verdict label-warning\"");
 
 WriteLiteralTo(__razor_helper_writer, ">Нарушение стилевых требований</div>\r\n\t\t<pre");
 

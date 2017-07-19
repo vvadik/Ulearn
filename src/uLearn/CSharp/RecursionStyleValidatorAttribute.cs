@@ -1,26 +1,31 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace uLearn.CSharp
 {
-	public class RecursionStyleValidator : BaseStyleValidator
+	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+	public class RecursionStyleValidatorAttribute : Attribute, ICSharpSolutionValidator, IStrictValidator
 	{
 		private readonly bool requireRecursion;
 
-		public RecursionStyleValidator(bool requireRecursion)
+		public RecursionStyleValidatorAttribute(bool requireRecursion)
 		{
 			this.requireRecursion = requireRecursion;
 		}
 
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+		public string FindError(SyntaxTree userSolution)
 		{
 			var recursiveMethods = userSolution.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().Where(IsRecursive).ToList();
+
 			if (requireRecursion && !recursiveMethods.Any())
-				yield return Report(userSolution.GetRoot(), "Решение должно быть рекурсивным");
+				return "Решение должно быть рекурсивным";
+
 			if (!requireRecursion && recursiveMethods.Any())
-				yield return Report(userSolution.GetRoot(), "Решение должно быть нерекурсивным");
+				return "Решение должно быть нерекурсивным";
+
+			return null;
 		}
 
 		private static bool IsRecursive(MethodDeclarationSyntax method)

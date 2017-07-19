@@ -147,6 +147,8 @@ namespace uLearn.CSharp
 				Exercise.ExerciseInitialCode = GetExerciseCode(node);
 				if (node.HasAttribute<SingleStatementMethodAttribute>())
 					Exercise.ValidatorName += " SingleStatementMethod";
+				if (node.HasAttribute<RecursionStyleValidatorAttribute>())
+					Exercise.ValidatorName += " recursion";
 			}
 			return newMethod;
 		}

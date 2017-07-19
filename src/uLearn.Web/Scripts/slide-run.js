@@ -31,6 +31,7 @@ function RunSolutionResult() {
 	this.ExpectedOutput = "";
 	this.ActualOutput = "";
 	this.ErrorMessage = "";
+	this.StyleMessage = "";
 	this.SentToReview = false;
 }
 
@@ -39,11 +40,10 @@ function setResults(ans) {
 	if (ans.Ignored) $('.run-solution-button').notify(ans.ErrorMessage);
 	else if (ans.IsCompillerFailure) setSimpleResult($serviceError, ans.ErrorMessage);
 	else if (ans.IsCompileError) setSimpleResult($compileError, ans.ErrorMessage);
-	else if (ans.IsStyleViolation) setSimpleResult($styleError, ans.ErrorMessage);
 	else if (ans.IsRightAnswer) {
 		slideNavigation.makeShowSolutionsNext();
 		if (ans.SubmissionId > 0)
-			setExerciseVersion(ans.SubmissionId, true);
+			setExerciseVersion(ans.SubmissionId, true, ans.StyleMessage);
 		else /* for course monitor tool */
 			setSimpleResult($success, ans.ActualOutput);
 	} else if (ans.ExpectedOutput === null)
