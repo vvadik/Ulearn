@@ -11,7 +11,6 @@ using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
-using log4net;
 using Microsoft.AspNet.Identity;
 using uLearn.Extensions;
 using uLearn.Web.Extensions;
@@ -23,8 +22,6 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class AccountController : BaseUserController
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(AccountController));
-
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
 		private readonly UserRolesRepo userRolesRepo;
@@ -263,7 +260,10 @@ namespace uLearn.Web.Controllers
 					await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
 
 					if (!await SendConfirmationEmail(user))
+					{
+						log.Warn("Register(): can't send confirmation email");
 						model.ReturnUrl = Url.Action("Manage", "Account", new { Message = ManageMessageId.ErrorOccured });
+					}
 					else if (string.IsNullOrWhiteSpace(model.ReturnUrl))
 						model.ReturnUrl = Url.Action("Index", "Home");
 					else
@@ -292,6 +292,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult Manage(ManageMessageId? message)
 		{
 			ViewBag.StatusMessage = message?.GetAttribute<DisplayAttribute>().GetName();
+			ViewBag.IsStatusError = message?.GetAttribute<IsErrorAttribute>()?.IsError ?? IsErrorAttribute.DefaultValue;
 			ViewBag.HasLocalPassword = ControllerUtils.HasPassword(userManager, User);
 			ViewBag.ReturnUrl = Url.Action("Manage");
 			return View();
@@ -395,11 +396,15 @@ namespace uLearn.Web.Controllers
 			[Display(Name = "Пароль установлен")]
 			PasswordSet,
 
-			[Display(Name = "Внешний логин удален")]
+			[Display(Name = "Привязка удалена")]
 			LoginRemoved,
 
 			[Display(Name = "Ваша почта уже подтверждена")]
 			EmailAlreadyConfirmed,
+
+			[Display(Name = "Не получилось привязать аккаунт. Он уже привязан к другому пользователю")]
+			[IsError(true)]
+			AlreadyLinkedToOtherUser,
 
 			[Display(Name = "Мы отправили вам письмо для подтверждения адреса")]
 			ConfirmationEmailSent,
@@ -411,10 +416,19 @@ namespace uLearn.Web.Controllers
 			TelegramAdded,
 
 			[Display(Name = "У вас не указан адрес эл. почты")]
+			[IsError(true)]
 			UserHasNoEmail,
 
 			[Display(Name = "Произошла ошибка. Если она будет повторяться, напишите нам на support@ulearn.me.")]
+			[IsError(true)]
 			ErrorOccured,
+
+			[Display(Name = "Аккаунт привязан")]
+			LoginAdded,
+
+			[Display(Name = "Это имя уже занято, выберите другое")]
+			[IsError(true)]
+			NameAlreadyTaken
 		}
 
 		public PartialViewResult ChangeDetailsPartial()
@@ -447,7 +461,10 @@ namespace uLearn.Web.Controllers
 			}
 			var nameChanged = user.UserName != userModel.Name;
 			if (nameChanged && await userManager.FindByNameAsync(userModel.Name) != null)
-				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
+			{
+				log.Warn("ChangeDetailsPartial(): this name is already taken");
+				return RedirectToAction("Manage", new { Message = ManageMessageId.NameAlreadyTaken });
+			}
 			var emailChanged = string.Compare(user.Email, userModel.Email, StringComparison.OrdinalIgnoreCase) != 0;
 
 			user.UserName = userModel.Name;
@@ -528,7 +545,10 @@ namespace uLearn.Web.Controllers
 
 			var correctSignature = GetEmailConfirmationSignature(email);
 			if (signature != correctSignature)
+			{
+				log.Warn("Invalid signature in confirmation email link");
 				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
+			}
 
 			await usersRepo.ConfirmEmail(userId);
 			metricSender.SendCount("email_confirmation.confirmed");
@@ -558,7 +578,10 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Manage", new { Message = ManageMessageId.EmailAlreadyConfirmed });
 
 			if (!await SendConfirmationEmail(user))
+			{
+				log.Warn($"SendConfirmationEmail(): can't send confirmation email to user {user}");
 				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
+			}
 
 			return RedirectToAction("Manage");
 		}
@@ -593,6 +616,18 @@ namespace uLearn.Web.Controllers
 
 			/* If email has been sent less than 1 day ago, show popup. Double popup is disabled via cookies and javascript */
 			return PartialView("EmailIsNotConfirmedPopup", user);
+		}
+	}
+
+	public class IsErrorAttribute : Attribute
+	{
+		public static bool DefaultValue = false;
+
+		public readonly bool IsError;
+
+		public IsErrorAttribute(bool isError)
+		{
+			IsError = isError;
 		}
 	}
 }

@@ -1,0 +1,34 @@
+﻿@model LoginViewModel
+
+<section class="login-and-registration-form">
+	@using (Html.BeginForm("Index", "Login", new { ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+	{
+		@Html.AntiForgeryToken()
+		<div class="form-group">
+			@Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Логин", autofocus = "autofocus" })
+			@Html.ValidationMessageFor(m => m.UserName)
+		</div>
+		<div class="form-group">
+			@Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Пароль" })
+			@Html.ValidationMessageFor(m => m.Password)
+		</div>
+		<div class="form-group">
+			<div class="checkbox checkbox-default">
+				@Html.CheckBoxFor(m => m.RememberMe)
+				@Html.LabelFor(m => m.RememberMe)
+			</div>
+		</div>
+		<div class="form-group">
+			<input type="submit" value="Войти" class="ph-btn ph-btn-green btn-block" />
+		</div>
+		@Html.ValidationSummary(true)
+		<div class="form-group">
+			<p>
+				@Html.ActionLink("Зарегистрироваться", "Register", "Account", new { ViewBag.ReturnUrl }, new { }) — если у вас ещё нет аккаунта
+			</p>
+			<p>
+				<a href="@Url.Action("Index", "RestorePassword")">Восстановить забытый пароль</a>
+			</p>
+		</div>
+	}
+</section>

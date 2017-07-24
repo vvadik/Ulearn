@@ -8,7 +8,7 @@
 			<p>Не удалось войти с помощью стороннего сервиса аутентификации.</p>
 
 			<section id="socialLoginForm">
-				@Html.Partial("_ExternalLoginsListPartial", new ExternalLoginsListModel { Action = "ExternalLogin", ReturnUrl = ViewBag.ReturnUrl })
+				@Html.Partial("ExternalLoginsListPartial", new ExternalLoginsListModel { Action = "ExternalLogin", ReturnUrl = ViewBag.ReturnUrl })
 			</section>
 
 			или <a href="/">вернуться на главную</a>

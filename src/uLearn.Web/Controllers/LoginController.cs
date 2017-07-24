@@ -7,7 +7,10 @@ using System.Web.Mvc;
 using Database.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
+using uLearn.Extensions;
 using uLearn.Web.FilterAttributes;
+using uLearn.Web.Kontur.Passport;
+using uLearn.Web.Microsoft.Owin.Security.VK;
 using uLearn.Web.Models;
 
 namespace uLearn.Web.Controllers
@@ -73,11 +76,12 @@ namespace uLearn.Web.Controllers
 			var user = await userManager.FindAsync(loginInfo.Login);
 			if (user != null)
 			{
-				var avatarUrl = loginInfo.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == "AvatarUrl")?.Value;
-				var sex = loginInfo.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Gender)?.Value;
+				var avatarUrl = loginInfo.ExternalIdentity.FindFirstValue("AvatarUrl");
+				var sex = loginInfo.ExternalIdentity.FindFirstValue(ClaimTypes.Gender);
 				Gender? userSex = null;
 				if (Enum.TryParse(sex, out Gender parsedSex))
 					userSex = parsedSex;
+
 				if (!string.IsNullOrEmpty(avatarUrl))
 					user.AvatarUrl = avatarUrl;
 				if (userSex != null && user.Gender == null)
@@ -89,13 +93,19 @@ namespace uLearn.Web.Controllers
 				return Redirect(this.FixRedirectUrl(returnUrl));
 			}
 
-			metricSender.SendCount("registration.via_vk.try");
+			if (loginInfo.ExternalIdentity.AuthenticationType == VkAuthenticationConstants.AuthenticationType)
+				metricSender.SendCount("registration.via_vk.try");
+			else if (loginInfo.ExternalIdentity.AuthenticationType == KonturPassportConstants.AuthenticationType)
+				metricSender.SendCount("registration.via_kontur_passport.try");
 
 			// If the user does not have an account, then prompt the user to create an account
 			ViewBag.ReturnUrl = returnUrl;
 			ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
+
+			Gender? loginGender = null;
+			loginInfo.ExternalIdentity.FindFirstValue(ClaimTypes.Gender)?.TryParseToNullableEnum<Gender>(out loginGender);
 			return View("ExternalLoginConfirmation",
-				new ExternalLoginConfirmationViewModel { UserName = loginInfo.DefaultUserName });
+				new ExternalLoginConfirmationViewModel { UserName = loginInfo.DefaultUserName, Email = loginInfo.Email, Gender = loginGender });
 		}
 		
 		[HttpPost]
@@ -115,13 +125,9 @@ namespace uLearn.Web.Controllers
 			ViewBag.LoginProvider = info.Login.LoginProvider;
 			if (ModelState.IsValid)
 			{
-				var userAvatarUrl = info.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == "AvatarUrl")?.Value;
-				var firstName = info.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.GivenName)?.Value;
-				var lastName = info.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Surname)?.Value;
-				var sex = info.ExternalIdentity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Gender)?.Value;
-				Gender? userSex = null;
-				if (Enum.TryParse(sex, out Gender parsedSex))
-					userSex = parsedSex;
+				var userAvatarUrl = info.ExternalIdentity.FindFirstValue("AvatarUrl");
+				var firstName = info.ExternalIdentity.FindFirstValue(ClaimTypes.GivenName);
+				var lastName = info.ExternalIdentity.FindFirstValue(ClaimTypes.Surname);
 				
 				var user = new ApplicationUser
 				{
@@ -130,7 +136,7 @@ namespace uLearn.Web.Controllers
 					LastName = lastName,
 					AvatarUrl = userAvatarUrl,
 					Email = model.Email,
-					Gender = userSex,
+					Gender = model.Gender,
 				};
 				var result = await userManager.CreateAsync(user);
 				if (result.Succeeded)
@@ -141,10 +147,16 @@ namespace uLearn.Web.Controllers
 						await userManager.AddPasswordAsync(user.Id, model.Password);
 						await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
 						if (!await SendConfirmationEmail(user))
+						{
+							log.Warn("ExternalLoginConfirmation(): can't send confirmation email");
 							return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.ErrorOccured });
+						}
 
 						metricSender.SendCount("registration.success");
-						metricSender.SendCount("registration.via_vk.success");
+						if (info.ExternalIdentity.AuthenticationType == VkAuthenticationConstants.AuthenticationType)
+							metricSender.SendCount("registration.via_vk.success");
+						else if (info.ExternalIdentity.AuthenticationType == KonturPassportConstants.AuthenticationType)
+							metricSender.SendCount("registration.via_kontur_passport.success");
 
 						return Redirect(this.FixRedirectUrl(returnUrl));
 					}
@@ -160,7 +172,18 @@ namespace uLearn.Web.Controllers
 		{
 			return View();
 		}
-		
+
+		[HttpGet]
+		[ULearnAuthorize]
+		public ActionResult LinkLogin(string provider, string returnUrl)
+		{
+			return View(new LinkLoginViewModel
+			{
+				Provider = provider,
+				ReturnUrl = returnUrl,
+			});
+		}
+
 		[HttpPost]
 		[ULearnAuthorize]
 		[ValidateAntiForgeryToken]
@@ -176,14 +199,15 @@ namespace uLearn.Web.Controllers
 			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext, XsrfKey, User.Identity.GetUserId());
 			if (loginInfo == null)
 			{
+				log.Warn("LinkLoginCallback: GetExternalLoginInfoAsync() returned null");
 				return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.ErrorOccured });
 			}
 			var result = await userManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login);
 			if (result.Succeeded)
 			{
-				return RedirectToAction("Manage", "Account");
+				return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.LoginAdded });
 			}
-			return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.ErrorOccured });
+			return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.AlreadyLinkedToOtherUser });
 		}
 		
 		[HttpPost]
@@ -192,6 +216,36 @@ namespace uLearn.Web.Controllers
 		{
 			AuthenticationManager.Logout(HttpContext);
 			return RedirectToAction("Index", "Home");
+		}
+
+		public ActionResult ExternalLoginsListPartial(ExternalLoginsListModel model)
+		{
+			if (User.Identity.IsAuthenticated)
+			{
+				var userId = User.Identity.GetUserId();
+				var user = userManager.FindById(userId);
+				model.UserLogins = user.Logins.ToList();
+			}
+			return PartialView(model);
+		}
+
+		public ActionResult EnsureKonturProfileLogin(string returnUrl)
+		{
+			if (User.Identity.IsAuthenticated)
+			{
+				var userId = User.Identity.GetUserId();
+				var user = userManager.FindById(userId);
+				var hasKonturPassportLogin = user.Logins.Any(l => l.LoginProvider == KonturPassportConstants.AuthenticationType);
+				if (hasKonturPassportLogin)
+					return Redirect(this.FixRedirectUrl(returnUrl));
+
+				return View("AddKonturProfileLogin", model: returnUrl);
+			}
+			else
+			{
+				var newReturnUrl = Url.Action("EnsureKonturProfileLogin", "Login", new { returnUrl = returnUrl });
+				return View("EnsureKonturProfileLogin", model: newReturnUrl);
+			}
 		}
 
 		private const string XsrfKey = "XsrfId";
@@ -219,5 +273,12 @@ namespace uLearn.Web.Controllers
 				context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
 			}
 		}
+	}
+
+	public class LinkLoginViewModel
+	{
+		public string Provider { get; set; }
+
+		public string ReturnUrl { get; set; }
 	}
 }

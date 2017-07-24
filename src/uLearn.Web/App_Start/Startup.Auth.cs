@@ -6,8 +6,12 @@ using Database.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
+using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
+using Microsoft.Owin.Security.OpenIdConnect;
 using Owin;
+using SkbKontur.Passport.Client;
+using uLearn.Web.Kontur.Passport;
 using uLearn.Web.LTI;
 using uLearn.Web.Microsoft.Owin.Security.VK;
 
@@ -52,6 +56,11 @@ namespace uLearn.Web
 			//app.UseFacebookAuthentication(
 			//   appId: "",
 			//   appSecret: "");
+
+			var konturPassportClientId = WebConfigurationManager.AppSettings["owin.konturPassport.clientId"];
+			var konturPassportClientSecret = WebConfigurationManager.AppSettings["owin.konturPassport.clientSecret"];
+			if (! string.IsNullOrEmpty(konturPassportClientSecret))
+				app.UseKonturPassportAuthentication(konturPassportClientId, konturPassportClientSecret);
 
 			//app.UseGoogleAuthentication();
 			app.UseLtiAuthentication();

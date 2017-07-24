@@ -51,6 +51,12 @@ namespace uLearn.Web.Controllers
 			feedRepo.AddFeedNotificationTransportIfNeeded(userId).Wait();
 		}
 
+		public async Task<ActionResult> Index()
+		{
+			var feedNotificationsModel = await GetFeedNotificationsModel();
+			return View(feedNotificationsModel);
+		}
+
 		public ActionResult UnreadCount(string lastTimestamp)
 		{
 			var userId = User.Identity.GetUserId();
@@ -100,6 +106,12 @@ namespace uLearn.Web.Controllers
 
 		public async Task<ActionResult> NotificationsPartial()
 		{
+			var feedNotificationsModel = await GetFeedNotificationsModel();
+			return PartialView(feedNotificationsModel);
+		}
+
+		private async Task<FeedNotificationsModel> GetFeedNotificationsModel()
+		{
 			var userId = User.Identity.GetUserId();
 			var notificationTransport = feedRepo.GetUsersFeedNotificationTransport(userId);
 
@@ -112,12 +124,12 @@ namespace uLearn.Web.Controllers
 			var lastViewTimestamp = feedRepo.GetFeedViewTimestamp(userId);
 			await feedRepo.UpdateFeedViewTimestamp(userId, DateTime.Now);
 
-			return PartialView(new NotificationsPartialModel
+			return new FeedNotificationsModel
 			{
 				Notifications = notifications,
 				LastViewTimestamp = lastViewTimestamp,
 				CourseManager = courseManager,
-			});
+			};
 		}
 
 		private IEnumerable<Notification> RemoveBlockedNotifications(IReadOnlyCollection<Notification> notifications)
@@ -127,7 +139,7 @@ namespace uLearn.Web.Controllers
 			{
 				var blockers = notification.GetBlockerNotifications(db);
 				if (blockers.Select(b => b.Id).Intersect(notificationsIds).Any())
-					break;
+					continue;
 				yield return notification;
 			}
 		}
@@ -146,7 +158,7 @@ namespace uLearn.Web.Controllers
 		}
 	}
 
-	public class NotificationsPartialModel
+	public class FeedNotificationsModel
 	{
 		public List<Notification> Notifications { get; set; }
 		public DateTime? LastViewTimestamp { get; set; }

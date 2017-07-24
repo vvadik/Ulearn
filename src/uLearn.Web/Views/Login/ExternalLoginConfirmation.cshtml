@@ -1,4 +1,5 @@
-﻿@using uLearn.Web.Extensions
+﻿@using uLearn
+@using uLearn.Web.Extensions
 @model ExternalLoginConfirmationViewModel
 @{
 	ViewBag.Title = "Регистрация";
@@ -9,7 +10,7 @@
 			<h2>@ViewBag.Title</h2>
 
 			<section class="login-and-registration-form">
-				@using (Html.BeginForm("ExternalLoginConfirmation", "Login", new { ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+				@using (Html.BeginForm("ExternalLoginConfirmation", "Login", new { ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form", @class = "form-horizontal" }))
 				{
 					@Html.AntiForgeryToken()
 
@@ -26,6 +27,18 @@
 					<div class="form-group">
 						@Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Эл. почта" })
 						@Html.ValidationMessageFor(m => m.Email)
+					</div>
+					<div class="form-group radio-form-group">
+						<div class="control-label for-non-text-fields ib">Пол</div>
+						<div class="pull-right">
+							<div class="radio radio-default ib">
+								@Html.RadioButtonFor(m => m.Gender, Gender.Male, new { id = "external-login__gender__male" }) <label for="external-login__gender__male">Мужской</label>
+							</div>
+							<div class="radio radio-default ib">
+								@Html.RadioButtonFor(m => m.Gender, Gender.Female, new { id = "external-login__gender__female" }) <label for="external-login__gender__female">Женский</label>
+							</div>
+						</div>
+						@Html.ValidationMessageFor(m => m.Gender)
 					</div>
 					<p class="strike-line grey">
 						<span>

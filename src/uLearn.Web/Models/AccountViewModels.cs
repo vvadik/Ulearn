@@ -26,6 +26,9 @@ namespace uLearn.Web.Models
 		[Display(Name = "Эл. почта")]
 		public string Email { get; set; }
 
+		[Display(Name = "Пол")]
+		public Gender? Gender { get; set; }
+
 		[Required(ErrorMessage = "{0} обязателен")]
 		[StringLength(100, ErrorMessage = "{0} не может быть короче {2} символов", MinimumLength = 6)]
 		[DataType(DataType.Password)]

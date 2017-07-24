@@ -13,7 +13,7 @@
 
 					@if (!string.IsNullOrEmpty(ViewBag.StatusMessage))
 					{
-						<div class="alert alert-success">@ViewBag.StatusMessage</div>
+						<div class="alert @(ViewBag.IsStatusError ? "alert-danger" : "alert-success")">@ViewBag.StatusMessage</div>
 					}
 				</div>
 			</div>
@@ -27,11 +27,7 @@
 			<div class="row">
 				<section id="externalLogins" class="col-sm-10 col-sm-offset-2">
 					@Html.Action("RemoveAccountList")
-					<div class="row">
-						<div class="col-md-6">
-							@Html.Partial("../Login/_ExternalLoginsListPartial", new ExternalLoginsListModel { Action = "LinkLogin", ReturnUrl = ViewBag.ReturnUrl })
-						</div>
-					</div>
+					@Html.Action("ExternalLoginsListPartial", "Login", new ExternalLoginsListModel { Action = "LinkLogin", ReturnUrl = ViewBag.ReturnUrl, Type = ExternalLoginListType.Link })
 				</section>
 			</div>
 		</div>

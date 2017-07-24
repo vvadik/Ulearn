@@ -12,9 +12,9 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 		[SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", 
 			MessageId = "Microsoft.Owin.Security.VK.VkAuthenticationOptions.set_Caption(System.String)", Justification = "Not localizable.")]
 		public VkAuthenticationOptions()
-			: base(Constants.DefaultAuthenticationType)
+			: base(VkAuthenticationConstants.AuthenticationType)
 		{
-			Caption = Constants.DefaultAuthenticationType;
+			Caption = VkAuthenticationConstants.AuthenticationType;
 			ReturnEndpointPath = "/signin-vk";
 			AuthenticationMode = AuthenticationMode.Passive;
 			Scope = new List<string>();
@@ -44,7 +44,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 		public TimeSpan BackchannelTimeout { get; set; }
 
 		/// <summary>
-		/// The HttpMessageHandler used to communicate with Facebook.
+		/// The HttpMessageHandler used to communicate with VK.
 		/// This cannot be set at the same time as BackchannelCertificateValidator unless the value 
 		/// can be downcast to a WebRequestHandler.
 		/// </summary>
@@ -52,8 +52,8 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 
 		public string Caption
 		{
-			get { return Description.Caption; }
-			set { Description.Caption = value; }
+			get => Description.Caption;
+			set => Description.Caption = value;
 		}
 		public string ReturnEndpointPath { get; set; }
 		public string SignInAsAuthenticationType { get; set; }

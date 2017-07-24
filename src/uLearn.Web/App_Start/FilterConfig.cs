@@ -1,8 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
+using System.Web.Routing;
+using Database.DataContexts;
+using Microsoft.AspNet.Identity;
+using SkbKontur.Passport.Client;
+using uLearn.Extensions;
+using uLearn.Web.Kontur.Passport;
 
 namespace uLearn.Web
 {
@@ -15,6 +23,7 @@ namespace uLearn.Web
 			if (requireHttps)
 				filters.Add(new RequireHttpsForCloudFlareAttribute());
 			filters.Add(new AntiForgeryTokenFilter());
+			filters.Add(new KonturPassportRequiredFilter());
 		}
 	}
 
@@ -58,6 +67,96 @@ namespace uLearn.Web
 				throw new InvalidOperationException("Require HTTPS");
 			var url = "https://" + filterContext.HttpContext.Request.Url?.Host + filterContext.HttpContext.Request.RawUrl;
 			filterContext.Result = new RedirectResult(url);
+		}
+	}
+
+	public class KonturPassportRequiredFilter : ActionFilterAttribute
+	{
+		/* If query string contains &konturPassport=true then we need to check kontur.passport login */
+		private const string queryStringParameterName = "kontur";
+
+		private readonly ULearnUserManager userManager;
+
+		public KonturPassportRequiredFilter(ULearnUserManager userManager)
+		{
+			this.userManager = userManager;
+		}
+
+		public KonturPassportRequiredFilter()
+			: this(new ULearnUserManager(new ULearnDb()))
+		{
+		}
+
+		public override void OnActionExecuting(ActionExecutingContext filterContext)
+		{
+			var httpContext = filterContext.RequestContext.HttpContext;
+
+			var queryString = httpContext.Request.QueryString;
+			var queryStringParams = HttpUtility.ParseQueryString(queryString.ToString()).ToDictionary();
+			var konturPassportRequired = Convert.ToBoolean(queryStringParams.GetOrDefault(queryStringParameterName, "false"));
+
+			if (!konturPassportRequired)
+				return;
+			
+			var originalUrl = httpContext.Request.Url?.ToString().RemoveQueryParameter(queryStringParameterName) ?? "";
+
+			var isAuthenticated = httpContext.User.Identity.IsAuthenticated;
+			if (isAuthenticated)
+			{
+				var userId = httpContext.User.Identity.GetUserId();
+				var user = userManager.FindById(userId);
+				var hasKonturPassportLogin = user.Logins.Any(l => l.LoginProvider == KonturPassportConstants.AuthenticationType);
+				if (hasKonturPassportLogin)
+				{
+					filterContext.Result = new RedirectResult(originalUrl);
+					return;
+				}
+
+				/* Try to link Kontur.Passport account to current user */
+				filterContext.Result = RedirectToAction("LinkLogin", "Login", new
+				{
+					provider = KonturPassportConstants.AuthenticationType,
+					returnUrl = originalUrl,
+				});
+			}
+			else
+			{
+				filterContext.Result = RedirectToAction("EnsureKonturProfileLogin", "Login", new
+				{
+					returnUrl = originalUrl
+				});
+			}
+		}
+		
+		private ActionResult RedirectToAction(string actionName, string controllerName, RouteValueDictionary values)
+		{
+			if (string.IsNullOrEmpty(actionName))
+				throw new ArgumentNullException(nameof(actionName));
+
+			if (string.IsNullOrEmpty(controllerName))
+				throw new ArgumentNullException(nameof(controllerName));
+
+			values.Add("action", actionName);
+			values.Add("controller", controllerName);
+			return new RedirectToRouteResult(values);
+		}
+
+		private ActionResult RedirectToAction(string actionName, string controllerName, Dictionary<string, string> values)
+		{
+			var routeValues = new RouteValueDictionary();
+			foreach (var kpv in values)
+				routeValues.Add(kpv.Key, kpv.Value);
+			return RedirectToAction(actionName, controllerName, routeValues);
+		}
+
+		private ActionResult RedirectToAction(string actionName, string controllerName, object values)
+		{
+			return RedirectToAction(actionName, controllerName, HtmlHelper.AnonymousObjectToHtmlAttributes(values));
+		}
+
+		private ActionResult RedirectToAction(string actionName, string controllerName)
+		{
+			return RedirectToAction(actionName, controllerName, new Dictionary<string, string>());
 		}
 	}
 }

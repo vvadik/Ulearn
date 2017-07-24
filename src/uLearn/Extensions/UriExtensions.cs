@@ -17,5 +17,14 @@ namespace uLearn.Extensions
 			uriBuilder.Query = query.ToString();
 			return uriBuilder.ToString();
 		}
+
+		public static string RemoveQueryParameter(this string url, string name)
+		{
+			var uriBuilder = new UriBuilder(url);
+			var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+			query.Remove(name);
+			uriBuilder.Query = query.ToString();
+			return uriBuilder.ToString();
+		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
+	font-family: "Segoe UI";
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -82,6 +83,10 @@ input[type="checkbox"].input-validation-error {
 
 .navbar .dropdown .glyphicon {
 	height: 20px;
+}
+
+.nav .dropdown-menu {
+	top: 49px;
 }
 
 @media (max-width: 767px) {
@@ -190,4 +195,9 @@ footer:hover {
 
 .glyphicon.glyphicon-sm {
 	font-size: 10px;
+}
+
+/* Small buttons*/
+.btn-group-xs > .btn, .btn-xs {
+	padding: 1px 7px 3px;
 }

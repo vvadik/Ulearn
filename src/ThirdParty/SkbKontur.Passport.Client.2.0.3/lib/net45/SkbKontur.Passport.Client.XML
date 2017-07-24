@@ -1,0 +1,399 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SkbKontur.Passport.Client</name>
+    </assembly>
+    <members>
+        <member name="T:SkbKontur.Passport.Client.AuthenticationResult">
+            <summary>
+                Результат проверки подлинности пользователя
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.AuthenticationResult.Authenticated">
+            <summary>
+                Состояние проверки подлинности
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.AuthenticationResult.UserClaims">
+            <summary>
+                Информация о пользователе
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.AuthenticationResult.ErrorMessage">
+            <summary>
+                Сообщение об ошибке
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.AuthenticationResult.IsError">
+            <summary>
+                Произошла ли ошибка
+            </summary>
+        </member>
+        <member name="T:SkbKontur.Passport.Client.ClientOptions">
+            <summary>
+                Класс настроек подключения
+            </summary>
+        </member>
+        <member name="T:SkbKontur.Passport.Client.IClientOptions">
+            <summary>
+                Настройки подключения к Контур.Паспорт
+            </summary>
+        </member>
+        <member name="M:SkbKontur.Passport.Client.IClientOptions.Validate">
+            <summary>
+                Метод проверки настроек
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.IClientOptions.ClientId">
+            <summary>
+                Идентификатор клиентского приложения
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.IClientOptions.ClientSecret">
+            <summary>
+                Секрет клиентского приложения
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.IClientOptions.Authority">
+            <summary>
+                Адрес Контур.Паспорта
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.IClientOptions.Scopes">
+            <summary>
+                Запрашиваемые данные о пользователе
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.IClientOptions.Metadata">
+            <summary>
+                Характеристики Контур.Паспорта
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.IClientOptions.ScopeString">
+            <summary>
+                Получение строки с описанием запрашиваемой информации о пользователе
+            </summary>
+        </member>
+        <member name="M:SkbKontur.Passport.Client.ClientOptions.#ctor(SkbKontur.Passport.Client.Configuration.PassportClientConfiguration)">
+            <summary>
+                Создание настроек подключения на основе значений из раздела конфигурационного файла
+            </summary>
+            <param name="config">Объект раздела конфигурации</param>
+        </member>
+        <member name="M:SkbKontur.Passport.Client.ClientOptions.#ctor(System.String,System.String)">
+            <summary>
+                Создание настроек подключения с минимальным набором параметров
+            </summary>
+            <param name="clientId">Идентификатор клиентского приложения</param>
+            <param name="clientSecret">Секрет клиентского приложения</param>
+        </member>
+        <member name="M:SkbKontur.Passport.Client.ClientOptions.Validate">
+            <summary>
+                Метод проверки настроек
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.ClientOptions.ClientId">
+            <summary>
+                Идентификатор клиентского приложения
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.ClientOptions.ClientSecret">
+            <summary>
+                Секрет клиентского приложения
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.ClientOptions.Authority">
+            <summary>
+                Адрес Контур.Паспорта
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.ClientOptions.Scopes">
+            <summary>
+                Запрашиваемые данные о пользователе
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.ClientOptions.Metadata">
+            <summary>
+                Характеристики Контур.Паспорта
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.ClientOptions.ScopeString">
+            <summary>
+                Получение строки с описанием запрашиваемой информации о пользователе
+            </summary>
+        </member>
+        <member name="T:SkbKontur.Passport.Client.PassportMetadata">
+            <summary>
+                Класс метаданных Контур.Паспорта
+            </summary>
+        </member>
+        <member name="T:SkbKontur.Passport.Client.IPassportMetadata">
+            <summary>
+                Метаданные Контур.Паспорта
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.IPassportMetadata.Issuer">
+            <summary>
+                Идентификатор Контур.Паспорта
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.IPassportMetadata.SigningCert">
+            <summary>
+                Сертификат Контур.Паспорта для проверки цифровой подписи токенов
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.IPassportMetadata.AuthorizationEndpoint">
+            <summary>
+                Адрес авторизации пользователей
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.IPassportMetadata.TokenEndpoint">
+            <summary>
+                Адрес получения токенов безопасности
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.IPassportMetadata.UserInfoEndpoint">
+            <summary>
+                Адрес получения информации о пользователе
+            </summary>
+        </member>
+        <member name="M:SkbKontur.Passport.Client.PassportMetadata.#ctor">
+            <summary>
+                Создание метаданных по умолчанию
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.PassportMetadata.Issuer">
+            <summary>
+                Идентификатор Контур.Паспорта
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.PassportMetadata.SigningCert">
+            <summary>
+                Сертификат Контур.Паспорта для проверки цифровой подписи токенов
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.PassportMetadata.AuthorizationEndpoint">
+            <summary>
+                Адрес авторизации пользователей
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.PassportMetadata.TokenEndpoint">
+            <summary>
+                Адрес получения токенов безопасности
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.PassportMetadata.UserInfoEndpoint">
+            <summary>
+                Адрес получения информации о пользователе
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.PassportMetadata.LogoutEndpoint">
+            <summary>
+                Адрес выхода из Контур.Паспорта
+            </summary>
+        </member>
+        <member name="T:SkbKontur.Passport.Client.Configuration.PassportClientConfiguration">
+            <summary>
+                Раздел конфигурации, описывающий настройки подключения к Контур.Паспорту
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.Configuration.PassportClientConfiguration.Current">
+            <summary>
+                Текущие настройки подключения
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.Configuration.PassportClientConfiguration.ClientId">
+            <summary>
+                Идентификатор клиентского приложения
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.Configuration.PassportClientConfiguration.ClientSecret">
+            <summary>
+                Секрет клиентского приложения
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.Configuration.PassportClientConfiguration.Authority">
+            <summary>
+                Адрес Контур.Паспорта
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.Configuration.PassportClientConfiguration.SigningCertificate">
+            <summary>
+                Сертификат Контур.Паспорта для проверки цифровой подписи токенов
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.Configuration.PassportClientConfiguration.Scope">
+            <summary>
+                Данные о пользователе, к которым запрашиваются доступ, в виде списка констант, разделенных пробелом (openid profile email address phone offline_access work groups)
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.Configuration.PassportClientConfiguration.AppRelativeCallbackUrl">
+            <summary>
+                Адрес куда будет направлен пользователь после аутентификации
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.Configuration.PassportClientConfiguration.AuthorizeErrorRedirectUrl">
+            <summary>
+                Адрес страницы ошибки аутентификации
+            </summary>
+        </member>
+        <member name="T:SkbKontur.Passport.Client.Domain">
+            <summary>
+                Домен учетной записи
+            </summary>
+        </member>
+        <member name="F:SkbKontur.Passport.Client.Domain.Kontur">
+            <summary>
+            Учетная запись в домене KONTUR
+            </summary>
+        </member>
+        <member name="F:SkbKontur.Passport.Client.Domain.M1">
+            <summary>
+                Учетная запись в домене M1
+            </summary>
+        </member>
+        <member name="F:SkbKontur.Passport.Client.Domain.None">
+            <summary>
+                Внутренняя учетная запись
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.OAuth2ErrorResponse.Error">
+            <summary>
+                Название ошибки
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.OAuth2ErrorResponse.ErrorDescription">
+            <summary>
+                Описание ошибки
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.OAuth2ErrorResponse.ErrorUri">
+            <summary>
+                Ссылка на описание ошибки
+            </summary>
+        </member>
+        <member name="T:SkbKontur.Passport.Client.PassportClient">
+            <summary>
+                Класс для выполнения аутентификации через Контур.Паспорт
+            </summary>
+        </member>
+        <member name="M:SkbKontur.Passport.Client.PassportClient.#ctor">
+            <summary>
+                Создание подключения с настройками из раздела конфигурационного файла
+            </summary>
+        </member>
+        <member name="M:SkbKontur.Passport.Client.PassportClient.#ctor(SkbKontur.Passport.Client.IClientOptions)">
+            <summary>
+                Создание подключения с переданными настройками 
+            </summary>
+            <param name="options">Настройки подключения</param>
+        </member>
+        <member name="M:SkbKontur.Passport.Client.PassportClient.GetLoginUri(System.Uri,System.String,System.Nullable{SkbKontur.Passport.Client.Domain})">
+            <summary>
+                Метод получения URL-адреса до страницы входа через Контур.Паспорт
+            </summary>
+            <param name="redirectUri">Адрес куда будет направлен пользователь после аутентификации
+                <example>openid profile email address phone offline_access work groups</example> 
+            </param>
+            <param name="state">Уникальное значение для запроса. В методе <seealso cref="M:SkbKontur.Passport.Client.PassportClient.Authenticate(System.Collections.Generic.IDictionary{System.String,System.String},System.Uri,System.String)"/> будет использоваться для проверки результата аутентификации</param>
+            <param name="defaultDomain">Домен по умолчанию на странице входа</param>
+            <returns>URL-адрес до страницы входа через Контур.Паспорт</returns>
+        </member>
+        <member name="M:SkbKontur.Passport.Client.PassportClient.Authenticate(System.Collections.Generic.IDictionary{System.String,System.String},System.Uri,System.String)">
+            <summary>
+                Метод проверки результата аутентификации и получения информации о пользователе
+            </summary>
+            <param name="queryString">Параметры строки запроса, полученные после перенаправления с Контур.Паспорта</param>
+            <param name="redirectUri">Адрес веб-приложения, запрашивающего ключ доступа</param>
+            <param name="state">Уникальное значение для запроса. Должно быть равно значению, переданному при переадресации обратно на клиентское приложение</param>
+            <returns>Ключ доступа к запрашиваемой информации. Его нужно хранить только чтобы использовать в другом экземпляре класса</returns>
+        </member>
+        <member name="M:SkbKontur.Passport.Client.PassportClient.GetLogoutUri(System.Uri)">
+            <summary>
+                Метод получения URL-адреса до страницы выхода из Контур.Паспорта
+            </summary>
+            <param name="redirectUri">Адрес куда будет направлен пользователь после выхода</param>
+            <returns>URL-адрес до страницы выхода из Контур.Паспорта</returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:SkbKontur.Passport.Client.PassportClient.GetProfile">
+            <summary>
+                Метод получения информации из профиля пользователя
+            </summary>
+            <returns>Профиль пользователя</returns>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.PassportClient.Options">
+            <summary>
+                Настройки подключения
+            </summary>
+        </member>
+        <member name="T:SkbKontur.Passport.Client.Properties.Resources">
+            <summary>
+              Класс ресурса со строгой типизацией для поиска локализованных строк и т.д.
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.Properties.Resources.ResourceManager">
+            <summary>
+              Возвращает кэшированный экземпляр ResourceManager, использованный этим классом.
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.Properties.Resources.Culture">
+            <summary>
+              Перезаписывает свойство CurrentUICulture текущего потока для всех
+              обращений к ресурсу с помощью этого класса ресурса со строгой типизацией.
+            </summary>
+        </member>
+        <member name="P:SkbKontur.Passport.Client.Properties.Resources.Kontur_Passport_Cert">
+            <summary>
+              Поиск локализованного ресурса типа System.Byte[].
+            </summary>
+        </member>
+        <member name="T:SkbKontur.Passport.Client.QueryStringExtensions">
+            <summary>
+                Методы расширений для преобразования строки запроса
+            </summary>
+        </member>
+        <member name="M:SkbKontur.Passport.Client.QueryStringExtensions.ToDictionary(System.Collections.Specialized.NameValueCollection)">
+            <summary>
+                Производит преобразование в словарь параметров строки запроса
+            </summary>
+            <param name="col">Коллекция строки запроса</param>
+            <returns></returns>
+        </member>
+        <member name="T:SkbKontur.Passport.Client.Scope">
+            <summary>
+                Тип информации запрашиваемой о пользователе
+            </summary>
+        </member>
+        <member name="F:SkbKontur.Passport.Client.Scope.OpenId">
+            <summary>
+                Идентификация (логин, SID)
+            </summary>
+        </member>
+        <member name="F:SkbKontur.Passport.Client.Scope.Profile">
+            <summary>
+                Профильная информация (ФИО, ссылка на Стафф, аватар)
+            </summary>
+        </member>
+        <member name="F:SkbKontur.Passport.Client.Scope.Email">
+            <summary>
+                Адрес электронной почты
+            </summary>
+        </member>
+        <member name="F:SkbKontur.Passport.Client.Scope.Phone">
+            <summary>
+                Номер телефона
+            </summary>
+        </member>
+        <member name="F:SkbKontur.Passport.Client.Scope.Work">
+            <summary>
+                Место работы, должность
+            </summary>
+        </member>
+        <member name="F:SkbKontur.Passport.Client.Scope.Groups">
+            <summary>
+                Группы AD, в которых состоит пользователь
+            </summary>
+        </member>
+    </members>
+</doc>

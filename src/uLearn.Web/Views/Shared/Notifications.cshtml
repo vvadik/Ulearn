@@ -1,0 +1,240 @@
+﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
+
+@using System.Web.Mvc
+@using Database.Models
+@using uLearn
+@using uLearn.Extensions
+@using uLearn.Quizes
+@using uLearn.Web.Extensions
+@using uLearn.Web.Views.Shared
+
+@functions
+{	private static string GetSlideUrl(UrlHelper Url, Course course, Slide slide)
+	{
+		return Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
+	}
+
+	private static string EncodeMultiLineTextAndHighlightLinks(HtmlHelper Html, string text)
+	{
+		var htmlText = Html.EncodeMultiLineText(text);
+		return Html.HighlightLinks(htmlText);
+	}
+
+	private static IHtmlString CollapseIfNeed(bool collapse, HtmlHelper Html, string commentText, int truncateMaxLength)
+	{
+		return collapse
+			? new HtmlString(commentText.TruncateWithEllipsis(truncateMaxLength))
+			: Html.Raw(EncodeMultiLineTextAndHighlightLinks(Html, commentText));
+	}
+
+}
+
+@helper SlideLink(UrlHelper Url, Course course, Slide slide)
+{
+	<a href="@GetSlideUrl(Url, course, slide)">@slide.Title.TruncateWithEllipsis(40)</a>
+}
+
+@helper UserName(ApplicationUser user)
+{
+	<span class="notifications__notification__user">@user.VisibleName</span>
+}
+
+@helper Notification(SystemMessageNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	<div class="notifications__system-message-notification without-link media">
+		<div class="media-left">
+		</div>
+		<div class="media-body">
+			<div class="">@CollapseIfNeed(collapse, Html, notification.Text, 100)</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(InstructorMessageNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	<div class="notifications__instructor-message-notification without-link media">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.InitiatedBy)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy):</div>
+			<div class="">@CollapseIfNeed(collapse, Html, notification.Text, 100)</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(NewCommentNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	var slide = course.GetSlideById(notification.Comment.SlideId);
+	<div class="notifications__new-comment-notification media" data-href="@GetSlideUrl(Url, course, slide)#comment-@notification.Comment.Id">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.Comment.Author)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">@UserName(notification.Comment.Author)</div>
+			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100)</div>
+			<div class="notifications__notification__footer">к&nbsp;слайду @SlideLink(Url, course, slide)</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(RepliedToYourCommentNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	var slide = course.GetSlideById(notification.Comment.SlideId);
+	<div class="notifications__replied-to-your-comment-notification media" data-href="@GetSlideUrl(Url, course, slide)#comment-@notification.Comment.Id">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.Comment.Author)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">
+				@UserName(notification.Comment.Author) ответил@(notification.Comment.Author.Gender.ChooseEnding()) на&nbsp;ваш комментарий
+				<span title="@notification.ParentComment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__cite">@CollapseIfNeed(collapse, Html, notification.ParentComment.Text, 50)</span>
+			</div>
+			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100)</div>
+			<div class="notifications__notification__footer">к&nbsp;слайду @SlideLink(Url, course, slide)</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(LikedYourCommentNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	var slide = course.GetSlideById(notification.Comment.SlideId);
+	<div class="notifications__liked-your-comment-notification media" data-href="@GetSlideUrl(Url, course, slide)#comment-@notification.Comment.Id">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.LikedUser)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">@UserName(notification.LikedUser) лайкнул@(notification.LikedUser.Gender.ChooseEnding()) ваш комментарий</div>
+			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100)</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(PassedManualExerciseCheckingNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	var slide = (ExerciseSlide)course.GetSlideById(notification.Checking.SlideId);
+	<div class="notifications__passed-manual-execise-checking-notification media" data-href="@GetSlideUrl(Url, course, slide)">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.InitiatedBy)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) проверил@(notification.InitiatedBy.Gender.ChooseEnding()) ваше решение<br />по&nbsp;«@slide.Title»</div>
+			<div class="notifications__notification__score">@notification.Checking.Score из @slide.Exercise.MaxReviewScore.PluralizeInRussian(RussianPluralizationOptions.Score)</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(PassedManualQuizCheckingNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	var slide = (QuizSlide)course.GetSlideById(notification.Checking.SlideId);
+	<div class="notifications__passed-manual-quiz-checking-notification media" data-href="@GetSlideUrl(Url, course, slide)">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.InitiatedBy)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) проверил@(notification.InitiatedBy.Gender.ChooseEnding()) ваш тест<br />«@slide.Title»</div>
+			<div class="notifications__notification__score">@notification.Checking.Score из @slide.MaxScore.PluralizeInRussian(RussianPluralizationOptions.ScoreDative)</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(ReceivedCertificateNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	<div class="notifications__received-certificate-notification media" data-href="@Url.RouteUrl("Certificate", new { certificateId = notification.CertificateId })">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.InitiatedBy)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">Поздравляем! Вы получили сертификат по&nbsp;курсу «@course.Title»</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(ReceivedAdditionalScoreNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	var unit = course.GetUnitById(notification.Score.UnitId);
+	var scoringGroup = unit.Scoring.Groups[notification.Score.ScoringGroupId];
+	<div class="notifications__received-additional-score-notification without-link media">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.InitiatedBy)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) поставил@(notification.InitiatedBy.Gender.ChooseEnding()) вам баллы <i>@scoringGroup.Name</i> в&nbsp;модуле «@unit.Title»</div>
+			<div class="notifications__notification__score">@notification.Score.Score из @scoringGroup.MaxAdditionalScore.PluralizeInRussian(RussianPluralizationOptions.ScoreDative)</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(JoinedToYourGroupNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	<div class="notifications__joined-to-your-group-notification media" data-href="@Url.Action("Groups", "Admin", new { courseId = notification.CourseId })">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.JoinedUser)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">@UserName(notification.JoinedUser) присоедини@(notification.InitiatedBy.Gender.ChooseEnding("лся", "лась")) к&nbsp;вашей группе <b>@notification.Group.Name</b></div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(AddedInstructorNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	<div class="notifications__added-instructor-notification media" data-href="@Url.Action("Users", "Admin", new { courseId = notification.CourseId })">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.AddedUser)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">@UserName(notification.AddedUser) стал@(notification.InitiatedBy.Gender.ChooseEnding()) преподавателем курса «@course.Title»</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(CreatedGroupNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	<div class="notifications__created-group-notification media" data-href="@Url.Action("Groups", "Admin", new { courseId = notification.CourseId })">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.InitiatedBy)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) создал@(notification.InitiatedBy.Gender.ChooseEnding()) группу «@notification.Group.Name» в&nbsp;курсе «@course.Title»</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(UploadedPackageNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	<div class="notifications__uploaded-package-notification media" data-href="@Url.Action("Packages", "Admin", new { courseId = notification.CourseId })">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.InitiatedBy)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) загрузил@(notification.InitiatedBy.Gender.ChooseEnding()) новую версию курса «@course.Title»</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(PublishedPackageNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	<div class="notifications__published-package-notification media" data-href="@Url.Action("Packages", "Admin", new { courseId = notification.CourseId })">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.InitiatedBy)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) опубликовал@(notification.InitiatedBy.Gender.ChooseEnding()) новую версию курса «@course.Title»</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
