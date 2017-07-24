@@ -51,7 +51,7 @@ namespace uLearn
 		{
 			var correctSolution = ex.ExerciseFolder.GetFiles()
 				.Select(f => f.Name)
-				.SingleOrDefault(n => n.Equals(ex.CorrectSolutionFileName));
+				.SingleOrDefault(n => n.Equals(ex.CorrectSolutionFileName, StringComparison.InvariantCultureIgnoreCase));
 			if (correctSolution != null)
 				excludedPaths.Add(correctSolution);
 
@@ -69,7 +69,7 @@ namespace uLearn
 
 		public static void SetFilenameItemType(Project proj, string fileName, string type)
 		{
-			proj.Items.Single(i => i.UnevaluatedInclude.Equals(fileName)).ItemType = type;
+			proj.Items.Single(i => i.UnevaluatedInclude.Equals(fileName, StringComparison.InvariantCultureIgnoreCase)).ItemType = type;
 		}
 
 		private static IEnumerable<string> FindItemNames(Project proj, Func<string, bool> predicate)

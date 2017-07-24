@@ -74,7 +74,7 @@ namespace uLearn
 		}
 
 		private bool ExerciseDirectoryContainsSolutionFile()
-			=> ex.ExerciseFolder.GetFiles().Any(f => f.Name.Equals(ex.CorrectSolutionFileName));
+			=> ex.ExerciseFolder.GetFiles().Any(f => f.Name.Equals(ex.CorrectSolutionFileName, StringComparison.InvariantCultureIgnoreCase));
 
 		private void ReportErrorIfSolutionNotBuildingOrNotPassesTests()
 		{
@@ -190,9 +190,9 @@ namespace uLearn
 			var csproj = unpackedZipDir.GetFiles(ex.CsprojFileName).Single();
 
 			var userCode = new Project(csproj.FullName, null, null, new ProjectCollection()).Items
-				.Single(i => i.UnevaluatedInclude.Equals(ex.UserCodeFileName));
+				.Single(i => i.UnevaluatedInclude.Equals(ex.UserCodeFileName, StringComparison.InvariantCultureIgnoreCase));
 
-			if (!userCode.ItemType.Equals("Compile"))
+			if (!userCode.ItemType.Equals("Compile", StringComparison.InvariantCultureIgnoreCase))
 				ReportSlideError(slide, $"Student's csproj has user code item ({userCode.UnevaluatedInclude}) of not compile type");
 		}
 

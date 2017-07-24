@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace uLearn.CSharp
 {
-	public class NotEmptyCodeValidator : BaseStyleValidator
+	public class NotEmptyCodeValidator : BaseStyleValidator, IStrictValidator
 	{
 		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
 		{

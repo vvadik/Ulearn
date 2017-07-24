@@ -83,7 +83,7 @@ namespace uLearn.Model.Blocks
 
 		public FileInfo StudentsZip => SlideFolderPath.GetFile(ExerciseDirName + ".exercise.zip");
 
-		public bool IsCorrectSolution(string name) => name.Equals(CorrectSolutionFileName);
+		public bool IsCorrectSolution(string name) => name.Equals(CorrectSolutionFileName, StringComparison.InvariantCultureIgnoreCase);
 
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{

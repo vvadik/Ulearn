@@ -171,7 +171,7 @@ namespace uLearn.CSharp
 		{
 			var csproj = new Project(projectFile, null, null, new ProjectCollection());
 			return csproj.Items
-				.Where(i => i.ItemType.Equals("Compile"))
+				.Where(i => i.ItemType.Equals("Compile", StringComparison.InvariantCultureIgnoreCase))
 				.ToList();
 		}
 	}
