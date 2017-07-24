@@ -227,9 +227,9 @@ namespace uLearn
 
 	public class ScoringGroup
 	{
-		public const bool DefaultCanBeSetByInstructor = false;
-		public const int DefaultMaxAdditionalScore = 10;
-		public const bool DefaultEnabledForEveryone = false;
+		private const bool DefaultCanBeSetByInstructor = false;
+		private const int DefaultMaxAdditionalScore = 10;
+		private const bool DefaultEnabledForEveryone = false;
 
 		[XmlAttribute("id")]
 		public string Id { get; set; }
@@ -249,10 +249,9 @@ namespace uLearn
 				if (string.IsNullOrEmpty(_canBeSetByInstructor) || _canBeSetByInstructor.Trim().Length == 0)
 					return DefaultCanBeSetByInstructor;
 
-				bool value;
-				return bool.TryParse(_canBeSetByInstructor, out value) ? value : DefaultCanBeSetByInstructor;
+				return bool.TryParse(_canBeSetByInstructor, out bool value) ? value : DefaultCanBeSetByInstructor;
 			}
-			set { _canBeSetByInstructor = value.ToString();  }
+			set => _canBeSetByInstructor = value.ToString();
 		}
 
 		[XmlIgnore]
@@ -271,7 +270,7 @@ namespace uLearn
 				int result;
 				return int.TryParse(_maxAdditionalScore, out result) ? result : DefaultMaxAdditionalScore;
 			}
-			set { _maxAdditionalScore = value.ToString(); }
+			set => _maxAdditionalScore = value.ToString();
 		}
 
 		[XmlIgnore]
@@ -292,10 +291,9 @@ namespace uLearn
 				if (string.IsNullOrEmpty(_enabledForEveryone) || _enabledForEveryone.Trim().Length == 0)
 					return DefaultEnabledForEveryone;
 
-				bool value;
-				return bool.TryParse(_enabledForEveryone, out value) ? value : DefaultEnabledForEveryone;
+				return bool.TryParse(_enabledForEveryone, out bool value) ? value : DefaultEnabledForEveryone;
 			}
-			set { _enabledForEveryone = value.ToString(); }
+			set => _enabledForEveryone = value.ToString();
 		}
 
 		[XmlIgnore]

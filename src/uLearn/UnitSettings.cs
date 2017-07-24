@@ -50,15 +50,7 @@ namespace uLearn
 				var unitScoringGroup = unitSettings.Scoring.Groups[scoringGroup.Id];
 				var courseScoringGroup = courseSettings.Scoring.Groups[scoringGroup.Id];
 				unitScoringGroup.CopySettingsFrom(courseScoringGroup);
-
-				if (scoringGroup.IsMaxAdditionalScoreSpecified &&
-					(!scoringGroup.IsCanBeSetByInstructorSpecified || !scoringGroup.CanBeSetByInstructor))
-					throw new CourseLoadingException(
-						$"Модуль «{unitSettings.Title}»: чтобы выставлять дополнительные баллы в группу {scoringGroup.Id}, установите у неё атрибут set_by_instructor=\"true\" " +
-						$"в настройках модуля (файл {file.Directory?.Name}/Unit.xml) или курса (файл Course.xml). " +
-						$"В противном случае атрибут max_additional_score=\"{scoringGroup.MaxAdditionalScore}\" не действует"
-						);
-
+				
 				if (scoringGroup.IsEnabledForEveryoneSpecified)
 					throw new CourseLoadingException(
 						$"В настройках модуля «{unitSettings.Title}» для группы баллов {scoringGroup.Id} указана опция enable_for_everyone=\"{scoringGroup._enabledForEveryone}\" (файл {file.Directory?.Name}/Unit.xml). " +

@@ -107,7 +107,7 @@ namespace uLearn.Web.Controllers
 			if (notificationTransport != null)
 				notifications = feedRepo.GetFeedNotificationDeliveries(userId, commonFeedNotificationTransport, notificationTransport).Select(d => d.Notification).ToList();
 
-			notifications = RemoveBlockedNotifications(notifications);
+			notifications = RemoveBlockedNotifications(notifications).ToList();
 
 			var lastViewTimestamp = feedRepo.GetFeedViewTimestamp(userId);
 			await feedRepo.UpdateFeedViewTimestamp(userId, DateTime.Now);
@@ -120,9 +120,16 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		private List<Notification> RemoveBlockedNotifications(IEnumerable<Notification> notifications)
+		private IEnumerable<Notification> RemoveBlockedNotifications(IReadOnlyCollection<Notification> notifications)
 		{
-			return notifications.Where(notification => !notification.GetBlockerNotifications(db).Any()).ToList();
+			var notificationsIds = notifications.Select(n => n.Id).ToList();
+			foreach (var notification in notifications)
+			{
+				var blockers = notification.GetBlockerNotifications(db);
+				if (blockers.Select(b => b.Id).Intersect(notificationsIds).Any())
+					break;
+				yield return notification;
+			}
 		}
 
 		[DataContract]
