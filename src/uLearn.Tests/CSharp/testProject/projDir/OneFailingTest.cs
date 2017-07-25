@@ -3,6 +3,7 @@
 namespace test
 {
 	[TestFixture]
+	[Explicit]
 	public class OneFailingTest
 	{
 		[Test]
