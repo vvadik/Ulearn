@@ -153,7 +153,16 @@ namespace uLearn.Model.Blocks
 				.Concat(new[] { "bin/*", "obj/*" })
 				.ToList();
 
-			return ExerciseFolder.ToZip(excluded, GetAdditionalFiles(code, ExerciseFolder, excluded));
+			var fileContents = GetAdditionalFiles(code, ExerciseFolder, excluded)
+				.ToList(); // важно, см ниже. 
+			/* 
+			Модификации csproj внутри GetAdditionalFiles происходит разрешение ссылок и копирование файлов.
+			нужно, чтобы они скопировались до вызова ToZip иначе не попадут в zip. Довольно криво, но этот ToList самый 
+			простой способ исправить баг, не пускаясь в большой рефакторинг. 
+			При оказии, нужно как-то переработать это.
+			*/
+
+			return ExerciseFolder.ToZip(excluded, fileContents);
 		}
 
 		private IEnumerable<FileContent> GetAdditionalFiles(string code, DirectoryInfo exerciseDir, List<string> excluded)
