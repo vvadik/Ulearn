@@ -39,7 +39,7 @@ namespace uLearn
 
 			ReportErrorIfStudentsZipHasErrors();
 
-			if (ex.DisableUserCodeFileValidations)
+			if (!ex.StudentZipIsBuildable)
 				return;
 
 			ReportErrorIfInitialCodeIsSolutionOrVerdictNotOk();
@@ -149,7 +149,7 @@ namespace uLearn
 				ReportErrorIfCsprojHasUserCodeOfNotCompileType(tempExFolder);
 				ReportErrorIfCsprojHasWrongAnswerOrSolutionItems(tempExFolder);
 
-				if (ex.DisableUserCodeFileValidations)
+				if (!ex.StudentZipIsBuildable)
 					return;
 
 				var buildResult = MsBuildRunner.BuildProject(settings.MsBuildSettings, ex.CsprojFile.Name, tempExFolder);
