@@ -22,7 +22,7 @@ namespace uLearn
 
 	public static class ProjModifier
 	{
-		public static void PrepareForStudentZip(Project proj, ProjectExerciseBlock ex)
+		internal static void PrepareForStudentZip(Project proj, ProjectExerciseBlock ex)
 		{
 			var toExclude = FindItemNames(proj, ProjectExerciseBlock.IsAnyWrongAnswerOrAnySolution).ToList();
 			var solutionsOfOtherTasks = toExclude.Where(n => ProjectExerciseBlock.IsAnySolution(n) && !ex.IsCorrectSolution(n)).ToList();
@@ -43,7 +43,7 @@ namespace uLearn
 		private static bool IsChecking(ProjectItem item)
 		{
 			return
-				item.EvaluatedInclude.StartsWith("checking" + Path.DirectorySeparatorChar) 
+				item.EvaluatedInclude.StartsWith("checking" + Path.DirectorySeparatorChar)
 				|| item.DirectMetadata.Any(md => md.Name == "Link" && md.EvaluatedValue.StartsWith("checking" + Path.DirectorySeparatorChar));
 		}
 
@@ -108,9 +108,9 @@ namespace uLearn
 		public static List<FileToCopy> ReplaceLinksWithItemsCopiedToProjectDir(Project project)
 		{
 			var linkedItems = (from item in project.Items
-							   let meta = item.DirectMetadata.FirstOrDefault(md => md.Name == "Link")
-							   where meta != null
-							   select new { item, newPath = ChangeNameToGitIgnored(meta.EvaluatedValue) }).ToList();
+				let meta = item.DirectMetadata.FirstOrDefault(md => md.Name == "Link")
+				where meta != null
+				select new { item, newPath = ChangeNameToGitIgnored(meta.EvaluatedValue) }).ToList();
 			var copies = new List<FileToCopy>();
 			foreach (var link in linkedItems)
 			{

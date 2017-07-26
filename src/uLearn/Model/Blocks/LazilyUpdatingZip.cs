@@ -13,15 +13,15 @@ namespace uLearn.Model.Blocks
 	{
 		private readonly DirectoryInfo dir;
 		private readonly string[] excludedDirs;
-	    private readonly string excludedFilesNamePattern;
+		private readonly string excludedFilesNamePattern;
 		private readonly Func<FileInfo, byte[]> getFileContent;
 		private readonly FileInfo zipFile;
 
-	    public LazilyUpdatingZip(
-			DirectoryInfo dir, 
-			string[] excludedDirs, 
-			string excludedFilesNamePattern, 
-			Func<FileInfo, byte[]> getFileContent, 
+		public LazilyUpdatingZip(
+			DirectoryInfo dir,
+			string[] excludedDirs,
+			string excludedFilesNamePattern,
+			Func<FileInfo, byte[]> getFileContent,
 			FileInfo zipFile)
 		{
 			this.dir = dir;
@@ -45,7 +45,6 @@ namespace uLearn.Model.Blocks
 						zip.AddFile(f.FullName, Path.GetDirectoryName(f.GetRelativePath(dir.FullName)));
 					else
 						zip.AddEntry(f.GetRelativePath(dir.FullName), newContent);
-
 				}
 				zip.Save(zipFile.FullName);
 			}

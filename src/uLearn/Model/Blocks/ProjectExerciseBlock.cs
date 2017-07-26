@@ -114,7 +114,13 @@ namespace uLearn.Model.Blocks
 				new[] { "checking", "bin", "obj" },
 				AnyWrongAnswerAndSolutionNameRegex,
 				ReplaceCsproj, StudentsZip);
+			ResolveCsprojLinks();
 			zip.UpdateZip();
+		}
+
+		private void ResolveCsprojLinks()
+		{
+			ProjModifier.ModifyCsproj(ExerciseFolder.GetFile(CsprojFileName), ProjModifier.ResolveLinks);
 		}
 
 		private byte[] ReplaceCsproj(FileInfo file)
@@ -152,7 +158,7 @@ namespace uLearn.Model.Blocks
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(new[] { "bin/*", "obj/*" })
 				.ToList();
-
+			ResolveCsprojLinks();
 			return ExerciseFolder.ToZip(excluded, GetAdditionalFiles(code, ExerciseFolder, excluded));
 		}
 

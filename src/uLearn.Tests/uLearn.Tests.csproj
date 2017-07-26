@@ -222,7 +222,7 @@
     <Content Include="CSharp\testProject\projDir\AnotherTask.WrongAnswer.88.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Compile Include="CSharp\Helper.cs" />
+    <Compile Include="CSharp\ValidatorTestsHelper.cs" />
     <Compile Include="CSharp\testProject\projDir\AnotherTask.Solution.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
