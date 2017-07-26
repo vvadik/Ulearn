@@ -114,7 +114,13 @@ namespace uLearn.Model.Blocks
 				new[] { "checking", "bin", "obj" },
 				AnyWrongAnswerAndSolutionNameRegex,
 				ReplaceCsproj, StudentsZip);
+			ResolveCsprojLinks();
 			zip.UpdateZip();
+		}
+
+		private void ResolveCsprojLinks()
+		{
+			ProjModifier.ModifyCsproj(ExerciseFolder.GetFile(CsprojFileName), ProjModifier.ResolveLinks);
 		}
 
 		private byte[] ReplaceCsproj(FileInfo file)
@@ -152,17 +158,8 @@ namespace uLearn.Model.Blocks
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(new[] { "bin/*", "obj/*" })
 				.ToList();
-
-			var fileContents = GetAdditionalFiles(code, ExerciseFolder, excluded)
-				.ToList(); // важно, см ниже. 
-			/* 
-			Модификации csproj внутри GetAdditionalFiles происходит разрешение ссылок и копирование файлов.
-			нужно, чтобы они скопировались до вызова ToZip иначе не попадут в zip. Довольно криво, но этот ToList самый 
-			простой способ исправить баг, не пускаясь в большой рефакторинг. 
-			При оказии, нужно как-то переработать это.
-			*/
-
-			return ExerciseFolder.ToZip(excluded, fileContents);
+			ResolveCsprojLinks();
+			return ExerciseFolder.ToZip(excluded, GetAdditionalFiles(code, ExerciseFolder, excluded));
 		}
 
 		private IEnumerable<FileContent> GetAdditionalFiles(string code, DirectoryInfo exerciseDir, List<string> excluded)

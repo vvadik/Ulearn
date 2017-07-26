@@ -59,7 +59,7 @@ namespace uLearn
 				.Select(path => new FileInfo(path).GetRelativePath(ex.ExerciseFolder.FullName))
 				.ToList();
 
-			return ReportErrorIfMissingCsproj() || ReportErrorIfMissingUserCodeFile();
+			return ReportErrorIfMissingCsproj() | ReportErrorIfMissingUserCodeFile(); // так можно сделать?
 
 			bool ReportErrorIfMissingUserCodeFile() => ReportErrorIfMissingFile(ex.UserCodeFileName);
 			bool ReportErrorIfMissingCsproj() => ReportErrorIfMissingFile(ex.CsprojFileName);

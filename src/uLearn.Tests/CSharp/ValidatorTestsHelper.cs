@@ -11,7 +11,7 @@ using uLearn.Model.Blocks;
 
 namespace uLearn.CSharp
 {
-	public static class Helper
+	public static class ValidatorTestsHelper
 	{
 		public static readonly string ProjSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "CSharp", "TestProject");
 		public static readonly DirectoryInfo ProjSlideFolder = new DirectoryInfo(ProjSlideFolderPath);
@@ -73,6 +73,14 @@ namespace uLearn.CSharp
 			var unit = new Unit(new UnitSettings { Title = "UnitTitle" }, null);
 			var slideInfo = new SlideInfo(unit, null, 0);
 			return new ExerciseSlide(new List<SlideBlock> { ex }, slideInfo, "SlideTitle", Guid.Empty);
+		}
+
+		public static string ValidateBlock(ProjectExerciseBlock exBlock)
+		{
+			var valOut = new StringBuilder();
+			var val = BuildProjectExerciseValidator(exBlock, valOut);
+			val.ValidateExercises();
+			return valOut.ToString();
 		}
 	}
 }

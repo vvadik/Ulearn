@@ -1,9 +1,12 @@
-﻿using System.IO;
-using System.Text;
+﻿using System;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
 using FluentAssertions;
+using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
+using uLearn.Model;
 using uLearn.Model.Blocks;
-using FileSystem = Microsoft.VisualBasic.FileIO.FileSystem;
 
 namespace uLearn.CSharp
 {
@@ -11,71 +14,56 @@ namespace uLearn.CSharp
 	public class CourseValidator_ReportWarning_should
 	{
 		private static string tempSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "ReportWarningTests_Temp_SlideFolder");
+		private static DirectoryInfo tempSlideFolder = new DirectoryInfo(tempSlideFolderPath);
 
 		private static ProjectExerciseBlock exBlock = new ProjectExerciseBlock
-			{
-				StartupObject = "test.Program",
-				UserCodeFileName = Helper.UserCodeFileName,
-				SlideFolderPath = new DirectoryInfo(tempSlideFolderPath),
-				CsProjFilePath = Helper.CsProjFilePath
-			};
+		{
+			StartupObject = "test.Program",
+			UserCodeFileName = ValidatorTestsHelper.UserCodeFileName,
+			SlideFolderPath = tempSlideFolder,
+			CsProjFilePath = ValidatorTestsHelper.CsProjFilePath
+		};
+
+		[OneTimeSetUp]
+		public void OneTimeSetUp()
+		{
+			ValidatorTestsHelper.RecreateDirectory(tempSlideFolderPath);
+			FileSystem.CopyDirectory(ValidatorTestsHelper.ProjSlideFolderPath, tempSlideFolderPath);
+
+			var ctx = new BuildUpContext(exBlock.SlideFolderPath, CourseSettings.DefaultSettings, null, String.Empty);
+			exBlock.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
+		}
 
 		[SetUp]
 		public void SetUp()
 		{
-			Helper.RecreateDirectory(tempSlideFolderPath);
-			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
+			FileSystem.CopyDirectory(ValidatorTestsHelper.ProjSlideFolderPath, tempSlideFolderPath, true);
 		}
 
 		[Test]
 		public void ReportWarning_If_ExerciseFolder_DoesntContain_SolutionFile()
 		{
-			var valOut = new StringBuilder();
-			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
 			FileSystem.DeleteFile(exBlock.SolutionFile.FullName);
 
-			val.ValidateExercises();
+			var validatorOut = ValidatorTestsHelper.ValidateBlock(exBlock);
 
-			valOut.ToString()
+			validatorOut
 				.Should().Contain($"Exercise directory doesn't contain {exBlock.CorrectSolutionFileName}");
 		}
 
 		[Test]
-		public void ReportWarning_If_WrongAnswer_Verdict_IsCompilationError()
+		public void ReportWarning_If_WrongAnswers_Have_Errors()
 		{
-			var valOut = new StringBuilder();
-			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
+			var validatorOut = ValidatorTestsHelper.ValidateBlock(exBlock);
 
-			val.ValidateExercises();
-
-			valOut.ToString()
+			validatorOut
 				.Should()
 				.Contain($"Code verdict of file with wrong answer ({exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.Type.cs) is not OK.")
 				.And
 				.Contain("Verdict: CompilationError");
-		}
-
-		[Test]
-		public void ReportWarning_If_WrongAnswer_IsSolution()
-		{
-			var valOut = new StringBuilder();
-			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
-
-			val.ValidateExercises();
-
-			valOut.ToString()
+			validatorOut
 				.Should().Contain($"Code of file with wrong answer ({exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.21.plus.21.cs) is solution!");
-		}
-
-		[Test]
-		public void Not_ReportWarning_If_WrongAnswer_IsWrongAnswer()
-		{
-			var valOut = new StringBuilder();
-			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
-
-			val.ValidateExercises();
-
-			valOut.ToString()
+			validatorOut
 				.Should().NotContain($"{exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.27.cs");
 		}
 	}
