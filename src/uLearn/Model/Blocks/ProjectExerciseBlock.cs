@@ -55,8 +55,8 @@ namespace uLearn.Model.Blocks
 		[XmlElement("exclude-path-for-student")]
 		public string[] PathsToExcludeForStudent { get; set; }
 
-		[XmlElement("disable-user-code-file-validations")]
-		public bool DisableUserCodeFileValidations { get; set; }
+		[XmlElement("student-zip-is-buildable")]
+		public bool StudentZipIsBuildable { get; set; } = true;
 
 		public string ExerciseDirName => Path.GetDirectoryName(CsProjFilePath).EnsureNotNull("csproj должен быть в поддиректории");
 
@@ -110,10 +110,10 @@ namespace uLearn.Model.Blocks
 		private void CreateZipForStudent()
 		{
 			var zip = new LazilyUpdatingZip(
-				ExerciseFolder, 
+				ExerciseFolder,
 				new[] { "checking", "bin", "obj" },
-				AnyWrongAnswerAndSolutionNameRegex, 
-                ReplaceCsproj, StudentsZip);
+				AnyWrongAnswerAndSolutionNameRegex,
+				ReplaceCsproj, StudentsZip);
 			zip.UpdateZip();
 		}
 
@@ -149,9 +149,9 @@ namespace uLearn.Model.Blocks
 
 		public byte[] GetZipBytesForChecker(string code)
 		{
-		    var excluded = (PathsToExcludeForChecker ?? new string[0])
-                .Concat(new[] { "bin/*", "obj/*" })
-                .ToList();
+			var excluded = (PathsToExcludeForChecker ?? new string[0])
+				.Concat(new[] { "bin/*", "obj/*" })
+				.ToList();
 
 			return ExerciseFolder.ToZip(excluded, GetAdditionalFiles(code, ExerciseFolder, excluded));
 		}
@@ -177,7 +177,7 @@ namespace uLearn.Model.Blocks
 
 		private static string GetNUnitTestRunnerFilename()
 		{
-			return nameof(NUnitTestRunner)+".cs";
+			return nameof(NUnitTestRunner) + ".cs";
 		}
 
 		private Action<Project> ModifyCsproj(List<string> excluded, bool addNUnitLauncher)

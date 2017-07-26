@@ -168,11 +168,11 @@
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="disable-user-code-file-validations" type="xs:boolean" minOccurs="0" maxOccurs="1">
+					<xs:element name="student-zip-is-buildable" type="xs:boolean" minOccurs="0" maxOccurs="1">
 						<xs:annotation>
 							<xs:documentation>
-								Флаг для проектов, которые не должны компилироваться у пользователя сразу после распаковки из Task.exercise.zip.
-								А также для задач на рефакторинг, которые изначально проходят все тесты.
+								Должен ли по задумке автора zip с проектом для студента успешно собираться без изменений? По умолчанию true.
+								Если false то валидатор не выдает ошибку, на несобирающийся проект из zip-а для студентов.
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
