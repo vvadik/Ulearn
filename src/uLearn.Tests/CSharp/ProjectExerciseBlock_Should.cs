@@ -22,53 +22,41 @@ namespace uLearn.CSharp
         private ProjectExerciseBlock ex;
         private List<SlideBlock> exBlocks;
 
-        private DirectoryInfo studentExerciseFolder => new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "ProjectExerciseBlockTests_Student_ExerciseFolder"));
-        private DirectoryInfo checkerExerciseFolder => new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "ProjectExerciseBlockTests_Checker_ExerciseFolder"));
-        private string studentCsProjFilePath => Path.Combine(studentExerciseFolder.FullName, Helper.CsProjFilename);
-        private string checkerCsprojFilePath => Path.Combine(checkerExerciseFolder.FullName, Helper.CsProjFilename);
+        private string tempSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, nameof(ProjectExerciseBlock_Should));
+        private DirectoryInfo tempSlideFolder => new DirectoryInfo(tempSlideFolderPath);
+
+        private string studentExerciseFolderPath => Path.Combine(tempSlideFolderPath, "ProjectExerciseBlockTests_Student_ExerciseFolder");
+        private DirectoryInfo studentExerciseFolder => new DirectoryInfo(studentExerciseFolderPath);
+
+        private string checkerExerciseFolderPath => Path.Combine(tempSlideFolderPath, "ProjectExerciseBlockTests_Checker_ExerciseFolder");
+
+		private string studentCsProjFilePath => Path.Combine(studentExerciseFolderPath, Helper.CsProjFilename);
+        private string checkerCsprojFilePath => Path.Combine(checkerExerciseFolderPath, Helper.CsProjFilename);
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            ReCreateFolder(studentExerciseFolder);
-            ReCreateFolder(checkerExerciseFolder);
+            Helper.RecreateDirectory(tempSlideFolderPath);
+			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
+
+	        Helper.RecreateDirectory(checkerExerciseFolderPath);
+	        Helper.RecreateDirectory(studentExerciseFolderPath);
 
             ex = new ProjectExerciseBlock
             {
 				StartupObject = "test.Program",
                 UserCodeFileName = Helper.UserCodeFileName,
-                SlideFolderPath = Helper.ProjSlideFolder,
+                SlideFolderPath = tempSlideFolder,
                 CsProjFilePath = Helper.CsProjFilePath
             };
 
-            CreateStudentZip_AndUnpackResult();
-			CreateCheckerZip_AndUnpackResult();
-        }
+	        var ctx = new BuildUpContext(ex.SlideFolderPath, CourseSettings.DefaultSettings, null, String.Empty);
+	        exBlocks = ex.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
+	        Utils.UnpackZip(ex.StudentsZip.Content(), studentExerciseFolderPath);
 
-        private void CreateStudentZip_AndUnpackResult()
-        {
-			if (File.Exists(ex.StudentsZip.FullName))
-				File.Delete(ex.StudentsZip.FullName);
-
-            var ctx = new BuildUpContext(ex.SlideFolderPath, CourseSettings.DefaultSettings, null, String.Empty);
-            exBlocks = ex.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
-
-            Utils.UnpackZip(ex.StudentsZip.Content(), studentExerciseFolder.FullName);
-        }
-
-		private void CreateCheckerZip_AndUnpackResult()
-        {
-            var zipBytes = ex.GetZipBytesForChecker("i_am_user_code");
-
-            Utils.UnpackZip(zipBytes, checkerExerciseFolder.FullName);
-        }
-
-        private void ReCreateFolder(DirectoryInfo dir)
-        {
-            if (FileSystem.DirectoryExists(dir.FullName))
-                FileSystem.DeleteDirectory(dir.FullName, DeleteDirectoryOption.DeleteAllContents);
-            FileSystem.CreateDirectory(dir.FullName);
-        }
+	        var zipBytes = ex.GetZipBytesForChecker("i_am_user_code");
+	        Utils.UnpackZip(zipBytes, checkerExerciseFolderPath);
+		}
 
         [Test]
         public void FindSolutionFile_OnBuildUp()

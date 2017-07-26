@@ -1,10 +1,14 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
 using test;
+using uLearn.Model;
 using uLearn.Model.Blocks;
 
 namespace uLearn.CSharp
@@ -14,7 +18,6 @@ namespace uLearn.CSharp
 	{
 		private static string tempSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "ReportErrorTests_Temp_SlideFolder");
 		private static DirectoryInfo tempSlideFolder = new DirectoryInfo(tempSlideFolderPath);
-		private static FileInfo zipWithFullProj = new FileInfo(Path.Combine(tempSlideFolderPath, "ProjDir.exercise.zip"));
 
 		private static ProjectExerciseBlock exBlock = new ProjectExerciseBlock
 		{
@@ -24,54 +27,53 @@ namespace uLearn.CSharp
 			CsProjFilePath = Helper.CsProjFilePath,
 		};
 
-		[SetUp]
-		public void SetUp()
+		[OneTimeSetUp]
+		public void OneTimeSetUp()
 		{
 			Helper.RecreateDirectory(tempSlideFolderPath);
 			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath);
+
+			var ctx = new BuildUpContext(exBlock.SlideFolderPath, CourseSettings.DefaultSettings, null, String.Empty);
+			exBlock.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
+		}
+
+		[SetUp]
+		public void SetUp()
+		{
+			FileSystem.CopyDirectory(Helper.ProjSlideFolderPath, tempSlideFolderPath, true);
 		}
 
 		[Test]
-		public void ReportError_If_StudentZip_Has_WrongAnswers_Or_Solution_Files()
+		public void ReportError_If_StudentZip_HasErrors()
 		{
-			SaveTempZipFileWithFullProject();
-			var valOut = new StringBuilder();
-			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
+			try
+			{
+				FileSystem.RenameDirectory(tempSlideFolder.GetDirectories("projDir").Single().FullName, "FullProjDir");
+				exBlock.CsProjFilePath = Path.Combine("FullProjDir", Helper.CsProjFilename);
+				SaveTempZipFileWithFullProject();
 
-			val.ValidateExercises();
+				var valOut = new StringBuilder();
+				var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
 
-			valOut.ToString()
-				.Should().Contain($"Student zip exercise directory has 'wrong answer' and/or solution files ({Helper.OrderedWrongAnswersAndSolutionNames})");
-		}
+				val.ValidateExercises();
 
-		[Test]
-		public void ReportError_If_Student_Csproj_Has_UserCodeFile_Of_Not_CompileType()
-		{
-			SaveTempZipFileWithFullProject();
-			var valOut = new StringBuilder();
-			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
-
-			val.ValidateExercises();
-
-			valOut.ToString()
-				.Should().Contain($"Student's csproj has user code item ({exBlock.UserCodeFileName}) of not compile type");
-		}
-
-		[Test]
-		public void ReportError_If_Student_Csproj_Has_WrongAnswers_Or_Solution_Items()
-		{
-			SaveTempZipFileWithFullProject();
-			var valOut = new StringBuilder();
-			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
-
-			val.ValidateExercises();
-
-			valOut.ToString()
-				.Should().Contain($"Student's csproj has 'wrong answer' and/or solution items ({Helper.OrderedWrongAnswersAndSolutionNames})");
+				valOut.ToString()
+					.Should().Contain($"Student zip exercise directory has 'wrong answer' and/or solution files ({Helper.OrderedWrongAnswersAndSolutionNames})");
+				valOut.ToString()
+					.Should().Contain($"Student's csproj has user code item ({exBlock.UserCodeFileName}) of not compile type");
+				valOut.ToString()
+					.Should().Contain($"Student's csproj has 'wrong answer' and/or solution items ({Helper.OrderedWrongAnswersAndSolutionNames})");
+			}
+			finally
+			{
+				FileSystem.RenameDirectory(tempSlideFolder.GetDirectories("FullProjDir").Single().FullName, "projDir");
+				exBlock.CsProjFilePath = Helper.CsProjFilePath;
+			}
 		}
 
 		private void SaveTempZipFileWithFullProject()
 		{
+			var zipWithFullProj = new FileInfo(Path.Combine(tempSlideFolderPath, "FullProjDir.exercise.zip"));
 			var noExcludedFiles = new Regex("[^\\s\\S]").ToString();
 			var noExcludedDirs = new string[0];
 			new LazilyUpdatingZip(
@@ -87,33 +89,23 @@ namespace uLearn.CSharp
 		}
 
 		[Test]
-		public void ReportError_If_ExerciseFolder_Doesnt_Contain_CsProj()
+		public void ReportError_If_ExerciseFolder_HasErrors()
 		{
 			var valOut = new StringBuilder();
 			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
+			File.Delete(exBlock.UserCodeFile.FullName);
 			File.Delete(Path.Combine(tempSlideFolderPath, exBlock.CsProjFilePath));
 
 			val.ValidateExercises();
 
 			valOut.ToString()
 				.Should().Contain($"Exercise folder ({exBlock.ExerciseFolder.Name}) doesn't contain ({exBlock.CsprojFileName})");
-		}
-
-		[Test]
-		public void ReportError_If_ExerciseFolder_Doesnt_Contain_UserCodeFile()
-		{
-			var valOut = new StringBuilder();
-			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
-			File.Delete(exBlock.UserCodeFile.FullName);
-
-			val.ValidateExercises();
-
 			valOut.ToString()
 				.Should().Contain($"Exercise folder ({exBlock.ExerciseFolder.Name}) doesn't contain ({exBlock.UserCodeFileName})");
 		}
 
 		[Test]
-		public void ReportError_If_Solution_For_ProjectExerciseBlock_Not_Building()
+		public void ReportError_If_CorrectSolution_Has_Errors()
 		{
 			var valOut = new StringBuilder();
 			var val = Helper.BuildProjectExerciseValidator(exBlock, valOut);
