@@ -29,7 +29,7 @@ namespace uLearn
 					new ProjectExerciseValidator(this, settings, slide, exercise).ValidateExercises();
 				}
 				else
-					ReportErrorIfEthalonSolutionIsNotRight(slide);
+					ReportIfEthalonSolutionHasErrorsOrIssues(slide);
 			}
 		}
 
@@ -67,7 +67,7 @@ namespace uLearn
 						.Select(b => Tuple.Create(slide, b.VideoId)));
 		}
 
-		private void ReportErrorIfEthalonSolutionIsNotRight(ExerciseSlide slide)
+		private void ReportIfEthalonSolutionHasErrorsOrIssues(ExerciseSlide slide)
 		{
 			var exercise = (SingleFileExerciseBlock)slide.Exercise;
 			var solution = exercise.BuildSolution(exercise.EthalonSolution);
@@ -78,7 +78,7 @@ namespace uLearn
 			}
 			if (solution.HasStyleIssues)
 			{
-				Console.WriteLine("Style issue: " + solution.StyleMessage);
+				ReportWarning("Style issue: " + solution.StyleMessage);
 			}
 
 			var result = SandboxRunner.Run(exercise.CreateSubmission(
@@ -91,6 +91,7 @@ namespace uLearn
 			if (!isRightAnswer)
 			{
 				ReportSlideError(slide,
+					"Ethalon solution for does not provide right answer\n" +
 					"ActualOutput: " + output.NormalizeEoln() + "\n" +
 					"ExpectedOutput: " + slide.Exercise.ExpectedOutput.NormalizeEoln() + "\n" +
 					"CompilationError: " + result.CompilationOutput + "\n" +
