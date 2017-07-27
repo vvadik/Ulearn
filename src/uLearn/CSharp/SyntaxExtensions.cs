@@ -64,10 +64,15 @@ namespace uLearn.CSharp
 			return node.GetAttributes<TAttr>().Any();
 		}
 
-		public static string GetArgument(this AttributeSyntax attribute, int index)
+		public static object GetObjArgument(this AttributeSyntax attribute, int index)
 		{
 			var expr = (LiteralExpressionSyntax)attribute.ArgumentList.Arguments[index].Expression;
-			return (string)expr.Token.Value;
+			return expr.Token.Value;
+		}
+
+		public static string GetArgument(this AttributeSyntax attribute, int index)
+		{
+			return (string)attribute.GetObjArgument(index);
 		}
 
 		private static SyntaxList<AttributeListSyntax> AttributeLists(this MemberDeclarationSyntax node)

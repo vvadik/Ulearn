@@ -12,5 +12,11 @@ namespace uLearn
 	
 	public class ExcludeFromSolutionAttribute : Attribute
 	{
+		public bool IsSolutionPart { get; set; }
+
+		public ExcludeFromSolutionAttribute(bool isSolutionPart = true)
+		{
+			IsSolutionPart = isSolutionPart;
+		}
 	}
 }

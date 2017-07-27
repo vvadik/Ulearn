@@ -39,9 +39,6 @@ namespace uLearn
 
 			ReportErrorIfStudentsZipHasErrors();
 
-			if (!ex.StudentZipIsBuildable)
-				return;
-
 			ReportErrorIfInitialCodeIsSolutionOrVerdictNotOk();
 		}
 
@@ -123,7 +120,9 @@ namespace uLearn
 			var submission = ex.CreateSubmission(ex.CsprojFileName, initialCode);
 			var result = SandboxRunner.Run(submission);
 
-			ReportErrorIfInitialCodeVerdictIsNotOk(result);
+			if (ex.StudentZipIsBuildable)
+				ReportErrorIfInitialCodeVerdictIsNotOk(result);
+
 			ReportErrorIfInitialCodeIsSolution(result);
 		}
 

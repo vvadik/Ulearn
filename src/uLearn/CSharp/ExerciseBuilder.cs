@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -81,18 +82,22 @@ namespace uLearn.CSharp
 				tree.GetRoot()
 				.DescendantNodes()
 				.OfType<MethodDeclarationSyntax>()
-				.Any(m => m.HasAttribute<ExpectedOutputAttribute>());
+					.Any(m => m.HasAttribute<ExpectedOutputAttribute>());
 		}
+
 		private SyntaxNode VisitMemberDeclaration(MemberDeclarationSyntax node, SyntaxNode newNode)
 		{
 			var newMember = ((MemberDeclarationSyntax) newNode).WithoutAttributes();
-			var isSolutionPart = node.HasAttribute<ExcludeFromSolutionAttribute>() || node.HasAttribute<ExerciseAttribute>();
-			if (node.HasAttribute<ExcludeFromSolutionAttribute>() 
-				|| (node is TypeDeclarationSyntax && node.HasAttribute<ExerciseAttribute>()))
+			var excludeSolutionAttr = node.GetAttributes<ExcludeFromSolutionAttribute>().SingleOrDefault();
+
+			var isSolutionPart = excludeSolutionAttr != null || node.HasAttribute<ExerciseAttribute>();
+
+			if (node is TypeDeclarationSyntax && node.HasAttribute<ExerciseAttribute>()
+				|| excludeSolutionAttr != null && (excludeSolutionAttr.ArgumentList == null || (bool)excludeSolutionAttr.GetObjArgument(0)))
 				Exercise.EthalonSolution += newMember.ToFullString();
+
 			return isSolutionPart ? null : newMember;
 		}
-
 
 		public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
 		{
