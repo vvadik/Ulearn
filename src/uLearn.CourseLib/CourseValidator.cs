@@ -18,7 +18,7 @@ namespace uLearn
 			this.settings = settings;
 		}
 
-		public void ValidateExercises()
+		public void ValidateExercises() // todo логирование log4net в файл (ошибки отдельно) и на консоль
 		{
 			foreach (var slide in slides.OfType<ExerciseSlide>())
 			{

@@ -56,7 +56,7 @@ namespace uLearn
 				.Select(path => new FileInfo(path).GetRelativePath(ex.ExerciseFolder.FullName))
 				.ToList();
 
-			return ReportErrorIfMissingCsproj() | ReportErrorIfMissingUserCodeFile(); // так можно сделать?
+			return ReportErrorIfMissingCsproj() | ReportErrorIfMissingUserCodeFile();
 
 			bool ReportErrorIfMissingUserCodeFile() => ReportErrorIfMissingFile(ex.UserCodeFileName);
 			bool ReportErrorIfMissingCsproj() => ReportErrorIfMissingFile(ex.CsprojFileName);
@@ -79,9 +79,11 @@ namespace uLearn
 			var submission = ex.CreateSubmission(ex.CsprojFileName, solutionCode);
 			var result = SandboxRunner.Run(submission, new SandboxRunnerSettings());
 
+			if (VerdictIsNotOk(result))
+				ReportError($"Correct solution file {ex.CorrectSolutionFileName} verdict is not OK. RunResult = {result}");
+
 			if (!IsSolution(result))
-				ReportError($"Correct solution file {ex.CorrectSolutionFileName} has errors:" +
-							$"{Environment.NewLine}{result.CompilationOutput}{Environment.NewLine}{result.Output}");
+				ReportError($"Correct solution file {ex.CorrectSolutionFileName} is not solution. RunResult = {result}");
 		}
 
 		private void ReportWarningIfWrongAnswersAreSolutionsOrNotOk()

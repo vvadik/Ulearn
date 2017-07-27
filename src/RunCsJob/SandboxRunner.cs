@@ -376,8 +376,8 @@ namespace RunCsJob
 		private bool CheckIsTimeLimitExceeded(Process sandbox, DateTime startTime, TimeSpan startUsedTime)
 		{
 			return hasTimeLimit = hasTimeLimit
-				|| settings.TimeLimit.Add(startUsedTime).CompareTo(sandbox.TotalProcessorTime) < 0
-				|| startTime.Add(settings.IdleTimeLimit).CompareTo(DateTime.Now) < 0;
+								|| settings.TimeLimit.Add(startUsedTime).CompareTo(sandbox.TotalProcessorTime) < 0
+								|| startTime.Add(settings.IdleTimeLimit).CompareTo(DateTime.Now) < 0;
 		}
 
 		private static Exception ParseSerializedException(string stderr)
@@ -411,7 +411,7 @@ namespace RunCsJob
 			if (ex is TargetInvocationException)
 				return HandleTargetInvocationException((TargetInvocationException) ex);
 
-			return new RunningResults(Verdict.SandboxError, ex.ToString());
+			return new RunningResults(Verdict.SandboxError, output: ex.ToString());
 		}
 
 		private static RunningResults HandleTargetInvocationException(TargetInvocationException ex)
@@ -421,22 +421,22 @@ namespace RunCsJob
 
 		private static RunningResults HandleInnerException(SecurityException ex)
 		{
-			return new RunningResults(Verdict.SecurityException, ex.ToString());
+			return new RunningResults(Verdict.SecurityException, output: ex.ToString());
 		}
 
 		private static RunningResults HandleInnerException(MemberAccessException ex)
 		{
-			return new RunningResults(Verdict.SecurityException, ex.ToString());
+			return new RunningResults(Verdict.SecurityException, output: ex.ToString());
 		}
 
 		private static RunningResults HandleInnerException(TypeInitializationException ex)
 		{
-			return new RunningResults(Verdict.SecurityException, ex.ToString());
+			return new RunningResults(Verdict.SecurityException, output: ex.ToString());
 		}
 
 		private static RunningResults HandleInnerException(Exception ex)
 		{
-			return new RunningResults(Verdict.RuntimeError, ex.ToString());
+			return new RunningResults(Verdict.RuntimeError, output: ex.ToString());
 		}
 	}
 
