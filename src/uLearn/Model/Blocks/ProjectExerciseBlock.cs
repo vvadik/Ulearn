@@ -17,16 +17,16 @@ namespace uLearn.Model.Blocks
 	[XmlType("proj-exercise")]
 	public class ProjectExerciseBlock : ExerciseBlock
 	{
-		public static readonly string AnySolutionNameRegex = new Regex("(.+)\\.Solution\\.cs").ToString();
-		public static readonly string AnyWrongAnswerNameRegex = new Regex("(.+)\\.WrongAnswer\\.(.+)\\.cs").ToString();
-		public static readonly string AnyWrongAnswerAndSolutionNameRegex = new Regex($"{AnySolutionNameRegex}|{AnyWrongAnswerNameRegex}").ToString();
+		private static readonly string anySolutionNameRegex = new Regex("(.+)\\.Solution\\.cs").ToString();
+		private static readonly string anyWrongAnswerNameRegex = new Regex("(.+)\\.WrongAnswer\\.(.+)\\.cs").ToString();
 
-		public static bool IsAnyWrongAnswerOrAnySolution(string name) => Regex.IsMatch(name, AnyWrongAnswerAndSolutionNameRegex);
-		public static bool IsAnySolution(string name) => Regex.IsMatch(name, AnySolutionNameRegex);
-		public static string ParseUserCodeFilenameFromSolution(string name)
+		public static bool IsAnyWrongAnswerOrAnySolution(string name) => Regex.IsMatch(name, anyWrongAnswerNameRegex) || Regex.IsMatch(name, anySolutionNameRegex);
+		public static bool IsAnySolution(string name) => Regex.IsMatch(name, anySolutionNameRegex);
+
+		public static string SolutionFilenameToUserCodeFilename(string solutionFilename)
 		{
-			var nameWithoutExt = name.Split(new[] { ".Solution.cs" }, StringSplitOptions.RemoveEmptyEntries).First();
-			return $"{nameWithoutExt}.cs";
+			var userCodeFilenameWithoutExt = solutionFilename.Split(new[] { ".Solution.cs" }, StringSplitOptions.RemoveEmptyEntries).First();
+			return $"{userCodeFilenameWithoutExt}.cs";
 		}
 
 		public ProjectExerciseBlock()
@@ -43,8 +43,15 @@ namespace uLearn.Model.Blocks
 		[XmlElement("startup-object")]
 		public string StartupObject { get; set; }
 
+		[XmlElement("user-code-file-path")]
+		public string UserCodeFilePath { get; set; }
+
 		[XmlElement("user-code-file-name")]
-		public string UserCodeFileName { get; set; }
+		public string ObsoleteUserCodeFileName
+		{
+			get => null;
+			set => UserCodeFilePath = value;
+		}
 
 		[XmlElement("exclude-path-for-checker")]
 		public string[] PathsToExcludeForChecker { get; set; }
@@ -64,31 +71,35 @@ namespace uLearn.Model.Blocks
 
 		public FileInfo CsprojFile => ExerciseFolder.GetFile(CsprojFileName);
 
-		public FileInfo UserCodeFile => ExerciseFolder.GetFile(UserCodeFileName);
+		public FileInfo UserCodeFile => ExerciseFolder.GetFile(UserCodeFilePath);
 
-		public FileInfo SolutionFile => ExerciseFolder.GetFile(CorrectSolutionFileName);
+		public DirectoryInfo UserCodeFileParentDirectory => UserCodeFile.Directory;
+
+		public FileInfo CorrectSolutionFile => UserCodeFileParentDirectory.GetFile(CorrectSolutionFileName);
 
 		public DirectoryInfo ExerciseFolder => new DirectoryInfo(Path.Combine(SlideFolderPath.FullName, ExerciseDirName));
 
-		public string UserCodeFileNameWithoutExt => Path.GetFileNameWithoutExtension(UserCodeFileName);
-
-		public string WrongAnswersAndSolutionNameRegexPattern => UserCodeFileNameWithoutExt + new Regex("\\.(.+)\\.cs");
+		public string UserCodeFileNameWithoutExt => Path.GetFileNameWithoutExtension(UserCodeFilePath);
 
 		public string CorrectSolutionFileName => $"{UserCodeFileNameWithoutExt}.Solution.cs";
 
-		public FileInfo CorrectSolution => ExerciseFolder.GetFile(CorrectSolutionFileName);
+		public string CorrectSolutionPath => CorrectSolutionFile.GetRelativePath(ExerciseFolder.FullName);
+
+		private string WrongAnswersAndSolutionNameRegexPattern => UserCodeFileNameWithoutExt + new Regex("\\.(.+)\\.cs");
 
 		[XmlIgnore]
 		public DirectoryInfo SlideFolderPath { get; set; }
 
 		public FileInfo StudentsZip => SlideFolderPath.GetFile(ExerciseDirName + ".exercise.zip");
 
+		public bool IsWrongAnswer(string name) => Regex.IsMatch(name, WrongAnswersAndSolutionNameRegexPattern) && !IsCorrectSolution(name);
+
 		public bool IsCorrectSolution(string name) => name.Equals(CorrectSolutionFileName, StringComparison.InvariantCultureIgnoreCase);
 
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
 			FillProperties(context);
-			ExerciseInitialCode = ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFileName;
+			ExerciseInitialCode = ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFilePath;
 			ExpectedOutput = ExpectedOutput ?? "";
 			ValidatorName = string.Join(" ", LangId, ValidatorName);
 			SlideFolderPath = context.Dir;
@@ -100,10 +111,10 @@ namespace uLearn.Model.Blocks
 
 			yield return this;
 
-			if (SolutionFile.Exists)
+			if (CorrectSolutionFile.Exists)
 			{
 				yield return new MdBlock("### Решение") { Hide = true };
-				yield return new CodeBlock(SolutionFile.ContentAsUtf8(), LangId, LangVer) { Hide = true };
+				yield return new CodeBlock(CorrectSolutionFile.ContentAsUtf8(), LangId, LangVer) { Hide = true };
 			}
 		}
 
@@ -112,7 +123,7 @@ namespace uLearn.Model.Blocks
 			var zip = new LazilyUpdatingZip(
 				ExerciseFolder,
 				new[] { "checking", "bin", "obj" },
-				AnyWrongAnswerAndSolutionNameRegex,
+				IsAnyWrongAnswerOrAnySolution,
 				ReplaceCsproj, StudentsZip);
 			ResolveCsprojLinks();
 			zip.UpdateZip();
@@ -164,7 +175,7 @@ namespace uLearn.Model.Blocks
 
 		private IEnumerable<FileContent> GetAdditionalFiles(string code, DirectoryInfo exerciseDir, List<string> excluded)
 		{
-			yield return new FileContent { Path = UserCodeFileName, Data = Encoding.UTF8.GetBytes(code) };
+			yield return new FileContent { Path = UserCodeFilePath, Data = Encoding.UTF8.GetBytes(code) };
 
 			var useNUnitLauncher = NUnitTestClasses != null;
 			StartupObject = useNUnitLauncher ? typeof(NUnitTestRunner).FullName : StartupObject;

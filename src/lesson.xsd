@@ -153,7 +153,7 @@
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="user-code-file-name" type="notEmptyString">
+					<xs:element name="user-code-file-path" type="notEmptyString">
 						<xs:annotation>
 							<xs:documentation>
 								Путь относительно директории, в котором лежит csproj-file-path.

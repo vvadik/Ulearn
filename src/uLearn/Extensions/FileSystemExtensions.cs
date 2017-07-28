@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.VisualBasic.FileIO;
+using SearchOption = Microsoft.VisualBasic.FileIO.SearchOption;
 
 namespace uLearn.Extensions
 {
@@ -41,6 +44,13 @@ namespace uLearn.Extensions
 				folder += Path.DirectorySeparatorChar;
 			var folderUri = new Uri(folder);
 			return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
+		}
+
+		public static IEnumerable<string> GetRelativePathsOfFiles(this DirectoryInfo dir)
+		{
+			return FileSystem.GetFiles(dir.FullName, SearchOption.SearchAllSubDirectories)
+				.Select(path => new FileInfo(path))
+				.Select(fi => fi.GetRelativePath(dir.FullName));
 		}
 
 		public static string[] GetFilenames(this DirectoryInfo di, string dirPath)

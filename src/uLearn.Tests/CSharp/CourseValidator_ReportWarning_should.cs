@@ -19,16 +19,16 @@ namespace uLearn.CSharp
 		private static ProjectExerciseBlock exBlock = new ProjectExerciseBlock
 		{
 			StartupObject = "test.Program",
-			UserCodeFileName = ValidatorTestsHelper.UserCodeFileName,
+			UserCodeFilePath = TestsHelper.UserCodeFileName,
 			SlideFolderPath = tempSlideFolder,
-			CsProjFilePath = ValidatorTestsHelper.CsProjFilePath
+			CsProjFilePath = TestsHelper.CsProjFilePath
 		};
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
-			ValidatorTestsHelper.RecreateDirectory(tempSlideFolderPath);
-			FileSystem.CopyDirectory(ValidatorTestsHelper.ProjSlideFolderPath, tempSlideFolderPath);
+			TestsHelper.RecreateDirectory(tempSlideFolderPath);
+			FileSystem.CopyDirectory(TestsHelper.ProjSlideFolderPath, tempSlideFolderPath);
 
 			var ctx = new BuildUpContext(exBlock.SlideFolderPath, CourseSettings.DefaultSettings, null, String.Empty);
 			exBlock.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
@@ -37,15 +37,15 @@ namespace uLearn.CSharp
 		[SetUp]
 		public void SetUp()
 		{
-			FileSystem.CopyDirectory(ValidatorTestsHelper.ProjSlideFolderPath, tempSlideFolderPath, true);
+			FileSystem.CopyDirectory(TestsHelper.ProjSlideFolderPath, tempSlideFolderPath, true);
 		}
 
 		[Test]
 		public void ReportWarning_If_ExerciseFolder_DoesntContain_SolutionFile()
 		{
-			FileSystem.DeleteFile(exBlock.SolutionFile.FullName);
+			FileSystem.DeleteFile(exBlock.CorrectSolutionFile.FullName);
 
-			var validatorOut = ValidatorTestsHelper.ValidateBlock(exBlock);
+			var validatorOut = TestsHelper.ValidateBlock(exBlock);
 
 			validatorOut
 				.Should().Contain($"Exercise directory doesn't contain {exBlock.CorrectSolutionFileName}");
@@ -54,7 +54,7 @@ namespace uLearn.CSharp
 		[Test]
 		public void ReportWarning_If_WrongAnswers_Have_Errors()
 		{
-			var validatorOut = ValidatorTestsHelper.ValidateBlock(exBlock);
+			var validatorOut = TestsHelper.ValidateBlock(exBlock);
 
 			validatorOut
 				.Should()

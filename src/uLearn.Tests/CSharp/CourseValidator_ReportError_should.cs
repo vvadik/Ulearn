@@ -24,7 +24,7 @@ namespace uLearn.CSharp
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
-			ValidatorTestsHelper.RecreateDirectory(tempSlideFolderPath);
+			TestsHelper.RecreateDirectory(tempSlideFolderPath);
 		}
 
 		[SetUp]
@@ -33,11 +33,11 @@ namespace uLearn.CSharp
 			exBlock = new ProjectExerciseBlock
 			{
 				StartupObject = "test.Program",
-				UserCodeFileName = ValidatorTestsHelper.UserCodeFileName,
+				UserCodeFilePath = TestsHelper.UserCodeFileName,
 				SlideFolderPath = tempSlideFolder,
-				CsProjFilePath = ValidatorTestsHelper.CsProjFilePath,
+				CsProjFilePath = TestsHelper.CsProjFilePath,
 			};
-			FileSystem.CopyDirectory(ValidatorTestsHelper.ProjSlideFolderPath, tempSlideFolderPath, true);
+			FileSystem.CopyDirectory(TestsHelper.ProjSlideFolderPath, tempSlideFolderPath, true);
 			var ctx = new BuildUpContext(exBlock.SlideFolderPath, CourseSettings.DefaultSettings, null, String.Empty);
 			exBlock.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
 		}
@@ -46,30 +46,30 @@ namespace uLearn.CSharp
 		public void ReportError_If_StudentZip_HasErrors()
 		{
 			FileSystem.CopyDirectory(tempSlideFolder.GetSubdir("projDir").FullName, tempSlideFolder.GetSubdir("FullProjDir").FullName);
-			exBlock.CsProjFilePath = Path.Combine("FullProjDir", ValidatorTestsHelper.CsProjFilename);
+			exBlock.CsProjFilePath = Path.Combine("FullProjDir", TestsHelper.CsProjFilename);
 			SaveTempZipFileWithFullProject();
 
-			var validatorOutput = ValidatorTestsHelper.ValidateBlock(exBlock);
+			var validatorOutput = TestsHelper.ValidateBlock(exBlock);
 
 			validatorOutput
-				.Should().Contain($"Student zip exercise directory has 'wrong answer' and/or solution files ({ValidatorTestsHelper.OrderedWrongAnswersAndSolutionNames})");
+				.Should().Contain($"Student zip exercise directory has 'wrong answer' and/or solution files ({TestsHelper.OrderedWrongAnswersAndSolutionNames})");
 			validatorOutput
-				.Should().Contain($"Student's csproj has user code item ({exBlock.UserCodeFileName}) of not compile type");
+				.Should().Contain($"Student's csproj has user code item ({exBlock.UserCodeFilePath}) of not compile type");
 			validatorOutput
-				.Should().Contain($"Student's csproj has 'wrong answer' and/or solution items ({ValidatorTestsHelper.OrderedWrongAnswersAndSolutionNames})");
+				.Should().Contain($"Student's csproj has 'wrong answer' and/or solution items ({TestsHelper.OrderedWrongAnswersAndSolutionNames})");
 		}
 
 		private void SaveTempZipFileWithFullProject()
 		{
 			var zipWithFullProj = new FileInfo(Path.Combine(tempSlideFolderPath, "FullProjDir.exercise.zip"));
-			var noExcludedFiles = new Regex("[^\\s\\S]").ToString();
+			var noExcludedFiles = new Func<string, bool>(_ => false);
 			var noExcludedDirs = new string[0];
 
-			var csProjFile = ValidatorTestsHelper.ProjExerciseFolder.GetFile(ValidatorTestsHelper.CsProjFilename);
+			var csProjFile = TestsHelper.ProjExerciseFolder.GetFile(TestsHelper.CsProjFilename);
 			ProjModifier.ModifyCsproj(csProjFile, ProjModifier.ResolveLinks);
 
 			new LazilyUpdatingZip(
-					ValidatorTestsHelper.ProjExerciseFolder,
+					TestsHelper.ProjExerciseFolder,
 					noExcludedDirs,
 					noExcludedFiles,
 					ResolveCsprojLink,
@@ -88,20 +88,20 @@ namespace uLearn.CSharp
 			File.Delete(exBlock.UserCodeFile.FullName);
 			File.Delete(Path.Combine(tempSlideFolderPath, exBlock.CsProjFilePath));
 
-			var validatorOutput = ValidatorTestsHelper.ValidateBlock(exBlock);
+			var validatorOutput = TestsHelper.ValidateBlock(exBlock);
 
 			validatorOutput
 				.Should().Contain($"Exercise folder ({exBlock.ExerciseFolder.Name}) doesn't contain ({exBlock.CsprojFileName})");
 			validatorOutput
-				.Should().Contain($"Exercise folder ({exBlock.ExerciseFolder.Name}) doesn't contain ({exBlock.UserCodeFileName})");
+				.Should().Contain($"Exercise folder ({exBlock.ExerciseFolder.Name}) doesn't contain ({exBlock.UserCodeFilePath})");
 		}
 
 		[Test]
 		public void ReportError_If_CorrectSolution_Not_Building()
 		{
-			File.WriteAllText(exBlock.CorrectSolution.FullName, "");
+			File.WriteAllText(exBlock.CorrectSolutionFile.FullName, "");
 
-			var validatorOutput = ValidatorTestsHelper.ValidateBlock(exBlock);
+			var validatorOutput = TestsHelper.ValidateBlock(exBlock);
 
 			validatorOutput
 				.Should().Contain($"Correct solution file {exBlock.CorrectSolutionFileName} verdict is not OK. RunResult = Id: test.csproj, Verdict: CompilationError");
@@ -112,7 +112,7 @@ namespace uLearn.CSharp
 		{
 			exBlock.NUnitTestClasses = new[] { "non_existing.test_class", };
 
-			var validatorOutput = ValidatorTestsHelper.ValidateBlock(exBlock);
+			var validatorOutput = TestsHelper.ValidateBlock(exBlock);
 
 			validatorOutput
 				.Should()
@@ -124,7 +124,7 @@ namespace uLearn.CSharp
 		{
 			exBlock.NUnitTestClasses = new[] { $"test.{nameof(OneFailingTest)}" };
 
-			var validatorOutput = ValidatorTestsHelper.ValidateBlock(exBlock);
+			var validatorOutput = TestsHelper.ValidateBlock(exBlock);
 
 			validatorOutput
 				.Should()

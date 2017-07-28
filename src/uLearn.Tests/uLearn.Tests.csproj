@@ -222,17 +222,17 @@
     <Content Include="CSharp\testProject\projDir\AnotherTask.WrongAnswer.88.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Compile Include="CSharp\ValidatorTestsHelper.cs" />
+    <Compile Include="CSharp\TestsHelper.cs" />
     <Compile Include="CSharp\testProject\projDir\AnotherTask.Solution.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Content Include="CSharp\testProject\projDir\AnotherTask.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Compile Include="CSharp\testProject\projDir\MeaningOfLifeTask.Solution.cs">
+    <Compile Include="CSharp\testProject\projDir\inner-dir-1\inner-dir-2\MeaningOfLifeTask.Solution.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.cs">
+    <Content Include="CSharp\testProject\projDir\inner-dir-1\inner-dir-2\MeaningOfLifeTask.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.WrongAnswer.Type.cs">

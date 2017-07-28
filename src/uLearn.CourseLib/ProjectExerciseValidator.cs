@@ -58,7 +58,7 @@ namespace uLearn
 
 			return ReportErrorIfMissingCsproj() | ReportErrorIfMissingUserCodeFile();
 
-			bool ReportErrorIfMissingUserCodeFile() => ReportErrorIfMissingFile(ex.UserCodeFileName);
+			bool ReportErrorIfMissingUserCodeFile() => ReportErrorIfMissingFile(ex.UserCodeFilePath);
 			bool ReportErrorIfMissingCsproj() => ReportErrorIfMissingFile(ex.CsprojFileName);
 
 			bool ReportErrorIfMissingFile(string path)
@@ -71,11 +71,11 @@ namespace uLearn
 		}
 
 		private bool ExerciseDirectoryContainsSolutionFile()
-			=> ex.ExerciseFolder.GetFiles().Any(f => f.Name.Equals(ex.CorrectSolutionFileName, StringComparison.InvariantCultureIgnoreCase));
+			=> ex.UserCodeFileParentDirectory.GetFiles().Any(f => f.Name.Equals(ex.CorrectSolutionFileName, StringComparison.InvariantCultureIgnoreCase));
 
 		private void ReportErrorIfSolutionNotBuildingOrNotPassesTests()
 		{
-			var solutionCode = ex.CorrectSolution.ContentAsUtf8();
+			var solutionCode = ex.CorrectSolutionFile.ContentAsUtf8();
 			var submission = ex.CreateSubmission(ex.CsprojFileName, solutionCode);
 			var result = SandboxRunner.Run(submission, new SandboxRunnerSettings());
 
@@ -90,7 +90,7 @@ namespace uLearn
 		{
 			var filesWithWrongAnswer = FileSystem.GetFiles(ex.ExerciseFolder.FullName, SearchOption.SearchAllSubDirectories)
 				.Select(name => new FileInfo(name))
-				.Where(f => IsWrongAnswer(f.Name));
+				.Where(f => ex.IsWrongAnswer(f.Name));
 
 			foreach (var waFile in filesWithWrongAnswer)
 			{
@@ -100,9 +100,6 @@ namespace uLearn
 				ReportWarningIfWrongAnswerIsSolution(waFile.Name, result);
 			}
 		}
-
-		private bool IsWrongAnswer(string name) =>
-			Regex.IsMatch(name, ex.WrongAnswersAndSolutionNameRegexPattern) && !ex.IsCorrectSolution(name);
 
 		private void ReportWarningIfWrongAnswerVerdictIsNotOk(string waFileName, RunningResults waResult)
 		{
@@ -170,28 +167,20 @@ namespace uLearn
 
 		private void ReportErrorIfStudentsZipHasWrongAnswerOrSolutionFiles(DirectoryInfo unpackedZipDir)
 		{
-			var wrongAnswersOrSolution = GetOrderedFileNames(unpackedZipDir, ProjectExerciseBlock.IsAnyWrongAnswerOrAnySolution);
+			var wrongAnswersOrSolution = GetOrderedFileNames(unpackedZipDir.GetRelativePathsOfFiles(), ProjectExerciseBlock.IsAnyWrongAnswerOrAnySolution);
 
 			if (wrongAnswersOrSolution.Any())
 				ReportSlideError(slide, $"Student zip exercise directory has 'wrong answer' and/or solution files ({string.Join(", ", wrongAnswersOrSolution)})");
 		}
 
-		private string[] GetOrderedFileNames(DirectoryInfo dir, Func<string, bool> predicate)
-		{
-			var allNames = dir.GetFiles().Select(f => f.Name);
-			return GetOrderedFileNames(allNames, predicate);
-		}
-
-		private string[] GetOrderedFileNames(IEnumerable<string> names, Func<string, bool> predicate)
-			=>
-				names.Where(predicate).OrderBy(n => n).ToArray();
+		private string[] GetOrderedFileNames(IEnumerable<string> names, Func<string, bool> predicate) => names.Where(predicate).OrderBy(n => n).ToArray();
 
 		private void ReportErrorIfCsprojHasUserCodeOfNotCompileType(DirectoryInfo unpackedZipDir)
 		{
 			var csproj = unpackedZipDir.GetFiles(ex.CsprojFileName).Single();
 
 			var userCode = new Project(csproj.FullName, null, null, new ProjectCollection()).Items
-				.Single(i => i.UnevaluatedInclude.Equals(ex.UserCodeFileName, StringComparison.InvariantCultureIgnoreCase));
+				.Single(i => i.UnevaluatedInclude.Equals(ex.UserCodeFilePath, StringComparison.InvariantCultureIgnoreCase));
 
 			if (!userCode.ItemType.Equals("Compile", StringComparison.InvariantCultureIgnoreCase))
 				ReportSlideError(slide, $"Student's csproj has user code item ({userCode.UnevaluatedInclude}) of not compile type");

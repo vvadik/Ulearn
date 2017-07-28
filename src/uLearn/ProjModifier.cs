@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Build.Evaluation;
+using uLearn.Extensions;
 using uLearn.Model.Blocks;
 
 namespace uLearn
@@ -25,11 +26,12 @@ namespace uLearn
 		internal static void PrepareForStudentZip(Project proj, ProjectExerciseBlock ex)
 		{
 			var toExclude = FindItemNames(proj, ProjectExerciseBlock.IsAnyWrongAnswerOrAnySolution).ToList();
-			var solutionsOfOtherTasks = toExclude.Where(n => ProjectExerciseBlock.IsAnySolution(n) && !ex.IsCorrectSolution(n)).ToList();
-			var userCodeFilenamesOfOtherTasks = solutionsOfOtherTasks.Select(ProjectExerciseBlock.ParseUserCodeFilenameFromSolution);
+			var solutionsOfOtherTasks = toExclude.Where(n => ProjectExerciseBlock.IsAnySolution(n) && ex.CorrectSolutionPath != n).ToList();
+
+			var userCodeFilenamesOfOtherTasks = solutionsOfOtherTasks.Select(ProjectExerciseBlock.SolutionFilenameToUserCodeFilename);
 
 			RemoveCheckingFromCsproj(proj);
-			SetFilenameItemTypeToCompile(proj, userCodeFilenamesOfOtherTasks.Concat(new[] { ex.UserCodeFileName }));
+			SetFilenameItemTypeToCompile(proj, userCodeFilenamesOfOtherTasks.Concat(new[] { ex.UserCodeFilePath }));
 			ResolveLinks(proj);
 			ExcludePaths(proj, toExclude);
 		}
@@ -49,13 +51,13 @@ namespace uLearn
 
 		public static void PrepareForCheckingUserCode(Project proj, ProjectExerciseBlock ex, List<string> excludedPaths)
 		{
-			var correctSolution = ex.ExerciseFolder.GetFiles()
-				.Select(f => f.Name)
-				.SingleOrDefault(n => n.Equals(ex.CorrectSolutionFileName, StringComparison.InvariantCultureIgnoreCase));
-			if (correctSolution != null)
-				excludedPaths.Add(correctSolution);
+			var solutionRelativePath = ex.ExerciseFolder.GetRelativePathsOfFiles()
+				.SingleOrDefault(n => n.Equals(ex.CorrectSolutionPath, StringComparison.InvariantCultureIgnoreCase));
 
-			SetFilenameItemTypeToCompile(proj, ex.UserCodeFileName);
+			if (solutionRelativePath != null)
+				excludedPaths.Add(solutionRelativePath);
+
+			SetFilenameItemTypeToCompile(proj, ex.UserCodeFilePath);
 			PrepareForChecking(proj, ex.StartupObject, excludedPaths);
 		}
 

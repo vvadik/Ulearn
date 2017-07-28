@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Ionic.Zip;
 using Ionic.Zlib;
 using uLearn.Extensions;
@@ -13,20 +12,20 @@ namespace uLearn.Model.Blocks
 	{
 		private readonly DirectoryInfo dir;
 		private readonly string[] excludedDirs;
-		private readonly string excludedFilesNamePattern;
+		private readonly Func<string, bool> needExcludeFile;
 		private readonly Func<FileInfo, byte[]> getFileContent;
 		private readonly FileInfo zipFile;
 
 		public LazilyUpdatingZip(
 			DirectoryInfo dir,
 			string[] excludedDirs,
-			string excludedFilesNamePattern,
+			Func<string, bool> needExcludeFile,
 			Func<FileInfo, byte[]> getFileContent,
 			FileInfo zipFile)
 		{
 			this.dir = dir;
 			this.excludedDirs = excludedDirs;
-			this.excludedFilesNamePattern = excludedFilesNamePattern;
+			this.needExcludeFile = needExcludeFile;
 			this.getFileContent = getFileContent;
 			this.zipFile = zipFile;
 		}
@@ -64,7 +63,7 @@ namespace uLearn.Model.Blocks
 		private IEnumerable<FileInfo> EnumerateFiles(DirectoryInfo aDir)
 		{
 			foreach (var f in aDir.GetFiles())
-				if (!Regex.IsMatch(f.Name, excludedFilesNamePattern))
+				if (!needExcludeFile(f.Name))
 					yield return f;
 			var dirs = aDir.GetDirectories().Where(d => !excludedDirs.Contains(d.Name));
 			foreach (var subdir in dirs)

@@ -55,7 +55,25 @@ namespace uLearn
 			});
 		}
 
-		private static SlideBlock[] DeserializeBlocks(string blocksXml)
+		[Test]
+		public void UserCodeFileName()
+		{
+			var ex = DeserializeLesson("<proj-exercise>" +
+										"<user-code-file-name>user-code-name-111</user-code-file-name>" +
+										"</proj-exercise>").Blocks.Single();
+			((ProjectExerciseBlock)ex).UserCodeFilePath.Should().Be("user-code-name-111");
+		}
+
+		[Test]
+		public void UserCodeFilePath()
+		{
+			var ex = DeserializeLesson("<proj-exercise>" +
+										"<user-code-file-path>user-code-name-111</user-code-file-path>" +
+										"</proj-exercise>").Blocks.Single();
+			((ProjectExerciseBlock)ex).UserCodeFilePath.Should().Be("user-code-name-111");
+		}
+
+		private static Lesson DeserializeLesson(string blocksXml)
 		{
 			var input = $@"
 <Lesson xmlns='https://ulearn.azurewebsites.net/lesson'>
@@ -63,9 +81,13 @@ namespace uLearn
 </Lesson>";
 			File.WriteAllText("temp.xml", input);
 			var fileInfo = new FileInfo("temp.xml");
+			return fileInfo.DeserializeXml<Lesson>();
+		}
+
+		private static SlideBlock[] DeserializeBlocks(string blocksXml)
+		{
 			var buildUpContext = new BuildUpContext(new DirectoryInfo("."), CourseSettings.DefaultSettings, null, "Заголовок слайда");
-			var lesson = fileInfo.DeserializeXml<Lesson>();
-			var blocks = lesson.Blocks;
+			var blocks = DeserializeLesson(blocksXml).Blocks;
 			return blocks.SelectMany(b => b.BuildUp(buildUpContext, ImmutableHashSet<string>.Empty)).ToArray();
 		}
 	}

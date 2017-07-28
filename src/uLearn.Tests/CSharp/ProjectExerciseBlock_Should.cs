@@ -30,24 +30,24 @@ namespace uLearn.CSharp
 
         private string checkerExerciseFolderPath => Path.Combine(tempSlideFolderPath, "ProjectExerciseBlockTests_Checker_ExerciseFolder");
 
-		private string studentCsProjFilePath => Path.Combine(studentExerciseFolderPath, ValidatorTestsHelper.CsProjFilename);
-        private string checkerCsprojFilePath => Path.Combine(checkerExerciseFolderPath, ValidatorTestsHelper.CsProjFilename);
+		private string studentCsProjFilePath => Path.Combine(studentExerciseFolderPath, TestsHelper.CsProjFilename);
+        private string checkerCsprojFilePath => Path.Combine(checkerExerciseFolderPath, TestsHelper.CsProjFilename);
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            ValidatorTestsHelper.RecreateDirectory(tempSlideFolderPath);
-			FileSystem.CopyDirectory(ValidatorTestsHelper.ProjSlideFolderPath, tempSlideFolderPath);
+            TestsHelper.RecreateDirectory(tempSlideFolderPath);
+			FileSystem.CopyDirectory(TestsHelper.ProjSlideFolderPath, tempSlideFolderPath);
 
-	        ValidatorTestsHelper.RecreateDirectory(checkerExerciseFolderPath);
-	        ValidatorTestsHelper.RecreateDirectory(studentExerciseFolderPath);
+	        TestsHelper.RecreateDirectory(checkerExerciseFolderPath);
+	        TestsHelper.RecreateDirectory(studentExerciseFolderPath);
 
             ex = new ProjectExerciseBlock
             {
 				StartupObject = "test.Program",
-                UserCodeFileName = ValidatorTestsHelper.UserCodeFileName,
+                UserCodeFilePath = TestsHelper.UserCodeFileName,
                 SlideFolderPath = tempSlideFolder,
-                CsProjFilePath = ValidatorTestsHelper.CsProjFilePath
+                CsProjFilePath = TestsHelper.CsProjFilePath
             };
 
 	        var ctx = new BuildUpContext(ex.SlideFolderPath, CourseSettings.DefaultSettings, null, String.Empty);
@@ -61,7 +61,7 @@ namespace uLearn.CSharp
         [Test]
         public void FindSolutionFile_OnBuildUp()
         {
-            var correctSolutionCode = ex.SolutionFile.ContentAsUtf8();
+            var correctSolutionCode = ex.CorrectSolutionFile.ContentAsUtf8();
 
             exBlocks.OfType<CodeBlock>()
                 .Should().Contain(block => block.Code.Equals(correctSolutionCode) && block.Hide);
@@ -72,7 +72,7 @@ namespace uLearn.CSharp
         {
 			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(studentCsProjFilePath);
 
-            itemNamesForCompile.Should().Contain(ValidatorTestsHelper.UserCodeFileName);
+            itemNamesForCompile.Should().Contain(TestsHelper.UserCodeFileName);
 		}
 
         [Test]
@@ -96,7 +96,7 @@ namespace uLearn.CSharp
 		{
 			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(studentCsProjFilePath);
 
-			itemNamesForCompile.Should().NotContain(ValidatorTestsHelper.WrongAnswersAndSolutionNames);
+			itemNamesForCompile.Should().NotContain(TestsHelper.WrongAnswersAndSolutionNames);
 		}
 
 		[Test]
@@ -104,7 +104,7 @@ namespace uLearn.CSharp
 		{
 			var projFiles = studentExerciseFolder.GetFiles().Select(f => f.Name);
 
-			projFiles.Should().NotContain(ValidatorTestsHelper.WrongAnswersAndSolutionNames);
+			projFiles.Should().NotContain(TestsHelper.WrongAnswersAndSolutionNames);
 		}
 
 		[Test]
@@ -130,7 +130,7 @@ namespace uLearn.CSharp
 		{
 			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerCsprojFilePath);
 
-			itemNamesForCompile.Should().Contain(ValidatorTestsHelper.UserCodeFileName);
+			itemNamesForCompile.Should().Contain(TestsHelper.UserCodeFileName);
 		}
 
 		[Test]

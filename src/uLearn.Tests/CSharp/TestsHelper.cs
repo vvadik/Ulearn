@@ -11,7 +11,7 @@ using uLearn.Model.Blocks;
 
 namespace uLearn.CSharp
 {
-	public static class ValidatorTestsHelper
+	public static class TestsHelper
 	{
 		public static readonly string ProjSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "CSharp", "TestProject");
 		public static readonly DirectoryInfo ProjSlideFolder = new DirectoryInfo(ProjSlideFolderPath);
@@ -21,7 +21,7 @@ namespace uLearn.CSharp
 
 		public static readonly string CsProjFilename = "test.csproj";
 		public static readonly string CsProjFilePath = Path.Combine("ProjDir", CsProjFilename);
-		public static readonly string UserCodeFileName = $"{nameof(MeaningOfLifeTask)}.cs";
+		public static readonly string UserCodeFileName = Path.Combine("inner-dir-1", "inner-dir-2", $"{nameof(MeaningOfLifeTask)}.cs");
 
 		public static readonly string[] WrongAnswerNames =
 		{
@@ -34,7 +34,7 @@ namespace uLearn.CSharp
 		public static readonly string[] SolutionNames =
 		{
 			$"{nameof(AnotherTask)}.Solution.cs",
-			$"{nameof(MeaningOfLifeTask)}.Solution.cs"
+			Path.Combine("inner-dir-1", "inner-dir-2", $"{nameof(MeaningOfLifeTask)}.Solution.cs")
 		};
 
 		public static string OrderedWrongAnswersAndSolutionNames => ToString(WrongAnswersAndSolutionNames.OrderBy(n => n));
