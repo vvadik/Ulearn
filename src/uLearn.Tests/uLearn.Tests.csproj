@@ -259,6 +259,7 @@
     <Compile Include="NUnitTestRunning\NUnitTestRunner_Should.cs" />
     <Compile Include="NUnitTestRunning\TestsToRun\TenRepeatTest.cs" />
     <Compile Include="NUnitTestRunning\TestsToRun\FiveTestCases.cs" />
+    <Compile Include="NUnitTestRunning\TestsToRun\ThreeOrderedTests.cs" />
     <Compile Include="NUnitTestRunning\TestsToRun\ThreeTestsWithSetUp.cs" />
     <Compile Include="NUnitTestRunning\TestsToRun\ThreeTestsWithTearDown.cs" />
     <Compile Include="NUnitTestRunning\TestsToRun\ThreePassingTests.cs" />

@@ -116,6 +116,16 @@ namespace uLearn.NUnitTestRunning
 		}
 
 		[Test]
+		public void Support_Order_Feature()
+		{
+			var testsToRun = typeof(ThreeOrderedTests).FullName;
+
+			NUnitTestRunner.RunAllTests(listener, Assembly.GetExecutingAssembly(), testsToRun);
+
+			Assert.AreEqual("012", ThreeOrderedTests.Order);
+		}
+
+		[Test]
 		public void ReportOn_NonexistentTestClasses()
 		{
 			var expected = "Error in checking system: test class Nonexistent does not exist.";
