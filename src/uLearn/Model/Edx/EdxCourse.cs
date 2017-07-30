@@ -15,7 +15,6 @@ namespace uLearn.Model.Edx
 	{
 		public bool FailOnNonExistingItem = true;
 		public NonExistentItemHandler HandleNonExistentItemTypeName;
-
 	}
 
 	[XmlRoot("course")]
@@ -118,12 +117,12 @@ namespace uLearn.Model.Edx
 			if (sequentials.Count > 1)
 				throw new Exception(
 					string.Format("Vertical {0} are in several sequentials {1}",
-					verticalId,
-					string.Join(", ", sequentials.Select(s => s.UrlName))));
+						verticalId,
+						string.Join(", ", sequentials.Select(s => s.UrlName))));
 			if (sequentials.Count == 0)
 				throw new Exception(
 					string.Format("Vertical {0} are not in any sequential!",
-					verticalId));
+						verticalId));
 
 			return sequentials.Single();
 		}

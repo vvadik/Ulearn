@@ -117,7 +117,7 @@ namespace uLearn.Web
 				"~/Content/buttons.css",
 				"~/Content/likely.css",
 				"~/Content/notifications.css"
-				);
+			);
 		}
 	}
 }

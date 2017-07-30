@@ -9,7 +9,6 @@ namespace uLearn.tests
 		{
 			Console.WriteLine(42);
 		}
-
 	}
 
 	[ShowBodyOnSlide]

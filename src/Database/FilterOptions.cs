@@ -6,8 +6,10 @@ namespace Database
 	public class AbstractFilterOptionByCourseAndUsers
 	{
 		public string CourseId { get; set; }
+
 		/* If true, search only users which ids IS NOT in UsersIds*/
 		public bool IsUserIdsSupplement { get; set; }
+
 		public List<string> UsersIds { get; set; }
 	}
 

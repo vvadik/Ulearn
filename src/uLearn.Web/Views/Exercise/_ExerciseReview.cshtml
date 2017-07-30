@@ -3,13 +3,13 @@
 @using Microsoft.AspNet.Identity
 @using uLearn.Web.Extensions
 @model ExerciseCodeReviewModel
-	
+
 <div class="exercise__review"
-	 data-id="@Model.Review.Id"
-	 data-start-line="@Model.Review.StartLine"
-	 data-start-position="@Model.Review.StartPosition"
-	 data-finish-line="@Model.Review.FinishLine"
-	 data-finish-position="@Model.Review.FinishPosition">
+	data-id="@Model.Review.Id"
+	data-start-line="@Model.Review.StartLine"
+	data-start-position="@Model.Review.StartPosition"
+	data-finish-line="@Model.Review.FinishLine"
+	data-finish-position="@Model.Review.FinishPosition">
 	<div class="exercise__review__header">
 		<span class="author">@Model.Review.Author.VisibleName</span>,
 		@if (Model.Review.StartLine != Model.Review.FinishLine)
@@ -26,14 +26,16 @@
 		}
 		@if (Model.ManualChecking != null)
 		{
-            var canDelete = Model.Review.AuthorId == User.Identity.GetUserId() || User.HasAccessFor(Model.ManualChecking.CourseId, CourseRole.CourseAdmin);
-            if (canDelete)
-            {
-    			<span class="close exercise__delete-review"
-    				  title="Удалить комментарий"
-    				  data-id="@Model.Review.Id"
-    				  data-url="@Url.Action("DeleteExerciseCodeReview", "Exercise", new { Model.ManualChecking.CourseId, reviewId = Model.Review.Id })">&times;</span>
-            }
+			var canDelete = Model.Review.AuthorId == User.Identity.GetUserId() || User.HasAccessFor(Model.ManualChecking.CourseId, CourseRole.CourseAdmin);
+			if (canDelete)
+			{
+				<span class="close exercise__delete-review"
+					title="Удалить комментарий"
+					data-id="@Model.Review.Id"
+					data-url="@Url.Action("DeleteExerciseCodeReview", "Exercise", new { Model.ManualChecking.CourseId, reviewId = Model.Review.Id })">
+					&times;
+				</span>
+			}
 		}
 	</div>
 	<div class="exercise__review__comment">

@@ -26,7 +26,7 @@
 				<td title="@unit.Total.Earned of @unit.Total.Total">@unit.Total</td>
 			</tr>
 		}
-		<tr style="font-weight: bold; text-align: center">
+		<tr style="font-weight: bold;text-align: center">
 			<td style="text-align: left">Итого по курсу</td>
 			<td title="@Model.Total.SlideVisits.Earned of @Model.Total.SlideVisits.Total">@Model.Total.SlideVisits</td>
 			<td title="@Model.Total.Exercises.Earned of @Model.Total.Exercises.Total">@Model.Total.Exercises</td>
@@ -36,7 +36,7 @@
 	</table>
 
 	<h3 id="questions">Заданные вопросы</h3>
-	<div class="load-content" data-url="@Url.Action("ItemsOfUser", "Questions", new{userId=Model.User.Id, courseId = Model.Course.Id})"></div>
+	<div class="load-content" data-url="@Url.Action("ItemsOfUser", "Questions", new { userId = Model.User.Id, courseId = Model.Course.Id })"></div>
 
 </div>
 

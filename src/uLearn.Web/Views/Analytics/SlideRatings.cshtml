@@ -2,22 +2,22 @@
 
 <table class="table table-condensed table-autowidth">
 	<thead>
-		<tr>
-			<th>Слайд</th>
-			<th>Непонятно</th>
-			<th>Хорошо</th>
-			<th>Тривиально</th>
-		</tr>
+	<tr>
+		<th>Слайд</th>
+		<th>Непонятно</th>
+		<th>Хорошо</th>
+		<th>Тривиально</th>
+	</tr>
 	</thead>
 	<tbody>
-		@foreach (var slide in Model)
-		{
-			<tr>
-				<td>@slide.SlideTitle</td>
-				<td>@slide.NotUnderstand</td>
-				<td>@slide.Good</td>
-				<td>@slide.Trivial</td>
-			</tr>
-		}
+	@foreach (var slide in Model)
+	{
+		<tr>
+			<td>@slide.SlideTitle</td>
+			<td>@slide.NotUnderstand</td>
+			<td>@slide.Good</td>
+			<td>@slide.Trivial</td>
+		</tr>
+	}
 	</tbody>
 </table>

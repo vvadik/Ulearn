@@ -41,10 +41,7 @@ namespace uLearn
 				Add(key, value);
 				return value;
 			}
-			set
-			{
-				base[key] = value;
-			}
+			set { base[key] = value; }
 		}
 
 		private static TValue GetEmptyValue()

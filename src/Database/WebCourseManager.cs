@@ -32,6 +32,7 @@ namespace Database
 		}
 
 		private readonly object @lock = new object();
+
 		public override Course GetCourse(string courseId)
 		{
 			var course = base.GetCourse(courseId);

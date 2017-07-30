@@ -43,7 +43,7 @@ namespace uLearn.CSharp
 
 		private string GetUncomment(SyntaxNode root)
 		{
-			var comment = 
+			var comment =
 				from c in root.DescendantTrivia()
 				where c.Kind() == SyntaxKind.MultiLineCommentTrivia
 				where c.ToString().StartsWith(uncommentPrefix)
@@ -63,7 +63,7 @@ namespace uLearn.CSharp
 				tree.DescendantNodes()
 					.OfType<ClassDeclarationSyntax>()
 					.FirstOrDefault(n => n.Identifier.Text == ExerciseClassName);
-			if (exerciseClass !=null)
+			if (exerciseClass != null)
 				return exerciseClass.OpenBraceToken.Span.End;
 			var ns = tree.DescendantNodes().OfType<NamespaceDeclarationSyntax>().FirstOrDefault();
 			if (ns != null)
@@ -78,16 +78,16 @@ namespace uLearn.CSharp
 
 		public static bool IsExercise(SyntaxTree tree)
 		{
-			return 
+			return
 				tree.GetRoot()
-				.DescendantNodes()
-				.OfType<MethodDeclarationSyntax>()
+					.DescendantNodes()
+					.OfType<MethodDeclarationSyntax>()
 					.Any(m => m.HasAttribute<ExpectedOutputAttribute>());
 		}
 
 		private SyntaxNode VisitMemberDeclaration(MemberDeclarationSyntax node, SyntaxNode newNode)
 		{
-			var newMember = ((MemberDeclarationSyntax) newNode).WithoutAttributes();
+			var newMember = ((MemberDeclarationSyntax)newNode).WithoutAttributes();
 			var excludeSolutionAttr = node.GetAttributes<ExcludeFromSolutionAttribute>().SingleOrDefault();
 
 			var isSolutionPart = excludeSolutionAttr != null || node.HasAttribute<ExerciseAttribute>();

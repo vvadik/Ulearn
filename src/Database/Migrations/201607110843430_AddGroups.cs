@@ -7,13 +7,13 @@ namespace Database.Migrations
 		public override void Up()
 		{
 			CreateTable(
-				"dbo.GroupMembers",
-				c => new
-				{
-					Id = c.Int(nullable: false, identity: true),
-					GroupId = c.Int(nullable: false),
-					UserId = c.String(nullable: false, maxLength: 128),
-				})
+					"dbo.GroupMembers",
+					c => new
+					{
+						Id = c.Int(nullable: false, identity: true),
+						GroupId = c.Int(nullable: false),
+						UserId = c.String(nullable: false, maxLength: 128),
+					})
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.Groups", t => t.GroupId)
 				.ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
@@ -21,18 +21,18 @@ namespace Database.Migrations
 				.Index(t => t.UserId, name: "IDX_GroupUser_GroupByUser");
 
 			CreateTable(
-				"dbo.Groups",
-				c => new
-				{
-					Id = c.Int(nullable: false, identity: true),
-					CourseId = c.String(nullable: false, maxLength: 64),
-					Name = c.String(nullable: false, maxLength: 300),
-					OwnerId = c.String(nullable: false, maxLength: 128),
-					IsPublic = c.Boolean(nullable: false),
-					IsDeleted = c.Boolean(nullable: false),
-					InviteHash = c.Guid(nullable: false),
-					IsInviteLinkEnabled = c.Boolean(nullable: false),
-				})
+					"dbo.Groups",
+					c => new
+					{
+						Id = c.Int(nullable: false, identity: true),
+						CourseId = c.String(nullable: false, maxLength: 64),
+						Name = c.String(nullable: false, maxLength: 300),
+						OwnerId = c.String(nullable: false, maxLength: 128),
+						IsPublic = c.Boolean(nullable: false),
+						IsDeleted = c.Boolean(nullable: false),
+						InviteHash = c.Guid(nullable: false),
+						IsInviteLinkEnabled = c.Boolean(nullable: false),
+					})
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.AspNetUsers", t => t.OwnerId, cascadeDelete: true)
 				.Index(t => t.CourseId, name: "IDX_Group_GroupByCourse")

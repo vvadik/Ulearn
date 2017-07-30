@@ -13,8 +13,8 @@
 }
 
 <div class="exercise__submission"
-	 data-version-update-url="@Url.Action("Submission", new { Model.CourseId, slideId = Model.Slide.Id, submissionId = "VERSION_ID", manualCheckingId = manualCheckingId, isLti = Model.IsLti, showOutput = Model.InstructorView ? "true" : "SHOW_OUTPUT", instructorView = Model.InstructorView, onlyAccepted = Model.ShowOnlyAccepted })"
-	 @SlideHtml.GetGuestOnclick(Model.IsGuest)>
+	data-version-update-url="@Url.Action("Submission", new { Model.CourseId, slideId = Model.Slide.Id, submissionId = "VERSION_ID", manualCheckingId = manualCheckingId, isLti = Model.IsLti, showOutput = Model.InstructorView ? "true" : "SHOW_OUTPUT", instructorView = Model.InstructorView, onlyAccepted = Model.ShowOnlyAccepted })"
+	@SlideHtml.GetGuestOnclick(Model.IsGuest)>
 	@{
 		var currentSubmissionId = Model.SubmissionSelectedByUser != null ? (int?)Model.SubmissionSelectedByUser.Id : null;
 
@@ -94,7 +94,7 @@
 		if (Model.ReviewState == ExerciseReviewState.Reviewed || Model.InstructorView)
 		{
 			/* For reviewed submission without reviews don't show reviews panel at all*/
-			var isEmpty = Model.Reviews.Count == 0 && ! canAddReviews ? "empty" : "";
+			var isEmpty = Model.Reviews.Count == 0 && !canAddReviews ? "empty" : "";
 			<div class="exercise__reviews @isEmpty">
 				@foreach (var review in Model.Reviews.OrderBy(r => r.StartLine).ThenBy(r => r.StartPosition))
 				{
@@ -109,7 +109,7 @@
 		<textarea id="secretCodeExercise" class="hide">@Model.Block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
 		<textarea class="code @classString hidden" data-lang="@Model.Block.LangId">@(Model.Solution ?? Model.Block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 		<div class="loading-spinner">
-			<img src="/Content/loading.gif" />
+			<img src="/Content/loading.gif"/>
 		</div>
 		<script type="text/javascript">
 			function cleanUserCode() {
@@ -145,7 +145,7 @@
 				}
 			}
 
-			if (Model.ManualChecking == null && 
+			if (Model.ManualChecking == null &&
 				Model.SubmissionSelectedByUser != null &&
 				Model.SubmissionSelectedByUser.AutomaticChecking != null &&
 				Model.SubmissionSelectedByUser.AutomaticChecking.Output != null)

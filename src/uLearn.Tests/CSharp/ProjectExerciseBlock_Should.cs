@@ -16,85 +16,85 @@ using uLearn.Model.Blocks;
 
 namespace uLearn.CSharp
 {
-    [TestFixture]
-    public class ProjectExerciseBlock_Should
-    {
-        private ProjectExerciseBlock ex;
-        private List<SlideBlock> exBlocks;
+	[TestFixture]
+	public class ProjectExerciseBlock_Should
+	{
+		private ProjectExerciseBlock ex;
+		private List<SlideBlock> exBlocks;
 
-        private string tempSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, nameof(ProjectExerciseBlock_Should));
-        private DirectoryInfo tempSlideFolder => new DirectoryInfo(tempSlideFolderPath);
+		private string tempSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, nameof(ProjectExerciseBlock_Should));
+		private DirectoryInfo tempSlideFolder => new DirectoryInfo(tempSlideFolderPath);
 
-        private string studentExerciseFolderPath => Path.Combine(tempSlideFolderPath, "ProjectExerciseBlockTests_Student_ExerciseFolder");
-        private DirectoryInfo studentExerciseFolder => new DirectoryInfo(studentExerciseFolderPath);
+		private string studentExerciseFolderPath => Path.Combine(tempSlideFolderPath, "ProjectExerciseBlockTests_Student_ExerciseFolder");
+		private DirectoryInfo studentExerciseFolder => new DirectoryInfo(studentExerciseFolderPath);
 
-        private string checkerExerciseFolderPath => Path.Combine(tempSlideFolderPath, "ProjectExerciseBlockTests_Checker_ExerciseFolder");
+		private string checkerExerciseFolderPath => Path.Combine(tempSlideFolderPath, "ProjectExerciseBlockTests_Checker_ExerciseFolder");
 
 		private string studentCsProjFilePath => Path.Combine(studentExerciseFolderPath, TestsHelper.CsProjFilename);
-        private string checkerCsprojFilePath => Path.Combine(checkerExerciseFolderPath, TestsHelper.CsProjFilename);
+		private string checkerCsprojFilePath => Path.Combine(checkerExerciseFolderPath, TestsHelper.CsProjFilename);
 
-	    private Project studentZipCsproj;
-	    private Project checkerZipCsproj;
+		private Project studentZipCsproj;
+		private Project checkerZipCsproj;
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            TestsHelper.RecreateDirectory(tempSlideFolderPath);
+		[OneTimeSetUp]
+		public void OneTimeSetUp()
+		{
+			TestsHelper.RecreateDirectory(tempSlideFolderPath);
 			FileSystem.CopyDirectory(TestsHelper.ProjSlideFolderPath, tempSlideFolderPath);
 
-	        TestsHelper.RecreateDirectory(checkerExerciseFolderPath);
-	        TestsHelper.RecreateDirectory(studentExerciseFolderPath);
+			TestsHelper.RecreateDirectory(checkerExerciseFolderPath);
+			TestsHelper.RecreateDirectory(studentExerciseFolderPath);
 
-            ex = new ProjectExerciseBlock
-            {
+			ex = new ProjectExerciseBlock
+			{
 				StartupObject = "test.Program",
-                UserCodeFilePath = TestsHelper.UserCodeFileName,
-                SlideFolderPath = tempSlideFolder,
-                CsProjFilePath = TestsHelper.CsProjFilePath
-            };
+				UserCodeFilePath = TestsHelper.UserCodeFileName,
+				SlideFolderPath = tempSlideFolder,
+				CsProjFilePath = TestsHelper.CsProjFilePath
+			};
 
-	        var ctx = new BuildUpContext(ex.SlideFolderPath, CourseSettings.DefaultSettings, null, String.Empty);
-	        exBlocks = ex.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
-	        Utils.UnpackZip(ex.StudentsZip.Content(), studentExerciseFolderPath);
+			var ctx = new BuildUpContext(ex.SlideFolderPath, CourseSettings.DefaultSettings, null, String.Empty);
+			exBlocks = ex.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
+			Utils.UnpackZip(ex.StudentsZip.Content(), studentExerciseFolderPath);
 
-	        var zipBytes = ex.GetZipBytesForChecker("i_am_user_code");
-	        Utils.UnpackZip(zipBytes, checkerExerciseFolderPath);
+			var zipBytes = ex.GetZipBytesForChecker("i_am_user_code");
+			Utils.UnpackZip(zipBytes, checkerExerciseFolderPath);
 
 			studentZipCsproj = new Project(studentCsProjFilePath, null, null, new ProjectCollection());
 			checkerZipCsproj = new Project(checkerCsprojFilePath, null, null, new ProjectCollection());
 		}
 
-        [Test]
-        public void FindSolutionFile_OnBuildUp()
-        {
-            var correctSolutionCode = ex.CorrectSolutionFile.ContentAsUtf8();
+		[Test]
+		public void FindSolutionFile_OnBuildUp()
+		{
+			var correctSolutionCode = ex.CorrectSolutionFile.ContentAsUtf8();
 
-            exBlocks.OfType<CodeBlock>()
-                .Should().Contain(block => block.Code.Equals(correctSolutionCode) && block.Hide);
-        }
+			exBlocks.OfType<CodeBlock>()
+				.Should().Contain(block => block.Code.Equals(correctSolutionCode) && block.Hide);
+		}
 
-        [Test]
+		[Test]
 		public void When_CreateStudentZip_Contain_UserCodeFile_OfCompileType_Inside_Csproj()
-        {
+		{
 			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(studentZipCsproj);
 
-            itemNamesForCompile.Should().Contain(TestsHelper.UserCodeFileName);
+			itemNamesForCompile.Should().Contain(TestsHelper.UserCodeFileName);
 		}
 
-        [Test]
+		[Test]
 		public void When_CreateStudentZip_Contain_Resolved_Links_Inside_Csproj()
-        {
-	        var itemNamesForCompile = GetFromCsProjItemsForCompile(checkerZipCsproj);
+		{
+			var itemNamesForCompile = GetFromCsProjItemsForCompile(checkerZipCsproj);
 
-	        itemNamesForCompile.Should().Contain(i => i.UnevaluatedInclude.Equals("~$Link.cs"));
+			itemNamesForCompile.Should().Contain(i => i.UnevaluatedInclude.Equals("~$Link.cs"));
 		}
 
-        [Test]
+		[Test]
 		public void When_CreateStudentZip_Contain_Resolved_Link_Files_Inside_Csproj()
-        {
-	        var projFiles = studentExerciseFolder.GetFiles().Select(f => f.Name);
+		{
+			var projFiles = studentExerciseFolder.GetFiles().Select(f => f.Name);
 
-	        projFiles.Should().Contain("~$Link.cs");
+			projFiles.Should().Contain("~$Link.cs");
 		}
 
 		[Test]

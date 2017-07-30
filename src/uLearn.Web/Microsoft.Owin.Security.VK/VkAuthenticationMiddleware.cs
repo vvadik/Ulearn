@@ -33,14 +33,14 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 			if (Options.StateDataFormat == null)
 			{
 				var dataProtector = app.CreateDataProtector(
-					typeof (VkAuthenticationMiddleware).FullName,
+					typeof(VkAuthenticationMiddleware).FullName,
 					Options.AuthenticationType, "v1");
 				Options.StateDataFormat = new PropertiesDataFormat(dataProtector);
 			}
 
 			_httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
 			_httpClient.Timeout = Options.BackchannelTimeout;
-			_httpClient.MaxResponseContentBufferSize = 1024*1024*10; // 10 MB
+			_httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
 		}
 
 		/// <summary>

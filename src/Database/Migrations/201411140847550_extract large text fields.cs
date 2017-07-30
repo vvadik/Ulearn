@@ -8,12 +8,12 @@ namespace Database.Migrations
 		public override void Up()
 		{
 			CreateTable(
-				"dbo.TextBlobs",
-				c => new
-				{
-					Hash = c.String(nullable: false, maxLength: 40),
-					Text = c.String(nullable: false),
-				})
+					"dbo.TextBlobs",
+					c => new
+					{
+						Hash = c.String(nullable: false, maxLength: 40),
+						Text = c.String(nullable: false),
+					})
 				.PrimaryKey(t => t.Hash);
 
 			AddColumn("dbo.UserSolutions", "SolutionCodeHash", c => c.String(nullable: false, maxLength: 40));

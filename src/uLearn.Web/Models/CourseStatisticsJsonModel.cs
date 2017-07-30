@@ -27,7 +27,8 @@ namespace uLearn.Web.Models
 					UserId = user.UserId,
 					VisibleName = user.UserVisibleName,
 					GroupsIds = model.VisitedUsersGroups[user.UserId].ToArray(),
-					SlidesScores = shouldBeSolvedSlides.Select(s => new CourseStatisticsStudentSlideScore {
+					SlidesScores = shouldBeSolvedSlides.Select(s => new CourseStatisticsStudentSlideScore
+					{
 						SlideId = s.Id,
 						Score = model.ScoreByUserAndSlide[Tuple.Create(user.UserId, s.Id)]
 					}).ToArray(),
@@ -205,7 +206,7 @@ namespace uLearn.Web.Models
 
 		[DataMember(Name = "groups")]
 		public int[] GroupsIds;
-	
+
 		[DataMember(Name = "name")]
 		public string VisibleName;
 

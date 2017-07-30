@@ -18,8 +18,8 @@ namespace uLearn.CSharp
 		{
 			bool trueStatementIsReturnBoolLiteral =
 				(ifElseStatement.Statement as ReturnStatementSyntax)
-					.Call(r => r.Expression as LiteralExpressionSyntax)
-					.Call(IsBoolLiteral, false);
+				.Call(r => r.Expression as LiteralExpressionSyntax)
+				.Call(IsBoolLiteral, false);
 			bool? falseStatementIsReturnBoolLiteral =
 				ifElseStatement.Else
 					.Call(e => e.Statement as ReturnStatementSyntax)
@@ -28,9 +28,9 @@ namespace uLearn.CSharp
 
 			var nextSibling = ifElseStatement.Parent.ChildNodes().SkipWhile(n => n != ifElseStatement).Skip(1).FirstOrDefault();
 			falseStatementIsReturnBoolLiteral = falseStatementIsReturnBoolLiteral ??
-								(nextSibling as ReturnStatementSyntax)
-									.Call(r => r.Expression as LiteralExpressionSyntax)
-									.Call(IsBoolLiteral, false);
+												(nextSibling as ReturnStatementSyntax)
+												.Call(r => r.Expression as LiteralExpressionSyntax)
+												.Call(IsBoolLiteral, false);
 			if (trueStatementIsReturnBoolLiteral && falseStatementIsReturnBoolLiteral == true)
 				yield return Report(ifElseStatement, "Используйте return вместо if");
 		}

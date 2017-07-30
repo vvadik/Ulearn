@@ -22,7 +22,7 @@ namespace uLearn.Web.Controllers
 			ViewBag.ReturnUrl = returnUrl;
 			return View();
 		}
-		
+
 		[HttpPost]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
@@ -55,7 +55,7 @@ namespace uLearn.Web.Controllers
 			if (user.LastConfirmationEmailTime == null)
 				await SendConfirmationEmail(user);
 		}
-		
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public ActionResult ExternalLogin(string provider, string returnUrl)
@@ -63,7 +63,7 @@ namespace uLearn.Web.Controllers
 			// Request a redirect to the external login provider
 			return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", new { ReturnUrl = returnUrl }));
 		}
-		
+
 		public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
 		{
 			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext);
@@ -107,7 +107,7 @@ namespace uLearn.Web.Controllers
 			return View("ExternalLoginConfirmation",
 				new ExternalLoginConfirmationViewModel { UserName = loginInfo.DefaultUserName, Email = loginInfo.Email, Gender = loginGender });
 		}
-		
+
 		[HttpPost]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
@@ -128,7 +128,7 @@ namespace uLearn.Web.Controllers
 				var userAvatarUrl = info.ExternalIdentity.FindFirstValue("AvatarUrl");
 				var firstName = info.ExternalIdentity.FindFirstValue(ClaimTypes.GivenName);
 				var lastName = info.ExternalIdentity.FindFirstValue(ClaimTypes.Surname);
-				
+
 				var user = new ApplicationUser
 				{
 					UserName = model.UserName,
@@ -167,7 +167,7 @@ namespace uLearn.Web.Controllers
 			ViewBag.ReturnUrl = returnUrl;
 			return View(model);
 		}
-		
+
 		public ActionResult ExternalLoginFailure()
 		{
 			return View();
@@ -192,7 +192,7 @@ namespace uLearn.Web.Controllers
 			// Request a redirect to the external login provider to link a login for the current user
 			return new ChallengeResult(provider, Url.Action("LinkLoginCallback"), User.Identity.GetUserId());
 		}
-		
+
 		[ULearnAuthorize]
 		public async Task<ActionResult> LinkLoginCallback()
 		{
@@ -209,7 +209,7 @@ namespace uLearn.Web.Controllers
 			}
 			return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.AlreadyLinkedToOtherUser });
 		}
-		
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public ActionResult LogOff()

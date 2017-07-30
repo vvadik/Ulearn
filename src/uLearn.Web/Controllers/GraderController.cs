@@ -17,7 +17,7 @@ namespace uLearn.Web.Controllers
 		private static readonly ILog log = LogManager.GetLogger(typeof(GraderController));
 
 		public GradersRepo gradersRepo;
-		
+
 		public GraderController()
 		{
 			gradersRepo = new GradersRepo(db);
@@ -114,7 +114,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		public ActionResult Submissions(string courseId, Guid clientId, string search="", int max=200)
+		public ActionResult Submissions(string courseId, Guid clientId, string search = "", int max = 200)
 		{
 			var client = gradersRepo.FindGraderClient(courseId, clientId);
 			if (client == null)
@@ -160,7 +160,7 @@ namespace uLearn.Web.Controllers
 
 			if (automaticChecking == null || automaticChecking.Status != AutomaticExerciseCheckingStatus.Done)
 				return new SubmissionResult { Status = "IN_PROCESS" };
-			
+
 			var score = (double)automaticChecking.Score / slide.Exercise.CorrectnessScore;
 			if (score > 1)
 				score = 1;
@@ -173,13 +173,13 @@ namespace uLearn.Web.Controllers
 				ExecutionLog = automaticChecking.Output?.Text ?? "",
 			};
 		}
-		
+
 		[DataMember(Name = "result")]
 		public double Result { get; set; }
 
 		[DataMember(Name = "compilation_log")]
 		public string CompilationLog { get; set; }
-		
+
 		[DataMember(Name = "execution_log")]
 		public string ExecutionLog { get; set; }
 	}
@@ -210,7 +210,7 @@ namespace uLearn.Web.Controllers
 		public int SubmissionId { get; set; }
 	}
 
-	public class GraderClientsViewModel 
+	public class GraderClientsViewModel
 	{
 		public string CourseId { get; set; }
 		public List<GraderClient> Clients { get; set; }

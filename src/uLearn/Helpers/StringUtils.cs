@@ -14,7 +14,7 @@ namespace uLearn.Helpers
 		{
 			return new string(
 				Enumerable.Repeat(alphanumericChars, length).Select(s => s[random.Next(s.Length)]).ToArray()
-				);
+			);
 		}
 
 		public static string GenerateSecureAlphanumericString(int length)

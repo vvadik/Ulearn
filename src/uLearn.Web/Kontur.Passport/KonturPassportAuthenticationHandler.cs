@@ -54,7 +54,7 @@ namespace uLearn.Web.Kontur.Passport
 					log.Error("Kontur.Passport returned non-authenticated status");
 					return null;
 				}
-				
+
 				var identity = new ClaimsIdentity(Options.AuthenticationType);
 
 				var userClaims = authenticationResult.UserClaims.ToList();
@@ -118,7 +118,7 @@ namespace uLearn.Web.Kontur.Passport
 			{
 				var redirectUri = GetRedirectUri(Request);
 				var currentUri = Request.Uri.ToString();
-				
+
 				var properties = challenge.Properties;
 				if (string.IsNullOrEmpty(properties.RedirectUri))
 				{
@@ -127,7 +127,7 @@ namespace uLearn.Web.Kontur.Passport
 
 				// OAuth2 10.12 CSRF
 				GenerateCorrelationId(properties);
-				
+
 				var state = Options.StateDataFormat.Protect(properties);
 				var loginUri = passportClient.GetLoginUri(redirectUri, state);
 				log.Debug($"Login url: {loginUri}");

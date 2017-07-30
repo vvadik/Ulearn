@@ -50,7 +50,8 @@ namespace uLearn.CourseTool
 		{
 			foreach (var element in chapterXml.Root.EnsureNotNull().Elements(elementType))
 			{
-				if (!element.HasElements) continue;
+				if (!element.HasElements)
+					continue;
 				var urlNameAttr = element.Attribute("url_name").EnsureNotNull();
 				var urlName = urlNameAttr.Value;
 				Console.WriteLine("desquashing " + urlName);
@@ -81,7 +82,8 @@ namespace uLearn.CourseTool
 			{
 				var urlName = element.Attribute("url_name")?.Value;
 				Console.WriteLine("squashing " + elementType + " " + urlName);
-				if (element.HasElements || urlName == null) continue;
+				if (element.HasElements || urlName == null)
+					continue;
 				var root = LoadItem(elementType, urlName, olxDir).Root.EnsureNotNull();
 				//element.Add(root.Attributes());
 				var obsoleteAttr = element.Attributes().Where(a => root.Attribute(a.Name) != null).ToList();

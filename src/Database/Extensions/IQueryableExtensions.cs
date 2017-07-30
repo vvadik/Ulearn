@@ -13,7 +13,7 @@ namespace Database.Extensions
 		{
 			var ofType = typeof(Queryable).GetMethod("OfType", BindingFlags.Static | BindingFlags.Public);
 			var ofTypeGenericMethod = ofType.MakeGenericMethod(type);
-			return (IQueryable<T>) ofTypeGenericMethod.Invoke(null, new object[] { input });
+			return (IQueryable<T>)ofTypeGenericMethod.Invoke(null, new object[] { input });
 		}
 	}
 }

@@ -24,6 +24,7 @@ namespace uLearn
 		public List<Unit> Units { get; private set; }
 
 		private List<Slide> slidesCache { get; set; }
+
 		public List<Slide> Slides
 		{
 			get { return slidesCache ?? (slidesCache = Units.SelectMany(u => u.Slides).ToList()); }
@@ -75,7 +76,7 @@ namespace uLearn
 		{
 			return Units.Select(u => u.Title);
 		}
-		
+
 		public override string ToString()
 		{
 			return $"Course(Id: {Id}, Title: {Title})";

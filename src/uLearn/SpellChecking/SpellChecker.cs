@@ -17,9 +17,12 @@ namespace uLearn.SpellChecking
 
 		public override bool Equals(object obj)
 		{
-			if (ReferenceEquals(null, obj)) return false;
-			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != GetType()) return false;
+			if (ReferenceEquals(null, obj))
+				return false;
+			if (ReferenceEquals(this, obj))
+				return true;
+			if (obj.GetType() != GetType())
+				return false;
 			return Equals((SpellingError)obj);
 		}
 
@@ -59,7 +62,10 @@ namespace uLearn.SpellChecking
 			}
 		}
 
-		public SpellChecker() : this("") { }
+		public SpellChecker()
+			: this("")
+		{
+		}
 
 		private void InitializeCustomDictionary(Hunspell _hunspell, string[] dictionaryLines)
 		{
@@ -134,8 +140,8 @@ namespace uLearn.SpellChecking
 			}
 
 			var spellingErrors = wordList.Select(x => SpellWord(x, context))
-									  .Where(spellingError => spellingError != null)
-									  .ToArray();
+				.Where(spellingError => spellingError != null)
+				.ToArray();
 			return spellingErrors;
 		}
 
@@ -214,7 +220,6 @@ namespace uLearn.SpellChecking
 				Suggestions = suggests.ToArray(),
 				Context = context
 			};
-
 		}
 
 		private bool IsVerb(string word)

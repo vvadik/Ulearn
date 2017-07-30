@@ -34,7 +34,6 @@
 		[ExpectedOutput("")]
 		public void Main()
 		{
-
 		}
 	}
 }

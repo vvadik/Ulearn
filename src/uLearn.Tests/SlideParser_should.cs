@@ -311,8 +311,8 @@ namespace uLearn.CSharp
 		{
 			var dir = new DirectoryInfo(@".\tests\stub");
 			return SlideParser.ParseSlide(
-				new FileInfo(@".\tests\" + name), 
-				new SlideInfo(new Unit(new UnitSettings(), dir), dir.GetFile(name), 0), 
+				new FileInfo(@".\tests\" + name),
+				new SlideInfo(new Unit(new UnitSettings(), dir), dir.GetFile(name), 0),
 				dir, CourseSettings.DefaultSettings);
 		}
 
@@ -320,8 +320,8 @@ namespace uLearn.CSharp
 		{
 			var file = new FileInfo(path);
 			return SlideParser.ParseSlide(
-				file, 
-				new SlideInfo(new Unit(new UnitSettings(), file.Directory), file, 0), 
+				file,
+				new SlideInfo(new Unit(new UnitSettings(), file.Directory), file, 0),
 				file.Directory, CourseSettings.DefaultSettings);
 		}
 	}

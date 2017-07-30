@@ -71,20 +71,20 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 				string text = await tokenResponse.Content.ReadAsStringAsync();
 				var form = JsonConvert.DeserializeObject<Dictionary<string, object>>(text);
 
-				var accessToken = (string) form["access_token"];
-				var userId = (long) form["user_id"];
+				var accessToken = (string)form["access_token"];
+				var userId = (long)form["user_id"];
 
 				string graphApiEndpoint = "https://api.vk.com/method/users.get" +
-										  "?user_id=" + userId +
-										  "&fields=sex,photo_100,screen_name" +
-										  "&name_case=Nom" +
-										  "&access_token=" + Uri.EscapeDataString(accessToken);
+										"?user_id=" + userId +
+										"&fields=sex,photo_100,screen_name" +
+										"&name_case=Nom" +
+										"&access_token=" + Uri.EscapeDataString(accessToken);
 
 				HttpResponseMessage graphResponse = await _httpClient.GetAsync(graphApiEndpoint, Request.CallCancelled);
 				graphResponse.EnsureSuccessStatusCode();
 				text = await graphResponse.Content.ReadAsStringAsync();
 				JObject data = JObject.Parse(text);
-				var user = (JObject) data["response"].First;
+				var user = (JObject)data["response"].First;
 
 				var context = new VkAuthenticatedContext(Context, user, accessToken);
 				context.Identity = new ClaimsIdentity(
@@ -101,7 +101,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 					context.Identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, context.UserName, XmlSchemaString,
 						Options.AuthenticationType));
 				}
-				if (! string.IsNullOrEmpty(context.FirstName))
+				if (!string.IsNullOrEmpty(context.FirstName))
 					context.Identity.AddClaim(new Claim(ClaimTypes.GivenName, context.FirstName));
 				if (!string.IsNullOrEmpty(context.LastName))
 					context.Identity.AddClaim(new Claim(ClaimTypes.Surname, context.LastName));

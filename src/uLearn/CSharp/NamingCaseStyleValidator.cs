@@ -12,7 +12,8 @@ namespace uLearn.CSharp
 		protected override IEnumerable<string> InspectName(SyntaxToken identifier)
 		{
 			var name = identifier.Text;
-			if (string.IsNullOrEmpty(name)) yield break;
+			if (string.IsNullOrEmpty(name))
+				yield break;
 			var mustStartWithUpper = MustStartWithUpper(identifier.Parent);
 			var mustStartWithLower = MustStartWithLower(identifier.Parent);
 			var isUpper = char.IsUpper(name[0]);
@@ -45,8 +46,8 @@ namespace uLearn.CSharp
 		{
 			var field = AsField(variableDeclarator);
 			return field == null
-				|| field.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword)
-				&& field.Modifiers.All(m => m.Kind() != SyntaxKind.ConstKeyword);
+					|| field.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword)
+					&& field.Modifiers.All(m => m.Kind() != SyntaxKind.ConstKeyword);
 		}
 
 		private static BaseFieldDeclarationSyntax AsField(VariableDeclaratorSyntax variableDeclarator)
@@ -61,7 +62,6 @@ namespace uLearn.CSharp
 			return
 				node is ParameterSyntax
 				|| node is VariableDeclaratorSyntax && MustStartWithLower((VariableDeclaratorSyntax)node);
-
 		}
 	}
 }

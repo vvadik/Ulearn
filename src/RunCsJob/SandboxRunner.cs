@@ -166,7 +166,7 @@ namespace RunCsJob
 		{
 			try
 			{
-				if(!File.Exists(destFilePath))
+				if (!File.Exists(destFilePath))
 					File.Copy(sourceFilePath, destFilePath);
 			}
 			catch (Exception e)
@@ -234,7 +234,7 @@ namespace RunCsJob
 				return new RunningResults(Verdict.MemoryLimit);
 			}
 
-			sandbox.WaitForExit((int) settings.WaitSandboxAfterKilling.TotalMilliseconds);
+			sandbox.WaitForExit((int)settings.WaitSandboxAfterKilling.TotalMilliseconds);
 			if (!sandbox.HasExited)
 				return new RunningResults(Verdict.SandboxError, error: "Can't kill sandbox");
 			if (sandbox.ExitCode != 0)
@@ -287,7 +287,7 @@ namespace RunCsJob
 
 			if (!sandbox.HasExited)
 				throw new SandboxErrorException($"Песочница не ответила «Ready» через {settings.TimeLimit.TotalSeconds} секунд после запуска, убиваю её");
-			
+
 			if (sandbox.ExitCode != 0)
 			{
 				log.Warn($"Песочница не ответила «Ready», а вышла с кодом {sandbox.ExitCode}");
@@ -328,7 +328,7 @@ namespace RunCsJob
 
 			if (sandbox == null)
 				throw new SandboxErrorException("Не смог запустить C#-песочницу. Process.Start() вернул NULL");
-			
+
 			return sandbox;
 		}
 
@@ -409,7 +409,7 @@ namespace RunCsJob
 		private static RunningResults GetResultFromException(Exception ex)
 		{
 			if (ex is TargetInvocationException)
-				return HandleTargetInvocationException((TargetInvocationException) ex);
+				return HandleTargetInvocationException((TargetInvocationException)ex);
 
 			return new RunningResults(Verdict.SandboxError, output: ex.ToString());
 		}

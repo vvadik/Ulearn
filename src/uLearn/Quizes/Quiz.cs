@@ -87,13 +87,13 @@ namespace uLearn.Quizes
 				if (otherQuestionBlock == null || questionBlock.Id != otherQuestionBlock.Id)
 					return false;
 
-				if (! questionBlock.HasEqualStructureWith(otherQuestionBlock))
+				if (!questionBlock.HasEqualStructureWith(otherQuestionBlock))
 					return false;
 			}
 			return true;
 		}
 	}
-	
+
 	public abstract class AbstractQuestionBlock : SlideBlock
 	{
 		protected AbstractQuestionBlock()
@@ -201,13 +201,14 @@ namespace uLearn.Quizes
 		{
 			return text.ToLower() == Answer.ToString().ToLower();
 		}
+
 		public override void Validate()
 		{
 		}
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
-			var items = new []
+			var items = new[]
 			{
 				new Choice { Correct = Answer, Text = "true" },
 				new Choice { Correct = !Answer, Text = "false" }
@@ -327,7 +328,7 @@ namespace uLearn.Quizes
 
 		private readonly Random random = new Random();
 
-		public List<MatchingMatch> GetMatches(bool shuffle=false)
+		public List<MatchingMatch> GetMatches(bool shuffle = false)
 		{
 			if (shuffle)
 				return Matches.Shuffle(random).ToList();
@@ -425,4 +426,3 @@ namespace uLearn.Quizes
 		}
 	}
 }
-

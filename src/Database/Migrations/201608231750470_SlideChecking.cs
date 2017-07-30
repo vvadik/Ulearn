@@ -11,16 +11,16 @@ namespace Database.Migrations
 			RenameIndex(table: "dbo.ManualQuizCheckings", name: "IDX_ManualQuizCheck_ManualQuizCheckBySlideAndTime", newName: "IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndTime");
 			RenameIndex(table: "dbo.ManualQuizCheckings", name: "IDX_ManualQuizCheck_ManualQuizCheckBySlideAndUser", newName: "IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser");
 			CreateTable(
-				"dbo.AutomaticQuizCheckings",
-				c => new
-				{
-					Id = c.Int(nullable: false, identity: true),
-					CourseId = c.String(nullable: false, maxLength: 64),
-					SlideId = c.Guid(nullable: false),
-					Timestamp = c.DateTime(nullable: false),
-					UserId = c.String(nullable: false, maxLength: 128),
-					Score = c.Int(nullable: false),
-				})
+					"dbo.AutomaticQuizCheckings",
+					c => new
+					{
+						Id = c.Int(nullable: false, identity: true),
+						CourseId = c.String(nullable: false, maxLength: 64),
+						SlideId = c.Guid(nullable: false),
+						Timestamp = c.DateTime(nullable: false),
+						UserId = c.String(nullable: false, maxLength: 128),
+						Score = c.Int(nullable: false),
+					})
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
 				.Index(t => t.SlideId, name: "IDX_AbstractSlideChecking_AbstractSlideCheckingBySlide")

@@ -21,7 +21,8 @@ namespace uLearn
 		{
 			if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
 			{
-				if (RelativeUrl != null) RelativeUrl.Invoke(url);
+				if (RelativeUrl != null)
+					RelativeUrl.Invoke(url);
 				if (!checkUrl)
 					url = url.Replace("/", "_");
 			}

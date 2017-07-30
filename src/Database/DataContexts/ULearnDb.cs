@@ -62,7 +62,6 @@ namespace Database.DataContexts
 
 			CancelCascaseDeleting<GraderClient, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 
-
 			CancelCascaseDeleting<Notification, ApplicationUser, string>(modelBuilder, c => c.InitiatedBy, c => c.InitiatedById);
 			CancelCascaseDeleting<AddedInstructorNotification, ApplicationUser, string>(modelBuilder, c => c.AddedUser, c => c.AddedUserId);
 			CancelCascaseDeleting<LikedYourCommentNotification, ApplicationUser, string>(modelBuilder, c => c.LikedUser, c => c.LikedUserId);
@@ -141,6 +140,6 @@ namespace Database.DataContexts
 		public DbSet<XQueueWatcher> XQueueWatchers { get; set; }
 		public DbSet<XQueueExerciseSubmission> XQueueExerciseSubmissions { get; set; }
 
-		public DbSet<FeedViewTimestamp> FeedViewTimestamps { get; set;  }
+		public DbSet<FeedViewTimestamp> FeedViewTimestamps { get; set; }
 	}
 }

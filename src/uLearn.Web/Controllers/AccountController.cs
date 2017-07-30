@@ -85,7 +85,7 @@ namespace uLearn.Web.Controllers
 
 			var model = new UserListModel
 			{
-				IsCourseAdmin = User.HasAccess(CourseRole.CourseAdmin), 
+				IsCourseAdmin = User.HasAccess(CourseRole.CourseAdmin),
 				ShowDangerEntities = User.IsSystemAdministrator(),
 				Users = usersList.Select(user => GetUserModel(user, coursesForUsers, courses)).ToList(),
 				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, usersList.Select(u => u.UserId), User)
@@ -155,7 +155,7 @@ namespace uLearn.Web.Controllers
 				return Redirect("/");
 			}
 
-			return View((object) group.Name);
+			return View((object)group.Name);
 		}
 
 		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]
@@ -220,7 +220,8 @@ namespace uLearn.Web.Controllers
 
 			var certificates = certificatesRepo.GetUserCertificates(user.Id);
 
-			return View(new UserInfoModel {
+			return View(new UserInfoModel
+			{
 				User = user,
 				GroupsNames = groupsRepo.GetUserGroupsNamesAsString(userCoursesIds.ToList(), user.Id, User, 10),
 				Certificates = certificates,
@@ -238,7 +239,7 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			return View(new UserCourseModel(course, user, db));
 		}
-		
+
 		[AllowAnonymous]
 		public ActionResult Register(string returnUrl = null)
 		{
@@ -279,7 +280,7 @@ namespace uLearn.Web.Controllers
 
 			return View(model);
 		}
-		
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Disassociate(string loginProvider, string providerKey)
@@ -288,7 +289,7 @@ namespace uLearn.Web.Controllers
 			var message = result.Succeeded ? ManageMessageId.LoginRemoved : ManageMessageId.ErrorOccured;
 			return RedirectToAction("Manage", new { Message = message });
 		}
-		
+
 		public ActionResult Manage(ManageMessageId? message)
 		{
 			ViewBag.StatusMessage = message?.GetAttribute<DisplayAttribute>().GetName();
@@ -297,7 +298,7 @@ namespace uLearn.Web.Controllers
 			ViewBag.ReturnUrl = Url.Action("Manage");
 			return View();
 		}
-		
+
 		[HttpPost]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
@@ -587,9 +588,9 @@ namespace uLearn.Web.Controllers
 		}
 
 		public async Task ChangeEmail(ApplicationUser user, string email)
-		{ 
+		{
 			await usersRepo.ChangeEmail(user, email);
-			
+
 			/* Disable mail notification transport if exists */
 			var mailNotificationTransport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(user.Id);
 			if (mailNotificationTransport != null)
@@ -602,12 +603,12 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		public ActionResult CheckIsEmailConfirmed()
 		{
-			if (! Request.IsAuthenticated)
+			if (!Request.IsAuthenticated)
 				return new HttpStatusCodeResult(HttpStatusCode.OK);
 
 			var userId = User.Identity.GetUserId();
 			var user = usersRepo.FindUserById(userId);
-			if (user.EmailConfirmed || ! user.LastConfirmationEmailTime.HasValue)
+			if (user.EmailConfirmed || !user.LastConfirmationEmailTime.HasValue)
 				return new HttpStatusCodeResult(HttpStatusCode.OK);
 
 			var sentAgo = DateTime.Now.Subtract(user.LastConfirmationEmailTime.Value);

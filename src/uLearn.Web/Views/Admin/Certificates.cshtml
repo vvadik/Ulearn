@@ -20,7 +20,9 @@
 		Сертификаты
 		@if (canEditTemplates)
 		{
-			<small><a href="" class="create-template-link  internal-page-link">новый шаблон</a></small>
+			<small>
+				<a href="" class="create-template-link  internal-page-link">новый шаблон</a>
+			</small>
 		}
 	</h1>
 
@@ -43,11 +45,11 @@
 				@if (canEditTemplates)
 				{
 					<a href=""
-					   class="edit-template-link  internal-page-link"
-					   title="Редактировать шаблон"
-					   data-template-id="@template.Id"
-					   data-template-name="@template.Name"
-					   data-template-url="@Url.Action("DownloadCertificateTemplate", new { courseId = template.CourseId, templateId = template.Id })">
+						class="edit-template-link  internal-page-link"
+						title="Редактировать шаблон"
+						data-template-id="@template.Id"
+						data-template-name="@template.Name"
+						data-template-url="@Url.Action("DownloadCertificateTemplate", new { courseId = template.CourseId, templateId = template.Id })">
 						@template.Name</a>
 				}
 				else
@@ -76,14 +78,15 @@
 				@Html.Hidden("userId")
 				<div>
 					<input type="text"
-						   class="add-certificate-input form-control ib"
-						   data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.Course.Id })"
-						   placeholder="Начните вводить имя или фамилию">
+							class="add-certificate-input form-control ib"
+							data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.Course.Id })"
+							placeholder="Начните вводить имя или фамилию">
 					или
 					<a href="#"
-					   class="generate-multiple-certificates-link internal-page-link"
-					   data-template-id="@template.Id"
-					   >сгенерируйте много сертификатов</a>
+						class="generate-multiple-certificates-link internal-page-link"
+						data-template-id="@template.Id">
+						сгенерируйте много сертификатов
+					</a>
 				</div>
 
 				foreach (var parameter in Model.TemplateParameters[template.Id])
@@ -113,12 +116,13 @@
 						выдан @certificate.Instructor.VisibleName @certificate.Timestamp.ToAgoPrettyString()
 
 						@if (User.HasAccessFor(Model.Course.Id, CourseRole.CourseAdmin) ||
-							 certificate.InstructorId == User.Identity.GetUserId())
+							certificate.InstructorId == User.Identity.GetUserId())
 						{
 							<span class="glyphicon glyphicon-remove  remove-certificate-link  text-danger visible-on-parent-hover  cursor-pointer"
-							  data-certificate-id="@certificate.Id"
-							  data-url="@Url.Action("RemoveCertificate", new { courseId = certificate.Template.CourseId, certificateId = certificate.Id })"
-							  title="Отозвать сертификат"></span>
+								data-certificate-id="@certificate.Id"
+								data-url="@Url.Action("RemoveCertificate", new { courseId = certificate.Template.CourseId, certificateId = certificate.Id })"
+								title="Отозвать сертификат">
+							</span>
 						}
 					</div>
 				}
@@ -185,8 +189,8 @@
 				}))
 				{
 					@Html.AntiForgeryToken()
-					<input type="hidden" name="courseId" value="@Model.Course.Id" />
-					<input type="hidden" name="templateId" value="" />
+					<input type="hidden" name="courseId" value="@Model.Course.Id"/>
+					<input type="hidden" name="templateId" value=""/>
 
 					<div>
 						<p>
@@ -217,7 +221,7 @@
 					</div>
 
 					<div class="form-group">
-						<input id="certificatesData" name="certificatesData" type="file" required="required" />
+						<input id="certificatesData" name="certificatesData" type="file" required="required"/>
 						CSV-файл с данными
 					</div>
 

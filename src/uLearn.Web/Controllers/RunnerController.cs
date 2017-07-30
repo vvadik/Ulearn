@@ -159,7 +159,7 @@ namespace uLearn.Web.Controllers
 				log.Warn($"Can't find exercise slide {checking.SlideId} in course {checking.CourseId}. Exit");
 				return;
 			}
-			var score = (double) checking.Score / slide.Exercise.CorrectnessScore;
+			var score = (double)checking.Score / slide.Exercise.CorrectnessScore;
 			if (score > 1)
 				score = 1;
 
@@ -181,7 +181,7 @@ namespace uLearn.Web.Controllers
 	public class SandboxErrorsResultObserver : IResultObserver
 	{
 		private static readonly ErrorsBot bot = new ErrorsBot();
-		
+
 		public async Task ProcessResult(UserExerciseSubmission submission, RunningResults result)
 		{
 			/* Ignore all verdicts except SandboxError */

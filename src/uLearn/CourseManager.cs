@@ -28,6 +28,7 @@ namespace uLearn
 		private readonly DirectoryInfo coursesVersionsDirectory;
 
 		private readonly ConcurrentDictionary<string, Course> courses = new ConcurrentDictionary<string, Course>(StringComparer.InvariantCultureIgnoreCase);
+
 		/* LRU-cache for course versions. 50 is a capactiy of the cache. */
 		private readonly LruCache<Guid, Course> versionsCache = new LruCache<Guid, Course>(50);
 
@@ -38,7 +39,7 @@ namespace uLearn
 				baseDirectory.GetSubdir("Courses.Staging"),
 				baseDirectory.GetSubdir("Courses.Versions"),
 				baseDirectory.GetSubdir("Courses")
-				  )
+			)
 		{
 		}
 
@@ -463,7 +464,6 @@ namespace uLearn
 
 			try
 			{
-
 				TrySeveralTimes(() => Directory.Move(destinationDirectory.FullName, tempDirectoryName.FullName));
 
 				try

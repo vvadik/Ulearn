@@ -19,8 +19,8 @@
 
 	@using (Html.BeginForm("UploadCourse", "Admin", new { Model.CourseId }, FormMethod.Post, new { enctype = "multipart/form-data", style = "margin-bottom: 10px" }))
 	{
-		<input type="file" data-filename-placement="inside" class="btn" name="file" />
-		<input type="submit" class="btn btn-success" value="Загрузить пакет" />
+		<input type="file" data-filename-placement="inside" class="btn" name="file"/>
+		<input type="submit" class="btn btn-success" value="Загрузить пакет"/>
 	}
 
 	@if (Model.Versions.Count > 0)
@@ -43,15 +43,17 @@
 						<div class="courses-versions__time">
 							<b title="@version.LoadingTime.ToPrettyString()">@version.LoadingTime.ToAgoPrettyString()</b>
 						</div>
-						
+
 						<div class="courses-versions__actions">
-							<a href="@Url.Action("DownloadVersion", new { Model.CourseId, versionId = version.Id })"><span class="glyphicon glyphicon-download-alt"></span></a>
+							<a href="@Url.Action("DownloadVersion", new { Model.CourseId, versionId = version.Id })">
+								<span class="glyphicon glyphicon-download-alt"></span>
+							</a>
 							@if (!isCurrentVersion)
 							{
 								using (Html.BeginForm("DeleteVersion", "Admin", new { Model.CourseId, versionId = version.Id }, FormMethod.Post))
 								{
 									@Html.AntiForgeryToken()
-									<input type="submit" class="btn btn-xs btn-danger" value="&times;" title="Удалить" />
+									<input type="submit" class="btn btn-xs btn-danger" value="&times;" title="Удалить"/>
 								}
 							}
 						</div>

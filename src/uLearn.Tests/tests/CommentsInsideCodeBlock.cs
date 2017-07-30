@@ -21,18 +21,20 @@ namespace uLearn.tests
 			/*
 			Not a block again
 			*/
-
 		}
+
 		public class C2
 		{
 			/*
 			Not a block never
 			*/
-			public void X() { }
+			public void X()
+			{
+			}
+
 			/* 
 			Not a block ever
 			*/
-
 		}
 	}
 }

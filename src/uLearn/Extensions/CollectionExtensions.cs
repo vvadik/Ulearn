@@ -21,7 +21,8 @@ namespace uLearn.Extensions
 		public static TValue Get<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
 		{
 			TValue v;
-			if (dictionary.TryGetValue(key, out v)) return v;
+			if (dictionary.TryGetValue(key, out v))
+				return v;
 			throw new KeyNotFoundException("Key " + key + " not found in dictionary");
 		}
 
@@ -29,14 +30,16 @@ namespace uLearn.Extensions
 		public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
 		{
 			TValue v;
-			if (dictionary.TryGetValue(key, out v)) return v;
+			if (dictionary.TryGetValue(key, out v))
+				return v;
 			return default(TValue);
 		}
 
 		public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue)
 		{
 			TValue v;
-			if (dictionary.TryGetValue(key, out v)) return v;
+			if (dictionary.TryGetValue(key, out v))
+				return v;
 			return defaultValue;
 		}
 	}

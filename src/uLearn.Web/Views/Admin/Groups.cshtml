@@ -13,7 +13,8 @@
 
 <div class="container">
 
-	<h1>Группы
+	<h1>
+		Группы
 		<small>
 			<a href="" class="create-group-link  internal-page-link">создать</a>
 			@if (Model.GroupsMayBeCopied.Count > 0)
@@ -47,16 +48,17 @@
 					@if (canModifyGroup)
 					{
 						<a href=""
-						   class="edit-group-link  internal-page-link"
-						   title="Редактировать свойства"
-						   data-group-id="@group.Id"
-						   data-name="@group.Name"
-						   data-is-public="@group.IsPublic.ToString().ToLower()"
-						   data-is-archived="@group.IsArchived.ToString().ToLower()"
-						   data-manual-checking="@group.IsManualCheckingEnabled.ToString().ToLower()"
-						   data-manual-checking-for-old-solutions="@group.IsManualCheckingEnabledForOldSolutions.ToString().ToLower()"
-						   data-scoring-groups="@string.Join(",", enabledScoringGroupsIds)"
-						   data-owner-id="@group.OwnerId">@group.Name</a>
+							class="edit-group-link  internal-page-link"
+							title="Редактировать свойства"
+							data-group-id="@group.Id"
+							data-name="@group.Name"
+							data-is-public="@group.IsPublic.ToString().ToLower()"
+							data-is-archived="@group.IsArchived.ToString().ToLower()"
+							data-manual-checking="@group.IsManualCheckingEnabled.ToString().ToLower()"
+							data-manual-checking-for-old-solutions="@group.IsManualCheckingEnabledForOldSolutions.ToString().ToLower()"
+							data-scoring-groups="@string.Join(",", enabledScoringGroupsIds)"
+							data-owner-id="@group.OwnerId">
+							@group.Name</a>
 					}
 					else
 					{
@@ -65,15 +67,21 @@
 
 					@if (!group.IsPublic)
 					{
-						<small><span class="label label-danger">приватная</span></small>
+						<small>
+							<span class="label label-danger">приватная</span>
+						</small>
 					}
 					@if (group.OwnerId != User.Identity.GetUserId())
 					{
-						<small><span class="label label-primary">владелец: @group.Owner.VisibleName</span></small>
+						<small>
+							<span class="label label-primary">владелец: @group.Owner.VisibleName</span>
+						</small>
 					}
 					@if (group.IsArchived)
 					{
-						<small><span class="label label-warning">архивная группа</span></small>
+						<small>
+							<span class="label label-warning">архивная группа</span>
+						</small>
 					}
 				</h3>
 				@{
@@ -125,12 +133,12 @@
 						<div>Добавить студентов:</div>
 					}
 					<input type="text"
-						   class="add-user-to-group-input form-control"
-						   data-group-id="@group.Id"
-						   data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.Course.Id, withGroups = false })"
-						   placeholder="Начните вводить имя или фамилию">
+							class="add-user-to-group-input form-control"
+							data-group-id="@group.Id"
+							data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.Course.Id, withGroups = false })"
+							placeholder="Начните вводить имя или фамилию">
 				}
-				@if ((group.IsArchived || ! canModifyGroup) && group.Members.Count == 0)
+				@if ((group.IsArchived || !canModifyGroup) && group.Members.Count == 0)
 				{
 					<div class="text-muted" title="@(group.IsArchived && canModifyGroup ? "Нельзя добавлять пользователей в архивные группы" : "")">
 						Нет студентов
@@ -155,8 +163,8 @@
 				}))
 				{
 					@Html.AntiForgeryToken()
-					<input type="hidden" name="courseId" value="@Model.Course.Id" />
-					<input type="hidden" name="groupId" value="" />
+					<input type="hidden" name="courseId" value="@Model.Course.Id"/>
+					<input type="hidden" name="groupId" value=""/>
 
 					<div class="form-group">
 						<input id="name" name="name" type="text" class="form-control" placeholder="Название новой группы">
@@ -207,9 +215,9 @@
 						<label for="manualCheckingForOldSolutions">
 							Отправить на код-ревью и ручную проверку тестов старые решения участников
 							<span class="glyphicon glyphicon-question-sign with-long-tooltip"
-								  data-toggle="tooltip"
-								  data-placement="right"
-								  title="Если эта опция выключена, то при добавлении студента в группу его старые решения не будут отправлены в очередь на код-ревью">
+								data-toggle="tooltip"
+								data-placement="right"
+								title="Если эта опция выключена, то при добавлении студента в группу его старые решения не будут отправлены в очередь на код-ревью">
 							</span>
 						</label>
 					</div>
@@ -219,9 +227,9 @@
 						<label for="isArchived">
 							Архивная группа
 							<span class="glyphicon glyphicon-question-sign with-long-tooltip"
-								  data-toggle="tooltip"
-								  data-placement="right"
-								  title="Студенты из архивных группы не показываются по фильтру «Мои группы», а сама группа не отвлекает вас от работы. Вы сможете вернуть группу из архива в любой момент">
+								data-toggle="tooltip"
+								data-placement="right"
+								title="Студенты из архивных группы не показываются по фильтру «Мои группы», а сама группа не отвлекает вас от работы. Вы сможете вернуть группу из архива в любой момент">
 							</span>
 						</label>
 					</div>

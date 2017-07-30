@@ -29,14 +29,14 @@ namespace uLearn.Web.Controllers
 
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
-		
+
 		private readonly UserQuizzesRepo userQuizzesRepo;
 		private readonly VisitsRepo visitsRepo;
 		private readonly QuizzesRepo quizzesRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly NotificationsRepo notificationsRepo;
-		
+
 		public QuizController()
 		{
 			userQuizzesRepo = new UserQuizzesRepo(db);
@@ -161,10 +161,10 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			var maxDropCount = GetMaxDropCount(slide);
 			var quizState = GetQuizState(courseId, userId, slideId, maxDropCount).Item1;
-			if (! CanUserFillQuiz(quizState))
+			if (!CanUserFillQuiz(quizState))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Already answered");
 
-			if (slide.ManualChecking && ! groupsRepo.IsManualCheckingEnabledForUser(course, userId))
+			if (slide.ManualChecking && !groupsRepo.IsManualCheckingEnabledForUser(course, userId))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Manual checking is disabled for you");
 
 			var time = DateTime.Now;
@@ -238,7 +238,7 @@ namespace uLearn.Web.Controllers
 				if (checking.IsChecked)
 					return Redirect(errorUrl + "Эта работа уже была проверена");
 
-				if (! checking.IsLockedBy(User.Identity))
+				if (!checking.IsLockedBy(User.Identity))
 					return Redirect(errorUrl + "Эта работа проверяется другим инструктором");
 
 				var answers = userQuizzesRepo.GetAnswersForUser(checking.SlideId, checking.UserId);
@@ -334,7 +334,7 @@ namespace uLearn.Web.Controllers
 						ItemId = answerItemId,
 						IsRightAnswer = isTrue,
 						Text = null,
-						QuizType = typeof (ChoiceBlock),
+						QuizType = typeof(ChoiceBlock),
 						QuizBlockScore = blockScore,
 						QuizBlockMaxScore = choiceBlock.MaxScore
 					}
@@ -352,9 +352,9 @@ namespace uLearn.Web.Controllers
 					QuizBlockMaxScore = choiceBlock.MaxScore
 				}).ToList();
 			var isRightQuizBlock = ans.All(x => x.IsRightAnswer) &&
-						 choiceBlock.Items.Where(x => x.IsCorrect)
-							 .Select(x => x.Id)
-							 .All(x => ans.Where(y => y.IsRightAnswer).Select(y => y.ItemId).Contains(x));
+									choiceBlock.Items.Where(x => x.IsCorrect)
+										.Select(x => x.Id)
+										.All(x => ans.Where(y => y.IsRightAnswer).Select(y => y.ItemId).Contains(x));
 			blockScore = isRightQuizBlock ? choiceBlock.MaxScore : 0;
 			foreach (var info in ans)
 				info.QuizBlockScore = blockScore;
@@ -376,7 +376,7 @@ namespace uLearn.Web.Controllers
 				}).ToList();
 
 			var isRightQuizBlock = answers.Count() == orderingBlock.Items.Length &&
-				answers.Zip(orderingBlock.Items, (answer, item) => answer.ItemId == item.GetHash()).All(x => x);
+									answers.Zip(orderingBlock.Items, (answer, item) => answer.ItemId == item.GetHash()).All(x => x);
 			var blockScore = isRightQuizBlock ? orderingBlock.MaxScore : 0;
 			foreach (var info in ans)
 				info.QuizBlockScore = blockScore;

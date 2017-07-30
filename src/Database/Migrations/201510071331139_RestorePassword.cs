@@ -7,13 +7,13 @@ namespace Database.Migrations
 		public override void Up()
 		{
 			CreateTable(
-				"dbo.RestoreRequests",
-				c => new
-				{
-					Id = c.String(nullable: false, maxLength: 128),
-					UserId = c.String(nullable: false, maxLength: 128),
-					Timestamp = c.DateTime(nullable: false),
-				})
+					"dbo.RestoreRequests",
+					c => new
+					{
+						Id = c.String(nullable: false, maxLength: 128),
+						UserId = c.String(nullable: false, maxLength: 128),
+						Timestamp = c.DateTime(nullable: false),
+					})
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
 				.Index(t => t.UserId);

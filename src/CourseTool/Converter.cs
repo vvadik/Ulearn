@@ -27,18 +27,19 @@ namespace uLearn.CourseTool
 				var verticalId = $"{course.Id}-{unitIndex}-note-vert";
 				var mdBlockId = $"{course.Id}-{unitIndex}-note-md";
 				result.Add(new Sequential(sequentialId, displayName,
-					new[]
-					{
-						new Vertical(
-							verticalId,
-							displayName,
-							new[]
-							{
-								new MdBlock(unit.InstructorNote.Markdown)
-								.ToEdxComponent(mdBlockId, displayName, unit.Directory.FullName)
-							})
-					}) { VisibleToStaffOnly = true }
-				);}
+						new[]
+						{
+							new Vertical(
+								verticalId,
+								displayName,
+								new[]
+								{
+									new MdBlock(unit.InstructorNote.Markdown)
+										.ToEdxComponent(mdBlockId, displayName, unit.Directory.FullName)
+								})
+						}) { VisibleToStaffOnly = true }
+				);
+			}
 			return result.ToArray();
 		}
 
@@ -48,8 +49,8 @@ namespace uLearn.CourseTool
 			return Enumerable
 				.Range(0, units.Count)
 				.Select(idx => new Chapter(
-					$"{course.Id}-{idx}", 
-					units[idx].Title, 
+					$"{course.Id}-{idx}",
+					units[idx].Title,
 					null,
 					UnitToSequentials(course, config, units, idx, exerciseUrl, solutionsUrl, videoGuids)))
 				.ToArray();
@@ -59,11 +60,11 @@ namespace uLearn.CourseTool
 			Dictionary<string, string> youtubeId2UlearnVideoIds)
 		{
 			return new EdxCourse(
-				course.Id, 
-				config.Organization, 
-				course.Title, 
-				new[] { "lti" }, 
-				null, 
+				course.Id,
+				config.Organization,
+				course.Title,
+				new[] { "lti" },
+				null,
 				CourseToChapters(course, config, exerciseUrl, solutionsUrl, youtubeId2UlearnVideoIds));
 		}
 	}

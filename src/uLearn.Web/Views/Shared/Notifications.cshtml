@@ -9,7 +9,9 @@
 @using uLearn.Web.Views.Shared
 
 @functions
-{	private static string GetSlideUrl(UrlHelper Url, Course course, Slide slide)
+{
+
+	private static string GetSlideUrl(UrlHelper Url, Course course, Slide slide)
 	{
 		return Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
 	}
@@ -90,7 +92,7 @@
 		</div>
 		<div class="media-body">
 			<div class="notifications__notification__header">
-				@UserName(notification.Comment.Author) ответил@(notification.Comment.Author.Gender.ChooseEnding()) на&nbsp;ваш комментарий
+				@UserName(notification.Comment.Author) ответил@( notification.Comment.Author.Gender.ChooseEnding()) на&nbsp;ваш комментарий
 				<span title="@notification.ParentComment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__cite">@CollapseIfNeed(collapse, Html, notification.ParentComment.Text, 50)</span>
 			</div>
 			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100)</div>
@@ -108,7 +110,7 @@
 			@UserAvatar.Avatar(notification.LikedUser)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.LikedUser) лайкнул@(notification.LikedUser.Gender.ChooseEnding()) ваш комментарий</div>
+			<div class="notifications__notification__header">@UserName(notification.LikedUser) лайкнул@( notification.LikedUser.Gender.ChooseEnding()) ваш комментарий</div>
 			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
@@ -123,7 +125,8 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) проверил@(notification.InitiatedBy.Gender.ChooseEnding()) ваше решение<br />по&nbsp;«@slide.Title»</div>
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) проверил@( notification.InitiatedBy.Gender.ChooseEnding()) ваше решение<br/>по&nbsp;«@slide.Title»
+			</div>
 			<div class="notifications__notification__score">@notification.Checking.Score из @slide.Exercise.MaxReviewScore.PluralizeInRussian(RussianPluralizationOptions.Score)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
@@ -138,7 +141,8 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) проверил@(notification.InitiatedBy.Gender.ChooseEnding()) ваш тест<br />«@slide.Title»</div>
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) проверил@( notification.InitiatedBy.Gender.ChooseEnding()) ваш тест<br/>«@slide.Title»
+			</div>
 			<div class="notifications__notification__score">@notification.Checking.Score из @slide.MaxScore.PluralizeInRussian(RussianPluralizationOptions.ScoreDative)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
@@ -167,7 +171,8 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) поставил@(notification.InitiatedBy.Gender.ChooseEnding()) вам баллы <i>@scoringGroup.Name</i> в&nbsp;модуле «@unit.Title»</div>
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) поставил@( notification.InitiatedBy.Gender.ChooseEnding()) вам баллы <i>@scoringGroup.Name</i> в&nbsp;модуле «@unit.Title»
+			</div>
 			<div class="notifications__notification__score">@notification.Score.Score из @scoringGroup.MaxAdditionalScore.PluralizeInRussian(RussianPluralizationOptions.ScoreDative)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
@@ -181,7 +186,8 @@
 			@UserAvatar.Avatar(notification.JoinedUser)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.JoinedUser) присоедини@(notification.InitiatedBy.Gender.ChooseEnding("лся", "лась")) к&nbsp;вашей группе <b>@notification.Group.Name</b></div>
+			<div class="notifications__notification__header">@UserName(notification.JoinedUser) присоедини@( notification.InitiatedBy.Gender.ChooseEnding("лся", "лась")) к&nbsp;вашей группе <b>@notification.Group.Name</b>
+			</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>
@@ -194,7 +200,7 @@
 			@UserAvatar.Avatar(notification.AddedUser)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.AddedUser) стал@(notification.InitiatedBy.Gender.ChooseEnding()) преподавателем курса «@course.Title»</div>
+			<div class="notifications__notification__header">@UserName(notification.AddedUser) стал@( notification.InitiatedBy.Gender.ChooseEnding()) преподавателем курса «@course.Title»</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>
@@ -207,7 +213,7 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) создал@(notification.InitiatedBy.Gender.ChooseEnding()) группу «@notification.Group.Name» в&nbsp;курсе «@course.Title»</div>
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) создал@( notification.InitiatedBy.Gender.ChooseEnding()) группу «@notification.Group.Name» в&nbsp;курсе «@course.Title»</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>
@@ -220,7 +226,7 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) загрузил@(notification.InitiatedBy.Gender.ChooseEnding()) новую версию курса «@course.Title»</div>
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) загрузил@( notification.InitiatedBy.Gender.ChooseEnding()) новую версию курса «@course.Title»</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>
@@ -233,7 +239,7 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) опубликовал@(notification.InitiatedBy.Gender.ChooseEnding()) новую версию курса «@course.Title»</div>
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) опубликовал@( notification.InitiatedBy.Gender.ChooseEnding()) новую версию курса «@course.Title»</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>

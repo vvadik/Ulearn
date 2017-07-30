@@ -29,11 +29,11 @@
 		status = "Проверяется инструктором";
 	}
 
-	if (! string.IsNullOrEmpty(status))
-	{	
+	if (!string.IsNullOrEmpty(status))
+	{
 		<p class="quiz-status">@status</p>
 	}
-	if (! string.IsNullOrEmpty(Request.QueryString["error"]))
+	if (!string.IsNullOrEmpty(Request.QueryString["error"]))
 	{
 		<p class="alert alert-danger">@Request.QueryString["error"]</p>
 	}
@@ -54,7 +54,7 @@
 		Model.CanUserFillQuiz,
 		null,
 		Model.IsLti
-	);
+		);
 
 	MvcForm form = null;
 	if (Model.ManualQuizCheckQueueItem != null)
@@ -88,8 +88,8 @@
 			{
 				<input type="submit" class="btn btn-default" form="quiz__score-form" value="Сохранить и вернуться">
 				<input type="submit" class="btn btn-primary" form="quiz__score-form" value="Сохранить и перейти к следующему"
-					   data-url="@Url.Action("CheckNextQuizForSlide", "Admin", new { courseId = Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
-					   onclick="$('[name=nextUrl]').val($(this).data('url'))">
+						data-url="@Url.Action("CheckNextQuizForSlide", "Admin", new { courseId = Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
+						onclick="$('[name=nextUrl]').val($(this).data('url'))">
 			}
 			else if (Model.QuizState == QuizState.Subtotal)
 			{
@@ -100,7 +100,7 @@
 					<input type="hidden" name="isLti" value="@Model.IsLtiToString">
 					<button class="btn btn-danger" type="submit">Пройти тест повторно</button>
 					<small class="quiz__remains">У вас остал@(remains == 1 ? "а" : "о")сь @remains из @(Model.MaxDropCount + 1) попыток</small>
-			}
+				}
 			}
 			else if (User.HasAccessFor(Model.CourseId, CourseRole.Tester))
 			{

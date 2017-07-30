@@ -30,7 +30,7 @@ namespace uLearn.CourseTool
 					edxCourse,
 					videoComponents,
 					guids != null || !SkipExistingGuids
-					);
+				);
 			}
 		}
 	}

@@ -5,20 +5,18 @@
 }
 
 @helper IsScoreFormActive()
-{
-	@(Model.IsCurrentSubmissionChecking ? "" : " disabled=\"disabled\" ")
-}
+{ @( Model.IsCurrentSubmissionChecking ? "" : " disabled=\"disabled\" ") }
 
 <div class="text-muted">Выделите участок кода, чтобы оставить комментарий</div>
 
 <div class="exercise__add-review" style="display: none"
-	 data-url="@Url.Action("AddExerciseCodeReview", "Exercise", new { courseId = Model.CourseId, checkingId = Model.Checking.Id })">
+	data-url="@Url.Action("AddExerciseCodeReview", "Exercise", new { courseId = Model.CourseId, checkingId = Model.Checking.Id })">
 	<div class="row">
 		<h4 class="col-xs-12">
 			Добавить комментарий
 			<a class="exercise__close-review pull-right no-underline" href="#">&times;</a>
 		</h4>
-		
+
 	</div>
 	<div class="row">
 		<div class="col-sm-6">
@@ -35,9 +33,9 @@
 <div class="row">
 	<div class="col-xs-12 col-md-6">
 		<form method="POST" action="@Url.Action("ScoreExercise", "Exercise", new { recheck = Model.Checking.IsChecked })" class="exercise__score-form" data-submission-id="@Model.Checking.Submission.Id">
-			<input type="hidden" name="id" value="@Model.Checking.Id" />
-			<input type="hidden" name="errorUrl" value="@Url.RouteUrl("Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, CheckQueueItemId = Model.Checking.Id, group = Model.GroupsIdsJoined })&amp;error=" />
-			<input type="hidden" name="nextUrl" value="@Url.Action("ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, group = Model.GroupsIdsJoined, done = Model.Checking.IsChecked })" />
+			<input type="hidden" name="id" value="@Model.Checking.Id"/>
+			<input type="hidden" name="errorUrl" value="@Url.RouteUrl("Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, CheckQueueItemId = Model.Checking.Id, group = Model.GroupsIdsJoined })&amp;error="/>
+			<input type="hidden" name="nextUrl" value="@Url.Action("ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, group = Model.GroupsIdsJoined, done = Model.Checking.IsChecked })"/>
 
 			@if (Model.Checking.IsLocked && !Model.Checking.IsLockedBy(User.Identity))
 			{
@@ -67,24 +65,24 @@
 						var otherScoreInputDisplay = Model.Checking.IsChecked && !isPercentScoreActive ? "" : "display: none";
 					}
 					<input type="number" class="form-control" style="@otherScoreInputDisplay" min="0" max="@block.MaxReviewScore" name="exerciseScore" required="required"
-						   value="@(Model.Checking.IsChecked ? Model.Checking.Score.ToString() : "")" />
+							value="@(Model.Checking.IsChecked ? Model.Checking.Score.ToString() : "")"/>
 				</div>
 			</div>
 
 			<div class="checkbox checkbox-default">
-				<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" @(Model.Checking.IsChecked && !Model.Checking.ProhibitFurtherManualCheckings ? "" : "checked") @IsScoreFormActive() />
+				<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" @(Model.Checking.IsChecked && !Model.Checking.ProhibitFurtherManualCheckings ? "" : "checked") @IsScoreFormActive()/>
 				<label for="prohibitFurtherReview">
 					Не принимать больше код-ревью у этого студента
 				</label>
 			</div>
 
-			<input type="submit" class="btn @(Model.Checking.IsChecked ? "btn-primary" : "btn-default")" value="Сохранить и вернуться" @IsScoreFormActive() />
+			<input type="submit" class="btn @(Model.Checking.IsChecked ? "btn-primary" : "btn-default")" value="Сохранить и вернуться" @IsScoreFormActive()/>
 
 			@if (!Model.Checking.IsChecked)
 			{
 				<input type="submit" class="btn btn-primary" value="Сохранить и перейти к следующему"
-					   data-url="@Url.Action("CheckNextExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
-					   onclick="$('[name=nextUrl]').val($(this).data('url'))" @IsScoreFormActive() />
+						data-url="@Url.Action("CheckNextExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
+						onclick="$('[name=nextUrl]').val($(this).data('url'))" @IsScoreFormActive()/>
 			}
 		</form>
 	</div>

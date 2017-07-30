@@ -297,8 +297,8 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 		{
 			var dir = new DirectoryInfo(@"..\..\test");
 			var buildingResult = MsBuildRunner.BuildProject(
-				new MsBuildSettings(), 
-				"test.csproj", 
+				new MsBuildSettings(),
+				"test.csproj",
 				dir);
 			Console.WriteLine(buildingResult.ErrorMessage);
 			Assert.That(buildingResult.Success, Is.True);

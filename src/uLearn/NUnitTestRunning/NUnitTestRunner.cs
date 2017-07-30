@@ -58,7 +58,7 @@ namespace uLearn.NUnitTestRunning
 			var classes = executingAssembly.GetTypes().Select(x => x.FullName).ToList();
 			var intersection = classes.Intersect(testClasses);
 			return testClasses.Except(intersection);
-		} 
+		}
 
 		// должен остаться в этом же файле
 		public class TestListener : ITestListener

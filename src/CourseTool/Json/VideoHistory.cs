@@ -37,7 +37,7 @@ namespace uLearn.CourseTool.Json
 						historyList.Add(record.Data);
 						recordHistory.Data = historyList.ToArray();
 					}
-					
+
 					distinctIds = distinctIds
 						.Distinct()
 						.ToList();
@@ -48,7 +48,7 @@ namespace uLearn.CourseTool.Json
 					}
 					distinctIds.AddRange(recordHistory.Data.Select(x => x.Id));
 				}
-				
+
 				File.WriteAllText(videoHistoryJson, JsonConvert.SerializeObject(videoHistory));
 				return videoHistory;
 			}

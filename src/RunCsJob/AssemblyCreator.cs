@@ -40,7 +40,7 @@ namespace RunCsJob
 					MetadataReference.CreateFromFile(typeof(ValueType).Assembly.Location), // System.Runtime
 					//MetadataReference.CreateFromFile(systemRuntimeDllPath), // System.Runtime (because typeof(ValueType).Assembly.Location sometimes appeared to be in mscorlib)
 				}, new CSharpCompilationOptions(OutputKind.ConsoleApplication));
-			
+
 			var assemblyFilename = Path.Combine(workingDirectory, assemblyName + ".exe");
 			Directory.SetCurrentDirectory(currentDirectory);
 			return new CompileResult(compilation.Emit(assemblyFilename), assemblyFilename);
@@ -57,6 +57,5 @@ namespace RunCsJob
 
 		public readonly EmitResult EmitResult;
 		public readonly string PathToAssembly;
-
 	}
 }

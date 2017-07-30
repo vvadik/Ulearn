@@ -19,10 +19,13 @@ namespace uLearn.CSharp
 		public string FindError(SyntaxTree userSolution)
 		{
 			var cu = userSolution.GetRoot() as CompilationUnitSyntax;
-			if (cu == null) return ShouldBeMethod;
-			if (cu.Members.Count > 1) return ShouldBeSingleMethod;
+			if (cu == null)
+				return ShouldBeMethod;
+			if (cu.Members.Count > 1)
+				return ShouldBeSingleMethod;
 			var method = cu.Members[0] as MethodDeclarationSyntax;
-			if (method == null) return ShouldBeMethod;
+			if (method == null)
+				return ShouldBeMethod;
 			return FindError(method);
 		}
 
@@ -40,8 +43,8 @@ namespace uLearn.CSharp
 		protected override string FindError(MethodDeclarationSyntax method)
 		{
 			var statements = method.Body.Statements;
-			return statements.Count != 1 
-				|| !(statements.Single() is ReturnStatementSyntax) 
+			return statements.Count != 1
+					|| !(statements.Single() is ReturnStatementSyntax)
 				? ShouldBeSingleMethodMessage : null;
 		}
 	}

@@ -24,14 +24,16 @@
 					<a class="btn btn-large btn-success" href="@Url.Action("EnableNotificationTransport", "Notifications", new
 					                                           {
 						                                           transportId = Model.Transport.Id,
-																   enable = true,
-																   timestamp = Model.LinkTimestamp,
-																   signature = Model.LinkSignature,
+						                                           enable = true,
+						                                           timestamp = Model.LinkTimestamp,
+						                                           signature = Model.LinkSignature,
 						                                           next = Request.RawUrl
-					                                           })">Получать новости на&nbsp;почту</a>
+					                                           })">
+						Получать новости на&nbsp;почту
+					</a>
 				</p>
 				<p>
-					Всегда ваши, <br />команда ulearn.me. <br />Пишите нам на <a href="mailto:support@ulearn.me">support@ulearn.me</a>.
+					Всегда ваши, <br/>команда ulearn.me. <br/>Пишите нам на <a href="mailto:support@ulearn.me">support@ulearn.me</a>.
 				</p>
 			</div>
 			<div class="modal-footer">

@@ -21,7 +21,7 @@ namespace uLearn.Quizes
 				Id = "Id",
 				Blocks = new SlideBlock[]
 				{
-					new MdBlock {Markdown = "This is quiz!"},
+					new MdBlock { Markdown = "This is quiz!" },
 					new IsTrueBlock
 					{
 						Id = "1",
@@ -32,9 +32,9 @@ namespace uLearn.Quizes
 						Text = "What is the \nbest color?",
 						Items = new[]
 						{
-							new ChoiceItem {Id="1", Description = "black", IsCorrect = true},
-							new ChoiceItem {Id="2", Description = "green"},
-							new ChoiceItem {Id="3", Description = "red"},
+							new ChoiceItem { Id = "1", Description = "black", IsCorrect = true },
+							new ChoiceItem { Id = "2", Description = "green" },
+							new ChoiceItem { Id = "3", Description = "red" },
 						}
 					},
 					new ChoiceBlock
@@ -43,15 +43,15 @@ namespace uLearn.Quizes
 						Text = "What does the fox say?",
 						Items = new[]
 						{
-							new ChoiceItem {Description = "Apapapapa", IsCorrect = true},
-							new ChoiceItem {Description = "Ding ding ding", IsCorrect = true},
-							new ChoiceItem {Description = "Mew"},
+							new ChoiceItem { Description = "Apapapapa", IsCorrect = true },
+							new ChoiceItem { Description = "Ding ding ding", IsCorrect = true },
+							new ChoiceItem { Description = "Mew" },
 						}
 					},
 					new FillInBlock
 					{
 						Text = "What does the fox say?",
-						Regexes = new[] {new RegexInfo {Pattern = "([Dd]ing )+"}, new RegexInfo {Pattern = "Ap(ap)+"}},
+						Regexes = new[] { new RegexInfo { Pattern = "([Dd]ing )+" }, new RegexInfo { Pattern = "Ap(ap)+" } },
 						Sample = "Apapap"
 					},
 				}
@@ -80,8 +80,8 @@ namespace uLearn.Quizes
 					new MdBlock("para2"),
 					new CodeBlock("code2", null),
 					new MdBlock("para3"),
-					new MdBlock("note") {Hide=true},
-					new MdBlock("hidden") {Hide=true},
+					new MdBlock("note") { Hide = true },
+					new MdBlock("hidden") { Hide = true },
 				}
 			});
 		}

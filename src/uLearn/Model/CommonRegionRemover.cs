@@ -18,7 +18,8 @@ namespace uLearn.Model
 
 			foreach (var region in blocks)
 			{
-				if (region.fullStart >= prevStart) continue;
+				if (region.fullStart >= prevStart)
+					continue;
 				code = code.Remove(region.fullStart, Math.Min(region.fullLength, prevStart - region.fullStart));
 				prevStart = region.fullStart;
 			}

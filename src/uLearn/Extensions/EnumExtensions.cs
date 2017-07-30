@@ -12,10 +12,10 @@ namespace uLearn.Extensions
 			var type = value.GetType();
 			var memberInfo = type.GetMember(value.ToString())[0];
 			var attributes = memberInfo.GetCustomAttributes(typeof(TAttribute), false);
-			return attributes.Length > 0 ? (TAttribute) attributes[0] : null;
+			return attributes.Length > 0 ? (TAttribute)attributes[0] : null;
 		}
 
-		public static bool TryParseToNullableEnum<TEnum>(this string value, out TEnum? result) where TEnum: struct
+		public static bool TryParseToNullableEnum<TEnum>(this string value, out TEnum? result) where TEnum : struct
 		{
 			if (Enum.TryParse<TEnum>(value, out TEnum localResult))
 			{

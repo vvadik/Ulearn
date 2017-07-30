@@ -22,7 +22,9 @@
 			@Html.Hidden("maxCertificateId", Model.Certificates.Count)
 			var certificateIndex = 0;
 
-			<div class="loading-spinner loading-spinner-template"><img src="~/Content/loading-ring.gif"/></div>
+			<div class="loading-spinner loading-spinner-template">
+				<img src="~/Content/loading-ring.gif"/>
+			</div>
 
 			<table class="table table-striped  preview-certificates" data-builtin-parameters-value-url="@Url.Action("GetBuiltinCertificateParametersForUser", new { Model.CourseId, templateId = Model.Template.Id, userId = "USER_ID" })">
 				<thead>
@@ -41,16 +43,22 @@
 					{
 						<th data-parameter="@parameter">
 							%@parameter%<nobr>
-								<a href="#" class="remove-certificate-preview-parameter-link" title="Не показывать эту подстановку"><i class="glyphicon glyphicon-remove"></i></a>
+								<a href="#" class="remove-certificate-preview-parameter-link" title="Не показывать эту подстановку">
+									<i class="glyphicon glyphicon-remove"></i>
+								</a>
 							</nobr>
-						</th>  
+						</th>
 					}
 				</tr>
 				</thead>
 				@foreach (var certificate in Model.Certificates)
 				{
 					<tr class="certificate">
-						<td><a href="#" class="remove-certificate-preview-link" title="Не выдавать сертификат"><i class="glyphicon glyphicon-remove"></i></a></td>
+						<td>
+							<a href="#" class="remove-certificate-preview-link" title="Не выдавать сертификат">
+								<i class="glyphicon glyphicon-remove"></i>
+							</a>
+						</td>
 						<td>@(certificateIndex + 1)</td>
 						<td>@certificate.UserNames</td>
 						<td>
@@ -66,9 +74,9 @@
 									<a href="#" class="select-another-user-link internal-page-link">другой</a>
 									<div class="select-another-user-block ib">
 										<input type="text"
-											   class="select-another-user-input form-control ib"
-											   data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.CourseId })"
-											   placeholder="Начните вводить имя или фамилию">
+												class="select-another-user-input form-control ib"
+												data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.CourseId })"
+												placeholder="Начните вводить имя или фамилию">
 										<a href="#" class="cancel-select-another-user-link internal-page-link">отмена</a>
 									</div>
 								</div>
@@ -90,9 +98,9 @@
 									<a href="#" class="select-another-user-link internal-page-link">другой</a>
 									<div class="select-another-user-block ib">
 										<input type="text"
-											   class="select-another-user-input form-control ib"
-											   data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.CourseId })"
-											   placeholder="Начните вводить имя или фамилию">
+												class="select-another-user-input form-control ib"
+												data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.CourseId })"
+												placeholder="Начните вводить имя или фамилию">
 										<a href="#" class="cancel-select-another-user-link internal-page-link">отмена</a>
 									</div>
 								</div>
@@ -102,7 +110,7 @@
 								<div class="certificate__user">
 									@Html.Hidden("user-" + certificateIndex, "", new { @class = "user-id" })
 									<span class="user-name"></span>
-								
+
 									<div class="nobody-found">
 										Никого не найдено. Выберите пользователя:
 									</div>
@@ -111,9 +119,9 @@
 
 									<div class="select-another-user-block shown-by-default">
 										<input type="text"
-											   class="select-another-user-input form-control ib"
-											   data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.CourseId })"
-											   placeholder="Начните вводить имя или фамилию">
+												class="select-another-user-input form-control ib"
+												data-url="@Url.Action("FindUsers", "Admin", new { courseId = Model.CourseId })"
+												placeholder="Начните вводить имя или фамилию">
 									</div>
 								</div>
 							}

@@ -43,7 +43,8 @@
 					</div>
 					<div class="modal-body">
 						<h3>Отправка решения</h3>
-						<p>POST-запрос на&nbsp;<code>@Url.Action("Submit", "Grader", null, Request.GetRealScheme())</code> с&nbsp;заголовком <code>Content-Type: application/json</code></p>
+						<p>POST-запрос на&nbsp;<code>@Url.Action("Submit", "Grader", null, Request.GetRealScheme())</code> с&nbsp;заголовком <code>Content-Type: application/json</code>
+						</p>
 						<pre>{
     "client_id": "@client.Id",
     "course_id": "@Model.CourseId",

@@ -8,14 +8,14 @@ namespace Database.Migrations
 		public override void Up()
 		{
 			CreateTable(
-				"dbo.UserRoles",
-				c => new
-				{
-					Id = c.Int(nullable: false, identity: true),
-					UserId = c.String(maxLength: 128),
-					CourseId = c.String(nullable: false),
-					Role = c.Int(nullable: false),
-				})
+					"dbo.UserRoles",
+					c => new
+					{
+						Id = c.Int(nullable: false, identity: true),
+						UserId = c.String(maxLength: 128),
+						CourseId = c.String(nullable: false),
+						Role = c.Int(nullable: false),
+					})
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.AspNetUsers", t => t.UserId)
 				.Index(t => t.UserId);
@@ -36,7 +36,7 @@ namespace Database.Migrations
 									where t.UserId = d.UserId and d.RoleId = @adminId
 								) and t.RoleId = @instructorId
 						);"
-				);
+			);
 			Sql(@"delete from AspNetRoles where Name <> N'admin'");
 			Sql("update AspNetRoles set Name = N'SysAdmin' where Name = N'admin'");
 		}

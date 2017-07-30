@@ -37,10 +37,12 @@ namespace uLearn.Web.Models
 
 		public UrlHelper Url { get; set; }
 		private string runSolutionUrl;
-		public string RunSolutionUrl {
+
+		public string RunSolutionUrl
+		{
 			get
 			{
-				if (! string.IsNullOrEmpty(runSolutionUrl) || Url == null)
+				if (!string.IsNullOrEmpty(runSolutionUrl) || Url == null)
 					return runSolutionUrl ?? "";
 				return Url.Action("RunSolution", "Exercise", new { CourseId, slideId = Slide.Id, IsLti });
 			}

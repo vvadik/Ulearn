@@ -32,13 +32,14 @@ namespace uLearn.CSharp
 			var errors = FindErrors(@"int A(){ if (true) return 1; else return 2; }");
 			Assert.That(errors, Is.Null);
 		}
-		
+
 		[Test]
 		public void warn_if_with_folowing_return()
 		{
 			var errors = FindErrors(@"bool A(){ if (true) return true; return false; }");
 			Assert.That(errors, Is.Not.Null);
 		}
+
 		[Test]
 		public void ignore_if_with_complex_then()
 		{
@@ -59,7 +60,7 @@ namespace uLearn.CSharp
 			var errors = FindErrors(@"void A(){ if (true) a=1; else a=2; }");
 			Assert.That(errors, Is.Null);
 		}
-		
+
 		[Test]
 		public void find_all_warnings()
 		{

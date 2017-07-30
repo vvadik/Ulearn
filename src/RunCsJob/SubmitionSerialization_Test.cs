@@ -57,7 +57,7 @@ namespace RunCsJob
 
 		[Test]
 		public
-		void Test
+			void Test
 			()
 		{
 			const string json = @"[{""$type"":""file"",""Code"":""code"",""Id"":""1029"",""Input"":"""",""NeedRun"":true}]";

@@ -29,6 +29,7 @@
 			CurrentUser = Model.CurrentUser,
 		};
 	}
+
 }
 
 @helper TopLevelReplyForm()
@@ -68,7 +69,7 @@
 		else if (Model.CommentsPolicy.IsCommentsEnabled)
 		{
 			<div class="comments_policy__message">
-				Чтобы оставить комментарий, @Html.ActionLink("войдите", "Login", "Account", new { returnUrl = Request.RawUrl }, new {})
+				Чтобы оставить комментарий, @Html.ActionLink("войдите", "Login", "Account", new { returnUrl = Request.RawUrl }, new { })
 			</div>
 		}
 		else
@@ -84,7 +85,7 @@ else
 	if (Model.CommentsPolicy.IsCommentsEnabled)
 	{
 		<div class="comments_policy__message">
-			Чтобы оставить комментарий, @Html.ActionLink("войдите", "Login", "Account", new { returnUrl = Request.RawUrl }, new {})
+			Чтобы оставить комментарий, @Html.ActionLink("войдите", "Login", "Account", new { returnUrl = Request.RawUrl }, new { })
 		</div>
 	}
 	else
@@ -103,7 +104,8 @@ else
 			<li>Используйте подсказки перед тем, как задать вопрос в комментариях.</li>
 			<li>Воздержитесь от вопросов «Почему у меня не работает?». Отлаживайте, экспериментируйте, думайте!</li>
 			<li>Пожалуйста, не публикуйте свои решения.</li>
-			<li>Мы будем благодарны вам за доброжелательный тон в комментариях.
+			<li>
+				Мы будем благодарны вам за доброжелательный тон в комментариях.
 			</li>
 		</ul>
 	</div>

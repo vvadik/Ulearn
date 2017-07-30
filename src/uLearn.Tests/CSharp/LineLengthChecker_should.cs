@@ -12,6 +12,7 @@ namespace uLearn.CSharp
 		{
 			CheckIncorrect(code, "длинная");
 		}
+
 		[TestCase("0123456789")]
 		[TestCase("int a=142;")]
 		[TestCase("								1;")]
@@ -24,6 +25,7 @@ namespace uLearn.CSharp
 		{
 			Assert.That(FindErrors(code), Is.Null, code);
 		}
+
 		private void CheckIncorrect(string incorrectCode, string messageSubstring)
 		{
 			Assert.That(FindErrors(incorrectCode), Does.Contain("Строка 1").And.Contain(messageSubstring), incorrectCode);

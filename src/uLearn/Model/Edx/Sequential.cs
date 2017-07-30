@@ -16,9 +16,11 @@ namespace uLearn.Model.Edx
 		private VerticalReference[] verticalReferences;
 
 		[XmlElement("vertical")]
-		public VerticalReference[] VerticalReferences {
+		public VerticalReference[] VerticalReferences
+		{
 			get { return verticalReferences = verticalReferences ?? new VerticalReference[0]; }
-			set { verticalReferences = value; } }
+			set { verticalReferences = value; }
+		}
 
 		[XmlAttribute("visible_to_staff_only")]
 		[DefaultValue(false)]

@@ -85,7 +85,7 @@ namespace uLearn
 				}
 
 				current += line.Length;
-				
+
 				if (line.Contains("region"))
 				{
 					var name = GetRegionName(line);

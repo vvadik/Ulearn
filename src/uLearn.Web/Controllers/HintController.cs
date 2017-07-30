@@ -32,12 +32,12 @@ namespace uLearn.Web.Controllers
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			if (!(slide is ExerciseSlide))
 				return Json(new { Text = "Для слайда нет подсказок" });
-			var exerciseSlide = (ExerciseSlide) slide;
+			var exerciseSlide = (ExerciseSlide)slide;
 			if (exerciseSlide.Exercise.HintsMd.Count == 0)
 				return Json(new { Text = "Для слайда нет подсказок" });
-			var model = new HintPageModel {Hints = await GetNewHintHtml(exerciseSlide, courseId, isNeedNewHint)};
+			var model = new HintPageModel { Hints = await GetNewHintHtml(exerciseSlide, courseId, isNeedNewHint) };
 			if (model.Hints == null)
-				return Json(new {Text = "Подсказок больше нет"});
+				return Json(new { Text = "Подсказок больше нет" });
 			return PartialView(model);
 		}
 

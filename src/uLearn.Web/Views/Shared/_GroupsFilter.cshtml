@@ -8,7 +8,8 @@
 	@{
 		var groupsListItems = new List<SelectListItemWithAttributes>
 		{
-			new SelectListItemWithAttributes {
+			new SelectListItemWithAttributes
+			{
 				Text = "Все пользователи",
 				Value = "all",
 				Selected = Model.SelectedGroupsIds.Contains("all"),
@@ -50,11 +51,12 @@
 				})
 			);
 	}
-	
+
 	@Html.DropDownListWithItemAttributes(
 		"group",
 		groupsListItems,
-		new {
+		new
+		{
 			@class = "form-control selectpicker without-backdrop",
 			size = "1",
 			multiple = "true",

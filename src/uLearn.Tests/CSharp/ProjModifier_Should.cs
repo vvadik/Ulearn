@@ -16,10 +16,11 @@ namespace uLearn.CSharp
 		public void NotChangeFile_OnModify()
 		{
 			ProjModifier.ModifyCsproj(
-				new FileInfo(TestProjectFilename), 
+				new FileInfo(TestProjectFilename),
 				p => ProjModifier.PrepareForChecking(p, "AAA", new string[0]));
 			Assert.AreNotEqual("AAA", CreateTestProject().GetProperty("StartupObject"));
 		}
+
 		[Test]
 		public void ReplaceLinksWithItems()
 		{

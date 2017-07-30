@@ -43,7 +43,7 @@ namespace Notifications
 			log.Info($"Using channel '{channelId}'");
 		}
 
-		public async Task SendEmailAsync(string to, string subject, string textContent=null, string htmlContent=null, EmailButton button=null, string textContentAfterButton=null, string htmlContentAfterButton=null)
+		public async Task SendEmailAsync(string to, string subject, string textContent = null, string htmlContent = null, EmailButton button = null, string textContentAfterButton = null, string htmlContentAfterButton = null)
 		{
 			metricSender.SendCount("send_email.try");
 			var messageInfo = new MessageSentInfo

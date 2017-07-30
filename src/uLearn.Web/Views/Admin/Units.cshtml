@@ -30,9 +30,11 @@
 					@using (Html.BeginForm("SetPublishTime", "Admin", new { courseId = Model.CourseId, unitId = unit.Item1.Id }, FormMethod.Post))
 					{
 						<div class="input-group">
-							<input type="text" name="publishTime" value="@Model.CurrentDateTime.ToString("s")" class="form-control ib" />
+							<input type="text" name="publishTime" value="@Model.CurrentDateTime.ToString("s")" class="form-control ib"/>
 							<span class="input-group-btn">
-								<button type="submit" class="btn btn-info" title="Установить новое время публикации"><i class="glyphicon glyphicon-edit"></i></button>
+								<button type="submit" class="btn btn-info" title="Установить новое время публикации">
+									<i class="glyphicon glyphicon-edit"></i>
+								</button>
 							</span>
 						</div>
 					}
@@ -42,7 +44,9 @@
 					{
 						using (Html.BeginForm("RemovePublishTime", "Admin", new { courseId = Model.CourseId, unitId = unit.Item1.Id }, FormMethod.Post))
 						{
-							<button type="submit" class="btn btn-danger" title="Отменить публикацию"><i class="glyphicon glyphicon-remove"></i></button>
+							<button type="submit" class="btn btn-danger" title="Отменить публикацию">
+								<i class="glyphicon glyphicon-remove"></i>
+							</button>
 						}
 					}
 				</td>

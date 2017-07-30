@@ -24,7 +24,8 @@ namespace uLearn
 		[NotNull]
 		public static T EnsureNotNull<T>(this T o, string exceptionMessageIfNull = "can't be null")
 		{
-			if (o == null) throw new ArgumentException(exceptionMessageIfNull);
+			if (o == null)
+				throw new ArgumentException(exceptionMessageIfNull);
 			return o;
 		}
 

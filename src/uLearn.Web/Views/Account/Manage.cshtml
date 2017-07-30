@@ -8,7 +8,7 @@
 			<div class="row">
 				<div class="col-sm-10 col-sm-offset-2">
 					<h2>Профиль @User.Identity.Name</h2>
-					
+
 					<hr class="without-top-margin"/>
 
 					@if (!string.IsNullOrEmpty(ViewBag.StatusMessage))
@@ -23,7 +23,7 @@
 			{
 				@Html.Partial("_ChangePasswordPartial")
 			}
-			
+
 			<div class="row">
 				<section id="externalLogins" class="col-sm-10 col-sm-offset-2">
 					@Html.Action("RemoveAccountList")

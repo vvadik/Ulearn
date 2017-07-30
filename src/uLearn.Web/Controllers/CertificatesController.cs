@@ -31,7 +31,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[AllowAnonymous]
-		public ActionResult Index(string userId="")
+		public ActionResult Index(string userId = "")
 		{
 			if (string.IsNullOrEmpty(userId) && User.Identity.IsAuthenticated)
 				userId = User.Identity.GetUserId();

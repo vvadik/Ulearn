@@ -7,15 +7,15 @@ namespace Database.Migrations
 		public override void Up()
 		{
 			CreateTable(
-				"dbo.Likes",
-				c => new
-				{
-					ID = c.Int(nullable: false, identity: true),
-					SolutionId = c.Int(nullable: false),
-					UserId = c.String(nullable: false),
-					Timestamp = c.DateTime(nullable: false),
-					UserSolution_Id = c.Int(),
-				})
+					"dbo.Likes",
+					c => new
+					{
+						ID = c.Int(nullable: false, identity: true),
+						SolutionId = c.Int(nullable: false),
+						UserId = c.String(nullable: false),
+						Timestamp = c.DateTime(nullable: false),
+						UserSolution_Id = c.Int(),
+					})
 				.PrimaryKey(t => t.ID)
 				.ForeignKey("dbo.UserSolutions", t => t.UserSolution_Id)
 				.Index(t => t.UserSolution_Id);

@@ -9,7 +9,7 @@
 				@if (Model.User.LastConfirmationEmailTime != null)
 				{
 					<div class="alert alert-success">
-						Мы отправили письмо на&nbsp;@Model.User.Email. 
+						Мы отправили письмо на&nbsp;@Model.User.Email.
 						Если письмо не&nbsp;пришло, мы можем @Html.ActionLink("отправить его ещё раз", "SendConfirmationEmail", "Account").
 					</div>
 				}

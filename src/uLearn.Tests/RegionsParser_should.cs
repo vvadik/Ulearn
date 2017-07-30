@@ -91,6 +91,5 @@ namespace uLearn
 			};
 			CollectionAssert.AreEquivalent(expected, regions);
 		}
-
 	}
 }

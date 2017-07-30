@@ -3,7 +3,7 @@
 	public class RunningResults
 	{
 		public string Id { get; set; }
-		
+
 		public Verdict Verdict { get; set; }
 
 		public string CompilationOutput { get; set; }

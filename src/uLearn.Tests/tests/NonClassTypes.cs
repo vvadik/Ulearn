@@ -1,4 +1,6 @@
-﻿#pragma warning disable 169
+﻿
+#pragma warning disable 169
+
 namespace uLearn.tests
 {
 	internal interface IRunnable
@@ -8,7 +10,9 @@ namespace uLearn.tests
 
 	public enum Enum
 	{
-		A, B, C
+		A,
+		B,
+		C
 	}
 
 	public struct Struct
@@ -17,4 +21,5 @@ namespace uLearn.tests
 		private int y, z;
 	}
 }
+
 #pragma warning restore 169

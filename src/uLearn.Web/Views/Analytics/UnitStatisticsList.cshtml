@@ -5,17 +5,17 @@
 }
 
 <body>
-	<div class="container">
+<div class="container">
 
-		<h1 class="hidden-xs">Аналитика</h1>
+	<h1 class="hidden-xs">Аналитика</h1>
 
-		<h3>Выберите модуль</h3>
+	<h3>Выберите модуль</h3>
 
-		@foreach (var unit in Model.Units)
-		{
-			<div>
-				@Html.ActionLink(unit.Title, "UnitStatistics", new { courseId = Model.Course.Id, unitId = unit.Id })
-			</div>
-		}
-	</div>
+	@foreach (var unit in Model.Units)
+	{
+		<div>
+			@Html.ActionLink(unit.Title, "UnitStatistics", new { courseId = Model.Course.Id, unitId = unit.Id })
+		</div>
+	}
+</div>
 </body>

@@ -104,16 +104,16 @@ namespace Database.DataContexts
 		public int GetAverageStatistics(Guid slideId, string courseId)
 		{
 			var newA = db.UserQuizzes
-				.Where(x => x.SlideId == slideId)
-				.GroupBy(x => x.UserId)
-				.Select(x => x
-					.GroupBy(y => y.QuizId)
-					.Select(y => y.All(z => z.QuizBlockScore == z.QuizBlockMaxScore))
-					.Select(y => y ? 1 : 0)
-					.DefaultIfEmpty()
-					.Average())
-				.DefaultIfEmpty()
-				.Average() * 100;
+							.Where(x => x.SlideId == slideId)
+							.GroupBy(x => x.UserId)
+							.Select(x => x
+								.GroupBy(y => y.QuizId)
+								.Select(y => y.All(z => z.QuizBlockScore == z.QuizBlockMaxScore))
+								.Select(y => y ? 1 : 0)
+								.DefaultIfEmpty()
+								.Average())
+							.DefaultIfEmpty()
+							.Average() * 100;
 			return (int)newA;
 		}
 
@@ -183,8 +183,8 @@ namespace Database.DataContexts
 			db.UserQuizzes.RemoveRange(
 				db.UserQuizzes.Where(
 					q => q.CourseId == courseId && q.SlideId == slideId && q.UserId == userId && !q.isDropped
-					)
-				);
+				)
+			);
 			await db.SaveChangesAsync();
 		}
 	}

@@ -41,6 +41,7 @@ namespace uLearn
 
 
 		public static Regex rxExtractLanguage = new Regex("^({{(.+)}}[\r\n])", RegexOptions.Compiled);
+
 		public static string FormatCodePrettyPrint(MarkdownDeep.Markdown m, string code)
 		{
 			// Try to extract the language from the first line
@@ -77,11 +78,11 @@ namespace uLearn
 				return string.Format("<pre><code>{0}</code></pre>\n", code);
 			else
 				return string.Format("<textarea class=\"code code-sample data-lang='{0}' \">{1}</textarea>\n",
-									language.ToLowerInvariant(), code);
+					language.ToLowerInvariant(), code);
 		}
+
 		public static Tuple<string, List<string>> GetHtmlWithUrls(this string md, string baseUrl = null)
 		{
-			
 			var texReplacer = new EdxTexReplacer(md);
 
 			var markdown = new Markdown2(baseUrl, false)
@@ -91,12 +92,12 @@ namespace uLearn
 				SafeMode = false,
 				MarkdownInHtml = false,
 			};
-			
+
 			var relativeUrls = new List<string>();
 			markdown.RelativeUrl += relativeUrls.Add;
 
 			var html = markdown.Transform(texReplacer.ReplacedText);
-			
+
 			return Tuple.Create(texReplacer.PlaceTexInsertsBack(html), relativeUrls);
 		}
 	}

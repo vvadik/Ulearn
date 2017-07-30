@@ -8,7 +8,7 @@
 
 <div class="container">
 	<h2>
-		@Html.ActionLink("←", "Clients", "Grader", new { courseId = Model.CourseId }, new {})
+		@Html.ActionLink("←", "Clients", "Grader", new { courseId = Model.CourseId }, new { })
 		Посылки от клиента @Model.Client.Name
 	</h2>
 
@@ -34,7 +34,7 @@
 			}
 			else
 			{
-				<text>Решений этого пользователя нет. @Html.ActionLink("Показать все?", "Submissions", "Grader", new { courseId = Model.CourseId, clientId = Model.Client.Id }, new {})</text>
+				<text>Решений этого пользователя нет. @Html.ActionLink("Показать все?", "Submissions", "Grader", new { courseId = Model.CourseId, clientId = Model.Client.Id }, new { })</text>
 			}
 		</p>
 	}
@@ -80,7 +80,7 @@
 					<td class="@resultCssClass">@result</td>
 					<td>
 						<a href="#" class="grader-submissions__details__link internal-page-link show-on-row-hover"
-						   data-url="@Url.Action("GetDetails", "Sandbox", new { id = submission.Id })">
+							data-url="@Url.Action("GetDetails", "Sandbox", new { id = submission.Id })">
 							Подробности
 						</a>
 						<span class="loading-icon glyphicon glyphicon-refresh glyphicon-refresh-animate invisible"></span>
@@ -96,9 +96,9 @@
 				Показано @Model.Solutions.Count последних решений.
 				@if (Model.Solutions.Count < 2000)
 				{
-					@Html.ActionLink("Показать больше.", "Submissions", "Grader", new { courseId = Model.CourseId, clientId = Model.Client.Id, max = Model.Solutions.Count * 2, search = Model.Search }, new {})
+					@Html.ActionLink("Показать больше.", "Submissions", "Grader", new { courseId = Model.CourseId, clientId = Model.Client.Id, max = Model.Solutions.Count * 2, search = Model.Search }, new { })
 				}
-			</div>	 
+			</div>
 		}
 	}
 
@@ -106,7 +106,9 @@
 		<div class="modal-dialog" style="width: 75%">
 			<div class="modal-content">
 				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+					</button>
 					<h4 class="modal-title">Информация по посылке</h4>
 				</div>
 				<div class="modal-body">

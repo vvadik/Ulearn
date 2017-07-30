@@ -7,15 +7,15 @@ namespace Database.Migrations
 		public override void Up()
 		{
 			CreateTable(
-				"dbo.CourseVersions",
-				c => new
-				{
-					Id = c.Guid(nullable: false),
-					CourseId = c.String(nullable: false, maxLength: 64),
-					LoadingTime = c.DateTime(nullable: false),
-					PublishTime = c.DateTime(),
-					AuthorId = c.String(nullable: false, maxLength: 128),
-				})
+					"dbo.CourseVersions",
+					c => new
+					{
+						Id = c.Guid(nullable: false),
+						CourseId = c.String(nullable: false, maxLength: 64),
+						LoadingTime = c.DateTime(nullable: false),
+						PublishTime = c.DateTime(),
+						AuthorId = c.String(nullable: false, maxLength: 128),
+					})
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.AspNetUsers", t => t.AuthorId, cascadeDelete: true)
 				.Index(t => new { t.CourseId, t.LoadingTime }, name: "IDX_CourseVersion_ByCourseAndLoadingTime")

@@ -44,7 +44,7 @@ namespace uLearn.CSharp
 			try
 			{
 				var solutionTree = CSharpSyntaxTree.ParseText(userCode);
-				var errors =  validators
+				var errors = validators
 					.Where(v => !(v is IStrictValidator))
 					.Select(v => v.FindError(solutionTree))
 					.Where(err => err != null)

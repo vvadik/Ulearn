@@ -50,7 +50,7 @@ namespace XQueueWatcher
 			{
 				return;
 			}
-			
+
 			OnSubmission.Invoke(this, new SubmissionEventArgs
 			{
 				Submission = submission

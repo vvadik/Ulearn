@@ -65,8 +65,8 @@ namespace uLearn.CSharp
 			CheckIncorrect("class A{ public const int abcDef; }");
 			CheckIncorrect("class A{ public const int _a; }");
 			CheckIncorrect("class A{ public const int _b; }");
-
 		}
+
 		[Test]
 		public void inspect_fieldName()
 		{

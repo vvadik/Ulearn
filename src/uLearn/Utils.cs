@@ -14,8 +14,8 @@ namespace uLearn
 				? code
 				: ((SingleFileExerciseBlock)((ExerciseSlide)courseManager.GetCourse(courseId).GetSlideById(slideId))
 					.Exercise)
-					.BuildSolution(code)
-					.SourceCode;
+				.BuildSolution(code)
+				.SourceCode;
 		}
 
 		public static void UnpackZip(byte[] data, string pathToExtractDir)

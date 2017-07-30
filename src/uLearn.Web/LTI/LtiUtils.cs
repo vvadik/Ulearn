@@ -11,7 +11,7 @@ namespace uLearn.Web.LTI
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(LtiUtils));
 
-		public static void SubmitScore(Slide slide, string userId, Visit visit=null)
+		public static void SubmitScore(Slide slide, string userId, Visit visit = null)
 		{
 			var db = new ULearnDb();
 			var ltiRequestsRepo = new LtiRequestsRepo(db);
@@ -45,7 +45,7 @@ namespace uLearn.Web.LTI
 			}
 
 			var maxScore = ControllerUtils.GetMaxScoreForUsersSlide(slide, true, false, false);
-			var outputScore = score / (double) maxScore;
+			var outputScore = score / (double)maxScore;
 			log.Info($"Отправляю результаты на {ltiRequest.LisOutcomeServiceUrl}: {score} из {maxScore} ({outputScore})");
 
 			/* Sometimes score is bigger then slide's MaxScore, i.e. in case of manual checking */
@@ -57,6 +57,5 @@ namespace uLearn.Web.LTI
 			if (!result.IsValid)
 				throw new Exception(uri + "\r\n\r\n" + result.Message);
 		}
-
 	}
 }

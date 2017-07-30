@@ -61,7 +61,7 @@ namespace uLearn.Model.Edx.EdxComponents
 					subcomponent.SaveAdditional(folderName);
 		}
 
-		public static SlideProblemComponent Load(string folderName, string urlName, EdxLoadOptions options) 
+		public static SlideProblemComponent Load(string folderName, string urlName, EdxLoadOptions options)
 			=> Load<SlideProblemComponent>(folderName, "problem", urlName, options);
 	}
 
@@ -124,7 +124,7 @@ namespace uLearn.Model.Edx.EdxComponents
 
 	public class Solution
 	{
-//		[XmlText]
+		//		[XmlText]
 		public XmlElement Text;
 
 		public Solution()

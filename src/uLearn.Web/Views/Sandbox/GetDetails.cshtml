@@ -4,17 +4,17 @@
 	Layout = null;
 	var texts = new[]
 	{
-		new {text = Model.SolutionCode.Text, type = "code", name = "Код"},
-		new {text = Model.AutomaticChecking.CompilationError.Text, type = "compilationInfo", name = "Сообщения компилятора"},
-		new {text = Model.AutomaticChecking.Output.Text, type = "output", name = "Вывод"},
+		new { text = Model.SolutionCode.Text, type = "code", name = "Код" },
+		new { text = Model.AutomaticChecking.CompilationError.Text, type = "compilationInfo", name = "Сообщения компилятора" },
+		new { text = Model.AutomaticChecking.Output.Text, type = "output", name = "Вывод" },
 	}
-	.Where(arg => !string.IsNullOrWhiteSpace(arg.text));
+		.Where(arg => !string.IsNullOrWhiteSpace(arg.text));
 }
 
 <div style="margin-bottom: 20px">
 	Id: @Html.Encode(Model.Id) <br/>
-	Время отправки: @Model.Timestamp.ToPrettyString() <br />
-	Статус: @Model.AutomaticChecking.Status.ToString() <br />
+	Время отправки: @Model.Timestamp.ToPrettyString() <br/>
+	Статус: @Model.AutomaticChecking.Status.ToString() <br/>
 	Результат: <b>@Model.AutomaticChecking.GetVerdict()</b>
 </div>
 

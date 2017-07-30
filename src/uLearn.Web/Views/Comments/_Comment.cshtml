@@ -5,7 +5,7 @@
 
 @helper ReplyForm(Comment comment, bool isFormHidden)
 {
-	<div class="reply-form is-reply media @(isFormHidden ? "collapse" : "")">
+	<div class="reply-form is-reply media @( isFormHidden ? "collapse" : "")">
 		@using (Html.BeginForm("AddComment", "Comments", FormMethod.Post))
 		{
 			@Html.Hidden("courseId", comment.CourseId)
@@ -28,7 +28,7 @@
 		 @(Model.Comment.IsPinnedToTop ? "is-pinned" : "")
 		 @(Model.Comment.IsCorrectAnswer ? "is-correct-answer" : "")
 		 media"
-		 data-comment-id="@Model.Comment.Id">
+		data-comment-id="@Model.Comment.Id">
 
 		<a class="pull-left" href="#">
 			@UserAvatar.Avatar(Model.Comment.Author, "comment__author-avatar media-object")
@@ -41,40 +41,48 @@
 					{
 						<sup>
 							@Html.ActionLink(
-							"решения",
-							"UserSolutions", "Analytics",
-							new
-							{
-								courseId = Model.Comment.CourseId,
-								slideId = Model.Comment.SlideId,
-								userId = Model.Comment.AuthorId
-							}, null)
+								"решения",
+								"UserSolutions", "Analytics",
+								new
+								{
+									courseId = Model.Comment.CourseId,
+									slideId = Model.Comment.SlideId,
+									userId = Model.Comment.AuthorId
+								}, null)
 						</sup>
 					}
 				</div>@if (Model.ShowContextInformation)
-				{
-					<div> — слайд
-						<a href="@Url.Action("SlideById", "Course", new
-						         {
-							         courseId = Model.Comment.CourseId,
-							         slideId = Model.Comment.SlideId,
-						         })">«@Model.ContextSlideTitle»</a>
-					</div><!--
-					-->if (! string.IsNullOrEmpty(Model.ContextParentComment))
-					{<div>
-					, в ответ на <a href="@Url.Action("SlideById", "Course", new
-												{
-													courseId = Model.Comment.CourseId,
-													slideId = Model.Comment.SlideId,
-												})#comment-@Model.Comment.ParentCommentId"
-									title="@Html.AttributeEncode(Model.ContextParentComment.TruncateWithEllipsis(200))">«@(Model.ContextParentComment.TruncateWithEllipsis(40))»</a>
-								</div>
-					}
-				}
+				      {
+					      <div>
+							— слайд
+							<a href="@Url.Action("SlideById", "Course", new
+							         {
+								         courseId = Model.Comment.CourseId,
+								         slideId = Model.Comment.SlideId,
+							         })">
+								«@Model.ContextSlideTitle»
+							</a>
+						</div>
+					      <!--
+						-->
+					      if (!string.IsNullOrEmpty(Model.ContextParentComment))
+					      {
+						      <div>
+								, в ответ на <a href="@Url.Action("SlideById", "Course", new
+								                      {
+									                      courseId = Model.Comment.CourseId,
+									                      slideId = Model.Comment.SlideId,
+								                      })#comment-@Model.Comment.ParentCommentId"
+												title="@Html.AttributeEncode(Model.ContextParentComment.TruncateWithEllipsis(200))">
+									«@(Model.ContextParentComment.TruncateWithEllipsis(40))»
+								</a>
+							</div>
+					      }
+				      }
 				@if (Model.CanModerateComment || !Model.Comment.IsApproved)
 				{
 					<div class="comment__not-approved @(Model.CanModerateComment ? "label-switcher" : "") label label-as-badge label-default"
-						 data-url="@Url.Action("ApproveComment", "Comments", new { commentId = Model.Comment.Id })">
+						data-url="@Url.Action("ApproveComment", "Comments", new { commentId = Model.Comment.Id })">
 						@if (Model.CanModerateComment)
 						{
 							<span class="hide-on-parent-hover">не опубликовано</span>
@@ -92,7 +100,7 @@
 					if (Model.CanModerateComment || Model.Comment.IsPinnedToTop)
 					{
 						<div class="comment__pinned @(Model.CanModerateComment ? "label-switcher" : "") label label-as-badge label-success show-on-comment-hover"
-							 data-url="@Url.Action("PinComment", "Comments", new { commentId = Model.Comment.Id })">
+							data-url="@Url.Action("PinComment", "Comments", new { commentId = Model.Comment.Id })">
 
 							@if (Model.CanModerateComment)
 							{
@@ -113,7 +121,7 @@
 					if (Model.CanModerateComment || Model.Comment.IsCorrectAnswer)
 					{
 						<div class="comment__correct-answer @(Model.CanModerateComment ? "label-switcher" : "") label label-as-badge label-primary show-on-comment-hover"
-							 data-url="@Url.Action("MarkAsCorrectAnswer", "Comments", new { commentId = Model.Comment.Id })">
+							data-url="@Url.Action("MarkAsCorrectAnswer", "Comments", new { commentId = Model.Comment.Id })">
 							@if (Model.CanModerateComment)
 							{
 								<span class="glyphicon glyphicon-remove"></span>
@@ -131,7 +139,7 @@
 					var likesCount = Model.LikesCount;
 				}
 				<div class="comment__likes-count @(Model.IsLikedByUser ? "is-liked" : "")"
-					 data-url="@Url.Action("LikeComment", "Comments", new { commentId = Model.Comment.Id })">
+					data-url="@Url.Action("LikeComment", "Comments", new { commentId = Model.Comment.Id })">
 					<span class="glyphicon glyphicon-heart"></span>
 					<span class="comment__likes-count__counter">
 						@if (likesCount > 0)
@@ -159,7 +167,7 @@
 				@if (Model.CanEditAndDeleteComment)
 				{
 					<div class="comment__edit-link show-on-comment-hover"
-						 data-url="@Url.Action("EditCommentText", "Comments", new { commentId = Model.Comment.Id })">
+						data-url="@Url.Action("EditCommentText", "Comments", new { commentId = Model.Comment.Id })">
 						<a href=""><span class="glyphicon glyphicon-pencil"></span>редактировать</a>
 					</div>
 				}
@@ -174,8 +182,8 @@
 				@if (Model.CanEditAndDeleteComment)
 				{
 					<div class="comment__delete-link show-on-comment-hover"
-						 data-url="@Url.Action("DeleteComment", "Comments", new { commentId = Model.Comment.Id })"
-						 data-restore-url="@Url.Action("RestoreComment", "Comments", new { commentId = Model.Comment.Id })">
+						data-url="@Url.Action("DeleteComment", "Comments", new { commentId = Model.Comment.Id })"
+						data-restore-url="@Url.Action("RestoreComment", "Comments", new { commentId = Model.Comment.Id })">
 						<a href="" title="удалить комментарий"><span class="glyphicon glyphicon-remove"></span>удалить</a>
 					</div>
 				}
@@ -186,12 +194,12 @@
 
 	foreach (var reply in Model.Replies)
 	{
-		@Html.Partial("_Comment", reply);
+		@Html.Partial("_Comment", reply)
+		;
 	}
 
 	if (Model.Comment.IsTopLevel() && Model.CanReply)
 	{
 		@ReplyForm(Model.Comment, !Model.Replies.Any())
 	}
-
 }

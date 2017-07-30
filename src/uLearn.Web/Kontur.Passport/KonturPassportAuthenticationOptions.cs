@@ -16,7 +16,7 @@ namespace uLearn.Web.Kontur.Passport
 			: this(KonturPassportConstants.AuthenticationType)
 		{
 		}
-		
+
 		public string ClientId { get; set; }
 
 		public string ClientSecret { get; set; }
@@ -31,6 +31,5 @@ namespace uLearn.Web.Kontur.Passport
 		public string SignInAsAuthenticationType { get; set; }
 
 		public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
-
 	}
 }

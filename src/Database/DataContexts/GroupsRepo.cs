@@ -261,8 +261,8 @@ namespace Database.DataContexts
 												coursesWhereUserCanSeeAllGroups.Contains(g.CourseId) ||
 												/* Other instructor can see only public or own groups */
 												(otherCourses.Contains(g.CourseId) && (g.OwnerId == userId || g.IsPublic))
-												)
-				);
+											)
+			);
 
 			return groups
 				.OrderBy(g => g.IsArchived)
@@ -398,7 +398,7 @@ namespace Database.DataContexts
 			{
 				db.EnabledAdditionalScoringGroups.RemoveRange(
 					db.EnabledAdditionalScoringGroups.Where(e => e.GroupId == groupId)
-					);
+				);
 
 				foreach (var scoringGroupId in scoringGroupsIds)
 					db.EnabledAdditionalScoringGroups.Add(new EnabledAdditionalScoringGroup

@@ -19,7 +19,7 @@ namespace uLearn.Web.Controllers
 		protected readonly ULearnDb db;
 		protected readonly CourseManager courseManager;
 		protected readonly GraphiteMetricSender metricSender;
-		
+
 		protected readonly UserSolutionsRepo userSolutionsRepo;
 		protected readonly SlideCheckingsRepo slideCheckingsRepo;
 		protected readonly GroupsRepo groupsRepo;
@@ -45,7 +45,7 @@ namespace uLearn.Web.Controllers
 			visitsRepo = new VisitsRepo(db);
 			notificationsRepo = new NotificationsRepo(db);
 		}
-		
+
 		private string GenerateSubmissionName(Slide exerciseSlide, string userName)
 		{
 			return $"{userName}: {exerciseSlide.Info.Unit.Title} - {exerciseSlide.Title}";
@@ -100,7 +100,7 @@ namespace uLearn.Web.Controllers
 				{
 					IsCompillerFailure = true,
 					ErrorMessage = "К сожалению, из-за большой нагрузки мы не смогли оперативно проверить ваше решение. " +
-								   "Мы попробуем проверить его позже, просто подождите и обновите страницу. ",
+									"Мы попробуем проверить его позже, просто подождите и обновите страницу. ",
 					ExecutionServiceName = "uLearn"
 				};
 			}

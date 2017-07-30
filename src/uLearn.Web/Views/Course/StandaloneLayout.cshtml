@@ -11,46 +11,46 @@
 	<html>
 	<head>
 		<title>Preview: @course.Title — @slide.Title</title>
-		<link rel="shortcut icon" href="favicon.ico?v=1" />
+		<link rel="shortcut icon" href="favicon.ico?v=1"/>
 		<meta charset='UTF-8'>
 		@foreach (var cssFile in cssFiles)
 		{
-			<link href='@cssFile' rel='stylesheet' />
+			<link href='@cssFile' rel='stylesheet'/>
 		}
 	</head>
 	<body>
-		<div class='side-bar navbar-collapse collapse navbar-nav container'>
-			@TableOfContents.Toc(toc)
-		</div>
+	<div class='side-bar navbar-collapse collapse navbar-nav container'>
+		@TableOfContents.Toc(toc)
+	</div>
 
-		<div class="slide-container">
-			<div class="container body-content">
-				<div class="row">
-					@SlideHtml.Slide(new BlockRenderContext(course, slide, "/static/", 
-						slide.Blocks.Select(
-							(b, i) => b is ExerciseBlock 
-								? new ExerciseBlockData(course.Id, (ExerciseSlide) slide) { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true, IsGuest = false } 
-								: b is AbstractQuestionBlock 
-									? new QuizBlockData(new QuizModel
-									{
-										AnswersToQuizes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<UserQuiz>()),
-										Slide = (QuizSlide) slide
-									}, i, QuizState.Total) 
-									: (dynamic)null
-							).ToArray(),
-						false,
-						true
-						),
-						null)
-				</div>
+	<div class="slide-container">
+		<div class="container body-content">
+			<div class="row">
+				@SlideHtml.Slide(new BlockRenderContext(course, slide, "/static/",
+					slide.Blocks.Select(
+						(b, i) => b is ExerciseBlock
+							? new ExerciseBlockData(course.Id, (ExerciseSlide)slide) { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true, IsGuest = false }
+							: b is AbstractQuestionBlock
+								? new QuizBlockData(new QuizModel
+								{
+									AnswersToQuizes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<UserQuiz>()),
+									Slide = (QuizSlide)slide
+								}, i, QuizState.Total)
+								: (dynamic)null
+						).ToArray(),
+					false,
+					true
+					),
+					null)
 			</div>
 		</div>
+	</div>
 
 
-		@foreach (var jsFile in jsFiles)
-		{
-			<script src='@jsFile'></script>
-		}
+	@foreach (var jsFile in jsFiles)
+	{
+		<script src='@jsFile'></script>
+	}
 	</body>
-</html>
+	</html>
 }

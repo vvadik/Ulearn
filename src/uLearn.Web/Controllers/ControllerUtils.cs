@@ -35,7 +35,7 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		public static T GetFilterOptionsByGroup<T>(GroupsRepo groupsRepo, IPrincipal User, string courseId, List<string> groupsIds, bool allowSeeGroupForAnyMember=false) where T : AbstractFilterOptionByCourseAndUsers, new()
+		public static T GetFilterOptionsByGroup<T>(GroupsRepo groupsRepo, IPrincipal User, string courseId, List<string> groupsIds, bool allowSeeGroupForAnyMember = false) where T : AbstractFilterOptionByCourseAndUsers, new()
 		{
 			var result = new T { CourseId = courseId };
 

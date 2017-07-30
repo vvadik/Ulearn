@@ -4,6 +4,7 @@
 
 @functions
 {
+
 	private static string GetSubmissionDescription(UserExerciseSubmission submission)
 	{
 		if (submission.AutomaticChecking != null && submission.AutomaticChecking.Status != AutomaticExerciseCheckingStatus.Done)
@@ -18,6 +19,7 @@
 				return ", ожидает код-ревью";
 		return "";
 	}
+
 }
 
 <div class="exercise__submissions-panel">

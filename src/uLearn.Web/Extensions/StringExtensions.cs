@@ -5,7 +5,7 @@ namespace uLearn.Web.Extensions
 {
 	public static class StringExtensions
 	{
-		public static string TruncateWithEllipsis(this string s, int maxLength, string ellipsis="...")
+		public static string TruncateWithEllipsis(this string s, int maxLength, string ellipsis = "...")
 		{
 			if (maxLength < 0)
 				return s;

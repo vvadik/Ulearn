@@ -22,6 +22,7 @@ namespace uLearn.Web.Models
 
 		/* GroupsIds != null if instructor filtered users by group and see their works */
 		public List<string> GroupsIds { get; set; }
+
 		public string GroupsIdsJoined => string.Join(",", GroupsIds ?? new List<string>());
 
 		public int Score

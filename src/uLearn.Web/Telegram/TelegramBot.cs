@@ -14,7 +14,7 @@ namespace uLearn.Web.Telegram
 			token = WebConfigurationManager.AppSettings["ulearn.telegram.botToken"];
 			telegramClient = new TelegramBotClient(token);
 		}
-		
-		protected bool IsBotEnabled => ! string.IsNullOrWhiteSpace(token) && ! string.IsNullOrEmpty(channel);
+
+		protected bool IsBotEnabled => !string.IsNullOrWhiteSpace(token) && !string.IsNullOrEmpty(channel);
 	}
 }

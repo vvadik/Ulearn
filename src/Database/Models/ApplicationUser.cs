@@ -26,11 +26,13 @@ namespace Database.Models
 
 		// AvatarUrl is empty if user has no avatar
 		public string AvatarUrl { get; set; }
+
 		public bool HasAvatar => !string.IsNullOrEmpty(AvatarUrl);
 
 		// TelegramChatId is null if telegram is not connected to the profile
 		[Index("IDX_ApplicationUser_ByTelegramChatId")]
 		public long? TelegramChatId { get; set; }
+
 		public bool HasTelegram => TelegramChatId != null;
 
 		[StringLength(200)]

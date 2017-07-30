@@ -29,16 +29,16 @@ namespace uLearn.Web
 			var message = error.Exception.Message;
 			return ignorableForTelegramChannelSubstrings.Any(ignorableSubstring => message.Contains(ignorableSubstring));
 		}
-		
+
 		private void OnLogged(object sender, ErrorLoggedEventArgs args)
 		{
 			var error = args.Entry.Error;
 			var entryId = args.Entry.Id;
 			log.Error($"Произошла ошибка {entryId} (код {error.StatusCode}, подробности в Elmah):\n" +
-					  $"Query string: {error.QueryString}",
+					$"Query string: {error.QueryString}",
 				error.Exception);
 
-			if (! IsErrorIgnoredForTelegramChannel(error))
+			if (!IsErrorIgnoredForTelegramChannel(error))
 				errorsBot.PostToChannel(entryId, error);
 		}
 	}

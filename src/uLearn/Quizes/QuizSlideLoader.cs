@@ -13,11 +13,11 @@ namespace uLearn.Quizes
 		public Slide Load(FileInfo file, Unit unit, int slideIndex, CourseSettings settings)
 		{
 			var quiz = file.DeserializeXml<Quiz>();
-			
+
 			var scoringGroupsIds = settings.Scoring.Groups.Keys;
-			if (! string.IsNullOrEmpty(quiz.ScoringGroup) && ! scoringGroupsIds.Contains(quiz.ScoringGroup))
+			if (!string.IsNullOrEmpty(quiz.ScoringGroup) && !scoringGroupsIds.Contains(quiz.ScoringGroup))
 				throw new CourseLoadingException(
-					$"Неизвестная группа оценки у теста {quiz.Title}: {quiz.ScoringGroup}\n" + 
+					$"Неизвестная группа оценки у теста {quiz.Title}: {quiz.ScoringGroup}\n" +
 					"Возможные значения: " + string.Join(", ", scoringGroupsIds));
 
 			if (string.IsNullOrEmpty(quiz.ScoringGroup))

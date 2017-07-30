@@ -29,6 +29,7 @@ namespace Database.Models
 		[Required]
 		[StringLength(64)]
 		public string UserId { get; set; }
+
 		public virtual ApplicationUser User { get; set; }
 	}
 }

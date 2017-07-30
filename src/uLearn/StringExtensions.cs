@@ -15,6 +15,7 @@ namespace uLearn
 		{
 			return Directory.Exists(directoryPath) ? Directory.GetFiles(directoryPath) : new string[0];
 		}
+
 		public static string PathCombine(this string directoryPath, string subdirectoryPath)
 		{
 			return Path.Combine(directoryPath, subdirectoryPath);
@@ -137,7 +138,7 @@ namespace uLearn
 			byte[] hash;
 			using (var md5 = MD5.Create())
 				hash = md5.ComputeHash(Encoding.Default.GetBytes(arg));
-			
+
 			var sb = new StringBuilder();
 			foreach (var b in hash)
 				sb.Append(b.ToString("X2"));

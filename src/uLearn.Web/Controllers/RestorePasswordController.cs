@@ -37,7 +37,7 @@ namespace uLearn.Web.Controllers
 			var spamLogin = WebConfigurationManager.AppSettings["ulearn.spam.login"] ?? "ulearn";
 			var spamPassword = WebConfigurationManager.AppSettings["ulearn.spam.password"] ?? "";
 			spamChannelId = WebConfigurationManager.AppSettings["ulearn.spam.channels.passwords"] ?? "";
-			
+
 			try
 			{
 				spamClient = new SpamClient(new Uri(spamEndpoint), spamLogin, spamPassword);
@@ -86,7 +86,7 @@ namespace uLearn.Web.Controllers
 					continue;
 				}
 
-				if (! user.EmailConfirmed)
+				if (!user.EmailConfirmed)
 				{
 					answer.Messages.Add(new Message($"У пользователя {user.UserName} не подтверждена электронная почта"));
 					continue;

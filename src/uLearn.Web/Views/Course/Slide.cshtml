@@ -61,7 +61,9 @@
 								  <span>(@Model.ContextManualCheckingUserGroups),</span>
 							  }
 							  else
-							  {<span>,</span>}
+							  {
+								  <span>,</span>
+							  }
 							@Model.ManualChecking.Timestamp.ToPrettyString()
 						</p>
 					}
@@ -100,7 +102,8 @@
 						Сделано в <a href="https://kontur.ru">СКБ Контур</a>.
 						@Html.ActionLink("Условия использования", "Terms", "Home").
 					</p>
-					<p>С вопросами и пожеланиями пишите на <a href="mailto:support@ulearn.me">support@ulearn.me</a>.</p>
+					<p>С вопросами и пожеланиями пишите на <a href="mailto:support@ulearn.me">support@ulearn.me</a>.
+					</p>
 				</div>
 			</footer>
 		</div>
@@ -140,6 +143,4 @@
 }
 
 @helper GetScore(Tuple<int, int> score)
-{
-	@(score.Item2 == 0 ? "" : string.Format("{0}/{1}", score.Item1, score.Item2))
-}
+{ @( score.Item2 == 0 ? "" : string.Format("{0}/{1}", score.Item1, score.Item2)) }

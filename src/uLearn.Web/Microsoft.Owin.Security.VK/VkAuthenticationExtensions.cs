@@ -17,7 +17,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 				throw new ArgumentNullException(nameof(options));
 			}
 
-			app.Use(typeof (VkAuthenticationMiddleware), app, options);
+			app.Use(typeof(VkAuthenticationMiddleware), app, options);
 			return app;
 		}
 

@@ -13,15 +13,17 @@
 	@Styles.Render("~/ulearn.bundle.css")
 </head>
 <body class="lti-component">
-	@if (Model != null)
-	{
-		@SlideHtml.Block(Model.ExerciseBlock, Model.Context, Html)
+@if (Model != null)
+{
+	@SlideHtml.Block(Model.ExerciseBlock, Model.Context, Html)
 
-		@Scripts.Render("~/scripts.bundle.js")
-		<script> getHints("@Model.CourseId", "@Model.SlideId.GetNormalizedGuid()", '@Model.ExerciseBlock.HintsMd.Count') </script>
-		<script> refreshPreviousDraft('@Model.SlideId') </script>
-	}
+	@Scripts.Render("~/scripts.bundle.js")
+	<script> getHints("@Model.CourseId", "@Model.SlideId.GetNormalizedGuid()", '@Model.ExerciseBlock.HintsMd.Count') </script>
+	<script>
+	refreshPreviousDraft('@Model.SlideId')
+	</script>
+}
 
-	@Html.Partial("_YandexMetrika")
+@Html.Partial("_YandexMetrika")
 </body>
 </html>

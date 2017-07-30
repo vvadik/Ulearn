@@ -32,7 +32,7 @@ namespace uLearn.Model.Blocks
 				displayName,
 				urlName,
 				string.Join("\n", TexLines.Select(x => "$$" + x + "$$")).GetHtmlWithUrls("/static").Item1
-				);
+			);
 		}
 
 		public override string TryGetText()

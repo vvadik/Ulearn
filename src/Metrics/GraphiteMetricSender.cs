@@ -58,7 +58,7 @@ namespace Metrics
 			var builtKey = BuildKey(key);
 			log.Info($"Send timing metric {builtKey}, value {value}");
 			try
-			{ 
+			{
 				MetricsPipe.Current.Timing(builtKey, value);
 			}
 			catch (Exception e)
@@ -75,7 +75,7 @@ namespace Metrics
 			var builtKey = BuildKey(key);
 			log.Info($"Send gauge metric {builtKey}, value {value}");
 			try
-			{ 
+			{
 				MetricsPipe.Current.Gauge(builtKey, value);
 			}
 			catch (Exception e)
@@ -92,7 +92,7 @@ namespace Metrics
 			var builtKey = BuildKey(key);
 			log.Info($"Send raw metric {builtKey}, value {value}");
 			try
-			{ 
+			{
 				MetricsPipe.Current.Raw(builtKey, value);
 			}
 			catch (Exception e)

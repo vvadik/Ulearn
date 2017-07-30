@@ -46,7 +46,7 @@ namespace uLearn.CSharp
 
 		public static IEnumerable<SyntaxNode> GetParents(this SyntaxToken token)
 		{
-			return new[] {token.Parent}.Concat(token.Parent.GetParents());
+			return new[] { token.Parent }.Concat(token.Parent.GetParents());
 		}
 
 		public static IEnumerable<SyntaxNode> GetParents(this SyntaxTrivia trivia)
@@ -91,7 +91,7 @@ namespace uLearn.CSharp
 
 		public static string GetAttributeShortName<TAttr>()
 		{
-			string attrName = typeof (TAttr).Name;
+			string attrName = typeof(TAttr).Name;
 			return attrName.EndsWith("Attribute") ? attrName.Substring(0, attrName.Length - "Attribute".Length) : attrName;
 		}
 

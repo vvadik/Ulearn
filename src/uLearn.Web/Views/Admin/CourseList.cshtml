@@ -16,11 +16,11 @@
 			}
 			else
 			{
-				<li>@Html.ActionLink(course.Title, "UnitStatistics", "Analytics", new { courseId = course.Id }, new {})</li>
+				<li>@Html.ActionLink(course.Title, "UnitStatistics", "Analytics", new { courseId = course.Id }, new { })</li>
 			}
 		}
 	</ul>
-	
+
 	@if (User.IsSystemAdministrator())
 	{
 		<h1>Создать курс</h1>
@@ -28,12 +28,13 @@
 		{
 			@Html.AntiForgeryToken()
 			<input type="text" class="form-control" name="courseId" value="@Model.CourseCreationLastTry" placeholder="CourseId"/>
-			<input type="submit" class="btn btn-danger" value="Создать" />
+			<input type="submit" class="btn btn-danger" value="Создать"/>
 			<p class="text-muted">CourseId используется как часть URL, имя файла, часть путей. Лучше использовать только латинские буквы и цифры.</p>
 		}
 		if (!string.IsNullOrEmpty(Model.CourseCreationLastTry))
 		{
-			<div style="margin: 10px">В идентификаторе курса недопустимы символы: <pre style="display: inline-block">@Model.InvalidCharacters</pre></div>
+			<div style="margin: 10px">В идентификаторе курса недопустимы символы: <pre style="display: inline-block">@Model.InvalidCharacters</pre>
+			</div>
 		}
 	}
 </div>

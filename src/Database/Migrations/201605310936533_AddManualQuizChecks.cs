@@ -7,19 +7,19 @@ namespace Database.Migrations
 		public override void Up()
 		{
 			CreateTable(
-				"dbo.ManualQuizCheckQueueItems",
-				c => new
-				{
-					Id = c.Int(nullable: false, identity: true),
-					CourseId = c.String(nullable: false, maxLength: 64),
-					SlideId = c.Guid(nullable: false),
-					Timestamp = c.DateTime(nullable: false),
-					UserId = c.String(nullable: false, maxLength: 128),
-					LockedUntil = c.DateTime(),
-					LockedById = c.String(maxLength: 128),
-					IsChecked = c.Boolean(nullable: false),
-					Score = c.Int(nullable: false),
-				})
+					"dbo.ManualQuizCheckQueueItems",
+					c => new
+					{
+						Id = c.Int(nullable: false, identity: true),
+						CourseId = c.String(nullable: false, maxLength: 64),
+						SlideId = c.Guid(nullable: false),
+						Timestamp = c.DateTime(nullable: false),
+						UserId = c.String(nullable: false, maxLength: 128),
+						LockedUntil = c.DateTime(),
+						LockedById = c.String(maxLength: 128),
+						IsChecked = c.Boolean(nullable: false),
+						Score = c.Int(nullable: false),
+					})
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.AspNetUsers", t => t.LockedById)
 				.ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)

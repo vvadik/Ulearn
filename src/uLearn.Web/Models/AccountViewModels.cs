@@ -20,7 +20,7 @@ namespace uLearn.Web.Models
 		[Required(ErrorMessage = "{0} есть у каждого пользователя")]
 		[Display(Name = "Логин")]
 		public string UserName { get; set; }
-		
+
 		[Required(ErrorMessage = "Укажите адрес электронной почты")]
 		[EmailAddress(ErrorMessage = "Не похоже на электронную почту")]
 		[Display(Name = "Эл. почта")]
@@ -109,7 +109,7 @@ namespace uLearn.Web.Models
 		[Required(ErrorMessage = "Укажите адрес электронной почты")]
 		[EmailAddress(ErrorMessage = "Не похоже на электронную почту")]
 		public string Email { get; set; }
-		
+
 		[Display(Name = "Согласен с&nbsp;<a href=\"/Home/Terms\">правилами использования</a> сайта")]
 		[MustBeTrue(ErrorMessage = "Нужно согласиться с правилами")]
 		public bool AgreeWithTerms { get; set; }
@@ -129,7 +129,7 @@ namespace uLearn.Web.Models
 		[Required(ErrorMessage = "{0} должен быть у каждого пользователя")]
 		[Display(Name = "Логин")]
 		public string Name { get; set; }
-		
+
 		[Required(ErrorMessage = "{0} — это обязательное поле")]
 		[StringLength(100, ErrorMessage = "{0} не может быть короче {2} символов", MinimumLength = 6)]
 		[DataType(DataType.Password)]

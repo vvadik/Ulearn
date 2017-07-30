@@ -1,4 +1,5 @@
 ﻿using System;
+
 #pragma warning disable 0649
 
 namespace uLearn.tests
@@ -17,7 +18,9 @@ namespace uLearn.tests
 		}
 
 		[HideOnSlide]
-		public void HiddenMethod() { }
+		public void HiddenMethod()
+		{
+		}
 
 		[HideOnSlide]
 		public int HiddenField;

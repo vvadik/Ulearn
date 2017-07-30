@@ -14,14 +14,14 @@ namespace uLearn.Web.Extensions
 			return $"{utcTime.ToDatePrettyString(withoutYearIfItsCurrent)} в {utcTime.ToShortTimeString()} (UTC)";
 		}
 
-		public static string ToDatePrettyString(this DateTime dateTime, bool withoutYearIfItsCurrent=false)
+		public static string ToDatePrettyString(this DateTime dateTime, bool withoutYearIfItsCurrent = false)
 		{
 			if (DateTime.Now.Year == dateTime.Year && withoutYearIfItsCurrent)
 				return dateTime.ToString("d MMMM");
 			return dateTime.ToLongDateString();
 		}
 
-		public static string ToAgoPrettyString(this DateTime from, bool showTimeForFarDate=false)
+		public static string ToAgoPrettyString(this DateTime from, bool showTimeForFarDate = false)
 		{
 			var diff = DateTime.Now.Subtract(from);
 			if (diff.TotalDays > 10)
@@ -36,7 +36,7 @@ namespace uLearn.Web.Extensions
 
 			if (daysAgo < 0)
 				return null;
-			
+
 			if (daysAgo == 0)
 			{
 				if (secondsAgo < 60)
@@ -88,6 +88,5 @@ namespace uLearn.Web.Extensions
 			second = second ?? DateTime.MinValue;
 			return first.Value.MinWith(second.Value);
 		}
-
 	}
 }

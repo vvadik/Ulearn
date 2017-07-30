@@ -78,12 +78,11 @@
 }
 else
 {
-	@section scripts {
-		<script>
-			$(document).ready(function() {
-				window.yaCounter25997251.reachGoal('registration');
-				window.location.replace("@Html.AttributeEncode(Model.ReturnUrl)");
-			});
-		</script>
-	}
-}
+@section scripts {
+	<script>
+		$(document).ready(function() {
+			window.yaCounter25997251.reachGoal('registration');
+			window.location.replace("@Html.AttributeEncode(Model.ReturnUrl)");
+		});
+	</script>
+}}

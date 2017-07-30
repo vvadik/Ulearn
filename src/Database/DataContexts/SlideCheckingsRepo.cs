@@ -280,7 +280,7 @@ namespace Database.DataContexts
 				r => r.ExerciseChecking.CourseId == courseId &&
 					r.ExerciseChecking.SlideId == slideId &&
 					!r.IsDeleted
-				).ToList();
+			).ToList();
 		}
 	}
 }

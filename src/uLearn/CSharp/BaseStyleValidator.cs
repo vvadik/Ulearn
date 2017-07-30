@@ -13,14 +13,17 @@ namespace uLearn.CSharp
 		{
 			return syntaxNode.SyntaxTree.GetLineSpan(syntaxNode.Span);
 		}
+
 		protected FileLinePositionSpan GetSpan(SyntaxToken syntaxNode)
 		{
 			return syntaxNode.SyntaxTree.GetLineSpan(syntaxNode.Span);
 		}
+
 		protected string Report(SyntaxNode syntaxNode, string message)
 		{
 			return Report(GetSpan(syntaxNode), message);
 		}
+
 		protected string Report(SyntaxToken syntaxToken, string message)
 		{
 			return Report(GetSpan(syntaxToken), message);

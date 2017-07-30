@@ -2,7 +2,7 @@
 {
 	public class QuizBlockData
 	{
-		public QuizModel QuizModel {get; set;}
+		public QuizModel QuizModel { get; set; }
 		public int BlockIndex { get; set; }
 		public QuizState QuizState;
 
@@ -15,5 +15,4 @@
 
 		public bool ShowCorrectAnswer => QuizState == QuizState.Total && !QuizModel.Slide.ManualChecking;
 	}
-
 }

@@ -9,7 +9,6 @@ namespace uLearn.Web.Models
 {
 	public class UserCourseModel
 	{
-
 		public UserCourseModel(Course course, ApplicationUser user, ULearnDb db)
 		{
 			Course = course;

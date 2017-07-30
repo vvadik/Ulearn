@@ -7,7 +7,6 @@ using uLearn.Extensions;
 
 namespace uLearn
 {
-
 	[XmlRoot("Course", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/course")]
 	public class CourseSettings
 	{
@@ -55,7 +54,8 @@ namespace uLearn
 			Scoring = new ScoringSettings();
 		}
 
-		public CourseSettings(string title, Language[] defaultLanguageVersions, PreludeFile[] preludes, string dictionaryFile) : this()
+		public CourseSettings(string title, Language[] defaultLanguageVersions, PreludeFile[] preludes, string dictionaryFile)
+			: this()
 		{
 			Title = title;
 			DefaultLanguageVersions = defaultLanguageVersions;
@@ -63,11 +63,12 @@ namespace uLearn
 			DictionaryFile = dictionaryFile;
 		}
 
-		public CourseSettings(CourseSettings other) : this()
+		public CourseSettings(CourseSettings other)
+			: this()
 		{
 			Title = other.Title;
-			DefaultLanguageVersions = (Language[]) other.DefaultLanguageVersions.Clone();
-			Preludes = (PreludeFile[]) other.Preludes.Clone();
+			DefaultLanguageVersions = (Language[])other.DefaultLanguageVersions.Clone();
+			Preludes = (PreludeFile[])other.Preludes.Clone();
 			DictionaryFile = other.DictionaryFile;
 		}
 
@@ -85,7 +86,7 @@ namespace uLearn
 
 			foreach (var scoringGroup in settings.Scoring.Groups.Values)
 			{
-				if (! scoringGroupIdRegex.IsMatch(scoringGroup.Id))
+				if (!scoringGroupIdRegex.IsMatch(scoringGroup.Id))
 					throw new CourseLoadingException(
 						$"Некорректный идентификатор группы баллов <group id={scoringGroup.Id}> (файл Course.xml). " +
 						"Идентификатор группы баллов может состоить только из латинских букв, цифр и подчёркивания, а также не может быть пустым. Понятное человеку название используйте в аббревиатуре и имени группы."
@@ -98,9 +99,9 @@ namespace uLearn
 						$"В противном случае атрибут max_additional_score=\"{scoringGroup.MaxAdditionalScore}\" не действует."
 					);
 
-				if (! scoringGroup.CanBeSetByInstructor && scoringGroup.IsEnabledForEveryoneSpecified)
+				if (!scoringGroup.CanBeSetByInstructor && scoringGroup.IsEnabledForEveryoneSpecified)
 					throw new CourseLoadingException(
-						$"Неправильные параметры для группы баллов {scoringGroup.Id} в файле Course.xml. " + 
+						$"Неправильные параметры для группы баллов {scoringGroup.Id} в файле Course.xml. " +
 						"Опция enable_for_everyone доступна только при установке опции set_by_instructor=\"true\"."
 					);
 			}
@@ -197,6 +198,7 @@ namespace uLearn
 		public ScoringGroup[] _groups { get; set; }
 
 		private SortedDictionary<string, ScoringGroup> groupsCache;
+
 		[XmlIgnore]
 		public SortedDictionary<string, ScoringGroup> Groups
 		{
@@ -243,7 +245,8 @@ namespace uLearn
 		public string _canBeSetByInstructor;
 
 		[XmlIgnore]
-		public bool CanBeSetByInstructor {
+		public bool CanBeSetByInstructor
+		{
 			get
 			{
 				if (string.IsNullOrEmpty(_canBeSetByInstructor) || _canBeSetByInstructor.Trim().Length == 0)
@@ -256,12 +259,13 @@ namespace uLearn
 
 		[XmlIgnore]
 		public bool IsCanBeSetByInstructorSpecified => !string.IsNullOrEmpty(_canBeSetByInstructor);
-		
+
 		[XmlAttribute("max_additional_score")]
 		public string _maxAdditionalScore { get; set; }
 
 		[XmlIgnore]
-		public int MaxAdditionalScore {
+		public int MaxAdditionalScore
+		{
 			get
 			{
 				if (string.IsNullOrEmpty(_maxAdditionalScore) || _maxAdditionalScore.Trim().Length == 0)

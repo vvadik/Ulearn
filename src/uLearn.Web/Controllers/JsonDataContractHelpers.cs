@@ -26,13 +26,14 @@ namespace uLearn.Web.Controllers
 			response.ContentType = !string.IsNullOrEmpty(ContentType) ? ContentType : "application/json";
 			if (ContentEncoding != null)
 				response.ContentEncoding = ContentEncoding;
-			
+
 			if (Data != null)
 			{
 				// Use the DataContractJsonSerializer instead of the JavaScriptSerializer 
 				var serializer = new DataContractJsonSerializer(
 					Data.GetType(),
-					new DataContractJsonSerializerSettings {
+					new DataContractJsonSerializerSettings
+					{
 						DateTimeFormat = new DateTimeFormat("yyyy-MM-dd'T'HH:mm:ss")
 					}
 				);

@@ -35,7 +35,7 @@ namespace uLearn.Web
 						validateInterval: TimeSpan.FromMinutes(30),
 						regenerateIdentityCallback: (manager, user) => user.GenerateUserIdentityAsync(manager),
 						getUserIdCallback: identity => identity.GetUserId()
-						)
+					)
 				}
 			});
 			// Use a cookie to temporarily store information about a user logging in with a third party login provider
@@ -59,7 +59,7 @@ namespace uLearn.Web
 
 			var konturPassportClientId = WebConfigurationManager.AppSettings["owin.konturPassport.clientId"];
 			var konturPassportClientSecret = WebConfigurationManager.AppSettings["owin.konturPassport.clientSecret"];
-			if (! string.IsNullOrEmpty(konturPassportClientSecret))
+			if (!string.IsNullOrEmpty(konturPassportClientSecret))
 				app.UseKonturPassportAuthentication(konturPassportClientId, konturPassportClientSecret);
 
 			//app.UseGoogleAuthentication();

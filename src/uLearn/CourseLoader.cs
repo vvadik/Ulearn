@@ -17,7 +17,7 @@ namespace uLearn
 				dir = courseXmls[0].Directory;
 			else
 				dir = dir.HasSubdirectory("Slides") ? dir.Subdirectory("Slides") : dir;
-			
+
 			var settings = CourseSettings.Load(dir);
 			if (string.IsNullOrEmpty(settings.Title))
 				settings.Title = GetCourseTitleFromFile(dir);
@@ -100,7 +100,7 @@ namespace uLearn
 					.ToList();
 			if (badSlides.Any())
 				throw new CourseLoadingException(
-					"Идентификаторы слайдов (SlideId) должны быть уникальными.\n" + 
+					"Идентификаторы слайдов (SlideId) должны быть уникальными.\n" +
 					"Слайды с повторяющимися идентификаторами:\n" +
 					string.Join("\n", badSlides.Select(x => string.Join("\n", x))));
 		}
@@ -108,7 +108,8 @@ namespace uLearn
 
 	public class CourseLoadingException : Exception
 	{
-		public CourseLoadingException(string message) : base(message)
+		public CourseLoadingException(string message)
+			: base(message)
 		{
 		}
 

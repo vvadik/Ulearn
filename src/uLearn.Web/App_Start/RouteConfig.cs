@@ -15,7 +15,7 @@ namespace uLearn.Web
 				name: "Course.Slide",
 				url: "Course/{courseId}/{slideIndex}",
 				defaults: new { controller = "Course", action = "Slide", slideIndex = -1 },
-				constraints: new { slideIndex = @"-?\d+|"}
+				constraints: new { slideIndex = @"-?\d+|" }
 			);
 			routes.MapRoute(
 				name: "Course.SlideById",

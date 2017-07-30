@@ -56,9 +56,7 @@
 </table>
 
 @helper RoleButton(UserModel user, CourseRole role, string cssClass)
-{
-	@RoleButton(user, role.ToString(), cssClass)
-}
+{ @RoleButton(user, role.ToString(), cssClass) }
 
 @helper RoleButton(UserModel user, string role, string cssClass)
 {
@@ -72,7 +70,7 @@
 {
 	var buttonClass = "btn-" + cssClass;
 	<button type="button"
-			class="btn btn-sm btn-default @(courseAccess.HasAccess ? buttonClass : "")"
+			class="btn btn-sm btn-default @( courseAccess.HasAccess ? buttonClass : "")"
 			data-css-class="@buttonClass"
 			data-toggle-url="@courseAccess.ToggleUrl"
 			onclick="ToggleRole(event, this, ToggleButtonClass)">
@@ -87,7 +85,7 @@
 	var hasAccess = coursesAccesses.CoursesAccesses.Any(model => model.HasAccess);
 	<div class="btn-group">
 		<button type="button"
-				class="btn btn-sm  btn-default dropdown-toggle @(hasAccess ? buttonClass : "")"
+				class="btn btn-sm  btn-default dropdown-toggle @( hasAccess ? buttonClass : "")"
 				data-css-class="@buttonClass"
 				data-toggle="dropdown"
 				aria-haspopup="true"
@@ -97,7 +95,7 @@
 		<ul class="dropdown-menu" data-css-class="li-@cssClass">
 			@foreach (var course in coursesAccesses.CoursesAccesses)
 			{
-				<li class="@(course.HasAccess ? liClass : "")"
+				<li class="@( course.HasAccess ? liClass : "")"
 					data-toggle-url="@course.ToggleUrl"
 					onclick="ToggleRole(event, this, ToggleDropDownClass)">
 					<a>@course.CourseId</a>

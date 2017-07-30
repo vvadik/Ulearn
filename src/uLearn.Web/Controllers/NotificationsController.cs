@@ -42,10 +42,11 @@ namespace uLearn.Web.Controllers
 			secretForHashes = WebConfigurationManager.AppSettings["ulearn.secretForHashes"] ?? "";
 		}
 
-		public NotificationsController() : this(new ULearnDb(), WebCourseManager.Instance)
+		public NotificationsController()
+			: this(new ULearnDb(), WebCourseManager.Instance)
 		{
 		}
-		
+
 		[AllowAnonymous]
 		public ActionResult SuggestMailTransport()
 		{
@@ -58,7 +59,7 @@ namespace uLearn.Web.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.OK);
 
 			var user = usersRepo.FindUserById(userId);
-			if (string.IsNullOrEmpty(user.Email) || ! user.EmailConfirmed)
+			if (string.IsNullOrEmpty(user.Email) || !user.EmailConfirmed)
 				return new HttpStatusCodeResult(HttpStatusCode.OK);
 
 			var mailNotificationTransport = new MailNotificationTransport
@@ -96,10 +97,10 @@ namespace uLearn.Web.Controllers
 			return signature == correctSignature;
 		}
 
-		public async Task<ActionResult> EnableNotificationTransport(int transportId, long timestamp, string signature, bool enable=true, string next="")
+		public async Task<ActionResult> EnableNotificationTransport(int transportId, long timestamp, string signature, bool enable = true, string next = "")
 		{
 			var transport = notificationsRepo.FindNotificationTransport(transportId);
-			if (! User.Identity.IsAuthenticated || transport.UserId != User.Identity.GetUserId())
+			if (!User.Identity.IsAuthenticated || transport.UserId != User.Identity.GetUserId())
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			if (!ValidateNotificationTransportEnablingSignature(transportId, timestamp, signature))
@@ -222,7 +223,7 @@ namespace uLearn.Web.Controllers
 
 			return Json(new { status = "ok", notificationTransportsSettings = GetNotificationTransportsSettings() });
 		}
-		
+
 		private IEnumerable<NotificationTransportsSettingsViewModel> GetNotificationTransportsSettings()
 		{
 			var notificationTransportsSettings = courseManager.GetCourses().SelectMany(
@@ -231,7 +232,7 @@ namespace uLearn.Web.Controllers
 					{
 						courseId = c.Id,
 						transportId = kvp.Key.Item1,
-						notificationType = (int) kvp.Key.Item2,
+						notificationType = (int)kvp.Key.Item2,
 						isEnabled = kvp.Value.IsEnabled
 					}
 				)

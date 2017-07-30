@@ -8,46 +8,48 @@
 @Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId })
 
 <body>
-	<div class="slide-container">
-		<div class="container body-content">
-			<div class="row">
-				<table id="myTable" class="tablesorter">
-					<thead>
-						<tr>
-							<th>user name</th>
-							@foreach (var unitName in Model.UnitNamesInOrdered)
-							{
-								<th>@unitName</th>
-							}
-							<th>total</th>
-						</tr>
-					</thead>
-					<tbody>
-						@foreach (var user in Model.UserStats)
+<div class="slide-container">
+	<div class="container body-content">
+		<div class="row">
+			<table id="myTable" class="tablesorter">
+				<thead>
+				<tr>
+					<th>user name</th>
+					@foreach (var unitName in Model.UnitNamesInOrdered)
+					{
+						<th>@unitName</th>
+					}
+					<th>total</th>
+				</tr>
+				</thead>
+				<tbody>
+				@foreach (var user in Model.UserStats)
+				{
+					<tr>
+						<td>
+							<h6>@user.Key</h6>
+						</td>
+						@foreach (var unitName in Model.UnitNamesInOrdered)
 						{
-							<tr>
-								<td><h6>@user.Key</h6></td>
-								@foreach (var unitName in Model.UnitNamesInOrdered)
-								{
-									if (user.Value.ContainsKey(unitName))
-									{
-										<td>@(user.Value[unitName] + "%")</td>
-									}
-									else
-									{
-										<td>0%</td>
-									}
-								}
-								<td>
-									@(user.Value.Values.Sum() / user.Value.Count + "%")
-								</td>
-							</tr>
+							if (user.Value.ContainsKey(unitName))
+							{
+								<td>@(user.Value[unitName] + "%")</td>
+							}
+							else
+							{
+								<td>0%</td>
+							}
 						}
-					</tbody>
-				</table>
-			</div>
+						<td>
+							@(user.Value.Values.Sum() / user.Value.Count + "%")
+						</td>
+					</tr>
+				}
+				</tbody>
+			</table>
 		</div>
 	</div>
+</div>
 </body>
 
 @section scripts {

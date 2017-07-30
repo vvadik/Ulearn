@@ -7,16 +7,16 @@ namespace Database.Migrations
 		public override void Up()
 		{
 			CreateTable(
-				"dbo.UnitAppearances",
-				c => new
-				{
-					Id = c.Int(nullable: false, identity: true),
-					CourseId = c.String(nullable: false, maxLength: 64),
-					UnitName = c.String(nullable: false),
-					UserId = c.String(nullable: false),
-					UserName = c.String(),
-					PublishTime = c.DateTime(nullable: false),
-				})
+					"dbo.UnitAppearances",
+					c => new
+					{
+						Id = c.Int(nullable: false, identity: true),
+						CourseId = c.String(nullable: false, maxLength: 64),
+						UnitName = c.String(nullable: false),
+						UserId = c.String(nullable: false),
+						UserName = c.String(),
+						PublishTime = c.DateTime(nullable: false),
+					})
 				.PrimaryKey(t => t.Id);
 		}
 

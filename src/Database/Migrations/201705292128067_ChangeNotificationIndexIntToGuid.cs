@@ -2,7 +2,7 @@ namespace Database.Migrations
 {
 	using System;
 	using System.Data.Entity.Migrations;
-	
+
 	public partial class ChangeNotificationIndexIntToGuid : DbMigration
 	{
 		public override void Up()
@@ -18,7 +18,7 @@ namespace Database.Migrations
 			CreateIndex("dbo.Notifications", "CourseVersionId");
 			CreateIndex("dbo.Notifications", "CourseVersionId1");
 		}
-		
+
 		public override void Down()
 		{
 			DropIndex("dbo.Notifications", new[] { "CourseVersionId1" });

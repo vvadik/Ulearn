@@ -4,7 +4,6 @@ using System.Web.Mvc;
 
 namespace uLearn.Web.Models
 {
-
 	public class SetNewPasswordModel
 	{
 		[HiddenInput]

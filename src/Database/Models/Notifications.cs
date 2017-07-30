@@ -406,7 +406,7 @@ namespace Database.Models
 		public int CommentId { get; set; }
 
 		public virtual Comment Comment { get; set; }
-		
+
 		protected string GetCommentUrl(Course course, Slide slide, string baseUrl)
 		{
 			return GetSlideUrl(course, slide, baseUrl) + "#comment-" + Comment.Id;
@@ -414,7 +414,7 @@ namespace Database.Models
 
 		public override bool IsActual()
 		{
-			return ! Comment.IsDeleted && Comment.IsApproved;
+			return !Comment.IsDeleted && Comment.IsApproved;
 		}
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -437,7 +437,7 @@ namespace Database.Models
 				return null;
 
 			return $"<b>{Comment.Author.VisibleName.EscapeHtml()} оставил{Comment.Author.Gender.ChooseEnding()} комментарий в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" +
-				   $"{Comment.Text.Trim().EscapeHtml()}";
+					$"{Comment.Text.Trim().EscapeHtml()}";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
@@ -476,9 +476,9 @@ namespace Database.Models
 			if (slide == null)
 				return null;
 
-			return $"<b>{Comment.Author.VisibleName.EscapeHtml()} ответил{Comment.Author.Gender.ChooseEnding()} на ваш комментарий в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" + 
-				   $"<i>{ParentComment.Text.Trim().EscapeHtml()}</i><br>" +	
-				   $"{Comment.Text.Trim().EscapeHtml()}";
+			return $"<b>{Comment.Author.VisibleName.EscapeHtml()} ответил{Comment.Author.Gender.ChooseEnding()} на ваш комментарий в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" +
+					$"<i>{ParentComment.Text.Trim().EscapeHtml()}</i><br>" +
+					$"{Comment.Text.Trim().EscapeHtml()}";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
@@ -488,8 +488,8 @@ namespace Database.Models
 				return null;
 
 			return $"{Comment.Author.VisibleName} ответил{Comment.Author.Gender.ChooseEnding()} на ваш комментарий в «{GetSlideTitle(course, slide)}»\n\n" +
-				   $"> {ParentComment.Text.Trim()}\n" +
-				   $"{Comment.Text.Trim()}";
+					$"> {ParentComment.Text.Trim()}\n" +
+					$"{Comment.Text.Trim()}";
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -514,7 +514,7 @@ namespace Database.Models
 				return null;
 
 			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} лайкнул{InitiatedBy.Gender.ChooseEnding()} ваш комментарий в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" +
-				   $"<i>{Comment.Text.Trim().EscapeHtml()}</i>";
+					$"<i>{Comment.Text.Trim().EscapeHtml()}</i>";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
@@ -522,9 +522,9 @@ namespace Database.Models
 			var slide = course.FindSlideById(Comment.SlideId);
 			if (slide == null)
 				return null;
-			
+
 			return $"{InitiatedBy.VisibleName} лайкнул{InitiatedBy.Gender.ChooseEnding()} ваш комментарий в «{GetSlideTitle(course, slide)}»\n\n" +
-				   $"> {Comment.Text.Trim()}";
+					$"> {Comment.Text.Trim()}";
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -569,8 +569,8 @@ namespace Database.Models
 			var commentsText = GetReviewsText(html: true);
 
 			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} проверил{InitiatedBy.Gender.ChooseEnding()} ваше решение в «{GetSlideTitle(course, slide).EscapeHtml()}»:</b><br/>" +
-				   $"вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}<br/><br/>" +
-				   commentsText;
+					$"вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}<br/><br/>" +
+					commentsText;
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
@@ -582,8 +582,8 @@ namespace Database.Models
 			var commentsText = GetReviewsText(html: false);
 
 			return $"{InitiatedBy.VisibleName} проверил{InitiatedBy.Gender.ChooseEnding()} ваше решение в «{GetSlideTitle(course, slide)}»:\n" +
-				   $"вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}\n\n" +
-				   commentsText;
+					$"вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}\n\n" +
+					commentsText;
 		}
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -621,7 +621,7 @@ namespace Database.Models
 				return null;
 
 			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} проверил{InitiatedBy.Gender.ChooseEnding()} ваш тест «{GetSlideTitle(course, slide).EscapeHtml()}»:</b><br/>" +
-				   $"вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}";
+					$"вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
@@ -631,7 +631,7 @@ namespace Database.Models
 				return null;
 
 			return $"{InitiatedBy.VisibleName} проверил{InitiatedBy.Gender.ChooseEnding()} ваш тест «{GetSlideTitle(course, slide)}»:\n" +
-				   $"вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}";
+					$"вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}";
 		}
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -670,15 +670,15 @@ namespace Database.Models
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			return $"<b>Поздравляем! Вы получили сертификат по курсу «{course.Title.EscapeHtml()}».</b><br/><br/>" +
-				   $"Посмотреть сертификат можно по ссылке {GetCertificateUrl(Certificate, baseUrl).EscapeHtml()} или в любой момент на ulearn.me.<br/><br/>" +
-				   "Поделитесь ссылкой на сертификат с друзьями в социальных сетях — пусть ваше достижение увидят все!";
+					$"Посмотреть сертификат можно по ссылке {GetCertificateUrl(Certificate, baseUrl).EscapeHtml()} или в любой момент на ulearn.me.<br/><br/>" +
+					"Поделитесь ссылкой на сертификат с друзьями в социальных сетях — пусть ваше достижение увидят все!";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
 			return $"Поздравляем! Вы получили сертификат по курсу «{course.Title}».\n\n" +
-				   $"Посмотреть сертификат можно по ссылке {GetCertificateUrl(Certificate, baseUrl)} или в любой момент на ulearn.me.\n\n" +
-				   "Поделитесь ссылкой на сертификат с друзьями в социальных сетях — пусть ваше достижение увидят все!";
+					$"Посмотреть сертификат можно по ссылке {GetCertificateUrl(Certificate, baseUrl)} или в любой момент на ulearn.me.\n\n" +
+					"Поделитесь ссылкой на сертификат с друзьями в социальных сетях — пусть ваше достижение увидят все!";
 		}
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -713,8 +713,8 @@ namespace Database.Models
 				return null;
 
 			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} поставил{InitiatedBy.Gender.ChooseEnding()} вам баллы <i>{scoringGroup.Name.EscapeHtml()}</i> в&nbsp;модуле «{GetUnitTitle(course, unit).EscapeHtml()}»:</b><br/>" +
-				   $"вы получили {Score.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}<br/><br/>" +
-				   "Полную ведомость смотрите на&nbsp;<a href=\"https://ulearn.me\">ulearn.me</a>.";
+					$"вы получили {Score.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}<br/><br/>" +
+					"Полную ведомость смотрите на&nbsp;<a href=\"https://ulearn.me\">ulearn.me</a>.";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
@@ -725,8 +725,8 @@ namespace Database.Models
 				return null;
 
 			return $"{InitiatedBy.VisibleName} поставил{InitiatedBy.Gender.ChooseEnding()} вам баллы {scoringGroup.Name} в модуле «{GetUnitTitle(course, unit)}»:\n" +
-				   $"вы получили {Score.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}\n\n" +
-				   "Полную ведомость смотрите на ulearn.me.";
+					$"вы получили {Score.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}\n\n" +
+					"Полную ведомость смотрите на ulearn.me.";
 		}
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -917,13 +917,13 @@ namespace Database.Models
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			return $"Опубликована новая версия курса <b>«{course.Title.EscapeHtml()}»</b>.<br/><br/>" +
-				   GetCourseUrl(course, baseUrl).EscapeHtml();
+					GetCourseUrl(course, baseUrl).EscapeHtml();
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
 			return $"Опубликована новая версия курса «{course.Title.EscapeHtml()}».\n\n" +
-				   GetCourseUrl(course, baseUrl);
+					GetCourseUrl(course, baseUrl);
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)

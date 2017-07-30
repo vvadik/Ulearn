@@ -115,8 +115,8 @@ namespace Database.DataContexts
 			transport.IsEnabled = isEnabled;
 			await db.SaveChangesAsync();
 		}
-		
-		public List<NotificationTransport> GetUsersNotificationTransports(string userId, bool includeDisabled=false)
+
+		public List<NotificationTransport> GetUsersNotificationTransports(string userId, bool includeDisabled = false)
 		{
 			var transports = db.NotificationTransports.Where(t => t.UserId == userId && !t.IsDeleted);
 			if (!includeDisabled)
@@ -124,7 +124,7 @@ namespace Database.DataContexts
 			return transports.ToList();
 		}
 
-		public T FindUsersNotificationTransport<T>(string userId, bool includeDisabled=false) where T : NotificationTransport
+		public T FindUsersNotificationTransport<T>(string userId, bool includeDisabled = false) where T : NotificationTransport
 		{
 			return GetUsersNotificationTransports(userId, includeDisabled).OfType<T>().FirstOrDefault();
 		}
@@ -133,7 +133,7 @@ namespace Database.DataContexts
 		{
 			var settings = db.NotificationTransportSettings.FirstOrDefault(
 				s => s.CourseId == courseId && s.NotificationTransportId == transportId && s.NotificationType == type
-				);
+			);
 			if (settings == null)
 			{
 				settings = new NotificationTransportSettings
@@ -191,9 +191,9 @@ namespace Database.DataContexts
 		{
 			var now = DateTime.Now;
 			return db.NotificationDeliveries.Where(
-				d => (d.NextTryTime < now || d.NextTryTime == null) && 
-				d.Status == NotificationDeliveryStatus.NotSent &&
-				d.FailsCount < maxNotificationsSendingFails
+				d => (d.NextTryTime < now || d.NextTryTime == null) &&
+					d.Status == NotificationDeliveryStatus.NotSent &&
+					d.FailsCount < maxNotificationsSendingFails
 			).ToList();
 		}
 
@@ -280,7 +280,7 @@ namespace Database.DataContexts
 				.Include(s => s.NotificationTransport)
 				.Where(s => s.CourseId == notification.CourseId &&
 							s.NotificationType == notificationType &&
-							! s.NotificationTransport.IsDeleted &&
+							!s.NotificationTransport.IsDeleted &&
 							recipientsIds.Contains(s.NotificationTransport.UserId)).ToList();
 
 			var commonTransports = db.NotificationTransports.Where(t => t.UserId == null && t.IsEnabled).ToList();
@@ -293,8 +293,8 @@ namespace Database.DataContexts
 
 				var recipientsTransports = db.NotificationTransports.Where(
 					t => recipientsIds.Contains(t.UserId) &&
-						 ! t.IsDeleted &&
-						 t.IsEnabled
+						!t.IsDeleted &&
+						t.IsEnabled
 				).ToList();
 				var notFoundTransports = recipientsTransports.Except(transportsSettings.Select(c => c.NotificationTransport), new NotificationTransportIdComparer());
 
@@ -345,7 +345,7 @@ namespace Database.DataContexts
 				if (!transportSettings.IsEnabled)
 					continue;
 
-				if (! transportSettings.NotificationTransport.IsEnabled)
+				if (!transportSettings.NotificationTransport.IsEnabled)
 				{
 					log.Info($"Transport {transportSettings.NotificationTransport} is fully disabled, ignore it");
 					continue;
@@ -418,7 +418,7 @@ namespace Database.DataContexts
 				.OrderByDescending(t => t.GetMinCourseRole())
 				.ThenBy(t => (int)t)
 				.ToList();
-			
+
 			if (!user.IsSystemAdministrator())
 				notificationTypes = notificationTypes.Where(t => !t.IsForSysAdminsOnly()).ToList();
 
@@ -460,6 +460,7 @@ namespace Database.DataContexts
 		{
 			return first.Id == second.Id;
 		}
+
 		public int GetHashCode(NotificationTransport transport)
 		{
 			return transport.Id.GetHashCode();

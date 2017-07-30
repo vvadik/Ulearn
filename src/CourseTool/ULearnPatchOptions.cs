@@ -29,21 +29,21 @@ namespace uLearn.CourseTool
 				.ToDictionary(x => x.Item1, x => x.Item2);
 
 			var guids = Guids?.Split(',').Select(Utils.GetNormalizedGuid).ToList();
-			
+
 			patcher.PatchVerticals(
-				edxCourse, 
+				edxCourse,
 				ulearnCourse.Slides
 					.Where(s => !config.IgnoredUlearnSlides.Select(Guid.Parse).Contains(s.Id))
 					.Where(s => guids == null || guids.Contains(s.NormalizedGuid))
 					.Select(s => s.ToVerticals(
-						ulearnCourse.Id, 
-						profile.UlearnUrl + SlideUrlFormat, 
-						profile.UlearnUrl + SolutionsUrlFormat, 
+						ulearnCourse.Id,
+						profile.UlearnUrl + SlideUrlFormat,
+						profile.UlearnUrl + SolutionsUrlFormat,
 						videoGuids,
 						config.LtiId
-						).ToArray()),
+					).ToArray()),
 				guids != null || !SkipExistingGuids
-				);
+			);
 			if (Config.EmitSequentialsForInstructorNotes)
 				PatchInstructorsNotes(edxCourse, ulearnCourse, patcher.OlxPath);
 		}

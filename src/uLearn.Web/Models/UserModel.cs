@@ -26,7 +26,9 @@ namespace uLearn.Web.Models
 		public Dictionary<string, ICoursesAccessListModel> CoursesAccess { get; set; }
 	}
 
-	public interface ICoursesAccessListModel {}
+	public interface ICoursesAccessListModel
+	{
+	}
 
 	public class SingleCourseAccessModel : ICoursesAccessListModel
 	{

@@ -59,7 +59,7 @@ namespace uLearn.Web.Controllers
 
 			/* Update the submission */
 			submission = solutionsRepo.FindNoTrackingSubmission(submission.Id);
-			
+
 			var automaticChecking = submission.AutomaticChecking;
 
 			return Json(new RunSolutionResult
@@ -81,8 +81,8 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			submission.SolutionCode.Text = ((ExerciseSlide)courseManager
-				.GetCourse(submission.CourseId)
-				.GetSlideById(submission.SlideId))
+					.GetCourse(submission.CourseId)
+					.GetSlideById(submission.SlideId))
 				.Exercise
 				.GetSourceCode(submission.SolutionCode.Text);
 

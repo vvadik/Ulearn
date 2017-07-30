@@ -62,7 +62,7 @@ namespace uLearn.Web
 		{
 			if (string.Equals(filterContext.HttpContext.Request.GetRealScheme(), "HTTPS", StringComparison.OrdinalIgnoreCase))
 				return;
-			if (!string.Equals(filterContext.HttpContext.Request.HttpMethod, "GET", StringComparison.OrdinalIgnoreCase) && 
+			if (!string.Equals(filterContext.HttpContext.Request.HttpMethod, "GET", StringComparison.OrdinalIgnoreCase) &&
 				!string.Equals(filterContext.HttpContext.Request.HttpMethod, "HEAD", StringComparison.OrdinalIgnoreCase))
 				throw new InvalidOperationException("Require HTTPS");
 			var url = "https://" + filterContext.HttpContext.Request.Url?.Host + filterContext.HttpContext.Request.RawUrl;
@@ -97,7 +97,7 @@ namespace uLearn.Web
 
 			if (!konturPassportRequired)
 				return;
-			
+
 			var originalUrl = httpContext.Request.Url?.ToString().RemoveQueryParameter(queryStringParameterName) ?? "";
 
 			var isAuthenticated = httpContext.User.Identity.IsAuthenticated;
@@ -127,7 +127,7 @@ namespace uLearn.Web
 				});
 			}
 		}
-		
+
 		private ActionResult RedirectToAction(string actionName, string controllerName, RouteValueDictionary values)
 		{
 			if (string.IsNullOrEmpty(actionName))

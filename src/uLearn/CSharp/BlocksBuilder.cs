@@ -19,7 +19,8 @@ namespace uLearn.CSharp
 		public string Title;
 		public Guid Id;
 
-		public SlideBuilder(DirectoryInfo di) : base(false)
+		public SlideBuilder(DirectoryInfo di)
+			: base(false)
 		{
 			this.di = di;
 		}
@@ -27,9 +28,10 @@ namespace uLearn.CSharp
 		private SyntaxNode VisitMemberDeclaration(MemberDeclarationSyntax node, SyntaxNode newNode)
 		{
 			var parent = node.GetParents().OfType<BaseTypeDeclarationSyntax>().FirstOrDefault();
-			if (!ShowOnSlide(node)) return null;
-			if (parent == null 
-				|| parent.HasAttribute<SlideAttribute>() 
+			if (!ShowOnSlide(node))
+				return null;
+			if (parent == null
+				|| parent.HasAttribute<SlideAttribute>()
 				|| parent.HasAttribute<ShowBodyOnSlideAttribute>())
 				AddCodeBlock(((MemberDeclarationSyntax)newNode));
 			return ((MemberDeclarationSyntax)newNode).WithoutAttributes();
@@ -41,8 +43,8 @@ namespace uLearn.CSharp
 			{
 				var arguments =
 					node.GetAttributes<SlideAttribute>()
-					.Select(a => new { title = a.GetArgument(0), id = a.GetArgument(1) })
-					.Single();
+						.Select(a => new { title = a.GetArgument(0), id = a.GetArgument(1) })
+						.Single();
 				Title = arguments.title;
 				Id = Guid.Parse(arguments.id);
 			}
@@ -101,10 +103,14 @@ namespace uLearn.CSharp
 				if (comment.StartsWith("//#"))
 				{
 					var parts = comment.Split(new[] { ' ' }, 2);
-					if (parts[0] == "//#video") EmbedVideo(parts[1]);
-					if (parts[0] == "//#include") EmbedCode(parts[1]);
-					if (parts[0] == "//#para") EmbedPara(parts[1]);
-					if (parts[0] == "//#gallery") EmbedGallery(parts[1]);
+					if (parts[0] == "//#video")
+						EmbedVideo(parts[1]);
+					if (parts[0] == "//#include")
+						EmbedCode(parts[1]);
+					if (parts[0] == "//#para")
+						EmbedPara(parts[1]);
+					if (parts[0] == "//#gallery")
+						EmbedGallery(parts[1]);
 				}
 			}
 			return base.VisitTrivia(trivia);
@@ -113,36 +119,42 @@ namespace uLearn.CSharp
 		private void EmbedPara(string filename)
 		{
 			Blocks.Add(new MdBlock(di.GetContent(filename)));
-//			Blocks.Add(new IncludeMdBlock(filename));
+			//			Blocks.Add(new IncludeMdBlock(filename));
 		}
 
 		private void EmbedGallery(string folderName)
 		{
 			string[] images = di.GetFilenames(folderName);
 			Blocks.Add(new ImageGaleryBlock(images));
-//			Blocks.Add(new IncludeImageGalleryBlock(folderName));
+			//			Blocks.Add(new IncludeImageGalleryBlock(folderName));
 		}
 
 		///<summary>Is child _inside_ Type or Method parent</summary>
 		private bool IsNestingParent(SyntaxNode parent, SyntaxTrivia child)
 		{
-			return IsNestingParent(parent as TypeDeclarationSyntax, child) 
-				|| IsNestingParent(parent as MethodDeclarationSyntax, child);
+			return IsNestingParent(parent as TypeDeclarationSyntax, child)
+					|| IsNestingParent(parent as MethodDeclarationSyntax, child);
 		}
 
 		private bool IsNestingParent(TypeDeclarationSyntax node, SyntaxTrivia trivia)
 		{
-			if (node == null) return false;
-			if (trivia.Span.Start < node.OpenBraceToken.Span.Start) return false;
-			if (trivia.Span.End > node.CloseBraceToken.Span.End) return false;
+			if (node == null)
+				return false;
+			if (trivia.Span.Start < node.OpenBraceToken.Span.Start)
+				return false;
+			if (trivia.Span.End > node.CloseBraceToken.Span.End)
+				return false;
 			return true;
 		}
-		
+
 		private bool IsNestingParent(MethodDeclarationSyntax node, SyntaxTrivia trivia)
 		{
-			if (node == null) return false;
-			if (trivia.Span.Start < node.Body.Span.Start) return false;
-			if (trivia.Span.End > node.Body.Span.End) return false;
+			if (node == null)
+				return false;
+			if (trivia.Span.Start < node.Body.Span.Start)
+				return false;
+			if (trivia.Span.End > node.Body.Span.End)
+				return false;
 			return true;
 		}
 
@@ -167,19 +179,19 @@ namespace uLearn.CSharp
 		{
 			return node.WithoutAttributes().ToPrettyString();
 		}
-		
+
 		private static bool ShowOnSlide(MemberDeclarationSyntax node)
 		{
 			return !node.HasAttribute<SlideAttribute>()
-			&& !node.HasAttribute<HideOnSlideAttribute>() 
-			&& !node.HasAttribute<ExerciseAttribute>()
-			&& !(node is TypeDeclarationSyntax && node.HasAttribute<ShowBodyOnSlideAttribute>());
+					&& !node.HasAttribute<HideOnSlideAttribute>()
+					&& !node.HasAttribute<ExerciseAttribute>()
+					&& !(node is TypeDeclarationSyntax && node.HasAttribute<ShowBodyOnSlideAttribute>());
 		}
 
 		private void EmbedCode(string filename)
 		{
 			Blocks.Add(new CodeBlock(di.GetContent(filename), LangId));
-//			Blocks.Add(new IncludeCodeBlock(filename));
+			//			Blocks.Add(new IncludeCodeBlock(filename));
 		}
 
 		private void EmbedVideo(string videoId)

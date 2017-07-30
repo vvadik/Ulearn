@@ -20,19 +20,19 @@ namespace Database.Migrations
 			DropIndex("dbo.AutomaticExerciseCheckings", "IDX_UserSolution_Timestamp");
 			DropIndex("dbo.Likes", "UserAndSolution");
 			CreateTable(
-				"dbo.UserExerciseSubmissions",
-				c => new
-				{
-					Id = c.Int(nullable: false, identity: true),
-					UserId = c.String(nullable: false, maxLength: 128),
-					CourseId = c.String(nullable: false, maxLength: 40),
-					SlideId = c.Guid(nullable: false),
-					Timestamp = c.DateTime(nullable: false),
-					SolutionCodeHash = c.String(nullable: false, maxLength: 40),
-					CodeHash = c.Int(nullable: false),
-					AutomaticChecking_Id = c.Int(nullable: false),
-					ManualChecking_Id = c.Int(),
-				})
+					"dbo.UserExerciseSubmissions",
+					c => new
+					{
+						Id = c.Int(nullable: false, identity: true),
+						UserId = c.String(nullable: false, maxLength: 128),
+						CourseId = c.String(nullable: false, maxLength: 40),
+						SlideId = c.Guid(nullable: false),
+						Timestamp = c.DateTime(nullable: false),
+						SolutionCodeHash = c.String(nullable: false, maxLength: 40),
+						CodeHash = c.Int(nullable: false),
+						AutomaticChecking_Id = c.Int(nullable: false),
+						ManualChecking_Id = c.Int(),
+					})
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.AutomaticExerciseCheckings", t => t.AutomaticChecking_Id)
 				.ForeignKey("dbo.ManualExerciseCheckings", t => t.ManualChecking_Id)
@@ -44,19 +44,19 @@ namespace Database.Migrations
 				.Index(t => t.ManualChecking_Id);
 
 			CreateTable(
-				"dbo.ManualExerciseCheckings",
-				c => new
-				{
-					Id = c.Int(nullable: false, identity: true),
-					LockedUntil = c.DateTime(),
-					LockedById = c.String(maxLength: 128),
-					IsChecked = c.Boolean(nullable: false),
-					CourseId = c.String(nullable: false, maxLength: 64),
-					SlideId = c.Guid(nullable: false),
-					Timestamp = c.DateTime(nullable: false),
-					UserId = c.String(nullable: false, maxLength: 128),
-					Score = c.Int(nullable: false),
-				})
+					"dbo.ManualExerciseCheckings",
+					c => new
+					{
+						Id = c.Int(nullable: false, identity: true),
+						LockedUntil = c.DateTime(),
+						LockedById = c.String(maxLength: 128),
+						IsChecked = c.Boolean(nullable: false),
+						CourseId = c.String(nullable: false, maxLength: 64),
+						SlideId = c.Guid(nullable: false),
+						Timestamp = c.DateTime(nullable: false),
+						UserId = c.String(nullable: false, maxLength: 128),
+						Score = c.Int(nullable: false),
+					})
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.AspNetUsers", t => t.LockedById)
 				.ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
@@ -66,17 +66,17 @@ namespace Database.Migrations
 				.Index(t => new { t.SlideId, t.UserId }, name: "IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser");
 
 			CreateTable(
-				"dbo.ExerciseCodeReviews",
-				c => new
-				{
-					Id = c.Int(nullable: false, identity: true),
-					ExerciseCheckingId = c.Int(nullable: false),
-					StartPosition = c.Int(nullable: false),
-					FinishPosition = c.Int(nullable: false),
-					Comment = c.String(nullable: false),
-					AuthorId = c.String(nullable: false, maxLength: 128),
-					IsDeleted = c.Boolean(nullable: false),
-				})
+					"dbo.ExerciseCodeReviews",
+					c => new
+					{
+						Id = c.Int(nullable: false, identity: true),
+						ExerciseCheckingId = c.Int(nullable: false),
+						StartPosition = c.Int(nullable: false),
+						FinishPosition = c.Int(nullable: false),
+						Comment = c.String(nullable: false),
+						AuthorId = c.String(nullable: false, maxLength: 128),
+						IsDeleted = c.Boolean(nullable: false),
+					})
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.AspNetUsers", t => t.AuthorId, cascadeDelete: true)
 				.ForeignKey("dbo.ManualExerciseCheckings", t => t.ExerciseCheckingId)

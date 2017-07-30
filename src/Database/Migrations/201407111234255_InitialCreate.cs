@@ -7,58 +7,58 @@ namespace Database.Migrations
 		public override void Up()
 		{
 			CreateTable(
-				"dbo.AspNetRoles",
-				c => new
-				{
-					Id = c.String(nullable: false, maxLength: 128),
-					Name = c.String(nullable: false),
-				})
+					"dbo.AspNetRoles",
+					c => new
+					{
+						Id = c.String(nullable: false, maxLength: 128),
+						Name = c.String(nullable: false),
+					})
 				.PrimaryKey(t => t.Id);
 
 			CreateTable(
-				"dbo.AspNetUsers",
-				c => new
-				{
-					Id = c.String(nullable: false, maxLength: 128),
-					UserName = c.String(),
-					PasswordHash = c.String(),
-					SecurityStamp = c.String(),
-					Discriminator = c.String(nullable: false, maxLength: 128),
-				})
+					"dbo.AspNetUsers",
+					c => new
+					{
+						Id = c.String(nullable: false, maxLength: 128),
+						UserName = c.String(),
+						PasswordHash = c.String(),
+						SecurityStamp = c.String(),
+						Discriminator = c.String(nullable: false, maxLength: 128),
+					})
 				.PrimaryKey(t => t.Id);
 
 			CreateTable(
-				"dbo.AspNetUserClaims",
-				c => new
-				{
-					Id = c.Int(nullable: false, identity: true),
-					ClaimType = c.String(),
-					ClaimValue = c.String(),
-					User_Id = c.String(nullable: false, maxLength: 128),
-				})
+					"dbo.AspNetUserClaims",
+					c => new
+					{
+						Id = c.Int(nullable: false, identity: true),
+						ClaimType = c.String(),
+						ClaimValue = c.String(),
+						User_Id = c.String(nullable: false, maxLength: 128),
+					})
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.AspNetUsers", t => t.User_Id, cascadeDelete: true)
 				.Index(t => t.User_Id);
 
 			CreateTable(
-				"dbo.AspNetUserLogins",
-				c => new
-				{
-					UserId = c.String(nullable: false, maxLength: 128),
-					LoginProvider = c.String(nullable: false, maxLength: 128),
-					ProviderKey = c.String(nullable: false, maxLength: 128),
-				})
+					"dbo.AspNetUserLogins",
+					c => new
+					{
+						UserId = c.String(nullable: false, maxLength: 128),
+						LoginProvider = c.String(nullable: false, maxLength: 128),
+						ProviderKey = c.String(nullable: false, maxLength: 128),
+					})
 				.PrimaryKey(t => new { t.UserId, t.LoginProvider, t.ProviderKey })
 				.ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
 				.Index(t => t.UserId);
 
 			CreateTable(
-				"dbo.AspNetUserRoles",
-				c => new
-				{
-					UserId = c.String(nullable: false, maxLength: 128),
-					RoleId = c.String(nullable: false, maxLength: 128),
-				})
+					"dbo.AspNetUserRoles",
+					c => new
+					{
+						UserId = c.String(nullable: false, maxLength: 128),
+						RoleId = c.String(nullable: false, maxLength: 128),
+					})
 				.PrimaryKey(t => new { t.UserId, t.RoleId })
 				.ForeignKey("dbo.AspNetRoles", t => t.RoleId, cascadeDelete: true)
 				.ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
@@ -66,20 +66,20 @@ namespace Database.Migrations
 				.Index(t => t.UserId);
 
 			CreateTable(
-				"dbo.UserSolutions",
-				c => new
-				{
-					Id = c.Int(nullable: false, identity: true),
-					CourseId = c.String(nullable: false, maxLength: 64),
-					SlideId = c.String(nullable: false, maxLength: 64),
-					UserId = c.String(maxLength: 128),
-					Code = c.String(nullable: false, maxLength: 1024),
-					Timestamp = c.DateTime(nullable: false),
-					IsRightAnswer = c.Boolean(nullable: false),
-					IsCompilationError = c.Boolean(nullable: false),
-					CompilationError = c.String(maxLength: 1024),
-					Output = c.String(maxLength: 1024),
-				})
+					"dbo.UserSolutions",
+					c => new
+					{
+						Id = c.Int(nullable: false, identity: true),
+						CourseId = c.String(nullable: false, maxLength: 64),
+						SlideId = c.String(nullable: false, maxLength: 64),
+						UserId = c.String(maxLength: 128),
+						Code = c.String(nullable: false, maxLength: 1024),
+						Timestamp = c.DateTime(nullable: false),
+						IsRightAnswer = c.Boolean(nullable: false),
+						IsCompilationError = c.Boolean(nullable: false),
+						CompilationError = c.String(maxLength: 1024),
+						Output = c.String(maxLength: 1024),
+					})
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.AspNetUsers", t => t.UserId)
 				.Index(t => t.UserId);

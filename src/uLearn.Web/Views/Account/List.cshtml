@@ -8,11 +8,16 @@
 <div class="container">
 	<h1>Пользователи</h1>
 
-	<p><a class="label label-danger" href="@Url.Action("List", new { role = LmsRoles.SysAdmin })">@LmsRoles.SysAdmin</a> может всё.</p>
-	<p><a class="label label-warning" href="@Url.Action("List", new { courseRole = CourseRole.CourseAdmin })">@CourseRole.CourseAdmin</a> может видеть служебную информацию и управлять ролями других пользователей в рамках курса.</p>
-	<p><a class="label label-info" href="@Url.Action("List", new { courseRole = CourseRole.Instructor })">@CourseRole.Instructor</a> может видеть статистику по успеваемости, проверять работы, отвечать на комментарии.</p>
-	<p><a class="label label-success" href="@Url.Action("List", new { courseRole = CourseRole.Tester })">@CourseRole.Tester</a> может видеть ещё не опубликованные для всех материалы.</p>
-	<p><a class="label label-default" href="@Url.Action("List")">Обычный пользователь</a> может видеть только опубликованные материалы.</p>
+	<p><a class="label label-danger" href="@Url.Action("List", new { role = LmsRoles.SysAdmin })">@LmsRoles.SysAdmin</a> может всё.
+	</p>
+	<p><a class="label label-warning" href="@Url.Action("List", new { courseRole = CourseRole.CourseAdmin })">@CourseRole.CourseAdmin</a> может видеть служебную информацию и управлять ролями других пользователей в рамках курса.
+	</p>
+	<p><a class="label label-info" href="@Url.Action("List", new { courseRole = CourseRole.Instructor })">@CourseRole.Instructor</a> может видеть статистику по успеваемости, проверять работы, отвечать на комментарии.
+	</p>
+	<p><a class="label label-success" href="@Url.Action("List", new { courseRole = CourseRole.Tester })">@CourseRole.Tester</a> может видеть ещё не опубликованные для всех материалы.
+	</p>
+	<p><a class="label label-default" href="@Url.Action("List")">Обычный пользователь</a> может видеть только опубликованные материалы.
+	</p>
 
 	<p>
 		@using (Html.BeginForm("List", "Account", FormMethod.Get, new { @class = "form-inline" }))

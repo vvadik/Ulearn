@@ -50,9 +50,9 @@ namespace uLearn.Web.Controllers
 			if (update == null)
 				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 
-            // Fix for bug: Telegram.Bot.Client doesn't know about some new messages types
-		    if (update.Message == null)
-		        return new HttpStatusCodeResult(HttpStatusCode.OK);
+			// Fix for bug: Telegram.Bot.Client doesn't know about some new messages types
+			if (update.Message == null)
+				return new HttpStatusCodeResult(HttpStatusCode.OK);
 
 			switch (update.Type)
 			{
@@ -73,7 +73,7 @@ namespace uLearn.Web.Controllers
 			using (var reader = new StreamReader(memstream))
 				return reader.ReadToEnd().DeserializeJson<T>();
 		}
-		
+
 		public async Task OnMessage(Message message)
 		{
 			if (telegramBot == null)
@@ -88,7 +88,7 @@ namespace uLearn.Web.Controllers
 				var chatTitle = GetChatTitle(message.Chat);
 				var secretHash = notificationsRepo.GetSecretHashForTelegramTransport(chatId, chatTitle, webhookSecret);
 				var createTransportUrl = Url.Action("AddTelegram", "Account", new { chatId = chatId, chatTitle = chatTitle, hash = secretHash }, "https");
-				
+
 				reply = $"Чтобы получать уведомления от ulearn.me в телеграм, перейдите по ссылке {createTransportUrl}";
 				if (text == "/start")
 					reply = "Добро пожаловать к боту ulearn.me!\n\n" + reply;
@@ -96,15 +96,15 @@ namespace uLearn.Web.Controllers
 			else if (text == "/help")
 			{
 				reply = "Наш бот поддерживает следующие команды:\n\n" +
-					"/connect — подключает получение уведомлений от ulearn.me в телеграм\n" +
-					"/help — показывает это сообщение\n";
+						"/connect — подключает получение уведомлений от ulearn.me в телеграм\n" +
+						"/help — показывает это сообщение\n";
 			}
 			else
 			{
 				reply = "Не понимаю такой команды. Нажмите /help, чтобы узнать, что я могу.";
 			}
 
-			if (! string.IsNullOrEmpty(reply))
+			if (!string.IsNullOrEmpty(reply))
 				await telegramBot.SendTextMessageAsync(chatId, reply);
 		}
 

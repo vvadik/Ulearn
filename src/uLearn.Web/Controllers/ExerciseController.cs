@@ -72,16 +72,16 @@ namespace uLearn.Web.Controllers
 
 			return Json(result);
 		}
-		
+
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		[System.Web.Mvc.HttpPost]
 		[ValidateInput(false)]
 		public async Task<ActionResult> AddExerciseCodeReview(string courseId, int checkingId, [FromBody] ReviewInfo reviewInfo)
 		{
 			var checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(checkingId);
-			if (! string.Equals(checking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
+			if (!string.Equals(checking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-			
+
 			/* Make start position less than finish position */
 			if (reviewInfo.StartLine > reviewInfo.FinishLine || (reviewInfo.StartLine == reviewInfo.FinishLine && reviewInfo.StartPosition > reviewInfo.FinishPosition))
 			{
@@ -108,9 +108,9 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> DeleteExerciseCodeReview(string courseId, int reviewId)
 		{
 			var review = slideCheckingsRepo.FindExerciseCodeReviewById(reviewId);
-			if (! string.Equals(review.ExerciseChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
+			if (!string.Equals(review.ExerciseChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-			if (review.AuthorId != User.Identity.GetUserId() && ! User.HasAccessFor(courseId, CourseRole.CourseAdmin))
+			if (review.AuthorId != User.Identity.GetUserId() && !User.HasAccessFor(courseId, CourseRole.CourseAdmin))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			await slideCheckingsRepo.DeleteExerciseCodeReview(review);
@@ -124,7 +124,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> UpdateExerciseCodeReview(string courseId, int reviewId, string comment)
 		{
 			var review = slideCheckingsRepo.FindExerciseCodeReviewById(reviewId);
-			if (! string.Equals(review.ExerciseChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
+			if (!string.Equals(review.ExerciseChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			if (review.AuthorId != User.Identity.GetUserId())
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
@@ -214,7 +214,7 @@ namespace uLearn.Web.Controllers
 
 		[System.Web.Mvc.HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public async Task<ActionResult> SimpleScoreExercise(int submissionId, int exerciseScore, bool ignoreNewestSubmission=false, int? updateCheckingId = null)
+		public async Task<ActionResult> SimpleScoreExercise(int submissionId, int exerciseScore, bool ignoreNewestSubmission = false, int? updateCheckingId = null)
 		{
 			var submission = userSolutionsRepo.FindSubmissionById(submissionId);
 			var courseId = submission.CourseId;
@@ -229,7 +229,8 @@ namespace uLearn.Web.Controllers
 				var lastAcceptedSubmission = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).OrderByDescending(s => s.Timestamp).FirstOrDefault();
 				if (lastAcceptedSubmission != null && lastAcceptedSubmission.Id != submission.Id)
 					return Json(
-						new SimpleScoreExerciseResult {
+						new SimpleScoreExerciseResult
+						{
 							Status = "error",
 							Error = "has_newest_submission",
 							SubmissionId = lastAcceptedSubmission.Id,
@@ -240,11 +241,12 @@ namespace uLearn.Web.Controllers
 			var manualScore = slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId);
 			if (exerciseScore < manualScore && !updateCheckingId.HasValue)
 				return Json(
-					new SimpleScoreExerciseResult {
+					new SimpleScoreExerciseResult
+					{
 						Status = "error",
 						Error = "has_greatest_score",
 						Score = manualScore.ToString(),
-						CheckedQueueUrl = Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId, done = true, userId, slideId})
+						CheckedQueueUrl = Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId, done = true, userId, slideId })
 					});
 
 			/* TODO: check if 0 <= exerciseScore <= exercise.MaxReviewScore */
@@ -262,7 +264,8 @@ namespace uLearn.Web.Controllers
 			await NotifyAboutManualExerciseChecking(checking);
 
 			return Json(
-				new SimpleScoreExerciseResult {
+				new SimpleScoreExerciseResult
+				{
 					Status = "ok",
 					Score = exerciseScore.PluralizeInRussian(RussianPluralizationOptions.Score),
 					TotalScore = visitsRepo.GetScore(slideId, userId),
@@ -270,7 +273,7 @@ namespace uLearn.Web.Controllers
 				});
 		}
 
-		public ActionResult SubmissionsPanel(string courseId, Guid slideId, string userId = "", int? currentSubmissionId = null, bool canTryAgain=true)
+		public ActionResult SubmissionsPanel(string courseId, Guid slideId, string userId = "", int? currentSubmissionId = null, bool canTryAgain = true)
 		{
 			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
 				userId = "";
@@ -308,7 +311,7 @@ namespace uLearn.Web.Controllers
 				userSolutionsRepo.GetAllSubmissionsByUser(course.Id, slide.Id, userId);
 			var topUserReviewComments = slideCheckingsRepo.GetTopUserReviewComments(course.Id, slide.Id, currentUserId, 10);
 
-			return new ExerciseBlockData(course.Id, (ExerciseSlide) slide, visit?.IsSkipped ?? false, solution)
+			return new ExerciseBlockData(course.Id, (ExerciseSlide)slide, visit?.IsSkipped ?? false, solution)
 			{
 				Url = Url,
 				Reviews = submissionReviews?.ToList() ?? new List<ExerciseCodeReview>(),
@@ -320,22 +323,22 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private UserExerciseSubmission GetExerciseSubmissionShownByDefault(string courseId, Guid slideId, string userId, bool allowNotAccepted=false)
+		private UserExerciseSubmission GetExerciseSubmissionShownByDefault(string courseId, Guid slideId, string userId, bool allowNotAccepted = false)
 		{
 			var submissions = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
 			var lastSubmission = submissions.LastOrDefault(s => s.ManualCheckings != null && s.ManualCheckings.Any()) ??
-					submissions.LastOrDefault(s => s.AutomaticCheckingIsRightAnswer);
+								submissions.LastOrDefault(s => s.AutomaticCheckingIsRightAnswer);
 			if (lastSubmission == null && allowNotAccepted)
 				lastSubmission = userSolutionsRepo.GetAllSubmissionsByUser(courseId, slideId, userId).ToList().LastOrDefault();
 			return lastSubmission;
 		}
 
 		[System.Web.Mvc.AllowAnonymous]
-		public ActionResult Submission(string courseId, Guid slideId, string userId=null, int? submissionId=null, int? manualCheckingId = null, bool isLti = false, bool showOutput = false, bool instructorView = false, bool onlyAccepted = true)
+		public ActionResult Submission(string courseId, Guid slideId, string userId = null, int? submissionId = null, int? manualCheckingId = null, bool isLti = false, bool showOutput = false, bool instructorView = false, bool onlyAccepted = true)
 		{
 			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
 				instructorView = false;
-			
+
 			var currentUserId = userId ?? (User.Identity.IsAuthenticated ? User.Identity.GetUserId() : "");
 			UserExerciseSubmission submission = null;
 			if (submissionId.HasValue && submissionId.Value > 0)
@@ -343,14 +346,14 @@ namespace uLearn.Web.Controllers
 				submission = userSolutionsRepo.FindSubmissionById(submissionId.Value);
 				if (submission == null)
 					return HttpNotFound();
-				if (! string.Equals(courseId, submission.CourseId, StringComparison.OrdinalIgnoreCase))
+				if (!string.Equals(courseId, submission.CourseId, StringComparison.OrdinalIgnoreCase))
 					return HttpNotFound();
 				if (slideId != submission.SlideId)
 					return HttpNotFound();
 				if (!User.HasAccessFor(courseId, CourseRole.Instructor) && submission.UserId != currentUserId)
 					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			}
-			else if (! submissionId.HasValue && ! manualCheckingId.HasValue)
+			else if (!submissionId.HasValue && !manualCheckingId.HasValue)
 			{
 				submission = GetExerciseSubmissionShownByDefault(courseId, slideId, currentUserId, instructorView);
 			}
@@ -425,6 +428,7 @@ namespace uLearn.Web.Controllers
 	{
 		[AllowHtml]
 		public string Comment { get; set; }
+
 		public int StartLine { get; set; }
 		public int StartPosition { get; set; }
 		public int FinishLine { get; set; }
@@ -493,4 +497,3 @@ namespace uLearn.Web.Controllers
 		public bool IsCurrentSubmissionChecking { get; set; }
 	}
 }
-

@@ -59,8 +59,10 @@ namespace uLearn.Model.Blocks
 
 		// То, что будет выполняться для проверки задания
 		public string ExerciseCode { get; set; }
+
 		// Индекс внутри ExerciseCode, куда нужно вставить код пользователя.
 		public int IndexToInsertSolution { get; set; }
+
 		// Если это вставить в ExerciseCode по индексу IndexToInsertSolution и выполнить полученный код, он должен вывести ExpectedOutput
 		public string EthalonSolution { get; set; }
 

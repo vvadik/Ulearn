@@ -44,7 +44,7 @@ namespace uLearn.Web.LTI
 
 			if (identity == null)
 				throw new Exception("Can\'t authenticate identity for LTI user");
-			
+
 			log.Info($"Аутенфицирую пользователя по identity: {identity.Name}");
 			context.OwinContext.Authentication.SignIn(new AuthenticationProperties { IsPersistent = false }, identity);
 		}

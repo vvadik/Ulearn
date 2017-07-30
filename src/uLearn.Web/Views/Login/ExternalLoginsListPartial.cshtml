@@ -4,8 +4,8 @@
 
 @{
 	var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes().Where(
-		x => x.AuthenticationType != "LTI" && (! Model.AvailableProviders.Any() || Model.AvailableProviders.Contains(x.AuthenticationType))
-	).OrderBy(x => x.AuthenticationType).ToList();
+		x => x.AuthenticationType != "LTI" && (!Model.AvailableProviders.Any() || Model.AvailableProviders.Contains(x.AuthenticationType))
+		).OrderBy(x => x.AuthenticationType).ToList();
 
 	if (Model.Type == ExternalLoginListType.Link)
 	{
@@ -19,7 +19,7 @@
 	if (!loginProviders.Any())
 	{
 		<div>
-			
+
 		</div>
 	}
 	else

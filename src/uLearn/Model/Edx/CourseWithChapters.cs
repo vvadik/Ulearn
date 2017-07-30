@@ -25,10 +25,7 @@ namespace uLearn.Model.Edx
 		[XmlElement("chapter")]
 		public ChapterReference[] ChapterReferences
 		{
-			get
-			{
-				return chapterReferences = chapterReferences ?? new ChapterReference[0];
-			}
+			get { return chapterReferences = chapterReferences ?? new ChapterReference[0]; }
 			set { chapterReferences = value; }
 		}
 

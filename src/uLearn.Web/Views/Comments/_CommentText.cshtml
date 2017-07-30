@@ -1,6 +1,6 @@
 ﻿@using uLearn.Web.Extensions
 @model Database.Models.Comment
-	
+
 @{
 	var htmlCommentText = Html.EncodeMultiLineText(Model.Text);
 	htmlCommentText = Html.HighlightLinks(htmlCommentText);

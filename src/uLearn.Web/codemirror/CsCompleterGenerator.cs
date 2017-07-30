@@ -17,6 +17,7 @@ namespace uLearn.Web.codemirror
 	{
 		private static readonly Dictionary<string, List<string>> returnTypeDictionary = new Dictionary<string, List<string>>();
 		private static readonly Dictionary<Type, HashSet<Tuple<string, string>>> extensionMethods = new Dictionary<Type, HashSet<Tuple<string, string>>>();
+
 		private static readonly List<Tuple<string, string>> prettyNames = new List<Tuple<string, string>>
 		{
 			Tuple.Create("ReadOnlyCollection", "Enumerable"),
@@ -46,36 +47,36 @@ namespace uLearn.Web.codemirror
 		{
 			var myTypes = new[]
 			{
-				typeof (int),
-				typeof (char),
-				typeof (double),
-				typeof (long),
-				typeof (float),
-				typeof (string),
-				typeof (Console),
-				typeof (Math),
-				typeof (Boolean),
-				typeof (Enumerable),
-				typeof (Array),
-				typeof (StringBuilder),
-				typeof (Dictionary<,>),
-				typeof (List<>),
-				typeof (DirectoryInfo),
-				typeof (FileInfo),
-				typeof (CultureInfo),
-				typeof (Tuple),
-				typeof (Tuple<,>),
-				typeof (Tuple<,,>),
-				typeof (Tuple<,,,>),
-				typeof (IComparer),
-				typeof (IComparable),
-				typeof (IEnumerable),
-				typeof (ILookup<,>),
-				typeof (Regex),
-				typeof (KeyValuePair<,>),
-				typeof (Point),
-				typeof (IEnumerable),
-				typeof (IEnumerator),
+				typeof(int),
+				typeof(char),
+				typeof(double),
+				typeof(long),
+				typeof(float),
+				typeof(string),
+				typeof(Console),
+				typeof(Math),
+				typeof(Boolean),
+				typeof(Enumerable),
+				typeof(Array),
+				typeof(StringBuilder),
+				typeof(Dictionary<,>),
+				typeof(List<>),
+				typeof(DirectoryInfo),
+				typeof(FileInfo),
+				typeof(CultureInfo),
+				typeof(Tuple),
+				typeof(Tuple<,>),
+				typeof(Tuple<,,>),
+				typeof(Tuple<,,,>),
+				typeof(IComparer),
+				typeof(IComparable),
+				typeof(IEnumerable),
+				typeof(ILookup<,>),
+				typeof(Regex),
+				typeof(KeyValuePair<,>),
+				typeof(Point),
+				typeof(IEnumerable),
+				typeof(IEnumerator),
 			};
 
 			var extendedTypes = new[]
@@ -120,7 +121,7 @@ namespace uLearn.Web.codemirror
 
 		private static string ToDictionary(IEnumerable<Tuple<string, string>> tuples)
 		{
-			return String.Join(", ", 
+			return String.Join(", ",
 				tuples
 					.Where(tuple => !tuple.Item1.Equals(tuple.Item2))
 					.Select(tuple => String.Format("'{0}' : '{1}'", tuple.Item1, tuple.Item2))
@@ -140,7 +141,7 @@ namespace uLearn.Web.codemirror
 			Console.WriteLine("this.membersByReturnType = [];");
 			foreach (
 				var type in
-					returnTypeDictionary.Keys/*.Where(
+				returnTypeDictionary.Keys /*.Where(
 						type => !type.ToString().Contains("TSource") && !type.ToString().Contains("TResult") && myTypes.Contains(type))*/)
 			{
 				Console.WriteLine("this.membersByReturnType['{0}'] = [{1}];", type,
@@ -167,7 +168,6 @@ namespace uLearn.Web.codemirror
 			var type = myType.Name;
 			foreach (var prettyName in prettyNames)
 			{
-				
 				if (type == prettyName.Item1)
 					return prettyName.Item2;
 			}
@@ -253,6 +253,5 @@ namespace uLearn.Web.codemirror
 			}
 			return fields.Select(x => x.Name).Distinct();
 		}
-
 	}
 }

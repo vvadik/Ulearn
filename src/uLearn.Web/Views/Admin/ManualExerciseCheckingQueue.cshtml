@@ -13,7 +13,6 @@
 
 	@if (Model.ShowFilterForm)
 	{
-
 		@Html.Partial("_ManualCheckingQueueFilterForm", Model)
 
 		<p>
@@ -66,7 +65,7 @@
 	@foreach (var checkModel in Model.Checkings)
 	{
 		var checking = (ManualExerciseChecking)checkModel.CheckingQueueItem;
-		<hr />
+		<hr/>
 		<div>
 			<div>
 				<p>
@@ -85,17 +84,17 @@
 					<p>
 						@if (checkModel.ContextReviews.Any())
 						{
-								<b>Комментарии:</b>
-								foreach (var review in checkModel.ContextReviews)
-								{
-									 var solution = checkModel.ContextExerciseSolution;
-									 var startPosition = solution.FindPositionByLineAndCharacted(review.StartLine, review.StartPosition);
-									 var finishPosition = solution.FindPositionByLineAndCharacted(review.FinishLine, review.FinishPosition);
-									<div>
-										<span class="commented-code">@solution.Substring(startPosition, finishPosition - startPosition).TruncateWithEllipsis(30)</span>
-										@review.Comment
-									</div>
-								}
+							<b>Комментарии:</b>
+							foreach (var review in checkModel.ContextReviews)
+							{
+								var solution = checkModel.ContextExerciseSolution;
+								var startPosition = solution.FindPositionByLineAndCharacted(review.StartLine, review.StartPosition);
+								var finishPosition = solution.FindPositionByLineAndCharacted(review.FinishLine, review.FinishPosition);
+								<div>
+									<span class="commented-code">@solution.Substring(startPosition, finishPosition - startPosition).TruncateWithEllipsis(30)</span>
+									@review.Comment
+								</div>
+							}
 						}
 					</p>
 					<p>
@@ -107,9 +106,9 @@
 					<p>
 						Проверяется преподавателем <b>@checking.LockedBy.VisibleName</b>,
 						заблокирована ещё на @{
-												 var minutes = (int)(checking.LockedUntil.Value - DateTime.Now).TotalMinutes;
-												 @minutes.PluralizeInRussian(RussianPluralizationOptions.MinuteDative)
-											 }
+							                     var minutes = (int)(checking.LockedUntil.Value - DateTime.Now).TotalMinutes;
+							                     @minutes.PluralizeInRussian(RussianPluralizationOptions.MinuteDative)
+						                     }
 					</p>
 					if (checking.IsLockedBy(User.Identity))
 					{

@@ -43,7 +43,8 @@ namespace uLearn
 
 		public IEnumerable<ResourceFile> EnumerateResourcesFrom(string ns)
 		{
-			if (!ns.EndsWith(".")) ns = ns + ".";
+			if (!ns.EndsWith("."))
+				ns = ns + ".";
 			return type.Assembly.GetManifestResourceNames()
 				.Where(name => name.StartsWith(ns, StringComparison.InvariantCultureIgnoreCase))
 				.Select(name => new ResourceFile(name.Substring(ns.Length), name, () => LoadResource(name)));
@@ -54,7 +55,8 @@ namespace uLearn
 			var buffer = new MemoryStream();
 			Stream stream = type.Assembly
 				.GetManifestResourceStream(name);
-			if (stream == null) throw new Exception("No resource " + name);
+			if (stream == null)
+				throw new Exception("No resource " + name);
 			stream.CopyTo(buffer);
 			return buffer.ToArray();
 		}

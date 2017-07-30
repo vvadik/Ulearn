@@ -23,7 +23,7 @@ namespace uLearn.Web.Helpers
 			ColumnsCount = 1;
 		}
 
-		public void AddCell(object value, int colspan=1)
+		public void AddCell(object value, int colspan = 1)
 		{
 			if (colspan < 1)
 				return;
@@ -34,7 +34,7 @@ namespace uLearn.Web.Helpers
 			var range = worksheet.Cells[currentRow, currentColumn, currentRow, currentColumn + colspan - 1];
 			if (colspan > 1)
 				range.Merge = true;
-			
+
 			foreach (var styleRule in styleRules)
 				styleRule(range.Style);
 			if (isLastStyleRuleForOneCellOnly)
@@ -43,7 +43,7 @@ namespace uLearn.Web.Helpers
 			currentColumn += colspan;
 			ColumnsCount = Math.Max(ColumnsCount, currentColumn);
 		}
-		
+
 		public void GoToNewLine()
 		{
 			currentRow += 1;

@@ -36,7 +36,7 @@ namespace uLearn
 
 			if (string.IsNullOrEmpty(unitSettings.Url))
 				unitSettings.Url = unitSettings.Title.ToLatin();
-			
+
 			var courseScoringGroupsIds = new HashSet<string>(courseSettings.Scoring.Groups.Keys);
 			foreach (var scoringGroup in unitSettings.Scoring.Groups.Values.ToList())
 			{
@@ -44,13 +44,13 @@ namespace uLearn
 					throw new CourseLoadingException(
 						$"Неизвестная группа баллов описана в модуле: {scoringGroup.Id}. Файл {file.FullName}. " +
 						$"Для курса определены только следующие группы баллов: {string.Join(", ", courseScoringGroupsIds)}"
-						);
+					);
 
 				/* By default set unit's scoring settings from course's scoring settings */
 				var unitScoringGroup = unitSettings.Scoring.Groups[scoringGroup.Id];
 				var courseScoringGroup = courseSettings.Scoring.Groups[scoringGroup.Id];
 				unitScoringGroup.CopySettingsFrom(courseScoringGroup);
-				
+
 				if (scoringGroup.IsEnabledForEveryoneSpecified)
 					throw new CourseLoadingException(
 						$"В настройках модуля «{unitSettings.Title}» для группы баллов {scoringGroup.Id} указана опция enable_for_everyone=\"{scoringGroup._enabledForEveryone}\" (файл {file.Directory?.Name}/Unit.xml). " +
@@ -59,7 +59,7 @@ namespace uLearn
 
 			/* Copy other scoring groups and scoring settings from course settings */
 			unitSettings.Scoring.CopySettingsFrom(courseSettings.Scoring);
-			
+
 			return unitSettings;
 		}
 

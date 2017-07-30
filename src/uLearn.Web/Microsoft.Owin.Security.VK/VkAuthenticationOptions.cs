@@ -9,7 +9,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 {
 	public class VkAuthenticationOptions : AuthenticationOptions
 	{
-		[SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", 
+		[SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters",
 			MessageId = "Microsoft.Owin.Security.VK.VkAuthenticationOptions.set_Caption(System.String)", Justification = "Not localizable.")]
 		public VkAuthenticationOptions()
 			: base(VkAuthenticationConstants.AuthenticationType)
@@ -55,6 +55,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 			get => Description.Caption;
 			set => Description.Caption = value;
 		}
+
 		public string ReturnEndpointPath { get; set; }
 		public string SignInAsAuthenticationType { get; set; }
 

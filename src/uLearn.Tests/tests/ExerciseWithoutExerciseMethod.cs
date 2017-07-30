@@ -21,5 +21,4 @@ namespace uLearn.tests
 	/*uncomment
 	class MyClass{ }
 	*/
-
 }

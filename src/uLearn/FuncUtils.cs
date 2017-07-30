@@ -51,7 +51,11 @@ namespace uLearn
 
 		public static async Task TrySeveralTimesAsync(Func<Task> func, int triesCount)
 		{
-			await TrySeveralTimesAsync(async () => { await func(); return 0;}, triesCount, () => Task.Delay(100));
+			await TrySeveralTimesAsync(async () =>
+			{
+				await func();
+				return 0;
+			}, triesCount, () => Task.Delay(100));
 		}
 
 		public static T TrySeveralTimes<T>(Func<T> func, int triesCount, Action runAfterFail, Type exceptionType)
@@ -68,6 +72,7 @@ namespace uLearn
 		{
 			return TrySeveralTimes(func, triesCount, () => { }, exceptionType);
 		}
+
 		public static T TrySeveralTimes<T>(Func<T> func, int triesCount)
 		{
 			return TrySeveralTimes(func, triesCount, () => { });
@@ -80,7 +85,7 @@ namespace uLearn
 		[SetUp]
 		public void ConfigureLogger()
 		{
-			log4net.Config.BasicConfigurator.Configure(new ConsoleAppender { Threshold = log4net.Core.Level.Debug});
+			log4net.Config.BasicConfigurator.Configure(new ConsoleAppender { Threshold = log4net.Core.Level.Debug });
 		}
 
 		[Test]
@@ -88,7 +93,7 @@ namespace uLearn
 		{
 			var index = 0;
 			FuncUtils.TrySeveralTimes<object>(() =>
-			{
+				{
 					index++;
 					Console.WriteLine($"Run #{index}");
 					if (index != 3)
@@ -96,10 +101,7 @@ namespace uLearn
 					return null;
 				},
 				3,
-				() =>
-				{
-					Thread.Sleep(200);
-				});
+				() => { Thread.Sleep(200); });
 			Assert.AreEqual(index, 3);
 		}
 
@@ -114,7 +116,7 @@ namespace uLearn
 				if (index != 3)
 					throw new Exception("exception");
 				await Task.Delay(100);
-				return (object) null;
+				return (object)null;
 			}, 3, async () => await Task.Delay(200));
 			Assert.AreEqual(index, 3);
 		}

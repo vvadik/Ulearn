@@ -98,7 +98,7 @@ namespace CsSandboxer
 				domain,
 				typeof(Sandboxer).Assembly.ManifestModule.FullyQualifiedName,
 				typeof(Sandboxer).FullName
-				);
+			);
 			var sandboxer = (Sandboxer)handle.Unwrap();
 			return sandboxer;
 		}

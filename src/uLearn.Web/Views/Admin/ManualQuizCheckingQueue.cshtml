@@ -12,7 +12,7 @@
 
 	@Html.Partial("_ManualCheckingQueueFilterForm", Model)
 
-	@if (! string.IsNullOrEmpty(Model.Message) && Model.Checkings.Count > 0)
+	@if (!string.IsNullOrEmpty(Model.Message) && Model.Checkings.Count > 0)
 	{
 		<div class="alert alert-danger">
 			@if (Model.Message == "already_checked")
@@ -55,15 +55,15 @@
 					<p>
 						Проверяется преподавателем <b>@check.LockedBy.VisibleName</b>,
 						заблокирована ещё на @{
-							var minutes = (int)(check.LockedUntil.Value - DateTime.Now).TotalMinutes;
-							@minutes.PluralizeInRussian(new RussianPluralizationOptions
-							{
-								One = "минуту",
-								Two = "минуты",
-								Five = "минут",
-								Gender = Gender.Female,
-							})
-						}
+							                     var minutes = (int)(check.LockedUntil.Value - DateTime.Now).TotalMinutes;
+							                     @minutes.PluralizeInRussian(new RussianPluralizationOptions
+							                     {
+								                     One = "минуту",
+								                     Two = "минуты",
+								                     Five = "минут",
+								                     Gender = Gender.Female,
+							                     })
+						                     }
 					</p>
 					if (check.IsLockedBy(User.Identity))
 					{

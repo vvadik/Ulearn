@@ -53,7 +53,7 @@ namespace Notifications
 		{
 			var timestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
 			var signature = NotificationsRepo.GetNotificationTransportEnablingSignature(transportId, timestamp, secretForHashes);
-			var transportUnsubscribeUrl = $"{baseUrl}/Notifications/SaveSettings?courseId={courseId}&transportId={transportId}&notificationType={(int) notificationType}&isEnabled=False&timestamp={timestamp}&signature={signature}";
+			var transportUnsubscribeUrl = $"{baseUrl}/Notifications/SaveSettings?courseId={courseId}&transportId={transportId}&notificationType={(int)notificationType}&isEnabled=False&timestamp={timestamp}&signature={signature}";
 			return "<p style=\"color: #999; font-size: 12px;\">" +
 					$"<a href=\"{transportUnsubscribeUrl}\">Нажмите здесь</a>, если вы не хотите получать такие уведомления от курса «{courseTitle}» на почту.<br/>" +
 					$"Если вы вовсе не хотите получать от нас уведомления на почту, выключите их <a href=\"{baseUrl}/Account/Manage\">в профиле</a>." +
@@ -115,7 +115,7 @@ namespace Notifications
 					htmlMessage += $"<br/></br><a href=\"{button.Link.EscapeHtml()}\">{button.Text.EscapeHtml()}</a>";
 					textMessage += $"\n\n{button.Text}: {button.Link}";
 				}
-				
+
 				htmlBodies.Add(htmlMessage);
 				textBodies.Add(textMessage);
 			}
@@ -144,7 +144,7 @@ namespace Notifications
 				transport.User.TelegramChatId.Value,
 				notification.GetHtmlMessageForDelivery(transport, notificationDelivery, course, baseUrl),
 				button: notificationButton != null ? new TelegramButton(notificationButton) : null
-				);
+			);
 		}
 
 		private async Task SendAsync(TelegramNotificationTransport transport, List<NotificationDelivery> notificationDeliveries)
@@ -181,7 +181,7 @@ namespace Notifications
 			metricSender.SendCount($"send_notification.{notificationDelivery.Notification.GetNotificationType()}");
 
 			if (transport is MailNotificationTransport || transport is TelegramNotificationTransport)
-				await SendAsync((dynamic) transport, notificationDelivery);
+				await SendAsync((dynamic)transport, notificationDelivery);
 		}
 
 		public async Task SendAsync(List<NotificationDelivery> notificationDeliveries)
@@ -202,7 +202,7 @@ namespace Notifications
 			metricSender.SendCount($"send_notification.{notificationType}", notificationDeliveries.Count);
 
 			if (transport is MailNotificationTransport || transport is TelegramNotificationTransport)
-				await SendAsync((dynamic) transport , notificationDeliveries);
+				await SendAsync((dynamic)transport, notificationDeliveries);
 		}
 	}
 }

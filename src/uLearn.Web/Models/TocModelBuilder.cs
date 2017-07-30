@@ -88,14 +88,14 @@ namespace uLearn.Web.Models
 			var page = new TocPageInfo
 			{
 				SlideId = slide.Id,
-				Url = getSlideUrl(slide), 
-				Name = slide.Title, 
-				ShouldBeSolved = slide.ShouldBeSolved, 
+				Url = getSlideUrl(slide),
+				Name = slide.Title,
+				ShouldBeSolved = slide.ShouldBeSolved,
 				MaxScore = getSlideMaxScore(slide),
-				Score = getSlideScore(slide), 
-				IsCurrent = slide.Id == currentSlideId, 
-				IsSolved = IsSolved(slide), 
-				IsVisited = IsVisited(slide), 
+				Score = getSlideScore(slide),
+				IsCurrent = slide.Id == currentSlideId,
+				IsSolved = IsSolved(slide),
+				IsVisited = IsVisited(slide),
 				PageType = GetPageType(slide)
 			};
 			return page;
@@ -103,8 +103,10 @@ namespace uLearn.Web.Models
 
 		private TocPageType GetPageType(Slide slide)
 		{
-			if (slide is QuizSlide) return TocPageType.Quiz;
-			if (slide is ExerciseSlide) return TocPageType.Exercise;
+			if (slide is QuizSlide)
+				return TocPageType.Quiz;
+			if (slide is ExerciseSlide)
+				return TocPageType.Exercise;
 			return TocPageType.Theory;
 		}
 	}

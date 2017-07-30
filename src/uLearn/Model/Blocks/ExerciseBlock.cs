@@ -126,9 +126,9 @@ namespace uLearn.Model.Blocks
 		public void CheckScoringGroup(string slideDescriptionForErrorMessage, ScoringSettings scoring)
 		{
 			var scoringGroupsIds = scoring.Groups.Keys;
-			if (!string.IsNullOrEmpty(ScoringGroup) && ! scoringGroupsIds.Contains(ScoringGroup))
+			if (!string.IsNullOrEmpty(ScoringGroup) && !scoringGroupsIds.Contains(ScoringGroup))
 				throw new CourseLoadingException($"Неизвестная группа оценки у задания {slideDescriptionForErrorMessage}: {ScoringGroup}\n" +
-												 "Возможные значения: " + string.Join(", ", scoringGroupsIds));
+												"Возможные значения: " + string.Join(", ", scoringGroupsIds));
 
 			if (string.IsNullOrEmpty(ScoringGroup))
 				ScoringGroup = scoring.DefaultScoringGroupForExercise;

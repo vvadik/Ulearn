@@ -83,6 +83,5 @@ namespace uLearn.CSharp
 		{
 			Approvals.Verify(GetRegion("Struct", onlyBody: true, fileName: "NonClassTypes.cs"));
 		}
-
 	}
 }

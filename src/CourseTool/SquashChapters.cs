@@ -30,6 +30,7 @@ namespace uLearn.CourseTool
 			new OlxSquasher().SquashCourse(Path.Combine(Dir, "olx"));
 		}
 	}
+
 	[Verb("desquash-olx-chapters", HelpText = "Move sequentials from chapter")]
 	public class DesquashOlxChapters : AbstractOptions
 	{
@@ -51,6 +52,7 @@ namespace uLearn.CourseTool
 			EdxInteraction.CreateEdxCourseArchive(Dir, Config.ULearnCourseId);
 		}
 	}
+
 	[Verb("create-olx", HelpText = "Unpack course.tar.gz to olx directory")]
 	public class CreateOlx : AbstractOptions
 	{

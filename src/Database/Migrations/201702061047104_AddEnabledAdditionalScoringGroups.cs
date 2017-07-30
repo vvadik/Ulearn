@@ -8,13 +8,13 @@ namespace Database.Migrations
 		{
 			DropIndex("dbo.AdditionalScores", "IDX_AdditionalScore_ByCourseUnitAndUser");
 			CreateTable(
-				"dbo.EnabledAdditionalScoringGroups",
-				c => new
-				{
-					Id = c.Int(nullable: false, identity: true),
-					GroupId = c.Int(nullable: false),
-					ScoringGroupId = c.String(nullable: false),
-				})
+					"dbo.EnabledAdditionalScoringGroups",
+					c => new
+					{
+						Id = c.Int(nullable: false, identity: true),
+						GroupId = c.Int(nullable: false),
+						ScoringGroupId = c.String(nullable: false),
+					})
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.Groups", t => t.GroupId, cascadeDelete: true)
 				.Index(t => t.GroupId, name: "IDX_EnabledAdditionalScoringGroup_ByGroup");

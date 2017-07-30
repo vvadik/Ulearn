@@ -7,18 +7,18 @@ namespace Database.Migrations
 		public override void Up()
 		{
 			CreateTable(
-				"dbo.AdditionalScores",
-				c => new
-				{
-					Id = c.Int(nullable: false, identity: true),
-					CourseId = c.String(nullable: false, maxLength: 64),
-					UnitId = c.Guid(nullable: false),
-					ScoringGroupId = c.String(),
-					UserId = c.String(nullable: false, maxLength: 128),
-					Score = c.Int(nullable: false),
-					InstructorId = c.String(nullable: false, maxLength: 128),
-					Timestamp = c.DateTime(nullable: false),
-				})
+					"dbo.AdditionalScores",
+					c => new
+					{
+						Id = c.Int(nullable: false, identity: true),
+						CourseId = c.String(nullable: false, maxLength: 64),
+						UnitId = c.Guid(nullable: false),
+						ScoringGroupId = c.String(),
+						UserId = c.String(nullable: false, maxLength: 128),
+						Score = c.Int(nullable: false),
+						InstructorId = c.String(nullable: false, maxLength: 128),
+						Timestamp = c.DateTime(nullable: false),
+					})
 				.PrimaryKey(t => t.Id)
 				.ForeignKey("dbo.AspNetUsers", t => t.InstructorId)
 				.ForeignKey("dbo.AspNetUsers", t => t.UserId)

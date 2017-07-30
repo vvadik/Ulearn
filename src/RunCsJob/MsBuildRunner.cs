@@ -24,6 +24,7 @@ namespace RunCsJob
 		public DirectoryInfo CompilerDirectory;
 		public DirectoryInfo WellKnownLibsDirectory;
 	}
+
 	public static class MsBuildRunner
 	{
 		//private const string ValueTupleLibName = "System.ValueTuple";
@@ -46,8 +47,8 @@ namespace RunCsJob
 
 			var includes = new HashSet<string>(
 				project.AllEvaluatedItems
-				.Where(i => i.ItemType == "None" || i.ItemType == "Content")
-				.Select(i => Path.GetFileName(i.EvaluatedInclude.ToLowerInvariant())));
+					.Where(i => i.ItemType == "None" || i.ItemType == "Content")
+					.Select(i => Path.GetFileName(i.EvaluatedInclude.ToLowerInvariant())));
 
 			foreach (var dll in settings.WellKnownLibsDirectory.GetFiles("*.dll"))
 				if (!includes.Contains(dll.Name.ToLowerInvariant()))
@@ -60,8 +61,8 @@ namespace RunCsJob
 				result.Success = SyncBuild(project, logger);
 				if (result.Success)
 					result.PathToExe = Path.Combine(project.DirectoryPath,
-													project.GetPropertyValue("OutputPath"),
-													project.GetPropertyValue("AssemblyName") + ".exe");
+						project.GetPropertyValue("OutputPath"),
+						project.GetPropertyValue("AssemblyName") + ".exe");
 				else
 					result.ErrorMessage = stringWriter.ToString();
 				return result;
@@ -69,7 +70,7 @@ namespace RunCsJob
 		}
 
 		private static readonly object buildLock = new object();
-		
+
 		private static bool SyncBuild(Project project, ILogger logger)
 		{
 			lock (buildLock)

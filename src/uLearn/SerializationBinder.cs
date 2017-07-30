@@ -20,10 +20,10 @@ namespace uLearn
 
 			nameToType = customDisplayNameTypes
 				.ToDictionary(t => t
-					.GetCustomAttributes(false)
-					.OfType<DisplayNameAttribute>()
-					.First()
-					.DisplayName,
+						.GetCustomAttributes(false)
+						.OfType<DisplayNameAttribute>()
+						.First()
+						.DisplayName,
 					t => t);
 
 			typeToName = nameToType

@@ -42,9 +42,10 @@ namespace uLearn.Web.Extensions
 											)?
 										   )
 										   ";
+
 		private static readonly Regex urlRegex = new Regex(urlRegexS, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-		public static string EncodeMultiLineText(this HtmlHelper helper, string text, bool keepFirstSpaces=false)
+		public static string EncodeMultiLineText(this HtmlHelper helper, string text, bool keepFirstSpaces = false)
 		{
 			if (string.IsNullOrEmpty(text))
 				return string.Empty;
@@ -143,5 +144,4 @@ namespace uLearn.Web.Extensions
 	{
 		public object HtmlAttributes = new object();
 	}
-
 }

@@ -43,7 +43,8 @@ namespace uLearn.Model.Edx
 						component.Save(OlxPath);
 					}
 				}
-				else newVerticals.Add(new Vertical(Utils.NewNormalizedGuid(), component.DisplayName, new[] { component }));
+				else
+					newVerticals.Add(new Vertical(Utils.NewNormalizedGuid(), component.DisplayName, new[] { component }));
 			}
 			Add(course, newVerticals.ToArray());
 		}
@@ -69,7 +70,8 @@ namespace uLearn.Model.Edx
 							);
 					}
 				}
-				else newVerticals.AddRange(subverticals);
+				else
+					newVerticals.AddRange(subverticals);
 			}
 			Add(course, newVerticals.ToArray());
 		}
@@ -87,8 +89,8 @@ namespace uLearn.Model.Edx
 			var sequentialXml = XDocument.Load(filename).Root ?? new XElement("sequential");
 			var refs = sequentialXml.Elements("vertical").ToList();
 			var insertIndex = refs
-				.Select((v, i) => new {urlName = v.Attribute("url_name").Value, i})
-				.First(v => v.urlName == afterThisVertical.UrlName).i + 1;
+								.Select((v, i) => new { urlName = v.Attribute("url_name").Value, i })
+								.First(v => v.urlName == afterThisVertical.UrlName).i + 1;
 			refs.InsertRange(insertIndex, verticalsToAdd.Select(v => new XElement("vertical", new XAttribute("url_name", v.UrlName))));
 			sequentialXml.ReplaceNodes(refs);
 			sequentialXml.Save(filename);

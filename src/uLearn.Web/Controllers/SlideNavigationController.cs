@@ -105,7 +105,7 @@ namespace uLearn.Web.Controllers
 			var tocGroupsForStatistics = userGroups.Select(g => new TocGroupForStatistics
 			{
 				GroupName = g.Name,
-				StatisticsUrl = Url.Action("CourseStatistics", "Analytics", new { courseId = course.Id, group = g.Id})
+				StatisticsUrl = Url.Action("CourseStatistics", "Analytics", new { courseId = course.Id, group = g.Id })
 			});
 			var toc = builder.CreateTocModel(tocGroupsForStatistics.ToList());
 			toc.NextUnitTime = unitsRepo.GetNextUnitPublishTime(course.Id);
@@ -121,15 +121,16 @@ namespace uLearn.Web.Controllers
 			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			var nextSlide = course.Slides.FirstOrDefault(s => s.Index > slide.Index && visibleUnits.Contains(s.Info.Unit));
 			var prevSlide = course.Slides.LastOrDefault(s => s.Index < slide.Index && visibleUnits.Contains(s.Info.Unit));
-			
+
 			var model = new PrevNextButtonsModel(
-				course, 
-				slide.Id, 
-				nextIsAcceptedSolutions, 
+				course,
+				slide.Id,
+				nextIsAcceptedSolutions,
 				nextSlide,
-				prevSlide, 
+				prevSlide,
 				!User.Identity.IsAuthenticated);
-			if (onSolutionsSlide) model.PrevSlide = slide;
+			if (onSolutionsSlide)
+				model.PrevSlide = slide;
 			return PartialView(model);
 		}
 	}

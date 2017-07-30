@@ -100,7 +100,6 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<RedirectToRouteResult> SetPublishTime(string courseId, Guid unitId, string publishTime)
 		{
-
 			var oldInfo = await db.UnitAppearances.Where(u => u.CourseId == courseId && u.UnitId == unitId).ToListAsync();
 			db.UnitAppearances.RemoveRange(oldInfo);
 			var unitAppearance = new UnitAppearance
@@ -226,22 +225,22 @@ namespace uLearn.Web.Controllers
 				ModerationPolicy = commentsPolicy.ModerationPolicy,
 				OnlyInstructorsCanReply = commentsPolicy.OnlyInstructorsCanReply,
 				Comments = (from c in comments
-							let slide = course.FindSlideById(c.SlideId)
-							where slide != null
-							select
-							new CommentViewModel
-							{
-								Comment = c,
-								LikesCount = commentsLikes.GetOrDefault(c.Id),
-								IsLikedByUser = commentsLikedByUser.Contains(c.Id),
-								Replies = new List<CommentViewModel>(),
-								CanEditAndDeleteComment = true,
-								CanModerateComment = true,
-								IsCommentVisibleForUser = true,
-								ShowContextInformation = true,
-								ContextSlideTitle = slide.Title,
-								ContextParentComment = c.IsTopLevel() ? null : commentsById.ContainsKey(c.ParentCommentId) ? commentsById[c.ParentCommentId].Text : null,
-							}).ToList()
+					let slide = course.FindSlideById(c.SlideId)
+					where slide != null
+					select
+					new CommentViewModel
+					{
+						Comment = c,
+						LikesCount = commentsLikes.GetOrDefault(c.Id),
+						IsLikedByUser = commentsLikedByUser.Contains(c.Id),
+						Replies = new List<CommentViewModel>(),
+						CanEditAndDeleteComment = true,
+						CanModerateComment = true,
+						IsCommentVisibleForUser = true,
+						ShowContextInformation = true,
+						ContextSlideTitle = slide.Title,
+						ContextParentComment = c.IsTopLevel() ? null : commentsById.ContainsKey(c.ParentCommentId) ? commentsById[c.ParentCommentId].Text : null,
+					}).ToList()
 			});
 		}
 
@@ -254,7 +253,7 @@ namespace uLearn.Web.Controllers
 		{
 			var MaxShownQueueSize = 500;
 			var course = courseManager.GetCourse(courseId);
-			
+
 			var filterOptions = GetManualCheckingFilterOptionsByGroup(courseId, groupsIds);
 			if (filterOptions.UsersIds == null)
 				groupsIds = new List<string> { "all" };
@@ -293,7 +292,7 @@ namespace uLearn.Web.Controllers
 				Message = message,
 				AlreadyChecked = done,
 				ExistsMore = checkings.Count > MaxShownQueueSize,
-				ShowFilterForm = string.IsNullOrEmpty(userId) && ! slideId.HasValue,
+				ShowFilterForm = string.IsNullOrEmpty(userId) && !slideId.HasValue,
 			});
 		}
 
@@ -329,7 +328,7 @@ namespace uLearn.Web.Controllers
 				if (!User.HasAccessFor(checking.CourseId, CourseRole.Instructor))
 					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
-				if (checking.IsChecked && ! recheck)
+				if (checking.IsChecked && !recheck)
 					return RedirectToAction(actionName,
 						new
 						{
@@ -372,10 +371,10 @@ namespace uLearn.Web.Controllers
 				filterOptions.SlidesIds = new List<Guid> { slideId };
 				var checkings = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions).ToList();
 
-				var itemToCheck = checkings.FirstOrDefault(i => ! i.IsLocked);
+				var itemToCheck = checkings.FirstOrDefault(i => !i.IsLocked);
 				if (itemToCheck == null)
 					return RedirectToAction(actionName, new { courseId, group = string.Join(",", groupsIds), message = "slide_checked" });
-				
+
 				await slideCheckingsRepo.LockManualChecking(itemToCheck, User.Identity.GetUserId());
 
 				transaction.Commit();
@@ -703,7 +702,7 @@ namespace uLearn.Web.Controllers
 			log.Info($"Добавляю пользователя Id = {userId} в группу «{group.Name}» (Id = {group.Id})");
 			var added = await groupsRepo.AddUserToGroup(groupId, userId);
 
-			return Json(new {added});
+			return Json(new { added });
 		}
 
 		[HttpPost]
@@ -715,7 +714,7 @@ namespace uLearn.Web.Controllers
 			log.Info($"Удаляю пользователя Id = {userId} из группы «{group.Name}» (Id = {group.Id})");
 			await groupsRepo.RemoveUserFromGroup(groupId, userId);
 
-			return Json(new { removed="true" });
+			return Json(new { removed = "true" });
 		}
 
 		[HttpPost]
@@ -783,7 +782,7 @@ namespace uLearn.Web.Controllers
 			public string value { get; set; }
 		}
 
-		public ActionResult FindUsers(string courseId, string term, bool withGroups=true)
+		public ActionResult FindUsers(string courseId, string term, bool withGroups = true)
 		{
 			var query = new UserSearchQueryModel { NamePrefix = term };
 			var users = usersRepo.FilterUsers(query, userManager).Take(10).ToList();
@@ -825,7 +824,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[ULearnAuthorize(MinAccessLevel=CourseRole.CourseAdmin)]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> CreateCertificateTemplate(string courseId, string name, HttpPostedFileBase archive)
 		{
 			if (archive == null || archive.ContentLength <= 0)
@@ -833,7 +832,7 @@ namespace uLearn.Web.Controllers
 				log.Error("Создание шаблона сертификата: ошибка загрузки архива");
 				throw new Exception("Ошибка загрузки архива");
 			}
-			
+
 			log.Info($"Создаю шаблон сертификата «{name}» для курса {courseId}");
 			var archiveName = SaveUploadedTemplate(archive);
 			var template = await certificatesRepo.AddTemplate(courseId, name, archiveName);
@@ -859,7 +858,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[ULearnAuthorize(MinAccessLevel=CourseRole.CourseAdmin)]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> EditCertificateTemplate(string courseId, Guid templateId, string name, HttpPostedFileBase archive)
 		{
 			var template = certificatesRepo.FindTemplateById(templateId);
@@ -881,7 +880,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[ULearnAuthorize(MinAccessLevel=CourseRole.CourseAdmin)]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> RemoveCertificateTemplate(string courseId, Guid templateId)
 		{
 			var template = certificatesRepo.FindTemplateById(templateId);
@@ -905,7 +904,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateInput(false)]
-		public async Task<ActionResult> AddCertificate(string courseId, Guid templateId, string userId, bool isPreview=false)
+		public async Task<ActionResult> AddCertificate(string courseId, Guid templateId, string userId, bool isPreview = false)
 		{
 			var template = certificatesRepo.FindTemplateById(templateId);
 			if (template == null || template.CourseId != courseId)
@@ -919,7 +918,7 @@ namespace uLearn.Web.Controllers
 
 			if (isPreview)
 				return RedirectToRoute("Certificate", new { certificateId = certificate.Id });
-			
+
 			await NotifyAboutCertificate(certificate);
 
 			return Redirect(Url.Action("Certificates", new { courseId }) + "#template-" + templateId);
@@ -989,7 +988,7 @@ namespace uLearn.Web.Controllers
 			}
 
 			var allUsersIds = new HashSet<string>();
-			
+
 			using (var parser = new TextFieldParser(new StreamReader(certificatesData.InputStream)))
 			{
 				parser.TextFieldType = FieldType.Delimited;
@@ -1072,7 +1071,7 @@ namespace uLearn.Web.Controllers
 					continue;
 				if (string.IsNullOrEmpty(userId))
 				{
-					return View("GenerateCertificatesError", (object) "Не все пользователи выбраны");
+					return View("GenerateCertificatesError", (object)"Не все пользователи выбраны");
 				}
 
 				var parameters = new Dictionary<string, string>();
@@ -1141,16 +1140,16 @@ namespace uLearn.Web.Controllers
 				await additionalScoresRepo.RemoveAdditionalScores(courseId, unitId, userId, scoringGroupId);
 				return Json(new { status = "ok", score = "" });
 			}
-			
+
 			int scoreInt;
-			if (! int.TryParse(score, out scoreInt))
+			if (!int.TryParse(score, out scoreInt))
 				return Json(new { status = "error", error = "Введите целое число" });
 			if (scoreInt < 0 || scoreInt > scoringGroup.MaxAdditionalScore)
 				return Json(new { status = "error", error = $"Баллы должны быть от 0 до {scoringGroup.MaxAdditionalScore}" });
 
 			var additionalScore = await additionalScoresRepo.SetAdditionalScore(courseId, unitId, userId, scoringGroupId, scoreInt, User.Identity.GetUserId());
 			await NotifyAboutAdditionalScore(additionalScore);
-			
+
 			return Json(new { status = "ok", score = scoreInt });
 		}
 	}
@@ -1171,7 +1170,7 @@ namespace uLearn.Web.Controllers
 	public class PreviewCertificatesViewModel
 	{
 		public string Error { get; set; }
-		
+
 		public string CourseId { get; set; }
 		public CertificateTemplate Template { get; set; }
 		public List<PreviewCertificatesCertificateModel> Certificates { get; set; }
@@ -1229,7 +1228,7 @@ namespace uLearn.Web.Controllers
 		public string Id { get; set; }
 		public DateTime LastWriteTime { get; set; }
 	}
-	
+
 	public class PackagesViewModel
 	{
 		public string CourseId { get; set; }
@@ -1294,6 +1293,5 @@ namespace uLearn.Web.Controllers
 		public List<UserRolesInfo> Instructors { get; set; }
 		public List<Group> GroupsMayBeCopied { get; set; }
 		public Dictionary<string, string> CoursesNames { get; set; }
-		
 	}
 }

@@ -9,7 +9,7 @@ namespace uLearn
 	public class HideOnSlideAttribute : Attribute
 	{
 	}
-	
+
 	public class ExcludeFromSolutionAttribute : Attribute
 	{
 		public bool IsSolutionPart { get; set; }

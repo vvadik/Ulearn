@@ -22,7 +22,7 @@ namespace uLearn
 				"<p><strong>x</strong>,</p>\n",
 				new Markdown { ExtraMode = true }.Transform("__x__,"));
 		}
-	
+
 		[Test]
 		public void dot_emphasize_in_html()
 		{
@@ -38,6 +38,7 @@ namespace uLearn
 				@"<p><span class=""tex"">noise_V, noise_{\omega}</span></p>",
 				@"<span class=""tex"">noise_V, noise_{\omega}</span>".RenderMd("/").Trim());
 		}
+
 		[Test]
 		public void render_tex()
 		{
@@ -45,6 +46,7 @@ namespace uLearn
 				@"<p>a <span class='tex'>x</span> b</p>",
 				@"a $x$ b".RenderMd("/").Trim());
 		}
+
 		[Test]
 		public void render_tex1()
 		{
@@ -52,6 +54,7 @@ namespace uLearn
 				@"<p><span class='tex'>x</span></p>",
 				@"$x$".RenderMd("/").Trim());
 		}
+
 		[Test]
 		public void dont_render_not_separate_dollar()
 		{
@@ -67,6 +70,7 @@ namespace uLearn
 				@"<p>1 <span class='tex'> = 2 </span></p>",
 				@"1 $ = 2 $".RenderMd("/").Trim());
 		}
+
 		[Test]
 		public void render_md_vs_tex()
 		{
@@ -74,6 +78,7 @@ namespace uLearn
 				@"<p><span class='tex'>a_1=b_2</span></p>",
 				@"$a_1=b_2$".RenderMd("/").Trim());
 		}
+
 		[Test]
 		public void dont_markdown()
 		{
@@ -81,7 +86,7 @@ namespace uLearn
 				"<div>\n*ha*</div>",
 				@"<div markdown='false'>*ha*</div>".RenderMd("/").Trim());
 		}
-		
+
 		[Test]
 		public void render_complex_tex()
 		{
@@ -105,6 +110,7 @@ namespace uLearn
 				@"<div class='tex'>\displaystyle x_1=y_1</div><p> <span class='tex'>1</span></p>",
 				@"$$x_1=y_1$$ $1$".RenderMd("/").Trim());
 		}
+
 		[Test]
 		public void render_tex_div_and_div()
 		{
@@ -113,6 +119,7 @@ namespace uLearn
 				@"$$1$$
 $$2$$".RenderMd("/").Trim());
 		}
+
 		[Test]
 		public void render_tex_triple_div()
 		{
@@ -129,6 +136,6 @@ $$3$$".RenderMd("/").Trim());
 			Assert.AreEqual(
 				@"<div class='tex'>\displaystyle 1</div>",
 				@" $$1$$ ".RenderMd("/").Trim());
-		}		
+		}
 	}
 }

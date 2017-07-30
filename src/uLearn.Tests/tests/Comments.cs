@@ -29,12 +29,16 @@
 		before method
 		*/
 
-		public void M() { }
+		public void M()
+		{
+		}
 
 		/*
 		before method 2
 		*/
-		public void M2() { }
+		public void M2()
+		{
+		}
 
 		/*
 		before slide class ends

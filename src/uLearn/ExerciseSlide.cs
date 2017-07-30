@@ -10,7 +10,7 @@ namespace uLearn
 		public override bool ShouldBeSolved => true;
 
 		public ExerciseBlock Exercise { get; }
-		
+
 		public ExerciseSlide(
 			List<SlideBlock> blocks,
 			SlideInfo slideInfo,

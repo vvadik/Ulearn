@@ -14,7 +14,7 @@
 	}
 
 	var hasProfileWarning = string.IsNullOrEmpty(Model.User.Email) || !Model.User.EmailConfirmed;
-		
+
 	<li class="dropdown">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 			@if (hasProfileWarning)
@@ -35,14 +35,16 @@
 					Не&nbsp;указана <nobr>эл.&nbsp;почта&nbsp;<span class="fa fa-question-circle with-long-tooltip" data-toggle="tooltip" data-placement="bottom" title="Укажите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля"></span></nobr>
 				</li>
 			}
-			@if (! string.IsNullOrEmpty(Model.User.Email) && ! Model.User.EmailConfirmed)
+			@if (!string.IsNullOrEmpty(Model.User.Email) && !Model.User.EmailConfirmed)
 			{
 				<li class="user-menu__error">
 					Эл.&nbsp;почта <nobr>не&nbsp;подтверждена&nbsp;<span class="fa fa-question-circle with-long-tooltip" data-toggle="tooltip" data-placement="bottom" title="Подтвердите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля"></span></nobr>
 				</li>
 			}
-            <li>@Html.ActionLink("Сертификаты", "Index", "Certificates", new { userId = Model.User.Id }, new { })</li>
-			<li><a href="#" onclick="document.getElementById('logoutForm').submit(); return false;">Выход</a></li>
+			<li>@Html.ActionLink("Сертификаты", "Index", "Certificates", new { userId = Model.User.Id }, new { })</li>
+			<li>
+				<a href="#" onclick="document.getElementById('logoutForm').submit();return false;">Выход</a>
+			</li>
 		</ul>
 	</li>
 }

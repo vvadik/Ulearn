@@ -11,10 +11,10 @@ namespace Database.Models
 
 		public int SubmissionId { get; set; }
 		public virtual UserExerciseSubmission Submission { get; set; }
-		
+
 		public int WatcherId { get; set; }
 		public virtual XQueueWatcher Watcher { get; set; }
-		
+
 		[Required(AllowEmptyStrings = true)]
 		public string XQueueHeader { get; set; }
 	}

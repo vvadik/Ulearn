@@ -44,10 +44,10 @@ namespace uLearn.Web.Telegram
 
 			var elmahUrl = "https://ulearn.me/elmah/detail?id=" + errorId;
 
-			var text = $"*Произошла ошибка {errorId.EscapeMarkdown()}*\n" + 
-				$"{error.Exception.Message.EscapeMarkdown()}\n\n" + 
-				$"Подробности: {elmahUrl.EscapeMarkdown()}";
-			
+			var text = $"*Произошла ошибка {errorId.EscapeMarkdown()}*\n" +
+						$"{error.Exception.Message.EscapeMarkdown()}\n\n" +
+						$"Подробности: {elmahUrl.EscapeMarkdown()}";
+
 			PostToChannel(text, ParseMode.Markdown);
 		}
 	}

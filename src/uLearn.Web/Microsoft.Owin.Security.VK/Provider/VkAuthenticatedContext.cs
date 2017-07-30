@@ -44,7 +44,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK.Provider
 		public string FirstName { get; private set; }
 		public string LastName { get; private set; }
 		public string AvatarUrl { get; private set; }
-		public Gender? Sex { get; private set; } 
+		public Gender? Sex { get; private set; }
 
 		public ClaimsIdentity Identity { get; set; }
 		public AuthenticationProperties Properties { get; set; }

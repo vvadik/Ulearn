@@ -74,11 +74,11 @@ namespace uLearn.Web.Controllers
 			}, JsonRequestBehavior.AllowGet);
 		}
 
-		private Tuple<int, DateTime?> GetUnreadNotificationsCountAndLastTimestamp(string userId, DateTime? from=null)
+		private Tuple<int, DateTime?> GetUnreadNotificationsCountAndLastTimestamp(string userId, DateTime? from = null)
 		{
 			var notificationTransport = feedRepo.GetUsersFeedNotificationTransport(userId);
 			if (notificationTransport == null)
-				return Tuple.Create(0, (DateTime?) null);
+				return Tuple.Create(0, (DateTime?)null);
 
 			var realFrom = from ?? feedRepo.GetFeedViewTimestamp(userId) ?? DateTime.MinValue;
 			var unreadCount = feedRepo.GetNotificationsCount(userId, realFrom, commonFeedNotificationTransport, notificationTransport);
@@ -92,7 +92,7 @@ namespace uLearn.Web.Controllers
 			return Tuple.Create(unreadCount, from);
 		}
 
-		public ActionResult NotificationsTopbarPartial(bool isMobile=false)
+		public ActionResult NotificationsTopbarPartial(bool isMobile = false)
 		{
 			var userId = User.Identity.GetUserId();
 			var unreadCountAndLastTimestamp = GetUnreadNotificationsCountAndLastTimestamp(userId);

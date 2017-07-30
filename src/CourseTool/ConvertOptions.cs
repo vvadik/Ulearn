@@ -12,14 +12,13 @@ namespace uLearn.CourseTool
 	class ConvertOptions : AbstractOptions
 	{
 		[Option('t', "tar-gz", HelpText = "Filepath of course tar.gz file")]
-		public string CourseTarGz{ get; set; }
+		public string CourseTarGz { get; set; }
 
 		public override void DoExecute()
 		{
 			var profile = Config.GetProfile(Profile);
 
 			Console.WriteLine("Please, download course from Edx (tar.gz from Tools - Export menu) and save it in working directory");
-
 
 			var tarGzPath = Dir.GetSingleFile(CourseTarGz ?? "*.tar.gz");
 
@@ -55,7 +54,7 @@ namespace uLearn.CourseTool
 				profile.UlearnUrl + SlideUrlFormat,
 				profile.UlearnUrl + SolutionsUrlFormat,
 				video.Records.ToDictionary(x => x.Data.Id, x => x.Guid.GetNormalizedGuid())
-				).Save(Dir + "/olx");
+			).Save(Dir + "/olx");
 
 			EdxInteraction.CreateEdxCourseArchive(Dir, course.Id);
 

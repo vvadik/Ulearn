@@ -38,7 +38,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly UserQuizzesRepo userQuizzesRepo;
-		
+
 		public CourseController()
 		{
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
@@ -176,7 +176,7 @@ namespace uLearn.Web.Controllers
 		{
 			if (string.IsNullOrWhiteSpace(courseId))
 				return RedirectToAction("Index", "Home");
-			
+
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.GetSlideById(slideId);
 
@@ -199,7 +199,7 @@ namespace uLearn.Web.Controllers
 			}
 
 			/* For now user should be authenticated */
-			if (! User.Identity.IsAuthenticated)
+			if (!User.Identity.IsAuthenticated)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			userId = User.Identity.GetUserId();
@@ -325,10 +325,10 @@ namespace uLearn.Web.Controllers
 			return maxSlideScore;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, 
-			AbstractManualSlideChecking manualChecking = null, 
-			int? exerciseSubmissionId = null, 
-			List<string> groupsIds = null, 
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide,
+			AbstractManualSlideChecking manualChecking = null,
+			int? exerciseSubmissionId = null,
+			List<string> groupsIds = null,
 			bool isLti = false,
 			bool autoplay = false,
 			bool isManualCheckingReadonly = false)
@@ -348,7 +348,7 @@ namespace uLearn.Web.Controllers
 				isLti,
 				autoplay,
 				isManualCheckingReadonly
-				)
+			)
 			{
 				VersionId = exerciseSubmissionId
 			};
@@ -507,7 +507,7 @@ namespace uLearn.Web.Controllers
 			db.Hints.RemoveSlideAction(slideId, userId);
 			await db.SaveChangesAsync();
 
-			return RedirectToAction("SlideById", new { courseId, slideId = slide.Id});
+			return RedirectToAction("SlideById", new { courseId, slideId = slide.Id });
 		}
 
 		public ActionResult CourseInstructorNavbar(string courseId)

@@ -33,10 +33,13 @@ namespace uLearn.Web.Models
 		public DefaultDictionary<Tuple<Guid, string>, List<Slide>> ShouldBeSolvedSlidesByUnitScoringGroup { get; set; }
 
 		public SortedDictionary<string, ScoringGroup> ScoringGroups { get; set; }
+
 		/* Dictionary<(userId, unitId, scoringGroupId), visitScore> */
 		public DefaultDictionary<Tuple<string, Guid, string>, int> ScoreByUserUnitScoringGroup { get; set; }
+
 		/* Dictionary<(userId, slideId), visitScore> */
 		public DefaultDictionary<Tuple<string, Guid>, int> ScoreByUserAndSlide { get; set; }
+
 		public DefaultDictionary<string, List<int>> VisitedUsersGroups { get; set; }
 
 		public SortedDictionary<string, ScoringGroup> GetUsingUnitScoringGroups(Unit unit, SortedDictionary<string, ScoringGroup> courseScoringGroups)
@@ -127,7 +130,6 @@ namespace uLearn.Web.Models
 		public int NotUnderstand { get; set; }
 		public int Good { get; set; }
 		public int Trivial { get; set; }
-
 	}
 
 	public class UserInfo

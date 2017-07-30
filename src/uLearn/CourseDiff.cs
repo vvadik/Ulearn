@@ -91,7 +91,6 @@ namespace uLearn
 					SlideBlockDiffs.Add(slideBlockDiff);
 				}
 			}
-
 		}
 
 		private void FindDifferencesInQuestionBlocks()

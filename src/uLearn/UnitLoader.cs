@@ -61,7 +61,7 @@ namespace uLearn
 			//S001_slide.ext
 			var id = name.Split(new[] { '_', '-', ' ' }, 2)[0];
 			return id.StartsWith("S", StringComparison.InvariantCultureIgnoreCase)
-				   && id.Skip(1).All(char.IsDigit);
+					&& id.Skip(1).All(char.IsDigit);
 		}
 
 		private static string GetUnitTitleFromFile(DirectoryInfo dir)

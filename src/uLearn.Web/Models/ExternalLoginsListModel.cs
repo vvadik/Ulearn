@@ -25,8 +25,8 @@ namespace uLearn.Web.Models
 
 	public enum ExternalLoginListType
 	{
-		 Registration,
-		 Login,
-		 Link
+		Registration,
+		Login,
+		Link
 	}
 }

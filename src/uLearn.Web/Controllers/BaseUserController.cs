@@ -54,7 +54,8 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		protected BaseUserController() : this(new ULearnDb())
+		protected BaseUserController()
+			: this(new ULearnDb())
 		{
 		}
 
@@ -83,13 +84,15 @@ namespace uLearn.Web.Controllers
 					{ "button", true },
 					{ "button_link", confirmationUrl },
 					{ "button_text", "Подтвердить адрес" },
-					{ "content_after_button",
+					{
+						"content_after_button",
 						"<p>Подтвердив адрес, ты сможешь восстановить доступ к своему аккаунту " +
 						"в любой момент, а также получать уведомления об ответах на свои комментарии и других важных событиях</p>" +
 						"<p>Мы не подпиcываем ни на какую периодическую рассылку, " +
 						"а все уведомления можно выключить в профиле.</p><p>" +
 						"Если ссылка для подтверждения почты не работает, просто скопируй адрес " +
-						$"и вставь его в адресную строку браузера: <a href=\"{confirmationUrl}\">{confirmationUrl}</a></p>" }
+						$"и вставь его в адресную строку браузера: <a href=\"{confirmationUrl}\">{confirmationUrl}</a></p>"
+					}
 				}
 			};
 

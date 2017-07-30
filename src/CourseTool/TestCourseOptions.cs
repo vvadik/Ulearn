@@ -27,17 +27,16 @@ namespace uLearn.CourseTool
 				slides = course.Slides.Where(s => s.Id == Guid.Parse(SlideId)).ToList();
 				Console.WriteLine("Only slide " + SlideId);
 			}
-			
+
 			var validator = new CourseValidator(slides, new SandboxRunnerSettings());
 			validator.InfoMessage += m => Write(ConsoleColor.Gray, m);
 			var errors = new List<string>();
-			validator.Error += m => {
+			validator.Error += m =>
+			{
 				Write(ConsoleColor.Red, m);
 				errors.Add(m);
 			};
-			validator.Warning += m => {
-				Write(ConsoleColor.DarkYellow, m);
-			};
+			validator.Warning += m => { Write(ConsoleColor.DarkYellow, m); };
 			validator.ValidateExercises();
 			validator.ValidateVideos();
 			if (errors.Any())

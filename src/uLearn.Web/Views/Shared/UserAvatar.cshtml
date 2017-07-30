@@ -16,11 +16,11 @@
 	<text>@char.ToUpper(user.VisibleName.FindFirstLetter('O'))</text>
 }
 
-@helper Avatar(ApplicationUser user, string classes="")
+@helper Avatar(ApplicationUser user, string classes = "")
 {
 	if (user.HasAvatar)
 	{
-		<img class="user__avatar @classes" src="@user.AvatarUrl" alt="@HttpUtility.HtmlAttributeEncode(user.VisibleName)" />
+		<img class="user__avatar @classes" src="@user.AvatarUrl" alt="@HttpUtility.HtmlAttributeEncode(user.VisibleName)"/>
 	}
 	else
 	{
@@ -28,7 +28,8 @@
 	}
 }
 
-@helper SmallAvatar(ApplicationUser user, string classes="")
+@helper SmallAvatar(ApplicationUser user, string classes = "")
 {
-	@Avatar(user, "small " + classes);
+	@Avatar(user, "small " + classes)
+	;
 }

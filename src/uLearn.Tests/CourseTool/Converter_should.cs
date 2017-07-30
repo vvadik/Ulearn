@@ -16,7 +16,7 @@ namespace uLearn.CourseTool
 		private Course course;
 		private static readonly Unit unit = new Unit(UnitSettings.CreateByTitle("u1", CourseSettings.DefaultSettings), new DirectoryInfo("u1"));
 		private readonly Slide aTextSlide = new Slide(new[] { new MdBlock("hello"), }, new SlideInfo(unit, new FileInfo("file"), 0), "title", Guid.NewGuid());
-		private readonly Slide exerciseSlide = new Slide(new ExerciseBlock[] { new ProjectExerciseBlock(), new SingleFileExerciseBlock()  }, new SlideInfo(unit, new FileInfo("file"), 0), "title", slideIdFromCourse);
+		private readonly Slide exerciseSlide = new Slide(new ExerciseBlock[] { new ProjectExerciseBlock(), new SingleFileExerciseBlock() }, new SlideInfo(unit, new FileInfo("file"), 0), "title", slideIdFromCourse);
 		private const string youtubeIdFromCourse = "GZS36w_fxdg";
 		private static readonly Guid slideIdFromCourse = Guid.Parse("108C89D9-36F0-45E3-BBEE-B93AC971063F");
 		private CourseManager courseManager;
@@ -157,12 +157,12 @@ namespace uLearn.CourseTool
 
 			new OlxPatcher(olxPath).PatchVerticals(edxCourse, course.Slides
 				.Select(x => x.ToVerticals(
-						course.Id,
-						slideUrl,
-						solutionsUrl,
-						new Dictionary<string, string>(),
-						ltiId
-					).ToArray()));
+					course.Id,
+					slideUrl,
+					solutionsUrl,
+					new Dictionary<string, string>(),
+					ltiId
+				).ToArray()));
 
 			var edxCourse2 = EdxCourse.Load(olxPath);
 			Assert.IsFalse(edxCourse2.CourseWithChapters.Chapters.Any(c => c.DisplayName == "Unsorted"));
@@ -177,12 +177,12 @@ namespace uLearn.CourseTool
 
 			new OlxPatcher(olxPath).PatchVerticals(edxCourse, new[] { aTextSlide }
 				.Select(x => x.ToVerticals(
-						course.Id,
-						slideUrl,
-						solutionsUrl,
-						new Dictionary<string, string>(),
-						ltiId
-					).ToArray()));
+					course.Id,
+					slideUrl,
+					solutionsUrl,
+					new Dictionary<string, string>(),
+					ltiId
+				).ToArray()));
 
 			var edxCourse2 = EdxCourse.Load(olxPath);
 			Assert.AreEqual("Unsorted", edxCourse2.CourseWithChapters.Chapters.Last().DisplayName);
@@ -199,12 +199,12 @@ namespace uLearn.CourseTool
 
 			new OlxPatcher(olxPath).PatchVerticals(edxCourse, new[] { exerciseSlide }
 				.Select(x => x.ToVerticals(
-						course.Id,
-						slideUrl,
-						solutionsUrl,
-						new Dictionary<string, string>(),
-						ltiId
-					).ToArray()));
+					course.Id,
+					slideUrl,
+					solutionsUrl,
+					new Dictionary<string, string>(),
+					ltiId
+				).ToArray()));
 
 			var edxCourse2 = EdxCourse.Load(olxPath);
 			var patchedSlidesCount = edxCourse2.CourseWithChapters.Chapters[0].Sequentials[0].Verticals.Count();

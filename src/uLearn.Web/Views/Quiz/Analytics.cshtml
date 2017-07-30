@@ -4,6 +4,7 @@
 @model QuizAnalyticsModel
 
 @functions {
+
 	private static int GetColSpan(SlideBlock block)
 	{
 		if (block is ChoiceBlock)
@@ -138,7 +139,9 @@
 							else if (ans is IsTrueBlockAnswerInfo)
 							{
 								var answer = (IsTrueBlockAnswerInfo)ans;
-								<td class="@(answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer")" data-sort-value="@answer.Answer"><i class="@(answer.Answer ? "glyphicon glyphicon-ok" : "")"></i></td>
+								<td class="@(answer.IsRight ? "rightQuizAnswer" : "falseQuizAnswer")" data-sort-value="@answer.Answer">
+									<i class="@(answer.Answer ? "glyphicon glyphicon-ok" : "")"></i>
+								</td>
 							}
 							else if (ans is OrderingBlockAnswerInfo)
 							{
@@ -169,7 +172,9 @@
 									var isContain = answer.RealyRightAnswer.Contains(item.Key);
 									var classForCell = ((isContain && item.Value) || (!isContain && !item.Value)) ? "rightQuizAnswer" : "falseQuizAnswer";
 									var itemClass = item.Value ? "glyphicon glyphicon-ok" : "";
-									<td class="@classForCell" data-sort-value="@item.Value"><i class="@itemClass"></i></td>
+									<td class="@classForCell" data-sort-value="@item.Value">
+										<i class="@itemClass"></i>
+									</td>
 								}
 							}
 						}
@@ -177,7 +182,7 @@
 						{
 							break;
 						}
-						<td style="border-top: none; border-bottom: none"></td>
+						<td style="border-top: none;border-bottom: none"></td>
 					}
 				</tr>
 			}

@@ -29,10 +29,12 @@
 			}
 			else
 			{
-				<a href="#" class="notifications__transport-settings__link internal-page-link @(Model.SelectedTransportId == transport.Id ? "auto-open" : "")"
+				<a href="#" class="notifications__transport-settings__link internal-page-link @( Model.SelectedTransportId == transport.Id ? "auto-open" : "")"
 					data-transport-id="@transport.Id"
 					data-transport-enable-signature="@Model.GetEnableLinkSignature(transport.Id)"
-					data-modal-title="Настройка уведомлений @notificationsDestination">Настроить уведомления</a>
+					data-modal-title="Настройка уведомлений @notificationsDestination">
+					Настроить уведомления
+				</a>
 			}
 		</div>
 	}
@@ -71,13 +73,15 @@
 						courseRoleStr = "Для администраторов";
 					}
 					<div class="course-role text-muted">
-						@(courseRoleStr):
+						@( courseRoleStr):
 					</div>
 				}
 			}
 
 			@Html.CheckBox(checkBoxId, false, new { data_default = notificationType.IsEnabledByDefault().ToString().ToLower(), data_notification_type = (int)notificationType })
-			<label for="@checkBoxId">@notificationType.GetGroupName() <span class="status"></span></label>
+			<label for="@checkBoxId">
+				@notificationType.GetGroupName() <span class="status"></span>
+			</label>
 		</div>
 	}
 }
@@ -136,7 +140,7 @@ else
 				<div class="row">
 					<div class="notifications__transport-settings__course__panel col-xs-12 col-md-5">
 						<h4>Выберите курс</h4>
-						
+
 						@foreach (var courseId in Model.CourseTitles.Keys.OrderBy(courseId => Model.CourseTitles[courseId]))
 						{
 							var courseTitle = Model.CourseTitles[courseId];
@@ -144,7 +148,7 @@ else
 								<a href="#" class="notifications__transport-settings__course__link" data-course-id="@courseId" data-course-title="@courseTitle">@courseTitle</a>
 							</div>
 						}
-						
+
 						@if (Model.CourseTitles.Count <= 0)
 						{
 							<div class="notifications__transport-settings__courses-description">
@@ -170,7 +174,7 @@ else
 
 <script>
 	var notificationTypesByCourse = @Html.Raw(
-		                                Model.NotificationTypesByCourse.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Select(t => (int) t)).JsonSerialize()
+		                                Model.NotificationTypesByCourse.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Select(t => (int)t)).JsonSerialize()
 		                                );
 
 	var notificationTransportsSettings = @Html.Raw(Model.NotificationTransportsSettings.Select(

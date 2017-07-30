@@ -6,30 +6,32 @@
 	<h2>Социальные сети</h2>
 	<table class="table">
 		<tbody>
-			@foreach (var account in Model)
-			{
-				<tr>
-					<td>@account.LoginProvider <span class="text-muted">@(account.LoginProvider == VkAuthenticationConstants.AuthenticationType ? "id" + account.ProviderKey : "")</span></td>
-					<td>
-						@if (ViewBag.ShowRemoveButton)
+		@foreach (var account in Model)
+		{
+			<tr>
+				<td>
+					@account.LoginProvider <span class="text-muted">@(account.LoginProvider == VkAuthenticationConstants.AuthenticationType ? "id" + account.ProviderKey : "")</span>
+				</td>
+				<td>
+					@if (ViewBag.ShowRemoveButton)
+					{
+						using (Html.BeginForm("Disassociate", "Account"))
 						{
-							using (Html.BeginForm("Disassociate", "Account"))
-							{
-								@Html.AntiForgeryToken()
-								<div>
-									@Html.Hidden("loginProvider", account.LoginProvider)
-									@Html.Hidden("providerKey", account.ProviderKey)
-									<input type="submit" class="btn btn-danger btn-sm pull-right" value="Отвязать" title="Удалить привязку @account.LoginProvider" />
-								</div>
-							}
+							@Html.AntiForgeryToken()
+							<div>
+								@Html.Hidden("loginProvider", account.LoginProvider)
+								@Html.Hidden("providerKey", account.ProviderKey)
+								<input type="submit" class="btn btn-danger btn-sm pull-right" value="Отвязать" title="Удалить привязку @account.LoginProvider"/>
+							</div>
 						}
-						else
-						{
-							@: &nbsp;
-						}
-					</td>
-				</tr>
-			}
+					}
+					else
+					{
+						@: &nbsp;
+					}
+				</td>
+			</tr>
+		}
 		</tbody>
 	</table>
 }

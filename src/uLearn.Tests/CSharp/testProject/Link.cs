@@ -1,5 +1,6 @@
-namespace Link{
-	
-	public class L{}
-	
+namespace Link
+{
+	public class L
+	{
+	}
 }

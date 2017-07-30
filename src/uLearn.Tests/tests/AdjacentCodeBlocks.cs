@@ -9,6 +9,7 @@ namespace uLearn.tests
 		{
 			Console.WriteLine("S1");
 		}
+
 		public void S2()
 		{
 			Console.WriteLine("S2");
@@ -23,6 +24,5 @@ namespace uLearn.tests
 		{
 			Console.WriteLine("S3");
 		}
-
 	}
 }

@@ -58,7 +58,7 @@ namespace uLearn
 				throw new FormatException($"Error in slide {title} (id: {id}). {e.Message}", e);
 			}
 		}
-		
+
 		public override string ToString()
 		{
 			return $"Title: {Title}, Id: {NormalizedGuid}, MaxScore: {MaxScore}";

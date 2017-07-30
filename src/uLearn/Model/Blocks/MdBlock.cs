@@ -73,7 +73,6 @@ namespace uLearn.Model.Blocks
 				Markdown = ((MdBlock)blocks[0]).Markdown;
 			else
 				InnerBlocks = blocks;
-
 		}
 
 		public SlideBlock[] InnerBlocks { get; set; }

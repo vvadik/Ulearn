@@ -22,7 +22,7 @@ namespace RunCsJob
 		private static readonly ILog log = LogManager.GetLogger(typeof(RunCsJobProgram));
 		public readonly SandboxRunnerSettings Settings;
 
-		public RunCsJobProgram(ManualResetEvent externalShutdownEvent=null)
+		public RunCsJobProgram(ManualResetEvent externalShutdownEvent = null)
 		{
 			if (externalShutdownEvent != null)
 				shutdownEvent = externalShutdownEvent;
@@ -138,4 +138,3 @@ namespace RunCsJob
 		}
 	}
 }
- 
