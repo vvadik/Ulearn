@@ -144,8 +144,11 @@ namespace uLearn
 			try
 			{
 				ReportErrorIfStudentsZipHasWrongAnswerOrSolutionFiles(tempExFolder);
-				ReportErrorIfCsprojHasUserCodeOfNotCompileType(tempExFolder);
-				ReportErrorIfCsprojHasWrongAnswerOrSolutionItems(tempExFolder);
+
+				var csprojFile = tempExFolder.GetFile(ex.CsprojFileName);
+				var csproj = new Project(csprojFile.FullName, null, null, new ProjectCollection());
+				ReportErrorIfCsprojHasUserCodeOfNotCompileType(tempExFolder, csproj);
+				ReportErrorIfCsprojHasWrongAnswerOrSolutionItems(tempExFolder, csproj);
 
 				if (!ex.StudentZipIsBuildable)
 					return;
@@ -175,22 +178,17 @@ namespace uLearn
 
 		private string[] GetOrderedFileNames(IEnumerable<string> names, Func<string, bool> predicate) => names.Where(predicate).OrderBy(n => n).ToArray();
 
-		private void ReportErrorIfCsprojHasUserCodeOfNotCompileType(DirectoryInfo unpackedZipDir)
+		private void ReportErrorIfCsprojHasUserCodeOfNotCompileType(DirectoryInfo unpackedZipDir, Project csproj)
 		{
-			var csproj = unpackedZipDir.GetFiles(ex.CsprojFileName).Single();
-
-			var userCode = new Project(csproj.FullName, null, null, new ProjectCollection()).Items
-				.Single(i => i.UnevaluatedInclude.Equals(ex.UserCodeFilePath, StringComparison.InvariantCultureIgnoreCase));
+			var userCode = csproj.Items.Single(i => i.UnevaluatedInclude.Equals(ex.UserCodeFilePath, StringComparison.InvariantCultureIgnoreCase));
 
 			if (!userCode.ItemType.Equals("Compile", StringComparison.InvariantCultureIgnoreCase))
 				ReportSlideError(slide, $"Student's csproj has user code item ({userCode.UnevaluatedInclude}) of not compile type");
 		}
 
-		private void ReportErrorIfCsprojHasWrongAnswerOrSolutionItems(DirectoryInfo unpackedZipDir)
+		private void ReportErrorIfCsprojHasWrongAnswerOrSolutionItems(DirectoryInfo unpackedZipDir, Project csproj)
 		{
-			var csprojFile = unpackedZipDir.GetFiles(ex.CsprojFileName).Single();
-			var csProj = new Project(csprojFile.FullName, null, null, new ProjectCollection());
-			var csProjItems = csProj.Items.Select(i => i.UnevaluatedInclude);
+			var csProjItems = csproj.Items.Select(i => i.UnevaluatedInclude);
 
 			var wrongAnswersOrSolution = GetOrderedFileNames(csProjItems, ProjectExerciseBlock.IsAnyWrongAnswerOrAnySolution);
 

@@ -33,6 +33,9 @@ namespace uLearn.CSharp
 		private string studentCsProjFilePath => Path.Combine(studentExerciseFolderPath, TestsHelper.CsProjFilename);
         private string checkerCsprojFilePath => Path.Combine(checkerExerciseFolderPath, TestsHelper.CsProjFilename);
 
+	    private Project studentZipCsproj;
+	    private Project checkerZipCsproj;
+
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
@@ -56,6 +59,9 @@ namespace uLearn.CSharp
 
 	        var zipBytes = ex.GetZipBytesForChecker("i_am_user_code");
 	        Utils.UnpackZip(zipBytes, checkerExerciseFolderPath);
+
+			studentZipCsproj = new Project(studentCsProjFilePath, null, null, new ProjectCollection());
+			checkerZipCsproj = new Project(checkerCsprojFilePath, null, null, new ProjectCollection());
 		}
 
         [Test]
@@ -70,7 +76,7 @@ namespace uLearn.CSharp
         [Test]
 		public void When_CreateStudentZip_Contain_UserCodeFile_OfCompileType_Inside_Csproj()
         {
-			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(studentCsProjFilePath);
+			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(studentZipCsproj);
 
             itemNamesForCompile.Should().Contain(TestsHelper.UserCodeFileName);
 		}
@@ -78,7 +84,7 @@ namespace uLearn.CSharp
         [Test]
 		public void When_CreateStudentZip_Contain_Resolved_Links_Inside_Csproj()
         {
-	        var itemNamesForCompile = GetFromCsProjItemsForCompile(checkerCsprojFilePath);
+	        var itemNamesForCompile = GetFromCsProjItemsForCompile(checkerZipCsproj);
 
 	        itemNamesForCompile.Should().Contain(i => i.UnevaluatedInclude.Equals("~$Link.cs"));
 		}
@@ -94,7 +100,7 @@ namespace uLearn.CSharp
 		[Test]
 		public void When_CreateStudentZip_NotContain_AnyWrongAnswersOrSolution_OfCompileType_InsideCsproj()
 		{
-			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(studentCsProjFilePath);
+			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(studentZipCsproj);
 
 			itemNamesForCompile.Should().NotContain(TestsHelper.WrongAnswersAndSolutionNames);
 		}
@@ -128,7 +134,7 @@ namespace uLearn.CSharp
 		[Test]
 		public void When_CreateCheckerZip_Contain_UserCodeFile_OfCompileType_InsideCsproj()
 		{
-			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerCsprojFilePath);
+			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerZipCsproj);
 
 			itemNamesForCompile.Should().Contain(TestsHelper.UserCodeFileName);
 		}
@@ -136,7 +142,7 @@ namespace uLearn.CSharp
 		[Test]
 		public void When_CreateCheckerZip_NotContain_CorrectSolution_OfCompileType_InsideCsproj()
 		{
-			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerCsprojFilePath);
+			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerZipCsproj);
 
 			itemNamesForCompile.Should().NotContain(ex.CorrectSolutionFileName);
 		}
@@ -144,20 +150,19 @@ namespace uLearn.CSharp
 		[Test]
 		public void When_CreateCheckerZip_NotRemove_OtherSolutions_OfCompileType_FromCsproj()
 		{
-			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerCsprojFilePath);
+			var itemNamesForCompile = GetFromCsProjItemsNamesForCompile(checkerZipCsproj);
 			var anotherSolutionReferencedByCurrentSolution = $"{nameof(AnotherTask)}.Solution.cs";
 
 			itemNamesForCompile.Should().Contain(anotherSolutionReferencedByCurrentSolution);
 		}
 
-		private List<string> GetFromCsProjItemsNamesForCompile(string projectFile)
+		private List<string> GetFromCsProjItemsNamesForCompile(Project csproj)
 		{
-			return GetFromCsProjItemsForCompile(projectFile).Select(i => i.UnevaluatedInclude).ToList();
+			return GetFromCsProjItemsForCompile(csproj).Select(i => i.UnevaluatedInclude).ToList();
 		}
 
-		private List<ProjectItem> GetFromCsProjItemsForCompile(string projectFile)
+		private List<ProjectItem> GetFromCsProjItemsForCompile(Project csproj)
 		{
-			var csproj = new Project(projectFile, null, null, new ProjectCollection());
 			return csproj.Items
 				.Where(i => i.ItemType.Equals("Compile", StringComparison.InvariantCultureIgnoreCase))
 				.ToList();
