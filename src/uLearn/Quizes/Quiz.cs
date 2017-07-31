@@ -26,11 +26,9 @@ namespace uLearn.Quizes
 		public string Id;
 
 		[XmlAttribute("maxDropCount")]
-		[DefaultValue(0)]
 		public int MaxDropCount;
 
 		[XmlAttribute("manualCheck")]
-		[DefaultValue(false)]
 		public bool ManualChecking;
 
 		[XmlAttribute("scoringGroup")]

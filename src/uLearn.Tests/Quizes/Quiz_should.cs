@@ -67,8 +67,8 @@ namespace uLearn.Quizes
 		[Test]
 		public void BeDeserializable()
 		{
-			var q = File.ReadAllText("Quizes/test.quiz.xml").DeserializeXml<Quiz>();
-			QuizSlideLoader.BuildUp(q, null, CourseSettings.DefaultSettings);
+			var q = File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "Quizes", "test.quiz.xml")).DeserializeXml<Quiz>();
+			QuizSlideLoader.BuildUp(q, new Unit(null, new DirectoryInfo(TestContext.CurrentContext.TestDirectory)), CourseSettings.DefaultSettings);
 			q.ShouldBeEquivalentTo(new Quiz
 			{
 				Id = "{DB95DA10-7DD2-46CA-BFB2-6D0D7554B83F}",
@@ -89,7 +89,7 @@ namespace uLearn.Quizes
 		[Test]
 		public void DeserializeNormalizedXml()
 		{
-			var q = File.ReadAllText("Quizes/normalizedQuiz.xml").DeserializeXml<Quiz>();
+			var q = File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "Quizes", "normalizedQuiz.xml")).DeserializeXml<Quiz>();
 			q.Blocks.Length.Should().Be(8);
 		}
 	}
