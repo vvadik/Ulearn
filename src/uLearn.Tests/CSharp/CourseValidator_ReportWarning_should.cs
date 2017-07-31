@@ -30,6 +30,10 @@ namespace uLearn.CSharp
 			TestsHelper.RecreateDirectory(tempSlideFolderPath);
 			FileSystem.CopyDirectory(TestsHelper.ProjSlideFolderPath, tempSlideFolderPath);
 
+			string studentZipFilepath = Path.Combine(tempSlideFolderPath, "ProjDir.exercise.zip");
+			if (File.Exists(studentZipFilepath))
+				File.Delete(studentZipFilepath);
+
 			var ctx = new BuildUpContext(new Unit(null, exBlock.SlideFolderPath), CourseSettings.DefaultSettings, null, String.Empty);
 			exBlock.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
 		}

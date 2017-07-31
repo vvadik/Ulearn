@@ -5,12 +5,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace uLearn.CSharp
 {
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-	public class RecursionStyleValidatorAttribute : Attribute, ICSharpSolutionValidator, IStrictValidator
+	public class RecursionStyleValidator : ICSharpSolutionValidator, IStrictValidator
 	{
 		private readonly bool requireRecursion;
 
-		public RecursionStyleValidatorAttribute(bool requireRecursion)
+		public RecursionStyleValidator(bool requireRecursion)
 		{
 			this.requireRecursion = requireRecursion;
 		}

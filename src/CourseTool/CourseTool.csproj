@@ -53,6 +53,7 @@
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
     </Reference>
@@ -62,6 +63,7 @@
     <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop, Version=1.0.168.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
@@ -135,6 +137,8 @@
   <ItemGroup>
     <Compile Include="AbstractOptions.cs" />
     <Compile Include="ArchiveManager.cs" />
+    <Compile Include="BaseValidator.cs" />
+    <Compile Include="CourseValidator.cs" />
     <Compile Include="Monitoring\Monitor.cs" />
     <Compile Include="Monitoring\PreviewHttpServer.cs" />
     <Compile Include="Monitoring\SlideRenderer.cs" />
@@ -148,6 +152,7 @@
     </Compile>
     <Compile Include="Converter.cs" />
     <Compile Include="Credentials.cs" />
+    <Compile Include="ProjectExerciseValidator.cs" />
     <Compile Include="SampleCustomPatchOptions.cs" />
     <Compile Include="EdxInteraction.cs" />
     <Compile Include="Json\Video.cs" />
@@ -343,10 +348,6 @@
     <ProjectReference Include="..\RunCsJob\RunCsJob.csproj">
       <Project>{77B16F9D-3CDF-4CC6-BE5F-B6BADFAC5394}</Project>
       <Name>RunCsJob</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\uLearn.CourseLib\uLearn.CourseLib.csproj">
-      <Project>{70f83ad9-235d-4675-8585-608eb089ef94}</Project>
-      <Name>uLearn.CourseLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\uLearn.Web\uLearn.Web.csproj">
       <Project>{B3701D2E-D001-4E0A-AB2F-7ACB5A89589B}</Project>

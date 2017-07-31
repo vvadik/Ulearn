@@ -394,9 +394,9 @@
       <Project>{77B16F9D-3CDF-4CC6-BE5F-B6BADFAC5394}</Project>
       <Name>RunCsJob</Name>
     </ProjectReference>
-    <ProjectReference Include="..\uLearn.CourseLib\uLearn.CourseLib.csproj">
-      <Project>{70F83AD9-235D-4675-8585-608EB089EF94}</Project>
-      <Name>uLearn.CourseLib</Name>
+    <ProjectReference Include="..\uLearn.CSharpAttributes\uLearn.CSharpAttributes.csproj">
+      <Project>{74bea97a-21eb-4fd2-b58a-1341c8ba3124}</Project>
+      <Name>uLearn.CSharpAttributes</Name>
     </ProjectReference>
     <ProjectReference Include="..\uLearn\uLearn.csproj">
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>

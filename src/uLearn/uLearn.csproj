@@ -182,7 +182,6 @@
     <Compile Include="AnalyticsTableInfo.cs" />
     <Compile Include="CSharp\IStrictValidator.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
-    <Compile Include="CommentAfterExerciseIsSolved.cs" />
     <Compile Include="Course.cs" />
     <Compile Include="CourseDiff.cs" />
     <Compile Include="CourseLoader.cs" />
@@ -217,7 +216,6 @@
     <Compile Include="Helpers\StringUtils.cs" />
     <Compile Include="ISolutionValidator.cs" />
     <Compile Include="ExerciseSlide.cs" />
-    <Compile Include="ExpectedOutput.cs" />
     <Compile Include="CSharp\ICSharpSolutionValidator.cs" />
     <Compile Include="Extensions\FileExtensions.cs" />
     <Compile Include="ISlideLoader.cs" />
@@ -280,9 +278,7 @@
     <Compile Include="Md.cs" />
     <Compile Include="ResourceLoader.cs" />
     <Compile Include="CSharp\SlideParser.cs" />
-    <Compile Include="HintAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SampleAttribute.cs" />
     <Compile Include="Slide.cs" />
     <Compile Include="Model\Blocks\SlideBlock.cs" />
     <Compile Include="NotFoundException.cs" />
@@ -295,7 +291,6 @@
     <Compile Include="Result.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="CSharp\SyntaxExtensions.cs" />
-    <Compile Include="SlideAttribute.cs" />
     <Compile Include="TexReplacer.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="UnitLoader.cs" />
@@ -325,6 +320,10 @@
     <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
       <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
       <Name>RunCsJob.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\uLearn.CSharpAttributes\uLearn.CSharpAttributes.csproj">
+      <Project>{74bea97a-21eb-4fd2-b58a-1341c8ba3124}</Project>
+      <Name>uLearn.CSharpAttributes</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

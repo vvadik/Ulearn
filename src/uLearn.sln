@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+VisualStudioVersion = 15.0.26430.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn", "uLearn\uLearn.csproj", "{333DD5A7-9955-46CB-8905-79E800F2B435}"
 EndProject
@@ -32,8 +32,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsSandboxer", "CsSandboxer\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn.Tests", "uLearn.Tests\uLearn.Tests.csproj", "{BF698331-FF65-4B1E-850D-2E399434580B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn.CourseLib", "uLearn.CourseLib\uLearn.CourseLib.csproj", "{70F83AD9-235D-4675-8585-608EB089EF94}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunCsJob.Api", "RunCsJob.Api\RunCsJob.Api.csproj", "{26580595-F4DC-41EE-BA66-0EF4692243AF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunCsJob.Service", "RunCsJob.Service\RunCsJob.Service.csproj", "{76897BE1-6FB1-4E29-9593-D1851549B00B}"
@@ -49,6 +47,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Service", "Notifications.Service\Notifications.Service.csproj", "{3F601596-995C-4B19-8FCA-A071CE7C4325}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metrics", "Metrics\Metrics.csproj", "{6BF55402-68F0-4BA3-9F03-E42C3912C9CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn.CSharpAttributes", "uLearn.CSharpAttributes\uLearn.CSharpAttributes.csproj", "{74BEA97A-21EB-4FD2-B58A-1341C8BA3124}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,10 +80,6 @@ Global
 		{BF698331-FF65-4B1E-850D-2E399434580B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF698331-FF65-4B1E-850D-2E399434580B}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{BF698331-FF65-4B1E-850D-2E399434580B}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{70F83AD9-235D-4675-8585-608EB089EF94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{70F83AD9-235D-4675-8585-608EB089EF94}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{70F83AD9-235D-4675-8585-608EB089EF94}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{70F83AD9-235D-4675-8585-608EB089EF94}.Release|Any CPU.Build.0 = Release|Any CPU
 		{26580595-F4DC-41EE-BA66-0EF4692243AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{26580595-F4DC-41EE-BA66-0EF4692243AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26580595-F4DC-41EE-BA66-0EF4692243AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -116,6 +112,10 @@ Global
 		{6BF55402-68F0-4BA3-9F03-E42C3912C9CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BF55402-68F0-4BA3-9F03-E42C3912C9CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6BF55402-68F0-4BA3-9F03-E42C3912C9CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74BEA97A-21EB-4FD2-B58A-1341C8BA3124}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74BEA97A-21EB-4FD2-B58A-1341C8BA3124}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74BEA97A-21EB-4FD2-B58A-1341C8BA3124}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74BEA97A-21EB-4FD2-B58A-1341C8BA3124}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

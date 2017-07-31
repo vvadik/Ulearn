@@ -17,17 +17,17 @@ namespace uLearn
 					var pp = part.Split('-');
 					var subValidator = pp[0];
 					if (subValidator == "singlestatementmethod")
-						validator.AddValidator(new SingleStatementMethodAttribute());
+						validator.AddValidator(new SingleStatementMethodValidator());
 					if (subValidator == "singlestaticmethod")
-						validator.AddValidator(new IsStaticMethodAttribute());
+						validator.AddValidator(new IsStaticMethodValidator());
 					if (subValidator == "blocklen")
 						validator.AddValidator(new BlockLengthStyleValidator(int.Parse(pp[1])));
 					if (subValidator == "linelen")
 						validator.AddValidator(new LineLengthStyleValidator(int.Parse(pp[1])));
 					if (subValidator == "recursion")
-						validator.AddValidator(new RecursionStyleValidatorAttribute(true));
+						validator.AddValidator(new RecursionStyleValidator(true));
 					if (subValidator == "norecursion")
-						validator.AddValidator(new RecursionStyleValidatorAttribute(false));
+						validator.AddValidator(new RecursionStyleValidator(false));
 				}
 				return validator;
 			}

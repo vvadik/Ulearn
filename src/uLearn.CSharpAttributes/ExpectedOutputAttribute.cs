@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace uLearn
 {
@@ -11,9 +11,5 @@ namespace uLearn
 		}
 
 		public string Output { get; private set; }
-	}
-
-	public class HideExpectedOutputOnErrorAttribute : Attribute
-	{
 	}
 }

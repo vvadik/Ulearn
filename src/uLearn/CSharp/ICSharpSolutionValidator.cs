@@ -10,8 +10,7 @@ namespace uLearn.CSharp
 		string FindError(SyntaxTree userSolution);
 	}
 
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-	public class IsStaticMethodAttribute : Attribute, ICSharpSolutionValidator, IStrictValidator
+	public class IsStaticMethodValidator : ICSharpSolutionValidator, IStrictValidator
 	{
 		public const string ShouldBeMethod = "Решение должно быть корректным определением статического метода";
 		public const string ShouldBeSingleMethod = "Решение должно состоять ровно из одного метода";
@@ -35,8 +34,7 @@ namespace uLearn.CSharp
 		}
 	}
 
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-	public class SingleStatementMethodAttribute : IsStaticMethodAttribute
+	public class SingleStatementMethodValidator : IsStaticMethodValidator
 	{
 		public const string ShouldBeSingleMethodMessage = "Решение этой задачи должно быть в одно выражение 'return ...'";
 
