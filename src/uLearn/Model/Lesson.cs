@@ -1,10 +1,12 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Linq;
+using System.Xml.Serialization;
 using uLearn.Model.Blocks;
 
 namespace uLearn.Model
 {
 	[XmlType(IncludeInSchema = false)]
-	public enum BlockTypes
+	public enum BlockType
 	{
 		[XmlEnum("youtube")]
 		YouTube,
@@ -78,17 +80,35 @@ namespace uLearn.Model
 		public SlideBlock[] Blocks;
 
 		[XmlIgnore]
-		public BlockTypes[] DefineBlockType;
+		public BlockType[] DefineBlockType;
 
 		public Lesson()
 		{
 		}
 
-		public Lesson(string title, string id, SlideBlock[] blocks)
+		public Lesson(string title, string id, params SlideBlock[] blocks)
 		{
 			Title = title;
 			Id = id;
 			Blocks = blocks;
+			DefineBlockType = blocks.Select(GetBlockType).ToArray();
+		}
+
+		private BlockType GetBlockType(SlideBlock b)
+		{
+			switch (b)
+			{
+				case YoutubeBlock _: return BlockType.YouTube;
+				case CodeBlock _: return BlockType.Code;
+				case ImageGaleryBlock _: return BlockType.GalleryImages;
+				case IncludeCodeBlock _: return BlockType.IncludeCode;
+				case IncludeImageGalleryBlock _: return BlockType.IncludeImageGalleryBlock;
+				case IncludeMdBlock _: return BlockType.IncludeMd;
+				case MdBlock _: return BlockType.Md;
+				case ProjectExerciseBlock _: return BlockType.ProjectExerciseBlock;
+				case SingleFileExerciseBlock _: return BlockType.SingleFileExerciseBlock;
+				default: throw new Exception("unknown slide block " + b);
+			}
 		}
 	}
 }

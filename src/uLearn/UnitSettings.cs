@@ -27,6 +27,9 @@ namespace uLearn
 		[XmlElement("scoring")]
 		public ScoringSettings Scoring { get; set; }
 
+		[XmlElement("default-include-code-file")]
+		public string DefaultIncludeCodeFile { get; set; }
+
 		public static UnitSettings Load(FileInfo file, CourseSettings courseSettings)
 		{
 			var unitSettings = file.DeserializeXml<UnitSettings>();

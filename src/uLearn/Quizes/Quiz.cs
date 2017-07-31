@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using uLearn.Model.Blocks;
 using uLearn.Model.Edx.EdxComponents;
+using Component = uLearn.Model.Edx.EdxComponents.Component;
 
 namespace uLearn.Quizes
 {
@@ -24,9 +26,11 @@ namespace uLearn.Quizes
 		public string Id;
 
 		[XmlAttribute("maxDropCount")]
+		[DefaultValue(0)]
 		public int MaxDropCount;
 
 		[XmlAttribute("manualCheck")]
+		[DefaultValue(false)]
 		public bool ManualChecking;
 
 		[XmlAttribute("scoringGroup")]
@@ -38,7 +42,9 @@ namespace uLearn.Quizes
 		private SlideBlock[] blocks;
 
 		[XmlElement("p", Type = typeof(MdBlock))]
-		[XmlElement("code", Type = typeof(CodeBlock))]
+		[XmlElement(typeof(CodeBlock))]
+		[XmlElement(typeof(TexBlock))]
+		[XmlElement(typeof(IncludeCodeBlock))]
 		[XmlElement("isTrue", Type = typeof(IsTrueBlock))]
 		[XmlElement("choice", Type = typeof(ChoiceBlock))]
 		[XmlElement("fillIn", Type = typeof(FillInBlock))]

@@ -14,7 +14,7 @@ namespace uLearn
 			Directory = directory;
 		}
 
-		private UnitSettings Settings { get; set; }
+		public UnitSettings Settings { get; set; }
 
 		public InstructorNote InstructorNote { get; set; }
 

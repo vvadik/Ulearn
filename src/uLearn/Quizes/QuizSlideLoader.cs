@@ -23,15 +23,15 @@ namespace uLearn.Quizes
 			if (string.IsNullOrEmpty(quiz.ScoringGroup))
 				quiz.ScoringGroup = settings.Scoring.DefaultScoringGroupForQuiz;
 
-			BuildUp(quiz, file.Directory, settings);
+			BuildUp(quiz, unit, settings);
 			quiz.InitQuestionIndices();
 			var slideInfo = new SlideInfo(unit, file, slideIndex);
 			return new QuizSlide(slideInfo, quiz);
 		}
 
-		public static void BuildUp(Quiz quiz, DirectoryInfo slideDir, CourseSettings settings)
+		public static void BuildUp(Quiz quiz, Unit unit, CourseSettings settings)
 		{
-			var context = new BuildUpContext(slideDir, settings, null, quiz.Title);
+			var context = new BuildUpContext(unit, settings, null, quiz.Title);
 			var blocks = quiz.Blocks.SelectMany(b => b.BuildUp(context, ImmutableHashSet<string>.Empty));
 			quiz.Blocks = blocks.ToArray();
 		}

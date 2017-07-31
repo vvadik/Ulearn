@@ -38,7 +38,7 @@ namespace uLearn.CSharp
 				CsProjFilePath = TestsHelper.CsProjFilePath,
 			};
 			FileSystem.CopyDirectory(TestsHelper.ProjSlideFolderPath, tempSlideFolderPath, true);
-			var ctx = new BuildUpContext(exBlock.SlideFolderPath, CourseSettings.DefaultSettings, null, String.Empty);
+			var ctx = new BuildUpContext(new Unit(null, exBlock.SlideFolderPath), CourseSettings.DefaultSettings, null, String.Empty);
 			exBlock.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
 		}
 
@@ -110,27 +110,27 @@ namespace uLearn.CSharp
 		[Test]
 		public void ReportError_If_NUnitTestRunner_Tries_To_Run_NonExisting_Test_Class()
 		{
-			exBlock.NUnitTestClasses = new[] { "non_existing.test_class", };
+				exBlock.NUnitTestClasses = new[] { "non_existing.test_class", };
 
 			var validatorOutput = TestsHelper.ValidateBlock(exBlock);
 
-			validatorOutput
-				.Should()
+				validatorOutput
+					.Should()
 				.Contain($"Correct solution file {exBlock.CorrectSolutionFileName} verdict is not OK. RunResult = Id: test.csproj, Verdict: RuntimeError: System.ArgumentException: Error in checking system: test class non_existing.test_class does not exist");
-		}
+			}
 
 		[Test]
 		public void ReportError_If_Solution_For_ProjectExerciseBlock_Is_Not_Solution()
 		{
-			exBlock.NUnitTestClasses = new[] { $"test.{nameof(OneFailingTest)}" };
+				exBlock.NUnitTestClasses = new[] { $"test.{nameof(OneFailingTest)}" };
 
 			var validatorOutput = TestsHelper.ValidateBlock(exBlock);
 
-			validatorOutput
-				.Should()
+				validatorOutput
+					.Should()
 				.Contain($"Correct solution file {exBlock.CorrectSolutionFileName} is not solution. RunResult = Id: test.csproj, Verdict: Ok")
-				.And
-				.Contain("Error on NUnit test: I_am_a_failure");
-		}
-	}
+					.And
+					.Contain("Error on NUnit test: I_am_a_failure");
+			}
+			}
 }

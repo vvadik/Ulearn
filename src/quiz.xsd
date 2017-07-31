@@ -18,6 +18,7 @@
 			<xs:element name="title" type="notEmptyString" minOccurs="1" maxOccurs="1"></xs:element>
 			<xs:choice minOccurs="1" maxOccurs="unbounded">
 				<xs:element name="p" type="notEmptyString" />
+				<xs:element name="include-code" type="IncludeCodeBlock" />
 				<xs:element name="code">
 					<xs:simpleType>
 						<xs:restriction base="notEmptyString">
@@ -51,6 +52,40 @@
 		<xs:attribute name="maxDropCount" type="xs:int" use="optional" />
 		<xs:attribute name="manualCheck" type="xs:boolean" use="optional" />
 		<xs:attribute name="scoringGroup" type="notEmptyString" use="optional" />
+	</xs:complexType>
+
+
+	<xs:complexType name="IncludeCodeBlock">
+		<xs:complexContent>
+			<xs:extension base="IncludeCode">
+				<xs:sequence minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="display" type="Label" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Label">
+		<xs:simpleContent>
+			<xs:extension base="notEmptyString">
+				<xs:attribute name="only-body" type="xs:boolean" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+
+	<xs:complexType name="IncludeCode">
+		<xs:complexContent>
+			<xs:extension base="Include">
+				<xs:attribute name="lang-id" type="notEmptyString" use="optional" />
+				<xs:attribute name="lang-ver" type="notEmptyString" use="optional" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Include">
+		<xs:attribute name="file" type="notEmptyString" use="optional" />
+		<xs:attribute name="hide" type="xs:boolean" />
 	</xs:complexType>
 
 	<xs:complexType name="IsTrueBlock">

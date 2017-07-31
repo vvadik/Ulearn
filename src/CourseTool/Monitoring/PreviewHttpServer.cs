@@ -5,11 +5,14 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Newtonsoft.Json;
 using NHttp;
 using RunCsJob;
 using RunCsJob.Api;
+using uLearn.Model;
 using uLearn.Model.Blocks;
+using uLearn.Quizes;
 using uLearn.Web.Models;
 
 namespace uLearn.CourseTool.Monitoring
@@ -106,12 +109,68 @@ namespace uLearn.CourseTool.Monitoring
 				case "submit":
 					response = ServeRunExercise(context, path);
 					break;
+				case "addLesson":
+					response = ServeAddLesson(context, path);
+					break;
+				case "addQuiz":
+					response = ServeAddQuiz(context, path);
+					break;
 				default:
 					response = ServeStatic(context, path);
 					break;
 			}
 			context.Response.OutputStream.WriteAsync(response, 0, response.Length).Wait();
 			context.Response.OutputStream.Close();
+		}
+
+		public int GetSlideIndex(string path)
+		{
+			return int.Parse(path.Substring(1, 3));
+		}
+
+		private byte[] ServeAddQuiz(HttpRequestEventArgs context, string path)
+		{
+			var quiz = new Quiz
+			{
+				Id = Guid.NewGuid().ToString("N"),
+				Title = "Новый quiz"
+			};
+			return AddNewSlide(context, path, quiz);
+		}
+
+		private byte[] ServeAddLesson(HttpRequestEventArgs context, string path)
+		{
+			var lesson = new Lesson(
+				"Новый слайд", 
+				Guid.NewGuid().ToString("N"), 
+				new MdBlock("текст"));
+			return AddNewSlide(context, path, lesson);
+		}
+
+		private byte[] AddNewSlide<TLessonOrQuiz>(HttpRequestEventArgs context, string path, TLessonOrQuiz lessonOrQuiz)
+		{
+			var prevSlide = course.FindSlide(GetSlideIndex(path));
+			if (prevSlide == null)
+			{
+				context.Response.StatusCode = 404;
+				return new byte[0];
+			}
+			var serializer = new XmlSerializer(typeof(TLessonOrQuiz));
+			var newFile = GenerateSlideFilename<TLessonOrQuiz>(prevSlide);
+			using (var s = new FileStream(Path.Combine(prevSlide.Info.Directory.FullName, newFile), FileMode.OpenOrCreate))
+				serializer.Serialize(s, lessonOrQuiz);
+			ReloadCourse();
+			context.Response.Redirect((prevSlide.Index + 1).ToString("000") + ".html");
+			return new byte[0];
+		}
+
+		private static string GenerateSlideFilename<T>(Slide prevSlide)
+		{
+			var prefix = prevSlide.Info.SlideFile.Name.Split('-', ' ', '_')[0];
+			var i = int.Parse(prefix.Substring(1));
+			i += 10;
+			var newFile = "S" + i.ToString().PadLeft(prefix.Length - 1, '0') + "_." + typeof(T).Name.ToLower() + ".xml";
+			return newFile;
 		}
 
 		private async Task<byte[]> ServeNeedRefresh(bool reloaded, DateTime requestTime)
@@ -132,7 +191,7 @@ namespace uLearn.CourseTool.Monitoring
 		private byte[] ServeRunExercise(HttpRequestEventArgs context, string path)
 		{
 			var code = context.Request.InputStream.GetString();
-			var index = int.Parse(path.Substring(1, 3));
+			var index = GetSlideIndex(path);
 			var exercise = ((ExerciseSlide)course.Slides[index]).Exercise;
 			var runResult = GetRunResult(exercise, code);
 			context.Response.ContentType = "application/json; charset=utf-8";

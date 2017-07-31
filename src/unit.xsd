@@ -6,17 +6,18 @@
 	elementFormDefault="qualified"
 	targetNamespace="https://ulearn.azurewebsites.net/unit">
 
-    <xs:import schemaLocation="types.xsd" namespace="https://ulearn.azurewebsites.net/types"/>
+	<xs:import schemaLocation="types.xsd" namespace="https://ulearn.azurewebsites.net/types"/>
 
-    <xs:element name="Unit" type="Unit">
+	<xs:element name="Unit" type="Unit">
 	</xs:element>
 
 	<xs:complexType name="Unit">
 		<xs:sequence>
-    		<xs:element name="id" type="types:notEmptyString" />
-    		<xs:element name="url" type="types:notEmptyString" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="id" type="types:notEmptyString" />
+			<xs:element name="url" type="types:notEmptyString" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="title" type="types:notEmptyString" />
 			<xs:element name="scoring" type="types:Scoring" minOccurs="0" maxOccurs="1" />
+			<xs:element name="default-include-code-file" type="types:notEmptyString" minOccurs="0" maxOccurs="1" />
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>

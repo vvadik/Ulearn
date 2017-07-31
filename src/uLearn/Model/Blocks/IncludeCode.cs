@@ -27,7 +27,7 @@ namespace uLearn.Model.Blocks
 
 		protected void FillProperties(BuildUpContext context)
 		{
-			CodeFile = CodeFile ?? context.Lesson?.DefaultIncludeCodeFile;
+			CodeFile = CodeFile ?? context.Lesson?.DefaultIncludeCodeFile ?? context.Unit.Settings?.DefaultIncludeCodeFile;
 			LangId = LangId ?? Path.GetExtension(CodeFile)?.Trim('.') ?? context.CourseSettings.DefaultLanguage;
 			LangVer = LangVer ?? context.CourseSettings.GetLanguageVersion(LangId);
 		}
