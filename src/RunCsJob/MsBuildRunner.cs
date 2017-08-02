@@ -35,7 +35,6 @@ namespace RunCsJob
 			var path = Path.Combine(dir.FullName, projectFileName);
 			var project = new Project(path, null, null, new ProjectCollection());
 			project.SetProperty("CscToolPath", settings.CompilerDirectory.FullName);
-			project.SetProperty("TargetFrameworkVersion", "4.7");
 
 			foreach (var libName in obligatoryLibs)
 			{
