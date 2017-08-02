@@ -105,9 +105,7 @@ namespace uLearn.Web.Kontur.Passport
 		/// <returns></returns>
 		protected override Task ApplyResponseChallengeAsync()
 		{
-			log.Debug("ApplyResponseChallenge");
-
-			if (Response.StatusCode != 401)
+    		if (Response.StatusCode != 401)
 			{
 				return Task.FromResult<object>(null);
 			}
@@ -116,6 +114,7 @@ namespace uLearn.Web.Kontur.Passport
 
 			if (challenge != null)
 			{
+				log.Debug("ApplyResponseChallenge");
 				var redirectUri = GetRedirectUri(Request);
 				var currentUri = Request.Uri.ToString();
 
@@ -149,11 +148,10 @@ namespace uLearn.Web.Kontur.Passport
 		/// pipeline.</returns>
 		public override async Task<bool> InvokeAsync()
 		{
-			log.Debug("InvokeAsync");
-
 			if (Options.ReturnEndpointPath != null &&
 				string.Equals(Options.ReturnEndpointPath, Request.Path.Value, StringComparison.OrdinalIgnoreCase))
 			{
+				log.Debug("InvokeAsync");
 				var ticket = await AuthenticateAsync();
 
 				var context = new KonturPassportReturnEndpointContext(Context, ticket)
