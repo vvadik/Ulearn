@@ -203,10 +203,8 @@ namespace uLearn.CourseTool.Monitoring
 			var buildResult = exercise.BuildSolution(code);
 			if (buildResult.HasErrors)
 				return new RunSolutionResult { IsCompileError = true, ErrorMessage = buildResult.ErrorMessage, ExecutionServiceName = "uLearn" };
-			if (buildResult.HasStyleIssues)
-				return new RunSolutionResult { IsStyleViolation = true, ErrorMessage = buildResult.StyleMessage, ExecutionServiceName = "uLearn" };
 			var result = SandboxRunner.Run(exercise.CreateSubmission(Utils.NewNormalizedGuid(), code));
-			return new RunSolutionResult
+			var runSolutionResult = new RunSolutionResult
 			{
 				IsRightAnswer = result.Verdict == Verdict.Ok && result.GetOutput().NormalizeEoln() == exercise.ExpectedOutput.NormalizeEoln(),
 				ActualOutput = result.GetOutput().NormalizeEoln(),
@@ -215,7 +213,14 @@ namespace uLearn.CourseTool.Monitoring
 				IsCompileError = result.Verdict == Verdict.CompilationError,
 				ExpectedOutput = exercise.ExpectedOutput.NormalizeEoln(),
 				SubmissionId = 0,
+
 			};
+			if (buildResult.HasStyleIssues)
+			{
+				runSolutionResult.IsStyleViolation = true;
+				runSolutionResult.StyleMessage = buildResult.StyleMessage;
+			}
+			return runSolutionResult;
 		}
 
 		private byte[] ServeStatic(HttpRequestEventArgs context, string path)

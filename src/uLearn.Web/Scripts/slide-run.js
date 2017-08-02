@@ -45,7 +45,12 @@ function setResults(ans) {
 		if (ans.SubmissionId > 0)
 			setExerciseVersion(ans.SubmissionId, true, ans.StyleMessage);
 		else /* for course monitor tool */
-			setSimpleResult($success, ans.ActualOutput);
+		{
+			if (ans.IsStyleViolation)
+				setSimpleResult($styleError, ans.StyleMessage);
+			else
+				setSimpleResult($success, ans.ActualOutput);
+		}
 	} else if (ans.ExpectedOutput === null)
 		setSimpleResult($waErrorNoDiff, ans.ActualOutput);
 	else
