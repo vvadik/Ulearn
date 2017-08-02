@@ -27,8 +27,7 @@ namespace RunCsJob
 
 	public static class MsBuildRunner
 	{
-		//private const string ValueTupleLibName = "System.ValueTuple";
-		private const string SystemRuntimeLibName = "System.Runtime";
+		private static readonly string[] obligatoryLibs = {"System.Runtime", "System.Reflection"};
 
 		public static MSbuildResult BuildProject(MsBuildSettings settings, string projectFileName, DirectoryInfo dir)
 		{
@@ -37,12 +36,11 @@ namespace RunCsJob
 			var project = new Project(path, null, null, new ProjectCollection());
 			project.SetProperty("CscToolPath", settings.CompilerDirectory.FullName);
 
-			//if (!project.HasReference(ValueTupleLibName))
-			//	project.AddReference(ValueTupleLibName, typeof(ValueTuple).Assembly.Location);
-
-			if (!project.HasReference(SystemRuntimeLibName))
-				project.AddReference(SystemRuntimeLibName, Path.Combine(settings.BaseDirectory, $"{SystemRuntimeLibName}.dll"));
-
+			foreach (var libName in obligatoryLibs)
+			{
+				if (!project.HasReference(libName))
+					project.AddReference(libName, Path.Combine(settings.BaseDirectory, $"{libName}.dll"));
+			}
 			project.ReevaluateIfNecessary();
 
 			var includes = new HashSet<string>(
