@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using Jint.Native.RegExp;
 using Microsoft.Build.Evaluation;
 using RunCsJob.Api;
 using uLearn.Extensions;
@@ -17,15 +18,16 @@ namespace uLearn.Model.Blocks
 	[XmlType("proj-exercise")]
 	public class ProjectExerciseBlock : ExerciseBlock
 	{
-		private static readonly string anySolutionNameRegex = new Regex("(.+)\\.Solution\\.cs").ToString();
-		private static readonly string anyWrongAnswerNameRegex = new Regex("(.+)\\.WrongAnswer\\.(.+)\\.cs").ToString();
+		private static readonly Regex anySolutionNameRegex = new Regex("(.+)\\.Solution\\.cs", RegexOptions.IgnoreCase);
+		private static readonly Regex anyWrongAnswerNameRegex = new Regex("(.+)\\.WrongAnswer\\.(.+)\\.cs", RegexOptions.IgnoreCase);
 
-		public static bool IsAnyWrongAnswerOrAnySolution(string name) => Regex.IsMatch(name, anyWrongAnswerNameRegex) || Regex.IsMatch(name, anySolutionNameRegex);
-		public static bool IsAnySolution(string name) => Regex.IsMatch(name, anySolutionNameRegex);
+		public static bool IsAnyWrongAnswerOrAnySolution(string name) => anyWrongAnswerNameRegex.IsMatch(name) || anySolutionNameRegex.IsMatch(name);
+		public static bool IsAnySolution(string name) => anySolutionNameRegex.IsMatch(name);
 
 		public static string SolutionFilenameToUserCodeFilename(string solutionFilename)
 		{
-			var userCodeFilenameWithoutExt = solutionFilename.Split(new[] { ".Solution.cs" }, StringSplitOptions.RemoveEmptyEntries).First();
+			// cut .solution.cs
+			var userCodeFilenameWithoutExt = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(solutionFilename));
 			return $"{userCodeFilenameWithoutExt}.cs";
 		}
 
