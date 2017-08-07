@@ -55,7 +55,8 @@
     <Compile Include="inner-dir-1\inner-dir-2\MeaningOfLifeTask.Solution.cs" />
     <Compile Include="AnotherTask.Solution.cs" />
     <Compile Include="OneFailingTest.cs" />
-    <Compile Include="Program.cs" />
+		<Compile Include="inner-dir-1\inner-dir-2\ExcludeMeForStudent.cs" />
+		<Compile Include="Program.cs" />
     <Compile Include="..\Link.cs">
       <Link>Link.cs</Link>
     </Compile>

@@ -12,14 +12,14 @@ namespace uLearn.Model.Blocks
 	{
 		private readonly DirectoryInfo dir;
 		private readonly string[] excludedDirs;
-		private readonly Func<string, bool> needExcludeFile;
+		private readonly Func<FileInfo, bool> needExcludeFile;
 		private readonly Func<FileInfo, byte[]> getFileContent;
 		private readonly FileInfo zipFile;
 
 		public LazilyUpdatingZip(
 			DirectoryInfo dir,
 			string[] excludedDirs,
-			Func<string, bool> needExcludeFile,
+			Func<FileInfo, bool> needExcludeFile,
 			Func<FileInfo, byte[]> getFileContent,
 			FileInfo zipFile)
 		{
@@ -63,7 +63,7 @@ namespace uLearn.Model.Blocks
 		private IEnumerable<FileInfo> EnumerateFiles(DirectoryInfo aDir)
 		{
 			foreach (var f in aDir.GetFiles())
-				if (!needExcludeFile(f.Name))
+				if (!needExcludeFile(f))
 					yield return f;
 			var dirs = aDir.GetDirectories().Where(d => !excludedDirs.Contains(d.Name));
 			foreach (var subdir in dirs)

@@ -20,7 +20,9 @@ namespace uLearn.Model.Blocks
 		private static readonly string anySolutionNameRegex = new Regex("(.+)\\.Solution\\.cs").ToString();
 		private static readonly string anyWrongAnswerNameRegex = new Regex("(.+)\\.WrongAnswer\\.(.+)\\.cs").ToString();
 
-		public static bool IsAnyWrongAnswerOrAnySolution(string name) => Regex.IsMatch(name, anyWrongAnswerNameRegex) || Regex.IsMatch(name, anySolutionNameRegex);
+		public static bool IsAnyWrongAnswerOrAnySolution(string filename)
+			=> Regex.IsMatch(filename, anyWrongAnswerNameRegex) || Regex.IsMatch(filename, anySolutionNameRegex);
+
 		public static bool IsAnySolution(string name) => Regex.IsMatch(name, anySolutionNameRegex);
 
 		public static string SolutionFilenameToUserCodeFilename(string solutionFilename)
@@ -60,7 +62,7 @@ namespace uLearn.Model.Blocks
 		public string[] NUnitTestClasses { get; set; }
 
 		[XmlElement("exclude-path-for-student")]
-		public string[] PathsToExcludeForStudent { get; set; }
+		public string[] PathsToExcludeForStudent { get; set; } = { };
 
 		[XmlElement("student-zip-is-buildable")]
 		public bool StudentZipIsBuildable { get; set; } = true;
@@ -123,10 +125,21 @@ namespace uLearn.Model.Blocks
 			var zip = new LazilyUpdatingZip(
 				ExerciseFolder,
 				new[] { "checking", "bin", "obj" },
-				IsAnyWrongAnswerOrAnySolution,
+				NeedExcludeFromStudentZip,
 				ReplaceCsproj, StudentsZip);
 			ResolveCsprojLinks();
 			zip.UpdateZip();
+		}
+
+		private bool NeedExcludeFromStudentZip(FileInfo file)
+		{
+			var relativeFilePath = file.GetRelativePath(ExerciseFolder.FullName);
+			return NeedExcludeFromStudentZip(relativeFilePath);
+		}
+
+		public bool NeedExcludeFromStudentZip(string filepath)
+		{
+			return IsAnyWrongAnswerOrAnySolution(filepath) || PathsToExcludeForStudent.Any(p => p == filepath);
 		}
 
 		private void ResolveCsprojLinks()

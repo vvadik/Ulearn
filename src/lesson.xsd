@@ -168,6 +168,13 @@
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
+					<xs:element name="exclude-path-for-student" type="notEmptyString" minOccurs="0" maxOccurs="unbounded" >
+						<xs:annotation>
+							<xs:documentation>
+								Путь относительно директории, в котором лежит csproj-file-path. Этот файл будет исключён из проекта при сборке для студента.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 					<xs:element name="student-zip-is-buildable" type="xs:boolean" minOccurs="0" maxOccurs="1">
 						<xs:annotation>
 							<xs:documentation>

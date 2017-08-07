@@ -25,7 +25,7 @@ namespace uLearn
 	{
 		internal static void PrepareForStudentZip(Project proj, ProjectExerciseBlock ex)
 		{
-			var toExclude = FindItemNames(proj, ProjectExerciseBlock.IsAnyWrongAnswerOrAnySolution).ToList();
+			var toExclude = FindItemNames(proj, ex.NeedExcludeFromStudentZip).ToList();
 			var solutionsOfOtherTasks = toExclude.Where(n => ProjectExerciseBlock.IsAnySolution(n) && ex.CorrectSolutionPath != n).ToList();
 
 			var userCodeFilenamesOfOtherTasks = solutionsOfOtherTasks.Select(ProjectExerciseBlock.SolutionFilenameToUserCodeFilename);

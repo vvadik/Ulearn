@@ -67,7 +67,7 @@ namespace uLearn.CSharp
 		private void SaveTempZipFileWithFullProject()
 		{
 			var zipWithFullProj = new FileInfo(Path.Combine(tempSlideFolderPath, "FullProjDir.exercise.zip"));
-			var noExcludedFiles = new Func<string, bool>(_ => false);
+			var noExcludedFiles = new Func<FileInfo, bool>(_ => false);
 			var noExcludedDirs = new string[0];
 
 			var csProjFile = TestsHelper.ProjExerciseFolder.GetFile(TestsHelper.CsProjFilename);

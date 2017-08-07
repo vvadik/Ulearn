@@ -13,6 +13,7 @@ using test;
 using uLearn.Extensions;
 using uLearn.Model;
 using uLearn.Model.Blocks;
+using SearchOption = System.IO.SearchOption;
 
 namespace uLearn.CSharp
 {
@@ -50,7 +51,8 @@ namespace uLearn.CSharp
 				StartupObject = "test.Program",
 				UserCodeFilePath = TestsHelper.UserCodeFileName,
 				SlideFolderPath = tempSlideFolder,
-				CsProjFilePath = TestsHelper.CsProjFilePath
+				CsProjFilePath = TestsHelper.CsProjFilePath,
+				PathsToExcludeForStudent = new[] { "inner-dir-1\\inner-dir-2\\ExcludeMeForStudent.cs" }
 			};
 
 			var ctx = new BuildUpContext(new Unit(null, ex.SlideFolderPath), CourseSettings.DefaultSettings, null, String.Empty);
@@ -90,11 +92,26 @@ namespace uLearn.CSharp
 		}
 
 		[Test]
-		public void When_CreateStudentZip_Contain_Resolved_Link_Files_Inside_Csproj()
+		public void When_CreateStudentZip_Contain_Resolved_Link_Files()
 		{
 			var projFiles = studentExerciseFolder.GetFiles().Select(f => f.Name);
 
 			projFiles.Should().Contain("~$Link.cs");
+		}
+
+		[Test]
+		public void When_CreateStudentZip_ExcludePathForStudent_From_Csproj()
+		{
+			var studentItemNames = studentZipCsproj.Items.Select(i => i.UnevaluatedInclude);
+			studentItemNames.Should().NotContain("inner-dir-1\\inner-dir-2\\ExcludeMeForStudent.cs");
+		}
+
+		[Test]
+		public void When_CreateStudentZip_ExcludePathForStudent_Files()
+		{
+			var projFilesRelativePaths = studentExerciseFolder.GetFiles("*", SearchOption.AllDirectories)
+				.Select(f => f.GetRelativePath(studentExerciseFolderPath));
+			projFilesRelativePaths.Should().NotContain("inner-dir-1\\inner-dir-2\\ExcludeMeForStudent.cs");
 		}
 
 		[Test]
