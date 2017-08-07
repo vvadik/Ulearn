@@ -28,10 +28,10 @@ namespace uLearn
 			var toExclude = FindItemNames(proj, ex.NeedExcludeFromStudentZip).ToList();
 			var solutionsOfOtherTasks = toExclude.Where(n => ProjectExerciseBlock.IsAnySolution(n) && ex.CorrectSolutionPath != n).ToList();
 
-			var userCodeFilenamesOfOtherTasks = solutionsOfOtherTasks.Select(ProjectExerciseBlock.SolutionFilenameToUserCodeFilename);
+			var userCodeFilepathsOfOtherTasks = solutionsOfOtherTasks.Select(ProjectExerciseBlock.SolutionFilepathToUserCodeFilepath);
 
 			RemoveCheckingFromCsproj(proj);
-			SetFilenameItemTypeToCompile(proj, userCodeFilenamesOfOtherTasks.Concat(new[] { ex.UserCodeFilePath }));
+			SetFilepathItemTypeToCompile(proj, userCodeFilepathsOfOtherTasks.Concat(new[] { ex.UserCodeFilePath }));
 			ResolveLinks(proj);
 			ExcludePaths(proj, toExclude);
 		}
@@ -57,19 +57,19 @@ namespace uLearn
 			if (solutionRelativePath != null)
 				excludedPaths.Add(solutionRelativePath);
 
-			SetFilenameItemTypeToCompile(proj, ex.UserCodeFilePath);
+			SetFilepathItemTypeToCompile(proj, ex.UserCodeFilePath);
 			PrepareForChecking(proj, ex.StartupObject, excludedPaths);
 		}
 
-		public static void SetFilenameItemTypeToCompile(Project proj, IEnumerable<string> files)
+		public static void SetFilepathItemTypeToCompile(Project proj, IEnumerable<string> files)
 		{
 			foreach (var f in files)
-				SetFilenameItemType(proj, f, "Compile");
+				SetFilepathItemType(proj, f, "Compile");
 		}
 
-		public static void SetFilenameItemTypeToCompile(Project proj, string fileName) => SetFilenameItemType(proj, fileName, "Compile");
+		public static void SetFilepathItemTypeToCompile(Project proj, string fileName) => SetFilepathItemType(proj, fileName, "Compile");
 
-		public static void SetFilenameItemType(Project proj, string fileName, string type)
+		public static void SetFilepathItemType(Project proj, string fileName, string type)
 		{
 			proj.Items.Single(i => i.UnevaluatedInclude.Equals(fileName, StringComparison.InvariantCultureIgnoreCase)).ItemType = type;
 		}

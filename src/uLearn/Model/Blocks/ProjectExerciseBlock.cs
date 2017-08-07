@@ -23,11 +23,13 @@ namespace uLearn.Model.Blocks
 		public static bool IsAnyWrongAnswerOrAnySolution(string name) => anyWrongAnswerNameRegex.IsMatch(name) || anySolutionNameRegex.IsMatch(name);
 		public static bool IsAnySolution(string name) => anySolutionNameRegex.IsMatch(name);
 
-		public static string SolutionFilenameToUserCodeFilename(string solutionFilename)
+		public static string SolutionFilepathToUserCodeFilepath(string solutionFilepath)
 		{
 			// cut .solution.cs
-			var userCodeFilenameWithoutExt = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(solutionFilename));
-			return $"{userCodeFilenameWithoutExt}.cs";
+			var userCodeFilenameWithoutExt = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(solutionFilepath));
+			var userCodeFilename = $"{userCodeFilenameWithoutExt}.cs";
+			var path = Path.GetDirectoryName(solutionFilepath);
+			return path == null ? userCodeFilename : Path.Combine(path, userCodeFilename);
 		}
 
 		public ProjectExerciseBlock()
@@ -86,14 +88,14 @@ namespace uLearn.Model.Blocks
 
 		public string CorrectSolutionPath => CorrectSolutionFile.GetRelativePath(ExerciseFolder.FullName);
 
-		private string WrongAnswersAndSolutionNameRegexPattern => UserCodeFileNameWithoutExt + new Regex("\\.(.+)\\.cs");
+		private Regex WrongAnswersAndSolutionNameRegex => new Regex(new Regex("^") + UserCodeFileNameWithoutExt + new Regex("\\.(.+)\\.cs"));
 
 		[XmlIgnore]
 		public DirectoryInfo SlideFolderPath { get; set; }
 
 		public FileInfo StudentsZip => SlideFolderPath.GetFile(ExerciseDirName + ".exercise.zip");
 
-		public bool IsWrongAnswer(string name) => Regex.IsMatch(name, WrongAnswersAndSolutionNameRegexPattern) && !IsCorrectSolution(name);
+		public bool IsWrongAnswer(string name) => WrongAnswersAndSolutionNameRegex.IsMatch(name) && !IsCorrectSolution(name);
 
 		public bool IsCorrectSolution(string name) => name.Equals(CorrectSolutionFileName, StringComparison.InvariantCultureIgnoreCase);
 
