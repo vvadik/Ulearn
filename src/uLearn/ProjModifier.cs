@@ -90,7 +90,7 @@ namespace uLearn
 
 		private static void ExcludePaths(Project proj, IReadOnlyList<string> excludedPaths)
 		{
-			var toRemove = proj.Items.Where(item => excludedPaths.Contains(item.UnevaluatedInclude)).ToList();
+			var toRemove = proj.Items.Where(item => excludedPaths.Contains(item.UnevaluatedInclude, StringComparer.InvariantCultureIgnoreCase)).ToList();
 			proj.RemoveItems(toRemove);
 		}
 
