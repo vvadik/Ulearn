@@ -61,7 +61,7 @@ namespace uLearn.Model.Blocks
 		public string[] NUnitTestClasses { get; set; }
 
 		[XmlElement("exclude-path-for-student")]
-		public string[] PathsToExcludeForStudent { get; set; } = { };
+		public string[] PathsToExcludeForStudent { get; set; }
 
 		[XmlElement("student-zip-is-buildable")]
 		public bool StudentZipIsBuildable { get; set; } = true;
@@ -138,7 +138,8 @@ namespace uLearn.Model.Blocks
 
 		public bool NeedExcludeFromStudentZip(string filepath)
 		{
-			return IsAnyWrongAnswerOrAnySolution(filepath) || PathsToExcludeForStudent.Any(p => p == filepath);
+			return IsAnyWrongAnswerOrAnySolution(filepath) ||
+					PathsToExcludeForStudent != null && PathsToExcludeForStudent.Any(p => p == filepath);
 		}
 
 		private void ResolveCsprojLinks()
