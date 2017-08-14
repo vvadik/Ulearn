@@ -135,37 +135,41 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbstractOptions.cs" />
+    <Compile Include="CmdLineOptions\AbstractOptions.cs" />
     <Compile Include="ArchiveManager.cs" />
     <Compile Include="BaseValidator.cs" />
+    <Compile Include="CmdLineOptions\OlxDesquashChaptersOptions.cs" />
+    <Compile Include="CmdLineOptions\OlxGcOptions.cs" />
+    <Compile Include="CmdLineOptions\OlxPackOptions.cs" />
+    <Compile Include="CmdLineOptions\OlxSetChapterStartDatesOptions.cs" />
+    <Compile Include="CmdLineOptions\OlxSquashChaptersOptions.cs" />
     <Compile Include="CourseValidator.cs" />
     <Compile Include="Monitoring\Monitor.cs" />
     <Compile Include="Monitoring\PreviewHttpServer.cs" />
     <Compile Include="Monitoring\SlideRenderer.cs" />
-    <Compile Include="MonitorOptions.cs" />
+    <Compile Include="CmdLineOptions\MonitorOptions.cs" />
     <Compile Include="OlxSquasher.cs" />
     <Compile Include="OperationFailedGracefully.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="ConvertOptions.cs" />
+    <Compile Include="CmdLineOptions\OlxConvertFromUlearnOptions.cs" />
     <Compile Include="CookieAwareWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Converter.cs" />
     <Compile Include="Credentials.cs" />
     <Compile Include="ProjectExerciseValidator.cs" />
-    <Compile Include="SampleCustomPatchOptions.cs" />
     <Compile Include="EdxInteraction.cs" />
     <Compile Include="Json\Video.cs" />
     <Compile Include="Json\VideoHistory.cs" />
-    <Compile Include="PatchOptions.cs" />
+    <Compile Include="CmdLineOptions\OlxAbstractPatchOptions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SquashChapters.cs" />
-    <Compile Include="TestCourseOptions.cs" />
+    <Compile Include="CmdLineOptions\OlxUnpackOptions.cs" />
+    <Compile Include="CmdLineOptions\TestCourseOptions.cs" />
     <Compile Include="ULearnInteractor.cs" />
-    <Compile Include="ULearnOptions.cs" />
-    <Compile Include="ULearnPatchOptions.cs" />
-    <Compile Include="VideoPatchOptions.cs" />
+    <Compile Include="CmdLineOptions\ULearnOptions.cs" />
+    <Compile Include="CmdLineOptions\OlxPatchFromUlearnOptions.cs" />
+    <Compile Include="CmdLineOptions\OlxPatchVideoOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

@@ -2,9 +2,9 @@ using System;
 using CommandLine;
 using uLearn.Model.Edx;
 
-namespace uLearn.CourseTool
+namespace uLearn.CourseTool.CmdLineOptions
 {
-	abstract class PatchOptions : AbstractOptions
+	abstract class OlxAbstractPatchOptions : AbstractOptions
 	{
 		[Option('s', "skip-existing", Default = false, HelpText = "If set, patch skips uLearn slides if edx slide with the same id exists already")]
 		public bool SkipExistingGuids { get; set; }

@@ -18,11 +18,17 @@ namespace uLearn.Model.Edx
 
 		public virtual void Save(string folderName)
 		{
+			Save(folderName, true);
+		}
+
+		public void Save(string folderName, bool withAdditionals)
+		{
 			var path = Path.Combine(folderName, SubfolderName);
 			if (!Directory.Exists(path))
 				Directory.CreateDirectory(path);
 			File.WriteAllText(Path.Combine(path, UrlName + ".xml"), this.XmlSerialize());
-			SaveAdditional(folderName);
+			if (withAdditionals)
+				SaveAdditional(folderName);
 		}
 
 		public virtual void SaveAdditional(string folderName)

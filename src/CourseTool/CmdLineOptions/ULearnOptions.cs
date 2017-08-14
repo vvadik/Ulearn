@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Xml;
 using CommandLine;
 
-namespace uLearn.CourseTool
+namespace uLearn.CourseTool.CmdLineOptions
 {
 	[Verb("ulearn", HelpText = "Operations with uLearn")]
 	class ULearnOptions : AbstractOptions
