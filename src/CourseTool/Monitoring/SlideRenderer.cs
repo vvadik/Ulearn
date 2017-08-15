@@ -40,7 +40,11 @@ namespace uLearn.CourseTool.Monitoring
 			try
 			{
 				foreach (var url in urls)
-					File.Copy($"{slideDir}\\{url}", $"{htmlDirectory.FullName}\\static\\{url}");
+				{
+					var destFilepath = $"{htmlDirectory.FullName}\\static\\{url}";
+					if (!File.Exists(destFilepath))
+						File.Copy($"{slideDir}\\{url}", $"{htmlDirectory.FullName}\\static\\{url}");
+				}
 			}
 			catch (Exception e)
 			{
