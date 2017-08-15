@@ -1,5 +1,6 @@
 using System.IO;
 using ApprovalTests;
+using ApprovalTests.Reporters;
 using NUnit.Framework;
 using uLearn.Extensions;
 
@@ -9,6 +10,7 @@ namespace uLearn.CourseTool
 	public class Config_Test
 	{
 		[Test]
+		[UseReporter(typeof(DiffReporter))]
 		public void ConfigTemplate_IsOk()
 		{
 			var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "templates", "config.xml");
