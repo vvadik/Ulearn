@@ -343,7 +343,8 @@ namespace uLearn
 			using (var entryStream = entry.OpenReader())
 			{
 				var xml = XDocument.Load(entryStream);
-				update(xml.XPathSelectElement(selector, nsResolver));
+				var element = xml.XPathSelectElement(selector, nsResolver);
+				update(element.EnsureNotNull($"no element [{selector}] in zip entry {entry.FileName}"));
 				xml.Save(output);
 			}
 			zip.UpdateEntry(entry.FileName, output.GetBuffer());
