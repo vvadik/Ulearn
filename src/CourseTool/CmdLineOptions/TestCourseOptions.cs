@@ -6,7 +6,7 @@ using System.Linq;
 using CommandLine;
 using RunCsJob;
 
-namespace uLearn.CourseTool
+namespace uLearn.CourseTool.CmdLineOptions
 {
 	[Verb("test", HelpText = "Run tests on course")]
 	class TestCourseOptions : AbstractOptions

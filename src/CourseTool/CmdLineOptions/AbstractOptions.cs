@@ -4,7 +4,7 @@ using System.IO;
 using CommandLine;
 using uLearn.Extensions;
 
-namespace uLearn.CourseTool
+namespace uLearn.CourseTool.CmdLineOptions
 {
 	public abstract class AbstractOptions
 	{
@@ -21,15 +21,15 @@ namespace uLearn.CourseTool
 		[Option('d', "dir", HelpText = "Working directory for the project")]
 		public string Dir
 		{
-			get { return dir ?? Directory.GetCurrentDirectory(); }
-			set { dir = value; }
+			get => dir ?? Directory.GetCurrentDirectory();
+			set => dir = value;
 		}
 
 		[Option('p', "profile", HelpText = "Profile used to work with Edx and uLearn")]
 		public string Profile
 		{
-			get { return profile ?? "default"; }
-			set { profile = value; }
+			get => profile ?? "default";
+			set => profile = value;
 		}
 
 		public string ConfigFile => Dir + "/config.xml";

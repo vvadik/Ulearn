@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CommandLine;
@@ -8,10 +7,10 @@ using uLearn.CourseTool.Json;
 using uLearn.Model.Blocks;
 using uLearn.Model.Edx;
 
-namespace uLearn.CourseTool
+namespace uLearn.CourseTool.CmdLineOptions
 {
-	[Verb("patch-ulearn", HelpText = "Patch Edx course with new slides from uLearn course")]
-	class ULearnPatchOptions : PatchOptions
+	[Verb("olx-patch-from-ulearn", HelpText = "Patch Edx course with new slides from uLearn course")]
+	class OlxPatchFromUlearnOptions : OlxAbstractPatchOptions
 	{
 		public override void Patch(OlxPatcher patcher, Config config, Profile profile, EdxCourse edxCourse)
 		{

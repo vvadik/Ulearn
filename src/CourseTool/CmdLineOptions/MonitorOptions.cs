@@ -1,11 +1,7 @@
-﻿using System.IO;
-using CommandLine;
-using System.Diagnostics;
-using System;
-using System.Reflection;
+﻿using CommandLine;
 using uLearn.CourseTool.Monitoring;
 
-namespace uLearn.CourseTool
+namespace uLearn.CourseTool.CmdLineOptions
 {
 	[Verb("monitor", HelpText = "start small http server to monitor all changes in ulearn course")]
 	class MonitorOptions : AbstractOptions

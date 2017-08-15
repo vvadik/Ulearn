@@ -2,10 +2,6 @@
 <Config>
 	<!-- Name of the organization that you used when creating a course -->
 	<Organization>UrFU</Organization>
-	<!-- Course Number that you used when creating a course -->
-	<CourseNumber>IMCS.b.CS-0093</CourseNumber>
-	<!-- Course Run that you used when creating a course -->
-	<CourseRun>2015</CourseRun>
 	<!-- Lti Id used to access Exercise slides -->
 	<LtiId>edx</LtiId>
 	<!-- Id of corresponding uLearn course -->
@@ -24,11 +20,9 @@
 	<Profiles>
 		<!-- the 'default' profile will be used when patching/converting if not specified -->
 		<Profile name="default">
-			<EdxStudioUrl>https://openedu.urfu.ru:8081</EdxStudioUrl>
 			<UlearnUrl>https://ulearn.me</UlearnUrl>
 		</Profile>
 		<Profile name="dev">
-			<EdxStudioUrl>http://192.168.33.10:18010</EdxStudioUrl>
 			<UlearnUrl>https://localhost:44300</UlearnUrl>
 		</Profile>
 	</Profiles>

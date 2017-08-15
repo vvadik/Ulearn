@@ -22,6 +22,7 @@ namespace uLearn.Model.Edx
 			set { StartDateAsString = value?.ToString("O"); }
 		}
 
+		[XmlIgnore]
 		public SequentialReference[] sequentialReferences;
 
 		[XmlElement("sequential")]

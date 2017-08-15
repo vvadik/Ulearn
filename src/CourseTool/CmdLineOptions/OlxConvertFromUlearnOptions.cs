@@ -6,10 +6,10 @@ using Newtonsoft.Json;
 using uLearn.CourseTool.Json;
 using uLearn.Model.Edx;
 
-namespace uLearn.CourseTool
+namespace uLearn.CourseTool.CmdLineOptions
 {
-	[Verb("convert", HelpText = "Convert uLearn course to Edx course")]
-	class ConvertOptions : AbstractOptions
+	[Verb("olx-convert-from-ulearn", HelpText = "Primary conversion of uLearn course to olx (edx format)")]
+	class OlxConvertFromUlearnOptions : AbstractOptions
 	{
 		[Option('t', "tar-gz", HelpText = "Filepath of course tar.gz file")]
 		public string CourseTarGz { get; set; }

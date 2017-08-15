@@ -6,15 +6,20 @@ namespace uLearn.CourseTool
 	public class Config
 	{
 		public string Organization;
-		public string CourseNumber;
-		public string CourseRun;
 		public string LtiId;
 		public string ULearnCourseId;
 		public string Video;
 		public Profile[] Profiles;
 
+		[XmlIgnore]
+		private string[] ignoredUlearnSlides = new string[0];
+
 		[XmlArrayItem("SlideId")]
-		public string[] IgnoredUlearnSlides = new string[0];
+		public string[] IgnoredUlearnSlides
+		{
+			get => ignoredUlearnSlides;
+			set => ignoredUlearnSlides = value.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+		}
 
 		public bool EmitSequentialsForInstructorNotes { get; set; }
 
@@ -28,8 +33,6 @@ namespace uLearn.CourseTool
 	{
 		[XmlAttribute("name")]
 		public string Name;
-
-		public string EdxStudioUrl;
 		public string UlearnUrl;
 	}
 }
