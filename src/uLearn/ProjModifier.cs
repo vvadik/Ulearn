@@ -71,7 +71,8 @@ namespace uLearn
 
 		public static void SetFilepathItemType(Project proj, string fileName, string type)
 		{
-			proj.Items.Single(i => i.UnevaluatedInclude.Equals(fileName, StringComparison.InvariantCultureIgnoreCase)).ItemType = type;
+			var projectItem = proj.Items.SingleOrDefault(i => i.UnevaluatedInclude.Equals(fileName, StringComparison.InvariantCultureIgnoreCase));
+			projectItem.EnsureNotNull($"{fileName} not found in csproj file. Project from {proj.DirectoryPath}").ItemType = type;
 		}
 
 		private static IEnumerable<string> FindItemNames(Project proj, Func<string, bool> predicate)
