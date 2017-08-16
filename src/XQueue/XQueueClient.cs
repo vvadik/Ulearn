@@ -60,11 +60,12 @@ namespace XQueue
 			};
 
 			var response = await client.PostAsync(loginUrl, new FormUrlEncodedContent(loginData));
-			if (response.IsSuccessStatusCode)
+			if (! response.IsSuccessStatusCode)
 			{
 				log.Warn($"Unexpected response status code for login: {response.StatusCode}");
 				throw new Exception($"Unexpected response status code for login: {response.StatusCode}");
 			}
+			log.Debug($"Login status code: {response.StatusCode}");
 			return response.StatusCode == HttpStatusCode.OK;
 		}
 
@@ -75,19 +76,22 @@ namespace XQueue
 
 		public async Task<XQueueSubmission> GetSubmission(string queueName)
 		{
-			var urlParams = HttpUtility.ParseQueryString(getSubmissionUrl);
+			var getSubmissionsUrl = new Uri(client.BaseAddress, getSubmissionUrl);
+			var uriBuilder = new UriBuilder(getSubmissionsUrl);
+			var urlParams = HttpUtility.ParseQueryString(getSubmissionsUrl.Query);
 			urlParams.Add("queue_name", queueName);
 			urlParams.Add("block", "true");
-
-			log.Info($"Try to get new submission from xqueue {urlParams}");
+			uriBuilder.Query = urlParams.ToString();
+			
 			HttpResponseMessage response;
 			try
 			{
-				response = await client.GetAsync(urlParams.ToString());
+				log.Info($"Try to get submission from queue {queueName} from url {uriBuilder}");
+				response = await client.GetAsync(uriBuilder.ToString());
 			}
 			catch (Exception e)
 			{
-				log.Warn($"Didn't get submission from xqueue: {e.Message}", e.InnerException);
+				log.Warn($"Can't get submission from xqueue {queueName}: {e.Message}", e.InnerException);
 				return null;
 			}
 
@@ -95,7 +99,12 @@ namespace XQueue
 			{
 				try
 				{
-					return (await response.Content.ReadAsStringAsync()).DeserializeJson<XQueueSubmission>();
+					var content = await response.Content.ReadAsStringAsync();
+					log.Debug($"XQueue returned following content: {content}");
+					var parsedResponse = content.DeserializeJson<XQueueResponse>();
+					if (parsedResponse.ReturnCode != 0)
+						return null;
+					return parsedResponse.Content.DeserializeJson<XQueueSubmission>();
 				}
 				catch (Exception e)
 				{
@@ -119,17 +128,21 @@ namespace XQueue
 			return await FuncUtils.TrySeveralTimesAsync(() => TryPutResult(result), 5, () => Task.Delay(TimeSpan.FromMilliseconds(1)));
 		}
 
-		public async Task<bool> TryPutResult(XQueueResult result)
+		private async Task<bool> TryPutResult(XQueueResult result)
 		{
 			var content = JsonConvert.SerializeObject(result);
-			var response = await client.PostAsync(putResultUrl, new StringContent(content));
-			if (response.IsSuccessStatusCode)
+			log.Info($"Try to put submission checking result into xqueue. Url: {putResultUrl}, content: {content}");
+			var formContent = new Dictionary<string, string> {{"xqueue_header", result.header}, {"xqueue_body", result.body}};
+			var response = await client.PostAsync(putResultUrl, new FormUrlEncodedContent(formContent));
+			if (! response.IsSuccessStatusCode)
 			{
 				log.Warn($"Unexpected response status code while putting results to xqueue: {response.StatusCode}");
 				throw new Exception($"Unexpected response status code while putting results to xqueue: {response.StatusCode}");
 			}
-
-			return true;
+			var responseContent = await response.Content.ReadAsStringAsync();
+			log.Info($"XQueue returned following content: {responseContent}");
+			var parsedResponse = responseContent.DeserializeJson<XQueueResponse>();
+			return parsedResponse.ReturnCode == 0;
 		}
 	}
 }

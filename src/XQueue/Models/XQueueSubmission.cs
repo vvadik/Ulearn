@@ -1,19 +1,45 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using uLearn;
+using uLearn.Extensions;
 
 namespace XQueue.Models
 {
 	[DataContract]
+	public class XQueueResponse
+	{
+		[DataMember(Name = "return_code")]
+		public int ReturnCode { get; set; }
+
+		[DataMember(Name = "content")]
+		public string Content { get; set; }
+	}
+
+	[DataContract]
 	public class XQueueSubmission
 	{
 		[DataMember(Name = "xqueue_header")]
-		public XQueueHeader Header { get; set; }
+		public string header { get; set; }
 
 		[DataMember(Name = "xqueue_files")]
 		public Dictionary<string, string> Files { get; set; }
 
 		[DataMember(Name = "xqueue_body")]
-		public XQueueSubmissionBody Body { get; set; }
+		public string body { get; set; }
+
+		[IgnoreDataMember]
+		public XQueueHeader Header
+		{
+			get => header.DeserializeJson<XQueueHeader>();
+			set => header = value.JsonSerialize();
+		}
+
+		[IgnoreDataMember]
+		public XQueueSubmissionBody Body
+		{
+			get => body.DeserializeJson<XQueueSubmissionBody>();
+			set => body = value.JsonSerialize();
+		}
 	}
 
 	[DataContract]

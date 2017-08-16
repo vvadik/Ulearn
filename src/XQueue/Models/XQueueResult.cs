@@ -1,4 +1,6 @@
 ﻿using System.Runtime.Serialization;
+using uLearn;
+using uLearn.Extensions;
 
 namespace XQueue.Models
 {
@@ -6,10 +8,24 @@ namespace XQueue.Models
 	public class XQueueResult
 	{
 		[DataMember(Name = "xqueue_header")]
-		public XQueueHeader Header { get; set; }
+		public string header { get; set; }
 
 		[DataMember(Name = "xqueue_body")]
-		public XQueueResultBody Body { get; set; }
+		public string body { get; set; }
+
+		[IgnoreDataMember]
+		public XQueueHeader Header
+		{
+			get => header.DeserializeJson<XQueueHeader>();
+			set => header = value.JsonSerialize();
+		}
+
+		[IgnoreDataMember]
+		public XQueueResultBody Body
+		{
+			get => body.DeserializeJson<XQueueResultBody>();
+			set => body = value.JsonSerialize();
+		}
 	}
 
 	[DataContract]

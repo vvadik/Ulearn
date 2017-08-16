@@ -432,6 +432,10 @@
     <Compile Include="Migrations\201706291400295_AddFeedNotificationTransport.Designer.cs">
       <DependentUpon>201706291400295_AddFeedNotificationTransport.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201708161353527_AddIsResultSentForXQueueExerciseSubmission.cs" />
+    <Compile Include="Migrations\201708161353527_AddIsResultSentForXQueueExerciseSubmission.Designer.cs">
+      <DependentUpon>201708161353527_AddIsResultSentForXQueueExerciseSubmission.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -707,6 +711,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201706291400295_AddFeedNotificationTransport.resx">
       <DependentUpon>201706291400295_AddFeedNotificationTransport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708161353527_AddIsResultSentForXQueueExerciseSubmission.resx">
+      <DependentUpon>201708161353527_AddIsResultSentForXQueueExerciseSubmission.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -1,33 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using Database;
 using Database.DataContexts;
 using log4net;
+using log4net.Config;
 using uLearn;
 using uLearn.Extensions;
 
 namespace XQueueWatcher
 {
-	class Program
+	public class Program
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
+		private static readonly CourseManager courseManager = WebCourseManager.Instance;
+		public CancellationTokenSource CancellationTokenSource { get; private set; }
 
 		static void Main(string[] args)
 		{
+			new Program().StartXQueueWatchers();
+		}
+
+		public void StartXQueueWatchers()
+		{
+			XmlConfigurator.Configure();
+
 			var db = new ULearnDb();
-			var xQueueRepo = new XQueueRepo(db, WebCourseManager.Instance);
+			var xQueueRepo = new XQueueRepo(db, courseManager);
 			var dbWatchers = xQueueRepo.GetXQueueWatchers();
 
 			var tasks = new List<Task>();
 			foreach (var dbWatcher in dbWatchers)
 			{
-				var watcher = new Watcher(dbWatcher);
+				log.Info($"Starting watcher '{dbWatcher.Name}' ({dbWatcher.BaseUrl}, queue {dbWatcher.QueueName})");
+				var watcher = new Watcher(dbWatcher, courseManager);
 				watcher.OnSubmission += OnSubmission;
 				tasks.Add(watcher.Loop());
 			}
-			Task.WaitAll(tasks.ToArray());
+
+			CancellationTokenSource = new CancellationTokenSource();
+			Task.WaitAll(tasks.ToArray(), CancellationTokenSource.Token);
 		}
 
 		private static void OnSubmission(object sender, SubmissionEventArgs args)
@@ -37,7 +51,7 @@ namespace XQueueWatcher
 				return;
 
 			var db = new ULearnDb();
-			var xQueueRepo = new XQueueRepo(db, WebCourseManager.Instance);
+			var xQueueRepo = new XQueueRepo(db, courseManager);
 			var submission = args.Submission;
 			GraderPayload graderPayload;
 			try

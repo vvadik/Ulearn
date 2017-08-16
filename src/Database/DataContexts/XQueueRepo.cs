@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -64,9 +65,24 @@ namespace Database.DataContexts
 				SubmissionId = submission.Id,
 				WatcherId = watcher.Id,
 				XQueueHeader = xQueueHeader,
+				IsResultSent = false,
 			});
 
 			await db.SaveChangesAsync().ConfigureAwait(false);
+		}
+
+		public async Task MarkXQueueSubmissionThatResultIsSent(XQueueExerciseSubmission submission)
+		{
+			submission.IsResultSent = true;
+			await db.SaveChangesAsync().ConfigureAwait(false);
+		}
+
+		public List<XQueueExerciseSubmission> GetXQueueSubmissionsReadyToSentResults(XQueueWatcher watcher)
+		{
+			return db.XQueueExerciseSubmissions
+					.Include(s => s.Submission.AutomaticChecking)
+					.Where(s => s.WatcherId == watcher.Id && !s.IsResultSent && s.Submission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Done)
+					.ToList();
 		}
 	}
 }
