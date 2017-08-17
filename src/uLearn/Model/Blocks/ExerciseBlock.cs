@@ -59,9 +59,7 @@ namespace uLearn.Model.Blocks
 		{
 			get
 			{
-				if (Hints == null)
-					return new List<string>();
-				return Hints.Select(h => h.Trim()).ToList();
+				return Hints?.Select(h => h.RemoveCommonNesting()).ToList() ?? new List<string>();
 			}
 			set { Hints = value; }
 		}
