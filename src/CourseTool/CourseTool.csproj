@@ -137,13 +137,13 @@
   <ItemGroup>
     <Compile Include="CmdLineOptions\AbstractOptions.cs" />
     <Compile Include="ArchiveManager.cs" />
-    <Compile Include="BaseValidator.cs" />
+    <Compile Include="Validating\BaseValidator.cs" />
     <Compile Include="CmdLineOptions\OlxDesquashChaptersOptions.cs" />
     <Compile Include="CmdLineOptions\OlxGcOptions.cs" />
     <Compile Include="CmdLineOptions\OlxPackOptions.cs" />
     <Compile Include="CmdLineOptions\OlxSetChapterStartDatesOptions.cs" />
     <Compile Include="CmdLineOptions\OlxSquashChaptersOptions.cs" />
-    <Compile Include="CourseValidator.cs" />
+    <Compile Include="Validating\CourseValidator.cs" />
     <Compile Include="Monitoring\Monitor.cs" />
     <Compile Include="Monitoring\PreviewHttpServer.cs" />
     <Compile Include="Monitoring\SlideRenderer.cs" />
@@ -157,7 +157,8 @@
     </Compile>
     <Compile Include="Converter.cs" />
     <Compile Include="Credentials.cs" />
-    <Compile Include="ProjectExerciseValidator.cs" />
+    <Compile Include="Validating\Indentation\IndentsValidator.cs" />
+    <Compile Include="Validating\ProjectExerciseValidator.cs" />
     <Compile Include="EdxInteraction.cs" />
     <Compile Include="Json\Video.cs" />
     <Compile Include="Json\VideoHistory.cs" />

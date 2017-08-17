@@ -212,8 +212,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSharp\CodeTestCase.cs" />
     <Compile Include="CSharp\CourseValidator_ReportError_should.cs" />
     <Compile Include="CSharp\CourseValidator_ReportWarning_should.cs" />
+    <Compile Include="CSharp\IndentsValidation\IndentsTestHelper.cs" />
+    <Compile Include="CSharp\IndentsValidation\IndentsValidator_Should_NotReport.cs" />
+    <Compile Include="CSharp\IndentsValidation\IndentsValidator_Should_Report.cs" />
     <Compile Include="CSharp\LineLengthChecker_should.cs" />
     <Compile Include="CSharp\NamingChecker_should.cs" />
     <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.WrongAnswer.27.cs">
