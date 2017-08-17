@@ -33,7 +33,7 @@ namespace XQueueWatcher
 				var xQueueRepo = GetNewXQueueRepo();
 				var dbWatchers = xQueueRepo.GetXQueueWatchers();
 
-				var tasks = dbWatchers.Select(GetAndProcessSubmissionFromXQueue);
+				var tasks = dbWatchers.Select(SafeGetAndProcessSubmissionFromXQueue);
 				
 				Task.WaitAll(tasks.ToArray(), cancellationToken);
 				if (cancellationToken.IsCancellationRequested)
@@ -48,9 +48,22 @@ namespace XQueueWatcher
 			return new XQueueRepo(db, courseManager);
 		}
 
+		private async Task SafeGetAndProcessSubmissionFromXQueue(Database.Models.XQueueWatcher watcher)
+		{
+			try
+			{
+				await GetAndProcessSubmissionFromXQueue(watcher);
+			}
+			catch (Exception e)
+			{
+				log.Error(e);
+			}
+		}
+
 		private async Task GetAndProcessSubmissionFromXQueue(Database.Models.XQueueWatcher watcher)
 		{
 			var client = new XQueueClient(watcher.BaseUrl, watcher.UserName, watcher.Password);
+			
 			if (!await client.Login())
 			{
 				log.Error($"Can\'t login to xqueue {watcher.QueueName} ({watcher.BaseUrl}, user {watcher.UserName})");
@@ -63,7 +76,24 @@ namespace XQueueWatcher
 
 			log.Info($"Got new submission in xqueue {watcher.QueueName}: {submission.JsonSerialize()}");
 
-			await ProcessSubmissionFromXQueue(watcher, submission);
+			try
+			{
+				await ProcessSubmissionFromXQueue(watcher, submission);
+			}
+			catch (Exception e)
+			{
+				log.Error($"Error occurred while processing submission from xqueue: {e.Message}", e);
+				await client.PutResult(new XQueueResult
+				{
+					header = submission.header,
+					Body = new XQueueResultBody
+					{
+						Score = 0,
+						IsCorrect = false,
+						Message = "Sorry, we can't check your code now. Please retry or contact us at support@ulearn.me",
+					}
+				});
+			}
 		}
 
 		private async Task ProcessSubmissionFromXQueue(Database.Models.XQueueWatcher watcher, XQueueSubmission submission)
