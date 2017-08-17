@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +9,8 @@ using log4net;
 using log4net.Config;
 using uLearn;
 using uLearn.Extensions;
+using XQueue;
+using XQueue.Models;
 
 namespace XQueueWatcher
 {
@@ -16,43 +18,57 @@ namespace XQueueWatcher
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
 		private static readonly CourseManager courseManager = WebCourseManager.Instance;
-		public CancellationTokenSource CancellationTokenSource { get; private set; }
 
 		static void Main(string[] args)
 		{
-			new Program().StartXQueueWatchers();
+			new Program().StartXQueueWatchers(new CancellationToken());
 		}
 
-		public void StartXQueueWatchers()
+		public void StartXQueueWatchers(CancellationToken cancellationToken)
 		{
 			XmlConfigurator.Configure();
 
-			var db = new ULearnDb();
-			var xQueueRepo = new XQueueRepo(db, courseManager);
-			var dbWatchers = xQueueRepo.GetXQueueWatchers();
-
-			var tasks = new List<Task>();
-			foreach (var dbWatcher in dbWatchers)
+			while (true)
 			{
-				log.Info($"Starting watcher '{dbWatcher.Name}' ({dbWatcher.BaseUrl}, queue {dbWatcher.QueueName})");
-				var watcher = new Watcher(dbWatcher, courseManager);
-				watcher.OnSubmission += OnSubmission;
-				tasks.Add(watcher.Loop());
-			}
+				var xQueueRepo = GetNewXQueueRepo();
+				var dbWatchers = xQueueRepo.GetXQueueWatchers();
 
-			CancellationTokenSource = new CancellationTokenSource();
-			Task.WaitAll(tasks.ToArray(), CancellationTokenSource.Token);
+				var tasks = dbWatchers.Select(GetAndProcessSubmissionFromXQueue);
+				
+				Task.WaitAll(tasks.ToArray(), cancellationToken);
+				if (cancellationToken.IsCancellationRequested)
+					break;
+			}
 		}
 
-		private static void OnSubmission(object sender, SubmissionEventArgs args)
+		/* We need to create new database connection each time for disabling EF's caching */
+		private static XQueueRepo GetNewXQueueRepo()
 		{
-			var watcher = sender as Watcher;
-			if (watcher == null)
+			var db = new ULearnDb();
+			return new XQueueRepo(db, courseManager);
+		}
+
+		private async Task GetAndProcessSubmissionFromXQueue(Database.Models.XQueueWatcher watcher)
+		{
+			var client = new XQueueClient(watcher.BaseUrl, watcher.UserName, watcher.Password);
+			if (!await client.Login())
+			{
+				log.Error($"Can\'t login to xqueue {watcher.QueueName} ({watcher.BaseUrl}, user {watcher.UserName})");
+				return;
+			}
+
+			var submission = await client.GetSubmission(watcher.QueueName);
+			if (submission == null)
 				return;
 
-			var db = new ULearnDb();
-			var xQueueRepo = new XQueueRepo(db, courseManager);
-			var submission = args.Submission;
+			log.Info($"Got new submission in xqueue {watcher.QueueName}: {submission.JsonSerialize()}");
+
+			await ProcessSubmissionFromXQueue(watcher, submission);
+		}
+
+		private async Task ProcessSubmissionFromXQueue(Database.Models.XQueueWatcher watcher, XQueueSubmission submission)
+		{
+			var xQueueRepo = GetNewXQueueRepo();
 			GraderPayload graderPayload;
 			try
 			{
@@ -66,13 +82,13 @@ namespace XQueueWatcher
 			}
 
 			log.Info($"Add new xqueue submission for course {graderPayload.CourseId}, slide {graderPayload.SlideId}");
-			xQueueRepo.AddXQueueSubmission(
-				watcher.watcher,
+			await xQueueRepo.AddXQueueSubmission(
+				watcher,
 				submission.Header.JsonSerialize(),
 				graderPayload.CourseId,
 				graderPayload.SlideId,
 				submission.Body.StudentResponse
-			).Wait();
+			);
 		}
 	}
 

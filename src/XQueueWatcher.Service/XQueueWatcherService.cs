@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
+﻿using System.ServiceProcess;
 using System.Threading;
-using System.Threading.Tasks;
 using log4net;
-using XQueueWatcher;
 
 namespace XQueueWatcher.Service
 {
@@ -19,6 +10,7 @@ namespace XQueueWatcher.Service
 
 		private XQueueWatcher.Program program;
 		private Thread thread;
+		private CancellationTokenSource cancellationTokenSource;
 
 		public XQueueWatcherService()
 		{
@@ -29,7 +21,8 @@ namespace XQueueWatcher.Service
 		{
 			program = new XQueueWatcher.Program();
 			log.Info("Запускаю сервис проверки решений из внешних XQueue");
-			thread = new Thread(() => program.StartXQueueWatchers())
+			cancellationTokenSource = new CancellationTokenSource();
+			thread = new Thread(() => program.StartXQueueWatchers(cancellationTokenSource.Token))
 			{
 				Name = "XQueueWatcher service thread",
 				IsBackground = true,
@@ -41,7 +34,7 @@ namespace XQueueWatcher.Service
 		{
 			log.Info("Пробую остановить сервис проверки решений из внешних XQueue");
 
-			program.CancellationTokenSource.Cancel();
+			cancellationTokenSource.Cancel();
 			if (!thread.Join(10000))
 			{
 				log.Info($"Вызываю Abort() для потока {thread.Name}");

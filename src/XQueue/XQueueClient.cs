@@ -46,12 +46,15 @@ namespace XQueue
 		{
 		}
 
+		public async Task<bool> Login()
+		{
+			return await FuncUtils.TrySeveralTimesAsync(TryLogin, 5, () => Task.Delay(TimeSpan.FromSeconds(1)));
+		}
+
 		private async Task<bool> TryLogin()
 		{
 			if (string.IsNullOrEmpty(username))
 				return true;
-
-			log.Info($"Try to login in xqueue {loginUrl} with username \"{username}\" and password \"{password.MaskAsSecret()}\"");
 
 			var loginData = new Dictionary<string, string>
 			{
@@ -62,16 +65,11 @@ namespace XQueue
 			var response = await client.PostAsync(loginUrl, new FormUrlEncodedContent(loginData));
 			if (! response.IsSuccessStatusCode)
 			{
+				log.Info($"I tried to login in xqueue {loginUrl} with username \"{username}\" and password \"{password.MaskAsSecret()}\"");
 				log.Warn($"Unexpected response status code for login: {response.StatusCode}");
 				throw new Exception($"Unexpected response status code for login: {response.StatusCode}");
 			}
-			log.Debug($"Login status code: {response.StatusCode}");
 			return response.StatusCode == HttpStatusCode.OK;
-		}
-
-		public async Task<bool> Login()
-		{
-			return await FuncUtils.TrySeveralTimesAsync(TryLogin, 5, () => Task.Delay(TimeSpan.FromSeconds(1)));
 		}
 
 		public async Task<XQueueSubmission> GetSubmission(string queueName)
@@ -86,7 +84,6 @@ namespace XQueue
 			HttpResponseMessage response;
 			try
 			{
-				log.Info($"Try to get submission from queue {queueName} from url {uriBuilder}");
 				response = await client.GetAsync(uriBuilder.ToString());
 			}
 			catch (Exception e)
@@ -100,7 +97,6 @@ namespace XQueue
 				try
 				{
 					var content = await response.Content.ReadAsStringAsync();
-					log.Debug($"XQueue returned following content: {content}");
 					var parsedResponse = content.DeserializeJson<XQueueResponse>();
 					if (parsedResponse.ReturnCode != 0)
 						return null;

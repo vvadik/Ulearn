@@ -151,28 +151,44 @@ namespace uLearn.Web.Controllers
 			var xQueueSubmission = xQueueRepo.FindXQueueSubmission(submission);
 			if (xQueueSubmission == null)
 				return;
+				
+			var watcher = xQueueSubmission.Watcher;
+			var client = new XQueueClient(watcher.BaseUrl, watcher.UserName, watcher.Password);
+			await client.Login();
+			if (await SendSubmissionResultsToQueue(client, xQueueSubmission))
+				await xQueueRepo.MarkXQueueSubmissionThatResultIsSent(xQueueSubmission);
+		}
 
-			var checking = xQueueSubmission.Submission.AutomaticChecking;
+		private async Task<bool> SendSubmissionResultsToQueue(XQueueClient client, XQueueExerciseSubmission submission)
+		{
+			return await FuncUtils.TrySeveralTimesAsync(() => TrySendSubmissionResultsToQueue(client, submission), 5, () => Task.Delay(TimeSpan.FromMilliseconds(1)));
+		}
+
+		private async Task<bool> TrySendSubmissionResultsToQueue(XQueueClient client, XQueueExerciseSubmission submission)
+		{
+			var checking = submission.Submission.AutomaticChecking;
+
+			var courseManager = WebCourseManager.Instance;
 			var slide = courseManager.FindCourse(checking.CourseId)?.FindSlideById(checking.SlideId) as ExerciseSlide;
 			if (slide == null)
 			{
 				log.Warn($"Can't find exercise slide {checking.SlideId} in course {checking.CourseId}. Exit");
-				return;
+				return false;
 			}
+
 			var score = (double)checking.Score / slide.Exercise.CorrectnessScore;
 			if (score > 1)
 				score = 1;
 
-			var watcher = xQueueSubmission.Watcher;
-			var client = new XQueueClient(watcher.BaseUrl, watcher.UserName, watcher.Password);
-			await client.PutResult(new XQueueResult
+			var message = checking.IsCompilationError ? checking.CompilationError.Text : checking.Output.Text;
+			return await client.PutResult(new XQueueResult
 			{
-				Header = xQueueSubmission.XQueueHeader.DeserializeJson<XQueueHeader>(),
+				header = submission.XQueueHeader,
 				Body = new XQueueResultBody
 				{
 					IsCorrect = checking.IsRightAnswer,
+					Message = message,
 					Score = score,
-					Message = checking.CompilationError.Text + checking.Output.Text,
 				}
 			});
 		}
