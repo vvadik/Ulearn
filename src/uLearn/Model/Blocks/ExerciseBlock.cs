@@ -57,7 +57,12 @@ namespace uLearn.Model.Blocks
 
 		public List<string> HintsMd
 		{
-			get { return Hints = Hints ?? new List<string>(); }
+			get
+			{
+				if (Hints == null)
+					return new List<string>();
+				return Hints.Select(h => h.Trim()).ToList();
+			}
 			set { Hints = value; }
 		}
 
