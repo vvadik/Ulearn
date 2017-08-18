@@ -1,15 +1,12 @@
 ﻿    using System;
 
-  namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
+  namespace Incorrect
 {
 	public class SpaceIndentsNotConsistent
 	{
-		public static class Hello
+		public static void Main()
 		{
-			public static void Main()
-			{
-				Console.WriteLine();
-			}
+			Console.WriteLine();
 		}
 	}
 }

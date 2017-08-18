@@ -1,21 +1,32 @@
-using uLearn.Model.Blocks;
+using System;
+using System.Linq;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace uLearn
 {
-	public class IndentsValidator : BaseValidator
+	public class IndentsValidator : CSharpSyntaxWalker
 	{
 		public void ReportWarningIfIndentsNotValidated(string code)
 		{
+			var tree = CSharpSyntaxTree.ParseText(code);
+			Visit(tree.GetRoot());
 		}
 
-		private void ValidateAsSingleFileExerciseBlock()
+		public override void Visit(SyntaxNode node)
 		{
-			throw new System.NotImplementedException();
+			Console.WriteLine(node);
+			Console.WriteLine();
+			base.Visit(node);
 		}
 
-		private void ValidateAsProjectExerciseBlock()
+		public override void VisitLeadingTrivia(SyntaxToken token)
 		{
-			throw new System.NotImplementedException();
+			//Console.WriteLine(token.GetAllTrivia().Select(t => $"{t.ToString()} "));
+			token.GetAllTrivia().Last().IsKind(SyntaxKind.WhitespaceTrivia);
+			base.VisitLeadingTrivia(token);
 		}
+
+		public event Action<string> Warning;
 	}
 }

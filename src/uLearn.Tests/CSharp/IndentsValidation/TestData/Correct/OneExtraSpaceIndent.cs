@@ -1,15 +1,12 @@
 ﻿    using System;
 
-    namespace uLearn.CSharp.IndentsValidation.TestData.Correct
+    namespace Correct
     {
         public class OneExtraSpaceIndent
         {
-            public static class Hello
+            public static void Main()
             {
-                public static void Main()
-                {
-                    Console.WriteLine();
-                }
+                Console.WriteLine();
             }
         }
 }
