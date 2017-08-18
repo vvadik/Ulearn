@@ -218,18 +218,21 @@
     <Compile Include="CSharp\IndentsValidation\IndentsTestHelper.cs" />
     <Compile Include="CSharp\IndentsValidation\IndentsValidator_Should_NotReport.cs" />
     <Compile Include="CSharp\IndentsValidation\IndentsValidator_Should_Report.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Correct\OneExtraSpaceIndent.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Correct\NoExtraSpaceIndents.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Correct\OneExtraTabIndent.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Correct\NoExtraTabIndents.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\MissingSpaceIndent.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Correct\ChildrenAlwaysIntended\BaseTypeDeclarationSyntaxIntendsChildrenAlways.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Correct\ChildrenNeverIntended\ChildrenOfCompilationUnitAreNeverIntented.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Correct\ChildrenSometimesIntended\IfOpenBraceTokenHasNoEndOfLineTrivia\CSharpSyntaxNodeDoesntIntendChildren.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Correct\ChildrenAlwaysIntended\NamespaceDeclarationSyntaxIntendsChildrenAlways.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Correct\ChildrenSometimesIntended\IfOpenBraceTokenHasEndOfLineTrivia\CSharpSyntaxNodeIntendsChildren.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\NoAnyIndents.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\MissingNestingSpaceIndent.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\RedundantSpaceIndent.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\SpaceIndentsNotConsistent.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\TabMixedWithSpace.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\RedundantTabIndent.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\MissingTabIndent.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\MissingNestingTabIndent.cs" />
     <Compile Include="CSharp\LineLengthChecker_should.cs" />
     <Compile Include="CSharp\NamingChecker_should.cs" />
+    <Content Include="CSharp\IndentsValidation\TestData\rules.txt" />
     <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.WrongAnswer.27.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

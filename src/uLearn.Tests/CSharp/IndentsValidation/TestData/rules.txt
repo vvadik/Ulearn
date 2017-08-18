@@ -1,0 +1,31 @@
+﻿* Ругаться на пустые строки в начале. В т.ч. с табами, пробелами.
+
+* Ограничить любой отступ. Н-р, 1 таб и 4 пробела - дефолт.
+
+* Ругаться на помесь табов и space. Можно слайд, можно в текст ошибки писать про ctrl+shift+l ???
+
+* Разрешать недефолтное количество пробелов в отступах. Размер отступа не меняется, ругаться
+
+* Универсальное правило:
+ - Если есть OpenBraceToken с родителем А и у OpenBraceToken есть Leading EndOfLineTrivia, 
+	все потомки А после OpenBraceToken должны получить отступ. 
+	Отступ убирается, когда будет найден CloseBraceToken с родителем А. (рекурсивная штука)
+
+* Ноды, у первого потомка которых не должно быть Lead Trivia (это все те, у кого Parent - CompilationUnitSyntax):
+ - UsingDirectiveSyntax
+ - NamespaceDeclaration
+ - AttributeList, если Parent - CompilationUnitSyntax
+ - ClassDeclaration, если Parent - CompilationUnitSyntax
+
+* Ноды, у детей которых (после OpenBraceToken) отступ должен быть всегда увеличен:
+ - NamespaceDeclarationSyntax
+ - BaseTypeDeclarationSyntax
+
+* Ноды, у детей которых (после OpenBraceToken) условно должен быть увеличен отступ:
+ - BlockSyntax должен увеличивать всегда, но не обязан, когда он содержит всего один StatementSyntax 
+	(н-р, `get { return null; }`, `set { a = value; }`)
+ - AccessorListSyntax должен увеличивать всегда, но не обязан, когда 
+	у его геттеров/сеттеров (AccessorDeclarationSyntax) в потомках нет тела, т.е. нет BlockSyntax
+
+* В методах в ParameterListSyntax или ArgumentListSyntax ругаться, если в переносах параметров/аргументов
+  отсутпов меньше, чем у объявления.

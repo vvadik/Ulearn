@@ -7,24 +7,43 @@ namespace uLearn
 {
 	public class IndentsValidator : CSharpSyntaxWalker
 	{
-		public void ReportWarningIfIndentsNotValidated(string code)
+		private readonly SyntaxTree tree;
+		private readonly SyntaxTrivia nestingLeadingTrivia;
+		private SyntaxNode root => tree.GetRoot();
+
+		public IndentsValidator(string code, SyntaxWalkerDepth depth = SyntaxWalkerDepth.Node)
+			: base(depth)
 		{
-			var tree = CSharpSyntaxTree.ParseText(code);
+			tree = CSharpSyntaxTree.ParseText(code);
+			nestingLeadingTrivia = root.GetLeadingTrivia().LastOrDefault();
+		}
+
+		public void ReportFirstWarningIfIndentsNotValidated()
+		{
 			Visit(tree.GetRoot());
 		}
 
 		public override void Visit(SyntaxNode node)
 		{
-			Console.WriteLine(node);
-			Console.WriteLine();
+			if (ReportIfCurrentNodeDoesntHaveNestingLeadingTrivia(node))
+				return;
 			base.Visit(node);
 		}
 
-		public override void VisitLeadingTrivia(SyntaxToken token)
+		private bool ReportIfCurrentNodeDoesntHaveNestingLeadingTrivia(SyntaxNode node)
 		{
-			//Console.WriteLine(token.GetAllTrivia().Select(t => $"{t.ToString()} "));
-			token.GetAllTrivia().Last().IsKind(SyntaxKind.WhitespaceTrivia);
-			base.VisitLeadingTrivia(token);
+			if (node.IsKind(SyntaxKind.CompilationUnit) ||
+				node.IsKind(SyntaxKind.IdentifierName))
+				return false;
+			var currentNodeLeadingTrivia = node.GetLeadingTrivia();
+			if (currentNodeLeadingTrivia.LastOrDefault() != nestingLeadingTrivia)
+			{
+				var nestingIndentline = tree.GetLineSpan(root.Span).Span.Start.Line;
+				var wrongIndentline = tree.GetLineSpan(node.Span).Span.Start.Line;
+				Warning?.Invoke($"Line {wrongIndentline} has no nesting indent as at line {nestingIndentline}");
+				return true;
+			}
+			return false;
 		}
 
 		public event Action<string> Warning;
