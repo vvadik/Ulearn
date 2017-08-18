@@ -1,6 +1,8 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 using FluentAssertions;
 using NUnit.Framework;
+using uLearn.Extensions;
 
 namespace uLearn.CSharp
 {
@@ -21,59 +23,47 @@ namespace uLearn.CSharp
 		{
 			validatorOut.Clear();
 		}
-
 		private static string notConsistentMsg = "Not consistent indentation between lines: 0, 1";
 
-		public static CodeTestCase[] notConsistentindents =
+		public static CodeTestCase[] incorrectTestCases =
 		{
 			new CodeTestCase
 			{
-				Name = "missing tab indent",
-				Code = @"	using System;
-namespace uLearn.CSharp",
+				FileName = "MissingTabIndent",
 				Warning = notConsistentMsg
 			},
 			new CodeTestCase
 			{
-				Name = "missing space indent",
-				Code = @"	using System;
-    namespace uLearn.CSharp",
+				FileName = "MissingSpaceIndent",
 				Warning = notConsistentMsg
 			},
 			new CodeTestCase
 			{
-				Name = "redundant tab indent",
-				Code = @"using System;
-	namespace uLearn.CSharp",
+				FileName = "RedundantTabIndent",
 				Warning = notConsistentMsg
 			},
 			new CodeTestCase
 			{
-				Name = "redundant space indent",
-				Code = @"using System;
-    namespace uLearn.CSharp",
+				FileName = "RedundantSpaceIndent",
 				Warning = notConsistentMsg
 			},
 			new CodeTestCase
 			{
-				Name = "tab mixed with space",
-				Code = @"	using System;
-    namespace uLearn.CSharp",
+				FileName = "TabMixedWithSpace",
 				Warning = notConsistentMsg
 			},
 			new CodeTestCase
 			{
-				Name = "space indents not consistent",
-				Code = @"    using System;
-  namespace uLearn.CSharp",
+				FileName = "SpaceIndentsNotConsistent",
 				Warning = notConsistentMsg
 			},
 		};
 
-		[TestCaseSource(nameof(notConsistentindents))]
-		public void On_NotConsistentindents(CodeTestCase testCase)
+		[TestCaseSource(nameof(incorrectTestCases))]
+		public void On_IncorrectIndents(CodeTestCase testCase)
 		{
-			indentsValidator.ReportWarningIfIndentsNotValidated(testCase.Code);
+			var code = IndentsTestHelper.IncorrectTestDataDir.GetFiles($"{testCase.FileName}.cs").Single().ContentAsUtf8();
+			indentsValidator.ReportWarningIfIndentsNotValidated(code);
 			validatorOut.ToString().Should().Be(testCase.Warning);
 		}
 	}

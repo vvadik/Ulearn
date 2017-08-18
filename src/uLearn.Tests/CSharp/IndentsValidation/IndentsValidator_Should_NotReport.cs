@@ -1,6 +1,8 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 using FluentAssertions;
 using NUnit.Framework;
+using uLearn.Extensions;
 
 namespace uLearn.CSharp
 {
@@ -22,88 +24,13 @@ namespace uLearn.CSharp
 			validatorOut.Clear();
 		}
 
-		public static CodeTestCase[] consistentIndents =
-		{
-			new CodeTestCase
-			{
-				Name = "no extra tabs indents",
-				Code = @"using System;
-namespace uLearn.CSharp
-{
-	public static class Hello
-	{
-		public static void Main()
-		{
-			Console.WriteLine("""");
-		}
-	}
-}"
-			},
-			new CodeTestCase
-			{
-				Name = "no extra spaces indents",
-				Code = @"using System;
-namespace uLearn.CSharp
-{
-    public static class Hello
-    {
-        public static void Main()
-        {
-            Console.WriteLine();
-        }
-    }
-}"
-			},
-			new CodeTestCase
-			{
-				Name = "extra empty line",
-				Code = @"using System;
+		public static string[] correctFilenames => IndentsTestHelper.CorrectTestDataDir.GetFiles().Select(f => f.Name).ToArray();
 
-namespace uLearn.CSharp"
-			},
-			new CodeTestCase
-			{
-				Name = "extra line with tabs and spaces",
-				Code = @"using System;
-		   
-namespace uLearn.CSharp"
-			},
-			new CodeTestCase
-			{
-				Name = "one extra tab indent",
-				Code = @"	using System;
-	namespace uLearn.CSharp
-	{
-		public static class Hello
+		[TestCaseSource(nameof(correctFilenames))]
+		public void On_CorrectIndents(string filename)
 		{
-			public static void Main()
-			{
-				Console.WriteLine();
-			}
-		}
-	}"
-			},
-			new CodeTestCase
-			{
-				Name = "one extra spaces indent",
-				Code = @"        using System;
-        namespace uLearn.CSharp
-        {
-            public static class Hello
-            {
-                public static void Main()
-                {
-                    Console.WriteLine();
-                }
-        }
-    }"
-			}
-		};
-
-		[TestCaseSource(nameof(consistentIndents))]
-		public void On_ConsistentIndents(CodeTestCase testCase)
-		{
-			indentsValidator.ReportWarningIfIndentsNotValidated(testCase.Code);
+			var code = IndentsTestHelper.CorrectTestDataDir.GetFiles(filename).Single().ContentAsUtf8();
+			indentsValidator.ReportWarningIfIndentsNotValidated(code);
 			validatorOut.ToString().Should().BeEmpty();
 		}
 	}
