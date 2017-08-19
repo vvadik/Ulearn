@@ -217,7 +217,7 @@
     <Compile Include="CSharp\IndentsValidation\IndentsTestHelper.cs" />
     <Compile Include="CSharp\IndentsValidation\IndentsValidator_Should.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\BaseTypesChildrenAlwaysIndented.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Correct\BlockChildrenMightBeNotIndented.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Correct\BlockChildrenNotIndentedInAccessors.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\CompilationUnitChildrenNeverIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\BlockChildrenIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\ContentOfBraceTokensKeepsIndentationLength.cs" />
@@ -225,9 +225,10 @@
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\BlockChildrenShouldBeIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\CompilationUnitChildrenShouldNeverBeIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\ContentOfBraceTokensShouldKeepIndentationLength.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\BraceTokensShouldBeAligned.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\TabsMixedWithSpaces.cs" />
     <Compile Include="CSharp\LineLengthChecker_should.cs" />
     <Compile Include="CSharp\NamingChecker_should.cs" />
-    <Content Include="CSharp\IndentsValidation\TestData\rules.txt" />
     <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.WrongAnswer.27.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

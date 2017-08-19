@@ -2,7 +2,7 @@
 
 namespace Correct
 {
-	public class BlockChildrenMightBeNotIndented
+	public class BlockChildrenNotIndentedInAccessors
 	{
 		private string prop;
 		public string Prop1
