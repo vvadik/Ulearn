@@ -212,24 +212,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CSharp\CodeTestCase.cs" />
     <Compile Include="CSharp\CourseValidator_ReportError_should.cs" />
     <Compile Include="CSharp\CourseValidator_ReportWarning_should.cs" />
     <Compile Include="CSharp\IndentsValidation\IndentsTestHelper.cs" />
-    <Compile Include="CSharp\IndentsValidation\IndentsValidator_Should_NotReport.cs" />
-    <Compile Include="CSharp\IndentsValidation\IndentsValidator_Should_Report.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Correct\ChildrenAlwaysIntended\BaseTypeDeclarationSyntaxIntendsChildrenAlways.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Correct\ChildrenNeverIntended\ChildrenOfCompilationUnitAreNeverIntented.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Correct\ChildrenSometimesIntended\IfOpenBraceTokenHasNoEndOfLineTrivia\CSharpSyntaxNodeDoesntIntendChildren.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Correct\ChildrenAlwaysIntended\NamespaceDeclarationSyntaxIntendsChildrenAlways.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Correct\ChildrenSometimesIntended\IfOpenBraceTokenHasEndOfLineTrivia\CSharpSyntaxNodeIntendsChildren.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\NoAnyIndents.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\MissingNestingSpaceIndent.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\RedundantSpaceIndent.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\SpaceIndentsNotConsistent.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\TabMixedWithSpace.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\RedundantTabIndent.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\MissingNestingTabIndent.cs" />
+    <Compile Include="CSharp\IndentsValidation\IndentsValidator_Should.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Correct\BaseTypesChildrenAlwaysIndented.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Correct\BlockChildrenMightBeNotIndented.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Correct\CompilationUnitChildrenNeverIndented.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Correct\BlockChildrenIndented.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Correct\ContentOfBraceTokensKeepsIndentationLength.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\BaseTypesChildrenShouldBeIndented.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\BlockChildrenShouldBeIndented.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\CompilationUnitChildrenShouldNeverBeIndented.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\ContentOfBraceTokensShouldKeepIndentationLength.cs" />
     <Compile Include="CSharp\LineLengthChecker_should.cs" />
     <Compile Include="CSharp\NamingChecker_should.cs" />
     <Content Include="CSharp\IndentsValidation\TestData\rules.txt" />

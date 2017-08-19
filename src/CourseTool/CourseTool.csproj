@@ -225,7 +225,6 @@
     </Compile>
     <Compile Include="Converter.cs" />
     <Compile Include="Credentials.cs" />
-    <Compile Include="Validating\Indentation\IndentsValidator.cs" />
     <Compile Include="Validating\ProjectExerciseValidator.cs" />
     <Compile Include="EdxInteraction.cs" />
     <Compile Include="Json\Video.cs" />

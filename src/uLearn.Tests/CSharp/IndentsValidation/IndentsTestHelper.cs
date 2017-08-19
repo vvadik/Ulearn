@@ -9,12 +9,6 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class IndentsTestHelper
 	{
-		public static DirectoryInfo IncorrectTestDataDir => TestDataDir.GetDirectories("Incorrect").Single();
-		public static DirectoryInfo CorrectTestDataDir => TestDataDir.GetDirectories("Correct").Single();
-
-		public static DirectoryInfo TestDataDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
-			"..", "CSharp", "IndentsValidation", "TestData"));
-
 		[Test]
 		[Explicit]
 		public void Write_ProjectExercises_UserCodeFile_FullNames_ToTxt()

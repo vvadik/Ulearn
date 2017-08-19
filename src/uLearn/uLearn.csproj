@@ -180,6 +180,7 @@
   <ItemGroup>
     <Compile Include="AcceptedSolutionInfo.cs" />
     <Compile Include="AnalyticsTableInfo.cs" />
+    <Compile Include="CSharp\IndentsValidator.cs" />
     <Compile Include="CSharp\IStrictValidator.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="Course.cs" />

@@ -16,6 +16,7 @@ namespace uLearn.CSharp
 			new NamingCaseStyleValidator(),
 			new RedundantIfStyleValidator(),
 			new NamingStyleValidator(),
+			new IndentsValidator(),
 		};
 
 		public void AddValidator(ICSharpSolutionValidator validator)
