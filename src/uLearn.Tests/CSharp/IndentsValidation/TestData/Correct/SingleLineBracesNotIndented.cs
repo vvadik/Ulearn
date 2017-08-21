@@ -32,6 +32,7 @@ namespace Correct
 			while (++i < 5) { intendedVar = 1; }
 			do { intendedVar = 1; } while (i++ < 10);
 			while (i++ < 10) { intendedVar++; }
+			var f = new[] { 1 }; var k = new[] { 2 }; var p = new[] { 3 };
 		}
 
 		public void Ok() { }

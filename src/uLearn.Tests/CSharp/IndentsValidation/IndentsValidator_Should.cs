@@ -42,7 +42,7 @@ namespace uLearn.CSharp
 			{
 				Filename = "BaseTypesChildrenShouldBeIndented.cs",
 				ErrorRegex = new Regex("Ошибка отступов! На строке \\d+ в позиции \\d+ должен быть отступ размером в \\d+ (табов|пробелов){1}$"),
-				ErrorsCount = 5
+				ErrorsCount = 4
 			},
 			new MyTestCase
 			{
@@ -59,7 +59,7 @@ namespace uLearn.CSharp
 			new MyTestCase
 			{
 				Filename = "DotTokenShouldKeepIndentationLength.cs",
-				ErrorRegex = new Regex("Ошибка отступов! Не стоит мешать табы с пробелами в отступах строк: +$")
+				ErrorRegex = new Regex("")
 			}
 		};
 
@@ -81,20 +81,14 @@ namespace uLearn.CSharp
 		}
 
 		// ReSharper disable once MemberCanBePrivate.Global
-		public static readonly string[] noErrorsFilenames =
-		{
-			"ContentOfBraceTokensKeepsIndentationLength.cs",
-			"CompilationUnitChildrenNeverIndented.cs",
-			"BlockChildrenIndented.cs",
-			"BlockChildrenNotIndentedInAccessors.cs",
-			"BaseTypesChildrenAlwaysIndented.cs",
-			"DotTokenKeepsIndentationLength.cs"
-		};
+		public static MyTestCase[] noErrorsTestCases => CorrectTestDataDir.GetFiles()
+			.Select(f => new MyTestCase {Filename = f.Name})
+			.ToArray();
 
-		[TestCaseSource(nameof(noErrorsFilenames))]
-		public void NotFindErrors(string filename)
+		[TestCaseSource(nameof(noErrorsTestCases))]
+		public void NotFindErrors(MyTestCase testCase)
 		{
-			var code = CorrectTestDataDir.GetFiles(filename).Single().ContentAsUtf8();
+			var code = CorrectTestDataDir.GetFiles(testCase.Filename).Single().ContentAsUtf8();
 			var validator = new IndentsValidator();
 
 			var errors = validator.FindError(CSharpSyntaxTree.ParseText(code));

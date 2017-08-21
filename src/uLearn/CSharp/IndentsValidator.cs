@@ -39,7 +39,7 @@ namespace uLearn
 			for (var ind = openBraceInd + 1; ind < closeBraceInd; ind++)
 			{
 				var childNode = (SyntaxNode)node.ChildNodesAndTokens()[ind];
-				if (childNode == null)
+				if (childNode == null || !IsFirstChildOfParent(childNode, node))
 					continue;
 				var childIndent = GetIndent(childNode);
 				if (childIndent.Type == IndentType.Mixed || parentIndent.Type != childIndent.Type)
@@ -54,17 +54,29 @@ namespace uLearn
 			}
 		}
 
-		private Indent GetIndent(SyntaxNode node)
+		private bool IsFirstChildOfParent(SyntaxNode child, SyntaxNode parent)
 		{
-			while (!node.GetLeadingTrivia().Any())
+			return parent.ChildNodes().FindIndex(c => c.Span == child.Span) == 0;
+		}
+
+		private Indent GetIndent(SyntaxNode node) // todo баг, когда несколько нод в одной строке
+		{
+			var currentNode = node;
+			while (!currentNode.GetLeadingTrivia().Any())
 			{
-				node = node.Parent;
-				if (node == null)
-					return Indent.Empty;
+				currentNode = currentNode.Parent;
+				if (currentNode == null)
+					return Indent.None;
 			}
-			return GetIndent(node.ChildNodes().First() != node
-				? node.ChildNodes().First().GetLeadingTrivia()
-				: node.GetLeadingTrivia());
+			return GetIndent(currentNode.GetLeadingTrivia());
+		}
+
+		private Indent GetIndent(SyntaxTriviaList leadingTriviaList)
+		{
+			var lastTrivia = leadingTriviaList.LastOrDefault();
+			if (lastTrivia == default(SyntaxTrivia) || !lastTrivia.IsKind(SyntaxKind.WhitespaceTrivia))
+				return Indent.None;
+			return new Indent(lastTrivia);
 		}
 
 		private void ReportIfCompilationUnitChildrenIndented(SyntaxNode node)
@@ -94,8 +106,8 @@ namespace uLearn
 				return;
 			if (GetTokenLine(openBrace) == GetTokenLine(closeBrace))
 				return;
-			var openBraceIndent = GetIndent(openBrace.Parent);
-			var closeBraceIndent = GetIndent(closeBrace.Parent);
+			var openBraceIndent = GetIndent(openBrace.LeadingTrivia);
+			var closeBraceIndent = GetIndent(closeBrace.LeadingTrivia);
 			if (openBraceIndent.Type == IndentType.Mixed || openBraceIndent.Type != closeBraceIndent.Type)
 				return;
 			if (openBraceIndent.Length != closeBraceIndent.Length)
@@ -107,12 +119,6 @@ namespace uLearn
 			}
 		}
 
-		private Indent GetIndent(SyntaxTriviaList leadingTriviaList)
-		{
-			var lastTrivia = leadingTriviaList.Last();
-			return !lastTrivia.IsKind(SyntaxKind.WhitespaceTrivia) ? Indent.Empty : new Indent(lastTrivia.ToFullString());
-		}
-
 		private void AddError(string msg)
 		{
 			errors += "Ошибка отступов! " + msg + "\r\n";
@@ -121,15 +127,21 @@ namespace uLearn
 
 	internal class Indent
 	{
-		public static readonly Indent Empty = new Indent("");
-		public string LeadingTrivia { get; }
+		public static readonly Indent None = new Indent();
+		public string LeadingTrivia { get; } = String.Empty;
 		public int Length => LeadingTrivia.Length;
 		public IndentType Type { get; }
+		public Location Location { get; }
 
-		public Indent(string leadingTrivia)
+		public Indent(SyntaxTrivia leadingTrivia)
 		{
-			LeadingTrivia = leadingTrivia;
+			LeadingTrivia = leadingTrivia.ToFullString();
+			Location = leadingTrivia.GetLocation();
 			Type = GetIndentType(LeadingTrivia);
+		}
+
+		private Indent()
+		{
 		}
 
 		public static IndentType GetIndentType(string value)

@@ -2,13 +2,14 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using uLearn.Extensions;
 
 namespace uLearn.CSharp
 {
 	[TestFixture]
 	public class Test_Jobs
 	{
-		DirectoryInfo courseDir = new DirectoryInfo("d:\\_work\\BasicProgramming\\");
+		DirectoryInfo courseDir = new DirectoryInfo("m:\\WorkshopApplets\\_work\\BasicProgramming\\");
 
 		[Test]
 		[Explicit]
@@ -27,7 +28,20 @@ namespace uLearn.CSharp
 			var programs = courseDir.GetDirectories("OOP").Single().GetFiles("Program.cs", SearchOption.AllDirectories);
 			foreach (var program in programs)
 			{
-				File.WriteAllText(program.FullName, @"using System.Collections.Generic;
+				if (program.ContentAsUtf8() == @"using System.Collections.Generic;
+using System.Linq;
+using NUnitLite;
+
+
+	class Program
+	{
+		static void Main(string[] args)
+		{
+			new AutoRun().Execute(args);
+		}
+	}
+")
+					File.WriteAllText(program.FullName, @"using System.Collections.Generic;
 using System.Linq;
 using NUnitLite;
 
