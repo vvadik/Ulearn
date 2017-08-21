@@ -1,9 +1,9 @@
-﻿using System;
+﻿	using System;
 
-namespace Correct
-{
-}
+	namespace Correct
+	{
+	}
 
-public class ChildrenOfCompilationUnitAreNeverIndented
-{
-}
+	public class ChildrenOfCompilationUnitAreNeverIndented
+	{
+	}

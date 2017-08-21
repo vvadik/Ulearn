@@ -9,7 +9,7 @@
 
 		public static void Main1(string[] args)
 		{
-			var a = 0;
+			var c = 0;
 			}
-		}
+	}
 }

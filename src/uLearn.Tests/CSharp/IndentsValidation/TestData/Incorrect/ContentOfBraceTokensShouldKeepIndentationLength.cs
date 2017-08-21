@@ -1,9 +1,37 @@
 ﻿using System.Collections.Generic;
 
-namespace Correct
+namespace Incorrect
 {
 	public class ContentOfBraceTokensShouldKeepIndentationLength
 	{
+		public static void Main2(string[] args)
+		{
+		var a = 0; var b = 0; var c = 0;
+		}
+
+		public static void Main3(string[] args)
+		{ var a = 0; var b = 0; var c = 0;
+		}
+
+		public static void Main5(string[] args)
+		{ var a = 0;
+			var b = 0; var c = 0;
+		}
+
+		public static void Main4(string[] args)
+		{var a = 0;
+			var b = 0; var c = 0;
+		}
+
+		public static void Main10(string[] args)
+		{var a = 0; var b = 0; var c = 0;
+		}
+
+		public static void Main7(string[] args)
+		{var a = 0;
+		var b = 0; var c = 0;
+		}
+
 		private object a1 = new
 		{
 		e = 5,
@@ -49,6 +77,27 @@ namespace Correct
 	"b"
 		};
 
+		public List<string> Coll3 => new List<string>
+		{
+			"a",
+				"b"
+		};
+		public List<string> Coll4 => new List<string>
+		{
+				"a",
+			"b"
+		};
+		public List<string> Coll5 => new List<string>
+		{
+		"a",
+			"b"
+		};
+		public List<string> Coll6 => new List<string>
+		{
+			"a",
+		"b"
+		};
+
 		List<List<List<int>>> l = new List<List<List<int>>>
 		{
 		new List<List<int>>
@@ -83,6 +132,18 @@ namespace Correct
 			{
 				2, 3
 			}
+			}
+		};
+		List<List<List<int>>> l2 = new List<List<List<int>>>
+		{
+			new List<List<int>>
+			{
+				new List<int>
+				{
+					1,
+				2,
+					3
+				}
 			}
 		};
 	}

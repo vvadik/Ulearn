@@ -4,39 +4,51 @@ namespace Correct
 {
 	public class ContentOfBraceTokensKeepsIndentationLength
 	{
+		public static void Main1(string[] args) {
+
+		}
+
+		public static void Main2(string[] args) {
+			var a = 0;
+		}
+
+		public static void Main3(string[] args)
+		{
+			var a = new {
+				name = "asd"
+			};
+		}
+
+		public static void Main4(string[] args)
+		{
+			for (var i = 0; i < 10; i++) { 
+				var a = new {
+					name = "asd"
+				};
+			}
+		}
 		private object a1 = new
 		{
 			e = 5,
 			g = "asd"
 		};
-
-		private object a2 = new { e = 5, g = "asd" };
-
-		public string Prop1 { get; set; }
-
 		public string Prop2
 		{
 			get;
 			set;
 		}
-
 		private int[] i1 = new[]
 		{
 			1,
 			2,
 			3
 		};
-
-		private int[] i2 = new[] { 1, 2, 3 };
-
 		public List<string> Coll1 => new List<string>
 		{
 			"a",
 			"b"
 		};
-
 		public List<string> Coll2 => new List<string> { "a", "b" };
-
 		List<List<List<int>>> l = new List<List<List<int>>>
 		{
 			new List<List<int>>
@@ -49,15 +61,12 @@ namespace Correct
 				}
 			}
 		};
-
 		Dictionary<int, int> d1 = new Dictionary<int, int>
 		{
 			{ 1, 2 },
 			{ 2, 3 },
 		};
-
 		Dictionary<int, int> d2 = new Dictionary<int, int> { { 1, 2 }, { 2, 3 } };
-
 		Dictionary<int, List<int>> dl1 = new Dictionary<int, List<int>>
 		{
 			{
@@ -68,10 +77,46 @@ namespace Correct
 				}
 			}
 		};
-
 		Dictionary<int, List<int>> dl2 = new Dictionary<int, List<int>>
 		{
 			{ 1, new List<int> { 2, 3 } }
 		};
+
+		public static void Main5(string[] args)
+		{
+			for (var i = 0; i < 10; i++)
+			for (var j = 0; j < 10; j++)
+			{
+				var a = new
+				{
+					name = "asd"
+				};
+			}
+		}
+
+		public static void Main6(string[] args)
+		{
+			for (var i = 0; i < 10; i++)
+				{
+					var a = new
+					{
+						name = "asd"
+					};
+				}
+		}
+
+		public static void Main7(string[] args)
+		{
+			for (var i = 0; i < 10; i++)
+			{
+				for (var j = 0; j < 10; j++)
+				{
+					var a = new
+					{
+						name = "asd"
+					};
+				}
+			}
+		}
 	}
 }

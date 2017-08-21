@@ -1,16 +1,18 @@
 ﻿namespace Correct
 {
+	public class ClassWithoutMembers { }
+
 	public class ClassIndentsChildrenAlways
 	{
 		public static void I_Am_Indented(string[] args)
 		{
-
+			var a = 0;
 		}
 	}
 
 	public enum EnumIndentsChildrenAlways
 	{
-		I_Am_Indented,
+		I_Am_Indented, // todo любой токен в начале строки, кроме фигурной скобки, - ошибка
 		Me_Too
 	}
 
