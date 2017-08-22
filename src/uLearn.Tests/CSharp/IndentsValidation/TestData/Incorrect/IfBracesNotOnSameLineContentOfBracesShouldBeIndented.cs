@@ -2,7 +2,33 @@
 
 namespace Incorrect
 {
-	public class ContentOfBraceTokensShouldKeepIndentationLength
+	public class ClassShouldIndentChildrenAlways
+	{
+	public static void I_Am_Not_Indented(string[] args)
+		{
+
+		}
+	}
+
+	public enum EnumShouldIndentChildrenAlways
+	{
+	I_Am_Not_Indented, Me_Too
+	}
+
+	public interface InterfaceShouldIndentChildrenAlways
+	{
+	void I_Am_Not_Indented(params object[] args); void Do();
+	}
+
+	public struct StructureShouldIndentChildrenAlways
+	{
+public static void I_Am_Not_Indented(string[] args)
+		{
+
+		}
+	}
+
+	public class IfBracesNotOnSameLineContentOfBracesShouldBeIndented
 	{
 		public static void Main2(string[] args)
 		{
@@ -11,16 +37,6 @@ namespace Incorrect
 
 		public static void Main3(string[] args)
 		{ var a = 0; var b = 0; var c = 0;
-		}
-
-		public static void Main5(string[] args)
-		{ var a = 0;
-			var b = 0; var c = 0;
-		}
-
-		public static void Main4(string[] args)
-		{var a = 0;
-			var b = 0; var c = 0;
 		}
 
 		public static void Main10(string[] args)
@@ -75,17 +91,6 @@ namespace Incorrect
 		{
 	"a",
 	"b"
-		};
-
-		public List<string> Coll3 => new List<string>
-		{
-			"a",
-				"b"
-		};
-		public List<string> Coll4 => new List<string>
-		{
-				"a",
-			"b"
 		};
 		public List<string> Coll5 => new List<string>
 		{

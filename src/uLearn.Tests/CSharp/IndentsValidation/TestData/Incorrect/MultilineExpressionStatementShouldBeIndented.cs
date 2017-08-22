@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 {
-	public class MultilineExpressionStatementShouldIncreaseIndentationLength
+	public class MultilineExpressionStatementShouldBeIndented
 	{
 		public static void Main(string[] args)
 		{

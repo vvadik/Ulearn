@@ -2,7 +2,9 @@
 
 namespace Correct
 {
-	public class SingleLineBracesNotIndented
+	public class ClassWithoutMembers { }
+
+	public class ContentOfSingleLineBracesNotIndented
 	{
 		private string prop;
 		public string Prop

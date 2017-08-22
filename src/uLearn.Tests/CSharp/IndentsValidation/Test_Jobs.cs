@@ -9,7 +9,7 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class Test_Jobs
 	{
-		DirectoryInfo courseDir = new DirectoryInfo("m:\\WorkshopApplets\\_work\\BasicProgramming\\");
+		DirectoryInfo courseDir = new DirectoryInfo("d:\\_work\\BasicProgramming\\");
 
 		[Test]
 		[Explicit]
@@ -23,7 +23,7 @@ namespace uLearn.CSharp
 
 		[Test]
 		[Explicit]
-		public void Fix_Programs()
+		public void Fix_OOP_Programs()
 		{
 			var programs = courseDir.GetDirectories("OOP").Single().GetFiles("Program.cs", SearchOption.AllDirectories);
 			foreach (var program in programs)

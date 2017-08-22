@@ -2,16 +2,12 @@
 
 namespace Correct
 {
-	public class ContentOfBraceTokensKeepsIndentationLength
+	public class IfBracesNotOnSameLineContentOfBracesIsIndented
 	{
-		public static void Main1(string[] args) {
+		private int b = 0;
+		private int c = 0;
 
-		}
-
-		public static void Main2(string[] args) {
-			var a = 0;
-		}
-
+		private int d = 0;
 		public static void Main3(string[] args)
 		{
 			var a = new {
@@ -117,6 +113,28 @@ namespace Correct
 					};
 				}
 			}
+		}
+	}
+
+	public enum EnumIndentsChildrenAlways
+	{
+		I_Am_Indented, Me_Too1,
+			Me_Too,
+				So_Am_I, And_I,
+				And_I1
+	}
+	
+	public interface InterfaceIndentsChildrenAlways
+	{
+		void I_Am_Indented(params object[] args); void O();
+			void Me_Too(params object[] args); void I();
+	}
+
+	public struct StructureIndentsChildrenAlways
+	{
+		public static void I_Am_Indented(string[] args)
+		{
+
 		}
 	}
 }

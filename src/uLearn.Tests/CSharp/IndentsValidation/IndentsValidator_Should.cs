@@ -24,8 +24,11 @@ namespace uLearn.CSharp
 		{
 			new MyTestCase
 			{
-				Filename = "ContentOfBraceTokensShouldKeepIndentationLength.cs",
-				ErrorRegex = new Regex("Ошибка отступов! Отступ на строке \\d+ должен быть не меньше отступа на строке \\d+$")
+				Filename = "BracesShouldBeAlignedIfOpenBraceHasLeadingTriviaAndBracesNotOnSameLine.cs",
+				ErrorRegex =
+					new Regex(
+						"Ошибка отступов! Размер отступа \\d+ \\(в (табах|пробелах){1}\\) на строке \\d+ должен совпадать с размером отступа \\d+ на строке \\d+$"),
+				ErrorsCount = 14
 			},
 			new MyTestCase
 			{
@@ -35,31 +38,15 @@ namespace uLearn.CSharp
 			},
 			new MyTestCase
 			{
-				Filename = "BlockChildrenShouldBeIndented.cs",
-				ErrorRegex = new Regex("Ошибка отступов! На строке \\d+ в позиции \\d+ должен быть отступ$")
-			},
-			new MyTestCase
-			{
-				Filename = "BaseTypesChildrenShouldBeIndented.cs",
-				ErrorRegex = new Regex("Ошибка отступов! На строке \\d+ в позиции \\d+ должен быть отступ размером в \\d+ (табов|пробелов){1}$"),
-				ErrorsCount = 4
-			},
-			new MyTestCase
-			{
-				Filename = "BraceTokensShouldBeAligned.cs",
+				Filename = "IfBracesNotOnSameLineContentOfBracesShouldBeIndented.cs",
 				ErrorRegex =
-					new Regex("Ошибка отступов! Размер отступа \\d+ \\(в (табах|пробелах){1}\\) на строке \\d+ должен совпадать с размером отступа \\d+ на строке \\d+$"),
-				ErrorsCount = 5
+					new Regex("Ошибка отступов! На строке \\d+ в позиции \\d+ должен быть отступ размером в \\d+ (табов|пробелов)$"),
+				ErrorsCount = 37
 			},
 			new MyTestCase
 			{
-				Filename = "TabsMixedWithSpaces.cs",
-				ErrorRegex = new Regex("Ошибка отступов! Не стоит мешать табы с пробелами в отступах строк: +$")
-			},
-			new MyTestCase
-			{
-				Filename = "DotTokenShouldKeepIndentationLength.cs",
-				ErrorRegex = new Regex("")
+				Filename = "MultilineArgumentListShouldBeIndented.cs",
+				ErrorRegex = new Regex("Ошибка отступов! На строке \\d+ в позиции \\d+ должен быть отступ$")
 			}
 		};
 
@@ -82,7 +69,7 @@ namespace uLearn.CSharp
 
 		// ReSharper disable once MemberCanBePrivate.Global
 		public static MyTestCase[] noErrorsTestCases => CorrectTestDataDir.GetFiles()
-			.Select(f => new MyTestCase {Filename = f.Name})
+			.Select(f => new MyTestCase { Filename = f.Name })
 			.ToArray();
 
 		[TestCaseSource(nameof(noErrorsTestCases))]
@@ -93,6 +80,10 @@ namespace uLearn.CSharp
 
 			var errors = validator.FindError(CSharpSyntaxTree.ParseText(code));
 
+			if (errors != null)
+			{
+				Console.WriteLine(errors);
+			}
 			errors.Should().BeNull();
 		}
 
@@ -103,7 +94,8 @@ namespace uLearn.CSharp
 				.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 			var pathAndCode = filepaths.Select(filepath => Tuple.Create(filepath, File.ReadAllText(filepath)));
 			var failed = false;
-			foreach (var tuple in pathAndCode.Where(tuple => !tuple.Item1.EndsWith("Settings.Designer.cs") && !tuple.Item1.EndsWith("Resources.Designer.cs")))
+			foreach (var tuple in pathAndCode.Where(tuple => !tuple.Item1.EndsWith("Settings.Designer.cs") &&
+															!tuple.Item1.EndsWith("Resources.Designer.cs")))
 			{
 				var validator = new IndentsValidator();
 

@@ -4,7 +4,8 @@
 	{
 		public BlockChildrenIndented()
 		{
-			var intendedVar = 0;
+			var intendedVar = 0; var a = 0; var b = 0;
+			var c = 0; var e = 0; var f = 0;
 			int i = 0;
 			foreach (var j in new[] { 0, 1, 2 })
 			{
@@ -14,8 +15,8 @@
 			{
 				intendedVar++;
 					intendedVar++;
-								intendedVar++;
-				intendedVar++;
+						intendedVar++;
+						intendedVar++;
 			}
 			for (i = 0; i < 5; i++)
 			{
