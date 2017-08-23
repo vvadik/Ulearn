@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Incorrect
 {
@@ -12,7 +13,8 @@ namespace Incorrect
 
 	public enum EnumShouldIndentChildrenAlways
 	{
-	I_Am_Not_Indented, Me_Too
+	I_Am_Not_Indented, Me_Too,
+I_Am_Not_Indented1
 	}
 
 	public interface InterfaceShouldIndentChildrenAlways
@@ -35,17 +37,8 @@ public static void I_Am_Not_Indented(string[] args)
 		var a = 0; var b = 0; var c = 0;
 		}
 
-		public static void Main3(string[] args)
-		{ var a = 0; var b = 0; var c = 0;
-		}
-
-		public static void Main10(string[] args)
-		{var a = 0; var b = 0; var c = 0;
-		}
-
-		public static void Main7(string[] args)
-		{var a = 0;
-		var b = 0; var c = 0;
+		public static void Main15(string[] args) {
+		var a = 0; var b = 0; var c = 0;
 		}
 
 		private object a1 = new
@@ -57,7 +50,11 @@ public static void I_Am_Not_Indented(string[] args)
 		private object a2 = new
 		{
 	e = 5,
-	g = "asd"
+	g = "asd",
+	h = new List<int>
+	{
+	1
+	}
 		};
 
 		public string Prop1
@@ -65,6 +62,29 @@ public static void I_Am_Not_Indented(string[] args)
 		get;
 		set;
 		}
+
+		IEnumerable<int> ints1 = new[] { 1, 2, 3 }.SelectMany(
+			i => new[] 
+			{
+			i,
+			} 
+			.Select(a => a));
+
+		IEnumerable<int> ints2 = new[] { 1, 2, 3 }.SelectMany(
+			i => new[] 
+			{
+				i,
+			i
+			} 
+			.Select(a => a));
+
+		IEnumerable<int> ints3 = new[] { 1, 2, 3 }.SelectMany(
+			i => new[] 
+			{
+		i,
+			i
+			} 
+			.Select(a => a));
 
 		public string Prop2
 		{
@@ -133,7 +153,8 @@ public static void I_Am_Not_Indented(string[] args)
 
 		Dictionary<int, List<int>> dl = new Dictionary<int, List<int>>
 		{
-			{ 1, new List<int>
+			{
+			1, new List<int>
 			{
 				2, 3
 			}

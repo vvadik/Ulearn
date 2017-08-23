@@ -8,13 +8,10 @@ using uLearn.CSharp;
 
 namespace uLearn
 {
-	public class
-		IndentsValidator : CSharpSyntaxWalker,
-			ICSharpSolutionValidator
+	public class IndentsValidator : ICSharpSolutionValidator
 	{
 		private string errors;
 		private SyntaxTree tree;
-		private List<Indent> orderedLineIndents;
 		private IEnumerable<SyntaxToken> openbraces;
 		private IEnumerable<SyntaxToken> closebraces;
 
@@ -22,53 +19,72 @@ namespace uLearn
 		{
 			tree = userSolution;
 			errors = null;
-			orderedLineIndents = BuildIndentsOfLines();
-			openbraces = userSolution.GetRoot().DescendantTokens(t => t.IsKind(SyntaxKind.OpenBraceToken));
-			closebraces = userSolution.GetRoot().DescendantTokens(t => t.IsKind(SyntaxKind.CloseBraceToken));
+			openbraces = tree.GetRoot().DescendantTokens().Where(t => t.IsKind(SyntaxKind.OpenBraceToken));
+			closebraces = tree.GetRoot().DescendantTokens().Where(t => t.IsKind(SyntaxKind.CloseBraceToken));
 
 			ReportIfCompilationUnitChildrenIndented();
+			ReportIfOpenBraceHasContentOnSameLine();
 			ReportIfBracesContentNotIndented();
 			ReportIfBracesNotAligned();
 			return errors;
-		}
-
-		private List<Indent> BuildIndentsOfLines()
-		{
-			return tree.GetText().Lines
-				.OrderBy(tl => tl.LineNumber)
-				.Select(line => line.Span.IsEmpty
-					? Indent.None
-					: new Indent(tree.GetRoot().FindToken(line.Span.Start)))
-				.ToList();
 		}
 
 		private void ReportIfCompilationUnitChildrenIndented()
 		{
 			foreach (var childNode in tree.GetRoot().ChildNodes())
 				if (Indent.Exists(childNode))
-					AddError($"Ќа строке {GetStartLinePosition(childNode).Line} не должно быть отступа");
+					AddError($"Ќа строке {GetStartLinePosition(childNode).Line + 1} не должно быть отступа");
 		}
 
 		private void ReportIfBracesContentNotIndented()
 		{
-			if (!orderedLineIndents.Any())
-				return;
-			for (var i = 1; i < orderedLineIndents.Count; i++)
+			foreach (var openbrace in openbraces)
 			{
-				if (orderedLineIndents[i].IsNone())
+				if (closebraces.Any(b => TokensOnSameLine(b, openbrace)))
 					continue;
-				var curIndent = orderedLineIndents[i];
-				var prevIndent = orderedLineIndents[i - 1];
-				if (curIndent.NodeOrToken.IsKind(SyntaxKind.CloseBraceToken) ||
-					!prevIndent.NodeOrToken.IsKind(SyntaxKind.OpenBraceToken))
-					continue;
-				if (curIndent.LessThanOrEqual(prevIndent) || curIndent.LessThan(prevIndent))
+				var children = openbrace.Parent.ChildNodesAndTokens();
+				var bracesContentStartInd = children.FindIndex(openbrace) + 1;
+				var bracesContentEndInd = children.FindIndex(c => c.IsKind(SyntaxKind.CloseBraceToken));
+				var openbraceIndent = new Indent(openbrace, tree);
+				Indent contentIndent = null;
+				for (var i = bracesContentStartInd; i < bracesContentEndInd; i++)
 				{
-					var units = curIndent.Type == IndentType.Tab ? "табов" : "пробелов";
-					AddError(
-						$"Ќа строке {GetLine(curIndent)} в позиции {GetCharacter(curIndent)} должен быть отступ размером в {prevIndent.Length} {units}");
+					var curIndent = new Indent(children[i], tree);
+					if (curIndent.NodeOrTokenIsNotFirstAtLine())
+						continue;
+					if (contentIndent == null && curIndent.Length <= openbraceIndent.Length ||
+						contentIndent != null && curIndent.Length != contentIndent.Length)
+					{
+						var units = openbraceIndent.Type == IndentType.Tab ? "табов" : "пробелов";
+						AddError(
+							$"Ќа строке {curIndent.Line + 1} в позиции {curIndent.Character} должен быть отступ размером в {openbraceIndent.Length} {units}");
+					}
+					else
+						contentIndent = curIndent;
 				}
 			}
+		}
+
+		private void ReportIfOpenBraceHasContentOnSameLine()
+		{
+			foreach (var openbrace in openbraces)
+			{
+				if (closebraces.Any(b => TokensOnSameLine(b, openbrace)))
+					continue;
+				var endSpanOfOpenbrace = openbrace.HasTrailingTrivia
+					? openbrace.TrailingTrivia.Last().Span.End
+					: openbrace.Span.End;
+				var firstTokenAfterOpenbrace = tree.GetRoot().FindToken(endSpanOfOpenbrace + 1);
+				if (TokensOnSameLine(firstTokenAfterOpenbrace, openbrace))
+				{
+					AddError($"Ќа строке {GetLine(openbrace) + 1} после фигурной скобки должен быть отступ");
+				}
+			}
+		}
+
+		private bool TokensOnSameLine(SyntaxToken a, SyntaxToken b)
+		{
+			return GetLine(a) == GetLine(b);
 		}
 
 		private void ReportIfBracesNotAligned()
@@ -76,7 +92,7 @@ namespace uLearn
 			if (openbraces.Count() != closebraces.Count())
 				return;
 			var openbracesStack = new Stack<SyntaxToken>();
-			foreach (var brace in openbraces.Concat(closebraces))
+			foreach (var brace in openbraces.Concat(closebraces).OrderBy(b => GetLine(b)).ThenBy(t => GetCharacter(t)))
 			{
 				if (brace.IsKind(SyntaxKind.OpenBraceToken))
 				{
@@ -84,17 +100,15 @@ namespace uLearn
 					continue;
 				}
 				var openBrace = openbracesStack.Pop();
-				var openBraceIndent = new Indent(openBrace);
-				var closeBraceIndent = new Indent(brace);
-				if (openBraceIndent.IsNone() ||
-					openBraceIndent.Type == IndentType.Mixed ||
-					openBraceIndent.Type != closeBraceIndent.Type)
-					return;
+				var openBraceIndent = new Indent(openBrace, tree);
+				var closeBraceIndent = new Indent(brace, tree);
+				if (openBraceIndent.NodeOrTokenIsNotFirstAtLine() || closeBraceIndent.NodeOrTokenIsNotFirstAtLine())
+					continue;
 				if (openBraceIndent.Length != closeBraceIndent.Length)
 				{
 					var units = openBraceIndent.Type == IndentType.Tab ? "табах" : "пробелах";
 					AddError(
-						$"–азмер отступа {closeBraceIndent.Length} (в {units}) на строке {GetLine(brace)} " +
+						$"–азмер отступа {closeBraceIndent.Length} (в {units}) на строке {GetLine(brace) + 1} " +
 						$"должен совпадать с размером отступа {openBraceIndent.Length} на строке {GetLine(openBrace)}");
 				}
 			}
@@ -115,16 +129,6 @@ namespace uLearn
 			return GetStartLinePosition(nodeOrToken.GetLocation()).Character;
 		}
 
-		private static int GetCharacter(Indent indent)
-		{
-			return GetStartLinePosition(indent.Location).Character;
-		}
-
-		private static int GetLine(Indent indent)
-		{
-			return GetStartLinePosition(indent.Location).Line;
-		}
-
 		private static LinePosition GetStartLinePosition(Location location)
 		{
 			return location.GetLineSpan().StartLinePosition;
@@ -138,17 +142,20 @@ namespace uLearn
 
 	internal class Indent
 	{
-		public static readonly Indent None = new Indent(default(SyntaxNodeOrToken));
 		public string LeadingTrivia { get; } = String.Empty;
 		public int Length => LeadingTrivia.Length;
-		public IndentType Type { get; }
-		public Location Location => NodeOrToken.GetLocation();
+		public IndentType Type { get; } = IndentType.Tab;
+		public int Line { get; }
+		public int Character { get; }
 		public SyntaxNodeOrToken NodeOrToken { get; }
 
-		public Indent(SyntaxNodeOrToken nodeOrToken)
+		public Indent(SyntaxNodeOrToken nodeOrToken, SyntaxTree tree)
 		{
 			NodeOrToken = nodeOrToken;
-			var lastTrivia = NodeOrToken.GetLeadingTrivia().LastOrDefault();
+			Line = NodeOrToken.GetLocation().GetLineSpan().StartLinePosition.Line;
+			Character = NodeOrToken.GetLocation().GetLineSpan().StartLinePosition.Character;
+			var firstTokenInLine = tree.GetRoot().FindToken(tree.GetText().Lines[Line].Start);
+			var lastTrivia = firstTokenInLine.LeadingTrivia.LastOrDefault();
 			if (lastTrivia.IsKind(SyntaxKind.WhitespaceTrivia))
 			{
 				LeadingTrivia = lastTrivia.ToFullString();
@@ -165,24 +172,14 @@ namespace uLearn
 			return IndentType.Mixed;
 		}
 
-		public bool IsNone()
-		{
-			return !LeadingTrivia.Any();
-		}
-
 		public static bool Exists(SyntaxNodeOrToken nodeOrToken)
 		{
 			return nodeOrToken.GetLeadingTrivia().LastOrDefault().IsKind(SyntaxKind.WhitespaceTrivia);
 		}
 
-		public bool LessThan(Indent i)
+		public bool NodeOrTokenIsNotFirstAtLine()
 		{
-			return Length < i.Length;
-		}
-
-		public bool LessThanOrEqual(Indent i)
-		{
-			return Length <= i.Length;
+			return Length == 0 && Character > 0;
 		}
 
 		public override string ToString()

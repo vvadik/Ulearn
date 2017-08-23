@@ -57,7 +57,7 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 		{
 			var d = new[] 
 				{
-				1, 2, 3
+					1, 2, 3
 			};
 
 			var d1 = new[] 
@@ -72,9 +72,9 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 
 			var e = new[] 
 				{
-				new[]
+					new[]
 					{
-					1
+						1
 				}, new[] 
 			{
 					2

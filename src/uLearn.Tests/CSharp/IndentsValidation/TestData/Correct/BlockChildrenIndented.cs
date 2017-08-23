@@ -14,9 +14,9 @@
 			foreach (var j in new[] { 0, 1, 2 })
 			{
 				intendedVar++;
-					intendedVar++;
-						intendedVar++;
-						intendedVar++;
+				intendedVar++;
+				intendedVar++;
+				intendedVar++;
 			}
 			for (i = 0; i < 5; i++)
 			{

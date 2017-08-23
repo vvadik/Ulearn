@@ -1,17 +1,21 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Correct
 {
 	public class IfBracesNotOnSameLineContentOfBracesIsIndented
 	{
-		private int b = 0;
-		private int c = 0;
-
-		private int d = 0;
 		public static void Main3(string[] args)
 		{
 			var a = new {
 				name = "asd"
+			};
+		}
+
+		public static void Mai500(string[] args)
+		{
+			var a = new[] { 1 }; var b = new[] {
+				2, 3
 			};
 		}
 
@@ -22,6 +26,22 @@ namespace Correct
 					name = "asd"
 				};
 			}
+
+			new[] { 1, 2, 3 }.Select(
+				i => new[]
+					{
+						i,
+						i
+					}
+					.Select(a => a));
+
+			new[] { 1, 2, 3 }.Select(
+				i => new[]
+					{
+						i,
+							i
+					}
+					.Select(a => a));
 		}
 		private object a1 = new
 		{

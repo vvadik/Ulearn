@@ -41,7 +41,13 @@ namespace uLearn.CSharp
 				Filename = "IfBracesNotOnSameLineContentOfBracesShouldBeIndented.cs",
 				ErrorRegex =
 					new Regex("Ошибка отступов! На строке \\d+ в позиции \\d+ должен быть отступ размером в \\d+ (табов|пробелов)$"),
-				ErrorsCount = 37
+				ErrorsCount = 41
+			},
+			new MyTestCase
+			{
+				Filename = "IfOpenBraceHasContentOnSameLineItShouldBeIndented.cs",
+				ErrorRegex = new Regex("Ошибка отступов! На строке \\d+ после фигурной скобки должен быть отступ$"),
+				ErrorsCount = 6
 			},
 			new MyTestCase
 			{
