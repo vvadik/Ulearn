@@ -38,16 +38,6 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 			var c = 0;
 }
 
-		public static void Main8(string[] args)
-{
-			var c = 0;
-}
-
-		public static void Main16(string[] args)
-	{
-				var c = 0;
-	}
-
 		public static void Main3(string[] args)
 	{
 			var c = 0;
@@ -75,7 +65,8 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 					new[]
 					{
 						1
-				}, new[] 
+				},
+					new[] 
 			{
 					2
 				}

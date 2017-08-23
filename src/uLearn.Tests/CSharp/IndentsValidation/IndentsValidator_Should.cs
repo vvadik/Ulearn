@@ -27,32 +27,46 @@ namespace uLearn.CSharp
 				Filename = "BracesShouldBeAlignedIfOpenBraceHasLeadingTriviaAndBracesNotOnSameLine.cs",
 				ErrorRegex =
 					new Regex(
-						"Ошибка отступов! Размер отступа \\d+ \\(в (табах|пробелах){1}\\) на строке \\d+ должен совпадать с размером отступа \\d+ на строке \\d+$"),
-				ErrorsCount = 14
+						"^Ошибка отступов! Отступ перед фигурной скобкой на строке \\d+ должен быть таким же, как отступ перед фигурной скобкой на строке \\d+\\.$"),
+				// Префикс: Код плохо отформатирован. Автоматически отформатировать код можно ...
+				// Парные фигурные скобки (//d+://d+) должны иметь одинаковый отступ.
+				// 
+				ErrorsLines = new[] { 10, 14, 18, 23, 28, 34, 39, 44, 51, 56, 61, 68, 72, 73 } // todo approvalstest
 			},
 			new MyTestCase
 			{
 				Filename = "CompilationUnitChildrenShouldNeverBeIndented.cs",
-				ErrorRegex = new Regex("Ошибка отступов! На строке \\d+ не должно быть отступа$"),
-				ErrorsCount = 3
+				ErrorRegex =
+					new Regex("^Ошибка отступов! На верхнем уровне вложенности на строке \\d+ не должно быть отступов\\.$"),
+				// Лишний отступ
+				ErrorsLines = new[] { 1, 3, 7 }
 			},
 			new MyTestCase
 			{
 				Filename = "IfBracesNotOnSameLineContentOfBracesShouldBeIndented.cs",
 				ErrorRegex =
-					new Regex("Ошибка отступов! На строке \\d+ в позиции \\d+ должен быть отступ размером в \\d+ (табов|пробелов)$"),
-				ErrorsCount = 41
+					new Regex(
+						"^Ошибка отступов! На строке \\d+ должен быть отступ\\. Если открывающаяся фигурная скобка закрывается на другой строке, то внутри фигурных скобок должен быть отступ\\.$"),
+				// Содержимое парных фигурных скобок должно иметь дополнительный отступ
+				ErrorsLines = new[]
+					{ 8, 16, 17, 22, 27, 37, 41, 46, 47, 52, 53, 54, 56, 63, 70, 71, 77, 82, 87, 92, 97, 101, 106, 108, 119, 125, 135 }
 			},
 			new MyTestCase
 			{
-				Filename = "IfOpenBraceHasContentOnSameLineItShouldBeIndented.cs",
-				ErrorRegex = new Regex("Ошибка отступов! На строке \\d+ после фигурной скобки должен быть отступ$"),
-				ErrorsCount = 6
+				Filename = "IfBracesNotOnSameLineContentOfBracesShouldBeConsistent.cs",
+				ErrorRegex =
+					new Regex(
+						"^Ошибка отступов! Отступ на строке \\d+ не консистентен\\. Внутри одних фигурных скобок отступ не должен изменять свой размер\\.$"),
+				// Содержимое парных фигурных скобок должно иметь одинаковый отступ
+				ErrorsLines = new[] { 16, 26, 33, 41, 48, 58, 59, 67, 74 }
 			},
 			new MyTestCase
 			{
-				Filename = "MultilineArgumentListShouldBeIndented.cs",
-				ErrorRegex = new Regex("Ошибка отступов! На строке \\d+ в позиции \\d+ должен быть отступ$")
+				Filename = "IfBracesNotOnSameLineAndOpenbraceHasContentOnSameLineItShouldBeIndented.cs",
+				ErrorRegex =
+					new Regex(
+						"^Ошибка отступов! На строке \\d+ должен быть отступ\\. Если открывающаяся фигурная скобка закрывается на другой строке, то внутри фигурных скобок должен быть отступ\\.$"),
+				ErrorsLines = new[] { 7, 12, 16, 20, 27, 33 }
 			}
 		};
 
@@ -64,13 +78,15 @@ namespace uLearn.CSharp
 
 			var errors = validator.FindError(CSharpSyntaxTree.ParseText(code));
 
+			errors.Should().NotBeNullOrEmpty();
 			var splittedErrors = errors.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-			if (splittedErrors.Length != testCase.ErrorsCount)
+			if (splittedErrors.Length != testCase.ErrorsLines.Length)
 			{
 				Console.WriteLine(errors);
 			}
 			splittedErrors.ForEach(error => error.Should().MatchRegex(testCase.ErrorRegex.ToString()));
-			splittedErrors.Length.Should().Be(testCase.ErrorsCount);
+			splittedErrors.Select(e => int.Parse(Regex.Matches(e, "\\d+")[0].Value))
+				.ShouldBeEquivalentTo(testCase.ErrorsLines);
 		}
 
 		// ReSharper disable once MemberCanBePrivate.Global
@@ -124,7 +140,7 @@ namespace uLearn.CSharp
 	{
 		public string Filename { get; set; }
 		public Regex ErrorRegex { get; set; }
-		public int ErrorsCount { get; set; }
+		public int[] ErrorsLines { get; set; }
 
 		public override string ToString()
 		{

@@ -21,6 +21,13 @@ namespace Correct
 
 		public static void Main4(string[] args)
 		{
+			var a10 = new[]
+			{
+					1,
+					2,
+					3
+			};
+
 			for (var i = 0; i < 10; i++) { 
 				var a = new {
 					name = "asd"
@@ -39,7 +46,7 @@ namespace Correct
 				i => new[]
 					{
 						i,
-							i
+						i
 					}
 					.Select(a => a));
 		}
@@ -139,15 +146,15 @@ namespace Correct
 	public enum EnumIndentsChildrenAlways
 	{
 		I_Am_Indented, Me_Too1,
-			Me_Too,
-				So_Am_I, And_I,
-				And_I1
+		Me_Too,
+		So_Am_I, And_I,
+		And_I1
 	}
 	
 	public interface InterfaceIndentsChildrenAlways
 	{
 		void I_Am_Indented(params object[] args); void O();
-			void Me_Too(params object[] args); void I();
+		void Me_Too(params object[] args); void I();
 	}
 
 	public struct StructureIndentsChildrenAlways

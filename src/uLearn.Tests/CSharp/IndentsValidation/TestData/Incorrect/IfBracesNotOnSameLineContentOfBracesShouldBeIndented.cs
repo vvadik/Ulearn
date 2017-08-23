@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Incorrect
+namespace Incorrect // todo разбить на файлы, чтоб легче было поддерживать тесты
 {
 	public class ClassShouldIndentChildrenAlways
 	{
@@ -57,24 +57,10 @@ public static void I_Am_Not_Indented(string[] args)
 	}
 		};
 
-		public string Prop1
-		{
-		get;
-		set;
-		}
-
 		IEnumerable<int> ints1 = new[] { 1, 2, 3 }.SelectMany(
 			i => new[] 
 			{
 			i,
-			} 
-			.Select(a => a));
-
-		IEnumerable<int> ints2 = new[] { 1, 2, 3 }.SelectMany(
-			i => new[] 
-			{
-				i,
-			i
 			} 
 			.Select(a => a));
 
@@ -103,35 +89,27 @@ public static void I_Am_Not_Indented(string[] args)
 
 		public List<string> Coll1 => new List<string>
 		{
-		"a",
-		"b"
+		"a"
 		};
 
 		public List<string> Coll2 => new List<string>
 		{
-	"a",
-	"b"
+	"a"
 		};
 		public List<string> Coll5 => new List<string>
 		{
 		"a",
 			"b"
 		};
-		public List<string> Coll6 => new List<string>
-		{
-			"a",
-		"b"
-		};
-
 		List<List<List<int>>> l = new List<List<List<int>>>
 		{
 		new List<List<int>>
 		{
 		new List<int>
 		{
-		1,
-		2,
-		3
+			1,
+			2,
+			3
 		}
 		}
 		};
@@ -139,15 +117,15 @@ public static void I_Am_Not_Indented(string[] args)
 		Dictionary<int, int> d1 = new Dictionary<int, int>
 		{
 		{ 1, 2 },
-		{ 2, 3 },
+			{ 2, 3 },
 		};
 
 		Dictionary<int, int> d2 = new Dictionary<int, int>
 		{
 		{ 1, 2 },
 			{
-			2,
-			3
+				2,
+				3
 			}
 		};
 
@@ -158,18 +136,6 @@ public static void I_Am_Not_Indented(string[] args)
 			{
 				2, 3
 			}
-			}
-		};
-		List<List<List<int>>> l2 = new List<List<List<int>>>
-		{
-			new List<List<int>>
-			{
-				new List<int>
-				{
-					1,
-				2,
-					3
-				}
 			}
 		};
 	}

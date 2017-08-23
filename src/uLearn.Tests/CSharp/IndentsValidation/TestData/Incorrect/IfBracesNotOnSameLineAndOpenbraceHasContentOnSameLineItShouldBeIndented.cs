@@ -2,7 +2,7 @@
 
 namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 {
-	public class IfOpenBraceHasContentOnSameLineItShouldBeIndented
+	public class IfBracesNotOnSameLineAndOpenbraceHasContentOnSameLineItShouldBeIndented
 	{
 		public static void Main17(string[] args) { var a = 0;
 			var b = 0; var c = 0;
