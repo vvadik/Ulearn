@@ -74,4 +74,12 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 				i
 				});
 	}
+	// todo no error
+	//	void M()
+	//	{
+	//		var a = new[] {
+	//	{
+	//		1
+	//	};
+	//	}
 }

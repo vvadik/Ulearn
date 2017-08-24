@@ -35,7 +35,8 @@ namespace uLearn.CSharp
 			return "Строка {0}, позиция {1}: {2}".WithArgs(linePosition.Line + 1, linePosition.Character, message);
 		}
 
-		protected IEnumerable<string> InspectAll<TNode>(SyntaxTree userSolution, Func<TNode, IEnumerable<string>> inspect) where TNode : SyntaxNode
+		protected IEnumerable<string> InspectAll<TNode>(SyntaxTree userSolution, Func<TNode, IEnumerable<string>> inspect)
+			where TNode : SyntaxNode
 		{
 			var nodes = userSolution.GetRoot().DescendantNodes().OfType<TNode>();
 			return nodes.SelectMany(inspect);

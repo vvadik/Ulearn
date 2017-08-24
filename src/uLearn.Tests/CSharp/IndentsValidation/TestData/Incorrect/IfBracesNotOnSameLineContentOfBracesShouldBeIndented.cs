@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Incorrect // todo разбить на файлы, чтоб легче было поддерживать тесты
+namespace Incorrect
 {
 	public class ClassShouldIndentChildrenAlways
 	{
