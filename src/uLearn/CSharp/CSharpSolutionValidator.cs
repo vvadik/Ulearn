@@ -49,7 +49,7 @@ namespace uLearn.CSharp
 					.Where(v => !(v is IStrictValidator))
 					.Select(v => v.FindError(solutionTree))
 					.Where(err => err != null)
-					.OrderBy(s => s); // todo без сортировки
+					.ToArray();
 				return errors.Any()
 					? errors.Aggregate((s1, s2) => $"{s1}{Environment.NewLine}{s2}")
 					: null;
