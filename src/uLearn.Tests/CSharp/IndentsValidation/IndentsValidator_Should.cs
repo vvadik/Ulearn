@@ -55,8 +55,7 @@ namespace uLearn.CSharp.IndentsValidation
 				.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 			var pathAndCode = filepaths.Select(filepath => Tuple.Create(filepath, File.ReadAllText(filepath)));
 			var failed = false;
-			foreach (var tuple in pathAndCode.Where(tuple => !tuple.Item1.EndsWith("Settings.Designer.cs") &&
-															!tuple.Item1.EndsWith("Resources.Designer.cs")))
+			foreach (var tuple in pathAndCode)
 			{
 				var errors = new IndentsValidator().FindError(tuple.Item2);
 

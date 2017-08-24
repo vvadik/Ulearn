@@ -3,9 +3,8 @@ using System.Linq;
 
 namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 {
-	public class IfBracesNotOnSameLineContentOfBracesShouldBeConsistent
-	{
-
+	public class IfBracesNotOnSameLineFirstLevelTokensInsideBracesShouldBeConsistent
+	{ // внутри фигурных скобок все токены верхнего уровня вложенности должны иметь консистентный отступ
 		List<List<List<int>>> l2 = new List<List<List<int>>>
 		{
 			new List<List<int>>
@@ -73,21 +72,5 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 					i,
 				i
 				});
-
-		void M()
-		{
-			var a = new[]
-		{
-			1
-		};
-		}
-
-		void M1
-			(
-			string b,
-			string c
-			)
-		{
-		}
 	}
 }

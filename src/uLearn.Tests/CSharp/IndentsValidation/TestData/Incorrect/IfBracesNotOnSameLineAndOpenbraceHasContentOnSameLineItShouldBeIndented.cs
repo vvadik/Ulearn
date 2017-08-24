@@ -3,7 +3,7 @@
 namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 {
 	public class IfBracesNotOnSameLineAndOpenbraceHasContentOnSameLineItShouldBeIndented
-	{
+	{ // если после фигурной скобки на той же строке что-то есть, это что-то должно быть перенесено на новую строку с отступом
 		public static void Main17(string[] args) { var a = 0;
 			var b = 0; var c = 0;
 		}

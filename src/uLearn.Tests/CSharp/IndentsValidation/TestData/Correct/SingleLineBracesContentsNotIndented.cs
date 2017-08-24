@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Correct
 {
 	public class ClassWithoutMembers { }
 
-	public class ContentOfSingleLineBracesNotIndented
+	public class SingleLineBracesContentsNotIndented
 	{
 		private string prop;
 		public string Prop
@@ -12,6 +13,8 @@ namespace Correct
 			get { return prop; }
 			set { prop = value; }
 		}
+
+		Dictionary<int, int> d2 = new Dictionary<int, int> { { 1, 2 }, { 2, 3 } };
 
 		public string Prop1 { get; set; }
 

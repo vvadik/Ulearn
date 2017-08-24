@@ -1,4 +1,4 @@
-﻿namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
+﻿namespace uLearn.CSharp.IndentsValidation.TestData.Correct
 {
 	public class TabsMixedWithSpaces
 	{

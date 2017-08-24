@@ -2,13 +2,13 @@
 using System.Linq;
 
 namespace Incorrect
-{
+{ // внутри фигурных скобок токены верхнего уровня вложенности должны иметь отступ (консистентный)
 	public class ClassShouldIndentChildrenAlways
 	{
 	public static void I_Am_Not_Indented(string[] args)
-		{
+	{
 
-		}
+	}
 	}
 
 	public enum EnumShouldIndentChildrenAlways
@@ -30,7 +30,7 @@ public static void I_Am_Not_Indented(string[] args)
 		}
 	}
 
-	public class IfBracesNotOnSameLineContentOfBracesShouldBeIndented
+	public class IfBracesNotOnSameLineTokensInsideBracesShouldBeIndented
 	{
 		public static void Main2(string[] args)
 		{
