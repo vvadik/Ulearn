@@ -248,6 +248,9 @@
     <Compile Include="CSharp\testProject\projDir\inner-dir-1\inner-dir-2\ExcludeMeForStudent.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="CSharp\testProject\S055 - Упражнение на параметры по умолчанию.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="CSharp\TestsHelper.cs" />
     <Compile Include="CSharp\testProject\projDir\AnotherTask.Solution.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -77,9 +77,9 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 		void M()
 		{
 			var a = new[]
-				{
-		1
-				};
+		{
+			1
+		};
 		}
 
 		void M1

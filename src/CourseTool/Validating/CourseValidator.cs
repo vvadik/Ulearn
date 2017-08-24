@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using RunCsJob;
-using uLearn.Extensions;
 using uLearn.Model.Blocks;
 
 namespace uLearn
@@ -71,10 +70,11 @@ namespace uLearn
 		private void ReportIfEthalonSolutionHasErrorsOrIssues(ExerciseSlide slide)
 		{
 			var exercise = (SingleFileExerciseBlock)slide.Exercise;
-			var solution = exercise.BuildSolution(exercise.EthalonSolution);
+			var ethalon = exercise.EthalonSolution.RemoveCommonNesting();
+			var solution = exercise.BuildSolution(ethalon);
 			if (solution.HasErrors)
 			{
-				FailOnError(slide, solution, exercise.EthalonSolution);
+				FailOnError(slide, solution, ethalon);
 				return;
 			}
 			if (solution.HasStyleIssues)
@@ -84,7 +84,7 @@ namespace uLearn
 
 			var result = SandboxRunner.Run(exercise.CreateSubmission(
 				slide.Id.ToString(),
-				exercise.EthalonSolution), settings);
+				ethalon), settings);
 
 			var output = result.GetOutput().NormalizeEoln();
 
@@ -92,7 +92,7 @@ namespace uLearn
 			if (!isRightAnswer)
 			{
 				ReportSlideError(slide,
-					"Ethalon solution for does not provide right answer\n" +
+					"Ethalon solution does not provide right answer\n" +
 					"ActualOutput: " + output.NormalizeEoln() + "\n" +
 					"ExpectedOutput: " + slide.Exercise.ExpectedOutput.NormalizeEoln() + "\n" +
 					"CompilationError: " + result.CompilationOutput + "\n" +
