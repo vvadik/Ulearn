@@ -21,7 +21,7 @@ namespace uLearn
 
 			var errors = ReportIfCompilationUnitChildrenIndented()
 				.Concat(ReportIfBracesNotAligned())
-				.Concat(ReportIfBracesContentNotIndented())
+				.Concat(ReportIfBracesContentNotIndentedOrNotConsistent())
 				.ToArray();
 			return errors.Any() ? new[] { prefix }.Concat(errors) : Enumerable.Empty<string>();
 		}
@@ -57,13 +57,12 @@ namespace uLearn
 					continue;
 				if (openBraceIndent.LengthInSpaces != closeBraceIndent.LengthInSpaces)
 				{
-					yield return Report(braces.Open,
-						$"Парные фигурные скобки ({braces.Open.GetLine() + 1}:{braces.Close.GetLine() + 1}) должны иметь одинаковый отступ.");
+					yield return Report(braces.Open, $"Парные фигурные скобки ({braces}) должны иметь одинаковый отступ.");
 				}
 			}
 		}
 
-		private IEnumerable<string> ReportIfBracesContentNotIndented()
+		private IEnumerable<string> ReportIfBracesContentNotIndentedOrNotConsistent()
 		{
 			foreach (var braces in bracesPairs)
 			{
@@ -87,13 +86,14 @@ namespace uLearn
 						else
 						{
 							yield return Report(firstTokensOfBracesContentNodes[i],
-								$"Содержимое парных фигурных скобок ({braces.Open.GetLine() + 1}:{braces.Close.GetLine() + 1}) должно иметь дополнительный отступ.");
+								$"Содержимое парных фигурных скобок ({braces}) должно иметь дополнительный отступ.");
 						}
 					}
 					else if (curIndent.LengthInSpaces != bracesContentIndent.LengthInSpaces)
 						yield return
 							Report(firstTokensOfBracesContentNodes[i],
-								$"Содержимое парных фигурных скобок ({braces.Open.GetLine() + 1}:{braces.Close.GetLine() + 1}) должно иметь одинаковый отступ.");
+								$"Содержимое парных фигурных скобок {braces}) должно иметь одинаковый отступ."); 
+					// todo неправда для вложенных уровней. можно сделать два сообщений - для вложенных слабое правило - не меньше отступа первого уровня
 				}
 			}
 		}
@@ -112,7 +112,7 @@ namespace uLearn
 
 		public override string ToString()
 		{
-			return $"{Open.GetLine()} : {Close.GetLine()}";
+			return $"{Open.GetLine() + 1}:{Close.GetLine() + 1}";
 		}
 	}
 

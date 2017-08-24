@@ -73,13 +73,21 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 					i,
 				i
 				});
+
+		void M()
+		{
+			var a = new[]
+				{
+		1
+				};
+		}
+
+		void M1
+			(
+			string b,
+			string c
+			)
+		{
+		}
 	}
-	// todo no error
-	//	void M()
-	//	{
-	//		var a = new[] {
-	//	{
-	//		1
-	//	};
-	//	}
 }
