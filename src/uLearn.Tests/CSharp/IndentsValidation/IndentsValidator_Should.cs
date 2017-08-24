@@ -45,7 +45,10 @@ namespace uLearn.CSharp.IndentsValidation
 			errors.Should().BeNullOrEmpty();
 		}
 
-		[Test]
+		[Test(Description =
+			@"Тест будет работать, только если предварительно подготовить файл TestFilepaths.txt со списком полных путей до файлов курса: 
+			см. Test_Jobs.Write_All_Cs_FileFullNames_Of_Course_ToTxt")]
+		[Explicit]
 		public void NotFindErrors_On_Course_Cs_Files()
 		{
 			var filepaths = TestDataDir.GetFiles("TestFilepaths.txt").Single().ContentAsUtf8()
