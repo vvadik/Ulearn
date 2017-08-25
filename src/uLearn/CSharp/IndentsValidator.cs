@@ -19,9 +19,10 @@ namespace uLearn
 			tree = userSolution;
 			bracesPairs = BuildBracesPairs().OrderBy(p => p.Open.SpanStart).ToArray();
 
-			var errors = ReportIfCompilationUnitChildrenIndented()
+			var errors = ReportIfCompilationUnitChildrenIndented() // todo сортировать по строкам?
 				.Concat(ReportIfBracesNotAligned())
 				.Concat(ReportIfBracesContentNotIndentedOrNotConsistent())
+				.Concat(ReportIfBracesNotIndented())
 				.ToArray();
 			return errors.Any() ? new[] { prefix }.Concat(errors) : Enumerable.Empty<string>();
 		}
@@ -93,9 +94,13 @@ namespace uLearn
 						yield return
 							Report(firstTokensOfBracesContentNodes[i],
 								$"Содержимое парных фигурных скобок ({braces}) должно иметь одинаковый отступ."); 
-					// todo неправда для вложенных уровней. можно сделать два сообщения - для вложенных слабое правило - не меньше отступа первого уровня
 				}
 			}
+		}
+
+		private IEnumerable<string> ReportIfBracesNotIndented()
+		{
+			return Enumerable.Empty<string>(); // todo
 		}
 	}
 
@@ -135,8 +140,7 @@ namespace uLearn
 		private int GetLengthInSpaces(SyntaxToken firstTokenInLine)
 		{
 			var lastTrivia = firstTokenInLine.LeadingTrivia.LastOrDefault();
-
-			var a = 0; /*fdfd*/ if (!lastTrivia.IsKind(SyntaxKind.WhitespaceTrivia)) // todo edge case with comment
+			if (!lastTrivia.IsKind(SyntaxKind.WhitespaceTrivia))
 				return 0;
 			var stringTrivia = lastTrivia.ToFullString();
 			var type = GetIndentType(stringTrivia);

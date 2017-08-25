@@ -215,7 +215,7 @@
     <Compile Include="CSharp\CourseValidator_ReportError_should.cs" />
     <Compile Include="CSharp\CourseValidator_ReportWarning_should.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\BracesMightNotBeAlignedIfOpenBraceDoesntHaveLeadingTrivia.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Correct\IfBracesNotOnSameLineNestedTokensInsideBracesIndented.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Correct\IfBracesNotOnSameLineBracesIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\IfBracesNotOnSameLineFirstLevelTokensInsideBracesIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\SingleLineParameterListNotIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\SingleLineExpressionStatementNotIndented.cs" />
@@ -226,7 +226,7 @@
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\BracesShouldBeAlignedIfOpenBraceHasLeadingTriviaAndBracesNotOnSameLine.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\IfBracesNotOnSameLineAndOpenbraceHasContentOnSameLineItShouldBeIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\IfBracesNotOnSameLineFirstLevelTokensInsideBracesShouldBeConsistent.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\IfBracesNotOnSameLineNestedTokensInsideBracesShouldBeIndented.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\IfBracesNotOnSameLineBracesShouldBeIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\MultilineArgumentListShouldBeIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\MultilineParameterListShouldBeIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\Test_Jobs.cs" />
