@@ -36,7 +36,11 @@ namespace uLearn.CourseTool.CmdLineOptions
 				Write(ConsoleColor.Red, m);
 				errors.Add(m);
 			};
-			validator.Warning += m => { Write(ConsoleColor.DarkYellow, m); };
+			validator.Warning += m =>
+			{
+				Write(ConsoleColor.DarkYellow, m);
+				errors.Add(m);
+			};
 			validator.ValidateExercises();
 			validator.ValidateVideos();
 			if (errors.Any())
@@ -50,7 +54,9 @@ namespace uLearn.CourseTool.CmdLineOptions
 			else
 				Console.WriteLine("OK! No errors found");
 			Console.WriteLine("Press any key...");
+			Console.WriteLine("Exit code " + Environment.ExitCode);
 			Console.ReadLine();
+			Environment.Exit(Environment.ExitCode);
 		}
 
 		private void Write(ConsoleColor color, string message, bool error = false)
