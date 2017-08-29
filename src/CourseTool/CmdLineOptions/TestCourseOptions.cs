@@ -44,7 +44,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 				Console.WriteLine("Done! There are errors:");
 				foreach (var error in errors)
 				{
-					Write(ConsoleColor.Red, error);
+					Write(ConsoleColor.Red, error, true);
 				}
 			}
 			else
@@ -53,13 +53,19 @@ namespace uLearn.CourseTool.CmdLineOptions
 			Console.ReadLine();
 		}
 
-		private void Write(ConsoleColor color, string message)
+		private void Write(ConsoleColor color, string message, bool error = false)
 		{
 			var oldColor = Console.ForegroundColor;
 			Console.ForegroundColor = color;
 			try
 			{
-				Console.WriteLine(message);
+				if (error)
+				{
+					Console.Error.WriteLine(message);
+					Environment.ExitCode = -1;
+				}
+				else
+					Console.WriteLine(message);
 			}
 			finally
 			{
