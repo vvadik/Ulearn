@@ -2,7 +2,7 @@
 using System.Linq;
 
 namespace Incorrect
-{ // внутри фигурных скобок токены верхнего уровня вложенности должны иметь отступ (консистентный)
+{ // внутри фигурных скобок первый токен должен иметь дополнительный отступ
 	public class ClassShouldIndentChildrenAlways
 	{
 	public static void I_Am_Not_Indented(string[] args)

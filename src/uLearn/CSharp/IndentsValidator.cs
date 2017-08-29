@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -19,8 +20,9 @@ namespace uLearn
 			tree = userSolution;
 			bracesPairs = BuildBracesPairs().OrderBy(p => p.Open.SpanStart).ToArray();
 
-			var errors = ReportIfCompilationUnitChildrenIndented() // todo сортировать по строкам?
+			var errors = ReportIfCompilationUnitChildrenIndented()
 				.Concat(ReportIfBracesNotAligned())
+				.Concat(ReportIfOpenBraceHasCodeOnSameLine())
 				.Concat(ReportIfBracesContentNotIndentedOrNotConsistent())
 				.Concat(ReportIfBracesNotIndented())
 				.ToArray();
@@ -63,44 +65,66 @@ namespace uLearn
 			}
 		}
 
+		private IEnumerable<string> ReportIfOpenBraceHasCodeOnSameLine()
+		{
+			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
+			{
+				var openBraceHasCodeOnSameLine = braces.Open.Parent.ChildNodes()
+					.Select(node => node.DescendantTokens().First())
+					.Any(t => braces.TokenInsideBraces(t) && t.GetLine() == braces.Open.GetLine());
+				if (openBraceHasCodeOnSameLine)
+					yield return Report(braces.Open, "После открывающей фигурной скобки на той же строке не должно быть кода");
+			}
+		}
+
 		private IEnumerable<string> ReportIfBracesContentNotIndentedOrNotConsistent()
 		{
-			foreach (var braces in bracesPairs)
+			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
 			{
-				if (braces.Open.GetLine() == braces.Close.GetLine())
-					continue;
-				var firstTokensOfBracesContentNodes = braces.Open.Parent.ChildNodes()
+				var childLineIndents = braces.Open.Parent.ChildNodes()
 					.Select(node => node.DescendantTokens().First())
-					.Where(n => n.SpanStart > braces.Open.SpanStart)
+					.Where(t => braces.TokenInsideBraces(t))
+					.Select(t => new Indent(t))
+					.Where(i => i.IndentedTokenIsFirstAtLine)
 					.ToList();
-				var openbraceIndent = new Indent(braces.Open);
-				Indent bracesContentIndent = null;
-				for (var i = 0; i < firstTokensOfBracesContentNodes.Count; i++)
+				if (!childLineIndents.Any())
+					continue;
+				var openbraceLineIndent = new Indent(braces.Open);
+				var firstChild = childLineIndents.First();
+				if (firstChild.LengthInSpaces <= openbraceLineIndent.LengthInSpaces)
+					yield return Report(firstChild.IndentedToken,
+						$"Содержимое парных фигурных скобок ({braces}) должно иметь дополнительный отступ.");
+				var badLines = childLineIndents.Where(t => t.LengthInSpaces != firstChild.LengthInSpaces);
+				foreach (var badIndent in badLines)
 				{
-					var curIndent = new Indent(firstTokensOfBracesContentNodes[i]);
-					if (!curIndent.IndentedTokenIsFirstAtLine && i > 0)
-						continue;
-					if (bracesContentIndent == null)
-					{
-						if (curIndent.LengthInSpaces > openbraceIndent.LengthInSpaces)
-							bracesContentIndent = curIndent;
-						else
-						{
-							yield return Report(firstTokensOfBracesContentNodes[i],
-								$"Содержимое парных фигурных скобок ({braces}) должно иметь дополнительный отступ.");
-						}
-					}
-					else if (curIndent.LengthInSpaces != bracesContentIndent.LengthInSpaces)
-						yield return
-							Report(firstTokensOfBracesContentNodes[i],
-								$"Содержимое парных фигурных скобок ({braces}) должно иметь одинаковый отступ."); 
+					yield return Report(badIndent.IndentedToken,
+						$"Содержимое парных фигурных скобок ({braces}) должно иметь одинаковый отступ.");
 				}
 			}
 		}
 
 		private IEnumerable<string> ReportIfBracesNotIndented()
 		{
-			return Enumerable.Empty<string>(); // todo
+			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine() &&
+															Indent.TokenIsFirstAtLine(pair.Open)))
+			{
+				var parent = FindClosestParentOnAnotherLine(braces.Open);
+				var parentLineIndent = new Indent(parent.DescendantTokens().First());
+				var openbraceLineIndent = new Indent(braces.Open);
+				if (openbraceLineIndent.LengthInSpaces < parentLineIndent.LengthInSpaces)
+					yield return Report(braces.Open,
+						$"Парные фигурные скобки ({braces}) должны иметь отступ не меньше, чем у родителя.");
+			}
+		}
+
+		private SyntaxNode FindClosestParentOnAnotherLine(SyntaxToken child)
+		{
+			var parentFirstToken = child.Parent;
+			while (parentFirstToken.DescendantTokens().First().GetLine() == child.GetLine())
+			{
+				parentFirstToken = parentFirstToken.Parent;
+			}
+			return parentFirstToken;
 		}
 	}
 
@@ -115,25 +139,28 @@ namespace uLearn
 			Close = close;
 		}
 
+		public bool TokenInsideBraces(SyntaxToken token)
+		{
+			return token.SpanStart > Open.SpanStart && token.Span.End < Close.Span.End;
+		}
+
 		public override string ToString()
 		{
-			return $"{Open.GetLine() + 1}:{Close.GetLine() + 1}";
+			return $"строки {Open.GetLine() + 1}, {Close.GetLine() + 1}";
 		}
 	}
 
 	internal class Indent
 	{
-		private SyntaxToken indentedToken;
-
 		public int LengthInSpaces { get; }
 		public bool IndentedTokenIsFirstAtLine { get; }
+		public SyntaxToken IndentedToken { get; }
 
 		public Indent(SyntaxToken indentedToken)
 		{
-			this.indentedToken = indentedToken;
-			var tokenLineSpanStart = indentedToken.SyntaxTree.GetText().Lines[indentedToken.GetLine()].Start;
-			var firstTokenInLine = indentedToken.SyntaxTree.GetRoot().FindToken(tokenLineSpanStart);
-			IndentedTokenIsFirstAtLine = firstTokenInLine.IsEquivalentTo(indentedToken);
+			IndentedToken = indentedToken;
+			IndentedTokenIsFirstAtLine = TokenIsFirstAtLine(indentedToken);
+			var firstTokenInLine = GetFirstTokenAtLine(indentedToken);
 			LengthInSpaces = GetLengthInSpaces(firstTokenInLine);
 		}
 
@@ -165,9 +192,20 @@ namespace uLearn
 			return nodeOrToken.GetLeadingTrivia().LastOrDefault().IsKind(SyntaxKind.WhitespaceTrivia);
 		}
 
+		public static SyntaxToken GetFirstTokenAtLine(SyntaxToken token)
+		{
+			var tokenLineSpanStart = token.SyntaxTree.GetText().Lines[token.GetLine()].Start;
+			return token.SyntaxTree.GetRoot().FindToken(tokenLineSpanStart);
+		}
+
+		public static bool TokenIsFirstAtLine(SyntaxToken token)
+		{
+			return GetFirstTokenAtLine(token).IsEquivalentTo(token);
+		}
+
 		public override string ToString()
 		{
-			return $"{indentedToken.Kind()}. LengthInSpaces: {LengthInSpaces}";
+			return $"{IndentedToken.Kind()}. LengthInSpaces: {LengthInSpaces}";
 		}
 	}
 

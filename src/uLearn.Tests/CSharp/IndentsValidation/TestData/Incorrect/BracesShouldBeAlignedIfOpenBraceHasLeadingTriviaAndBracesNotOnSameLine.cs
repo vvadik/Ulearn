@@ -39,9 +39,9 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 }
 
 		public static void Main3(string[] args)
-	{
+		{
 			var c = 0;
-			}
+					}
 
 		public static void Main2(string[] args)
 		{
@@ -67,8 +67,8 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 						1
 				},
 					new[] 
-			{
-					2
+					{
+						2
 				}
 			};
 		}

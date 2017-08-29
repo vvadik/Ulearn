@@ -224,7 +224,7 @@
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\MultilineParameterListIsIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\SingleLineMultipleStatementsNotIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\BracesShouldBeAlignedIfOpenBraceHasLeadingTriviaAndBracesNotOnSameLine.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\IfBracesNotOnSameLineAndOpenbraceHasContentOnSameLineItShouldBeIndented.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\IfBracesNotOnSameLineOpenbraceShouldNotHaveCodeOnSameLine.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\IfBracesNotOnSameLineFirstLevelTokensInsideBracesShouldBeConsistent.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\IfBracesNotOnSameLineBracesShouldBeIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\MultilineArgumentListShouldBeIndented.cs" />
@@ -236,7 +236,7 @@
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\BlockChildrenIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\IfBracesNotOnSameLineFirstLevelTokensInsideBracesConsistent.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\MultilineExpressionStatementIsIndented.cs" />
-    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\IfBracesNotOnSameLineFirstLevelTokensInsideBracesShouldBeIndented.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\IfBracesNotOnSameLineFirstTokenAfterOpenbraceShouldBeIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\CompilationUnitChildrenShouldNeverBeIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\MultilineExpressionStatementShouldBeIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\TabsMixedWithSpaces.cs" />

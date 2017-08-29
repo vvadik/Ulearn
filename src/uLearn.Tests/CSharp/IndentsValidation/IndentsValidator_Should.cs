@@ -8,21 +8,20 @@ using FluentAssertions;
 using NUnit.Framework;
 using uLearn.Extensions;
 
-// ReSharper disable MemberCanBePrivate.Global
 
 namespace uLearn.CSharp.IndentsValidation
 {
 	[TestFixture]
 	public class IndentsValidator_Should
 	{
-		public static DirectoryInfo TestDataDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+		private static DirectoryInfo TestDataDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
 			"..", "CSharp", "IndentsValidation", "TestData"));
 
 		private static DirectoryInfo IncorrectTestDataDir => TestDataDir.GetDirectories("Incorrect").Single();
 		private static DirectoryInfo CorrectTestDataDir => TestDataDir.GetDirectories("Correct").Single();
 
-		public static string[] correctFilenames => CorrectTestDataDir.GetFiles().Select(f => f.Name).ToArray();
-		public static string[] incorrectFilenames => IncorrectTestDataDir.GetFiles().Select(f => f.Name).ToArray();
+		private static string[] correctFilenames => CorrectTestDataDir.GetFiles().Select(f => f.Name).ToArray();
+		private static string[] incorrectFilenames => IncorrectTestDataDir.GetFiles().Select(f => f.Name).ToArray();
 
 		[Test]
 		[TestCaseSource(nameof(incorrectFilenames))]
