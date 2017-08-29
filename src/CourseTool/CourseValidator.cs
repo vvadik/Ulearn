@@ -101,9 +101,12 @@ namespace uLearn
 
 		private void FailOnError(ExerciseSlide slide, SolutionBuildResult solution, string ethalonSolution)
 		{
-			ReportSlideError(slide, $@"Template solution: {ethalonSolution}
-source code: {solution.SourceCode}
-error: {solution.ErrorMessage}");
+			ReportSlideError(slide, $@"ETHALON SOLUTION:
+{ethalonSolution}
+SOURCE CODE: 
+{solution.SourceCode}
+ERROR:
+{solution.ErrorMessage}");
 		}
 	}
 }
