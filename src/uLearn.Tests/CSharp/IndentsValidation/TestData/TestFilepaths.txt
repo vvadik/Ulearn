@@ -581,8 +581,6 @@ d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\T
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\Properties\AssemblyInfo.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\Properties\Resources.Designer.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\Properties\Settings.Designer.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\S010_AlgorithmsMatters.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\S020_BasicTerms.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\S030_ComplexityMeausure.cs
@@ -676,8 +674,6 @@ d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomple
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\Properties\AssemblyInfo.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\Properties\Resources.Designer.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\Properties\Settings.Designer.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\AnglesToCoordinatesTask.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\AnglesToCoordinatesTask.Solution.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\AntiFlickerForm.cs
@@ -700,8 +696,6 @@ d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulat
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\Properties\AssemblyInfo.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\Properties\Resources.Designer.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\Properties\Settings.Designer.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\S010_Classes.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\S016_CreateClass.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\S017_ShortSyntax.cs
@@ -739,8 +733,6 @@ d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainti
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\Properties\AssemblyInfo.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\Properties\Resources.Designer.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\Properties\Settings.Designer.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S010_Why.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S020_Inheritance.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S030_Hierarchy.cs
@@ -775,8 +767,6 @@ d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\Properties\AssemblyInfo.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\Properties\Resources.Designer.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\Properties\Settings.Designer.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S010_Целостность данных.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S020_Ключевое слово private.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S030_Отложенные ошибки.cs
@@ -798,8 +788,6 @@ d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelA
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelAccounting\checking\HotelAccountingTestCase.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelAccounting\checking\~$Checker.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelAccounting\Properties\AssemblyInfo.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelAccounting\Properties\Resources.Designer.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelAccounting\Properties\Settings.Designer.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\IIndexer.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\Indexer.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\Indexer.Solution.cs
@@ -815,8 +803,6 @@ d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\Pocket
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\Properties\AssemblyInfo.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\Properties\Resources.Designer.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\Properties\Settings.Designer.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\ReadOnlyVector\ReadOnlyVector.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\ReadOnlyVector\ReadOnlyVector.Solution.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\ReadOnlyVector\checking\ReadonlyVectorChecking.cs
@@ -858,8 +844,6 @@ d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profili
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
 d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\Properties\AssemblyInfo.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\Properties\Resources.Designer.cs
-d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\Properties\Settings.Designer.cs
 d:\_work\BasicProgramming\Part01\libs\TestRoom\ITestRoomUI.cs
 d:\_work\BasicProgramming\Part01\libs\TestRoom\TestCase.cs
 d:\_work\BasicProgramming\Part01\libs\TestRoom\TestCaseUI.cs
@@ -867,8 +851,6 @@ d:\_work\BasicProgramming\Part01\libs\TestRoom\TestResult.cs
 d:\_work\BasicProgramming\Part01\libs\TestRoom\TestRoom.cs
 d:\_work\BasicProgramming\Part01\libs\TestRoom\TestRoom.Designer.cs
 d:\_work\BasicProgramming\Part01\libs\TestRoom\Properties\AssemblyInfo.cs
-d:\_work\BasicProgramming\Part01\libs\TestRoom\Properties\Resources.Designer.cs
-d:\_work\BasicProgramming\Part01\libs\TestRoom\Properties\Settings.Designer.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\DP_Flags.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\DP_SquareWorld.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\DP_Tickets.cs
@@ -1052,8 +1034,6 @@ d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgram
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\Properties\AssemblyInfo.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\Properties\Resources.Designer.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\Properties\Settings.Designer.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\S010_Практикум.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\ExtensionsTask.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\ExtensionsTask.Solution.cs
@@ -1119,48 +1099,9 @@ d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные а
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S120 - Жадный алгоритм для задачи коммивояжера.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S130 - Жадные алгоритмы как эвристические.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S999 - Практика.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\GreedyPathFinder.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\GreedyPathFinder.Solution.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\NotGreedyPathFinder.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\NotGreedyPathFinder.Solution.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\NotGreedyPathFinder.WrongAnswer.Timeout.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Program.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Architecture\Extensions.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Architecture\Folders.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Architecture\State.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Architecture\StateController.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Architecture\StatesLoader.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Architecture\Drawing\GreedyWindow.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Architecture\Drawing\IPathFinder.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Architecture\Drawing\IScenePainter.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Architecture\Drawing\PlayerImageProvider.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Architecture\Drawing\ScaledViewPanel.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Architecture\Drawing\ScaledViewPanelPainter.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Architecture\Drawing\Sprites.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\checking\StateTestCase.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\checking\Architecture\PathStep.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\checking\Architecture\PathWithCost.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\checking\Architecture\ArchitectureTests\GameOver_Message_Should.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\checking\Architecture\ArchitectureTests\StateValidator_Should.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\checking\Architecture\Jobs\MakeJob.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\checking\Architecture\Jobs\MazeToStateParser.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\checking\Architecture\Jobs\StateConverter.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\checking\Architecture\Jobs\StateGenerator.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\checking\Architecture\Jobs\StateValidator.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\checking\SecretTests\Secret_GreedyPathFinder_Should.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\checking\SecretTests\Secret_GreedyTimeLimit_Tests.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\checking\SecretTests\Secret_NotGreedyPathFinder_Should.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\checking\SecretTests\Secret_NotGreedyTimeLimit_Tests.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Properties\AssemblyInfo.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Properties\Resources.Designer.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Properties\Settings.Designer.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Tests\GreedyPathFinder_Should.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Tests\GreedyTimeLimit_Tests.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Tests\NotGreedyPathFinder_Should.cs
-d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\Tests\TestsHelper.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S010 - Динамическое программирование на задаче о планировании времени.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S018 - PlanExercise.cs
 d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S020 - Резюме по задаче планирования времени.cs
