@@ -229,7 +229,6 @@
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\IfBracesNotOnSameLineBracesShouldBeIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\MultilineArgumentListShouldBeIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\MultilineParameterListShouldBeIndented.cs" />
-    <Compile Include="CSharp\IndentsValidation\Test_Jobs.cs" />
     <Compile Include="CSharp\IndentsValidation\IndentsValidator_Should.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\SingleLineBracesContentsNotIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\CompilationUnitChildrenNeverIndented.cs" />

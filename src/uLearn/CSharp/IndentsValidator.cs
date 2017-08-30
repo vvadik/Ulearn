@@ -52,13 +52,13 @@ namespace uLearn
 
 		private IEnumerable<string> ReportIfBracesNotAligned()
 		{
-			foreach (var braces in bracesPairs)
+			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
 			{
 				var openBraceIndent = new Indent(braces.Open);
 				var closeBraceIndent = new Indent(braces.Close);
-				if (!openBraceIndent.IndentedTokenIsFirstAtLine)
-					continue;
-				if (openBraceIndent.LengthInSpaces != closeBraceIndent.LengthInSpaces)
+				if (openBraceIndent.IndentedTokenIsFirstAtLine &&
+					!closeBraceIndent.IndentedTokenIsFirstAtLine ||
+					openBraceIndent.LengthInSpaces != closeBraceIndent.LengthInSpaces)
 				{
 					yield return Report(braces.Open, $"Парные фигурные скобки ({braces}) должны иметь одинаковый отступ.");
 				}

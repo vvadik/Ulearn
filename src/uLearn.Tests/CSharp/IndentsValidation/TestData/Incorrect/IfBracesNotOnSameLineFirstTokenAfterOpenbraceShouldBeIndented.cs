@@ -14,7 +14,7 @@ namespace Incorrect
 	public enum EnumShouldIndentChildrenAlways
 	{
 	I_Am_Not_Indented, Me_Too,
-I_Am_Not_Indented1
+	I_Am_Not_Indented1
 	}
 
 	public interface InterfaceShouldIndentChildrenAlways
@@ -68,7 +68,7 @@ public static void I_Am_Not_Indented(string[] args)
 			i => new[] 
 			{
 		i,
-			i
+		i
 			} 
 			.Select(a => a));
 
@@ -99,7 +99,7 @@ public static void I_Am_Not_Indented(string[] args)
 		public List<string> Coll5 => new List<string>
 		{
 		"a",
-			"b"
+		"b"
 		};
 		List<List<List<int>>> l = new List<List<List<int>>>
 		{
@@ -117,16 +117,16 @@ public static void I_Am_Not_Indented(string[] args)
 		Dictionary<int, int> d1 = new Dictionary<int, int>
 		{
 		{ 1, 2 },
-			{ 2, 3 },
+		{ 2, 3 },
 		};
 
 		Dictionary<int, int> d2 = new Dictionary<int, int>
 		{
 		{ 1, 2 },
-			{
+		{
 				2,
 				3
-			}
+		}
 		};
 
 		Dictionary<int, List<int>> dl = new Dictionary<int, List<int>>

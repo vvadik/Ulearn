@@ -48,7 +48,7 @@ namespace uLearn.CSharp.IndentsValidation
 		[Explicit]
 		public void NotFindErrors_On_Cs_Files_Of_Folder()
 		{
-			var folder = new DirectoryInfo("DIRECTORY FULL PATH");
+			var folder = new DirectoryInfo("d:\\BP1_UserCodeFiles\\");
 			var filesCode = folder.GetFiles("*.cs", SearchOption.AllDirectories)
 				.Where(f => !f.Name.Equals("Settings.Designer.cs") && !f.Name.Equals("Resources.Designer.cs"))
 				.Select(f => Tuple.Create(f.FullName, f.ContentAsUtf8()));

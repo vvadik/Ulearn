@@ -71,6 +71,16 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 						2
 				}
 			};
+
+			for (int i = 0; i < 10; i++)
+			{
+				var a = 0
+			; }
+
+			for (int i = 0; i < 10; i++)
+			{
+				var
+			a = 0; }
 		}
 	}
 }
