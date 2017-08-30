@@ -44,17 +44,16 @@ namespace uLearn.CSharp.IndentsValidation
 			errors.Should().BeNullOrEmpty();
 		}
 
-		[Test(Description =
-			@"Тест будет работать, только если предварительно подготовить файл TestFilepaths.txt со списком полных путей до файлов курса: 
-			см. Test_Jobs.Write_All_Cs_FileFullNames_Of_Course_ToTxt")]
+		[Test]
 		[Explicit]
-		public void NotFindErrors_On_Course_Cs_Files()
+		public void NotFindErrors_On_Cs_Files_Of_Folder()
 		{
-			var filepaths = TestDataDir.GetFiles("TestFilepaths.txt").Single().ContentAsUtf8()
-				.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-			var pathAndCode = filepaths.Select(filepath => Tuple.Create(filepath, File.ReadAllText(filepath)));
+			var folder = new DirectoryInfo("DIRECTORY FULL PATH");
+			var filesCode = folder.GetFiles("*.cs", SearchOption.AllDirectories)
+				.Where(f => !f.Name.Equals("Settings.Designer.cs") && !f.Name.Equals("Resources.Designer.cs"))
+				.Select(f => Tuple.Create(f.FullName, f.ContentAsUtf8()));
 			var failed = false;
-			foreach (var tuple in pathAndCode)
+			foreach (var tuple in filesCode)
 			{
 				var errors = new IndentsValidator().FindError(tuple.Item2);
 
