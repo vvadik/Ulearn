@@ -1,12 +1,12 @@
 ﻿namespace Incorrect
 {
 	public class IfBracesNotOnSameLineBracesShouldBeIndented
-	{ // фигурные скобки долджны иметь отступ > чем отступ родителя
+	{ // фигурные скобки должны иметь отступ > чем отступ родителя
 		void M0()
 		{
 			var a = new[]
 		{
-			1
+				1
 		};
 		}
 
@@ -14,7 +14,7 @@
 		{
 			var a = new[]
 	{
-		1
+				1
 	};
 		}
 
@@ -22,7 +22,7 @@
 		{
 			var a = new[]
 {
-	1
+				1
 };
 		}
 

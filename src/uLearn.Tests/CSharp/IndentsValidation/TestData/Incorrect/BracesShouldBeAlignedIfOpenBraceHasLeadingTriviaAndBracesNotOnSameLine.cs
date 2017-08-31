@@ -9,25 +9,6 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 			var a = 0;
 	}
 
-		public static void M(string[] args)
-		{
-			var a = 0; }
-
-		public static void M1(string[] args)
-		{
-			var a = 0;      }
-
-		public static void M4(string[] args)
-		{
-			var b = 0;
-			var a = 0;     }
-
-		public static void M5(string[] args)
-		{
-			var b = 0;
-			var a = new List<int> { 1, 2, 3 };     }
-		
-
 		public static void Main1(string[] args)
 		{
 			var c = 0;
@@ -71,16 +52,6 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 						2
 				}
 			};
-
-			for (int i = 0; i < 10; i++)
-			{
-				var a = 0
-			; }
-
-			for (int i = 0; i < 10; i++)
-			{
-				var
-			a = 0; }
 		}
 	}
 }

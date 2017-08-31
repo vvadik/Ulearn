@@ -1,16 +1,16 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using uLearn.CSharp;
 
 namespace uLearn
 {
 	public class IndentsValidator : BaseStyleValidator
 	{
-		private const string prefix = "Код плохо отформатирован. " +
-									"Автоматически отформатировать код можно в Visual Studio с помощью комбинации клавиш Ctrl + K + D";
+		private const string prefix = "Код плохо отформатирован.\n" +
+									"Автоматически отформатировать код в Visual Studio можно с помощью комбинации клавиш Ctrl+K+D";
 
 		private SyntaxTree tree;
 		private BracesPair[] bracesPairs;
@@ -20,8 +20,9 @@ namespace uLearn
 			tree = userSolution;
 			bracesPairs = BuildBracesPairs().OrderBy(p => p.Open.SpanStart).ToArray();
 
-			var errors = ReportIfCompilationUnitChildrenIndented()
+			var errors = ReportIfCompilationUnitChildrenNotConsistent()
 				.Concat(ReportIfBracesNotAligned())
+				.Concat(ReportIfCloseBraceHasCodeOnSameLine())
 				.Concat(ReportIfOpenBraceHasCodeOnSameLine())
 				.Concat(ReportIfBracesContentNotIndentedOrNotConsistent())
 				.Concat(ReportIfBracesNotIndented())
@@ -43,11 +44,22 @@ namespace uLearn
 			}
 		}
 
-		private IEnumerable<string> ReportIfCompilationUnitChildrenIndented()
+		private IEnumerable<string> ReportIfCompilationUnitChildrenNotConsistent()
 		{
-			foreach (var childNode in tree.GetRoot().ChildNodes())
-				if (Indent.Exists(childNode))
-					yield return Report(childNode, "Лишний отступ.");
+			var childLineIndents = tree.GetRoot().ChildNodes()
+				.Select(node => node.GetFirstToken())
+				.Select(t => new Indent(t))
+				.Where(i => i.IndentedTokenIsFirstAtLine)
+				.ToList();
+			if (!childLineIndents.Any())
+			{
+				return Enumerable.Empty<string>();
+			}
+			var firstIndent = childLineIndents.First();
+			return childLineIndents
+				.Skip(1)
+				.Where(i => i.LengthInSpaces != firstIndent.LengthInSpaces)
+				.Select(i => Report(i.IndentedToken, "На верхнем уровне вложенности все узлы должны иметь одинаковый отступ"));
 		}
 
 		private IEnumerable<string> ReportIfBracesNotAligned()
@@ -56,11 +68,22 @@ namespace uLearn
 			{
 				var openBraceIndent = new Indent(braces.Open);
 				var closeBraceIndent = new Indent(braces.Close);
-				if (openBraceIndent.IndentedTokenIsFirstAtLine &&
-					!closeBraceIndent.IndentedTokenIsFirstAtLine ||
-					openBraceIndent.LengthInSpaces != closeBraceIndent.LengthInSpaces)
+				if (openBraceIndent.IndentedTokenIsFirstAtLine && openBraceIndent.LengthInSpaces != closeBraceIndent.LengthInSpaces)
 				{
 					yield return Report(braces.Open, $"Парные фигурные скобки ({braces}) должны иметь одинаковый отступ.");
+				}
+			}
+		}
+
+		private IEnumerable<string> ReportIfCloseBraceHasCodeOnSameLine()
+		{
+			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
+			{
+				var openBraceIndent = new Indent(braces.Open);
+				var closeBraceIndent = new Indent(braces.Close);
+				if (openBraceIndent.IndentedTokenIsFirstAtLine && !closeBraceIndent.IndentedTokenIsFirstAtLine)
+				{
+					yield return Report(braces.Close, "Перед закрывающей фигурной скобкой на той же строке не должно быть кода.");
 				}
 			}
 		}
@@ -70,7 +93,7 @@ namespace uLearn
 			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
 			{
 				var openBraceHasCodeOnSameLine = braces.Open.Parent.ChildNodes()
-					.Select(node => node.DescendantTokens().First())
+					.Select(node => node.GetFirstToken())
 					.Any(t => braces.TokenInsideBraces(t) && t.GetLine() == braces.Open.GetLine());
 				if (openBraceHasCodeOnSameLine)
 					yield return Report(braces.Open, "После открывающей фигурной скобки на той же строке не должно быть кода");
@@ -89,9 +112,14 @@ namespace uLearn
 					.ToList();
 				if (!childLineIndents.Any())
 					continue;
-				var openbraceLineIndent = new Indent(braces.Open);
+				var firstTokenOfLineWithMinimalIndent = Indent.TokenIsFirstAtLine(braces.Open)
+					? braces.Open
+					: GetFirstTokenOfCorrectOpenbraceParent(braces.Open);
+				if (firstTokenOfLineWithMinimalIndent == default(SyntaxToken))
+					continue;
+				var minimalIndentAfterOpenbrace = new Indent(firstTokenOfLineWithMinimalIndent);
 				var firstChild = childLineIndents.First();
-				if (firstChild.LengthInSpaces <= openbraceLineIndent.LengthInSpaces)
+				if (firstChild.LengthInSpaces <= minimalIndentAfterOpenbrace.LengthInSpaces)
 					yield return Report(firstChild.IndentedToken,
 						$"Содержимое парных фигурных скобок ({braces}) должно иметь дополнительный отступ.");
 				var badLines = childLineIndents.Where(t => t.LengthInSpaces != firstChild.LengthInSpaces);
@@ -103,28 +131,38 @@ namespace uLearn
 			}
 		}
 
+		private SyntaxToken GetFirstTokenOfCorrectOpenbraceParent(SyntaxToken openbrace)
+		{
+			if (openbrace.Parent is BaseTypeDeclarationSyntax ||
+				openbrace.Parent is AccessorListSyntax ||
+				openbrace.Parent is SwitchStatementSyntax ||
+				openbrace.Parent is AnonymousObjectCreationExpressionSyntax ||
+				openbrace.Parent.IsKind(SyntaxKind.ComplexElementInitializerExpression))
+			{
+				return openbrace.Parent.GetFirstToken();
+			}
+			if (openbrace.Parent is InitializerExpressionSyntax ||
+				openbrace.Parent is BlockSyntax && !(openbrace.Parent.Parent is BlockSyntax))
+			{
+				return openbrace.Parent.Parent.GetFirstToken();
+			}
+			return default(SyntaxToken);
+		}
+
 		private IEnumerable<string> ReportIfBracesNotIndented()
 		{
 			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine() &&
 															Indent.TokenIsFirstAtLine(pair.Open)))
 			{
-				var parent = FindClosestParentOnAnotherLine(braces.Open);
-				var parentLineIndent = new Indent(parent.DescendantTokens().First());
+				var correctOpenbraceParent = GetFirstTokenOfCorrectOpenbraceParent(braces.Open);
+				if (correctOpenbraceParent == default(SyntaxToken))
+					continue;
+				var parentLineIndent = new Indent(correctOpenbraceParent);
 				var openbraceLineIndent = new Indent(braces.Open);
 				if (openbraceLineIndent.LengthInSpaces < parentLineIndent.LengthInSpaces)
 					yield return Report(braces.Open,
 						$"Парные фигурные скобки ({braces}) должны иметь отступ не меньше, чем у родителя.");
 			}
-		}
-
-		private SyntaxNode FindClosestParentOnAnotherLine(SyntaxToken child)
-		{
-			var parentFirstToken = child.Parent;
-			while (parentFirstToken.DescendantTokens().First().GetLine() == child.GetLine())
-			{
-				parentFirstToken = parentFirstToken.Parent;
-			}
-			return parentFirstToken;
 		}
 	}
 
@@ -185,11 +223,6 @@ namespace uLearn
 			if (leadingTrivia.All(v => v == ' '))
 				return IndentType.Whitespace;
 			return IndentType.Mixed;
-		}
-
-		public static bool Exists(SyntaxNodeOrToken nodeOrToken)
-		{
-			return nodeOrToken.GetLeadingTrivia().LastOrDefault().IsKind(SyntaxKind.WhitespaceTrivia);
 		}
 
 		public static SyntaxToken GetFirstTokenAtLine(SyntaxToken token)
