@@ -104,14 +104,18 @@ namespace uLearn.Model.Blocks
 			return $"Exercise: {ExerciseInitialCode}, Hints: {string.Join("; ", HintsMd)}";
 		}
 
-		public Component GetSolutionsComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)
+		public Component GetSolutionsComponent(string displayName, Slide slide, int componentIndex, string launchUrl,
+			string ltiId)
 		{
-			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex + "-solutions", launchUrl, ltiId, false, 0, false);
+			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex + "-solutions", launchUrl, ltiId, false,
+				0, false);
 		}
 
-		public Component GetExerciseComponent(string displayName, Slide slide, int componentIndex, string launchUrl, string ltiId)
+		public Component GetExerciseComponent(string displayName, Slide slide, int componentIndex, string launchUrl,
+			string ltiId)
 		{
-			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex, launchUrl, ltiId, true, CorrectnessScore, false);
+			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex, launchUrl, ltiId, true, CorrectnessScore,
+				false);
 		}
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
@@ -130,8 +134,9 @@ namespace uLearn.Model.Blocks
 		{
 			var scoringGroupsIds = scoring.Groups.Keys;
 			if (!string.IsNullOrEmpty(ScoringGroup) && !scoringGroupsIds.Contains(ScoringGroup))
-				throw new CourseLoadingException($"Неизвестная группа оценки у задания {slideDescriptionForErrorMessage}: {ScoringGroup}\n" +
-												"Возможные значения: " + string.Join(", ", scoringGroupsIds));
+				throw new CourseLoadingException(
+					$"Неизвестная группа оценки у задания {slideDescriptionForErrorMessage}: {ScoringGroup}\n" +
+					"Возможные значения: " + string.Join(", ", scoringGroupsIds));
 
 			if (string.IsNullOrEmpty(ScoringGroup))
 				ScoringGroup = scoring.DefaultScoringGroupForExercise;

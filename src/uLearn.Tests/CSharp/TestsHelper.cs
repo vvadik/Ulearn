@@ -68,7 +68,7 @@ namespace uLearn.CSharp
 			return v;
 		}
 
-		public static ExerciseSlide BuildSlide(ProjectExerciseBlock ex)
+		public static ExerciseSlide BuildSlide(ExerciseBlock ex)
 		{
 			var unit = new Unit(new UnitSettings { Title = "UnitTitle" }, null);
 			var slideInfo = new SlideInfo(unit, null, 0);
@@ -79,6 +79,14 @@ namespace uLearn.CSharp
 		{
 			var valOut = new StringBuilder();
 			var val = BuildProjectExerciseValidator(exBlock, valOut);
+			val.ValidateExercises();
+			return valOut.ToString();
+		}
+
+		public static string ValidateBlock(ExerciseBlock exBlock)
+		{
+			var valOut = new StringBuilder();
+			var val = BuildValidator(BuildSlide(exBlock), valOut);
 			val.ValidateExercises();
 			return valOut.ToString();
 		}

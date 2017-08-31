@@ -16,6 +16,7 @@ namespace uLearn.CSharp
 			new NamingCaseStyleValidator(),
 			new RedundantIfStyleValidator(),
 			new NamingStyleValidator(),
+			new IndentsValidator() // Выводит дополнительный текст в конце, поэтому лучше ему быть последним
 		};
 
 		public void AddValidator(ICSharpSolutionValidator validator)
@@ -49,9 +50,7 @@ namespace uLearn.CSharp
 					.Select(v => v.FindError(solutionTree))
 					.Where(err => err != null)
 					.ToArray();
-				return errors.Any()
-					? errors.Aggregate((s1, s2) => $"{s1}{Environment.NewLine}{s2}")
-					: null;
+				return errors.Any() ? string.Join("\n\n", errors) : null;
 			}
 			catch (Exception e)
 			{

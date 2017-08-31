@@ -3,8 +3,10 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
+using uLearn.Extensions;
 using uLearn.Model;
 using uLearn.Model.Blocks;
 
@@ -13,7 +15,9 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class CourseValidator_ReportWarning_should
 	{
-		private static string tempSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "ReportWarningTests_Temp_SlideFolder");
+		private static string tempSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory,
+			"ReportWarningTests_Temp_SlideFolder");
+
 		private static DirectoryInfo tempSlideFolder = new DirectoryInfo(tempSlideFolderPath);
 
 		private static ProjectExerciseBlock exBlock = new ProjectExerciseBlock
@@ -34,7 +38,8 @@ namespace uLearn.CSharp
 			if (File.Exists(studentZipFilepath))
 				File.Delete(studentZipFilepath);
 
-			var ctx = new BuildUpContext(new Unit(null, exBlock.SlideFolderPath), CourseSettings.DefaultSettings, null, String.Empty);
+			var ctx = new BuildUpContext(new Unit(null, exBlock.SlideFolderPath), CourseSettings.DefaultSettings, null,
+				String.Empty);
 			exBlock.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
 		}
 
@@ -62,13 +67,26 @@ namespace uLearn.CSharp
 
 			validatorOut
 				.Should()
-				.Contain($"Code verdict of file with wrong answer ({exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.Type.cs) is not OK.")
+				.Contain(
+					$"Code verdict of file with wrong answer ({exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.Type.cs) is not OK.")
 				.And
 				.Contain("Verdict: CompilationError");
 			validatorOut
-				.Should().Contain($"Code of file with wrong answer ({exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.21.plus.21.cs) is solution!");
+				.Should().Contain(
+					$"Code of file with wrong answer ({exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.21.plus.21.cs) is solution!");
 			validatorOut
 				.Should().NotContain($"{exBlock.UserCodeFileNameWithoutExt}.WrongAnswer.27.cs");
+		}
+
+		[Test]
+		public void Not_Report_Indentation_Warning_On_Ethalon_Solution_Of_SingleFileExercise()
+		{
+			var singleBlock =
+				new ExerciseBuilder("cs", "using System; using System.Linq; using System.Text;").BuildBlockFrom(
+					CSharpSyntaxTree.ParseText(TestsHelper.ProjSlideFolder.GetFile("S055 - Упражнение на параметры по умолчанию.cs")
+						.ContentAsUtf8()), null);
+			var validatorOut = TestsHelper.ValidateBlock(singleBlock);
+			validatorOut.Should().BeNullOrEmpty();
 		}
 	}
 }

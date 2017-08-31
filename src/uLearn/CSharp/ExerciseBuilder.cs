@@ -93,7 +93,8 @@ namespace uLearn.CSharp
 			var isSolutionPart = excludeSolutionAttr != null || node.HasAttribute<ExerciseAttribute>();
 
 			if (node is TypeDeclarationSyntax && node.HasAttribute<ExerciseAttribute>()
-				|| excludeSolutionAttr != null && (excludeSolutionAttr.ArgumentList == null || (bool)excludeSolutionAttr.GetObjArgument(0)))
+				|| excludeSolutionAttr != null && (excludeSolutionAttr.ArgumentList == null ||
+													(bool)excludeSolutionAttr.GetObjArgument(0)))
 				Exercise.EthalonSolution += newMember.ToFullString();
 
 			return isSolutionPart ? null : newMember;
@@ -137,7 +138,8 @@ namespace uLearn.CSharp
 			if (node.HasAttribute<ExpectedOutputAttribute>())
 			{
 				ExerciseClassName = ExerciseClassName ?? FindParentClassName(node);
-				Exercise.ExpectedOutput = node.GetAttributes<ExpectedOutputAttribute>().Select(attr => attr.GetArgument(0)).FirstOrDefault();
+				Exercise.ExpectedOutput = node.GetAttributes<ExpectedOutputAttribute>().Select(attr => attr.GetArgument(0))
+					.FirstOrDefault();
 			}
 			if (node.HasAttribute<HideExpectedOutputOnErrorAttribute>())
 				Exercise.HideExpectedOutputOnError = true;

@@ -179,6 +179,7 @@ FakesAssemblies/
 /src/Courses/Courses.Versions/*.zip
 /src/uLearn.Web/Certificates/
 /src/UI.Tests/screenshots
+/src/uLearn.Tests/CSharp/BasicProgramming
 *.received.txt
 private.settings
 /src/.vs/config

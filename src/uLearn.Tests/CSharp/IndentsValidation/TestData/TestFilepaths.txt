@@ -1,0 +1,1214 @@
+d:\_work\BasicProgramming\Common\Checker.cs
+d:\_work\BasicProgramming\ConsoleApp1\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\ConsoleApp1\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\ConsoleApp1\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\Prelude.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L010 - Введение в C#\S010 - Введение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L010 - Введение в C#\S020 - C# и Java.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L010 - Введение в C#\S030 - C# и C.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L010 - Введение в C#\S040 - C# и Python, PHP.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L010 - Введение в C#\S050 - C# и другие языки.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L010 - Введение в C#\S060 - Hello, world.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L010 - Введение в C#\S070 - Типы данных.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L010 - Введение в C#\S080 - Основные программные конструкции.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L010 - Введение в C#\S090 - Массивы, коллекции, foreach.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L010 - Введение в C#\S100 - Ссылочные типы и типы-значения.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L010 - Введение в C#\_HelloWorld.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L020 - Инкапсуляция (лекция)\S005 - Пререквизиты.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L020 - Инкапсуляция (лекция)\S010 - public, private, static.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L020 - Инкапсуляция (лекция)\S020 - Модификатор internal.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L020 - Инкапсуляция (лекция)\S030 - Конструкторы.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L020 - Инкапсуляция (лекция)\S040 - Порядок инициализации.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L020 - Инкапсуляция (лекция)\S050 - Перегруженные методы и параметры по умолчанию.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L020 - Инкапсуляция (лекция)\S055 - Упражнение на параметры по умолчанию.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L020 - Инкапсуляция (лекция)\S060 - Операторы.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L020 - Инкапсуляция (лекция)\S065 - Упражнение на операторы.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L020 - Инкапсуляция (лекция)\S070 - Свойства.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L020 - Инкапсуляция (лекция)\S075 - Упражнение на свойства.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L020 - Инкапсуляция (лекция)\S080 - Индексаторы.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L020 - Инкапсуляция (лекция)\S090 - Структуры.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\S005 - Файл.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\S010 - Выделение класса - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\S020 - Выделение класса - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\S030 - Свойства - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\S040 - Свойства - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\S050 - Маскировка ошибок vs решение проблем.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\S060 - Конструкторы - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\S070 - Конструкторы - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\S080 - Индексаторы - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\S090 - Индексаторы - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\S100 - Структуры - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\S110 - Структуры - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\S120 - Операторы - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\S130 - Операторы - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.EnterpriseTask\DataBase.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.EnterpriseTask\Enterprise.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.EnterpriseTask\Enterprise.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.EnterpriseTask\Transaction.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.EnterpriseTask\checking\Enterprise_Should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.EnterpriseTask\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.EnterpriseTask\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.EnterpriseTask\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.EnterpriseTask\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Failures\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Failures\ReportMaker.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Failures\ReportMaker.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Failures\ReportMaker_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Failures\checking\Refactored_ReportMaker_Should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Failures\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Failures\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Failures\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Failures\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.RationalNumbers\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.RationalNumbers\Rational.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.RationalNumbers\Rational.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.RationalNumbers\Rational_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.RationalNumbers\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.RationalNumbers\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.RationalNumbers\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.RationalNumbers\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Weights\Indexer.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Weights\Indexer.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Weights\Indexer_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Weights\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Weights\checking\Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Weights\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Weights\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Weights\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L030 - Инкапсуляция (тренинг)\Incapsulation.Weights\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L040 - Наследование и полиморфизм (лекция)\S005 - Пререквизиты.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L040 - Наследование и полиморфизм (лекция)\S010 - Наследование.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L040 - Наследование и полиморфизм (лекция)\S020 - Интерфейсы.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L040 - Наследование и полиморфизм (лекция)\S030 - Дополнение к явной реализации.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L040 - Наследование и полиморфизм (лекция)\S040 - Полиморфизм и абстрактные базовые классы.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L040 - Наследование и полиморфизм (лекция)\S050 - Ключевые слова new и sealed.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\S010 - Реализация интерфейса - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\S020 - Реализация интерфейса - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\S030 - Выделение метода - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\S040 - Выделение метода - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\S050 - Чистые и грязные методы.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\S060 - Наследование - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\S070 - Наследование - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\S080 - Роль архитектуры в приложении.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\S090 - Большой рефакторинг - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\S100 - Большой рефакторинг - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\S110 - Single Responsibility Principle.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.DataStructure\Category.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.DataStructure\Category.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.DataStructure\Category_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.DataStructure\Enums.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.DataStructure\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.DataStructure\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.DataStructure\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.DataStructure\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.DataStructure\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.Geometry\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.Geometry\SurfaceArea_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.Geometry\Task.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.Geometry\Task.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.Geometry\Volume_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.Geometry\checking\Virtual_SecretTests.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.Geometry\checking\Visitor_SecretTests.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.Geometry\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.Geometry\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.Geometry\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.Geometry\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.MapObjects\Army.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.MapObjects\Player.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.MapObjects\Player_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.MapObjects\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.MapObjects\Task.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.MapObjects\Task.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.MapObjects\Tests.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.MapObjects\Treasure.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.MapObjects\checking\MapObjects_SecretTests.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.MapObjects\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.MapObjects\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.MapObjects\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L050 - Наследование и полиморфизм (тренинг)\Inheritance.MapObjects\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\S005 - Пререквизиты.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\S010 - Generic-классы.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\S020 - Generic-методы.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\S030 - Ковариация и контравариация.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\S040 - Дженерики - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\S050 - Дженерики - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.BinaryTrees\BinaryTree.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.BinaryTrees\BinaryTree.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.BinaryTrees\BinaryTree_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.BinaryTrees\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.BinaryTrees\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.BinaryTrees\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.BinaryTrees\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.BinaryTrees\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Robots\Architecture.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Robots\Architecture.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Robots\Architecture_Should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Robots\Commands.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Robots\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Robots\checking\Robots_SecretTests.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Robots\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Robots\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Robots\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Robots\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Tables\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Tables\Table.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Tables\Table.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Tables\Tests.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Tables\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Tables\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Tables\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L060 - Дженерики\Generics.Tables\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\S005 - Пререквизиты.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\S010 - Простое делегирование, задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\S020 - Простое делегирование, решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\S030 - Более сложное делегирование, задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\S040 - Более сложное делегирование, решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\S050 - Сложное делегирование - задание.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\S060 - Сложное делегирование - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\S070 - Делегирование без делегатов - задание.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\S080 - Делегирование без делегатов - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\S090 - Делегирование без делегатов - обсуждение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\S100 - Обратное совместимость - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\S110 - Обратная совместимость - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\S120 - Декораторы.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Observers\ObservableStack.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Observers\ObservableStack.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Observers\ObservableStack_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Observers\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Observers\StackEventData.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Observers\checking\Secret_ObservableStack_Should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Observers\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Observers\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Observers\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Observers\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.PairsAnalysis\Analysis.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.PairsAnalysis\Analysis.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.PairsAnalysis\Analysis_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.PairsAnalysis\AverageDifferenceFinder.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.PairsAnalysis\MaxPauseFinder.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.PairsAnalysis\PairsAnalyzer.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.PairsAnalysis\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.PairsAnalysis\checking\Analysis_extensions_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.PairsAnalysis\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.PairsAnalysis\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.PairsAnalysis\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.PairsAnalysis\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Reports\MeanAndStd.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Reports\Measurement.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Reports\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Reports\ReportMaker.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Reports\ReportMaker.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Reports\ReportMaker_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Reports\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Reports\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Reports\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.Reports\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.TreeTraversal\DataClasses.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.TreeTraversal\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.TreeTraversal\Traversal.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.TreeTraversal\Traversal.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.TreeTraversal\Traversal_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.TreeTraversal\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.TreeTraversal\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.TreeTraversal\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L070 - Делегаты\Delegates.TreeTraversal\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\S005 - Пререквизиты.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\S010 - Рефлексия типов - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\S020 - Рефлексия типов - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\S030 - Профайлинг рефлексии - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\S040 - Профайлинг рефлексии - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\S050 - Рефакторинг рефлексии - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\S060 - Рефакторинг рефлексии - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\S070 - Оптимизация рефлекции - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\S080 - Оптимизация рефлексии - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\S090 - Expressions - задача.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\S100 - Expressions - решение.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Differentiation\Algebra.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Differentiation\Algebra.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Differentiation\Algebra_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Differentiation\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Differentiation\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Differentiation\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Differentiation\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Differentiation\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Randomness\ExponentialDistribution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Randomness\Generator.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Randomness\Generator.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Randomness\Generator_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Randomness\IContinousDistribution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Randomness\NormalDistribution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Randomness\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Randomness\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Randomness\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Randomness\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L080 - Рефлексия\Reflection.Randomness\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\S010 - Потоки.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\S020 - Исключения.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\S030 - Управляемая память.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\S040 - Финализаторы.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\S050 - Паттерн Disposable.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\S060 - Оператор using.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\S070 - Нетипичное использование using.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\_Дополнительный код.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.API\APIObject.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.API\APIObject.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.API\APIObject_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.API\MagicAPI.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.API\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.API\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.API\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.API\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.API\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.Timers\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.Timers\Timer.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.Timers\Timer.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.Timers\Timer_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.Timers\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.Timers\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.Timers\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L090 - Управление памятью\Memory.Timers\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\S010 - Текстовые и бинарные потоки.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\S020 - Метод ReadLines.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\S030 - Архитектура потоков.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\S040 - MemoryStream и NetworkStream.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\S050 - GZipStream.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\S060 - Написание собственного Stream.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Compression\CustomCompressionStream.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Compression\CustomCompressionStream.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Compression\CustomCompressionStream_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Compression\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Compression\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Compression\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Compression\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Compression\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Resources\Constants.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Resources\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Resources\ResourceStream.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Resources\ResourceStream.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Resources\ResourceStream_should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Resources\TestStream.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Resources\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Resources\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Resources\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L100 - Файлы\Streams.Resources\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L110 - Исключения\S010 - Exception и его поля.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L110 - Исключения\S020 - InnerException.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L110 - Исключения\S030 - Перевыброс исключения.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L110 - Исключения\S040 - Первый паттерн - глобальная обработка.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L110 - Исключения\S050 - Второй паттерн - однострочный try.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L110 - Исключения\S060 - Третий паттерн - перевыброс исключения.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L110 - Исключения\S070 - Антипаттерны.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L110 - Исключения\S075 - Раздельная обработка.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L110 - Исключения\S099 - NoPracticeToday.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Entity.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\__Point.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\checking\TaxiOrder_SecretTests.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\checking\ValueType_SecretTests.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\Domain\Address.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\Domain\ITaxiApi.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\Domain\PersonName.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\Domain\TaxiOrder.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\Domain\TaxiOrder.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\Domain\TaxiOrderStatus.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\Domain\TaxiOrder_Should.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\Infrastructure\Entity.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\Infrastructure\ValueType.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\Infrastructure\ValueType.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\Infrastructure\ValueType_Tests.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L120 - DDD\Ddd.Taxi\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\S035 - Сделать Fluent.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\_Spectacle.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\FluentApi.Graph\DotFormatWriter.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\FluentApi.Graph\DotGraphBuilder.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\FluentApi.Graph\DotGraphBuilder.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\FluentApi.Graph\DotGraphBuilder_Tests.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\FluentApi.Graph\Graph.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\FluentApi.Graph\GraphEdge.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\FluentApi.Graph\GraphNode.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\FluentApi.Graph\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\FluentApi.Graph\checking\DotGraphBuilder_SecretTests.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\FluentApi.Graph\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\FluentApi.Graph\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\FluentApi.Graph\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L130 - FluentAPI\FluentApi.Graph\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L140 - Модульность\SRP.ControlDigit\ControlDigitAlgo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L140 - Модульность\SRP.ControlDigit\ControlDigitAlgo.Solution.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L140 - Модульность\SRP.ControlDigit\ControlDigitAlgo_Tests.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L140 - Модульность\SRP.ControlDigit\Program.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L140 - Модульность\SRP.ControlDigit\checking\ControlDigitAlgo_SecretTests.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L140 - Модульность\SRP.ControlDigit\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L140 - Модульность\SRP.ControlDigit\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L140 - Модульность\SRP.ControlDigit\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L140 - Модульность\SRP.ControlDigit\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L150 - Управление зависимостями\_DIP.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L150 - Управление зависимостями\_Mocks.cs
+d:\_work\BasicProgramming\OOP\OOP\Slides\L150 - Управление зависимостями\_Monolithic.cs
+d:\_work\BasicProgramming\Part01\Activities\Ifs-GravityBalls\BallsForm.cs
+d:\_work\BasicProgramming\Part01\Activities\Ifs-GravityBalls\Program.cs
+d:\_work\BasicProgramming\Part01\Activities\Ifs-GravityBalls\WorldModel.cs
+d:\_work\BasicProgramming\Part01\Activities\Ifs-GravityBalls\WorldModel_Solved.cs
+d:\_work\BasicProgramming\Part01\Activities\Ifs-GravityBalls\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\Activities\Ifs-GravityBalls\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\Activities\Ifs-GravityBalls\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\CheckerTests.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\Prelude.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S000_HelpSlide.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S010_HelloWorldVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S013_FirstStep.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S016_InformationSources.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S020_TypesVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S021_TypesExercise.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S031_Conversion.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S032_Conversion2.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S040_StringsVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S050_ParseAndToString.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S060_OperationsVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S061_Operations.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S070_MethodsVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S072_Salary.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S073_Methods.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S075_FindingMethod.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\S080_LocalAndGlobalVarsVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\zzS005_Intro.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L010_Basics\_HelloWorld.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\S010_CompileErrorsVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\S031_Typo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\S040_RuntimeExceptionsVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\S041_RuntimeErrors.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\S050_DebugVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\S060_Experiments.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\S070_Style.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\S075_RefactoringVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\S080_ConstantAndEnum.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\S090_MethodRefactoring.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\S095_Quest.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\_DivisionByZero.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\_MissedUsings.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\_Percents.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\_Refactored.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\_RefactorMe.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\AngryBirds\AngryBirdsTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\AngryBirds\AngryBirdsTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\AngryBirds\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\AngryBirds\checking\AngryBirdsTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\AngryBirds\checking\AngryBirdsTestCaseFactory.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\AngryBirds\checking\CheckerStarter.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\AngryBirds\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\AngryBirds\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\AngryBirds\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\AngryBirds\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\Billiards\BilliardsTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\Billiards\BilliardsTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\Billiards\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\Billiards\checking\BilliardsSolution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\Billiards\checking\BilliardsTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\Billiards\checking\BilliardsTestCaseFactory.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\Billiards\checking\CheckerRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\Billiards\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\Billiards\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\Billiards\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L020_Mistakes\Billiards\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\S010_LogicalTypeVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\S015_IsLeapYear.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\S016 - Сравнение float.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\S017 - Полные и сокращенные операции.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\S020_IfElse.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\S022_MiddleOf3Task.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\S023_QueenMove.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\S030_IfErrorsVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\S050_RobotControl.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Distance\DistanceTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Distance\DistanceTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Distance\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Distance\checking\CheckerRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Distance\checking\DistanceTaskSolution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Distance\checking\DistanceTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Distance\checking\DistanceTestCaseFactory.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Distance\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Distance\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Distance\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Distance\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Pluralize\PluralizeTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Pluralize\PluralizeTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Pluralize\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Pluralize\checking\CheckerRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Pluralize\checking\PluralizeSolution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Pluralize\checking\PluralizeTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Pluralize\checking\PluralizeTestCaseFactory.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Pluralize\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Pluralize\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Pluralize\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Pluralize\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Rectangles\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Rectangles\Rectangle.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Rectangles\RectanglesTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Rectangles\RectanglesTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Rectangles\checking\CheckerRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Rectangles\checking\RectanglesSolution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Rectangles\checking\RectanglesTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Rectangles\checking\RectanglesTestCaseFactory.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Rectangles\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Rectangles\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Rectangles\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L030_Ifs\Rectangles\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\S040_WhileVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\S041_PowerOfTwo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\S044_WhileRefactoringVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\S046_RemoveSpaces.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\S050_ForVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\S055_Border.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\S060_ForVsWhileVideo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\S065_Chessboard.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\DragonFractal\DragonFractalTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\DragonFractal\DragonFractalTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\DragonFractal\Pixels.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\DragonFractal\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\DragonFractal\checking\CheckerRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\DragonFractal\checking\DragonFractalSolution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\DragonFractal\checking\DragonFractalTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\DragonFractal\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\DragonFractal\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\DragonFractal\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\DragonFractal\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\DragonFractal\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\DiagonalMazeTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\DiagonalMazeTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\EmptyMazeTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\EmptyMazeTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\Maze.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\PyramidMazeTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\PyramidMazeTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\Robot.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\SnakeMazeTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\SnakeMazeTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\checking\CheckerRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\checking\MazesTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L040_Loops\Mazes\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\S010_ArrayAndForeach.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\S015_EvenArray.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\S016_FindMinIndex.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\S017_CountElement.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\S018_FindPattern.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\S020_ShortForm.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\S021_Tarot.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\S030_ArrayNull.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\S040_PassArrToMethod.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\S041 - NullIf.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\S042_ArrayInPower.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\S050_MultiDimensionArr.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\S060_ArrayOfArrays.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\S062_TicTacToe.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\Charts.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\HeatmapData.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\HeatmapTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\HeatmapTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\HistogramData.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\HistogramSample.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\HistogramTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\HistogramTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\NameData.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\checking\HistogramTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\checking\NamesRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\checking\NamesSolution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L050_Arrays\Names\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\S010_List.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\S011_CipherTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\S020_Dictionary.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\S021_DictionaryTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\S030_ArrayAndStringComparison.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\S040_StringBuilder.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\S041_StackCipherTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\S050_SpecialChars.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\S060_FormatOutput.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\S070_FilesAndDirectories.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\S080_Encodings.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\BigramGeneratorTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\BigramGeneratorTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\FrequencyAnalysisTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\FrequencyAnalysisTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\SentencesParserTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\SentencesParserTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\TrigramGeneratorTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\TrigramGeneratorTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\checking\CheckerRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\checking\TestAnalysisTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\checking\TextAnalysisSolution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L060_Collections\TextAnalysis\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\CheckUnitTests.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\S010_Testing.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\S020_Library.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\S030_UnitTest.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\S040_MoreTests.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\S050_Coverage.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\S060_Tdd.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\S070_FunctionalTestingcs.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\S080_ValueOfTesting.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\S090_IntroducingTests.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\_Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\_QuadricEquation.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\_S030_UnitTest.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\_UnitTest.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\FieldsParserTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\FieldsParserTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\Token.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\checking\CheckerRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\checking\FieldsParserTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L070_AutomaticTesting\TableParser\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\S010_AlgorithmsMatters.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\S020_BasicTerms.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\S030_ComplexityMeausure.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\S040_FunctionGrowth.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\S050_OSymbol.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\S060_ComplexityEstimation.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\S070_NumberComplex.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\S080_ComplexityClasses.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\GrayscaleTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\GrayscaleTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\HoughTransformTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\Line.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\MedianFilterTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\MedianFilterTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\Pixel.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\SobelFilterTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\SobelFilterTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\ThresholdFilterTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\ThresholdFilterTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\checking\CheckerRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\checking\Generator.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\checking\GrayscaleTask_Solved.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\checking\MedianFilterTask_Solved.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\checking\RecognizerTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\checking\SobelFilterTask_Solved.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\checking\ThresholdFilterTask_Solved.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L080_Complexity\image\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\S010_Recursion.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\S015_FixRecursion.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\S020_RecursionTree.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\S030_AdvancedExample.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\S040_DivideAndRule.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\S050_Subsets.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\S055_FixSubsets.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\S060_Permutations.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\S065_FinishPermutations.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\S070_Combinations.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\_S100_Passwords.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\__S101_RoutePlanningExercise.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\route-planning\PathFinderTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\route-planning\PathFinderTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\route-planning\PathForm.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\route-planning\PointExtensions.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\route-planning\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\route-planning\checking\CheckerRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\route-planning\checking\PathFinderRandomizedTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\route-planning\checking\PathFinderTask_Solved.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\route-planning\checking\RoutePlanningTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\route-planning\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\route-planning\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\route-planning\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L090_Recursion\route-planning\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\S010_BinSearch.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\S020_LinearSearch.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\S030_BinSearchAnalysis.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\S040_Performance.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\S045_BinSearch.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\S050_BubbleSort.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\S055_BubbleSortRange.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\S060_MergeSort.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\S070_QuickSort.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\S085 - Сравнение алгоритмов сортировки.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\zzS099_Exercise.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\AutocompleteForm.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\AutocompleteForm.Designer.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\AutocompleteTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\AutocompleteTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\LeftBorderTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\LeftBorderTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\Phrases.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\PhrasesLoader.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\RightBorderTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\RightBorderTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\TaskExtensions.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\checking\AutocompleteCheckerRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\checking\AutocompleteTestCaseFactory.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\checking\BigSequentialNumericPhrases.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\checking\BinsearchCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\checking\BinsearchTopCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\checking\FakePhrases.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\checking\FindByPrefixAndCountTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\checking\LeftBorderCheckerRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\checking\RightBorderCheckerRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L100_Sorting\autocomplete\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\AnglesToCoordinatesTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\AnglesToCoordinatesTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\AntiFlickerForm.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\Manipulator.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\ManipulatorTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\ManipulatorTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\TriangleTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\TriangleTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\VisualizerTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\VisualizerTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\checking\AnglesToCoordinatesTask_SecretTests.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\checking\AssertAngles.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\checking\ManipulatorTask_SecretTests.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\checking\ManipulatorTask_Solved.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\checking\TriangleTask_SecretTests.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\checking\Visualizer_Should.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L110_Practice\manipulator\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\S010_Classes.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\S016_CreateClass.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\S017_ShortSyntax.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\S020_StaticAndDynamic.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\S030_Methods.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\S040_ExtensionMethods.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\S045_CreateExtension.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\S050_DirectoryAndFile.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\S055_FileInfo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\S060_StaticClass.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\S066_RefactorStatic.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\_Fields.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\VectorTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\VectorTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\checking\Checker.First.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\checking\Checker.Second.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\checking\Checker.Third.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\checking\ExpressionTest.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\checking\GeometryTests.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\checking\Mocks.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\checking\VectorOnSegmentTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\checking\Mocks\MockProvider.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\Geometry\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\SegmentExtensions.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\SegmentExtensions.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\checking\GeometryClasses.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\checking\GeometryPaintingChecker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L120_OOP\GeometryPainting\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S010_Why.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S020_Inheritance.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S030_Hierarchy.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S040_Array.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S044_PrintEverything.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S046_CombineArrays.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S050_Interfaces.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S055_MiddleOfThreeAgain.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S056_Min.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S070_ComparableImpl.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S075_IComparableTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S080_IComparer.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S085_IComparerTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S090_Polymorphism.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S100_VirtualMethods.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\S105_ToString.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\DiggerTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\DiggerTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\Game.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\Architecture\CreatureAnimation.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\Architecture\CreatureCommand.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\Architecture\DiggerWindow.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\Architecture\GameState.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\Architecture\ICreature.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\Architecture\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\checking\Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\checking\Checker.FirstTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\checking\Checker.SecondTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\checking\Checker.ThirdTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\checking\DiggerTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L130_Inheritance\Digger\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S010_Целостность данных.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S020_Ключевое слово private.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S030_Отложенные ошибки.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S040_Свойства.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S045_Не_откладывать_ошибки_задача.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S050_Больше свойств.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S055_Свойство_вместо_поля_задача.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S060_Конструкторы.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S065_Конструктор_вектора_задача.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S070_Поля readonly.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S075_Дробь_задача.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\S080_Статические конструкторы.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelAccounting\AccountingModel.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelAccounting\AccountingModel.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelAccounting\MainWindow.xaml.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelAccounting\ModelBase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelAccounting\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelAccounting\checking\HotelAccountingChecking.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelAccounting\checking\HotelAccountingTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelAccounting\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\HotelAccounting\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\IIndexer.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\Indexer.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\Indexer.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\PockerGoogleWindow.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\PockerGoogleWindow.Designer.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\checking\IndexerChecking.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\checking\IndexerTestCase.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\checking\Indexer_Ethalon.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\checking\TimeTest.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\PocketGoogle\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\ReadOnlyVector\ReadOnlyVector.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\ReadOnlyVector\ReadOnlyVector.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\ReadOnlyVector\checking\ReadonlyVectorChecking.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\ReadOnlyVector\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\ReadOnlyVector\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\ReadOnlyVector\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\ReadOnlyVector\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L140_Consistency\ReadOnlyVector\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\S010_Объявление структуры.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\S020_Инициализация полей структуры.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\S030_Передача структуры в метод.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\S040_Ключевое слово ref.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\S045_Сделать_ref.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\S050_Боксинг и анбоксинг.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\S060_Структуры и свойства.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\S070_Зачем нужны структуры.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\_055_boxing_quiz.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\ChartBuilder.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\ChartBuilder.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\Constants.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\ExperimentResult.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\Generator.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\Generator.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\IChartBuilder.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\IProfiler.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\IRunner.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\ProfilerTask.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\ProfilerTask.Solution.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\Program.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\checking\StringComparison.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\checking\checkers\Task1Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\checking\checkers\Task2Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\checking\checkers\Task3Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\checking\checkers\Task4Checker.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\checking\etalons\Classes_Should.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\checking\etalons\Generator_Should.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part01\BasicProgramming\Slides\L150_Structures\Profiling\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part01\libs\TestRoom\ITestRoomUI.cs
+d:\_work\BasicProgramming\Part01\libs\TestRoom\TestCase.cs
+d:\_work\BasicProgramming\Part01\libs\TestRoom\TestCaseUI.cs
+d:\_work\BasicProgramming\Part01\libs\TestRoom\TestResult.cs
+d:\_work\BasicProgramming\Part01\libs\TestRoom\TestRoom.cs
+d:\_work\BasicProgramming\Part01\libs\TestRoom\TestRoom.Designer.cs
+d:\_work\BasicProgramming\Part01\libs\TestRoom\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\DP_Flags.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\DP_SquareWorld.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\DP_Tickets.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Tree_Disk.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\_BinaryTree.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\Prelude.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\S010_Стэки и очереди.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\S020_Очередь на связных списках.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\S030_Универсальная очередь и даункасты.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\S040_Дженерик-классы.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\S050_Стэки для анализа скобочных выражений.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\S060_Стэки для вычислений.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\S070_Очередь для скользящего среднего.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\S080_Дженерики и сортировка массивов.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\S085_Максимум_в_массиве.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\S090_Возврат из метода значения и ошибки.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\S100_Возврат нескольких значений.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\S110_Дженерик-класс Tuple.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\S120_Дженерик-класс Nullable.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Clones\CloneVersionSystem.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Clones\CloneVersionSystem.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Clones\CloneVersionSystem_should.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Clones\ICloneVersionSystem.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Clones\Program.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Clones\checking\CheckerRunner.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Clones\checking\CloneVersionSystem_HiddenPerformanceTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Clones\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Clones\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Clones\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Clones\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Clones\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Monobilliards\Factory.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Monobilliards\IMonobilliards.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Monobilliards\Monobilliards.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Monobilliards\Monobilliards.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Monobilliards\MonobilliardsTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Monobilliards\Program.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Monobilliards\checking\CheckerRunner.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Monobilliards\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Monobilliards\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Monobilliards\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Monobilliards\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L000_StacksAndQueues\Monobilliards\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\S010_foreach, IEnumerable и IEnumerator.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\S020_Реализация IEnumerator.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\S030_yield return.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\S040_Ленивые коллекции.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\S045_ZipSum.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\S050_yield return в рекурсивных методах.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\DataPoint.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\DataSource.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\ExpSmoothingTask.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\ExpSmoothingTask.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\ExpSmoothingTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\Factory.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\IDataAnalyzer.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\MovingAverageTask.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\MovingAverageTask.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\MovingAverageTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\MovingMaxTask.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\MovingMaxTask.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\MovingMaxTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\Program.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\checking\DataAnalyzerSolvedImpl.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\checking\ExpSmoothing_HiddenTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\checking\MovingAverage_HiddenTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\checking\MovingMax_HiddenTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L010_yield_return\Smooth\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\S010_Листы и индексация.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\S020_Метод Contains.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\S030_Метод Equals.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\S040_Перегрузка операторов.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\S050_Когда следует перегружать операторы.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\S060_Хэширующие функции.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\S070_Хэши в компьютерной безопасности.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\S080_Поиск подстроки в строке - 1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\S090_Поиск подстроки в строке - 2.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\S100_Класс Dictionary.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\S110_GetHashCode.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\_OperatorMagic_David_Blaine.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\Animal.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\Cat.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\Document.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\GhostsTask.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\GhostsTask.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\GhostsTest.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\IFactory.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\Program.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\Robot.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\Segment.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\Vector.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\ghost\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\readonly-bytes\Program.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\readonly-bytes\ReadonlyBytes.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\readonly-bytes\ReadonlyBytes.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\readonly-bytes\ReadonlyBytesTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\readonly-bytes\checking\ReadonlyBytes_HiddenTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\readonly-bytes\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\readonly-bytes\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\readonly-bytes\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\readonly-bytes\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L020_ListAndDict\readonly-bytes\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S010_Постановка проблемы.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S020_Делегаты.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S025_Синтаксис_делегатов.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S030_Делегаты для динамических методов.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S040_Карта памяти.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S050_Дженерик-делегаты.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S060_Func и Action.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S065_Синтаксис_делегатов_2.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S070_Анонимные делегаты.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S080_Лямбда-выражения.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S090_Больше лямбд.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S092_Синтаксис_лямбд.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S095_Синтаксис_лямбд_2.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S100_Замыкание.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S110_Карта памяти.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\S120_Ловушка замыкания.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\_SortStrings.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\Brainfuck.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\BrainfuckBasicCommands.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\BrainfuckBasicCommands.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\BrainfuckBasicCommandsTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\BrainfuckLoopCommands.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\BrainfuckLoopCommands.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\BrainfuckLoopCommandsTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\IVirtualMachine.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\Program.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\VirtualMachine.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\VirtualMachine.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\VirtualMachineTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L030_Delegates\brainfuck\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\Prelude.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\S010_О функциональном программировании.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\S020_Делегаты для диагностики кода.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\S030_Делегаты в разборе арифметических выражений.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\S040_Вычисление производной.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\S050_Лямбда-выражения в тестах.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\S060_Знакомство с LINQ.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\S070_Реализация метода Where.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\S080_Реализация Select и ToList.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\S085_Реализация метода FirstOrDefault.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\S086_Реализация метода Take.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\S090_Последовательность вызовов Where и Select.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\S100_Последовательность вызовов с ToList.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\_055_quiz.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\ControlTask.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\ControlTask.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\ForcesTask.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\ForcesTask.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\GameForm.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\Gravity.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\Level.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\LevelsTask.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\LevelsTask.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\Physics.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\Program.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\Rocket.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\RocketForce.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\Turn.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\Vector.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\checking\ControlTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\checking\ForcesTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\checking\LevelsTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L040_FunctionalProgramming\rocket\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\S010_Практикум.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\ExtensionsTask.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\ExtensionsTask.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\ExtensionsTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\ParsingTask.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\ParsingTask.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\ParsingTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\Program.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\SlideRecord.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\SlideType.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\StatisticsTask.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\StatisticsTask.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\StatisticsTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\VisitRecord.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\checking\ExtensionsSecretTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\checking\ParsingSecretTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\checking\StatisticsSecretTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L045_LINQ\linq-slideviews\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\GraphLibrary.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S010 - Определение графа.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S020 - Зачем нужны графы.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S030 - Дополнительные определения теории графов.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S040 - Обход лабиринта в глубину, рекурсия.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S050 - Обход лабиринта в глубину, стэк.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S060 - Обход лабиринта в ширину.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S070 - Простейшая реализация графа.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S080 - Неориентированные графы и целостность данных.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S090 - Больше защиты целостности в графах.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S100 - Добавление сущности ребра.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S110 - Хранение дополнительной информации о графе.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S120 - Обходы графа.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S125 - Использование_памяти.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S130 - Поиск компонент связности.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S140 - Поиск пути в невзвешенном графе.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S150 - Игра в 8.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S160 - Топологическая сортировка. Алгоритм Кана.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S170 - Алгоритм Тарьяна.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S175 - Поиск цикла в неориентированном графе.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\S999 - Практика.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\_S065_complexity.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\Dungeon\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\Dungeon\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\Dungeon\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\Rivals\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\Rivals\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L050 - Графы и обходы\Rivals\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S010 - Комбинаторные задачи.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S020 - Стратегия перебора для комбинаторных задач.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S030 - Задача о планировании времени.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S035 - Планирование времени.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S040 - Корректность алгоритма планирования времени.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S050 - Алгоритм Краскала.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S055 - Реализация алгоритма Краскала.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S060 - Корректность алгоритма Краскала.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S070 - Алгоритм Дейкстры.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S080 - Реализация алгоритма Дейкстры.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S100 - Корректность алгоритма Дейкстры.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S110 - Жадный алгоритм для задачи разбиения.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S120 - Жадный алгоритм для задачи коммивояжера.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S130 - Жадные алгоритмы как эвристические.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\S999 - Практика.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L060 - Жадные алгоритмы\Greedy\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S010 - Динамическое программирование на задаче о планировании времени.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S018 - PlanExercise.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S020 - Резюме по задаче планирования времени.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S030 - Расстояние Левенштейна.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S040 - Поиск расстояния Левенштейна - 1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S050 - Поиск расстояния Левенштейна - 2.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S055 - LevenshteinExercise.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S060 - Резюме по ДП для поиска расстояния Левенштейна.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S070 - Динамическое программирование в комбинаторике.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S080 - Алгоритм Форда-Беллмана.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S085 - FordBellmanExercise.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S090 - Динамическое программирование для задачи разбиения.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S100 - Сложность алгоритма ДП для задачи разбиения.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L070 - Динамическое программирование\S999 - Практика.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\S010 - Очередь с приоритетами.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\S020 - Модифицированный алгоритм Дейкстры.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\S030 - Метод расширения для интерфейса.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\S040 - Простейшая реализация очереди с приоритетами.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\S050 - Модифицированный алгоритм Дейкстры, полиморфизм и сложность.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\S060 - Бинарная куча.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\S070 - Операции с бинарной кучей.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\S075 - BinaryHeapExercise.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\S080 - Бинарное дерево поиска.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\S082 - Tree_GetMinValue.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\S085 - BinaryTreeExercise.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\S090 - Удаление элементов из бинарного дерева поиска.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\DiskTree\DiskTreeTask.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\DiskTree\DiskTreeTask.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\DiskTree\DiskTreeTask_should.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\DiskTree\Program.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\DiskTree\checking\DiskTreeTask_HiddenTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\DiskTree\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\DiskTree\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\DiskTree\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\DiskTree\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\DiskTree\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Flags\FlagsTask.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Flags\FlagsTask.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Flags\FlagsTask_should.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Flags\Program.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Flags\checking\FlagsTask_HiddenTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Flags\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Flags\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Flags\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Flags\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Flags\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Tickets\Program.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Tickets\TicketsTask.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Tickets\TicketsTask.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Tickets\TicketsTask_should.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Tickets\checking\TicketsTask_HiddenTests.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Tickets\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Tickets\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Tickets\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Tickets\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L080 - Структуры данных\Tickets\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\S010_Программирование GUI.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\S020_Событийная модель.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\S030_Событийная модель с делегатами.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\S040_Мультикаст-делегаты.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\S050_Целостность событийной модели.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\S060_События.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\S070_Сокращенный синтаксис событий.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\S080_Конвенция оформления событий.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\S090_Назначение protected virtual OnTick.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\S100_Назначение sender.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\S110_Назначение EventArgs.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\BinaryTrees\BinaryTree.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\BinaryTrees\BinaryTree.Solution.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\BinaryTrees\BinaryTreeInTask1_should.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\BinaryTrees\BinaryTreeInTask2_should.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\BinaryTrees\BinaryTreeInTask3_should.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\BinaryTrees\Program.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\BinaryTrees\ShuffleExtension.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\BinaryTrees\checking\~$Checker.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\BinaryTrees\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\BinaryTrees\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\BinaryTrees\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L090 - События\BinaryTrees\Properties\AssemblyInfo.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L100 - Оконные приложения\S010 - Windows Forms и WPF.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L100 - Оконные приложения\S020 - Расположение контролов на форме.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L100 - Оконные приложения\S030 - Дизайнер Windows Forms.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L100 - Оконные приложения\S040 - Резиновый дизайн.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L100 - Оконные приложения\S050 - Резиновый дизайн с TableLayoutPanel.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L100 - Оконные приложения\S060 - Рисование.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L100 - Оконные приложения\S070 - Повороты и переносы рисунка.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L100 - Оконные приложения\S080 - Таймеры и анимация.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L100 - Оконные приложения\S090 - Паттерн MVC.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L100 - Оконные приложения\S100 - Антипаттерн интеллектуального интерфейса.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L100 - Оконные приложения\S110 - Использование MVC.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L100 - Оконные приложения\S999 - Практика.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L110 - Асинхронное программирование\S010 - Треды, домены и процессы.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L110 - Асинхронное программирование\S020 - Класс Thread.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L110 - Асинхронное программирование\S030 - BeginInvoke.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L110 - Асинхронное программирование\S040 - Parallel.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L110 - Асинхронное программирование\S050 - Общие ресурсы и lock.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L110 - Асинхронное программирование\S060 - Блокирование треда GUI.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L110 - Асинхронное программирование\S070 - Асинхронные операции в GUI.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L110 - Асинхронное программирование\S080 - async, await.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L110 - Асинхронное программирование\S090 - BackgroundWorker.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L110 - Асинхронное программирование\S095 - Дополнительные материалы.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L120 - Рефлексия типов\S010 - Рефлексия. Класс Type.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L120 - Рефлексия типов\S020 - Создание объекта с помощью рефлексии.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L120 - Рефлексия типов\S030 - Рефлексия для свойств, методов и полей.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L120 - Рефлексия типов\S040 - Рефлексия для сериализации.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L120 - Рефлексия типов\S050 - Использование json сериализации от Newtonsoft.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L120 - Рефлексия типов\S060 - Биндинг и атрибуты.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L120 - Рефлексия типов\S070 - LINQ Expressions.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L120 - Рефлексия типов\S080 - Code Emission.cs
+d:\_work\BasicProgramming\Part02\BasicProgramming2\Slides\L120 - Рефлексия типов\_S060.cs
