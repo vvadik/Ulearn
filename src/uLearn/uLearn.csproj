@@ -182,6 +182,8 @@
     <Compile Include="AnalyticsTableInfo.cs" />
     <Compile Include="CSharp\IndentsValidator.cs" />
     <Compile Include="CSharp\IStrictValidator.cs" />
+    <Compile Include="ExportedSlide.cs" />
+    <Compile Include="Extensions\DictionaryExtension.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="Course.cs" />
     <Compile Include="CourseDiff.cs" />
@@ -208,6 +210,7 @@
     <Compile Include="DefaultDictionary.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\FileSystemExtensions.cs" />
+    <Compile Include="Extensions\NameValueCollectionExtensions.cs" />
     <Compile Include="Extensions\UriExtensions.cs" />
     <Compile Include="Gender.cs" />
     <Compile Include="Extensions\HttpClientExtensions.cs" />

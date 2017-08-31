@@ -1,14 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Formatting = Newtonsoft.Json.Formatting;
 
-namespace uLearn
+namespace uLearn.Extensions
 {
 	public static class ObjectExtensions
 	{

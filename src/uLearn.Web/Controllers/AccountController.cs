@@ -508,7 +508,8 @@ namespace uLearn.Web.Controllers
 		public ActionResult UserMenuPartial()
 		{
 			var isAuthenticated = Request.IsAuthenticated;
-			var user = userManager.FindById(User.Identity.GetUserId());
+			var userId = User.Identity.GetUserId();
+			var user = userManager.FindById(userId);
 			return PartialView(new UserMenuPartialViewModel
 			{
 				IsAuthenticated = isAuthenticated,

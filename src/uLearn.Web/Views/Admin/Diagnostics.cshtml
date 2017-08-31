@@ -1,4 +1,4 @@
-﻿@using uLearn
+﻿@using uLearn.Extensions
 @using uLearn.Web.Controllers
 
 @model DiagnosticsModel
@@ -14,6 +14,7 @@
 
 		<div>
 			@Html.ActionLink("← Назад", "Packages", new { courseId = Model.CourseId }, new { @class = "btn btn-primary" })
+			@Html.ActionLink("Скопировать на Степик", "ExportCourse", "Stepik", new { courseId = Model.CourseId }, new { @class = "btn btn-success" })
 		</div>
 
 		if (Model.CourseDiff.SlideDiffs.Count > 0)

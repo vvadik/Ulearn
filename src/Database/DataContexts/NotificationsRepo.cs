@@ -8,10 +8,10 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using Database.Extensions;
-using Database.Migrations;
 using Database.Models;
 using log4net;
 using uLearn;
+using uLearn.Extensions;
 
 namespace Database.DataContexts
 {

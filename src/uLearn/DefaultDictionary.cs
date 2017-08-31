@@ -51,22 +51,4 @@ namespace uLearn
 			return typeof(TValue).IsValueType ? default(TValue) : Activator.CreateInstance<TValue>();
 		}
 	}
-
-	public static class DictionaryExtension
-	{
-		public static DefaultDictionary<TKey, TValue> ToDefaultDictionary<TKey, TValue>(this IDictionary<TKey, TValue> dict)
-		{
-			return new DefaultDictionary<TKey, TValue>(dict);
-		}
-
-		public static DefaultDictionary<TKey, TValue> ToDefaultDictionary<TKey, TValue>(this IDictionary<TKey, TValue> dict, Func<TValue> defaultSelector)
-		{
-			return new DefaultDictionary<TKey, TValue>(dict, defaultSelector);
-		}
-
-		public static SortedDictionary<TKey, TValue> ToSortedDictionary<TKey, TValue>(this IDictionary<TKey, TValue> dict)
-		{
-			return new SortedDictionary<TKey, TValue>(dict);
-		}
-	}
 }

@@ -105,6 +105,7 @@
     <Compile Include="DataContexts\SlideCheckingsRepo.cs" />
     <Compile Include="DataContexts\SlideHintRepo.cs" />
     <Compile Include="DataContexts\SlideRateRepo.cs" />
+    <Compile Include="DataContexts\StepikRepo.cs" />
     <Compile Include="DataContexts\TextsRepo.cs" />
     <Compile Include="DataContexts\ULearnDb.cs" />
     <Compile Include="DataContexts\ULearnUserManager.cs" />
@@ -436,6 +437,22 @@
     <Compile Include="Migrations\201708161353527_AddIsResultSentForXQueueExerciseSubmission.Designer.cs">
       <DependentUpon>201708161353527_AddIsResultSentForXQueueExerciseSubmission.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201708250512030_AddStepikAccessTokens.cs" />
+    <Compile Include="Migrations\201708250512030_AddStepikAccessTokens.Designer.cs">
+      <DependentUpon>201708250512030_AddStepikAccessTokens.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708281908582_AddStepikExportProcessAndMapping.cs" />
+    <Compile Include="Migrations\201708281908582_AddStepikExportProcessAndMapping.Designer.cs">
+      <DependentUpon>201708281908582_AddStepikExportProcessAndMapping.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708300737456_AddCourseExportToStepikNotification.cs" />
+    <Compile Include="Migrations\201708300737456_AddCourseExportToStepikNotification.Designer.cs">
+      <DependentUpon>201708300737456_AddCourseExportToStepikNotification.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708311313257_RemoveRequiredFieldsOnStepikExportProcess.cs" />
+    <Compile Include="Migrations\201708311313257_RemoveRequiredFieldsOnStepikExportProcess.Designer.cs">
+      <DependentUpon>201708311313257_RemoveRequiredFieldsOnStepikExportProcess.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -463,6 +480,9 @@
     <Compile Include="Models\SlideChecking.cs" />
     <Compile Include="Models\SlideHint.cs" />
     <Compile Include="Models\SlideRate.cs" />
+    <Compile Include="Models\StepikAccessToken.cs" />
+    <Compile Include="Models\StepikExportProcess.cs" />
+    <Compile Include="Models\StepikExportSlideAndStepMap.cs" />
     <Compile Include="Models\TextBlob.cs" />
     <Compile Include="Models\UnitAppearance.cs" />
     <Compile Include="Models\UserExerciseSubmission.cs" />
@@ -714,6 +734,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201708161353527_AddIsResultSentForXQueueExerciseSubmission.resx">
       <DependentUpon>201708161353527_AddIsResultSentForXQueueExerciseSubmission.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708250512030_AddStepikAccessTokens.resx">
+      <DependentUpon>201708250512030_AddStepikAccessTokens.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708281908582_AddStepikExportProcessAndMapping.resx">
+      <DependentUpon>201708281908582_AddStepikExportProcessAndMapping.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708300737456_AddCourseExportToStepikNotification.resx">
+      <DependentUpon>201708300737456_AddCourseExportToStepikNotification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708311313257_RemoveRequiredFieldsOnStepikExportProcess.resx">
+      <DependentUpon>201708311313257_RemoveRequiredFieldsOnStepikExportProcess.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

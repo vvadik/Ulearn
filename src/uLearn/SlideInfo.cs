@@ -33,7 +33,7 @@ namespace uLearn
 					return path;
 				d = d.Parent;
 			}
-			throw new FileNotFoundException("Courses folder not found", file.FullName);
+			throw new FileNotFoundException($"Courses folder not found for {file.FullName}", file.FullName);
 		}
 	}
 }

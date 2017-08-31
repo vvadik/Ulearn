@@ -8,17 +8,11 @@ namespace uLearn
 {
 	public static class Md
 	{
-		public static string RenderMd(this string md, FileInfo sourceFile)
+		public static string RenderMd(this string md, FileInfo sourceFile, string baseUrl="")
 		{
-			var baseUrl = CourseUnitUtils.GetDirectoryRelativeWebPath(sourceFile);
+			var relativeUrl = CourseUnitUtils.GetDirectoryRelativeWebPath(sourceFile);
+			baseUrl = baseUrl + relativeUrl;
 			return md.RenderMd(baseUrl);
-		}
-
-		public static HtmlString RenderTex(this string textWithTex)
-		{
-			var texReplacer = new TexReplacer(textWithTex);
-			string html = HttpUtility.HtmlEncode(texReplacer.ReplacedText);
-			return new HtmlString(texReplacer.PlaceTexInsertsBack(html));
 		}
 
 		public static string RenderMd(this string md, string baseUrl = null)
@@ -39,6 +33,12 @@ namespace uLearn
 			return texReplacer.PlaceTexInsertsBack(html);
 		}
 
+		public static HtmlString RenderTex(this string textWithTex)
+		{
+			var texReplacer = new TexReplacer(textWithTex);
+			string html = HttpUtility.HtmlEncode(texReplacer.ReplacedText);
+			return new HtmlString(texReplacer.PlaceTexInsertsBack(html));
+		}
 
 		public static Regex rxExtractLanguage = new Regex("^({{(.+)}}[\r\n])", RegexOptions.Compiled);
 
