@@ -13,6 +13,7 @@ using Database.Models;
 using Elmah;
 using log4net;
 using LtiLibrary.Owin.Security.Lti;
+using uLearn.Extensions;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
 using uLearn.Web.Extensions;

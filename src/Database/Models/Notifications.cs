@@ -210,6 +210,11 @@ namespace Database.Models
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		PublishedPackage = 204,
+
+		[Display(Name = @"Курс скопирован на Stepik.org", GroupName = @"Курсы скопированы на Stepik.org")]
+		[MinCourseRole(CourseRole.CourseAdmin)]
+		[IsEnabledByDefault(true)]
+		CourseExportedToStepik = 205,
 	}
 
 	public static class NotificationTypeExtensions
@@ -934,6 +939,61 @@ namespace Database.Models
 		public override bool IsActual()
 		{
 			return true;
+		}
+	}
+
+	[NotificationType(NotificationType.CourseExportedToStepik)]
+	public class CourseExportedToStepikNotification : Notification
+	{
+		[Required]
+		public int ProcessId { get; set; }
+		public virtual StepikExportProcess Process { get; set; }
+
+		/* TODO (andgein): Process.UlearnCourseId should be safely urlized */
+		private string GetStepikExportProcessUrl(string baseUrl)
+		{
+			return baseUrl + $"/Stepik/Process?courseId={Process.UlearnCourseId}&processId={ProcessId}";
+		}
+
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			var isInitial = Process.IsInitialExport;
+			if (Process.IsSuccess)
+			{
+				return $"Курс <b>«{Process.StepikCourseTitle.EscapeHtml()}</b> на Степике {(isInitial ? "скопирован" : "обновлён")} из курса <b>«{course.Title.EscapeHtml()}»</b>.";
+			}
+			else
+			{
+				return $"<b>Произошла ошибка</b> при {(isInitial ? "копировании" : "обновлении")} курса {course.Title.EscapeHtml()} на Степик{(isInitial ? "" : "е")}:<br /><br/>Лог:<br/>" + Process.Log;
+			}
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			var isInitial = Process.IsInitialExport;
+			if (Process.IsSuccess)
+			{
+				return $"Курс «{Process.StepikCourseTitle} на Степике {(isInitial ? "скопирован" : "обновлён")} из курса «{course.Title}».";
+			}
+			else
+			{
+				return $"Произошла ошибка при {(isInitial ? "копировании" : "обновлении")} курса {course.Title} на Степик{(isInitial ? "" : "е")}:\n\nЛог:" + Process.Log;
+			}
+		}
+
+		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return new NotificationButton("Смотреть детали переноса курса", GetStepikExportProcessUrl(baseUrl));
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new List<string> { Process.OwnerId };
+		}
+
+		public override bool IsActual()
+		{
+			return Process.IsFinished;
 		}
 	}
 }

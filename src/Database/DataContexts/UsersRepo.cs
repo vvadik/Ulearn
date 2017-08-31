@@ -6,7 +6,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using EntityFramework.Functions;
+using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
+using uLearn;
+using uLearn.Helpers;
 
 namespace Database.DataContexts
 {
@@ -14,6 +17,8 @@ namespace Database.DataContexts
 	{
 		private readonly ULearnDb db;
 		private readonly UserRolesRepo userRolesRepo;
+
+		public const string UlearnBotUsername = "ulearn-bot";
 
 		public UsersRepo(ULearnDb db)
 		{
@@ -117,6 +122,39 @@ namespace Database.DataContexts
 			user.Email = email;
 			user.EmailConfirmed = false;
 			await db.SaveChangesAsync();
+		}
+
+		[NotNull]
+		public ApplicationUser GetUlearnBotUser()
+		{
+			var user = db.Users.FirstOrDefault(u => u.UserName == UlearnBotUsername);
+			if (user == null)
+				throw new NotFoundException($"Ulearn bot user (username = {UlearnBotUsername}) not found");
+			return user;
+		}
+
+		public string GetUlearnBotUserId()
+		{
+			var user = GetUlearnBotUser();
+			return user.Id;
+		}
+
+		public void CreateUlearnBotUserIfNotExists()
+		{
+			if (! db.Users.Any(u => u.UserName == UlearnBotUsername))
+			{
+				var user = new ApplicationUser
+				{
+					UserName = UlearnBotUsername,
+					FirstName = "Ulearn",
+					LastName = "bot",
+					Email = "support@ulearn.me",
+				};
+				var userManager = new ULearnUserManager(db);
+				userManager.Create(user, StringUtils.GenerateSecureAlphanumericString(10));
+
+				db.SaveChanges();
+			}
 		}
 	}
 

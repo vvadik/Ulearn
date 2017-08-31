@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using uLearn.Extensions;
 using uLearn.Model.Blocks;
 using uLearn.Model.Edx.EdxComponents;
 using Component = uLearn.Model.Edx.EdxComponents.Component;

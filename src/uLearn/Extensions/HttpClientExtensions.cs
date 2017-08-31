@@ -17,6 +17,15 @@ namespace uLearn.Extensions
 				CancellationToken.None);
 		}
 
+		public static async Task<HttpResponseMessage> PutAsJsonAsync<T>(this HttpClient client, string uri, T payload)
+		{
+			var serializedPayload = JsonConvert.SerializeObject(payload, Formatting.Indented);
+			return await client.PutAsync(
+				uri,
+				new StringContent(serializedPayload, Encoding.UTF8, "application/json"),
+				CancellationToken.None);
+		}
+
 		public static async Task<T> ReadAsAsync<T>(this HttpContent content)
 		{
 			var s = await content.ReadAsStringAsync();
