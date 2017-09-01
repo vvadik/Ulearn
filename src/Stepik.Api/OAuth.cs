@@ -25,17 +25,17 @@ namespace Stepik.Api
 			return uriBuilder.ToString();
 		}
 
-		// TODO (andgein): DataProtectionScope.CurrentUser is bad idea because second request may be handled by another web server
+		// TODO (andgein): DataProtectionScope.LocalMachine is bad idea because second request may be handled by another web server
 		public static string EncryptState(string state)
 		{
 			var stateBytes = Encoding.UTF8.GetBytes(state);
-			return Convert.ToBase64String(ProtectedData.Protect(stateBytes, null, DataProtectionScope.CurrentUser));
+			return Convert.ToBase64String(ProtectedData.Protect(stateBytes, null, DataProtectionScope.LocalMachine));
 		}
 
 		public static string DecryptState(string encryptedState)
 		{
 			var unpacked = Convert.FromBase64String(encryptedState);
-			return Encoding.UTF8.GetString(ProtectedData.Unprotect(unpacked, null, DataProtectionScope.CurrentUser));
+			return Encoding.UTF8.GetString(ProtectedData.Unprotect(unpacked, null, DataProtectionScope.LocalMachine));
 		}
 
 	}
