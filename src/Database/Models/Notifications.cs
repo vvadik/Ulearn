@@ -960,7 +960,7 @@ namespace Database.Models
 			var isInitial = Process.IsInitialExport;
 			if (Process.IsSuccess)
 			{
-				return $"Курс <b>«{Process.StepikCourseTitle.EscapeHtml()}</b> на Степике {(isInitial ? "скопирован" : "обновлён")} из курса <b>«{course.Title.EscapeHtml()}»</b>.";
+				return $"Курс <b>«{Process.StepikCourseTitle.EscapeHtml()}»</b> на Степике успешно {(isInitial ? "скопирован" : "обновлён")} из курса <b>«{course.Title.EscapeHtml()}»</b>.";
 			}
 			else
 			{
@@ -973,7 +973,7 @@ namespace Database.Models
 			var isInitial = Process.IsInitialExport;
 			if (Process.IsSuccess)
 			{
-				return $"Курс «{Process.StepikCourseTitle} на Степике {(isInitial ? "скопирован" : "обновлён")} из курса «{course.Title}».";
+				return $"Курс «{Process.StepikCourseTitle}» на Степике успешно {(isInitial ? "скопирован" : "обновлён")} из курса «{course.Title}».";
 			}
 			else
 			{
