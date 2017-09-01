@@ -54,7 +54,7 @@ namespace uLearn
 				}
 				catch (Exception e)
 				{
-					ReportError("Slide " + slide + " contains not accessible video. " + e.Message);
+					ReportSlideError(slide, "Slide contains not accessible video. " + e.Message);
 				}
 			}
 		}
@@ -79,7 +79,7 @@ namespace uLearn
 			}
 			if (solution.HasStyleIssues)
 			{
-				ReportWarning($"Slide {slide.Title} has style issues:\n{solution.StyleMessage}");
+				ReportSlideWarning(slide, "Style issue: " + solution.StyleMessage);
 			}
 
 			var result = SandboxRunner.Run(exercise.CreateSubmission(
