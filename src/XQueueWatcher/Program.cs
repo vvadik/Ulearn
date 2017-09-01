@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -18,6 +19,8 @@ namespace XQueueWatcher
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
 		private static readonly CourseManager courseManager = WebCourseManager.Instance;
+
+		private static readonly Dictionary<int, XQueueClient> clientsCache = new Dictionary<int, XQueueClient>();
 
 		static void Main(string[] args)
 		{
@@ -62,12 +65,17 @@ namespace XQueueWatcher
 
 		private async Task GetAndProcessSubmissionFromXQueue(Database.Models.XQueueWatcher watcher)
 		{
-			var client = new XQueueClient(watcher.BaseUrl, watcher.UserName, watcher.Password);
-			
-			if (!await client.Login())
+			if (!clientsCache.TryGetValue(watcher.Id, out XQueueClient client))
 			{
-				log.Error($"Can\'t login to xqueue {watcher.QueueName} ({watcher.BaseUrl}, user {watcher.UserName})");
-				return;
+				client = new XQueueClient(watcher.BaseUrl, watcher.UserName, watcher.Password);
+
+				if (!await client.Login())
+				{
+					log.Error($"Can\'t login to xqueue {watcher.QueueName} ({watcher.BaseUrl}, user {watcher.UserName})");
+					return;
+				}
+
+				clientsCache[watcher.Id] = client;
 			}
 
 			var submission = await client.GetSubmission(watcher.QueueName);

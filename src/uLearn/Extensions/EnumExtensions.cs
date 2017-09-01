@@ -17,7 +17,7 @@ namespace uLearn.Extensions
 
 		public static bool TryParseToNullableEnum<TEnum>(this string value, out TEnum? result) where TEnum : struct
 		{
-			if (Enum.TryParse<TEnum>(value, out TEnum localResult))
+			if (Enum.TryParse(value, out TEnum localResult))
 			{
 				result = localResult;
 				return true;

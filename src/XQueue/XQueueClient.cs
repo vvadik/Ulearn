@@ -56,6 +56,8 @@ namespace XQueue
 			if (string.IsNullOrEmpty(username))
 				return true;
 
+			log.Debug($"Try to login at {loginUrl} with username {username} and password {password.MaskAsSecret()}");
+
 			var loginData = new Dictionary<string, string>
 			{
 				{ "username", username },
@@ -91,6 +93,13 @@ namespace XQueue
 				log.Warn($"Can't get submission from xqueue {queueName}: {e.Message}", e.InnerException);
 				return null;
 			}
+			
+			if (response.StatusCode == HttpStatusCode.Moved || response.StatusCode == HttpStatusCode.Found)
+			{
+				log.Warn("Redirected to the login page. Try to authorize again");
+				await Login();
+				return null;
+			}
 
 			if (response.IsSuccessStatusCode)
 			{
@@ -109,12 +118,6 @@ namespace XQueue
 				}
 			}
 
-			if (response.StatusCode == HttpStatusCode.Moved || response.StatusCode == HttpStatusCode.Found)
-			{
-				log.Warn("Redirected to the login page. Try to authorize again");
-				await Login();
-				return null;
-			}
 
 			return null;
 		}
@@ -130,11 +133,20 @@ namespace XQueue
 			log.Info($"Try to put submission checking result into xqueue. Url: {putResultUrl}, content: {content}");
 			var formContent = new Dictionary<string, string> {{"xqueue_header", result.header}, {"xqueue_body", result.body}};
 			var response = await client.PostAsync(putResultUrl, new FormUrlEncodedContent(formContent));
+
+			if (response.StatusCode == HttpStatusCode.Moved || response.StatusCode == HttpStatusCode.Found)
+			{
+				log.Warn("Redirected to the login page. Try to authorize again");
+				await Login();
+				throw new Exception("Redirected to the login page. Try to authorize again");
+			}
+
 			if (! response.IsSuccessStatusCode)
 			{
 				log.Warn($"Unexpected response status code while putting results to xqueue: {response.StatusCode}");
 				throw new Exception($"Unexpected response status code while putting results to xqueue: {response.StatusCode}");
 			}
+
 			var responseContent = await response.Content.ReadAsStringAsync();
 			log.Info($"XQueue returned following content: {responseContent}");
 			var parsedResponse = responseContent.DeserializeJson<XQueueResponse>();

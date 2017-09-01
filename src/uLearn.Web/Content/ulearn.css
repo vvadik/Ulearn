@@ -1075,7 +1075,6 @@ hr.without-top-margin {
 .strike-line > span {
 	position: relative;
 	display: inline-block;
-	font-style: italic;
 }
 
 .strike-line > span:before,

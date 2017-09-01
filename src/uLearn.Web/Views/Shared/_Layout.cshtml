@@ -88,7 +88,7 @@
 					{
 						/* RouteData has no attribute 'courseId' */
 						var controller = Html.ViewContext.RouteData.Values["controller"].ToString();
-						if ((controller == "Admin" || controller == "Analytics" || controller == "Grader" || controller == "Notifications") &&
+						if ((controller == "Admin" || controller == "Analytics" || controller == "Grader" || controller == "Notifications" || controller == "Stepik") &&
 							Request.Params["courseId"] != null)
 						{
 							courseId = Request.Params["courseId"];

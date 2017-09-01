@@ -15,27 +15,30 @@ namespace Database.Migrations
 			CommandTimeout = 60 * 10;
 		}
 
-		protected override void Seed(ULearnDb context)
+		protected override void Seed(ULearnDb db)
 		{
-			var roleStore = new RoleStore<IdentityRole>(context);
+			var roleStore = new RoleStore<IdentityRole>(db);
 			var roleManager = new RoleManager<IdentityRole>(roleStore);
 			roleManager.Create(new IdentityRole(LmsRoles.SysAdmin));
-			if (!context.Users.Any(u => u.UserName == "user"))
+
+			var userStore = new UserStore<ApplicationUser>(db);
+			var manager = new ULearnUserManager(userStore);
+			if (!db.Users.Any(u => u.UserName == "user"))
 			{
-				var userStore = new UserStore<ApplicationUser>(context);
-				var manager = new ULearnUserManager(userStore);
 				var user = new ApplicationUser { UserName = "user", FirstName = "User", LastName = "" };
 				manager.Create(user, "asdasd");
 			}
-			if (!context.Users.Any(u => u.UserName == "admin"))
+			if (!db.Users.Any(u => u.UserName == "admin"))
 			{
-				var userStore = new UserStore<ApplicationUser>(context);
-				var manager = new ULearnUserManager(userStore);
 				var user = new ApplicationUser { UserName = "admin", FirstName = "System Administrator", LastName = "" };
 				manager.Create(user, "fullcontrol");
 				manager.AddToRole(user.Id, LmsRoles.SysAdmin);
 			}
-			context.SaveChanges();
+			
+			var usersRepo = new UsersRepo(db);
+			usersRepo.CreateUlearnBotUserIfNotExists();
+
+			db.SaveChanges();
 		}
 	}
 }

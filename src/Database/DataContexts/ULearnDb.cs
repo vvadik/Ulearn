@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Database.Migrations;
 using Database.Models;
 using EntityFramework.Functions;
@@ -79,7 +82,11 @@ namespace Database.DataContexts
 			CancelCascaseDeleting<UploadedPackageNotification, CourseVersion, Guid>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
 			CancelCascaseDeleting<PublishedPackageNotification, CourseVersion, Guid>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
 
+			CancelCascaseDeleting<CourseExportedToStepikNotification, StepikExportProcess, int>(modelBuilder, c => c.Process, c => c.ProcessId);
+			
 			CancelCascaseDeleting<XQueueWatcher, ApplicationUser, string>(modelBuilder, w => w.User, w => w.UserId);
+
+			CancelCascaseDeleting<StepikExportProcess, ApplicationUser, string>(modelBuilder, c => c.Owner, c => c.OwnerId);
 		}
 
 		private static void CancelCascaseDeleting<T1, T2, T3>(DbModelBuilder modelBuilder, Expression<Func<T1, T2>> oneWay, Expression<Func<T1, T3>> secondWay)
@@ -91,6 +98,44 @@ namespace Database.DataContexts
 				.WithMany()
 				.HasForeignKey(secondWay)
 				.WillCascadeOnDelete(false);
+		}
+
+		/* Construct easy understandable message on DbEntityValidationException */
+		public override int SaveChanges()
+		{
+			try
+			{
+				return base.SaveChanges();
+			}
+			catch (DbEntityValidationException ex)
+			{
+				throw GetDbEntityValidationExceptionWithDetails(ex);
+			}
+		}
+
+		public override Task<int> SaveChangesAsync()
+		{
+			try
+			{
+				return base.SaveChangesAsync();
+			}
+			catch (DbEntityValidationException ex)
+			{
+				throw GetDbEntityValidationExceptionWithDetails(ex);
+			}
+		}
+
+		private static DbEntityValidationException GetDbEntityValidationExceptionWithDetails(DbEntityValidationException ex)
+		{
+			var errorMessages = ex.EntityValidationErrors
+				.SelectMany(x => x.ValidationErrors)
+				.Select(x => x.ErrorMessage);
+
+			var fullErrorMessage = string.Join("; ", errorMessages);
+			var exceptionMessage = string.Concat(ex.Message, " The validation errors are: ", fullErrorMessage);
+
+			// Returns a new DbEntityValidationException with the improved exception message.
+			return new DbEntityValidationException(exceptionMessage, ex.EntityValidationErrors);
 		}
 
 		public DbSet<UserQuestion> UserQuestions { get; set; }
@@ -141,5 +186,10 @@ namespace Database.DataContexts
 		public DbSet<XQueueExerciseSubmission> XQueueExerciseSubmissions { get; set; }
 
 		public DbSet<FeedViewTimestamp> FeedViewTimestamps { get; set; }
+
+		public DbSet<StepikAccessToken> StepikAccessTokens { get; set; }
+		public DbSet<StepikExportProcess> StepikExportProcesses { get; set; }
+		public DbSet<StepikExportSlideAndStepMap> StepikExportSlideAndStepMaps { get; set; }
 	}
 }
+ 

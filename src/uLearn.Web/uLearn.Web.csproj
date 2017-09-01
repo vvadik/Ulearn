@@ -371,6 +371,7 @@
     <Compile Include="Controllers\JsonDataContractController.cs" />
     <Compile Include="Controllers\JsonDataContractHelpers.cs" />
     <Compile Include="Controllers\NotificationsController.cs" />
+    <Compile Include="Controllers\StepikController.cs" />
     <Compile Include="Controllers\TelegramController.cs" />
     <Compile Include="Controllers\BaseUserController.cs" />
     <Compile Include="Extensions\UserExtensions.cs" />
@@ -793,6 +794,7 @@
     <Content Include="Content\loading.gif" />
     <Content Include="Content\logo.png" />
     <Content Include="Content\notifications.css" />
+    <Content Include="Content\stepik.css" />
     <Content Include="Content\summer-practice.png" />
     <Content Include="Content\tablesorter.css" />
     <Content Include="Content\ulearn.css" />
@@ -899,6 +901,7 @@
     <Content Include="Scripts\slide-utils.js" />
     <Content Include="Scripts\slide-versions.js" />
     <Content Include="Scripts\slide-video.js" />
+    <Content Include="Scripts\stepik.js" />
     <Content Include="Scripts\table-configurator.js" />
     <Content Include="Scripts\tooltips.js" />
     <Content Include="Scripts\suggest-mail-notifications.js" />
@@ -1149,6 +1152,13 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>Notifications.generated.cs</LastGenOutput>
     </Content>
+    <Content Include="Views\Stepik\ConnectError.cshtml" />
+    <Content Include="Views\Stepik\SelectTarget.cshtml" />
+    <Content Include="Views\Stepik\InitialExportOptions.cshtml" />
+    <Content Include="Views\Stepik\ExportStarted.cshtml" />
+    <Content Include="Views\Stepik\UpdateOptions.cshtml" />
+    <Content Include="Views\Stepik\UpdateStarted.cshtml" />
+    <Content Include="Views\Stepik\Process.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1173,6 +1183,10 @@
     <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
       <Project>{26580595-F4DC-41EE-BA66-0EF4692243AF}</Project>
       <Name>RunCsJob.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Stepik.Api\Stepik.Api.csproj">
+      <Project>{0BF85278-186B-4FF1-85A8-74992C7CB7AE}</Project>
+      <Name>Stepik.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\uLearn\uLearn.csproj">
       <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>

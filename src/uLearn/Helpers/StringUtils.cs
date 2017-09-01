@@ -5,10 +5,15 @@ using System.Text;
 
 namespace uLearn.Helpers
 {
-	public class StringUtils
+	public static class StringUtils
 	{
-		public static Random random;
+		private static readonly Random random;
 		private const string alphanumericChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+		static StringUtils()
+		{
+			random = new Random();
+		}
 
 		public static string GenerateAlphanumericString(int length)
 		{

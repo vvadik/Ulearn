@@ -244,3 +244,23 @@
 		</div>
 	</div>
 }
+
+@helper Notification(CourseExportedToStepikNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	<div class="notifications__course-exported-to-stepik-notification media" data-href="@Url.Action("Process", "Stepik", new { courseId = course.Id, processId = notification.ProcessId })">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.InitiatedBy)
+		</div>
+		<div class="media-body">
+			@if (notification.Process.IsSuccess)
+			{
+				<div class="notifications__notification__header">Курс <b>«@course.Title»</b> успешно экспортирован на&nbsp;Степик. Нажмите для&nbsp;подробностей.</div>
+			}
+			else
+			{
+				<div class="notifications__notification__header">Произошла ошибка при копировании курса <b>«@course.Title»</b> на&nbsp;Степик. Нажмите для&nbsp;подробностей.</div>
+			}
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}

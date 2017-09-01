@@ -429,7 +429,11 @@ namespace uLearn.Web.Controllers
 
 			[Display(Name = "Это имя уже занято, выберите другое")]
 			[IsError(true)]
-			NameAlreadyTaken
+			NameAlreadyTaken,
+
+			[Display(Name = "Не все поля заполнены верны. Проверьте, пожалуйста, и попробуйте ещё раз")]
+			[IsError(true)]
+			NotAllFieldsFilled
 		}
 
 		public PartialViewResult ChangeDetailsPartial()
@@ -454,6 +458,11 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ChangeDetailsPartial(UserViewModel userModel)
 		{
+			if (!ModelState.IsValid)
+			{
+				return RedirectToAction("Manage", new { Message = ManageMessageId.NotAllFieldsFilled });
+			}
+
 			var user = await userManager.FindByIdAsync(User.Identity.GetUserId());
 			if (user == null)
 			{
@@ -508,7 +517,8 @@ namespace uLearn.Web.Controllers
 		public ActionResult UserMenuPartial()
 		{
 			var isAuthenticated = Request.IsAuthenticated;
-			var user = userManager.FindById(User.Identity.GetUserId());
+			var userId = User.Identity.GetUserId();
+			var user = userManager.FindById(userId);
 			return PartialView(new UserMenuPartialViewModel
 			{
 				IsAuthenticated = isAuthenticated,

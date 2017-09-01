@@ -22,7 +22,7 @@ namespace uLearn.Model.Blocks
 
 		public override string ToString()
 		{
-			return string.Format("Video {0}", VideoId);
+			return $"Video {GetYoutubeUrl()}";
 		}
 
 		public VideoComponent GetVideoComponent(string displayName, Slide slide, int componentIndex, Dictionary<string, string> videoGuids)
@@ -35,6 +35,11 @@ namespace uLearn.Model.Blocks
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
 			throw new NotSupportedException();
+		}
+
+		public string GetYoutubeUrl()
+		{
+			return $"https://youtube.com/watch?v={VideoId}";
 		}
 	}
 }

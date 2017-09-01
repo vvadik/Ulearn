@@ -45,7 +45,9 @@ namespace Notifications
 
 			InlineKeyboardMarkup replyMarkup = null;
 			if (button != null)
-				replyMarkup = new InlineKeyboardMarkup(new[] { new InlineKeyboardButton { Url = button.Link, Text = button.Text } });
+				// For new version of Telegram.Bot use:
+				//replyMarkup = new InlineKeyboardMarkup(new[] { InlineKeyboardButton.WithUrl(button.Text, button.Link) });
+				replyMarkup = new InlineKeyboardMarkup(new[] { new InlineKeyboardButton { Text = button.Text, Url = button.Link} });
 
 			try
 			{

@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using Database.DataContexts;
 using Database.Models;
 using log4net;
+using uLearn.Extensions;
 using uLearn.Web.FilterAttributes;
 
 namespace uLearn.Web.Controllers

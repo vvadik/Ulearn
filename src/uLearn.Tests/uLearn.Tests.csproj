@@ -57,6 +57,9 @@
     <Reference Include="FluentAssertions.Core, Version=4.19.2.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.4.19.2\lib\net45\FluentAssertions.Core.dll</HintPath>
     </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="MarkdownDeep, Version=1.5.5383.24027, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\External\MarkdownDeep\MarkdownDeep.dll</HintPath>
@@ -279,6 +282,7 @@
     <Compile Include="CSharp\testProject\projDir\OneFailingTest.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="ExportedSlide_should.cs" />
     <Compile Include="LockFilesTests.cs" />
     <Compile Include="CourseTool\Config_Test.cs" />
     <Compile Include="CourseTool\Converter_should.cs" />
