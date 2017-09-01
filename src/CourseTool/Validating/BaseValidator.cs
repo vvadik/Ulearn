@@ -23,7 +23,7 @@ namespace uLearn
 
 		private static string FormatSlideIssueMessage(Slide slide, string warning)
 		{
-			return $"{slide.Info.Unit.Title}: {slide.Info.SlideFile.Name} ({slide.Title})\n{warning}";
+			return $"{slide.Info.Unit.Title}: {slide.Info.SlideFile?.Name} ({slide.Title})\n{warning}";
 		}
 
 		protected void ReportSlideWarning(Slide slide, string warning)
