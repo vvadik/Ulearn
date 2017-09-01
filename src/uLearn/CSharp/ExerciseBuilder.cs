@@ -150,7 +150,7 @@ namespace uLearn.CSharp
 			if (node.HasAttribute<ExerciseAttribute>())
 			{
 				ExerciseClassName = ExerciseClassName ?? FindParentClassName(node);
-				Exercise.EthalonSolution += node.WithoutAttributes();
+				Exercise.EthalonSolution += node.WithoutAttributes().ToFullString();
 				Exercise.ExerciseInitialCode = GetExerciseCode(node);
 				if (node.HasAttribute<SingleStatementMethodAttribute>())
 					Exercise.ValidatorName += " SingleStatementMethod";
