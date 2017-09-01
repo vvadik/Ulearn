@@ -79,7 +79,7 @@ namespace uLearn
 			}
 			if (solution.HasStyleIssues)
 			{
-				ReportWarning("Style issue: " + solution.StyleMessage);
+				ReportWarning($"Slide {slide.Title} has style issues:\n{solution.StyleMessage}");
 			}
 
 			var result = SandboxRunner.Run(exercise.CreateSubmission(
