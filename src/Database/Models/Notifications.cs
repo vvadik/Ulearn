@@ -211,7 +211,7 @@ namespace Database.Models
 		[IsEnabledByDefault(true)]
 		PublishedPackage = 204,
 
-		[Display(Name = @"Курс скопирован на Stepik.org", GroupName = @"Курсы скопированы на Stepik.org")]
+		[Display(Name = @"Курс скопирован на Степик", GroupName = @"Курсы скопированы на Степик")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		CourseExportedToStepik = 205,
