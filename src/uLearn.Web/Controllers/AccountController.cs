@@ -458,7 +458,7 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ChangeDetailsPartial(UserViewModel userModel)
 		{
-			if (!ModelState.IsValid)
+			if (string.IsNullOrEmpty(userModel.Name))
 			{
 				return RedirectToAction("Manage", new { Message = ManageMessageId.NotAllFieldsFilled });
 			}
