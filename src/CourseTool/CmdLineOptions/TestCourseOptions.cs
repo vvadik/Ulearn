@@ -42,6 +42,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 				Write(ConsoleColor.DarkYellow, m);
 				errors.Add(m);
 			};
+			validator.ValidateSpelling(course);
 			validator.ValidateExercises();
 			validator.ValidateVideos();
 			if (errors.Any())

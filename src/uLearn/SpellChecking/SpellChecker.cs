@@ -36,6 +36,11 @@ namespace uLearn.SpellChecking
 		public string Context { get; set; }
 
 		public string[] Suggestions { get; set; }
+
+		public override string ToString()
+		{
+			return $"{nameof(Mispelling)}: {Mispelling}, {nameof(Context)}: {Context}, {nameof(Suggestions)}: {string.Join(", ", Suggestions)}";
+		}
 	}
 
 	public class SpellChecker : IDisposable
@@ -185,7 +190,14 @@ namespace uLearn.SpellChecking
 					return null;
 			}
 
-			if (hunspell.Spell(normalizedWord) || hunspell.Spell(normalizedWord.ToLower()))
+			string lowercasedNormalizedWord = normalizedWord.ToLower();
+			if (hunspell.Spell(normalizedWord) || hunspell.Spell(lowercasedNormalizedWord))
+				return null;
+
+			var isPrefixedWord = prefixes.Any(
+				prefix => lowercasedNormalizedWord.StartsWith(prefix)
+						&& hunspell.Spell(lowercasedNormalizedWord.Substring(prefix.Length)));
+			if (isPrefixedWord)
 				return null;
 
 			var suggests = hunspell.Suggest(normalizedWord);
@@ -193,26 +205,6 @@ namespace uLearn.SpellChecking
 			//One does not simply make error without suggestions. It's not word at all
 			if (suggests.Count == 0)
 				return null;
-
-			foreach (var suggest in suggests)
-			{
-				var suggestionParts = suggest.Split(' ');
-
-				//if word = prefix + stem of right spelling, ignore it
-				if (suggestionParts.Length == 2 &&
-					normalizedWord.Equals(suggestionParts[0] + suggestionParts[1], StringComparison.InvariantCultureIgnoreCase))
-				{
-					var prefix = suggestionParts[0].ToLower();
-					if (prefixes.Contains(prefix))
-						return null;
-
-					//"не" можно писать слитно, но только не с глаголом
-					if (prefix == "не" && !IsVerb(suggestionParts[1]))
-					{
-						return null;
-					}
-				}
-			}
 
 			return new SpellingError
 			{
@@ -222,36 +214,6 @@ namespace uLearn.SpellChecking
 			};
 		}
 
-		private bool IsVerb(string word)
-		{
-			var verbConsonants = new[] { 'с', 'з' };
-
-			var verbSuffixes = new[] { "ть", "чь", "тся", "ться", "чься" };
-
-			if (word.Length < 3)
-				return false;
-
-			var stems = hunspell.Stem(word);
-			if (!stems.Any())
-				return false;
-
-			var stem = stems[0];
-
-			if (verbSuffixes.Any(verbSuffix => stem.EndsWith(verbSuffix) && (vowels.Contains(stem[stem.Length - verbSuffix.Length - 1]) || verbConsonants.Contains(stem[stem.Length - verbSuffix.Length - 1]))))
-			{
-				return true;
-			}
-
-			verbSuffixes = new[] { "ти", "тись" };
-
-			if (verbSuffixes.Any(verbSuffix => stem.EndsWith(verbSuffix) && (!vowels.Contains(stem[stem.Length - verbSuffix.Length - 1]))))
-			{
-				return true;
-			}
-
-			return false;
-		}
-
 		public void Dispose()
 		{
 			hunspell.Dispose();
@@ -259,7 +221,7 @@ namespace uLearn.SpellChecking
 
 		private static bool IsRussianLetter(char c)
 		{
-			return BelongsToRange(c, 'а', 'я') || BelongsToRange(c, 'А', 'Я');
+			return BelongsToRange(c, 'а', 'я') || BelongsToRange(c, 'А', 'Я') || c == 'ё' || c == 'Ё';
 		}
 
 		private static bool BelongsToRange(char c, char left, char right)

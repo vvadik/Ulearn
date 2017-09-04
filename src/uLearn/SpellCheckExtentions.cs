@@ -7,16 +7,9 @@ namespace uLearn
 {
 	public static class SpellCheckExtentions
 	{
-		private static readonly string[] dictionary =
-		{
-			"хеш:марш", "серверный:северный", "википедия:рептилия", "лямбда:корова",
-			"прорешать:решать", "покоординатно", "регистронезависимо", "дженерик:чайник",
-			"оффлайн:онлайн", "сериализация:линия", "логгирование:здание", "рефакторинг:чайник"
-		};
-
 		public static string[] SpellCheck(this Course course)
 		{
-			using (var spellchecker = CreateSpellChecker(course.TryGetDictionaryPath()))
+			using (var spellchecker = new SpellChecker(course.TryGetDictionaryPath()))
 			{
 				return spellchecker.SpellCheckCourse(course);
 			}
@@ -67,20 +60,6 @@ namespace uLearn
 		{
 			var file = Path.Combine(course.Directory.FullName, course.Settings.GetDictionaryFile());
 			return File.Exists(file) ? file : null;
-		}
-
-		private static SpellChecker CreateSpellChecker(string dictionaryFile)
-		{
-			var spellChecker = new SpellChecker(dictionaryFile);
-			foreach (var word in dictionary)
-			{
-				var tokens = word.Split(':');
-				if (tokens.Length == 1)
-					spellChecker.AddWord(tokens[0]);
-				else
-					spellChecker.AddWord(tokens[0], tokens[1]);
-			}
-			return spellChecker;
 		}
 	}
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using RunCsJob;
@@ -108,6 +109,18 @@ SOURCE CODE:
 {solution.SourceCode}
 ERROR:
 {solution.ErrorMessage}");
+		}
+
+		public void ValidateSpelling(Course course)
+		{
+			LogInfoMessage("Spell checking...");
+			var sw = Stopwatch.StartNew();
+			var errors = course.SpellCheck();
+			foreach (string error in errors)
+			{
+				ReportError("Spelling: " + error);
+			}
+			LogInfoMessage($"Spell checking done in {sw.ElapsedMilliseconds} ms");
 		}
 	}
 }
