@@ -17,9 +17,11 @@ namespace XQueueWatcher
 {
 	public class Program
 	{
+		private static readonly TimeSpan pauseBetweenRequests = TimeSpan.FromSeconds(1);
+
 		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
 		private static readonly CourseManager courseManager = WebCourseManager.Instance;
-
+		
 		private static readonly Dictionary<int, XQueueClient> clientsCache = new Dictionary<int, XQueueClient>();
 
 		static void Main(string[] args)
@@ -41,6 +43,8 @@ namespace XQueueWatcher
 				Task.WaitAll(tasks.ToArray(), cancellationToken);
 				if (cancellationToken.IsCancellationRequested)
 					break;
+					
+				Task.Delay(pauseBetweenRequests, cancellationToken).Wait(cancellationToken);
 			}
 		}
 
