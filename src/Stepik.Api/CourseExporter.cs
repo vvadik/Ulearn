@@ -305,7 +305,7 @@ namespace Stepik.Api
 				}
 
 				results.Info($"Inserting steps for slide «{slide.Title}» into lesson {lesson.Id} on position {position}");
-				await InsertSlideAsStepsInLesson(course, slide, lesson.Id.Value, position, updateOptions, results);
+				await InsertSlideAsStepsInLesson(course, slide, lesson.Id.Value, position + 1, updateOptions, results);
 			}
 		}
 
