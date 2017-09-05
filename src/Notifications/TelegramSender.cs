@@ -40,7 +40,7 @@ namespace Notifications
 		public async Task SendMessageAsync(long chatId, string html, TelegramButton button = null)
 		{
 			metricSender.SendCount("send_to_telegram.try");
-			html = html.Replace("<br>", "\n").Replace("<br/>", "\n");
+			html = html.Replace("<br>", "\n").Replace("<br/>", "\n").Replace("<br />", "\n");
 			log.Info($"Try to send message to telegram chat {chatId}, html: {html.Replace("\n", @" \\ ")}" + (button != null ? $", button: {button}" : ""));
 
 			InlineKeyboardMarkup replyMarkup = null;
