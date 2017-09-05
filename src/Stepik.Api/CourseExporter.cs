@@ -331,6 +331,7 @@ namespace Stepik.Api
 			{
 				CourseId = stepikCourse.Id.Value,
 				Position = ++sectionIndex,
+				Title = slide.Title,
 			});
 			await client.UploadUnit(new StepikApiUnit
 			{

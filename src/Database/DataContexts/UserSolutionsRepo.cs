@@ -115,24 +115,35 @@ namespace Database.DataContexts
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
 		public async Task<Tuple<int, bool>> Like(int solutionId, string userId)
 		{
-			var solutionForLike = db.UserExerciseSubmissions.Find(solutionId);
-			if (solutionForLike == null)
-				throw new Exception("Solution " + solutionId + " not found");
-			var hisLike = db.SolutionLikes.FirstOrDefault(like => like.UserId == userId && like.SubmissionId == solutionId);
-			var votedAlready = hisLike != null;
-			var likesCount = solutionForLike.Likes.Count;
-			if (votedAlready)
+			return await FuncUtils.TrySeveralTimesAsync(() => TryLike(solutionId, userId), 3);
+		}
+
+		private async Task<Tuple<int, bool>> TryLike(int solutionId, string userId)
+		{
+			using (var transaction = db.Database.BeginTransaction())
 			{
-				db.SolutionLikes.Remove(hisLike);
-				likesCount--;
+				var solutionForLike = db.UserExerciseSubmissions.Find(solutionId);
+				if (solutionForLike == null)
+					throw new Exception("Solution " + solutionId + " not found");
+				var hisLike = db.SolutionLikes.FirstOrDefault(like => like.UserId == userId && like.SubmissionId == solutionId);
+				var votedAlready = hisLike != null;
+				var likesCount = solutionForLike.Likes.Count;
+				if (votedAlready)
+				{
+					db.SolutionLikes.Remove(hisLike);
+					likesCount--;
+				}
+				else
+				{
+					db.SolutionLikes.Add(new Like { SubmissionId = solutionId, Timestamp = DateTime.Now, UserId = userId });
+					likesCount++;
+				}
+				await db.SaveChangesAsync();
+
+				transaction.Commit();
+				
+				return Tuple.Create(likesCount, !votedAlready);
 			}
-			else
-			{
-				db.SolutionLikes.Add(new Like { SubmissionId = solutionId, Timestamp = DateTime.Now, UserId = userId });
-				likesCount++;
-			}
-			await db.SaveChangesAsync();
-			return Tuple.Create(likesCount, !votedAlready);
 		}
 
 		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId)
