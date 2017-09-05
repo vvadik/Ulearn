@@ -53,7 +53,7 @@ p {
 .internal-page-link:focus,
 .internal-page-link:active {
 	text-decoration: none;
-	border-bottom: 1px dotted rgba(66, 139, 202, 0.62);
+	border-bottom: 1px dashed rgba(66, 139, 202, 0.62);
 }
 
 .internal-page-link:hover,
@@ -1325,21 +1325,58 @@ h1 .copy-group-link {
 	margin-left: 10px;
 }
 
-.groups .group {
-	margin-top: 25px;
+.groups {
+	padding-top: 20px;
 }
 
+.groups .group:first-child {
+	border-top: 1px solid rgba(150, 150, 150, 0.2);
+}
+
+.groups .group {
+	padding-top: 7px;
+	padding-bottom: 9px;
+	border-bottom: 1px solid rgba(150, 150, 150, 0.2);
+}
+
+.groups .group:hover {
+	cursor: pointer;
+	background-color: #f6f6ff;
+}
+	
 .groups .group.collapsing .group__title {
 	margin-top: 0;
 }
 
 .groups .group .group__title {
-	margin-bottom: 0;
+	font-size: 18px;
+}
+
+.groups .group:hover .group__title {
+	text-decoration: underline;
+	color: #23527c;
 }
 
 .groups .group .group__title .label {
 	position: relative;
 	top: -3px;
+}
+
+.groups .group .group__labels .group__label {
+	position: relative;
+	top: -2px;
+}
+
+.groups .group .group__labels .bootstrap-select {
+	width: 100%;
+}
+
+.groups .group .group__labels .bootstrap-select ul > li > a {
+	padding-left: 12px;
+}
+
+.groups .group .group__members-count {
+	color: #999;
 }
 
 .groups .group .members {

@@ -92,7 +92,8 @@ namespace uLearn.Web
 				"~/Scripts/profile.js",
 				"~/Scripts/email-is-not-confirmed.js",
 				"~/Scripts/notifications.js",
-				"~/Scripts/stepik.js"
+				"~/Scripts/stepik.js",
+				"~/Scripts/modals.js",
 			};
 		}
 
@@ -118,7 +119,8 @@ namespace uLearn.Web
 				"~/Content/buttons.css",
 				"~/Content/likely.css",
 				"~/Content/notifications.css",
-				"~/Content/stepik.css"
+				"~/Content/stepik.css",
+				"~/Content/modals.css"
 			);
 		}
 	}

@@ -608,15 +608,23 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult Groups(string courseId)
 		{
+			var userId = User.Identity.GetUserId();
+
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User, includeArchived: true);
+			var groupsIds = groups.Select(g => g.Id).ToList();
+
 			var course = courseManager.GetCourse(courseId);
 			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course);
 			var enabledScoringGroups = groupsRepo.GetEnabledAdditionalScoringGroups(courseId)
 				.GroupBy(e => e.GroupId)
 				.ToDictionary(g => g.Key, g => g.Select(e => e.ScoringGroupId).ToList());
+
 			var instructors = usersRepo.GetCourseInstructors(courseId, userManager, limit: 100);
 			var coursesIds = User.GetControllableCoursesId().ToList();
 			var groupsMayBeCopied = groupsRepo.GetAvailableForUserGroups(coursesIds, User).ToList();
+			
+			var labels = groupsRepo.GetLabels(userId).ToDictionary(l => l.Id, l => l);
+			var labelsOnGroups = groupsRepo.GetGroupsLabels(groupsIds);
 
 			return View("Groups", new GroupsViewModel
 			{
@@ -629,6 +637,8 @@ namespace uLearn.Web.Controllers
 				Instructors = instructors,
 				GroupsMayBeCopied = groupsMayBeCopied,
 				CoursesNames = courseManager.GetCourses().ToDictionary(c => c.Id.ToLower(), c => c.Title),
+				Labels = labels,
+				LabelsOnGroups = labelsOnGroups,
 			});
 		}
 
@@ -1141,8 +1151,7 @@ namespace uLearn.Web.Controllers
 				return Json(new { status = "ok", score = "" });
 			}
 
-			int scoreInt;
-			if (!int.TryParse(score, out scoreInt))
+			if (!int.TryParse(score, out int scoreInt))
 				return Json(new { status = "error", error = "Введите целое число" });
 			if (scoreInt < 0 || scoreInt > scoringGroup.MaxAdditionalScore)
 				return Json(new { status = "error", error = $"Баллы должны быть от 0 до {scoringGroup.MaxAdditionalScore}" });
@@ -1151,6 +1160,28 @@ namespace uLearn.Web.Controllers
 			await NotifyAboutAdditionalScore(additionalScore);
 
 			return Json(new { status = "ok", score = scoreInt });
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> AddLabelToGroup(int groupId, int labelId)
+		{
+			var label = groupsRepo.FindLabel(labelId);
+			if (label == null || label.OwnerId != User.Identity.GetUserId())
+				return Json(new { status = "ok", error = "Label not found or not owned by you" });
+
+			await groupsRepo.AddLabelToGroup(groupId, labelId);
+			return Json(new { status = "ok" });
+		}
+		
+		[HttpPost]
+		public async Task<ActionResult> RemoveLabelFromGroup(int groupId, int labelId)
+		{
+			var label = groupsRepo.FindLabel(labelId);
+			if (label == null || label.OwnerId != User.Identity.GetUserId())
+				return Json(new { status = "ok", error = "Label not found or not owned by you" });
+
+			await groupsRepo.RemoveLabelFromGroup(groupId, labelId);
+			return Json(new { status = "ok" });
 		}
 	}
 
@@ -1293,5 +1324,8 @@ namespace uLearn.Web.Controllers
 		public List<UserRolesInfo> Instructors { get; set; }
 		public List<Group> GroupsMayBeCopied { get; set; }
 		public Dictionary<string, string> CoursesNames { get; set; }
+
+		public Dictionary<int, GroupLabel> Labels { get; set; }
+		public DefaultDictionary<int, List<int>> LabelsOnGroups { get; set; }
 	}
 }

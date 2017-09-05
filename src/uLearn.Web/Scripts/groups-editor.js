@@ -82,7 +82,11 @@
 		$('#createOrUpdateGroupModal').modal();
 	});
 
-	$('.edit-group-link').click(function(e) {
+	$('.groups .group').click(function (e) {
+		var $target = $(e.target);
+		if ($target.closest('a').length > 0 || $target.closest('select').length > 0 || $target.closest('button').length > 0 || $target.closest('.dropdown-backdrop').length > 0)
+			return;
+
 		e.preventDefault();
 
 		var $self = $(this);

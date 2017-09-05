@@ -793,6 +793,7 @@
     <Content Include="Content\loading-ring.gif" />
     <Content Include="Content\loading.gif" />
     <Content Include="Content\logo.png" />
+    <Content Include="Content\modals.css" />
     <Content Include="Content\notifications.css" />
     <Content Include="Content\stepik.css" />
     <Content Include="Content\summer-practice.png" />
@@ -874,6 +875,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\js.cookie.js" />
     <Content Include="Scripts\likely.js" />
+    <Content Include="Scripts\modals.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\notifications-settings.js" />
     <Content Include="Scripts\notifications.js" />

@@ -87,5 +87,14 @@
 			Two = "дня",
 			Five = "дней"
 		};
+
+		public static RussianPluralizationOptions Man = new RussianPluralizationOptions
+		{
+			One = "человек",
+			Two = "человека",
+			Five = "человек",
+			hideNumberOne = false,
+			smallNumbersAreWords = false,
+		};
 	}
 }

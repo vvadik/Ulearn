@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration.Configuration;
 using System.Data.Entity.Validation;
 using System.Linq;
 using System.Linq.Expressions;
@@ -84,20 +85,24 @@ namespace Database.DataContexts
 
 			CancelCascaseDeleting<CourseExportedToStepikNotification, StepikExportProcess, int>(modelBuilder, c => c.Process, c => c.ProcessId);
 			
-			CancelCascaseDeleting<XQueueWatcher, ApplicationUser, string>(modelBuilder, w => w.User, w => w.UserId);
+			CancelCascaseDeleting<XQueueWatcher, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 
 			CancelCascaseDeleting<StepikExportProcess, ApplicationUser, string>(modelBuilder, c => c.Owner, c => c.OwnerId);
+
+			CancelCascaseDeleting<NotificationTransport, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId, isRequired: false);
+
+			CancelCascaseDeleting<LabelOnGroup, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
+			CancelCascaseDeleting<GroupLabel, ApplicationUser, string>(modelBuilder, c => c.Owner, c => c.OwnerId);
+			CancelCascaseDeleting<LabelOnGroup, GroupLabel, int>(modelBuilder, c => c.Label, c => c.LabelId);
 		}
 
-		private static void CancelCascaseDeleting<T1, T2, T3>(DbModelBuilder modelBuilder, Expression<Func<T1, T2>> oneWay, Expression<Func<T1, T3>> secondWay)
+		private static void CancelCascaseDeleting<T1, T2, T3>(DbModelBuilder modelBuilder, Expression<Func<T1, T2>> oneWay, Expression<Func<T1, T3>> secondWay, bool isRequired=true)
 			where T1 : class
 			where T2 : class
 		{
-			modelBuilder.Entity<T1>()
-				.HasRequired(oneWay)
-				.WithMany()
-				.HasForeignKey(secondWay)
-				.WillCascadeOnDelete(false);
+			var entity = modelBuilder.Entity<T1>();
+			var a = isRequired ? entity.HasRequired(oneWay).WithMany() : entity.HasOptional(oneWay).WithMany();
+			a.HasForeignKey(secondWay).WillCascadeOnDelete(false);
 		}
 
 		/* Construct easy understandable message on DbEntityValidationException */
@@ -167,6 +172,8 @@ namespace Database.DataContexts
 
 		public DbSet<Group> Groups { get; set; }
 		public DbSet<GroupMember> GroupMembers { get; set; }
+		public DbSet<GroupLabel> GroupLabels { get; set; }
+		public DbSet<LabelOnGroup> LabelsOnGroups { get; set; }
 
 		public DbSet<CertificateTemplate> CertificateTemplates { get; set; }
 		public DbSet<Certificate> Certificates { get; set; }

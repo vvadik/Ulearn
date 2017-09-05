@@ -26,13 +26,17 @@ namespace Database.Models
 		public string OwnerId { get; set; }
 
 		public virtual ApplicationUser Owner { get; set; }
-
-		[Required]
-		public bool IsPublic { get; set; }
-
+		
 		[Required]
 		public bool IsDeleted { get; set; }
 
+		[Required]
+		/* Архивная группа не учитываются в фильтрах «Мои группы» и всегда показывается позже неархивных */
+		public bool IsArchived { get; set; }
+
+		[Required]
+		public bool IsPublic { get; set; }
+		
 		[Required]
 		[Index("IDX_Group_GroupByInviteHash")]
 		public Guid InviteHash { get; set; }
@@ -51,10 +55,6 @@ namespace Database.Models
 		[Required]
 		/* Могут ли студенты этой группы видеть сводную таблицу прогресса по курсу всех студентов группы */
 		public bool CanUsersSeeGroupProgress { get; set; }
-
-		[Required]
-		/* Архивная группа не учитываются в фильтрах «Мои группы» и всегда показывается позже неархивных */
-		public bool IsArchived { get; set; }
 
 		public virtual ICollection<GroupMember> Members { get; set; }
 

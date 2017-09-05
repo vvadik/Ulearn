@@ -453,6 +453,10 @@
     <Compile Include="Migrations\201708311313257_RemoveRequiredFieldsOnStepikExportProcess.Designer.cs">
       <DependentUpon>201708311313257_RemoveRequiredFieldsOnStepikExportProcess.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709041435522_AddGroupsLabels.cs" />
+    <Compile Include="Migrations\201709041435522_AddGroupsLabels.Designer.cs">
+      <DependentUpon>201709041435522_AddGroupsLabels.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -468,6 +472,8 @@
     <Compile Include="Models\FeedUpdateTimestamp.cs" />
     <Compile Include="Models\GraderClient.cs" />
     <Compile Include="Models\Group.cs" />
+    <Compile Include="Models\GroupAccess.cs" />
+    <Compile Include="Models\GroupLabel.cs" />
     <Compile Include="Models\GroupMember.cs" />
     <Compile Include="Models\ISlideAction.cs" />
     <Compile Include="Models\Like.cs" />
@@ -746,6 +752,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201708311313257_RemoveRequiredFieldsOnStepikExportProcess.resx">
       <DependentUpon>201708311313257_RemoveRequiredFieldsOnStepikExportProcess.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709041435522_AddGroupsLabels.resx">
+      <DependentUpon>201709041435522_AddGroupsLabels.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

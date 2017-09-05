@@ -964,7 +964,7 @@ namespace Database.Models
 			}
 			else
 			{
-				return $"<b>Произошла ошибка</b> при {(isInitial ? "копировании" : "обновлении")} курса {course.Title.EscapeHtml()} на Степик{(isInitial ? "" : "е")}:<br /><br/>Лог:<br/>" + Process.Log;
+				return $"<b>Произошла ошибка</b> при {(isInitial ? "копировании" : "обновлении")} курса {course.Title.EscapeHtml()} на Степик{(isInitial ? "" : "е")}:<br/><br/>Лог:<br/>" + Process.Log;
 			}
 		}
 

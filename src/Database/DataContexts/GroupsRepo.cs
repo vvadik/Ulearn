@@ -5,6 +5,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
+using JetBrains.Annotations;
 using log4net;
 using Microsoft.AspNet.Identity;
 using uLearn;
@@ -417,6 +418,72 @@ namespace Database.DataContexts
 		{
 			var groupsIds = GetGroups(courseId).Select(g => g.Id);
 			return db.EnabledAdditionalScoringGroups.Where(e => groupsIds.Contains(e.GroupId)).ToList();
+		}
+
+		public List<GroupLabel> GetLabels(string ownerId)
+		{
+			return db.GroupLabels.Where(l => !l.IsDeleted && l.OwnerId == ownerId).ToList();
+		}
+
+		public async Task<GroupLabel> CreateLabel(string ownerId, string name, string colorHex)
+		{
+			var label = new GroupLabel
+			{
+				OwnerId = ownerId,
+				Name = name,
+				IsDeleted = false,
+				ColorHex = colorHex
+			};
+			db.GroupLabels.Add(label);
+			await db.SaveChangesAsync();
+			return label;
+		}
+
+		public async Task AddLabelToGroup(int groupId, int labelId)
+		{
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				if (db.LabelsOnGroups.Any(g => g.LabelId == labelId && g.GroupId == groupId))
+					return;
+
+				var labelOnGroup = new LabelOnGroup
+				{
+					GroupId = groupId,
+					LabelId = labelId,
+				};
+				db.LabelsOnGroups.Add(labelOnGroup);
+				await db.SaveChangesAsync();
+
+				transaction.Commit();
+			}
+		}
+
+		public async Task RemoveLabelFromGroup(int groupId, int labelId)
+		{
+			var labels = db.LabelsOnGroups.Where(g => g.LabelId == labelId && g.GroupId == groupId);
+			db.LabelsOnGroups.RemoveRange(labels);
+			await db.SaveChangesAsync();
+		}
+
+		public List<int> GetGroupsWithSpecificLabel(int labelId)
+		{
+			return db.LabelsOnGroups.Where(l => l.LabelId == labelId).Select(l => l.GroupId).ToList();
+		}
+
+		public DefaultDictionary<int, List<int>> GetGroupsLabels(IEnumerable<int> groupsIds)
+		{
+			var groupsIdsSet = new HashSet<int>(groupsIds);
+			return db.LabelsOnGroups
+				.Where(l => groupsIdsSet.Contains(l.GroupId))
+				.GroupBy(l => l.GroupId)
+				.ToDictionary(g => g.Key, g => g.Select(l => l.LabelId).ToList())
+				.ToDefaultDictionary();
+		}
+
+		[CanBeNull]
+		public GroupLabel FindLabel(int labelId)
+		{
+			return db.GroupLabels.Find(labelId);
 		}
 	}
 }
