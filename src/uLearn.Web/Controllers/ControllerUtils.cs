@@ -25,8 +25,6 @@ namespace uLearn.Web.Controllers
 		static ControllerUtils()
 		{
 			ulearnBaseUrl = WebConfigurationManager.AppSettings["ulearn.baseUrl"] ?? "";
-			if (!ulearnBaseUrl.EndsWith("/"))
-				ulearnBaseUrl = ulearnBaseUrl + "/";
 		}
 
 		public static bool HasPassword(UserManager<ApplicationUser> userManager, IPrincipal principal)
@@ -37,9 +35,22 @@ namespace uLearn.Web.Controllers
 
 		private static bool IsLocalUrl(this Controller controller, string url)
 		{
-			if (string.IsNullOrEmpty(url))
+			if (string.IsNullOrEmpty(url) || controller.Url.IsLocalUrl(url))
 				return true;
-			return controller.Url.IsLocalUrl(url) || (! string.IsNullOrEmpty(ulearnBaseUrl) && url.StartsWith(ulearnBaseUrl));
+
+			if (string.IsNullOrEmpty(ulearnBaseUrl))
+				return false;
+
+			try
+			{
+				var ulearnBaseUrlBuilder = new UriBuilder(ulearnBaseUrl);
+				var urlBuilder = new UriBuilder(url);
+				return ulearnBaseUrlBuilder.Host == urlBuilder.Host && ulearnBaseUrlBuilder.Scheme == urlBuilder.Scheme && ulearnBaseUrlBuilder.Port == urlBuilder.Port;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
 		}
 
 		public static string FixRedirectUrl(this Controller controller, string url)
