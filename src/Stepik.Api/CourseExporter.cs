@@ -295,7 +295,7 @@ namespace Stepik.Api
 					position = lesson.StepsIds.FindIndex(stepId);
 
 					results.Info($"Removing old steps created for this slide: {string.Join(", ", slideUpdateOptions.RemoveStepsIds)}");
-					await RemoveStepsFromLesson(lesson, slideUpdateOptions.RemoveStepsIds);
+					await RemoveStepsFromLesson(lesson, slideUpdateOptions.RemoveStepsIds, results);
 				}
 				else
 				{
@@ -305,20 +305,40 @@ namespace Stepik.Api
 				}
 
 				results.Info($"Inserting steps for slide «{slide.Title}» into lesson {lesson.Id} on position {position}");
-				await InsertSlideAsStepsInLesson(course, slide, lesson.Id.Value, position, updateOptions, results);
+				await InsertSlideAsStepsInLesson(course, slide, lesson.Id.Value, position + 1, updateOptions, results);
 			}
 		}
 
-		private async Task RemoveStepsFromLesson(StepikApiLesson lesson, List<int> removeStepsIds)
+		private async Task RemoveStepsFromLesson(StepikApiLesson lesson, List<int> removeStepsIds, CourseExportResults results)
 		{
 			var realStepsIds = lesson.StepsIds;
 
 			var newPosition = 0;
 			foreach (var stepId in realStepsIds)
 				if (removeStepsIds.Contains(stepId))
-					await client.DeleteStep(stepId);
+				{
+					try
+					{
+						await client.DeleteStep(stepId);
+					}
+					catch (StepikApiException e)
+					{
+						results.Error("Can't delete step: " + e.Message);
+					}
+				}
 				else
-					await client.MoveStep(stepId, ++newPosition);
+				{
+					try
+					{
+						await client.MoveStep(stepId, newPosition + 1);
+						// Increment newPosition only if success
+						newPosition++;
+					}
+					catch (StepikApiException e)
+					{
+						results.Error("Can't move step: " + e.Message);
+					}
+				}
 		}
 
 		private async Task<StepikApiLesson> CreateLessonAndSectionForSlide(Slide slide, StepikApiCourse stepikCourse, int sectionIndex)
@@ -330,7 +350,8 @@ namespace Stepik.Api
 			var section = await client.UploadSection(new StepikApiSection
 			{
 				CourseId = stepikCourse.Id.Value,
-				Position = ++sectionIndex,
+				Position = sectionIndex,
+				Title = slide.Title,
 			});
 			await client.UploadUnit(new StepikApiUnit
 			{

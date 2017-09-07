@@ -80,14 +80,14 @@ namespace uLearn
 			var result = SandboxRunner.Run(submission, new SandboxRunnerSettings());
 
 			if (VerdictIsNotOk(result))
-				ReportError($"Correct solution file {ex.CorrectSolutionFileName} verdict is not OK. RunResult = {result}");
+				ReportSlideError(slide, $"Correct solution file {ex.CorrectSolutionFileName} verdict is not OK. RunResult = {result}");
 
 			if (!IsSolution(result))
-				ReportError($"Correct solution file {ex.CorrectSolutionFileName} is not solution. RunResult = {result}");
+				ReportSlideError(slide, $"Correct solution file {ex.CorrectSolutionFileName} is not solution. RunResult = {result}");
 			var buildResult = ex.BuildSolution(solutionCode);
 
 			if (buildResult.HasStyleIssues)
-				ReportWarning($"Correct solution file {ex.CorrectSolutionFileName} has style issues. {buildResult.StyleMessage}");
+				ReportSlideWarning(slide, $"Correct solution file {ex.CorrectSolutionFileName} has style issues. {buildResult.StyleMessage}");
 		}
 
 		private void ReportWarningIfWrongAnswersAreSolutionsOrNotOk()

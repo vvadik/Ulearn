@@ -6,10 +6,6 @@ namespace uLearn
 {
 	public abstract class BaseValidator
 	{
-		public event Action<string> InfoMessage;
-		public event Action<string> Error;
-		public event Action<string> Warning;
-
 		protected BaseValidator()
 		{
 		}
@@ -21,14 +17,23 @@ namespace uLearn
 			Warning = fromValidator.Warning;
 		}
 
+		public event Action<string> InfoMessage;
+		public event Action<string> Error;
+		public event Action<string> Warning;
+
+		private static string FormatSlideIssueMessage(Slide slide, string warning)
+		{
+			return $"{slide.Info.Unit.Title}: {slide.Info.SlideFile?.Name} ({slide.Title})\n{warning}";
+		}
+
 		protected void ReportSlideWarning(Slide slide, string warning)
 		{
-			ReportWarning(slide.Title + ". " + warning);
+			ReportWarning(FormatSlideIssueMessage(slide, warning));
 		}
 
 		protected void ReportSlideError(Slide slide, string error)
 		{
-			ReportError(slide.Info.Unit.Title + ": " + slide.Title + ". " + error);
+			ReportError(FormatSlideIssueMessage(slide, error));
 		}
 
 		protected void ReportWarning(string message)

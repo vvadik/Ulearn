@@ -16,9 +16,11 @@ namespace uLearn.CSharp
 		private IEnumerable<string> InspectMethod(MethodDeclarationSyntax method)
 		{
 			var name = method?.Identifier.Text;
-			if (name == null)
+			if (name == null || method.AttributeLists.Any()) 
 				yield break;
-			if (method.IsVoidGetter())
+			if (method.AttributeLists.Any()) 
+				yield break; // Turn this check off for [Test], [TestCase] and all other special cases marked with attribute
+			if (method.IsVoidGetter() && !method.AttributeLists.Any())
 				yield return Report(method.Identifier, "'Get' метод без возвращаемого значения — это бессмыслица");
 			if (method.IsNoArgsSetter())
 				yield return Report(method.Identifier, "'Set' метод без аргументов — это бессмыслица");

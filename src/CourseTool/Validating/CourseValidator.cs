@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using RunCsJob;
@@ -54,7 +55,7 @@ namespace uLearn
 				}
 				catch (Exception e)
 				{
-					ReportError("Slide " + slide + " contains not accessible video. " + e.Message);
+					ReportSlideError(slide, "Slide contains not accessible video. " + e.Message);
 				}
 			}
 		}
@@ -79,7 +80,7 @@ namespace uLearn
 			}
 			if (solution.HasStyleIssues)
 			{
-				ReportWarning($"Slide {slide.Title} has style issues:\n{solution.StyleMessage}");
+				ReportSlideWarning(slide, "Style issue: " + solution.StyleMessage);
 			}
 
 			var result = SandboxRunner.Run(exercise.CreateSubmission(
@@ -108,6 +109,18 @@ SOURCE CODE:
 {solution.SourceCode}
 ERROR:
 {solution.ErrorMessage}");
+		}
+
+		public void ValidateSpelling(Course course)
+		{
+			LogInfoMessage("Spell checking...");
+			var sw = Stopwatch.StartNew();
+			var errors = course.SpellCheck();
+			foreach (string error in errors)
+			{
+				ReportError("Spelling: " + error);
+			}
+			LogInfoMessage($"Spell checking done in {sw.ElapsedMilliseconds} ms");
 		}
 	}
 }

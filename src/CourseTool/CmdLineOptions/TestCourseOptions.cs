@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using CommandLine;
 using RunCsJob;
 
@@ -41,6 +42,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 				Write(ConsoleColor.DarkYellow, m);
 				errors.Add(m);
 			};
+			validator.ValidateSpelling(course);
 			validator.ValidateExercises();
 			validator.ValidateVideos();
 			if (errors.Any())
@@ -50,6 +52,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 				{
 					Write(ConsoleColor.Red, error, true);
 				}
+				File.WriteAllText(course.Id + "-validation-report.html", GenerateHtmlReport(course, errors));
 			}
 			else
 				Console.WriteLine("OK! No errors found");
@@ -57,6 +60,24 @@ namespace uLearn.CourseTool.CmdLineOptions
 			Console.WriteLine("Exit code " + Environment.ExitCode);
 			Console.ReadLine();
 			Environment.Exit(Environment.ExitCode);
+		}
+
+		private string GenerateHtmlReport(Course course, List<string> errors)
+		{
+			var html = new StringBuilder();
+			html.AppendLine("<!DOCTYPE html>");
+			html.AppendLine("<html>");
+			html.AppendLine("	<head>");
+			html.AppendLine("		<meta charset='utf-8'>");
+			html.AppendLine($"		<title>Валидация курса {course.Id}</title>");
+			html.AppendLine("	</head>");
+			html.AppendLine("	<body>");
+			html.AppendLine($"		<h1>{course.Id}</h1>");
+			var items = errors.Select(e => $"		<pre class='error'>{e}</pre>");
+			html.AppendLine(string.Join("\n", items));
+			html.AppendLine("	</body>");
+			html.AppendLine("</html>");
+			return html.ToString();
 		}
 
 		private void Write(ConsoleColor color, string message, bool error = false)
