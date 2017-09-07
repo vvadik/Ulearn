@@ -35,10 +35,10 @@ namespace uLearn.Web.Controllers
 
 		private static bool IsLocalUrl(this Controller controller, string url)
 		{
-			if (string.IsNullOrEmpty(url) || controller.Url.IsLocalUrl(url))
+			if (controller.Url.IsLocalUrl(url))
 				return true;
 
-			if (string.IsNullOrEmpty(ulearnBaseUrl))
+			if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(ulearnBaseUrl))
 				return false;
 
 			try
