@@ -52,6 +52,13 @@ namespace uLearn.Web
 		{
 			return request.Headers[xSchemeHeaderName] ?? request.Url?.Scheme;
 		}
+
+		public static int GetRealPort(this HttpRequestBase request)
+		{
+			if (request.Url?.Scheme == "http" && request.Url?.Port == 80 && request.GetRealScheme() == "https")
+				return 443;
+			return request.Url?.Port ?? 80;
+		}
 	}
 
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
@@ -102,9 +109,10 @@ namespace uLearn.Web
 			var requestUrl = httpContext.Request.Url;
 			if (requestUrl != null)
 			{
-				/* Override scheme (from http to https) if need */
+				/* Substitute http(s) scheme with real scheme from header */
 				var realScheme = filterContext.RequestContext.HttpContext.Request.GetRealScheme();
-				requestUrl = new UriBuilder(requestUrl) { Scheme = realScheme }.Uri;
+				var realPort = filterContext.RequestContext.HttpContext.Request.GetRealPort();
+				requestUrl = new UriBuilder(requestUrl) { Scheme = realScheme, Port = realPort }.Uri;
 
 				originalUrl = requestUrl.ToString().RemoveQueryParameter(queryStringParameterName) ?? "";
 			}
