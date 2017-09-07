@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
+using System.Web.Configuration;
 using System.Web.Mvc;
 using ApprovalUtilities.Utilities;
 using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
+using log4net;
 using Microsoft.AspNet.Identity;
 using uLearn.Extensions;
 using uLearn.Quizes;
@@ -16,15 +18,46 @@ namespace uLearn.Web.Controllers
 {
 	public static class ControllerUtils
 	{
+		private static readonly string ulearnBaseUrl;
+
+		private static readonly ILog log = LogManager.GetLogger(typeof(ControllerUtils));
+
+		static ControllerUtils()
+		{
+			ulearnBaseUrl = WebConfigurationManager.AppSettings["ulearn.baseUrl"] ?? "";
+		}
+
 		public static bool HasPassword(UserManager<ApplicationUser> userManager, IPrincipal principal)
 		{
 			var user = userManager.FindById(principal.Identity.GetUserId());
 			return user?.PasswordHash != null;
 		}
 
-		public static string FixRedirectUrl(this Controller controller, string returnUrl)
+		private static bool IsLocalUrl(this Controller controller, string url)
 		{
-			return controller.Url.IsLocalUrl(returnUrl) ? returnUrl : controller.Url.Action("Index", "Home");
+			if (string.IsNullOrEmpty(url) || controller.Url.IsLocalUrl(url))
+				return true;
+
+			if (string.IsNullOrEmpty(ulearnBaseUrl))
+				return false;
+
+			try
+			{
+				var ulearnBaseUrlBuilder = new UriBuilder(ulearnBaseUrl);
+				var urlBuilder = new UriBuilder(url);
+				return ulearnBaseUrlBuilder.Host == urlBuilder.Host && ulearnBaseUrlBuilder.Scheme == urlBuilder.Scheme && ulearnBaseUrlBuilder.Port == urlBuilder.Port;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+		}
+
+		public static string FixRedirectUrl(this Controller controller, string url)
+		{
+			var isLocalUrl = controller.IsLocalUrl(url);
+			log.Info($"Redirect to {url}: {(isLocalUrl ? "it's safe" : "it's not safe, redirect to home page")}. Base url is {ulearnBaseUrl}");
+			return isLocalUrl ? url : controller.Url.Action("Index", "Home");
 		}
 
 		public static void AddErrors(this Controller controller, IdentityResult result)
@@ -88,7 +121,6 @@ namespace uLearn.Web.Controllers
 			result.UsersIds = usersIds.ToList();
 			return result;
 		}
-
 
 		public static List<string> GetEnabledAdditionalScoringGroupsForGroups(GroupsRepo groupsRepo, Course course, List<string> groupsIds, IPrincipal User)
 		{

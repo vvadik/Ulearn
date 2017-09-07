@@ -53,6 +53,13 @@ namespace uLearn.Web
 		{
 			return request.Headers[xSchemeHeaderName] ?? request.Url?.Scheme;
 		}
+
+		public static int GetRealPort(this HttpRequestBase request)
+		{
+			if (request.Url?.Scheme == "http" && request.Url?.Port == 80 && request.GetRealScheme() == "https")
+				return 443;
+			return request.Url?.Port ?? 80;
+		}
 	}
 
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
@@ -99,7 +106,17 @@ namespace uLearn.Web
 			if (!konturPassportRequired)
 				return;
 
-			var originalUrl = httpContext.Request.Url?.ToString().RemoveQueryParameter(queryStringParameterName) ?? "";
+			var originalUrl = "";
+			var requestUrl = httpContext.Request.Url;
+			if (requestUrl != null)
+			{
+				/* Substitute http(s) scheme with real scheme from header */
+				var realScheme = filterContext.RequestContext.HttpContext.Request.GetRealScheme();
+				var realPort = filterContext.RequestContext.HttpContext.Request.GetRealPort();
+				requestUrl = new UriBuilder(requestUrl) { Scheme = realScheme, Port = realPort }.Uri;
+
+				originalUrl = requestUrl.ToString().RemoveQueryParameter(queryStringParameterName) ?? "";
+			}
 
 			var isAuthenticated = httpContext.User.Identity.IsAuthenticated;
 			if (isAuthenticated)
