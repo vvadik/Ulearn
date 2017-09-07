@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
+using System.Web.Configuration;
 using System.Web.Mvc;
 using ApprovalUtilities.Utilities;
 using Database;
@@ -16,15 +17,29 @@ namespace uLearn.Web.Controllers
 {
 	public static class ControllerUtils
 	{
+		private static readonly string ulearnBaseUrl;
+
+		static ControllerUtils()
+		{
+			ulearnBaseUrl = WebConfigurationManager.AppSettings["ulearn.baseUrl"];
+			if (!ulearnBaseUrl.EndsWith("/"))
+				ulearnBaseUrl = ulearnBaseUrl + "/";
+		}
+
 		public static bool HasPassword(UserManager<ApplicationUser> userManager, IPrincipal principal)
 		{
 			var user = userManager.FindById(principal.Identity.GetUserId());
 			return user?.PasswordHash != null;
 		}
 
+		private static bool IsLocalUrl(this Controller controller, string url)
+		{
+			return controller.Url.IsLocalUrl(url) || url.StartsWith(ulearnBaseUrl);
+		}
+
 		public static string FixRedirectUrl(this Controller controller, string returnUrl)
 		{
-			return controller.Url.IsLocalUrl(returnUrl) ? returnUrl : controller.Url.Action("Index", "Home");
+			return controller.IsLocalUrl(returnUrl) ? returnUrl : controller.Url.Action("Index", "Home");
 		}
 
 		public static void AddErrors(this Controller controller, IdentityResult result)
@@ -88,7 +103,6 @@ namespace uLearn.Web.Controllers
 			result.UsersIds = usersIds.ToList();
 			return result;
 		}
-
 
 		public static List<string> GetEnabledAdditionalScoringGroupsForGroups(GroupsRepo groupsRepo, Course course, List<string> groupsIds, IPrincipal User)
 		{
