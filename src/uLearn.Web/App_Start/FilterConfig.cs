@@ -98,7 +98,16 @@ namespace uLearn.Web
 			if (!konturPassportRequired)
 				return;
 
-			var originalUrl = httpContext.Request.Url?.ToString().RemoveQueryParameter(queryStringParameterName) ?? "";
+			var originalUrl = "";
+			var requestUrl = httpContext.Request.Url;
+			if (requestUrl != null)
+			{
+				/* Override scheme (from http to https) if need */
+				var realScheme = filterContext.RequestContext.HttpContext.Request.GetRealScheme();
+				requestUrl = new UriBuilder(requestUrl) { Scheme = realScheme }.Uri;
+
+				originalUrl = requestUrl.ToString().RemoveQueryParameter(queryStringParameterName) ?? "";
+			}
 
 			var isAuthenticated = httpContext.User.Identity.IsAuthenticated;
 			if (isAuthenticated)

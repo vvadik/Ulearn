@@ -9,6 +9,7 @@ using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
+using log4net;
 using Microsoft.AspNet.Identity;
 using uLearn.Extensions;
 using uLearn.Quizes;
@@ -19,9 +20,11 @@ namespace uLearn.Web.Controllers
 	{
 		private static readonly string ulearnBaseUrl;
 
+		private static readonly ILog log = LogManager.GetLogger(typeof(ControllerUtils));
+
 		static ControllerUtils()
 		{
-			ulearnBaseUrl = WebConfigurationManager.AppSettings["ulearn.baseUrl"];
+			ulearnBaseUrl = WebConfigurationManager.AppSettings["ulearn.baseUrl"] ?? "";
 			if (!ulearnBaseUrl.EndsWith("/"))
 				ulearnBaseUrl = ulearnBaseUrl + "/";
 		}
@@ -34,12 +37,16 @@ namespace uLearn.Web.Controllers
 
 		private static bool IsLocalUrl(this Controller controller, string url)
 		{
-			return controller.Url.IsLocalUrl(url) || url.StartsWith(ulearnBaseUrl);
+			if (string.IsNullOrEmpty(url))
+				return true;
+			return controller.Url.IsLocalUrl(url) || (! string.IsNullOrEmpty(ulearnBaseUrl) && url.StartsWith(ulearnBaseUrl));
 		}
 
-		public static string FixRedirectUrl(this Controller controller, string returnUrl)
+		public static string FixRedirectUrl(this Controller controller, string url)
 		{
-			return controller.IsLocalUrl(returnUrl) ? returnUrl : controller.Url.Action("Index", "Home");
+			var isLocalUrl = controller.IsLocalUrl(url);
+			log.Info($"Redirect to {url}: {(isLocalUrl ? "it's safe" : "it's not safe, redirect to home page")}. Base url is {ulearnBaseUrl}");
+			return isLocalUrl ? url : controller.Url.Action("Index", "Home");
 		}
 
 		public static void AddErrors(this Controller controller, IdentityResult result)
