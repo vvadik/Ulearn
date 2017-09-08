@@ -457,6 +457,10 @@
     <Compile Include="Migrations\201709041435522_AddGroupsLabels.Designer.cs">
       <DependentUpon>201709041435522_AddGroupsLabels.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709071139296_AddGroupAccessAndTimes.cs" />
+    <Compile Include="Migrations\201709071139296_AddGroupAccessAndTimes.Designer.cs">
+      <DependentUpon>201709071139296_AddGroupAccessAndTimes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -755,6 +759,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709041435522_AddGroupsLabels.resx">
       <DependentUpon>201709041435522_AddGroupsLabels.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709071139296_AddGroupAccessAndTimes.resx">
+      <DependentUpon>201709071139296_AddGroupAccessAndTimes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

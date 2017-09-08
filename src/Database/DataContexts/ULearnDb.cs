@@ -174,6 +174,7 @@ namespace Database.DataContexts
 		public DbSet<GroupMember> GroupMembers { get; set; }
 		public DbSet<GroupLabel> GroupLabels { get; set; }
 		public DbSet<LabelOnGroup> LabelsOnGroups { get; set; }
+		public DbSet<GroupAccess> GroupAccesses { get; set; }
 
 		public DbSet<CertificateTemplate> CertificateTemplates { get; set; }
 		public DbSet<Certificate> Certificates { get; set; }

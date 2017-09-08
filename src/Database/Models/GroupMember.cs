@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Database.Models
@@ -21,5 +22,7 @@ namespace Database.Models
 		public string UserId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
+
+		public DateTime? AddingTime { get; set; }
 	}
 }

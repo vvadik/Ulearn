@@ -179,7 +179,7 @@ namespace uLearn.Web.Controllers
 				int groupIdInt;
 				if (!int.TryParse(groupId, out groupIdInt))
 					return false;
-				var usersIds = groupsRepo.GetGroupMembers(groupIdInt).Select(u => u.Id);
+				var usersIds = groupsRepo.GetGroupMembersAsUsers(groupIdInt).Select(u => u.Id);
 				if (!usersIds.Contains(userId))
 					return false;
 			}

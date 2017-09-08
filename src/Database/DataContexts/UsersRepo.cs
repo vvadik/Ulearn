@@ -156,6 +156,11 @@ namespace Database.DataContexts
 				db.SaveChanges();
 			}
 		}
+
+		public List<ApplicationUser> FindUsersByUsernameOrEmail(string usernameOrEmail)
+		{
+			return db.Users.Where(u => u.UserName == usernameOrEmail || u.Email == usernameOrEmail).ToList();
+		}
 	}
 
 	/* System.String is not available for table-valued functions so we need to create ComplexTyped wrapper */

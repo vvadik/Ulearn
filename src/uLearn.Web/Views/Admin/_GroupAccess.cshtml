@@ -1,0 +1,32 @@
+﻿@using Database.Models
+@using uLearn.Web.Extensions
+@using uLearn.Web.Views.Shared
+
+@model uLearn.Web.Controllers.GroupAccessViewModel
+
+<div class="group__access media">
+	<div class="pull-left">
+		@UserAvatar.Avatar(Model.Access.User)
+	</div>
+	<div class="media-body">
+		@if (Model.CanBeRevoked)
+		{
+			<div class="pull-right">
+				<a href="@Url.Action("RevokeAccessFromGroup", "Admin", new { groupId = Model.Access.GroupId, userId = Model.Access.UserId })" class="group__access__revoke-link" title="Забрать доступ">&times;</a>
+			</div>
+		}
+
+		<div>@Model.Access.User.VisibleName</div>
+		<div class="group__access__role help-block">
+			@if (Model.Access.AccessType == GroupAccessType.Owner)
+			{
+				<text>Владелец</text>
+			}
+			else
+			{
+				<text>Полный доступ предоставлен @Model.Access.GrantedBy.VisibleName @Model.Access.GrantTime.ToAgoPrettyString()</text>
+			}
+		</div>
+
+	</div>
+</div>

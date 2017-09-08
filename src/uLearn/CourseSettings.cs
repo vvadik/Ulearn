@@ -239,8 +239,11 @@ namespace uLearn
 		[XmlAttribute("abbr")]
 		public string Abbreviation { get; set; }
 
+		[XmlAttribute("description")]
+		public string Description { get; set; }
+
 		/* Hack to handle empty bool and integer attributes,
-		 * because standart XmlSerializer doesn't work with nullable (i.e. int? and bool?) fields */
+		 * because standard XmlSerializer doesn't work with nullable (i.e. int? and bool?) fields */
 		[XmlAttribute("set_by_instructor")]
 		public string _canBeSetByInstructor;
 
@@ -313,6 +316,7 @@ namespace uLearn
 			_enabledForEveryone = string.IsNullOrEmpty(_enabledForEveryone) ? otherScoringGroup._enabledForEveryone : _enabledForEveryone;
 			Abbreviation = Abbreviation ?? otherScoringGroup.Abbreviation;
 			Name = string.IsNullOrEmpty(Name) ? otherScoringGroup.Name : Name;
+			Description = string.IsNullOrEmpty(Description) ? otherScoringGroup.Description : Description;
 		}
 	}
 }

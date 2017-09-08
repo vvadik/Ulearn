@@ -942,6 +942,11 @@ li.li-success {
 	height: 24px;
 }
 
+.user__avatar.xsmall {
+	width: 18px;
+	height: 18px;
+}
+
 .user__avatar.user__avatar__placeholder {
 	color: white;
 	font-size: 25pt;
@@ -954,6 +959,10 @@ li.li-success {
 	padding-top: 2px;
 }
 
+.user__avatar.user__avatar__placeholder.xsmall {
+	font-size: 10pt;
+	padding-top: 0px;
+}
 
 /* Login and registration forms */
 .login-and-registration-form input {
@@ -1397,6 +1406,67 @@ h1 .copy-group-link {
 
 .groups .show-archived-groups-selector {
 	margin-top: 10px;
+}
+
+.group__accesses .group__access {
+	margin: 10px 0;
+}
+
+.group__accesses .group__access .media-body {
+	padding-top: 6px;
+}
+
+.group__accesses .group__access .group__access__role {
+	margin: 0;
+}
+
+.group__accesses .group__access .group__access__revoke-link {
+	font-size: 27px;
+	color: #888;
+	display: none;
+}
+
+.group__accesses .group__access:hover .group__access__revoke-link {
+	display: inline-block;
+}
+
+.group__accesses .group__access .group__access__revoke-link:hover {
+	text-decoration: none;
+	color: #333;
+}
+
+.modal__edit-group__members {
+	padding-left: 15px;
+}
+
+.modal__edit-group__members .group__member {
+}
+
+.modal__edit-group__members .group__member .user__avatar {
+	vertical-align: text-bottom;
+}
+
+.modal__edit-group__members .group__member .group__member__since {
+	color: #ccc;	
+}
+
+.modal__edit-group__members .group__member .group__member__remove-link {
+	font-size: 18px;
+	color: #888;
+	display: none;
+}
+
+.modal__edit-group__members .group__member:hover .group__member__remove-link {
+	display: inline-block;
+}
+
+.modal__edit-group__members .group__member .group__member__remove-link:hover {
+	text-decoration: none;
+	color: #333;
+}
+
+.scoring-group-checkbox .scoring-group-description {
+	margin-left: 5px;
 }
 
 /* Analytics dashboard */

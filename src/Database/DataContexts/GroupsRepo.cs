@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -126,7 +127,8 @@ namespace Database.DataContexts
 			var groupMember = new GroupMember
 			{
 				GroupId = groupId,
-				UserId = userId
+				UserId = userId,
+				AddingTime = DateTime.Now,
 			};
 			using (var transaction = db.Database.BeginTransaction())
 			{
@@ -281,9 +283,14 @@ namespace Database.DataContexts
 			return groups.ToList();
 		}
 
-		public List<ApplicationUser> GetGroupMembers(int groupId)
+		public List<ApplicationUser> GetGroupMembersAsUsers(int groupId)
 		{
 			return db.GroupMembers.Where(m => m.GroupId == groupId).Select(m => m.User).ToList();
+		}
+
+		public List<GroupMember> GetGroupMembers(int groupId)
+		{
+			return db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId).ToList();
 		}
 
 		public Dictionary<string, List<Group>> GetUsersGroups(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)
@@ -420,6 +427,12 @@ namespace Database.DataContexts
 			return db.EnabledAdditionalScoringGroups.Where(e => groupsIds.Contains(e.GroupId)).ToList();
 		}
 
+		public List<EnabledAdditionalScoringGroup> GetEnabledAdditionalScoringGroupsForGroup(int groupId)
+		{
+			return db.EnabledAdditionalScoringGroups.Where(e => e.GroupId == groupId).ToList();
+		}
+
+
 		public List<GroupLabel> GetLabels(string ownerId)
 		{
 			return db.GroupLabels.Where(l => !l.IsDeleted && l.OwnerId == ownerId).ToList();
@@ -481,9 +494,62 @@ namespace Database.DataContexts
 		}
 
 		[CanBeNull]
-		public GroupLabel FindLabel(int labelId)
+		public GroupLabel FindLabelById(int labelId)
 		{
 			return db.GroupLabels.Find(labelId);
+		}
+
+		public async Task<GroupAccess> GrantAccess(int groupId, string userId, GroupAccessType accessType, string grantedById)
+		{
+			var currentAccess = db.GroupAccesses.FirstOrDefault(a => a.GroupId == groupId && a.UserId == userId);
+			if (currentAccess == null)
+			{
+				currentAccess = new GroupAccess
+				{
+					GroupId = groupId,
+					UserId = userId,
+				};
+				db.GroupAccesses.Add(currentAccess);
+			}
+			currentAccess.AccessType = accessType;
+			currentAccess.GrantedById = grantedById;
+			currentAccess.GrantTime = DateTime.Now;
+			currentAccess.IsEnabled = true;
+
+			await db.SaveChangesAsync();
+			return db.GroupAccesses.Include(a => a.GrantedBy).Single(a => a.Id == currentAccess.Id);
+		}
+
+		public bool CanRevokeAccess(int groupId, string userId, IPrincipal revokedBy)
+		{
+			var revokedById = revokedBy.Identity.GetUserId();
+
+			var group = FindGroupById(groupId);
+			if (group.OwnerId == revokedById || revokedBy.HasAccessFor(group.CourseId, CourseRole.CourseAdmin))
+				return true;
+			return db.GroupAccesses.Any(a => a.GroupId == groupId && a.UserId == userId && a.GrantedById == revokedById && a.IsEnabled);
+		}
+
+		public async Task RevokeAcess(int groupId, string userId)
+		{
+			var accesses = db.GroupAccesses.Where(a => a.GroupId == groupId && a.UserId == userId).ToList();
+			foreach (var access in accesses)
+				access.IsEnabled = false;
+			await db.SaveChangesAsync();
+		}
+
+		public List<GroupAccess> GetGroupAccesses(int groupId)
+		{
+			return db.GroupAccesses.Include(a => a.User).Where(a => a.GroupId == groupId && a.IsEnabled).ToList();
+		}
+
+		public DefaultDictionary<int, List<GroupAccess>> GetGroupAccesses(IEnumerable<int> groupsIds)
+		{
+			return db.GroupAccesses.Include(a => a.User)
+				.Where(a => groupsIds.Contains(a.GroupId) && a.IsEnabled)
+				.GroupBy(a => a.GroupId)
+				.ToDictionary(g => g.Key, g => g.ToList())
+				.ToDefaultDictionary();
 		}
 	}
 }

@@ -56,7 +56,11 @@ namespace Database.Models
 		/* Могут ли студенты этой группы видеть сводную таблицу прогресса по курсу всех студентов группы */
 		public bool CanUsersSeeGroupProgress { get; set; }
 
+		public DateTime? CreateTime { get; set; }
+
 		public virtual ICollection<GroupMember> Members { get; set; }
+
+		public virtual ICollection<GroupAccess> Accesses { get; set; }
 
 		public Group()
 		{

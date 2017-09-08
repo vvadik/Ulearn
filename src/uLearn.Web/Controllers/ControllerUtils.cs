@@ -93,7 +93,7 @@ namespace uLearn.Web.Controllers
 				var ownGroupsIds = groupsRepo.GetGroupsOwnedByUser(courseId, User).Select(g => g.Id).ToList();
 				foreach (var ownGroupId in ownGroupsIds)
 				{
-					var groupUsersIds = groupsRepo.GetGroupMembers(ownGroupId).Select(u => u.Id);
+					var groupUsersIds = groupsRepo.GetGroupMembersAsUsers(ownGroupId).Select(u => u.Id);
 					usersIds.AddAll(groupUsersIds);
 				}
 				result.UsersIds = usersIds.ToList();
@@ -108,7 +108,7 @@ namespace uLearn.Web.Controllers
 					var group = groupsRepo.FindGroupById(groupIdInt);
 					if (group != null)
 					{
-						var groupMembersIds = groupsRepo.GetGroupMembers(group.Id).Select(u => u.Id).ToList();
+						var groupMembersIds = groupsRepo.GetGroupMembersAsUsers(group.Id).Select(u => u.Id).ToList();
 						var hasAccessToGroup = groupsRepo.IsGroupAvailableForUser(group.Id, User);
 						if (allowSeeGroupForAnyMember)
 							hasAccessToGroup |= groupMembersIds.Contains(User.Identity.GetUserId());

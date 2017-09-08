@@ -14,6 +14,7 @@ using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
+using JetBrains.Annotations;
 using Microsoft.VisualBasic.FileIO;
 using uLearn.Extensions;
 using uLearn.Quizes;
@@ -626,6 +627,8 @@ namespace uLearn.Web.Controllers
 			var labels = groupsRepo.GetLabels(userId).ToDictionary(l => l.Id, l => l);
 			var labelsOnGroups = groupsRepo.GetGroupsLabels(groupsIds);
 
+			var groupAccesses = groupsRepo.GetGroupAccesses(groupsIds);
+
 			return View("Groups", new GroupsViewModel
 			{
 				Course = course,
@@ -639,6 +642,7 @@ namespace uLearn.Web.Controllers
 				CoursesNames = courseManager.GetCourses().ToDictionary(c => c.Id.ToLower(), c => c.Title),
 				Labels = labels,
 				LabelsOnGroups = labelsOnGroups,
+				GroupAccesses = groupAccesses,
 			});
 		}
 
@@ -651,6 +655,26 @@ namespace uLearn.Web.Controllers
 			await notificationsRepo.AddNotification(group.CourseId, notification, initiatedUserId);
 		}
 
+		[HttpPost]
+		public async Task<ActionResult> CreateGroupApi(string courseId, string name)
+		{
+			var ownerId = User.Identity.GetUserId();
+			if (string.IsNullOrEmpty(name))
+				return Json(new { status = "error", message = "Название группы не может быть пустым" });
+
+			log.Info($"Создаю группу «{name}» для курса {courseId} (id владельца {ownerId})");
+
+			var group = await groupsRepo.CreateGroup(courseId, name, ownerId, true, true, true);
+			log.Info($"Группа «{name}» (Id = {group.Id}) создана");
+
+			var course = courseManager.GetCourse(courseId);
+			await UpdateEnabledScoringGroupsForGroup(course, group.Id);
+			await NotifyAboutNewGroup(group, ownerId);
+
+			return Json(new { status = "ok", groupId = group.Id });
+		}
+
+		[HttpPost]
 		public async Task<ActionResult> CreateGroup(string courseId, string name, bool isPublic, bool manualChecking, bool manualCheckingForOldSolutions, string ownerId)
 		{
 			var currentUserId = User.Identity.GetUserId();
@@ -728,6 +752,28 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
+		public async Task<ActionResult> UpdateGroupApi(string courseId, int groupId, bool manualChecking, bool manualCheckingForOldSolutions, string name=null)
+		{
+			var group = groupsRepo.FindGroupById(groupId);
+			if (!CanModifyGroup(group) || group.CourseId != courseId)
+				return Json(new { status = "error", message = "Вы не можете редактировать эту группу" });
+
+			if (name == "")
+				return Json(new { status = "error", message = "Название группы не может быть пустым" });
+			if (name == null)
+				name = group.Name;
+
+			log.Info($"Обновляю группу «{group.Name}» → «{name}» (Id = {group.Id}) для курса {courseId}");
+
+			await groupsRepo.ModifyGroup(groupId, name, true, manualChecking, manualCheckingForOldSolutions, group.IsArchived, group.OwnerId);
+
+			var course = courseManager.GetCourse(group.CourseId);
+			await UpdateEnabledScoringGroupsForGroup(course, groupId);
+
+			return Json(new { status = "ok", groupId = groupId });
+		}
+
+		[HttpPost]
 		public async Task<ActionResult> UpdateGroup(string courseId, int groupId, string name, bool isPublic, bool manualChecking, bool manualCheckingForOldSolutions, bool isArchived, string ownerId)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
@@ -784,6 +830,93 @@ namespace uLearn.Web.Controllers
 			await groupsRepo.EnableGroupInviteLink(groupId, isEnabled);
 
 			return RedirectToAction("Groups", new { courseId = group.CourseId });
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> GrantAccessToGroup(int groupId, string usernameOrEmail)
+		{
+			var group = groupsRepo.FindGroupById(groupId);
+			if (!CanModifyGroup(group))
+				return Json(new { status = "error", message = "Вы не можете выдавать права на эту группу" });
+
+			var users = usersRepo.FindUsersByUsernameOrEmail(usernameOrEmail);
+			if (users.Count > 1)
+			{
+				/* TODO (andgein): suggest to choose one user */
+				return Json(new { status = "error", message = $"Несколько пользователей имеют почту {usernameOrEmail}" });
+			}
+			if (users.Count == 0)
+				return Json(new { status = "error", message = $"Пользователь с логином или почтой {usernameOrEmail} не найден" });
+			var userId = users[0].Id;
+
+			if (groupsRepo.GetGroupAccesses(groupId).Select(a => a.UserId).Contains(userId) || group.OwnerId == userId)
+				return Json(new { status = "error", message = $"{users[0].VisibleName} уже является преподавателем этой группы" });
+
+			var access = await groupsRepo.GrantAccess(groupId, userId, GroupAccessType.FullAccess, User.Identity.GetUserId());
+			var renderedHtml = this.RenderPartialViewToString("_GroupAccess", new GroupAccessViewModel
+			{
+				Access = access,
+				CanBeRevoked = true,
+			});
+			return Json(new { status = "ok", html = renderedHtml });
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> RevokeAccessFromGroup(int groupId, string userId)
+		{
+			var group = groupsRepo.FindGroupById(groupId);
+			if (!CanModifyGroup(group) || ! groupsRepo.CanRevokeAccess(groupId, userId, User))
+				return Json(new { status = "error", message = "Вы не можете забрать права на группу у этого пользователя" });
+
+			await groupsRepo.RevokeAcess(groupId, userId);
+			return Json(new { status = "ok", userId = userId });
+		}
+
+		public ActionResult GroupInfo(int groupId)
+		{
+			var group = groupsRepo.FindGroupById(groupId);
+			if (!CanModifyGroup(group))
+				return Json(new { status = "error", message = "Вы не можете редактировать эту группу" });
+
+			var userId = User.Identity.GetUserId();
+
+			var accesses = groupsRepo.GetGroupAccesses(groupId);
+			var accessesViewModels = accesses.Select(a => new GroupAccessViewModel
+			{
+				Access = a,
+				CanBeRevoked = group.OwnerId == userId || a.GrantedById == userId || User.HasAccessFor(group.CourseId, CourseRole.CourseAdmin),
+			}).ToList();
+			accessesViewModels.Insert(0, new GroupAccessViewModel
+			{
+				Access = new GroupAccess
+				{
+					User = group.Owner,
+					AccessType = GroupAccessType.Owner,
+					Group = group,
+					GrantTime = group.CreateTime ?? DateTime.MaxValue,
+				},
+				CanBeRevoked = false,
+			});
+
+			var members = groupsRepo.GetGroupMembers(groupId);
+
+			var enabledScoringGroups = groupsRepo.GetEnabledAdditionalScoringGroupsForGroup(groupId);
+
+			return Json(new
+			{
+				status = "ok",
+				inviteLink = Url.Action("JoinGroup", "Account", new { hash = group.InviteHash }, Request.GetRealScheme()),
+				accesses = accessesViewModels.Select(model => this.RenderPartialViewToString("_GroupAccess", model)).ToList(),
+				group = new
+				{
+					name = group.Name,
+					isManualCheckingEnabled = group.IsManualCheckingEnabled,
+					isManualCheckingEnabledForOldSolutions = group.IsManualCheckingEnabledForOldSolutions,
+					isInviteLinkEnabled = group.IsInviteLinkEnabled,
+				},
+				members = members.Select(model => this.RenderPartialViewToString("_GroupMember", model)).ToList(),
+				enabledScoringGroups = enabledScoringGroups.Select(g => g.ScoringGroupId).ToList(),
+			}, JsonRequestBehavior.AllowGet);
 		}
 
 		public class UserSearchResultModel
@@ -1165,7 +1298,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		public async Task<ActionResult> AddLabelToGroup(int groupId, int labelId)
 		{
-			var label = groupsRepo.FindLabel(labelId);
+			var label = groupsRepo.FindLabelById(labelId);
 			if (label == null || label.OwnerId != User.Identity.GetUserId())
 				return Json(new { status = "ok", error = "Label not found or not owned by you" });
 
@@ -1176,7 +1309,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		public async Task<ActionResult> RemoveLabelFromGroup(int groupId, int labelId)
 		{
-			var label = groupsRepo.FindLabel(labelId);
+			var label = groupsRepo.FindLabelById(labelId);
 			if (label == null || label.OwnerId != User.Identity.GetUserId())
 				return Json(new { status = "ok", error = "Label not found or not owned by you" });
 
@@ -1327,5 +1460,14 @@ namespace uLearn.Web.Controllers
 
 		public Dictionary<int, GroupLabel> Labels { get; set; }
 		public DefaultDictionary<int, List<int>> LabelsOnGroups { get; set; }
+
+		public DefaultDictionary<int, List<GroupAccess>> GroupAccesses { get; set; }
+	}
+
+	public class GroupAccessViewModel
+	{
+		public GroupAccess Access { get; set; }
+
+		public bool CanBeRevoked { get; set; }
 	}
 }

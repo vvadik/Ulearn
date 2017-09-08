@@ -1161,6 +1161,8 @@
     <Content Include="Views\Stepik\UpdateOptions.cshtml" />
     <Content Include="Views\Stepik\UpdateStarted.cshtml" />
     <Content Include="Views\Stepik\Process.cshtml" />
+    <Content Include="Views\Admin\_GroupAccess.cshtml" />
+    <Content Include="Views\Admin\_GroupMember.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
