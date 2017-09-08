@@ -1,4 +1,6 @@
-﻿@model UserMenuPartialViewModel
+﻿@using Database.Extensions
+@using Database.Models
+@model UserMenuPartialViewModel
 
 @if (Model.IsAuthenticated)
 {
@@ -14,6 +16,11 @@
 	}
 
 	var hasProfileWarning = string.IsNullOrEmpty(Model.User.Email) || !Model.User.EmailConfirmed;
+	/* Instructors should have filled first and last name */
+	if (User.HasAccess(CourseRole.Instructor) && (string.IsNullOrEmpty(Model.User.FirstName) || string.IsNullOrEmpty(Model.User.LastName)))
+	{
+		hasProfileWarning = true;
+	}
 
 	<li class="dropdown">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -35,10 +42,16 @@
 					Не&nbsp;указана <nobr>эл.&nbsp;почта&nbsp;<span class="fa fa-question-circle with-long-tooltip" data-toggle="tooltip" data-placement="bottom" title="Укажите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля"></span></nobr>
 				</li>
 			}
-			@if (!string.IsNullOrEmpty(Model.User.Email) && !Model.User.EmailConfirmed)
+			else if (!string.IsNullOrEmpty(Model.User.Email) && !Model.User.EmailConfirmed)
 			{
 				<li class="user-menu__error">
 					Эл.&nbsp;почта <nobr>не&nbsp;подтверждена&nbsp;<span class="fa fa-question-circle with-long-tooltip" data-toggle="tooltip" data-placement="bottom" title="Подтвердите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля"></span></nobr>
+				</li>
+			}
+			else if (User.HasAccess(CourseRole.Instructor) && (string.IsNullOrEmpty(Model.User.FirstName) || string.IsNullOrEmpty(Model.User.LastName)))
+			{
+				<li class="user-menu__error">
+					Не&nbsp;указаны имя или фамилия&nbsp;<span class="fa fa-question-circle with-long-tooltip" data-toggle="tooltip" data-placement="bottom" title="Укажите в профиле имя и фамилию, чтобы студентам было проще с вами работать"></span>
 				</li>
 			}
 			<li>@Html.ActionLink("Сертификаты", "Index", "Certificates", new { userId = Model.User.Id }, new { })</li>
