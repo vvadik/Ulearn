@@ -453,13 +453,9 @@
     <Compile Include="Migrations\201708311313257_RemoveRequiredFieldsOnStepikExportProcess.Designer.cs">
       <DependentUpon>201708311313257_RemoveRequiredFieldsOnStepikExportProcess.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201709041435522_AddGroupsLabels.cs" />
-    <Compile Include="Migrations\201709041435522_AddGroupsLabels.Designer.cs">
-      <DependentUpon>201709041435522_AddGroupsLabels.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709071139296_AddGroupAccessAndTimes.cs" />
-    <Compile Include="Migrations\201709071139296_AddGroupAccessAndTimes.Designer.cs">
-      <DependentUpon>201709071139296_AddGroupAccessAndTimes.cs</DependentUpon>
+    <Compile Include="Migrations\201709080920180_AddGroupLabelsAccessAndTimes.cs" />
+    <Compile Include="Migrations\201709080920180_AddGroupLabelsAccessAndTimes.Designer.cs">
+      <DependentUpon>201709080920180_AddGroupLabelsAccessAndTimes.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
@@ -757,11 +753,8 @@
     <EmbeddedResource Include="Migrations\201708311313257_RemoveRequiredFieldsOnStepikExportProcess.resx">
       <DependentUpon>201708311313257_RemoveRequiredFieldsOnStepikExportProcess.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709041435522_AddGroupsLabels.resx">
-      <DependentUpon>201709041435522_AddGroupsLabels.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709071139296_AddGroupAccessAndTimes.resx">
-      <DependentUpon>201709071139296_AddGroupAccessAndTimes.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201709080920180_AddGroupLabelsAccessAndTimes.resx">
+      <DependentUpon>201709080920180_AddGroupLabelsAccessAndTimes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

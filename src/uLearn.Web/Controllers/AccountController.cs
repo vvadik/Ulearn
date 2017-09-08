@@ -155,7 +155,7 @@ namespace uLearn.Web.Controllers
 				return Redirect("/");
 			}
 
-			return View((object)group.Name);
+			return View(group);
 		}
 
 		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]

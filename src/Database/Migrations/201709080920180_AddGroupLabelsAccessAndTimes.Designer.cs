@@ -7,13 +7,13 @@ namespace Database.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddGroupAccessAndTimes : IMigrationMetadata
+    public sealed partial class AddGroupLabelsAccessAndTimes : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddGroupAccessAndTimes));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddGroupLabelsAccessAndTimes));
         
         string IMigrationMetadata.Id
         {
-            get { return "201709071139296_AddGroupAccessAndTimes"; }
+            get { return "201709080920180_AddGroupLabelsAccessAndTimes"; }
         }
         
         string IMigrationMetadata.Source

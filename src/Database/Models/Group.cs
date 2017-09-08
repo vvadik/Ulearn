@@ -60,8 +60,6 @@ namespace Database.Models
 
 		public virtual ICollection<GroupMember> Members { get; set; }
 
-		public virtual ICollection<GroupAccess> Accesses { get; set; }
-
 		public Group()
 		{
 			InviteHash = Guid.NewGuid();

@@ -432,7 +432,6 @@ namespace Database.DataContexts
 			return db.EnabledAdditionalScoringGroups.Where(e => e.GroupId == groupId).ToList();
 		}
 
-
 		public List<GroupLabel> GetLabels(string ownerId)
 		{
 			return db.GroupLabels.Where(l => !l.IsDeleted && l.OwnerId == ownerId).ToList();
@@ -550,6 +549,6 @@ namespace Database.DataContexts
 				.GroupBy(a => a.GroupId)
 				.ToDictionary(g => g.Key, g => g.ToList())
 				.ToDefaultDictionary();
-		}
+		}		
 	}
 }

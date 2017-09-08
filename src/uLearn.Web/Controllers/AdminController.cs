@@ -918,7 +918,7 @@ namespace uLearn.Web.Controllers
 				enabledScoringGroups = enabledScoringGroups.Select(g => g.ScoringGroupId).ToList(),
 			}, JsonRequestBehavior.AllowGet);
 		}
-
+		
 		public class UserSearchResultModel
 		{
 			public string id { get; set; }
@@ -1294,7 +1294,7 @@ namespace uLearn.Web.Controllers
 
 			return Json(new { status = "ok", score = scoreInt });
 		}
-
+		
 		[HttpPost]
 		public async Task<ActionResult> AddLabelToGroup(int groupId, int labelId)
 		{
@@ -1315,7 +1315,7 @@ namespace uLearn.Web.Controllers
 
 			await groupsRepo.RemoveLabelFromGroup(groupId, labelId);
 			return Json(new { status = "ok" });
-		}
+		}		
 	}
 
 	public class CertificateRequest
