@@ -996,6 +996,7 @@ namespace uLearn.Web.Controllers
 			if (onlyInstructors)
 			{
 				query.CourseRole = CourseRole.Instructor;
+				query.CourseId = courseId;
 				query.IncludeHighCourseRoles = true;
 			}
 

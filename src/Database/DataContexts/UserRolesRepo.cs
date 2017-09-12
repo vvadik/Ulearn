@@ -46,7 +46,7 @@ namespace Database.DataContexts
 
 			var usersQuery = (IQueryable<UserRole>)db.UserRoles;
 			usersQuery = includeHighRoles
-				? usersQuery.Where(userRole => userRole.Role >= courseRole)
+				? usersQuery.Where(userRole => userRole.Role <= courseRole)
 				: usersQuery.Where(userRole => userRole.Role == courseRole);
 
 			if (!string.IsNullOrEmpty(courseId))
