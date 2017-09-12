@@ -994,9 +994,12 @@ namespace uLearn.Web.Controllers
 
 			var query = new UserSearchQueryModel { NamePrefix = term };
 			if (onlyInstructors)
+			{
 				query.CourseRole = CourseRole.Instructor;
+				query.IncludeHighCourseRoles = true;
+			}
 
-			var users = usersRepo.FilterUsers(query, userManager).Take(10).ToList();
+			var users = usersRepo.FilterUsers(query, userManager, 10).ToList();
 			var usersList = users.Select(ur => new UserSearchResultModel
 			{
 				id = ur.UserId,

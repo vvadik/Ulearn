@@ -44,7 +44,7 @@ namespace Database.DataContexts
 			return users
 				.FilterByRole(role, userManager)
 				.FilterByUserIds(
-					userRolesRepo.GetListOfUsersWithCourseRole(query.CourseRole, query.CourseId),
+					userRolesRepo.GetListOfUsersWithCourseRole(query.CourseRole, query.CourseId, query.IncludeHighCourseRoles),
 					userRolesRepo.GetListOfUsersByPrivilege(query.OnlyPrivileged, query.CourseId)
 				)
 				.GetUserRolesInfo(limit, userManager);
