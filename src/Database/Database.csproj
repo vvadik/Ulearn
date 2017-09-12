@@ -457,6 +457,14 @@
     <Compile Include="Migrations\201709080920180_AddGroupLabelsAccessAndTimes.Designer.cs">
       <DependentUpon>201709080920180_AddGroupLabelsAccessAndTimes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709120648366_AddSomeGroupsNotifications.cs" />
+    <Compile Include="Migrations\201709120648366_AddSomeGroupsNotifications.Designer.cs">
+      <DependentUpon>201709120648366_AddSomeGroupsNotifications.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709120745261_RemoveGroupIsPublic.cs" />
+    <Compile Include="Migrations\201709120745261_RemoveGroupIsPublic.Designer.cs">
+      <DependentUpon>201709120745261_RemoveGroupIsPublic.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -755,6 +763,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709080920180_AddGroupLabelsAccessAndTimes.resx">
       <DependentUpon>201709080920180_AddGroupLabelsAccessAndTimes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709120648366_AddSomeGroupsNotifications.resx">
+      <DependentUpon>201709120648366_AddSomeGroupsNotifications.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709120745261_RemoveGroupIsPublic.resx">
+      <DependentUpon>201709120745261_RemoveGroupIsPublic.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

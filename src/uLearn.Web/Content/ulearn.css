@@ -951,7 +951,7 @@ li.li-success {
 	color: white;
 	font-size: 25pt;
 	text-align: center;
-	padding-top: 5px;
+	padding-top: 3px;
 }
 
 .user__avatar.user__avatar__placeholder.small {
@@ -960,8 +960,8 @@ li.li-success {
 }
 
 .user__avatar.user__avatar__placeholder.xsmall {
-	font-size: 10pt;
-	padding-top: 0px;
+	font-size: 9pt;
+	padding-top: 1px;
 }
 
 /* Login and registration forms */
@@ -1405,15 +1405,15 @@ h1 .copy-group-link {
 }
 
 .groups .show-archived-groups-selector {
-	margin-top: 10px;
+	margin-bottom: 10px;
 }
 
 .group__accesses .group__access {
 	margin: 10px 0;
 }
 
-.group__accesses .group__access .media-body {
-	padding-top: 6px;
+.group__accesses .group__access .media-body > div:not(.pull-right) {
+	line-height: 18px;
 }
 
 .group__accesses .group__access .group__access__role {
@@ -1422,7 +1422,7 @@ h1 .copy-group-link {
 
 .group__accesses .group__access .group__access__revoke-link {
 	font-size: 27px;
-	color: #888;
+	color: #c55;
 	display: none;
 }
 
@@ -1432,7 +1432,16 @@ h1 .copy-group-link {
 
 .group__accesses .group__access .group__access__revoke-link:hover {
 	text-decoration: none;
-	color: #333;
+	color: #611;
+}
+
+.group__access .group__access__change-owner-link {
+	display: none;
+	font-size: 12px;
+}
+
+.group__access:hover .group__access__change-owner-link {
+	display: initial;
 }
 
 .modal__edit-group__members {
@@ -1452,7 +1461,7 @@ h1 .copy-group-link {
 
 .modal__edit-group__members .group__member .group__member__remove-link {
 	font-size: 18px;
-	color: #888;
+	color: #c55;
 	display: none;
 }
 
@@ -1462,11 +1471,35 @@ h1 .copy-group-link {
 
 .modal__edit-group__members .group__member .group__member__remove-link:hover {
 	text-decoration: none;
-	color: #333;
+	color: #611;
 }
 
 .scoring-group-checkbox .scoring-group-description {
 	margin-left: 5px;
+}
+
+.group__links {
+	margin-top: 7px;
+}
+
+.visible-on-group-hover {
+	display: none;
+}
+
+.group:hover .visible-on-group-hover {
+	display: initial;
+}
+
+.remove-group__link {
+	color: #c55;
+}
+
+.remove-group__link:hover {
+	color: #611;
+}
+
+.remove-group__link .glyphicon {
+	padding-top: 3px;
 }
 
 /* Analytics dashboard */

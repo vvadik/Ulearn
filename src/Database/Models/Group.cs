@@ -33,9 +33,6 @@ namespace Database.Models
 		[Required]
 		/* Архивная группа не учитываются в фильтрах «Мои группы» и всегда показывается позже неархивных */
 		public bool IsArchived { get; set; }
-
-		[Required]
-		public bool IsPublic { get; set; }
 		
 		[Required]
 		[Index("IDX_Group_GroupByInviteHash")]

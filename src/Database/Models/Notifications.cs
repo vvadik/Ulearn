@@ -187,8 +187,23 @@ namespace Database.Models
 		// Instructors
 		[Display(Name = @"Кто-то присоединился к вашей группе", GroupName = @"Кто-то присоединился к вашей группе")]
 		[MinCourseRole(CourseRole.Instructor)]
-		[IsEnabledByDefault(true)]
+		[IsEnabledByDefault(false)]
 		JoinedToYourGroup = 101,
+
+		[Display(Name = @"Вас назначили преподавателем группы", GroupName = @"Вас назначили преподавателем групп")]
+		[MinCourseRole(CourseRole.Instructor)]
+		[IsEnabledByDefault(true)]
+		GrantedAccessToGroup = 102,
+
+		[Display(Name = @"Вы перестали быть преподавателем группы", GroupName = @"Вы перестали быть преподавателем группы")]
+		[MinCourseRole(CourseRole.Instructor)]
+		[IsEnabledByDefault(true)]
+		RevokedAccessToGroup = 103,
+
+		[Display(Name = @"Преподаватель удалил студента из вашей группы", GroupName = @"Преподаватель удалил студентов из ваших групп")]
+		[MinCourseRole(CourseRole.Instructor)]
+		[IsEnabledByDefault(true)]
+		GroupMemberHasBeenRemoved = 104,
 
 		// Course admins
 		[Display(Name = @"Добавлен новый преподаватель", GroupName = @"Добавлены новые преподаватели")]
@@ -319,6 +334,11 @@ namespace Database.Models
 		protected string GetCourseUrl(Course course, string baseUrl)
 		{
 			return baseUrl + $"/Course/{course.Id}/";
+		}
+
+		protected static string GetGroupsUrl(Course course, string baseUrl)
+		{
+			return baseUrl + $"/Admin/Groups?courseId={course.Id.EscapeHtml()}";
 		}
 	}
 
@@ -795,6 +815,114 @@ namespace Database.Models
 		}
 	}
 
+	[NotificationType(NotificationType.GrantedAccessToGroup)]
+	public class GrantedAccessToGroupNotification : Notification
+	{
+		[Required]
+		public int AccessId { get; set; }
+
+		public virtual GroupAccess Access { get; set; }
+
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return $"<b>{Access.GrantedBy.VisibleName.EscapeHtml()}</b> назначил вас преподавателем группы <b>«{Access.Group.Name.EscapeHtml()}»</b> в курсе «{course.Title.EscapeHtml()}».";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			return $"{Access.GrantedBy.VisibleName} назначил вас преподавателем группы <b>«{Access.Group.Name}»</b> в курсе «{course.Title}».";
+		}
+
+		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new List<string> { Access.UserId };
+		}
+
+		public override bool IsActual()
+		{
+			return Access != null && Access.IsEnabled;
+		}
+	}
+
+	[NotificationType(NotificationType.RevokedAccessToGroup)]
+	public class RevokedAccessToGroupNotification : Notification
+	{
+		[Required]
+		public int AccessId { get; set; }
+
+		public virtual GroupAccess Access { get; set; }
+
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return $"Вы перестали быть преподавателем группы <b>«{Access.Group.Name.EscapeHtml()}»</b> в курсе «{course.Title.EscapeHtml()}».";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			return $"Вы перестали быть преподавателем группы «{Access.Group.Name}» в курсе «{course.Title}».";
+		}
+
+		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new List<string> { Access.UserId };
+		}
+
+		public override bool IsActual()
+		{
+			return Access != null && ! Access.IsEnabled;
+		}
+	}
+
+	[NotificationType(NotificationType.GroupMemberHasBeenRemoved)]
+	public class GroupMemberHasBeenRemovedNotification : Notification
+	{
+		public string UserId { get; set; }
+
+		public virtual ApplicationUser User { get; set; }
+
+		[Required]
+		public int GroupId { get; set; }
+
+		public virtual Group Group { get; set; }
+
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return $"{InitiatedBy.VisibleName.EscapeHtml()} удалил{InitiatedBy.Gender.ChooseEnding()} студента <b>{User.VisibleName.EscapeHtml()}</b> из вашей группы <b>«{Group.Name.EscapeHtml()}» (курс «{course.Title.EscapeHtml()}»).";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			return $"{InitiatedBy.VisibleName} удалил{InitiatedBy.Gender.ChooseEnding()} студента {User.VisibleName} из вашей группы <b>«{Group.Name}» (курс «{course.Title}»).";
+		}
+
+		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
+			var accesses = groupsRepo.GetGroupAccesses(GroupId);
+			return accesses.Select(a => a.UserId).ToList();
+		}
+
+		public override bool IsActual()
+		{
+			return User != null && ! Group.IsDeleted;
+		}
+	}
+
 	[NotificationType(NotificationType.AddedInstructor)]
 	public class AddedInstructorNotification : Notification
 	{
@@ -837,11 +965,6 @@ namespace Database.Models
 		public int GroupId { get; set; }
 
 		public virtual Group Group { get; set; }
-
-		protected static string GetGroupsUrl(Course course, string baseUrl)
-		{
-			return baseUrl + $"/Admin/Groups?courseId={course.Id.EscapeHtml()}";
-		}
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{

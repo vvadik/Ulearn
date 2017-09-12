@@ -71,6 +71,10 @@ namespace Database.DataContexts
 			CancelCascaseDeleting<LikedYourCommentNotification, ApplicationUser, string>(modelBuilder, c => c.LikedUser, c => c.LikedUserId);
 			CancelCascaseDeleting<JoinedToYourGroupNotification, ApplicationUser, string>(modelBuilder, c => c.JoinedUser, c => c.JoinedUserId);
 			CancelCascaseDeleting<JoinedToYourGroupNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
+			CancelCascaseDeleting<GrantedAccessToGroupNotification, GroupAccess, int>(modelBuilder, c => c.Access, c => c.AccessId);
+			CancelCascaseDeleting<RevokedAccessToGroupNotification, GroupAccess, int>(modelBuilder, c => c.Access, c => c.AccessId);
+			CancelCascaseDeleting<GroupMemberHasBeenRemovedNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
+			CancelCascaseDeleting<GroupMemberHasBeenRemovedNotification, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 			CancelCascaseDeleting<CreatedGroupNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
 			CancelCascaseDeleting<PassedManualExerciseCheckingNotification, ManualExerciseChecking, int>(modelBuilder, c => c.Checking, c => c.CheckingId);
 			CancelCascaseDeleting<PassedManualQuizCheckingNotification, ManualQuizChecking, int>(modelBuilder, c => c.Checking, c => c.CheckingId);
@@ -79,6 +83,7 @@ namespace Database.DataContexts
 			CancelCascaseDeleting<LikedYourCommentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
 			CancelCascaseDeleting<RepliedToYourCommentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
 			CancelCascaseDeleting<RepliedToYourCommentNotification, Comment, int>(modelBuilder, c => c.ParentComment, c => c.ParentCommentId);
+			
 
 			CancelCascaseDeleting<UploadedPackageNotification, CourseVersion, Guid>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
 			CancelCascaseDeleting<PublishedPackageNotification, CourseVersion, Guid>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);

@@ -627,7 +627,7 @@ namespace uLearn.Web.Controllers
 			var labels = groupsRepo.GetLabels(userId).ToDictionary(l => l.Id, l => l);
 			var labelsOnGroups = groupsRepo.GetGroupsLabels(groupsIds);
 
-			var groupAccesses = groupsRepo.GetGroupAccesses(groupsIds);
+			var groupAccesses = groupsRepo.GetGroupsAccesses(groupsIds);
 
 			return View("Groups", new GroupsViewModel
 			{
@@ -664,7 +664,7 @@ namespace uLearn.Web.Controllers
 
 			log.Info($"Создаю группу «{name}» для курса {courseId} (id владельца {ownerId})");
 
-			var group = await groupsRepo.CreateGroup(courseId, name, ownerId, true, true, true);
+			var group = await groupsRepo.CreateGroup(courseId, name, ownerId, true, true);
 			log.Info($"Группа «{name}» (Id = {group.Id}) создана");
 
 			var course = courseManager.GetCourse(courseId);
@@ -683,7 +683,7 @@ namespace uLearn.Web.Controllers
 
 			log.Info($"Создаю группу «{name}» для курса {courseId} (id владельца {ownerId}, публичная = {isPublic})");
 
-			var group = await groupsRepo.CreateGroup(courseId, name, ownerId, isPublic, manualChecking, manualCheckingForOldSolutions);
+			var group = await groupsRepo.CreateGroup(courseId, name, ownerId, manualChecking, manualCheckingForOldSolutions);
 			log.Info($"Группа «{name}» (Id = {group.Id}) создана");
 
 			var course = courseManager.GetCourse(courseId);
@@ -713,30 +713,48 @@ namespace uLearn.Web.Controllers
 		{
 			if (group == null)
 				return false;
-			return CanModifyGroup(group) || group.IsPublic;
+			return CanModifyGroup(group);
 		}
 
 		private bool CanModifyGroup(Group group)
 		{
 			if (group == null)
 				return false;
+
 			var courseId = group.CourseId;
 			if (groupsRepo.CanUserSeeAllCourseGroups(User, courseId))
 				return true;
-			return group.OwnerId == User.Identity.GetUserId();
+
+			var userId = User.Identity.GetUserId();
+			if (group.OwnerId == userId)
+				return true;
+
+			var accesses = groupsRepo.GetGroupAccesses(group.Id);
+			return accesses.Any(a => a.UserId == userId);
+		}
+
+		private bool CanAddUsersToGroupManually()
+		{
+			return User.IsInRole(LmsRoles.SysAdmin);
 		}
 
 		[HttpPost]
 		public async Task<ActionResult> AddUserToGroup(int groupId, string userId)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanModifyGroup(group))
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			if (!CanAddUsersToGroupManually())
+				return Json(new { status = "error", message = "Вы не можете добавлять пользователей в группы"});
 
-			log.Info($"Добавляю пользователя Id = {userId} в группу «{group.Name}» (Id = {group.Id})");
-			var added = await groupsRepo.AddUserToGroup(groupId, userId);
+			var user = usersRepo.FindUserById(userId);
+			if (user == null)
+				return Json(new { status = "error", message = $"Пользователь с id {userId} не найден" });
 
-			return Json(new { added });
+			log.Info($"Добавляю пользователя {user.VisibleName} (Id = {userId}) в группу «{group.Name}» (Id = {group.Id})");
+			var member = await groupsRepo.AddUserToGroup(groupId, userId);
+
+			if (member == null)
+				return Json(new { status = "error", message = $"{user.VisibleName} уже учится в этой группе" });
+			return Json(new { status = "ok", html = this.RenderPartialViewToString("_GroupMember", member) });
 		}
 
 		[HttpPost]
@@ -744,11 +762,20 @@ namespace uLearn.Web.Controllers
 		{
 			var group = groupsRepo.FindGroupById(groupId);
 			if (!CanModifyGroup(group))
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-			log.Info($"Удаляю пользователя Id = {userId} из группы «{group.Name}» (Id = {group.Id})");
-			await groupsRepo.RemoveUserFromGroup(groupId, userId);
+				return Json(new { status = "error", message = "Вы не можете удалять пользователей из этой группы" });
 
-			return Json(new { removed = "true" });
+			var user = usersRepo.FindUserById(userId);
+			if (user == null)
+				return Json(new { status = "error", message = $"Не могу найти опвател {userId}" });
+
+			log.Info($"Удаляю пользователя {user.VisibleName} (Id = {userId}) из группы «{group.Name}» (Id = {group.Id})");
+
+			var currentUserId = User.Identity.GetUserId();
+			var member = await groupsRepo.RemoveUserFromGroup(groupId, userId);
+			if (member != null)
+				await notificationsRepo.AddNotification(group.CourseId, new GroupMemberHasBeenRemovedNotification { UserId = userId, GroupId = groupId }, currentUserId);
+
+			return Json(new { status = "ok", removed = member != null ? "true" : "false" });
 		}
 
 		[HttpPost]
@@ -765,7 +792,7 @@ namespace uLearn.Web.Controllers
 
 			log.Info($"Обновляю группу «{group.Name}» → «{name}» (Id = {group.Id}) для курса {courseId}");
 
-			await groupsRepo.ModifyGroup(groupId, name, true, manualChecking, manualCheckingForOldSolutions, group.IsArchived, group.OwnerId);
+			await groupsRepo.ModifyGroup(groupId, name, manualChecking, manualCheckingForOldSolutions);
 
 			var course = courseManager.GetCourse(group.CourseId);
 			await UpdateEnabledScoringGroupsForGroup(course, groupId);
@@ -774,18 +801,52 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> UpdateGroup(string courseId, int groupId, string name, bool isPublic, bool manualChecking, bool manualCheckingForOldSolutions, bool isArchived, string ownerId)
+		public async Task<ActionResult> ChangeGroupOwnerApi(string courseId, int groupId, string newOwnerId)
+		{
+			var group = groupsRepo.FindGroupById(groupId);
+			if (group.CourseId != courseId || group.OwnerId != User.Identity.GetUserId())
+				return Json(new { status = "error", message = "Вы не можете сменить владельца у этой группы" });
+
+			var newOwner = usersRepo.FindUserById(newOwnerId);
+			if (newOwner == null)
+				return Json(new { status = "error", message = $"Пользователь {newOwnerId} не найден" });
+
+			log.Info($"Меняю владельца группы «{group.Name}» (Id = {group.Id}) на {newOwner.VisibleName} (Id = {newOwnerId})");
+
+			/* Grant full access to previous owner */
+			await groupsRepo.GrantAccess(groupId, group.OwnerId, GroupAccessType.FullAccess, group.OwnerId);
+			/* Change owner */
+			await groupsRepo.ChangeOwner(groupId, newOwnerId);
+			/* Revoke access from new owner */
+			await groupsRepo.RevokeAccess(groupId, newOwnerId);
+
+			return Json(new { status = "ok", groupId = groupId });
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> ArchiveGroupApi(string courseId, int groupId, bool isArchived)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
 			if (!CanModifyGroup(group) || group.CourseId != courseId)
+				return Json(new { status = "error", message = "Вы не можете редактировать эту группу" });
+
+			log.Info($"Обновляю архивность группы «{group.Name}». Была ли архивна: {group.IsArchived}. Архивна теперь: {isArchived}");
+
+			await groupsRepo.ArchiveGroup(groupId, isArchived);
+
+			return Json(new { status = "ok", groupId = groupId });
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> ArchiveGroup(int groupId, bool isArchived)
+		{
+			var group = groupsRepo.FindGroupById(groupId);
+			if (!CanModifyGroup(group))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
-			log.Info($"Обновляю группу «{group.Name}» (Id = {group.Id}) для курса {courseId} (новое название «{name}», Id владельца {ownerId}, публичная = {isPublic})");
+			log.Info($"Обновляю архивность группы «{group.Name}». Была ли архивна: {group.IsArchived}. Архивна теперь: {isArchived}");
 
-			await groupsRepo.ModifyGroup(groupId, name, isPublic, manualChecking, manualCheckingForOldSolutions, isArchived, ownerId);
-
-			var course = courseManager.GetCourse(group.CourseId);
-			await UpdateEnabledScoringGroupsForGroup(course, groupId);
+			await groupsRepo.ArchiveGroup(groupId, isArchived);
 
 			return RedirectToAction("Groups", new { courseId = group.CourseId });
 		}
@@ -833,26 +894,23 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> GrantAccessToGroup(int groupId, string usernameOrEmail)
+		public async Task<ActionResult> GrantAccessToGroup(int groupId, string userId)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
 			if (!CanModifyGroup(group))
 				return Json(new { status = "error", message = "Вы не можете выдавать права на эту группу" });
 
-			var users = usersRepo.FindUsersByUsernameOrEmail(usernameOrEmail);
-			if (users.Count > 1)
-			{
-				/* TODO (andgein): suggest to choose one user */
-				return Json(new { status = "error", message = $"Несколько пользователей имеют почту {usernameOrEmail}" });
-			}
-			if (users.Count == 0)
-				return Json(new { status = "error", message = $"Пользователь с логином или почтой {usernameOrEmail} не найден" });
-			var userId = users[0].Id;
+			var user = usersRepo.FindUserById(userId);
+			if (user == null)
+				return Json(new { status = "error", message = $"Пользователь {userId} не найден" });
 
 			if (groupsRepo.GetGroupAccesses(groupId).Select(a => a.UserId).Contains(userId) || group.OwnerId == userId)
-				return Json(new { status = "error", message = $"{users[0].VisibleName} уже является преподавателем этой группы" });
+				return Json(new { status = "error", message = $"{user.VisibleName} уже является преподавателем этой группы" });
 
-			var access = await groupsRepo.GrantAccess(groupId, userId, GroupAccessType.FullAccess, User.Identity.GetUserId());
+			var currentUserId = User.Identity.GetUserId();
+			var access = await groupsRepo.GrantAccess(groupId, userId, GroupAccessType.FullAccess, currentUserId);
+			await notificationsRepo.AddNotification(group.CourseId, new GrantedAccessToGroupNotification { AccessId = access.Id }, currentUserId);
+
 			var renderedHtml = this.RenderPartialViewToString("_GroupAccess", new GroupAccessViewModel
 			{
 				Access = access,
@@ -868,7 +926,10 @@ namespace uLearn.Web.Controllers
 			if (!CanModifyGroup(group) || ! groupsRepo.CanRevokeAccess(groupId, userId, User))
 				return Json(new { status = "error", message = "Вы не можете забрать права на группу у этого пользователя" });
 
-			await groupsRepo.RevokeAcess(groupId, userId);
+			var currentUserId = User.Identity.GetUserId();
+			var accesses = await groupsRepo.RevokeAccess(groupId, userId);
+			foreach (var access in accesses)
+				await notificationsRepo.AddNotification(group.CourseId, new RevokedAccessToGroupNotification { AccessId = access.Id }, currentUserId);
 			return Json(new { status = "ok", userId = userId });
 		}
 
@@ -884,7 +945,7 @@ namespace uLearn.Web.Controllers
 			var accessesViewModels = accesses.Select(a => new GroupAccessViewModel
 			{
 				Access = a,
-				CanBeRevoked = group.OwnerId == userId || a.GrantedById == userId || User.HasAccessFor(group.CourseId, CourseRole.CourseAdmin),
+				CanBeRevoked = group.OwnerId == userId || a.GrantedById == userId || a.UserId == userId || User.HasAccessFor(group.CourseId, CourseRole.CourseAdmin),
 			}).ToList();
 			accessesViewModels.Insert(0, new GroupAccessViewModel
 			{
@@ -925,9 +986,16 @@ namespace uLearn.Web.Controllers
 			public string value { get; set; }
 		}
 
-		public ActionResult FindUsers(string courseId, string term, bool withGroups = true)
+		public ActionResult FindUsers(string courseId, string term, bool onlyInstructors=true, bool withGroups=true)
 		{
+			/* Only sysadmins can search ordinary users */
+			if (!User.IsInRole(LmsRoles.SysAdmin) && !onlyInstructors)
+				return Json(new { status = "error", message = "Вы не можете искать среди всех пользователей" }, JsonRequestBehavior.AllowGet);
+
 			var query = new UserSearchQueryModel { NamePrefix = term };
+			if (onlyInstructors)
+				query.CourseRole = CourseRole.Instructor;
+
 			var users = usersRepo.FilterUsers(query, userManager).Take(10).ToList();
 			var usersList = users.Select(ur => new UserSearchResultModel
 			{

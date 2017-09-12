@@ -1,7 +1,7 @@
 ﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
-	font-family: "Segoe UI";
+	padding-top: 50px;
+	padding-bottom: 20px;
+	font-family: "Segoe UI", Arial, sans-serif;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -200,4 +200,9 @@ footer:hover {
 /* Small buttons*/
 .btn-group-xs > .btn, .btn-xs {
 	padding: 1px 7px 3px;
+}
+
+/* Fixes for jquery-ui */
+.ui-front {
+	z-index: 1100;
 }

@@ -1,6 +1,7 @@
 ﻿@using uLearn
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Shared
+
 @model Database.Models.GroupMember
 
 <li class="group__member">
@@ -10,10 +11,14 @@
 		</div>
 
 		@UserAvatar.ExtraSmallAvatar(Model.User)
-		@Model.User.VisibleName
+		<span title="@Model.User.UserName">@Model.User.VisibleName</span>
+		@if (!string.IsNullOrEmpty(Model.User.Email))
+		{
+			<a href="mailto:@Model.User.Email">@Model.User.Email</a><text>,</text>
+		}
 		@if (Model.AddingTime.HasValue)
 		{
-			<span class="group__member__since">вступил@(Model.User.Gender.ChooseEnding()) @Model.AddingTime.Value.ToAgoPrettyString()</span>
+			<span class="group__member__since" title="@Model.AddingTime.Value.ToPrettyString()">вступил@(Model.User.Gender.ChooseEnding()) @Model.AddingTime.Value.ToAgoPrettyString()</span>
 		}
 	</div>
 </li>
