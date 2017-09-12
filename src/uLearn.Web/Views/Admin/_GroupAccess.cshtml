@@ -1,4 +1,5 @@
-﻿@using Database.Models
+﻿@using Database.Extensions
+@using Database.Models
 @using Microsoft.AspNet.Identity
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Shared
@@ -32,13 +33,16 @@
 		</div>
 		<div>
 			@{
+				var courseId = Model.Access.Group.CourseId;
+
 				var iAmGroupOwner = Model.Access.Group.OwnerId == User.Identity.GetUserId();
+				var canChangeOwner = iAmGroupOwner || User.HasAccessFor(courseId, CourseRole.CourseAdmin);
 			}
-			@if (iAmGroupOwner && Model.Access.AccessType != GroupAccessType.Owner)
+			@if (canChangeOwner && Model.Access.AccessType != GroupAccessType.Owner)
 			{
 				<form action="@Url.Action("ChangeGroupOwnerApi")" onsubmit="return false;">
 					@Html.AntiForgeryToken()
-					@Html.Hidden("courseId", Model.Access.Group.CourseId)
+					@Html.Hidden("courseId", courseId)
 					@Html.Hidden("groupId", Model.Access.GroupId)
 					@Html.Hidden("newOwnerId", Model.Access.UserId)
 					<a href="#" class="group__access__change-owner-link">Сделать владельцем</a>

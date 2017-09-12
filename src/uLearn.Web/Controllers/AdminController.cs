@@ -804,7 +804,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> ChangeGroupOwnerApi(string courseId, int groupId, string newOwnerId)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
-			if (group.CourseId != courseId || group.OwnerId != User.Identity.GetUserId())
+			if (group.CourseId != courseId || ! CanChangeGroupOwner(group))
 				return Json(new { status = "error", message = "Вы не можете сменить владельца у этой группы" });
 
 			var newOwner = usersRepo.FindUserById(newOwnerId);
@@ -821,6 +821,11 @@ namespace uLearn.Web.Controllers
 			await groupsRepo.RevokeAccess(groupId, newOwnerId);
 
 			return Json(new { status = "ok", groupId = groupId });
+		}
+
+		private bool CanChangeGroupOwner(Group group)
+		{
+			return group.OwnerId == User.Identity.GetUserId() || User.HasAccessFor(group.CourseId, CourseRole.CourseAdmin);
 		}
 
 		[HttpPost]
