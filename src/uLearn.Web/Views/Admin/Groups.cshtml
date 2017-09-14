@@ -364,8 +364,9 @@
 					<h3 class="first-header">Группа, которую надо скопировать</h3>
 					<div>
 						<p class="help-block">
-							Новая группа будет создана для курса «@Model.Course.Title».
+							Новая группа будет создана для&nbsp;курса <b>«@Model.Course.Title»</b>.
 							Скопируются все настройки группы (в&nbsp;том числе владелец), в&nbsp;неё автоматически добавятся участники из&nbsp;копируемой группы.
+							Преподаватели тоже будут добавлены в группу, если у&nbsp;них есть права на&nbsp;курс «@Model.Course.Title».
 						</p>
 					</div>
 					<div class="form-group input-group">
@@ -377,9 +378,9 @@
 								Value = g.Id.ToString(),
 								Text = g.Name + ": " + g.Members.Count.PluralizeInRussian(new RussianPluralizationOptions
 								{
-									One = "человек",
-									Two = "человека",
-									Five = "человек",
+									One = "студент",
+									Two = "студента",
+									Five = "студентов",
 									Gender = Gender.Male,
 									hideNumberOne = false
 								}),

@@ -24,6 +24,7 @@ namespace Database.DataContexts
 		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly UserQuizzesRepo userQuizzesRepo;
 		private readonly VisitsRepo visitsRepo;
+		private readonly UserRolesRepo userRolesRepo;
 
 		private readonly CourseManager courseManager;
 
@@ -35,6 +36,7 @@ namespace Database.DataContexts
 			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			visitsRepo = new VisitsRepo(db);
+			userRolesRepo = new UserRolesRepo(db);
 		}
 
 		public bool CanUserSeeAllCourseGroups(IPrincipal user, string courseId)
@@ -64,16 +66,27 @@ namespace Database.DataContexts
 		{
 			var newGroup = await CopyGroupWithoutMembers(group, courseId, newOwnerId);
 			await CopyGroupMembers(group, newGroup);
+			await CopyGroupAccesses(group, newGroup);
+
+			/* We can also copy group's scoring-group settings if their are in one course */
+			if (courseId == group.CourseId)
+			{
+				await CopyEnabledAdditionalScoringGroups(group, newGroup);
+			}
+
 			return newGroup;
 		}
 
 		private async Task<Group> CopyGroupWithoutMembers(Group group, string courseId, string newOwnerId)
 		{
+			var newName = group.Name;
+			if (courseId == group.CourseId)
+				newName += " (копия)";
 			var newGroup = new Group
 			{
 				CourseId = courseId,
 				OwnerId = string.IsNullOrEmpty(newOwnerId) ? group.OwnerId : newOwnerId,
-				Name = group.Name,
+				Name = newName,
 				CanUsersSeeGroupProgress = group.CanUsersSeeGroupProgress,
 				IsManualCheckingEnabled = group.IsManualCheckingEnabled,
 				IsInviteLinkEnabled = group.IsInviteLinkEnabled,
@@ -86,12 +99,47 @@ namespace Database.DataContexts
 
 		private async Task CopyGroupMembers(Group group, Group newGroup)
 		{
-			var members = @group.Members.Select(m => new GroupMember
+			var members = group.Members.Select(m => new GroupMember
 			{
 				UserId = m.UserId,
 				GroupId = newGroup.Id,
 			});
 			db.GroupMembers.AddRange(members);
+			await db.SaveChangesAsync();
+		}
+
+		private async Task CopyGroupAccesses(Group group, Group newGroup)
+		{
+			var accesses = db.GroupAccesses.Where(a => a.GroupId == group.Id && a.IsEnabled).ToList();
+			var courseInstructorsIds = userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, newGroup.CourseId, includeHighRoles: true);
+			foreach (var access in accesses)
+			{
+				if (! courseInstructorsIds.Contains(access.UserId))
+					continue;
+				db.GroupAccesses.Add(new GroupAccess
+				{
+					GroupId = newGroup.Id,
+					UserId = access.UserId,
+					AccessType = access.AccessType,
+					GrantedById = access.GrantedById,
+					GrantTime = DateTime.Now,
+					IsEnabled = true,
+				});
+			}
+
+			await db.SaveChangesAsync();
+		}
+		
+		private async Task CopyEnabledAdditionalScoringGroups(Group group, Group newGroup)
+		{
+			var enabledAdditionalScoringGroups = db.EnabledAdditionalScoringGroups.Where(s => s.GroupId == group.Id).Select(s => s.ScoringGroupId).ToList();
+			foreach (var scoringGroupId in enabledAdditionalScoringGroups)
+				db.EnabledAdditionalScoringGroups.Add(new EnabledAdditionalScoringGroup
+				{
+					GroupId = newGroup.Id,
+					ScoringGroupId = scoringGroupId,
+				});
+
 			await db.SaveChangesAsync();
 		}
 
@@ -291,10 +339,13 @@ namespace Database.DataContexts
 				.ToList();
 		}
 
-		public List<Group> GetGroupsOwnedByUser(string courseId, IPrincipal user, bool includeArchived = false)
+		public List<Group> GetMyGroupsFilterAccessibleToUser(string courseId, IPrincipal user, bool includeArchived = false)
 		{
 			var userId = user.Identity.GetUserId();
-			var groups = db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && g.OwnerId == userId);
+
+			var accessableGroupsIds = db.GroupAccesses.Where(a => a.Group.CourseId == courseId && a.UserId == userId && a.IsEnabled).Select(a => a.GroupId);
+
+			var groups = db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || accessableGroupsIds.Contains(g.Id)));
 			if (!includeArchived)
 				groups = groups.Where(g => !g.IsArchived);
 			return groups.ToList();

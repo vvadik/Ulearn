@@ -290,9 +290,14 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Manage", new { Message = message });
 		}
 
-		public ActionResult Manage(ManageMessageId? message)
+		public async Task<ActionResult> Manage(ManageMessageId? message, string provider="", string otherUserId="")
 		{
 			ViewBag.StatusMessage = message?.GetAttribute<DisplayAttribute>().GetName();
+			if (message == ManageMessageId.AlreadyLinkedToOtherUser )
+			{
+				var otherUser = await userManager.FindByIdAsync(otherUserId);
+				ViewBag.StatusMessage += $" {provider}. Аккаунт уже привязан к пользователю {otherUser.UserName}.";
+			}
 			ViewBag.IsStatusError = message?.GetAttribute<IsErrorAttribute>()?.IsError ?? IsErrorAttribute.DefaultValue;
 			ViewBag.HasLocalPassword = ControllerUtils.HasPassword(userManager, User);
 			ViewBag.ReturnUrl = Url.Action("Manage");
@@ -403,7 +408,7 @@ namespace uLearn.Web.Controllers
 			[Display(Name = "Ваша почта уже подтверждена")]
 			EmailAlreadyConfirmed,
 
-			[Display(Name = "Не получилось привязать аккаунт. Он уже привязан к другому пользователю")]
+			[Display(Name = "Не получилось привязать аккаунт")]
 			[IsError(true)]
 			AlreadyLinkedToOtherUser,
 

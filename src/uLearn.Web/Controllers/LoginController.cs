@@ -187,14 +187,14 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ULearnAuthorize]
 		[ValidateAntiForgeryToken]
-		public ActionResult LinkLogin(string provider)
+		public ActionResult DoLinkLogin(string provider, string returnUrl="")
 		{
 			// Request a redirect to the external login provider to link a login for the current user
-			return new ChallengeResult(provider, Url.Action("LinkLoginCallback"), User.Identity.GetUserId());
+			return new ChallengeResult(provider, Url.Action("LinkLoginCallback", new { returnUrl = returnUrl }), User.Identity.GetUserId());
 		}
 
 		[ULearnAuthorize]
-		public async Task<ActionResult> LinkLoginCallback()
+		public async Task<ActionResult> LinkLoginCallback(string returnUrl="")
 		{
 			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext, XsrfKey, User.Identity.GetUserId());
 			if (loginInfo == null)
@@ -205,9 +205,13 @@ namespace uLearn.Web.Controllers
 			var result = await userManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login);
 			if (result.Succeeded)
 			{
+				if (!string.IsNullOrEmpty(returnUrl))
+					return Redirect(this.FixRedirectUrl(returnUrl));
+
 				return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.LoginAdded });
 			}
-			return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.AlreadyLinkedToOtherUser });
+			var otherUser = await userManager.FindAsync(loginInfo.Login);
+			return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.AlreadyLinkedToOtherUser, Provider = loginInfo.Login.LoginProvider, OtherUserId = otherUser?.Id ?? "" });
 		}
 
 		[HttpPost]

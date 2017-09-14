@@ -15,7 +15,7 @@
 			</p>
 
 			<section id="socialLoginForm">
-				@using (Html.BeginForm("LinkLogin", "Login", new { ReturnUrl = Model }))
+				@using (Html.BeginForm("DoLinkLogin", "Login", new { ReturnUrl = Model }))
 				{
 					@Html.AntiForgeryToken()
 					const string authenticationType = KonturPassportConstants.AuthenticationType;
