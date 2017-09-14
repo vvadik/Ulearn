@@ -186,7 +186,52 @@
 			@UserAvatar.Avatar(notification.JoinedUser)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.JoinedUser) присоедини@( notification.InitiatedBy.Gender.ChooseEnding("лся", "лась")) к&nbsp;вашей группе <b>@notification.Group.Name</b>
+			<div class="notifications__notification__header">@UserName(notification.JoinedUser) присоедини@( notification.InitiatedBy.Gender.ChooseEnding("лся", "лась")) к&nbsp;вашей группе <b>«@notification.Group.Name»</b>
+			</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(GrantedAccessToGroupNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	<div class="notifications__granted-access-to-group-notification media" data-href="@Url.Action("Groups", "Admin", new { courseId = notification.CourseId })">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.Access.User)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">
+				@UserName(notification.Access.GrantedBy) назначил@(notification.Access.GrantedBy.Gender.ChooseEnding()) вас преподавателем группы <b>«@notification.Access.Group.Name»</b> в&nbsp;курсе «@course.Title».
+			</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(RevokedAccessToGroupNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	<div class="notifications__revoked-access-to-group-notification media" data-href="@Url.Action("Groups", "Admin", new { courseId = notification.CourseId })">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.Access.User)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">
+				Вы перестали быть преподавателем группы <b>«@notification.Access.Group.Name»</b> в курсе «@course.Title».
+			</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
+
+@helper Notification(GroupMemberHasBeenRemovedNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	<div class="notifications__group-member-has-been-removed-notification media" data-href="@Url.Action("Groups", "Admin", new { courseId = notification.CourseId })">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.InitiatedBy)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">
+				@UserName(notification.InitiatedBy) удалил@(notification.InitiatedBy.Gender.ChooseEnding()) студента @notification.User.VisibleName из группы <b>«@notification.Group.Name»</b> в курсе «@course.Title».
 			</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>

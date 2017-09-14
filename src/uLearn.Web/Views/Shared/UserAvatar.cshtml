@@ -31,5 +31,9 @@
 @helper SmallAvatar(ApplicationUser user, string classes = "")
 {
 	@Avatar(user, "small " + classes)
-	;
+}
+
+@helper ExtraSmallAvatar(ApplicationUser user, string classes = "")
+{
+	@Avatar(user, "xsmall " + classes)
 }

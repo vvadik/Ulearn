@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -98,7 +99,7 @@ namespace uLearn.Web
 		{
 			var httpContext = filterContext.RequestContext.HttpContext;
 
-			var queryString = httpContext.Request.QueryString;
+			var queryString = httpContext.Request.QueryString ?? new NameValueCollection();
 			var queryStringParams = HttpUtility.ParseQueryString(queryString.ToString()).ToDictionary();
 			var konturPassportRequired = Convert.ToBoolean(queryStringParams.GetOrDefault(queryStringParameterName, "false"));
 

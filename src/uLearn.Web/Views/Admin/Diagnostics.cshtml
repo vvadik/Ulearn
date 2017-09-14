@@ -13,8 +13,7 @@
 		<h1>Курс обновлён, @Html.RouteLink("перейти к курсу →", "Course", new { courseId = Model.CourseId, action = "Slide" }, new { })</h1>
 
 		<div>
-			@Html.ActionLink("← Назад", "Packages", new { courseId = Model.CourseId }, new { @class = "btn btn-primary" })
-			@Html.ActionLink("Скопировать на Степик", "ExportCourse", "Stepik", new { courseId = Model.CourseId }, new { @class = "btn btn-success" })
+			@Html.ActionLink("Скопировать на Степик", "ExportCourse", "Stepik", new { courseId = Model.CourseId }, new { @class = "btn btn-warning" })
 		</div>
 
 		if (Model.CourseDiff.SlideDiffs.Count > 0)

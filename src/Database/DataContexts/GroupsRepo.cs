@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
+using JetBrains.Annotations;
 using log4net;
 using Microsoft.AspNet.Identity;
 using uLearn;
@@ -22,6 +24,7 @@ namespace Database.DataContexts
 		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly UserQuizzesRepo userQuizzesRepo;
 		private readonly VisitsRepo visitsRepo;
+		private readonly UserRolesRepo userRolesRepo;
 
 		private readonly CourseManager courseManager;
 
@@ -33,6 +36,7 @@ namespace Database.DataContexts
 			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			visitsRepo = new VisitsRepo(db);
+			userRolesRepo = new UserRolesRepo(db);
 		}
 
 		public bool CanUserSeeAllCourseGroups(IPrincipal user, string courseId)
@@ -40,13 +44,12 @@ namespace Database.DataContexts
 			return user.HasAccessFor(courseId, CourseRole.CourseAdmin);
 		}
 
-		public async Task<Group> CreateGroup(string courseId, string name, string ownerId, bool isPublic = false, bool isManualCheckingEnabled = false, bool isManualCheckingEnabledForOldSolutions = false)
+		public async Task<Group> CreateGroup(string courseId, string name, string ownerId, bool isManualCheckingEnabled = false, bool isManualCheckingEnabledForOldSolutions = false)
 		{
 			var group = new Group
 			{
 				CourseId = courseId,
 				Name = name,
-				IsPublic = isPublic,
 				OwnerId = ownerId,
 				IsManualCheckingEnabled = isManualCheckingEnabled,
 				IsManualCheckingEnabledForOldSolutions = isManualCheckingEnabledForOldSolutions,
@@ -63,20 +66,30 @@ namespace Database.DataContexts
 		{
 			var newGroup = await CopyGroupWithoutMembers(group, courseId, newOwnerId);
 			await CopyGroupMembers(group, newGroup);
+			await CopyGroupAccesses(group, newGroup);
+
+			/* We can also copy group's scoring-group settings if their are in one course */
+			if (courseId == group.CourseId)
+			{
+				await CopyEnabledAdditionalScoringGroups(group, newGroup);
+			}
+
 			return newGroup;
 		}
 
 		private async Task<Group> CopyGroupWithoutMembers(Group group, string courseId, string newOwnerId)
 		{
+			var newName = group.Name;
+			if (courseId == group.CourseId)
+				newName += " (копия)";
 			var newGroup = new Group
 			{
 				CourseId = courseId,
 				OwnerId = string.IsNullOrEmpty(newOwnerId) ? group.OwnerId : newOwnerId,
-				Name = group.Name,
+				Name = newName,
 				CanUsersSeeGroupProgress = group.CanUsersSeeGroupProgress,
 				IsManualCheckingEnabled = group.IsManualCheckingEnabled,
 				IsInviteLinkEnabled = group.IsInviteLinkEnabled,
-				IsPublic = group.IsPublic,
 				InviteHash = Guid.NewGuid(),
 			};
 			db.Groups.Add(newGroup);
@@ -86,7 +99,7 @@ namespace Database.DataContexts
 
 		private async Task CopyGroupMembers(Group group, Group newGroup)
 		{
-			var members = @group.Members.Select(m => new GroupMember
+			var members = group.Members.Select(m => new GroupMember
 			{
 				UserId = m.UserId,
 				GroupId = newGroup.Id,
@@ -95,23 +108,73 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsPublic, bool newIsManualCheckingEnabled, bool newIsManualCheckingEnabledForOldSolutions, bool newIsArchived, string newOwnerId)
+		private async Task CopyGroupAccesses(Group group, Group newGroup)
+		{
+			var accesses = db.GroupAccesses.Where(a => a.GroupId == group.Id && a.IsEnabled).ToList();
+			var courseInstructorsIds = userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, newGroup.CourseId, includeHighRoles: true);
+			foreach (var access in accesses)
+			{
+				if (! courseInstructorsIds.Contains(access.UserId))
+					continue;
+				db.GroupAccesses.Add(new GroupAccess
+				{
+					GroupId = newGroup.Id,
+					UserId = access.UserId,
+					AccessType = access.AccessType,
+					GrantedById = access.GrantedById,
+					GrantTime = DateTime.Now,
+					IsEnabled = true,
+				});
+			}
+
+			await db.SaveChangesAsync();
+		}
+		
+		private async Task CopyEnabledAdditionalScoringGroups(Group group, Group newGroup)
+		{
+			var enabledAdditionalScoringGroups = db.EnabledAdditionalScoringGroups.Where(s => s.GroupId == group.Id).Select(s => s.ScoringGroupId).ToList();
+			foreach (var scoringGroupId in enabledAdditionalScoringGroups)
+				db.EnabledAdditionalScoringGroups.Add(new EnabledAdditionalScoringGroup
+				{
+					GroupId = newGroup.Id,
+					ScoringGroupId = scoringGroupId,
+				});
+
+			await db.SaveChangesAsync();
+		}
+
+		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsManualCheckingEnabled, bool newIsManualCheckingEnabledForOldSolutions)
 		{
 			var group = FindGroupById(groupId);
 			group.Name = newName;
-			group.IsPublic = newIsPublic;
 			group.IsManualCheckingEnabled = newIsManualCheckingEnabled;
 
 			if (!group.IsManualCheckingEnabledForOldSolutions && newIsManualCheckingEnabledForOldSolutions)
 				await AddManualCheckingsForOldSolutions(group.CourseId, group.Members.Select(m => m.UserId).ToList());
 
 			group.IsManualCheckingEnabledForOldSolutions = newIsManualCheckingEnabledForOldSolutions;
-			group.IsArchived = newIsArchived;
-			group.OwnerId = newOwnerId;
 			await db.SaveChangesAsync();
 
 			return group;
 		}
+
+		public async Task ChangeOwner(int groupId, string newOwnerId)
+		{
+			var group = FindGroupById(groupId);
+			group.OwnerId = newOwnerId;
+
+			await db.SaveChangesAsync();
+		}
+
+		public async Task<Group> ArchiveGroup(int groupId, bool isArchived)
+		{
+			var group = FindGroupById(groupId);
+			group.IsArchived = isArchived;
+			await db.SaveChangesAsync();
+
+			return group;
+		}
+
 
 		public async Task RemoveGroup(int groupId)
 		{
@@ -120,19 +183,20 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public async Task<bool> AddUserToGroup(int groupId, string userId)
+		public async Task<GroupMember> AddUserToGroup(int groupId, string userId)
 		{
 			var groupMember = new GroupMember
 			{
 				GroupId = groupId,
-				UserId = userId
+				UserId = userId,
+				AddingTime = DateTime.Now,
 			};
 			using (var transaction = db.Database.BeginTransaction())
 			{
 				/* Don't add member if it's already exists */
 				var existsMember = db.GroupMembers.FirstOrDefault(m => m.GroupId == groupId && m.UserId == userId);
 				if (existsMember != null)
-					return false;
+					return null;
 
 				db.GroupMembers.Add(groupMember);
 				await db.SaveChangesAsync();
@@ -144,7 +208,7 @@ namespace Database.DataContexts
 			if (group != null && group.IsManualCheckingEnabledForOldSolutions)
 				await AddManualCheckingsForOldSolutions(group.CourseId, userId);
 
-			return true;
+			return groupMember;
 		}
 
 		private async Task AddManualCheckingsForOldSolutions(string courseId, IEnumerable<string> usersIds)
@@ -196,17 +260,19 @@ namespace Database.DataContexts
 			}
 		}
 
-		public async Task<bool> AddUserToGroup(int groupId, ApplicationUser user)
+		public async Task<GroupMember> AddUserToGroup(int groupId, ApplicationUser user)
 		{
 			return await AddUserToGroup(groupId, user.Id);
 		}
 
-		public async Task RemoveUserFromGroup(int groupId, string userId)
+		public async Task<GroupMember> RemoveUserFromGroup(int groupId, string userId)
 		{
 			var member = db.GroupMembers.FirstOrDefault(m => m.GroupId == groupId && m.UserId == userId);
 			if (member != null)
 				db.GroupMembers.Remove(member);
+
 			await db.SaveChangesAsync();
+			return member;
 		}
 
 		public Group FindGroupById(int groupId)
@@ -238,7 +304,8 @@ namespace Database.DataContexts
 				return false;
 
 			var userId = user.Identity.GetUserId();
-			return !group.IsDeleted && (group.OwnerId == userId || group.IsPublic);
+			var hasAccess = db.GroupAccesses.Any(a => a.UserId == userId && a.GroupId == groupId && a.IsEnabled);
+			return !group.IsDeleted && (group.OwnerId == userId || hasAccess);
 		}
 
 		public List<Group> GetAvailableForUserGroups(string courseId, IPrincipal user, bool includeArchived = false)
@@ -255,12 +322,13 @@ namespace Database.DataContexts
 			var otherCourses = new HashSet<string>(coursesIds).Except(coursesWhereUserCanSeeAllGroups).ToList();
 
 			var userId = user.Identity.GetUserId();
+			var groupsWithAccess = new HashSet<int>(db.GroupAccesses.Where(a => a.UserId == userId && a.IsEnabled).Select(a => a.GroupId));
 			var groups = db.Groups.Where(g => !g.IsDeleted && (includeArchived || !g.IsArchived) &&
 											(
 												/* Course admins can see all groups */
 												coursesWhereUserCanSeeAllGroups.Contains(g.CourseId) ||
 												/* Other instructor can see only public or own groups */
-												(otherCourses.Contains(g.CourseId) && (g.OwnerId == userId || g.IsPublic))
+												(otherCourses.Contains(g.CourseId) && (g.OwnerId == userId || groupsWithAccess.Contains(g.Id)))
 											)
 			);
 
@@ -271,18 +339,26 @@ namespace Database.DataContexts
 				.ToList();
 		}
 
-		public List<Group> GetGroupsOwnedByUser(string courseId, IPrincipal user, bool includeArchived = false)
+		public List<Group> GetMyGroupsFilterAccessibleToUser(string courseId, IPrincipal user, bool includeArchived = false)
 		{
 			var userId = user.Identity.GetUserId();
-			var groups = db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && g.OwnerId == userId);
+
+			var accessableGroupsIds = db.GroupAccesses.Where(a => a.Group.CourseId == courseId && a.UserId == userId && a.IsEnabled).Select(a => a.GroupId);
+
+			var groups = db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted && (g.OwnerId == userId || accessableGroupsIds.Contains(g.Id)));
 			if (!includeArchived)
 				groups = groups.Where(g => !g.IsArchived);
 			return groups.ToList();
 		}
 
-		public List<ApplicationUser> GetGroupMembers(int groupId)
+		public List<ApplicationUser> GetGroupMembersAsUsers(int groupId)
 		{
 			return db.GroupMembers.Where(m => m.GroupId == groupId).Select(m => m.User).ToList();
+		}
+
+		public List<GroupMember> GetGroupMembers(int groupId)
+		{
+			return db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId).ToList();
 		}
 
 		public Dictionary<string, List<Group>> GetUsersGroups(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)
@@ -290,6 +366,7 @@ namespace Database.DataContexts
 			var canSeeAllGroups = courseIds.ToDictionary(c => c.ToLower(), c => CanUserSeeAllCourseGroups(currentUser, c));
 			var currentUserId = currentUser.Identity.GetUserId();
 
+			var groupsWithAccess = new HashSet<int>(db.GroupAccesses.Where(a => a.UserId == currentUserId && a.IsEnabled).Select(a => a.GroupId));
 			var usersGroups = db.GroupMembers
 				.Where(m => userIds.Contains(m.UserId) && courseIds.Contains(m.Group.CourseId))
 				.GroupBy(m => m.UserId)
@@ -298,7 +375,7 @@ namespace Database.DataContexts
 					kv => kv.Key,
 					kv => kv.Value.Select(m => m.Group)
 						.Distinct()
-						.Where(g => (g.OwnerId == currentUserId || g.IsPublic || canSeeAllGroups[g.CourseId.ToLower()]) && !g.IsDeleted && !g.IsArchived)
+						.Where(g => (g.OwnerId == currentUserId || groupsWithAccess.Contains(g.Id) || canSeeAllGroups[g.CourseId.ToLower()]) && !g.IsDeleted && !g.IsArchived)
 						.OrderBy(g => g.OwnerId != currentUserId)
 						.Take(maxCount)
 						.ToList()
@@ -417,6 +494,132 @@ namespace Database.DataContexts
 		{
 			var groupsIds = GetGroups(courseId).Select(g => g.Id);
 			return db.EnabledAdditionalScoringGroups.Where(e => groupsIds.Contains(e.GroupId)).ToList();
+		}
+
+		public List<EnabledAdditionalScoringGroup> GetEnabledAdditionalScoringGroupsForGroup(int groupId)
+		{
+			return db.EnabledAdditionalScoringGroups.Where(e => e.GroupId == groupId).ToList();
+		}
+
+		public List<GroupLabel> GetLabels(string ownerId)
+		{
+			return db.GroupLabels.Where(l => !l.IsDeleted && l.OwnerId == ownerId).ToList();
+		}
+
+		public async Task<GroupLabel> CreateLabel(string ownerId, string name, string colorHex)
+		{
+			var label = new GroupLabel
+			{
+				OwnerId = ownerId,
+				Name = name,
+				IsDeleted = false,
+				ColorHex = colorHex
+			};
+			db.GroupLabels.Add(label);
+			await db.SaveChangesAsync();
+			return label;
+		}
+
+		public async Task AddLabelToGroup(int groupId, int labelId)
+		{
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				if (db.LabelsOnGroups.Any(g => g.LabelId == labelId && g.GroupId == groupId))
+					return;
+
+				var labelOnGroup = new LabelOnGroup
+				{
+					GroupId = groupId,
+					LabelId = labelId,
+				};
+				db.LabelsOnGroups.Add(labelOnGroup);
+				await db.SaveChangesAsync();
+
+				transaction.Commit();
+			}
+		}
+
+		public async Task RemoveLabelFromGroup(int groupId, int labelId)
+		{
+			var labels = db.LabelsOnGroups.Where(g => g.LabelId == labelId && g.GroupId == groupId);
+			db.LabelsOnGroups.RemoveRange(labels);
+			await db.SaveChangesAsync();
+		}
+
+		public List<int> GetGroupsWithSpecificLabel(int labelId)
+		{
+			return db.LabelsOnGroups.Where(l => l.LabelId == labelId).Select(l => l.GroupId).ToList();
+		}
+
+		public DefaultDictionary<int, List<int>> GetGroupsLabels(IEnumerable<int> groupsIds)
+		{
+			var groupsIdsSet = new HashSet<int>(groupsIds);
+			return db.LabelsOnGroups
+				.Where(l => groupsIdsSet.Contains(l.GroupId))
+				.GroupBy(l => l.GroupId)
+				.ToDictionary(g => g.Key, g => g.Select(l => l.LabelId).ToList())
+				.ToDefaultDictionary();
+		}
+
+		[CanBeNull]
+		public GroupLabel FindLabelById(int labelId)
+		{
+			return db.GroupLabels.Find(labelId);
+		}
+
+		public async Task<GroupAccess> GrantAccess(int groupId, string userId, GroupAccessType accessType, string grantedById)
+		{
+			var currentAccess = db.GroupAccesses.FirstOrDefault(a => a.GroupId == groupId && a.UserId == userId);
+			if (currentAccess == null)
+			{
+				currentAccess = new GroupAccess
+				{
+					GroupId = groupId,
+					UserId = userId,
+				};
+				db.GroupAccesses.Add(currentAccess);
+			}
+			currentAccess.AccessType = accessType;
+			currentAccess.GrantedById = grantedById;
+			currentAccess.GrantTime = DateTime.Now;
+			currentAccess.IsEnabled = true;
+
+			await db.SaveChangesAsync();
+			return db.GroupAccesses.Include(a => a.GrantedBy).Single(a => a.Id == currentAccess.Id);
+		}
+
+		public bool CanRevokeAccess(int groupId, string userId, IPrincipal revokedBy)
+		{
+			var revokedById = revokedBy.Identity.GetUserId();
+
+			var group = FindGroupById(groupId);
+			if (group.OwnerId == revokedById || revokedBy.HasAccessFor(group.CourseId, CourseRole.CourseAdmin))
+				return true;
+			return db.GroupAccesses.Any(a => a.GroupId == groupId && a.UserId == userId && a.GrantedById == revokedById && a.IsEnabled);
+		}
+
+		public async Task<List<GroupAccess>> RevokeAccess(int groupId, string userId)
+		{
+			var accesses = db.GroupAccesses.Where(a => a.GroupId == groupId && a.UserId == userId).ToList();
+			foreach (var access in accesses)
+				access.IsEnabled = false;
+
+			await db.SaveChangesAsync();
+			return accesses;
+		}
+
+		public List<GroupAccess> GetGroupAccesses(int groupId)
+		{
+			return db.GroupAccesses.Include(a => a.User).Where(a => a.GroupId == groupId && a.IsEnabled).ToList();
+		}
+
+		public DefaultDictionary<int, List<GroupAccess>> GetGroupsAccesses(IEnumerable<int> groupsIds)
+		{
+			return db.GroupAccesses.Include(a => a.User)
+				.Where(a => groupsIds.Contains(a.GroupId) && a.IsEnabled)
+				.GroupBy(a => a.GroupId)
+				.ToDictionary(g => g.Key, g => g.ToList())
+				.ToDefaultDictionary();
 		}
 	}
 }

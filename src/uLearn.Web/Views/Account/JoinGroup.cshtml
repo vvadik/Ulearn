@@ -1,4 +1,5 @@
-﻿@model string
+﻿@using uLearn
+@model Database.Models.Group
 
 @{
 	ViewBag.Title = "Присоединться к группе";
@@ -10,7 +11,12 @@
 	<form method="POST" action="">
 		@Html.AntiForgeryToken()
 		<p>
-			Вас пригласили присоединиться к&nbsp;группе «@Model».
+			@Model.Owner.VisibleName пригласил@(Model.Owner.Gender.ChooseEnding()) вас присоединиться к&nbsp;группе «@Model.Name».
+			Преподаватели группы смогут проверять ваши задания и тесты, проводить код-ревью и выставлять вам дополнительные баллы. 
+			Вступив, вы сможете смотреть ведомость всей группы прямо на&nbsp;сайте.
+		</p>
+		<p class="help-block">
+			Преподаватели группы увидят вашу электронную почту.
 		</p>
 		<button class="btn btn-success btn-large">Присоединиться</button>
 	</form>

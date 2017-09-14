@@ -87,13 +87,13 @@ namespace uLearn.Web.Controllers
 			result.UsersIds = new List<string>();
 			var usersIds = new HashSet<string>();
 
-			/* if groupsIds is empty, get members of all own groups. Available for instructors */
+			/* if groupsIds is empty, get members of all groups user has access to. Available for instructors */
 			if ((groupsIds.Count == 0 || groupsIds.Any(string.IsNullOrEmpty)) && User.HasAccessFor(courseId, CourseRole.Instructor))
 			{
-				var ownGroupsIds = groupsRepo.GetGroupsOwnedByUser(courseId, User).Select(g => g.Id).ToList();
-				foreach (var ownGroupId in ownGroupsIds)
+				var accessableGroupsIds = groupsRepo.GetMyGroupsFilterAccessibleToUser(courseId, User).Select(g => g.Id).ToList();
+				foreach (var accessableGroupId in accessableGroupsIds)
 				{
-					var groupUsersIds = groupsRepo.GetGroupMembers(ownGroupId).Select(u => u.Id);
+					var groupUsersIds = groupsRepo.GetGroupMembersAsUsers(accessableGroupId).Select(u => u.Id);
 					usersIds.AddAll(groupUsersIds);
 				}
 				result.UsersIds = usersIds.ToList();
@@ -108,7 +108,7 @@ namespace uLearn.Web.Controllers
 					var group = groupsRepo.FindGroupById(groupIdInt);
 					if (group != null)
 					{
-						var groupMembersIds = groupsRepo.GetGroupMembers(group.Id).Select(u => u.Id).ToList();
+						var groupMembersIds = groupsRepo.GetGroupMembersAsUsers(group.Id).Select(u => u.Id).ToList();
 						var hasAccessToGroup = groupsRepo.IsGroupAvailableForUser(group.Id, User);
 						if (allowSeeGroupForAnyMember)
 							hasAccessToGroup |= groupMembersIds.Contains(User.Identity.GetUserId());
@@ -134,8 +134,8 @@ namespace uLearn.Web.Controllers
 			/* if groupsIds is empty, get members of all own groups. Available for instructors */
 			if (groupsIds.Count == 0 || groupsIds.Any(string.IsNullOrEmpty))
 			{
-				var ownGroupsIds = groupsRepo.GetGroupsOwnedByUser(course.Id, User).Select(g => g.Id).ToList();
-				return enabledAdditionalScoringGroupsForGroups.Where(kv => ownGroupsIds.Contains(kv.Key)).SelectMany(kv => kv.Value).ToList();
+				var accessableGroupsIds = groupsRepo.GetMyGroupsFilterAccessibleToUser(course.Id, User).Select(g => g.Id).ToList();
+				return enabledAdditionalScoringGroupsForGroups.Where(kv => accessableGroupsIds.Contains(kv.Key)).SelectMany(kv => kv.Value).ToList();
 			}
 
 			var result = new List<string>();

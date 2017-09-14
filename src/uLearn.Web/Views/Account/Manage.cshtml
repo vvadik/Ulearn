@@ -27,7 +27,7 @@
 			<div class="row">
 				<section id="externalLogins" class="col-sm-10 col-sm-offset-2">
 					@Html.Action("RemoveAccountList")
-					@Html.Action("ExternalLoginsListPartial", "Login", new ExternalLoginsListModel { Action = "LinkLogin", ReturnUrl = ViewBag.ReturnUrl, Type = ExternalLoginListType.Link })
+					@Html.Action("ExternalLoginsListPartial", "Login", new ExternalLoginsListModel { Action = "DoLinkLogin", ReturnUrl = ViewBag.ReturnUrl, Type = ExternalLoginListType.Link })
 				</section>
 			</div>
 		</div>

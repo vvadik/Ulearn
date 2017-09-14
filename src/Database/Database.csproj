@@ -453,6 +453,18 @@
     <Compile Include="Migrations\201708311313257_RemoveRequiredFieldsOnStepikExportProcess.Designer.cs">
       <DependentUpon>201708311313257_RemoveRequiredFieldsOnStepikExportProcess.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709080920180_AddGroupLabelsAccessAndTimes.cs" />
+    <Compile Include="Migrations\201709080920180_AddGroupLabelsAccessAndTimes.Designer.cs">
+      <DependentUpon>201709080920180_AddGroupLabelsAccessAndTimes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709120648366_AddSomeGroupsNotifications.cs" />
+    <Compile Include="Migrations\201709120648366_AddSomeGroupsNotifications.Designer.cs">
+      <DependentUpon>201709120648366_AddSomeGroupsNotifications.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709120745261_RemoveGroupIsPublic.cs" />
+    <Compile Include="Migrations\201709120745261_RemoveGroupIsPublic.Designer.cs">
+      <DependentUpon>201709120745261_RemoveGroupIsPublic.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -468,6 +480,8 @@
     <Compile Include="Models\FeedUpdateTimestamp.cs" />
     <Compile Include="Models\GraderClient.cs" />
     <Compile Include="Models\Group.cs" />
+    <Compile Include="Models\GroupAccess.cs" />
+    <Compile Include="Models\GroupLabel.cs" />
     <Compile Include="Models\GroupMember.cs" />
     <Compile Include="Models\ISlideAction.cs" />
     <Compile Include="Models\Like.cs" />
@@ -746,6 +760,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201708311313257_RemoveRequiredFieldsOnStepikExportProcess.resx">
       <DependentUpon>201708311313257_RemoveRequiredFieldsOnStepikExportProcess.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709080920180_AddGroupLabelsAccessAndTimes.resx">
+      <DependentUpon>201709080920180_AddGroupLabelsAccessAndTimes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709120648366_AddSomeGroupsNotifications.resx">
+      <DependentUpon>201709120648366_AddSomeGroupsNotifications.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709120745261_RemoveGroupIsPublic.resx">
+      <DependentUpon>201709120745261_RemoveGroupIsPublic.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

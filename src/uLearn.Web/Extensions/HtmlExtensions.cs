@@ -100,7 +100,7 @@ namespace uLearn.Web.Extensions
 			var selectElement = selectDoc.Element("select");
 			if (selectElement != null)
 			{
-				var options = selectElement.XPathSelectElements("option").ToList();
+				var options = selectElement.XPathSelectElements("//option").ToList();
 
 				foreach (var option in options)
 				{

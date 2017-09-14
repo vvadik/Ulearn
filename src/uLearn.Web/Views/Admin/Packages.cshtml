@@ -14,7 +14,7 @@
 			Текущая версия загружена <b title="@Model.LastUpdate.ToPrettyString()">@Model.LastUpdate.ToAgoPrettyString()</b>
 
 			@Html.ActionLink("Скачать опубликованный пакет", "DownloadPackage", new { Model.CourseId }, new { @class = "btn btn-xs btn-primary", style = "margin-left: 10px" })
-			@Html.ActionLink("Скопировать на Степик", "ExportCourse", "Stepik", new { courseId = Model.CourseId }, new { @class = "btn btn-xs btn-success" })
+			@Html.ActionLink("Скопировать на Степик", "ExportCourse", "Stepik", new { courseId = Model.CourseId }, new { @class = "btn btn-xs btn-warning" })
 		</div>
 	}
 
