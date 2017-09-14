@@ -2,6 +2,11 @@
 	var addUserToGroupUrl = "/Admin/AddUserToGroup";
 	var token = $('input[name="__RequestVerificationToken"]').val();
 
+	$('input[name="__RequestVerificationToken"]').each(function() {
+		if ($(this).val() === '')
+			$(this).val(token);
+	});
+
 	var addAntiForgeryToken = function (data) {
 		var token = $('#__AjaxAntiForgeryForm input[name=__RequestVerificationToken]').val();
 		if (typeof (data) === 'string') {

@@ -66,6 +66,7 @@
 
 <div class="container">
 
+	@Html.AntiForgeryToken()
 	<h1>
 		Группы
 		<small>
@@ -142,14 +143,14 @@
 				<div class="group__links col-xs-2 col-md-4 col-lg-2 text-right">
 					@using (Html.BeginForm("ArchiveGroup", "Admin", FormMethod.Post, new { @class = "ib" }))
 					{
-						@Html.AntiForgeryToken()
+						@Html.Hidden("__RequestVerificationToken")
 						@Html.Hidden("groupId", group.Id)
 						@Html.Hidden("isArchived", !group.IsArchived)
 						<button class="archive-group__link visible-on-group-hover btn btn-default btn-xs" title="@(group.IsArchived ? "Вернуть группу из архива" : "Архивировать группу")">@(group.IsArchived ? "Вернуть" : "Архивировать")</button>
 					}
 					@using (Html.BeginForm("RemoveGroup", "Admin", FormMethod.Post, new { @class = "ib" }))
 					{
-						@Html.AntiForgeryToken()
+						@Html.Hidden("__RequestVerificationToken")
 						@Html.Hidden("groupId", group.Id)
 						<button class="remove-group__link visible-on-group-hover btn btn-link" title="Удалить группу"><span class="glyphicon glyphicon-trash"></span></button>
 					}
