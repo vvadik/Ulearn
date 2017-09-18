@@ -114,8 +114,8 @@ namespace uLearn.Web.Models
 		{
 			UserId = user.Id;
 			UserName = user.UserName;
-			UserEmail = user.Email;
-			UserVisibleName = user.VisibleName;
+			UserEmail = user.Email ?? "";
+			UserVisibleName = user.VisibleName ?? "";
 		}
 
 		public string UserId { get; set; }
