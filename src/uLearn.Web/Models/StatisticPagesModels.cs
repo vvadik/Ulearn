@@ -110,9 +110,18 @@ namespace uLearn.Web.Models
 
 	public class UnitStatisticUserInfo
 	{
+		public UnitStatisticUserInfo(ApplicationUser user)
+		{
+			UserId = user.Id;
+			UserName = user.UserName;
+			UserEmail = user.Email;
+			UserVisibleName = user.VisibleName;
+		}
+
 		public string UserId { get; set; }
 		public string UserVisibleName { get; set; }
 		public string UserName { get; set; }
+		public string UserEmail { get; set; }
 	}
 
 	public class DailyStatistics

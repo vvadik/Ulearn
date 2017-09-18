@@ -161,6 +161,11 @@ namespace Database.DataContexts
 		{
 			return db.Users.Where(u => u.UserName == usernameOrEmail || u.Email == usernameOrEmail).ToList();
 		}
+
+		public IEnumerable<ApplicationUser> GetUsersByIds(IEnumerable<string> usersIds)
+		{
+			return db.Users.Where(u => usersIds.Contains(u.Id));
+		}
 	}
 
 	/* System.String is not available for table-valued functions so we need to create ComplexTyped wrapper */

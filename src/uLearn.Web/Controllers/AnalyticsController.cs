@@ -111,9 +111,8 @@ namespace uLearn.Web.Controllers
 			/* If we filtered out users from one or several groups show them all */
 			if (filterOptions.UsersIds != null && !filterOptions.IsUserIdsSupplement)
 				usersIds = filterOptions.UsersIds;
-			var visitedUsers = usersIds
-				.Join(db.Users, v => v, u => u.Id, (v, u) => new UnitStatisticUserInfo { UserId = u.Id, UserName = u.UserName, UserVisibleName = (u.LastName + u.FirstName != "" ? u.LastName + " " + u.FirstName : u.UserName).Trim() })
-				.ToList();
+
+			var visitedUsers = usersRepo.GetUsersByIds(usersIds).Select(u => new UnitStatisticUserInfo(u)).ToList();
 			var isMore = visitedUsers.Count > usersLimit;
 
 			var visitedSlidesCountByUser = visitsRepo.GetVisitsInPeriod(filterOptions)
@@ -240,8 +239,7 @@ namespace uLearn.Web.Controllers
 
 			builder.AddStyleRule(s => s.Font.Bold = true);
 
-			builder.AddCell("");
-			builder.AddCell("");
+			builder.AddCell("", 3);
 			builder.AddCell("За весь курс", model.ScoringGroups.Count);
 			builder.AddStyleRule(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
 			foreach (var unit in model.Course.Units)
@@ -260,6 +258,7 @@ namespace uLearn.Web.Controllers
 			builder.GoToNewLine();
 
 			builder.AddCell("Фамилия Имя");
+			builder.AddCell("Эл. почта");
 			builder.AddCell("Группа");
 			foreach (var scoringGroup in model.ScoringGroups.Values)
 				builder.AddCell(scoringGroup.Abbreviation);
@@ -289,7 +288,7 @@ namespace uLearn.Web.Controllers
 				s.HorizontalAlignment = ExcelHorizontalAlignment.Right;
 				s.Font.Size = 10;
 			});
-			builder.AddCell("Максимум:", 2);
+			builder.AddCell("Максимум:", 3);
 			foreach (var scoringGroup in model.ScoringGroups.Values)
 				builder.AddCell(model.Course.Units.Sum(unit => model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup)));
 			foreach (var unit in model.Course.Units)
@@ -313,6 +312,7 @@ namespace uLearn.Web.Controllers
 			foreach (var user in model.VisitedUsers)
 			{
 				builder.AddCell(user.UserVisibleName);
+				builder.AddCell(user.UserEmail);
 				var userGroups = model.Groups.Where(g => model.VisitedUsersGroups[user.UserId].Contains(g.Id)).Select(g => g.Name).ToList();
 				builder.AddCell(string.Join(", ", userGroups));
 				foreach (var scoringGroup in model.ScoringGroups.Values)
@@ -347,7 +347,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Student)]
-		public ActionResult CourseStatistics(CourseStatisticsParams param, int max = 200)
+		public ActionResult CourseStatistics(CourseStatisticsParams param, int max=200)
 		{
 			var usersLimit = max;
 			if (usersLimit > 300)
@@ -361,7 +361,7 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 
-		/*TODO: extract copy-paste */
+		/* TODO: extract copy-paste */
 		private CourseStatisticPageModel GetCourseStatisticsModel(CourseStatisticsParams param, int usersLimit)
 		{
 			var courseId = param.CourseId;
@@ -390,9 +390,7 @@ namespace uLearn.Web.Controllers
 			if (filterOptions.UsersIds != null && !filterOptions.IsUserIdsSupplement)
 				usersIds = filterOptions.UsersIds;
 
-			var visitedUsers = usersIds
-				.Join(db.Users, v => v, u => u.Id, (v, u) => new UnitStatisticUserInfo { UserId = u.Id, UserName = u.UserName, UserVisibleName = (u.LastName + u.FirstName != "" ? u.LastName + " " + u.FirstName : u.UserName).Trim() })
-				.ToList();
+			var visitedUsers = usersRepo.GetUsersByIds(usersIds).Select(u => new UnitStatisticUserInfo(u)).ToList();
 			var isMore = visitedUsers.Count > usersLimit;
 
 			var unitBySlide = course.Units.SelectMany(u => u.Slides.Select(s => Tuple.Create(u.Id, s.Id))).ToDictionary(p => p.Item2, p => p.Item1);

@@ -148,6 +148,10 @@
 <thead>
 <tr>
 	<th rowspan="2">Фамилия Имя</th>
+	@if (Model.IsInstructor)
+	{
+		<th rowspan="2">Эл. почта</th>
+	}
 	<th colspan="@Model.ScoringGroups.Count" data-unit-id="sum">
 		<div class="unit-title" data-unit-id="sum">Сумма</div>
 	</th>
@@ -214,6 +218,10 @@
 	}
 </tr>
 <tr>
+	@if (Model.IsInstructor)
+	{
+		<th>&nbsp;</th>
+	}
 	<th class="scoring-group-max-score" style="text-align: right">Максимум:</th>
 	@foreach (var scoringGroup in Model.ScoringGroups.Values)
 	{
@@ -301,6 +309,10 @@
 	{
 		<tr class="student" data-user-id="@user.UserId" data-group="@groupId">
 			<td title="@(Model.IsInstructor ? user.UserName : user.UserVisibleName)" class="student-name">@user.UserVisibleName.TruncateWithEllipsis(30)</td>
+			@if (Model.IsInstructor)
+			{
+				<td title="@user.UserEmail" class="student-email">@user.UserEmail.TruncateWithEllipsis(30)</td>
+			}
 
 			@foreach (var scoringGroup in Model.ScoringGroups.Values)
 			{
