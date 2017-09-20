@@ -296,7 +296,7 @@ namespace uLearn.Web.Controllers
 			if (message == ManageMessageId.AlreadyLinkedToOtherUser )
 			{
 				var otherUser = await userManager.FindByIdAsync(otherUserId);
-				ViewBag.StatusMessage += $" {provider}. Аккаунт уже привязан к пользователю {otherUser.UserName}.";
+				ViewBag.StatusMessage += $" {provider ?? ""}. Аккаунт уже привязан к пользователю {otherUser?.UserName ?? ""}.";
 			}
 			ViewBag.IsStatusError = message?.GetAttribute<IsErrorAttribute>()?.IsError ?? IsErrorAttribute.DefaultValue;
 			ViewBag.HasLocalPassword = ControllerUtils.HasPassword(userManager, User);
