@@ -465,6 +465,14 @@
     <Compile Include="Migrations\201709120745261_RemoveGroupIsPublic.Designer.cs">
       <DependentUpon>201709120745261_RemoveGroupIsPublic.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709200701427_RemoveRequiredAdditionalScoreForeignKey.cs" />
+    <Compile Include="Migrations\201709200701427_RemoveRequiredAdditionalScoreForeignKey.Designer.cs">
+      <DependentUpon>201709200701427_RemoveRequiredAdditionalScoreForeignKey.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709200719448_RemoveRequiredNotificationTransportApplicationUserForeignKey.cs" />
+    <Compile Include="Migrations\201709200719448_RemoveRequiredNotificationTransportApplicationUserForeignKey.Designer.cs">
+      <DependentUpon>201709200719448_RemoveRequiredNotificationTransportApplicationUserForeignKey.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -769,6 +777,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709120745261_RemoveGroupIsPublic.resx">
       <DependentUpon>201709120745261_RemoveGroupIsPublic.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709200701427_RemoveRequiredAdditionalScoreForeignKey.resx">
+      <DependentUpon>201709200701427_RemoveRequiredAdditionalScoreForeignKey.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709200719448_RemoveRequiredNotificationTransportApplicationUserForeignKey.resx">
+      <DependentUpon>201709200719448_RemoveRequiredNotificationTransportApplicationUserForeignKey.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

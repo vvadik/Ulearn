@@ -725,8 +725,7 @@ namespace Database.Models
 	[NotificationType(NotificationType.ReceivedAdditionalScore)]
 	public class ReceivedAdditionalScoreNotification : Notification
 	{
-		[Required]
-		public int ScoreId { get; set; }
+		public int? ScoreId { get; set; }
 
 		public virtual AdditionalScore Score { get; set; }
 
@@ -766,7 +765,7 @@ namespace Database.Models
 
 		public override bool IsActual()
 		{
-			return Score != null;
+			return ScoreId != null && Score != null;
 		}
 	}
 
