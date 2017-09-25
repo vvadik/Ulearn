@@ -8,6 +8,7 @@ using Database.Extensions;
 using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
+using uLearn;
 
 namespace Database.DataContexts
 {
@@ -77,25 +78,38 @@ namespace Database.DataContexts
 			var commentForLike = db.Comments.Find(commentId);
 			if (commentForLike == null)
 				throw new Exception("Comment " + commentId + " not found");
-			var hisLike = db.CommentLikes.FirstOrDefault(x => x.UserId == userId && x.CommentId == commentId);
-			var votedAlready = hisLike != null;
-			var likesCount = commentForLike.Likes.Count;
-			if (votedAlready)
+
+			return await FuncUtils.TrySeveralTimesAsync(() => TryLikeComment(commentId, userId, commentForLike), 3);
+		}
+
+		private async Task<Tuple<int, bool>> TryLikeComment(int commentId, string userId, Comment commentForLike)
+		{
+			int likesCount;
+			bool votedAlready;
+			using (var transaction = db.Database.BeginTransaction())
 			{
-				db.CommentLikes.Remove(hisLike);
-				likesCount--;
-			}
-			else
-			{
-				db.CommentLikes.Add(new CommentLike
+				var hisLike = db.CommentLikes.FirstOrDefault(x => x.UserId == userId && x.CommentId == commentId);
+				votedAlready = hisLike != null;
+				likesCount = commentForLike.Likes.Count;
+				if (votedAlready)
 				{
-					UserId = userId,
-					CommentId = commentId,
-					Timestamp = DateTime.Now,
-				});
-				likesCount++;
+					db.CommentLikes.Remove(hisLike);
+					likesCount--;
+				}
+				else
+				{
+					db.CommentLikes.Add(new CommentLike
+					{
+						UserId = userId,
+						CommentId = commentId,
+						Timestamp = DateTime.Now,
+					});
+					likesCount++;
+				}
+				await db.SaveChangesAsync();
+
+				transaction.Commit();
 			}
-			await db.SaveChangesAsync();
 			return Tuple.Create(likesCount, !votedAlready);
 		}
 

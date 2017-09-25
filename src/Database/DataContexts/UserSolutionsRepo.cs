@@ -267,6 +267,11 @@ namespace Database.DataContexts
 
 		public UserExerciseSubmission FindNoTrackingSubmission(int id)
 		{
+			return FuncUtils.TrySeveralTimes(() => TryFindNoTrackingSubmission(id), 3, () => Thread.Sleep(TimeSpan.FromMilliseconds(200)));
+		}
+
+		private UserExerciseSubmission TryFindNoTrackingSubmission(int id)
+		{
 			var submission = db.UserExerciseSubmissions.AsNoTracking().SingleOrDefault(x => x.Id == id);
 			if (submission == null)
 				return null;
