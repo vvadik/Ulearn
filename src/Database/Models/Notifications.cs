@@ -783,11 +783,6 @@ namespace Database.Models
 
 		public virtual ApplicationUser JoinedUser { get; set; }
 
-		private static string GetGroupsUrl(Course course, string baseUrl)
-		{
-			return baseUrl + $"/Admin/Groups?courseId={course.Id.EscapeHtml()}";
-		}
-
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			return $"<b>{JoinedUser.VisibleName.EscapeHtml()}</b> присоедини{JoinedUser.Gender.ChooseEnding("лся", "лась")} к вашей группе «{Group.Name.EscapeHtml()}» по курсу «{course.Title.EscapeHtml()}».";
