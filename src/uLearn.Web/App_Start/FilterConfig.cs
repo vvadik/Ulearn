@@ -9,9 +9,9 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Database.DataContexts;
 using Microsoft.AspNet.Identity;
-using SkbKontur.Passport.Client;
 using uLearn.Extensions;
 using uLearn.Web.Kontur.Passport;
+using SkbKontur.Passport.Client;
 
 namespace uLearn.Web
 {
@@ -100,8 +100,7 @@ namespace uLearn.Web
 			var httpContext = filterContext.RequestContext.HttpContext;
 
 			var queryString = httpContext.Request.QueryString ?? new NameValueCollection();
-			var queryStringParams = HttpUtility.ParseQueryString(queryString.ToString()).ToDictionary();
-			var konturPassportRequired = Convert.ToBoolean(queryStringParams.GetOrDefault(queryStringParameterName, "false"));
+			var konturPassportRequired = Convert.ToBoolean(queryString.Get(queryStringParameterName) ?? "false");
 
 			if (!konturPassportRequired)
 				return;
