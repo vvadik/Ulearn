@@ -2,6 +2,7 @@
 using System.Linq;
 using Elmah;
 using log4net;
+using uLearn.Extensions;
 using uLearn.Web.Telegram;
 
 namespace uLearn.Web
@@ -15,7 +16,8 @@ namespace uLearn.Web
 		{
 			"The provided anti-forgery token was meant for user",
 			"The required anti-forgery cookie \"__RequestVerificationToken\" is not present.",
-			"Error executing child request for handler 'System.Web.Mvc.HttpHandlerUtil+ServerExecuteHttpHandlerAsyncWrapper'."
+			"Error executing child request for handler 'System.Web.Mvc.HttpHandlerUtil+ServerExecuteHttpHandlerAsyncWrapper'.",
+			"A potentially dangerous Request.Path value was detected from the client"
 		};
 
 		public ErrorLogModule()
@@ -35,7 +37,7 @@ namespace uLearn.Web
 			var error = args.Entry.Error;
 			var entryId = args.Entry.Id;
 			log.Error($"Произошла ошибка {entryId} (код {error.StatusCode}, подробности в Elmah):\n" +
-					$"Query string: {error.QueryString}",
+					$"Query string: {error.QueryString.ToQueryString()}",
 				error.Exception);
 
 			if (!IsErrorIgnoredForTelegramChannel(error))
