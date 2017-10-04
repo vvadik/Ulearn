@@ -27,7 +27,9 @@ function displayVisits() {
 		return;
 	var visits = JSON.parse(localStorage['visits']);
 	for (var visit in visits) {
-		var glyph = $('[data-slide-id="' + visit + '"] > i');
+		var splittedVisit = visit.split(' ');
+		var slideId = splittedVisit.length > 1 ? splittedVisit[1] : splittedVisit[0];
+		var glyph = $('[data-slide-id="' + slideId + '"] > i');
 		if (glyph.hasClass('glyphicon-none')) {
 			glyph.removeClass('glyphicon-none');
 			glyph.addClass('glyphicon-ok');

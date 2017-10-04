@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Database;
 using Database.DataContexts;
 using Database.Models;
 using Microsoft.AspNet.Identity;
@@ -17,7 +15,6 @@ namespace uLearn.Web.Controllers
 	public class VisitsController : Controller
 	{
 		private readonly VisitsRepo visitsRepo = new VisitsRepo(new ULearnDb());
-		private readonly CourseManager courseManager = WebCourseManager.Instance;
 
 		[HttpPost]
 		public async Task<ActionResult> Upload()
@@ -26,13 +23,12 @@ namespace uLearn.Web.Controllers
 			var visitsDictionary = JsonConvert.DeserializeObject<Dictionary<string, DateTime>>(visitsAsText);
 			var userId = User.Identity.GetUserId();
 			var visits = new List<Visit>();
-			var slides = courseManager.GetCourses().SelectMany(course => course.Slides.Select(slide => new { courseId = course.Id, slideId = slide.Id })).ToDictionary(arg => arg.slideId, arg => arg.courseId);
 			foreach (var visit in visitsDictionary)
 			{
-				var slideId = Guid.Parse(visit.Key);
-				string courseId;
-				if (!slides.TryGetValue(slideId, out courseId))
-					continue;
+				/* visit.Key is "<courseId> <slideId>" */
+				var splittedVisit = visit.Key.Split(' ');
+				var courseId = splittedVisit[0];
+				var slideId = Guid.Parse(splittedVisit.Length > 1 ? splittedVisit[1] : splittedVisit[0]);
 				visits.Add(new Visit
 				{
 					UserId = userId,

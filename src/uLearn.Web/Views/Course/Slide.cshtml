@@ -121,7 +121,7 @@
 	else
 	{
 		<script>
-			saveVisits("@Model.Slide.Id", "@DateTime.Now.ToString("u")");
+			saveVisits("@Model.CourseId @Model.Slide.Id", "@DateTime.Now.ToString("u")");
 			displayVisits();
 		</script>
 	}
