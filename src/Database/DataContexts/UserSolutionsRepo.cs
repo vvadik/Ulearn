@@ -281,11 +281,15 @@ namespace Database.DataContexts
 			return submission;
 		}
 
-		private static readonly SemaphoreSlim getSubmissionsSemaphore = new SemaphoreSlim(1, 1);
+		private static readonly SemaphoreSlim getSubmissionsSemaphore = new SemaphoreSlim(0, 1);
 
 		public async Task<List<UserExerciseSubmission>> GetUnhandledSubmissions(int count)
 		{
-			await getSubmissionsSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
+			var semaphoreLocked = await getSubmissionsSemaphore.WaitAsync(TimeSpan.FromSeconds(5));
+			if (!semaphoreLocked)
+			{
+				log.Error("GetUnhandledSubmissions(): Can't lock semaphore for 5 seconds");
+			}
 			try
 			{
 				return await FuncUtils.TrySeveralTimesAsync(() => TryGetExerciseSubmissions(count), 3);
