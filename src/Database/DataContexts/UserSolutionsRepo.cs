@@ -281,7 +281,7 @@ namespace Database.DataContexts
 			return submission;
 		}
 
-		private static readonly SemaphoreSlim getSubmissionsSemaphore = new SemaphoreSlim(0, 1);
+		private static readonly SemaphoreSlim getSubmissionsSemaphore = new SemaphoreSlim(1);
 
 		public async Task<List<UserExerciseSubmission>> GetUnhandledSubmissions(int count)
 		{
