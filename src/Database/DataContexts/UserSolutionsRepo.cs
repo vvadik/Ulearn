@@ -285,14 +285,21 @@ namespace Database.DataContexts
 
 		public async Task<List<UserExerciseSubmission>> GetUnhandledSubmissions(int count)
 		{
-			var semaphoreLocked = await getSubmissionsSemaphore.WaitAsync(TimeSpan.FromSeconds(5));
+			var semaphoreLocked = await getSubmissionsSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
 			if (!semaphoreLocked)
 			{
-				log.Error("GetUnhandledSubmissions(): Can't lock semaphore for 5 seconds");
+				log.Error("GetUnhandledSubmissions(): Can't lock semaphore for 2 seconds");
+				return new List<UserExerciseSubmission>();
 			}
+
 			try
 			{
-				return await FuncUtils.TrySeveralTimesAsync(() => TryGetExerciseSubmissions(count), 3);
+				return await TryGetExerciseSubmissions(count);
+			}
+			catch (Exception e)
+			{
+				log.Error("GetUnhandledSubmissions()", e);
+				return new List<UserExerciseSubmission>();
 			}
 			finally
 			{
