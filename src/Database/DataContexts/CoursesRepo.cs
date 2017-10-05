@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
+using Database.Extensions;
 using Database.Models;
+using Microsoft.AspNet.Identity;
+using uLearn;
+using uLearn.Extensions;
 
 namespace Database.DataContexts
 {
@@ -67,6 +73,57 @@ namespace Database.DataContexts
 
 			db.CourseVersions.Remove(courseVersion);
 			await db.SaveChangesAsync();
+		}
+
+		/* Course accesses */
+		public async Task<CourseAccess> GrantAccess(string courseId, string userId, CourseAccessType accessType, string grantedById)
+		{
+			var currentAccess = db.CourseAccesses.FirstOrDefault(a => a.CourseId == courseId && a.UserId == userId);
+			if (currentAccess == null)
+			{
+				currentAccess = new CourseAccess
+				{
+					CourseId = courseId,
+					UserId = userId,
+				};
+				db.CourseAccesses.Add(currentAccess);
+			}
+			currentAccess.AccessType = accessType;
+			currentAccess.GrantedById = grantedById;
+			currentAccess.GrantTime = DateTime.Now;
+			currentAccess.IsEnabled = true;
+
+			await db.SaveChangesAsync();
+			return db.CourseAccesses.Include(a => a.GrantedBy).Single(a => a.Id == currentAccess.Id);
+		}
+
+		public bool CanRevokeAccess(string courseId, string userId, IPrincipal revokedBy)
+		{
+			return revokedBy.HasAccessFor(courseId, CourseRole.Instructor);
+		}
+
+		public async Task<List<CourseAccess>> RevokeAccess(string courseId, string userId)
+		{
+			var accesses = db.CourseAccesses.Where(a => a.CourseId == courseId && a.UserId == userId).ToList();
+			foreach (var access in accesses)
+				access.IsEnabled = false;
+
+			await db.SaveChangesAsync();
+			return accesses;
+		}
+
+		public List<CourseAccess> GetCourseAccesses(string courseId)
+		{
+			return db.CourseAccesses.Include(a => a.User).Where(a => a.CourseId == courseId && a.IsEnabled).ToList();
+		}
+
+		public DefaultDictionary<string, List<CourseAccess>> GetCoursesAccesses(IEnumerable<string> coursesIds)
+		{
+			return db.CourseAccesses.Include(a => a.User)
+				.Where(a => coursesIds.Contains(a.CourseId) && a.IsEnabled)
+				.GroupBy(a => a.CourseId)
+				.ToDictionary(g => g.Key, g => g.ToList())
+				.ToDefaultDictionary();
 		}
 	}
 }

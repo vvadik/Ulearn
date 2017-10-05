@@ -175,7 +175,6 @@ namespace Database.DataContexts
 			return group;
 		}
 
-
 		public async Task RemoveGroup(int groupId)
 		{
 			var group = db.Groups.Find(groupId);
@@ -566,6 +565,8 @@ namespace Database.DataContexts
 		{
 			return db.GroupLabels.Find(labelId);
 		}
+
+		/* Group accesses */
 
 		public async Task<GroupAccess> GrantAccess(int groupId, string userId, GroupAccessType accessType, string grantedById)
 		{

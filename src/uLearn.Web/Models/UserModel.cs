@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Database;
+using Database.Models;
 
 namespace uLearn.Web.Models
 {
@@ -23,17 +24,30 @@ namespace uLearn.Web.Models
 		public string UserId { get; private set; }
 		public string UserName { get; private set; }
 		public string UserVisibleName { get; private set; }
-		public Dictionary<string, ICoursesAccessListModel> CoursesAccess { get; set; }
+		public Dictionary<string, ICoursesRolesListModel> CourseRoles { get; set; }
+		public Dictionary<CourseAccessType, CourseAccessModel> CourseAccesses { get; set; }
 	}
 
-	public interface ICoursesAccessListModel
+	public interface ICoursesRolesListModel
 	{
 	}
 
-	public class SingleCourseAccessModel : ICoursesAccessListModel
+	public class SingleCourseRolesModel : ICoursesRolesListModel
 	{
 		public bool HasAccess { get; set; }
 		public string ToggleUrl { get; set; }
+	}
+
+	public class CourseRoleModel
+	{
+		public string CourseId { get; set; }
+		public bool HasAccess { get; set; }
+		public string ToggleUrl { get; set; }
+	}
+
+	public class ManyCourseRolesModel : ICoursesRolesListModel
+	{
+		public List<CourseRoleModel> CourseRoles { get; set; }
 	}
 
 	public class CourseAccessModel
@@ -41,10 +55,5 @@ namespace uLearn.Web.Models
 		public string CourseId { get; set; }
 		public bool HasAccess { get; set; }
 		public string ToggleUrl { get; set; }
-	}
-
-	public class ManyCourseAccessModel : ICoursesAccessListModel
-	{
-		public List<CourseAccessModel> CoursesAccesses { get; set; }
 	}
 }

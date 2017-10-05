@@ -481,6 +481,7 @@
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\CommentLike.cs" />
     <Compile Include="Models\CommentPolicy.cs" />
+    <Compile Include="Models\CourseAccess.cs" />
     <Compile Include="Models\CourseVersion.cs" />
     <Compile Include="Models\EnabledAdditionalScoringGroup.cs" />
     <Compile Include="Models\ExerciseCodeReview.cs" />

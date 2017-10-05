@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace uLearn.Extensions
 {
@@ -24,6 +25,12 @@ namespace uLearn.Extensions
 			}
 			result = null;
 			return false;
+		}
+
+		/* Mark your enum with [Display(Name = "any text")] and retrieve Name via this function */
+		public static string GetDisplayName(this Enum type)
+		{
+			return type.GetAttribute<DisplayAttribute>().GetName();
 		}
 	}
 }

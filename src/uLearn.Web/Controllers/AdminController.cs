@@ -463,16 +463,15 @@ namespace uLearn.Web.Controllers
 			{
 				var user = new UserModel(userRolesInfo);
 
-				List<CourseRole> roles;
-				if (!rolesForUsers.TryGetValue(userRolesInfo.UserId, out roles))
+				if (!rolesForUsers.TryGetValue(userRolesInfo.UserId, out List<CourseRole> roles))
 					roles = new List<CourseRole>();
 
-				user.CoursesAccess = Enum.GetValues(typeof(CourseRole))
+				user.CourseRoles = Enum.GetValues(typeof(CourseRole))
 					.Cast<CourseRole>()
 					.Where(courseRole => courseRole != CourseRole.Student)
 					.ToDictionary(
 						courseRole => courseRole.ToString(),
-						courseRole => (ICoursesAccessListModel)new SingleCourseAccessModel
+						courseRole => (ICoursesRolesListModel)new SingleCourseRolesModel
 						{
 							HasAccess = roles.Contains(courseRole),
 							ToggleUrl = Url.Action("ToggleRole", "Account", new { courseId, userId = user.UserId, role = courseRole })
