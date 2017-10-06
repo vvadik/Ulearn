@@ -21,6 +21,7 @@
 		</li>
 	}
 }
+
 @helper UnreadCountLabel(List<Notification> notifications)
 {
 	var unreadCount = notifications.Count(n => n.CreateTime >= Model.LastViewTimestamp);

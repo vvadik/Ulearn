@@ -254,6 +254,26 @@ namespace uLearn.Web.Controllers
 			return View(new UserCourseModel(course, user, db));
 		}
 
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		public async Task<ActionResult> Profile(string userId)
+		{
+			var isCourseAdmin = User.HasAccess(CourseRole.CourseAdmin);
+			if (!groupsRepo.CanInstructorViewStudent(User, userId))
+				return HttpNotFound();
+			
+			var user = usersRepo.FindUserById(userId);
+			if (user == null)
+				return HttpNotFound();
+
+			var logins = await userManager.GetLoginsAsync(userId);
+
+			return View(new ProfileModel
+			{
+				User = user,
+				Logins = logins
+			});
+		}
+
 		[AllowAnonymous]
 		public ActionResult Register(string returnUrl = null)
 		{
@@ -647,6 +667,12 @@ namespace uLearn.Web.Controllers
 			/* If email has been sent less than 1 day ago, show popup. Double popup is disabled via cookies and javascript */
 			return PartialView("EmailIsNotConfirmedPopup", user);
 		}
+	}
+
+	public class ProfileModel
+	{
+		public ApplicationUser User { get; set; }
+		public IList<UserLoginInfo> Logins { get; set; }
 	}
 
 	public class IsErrorAttribute : Attribute

@@ -359,6 +359,23 @@ namespace Database.DataContexts
 		{
 			return db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId).ToList();
 		}
+		
+		public List<GroupMember> GetGroupsMembers(List<int> groupsIds)
+		{
+			return db.GroupMembers.Include(m => m.User).Where(m => groupsIds.Contains(m.GroupId)).ToList();
+		}
+
+		/* Instructor can view student if he is course admin or if student is member of one of accessable for instructor group */
+		public bool CanInstructorViewStudent(IPrincipal instructor, string studentId)
+		{
+			if (instructor.HasAccess(CourseRole.CourseAdmin))
+				return true;
+
+			var coursesIds = courseManager.GetCourses().Select(c => c.Id).ToList();
+			var groups = GetAvailableForUserGroups(coursesIds, instructor);
+			var members = GetGroupsMembers(groups.Select(g => g.Id).ToList());
+			return members.Select(m => m.UserId).Contains(studentId);
+		}
 
 		public Dictionary<string, List<Group>> GetUsersGroups(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)
 		{

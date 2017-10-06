@@ -1,0 +1,47 @@
+﻿@using uLearn.Web.Kontur.Passport
+@using uLearn.Web.Microsoft.Owin.Security.VK
+@using uLearn.Web.Views.Shared
+@model uLearn.Web.Controllers.ProfileModel
+
+@{
+	ViewBag.Title = Model.User.VisibleName;
+}
+
+<div class="container">
+	<h2>@Model.User.VisibleName</h2>
+	<div class="pull-left profile__avatar">
+		@UserAvatar.LargeAvatar(Model.User)
+	</div>
+	<div>
+		<div><b>@Model.User.UserName</b>, <a href="mailto:@Model.User.Email">@Model.User.Email</a>@(!Model.User.EmailConfirmed ? " <i>не подтверждена</i>" : "")</div>
+		@{
+			var vkLogin = Model.Logins.FirstOrDefault(l => l.LoginProvider == VkAuthenticationConstants.AuthenticationType);
+			if (vkLogin != null)
+			{
+				<div><b>ВКонтакте:</b> <a href="https://vk.com/id@(vkLogin.ProviderKey)" target="_blank" title="Откроется в новой вкладке">id@(vkLogin.ProviderKey)</a></div>
+			}
+
+			var konturPassportLogin = Model.Logins.FirstOrDefault(l => l.LoginProvider == KonturPassportConstants.AuthenticationType);
+			if (konturPassportLogin != null)
+			{
+				<div><b>Контур.Паспорт:</b> @konturPassportLogin.ProviderKey</div>
+			}
+
+			if (Model.User.HasTelegram)
+			{
+				<div>
+					<b>Телеграм:</b> 
+					@if (!string.IsNullOrEmpty(Model.User.TelegramChatTitle))
+					{
+						<a href="https://t.me/@(Model.User.TelegramChatTitle)">@@@Model.User.TelegramChatTitle</a>
+					}
+					else
+					{
+						@Model.User.TelegramChatId <i>(никнейм не&nbsp;указан)</i>
+					}
+				</div>
+			}
+		}
+	</div>
+
+</div>

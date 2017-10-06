@@ -959,6 +959,11 @@ li.li-success {
 	height: 18px;
 }
 
+.user__avatar.large {
+	width: 100px;
+	height: 100px;
+}
+
 .user__avatar.user__avatar__placeholder {
 	color: white;
 	font-size: 25pt;
@@ -974,6 +979,11 @@ li.li-success {
 .user__avatar.user__avatar__placeholder.xsmall {
 	font-size: 9pt;
 	padding-top: 1px;
+}
+
+.user__avatar.user__avatar__placeholder.large {
+	font-size: 40pt;
+	padding-top: 10px;
 }
 
 /* Login and registration forms */
@@ -2321,3 +2331,8 @@ h4 + div > .notifications__transport-settings__course__link {
 	padding-right: 15px;
 }
 /* End of profile */
+
+/* Other user's profile page '*/
+.profile__avatar {
+	margin-right: 10px;
+}

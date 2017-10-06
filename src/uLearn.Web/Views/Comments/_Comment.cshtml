@@ -1,4 +1,5 @@
-﻿@using Database.Models
+﻿@using Database.Extensions
+@using Database.Models
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Shared
 @model CommentViewModel
@@ -29,10 +30,20 @@
 		 @(Model.Comment.IsCorrectAnswer ? "is-correct-answer" : "")
 		 media"
 		data-comment-id="@Model.Comment.Id">
-
-		<a class="pull-left" href="#">
-			@UserAvatar.Avatar(Model.Comment.Author, "comment__author-avatar media-object")
-		</a>
+		
+		@if (User.HasAccess(CourseRole.CourseAdmin))
+		{
+			<a class="pull-left" href="@Url.Action("Profile", "Account", new { userId = Model.Comment.AuthorId })">
+				@UserAvatar.Avatar(Model.Comment.Author, "comment__author-avatar media-object")
+			</a>
+		}
+		else
+		{
+			<div class="pull-left">
+				@UserAvatar.Avatar(Model.Comment.Author, "comment__author-avatar media-object")
+			</div>
+		}
+		
 		<div class="media-body">
 			<div class="comment__header media-heading">
 				<div class="comment__author-name">

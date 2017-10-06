@@ -197,6 +197,27 @@ WriteTo(__razor_helper_writer, Avatar(user, "xsmall " + classes));
 #line default
 #line hidden
 
+#line default
+#line hidden
+public static System.Web.WebPages.HelperResult LargeAvatar(ApplicationUser user, string classes = "")
+{
+#line default
+#line hidden
+return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
+ 
+	
+WriteTo(__razor_helper_writer, Avatar(user, "large " + classes));
+
+                                     
+
+});
+
+#line default
+#line hidden
+}
+#line default
+#line hidden
+
     }
 }
 #pragma warning restore 1591
