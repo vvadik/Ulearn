@@ -458,7 +458,7 @@ namespace Database.Models
 
 		protected string GetHtmlCommentText(Comment comment)
 		{
-			return comment.Text.Trim().EscapeHtml().RenderSimpleMarkdown().Replace("\n", "<br/>");
+			return comment.Text.Trim().EscapeHtml().RenderSimpleMarkdown(isHtml: false, telegramMode: true).Replace("\n", "<br/>");
 		}
 	}
 

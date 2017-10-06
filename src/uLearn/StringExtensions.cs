@@ -169,13 +169,13 @@ namespace uLearn
 			return Regex.Replace(text, "[\"»]", @"“");
 		}
 
-		public static string RenderSimpleMarkdown(this string text, bool isHtml=true)
+		public static string RenderSimpleMarkdown(this string text, bool isHtml=true, bool telegramMode=false)
 		{
 			text = Regex.Replace(text, @"\*\*(.+?)\*\*", @"<b>$1</b>", RegexOptions.Multiline);
 			text = Regex.Replace(text, @"__(.+?)__", @"<i>$1</i>", RegexOptions.Multiline);
 			var newLineRegExp = isHtml ? @"\<br/?\>" : "\n";
-			text = Regex.Replace(text, @"(?:" + newLineRegExp + @")*```(?:" + newLineRegExp + @")*(.+?)```(?:" + newLineRegExp + @")*", @"<pre>$1</pre>", RegexOptions.Multiline);
-			text = Regex.Replace(text, @"`(.+?)`", @"<span class='inline-pre'>$1</span>");
+			text = Regex.Replace(text, @"(?:" + newLineRegExp + @")*```(?:" + newLineRegExp + @")*(.+?)```(?:" + newLineRegExp + @")*", telegramMode ? @"<code>$1</code>" : @"<pre>$1</pre>", RegexOptions.Multiline);
+			text = Regex.Replace(text, @"`(.+?)`", telegramMode ? @"<pre></pre>" : @"<span class='inline-pre'>$1</span>");
 			return text;
 		}
 	}

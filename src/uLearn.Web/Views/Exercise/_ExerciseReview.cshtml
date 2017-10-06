@@ -1,6 +1,7 @@
 ﻿@using Database.Models
 @using Database.Extensions
 @using Microsoft.AspNet.Identity
+@using uLearn
 @using uLearn.Web.Extensions
 @model ExerciseCodeReviewModel
 
@@ -39,6 +40,6 @@
 		}
 	</div>
 	<div class="exercise__review__comment">
-		@Html.Raw(Html.EncodeMultiLineText(Model.Review.Comment, keepFirstSpaces: true))
+		@Html.Raw(Html.EncodeMultiLineText(Model.Review.Comment, keepFirstSpaces: true).RenderSimpleMarkdown())
 	</div>
 </div>

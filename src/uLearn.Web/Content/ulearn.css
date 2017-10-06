@@ -779,6 +779,10 @@ li.li-success {
 	color: #700;
 }
 
+.comments .comment__text b {
+	font-weight: 600;
+}
+
 .comments .comment__text pre:not(.inline) {
 	margin: 10px 0;
 }
