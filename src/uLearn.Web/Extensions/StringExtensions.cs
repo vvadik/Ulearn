@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web;
+using OfficeOpenXml.FormulaParsing;
 
 namespace uLearn.Web.Extensions
 {
 	public static class StringExtensions
 	{
-		public static string TruncateWithEllipsis(this string s, int maxLength, string ellipsis = "...")
+		public static string TruncateWithEllipsis(this string s, int maxLength, string ellipsis="...")
 		{
 			if (maxLength < 0)
 				return s;
@@ -15,6 +17,57 @@ namespace uLearn.Web.Extensions
 
 			if (s.Length > maxLength - ellipsis.Length)
 				return s.Substring(0, maxLength - ellipsis.Length) + ellipsis;
+
+			return s;
+		}
+
+		public static string TruncateHtmlWithEllipsis(this string s, int maxLength, string ellipsis = "...")
+		{
+			if (maxLength < 0)
+				return s;
+
+			if (ellipsis.Length > maxLength)
+				throw new ArgumentOutOfRangeException("length", maxLength, "length must be at least as long as ellipsis.");
+
+			var inTag = false;
+			var realCharsCount = 0;
+			var tags = new Stack<string>();
+			var currentTag = "";
+			var isClosingTag = false;
+			for (var i = 0; i < s.Length; i++)
+			{
+				if (s[i] == '<' && !inTag)
+				{
+					currentTag = "";
+					inTag = true;
+					isClosingTag = false;
+				}
+				if (s[i] == '>' && inTag)
+				{
+					if (isClosingTag && tags.Count > 0)
+						tags.Pop();
+					if (! isClosingTag)
+						tags.Push(currentTag);
+					inTag = false;
+				}
+				if (inTag)
+				{
+					if (s[i] == '/' && s[i - 1] == '<')
+						isClosingTag = true;
+					else
+						currentTag += s[i];
+					continue;
+				}
+
+				realCharsCount++;
+				if (realCharsCount == maxLength)
+				{
+					var closingTags = "";
+					while (tags.Count > 0)
+						closingTags += $"</{tags.Pop()}>";
+					return s.Substring(0, i + 1) + closingTags + ellipsis;
+				}
+			}
 
 			return s;
 		}

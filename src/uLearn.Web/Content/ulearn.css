@@ -779,14 +779,6 @@ li.li-success {
 	color: #700;
 }
 
-.comments .comment__text pre.inline {
-	display: inline;
-	margin: 0;
-	border-width: 0;
-	padding: 0 5px;
-	overflow: visible;
-}
-
 .comments .comment__text pre:not(.inline) {
 	margin: 10px 0;
 }

@@ -174,8 +174,8 @@ namespace uLearn
 			text = Regex.Replace(text, @"\*\*(.+?)\*\*", @"<b>$1</b>", RegexOptions.Multiline);
 			text = Regex.Replace(text, @"__(.+?)__", @"<i>$1</i>", RegexOptions.Multiline);
 			var newLineRegExp = isHtml ? @"\<br/?\>" : "\n";
-			text = Regex.Replace(text, @"(?:" + newLineRegExp + @")*```(.+?)```(?:" + newLineRegExp + @")*", @"<pre>$1</pre>", RegexOptions.Multiline);
-			text = Regex.Replace(text, @"`(.+?)`", @"<pre class='inline'>$1</pre>");
+			text = Regex.Replace(text, @"(?:" + newLineRegExp + @")*```(?:" + newLineRegExp + @")*(.+?)```(?:" + newLineRegExp + @")*", @"<pre>$1</pre>", RegexOptions.Multiline);
+			text = Regex.Replace(text, @"`(.+?)`", @"<span class='inline-pre'>$1</span>");
 			return text;
 		}
 	}

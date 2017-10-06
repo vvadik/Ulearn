@@ -81,12 +81,10 @@ namespace uLearn.Web.Controllers
 				return Tuple.Create(0, (DateTime?)null);
 
 			var realFrom = from ?? feedRepo.GetFeedViewTimestamp(userId) ?? DateTime.MinValue;
-			var unreadCount = feedRepo.GetNotificationsCount(userId, realFrom, commonFeedNotificationTransport, notificationTransport);
+			var unreadCount = feedRepo.GetNotificationsCount(userId, realFrom, notificationTransport);
 			if (unreadCount > 0)
 			{
-				from = feedRepo.GetLastDeliveryTimestamp(commonFeedNotificationTransport).MaxWith(
-					feedRepo.GetLastDeliveryTimestamp(notificationTransport)
-				);
+				from = feedRepo.GetLastDeliveryTimestamp(notificationTransport);
 			}
 
 			return Tuple.Create(unreadCount, from);
@@ -115,30 +113,39 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			var notificationTransport = feedRepo.GetUsersFeedNotificationTransport(userId);
 
-			var notifications = new List<Notification>();
+			var importantNotifications = new List<Notification>();
+			var commentsNotifications = new List<Notification>();
 			if (notificationTransport != null)
-				notifications = feedRepo.GetFeedNotificationDeliveries(userId, commonFeedNotificationTransport, notificationTransport).Select(d => d.Notification).ToList();
+			{
+				importantNotifications = feedRepo.GetFeedNotificationDeliveries(userId, notificationTransport).Select(d => d.Notification).ToList();
+				commentsNotifications = feedRepo.GetFeedNotificationDeliveries(userId, commonFeedNotificationTransport).Select(d => d.Notification).ToList();
+			}
 
-			notifications = RemoveBlockedNotifications(notifications).ToList();
+			importantNotifications = RemoveBlockedNotifications(importantNotifications).ToList();
+			commentsNotifications = RemoveBlockedNotifications(commentsNotifications, importantNotifications).ToList();
 
 			var lastViewTimestamp = feedRepo.GetFeedViewTimestamp(userId);
 			await feedRepo.UpdateFeedViewTimestamp(userId, DateTime.Now);
 
 			return new FeedNotificationsModel
 			{
-				Notifications = notifications,
+				ImportantNotifications = importantNotifications,
+				CommentsNotifications = commentsNotifications,
 				LastViewTimestamp = lastViewTimestamp,
 				CourseManager = courseManager,
 			};
 		}
 
-		private IEnumerable<Notification> RemoveBlockedNotifications(IReadOnlyCollection<Notification> notifications)
+		private IEnumerable<Notification> RemoveBlockedNotifications(IReadOnlyCollection<Notification> notifications, IReadOnlyCollection<Notification> searchBlockersAlsoIn=null)
 		{
 			var notificationsIds = notifications.Select(n => n.Id).ToList();
+			var searchBlockersAlsoInIds = searchBlockersAlsoIn?.Select(n => n.Id).ToList();
 			foreach (var notification in notifications)
 			{
 				var blockers = notification.GetBlockerNotifications(db);
 				if (blockers.Select(b => b.Id).Intersect(notificationsIds).Any())
+					continue;
+				if (searchBlockersAlsoInIds != null && blockers.Select(b => b.Id).Intersect(searchBlockersAlsoInIds).Any())
 					continue;
 				yield return notification;
 			}
@@ -160,7 +167,9 @@ namespace uLearn.Web.Controllers
 
 	public class FeedNotificationsModel
 	{
-		public List<Notification> Notifications { get; set; }
+		public List<Notification> ImportantNotifications { get; set; }
+		public List<Notification> CommentsNotifications { get; set; }
+
 		public DateTime? LastViewTimestamp { get; set; }
 		public CourseManager CourseManager { get; set; }
 	}

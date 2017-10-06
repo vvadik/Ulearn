@@ -39,6 +39,24 @@
 		}
 	});
 
+	$(document).on('click', '.notifications__feed-switcher a', function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		var $self = $(this);
+		var feed = $self.data('feed');
+		if ($self.hasClass('active'))
+			return;
+
+		var $feeds = $('.notifications__feed');
+		var $switchers = $('.notifications__feed-switcher a');
+		$switchers.removeClass('active');
+		$feeds.removeClass('active');
+
+		$self.addClass('active');
+		$feeds.filter('[data-feed="' + feed + '"]').addClass('active');
+	});
+
 	var updateNotificationUnreadCount = function () {
 		var url = $notificaticationsIconLink.data('countUrl').replace('LAST_TIMESTAMP', lastCountUpdateTimestamp);
 		$.getJSON(url, function (data) {

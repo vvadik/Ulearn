@@ -4,21 +4,56 @@
 
 @model uLearn.Web.Controllers.FeedNotificationsModel
 
-@if (Model.Notifications.Count > 0)
+@helper ShowNotifications(List<Notification> notifications)
 {
-	<div class="notifications__notifications-wrapper">
-		@foreach (var notification in Model.Notifications)
+	foreach (var notification in notifications)
+	{
+		<li class="notifications__notification @(notification.CreateTime >= Model.LastViewTimestamp ? "unread" : "")">
+
+			@try
+			{
+				@Notifications.Notification((dynamic)notification, Model.CourseManager.FindCourse(notification.CourseId), Html, Url)
+			}
+			catch (Exception)
+			{
+				/* Sometimes slide or course can be deleted already. It's not the reason for throwing an error */
+			}
+		</li>
+	}
+}
+@helper UnreadCountLabel(List<Notification> notifications)
+{
+	var unreadCount = notifications.Count(n => n.CreateTime >= Model.LastViewTimestamp);
+	if (unreadCount > 0)
+	{
+		<span class="label label-as-badge label-primary label-xs">@unreadCount</span>
+	}
+}
+
+
+@if (Model.ImportantNotifications.Count > 0 || Model.CommentsNotifications.Count > 0)
+{
+	<div class="notifications__feed-switcher">
+		<a href="#important" data-feed="important" class="active">
+			Уведомления
+			@UnreadCountLabel(Model.ImportantNotifications)
+		</a><a href="#comments" data-feed="comments">
+			Комментарии
+			@UnreadCountLabel(Model.CommentsNotifications)
+		</a>
+	</div>
+	<div class="notifications__notifications-wrapper notifications__feed active" data-feed="important">
+		@ShowNotifications(Model.ImportantNotifications)
+		@if (Model.ImportantNotifications.Count == 0)
 		{
-			<li class="notifications__notification @(notification.CreateTime >= Model.LastViewTimestamp ? "unread" : "")">
-				@try
-				{
-					@Notifications.Notification((dynamic)notification, Model.CourseManager.FindCourse(notification.CourseId), Html, Url)
-				}
-				catch (Exception)
-				{
-					@* Sometimes slide or course can be deleted already. It's not the reason for throwing an error *@
-				}
-			</li>
+			<li class="notifications__info">Здесь будут появляться ответы на&nbsp;ваши комментарии, сообщения от&nbsp;преподавателей и системы.</li>
+		}
+	</div>
+	<div class="notifications__notifications-wrapper notifications__feed" data-feed="comments">
+		@ShowNotifications(Model.CommentsNotifications)
+		@if (Model.CommentsNotifications.Count == 0)
+		{
+			<li class="notifications__info">Здесь будут появляться комментарии пользователей во&nbsp;всех курсах, в&nbsp;которых вы занимаетесь.</li>
 		}
 	</div>
 

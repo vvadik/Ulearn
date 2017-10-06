@@ -69,6 +69,10 @@ input[type="checkbox"].input-validation-error {
 	border-color: #999999;
 }
 
+.label-xs {
+	font-size: 10px;
+}
+
 
 .navbar-inverse {
 	background-color: #32383F;
@@ -205,4 +209,23 @@ footer:hover {
 /* Fixes for jquery-ui */
 .ui-front {
 	z-index: 1100;
+}
+
+/* Inline pre */
+.inline-pre {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+
+	font-size: 13px;
+	line-height: 1.42857143;
+	color: #333;
+	word-break: break-all;
+	word-wrap: break-word;
+	background-color: #f5f5f5;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	display: inline;
+	margin: 0;
+	border-width: 0;
+	padding: 0 5px;
+	overflow: visible;
 }
