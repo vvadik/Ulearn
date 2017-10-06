@@ -8,8 +8,9 @@ namespace uLearn.Web.Models
 	{
 		public List<UserModel> Users { get; set; }
 		public Dictionary<string, string> UsersGroups { get; set; }
-		public bool IsCourseAdmin { get; set; }
+		public bool CanToggleRoles { get; set; }
 		public bool ShowDangerEntities { get; set; }
+		public bool CanViewAndToggleAccesses { get; set; }
 	}
 
 	public class UserModel
@@ -19,13 +20,14 @@ namespace uLearn.Web.Models
 			UserName = userRoles.UserName;
 			UserId = userRoles.UserId;
 			UserVisibleName = userRoles.UserVisibleName;
+			CourseAccesses = new DefaultDictionary<string, Dictionary<CourseAccessType, CourseAccessModel>>();
 		}
 
 		public string UserId { get; private set; }
 		public string UserName { get; private set; }
 		public string UserVisibleName { get; private set; }
 		public Dictionary<string, ICoursesRolesListModel> CourseRoles { get; set; }
-		public Dictionary<CourseAccessType, CourseAccessModel> CourseAccesses { get; set; }
+		public DefaultDictionary<string, Dictionary<CourseAccessType, CourseAccessModel>> CourseAccesses { get; set; }
 	}
 
 	public interface ICoursesRolesListModel

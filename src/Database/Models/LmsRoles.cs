@@ -1,15 +1,25 @@
-﻿namespace Database.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Database.Models
 {
-	public class LmsRoles
+	public enum LmsRoles 
 	{
-		public const string SysAdmin = "SysAdmin";
+		[Display(Name = "Сис. админ")]
+		SysAdmin
 	}
 
 	public enum CourseRole
 	{
+		[Display(Name = "Администратор курса")]
 		CourseAdmin,
+
+		[Display(Name = "Преподаватель")]
 		Instructor,
+
+		[Display(Name = "Тестер")]
 		Tester,
+
+		[Display(Name = "Студент")]
 		Student
 	}
 }

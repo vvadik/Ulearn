@@ -11,6 +11,7 @@ namespace Database.Models
 		public int Id { get; set; }
 		
 		[Required]
+		[StringLength(64)]
 		[Index("IDX_CourseAccess_ByCourse")]
 		[Index("IDX_CourseAccess_ByCourseAndIsEnabled", 1)]
 		[Index("IDX_CourseAccess_ByCourseUserAndIsEnabled", 1)]
@@ -47,7 +48,7 @@ namespace Database.Models
 		EditPinAndRemoveComments = 1,
 
 		/* Смотреть решения всех, а не только студентов своих групп */
-		[Display(Name = "Видеть решения всех участников")]
+		[Display(Name = "Видеть решения всех пользователей")]
 		ViewAllStudentsSubmissions = 2,
 
 		/* Назначать людей преподавателями */

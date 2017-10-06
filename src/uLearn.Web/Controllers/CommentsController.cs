@@ -23,7 +23,7 @@ namespace uLearn.Web.Controllers
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
 		private readonly CommentsRepo commentsRepo;
 		private readonly NotificationsRepo notificationsRepo;
-		private readonly VisitsRepo visitsRepo;
+		private readonly CoursesRepo coursesRepo;
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly CommentsBot commentsBot = new CommentsBot();
 
@@ -33,7 +33,7 @@ namespace uLearn.Web.Controllers
 			commentsRepo = new CommentsRepo(db);
 			userManager = new ULearnUserManager(db);
 			notificationsRepo = new NotificationsRepo(db);
-			visitsRepo = new VisitsRepo(db);
+			coursesRepo = new CoursesRepo(db);
 		}
 
 		public ActionResult SlideComments(string courseId, Guid slideId)
@@ -54,14 +54,16 @@ namespace uLearn.Web.Controllers
 			else
 				topLevelComments = new List<Comment>();
 
+			var userId = User.Identity.GetUserId();
 			var commentsLikesCounts = commentsRepo.GetCommentsLikesCounts(comments);
-			var commentsLikedByUser = commentsRepo.GetSlideCommentsLikedByUser(courseId, slideId, User.Identity.GetUserId()).ToImmutableHashSet();
+			var commentsLikedByUser = commentsRepo.GetSlideCommentsLikedByUser(courseId, slideId, userId).ToImmutableHashSet();
 
-			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
 			var isAuthorizedAndCanComment = CanAddCommentHere(User, courseId, false);
 			var canReply = CanAddCommentHere(User, courseId, true);
-			var canModerateComments = User.Identity.IsAuthenticated && isInstructor;
-			var canSeeNotApprovedComments = User.Identity.IsAuthenticated && isInstructor;
+			var canModerateComments = CanModerateComments(User, courseId);
+			var canSeeNotApprovedComments = canModerateComments;
+
+			var canViewAuthorSubmissions = coursesRepo.HasCourseAccess(userId, courseId, CourseAccessType.ViewAllStudentsSubmissions);
 
 			var model = new SlideCommentsModel
 			{
@@ -71,14 +73,24 @@ namespace uLearn.Web.Controllers
 				CanReply = canReply,
 				CanModerateComments = canModerateComments,
 				CanSeeNotApprovedComments = canSeeNotApprovedComments,
+				CanViewAuthorSubmissions = canViewAuthorSubmissions,
 				TopLevelComments = topLevelComments,
 				CommentsByParent = commentsByParent,
 				CommentsLikesCounts = commentsLikesCounts,
 				CommentsLikedByUser = commentsLikedByUser,
-				CurrentUser = User.Identity.IsAuthenticated ? userManager.FindById(User.Identity.GetUserId()) : null,
+				CurrentUser = User.Identity.IsAuthenticated ? userManager.FindById(userId) : null,
 				CommentsPolicy = commentsPolicy,
 			};
 			return PartialView(model);
+		}
+
+		private bool CanModerateComments(IPrincipal user, string courseId)
+		{
+			if (!user.Identity.IsAuthenticated)
+				return false;
+
+			var hasCourseAccessForCommentEditing = coursesRepo.HasCourseAccess(user.Identity.GetUserId(), courseId, CourseAccessType.EditPinAndRemoveComments);
+			return user.HasAccessFor(courseId, CourseRole.CourseAdmin) || hasCourseAccessForCommentEditing;
 		}
 
 		private bool CanAddCommentHere(IPrincipal user, string courseId, bool isReply)
@@ -224,7 +236,7 @@ namespace uLearn.Web.Controllers
 			if (comment == null)
 				return HttpNotFound();
 
-			if (!User.HasAccessFor(comment.CourseId, CourseRole.Instructor))
+			if (! CanModerateComments(User, comment.CourseId))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			await commentsRepo.ApproveComment(commentId, isApproved);
@@ -241,7 +253,7 @@ namespace uLearn.Web.Controllers
 			if (comment == null)
 				return HttpNotFound();
 
-			if (!User.HasAccessFor(comment.CourseId, CourseRole.Instructor))
+			if (!CanModerateComments(User, comment.CourseId))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			await commentsRepo.PinComment(commentId, isPinned);
@@ -253,8 +265,7 @@ namespace uLearn.Web.Controllers
 			if (comment == null)
 				return false;
 
-			return user.HasAccessFor(comment.CourseId, CourseRole.Instructor) ||
-					user.Identity.GetUserId() == comment.AuthorId;
+			return CanModerateComments(user, comment.CourseId) || user.Identity.GetUserId() == comment.AuthorId;
 		}
 
 		[HttpPost]
@@ -315,6 +326,7 @@ namespace uLearn.Web.Controllers
 		public bool CanReply { get; set; }
 		public bool CanModerateComments { get; set; }
 		public bool CanSeeNotApprovedComments { get; set; }
+		public bool CanViewAuthorSubmissions { get; set; }
 		public List<Comment> TopLevelComments { get; set; }
 		public Dictionary<int, List<Comment>> CommentsByParent { get; set; }
 		public Dictionary<int, int> CommentsLikesCounts { get; set; }

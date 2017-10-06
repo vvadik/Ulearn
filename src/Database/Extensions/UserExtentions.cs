@@ -64,7 +64,7 @@ namespace Database.Extensions
 
 		public static bool IsSystemAdministrator(this IPrincipal principal)
 		{
-			return principal.IsInRole(LmsRoles.SysAdmin);
+			return principal.IsInRole(LmsRoles.SysAdmin.ToString());
 		}
 
 		public static void AddCourseRoles(this ClaimsIdentity identity, Dictionary<string, CourseRole> roles)

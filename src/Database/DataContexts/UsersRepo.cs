@@ -68,7 +68,7 @@ namespace Database.DataContexts
 
 		public List<string> GetSysAdminsIds(UserManager<ApplicationUser> userManager)
 		{
-			var role = db.Roles.FirstOrDefault(r => r.Name == LmsRoles.SysAdmin);
+			var role = db.Roles.FirstOrDefault(r => r.Name == LmsRoles.SysAdmin.ToString());
 			if (role == null)
 				return new List<string>();
 			return db.Users.FilterByRole(role, userManager).Select(u => u.Id).ToList();

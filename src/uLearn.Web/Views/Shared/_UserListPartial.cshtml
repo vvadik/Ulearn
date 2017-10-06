@@ -12,10 +12,13 @@
 		<th>Логин</th>
 		<th>Имя</th>
 		<th>Группы</th>
-		@if (Model.IsCourseAdmin)
+		@if (Model.CanToggleRoles)
 		{
 			<th>Роли</th>
-			<th>Права</th>
+		}
+		@if (Model.CanViewAndToggleAccesses)
+		{
+			<th>Права преподавателей</th>
 		}
 		@if (Model.ShowDangerEntities)
 		{
@@ -28,19 +31,22 @@
 			<td>@Html.ActionLink(user.UserName, "Info", "Account", new { userName = user.UserName }, new { })</td>
 			<td>@user.UserVisibleName</td>
 			<td>@Model.UsersGroups.GetOrDefault(user.UserId, "")</td>
-			@if (Model.IsCourseAdmin)
+			@if (Model.CanToggleRoles)
 			{
 				<td>
 					<div class="btn-group">
 						@if (Model.ShowDangerEntities)
 						{
-							@RoleButton(user, LmsRoles.SysAdmin, "danger")
+							@RoleButton(user, LmsRoles.SysAdmin.ToString(), LmsRoles.SysAdmin.GetDisplayName(), "danger")
 						}
 						@RoleButton(user, CourseRole.CourseAdmin, "warning")
 						@RoleButton(user, CourseRole.Instructor, "info")
 						@RoleButton(user, CourseRole.Tester, "success")
 					</div>
 				</td>
+			}
+			@if (Model.CanViewAndToggleAccesses)
+			{
 				<td>
 					@AccessButtons(user)
 				</td>
@@ -61,14 +67,14 @@
 
 @helper RoleButton(UserModel user, CourseRole role, string cssClass)
 {
-	@RoleButton(user, role.ToString(), cssClass)
+	@RoleButton(user, role.ToString(), role.GetDisplayName(), cssClass)
 }
 
-@helper RoleButton(UserModel user, string role, string cssClass)
+@helper RoleButton(UserModel user, string role, string roleName ,string cssClass)
 {
 	if (user.CourseRoles.ContainsKey(role))
 	{
-		@RoleButton((dynamic)user.CourseRoles[role], role, cssClass)
+		@RoleButton((dynamic)user.CourseRoles[role], roleName, cssClass)
 	}
 }
 
@@ -79,7 +85,7 @@
 			class="btn btn-sm btn-default @( courseRoles.HasAccess ? buttonClass : "")"
 			data-css-class="@buttonClass"
 			data-toggle-url="@courseRoles.ToggleUrl"
-			onclick="ToggleRole(event, this, ToggleButtonClass)">
+			onclick="ToggleRoleOrCourseAccess(event, this, ToggleButtonClass)">
 		@role
 	</button>
 }
@@ -103,7 +109,7 @@
 			{
 				<li class="@( course.HasAccess ? liClass : "")"
 					data-toggle-url="@course.ToggleUrl"
-					onclick="ToggleRole(event, this, ToggleDropDownClass)">
+					onclick="ToggleRoleOrCourseAccess(event, this, ToggleDropDownClass)">
 					<a>@course.CourseId</a>
 				</li>
 			}
@@ -113,25 +119,28 @@
 
 @helper AccessButtons(UserModel user)
 {
-	var buttonClass = "btn-primary";
 	<div class="btn-group">
 		<button type="button"
 				class="btn btn-sm  btn-default dropdown-toggle"
-				data-css-class="@buttonClass"
 				data-toggle="dropdown"
 				aria-haspopup="true"
 				aria-expanded="false">
-			Права <span class="caret"></span>
+			Выберите права <span class="caret"></span>
 		</button>
 		<ul class="dropdown-menu" data-css-class="li-primary">
-			@foreach (var courseAccessType in user.CourseAccesses.Keys)
+			@foreach (var courseId in user.CourseAccesses.Keys)
 			{
-				var courseAccess = user.CourseAccesses[courseAccessType];
-				<li class="@( courseAccess.HasAccess ? "li-primary" : "")"
-					data-toggle-url="@courseAccess.ToggleUrl"
-					onclick="ToggleRole(event, this, ToggleDropDownClass)">
-					<a>@courseAccessType.GetDisplayName()</a>
-				</li>
+			 	foreach (var courseAccessType in user.CourseAccesses[courseId].Keys)
+				{
+					var courseAccess = user.CourseAccesses[courseId][courseAccessType];
+					<li class="@( courseAccess.HasAccess ? "li-info" : "")"
+						data-toggle-url="@courseAccess.ToggleUrl"
+						data-css-class="li-info"
+						data-has-access="@( courseAccess.HasAccess ? "true" : "false" )"
+						onclick="ToggleRoleOrCourseAccess(event, this, ToggleButtonClass)">
+						<a>@courseAccessType.GetDisplayName()</a>
+					</li>
+				}
 			}
 		</ul>
 	</div>

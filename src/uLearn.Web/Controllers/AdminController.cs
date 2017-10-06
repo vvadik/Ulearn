@@ -14,7 +14,6 @@ using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
-using JetBrains.Annotations;
 using Microsoft.VisualBasic.FileIO;
 using uLearn.Extensions;
 using uLearn.Quizes;
@@ -32,6 +31,7 @@ namespace uLearn.Web.Controllers
 		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
 		private readonly ULearnDb db;
 		private readonly UsersRepo usersRepo;
+		private readonly UserRolesRepo userRolesRepo;
 		private readonly CommentsRepo commentsRepo;
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly QuizzesRepo quizzesRepo;
@@ -48,6 +48,7 @@ namespace uLearn.Web.Controllers
 			db = new ULearnDb();
 
 			usersRepo = new UsersRepo(db);
+			userRolesRepo = new UserRolesRepo(db);
 			commentsRepo = new CommentsRepo(db);
 			userManager = new ULearnUserManager(db);
 			quizzesRepo = new QuizzesRepo(db);
@@ -184,7 +185,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]
+		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		public ActionResult CreateCourse(string courseId)
 		{
 			if (!courseManager.TryCreateCourse(courseId))
@@ -425,9 +426,14 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Comments", new { courseId });
 		}
 
-		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult Users(UserSearchQueryModel queryModel)
 		{
+			var isCourseAdmin = User.HasAccessFor(queryModel.CourseId, CourseRole.CourseAdmin);
+			var canAddInstructors = coursesRepo.HasCourseAccess(User.Identity.GetUserId(), queryModel.CourseId, CourseAccessType.AddAndRemoveInstructors);
+			if (! isCourseAdmin && ! canAddInstructors)
+				return HttpNotFound();
+
 			if (string.IsNullOrEmpty(queryModel.CourseId))
 				return RedirectToAction("CourseList");
 			return View(queryModel);
@@ -452,11 +458,14 @@ namespace uLearn.Web.Controllers
 					g => g.Select(role => role.Role).Distinct().ToList()
 				);
 
+			var isCourseAdmin = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
+			var canAddInstructors = coursesRepo.HasCourseAccess(User.Identity.GetUserId(), courseId, CourseAccessType.AddAndRemoveInstructors);
 			var model = new UserListModel
 			{
-				IsCourseAdmin = true,
+				CanToggleRoles = isCourseAdmin || canAddInstructors,
 				ShowDangerEntities = false,
-				Users = new List<UserModel>()
+				Users = new List<UserModel>(),
+				CanViewAndToggleAccesses = isCourseAdmin,
 			};
 
 			foreach (var userRolesInfo in userRoles)
@@ -476,6 +485,19 @@ namespace uLearn.Web.Controllers
 							HasAccess = roles.Contains(courseRole),
 							ToggleUrl = Url.Action("ToggleRole", "Account", new { courseId, userId = user.UserId, role = courseRole })
 						});
+
+				var courseAccesses = coursesRepo.GetCourseAccesses(courseId, user.UserId).Select(a => a.AccessType).ToList();
+				user.CourseAccesses[courseId] = Enum.GetValues(typeof(CourseAccessType))
+					.Cast<CourseAccessType>()
+					.ToDictionary(
+						a => a,
+						a => new CourseAccessModel
+						{
+							CourseId = courseId,
+							HasAccess = courseAccesses.Contains(a),
+							ToggleUrl = Url.Action("ToggleCourseAccess", "Admin", new { courseId = courseId, userId = user.UserId, accessType = a })
+						}
+					);
 
 				model.Users.Add(user);
 			}
@@ -734,7 +756,7 @@ namespace uLearn.Web.Controllers
 
 		private bool CanAddUsersToGroupManually()
 		{
-			return User.IsInRole(LmsRoles.SysAdmin);
+			return User.IsSystemAdministrator();
 		}
 
 		[HttpPost]
@@ -993,7 +1015,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult FindUsers(string courseId, string term, bool onlyInstructors=true, bool withGroups=true)
 		{
 			/* Only sysadmins can search ordinary users */
-			if (!User.IsInRole(LmsRoles.SysAdmin) && !onlyInstructors)
+			if (!User.IsSystemAdministrator() && !onlyInstructors)
 				return Json(new { status = "error", message = "Вы не можете искать среди всех пользователей" }, JsonRequestBehavior.AllowGet);
 
 			var query = new UserSearchQueryModel { NamePrefix = term };
@@ -1376,7 +1398,7 @@ namespace uLearn.Web.Controllers
 		{
 			var label = groupsRepo.FindLabelById(labelId);
 			if (label == null || label.OwnerId != User.Identity.GetUserId())
-				return Json(new { status = "ok", error = "Label not found or not owned by you" });
+				return Json(new { status = "error", message = "Label not found or not owned by you" });
 
 			await groupsRepo.AddLabelToGroup(groupId, labelId);
 			return Json(new { status = "ok" });
@@ -1387,11 +1409,32 @@ namespace uLearn.Web.Controllers
 		{
 			var label = groupsRepo.FindLabelById(labelId);
 			if (label == null || label.OwnerId != User.Identity.GetUserId())
-				return Json(new { status = "ok", error = "Label not found or not owned by you" });
+				return Json(new { status = "error", message = "Label not found or not owned by you" });
 
 			await groupsRepo.RemoveLabelFromGroup(groupId, labelId);
 			return Json(new { status = "ok" });
-		}		
+		}
+
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		[HttpPost]
+		public async Task<ActionResult> ToggleCourseAccess(string courseId, string userId, CourseAccessType accessType, bool isEnabled)
+		{
+			var currentUserId = User.Identity.GetUserId();
+
+			var userRoles = userRolesRepo.GetRoles(userId);
+			var errorMessage = "Выдавать дополнительные права можно только преподавателям. Сначала назначьте пользователя администратором курса или преподавателем";
+			if (!userRoles.ContainsKey(courseId))
+				return Json(new { status = "error", message = errorMessage });
+			if (userRoles[courseId] > CourseRole.Instructor)
+				return Json(new { status = "error", message = errorMessage });
+
+			if (isEnabled)
+				await coursesRepo.GrantAccess(courseId, userId, accessType, currentUserId);
+			else
+				await coursesRepo.RevokeAccess(courseId, userId, accessType);
+
+			return Json(new { status = "ok" });
+		}
 	}
 
 	public class CertificateRequest

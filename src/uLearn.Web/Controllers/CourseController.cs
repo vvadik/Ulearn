@@ -39,6 +39,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly UserQuizzesRepo userQuizzesRepo;
+		private readonly CoursesRepo coursesRepo;
 
 		public CourseController()
 		{
@@ -50,6 +51,7 @@ namespace uLearn.Web.Controllers
 			ltiRequestsRepo = new LtiRequestsRepo(db);
 			groupsRepo = new GroupsRepo(db, courseManager);
 			userQuizzesRepo = new UserQuizzesRepo(db);
+			coursesRepo = new CoursesRepo(db);
 		}
 
 		[AllowAnonymous]
@@ -517,10 +519,12 @@ namespace uLearn.Web.Controllers
 				return PartialView((CourseInstructorNavbarViewModel)null);
 
 			var course = courseManager.GetCourse(courseId);
+			var canAddInstructors = coursesRepo.HasCourseAccess(User.Identity.GetUserId(), courseId, CourseAccessType.AddAndRemoveInstructors);
 			return PartialView(new CourseInstructorNavbarViewModel
 			{
 				CourseId = courseId,
 				CourseTitle = course.Title,
+				CanAddInstructors = canAddInstructors,
 			});
 		}
 	}

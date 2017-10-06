@@ -31,7 +31,7 @@ namespace uLearn.Web.Controllers
 			this.courseManager = courseManager;
 		}
 
-		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]
+		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		public ActionResult FixQuestions()
 		{
 			var fixedQuestions = new List<string>();
