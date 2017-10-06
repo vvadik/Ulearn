@@ -19,7 +19,7 @@ namespace Database.Migrations
 		{
 			var roleStore = new RoleStore<IdentityRole>(db);
 			var roleManager = new RoleManager<IdentityRole>(roleStore);
-			roleManager.Create(new IdentityRole(LmsRoles.SysAdmin));
+			roleManager.Create(new IdentityRole(LmsRoles.SysAdmin.ToString()));
 
 			var userStore = new UserStore<ApplicationUser>(db);
 			var manager = new ULearnUserManager(userStore);
@@ -32,7 +32,7 @@ namespace Database.Migrations
 			{
 				var user = new ApplicationUser { UserName = "admin", FirstName = "System Administrator", LastName = "" };
 				manager.Create(user, "fullcontrol");
-				manager.AddToRole(user.Id, LmsRoles.SysAdmin);
+				manager.AddToRole(user.Id, LmsRoles.SysAdmin.ToString());
 			}
 			
 			var usersRepo = new UsersRepo(db);

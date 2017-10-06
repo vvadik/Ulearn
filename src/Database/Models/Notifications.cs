@@ -450,6 +450,16 @@ namespace Database.Models
 
 			return new NotificationButton("Перейти к комментарию", GetCommentUrl(course, slide, baseUrl));
 		}
+
+		protected string GetHtmlCommentText()
+		{
+			return GetHtmlCommentText(Comment);
+		}
+
+		protected string GetHtmlCommentText(Comment comment)
+		{
+			return comment.Text.Trim().EscapeHtml().RenderSimpleMarkdown().Replace("\n", "<br/>");
+		}
 	}
 
 	[NotificationType(NotificationType.NewComment)]
@@ -462,7 +472,7 @@ namespace Database.Models
 				return null;
 
 			return $"<b>{Comment.Author.VisibleName.EscapeHtml()} оставил{Comment.Author.Gender.ChooseEnding()} комментарий в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" +
-					$"{Comment.Text.Trim().EscapeHtml()}";
+					$"{GetHtmlCommentText()}";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
@@ -502,8 +512,8 @@ namespace Database.Models
 				return null;
 
 			return $"<b>{Comment.Author.VisibleName.EscapeHtml()} ответил{Comment.Author.Gender.ChooseEnding()} на ваш комментарий в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" +
-					$"<i>{ParentComment.Text.Trim().EscapeHtml()}</i><br>" +
-					$"{Comment.Text.Trim().EscapeHtml()}";
+					$"<i>{GetHtmlCommentText(ParentComment)}</i><br>" +
+					$"{GetHtmlCommentText()}";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
@@ -539,7 +549,7 @@ namespace Database.Models
 				return null;
 
 			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} лайкнул{InitiatedBy.Gender.ChooseEnding()} ваш комментарий в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" +
-					$"<i>{Comment.Text.Trim().EscapeHtml()}</i>";
+					$"<i>{GetHtmlCommentText()}</i>";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)

@@ -203,6 +203,8 @@ namespace Database.DataContexts
 		public DbSet<StepikAccessToken> StepikAccessTokens { get; set; }
 		public DbSet<StepikExportProcess> StepikExportProcesses { get; set; }
 		public DbSet<StepikExportSlideAndStepMap> StepikExportSlideAndStepMaps { get; set; }
+
+		public DbSet<CourseAccess> CourseAccesses { get; set; }
 	}
 }
  

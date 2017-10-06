@@ -39,6 +39,7 @@ namespace uLearn.Web.Controllers
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly UserQuizzesRepo userQuizzesRepo;
+		private readonly CoursesRepo coursesRepo;
 
 		public CourseController()
 		{
@@ -50,6 +51,7 @@ namespace uLearn.Web.Controllers
 			ltiRequestsRepo = new LtiRequestsRepo(db);
 			groupsRepo = new GroupsRepo(db, courseManager);
 			userQuizzesRepo = new UserQuizzesRepo(db);
+			coursesRepo = new CoursesRepo(db);
 		}
 
 		[AllowAnonymous]
@@ -252,7 +254,7 @@ namespace uLearn.Web.Controllers
 			var visibleSlides = visibleUnits.SelectMany(u => u.Slides).ToList();
 			var lastVisited = visibleSlides.LastOrDefault(slide => visitedIds.Contains(slide.Id));
 			if (lastVisited == null)
-				return visibleSlides.First();
+				return visibleSlides.Any() ? visibleSlides.First() : null;
 
 			var unitSlides = lastVisited.Info.Unit.Slides.Where(s => visibleSlides.Contains(s)).ToList();
 
@@ -517,10 +519,12 @@ namespace uLearn.Web.Controllers
 				return PartialView((CourseInstructorNavbarViewModel)null);
 
 			var course = courseManager.GetCourse(courseId);
+			var canAddInstructors = coursesRepo.HasCourseAccess(User.Identity.GetUserId(), courseId, CourseAccessType.AddAndRemoveInstructors);
 			return PartialView(new CourseInstructorNavbarViewModel
 			{
 				CourseId = courseId,
 				CourseTitle = course.Title,
+				CanAddInstructors = canAddInstructors,
 			});
 		}
 	}

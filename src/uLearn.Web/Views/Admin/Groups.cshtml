@@ -246,7 +246,7 @@
 					Отправьте своим студентам ссылку для&nbsp;вступления в&nbsp;группу: <a href="#" class="modal__create-group__step3__invite-link">...</a>
 				</div>
 				
-				@if (User.IsInRole(LmsRoles.SysAdmin))
+				@if (User.IsSystemAdministrator())
 				{
 					<ol class="modal__edit-group__members">
 						
@@ -315,7 +315,7 @@
 						
 					</ol>
 					
-					@if (User.IsInRole(LmsRoles.SysAdmin))
+					@if (User.IsSystemAdministrator())
 					{
 						<div class="help-block">
 							Администраторы ulearn могут добавлять студентов в&nbsp;группу самостоятельно:

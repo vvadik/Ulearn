@@ -25,7 +25,7 @@
 			CanModerateComment = Model.CanModerateComments,
 			IsCommentVisibleForUser = comment.IsApproved || Model.CanSeeNotApprovedComments || isAuthor,
 			CanEditAndDeleteComment = Model.CanModerateComments || isAuthor,
-			CanViewAuthorSubmissions = slide is ExerciseSlide && Model.CanModerateComments,
+			CanViewAuthorSubmissions = slide is ExerciseSlide && Model.CanViewAuthorSubmissions,
 			CurrentUser = Model.CurrentUser,
 		};
 	}

@@ -10,6 +10,7 @@ using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
+using LtiLibrary.Core.Extensions;
 using Microsoft.AspNet.Identity;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -524,7 +525,7 @@ namespace uLearn.Web.Controllers
 			return PartialView(model);
 		}
 
-		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]
+		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		public ActionResult SystemStatistics()
 		{
 			return View();

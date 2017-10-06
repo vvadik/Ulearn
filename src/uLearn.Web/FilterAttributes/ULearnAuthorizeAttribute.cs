@@ -32,10 +32,10 @@ namespace uLearn.Web.FilterAttributes
 			if (!user.Identity.IsAuthenticated)
 				return false;
 
-			if (MinAccessLevel == CourseRole.Student && rolesSplit.Length == 0)
+			if (MinAccessLevel == CourseRole.Student && ! ShouldBeSysAdmin)
 				return true;
 
-			if (rolesSplit.Length > 0 && rolesSplit.Any(user.IsInRole))
+			if (ShouldBeSysAdmin && user.IsSystemAdministrator())
 				return true;
 
 			if (MinAccessLevel == CourseRole.Student)
@@ -51,13 +51,7 @@ namespace uLearn.Web.FilterAttributes
 			return user.HasAccessFor(courseIds[0], MinAccessLevel);
 		}
 
-		private string[] rolesSplit = new string[0];
-
-		public new string Roles
-		{
-			get { return string.Join(",", rolesSplit); }
-			set { rolesSplit = SplitString(value); }
-		}
+		public bool ShouldBeSysAdmin { get; set; }
 
 		public new string Users
 		{

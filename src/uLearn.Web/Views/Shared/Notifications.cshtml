@@ -16,17 +16,14 @@
 		return Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
 	}
 
-	private static string EncodeMultiLineTextAndHighlightLinks(HtmlHelper Html, string text)
+	private static IHtmlString CollapseIfNeed(bool collapse, HtmlHelper Html, string text, int truncateMaxLength, bool renderSimpleMarkdown=false)
 	{
-		var htmlText = Html.EncodeMultiLineText(text);
-		return Html.HighlightLinks(htmlText);
-	}
-
-	private static IHtmlString CollapseIfNeed(bool collapse, HtmlHelper Html, string commentText, int truncateMaxLength)
-	{
-		return collapse
-			? new HtmlString(commentText.TruncateWithEllipsis(truncateMaxLength))
-			: Html.Raw(EncodeMultiLineTextAndHighlightLinks(Html, commentText));
+		var encodedText = Html.EncodeMultiLineText(text);
+		if (renderSimpleMarkdown)
+			encodedText = encodedText.RenderSimpleMarkdown();
+		if (collapse)
+			encodedText = encodedText.TruncateHtmlWithEllipsis(truncateMaxLength);
+		return Html.Raw(collapse ? encodedText : Html.HighlightLink(encodedText));
 	}
 
 }
@@ -76,7 +73,7 @@
 		</div>
 		<div class="media-body">
 			<div class="notifications__notification__header">@UserName(notification.Comment.Author)</div>
-			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100)</div>
+			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100, renderSimpleMarkdown: true)</div>
 			<div class="notifications__notification__footer">к&nbsp;слайду @SlideLink(Url, course, slide)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
@@ -93,9 +90,9 @@
 		<div class="media-body">
 			<div class="notifications__notification__header">
 				@UserName(notification.Comment.Author) ответил@( notification.Comment.Author.Gender.ChooseEnding()) на&nbsp;ваш комментарий
-				<span title="@notification.ParentComment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__cite">@CollapseIfNeed(collapse, Html, notification.ParentComment.Text, 50)</span>
+				<span title="@notification.ParentComment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__cite">@CollapseIfNeed(collapse, Html, notification.ParentComment.Text, 50, renderSimpleMarkdown: true)</span>
 			</div>
-			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100)</div>
+			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100, renderSimpleMarkdown: true)</div>
 			<div class="notifications__notification__footer">к&nbsp;слайду @SlideLink(Url, course, slide)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
@@ -111,7 +108,7 @@
 		</div>
 		<div class="media-body">
 			<div class="notifications__notification__header">@UserName(notification.LikedUser) лайкнул@( notification.LikedUser.Gender.ChooseEnding()) ваш комментарий</div>
-			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100)</div>
+			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100, renderSimpleMarkdown: true)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>

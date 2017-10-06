@@ -10,7 +10,7 @@
 	<h2>@ViewBag.Title</h2>
 
 	<div class="notifications-feed">
-		@foreach (var notification in Model.Notifications)
+		@foreach (var notification in Model.ImportantNotifications)
 		{
 			<div class="notifications__notification @(notification.CreateTime >= Model.LastViewTimestamp ? "unread" : "")">
 				@try

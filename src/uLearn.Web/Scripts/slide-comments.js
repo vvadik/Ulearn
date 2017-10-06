@@ -83,8 +83,8 @@
 
 	var hideCommentsRules = function(e) {
 		var $textarea = $(this);
-		var $replyForm = $textarea.closest('.reply-form');
-		var $localCommentsRules = $replyForm.find('.comments__rules');
+		var $parent = $textarea.parent();
+		var $localCommentsRules = $parent.find('.comments__rules');
 		if ($textarea.val() === '')
 			$localCommentsRules.remove();
 	}
@@ -263,8 +263,9 @@
 		var url = $self.data('url');
 		var $comment = $self.closest('.comment');
 		var $commentText = $comment.find('.comment__text');
+		var originalText = $commentText.data('originalText');
 		var $commentFooter = $comment.find('.comment__footer');
-		var $editTextarea = $('<textarea class="comment__new-text" name="commentText"></textarea>').val($commentText.html().decodeMultiLineText());
+		var $editTextarea = $('<textarea class="comment__new-text" name="commentText"></textarea>').val(originalText);
 		var $saveButton = $('<button class="btn btn-primary">Сохранить</button>');
 		var $cancelButton = $('<button class="btn btn-link">Отмена</button>');
 
@@ -285,6 +286,7 @@
 				})
 			}).done(function (renderedCommentText) {
 				$commentText.replaceWith($(renderedCommentText));
+				$commentText.data('originalText', newText);
 				// Remove form, restore comment view (see below)
 				$cancelButton.trigger('click');
 			});
@@ -294,7 +296,8 @@
 			$commentText.show();
 			$commentFooter.show();
 
-			$editTextarea.remove();
+			/* .val('').blur() for hiding comment rules */
+			$editTextarea.val('').blur().remove();
 			$saveButton.remove();
 			$cancelButton.remove();
 		});
@@ -331,6 +334,7 @@
 	$('.comments').on('click', '.reply-form input[name=commentText]', expandReplyForm);
 	$('.comments').on('click', '.comment .comment__likes-count', likeComment);
 	$('.comments').on('keyup', 'textarea[name=commentText]', onTextareaKeyUp);
+	$('.comments').on('blur', '.comment textarea[name=commentText]', hideCommentsRules);
 	$('.comments').on('blur', '.reply-form textarea[name=commentText]', hideCommentsRules);
 	$('.comments').on('blur', '.reply-form.is-reply textarea[name=commentText]', collapseReplyForm);
 	$('.comments').on('click', '.reply-form .reply-form__send-button', sendComment);

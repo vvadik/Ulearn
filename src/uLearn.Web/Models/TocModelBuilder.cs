@@ -66,7 +66,7 @@ namespace uLearn.Web.Models
 				pages.Add(new TocPageInfo
 				{
 					Url = GetUnitStatisticsUrl(unit),
-					Name = "Статистика и успеваемость",
+					Name = "Ведомость модуля",
 					PageType = TocPageType.UnitStatistics,
 				});
 			}

@@ -29,6 +29,7 @@ namespace uLearn.Web.Controllers
 		private readonly CertificatesRepo certificatesRepo;
 		private readonly VisitsRepo visitsRepo;
 		private readonly NotificationsRepo notificationsRepo;
+		private readonly CoursesRepo coursesRepo;
 
 		private readonly string telegramSecret;
 
@@ -39,6 +40,7 @@ namespace uLearn.Web.Controllers
 			certificatesRepo = new CertificatesRepo(db, courseManager);
 			visitsRepo = new VisitsRepo(db);
 			notificationsRepo = new NotificationsRepo(db);
+			coursesRepo = new CoursesRepo(db);
 
 			telegramSecret = WebConfigurationManager.AppSettings["ulearn.telegram.webhook.secret"] ?? "";
 		}
@@ -85,26 +87,27 @@ namespace uLearn.Web.Controllers
 
 			var model = new UserListModel
 			{
-				IsCourseAdmin = User.HasAccess(CourseRole.CourseAdmin),
+				CanToggleRoles = User.HasAccess(CourseRole.CourseAdmin),
 				ShowDangerEntities = User.IsSystemAdministrator(),
 				Users = usersList.Select(user => GetUserModel(user, coursesForUsers, courses)).ToList(),
-				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, usersList.Select(u => u.UserId), User)
+				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, usersList.Select(u => u.UserId), User),
+				CanViewAndToggleAccesses = false,
 			};
 
 			return model;
 		}
 
-		private UserModel GetUserModel(UserRolesInfo userRoles, Dictionary<string, Dictionary<CourseRole, List<string>>> coursesForUsers, List<string> courses)
+		private UserModel GetUserModel(UserRolesInfo userRoles, Dictionary<string, Dictionary<CourseRole, List<string>>> coursesForUsers, List<string> coursesIds)
 		{
 			var user = new UserModel(userRoles)
 			{
-				CoursesAccess = new Dictionary<string, ICoursesAccessListModel>
+				CourseRoles = new Dictionary<string, ICoursesRolesListModel>
 				{
 					{
-						LmsRoles.SysAdmin,
-						new SingleCourseAccessModel
+						LmsRoles.SysAdmin.ToString(),
+						new SingleCourseRolesModel
 						{
-							HasAccess = userRoles.Roles.Contains(LmsRoles.SysAdmin),
+							HasAccess = userRoles.Roles.Contains(LmsRoles.SysAdmin.ToString()),
 							ToggleUrl = Url.Action("ToggleSystemRole", new { userId = userRoles.UserId, role = LmsRoles.SysAdmin })
 						}
 					}
@@ -116,10 +119,10 @@ namespace uLearn.Web.Controllers
 
 			foreach (var role in Enum.GetValues(typeof(CourseRole)).Cast<CourseRole>().Where(roles => roles != CourseRole.Student))
 			{
-				user.CoursesAccess[role.ToString()] = new ManyCourseAccessModel
+				user.CourseRoles[role.ToString()] = new ManyCourseRolesModel
 				{
-					CoursesAccesses = courses
-						.Select(s => new CourseAccessModel
+					CourseRoles = coursesIds
+						.Select(s => new CourseRoleModel
 						{
 							CourseId = s,
 							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s.ToLower()),
@@ -128,6 +131,7 @@ namespace uLearn.Web.Controllers
 						.ToList()
 				};
 			}
+
 			return user;
 		}
 
@@ -158,7 +162,7 @@ namespace uLearn.Web.Controllers
 			return View(group);
 		}
 
-		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]
+		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ToggleSystemRole(string userId, string role)
 		{
@@ -180,22 +184,32 @@ namespace uLearn.Web.Controllers
 			await notificationsRepo.AddNotification(courseId, notification, initiatedUserId);
 		}
 
-		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ToggleRole(string courseId, string userId, CourseRole role)
 		{
-			if (userManager.FindById(userId) == null || userId == User.Identity.GetUserId())
-				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+			var currentUserId = User.Identity.GetUserId();
+			if (userManager.FindById(userId) == null || userId == currentUserId)
+				return Json(new { status = "error", message = "Вы не можете назначать администратором, преподавателем или тестером сами себя." });
+
+			var isCourseAdmin = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
+			var canAddInstructors = coursesRepo.HasCourseAccess(currentUserId, courseId, CourseAccessType.AddAndRemoveInstructors);
+			if (!isCourseAdmin && !canAddInstructors)
+				return Json(new { status = "error", message = "У вас нет прав назначать преподавателей или тестеров. Это могут делать только администраторы курса и преподаватели со специальными правами." });
+
+			if (!isCourseAdmin && role == CourseRole.CourseAdmin)
+				return Json(new { status = "error", message = "Вы не можете назначать администраторов курса. Это могут делать только другие администраторы курса." });
+
 			var enabledRole = await userRolesRepo.ToggleRole(courseId, userId, role);
 
 			if (enabledRole && (role == CourseRole.Instructor || role == CourseRole.CourseAdmin))
-				await NotifyAboutNewInstructor(courseId, userId, User.Identity.GetUserId());
+				await NotifyAboutNewInstructor(courseId, userId, currentUserId);
 
-			return Content(role.ToString());
+			return Json(new { status = "ok", role = role.ToString() });
 		}
 
 		[HttpPost]
-		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]
+		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> DeleteUser(string userId)
 		{
@@ -238,6 +252,26 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("List");
 			var course = courseManager.GetCourse(courseId);
 			return View(new UserCourseModel(course, user, db));
+		}
+
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		public async Task<ActionResult> Profile(string userId)
+		{
+			var isCourseAdmin = User.HasAccess(CourseRole.CourseAdmin);
+			if (!groupsRepo.CanInstructorViewStudent(User, userId))
+				return HttpNotFound();
+			
+			var user = usersRepo.FindUserById(userId);
+			if (user == null)
+				return HttpNotFound();
+
+			var logins = await userManager.GetLoginsAsync(userId);
+
+			return View(new ProfileModel
+			{
+				User = user,
+				Logins = logins
+			});
 		}
 
 		[AllowAnonymous]
@@ -506,7 +540,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		[ULearnAuthorize(Roles = LmsRoles.SysAdmin)]
+		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ResetPassword(string newPassword, string userId)
 		{
@@ -633,6 +667,12 @@ namespace uLearn.Web.Controllers
 			/* If email has been sent less than 1 day ago, show popup. Double popup is disabled via cookies and javascript */
 			return PartialView("EmailIsNotConfirmedPopup", user);
 		}
+	}
+
+	public class ProfileModel
+	{
+		public ApplicationUser User { get; set; }
+		public IList<UserLoginInfo> Logins { get; set; }
 	}
 
 	public class IsErrorAttribute : Attribute

@@ -473,6 +473,10 @@
     <Compile Include="Migrations\201709200719448_RemoveRequiredNotificationTransportApplicationUserForeignKey.Designer.cs">
       <DependentUpon>201709200719448_RemoveRequiredNotificationTransportApplicationUserForeignKey.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710050829134_AddCourseAccesses.cs" />
+    <Compile Include="Migrations\201710050829134_AddCourseAccesses.Designer.cs">
+      <DependentUpon>201710050829134_AddCourseAccesses.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -481,6 +485,7 @@
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\CommentLike.cs" />
     <Compile Include="Models\CommentPolicy.cs" />
+    <Compile Include="Models\CourseAccess.cs" />
     <Compile Include="Models\CourseVersion.cs" />
     <Compile Include="Models\EnabledAdditionalScoringGroup.cs" />
     <Compile Include="Models\ExerciseCodeReview.cs" />
@@ -783,6 +788,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709200719448_RemoveRequiredNotificationTransportApplicationUserForeignKey.resx">
       <DependentUpon>201709200719448_RemoveRequiredNotificationTransportApplicationUserForeignKey.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710050829134_AddCourseAccesses.resx">
+      <DependentUpon>201710050829134_AddCourseAccesses.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

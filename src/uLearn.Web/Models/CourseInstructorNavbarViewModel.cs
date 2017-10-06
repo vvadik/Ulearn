@@ -4,5 +4,6 @@
 	{
 		public string CourseId { get; set; }
 		public string CourseTitle { get; set; }
+		public bool CanAddInstructors { get; set; }
 	}
 }

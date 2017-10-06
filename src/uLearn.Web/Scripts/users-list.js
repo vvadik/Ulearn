@@ -1,17 +1,24 @@
-﻿function ToggleRole(event, target, toggleClass) {
+﻿function ToggleRoleOrCourseAccess(event, target, toggleClass) {
 	event.stopPropagation();
-	var obj = $(target);
-	var url = obj.data("toggle-url");
+	var $object = $(target);
+	var url = $object.data("toggleUrl");
 	var token = $('#AntiForgeryTokenContainer input[name="__RequestVerificationToken"]').val();
 	$.ajax({
 			url: url,
 			method: "POST",
 			data: {
-				__RequestVerificationToken: token
-			}
+				__RequestVerificationToken: token,
+				isEnabled: ! $object.data('hasAccess')
+			},
+			dataType: 'json',
 		})
-		.done(function() {
-			toggleClass(obj);
+		.done(function (result) {
+			if (result.status !== 'ok') {
+				alert(result.message);
+				return;
+			}
+			$object.data('hasAccess', ! $object.data('hasAccess'));
+			toggleClass($object);
 		});
 }
 

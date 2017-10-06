@@ -7,6 +7,7 @@ using System.Web.Configuration;
 using System.Web.Mvc;
 using Database;
 using Database.DataContexts;
+using Database.Extensions;
 using Database.Models;
 using log4net;
 using Microsoft.AspNet.Identity;
@@ -314,7 +315,7 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var userId = User.Identity.GetUserId();
-			if (process.OwnerId != userId && User.IsInRole(LmsRoles.SysAdmin))
+			if (process.OwnerId != userId && User.IsSystemAdministrator())
 				return HttpNotFound();
 
 			var course = courseManager.GetCourse(process.UlearnCourseId);
