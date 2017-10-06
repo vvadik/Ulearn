@@ -168,5 +168,15 @@ namespace uLearn
 			text = Regex.Replace(text, "(\\s|^)[\"«]", @"$1„");
 			return Regex.Replace(text, "[\"»]", @"“");
 		}
+
+		public static string RenderSimpleMarkdown(this string text, bool isHtml=true)
+		{
+			text = Regex.Replace(text, @"\*\*(.+?)\*\*", @"<b>$1</b>", RegexOptions.Multiline);
+			text = Regex.Replace(text, @"__(.+?)__", @"<i>$1</i>", RegexOptions.Multiline);
+			var newLineRegExp = isHtml ? @"\<br/?\>" : "\n";
+			text = Regex.Replace(text, @"(?:" + newLineRegExp + @")*```(.+?)```(?:" + newLineRegExp + @")*", @"<pre>$1</pre>", RegexOptions.Multiline);
+			text = Regex.Replace(text, @"`(.+?)`", @"<pre class='inline'>$1</pre>");
+			return text;
+		}
 	}
 }

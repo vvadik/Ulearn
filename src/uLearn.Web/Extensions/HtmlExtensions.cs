@@ -13,6 +13,9 @@ namespace uLearn.Web.Extensions
 {
 	public static class HtmlExtensions
 	{
+		// See https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains for TLD list, we selected some of them
+		private const string tldWhiteList = @"arpa|adult|aero|audio|best|blog|camera|camp|center|club|dance|data|education|email|game|global|hosting|jobs|live|map|mobi|photo|pizza|sale|shop|travel|video|wiki";
+
 		private const string urlRegexS = @"(
 											(?<protocol>(https?|ftps?)://|mailto:)?
 											(?<usernameAndPassword>
@@ -21,7 +24,7 @@ namespace uLearn.Web.Extensions
 											 @h
 											)?
 											(?<hostnameOrIpAddress>
-											 (([-a-z0-9_]{2,}\.)+[a-z]{2,})
+											 (([-a-z0-9_]{2,}\.)+([a-z]{2,3}|" + tldWhiteList + @"))
 											 |
 											 ((?:(?:25[0-5]|2[0-4]\d|[01]\d\d|\d?\d)(?(\.?\d)\.)){4})
 											)
@@ -40,6 +43,8 @@ namespace uLearn.Web.Extensions
 											  (?<=[-a-z0-9_'/\+&%$#=~@)]|&[a-z]+;)
 											 )?
 											)?
+											# not all chars can be next after url
+											(?=$|\n|[^a-zA-Z0-9])
 										   )
 										   ";
 

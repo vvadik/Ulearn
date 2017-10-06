@@ -254,7 +254,7 @@ namespace uLearn.Web.Controllers
 			var visibleSlides = visibleUnits.SelectMany(u => u.Slides).ToList();
 			var lastVisited = visibleSlides.LastOrDefault(slide => visitedIds.Contains(slide.Id));
 			if (lastVisited == null)
-				return visibleSlides.First();
+				return visibleSlides.Any() ? visibleSlides.First() : null;
 
 			var unitSlides = lastVisited.Info.Unit.Slides.Where(s => visibleSlides.Contains(s)).ToList();
 
