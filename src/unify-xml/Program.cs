@@ -12,8 +12,6 @@ namespace unify_xml
 	{
 		static void Main(string[] args)
 		{
-			T();
-			return;
 			var dirname = args[0];
 			foreach (string xmlFile in Directory.EnumerateFiles(dirname, "*.xml", SearchOption.AllDirectories))
 			{
@@ -35,22 +33,6 @@ namespace unify_xml
 					Console.Error.WriteLine(e.ToString());
 				}
 			}
-		}
-
-		private static void T()
-		{
-			var s = new Stack<int>();
-			var res = new List<int>();
-			s.Push(1);
-			s.Push(2);
-			res.Add(s.Pop());
-			s.Push(3);
-			s.Push(4);
-			res.Add(s.Pop());
-			res.Add(s.Pop());
-			res.Add(s.Pop());
-			Console.WriteLine(string.Join(" ", res));
-
 		}
 
 		private static XDocument Unify(XDocument xdoc)
