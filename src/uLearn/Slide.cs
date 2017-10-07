@@ -80,22 +80,28 @@ namespace uLearn
 					var innerComponents = new List<Component>();
 					foreach (var block in blocks)
 					{
-						var component = block.ToEdxComponent("", slide, componentIndex);
-						innerComponents.Add(component);
+						if (!block.Hide)
+						{
+							var component = block.ToEdxComponent("", slide, componentIndex);
+							innerComponents.Add(component);
+						}
 						componentIndex++;
 					}
 
-					var displayName = componentIndex == blocks.Count ? slide.Title : "";
-					var header = displayName == "" ? "" : "<h2>" + displayName + "</h2>";
-					var slideComponent = new HtmlComponent
+					if (innerComponents.Any())
 					{
-						DisplayName = displayName,
-						UrlName = slide.NormalizedGuid + componentIndex,
-						Filename = slide.NormalizedGuid + componentIndex,
-						Source = header + string.Join("", innerComponents.Select(x => x.AsHtmlString())),
-						Subcomponents = innerComponents.ToArray()
-					};
-					components.Add(slideComponent);
+						var displayName = componentIndex == blocks.Count ? slide.Title : "";
+						var header = displayName == "" ? "" : "<h2>" + displayName + "</h2>";
+						var slideComponent = new HtmlComponent
+						{
+							DisplayName = displayName,
+							UrlName = slide.NormalizedGuid + componentIndex,
+							Filename = slide.NormalizedGuid + componentIndex,
+							Source = header + string.Join("", innerComponents.Select(x => x.AsHtmlString())),
+							Subcomponents = innerComponents.ToArray()
+						};
+						components.Add(slideComponent);
+					}
 				}
 				if (componentIndex >= slide.Blocks.Length)
 					break;
@@ -135,10 +141,17 @@ namespace uLearn
 
 		public IEnumerable<Vertical> ToVerticals(string courseId, string slideUrl, string solutionsUrl, Dictionary<string, string> videoGuids, string ltiId)
 		{
-			var quizSlide = this as QuizSlide;
-			if (quizSlide != null)
-				return QuizToVerticals(courseId, quizSlide, slideUrl, ltiId);
-			return OrdinarySlideToVerticals(courseId, this, slideUrl, solutionsUrl, videoGuids, ltiId);
+			try
+			{
+				var quizSlide = this as QuizSlide;
+				if (quizSlide != null)
+					return QuizToVerticals(courseId, quizSlide, slideUrl, ltiId).ToList();
+				return OrdinarySlideToVerticals(courseId, this, slideUrl, solutionsUrl, videoGuids, ltiId).ToList();
+			}
+			catch (Exception e)
+			{
+				throw new Exception($"Slide {this}. {e.Message}", e);
+			}
 		}
 	}
 

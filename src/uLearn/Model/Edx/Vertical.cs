@@ -38,11 +38,17 @@ namespace uLearn.Model.Edx
 
 		[XmlAttribute("graded")]
 		[DefaultValue(false)]
-		public bool Graded => !string.IsNullOrEmpty(ScoringGroup);
+		public bool Graded
+		{
+			get => !string.IsNullOrEmpty(ScoringGroup);
+			set { }
+		}
+
+		public bool ShouldSerizlizeGraded() => !string.IsNullOrEmpty(ScoringGroup);
 
 		[XmlAttribute("weight")]
-		[DefaultValue(0.0)]
-		public double Weight;
+		[DefaultValue("0.0")]
+		public string Weight;
 
 		public Vertical(string urlName, string displayName, Component[] components, string scoringGroup = null, double weight = 0)
 		{
@@ -50,7 +56,7 @@ namespace uLearn.Model.Edx
 			DisplayName = displayName;
 			Components = components;
 			ScoringGroup = scoringGroup;
-			Weight = weight;
+			Weight = weight.Equals(0.0) ? "0.0" : "1.0";
 			ComponentReferences = components.Select(x => x.GetReference()).ToArray();
 		}
 

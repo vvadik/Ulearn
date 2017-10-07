@@ -10,8 +10,13 @@ namespace uLearn.Model.Edx
 		[XmlAttribute("url_name")]
 		public string UrlName { get; set; }
 
+		public virtual bool ShouldSerializeUrlName()
+		{
+			return false;
+		}
+
 		[XmlAttribute("display_name")]
-		public virtual string DisplayName { get; set; }
+		public string DisplayName { get; set; }
 
 		[XmlIgnore]
 		public virtual string SubfolderName { get; set; }
