@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Xml.Serialization;
 
@@ -7,6 +8,11 @@ namespace uLearn.Model.Edx.EdxComponents
 	[XmlRoot("lti")]
 	public class LtiComponent : Component
 	{
+		public override bool ShouldSerializeUrlName()
+		{
+			return true;
+		}
+
 		[XmlAttribute("has_score")]
 		public bool HasScore;
 
@@ -20,7 +26,7 @@ namespace uLearn.Model.Edx.EdxComponents
 		public bool OpenInNewPage;
 
 		[XmlAttribute("weight")]
-		public double Weight;
+		public string Weight;
 
 		[XmlIgnore]
 		public override string SubfolderName
@@ -39,7 +45,7 @@ namespace uLearn.Model.Edx.EdxComponents
 			LaunchUrl = launchUrl;
 			LtiId = ltiId;
 			HasScore = hasScore;
-			Weight = weight;
+			Weight = weight.ToString("0.0", CultureInfo.InvariantCulture);
 			OpenInNewPage = openInNewPage;
 		}
 

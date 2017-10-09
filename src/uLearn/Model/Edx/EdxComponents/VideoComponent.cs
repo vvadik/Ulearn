@@ -7,17 +7,21 @@ namespace uLearn.Model.Edx.EdxComponents
 	[XmlRoot("video")]
 	public class VideoComponent : Component
 	{
+		public override bool ShouldSerializeUrlName()
+		{
+			return true;
+		}
+
 		[XmlAttribute("youtube")]
 		public string VideoId;
 
 		[XmlAttribute("youtube_id_1_0")]
 		public string NormalSpeedVideoId;
+		[XmlAttribute("download_video")]
+		public bool DownloadVideo;
 
 		[XmlIgnore]
-		public override string SubfolderName
-		{
-			get { return "video"; }
-		}
+		public override string SubfolderName => "video";
 
 		public VideoComponent()
 		{
@@ -27,7 +31,7 @@ namespace uLearn.Model.Edx.EdxComponents
 		{
 			UrlName = urlName;
 			DisplayName = displayName;
-			VideoId = "1:00:" + videoId;
+			VideoId = "1.00:" + videoId;
 			NormalSpeedVideoId = videoId;
 		}
 

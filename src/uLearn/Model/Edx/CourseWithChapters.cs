@@ -22,12 +22,15 @@ namespace uLearn.Model.Edx
 		[XmlAttribute("use_latex_compiler")]
 		public bool UseLatexCompiler;
 
-		[XmlElement("chapter")]
+		[XmlElement("chapter", Order = 1)]
 		public ChapterReference[] ChapterReferences
 		{
 			get { return chapterReferences = chapterReferences ?? new ChapterReference[0]; }
 			set { chapterReferences = value; }
 		}
+
+		[XmlElement("wiki", Order = 2)]
+		public Wiki[] Wiki;
 
 		[XmlIgnore]
 		public Chapter[] Chapters;
@@ -95,5 +98,11 @@ namespace uLearn.Model.Edx
 				c.ChapterReferences = c.Chapters.Select(v => v.GetReference()).ToArray();
 			});
 		}
+	}
+
+	public class Wiki
+	{
+		[XmlAttribute("slug")]
+		public string Slug;
 	}
 }
