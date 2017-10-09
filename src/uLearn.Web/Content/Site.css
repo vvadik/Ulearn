@@ -93,6 +93,10 @@ input[type="checkbox"].input-validation-error {
 	top: 49px;
 }
 
+.dropdown-menu li {
+	cursor: pointer;
+}
+
 @media (max-width: 767px) {
 	h1 {
 		font-size: 25px;

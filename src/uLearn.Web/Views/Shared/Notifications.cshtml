@@ -124,7 +124,7 @@
 		<div class="media-body">
 			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) проверил@( notification.InitiatedBy.Gender.ChooseEnding()) ваше решение<br/>по&nbsp;«@slide.Title»
 			</div>
-			<div class="notifications__notification__score">@notification.Checking.Score из @slide.Exercise.MaxReviewScore.PluralizeInRussian(RussianPluralizationOptions.Score)</div>
+			<div class="notifications__notification__score">Вы получили @notification.Checking.Score из @slide.Exercise.MaxReviewScore.PluralizeInRussian(RussianPluralizationOptions.Score)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>
@@ -140,7 +140,7 @@
 		<div class="media-body">
 			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) проверил@( notification.InitiatedBy.Gender.ChooseEnding()) ваш тест<br/>«@slide.Title»
 			</div>
-			<div class="notifications__notification__score">@notification.Checking.Score из @slide.MaxScore.PluralizeInRussian(RussianPluralizationOptions.ScoreDative)</div>
+			<div class="notifications__notification__score">Вы получили @notification.Checking.Score из @slide.MaxScore.PluralizeInRussian(RussianPluralizationOptions.ScoreDative)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>
@@ -170,7 +170,7 @@
 		<div class="media-body">
 			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) поставил@( notification.InitiatedBy.Gender.ChooseEnding()) вам баллы <b>@scoringGroup.Name</b> в&nbsp;модуле «@unit.Title»
 			</div>
-			<div class="notifications__notification__score"><b>@notification.Score.Score из @scoringGroup.MaxAdditionalScore.PluralizeInRussian(RussianPluralizationOptions.ScoreDative)</b></div>
+			<div class="notifications__notification__score">Вы получили @notification.Score.Score из @scoringGroup.MaxAdditionalScore.PluralizeInRussian(RussianPluralizationOptions.ScoreDative)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>

@@ -168,6 +168,10 @@
 	font-weight: 600;
 }
 
+.notifications__notification__score {
+	font-weight: 600;
+}
+
 .notifications__notification b {
 	font-weight: 600;
 }
@@ -178,6 +182,17 @@
 
 .notifications__comment-notification__text {
 	_font-weight: 600;
+}
+
+.notifications__comment-notification__text pre,
+.notifications__comment-notification__text .inline-pre {
+	background-color: #f9f9fd;
+	border-color: #e6e6e9;
+}
+
+.notifications__notification:hover .notifications__comment-notification__text pre,
+.notifications__notification:hover .notifications__comment-notification__text .inline-pre {
+	background-color: transparent;
 }
 
 .notifications__all-notifications-link {

@@ -173,10 +173,18 @@ namespace uLearn
 		{
 			text = Regex.Replace(text, @"\*\*(.+?)\*\*", @"<b>$1</b>", RegexOptions.Multiline);
 			text = Regex.Replace(text, @"__(.+?)__", @"<i>$1</i>", RegexOptions.Multiline);
-			var newLineRegExp = isHtml ? @"\<br/?\>" : "\n";
-			text = Regex.Replace(text, @"(?:" + newLineRegExp + @")*```(?:" + newLineRegExp + @")*(.+?)```(?:" + newLineRegExp + @")*", telegramMode ? @"<code>$1</code>" : @"<pre>$1</pre>", RegexOptions.Multiline);
-			text = Regex.Replace(text, @"`(.+?)`", telegramMode ? @"<pre></pre>" : @"<span class='inline-pre'>$1</span>");
+
+			var newLineRegExp = isHtml ? @"\<br/?\>" : @"\r?\n";
+			/* ```Multiline code``` */
+			text = Regex.Replace(text, @"(?:" + newLineRegExp + @")*```(?:" + newLineRegExp + @")*(.+?)```(?:" + newLineRegExp + @")*", @"<pre>$1</pre>", RegexOptions.Multiline | RegexOptions.Singleline);
+			/* `Inline code` */
+			text = Regex.Replace(text, @"`(.+?)`", telegramMode ? @"<code>$1</code>" : @"<span class='inline-pre'>$1</span>");
 			return text;
+		}
+
+		public static string LineEndingsToBrTags(this string text)
+		{
+			return Regex.Replace(text, @"\r?\n", "<br/>");
 		}
 	}
 }

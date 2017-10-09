@@ -308,8 +308,8 @@
 		var match;
 		if ((match = /^#comment-(\d+)$/.exec(hash)) !== null && $('.comment[data-comment-id=' + match[1] + ']').length > 0)
 			scrollTo($('.comment[data-comment-id=' + match[1] + ']')
-				.animate({ backgroundColor: '#fdd' })
-				.delay(500)
+				.animate({ backgroundColor: '#ffe6e3' })
+				.delay(1500)
 				.animate({ backgroundColor: 'initial' })
 				);
 	};

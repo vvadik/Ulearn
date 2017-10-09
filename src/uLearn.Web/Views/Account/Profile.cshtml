@@ -13,7 +13,7 @@
 		@UserAvatar.LargeAvatar(Model.User)
 	</div>
 	<div>
-		<div><b>@Model.User.UserName</b>, <a href="mailto:@Model.User.Email">@Model.User.Email</a>@(!Model.User.EmailConfirmed ? " <i>не подтверждена</i>" : "")</div>
+		<div><b>@Model.User.UserName</b>, <a href="mailto:@Model.User.Email">@Model.User.Email</a><i>@(!Model.User.EmailConfirmed ? " не подтверждена" : "")</i></div>
 		@{
 			var vkLogin = Model.Logins.FirstOrDefault(l => l.LoginProvider == VkAuthenticationConstants.AuthenticationType);
 			if (vkLogin != null)
@@ -33,7 +33,7 @@
 					<b>Телеграм:</b> 
 					@if (!string.IsNullOrEmpty(Model.User.TelegramChatTitle))
 					{
-						<a href="https://t.me/@(Model.User.TelegramChatTitle)">@@@Model.User.TelegramChatTitle</a>
+						<a href="https://t.me/@(Model.User.TelegramChatTitle.Substring(1))" target="_blank">@Model.User.TelegramChatTitle</a>
 					}
 					else
 					{
