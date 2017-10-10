@@ -172,6 +172,11 @@
 	font-weight: 600;
 }
 
+.notifications__notification__subheader {
+	color: #bbb;
+	font-weight: normal;
+}
+
 .notifications__notification b {
 	font-weight: 600;
 }
@@ -189,6 +194,17 @@
 	background-color: #f9f9fd;
 	border-color: #e6e6e9;
 }
+
+.notifications__comment-notification__text pre {
+	margin: 10px 0;
+}
+
+.notifications__notification.unread .notifications__comment-notification__text pre,
+.notifications__notification.unread .notifications__comment-notification__text .inline-pre {
+	background-color: #dbf3e7;
+	border-color: #c1ead6;
+}
+
 
 .notifications__notification:hover .notifications__comment-notification__text pre,
 .notifications__notification:hover .notifications__comment-notification__text .inline-pre {

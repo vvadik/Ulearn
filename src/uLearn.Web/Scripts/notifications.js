@@ -48,6 +48,11 @@
 		if ($self.hasClass('active'))
 			return;
 
+		var updateTimestampUrl = $self.data('updateTimestampUrl');
+		if (updateTimestampUrl) {
+			$.post(updateTimestampUrl);
+		}
+
 		var $feeds = $('.notifications__feed');
 		var $switchers = $('.notifications__feed-switcher a');
 		$switchers.removeClass('active');

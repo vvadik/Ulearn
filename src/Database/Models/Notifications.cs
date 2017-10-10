@@ -521,7 +521,7 @@ namespace Database.Models
 
 			return $"<b>{Comment.Author.VisibleName.EscapeHtml()} ответил{Comment.Author.Gender.ChooseEnding()} на ваш комментарий в «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" +
 					$"{GetHtmlCommentText(ParentComment, isCitation: true)}<br/><br/>" +
-					$"{GetHtmlCommentText()}";
+					$"{GetHtmlCommentText()}<br/>";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)

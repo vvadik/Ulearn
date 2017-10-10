@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 using Database;
 using Database.DataContexts;
 using Database.Models;
 using log4net;
 using Microsoft.AspNet.Identity;
-using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 
 namespace uLearn.Web.Controllers
@@ -23,7 +22,6 @@ namespace uLearn.Web.Controllers
 		private readonly ULearnDb db;
 		private readonly CourseManager courseManager;
 
-		private readonly NotificationsRepo notificationsRepo;
 		private readonly FeedRepo feedRepo;
 
 		private readonly FeedNotificationTransport commonFeedNotificationTransport;
@@ -37,7 +35,6 @@ namespace uLearn.Web.Controllers
 		{
 			this.db = db;
 			this.courseManager = courseManager;
-			notificationsRepo = new NotificationsRepo(db);
 			feedRepo = new FeedRepo(db);
 
 			commonFeedNotificationTransport = feedRepo.GetCommonFeedNotificationTransport();
@@ -53,7 +50,10 @@ namespace uLearn.Web.Controllers
 
 		public async Task<ActionResult> Index()
 		{
+			var userId = User.Identity.GetUserId();
+
 			var feedNotificationsModel = await GetFeedNotificationsModel();
+			await feedRepo.UpdateFeedViewTimestamp(userId, commonFeedNotificationTransport.Id, DateTime.Now);
 			return View(feedNotificationsModel);
 		}
 
@@ -64,7 +64,8 @@ namespace uLearn.Web.Controllers
 			if (DateTime.TryParse(lastTimestamp, out var dt))
 				lastTimestampDateTime = dt;
 
-			var unreadCountAndLastTimestamp = GetUnreadNotificationsCountAndLastTimestamp(userId, lastTimestampDateTime);
+			var userNotificationTransport = feedRepo.GetUsersFeedNotificationTransport(userId);
+			var unreadCountAndLastTimestamp = GetUnreadNotificationsCountAndLastTimestamp(userId, userNotificationTransport, lastTimestampDateTime);
 
 			return Json(new UnreadCountModel
 			{
@@ -74,26 +75,29 @@ namespace uLearn.Web.Controllers
 			}, JsonRequestBehavior.AllowGet);
 		}
 
-		private Tuple<int, DateTime?> GetUnreadNotificationsCountAndLastTimestamp(string userId, DateTime? from = null)
+		private Tuple<int, DateTime?> GetUnreadNotificationsCountAndLastTimestamp(string userId, FeedNotificationTransport transport, DateTime? from = null)
 		{
-			var notificationTransport = feedRepo.GetUsersFeedNotificationTransport(userId);
-			if (notificationTransport == null)
-				return Tuple.Create(0, (DateTime?)null);
-
-			var realFrom = from ?? feedRepo.GetFeedViewTimestamp(userId) ?? DateTime.MinValue;
-			var unreadCount = feedRepo.GetNotificationsCount(userId, realFrom, notificationTransport);
+			var realFrom = from ?? feedRepo.GetFeedViewTimestamp(userId, transport.Id) ?? DateTime.MinValue;
+			var unreadCount = feedRepo.GetNotificationsCount(userId, realFrom, transport);
 			if (unreadCount > 0)
 			{
-				from = feedRepo.GetLastDeliveryTimestamp(notificationTransport);
+				from = feedRepo.GetLastDeliveryTimestamp(transport);
 			}
 
 			return Tuple.Create(unreadCount, from);
 		}
 
+		public async Task<ActionResult> UpdateLastViewTimestamp(int transportId, DateTime timestamp)
+		{
+			await feedRepo.UpdateFeedViewTimestamp(User.Identity.GetUserId(), transportId, timestamp);
+			return new HttpStatusCodeResult(HttpStatusCode.OK);
+		}
+
 		public ActionResult NotificationsTopbarPartial(bool isMobile = false)
 		{
 			var userId = User.Identity.GetUserId();
-			var unreadCountAndLastTimestamp = GetUnreadNotificationsCountAndLastTimestamp(userId);
+			var userNotificationTransport = feedRepo.GetUsersFeedNotificationTransport(userId);
+			var unreadCountAndLastTimestamp = GetUnreadNotificationsCountAndLastTimestamp(userId, userNotificationTransport);
 			return PartialView(new NotificationsTopbarPartialModel
 			{
 				UnreadCount = unreadCountAndLastTimestamp.Item1,
@@ -124,14 +128,19 @@ namespace uLearn.Web.Controllers
 			importantNotifications = RemoveBlockedNotifications(importantNotifications).ToList();
 			commentsNotifications = RemoveBlockedNotifications(commentsNotifications, importantNotifications).ToList();
 
-			var lastViewTimestamp = feedRepo.GetFeedViewTimestamp(userId);
-			await feedRepo.UpdateFeedViewTimestamp(userId, DateTime.Now);
+			var importantLastViewTimestamp = feedRepo.GetFeedViewTimestamp(userId, notificationTransport?.Id ?? -1);
+			var commentsLastViewTimestamp = feedRepo.GetFeedViewTimestamp(userId, commonFeedNotificationTransport.Id);
+
+			if (notificationTransport != null)
+				await feedRepo.UpdateFeedViewTimestamp(userId, notificationTransport.Id, DateTime.Now);
 
 			return new FeedNotificationsModel
 			{
 				ImportantNotifications = importantNotifications,
+				ImportantLastViewTimestamp = importantLastViewTimestamp,
 				CommentsNotifications = commentsNotifications,
-				LastViewTimestamp = lastViewTimestamp,
+				CommentsLastViewTimestamp = commentsLastViewTimestamp,
+				CommentsNotificationsTransportId = commonFeedNotificationTransport.Id,
 				CourseManager = courseManager,
 			};
 		}
@@ -170,8 +179,12 @@ namespace uLearn.Web.Controllers
 		public List<Notification> ImportantNotifications { get; set; }
 		public List<Notification> CommentsNotifications { get; set; }
 
-		public DateTime? LastViewTimestamp { get; set; }
+		public DateTime? ImportantLastViewTimestamp { get; set; }
+		public DateTime? CommentsLastViewTimestamp { get; set; }
+
 		public CourseManager CourseManager { get; set; }
+
+		public int CommentsNotificationsTransportId { get; set; }
 	}
 
 	public class NotificationsTopbarPartialModel

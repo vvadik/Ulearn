@@ -477,6 +477,14 @@
     <Compile Include="Migrations\201710050829134_AddCourseAccesses.Designer.cs">
       <DependentUpon>201710050829134_AddCourseAccesses.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710100518377_AddTransportToFeedViewTimestamp.cs" />
+    <Compile Include="Migrations\201710100518377_AddTransportToFeedViewTimestamp.Designer.cs">
+      <DependentUpon>201710100518377_AddTransportToFeedViewTimestamp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710100555536_AddIndeciesToFeedViewTimestamp.cs" />
+    <Compile Include="Migrations\201710100555536_AddIndeciesToFeedViewTimestamp.Designer.cs">
+      <DependentUpon>201710100555536_AddIndeciesToFeedViewTimestamp.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -791,6 +799,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710050829134_AddCourseAccesses.resx">
       <DependentUpon>201710050829134_AddCourseAccesses.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710100518377_AddTransportToFeedViewTimestamp.resx">
+      <DependentUpon>201710100518377_AddTransportToFeedViewTimestamp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710100555536_AddIndeciesToFeedViewTimestamp.resx">
+      <DependentUpon>201710100555536_AddIndeciesToFeedViewTimestamp.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

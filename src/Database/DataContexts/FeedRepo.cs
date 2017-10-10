@@ -24,19 +24,29 @@ namespace Database.DataContexts
 			visitsRepo = new VisitsRepo(db);
 		}
 
-		public DateTime? GetFeedViewTimestamp(string userId)
+		public DateTime? GetFeedViewTimestamp(string userId, int transportId)
 		{
-			var updateTimestamp = db.FeedViewTimestamps.Where(t => t.UserId == userId).OrderByDescending(t => t.Timestamp).FirstOrDefault();
+			var updateTimestamp = db.FeedViewTimestamps
+				.Where(t => t.UserId == userId && (t.TransportId == null || t.TransportId == transportId))
+				.OrderByDescending(t => t.Timestamp)
+				.FirstOrDefault();
 			return updateTimestamp?.Timestamp;
 		}
 
-		public async Task UpdateFeedViewTimestamp(string userId, DateTime timestamp)
+		public async Task UpdateFeedViewTimestamp(string userId, int transportId, DateTime timestamp)
 		{
-			db.FeedViewTimestamps.AddOrUpdate(t => t.UserId, new FeedViewTimestamp
+			var currentTimestamp = db.FeedViewTimestamps.FirstOrDefault(t => t.UserId == userId && t.TransportId == transportId);
+			if (currentTimestamp == null)
 			{
-				UserId = userId,
-				Timestamp = timestamp
-			});
+				currentTimestamp = new FeedViewTimestamp
+				{
+					UserId = userId,
+					TransportId = transportId,
+				};
+				db.FeedViewTimestamps.Add(currentTimestamp);
+			}
+			currentTimestamp.Timestamp = timestamp;
+
 			await db.SaveChangesAsync();
 		}
 

@@ -4,11 +4,11 @@
 
 @model uLearn.Web.Controllers.FeedNotificationsModel
 
-@helper ShowNotifications(List<Notification> notifications)
+@helper ShowNotifications(List<Notification> notifications, DateTime? lastViewTimestamp)
 {
 	foreach (var notification in notifications)
 	{
-		<li class="notifications__notification @(notification.CreateTime >= Model.LastViewTimestamp ? "unread" : "")">
+		<li class="notifications__notification @(notification.CreateTime >= lastViewTimestamp ? "unread" : "")">
 
 			@try
 			{
@@ -22,9 +22,9 @@
 	}
 }
 
-@helper UnreadCountLabel(List<Notification> notifications)
+@helper UnreadCountLabel(List<Notification> notifications, DateTime? lastViewTimestamp)
 {
-	var unreadCount = notifications.Count(n => n.CreateTime >= Model.LastViewTimestamp);
+	var unreadCount = notifications.Count(n => n.CreateTime >= lastViewTimestamp);
 	if (unreadCount > 0)
 	{
 		<span class="label label-as-badge label-primary label-xs">@unreadCount</span>
@@ -37,21 +37,21 @@
 	<div class="notifications__feed-switcher">
 		<a href="#important" data-feed="important" class="active">
 			Уведомления
-			@UnreadCountLabel(Model.ImportantNotifications)
-		</a><a href="#comments" data-feed="comments">
+			@UnreadCountLabel(Model.ImportantNotifications, Model.ImportantLastViewTimestamp)
+		</a><a href="#comments" data-feed="comments" data-update-timestamp-url="@Url.Action("UpdateLastViewTimestamp", new { transportId = Model.CommentsNotificationsTransportId, timestamp = DateTime.Now })">
 			Комментарии
-			@UnreadCountLabel(Model.CommentsNotifications)
+			@UnreadCountLabel(Model.CommentsNotifications, Model.CommentsLastViewTimestamp)
 		</a>
 	</div>
 	<div class="notifications__notifications-wrapper notifications__feed active" data-feed="important">
-		@ShowNotifications(Model.ImportantNotifications)
+		@ShowNotifications(Model.ImportantNotifications, Model.ImportantLastViewTimestamp)
 		@if (Model.ImportantNotifications.Count == 0)
 		{
 			<li class="notifications__info">Здесь будут появляться ответы на&nbsp;ваши комментарии, сообщения от&nbsp;преподавателей и системы.</li>
 		}
 	</div>
 	<div class="notifications__notifications-wrapper notifications__feed" data-feed="comments">
-		@ShowNotifications(Model.CommentsNotifications)
+		@ShowNotifications(Model.CommentsNotifications, Model.CommentsLastViewTimestamp)
 		@if (Model.CommentsNotifications.Count == 0)
 		{
 			<li class="notifications__info">Здесь будут появляться комментарии пользователей во&nbsp;всех курсах, в&nbsp;которых вы занимаетесь.</li>

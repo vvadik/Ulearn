@@ -72,9 +72,11 @@
 			@UserAvatar.Avatar(notification.Comment.Author)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.Comment.Author)</div>
+			<div class="notifications__notification__header">
+				@UserName(notification.Comment.Author)
+				<span class="notifications__notification__subheader">к&nbsp;слайду @SlideLink(Url, course, slide)</span>
+			</div>
 			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100, renderSimpleMarkdown: true)</div>
-			<div class="notifications__notification__footer">к&nbsp;слайду @SlideLink(Url, course, slide)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>
@@ -93,8 +95,10 @@
 				<span title="@notification.ParentComment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__cite">@CollapseIfNeed(collapse, Html, notification.ParentComment.Text, 50, renderSimpleMarkdown: true)</span>
 			</div>
 			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100, renderSimpleMarkdown: true)</div>
-			<div class="notifications__notification__footer">к&nbsp;слайду @SlideLink(Url, course, slide)</div>
-			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+			<div class="notifications__notification__footer">
+				к&nbsp;слайду @SlideLink(Url, course, slide)
+				<span title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</span>
+			</div>
 		</div>
 	</div>
 }
