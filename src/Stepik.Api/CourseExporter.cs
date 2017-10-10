@@ -104,6 +104,8 @@ namespace Stepik.Api
 
 	public class CourseExporter
 	{
+		private const string stepikCSharpLanguageName = "mono c#";
+
 		private readonly string ulearnBaseUrl;
 		private readonly StepikApiClient client;
 		private readonly YoutubeVideoUrlExtractor youtubeVideoUrlExtractor;
@@ -444,7 +446,7 @@ namespace Stepik.Api
 					Name = "external-grader",
 					Text = lastTextBlock.Text,
 					Cost = exerciseBlock.CorrectnessScore,
-					Source = new StepikApiExternalGraderBlockSource(courseId, slideId, options.XQueueName)
+					Source = new StepikApiExternalGraderBlockSource(courseId, slideId, options.XQueueName, exerciseBlock.ExerciseInitialCode, stepikCSharpLanguageName)
 				};
 			}
 

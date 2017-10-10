@@ -272,15 +272,23 @@ namespace Stepik.Api
 	[DataContract]
 	public class StepikApiExternalGraderBlockSource : StepikApiBlockSource
 	{
+		[DataMember(Name = "language")]
+		public string Language;
+
+		[DataMember(Name = "template")]
+		public string Template;
+
 		public StepikApiExternalGraderBlockSource()
 		{
 		}
 
-		public StepikApiExternalGraderBlockSource(string courseId, Guid slideId, string queueName, bool isTextEnabled = true)
+		public StepikApiExternalGraderBlockSource(string courseId, Guid slideId, string queueName, string template, string language, bool isTextEnabled = true)
 		{
 			GraderPayload = new StepikApiExternalGraderPayload(courseId, slideId);
 			QueueName = queueName;
 			IsTextEnabled = isTextEnabled;
+			Template = template;
+			Language = language;
 		}
 	}
 
