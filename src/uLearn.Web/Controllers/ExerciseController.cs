@@ -298,6 +298,13 @@ namespace uLearn.Web.Controllers
 			var visit = visitsRepo.FindVisiter(course.Id, slide.Id, userId);
 
 			var solution = submission?.SolutionCode.Text;
+			if (string.IsNullOrEmpty(solution))
+			{
+				/* I.e. after click on `Try again` button solution is empty. Let try to show last sent submission */
+				var lastSubmission = userSolutionsRepo.GetAllSubmissionsByUser(course.Id, slide.Id, currentUserId).OrderByDescending(s => s.Timestamp).FirstOrDefault();
+				solution = lastSubmission?.SolutionCode.Text;
+			}
+
 			var submissionReviews = submission?.ManualCheckings.LastOrDefault()?.NotDeletedReviews;
 
 			var hasUncheckedReview = submission?.ManualCheckings.Any(c => !c.IsChecked) ?? false;

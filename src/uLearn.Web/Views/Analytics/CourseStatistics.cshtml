@@ -1,4 +1,6 @@
-﻿@using LtiLibrary.Core.Extensions
+﻿@using Database.Extensions
+@using Database.Models
+@using LtiLibrary.Core.Extensions
 @using uLearn
 @using uLearn.Extensions
 @using uLearn.Web.Extensions
@@ -308,10 +310,21 @@
 	foreach (var user in groupUsers.OrderBy(user => user.UserVisibleName))
 	{
 		<tr class="student" data-user-id="@user.UserId" data-group="@groupId">
-			<td title="@(Model.IsInstructor ? user.UserName : user.UserVisibleName)" class="student-name">@user.UserVisibleName.TruncateWithEllipsis(30)</td>
+			<td title="@(Model.IsInstructor ? user.UserName : user.UserVisibleName)" class="student-name">
+				@if (User.HasAccess(CourseRole.CourseAdmin))
+				{
+					@Html.ActionLink(user.UserVisibleName.TruncateWithEllipsis(30), "Profile", "Account", new { userId = user.UserId }, new {})
+				}
+				else
+				{
+					@user.UserVisibleName.TruncateWithEllipsis(30)
+				}
+			</td>
 			@if (Model.IsInstructor)
 			{
-				<td title="@user.UserEmail" class="student-email">@user.UserEmail.TruncateWithEllipsis(30)</td>
+				<td class="student-email">
+					<a href="mailto:@(user.UserEmail)" target="_blank">@user.UserEmail.TruncateWithEllipsis(30)</a>
+				</td>
 			}
 
 			@foreach (var scoringGroup in Model.ScoringGroups.Values)

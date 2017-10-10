@@ -53,6 +53,6 @@ namespace Database.Models
 
 		/* Назначать людей преподавателями */
 		[Display(Name = "Назначать преподавателей")]
-		AddAndRemoveInstructors = 3
+		AddAndRemoveInstructors = 3,
 	}
 }

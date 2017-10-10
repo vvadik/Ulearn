@@ -213,7 +213,7 @@
 		<div class="small-table__title">
 			<div class="small-table__title__cell">пользователь</div>
 			<div class="pull-right">
-				<div class="small-table__title__cell">прогресс</div>
+				<div class="small-table__title__cell  hidden-xs-inline-block">прогресс</div>
 				@foreach (var slide in exercisesAndQuizzes)
 				{
 					var isHiddenOnSmallScreens = IsSlideHiddenOnSmallScreens(slide);
@@ -257,7 +257,7 @@
 					@Html.ActionLink(userVisibleName.TruncateWithEllipsis(25), "UserUnitStatistics", new { courseId = Model.Course.Id, unitId = Model.Unit.Id, userId = userInfo.UserId }, new { title = "Посмотреть статистику пользователя " + userInfo.UserName })
 				</div>
 				<div class="ib pull-right">
-					<div class="student-progress progress">
+					<div class="student-progress progress  hidden-xs-inline-block">
 						<div class="progress-bar progress-bar-warning"
 							style="width: @(100 * (visitedSlidesCountAllTime - visitedSlidesCount) / Model.Slides.Count)%"
 							title="Посмотрел(а) @((visitedSlidesCountAllTime - visitedSlidesCount).PluralizeInRussian(new RussianPluralizationOptions

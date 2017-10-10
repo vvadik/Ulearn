@@ -1658,6 +1658,14 @@ h1 .copy-group-link {
 	}
 }
 
+@media (max-width: 600px) {
+	.analytics__dashboard .small-table__title__cell,
+	.analytics__dashboard .small-table__right-cell
+	{
+		width: 35px;
+	}
+}
+
 .analytics__dashboard .large-number {
 	text-align: center;
 	font-size: 40pt;

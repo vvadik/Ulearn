@@ -47,7 +47,14 @@
 		<div class="media-body">
 			<div class="comment__header media-heading">
 				<div class="comment__author-name">
-					@Model.Comment.Author.VisibleName
+					@if (User.HasAccess(CourseRole.CourseAdmin))
+					{
+						<a href="@Url.Action("Profile", "Account", new { userId = Model.Comment.AuthorId })">@Model.Comment.Author.VisibleName</a>
+					}
+					else
+					{
+						@Model.Comment.Author.VisibleName
+					}
 					@if (Model.CanViewAuthorSubmissions)
 					{
 						<sup>
