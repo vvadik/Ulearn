@@ -12,7 +12,7 @@
 	<div class="notifications-feed">
 		@foreach (var notification in Model.ImportantNotifications)
 		{
-			<div class="notifications__notification @(notification.CreateTime >= Model.LastViewTimestamp ? "unread" : "")">
+			<div class="notifications__notification @(notification.CreateTime >= Model.ImportantLastViewTimestamp ? "unread" : "")">
 				@try
 				{
 					@Notifications.Notification((dynamic)notification, Model.CourseManager.FindCourse(notification.CourseId), Html, Url, collapse: false)
