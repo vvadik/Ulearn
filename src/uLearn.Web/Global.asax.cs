@@ -21,6 +21,12 @@ namespace uLearn.Web
 			 * See http://stackoverflow.com/questions/14970102/anti-forgery-token-is-meant-for-user-but-the-current-user-is-username for details
 			 */
 			AntiForgeryConfig.SuppressIdentityHeuristicChecks = true;
+
+			/* Disable X-AspNetMvc-Version header
+			 * See https://stackoverflow.com/questions/3418557/how-to-remove-asp-net-mvc-default-http-headers for details
+			 */
+			MvcHandler.DisableMvcResponseHeader = true;
 		}
 	}
 }
+ 
