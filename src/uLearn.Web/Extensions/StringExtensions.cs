@@ -41,6 +41,7 @@ namespace uLearn.Web.Extensions
 					currentTag = "";
 					inTag = true;
 					isClosingTag = false;
+					continue;
 				}
 				if (s[i] == '>' && inTag)
 				{
