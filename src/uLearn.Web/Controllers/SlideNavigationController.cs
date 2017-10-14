@@ -130,7 +130,7 @@ namespace uLearn.Web.Controllers
 				prevSlide,
 				!User.Identity.IsAuthenticated);
 			if (onSolutionsSlide)
-				model.PrevSlide = slide;
+				model.SetPrevSlide(slide);
 			return PartialView(model);
 		}
 	}

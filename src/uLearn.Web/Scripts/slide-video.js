@@ -29,7 +29,11 @@
 					var newRate = e.data;
 					Cookies.set(rateCookieName, newRate);
 				}
-			}
+			},
+			playerVars: {
+				/* Disable related videos */
+				rel: 0,
+			},
 		});
 	});
 }

@@ -232,7 +232,7 @@
 			var ans = itemChecked ? "checked" : "";
 			var itemClass = "";
 			var title = "";
-			var readonlyAttr = context.CanUserFillQuiz ? "" : "readonly";
+			var readonlyAttr = context.CanUserFillQuiz ? "" : "disabled";
 			if (model.QuizState == QuizState.Total)
 			{
 				itemClass = item.IsCorrect ? "right-quiz" : itemChecked ? "wrong-quiz" : "";
@@ -326,7 +326,7 @@
 		ttitle = (block.Answer ? "Правильный" : "Неправильный") + " вариант";
 		ftitle = (!block.Answer ? "Правильный" : "Неправильный") + " вариант";
 	}
-	var readonlyAttr = context.CanUserFillQuiz ? "" : "readonly";
+	var readonlyAttr = context.CanUserFillQuiz ? "" : "disabled";
 	<div class="radio quiz-block-mark" id="@( block.Id + "_quizBlock")">
 		<div class="quiz">
 			<input autocomplete="off" @tchecked id='@( block.Id + "quizBlock" + "True")' name='@( block.Id + "group")' type="radio" @GetGuestDisable(context.IsGuest) @readonlyAttr>
@@ -337,7 +337,7 @@
 			}
 		</div>
 		<div class="quiz">
-			<input autocomplete="off" @fchecked id='@( block.Id + "quizBlock" + "False")' name='@( block.Id + "group")' type="radio" @GetGuestDisable(context.IsGuest)>
+			<input autocomplete="off" @fchecked id='@( block.Id + "quizBlock" + "False")' name='@( block.Id + "group")' type="radio" @GetGuestDisable(context.IsGuest) @readonlyAttr>
 			<label class="@falseItemClass" title="@ftitle" for="@( block.Id + "quizBlock" + "False")" @GetGuestOnclick(context.IsGuest)>Неверно</label>
 			@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && !block.Answer)
 			{

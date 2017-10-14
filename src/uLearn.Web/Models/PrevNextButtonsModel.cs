@@ -15,28 +15,23 @@ namespace uLearn.Web.Models
 		}
 
 		private readonly Course course;
+		public string CourseId => course.Id;
 
 		public bool NextIsAcceptedSolutions { get; set; }
 
-		public string CourseId
-		{
-			get { return course.Id; }
-		}
+		public Slide NextSlide { get; private set; }
+		public Slide PrevSlide { get; private set; }
 
-		public Slide NextSlide;
-		public Slide PrevSlide;
+		public bool HasNextSlide => NextSlide != null;
 
-		public bool HasNextSlide
-		{
-			get { return NextSlide != null; }
-		}
-
-		public bool HasPrevSlide
-		{
-			get { return PrevSlide != null; }
-		}
+		public bool HasPrevSlide => PrevSlide != null;
 
 		public bool IsGuest { get; set; }
 		public Guid SlideId { get; set; }
+
+		public void SetPrevSlide(Slide slide)
+		{
+			PrevSlide = slide;
+		}
 	}
 }
