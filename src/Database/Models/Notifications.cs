@@ -931,12 +931,12 @@ namespace Database.Models
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			return $"{InitiatedBy.VisibleName.EscapeHtml()} удалил{InitiatedBy.Gender.ChooseEnding()} студента <b>{User.VisibleName.EscapeHtml()}</b> из вашей группы <b>«{Group.Name.EscapeHtml()}» (курс «{course.Title.EscapeHtml()}»).";
+			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()}</b> удалил{InitiatedBy.Gender.ChooseEnding()} студента <b>{User.VisibleName.EscapeHtml()}</b> из вашей группы <b>«{Group.Name.EscapeHtml()}»</b> (курс «{course.Title.EscapeHtml()}»).";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			return $"{InitiatedBy.VisibleName} удалил{InitiatedBy.Gender.ChooseEnding()} студента {User.VisibleName} из вашей группы <b>«{Group.Name}» (курс «{course.Title}»).";
+			return $"{InitiatedBy.VisibleName} удалил{InitiatedBy.Gender.ChooseEnding()} студента {User.VisibleName} из вашей группы «{Group.Name}» (курс «{course.Title}»).";
 		}
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
