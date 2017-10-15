@@ -61,7 +61,7 @@ namespace uLearn.Web.Controllers
 			var canModerateComments = CanModerateComments(User, courseId);
 			var canSeeNotApprovedComments = canModerateComments;
 
-			var canViewAuthorSubmissions = coursesRepo.HasCourseAccess(userId, courseId, CourseAccessType.ViewAllStudentsSubmissions);
+			var canViewAuthorSubmissions = coursesRepo.HasCourseAccess(userId, courseId, CourseAccessType.ViewAllStudentsSubmissions) || User.HasAccessFor(courseId, CourseRole.CourseAdmin);
 
 			var model = new SlideCommentsModel
 			{

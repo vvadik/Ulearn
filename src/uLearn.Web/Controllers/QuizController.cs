@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using Database;
 using Database.DataContexts;
+using Database.Extensions;
 using Database.Models;
 using log4net;
 using uLearn.Quizes;
@@ -24,8 +25,9 @@ namespace uLearn.Web.Controllers
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(QuizController));
 
-		private const int MAX_DROPS_COUNT = 1;
-		public const int MAX_FILLINBLOCK_SIZE = 1024;
+		private const int defaultMaxDropsCount = 1;
+		public const int InfinityDropsCount = int.MaxValue - 1;
+		public const int MaxFillinblockSize = 1024;
 
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
@@ -86,7 +88,7 @@ namespace uLearn.Web.Controllers
 			if (isGuest)
 				return PartialView(GuestQuiz(slide, courseId));
 			var slideId = slide.Id;
-			var maxDropCount = GetMaxDropCount(slide);
+			var maxDropCount = GetMaxDropCount(courseId, slide);
 			var state = GetQuizState(courseId, userId, slideId, maxDropCount);
 			var quizState = state.Item1;
 			var tryNumber = state.Item2;
@@ -129,27 +131,7 @@ namespace uLearn.Web.Controllers
 
 			return PartialView(model);
 		}
-
-		[HttpPost]
-		[ULearnAuthorize(MinAccessLevel = CourseRole.Tester)]
-		public async Task<ActionResult> ClearAnswers(string courseId, Guid slideId, bool isLti)
-		{
-			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId) as QuizSlide;
-			if (slide == null)
-				return HttpNotFound();
-
-			var userId = User.Identity.GetUserId();
-			await userQuizzesRepo.RemoveAnswers(userId, slideId);
-			await visitsRepo.RemoveAttempts(slideId, userId);
-			var model = new { courseId, slideId = slide.Id };
-			if (isLti)
-			{
-				LtiUtils.SubmitScore(slide, userId);
-				return RedirectToAction("LtiSlide", "Course", model);
-			}
-			return RedirectToAction("SlideById", "Course", model);
-		}
-
+		
 		[HttpPost]
 		public async Task<ActionResult> SubmitQuiz(string courseId, Guid slideId, string answer, bool isLti)
 		{
@@ -159,7 +141,7 @@ namespace uLearn.Web.Controllers
 				return new HttpNotFoundResult();
 
 			var userId = User.Identity.GetUserId();
-			var maxDropCount = GetMaxDropCount(slide);
+			var maxDropCount = GetMaxDropCount(courseId, slide);
 			var quizState = GetQuizState(courseId, userId, slideId, maxDropCount).Item1;
 			if (!CanUserFillQuiz(quizState))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Already answered");
@@ -409,8 +391,8 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(FillInBlock fillInBlock, string data)
 		{
-			if (data.Length > MAX_FILLINBLOCK_SIZE)
-				data = data.Substring(0, MAX_FILLINBLOCK_SIZE);
+			if (data.Length > MaxFillinblockSize)
+				data = data.Substring(0, MaxFillinblockSize);
 			var isRightAnswer = true;
 			if (fillInBlock.Regexes != null)
 				isRightAnswer = fillInBlock.Regexes.Any(regex => regex.Regex.IsMatch(data));
@@ -642,7 +624,7 @@ namespace uLearn.Web.Controllers
 			if (slide is QuizSlide)
 			{
 				var userId = User.Identity.GetUserId();
-				if (userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b) < GetMaxDropCount(slide as QuizSlide) &&
+				if (userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b) < GetMaxDropCount(courseId, slide as QuizSlide) &&
 					!userQuizzesRepo.IsQuizScoredMaximum(courseId, userId, slideId))
 				{
 					await userQuizzesRepo.DropQuiz(userId, slideId);
@@ -669,12 +651,16 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private static int GetMaxDropCount(QuizSlide quizSlide)
+		private int GetMaxDropCount(string courseId, QuizSlide quizSlide)
 		{
+			if (User.HasAccessFor(courseId, CourseRole.Tester))
+				return InfinityDropsCount;
+
 			if (quizSlide == null)
-				return MAX_DROPS_COUNT;
-			var maxDropCount = quizSlide.MaxDropCount;
-			return maxDropCount == 0 ? MAX_DROPS_COUNT : maxDropCount;
+				return defaultMaxDropsCount;
+
+			var slideMaxDropCount = quizSlide.MaxDropCount;
+			return slideMaxDropCount == 0 ? defaultMaxDropsCount : quizSlide.MaxDropCount;
 		}
 
 		private Dictionary<string, int> GetResultForQuizes(string courseId, string userId, Guid slideId, QuizState state)
@@ -694,7 +680,7 @@ namespace uLearn.Web.Controllers
 				return Tuple.Create(queueItem.IsLocked ? QuizState.IsChecking : QuizState.WaitForCheck, states.Count);
 			}
 
-			if (states.Count > maxDropCount)
+			if (states.Count > maxDropCount && maxDropCount != InfinityDropsCount)
 				return Tuple.Create(QuizState.Total, states.Count);
 			if (states.Any(b => !b))
 				return Tuple.Create(QuizState.Subtotal, states.Count);

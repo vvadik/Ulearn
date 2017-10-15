@@ -1,17 +1,32 @@
 ﻿@using Database.Extensions
 @using Database.Models
-@using uLearn
+@using uLearn.Extensions
 @using uLearn.Quizes
-@using uLearn.Web.Extensions
+@using uLearn.Web.Controllers
 @using uLearn.Web.Views.Course
+
 @model QuizModel
 @{
 	var quizSlide = Model.Slide;
 
 	var status = "";
+	var triesCountMessage = Model.MaxDropCount == QuizController.InfinityDropsCount ? "∞ (преподаватели неограничены в попытках)" : (Model.MaxDropCount + 1).ToString();
 	if (!Model.IsGuest && Model.QuizState == QuizState.NotPassed)
 	{
-		status = string.Format("Попытка {0} из {1}", Model.TryNumber + 1, Model.MaxDropCount + 1);
+		status = string.Format(
+			"Попытка {0} из {1}",
+			Model.TryNumber + 1,
+			triesCountMessage
+		);
+	}
+	else if (!Model.IsGuest && Model.QuizState == QuizState.Subtotal)
+	{
+		status = string.Format(
+			"Использован{0} {1} из {2}",
+			Model.TryNumber % 10 == 1 && (Model.TryNumber / 10) % 10 != 1 ? "а" : "о",
+			Model.TryNumber.PluralizeInRussian(RussianPluralizationOptions.Tries),
+			triesCountMessage
+		);
 	}
 	else if (Model.ManualQuizCheckQueueItem != null)
 	{
@@ -98,18 +113,17 @@
 					<input type="hidden" name="slideId" value="@Model.Slide.Id"/>
 					<input type="hidden" name="courseId" value="@Model.CourseId"/>
 					<input type="hidden" name="isLti" value="@Model.IsLtiToString">
-					<button class="btn btn-danger" type="submit">Пройти тест повторно</button>
-					<small class="quiz__remains">У вас остал@(remains == 1 ? "а" : "о")сь @remains из @(Model.MaxDropCount + 1) попыток</small>
-				}
-			}
-			else if (User.HasAccessFor(Model.CourseId, CourseRole.Tester))
-			{
-				using (Html.BeginForm("ClearAnswers", "Quiz"))
-				{
-					<input type="hidden" name="slideId" value="@Model.Slide.Id"/>
-					<input type="hidden" name="courseId" value="@Model.CourseId"/>
-					<input type="hidden" name="isLti" value="@Model.IsLtiToString">
-					<button class="btn btn-danger" type="submit">Удалить ответы</button>
+					<button class="btn btn-primary" type="submit">Пройти тест ещё раз</button>
+					<small class="quiz__remains">
+						@if (Model.MaxDropCount == QuizController.InfinityDropsCount)
+						{
+							<text>Количество попыток для&nbsp;преподавателей неограничено</text>
+						}
+						else
+						{
+							<text>У вас остал@(remains == 1 ? "а" : "о")сь @remains.PluralizeInRussian(RussianPluralizationOptions.Tries) из @(Model.MaxDropCount + 1)</text>
+						}
+					</small>
 				}
 			}
 		</div>
