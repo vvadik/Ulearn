@@ -10,7 +10,7 @@ namespace uLearn.Web.Extensions
 		{
 			var html = "Text before tag <b>text in tag</b> text after tag";
 			var truncated = html.TruncateHtmlWithEllipsis(25);
-			Assert.True(truncated.EndsWith("</b>..."));
+			Assert.True(truncated.EndsWith("...</b>"));
 		}
 	}
 }

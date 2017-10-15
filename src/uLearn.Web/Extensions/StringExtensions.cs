@@ -66,7 +66,7 @@ namespace uLearn.Web.Extensions
 					var closingTags = "";
 					while (tags.Count > 0)
 						closingTags += $"</{tags.Pop()}>";
-					return s.Substring(0, i + 1) + closingTags + ellipsis;
+					return s.Substring(0, i + 1) + ellipsis + closingTags;
 				}
 			}
 
