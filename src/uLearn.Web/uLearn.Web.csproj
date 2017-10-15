@@ -424,7 +424,6 @@
     <Compile Include="Telegram\TelegramBot.cs" />
     <Compile Include="Extensions\ControllerExtensions.cs" />
     <Compile Include="Controllers\AuthenticationManager.cs" />
-    <Compile Include="Telegram\CommentsBot.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
     <Compile Include="Extensions\RequestExtensions.cs" />

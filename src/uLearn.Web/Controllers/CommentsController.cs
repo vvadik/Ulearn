@@ -14,7 +14,6 @@ using Microsoft.AspNet.Identity;
 using uLearn.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
-using uLearn.Web.Telegram;
 
 namespace uLearn.Web.Controllers
 {
@@ -25,7 +24,6 @@ namespace uLearn.Web.Controllers
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly CoursesRepo coursesRepo;
 		private readonly UserManager<ApplicationUser> userManager;
-		private readonly CommentsBot commentsBot = new CommentsBot();
 
 		public CommentsController()
 		{
@@ -154,7 +152,6 @@ namespace uLearn.Web.Controllers
 			}
 
 			var comment = await commentsRepo.AddComment(User, courseId, slideId, parentCommentIdInt, commentText);
-			await commentsBot.PostToChannel(comment);
 			if (comment.IsApproved)
 				await NotifyAboutNewComment(comment);
 			var canReply = CanAddCommentHere(User, courseId, isReply: true);
