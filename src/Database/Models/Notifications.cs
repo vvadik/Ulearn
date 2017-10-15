@@ -776,7 +776,7 @@ namespace Database.Models
 			if (scoringGroup == null)
 				return null;
 
-			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()} поставил{InitiatedBy.Gender.ChooseEnding()} вам баллы <i>{scoringGroup.Name.EscapeHtml()}</i> в&nbsp;модуле «{GetUnitTitle(course, unit).EscapeHtml()}»:</b><br/>" +
+			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()}</b> поставил{InitiatedBy.Gender.ChooseEnding()} вам баллы <b>{scoringGroup.Name.EscapeHtml()}</b> в&nbsp;модуле «{GetUnitTitle(course, unit).EscapeHtml()}»:<br/>" +
 					$"вы получили {Score.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}<br/><br/>" +
 					"Полную ведомость смотрите на&nbsp;<a href=\"https://ulearn.me\">ulearn.me</a>.";
 		}

@@ -45,7 +45,11 @@ namespace Notifications
 
 		public async Task SendEmailAsync(string to, string subject, string textContent = null, string htmlContent = null, EmailButton button = null, string textContentAfterButton = null, string htmlContentAfterButton = null)
 		{
+			var recipientEmailMetricName = to.ToLower().Replace(".", "_");
+
 			metricSender.SendCount("send_email.try");
+			metricSender.SendCount($"send_email.try.to.{recipientEmailMetricName}");
+
 			var messageInfo = new MessageSentInfo
 			{
 				RecipientAddress = to,
@@ -80,10 +84,13 @@ namespace Notifications
 			catch (Exception e)
 			{
 				log.Error($"Can\'t send message via Spam.API to {to} with subject {subject}", e);
+				metricSender.SendCount("send_email.fail");
+				metricSender.SendCount($"send_email.fail.to.{recipientEmailMetricName}");
 				throw;
 			}
 
 			metricSender.SendCount("send_email.success");
+			metricSender.SendCount($"send_email.success.to.{recipientEmailMetricName}");
 		}
 	}
 }
