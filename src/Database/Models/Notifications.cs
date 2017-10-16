@@ -596,15 +596,15 @@ namespace Database.Models
 				{
 					commentsText += $"{++reviewIndex}. ";
 					if (review.StartLine == review.FinishLine)
-						commentsText += $"Строка {review.StartLine}: ";
+						commentsText += $"Строка {review.StartLine + 1}: ";
 					else
-						commentsText += $"Строки {review.StartLine}—{review.FinishLine}: ";
+						commentsText += $"Строки {review.StartLine + 1}—{review.FinishLine + 1}: ";
 
 					if (html)
 					{
 						var codeFragment = GetSolutionCodeFragments(solutionCodeLines, review).EscapeHtml().LineEndingsToBrTags();
 						var reviewCommentHtml = review.Comment.EscapeHtml().RenderSimpleMarkdown(isHtml: false, telegramMode: true).LineEndingsToBrTags();
-						commentsText += $"<pre>{codeFragment}</pre><b>{review.Author.VisibleName}:</b> {reviewCommentHtml}<br/><br/>";
+						commentsText += $"<pre>{codeFragment}</pre><b>Комментарий:</b> {reviewCommentHtml}<br/><br/>";
 					}
 					else
 						commentsText += review.Comment + "\n";
@@ -633,7 +633,7 @@ namespace Database.Models
 
 			var commentsText = GetReviewsText(html: true);
 
-			return $"{InitiatedBy.VisibleName.EscapeHtml()} проверил{InitiatedBy.Gender.ChooseEnding()} ваше решение в «{GetSlideTitle(course, slide).EscapeHtml()}»<br/>" +
+			return $"{InitiatedBy.VisibleName.EscapeHtml()} проверил{InitiatedBy.Gender.ChooseEnding()} ваше решение в «{GetSlideTitle(course, slide).EscapeHtml()}»<br/><br/>" +
 					$"<b>Вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}</b><br/><br/>" +
 					commentsText;
 		}
