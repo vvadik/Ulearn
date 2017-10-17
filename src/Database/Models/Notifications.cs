@@ -604,7 +604,7 @@ namespace Database.Models
 					{
 						var codeFragment = GetSolutionCodeFragments(solutionCodeLines, review).EscapeHtml().LineEndingsToBrTags();
 						var reviewCommentHtml = review.Comment.EscapeHtml().RenderSimpleMarkdown(isHtml: false, telegramMode: true).LineEndingsToBrTags();
-						commentsText += $"<pre>{codeFragment}</pre><b>Комментарий:</b> {reviewCommentHtml}<br/><br/>";
+						commentsText += $"<br/><pre>{codeFragment}</pre><br/><b>Комментарий:</b> {reviewCommentHtml}<br/><br/>";
 					}
 					else
 						commentsText += review.Comment + "\n";
