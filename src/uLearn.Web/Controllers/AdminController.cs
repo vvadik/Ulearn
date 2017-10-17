@@ -288,7 +288,7 @@ namespace uLearn.Web.Controllers
 					/* Divider between used slides and another ones */
 					new KeyValuePair<Guid, Slide>(Guid.Empty, emptySlideMock)
 				})
-				.OrderBy(s => usedSlidesIds.Contains(s.Key))
+				.OrderBy(s => usedSlidesIds.Contains(s.Key) ? 0 : 1)
 				.ThenBy(s => s.Value.Index)
 				.Select(s => new KeyValuePair<Guid, string>(s.Key, s.Value.Title))
 				.ToList();
