@@ -278,7 +278,9 @@ namespace uLearn.Web.Controllers
 			var submissionsIds = checkings.Select(c => (c as ManualExerciseChecking)?.SubmissionId).Where(s => s.HasValue).Select(s => s.Value);
 			var solutions = userSolutionsRepo.GetSolutionsForSubmissions(submissionsIds);
 
-			var usedSlidesIds = new HashSet<Guid>(checkings.Select(c => c.SlideId));
+			filterOptions.SlidesIds = Enumerable.Empty<Guid>();
+			var usedCheckings = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions);
+			var usedSlidesIds = new HashSet<Guid>(usedCheckings.Select(c => c.SlideId));
 			var allCheckingsSlidesIds = slideCheckingsRepo.GetManualCheckingQueue<T>(GetManualCheckingFilterOptionsByGroup(courseId, groupsIds)).Select(c => c.SlideId).Distinct();
 			var emptySlideMock = new Slide(Enumerable.Empty<SlideBlock>(), new SlideInfo(null, null, -1), "", Guid.Empty);
 			var allCheckingsSlidesTitles = allCheckingsSlidesIds
