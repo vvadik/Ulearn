@@ -12,5 +12,13 @@ namespace uLearn.Web.Extensions
 			var truncated = html.TruncateHtmlWithEllipsis(25);
 			Assert.True(truncated.EndsWith("...</b>"));
 		}
+
+		[Test]
+		public void TruncateHtmlWithEllipsis_shouldIgnoreHtmlEntities()
+		{
+			var html = "Text before entity &amp; text after entity";
+			var truncated = html.TruncateHtmlWithEllipsis(20);
+			Assert.True(truncated.Contains("&amp;"));
+		}
 	}
 }
