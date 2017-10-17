@@ -821,13 +821,9 @@ WriteLiteralTo(__razor_helper_writer, "\t\t\t\t");
                  if (model.QuizState == QuizState.Total && !string.IsNullOrEmpty(item.Explanation))
 				{
 
-WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t<p");
+WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t<p>");
 
-WriteLiteralTo(__razor_helper_writer, " class=\"text-muted\"");
-
-WriteLiteralTo(__razor_helper_writer, ">");
-
-            WriteTo(__razor_helper_writer, item.Explanation);
+WriteTo(__razor_helper_writer, item.Explanation);
 
 WriteLiteralTo(__razor_helper_writer, "</p>\r\n");
 
@@ -886,20 +882,20 @@ WriteLiteralTo(__razor_helper_writer, ">\r\n");
 
 WriteLiteralTo(__razor_helper_writer, "\t\t\t\t<textarea");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 9382), Tuple.Create("\"", 9411)
-, Tuple.Create(Tuple.Create("", 9390), Tuple.Create("form-control", 9390), true)
-, Tuple.Create(Tuple.Create(" ", 9402), Tuple.Create<System.Object, System.Int32>(quizRes
-, 9403), false)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 9363), Tuple.Create("\"", 9392)
+, Tuple.Create(Tuple.Create("", 9371), Tuple.Create("form-control", 9371), true)
+, Tuple.Create(Tuple.Create(" ", 9383), Tuple.Create<System.Object, System.Int32>(quizRes
+, 9384), false)
 );
 
-WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 9412), Tuple.Create("\'", 9443)
-, Tuple.Create(Tuple.Create("", 9417), Tuple.Create<System.Object, System.Int32>( block.Id + "quizBlock"
-, 9417), false)
+WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 9393), Tuple.Create("\'", 9424)
+, Tuple.Create(Tuple.Create("", 9398), Tuple.Create<System.Object, System.Int32>( block.Id + "quizBlock"
+, 9398), false)
 );
 
-WriteAttributeTo(__razor_helper_writer, "maxlength", Tuple.Create(" maxlength=\"", 9444), Tuple.Create("\"", 9490)
-                   , Tuple.Create(Tuple.Create("", 9456), Tuple.Create<System.Object, System.Int32>(QuizController.MaxFillinblockSize
-, 9456), false)
+WriteAttributeTo(__razor_helper_writer, "maxlength", Tuple.Create(" maxlength=\"", 9425), Tuple.Create("\"", 9471)
+                   , Tuple.Create(Tuple.Create("", 9437), Tuple.Create<System.Object, System.Int32>(QuizController.MaxFillinblockSize
+, 9437), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, " ");
@@ -1027,9 +1023,9 @@ WriteLiteralTo(__razor_helper_writer, "\t<div");
 
 WriteLiteralTo(__razor_helper_writer, " class=\"radio quiz-block-mark\"");
 
-WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\"", 11286), Tuple.Create("\"", 11318)
-, Tuple.Create(Tuple.Create("", 11291), Tuple.Create<System.Object, System.Int32>( block.Id + "_quizBlock"
-, 11291), false)
+WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\"", 11267), Tuple.Create("\"", 11299)
+, Tuple.Create(Tuple.Create("", 11272), Tuple.Create<System.Object, System.Int32>( block.Id + "_quizBlock"
+, 11272), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t<div");
@@ -1062,19 +1058,19 @@ WriteLiteralTo(__razor_helper_writer, " ");
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t<label");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 11526), Tuple.Create("\"", 11548)
-, Tuple.Create(Tuple.Create("", 11534), Tuple.Create<System.Object, System.Int32>(trueItemClass
-, 11534), false)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 11507), Tuple.Create("\"", 11529)
+, Tuple.Create(Tuple.Create("", 11515), Tuple.Create<System.Object, System.Int32>(trueItemClass
+, 11515), false)
 );
 
-WriteAttributeTo(__razor_helper_writer, "title", Tuple.Create(" title=\"", 11549), Tuple.Create("\"", 11564)
-, Tuple.Create(Tuple.Create("", 11557), Tuple.Create<System.Object, System.Int32>(ttitle
-, 11557), false)
+WriteAttributeTo(__razor_helper_writer, "title", Tuple.Create(" title=\"", 11530), Tuple.Create("\"", 11545)
+, Tuple.Create(Tuple.Create("", 11538), Tuple.Create<System.Object, System.Int32>(ttitle
+, 11538), false)
 );
 
-WriteAttributeTo(__razor_helper_writer, "for", Tuple.Create(" for=\"", 11565), Tuple.Create("\"", 11606)
-, Tuple.Create(Tuple.Create("", 11571), Tuple.Create<System.Object, System.Int32>( block.Id + "quizBlock" + "True"
-, 11571), false)
+WriteAttributeTo(__razor_helper_writer, "for", Tuple.Create(" for=\"", 11546), Tuple.Create("\"", 11587)
+, Tuple.Create(Tuple.Create("", 11552), Tuple.Create<System.Object, System.Int32>( block.Id + "quizBlock" + "True"
+, 11552), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, " ");
@@ -1093,9 +1089,9 @@ WriteLiteralTo(__razor_helper_writer, " class=\"glyphicon glyphicon-ok\"");
 
 WriteLiteralTo(__razor_helper_writer, " style=\"color: green\"");
 
-WriteAttributeTo(__razor_helper_writer, "title", Tuple.Create(" title=\"", 11809), Tuple.Create("\"", 11824)
-, Tuple.Create(Tuple.Create("", 11817), Tuple.Create<System.Object, System.Int32>(ttitle
-, 11817), false)
+WriteAttributeTo(__razor_helper_writer, "title", Tuple.Create(" title=\"", 11790), Tuple.Create("\"", 11805)
+, Tuple.Create(Tuple.Create("", 11798), Tuple.Create<System.Object, System.Int32>(ttitle
+, 11798), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, "></i>\r\n");
@@ -1132,19 +1128,19 @@ WriteLiteralTo(__razor_helper_writer, " ");
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t<label");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 12053), Tuple.Create("\"", 12076)
-, Tuple.Create(Tuple.Create("", 12061), Tuple.Create<System.Object, System.Int32>(falseItemClass
-, 12061), false)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 12034), Tuple.Create("\"", 12057)
+, Tuple.Create(Tuple.Create("", 12042), Tuple.Create<System.Object, System.Int32>(falseItemClass
+, 12042), false)
 );
 
-WriteAttributeTo(__razor_helper_writer, "title", Tuple.Create(" title=\"", 12077), Tuple.Create("\"", 12092)
-, Tuple.Create(Tuple.Create("", 12085), Tuple.Create<System.Object, System.Int32>(ftitle
-, 12085), false)
+WriteAttributeTo(__razor_helper_writer, "title", Tuple.Create(" title=\"", 12058), Tuple.Create("\"", 12073)
+, Tuple.Create(Tuple.Create("", 12066), Tuple.Create<System.Object, System.Int32>(ftitle
+, 12066), false)
 );
 
-WriteAttributeTo(__razor_helper_writer, "for", Tuple.Create(" for=\"", 12093), Tuple.Create("\"", 12135)
-, Tuple.Create(Tuple.Create("", 12099), Tuple.Create<System.Object, System.Int32>( block.Id + "quizBlock" + "False"
-, 12099), false)
+WriteAttributeTo(__razor_helper_writer, "for", Tuple.Create(" for=\"", 12074), Tuple.Create("\"", 12116)
+, Tuple.Create(Tuple.Create("", 12080), Tuple.Create<System.Object, System.Int32>( block.Id + "quizBlock" + "False"
+, 12080), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, " ");
@@ -1163,9 +1159,9 @@ WriteLiteralTo(__razor_helper_writer, " class=\"glyphicon glyphicon-ok\"");
 
 WriteLiteralTo(__razor_helper_writer, " style=\"color: green\"");
 
-WriteAttributeTo(__razor_helper_writer, "title", Tuple.Create(" title=\"", 12341), Tuple.Create("\"", 12356)
-, Tuple.Create(Tuple.Create("", 12349), Tuple.Create<System.Object, System.Int32>(ftitle
-, 12349), false)
+WriteAttributeTo(__razor_helper_writer, "title", Tuple.Create(" title=\"", 12322), Tuple.Create("\"", 12337)
+, Tuple.Create(Tuple.Create("", 12330), Tuple.Create<System.Object, System.Int32>(ftitle
+, 12330), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, "></i>\r\n");
@@ -1216,15 +1212,15 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 WriteLiteralTo(__razor_helper_writer, "\t<div");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 13102), Tuple.Create("\"", 13178)
-, Tuple.Create(Tuple.Create("", 13110), Tuple.Create("quiz-block-ordering", 13110), true)
-, Tuple.Create(Tuple.Create(" ", 13129), Tuple.Create<System.Object, System.Int32>( context.CanUserFillQuiz ? "" : "not-movable"
-, 13130), false)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 13083), Tuple.Create("\"", 13159)
+, Tuple.Create(Tuple.Create("", 13091), Tuple.Create("quiz-block-ordering", 13091), true)
+, Tuple.Create(Tuple.Create(" ", 13110), Tuple.Create<System.Object, System.Int32>( context.CanUserFillQuiz ? "" : "not-movable"
+, 13111), false)
 );
 
-WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 13179), Tuple.Create("\'", 13211)
-          , Tuple.Create(Tuple.Create("", 13184), Tuple.Create<System.Object, System.Int32>( block.Id + "_quizBlock"
-, 13184), false)
+WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 13160), Tuple.Create("\'", 13192)
+          , Tuple.Create(Tuple.Create("", 13165), Tuple.Create<System.Object, System.Int32>( block.Id + "_quizBlock"
+, 13165), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n");
@@ -1292,9 +1288,9 @@ WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t\t<input");
 
 WriteLiteralTo(__razor_helper_writer, " autocomplete=\"off\"");
 
-WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 13966), Tuple.Create("\'", 14014)
-, Tuple.Create(Tuple.Create("", 13971), Tuple.Create<System.Object, System.Int32>( block.Id + "quizBlock" + item.GetHash()
-, 13971), false)
+WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 13947), Tuple.Create("\'", 13995)
+, Tuple.Create(Tuple.Create("", 13952), Tuple.Create<System.Object, System.Int32>( block.Id + "quizBlock" + item.GetHash()
+, 13952), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, " type=\"hidden\"");
@@ -1379,15 +1375,15 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 WriteLiteralTo(__razor_helper_writer, "\t<div");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 15318), Tuple.Create("\"", 15394)
-, Tuple.Create(Tuple.Create("", 15326), Tuple.Create("quiz-block-matching", 15326), true)
-, Tuple.Create(Tuple.Create(" ", 15345), Tuple.Create<System.Object, System.Int32>( context.CanUserFillQuiz ? "" : "not-movable"
-, 15346), false)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 15299), Tuple.Create("\"", 15375)
+, Tuple.Create(Tuple.Create("", 15307), Tuple.Create("quiz-block-matching", 15307), true)
+, Tuple.Create(Tuple.Create(" ", 15326), Tuple.Create<System.Object, System.Int32>( context.CanUserFillQuiz ? "" : "not-movable"
+, 15327), false)
 );
 
-WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 15395), Tuple.Create("\'", 15427)
-          , Tuple.Create(Tuple.Create("", 15400), Tuple.Create<System.Object, System.Int32>( block.Id + "_quizBlock"
-, 15400), false)
+WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 15376), Tuple.Create("\'", 15408)
+          , Tuple.Create(Tuple.Create("", 15381), Tuple.Create<System.Object, System.Int32>( block.Id + "_quizBlock"
+, 15381), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n");
@@ -1450,21 +1446,21 @@ WriteLiteralTo(__razor_helper_writer, "\t\t<ul>\r\n");
 
 WriteLiteralTo(__razor_helper_writer, "\t\t\t\t<li>\r\n\t\t\t\t\t<div");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 16329), Tuple.Create("\"", 16385)
-, Tuple.Create(Tuple.Create("", 16337), Tuple.Create("quiz", 16337), true)
-, Tuple.Create(Tuple.Create(" ", 16341), Tuple.Create("quiz-block-matching__item", 16342), true)
-, Tuple.Create(Tuple.Create(" ", 16367), Tuple.Create<System.Object, System.Int32>(isRightClass
-, 16368), false)
-, Tuple.Create(Tuple.Create(" ", 16381), Tuple.Create("row", 16382), true)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 16310), Tuple.Create("\"", 16366)
+, Tuple.Create(Tuple.Create("", 16318), Tuple.Create("quiz", 16318), true)
+, Tuple.Create(Tuple.Create(" ", 16322), Tuple.Create("quiz-block-matching__item", 16323), true)
+, Tuple.Create(Tuple.Create(" ", 16348), Tuple.Create<System.Object, System.Int32>(isRightClass
+, 16349), false)
+, Tuple.Create(Tuple.Create(" ", 16362), Tuple.Create("row", 16363), true)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\t\t<input");
 
 WriteLiteralTo(__razor_helper_writer, " autocomplete=\"off\"");
 
-WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 16420), Tuple.Create("\'", 16485)
-, Tuple.Create(Tuple.Create("", 16425), Tuple.Create<System.Object, System.Int32>( block.Id + "quizBlock" + fixedItem.GetHashForFixedItem()
-, 16425), false)
+WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 16401), Tuple.Create("\'", 16466)
+, Tuple.Create(Tuple.Create("", 16406), Tuple.Create<System.Object, System.Int32>( block.Id + "quizBlock" + fixedItem.GetHashForFixedItem()
+, 16406), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, " type=\"hidden\"");
@@ -1813,14 +1809,14 @@ WriteLiteralTo(__razor_helper_writer, "\t\t\t<button");
 
 WriteLiteralTo(__razor_helper_writer, " type=\"button\"");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 19774), Tuple.Create("\"", 19901)
-, Tuple.Create(Tuple.Create("", 19782), Tuple.Create("try-again-button", 19782), true)
-, Tuple.Create(Tuple.Create(" ", 19798), Tuple.Create("btn", 19799), true)
-, Tuple.Create(Tuple.Create(" ", 19802), Tuple.Create("btn-primary", 19803), true)
-, Tuple.Create(Tuple.Create(" ", 19814), Tuple.Create("no-rounds", 19815), true)
-, Tuple.Create(Tuple.Create(" ", 19824), Tuple.Create("exercise-version-link", 19825), true)
-                         , Tuple.Create(Tuple.Create(" ", 19846), Tuple.Create<System.Object, System.Int32>( model.IsLti ? "exercise-controls_button-long" : ""
-, 19847), false)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 19755), Tuple.Create("\"", 19882)
+, Tuple.Create(Tuple.Create("", 19763), Tuple.Create("try-again-button", 19763), true)
+, Tuple.Create(Tuple.Create(" ", 19779), Tuple.Create("btn", 19780), true)
+, Tuple.Create(Tuple.Create(" ", 19783), Tuple.Create("btn-primary", 19784), true)
+, Tuple.Create(Tuple.Create(" ", 19795), Tuple.Create("no-rounds", 19796), true)
+, Tuple.Create(Tuple.Create(" ", 19805), Tuple.Create("exercise-version-link", 19806), true)
+                         , Tuple.Create(Tuple.Create(" ", 19827), Tuple.Create<System.Object, System.Int32>( model.IsLti ? "exercise-controls_button-long" : ""
+, 19828), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, " data-version-id=\"-1\"");
@@ -1835,13 +1831,13 @@ WriteLiteralTo(__razor_helper_writer, "\t\t\t<button");
 
 WriteLiteralTo(__razor_helper_writer, " type=\"button\"");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 19995), Tuple.Create("\"", 20103)
-, Tuple.Create(Tuple.Create("", 20003), Tuple.Create("run-solution-button", 20003), true)
-, Tuple.Create(Tuple.Create(" ", 20022), Tuple.Create("btn", 20023), true)
-, Tuple.Create(Tuple.Create(" ", 20026), Tuple.Create("btn-primary", 20027), true)
-, Tuple.Create(Tuple.Create(" ", 20038), Tuple.Create("no-rounds", 20039), true)
-      , Tuple.Create(Tuple.Create(" ", 20048), Tuple.Create<System.Object, System.Int32>( model.IsLti ? "exercise-controls_button-long" : ""
-, 20049), false)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 19976), Tuple.Create("\"", 20084)
+, Tuple.Create(Tuple.Create("", 19984), Tuple.Create("run-solution-button", 19984), true)
+, Tuple.Create(Tuple.Create(" ", 20003), Tuple.Create("btn", 20004), true)
+, Tuple.Create(Tuple.Create(" ", 20007), Tuple.Create("btn-primary", 20008), true)
+, Tuple.Create(Tuple.Create(" ", 20019), Tuple.Create("no-rounds", 20020), true)
+      , Tuple.Create(Tuple.Create(" ", 20029), Tuple.Create<System.Object, System.Int32>( model.IsLti ? "exercise-controls_button-long" : ""
+, 20030), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, " data-url=\"");
@@ -1901,13 +1897,13 @@ WriteLiteralTo(__razor_helper_writer, "\t\t\t\t<button");
 
 WriteLiteralTo(__razor_helper_writer, " type=\"button\"");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 20558), Tuple.Create("\"", 20661)
-, Tuple.Create(Tuple.Create("", 20566), Tuple.Create("show-output-button", 20566), true)
-, Tuple.Create(Tuple.Create(" ", 20584), Tuple.Create("btn", 20585), true)
-, Tuple.Create(Tuple.Create(" ", 20588), Tuple.Create("btn-default", 20589), true)
-, Tuple.Create(Tuple.Create(" ", 20600), Tuple.Create("no-rounds", 20601), true)
-         , Tuple.Create(Tuple.Create(" ", 20610), Tuple.Create<System.Object, System.Int32>( model.IsShowOutputButtonActive ? "active" : ""
-, 20611), false)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 20539), Tuple.Create("\"", 20642)
+, Tuple.Create(Tuple.Create("", 20547), Tuple.Create("show-output-button", 20547), true)
+, Tuple.Create(Tuple.Create(" ", 20565), Tuple.Create("btn", 20566), true)
+, Tuple.Create(Tuple.Create(" ", 20569), Tuple.Create("btn-default", 20570), true)
+, Tuple.Create(Tuple.Create(" ", 20581), Tuple.Create("no-rounds", 20582), true)
+         , Tuple.Create(Tuple.Create(" ", 20591), Tuple.Create<System.Object, System.Int32>( model.IsShowOutputButtonActive ? "active" : ""
+, 20592), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\tПоказать вывод\r\n\t\t\t\t</button>\r\n");
@@ -1922,9 +1918,9 @@ WriteLiteralTo(__razor_helper_writer, " type=\"button\"");
 
 WriteLiteralTo(__razor_helper_writer, " class=\"btn btn-default giveup-btn no-rounds\"");
 
-WriteAttributeTo(__razor_helper_writer, "onclick", Tuple.Create(" onclick=\"", 20839), Tuple.Create("\"", 20882)
-            , Tuple.Create(Tuple.Create("", 20849), Tuple.Create<System.Object, System.Int32>( model.AcceptedSolutionsAction
-, 20849), false)
+WriteAttributeTo(__razor_helper_writer, "onclick", Tuple.Create(" onclick=\"", 20820), Tuple.Create("\"", 20863)
+            , Tuple.Create(Tuple.Create("", 20830), Tuple.Create<System.Object, System.Int32>( model.AcceptedSolutionsAction
+, 20830), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\tЧужие решения\r\n\t\t\t\t</button>\r\n");

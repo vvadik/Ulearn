@@ -857,6 +857,7 @@
     <Content Include="Scripts\buttons.js" />
     <Content Include="Scripts\certificates-editor.js" />
     <Content Include="Scripts\clipboard.min.js" />
+    <Content Include="Scripts\connect-checkboxes.js" />
     <Content Include="Scripts\course-statistics.js" />
     <Content Include="Scripts\diagnostics.js" />
     <Content Include="Scripts\forms.replace-action.js" />

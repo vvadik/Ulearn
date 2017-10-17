@@ -94,6 +94,7 @@ namespace uLearn.Web
 				"~/Scripts/notifications.js",
 				"~/Scripts/stepik.js",
 				"~/Scripts/modals.js",
+				"~/Scripts/connect-checkboxes.js",
 			};
 		}
 

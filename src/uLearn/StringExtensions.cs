@@ -178,7 +178,7 @@ namespace uLearn
 			/* ```Multiline code``` */
 			text = Regex.Replace(text, @"(?:" + newLineRegExp + @")*```(?:" + newLineRegExp + @")*(.+?)```(?:" + newLineRegExp + @")*", @"<pre>$1</pre>", RegexOptions.Multiline | RegexOptions.Singleline);
 			/* `Inline code` */
-			text = Regex.Replace(text, @"`(.+?)`", telegramMode ? @"<code>$1</code>" : @"<span class='inline-pre'>$1</span>");
+			text = Regex.Replace(text, @"(?<!\d)`(.+?)`(?!\d)", telegramMode ? @"<code>$1</code>" : @"<span class='inline-pre'>$1</span>");
 			return text;
 		}
 

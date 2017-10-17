@@ -31,7 +31,7 @@ namespace uLearn.Web.Extensions
 											  @
 											 )?
 											 (?<hostnameOrIpAddress>
-											  (([-a-z0-9_]{2,}\.)+([a-z]{2,3}(?<!txt|cs|min|max|add)|" + tldWhiteList + @"))
+											  (([-a-z0-9_]{2,}\.)+([a-z]{2,3}(?<!txt|cs|min|max|add|io)|" + tldWhiteList + @"))
 											  |
 											  ((?:(?:25[0-5]|2[0-4]\d|[01]\d\d|\d?\d)(?(\.?\d)\.)){4})
 											 )

@@ -45,7 +45,7 @@
 				<div class="alert alert-info mt10 ">Эта работа проверяется преподавателем @Model.Checking.LockedBy.VisibleName</div>
 			}
 
-			<h4 class="@(Model.IsCurrentSubmissionChecking ? "" : "text-muted")">Оцените работу (максимальный балл @block.MaxReviewScore)</h4>
+			<h4>Оцените работу (максимальный балл @block.MaxReviewScore)</h4>
 			<div class="exercise__score">
 				<div class="btn-group" role="group">
 					@{
@@ -63,7 +63,7 @@
 					}
 				</div>
 				<div class="ib">
-					<a href="#" class="exercise__other-score-link internal-page-link @(isPercentScoreActive ? "" : "active") @(Model.IsCurrentSubmissionChecking ? "" : "text-muted")">Другая оценка</a>
+					<a href="#" class="exercise__other-score-link internal-page-link @(isPercentScoreActive ? "" : "active")">Другая оценка</a>
 					@{
 						var otherScoreInputDisplay = Model.Checking.IsChecked && !isPercentScoreActive ? "" : "display: none";
 					}
