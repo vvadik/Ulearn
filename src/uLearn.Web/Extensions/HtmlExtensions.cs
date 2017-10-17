@@ -17,17 +17,25 @@ namespace uLearn.Web.Extensions
 		private const string tldWhiteList = @"arpa|adult|aero|audio|best|blog|camera|camp|center|club|dance|data|education|email|game|global|hosting|jobs|live|map|mobi|photo|pizza|sale|shop|travel|video|wiki";
 
 		private const string urlRegexS = @"(
-											(?<protocol>(https?|ftps?)://|mailto:)?
-											(?<usernameAndPassword>
-											 [-a-z0-9_.+]+
-											 (:[-a-z0-9_.]+)?
-											 @h
-											)?
-											(?<hostnameOrIpAddress>
-											 (([-a-z0-9_]{2,}\.)+([a-z]{2,3}|" + tldWhiteList + @"))
+											(
+											 (?<protocol>(https?|ftps?)://|mailto:)
+											 (?<hostnameOrIpAddress>
+											  (([-a-z0-9_]*\.)+([a-z]*))
+											  |
+											  ((?:(?:25[0-5]|2[0-4]\d|[01]\d\d|\d?\d)(?(\.?\d)\.)){4})
+											 )
 											 |
-											 ((?:(?:25[0-5]|2[0-4]\d|[01]\d\d|\d?\d)(?(\.?\d)\.)){4})
-											)
+											 (?<usernameAndPassword>
+											  [-a-z0-9_.+]+
+											  (:[-a-z0-9_.]+)?
+											  @
+											 )?
+											 (?<hostnameOrIpAddress>
+											  (([-a-z0-9_]{2,}\.)+([a-z]{2,3}(?<!txt|cs|min|max|add)|" + tldWhiteList + @"))
+											  |
+											  ((?:(?:25[0-5]|2[0-4]\d|[01]\d\d|\d?\d)(?(\.?\d)\.)){4})
+											 )
+                                            )
 											(?<port>:\d+)?
 											(?<relativePath>
 											 [/?]
@@ -48,7 +56,7 @@ namespace uLearn.Web.Extensions
 										   )
 										   ";
 
-		private static readonly Regex urlRegex = new Regex(urlRegexS, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+		public static readonly Regex urlRegex = new Regex(urlRegexS, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
 		public static string EncodeMultiLineText(this HtmlHelper helper, string text, bool keepFirstSpaces = false)
 		{
