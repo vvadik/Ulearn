@@ -16,6 +16,7 @@ using Database.Extensions;
 using Database.Models;
 using Microsoft.VisualBasic.FileIO;
 using uLearn.Extensions;
+using uLearn.Model.Blocks;
 using uLearn.Quizes;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
@@ -276,25 +277,51 @@ namespace uLearn.Web.Controllers
 			var reviews = slideCheckingsRepo.GetExerciseCodeReviewForCheckings(checkings.Select(c => c.Id));
 			var submissionsIds = checkings.Select(c => (c as ManualExerciseChecking)?.SubmissionId).Where(s => s.HasValue).Select(s => s.Value);
 			var solutions = userSolutionsRepo.GetSolutionsForSubmissions(submissionsIds);
+
+			var usedSlidesIds = new HashSet<Guid>(checkings.Select(c => c.SlideId));
+			var allCheckingsSlidesIds = slideCheckingsRepo.GetManualCheckingQueue<T>(GetManualCheckingFilterOptionsByGroup(courseId, groupsIds)).Select(c => c.SlideId).Distinct();
+			var emptySlideMock = new Slide(Enumerable.Empty<SlideBlock>(), new SlideInfo(null, null, -1), "", Guid.Empty);
+			var allCheckingsSlidesTitles = allCheckingsSlidesIds
+				.Select(s => new KeyValuePair<Guid, Slide>(s, course.GetSlideById(s)))
+				.Union(new List<KeyValuePair<Guid, Slide>>
+				{
+					/* Divider between used slides and another ones */
+					new KeyValuePair<Guid, Slide>(Guid.Empty, emptySlideMock)
+				})
+				.OrderBy(s => usedSlidesIds.Contains(s.Key))
+				.ThenBy(s => s.Value.Index)
+				.Select(s => new KeyValuePair<Guid, string>(s.Key, s.Value.Title))
+				.ToList();
+			/* Remove divider iff it is first or last */
+			if (allCheckingsSlidesTitles.First().Key == Guid.Empty || allCheckingsSlidesTitles.Last().Key == Guid.Empty)
+				allCheckingsSlidesTitles.RemoveAll(kvp => kvp.Key == Guid.Empty);
+
 			return View(viewName, new ManualCheckingQueueViewModel
 			{
 				CourseId = courseId,
-				Checkings = checkings.Take(MaxShownQueueSize).Select(c => new ManualCheckingQueueItemViewModel
+				Checkings = checkings.Take(MaxShownQueueSize).Select(c =>
 				{
-					CheckingQueueItem = c,
-					ContextSlideTitle = course.GetSlideById(c.SlideId).Title,
-					ContextMaxScore = course.GetSlideById(c.SlideId).MaxScore,
-					ContextReviews = reviews.GetOrDefault(c.Id, new List<ExerciseCodeReview>()),
-					ContextExerciseSolution = c is ManualExerciseChecking ?
-						solutions.GetOrDefault((c as ManualExerciseChecking).SubmissionId, "") :
-						"",
+					var slide = course.GetSlideById(c.SlideId);
+					return new ManualCheckingQueueItemViewModel
+					{
+						CheckingQueueItem = c,
+						ContextSlideId = slide.Id,
+						ContextSlideTitle = slide.Title,
+						ContextMaxScore = (slide as ExerciseSlide)?.Exercise.MaxReviewScore ?? slide.MaxScore,
+						ContextTimestamp = c.Timestamp,
+						ContextReviews = reviews.GetOrDefault(c.Id, new List<ExerciseCodeReview>()),
+						ContextExerciseSolution = c is ManualExerciseChecking ?
+							solutions.GetOrDefault((c as ManualExerciseChecking).SubmissionId, "") :
+							"",
+					};
 				}).ToList(),
 				Groups = groups,
 				SelectedGroupsIds = groupsIds,
 				Message = message,
 				AlreadyChecked = done,
 				ExistsMore = checkings.Count > MaxShownQueueSize,
-				ShowFilterForm = string.IsNullOrEmpty(userId) && !slideId.HasValue,
+				ShowFilterForm = string.IsNullOrEmpty(userId),
+				SlidesTitles = allCheckingsSlidesTitles,
 			});
 		}
 
@@ -1541,16 +1568,19 @@ namespace uLearn.Web.Controllers
 		public bool AlreadyChecked { get; set; }
 		public bool ExistsMore { get; set; }
 		public bool ShowFilterForm { get; set; }
+		public List<KeyValuePair<Guid, string>> SlidesTitles { get; set; }
 	}
 
 	public class ManualCheckingQueueItemViewModel
 	{
 		public AbstractManualSlideChecking CheckingQueueItem { get; set; }
 
+		public Guid ContextSlideId { get; set; }
 		public string ContextSlideTitle { get; set; }
 		public int ContextMaxScore { get; set; }
 		public List<ExerciseCodeReview> ContextReviews { get; set; }
 		public string ContextExerciseSolution { get; set; }
+		public DateTime ContextTimestamp { get; set; }
 	}
 
 	public class DiagnosticsModel

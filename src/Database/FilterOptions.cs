@@ -16,7 +16,7 @@ namespace Database
 	public class ManualCheckingQueueFilterOptions : AbstractFilterOptionByCourseAndUsers
 	{
 		public IEnumerable<Guid> SlidesIds { get; set; }
-		public bool OnlyChecked { get; set; }
+		public bool? OnlyChecked { get; set; }
 		public int Count { get; set; }
 	}
 

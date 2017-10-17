@@ -2406,3 +2406,13 @@ h4 + div > .notifications__transport-settings__course__link {
 .profile__avatar {
 	margin-right: 10px;
 }
+
+/* Manual checking queue filter form */
+#manual-checking-queue-filter-form .checkbox {
+	padding-left: 0;
+	padding-top: 5px;
+}
+
+#manual-checking-queue-filter-form .checkbox > label {
+	padding-left: 5px;
+}

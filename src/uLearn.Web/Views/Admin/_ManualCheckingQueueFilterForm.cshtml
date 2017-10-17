@@ -1,9 +1,11 @@
-﻿@model uLearn.Web.Controllers.ManualCheckingQueueViewModel
+﻿@using System.Web.Mvc.Html
+@using uLearn.Web.Extensions
+
+@model uLearn.Web.Controllers.ManualCheckingQueueViewModel
 
 @using (Html.BeginForm(Url.RequestContext.RouteData.GetRequiredString("Action"), "Admin", FormMethod.Get, new { @class = "form-inline", id = "manual-checking-queue-filter-form" }))
 {
 	@Html.Hidden("courseId", Model.CourseId)
-	@Html.Hidden("done", Model.AlreadyChecked)
 
 	@Html.Partial("~/Views/Shared/_GroupsFilter.cshtml", new GroupsFilterViewModel
 	{
@@ -13,6 +15,51 @@
 	})
 
 	<div class="form-group">
+		@{
+			var slideListItems = new List<SelectListItemWithAttributes>
+			{
+				new SelectListItemWithAttributes { Text = "Все задания", Value = "" },
+			};
+			if (Model.SlidesTitles.Any(s => s.Key != Guid.Empty))
+			{
+				slideListItems.Add(new SelectListItemWithAttributes { Value = "-", HtmlAttributes = new { data_divider = "true", data_exclusive = "true" } });
+			}
+
+			slideListItems.AddRange(
+				Model.SlidesTitles.Select(
+					kvp => new SelectListItemWithAttributes
+					{
+						Text = kvp.Value,
+						Value = kvp.Key.ToString(),
+						HtmlAttributes = kvp.Key == Guid.Empty ? new { data_divider = "true", data_exclusive = "true" } : new object(),
+					}
+				)
+			);
+		}
+
+		@Html.DropDownListWithItemAttributes(
+			"slideId",
+			slideListItems,
+			new
+			{
+				@class = "form-control selectpicker without-backdrop",
+				size = "1",
+				data_live_search = "true",
+			})
+	</div>
+
+	<div class="form-group">
 		<button role="button" class="btn btn-primary">Отфильтровать</button>
+	</div>
+
+	<br />
+
+	<div class="form-group">
+		<div class="checkbox checkbox-default">
+			@Html.CheckBox("done", Model.AlreadyChecked);
+			<label for="done">
+				Уже проверенные работы
+			</label>
+		</div>
 	</div>
 }
