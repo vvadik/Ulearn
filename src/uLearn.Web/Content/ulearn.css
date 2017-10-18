@@ -2415,12 +2415,12 @@ h4 + div > .notifications__transport-settings__course__link {
 @media (min-width: 769px) {
 	#manual-checking-queue-filter-form .manual-checking-queue-filter-form__done-filter {
 		display: block;
-
 	}
 	
 	#manual-checking-queue-filter-form .checkbox {
 		padding-left: 0px;
 		padding-top: 5px;
+		padding-bottom: 10px;
 	}
 
 	#manual-checking-queue-filter-form .checkbox > label {
