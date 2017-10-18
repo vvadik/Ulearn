@@ -281,7 +281,11 @@ namespace uLearn.Web.Controllers
 			filterOptions.SlidesIds = null;
 			var usedCheckings = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions);
 			var usedSlidesIds = new HashSet<Guid>(usedCheckings.Select(c => c.SlideId));
-			var allCheckingsSlidesIds = slideCheckingsRepo.GetManualCheckingQueue<T>(GetManualCheckingFilterOptionsByGroup(courseId, groupsIds)).Select(c => c.SlideId).Distinct();
+
+			filterOptions = GetManualCheckingFilterOptionsByGroup(courseId, groupsIds);
+			filterOptions.OnlyChecked = null;
+			var allCheckingsSlidesIds = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions).Select(c => c.SlideId).Distinct();
+
 			var emptySlideMock = new Slide(Enumerable.Empty<SlideBlock>(), new SlideInfo(null, null, -1), "", Guid.Empty);
 			var allCheckingsSlidesTitles = allCheckingsSlidesIds
 				.Select(s => new KeyValuePair<Guid, Slide>(s, course.GetSlideById(s)))

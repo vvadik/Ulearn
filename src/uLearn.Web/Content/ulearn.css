@@ -1881,6 +1881,10 @@ h1 .copy-group-link {
 .exercise__score .status.error { color: #a0372b }
 .exercise__score .status.success { color: #2ca02b }
 
+.exercise__score-form {
+	margin-bottom: 10px;
+}
+
 #exercise__submission__output {
 	margin-top: 10px;
 	font-family: monospace;
