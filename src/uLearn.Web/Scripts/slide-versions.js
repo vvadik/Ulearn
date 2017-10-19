@@ -70,6 +70,6 @@ $(document).ready(function () {
 
 	$('.exercise__submission').on('change', '[name=version]', function() {
 		var $self = $(this);
-		setExerciseVersion($self.val());
+		setExerciseVersion(parseInt($self.val()));
 	});
 });

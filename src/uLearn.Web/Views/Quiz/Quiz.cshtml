@@ -30,7 +30,7 @@
 	}
 	else if (!Model.IsGuest && Model.QuizState == QuizState.Total)
 	{
-		status = string.Format("Решёно с {0} попытки", Model.TryNumber - 1);
+		status = string.Format("Решено с {0} попытки", Model.TryNumber);
 	}
 	else if (Model.ManualQuizCheckQueueItem != null)
 	{
