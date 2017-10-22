@@ -218,6 +218,7 @@
   <ItemGroup>
     <Compile Include="CSharp\CourseValidator_ReportError_should.cs" />
     <Compile Include="CSharp\CourseValidator_ReportWarning_should.cs" />
+    <Compile Include="CSharp\ExponentiationValidator_should.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\BracesMightNotBeAlignedIfOpenBraceDoesntHaveLeadingTrivia.cs" />
     <Content Include="CSharp\IndentsValidation\TestData\Correct\TopLevelNodesCanBeIndented.cs" />
     <Content Include="CSharp\IndentsValidation\TestData\Correct\IfOpenBraceGrandparentIsMultilineThenContentIndentedFromGrandparent.cs" />
