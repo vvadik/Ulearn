@@ -8,9 +8,8 @@ namespace uLearn.CSharp
 	{
 		public static bool IsMathPow(this InvocationExpressionSyntax invocation, ISymbol symbol = null)
 		{
-			var invokedMethodName = symbol?.ToString() ?? invocation.Expression.ToString();
-			return IsMathPowMethodName(invokedMethodName) 
-				&& invocation.ArgumentList.Arguments.Count == 2;
+			var invokedMethodName = symbol?.ToString();
+			return IsMathPowMethodName(invokedMethodName) && invocation.ArgumentList.Arguments.Count == 2;
 		}
 
 		public static bool ContainsForbiddenDegrees(this ArgumentListSyntax argumentListSyntax,
@@ -21,9 +20,7 @@ namespace uLearn.CSharp
 
 		private static bool IsMathPowMethodName(string methodName)
 		{
-			return methodName == "System.Math.Pow(double, double)"
-					|| methodName == "Math.Pow"
-					|| methodName == "System.Math.Pow";
+			return methodName == "System.Math.Pow(double, double)";
 		}
 	}
 }
