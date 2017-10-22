@@ -5,22 +5,17 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace uLearn.CSharp
 {
-	public class ExponentiationValidator: BaseStyleValidator
+	public class ExponentiationValidator: BaseStyleValidatorWithSemanticModel
 	{
-		private SemanticModel semanticModel;
 		private static readonly HashSet<string> forbiddenDegrees = 
 			new HashSet<string>{"2", "3"};
 		
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
-			var mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
-			var compilation = CSharpCompilation.Create("MyCompilation",
-				syntaxTrees: new[] { userSolution }, references: new[] { mscorlib });
-			semanticModel = compilation.GetSemanticModel(userSolution);
-			return InspectAll<InvocationExpressionSyntax>(userSolution, InspectMethod);
+			return InspectAll<InvocationExpressionSyntax>(userSolution, semanticModel, InspectMethod);
 		}
 
-		private IEnumerable<string> InspectMethod(InvocationExpressionSyntax methodInvocation)
+		private IEnumerable<string> InspectMethod(InvocationExpressionSyntax methodInvocation, SemanticModel semanticModel)
 		{
 			var symbol = semanticModel.GetSymbolInfo(methodInvocation).Symbol;
 			if (methodInvocation.IsMathPow(symbol) &&
