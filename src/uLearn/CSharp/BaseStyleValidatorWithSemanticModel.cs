@@ -8,9 +8,15 @@ namespace uLearn.CSharp
 {
 	public abstract class BaseStyleValidatorWithSemanticModel: BaseStyleValidator
 	{
+		private readonly PortableExecutableReference mscorlib;
+
+		public BaseStyleValidatorWithSemanticModel()
+		{
+			mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
+		}
+
 		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
 		{
-			var mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
 			var compilation = CSharpCompilation.Create("MyCompilation", new[] { userSolution },
 				new[] { mscorlib });
 			var semanticModel = compilation.GetSemanticModel(userSolution);
