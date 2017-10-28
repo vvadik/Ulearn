@@ -52,14 +52,17 @@ namespace uLearn.CSharp.ExponentiationValidation
 
 		[Explicit]
 		[TestCaseSource(nameof(basicProgrammingFiles))]
-		public void CheckFile(FileInfo file)
+		public void NotFindErrors_InBasicProgramming(FileInfo file)
 		{
 			var fileContent = file.ContentAsUtf8();
 
 			var errors = validator.FindError(fileContent);
 
 			if (errors != null)
+			{
 				File.WriteAllText($@"C:\work\uLearn\errors\{file.Name}_errors.txt", errors);
+				Assert.Fail();
+			}
 		}
 	}
 }
