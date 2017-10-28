@@ -187,3 +187,6 @@ private.settings
 # Exercises projects zips
 *.exercise.zip
 /src/uLearn.Web/App_Data/error*.xml
+
+# Rider files
+/src/.idea/
