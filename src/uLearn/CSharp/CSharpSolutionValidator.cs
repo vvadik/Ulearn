@@ -16,6 +16,7 @@ namespace uLearn.CSharp
 			new NamingCaseStyleValidator(),
 			new RedundantIfStyleValidator(),
 			new NamingStyleValidator(),
+			new ExponentiationValidator(),
 			new IndentsValidator() // Выводит дополнительный текст в конце, поэтому лучше ему быть последним
 		};
 
