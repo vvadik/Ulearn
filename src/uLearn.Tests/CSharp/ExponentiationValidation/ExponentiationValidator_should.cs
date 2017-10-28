@@ -60,7 +60,34 @@ namespace uLearn.CSharp.ExponentiationValidation
 
 			if (errors != null)
 			{
-				File.WriteAllText($@"C:\work\uLearn\errors\{file.Name}_errors.txt", errors);
+				File.WriteAllText($@"C:\work\uLearn\errors\{file.Name}_errors.txt",
+					$@"{fileContent}
+
+{errors}");
+
+				Assert.Fail();
+			}
+		}
+
+		private static readonly DirectoryInfo uLearnSubmissionsDirectory = new DirectoryInfo(@"C:\work\uLearn\submissions");
+		private static IEnumerable<FileInfo> submissionsFiles = uLearnSubmissionsDirectory
+			.GetFiles("*.cs", SearchOption.AllDirectories)
+			.Where(f => f.Name.Contains("Accepted"));
+
+		[Test]
+		[TestCaseSource(nameof(submissionsFiles))]
+		public void NotFindErrors_InCheckAcceptedFiles(FileInfo file)
+		{
+			var fileContent = file.ContentAsUtf8();
+
+			var errors = validator.FindError(fileContent);
+			if (errors != null)
+			{
+				File.WriteAllText($@"C:\work\uLearn\submissions_errors\{file.Name}_errors.txt",
+					$@"{fileContent}
+
+{errors}");
+
 				Assert.Fail();
 			}
 		}
