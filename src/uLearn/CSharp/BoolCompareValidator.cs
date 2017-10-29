@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using RazorEngine.Compilation.ImpromptuInterface.Optimization;
 using uLearn.Extensions;
 
 namespace uLearn.CSharp
@@ -13,19 +11,19 @@ namespace uLearn.CSharp
 	{
 		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
 		{
-			var mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
 			var compilation = CSharpCompilation.Create("MyCompilation", new[] { userSolution }, new[] { mscorlib });
-			semanticModel = compilation.GetSemanticModel(userSolution);
-			return InspectAll<BinaryExpressionSyntax>(userSolution, Inspect);
+			var semanticModel = compilation.GetSemanticModel(userSolution);
+			var nodes = userSolution.GetRoot().DescendantNodes().OfType<BinaryExpressionSyntax>();
+			return nodes.SelectMany(node => Inspect(semanticModel, node));
 		}
 
-		private IEnumerable<string> Inspect(BinaryExpressionSyntax binaryExpression)
+		private IEnumerable<string> Inspect(SemanticModel semanticModel, BinaryExpressionSyntax binaryExpression)
 		{
-			var leftNodeModel = semanticModel.GetTypeInfo(binaryExpression.Left);
+			var leftNodeTypeInfo = semanticModel.GetTypeInfo(binaryExpression.Left);
 			var leftNodeTree = binaryExpression.Left.Call(n => n as LiteralExpressionSyntax);
-			var rightNodeModel = semanticModel.GetTypeInfo(binaryExpression.Right);
+			var rightNodeTypeInfo = semanticModel.GetTypeInfo(binaryExpression.Right);
 			var rightNodeTree = binaryExpression.Right.Call(n => n as LiteralExpressionSyntax);
-			if (IsBooleanType(rightNodeModel) && IsBooleanType(leftNodeModel) && (IsBoolLiteral(leftNodeTree) || IsBoolLiteral(rightNodeTree)))
+			if (IsBooleanType(rightNodeTypeInfo) && IsBooleanType(leftNodeTypeInfo) && (IsBoolLiteral(leftNodeTree) || IsBoolLiteral(rightNodeTree)))
 				yield return Report(binaryExpression, "Ненужное сравнение с переменной типа bool");
 		}
 
@@ -37,11 +35,8 @@ namespace uLearn.CSharp
 			return token == SyntaxKind.TrueKeyword || token == SyntaxKind.FalseKeyword;
 		}
 
-		private bool IsBooleanType(TypeInfo node)
-		{
-			return node.Type?.Name == "Boolean"; //Boolean
-		}
+		private bool IsBooleanType(TypeInfo node) => node.Type?.Name == "Boolean";
 
-		private SemanticModel semanticModel;
+		private readonly PortableExecutableReference mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
 	}
 }

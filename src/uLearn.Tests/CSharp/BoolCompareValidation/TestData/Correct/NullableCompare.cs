@@ -4,7 +4,7 @@
 	{
 		private TestClass testClass = new TestClass();
 
-		public bool Compare(bool? a)
+		public bool CompareWithNullable(bool? a)
 		{
 			if (false == a)
 			{
@@ -12,7 +12,7 @@
 			return a == true;
 		}
 
-		public bool Method(bool? b)
+		public bool CompareWithNullableCheck(bool? b)
 		{
 			if (b ?? true)
 			{
