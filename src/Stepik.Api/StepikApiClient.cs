@@ -297,7 +297,7 @@ namespace Stepik.Api
 	    public async Task<List<StepikApiCourse>> GetMyCourses()
 	    {
 		    var userId = await GetCurrentStepikUserId();
-		    var parameters = new Dictionary<string, string> { {"owner", userId.ToString()}};
+		    var parameters = new Dictionary<string, string> { {"teacher", userId.ToString()}};
 		    return await GetList<StepikApiCourse>(parameters);
 	    }
 
