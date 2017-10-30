@@ -18,13 +18,20 @@ namespace uLearn.CSharp.ExponentiationValidation
 
 		private static IEnumerable<FileInfo> correctFiles = correctTestDataDir.EnumerateFiles();
 		private static IEnumerable<FileInfo> incorrectFiles = incorrectTestDataDir.EnumerateFiles();	
-		private static readonly DirectoryInfo basicProgrammingDirectory = new DirectoryInfo(@"C:\work\uLearn\BasicProgramming-master");
+		private static readonly DirectoryInfo basicProgrammingDirectory = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+			"..", "CSharp", "ExampleFiles", "BasicProgramming-master"));
 		private static IEnumerable<FileInfo> basicProgrammingFiles = basicProgrammingDirectory
 			.EnumerateFiles("*.cs", SearchOption.AllDirectories)
 			.Where(f => !f.Name.Equals("Settings.Designer.cs") &&
 						!f.Name.Equals("Resources.Designer.cs") &&
 						!f.Name.Equals("AssemblyInfo.cs"));
-		
+
+		private static readonly DirectoryInfo uLearnSubmissionsDirectory = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+			"..", "CSharp", "ExampleFiles", "submissions"));
+		private static IEnumerable<FileInfo> submissionsFiles = uLearnSubmissionsDirectory
+			.GetFiles("*.cs", SearchOption.AllDirectories)
+			.Where(f => f.Name.Contains("Accepted"));
+
 		private static readonly ExponentiationValidator validator = new ExponentiationValidator();
 
 		[TestCaseSource(nameof(incorrectFiles))]
@@ -59,7 +66,8 @@ namespace uLearn.CSharp.ExponentiationValidation
 
 			if (errors != null)
 			{
-				File.WriteAllText($@"C:\work\uLearn\errors\{file.Name}_errors.txt",
+				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+					"..", "CSharp", "ExampleFiles", "errors", $"{file.Name}_errors.txt"),
 					$@"{fileContent}
 
 {errors}");
@@ -67,11 +75,6 @@ namespace uLearn.CSharp.ExponentiationValidation
 				Assert.Fail();
 			}
 		}
-
-		private static readonly DirectoryInfo uLearnSubmissionsDirectory = new DirectoryInfo(@"C:\work\uLearn\submissions");
-		private static IEnumerable<FileInfo> submissionsFiles = uLearnSubmissionsDirectory
-			.GetFiles("*.cs", SearchOption.AllDirectories)
-			.Where(f => f.Name.Contains("Accepted"));
 
 		[Explicit]
 		[TestCaseSource(nameof(submissionsFiles))]
@@ -82,7 +85,8 @@ namespace uLearn.CSharp.ExponentiationValidation
 			var errors = validator.FindError(fileContent);
 			if (errors != null)
 			{
-				File.WriteAllText($@"C:\work\uLearn\submissions_errors\{file.Name}_errors.txt",
+				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+						"..", "CSharp", "ExampleFiles", "submissions_errors", $"{file.Name}_errors.txt"),
 					$@"{fileContent}
 
 {errors}");
