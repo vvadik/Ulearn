@@ -181,6 +181,7 @@
   <ItemGroup>
     <Compile Include="AcceptedSolutionInfo.cs" />
     <Compile Include="AnalyticsTableInfo.cs" />
+    <Compile Include="CSharp\BoolCompareValidator.cs" />
     <Compile Include="CSharp\IndentsValidator.cs" />
     <Compile Include="CSharp\IStrictValidator.cs" />
     <Compile Include="ExportedSlide.cs" />

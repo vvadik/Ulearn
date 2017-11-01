@@ -216,6 +216,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSharp\BoolCompareValidation\BoolCompareValidator_should.cs" />
+    <Compile Include="CSharp\BoolCompareValidation\TestData\Correct\NullableCompare.cs" />
+    <Compile Include="CSharp\BoolCompareValidation\TestData\Correct\SimpleIf.cs" />
+    <Compile Include="CSharp\BoolCompareValidation\TestData\Incorrect\IfWithBool.cs" />
+    <Compile Include="CSharp\BoolCompareValidation\TestData\Incorrect\TernaryOperatorWithBool.cs" />
     <Compile Include="CSharp\CourseValidator_ReportError_should.cs" />
     <Compile Include="CSharp\CourseValidator_ReportWarning_should.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\BracesMightNotBeAlignedIfOpenBraceDoesntHaveLeadingTrivia.cs" />
