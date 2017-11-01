@@ -208,13 +208,13 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 			Assert.AreEqual(Verdict.Ok, details.Verdict);
 		}
 
-		[TestCase(@"using System; class Program { static void Main() { var a = new byte[65 * 1024 * 1024]; for (var i = 0; i < a.Length; ++i) { a[i] = (byte)i; } }}",
+		[TestCase(@"using System; class Program { static void Main() { var a = new byte[70 * 1024 * 1024]; for (var i = 0; i < a.Length; ++i) { a[i] = (byte)i; } }}",
 			TestName = "Local array")]
-		[TestCase(@"using System; using System.Collections.Generic; class Program { const int memory = 65 * 1024 * 1024; static List<byte> a = new List<byte>(memory); static void Main() { for (var i = 0; i < memory; ++i) { a.Add((byte)i); } }}",
+		[TestCase(@"using System; using System.Collections.Generic; class Program { const int memory = 70 * 1024 * 1024; static List<byte> a = new List<byte>(memory); static void Main() { for (var i = 0; i < memory; ++i) { a.Add((byte)i); } }}",
 			TestName = "List field")]
-		[TestCase(@"using System; using System.Collections.Generic; class Program { static void Main() { const int memory = 65 * 1024 * 1024; var a = new List<byte>(memory); for (var i = 0; i < memory; ++i) { a.Add((byte)i); } }}",
+		[TestCase(@"using System; using System.Collections.Generic; class Program { static void Main() { const int memory = 70 * 1024 * 1024; var a = new List<byte>(memory); for (var i = 0; i < memory; ++i) { a.Add((byte)i); } }}",
 			TestName = "Local List")]
-		[TestCase(@"using System; using System.Collections.Generic; class Program { static void Main() { const int memory = 65 * 1024 * 1024; var a = new byte[memory]; var i = 0; while(true){ a[i] = (byte)i; i = (i + 1) % memory; } }}",
+		[TestCase(@"using System; using System.Collections.Generic; class Program { static void Main() { const int memory = 70 * 1024 * 1024; var a = new byte[memory]; var i = 0; while(true){ a[i] = (byte)i; i = (i + 1) % memory; } }}",
 			TestName = "TL after ML")]
 		public static void TestMemoryLimitError(string code)
 		{

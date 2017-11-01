@@ -36,8 +36,9 @@
 
 	@if (Model.Checkings.Count == 0)
 	{
-		<div class="alert alert-success">Поздравляем, очередь пуста! Работ для проверки нет</div>
+		<hr/>
 		<div class="text-muted">Здесь будут появляться ответы студентов на тесты, которые должны быть проверены преподавателем вручную.</div>
+		<div><b>Поздравляем, очередь пуста! Работ для проверки нет.</b></div>
 	}
 
 	@foreach (var checkModel in Model.Checkings)
@@ -46,7 +47,7 @@
 		<div>
 			<div>
 				<p>
-					<b>@check.User.VisibleName</b> заполнил(а) тест «@checkModel.ContextSlideTitle»
+					<b>@check.User.VisibleName</b> заполнил@(check.User.Gender.ChooseEnding()) тест «@checkModel.ContextSlideTitle»
 				</p>
 			</div>
 			<div>
@@ -54,15 +55,9 @@
 				{
 					<p>
 						Проверяется преподавателем <b>@check.LockedBy.VisibleName</b>,
-						заблокирована ещё на @{
+						заблокирована ещё на&Nbsp;@{
 							                     var minutes = (int)(check.LockedUntil.Value - DateTime.Now).TotalMinutes;
-							                     @minutes.PluralizeInRussian(new RussianPluralizationOptions
-							                     {
-								                     One = "минуту",
-								                     Two = "минуты",
-								                     Five = "минут",
-								                     Gender = Gender.Female,
-							                     })
+							                     @minutes.PluralizeInRussian(RussianPluralizationOptions.MinuteDative)
 						                     }
 					</p>
 					if (check.IsLockedBy(User.Identity))

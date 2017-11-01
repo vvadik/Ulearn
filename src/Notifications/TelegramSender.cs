@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using log4net;
 using Metrics;
 using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -40,7 +41,8 @@ namespace Notifications
 		public async Task SendMessageAsync(long chatId, string html, TelegramButton button = null)
 		{
 			metricSender.SendCount("send_to_telegram.try");
-			html = html.Replace("<br>", "\n").Replace("<br/>", "\n").Replace("<br />", "\n");
+			metricSender.SendCount($"send_to_telegram.try.to.{chatId}");
+			html = PrepareHtmlForTelegram(html);
 			log.Info($"Try to send message to telegram chat {chatId}, html: {html.Replace("\n", @" \\ ")}" + (button != null ? $", button: {button}" : ""));
 
 			InlineKeyboardMarkup replyMarkup = null;
@@ -56,9 +58,37 @@ namespace Notifications
 			catch (Exception e)
 			{
 				log.Error($"Can\'t send message to telegram chat {chatId}", e);
+
+				metricSender.SendCount("send_to_telegram.fail");
+				metricSender.SendCount($"send_to_telegram.fail.to.{chatId}");
+
+				if (e is ApiRequestException)
+				{
+					var apiRequestException = (ApiRequestException)e;
+					var isBotBlockedByUser = apiRequestException.Message.Contains("bot was blocked by the user");
+					if (isBotBlockedByUser)
+					{
+						metricSender.SendCount("send_to_telegram.fail.blocked_by_user");
+						metricSender.SendCount($"send_to_telegram.fail.blocked_by_user.to.{chatId}");
+					}
+				}
 				throw;
 			}
 			metricSender.SendCount("send_to_telegram.success");
+			metricSender.SendCount($"send_to_telegram.success.to.{chatId}");
+		}
+
+		private static string PrepareHtmlForTelegram(string html)
+		{
+			html = html.Replace("<br>", "\n").Replace("<br/>", "\n").Replace("<br />", "\n");
+			
+			/* https://core.telegram.org/bots/api#html-style
+			 * All numerical HTML entities are supported.
+			 * The API currently supports only the following named HTML entities: &lt;, &gt;, &amp; and &quot;. */
+			html = html.Replace("&apos;", "'");
+
+			return html;
 		}
 	}
 }
+ 

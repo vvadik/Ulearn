@@ -73,16 +73,6 @@
 			</div>
 			@if (Model.ManualChecking == null)
 			{
-				if (User.HasAccessFor(Model.CourseId, CourseRole.Tester))
-				{
-					using (Html.BeginForm("ForgetAll", "Course"))
-					{
-						<input type="hidden" name="slideId" value="@Model.Slide.Id"/>
-						<input type="hidden" name="courseId" value="@Model.CourseId"/>
-						<button class="btn btn-danger" type="submit">Удалить мой прогресс</button>
-						<span class="text-danger">(для тестеров и преподавателей)</span>
-					}
-				}
 				if (Model.IsGuest)
 				{
 					@Html.Partial("_LoginForContinue")

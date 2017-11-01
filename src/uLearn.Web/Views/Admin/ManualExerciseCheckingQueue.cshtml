@@ -16,17 +16,6 @@
 	@if (Model.ShowFilterForm)
 	{
 		@Html.Partial("_ManualCheckingQueueFilterForm", Model)
-
-		<p>
-			@if (!Model.AlreadyChecked)
-			{
-				@Html.ActionLink("Проверенные работы →", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Group = Model.SelectedGroupsIdsJoined, done = true }, new { @class = "btn btn-xs btn-info" })
-			}
-			else
-			{
-				@Html.ActionLink("← Вернуться в очередь", "ManualExerciseCheckingQueue", "Admin", new { Model.CourseId, Group = Model.SelectedGroupsIdsJoined }, new { @class = "btn btn-xs btn-info" })
-			}
-		</p>
 	}
 
 	@if (!string.IsNullOrEmpty(Model.Message) && Model.Checkings.Count > 0)
@@ -55,12 +44,14 @@
 	{
 		if (Model.AlreadyChecked)
 		{
+			<hr/>
 			<div class="text-muted">Здесь будут проверенные преподавателями программы студентов</div>
 		}
 		else
 		{
-			<div class="alert alert-success">Поздравляем, очередь пуста! Работ для проверки нет</div>
+			<hr />
 			<div class="text-muted">Здесь будут появляться программы студентов, которые должны быть проверены преподавателем вручную.</div>
+			<div><b>Поздравляем, очередь пуста! Работ для проверки нет.</b></div>
 		}
 	}
 
@@ -71,7 +62,8 @@
 		<div>
 			<div>
 				<p>
-					<b>@checking.User.VisibleName</b> решил(а) задание «@checkModel.ContextSlideTitle»
+					<b>@checking.User.VisibleName</b> решил@(checking.User.Gender.ChooseEnding()) задание «@checkModel.ContextSlideTitle»
+					<span title="@checkModel.ContextTimestamp.ToPrettyString()">@checkModel.ContextTimestamp.ToAgoPrettyString()</span>
 				</p>
 			</div>
 			<div>
@@ -80,7 +72,7 @@
 					<p>
 						Последний раз проверялась преподавателем <b>@checking.LockedBy.VisibleName</b>
 						<span class="label label-xs label-default">
-							@checking.Score из @checkModel.ContextMaxScore.PluralizeInRussian(RussianPluralizationOptions.Score)
+							@checking.Score из @checkModel.ContextMaxScore.PluralizeInRussian(RussianPluralizationOptions.Score) за код-ревью
 						</span>
 					</p>
 					<p>

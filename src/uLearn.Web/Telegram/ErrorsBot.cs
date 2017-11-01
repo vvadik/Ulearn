@@ -24,7 +24,7 @@ namespace uLearn.Web.Telegram
 			log.Info($"Отправляю в телеграм-канал {channel} сообщение об ошибке:\n{message}");
 			try
 			{
-				await telegramClient.SendTextMessageAsync(channel, message, parseMode: parseMode, disableWebPagePreview: true);
+				await telegramClient.SendTextMessageAsync(channel, message, parseMode: parseMode, disableWebPagePreview: true).ConfigureAwait(false);
 			}
 			catch (Exception e)
 			{
@@ -34,7 +34,7 @@ namespace uLearn.Web.Telegram
 
 		public void PostToChannel(string message, ParseMode parseMode = ParseMode.Default)
 		{
-			PostToChannelAsync(message, parseMode).GetAwaiter().GetResult();
+			PostToChannelAsync(message, parseMode).Wait();
 		}
 
 		public void PostToChannel(string errorId, Error error)

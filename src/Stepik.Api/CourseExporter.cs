@@ -293,7 +293,8 @@ namespace Stepik.Api
 				if (stepId != -1 && stepikLessons.Values.Any(l => l.StepsIds.Contains(stepId)))
 				{
 					var lessonId = stepikLessons.FirstOrDefault(kvp => kvp.Value.StepsIds.Contains(stepId)).Key;
-					lesson = stepikLessons[lessonId];
+					// Re-download lesson because it can be changed for a while 
+					lesson = await client.GetLesson(lessonId);
 					position = lesson.StepsIds.FindIndex(stepId);
 
 					results.Info($"Removing old steps created for this slide: {string.Join(", ", slideUpdateOptions.RemoveStepsIds)}");

@@ -59,6 +59,20 @@ namespace uLearn.Web.Extensions
 						currentTag += s[i];
 					continue;
 				}
+				// Ignore HTML entities. HTML entity is all between & and ;
+				if (s[i] == '&')
+				{
+					const int maxEntityLength = 10;
+					int entityEnd;
+					for (entityEnd = i + 1; entityEnd < i + maxEntityLength && entityEnd < s.Length; entityEnd++)
+						if (s[entityEnd] == ';')
+							break;
+					if (entityEnd < s.Length && s[entityEnd] == ';')
+					{
+						i = entityEnd;
+						continue;
+					}
+				}
 
 				realCharsCount++;
 				if (realCharsCount == maxLength)
@@ -66,7 +80,7 @@ namespace uLearn.Web.Extensions
 					var closingTags = "";
 					while (tags.Count > 0)
 						closingTags += $"</{tags.Pop()}>";
-					return s.Substring(0, i + 1) + closingTags + ellipsis;
+					return s.Substring(0, i + 1) + ellipsis + closingTags;
 				}
 			}
 

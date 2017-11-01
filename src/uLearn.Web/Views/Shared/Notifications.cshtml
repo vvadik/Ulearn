@@ -126,7 +126,7 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) проверил@( notification.InitiatedBy.Gender.ChooseEnding()) ваше решение<br/>по&nbsp;«@slide.Title»
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) проверил@( notification.InitiatedBy.Gender.ChooseEnding()) ваше решение<br/>по&nbsp;«@slide.Title.MakeNestedQuotes()»
 			</div>
 			<div class="notifications__notification__score">Вы получили @notification.Checking.Score из @slide.Exercise.MaxReviewScore.PluralizeInRussian(RussianPluralizationOptions.Score)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
@@ -142,7 +142,7 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) проверил@( notification.InitiatedBy.Gender.ChooseEnding()) ваш тест<br/>«@slide.Title»
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy)проверил@( notification.InitiatedBy.Gender.ChooseEnding()) ваш тест<br/>«@slide.Title.MakeNestedQuotes()»
 			</div>
 			<div class="notifications__notification__score">Вы получили @notification.Checking.Score из @slide.MaxScore.PluralizeInRussian(RussianPluralizationOptions.ScoreDative)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
@@ -157,7 +157,7 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">Поздравляем! Вы получили сертификат по&nbsp;курсу «@course.Title»</div>
+			<div class="notifications__notification__header">Поздравляем! Вы получили сертификат по&nbsp;курсу «@course.Title.MakeNestedQuotes()»</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>
@@ -172,7 +172,7 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) поставил@( notification.InitiatedBy.Gender.ChooseEnding()) вам баллы <b>@scoringGroup.Name</b> в&nbsp;модуле «@unit.Title»
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) поставил@( notification.InitiatedBy.Gender.ChooseEnding()) вам баллы <b>@scoringGroup.Name</b> в&nbsp;модуле «@unit.Title.MakeNestedQuotes()»
 			</div>
 			<div class="notifications__notification__score">Вы получили @notification.Score.Score из @scoringGroup.MaxAdditionalScore.PluralizeInRussian(RussianPluralizationOptions.ScoreDative)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
@@ -202,7 +202,7 @@
 		</div>
 		<div class="media-body">
 			<div class="notifications__notification__header">
-				@UserName(notification.Access.GrantedBy) назначил@(notification.Access.GrantedBy.Gender.ChooseEnding()) вас преподавателем группы <b>«@notification.Access.Group.Name»</b> в&nbsp;курсе «@course.Title».
+				@UserName(notification.Access.GrantedBy) назначил@(notification.Access.GrantedBy.Gender.ChooseEnding()) вас преподавателем группы <b>«@notification.Access.Group.Name.MakeNestedQuotes()»</b> в&nbsp;курсе «@course.Title.MakeNestedQuotes()».
 			</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
@@ -217,7 +217,7 @@
 		</div>
 		<div class="media-body">
 			<div class="notifications__notification__header">
-				Вы перестали быть преподавателем группы <b>«@notification.Access.Group.Name»</b> в курсе «@course.Title».
+				Вы перестали быть преподавателем группы <b>«@notification.Access.Group.Name.MakeNestedQuotes()»</b> в курсе «@course.Title.MakeNestedQuotes()».
 			</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
@@ -232,7 +232,7 @@
 		</div>
 		<div class="media-body">
 			<div class="notifications__notification__header">
-				@UserName(notification.InitiatedBy) удалил@(notification.InitiatedBy.Gender.ChooseEnding()) студента @notification.User.VisibleName из группы <b>«@notification.Group.Name»</b> в курсе «@course.Title».
+				@UserName(notification.InitiatedBy) удалил@(notification.InitiatedBy.Gender.ChooseEnding()) студента @notification.User.VisibleName из группы <b>«@notification.Group.Name.MakeNestedQuotes()»</b> в курсе «@course.Title.MakeNestedQuotes()».
 			</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
@@ -246,7 +246,7 @@
 			@UserAvatar.Avatar(notification.AddedUser)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.AddedUser) стал@( notification.InitiatedBy.Gender.ChooseEnding()) преподавателем курса «@course.Title»</div>
+			<div class="notifications__notification__header">@UserName(notification.AddedUser) стал@(notification.InitiatedBy.Gender.ChooseEnding()) преподавателем курса «@course.Title.MakeNestedQuotes()»</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>
@@ -259,7 +259,7 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) создал@( notification.InitiatedBy.Gender.ChooseEnding()) группу «@notification.Group.Name» в&nbsp;курсе «@course.Title»</div>
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) создал@(notification.InitiatedBy.Gender.ChooseEnding()) группу «@notification.Group.Name.MakeNestedQuotes()» в&nbsp;курсе «@course.Title.MakeNestedQuotes()»</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>
@@ -272,7 +272,7 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) загрузил@( notification.InitiatedBy.Gender.ChooseEnding()) новую версию курса «@course.Title»</div>
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) загрузил@( notification.InitiatedBy.Gender.ChooseEnding()) новую версию курса «@course.Title.MakeNestedQuotes()»</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>
@@ -285,7 +285,7 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) опубликовал@( notification.InitiatedBy.Gender.ChooseEnding()) новую версию курса «@course.Title»</div>
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) опубликовал@( notification.InitiatedBy.Gender.ChooseEnding()) новую версию курса «@course.Title.MakeNestedQuotes()»</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>
@@ -300,7 +300,7 @@
 		<div class="media-body">
 			@if (notification.Process.IsSuccess)
 			{
-				<div class="notifications__notification__header">Курс <b>«@course.Title»</b> успешно экспортирован на&nbsp;Степик. Нажмите для&nbsp;подробностей.</div>
+				<div class="notifications__notification__header">Курс <b>«@course.Title.MakeNestedQuotes()»</b> успешно экспортирован на&nbsp;Степик. Нажмите для&nbsp;подробностей.</div>
 			}
 			else
 			{

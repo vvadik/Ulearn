@@ -472,8 +472,7 @@ namespace Database.DataContexts
 			}
 
 			/* If something is wrong */
-			DateTime value;
-			unhandledSubmissions.TryRemove(submission.Id, out value);
+			unhandledSubmissions.TryRemove(submission.Id, out DateTime value);
 			throw new SubmissionCheckingTimeout();
 		}
 

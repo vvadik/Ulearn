@@ -49,13 +49,7 @@ function setExerciseVersion(versionId, showOutput, styleMessage) {
 		var $scoreForm = $('.exercise__score-form');
 		if ($scoreForm.length > 0) {
 			var submissionId = parseInt($scoreForm.data('submissionId'));
-			if (submissionId != versionId) {
-				$scoreForm.find('input, .btn').attr('disabled', 'disabled');
-				$scoreForm.find('h4, a').addClass('text-muted');
-			} else {
-				$scoreForm.find('input, .btn').removeAttr('disabled');
-				$scoreForm.find('h4, a').removeClass('text-muted');
-			}
+			$scoreForm.toggle(submissionId === versionId);
 		}
 	});
 }
@@ -76,6 +70,6 @@ $(document).ready(function () {
 
 	$('.exercise__submission').on('change', '[name=version]', function() {
 		var $self = $(this);
-		setExerciseVersion($self.val());
+		setExerciseVersion(parseInt($self.val()));
 	});
 });

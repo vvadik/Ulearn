@@ -213,7 +213,6 @@ namespace uLearn.CourseTool.Monitoring
 				IsCompileError = result.Verdict == Verdict.CompilationError,
 				ExpectedOutput = exercise.ExpectedOutput.NormalizeEoln(),
 				SubmissionId = 0,
-
 			};
 			if (buildResult.HasStyleIssues)
 			{

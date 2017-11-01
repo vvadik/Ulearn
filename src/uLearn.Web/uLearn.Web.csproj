@@ -377,6 +377,7 @@
     <Compile Include="Controllers\StepikController.cs" />
     <Compile Include="Controllers\TelegramController.cs" />
     <Compile Include="Controllers\BaseUserController.cs" />
+    <Compile Include="Extensions\HtmlExtensions_should.cs" />
     <Compile Include="Extensions\StringExtensions_should.cs" />
     <Compile Include="Extensions\UserExtensions.cs" />
     <Compile Include="Helpers\ExcelWorksheetBuilder.cs" />
@@ -424,7 +425,6 @@
     <Compile Include="Telegram\TelegramBot.cs" />
     <Compile Include="Extensions\ControllerExtensions.cs" />
     <Compile Include="Controllers\AuthenticationManager.cs" />
-    <Compile Include="Telegram\CommentsBot.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\ControllerUtils.cs" />
     <Compile Include="Extensions\RequestExtensions.cs" />
@@ -857,6 +857,7 @@
     <Content Include="Scripts\buttons.js" />
     <Content Include="Scripts\certificates-editor.js" />
     <Content Include="Scripts\clipboard.min.js" />
+    <Content Include="Scripts\connect-checkboxes.js" />
     <Content Include="Scripts\course-statistics.js" />
     <Content Include="Scripts\diagnostics.js" />
     <Content Include="Scripts\forms.replace-action.js" />

@@ -96,5 +96,15 @@
 			hideNumberOne = false,
 			smallNumbersAreWords = false,
 		};
+
+		public static RussianPluralizationOptions Tries = new RussianPluralizationOptions
+		{
+			One = "попытка",
+			Two = "попытки",
+			Five = "попыток",
+			Gender = Gender.Female,
+			hideNumberOne = false,
+			smallNumbersAreWords = false,
+		};
 	}
 }

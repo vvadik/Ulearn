@@ -7,9 +7,9 @@ namespace uLearn.Web.Telegram
 	{
 		private readonly string token;
 		protected string channel;
-		protected TelegramBotClient telegramClient;
+		protected readonly TelegramBotClient telegramClient;
 
-		public TelegramBot()
+		protected TelegramBot()
 		{
 			token = WebConfigurationManager.AppSettings["ulearn.telegram.botToken"];
 			telegramClient = new TelegramBotClient(token);
