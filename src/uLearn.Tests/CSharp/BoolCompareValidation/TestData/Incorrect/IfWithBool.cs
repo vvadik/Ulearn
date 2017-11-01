@@ -1,7 +1,10 @@
-﻿namespace uLearn.CSharp.BoolCompareValidation.TestData.Incorrect
+﻿using NUnit.Framework;
+
+namespace uLearn.CSharp.BoolCompareValidation.TestData.Incorrect
 {
 	public class IfWithBool
 	{
+		[Test]
 		void CheckIfStatementWithErrors(bool a)
 		{
 			if (a == true) {}
@@ -12,9 +15,6 @@
 			if (false == a){}
 			if (true != a){}
 			if (false != a){}
-			if (false || a){}
-			if (true && true){}
-			if (a && false){}
 		}
 	}
 }

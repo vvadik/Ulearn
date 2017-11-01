@@ -218,6 +218,7 @@
   <ItemGroup>
     <Compile Include="CSharp\BoolCompareValidation\BoolCompareValidator_should.cs" />
     <Compile Include="CSharp\BoolCompareValidation\TestData\Correct\NullableCompare.cs" />
+    <Compile Include="CSharp\BoolCompareValidation\TestData\Correct\UnknownTypes.cs" />
     <Compile Include="CSharp\BoolCompareValidation\TestData\Correct\SimpleIf.cs" />
     <Compile Include="CSharp\BoolCompareValidation\TestData\Incorrect\IfWithBool.cs" />
     <Compile Include="CSharp\BoolCompareValidation\TestData\Incorrect\TernaryOperatorWithBool.cs" />

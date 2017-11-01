@@ -12,10 +12,6 @@
 			expression = a != true ? 1 : 0;
 			expression = a == false ? 1 : 0;
 			expression = a != false ? 1 : 0;
-			expression = true && false ? 1 : 0;
-			expression = true && true ? 1 : 0;
-			expression = true || true ? 1 : 0;
-			expression = true || false ? 1 : 0;
 		}
 	}
 }

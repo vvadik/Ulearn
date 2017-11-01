@@ -32,19 +32,17 @@ namespace uLearn.CSharp.BoolCompareValidation
 
 		[Test]
 		[TestCaseSource(nameof(IncorrectFilenames))]
-		[UseReporter(typeof(DiffReporter))]
 		public void FindErrors(string filename)
 		{
 			var code = IncorrectTestDataDir.GetFiles(filename).Single().ContentAsUtf8();
 			var binaryExpressionSyntaxsCount = CSharpSyntaxTree.ParseText(code).GetRoot().DescendantNodes().OfType<BinaryExpressionSyntax>().Count();
 			var errors = validator.FindError(code);
 			errors.Should().NotBeNullOrEmpty();
-			errors.Split('\n').Length.Should().Be(binaryExpressionSyntaxsCount);
+			errors.Split('\n').Length.Should().Be(binaryExpressionSyntaxsCount, errors);
 		}
 
 		[Test]
 		[TestCaseSource(nameof(CorrectFilenames))]
-		[UseReporter(typeof(DiffReporter))]
 		public void NotFindErrors(string filename)
 		{
 			var code = CorrectTestDataDir.GetFiles(filename).Single().ContentAsUtf8();

@@ -3,7 +3,6 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using uLearn.Extensions;
 
 namespace uLearn.CSharp
 {
@@ -19,12 +18,16 @@ namespace uLearn.CSharp
 
 		private IEnumerable<string> Inspect(SemanticModel semanticModel, BinaryExpressionSyntax binaryExpression)
 		{
+			var operatorKind = binaryExpression.OperatorToken.Kind();
+			if (operatorKind != SyntaxKind.EqualsEqualsToken && operatorKind != SyntaxKind.ExclamationEqualsToken)
+				yield break;
 			var leftNodeTypeInfo = semanticModel.GetTypeInfo(binaryExpression.Left);
-			var leftNodeTree = binaryExpression.Left.Call(n => n as LiteralExpressionSyntax);
+			var leftNodeTree = binaryExpression.Left as LiteralExpressionSyntax;
 			var rightNodeTypeInfo = semanticModel.GetTypeInfo(binaryExpression.Right);
-			var rightNodeTree = binaryExpression.Right.Call(n => n as LiteralExpressionSyntax);
-			if (IsBooleanType(rightNodeTypeInfo) && IsBooleanType(leftNodeTypeInfo) && (IsBoolLiteral(leftNodeTree) || IsBoolLiteral(rightNodeTree)))
-				yield return Report(binaryExpression, "Ненужное сравнение с переменной типа bool");
+			var rightNodeTree = binaryExpression.Right as LiteralExpressionSyntax;
+			if (IsBooleanType(rightNodeTypeInfo) && IsBooleanType(leftNodeTypeInfo) 
+				&& (IsBoolLiteral(leftNodeTree) || IsBoolLiteral(rightNodeTree)))
+				yield return Report(binaryExpression, "Ненужное сравнение с переменной типа bool. Вместо x == true лучше писать просто x, а вместо x != true лучше писать !x.");
 		}
 
 		private static bool IsBoolLiteral(LiteralExpressionSyntax node)
