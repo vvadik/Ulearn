@@ -229,6 +229,7 @@
     <Compile Include="CSharp\ExponentiationValidation\TestData\Correct\NoMathPow.cs" />
     <Compile Include="CSharp\ExponentiationValidation\TestData\Incorrect\DegreeEqualsThree.cs" />
     <Compile Include="CSharp\ExponentiationValidation\TestData\Incorrect\DegreeEqualsTwo.cs" />
+    <Compile Include="CSharp\ExponentiationValidation\TestData\Incorrect\ComplexExpression.cs" />
     <Compile Include="CSharp\ExponentiationValidation\TestData\Incorrect\TwoErrorsInFile.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\BracesMightNotBeAlignedIfOpenBraceDoesntHaveLeadingTrivia.cs" />
     <Content Include="CSharp\IndentsValidation\TestData\Correct\TopLevelNodesCanBeIndented.cs" />

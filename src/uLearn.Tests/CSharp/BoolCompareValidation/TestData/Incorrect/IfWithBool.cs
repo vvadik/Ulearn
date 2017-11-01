@@ -4,7 +4,6 @@ namespace uLearn.CSharp.BoolCompareValidation.TestData.Incorrect
 {
 	public class IfWithBool
 	{
-		[Test]
 		void CheckIfStatementWithErrors(bool a)
 		{
 			if (a == true) {}

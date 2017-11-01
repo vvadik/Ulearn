@@ -18,17 +18,21 @@ namespace uLearn.CSharp.ExponentiationValidation
 
 		private static IEnumerable<FileInfo> correctFiles = correctTestDataDir.EnumerateFiles();
 		private static IEnumerable<FileInfo> incorrectFiles = incorrectTestDataDir.EnumerateFiles();	
-		private static readonly DirectoryInfo basicProgrammingDirectory = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+		private static DirectoryInfo basicProgrammingDirectory =>
+			new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
 			"..", "CSharp", "ExampleFiles", "BasicProgramming-master"));
-		private static IEnumerable<FileInfo> basicProgrammingFiles = basicProgrammingDirectory
+		private static IEnumerable<FileInfo> basicProgrammingFiles => 
+			basicProgrammingDirectory
 			.EnumerateFiles("*.cs", SearchOption.AllDirectories)
 			.Where(f => !f.Name.Equals("Settings.Designer.cs") &&
 						!f.Name.Equals("Resources.Designer.cs") &&
 						!f.Name.Equals("AssemblyInfo.cs"));
 
-		private static readonly DirectoryInfo uLearnSubmissionsDirectory = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+		private static DirectoryInfo uLearnSubmissionsDirectory => 
+			new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
 			"..", "CSharp", "ExampleFiles", "submissions"));
-		private static IEnumerable<FileInfo> submissionsFiles = uLearnSubmissionsDirectory
+		private static IEnumerable<FileInfo> submissionsFiles => 
+			uLearnSubmissionsDirectory
 			.GetFiles("*.cs", SearchOption.AllDirectories)
 			.Where(f => f.Name.Contains("Accepted"));
 

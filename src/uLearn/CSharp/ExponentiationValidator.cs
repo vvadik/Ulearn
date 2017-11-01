@@ -20,7 +20,7 @@ namespace uLearn.CSharp
 			var symbol = semanticModel.GetSymbolInfo(methodInvocation).Symbol;
 			if (methodInvocation.IsMathPow(symbol) &&
 				methodInvocation.ArgumentList.ContainsForbiddenDegrees(forbiddenDegrees))
-				yield return Report(methodInvocation, "вызов Math.Pow для маленьких степеней неэффективен");
+				yield return Report(methodInvocation, "Неэффективный код. Если число нужно возвести в квадрат или куб, лучше сделать это с помощью умножения, не используя более общий, но менее быстрый Math.Pow");
 		}
 	}
 }

@@ -6,17 +6,14 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace uLearn.CSharp
 {
-	public class BoolCompareValidator : BaseStyleValidator
+	public class BoolCompareValidator : BaseStyleValidatorWithSemanticModel
 	{
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
-			var compilation = CSharpCompilation.Create("MyCompilation", new[] { userSolution }, new[] { mscorlib });
-			var semanticModel = compilation.GetSemanticModel(userSolution);
-			var nodes = userSolution.GetRoot().DescendantNodes().OfType<BinaryExpressionSyntax>();
-			return nodes.SelectMany(node => Inspect(semanticModel, node));
+			return InspectAll<BinaryExpressionSyntax>(userSolution, semanticModel, Inspect);
 		}
 
-		private IEnumerable<string> Inspect(SemanticModel semanticModel, BinaryExpressionSyntax binaryExpression)
+		private IEnumerable<string> Inspect(BinaryExpressionSyntax binaryExpression, SemanticModel semanticModel)
 		{
 			var operatorKind = binaryExpression.OperatorToken.Kind();
 			if (operatorKind != SyntaxKind.EqualsEqualsToken && operatorKind != SyntaxKind.ExclamationEqualsToken)
@@ -39,7 +36,5 @@ namespace uLearn.CSharp
 		}
 
 		private bool IsBooleanType(TypeInfo node) => node.Type?.Name == "Boolean";
-
-		private readonly PortableExecutableReference mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
 	}
 }
