@@ -7,8 +7,8 @@ namespace uLearn.CSharp
 {
 	public class ExponentiationValidator: BaseStyleValidatorWithSemanticModel
 	{
-		private static readonly HashSet<string> forbiddenDegrees = 
-			new HashSet<string>{"2", "3"};
+		private static readonly HashSet<double> forbiddenDegrees = 
+			new HashSet<double>{2.0, 3.0};
 		
 		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{

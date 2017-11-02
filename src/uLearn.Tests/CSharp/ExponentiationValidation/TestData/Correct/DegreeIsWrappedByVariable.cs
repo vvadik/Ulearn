@@ -2,11 +2,12 @@
 
 namespace uLearn.CSharp.ExponentiationValidation.TestData.Correct
 {
-	public class DegreeMoreThanThree
+	public class DegreeIsWrappedByVariable
 	{
 		public double A()
 		{
-			return Math.Pow(2, 5);
+			var b = 2.0;
+			return Math.Pow(2, b);
 		}
 	}
 }
