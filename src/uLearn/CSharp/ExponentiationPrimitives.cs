@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -14,9 +13,11 @@ namespace uLearn.CSharp
 		}
 
 		public static bool ContainsForbiddenDegrees(this ArgumentListSyntax argumentListSyntax,
-			HashSet<string> degrees)
+			HashSet<double> forbiddenDegrees)
 		{
-			return degrees.Contains(argumentListSyntax.Arguments[1].ToString());
+			var degree = argumentListSyntax.Arguments[1].ToString();
+			return double.TryParse(degree, out var degreeValue) &&
+				forbiddenDegrees.Contains(degreeValue);
 		}
 
 		private static bool IsMathPowMethodName(string methodName)
