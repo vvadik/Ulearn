@@ -20,7 +20,7 @@ namespace uLearn.Web.Controllers
 		protected UserManager<ApplicationUser> userManager;
 		protected readonly UsersRepo usersRepo;
 
-		protected GraphiteMetricSender metricSender;
+		protected readonly GraphiteMetricSender metricSender;
 
 		protected readonly string secretForHashes;
 

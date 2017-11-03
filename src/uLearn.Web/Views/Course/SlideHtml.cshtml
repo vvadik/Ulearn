@@ -61,27 +61,20 @@
 		}
 	}
 	<h4>
-		<i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text.RenderTex()
-		<sup class="text-muted">
+		<i class="@mark" style="@style"></i>
+		<span class="quiz-block__text">
+			@block.QuestionIndex. @block.Text.RenderTex()
+		</span>
+		<span class="quiz-block__score">
 			@if (blockScore >= 0)
 			{
-				<span>
-					@blockScore из @block.MaxScore балл@( block.MaxScore == 1 ? "а" : "ов")
-				</span>
+				<nobr>@blockScore из @block.MaxScore балл@( block.MaxScore == 1 ? "а" : "ов")</nobr>
 			}
 			else
 			{
-				@block.MaxScore.PluralizeInRussian(new RussianPluralizationOptions
-				{
-					One = "балл",
-					Two = "балла",
-					Five = "баллов",
-					smallNumbersAreWords = false,
-					hideNumberOne = false
-				}
-				)
+				<nobr>@block.MaxScore.PluralizeInRussian(RussianPluralizationOptions.Score)</nobr>
 			}
-		</sup>
+		</span>
 	</h4>
 
 	@QuizBlock((dynamic)block, context)
@@ -240,14 +233,16 @@
 			}
 			<div class="quiz">
 				<input @ans autocomplete="off" id='@( block.Id + "quizBlock" + item.Id)' name=@( "group" + id) type="@typeInp" @GetGuestDisable(context.IsGuest) @readonlyAttr>
-				<label class="@itemClass" title="@title" for="@( block.Id + "quizBlock" + item.Id)" @GetGuestOnclick(context.IsGuest)>@item.Description.Trim().RenderTex()</label>
-				@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && item.IsCorrect)
-				{
-					<i class="glyphicon glyphicon-ok" style="color: green" title="@title"></i>
-				}
+				<label class="@itemClass" title="@title" for="@( block.Id + "quizBlock" + item.Id)" @GetGuestOnclick(context.IsGuest)>
+					@item.Description.Trim().RenderTex()
+					@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && item.IsCorrect)
+					{
+						<i class="glyphicon glyphicon-ok" style="color: green" title="@title"></i>
+					}
+				</label>
 				@if (model.QuizState == QuizState.Total && !string.IsNullOrEmpty(item.Explanation))
 				{
-					<p>@item.Explanation</p>
+					<p class="quiz__explanation">@item.Explanation</p>
 				}
 			</div>
 		}

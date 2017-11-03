@@ -1169,6 +1169,7 @@
     <Content Include="Views\Admin\_GroupAccess.cshtml" />
     <Content Include="Views\Admin\_GroupMember.cshtml" />
     <Content Include="Views\Account\Profile.cshtml" />
+    <Content Include="Views\Shared\_Footer.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

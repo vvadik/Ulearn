@@ -12,6 +12,7 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using log4net;
+using Metrics;
 using uLearn.Quizes;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
@@ -31,6 +32,7 @@ namespace uLearn.Web.Controllers
 
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
+		protected readonly GraphiteMetricSender metricSender;
 
 		private readonly UserQuizzesRepo userQuizzesRepo;
 		private readonly VisitsRepo visitsRepo;
@@ -41,6 +43,8 @@ namespace uLearn.Web.Controllers
 
 		public QuizController()
 		{
+			metricSender = new GraphiteMetricSender("web");
+
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			visitsRepo = new VisitsRepo(db);
 			quizzesRepo = new QuizzesRepo(db);
@@ -51,10 +55,10 @@ namespace uLearn.Web.Controllers
 
 		internal class QuizAnswer
 		{
-			public string QuizType;
-			public string QuizId;
-			public string ItemId;
-			public string Text;
+			public readonly string QuizType;
+			public readonly string QuizId;
+			public readonly string ItemId;
+			public readonly string Text;
 
 			public QuizAnswer(string type, string quizId, string itemId, string text)
 			{
@@ -64,7 +68,6 @@ namespace uLearn.Web.Controllers
 				Text = text;
 			}
 		}
-
 
 		internal class QuizInfoForDb
 		{
@@ -85,8 +88,17 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem = null)
 		{
+			metricSender.SendCount("quiz.show");
+			if (isLti)
+				metricSender.SendCount("quiz.show.lti");
+			metricSender.SendCount($"quiz.show.{courseId}");
+			metricSender.SendCount($"quiz.show.{courseId}.{slide.Id}");
+
 			if (isGuest)
+			{
+				metricSender.SendCount("quiz.show.to.guest");
 				return PartialView(GuestQuiz(slide, courseId));
+			}
 			var slideId = slide.Id;
 			var maxDropCount = GetMaxDropCount(courseId, slide);
 			var state = GetQuizState(courseId, userId, slideId, maxDropCount);
@@ -135,6 +147,12 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		public async Task<ActionResult> SubmitQuiz(string courseId, Guid slideId, string answer, bool isLti)
 		{
+			metricSender.SendCount("quiz.submit");
+			if (isLti)
+				metricSender.SendCount("quiz.submit.lti");
+			metricSender.SendCount($"quiz.submit.{courseId}");
+			metricSender.SendCount($"quiz.submit.{courseId}.{slideId}");
+
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.FindSlideById(slideId) as QuizSlide;
 			if (slide == null)
@@ -210,6 +228,8 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public async Task<ActionResult> ScoreQuiz(int id, string nextUrl, string errorUrl = "")
 		{
+			metricSender.SendCount("quiz.score");
+
 			if (string.IsNullOrEmpty(errorUrl))
 				errorUrl = nextUrl;
 
@@ -222,6 +242,9 @@ namespace uLearn.Web.Controllers
 
 				if (!checking.IsLockedBy(User.Identity))
 					return Redirect(errorUrl + "Эта работа проверяется другим инструктором");
+
+				metricSender.SendCount($"quiz.score.{checking.CourseId}");
+				metricSender.SendCount($"quiz.score.{checking.CourseId}.{checking.SlideId}");
 
 				var answers = userQuizzesRepo.GetAnswersForUser(checking.SlideId, checking.UserId);
 

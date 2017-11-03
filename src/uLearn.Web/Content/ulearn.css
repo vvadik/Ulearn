@@ -1170,14 +1170,33 @@ hr.without-top-margin {
 	margin-left: 10px;
 }
 
-.quiz-block-mark .quiz label {
-	white-space: pre-wrap;
+.quiz-block__text {
+	margin-right: 10px;
+}
+
+.quiz-block__score {
+	white-space: nowrap;
+	color: #999;
+	font-weight: 400;
+}
+
+.quiz-block-mark .quiz {
+	margin-bottom: 3px;
+}
+
+.quiz label.right-quiz .glyphicon {
+	margin-left: 5px;
+}
+
+.quiz .quiz__explanation {
+	margin-left: 5px;
+	margin-top: 0;
 }
 
 /* Ordering quizes */
 .quiz-block-ordering ul {
 	list-style: none;
-	padding-left: 0;	
+	padding-left: 0;
 }
 
 .quiz-block-ordering .quiz-block-ordering__item {
