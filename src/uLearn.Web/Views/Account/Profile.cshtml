@@ -1,4 +1,6 @@
-﻿@using uLearn.Web.Kontur.Passport
+﻿@using Database.Extensions
+@using uLearn.Web.Extensions
+@using uLearn.Web.Kontur.Passport
 @using uLearn.Web.Microsoft.Owin.Security.VK
 @using uLearn.Web.Views.Shared
 @model uLearn.Web.Controllers.ProfileModel
@@ -9,39 +11,97 @@
 
 <div class="container">
 	<h2>@Model.User.VisibleName</h2>
-	<div class="pull-left profile__avatar">
-		@UserAvatar.LargeAvatar(Model.User)
+	
+	<div class="user-profile__info">
+		<div class="pull-left user-profile__avatar">
+			@UserAvatar.LargeAvatar(Model.User)
+		</div>
+		<div>
+			<div><b>@Model.User.UserName</b>, <a href="mailto:@Model.User.Email">@Model.User.Email</a><i>@(!Model.User.EmailConfirmed ? " (почта не подтверждена)" : "")</i></div>
+			@{
+				var vkLogin = Model.Logins.FirstOrDefault(l => l.LoginProvider == VkAuthenticationConstants.AuthenticationType);
+				if (vkLogin != null)
+				{
+					<div><b>ВКонтакте:</b> <a href="https://vk.com/id@(vkLogin.ProviderKey)" target="_blank" title="Откроется в новой вкладке">id@(vkLogin.ProviderKey)</a></div>
+				}
+
+				var konturPassportLogin = Model.Logins.FirstOrDefault(l => l.LoginProvider == KonturPassportConstants.AuthenticationType);
+				if (konturPassportLogin != null)
+				{
+					<div><b>Контур.Паспорт:</b> @konturPassportLogin.ProviderKey</div>
+				}
+
+				if (Model.User.HasTelegram)
+				{
+					<div>
+						<b>Телеграм:</b>
+						@if (!string.IsNullOrEmpty(Model.User.TelegramChatTitle))
+						{
+							<a href="https://t.me/@(Model.User.TelegramChatTitle.Substring(1))" target="_blank">@Model.User.TelegramChatTitle</a>
+						}
+						else
+						{
+							@Model.User.TelegramChatId <i>(никнейм не&nbsp;указан)</i>
+						}
+					</div>
+				}
+			}
+		</div>
 	</div>
-	<div>
-		<div><b>@Model.User.UserName</b>, <a href="mailto:@Model.User.Email">@Model.User.Email</a><i>@(!Model.User.EmailConfirmed ? " не подтверждена" : "")</i></div>
-		@{
-			var vkLogin = Model.Logins.FirstOrDefault(l => l.LoginProvider == VkAuthenticationConstants.AuthenticationType);
-			if (vkLogin != null)
+	
+	<div class="user-profile__courses">
+		<h2>Курсы</h2>
+		@if (Model.UserCourses.Count == 0)
+		{
+			<p class="help-block">Нет курсов</p>
+		}
+		<ol>
+			@foreach (var course in Model.UserCourses)
 			{
-				<div><b>ВКонтакте:</b> <a href="https://vk.com/id@(vkLogin.ProviderKey)" target="_blank" title="Откроется в новой вкладке">id@(vkLogin.ProviderKey)</a></div>
-			}
-
-			var konturPassportLogin = Model.Logins.FirstOrDefault(l => l.LoginProvider == KonturPassportConstants.AuthenticationType);
-			if (konturPassportLogin != null)
-			{
-				<div><b>Контур.Паспорт:</b> @konturPassportLogin.ProviderKey</div>
-			}
-
-			if (Model.User.HasTelegram)
-			{
-				<div>
-					<b>Телеграм:</b> 
-					@if (!string.IsNullOrEmpty(Model.User.TelegramChatTitle))
+				<li>
+					@Html.ActionLink(course.Title, "CourseInfo", new { userId = Model.User.Id, courseId = course.Id })
+					@if (!string.IsNullOrEmpty(Model.CourseGroups[course.Id]))
 					{
-						<a href="https://t.me/@(Model.User.TelegramChatTitle.Substring(1))" target="_blank">@Model.User.TelegramChatTitle</a>
+						<div title="Группы, в которых состоит студент">
+							@Model.CourseGroups[course.Id]
+						</div>
 					}
-					else
-					{
-						@Model.User.TelegramChatId <i>(никнейм не&nbsp;указан)</i>
-					}
-				</div>
+					
+				</li>
+			}
+		</ol>
+	</div>
+	
+	<div class="user-profile__certificates">
+		<h2>
+			@Html.ActionLink("Сертификаты", "Index", "Certificates", new { userId = Model.User.Id }, new { })
+		</h2>
+		@if (Model.Certificates.Count == 0)
+		{
+			<p class="help-block">Нет сертификатов</p>
+		}
+		<ol>
+			@foreach (var certificate in Model.Certificates)
+			{
+				<li>
+					@Html.RouteLink(Model.AllCourses[certificate.Template.CourseId].Title, "Certificate", new { certificateId = certificate.Id }),
+					@certificate.Timestamp.ToAgoPrettyString()
+				</li>
+			}
+		</ol>
+	</div>
+	
+	<div class="user-profile__password-reset">
+		@if (User.IsSystemAdministrator())
+		{
+			var newPassword = (DateTime.Now.Ticks % 1000000).ToString();
+			using (Html.BeginForm("ResetPassword", "Account", new { newPassword, userId = Model.User.Id }))
+			{
+				@Html.AntiForgeryToken()
+				<h2>Сброс пароля</h2>
+				<div class="help-block">Установить пароль <b>@newPassword</b>?</div>
+				<button class="btn btn-danger"> Установить </button>
 			}
 		}
 	</div>
-
 </div>

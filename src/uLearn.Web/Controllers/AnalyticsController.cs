@@ -700,7 +700,7 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.FindSlideById(slideId) as ExerciseSlide;
 			if (slide == null)
-				return RedirectToAction("CourseInfo", "Account", new { userName = userId, courseId });
+				return RedirectToAction("CourseInfo", "Account", new { userId = userId, courseId });
 			var model = new UserSolutionsViewModel
 			{
 				User = user,

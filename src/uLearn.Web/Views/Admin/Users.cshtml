@@ -1,4 +1,5 @@
 ﻿@using Database.Models
+@using uLearn.Extensions
 @model Database.UserSearchQueryModel
 
 @{
@@ -9,13 +10,13 @@
 	<h1>Пользователи</h1>
 
 	<p>
-		<a class="label label-warning" href="@Url.Action("Users", new { Model.CourseId, courseRole = CourseRole.CourseAdmin })">@CourseRole.CourseAdmin</a> может видеть служебную информацию и управлять ролями других пользователей в рамках курса.
+		<a class="label label-warning" href="@Url.Action("Users", new { Model.CourseId, courseRole = CourseRole.CourseAdmin })">@CourseRole.CourseAdmin.GetDisplayName()</a> может видеть служебную информацию и управлять ролями других пользователей в рамках курса.
 	</p>
 	<p>
-		<a class="label label-info" href="@Url.Action("Users", new { Model.CourseId, courseRole = CourseRole.Instructor })">@CourseRole.Instructor</a> может видеть статистику по успеваемости, проверять работы, отвечать на комментарии.
+		<a class="label label-info" href="@Url.Action("Users", new { Model.CourseId, courseRole = CourseRole.Instructor })">@CourseRole.Instructor.GetDisplayName()</a> может видеть статистику по успеваемости, проверять работы, отвечать на комментарии.
 	</p>
 	<p>
-		<a class="label label-success" href="@Url.Action("Users", new { Model.CourseId, courseRole = CourseRole.Tester })">@CourseRole.Tester</a> может видеть ещё не опубликованные для всех материалы.
+		<a class="label label-success" href="@Url.Action("Users", new { Model.CourseId, courseRole = CourseRole.Tester })">@CourseRole.Tester.GetDisplayName()</a> может видеть ещё не опубликованные для всех материалы.
 	</p>
 	<p>
 		<a class="label label-default" href="@Url.Action("Users", new { Model.CourseId })">Обычный пользователь</a> может видеть только опубликованные материалы.
@@ -25,8 +26,12 @@
 		@using (Html.BeginForm("Users", "Admin", FormMethod.Get, new { @class = "form-inline" }))
 		{
 			<input type="hidden" name="courseId" value="@Model.CourseId"/>
-			<input class="form-control" type="text" name="namePrefix" value="@Model.NamePrefix"/>
-			<button class="btn btn-primary button" type="submit">Фильтровать по имени</button>
+			<div class="input-group">
+				<input class="form-control" type="text" name="namePrefix" value="@Model.NamePrefix"/>
+				<span class="input-group-btn">
+					<button class="btn btn-primary button" type="submit">Фильтровать по имени</button>
+				</span>
+			</div>
 		}
 	</p>
 

@@ -223,33 +223,23 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		/* Now we use AccountController.Profile and don't use AccountController.Info, but this method exists for back compatibility */
 		public ActionResult Info(string userName)
 		{
 			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
 			if (user == null)
-				return RedirectToAction("List");
+				return HttpNotFound();
 
-			var userCoursesIds = visitsRepo.GetUserCourses(user.Id);
-			var userCourses = courseManager.GetCourses().Where(c => userCoursesIds.Contains(c.Id)).ToList();
-
-			var certificates = certificatesRepo.GetUserCertificates(user.Id);
-
-			return View(new UserInfoModel
-			{
-				User = user,
-				GroupsNames = groupsRepo.GetUserGroupsNamesAsString(userCoursesIds.ToList(), user.Id, User, 10),
-				Certificates = certificates,
-				Courses = courseManager.GetCourses().ToDictionary(c => c.Id, c => c),
-				UserCourses = userCourses,
-			});
+			return RedirectToAction("Profile", new { userId = user.Id });
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public ActionResult CourseInfo(string userName, string courseId)
+		public ActionResult CourseInfo(string userId, string courseId)
 		{
-			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
+			var user = usersRepo.FindUserById(userId);
 			if (user == null)
 				return RedirectToAction("List");
+
 			var course = courseManager.GetCourse(courseId);
 			return View(new UserCourseModel(course, user, db));
 		}
@@ -257,20 +247,31 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public async Task<ActionResult> Profile(string userId)
 		{
-			var isCourseAdmin = User.HasAccess(CourseRole.CourseAdmin);
-			if (!groupsRepo.CanInstructorViewStudent(User, userId))
-				return HttpNotFound();
-			
 			var user = usersRepo.FindUserById(userId);
 			if (user == null)
 				return HttpNotFound();
 
+			if (!groupsRepo.CanInstructorViewStudent(User, userId))
+				return HttpNotFound();
+			
 			var logins = await userManager.GetLoginsAsync(userId);
+
+			var userCoursesIds = visitsRepo.GetUserCourses(user.Id);
+			var userCourses = courseManager.GetCourses().Where(c => userCoursesIds.Contains(c.Id)).OrderBy(c => c.Title).ToList();
+
+			var allCourses = courseManager.GetCourses().ToDictionary(c => c.Id, c => c);
+			var certificates = certificatesRepo.GetUserCertificates(user.Id).OrderBy(c => allCourses.GetOrDefault(c.Template.CourseId)?.Title ?? "<курс удалён>").ToList();
+
+			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User));
 
 			return View(new ProfileModel
 			{
 				User = user,
-				Logins = logins
+				Logins = logins,
+				UserCourses = userCourses,
+				CourseGroups = courseGroups,
+				Certificates = certificates,
+				AllCourses = allCourses,
 			});
 		}
 
@@ -549,7 +550,7 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("List");
 			await userManager.RemovePasswordAsync(userId);
 			await userManager.AddPasswordAsync(userId, newPassword);
-			return RedirectToAction("Info", new { user.UserName });
+			return RedirectToAction("Profile", new { userId = user.Id });
 		}
 
 		[AllowAnonymous]
@@ -673,6 +674,10 @@ namespace uLearn.Web.Controllers
 	{
 		public ApplicationUser User { get; set; }
 		public IList<UserLoginInfo> Logins { get; set; }
+		public List<Course> UserCourses { get; set; }
+		public List<Certificate> Certificates { get; set; }
+		public Dictionary<string, Course> AllCourses { get; set; }
+		public Dictionary<string, string> CourseGroups { get; set; }
 	}
 
 	public class IsErrorAttribute : Attribute

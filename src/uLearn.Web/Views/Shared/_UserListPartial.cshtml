@@ -28,7 +28,7 @@
 	@foreach (var user in Model.Users)
 	{
 		<tr data-userid="@user.UserId">
-			<td>@Html.ActionLink(user.UserName, "Info", "Account", new { userName = user.UserName }, new { })</td>
+			<td>@Html.ActionLink(user.UserName, "Profile", "Account", new { userId = user.UserId }, new { })</td>
 			<td>@user.UserVisibleName</td>
 			<td>@Model.UsersGroups.GetOrDefault(user.UserId, "")</td>
 			@if (Model.CanToggleRoles)

@@ -11,7 +11,7 @@
 		Решения @Model.User.VisibleName (@Model.User.UserName@(Model.GroupsNames != "" ? ", " + Model.GroupsNames : ""))
 	</h2>
 	<p>
-		@Html.ActionLink("Cтатистика пользователя по всему курсу", "CourseInfo", "Account", new { userName = Model.User.Id, courseId = Model.Course.Id }, null)
+		@Html.ActionLink("Cтатистика пользователя по всему курсу", "CourseInfo", "Account", new { userId = Model.User.Id, courseId = Model.Course.Id }, null)
 	</p>
 
 	@Html.Action("Submission", "Exercise", new { courseId = Model.Course.Id, slideId = Model.Slide.Id, userId = Model.User.Id, submissionId = Model.SubmissionId, instructorView = true, onlyAccepted = false, showOutput = true })

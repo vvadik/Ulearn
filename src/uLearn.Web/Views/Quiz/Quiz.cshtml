@@ -10,7 +10,7 @@
 	var quizSlide = Model.Slide;
 
 	var status = "";
-	var triesCountMessage = Model.MaxDropCount == QuizController.InfinityDropsCount ? "∞ (преподаватели неограничены в попытках)" : (Model.MaxDropCount + 1).ToString();
+	var triesCountMessage = Model.MaxDropCount == QuizController.InfinityDropsCount ? "∞ (преподаватели не ограничены в попытках)" : (Model.MaxDropCount + 1).ToString();
 	if (!Model.IsGuest && Model.QuizState == QuizState.NotPassed)
 	{
 		status = string.Format(

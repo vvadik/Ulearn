@@ -2407,8 +2407,12 @@ h4 + div > .notifications__transport-settings__course__link {
 /* End of profile */
 
 /* Other user's profile page '*/
-.profile__avatar {
+.user-profile__avatar {
 	margin-right: 10px;
+}
+
+.user-profile__info {
+	min-height: 100px;
 }
 
 /* Manual checking queue filter form */
