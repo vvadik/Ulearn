@@ -182,6 +182,7 @@
     <Compile Include="AcceptedSolutionInfo.cs" />
     <Compile Include="AnalyticsTableInfo.cs" />
     <Compile Include="CSharp\IndentsValidator.cs" />
+    <Compile Include="CSharp\SyntaxNodeOrToken.cs" />
     <Compile Include="CSharp\IStrictValidator.cs" />
     <Compile Include="ExportedSlide.cs" />
     <Compile Include="Extensions\DictionaryExtension.cs" />

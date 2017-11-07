@@ -246,6 +246,7 @@
     <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\MultilineExpressionStatementShouldBeIndented.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\TabsMixedWithSpaces.cs" />
     <Content Include="CSharp\IndentsValidation\TestData\Incorrect\TopLevelNodesShouldBeConsistent.cs" />
+    <Compile Include="CSharp\IndentsValidation\TestData\Incorrect\SingleLineOperations.cs" />
     <Compile Include="CSharp\LineLengthChecker_should.cs" />
     <Compile Include="CSharp\NamingChecker_should.cs" />
     <Content Include="CSharp\testProject\projDir\MeaningOfLifeTask.WrongAnswer.27.cs">

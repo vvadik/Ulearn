@@ -3,257 +3,299 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using uLearn.CSharp;
+using SyntaxNodeOrToken = uLearn.CSharp.SyntaxNodeOrToken;
 
 namespace uLearn
 {
-	public class IndentsValidator : BaseStyleValidator
-	{
-		private const string prefix = "Код плохо отформатирован.\n" +
-									"Автоматически отформатировать код в Visual Studio можно с помощью комбинации клавиш Ctrl+K+D";
+    public class IndentsValidator : BaseStyleValidator
+    {
+        private const string prefix = "РљРѕРґ РїР»РѕС…Рѕ РѕС‚С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅ.\n" +
+                                      "РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРё РѕС‚С„РѕСЂРјР°С‚РёСЂРѕРІР°С‚СЊ РєРѕРґ РІ Visual Studio РјРѕР¶РЅРѕ СЃ РїРѕРјРѕС‰СЊСЋ РєРѕРјР±РёРЅР°С†РёРё РєР»Р°РІРёС€ Ctrl+K+D";
 
-		private SyntaxTree tree;
-		private BracesPair[] bracesPairs;
+        private SyntaxTree tree;
+        private BracesPair[] bracesPairs;
 
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
-		{
-			tree = userSolution;
-			bracesPairs = BuildBracesPairs().OrderBy(p => p.Open.SpanStart).ToArray();
+        protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+        {
+            tree = userSolution;
+            bracesPairs = BuildBracesPairs().OrderBy(p => p.Open.SpanStart).ToArray();
 
-			var errors = ReportIfCompilationUnitChildrenNotConsistent()
-				.Concat(ReportIfBracesNotAligned())
-				.Concat(ReportIfCloseBraceHasCodeOnSameLine())
-				.Concat(ReportIfOpenBraceHasCodeOnSameLine())
-				.Concat(ReportIfBracesContentNotIndentedOrNotConsistent())
-				.Concat(ReportIfBracesNotIndented())
-				.ToArray();
-			return errors.Any() ? new[] { prefix }.Concat(errors) : Enumerable.Empty<string>();
-		}
+            var errors = ReportIfCompilationUnitChildrenNotConsistent()
+                .Concat(ReportIfBracesNotAligned())
+                .Concat(ReportIfCloseBraceHasCodeOnSameLine())
+                .Concat(ReportIfOpenBraceHasCodeOnSameLine())
+                .Concat(ReportIfBracesContentNotIndentedOrNotConsistent())
+                .Concat(ReportIfBracesNotIndented())
+                .Concat(ReportIfNonBracesTokensHaveIncorrectIndents())
+                .ToArray();
+            return errors.Any() ? new[] { prefix }.Concat(errors) : Enumerable.Empty<string>();
+        }
 
-		private IEnumerable<BracesPair> BuildBracesPairs()
-		{
-			var braces = tree.GetRoot().DescendantTokens()
-				.Where(t => t.IsKind(SyntaxKind.OpenBraceToken) || t.IsKind(SyntaxKind.CloseBraceToken));
-			var openbracesStack = new Stack<SyntaxToken>();
-			foreach (var brace in braces)
-			{
-				if (brace.IsKind(SyntaxKind.OpenBraceToken))
-					openbracesStack.Push(brace);
-				else
-					yield return new BracesPair(openbracesStack.Pop(), brace);
-			}
-		}
+        private IEnumerable<BracesPair> BuildBracesPairs()
+        {
+            var braces = tree.GetRoot().DescendantTokens()
+                .Where(t => t.IsKind(SyntaxKind.OpenBraceToken) || t.IsKind(SyntaxKind.CloseBraceToken));
+            var openbracesStack = new Stack<SyntaxToken>();
+            foreach (var brace in braces)
+            {
+                if (brace.IsKind(SyntaxKind.OpenBraceToken))
+                    openbracesStack.Push(brace);
+                else
+                    yield return new BracesPair(openbracesStack.Pop(), brace);
+            }
+        }
 
-		private IEnumerable<string> ReportIfCompilationUnitChildrenNotConsistent()
-		{
-			var childLineIndents = tree.GetRoot().ChildNodes()
-				.Select(node => node.GetFirstToken())
-				.Select(t => new Indent(t))
-				.Where(i => i.IndentedTokenIsFirstAtLine)
-				.ToList();
-			if (!childLineIndents.Any())
-			{
-				return Enumerable.Empty<string>();
-			}
-			var firstIndent = childLineIndents.First();
-			return childLineIndents
-				.Skip(1)
-				.Where(i => i.LengthInSpaces != firstIndent.LengthInSpaces)
-				.Select(i => Report(i.IndentedToken, "На верхнем уровне вложенности все узлы должны иметь одинаковый отступ"));
-		}
+        private IEnumerable<string> ReportIfCompilationUnitChildrenNotConsistent()
+        {
+            var childLineIndents = tree.GetRoot().ChildNodes()
+                .Select(node => node.GetFirstToken())
+                .Select(t => new Indent(t))
+                .Where(i => i.IndentedTokenIsFirstAtLine)
+                .ToList();
+            if (!childLineIndents.Any())
+            {
+                return Enumerable.Empty<string>();
+            }
+            var firstIndent = childLineIndents.First();
+            return childLineIndents
+                .Skip(1)
+                .Where(i => i.LengthInSpaces != firstIndent.LengthInSpaces)
+                .Select(i => Report(i.IndentedToken, "РќР° РІРµСЂС…РЅРµРј СѓСЂРѕРІРЅРµ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё РІСЃРµ СѓР·Р»С‹ РґРѕР»Р¶РЅС‹ РёРјРµС‚СЊ РѕРґРёРЅР°РєРѕРІС‹Р№ РѕС‚СЃС‚СѓРї"));
+        }
 
-		private IEnumerable<string> ReportIfBracesNotAligned()
-		{
-			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
-			{
-				var openBraceIndent = new Indent(braces.Open);
-				var closeBraceIndent = new Indent(braces.Close);
-				if (openBraceIndent.IndentedTokenIsFirstAtLine && openBraceIndent.LengthInSpaces != closeBraceIndent.LengthInSpaces)
-				{
-					yield return Report(braces.Open, $"Парные фигурные скобки ({braces}) должны иметь одинаковый отступ.");
-				}
-			}
-		}
+        private IEnumerable<string> ReportIfBracesNotAligned()
+        {
+            foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
+            {
+                var openBraceIndent = new Indent(braces.Open);
+                var closeBraceIndent = new Indent(braces.Close);
+                if (openBraceIndent.IndentedTokenIsFirstAtLine && openBraceIndent.LengthInSpaces != closeBraceIndent.LengthInSpaces)
+                {
+                    yield return Report(braces.Open, $"РџР°СЂРЅС‹Рµ С„РёРіСѓСЂРЅС‹Рµ СЃРєРѕР±РєРё ({braces}) РґРѕР»Р¶РЅС‹ РёРјРµС‚СЊ РѕРґРёРЅР°РєРѕРІС‹Р№ РѕС‚СЃС‚СѓРї.");
+                }
+            }
+        }
 
-		private IEnumerable<string> ReportIfCloseBraceHasCodeOnSameLine()
-		{
-			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
-			{
-				var openBraceIndent = new Indent(braces.Open);
-				var closeBraceIndent = new Indent(braces.Close);
-				if (openBraceIndent.IndentedTokenIsFirstAtLine && !closeBraceIndent.IndentedTokenIsFirstAtLine)
-				{
-					yield return Report(braces.Close, "Перед закрывающей фигурной скобкой на той же строке не должно быть кода.");
-				}
-			}
-		}
+        private IEnumerable<string> ReportIfCloseBraceHasCodeOnSameLine()
+        {
+            foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
+            {
+                var openBraceIndent = new Indent(braces.Open);
+                var closeBraceIndent = new Indent(braces.Close);
+                if (openBraceIndent.IndentedTokenIsFirstAtLine && !closeBraceIndent.IndentedTokenIsFirstAtLine)
+                {
+                    yield return Report(braces.Close, "РџРµСЂРµРґ Р·Р°РєСЂС‹РІР°СЋС‰РµР№ С„РёРіСѓСЂРЅРѕР№ СЃРєРѕР±РєРѕР№ РЅР° С‚РѕР№ Р¶Рµ СЃС‚СЂРѕРєРµ РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РєРѕРґР°.");
+                }
+            }
+        }
 
-		private IEnumerable<string> ReportIfOpenBraceHasCodeOnSameLine()
-		{
-			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
-			{
-				var openBraceHasCodeOnSameLine = braces.Open.Parent.ChildNodes()
-					.Select(node => node.GetFirstToken())
-					.Any(t => braces.TokenInsideBraces(t) && t.GetLine() == braces.Open.GetLine());
-				if (openBraceHasCodeOnSameLine)
-					yield return Report(braces.Open, "После открывающей фигурной скобки на той же строке не должно быть кода");
-			}
-		}
+        private IEnumerable<string> ReportIfOpenBraceHasCodeOnSameLine()
+        {
+            foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
+            {
+                var openBraceHasCodeOnSameLine = braces.Open.Parent.ChildNodes()
+                    .Select(node => node.GetFirstToken())
+                    .Any(t => braces.TokenInsideBraces(t) && t.GetLine() == braces.Open.GetLine());
+                if (openBraceHasCodeOnSameLine)
+                    yield return Report(braces.Open, "РџРѕСЃР»Рµ РѕС‚РєСЂС‹РІР°СЋС‰РµР№ С„РёРіСѓСЂРЅРѕР№ СЃРєРѕР±РєРё РЅР° С‚РѕР№ Р¶Рµ СЃС‚СЂРѕРєРµ РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РєРѕРґР°");
+            }
+        }
 
-		private IEnumerable<string> ReportIfBracesContentNotIndentedOrNotConsistent()
-		{
-			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
-			{
-				var childLineIndents = braces.Open.Parent.ChildNodes()
-					.Select(node => node.DescendantTokens().First())
-					.Where(t => braces.TokenInsideBraces(t))
-					.Select(t => new Indent(t))
-					.Where(i => i.IndentedTokenIsFirstAtLine)
-					.ToList();
-				if (!childLineIndents.Any())
-					continue;
-				var firstTokenOfLineWithMinimalIndent = Indent.TokenIsFirstAtLine(braces.Open)
-					? braces.Open
-					: GetFirstTokenOfCorrectOpenbraceParent(braces.Open);
-				if (firstTokenOfLineWithMinimalIndent == default(SyntaxToken))
-					continue;
-				var minimalIndentAfterOpenbrace = new Indent(firstTokenOfLineWithMinimalIndent);
-				var firstChild = childLineIndents.First();
-				if (firstChild.LengthInSpaces <= minimalIndentAfterOpenbrace.LengthInSpaces)
-					yield return Report(firstChild.IndentedToken,
-						$"Содержимое парных фигурных скобок ({braces}) должно иметь дополнительный отступ.");
-				var badLines = childLineIndents.Where(t => t.LengthInSpaces != firstChild.LengthInSpaces);
-				foreach (var badIndent in badLines)
-				{
-					yield return Report(badIndent.IndentedToken,
-						$"Содержимое парных фигурных скобок ({braces}) должно иметь одинаковый отступ.");
-				}
-			}
-		}
+        private IEnumerable<string> ReportIfBracesContentNotIndentedOrNotConsistent()
+        {
+            foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
+            {
+                var childLineIndents = braces.Open.Parent.ChildNodes()
+                    .Select(node => node.DescendantTokens().First())
+                    .Where(t => braces.TokenInsideBraces(t))
+                    .Select(t => new Indent(t))
+                    .Where(i => i.IndentedTokenIsFirstAtLine)
+                    .ToList();
+                if (!childLineIndents.Any())
+                    continue;
+                var firstTokenOfLineWithMinimalIndent = Indent.TokenIsFirstAtLine(braces.Open)
+                    ? braces.Open
+                    : GetFirstTokenOfCorrectOpenbraceParent(braces.Open);
+                if (firstTokenOfLineWithMinimalIndent == default(SyntaxToken))
+                    continue;
+                var minimalIndentAfterOpenbrace = new Indent(firstTokenOfLineWithMinimalIndent);
+                var firstChild = childLineIndents.First();
+                if (firstChild.LengthInSpaces <= minimalIndentAfterOpenbrace.LengthInSpaces)
+                    yield return Report(firstChild.IndentedToken,
+                        $"РЎРѕРґРµСЂР¶РёРјРѕРµ РїР°СЂРЅС‹С… С„РёРіСѓСЂРЅС‹С… СЃРєРѕР±РѕРє ({braces}) РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ РѕС‚СЃС‚СѓРї.");
+                var badLines = childLineIndents.Where(t => t.LengthInSpaces != firstChild.LengthInSpaces);
+                foreach (var badIndent in badLines)
+                {
+                    yield return Report(badIndent.IndentedToken,
+                        $"РЎРѕРґРµСЂР¶РёРјРѕРµ РїР°СЂРЅС‹С… С„РёРіСѓСЂРЅС‹С… СЃРєРѕР±РѕРє ({braces}) РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ РѕРґРёРЅР°РєРѕРІС‹Р№ РѕС‚СЃС‚СѓРї.");
+                }
+            }
+        }
 
-		private SyntaxToken GetFirstTokenOfCorrectOpenbraceParent(SyntaxToken openbrace)
-		{
-			if (openbrace.Parent is BaseTypeDeclarationSyntax ||
-				openbrace.Parent is AccessorListSyntax ||
-				openbrace.Parent is SwitchStatementSyntax ||
-				openbrace.Parent is AnonymousObjectCreationExpressionSyntax ||
-				openbrace.Parent.IsKind(SyntaxKind.ComplexElementInitializerExpression))
-			{
-				return openbrace.Parent.GetFirstToken();
-			}
-			if (openbrace.Parent is InitializerExpressionSyntax ||
-				openbrace.Parent is BlockSyntax && !(openbrace.Parent.Parent is BlockSyntax))
-			{
-				return openbrace.Parent.Parent.GetFirstToken();
-			}
-			return default(SyntaxToken);
-		}
+        private IEnumerable<string> ReportIfNonBracesTokensHaveIncorrectIndents()
+        {
+            return tree.GetRoot().DescendantNodes()
+                .Where(NeedToValidateNonBracesTokens)
+                .Select(x => SyntaxNodeOrToken.Create(tree, x))
+                .SelectMany(CheckStatement);
+        }
 
-		private IEnumerable<string> ReportIfBracesNotIndented()
-		{
-			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine() &&
-															Indent.TokenIsFirstAtLine(pair.Open)))
-			{
-				var correctOpenbraceParent = GetFirstTokenOfCorrectOpenbraceParent(braces.Open);
-				if (correctOpenbraceParent == default(SyntaxToken))
-					continue;
-				var parentLineIndent = new Indent(correctOpenbraceParent);
-				var openbraceLineIndent = new Indent(braces.Open);
-				if (openbraceLineIndent.LengthInSpaces < parentLineIndent.LengthInSpaces)
-					yield return Report(braces.Open,
-						$"Парные фигурные скобки ({braces}) должны иметь отступ не меньше, чем у родителя.");
-			}
-		}
-	}
+        private static IEnumerable<string> CheckStatement(SyntaxNodeOrToken rootStatementSyntax)
+        {
+            var rootStart = rootStatementSyntax.GetStartIndexInSpaces();
 
-	internal class BracesPair
-	{
-		public readonly SyntaxToken Open;
-		public readonly SyntaxToken Close;
+            var statementClauses = rootStatementSyntax.GetStatementsSyntax().ToArray();
+            foreach (var statementClause in statementClauses)
+            {
+                if (statementClause.Kind == SyntaxKind.Block)
+                    break;
+                var statementStart = statementClause.GetStartIndexInSpaces();
+                if (!statementClause.IsKeyword ? statementStart <= rootStart : statementStart != rootStart)
+                    yield return
+                        $"РЎС‚СЂРѕРєР° {statementClause.GetLine()}, РїРѕР·РёС†РёСЏ {statementStart}: Р’С‹СЂР°Р¶РµРЅРёРµ РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ РѕС‚СЃС‚СѓРї Р±РѕР»СЊС€Рµ, " +
+                        $"С‡РµРј Сѓ СЂРѕРґРёС‚РµР»СЏ (СЃС‚СЂРѕРєР° {rootStatementSyntax.GetLine()}, РїРѕР·РёС†РёСЏ {rootStart}).";
 
-		public BracesPair(SyntaxToken open, SyntaxToken close)
-		{
-			Open = open;
-			Close = close;
-		}
+                foreach (var nestedError in CheckStatement(statementClause))
+                    yield return nestedError;
+            }
+        }
 
-		public bool TokenInsideBraces(SyntaxToken token)
-		{
-			return token.SpanStart > Open.SpanStart && token.Span.End < Close.Span.End;
-		}
+        private static bool NeedToValidateNonBracesTokens(SyntaxNode syntaxNode)
+        {
+            var syntaxKind = syntaxNode.Kind();
+            return syntaxKind == SyntaxKind.IfStatement
+                   || syntaxKind == SyntaxKind.WhileStatement
+                   || syntaxKind == SyntaxKind.ForStatement
+                   || syntaxKind == SyntaxKind.ForEachStatement
+                   || syntaxKind == SyntaxKind.DoStatement
+                   || syntaxKind == SyntaxKind.SwitchStatement;
+        }
 
-		public override string ToString()
-		{
-			return $"строки {Open.GetLine() + 1}, {Close.GetLine() + 1}";
-		}
-	}
+        private SyntaxToken GetFirstTokenOfCorrectOpenbraceParent(SyntaxToken openbrace)
+        {
+            if (openbrace.Parent is BaseTypeDeclarationSyntax ||
+                openbrace.Parent is AccessorListSyntax ||
+                openbrace.Parent is SwitchStatementSyntax ||
+                openbrace.Parent is AnonymousObjectCreationExpressionSyntax ||
+                openbrace.Parent.IsKind(SyntaxKind.ComplexElementInitializerExpression))
+            {
+                return openbrace.Parent.GetFirstToken();
+            }
+            if (openbrace.Parent is InitializerExpressionSyntax ||
+                openbrace.Parent is BlockSyntax && !(openbrace.Parent.Parent is BlockSyntax))
+            {
+                return openbrace.Parent.Parent.GetFirstToken();
+            }
+            return default(SyntaxToken);
+        }
 
-	internal class Indent
-	{
-		public int LengthInSpaces { get; }
-		public bool IndentedTokenIsFirstAtLine { get; }
-		public SyntaxToken IndentedToken { get; }
+        private IEnumerable<string> ReportIfBracesNotIndented()
+        {
+            foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine() &&
+                                                             Indent.TokenIsFirstAtLine(pair.Open)))
+            {
+                var correctOpenbraceParent = GetFirstTokenOfCorrectOpenbraceParent(braces.Open);
+                if (correctOpenbraceParent == default(SyntaxToken))
+                    continue;
+                var parentLineIndent = new Indent(correctOpenbraceParent);
+                var openbraceLineIndent = new Indent(braces.Open);
+                if (openbraceLineIndent.LengthInSpaces < parentLineIndent.LengthInSpaces)
+                    yield return Report(braces.Open,
+                        $"РџР°СЂРЅС‹Рµ С„РёРіСѓСЂРЅС‹Рµ СЃРєРѕР±РєРё ({braces}) РґРѕР»Р¶РЅС‹ РёРјРµС‚СЊ РѕС‚СЃС‚СѓРї РЅРµ РјРµРЅСЊС€Рµ, С‡РµРј Сѓ СЂРѕРґРёС‚РµР»СЏ.");
+            }
+        }
+    }
 
-		public Indent(SyntaxToken indentedToken)
-		{
-			IndentedToken = indentedToken;
-			IndentedTokenIsFirstAtLine = TokenIsFirstAtLine(indentedToken);
-			var firstTokenInLine = GetFirstTokenAtLine(indentedToken);
-			LengthInSpaces = GetLengthInSpaces(firstTokenInLine);
-		}
+    internal class BracesPair
+    {
+        public readonly SyntaxToken Open;
+        public readonly SyntaxToken Close;
 
-		private int GetLengthInSpaces(SyntaxToken firstTokenInLine)
-		{
-			var lastTrivia = firstTokenInLine.LeadingTrivia.LastOrDefault();
-			if (!lastTrivia.IsKind(SyntaxKind.WhitespaceTrivia))
-				return 0;
-			var stringTrivia = lastTrivia.ToFullString();
-			var type = GetIndentType(stringTrivia);
-			if (type == IndentType.Whitespace)
-				return stringTrivia.Length;
-			if (type == IndentType.Tab)
-				return stringTrivia.Length * 4;
-			return stringTrivia.Count(c => c == ' ') + stringTrivia.Count(c => c == '\t') * 4;
-		}
+        public BracesPair(SyntaxToken open, SyntaxToken close)
+        {
+            Open = open;
+            Close = close;
+        }
 
-		public static IndentType GetIndentType(string leadingTrivia)
-		{
-			if (leadingTrivia.All(v => v == '\t'))
-				return IndentType.Tab;
-			if (leadingTrivia.All(v => v == ' '))
-				return IndentType.Whitespace;
-			return IndentType.Mixed;
-		}
+        public bool TokenInsideBraces(SyntaxToken token)
+        {
+            return token.SpanStart > Open.SpanStart && token.Span.End < Close.Span.End;
+        }
 
-		public static SyntaxToken GetFirstTokenAtLine(SyntaxToken token)
-		{
-			var tokenLineSpanStart = token.SyntaxTree.GetText().Lines[token.GetLine()].Start;
-			return token.SyntaxTree.GetRoot().FindToken(tokenLineSpanStart);
-		}
+        public override string ToString()
+        {
+            return $"СЃС‚СЂРѕРєРё {Open.GetLine() + 1}, {Close.GetLine() + 1}";
+        }
+    }
+    
+    internal class Indent
+    {
+        public int LengthInSpaces { get; }
+        public bool IndentedTokenIsFirstAtLine { get; }
+        public SyntaxToken IndentedToken { get; }
 
-		public static bool TokenIsFirstAtLine(SyntaxToken token)
-		{
-			return GetFirstTokenAtLine(token).IsEquivalentTo(token);
-		}
+        public Indent(SyntaxToken indentedToken)
+        {
+            IndentedToken = indentedToken;
+            IndentedTokenIsFirstAtLine = TokenIsFirstAtLine(indentedToken);
+            var firstTokenInLine = GetFirstTokenAtLine(indentedToken);
+            LengthInSpaces = GetLengthInSpaces(firstTokenInLine);
+        }
 
-		public override string ToString()
-		{
-			return $"{IndentedToken.Kind()}. LengthInSpaces: {LengthInSpaces}";
-		}
-	}
+        private int GetLengthInSpaces(SyntaxToken firstTokenInLine)
+        {
+            var lastTrivia = firstTokenInLine.LeadingTrivia.LastOrDefault();
+            if (!lastTrivia.IsKind(SyntaxKind.WhitespaceTrivia))
+                return 0;
+            var stringTrivia = lastTrivia.ToFullString();
+            var type = GetIndentType(stringTrivia);
+            if (type == IndentType.Whitespace)
+                return stringTrivia.Length;
+            if (type == IndentType.Tab)
+                return stringTrivia.Length * 4;
+            return stringTrivia.Count(c => c == ' ') + stringTrivia.Count(c => c == '\t') * 4;
+        }
 
-	internal enum IndentType
-	{
-		Tab,
-		Whitespace,
-		Mixed
-	}
+        public static IndentType GetIndentType(string leadingTrivia)
+        {
+            if (leadingTrivia.All(v => v == '\t'))
+                return IndentType.Tab;
+            if (leadingTrivia.All(v => v == ' '))
+                return IndentType.Whitespace;
+            return IndentType.Mixed;
+        }
 
-	public static class SyntaxTokenExt
-	{
-		public static int GetLine(this SyntaxToken t)
-		{
-			return t.GetLocation().GetLineSpan().StartLinePosition.Line;
-		}
-	}
+        public static SyntaxToken GetFirstTokenAtLine(SyntaxToken token)
+        {
+            var tokenLineSpanStart = token.SyntaxTree.GetText().Lines[token.GetLine()].Start;
+            return token.SyntaxTree.GetRoot().FindToken(tokenLineSpanStart);
+        }
+
+        public static bool TokenIsFirstAtLine(SyntaxToken token)
+        {
+            return GetFirstTokenAtLine(token).IsEquivalentTo(token);
+        }
+
+        public override string ToString()
+        {
+            return $"{IndentedToken.Kind()}. LengthInSpaces: {LengthInSpaces}";
+        }
+    }
+
+    internal enum IndentType
+    {
+        Tab,
+        Whitespace,
+        Mixed
+    }
+
+    public static class SyntaxTokenExt
+    {
+        public static int GetLine(this SyntaxToken t)
+        {
+            return t.GetLocation().GetLineSpan().StartLinePosition.Line;
+        }
+    }
 }
