@@ -187,7 +187,7 @@
     <Compile Include="CSharp\BoolCompareValidator.cs" />
     <Compile Include="CSharp\IndentsValidator.cs" />
     <Compile Include="CSharp\IStrictValidator.cs" />
-    <Compile Include="CSharp\ParametrNameLengthValidator.cs" />
+    <Compile Include="CSharp\NamimgLengthValidator.cs" />
     <Compile Include="ExportedSlide.cs" />
     <Compile Include="Extensions\DictionaryExtension.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
