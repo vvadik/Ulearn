@@ -36,7 +36,7 @@ namespace uLearn.CSharp.ExponentiationValidation
 			.GetFiles("*.cs", SearchOption.AllDirectories)
 			.Where(f => f.Name.Contains("Accepted"));
 
-		private static readonly ExponentiationValidator validator = new ExponentiationValidator();
+		private static readonly ExponentiationStyleValidator validator = new ExponentiationStyleValidator();
 
 		[TestCaseSource(nameof(incorrectFiles))]
 		public void FindErrors(FileInfo file)

@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace uLearn.CSharp
 {
-	public class ExponentiationValidator: BaseStyleValidatorWithSemanticModel
+	public class ExponentiationStyleValidator: BaseStyleValidatorWithSemanticModel
 	{
 		private static readonly HashSet<double> forbiddenDegrees = 
 			new HashSet<double>{2.0, 3.0};
