@@ -216,6 +216,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSharp\ArrayGetLengthValidation\ArrayLengthStyleValidator_should.cs" />
     <Compile Include="CSharp\BoolCompareValidation\BoolCompareValidator_should.cs" />
     <Compile Include="CSharp\BoolCompareValidation\TestData\Correct\NullableCompare.cs" />
     <Compile Include="CSharp\BoolCompareValidation\TestData\Correct\UnknownTypes.cs" />
@@ -296,6 +297,7 @@
     <Compile Include="CSharp\testProject\projDir\OneFailingTest.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="CSharp\ValidatorTestBase.cs" />
     <Compile Include="ExportedSlide_should.cs" />
     <Compile Include="LockFilesTests.cs" />
     <Compile Include="CourseTool\Config_Test.cs" />

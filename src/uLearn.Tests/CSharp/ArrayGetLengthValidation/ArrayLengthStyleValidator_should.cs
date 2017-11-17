@@ -4,21 +4,20 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 
-namespace uLearn.CSharp.ExponentiationValidation
+namespace uLearn.CSharp.ArrayGetLengthValidation
 {
 	[TestFixture]
-	public class ExponentiationValidator_should: ValidatorTestBase
+	public class ArrayLengthStyleValidator_should : ValidatorTestBase
 	{
 		private static readonly DirectoryInfo testDataDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
-			"..", "CSharp", "ExponentiationValidation", "TestData"));
+			"..", "CSharp", "ArraGetLengthValidation", "TestData"));
 		private static readonly DirectoryInfo incorrectTestDataDir = testDataDir.GetDirectories("Incorrect").Single();
 		private static readonly DirectoryInfo correctTestDataDir = testDataDir.GetDirectories("Correct").Single();
 
 		private static IEnumerable<FileInfo> correctFiles = correctTestDataDir.EnumerateFiles();
-		private static IEnumerable<FileInfo> incorrectFiles = incorrectTestDataDir.EnumerateFiles();	
-
-		private static readonly ExponentiationStyleValidator validator = new ExponentiationStyleValidator();
-
+		private static IEnumerable<FileInfo> incorrectFiles = incorrectTestDataDir.EnumerateFiles();
+		
+		private readonly ArrayLengthStyleValidator validator = new ArrayLengthStyleValidator();
 		protected override BaseStyleValidator Validator => validator;
 
 		[TestCaseSource(nameof(incorrectFiles))]
