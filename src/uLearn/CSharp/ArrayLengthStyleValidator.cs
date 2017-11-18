@@ -13,7 +13,7 @@ namespace uLearn.CSharp
 			var errorsInForCycle = InspectAll<ForStatementSyntax>(userSolution, semanticModel, InspectMethod);
 			var errorsInForEachCycle = InspectAll<ForEachStatementSyntax>(userSolution, semanticModel, InspectMethod);
 			var errorsInWhileCycle = InspectAll<WhileStatementSyntax>(userSolution, semanticModel, InspectMethod);
-			var errorsInDoWhileCycle = InspectAll<DoStatementSyntax>(userSolution, semanticModel, InspectMethod); // TODO: уточнить
+			var errorsInDoWhileCycle = InspectAll<DoStatementSyntax>(userSolution, semanticModel, InspectMethod);
 
 			return errorsInForCycle
 				.Concat(errorsInForEachCycle)
