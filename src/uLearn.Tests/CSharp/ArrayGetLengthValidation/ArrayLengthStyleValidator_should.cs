@@ -10,7 +10,7 @@ namespace uLearn.CSharp.ArrayGetLengthValidation
 	public class ArrayLengthStyleValidator_should : ValidatorTestBase
 	{
 		private static readonly DirectoryInfo testDataDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
-			"..", "CSharp", "ArraGetLengthValidation", "TestData"));
+			"..", "CSharp", "ArrayGetLengthValidation", "TestData"));
 		private static readonly DirectoryInfo incorrectTestDataDir = testDataDir.GetDirectories("Incorrect").Single();
 		private static readonly DirectoryInfo correctTestDataDir = testDataDir.GetDirectories("Correct").Single();
 

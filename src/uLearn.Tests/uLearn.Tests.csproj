@@ -217,6 +217,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CSharp\ArrayGetLengthValidation\ArrayLengthStyleValidator_should.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Correct\GetLengthNotInCycle.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Correct\GetLengthWithVariable.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Correct\NoGetLengthCall.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Incorrect\GetLengthInDoWhileCycle.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Incorrect\GetLengthInForCycle.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Incorrect\GetLengthInForeachCycle.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Incorrect\GetLengthInWhileCycle.cs" />
     <Compile Include="CSharp\BoolCompareValidation\BoolCompareValidator_should.cs" />
     <Compile Include="CSharp\BoolCompareValidation\TestData\Correct\NullableCompare.cs" />
     <Compile Include="CSharp\BoolCompareValidation\TestData\Correct\UnknownTypes.cs" />
