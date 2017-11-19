@@ -48,9 +48,11 @@ namespace uLearn.CSharp
 			try
 			{
 				var solutionTree = CSharpSyntaxTree.ParseText(userCode);
+				var compilation = CSharpCompilation.Create("MyCompilation", new[] { solutionTree }, new[] { mscorlib });
+				var semanticModel = compilation.GetSemanticModel(solutionTree);
 				var errors = validators
 					.Where(v => !(v is IStrictValidator))
-					.Select(v => v.FindError(solutionTree))
+					.Select(v => v.FindError(solutionTree, semanticModel))
 					.Where(err => err != null)
 					.ToArray();
 				return errors.Any() ? string.Join("\n\n", errors) : null;
@@ -66,9 +68,11 @@ namespace uLearn.CSharp
 			try
 			{
 				var solutionTree = CSharpSyntaxTree.ParseText(userCode);
+				var compilation = CSharpCompilation.Create("MyCompilation", new[] { solutionTree }, new[] { mscorlib });
+				var semanticModel = compilation.GetSemanticModel(solutionTree);
 				return validators
 					.Where(v => v is IStrictValidator)
-					.Select(v => v.FindError(solutionTree))
+					.Select(v => v.FindError(solutionTree, semanticModel))
 					.FirstOrDefault(err => err != null);
 			}
 			catch (Exception e)
@@ -76,5 +80,8 @@ namespace uLearn.CSharp
 				return e.Message;
 			}
 		}
+
+		private static readonly PortableExecutableReference mscorlib =
+			MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
 	}
 }

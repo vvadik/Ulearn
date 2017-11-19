@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace uLearn.CSharp
 {
 	public class NamingStyleValidator : BaseStyleValidator
 	{
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			return InspectAll<MethodDeclarationSyntax>(userSolution, InspectMethod);
 		}

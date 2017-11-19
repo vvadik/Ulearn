@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -14,7 +13,7 @@ namespace uLearn.CSharp
 			this.requireRecursion = requireRecursion;
 		}
 
-		public string FindError(SyntaxTree userSolution)
+		public string FindError(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			var recursiveMethods = userSolution.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().Where(IsRecursive).ToList();
 

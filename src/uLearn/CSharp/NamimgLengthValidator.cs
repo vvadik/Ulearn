@@ -8,32 +8,32 @@ namespace uLearn.CSharp
 {
 	public class NamimgLengthValidator : BaseStyleValidator
 	{
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
-			return InspectAll<FieldDeclarationSyntax>(userSolution, ReportField)
-				.Concat(InspectAll<PropertyDeclarationSyntax>(userSolution, ReportProperty))
-				.Concat(InspectAll<BaseMethodDeclarationSyntax>(userSolution, ReportMethod));
+			return InspectAll<FieldDeclarationSyntax>(userSolution, semanticModel, ReportField)
+				.Concat(InspectAll<PropertyDeclarationSyntax>(userSolution, semanticModel, ReportProperty))
+				.Concat(InspectAll<BaseMethodDeclarationSyntax>(userSolution, semanticModel, ReportMethod));
 		}
 
-		private IEnumerable<string> ReportProperty(PropertyDeclarationSyntax propertyDeclarationSyntax)
+		private IEnumerable<string> ReportProperty(PropertyDeclarationSyntax propertyDeclarationSyntax, SemanticModel semanticModel)
 		{
 			var syntaxNodes = propertyDeclarationSyntax.Identifier;
 			if (!IsCorrectName(syntaxNodes.ValueText, validCoordinateNames))
 				yield return Report(syntaxNodes, "Свойство");
 		}
 
-		private IEnumerable<string> ReportField(FieldDeclarationSyntax fieldDeclarationSyntax)
+		private IEnumerable<string> ReportField(FieldDeclarationSyntax fieldDeclarationSyntax, SemanticModel semanticModel)
 		{
 			if (IsContainConstModifier(fieldDeclarationSyntax))
 				return new List<string>();
 
-			var syntaxTokens = fieldDeclarationSyntax.Declaration.Variables.Select(variableDeclarationSyntax => variableDeclarationSyntax.Identifier);
+			var syntaxTokens = fieldDeclarationSyntax.Declaration.Variables.Select(declarationSyntax => declarationSyntax.Identifier);
 			return ReportSyntaxTokensNames(syntaxTokens, "Поле");
 		}
 
-		private IEnumerable<string> ReportMethod(BaseMethodDeclarationSyntax methodDeclarationSyntax) =>
+		private IEnumerable<string> ReportMethod(BaseMethodDeclarationSyntax methodDeclarationSyntax, SemanticModel semanticModel) =>
 			ReportMethodsParameters(methodDeclarationSyntax.ParameterList)
-				.Concat(ReportMethodBody(methodDeclarationSyntax.Body));
+				.Concat(ReportMethodBody(methodDeclarationSyntax.Body, semanticModel));
 
 		private IEnumerable<string> ReportMethodsParameters(ParameterListSyntax parameterListSyntax)
 		{
@@ -41,59 +41,76 @@ namespace uLearn.CSharp
 			return ReportSyntaxTokensNames(syntaxTokens, "Аргумент функции");
 		}
 
-		private IEnumerable<string> ReportMethodBody(BlockSyntax blockSyntax)
+		private IEnumerable<string> ReportMethodBody(BlockSyntax blockSyntax, SemanticModel semanticModel)
 		{
-			var list = new List<string>();
-
 			if (blockSyntax == null)
-				return list;
+				return new List<string>();
 
-			foreach (var statement in blockSyntax.Statements)
-			{
-				if (statement is ExpressionStatementSyntax)
-					list.AddRange(ReportExpressionStatments(statement as ExpressionStatementSyntax));
-				else if (statement is ForStatementSyntax)
-					list.AddRange(ReportForStatment(statement as ForStatementSyntax));
-				else
-					list.AddRange(ReportLovalVariables(statement));
-			}
-
-			return list;
+			var nodes = blockSyntax.DescendantNodes();
+			var forStatementSyntaxs = nodes.OfType<ForStatementSyntax>().SelectMany(x => ReportForStatment(x, semanticModel));
+			return forStatementSyntaxs.Concat(ReportLovalVariables(nodes, semanticModel));
 		}
 
-		private IEnumerable<string> ReportLovalVariables(StatementSyntax statement)
+		private IEnumerable<string> ReportLovalVariables(IEnumerable<SyntaxNode> nodes, SemanticModel semanticModel)
 		{
-			var syntaxTokens = statement.DescendantNodes().OfType<VariableDeclarationSyntax>().SelectMany(declarationSynax => declarationSynax.Variables).Select(variableDeclarationSyntax => variableDeclarationSyntax.Identifier);
-			return ReportSyntaxTokensNames(syntaxTokens, "Локальная переменная", validLocalNames);
+			var declaredSymbols = nodes.OfType<VariableDeclarationSyntax>()
+				.Where(IsCorrectType)
+				.SelectMany(x => x.Variables)
+				.ToDictionary(x => x.Identifier, x => (ILocalSymbol)semanticModel.GetDeclaredSymbol(x));
+
+			var parametersSyntaxTokens = nodes.OfType<ParameterSyntax>().Select(x => x.Identifier);
+
+			return ReportSyntaxTokensNames(declaredSymbols, "Переменная", validLocalNames)
+				.Concat(ReportSyntaxTokensNames(parametersSyntaxTokens, "Аргумент LINQ выражения"));
 		}
 
-		private IEnumerable<string> ReportForStatment(ForStatementSyntax statementSyntax)
+		private bool IsCorrectType(VariableDeclarationSyntax declarationSyntaxs) =>
+			!(declarationSyntaxs.Parent is ForStatementSyntax || declarationSyntaxs.Parent is ExpressionStatementSyntax);
+
+
+		private IEnumerable<string> ReportForStatment(ForStatementSyntax statementSyntax, SemanticModel semanticModel)
 		{
 			if (statementSyntax.Declaration == null)
 				return new List<string>();
-			var syntaxTokens = statementSyntax.Declaration.Variables.Select(variable => variable.Identifier);
-			return ReportSyntaxTokensNames(syntaxTokens, "Итератор цикла", validCycleNames);
+
+			var declaredDictionary = statementSyntax.Declaration.Variables
+				.ToDictionary(variable => variable.Identifier, variable => (ILocalSymbol)semanticModel.GetDeclaredSymbol(variable));
+
+			return ReportSyntaxTokensNames(declaredDictionary, "Итератор цикла", validCycleNames)
+				.Concat(ReportLovalVariables(statementSyntax.Statement.DescendantNodes(), semanticModel));
 		}
 
-		private IEnumerable<string> ReportExpressionStatments(ExpressionStatementSyntax expressionStatementSyntax)
-		{
-			var syntaxTokens = expressionStatementSyntax.DescendantNodes().OfType<ParameterSyntax>().Select(parameterSyntax => parameterSyntax.Identifier);
-			return ReportSyntaxTokensNames(syntaxTokens, "Аргумент LINQ выражения");
-		}
 
-
-		private IEnumerable<string> ReportSyntaxTokensNames(IEnumerable<SyntaxToken> nodesToCheck, string reportMessage, IEnumerable<string> validNodeNames = null)
+		private IEnumerable<string> ReportSyntaxTokensNames(IEnumerable<SyntaxToken> syntaxTokens, string reportMessage, IEnumerable<string> validNodeNames = null)
 		{
 			var validNames = validNodeNames?.Concat(validCoordinateNames).ToArray() ?? validCoordinateNames;
-			foreach (var syntaxToken in nodesToCheck)
+			foreach (var syntaxToken in syntaxTokens)
 			{
 				if (!IsCorrectName(syntaxToken.ValueText, validNames))
 					yield return Report(syntaxToken, $"{reportMessage} имеет слишком котороткое имя, старайся не использовать однобуквенные названия.");
 			}
 		}
 
+		private IEnumerable<string> ReportSyntaxTokensNames(IDictionary<SyntaxToken, ILocalSymbol> declaredDictionary, string reportMessage, IEnumerable<string> validNodeNames = null)
+		{
+			var validNames = validNodeNames?.Concat(validCoordinateNames).ToArray() ?? validCoordinateNames;
+			foreach (var declaredPair in declaredDictionary)
+			{
+				if (!IsCorrectName(declaredPair.Key.ValueText, validNames) && !IsCustomClassStartsWithName(declaredPair.Key.ValueText, declaredPair.Value))
+					yield return Report(declaredPair.Key, $"{reportMessage} имеет слишком котороткое имя, старайся не использовать однобуквенные названия.");
+			}
+		}
+
+		private bool IsCustomClassStartsWithName(string name, ILocalSymbol localSymbol)
+		{
+			var type = localSymbol.Type;
+			if (type == null)
+				return false;
+			return type.ContainingNamespace?.Name != "System" && type.Name.StartsWith(name, StringComparison.InvariantCultureIgnoreCase);
+		}
+
 		private bool IsCorrectName(string name, IEnumerable<string> validNames) =>
-			name.Length != 1 || IsValidName(validNames, name);
+			name.Count(char.IsLetter) > 1 || IsValidName(validNames, name);
 
 		private bool IsContainConstModifier(FieldDeclarationSyntax fieldDeclarationSyntax) =>
 			fieldDeclarationSyntax.Modifiers.Any(x => x.ValueText == "const");

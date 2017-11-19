@@ -9,7 +9,7 @@ namespace uLearn.CSharp
 {
 	public class RedundantIfStyleValidator : BaseStyleValidator
 	{
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			return InspectAll<IfStatementSyntax>(userSolution, Inspect);
 		}

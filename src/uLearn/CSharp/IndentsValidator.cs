@@ -9,13 +9,13 @@ namespace uLearn
 {
 	public class IndentsValidator : BaseStyleValidator
 	{
-		private const string prefix = "Код плохо отформатирован.\n" +
-									"Автоматически отформатировать код в Visual Studio можно с помощью комбинации клавиш Ctrl+K+D";
+		private const string prefix = "РљРѕРґ РїР»РѕС…Рѕ РѕС‚С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅ.\n" +
+									"РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРё РѕС‚С„РѕСЂРјР°С‚РёСЂРѕРІР°С‚СЊ РєРѕРґ РІ Visual Studio РјРѕР¶РЅРѕ СЃ РїРѕРјРѕС‰СЊСЋ РєРѕРјР±РёРЅР°С†РёРё РєР»Р°РІРёС€ Ctrl+K+D";
 
 		private SyntaxTree tree;
 		private BracesPair[] bracesPairs;
 
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			tree = userSolution;
 			bracesPairs = BuildBracesPairs().OrderBy(p => p.Open.SpanStart).ToArray();
@@ -59,7 +59,7 @@ namespace uLearn
 			return childLineIndents
 				.Skip(1)
 				.Where(i => i.LengthInSpaces != firstIndent.LengthInSpaces)
-				.Select(i => Report(i.IndentedToken, "На верхнем уровне вложенности все узлы должны иметь одинаковый отступ"));
+				.Select(i => Report(i.IndentedToken, "РќР° РІРµСЂС…РЅРµРј СѓСЂРѕРІРЅРµ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё РІСЃРµ СѓР·Р»С‹ РґРѕР»Р¶РЅС‹ РёРјРµС‚СЊ РѕРґРёРЅР°РєРѕРІС‹Р№ РѕС‚СЃС‚СѓРї"));
 		}
 
 		private IEnumerable<string> ReportIfBracesNotAligned()
@@ -70,7 +70,7 @@ namespace uLearn
 				var closeBraceIndent = new Indent(braces.Close);
 				if (openBraceIndent.IndentedTokenIsFirstAtLine && openBraceIndent.LengthInSpaces != closeBraceIndent.LengthInSpaces)
 				{
-					yield return Report(braces.Open, $"Парные фигурные скобки ({braces}) должны иметь одинаковый отступ.");
+					yield return Report(braces.Open, $"РџР°СЂРЅС‹Рµ С„РёРіСѓСЂРЅС‹Рµ СЃРєРѕР±РєРё ({braces}) РґРѕР»Р¶РЅС‹ РёРјРµС‚СЊ РѕРґРёРЅР°РєРѕРІС‹Р№ РѕС‚СЃС‚СѓРї.");
 				}
 			}
 		}
@@ -83,7 +83,7 @@ namespace uLearn
 				var closeBraceIndent = new Indent(braces.Close);
 				if (openBraceIndent.IndentedTokenIsFirstAtLine && !closeBraceIndent.IndentedTokenIsFirstAtLine)
 				{
-					yield return Report(braces.Close, "Перед закрывающей фигурной скобкой на той же строке не должно быть кода.");
+					yield return Report(braces.Close, "РџРµСЂРµРґ Р·Р°РєСЂС‹РІР°СЋС‰РµР№ С„РёРіСѓСЂРЅРѕР№ СЃРєРѕР±РєРѕР№ РЅР° С‚РѕР№ Р¶Рµ СЃС‚СЂРѕРєРµ РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РєРѕРґР°.");
 				}
 			}
 		}
@@ -96,7 +96,7 @@ namespace uLearn
 					.Select(node => node.GetFirstToken())
 					.Any(t => braces.TokenInsideBraces(t) && t.GetLine() == braces.Open.GetLine());
 				if (openBraceHasCodeOnSameLine)
-					yield return Report(braces.Open, "После открывающей фигурной скобки на той же строке не должно быть кода");
+					yield return Report(braces.Open, "РџРѕСЃР»Рµ РѕС‚РєСЂС‹РІР°СЋС‰РµР№ С„РёРіСѓСЂРЅРѕР№ СЃРєРѕР±РєРё РЅР° С‚РѕР№ Р¶Рµ СЃС‚СЂРѕРєРµ РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РєРѕРґР°");
 			}
 		}
 
@@ -121,12 +121,12 @@ namespace uLearn
 				var firstChild = childLineIndents.First();
 				if (firstChild.LengthInSpaces <= minimalIndentAfterOpenbrace.LengthInSpaces)
 					yield return Report(firstChild.IndentedToken,
-						$"Содержимое парных фигурных скобок ({braces}) должно иметь дополнительный отступ.");
+						$"РЎРѕРґРµСЂР¶РёРјРѕРµ РїР°СЂРЅС‹С… С„РёРіСѓСЂРЅС‹С… СЃРєРѕР±РѕРє ({braces}) РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ РѕС‚СЃС‚СѓРї.");
 				var badLines = childLineIndents.Where(t => t.LengthInSpaces != firstChild.LengthInSpaces);
 				foreach (var badIndent in badLines)
 				{
 					yield return Report(badIndent.IndentedToken,
-						$"Содержимое парных фигурных скобок ({braces}) должно иметь одинаковый отступ.");
+						$"РЎРѕРґРµСЂР¶РёРјРѕРµ РїР°СЂРЅС‹С… С„РёРіСѓСЂРЅС‹С… СЃРєРѕР±РѕРє ({braces}) РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ РѕРґРёРЅР°РєРѕРІС‹Р№ РѕС‚СЃС‚СѓРї.");
 				}
 			}
 		}
@@ -161,7 +161,7 @@ namespace uLearn
 				var openbraceLineIndent = new Indent(braces.Open);
 				if (openbraceLineIndent.LengthInSpaces < parentLineIndent.LengthInSpaces)
 					yield return Report(braces.Open,
-						$"Парные фигурные скобки ({braces}) должны иметь отступ не меньше, чем у родителя.");
+						$"РџР°СЂРЅС‹Рµ С„РёРіСѓСЂРЅС‹Рµ СЃРєРѕР±РєРё ({braces}) РґРѕР»Р¶РЅС‹ РёРјРµС‚СЊ РѕС‚СЃС‚СѓРї РЅРµ РјРµРЅСЊС€Рµ, С‡РµРј Сѓ СЂРѕРґРёС‚РµР»СЏ.");
 			}
 		}
 	}
@@ -184,7 +184,7 @@ namespace uLearn
 
 		public override string ToString()
 		{
-			return $"строки {Open.GetLine() + 1}, {Close.GetLine() + 1}";
+			return $"СЃС‚СЂРѕРєРё {Open.GetLine() + 1}, {Close.GetLine() + 1}";
 		}
 	}
 
