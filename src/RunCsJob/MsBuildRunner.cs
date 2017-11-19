@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Logging;
+using NUnit.Framework.Constraints;
 
 namespace RunCsJob
 {
@@ -23,6 +24,7 @@ namespace RunCsJob
 		public readonly string BaseDirectory;
 		public DirectoryInfo CompilerDirectory;
 		public DirectoryInfo WellKnownLibsDirectory;
+		public readonly string MsBuildToolsVersion = "14.0";
 	}
 
 	public static class MsBuildRunner
@@ -33,7 +35,7 @@ namespace RunCsJob
 		{
 			var result = new MSbuildResult();
 			var path = Path.Combine(dir.FullName, projectFileName);
-			var project = new Project(path, null, null, new ProjectCollection());
+			var project = new Project(path, null, settings.MsBuildToolsVersion, new ProjectCollection());
 			project.SetProperty("CscToolPath", settings.CompilerDirectory.FullName);
 
 			foreach (var libName in obligatoryLibs)

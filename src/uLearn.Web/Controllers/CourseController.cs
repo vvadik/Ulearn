@@ -302,6 +302,7 @@ namespace uLearn.Web.Controllers
 
 			var visiter = await VisitSlide(course.Id, slide.Id, userId);
 			var maxSlideScore = GetMaxSlideScoreForUser(course, slide, userId);
+			var defaultProhibitFutherReview = groupsRepo.GetDefaultProhibitFutherReviewForUser(course.Id, userId, User);
 
 			var score = Tuple.Create(visiter.Score, maxSlideScore);
 			var model = new CoursePageModel
@@ -311,7 +312,7 @@ namespace uLearn.Web.Controllers
 				CourseTitle = course.Title,
 				Slide = slide,
 				Score = score,
-				BlockRenderContext = CreateRenderContext(course, slide, manualChecking, exerciseSubmissionId, groupsIds, autoplay: autoplay, isManualCheckingReadonly: isManualCheckingReadonly),
+				BlockRenderContext = CreateRenderContext(course, slide, manualChecking, exerciseSubmissionId, groupsIds, autoplay: autoplay, isManualCheckingReadonly: isManualCheckingReadonly, defaultProhibitFutherReview: defaultProhibitFutherReview),
 				ManualChecking = manualChecking,
 				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
 				IsGuest = false
@@ -328,13 +329,9 @@ namespace uLearn.Web.Controllers
 			return maxSlideScore;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide,
-			AbstractManualSlideChecking manualChecking = null,
-			int? exerciseSubmissionId = null,
-			List<string> groupsIds = null,
-			bool isLti = false,
-			bool autoplay = false,
-			bool isManualCheckingReadonly = false)
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, 
+			AbstractManualSlideChecking manualChecking = null, int? exerciseSubmissionId = null, List<string> groupsIds = null, bool isLti = false,
+			bool autoplay = false, bool isManualCheckingReadonly = false, bool defaultProhibitFutherReview = true)
 		{
 			/* ExerciseController will fill blockDatas later */
 			var blockData = slide.Blocks.Select(b => (dynamic)null).ToArray();
@@ -350,7 +347,8 @@ namespace uLearn.Web.Controllers
 				groupsIds,
 				isLti,
 				autoplay,
-				isManualCheckingReadonly
+				isManualCheckingReadonly,
+				defaultProhibitFutherReview
 			)
 			{
 				VersionId = exerciseSubmissionId

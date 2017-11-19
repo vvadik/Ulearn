@@ -23,6 +23,23 @@ namespace uLearn
 
 	public static class ProjModifier
 	{
+		public static byte[] ModifyCsproj(FileInfo csproj, Action<Project> changingAction, string toolsVersion=null)
+		{
+			var proj = new Project(csproj.FullName, null, toolsVersion, new ProjectCollection());
+			return ModifyCsproj(proj, changingAction);
+		}
+
+		private static byte[] ModifyCsproj(Project proj, Action<Project> changingAction)
+		{
+			changingAction?.Invoke(proj);
+			using (var memoryStream = new MemoryStream())
+			using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
+			{
+				proj.Save(streamWriter);
+				return memoryStream.ToArray();
+			}
+		}
+		
 		internal static void PrepareForStudentZip(Project proj, ProjectExerciseBlock ex)
 		{
 			var toExclude = FindItemNames(proj, ex.NeedExcludeFromStudentZip).ToList();
@@ -108,6 +125,11 @@ namespace uLearn
 			}
 		}
 
+		public static void SetBuildEnvironmentOptions(Project proj, BuildEnvironmentOptions options)
+		{
+			proj.SetProperty("TargetFrameworkVersion", options.TargetFrameworkVersion);
+		}
+
 		public static List<FileToCopy> ReplaceLinksWithItemsCopiedToProjectDir(Project project)
 		{
 			var linkedItems = (from item in project.Items
@@ -130,22 +152,11 @@ namespace uLearn
 			var fn = Path.GetFileName(filename);
 			return Path.Combine(d, "~$" + fn);
 		}
+	}
 
-		public static byte[] ModifyCsproj(FileInfo csproj, Action<Project> changingAction)
-		{
-			var proj = new Project(csproj.FullName, null, null, new ProjectCollection());
-			return ModifyCsproj(changingAction, proj);
-		}
-
-		private static byte[] ModifyCsproj(Action<Project> changingAction, Project proj)
-		{
-			changingAction?.Invoke(proj);
-			using (var memoryStream = new MemoryStream())
-			using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
-			{
-				proj.Save(streamWriter);
-				return memoryStream.ToArray();
-			}
-		}
+	public class BuildEnvironmentOptions
+	{
+		public string TargetFrameworkVersion { get; set; }
+		public string ToolsVersion { get; set; }
 	}
 }

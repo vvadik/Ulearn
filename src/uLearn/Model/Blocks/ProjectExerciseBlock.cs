@@ -38,6 +38,11 @@ namespace uLearn.Model.Blocks
 			HideExpectedOutputOnError = true;
 			HideShowSolutionsButton = true;
 			MaxScore = 50;
+			BuildEnvironmentOptions = new BuildEnvironmentOptions
+			{
+				TargetFrameworkVersion = "4.7",
+				ToolsVersion = "14.0",
+			};
 		}
 
 		[XmlElement("csproj-file-path")]
@@ -98,6 +103,8 @@ namespace uLearn.Model.Blocks
 		public bool IsWrongAnswer(string name) => WrongAnswersAndSolutionNameRegex.IsMatch(name) && !IsCorrectSolution(name);
 
 		public bool IsCorrectSolution(string name) => name.Equals(CorrectSolutionFileName, StringComparison.InvariantCultureIgnoreCase);
+		
+		public BuildEnvironmentOptions BuildEnvironmentOptions { get; set; }
 
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
@@ -185,7 +192,9 @@ namespace uLearn.Model.Blocks
 				.Concat(new[] { "bin/*", "obj/*" })
 				.ToList();
 			ResolveCsprojLinks();
-			return ExerciseFolder.ToZip(excluded, GetAdditionalFiles(code, ExerciseFolder, excluded));
+
+			var toUpdate = GetAdditionalFiles(code, ExerciseFolder, excluded);
+			return ExerciseFolder.ToZip(excluded, toUpdate);
 		}
 
 		private IEnumerable<FileContent> GetAdditionalFiles(string code, DirectoryInfo exerciseDir, List<string> excluded)
@@ -198,7 +207,7 @@ namespace uLearn.Model.Blocks
 			yield return new FileContent
 			{
 				Path = CsprojFileName,
-				Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(CsprojFileName), ModifyCsproj(excluded, useNUnitLauncher))
+				Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(CsprojFileName), ModifyCsproj(excluded, useNUnitLauncher), toolsVersion: BuildEnvironmentOptions.ToolsVersion)
 			};
 
 			if (useNUnitLauncher)
@@ -206,7 +215,7 @@ namespace uLearn.Model.Blocks
 				yield return new FileContent { Path = GetNUnitTestRunnerFilename(), Data = CreateTestLauncherFile() };
 			}
 		}
-
+		
 		private static string GetNUnitTestRunnerFilename()
 		{
 			return nameof(NUnitTestRunner) + ".cs";
@@ -214,11 +223,13 @@ namespace uLearn.Model.Blocks
 
 		private Action<Project> ModifyCsproj(List<string> excluded, bool addNUnitLauncher)
 		{
-			return p =>
+			return proj =>
 			{
-				ProjModifier.PrepareForCheckingUserCode(p, this, excluded);
+				ProjModifier.PrepareForCheckingUserCode(proj, this, excluded);
 				if (addNUnitLauncher)
-					p.AddItem("Compile", GetNUnitTestRunnerFilename());
+					proj.AddItem("Compile", GetNUnitTestRunnerFilename());
+				
+				ProjModifier.SetBuildEnvironmentOptions(proj, BuildEnvironmentOptions);
 			};
 		}
 

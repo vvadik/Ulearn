@@ -233,6 +233,7 @@
 			$modal.find('input[name="name"]').val(data.group.name);
 			$modal.find('[name="manualChecking"]').prop('checked', data.group.isManualCheckingEnabled);
 			$modal.find('[name="manualCheckingForOldSolutions"]').prop('checked', data.group.isManualCheckingEnabledForOldSolutions).closest('.checkbox').toggle(data.group.isManualCheckingEnabled);
+			$modal.find('[name="defaultProhibitFutherReview"]').prop('checked', data.group.defaultProhibitFutherReview);
 
 			$modal.find('.scoring-group-checkbox input').prop('checked', false);
 			data.enabledScoringGroups.forEach(function (scoringGroupId) {

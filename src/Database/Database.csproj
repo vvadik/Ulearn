@@ -485,6 +485,10 @@
     <Compile Include="Migrations\201710100555536_AddIndeciesToFeedViewTimestamp.Designer.cs">
       <DependentUpon>201710100555536_AddIndeciesToFeedViewTimestamp.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201711191919009_AddDefaultProhibitFutherReviewInGroup.cs" />
+    <Compile Include="Migrations\201711191919009_AddDefaultProhibitFutherReviewInGroup.Designer.cs">
+      <DependentUpon>201711191919009_AddDefaultProhibitFutherReviewInGroup.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -805,6 +809,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710100555536_AddIndeciesToFeedViewTimestamp.resx">
       <DependentUpon>201710100555536_AddIndeciesToFeedViewTimestamp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711191919009_AddDefaultProhibitFutherReviewInGroup.resx">
+      <DependentUpon>201711191919009_AddDefaultProhibitFutherReviewInGroup.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
