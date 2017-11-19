@@ -256,8 +256,8 @@ namespace uLearn.Web.Controllers
 			
 			var logins = await userManager.GetLoginsAsync(userId);
 
-			var userCoursesIds = visitsRepo.GetUserCourses(user.Id);
-			var userCourses = courseManager.GetCourses().Where(c => userCoursesIds.Contains(c.Id)).OrderBy(c => c.Title).ToList();
+			var userCoursesIds = visitsRepo.GetUserCourses(user.Id).Select(s => s.ToLower());
+			var userCourses = courseManager.GetCourses().Where(c => userCoursesIds.Contains(c.Id.ToLower())).OrderBy(c => c.Title).ToList();
 
 			var allCourses = courseManager.GetCourses().ToDictionary(c => c.Id, c => c);
 			var certificates = certificatesRepo.GetUserCertificates(user.Id).OrderBy(c => allCourses.GetOrDefault(c.Template.CourseId)?.Title ?? "<курс удалён>").ToList();
