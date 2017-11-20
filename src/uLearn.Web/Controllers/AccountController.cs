@@ -428,12 +428,15 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("StudentInfo");
 		}
 
-
 		[ChildActionOnly]
 		public ActionResult RemoveAccountList()
 		{
 			var linkedAccounts = userManager.GetLogins(User.Identity.GetUserId());
+			var user = userManager.FindById(User.Identity.GetUserId());
+			
+			ViewBag.User = user;
 			ViewBag.ShowRemoveButton = ControllerUtils.HasPassword(userManager, User) || linkedAccounts.Count > 1;
+			
 			return PartialView("_RemoveAccountPartial", linkedAccounts);
 		}
 

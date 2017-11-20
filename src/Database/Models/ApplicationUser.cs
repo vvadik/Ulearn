@@ -36,6 +36,9 @@ namespace Database.Models
 
 		[StringLength(200)]
 		public string TelegramChatTitle { get; set; }
+		
+		[StringLength(200)]
+		public string KonturLogin { get; set; }
 
 		public DateTime? LastConfirmationEmailTime { get; set; }
 

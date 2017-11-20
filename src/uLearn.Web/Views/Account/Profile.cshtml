@@ -28,7 +28,18 @@
 				var konturPassportLogin = Model.Logins.FirstOrDefault(l => l.LoginProvider == KonturPassportConstants.AuthenticationType);
 				if (konturPassportLogin != null)
 				{
-					<div><b>Контур.Паспорт:</b> @konturPassportLogin.ProviderKey</div>
+					<div>
+                        <b>Контур.Паспорт:</b>
+                        @if (!string.IsNullOrEmpty(Model.User.KonturLogin))
+                        {
+	                        <a href="https://staff.skbkontur.ru/profile/@Model.User.KonturLogin" target="_blank" title="Откроется в новой вкладке">@Model.User.KonturLogin</a>
+	                        <span class="text-muted small">@konturPassportLogin.ProviderKey</span>
+                        }
+                        else
+                        {
+	                        <text>@konturPassportLogin.ProviderKey</text>
+                        }
+                    </div>
 				}
 
 				if (Model.User.HasTelegram)

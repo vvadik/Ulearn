@@ -494,6 +494,10 @@
     <Compile Include="Migrations\201711192044080_AddSystemAccesses.Designer.cs">
       <DependentUpon>201711192044080_AddSystemAccesses.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201711201858456_AddKonturLoginToApplicationUser.cs" />
+    <Compile Include="Migrations\201711201858456_AddKonturLoginToApplicationUser.Designer.cs">
+      <DependentUpon>201711201858456_AddKonturLoginToApplicationUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -821,6 +825,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201711192044080_AddSystemAccesses.resx">
       <DependentUpon>201711192044080_AddSystemAccesses.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711201858456_AddKonturLoginToApplicationUser.resx">
+      <DependentUpon>201711201858456_AddKonturLoginToApplicationUser.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
