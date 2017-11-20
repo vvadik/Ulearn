@@ -99,6 +99,8 @@ namespace Database.DataContexts
 			CancelCascaseDeleting<LabelOnGroup, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
 			CancelCascaseDeleting<GroupLabel, ApplicationUser, string>(modelBuilder, c => c.Owner, c => c.OwnerId);
 			CancelCascaseDeleting<LabelOnGroup, GroupLabel, int>(modelBuilder, c => c.Label, c => c.LabelId);
+			
+			CancelCascaseDeleting<SystemAccess, ApplicationUser, string>(modelBuilder, c => c.GrantedBy, c => c.GrantedById);
 		}
 
 		private static void CancelCascaseDeleting<T1, T2, T3>(DbModelBuilder modelBuilder, Expression<Func<T1, T2>> oneWay, Expression<Func<T1, T3>> secondWay, bool isRequired=true)
@@ -205,6 +207,7 @@ namespace Database.DataContexts
 		public DbSet<StepikExportSlideAndStepMap> StepikExportSlideAndStepMaps { get; set; }
 
 		public DbSet<CourseAccess> CourseAccesses { get; set; }
+		public DbSet<SystemAccess> SystemAccesses { get; set; }
 	}
 }
  

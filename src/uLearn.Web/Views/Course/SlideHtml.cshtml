@@ -419,7 +419,14 @@
 	<div class="quiz-block-matching @( context.CanUserFillQuiz ? "" : "not-movable")" id='@( block.Id + "_quizBlock")'>
 		@if (model.QuizState == QuizState.NotPassed)
 		{
-			<div class="quiz-block-matching__description text-muted">Перетащите элементы из правого столбца на свободные места</div>
+			<div class="quiz-block-matching__description text-muted">
+                <span class="visible-xs">
+                    Нажмите сначала на&nbsp;блоке из&nbsp;правого столбца, а&nbsp;затем на&nbsp;свободном месте в&nbsp;левом.
+                </span>
+                <span class="hidden-xs">
+                    Перетащите блоки из&nbsp;правого столбца на&nbsp;свободные места.
+                </span>
+            </div>
 		}
 		@if (model.QuizState == QuizState.Total)
 		{
@@ -427,7 +434,7 @@
 				<div class="text-muted col-sm-3 col-sm-offset-3">Ваш вариант</div>
 				@if (model.ShowCorrectAnswer)
 				{
-					<div class="text-success col-sm-3 col-sm-offset-1">Правильный вариант</div>
+					<div class="text-success col-sm-3 col-xs-offset-1">Правильный вариант</div>
 				}
 			</div>
 		}
@@ -448,7 +455,7 @@
 						@if (model.QuizState == QuizState.NotPassed)
 						{
 							<div class="quiz-block-matching__droppable col-xs-3" data-block-id="@block.Id" data-item-id="@fixedItem.GetHashForFixedItem()"></div>
-							<div class="quiz-block-matching__source__droppable col-xs-3 col-sm-offset-1 added" data-block-id="@block.Id" data-movable-item-id="@movableItem.GetHashForMovableItem()">
+							<div class="quiz-block-matching__source__droppable col-xs-3 col-xs-offset-1 added" data-block-id="@block.Id" data-movable-item-id="@movableItem.GetHashForMovableItem()">
 								<div class="quiz-block-matching__movable-item" data-block-id="@block.Id" data-item-id="@movableItem.GetHashForMovableItem()">@movableItem.MovableItem.RenderTex()</div>
 							</div>
 						}
@@ -459,13 +466,13 @@
 							</div>
 							if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer)
 							{
-								<div class="quiz-block-matching__fixed-item correct col-xs-3 col-sm-offset-1">
+								<div class="quiz-block-matching__fixed-item correct col-xs-3 col-xs-offset-1">
 									@fixedItem.MovableItem.RenderTex()
 								</div>
 							}
 							if (context.CanUserFillQuiz)
 							{
-								<div class="quiz-block-matching__source__droppable col-xs-3 col-sm-offset-1" data-block-id="@block.Id">
+								<div class="quiz-block-matching__source__droppable col-xs-3 col-xs-offset-1" data-block-id="@block.Id">
 								</div>
 							}
 						}

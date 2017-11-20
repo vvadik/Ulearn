@@ -1296,6 +1296,11 @@ hr.without-top-margin {
 	border-width: 0;
 }
 
+.quiz-block-matching .quiz-block-matching__source__droppable .quiz-block-matching__movable-item.clicked-item {
+	background-color: #20b2aa;
+	border-color: #08827b;
+}
+
 .quiz-block-matching__item.right {
 	margin-left: -15px;
 }

@@ -30,6 +30,7 @@ namespace uLearn.Web.Controllers
 		private readonly VisitsRepo visitsRepo;
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly CoursesRepo coursesRepo;
+		private readonly SystemAccessesRepo systemAccessesRepo;
 
 		private readonly string telegramSecret;
 
@@ -41,6 +42,7 @@ namespace uLearn.Web.Controllers
 			visitsRepo = new VisitsRepo(db);
 			notificationsRepo = new NotificationsRepo(db);
 			coursesRepo = new CoursesRepo(db);
+			systemAccessesRepo = new SystemAccessesRepo(db);
 
 			telegramSecret = WebConfigurationManager.AppSettings["ulearn.telegram.webhook.secret"] ?? "";
 		}
@@ -85,15 +87,18 @@ namespace uLearn.Web.Controllers
 			var courses = User.GetControllableCoursesId().ToList();
 			var usersList = users.ToList();
 
+			var currentUserId = User.Identity.GetUserId();
 			var model = new UserListModel
 			{
 				CanToggleRoles = User.HasAccess(CourseRole.CourseAdmin),
 				ShowDangerEntities = User.IsSystemAdministrator(),
 				Users = usersList.Select(user => GetUserModel(user, coursesForUsers, courses)).ToList(),
 				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, usersList.Select(u => u.UserId), User),
-				CanViewAndToggleAccesses = false,
+				CanViewAndToggleCourseAccesses = false,
+				CanViewAndToogleSystemAccesses = User.IsSystemAdministrator(),
+				CanViewProfiles = systemAccessesRepo.HasSystemAccess(currentUserId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator(),
 			};
-
+			
 			return model;
 		}
 
@@ -125,12 +130,26 @@ namespace uLearn.Web.Controllers
 						.Select(s => new CourseRoleModel
 						{
 							CourseId = s,
+							CourseTitle = courseManager.GetCourse(s).Title,
 							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s.ToLower()),
 							ToggleUrl = Url.Action("ToggleRole", new { courseId = s, userId = user.UserId, role })
 						})
+						.OrderBy(s => s.CourseTitle, StringComparer.InvariantCultureIgnoreCase)
 						.ToList()
 				};
 			}
+
+			var systemAccesses = systemAccessesRepo.GetSystemAccesses(user.UserId).Select(a => a.AccessType);
+			user.SystemAccesses = Enum.GetValues(typeof(SystemAccessType))
+				.Cast<SystemAccessType>()
+				.ToDictionary(
+					a => a,
+					a => new SystemAccessModel
+					{
+						HasAccess = systemAccesses.Contains(a),
+						ToggleUrl = Url.Action("ToggleSystemAccess", "Account", new { userId = user.UserId, accessType = a })
+					}
+				);
 
 			return user;
 		}
@@ -244,14 +263,13 @@ namespace uLearn.Web.Controllers
 			return View(new UserCourseModel(course, user, db));
 		}
 
-		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public async Task<ActionResult> Profile(string userId)
 		{
 			var user = usersRepo.FindUserById(userId);
 			if (user == null)
 				return HttpNotFound();
 
-			if (!groupsRepo.CanInstructorViewStudent(User, userId))
+			if (!systemAccessesRepo.HasSystemAccess(User.Identity.GetUserId(), SystemAccessType.ViewAllProfiles) && ! User.IsSystemAdministrator())
 				return HttpNotFound();
 			
 			var logins = await userManager.GetLoginsAsync(userId);
@@ -667,6 +685,19 @@ namespace uLearn.Web.Controllers
 
 			/* If email has been sent less than 1 day ago, show popup. Double popup is disabled via cookies and javascript */
 			return PartialView("EmailIsNotConfirmedPopup", user);
+		}
+
+		[ULearnAuthorize(ShouldBeSysAdmin = true)]
+		[HttpPost]
+		public async Task<ActionResult> ToggleSystemAccess(string userId, SystemAccessType accessType, bool isEnabled)
+		{
+			var currentUserId = User.Identity.GetUserId();
+			if (isEnabled)
+				await systemAccessesRepo.GrantAccess(userId, accessType, currentUserId);
+			else
+				await systemAccessesRepo.RevokeAccess(userId, accessType);
+
+			return Json(new { status = "ok" });
 		}
 	}
 
