@@ -152,10 +152,34 @@ namespace uLearn
                 if (statementClause.Kind == SyntaxKind.Block)
                     break;
                 var statementStart = statementClause.GetStartIndexInSpaces();
-                if (!statementClause.IsKeyword ? statementStart <= rootStart : statementStart != rootStart)
-                    yield return
-                        $"Строка {statementClause.GetLine()}, позиция {statementStart}: Выражение должно иметь отступ больше, " +
-                        $"чем у родителя (строка {rootStatementSyntax.GetLine()}, позиция {rootStart}).";
+                if (statementClause.HasExcessNewLines())
+                {
+                    statementClause.HasExcessNewLines();
+                    yield return $"Строка {statementClause.GetLine()}, позиция {statementStart}: выражение не должно иметь лишние " +
+                                 $"переносы строк после родителя (строка {rootStatementSyntax.GetLine()}, позиция {rootStart}).";
+                }
+                if (statementClause.IsKeyword)
+                {
+                    if (statementStart != rootStart)
+                        yield return
+                            $"Строка {statementClause.GetLine()}, позиция {statementStart}: выражение должно иметь такой же отступ, " +
+                            $"как у родителя (строка {rootStatementSyntax.GetLine()}, позиция {rootStart}).";
+                }
+                else
+                {
+                    if (statementStart <= rootStart)
+                        yield return
+                            $"Строка {statementClause.GetLine()}, позиция {statementStart}: выражение должно иметь отступ больше, " +
+                            $"чем у родителя (строка {rootStatementSyntax.GetLine()}, позиция {rootStart}).";
+                    else
+                    {
+                        var delta = statementStart - rootStart;
+                        if (delta < 4)
+                            yield return
+                                $"Строка {statementClause.GetLine()}, позиция {statementStart}: выражение должно иметь отступ, не меньше 4 пробелов " +
+                                $"относительно родителя (строка {rootStatementSyntax.GetLine()}, позиция {rootStart}).";
+                    }
+                }
 
                 foreach (var nestedError in CheckStatement(statementClause))
                     yield return nestedError;
@@ -169,8 +193,7 @@ namespace uLearn
                    || syntaxKind == SyntaxKind.WhileStatement
                    || syntaxKind == SyntaxKind.ForStatement
                    || syntaxKind == SyntaxKind.ForEachStatement
-                   || syntaxKind == SyntaxKind.DoStatement
-                   || syntaxKind == SyntaxKind.SwitchStatement;
+                   || syntaxKind == SyntaxKind.DoStatement;
         }
 
         private SyntaxToken GetFirstTokenOfCorrectOpenbraceParent(SyntaxToken openbrace)

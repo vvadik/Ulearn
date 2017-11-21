@@ -4,6 +4,11 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
     {
         public static void Main(string[] args)
         {
+	  	    if (true)
+
+
+ 	  	   		SomeMethod();
+
             for (var i = 0; i < 10; i++)
             for (var j = 0; j < 10; j++)
             for (var k = 0; j < 10; j++)
@@ -17,12 +22,18 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
             }
             do
          SomeMethod();
-            while (true);
+
+
+            while (true);     
 
 
             do
        SomeMethod();
             while (true);
+
+            do
+            SomeMethod();
+          while (true);
 
             if (true)
         SomeMethod();
@@ -38,9 +49,15 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
       SomeMethod();
 
             if (true)
+ 	  	   		SomeMethod();
+
+            if (true)
              SomeMethod();
 
-			if (true)
+            if (true)
+                           SomeMethod();
+
+            if (true)
 		SomeMethod();
 		 
             while (false)
@@ -48,31 +65,20 @@ namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
         SomeMethod();
 
             for (;;)
-        SomeMethod();
-
-            var t = 1;
-            switch (t)
-            {
-           case 1:
-                SomeMethod();
-                    break;
-                case 2:
-
-              SomeMethod();
-                    break;
-                case 3:
-
-              SomeMethod();
-             break;
-                case 4:
-                    SomeMethod();
-              break;
-            }
+SomeMethod();
         }
 
         public static void SomeMethod()
         {
 
+            SomeMethod();
+            SomeMethod();
+            SomeMethod();
+
+            SomeMethod();
+
+
+            SomeMethod();
         }
     }
 }

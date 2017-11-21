@@ -3,7 +3,6 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 
 namespace uLearn.CSharp
 {
@@ -65,18 +64,54 @@ namespace uLearn.CSharp
         public int GetStartIndexInSpaces()
         {
             var sourceText = RootTree.GetText();
-            var textSpan = default(TextSpan);
+            var syntaxTrivias = GetSyntaxTrivias();
+            var textSpan = syntaxTrivias.Count == 1
+                ? syntaxTrivias.FullSpan
+                : syntaxTrivias.LastOrDefault().FullSpan;
+            var subText = sourceText.GetSubText(textSpan).ToString();
+            return GetRealLength(subText);
+        }
+
+        private SyntaxTriviaList GetSyntaxTrivias()
+        {
             if (SyntaxNode != null)
-            {
-                var syntaxTriviaList = SyntaxNode.GetLeadingTrivia();
-                textSpan = syntaxTriviaList.Count == 1
-                    ? syntaxTriviaList.FullSpan
-                    : syntaxTriviaList.LastOrDefault().FullSpan;
-            }
+                return SyntaxNode.GetLeadingTrivia();
             if (SyntaxToken != default(SyntaxToken))
-                textSpan = SyntaxToken.GetAllTrivia().First().FullSpan;
-            var subText = sourceText.GetSubText(textSpan).ToString().Replace("\t", "    ");
-            return subText.Length;
+                return SyntaxToken.LeadingTrivia;
+            return default(SyntaxTriviaList);
+        }
+
+        public bool HasExcessNewLines()
+        {
+            var syntaxTrivias = GetSyntaxTrivias();
+            return syntaxTrivias.Count > 1;
+        }
+
+        private int GetRealLength(string trivia)
+        {
+            var count = 0;
+            var currentTabSpaces = 0;
+            for (var i = 0; i < trivia.Length; ++i)
+            {
+                if (trivia[i] == '\t')
+                {
+                    if (currentTabSpaces == 0)
+                        count += 4;
+                    else
+                        count += currentTabSpaces + (4 - currentTabSpaces);
+                    currentTabSpaces = 0;
+                }
+                else if (trivia[i] == ' ')
+                {
+                    currentTabSpaces++;
+                }
+                if (currentTabSpaces == 4)
+                {
+                    count += 4;
+                    currentTabSpaces = 0;
+                }
+            }
+            return count + currentTabSpaces;
         }
 
         public IEnumerable<SyntaxNodeOrToken> GetStatementsSyntax()
@@ -85,10 +120,6 @@ namespace uLearn.CSharp
                 yield break;
             switch (SyntaxNode)
             {
-                case SwitchSectionSyntax switchSectionSyntax:
-                    foreach (var switchSectionSyntaxStatement in switchSectionSyntax.Statements)
-                        yield return Create(RootTree, switchSectionSyntaxStatement);
-                    break;
                 case DoStatementSyntax doStatementSyntax:
                     yield return Create(RootTree, doStatementSyntax.Statement);
                     yield return Create(RootTree, doStatementSyntax.WhileKeyword, true);
@@ -107,15 +138,13 @@ namespace uLearn.CSharp
                     break;
                 case ForEachStatementSyntax foreachStatement:
                     var innerForeachStatement = foreachStatement.Statement;
-                    yield return Create(RootTree, foreachStatement.Statement, innerForeachStatement is ForEachStatementSyntax);
+                    yield return Create(RootTree, foreachStatement.Statement,
+                        innerForeachStatement is ForEachStatementSyntax);
                     break;
                 case WhileStatementSyntax whileStatement:
                     var innerWhileStatement = whileStatement.Statement;
-                    yield return Create(RootTree, whileStatement.Statement, innerWhileStatement is WhileStatementSyntax);
-                    break;
-                case SwitchStatementSyntax switchStatementSyntax:
-                    foreach (var switchSectionSyntax in switchStatementSyntax.Sections)
-                        yield return Create(RootTree, switchSectionSyntax);
+                    yield return Create(RootTree, whileStatement.Statement,
+                        innerWhileStatement is WhileStatementSyntax);
                     break;
                 default:
                     yield break;
