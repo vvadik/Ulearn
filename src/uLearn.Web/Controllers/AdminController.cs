@@ -390,7 +390,8 @@ namespace uLearn.Web.Controllers
 							message = "locked",
 						});
 
-				await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId());
+				if (! recheck)
+					await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId());
 				transaction.Commit();
 			}
 
