@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using FluentAssertions;
+using log4net.Config;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
 using test;
@@ -26,6 +27,7 @@ namespace uLearn.CSharp
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
+			BasicConfigurator.Configure();
 			TestsHelper.RecreateDirectory(tempSlideFolderPath);
 		}
 

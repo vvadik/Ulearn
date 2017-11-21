@@ -5,13 +5,12 @@ using System.Linq;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Logging;
-using NUnit.Framework.Constraints;
 
 namespace RunCsJob
 {
 	public class MsBuildSettings
 	{
-		private const string CompilersFolderName = "Microsoft.Net.Compilers.2.2.0";
+		private const string CompilersFolderName = "Microsoft.Net.Compilers.2.4.0";
 		private const string WellKnownLibsFolderName = "WellKnownLibs";
 
 		public MsBuildSettings()

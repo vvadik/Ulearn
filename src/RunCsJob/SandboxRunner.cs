@@ -128,7 +128,7 @@ namespace RunCsJob
 
 			if (!builderResult.Success)
 			{
-				log.Info($"Решение {submission.Id} не скомпилировалось: {builderResult.ToString().RemoveNewLines()}");
+				log.Info($"Решение {submission.Id} не скомпилировалось: {builderResult.ToString().Replace("\n", @"\n")}");
 				return new RunningResults(Verdict.CompilationError, compilationOutput: builderResult.ToString());
 			}
 
