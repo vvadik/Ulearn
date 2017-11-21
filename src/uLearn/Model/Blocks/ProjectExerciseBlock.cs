@@ -118,7 +118,11 @@ namespace uLearn.Model.Blocks
 				CreateZipForStudent();
 
 			CheckScoringGroup(context.SlideTitle, context.CourseSettings.Scoring);
-
+			
+			/* Replace StartupObject if exerciser uses NUnit tests. It should be after CreateZipForStudent() call */
+			var useNUnitLauncher = NUnitTestClasses != null;
+			StartupObject = useNUnitLauncher ? typeof(NUnitTestRunner).FullName : StartupObject;
+			
 			yield return this;
 
 			if (CorrectSolutionFile.Exists)
@@ -202,7 +206,6 @@ namespace uLearn.Model.Blocks
 			yield return new FileContent { Path = UserCodeFilePath, Data = Encoding.UTF8.GetBytes(code) };
 
 			var useNUnitLauncher = NUnitTestClasses != null;
-			StartupObject = useNUnitLauncher ? typeof(NUnitTestRunner).FullName : StartupObject;
 
 			yield return new FileContent
 			{
