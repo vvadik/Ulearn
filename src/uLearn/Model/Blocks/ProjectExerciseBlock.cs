@@ -119,10 +119,8 @@ namespace uLearn.Model.Blocks
 
 			CheckScoringGroup(context.SlideTitle, context.CourseSettings.Scoring);
 			
-			/* Replace StartupObject if exerciser uses NUnit tests. It should be after CreateZipForStudent() call */
-			var useNUnitLauncher = NUnitTestClasses != null;
-			StartupObject = useNUnitLauncher ? typeof(NUnitTestRunner).FullName : StartupObject;
-			
+			ReplaceStartupObjectForNUnitExercises();
+
 			yield return this;
 
 			if (CorrectSolutionFile.Exists)
@@ -130,6 +128,13 @@ namespace uLearn.Model.Blocks
 				yield return new MdBlock("### Решение") { Hide = true };
 				yield return new CodeBlock(CorrectSolutionFile.ContentAsUtf8(), LangId, LangVer) { Hide = true };
 			}
+		}
+
+		public void ReplaceStartupObjectForNUnitExercises()
+		{
+			/* Replace StartupObject if exercise uses NUnit tests. It should be after CreateZipForStudent() call */
+			var useNUnitLauncher = NUnitTestClasses != null;
+			StartupObject = useNUnitLauncher ? typeof(NUnitTestRunner).FullName : StartupObject;
 		}
 
 		private void CreateZipForStudent()

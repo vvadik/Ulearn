@@ -125,6 +125,7 @@ namespace uLearn.CSharp
 		public void ReportError_If_NUnitTestRunner_Tries_To_Run_NonExisting_Test_Class()
 		{
 			exBlock.NUnitTestClasses = new[] { "non_existing.test_class", };
+			exBlock.ReplaceStartupObjectForNUnitExercises();
 
 			var validatorOutput = TestsHelper.ValidateBlock(exBlock);
 
@@ -138,6 +139,7 @@ namespace uLearn.CSharp
 		public void ReportError_If_Solution_For_ProjectExerciseBlock_Is_Not_Solution()
 		{
 			exBlock.NUnitTestClasses = new[] { $"test.{nameof(OneFailingTest)}" };
+			exBlock.ReplaceStartupObjectForNUnitExercises();
 
 			var validatorOutput = TestsHelper.ValidateBlock(exBlock);
 
