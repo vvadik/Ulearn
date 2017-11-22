@@ -150,7 +150,7 @@ namespace uLearn
 				ReportErrorIfStudentsZipHasWrongAnswerOrSolutionFiles(tempExFolder);
 
 				var csprojFile = tempExFolder.GetFile(ex.CsprojFileName);
-				var csproj = new Project(csprojFile.FullName, null, null, new ProjectCollection());
+				var csproj = new Project(csprojFile.FullName, null, null, ProjectCollectionHelper.CreateEmptyProjectCollection());
 				ReportErrorIfCsprojHasUserCodeOfNotCompileType(tempExFolder, csproj);
 				ReportErrorIfCsprojHasWrongAnswerOrSolutionItems(tempExFolder, csproj);
 

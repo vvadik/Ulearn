@@ -58,9 +58,11 @@
     </Reference>
     <Reference Include="Microsoft.Build.Engine, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\packages\Microsoft.Build.Engine.15.3.409\lib\net46\Microsoft.Build.Engine.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build.Framework, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\packages\Microsoft.Build.Framework.15.3.409\lib\net46\Microsoft.Build.Framework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build.Tasks.Core, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\packages\Microsoft.Build.Tasks.Core.15.3.409\lib\net46\Microsoft.Build.Tasks.Core.dll</HintPath>
@@ -287,6 +289,7 @@
     <Compile Include="Markdown2.cs" />
     <Compile Include="NullValidator.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="ProjectCollectionHelper.cs" />
     <Compile Include="ProjModifier.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

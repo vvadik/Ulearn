@@ -1211,6 +1211,10 @@ hr.without-top-margin {
 	cursor: n-resize;	
 }
 
+.quiz-block-ordering.not-movable .quiz-block-ordering__item {
+	background-color: #eee;
+}
+
 .quiz-block-ordering .quiz-block-ordering__item:first-child {
 	margin-left: 15px;
 }
@@ -1271,6 +1275,12 @@ hr.without-top-margin {
 
 .quiz-block-matching:not(.not-movable) .quiz-block-matching__movable-item {
 	cursor: move;	
+}
+
+.quiz-block-matching.not-movable .quiz-block-matching__item > * {
+	background-color: #eee;
+	border-color: #bbb;
+	border-style: solid;
 }
 
 .quiz-block-matching .quiz-block-matching__droppable,

@@ -25,7 +25,7 @@ namespace uLearn
 	{
 		public static byte[] ModifyCsproj(FileInfo csproj, Action<Project> changingAction, string toolsVersion=null)
 		{
-			var proj = new Project(csproj.FullName, null, toolsVersion, new ProjectCollection());
+			var proj = new Project(csproj.FullName, null, toolsVersion, ProjectCollectionHelper.CreateEmptyProjectCollection());
 			return ModifyCsproj(proj, changingAction);
 		}
 

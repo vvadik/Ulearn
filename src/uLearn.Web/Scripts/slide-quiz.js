@@ -124,6 +124,10 @@ $(document).ready(function() {
         	}
 		);
 
+        /* Cancel old clicks */
+        $self.closest('.quiz-block-matching').find('.clicked').removeClass('clicked');
+        $self.closest('.quiz-block-matching').find('.clicked-item').removeClass('clicked-item');
+
 		$container.toggleClass('clicked');
 		$self.toggleClass('clicked-item');
     });

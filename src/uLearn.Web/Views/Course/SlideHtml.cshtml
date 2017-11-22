@@ -363,7 +363,7 @@
 		var userAnswers = model.QuizModel.AnswersToQuizes[block.Id].Select(x => x.ItemId).ToList();
 		items = items.OrderBy(item => userAnswers.IndexOf(item.GetHash())).ToArray();
 	}
-	<div class="quiz-block-ordering @( context.CanUserFillQuiz ? "" : "not-movable")" id='@( block.Id + "_quizBlock")'>
+	<div class="quiz-block-ordering @( context.CanUserFillQuiz ? "" : "not-movable")" id='@( block.Id + "_quizBlock")' @GetGuestOnclick(context.IsGuest)>
 		@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer)
 		{
 			<div class="quiz-block-ordering__correct-description row">
@@ -416,7 +416,7 @@
 			.OrderBy(item => userAnswers.FindIndex(answer => item.GetHashForFixedItem() == answer.ItemId)).ToList();
 		movableItems = GetMovableItemsAccordingToUserAnswers(userAnswers, fixedItems);
 	}
-	<div class="quiz-block-matching @( context.CanUserFillQuiz ? "" : "not-movable")" id='@( block.Id + "_quizBlock")'>
+	<div class="quiz-block-matching @( context.CanUserFillQuiz ? "" : "not-movable")" id='@( block.Id + "_quizBlock")' @GetGuestOnclick(context.IsGuest)>
 		@if (model.QuizState == QuizState.NotPassed)
 		{
 			<div class="quiz-block-matching__description text-muted">
