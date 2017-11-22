@@ -23,7 +23,7 @@ namespace RunCsJob
 		public readonly string BaseDirectory;
 		public DirectoryInfo CompilerDirectory;
 		public DirectoryInfo WellKnownLibsDirectory;
-		public readonly string MsBuildToolsVersion = "14.0";
+		public readonly string MsBuildToolsVersion = "15.0";
 	}
 
 	public static class MsBuildRunner

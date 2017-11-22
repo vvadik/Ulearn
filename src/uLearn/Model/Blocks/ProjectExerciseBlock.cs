@@ -41,7 +41,7 @@ namespace uLearn.Model.Blocks
 			BuildEnvironmentOptions = new BuildEnvironmentOptions
 			{
 				TargetFrameworkVersion = "4.7",
-				ToolsVersion = "14.0",
+				ToolsVersion = "15.0",
 			};
 		}
 
