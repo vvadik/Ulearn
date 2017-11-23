@@ -10,19 +10,19 @@ namespace RunCsJob
 {
 	public class MsBuildSettings
 	{
-		private const string CompilersFolderName = "Microsoft.Net.Compilers.2.4.0";
-		private const string WellKnownLibsFolderName = "WellKnownLibs";
+		private const string compilersFolderName = "Microsoft.Net.Compilers.2.4.0";
+		private const string wellKnownLibsFolderName = "WellKnownLibs";
 
 		public MsBuildSettings()
 		{
 			BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-			CompilerDirectory = new DirectoryInfo(Path.Combine(BaseDirectory, CompilersFolderName));
-			WellKnownLibsDirectory = new DirectoryInfo(Path.Combine(BaseDirectory, WellKnownLibsFolderName));
+			CompilerDirectory = new DirectoryInfo(Path.Combine(BaseDirectory, compilersFolderName));
+			WellKnownLibsDirectory = new DirectoryInfo(Path.Combine(BaseDirectory, wellKnownLibsFolderName));
 		}
 
 		public readonly string BaseDirectory;
 		public DirectoryInfo CompilerDirectory;
-		public DirectoryInfo WellKnownLibsDirectory;
+		public readonly DirectoryInfo WellKnownLibsDirectory;
 		public readonly string MsBuildToolsVersion = "15.0";
 	}
 
