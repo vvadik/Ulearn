@@ -165,8 +165,8 @@ namespace uLearn.Extensions
 
 		public static string MakeNestedQuotes(this string text)
 		{
-			text = Regex.Replace(text, "(\\s|^)[\"�]", @"$1�");
-			return Regex.Replace(text, "[\"�]", @"�");
+			text = Regex.Replace(text, "(\\s|^)[\"«]", @"$1„");
+			return Regex.Replace(text, "[\"»]", @"“");
 		}
 
 		public static string RenderSimpleMarkdown(this string text, bool isHtml=true, bool telegramMode=false)

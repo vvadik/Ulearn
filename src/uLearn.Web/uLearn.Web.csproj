@@ -1025,6 +1025,7 @@
     <Content Include="tablesorter-master\README.md" />
     <Content Include="tablesorter-master\tablesorter.jquery.json" />
     <Content Include="tablesorter-master\test.html" />
+    <Content Include="Views\Shared\_ReturnHijack.cshtml" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

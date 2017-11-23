@@ -237,3 +237,28 @@ footer:hover {
 	padding: 0 5px;
 	overflow: visible;
 }
+
+/* Hijack panel */
+.hijack__panel {
+	position: fixed;
+	bottom: 0px;
+	background-color: #d8584a;
+	width: 100%;
+	margin: 0;
+    padding: 15px;
+    padding-bottom: 10px;
+    color: black;
+    font-size: 16px;
+}
+
+.hijack__panel .btn {
+    margin-left: 20px;
+    position: relative;
+    top: -2px;
+    min-width: 70px;
+    font-size: 16px;
+}
+
+.hijack__enter {
+    margin-top: 20px;
+}

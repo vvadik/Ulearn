@@ -57,7 +57,18 @@
 					</div>
 				}
 			}
-		</div>
+            
+            @if (User.IsSystemAdministrator())
+            {
+	            <div class="hijack__enter">
+                    @using (Html.BeginForm("Hijack", "Account", new { userId = Model.User.Id }, FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-warning btn-xs">Войти как @Model.User.VisibleName</button>
+                    }
+                </div>
+            }
+        </div>
 	</div>
 	
 	<div class="user-profile__courses">

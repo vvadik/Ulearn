@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace uLearn
+namespace uLearn.Extensions
 {
 	[TestFixture]
 	public class StringHasher_should

@@ -2,6 +2,7 @@
 @using Database.Extensions
 @using Database.Models
 @using uLearn
+@using uLearn.Web.Controllers
 @using uLearn.Web.Extensions
 <!DOCTYPE html>
 <html>
@@ -132,6 +133,12 @@
 </script>
 
 @Html.Partial("_YandexMetrika")
+
+@if (AccountController.IsHijacked(HttpContext.Current.Request))
+{
+	@Html.Partial("_ReturnHijack")
+}
+
 </body>
 </html>
 
