@@ -8,6 +8,7 @@ using Database.Models;
 using log4net;
 using Metrics;
 using uLearn;
+using uLearn.Extensions;
 
 namespace Notifications
 {

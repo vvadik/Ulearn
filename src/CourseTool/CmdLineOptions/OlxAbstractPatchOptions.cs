@@ -1,5 +1,6 @@
 using System;
 using CommandLine;
+using uLearn.Extensions;
 using uLearn.Model.Edx;
 
 namespace uLearn.CourseTool.CmdLineOptions

@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using BinaryAnalysis.UnidecodeSharp;
 
-namespace uLearn
+namespace uLearn.Extensions
 {
 	public static class StringExtensions
 	{
@@ -165,8 +165,8 @@ namespace uLearn
 
 		public static string MakeNestedQuotes(this string text)
 		{
-			text = Regex.Replace(text, "(\\s|^)[\"«]", @"$1„");
-			return Regex.Replace(text, "[\"»]", @"“");
+			text = Regex.Replace(text, "(\\s|^)[\"ï¿½]", @"$1ï¿½");
+			return Regex.Replace(text, "[\"ï¿½]", @"ï¿½");
 		}
 
 		public static string RenderSimpleMarkdown(this string text, bool isHtml=true, bool telegramMode=false)

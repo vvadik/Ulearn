@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using uLearn.Extensions;
 
 namespace uLearn
 {

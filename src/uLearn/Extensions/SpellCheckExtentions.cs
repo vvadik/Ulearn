@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using uLearn.SpellChecking;
 
-namespace uLearn
+namespace uLearn.Extensions
 {
 	public static class SpellCheckExtentions
 	{
