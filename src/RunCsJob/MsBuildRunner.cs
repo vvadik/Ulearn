@@ -5,7 +5,6 @@ using System.Linq;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Logging;
-using uLearn;
 
 namespace RunCsJob
 {
@@ -35,7 +34,7 @@ namespace RunCsJob
 		{
 			var result = new MSbuildResult();
 			var path = Path.Combine(dir.FullName, projectFileName);
-			var project = new Project(path, null, settings.MsBuildToolsVersion, ProjectCollectionHelper.CreateEmptyProjectCollection());
+			var project = new Project(path, null, settings.MsBuildToolsVersion, new ProjectCollection());
 			project.SetProperty("CscToolPath", settings.CompilerDirectory.FullName);
 
 			foreach (var libName in obligatoryLibs)
