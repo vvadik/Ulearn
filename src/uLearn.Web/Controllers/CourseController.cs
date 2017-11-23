@@ -108,16 +108,6 @@ namespace uLearn.Web.Controllers
 						message = "time_is_over",
 					});
 
-				/* If it's not locked then lock them! */
-				if (!queueItem.IsLocked)
-					return RedirectToAction(GetAdminCheckActionName(queueItem), "Admin", new
-					{
-						CourseId = courseId,
-						group = string.Join(",", groupsIds),
-						id = queueItem.Id,
-						recheck = true
-					});
-
 				if (queueItem.IsLocked && !queueItem.IsLockedBy(User.Identity))
 				{
 					isManualCheckingReadonly = true;
