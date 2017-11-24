@@ -170,19 +170,12 @@ namespace uLearn.Web.Controllers
 			{
 				var checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(id);
 
-				if (checking.IsChecked && !recheck)
-					return Redirect(errorUrl + "Эта работа уже была проверена");
-
-				if (!checking.IsLockedBy(User.Identity))
-					return Redirect(errorUrl + "Эта работа проверяется другим инструктором");
-
 				var course = courseManager.GetCourse(checking.CourseId);
 				var slide = (ExerciseSlide)course.GetSlideById(checking.SlideId);
 				var exercise = slide.Exercise;
 
-				int score;
 				/* Invalid form: score isn't integer */
-				if (!int.TryParse(exerciseScore, out score))
+				if (!int.TryParse(exerciseScore, out var score))
 					return Redirect(errorUrl + "Неверное количество баллов");
 
 				/* Invalid form: score isn't from range 0..MAX_SCORE */

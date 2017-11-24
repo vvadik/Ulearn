@@ -380,16 +380,6 @@ namespace uLearn.Web.Controllers
 							message = "already_checked",
 						});
 
-				if (checking.IsLocked && !ignoreLock && !checking.IsLockedBy(User.Identity))
-					return RedirectToAction(actionName,
-						new
-						{
-							courseId = checking.CourseId,
-							group = joinedGroupsIds,
-							done = recheck,
-							message = "locked",
-						});
-
 				if (! recheck)
 					await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId());
 				transaction.Commit();

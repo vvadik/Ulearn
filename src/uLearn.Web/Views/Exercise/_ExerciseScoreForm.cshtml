@@ -42,7 +42,7 @@
 
 			@if (Model.Checking.IsLocked && !Model.Checking.IsLockedBy(User.Identity))
 			{
-				<div class="alert alert-info mt10 ">Эта работа проверяется преподавателем @Model.Checking.LockedBy.VisibleName</div>
+				<div class="alert alert-danger mt10 ">Внимание. Эта работа прямо сейчас проверяется преподавателем @Model.Checking.LockedBy.VisibleName</div>
 			}
 
 			<h4>Оцените работу (максимальный балл @block.MaxReviewScore)</h4>

@@ -107,11 +107,6 @@ namespace uLearn.Web.Controllers
 						done = queueItem.IsChecked,
 						message = "time_is_over",
 					});
-
-				if (queueItem.IsLocked && !queueItem.IsLockedBy(User.Identity))
-				{
-					isManualCheckingReadonly = true;
-				}
 			}
 
 			var model = isGuest ?
