@@ -97,16 +97,6 @@ namespace uLearn.Web.Controllers
 
 				if (queueItem == null)
 					return HttpNotFound();
-
-				/* If lock time is finished */
-				if (!queueItem.IsLockedBy(User.Identity) && queueItem.HasLastLockedBy(User.Identity))
-					return RedirectToAction(GetAdminQueueActionName(queueItem), "Admin", new
-					{
-						CourseId = courseId,
-						group = string.Join(",", groupsIds),
-						done = queueItem.IsChecked,
-						message = "time_is_over",
-					});
 			}
 
 			var model = isGuest ?
