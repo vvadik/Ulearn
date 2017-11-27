@@ -946,12 +946,12 @@ namespace uLearn.Web.Controllers
 		{
 			var group = groupsRepo.FindGroupById(groupId);
 			if (!CanModifyGroup(group))
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+				return Json(new { status = "error", message = "Вы не можете изменять настройки ссылки для этой группы" });
 
 			log.Info($"В{(isEnabled ? "" : "ы")}ключаю инвайт-ссылку для группы «{group.Name}» (Id = {groupId})");
-			await groupsRepo.EnableGroupInviteLink(groupId, isEnabled);
+			await groupsRepo.EnableInviteLink(groupId, isEnabled);
 
-			return RedirectToAction("Groups", new { courseId = group.CourseId });
+			return Json(new { status = "ok", isEnabled = isEnabled });
 		}
 
 		[HttpPost]
@@ -1028,6 +1028,7 @@ namespace uLearn.Web.Controllers
 			{
 				status = "ok",
 				inviteLink = Url.Action("JoinGroup", "Account", new { hash = group.InviteHash }, Request.GetRealScheme()),
+				isInviteLinkEnabled = group.IsInviteLinkEnabled,
 				accesses = accessesViewModels.Select(model => this.RenderPartialViewToString("_GroupAccess", model)).ToList(),
 				group = new
 				{

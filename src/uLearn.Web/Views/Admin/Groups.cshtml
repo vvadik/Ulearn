@@ -73,6 +73,22 @@
 	}
 }
 
+@helper GroupInviteLinkSettings() {
+    <div class="help-block">
+        <div class="modal__create_group__step3__invite-link-block" data-enabled="true">
+            Отправьте своим студентам ссылку для&nbsp;вступления в&nbsp;группу: <a href="#" class="modal__create-group__step3__invite-link">...</a>
+            <a href="#" class="modal__create-group__step3__enable-invite_link" data-group-id="" data-url="@Url.Action("EnableGroupInviteLink", new { groupId = "GROUP_ID", isEnabled = false })">
+                Выключить ссылку
+            </a>
+        </div>
+        <div class="modal__create_group__step3__invite-link-block" data-enabled="false">
+            <a href="#" class="modal__create-group__step3__enable-invite_link" data-group-id="" data-url="@Url.Action("EnableGroupInviteLink", new { groupId = "GROUP_ID", isEnabled = true})">
+                Включить инвайт-ссылку для&nbsp;вступления в&nbsp;группу
+            </a>
+        </div>
+    </div>
+}
+
 @{
 	ViewBag.Title = "Группы";
 }
@@ -255,9 +271,7 @@
 				</div>
 
 				<h3>Студенты</h3>
-				<div class="help-block">
-					Отправьте своим студентам ссылку для&nbsp;вступления в&nbsp;группу: <a href="#" class="modal__create-group__step3__invite-link">...</a>
-				</div>
+				@GroupInviteLinkSettings()
 				
 				@if (User.IsSystemAdministrator())
 				{
@@ -321,9 +335,7 @@
 					</div>
 
 					<h3>Студенты</h3>
-					<div class="help-block">
-						Отправьте своим студентам ссылку для&nbsp;вступления в&nbsp;группу: <a href="#" class="modal__create-group__step3__invite-link">...</a>
-					</div>
+                    @GroupInviteLinkSettings()
 					<ol class="modal__edit-group__members">
 						
 					</ol>

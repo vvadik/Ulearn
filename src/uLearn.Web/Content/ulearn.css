@@ -1565,6 +1565,26 @@ h1 .copy-group-link {
 	color: #611;
 }
 
+.modal__create-group__step3__enable-invite_link {
+	display: block;	
+}
+
+.modal__create_group__step3__invite-link-block[data-enabled="true"] .modal__create-group__step3__enable-invite_link {
+    color: #c99;
+}
+
+.modal__create_group__step3__invite-link-block[data-enabled="true"] .modal__create-group__step3__enable-invite_link:hover {
+	color: #966;
+}
+
+.modal__create_group__step3__invite-link-block[data-enabled="false"] .modal__create-group__step3__enable-invite_link {
+    color: #696;
+}
+
+.modal__create_group__step3__invite-link-block[data-enabled="false"] .modal__create-group__step3__enable-invite_link:hover {
+    color: #363;
+}
+
 .scoring-group-checkbox .scoring-group-description {
 	margin-left: 5px;
 }

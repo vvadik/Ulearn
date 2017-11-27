@@ -109,6 +109,11 @@
 				return;
 			}
 			$modal.find('.modal__create-group__step3__invite-link').text(data.inviteLink).attr('href', data.inviteLink);
+			
+            $modal.find('.modal__create_group__step3__invite-link-block').hide();
+            $modal.find('.modal__create_group__step3__invite-link-block').filter('[data-enabled="' + data.group.isInviteLinkEnabled + '"]').show();
+            $modal.find('.modal__create-group__step3__enable-invite_link').data('groupId', groupId);
+            
 			$modal.find('.group__accesses').html(data.accesses.join(''));
 		});
 	}
@@ -229,6 +234,10 @@
 			$modal.find('.modal__edit-group__group-name').text(data.group.name);
 			$modal.find('.group__accesses').html(data.accesses.join(''));
 			$modal.find('.modal__edit-group__members').html(data.members.join(''));
+			
+			$modal.find('.modal__create_group__step3__invite-link-block').hide();
+			$modal.find('.modal__create_group__step3__invite-link-block').filter('[data-enabled="' + data.group.isInviteLinkEnabled + '"]').show();
+			$modal.find('.modal__create-group__step3__enable-invite_link').data('groupId', groupId);
 
 			$modal.find('input[name="name"]').val(data.group.name);
 			$modal.find('[name="manualChecking"]').prop('checked', data.group.isManualCheckingEnabled);
@@ -278,7 +287,7 @@
 			$member.remove();
 		});
 	});
-
+	
 	$('.modal__edit-group__button').click(function (e) {
 		e.preventDefault();
 		var $modal = $('#modal__edit-group');
@@ -349,7 +358,29 @@
 			openModelForEditingGroup(data.groupId);
 		});
 	});
+	
+	$('.modal__create-group__step3__enable-invite_link').click(function (e) {
+	    e.preventDefault();
 
+        var $self = $(this);
+        var groupId = $self.data('groupId');
+        var url = $self.data('url').replace('GROUP_ID', groupId);
+        var $modal = $self.closest('.modal');
+        
+        $.ajax({
+            type: 'post',
+            url: url, 
+            dataType: 'json',
+        }).done(function (data) {
+            if (data.status !== 'ok') {
+                alert(data.message);
+                return;
+            }
+
+            $modal.find('.modal__create_group__step3__invite-link-block').hide();
+            $modal.find('.modal__create_group__step3__invite-link-block').filter('[data-enabled="' + data.isEnabled + '"]').show();
+        });
+    });
 
 	/* Group copying */
 

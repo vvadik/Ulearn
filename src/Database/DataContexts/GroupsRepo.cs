@@ -439,7 +439,7 @@ namespace Database.DataContexts
 			return GetUserGroupsNamesAsString(new List<string> { courseId }, userId, currentUser, maxCount);
 		}
 
-		public async Task EnableGroupInviteLink(int groupId, bool isEnabled)
+		public async Task EnableInviteLink(int groupId, bool isEnabled)
 		{
 			var group = db.Groups.Find(groupId);
 			group.IsInviteLinkEnabled = isEnabled;
