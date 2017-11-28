@@ -1529,10 +1529,15 @@ h1 .copy-group-link {
 .group__access .group__access__change-owner-link {
 	display: none;
 	font-size: 12px;
+    color: #696;
 }
 
 .group__access:hover .group__access__change-owner-link {
 	display: initial;
+}
+
+.group__access .group__access__change-owner-link:hover {
+    color: #363;
 }
 
 .modal__edit-group__members {
