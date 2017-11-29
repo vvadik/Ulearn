@@ -14,7 +14,7 @@ namespace uLearn.CSharp
 			new BlockLengthStyleValidator(),
 			new LineLengthStyleValidator(),
 			new NamingCaseStyleValidator(),
-			new NamimgLengthValidator(),
+			new VerbInMethodNameValidator(),
 			new RedundantIfStyleValidator(),
 			new NamingStyleValidator(),
 			new ExponentiationValidator(),

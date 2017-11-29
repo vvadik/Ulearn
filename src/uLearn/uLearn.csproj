@@ -186,7 +186,7 @@
     <Compile Include="CSharp\BoolCompareValidator.cs" />
     <Compile Include="CSharp\IndentsValidator.cs" />
     <Compile Include="CSharp\IStrictValidator.cs" />
-    <Compile Include="CSharp\NamimgLengthValidator.cs" />
+    <Compile Include="CSharp\VerbInMethodNameValidation\VerbInMethodNameValidator.cs" />
     <Compile Include="ExportedSlide.cs" />
     <Compile Include="Extensions\DictionaryExtension.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
@@ -351,6 +351,9 @@
     <None Include="Hunspellx86.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="CSharp\VerbInMethodNameValidation\31K verbs.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
