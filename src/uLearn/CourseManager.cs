@@ -143,7 +143,6 @@ namespace uLearn
 					catch (Exception e)
 					{
 						log.Error($"Не могу загрузить курс из {zipFile.FullName}", e);
-						errorsBot.PostToChannel($"Не могу загрузить курс из {zipFile.FullName.EscapeMarkdown()}:\n{e.Message.EscapeMarkdown()}\n```{e.StackTrace}```", ParseMode.Markdown);
 						if (firstException == null)
 							firstException = new Exception("Error loading course from " + zipFile.Name, e);
 					}
@@ -156,16 +155,17 @@ namespace uLearn
 		protected Course ReloadCourse(string courseId)
 		{
 			/* First try load course from directory */
+			var courseDir = GetExtractedCourseDirectory(courseId);
 			try
 			{
-				var courseDir = GetExtractedCourseDirectory(courseId);
 				log.Info($"Сначала попробую загрузить уже распакованный курс из {courseDir.FullName}");
 				return ReloadCourseFromDirectory(courseDir);
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
 				var zipFile = GetStagingCourseFile(courseId);
 				log.Info($"Неудача. Загружаю из zip-архива: {zipFile.FullName}");
+				errorsBot.PostToChannel($"Не смог загрузить курс из папки {courseDir}, буду загружать из zip-архива {zipFile.FullName}:\n{e.Message.EscapeMarkdown()}\n```{e.StackTrace}```", ParseMode.Markdown);
 				return ReloadCourseFromZip(zipFile);
 			}
 		}
