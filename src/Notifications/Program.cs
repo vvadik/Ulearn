@@ -98,7 +98,8 @@ namespace Notifications
 				var course = courseManager.FindCourse(delivery.Notification.CourseId);
 				if (course == null)
 				{
-					await notificationsRepo.MarkDeliveryAsWontSend(delivery.Id);
+					log.Warn($"Can't find course {delivery.Notification.CourseId}");
+					await notificationsRepo.MarkDeliveryAsFailed(delivery);
 					return;
 				}
 

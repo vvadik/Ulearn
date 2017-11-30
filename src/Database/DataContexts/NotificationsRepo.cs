@@ -382,7 +382,7 @@ namespace Database.DataContexts
 			return db.NotificationDeliveries.Where(d => notificationsIds.Contains(d.NotificationId) && transportsIds.Contains(d.NotificationTransportId));
 		}
 
-		public async Task MarkDeliveriesAsFailed(List<NotificationDelivery> deliveries)
+		public async Task MarkDeliveriesAsFailed(IEnumerable<NotificationDelivery> deliveries)
 		{
 			foreach (var delivery in deliveries)
 			{
