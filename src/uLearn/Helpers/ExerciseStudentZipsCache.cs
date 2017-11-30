@@ -47,7 +47,7 @@ namespace uLearn.Helpers
 			{
 				courseDirectory.EnsureExists();
 				log.Info($"Собираю zip-архив с упражнением: курс {courseId}, слайд «{slide.Title}» ({slide.Id}), файл {zipFile.FullName}");
-				builder.BuildStudentZip(courseId, slide, zipFile);
+				builder.BuildStudentZip(slide, zipFile);
 			}
 
 			return zipFile;

@@ -15,11 +15,11 @@ namespace uLearn.Helpers
 		public static bool IsAnyWrongAnswerOrAnySolution(string name) => anyWrongAnswerNameRegex.IsMatch(name) || anySolutionNameRegex.IsMatch(name);
 		public static bool IsAnySolution(string name) => anySolutionNameRegex.IsMatch(name);		
 		
-		public void BuildStudentZip(string courseId, Slide slide, FileInfo zipFile)
+		public void BuildStudentZip(Slide slide, FileInfo zipFile)
 		{
 			var block = (slide as ExerciseSlide)?.Exercise as ProjectExerciseBlock;
 			if (block == null)
-				throw new InvalidOperationException($"Can't generate student zip for non-project exercise block: course {courseId}, slide \"{slide.Title}\" ({slide.Id})");
+				throw new InvalidOperationException($"Can't generate student zip for non-project exercise block: slide \"{slide.Title}\" ({slide.Id})");
 			
 			var zip = new LazilyUpdatingZip(
 				block.ExerciseFolder,

@@ -21,7 +21,7 @@ namespace uLearn.Utilities
 			var unit = new Unit(UnitSettings.CreateByTitle("u1", CourseSettings.DefaultSettings), slidesDirectory.GetSubdirectory("u1"));
 			foreach (var slideFile in slidesDirectory.GetFiles("S*.cs"))
 			{
-				var slide = new CSharpSlideLoader().Load(slideFile, unit, 0, TODO, CourseSettings.DefaultSettings);
+				var slide = new CSharpSlideLoader().Load(slideFile, unit, 0, "Test", CourseSettings.DefaultSettings);
 				ConvertSlide(slide);
 			}
 		}

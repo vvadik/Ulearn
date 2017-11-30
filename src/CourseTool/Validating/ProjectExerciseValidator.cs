@@ -20,6 +20,7 @@ namespace uLearn
 		private readonly ProjectExerciseBlock ex;
 		private readonly ExerciseSlide slide;
 		private readonly SandboxRunnerSettings settings;
+		private readonly ExerciseStudentZipBuilder exerciseStudentZipBuilder = new ExerciseStudentZipBuilder();
 
 		public ProjectExerciseValidator(BaseValidator baseValidator, SandboxRunnerSettings settings, ExerciseSlide slide, ProjectExerciseBlock exercise)
 			: base(baseValidator)
@@ -145,8 +146,11 @@ namespace uLearn
 
 		private void ReportErrorIfStudentsZipHasErrors()
 		{
+			var tempExZipFilePath = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).GetFile($"{slide.Id}.exercise.zip");
 			var tempExFolder = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ExerciseFolder_From_StudentZip"));
-			Utils.UnpackZip(ex.StudentsZip.Content(), tempExFolder.FullName);
+			
+			exerciseStudentZipBuilder.BuildStudentZip(slide, tempExZipFilePath);
+			Utils.UnpackZip(tempExZipFilePath.Content(), tempExFolder.FullName);
 			try
 			{
 				ReportErrorIfStudentsZipHasWrongAnswerOrSolutionFiles(tempExFolder);
@@ -165,6 +169,7 @@ namespace uLearn
 			finally
 			{
 				tempExFolder.Delete(true);
+				tempExZipFilePath.Delete();
 			}
 		}
 

@@ -52,6 +52,7 @@ namespace uLearn.CSharp
 		}
 
 		[Test]
+		[Ignore("ProjectExerciseValidator generates exercise zip from exercise block. Zip file built here is not care")]
 		public void ReportError_If_StudentZip_HasErrors()
 		{
 			FileSystem.CopyDirectory(tempSlideFolder.GetSubdirectory("projDir").FullName,
