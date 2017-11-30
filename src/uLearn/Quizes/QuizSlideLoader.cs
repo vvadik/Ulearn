@@ -10,7 +10,7 @@ namespace uLearn.Quizes
 	{
 		public string Extension => ".quiz.xml";
 
-		public Slide Load(FileInfo file, Unit unit, int slideIndex, CourseSettings settings)
+		public Slide Load(FileInfo file, Unit unit, int slideIndex, string courseId, CourseSettings settings)
 		{
 			var quiz = file.DeserializeXml<Quiz>();
 
@@ -23,15 +23,15 @@ namespace uLearn.Quizes
 			if (string.IsNullOrEmpty(quiz.ScoringGroup))
 				quiz.ScoringGroup = settings.Scoring.DefaultScoringGroupForQuiz;
 
-			BuildUp(quiz, unit, settings);
+			BuildUp(quiz, unit, courseId, settings);
 			quiz.InitQuestionIndices();
 			var slideInfo = new SlideInfo(unit, file, slideIndex);
 			return new QuizSlide(slideInfo, quiz);
 		}
 
-		public static void BuildUp(Quiz quiz, Unit unit, CourseSettings settings)
+		public static void BuildUp(Quiz quiz, Unit unit, string courseId, CourseSettings settings)
 		{
-			var context = new BuildUpContext(unit, settings, null, quiz.Title);
+			var context = new BuildUpContext(unit, settings, null, courseId, quiz.Title);
 			var blocks = quiz.Blocks.SelectMany(b => b.BuildUp(context, ImmutableHashSet<string>.Empty));
 			quiz.Blocks = blocks.ToArray();
 		}

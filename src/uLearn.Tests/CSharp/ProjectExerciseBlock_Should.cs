@@ -55,7 +55,7 @@ namespace uLearn.CSharp
 				PathsToExcludeForStudent = new[] { "inner-dir-1\\inner-dir-2\\ExcludeMeForStudent.cs" }
 			};
 
-			var ctx = new BuildUpContext(new Unit(null, ex.SlideFolderPath), CourseSettings.DefaultSettings, null, String.Empty);
+			var ctx = new BuildUpContext(new Unit(null, ex.SlideFolderPath), CourseSettings.DefaultSettings, null, "Test", string.Empty);
 			exBlocks = ex.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
 			Utils.UnpackZip(ex.StudentsZip.Content(), studentExerciseFolderPath);
 

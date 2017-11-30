@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Schema;
@@ -32,6 +33,18 @@ namespace uLearn.Model.Blocks
 		{
 		}
 
+		public string RenderMd(string courseId, Guid slideId, string baseUrl)
+		{
+			ReplaceLinksToStudentZips(courseId, slideId);
+			return Markdown.RenderMd(baseUrl);
+		}
+		
+		public string RenderMd(string courseId, Guid slideId, FileInfo sourceFile, string baseUrl="")
+		{
+			ReplaceLinksToStudentZips(courseId, slideId);
+			return Markdown.RenderMd(sourceFile, baseUrl);
+		}
+
 		public override string ToString()
 		{
 			return $"Markdown {Markdown}";
@@ -53,6 +66,13 @@ namespace uLearn.Model.Blocks
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
 			return InnerBlocks?.SelectMany(b => b.BuildUp(context, filesInProgress)) ?? new[] { this };
+		}
+
+		/* Replace links to /Exercise/StudentZip: automagically add courseId and slideId */
+		private void ReplaceLinksToStudentZips(string courseId, Guid slideId)
+		{
+			if (! string.IsNullOrEmpty(Markdown))
+				Markdown = Markdown.Replace("(/Exercise/StudentZip)", $"(/Exercise/StudentZip?courseId={courseId}&slideId={slideId})");
 		}
 
 		public override string TryGetText()

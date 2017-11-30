@@ -94,7 +94,9 @@
 { @( maxScore == 0 ? "" : string.Format("{0}/{1}", currentScore, maxScore)) }
 
 @helper Block(MdBlock block, BlockRenderContext context, HtmlHelper Html)
-{ @MvcHtmlString.Create(block.Markdown.RenderMd(context.BaseUrl)) }
+{
+	@MvcHtmlString.Create(block.RenderMd(context.Course.Id, context.Slide.Id, context.BaseUrl))
+}
 
 @helper Block(CodeBlock block, BlockRenderContext context, HtmlHelper Html)
 {

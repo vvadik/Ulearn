@@ -8,7 +8,9 @@ using Microsoft.VisualBasic.FileIO;
 using RunCsJob;
 using RunCsJob.Api;
 using uLearn.Extensions;
+using uLearn.Helpers;
 using uLearn.Model.Blocks;
+using uLearn.Web.Helpers;
 using SearchOption = Microsoft.VisualBasic.FileIO.SearchOption;
 
 namespace uLearn
@@ -174,7 +176,7 @@ namespace uLearn
 
 		private void ReportErrorIfStudentsZipHasWrongAnswerOrSolutionFiles(DirectoryInfo unpackedZipDir)
 		{
-			var wrongAnswersOrSolution = GetOrderedFileNames(unpackedZipDir.GetRelativePathsOfFiles(), ProjectExerciseBlock.IsAnyWrongAnswerOrAnySolution);
+			var wrongAnswersOrSolution = GetOrderedFileNames(unpackedZipDir.GetRelativePathsOfFiles(), ExerciseStudentZipBuilder.IsAnyWrongAnswerOrAnySolution);
 
 			if (wrongAnswersOrSolution.Any())
 				ReportSlideError(slide, $"Student zip exercise directory has 'wrong answer' and/or solution files ({string.Join(", ", wrongAnswersOrSolution)})");
@@ -194,7 +196,7 @@ namespace uLearn
 		{
 			var csProjItems = csproj.Items.Select(i => i.UnevaluatedInclude);
 
-			var wrongAnswersOrSolution = GetOrderedFileNames(csProjItems, ProjectExerciseBlock.IsAnyWrongAnswerOrAnySolution);
+			var wrongAnswersOrSolution = GetOrderedFileNames(csProjItems, ExerciseStudentZipBuilder.IsAnyWrongAnswerOrAnySolution);
 
 			if (wrongAnswersOrSolution.Any())
 				ReportSlideError(slide, $"Student's csproj has 'wrong answer' and/or solution items ({string.Join(", ", wrongAnswersOrSolution)})");

@@ -63,7 +63,7 @@ namespace RunCsJob
 
 			var randomSuffix = Guid.NewGuid().ToString("D");
 			randomSuffix = randomSuffix.Substring(randomSuffix.Length - 8);
-			var submissionCompilationDirectory = workingDirectory.GetSubdir($"{submission.Id}-{randomSuffix}");
+			var submissionCompilationDirectory = workingDirectory.GetSubdirectory($"{submission.Id}-{randomSuffix}");
 			try
 			{
 				submissionCompilationDirectory.Create();

@@ -17,12 +17,6 @@ namespace uLearn.Model.Blocks
 	[XmlType("proj-exercise")]
 	public class ProjectExerciseBlock : ExerciseBlock
 	{
-		private static readonly Regex anySolutionNameRegex = new Regex("(.+)\\.Solution\\.cs", RegexOptions.IgnoreCase);
-		private static readonly Regex anyWrongAnswerNameRegex = new Regex("(.+)\\.WrongAnswer\\.(.+)\\.cs", RegexOptions.IgnoreCase);
-
-		public static bool IsAnyWrongAnswerOrAnySolution(string name) => anyWrongAnswerNameRegex.IsMatch(name) || anySolutionNameRegex.IsMatch(name);
-		public static bool IsAnySolution(string name) => anySolutionNameRegex.IsMatch(name);
-
 		public static string SolutionFilepathToUserCodeFilepath(string solutionFilepath)
 		{
 			// cut .solution.cs
@@ -98,7 +92,7 @@ namespace uLearn.Model.Blocks
 		[XmlIgnore]
 		public DirectoryInfo SlideFolderPath { get; set; }
 
-		public FileInfo StudentsZip => SlideFolderPath.GetFile(ExerciseDirName + ".exercise.zip");
+		//public FileInfo StudentsZip => SlideFolderPath.GetFile(ExerciseDirName + ".exercise.zip");
 
 		public bool IsWrongAnswer(string name) => WrongAnswersAndSolutionNameRegex.IsMatch(name) && !IsCorrectSolution(name);
 
@@ -113,9 +107,9 @@ namespace uLearn.Model.Blocks
 			ExpectedOutput = ExpectedOutput ?? "";
 			ValidatorName = string.Join(" ", LangId, ValidatorName);
 			SlideFolderPath = context.Dir;
-			var exercisePath = context.Dir.GetSubdir(ExerciseDirName).FullName;
-			if (context.ZippedProjectExercises.Add(exercisePath))
-				CreateZipForStudent();
+//			var exercisePath = context.Dir.GetSubdirectory(ExerciseDirName).FullName;
+//			if (context.ZippedProjectExercises.Add(exercisePath))
+//				CreateZipForStudent();
 
 			CheckScoringGroup(context.SlideTitle, context.CourseSettings.Scoring);
 			
@@ -137,39 +131,9 @@ namespace uLearn.Model.Blocks
 			StartupObject = useNUnitLauncher ? typeof(NUnitTestRunner).FullName : StartupObject;
 		}
 
-		private void CreateZipForStudent()
-		{
-			var zip = new LazilyUpdatingZip(
-				ExerciseFolder,
-				new[] { "checking", "bin", "obj" },
-				NeedExcludeFromStudentZip,
-				ReplaceCsproj, StudentsZip);
-			ResolveCsprojLinks();
-			zip.UpdateZip();
-		}
-
-		private bool NeedExcludeFromStudentZip(FileInfo file)
-		{
-			var relativeFilePath = file.GetRelativePath(ExerciseFolder.FullName);
-			return NeedExcludeFromStudentZip(relativeFilePath);
-		}
-
-		public bool NeedExcludeFromStudentZip(string filepath)
-		{
-			return IsAnyWrongAnswerOrAnySolution(filepath) ||
-					PathsToExcludeForStudent != null && PathsToExcludeForStudent.Any(p => p == filepath);
-		}
-
 		private void ResolveCsprojLinks()
 		{
 			ProjModifier.ModifyCsproj(ExerciseFolder.GetFile(CsprojFileName), ProjModifier.ResolveLinks);
-		}
-
-		private byte[] ReplaceCsproj(FileInfo file)
-		{
-			if (!file.Name.Equals(CsprojFileName, StringComparison.InvariantCultureIgnoreCase))
-				return null;
-			return ProjModifier.ModifyCsproj(file, proj => ProjModifier.PrepareForStudentZip(proj, this));
 		}
 
 		public override string GetSourceCode(string code)

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Build.Evaluation;
 using uLearn.Extensions;
+using uLearn.Helpers;
 using uLearn.Model.Blocks;
 
 namespace uLearn
@@ -40,10 +41,10 @@ namespace uLearn
 			}
 		}
 		
-		internal static void PrepareForStudentZip(Project proj, ProjectExerciseBlock ex)
+		public static void PrepareForStudentZip(Project proj, ProjectExerciseBlock ex)
 		{
-			var toExclude = FindItemNames(proj, ex.NeedExcludeFromStudentZip).ToList();
-			var solutionsOfOtherTasks = toExclude.Where(n => ProjectExerciseBlock.IsAnySolution(n) && ex.CorrectSolutionPath != n).ToList();
+			var toExclude = FindItemNames(proj, file => ExerciseStudentZipBuilder.NeedExcludeFromStudentZip(ex, file)).ToList();
+			var solutionsOfOtherTasks = toExclude.Where(n => ExerciseStudentZipBuilder.IsAnySolution(n) && ex.CorrectSolutionPath != n).ToList();
 
 			var userCodeFilepathsOfOtherTasks = solutionsOfOtherTasks.Select(ProjectExerciseBlock.SolutionFilepathToUserCodeFilepath);
 

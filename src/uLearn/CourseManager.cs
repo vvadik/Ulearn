@@ -2,6 +2,7 @@ using Ionic.Zip;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ using System.Xml.XPath;
 using JetBrains.Annotations;
 using log4net;
 using uLearn.Extensions;
+using uLearn.Helpers;
 using uLearn.Model.Blocks;
 
 namespace uLearn
@@ -32,13 +34,15 @@ namespace uLearn
 		/* LRU-cache for course versions. 50 is a capactiy of the cache. */
 		private readonly LruCache<Guid, Course> versionsCache = new LruCache<Guid, Course>(50);
 
+		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache = new ExerciseStudentZipsCache();
+
 		private static readonly CourseLoader loader = new CourseLoader();
 
 		public CourseManager(DirectoryInfo baseDirectory)
 			: this(
-				baseDirectory.GetSubdir("Courses.Staging"),
-				baseDirectory.GetSubdir("Courses.Versions"),
-				baseDirectory.GetSubdir("Courses")
+				baseDirectory.GetSubdirectory("Courses.Staging"),
+				baseDirectory.GetSubdirectory("Courses.Versions"),
+				baseDirectory.GetSubdirectory("Courses")
 			)
 		{
 		}
@@ -78,8 +82,7 @@ namespace uLearn
 
 		public Course GetVersion(Guid versionId)
 		{
-			Course version;
-			if (versionsCache.TryGet(versionId, out version))
+			if (versionsCache.TryGet(versionId, out var version))
 				return version;
 
 			var versionFile = GetCourseVersionFile(versionId);
@@ -100,7 +103,7 @@ namespace uLearn
 
 		public DirectoryInfo GetExtractedCourseDirectory(string courseId)
 		{
-			return coursesDirectory.GetSubdir(courseId);
+			return coursesDirectory.GetSubdirectory(courseId);
 		}
 
 		public DirectoryInfo GetExtractedVersionDirectory(Guid versionId)
@@ -172,6 +175,8 @@ namespace uLearn
 			var course = LoadCourseFromZip(zipFile);
 			courses[course.Id] = course;
 			log.Info($"Курс {course.Id} загружен из {zipFile.FullName} и сохранён в памяти");
+			if (exerciseStudentZipsCache.IsEnabled)
+				exerciseStudentZipsCache.DeleteCourseZips(course.Id);
 			return course;
 		}
 
@@ -180,28 +185,16 @@ namespace uLearn
 			var course = LoadCourseFromDirectory(directory);
 			courses[course.Id] = course;
 			log.Info($"Курс {course.Id} загружен из {directory.FullName} и сохранён в памяти");
+			if (exerciseStudentZipsCache.IsEnabled)
+				exerciseStudentZipsCache.DeleteCourseZips(course.Id);
 			return course;
-		}
-
-		private static void ClearDirectory(DirectoryInfo directory, bool deleteDirectory = false)
-		{
-			foreach (var file in directory.GetFiles())
-				file.Delete();
-			foreach (var subDirectory in directory.GetDirectories())
-			{
-				/* subDirectory.Delete(true) sometimes not works */
-				ClearDirectory(subDirectory);
-				subDirectory.Delete();
-			}
-			if (deleteDirectory)
-				directory.Delete();
 		}
 
 		private void UnzipFile(FileInfo zipFile, DirectoryInfo unpackDirectory)
 		{
 			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
 			{
-				ClearDirectory(unpackDirectory);
+				unpackDirectory.ClearDirectory();
 				zip.ExtractAll(unpackDirectory.FullName, ExtractExistingFileAction.OverwriteSilently);
 			}
 		}
@@ -370,6 +363,10 @@ namespace uLearn
 		{
 			if (!courses.ContainsKey(course.Id))
 				return;
+			
+			if (exerciseStudentZipsCache.IsEnabled)
+				exerciseStudentZipsCache.DeleteCourseZips(course.Id);
+			
 			courses[course.Id] = course;
 		}
 
@@ -460,7 +457,7 @@ namespace uLearn
 
 		public void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
 		{
-			var tempDirectoryName = coursesDirectory.GetSubdir(Path.GetRandomFileName());
+			var tempDirectoryName = coursesDirectory.GetSubdirectory(Path.GetRandomFileName());
 			LockCourse(course.Id);
 
 			try
@@ -485,7 +482,7 @@ namespace uLearn
 			{
 				ReleaseCourse(course.Id);
 			}
-			TrySeveralTimes(() => ClearDirectory(tempDirectoryName, true));
+			TrySeveralTimes(() => tempDirectoryName.ClearDirectory(true));
 		}
 
 		private void FixFileReferencesInCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
@@ -513,6 +510,15 @@ namespace uLearn
 			if (file is DirectoryInfo)
 				return new DirectoryInfo(newPath);
 			return new FileInfo(newPath);
+		}
+
+		public static DirectoryInfo GetCoursesDirectory()
+		{
+			var coursesDirectory = ConfigurationManager.AppSettings["ulearn.coursesDirectory"];
+			if (string.IsNullOrEmpty(coursesDirectory))
+				coursesDirectory = Utils.GetAppPath() + @"\..\Courses\";
+
+			return new DirectoryInfo(coursesDirectory);
 		}
 	}
 }
