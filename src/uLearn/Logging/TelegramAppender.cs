@@ -17,9 +17,7 @@ namespace uLearn.Logging
 			if (loggingEvent.ExceptionObject is ApiRequestException)
 				return;
 			
-			var message = $"*{loggingEvent.Level}* from `{loggingEvent.LoggerName.EscapeMarkdown()}`:\n{RenderLoggingEvent(loggingEvent).EscapeMarkdown()}";
-			if (loggingEvent.ExceptionObject != null)
-				message += $"```{loggingEvent.ExceptionObject.Message}\n\n{loggingEvent.ExceptionObject.StackTrace}```";
+			var message = $"*{loggingEvent.Level}* from `{loggingEvent.LoggerName.EscapeMarkdown()}`:\n```{RenderLoggingEvent(loggingEvent).EscapeMarkdown()}```";
 			
 			errorsBot.PostToChannel(message, ParseMode.Markdown);
 		}
