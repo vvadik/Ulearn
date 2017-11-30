@@ -12,8 +12,10 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using JetBrains.Annotations;
 using log4net;
+using Telegram.Bot.Types.Enums;
 using uLearn.Extensions;
 using uLearn.Model.Blocks;
+using uLearn.Telegram;
 
 namespace uLearn
 {
@@ -33,6 +35,7 @@ namespace uLearn
 		private readonly LruCache<Guid, Course> versionsCache = new LruCache<Guid, Course>(50);
 
 		private static readonly CourseLoader loader = new CourseLoader();
+		private static readonly ErrorsBot errorsBot = new ErrorsBot();
 
 		public CourseManager(DirectoryInfo baseDirectory)
 			: this(
@@ -78,8 +81,7 @@ namespace uLearn
 
 		public Course GetVersion(Guid versionId)
 		{
-			Course version;
-			if (versionsCache.TryGet(versionId, out version))
+			if (versionsCache.TryGet(versionId, out var version))
 				return version;
 
 			var versionFile = GetCourseVersionFile(versionId);
@@ -141,6 +143,7 @@ namespace uLearn
 					catch (Exception e)
 					{
 						log.Error($"Не могу загрузить курс из {zipFile.FullName}", e);
+						errorsBot.PostToChannel($"Не могу загрузить курс из {zipFile.FullName.EscapeMarkdown()}:\n{e.Message.EscapeMarkdown()}\n```{e.StackTrace}```", ParseMode.Markdown);
 						if (firstException == null)
 							firstException = new Exception("Error loading course from " + zipFile.Name, e);
 					}

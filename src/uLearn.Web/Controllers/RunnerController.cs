@@ -14,7 +14,7 @@ using log4net;
 using RunCsJob.Api;
 using Telegram.Bot.Types.Enums;
 using uLearn.Extensions;
-using uLearn.Web.Telegram;
+using uLearn.Telegram;
 using XQueue;
 using XQueue.Models;
 

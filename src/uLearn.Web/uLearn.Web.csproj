@@ -449,8 +449,6 @@
     <Compile Include="Models\UserCourseModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Models\UsersStatsPageModel.cs" />
-    <Compile Include="Telegram\ErrorsBot.cs" />
-    <Compile Include="Telegram\TelegramBot.cs" />
     <Compile Include="Extensions\ControllerExtensions.cs" />
     <Compile Include="Controllers\AuthenticationManager.cs" />
     <Compile Include="Controllers\CommentsController.cs" />

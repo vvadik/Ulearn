@@ -7,8 +7,8 @@ using Database.Models;
 using log4net;
 using Metrics;
 using uLearn.Extensions;
+using uLearn.Telegram;
 using uLearn.Web.Models;
-using uLearn.Web.Telegram;
 
 namespace uLearn.Web.Controllers
 {

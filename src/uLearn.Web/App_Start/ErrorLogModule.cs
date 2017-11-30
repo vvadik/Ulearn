@@ -3,7 +3,7 @@ using System.Linq;
 using Elmah;
 using log4net;
 using uLearn.Extensions;
-using uLearn.Web.Telegram;
+using uLearn.Telegram;
 
 namespace uLearn.Web
 {

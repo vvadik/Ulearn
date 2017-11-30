@@ -1,20 +1,20 @@
 using System;
+using System.Configuration;
 using System.Threading.Tasks;
-using System.Web.Configuration;
 using Elmah;
 using log4net;
 using Telegram.Bot.Types.Enums;
 using uLearn.Extensions;
 
-namespace uLearn.Web.Telegram
+namespace uLearn.Telegram
 {
-	class ErrorsBot : TelegramBot
+	public class ErrorsBot : TelegramBot
 	{
 		private readonly ILog log = LogManager.GetLogger(typeof(ErrorsBot));
 
 		public ErrorsBot()
 		{
-			channel = WebConfigurationManager.AppSettings["ulearn.telegram.errors.channel"];
+			channel = ConfigurationManager.AppSettings["ulearn.telegram.errors.channel"];
 		}
 
 		public async Task PostToChannelAsync(string message, ParseMode parseMode = ParseMode.Default)
