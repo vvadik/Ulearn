@@ -12,6 +12,7 @@ using Database.Models;
 using Elmah;
 using Microsoft.AspNet.Identity;
 using uLearn.Extensions;
+using uLearn.Helpers;
 using uLearn.Model.Blocks;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
@@ -23,6 +24,13 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class ExerciseController : BaseExerciseController
 	{
+		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache;
+
+		public ExerciseController()
+		{
+			exerciseStudentZipsCache = new ExerciseStudentZipsCache();
+		}
+		
 		[System.Web.Mvc.HttpPost]
 		public async Task<ActionResult> RunSolution(string courseId, Guid slideId, bool isLti = false)
 		{
@@ -386,6 +394,22 @@ namespace uLearn.Web.Controllers
 			}
 
 			return PartialView(model);
+		}
+
+		public ActionResult StudentZip(string courseId, Guid slideId)
+		{
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId);
+			if (!(slide is ExerciseSlide))
+				return HttpNotFound();
+
+			var exerciseSlide = slide as ExerciseSlide;
+			if (!(exerciseSlide.Exercise is ProjectExerciseBlock))
+				return HttpNotFound();
+
+			var block = (ProjectExerciseBlock) exerciseSlide.Exercise;
+			var zipFile = exerciseStudentZipsCache.GenerateOrFindZip(courseId, exerciseSlide);
+			
+			return File(zipFile.FullName, "application/zip", block.CsprojFile.Name + ".zip");
 		}
 	}
 

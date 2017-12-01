@@ -18,10 +18,10 @@ namespace uLearn.Utilities
 		public void ConvertSlidesFromDirectory()
 		{
 			var slidesDirectory = new DirectoryInfo(@"Your path to slides");
-			var unit = new Unit(UnitSettings.CreateByTitle("u1", CourseSettings.DefaultSettings), slidesDirectory.GetSubdir("u1"));
+			var unit = new Unit(UnitSettings.CreateByTitle("u1", CourseSettings.DefaultSettings), slidesDirectory.GetSubdirectory("u1"));
 			foreach (var slideFile in slidesDirectory.GetFiles("S*.cs"))
 			{
-				var slide = new CSharpSlideLoader().Load(slideFile, unit, 0, CourseSettings.DefaultSettings);
+				var slide = new CSharpSlideLoader().Load(slideFile, unit, 0, "Test", CourseSettings.DefaultSettings);
 				ConvertSlide(slide);
 			}
 		}
@@ -48,7 +48,7 @@ namespace uLearn.Utilities
 			if (slide.ShouldBeSolved)
 				return;
 			Console.WriteLine(slide.Info.SlideFile.FullName);
-			var lesson = new Lesson(slide.Title, slide.NormalizedGuid, slide.Blocks);
+			var lesson = new Lesson(slide.Title, slide.Id, slide.Blocks);
 			var path = Path.ChangeExtension(slide.Info.SlideFile.FullName, "lesson.xml");
 			using (var writer = new StreamWriter(path, false, Encoding.UTF8))
 				lessonSerializer.Serialize(writer, lesson);

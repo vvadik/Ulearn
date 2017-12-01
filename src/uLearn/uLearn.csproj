@@ -269,6 +269,8 @@
     <Compile Include="Extensions\PluralizeExtensions.cs" />
     <Compile Include="FuncUtils.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
+    <Compile Include="Helpers\ExerciseStudentZipBuilder.cs" />
+    <Compile Include="Helpers\ExerciseStudentZipsCache.cs" />
     <Compile Include="Helpers\StringUtils.cs" />
     <Compile Include="ISolutionValidator.cs" />
     <Compile Include="ExerciseSlide.cs" />

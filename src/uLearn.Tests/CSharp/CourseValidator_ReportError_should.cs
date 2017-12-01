@@ -47,16 +47,16 @@ namespace uLearn.CSharp
 			if (File.Exists(studentZipFilepath))
 				File.Delete(studentZipFilepath);
 
-			var ctx = new BuildUpContext(new Unit(null, exBlock.SlideFolderPath), CourseSettings.DefaultSettings, null,
-				String.Empty);
+			var ctx = new BuildUpContext(new Unit(null, exBlock.SlideFolderPath), CourseSettings.DefaultSettings, null, "Test", string.Empty);
 			exBlock.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
 		}
 
 		[Test]
+		[Ignore("ProjectExerciseValidator generates exercise zip from exercise block. Zip file built here is not care")]
 		public void ReportError_If_StudentZip_HasErrors()
 		{
-			FileSystem.CopyDirectory(tempSlideFolder.GetSubdir("projDir").FullName,
-				tempSlideFolder.GetSubdir("FullProjDir").FullName);
+			FileSystem.CopyDirectory(tempSlideFolder.GetSubdirectory("projDir").FullName,
+				tempSlideFolder.GetSubdirectory("FullProjDir").FullName);
 			exBlock.CsProjFilePath = Path.Combine("FullProjDir", TestsHelper.CsProjFilename);
 			SaveTempZipFileWithFullProject();
 

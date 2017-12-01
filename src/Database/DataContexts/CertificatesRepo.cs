@@ -166,7 +166,7 @@ namespace Database.DataContexts
 
 		public DirectoryInfo GetTemplateDirectory(string templateArchiveName)
 		{
-			return GetCertificatesDirectory().GetSubdir(templateArchiveName);
+			return GetCertificatesDirectory().GetSubdirectory(templateArchiveName);
 		}
 
 		public void EnsureCertificateTemplateIsUnpacked(CertificateTemplate template)

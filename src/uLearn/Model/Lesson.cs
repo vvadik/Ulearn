@@ -52,7 +52,7 @@ namespace uLearn.Model
 		public string Title;
 
 		[XmlElement("id")]
-		public string Id;
+		public Guid Id;
 
 		[XmlElement("default-include-file")]
 		public string DefaultInclideFile;
@@ -86,7 +86,7 @@ namespace uLearn.Model
 		{
 		}
 
-		public Lesson(string title, string id, params SlideBlock[] blocks)
+		public Lesson(string title, Guid id, params SlideBlock[] blocks)
 		{
 			Title = title;
 			Id = id;

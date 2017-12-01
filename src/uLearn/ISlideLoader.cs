@@ -5,6 +5,6 @@ namespace uLearn
 	public interface ISlideLoader
 	{
 		string Extension { get; }
-		Slide Load(FileInfo file, Unit unit, int slideIndex, CourseSettings settings);
+		Slide Load(FileInfo file, Unit unit, int slideIndex, string courseId, CourseSettings settings);
 	}
 }

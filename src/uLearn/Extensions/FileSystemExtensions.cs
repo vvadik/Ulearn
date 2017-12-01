@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualBasic.FileIO;
+using Newtonsoft.Json.Serialization;
 using SearchOption = Microsoft.VisualBasic.FileIO.SearchOption;
 
 namespace uLearn.Extensions
@@ -11,12 +12,7 @@ namespace uLearn.Extensions
 	{
 		public static bool HasSubdirectory(this DirectoryInfo root, string name)
 		{
-			return root.Subdirectory(name).Exists;
-		}
-
-		public static DirectoryInfo Subdirectory(this DirectoryInfo root, string name)
-		{
-			return new DirectoryInfo(Path.Combine(root.FullName, name));
+			return root.GetSubdirectory(name).Exists;
 		}
 
 		public static FileInfo GetFile(this DirectoryInfo dir, string filename)
@@ -24,17 +20,29 @@ namespace uLearn.Extensions
 			return new FileInfo(Path.Combine(dir.FullName, filename));
 		}
 
-		public static DirectoryInfo GetSubdir(this DirectoryInfo dir, string name)
+		public static DirectoryInfo GetSubdirectory(this DirectoryInfo dir, string name)
 		{
 			return new DirectoryInfo(Path.Combine(dir.FullName, name));
 		}
 
-		public static DirectoryInfo GetOrCreateSubdir(this DirectoryInfo dir, string name)
+		public static void EnsureExists(this DirectoryInfo dir)
 		{
-			var subdir = dir.GetSubdir(name);
-			if (!subdir.Exists)
-				subdir.Create();
-			return subdir;
+			if (!dir.Exists)
+				dir.Create();
+		}
+
+		public static void ClearDirectory(this DirectoryInfo directory, bool deleteDirectory = false)
+		{
+			foreach (var file in directory.GetFiles())
+				file.Delete();
+			foreach (var subDirectory in directory.GetDirectories())
+			{
+				/* subDirectory.Delete(true) sometimes not works */
+				subDirectory.ClearDirectory();
+				subDirectory.Delete();
+			}
+			if (deleteDirectory)
+				directory.Delete();
 		}
 
 		public static string GetRelativePath(this FileSystemInfo file, string folder)
@@ -55,7 +63,7 @@ namespace uLearn.Extensions
 
 		public static string[] GetFilenames(this DirectoryInfo di, string dirPath)
 		{
-			var dir = di.GetSubdir(dirPath);
+			var dir = di.GetSubdirectory(dirPath);
 			if (!dir.Exists)
 				throw new Exception("No " + dirPath + " in " + di.Name);
 			return dir.GetFiles().Select(f => Path.Combine(dirPath, f.Name)).ToArray();

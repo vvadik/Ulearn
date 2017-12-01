@@ -143,7 +143,7 @@ namespace uLearn.CourseTool.Monitoring
 		{
 			var lesson = new Lesson(
 				"Новый слайд", 
-				Guid.NewGuid().ToString("N"), 
+				Guid.NewGuid(), 
 				new MdBlock("текст"));
 			return AddNewSlide(context, path, lesson);
 		}
