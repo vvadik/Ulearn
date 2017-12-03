@@ -2,49 +2,101 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FluentAssertions;
 using NUnit.Framework;
+using uLearn.Extensions;
 
 namespace uLearn.CSharp.ExponentiationValidation
 {
 	[TestFixture]
-	public class ExponentiationValidator_should: ValidatorTestBase
+	public class ExponentiationValidator_should
 	{
-		private static readonly DirectoryInfo testDataDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+		private static DirectoryInfo TestDataDir => new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
 			"..", "CSharp", "ExponentiationValidation", "TestData"));
-		private static readonly DirectoryInfo incorrectTestDataDir = testDataDir.GetDirectories("Incorrect").Single();
-		private static readonly DirectoryInfo correctTestDataDir = testDataDir.GetDirectories("Correct").Single();
+		private static DirectoryInfo IncorrectTestDataDir => TestDataDir.GetDirectories("Incorrect").Single();
+		private static DirectoryInfo CorrectTestDataDir => TestDataDir.GetDirectories("Correct").Single();
 
-		private static IEnumerable<FileInfo> correctFiles = correctTestDataDir.EnumerateFiles();
-		private static IEnumerable<FileInfo> incorrectFiles = incorrectTestDataDir.EnumerateFiles();	
+		private static IEnumerable<FileInfo> CorrectFiles => CorrectTestDataDir.EnumerateFiles();
+		private static IEnumerable<FileInfo> IncorrectFiles => IncorrectTestDataDir.EnumerateFiles();
 
-		private static readonly ExponentiationStyleValidator validator = new ExponentiationStyleValidator();
+		private static DirectoryInfo BasicProgrammingDirectory =>
+			new DirectoryInfo(TestPaths.BasicProgrammingDirectoryPath);
 
-		protected override BaseStyleValidator Validator => validator;
+		private static IEnumerable<FileInfo> BasicProgrammingFiles =>
+			BasicProgrammingDirectory
+				.EnumerateFiles("*.cs", SearchOption.AllDirectories)
+				.Where(f => !f.Name.Equals("Settings.Designer.cs") &&
+							!f.Name.Equals("Resources.Designer.cs") &&
+							!f.Name.Equals("AssemblyInfo.cs"));
 
-		[TestCaseSource(nameof(incorrectFiles))]
+		private static DirectoryInfo ULearnSubmissionsDirectory =>
+			new DirectoryInfo(TestPaths.ULearnSubmissionsDirectoryPath);
+
+		private static IEnumerable<FileInfo> SubmissionsFiles =>ULearnSubmissionsDirectory
+			.EnumerateFiles("*.cs", SearchOption.AllDirectories)
+			.Where(f => f.Name.Contains("Accepted"));
+		
+		private readonly ExponentiationStyleValidator validator = new ExponentiationStyleValidator();
+
+		[TestCaseSource(nameof(IncorrectFiles))]
 		public void FindErrors(FileInfo file)
 		{
-			CheckThatErrorsAreFound(file);
+			var code = file.ContentAsUtf8();
+			var errors = validator.FindError(code);
+
+			errors.Should().NotBeNullOrEmpty();
 		}
 
-		[TestCaseSource(nameof(correctFiles))]
+		[TestCaseSource(nameof(CorrectFiles))]
 		public void NotFindErrors(FileInfo file)
 		{
-			CheckThatErrorsAreNotFound(file);
+			var code = file.ContentAsUtf8();
+			var errors = validator.FindError(code);
+			if (errors != null)
+			{
+				Console.WriteLine(errors);
+			}
+
+			errors.Should().BeNullOrEmpty();
 		}
 
 		[Explicit]
 		[TestCaseSource(nameof(BasicProgrammingFiles))]
 		public void NotFindErrors_InBasicProgramming(FileInfo file)
 		{
-			CheckErrorsAreNotFound_InBasicProgramming(file);
+			var fileContent = file.ContentAsUtf8();
+
+			var errors = validator.FindError(fileContent);
+
+			if (errors != null)
+			{
+				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+						"..", "CSharp", "ExampleFiles", "errors", $"{file.Name}_errors.txt"),
+					$@"{fileContent}
+
+{errors}");
+
+				Assert.Fail();
+			}
 		}
 
 		[Explicit]
 		[TestCaseSource(nameof(SubmissionsFiles))]
 		public void NotFindErrors_InCheckAcceptedFiles(FileInfo file)
 		{
-			CheckThatErrorsAreNotFound_InAcceptedFiles(file);
+			var fileContent = file.ContentAsUtf8();
+
+			var errors = validator.FindError(fileContent);
+			if (errors != null)
+			{
+				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+						"..", "CSharp", "ExampleFiles", "submissions_errors", $"{file.Name}_errors.txt"),
+					$@"{fileContent}
+
+{errors}");
+
+				Assert.Fail();
+			}
 		}
 	}
 }

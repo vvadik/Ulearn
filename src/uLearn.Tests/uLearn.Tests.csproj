@@ -276,6 +276,7 @@
     <Content Include="CSharp\testProject\projDir\AnotherTask.WrongAnswer.88.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Compile Include="CSharp\TestPaths.cs" />
     <Compile Include="CSharp\testProject\projDir\inner-dir-1\inner-dir-2\ExcludeMeForStudent.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
@@ -304,7 +305,6 @@
     <Compile Include="CSharp\testProject\projDir\OneFailingTest.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="CSharp\ValidatorTestBase.cs" />
     <Compile Include="ExportedSlide_should.cs" />
     <Compile Include="LockFilesTests.cs" />
     <Compile Include="CourseTool\Config_Test.cs" />
