@@ -19,7 +19,17 @@ namespace uLearn.CSharp
 			return syntaxNode.SyntaxTree.GetLineSpan(syntaxNode.Span);
 		}
 
-		protected string Report(SyntaxNode syntaxNode, string message)
+        public static FileLinePositionSpan GetSpan(SyntaxNodeOrToken syntaxNode)
+        {
+            return syntaxNode.GetFileLinePositionSpan();
+        }
+
+        public static string Report(SyntaxNodeOrToken syntaxNode, string message)
+        {
+            return Report(GetSpan(syntaxNode), message);
+        }
+
+        protected string Report(SyntaxNode syntaxNode, string message)
 		{
 			return Report(GetSpan(syntaxNode), message);
 		}

@@ -138,52 +138,121 @@ namespace uLearn
         {
             return tree.GetRoot().DescendantNodes()
                 .Where(NeedToValidateNonBracesTokens)
-                .Select(x => SyntaxNodeOrToken.Create(tree, x))
-                .SelectMany(CheckStatement);
+                .Select(x => SyntaxNodeOrToken.Create(tree, x, true))
+                .SelectMany(CheckNonBracesStatements)
+                .Distinct();
         }
 
-        private static IEnumerable<string> CheckStatement(SyntaxNodeOrToken rootStatementSyntax)
+        private static IEnumerable<string> CheckNonBracesStatements(SyntaxNodeOrToken rootStatementSyntax)
         {
-            var rootStart = rootStatementSyntax.GetStartIndexInSpaces();
+            var rootLine = rootStatementSyntax.GetStartLine();
+            var rootEndLine = rootStatementSyntax.GetConditionEndLine();
+            var parent = rootStatementSyntax.GetParent();
+            var rootStart = rootStatementSyntax.GetValidationStartIndexInSpaces();
+
+            if (parent != null && parent.Kind == SyntaxKind.Block)
+            {
+                var parentLine = parent.GetStartLine();
+                if (parentLine == rootLine)
+                    yield break;
+                var parentStart = parent.GetValidationStartIndexInSpaces();
+                if (rootStart == 0)
+                    yield break;
+                var validateIndent =
+                    ValidateIndent(rootStatementSyntax, rootStart, parentStart, rootLine, parentLine);
+                if (validateIndent != null)
+                {
+                    yield return Report(rootStatementSyntax, validateIndent);
+                    yield break;
+                }
+            }
 
             var statementClauses = rootStatementSyntax.GetStatementsSyntax().ToArray();
+
             foreach (var statementClause in statementClauses)
             {
                 if (statementClause.Kind == SyntaxKind.Block)
                     break;
-                var statementStart = statementClause.GetStartIndexInSpaces();
+                var statementStart = statementClause.GetValidationStartIndexInSpaces();
+                var statementLine = statementClause.GetStartLine();
+
                 if (statementClause.HasExcessNewLines())
                 {
-                    statementClause.HasExcessNewLines();
-                    yield return $"Строка {statementClause.GetLine()}, позиция {statementStart}: выражение не должно иметь лишние " +
-                                 $"переносы строк после родителя (строка {rootStatementSyntax.GetLine()}, позиция {rootStart}).";
+                    yield return Report(statementClause, "Выражение не должно иметь лишние " +
+                                                         $"переносы строк после родителя ({GetNodePosition(rootStatementSyntax)}).");
+                    continue;
                 }
-                if (statementClause.IsKeyword)
+                if (!statementClause.OnSameIndentWithParent.HasValue)
                 {
                     if (statementStart != rootStart)
-                        yield return
-                            $"Строка {statementClause.GetLine()}, позиция {statementStart}: выражение должно иметь такой же отступ, " +
-                            $"как у родителя (строка {rootStatementSyntax.GetLine()}, позиция {rootStart}).";
+                    {
+                        var report = ValidateIndent(rootStatementSyntax, statementStart, rootStart, statementLine, rootLine);
+                        if (report != null)
+                        {
+                            yield return Report(statementClause, report);
+                            continue;
+                        }
+                    }
                 }
                 else
                 {
-                    if (statementStart <= rootStart)
-                        yield return
-                            $"Строка {statementClause.GetLine()}, позиция {statementStart}: выражение должно иметь отступ больше, " +
-                            $"чем у родителя (строка {rootStatementSyntax.GetLine()}, позиция {rootStart}).";
+                    if (statementClause.OnSameIndentWithParent.Value)
+                    {
+                        if (statementStart != rootStart)
+                        {
+                            yield return Report(statementClause, "Выражение должно иметь такой же отступ, " +
+                                                                 $"как у родителя ({GetNodePosition(rootStatementSyntax)}).");
+                            continue;
+                        }
+                    }
                     else
                     {
-                        var delta = statementStart - rootStart;
-                        if (delta < 4)
-                            yield return
-                                $"Строка {statementClause.GetLine()}, позиция {statementStart}: выражение должно иметь отступ, не меньше 4 пробелов " +
-                                $"относительно родителя (строка {rootStatementSyntax.GetLine()}, позиция {rootStart}).";
+                        if (rootEndLine == statementLine
+                            && (rootStatementSyntax.Kind == SyntaxKind.IfStatement ||
+                                rootStatementSyntax.Kind == SyntaxKind.ElseClause)
+                            && (statementClause.Kind != SyntaxKind.IfStatement
+                                && statementClause.Kind != SyntaxKind.ForStatement
+                                && statementClause.Kind != SyntaxKind.ForEachStatement
+                                && statementClause.Kind != SyntaxKind.WhileStatement
+                                && statementClause.Kind != SyntaxKind.DoStatement))
+                            continue;
+                        var report = ValidateIndent(rootStatementSyntax, statementStart, rootStart, statementLine, rootLine);
+                        if (report != null)
+                        {
+                            yield return Report(statementClause, report);
+                            continue;
+                        }
                     }
                 }
-
-                foreach (var nestedError in CheckStatement(statementClause))
+                foreach (var nestedError in CheckNonBracesStatements(statementClause))
                     yield return nestedError;
             }
+        }
+
+        private static string ValidateIndent(
+            SyntaxNodeOrToken root,
+            int statementStart,
+            int rootStart,
+            int statementLine,
+            int rootLine)
+        {
+            if (statementLine == rootLine)
+            {
+                return "Выражение должно иметь дополнительный перенос строки " +
+                       $"после родителя ({GetNodePosition(root)}).";
+            }
+            if (statementStart <= rootStart)
+            {
+                return "Выражение должно иметь отступ больше, " +
+                       $"чем у родителя ({GetNodePosition(root)}).";
+            }
+            var delta = statementStart - rootStart;
+            if (delta < 4)
+            {
+                return "Выражение должно иметь отступ, не меньше 4 пробелов " +
+                       $"относительно родителя ({GetNodePosition(root)}).";
+            }
+            return null;
         }
 
         private static bool NeedToValidateNonBracesTokens(SyntaxNode syntaxNode)
@@ -194,6 +263,12 @@ namespace uLearn
                    || syntaxKind == SyntaxKind.ForStatement
                    || syntaxKind == SyntaxKind.ForEachStatement
                    || syntaxKind == SyntaxKind.DoStatement;
+        }
+
+        private static string GetNodePosition(SyntaxNodeOrToken nodeOrToken)
+        {
+            var linePosition = nodeOrToken.GetFileLinePositionSpan().StartLinePosition;
+            return $"cтрока {linePosition.Line + 1}, позиция {linePosition.Character}";
         }
 
         private SyntaxToken GetFirstTokenOfCorrectOpenbraceParent(SyntaxToken openbrace)
@@ -252,7 +327,7 @@ namespace uLearn
             return $"строки {Open.GetLine() + 1}, {Close.GetLine() + 1}";
         }
     }
-    
+
     internal class Indent
     {
         public int LengthInSpaces { get; }
