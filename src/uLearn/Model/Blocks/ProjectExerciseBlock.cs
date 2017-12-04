@@ -107,9 +107,6 @@ namespace uLearn.Model.Blocks
 			ExpectedOutput = ExpectedOutput ?? "";
 			ValidatorName = string.Join(" ", LangId, ValidatorName);
 			SlideFolderPath = context.Dir;
-//			var exercisePath = context.Dir.GetSubdirectory(ExerciseDirName).FullName;
-//			if (context.ZippedProjectExercises.Add(exercisePath))
-//				CreateZipForStudent();
 
 			CheckScoringGroup(context.SlideTitle, context.CourseSettings.Scoring);
 			

@@ -45,6 +45,13 @@ namespace uLearn.Model.Blocks
 			return Markdown.RenderMd(sourceFile, baseUrl);
 		}
 
+		/* Replace links to /Exercise/StudentZip: automagically add courseId and slideId */
+		private void ReplaceLinksToStudentZips(string courseId, Guid slideId)
+		{
+			if (! string.IsNullOrEmpty(Markdown))
+				Markdown = Markdown.Replace("(/Exercise/StudentZip)", $"(/Exercise/StudentZip?courseId={courseId}&slideId={slideId})");
+		}
+
 		public override string ToString()
 		{
 			return $"Markdown {Markdown}";
@@ -66,13 +73,6 @@ namespace uLearn.Model.Blocks
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
 			return InnerBlocks?.SelectMany(b => b.BuildUp(context, filesInProgress)) ?? new[] { this };
-		}
-
-		/* Replace links to /Exercise/StudentZip: automagically add courseId and slideId */
-		private void ReplaceLinksToStudentZips(string courseId, Guid slideId)
-		{
-			if (! string.IsNullOrEmpty(Markdown))
-				Markdown = Markdown.Replace("(/Exercise/StudentZip)", $"(/Exercise/StudentZip?courseId={courseId}&slideId={slideId})");
 		}
 
 		public override string TryGetText()

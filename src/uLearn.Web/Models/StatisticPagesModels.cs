@@ -116,12 +116,16 @@ namespace uLearn.Web.Models
 			UserName = user.UserName;
 			UserEmail = user.Email ?? "";
 			UserVisibleName = user.VisibleName ?? "";
+			UserFirstName = user.FirstName ?? "";
+			UserLastName = user.LastName ?? "";
 		}
 
-		public string UserId { get; set; }
-		public string UserVisibleName { get; set; }
-		public string UserName { get; set; }
-		public string UserEmail { get; set; }
+		public string UserId { get; private set; }
+		public string UserVisibleName { get; private set; }
+		public string UserName { get; private set; }
+		public string UserFirstName { get; private set; }
+		public string UserLastName { get; private set; }		
+		public string UserEmail { get; private set; }
 	}
 
 	public class DailyStatistics

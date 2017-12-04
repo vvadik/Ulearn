@@ -57,7 +57,7 @@
 
 	var remains = Model.MaxDropCount - Model.TryNumber + 1;
 	var context = new BlockRenderContext(
-		null,
+		Model.Course,
 		Model.Slide,
 		quizSlide.Info.DirectoryRelativePath,
 		Enumerable.Range(0, Model.Slide.Blocks.Length)
@@ -84,8 +84,8 @@
 		if (Model.ManualQuizCheckQueueItem != null)
 		{
 			@Html.Hidden("id", Model.ManualQuizCheckQueueItem.Id)
-			@Html.Hidden("errorUrl", Url.RouteUrl("Course.SlideById", new { courseId = Model.CourseId, slideId = Model.Slide.Url, CheckQueueItemId = Model.ManualQuizCheckQueueItem.Id, group = Model.GroupsIdsJoined }) + "&error=")
-			@Html.Hidden("nextUrl", Url.Action("ManualQuizCheckingQueue", "Admin", new { courseId = Model.CourseId, group = Model.GroupsIdsJoined }))
+			@Html.Hidden("errorUrl", Url.RouteUrl("Course.SlideById", new { courseId = Model.Course.Id, slideId = Model.Slide.Url, CheckQueueItemId = Model.ManualQuizCheckQueueItem.Id, group = Model.GroupsIdsJoined }) + "&error=")
+			@Html.Hidden("nextUrl", Url.Action("ManualQuizCheckingQueue", "Admin", new { courseId = Model.Course.Id, group = Model.GroupsIdsJoined }))
 		}
 		@SlideHtml.Blocks(context, Html)
 	}
@@ -95,17 +95,17 @@
 		<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
 			@if (Model.QuizState == QuizState.NotPassed)
 			{
-				<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Id', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString) ">Готово!</button>
+				<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.Course.Id', '@Model.Slide.Id', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString) ">Готово!</button>
 			}
 			else if (Model.QuizState == QuizState.WaitForCheck && Model.ManualQuizCheckQueueItem == null)
 			{
-				<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.CourseId', '@Model.Slide.Id', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString) ">Переотправить ответы</button>
+				<button class="btn btn-primary quiz-submit-btn" onclick="submitQuiz('@Model.Course.Id', '@Model.Slide.Id', '@Model.AnswersToQuizes.Count', @Model.IsLtiToString) ">Переотправить ответы</button>
 			}
 			else if (Model.QuizState == QuizState.IsChecking && Model.ManualQuizCheckQueueItem != null)
 			{
 				<input type="submit" class="btn btn-default" form="quiz__score-form" value="Сохранить и вернуться">
 				<input type="submit" class="btn btn-primary" form="quiz__score-form" value="Сохранить и перейти к следующему"
-						data-url="@Url.Action("CheckNextQuizForSlide", "Admin", new { courseId = Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
+						data-url="@Url.Action("CheckNextQuizForSlide", "Admin", new { courseId = Model.Course.Id, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
 						onclick="$('[name=nextUrl]').val($(this).data('url'))">
 			}
 			else if (Model.QuizState == QuizState.Subtotal)
@@ -113,7 +113,7 @@
 				using (Html.BeginForm("DropQuiz", "Quiz"))
 				{
 					<input type="hidden" name="slideId" value="@Model.Slide.Id"/>
-					<input type="hidden" name="courseId" value="@Model.CourseId"/>
+					<input type="hidden" name="courseId" value="@Model.Course.Id"/>
 					<input type="hidden" name="isLti" value="@Model.IsLtiToString">
 					<button class="btn btn-primary" type="submit">Пройти тест ещё раз</button>
 					<small class="quiz__remains">

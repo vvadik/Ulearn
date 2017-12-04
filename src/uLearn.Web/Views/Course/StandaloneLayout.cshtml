@@ -34,8 +34,8 @@
 									? new QuizBlockData(new QuizModel
 									{
 										AnswersToQuizes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<UserQuiz>()),
-									Slide = (QuizSlide)slide
-								}, i, QuizState.Total)
+                                        Slide = (QuizSlide)slide
+                                    }, i, QuizState.Total)
 									: (dynamic)null
 							).ToArray(),
 						false,

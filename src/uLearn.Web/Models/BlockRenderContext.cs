@@ -40,7 +40,7 @@ namespace uLearn.Web.Models
 			bool isManualCheckingReadonly = false, bool defaultProhibitFutherReview = true)
 		{
 			if (blockData.Length != slide.Blocks.Length)
-				throw new ArgumentException("BlockData.Length should be slide.Blocks.Length");
+				throw new ArgumentException("BlockRenderContext(): BlockData.Length should be slide.Blocks.Length");
 			Course = course;
 			Slide = slide;
 			BaseUrl = baseUrl;

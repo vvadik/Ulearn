@@ -127,7 +127,8 @@ namespace uLearn.Web.Controllers
 			visitedUsers = visitedUsers
 				.OrderByDescending(u => visitedSlidesCountByUserAllTime.GetOrDefault(u.UserId, 0))
 				.Take(usersLimit)
-				.OrderBy(u => u.UserVisibleName)
+				.OrderBy(u => u.UserLastName)
+				.ThenBy(u => u.UserVisibleName)
 				.ToList();
 
 			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();

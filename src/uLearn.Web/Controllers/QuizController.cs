@@ -94,10 +94,14 @@ namespace uLearn.Web.Controllers
 			metricSender.SendCount($"quiz.show.{courseId}");
 			metricSender.SendCount($"quiz.show.{courseId}.{slide.Id}");
 
+			var course = courseManager.FindCourse(courseId);
+			if (course == null)
+				return HttpNotFound();
+			
 			if (isGuest)
 			{
 				metricSender.SendCount("quiz.show.to.guest");
-				return PartialView(GuestQuiz(slide, courseId));
+				return PartialView(GuestQuiz(course, slide));
 			}
 			var slideId = slide.Id;
 			var maxDropCount = GetMaxDropCount(courseId, slide);
@@ -125,7 +129,7 @@ namespace uLearn.Web.Controllers
 
 			var model = new QuizModel
 			{
-				CourseId = courseId,
+				Course = course,
 				Slide = slide,
 				QuizState = quizState,
 				TryNumber = tryNumber,
@@ -695,11 +699,11 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("SlideById", "Course", model);
 		}
 
-		private QuizModel GuestQuiz(QuizSlide slide, string courseId)
+		private QuizModel GuestQuiz(Course course, QuizSlide slide)
 		{
 			return new QuizModel
 			{
-				CourseId = courseId,
+				Course = course,
 				Slide = slide,
 				IsGuest = true,
 				QuizState = QuizState.NotPassed

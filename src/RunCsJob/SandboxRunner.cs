@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -213,7 +214,16 @@ namespace RunCsJob
 			finally
 			{
 				if (!sandbox.HasExited)
-					sandbox.Kill();
+				{
+					try
+					{
+						sandbox.Kill();
+					}
+					catch (Win32Exception)
+					{
+						/* Sometimes we can catch Access Denied error because the process is already terminating. It's ok, we don't need to rethrow exception */	
+					}
+				}
 			}
 
 			if (hasOutputLimit)

@@ -163,11 +163,11 @@
 		$courseStatisticsParent.find(filterByUnitAndScoringGroup).toggleClass('in-expanded-scoring-group', isExpanded);
 		$unitTitleTh.toggleClass('in-expanded-scoring-group', $courseStatistics.find('td.in-expanded-scoring-group[data-unit-id="' + unitId + '"]').length > 0);
 		$courseStatisticsParent.toggleClass('with-expanded-scoring-group', $courseStatistics.find('.in-expanded-scoring-group').length > 0);
-	}
+	};
 
 	var toggleUnitScoringGroup = function ($scoringGroupTitle) {
 		callFunctionForPairedCells(_toggleUnitScoringGroup, $scoringGroupTitle);
-	}
+	};
 
 	$courseStatistics.find('.expand-scoring-group__link').click(function(e) {
 		e.preventDefault();
@@ -181,7 +181,7 @@
 			$('.course-statistics__enable-scoring-group__checkbox:checked').attr('disabled', 'disabled');
 		else
 			$('.course-statistics__enable-scoring-group__checkbox').removeAttr('disabled');
-	}
+	};
 
 	$('.course-statistics__enable-scoring-group__checkbox').change(function () {
 		var $self = $(this);
@@ -251,7 +251,7 @@
 			if (groupingFunction) {
 				var valueGroupingFunction = function(element) {
 					return $(groupHeadersByFunctionValue[groupingFunction(element)]).text();
-				}
+				};
 				compare = compareByKeyFunction($firstRow, $secondRow, valueGroupingFunction, 'asc');
 				if (compare !== 0)
 					return compare;
@@ -270,13 +270,15 @@
 		var $tbody = $table.children('tbody');
 		var prevGroupingValue = undefined;
 		var alreadyInsertedRowsIds = [];
+		var rowsToAppend = [];
 		$.each(rows, function (index, row) {
 			var $row = $(row);
 
 			if (groupingFunction) {
 				var currentGroupingValue = groupingFunction($row);
 				if (prevGroupingValue !== currentGroupingValue) {
-					$tbody.append(groupHeadersByFunctionValue[currentGroupingValue]);
+					//$tbody.append(groupHeadersByFunctionValue[currentGroupingValue]);
+                    rowsToAppend.push(groupHeadersByFunctionValue[currentGroupingValue]);
 				}
 				prevGroupingValue = currentGroupingValue;
 			}
@@ -290,15 +292,17 @@
 			}
 			alreadyInsertedRowsIds.push(rowId);
 
-			/* If all ok append row to sorted table and make it visible */
-			$tbody.append(row);
-			$row.show();
+            rowsToAppend.push(row);            
 		});
 
+        /* Append all rows to sorted table and make them visible */		
+		$tbody.append(rowsToAppend);
+		$(rowsToAppend).show();
+        
 		setTimeout(function() {
 			rerenderStickyColumn($courseStatistics, documentHeaderHeight);
 		}, 0);
-	}
+	};
 
 	var getCompareFunction = function(filter, order) {
 		return function ($firstRow, $secondRow) {
@@ -307,11 +311,11 @@
 
 			return compareAsIntsAndStrings(firstValue, secondValue, order);
 		}
-	}
+	};
 
 	var changeOrder = function(order) {
 		return order === 'desc' ? 'asc' : 'desc';
-	}
+	};
 
 	var getSortingFunction = function($th, order) {
 		var unitId = $th.data('unitId');
@@ -322,7 +326,7 @@
 			filter += '[data-slide-id="' + slideId + '"]';
 
 		return getCompareFunction(filter, order);
-	}
+	};
 
 	var getCurrentSortingFunctions = function() {
 		var $oldSortingThs = $courseStatistics.find('thead th[data-sorter="true"].sorted');
@@ -334,7 +338,7 @@
 			return 0;
 		});
 		return $.map($oldSortingThs, function (el) { return getSortingFunction($(el), $(el).data('order')); });
-	}
+	};
 
 	var groupingFunction = function ($row) { return $row.data('group'); };
 
