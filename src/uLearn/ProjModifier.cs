@@ -50,7 +50,7 @@ namespace uLearn
 
 			RemoveCheckingFromCsproj(proj);
 			SetFilepathItemTypeToCompile(proj, userCodeFilepathsOfOtherTasks.Concat(new[] { ex.UserCodeFilePath }));
-			ResolveLinks(proj);
+			ReplaceLinksWithItems(proj);
 			ExcludePaths(proj, toExclude);
 		}
 
@@ -103,7 +103,7 @@ namespace uLearn
 			proj.SetProperty("StartupObject", startupObject);
 			proj.SetProperty("OutputType", "Exe");
 			proj.SetProperty("UseVSHostingProcess", "false");
-			ResolveLinks(proj);
+			ReplaceLinksWithItems(proj);
 			ExcludePaths(proj, excludedPaths);
 		}
 
@@ -113,25 +113,12 @@ namespace uLearn
 			proj.RemoveItems(toRemove);
 		}
 
-		public static void ResolveLinks(Project project)
-		{
-			var files = ReplaceLinksWithItemsCopiedToProjectDir(project);
-			foreach (var file in files)
-			{
-				var dst = Path.Combine(project.DirectoryPath, file.DestinationFile);
-				var src = Path.Combine(project.DirectoryPath, file.SourceFile);
-				var dstDir = Path.GetDirectoryName(dst).EnsureNotNull();
-				Directory.CreateDirectory(dstDir);
-				File.Copy(src, dst, true);
-			}
-		}
-
 		public static void SetBuildEnvironmentOptions(Project proj, BuildEnvironmentOptions options)
 		{
 			proj.SetProperty("TargetFrameworkVersion", options.TargetFrameworkVersion);
 		}
 
-		public static List<FileToCopy> ReplaceLinksWithItemsCopiedToProjectDir(Project project)
+		public static List<FileToCopy> ReplaceLinksWithItemsAndReturnWhatToCopy(Project project)
 		{
 			var linkedItems = (from item in project.Items
 				let meta = item.DirectMetadata.FirstOrDefault(md => md.Name == "Link")
@@ -145,6 +132,11 @@ namespace uLearn
 				link.item.RemoveMetadata("Link");
 			}
 			return copies;
+		}
+
+		public static void ReplaceLinksWithItems(Project project)
+		{
+			ReplaceLinksWithItemsAndReturnWhatToCopy(project);
 		}
 
 		private static string ChangeNameToGitIgnored(string filename)

@@ -9,6 +9,7 @@ using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
 using test;
 using uLearn.Extensions;
+using uLearn.Helpers;
 using uLearn.Model;
 using uLearn.Model.Blocks;
 
@@ -79,19 +80,19 @@ namespace uLearn.CSharp
 			var noExcludedDirs = new string[0];
 
 			var csProjFile = TestsHelper.ProjExerciseFolder.GetFile(TestsHelper.CsProjFilename);
-			ProjModifier.ModifyCsproj(csProjFile, ProjModifier.ResolveLinks);
 
 			new LazilyUpdatingZip(
 					TestsHelper.ProjExerciseFolder,
 					noExcludedDirs,
 					noExcludedFiles,
 					ResolveCsprojLink,
+					ExerciseStudentZipBuilder.ResolveCsprojLinks(csProjFile, ProjectExerciseBlock.BuildingToolsVersion), 
 					zipWithFullProj)
 				.UpdateZip();
 
 			byte[] ResolveCsprojLink(FileInfo file)
 			{
-				return file.Name.Equals(exBlock.CsprojFileName) ? ProjModifier.ModifyCsproj(file, ProjModifier.ResolveLinks) : null;
+				return file.Name.Equals(exBlock.CsprojFileName) ? ProjModifier.ModifyCsproj(file, ProjModifier.ReplaceLinksWithItems) : null;
 			}
 		}
 

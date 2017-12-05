@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Build.Evaluation;
 using uLearn.Extensions;
 using uLearn.Model.Blocks;
 
@@ -25,8 +27,9 @@ namespace uLearn.Helpers
 				block.ExerciseFolder,
 				new[] { "checking", "bin", "obj" },
 				file => NeedExcludeFromStudentZip(block, file),
-				file => ReplaceCsproj(block, file), zipFile);
-			ResolveCsprojLinks(block);
+				file => GetFileContentInStudentZip(block, file),
+				ResolveCsprojLinks(block),
+				zipFile);
 			zip.UpdateZip();
 		}
 		
@@ -42,16 +45,26 @@ namespace uLearn.Helpers
 					block.PathsToExcludeForStudent != null && block.PathsToExcludeForStudent.Any(p => p == filepath);
 		}
 		
-		private static byte[] ReplaceCsproj(ProjectExerciseBlock block, FileInfo file)
+		private static byte[] GetFileContentInStudentZip(ProjectExerciseBlock block, FileInfo file)
 		{
 			if (!file.Name.Equals(block.CsprojFileName, StringComparison.InvariantCultureIgnoreCase))
 				return null;
 			return ProjModifier.ModifyCsproj(file, proj => ProjModifier.PrepareForStudentZip(proj, block));
 		}
-		
-		private static void ResolveCsprojLinks(ProjectExerciseBlock block)
+		public static IEnumerable<FileContent> ResolveCsprojLinks(ProjectExerciseBlock block)
 		{
-			ProjModifier.ModifyCsproj(block.ExerciseFolder.GetFile(block.CsprojFileName), ProjModifier.ResolveLinks);
+			return ResolveCsprojLinks(block.CsprojFile, block.BuildEnvironmentOptions.ToolsVersion);
+		}
+		
+		public static IEnumerable<FileContent> ResolveCsprojLinks(FileInfo csprojFile, string toolsVersion)
+		{
+			var project = new Project(csprojFile.FullName, null, toolsVersion, new ProjectCollection());
+			var filesToCopy = ProjModifier.ReplaceLinksWithItemsAndReturnWhatToCopy(project);
+			foreach (var fileToCopy in filesToCopy)
+			{
+				var fullSourcePath = Path.Combine(project.DirectoryPath, fileToCopy.SourceFile);
+				yield return new FileContent { Path = fileToCopy.DestinationFile, Data = File.ReadAllBytes(fullSourcePath) };
+			}
 		}
 	}
 }

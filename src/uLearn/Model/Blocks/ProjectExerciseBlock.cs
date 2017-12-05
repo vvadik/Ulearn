@@ -9,6 +9,7 @@ using System.Xml.Serialization;
 using Microsoft.Build.Evaluation;
 using RunCsJob.Api;
 using uLearn.Extensions;
+using uLearn.Helpers;
 using uLearn.NUnitTestRunning;
 using uLearn.Properties;
 
@@ -17,6 +18,9 @@ namespace uLearn.Model.Blocks
 	[XmlType("proj-exercise")]
 	public class ProjectExerciseBlock : ExerciseBlock
 	{
+		public const string BuildingTargetFrameworkVersion = "4.7";
+		public const string BuildingToolsVersion = "15.0";
+		
 		public static string SolutionFilepathToUserCodeFilepath(string solutionFilepath)
 		{
 			// cut .solution.cs
@@ -34,8 +38,8 @@ namespace uLearn.Model.Blocks
 			MaxScore = 50;
 			BuildEnvironmentOptions = new BuildEnvironmentOptions
 			{
-				TargetFrameworkVersion = "4.7",
-				ToolsVersion = "15.0",
+				TargetFrameworkVersion = BuildingTargetFrameworkVersion,
+				ToolsVersion = BuildingToolsVersion,
 			};
 		}
 
@@ -128,11 +132,6 @@ namespace uLearn.Model.Blocks
 			StartupObject = useNUnitLauncher ? typeof(NUnitTestRunner).FullName : StartupObject;
 		}
 
-		private void ResolveCsprojLinks()
-		{
-			ProjModifier.ModifyCsproj(ExerciseFolder.GetFile(CsprojFileName), ProjModifier.ResolveLinks);
-		}
-
 		public override string GetSourceCode(string code)
 		{
 			return code;
@@ -161,13 +160,12 @@ namespace uLearn.Model.Blocks
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(new[] { "bin/*", "obj/*" })
 				.ToList();
-			ResolveCsprojLinks();
 
-			var toUpdate = GetAdditionalFiles(code, ExerciseFolder, excluded);
+			var toUpdate = GetAdditionalFiles(code, excluded);
 			return ExerciseFolder.ToZip(excluded, toUpdate);
 		}
 
-		private IEnumerable<FileContent> GetAdditionalFiles(string code, DirectoryInfo exerciseDir, List<string> excluded)
+		private IEnumerable<FileContent> GetAdditionalFiles(string code, List<string> excluded)
 		{
 			yield return new FileContent { Path = UserCodeFilePath, Data = Encoding.UTF8.GetBytes(code) };
 
@@ -176,15 +174,18 @@ namespace uLearn.Model.Blocks
 			yield return new FileContent
 			{
 				Path = CsprojFileName,
-				Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(CsprojFileName), ModifyCsproj(excluded, useNUnitLauncher), toolsVersion: BuildEnvironmentOptions.ToolsVersion)
+				Data = ProjModifier.ModifyCsproj(CsprojFile, ModifyCsproj(excluded, useNUnitLauncher), toolsVersion: BuildEnvironmentOptions.ToolsVersion)
 			};
 
 			if (useNUnitLauncher)
 			{
 				yield return new FileContent { Path = GetNUnitTestRunnerFilename(), Data = CreateTestLauncherFile() };
 			}
+
+			foreach (var fileContent in ExerciseStudentZipBuilder.ResolveCsprojLinks(this))
+				yield return fileContent;
 		}
-		
+	
 		private static string GetNUnitTestRunnerFilename()
 		{
 			return nameof(NUnitTestRunner) + ".cs";

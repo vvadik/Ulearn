@@ -15,18 +15,15 @@ namespace uLearn.Model.Blocks
 		private readonly Func<FileInfo, bool> needExcludeFile;
 		private readonly Func<FileInfo, byte[]> getFileContent;
 		private readonly FileInfo zipFile;
+		private readonly IEnumerable<FileContent> filesToAdd;
 
-		public LazilyUpdatingZip(
-			DirectoryInfo dir,
-			string[] excludedDirs,
-			Func<FileInfo, bool> needExcludeFile,
-			Func<FileInfo, byte[]> getFileContent,
-			FileInfo zipFile)
+		public LazilyUpdatingZip(DirectoryInfo dir, string[] excludedDirs, Func<FileInfo, bool> needExcludeFile, Func<FileInfo, byte[]> getFileContent, IEnumerable<FileContent> filesToAdd, FileInfo zipFile)
 		{
 			this.dir = dir;
 			this.excludedDirs = excludedDirs;
 			this.needExcludeFile = needExcludeFile;
 			this.getFileContent = getFileContent;
+			this.filesToAdd = filesToAdd;
 			this.zipFile = zipFile;
 		}
 
@@ -45,6 +42,8 @@ namespace uLearn.Model.Blocks
 					else
 						zip.AddEntry(f.GetRelativePath(dir.FullName), newContent);
 				}
+				foreach (var fileToAdd in filesToAdd)
+					zip.UpdateEntry(fileToAdd.Path, fileToAdd.Data);
 				zip.Save(zipFile.FullName);
 			}
 		}
