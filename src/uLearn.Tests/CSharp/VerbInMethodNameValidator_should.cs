@@ -14,6 +14,7 @@ namespace uLearn.CSharp
 		[TestCase(@"void SomeMethod(int a){}")]
 		[TestCase(@"void A(string s){}")]
 		[TestCase(@"public int DrawingPriority() => 0;")]
+		[TestCase(@"public int getdrawingpriority() => 0;")]
 		public void warn_method_name_without_verb(string code)
 		{
 			FindErrors(code).Should().NotBeNullOrEmpty();
@@ -23,11 +24,11 @@ namespace uLearn.CSharp
 		[TestCase(@"int GetX(){ return 1; }")]
 		[TestCase(@"bool IsCorrectMethod(){ return true; }")]
 		[TestCase(@"public int GetDrawingPriority() => 0;")]
-		[TestCase(@"public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this); //финализатор не будет вызываться
-        }")]
+		[TestCase(@"public int getDrawingPriority() => 0;")]
+		[TestCase(@"public void Dispose(){}")]
+		[TestCase(@"public int ToInt(){}")]
+		[TestCase(@"public string FromInt(){}")]
+		[TestCase(@"public static void With(){}")]
 		public void ignore_correct_method_name(string code)
 		{
 			FindErrors(code).Should().BeNullOrEmpty();

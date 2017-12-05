@@ -25,16 +25,20 @@ namespace uLearn.CSharp
 		private IEnumerable<string> InspectMethodsNames(MethodDeclarationSyntax methodDeclarationSyntax)
 		{
 			var syntaxToken = methodDeclarationSyntax.Identifier();
-			if (exceptions.Contains(syntaxToken.ValueText))
+			if (exceptionsMethodNames.Contains(syntaxToken.ValueText))
 				yield break;
 
-			var wordsInName = SplitMethodName(syntaxToken.ValueText);
+			var wordsInName = SplitMethodName(syntaxToken.ValueText).ToList();
+
+			if (exceptionsPreposition.Contains(wordsInName.First()))
+				yield break;
 
 			foreach (var word in wordsInName)
 			{
-				if (exceptions.Contains(word) || englishVerbs.Any(x => x.Equals(word, StringComparison.InvariantCultureIgnoreCase)))
+				if (englishVerbs.Any(x => x.Equals(word, StringComparison.InvariantCultureIgnoreCase)))
 					yield break;
 			}
+
 			yield return Report(syntaxToken, "В названии метода отсутствует глагол");
 		}
 
@@ -53,6 +57,7 @@ namespace uLearn.CSharp
 			yield return word;
 		}
 
-		private IEnumerable<string> exceptions = new[] { "Main"};
+		private readonly HashSet<string> exceptionsMethodNames = new HashSet<string>(new[] { "Main" });
+		private readonly HashSet<string> exceptionsPreposition = new HashSet<string>(new[] { "For", "To", "With", "From", "At" });
 	}
 }
