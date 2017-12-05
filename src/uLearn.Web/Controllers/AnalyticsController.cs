@@ -398,13 +398,14 @@ namespace uLearn.Web.Controllers
 			var unitBySlide = course.Units.SelectMany(u => u.Slides.Select(s => Tuple.Create(u.Id, s.Id))).ToDictionary(p => p.Item2, p => p.Item1);
 			var scoringGroups = course.Settings.Scoring.Groups;
 
-			var visitedSlidesCountByUserAllTime = visitsRepo.GetVisitsInPeriod(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(DateTime.MaxValue))
+			var totalScoreByUserAllTime = visitsRepo.GetVisitsInPeriod(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(DateTime.MaxValue))
 				.GroupBy(v => v.UserId)
-				.ToDictionary(g => g.Key, g => g.Count());
+				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score))
+				.ToDefaultDictionary();
 
 			/* Get `usersLimit` best by slides count */
 			visitedUsers = visitedUsers
-				.OrderByDescending(u => visitedSlidesCountByUserAllTime.GetOrDefault(u.UserId, 0))
+				.OrderByDescending(u => totalScoreByUserAllTime[u.UserId])
 				.Take(usersLimit)
 				.ToList();
 			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();

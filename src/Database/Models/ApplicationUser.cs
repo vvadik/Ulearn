@@ -65,5 +65,17 @@ namespace Database.Models
 				return "Пользователь";
 			}
 		}
+
+		public string VisibleNameWithLastNameFirst
+		{
+			get
+			{
+				if (FirstName + LastName != "")
+					return (LastName + " " + FirstName).Trim();
+				if (!string.IsNullOrEmpty(UserName))
+					return UserName.Trim();
+				return "Пользователь";	
+			}
+		}
 	}
 }

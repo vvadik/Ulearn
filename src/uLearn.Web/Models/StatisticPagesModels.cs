@@ -115,7 +115,7 @@ namespace uLearn.Web.Models
 			UserId = user.Id;
 			UserName = user.UserName;
 			UserEmail = user.Email ?? "";
-			UserVisibleName = user.VisibleName ?? "";
+			UserVisibleName = user.VisibleNameWithLastNameFirst ?? "";
 			UserFirstName = user.FirstName ?? "";
 			UserLastName = user.LastName ?? "";
 		}
