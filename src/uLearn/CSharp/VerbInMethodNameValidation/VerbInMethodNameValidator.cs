@@ -30,7 +30,7 @@ namespace uLearn.CSharp
 
 			var wordsInName = SplitMethodName(syntaxToken.ValueText).ToList();
 
-			if (exceptionsPreposition.Contains(wordsInName.First()))
+			if (exceptionsPreposition.Any(x => x.Equals(wordsInName.First(), StringComparison.InvariantCultureIgnoreCase)))
 				yield break;
 
 			foreach (var word in wordsInName)
