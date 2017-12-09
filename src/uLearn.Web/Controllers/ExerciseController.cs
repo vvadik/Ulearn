@@ -396,6 +396,7 @@ namespace uLearn.Web.Controllers
 			return PartialView(model);
 		}
 
+        [System.Web.Mvc.AllowAnonymous]
 		public ActionResult StudentZip(string courseId, Guid slideId)
 		{
 			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId);
