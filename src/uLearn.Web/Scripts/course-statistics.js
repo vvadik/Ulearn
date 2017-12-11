@@ -300,7 +300,7 @@
 		$(rowsToAppend).show();
         
 		setTimeout(function() {
-			rerenderStickyColumn($courseStatistics, documentHeaderHeight);
+            requestAnimationFrame(rerenderStickyColumn($courseStatistics, documentHeaderHeight));
 		}, 0);
 	};
 
