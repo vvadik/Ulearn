@@ -51,6 +51,7 @@ namespace uLearn.Helpers
 				return null;
 			return ProjModifier.ModifyCsproj(file, proj => ProjModifier.PrepareForStudentZip(proj, block));
 		}
+		
 		public static IEnumerable<FileContent> ResolveCsprojLinks(ProjectExerciseBlock block)
 		{
 			return ResolveCsprojLinks(block.CsprojFile, block.BuildEnvironmentOptions.ToolsVersion);

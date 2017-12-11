@@ -46,11 +46,18 @@ namespace uLearn
 			var toExclude = FindItemNames(proj, file => ExerciseStudentZipBuilder.NeedExcludeFromStudentZip(ex, file)).ToList();
 			var solutionsOfOtherTasks = toExclude.Where(n => ExerciseStudentZipBuilder.IsAnySolution(n) && ex.CorrectSolutionPath != n).ToList();
 
-			var userCodeFilepathsOfOtherTasks = solutionsOfOtherTasks.Select(ProjectExerciseBlock.SolutionFilepathToUserCodeFilepath);
-
+			/* Remove StartupObject from csproj: it's not needed in student zip */
+			var startupObject = proj.GetProperty("StartupObject");
+			if (startupObject != null)
+				proj.RemoveProperty(startupObject);
+			
 			RemoveCheckingFromCsproj(proj);
+			
+			var userCodeFilepathsOfOtherTasks = solutionsOfOtherTasks.Select(ProjectExerciseBlock.SolutionFilepathToUserCodeFilepath);
 			SetFilepathItemTypeToCompile(proj, userCodeFilepathsOfOtherTasks.Concat(new[] { ex.UserCodeFilePath }));
+			
 			ReplaceLinksWithItems(proj);
+			
 			ExcludePaths(proj, toExclude);
 		}
 
