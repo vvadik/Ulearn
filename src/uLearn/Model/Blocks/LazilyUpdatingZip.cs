@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Ionic.Zip;
 using Ionic.Zlib;
+using NUnit.Framework;
 using uLearn.Extensions;
 
 namespace uLearn.Model.Blocks
@@ -43,8 +44,23 @@ namespace uLearn.Model.Blocks
 						zip.AddEntry(f.GetRelativePath(dir.FullName), newContent);
 				}
 				foreach (var fileToAdd in filesToAdd)
-					zip.UpdateEntry(fileToAdd.Path, fileToAdd.Data);
+				{
+					var relativePath = new FileInfo(fileToAdd.Path).GetRelativePath(dir.FullName);
+					var directoriesList = GetDirectoriesList(new FileInfo(relativePath));
+					if (!excludedDirs.Intersect(directoriesList).Any())
+						zip.UpdateEntry(fileToAdd.Path, fileToAdd.Data);
+				}
 				zip.Save(zipFile.FullName);
+			}
+		}
+
+		public static IEnumerable<string> GetDirectoriesList(FileInfo file)
+		{
+			var currentDirectory = file.Directory;
+			while (!string.IsNullOrEmpty(currentDirectory?.FullName))
+			{
+				yield return currentDirectory.Name;
+				currentDirectory = currentDirectory.Parent;
 			}
 		}
 
@@ -66,8 +82,22 @@ namespace uLearn.Model.Blocks
 					yield return f;
 			var dirs = aDir.GetDirectories().Where(d => !excludedDirs.Contains(d.Name));
 			foreach (var subdir in dirs)
-			foreach (var f in EnumerateFiles(subdir))
-				yield return f;
+				foreach (var f in EnumerateFiles(subdir))
+					yield return f;
+		}
+	}
+
+	[TestFixture]
+	public class LazilyUpdatingZip_should
+	{
+		[Test]
+		public void TestGetDirectoriesList()
+		{
+			const string fileName = "directory-1/directory-2/subdirectory/file.txt";
+			var directories = LazilyUpdatingZip.GetDirectoriesList(new FileInfo(fileName)).ToList();
+			CollectionAssert.Contains(directories, "directory-1");
+			CollectionAssert.Contains(directories, "directory-2");
+			CollectionAssert.Contains(directories, "subdirectory");
 		}
 	}
 }
