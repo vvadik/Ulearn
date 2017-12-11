@@ -5,21 +5,31 @@
 	var createTableHeaderCopy = function ($table, minTopOffset) {
 		var $thead = $table.find('thead');
 		var $copy = $thead.clone(true, true);
+		
+		var pendingChanges = [];
 		$thead.find('tr').each(function (rowId, tr) {
 			var $rowCopy = $copy.find('tr').eq(rowId);
 			var $thsCopy = $rowCopy.find('th');
 			$(tr).find('th').each(function (cellId, th) {
-				var $th = $(th);
-				var $thCopy = $thsCopy.eq(cellId);
-				var width = $th.outerWidth();
-				
+				var width = th.offsetWidth;
+
 				/* Put equals randomId to cell and it's copy to easy find pair
 				   We use .attr() instead of .data() here because in other case '[data-random-id=1]' will not work */
 				var randomId = Math.floor(Math.random() * 10000000);
-				$th.css({ 'maxWidth': width, 'minWidth': width, 'width': width }).attr('data-random-id', randomId);
-				$thCopy.css({ 'maxWidth': width, 'minWidth': width, 'width': width }).attr('data-random-id', randomId);
+				pendingChanges.push([th, width, randomId]);
+                pendingChanges.push([$thsCopy[cellId], width, randomId]);	
 			});
 		});
+
+		/* Run all changes in DOM as a batch, because we don't want doing relayouting too often */
+		for (var i = 0; i < pendingChanges.length; i++)
+		{
+			var change = pendingChanges[i];
+			var $object = $(change[0]);
+			var width = change[1];
+			var randomId = change[2];
+			$object.css({ 'maxWidth': width, 'minWidth': width, 'width': width }).attr('data-random-id', randomId);
+		}
 
 		/* Add <table></table> tags around copied thead */
 		var $tableForHeader = $('<table></table>')
