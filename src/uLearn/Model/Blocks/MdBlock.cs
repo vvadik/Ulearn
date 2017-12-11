@@ -35,21 +35,20 @@ namespace uLearn.Model.Blocks
 
 		public string RenderMd(string courseId, Guid slideId, string baseUrl)
 		{
-			ReplaceLinksToStudentZips(courseId, slideId);
-			return Markdown.RenderMd(baseUrl);
+			return GetMarkdownWithReplacedLinksToStudentZips(courseId, slideId).RenderMd(baseUrl);
 		}
 		
 		public string RenderMd(string courseId, Guid slideId, FileInfo sourceFile, string baseUrl="")
 		{
-			ReplaceLinksToStudentZips(courseId, slideId);
-			return Markdown.RenderMd(sourceFile, baseUrl);
+			return GetMarkdownWithReplacedLinksToStudentZips(courseId, slideId).RenderMd(sourceFile, baseUrl);
 		}
 
 		/* Replace links to /Exercise/StudentZip: automagically add courseId and slideId */
-		private void ReplaceLinksToStudentZips(string courseId, Guid slideId)
+		private string GetMarkdownWithReplacedLinksToStudentZips(string courseId, Guid slideId)
 		{
-			if (! string.IsNullOrEmpty(Markdown))
-				Markdown = Markdown.Replace("(/Exercise/StudentZip)", $"(/Exercise/StudentZip?courseId={courseId}&slideId={slideId})");
+			if (string.IsNullOrEmpty(Markdown))
+				return "";
+			return Markdown.Replace("(/Exercise/StudentZip)", $"(/Exercise/StudentZip?courseId={courseId}&slideId={slideId})");
 		}
 
 		public override string ToString()
