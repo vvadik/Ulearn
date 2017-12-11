@@ -92,7 +92,7 @@
 
 		$stickyHeader.css('left', $table.position().left - scrollLeft);
 		$stickyColumn.css('top', $tbody.position().top - scrollTop + minTopOffset);
-	}
+	};
 
 	/* Call this function each time when rows order has been changed */
 	var rerenderStickyColumn = function ($table, minTopOffset) {
@@ -104,7 +104,7 @@
 		$('body').append($stickyColumn);
 
 		relocateStickyHeaderAndColumn($table, $stickyHeader, $stickyColumn, minTopOffset);
-	}
+	};
 
 	var rerenderStickyHeaderAndColumn = function ($table, minTopOffset) {
 		if ($stickyHeader)
@@ -115,7 +115,7 @@
 		$('body').append($stickyHeader);
 
 		rerenderStickyColumn($table, minTopOffset);
-	}
+	};
 
 	/* Call func() for this cell and paired cell from sticky header */
 	var callFunctionForPairedCells = function(func, $cell) {
