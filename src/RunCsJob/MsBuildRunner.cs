@@ -36,6 +36,11 @@ namespace RunCsJob
 			var path = Path.Combine(dir.FullName, projectFileName);
 			var project = new Project(path, null, settings.MsBuildToolsVersion, new ProjectCollection());
 			project.SetProperty("CscToolPath", settings.CompilerDirectory.FullName);
+			
+			/* WPF markups should be compiled in separate AppDomain, otherwise MsBuild raise NRE while building:
+			 * https://stackoverflow.com/questions/1552092/microsoft-build-buildengine-engine-throws-error-when-building-wpf-application
+			 */
+			project.SetProperty("AlwaysCompileMarkupFilesInSeparateDomain", "True");
 
 			foreach (var libName in obligatoryLibs)
 			{
