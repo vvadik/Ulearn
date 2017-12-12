@@ -37,7 +37,7 @@ namespace RunCsJob
 			var project = new Project(path, null, settings.MsBuildToolsVersion, new ProjectCollection());
 			project.SetProperty("CscToolPath", settings.CompilerDirectory.FullName);
 			
-			/* WPF markups should be compiled in separate AppDomain, otherwise MsBuild raise NRE while building:
+			/* WPF markups should be compiled in separate AppDomain, otherwise MsBuild raises NRE while building:
 			 * https://stackoverflow.com/questions/1552092/microsoft-build-buildengine-engine-throws-error-when-building-wpf-application
 			 */
 			project.SetProperty("AlwaysCompileMarkupFilesInSeparateDomain", "True");
@@ -78,7 +78,7 @@ namespace RunCsJob
 		private static bool SyncBuild(Project project, ILogger logger)
 		{
 			lock (buildLock)
-				return project.Build(logger);
+				return project.Build("Rebuild", new List<ILogger> { logger });
 		}
 	}
 }
