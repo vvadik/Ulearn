@@ -5,21 +5,31 @@
 	var createTableHeaderCopy = function ($table, minTopOffset) {
 		var $thead = $table.find('thead');
 		var $copy = $thead.clone(true, true);
+		
+		var pendingChanges = [];
 		$thead.find('tr').each(function (rowId, tr) {
 			var $rowCopy = $copy.find('tr').eq(rowId);
 			var $thsCopy = $rowCopy.find('th');
 			$(tr).find('th').each(function (cellId, th) {
-				var $th = $(th);
-				var $thCopy = $thsCopy.eq(cellId);
-				var width = $th.outerWidth();
-				
+				var width = th.offsetWidth;
+
 				/* Put equals randomId to cell and it's copy to easy find pair
 				   We use .attr() instead of .data() here because in other case '[data-random-id=1]' will not work */
 				var randomId = Math.floor(Math.random() * 10000000);
-				$th.css({ 'maxWidth': width, 'minWidth': width, 'width': width }).attr('data-random-id', randomId);
-				$thCopy.css({ 'maxWidth': width, 'minWidth': width, 'width': width }).attr('data-random-id', randomId);
+				pendingChanges.push([th, width, randomId]);
+                pendingChanges.push([$thsCopy[cellId], width, randomId]);	
 			});
 		});
+
+		/* Run all changes in DOM as a batch, because we don't want doing relayouting too often */
+		for (var i = 0; i < pendingChanges.length; i++)
+		{
+			var change = pendingChanges[i];
+			var $object = $(change[0]);
+			var width = change[1];
+			var randomId = change[2];
+			$object.css({ 'maxWidth': width, 'minWidth': width, 'width': width }).attr('data-random-id', randomId);
+		}
 
 		/* Add <table></table> tags around copied thead */
 		var $tableForHeader = $('<table></table>')
@@ -92,7 +102,7 @@
 
 		$stickyHeader.css('left', $table.position().left - scrollLeft);
 		$stickyColumn.css('top', $tbody.position().top - scrollTop + minTopOffset);
-	}
+	};
 
 	/* Call this function each time when rows order has been changed */
 	var rerenderStickyColumn = function ($table, minTopOffset) {
@@ -104,7 +114,7 @@
 		$('body').append($stickyColumn);
 
 		relocateStickyHeaderAndColumn($table, $stickyHeader, $stickyColumn, minTopOffset);
-	}
+	};
 
 	var rerenderStickyHeaderAndColumn = function ($table, minTopOffset) {
 		if ($stickyHeader)
@@ -115,7 +125,7 @@
 		$('body').append($stickyHeader);
 
 		rerenderStickyColumn($table, minTopOffset);
-	}
+	};
 
 	/* Call func() for this cell and paired cell from sticky header */
 	var callFunctionForPairedCells = function(func, $cell) {
@@ -163,11 +173,11 @@
 		$courseStatisticsParent.find(filterByUnitAndScoringGroup).toggleClass('in-expanded-scoring-group', isExpanded);
 		$unitTitleTh.toggleClass('in-expanded-scoring-group', $courseStatistics.find('td.in-expanded-scoring-group[data-unit-id="' + unitId + '"]').length > 0);
 		$courseStatisticsParent.toggleClass('with-expanded-scoring-group', $courseStatistics.find('.in-expanded-scoring-group').length > 0);
-	}
+	};
 
 	var toggleUnitScoringGroup = function ($scoringGroupTitle) {
 		callFunctionForPairedCells(_toggleUnitScoringGroup, $scoringGroupTitle);
-	}
+	};
 
 	$courseStatistics.find('.expand-scoring-group__link').click(function(e) {
 		e.preventDefault();
@@ -181,7 +191,7 @@
 			$('.course-statistics__enable-scoring-group__checkbox:checked').attr('disabled', 'disabled');
 		else
 			$('.course-statistics__enable-scoring-group__checkbox').removeAttr('disabled');
-	}
+	};
 
 	$('.course-statistics__enable-scoring-group__checkbox').change(function () {
 		var $self = $(this);
@@ -251,7 +261,7 @@
 			if (groupingFunction) {
 				var valueGroupingFunction = function(element) {
 					return $(groupHeadersByFunctionValue[groupingFunction(element)]).text();
-				}
+				};
 				compare = compareByKeyFunction($firstRow, $secondRow, valueGroupingFunction, 'asc');
 				if (compare !== 0)
 					return compare;
@@ -270,13 +280,15 @@
 		var $tbody = $table.children('tbody');
 		var prevGroupingValue = undefined;
 		var alreadyInsertedRowsIds = [];
+		var rowsToAppend = [];
 		$.each(rows, function (index, row) {
 			var $row = $(row);
 
 			if (groupingFunction) {
 				var currentGroupingValue = groupingFunction($row);
 				if (prevGroupingValue !== currentGroupingValue) {
-					$tbody.append(groupHeadersByFunctionValue[currentGroupingValue]);
+					//$tbody.append(groupHeadersByFunctionValue[currentGroupingValue]);
+                    rowsToAppend.push(groupHeadersByFunctionValue[currentGroupingValue]);
 				}
 				prevGroupingValue = currentGroupingValue;
 			}
@@ -290,15 +302,17 @@
 			}
 			alreadyInsertedRowsIds.push(rowId);
 
-			/* If all ok append row to sorted table and make it visible */
-			$tbody.append(row);
-			$row.show();
+            rowsToAppend.push(row);            
 		});
 
+        /* Append all rows to sorted table and make them visible */		
+		$tbody.append(rowsToAppend);
+		$(rowsToAppend).show();
+        
 		setTimeout(function() {
-			rerenderStickyColumn($courseStatistics, documentHeaderHeight);
+            requestAnimationFrame(rerenderStickyColumn($courseStatistics, documentHeaderHeight));
 		}, 0);
-	}
+	};
 
 	var getCompareFunction = function(filter, order) {
 		return function ($firstRow, $secondRow) {
@@ -307,11 +321,11 @@
 
 			return compareAsIntsAndStrings(firstValue, secondValue, order);
 		}
-	}
+	};
 
 	var changeOrder = function(order) {
 		return order === 'desc' ? 'asc' : 'desc';
-	}
+	};
 
 	var getSortingFunction = function($th, order) {
 		var unitId = $th.data('unitId');
@@ -322,7 +336,7 @@
 			filter += '[data-slide-id="' + slideId + '"]';
 
 		return getCompareFunction(filter, order);
-	}
+	};
 
 	var getCurrentSortingFunctions = function() {
 		var $oldSortingThs = $courseStatistics.find('thead th[data-sorter="true"].sorted');
@@ -334,7 +348,7 @@
 			return 0;
 		});
 		return $.map($oldSortingThs, function (el) { return getSortingFunction($(el), $(el).data('order')); });
-	}
+	};
 
 	var groupingFunction = function ($row) { return $row.data('group'); };
 

@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using uLearn.Extensions;
 
 namespace uLearn.CourseTool.CmdLineOptions
 {

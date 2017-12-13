@@ -43,6 +43,7 @@ namespace uLearn.Web.Controllers
 		private readonly CertificatesRepo certificatesRepo;
 		private readonly AdditionalScoresRepo additionalScoresRepo;
 		private readonly NotificationsRepo notificationsRepo;
+		private readonly SystemAccessesRepo systemAccessesRepo;
 
 		public AdminController()
 		{
@@ -60,6 +61,7 @@ namespace uLearn.Web.Controllers
 			certificatesRepo = new CertificatesRepo(db, courseManager);
 			additionalScoresRepo = new AdditionalScoresRepo(db);
 			notificationsRepo = new NotificationsRepo(db);
+			systemAccessesRepo = new SystemAccessesRepo(db);
 		}
 
 		public ActionResult CourseList(string courseCreationLastTry = null)
@@ -213,13 +215,17 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult Comments(string courseId)
 		{
+			var userId = User.Identity.GetUserId();			
+			
 			var course = courseManager.GetCourse(courseId);
 			var commentsPolicy = commentsRepo.GetCommentsPolicy(courseId);
 
 			var comments = commentsRepo.GetCourseComments(courseId).OrderByDescending(x => x.PublishTime).ToList();
 			var commentsLikes = commentsRepo.GetCommentsLikesCounts(comments);
-			var commentsLikedByUser = commentsRepo.GetCourseCommentsLikedByUser(courseId, User.Identity.GetUserId());
+			var commentsLikedByUser = commentsRepo.GetCourseCommentsLikedByUser(courseId, userId);
 			var commentsById = comments.ToDictionary(x => x.Id);
+
+			var canViewProfiles = systemAccessesRepo.HasSystemAccess(userId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator();
 
 			return View(new AdminCommentsViewModel
 			{
@@ -243,6 +249,7 @@ namespace uLearn.Web.Controllers
 						ShowContextInformation = true,
 						ContextSlideTitle = slide.Title,
 						ContextParentComment = c.IsTopLevel() ? null : commentsById.ContainsKey(c.ParentCommentId) ? commentsById[c.ParentCommentId].Text : null,
+						CanViewAuthorProfile = canViewProfiles,
 					}).ToList()
 			});
 		}
@@ -373,17 +380,8 @@ namespace uLearn.Web.Controllers
 							message = "already_checked",
 						});
 
-				if (checking.IsLocked && !ignoreLock && !checking.IsLockedBy(User.Identity))
-					return RedirectToAction(actionName,
-						new
-						{
-							courseId = checking.CourseId,
-							group = joinedGroupsIds,
-							done = recheck,
-							message = "locked",
-						});
-
-				await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId());
+				if (! recheck)
+					await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId());
 				transaction.Commit();
 			}
 
@@ -491,14 +489,18 @@ namespace uLearn.Web.Controllers
 					g => g.Select(role => role.Role).Distinct().ToList()
 				);
 
+			var currentUserId = User.Identity.GetUserId();			
+			
 			var isCourseAdmin = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
-			var canAddInstructors = coursesRepo.HasCourseAccess(User.Identity.GetUserId(), courseId, CourseAccessType.AddAndRemoveInstructors);
+			var canAddInstructors = coursesRepo.HasCourseAccess(currentUserId, courseId, CourseAccessType.AddAndRemoveInstructors);
 			var model = new UserListModel
 			{
 				CanToggleRoles = isCourseAdmin || canAddInstructors,
 				ShowDangerEntities = false,
 				Users = new List<UserModel>(),
-				CanViewAndToggleAccesses = isCourseAdmin,
+				CanViewAndToggleCourseAccesses = isCourseAdmin,
+				CanViewAndToogleSystemAccesses = false,
+				CanViewProfiles = systemAccessesRepo.HasSystemAccess(currentUserId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator(),
 			};
 
 			foreach (var userRolesInfo in userRoles)
@@ -833,7 +835,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> UpdateGroupApi(string courseId, int groupId, bool manualChecking, bool manualCheckingForOldSolutions, string name=null)
+		public async Task<ActionResult> UpdateGroupApi(string courseId, int groupId, bool manualChecking, bool manualCheckingForOldSolutions, bool defaultProhibitFutherReview, string name=null)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
 			if (!CanModifyGroup(group) || group.CourseId != courseId)
@@ -846,7 +848,7 @@ namespace uLearn.Web.Controllers
 
 			log.Info($"Обновляю группу «{group.Name}» → «{name}» (Id = {group.Id}) для курса {courseId}");
 
-			await groupsRepo.ModifyGroup(groupId, name, manualChecking, manualCheckingForOldSolutions);
+			await groupsRepo.ModifyGroup(groupId, name, manualChecking, manualCheckingForOldSolutions, defaultProhibitFutherReview);
 
 			var course = courseManager.GetCourse(group.CourseId);
 			await UpdateEnabledScoringGroupsForGroup(course, groupId);
@@ -944,12 +946,12 @@ namespace uLearn.Web.Controllers
 		{
 			var group = groupsRepo.FindGroupById(groupId);
 			if (!CanModifyGroup(group))
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+				return Json(new { status = "error", message = "Вы не можете изменять настройки ссылки для этой группы" });
 
 			log.Info($"В{(isEnabled ? "" : "ы")}ключаю инвайт-ссылку для группы «{group.Name}» (Id = {groupId})");
-			await groupsRepo.EnableGroupInviteLink(groupId, isEnabled);
+			await groupsRepo.EnableInviteLink(groupId, isEnabled);
 
-			return RedirectToAction("Groups", new { courseId = group.CourseId });
+			return Json(new { status = "ok", isEnabled = isEnabled });
 		}
 
 		[HttpPost]
@@ -1026,6 +1028,7 @@ namespace uLearn.Web.Controllers
 			{
 				status = "ok",
 				inviteLink = Url.Action("JoinGroup", "Account", new { hash = group.InviteHash }, Request.GetRealScheme()),
+				isInviteLinkEnabled = group.IsInviteLinkEnabled,
 				accesses = accessesViewModels.Select(model => this.RenderPartialViewToString("_GroupAccess", model)).ToList(),
 				group = new
 				{
@@ -1033,6 +1036,7 @@ namespace uLearn.Web.Controllers
 					isManualCheckingEnabled = group.IsManualCheckingEnabled,
 					isManualCheckingEnabledForOldSolutions = group.IsManualCheckingEnabledForOldSolutions,
 					isInviteLinkEnabled = group.IsInviteLinkEnabled,
+					defaultProhibitFutherReview = group.DefaultProhibitFutherReview,
 				},
 				members = members.Select(model => this.RenderPartialViewToString("_GroupMember", model)).ToList(),
 				enabledScoringGroups = enabledScoringGroups.Select(g => g.ScoringGroupId).ToList(),

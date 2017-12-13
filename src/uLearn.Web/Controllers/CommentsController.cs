@@ -23,15 +23,21 @@ namespace uLearn.Web.Controllers
 		private readonly CommentsRepo commentsRepo;
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly CoursesRepo coursesRepo;
+		private readonly SystemAccessesRepo systemAccessesRepo;		
 		private readonly UserManager<ApplicationUser> userManager;
 
-		public CommentsController()
+		public CommentsController(ULearnDb db)
 		{
-			var db = new ULearnDb();
 			commentsRepo = new CommentsRepo(db);
 			userManager = new ULearnUserManager(db);
 			notificationsRepo = new NotificationsRepo(db);
 			coursesRepo = new CoursesRepo(db);
+			systemAccessesRepo = new SystemAccessesRepo(db);
+		}
+
+		public CommentsController()
+			: this(new ULearnDb())
+		{
 		}
 
 		public ActionResult SlideComments(string courseId, Guid slideId)
@@ -62,6 +68,7 @@ namespace uLearn.Web.Controllers
 			var canSeeNotApprovedComments = canModerateComments;
 
 			var canViewAuthorSubmissions = coursesRepo.HasCourseAccess(userId, courseId, CourseAccessType.ViewAllStudentsSubmissions) || User.HasAccessFor(courseId, CourseRole.CourseAdmin);
+			var canViewProfiles = systemAccessesRepo.HasSystemAccess(userId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator();			
 
 			var model = new SlideCommentsModel
 			{
@@ -78,6 +85,7 @@ namespace uLearn.Web.Controllers
 				CommentsLikedByUser = commentsLikedByUser,
 				CurrentUser = User.Identity.IsAuthenticated ? userManager.FindById(userId) : null,
 				CommentsPolicy = commentsPolicy,
+				CanViewAuthorProfiles = canViewProfiles,
 			};
 			return PartialView(model);
 		}
@@ -324,6 +332,7 @@ namespace uLearn.Web.Controllers
 		public bool CanModerateComments { get; set; }
 		public bool CanSeeNotApprovedComments { get; set; }
 		public bool CanViewAuthorSubmissions { get; set; }
+		public bool CanViewAuthorProfiles { get; set; }
 		public List<Comment> TopLevelComments { get; set; }
 		public Dictionary<int, List<Comment>> CommentsByParent { get; set; }
 		public Dictionary<int, int> CommentsLikesCounts { get; set; }

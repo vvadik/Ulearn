@@ -16,13 +16,13 @@ namespace uLearn
 			if (courseXmls.Count == 1)
 				dir = courseXmls[0].Directory;
 			else
-				dir = dir.HasSubdirectory("Slides") ? dir.Subdirectory("Slides") : dir;
+				dir = dir.HasSubdirectory("Slides") ? dir.GetSubdirectory("Slides") : dir;
 
 			var settings = CourseSettings.Load(dir);
 			if (string.IsNullOrEmpty(settings.Title))
 				settings.Title = GetCourseTitleFromFile(dir);
 
-			var units = LoadUnits(dir, settings).ToList();
+			var units = LoadUnits(dir, settings, courseId).ToList();
 			var slides = units.SelectMany(u => u.Slides).ToList();
 			CheckDuplicateSlideIds(slides);
 			AddDefaultScoringGroupIfNeeded(units, slides, settings);
@@ -61,7 +61,7 @@ namespace uLearn
 			}
 		}
 
-		private static IEnumerable<Unit> LoadUnits(DirectoryInfo dir, CourseSettings settings)
+		private static IEnumerable<Unit> LoadUnits(DirectoryInfo dir, CourseSettings settings, string courseId)
 		{
 			var unitsDirectories = dir.GetDirectories().OrderBy(d => d.Name);
 
@@ -70,7 +70,7 @@ namespace uLearn
 			var slideIndex = 0;
 			foreach (var unitDirectory in unitsDirectories)
 			{
-				var unit = UnitLoader.LoadUnit(unitDirectory, settings, slideIndex);
+				var unit = UnitLoader.LoadUnit(unitDirectory, settings, courseId, slideIndex);
 
 				if (unitsIds.Contains(unit.Id))
 					throw new CourseLoadingException($"Ошибка в курсе \"{settings.Title}\". Повторяющийся идентификатор модуля: {unit.Id}. Идентификаторы модулей должны быть уникальными");

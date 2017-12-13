@@ -36,6 +36,9 @@ namespace Database.Models
 
 		[StringLength(200)]
 		public string TelegramChatTitle { get; set; }
+		
+		[StringLength(200)]
+		public string KonturLogin { get; set; }
 
 		public DateTime? LastConfirmationEmailTime { get; set; }
 
@@ -60,6 +63,18 @@ namespace Database.Models
 				if (!string.IsNullOrEmpty(UserName))
 					return UserName.Trim();
 				return "Пользователь";
+			}
+		}
+
+		public string VisibleNameWithLastNameFirst
+		{
+			get
+			{
+				if (FirstName + LastName != "")
+					return (LastName + " " + FirstName).Trim();
+				if (!string.IsNullOrEmpty(UserName))
+					return UserName.Trim();
+				return "Пользователь";	
 			}
 		}
 	}

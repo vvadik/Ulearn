@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using NHttp;
 using RunCsJob;
 using RunCsJob.Api;
+using uLearn.Extensions;
 using uLearn.Model;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
@@ -142,7 +143,7 @@ namespace uLearn.CourseTool.Monitoring
 		{
 			var lesson = new Lesson(
 				"Новый слайд", 
-				Guid.NewGuid().ToString("N"), 
+				Guid.NewGuid(), 
 				new MdBlock("текст"));
 			return AddNewSlide(context, path, lesson);
 		}

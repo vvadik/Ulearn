@@ -18,7 +18,7 @@ namespace uLearn
 			new QuizSlideLoader()
 		};
 
-		public static Unit LoadUnit(DirectoryInfo unitDir, CourseSettings courseSettings, int firstSlideIndex)
+		public static Unit LoadUnit(DirectoryInfo unitDir, CourseSettings courseSettings, string courseId, int firstSlideIndex)
 		{
 			var unitFile = unitDir.GetFile("Unit.xml");
 			var unitSettings = unitFile.Exists
@@ -30,7 +30,7 @@ namespace uLearn
 			unit.Slides = unitDir.GetFiles()
 				.Where(f => IsSlideFile(f.Name))
 				.OrderBy(f => f.Name)
-				.Select((f, internalIndex) => LoadSlide(f, unit, firstSlideIndex + internalIndex, courseSettings))
+				.Select((f, internalIndex) => LoadSlide(f, unit, firstSlideIndex + internalIndex, courseId, courseSettings))
 				.ToList();
 
 			unit.LoadInstructorNote();
@@ -38,21 +38,21 @@ namespace uLearn
 			return unit;
 		}
 
-		private static Slide LoadSlide(FileInfo file, Unit unit, int slideIndex, CourseSettings courseSettings)
+		private static Slide LoadSlide(FileInfo file, Unit unit, int slideIndex, string courseId, CourseSettings courseSettings)
 		{
 			try
 			{
 				var slideLoader = slideLoaders
 					.FirstOrDefault(loader => file.FullName.EndsWith(loader.Extension, StringComparison.InvariantCultureIgnoreCase));
 				if (slideLoader == null)
-					throw new CourseLoadingException($"Неизвестный формат слайда в файле {file.FullName}");
-				return slideLoader.Load(file, unit, slideIndex, courseSettings);
+					throw new CourseLoadingException($"РќРµРёР·РІРµСЃС‚РЅС‹Р№ С„РѕСЂРјР°С‚ СЃР»Р°Р№РґР° РІ С„Р°Р№Р»Рµ {file.FullName}");
+				return slideLoader.Load(file, unit, slideIndex, courseId, courseSettings);
 			}
 			catch (Exception e)
 			{
 				if (e.GetType().IsSubclassOf(typeof(CourseLoadingException)))
 					throw;
-				throw new CourseLoadingException($"Не могу загрузить слайд из файла {file.FullName}", e);
+				throw new CourseLoadingException($"РќРµ РјРѕРіСѓ Р·Р°РіСЂСѓР·РёС‚СЊ СЃР»Р°Р№Рґ РёР· С„Р°Р№Р»Р° {file.FullName}", e);
 			}
 		}
 

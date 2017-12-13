@@ -17,7 +17,7 @@
 		<div class="col-sm-6">
 			<textarea class="exercise__add-review__comment"></textarea>
 			<span class="with-long-tooltip cursor-pointer" data-toggle="tooltip" data-placement="bottom" title="**жирный текст**, __курсивный текст__, `код`, ```многострочный код```">
-				<span class="fa fa-question-circle"></span>
+                <span class="fa fa-question-circle"></span>
 				Работает форматирование
 			</span>
 			<button class="exercise__add-review__button btn btn-success btn-sm mt10">Сохранить (Ctrl+Enter)</button> 
@@ -42,7 +42,7 @@
 
 			@if (Model.Checking.IsLocked && !Model.Checking.IsLockedBy(User.Identity))
 			{
-				<div class="alert alert-info mt10 ">Эта работа проверяется преподавателем @Model.Checking.LockedBy.VisibleName</div>
+				<div class="alert alert-danger mt10 ">Внимание. Эта работа прямо сейчас проверяется преподавателем @Model.Checking.LockedBy.VisibleName</div>
 			}
 
 			<h4>Оцените работу (максимальный балл @block.MaxReviewScore)</h4>
@@ -72,8 +72,22 @@
 				</div>
 			</div>
 
-			<div class="checkbox checkbox-default">
-				<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" @(Model.Checking.IsChecked && !Model.Checking.ProhibitFurtherManualCheckings ? "" : "checked")/>
+            @{
+                // ReSharper disable ReplaceWithSingleAssignment.True
+	            var prohibitFutherReview = true;
+	            if (Model.Checking.IsChecked && !Model.Checking.ProhibitFurtherManualCheckings)
+	            {
+		            prohibitFutherReview = false;
+	            }
+                if (!Model.Checking.IsChecked && !Model.DefaultProhibitFutherReview)
+	            {
+		            prohibitFutherReview = false;
+	            }
+	            // ReSharper restore ReplaceWithSingleAssignment.True
+            }
+            
+            <div class="checkbox checkbox-default">
+				<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" @(prohibitFutherReview ? "checked" : "")/>
 				<label for="prohibitFurtherReview">
 					Не принимать больше код-ревью у этого студента
 				</label>

@@ -10,7 +10,9 @@ namespace uLearn.Web.Models
 		public Dictionary<string, string> UsersGroups { get; set; }
 		public bool CanToggleRoles { get; set; }
 		public bool ShowDangerEntities { get; set; }
-		public bool CanViewAndToggleAccesses { get; set; }
+		public bool CanViewAndToggleCourseAccesses { get; set; }
+		public bool CanViewAndToogleSystemAccesses { get; set; }
+		public bool CanViewProfiles { get; set; }
 	}
 
 	public class UserModel
@@ -21,6 +23,7 @@ namespace uLearn.Web.Models
 			UserId = userRoles.UserId;
 			UserVisibleName = userRoles.UserVisibleName;
 			CourseAccesses = new DefaultDictionary<string, Dictionary<CourseAccessType, CourseAccessModel>>();
+			SystemAccesses = new Dictionary<SystemAccessType, SystemAccessModel>();
 		}
 
 		public string UserId { get; private set; }
@@ -28,6 +31,7 @@ namespace uLearn.Web.Models
 		public string UserVisibleName { get; private set; }
 		public Dictionary<string, ICoursesRolesListModel> CourseRoles { get; set; }
 		public DefaultDictionary<string, Dictionary<CourseAccessType, CourseAccessModel>> CourseAccesses { get; set; }
+		public Dictionary<SystemAccessType, SystemAccessModel> SystemAccesses { get; set; }
 	}
 
 	public interface ICoursesRolesListModel
@@ -43,6 +47,7 @@ namespace uLearn.Web.Models
 	public class CourseRoleModel
 	{
 		public string CourseId { get; set; }
+		public string CourseTitle { get; set; }
 		public bool HasAccess { get; set; }
 		public string ToggleUrl { get; set; }
 	}
@@ -52,10 +57,19 @@ namespace uLearn.Web.Models
 		public List<CourseRoleModel> CourseRoles { get; set; }
 	}
 
-	public class CourseAccessModel
+
+	public abstract class AccessModel
 	{
-		public string CourseId { get; set; }
 		public bool HasAccess { get; set; }
 		public string ToggleUrl { get; set; }
+	}
+
+	public class CourseAccessModel : AccessModel
+	{
+		public string CourseId { get; set; }
+	}
+
+	public class SystemAccessModel : AccessModel
+	{
 	}
 }

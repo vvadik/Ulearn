@@ -5,6 +5,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
 using Database;
@@ -12,6 +13,7 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
+using Microsoft.Owin.Security.Cookies;
 using uLearn.Extensions;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
@@ -30,8 +32,11 @@ namespace uLearn.Web.Controllers
 		private readonly VisitsRepo visitsRepo;
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly CoursesRepo coursesRepo;
+		private readonly SystemAccessesRepo systemAccessesRepo;
 
 		private readonly string telegramSecret;
+
+		private static readonly List<string> hijackCookies = new List<string> { ".AspNet.ApplicationCookie" };
 
 		public AccountController()
 		{
@@ -41,6 +46,7 @@ namespace uLearn.Web.Controllers
 			visitsRepo = new VisitsRepo(db);
 			notificationsRepo = new NotificationsRepo(db);
 			coursesRepo = new CoursesRepo(db);
+			systemAccessesRepo = new SystemAccessesRepo(db);
 
 			telegramSecret = WebConfigurationManager.AppSettings["ulearn.telegram.webhook.secret"] ?? "";
 		}
@@ -85,15 +91,18 @@ namespace uLearn.Web.Controllers
 			var courses = User.GetControllableCoursesId().ToList();
 			var usersList = users.ToList();
 
+			var currentUserId = User.Identity.GetUserId();
 			var model = new UserListModel
 			{
 				CanToggleRoles = User.HasAccess(CourseRole.CourseAdmin),
 				ShowDangerEntities = User.IsSystemAdministrator(),
 				Users = usersList.Select(user => GetUserModel(user, coursesForUsers, courses)).ToList(),
 				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, usersList.Select(u => u.UserId), User),
-				CanViewAndToggleAccesses = false,
+				CanViewAndToggleCourseAccesses = false,
+				CanViewAndToogleSystemAccesses = User.IsSystemAdministrator(),
+				CanViewProfiles = systemAccessesRepo.HasSystemAccess(currentUserId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator(),
 			};
-
+			
 			return model;
 		}
 
@@ -125,12 +134,26 @@ namespace uLearn.Web.Controllers
 						.Select(s => new CourseRoleModel
 						{
 							CourseId = s,
+							CourseTitle = courseManager.GetCourse(s).Title,
 							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s.ToLower()),
 							ToggleUrl = Url.Action("ToggleRole", new { courseId = s, userId = user.UserId, role })
 						})
+						.OrderBy(s => s.CourseTitle, StringComparer.InvariantCultureIgnoreCase)
 						.ToList()
 				};
 			}
+
+			var systemAccesses = systemAccessesRepo.GetSystemAccesses(user.UserId).Select(a => a.AccessType);
+			user.SystemAccesses = Enum.GetValues(typeof(SystemAccessType))
+				.Cast<SystemAccessType>()
+				.ToDictionary(
+					a => a,
+					a => new SystemAccessModel
+					{
+						HasAccess = systemAccesses.Contains(a),
+						ToggleUrl = Url.Action("ToggleSystemAccess", "Account", new { userId = user.UserId, accessType = a })
+					}
+				);
 
 			return user;
 		}
@@ -244,25 +267,24 @@ namespace uLearn.Web.Controllers
 			return View(new UserCourseModel(course, user, db));
 		}
 
-		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public async Task<ActionResult> Profile(string userId)
 		{
 			var user = usersRepo.FindUserById(userId);
 			if (user == null)
 				return HttpNotFound();
 
-			if (!groupsRepo.CanInstructorViewStudent(User, userId))
+			if (!systemAccessesRepo.HasSystemAccess(User.Identity.GetUserId(), SystemAccessType.ViewAllProfiles) && ! User.IsSystemAdministrator())
 				return HttpNotFound();
 			
 			var logins = await userManager.GetLoginsAsync(userId);
 
-			var userCoursesIds = visitsRepo.GetUserCourses(user.Id);
-			var userCourses = courseManager.GetCourses().Where(c => userCoursesIds.Contains(c.Id)).OrderBy(c => c.Title).ToList();
+			var userCoursesIds = visitsRepo.GetUserCourses(user.Id).Select(s => s.ToLower());
+			var userCourses = courseManager.GetCourses().Where(c => userCoursesIds.Contains(c.Id.ToLower())).OrderBy(c => c.Title).ToList();
 
 			var allCourses = courseManager.GetCourses().ToDictionary(c => c.Id, c => c);
 			var certificates = certificatesRepo.GetUserCertificates(user.Id).OrderBy(c => allCourses.GetOrDefault(c.Template.CourseId)?.Title ?? "<курс удалён>").ToList();
 
-			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User));
+			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10));
 
 			return View(new ProfileModel
 			{
@@ -410,12 +432,15 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("StudentInfo");
 		}
 
-
 		[ChildActionOnly]
 		public ActionResult RemoveAccountList()
 		{
 			var linkedAccounts = userManager.GetLogins(User.Identity.GetUserId());
+			var user = userManager.FindById(User.Identity.GetUserId());
+			
+			ViewBag.User = user;
 			ViewBag.ShowRemoveButton = ControllerUtils.HasPassword(userManager, User) || linkedAccounts.Count > 1;
+			
 			return PartialView("_RemoveAccountPartial", linkedAccounts);
 		}
 
@@ -667,6 +692,66 @@ namespace uLearn.Web.Controllers
 
 			/* If email has been sent less than 1 day ago, show popup. Double popup is disabled via cookies and javascript */
 			return PartialView("EmailIsNotConfirmedPopup", user);
+		}
+
+		[ULearnAuthorize(ShouldBeSysAdmin = true)]
+		[HttpPost]
+		public async Task<ActionResult> ToggleSystemAccess(string userId, SystemAccessType accessType, bool isEnabled)
+		{
+			var currentUserId = User.Identity.GetUserId();
+			if (isEnabled)
+				await systemAccessesRepo.GrantAccess(userId, accessType, currentUserId);
+			else
+				await systemAccessesRepo.RevokeAccess(userId, accessType);
+
+			return Json(new { status = "ok" });
+		}
+
+		[ULearnAuthorize(ShouldBeSysAdmin = true)]
+		[HttpPost]
+		public async Task<ActionResult> Hijack(string userId)
+		{
+			var user = await userManager.FindByIdAsync(userId);
+			if (user == null)
+				return HttpNotFound("User not found");
+			
+			CopyHijackedCookies(HttpContext.Request, HttpContext.Response, s => s, s => s + ".hijack", removeOld: false);
+			await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
+
+			return Redirect("/");
+		}
+		
+		[HttpPost]
+		[AllowAnonymous]
+		public ActionResult ReturnHijack()
+		{
+			CopyHijackedCookies(HttpContext.Request, HttpContext.Response, s => s + ".hijack", s => s, removeOld: true);
+			return Redirect("/");
+		}
+
+		private void CopyHijackedCookies(HttpRequestBase request, HttpResponseBase response, Func<string, string> actualCookie, Func<string, string> newCookie, bool removeOld)
+		{
+			foreach (var cookieName in hijackCookies)
+			{
+				var cookie = request.Cookies.Get(actualCookie(cookieName));
+				if (cookie == null)
+					continue;
+
+				response.Cookies.Add(new HttpCookie(newCookie(cookieName), cookie.Value) { HttpOnly = true });
+				
+				if (removeOld)
+					response.Cookies.Add(new HttpCookie(actualCookie(cookieName), "") { HttpOnly = true, Expires = DateTime.Now.AddDays(-1)});
+			}
+		}
+
+		public static bool IsHijacked(HttpRequest request)
+		{
+			foreach (var cookieName in hijackCookies)
+			{
+				if (request.Cookies.Get(cookieName + ".hijack") != null)
+					return true;
+			}
+			return false;
 		}
 	}
 

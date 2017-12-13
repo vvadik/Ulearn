@@ -1,7 +1,7 @@
-﻿using System.Web.Configuration;
+﻿using System.Configuration;
 using Telegram.Bot;
 
-namespace uLearn.Web.Telegram
+namespace uLearn.Telegram
 {
 	public class TelegramBot
 	{
@@ -11,7 +11,7 @@ namespace uLearn.Web.Telegram
 
 		protected TelegramBot()
 		{
-			token = WebConfigurationManager.AppSettings["ulearn.telegram.botToken"];
+			token = ConfigurationManager.AppSettings["ulearn.telegram.botToken"];
 			telegramClient = new TelegramBotClient(token);
 		}
 

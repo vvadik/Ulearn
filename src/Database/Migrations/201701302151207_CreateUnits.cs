@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Database.DataContexts;
 using uLearn;
+using uLearn.Extensions;
 
 namespace Database.Migrations
 {

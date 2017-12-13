@@ -18,9 +18,16 @@
 			</div>
 		}
 
-		<div>
-			@Model.Access.User.VisibleName
-		</div>
+        <div title="@Model.Access.User.UserName">
+            @if (User.HasSystemAccess(SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator())
+            {
+	            @Html.ActionLink(Model.Access.User.VisibleName, "Profile", "Account", new { userId = Model.Access.User.Id }, new {})
+            }
+            else
+            {
+	            @Model.Access.User.VisibleName
+            }
+        </div>
 		<div class="group__access__role help-block">
 			@if (Model.Access.AccessType == GroupAccessType.Owner)
 			{

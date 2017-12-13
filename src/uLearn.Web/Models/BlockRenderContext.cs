@@ -18,6 +18,7 @@ namespace uLearn.Web.Models
 		public bool RevealHidden { get; private set; }
 		public bool Autoplay { get; private set; }
 		public bool IsManualCheckingReadonly { get; private set; }
+		public bool DefaultProhibitFutherReview { get; set; }
 
 		/* GroupsIds != null if instructor filtered users by group and see their works */
 		public List<string> GroupsIds { get; set; }
@@ -33,10 +34,13 @@ namespace uLearn.Web.Models
 			return BlockData[index];
 		}
 
-		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData, bool isGuest = false, bool revealHidden = false, AbstractManualSlideChecking manualChecking = null, bool canUserFillQuiz = false, List<string> groupsIds = null, bool isLti = false, bool autoplay = false, bool isManualCheckingReadonly = false)
+		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData,
+			bool isGuest = false, bool revealHidden = false, AbstractManualSlideChecking manualChecking = null,
+			bool canUserFillQuiz = false, List<string> groupsIds = null, bool isLti = false, bool autoplay = false,
+			bool isManualCheckingReadonly = false, bool defaultProhibitFutherReview = true)
 		{
 			if (blockData.Length != slide.Blocks.Length)
-				throw new ArgumentException("BlockData.Length should be slide.Blocks.Length");
+				throw new ArgumentException("BlockRenderContext(): BlockData.Length should be slide.Blocks.Length");
 			Course = course;
 			Slide = slide;
 			BaseUrl = baseUrl;
@@ -49,6 +53,7 @@ namespace uLearn.Web.Models
 			IsLti = isLti;
 			Autoplay = autoplay;
 			IsManualCheckingReadonly = isManualCheckingReadonly;
+			DefaultProhibitFutherReview = defaultProhibitFutherReview;
 		}
 	}
 }

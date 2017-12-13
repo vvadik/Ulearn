@@ -5,10 +5,10 @@ using log4net;
 using Metrics;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.ReplyMarkups;
-using uLearn;
+using uLearn.Extensions;
 
 namespace Notifications
 {
@@ -47,9 +47,7 @@ namespace Notifications
 
 			InlineKeyboardMarkup replyMarkup = null;
 			if (button != null)
-				// For new version of Telegram.Bot use:
-				//replyMarkup = new InlineKeyboardMarkup(new[] { InlineKeyboardButton.WithUrl(button.Text, button.Link) });
-				replyMarkup = new InlineKeyboardMarkup(new[] { new InlineKeyboardButton { Text = button.Text, Url = button.Link} });
+				replyMarkup = new InlineKeyboardMarkup(new[] { InlineKeyboardButton.WithUrl(button.Text, button.Link) });
 
 			try
 			{
