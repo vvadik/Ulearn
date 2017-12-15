@@ -13,6 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <CscToolPath>C:\Users\andgein\Documents\Work\ulearn\uLearn\src\RunCsJob\bin\Debug\Microsoft.Net.Compilers.2.4.0</CscToolPath>
+    <AlwaysCompileMarkupFilesInSeparateDomain>True</AlwaysCompileMarkupFilesInSeparateDomain>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
