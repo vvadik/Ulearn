@@ -41,6 +41,11 @@ namespace RunCsJob
 			 * https://stackoverflow.com/questions/1552092/microsoft-build-buildengine-engine-throws-error-when-building-wpf-application
 			 */
 			project.SetProperty("AlwaysCompileMarkupFilesInSeparateDomain", "True");
+			
+			/* We don't know why, but MSBuild on server set BaseIntermediateOutputPath to "\".
+			 * Here we return default value "obj\". 
+			 */
+			project.SetProperty("BaseIntermediateOutputPath", @"obj\");
 
 			foreach (var libName in obligatoryLibs)
 			{
