@@ -12,7 +12,8 @@ namespace uLearn.Telegram
 		protected TelegramBot()
 		{
 			token = ConfigurationManager.AppSettings["ulearn.telegram.botToken"];
-			telegramClient = new TelegramBotClient(token);
+			if (IsBotEnabled)
+				telegramClient = new TelegramBotClient(token);
 		}
 
 		protected bool IsBotEnabled => !string.IsNullOrWhiteSpace(token) && !string.IsNullOrEmpty(channel);
