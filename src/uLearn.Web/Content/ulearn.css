@@ -2119,7 +2119,7 @@ h1 .copy-group-link {
 }
 
 .course-statistics thead th {
-	font-weight: 100;
+	font-weight: 400;
 	font-size: 12px;
 	background-color: #ebf4f9;
 }
@@ -2178,6 +2178,10 @@ h1 .copy-group-link {
 	white-space: nowrap;
 	cursor: pointer;
 	font-weight: 400;
+}
+
+ourse-statistics thead .student-name {
+	cursor: pointer;	
 }
 
 .course-statistics .slide-title {
