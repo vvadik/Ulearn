@@ -228,8 +228,8 @@
 		var secondValueInt = parseInt(secondValue);
 		if (firstValueInt < secondValueInt) return order === 'asc' ? -1 : 1;
 		if (firstValueInt > secondValueInt) return order === 'asc' ? 1 : -1;
-		if (firstValue < secondValue) return order === 'asc' ? -1 : 1;
-		if (firstValue > secondValue) return order === 'asc' ? 1 : -1;
+		if (firstValue.toLowerCase() < secondValue.toLowerCase()) return order === 'asc' ? -1 : 1;
+		if (firstValue.toLowerCase() > secondValue.toLowerCase()) return order === 'asc' ? 1 : -1;
 		return 0;
 	}
 
@@ -310,7 +310,9 @@
 		$(rowsToAppend).show();
         
 		setTimeout(function() {
-            requestAnimationFrame(rerenderStickyColumn($courseStatistics, documentHeaderHeight));
+            requestAnimationFrame(function () {
+            	rerenderStickyColumn($courseStatistics, documentHeaderHeight);
+			});
 		}, 0);
 	};
 
@@ -328,6 +330,11 @@
 	};
 
 	var getSortingFunction = function($th, order) {
+		/* Ordering by name*/
+		if ($th.hasClass('student-name'))
+			return getCompareFunction('.student-name', order);
+		
+		/* Ordering by score */
 		var unitId = $th.data('unitId');
 		var scoringGroupId = $th.data('scoringGroup');
 		var slideId = $th.data('slideId');
