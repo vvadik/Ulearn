@@ -37,7 +37,7 @@ namespace XQueueWatcher
 		{
 			XmlConfigurator.Configure();
 			
-			if (!int.TryParse(ConfigurationManager.AppSettings["ulearn.notifications.keepAlive.interval"], out var keepAliveIntervalSeconds))
+			if (!int.TryParse(ConfigurationManager.AppSettings["ulearn.xqueuewatcher.keepAlive.interval"], out var keepAliveIntervalSeconds))
 				keepAliveIntervalSeconds = 30;
 			var keepAliveInterval = TimeSpan.FromSeconds(keepAliveIntervalSeconds);
 
@@ -78,7 +78,7 @@ namespace XQueueWatcher
 
 		private async Task GetAndProcessSubmissionFromXQueue(Database.Models.XQueueWatcher watcher)
 		{
-			if (!clientsCache.TryGetValue(watcher.Id, out XQueueClient client))
+			if (!clientsCache.TryGetValue(watcher.Id, out var client))
 			{
 				client = new XQueueClient(watcher.BaseUrl, watcher.UserName, watcher.Password);
 
