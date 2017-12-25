@@ -227,6 +227,7 @@
     <Compile Include="CSharp\BoolCompareValidator.cs" />
     <Compile Include="CSharp\IndentsValidator.cs" />
     <Compile Include="CSharp\IStrictValidator.cs" />
+    <Compile Include="CSharp\VerbInMethodNameValidation\NameIgnoreCaseComparer.cs" />
     <Compile Include="CSharp\VerbInMethodNameValidation\VerbInMethodNameValidator.cs" />
     <Compile Include="ExportedSlide.cs" />
     <Compile Include="Extensions\DictionaryExtension.cs" />

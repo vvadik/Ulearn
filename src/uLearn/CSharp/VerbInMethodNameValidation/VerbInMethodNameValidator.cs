@@ -14,7 +14,11 @@ namespace uLearn.CSharp
 		public VerbInMethodNameValidator()
 		{
 			var lines = File.ReadAllLines(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "uLearn\\Csharp\\VerbInMethodNameValidation\\31K verbs.txt"));
-			englishVerbs = new HashSet<string>(lines);
+
+			var nameComparer = new NameIgnoreCaseComparer();
+			exceptionsMethodNames = new HashSet<string>(new[] { "Main" }, nameComparer);
+			exceptionsPreposition = new HashSet<string>(new[] { "For", "To", "With", "From", "At" }, nameComparer);
+			englishVerbs = new HashSet<string>(lines, nameComparer);
 		}
 
 		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
@@ -30,12 +34,12 @@ namespace uLearn.CSharp
 
 			var wordsInName = SplitMethodName(syntaxToken.ValueText).ToList();
 
-			if (exceptionsPreposition.Any(x => x.Equals(wordsInName.First(), StringComparison.InvariantCultureIgnoreCase)))
+			if (exceptionsPreposition.Contains(wordsInName.First()))
 				yield break;
 
 			foreach (var word in wordsInName)
 			{
-				if (englishVerbs.Any(x => x.Equals(word, StringComparison.InvariantCultureIgnoreCase)))
+				if (englishVerbs.Contains(word))
 					yield break;
 			}
 
@@ -57,7 +61,7 @@ namespace uLearn.CSharp
 			yield return word;
 		}
 
-		private readonly HashSet<string> exceptionsMethodNames = new HashSet<string>(new[] { "Main" });
-		private readonly HashSet<string> exceptionsPreposition = new HashSet<string>(new[] { "For", "To", "With", "From", "At" });
+		private readonly HashSet<string> exceptionsMethodNames;
+		private readonly HashSet<string> exceptionsPreposition;
 	}
 }
