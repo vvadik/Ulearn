@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Database;
 using Database.DataContexts;
+using Graphite;
 using log4net;
 using log4net.Config;
 using Metrics;
@@ -36,6 +37,7 @@ namespace XQueueWatcher
 		public void StartXQueueWatchers(CancellationToken cancellationToken)
 		{
 			XmlConfigurator.Configure();
+			StaticMetricsPipeProvider.Instance.Start();
 			
 			if (!int.TryParse(ConfigurationManager.AppSettings["ulearn.xqueuewatcher.keepAlive.interval"], out var keepAliveIntervalSeconds))
 				keepAliveIntervalSeconds = 30;
