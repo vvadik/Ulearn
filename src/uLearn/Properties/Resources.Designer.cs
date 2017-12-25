@@ -19,7 +19,7 @@ namespace uLearn.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -62,34 +62,47 @@ namespace uLearn.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to #IT
-        ///криптоанализ:анализ
+        ///Беллман:артист
+        ///Блэйн:артист
+        ///Бэкона
+        ///Дейкстра:корова
+        ///Джоэл:артист
         ///Диффи
-        ///Хеллман:кран
-        ///криптоалгоритм:алгоритм
-        ///криптостойкий:стойкий
-        ///бóльшая
-        ///майнинг:ринг
-        ///Сатоши
-        ///Накамото
-        ///стегоанализ:анализ
-        ///пиксель:вексель
-        ///биткоин:воин
-        ///очепятки:опечатки
-        ///распознаться:делаться
+        ///Дэвид:артист
+        ///Йетс:артист
+        ///Краскал:артист
         ///Ктулху
-        ///шарп:карп
-        ///проинициализировать:инициализировать
-        ///проинициализироваться:инициализироваться
-        ///проинициализированный:инициализированный
-        ///подмассив:массив
-        ///локаль:тетрадь
-        ///грамма:парта
-        ///биграмма:грамма
-        ///триграмма:грамма
-        ///бэкслеш:марш
-        ///граммный:новый
-        ///чекпоинт:завод
-        ///бинпоиск:поис [rest of string was truncated]&quot;;.
+        ///Левенштейн:артист
+        ///Макконнелл
+        ///Мартин
+        ///Накамото
+        ///Сатоши
+        ///Симан:Риман
+        ///Спольски
+        ///Стив
+        ///Таро
+        ///Тарьян:артист
+        ///Троэлсен
+        ///Фишер:артист
+        ///Хеллман:кран
+        ///Хоар:артист
+        ///Чичиков:артист
+        ///Эванс
+        ///Эванса
+        ///Эвансом
+        ///Эратосфена
+        ///антипаттерн
+        ///апкаст:пласт
+        ///арканоид:завод
+        ///бакет:пакет
+        ///биграмм
+        ///биграмма:кардиограмма
+        ///биграммной
+        ///биграммные
+        ///биграммный:полный
+        ///биграммных
+        ///биндинг:чайник
+        ///бинпоиск:по [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string customDictionary {
             get {
@@ -98,7 +111,8 @@ namespace uLearn.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to авто
+        ///   Looks up a localized string similar to анти
+        ///авто
         ///аква
         ///алко
         ///бух
@@ -117,6 +131,7 @@ namespace uLearn.Properties {
         ///мета
         ///мини
         ///много
+        ///не
         ///от
         ///пере
         ///пост
@@ -142,27 +157,73 @@ namespace uLearn.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Is
+        ///Are
+        ///Africanize
+        ///Africanized
+        ///Africanizes
+        ///Africanizing
+        ///Americanise
+        ///Americanize
+        ///Americanized
+        ///Americanizes
+        ///Americanizing
+        ///Aryanise
+        ///Aryanised
+        ///Aryanises
+        ///Aryanising
+        ///Aryanize
+        ///Aryanized
+        ///Aryanizes
+        ///Aryanizing
+        ///Atticise
+        ///Atticised
+        ///Atticises
+        ///Atticising
+        ///Atticize
+        ///Atticized
+        ///Atticizes
+        ///Atticizing
+        ///Balkanise
+        ///Balkanised
+        ///Balkanises
+        ///Balkanising
+        ///Braille
+        ///Christianise
+        ///Christianised
+        ///Christianises
+        ///Christianising
+        ///Christianize
+        ///Christianized
+        ///Christianizes
+        ///Christianizing
+        ///English
+        ///French-polish
+        ///Frenc [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string englishVerbs {
+            get {
+                return ResourceManager.GetString("englishVerbs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to using System;
         ///using System.Collections.Generic;
         ///using System.Linq;
         ///using System.Reflection;
+        ///using System.Runtime.CompilerServices;
         ///using NUnit.Framework.Api;
         ///using NUnit.Framework.Interfaces;
         ///using NUnit.Framework.Internal.Filters;
         ///
+        ///[assembly: InternalsVisibleTo(&quot;NUnit.Framework&quot;)]
+        ///
         ///namespace uLearn.NUnitTestRunning
         ///{
-        ///	public class NUnitTestRunner
-        ///	{
-        ///		public static void Main()
-        ///		{
-        ///			string[] testClassesToLaunch = { &quot;SHOULD_BE_REPLACED&quot; };
-        ///			RunAllTests(testClassesToLaunch);
-        ///		}
-        ///
-        ///		public static void RunAllTests(params string[] testClassesToLaunch)
-        ///		{
-        ///			var runner = new NUnitTe [rest of string was truncated]&quot;;.
+        ///	/// &lt;summary&gt;
+        ///	/// Этот файл включен в ресурсы и добавляется в пришедший на проверку проект с задачей, если у нее в качестве способа проверки 
+        ///	/// установлен nunit-test-class, [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string NUnitTestRunner {
             get {
