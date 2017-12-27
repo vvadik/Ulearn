@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uLearn", "uLearn\uLearn.csproj", "{333DD5A7-9955-46CB-8905-79E800F2B435}"
 EndProject
@@ -55,6 +55,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stepik.Api", "Stepik.Api\Stepik.Api.csproj", "{0BF85278-186B-4FF1-85A8-74992C7CB7AE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stepik.Api.Tests", "Stepik.Api.Tests\Stepik.Api.Tests.csproj", "{BCDCD865-9A16-4F1A-97F9-C5CD1A2FE51C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GiftsGranter", "GiftsGranter\GiftsGranter.csproj", "{0722E8E2-8A5C-4153-AD61-AEA9474970CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -134,8 +136,15 @@ Global
 		{BCDCD865-9A16-4F1A-97F9-C5CD1A2FE51C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCDCD865-9A16-4F1A-97F9-C5CD1A2FE51C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCDCD865-9A16-4F1A-97F9-C5CD1A2FE51C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0722E8E2-8A5C-4153-AD61-AEA9474970CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0722E8E2-8A5C-4153-AD61-AEA9474970CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0722E8E2-8A5C-4153-AD61-AEA9474970CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0722E8E2-8A5C-4153-AD61-AEA9474970CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E27C085B-2E27-4ECC-BC70-54AF236F5034}
 	EndGlobalSection
 EndGlobal
