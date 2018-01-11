@@ -1,13 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Newtonsoft.Json;
 using Serilog;
 
-namespace AntiPlagiarism.Web.Controllers.ModelBinders
+namespace AntiPlagiarism.Api.ModelBinders
 {
 	public class JsonModelBinder : IModelBinder
 	{
