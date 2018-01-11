@@ -58,6 +58,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stepik.Api.Tests", "Stepik.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GiftsGranter", "GiftsGranter\GiftsGranter.csproj", "{0722E8E2-8A5C-4153-AD61-AEA9474970CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiPlagiarism.Web", "AntiPlagiarism.Web\AntiPlagiarism.Web.csproj", "{A83A0EFD-AA5B-45FC-81D0-E6F64EF61699}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiPlagiarism.Tests", "AntiPlagiarism.Tests\AntiPlagiarism.Tests.csproj", "{E106E0BA-DD9E-476F-A3B5-334C3C4A0BFE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -140,6 +144,14 @@ Global
 		{0722E8E2-8A5C-4153-AD61-AEA9474970CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0722E8E2-8A5C-4153-AD61-AEA9474970CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0722E8E2-8A5C-4153-AD61-AEA9474970CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A83A0EFD-AA5B-45FC-81D0-E6F64EF61699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A83A0EFD-AA5B-45FC-81D0-E6F64EF61699}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A83A0EFD-AA5B-45FC-81D0-E6F64EF61699}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A83A0EFD-AA5B-45FC-81D0-E6F64EF61699}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E106E0BA-DD9E-476F-A3B5-334C3C4A0BFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E106E0BA-DD9E-476F-A3B5-334C3C4A0BFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E106E0BA-DD9E-476F-A3B5-334C3C4A0BFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E106E0BA-DD9E-476F-A3B5-334C3C4A0BFE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
