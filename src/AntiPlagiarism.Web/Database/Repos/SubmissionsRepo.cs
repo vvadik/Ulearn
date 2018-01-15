@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AntiPlagiarism.Api.Models;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +9,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 	public interface ISubmissionsRepo
 	{
 		Task<Submission> GetSubmissionByIdAsync(int submissionId);
-		Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, string code, string additionalInfo="");
+		Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, string additionalInfo="");
 	}
 
 	public class SubmissionsRepo : ISubmissionsRepo
@@ -25,13 +26,14 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return db.Submissions.FirstOrDefaultAsync(s => s.Id == submissionId);
 		}
 
-		public async Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, string code, string additionalInfo="")
+		public async Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, string additionalInfo="")
 		{
 			var submission = new Submission
 			{
 				ClientId = clientId,
 				TaskId = taskId,
 				AuthorId = authorId,
+				Language = language,
 				Program = new Code
 				{
 					Text = code,

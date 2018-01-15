@@ -9,8 +9,10 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
 		public CodePath Path { get; private set; }
 		public List<SyntaxToken> Tokens { get; private set; }
 		public int FirstTokenIndex { get; set; }
-
-		public CodeUnit(CodePath path, IEnumerable<SyntaxToken> tokens, int firstTokenIndex = 0)
+		
+		public int Position => Tokens.FirstOrDefault().SpanStart;
+		
+		public CodeUnit(CodePath path, IEnumerable<SyntaxToken> tokens, int firstTokenIndex=0)
 		{
 			Path = path;
 			Tokens = tokens.ToList();
@@ -20,7 +22,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
 		public override string ToString()
 		{
 			var tokensString = string.Join(" ", Tokens.Select(t => t.ToString()));
-			return $"CodeUnit({tokensString} at {Path}, position {FirstTokenIndex})";
+			return $"CodeUnit({tokensString} at {Path}, position {Position})";
 		}
 	}
 }

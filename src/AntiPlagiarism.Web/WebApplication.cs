@@ -1,4 +1,5 @@
 using System;
+using AntiPlagiarism.Web.Controllers;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.AspNetCore.Builder;
@@ -48,9 +49,13 @@ namespace AntiPlagiarism.Web
                 {
                     var env = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
                     app.UseVostok();
-                    if (env.IsDevelopment())
-                        app.UseDeveloperExceptionPage();
-                    app.UseMvc();
+					if (env.IsDevelopment())
+					{
+						app.UseDeveloperExceptionPage();
+						app.UseBrowserLink();
+					}
+
+					app.UseMvc();
                 })
                 .Build();
         }
@@ -61,6 +66,8 @@ namespace AntiPlagiarism.Web
 				options => options.UseSqlServer(hostingEnvironment.Configuration["database"])
 			);
 			services.AddSingleton(logger);
+
+			services.Configure<AntiPlagiarismConfiguration>(options => hostingEnvironment.Configuration.GetSection("antiplagiarism").Bind(options));
 			
 			/* Database repositories */
 			/* TODO (andgein): make auto-discovering of repositories */

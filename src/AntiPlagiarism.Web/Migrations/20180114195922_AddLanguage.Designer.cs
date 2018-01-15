@@ -13,9 +13,10 @@ using System;
 namespace AntiPlagiarism.Web.Migrations
 {
     [DbContext(typeof(AntiPlagiarismDb))]
-    partial class AntiPlagiarismDbModelSnapshot : ModelSnapshot
+    [Migration("20180114195922_AddLanguage")]
+    partial class AddLanguage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,7 +81,7 @@ namespace AntiPlagiarism.Web.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("FirstTokenIndex");
+                    b.Property<int>("Position");
 
                     b.Property<int>("SnippetId");
 
@@ -90,7 +91,7 @@ namespace AntiPlagiarism.Web.Migrations
 
                     b.HasIndex("SnippetId");
 
-                    b.HasIndex("SubmissionId", "FirstTokenIndex")
+                    b.HasIndex("SubmissionId", "Position")
                         .IsUnique();
 
                     b.ToTable("SnippetsOccurences");

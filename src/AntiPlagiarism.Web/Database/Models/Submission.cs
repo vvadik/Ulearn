@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AntiPlagiarism.Api.Models;
 
 namespace AntiPlagiarism.Web.Database.Models
 {
@@ -27,6 +28,9 @@ namespace AntiPlagiarism.Web.Database.Models
 		
 		[Required]
 		public DateTime AddingTime { get; set; }
+		
+		[Required]
+		public Language Language { get; set; }
 
 		[NotMapped]
 		public string ProgramText => Program.Text;

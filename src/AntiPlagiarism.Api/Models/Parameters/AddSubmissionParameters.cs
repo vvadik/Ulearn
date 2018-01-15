@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace AntiPlagiarism.Api.Models.Parameters
 {
 	[DataContract]
-	public class AddCodeApiParameters : ApiParameters
+	public class AddSubmissionParameters : ApiParameters
 	{
 		[DataMember(Name = "task_id", IsRequired = true)]
 		public Guid TaskId { get; set; }
@@ -14,6 +14,9 @@ namespace AntiPlagiarism.Api.Models.Parameters
 		
 		[DataMember(Name = "code", IsRequired = true)]
 		public string Code { get; set; }
+		
+		[DataMember(Name = "language", IsRequired = true)]
+		public Language Language { get; set; }
 		
 		[DataMember(Name = "additional_info")]
 		public string AdditionalInfo { get; set; }

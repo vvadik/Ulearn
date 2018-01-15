@@ -19,7 +19,7 @@ namespace AntiPlagiarism.Web.Database
 				.IsUnique();
 
 			modelBuilder.Entity<SnippetOccurence>()
-				.HasIndex(c => new { c.SubmissionId, c.Position })
+				.HasIndex(c => new { c.SubmissionId, c.FirstTokenIndex })
 				.IsUnique();
 
 			modelBuilder.Entity<Snippet>()

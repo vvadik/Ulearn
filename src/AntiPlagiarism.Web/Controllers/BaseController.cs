@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Net;
+using System.Threading.Tasks;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -13,14 +15,20 @@ namespace AntiPlagiarism.Web.Controllers
 	public abstract class BaseController : Controller
 	{
 		protected readonly ILogger logger;
+		//private readonly IConfiguration configuration;
+		
+		//protected readonly AntiPlagiarismConfiguration ApplicationConfiguration = new AntiPlagiarismConfiguration();
+		
 		protected Client client;
 
 		protected BaseController(ILogger logger)
 		{
 			this.logger = logger;
+			//this.configuration = configuration;
+			//configuration.GetSection("antiplagiarism").Bind(ApplicationConfiguration);
 		}
-		
-		public override void OnActionExecuting(ActionExecutingContext context)
+
+		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
 		{
 			/* TODO (andgein): bad code, losing DI greats */
 			var clientsRepo = context.HttpContext.RequestServices.GetService<IClientsRepo>();
@@ -37,7 +45,6 @@ namespace AntiPlagiarism.Web.Controllers
 				});
 				return;
 			}
-			logger.Information($"Token = {token}");
 			if (! Guid.TryParse(token, out var tokenGuid))
 			{
 				context.HttpContext.Response.StatusCode = (int) HttpStatusCode.Forbidden;
@@ -50,7 +57,8 @@ namespace AntiPlagiarism.Web.Controllers
 				return;
 			}
 			
-			client = clientsRepo.FindClientByTokenAsync(tokenGuid).Result;
+			logger.Debug($"Token in request is {token}", token);			
+			client = await clientsRepo.FindClientByTokenAsync(tokenGuid);
 			if (client == null)
 			{
 				context.HttpContext.Response.StatusCode = (int) HttpStatusCode.Forbidden;
@@ -63,8 +71,12 @@ namespace AntiPlagiarism.Web.Controllers
 				return;
 			}
 
-			base.OnActionExecuting(context);
+			await base.OnActionExecutionAsync(context, next);
 		}
+	}
 
+	public class AntiPlagiarismConfiguration
+	{
+		public int SnippetTokensCount { get; set; }
 	}
 }

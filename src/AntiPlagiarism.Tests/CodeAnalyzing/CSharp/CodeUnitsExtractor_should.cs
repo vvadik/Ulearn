@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
 
 namespace AntiPlagiarism.Tests.CodeAnalyzing.CSharp
@@ -13,21 +10,6 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.CSharp
 	public class CodeUnitsExtractor_should
 	{
 		private CodeUnitsExtractor extractor;
-
-		private const string program = @"using System;
-using System.Collections;
-using System.Linq;
-using System.Text;
-
-namespace HelloWorld.Namespace
-{
-	class Program
-	{
-		static void Main(){ Console.WriteLine(""A"");}
-
-		static int A { get { return 2; } set { Console.WriteLine(value); }}
-	}
-}";
 
 		[SetUp]
 		public void SetUp()
@@ -38,8 +20,7 @@ namespace HelloWorld.Namespace
 		[Test]
 		public void TestExtract()
 		{
-			
-			var codeUnits = extractor.Extract(program);
+			var codeUnits = extractor.Extract(TestData.SimpleProgramWithMethodAndProperty);
 			
 			Assert.AreEqual(3, codeUnits.Count);
 			CollectionAssert.AreEqual(new List<int> { 31, 45, 51 }, codeUnits.Select(u => u.FirstTokenIndex));
@@ -64,7 +45,7 @@ namespace HelloWorld.Namespace
 		[Test]
 		public void TestGetNodeName()
 		{
-			var syntaxTree = CSharpSyntaxTree.ParseText(program);
+			var syntaxTree = CSharpSyntaxTree.ParseText(TestData.SimpleProgramWithMethodAndProperty);
 			var syntaxTreeRoot = syntaxTree.GetRoot();
 			
 			Assert.AreEqual("ROOT", CodeUnitsExtractor.GetNodeName(syntaxTreeRoot));

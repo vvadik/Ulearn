@@ -4,7 +4,6 @@ using System.Linq;
 using AntiPlagiarism.Web.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
 
 namespace AntiPlagiarism.Tests.Extensions
@@ -12,25 +11,10 @@ namespace AntiPlagiarism.Tests.Extensions
 	[TestFixture]
 	public class SyntaxNodeExtensions_should
 	{
-		private const string program = @"using System;
-using System.Collections;
-using System.Linq;
-using System.Text;
-
-namespace HelloWorld.Namespace
-{
-	class Program
-	{
-		static void Main(){ Console.WriteLine(""A"");}
-
-		static int A { get { return 2; } set { Console.WriteLine(value); }}
-	}
-}";
-		
 		[Test]
 		public void TestGetTokens()
 		{
-			var syntaxTree = CSharpSyntaxTree.ParseText(program);
+			var syntaxTree = CSharpSyntaxTree.ParseText(TestData.SimpleProgramWithMethodAndProperty);
 			var syntaxTreeRoot = syntaxTree.GetRoot();
 			var tokens = syntaxTreeRoot.GetTokens().ToList();
 			

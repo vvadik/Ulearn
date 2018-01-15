@@ -22,10 +22,12 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
 				t => t.Item.SpanStart,
 				t => t.Index
 			);
-			
+
 			foreach (var unit in codeUnits)
+			{
 				unit.FirstTokenIndex = tokenIndexByPosition[unit.Tokens[0].SpanStart];
-			
+			}
+
 			return codeUnits;
 		}
 		

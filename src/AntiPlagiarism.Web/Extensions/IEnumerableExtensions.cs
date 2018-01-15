@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace AntiPlagiarism.Web.Extensions
 {
@@ -12,6 +12,11 @@ namespace AntiPlagiarism.Web.Extensions
 			foreach (var element in collection)
 				yield return new ItemWithIndex<T>(element, index++);
 		}
+		
+		public static string Join(this IEnumerable<object> collection, string separator)
+		{
+			return string.Join(separator, collection.Select(o => o.ToString()));
+		}
 	}
 
 	public class ItemWithIndex<T>
@@ -23,6 +28,12 @@ namespace AntiPlagiarism.Web.Extensions
 		{
 			Item = item;
 			Index = index;
+		}
+
+		public void Deconstruct(out int index, out T item)
+		{
+			index = Index;
+			item = Item;
 		}
 	}
 }

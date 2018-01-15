@@ -10,8 +10,8 @@ namespace AntiPlagiarism.Web.Database.Repos
 	{
 		Task<Snippet> AddSnippetAsync(int tokensCount, SnippetType type, int hash);
 		Task<bool> IsSnippetExistsAsync(int tokensCount, SnippetType type, int hash);
-		Task<SnippetOccurence> AddSnippetOccurence(int submissionId, int snippetId, int position);
-		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmission(int submissionId);
+		Task<SnippetOccurence> AddSnippetOccurenceAsync(int submissionId, Snippet snippet, int firstTokenIndex);
+		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(int submissionId);
 	}
 
 	public class SnippetsRepo : ISnippetsRepo
@@ -41,27 +41,43 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return db.Snippets.AnyAsync(s => s.TokensCount == tokensCount && s.SnippetType == type && s.Hash == hash);
 		}
 
-		public async Task<SnippetOccurence> AddSnippetOccurence(int submissionId, int snippetId, int position)
+		public async Task<SnippetOccurence> AddSnippetOccurenceAsync(int submissionId, Snippet snippet, int firstTokenIndex)
 		{
+			var foundSnippet = await GetOrAddSnippetAsync(snippet);
 			var snippetOccurence = new SnippetOccurence
 			{
 				SubmissionId = submissionId,
-				SnippetId = snippetId,
-				Position = position,
+				Snippet = foundSnippet,
+				FirstTokenIndex = firstTokenIndex,
 			};
 			await db.SnippetsOccurences.AddAsync(snippetOccurence);
 			await db.SaveChangesAsync();
 			return snippetOccurence;
 		}
 
-		public Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmission(int submissionId)
+		private async Task<Snippet> GetOrAddSnippetAsync(Snippet snippet)
+		{
+			var foundSnippet = await db.Snippets.SingleOrDefaultAsync(
+				s => s.SnippetType == snippet.SnippetType
+					&& s.TokensCount == snippet.TokensCount
+					&& s.Hash == snippet.Hash
+			);
+			if (foundSnippet != null)
+				return foundSnippet;
+			
+			await db.Snippets.AddAsync(snippet);
+			await db.SaveChangesAsync();
+			return snippet;
+		}
+
+		public Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(int submissionId)
 		{
 			return db.SnippetsOccurences.Where(o => o.SubmissionId == submissionId).ToListAsync();
 		}
 
 		public async Task<List<Snippet>> GetSnippetsForSubmission(int submissionId)
 		{
-			return (await GetSnippetsOccurencesForSubmission(submissionId)).Select(o => o.Snippet).ToList();
+			return (await GetSnippetsOccurencesForSubmissionAsync(submissionId)).Select(o => o.Snippet).ToList();
 		}
 	}
 }

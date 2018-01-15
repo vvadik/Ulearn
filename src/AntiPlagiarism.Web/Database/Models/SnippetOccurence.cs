@@ -15,6 +15,6 @@ namespace AntiPlagiarism.Web.Database.Models
 		public int SnippetId { get; set; }
 		public virtual Snippet Snippet { get; set; }
 		
-		public int Position { get; set; }
+		public int FirstTokenIndex { get; set; }
 	}
 }

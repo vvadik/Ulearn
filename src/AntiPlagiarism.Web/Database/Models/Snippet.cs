@@ -23,5 +23,10 @@ namespace AntiPlagiarism.Web.Database.Models
 		
 		[Required]
 		public int Hash { get; set; }
+
+		public override string ToString()
+		{
+			return $"SnippetWith{SnippetType.ToString()}(Hash={Hash}, TokensCount={TokensCount})";
+		}
 	}
 }

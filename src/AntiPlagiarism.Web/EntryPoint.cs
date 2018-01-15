@@ -22,7 +22,7 @@ namespace AntiPlagiarism.Web
                 {
                     configurationBuilder.AddCommandLine(args);
                     configurationBuilder.AddEnvironmentVariables();
-                    configurationBuilder.AddJsonFile("appsettings.json");
+                    configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
                 })
                 .ConfigureHost((context, hostConfigurator) =>
                 {
