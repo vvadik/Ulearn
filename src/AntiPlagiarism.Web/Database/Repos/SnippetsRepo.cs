@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +14,8 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<bool> IsSnippetExistsAsync(int tokensCount, SnippetType type, int hash);
 		Task<SnippetOccurence> AddSnippetOccurenceAsync(int submissionId, Snippet snippet, int firstTokenIndex);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(int submissionId);
+		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId);
+		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId, Expression<Func<SnippetOccurence, bool>> filterFunction);
 	}
 
 	public class SnippetsRepo : ISnippetsRepo
@@ -57,22 +61,37 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		private async Task<Snippet> GetOrAddSnippetAsync(Snippet snippet)
 		{
-			var foundSnippet = await db.Snippets.SingleOrDefaultAsync(
-				s => s.SnippetType == snippet.SnippetType
-					&& s.TokensCount == snippet.TokensCount
-					&& s.Hash == snippet.Hash
-			);
-			if (foundSnippet != null)
-				return foundSnippet;
-			
-			await db.Snippets.AddAsync(snippet);
-			await db.SaveChangesAsync();
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				var foundSnippet = await db.Snippets.SingleOrDefaultAsync(
+					s => s.SnippetType == snippet.SnippetType
+						&& s.TokensCount == snippet.TokensCount
+						&& s.Hash == snippet.Hash
+				);
+				if (foundSnippet != null)
+					return foundSnippet;
+
+				await db.Snippets.AddAsync(snippet);
+				await db.SaveChangesAsync();
+				transaction.Commit();
+			}
+
 			return snippet;
 		}
 
 		public Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(int submissionId)
 		{
-			return db.SnippetsOccurences.Where(o => o.SubmissionId == submissionId).ToListAsync();
+			return db.SnippetsOccurences.Include(o => o.Snippet).Where(o => o.SubmissionId == submissionId).ToListAsync();
+		}
+
+		public Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId)
+		{
+			return GetSnippetsOccurencesAsync(snippetId, o => true);
+		}
+
+		public Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId, Expression<Func<SnippetOccurence, bool>> filterFunction)
+		{
+			return db.SnippetsOccurences.Include(o => o.Submission).Where(o => o.SnippetId == snippetId).ToListAsync();
 		}
 
 		public async Task<List<Snippet>> GetSnippetsForSubmission(int submissionId)

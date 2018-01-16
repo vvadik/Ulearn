@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AntiPlagiarism.Api.Models;
 using AntiPlagiarism.Web.Database.Models;
@@ -9,6 +11,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 	public interface ISubmissionsRepo
 	{
 		Task<Submission> GetSubmissionByIdAsync(int submissionId);
+		Task<List<Submission>> GetSubmissionsByIdsAsync(IEnumerable<int> submissionIds);
 		Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, string additionalInfo="");
 	}
 
@@ -23,7 +26,12 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		public Task<Submission> GetSubmissionByIdAsync(int submissionId)
 		{
-			return db.Submissions.FirstOrDefaultAsync(s => s.Id == submissionId);
+			return db.Submissions.Include(s => s.Program).FirstOrDefaultAsync(s => s.Id == submissionId);
+		}
+		
+		public Task<List<Submission>> GetSubmissionsByIdsAsync(IEnumerable<int> submissionIds)
+		{
+			return db.Submissions.Include(s => s.Program).Where(s => submissionIds.Contains(s.Id)).ToListAsync();
 		}
 
 		public async Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, string additionalInfo="")
