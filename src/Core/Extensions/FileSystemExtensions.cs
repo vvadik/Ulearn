@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.VisualBasic.FileIO;
 using Newtonsoft.Json.Serialization;
-using SearchOption = Microsoft.VisualBasic.FileIO.SearchOption;
+using NUnit.Framework;
 
 namespace uLearn.Extensions
 {
@@ -56,7 +55,7 @@ namespace uLearn.Extensions
 
 		public static IEnumerable<string> GetRelativePathsOfFiles(this DirectoryInfo dir)
 		{
-			return FileSystem.GetFiles(dir.FullName, SearchOption.SearchAllSubDirectories)
+			return Directory.EnumerateFiles(dir.FullName, "*", SearchOption.AllDirectories)
 				.Select(path => new FileInfo(path))
 				.Select(fi => fi.GetRelativePath(dir.FullName));
 		}
