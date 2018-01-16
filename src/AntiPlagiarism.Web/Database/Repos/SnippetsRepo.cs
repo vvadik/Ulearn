@@ -91,7 +91,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		public Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId, Expression<Func<SnippetOccurence, bool>> filterFunction)
 		{
-			return db.SnippetsOccurences.Include(o => o.Submission).Where(o => o.SnippetId == snippetId).ToListAsync();
+			return db.SnippetsOccurences.Include(o => o.Submission).Where(o => o.SnippetId == snippetId).Where(filterFunction).ToListAsync();
 		}
 
 		public async Task<List<Snippet>> GetSnippetsForSubmission(int submissionId)
