@@ -70,6 +70,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ulearn.CSharpAttributes.Core", "Ulearn.CSharpAttributes.Core\Ulearn.CSharpAttributes.Core.csproj", "{08396F5C-2A03-43CB-83AF-7167E6B0331F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database.Core", "Database.Core\Database.Core.csproj", "{62A04F90-888F-42A6-BD35-48FAA260574E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -176,6 +178,10 @@ Global
 		{08396F5C-2A03-43CB-83AF-7167E6B0331F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08396F5C-2A03-43CB-83AF-7167E6B0331F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08396F5C-2A03-43CB-83AF-7167E6B0331F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62A04F90-888F-42A6-BD35-48FAA260574E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62A04F90-888F-42A6-BD35-48FAA260574E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62A04F90-888F-42A6-BD35-48FAA260574E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62A04F90-888F-42A6-BD35-48FAA260574E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

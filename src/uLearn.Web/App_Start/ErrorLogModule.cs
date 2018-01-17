@@ -41,7 +41,7 @@ namespace uLearn.Web
 				error.Exception);
 
 			if (!IsErrorIgnoredForTelegramChannel(error))
-				errorsBot.PostToChannel(entryId, error);
+				errorsBot.PostToChannel(entryId, error.Exception);
 		}
 	}
 }

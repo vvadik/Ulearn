@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Microsoft.Build.Evaluation;
-using RunCsJob.Api.Core;
+using RunCsJob.Api;
 using uLearn.Extensions;
 using uLearn.Helpers;
 using uLearn.NUnitTestRunning;

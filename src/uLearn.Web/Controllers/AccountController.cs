@@ -187,14 +187,14 @@ namespace uLearn.Web.Controllers
 
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> ToggleSystemRole(string userId, string role)
+		public ActionResult ToggleSystemRole(string userId, string role)
 		{
 			if (userId == User.Identity.GetUserId())
 				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 			if (userManager.IsInRole(userId, role))
-				await userManager.RemoveFromRoleAsync(userId, role);
+				userManager.RemoveFromRole(userId, role);
 			else
-				await userManager.AddToRolesAsync(userId, role);
+				userManager.AddToRole(userId, role);
 			return Content(role);
 		}
 

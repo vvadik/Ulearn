@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using log4net;
 using Telegram.Bot.Types.Enums;
+using uLearn.Configuration;
 using uLearn.Extensions;
 
 namespace uLearn.Telegram
@@ -12,7 +13,8 @@ namespace uLearn.Telegram
 
 		public ErrorsBot()
 		{
-			channel = ConfigurationManager.AppSettings["ulearn.telegram.errors.channel"];
+			//channel = ConfigurationManager.AppSettings["ulearn.telegram.errors.channel"];
+			channel = ApplicationConfiguration.Read<UlearnConfiguration>().Telegram.Errors.Channel;
 		}
 
 		public async Task PostToChannelAsync(string message, ParseMode parseMode = ParseMode.Default)

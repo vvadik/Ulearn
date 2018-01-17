@@ -112,5 +112,8 @@ namespace uLearn
 		{
 			return HostingEnvironment.ApplicationPhysicalPath ?? @"..\";
 		}
+
+		/* Don't used, for compability with .net core port */
+		public static string WebApplicationPhysicalPath { get; set; }
 	}
 }

@@ -3,7 +3,6 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Xml.Serialization;
 using RunCsJob.Api;
-using RunCsJob.Api.Core;
 using uLearn.Extensions;
 
 namespace uLearn.Model.Blocks

@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Configuration;
 using System.IO;
 using log4net;
+using uLearn.Configuration;
 using uLearn.Extensions;
 
 namespace uLearn.Helpers
@@ -10,14 +10,21 @@ namespace uLearn.Helpers
 	{
 		public bool IsEnabled { get; private set; }
 
-		private static ILog log = LogManager.GetLogger(typeof(ExerciseStudentZipsCache)); 
+		private static readonly ILog log = LogManager.GetLogger(typeof(ExerciseStudentZipsCache)); 
 		
 		private readonly DirectoryInfo cacheDirectory;
 		private readonly ExerciseStudentZipBuilder builder;
+		private static readonly UlearnConfiguration configuration;
 
+		static ExerciseStudentZipsCache()
+		{
+			configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+		}
+		
 		public ExerciseStudentZipsCache()
 		{
-			IsEnabled = Convert.ToBoolean(ConfigurationManager.AppSettings["ulearn.buildExerciseStudentZips"] ?? "false");
+			//IsEnabled = Convert.ToBoolean(ConfigurationManager.AppSettings["ulearn.buildExerciseStudentZips"] ?? "false");
+			IsEnabled = configuration.BuildExerciseStudentZips;
 
 			if (IsEnabled)
 			{
@@ -29,7 +36,8 @@ namespace uLearn.Helpers
 
 		private static DirectoryInfo GetCacheDirectory()
 		{
-			var directory = ConfigurationManager.AppSettings["ulearn.exerciseStudentZipsDirectory"] ?? "";
+			//var directory = ConfigurationManager.AppSettings["ulearn.exerciseStudentZipsDirectory"] ?? "";
+			var directory = configuration.ExerciseStudentZipsDirectory;
 			if (!string.IsNullOrEmpty(directory))
 				return new DirectoryInfo(directory);
 

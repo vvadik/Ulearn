@@ -1211,6 +1211,10 @@
     <EmbeddedResource Include="Microsoft.Owin.Security.VK\Resources.resx" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{803c067a-5553-467d-9470-116fe2430255}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Database\Database.csproj">
       <Project>{95510835-0b21-4d99-a4d2-b8fc87761a3c}</Project>
       <Name>Database</Name>
@@ -1219,17 +1223,13 @@
       <Project>{6BF55402-68F0-4BA3-9F03-E42C3912C9CA}</Project>
       <Name>Metrics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
-      <Project>{26580595-F4DC-41EE-BA66-0EF4692243AF}</Project>
-      <Name>RunCsJob.Api</Name>
+    <ProjectReference Include="..\RunCsJob.Api.Core\RunCsJob.Api.Core.csproj">
+      <Project>{b7df3fa1-307f-4f9a-87f0-b0faa9d2ce8c}</Project>
+      <Name>RunCsJob.Api.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Stepik.Api\Stepik.Api.csproj">
       <Project>{0BF85278-186B-4FF1-85A8-74992C7CB7AE}</Project>
       <Name>Stepik.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\uLearn\uLearn.csproj">
-      <Project>{333dd5a7-9955-46cb-8905-79e800f2b435}</Project>
-      <Name>uLearn</Name>
     </ProjectReference>
     <ProjectReference Include="..\XQueue\XQueue.csproj">
       <Project>{4b227920-6eb6-476f-95c7-1cdbe02dae3f}</Project>

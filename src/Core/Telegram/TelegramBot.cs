@@ -1,5 +1,6 @@
-﻿using System.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Telegram.Bot;
+using uLearn.Configuration;
 
 namespace uLearn.Telegram
 {
@@ -11,7 +12,8 @@ namespace uLearn.Telegram
 
 		protected TelegramBot()
 		{
-			token = ConfigurationManager.AppSettings["ulearn.telegram.botToken"];
+			token = ApplicationConfiguration.Read<UlearnConfiguration>().Telegram.BotToken;
+			// token = ConfigurationManager.AppSettings["ulearn.telegram.botToken"];
 			if (! string.IsNullOrEmpty(token))
 				telegramClient = new TelegramBotClient(token);
 		}

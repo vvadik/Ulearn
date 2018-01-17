@@ -835,13 +835,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
-      <Project>{26580595-F4DC-41EE-BA66-0EF4692243AF}</Project>
-      <Name>RunCsJob.Api</Name>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{803c067a-5553-467d-9470-116fe2430255}</Project>
+      <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\uLearn\uLearn.csproj">
-      <Project>{333DD5A7-9955-46CB-8905-79E800F2B435}</Project>
-      <Name>uLearn</Name>
+    <ProjectReference Include="..\RunCsJob.Api.Core\RunCsJob.Api.Core.csproj">
+      <Project>{b7df3fa1-307f-4f9a-87f0-b0faa9d2ce8c}</Project>
+      <Name>RunCsJob.Api.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

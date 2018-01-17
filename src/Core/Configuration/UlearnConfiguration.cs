@@ -1,0 +1,53 @@
+﻿using System.Collections.Generic;
+using System.IO;
+using Microsoft.Extensions.Configuration;
+
+namespace uLearn.Configuration
+{
+	public static class ApplicationConfiguration
+	{
+		public static T Read<T>(IDictionary<string, string> initialData) where T : AbstractConfiguration
+		{
+			var configuration = new ConfigurationBuilder()
+				.AddInMemoryCollection(initialData)
+				.SetBasePath(Directory.GetCurrentDirectory())
+				.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+				.Build();
+			
+			return configuration.Get<T>();
+		}
+		
+		public static T Read<T>() where T : AbstractConfiguration
+		{
+			return Read<T>(new Dictionary<string, string>());
+		}
+	}
+	
+	public abstract class AbstractConfiguration
+	{
+		 
+	}
+	
+	public class UlearnConfiguration : AbstractConfiguration
+	{
+		public TelegramConfiguration Telegram { get; set; }
+		
+		public string CoursesDirectory { get; set; }
+		
+		public bool BuildExerciseStudentZips { get; set; }
+		
+		public string ExerciseStudentZipsDirectory { get; set; }
+	}
+
+	public class TelegramConfiguration
+	{
+		public string BotToken { get; set; }
+		
+		public ErrorsTelegramConfiguration Errors { get; set; }
+	}
+
+	public class ErrorsTelegramConfiguration
+	{
+		public string Channel { get; set; }
+	}
+}

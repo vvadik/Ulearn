@@ -15,6 +15,7 @@ using System.Xml.XPath;
 using JetBrains.Annotations;
 using log4net;
 using Telegram.Bot.Types.Enums;
+using uLearn.Configuration;
 using uLearn.Extensions;
 using uLearn.Helpers;
 using uLearn.Model.Blocks;
@@ -519,7 +520,8 @@ namespace uLearn
 
 		public static DirectoryInfo GetCoursesDirectory()
 		{
-			var coursesDirectory = ConfigurationManager.AppSettings["ulearn.coursesDirectory"];
+			// var coursesDirectory = ConfigurationManager.AppSettings["ulearn.coursesDirectory"];
+			var coursesDirectory = ApplicationConfiguration.Read<UlearnConfiguration>().CoursesDirectory;
 			if (string.IsNullOrEmpty(coursesDirectory))
 				coursesDirectory = Utils.GetAppPath() + @"\..\Courses\";
 
