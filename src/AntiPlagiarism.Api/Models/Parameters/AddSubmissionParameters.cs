@@ -20,9 +20,9 @@ namespace AntiPlagiarism.Api.Models.Parameters
 		
 		[DataMember(Name = "language", IsRequired = true)]
 		public Language Language { get; set; }
-		
+
 		[DataMember(Name = "additional_info")]
-		public string AdditionalInfo { get; set; }
+		public string AdditionalInfo { get; set; } = "";
 
 		public override string ToString()
 		{

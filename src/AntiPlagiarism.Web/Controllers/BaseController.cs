@@ -78,5 +78,6 @@ namespace AntiPlagiarism.Web.Controllers
 	public class AntiPlagiarismConfiguration
 	{
 		public int SnippetTokensCount { get; set; }
+		public int MaxCodeLength { get; set; }
 	}
 }

@@ -22,6 +22,8 @@ namespace AntiPlagiarism.Web.Controllers
 	{
 		private readonly ISubmissionsRepo submissionsRepo;
 		private readonly ISnippetsRepo snippetsRepo;
+		private readonly ITasksRepo tasksRepo;
+		private readonly StatisticsParametersFinder statisticsParametersFinder;
 		private readonly AntiPlagiarismConfiguration configuration;
 
 		private readonly CodeUnitsExtractor codeUnitsExtractor = new CodeUnitsExtractor();
@@ -33,11 +35,17 @@ namespace AntiPlagiarism.Web.Controllers
 			new TokensKindsAndValuesConverter(),
 		};
 
-		public ApiController(ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ILogger logger, IOptions<AntiPlagiarismConfiguration> configuration)
+		public ApiController(
+			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo,
+			StatisticsParametersFinder statisticsParametersFinder,
+			ILogger logger,
+			IOptions<AntiPlagiarismConfiguration> configuration)
 			: base(logger)
 		{
 			this.submissionsRepo = submissionsRepo;
 			this.snippetsRepo = snippetsRepo;
+			this.tasksRepo = tasksRepo;
+			this.statisticsParametersFinder = statisticsParametersFinder;
 			this.configuration = configuration.Value;
 		}
 		
@@ -46,18 +54,23 @@ namespace AntiPlagiarism.Web.Controllers
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
-			
+
+			if (parameters.Code.Length > configuration.MaxCodeLength)
+				return Json(ApiError.Create($"Code is too long. Maximum length is {configuration.MaxCodeLength} bytes"));
+
+			var tokensCount = GetTokensCount(parameters.Code);
 			var submission = await submissionsRepo.AddSubmissionAsync(
 				client.Id,
 				parameters.TaskId,
 				parameters.AuthorId,
 				parameters.Language,
 				parameters.Code,
+				tokensCount,
 				parameters.AdditionalInfo
 			);
 
 			logger.Information(
-				"Added new submission {submissionId} by task {taskId}, author {authorId}, language {language}, additional info {additionalInfo}",
+				"Добавляю новое решение {submissionId} по задаче {taskId}, автор {authorId}, язык {language}, доп. информация {additionalInfo}",
 				submission.Id,
 				parameters.TaskId,
 				parameters.AuthorId,
@@ -66,11 +79,18 @@ namespace AntiPlagiarism.Web.Controllers
 				);
 
 			await ExtractSnippetsFromSubmission(submission);
+			await CalculateTaskStatisticsParametersAsync(submission.TaskId);
 			
 			return Json(new AddSubmissionResult
 			{
 				SubmissionId = submission.Id,
 			});
+		}
+
+		private int GetTokensCount(string code)
+		{
+			var codeUnits = codeUnitsExtractor.Extract(code);
+			return codeUnits.Select(u => u.Tokens.Count).Sum();
 		}
 
 		[HttpGet("GetPlagiarisms")]
@@ -92,8 +112,11 @@ namespace AntiPlagiarism.Web.Controllers
 			{
 				var otherOccurences = await snippetsRepo.GetSnippetsOccurencesAsync(
 					snippetOccurence.SnippetId,
-					/* Filter only snippet occurences in submissions BY THIS client, THIS task and NOT BY THIS author */
-					o => o.Submission.ClientId == submission.ClientId && o.Submission.TaskId == submission.TaskId && o.Submission.AuthorId != submission.AuthorId
+					/* Filter only snippet occurences in submissions BY THIS client, THIS task, THIS language and NOT BY THIS author */
+					o => o.Submission.ClientId == submission.ClientId &&
+						o.Submission.TaskId == submission.TaskId &&
+						o.Submission.Language == submission.Language &&
+						o.Submission.AuthorId != submission.AuthorId
 				);
 
 				var snippetType = snippetOccurence.Snippet.SnippetType;
@@ -153,7 +176,7 @@ namespace AntiPlagiarism.Web.Controllers
 
 		private async Task ExtractSnippetsFromSubmission(Submission submission)
 		{
-			logger.Information("Extracting snippets from submission {submissionId}, snippet tokens count = {tokensCount}", submission.Id, configuration.SnippetTokensCount);
+			logger.Information("Достаю сниппеты из решения {submissionId}, длина сниппетов: {tokensCount} токенов", submission.Id, configuration.SnippetTokensCount);
 			var codeUnits = codeUnitsExtractor.Extract(submission.ProgramText);
 			foreach (var codeUnit in codeUnits)
 			{
@@ -166,7 +189,17 @@ namespace AntiPlagiarism.Web.Controllers
 					}
 				}
 			}
-			
+		}
+		
+		public async Task CalculateTaskStatisticsParametersAsync(Guid taskId)
+		{
+			/* TODO (andgein): move number 100 to config */
+			var lastAuthorsIds = await submissionsRepo.GetLastAuthorsByTaskAsync(taskId, 100);
+			var lastSubmissions = await submissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(taskId, lastAuthorsIds);
+
+			var statisticsParameters = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions);
+			statisticsParameters.TaskId = taskId;
+			await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters);
 		}
 	}
 }

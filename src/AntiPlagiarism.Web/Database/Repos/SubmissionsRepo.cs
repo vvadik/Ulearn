@@ -12,7 +12,9 @@ namespace AntiPlagiarism.Web.Database.Repos
 	{
 		Task<Submission> GetSubmissionByIdAsync(int submissionId);
 		Task<List<Submission>> GetSubmissionsByIdsAsync(IEnumerable<int> submissionIds);
-		Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, string additionalInfo="");
+		Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo);
+		Task<List<Guid>> GetLastAuthorsByTaskAsync(Guid taskId, int count);
+		Task<List<Submission>> GetLastSubmissionsByAuthorsForTaskAsync(Guid taskId, IEnumerable<Guid> authorsIds);
 	}
 
 	public class SubmissionsRepo : ISubmissionsRepo
@@ -34,7 +36,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return db.Submissions.Include(s => s.Program).Where(s => submissionIds.Contains(s.Id)).ToListAsync();
 		}
 
-		public async Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, string additionalInfo="")
+		public async Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo="")
 		{
 			var submission = new Submission
 			{
@@ -46,6 +48,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 				{
 					Text = code,
 				},
+				TokensCount = tokensCount,
 				AdditionalInfo = additionalInfo,
 				AddingTime = DateTime.Now,
 			};
@@ -54,6 +57,26 @@ namespace AntiPlagiarism.Web.Database.Repos
 			await db.SaveChangesAsync();
 
 			return submission;
+		}
+
+		public Task<List<Guid>> GetLastAuthorsByTaskAsync(Guid taskId, int count)
+		{
+			return db.Submissions
+				.OrderByDescending(s => s.Id)
+				.Where(s => s.TaskId == taskId)
+				.Select(s => s.AuthorId)
+				.Distinct()
+				.Take(count)
+				.ToListAsync();
+		}
+
+		public async Task<List<Submission>> GetLastSubmissionsByAuthorsForTaskAsync(Guid taskId, IEnumerable<Guid> authorsIds)
+		{
+			var lastSubmissionByAuthor = await db.Submissions
+				.Where(s => s.TaskId == taskId && authorsIds.Contains(s.AuthorId))
+				.GroupBy(s => s.AuthorId)
+				.ToDictionaryAsync(g => g.Key, g => g.Last());
+			return lastSubmissionByAuthor.Values.ToList();
 		}
 	}
 }

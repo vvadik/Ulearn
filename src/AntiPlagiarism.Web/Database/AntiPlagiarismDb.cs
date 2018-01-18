@@ -29,7 +29,11 @@ namespace AntiPlagiarism.Web.Database
 			var submissionEntityBuilder = modelBuilder.Entity<Submission>();
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AuthorId });
+		}
 
+		public void MigrateToLatestVersion()
+		{
+			Database.Migrate();
 		}
 
 		public DbSet<Client> Clients { get; set; }
@@ -37,5 +41,6 @@ namespace AntiPlagiarism.Web.Database
 		public DbSet<Code> Codes { get; set; }
 		public DbSet<Snippet> Snippets { get; set; }
 		public DbSet<SnippetOccurence> SnippetsOccurences { get; set; }
+		public DbSet<TaskStatisticsParameters> TasksStatisticsParameters { get; set; }
 	}
 }
