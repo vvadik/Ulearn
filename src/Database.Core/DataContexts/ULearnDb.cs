@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Configuration;
 using System.Data.Entity.Validation;
@@ -20,6 +21,11 @@ namespace Database.DataContexts
 			: base("DefaultConnection", throwIfV1Schema: false)
 		{
 			System.Data.Entity.Database.SetInitializer(new MigrateDatabaseToLatestVersion<ULearnDb, Configuration>());
+		}
+
+		public ULearnDb(DbContextOptions<ULearnDb> options)
+			: base(options)
+		{
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -117,39 +123,27 @@ namespace Database.DataContexts
 		/* Construct easy understandable message on DbEntityValidationException */
 		public override int SaveChanges()
 		{
-			try
-			{
-				return base.SaveChanges();
-			}
-			catch (DbEntityValidationException ex)
-			{
-				throw GetDbEntityValidationExceptionWithDetails(ex);
-			}
+			ValidateChanges();
+			return base.SaveChanges();
 		}
 
 		public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = new CancellationToken())
 		{
-			try
-			{
-				return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-			}
-			catch (DbEntityValidationException ex)
-			{
-				throw GetDbEntityValidationExceptionWithDetails(ex);
-			}
+			ValidateChanges();
+			return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
 		}
 
-		private static DbEntityValidationException GetDbEntityValidationExceptionWithDetails(DbEntityValidationException ex)
+		private void ValidateChanges()
 		{
-			var errorMessages = ex.EntityValidationErrors
-				.SelectMany(x => x.ValidationErrors)
-				.Select(x => x.ErrorMessage);
-
-			var fullErrorMessage = string.Join("; ", errorMessages);
-			var exceptionMessage = string.Concat(ex.Message, " The validation errors are: ", fullErrorMessage);
-
-			// Returns a new DbEntityValidationException with the improved exception message.
-			return new DbEntityValidationException(exceptionMessage, ex.EntityValidationErrors);
+			var entities = from e in ChangeTracker.Entries()
+				where e.State == EntityState.Added
+					|| e.State == EntityState.Modified
+				select e.Entity;
+			foreach (var entity in entities)
+			{
+				var validationContext = new ValidationContext(entity);
+				Validator.ValidateObject(entity, validationContext);
+			}
 		}
 
 		public DbSet<UserQuestion> UserQuestions { get; set; }

@@ -10,8 +10,10 @@ using Database.Models;
 using Ionic.Zip;
 using log4net;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using uLearn;
+using uLearn.Configuration;
 using uLearn.Extensions;
 
 namespace Database.DataContexts
@@ -24,6 +26,7 @@ namespace Database.DataContexts
 		private readonly UserQuizzesRepo userQuizzesRepo;
 		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
+		private readonly UlearnConfiguration configuration;
 
 		private static readonly ILog log = LogManager.GetLogger(typeof(CertificatesRepo));
 
@@ -43,13 +46,17 @@ namespace Database.DataContexts
 			"exercises.accepted",
 		};
 
-		public CertificatesRepo(ULearnDb db, CourseManager courseManager)
+		public CertificatesRepo(
+			ULearnDb db,
+			VisitsRepo visitsRepo, UserQuizzesRepo userQuizzesRepo, UserSolutionsRepo userSolutionsRepo, SlideCheckingsRepo slideCheckingsRepo,
+			IOptions<UlearnConfiguration> configuration)
 		{
 			this.db = db;
-			visitsRepo = new VisitsRepo(db);
-			userQuizzesRepo = new UserQuizzesRepo(db);
-			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
-			slideCheckingsRepo = new SlideCheckingsRepo(db);
+			this.visitsRepo = visitsRepo;
+			this.userQuizzesRepo = userQuizzesRepo;
+			this.userSolutionsRepo = userSolutionsRepo;
+			this.slideCheckingsRepo = slideCheckingsRepo;
+			this.configuration = configuration.Value;
 		}
 
 		public List<CertificateTemplate> GetTemplates(string courseId)
@@ -142,9 +149,10 @@ namespace Database.DataContexts
 			return GetTemplateArchivePath(template.ArchiveName);
 		}
 
-		private static DirectoryInfo GetCertificatesDirectory()
+		private DirectoryInfo GetCertificatesDirectory()
 		{
-			var certificatesDirectory = ConfigurationManager.AppSettings["ulearn.certificatesDirectory"];
+			// var certificatesDirectory = ConfigurationManager.AppSettings["ulearn.certificatesDirectory"];
+			var certificatesDirectory = configuration.Certificates.Directory;
 			if (string.IsNullOrEmpty(certificatesDirectory))
 				certificatesDirectory = Path.Combine(Utils.GetAppPath(), "Certificates");
 

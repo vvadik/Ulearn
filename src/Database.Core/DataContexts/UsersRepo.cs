@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using EntityFramework.Functions;
 using JetBrains.Annotations;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using uLearn;
 using uLearn.Helpers;
 
@@ -32,7 +30,7 @@ namespace Database.DataContexts
 		}
 
 		/* Pass limit=0 to disable limiting */
-		public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager, int limit=100)
+		public Task<List<UserRolesInfo>> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager, int limit=100)
 		{
 			var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
 			IQueryable<ApplicationUser> users = db.Users;
@@ -51,7 +49,7 @@ namespace Database.DataContexts
 		}
 
 		/* Pass limit=0 to disable limiting */
-		public List<UserRolesInfo> GetCourseInstructors(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
+		public Task<List<UserRolesInfo>> GetCourseInstructors(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
 		{
 			return db.Users
 				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, courseId, includeHighRoles: true))
@@ -59,7 +57,7 @@ namespace Database.DataContexts
 		}
 
 		/* Pass limit=0 to disable limiting */
-		public List<UserRolesInfo> GetCourseAdmins(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
+		public Task<List<UserRolesInfo>> GetCourseAdmins(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
 		{
 			return db.Users
 				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, courseId, includeHighRoles: true))

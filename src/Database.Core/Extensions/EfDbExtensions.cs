@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Data.Entity;
 using System.Linq;
 using Database.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Database.Extensions
 {

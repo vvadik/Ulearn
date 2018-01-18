@@ -10,10 +10,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using ApprovalUtilities.Utilities;
 using Database.Models;
 using EntityFramework.Functions;
 using log4net;
+using Microsoft.EntityFrameworkCore;
 using RunCsJob.Api;
 using uLearn;
 using uLearn.Extensions;
@@ -32,12 +34,15 @@ namespace Database.DataContexts
 		private static readonly ConcurrentDictionary<int, DateTime> handledSubmissions = new ConcurrentDictionary<int, DateTime>();
 		private static readonly TimeSpan handleTimeout = TimeSpan.FromMinutes(3);
 
-		public UserSolutionsRepo(ULearnDb db, CourseManager courseManager)
+		public UserSolutionsRepo(
+			ULearnDb db,
+			TextsRepo textsRepo, VisitsRepo visitsRepo, 
+			CourseManager courseManager)
 		{
 			this.db = db;
+			this.textsRepo = textsRepo;
+			this.visitsRepo = visitsRepo;
 			this.courseManager = courseManager;
-			textsRepo = new TextsRepo(db);
-			visitsRepo = new VisitsRepo(db);
 		}
 
 		public async Task<UserExerciseSubmission> AddUserExerciseSubmission(
@@ -84,18 +89,7 @@ namespace Database.DataContexts
 
 			db.UserExerciseSubmissions.Add(submission);
 
-			try
-			{
-				await db.SaveChangesAsync();
-			}
-			catch (DbEntityValidationException e)
-			{
-				log.Error(e);
-				throw new Exception(
-					string.Join("\r\n",
-						e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
-			}
-
+			await db.SaveChangesAsync();
 			return submission;
 		}
 
@@ -330,9 +324,8 @@ namespace Database.DataContexts
 				db.ObjectContext().AcceptAllChanges();
 			}
 
-			DateTime value;
 			foreach (var submission in submissions)
-				unhandledSubmissions.TryRemove(submission.Id, out value);
+				unhandledSubmissions.TryRemove(submission.Id, out _);
 
 			return submissions;
 		}
@@ -352,11 +345,11 @@ namespace Database.DataContexts
 			return db.UserExerciseSubmissions.Where(c => checkingsIds.Contains(c.Id.ToString())).ToList();
 		}
 
-		private void UpdateIsRightAnswerForSubmission(AutomaticExerciseChecking checking)
+		private async Task UpdateIsRightAnswerForSubmission(AutomaticExerciseChecking checking)
 		{
-			db.UserExerciseSubmissions
+			await db.UserExerciseSubmissions
 				.Where(s => s.AutomaticCheckingId == checking.Id)
-				.ForEach(s => s.AutomaticCheckingIsRightAnswer = checking.IsRightAnswer);
+				.ForEachAsync(s => s.AutomaticCheckingIsRightAnswer = checking.IsRightAnswer);
 		}
 
 		protected async Task SaveAll(IEnumerable<AutomaticExerciseChecking> checkings)
@@ -365,18 +358,9 @@ namespace Database.DataContexts
 			{
 				log.Info($"Обновляю статус автоматической проверки #{checking.Id}: {checking.Status}");
 				db.AutomaticExerciseCheckings.AddOrUpdate(checking);
-				UpdateIsRightAnswerForSubmission(checking);
+				await UpdateIsRightAnswerForSubmission(checking);
 			}
-			try
-			{
-				await db.ObjectContext().SaveChangesAsync(SaveOptions.DetectChangesBeforeSave);
-			}
-			catch (DbEntityValidationException e)
-			{
-				throw new Exception(
-					string.Join("\r\n",
-						e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
-			}
+			await db.ObjectContext().SaveChangesAsync(SaveOptions.DetectChangesBeforeSave);
 		}
 
 		public async Task SaveResults(List<RunningResults> results)
@@ -508,8 +492,7 @@ namespace Database.DataContexts
 			{
 				if (handledSubmissions.ContainsKey(submissionId))
 				{
-					DateTime value;
-					handledSubmissions.TryRemove(submissionId, out value);
+					handledSubmissions.TryRemove(submissionId, out _);
 					return;
 				}
 				await Task.Delay(TimeSpan.FromMilliseconds(100));
@@ -527,8 +510,7 @@ namespace Database.DataContexts
 		{
 			foreach (var key in dictionary.Keys)
 			{
-				DateTime value;
-				if (dictionary.TryGetValue(key, out value) && value < timeout)
+				if (dictionary.TryGetValue(key, out var value) && value < timeout)
 					dictionary.TryRemove(key, out value);
 			}
 		}

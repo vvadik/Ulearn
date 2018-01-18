@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Database.Extensions
 {
-	public static class UserExtentions
+	public static class UserExtensions
 	{
 		private const string courseRoleClaimType = "CourseRole";
 		
@@ -96,10 +96,10 @@ namespace Database.Extensions
 			return systemAccessesRepo.HasSystemAccess(user.Id, accessType);
 		}
 		
-		public static bool HasSystemAccess(this IPrincipal User, SystemAccessType accessType)
+		public static bool HasSystemAccess(this ClaimsPrincipal User, SystemAccessType accessType)
 		{
 			var systemAccessesRepo = new SystemAccessesRepo();
-			return systemAccessesRepo.HasSystemAccess(User.Identity.GetUserId(), accessType);
+			return systemAccessesRepo.HasSystemAccess(User.GetUserId(), accessType);
 		}
 	}
 }

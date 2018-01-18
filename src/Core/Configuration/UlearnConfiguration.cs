@@ -37,6 +37,8 @@ namespace uLearn.Configuration
 		public bool BuildExerciseStudentZips { get; set; }
 		
 		public string ExerciseStudentZipsDirectory { get; set; }
+		
+		public CertificateConfiguration Certificates { get; set; }
 	}
 
 	public class TelegramConfiguration
@@ -50,4 +52,11 @@ namespace uLearn.Configuration
 	{
 		public string Channel { get; set; }
 	}
+	
+	public class CertificateConfiguration
+	{
+		public string Directory { get; set; }
+	}
+
+	
 }

@@ -70,7 +70,7 @@ namespace Database.Models
 		{
 			get
 			{
-				if (FirstName + LastName != "")
+				if (LastName + FirstName != "")
 					return (LastName + " " + FirstName).Trim();
 				if (!string.IsNullOrEmpty(UserName))
 					return UserName.Trim();

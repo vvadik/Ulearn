@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
 using JetBrains.Annotations;
-using Microsoft.AspNet.Identity;
 using uLearn;
+using uLearn.Extensions;
 
 namespace Database.DataContexts
 {
@@ -16,17 +17,12 @@ namespace Database.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		public CommentsRepo()
-			: this(new ULearnDb())
-		{
-		}
-
 		public CommentsRepo(ULearnDb db)
 		{
 			this.db = db;
 		}
 
-		public async Task<Comment> AddComment(IPrincipal author, string courseId, Guid slideId, int parentCommentId, string commentText)
+		public async Task<Comment> AddComment(ClaimsPrincipal author, string courseId, Guid slideId, int parentCommentId, string commentText)
 		{
 			var commentsPolicy = GetCommentsPolicy(courseId);
 			var isInstructor = author.HasAccessFor(courseId, CourseRole.Instructor);
@@ -35,16 +31,18 @@ namespace Database.DataContexts
 			/* Instructors' replies are automaticly correct */
 			var isReply = parentCommentId != -1;
 			var isCorrectAnswer = isReply && isInstructor;
-
-			var comment = db.Comments.Create();
-			comment.AuthorId = author.Identity.GetUserId();
-			comment.CourseId = courseId;
-			comment.SlideId = slideId;
-			comment.ParentCommentId = parentCommentId;
-			comment.Text = commentText;
-			comment.IsApproved = isApproved;
-			comment.IsCorrectAnswer = isCorrectAnswer;
-			comment.PublishTime = DateTime.Now;
+			
+			var comment = new Comment
+			{
+				AuthorId = author.GetUserId(),
+				CourseId = courseId,
+				SlideId = slideId,
+				ParentCommentId = parentCommentId,
+				Text = commentText,
+				IsApproved = isApproved,
+				IsCorrectAnswer = isCorrectAnswer,
+				PublishTime = DateTime.Now
+			};
 			db.Comments.Add(comment);
 			await db.SaveChangesAsync();
 

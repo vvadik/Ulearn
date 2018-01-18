@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ApprovalUtilities.Utilities;
 using Database.Models;
+using Microsoft.EntityFrameworkCore;
 using uLearn.Quizes;
 
 namespace Database.DataContexts
@@ -172,9 +173,9 @@ namespace Database.DataContexts
 
 		public async Task SetScoreForQuizBlock(string userId, Guid slideId, string blockId, int score)
 		{
-			db.UserQuizzes
+			await db.UserQuizzes
 				.Where(q => q.UserId == userId && q.SlideId == slideId && q.QuizId == blockId)
-				.ForEach(q => q.QuizBlockScore = score);
+				.ForEachAsync(q => q.QuizBlockScore = score);
 			await db.SaveChangesAsync();
 		}
 

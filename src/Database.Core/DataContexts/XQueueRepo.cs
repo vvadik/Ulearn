@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
 using uLearn;
 
 namespace Database.DataContexts
@@ -16,11 +15,11 @@ namespace Database.DataContexts
 		private readonly ULearnUserManager userManager;
 		private readonly UserSolutionsRepo userSolutionsRepo;
 
-		public XQueueRepo(ULearnDb db, CourseManager courseManager)
+		public XQueueRepo(ULearnDb db, ULearnUserManager userManager, UserSolutionsRepo userSolutionsRepo)
 		{
 			this.db = db;
-			userManager = new ULearnUserManager(db);
-			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
+			this.userManager = userManager;
+			this.userSolutionsRepo = userSolutionsRepo;
 		}
 
 		public async Task AddXQueueWatcher(string name, string baseUrl, string queueName, string username, string password)

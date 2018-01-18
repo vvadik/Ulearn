@@ -16,14 +16,14 @@ namespace Database.DataContexts
 	public class GradersRepo
 	{
 		private readonly ULearnDb db;
-
-		private static readonly ILog log = LogManager.GetLogger(typeof(GradersRepo));
 		private readonly ULearnUserManager userManager;
 
-		public GradersRepo(ULearnDb db)
+		private static readonly ILog log = LogManager.GetLogger(typeof(GradersRepo));
+
+		public GradersRepo(ULearnDb db, ULearnUserManager userManager)
 		{
 			this.db = db;
-			userManager = new ULearnUserManager(db);
+			this.userManager = userManager;
 		}
 
 		[CanBeNull]
@@ -69,15 +69,7 @@ namespace Database.DataContexts
 				ClientUserId = clientUserId,
 			};
 			db.ExerciseSolutionsByGrader.Add(exerciseSolutionByGrader);
-			try
-			{
-				await db.SaveChangesAsync();
-			}
-			catch (DbEntityValidationException e)
-			{
-				var errors = string.Join(", ", e.EntityValidationErrors.SelectMany(err => err.ValidationErrors.Select(error => error.ErrorMessage)));
-				throw new Exception(errors);
-			}
+			await db.SaveChangesAsync();
 
 			return exerciseSolutionByGrader;
 		}

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
 using log4net;
+using Microsoft.EntityFrameworkCore;
 using uLearn;
 using uLearn.Extensions;
 
@@ -20,11 +21,6 @@ namespace Database.DataContexts
 		private readonly ILog log = LogManager.GetLogger(typeof(NotificationsRepo));
 
 		private readonly ULearnDb db;
-
-		public NotificationsRepo()
-			: this(new ULearnDb())
-		{
-		}
 
 		public NotificationsRepo(ULearnDb db)
 		{

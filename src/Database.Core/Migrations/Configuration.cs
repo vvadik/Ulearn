@@ -1,9 +1,8 @@
-using System.Data.Entity.Migrations;
 using System.Linq;
 using Database.DataContexts;
 using Database.Models;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Database.Migrations
 {
@@ -15,6 +14,7 @@ namespace Database.Migrations
 			CommandTimeout = 60 * 10;
 		}
 
+	
 		protected override void Seed(ULearnDb db)
 		{
 			var roleStore = new RoleStore<IdentityRole>(db);

@@ -63,17 +63,7 @@ namespace Database.DataContexts
 			};
 			db.ManualExerciseCheckings.Add(manualChecking);
 
-			try
-			{
-				await db.SaveChangesAsync();
-			}
-			catch (DbEntityValidationException e)
-			{
-				throw new Exception(
-					string.Join("\r\n", e.EntityValidationErrors.Select(v => v.Entry.Entity.ToString())) +
-					string.Join("\r\n",
-						e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
-			}
+			await db.SaveChangesAsync();
 
 			return manualChecking;
 		}
@@ -84,7 +74,7 @@ namespace Database.DataContexts
 			{
 				var checkings = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId, false).Where(c => !c.IsChecked && !c.IsLocked);
 				foreach (var checking in checkings)
-					// Use EntityState.Deleted because EF could don't know abount these checkings (they have been retrieved via AsNoTracking())
+					// Use EntityState.Deleted because EF could know nothing abount these checkings (they have been retrieved via AsNoTracking())
 					db.Entry(checking).State = EntityState.Deleted;
 				await db.SaveChangesAsync();
 				transaction.Commit();
@@ -193,7 +183,7 @@ namespace Database.DataContexts
 
 		public async Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment)
 		{
-			var review = db.ExerciseCodeReviews.Add(new ExerciseCodeReview
+			var review = new ExerciseCodeReview
 			{
 				AuthorId = userId,
 				Comment = comment,
@@ -202,19 +192,10 @@ namespace Database.DataContexts
 				StartPosition = startPosition,
 				FinishLine = finishLine,
 				FinishPosition = finishPosition,
-			});
-
-			try
-			{
-				await db.SaveChangesAsync();
-			}
-			catch (DbEntityValidationException e)
-			{
-				throw new Exception(
-					string.Join("\r\n",
-						e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
-			}
-
+			};
+			db.ExerciseCodeReviews.Add(review);
+			await db.SaveChangesAsync();
+			
 			/* Extract review from database to fill review.Author by EF's DynamicProxy */
 			return db.ExerciseCodeReviews.AsNoTracking().FirstOrDefault(r => r.Id == review.Id);
 		}

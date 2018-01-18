@@ -4,9 +4,11 @@ using System.Data.Entity.Migrations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Database.Models;
 using EntityFramework.Functions;
 using LtiLibrary.Core.Lti1;
+using LtiLibrary.NetCore.Lti.v1;
 using Newtonsoft.Json;
 using uLearn;
 
