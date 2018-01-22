@@ -1,6 +1,7 @@
 using System;
 using AntiPlagiarism.Web.CodeAnalyzing;
 using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
+using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Controllers;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;

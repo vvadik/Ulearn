@@ -7,6 +7,7 @@ using AntiPlagiarism.Api.Models.Parameters;
 using AntiPlagiarism.Api.Models.Results;
 using AntiPlagiarism.Web.CodeAnalyzing;
 using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
+using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
@@ -25,9 +26,9 @@ namespace AntiPlagiarism.Web.Controllers
 		private readonly ITasksRepo tasksRepo;
 		private readonly StatisticsParametersFinder statisticsParametersFinder;
 		private readonly PlagiarismDetector plagiarismDetector;
+		private readonly CodeUnitsExtractor codeUnitsExtractor;		
 		private readonly AntiPlagiarismConfiguration configuration;
 
-		private readonly CodeUnitsExtractor codeUnitsExtractor = new CodeUnitsExtractor();
 		private readonly SnippetsExtractor snippetsExtractor = new SnippetsExtractor();
 
 		private readonly List<ITokenInSnippetConverter> tokenConverters = new List<ITokenInSnippetConverter>
@@ -40,6 +41,7 @@ namespace AntiPlagiarism.Web.Controllers
 			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo,
 			StatisticsParametersFinder statisticsParametersFinder,
 			PlagiarismDetector plagiarismDetector,
+			CodeUnitsExtractor codeUnitsExtractor,
 			ILogger logger,
 			IOptions<AntiPlagiarismConfiguration> configuration)
 			: base(logger)
@@ -49,6 +51,7 @@ namespace AntiPlagiarism.Web.Controllers
 			this.tasksRepo = tasksRepo;
 			this.statisticsParametersFinder = statisticsParametersFinder;
 			this.plagiarismDetector = plagiarismDetector;
+			this.codeUnitsExtractor = codeUnitsExtractor;
 			this.configuration = configuration.Value;
 		}
 		
@@ -121,7 +124,7 @@ namespace AntiPlagiarism.Web.Controllers
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
-			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTask(parameters.AuthorId, parameters.TaskId);
+			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTaskAsync(parameters.AuthorId, parameters.TaskId);
 			var result = new GetAuthorPlagiarismsResult();
 			foreach (var submission in submissions)
 			{
@@ -155,8 +158,7 @@ namespace AntiPlagiarism.Web.Controllers
 		
 		public async Task CalculateTaskStatisticsParametersAsync(Guid taskId)
 		{
-			/* TODO (andgein): move number 100 to config */
-			var lastAuthorsIds = await submissionsRepo.GetLastAuthorsByTaskAsync(taskId, 100);
+			var lastAuthorsIds = await submissionsRepo.GetLastAuthorsByTaskAsync(taskId, configuration.StatisticsAnalyzing.CountOfLastAuthorsForCalculatingMeanAndDeviation);
 			var lastSubmissions = await submissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(taskId, lastAuthorsIds);
 
 			var statisticsParameters = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions);

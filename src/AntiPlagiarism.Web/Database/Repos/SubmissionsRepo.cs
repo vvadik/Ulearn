@@ -13,9 +13,10 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<Submission> FindSubmissionByIdAsync(int submissionId);
 		Task<List<Submission>> GetSubmissionsByIdsAsync(IEnumerable<int> submissionIds);
 		Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo);
+		/* TODO (andgein): add filter by clientId to following methods */
 		Task<List<Guid>> GetLastAuthorsByTaskAsync(Guid taskId, int count);
 		Task<List<Submission>> GetLastSubmissionsByAuthorsForTaskAsync(Guid taskId, IEnumerable<Guid> authorsIds);
-		Task<List<Submission>> GetSubmissionsByAuthorAndTask(Guid authorId, Guid taskId);
+		Task<List<Submission>> GetSubmissionsByAuthorAndTaskAsync(Guid authorId, Guid taskId);
 	}
 
 	public class SubmissionsRepo : ISubmissionsRepo
@@ -80,7 +81,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return lastSubmissionByAuthor.Values.ToList();
 		}
 
-		public Task<List<Submission>> GetSubmissionsByAuthorAndTask(Guid authorId, Guid taskId)
+		public Task<List<Submission>> GetSubmissionsByAuthorAndTaskAsync(Guid authorId, Guid taskId)
 		{
 			return db.Submissions
 				.Include(s => s.Program)
