@@ -9,11 +9,11 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 {
 	public class StatisticsParametersFinder
 	{
-		private readonly PlagiarismWeighter plagiarismWeighter;
+		private readonly PlagiarismDetector plagiarismDetector;
 
-		public StatisticsParametersFinder(PlagiarismWeighter plagiarismWeighter)
+		public StatisticsParametersFinder(PlagiarismDetector plagiarismDetector)
 		{
-			this.plagiarismWeighter = plagiarismWeighter;
+			this.plagiarismDetector = plagiarismDetector;
 		}
 
 		public async Task<TaskStatisticsParameters> FindStatisticsParametersAsync(List<Submission> submissions)
@@ -31,7 +31,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			{
 				Mean = mean,
 				Deviation = deviation,
-				TauCoefficient = tauCoefficient,
+				//TauCoefficient = tauCoefficient,
 			};
 		}
 
@@ -45,7 +45,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 		private Task<double> GetLinkWeight(Submission first, Submission second)
 		{
-			return plagiarismWeighter.GetWeightAsync(first, second);
+			return plagiarismDetector.GetWeightAsync(first, second);
 		}
 		
 		private static readonly List<(int, double)> tauCoefficients = new List<(int, double)>

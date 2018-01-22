@@ -1,14 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AntiPlagiarism.Api.Models;
 
 namespace AntiPlagiarism.Web.Database.Models
 {
-	public enum SnippetType : short
-	{
-		TokensKindsOnly = 1,
-		TokensKindsAndValues = 2,
-	}
-	
 	public class Snippet
 	{
 		[Key]

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
+using AntiPlagiarism.Api.Models;
 using AntiPlagiarism.Web.CodeAnalyzing;
-using AntiPlagiarism.Web.CodeAnalyzing.Hashers;
-using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Extensions;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;

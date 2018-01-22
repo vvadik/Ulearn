@@ -11,7 +11,5 @@ namespace AntiPlagiarism.Web.Database.Models
 		public double Mean { get; set; }
 
 		public double Deviation { get; set; }
-		
-		public double TauCoefficient { get; set; }
 	}
 }

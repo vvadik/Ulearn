@@ -9,6 +9,11 @@ namespace AntiPlagiarism.Api.Models.Results
 	{
 		[DataMember(Name = "plagiarisms")]
 		public List<Plagiarism> Plagiarisms { get; set; }
+		
+		[DataMember(Name = "tokens_positions")]
+		public List<TokenPosition> TokensPositions { get; set; }
+		
+		// TODO (andgein): возвращать две отметки: 4 сигма и 6 сигма, но не больше 1 
 
 		public GetPlagiarismsResult()
 		{
@@ -20,14 +25,23 @@ namespace AntiPlagiarism.Api.Models.Results
 	public class Plagiarism
 	{
 		[DataMember(Name = "submission")]
-		public PlagiateSubmission Submission { get; set; }
+		public PlagiarismSubmission Submission { get; set; }
 		
 		[DataMember(Name = "weight")]
 		public double Weight { get; set; }
+		
+		[DataMember(Name = "analyzed_code_units")]
+		public List<AnalyzedCodeUnit> AnalyzedCodeUnits { get; set; }
+		
+		[DataMember(Name = "tokens_positions")]
+		public List<TokenPosition> TokensPositions { get; set; }
+		
+		[DataMember(Name = "matched_snippets")]
+		public List<MatchedSnippet> MatchedSnippets { get; set; }
 	}
 
 	[DataContract]
-	public class PlagiateSubmission
+	public class PlagiarismSubmission
 	{
 		[DataMember(Name = "id")]
 		public int Id { get; set; }
@@ -42,6 +56,48 @@ namespace AntiPlagiarism.Api.Models.Results
 		public Guid AuthorId { get; set; }
 
 		[DataMember(Name = "additional_info")]
-		public string AdditionalInfo;
+		public string AdditionalInfo { get; set; }
+	}
+	
+	[DataContract]
+	public class AnalyzedCodeUnit
+	{
+		[DataMember(Name = "name")]
+		public string Name { get; set; }
+		
+		[DataMember(Name = "first_token_index")]
+		public int FirstTokenIndex { get; set; }
+		
+		[DataMember(Name = "tokens_count")]
+		public int TokensCount { get; set; }
+	}
+
+	[DataContract]
+	public class TokenPosition
+	{
+		[DataMember(Name = "token_index")]
+		public int TokenIndex { get; set; }
+		
+		[DataMember(Name = "start_position")]
+		public int StartPosition { get; set; }
+		
+		[DataMember(Name = "length")]
+		public int Length { get; set; }
+	}
+
+	[DataContract]
+	public class MatchedSnippet
+	{
+		[DataMember(Name = "snippet_type")]
+		public SnippetType SnippetType { get; set; }
+		
+		[DataMember(Name = "snippet_tokens_count")]
+		public int TokensCount { get; set; }
+		
+		[DataMember(Name = "original_submission_first_token_index")]
+		public int OriginalSubmissionFirstTokenIndex { get; set; }
+		
+		[DataMember(Name = "plagiarism_submission_first_token_index")]
+		public int PlagiarismSubmissionFirstTokenIndex { get; set; }
 	}
 }

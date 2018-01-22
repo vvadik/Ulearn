@@ -10,7 +10,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 {
 	public interface ISubmissionsRepo
 	{
-		Task<Submission> GetSubmissionByIdAsync(int submissionId);
+		Task<Submission> FindSubmissionByIdAsync(int submissionId);
 		Task<List<Submission>> GetSubmissionsByIdsAsync(IEnumerable<int> submissionIds);
 		Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo);
 		Task<List<Guid>> GetLastAuthorsByTaskAsync(Guid taskId, int count);
@@ -26,7 +26,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			this.db = db;
 		}
 
-		public Task<Submission> GetSubmissionByIdAsync(int submissionId)
+		public Task<Submission> FindSubmissionByIdAsync(int submissionId)
 		{
 			return db.Submissions.Include(s => s.Program).FirstOrDefaultAsync(s => s.Id == submissionId);
 		}

@@ -13,9 +13,10 @@ using System;
 namespace AntiPlagiarism.Web.Migrations
 {
     [DbContext(typeof(AntiPlagiarismDb))]
-    partial class AntiPlagiarismDbModelSnapshot : ModelSnapshot
+    [Migration("20180122162300_RemoveTauCoefficientFromTaskStatisticsParameters")]
+    partial class RemoveTauCoefficientFromTaskStatisticsParameters
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,8 +137,6 @@ namespace AntiPlagiarism.Web.Migrations
                     b.Property<double>("Deviation");
 
                     b.Property<double>("Mean");
-
-                    b.Property<double>("TauCoefficient");
 
                     b.HasKey("TaskId");
 

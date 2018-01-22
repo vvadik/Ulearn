@@ -1,5 +1,6 @@
 using System;
 using AntiPlagiarism.Web.CodeAnalyzing;
+using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
 using AntiPlagiarism.Web.Controllers;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;
@@ -81,8 +82,9 @@ namespace AntiPlagiarism.Web
 			services.AddScoped<ITasksRepo, TasksRepo>();
 			
 			/* Other services */
-			services.AddScoped<PlagiarismWeighter>();
+			services.AddScoped<PlagiarismDetector>();
 			services.AddScoped<StatisticsParametersFinder>();
+			services.AddSingleton<CodeUnitsExtractor>();
 			
 			/* Asp.NET Core MVC */
 			services.AddMvc();

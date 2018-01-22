@@ -24,6 +24,7 @@ namespace AntiPlagiarism.Web.Controllers
 		private readonly ISnippetsRepo snippetsRepo;
 		private readonly ITasksRepo tasksRepo;
 		private readonly StatisticsParametersFinder statisticsParametersFinder;
+		private readonly PlagiarismDetector plagiarismDetector;
 		private readonly AntiPlagiarismConfiguration configuration;
 
 		private readonly CodeUnitsExtractor codeUnitsExtractor = new CodeUnitsExtractor();
@@ -38,6 +39,7 @@ namespace AntiPlagiarism.Web.Controllers
 		public ApiController(
 			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo,
 			StatisticsParametersFinder statisticsParametersFinder,
+			PlagiarismDetector plagiarismDetector,
 			ILogger logger,
 			IOptions<AntiPlagiarismConfiguration> configuration)
 			: base(logger)
@@ -46,6 +48,7 @@ namespace AntiPlagiarism.Web.Controllers
 			this.snippetsRepo = snippetsRepo;
 			this.tasksRepo = tasksRepo;
 			this.statisticsParametersFinder = statisticsParametersFinder;
+			this.plagiarismDetector = plagiarismDetector;
 			this.configuration = configuration.Value;
 		}
 		
@@ -99,77 +102,15 @@ namespace AntiPlagiarism.Web.Controllers
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 			
-			var submission = await submissionsRepo.GetSubmissionByIdAsync(parameters.SubmissionId);
-			if (submission.ClientId != client.Id)
+			var submission = await submissionsRepo.FindSubmissionByIdAsync(parameters.SubmissionId);
+			if (submission == null || submission.ClientId != client.Id)
 				return Json(ApiError.Create("Invalid submission id"));
 
-			/* Dictionaries by submission id and snippet type */
-			var tokensMatchedInThisSubmission = new DefaultDictionary<Tuple<int, SnippetType>, HashSet<int>>();
-			var tokensMatchedInOtherSubmissions = new DefaultDictionary<Tuple<int, SnippetType>, HashSet<int>>();
-			
-			var snippetsOccurences = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission.Id);
-			foreach (var snippetOccurence in snippetsOccurences)
+			var result = new GetPlagiarismsResult
 			{
-				var otherOccurences = await snippetsRepo.GetSnippetsOccurencesAsync(
-					snippetOccurence.SnippetId,
-					/* Filter only snippet occurences in submissions BY THIS client, THIS task, THIS language and NOT BY THIS author */
-					o => o.Submission.ClientId == submission.ClientId &&
-						o.Submission.TaskId == submission.TaskId &&
-						o.Submission.Language == submission.Language &&
-						o.Submission.AuthorId != submission.AuthorId
-				);
-
-				var snippetType = snippetOccurence.Snippet.SnippetType;
-
-				foreach (var otherOccurence in otherOccurences)
-				{
-					for (var i = 0; i < snippetOccurence.Snippet.TokensCount; i++)
-					{
-						var tokenIndexInThisSubmission = snippetOccurence.FirstTokenIndex + i;
-						var tokenIndexInOtherSubmission = otherOccurence.FirstTokenIndex + i;
-						tokensMatchedInThisSubmission[Tuple.Create(otherOccurence.SubmissionId, snippetType)].Add(tokenIndexInThisSubmission);
-						tokensMatchedInOtherSubmissions[Tuple.Create(otherOccurence.SubmissionId, snippetType)].Add(tokenIndexInOtherSubmission);
-					}
-				}
-			}
-
-			var plagiateSubmissionIds = tokensMatchedInOtherSubmissions.Keys.Select(tuple => tuple.Item1).ToList();
-			var plagiateSubmissions = await submissionsRepo.GetSubmissionsByIdsAsync(plagiateSubmissionIds);
-
-			var allSnippetTypes = Enum.GetValues(typeof(SnippetType)).Cast<SnippetType>().ToList();
-			var thisSubmissionLength = codeUnitsExtractor.Extract(submission.ProgramText).Select(u => u.Tokens.Count).Sum();
-			var result = new GetPlagiarismsResult();
-			foreach (var plagiateSubmission in plagiateSubmissions)
-			{
-				var totalUnion = 0;
-				foreach (var snippetType in allSnippetTypes)
-				{
-					var submissionIdWithSnippetType = Tuple.Create(plagiateSubmission.Id, snippetType);
-					if (!tokensMatchedInThisSubmission.ContainsKey(submissionIdWithSnippetType))
-						continue;
-					
-					totalUnion += tokensMatchedInThisSubmission[submissionIdWithSnippetType].Count;
-					totalUnion += tokensMatchedInOtherSubmissions[submissionIdWithSnippetType].Count;
-				}
-
-				/* TODO (andgein): store submissionLengths somewhere in the database */
-				var plagiateSubmissionLength = codeUnitsExtractor.Extract(plagiateSubmission.ProgramText).Select(u => u.Tokens.Count).Sum();
-				var totalLength = thisSubmissionLength + plagiateSubmissionLength;
-				var weight = ((double)totalUnion) / totalLength;
-				
-				result.Plagiarisms.Add(new Plagiarism
-				{
-					Submission = new PlagiateSubmission
-					{
-						Id = plagiateSubmission.Id,
-						TaskId = plagiateSubmission.TaskId,
-						AuthorId = plagiateSubmission.AuthorId,
-						Code = plagiateSubmission.ProgramText,
-						AdditionalInfo = plagiateSubmission.AdditionalInfo,
-					},
-					Weight = weight,
-				});
-			}
+				Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission),
+				TokensPositions = plagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
+			};
 			
 			return Json(result);
 		}
