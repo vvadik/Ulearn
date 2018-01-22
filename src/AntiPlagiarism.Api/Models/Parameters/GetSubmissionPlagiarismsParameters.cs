@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace AntiPlagiarism.Api.Models.Parameters
 {
-	public class GetPlagiarismsParameters: ApiParameters
+	public class GetSubmissionPlagiarismsParameters: ApiParameters
 	{
 		[BindRequired]
 		[FromQuery(Name = "submission_id")]

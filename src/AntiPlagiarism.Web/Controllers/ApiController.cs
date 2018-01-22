@@ -96,8 +96,8 @@ namespace AntiPlagiarism.Web.Controllers
 			return codeUnits.Select(u => u.Tokens.Count).Sum();
 		}
 
-		[HttpGet("GetPlagiarisms")]
-		public async Task<IActionResult> GetPlagiarisms(GetPlagiarismsParameters parameters)
+		[HttpGet("GetSubmissionPlagiarisms")]
+		public async Task<IActionResult> GetSubmissionPlagiarisms(GetSubmissionPlagiarismsParameters parameters)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
@@ -106,12 +106,33 @@ namespace AntiPlagiarism.Web.Controllers
 			if (submission == null || submission.ClientId != client.Id)
 				return Json(ApiError.Create("Invalid submission id"));
 
-			var result = new GetPlagiarismsResult
+			var result = new GetSubmissionPlagiarismsResult
 			{
 				Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission),
 				TokensPositions = plagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
 			};
 			
+			return Json(result);
+		}
+
+		[HttpGet("GetAuthorPlagiarisms")]
+		public async Task<IActionResult> GetAuthorPlagiarisms(GetAuthorPlagiarismsParameters parameters)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTask(parameters.AuthorId, parameters.TaskId);
+			var result = new GetAuthorPlagiarismsResult();
+			foreach (var submission in submissions)
+			{
+				result.ResearchedSubmissions.Add(new ResearchedSubmission
+				{
+					SubmissionInfo = submission.GetSubmissionInfoForApi(),
+					Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission),
+					TokensPositions = plagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
+				});
+			}
+
 			return Json(result);
 		}
 

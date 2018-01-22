@@ -160,14 +160,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var codeUnits = codeUnitsExtractor.Extract(submission.ProgramText);
 			return new Plagiarism
 			{
-				Submission = new PlagiarismSubmission
-				{
-					Id = submission.Id,
-					TaskId = submission.TaskId,
-					AuthorId = submission.AuthorId,
-					Code = submission.ProgramText,
-					AdditionalInfo = submission.AdditionalInfo,
-				},
+				SubmissionInfo = submission.GetSubmissionInfoForApi(),
 				Weight = weight,
 				AnalyzedCodeUnits = codeUnits.Select(
 					u => new AnalyzedCodeUnit
