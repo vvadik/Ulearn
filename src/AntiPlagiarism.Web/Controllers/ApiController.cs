@@ -12,6 +12,7 @@ using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Options;
 using Serilog;
 using uLearn;
@@ -55,7 +56,7 @@ namespace AntiPlagiarism.Web.Controllers
 			this.configuration = configuration.Value;
 		}
 		
-		[HttpPost("AddSubmission")]
+		[HttpPost(nameof(AddSubmission))]
 		public async Task<IActionResult> AddSubmission(AddSubmissionParameters parameters)
 		{
 			if (!ModelState.IsValid)
@@ -84,7 +85,7 @@ namespace AntiPlagiarism.Web.Controllers
 				parameters.AdditionalInfo
 				);
 
-			await ExtractSnippetsFromSubmission(submission);
+			await ExtractSnippetsFromSubmissionAsync(submission);
 			await CalculateTaskStatisticsParametersAsync(submission.TaskId);
 			
 			return Json(new AddSubmissionResult
@@ -99,7 +100,7 @@ namespace AntiPlagiarism.Web.Controllers
 			return codeUnits.Select(u => u.Tokens.Count).Sum();
 		}
 
-		[HttpGet("GetSubmissionPlagiarisms")]
+		[HttpGet(nameof(GetSubmissionPlagiarisms))]
 		public async Task<IActionResult> GetSubmissionPlagiarisms(GetSubmissionPlagiarismsParameters parameters)
 		{
 			if (!ModelState.IsValid)
@@ -109,29 +110,42 @@ namespace AntiPlagiarism.Web.Controllers
 			if (submission == null || submission.ClientId != client.Id)
 				return Json(ApiError.Create("Invalid submission id"));
 
+			var suspicionLevels = await GetSuspicionLevelsAsync(submission.TaskId);
+			if (suspicionLevels == null)
+				return Json(ApiError.Create("Not enough statistics for defining suspicion levels"));
+				
 			var result = new GetSubmissionPlagiarismsResult
 			{
-				Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission),
+				Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels),
 				TokensPositions = plagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
+				SuspicionLevels = suspicionLevels, 
 			};
 			
 			return Json(result);
 		}
 
-		[HttpGet("GetAuthorPlagiarisms")]
+		[HttpGet(nameof(GetAuthorPlagiarisms))]
 		public async Task<IActionResult> GetAuthorPlagiarisms(GetAuthorPlagiarismsParameters parameters)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
 			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTaskAsync(parameters.AuthorId, parameters.TaskId);
-			var result = new GetAuthorPlagiarismsResult();
+
+			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId);
+			if (suspicionLevels == null)
+				return Json(ApiError.Create("Not enough statistics for defining suspicion levels"));
+
+			var result = new GetAuthorPlagiarismsResult
+			{
+				SuspicionLevels = suspicionLevels,
+			};
 			foreach (var submission in submissions)
 			{
 				result.ResearchedSubmissions.Add(new ResearchedSubmission
 				{
 					SubmissionInfo = submission.GetSubmissionInfoForApi(),
-					Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission),
+					Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels),
 					TokensPositions = plagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
 				});
 			}
@@ -139,7 +153,7 @@ namespace AntiPlagiarism.Web.Controllers
 			return Json(result);
 		}
 
-		private async Task ExtractSnippetsFromSubmission(Submission submission)
+		private async Task ExtractSnippetsFromSubmissionAsync(Submission submission)
 		{
 			logger.Information("Достаю сниппеты из решения {submissionId}, длина сниппетов: {tokensCount} токенов", submission.Id, configuration.SnippetTokensCount);
 			var codeUnits = codeUnitsExtractor.Extract(submission.ProgramText);
@@ -164,6 +178,19 @@ namespace AntiPlagiarism.Web.Controllers
 			var statisticsParameters = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions);
 			statisticsParameters.TaskId = taskId;
 			await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters);
+		}
+		
+		private async Task<SuspicionLevels> GetSuspicionLevelsAsync(Guid taskId)
+		{
+			var taskStatisticsParameters = await tasksRepo.FindTaskStatisticsParametersAsync(taskId);
+			if (taskStatisticsParameters == null)
+				return null;
+
+			return new SuspicionLevels
+			{
+				FaintSuspicion = Math.Min(taskStatisticsParameters.Mean + 4 * taskStatisticsParameters.Deviation, 1),
+				StrongSuspicion = Math.Min(taskStatisticsParameters.Mean + 6 * taskStatisticsParameters.Deviation, 1),
+			};
 		}
 	}
 }

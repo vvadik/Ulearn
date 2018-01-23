@@ -67,7 +67,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			return weight;
 		}
 
-		public async Task<List<Plagiarism>> GetPlagiarismsAsync(Submission submission)
+		public async Task<List<Plagiarism>> GetPlagiarismsAsync(Submission submission, SuspicionLevels suspicionLevels)
 		{
 			/* Dictionaries by submission id and snippet type */
 			var tokensMatchedInThisSubmission = new DefaultDictionary<Tuple<int, SnippetType>, HashSet<int>>();
@@ -133,6 +133,9 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				var weight = ((double)unionLength) / totalLength;
 				/* Normalize weight */
 				weight /= allSnippetTypes.Count;
+
+				if (weight < suspicionLevels.FaintSuspicion)
+					continue;
 				
 				plagiarisms.Add(BuildPlagiarismInfo(plagiarismSubmission, weight, matchedSnippets[plagiarismSubmission.Id]));
 			}

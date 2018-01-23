@@ -13,7 +13,8 @@ namespace AntiPlagiarism.Api.Models.Results
 		[DataMember(Name = "tokens_positions")]
 		public List<TokenPosition> TokensPositions { get; set; }
 		
-		// TODO (andgein): возвращать две отметки: 4 сигма и 6 сигма, но не больше 1 
+		[DataMember(Name = "suspicion_levels")]
+		public SuspicionLevels SuspicionLevels { get; set; } 
 
 		public GetSubmissionPlagiarismsResult()
 		{

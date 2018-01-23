@@ -8,9 +8,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 {
 	public interface ITasksRepo
 	{
-		[CanBeNull]
 		Task<TaskStatisticsParameters> FindTaskStatisticsParametersAsync(Guid taskId);
-
 		Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters);
 	}
 	

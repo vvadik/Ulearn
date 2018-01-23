@@ -83,4 +83,14 @@ namespace AntiPlagiarism.Api.Models.Results
 		[DataMember(Name = "plagiarism_submission_first_token_index")]
 		public int PlagiarismSubmissionFirstTokenIndex { get; set; }
 	}
+
+	[DataContract]
+	public class SuspicionLevels
+	{
+		[DataMember(Name = "faint_suspicion")]
+		public double FaintSuspicion { get; set; }
+		
+		[DataMember(Name = "strong_suspicion")]
+		public double StrongSuspicion { get; set; }
+	}	
 }
