@@ -1,11 +1,14 @@
-﻿using System.Web.Configuration;
+﻿using System;
+using System.Web;
+using System.Web.Configuration;
 using Graphite.Web;
 using Metrics;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
+using uLearn.Web;
 
-[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(uLearn.Web.App_Start.GraphiteMetricsPipeStart), "PreStart")]
+[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(GraphiteMetricsPipeStart), "PreStart")]
 
-namespace uLearn.Web.App_Start
+namespace uLearn.Web
 {
 	public class GraphiteMetricsPipeStart
 	{
