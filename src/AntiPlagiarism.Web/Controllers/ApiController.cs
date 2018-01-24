@@ -131,12 +131,17 @@ namespace AntiPlagiarism.Web.Controllers
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
-			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTaskAsync(parameters.AuthorId, parameters.TaskId);
+			var maxLastSubmissionsCount = configuration.Actions.GetAuthorPlagiarisms.MaxLastSubmissionsCount;
+			if (parameters.LastSubmissionsCount <= 0 || parameters.LastSubmissionsCount > maxLastSubmissionsCount)
+				return Json(ApiError.Create(
+					$"Invalid last_submissions_count. This value should be at least 1 and at most {maxLastSubmissionsCount}"
+				));
 
 			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId);
 			if (suspicionLevels == null)
 				return Json(ApiError.Create("Not enough statistics for defining suspicion levels"));
 
+			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTaskAsync(parameters.AuthorId, parameters.TaskId, parameters.LastSubmissionsCount);			
 			var result = new GetAuthorPlagiarismsResult
 			{
 				SuspicionLevels = suspicionLevels,

@@ -16,7 +16,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		/* TODO (andgein): add filter by clientId to following methods */
 		Task<List<Guid>> GetLastAuthorsByTaskAsync(Guid taskId, int count);
 		Task<List<Submission>> GetLastSubmissionsByAuthorsForTaskAsync(Guid taskId, IEnumerable<Guid> authorsIds);
-		Task<List<Submission>> GetSubmissionsByAuthorAndTaskAsync(Guid authorId, Guid taskId);
+		Task<List<Submission>> GetSubmissionsByAuthorAndTaskAsync(Guid authorId, Guid taskId, int count);
 	}
 
 	public class SubmissionsRepo : ISubmissionsRepo
@@ -81,11 +81,13 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return lastSubmissionByAuthor.Values.ToList();
 		}
 
-		public Task<List<Submission>> GetSubmissionsByAuthorAndTaskAsync(Guid authorId, Guid taskId)
+		public Task<List<Submission>> GetSubmissionsByAuthorAndTaskAsync(Guid authorId, Guid taskId, int count)
 		{
 			return db.Submissions
 				.Include(s => s.Program)
 				.Where(s => s.AuthorId == authorId && s.TaskId == taskId)
+				.OrderByDescending(s => s.AddingTime)
+				.Take(count)
 				.ToListAsync();
 		}
 	}

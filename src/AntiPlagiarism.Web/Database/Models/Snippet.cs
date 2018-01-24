@@ -18,6 +18,12 @@ namespace AntiPlagiarism.Web.Database.Models
 		
 		[Required]
 		public int Hash { get; set; }
+		
+		/* This property is equal to amount of authors whom solutions has this shippet.
+		 * It shows "hotness" of this snippet
+		 */
+		[Required]
+		public int AuthorsCount { get; set; }
 
 		public override string ToString()
 		{

@@ -14,7 +14,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<Snippet> AddSnippetAsync(int tokensCount, SnippetType type, int hash);
 		Task<bool> IsSnippetExistsAsync(int tokensCount, SnippetType type, int hash);
 		Task<SnippetOccurence> AddSnippetOccurenceAsync(int submissionId, Snippet snippet, int firstTokenIndex);
-		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(int submissionId);
+		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(int submissionId, int maxCount);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId, Expression<Func<SnippetOccurence, bool>> filterFunction);
 	}
@@ -57,6 +57,14 @@ namespace AntiPlagiarism.Web.Database.Repos
 			};
 			await db.SnippetsOccurences.AddAsync(snippetOccurence);
 			await db.SaveChangesAsync();
+			
+			foundSnippet.AuthorsCount = await db.SnippetsOccurences.Include(o => o.Submission)
+				.Where(o => o.SnippetId == foundSnippet.Id)
+				.Select(o => o.Submission.AuthorId)
+				.Distinct()
+				.CountAsync();
+			await db.SaveChangesAsync();
+			
 			return snippetOccurence;
 		}
 
@@ -80,9 +88,13 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return snippet;
 		}
 
-		public Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(int submissionId)
+		public Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(int submissionId, int maxCount)
 		{
-			return db.SnippetsOccurences.Include(o => o.Snippet).Where(o => o.SubmissionId == submissionId).ToListAsync();
+			return db.SnippetsOccurences.Include(o => o.Snippet)
+				.Where(o => o.SubmissionId == submissionId)
+				.OrderBy(o => o.Snippet.AuthorsCount)
+				.Take(maxCount)
+				.ToListAsync();
 		}
 
 		public Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId)
@@ -95,9 +107,9 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return db.SnippetsOccurences.Include(o => o.Submission).Where(o => o.SnippetId == snippetId).Where(filterFunction).ToListAsync();
 		}
 
-		public async Task<List<Snippet>> GetSnippetsForSubmission(int submissionId)
+		public async Task<List<Snippet>> GetSnippetsForSubmission(int submissionId, int maxCount)
 		{
-			return (await GetSnippetsOccurencesForSubmissionAsync(submissionId)).Select(o => o.Snippet).ToList();
+			return (await GetSnippetsOccurencesForSubmissionAsync(submissionId, maxCount)).Select(o => o.Snippet).ToList();
 		}
 	}
 }

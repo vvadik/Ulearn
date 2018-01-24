@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using AntiPlagiarism.Api.Models;
 using AntiPlagiarism.Api.Models.Results;
 using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
+using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Options;
 using uLearn;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing
@@ -18,20 +20,24 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		private readonly ISnippetsRepo snippetsRepo;
 		private readonly ISubmissionsRepo submissionsRepo;
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
+		private readonly AntiPlagiarismConfiguration configuration;
 
 		public PlagiarismDetector(
 			ISnippetsRepo snippetsRepo, ISubmissionsRepo submissionsRepo,
-			CodeUnitsExtractor codeUnitsExtractor)
+			CodeUnitsExtractor codeUnitsExtractor,
+			IOptions<AntiPlagiarismConfiguration> options)
 		{
 			this.snippetsRepo = snippetsRepo;
 			this.submissionsRepo = submissionsRepo;
 			this.codeUnitsExtractor = codeUnitsExtractor;
+			configuration = options.Value;
 		}
 
 		public async Task<double> GetWeightAsync(Submission firstSubmission, Submission secondSubmission)
 		{
-			var snippetsOccurencesOfFirstSubmission = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(firstSubmission.Id);
-			var snippetsOccurencesOfSecondSubmission = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(secondSubmission.Id);
+			var maxSnippetsCount = configuration.PlagiarismDetector.CountOfColdestSnippetsUsedToSearch;
+			var snippetsOccurencesOfFirstSubmission = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(firstSubmission.Id, maxSnippetsCount);
+			var snippetsOccurencesOfSecondSubmission = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(secondSubmission.Id, maxSnippetsCount);
 
 			var tokensMatchedInFirstSubmission = new DefaultDictionary<SnippetType, HashSet<int>>();
 			var tokensMatchedInSecondSubmission = new DefaultDictionary<SnippetType, HashSet<int>>();
@@ -72,8 +78,9 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			/* Dictionaries by submission id and snippet type */
 			var tokensMatchedInThisSubmission = new DefaultDictionary<Tuple<int, SnippetType>, HashSet<int>>();
 			var tokensMatchedInOtherSubmissions = new DefaultDictionary<Tuple<int, SnippetType>, HashSet<int>>();
-			
-			var snippetsOccurences = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission.Id);
+		
+			var maxSnippetsCount = configuration.PlagiarismDetector.CountOfColdestSnippetsUsedToSearch;
+			var snippetsOccurences = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission.Id, maxSnippetsCount);
 			var matchedSnippets = new DefaultDictionary<int, List<MatchedSnippet>>();
 			foreach (var snippetOccurence in snippetsOccurences)
 			{
