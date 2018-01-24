@@ -116,6 +116,7 @@ namespace AntiPlagiarism.Web.Controllers
 				
 			var result = new GetSubmissionPlagiarismsResult
 			{
+				SubmissionInfo = submission.GetSubmissionInfoForApi(),
 				Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels),
 				TokensPositions = plagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
 				SuspicionLevels = suspicionLevels, 

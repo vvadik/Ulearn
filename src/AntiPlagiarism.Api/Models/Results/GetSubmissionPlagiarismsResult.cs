@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace AntiPlagiarism.Api.Models.Results
@@ -7,6 +6,9 @@ namespace AntiPlagiarism.Api.Models.Results
 	[DataContract]
 	public class GetSubmissionPlagiarismsResult : ApiSuccessResult
 	{
+		[DataMember(Name = "submission")]
+		public SubmissionInfo SubmissionInfo { get; set; }
+		
 		[DataMember(Name = "plagiarisms")]
 		public List<Plagiarism> Plagiarisms { get; set; }
 		
