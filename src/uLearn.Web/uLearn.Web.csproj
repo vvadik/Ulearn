@@ -114,7 +114,7 @@
     <Reference Include="Graphite.Elmah, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Graphite.Elmah.1.0.3.0\lib\net40\Graphite.Elmah.dll</HintPath>
     </Reference>
-    <Reference Include="Graphite.Web, Version=1.0.0.0, Culture=neutral, PublicKeyToken=db1870846884bbb9, processorArchitecture=MSIL">
+    <Reference Include="Graphite.Web, Version=1.0.0.0, Culture=neutral, PublicKeyToken=db1870846884bbb9">
       <HintPath>..\ThirdParty\Graphite.Web.1.0.0.0\Graphite.Web.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.4.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
@@ -1220,7 +1220,7 @@
       <Name>Metrics</Name>
     </ProjectReference>
     <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
-      <Project>{26580595-F4DC-41EE-BA66-0EF4692243AF}</Project>
+      <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
       <Name>RunCsJob.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\Stepik.Api\Stepik.Api.csproj">
