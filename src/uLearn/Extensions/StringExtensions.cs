@@ -187,5 +187,12 @@ namespace uLearn.Extensions
 		{
 			return Regex.Replace(text, @"\r?\n", "<br/>");
 		}
+
+		public static string ToLowerFirstLetter(this string text)
+		{
+			if (string.IsNullOrEmpty(text))
+				return "";
+			return char.ToLowerInvariant(text[0]) + text.Substring(1);
+		}
 	}
 }

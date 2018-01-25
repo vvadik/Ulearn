@@ -177,8 +177,19 @@ namespace uLearn.Web.Controllers
 			var destinationFile = courseManager.GetCourseVersionFile(versionId);
 			file.SaveAs(destinationFile.FullName);
 
-			/* Load version and put it into LRU-cache */
-			courseManager.GetVersion(versionId);
+			try
+			{
+				/* Load version and put it into LRU-cache */
+				courseManager.GetVersion(versionId);
+			}
+			catch (Exception e)
+			{
+				var errorMessage = e.Message.ToLowerFirstLetter();
+				if (e.InnerException != null)
+					errorMessage += $" ({e.InnerException.Message})";
+				return RedirectToAction("Packages", new { courseId, error=errorMessage });
+			}
+			
 			var userId = User.Identity.GetUserId();
 			await coursesRepo.AddCourseVersion(courseId, versionId, userId);
 			await NotifyAboutCourseVersion(courseId, versionId, userId);
@@ -197,7 +208,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		public ActionResult Packages(string courseId)
+		public ActionResult Packages(string courseId, string error="")
 		{
 			var hasPackage = courseManager.HasPackageFor(courseId);
 			var lastUpdate = courseManager.GetLastWriteTime(courseId);
@@ -210,6 +221,7 @@ namespace uLearn.Web.Controllers
 				LastUpdate = lastUpdate,
 				Versions = courseVersions,
 				PublishedVersion = publishedVersion,
+				Error = error,
 			});
 		}
 
@@ -1556,6 +1568,7 @@ namespace uLearn.Web.Controllers
 		public DateTime LastUpdate { get; set; }
 		public List<CourseVersion> Versions { get; set; }
 		public CourseVersion PublishedVersion { get; set; }
+		public string Error { get; set; }
 	}
 
 	public class AdminCommentsViewModel
