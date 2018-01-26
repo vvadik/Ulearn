@@ -82,6 +82,9 @@ namespace AntiPlagiarism.Api.Models.Results
 	
 		[DataMember(Name = "plagiarism_submission_first_token_index")]
 		public int PlagiarismSubmissionFirstTokenIndex { get; set; }
+		
+		[DataMember(Name = "snippet_frequency")]
+		public double SnippetFrequency { get; set; }
 	}
 
 	[DataContract]

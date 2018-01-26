@@ -17,6 +17,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<List<Guid>> GetLastAuthorsByTaskAsync(Guid taskId, int count);
 		Task<List<Submission>> GetLastSubmissionsByAuthorsForTaskAsync(Guid taskId, IEnumerable<Guid> authorsIds);
 		Task<List<Submission>> GetSubmissionsByAuthorAndTaskAsync(Guid authorId, Guid taskId, int count);
+		Task<int> GetAuthorsCountAsync(Guid taskId);
 	}
 
 	public class SubmissionsRepo : ISubmissionsRepo
@@ -89,6 +90,11 @@ namespace AntiPlagiarism.Web.Database.Repos
 				.OrderByDescending(s => s.AddingTime)
 				.Take(count)
 				.ToListAsync();
+		}
+
+		public Task<int> GetAuthorsCountAsync(Guid taskId)
+		{
+			return db.Submissions.Where(s => s.TaskId == taskId).Select(s => s.AuthorId).Distinct().CountAsync();
 		}
 	}
 }

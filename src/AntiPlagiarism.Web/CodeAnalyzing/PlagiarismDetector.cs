@@ -81,6 +81,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		
 			var maxSnippetsCount = configuration.PlagiarismDetector.CountOfColdestSnippetsUsedToSearch;
 			var snippetsOccurences = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission.Id, maxSnippetsCount);
+			var authorsCount = await submissionsRepo.GetAuthorsCountAsync(submission.TaskId);
 			var matchedSnippets = new DefaultDictionary<int, List<MatchedSnippet>>();
 			foreach (var snippetOccurence in snippetsOccurences)
 			{
@@ -93,11 +94,12 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 						o.Submission.AuthorId != submission.AuthorId
 				);
 
-				var snippetType = snippetOccurence.Snippet.SnippetType;
+				var snippet = snippetOccurence.Snippet;
+				var snippetType = snippet.SnippetType;
 
 				foreach (var otherOccurence in otherOccurences)
 				{
-					for (var i = 0; i < snippetOccurence.Snippet.TokensCount; i++)
+					for (var i = 0; i < snippet.TokensCount; i++)
 					{
 						var tokenIndexInThisSubmission = snippetOccurence.FirstTokenIndex + i;
 						var tokenIndexInOtherSubmission = otherOccurence.FirstTokenIndex + i;
@@ -108,9 +110,10 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 					matchedSnippets[otherOccurence.SubmissionId].Add(new MatchedSnippet
 					{
 						SnippetType = snippetType,
-						TokensCount = snippetOccurence.Snippet.TokensCount,
+						TokensCount = snippet.TokensCount,
 						OriginalSubmissionFirstTokenIndex = snippetOccurence.FirstTokenIndex,
 						PlagiarismSubmissionFirstTokenIndex = otherOccurence.FirstTokenIndex,
+						SnippetFrequency = GetSnippetFrequency(snippet, authorsCount),
 					});
 				}
 			}
@@ -187,6 +190,11 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		private static List<SnippetType> GetAllSnippetTypes()
 		{
 			return Enum.GetValues(typeof(SnippetType)).Cast<SnippetType>().ToList();
+		}
+		
+		private static double GetSnippetFrequency(Snippet snippet, int authorsCount)
+		{
+			return (double) snippet.AuthorsCount / (authorsCount == 0 ? 1 : authorsCount);
 		}
 	}
 }
