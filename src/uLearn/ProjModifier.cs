@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Build.Evaluation;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NUnit.Framework.Constraints;
 using uLearn.Extensions;
 using uLearn.Helpers;
 using uLearn.Model.Blocks;
@@ -122,7 +124,11 @@ namespace uLearn
 
 		public static void SetBuildEnvironmentOptions(Project proj, BuildEnvironmentOptions options)
 		{
-			proj.SetProperty("TargetFrameworkVersion", options.TargetFrameworkVersion);
+			var frameworkName = proj.GetPropertyValue("TargetFramework");
+			if (frameworkName.Contains("netcore"))
+				proj.SetProperty("TargetFrameworkVersion", options.TargetNetCoreFrameworkVersion);
+			else
+				proj.SetProperty("TargetFrameworkVersion", options.TargetFrameworkVersion);
 		}
 
 		public static List<FileToCopy> ReplaceLinksWithItemsAndReturnWhatToCopy(Project project)
@@ -157,6 +163,7 @@ namespace uLearn
 	public class BuildEnvironmentOptions
 	{
 		public string TargetFrameworkVersion { get; set; }
+		public string TargetNetCoreFrameworkVersion { get; set; }
 		public string ToolsVersion { get; set; }
 	}
 }
