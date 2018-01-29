@@ -12,9 +12,10 @@ using System;
 namespace AntiPlagiarism.Web.Migrations
 {
     [DbContext(typeof(AntiPlagiarismDb))]
-    partial class AntiPlagiarismDbModelSnapshot : ModelSnapshot
+    [Migration("20180129200336_AddSnippetStatistics")]
+    partial class AddSnippetStatistics
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

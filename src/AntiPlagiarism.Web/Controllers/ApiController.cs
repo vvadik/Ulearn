@@ -170,7 +170,7 @@ namespace AntiPlagiarism.Web.Controllers
 					var snippets = snippetsExtractor.GetSnippets(codeUnit.Tokens, configuration.SnippetTokensCount, tokenConverter);
 					foreach (var (index, snippet) in snippets.Enumerate())
 					{
-						await snippetsRepo.AddSnippetOccurenceAsync(submission.Id, snippet, codeUnit.FirstTokenIndex + index);
+						await snippetsRepo.AddSnippetOccurenceAsync(submission, snippet, codeUnit.FirstTokenIndex + index);
 					}
 				}
 			}
