@@ -1,14 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AntiPlagiarism.Api.Models;
 
 namespace AntiPlagiarism.Web.Database.Models
 {
-	public enum SnippetType : short
-	{
-		TokensKindsOnly = 1,
-		TokensKindsAndValues = 2,
-	}
-	
 	public class Snippet
 	{
 		[Key]
@@ -23,7 +18,7 @@ namespace AntiPlagiarism.Web.Database.Models
 		
 		[Required]
 		public int Hash { get; set; }
-
+		
 		public override string ToString()
 		{
 			return $"SnippetWith{SnippetType.ToString()}(Hash={Hash}, TokensCount={TokensCount})";

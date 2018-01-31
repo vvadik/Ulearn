@@ -6,8 +6,10 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.Hashers
 	[TestFixture]
 	public class PolynomialSequenceHasher_should
 	{
+		/* TODO (andgein): use DefaultObjectHasher instead of GetHashCode in tests. Add tests for StableStringHasher */
+		
 		[Test]
-		public void TestWithSimpleMultiplier()
+		public void TestWithPolynomBase1()
 		{
 			var hasher = new PolynomialSequenceHasher(1);
 			hasher.Enqueue("first");
@@ -21,13 +23,13 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.Hashers
 		[TestCase(2)]
 		[TestCase(5)]
 		[TestCase(137)]
-		public void TestWithMultiplier(int multiplier)
+		public void TestWithPolynomBase(int polynomBase)
 		{
-			var hasher = new PolynomialSequenceHasher(multiplier);
+			var hasher = new PolynomialSequenceHasher(polynomBase);
 			hasher.Enqueue("first");
 			Assert.AreEqual("first".GetHashCode(), hasher.GetCurrentHash());
 			hasher.Enqueue("second");
-			Assert.AreEqual(unchecked(multiplier * "first".GetHashCode() + "second".GetHashCode()), hasher.GetCurrentHash());
+			Assert.AreEqual(unchecked(polynomBase * "first".GetHashCode() + "second".GetHashCode()), hasher.GetCurrentHash());
 			hasher.Dequeue();
 			Assert.AreEqual("second".GetHashCode(), hasher.GetCurrentHash());
 		}
@@ -47,14 +49,14 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.Hashers
 		[TestCase(1000, 2)]
 		[TestCase(2000, 5)]
 		[TestCase(3000, 137)]
-		public void TestWithManyAdds(int count, int multiplier)
+		public void TestWithManyAdds(int count, int polynomBase)
 		{
-			var hasher = new PolynomialSequenceHasher(multiplier);
+			var hasher = new PolynomialSequenceHasher(polynomBase);
 			var currentHash = 0;
 			for (var i = 0; i < count; i++)
 			{
 				hasher.Enqueue("some_string");
-				currentHash = unchecked(currentHash * multiplier + "some_string".GetHashCode());
+				currentHash = unchecked(currentHash * polynomBase + "some_string".GetHashCode());
 				Assert.AreEqual(currentHash, hasher.GetCurrentHash());
 			}
 		}
@@ -74,11 +76,11 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.Hashers
 		[Test]
 		public void TestIntegerOverflow()
 		{
-			const int multiplier = 137;
-			var result = 1;
+			const int polynomBase = 137;
+			var hash = 1;
 			for (var i = 0; i < 100; i++)
-				result = unchecked(result * multiplier);
-			Assert.AreEqual(656577185, result);
+				hash = unchecked(hash * polynomBase);
+			Assert.AreEqual(656577185, hash);
 		}
 	}
 }

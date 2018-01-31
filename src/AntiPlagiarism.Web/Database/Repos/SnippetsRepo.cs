@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AntiPlagiarism.Api.Models;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,8 +13,11 @@ namespace AntiPlagiarism.Web.Database.Repos
 	{
 		Task<Snippet> AddSnippetAsync(int tokensCount, SnippetType type, int hash);
 		Task<bool> IsSnippetExistsAsync(int tokensCount, SnippetType type, int hash);
-		Task<SnippetOccurence> AddSnippetOccurenceAsync(int submissionId, Snippet snippet, int firstTokenIndex);
-		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(int submissionId);
+		Task<SnippetOccurence> AddSnippetOccurenceAsync(Submission submission, Snippet snippet, int firstTokenIndex);
+		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount);
+		Task<Dictionary<int, SnippetStatistics>> GetSnippetsStatisticsAsync(int clientId, Guid taskId, IEnumerable<int> snippetsIds);
+		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId);
+		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId, Expression<Func<SnippetOccurence, bool>> filterFunction);
 	}
 
 	public class SnippetsRepo : ISnippetsRepo
@@ -41,43 +47,108 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return db.Snippets.AnyAsync(s => s.TokensCount == tokensCount && s.SnippetType == type && s.Hash == hash);
 		}
 
-		public async Task<SnippetOccurence> AddSnippetOccurenceAsync(int submissionId, Snippet snippet, int firstTokenIndex)
+		public async Task<SnippetOccurence> AddSnippetOccurenceAsync(Submission submission, Snippet snippet, int firstTokenIndex)
 		{
 			var foundSnippet = await GetOrAddSnippetAsync(snippet);
 			var snippetOccurence = new SnippetOccurence
 			{
-				SubmissionId = submissionId,
+				SubmissionId = submission.Id,
 				Snippet = foundSnippet,
 				FirstTokenIndex = firstTokenIndex,
 			};
 			await db.SnippetsOccurences.AddAsync(snippetOccurence);
 			await db.SaveChangesAsync();
+
+			var snippetStatistics = await GetOrAddSnippetStatisticsAsync(foundSnippet, submission.TaskId, submission.ClientId);
+			snippetStatistics.AuthorsCount = await db.SnippetsOccurences.Include(o => o.Submission)
+				.Where(o => o.SnippetId == foundSnippet.Id &&
+							o.Submission.ClientId == submission.ClientId &&
+							o.Submission.TaskId == submission.TaskId)
+				.Select(o => o.Submission.AuthorId)
+				.Distinct()
+				.CountAsync();
+			await db.SaveChangesAsync();
+			
 			return snippetOccurence;
+		}
+
+		private async Task<SnippetStatistics> GetOrAddSnippetStatisticsAsync(Snippet snippet, Guid taskId, int clientId)
+		{
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				var foundStatistics = await db.SnippetsStatistics.SingleOrDefaultAsync(
+					s => s.SnippetId == snippet.Id &&
+						s.TaskId == taskId &&
+						s.ClientId == clientId
+						);
+				if (foundStatistics != null)
+					return foundStatistics;
+
+				var addedStatistics = await db.SnippetsStatistics.AddAsync(new SnippetStatistics
+				{
+					SnippetId = snippet.Id,					
+					ClientId = clientId,
+					TaskId = taskId,
+				});
+				await db.SaveChangesAsync();
+				transaction.Commit();
+
+				return addedStatistics.Entity;
+			}
 		}
 
 		private async Task<Snippet> GetOrAddSnippetAsync(Snippet snippet)
 		{
-			var foundSnippet = await db.Snippets.SingleOrDefaultAsync(
-				s => s.SnippetType == snippet.SnippetType
-					&& s.TokensCount == snippet.TokensCount
-					&& s.Hash == snippet.Hash
-			);
-			if (foundSnippet != null)
-				return foundSnippet;
-			
-			await db.Snippets.AddAsync(snippet);
-			await db.SaveChangesAsync();
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				var foundSnippet = await db.Snippets.SingleOrDefaultAsync(
+					s => s.SnippetType == snippet.SnippetType
+						&& s.TokensCount == snippet.TokensCount
+						&& s.Hash == snippet.Hash
+				);
+				if (foundSnippet != null)
+					return foundSnippet;
+
+				await db.Snippets.AddAsync(snippet);
+				await db.SaveChangesAsync();
+				transaction.Commit();
+			}
+
 			return snippet;
 		}
 
-		public Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(int submissionId)
+		public Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount)
 		{
-			return db.SnippetsOccurences.Where(o => o.SubmissionId == submissionId).ToListAsync();
+			var selectedSnippetsStatistics = db.SnippetsStatistics.Where(s => s.TaskId == submission.TaskId && s.ClientId == submission.ClientId);
+			return db.SnippetsOccurences.Include(o => o.Snippet)
+				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => Tuple.Create(occurence, statistics))
+				.Where(o => o.Item1.SubmissionId == submission.Id)
+				.OrderBy(o => o.Item2.AuthorsCount)
+				.Take(maxCount)
+				.Select(o => o.Item1)
+				.ToListAsync();
 		}
 
-		public async Task<List<Snippet>> GetSnippetsForSubmission(int submissionId)
+		public Task<Dictionary<int, SnippetStatistics>> GetSnippetsStatisticsAsync(int clientId, Guid taskId, IEnumerable<int> snippetsIds)
 		{
-			return (await GetSnippetsOccurencesForSubmissionAsync(submissionId)).Select(o => o.Snippet).ToList();
+			return db.SnippetsStatistics
+				.Where(s => s.ClientId == clientId && s.TaskId == taskId && snippetsIds.Contains(s.SnippetId))
+				.ToDictionaryAsync(s => s.SnippetId);
+		}
+
+		public Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId)
+		{
+			return GetSnippetsOccurencesAsync(snippetId, o => true);
+		}
+
+		public Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId, Expression<Func<SnippetOccurence, bool>> filterFunction)
+		{
+			return db.SnippetsOccurences.Include(o => o.Submission).Where(o => o.SnippetId == snippetId).Where(filterFunction).ToListAsync();
+		}
+
+		public async Task<List<Snippet>> GetSnippetsForSubmission(Submission submission, int maxCount)
+		{
+			return (await GetSnippetsOccurencesForSubmissionAsync(submission, maxCount)).Select(o => o.Snippet).ToList();
 		}
 	}
 }

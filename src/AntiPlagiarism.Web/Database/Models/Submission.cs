@@ -31,6 +31,9 @@ namespace AntiPlagiarism.Web.Database.Models
 		
 		[Required]
 		public Language Language { get; set; }
+		
+		[Required]
+		public int TokensCount { get; set; }
 
 		[NotMapped]
 		public string ProgramText => Program.Text;

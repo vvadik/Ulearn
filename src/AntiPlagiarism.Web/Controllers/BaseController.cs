@@ -15,17 +15,12 @@ namespace AntiPlagiarism.Web.Controllers
 	public abstract class BaseController : Controller
 	{
 		protected readonly ILogger logger;
-		//private readonly IConfiguration configuration;
-		
-		//protected readonly AntiPlagiarismConfiguration ApplicationConfiguration = new AntiPlagiarismConfiguration();
 		
 		protected Client client;
 
 		protected BaseController(ILogger logger)
 		{
 			this.logger = logger;
-			//this.configuration = configuration;
-			//configuration.GetSection("antiplagiarism").Bind(ApplicationConfiguration);
 		}
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -73,10 +68,5 @@ namespace AntiPlagiarism.Web.Controllers
 
 			await base.OnActionExecutionAsync(context, next);
 		}
-	}
-
-	public class AntiPlagiarismConfiguration
-	{
-		public int SnippetTokensCount { get; set; }
 	}
 }

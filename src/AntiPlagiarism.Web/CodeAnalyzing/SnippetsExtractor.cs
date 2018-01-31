@@ -13,7 +13,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		
 		public static SnippetsExtractorOptions Default => new SnippetsExtractorOptions
 		{
-			SequenceHasher = new PolynomialSequenceHasher(137),
+			SequenceHasher = new PolynomialSequenceHasher(137, new StableStringHasher()),
 		};		
 	}
 	
@@ -54,7 +54,6 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			
 				if (tokensQueue.Count == snippetTokensCount)
 				{
-//					var snippet = tokensQueue.Join(" ");
 					yield return new Snippet
 					{
 						SnippetType = converter.SnippetType,

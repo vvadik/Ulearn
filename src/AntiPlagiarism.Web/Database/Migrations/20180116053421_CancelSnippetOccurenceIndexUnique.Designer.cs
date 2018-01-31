@@ -13,9 +13,10 @@ using System;
 namespace AntiPlagiarism.Web.Migrations
 {
     [DbContext(typeof(AntiPlagiarismDb))]
-    partial class AntiPlagiarismDbModelSnapshot : ModelSnapshot
+    [Migration("20180116053421_CancelSnippetOccurenceIndexUnique")]
+    partial class CancelSnippetOccurenceIndexUnique
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,8 +91,7 @@ namespace AntiPlagiarism.Web.Migrations
 
                     b.HasIndex("SnippetId");
 
-                    b.HasIndex("SubmissionId", "FirstTokenIndex")
-                        .IsUnique();
+                    b.HasIndex("SubmissionId", "FirstTokenIndex");
 
                     b.ToTable("SnippetsOccurences");
                 });

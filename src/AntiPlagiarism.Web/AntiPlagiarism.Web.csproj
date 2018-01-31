@@ -3,8 +3,10 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.1" />
+    <PackageReference Include="OctoPack" Version="3.6.3" />
     <PackageReference Include="Serilog.AspNetCore" Version="2.1.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="2.4.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
@@ -23,9 +25,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Migrations" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\AntiPlagiarism.Api\AntiPlagiarism.Api.csproj" />
+    <ProjectReference Include="..\uLearn\uLearn.csproj" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,7 @@
 using System;
+using AntiPlagiarism.Web.CodeAnalyzing;
+using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
+using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Controllers;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;
@@ -56,7 +59,10 @@ namespace AntiPlagiarism.Web
 					}
 
 					app.UseMvc();
-                })
+
+					var database = app.ApplicationServices.GetService<AntiPlagiarismDb>();
+					database.MigrateToLatestVersion();
+				})
                 .Build();
         }
 
@@ -74,6 +80,12 @@ namespace AntiPlagiarism.Web
 			services.AddScoped<IClientsRepo, ClientsRepo>();
 			services.AddScoped<ISubmissionsRepo, SubmissionsRepo>();
 			services.AddScoped<ISnippetsRepo, SnippetsRepo>();
+			services.AddScoped<ITasksRepo, TasksRepo>();
+			
+			/* Other services */
+			services.AddScoped<PlagiarismDetector>();
+			services.AddScoped<StatisticsParametersFinder>();
+			services.AddSingleton<CodeUnitsExtractor>();
 			
 			/* Asp.NET Core MVC */
 			services.AddMvc();

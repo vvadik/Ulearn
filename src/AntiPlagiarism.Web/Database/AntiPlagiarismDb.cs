@@ -20,22 +20,32 @@ namespace AntiPlagiarism.Web.Database
 
 			modelBuilder.Entity<SnippetOccurence>()
 				.HasIndex(c => new { c.SubmissionId, c.FirstTokenIndex })
-				.IsUnique();
+				.IsUnique(false);
 
 			modelBuilder.Entity<Snippet>()
 				.HasIndex(c => new { c.TokensCount, c.SnippetType, c.Hash })
 				.IsUnique();
 
+			modelBuilder.Entity<SnippetStatistics>()
+				.HasIndex(c => new { c.SnippetId, c.TaskId, c.ClientId })
+				.IsUnique();
+
 			var submissionEntityBuilder = modelBuilder.Entity<Submission>();
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AuthorId });
+		}
 
+		public void MigrateToLatestVersion()
+		{
+			Database.Migrate();
 		}
 
 		public DbSet<Client> Clients { get; set; }
 		public DbSet<Submission> Submissions { get; set; }
 		public DbSet<Code> Codes { get; set; }
 		public DbSet<Snippet> Snippets { get; set; }
+		public DbSet<SnippetStatistics> SnippetsStatistics { get; set; }
 		public DbSet<SnippetOccurence> SnippetsOccurences { get; set; }
+		public DbSet<TaskStatisticsParameters> TasksStatisticsParameters { get; set; }
 	}
 }

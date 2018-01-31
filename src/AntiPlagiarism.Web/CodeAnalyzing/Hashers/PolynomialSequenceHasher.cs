@@ -1,39 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Server.Kestrel.Transport.Libuv.Internal.Networking;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing.Hashers
 {
 	public class PolynomialSequenceHasher : ISequenceHasher
 	{
+		private readonly IObjectHasher hasher;	
 		private readonly int polynomBase;
+		
 		private int currentHash;
 		private readonly Queue<int> objectsHashes = new Queue<int>();
-		private readonly Dictionary<int, int> valueToSubstractCache;
 		private int[] basePowers;
 
-		public PolynomialSequenceHasher(int polynomBase, int defaultCapacity=10000)
+		public PolynomialSequenceHasher(int polynomBase, IObjectHasher hasher=null, int defaultCapacity=10000)
 		{
 			this.polynomBase = polynomBase;
-			valueToSubstractCache = new Dictionary<int, int>();
+			this.hasher = hasher ?? new DefaultObjectHasher();
 			InitBasePowers(defaultCapacity);
 			Reset();
 		}
 
 		public void Enqueue(object obj)
 		{
-			var objectHashCode = obj.GetHashCode();
+			var objectHashCode = hasher.GetHashCode(obj);
 			currentHash = unchecked(currentHash * polynomBase + objectHashCode);	
 			objectsHashes.Enqueue(objectHashCode);
 		}
 
 		public void Dequeue()
 		{
-			if (!valueToSubstractCache.TryGetValue(objectsHashes.Count, out var valueToSubstract))
-			{
-				valueToSubstract = GetBasePower(objectsHashes.Count - 1);
-				valueToSubstractCache[objectsHashes.Count] = valueToSubstract;
-			}
-
+			var valueToSubstract = GetBasePower(objectsHashes.Count - 1);
 			currentHash = unchecked(currentHash - valueToSubstract * objectsHashes.Dequeue());
 		}
 
