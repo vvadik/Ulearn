@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using JetBrains.Annotations;
 
-namespace uLearn
+namespace Ulearn.Common
 {
 	public class DefaultDictionary<TKey, TValue> : Dictionary<TKey, TValue>
 	{
@@ -33,8 +32,7 @@ namespace uLearn
 		{
 			get
 			{
-				TValue value;
-				if (TryGetValue(key, out value))
+				if (TryGetValue(key, out var value))
 					return value;
 
 				value = DefaultSelector != null ? DefaultSelector() : GetEmptyValue();

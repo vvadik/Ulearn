@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using uLearn.Extensions;
 using uLearn.Model.Blocks;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp
 {

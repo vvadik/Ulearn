@@ -6,6 +6,7 @@ using System.Linq;
 using System.Xml.Serialization;
 using uLearn.Extensions;
 using uLearn.Model.Edx.EdxComponents;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Model.Blocks
 {

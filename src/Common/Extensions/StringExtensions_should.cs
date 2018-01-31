@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace uLearn.Extensions
+namespace Ulearn.Common.Extensions
 {
 	[TestFixture]
 	public class StringExtensions_should

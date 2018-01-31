@@ -12,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using uLearn;
 using uLearn.Extensions;
 using uLearn.Quizes;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {
@@ -28,15 +30,18 @@ namespace Database.DataContexts
 
 		private readonly CourseManager courseManager;
 
-		public GroupsRepo(ULearnDb db, CourseManager courseManager)
+		public GroupsRepo(
+			ULearnDb db,
+			SlideCheckingsRepo slideCheckingsRepo, UserSolutionsRepo userSolutionsRepo, UserQuizzesRepo userQuizzesRepo, VisitsRepo visitsRepo, UserRolesRepo userRolesRepo,
+			CourseManager courseManager)
 		{
 			this.db = db;
+			this.slideCheckingsRepo = slideCheckingsRepo;
+			this.userSolutionsRepo = userSolutionsRepo;
+			this.userQuizzesRepo = userQuizzesRepo;
+			this.visitsRepo = visitsRepo;
+			this.userRolesRepo = userRolesRepo;
 			this.courseManager = courseManager;
-			slideCheckingsRepo = new SlideCheckingsRepo(db);
-			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
-			userQuizzesRepo = new UserQuizzesRepo(db);
-			visitsRepo = new VisitsRepo(db);
-			userRolesRepo = new UserRolesRepo(db);
 		}
 
 		public bool CanUserSeeAllCourseGroups(IPrincipal user, string courseId)

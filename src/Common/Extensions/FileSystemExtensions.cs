@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json.Serialization;
-using NUnit.Framework;
 
-namespace uLearn.Extensions
+namespace Ulearn.Common.Extensions
 {
 	public static class FileSystemExtensions
 	{

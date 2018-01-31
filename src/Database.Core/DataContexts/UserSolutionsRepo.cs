@@ -19,6 +19,8 @@ using Microsoft.EntityFrameworkCore;
 using RunCsJob.Api;
 using uLearn;
 using uLearn.Extensions;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {
@@ -456,7 +458,7 @@ namespace Database.DataContexts
 			}
 
 			/* If something is wrong */
-			unhandledSubmissions.TryRemove(submission.Id, out DateTime value);
+			unhandledSubmissions.TryRemove(submission.Id, out var _);
 			throw new SubmissionCheckingTimeout();
 		}
 

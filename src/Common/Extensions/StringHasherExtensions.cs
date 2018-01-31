@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
 
-namespace uLearn.Extensions
+namespace Ulearn.Common.Extensions
 {
 	public static class StringHasherExtensions
 	{

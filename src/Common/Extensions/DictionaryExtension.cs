@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
-namespace uLearn.Extensions
+namespace Ulearn.Common.Extensions
 {
 	public static class DictionaryExtension
 	{

@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp
 {

@@ -1,6 +1,6 @@
 using System;
 
-namespace uLearn
+namespace Ulearn.Common
 {
 	public enum Gender : short
 	{

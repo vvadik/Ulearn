@@ -6,6 +6,7 @@ using System.Linq;
 using Database.DataContexts;
 using uLearn;
 using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace Database.Migrations
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Web;
 
-namespace uLearn.Extensions
+namespace Ulearn.Common.Extensions
 {
 	public static class NameValueCollectionExtensions
 	{

@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
-using Newtonsoft.Json;
 using Ionic.Zip;
+using Newtonsoft.Json;
 
-namespace uLearn.Extensions
+namespace Ulearn.Common.Extensions
 {
 	public static class FileExtensions
 	{

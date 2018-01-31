@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using NHunspell;
 using uLearn.Extensions;
 using uLearn.Properties;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.SpellChecking
 {

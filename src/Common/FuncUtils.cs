@@ -6,7 +6,7 @@ using log4net.Appender;
 using log4net.Repository.Hierarchy;
 using NUnit.Framework;
 
-namespace uLearn
+namespace Ulearn.Common
 {
 	public class FuncUtils
 	{

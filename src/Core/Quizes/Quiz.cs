@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 using uLearn.Extensions;
 using uLearn.Model.Blocks;
 using uLearn.Model.Edx.EdxComponents;
+using Ulearn.Common.Extensions;
 using Component = uLearn.Model.Edx.EdxComponents.Component;
 
 namespace uLearn.Quizes

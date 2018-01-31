@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace uLearn.Extensions
+namespace Ulearn.Common.Extensions
 {
 	public static class EnumExtensions
 	{

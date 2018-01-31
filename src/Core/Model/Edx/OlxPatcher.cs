@@ -6,6 +6,7 @@ using System.Xml;
 using System.Xml.Linq;
 using uLearn.Extensions;
 using uLearn.Model.Edx.EdxComponents;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Model.Edx
 {

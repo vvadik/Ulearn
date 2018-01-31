@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Formatting = Newtonsoft.Json.Formatting;
 
-namespace uLearn.Extensions
+namespace Ulearn.Common.Extensions
 {
 	public static class ObjectExtensions
 	{

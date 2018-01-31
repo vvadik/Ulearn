@@ -5,9 +5,9 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using BinaryAnalysis.UnidecodeSharp;
+using UnidecodeSharpCore;
 
-namespace uLearn.Extensions
+namespace Ulearn.Common.Extensions
 {
 	public static class StringExtensions
 	{

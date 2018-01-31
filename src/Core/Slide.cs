@@ -7,6 +7,7 @@ using uLearn.Model.Blocks;
 using uLearn.Model.Edx;
 using uLearn.Model.Edx.EdxComponents;
 using uLearn.Quizes;
+using Ulearn.Common.Extensions;
 
 namespace uLearn
 {

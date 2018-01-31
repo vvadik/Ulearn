@@ -12,6 +12,8 @@ using uLearn.Extensions;
 using uLearn.Helpers;
 using uLearn.NUnitTestRunning;
 using uLearn.Properties;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Model.Blocks
 {

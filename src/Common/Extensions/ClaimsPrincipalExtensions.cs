@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 
-namespace uLearn.Extensions
+namespace Ulearn.Common.Extensions
 {
 	public static class ClaimsPrincipalExtensions
 	{

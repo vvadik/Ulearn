@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace uLearn.Extensions
+namespace Ulearn.Common.Extensions
 {
 	public static class CollectionExtensions
 	{

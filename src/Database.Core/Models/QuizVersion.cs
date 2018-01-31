@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using uLearn.Extensions;
 using uLearn.Quizes;
+using Ulearn.Common.Extensions;
 
 namespace Database.Models
 {

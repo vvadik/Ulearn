@@ -2,7 +2,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>uLearn</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Ionic.Zip" Version="1.9.1.8" />
@@ -35,6 +34,7 @@
     <PackageReference Include="UnidecodeSharp" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\RunCsJob.Api.Core\RunCsJob.Api.Core.csproj">
       <Project>{B7DF3FA1-307F-4F9A-87F0-B0FAA9D2CE8C}</Project>
       <Name>RunCsJob.Api.Core</Name>
