@@ -10,6 +10,7 @@ using EntityFramework.Functions;
 using JetBrains.Annotations;
 using log4net;
 using uLearn;
+using Ulearn.Common;
 
 namespace Database.DataContexts
 {
@@ -44,7 +45,7 @@ namespace Database.DataContexts
 		{
 			var clientId = Guid.NewGuid();
 			var user = new ApplicationUser { UserName = $"__grader_client_{clientId.GetNormalizedGuid()}__" };
-			var password = uLearn.Helpers.StringUtils.GenerateSecureAlphanumericString(10);
+			var password = StringUtils.GenerateSecureAlphanumericString(10);
 			await userManager.CreateAsync(user, password);
 
 			var client = new GraderClient

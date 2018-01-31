@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Extensions;
-using JetBrains.Annotations;
+using Ulearn.Common.Extensions;
 
 namespace AntiPlagiarism.Web.Database.Repos
 {

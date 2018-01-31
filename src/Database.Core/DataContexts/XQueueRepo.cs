@@ -6,6 +6,7 @@ using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using uLearn;
+using Ulearn.Common;
 
 namespace Database.DataContexts
 {
@@ -25,7 +26,7 @@ namespace Database.DataContexts
 		public async Task AddXQueueWatcher(string name, string baseUrl, string queueName, string username, string password)
 		{
 			var user = new ApplicationUser { UserName = $"__xqueue_watcher_{new Guid().GetNormalizedGuid()}__" };
-			var userPassword = uLearn.Helpers.StringUtils.GenerateSecureAlphanumericString(10);
+			var userPassword = StringUtils.GenerateSecureAlphanumericString(10);
 			await userManager.CreateAsync(user, userPassword);
 			var watcher = new XQueueWatcher
 			{

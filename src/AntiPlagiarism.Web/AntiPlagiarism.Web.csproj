@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntiPlagiarism.Api\AntiPlagiarism.Api.csproj" />
-    <ProjectReference Include="..\uLearn\uLearn.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 </Project>

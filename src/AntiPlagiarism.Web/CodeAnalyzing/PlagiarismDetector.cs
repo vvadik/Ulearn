@@ -9,9 +9,8 @@ using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
-using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
-using uLearn;
+using Ulearn.Common;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing
 {
