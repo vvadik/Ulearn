@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Reflection;
-using Database.DataContexts;
+using Database.Repos;
 using uLearn;
-using uLearn.Extensions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
@@ -292,13 +290,13 @@ namespace Database.Models
 		public abstract string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl);
 		public abstract NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl);
 
-		public abstract List<string> GetRecipientsIds(ULearnDb db);
+		public abstract List<string> GetRecipientsIds(UlearnDb db);
 		public virtual bool IsNotificationForEveryone => false;
 
 		public abstract bool IsActual();
 
 		/* Returns list of notifications, which blocks this notification from sending to specific user. I.e. NewComment is blocked by ReplyToYourComment */
-		public virtual List<Notification> GetBlockerNotifications(ULearnDb db)
+		public virtual List<Notification> GetBlockerNotifications(UlearnDb db)
 		{
 			return new List<Notification>();
 		}
@@ -367,7 +365,7 @@ namespace Database.Models
 			return null;
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			/* If you want to send system message you should create NotificationDelivery yourself. By default nobody receives it */
 			return new List<string>();
@@ -400,7 +398,7 @@ namespace Database.Models
 			return null;
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			/* If you want to send message you should create NotificationDelivery yourself. By default nobody receives it */
 			return new List<string>();
@@ -479,14 +477,14 @@ namespace Database.Models
 			return $"{Comment.Author.VisibleName} прокомментировал{Comment.Author.Gender.ChooseEnding()} «{GetSlideTitle(course, slide)}»\n\n{Comment.Text.Trim()}";
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new VisitsRepo(db).GetCourseUsers(CourseId);
 		}
 
 		public override bool IsNotificationForEveryone => true;
 
-		public override List<Notification> GetBlockerNotifications(ULearnDb db)
+		public override List<Notification> GetBlockerNotifications(UlearnDb db)
 		{
 			return new NotificationsRepo(db).FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
 		}
@@ -522,7 +520,7 @@ namespace Database.Models
 					$"{Comment.Text.Trim()}";
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new List<string> { ParentComment.AuthorId };
 		}
@@ -557,7 +555,7 @@ namespace Database.Models
 					$"> {Comment.Text.Trim().Replace("\n", "\n >")}";
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new List<string> { Comment.AuthorId };
 		}
@@ -647,7 +645,7 @@ namespace Database.Models
 			return new NotificationButton("Перейти к странице с заданием", GetSlideUrl(course, slide, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new List<string> { Checking.UserId };
 		}
@@ -695,7 +693,7 @@ namespace Database.Models
 			return new NotificationButton("Перейти к странице с тестом", GetSlideUrl(course, slide, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new List<string> { Checking.UserId };
 		}
@@ -738,7 +736,7 @@ namespace Database.Models
 			return new NotificationButton("Смотреть сертификат", GetCertificateUrl(Certificate, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new List<string> { Certificate.UserId };
 		}
@@ -785,7 +783,7 @@ namespace Database.Models
 			return null;
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new List<string> { Score.UserId };
 		}
@@ -825,7 +823,7 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new List<string> { Group.OwnerId };
 		}
@@ -859,7 +857,7 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new List<string> { Access.UserId };
 		}
@@ -893,7 +891,7 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new List<string> { Access.UserId };
 		}
@@ -931,11 +929,12 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
-			var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
-			var accesses = groupsRepo.GetGroupAccesses(GroupId);
-			return accesses.Select(a => a.UserId).ToList();
+			// var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
+			// var accesses = groupsRepo.GetGroupAccesses(GroupId);
+			// return accesses.Select(a => a.UserId).ToList();
+			throw new NotImplementedException();
 		}
 
 		public override bool IsActual()
@@ -963,7 +962,7 @@ namespace Database.Models
 			return $"{AddedUser.VisibleName} стал{AddedUser.Gender.ChooseEnding()} преподавателем курса «{course.Title}».";
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
 		}
@@ -1002,7 +1001,7 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
 		}
@@ -1044,7 +1043,7 @@ namespace Database.Models
 			return $"Загружена новая версия курса «{course.Title.EscapeHtml()}». Теперь её можно опубликовать.";
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
 		}
@@ -1075,7 +1074,7 @@ namespace Database.Models
 					GetCourseUrl(course, baseUrl);
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
 		}
@@ -1130,7 +1129,7 @@ namespace Database.Models
 			return new NotificationButton("Смотреть детали переноса курса", GetStepikExportProcessUrl(baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(ULearnDb db)
+		public override List<string> GetRecipientsIds(UlearnDb db)
 		{
 			return new List<string> { Process.OwnerId };
 		}

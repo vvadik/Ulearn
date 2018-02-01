@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-using Database.DataContexts;
+using Database.Repos;
 using log4net;
 using uLearn;
 
@@ -11,15 +11,17 @@ namespace Database
 {
 	public class WebCourseManager : CourseManager
 	{
+		private readonly CoursesRepo coursesRepo;
 		private static readonly ILog log = LogManager.GetLogger(typeof(WebCourseManager));
 
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
 		private readonly TimeSpan fetchCourseVersionEvery = TimeSpan.FromMinutes(1);
 
-		private WebCourseManager()
+		private WebCourseManager(CoursesRepo coursesRepo)
 			: base(GetCoursesDirectory())
 		{
+			this.coursesRepo = coursesRepo;
 		}
 
 		private readonly object @lock = new object();
@@ -31,7 +33,7 @@ namespace Database
 				return course;
 
 			courseVersionFetchTime[courseId] = DateTime.Now;
-			var coursesRepo = new CoursesRepo();
+			
 			var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
 
 			if (publishedVersion == null)
@@ -65,6 +67,6 @@ namespace Database
 			}
 		}
 
-		public static readonly WebCourseManager Instance = new WebCourseManager();
+		// public static readonly WebCourseManager Instance = new WebCourseManager(TODO);
 	}
 }
