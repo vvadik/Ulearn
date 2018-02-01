@@ -20,15 +20,12 @@ namespace Database.Models
 		public int Id { get; set; }
 
 		[StringLength(64)]
-		[Index("IDX_NotificationTransport_ByUser")]
-		[Index("IDX_NotificationTransport_ByUserAndDeleted", 1)]
 		public string UserId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
 
 		public bool IsEnabled { get; set; }
 
-		[Index("IDX_NotificationTransport_ByUserAndDeleted", 2)]
 		public bool IsDeleted { get; set; }
 	}
 
@@ -62,18 +59,13 @@ namespace Database.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
 
-		[Index("IDX_NotificationTransportSettings_ByNotificationTransport")]
 		public int NotificationTransportId { get; set; }
 
 		public virtual NotificationTransport NotificationTransport { get; set; }
 
 		[StringLength(100)]
-		[Index("IDX_NotificationTransportSettings_ByCourse")]
-		[Index("IDX_NotificationTransportSettings_ByCourseAndNofiticationType", 1)]
 		public string CourseId { get; set; }
 
-		[Index("IDX_NotificationTransportSettings_ByNotificationType")]
-		[Index("IDX_NotificationTransportSettings_ByCourseAndNofiticationType", 2)]
 		public NotificationType NotificationType { get; set; }
 
 		public bool IsEnabled { get; set; }
@@ -85,22 +77,18 @@ namespace Database.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
 
-		[Index("IDX_NotificationDelivery_ByNotificationAndTransport", 1)]
 		public int NotificationId { get; set; }
 
 		public virtual Notification Notification { get; set; }
 
-		[Index("IDX_NotificationDelivery_ByNotificationAndTransport", 2)]
 		public int NotificationTransportId { get; set; }
 
 		public virtual NotificationTransport NotificationTransport { get; set; }
 
 		public NotificationDeliveryStatus Status { get; set; }
 
-		[Index("IDX_NotificatoinDelivery_ByCreateTime")]
 		public DateTime CreateTime { get; set; }
 
-		[Index("IDX_NotificationDelivery_ByNextTryTime")]
 		public DateTime? NextTryTime { get; set; }
 
 		public int FailsCount { get; set; }
@@ -284,7 +272,6 @@ namespace Database.Models
 
 		[StringLength(100)]
 		[Required(AllowEmptyStrings = true)]
-		[Index("IDX_Notification_ByCourse")]
 		public string CourseId { get; set; }
 
 		[StringLength(60)]
@@ -294,11 +281,9 @@ namespace Database.Models
 		public virtual ApplicationUser InitiatedBy { get; set; }
 
 		[Required]
-		[Index("IDX_Notification_ByCreateTime")]
 		public DateTime CreateTime { get; set; }
 
 		[Required]
-		[Index("IDX_Notification_ByAreDeliveriesCreated")]
 		public bool AreDeliveriesCreated { get; set; }
 
 		public virtual ICollection<NotificationDelivery> Deliveries { get; set; }
@@ -357,7 +342,7 @@ namespace Database.Models
 
 		public static NotificationType GetNotificationType(this Notification notification)
 		{
-			return GetNotificationType(ObjectContext.GetObjectType(notification.GetType()));
+			return GetNotificationType(((dynamic) notification).GetType());
 		}
 	}
 

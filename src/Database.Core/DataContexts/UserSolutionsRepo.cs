@@ -2,23 +2,15 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Core.Objects;
-using System.Data.Entity.Migrations;
-using System.Data.Entity.Validation;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using ApprovalUtilities.Utilities;
 using Database.Models;
-using EntityFramework.Functions;
 using log4net;
 using Microsoft.EntityFrameworkCore;
 using RunCsJob.Api;
 using uLearn;
-using uLearn.Extensions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
@@ -322,8 +314,8 @@ namespace Database.DataContexts
 				await SaveAll(submissions.Select(s => s.AutomaticChecking));
 
 				transaction.Commit();
-
-				db.ObjectContext().AcceptAllChanges();
+				
+				db.ChangeTracker.AcceptAllChanges();
 			}
 
 			foreach (var submission in submissions)
@@ -359,10 +351,11 @@ namespace Database.DataContexts
 			foreach (var checking in checkings)
 			{
 				log.Info($"Обновляю статус автоматической проверки #{checking.Id}: {checking.Status}");
-				db.AutomaticExerciseCheckings.AddOrUpdate(checking);
+				db.AutomaticExerciseCheckings.AddOrUpdate(checking, c => c.Id == checking.Id);
 				await UpdateIsRightAnswerForSubmission(checking);
 			}
-			await db.ObjectContext().SaveChangesAsync(SaveOptions.DetectChangesBeforeSave);
+
+			await db.SaveChangesAsync();
 		}
 
 		public async Task SaveResults(List<RunningResults> results)
@@ -388,8 +381,8 @@ namespace Database.DataContexts
 				log.Info($"Есть информация о следующих проверках, которые ещё не забраны клиентом: [{string.Join(", ", handledSubmissions.Keys)}]");
 
 				transaction.Commit();
-
-				db.ObjectContext().AcceptAllChanges();
+				
+				db.ChangeTracker.AcceptAllChanges();
 			}
 		}
 

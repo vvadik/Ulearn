@@ -16,8 +16,6 @@ namespace Database.Models
 
 		[Required]
 		[StringLength(64)]
-		[Index("IDX_GroupLabel_ByOwner")]
-		[Index("IDX_GroupLabel_ByOwnerAndIsDeleted", 1)]
 		public string OwnerId { get; set; }
 
 		public virtual ApplicationUser Owner { get; set; }
@@ -29,7 +27,6 @@ namespace Database.Models
 		public string ColorHex { get; set; }
 
 		[Required]
-		[Index("IDX_GroupLabel_ByOwnerAndIsDeleted", 2)]
 		public bool IsDeleted { get; set; }
 	}
 
@@ -40,15 +37,11 @@ namespace Database.Models
 		public int Id { get; set; }
 
 		[Required]
-		[Index("IDX_LabelOnGroup_ByGroup")]
-		[Index("IDX_LabelOnGroup_ByGroupAndLabel", 1, IsUnique = true)]
 		public int GroupId { get; set; }
 
 		public virtual Group Group { get; set; }
 
 		[Required]
-		[Index("IDX_LabelOnGroup_ByLabel")]
-		[Index("IDX_LabelOnGroup_ByGroupAndLabel", 2, IsUnique = true)]
 		public int LabelId { get; set; }
 		
 		public virtual GroupLabel Label { get; set; }

@@ -17,11 +17,6 @@ namespace Database.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		public CoursesRepo()
-			: this(new ULearnDb())
-		{
-		}
-
 		public CoursesRepo(ULearnDb db)
 		{
 			this.db = db;

@@ -13,11 +13,9 @@ namespace Database.Models
 
 		[StringLength(64)]
 		[Required]
-		[Index("FullIndex", 2)]
 		public string UserId { get; set; }
 
 		[Required]
-		[Index("FullIndex", 3)]
 		public int HintId { get; set; }
 
 		[Required]
@@ -25,10 +23,8 @@ namespace Database.Models
 		public string CourseId { get; set; }
 
 		[Required]
-		[Index("FullIndex", 1)]
 		public Guid SlideId { get; set; }
 
-		[Index("FullIndex", 4)]
 		public bool IsHintHelped { get; set; }
 	}
 }

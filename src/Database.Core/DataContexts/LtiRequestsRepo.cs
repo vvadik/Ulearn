@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Data.Entity.Core.Objects;
-using System.Data.Entity.Migrations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Database.Models;
-using EntityFramework.Functions;
-using LtiLibrary.Core.Lti1;
 using LtiLibrary.NetCore.Lti.v1;
 using Newtonsoft.Json;
-using uLearn;
 using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {
@@ -47,9 +42,8 @@ namespace Database.DataContexts
 			else
 				ltiRequestModel.Request = ltiRequestJson;
 
-			db.LtiRequests.AddOrUpdate(ltiRequestModel);
-			await db.ObjectContext().SaveChangesAsync(SaveOptions.DetectChangesBeforeSave);
-			db.ObjectContext().AcceptAllChanges();
+			db.LtiRequests.AddOrUpdate(ltiRequestModel, r => r.RequestId == ltiRequestModel.RequestId);
+			await db.SaveChangesAsync();
 		}
 
 		public LtiRequest Find(string userId, Guid slideId)

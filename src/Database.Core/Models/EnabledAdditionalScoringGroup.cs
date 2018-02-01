@@ -10,7 +10,6 @@ namespace Database.Models
 		public int Id { get; set; }
 
 		[Required]
-		[Index("IDX_EnabledAdditionalScoringGroup_ByGroup", 2)]
 		public int GroupId { get; set; }
 
 		public virtual Group Group { get; set; }

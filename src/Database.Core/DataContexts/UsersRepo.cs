@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using uLearn;
-using uLearn.Helpers;
 using Ulearn.Common;
 
 namespace Database.DataContexts
@@ -15,14 +15,20 @@ namespace Database.DataContexts
 	public class UsersRepo
 	{
 		private readonly ULearnDb db;
+		private readonly ULearnUserManager userManager;
 		private readonly UserRolesRepo userRolesRepo;
 
 		public const string UlearnBotUsername = "ulearn-bot";
 
-		public UsersRepo(ULearnDb db)
+		public UsersRepo(
+			ULearnDb db,
+			ULearnUserManager userManager,
+			UserRolesRepo userRolesRepo
+		)
 		{
 			this.db = db;
-			userRolesRepo = new UserRolesRepo(db);
+			this.userManager = userManager;
+			this.userRolesRepo = userRolesRepo;
 		}
 
 		public ApplicationUser FindUserById(string id)
@@ -94,20 +100,16 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		private const string nameSpace = nameof(UsersRepo);
-		private const string dbo = nameof(dbo);
-
-		[TableValuedFunction(nameof(GetUsersByNamePrefix), nameSpace, Schema = dbo)]
-		// ReSharper disable once MemberCanBePrivate.Global
-		public IQueryable<UserIdWrapper> GetUsersByNamePrefix(string name)
+		private IQueryable<UserIdWrapper> GetUsersByNamePrefix(string name)
 		{
 			if (string.IsNullOrEmpty(name))
 				return db.Users.Select(u => new UserIdWrapper(u.Id));
-			;
+			
 			var splittedName = name.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 			var nameQuery = string.Join(" & ", splittedName.Select(s => "\"" + s.Trim().Replace("\"", "\\\"") + "*\""));
-			var nameParameter = new ObjectParameter("name", nameQuery);
-			return db.ObjectContext().CreateQuery<UserIdWrapper>($"[{nameof(GetUsersByNamePrefix)}](@name)", nameParameter);
+			return db.Users
+				.FromSql("SELECT * FROM dbo.AspNetUsers WHERE CONTAINS([Names], {0})", nameQuery)
+				.Select(u => new UserIdWrapper(u.Id));
 		}
 
 		public async Task UpdateLastConfirmationEmailTime(ApplicationUser user)
@@ -138,9 +140,10 @@ namespace Database.DataContexts
 			return user.Id;
 		}
 
-		public void CreateUlearnBotUserIfNotExists()
+		public async Task CreateUlearnBotUserIfNotExists()
 		{
-			if (! db.Users.Any(u => u.UserName == UlearnBotUsername))
+			var ulearnBotFound = await db.Users.AnyAsync(u => u.UserName == UlearnBotUsername).ConfigureAwait(false);
+			if (! ulearnBotFound)
 			{
 				var user = new ApplicationUser
 				{
@@ -149,10 +152,9 @@ namespace Database.DataContexts
 					LastName = "bot",
 					Email = "support@ulearn.me",
 				};
-				var userManager = new ULearnUserManager(db);
-				userManager.Create(user, StringUtils.GenerateSecureAlphanumericString(10));
+				await userManager.CreateAsync(user, StringUtils.GenerateSecureAlphanumericString(10)).ConfigureAwait(false);
 
-				db.SaveChanges();
+				await db.SaveChangesAsync().ConfigureAwait(false);
 			}
 		}
 

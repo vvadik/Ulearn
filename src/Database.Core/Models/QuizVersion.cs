@@ -18,15 +18,12 @@ namespace Database.Models
 		public string CourseId { get; set; }
 
 		[Required]
-		[Index("IDX_QuizVersion_QuizVersionBySlide")]
-		[Index("IDX_QuizVersion_QuizVersionBySlideAndTime", 1)]
 		public Guid SlideId { get; set; }
 
 		[Required]
 		public string NormalizedXml { get; set; }
 
 		[Required]
-		[Index("IDX_QuizVersion_QuizVersionBySlideAndTime", 2)]
 		public DateTime LoadingTime { get; set; }
 
 		[NotMapped]

@@ -20,7 +20,6 @@ namespace Database.Models
 		public string AccessToken { get; set; }
 
 		[Required]
-		[Index]
 		public DateTime AddedTime { get; set; }
 	}
 }

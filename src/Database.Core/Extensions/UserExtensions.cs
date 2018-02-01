@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
-using System.Threading.Tasks;
 using Database.DataContexts;
 using Database.Models;
-using Microsoft.AspNetCore.Identity;
+using Ulearn.Common.Extensions;
 
 namespace Database.Extensions
 {
@@ -77,6 +76,7 @@ namespace Database.Extensions
 			identity.AddClaim(new Claim(courseRoleClaimType, courseId + " " + role));
 		}
 
+		/*
 		public static async Task<ClaimsIdentity> GenerateUserIdentityAsync(this ApplicationUser user, UserManager<ApplicationUser> manager, UserRolesRepo userRoles)
 		{
 			var identity = await manager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
@@ -89,7 +89,9 @@ namespace Database.Extensions
 			var userRoles = new UserRolesRepo();
 			return await user.GenerateUserIdentityAsync(manager, userRoles);
 		}
+		*/
 
+		/*
 		public static bool HasSystemAccess(this ApplicationUser user, SystemAccessType accessType)
 		{
 			var systemAccessesRepo = new SystemAccessesRepo();
@@ -101,5 +103,6 @@ namespace Database.Extensions
 			var systemAccessesRepo = new SystemAccessesRepo();
 			return systemAccessesRepo.HasSystemAccess(User.GetUserId(), accessType);
 		}
+		*/
 	}
 }

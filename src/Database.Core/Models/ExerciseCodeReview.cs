@@ -10,7 +10,6 @@ namespace Database.Models
 		public int Id { get; set; }
 
 		[Required]
-		[Index("IDX_ExerciseCodeReview_ByManualExerciseChecking")]
 		public int ExerciseCheckingId { get; set; }
 
 		public virtual ManualExerciseChecking ExerciseChecking { get; set; }

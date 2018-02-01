@@ -16,17 +16,12 @@ namespace Database.Models
 
 		[Required]
 		[StringLength(100)]
-		[Index("IDX_StepikExportSlideAndStepMap_ByUlearnCourseId")]
-		[Index("IDX_StepikExportSlideAndStepMap_ByUlearnCourseIdAndStepikCourseId", 1)]
-		[Index("IDX_StepikExportSlideAndStepMap_ByUlearnCourseIdAndSlideId", 1)]
 		public string UlearnCourseId { get; set; }
 
 		[Required]
-		[Index("IDX_StepikExportSlideAndStepMap_ByUlearnCourseIdAndStepikCourseId", 2)]
 		public int StepikCourseId { get; set; }
 
 		[Required]
-		[Index("IDX_StepikExportSlideAndStepMap_ByUlearnCourseIdAndSlideId", 2)]
 		public Guid SlideId { get; set; }
 
 		[Required]

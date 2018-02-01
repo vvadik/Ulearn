@@ -11,15 +11,11 @@ namespace Database.Models
 
 		[Required]
 		[StringLength(64)]
-		[Index("IDX_CourseVersion_ByCourseAndPublishTime", 1)]
-		[Index("IDX_CourseVersion_ByCourseAndLoadingTime", 1)]
 		public string CourseId { get; set; }
 
 		[Required]
-		[Index("IDX_CourseVersion_ByCourseAndLoadingTime", 2)]
 		public DateTime LoadingTime { get; set; }
 
-		[Index("IDX_CourseVersion_ByCourseAndPublishTime", 2)]
 		public DateTime? PublishTime { get; set; }
 
 		[Required]

@@ -12,8 +12,6 @@ namespace Database.Models
 		
 		[Required]
 		[StringLength(64)]
-		[Index("IDX_SystemAccess_ByUser")]
-		[Index("IDX_SystemAccess_ByUserAndIsEnabled", 1)]
 		public string UserId { get; set; }
 		
 		public virtual ApplicationUser User { get; set; }
@@ -27,18 +25,14 @@ namespace Database.Models
 		[Required]
 		public SystemAccessType AccessType { get; set; }
 
-		[Index("IDX_SystemAccess_ByGrantTime")]
 		public DateTime GrantTime { get; set; }
 
 		[Required]
-		[Index("IDX_SystemAccess_ByIsEnabled", 1)]
-		[Index("IDX_SystemAccess_ByUserAndIsEnabled", 2)]
 		public bool IsEnabled { get; set; }
 	}
 	
 	public enum SystemAccessType : short
 	{
-		/* Видеть профили всех пользователей */
 		[Display(Name = "Видеть профили всех пользователей")]
 		ViewAllProfiles = 1,
 	}

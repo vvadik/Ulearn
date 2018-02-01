@@ -7,11 +7,6 @@ namespace Database.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		public ConsumersRepo()
-			: this(new ULearnDb())
-		{
-		}
-
 		public ConsumersRepo(ULearnDb db)
 		{
 			this.db = db;

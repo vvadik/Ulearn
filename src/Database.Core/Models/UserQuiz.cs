@@ -15,8 +15,6 @@ namespace Database.Models
 		public string CourseId { get; set; }
 
 		[Required]
-		[Index("FullIndex", 2)]
-		[Index("StatisticsIndex", 1)]
 		public Guid SlideId { get; set; }
 
 		public virtual QuizVersion QuizVersion { get; set; }
@@ -27,26 +25,21 @@ namespace Database.Models
 
 		[StringLength(64)]
 		[Required]
-		[Index("FullIndex", 1)]
 		public string UserId { get; set; }
 
 		[StringLength(64)]
-		[Index("FullIndex", 4)]
 		public string QuizId { get; set; }
 
 		[StringLength(64)]
-		[Index("FullIndex", 5)]
 		public string ItemId { get; set; }
 
 		[StringLength(1024)]
 		public string Text { get; set; }
 
 		[Required]
-		[Index("StatisticsIndex", 2)]
 		public DateTime Timestamp { get; set; }
 
 		[Required]
-		[Index("FullIndex", 3)]
 		public bool isDropped { get; set; }
 
 

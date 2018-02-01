@@ -11,7 +11,6 @@ namespace Database.Models
 
 		[Required]
 		[StringLength(64)]
-		[Index("CourseAndTime", 1)]
 		public string CourseId { get; set; }
 
 		[Required]
@@ -21,7 +20,6 @@ namespace Database.Models
 		public string UserName { get; set; }
 
 		[Required]
-		[Index("CourseAndTime", 2)]
 		public DateTime PublishTime { get; set; }
 	}
 }

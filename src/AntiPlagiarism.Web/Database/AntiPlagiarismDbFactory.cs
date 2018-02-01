@@ -4,6 +4,7 @@ using Vostok.Hosting;
 
 namespace AntiPlagiarism.Web.Database
 {
+	/* TODO (andgein): is this class needed? */
 	public class AntiPlagiarismDbFactory : IDesignTimeDbContextFactory<AntiPlagiarismDb>
 	{
 		public AntiPlagiarismDb CreateDbContext(string[] args)

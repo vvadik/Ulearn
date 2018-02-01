@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ApprovalUtilities.Utilities;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
 using uLearn.Quizes;

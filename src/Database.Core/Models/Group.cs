@@ -13,7 +13,6 @@ namespace Database.Models
 
 		[Required]
 		[StringLength(64)]
-		[Index("IDX_Group_GroupByCourse")]
 		public string CourseId { get; set; }
 
 		[Required]
@@ -22,7 +21,6 @@ namespace Database.Models
 
 		[Required]
 		[StringLength(64)]
-		[Index("IDX_Group_GroupByOwner")]
 		public string OwnerId { get; set; }
 
 		public virtual ApplicationUser Owner { get; set; }
@@ -35,7 +33,6 @@ namespace Database.Models
 		public bool IsArchived { get; set; }
 		
 		[Required]
-		[Index("IDX_Group_GroupByInviteHash")]
 		public Guid InviteHash { get; set; }
 
 		[Required]

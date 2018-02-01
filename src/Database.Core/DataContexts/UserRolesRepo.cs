@@ -13,11 +13,6 @@ namespace Database.DataContexts
 		{
 			this.db = db;
 		}
-
-		public UserRolesRepo()
-			: this(new ULearnDb())
-		{
-		}
 			
 		public Dictionary<string, CourseRole> GetRoles(string userId)
 		{

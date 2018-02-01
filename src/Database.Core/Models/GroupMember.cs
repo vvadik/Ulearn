@@ -11,14 +11,12 @@ namespace Database.Models
 		public int Id { get; set; }
 
 		[Required]
-		[Index("IDX_GroupMember_MembersByGroup")]
 		public int GroupId { get; set; }
 
 		public virtual Group Group { get; set; }
 	
 		[Required]
 		[StringLength(64)]
-		[Index("IDX_GroupMember_GroupByMember")]
 		public string UserId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }

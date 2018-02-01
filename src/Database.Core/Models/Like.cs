@@ -12,13 +12,10 @@ namespace Database.Models
 		public virtual UserExerciseSubmission Submission { get; set; }
 
 		[Required]
-		[Index("IDX_Like_ByUserAndSubmission", 2)]
-		[Index("IDX_Like_BySubmission")]
 		public int SubmissionId { get; set; }
 
 		[Required]
 		[StringLength(64)]
-		[Index("IDX_Like_ByUserAndSubmission", 1)]
 		public string UserId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }

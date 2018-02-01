@@ -35,8 +35,8 @@ namespace Database.Migrations
 				manager.AddToRole(user.Id, LmsRoles.SysAdmin.ToString());
 			}
 			
-			var usersRepo = new UsersRepo(db);
-			usersRepo.CreateUlearnBotUserIfNotExists();
+			var usersRepo = new UsersRepo(TODO, TODO);
+			usersRepo.CreateUlearnBotUserIfNotExists().Wait();
 
 			db.SaveChanges();
 		}

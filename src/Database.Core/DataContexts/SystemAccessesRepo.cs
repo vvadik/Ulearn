@@ -17,11 +17,6 @@ namespace Database.DataContexts
 		{
 			this.db = db;
 		}
-
-		public SystemAccessesRepo()
-			: this(new ULearnDb())
-		{
-		}
 		
 		public async Task<SystemAccess> GrantAccess(string userId, SystemAccessType accessType, string grantedById)
 		{

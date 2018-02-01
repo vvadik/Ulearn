@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {
@@ -41,7 +42,7 @@ namespace Database.DataContexts
 				Hash = hash,
 				Text = text
 			};
-			db.Texts.AddOrUpdate(blob);
+			db.Texts.AddOrUpdate(blob, b => b.Hash == hash);
 
 			try
 			{
