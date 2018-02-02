@@ -14,9 +14,10 @@ using Ulearn.Common;
 namespace Database.Migrations
 {
     [DbContext(typeof(UlearnDb))]
-    partial class UlearnDbModelSnapshot : ModelSnapshot
+    [Migration("20180202105253_AddCommonFeedNotificationTransportAndReplaceAdminRole")]
+    partial class AddCommonFeedNotificationTransportAndReplaceAdminRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

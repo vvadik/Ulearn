@@ -14,7 +14,7 @@ using Ulearn.Common;
 namespace Database.Migrations
 {
     [DbContext(typeof(UlearnDb))]
-    [Migration("20180201181828_InitialCreate")]
+    [Migration("20180202103914_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -70,7 +70,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(64);
 
                     b.Property<int>("AccessFailedCount");
 
@@ -514,7 +515,7 @@ namespace Database.Migrations
 
                     b.HasIndex("SubmissionId");
 
-                    b.ToTable("ExerciseSolutionsByGrader");
+                    b.ToTable("ExerciseSolutionByGraders");
                 });
 
             modelBuilder.Entity("Database.Models.FeedViewTimestamp", b =>
@@ -894,7 +895,7 @@ namespace Database.Migrations
 
                     b.Property<string>("InitiatedById")
                         .IsRequired()
-                        .HasMaxLength(60);
+                        .HasMaxLength(64);
 
                     b.HasKey("Id");
 
@@ -1266,7 +1267,7 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasMaxLength(40);
+                        .HasMaxLength(100);
 
                     b.Property<Guid>("SlideId");
 
@@ -1278,7 +1279,7 @@ namespace Database.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasMaxLength(40);
+                        .HasMaxLength(64);
 
                     b.HasKey("Id");
 

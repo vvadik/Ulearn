@@ -27,7 +27,7 @@ namespace Database.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<string>(maxLength: 64, nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
                     AvatarUrl = table.Column<string>(nullable: true),
                     ConcurrencyStamp = table.Column<string>(nullable: true),
@@ -1090,11 +1090,11 @@ namespace Database.Migrations
                     AutomaticCheckingId = table.Column<int>(nullable: false),
                     AutomaticCheckingIsRightAnswer = table.Column<bool>(nullable: false),
                     CodeHash = table.Column<int>(nullable: false),
-                    CourseId = table.Column<string>(maxLength: 40, nullable: false),
+                    CourseId = table.Column<string>(maxLength: 100, nullable: false),
                     SlideId = table.Column<Guid>(nullable: false),
                     SolutionCodeHash = table.Column<string>(maxLength: 40, nullable: false),
                     Timestamp = table.Column<DateTime>(nullable: false),
-                    UserId = table.Column<string>(maxLength: 40, nullable: false)
+                    UserId = table.Column<string>(maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1126,7 +1126,7 @@ namespace Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ExerciseSolutionsByGrader",
+                name: "ExerciseSolutionByGraders",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -1137,15 +1137,15 @@ namespace Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ExerciseSolutionsByGrader", x => x.Id);
+                    table.PrimaryKey("PK_ExerciseSolutionByGraders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ExerciseSolutionsByGrader_GraderClients_ClientId",
+                        name: "FK_ExerciseSolutionByGraders_GraderClients_ClientId",
                         column: x => x.ClientId,
                         principalTable: "GraderClients",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ExerciseSolutionsByGrader_UserExerciseSubmissions_SubmissionId",
+                        name: "FK_ExerciseSolutionByGraders_UserExerciseSubmissions_SubmissionId",
                         column: x => x.SubmissionId,
                         principalTable: "UserExerciseSubmissions",
                         principalColumn: "Id",
@@ -1301,7 +1301,7 @@ namespace Database.Migrations
                     CourseId = table.Column<string>(maxLength: 100, nullable: false),
                     CreateTime = table.Column<DateTime>(nullable: false),
                     Discriminator = table.Column<string>(nullable: false),
-                    InitiatedById = table.Column<string>(maxLength: 60, nullable: false),
+                    InitiatedById = table.Column<string>(maxLength: 64, nullable: false),
                     CheckingId = table.Column<int>(nullable: true),
                     PassedManualQuizCheckingNotification_CheckingId = table.Column<int>(nullable: true),
                     CourseVersionId = table.Column<Guid>(nullable: true),
@@ -1708,13 +1708,13 @@ namespace Database.Migrations
                 column: "ExerciseCheckingId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExerciseSolutionsByGrader_ClientId",
-                table: "ExerciseSolutionsByGrader",
+                name: "IX_ExerciseSolutionByGraders_ClientId",
+                table: "ExerciseSolutionByGraders",
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExerciseSolutionsByGrader_SubmissionId",
-                table: "ExerciseSolutionsByGrader",
+                name: "IX_ExerciseSolutionByGraders_SubmissionId",
+                table: "ExerciseSolutionByGraders",
                 column: "SubmissionId");
 
             migrationBuilder.CreateIndex(
@@ -2316,7 +2316,7 @@ namespace Database.Migrations
                 name: "ExerciseCodeReviews");
 
             migrationBuilder.DropTable(
-                name: "ExerciseSolutionsByGrader");
+                name: "ExerciseSolutionByGraders");
 
             migrationBuilder.DropTable(
                 name: "FeedViewTimestamps");

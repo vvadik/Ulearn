@@ -31,10 +31,15 @@ namespace Database
 		{
 			base.OnModelCreating(modelBuilder);
 			
+			/* IdentityUser.Id is guid in ASP.NET Core, so we can limit it by 64 chars.
+			   If we will not do it, foreign keys to AspNetUsers.Id will fail in ASP.NET Core
+			 */
+			modelBuilder.Entity<ApplicationUser>(b => { b.Property(u => u.Id).HasMaxLength(64); });
+
 			/* Customize the ASP.NET Identity model and override the defaults if needed.
 			 * See https://docs.microsoft.com/en-us/aspnet/core/migration/1x-to-2x/identity-2x#add-identityuser-poco-navigation-properties
 			 * for details */
-
+			
 			modelBuilder.Entity<ApplicationUser>()
 				.HasMany(e => e.Claims)
 				.WithOne()

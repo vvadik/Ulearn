@@ -272,7 +272,7 @@ namespace Database.Models
 		[Required(AllowEmptyStrings = true)]
 		public string CourseId { get; set; }
 
-		[StringLength(60)]
+		[StringLength(64)]
 		[Required]
 		public string InitiatedById { get; set; }
 

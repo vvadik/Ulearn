@@ -13,13 +13,13 @@ namespace Database.Models
 		public int Id { get; set; }
 
 		[Required]
-		[StringLength(40)]
+		[StringLength(64)]
 		public string UserId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
 
 		[Required]
-		[StringLength(40)]
+		[StringLength(100)]
 		public string CourseId { get; set; }
 
 		[Required]
