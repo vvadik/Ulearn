@@ -15,7 +15,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
 using uLearn.Extensions;
 
-
 namespace uLearn.CSharp.IndentsValidation
 {
 	[TestFixture]

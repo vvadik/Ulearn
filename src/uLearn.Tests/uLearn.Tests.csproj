@@ -216,8 +216,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSharp\ExcessLinesValidation\ExcessLinesValidator_Should.cs" />
     <Compile Include="CSharp\CourseValidator_ReportError_should.cs" />
     <Compile Include="CSharp\CourseValidator_ReportWarning_should.cs" />
+    <Compile Include="CSharp\ExcessLinesValidation\TestData\Correct\ExcessLinesValidatorCases.cs" />
+    <Compile Include="CSharp\ExcessLinesValidation\TestData\Incorrect\ExcessLinesValidatorCases.cs" />
     <Compile Include="CSharp\IndentsValidation\TestData\Correct\BracesMightNotBeAlignedIfOpenBraceDoesntHaveLeadingTrivia.cs" />
     <Content Include="CSharp\IndentsValidation\TestData\Correct\TopLevelNodesCanBeIndented.cs" />
     <Content Include="CSharp\IndentsValidation\TestData\Correct\IfOpenBraceGrandparentIsMultilineThenContentIndentedFromGrandparent.cs" />

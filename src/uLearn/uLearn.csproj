@@ -181,8 +181,11 @@
   <ItemGroup>
     <Compile Include="AcceptedSolutionInfo.cs" />
     <Compile Include="AnalyticsTableInfo.cs" />
+    <Compile Include="CSharp\ExcessLinesValidator.cs" />
+    <Compile Include="CSharp\Model\BracesPair.cs" />
     <Compile Include="CSharp\IndentsValidator.cs" />
     <Compile Include="CSharp\IStrictValidator.cs" />
+    <Compile Include="CSharp\Model\ReportWithLine.cs" />
     <Compile Include="ExportedSlide.cs" />
     <Compile Include="Extensions\DictionaryExtension.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />

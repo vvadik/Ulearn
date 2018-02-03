@@ -147,5 +147,10 @@ namespace uLearn.CSharp
 				.WithoutAttributes()
 				.WithBody(method.Body.WithStatements(new SyntaxList<StatementSyntax>()));
 		}
-	}
+
+        public static int GetLine(this SyntaxToken token)
+        {
+            return token.GetLocation().GetLineSpan().StartLinePosition.Line;
+        }
+    }
 }
