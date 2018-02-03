@@ -4,7 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Build.Evaluation;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NUnit.Framework.Constraints;
 using uLearn.Extensions;
+using uLearn.Helpers;
 using uLearn.Model.Blocks;
 
 namespace uLearn
@@ -23,16 +26,40 @@ namespace uLearn
 
 	public static class ProjModifier
 	{
-		internal static void PrepareForStudentZip(Project proj, ProjectExerciseBlock ex)
+		public static byte[] ModifyCsproj(FileInfo csproj, Action<Project> changingAction, string toolsVersion=null)
 		{
-			var toExclude = FindItemNames(proj, ex.NeedExcludeFromStudentZip).ToList();
-			var solutionsOfOtherTasks = toExclude.Where(n => ProjectExerciseBlock.IsAnySolution(n) && ex.CorrectSolutionPath != n).ToList();
+			var proj = new Project(csproj.FullName, null, toolsVersion, new ProjectCollection());
+			return ModifyCsproj(proj, changingAction);
+		}
 
-			var userCodeFilepathsOfOtherTasks = solutionsOfOtherTasks.Select(ProjectExerciseBlock.SolutionFilepathToUserCodeFilepath);
+		private static byte[] ModifyCsproj(Project proj, Action<Project> changingAction)
+		{
+			changingAction?.Invoke(proj);
+			using (var memoryStream = new MemoryStream())
+			using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
+			{
+				proj.Save(streamWriter);
+				return memoryStream.ToArray();
+			}
+		}
+		
+		public static void PrepareForStudentZip(Project proj, ProjectExerciseBlock ex)
+		{
+			var toExclude = FindItemNames(proj, file => ExerciseStudentZipBuilder.NeedExcludeFromStudentZip(ex, file)).ToList();
+			var solutionsOfOtherTasks = toExclude.Where(n => ExerciseStudentZipBuilder.IsAnySolution(n) && ex.CorrectSolutionPath != n).ToList();
 
+			/* Remove StartupObject from csproj: it's not needed in student zip */
+			var startupObject = proj.GetProperty("StartupObject");
+			if (startupObject != null)
+				proj.RemoveProperty(startupObject);
+			
 			RemoveCheckingFromCsproj(proj);
+			
+			var userCodeFilepathsOfOtherTasks = solutionsOfOtherTasks.Select(ProjectExerciseBlock.SolutionFilepathToUserCodeFilepath);
 			SetFilepathItemTypeToCompile(proj, userCodeFilepathsOfOtherTasks.Concat(new[] { ex.UserCodeFilePath }));
-			ResolveLinks(proj);
+			
+			ReplaceLinksWithItems(proj);
+			
 			ExcludePaths(proj, toExclude);
 		}
 
@@ -85,7 +112,7 @@ namespace uLearn
 			proj.SetProperty("StartupObject", startupObject);
 			proj.SetProperty("OutputType", "Exe");
 			proj.SetProperty("UseVSHostingProcess", "false");
-			ResolveLinks(proj);
+			ReplaceLinksWithItems(proj);
 			ExcludePaths(proj, excludedPaths);
 		}
 
@@ -95,20 +122,16 @@ namespace uLearn
 			proj.RemoveItems(toRemove);
 		}
 
-		public static void ResolveLinks(Project project)
+		public static void SetBuildEnvironmentOptions(Project proj, BuildEnvironmentOptions options)
 		{
-			var files = ReplaceLinksWithItemsCopiedToProjectDir(project);
-			foreach (var file in files)
-			{
-				var dst = Path.Combine(project.DirectoryPath, file.DestinationFile);
-				var src = Path.Combine(project.DirectoryPath, file.SourceFile);
-				var dstDir = Path.GetDirectoryName(dst).EnsureNotNull();
-				Directory.CreateDirectory(dstDir);
-				File.Copy(src, dst, true);
-			}
+			var frameworkName = proj.GetPropertyValue("TargetFramework");
+			if (frameworkName.Contains("netcore"))
+				proj.SetProperty("TargetFrameworkVersion", options.TargetNetCoreFrameworkVersion);
+			else
+				proj.SetProperty("TargetFrameworkVersion", options.TargetFrameworkVersion);
 		}
 
-		public static List<FileToCopy> ReplaceLinksWithItemsCopiedToProjectDir(Project project)
+		public static List<FileToCopy> ReplaceLinksWithItemsAndReturnWhatToCopy(Project project)
 		{
 			var linkedItems = (from item in project.Items
 				let meta = item.DirectMetadata.FirstOrDefault(md => md.Name == "Link")
@@ -124,28 +147,23 @@ namespace uLearn
 			return copies;
 		}
 
+		public static void ReplaceLinksWithItems(Project project)
+		{
+			ReplaceLinksWithItemsAndReturnWhatToCopy(project);
+		}
+
 		private static string ChangeNameToGitIgnored(string filename)
 		{
 			var d = Path.GetDirectoryName(filename) ?? "";
 			var fn = Path.GetFileName(filename);
 			return Path.Combine(d, "~$" + fn);
 		}
+	}
 
-		public static byte[] ModifyCsproj(FileInfo csproj, Action<Project> changingAction)
-		{
-			var proj = new Project(csproj.FullName, null, null, new ProjectCollection());
-			return ModifyCsproj(changingAction, proj);
-		}
-
-		private static byte[] ModifyCsproj(Action<Project> changingAction, Project proj)
-		{
-			changingAction?.Invoke(proj);
-			using (var memoryStream = new MemoryStream())
-			using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
-			{
-				proj.Save(streamWriter);
-				return memoryStream.ToArray();
-			}
-		}
+	public class BuildEnvironmentOptions
+	{
+		public string TargetFrameworkVersion { get; set; }
+		public string TargetNetCoreFrameworkVersion { get; set; }
+		public string ToolsVersion { get; set; }
 	}
 }

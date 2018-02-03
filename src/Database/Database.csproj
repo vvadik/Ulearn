@@ -106,6 +106,7 @@
     <Compile Include="DataContexts\SlideHintRepo.cs" />
     <Compile Include="DataContexts\SlideRateRepo.cs" />
     <Compile Include="DataContexts\StepikRepo.cs" />
+    <Compile Include="DataContexts\SystemAccessesRepo.cs" />
     <Compile Include="DataContexts\TextsRepo.cs" />
     <Compile Include="DataContexts\ULearnDb.cs" />
     <Compile Include="DataContexts\ULearnUserManager.cs" />
@@ -485,6 +486,18 @@
     <Compile Include="Migrations\201710100555536_AddIndeciesToFeedViewTimestamp.Designer.cs">
       <DependentUpon>201710100555536_AddIndeciesToFeedViewTimestamp.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201711191919009_AddDefaultProhibitFutherReviewInGroup.cs" />
+    <Compile Include="Migrations\201711191919009_AddDefaultProhibitFutherReviewInGroup.Designer.cs">
+      <DependentUpon>201711191919009_AddDefaultProhibitFutherReviewInGroup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201711192044080_AddSystemAccesses.cs" />
+    <Compile Include="Migrations\201711192044080_AddSystemAccesses.Designer.cs">
+      <DependentUpon>201711192044080_AddSystemAccesses.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201711201858456_AddKonturLoginToApplicationUser.cs" />
+    <Compile Include="Migrations\201711201858456_AddKonturLoginToApplicationUser.Designer.cs">
+      <DependentUpon>201711201858456_AddKonturLoginToApplicationUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -518,6 +531,7 @@
     <Compile Include="Models\StepikAccessToken.cs" />
     <Compile Include="Models\StepikExportProcess.cs" />
     <Compile Include="Models\StepikExportSlideAndStepMap.cs" />
+    <Compile Include="Models\SystemAccess.cs" />
     <Compile Include="Models\TextBlob.cs" />
     <Compile Include="Models\UnitAppearance.cs" />
     <Compile Include="Models\UserExerciseSubmission.cs" />
@@ -805,6 +819,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710100555536_AddIndeciesToFeedViewTimestamp.resx">
       <DependentUpon>201710100555536_AddIndeciesToFeedViewTimestamp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711191919009_AddDefaultProhibitFutherReviewInGroup.resx">
+      <DependentUpon>201711191919009_AddDefaultProhibitFutherReviewInGroup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711192044080_AddSystemAccesses.resx">
+      <DependentUpon>201711192044080_AddSystemAccesses.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711201858456_AddKonturLoginToApplicationUser.resx">
+      <DependentUpon>201711201858456_AddKonturLoginToApplicationUser.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

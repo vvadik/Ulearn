@@ -127,7 +127,8 @@ namespace uLearn.Web.Controllers
 			visitedUsers = visitedUsers
 				.OrderByDescending(u => visitedSlidesCountByUserAllTime.GetOrDefault(u.UserId, 0))
 				.Take(usersLimit)
-				.OrderBy(u => u.UserVisibleName)
+				.OrderBy(u => u.UserLastName)
+				.ThenBy(u => u.UserVisibleName)
 				.ToList();
 
 			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();
@@ -397,13 +398,14 @@ namespace uLearn.Web.Controllers
 			var unitBySlide = course.Units.SelectMany(u => u.Slides.Select(s => Tuple.Create(u.Id, s.Id))).ToDictionary(p => p.Item2, p => p.Item1);
 			var scoringGroups = course.Settings.Scoring.Groups;
 
-			var visitedSlidesCountByUserAllTime = visitsRepo.GetVisitsInPeriod(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(DateTime.MaxValue))
+			var totalScoreByUserAllTime = visitsRepo.GetVisitsInPeriod(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(DateTime.MaxValue))
 				.GroupBy(v => v.UserId)
-				.ToDictionary(g => g.Key, g => g.Count());
+				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score))
+				.ToDefaultDictionary();
 
 			/* Get `usersLimit` best by slides count */
 			visitedUsers = visitedUsers
-				.OrderByDescending(u => visitedSlidesCountByUserAllTime.GetOrDefault(u.UserId, 0))
+				.OrderByDescending(u => totalScoreByUserAllTime[u.UserId])
 				.Take(usersLimit)
 				.ToList();
 			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();
@@ -700,7 +702,7 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.FindSlideById(slideId) as ExerciseSlide;
 			if (slide == null)
-				return RedirectToAction("CourseInfo", "Account", new { userName = userId, courseId });
+				return RedirectToAction("CourseInfo", "Account", new { userId = userId, courseId });
 			var model = new UserSolutionsViewModel
 			{
 				User = user,
@@ -737,15 +739,8 @@ namespace uLearn.Web.Controllers
 
 		private static DateTime GetDefaultPeriodStart()
 		{
-			/* Select between January, 1 and September, 1 */
 			var now = DateTime.Now;
-			var periodStart = 1 < now.Month && now.Month < 9 ? new DateTime(now.Year, 1, 1) : new DateTime(now.Year, 9, 1);
-
-			/* At least one month should be passed before now */
-			var monthAgo = now.AddMonths(-1);
-			if (periodStart > monthAgo)
-				periodStart = monthAgo;
-			return periodStart;
+			return new DateTime(2015, 1, 1);
 		}
 
 		public DateTime PeriodFinishDate

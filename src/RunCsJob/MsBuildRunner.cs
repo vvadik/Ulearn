@@ -10,19 +10,20 @@ namespace RunCsJob
 {
 	public class MsBuildSettings
 	{
-		private const string CompilersFolderName = "Microsoft.Net.Compilers.2.2.0";
-		private const string WellKnownLibsFolderName = "WellKnownLibs";
+		private const string compilersFolderName = "Microsoft.Net.Compilers.2.4.0";
+		private const string wellKnownLibsFolderName = "WellKnownLibs";
 
 		public MsBuildSettings()
 		{
 			BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-			CompilerDirectory = new DirectoryInfo(Path.Combine(BaseDirectory, CompilersFolderName));
-			WellKnownLibsDirectory = new DirectoryInfo(Path.Combine(BaseDirectory, WellKnownLibsFolderName));
+			CompilerDirectory = new DirectoryInfo(Path.Combine(BaseDirectory, compilersFolderName));
+			WellKnownLibsDirectory = new DirectoryInfo(Path.Combine(BaseDirectory, wellKnownLibsFolderName));
 		}
 
 		public readonly string BaseDirectory;
 		public DirectoryInfo CompilerDirectory;
-		public DirectoryInfo WellKnownLibsDirectory;
+		public readonly DirectoryInfo WellKnownLibsDirectory;
+		public readonly string MsBuildToolsVersion = "15.0";
 	}
 
 	public static class MsBuildRunner
@@ -33,8 +34,18 @@ namespace RunCsJob
 		{
 			var result = new MSbuildResult();
 			var path = Path.Combine(dir.FullName, projectFileName);
-			var project = new Project(path, null, null, new ProjectCollection());
+			var project = new Project(path, null, settings.MsBuildToolsVersion, new ProjectCollection());
 			project.SetProperty("CscToolPath", settings.CompilerDirectory.FullName);
+			
+			/* WPF markups should be compiled in separate AppDomain, otherwise MsBuild raises NRE while building:
+			 * https://stackoverflow.com/questions/1552092/microsoft-build-buildengine-engine-throws-error-when-building-wpf-application
+			 */
+			project.SetProperty("AlwaysCompileMarkupFilesInSeparateDomain", "True");
+			
+			/* We don't know why, but MSBuild on server set BaseIntermediateOutputPath to "\".
+			 * Here we return default value "obj\". 
+			 */
+			project.SetProperty("BaseIntermediateOutputPath", @"obj\");
 
 			foreach (var libName in obligatoryLibs)
 			{
@@ -72,7 +83,7 @@ namespace RunCsJob
 		private static bool SyncBuild(Project project, ILogger logger)
 		{
 			lock (buildLock)
-				return project.Build(logger);
+				return project.Build("Rebuild", new List<ILogger> { logger });
 		}
 	}
 }

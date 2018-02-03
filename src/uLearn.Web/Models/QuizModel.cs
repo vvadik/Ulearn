@@ -7,7 +7,7 @@ namespace uLearn.Web.Models
 {
 	public class QuizModel
 	{
-		public string CourseId { get; set; }
+		public Course Course { get; set; }
 
 		public QuizSlide Slide { get; set; }
 		public QuizState QuizState { get; set; }

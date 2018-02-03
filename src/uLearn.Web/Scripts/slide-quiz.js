@@ -113,18 +113,36 @@ $(document).ready(function() {
 
 	$('.quiz-block-matching:not(.not-movable) .quiz-block-matching__movable-item').draggable({
 		revert: "invalid",
-	});
+	}).click(function (e) {
+		e.stopPropagation();
+	
+        var $self = $(this);
+        var itemId = $self.data('itemId');
+        var $container = $self.closest('.quiz-block-matching').find('.added:data(movable-item-id)').filter(
+        	function(){
+        		return $(this).data('movableItemId') === itemId;
+        	}
+		);
+
+        /* Cancel old clicks */
+        $self.closest('.quiz-block-matching').find('.clicked').removeClass('clicked');
+        $self.closest('.quiz-block-matching').find('.clicked-item').removeClass('clicked-item');
+
+		$container.toggleClass('clicked');
+		$self.toggleClass('clicked-item');
+    });
 
 	$('.quiz-block-matching:not(.not-movable) .quiz-block-matching__droppable')
 		.add('.quiz-block-matching:not(.not-movable) .quiz-block-matching__source__droppable').each(function () {
 		var $this = $(this);
-		var blockId = $(this).data('block-id');
+		var blockId = $(this).data('blockId');
+		
 		$this.droppable({
 			activeClass: 'active',
 			hoverClass: 'hover',
 			accept: function($el) {
-				return $el.data('block-id') === blockId &&
-					(!$(this).hasClass('added') || $(this).data('movable-item-id') === $el.data('item-id'));
+				return $el.data('blockId') === blockId &&
+					(!$(this).hasClass('added') || $(this).data('movableItemId') === $el.data('itemId'));
 			},
 			drop: function (event, ui) {
 				if ($(this).hasClass('added'))
@@ -134,17 +152,38 @@ $(document).ready(function() {
 				var $droppedOn = $(this);
 
 				$dropped.offset($droppedOn.offset());
-				$droppedOn.data('movable-item-id', $dropped.data('item-id'));
+				$droppedOn.data('movableItemId', $dropped.data('itemId'));
 			},
 			out: function (event, ui) {
 				var $dropped = $(ui.draggable);
-				if ($(this).data('movable-item-id') === $dropped.data('item-id')) {
+				if ($(this).data('movableItemId') === $dropped.data('itemId')) {
 					$(this).removeClass('added');
-					$(this).removeData('movable-item-id');
+					$(this).removeData('movableItemId');
 				}
 			}
 		});
-	});
+	}).click(function () {
+		var $self = $(this);
+        
+		if ($self.hasClass('added'))
+			return;
+		
+        var $clicked = $self.closest('.quiz-block-matching').find('.clicked');
+        if ($clicked.length > 0)
+        {
+			var itemId = $clicked.data('movableItemId');
+            var $draggable = $self.closest('.quiz-block-matching').find('.quiz-block-matching__movable-item').filter(function(){ return $(this).data('itemId') === itemId; });
+            
+            $draggable.offset($self.offset());
+            $self.data('movableItemId', itemId);
+            $self.addClass('added');
+
+            $clicked.removeData('movableItemId');
+            $clicked.removeClass('clicked');            
+            $clicked.removeClass('added');
+            $draggable.removeClass('clicked-item');
+        }
+    });
 
 	/* Auto-height by maximum hieght in matching block */
 	$('.quiz-block-matching').each(function(idx, block) {

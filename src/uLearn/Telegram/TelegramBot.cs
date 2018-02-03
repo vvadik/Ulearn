@@ -1,7 +1,7 @@
-﻿using System.Web.Configuration;
+﻿using System.Configuration;
 using Telegram.Bot;
 
-namespace uLearn.Web.Telegram
+namespace uLearn.Telegram
 {
 	public class TelegramBot
 	{
@@ -11,8 +11,9 @@ namespace uLearn.Web.Telegram
 
 		protected TelegramBot()
 		{
-			token = WebConfigurationManager.AppSettings["ulearn.telegram.botToken"];
-			telegramClient = new TelegramBotClient(token);
+			token = ConfigurationManager.AppSettings["ulearn.telegram.botToken"];
+			if (! string.IsNullOrEmpty(token))
+				telegramClient = new TelegramBotClient(token);
 		}
 
 		protected bool IsBotEnabled => !string.IsNullOrWhiteSpace(token) && !string.IsNullOrEmpty(channel);

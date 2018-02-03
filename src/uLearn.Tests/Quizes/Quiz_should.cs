@@ -68,7 +68,7 @@ namespace uLearn.Quizes
 		public void BeDeserializable()
 		{
 			var q = File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "Quizes", "test.quiz.xml")).DeserializeXml<Quiz>();
-			QuizSlideLoader.BuildUp(q, new Unit(null, new DirectoryInfo(TestContext.CurrentContext.TestDirectory)), CourseSettings.DefaultSettings);
+			QuizSlideLoader.BuildUp(q, new Unit(null, new DirectoryInfo(TestContext.CurrentContext.TestDirectory)), "QuizzesTest", CourseSettings.DefaultSettings);
 			q.ShouldBeEquivalentTo(new Quiz
 			{
 				Id = "{DB95DA10-7DD2-46CA-BFB2-6D0D7554B83F}",

@@ -25,7 +25,7 @@ namespace uLearn.CSharp
 		public void ReplaceLinksWithItems()
 		{
 			var project = CreateTestProject();
-			var copies = ProjModifier.ReplaceLinksWithItemsCopiedToProjectDir(project);
+			var copies = ProjModifier.ReplaceLinksWithItemsAndReturnWhatToCopy(project);
 			copies.Should().HaveCount(1);
 			var writer = new StringWriter();
 			foreach (var fileToCopy in copies)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Schema;
@@ -30,6 +31,24 @@ namespace uLearn.Model.Blocks
 
 		public MdBlock()
 		{
+		}
+
+		public string RenderMd(string courseId, Guid slideId, string baseUrl)
+		{
+			return GetMarkdownWithReplacedLinksToStudentZips(courseId, slideId).RenderMd(baseUrl);
+		}
+		
+		public string RenderMd(string courseId, Guid slideId, FileInfo sourceFile, string baseUrl="")
+		{
+			return GetMarkdownWithReplacedLinksToStudentZips(courseId, slideId).RenderMd(sourceFile, baseUrl);
+		}
+
+		/* Replace links to /Exercise/StudentZip: automagically add courseId and slideId */
+		private string GetMarkdownWithReplacedLinksToStudentZips(string courseId, Guid slideId)
+		{
+			if (string.IsNullOrEmpty(Markdown))
+				return "";
+			return Markdown.Replace("(/Exercise/StudentZip)", $"(/Exercise/StudentZip?courseId={courseId}&slideId={slideId})");
 		}
 
 		public override string ToString()

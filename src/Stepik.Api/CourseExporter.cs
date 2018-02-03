@@ -293,7 +293,8 @@ namespace Stepik.Api
 				if (stepId != -1 && stepikLessons.Values.Any(l => l.StepsIds.Contains(stepId)))
 				{
 					var lessonId = stepikLessons.FirstOrDefault(kvp => kvp.Value.StepsIds.Contains(stepId)).Key;
-					lesson = stepikLessons[lessonId];
+					// Re-download lesson because it can be changed for a while 
+					lesson = await client.GetLesson(lessonId);
 					position = lesson.StepsIds.FindIndex(stepId);
 
 					results.Info($"Removing old steps created for this slide: {string.Join(", ", slideUpdateOptions.RemoveStepsIds)}");
@@ -383,7 +384,7 @@ namespace Stepik.Api
 				var isCurrentBlockText = IsCurrentBlockText(block, options);
 				if (isCurrentBlockText)
 				{
-					previousTextBlock.Text += GetTextForStepikBlockFromUlearnBlock(slide, block);
+					previousTextBlock.Text += GetTextForStepikBlockFromUlearnBlock(courseId, slide, block);
 				}
 				else
 				{
@@ -414,10 +415,13 @@ namespace Stepik.Api
 			return block is MdBlock || block is CodeBlock || (options.VideoUploadOptions == UploadVideoToStepikOption.Iframe && block is YoutubeBlock);
 		}
 
-		private string GetTextForStepikBlockFromUlearnBlock(Slide slide, SlideBlock block)
+		private string GetTextForStepikBlockFromUlearnBlock(string courseId, Slide slide, SlideBlock block)
 		{
 			if (block is MdBlock)
-				return ((MdBlock)block).Markdown.RenderMd(slide.Info.SlideFile, ulearnBaseUrl);
+			{
+				var mdBlock = (MdBlock)block;
+				return mdBlock.RenderMd(courseId, slide.Id, slide.Info.SlideFile, ulearnBaseUrl);
+			}
 
 			if (block is CodeBlock)
 			{

@@ -6,6 +6,7 @@ using Kontur.Spam.Client;
 using log4net;
 using Metrics;
 using uLearn;
+using uLearn.Extensions;
 
 namespace Notifications
 {

@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Database;
 using Database.DataContexts;
+using Graphite;
 using log4net;
 using log4net.Config;
+using Metrics;
 using uLearn;
 using uLearn.Extensions;
 using XQueue;
@@ -21,6 +24,8 @@ namespace XQueueWatcher
 
 		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
 		private static readonly CourseManager courseManager = WebCourseManager.Instance;
+
+		private static readonly ServiceKeepAliver keepAliver = new ServiceKeepAliver("xqueuewatcher");
 		
 		private static readonly Dictionary<int, XQueueClient> clientsCache = new Dictionary<int, XQueueClient>();
 
@@ -32,6 +37,11 @@ namespace XQueueWatcher
 		public void StartXQueueWatchers(CancellationToken cancellationToken)
 		{
 			XmlConfigurator.Configure();
+			StaticMetricsPipeProvider.Instance.Start();
+			
+			if (!int.TryParse(ConfigurationManager.AppSettings["ulearn.xqueuewatcher.keepAlive.interval"], out var keepAliveIntervalSeconds))
+				keepAliveIntervalSeconds = 30;
+			var keepAliveInterval = TimeSpan.FromSeconds(keepAliveIntervalSeconds);
 
 			while (true)
 			{
@@ -45,6 +55,7 @@ namespace XQueueWatcher
 					break;
 					
 				Task.Delay(pauseBetweenRequests, cancellationToken).Wait(cancellationToken);
+				keepAliver.Ping(keepAliveInterval);
 			}
 		}
 
@@ -69,7 +80,7 @@ namespace XQueueWatcher
 
 		private async Task GetAndProcessSubmissionFromXQueue(Database.Models.XQueueWatcher watcher)
 		{
-			if (!clientsCache.TryGetValue(watcher.Id, out XQueueClient client))
+			if (!clientsCache.TryGetValue(watcher.Id, out var client))
 			{
 				client = new XQueueClient(watcher.BaseUrl, watcher.UserName, watcher.Password);
 

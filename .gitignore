@@ -5,6 +5,7 @@
 *.suo
 *.user
 *.sln.docstates
+/src/.vs
 
 # Build results
 [Dd]ebug/
@@ -23,6 +24,9 @@ bld/
 #NUNIT
 *.VisualState.xml
 TestResult.xml
+
+#Test Examples
+/src/uLearn.Tests/CSharp/ExampleFiles
 
 # Build Results of an ATL Project
 [Dd]ebugPS/
@@ -187,3 +191,6 @@ private.settings
 # Exercises projects zips
 *.exercise.zip
 /src/uLearn.Web/App_Data/error*.xml
+
+# Rider files
+/src/.idea/

@@ -61,27 +61,20 @@
 		}
 	}
 	<h4>
-		<i class="@mark" style="@style"></i> @block.QuestionIndex. @block.Text.RenderTex()
-		<sup class="text-muted">
+		<i class="@mark" style="@style"></i>
+		<span class="quiz-block__text">
+			@block.QuestionIndex. @block.Text.RenderTex()
+		</span>
+		<span class="quiz-block__score">
 			@if (blockScore >= 0)
 			{
-				<span>
-					@blockScore из @block.MaxScore балл@( block.MaxScore == 1 ? "а" : "ов")
-				</span>
+				<nobr>@blockScore из @block.MaxScore балл@( block.MaxScore == 1 ? "а" : "ов")</nobr>
 			}
 			else
 			{
-				@block.MaxScore.PluralizeInRussian(new RussianPluralizationOptions
-				{
-					One = "балл",
-					Two = "балла",
-					Five = "баллов",
-					smallNumbersAreWords = false,
-					hideNumberOne = false
-				}
-				)
+				<nobr>@block.MaxScore.PluralizeInRussian(RussianPluralizationOptions.Score)</nobr>
 			}
-		</sup>
+		</span>
 	</h4>
 
 	@QuizBlock((dynamic)block, context)
@@ -101,7 +94,9 @@
 { @( maxScore == 0 ? "" : string.Format("{0}/{1}", currentScore, maxScore)) }
 
 @helper Block(MdBlock block, BlockRenderContext context, HtmlHelper Html)
-{ @MvcHtmlString.Create(block.Markdown.RenderMd(context.BaseUrl)) }
+{
+	@MvcHtmlString.Create(block.RenderMd(context.Course.Id, context.Slide.Id, context.BaseUrl))
+}
 
 @helper Block(CodeBlock block, BlockRenderContext context, HtmlHelper Html)
 {
@@ -212,7 +207,14 @@
 
 			@Html.Partial(
 				"~/Views/Exercise/_ExerciseScoreForm.cshtml",
-				new ExerciseScoreFormModel(context.Course.Id, (ExerciseSlide)context.Slide, checking, context.GroupsIds, (context.VersionId == null || checking.Submission.Id == context.VersionId) && !context.IsManualCheckingReadonly))
+				new ExerciseScoreFormModel(
+					context.Course.Id,
+					(ExerciseSlide)context.Slide,
+					checking,
+					context.GroupsIds,
+					(context.VersionId == null || checking.Submission.Id == context.VersionId) && !context.IsManualCheckingReadonly,
+					context.DefaultProhibitFutherReview
+				))
 		}
 	</div>
 }
@@ -240,14 +242,16 @@
 			}
 			<div class="quiz">
 				<input @ans autocomplete="off" id='@( block.Id + "quizBlock" + item.Id)' name=@( "group" + id) type="@typeInp" @GetGuestDisable(context.IsGuest) @readonlyAttr>
-				<label class="@itemClass" title="@title" for="@( block.Id + "quizBlock" + item.Id)" @GetGuestOnclick(context.IsGuest)>@item.Description.Trim().RenderTex()</label>
-				@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && item.IsCorrect)
-				{
-					<i class="glyphicon glyphicon-ok" style="color: green" title="@title"></i>
-				}
+				<label class="@itemClass" title="@title" for="@( block.Id + "quizBlock" + item.Id)" @GetGuestOnclick(context.IsGuest)>
+					@item.Description.Trim().RenderTex()
+					@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && item.IsCorrect)
+					{
+						<i class="glyphicon glyphicon-ok" style="color: green" title="@title"></i>
+					}
+				</label>
 				@if (model.QuizState == QuizState.Total && !string.IsNullOrEmpty(item.Explanation))
 				{
-					<p>@item.Explanation</p>
+					<p class="quiz__explanation">@item.Explanation</p>
 				}
 			</div>
 		}
@@ -361,7 +365,7 @@
 		var userAnswers = model.QuizModel.AnswersToQuizes[block.Id].Select(x => x.ItemId).ToList();
 		items = items.OrderBy(item => userAnswers.IndexOf(item.GetHash())).ToArray();
 	}
-	<div class="quiz-block-ordering @( context.CanUserFillQuiz ? "" : "not-movable")" id='@( block.Id + "_quizBlock")'>
+	<div class="quiz-block-ordering @( context.CanUserFillQuiz ? "" : "not-movable")" id='@( block.Id + "_quizBlock")' @GetGuestOnclick(context.IsGuest)>
 		@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer)
 		{
 			<div class="quiz-block-ordering__correct-description row">
@@ -414,10 +418,17 @@
 			.OrderBy(item => userAnswers.FindIndex(answer => item.GetHashForFixedItem() == answer.ItemId)).ToList();
 		movableItems = GetMovableItemsAccordingToUserAnswers(userAnswers, fixedItems);
 	}
-	<div class="quiz-block-matching @( context.CanUserFillQuiz ? "" : "not-movable")" id='@( block.Id + "_quizBlock")'>
+	<div class="quiz-block-matching @( context.CanUserFillQuiz ? "" : "not-movable")" id='@( block.Id + "_quizBlock")' @GetGuestOnclick(context.IsGuest)>
 		@if (model.QuizState == QuizState.NotPassed)
 		{
-			<div class="quiz-block-matching__description text-muted">Перетащите элементы из правого столбца на свободные места</div>
+			<div class="quiz-block-matching__description text-muted">
+                <span class="visible-xs">
+                    Нажмите сначала на&nbsp;блоке из&nbsp;правого столбца, а&nbsp;затем на&nbsp;свободном месте в&nbsp;левом.
+                </span>
+                <span class="hidden-xs">
+                    Перетащите блоки из&nbsp;правого столбца на&nbsp;свободные места.
+                </span>
+            </div>
 		}
 		@if (model.QuizState == QuizState.Total)
 		{
@@ -425,7 +436,7 @@
 				<div class="text-muted col-sm-3 col-sm-offset-3">Ваш вариант</div>
 				@if (model.ShowCorrectAnswer)
 				{
-					<div class="text-success col-sm-3 col-sm-offset-1">Правильный вариант</div>
+					<div class="text-success col-sm-3 col-xs-offset-1">Правильный вариант</div>
 				}
 			</div>
 		}
@@ -446,7 +457,7 @@
 						@if (model.QuizState == QuizState.NotPassed)
 						{
 							<div class="quiz-block-matching__droppable col-xs-3" data-block-id="@block.Id" data-item-id="@fixedItem.GetHashForFixedItem()"></div>
-							<div class="quiz-block-matching__source__droppable col-xs-3 col-sm-offset-1 added" data-block-id="@block.Id" data-movable-item-id="@movableItem.GetHashForMovableItem()">
+							<div class="quiz-block-matching__source__droppable col-xs-3 col-xs-offset-1 added" data-block-id="@block.Id" data-movable-item-id="@movableItem.GetHashForMovableItem()">
 								<div class="quiz-block-matching__movable-item" data-block-id="@block.Id" data-item-id="@movableItem.GetHashForMovableItem()">@movableItem.MovableItem.RenderTex()</div>
 							</div>
 						}
@@ -457,13 +468,13 @@
 							</div>
 							if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer)
 							{
-								<div class="quiz-block-matching__fixed-item correct col-xs-3 col-sm-offset-1">
+								<div class="quiz-block-matching__fixed-item correct col-xs-3 col-xs-offset-1">
 									@fixedItem.MovableItem.RenderTex()
 								</div>
 							}
 							if (context.CanUserFillQuiz)
 							{
-								<div class="quiz-block-matching__source__droppable col-xs-3 col-sm-offset-1" data-block-id="@block.Id">
+								<div class="quiz-block-matching__source__droppable col-xs-3 col-xs-offset-1" data-block-id="@block.Id">
 								</div>
 							}
 						}

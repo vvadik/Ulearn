@@ -6,6 +6,7 @@ using Database;
 using Database.DataContexts;
 using Database.Models;
 using Microsoft.AspNet.Identity;
+using uLearn.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 

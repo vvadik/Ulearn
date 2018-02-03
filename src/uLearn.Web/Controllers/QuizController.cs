@@ -12,6 +12,7 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using log4net;
+using Metrics;
 using uLearn.Quizes;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
@@ -31,6 +32,7 @@ namespace uLearn.Web.Controllers
 
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
+		protected readonly GraphiteMetricSender metricSender;
 
 		private readonly UserQuizzesRepo userQuizzesRepo;
 		private readonly VisitsRepo visitsRepo;
@@ -41,6 +43,8 @@ namespace uLearn.Web.Controllers
 
 		public QuizController()
 		{
+			metricSender = new GraphiteMetricSender("web");
+
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			visitsRepo = new VisitsRepo(db);
 			quizzesRepo = new QuizzesRepo(db);
@@ -51,10 +55,10 @@ namespace uLearn.Web.Controllers
 
 		internal class QuizAnswer
 		{
-			public string QuizType;
-			public string QuizId;
-			public string ItemId;
-			public string Text;
+			public readonly string QuizType;
+			public readonly string QuizId;
+			public readonly string ItemId;
+			public readonly string Text;
 
 			public QuizAnswer(string type, string quizId, string itemId, string text)
 			{
@@ -64,7 +68,6 @@ namespace uLearn.Web.Controllers
 				Text = text;
 			}
 		}
-
 
 		internal class QuizInfoForDb
 		{
@@ -85,8 +88,21 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem = null)
 		{
+			metricSender.SendCount("quiz.show");
+			if (isLti)
+				metricSender.SendCount("quiz.show.lti");
+			metricSender.SendCount($"quiz.show.{courseId}");
+			metricSender.SendCount($"quiz.show.{courseId}.{slide.Id}");
+
+			var course = courseManager.FindCourse(courseId);
+			if (course == null)
+				return HttpNotFound();
+			
 			if (isGuest)
-				return PartialView(GuestQuiz(slide, courseId));
+			{
+				metricSender.SendCount("quiz.show.to.guest");
+				return PartialView(GuestQuiz(course, slide));
+			}
 			var slideId = slide.Id;
 			var maxDropCount = GetMaxDropCount(courseId, slide);
 			var state = GetQuizState(courseId, userId, slideId, maxDropCount);
@@ -113,7 +129,7 @@ namespace uLearn.Web.Controllers
 
 			var model = new QuizModel
 			{
-				CourseId = courseId,
+				Course = course,
 				Slide = slide,
 				QuizState = quizState,
 				TryNumber = tryNumber,
@@ -135,6 +151,12 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		public async Task<ActionResult> SubmitQuiz(string courseId, Guid slideId, string answer, bool isLti)
 		{
+			metricSender.SendCount("quiz.submit");
+			if (isLti)
+				metricSender.SendCount("quiz.submit.lti");
+			metricSender.SendCount($"quiz.submit.{courseId}");
+			metricSender.SendCount($"quiz.submit.{courseId}.{slideId}");
+
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.FindSlideById(slideId) as QuizSlide;
 			if (slide == null)
@@ -142,9 +164,14 @@ namespace uLearn.Web.Controllers
 
 			var userId = User.Identity.GetUserId();
 			var maxDropCount = GetMaxDropCount(courseId, slide);
-			var quizState = GetQuizState(courseId, userId, slideId, maxDropCount).Item1;
-			if (!CanUserFillQuiz(quizState))
+			var quizState = GetQuizState(courseId, userId, slideId, maxDropCount);
+			if (!CanUserFillQuiz(quizState.Item1))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Already answered");
+
+			var tryIndex = quizState.Item2;
+			metricSender.SendCount($"quiz.submit.try.{tryIndex}");
+			metricSender.SendCount($"quiz.submit.{courseId}.try.{tryIndex}");
+			metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.try.{tryIndex}");
 
 			if (slide.ManualChecking && !groupsRepo.IsManualCheckingEnabledForUser(course, userId))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Manual checking is disabled for you");
@@ -177,7 +204,7 @@ namespace uLearn.Web.Controllers
 			if (slide.ManualChecking)
 			{
 				/* If this quiz is already queued for checking for this user, don't add it to queue again */
-				if (quizState != QuizState.WaitForCheck)
+				if (quizState.Item1 != QuizState.WaitForCheck)
 				{
 					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, slideId, userId);
 					await visitsRepo.MarkVisitsAsWithManualChecking(slideId, userId);
@@ -188,6 +215,24 @@ namespace uLearn.Web.Controllers
 				var score = allQuizInfos
 					.DistinctBy(forDb => forDb.QuizId)
 					.Sum(forDb => forDb.QuizBlockScore);
+				
+				metricSender.SendCount($"quiz.submit.try.{tryIndex}.score", score);
+				metricSender.SendCount($"quiz.submit.{courseId}.try.{tryIndex}.score", score);
+				metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.try.{tryIndex}.score", score);
+				metricSender.SendCount($"quiz.submit.score", score);
+				metricSender.SendCount($"quiz.submit.{courseId}.score", score);
+				metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.score", score);
+
+				if (score == slide.MaxScore)
+				{
+					metricSender.SendCount($"quiz.submit.try.{tryIndex}.full_passed");
+					metricSender.SendCount($"quiz.submit.{courseId}.try.{tryIndex}.full_passed");
+					metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.try.{tryIndex}.full_passed");
+					metricSender.SendCount($"quiz.submit.full_passed");
+					metricSender.SendCount($"quiz.submit.{courseId}.full_passed");
+					metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.full_passed");
+				}
+				
 				await slideCheckingsRepo.AddQuizAttemptWithAutomaticChecking(courseId, slideId, userId, score);
 				await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 				if (isLti)
@@ -210,6 +255,8 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public async Task<ActionResult> ScoreQuiz(int id, string nextUrl, string errorUrl = "")
 		{
+			metricSender.SendCount("quiz.manual_score");
+
 			if (string.IsNullOrEmpty(errorUrl))
 				errorUrl = nextUrl;
 
@@ -222,6 +269,9 @@ namespace uLearn.Web.Controllers
 
 				if (!checking.IsLockedBy(User.Identity))
 					return Redirect(errorUrl + "Эта работа проверяется другим инструктором");
+
+				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}");
+				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.{checking.SlideId}");
 
 				var answers = userQuizzesRepo.GetAnswersForUser(checking.SlideId, checking.UserId);
 
@@ -243,9 +293,8 @@ namespace uLearn.Web.Controllers
 				{
 					var scoreFieldName = "quiz__score__" + question.Id;
 					var scoreStr = Request.Form[scoreFieldName];
-					int score;
 					/* Invalid form: score isn't integer */
-					if (!int.TryParse(scoreStr, out score))
+					if (!int.TryParse(scoreStr, out var score))
 						return Redirect(errorUrl + $"Неверное количество баллов в задании «{question.QuestionIndex}. {question.Text.TruncateWithEllipsis(50)}»");
 					/* Invalid form: score isn't from range 0..MAX_SCORE */
 					if (score < 0 || score > question.MaxScore)
@@ -258,6 +307,16 @@ namespace uLearn.Web.Controllers
 				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, totalScore);
 				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, checking.UserId);
 				transaction.Commit();
+
+				metricSender.SendCount($"quiz.manual_score.score", totalScore);
+				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.score", totalScore);
+				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.{checking.SlideId}.score", totalScore);
+				if (totalScore == quizVersion.RestoredQuiz.MaxScore)
+				{
+					metricSender.SendCount($"quiz.manual_score.full_scored");
+					metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.full_scored");
+					metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.{checking.SlideId}.full_scored");
+				}
 
 				await NotifyAboutManualQuizChecking(checking);
 			}
@@ -640,11 +699,11 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("SlideById", "Course", model);
 		}
 
-		private QuizModel GuestQuiz(QuizSlide slide, string courseId)
+		private QuizModel GuestQuiz(Course course, QuizSlide slide)
 		{
 			return new QuizModel
 			{
-				CourseId = courseId,
+				Course = course,
 				Slide = slide,
 				IsGuest = true,
 				QuizState = QuizState.NotPassed

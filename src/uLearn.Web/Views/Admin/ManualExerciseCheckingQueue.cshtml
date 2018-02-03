@@ -62,7 +62,7 @@
 		<div>
 			<div>
 				<p>
-					<b>@checking.User.VisibleName</b> решил@(checking.User.Gender.ChooseEnding()) задание «@checkModel.ContextSlideTitle»
+					<b>@checking.User.VisibleName</b> решил@(checking.User.Gender.ChooseEnding()) задание «@checkModel.ContextSlideTitle.MakeNestedQuotes()»
 					<span title="@checkModel.ContextTimestamp.ToPrettyString()">@checkModel.ContextTimestamp.ToAgoPrettyString()</span>
 				</p>
 			</div>
@@ -98,7 +98,7 @@
 				{
 					<p>
 						Проверяется преподавателем <b>@checking.LockedBy.VisibleName</b>,
-						заблокирована ещё на @{
+						заблокирована ещё на&nbsp;@{
 							                     var minutes = (int)(checking.LockedUntil.Value - DateTime.Now).TotalMinutes;
 							                     @minutes.PluralizeInRussian(RussianPluralizationOptions.MinuteDative)
 						                     }
@@ -106,6 +106,10 @@
 					if (checking.IsLockedBy(User.Identity))
 					{
 						@Html.ActionLink("Вернуться к проверке →", "CheckExercise", new { Model.CourseId, checking.Id, Group = Model.SelectedGroupsIdsJoined }, new { @class = "btn btn-sm btn-primary" })
+					}
+					else
+					{
+						@Html.ActionLink("Все равно проверить →", "CheckExercise", new { Model.CourseId, checking.Id, Group = Model.SelectedGroupsIdsJoined }, new { @class = "btn btn-sm btn-primary" })
 					}
 				}
 				else

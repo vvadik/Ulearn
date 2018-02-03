@@ -77,6 +77,15 @@ namespace uLearn
 		{
 			return TrySeveralTimes(func, triesCount, () => { });
 		}
+		
+		public static void TrySeveralTimes(Action func, int triesCount)
+		{
+			TrySeveralTimes(() =>
+			{
+				func();
+				return 0;
+			}, triesCount, () => { });
+		}
 	}
 
 	[TestFixture]

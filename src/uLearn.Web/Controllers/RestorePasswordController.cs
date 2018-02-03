@@ -10,6 +10,7 @@ using Kontur.Spam.Client;
 using log4net;
 using Metrics;
 using Microsoft.AspNet.Identity;
+using uLearn.Extensions;
 using uLearn.Web.Models;
 using Message = uLearn.Web.Models.Message;
 

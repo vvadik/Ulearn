@@ -14,7 +14,7 @@ using log4net;
 using RunCsJob.Api;
 using Telegram.Bot.Types.Enums;
 using uLearn.Extensions;
-using uLearn.Web.Telegram;
+using uLearn.Telegram;
 using XQueue;
 using XQueue.Models;
 
@@ -207,7 +207,7 @@ namespace uLearn.Web.Controllers
 			var output = result.Output;
 			await bot.PostToChannelAsync(
 				$"<b>Решение #{submission.Id} не запустилось в песочнице (SandboxError).</b>\n" +
-				(string.IsNullOrEmpty(output) ? "" : $"Вывод:\n<pre>{output.EscapeHtml()}</pre>") + 
+				(string.IsNullOrEmpty(output) ? "" : $"Вывод:\n<pre>{output.EscapeHtml()}</pre>"), 
 				ParseMode.Html
 			);
 		}

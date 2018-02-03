@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Web;
+using MarkdownDeep;
 
 namespace uLearn
 {
@@ -15,16 +16,17 @@ namespace uLearn
 			return md.RenderMd(baseUrl);
 		}
 
-		public static string RenderMd(this string md, string baseUrl = null)
+		public static string RenderMd(this string md, string baseUrlForRelativeLinks=null)
 		{
 			var texReplacer = new TexReplacer(md);
 
-			var markdown = new Markdown2(baseUrl)
+			var markdown = new Markdown
 			{
 				NewWindowForExternalLinks = true,
 				ExtraMode = true,
 				SafeMode = false,
-				MarkdownInHtml = false
+				MarkdownInHtml = false,
+				UrlBaseLocation = baseUrlForRelativeLinks,
 			};
 
 			markdown.FormatCodeBlock += FormatCodePrettyPrint;
@@ -40,7 +42,7 @@ namespace uLearn
 			return new HtmlString(texReplacer.PlaceTexInsertsBack(html));
 		}
 
-		public static Regex rxExtractLanguage = new Regex("^({{(.+)}}[\r\n])", RegexOptions.Compiled);
+		public static readonly Regex rxExtractLanguage = new Regex("^({{(.+)}}[\r\n])", RegexOptions.Compiled);
 
 		public static string FormatCodePrettyPrint(MarkdownDeep.Markdown m, string code)
 		{
@@ -75,10 +77,9 @@ namespace uLearn
 
 			// Wrap code in pre/code tags and add PrettyPrint attributes if necessary
 			if (string.IsNullOrEmpty(language))
-				return string.Format("<pre><code>{0}</code></pre>\n", code);
+				return $"<pre><code>{code}</code></pre>\n";
 			else
-				return string.Format("<textarea class=\"code code-sample data-lang='{0}' \">{1}</textarea>\n",
-					language.ToLowerInvariant(), code);
+				return $"<textarea class=\"code code-sample data-lang='{language.ToLowerInvariant()}' \">{code}</textarea>\n";
 		}
 
 		public static Tuple<string, List<string>> GetHtmlWithUrls(this string md, string baseUrl = null)

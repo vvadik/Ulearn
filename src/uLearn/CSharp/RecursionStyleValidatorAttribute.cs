@@ -23,7 +23,7 @@ namespace uLearn.CSharp
 
 			if (!requireRecursion && recursiveMethods.Any())
 				return "Решение должно быть нерекурсивным";
-
+			
 			return null;
 		}
 

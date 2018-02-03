@@ -14,7 +14,7 @@
 	<ol>
 		@foreach (var course in Model.UserCourses)
 		{
-			<li>@Html.ActionLink(course.Title, "CourseInfo", new { userName = Model.User.Id, courseId = course.Id })</li>
+			<li>@Html.ActionLink(course.Title, "CourseInfo", new { userId = Model.User.Id, courseId = course.Id })</li>
 		}
 	</ol>
 

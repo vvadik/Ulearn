@@ -9,6 +9,7 @@ using System.Xml.Serialization;
 using Microsoft.Build.Evaluation;
 using RunCsJob.Api;
 using uLearn.Extensions;
+using uLearn.Helpers;
 using uLearn.NUnitTestRunning;
 using uLearn.Properties;
 
@@ -17,12 +18,10 @@ namespace uLearn.Model.Blocks
 	[XmlType("proj-exercise")]
 	public class ProjectExerciseBlock : ExerciseBlock
 	{
-		private static readonly Regex anySolutionNameRegex = new Regex("(.+)\\.Solution\\.cs", RegexOptions.IgnoreCase);
-		private static readonly Regex anyWrongAnswerNameRegex = new Regex("(.+)\\.WrongAnswer\\.(.+)\\.cs", RegexOptions.IgnoreCase);
-
-		public static bool IsAnyWrongAnswerOrAnySolution(string name) => anyWrongAnswerNameRegex.IsMatch(name) || anySolutionNameRegex.IsMatch(name);
-		public static bool IsAnySolution(string name) => anySolutionNameRegex.IsMatch(name);
-
+		public const string BuildingTargetFrameworkVersion = "4.7";
+		public const string BuildingTargetNetCoreFrameworkVersion = "2.0";
+		public const string BuildingToolsVersion = "15.0";
+		
 		public static string SolutionFilepathToUserCodeFilepath(string solutionFilepath)
 		{
 			// cut .solution.cs
@@ -38,6 +37,12 @@ namespace uLearn.Model.Blocks
 			HideExpectedOutputOnError = true;
 			HideShowSolutionsButton = true;
 			MaxScore = 50;
+			BuildEnvironmentOptions = new BuildEnvironmentOptions
+			{
+				TargetFrameworkVersion = BuildingTargetFrameworkVersion,
+				TargetNetCoreFrameworkVersion = BuildingTargetNetCoreFrameworkVersion,
+				ToolsVersion = BuildingToolsVersion,
+			};
 		}
 
 		[XmlElement("csproj-file-path")]
@@ -93,11 +98,13 @@ namespace uLearn.Model.Blocks
 		[XmlIgnore]
 		public DirectoryInfo SlideFolderPath { get; set; }
 
-		public FileInfo StudentsZip => SlideFolderPath.GetFile(ExerciseDirName + ".exercise.zip");
+		//public FileInfo StudentsZip => SlideFolderPath.GetFile(ExerciseDirName + ".exercise.zip");
 
 		public bool IsWrongAnswer(string name) => WrongAnswersAndSolutionNameRegex.IsMatch(name) && !IsCorrectSolution(name);
 
 		public bool IsCorrectSolution(string name) => name.Equals(CorrectSolutionFileName, StringComparison.InvariantCultureIgnoreCase);
+		
+		public BuildEnvironmentOptions BuildEnvironmentOptions { get; set; }
 
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
@@ -106,11 +113,10 @@ namespace uLearn.Model.Blocks
 			ExpectedOutput = ExpectedOutput ?? "";
 			ValidatorName = string.Join(" ", LangId, ValidatorName);
 			SlideFolderPath = context.Dir;
-			var exercisePath = context.Dir.GetSubdir(ExerciseDirName).FullName;
-			if (context.ZippedProjectExercises.Add(exercisePath))
-				CreateZipForStudent();
 
 			CheckScoringGroup(context.SlideTitle, context.CourseSettings.Scoring);
+			
+			ReplaceStartupObjectForNUnitExercises();
 
 			yield return this;
 
@@ -121,39 +127,11 @@ namespace uLearn.Model.Blocks
 			}
 		}
 
-		private void CreateZipForStudent()
+		public void ReplaceStartupObjectForNUnitExercises()
 		{
-			var zip = new LazilyUpdatingZip(
-				ExerciseFolder,
-				new[] { "checking", "bin", "obj" },
-				NeedExcludeFromStudentZip,
-				ReplaceCsproj, StudentsZip);
-			ResolveCsprojLinks();
-			zip.UpdateZip();
-		}
-
-		private bool NeedExcludeFromStudentZip(FileInfo file)
-		{
-			var relativeFilePath = file.GetRelativePath(ExerciseFolder.FullName);
-			return NeedExcludeFromStudentZip(relativeFilePath);
-		}
-
-		public bool NeedExcludeFromStudentZip(string filepath)
-		{
-			return IsAnyWrongAnswerOrAnySolution(filepath) ||
-					PathsToExcludeForStudent != null && PathsToExcludeForStudent.Any(p => p == filepath);
-		}
-
-		private void ResolveCsprojLinks()
-		{
-			ProjModifier.ModifyCsproj(ExerciseFolder.GetFile(CsprojFileName), ProjModifier.ResolveLinks);
-		}
-
-		private byte[] ReplaceCsproj(FileInfo file)
-		{
-			if (!file.Name.Equals(CsprojFileName, StringComparison.InvariantCultureIgnoreCase))
-				return null;
-			return ProjModifier.ModifyCsproj(file, proj => ProjModifier.PrepareForStudentZip(proj, this));
+			/* Replace StartupObject if exercise uses NUnit tests. It should be after CreateZipForStudent() call */
+			var useNUnitLauncher = NUnitTestClasses != null;
+			StartupObject = useNUnitLauncher ? typeof(NUnitTestRunner).FullName : StartupObject;
 		}
 
 		public override string GetSourceCode(string code)
@@ -184,29 +162,32 @@ namespace uLearn.Model.Blocks
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(new[] { "bin/*", "obj/*" })
 				.ToList();
-			ResolveCsprojLinks();
-			return ExerciseFolder.ToZip(excluded, GetAdditionalFiles(code, ExerciseFolder, excluded));
+
+			var toUpdate = GetAdditionalFiles(code, excluded);
+			return ExerciseFolder.ToZip(excluded, toUpdate);
 		}
 
-		private IEnumerable<FileContent> GetAdditionalFiles(string code, DirectoryInfo exerciseDir, List<string> excluded)
+		private IEnumerable<FileContent> GetAdditionalFiles(string code, List<string> excluded)
 		{
 			yield return new FileContent { Path = UserCodeFilePath, Data = Encoding.UTF8.GetBytes(code) };
 
 			var useNUnitLauncher = NUnitTestClasses != null;
-			StartupObject = useNUnitLauncher ? typeof(NUnitTestRunner).FullName : StartupObject;
 
 			yield return new FileContent
 			{
 				Path = CsprojFileName,
-				Data = ProjModifier.ModifyCsproj(exerciseDir.GetFile(CsprojFileName), ModifyCsproj(excluded, useNUnitLauncher))
+				Data = ProjModifier.ModifyCsproj(CsprojFile, ModifyCsproj(excluded, useNUnitLauncher), toolsVersion: BuildEnvironmentOptions.ToolsVersion)
 			};
 
 			if (useNUnitLauncher)
 			{
 				yield return new FileContent { Path = GetNUnitTestRunnerFilename(), Data = CreateTestLauncherFile() };
 			}
-		}
 
+			foreach (var fileContent in ExerciseStudentZipBuilder.ResolveCsprojLinks(this))
+				yield return fileContent;
+		}
+	
 		private static string GetNUnitTestRunnerFilename()
 		{
 			return nameof(NUnitTestRunner) + ".cs";
@@ -214,11 +195,13 @@ namespace uLearn.Model.Blocks
 
 		private Action<Project> ModifyCsproj(List<string> excluded, bool addNUnitLauncher)
 		{
-			return p =>
+			return proj =>
 			{
-				ProjModifier.PrepareForCheckingUserCode(p, this, excluded);
+				ProjModifier.PrepareForCheckingUserCode(proj, this, excluded);
 				if (addNUnitLauncher)
-					p.AddItem("Compile", GetNUnitTestRunnerFilename());
+					proj.AddItem("Compile", GetNUnitTestRunnerFilename());
+				
+				ProjModifier.SetBuildEnvironmentOptions(proj, BuildEnvironmentOptions);
 			};
 		}
 

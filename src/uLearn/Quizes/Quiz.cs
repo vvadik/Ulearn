@@ -368,7 +368,7 @@ namespace uLearn.Quizes
 
 		public string GetHash()
 		{
-			return (Id + "OrderingItemSalt").GetHashCode().ToString();
+			return (Id + "OrderingItemSalt").GetStableHashCode().ToString();
 		}
 	}
 
@@ -385,12 +385,12 @@ namespace uLearn.Quizes
 
 		public string GetHashForFixedItem()
 		{
-			return (Id + "MatchingItemFixedItemSalt").GetHashCode().ToString();
+			return (Id + "MatchingItemFixedItemSalt").GetStableHashCode().ToString();
 		}
 
 		public string GetHashForMovableItem()
 		{
-			return (Id + "MatchingItemMovableItemSalt").GetHashCode().ToString();
+			return (Id + "MatchingItemMovableItemSalt").GetStableHashCode().ToString();
 		}
 	}
 

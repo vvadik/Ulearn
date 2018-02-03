@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
@@ -8,6 +9,8 @@ using Database.Models;
 using Graphite;
 using log4net;
 using log4net.Config;
+using Metrics;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Notifications
 {
@@ -18,6 +21,9 @@ namespace Notifications
 		public volatile bool Stopped;
 		private readonly WebCourseManager courseManager;
 		private readonly NotificationSender notificationSender;
+		
+		private readonly ServiceKeepAliver keepAliver;
+		private readonly TimeSpan keepAliveInterval;		
 
 		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
 
@@ -25,6 +31,11 @@ namespace Notifications
 		{
 			this.courseManager = courseManager;
 			notificationSender = new NotificationSender(courseManager);
+			keepAliver = new ServiceKeepAliver("notifications");
+
+			if (!int.TryParse(ConfigurationManager.AppSettings["ulearn.notifications.keepAlive.interval"], out var keepAliveIntervalSeconds))
+				keepAliveIntervalSeconds = 30;
+			keepAliveInterval = TimeSpan.FromSeconds(keepAliveIntervalSeconds);
 		}
 
 		public Program()
@@ -59,6 +70,7 @@ namespace Notifications
 					log.Info("Waiting one second and repeat");
 				}
 
+				keepAliver.Ping(keepAliveInterval);
 				await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
 			}
 
@@ -98,7 +110,8 @@ namespace Notifications
 				var course = courseManager.FindCourse(delivery.Notification.CourseId);
 				if (course == null)
 				{
-					await notificationsRepo.MarkDeliveryAsWontSend(delivery.Id);
+					log.Warn($"Can't find course {delivery.Notification.CourseId}");
+					await notificationsRepo.MarkDeliveryAsFailed(delivery);
 					return;
 				}
 

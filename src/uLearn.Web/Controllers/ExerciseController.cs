@@ -12,6 +12,7 @@ using Database.Models;
 using Elmah;
 using Microsoft.AspNet.Identity;
 using uLearn.Extensions;
+using uLearn.Helpers;
 using uLearn.Model.Blocks;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
@@ -23,6 +24,13 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class ExerciseController : BaseExerciseController
 	{
+		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache;
+
+		public ExerciseController()
+		{
+			exerciseStudentZipsCache = new ExerciseStudentZipsCache();
+		}
+		
 		[System.Web.Mvc.HttpPost]
 		public async Task<ActionResult> RunSolution(string courseId, Guid slideId, bool isLti = false)
 		{
@@ -170,19 +178,12 @@ namespace uLearn.Web.Controllers
 			{
 				var checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(id);
 
-				if (checking.IsChecked && !recheck)
-					return Redirect(errorUrl + "Эта работа уже была проверена");
-
-				if (!checking.IsLockedBy(User.Identity))
-					return Redirect(errorUrl + "Эта работа проверяется другим инструктором");
-
 				var course = courseManager.GetCourse(checking.CourseId);
 				var slide = (ExerciseSlide)course.GetSlideById(checking.SlideId);
 				var exercise = slide.Exercise;
 
-				int score;
 				/* Invalid form: score isn't integer */
-				if (!int.TryParse(exerciseScore, out score))
+				if (!int.TryParse(exerciseScore, out var score))
 					return Redirect(errorUrl + "Неверное количество баллов");
 
 				/* Invalid form: score isn't from range 0..MAX_SCORE */
@@ -394,6 +395,25 @@ namespace uLearn.Web.Controllers
 
 			return PartialView(model);
 		}
+
+        [System.Web.Mvc.AllowAnonymous]
+		public ActionResult StudentZip(string courseId, Guid? slideId)
+		{
+			if (!slideId.HasValue)
+				return HttpNotFound();
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId.Value);
+			if (!(slide is ExerciseSlide))
+				return HttpNotFound();
+
+			var exerciseSlide = slide as ExerciseSlide;
+			if (!(exerciseSlide.Exercise is ProjectExerciseBlock))
+				return HttpNotFound();
+
+			var block = (ProjectExerciseBlock) exerciseSlide.Exercise;
+			var zipFile = exerciseStudentZipsCache.GenerateOrFindZip(courseId, exerciseSlide);
+			
+			return File(zipFile.FullName, "application/zip", block.CsprojFile.Name + ".zip");
+		}
 	}
 
 	[DataContract]
@@ -487,20 +507,23 @@ namespace uLearn.Web.Controllers
 
 	public class ExerciseScoreFormModel
 	{
-		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking, List<string> groupsIds = null, bool isCurrentSubmissionChecking = false)
+		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking, List<string> groupsIds = null,
+			bool isCurrentSubmissionChecking = false, bool defaultProhibitFutherReview = true)
 		{
 			CourseId = courseId;
 			Slide = slide;
 			Checking = checking;
 			GroupsIds = groupsIds;
 			IsCurrentSubmissionChecking = isCurrentSubmissionChecking;
+			DefaultProhibitFutherReview = defaultProhibitFutherReview;
 		}
-
+		
 		public string CourseId { get; set; }
 		public ExerciseSlide Slide { get; set; }
 		public ManualExerciseChecking Checking { get; set; }
 		public List<string> GroupsIds { get; set; }
 		public string GroupsIdsJoined => string.Join(",", GroupsIds ?? new List<string>());
 		public bool IsCurrentSubmissionChecking { get; set; }
+		public bool DefaultProhibitFutherReview { get; set; }
 	}
 }
