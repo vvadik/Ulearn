@@ -13,11 +13,11 @@ namespace uLearn.Web
 	{
 		public void Configuration(IAppBuilder app)
 		{
-			ConfigureAuth(app);
-			InitTelegramBot();
-
 			/* TODO (andgein): remove this hack */
 			Utils.WebApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath;
+
+			ConfigureAuth(app);
+			InitTelegramBot();
 		}
 
 		public void InitTelegramBot()

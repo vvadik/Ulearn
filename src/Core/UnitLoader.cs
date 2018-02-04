@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using uLearn.CSharp;
-using uLearn.Extensions;
 using uLearn.Model;
 using uLearn.Quizes;
 using Ulearn.Common.Extensions;

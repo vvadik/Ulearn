@@ -13,6 +13,8 @@ using uLearn.Web.FilterAttributes;
 using uLearn.Web.Kontur.Passport;
 using uLearn.Web.Microsoft.Owin.Security.VK;
 using uLearn.Web.Models;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {
@@ -94,7 +96,7 @@ namespace uLearn.Web.Controllers
 			ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
 
 			Gender? loginGender = null;
-			loginInfo.ExternalIdentity.FindFirstValue(ClaimTypes.Gender)?.TryParseToNullableEnum<Gender>(out loginGender);
+			loginInfo.ExternalIdentity.FindFirstValue(ClaimTypes.Gender)?.TryParseToNullableEnum(out loginGender);
 			return View("ExternalLoginConfirmation",
 				new ExternalLoginConfirmationViewModel { UserName = loginInfo.DefaultUserName, Email = loginInfo.Email, Gender = loginGender });
 		}

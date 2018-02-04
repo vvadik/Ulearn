@@ -3,7 +3,6 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
-using uLearn.Extensions;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.Model.Edx

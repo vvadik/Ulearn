@@ -3,7 +3,6 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using uLearn.Extensions;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp

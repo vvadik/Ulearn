@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using uLearn.Extensions;
 using uLearn.Model.Blocks;
 using uLearn.Model.Edx;
 using uLearn.Model.Edx.EdxComponents;

@@ -15,6 +15,8 @@ using RunCsJob.Api;
 using Telegram.Bot.Types.Enums;
 using uLearn.Extensions;
 using uLearn.Telegram;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 using XQueue;
 using XQueue.Models;
 

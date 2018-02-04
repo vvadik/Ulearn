@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Microsoft.Build.Evaluation;
 using RunCsJob.Api;
-using uLearn.Extensions;
 using uLearn.Helpers;
 using uLearn.NUnitTestRunning;
 using uLearn.Properties;
@@ -208,9 +207,13 @@ namespace uLearn.Model.Blocks
 		private byte[] CreateTestLauncherFile()
 		{
 			var data = Resources.NUnitTestRunner;
+			
 			var oldTestFilter = "\"SHOULD_BE_REPLACED\"";
 			var newTestFilter = string.Join(",", NUnitTestClasses.Select(x => $"\"{x}\""));
 			var newData = data.Replace(oldTestFilter, newTestFilter);
+			
+			newData = newData.Replace("WillBeMain", "Main");
+			
 			return Encoding.UTF8.GetBytes(newData);
 		}
 	}

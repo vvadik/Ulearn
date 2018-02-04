@@ -3,7 +3,6 @@ using log4net.Core;
 using Telegram.Bot.Types.Enums;
 using uLearn.Telegram;
 using Telegram.Bot.Exceptions;
-using uLearn.Extensions;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.Logging

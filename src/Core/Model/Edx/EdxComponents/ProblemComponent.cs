@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Xml;
 using System.Xml.Serialization;
-using uLearn.Extensions;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.Model.Edx.EdxComponents

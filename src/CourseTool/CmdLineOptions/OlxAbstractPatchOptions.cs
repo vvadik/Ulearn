@@ -1,7 +1,7 @@
 using System;
 using CommandLine;
-using uLearn.Extensions;
 using uLearn.Model.Edx;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CourseTool.CmdLineOptions
 {

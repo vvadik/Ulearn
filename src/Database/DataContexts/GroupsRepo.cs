@@ -10,8 +10,9 @@ using JetBrains.Annotations;
 using log4net;
 using Microsoft.AspNet.Identity;
 using uLearn;
-using uLearn.Extensions;
 using uLearn.Quizes;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {

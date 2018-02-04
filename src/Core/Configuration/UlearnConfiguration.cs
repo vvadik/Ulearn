@@ -6,20 +6,23 @@ namespace uLearn.Configuration
 {
 	public static class ApplicationConfiguration
 	{
-		public static T Read<T>(IDictionary<string, string> initialData) where T : AbstractConfiguration
+		public static T Read<T>(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
 		{
+			var applicationPath = string.IsNullOrEmpty(Utils.WebApplicationPhysicalPath)
+				? Directory.GetCurrentDirectory()
+				: Utils.WebApplicationPhysicalPath;
 			var configuration = new ConfigurationBuilder()
 				.AddInMemoryCollection(initialData)
-				.SetBasePath(Directory.GetCurrentDirectory())
-				.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+				.SetBasePath(applicationPath)
+				.AddJsonFile("appsettings.json", optional: isAppsettingsJsonOptional, reloadOnChange: true)
 				.Build();
 			
 			return configuration.Get<T>();
 		}
 		
-		public static T Read<T>() where T : AbstractConfiguration
+		public static T Read<T>(bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
 		{
-			return Read<T>(new Dictionary<string, string>());
+			return Read<T>(new Dictionary<string, string>(), isAppsettingsJsonOptional);
 		}
 	}
 	
@@ -57,6 +60,4 @@ namespace uLearn.Configuration
 	{
 		public string Directory { get; set; }
 	}
-
-	
 }

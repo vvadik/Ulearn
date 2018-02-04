@@ -8,7 +8,7 @@ using Database.Extensions;
 using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
-using uLearn;
+using Ulearn.Common;
 
 namespace Database.DataContexts
 {

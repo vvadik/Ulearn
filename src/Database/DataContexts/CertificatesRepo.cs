@@ -12,7 +12,7 @@ using Ionic.Zip;
 using log4net;
 using Newtonsoft.Json;
 using uLearn;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {

@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using NUnit.Framework.Api;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
-using NUnit.Framework.Internal.Filters;
 
 [assembly: InternalsVisibleTo("NUnit.Framework")]
 
@@ -19,7 +18,7 @@ namespace uLearn.NUnitTestRunning
 	/// </summary>
 	public class NUnitTestRunner
 	{
-		public static void Main()
+		public static void WillBeMain()
 		{
 			string[] testClassesToLaunch = { "SHOULD_BE_REPLACED" };
 			var listener = new TestListener();

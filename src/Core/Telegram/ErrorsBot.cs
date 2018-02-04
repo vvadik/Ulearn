@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using log4net;
 using Telegram.Bot.Types.Enums;
 using uLearn.Configuration;
-using uLearn.Extensions;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.Telegram

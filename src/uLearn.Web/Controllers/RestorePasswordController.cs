@@ -12,6 +12,7 @@ using Metrics;
 using Microsoft.AspNet.Identity;
 using uLearn.Extensions;
 using uLearn.Web.Models;
+using Ulearn.Common.Extensions;
 using Message = uLearn.Web.Models.Message;
 
 namespace uLearn.Web.Controllers

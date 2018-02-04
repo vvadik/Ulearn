@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using uLearn.Configuration;
 
 namespace uLearn.Telegram
