@@ -11,7 +11,6 @@ using Database.Extensions;
 using Database.Models;
 using Elmah;
 using Microsoft.AspNet.Identity;
-using uLearn.Extensions;
 using uLearn.Helpers;
 using uLearn.Model.Blocks;
 using uLearn.Web.Extensions;

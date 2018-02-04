@@ -8,7 +8,6 @@ using Database.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
-using uLearn.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Kontur.Passport;
 using uLearn.Web.Microsoft.Owin.Security.VK;

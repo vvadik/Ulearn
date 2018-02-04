@@ -13,7 +13,6 @@ using Database.Models;
 using log4net;
 using RunCsJob.Api;
 using Telegram.Bot.Types.Enums;
-using uLearn.Extensions;
 using uLearn.Telegram;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;

@@ -13,8 +13,6 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
-using Microsoft.Owin.Security.Cookies;
-using uLearn.Extensions;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
