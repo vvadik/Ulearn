@@ -168,8 +168,9 @@ namespace uLearn
 			}
 			catch (Exception e)
 			{
+				log.Warn("Не смог загрузить курс из папки", e);
 				var zipFile = GetStagingCourseFile(courseId);
-				log.Info($"Неудача. Загружаю из zip-архива: {zipFile.FullName}");
+				log.Info($"Буду загружать из zip-архива: {zipFile.FullName}");
 				errorsBot.PostToChannel($"Не смог загрузить курс из папки {courseDir}, буду загружать из zip-архива {zipFile.FullName}:\n{e.Message.EscapeMarkdown()}\n```{e.StackTrace}```", ParseMode.Markdown);
 				return ReloadCourseFromZip(zipFile);
 			}
