@@ -5,6 +5,7 @@ namespace Correct
 {
 	public class SingleLineArgumentListNotIndented
 	{
+		// ReSharper disable once FunctionRecursiveOnAllPaths
 		public static void Main(string s1, string s2, string s3)
 		{
 			new[] { 1, 2, 3 }.Select(i => i);

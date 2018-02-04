@@ -19,10 +19,10 @@ namespace uLearn.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace uLearn.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("uLearn.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace uLearn.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -62,43 +62,57 @@ namespace uLearn.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to #IT
-        ///криптоанализ:анализ
+        ///Беллман:артист
+        ///Блэйн:артист
+        ///Бэкона
+        ///Дейкстра:корова
+        ///Джоэл:артист
         ///Диффи
-        ///Хеллман:кран
-        ///криптоалгоритм:алгоритм
-        ///криптостойкий:стойкий
-        ///бóльшая
-        ///майнинг:ринг
-        ///Сатоши
-        ///Накамото
-        ///стегоанализ:анализ
-        ///пиксель:вексель
-        ///биткоин:воин
-        ///очепятки:опечатки
-        ///распознаться:делаться
+        ///Дэвид:артист
+        ///Йетс:артист
+        ///Краскал:артист
         ///Ктулху
-        ///шарп:карп
-        ///проинициализировать:инициализировать
-        ///проинициализироваться:инициализироваться
-        ///проинициализированный:инициализированный
-        ///подмассив:массив
-        ///локаль:тетрадь
-        ///грамма:парта
-        ///биграмма:грамма
-        ///триграмма:грамма
-        ///бэкслеш:марш
-        ///граммный:новый
-        ///чекпоинт:завод
-        ///бинпоиск:поис [rest of string was truncated]&quot;;.
+        ///Левенштейн:артист
+        ///Макконнелл
+        ///Мартин
+        ///Накамото
+        ///Сатоши
+        ///Симан:Риман
+        ///Спольски
+        ///Стив
+        ///Таро
+        ///Тарьян:артист
+        ///Троэлсен
+        ///Фишер:артист
+        ///Хеллман:кран
+        ///Хоар:артист
+        ///Чичиков:артист
+        ///Эванс
+        ///Эванса
+        ///Эвансом
+        ///Эратосфена
+        ///антипаттерн
+        ///апкаст:пласт
+        ///арканоид:завод
+        ///бакет:пакет
+        ///биграмм
+        ///биграмма:кардиограмма
+        ///биграммной
+        ///биграммные
+        ///биграммный:полный
+        ///биграммных
+        ///биндинг:чайник
+        ///бинпоиск:по [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string customDictionary {
+        public static string customDictionary {
             get {
                 return ResourceManager.GetString("customDictionary", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to авто
+        ///   Looks up a localized string similar to анти
+        ///авто
         ///аква
         ///алко
         ///бух
@@ -117,6 +131,7 @@ namespace uLearn.Properties {
         ///мета
         ///мини
         ///много
+        ///не
         ///от
         ///пере
         ///пост
@@ -135,7 +150,7 @@ namespace uLearn.Properties {
         ///фото
         ///юр.
         /// </summary>
-        internal static string customPrefixes {
+        public static string customPrefixes {
             get {
                 return ResourceManager.GetString("customPrefixes", resourceCulture);
             }
@@ -146,25 +161,21 @@ namespace uLearn.Properties {
         ///using System.Collections.Generic;
         ///using System.Linq;
         ///using System.Reflection;
+        ///using System.Runtime.CompilerServices;
+        ///using System.Text.RegularExpressions;
         ///using NUnit.Framework.Api;
         ///using NUnit.Framework.Interfaces;
-        ///using NUnit.Framework.Internal.Filters;
+        ///using NUnit.Framework.Internal;
+        ///
+        ///[assembly: InternalsVisibleTo(&quot;NUnit.Framework&quot;)]
         ///
         ///namespace uLearn.NUnitTestRunning
         ///{
-        ///	public class NUnitTestRunner
-        ///	{
-        ///		public static void Main()
-        ///		{
-        ///			string[] testClassesToLaunch = { &quot;SHOULD_BE_REPLACED&quot; };
-        ///			RunAllTests(testClassesToLaunch);
-        ///		}
-        ///
-        ///		public static void RunAllTests(params string[] testClassesToLaunch)
-        ///		{
-        ///			var runner = new NUnitTe [rest of string was truncated]&quot;;.
+        ///	/// &lt;summary&gt;
+        ///	/// Этот файл включен в ресурсы и добавляется в пришедший на проверку проект с задачей, если у нее в качестве способа проверки 
+        ///	/ [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string NUnitTestRunner {
+        public static string NUnitTestRunner {
             get {
                 return ResourceManager.GetString("NUnitTestRunner", resourceCulture);
             }
@@ -173,7 +184,7 @@ namespace uLearn.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] ru_RU_aff {
+        public static byte[] ru_RU_aff {
             get {
                 object obj = ResourceManager.GetObject("ru_RU_aff", resourceCulture);
                 return ((byte[])(obj));
@@ -183,7 +194,7 @@ namespace uLearn.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] ru_RU_dic {
+        public static byte[] ru_RU_dic {
             get {
                 object obj = ResourceManager.GetObject("ru_RU_dic", resourceCulture);
                 return ((byte[])(obj));

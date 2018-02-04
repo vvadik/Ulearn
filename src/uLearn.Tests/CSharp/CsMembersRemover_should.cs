@@ -2,8 +2,8 @@
 using System.IO;
 using ApprovalTests;
 using NUnit.Framework;
-using uLearn.Extensions;
 using uLearn.Model.Blocks;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp
 {
