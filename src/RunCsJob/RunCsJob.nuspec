@@ -17,5 +17,6 @@
   <files>
     <file src="bin\*\*.config"/>
     <file src="..\..\deploy\CreateScheduledTask.ps1" target="deploy\CreateScheduledTask.ps1"/>
+    <file src="deploy\*" target="deploy\"/>
   </files>
 </package>
