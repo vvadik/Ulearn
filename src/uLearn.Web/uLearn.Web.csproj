@@ -1273,9 +1273,9 @@
       <Project>{6BF55402-68F0-4BA3-9F03-E42C3912C9CA}</Project>
       <Name>Metrics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RunCsJob.Api.Core\RunCsJob.Api.Core.csproj">
-      <Project>{b7df3fa1-307f-4f9a-87f0-b0faa9d2ce8c}</Project>
-      <Name>RunCsJob.Api.Core</Name>
+    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
+      <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
+      <Name>RunCsJob.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\Stepik.Api\Stepik.Api.csproj">
       <Project>{60247c0a-b6ee-46e2-ab66-c7285f5f1345}</Project>

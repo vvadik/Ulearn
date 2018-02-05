@@ -36,10 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\RunCsJob.Api.Core\RunCsJob.Api.Core.csproj">
-      <Project>{B7DF3FA1-307F-4F9A-87F0-B0FAA9D2CE8C}</Project>
-      <Name>RunCsJob.Api.Core</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj" />
     <ProjectReference Include="..\Ulearn.CSharpAttributes\Ulearn.CSharpAttributes.csproj" />
   </ItemGroup>
 </Project>

@@ -932,9 +932,9 @@
       <Project>{803c067a-5553-467d-9470-116fe2430255}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RunCsJob.Api.Core\RunCsJob.Api.Core.csproj">
-      <Project>{b7df3fa1-307f-4f9a-87f0-b0faa9d2ce8c}</Project>
-      <Name>RunCsJob.Api.Core</Name>
+    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
+      <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
+      <Name>RunCsJob.Api</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
