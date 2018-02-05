@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Database.Models;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace Notifications
 {

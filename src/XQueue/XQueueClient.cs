@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using System.Web;
 using log4net;
 using Newtonsoft.Json;
-using uLearn;
-using uLearn.Extensions;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 using XQueue.Models;
 
 namespace XQueue

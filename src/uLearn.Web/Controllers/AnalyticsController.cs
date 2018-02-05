@@ -10,16 +10,15 @@ using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
-using LtiLibrary.Core.Extensions;
 using Microsoft.AspNet.Identity;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using uLearn.Extensions;
 using uLearn.Quizes;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Helpers;
 using uLearn.Web.Models;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {

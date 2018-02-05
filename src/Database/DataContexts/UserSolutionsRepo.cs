@@ -16,7 +16,8 @@ using EntityFramework.Functions;
 using log4net;
 using RunCsJob.Api;
 using uLearn;
-using uLearn.Extensions;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {

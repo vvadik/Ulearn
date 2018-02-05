@@ -6,9 +6,8 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
-using Microsoft.AspNet.Identity;
-using uLearn;
-using uLearn.Extensions;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {

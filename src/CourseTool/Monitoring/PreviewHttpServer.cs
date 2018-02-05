@@ -10,11 +10,12 @@ using Newtonsoft.Json;
 using NHttp;
 using RunCsJob;
 using RunCsJob.Api;
-using uLearn.Extensions;
+using uLearn.Helpers;
 using uLearn.Model;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
 using uLearn.Web.Models;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CourseTool.Monitoring
 {
@@ -27,6 +28,9 @@ namespace uLearn.CourseTool.Monitoring
 		private DateTime lastChangeTime = DateTime.MinValue;
 		private volatile Course course;
 		private readonly object locker = new object();
+		private readonly ExerciseStudentZipBuilder exerciseStudentZipBuilder = new ExerciseStudentZipBuilder();
+
+		private const string exerciseStudentZipPath = "/Exercise/StudentZip";
 
 		public PreviewHttpServer(string courseDir, string htmlDir, int port)
 		{
@@ -97,31 +101,74 @@ namespace uLearn.CourseTool.Monitoring
 		{
 			var query = context.Request.QueryString["query"];
 			var path = context.Request.Url.LocalPath;
-			byte[] response;
 			var requestTime = DateTime.Now;
 			var reloaded = ReloadCourseIfChanged(requestTime);
 			if (!new[] { ".js", ".css", ".png", ".jpg", ".woff" }.Any(ext => path.EndsWith(ext)))
 				Console.WriteLine($"{requestTime:T} {context.Request.HttpMethod} {context.Request.Url}");
-			switch (query)
-			{
-				case "needRefresh":
-					response = ServeNeedRefresh(reloaded, requestTime).Result;
-					break;
-				case "submit":
-					response = ServeRunExercise(context, path);
-					break;
-				case "addLesson":
-					response = ServeAddLesson(context, path);
-					break;
-				case "addQuiz":
-					response = ServeAddQuiz(context, path);
-					break;
-				default:
-					response = ServeStatic(context, path);
-					break;
-			}
-			context.Response.OutputStream.WriteAsync(response, 0, response.Length).Wait();
+
+			byte[] responseBytes;			
+			/* Serve exercise student zips */
+			if (path == exerciseStudentZipPath)
+				responseBytes = ServeExerciseStudentZip(context, context.Request.QueryString["slideId"]);
+			else
+				switch (query)
+				{
+					case "needRefresh":
+						responseBytes = ServeNeedRefresh(reloaded, requestTime).Result;
+						break;
+					case "submit":
+						responseBytes = ServeRunExercise(context, path);
+						break;
+					case "addLesson":
+						responseBytes = ServeAddLesson(context, path);
+						break;
+					case "addQuiz":
+						responseBytes = ServeAddQuiz(context, path);
+						break;
+					default:
+						responseBytes = ServeStatic(context, path);
+						break;
+				}
+
+			context.Response.OutputStream.WriteAsync(responseBytes, 0, responseBytes.Length).Wait();
 			context.Response.OutputStream.Close();
+		}
+
+		private byte[] ServeExerciseStudentZip(HttpRequestEventArgs context, string slideId)
+		{
+			if (!Guid.TryParse(slideId, out var slideIdGuid))
+				return Encoding.UTF8.GetBytes("Invalid slide id");
+			var slide = course.FindSlideById(slideIdGuid);
+			if (!(slide is ExerciseSlide))
+				return Encoding.UTF8.GetBytes("Invalid slide id");
+			
+			var zipBytes = GenerateExerciseStudentZip(slide);
+			context.Response.Headers.Add("Content-Type", "application/zip");
+			var projectExerciseBlock = ((slide as ExerciseSlide).Exercise as ProjectExerciseBlock);
+			context.Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{projectExerciseBlock?.ExerciseDirName.ToLatin()}.zip\"");
+			
+			return zipBytes;
+		}
+
+		private byte[] GenerateExerciseStudentZip(Slide slide)
+		{
+			var tempZipFile = Path.GetRandomFileName();
+			var tempZipFileInfo = new FileInfo(tempZipFile);
+
+			try
+			{
+				exerciseStudentZipBuilder.BuildStudentZip(slide, tempZipFileInfo);
+				return File.ReadAllBytes(tempZipFile);
+			}
+			catch (Exception e)
+			{
+				Console.Error.WriteLine(e.ToString());
+				throw;
+			}
+			finally
+			{
+				tempZipFileInfo.Delete();
+			}
 		}
 
 		public int GetSlideIndex(string path)

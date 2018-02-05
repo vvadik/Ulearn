@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 using Kontur.Spam.Client;
 using log4net;
 using Metrics;
-using uLearn;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace Notifications
 {

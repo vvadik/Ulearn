@@ -1,6 +1,4 @@
-﻿using NUnit.Framework;
-
-namespace uLearn.CSharp.BoolCompareValidation.TestData.Incorrect
+﻿namespace uLearn.CSharp.BoolCompareValidation.TestData.Incorrect
 {
 	public class IfWithBool
 	{

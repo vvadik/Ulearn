@@ -1,5 +1,4 @@
 ﻿using System;
-using uLearn.CSharp;
 
 namespace uLearn.tests
 {

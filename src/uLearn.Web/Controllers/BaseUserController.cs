@@ -9,7 +9,7 @@ using Kontur.Spam.Client;
 using log4net;
 using Metrics;
 using Microsoft.AspNet.Identity;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {

@@ -11,13 +11,13 @@ using Database.Extensions;
 using Database.Models;
 using Elmah;
 using Microsoft.AspNet.Identity;
-using uLearn.Extensions;
 using uLearn.Helpers;
 using uLearn.Model.Blocks;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
 using uLearn.Web.Models;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {
@@ -397,9 +397,11 @@ namespace uLearn.Web.Controllers
 		}
 
         [System.Web.Mvc.AllowAnonymous]
-		public ActionResult StudentZip(string courseId, Guid slideId)
+		public ActionResult StudentZip(string courseId, Guid? slideId)
 		{
-			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId);
+			if (!slideId.HasValue)
+				return HttpNotFound();
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId.Value);
 			if (!(slide is ExerciseSlide))
 				return HttpNotFound();
 

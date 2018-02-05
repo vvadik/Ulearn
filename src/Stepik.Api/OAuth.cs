@@ -2,7 +2,7 @@
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace Stepik.Api
 {

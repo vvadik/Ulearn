@@ -1,4 +1,5 @@
 ﻿using System.Web.Configuration;
+using System.Web.Hosting;
 using Microsoft.Owin;
 using Owin;
 using Telegram.Bot;
@@ -12,6 +13,9 @@ namespace uLearn.Web
 	{
 		public void Configuration(IAppBuilder app)
 		{
+			/* TODO (andgein): remove this hack */
+			Utils.WebApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath;
+
 			ConfigureAuth(app);
 			InitTelegramBot();
 		}

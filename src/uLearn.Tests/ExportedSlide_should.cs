@@ -2,9 +2,9 @@
 using log4net;
 using log4net.Config;
 using NUnit.Framework;
-using uLearn.Extensions;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
+using Ulearn.Common.Extensions;
 
 namespace uLearn
 {

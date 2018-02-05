@@ -1,12 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using ApprovalTests.Reporters;
 using FluentAssertions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp.BoolCompareValidation
 {

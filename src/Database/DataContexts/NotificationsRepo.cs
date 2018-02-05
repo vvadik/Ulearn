@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
 using log4net;
-using uLearn;
-using uLearn.Extensions;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {

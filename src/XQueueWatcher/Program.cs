@@ -13,6 +13,7 @@ using log4net.Config;
 using Metrics;
 using uLearn;
 using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 using XQueue;
 using XQueue.Models;
 
@@ -57,13 +58,6 @@ namespace XQueueWatcher
 				Task.Delay(pauseBetweenRequests, cancellationToken).Wait(cancellationToken);
 				keepAliver.Ping(keepAliveInterval);
 			}
-		}
-
-		/* We need to create new database connection each time for disabling EF's caching */
-		private static XQueueRepo GetNewXQueueRepo()
-		{
-			var db = new ULearnDb();
-			return new XQueueRepo(db, courseManager);
 		}
 
 		private async Task SafeGetAndProcessSubmissionFromXQueue(Database.Models.XQueueWatcher watcher)
@@ -142,6 +136,13 @@ namespace XQueueWatcher
 				graderPayload.SlideId,
 				submission.Body.StudentResponse
 			);
+		}
+		
+		/* We need to create new database connection each time for disabling EF's caching */
+		private static XQueueRepo GetNewXQueueRepo()
+		{
+			var db = new ULearnDb();
+			return new XQueueRepo(db, courseManager);
 		}
 	}
 

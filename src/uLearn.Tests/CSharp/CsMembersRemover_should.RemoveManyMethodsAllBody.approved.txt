@@ -1,8 +1,5 @@
 ﻿//region all
 
-using System;
-using System.IO;
-
 namespace uLearn.tests
 {
 	internal class OverloadedMethods : IRunnable

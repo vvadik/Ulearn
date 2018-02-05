@@ -9,7 +9,7 @@ using EntityFramework.Functions;
 using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
 using uLearn;
-using uLearn.Helpers;
+using Ulearn.Common;
 
 namespace Database.DataContexts
 {

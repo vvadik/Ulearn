@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp.ExponentiationValidation
 {
@@ -84,6 +84,7 @@ namespace uLearn.CSharp.ExponentiationValidation
 		[TestCaseSource(nameof(submissionsFiles))]
 		public void NotFindErrors_InCheckAcceptedFiles(FileInfo file)
 		{
+			Console.WriteLine(file.FullName);
 			var fileContent = file.ContentAsUtf8();
 
 			var errors = validator.FindError(fileContent);

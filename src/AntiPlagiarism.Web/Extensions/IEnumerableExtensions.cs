@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace AntiPlagiarism.Web.Extensions
 {
+	// ReSharper disable once InconsistentNaming
 	public static class IEnumerableExtensions
 	{
 		public static IEnumerable<ItemWithIndex<T>> Enumerate<T>(this IEnumerable<T> collection, int start=0)

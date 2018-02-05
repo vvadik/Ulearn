@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Vostok.Hosting;
 
 namespace AntiPlagiarism.Web.Database
 {

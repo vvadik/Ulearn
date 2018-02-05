@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
-using uLearn.Extensions;
 using uLearn.SpellChecking;
+using Ulearn.Common.Extensions;
 
 namespace uLearn
 {
