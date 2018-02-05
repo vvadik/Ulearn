@@ -3,7 +3,6 @@ param(
     [string]$xmlFileName,
     [string]$taskName,
     [string]$userName,
-    [string]$password
 )
 
 $ErrorActionPreference = "Stop" 
@@ -33,8 +32,8 @@ function Get-Param($Name, [switch]$Required, $Default) {
     return $result
 }
 
-Function Create-ScheduledTask($xmlFileName, $taskName, $username, $password){
-  $Command = "schtasks.exe /create /tn $($taskName) /RU $($username) /RP $($password) /XML $($xmlFileName)"
+Function Create-ScheduledTask($xmlFileName, $taskName, $username){
+  $Command = "schtasks.exe /create /tn `"$($taskName)`" /RU $($username) /XML $($xmlFileName)"
 
   Write-Host $Command
   Invoke-Expression $Command
@@ -80,13 +79,11 @@ Function GetTaskNameFromXmlPath($xmlFile){
         [string]$xmlFileName,
         [string]$taskName,
         [string]$userName,
-        [string]$password
     ) 
 
     Write-Host "Create Schedule Task From XML"
     Write-Host "xmlFileName: $xmlFileName"
     Write-Host "userName: $userName"
-    Write-Host "password: <Hidden>"
 
     $xmlFileName.Split(";") | foreach{
         $xmlFile = $_.Trim()
@@ -105,11 +102,10 @@ Function GetTaskNameFromXmlPath($xmlFile){
         }
 
         Write-Output "Create a Scheduled Task from $xmlFile called $taskName. Run as $username" 
-        Create-ScheduledTask "$($xmlFile)" $taskName $username $password
+        Create-ScheduledTask "$($xmlFile)" $taskName $username
     }
 
 }`
 (Get-Param 'xmlFileName' -Required)`
 (Get-Param 'taskName' -Required)`
-(Get-Param 'userName' -Required)`
-(Get-Param 'password' -Required)
+(Get-Param 'userName' -Required)
