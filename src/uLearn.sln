@@ -64,6 +64,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiPlagiarism.Tests", "Ant
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiPlagiarism.Api", "AntiPlagiarism.Api\AntiPlagiarism.Api.csproj", "{A019580A-4CF2-475E-BD57-7F57F411B64F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.Api", "Web.Api\Web.Api.csproj", "{0EF1C1C2-1DA1-4C53-B581-3BAC8A51C177}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -158,6 +160,10 @@ Global
 		{A019580A-4CF2-475E-BD57-7F57F411B64F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A019580A-4CF2-475E-BD57-7F57F411B64F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A019580A-4CF2-475E-BD57-7F57F411B64F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EF1C1C2-1DA1-4C53-B581-3BAC8A51C177}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EF1C1C2-1DA1-4C53-B581-3BAC8A51C177}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EF1C1C2-1DA1-4C53-B581-3BAC8A51C177}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EF1C1C2-1DA1-4C53-B581-3BAC8A51C177}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
