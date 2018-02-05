@@ -162,6 +162,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{803C067A-5553-467D-9470-116FE2430255}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Database\Database.csproj">
       <Project>{95510835-0b21-4d99-a4d2-b8fc87761a3c}</Project>
       <Name>Database</Name>
