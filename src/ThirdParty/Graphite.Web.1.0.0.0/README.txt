@@ -1,1 +1,2 @@
-It's Graphite.Web (or Graphite.Mvc) project from https://github.com/peschuster/graphite-client, built by andgein June 14th, 2017
+It's Graphite.Web (or Graphite.Mvc) project from https://github.com/peschuster/graphite-client,
+patched (see MetricsPipeStartupModule.cs) and built by andgein Junuary 23rd, 2018 

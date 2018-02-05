@@ -234,7 +234,7 @@ namespace Database.DataContexts
 				.GroupBy(v => v.UserId)
 				.Where(g => g.Sum(v => v.Score) >= minScore)
 				.ToList()
-				.Select(g => new RatingEntry(g.First().User, g.Sum(v => v.Score)))
+				.Select(g => new RatingEntry(g.First().User, g.Sum(v => v.Score), g.Max(v => v.Timestamp)))
 				.OrderByDescending(r => r.Score)
 				.ToList();
 		}
@@ -242,13 +242,15 @@ namespace Database.DataContexts
 
 	public class RatingEntry
 	{
-		public RatingEntry(ApplicationUser user, int score)
+		public RatingEntry(ApplicationUser user, int score, DateTime lastVisitTime)
 		{
 			User = user;
 			Score = score;
+			LastVisitTime = lastVisitTime;
 		}
 
 		public readonly ApplicationUser User;
 		public readonly int Score;
+		public readonly DateTime LastVisitTime;
 	}
 }

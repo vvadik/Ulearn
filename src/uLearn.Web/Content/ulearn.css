@@ -1419,6 +1419,11 @@ table.analytics__user-answers {
 	display: inline-block;
 }
 
+.course-loading-error {
+	margin-bottom: 20px;
+	max-width: 800px;
+}
+
 /* Groups */
 h1 .create-group-link,
 h1 .copy-group-link {

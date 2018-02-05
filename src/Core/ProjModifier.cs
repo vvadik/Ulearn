@@ -122,7 +122,11 @@ namespace uLearn
 
 		public static void SetBuildEnvironmentOptions(Project proj, BuildEnvironmentOptions options)
 		{
-			proj.SetProperty("TargetFrameworkVersion", options.TargetFrameworkVersion);
+			var frameworkName = proj.GetPropertyValue("TargetFramework");
+			if (frameworkName.Contains("netcore"))
+				proj.SetProperty("TargetFrameworkVersion", options.TargetNetCoreFrameworkVersion);
+			else
+				proj.SetProperty("TargetFrameworkVersion", options.TargetFrameworkVersion);
 		}
 
 		public static List<FileToCopy> ReplaceLinksWithItemsAndReturnWhatToCopy(Project project)
@@ -157,6 +161,7 @@ namespace uLearn
 	public class BuildEnvironmentOptions
 	{
 		public string TargetFrameworkVersion { get; set; }
+		public string TargetNetCoreFrameworkVersion { get; set; }
 		public string ToolsVersion { get; set; }
 	}
 }

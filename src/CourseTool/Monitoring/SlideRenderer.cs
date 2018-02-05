@@ -94,7 +94,7 @@ namespace uLearn.CourseTool.Monitoring
 			var builder = new TocModelBuilder(GetSlideUrl, s => 0, s => s.MaxScore, (u, g) => 0, course, slide.Id)
 			{
 				IsInstructor = true,
-				GetUnitInstructionNotesUrl = unit => GetInstructorNotesFilename(unit),
+				GetUnitInstructionNotesUrl = GetInstructorNotesFilename,
 				GetUnitStatisticsUrl = unit => "404.html",
 				IsSlideHidden = s => false
 			};

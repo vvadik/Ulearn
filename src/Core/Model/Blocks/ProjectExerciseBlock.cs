@@ -20,6 +20,7 @@ namespace uLearn.Model.Blocks
 	public class ProjectExerciseBlock : ExerciseBlock
 	{
 		public const string BuildingTargetFrameworkVersion = "4.7";
+		public const string BuildingTargetNetCoreFrameworkVersion = "2.0";
 		public const string BuildingToolsVersion = "15.0";
 		
 		public static string SolutionFilepathToUserCodeFilepath(string solutionFilepath)
@@ -40,6 +41,7 @@ namespace uLearn.Model.Blocks
 			BuildEnvironmentOptions = new BuildEnvironmentOptions
 			{
 				TargetFrameworkVersion = BuildingTargetFrameworkVersion,
+				TargetNetCoreFrameworkVersion = BuildingTargetNetCoreFrameworkVersion,
 				ToolsVersion = BuildingToolsVersion,
 			};
 		}

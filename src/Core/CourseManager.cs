@@ -295,7 +295,7 @@ namespace uLearn
 			nsResolver.AddNamespace("course", "https://ulearn.azurewebsites.net/course");
 			nsResolver.AddNamespace("lesson", "https://ulearn.azurewebsites.net/lesson");
 			nsResolver.AddNamespace("quiz", "https://ulearn.azurewebsites.net/quiz");
-			nsResolver.AddNamespace("quiz", "https://ulearn.azurewebsites.net/types");
+			nsResolver.AddNamespace("types", "https://ulearn.azurewebsites.net/types");
 			using (var zip = ZipFile.Read(path, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
 			{
 				if (zip.ContainsEntry("Course.xml"))
@@ -314,7 +314,7 @@ namespace uLearn
 			UpdateXmlEntity(entry, selector, element => element.Value = value, zip, nsResolver);
 		}
 
-		private static void UpdateXmlAttribute(ZipEntry entry, string selector, string attribute, string value, ZipFile zip, XmlNamespaceManager nsResolver)
+		private static void UpdateXmlAttribute(ZipEntry entry, string selector, string attribute, string value, ZipFile zip, IXmlNamespaceResolver nsResolver)
 		{
 			UpdateXmlEntity(entry, selector, element =>
 			{

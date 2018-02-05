@@ -114,7 +114,7 @@
     <Reference Include="Graphite.Elmah, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Graphite.Elmah.1.0.3.0\lib\net40\Graphite.Elmah.dll</HintPath>
     </Reference>
-    <Reference Include="Graphite.Web, Version=1.0.0.0, Culture=neutral, PublicKeyToken=db1870846884bbb9, processorArchitecture=MSIL">
+    <Reference Include="Graphite.Web, Version=1.0.0.0, Culture=neutral, PublicKeyToken=db1870846884bbb9">
       <HintPath>..\ThirdParty\Graphite.Web.1.0.0.0\Graphite.Web.dll</HintPath>
     </Reference>
     <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c">
