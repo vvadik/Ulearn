@@ -34,7 +34,7 @@ function Get-Param($Name, [switch]$Required, $Default) {
 }
 
 Function Create-ScheduledTask($xmlFileName, $taskName, $username, $password){
-  $Command = "schtasks.exe /create /tn `"$($taskName)`" /RU $($username) /RP $(password) /XML $($xmlFileName)"
+  $Command = "schtasks.exe /create /tn `"$($taskName)`" /RU $($username) /RP $($password) /XML $($xmlFileName)"
 
   Write-Host $Command
   Invoke-Expression $Command
@@ -89,6 +89,7 @@ Function GetTaskNameFromXmlPath($xmlFile){
     Write-Host "Create Schedule Task From XML"
     Write-Host "xmlFileName: $xmlFileName"
     Write-Host "userName: $userName"
+    Write-Host "password: <Hidden>"
     Write-Host "Current directory is $PWD"
 
     $xmlFileName.Split(";") | foreach{
