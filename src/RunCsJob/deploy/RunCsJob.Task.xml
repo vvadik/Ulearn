@@ -48,7 +48,7 @@
   </Settings>
   <Actions Context="Author">
     <Exec>
-      <Command>#{Octopus.Action.Package.InstallationDirectoryPath}RunCsJob.exe</Command>
+      <Command>#{Octopus.Action.Package.InstallationDirectoryPath}\RunCsJob.exe</Command>
       <WorkingDirectory>#{Octopus.Action.Package.InstallationDirectoryPath}</WorkingDirectory>
     </Exec>
   </Actions>
