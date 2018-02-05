@@ -59,13 +59,6 @@ namespace XQueueWatcher
 			}
 		}
 
-		/* We need to create new database connection each time for disabling EF's caching */
-		private static XQueueRepo GetNewXQueueRepo()
-		{
-			var db = new ULearnDb();
-			return new XQueueRepo(db, courseManager);
-		}
-
 		private async Task SafeGetAndProcessSubmissionFromXQueue(Database.Models.XQueueWatcher watcher)
 		{
 			try
@@ -142,6 +135,13 @@ namespace XQueueWatcher
 				graderPayload.SlideId,
 				submission.Body.StudentResponse
 			);
+		}
+		
+		/* We need to create new database connection each time for disabling EF's caching */
+		private static XQueueRepo GetNewXQueueRepo()
+		{
+			var db = new ULearnDb();
+			return new XQueueRepo(db, courseManager);
 		}
 	}
 
