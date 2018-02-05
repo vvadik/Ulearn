@@ -480,9 +480,9 @@
       <Project>{77B16F9D-3CDF-4CC6-BE5F-B6BADFAC5394}</Project>
       <Name>RunCsJob</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ulearn.CSharpAttributes.Core\Ulearn.CSharpAttributes.Core.csproj">
-      <Project>{08396f5c-2a03-43cb-83af-7167e6b0331f}</Project>
-      <Name>Ulearn.CSharpAttributes.Core</Name>
+    <ProjectReference Include="..\Ulearn.CSharpAttributes\Ulearn.CSharpAttributes.csproj">
+      <Project>{74bea97a-21eb-4fd2-b58a-1341c8ba3124}</Project>
+      <Name>Ulearn.CSharpAttributes</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
