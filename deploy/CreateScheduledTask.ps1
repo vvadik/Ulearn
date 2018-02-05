@@ -2,7 +2,7 @@
 param(
     [string]$xmlFileName,
     [string]$taskName,
-    [string]$userName,
+    [string]$userName
 )
 
 $ErrorActionPreference = "Stop" 
@@ -78,7 +78,7 @@ Function GetTaskNameFromXmlPath($xmlFile){
     param(
         [string]$xmlFileName,
         [string]$taskName,
-        [string]$userName,
+        [string]$userName
     ) 
 
     Write-Host "Create Schedule Task From XML"
