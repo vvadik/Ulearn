@@ -81,9 +81,13 @@ Function GetTaskNameFromXmlPath($xmlFile){
         [string]$userName
     ) 
 
+    Push-Location $MyInvocation.MyCommand.Path
+    [Environment]::CurrentDirectory = $PWD
+
     Write-Host "Create Schedule Task From XML"
     Write-Host "xmlFileName: $xmlFileName"
     Write-Host "userName: $userName"
+    Write-Host "Current directory is $PWD"
 
     $xmlFileName.Split(";") | foreach{
         $xmlFile = $_.Trim()
@@ -104,6 +108,9 @@ Function GetTaskNameFromXmlPath($xmlFile){
         Write-Output "Create a Scheduled Task from $xmlFile called $taskName. Run as $username" 
         Create-ScheduledTask "$($xmlFile)" $taskName $username
     }
+
+    Pop-Location
+    [Environment]::CurrentDirectory = $PWD
 
 }`
 (Get-Param 'xmlFileName' -Required)`
