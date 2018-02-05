@@ -98,6 +98,10 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="App.Kontur.config">
+      <DependentUpon>App.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
