@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 using System.Threading;
 using log4net;
 using log4net.Config;
@@ -19,6 +20,8 @@ namespace RunCsJob
 		private readonly int jobsToRequest;
 
 		private readonly ManualResetEvent shutdownEvent = new ManualResetEvent(false);
+		private readonly List<Thread> threads = new List<Thread>();
+		
 		private static readonly ILog log = LogManager.GetLogger(typeof(RunCsJobProgram));
 		public readonly SandboxRunnerSettings Settings;
 
@@ -66,7 +69,7 @@ namespace RunCsJob
 				program.Run();
 		}
 
-		public void Run()
+		public void Run(bool joinAllThreads=true)
 		{
 			if (!Settings.MsBuildSettings.CompilerDirectory.Exists)
 			{
@@ -77,7 +80,53 @@ namespace RunCsJob
 
 			AppDomain.MonitoringIsEnabled = true;
 			log.Info($"Отправляю запросы на {address} для получения новых решений");
+			
+			var threadsCount = int.Parse(ConfigurationManager.AppSettings["ulearn.runcsjob.threadsCount"] ?? "1");
+			if (threadsCount < 1)
+			{
+				log.Error($"Не могу определить количество потоков для запуска из конфигурации: ${threadsCount}. Количество потоков должно быть положительно");
+				throw new ArgumentOutOfRangeException(nameof(threadsCount), "Number of threads (appSettings/ulearn.runcsjob.threadsCount) should be positive");
+			}
+			
+			log.Info($"Запускаю {threadsCount} потока(ов)");
+			for (var i = 0; i < threadsCount; i++)
+			{
+				threads.Add(new Thread(WorkerThread)
+				{
+					Name = $"RunCsJob Worker Thread #{i}",
+					IsBackground = true
+				});
+			}
+			threads.ForEach(t => t.Start());
+			
+			if (joinAllThreads)
+				threads.ForEach(t => t.Join());
+		}
+		
+		private void WorkerThread()
+		{
+			log.Info($"Поток {Thread.CurrentThread.Name} запускается");
+			RunOneThread();
+		}
 
+		public void Stop()
+		{
+			shutdownEvent.Set();
+			log.Info("Получен сигнал остановки");
+
+			foreach (var thread in threads)
+			{
+				log.Info($"Пробую остановить поток {thread.Name}");
+				if (!thread.Join(10000))
+				{
+					log.Info($"Вызываю Abort() для потока {thread.Name}");
+					thread.Abort();
+				}
+			}
+		}
+
+		private void RunOneThread()
+		{
 			Client client;
 			try
 			{
