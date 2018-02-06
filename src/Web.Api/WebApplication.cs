@@ -1,5 +1,9 @@
+using Database;
+using Database.Models;
+using Database.Repos;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -43,7 +47,14 @@ namespace Web.Api
                     app.UseVostok();
                     if (env.IsDevelopment())
                         app.UseDeveloperExceptionPage();
+					
                     app.UseMvc();
+					app.UseAuthentication();
+					
+					var database = app.ApplicationServices.GetService<UlearnDb>();
+					database.MigrateToLatestVersion();
+					var initialDataCreator = app.ApplicationServices.GetService<InitialDataCreator>();
+					database.CreateInitialDataAsync(initialDataCreator);
                 })
                 .Build();
         }
@@ -53,10 +64,37 @@ namespace Web.Api
 			services.AddDbContext<UlearnDb>(
 				options => options.UseSqlServer(hostingEnvironment.Configuration["database"])
 			);
-			services.AddSingleton(logger);
+			
+			/* DI */
+			services.AddSingleton<ILogger>(logger);
+			services.AddSingleton<ULearnUserManager>();
+			services.AddSingleton<InitialDataCreator>();
+			
+			/* DI for database repos */
+			services.AddScoped<UsersRepo>();
+			services.AddScoped<CommentsRepo>();
+			services.AddScoped<UserRolesRepo>();
 			
 			/* Asp.NET Core MVC */
 			services.AddMvc();
+
+			ConfigureAuthServices(services, hostingEnvironment, logger);
+		}
+
+		private void ConfigureAuthServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, Logger logger)
+		{
+			services.AddIdentity<ApplicationUser, IdentityRole>()
+				.AddEntityFrameworkStores<UlearnDb>()
+				.AddDefaultTokenProviders();
+
+			services.ConfigureApplicationCookie(options =>
+			{
+				options.LoginPath = "/Account/Login";
+				options.LogoutPath = "/Account/Logout";
+			});
+
+			services.AddAuthentication();
+				//.AddVk()
 		}
 	}
 }
