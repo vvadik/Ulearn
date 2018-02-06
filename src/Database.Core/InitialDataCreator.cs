@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Database
 {
@@ -28,21 +29,25 @@ namespace Database
 
 		public async Task CreateInitialDataAsync()
 		{
-			await roleManager.CreateAsync(new IdentityRole(LmsRoles.SysAdmin.ToString()));
+			var sysAdminRole = LmsRoles.SysAdmin.ToString();
+			if (! await db.Roles.AnyAsync(r => r.Name == sysAdminRole))
+			{
+				await roleManager.CreateAsync(new IdentityRole(sysAdminRole));
+			}
 
-			if (!db.Users.Any(u => u.UserName == "user"))
+			if (! await db.Users.AnyAsync(u => u.UserName == "user"))
 			{
 				var user = new ApplicationUser { UserName = "user", FirstName = "User", LastName = "" };
 				await userManager.CreateAsync(user, "asdasd");
 			}
-			if (!db.Users.Any(u => u.UserName == "admin"))
+			if (! await db.Users.AnyAsync(u => u.UserName == "admin"))
 			{
 				var user = new ApplicationUser { UserName = "admin", FirstName = "System Administrator", LastName = "" };
 				await userManager.CreateAsync(user, "fullcontrol");
-				await userManager.AddToRoleAsync(user, LmsRoles.SysAdmin.ToString());
+				await userManager.AddToRoleAsync(user, sysAdminRole);
 			}
-			
-			usersRepo.CreateUlearnBotUserIfNotExists().Wait();
+
+			await usersRepo.CreateUlearnBotUserIfNotExists();
 
 			await db.SaveChangesAsync();
 		}
