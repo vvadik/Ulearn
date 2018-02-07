@@ -7,7 +7,7 @@ namespace uLearn.CSharp
 {
 	public class NotEmptyCodeValidator : BaseStyleValidator, IStrictValidator
 	{
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			var hasCode = userSolution.GetRoot().DescendantNodes().Any(n => n is StatementSyntax || n is MemberDeclarationSyntax);
 			if (!hasCode)

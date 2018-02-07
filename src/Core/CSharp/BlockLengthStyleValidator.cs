@@ -6,7 +6,7 @@ namespace uLearn.CSharp
 {
 	public class HasRecursionStyleValidator : BaseStyleValidator
 	{
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			throw new System.NotImplementedException();
 		}
@@ -21,7 +21,7 @@ namespace uLearn.CSharp
 			this.maxLen = maxLen;
 		}
 
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			return InspectAll<BlockSyntax>(userSolution, Inspect);
 		}

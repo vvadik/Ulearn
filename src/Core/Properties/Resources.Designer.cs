@@ -157,12 +157,62 @@ namespace uLearn.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Is
+        ///Are
+        ///Africanize
+        ///Africanized
+        ///Africanizes
+        ///Africanizing
+        ///Americanise
+        ///Americanize
+        ///Americanized
+        ///Americanizes
+        ///Americanizing
+        ///Aryanise
+        ///Aryanised
+        ///Aryanises
+        ///Aryanising
+        ///Aryanize
+        ///Aryanized
+        ///Aryanizes
+        ///Aryanizing
+        ///Atticise
+        ///Atticised
+        ///Atticises
+        ///Atticising
+        ///Atticize
+        ///Atticized
+        ///Atticizes
+        ///Atticizing
+        ///Balkanise
+        ///Balkanised
+        ///Balkanises
+        ///Balkanising
+        ///Braille
+        ///Christianise
+        ///Christianised
+        ///Christianises
+        ///Christianising
+        ///Christianize
+        ///Christianized
+        ///Christianizes
+        ///Christianizing
+        ///English
+        ///French-polish
+        ///Frenc [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string englishVerbs {
+            get {
+                return ResourceManager.GetString("englishVerbs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to using System;
         ///using System.Collections.Generic;
         ///using System.Linq;
         ///using System.Reflection;
         ///using System.Runtime.CompilerServices;
-        ///using System.Text.RegularExpressions;
         ///using NUnit.Framework.Api;
         ///using NUnit.Framework.Interfaces;
         ///using NUnit.Framework.Internal;
@@ -173,7 +223,7 @@ namespace uLearn.Properties {
         ///{
         ///	/// &lt;summary&gt;
         ///	/// Этот файл включен в ресурсы и добавляется в пришедший на проверку проект с задачей, если у нее в качестве способа проверки 
-        ///	/ [rest of string was truncated]&quot;;.
+        ///	/// установлен nunit-test-class, [rest of string was truncated]&quot;;.
         /// </summary>
         public static string NUnitTestRunner {
             get {

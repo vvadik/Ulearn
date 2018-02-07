@@ -7,7 +7,7 @@ namespace uLearn.CSharp
 {
 	public abstract class BaseNamingChecker : BaseStyleValidator
 	{
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			return InspectAll<BaseTypeDeclarationSyntax>(userSolution, n => InspectName(n.Identifier))
 				.Concat(InspectAll<TypeParameterSyntax>(userSolution, n => InspectName(n.Identifier)))
