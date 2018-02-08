@@ -621,7 +621,7 @@ namespace uLearn.Web.Controllers
 			var correctSignature = GetEmailConfirmationSignature(email);
 			if (signature != correctSignature)
 			{
-				log.Warn("Invalid signature in confirmation email link");
+				log.Warn($"Invalid signature in confirmation email link, expected \"{correctSignature}\", actual \"{signature}\". Email is \"{email}\",");
 				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
 			}
 
