@@ -15,7 +15,7 @@ namespace uLearn
 		private SyntaxTree tree;
 		private BracesPair[] bracesPairs;
 
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			tree = userSolution;
 			bracesPairs = BuildBracesPairs().OrderBy(p => p.Open.SpanStart).ToArray();

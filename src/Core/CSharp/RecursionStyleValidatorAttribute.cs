@@ -13,7 +13,7 @@ namespace uLearn.CSharp
 			this.requireRecursion = requireRecursion;
 		}
 
-		public string FindError(SyntaxTree userSolution)
+		public string FindError(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			var recursiveMethods = userSolution.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().Where(IsRecursive).ToList();
 

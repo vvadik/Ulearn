@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace uLearn.CSharp
 {
-	public class BoolCompareValidator : BaseStyleValidatorWithSemanticModel
+	public class BoolCompareValidator : BaseStyleValidator
 	{
 		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
@@ -21,7 +21,7 @@ namespace uLearn.CSharp
 			var leftNodeTree = binaryExpression.Left as LiteralExpressionSyntax;
 			var rightNodeTypeInfo = semanticModel.GetTypeInfo(binaryExpression.Right);
 			var rightNodeTree = binaryExpression.Right as LiteralExpressionSyntax;
-			if (IsBooleanType(rightNodeTypeInfo) && IsBooleanType(leftNodeTypeInfo) 
+			if (IsBooleanType(rightNodeTypeInfo) && IsBooleanType(leftNodeTypeInfo)
 				&& (IsBoolLiteral(leftNodeTree) || IsBoolLiteral(rightNodeTree)))
 				yield return Report(binaryExpression, "Ненужное сравнение с переменной типа bool. Вместо x == true лучше писать просто x, а вместо x != true лучше писать !x.");
 		}

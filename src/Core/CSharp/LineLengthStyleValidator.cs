@@ -13,7 +13,7 @@ namespace uLearn.CSharp
 			this.maxLineLen = maxLineLen;
 		}
 
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			var text = userSolution.GetText();
 			var longLines = text.Lines.Where(line => line.End - line.Start > maxLineLen).ToList();

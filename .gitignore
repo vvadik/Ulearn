@@ -182,6 +182,7 @@ FakesAssemblies/
 /src/Courses/Courses.Staging/*.zip
 /src/Courses/Courses.Versions/*.zip
 /src/uLearn.Web/Certificates/
+/src/uLearn.Web/Courses/
 /src/UI.Tests/screenshots
 /src/uLearn.Tests/CSharp/BasicProgramming
 *.received.txt

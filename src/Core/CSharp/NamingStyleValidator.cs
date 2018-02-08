@@ -6,7 +6,7 @@ namespace uLearn.CSharp
 {
 	public class NamingStyleValidator : BaseStyleValidator
 	{
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution)
+		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			return InspectAll<MethodDeclarationSyntax>(userSolution, InspectMethod);
 		}

@@ -6,7 +6,7 @@ namespace uLearn.CSharp
 {
 	public interface ICSharpSolutionValidator
 	{
-		string FindError(SyntaxTree userSolution);
+		string FindError(SyntaxTree userSolution, SemanticModel semanticModel);
 	}
 
 	public class IsStaticMethodValidator : ICSharpSolutionValidator, IStrictValidator
@@ -14,7 +14,7 @@ namespace uLearn.CSharp
 		public const string ShouldBeMethod = "Решение должно быть корректным определением статического метода";
 		public const string ShouldBeSingleMethod = "Решение должно состоять ровно из одного метода";
 
-		public string FindError(SyntaxTree userSolution)
+		public string FindError(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			var cu = userSolution.GetRoot() as CompilationUnitSyntax;
 			if (cu == null)

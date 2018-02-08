@@ -35,6 +35,13 @@ namespace uLearn.CSharp
 			return "Строка {0}, позиция {1}: {2}".WithArgs(linePosition.Line + 1, linePosition.Character, message);
 		}
 
+		protected IEnumerable<string> InspectAll<TNode>(SyntaxTree userSolution, SemanticModel semanticModel, Func<TNode, SemanticModel, IEnumerable<string>> inspect)
+			where TNode : SyntaxNode
+		{
+			var nodes = userSolution.GetRoot().DescendantNodes().OfType<TNode>();
+			return nodes.SelectMany(node => inspect(node, semanticModel));
+		}
+
 		protected IEnumerable<string> InspectAll<TNode>(SyntaxTree userSolution, Func<TNode, IEnumerable<string>> inspect)
 			where TNode : SyntaxNode
 		{
@@ -44,15 +51,21 @@ namespace uLearn.CSharp
 
 		public string FindError(string code)
 		{
-			return FindError(CSharpSyntaxTree.ParseText(code));
+			var syntaxTree = CSharpSyntaxTree.ParseText(code);
+			var compilation = CSharpCompilation.Create("MyCompilation", new[] { syntaxTree }, new[] { mscorlib });
+			var semanticModel = compilation.GetSemanticModel(syntaxTree);
+			return FindError(syntaxTree, semanticModel);
 		}
 
-		public string FindError(SyntaxTree userSolution)
+		public string FindError(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
-			var errors = ReportAllErrors(userSolution).ToList();
+			var errors = ReportAllErrors(userSolution, semanticModel).ToList();
 			return errors.Any() ? string.Join("\n", errors) : null;
 		}
 
-		protected abstract IEnumerable<string> ReportAllErrors(SyntaxTree userSolution);
+		protected abstract IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel);
+
+		private static readonly PortableExecutableReference mscorlib =
+			MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
 	}
 }
