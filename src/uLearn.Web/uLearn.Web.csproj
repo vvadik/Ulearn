@@ -899,10 +899,14 @@
     <Content Include="frontend\src\App.css" />
     <Content Include="frontend\src\App.js" />
     <Content Include="frontend\src\App.test.js" />
+    <Content Include="frontend\src\components\common\Header.css" />
     <Content Include="frontend\src\components\common\Header.js" />
+    <Content Include="frontend\src\components\instructor\exercise\PlagiarismViewer.js" />
     <Content Include="frontend\src\index.css" />
     <Content Include="frontend\src\index.js" />
     <Content Include="frontend\src\logo.svg" />
+    <Content Include="frontend\src\pages\course\index.js" />
+    <Content Include="frontend\src\pages\course\instructor\PlagiarismsPage.js" />
     <Content Include="frontend\src\pages\home\index.js" />
     <Content Include="frontend\src\pages\home\IndexPage.js" />
     <Content Include="frontend\src\registerServiceWorker.js" />

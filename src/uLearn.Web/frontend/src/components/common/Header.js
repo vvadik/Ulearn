@@ -1,5 +1,8 @@
 ﻿import React, { Component } from 'react'
-import { Navbar } from 'react-bootstrap'
+import { Navbar, Nav, NavDropdown } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
+
+import './Header.css'
 
 class NavbarIcons extends Component {
     render() {
@@ -22,16 +25,13 @@ class Header extends Component {
                     <Navbar.Header>
                         <NavbarIcons target=".greeting-collapse-class"/>
                         <Navbar.Brand>
-                            <a href="/Home">Ulearn</a>
+                            <Link to="/">Ulearn</Link>                            
                         </Navbar.Brand>
-                        <ul className="notifications__mobile-nav nav navbar-nav pull-right visible-xs">
-                            @if (User.Identity.IsAuthenticated)
-                            {
-                                <li className="dropdown">
-                                    <a href="Feed/NotificationsTopbarPartial?isMobile=true" />
-                                </li>
-                            }
-                        </ul>
+                        <Nav className="notifications__mobile-nav pull-right visible-xs">
+                            <NavDropdown title="Dropdown">
+                                <a href="Feed/NotificationsTopbarPartial?isMobile=true" />
+                            </NavDropdown>
+                        </Nav>
                     </Navbar.Header>
                     <ul className="notifications__mobile-dropdown notifications__dropdown navbar-collapse collapse visible-xs">
 
