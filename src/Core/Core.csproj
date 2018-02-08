@@ -39,4 +39,10 @@
     <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj" />
     <ProjectReference Include="..\Ulearn.CSharpAttributes\Ulearn.CSharpAttributes.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <HunspellDlls Include="Hunspell*.dll"/>
+  </ItemGroup>
+  <Target Name="CopyFiles" AfterTargets="Build">
+    <Copy DestinationFolder="$(OutputPath)" SourceFiles="@(HunspellDlls)" SkipUnchangedFiles="true"/>
+  </Target>
 </Project>
