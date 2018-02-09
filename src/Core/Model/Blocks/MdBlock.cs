@@ -48,7 +48,8 @@ namespace uLearn.Model.Blocks
 		{
 			if (string.IsNullOrEmpty(Markdown))
 				return "";
-			return Markdown.Replace("(/Exercise/StudentZip)", $"(/Exercise/StudentZip?courseId={courseId}&slideId={slideId})");
+			var studentZipFullPath = $"(/Exercise/StudentZip?courseId={courseId}&slideId={slideId})";
+			return Markdown.Replace("(/Exercise/StudentZip)", studentZipFullPath).Replace("(ExerciseZip)", studentZipFullPath);
 		}
 
 		public override string ToString()
