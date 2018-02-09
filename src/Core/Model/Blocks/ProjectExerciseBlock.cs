@@ -112,7 +112,7 @@ namespace uLearn.Model.Blocks
 			FillProperties(context);
 			ExerciseInitialCode = ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFilePath;
 			ExpectedOutput = ExpectedOutput ?? "";
-			ValidatorName = string.Join(" ", LangId, ValidatorName);
+			Validator.ValidatorName = string.Join(" ", LangId, Validator.ValidatorName ?? "");
 			SlideFolderPath = context.Dir;
 
 			CheckScoringGroup(context.SlideTitle, context.CourseSettings.Scoring);
@@ -142,7 +142,7 @@ namespace uLearn.Model.Blocks
 
 		public override SolutionBuildResult BuildSolution(string userWrittenCodeFile)
 		{
-			var validator = ValidatorsRepository.Get(ValidatorName);
+			var validator = ValidatorsRepository.Get(Validator);
 			return validator.ValidateSolution(userWrittenCodeFile, userWrittenCodeFile);
 		}
 

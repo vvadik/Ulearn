@@ -22,7 +22,7 @@ namespace uLearn.CSharp
 			this.prelude = prelude;
 			Exercise = new SingleFileExerciseBlock
 			{
-				ValidatorName = "cs",
+				Validator = new ValidatorDescription { ValidatorName = "cs" },
 				LangId = langId
 			};
 		}
@@ -153,9 +153,9 @@ namespace uLearn.CSharp
 				Exercise.EthalonSolution += node.WithoutAttributes().ToFullString();
 				Exercise.ExerciseInitialCode = GetExerciseCode(node);
 				if (node.HasAttribute<SingleStatementMethodAttribute>())
-					Exercise.ValidatorName += " SingleStatementMethod";
+					Exercise.Validator.ValidatorName += " SingleStatementMethod";
 				if (node.HasAttribute<RecursionStyleValidatorAttribute>())
-					Exercise.ValidatorName += " recursion";
+					Exercise.Validator.ValidatorName += " recursion";
 			}
 			return newMethod;
 		}

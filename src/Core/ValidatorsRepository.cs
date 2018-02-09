@@ -1,16 +1,18 @@
 using System.Linq;
 using uLearn.CSharp;
+using uLearn.Model.Blocks;
 
 namespace uLearn
 {
 	public class ValidatorsRepository
 	{
-		public static ISolutionValidator Get(string name)
+		public static ISolutionValidator Get(ValidatorDescription validatorDescription)
 		{
+			var name = validatorDescription.ValidatorName ?? "";
 			var parts = name.ToLower().Split(' ');
 			if (parts.Contains("cs"))
 			{
-				var validator = new CSharpSolutionValidator();
+				var validator = new CSharpSolutionValidator(validatorDescription.RemoveDefaults);
 				foreach (var part in parts)
 				{
 					var pp = part.Split('-');

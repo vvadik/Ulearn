@@ -1,12 +1,14 @@
-﻿namespace uLearn
+﻿using uLearn.Model.Blocks;
+
+namespace uLearn
 {
 	public class SolutionBuilder
 	{
-		public SolutionBuilder(int indexForInsert, string exerciseCode, string validatorName)
+		public SolutionBuilder(int indexForInsert, string exerciseCode, ValidatorDescription validator)
 		{
 			IndexForInsert = indexForInsert;
 			ExerciseCode = exerciseCode;
-			Validator = ValidatorsRepository.Get(validatorName);
+			Validator = ValidatorsRepository.Get(validator);
 		}
 
 		private readonly int IndexForInsert;
