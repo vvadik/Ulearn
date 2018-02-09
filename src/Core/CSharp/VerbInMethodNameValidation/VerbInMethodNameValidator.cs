@@ -12,9 +12,10 @@ namespace uLearn.CSharp.VerbInMethodNameValidation
     {
         private readonly HashSet<string> englishVerbs;
 
-        public VerbInMethodNameValidator()
-        {
-            exceptionsMethodNames = new HashSet<string>(new[] { "Main" }, StringComparer.InvariantCultureIgnoreCase);
+        public VerbInMethodNameValidator(string[] exceptions = null)
+		{
+			exceptions = exceptions ?? new string[0];
+            exceptionsMethodNames = new HashSet<string>(exceptions.Concat(new[] { "Main" }), StringComparer.InvariantCultureIgnoreCase);
             exceptionsPreposition = new HashSet<string>(new[] { "For", "To", "With", "From", "At" }, StringComparer.InvariantCultureIgnoreCase);
             englishVerbs = new HashSet<string>(Resources.englishVerbs.SplitToLines(), StringComparer.InvariantCultureIgnoreCase);
         }
@@ -49,12 +50,13 @@ namespace uLearn.CSharp.VerbInMethodNameValidation
             var word = "";
             foreach (var letter in methodName)
             {
-                if (char.IsUpper(letter) && word != "")
+                if ((char.IsUpper(letter) || !char.IsLetter(letter)) && word != "")
                 {
                     yield return word;
                     word = "";
                 }
-                word += letter;
+				if (char.IsLetter(letter))
+					word += letter;
             }
             yield return word;
         }

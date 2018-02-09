@@ -1,5 +1,6 @@
 using System.Linq;
 using uLearn.CSharp;
+using uLearn.CSharp.VerbInMethodNameValidation;
 using uLearn.Model.Blocks;
 
 namespace uLearn
@@ -29,6 +30,8 @@ namespace uLearn
 						validator.AddValidator(new RecursionStyleValidator(true));
 					if (subValidator == "norecursion")
 						validator.AddValidator(new RecursionStyleValidator(false));
+					if (subValidator == "verbinmethod")
+						validator.AddValidator(new VerbInMethodNameValidator(pp.Skip(1).ToArray()));
 				}
 				return validator;
 			}

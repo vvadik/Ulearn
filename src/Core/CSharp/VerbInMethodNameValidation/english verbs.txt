@@ -12980,6 +12980,7 @@ heads
 heal
 heals
 heap
+heapify
 heaps
 hear
 heard
@@ -23622,6 +23623,7 @@ roll-outs
 roll-over
 roll-overs
 roll-up
+rollback
 roller-skate
 roller-skated
 roller-skates
@@ -28761,6 +28763,7 @@ ululates
 ululating
 umpire
 umpires
+unassign
 unarm
 unarms
 unbalance
@@ -30802,3 +30805,10 @@ zoom
 zooms
 zugzwang
 zugzwangs
+median
+max
+min
+increment
+decrement
+inc
+dec
