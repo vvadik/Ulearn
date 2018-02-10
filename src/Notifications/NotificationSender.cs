@@ -113,7 +113,7 @@ namespace Notifications
 				var button = notification.GetNotificationButton(transport, delivery, course, baseUrl);
 				if (button != null)
 				{
-					htmlMessage += $"<br/></br><a href=\"{button.Link.EscapeHtml()}\">{button.Text.EscapeHtml()}</a>";
+					htmlMessage += $"<br/><br/><a href=\"{button.Link.EscapeHtml()}\">{button.Text.EscapeHtml()}</a>";
 					textMessage += $"\n\n{button.Text}: {button.Link}";
 				}
 
