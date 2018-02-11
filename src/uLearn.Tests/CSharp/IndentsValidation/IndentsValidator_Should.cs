@@ -15,6 +15,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
 using uLearn.Extensions;
 
+// ReSharper disable InconsistentNaming
 
 namespace uLearn.CSharp.IndentsValidation
 {

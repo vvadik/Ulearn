@@ -181,8 +181,20 @@
   <ItemGroup>
     <Compile Include="AcceptedSolutionInfo.cs" />
     <Compile Include="AnalyticsTableInfo.cs" />
-    <Compile Include="CSharp\IndentsValidator.cs" />
-    <Compile Include="CSharp\SyntaxNodeOrToken.cs" />
+    <Compile Include="CSharp\IndentsValidation\Reporters\NonBracesTokensHaveIncorrectIndentsReporter.cs" />
+    <Compile Include="CSharp\IndentsValidation\Reporters\BracesNotIndentedReporter.cs" />
+    <Compile Include="CSharp\IndentsValidation\Reporters\OpenBraceHasCodeOnSameLineReporter.cs" />
+    <Compile Include="CSharp\IndentsValidation\Reporters\CloseBraceHasCodeOnSameLineReporter.cs" />
+    <Compile Include="CSharp\IndentsValidation\Reporters\BracesContentNotIndentedOrNotConsistentReporter.cs" />
+    <Compile Include="CSharp\IndentsValidation\Reporters\BracesNotAlignedReporter.cs" />
+    <Compile Include="CSharp\IndentsValidation\BracesPair.cs" />
+    <Compile Include="CSharp\IndentsValidation\Reporters\CompilationUnitChildrenNotConsistentReporter.cs" />
+    <Compile Include="CSharp\IndentsValidation\Indent.cs" />
+    <Compile Include="CSharp\IndentsValidation\IndentsSyntaxExtensions.cs" />
+    <Compile Include="CSharp\IndentsValidation\SyntaxNodeOrTokenExtensions.cs" />
+    <Compile Include="CSharp\IndentsValidation\IndentsValidator.cs" />
+    <Compile Include="CSharp\IndentsValidation\IndentType.cs" />
+    <Compile Include="CSharp\IndentsValidation\SyntaxNodeOrToken.cs" />
     <Compile Include="CSharp\IStrictValidator.cs" />
     <Compile Include="ExportedSlide.cs" />
     <Compile Include="Extensions\DictionaryExtension.cs" />
