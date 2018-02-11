@@ -742,7 +742,7 @@ namespace Database.Models
 		{
 			return $"<b>Поздравляем! Вы получили сертификат по курсу «{course.Title.EscapeHtml()}».</b><br/><br/>" +
 					$"Посмотреть сертификат можно <a href=\"{GetCertificateUrl(Certificate, baseUrl).EscapeHtml()}\">по ссылке</a> " +
-					$"или в любой момент на {GetCertificatesListUrl(Certificate.User, baseUrl)}.<br/><br/>" +
+					$"или в любой момент на <a href=\"{GetCertificatesListUrl(Certificate.User, baseUrl).EscapeHtml()}\">{GetCertificatesListUrl(Certificate.User, baseUrl)}</a>.<br/><br/>" +
 					"Поделитесь ссылкой на сертификат с друзьями в социальных сетях — пусть ваше достижение увидят все!";
 		}
 
