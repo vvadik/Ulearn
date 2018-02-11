@@ -461,6 +461,7 @@
     <Compile Include="Controllers\TelegramController.cs" />
     <Compile Include="Controllers\BaseUserController.cs" />
     <Compile Include="Extensions\HtmlExtensions_should.cs" />
+    <Compile Include="Extensions\HtmlStringExtensions.cs" />
     <Compile Include="Extensions\StringExtensions_should.cs" />
     <Compile Include="Extensions\UserExtensions.cs" />
     <Compile Include="Helpers\ExcelWorksheetBuilder.cs" />
