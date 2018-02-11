@@ -31,8 +31,7 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 				var parentStart = parent.GetValidationStartIndexInSpaces();
 				if (rootStart == 0)
 					yield break;
-				var validateIndent =
-					ValidateIndent(rootStatementSyntax, rootStart, parentStart, rootLine, parentLine);
+				var validateIndent = ValidateIndent(rootStatementSyntax, rootStart, parentStart, rootLine, parentLine);
 				if (validateIndent != null)
 				{
 					yield return BaseStyleValidator.Report(rootStatementSyntax, validateIndent);
@@ -41,7 +40,18 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 			}
 
 			var statementClauses = rootStatementSyntax.SyntaxNode.CreateStatements().ToArray();
+			var reports = ValidateStatementClauses(statementClauses, rootStatementSyntax, rootStart, rootLine, rootEndLine);
+			foreach (var report in reports)
+				yield return report;
+		}
 
+		private static IEnumerable<string> ValidateStatementClauses(
+			SyntaxNodeOrToken[] statementClauses,
+			SyntaxNodeOrToken rootStatementSyntax,
+			int rootStart,
+			int rootLine,
+			int rootEndLine)
+		{
 			foreach (var statementClause in statementClauses)
 			{
 				if (statementClause.Kind == SyntaxKind.Block)
@@ -51,8 +61,8 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 
 				if (statementClause.HasExcessNewLines())
 				{
-					yield return BaseStyleValidator.Report(statementClause, "Выражение не должно иметь лишние " +
-																			$"переносы строк после родителя ({GetNodePosition(rootStatementSyntax)}).");
+					yield return BaseStyleValidator.Report(statementClause,
+						$"Выражение не должно иметь лишние переносы строк после родителя ({GetNodePosition(rootStatementSyntax)}).");
 					continue;
 				}
 				if (!statementClause.OnSameIndentWithParent.HasValue)
@@ -73,21 +83,14 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 					{
 						if (statementStart != rootStart)
 						{
-							yield return BaseStyleValidator.Report(statementClause, "Выражение должно иметь такой же отступ, " +
-																					$"как у родителя ({GetNodePosition(rootStatementSyntax)}).");
+							yield return BaseStyleValidator.Report(statementClause,
+								$"Выражение должно иметь такой же отступ, как у родителя ({GetNodePosition(rootStatementSyntax)}).");
 							continue;
 						}
 					}
 					else
 					{
-						if (rootEndLine == statementLine
-							&& (rootStatementSyntax.Kind == SyntaxKind.IfStatement ||
-								rootStatementSyntax.Kind == SyntaxKind.ElseClause)
-							&& (statementClause.Kind != SyntaxKind.IfStatement
-								&& statementClause.Kind != SyntaxKind.ForStatement
-								&& statementClause.Kind != SyntaxKind.ForEachStatement
-								&& statementClause.Kind != SyntaxKind.WhileStatement
-								&& statementClause.Kind != SyntaxKind.DoStatement))
+						if (IsAllowedOneLineSyntaxToken(rootEndLine, statementLine, rootStatementSyntax, statementClause))
 							continue;
 						var report = ValidateIndent(rootStatementSyntax, statementStart, rootStart, statementLine, rootLine);
 						if (report != null)
@@ -100,6 +103,22 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 				foreach (var nestedError in CheckNonBracesStatements(statementClause))
 					yield return nestedError;
 			}
+		}
+
+		private static bool IsAllowedOneLineSyntaxToken(
+			int rootEndLine,
+			int statementLine,
+			SyntaxNodeOrToken rootStatementSyntax,
+			SyntaxNodeOrToken statementClause)
+		{
+			return rootEndLine == statementLine &&
+					(rootStatementSyntax.Kind == SyntaxKind.IfStatement ||
+					rootStatementSyntax.Kind == SyntaxKind.ElseClause) &&
+					statementClause.Kind != SyntaxKind.IfStatement &&
+					statementClause.Kind != SyntaxKind.ForStatement &&
+					statementClause.Kind != SyntaxKind.ForEachStatement &&
+					statementClause.Kind != SyntaxKind.WhileStatement &&
+					statementClause.Kind != SyntaxKind.DoStatement;
 		}
 
 		private static string ValidateIndent(
