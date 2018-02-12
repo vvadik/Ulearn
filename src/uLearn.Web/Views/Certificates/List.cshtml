@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNet.Identity
+@using Ulearn.Common
 @using Ulearn.Common.Extensions
 
 @model uLearn.Web.Controllers.UserCertificatesViewModel
@@ -35,15 +36,13 @@
 	{
 		<div class="certificates-list__info">
 			<div>
-				Вы можете поделиться ссылкой на&nbsp;эту страницу или отдельный сертификат с&nbsp;друзьями:
+                Поделитесь ссылкой на&nbsp;эту страницу или отдельный сертификат с&nbsp;друзьями. Это поможет другим людям находить курсы по&nbsp;программированию.
 			</div>
 			<div class="likely">
 				<div class="vkontakte">Поделиться</div>
 				<div class="telegram">Отправить</div>
 				<div class="twitter">Твитнуть</div>
 				<div class="facebook">Поделиться</div>
-				<div class="gplus">Плюсануть</div>
-				<div class="linkedin">Линкануть</div>
 			</div>
 		</div>
 	}
@@ -59,7 +58,7 @@
 				                   )</h3>
 		<div>
 			<strong>@certificate.Timestamp.ToLongDateString()</strong>,
-			преподаватель: @certificate.Instructor.VisibleName
+			выдал@(certificate.Instructor.Gender.ChooseEnding()) @certificate.Instructor.VisibleName
 		</div>
 		certificateIndex++;
 	}

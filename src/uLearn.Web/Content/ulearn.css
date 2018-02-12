@@ -2076,8 +2076,35 @@ h1 .copy-group-link {
 	margin: 15px 0;
 }
 
+ol.certificates {
+	padding-left: 15px;
+}
+
 .certificates-list__info {
 	padding: 10px 0;
+}
+
+.certificate-template__title .text-muted {
+	font-weight: 300;
+}
+
+.certificates .certificate .remove-certificate-link {
+	font-size: 18px;
+	line-height: 20px;
+	vertical-align: top;
+	margin-left: 15px;
+	color: #c55;
+	display: none;
+	cursor: pointer;
+}
+
+.certificates .certificate:hover .remove-certificate-link {
+	display: inline;
+}
+
+.certificates .certificate .remove-certificate-link:hover {
+	text-decoration: none;
+	color: #611;
 }
 
 .preview-certificates .select-another-user-block:not(.shown-by-default) {

@@ -1066,8 +1066,9 @@ namespace uLearn.Web.Controllers
 		public ActionResult FindUsers(string courseId, string term, bool onlyInstructors=true, bool withGroups=true)
 		{
 			/* Only sysadmins can search ordinary users */
-			if (!User.IsSystemAdministrator() && !onlyInstructors)
-				return Json(new { status = "error", message = "Вы не можете искать среди всех пользователей" }, JsonRequestBehavior.AllowGet);
+			// This limitation is disabled now for certificates generation. Waits for futher investigation
+			// if (!User.IsSystemAdministrator() && !onlyInstructors)
+			//   	return Json(new { status = "error", message = "Вы не можете искать среди всех пользователей" }, JsonRequestBehavior.AllowGet);
 
 			var query = new UserSearchQueryModel { NamePrefix = term };
 			if (onlyInstructors)
@@ -1382,7 +1383,8 @@ namespace uLearn.Web.Controllers
 
 			foreach (var certificateRequest in certificateRequests)
 			{
-				await certificatesRepo.AddCertificate(templateId, certificateRequest.UserId, User.Identity.GetUserId(), certificateRequest.Parameters);
+				var certificate = await certificatesRepo.AddCertificate(templateId, certificateRequest.UserId, User.Identity.GetUserId(), certificateRequest.Parameters);
+				await NotifyAboutCertificate(certificate);
 			}
 
 			return Redirect(Url.Action("Certificates", new { courseId }) + "#template-" + templateId);

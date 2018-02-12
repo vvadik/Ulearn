@@ -45,7 +45,7 @@ namespace uLearn
 
 		public static readonly Regex rxExtractLanguage = new Regex("^({{(.+)}}[\r\n])", RegexOptions.Compiled);
 
-		public static string FormatCodePrettyPrint(MarkdownDeep.Markdown m, string code)
+		public static string FormatCodePrettyPrint(Markdown m, string code)
 		{
 			// Try to extract the language from the first line
 			var match = rxExtractLanguage.Match(code);
@@ -54,7 +54,7 @@ namespace uLearn
 			if (match.Success)
 			{
 				// Save the language
-				var g = (Group)match.Groups[2];
+				var g = match.Groups[2];
 				language = g.ToString();
 
 				// Remove the first line

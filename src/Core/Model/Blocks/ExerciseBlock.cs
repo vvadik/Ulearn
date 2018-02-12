@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Xml.Serialization;
 using RunCsJob.Api;
 using uLearn.Model.Edx.EdxComponents;
 using Ulearn.Common.Extensions;
+using Component = uLearn.Model.Edx.EdxComponents.Component;
 
 namespace uLearn.Model.Blocks
 {
@@ -15,6 +17,7 @@ namespace uLearn.Model.Blocks
 			MaxScore = 5;
 			MaxReviewAttempts = 2;
 			CorrectnessScore = MaxScore;
+			Validator = new ValidatorDescription();
 		}
 
 		[XmlElement("max-score")]
@@ -37,7 +40,7 @@ namespace uLearn.Model.Blocks
 		public bool HideExpectedOutputOnError { get; set; }
 
 		[XmlElement("validator")]
-		public string ValidatorName { get; set; }
+		public ValidatorDescription Validator { get; set; }
 
 		[XmlElement("hide-solutions")]
 		public bool HideShowSolutionsButton { get; set; }
@@ -142,5 +145,20 @@ namespace uLearn.Model.Blocks
 			if (string.IsNullOrEmpty(ScoringGroup))
 				ScoringGroup = scoring.DefaultScoringGroupForExercise;
 		}
+	}
+
+	public class ValidatorDescription
+	{
+		public ValidatorDescription()
+		{
+			ValidatorName = "";
+		}
+		
+		[XmlAttribute("remove-defaults")]
+		[DefaultValue(false)]
+		public bool RemoveDefaults { get; set; }
+
+		[XmlText]
+		public string ValidatorName { get; set; }
 	}
 }

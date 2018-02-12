@@ -201,7 +201,7 @@ namespace uLearn.Properties {
         ///French-polish
         ///Frenc [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string englishVerbs {
+        public static string englishVerbs {
             get {
                 return ResourceManager.GetString("englishVerbs", resourceCulture);
             }
@@ -213,6 +213,7 @@ namespace uLearn.Properties {
         ///using System.Linq;
         ///using System.Reflection;
         ///using System.Runtime.CompilerServices;
+        ///using System.Text.RegularExpressions;
         ///using NUnit.Framework.Api;
         ///using NUnit.Framework.Interfaces;
         ///using NUnit.Framework.Internal;
@@ -223,7 +224,7 @@ namespace uLearn.Properties {
         ///{
         ///	/// &lt;summary&gt;
         ///	/// Этот файл включен в ресурсы и добавляется в пришедший на проверку проект с задачей, если у нее в качестве способа проверки 
-        ///	/// установлен nunit-test-class, [rest of string was truncated]&quot;;.
+        ///	/ [rest of string was truncated]&quot;;.
         /// </summary>
         public static string NUnitTestRunner {
             get {

@@ -39,4 +39,23 @@
     <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj" />
     <ProjectReference Include="..\Ulearn.CSharpAttributes\Ulearn.CSharpAttributes.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <HunspellDlls Include="Hunspell*.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Target Name="CopyFiles" AfterTargets="Build">
+    <Copy DestinationFolder="$(OutputPath)" SourceFiles="@(HunspellDlls)" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

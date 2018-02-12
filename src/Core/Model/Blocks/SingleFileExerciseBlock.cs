@@ -49,7 +49,7 @@ namespace uLearn.Model.Blocks
 			ExerciseCode = prelude + exerciseCode;
 			IndexToInsertSolution = index;
 			EthalonSolution = extractor.GetRegion(SolutionLabel);
-			ValidatorName = string.Join(" ", LangId, ValidatorName);
+			Validator.ValidatorName = string.Join(" ", LangId, Validator.ValidatorName ?? "");
 
 			CheckScoringGroup(context.SlideTitle, context.CourseSettings.Scoring);
 
@@ -72,7 +72,7 @@ namespace uLearn.Model.Blocks
 
 		public override SolutionBuildResult BuildSolution(string userWrittenCode)
 		{
-			return new SolutionBuilder(IndexToInsertSolution, ExerciseCode, ValidatorName).BuildSolution(userWrittenCode);
+			return new SolutionBuilder(IndexToInsertSolution, ExerciseCode, Validator).BuildSolution(userWrittenCode);
 		}
 
 		public override RunnerSubmission CreateSubmission(string submissionId, string code)

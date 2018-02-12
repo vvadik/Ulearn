@@ -4,6 +4,7 @@
 @using uLearn.Model.Blocks
 @using uLearn.Quizes
 @using uLearn.Web.Controllers
+@using uLearn.Web.Extensions
 @* ReSharper disable RedundantUsingDirective *@
 @using uLearn.Web.Models
 @using Ulearn.Common.Extensions
@@ -62,7 +63,7 @@
 	<h4>
 		<i class="@mark" style="@style"></i>
 		<span class="quiz-block__text">
-			@block.QuestionIndex. @block.Text.RenderTex()
+			@block.QuestionIndex. @block.Text.RenderTex().ToLegacyHtmlString()
 		</span>
 		<span class="quiz-block__score">
 			@if (blockScore >= 0)
@@ -242,7 +243,7 @@
 			<div class="quiz">
 				<input @ans autocomplete="off" id='@( block.Id + "quizBlock" + item.Id)' name=@( "group" + id) type="@typeInp" @GetGuestDisable(context.IsGuest) @readonlyAttr>
 				<label class="@itemClass" title="@title" for="@( block.Id + "quizBlock" + item.Id)" @GetGuestOnclick(context.IsGuest)>
-					@item.Description.Trim().RenderTex()
+					@item.Description.Trim().RenderTex().ToLegacyHtmlString()
 					@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer && item.IsCorrect)
 					{
 						<i class="glyphicon glyphicon-ok" style="color: green" title="@title"></i>
@@ -385,13 +386,13 @@
 							</div>
 						}
 						<input autocomplete="off" id='@( block.Id + "quizBlock" + item.GetHash())' type="hidden">
-						<div class="text">@item.Text.RenderTex()</div>
+						<div class="text">@item.Text.RenderTex().ToLegacyHtmlString()</div>
 					</div>
 					@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer)
 					{
 						var correctItem = correctItems[itemIndex];
 						<div class="quiz-block-ordering__item correct col-xs-12 col-sm-offset-1 col-sm-5">
-							@correctItem.Text.RenderTex()
+							@correctItem.Text.RenderTex().ToLegacyHtmlString()
 						</div>
 					}
 				</li>
@@ -452,23 +453,23 @@
 				<li>
 					<div class="quiz quiz-block-matching__item @isRightClass row">
 						<input autocomplete="off" id='@( block.Id + "quizBlock" + fixedItem.GetHashForFixedItem())' type="hidden">
-						<div class="quiz-block-matching__fixed-item col-xs-3" data-item-id="@fixedItem.GetHashForFixedItem()">@fixedItem.FixedItem.RenderTex()</div>
+						<div class="quiz-block-matching__fixed-item col-xs-3" data-item-id="@fixedItem.GetHashForFixedItem()">@fixedItem.FixedItem.RenderTex().ToLegacyHtmlString()</div>
 						@if (model.QuizState == QuizState.NotPassed)
 						{
 							<div class="quiz-block-matching__droppable col-xs-3" data-block-id="@block.Id" data-item-id="@fixedItem.GetHashForFixedItem()"></div>
 							<div class="quiz-block-matching__source__droppable col-xs-3 col-xs-offset-1 added" data-block-id="@block.Id" data-movable-item-id="@movableItem.GetHashForMovableItem()">
-								<div class="quiz-block-matching__movable-item" data-block-id="@block.Id" data-item-id="@movableItem.GetHashForMovableItem()">@movableItem.MovableItem.RenderTex()</div>
+								<div class="quiz-block-matching__movable-item" data-block-id="@block.Id" data-item-id="@movableItem.GetHashForMovableItem()">@movableItem.MovableItem.RenderTex().ToLegacyHtmlString()</div>
 							</div>
 						}
 						else
 						{
 							<div class="quiz-block-matching__droppable col-xs-3 added" data-block-id="@block.Id" data-item-id="@fixedItem.GetHashForFixedItem()" data-movable-item-id="@movableItem.GetHashForMovableItem()">
-								<div class="quiz-block-matching__movable-item" data-block-id="@block.Id" data-item-id="@movableItem.GetHashForMovableItem()">@movableItem.MovableItem.RenderTex()</div>
+								<div class="quiz-block-matching__movable-item" data-block-id="@block.Id" data-item-id="@movableItem.GetHashForMovableItem()">@movableItem.MovableItem.RenderTex().ToLegacyHtmlString()</div>
 							</div>
 							if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer)
 							{
 								<div class="quiz-block-matching__fixed-item correct col-xs-3 col-xs-offset-1">
-									@fixedItem.MovableItem.RenderTex()
+									@fixedItem.MovableItem.RenderTex().ToLegacyHtmlString()
 								</div>
 							}
 							if (context.CanUserFillQuiz)

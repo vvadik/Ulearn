@@ -48,7 +48,7 @@
 		public bool smallNumbersAreWords = true;
 		public bool hideNumberOne = true;
 
-		public static RussianPluralizationOptions Score = new RussianPluralizationOptions
+		public static readonly RussianPluralizationOptions Score = new RussianPluralizationOptions
 		{
 			One = "балл",
 			Two = "балла",
@@ -57,7 +57,7 @@
 			hideNumberOne = false,
 		};
 
-		public static RussianPluralizationOptions ScoreDative = new RussianPluralizationOptions
+		public static readonly RussianPluralizationOptions ScoreDative = new RussianPluralizationOptions
 		{
 			One = "балла",
 			Two = "баллов",
@@ -66,7 +66,7 @@
 			hideNumberOne = false,
 		};
 
-		public static RussianPluralizationOptions MinuteDative = new RussianPluralizationOptions
+		public static readonly RussianPluralizationOptions MinuteDative = new RussianPluralizationOptions
 		{
 			One = "минуту",
 			Two = "минуты",
@@ -74,21 +74,21 @@
 			Gender = Gender.Female,
 		};
 
-		public static RussianPluralizationOptions Hour = new RussianPluralizationOptions
+		public static readonly RussianPluralizationOptions Hour = new RussianPluralizationOptions
 		{
 			One = "час",
 			Two = "часа",
 			Five = "часов"
 		};
 
-		public static RussianPluralizationOptions Day = new RussianPluralizationOptions
+		public static readonly RussianPluralizationOptions Day = new RussianPluralizationOptions
 		{
 			One = "день",
 			Two = "дня",
 			Five = "дней"
 		};
 
-		public static RussianPluralizationOptions Man = new RussianPluralizationOptions
+		public static readonly RussianPluralizationOptions Man = new RussianPluralizationOptions
 		{
 			One = "человек",
 			Two = "человека",
@@ -97,7 +97,7 @@
 			smallNumbersAreWords = false,
 		};
 
-		public static RussianPluralizationOptions Tries = new RussianPluralizationOptions
+		public static readonly RussianPluralizationOptions Tries = new RussianPluralizationOptions
 		{
 			One = "попытка",
 			Two = "попытки",

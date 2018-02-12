@@ -23,6 +23,12 @@ namespace uLearn.CSharp
 			new IndentsValidator() // Выводит дополнительный текст в конце, поэтому лучше ему быть последним
 		};
 
+		public CSharpSolutionValidator(bool removeDefaults=false)
+		{
+			if (removeDefaults)
+				validators.Clear();
+		}
+
 		public void AddValidator(ICSharpSolutionValidator validator)
 		{
 			validators.RemoveAll(item => item.GetType() == validator.GetType());
