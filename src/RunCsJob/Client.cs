@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 using System.Web;
 using log4net;
 using RunCsJob.Api;
+using uLearn;
 using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace RunCsJob
 {
@@ -45,7 +47,7 @@ namespace RunCsJob
 			{
 				var response = await httpClient.GetAsync(uri);
 				if (response.IsSuccessStatusCode)
-					return await response.Content.ReadAsAsync<List<RunnerSubmission>>();
+					return await response.Content.ReadAsJsonAsync<List<RunnerSubmission>>(JsonConfig.GetSettings());
 				else
 				{
 					var text = await response.Content.ReadAsStringAsync();

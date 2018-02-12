@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AntiPlagiarism.Api.Models.Parameters;
 using AntiPlagiarism.Api.Models.Results;
@@ -12,14 +11,12 @@ using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Options;
 using Serilog;
-using uLearn;
 
 namespace AntiPlagiarism.Web.Controllers
 {
-	[Route("/Api")]
+	[Route("/api")]
 	public class ApiController : BaseController
 	{
 		private readonly ISubmissionsRepo submissionsRepo;
@@ -56,7 +53,7 @@ namespace AntiPlagiarism.Web.Controllers
 			this.configuration = configuration.Value;
 		}
 		
-		[HttpPost(nameof(AddSubmission))]
+		[HttpPost(Api.Urls.AddSubmission)]
 		public async Task<IActionResult> AddSubmission(AddSubmissionParameters parameters)
 		{
 			if (!ModelState.IsValid)
@@ -100,7 +97,7 @@ namespace AntiPlagiarism.Web.Controllers
 			return codeUnits.Select(u => u.Tokens.Count).Sum();
 		}
 
-		[HttpGet(nameof(GetSubmissionPlagiarisms))]
+		[HttpGet(Api.Urls.GetSubmissionPlagiarisms)]
 		public async Task<IActionResult> GetSubmissionPlagiarisms(GetSubmissionPlagiarismsParameters parameters)
 		{
 			if (!ModelState.IsValid)
@@ -125,7 +122,7 @@ namespace AntiPlagiarism.Web.Controllers
 			return Json(result);
 		}
 
-		[HttpGet(nameof(GetAuthorPlagiarisms))]
+		[HttpGet(Api.Urls.GetAuthorPlagiarisms)]
 		public async Task<IActionResult> GetAuthorPlagiarisms(GetAuthorPlagiarismsParameters parameters)
 		{
 			if (!ModelState.IsValid)

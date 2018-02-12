@@ -4,13 +4,17 @@ using System.Linq;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using System.Web.Configuration;
 using System.Web.Http;
 using System.Web.Mvc;
+using AntiPlagiarism.Api;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Elmah;
 using Microsoft.AspNet.Identity;
+using Serilog;
+using Serilog.Events;
 using uLearn.Helpers;
 using uLearn.Model.Blocks;
 using uLearn.Web.Extensions;
@@ -25,7 +29,16 @@ namespace uLearn.Web.Controllers
 	public class ExerciseController : BaseExerciseController
 	{
 		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache;
+		private static readonly AntiPlagiarismClient antiPlagiarismClient;
 
+		static ExerciseController()
+		{
+			var serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
+			var antiPlagiarismEndpointUrl = WebConfigurationManager.AppSettings["ulearn.antiplagiarism.endpoint"];
+			var antiPlagiarismToken = WebConfigurationManager.AppSettings["ulearn.antiplagiarism.token"];
+			antiPlagiarismClient = new AntiPlagiarismClient(antiPlagiarismEndpointUrl, antiPlagiarismToken, serilogLogger);
+		}
+		
 		public ExerciseController()
 		{
 			exerciseStudentZipsCache = new ExerciseStudentZipsCache();

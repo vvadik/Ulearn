@@ -6,14 +6,22 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web.Configuration;
 using System.Web.Http;
+using AntiPlagiarism.Api;
+using AntiPlagiarism.Api.Models.Parameters;
 using Database;
 using Database.DataContexts;
 using Database.Models;
 using log4net;
+using LtiLibrary.Core.Extensions;
+using Newtonsoft.Json;
 using RunCsJob.Api;
+using Serilog;
+using Serilog.Events;
 using Telegram.Bot.Types.Enums;
 using uLearn.Telegram;
+using uLearn.Web.AntiPlagiarismUsage;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using XQueue;
@@ -26,16 +34,19 @@ namespace uLearn.Web.Controllers
 		private static readonly ILog log = LogManager.GetLogger(typeof(RunnerController));
 
 		private readonly UserSolutionsRepo userSolutionsRepo;
+		private readonly ULearnDb db;
 		private readonly CourseManager courseManager;
 
 		private static readonly List<IResultObserver> resultObserveres = new List<IResultObserver>
 		{
 			new XQueueResultObserver(),
 			new SandboxErrorsResultObserver(),
+			new AntiPlagiarismResultObserver(),
 		};
 
 		public RunnerController(ULearnDb db, CourseManager courseManager)
 		{
+			this.db = db;
 			this.courseManager = courseManager;
 			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
 		}
@@ -123,7 +134,7 @@ namespace uLearn.Web.Controllers
 
 		private Task SendResultToObservers(UserExerciseSubmission submission, RunningResults result)
 		{
-			var tasks = resultObserveres.Select(o => o.ProcessResult(submission, result));
+			var tasks = resultObserveres.Select(o => o.ProcessResult(db, submission, result));
 			return Task.WhenAll(tasks);
 		}
 
@@ -137,18 +148,18 @@ namespace uLearn.Web.Controllers
 
 	public interface IResultObserver
 	{
-		Task ProcessResult(UserExerciseSubmission submission, RunningResults result);
+		Task ProcessResult(ULearnDb db, UserExerciseSubmission submission, RunningResults result);
 	}
 
 	public class XQueueResultObserver : IResultObserver
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(XQueueResultObserver));
 
-		public async Task ProcessResult(UserExerciseSubmission submission, RunningResults result)
+		public async Task ProcessResult(ULearnDb db, UserExerciseSubmission submission, RunningResults result)
 		{
 			var courseManager = WebCourseManager.Instance;
 
-			var xQueueRepo = new XQueueRepo(new ULearnDb(), courseManager);
+			var xQueueRepo = new XQueueRepo(db, courseManager);
 			var xQueueSubmission = xQueueRepo.FindXQueueSubmission(submission);
 			if (xQueueSubmission == null)
 				return;
@@ -199,7 +210,7 @@ namespace uLearn.Web.Controllers
 	{
 		private static readonly ErrorsBot bot = new ErrorsBot();
 
-		public async Task ProcessResult(UserExerciseSubmission submission, RunningResults result)
+		public async Task ProcessResult(ULearnDb db, UserExerciseSubmission submission, RunningResults result)
 		{
 			/* Ignore all verdicts except SandboxError */
 			if (result.Verdict != Verdict.SandboxError)
@@ -211,6 +222,42 @@ namespace uLearn.Web.Controllers
 				(string.IsNullOrEmpty(output) ? "" : $"Вывод:\n<pre>{output.EscapeHtml()}</pre>"), 
 				ParseMode.Html
 			);
+		}
+	}
+
+	public class AntiPlagiarismResultObserver : IResultObserver
+	{
+		private static readonly AntiPlagiarismClient antiPlagiarismClient;
+		private static readonly ILog log = LogManager.GetLogger(typeof(AntiPlagiarismResultObserver));
+
+		static AntiPlagiarismResultObserver()
+		{
+			var serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
+			var antiPlagiarismEndpointUrl = WebConfigurationManager.AppSettings["ulearn.antiplagiarism.endpoint"];
+			var antiPlagiarismToken = WebConfigurationManager.AppSettings["ulearn.antiplagiarism.token"];
+			antiPlagiarismClient = new AntiPlagiarismClient(antiPlagiarismEndpointUrl, antiPlagiarismToken, serilogLogger);
+		}
+		
+		public async Task ProcessResult(ULearnDb db, UserExerciseSubmission submission, RunningResults result)
+		{
+			/* Sent to antiplagiarism service only accepted submissions */
+			if (result.Verdict != Verdict.Ok)
+				return;
+
+			var parameters = new AddSubmissionParameters
+			{
+				TaskId = submission.SlideId,
+				Language = AntiPlagiarism.Api.Models.Language.CSharp,
+				Code = submission.SolutionCode.Text,
+				AuthorId = Guid.Parse(submission.UserId),
+				AdditionalInfo = new AntiPlagiarismAdditionalInfo { SubmissionId = submission.Id }.ToJsonString(),
+			};
+			var antiPlagiasismResult = await FuncUtils.TrySeveralTimesAsync(() => antiPlagiarismClient.AddSubmissionAsync(parameters), 3);
+			
+			log.Info($"Получил ответ от сервиса антиплагиата: {antiPlagiasismResult}");
+			
+			var userSolutionsRepo = new UserSolutionsRepo(db, WebCourseManager.Instance);
+			await userSolutionsRepo.SetAntiPlagiarismSubmissionId(submission, antiPlagiasismResult.SubmissionId);
 		}
 	}
 }
