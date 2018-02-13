@@ -114,6 +114,11 @@ namespace Database.DataContexts
 			return db.UserExerciseSubmissions.FirstOrDefault(s => s.AntiPlagiarismSubmissionId == antiPlagiarismSubmissionId);
 		}
 
+		public List<UserExerciseSubmission> GetSubmissionsByAntiPlagiarismSubmissionsIds(IEnumerable<int> antiPlagiarismSubmissionsIds)
+		{
+			return db.UserExerciseSubmissions.Where(s => s.AntiPlagiarismSubmissionId.HasValue && antiPlagiarismSubmissionsIds.Contains(s.AntiPlagiarismSubmissionId.Value)).ToList();
+		}
+
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
 		public async Task<Tuple<int, bool>> Like(int solutionId, string userId)
 		{

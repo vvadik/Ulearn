@@ -99,7 +99,7 @@ namespace AntiPlagiarism.Api
 		
 		public Task<GetAuthorPlagiarismsResult> GetAuthorPlagiarismsAsync(GetAuthorPlagiarismsParameters parameters)
 		{
-			return MakeRequestAsync<GetAuthorPlagiarismsParameters, GetAuthorPlagiarismsResult>(Urls.GetSubmissionPlagiarisms, parameters, HttpMethod.Get);
+			return MakeRequestAsync<GetAuthorPlagiarismsParameters, GetAuthorPlagiarismsResult>(Urls.GetAuthorPlagiarisms, parameters, HttpMethod.Get);
 		}
 	}
 }

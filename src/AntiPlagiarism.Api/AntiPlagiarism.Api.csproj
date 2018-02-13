@@ -16,4 +16,9 @@
       <Name>Common</Name>
     </ProjectReference>
   </ItemGroup>
+  <PropertyGroup>
+    <!-- Temporary workaround for getting Microsoft.AspNetCore.Mvc.Code.dll in the output folder
+         (for Ulearn.Web, which is .NET Framework project, not .NET Core) -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
 </Project>

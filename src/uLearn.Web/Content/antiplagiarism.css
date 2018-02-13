@@ -1,0 +1,38 @@
+/* Antiplagiarism status */
+.antiplagiarism-status {
+    background-color: #ececec;
+    padding: 11px 18px;
+    color: #333;
+    font-size: 13pt;
+    margin: 0;
+}
+
+.antiplagiarism-status.found-none,
+.antiplagiarism-status.found-level0 {
+    background-color: #cafac1;
+}
+
+.antiplagiarism-status.found-faint,
+.antiplagiarism-status.found-level1 {
+    background-color: #faf4c1;
+}
+
+.antiplagiarism-status.found-strong,
+.antiplagiarism-status.found-level2 {
+    background-color: #fac1c1;    
+}
+
+/* Antiplagiarism page */
+
+.antiplagiarism {
+    margin-top: 15px;
+}
+
+.antiplagiarism__author {
+    font-size: 18px;
+    margin: 5px 0;
+}
+
+.antiplagiarism__matched-snippet {
+    /*background-color: #fdd5d5;*/
+}

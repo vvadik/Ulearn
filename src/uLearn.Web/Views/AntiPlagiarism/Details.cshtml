@@ -1,0 +1,71 @@
+﻿@using uLearn.Web.Extensions
+@using uLearn.Web.Views.Shared
+@using Ulearn.Common.Extensions
+@model uLearn.Web.Controllers.AntiPlagiarismDetailsModel
+
+@{
+	ViewBag.Title = "Проверка на списывание";
+
+	var submission = Model.Submissions[Model.SubmissionId];
+	var submissionsByAntiPlagiarismIds = Model.Submissions.Values
+		.Where(s => s.AntiPlagiarismSubmissionId != null)
+		.ToDictionary(s => s.AntiPlagiarismSubmissionId);
+}
+
+<div class="container">
+    @{
+	    var researchedSubmission = Model.AntiPlagiarismResult.ResearchedSubmissions.FirstOrDefault(s => s.SubmissionInfo.Id == submission.AntiPlagiarismSubmissionId);
+	    if (researchedSubmission != null && researchedSubmission.Plagiarisms.Count > 0)
+	    {
+		    <div class="row">
+                <div class="col-xs-6">
+                    <h3>
+                        Исходное решение
+                    </h3>
+                    @Html.Action("SubmissionsPanel", "Exercise", new { courseId = submission.CourseId, slideId = submission.SlideId, userId = submission.UserId, currentSubmissionId = submission.Id, canTryAgain = false})
+                </div>
+                <div class="col-xs-6">
+                    <h3>
+                        Похожие решения
+                    </h3>
+                </div>
+            </div>
+		    foreach (var plagiarism in researchedSubmission.Plagiarisms.OrderByDescending(p => p.Weight))
+		    {
+			    var plagiarismSubmission = submissionsByAntiPlagiarismIds[plagiarism.SubmissionInfo.Id];
+			    <div class="antiplagiarism row">
+                    <div class="col-xs-6">
+                        <div class="antiplagiarism__author">
+                            @UserAvatar.SmallAvatar(submission.User)
+                            @Html.ActionLink(submission.User.VisibleName, "Profile", "Account", new { userId = submission.UserId }, new { title = submission.User.UserName }),
+                            <span title="@submission.Timestamp.ToPrettyString()">@submission.Timestamp.ToAgoPrettyString()</span>
+                        </div>
+                        <textarea class="code code-sample" data-lang="cs" data-submission-id="@submission.Id">@submission.SolutionCode.Text</textarea>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="antiplagiarism__author">
+                            @UserAvatar.SmallAvatar(plagiarismSubmission.User)
+                            @Html.ActionLink(plagiarismSubmission.User.VisibleName, "Profile", "Account", new { userId = plagiarismSubmission.UserId }, new { title = plagiarismSubmission.User.UserName }),
+                            <span title="@plagiarismSubmission.Timestamp.ToPrettyString()">@plagiarismSubmission.Timestamp.ToAgoPrettyString()</span>
+                            <div class="pull-right" title="Коэффициент похожести. Чем больше значение, тем более подозрительна эта пара">
+                                @plagiarism.Weight.ToString("N4")
+                            </div>
+                        </div>
+                        
+                        <textarea class="code code-sample" data-lang="cs" data-submission-id="@plagiarismSubmission.Id">@plagiarismSubmission.SolutionCode.Text</textarea>
+                    </div>
+                    <div class="hidden antiplagiarism__data" data-original-submission-id="@submission.Id" data-plagiarism-submission-id="@plagiarismSubmission.Id">
+                        @(new { tokens_positions = researchedSubmission.TokensPositions, plagiarism = plagiarism }.JsonSerialize())
+                    </div>
+                </div>
+		    }	    
+	    }
+	    else
+	    {
+		    <h3>@submission.User.VisibleName</h3>
+		    <div class="text-muted">Мы не нашли ничего похожего на это решение. Вероятно, этот код написан самостоятельно.</div>
+		    <textarea class="code code-sample" data-lang="cs">@submission.SolutionCode.Text</textarea>
+	    }
+    }
+    
+</div>
