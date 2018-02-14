@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 using System.Web;
 using log4net;
 using RunCsJob.Api;
-using uLearn;
-using Ulearn.Common.Extensions;
+using uLearn.Extensions;
 
 namespace RunCsJob
 {
