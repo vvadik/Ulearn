@@ -10,7 +10,7 @@ using Ulearn.Common.Extensions;
 
 namespace AntiPlagiarism.Api
 {
-	public class AntiPlagiarismClient
+	public class AntiPlagiarismClient : IAntiPlagiarismClient
 	{
 		private static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
 

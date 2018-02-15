@@ -117,6 +117,7 @@ namespace AntiPlagiarism.Web.Controllers
 				Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels),
 				TokensPositions = plagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
 				SuspicionLevels = suspicionLevels, 
+				AnalyzedCodeUnits = GetAnalyzedCodeUnits(submission),
 			};
 			
 			return Json(result);
@@ -150,10 +151,23 @@ namespace AntiPlagiarism.Web.Controllers
 					SubmissionInfo = submission.GetSubmissionInfoForApi(),
 					Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels),
 					TokensPositions = plagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
+					AnalyzedCodeUnits = GetAnalyzedCodeUnits(submission),
 				});
 			}
 
 			return Json(result);
+		}
+
+		private List<AnalyzedCodeUnit> GetAnalyzedCodeUnits(Submission submission)
+		{
+			var codeUnits = codeUnitsExtractor.Extract(submission.ProgramText);
+			return codeUnits.Select(
+				u => new AnalyzedCodeUnit
+				{
+					Name = u.Path.ToString(),
+					FirstTokenIndex = u.FirstTokenIndex,
+					TokensCount = u.Tokens.Count,
+				}).ToList();
 		}
 
 		private async Task ExtractSnippetsFromSubmissionAsync(Submission submission)

@@ -23,7 +23,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly ULearnDb db;
 		private readonly UserSolutionsRepo userSolutionsRepo;
-		private static readonly AntiPlagiarismClient antiPlagiarismClient;
+		private static readonly IAntiPlagiarismClient antiPlagiarismClient;
 
 		static AntiPlagiarismController()
 		{

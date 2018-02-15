@@ -40,7 +40,7 @@
                             @Html.ActionLink(submission.User.VisibleName, "Profile", "Account", new { userId = submission.UserId }, new { title = submission.User.UserName }),
                             <span title="@submission.Timestamp.ToPrettyString()">@submission.Timestamp.ToAgoPrettyString()</span>
                         </div>
-                        <textarea class="code code-sample" data-lang="cs" data-submission-id="@submission.Id">@submission.SolutionCode.Text</textarea>
+                        <textarea class="code code-sample" data-lang="cs" data-submission-id="@submission.Id-@plagiarismSubmission.Id">@submission.SolutionCode.Text</textarea>
                     </div>
                     <div class="col-xs-6">
                         <div class="antiplagiarism__author">
@@ -54,7 +54,7 @@
                         
                         <textarea class="code code-sample" data-lang="cs" data-submission-id="@plagiarismSubmission.Id">@plagiarismSubmission.SolutionCode.Text</textarea>
                     </div>
-                    <div class="hidden antiplagiarism__data" data-original-submission-id="@submission.Id" data-plagiarism-submission-id="@plagiarismSubmission.Id">
+                    <div class="hidden antiplagiarism__data" data-original-submission-id="@submission.Id-@plagiarismSubmission.Id" data-plagiarism-submission-id="@plagiarismSubmission.Id">
                         @(new { tokens_positions = researchedSubmission.TokensPositions, plagiarism = plagiarism }.JsonSerialize())
                     </div>
                 </div>

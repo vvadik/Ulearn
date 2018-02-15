@@ -227,7 +227,7 @@ namespace uLearn.Web.Controllers
 
 	public class AntiPlagiarismResultObserver : IResultObserver
 	{
-		private static readonly AntiPlagiarismClient antiPlagiarismClient;
+		private static readonly IAntiPlagiarismClient antiPlagiarismClient;
 		private static readonly ILog log = LogManager.GetLogger(typeof(AntiPlagiarismResultObserver));
 
 		static AntiPlagiarismResultObserver()
