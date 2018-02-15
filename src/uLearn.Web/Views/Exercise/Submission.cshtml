@@ -99,11 +99,14 @@
 
 		if (Model.InstructorView)
 		{
-			<p class="antiplagiarism-status"
-               data-antiplagiarism-url="@Url.Action("Info", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })"
-               data-antiplagiarism-details-url="@Url.Action("Details", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })">
-                Проверка на&nbsp;списывание: ищу похожие решения у&nbsp;других студентов...
-            </p>
+			if (User.HasCourseAccess(Model.CourseId, CourseAccessType.FeatureUseAntiPlagiarism) || User.IsSystemAdministrator())
+			{
+				<p class="antiplagiarism-status"
+                   data-antiplagiarism-url="@Url.Action("Info", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })"
+                   data-antiplagiarism-details-url="@Url.Action("Details", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })">
+                    Проверка на&nbsp;списывание: ищу похожие решения у&nbsp;других студентов...
+                </p>
+			}
 		}
 
 		if (Model.ReviewState == ExerciseReviewState.Reviewed || Model.InstructorView)
