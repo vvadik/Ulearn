@@ -1,4 +1,5 @@
 /* Antiplagiarism status */
+
 .antiplagiarism-status {
     background-color: #ececec;
     padding: 11px 18px;
@@ -24,6 +25,15 @@
 
 /* Antiplagiarism page */
 
+.antiplagiarism__slide-title {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.code-antiplagiarism + .CodeMirror {
+    font-size: 13px;
+}
+
 .antiplagiarism {
     margin-top: 15px;
 }
@@ -33,6 +43,22 @@
     margin: 5px 0;
 }
 
+.antiplagiarism__not-analyzed {
+    color: #ccc !important;   
+}
+
+.antiplagiarism__not-analyzed.CodeMirror-selectedtext {
+    color: #00000061 !important;
+}
+
 .antiplagiarism__matched-snippet {
     /*background-color: #fdd5d5;*/
+}
+
+.antiplagiarism__plagiarism-token-tokensKindsOnly {
+    background-color: rgba(255, 255, 205, 0.7);
+}
+
+.antiplagiarism__plagiarism-token-tokensKindsAndValues {
+    background-color: rgba(255, 205, 205, 0.7);
 }

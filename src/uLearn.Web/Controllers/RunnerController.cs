@@ -240,8 +240,12 @@ namespace uLearn.Web.Controllers
 		
 		public async Task ProcessResult(ULearnDb db, UserExerciseSubmission submission, RunningResults result)
 		{
-			/* Sent to antiplagiarism service only accepted submissions */
 			if (result.Verdict != Verdict.Ok)
+				return;
+
+			/* Sent to antiplagiarism service only accepted submissions */
+			var checking = submission.AutomaticChecking;
+			if (!checking.IsRightAnswer)
 				return;
 
 			var parameters = new AddSubmissionParameters

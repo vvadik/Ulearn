@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
 using uLearn.Web.FilterAttributes;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {
@@ -23,6 +24,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly ULearnDb db;
 		private readonly UserSolutionsRepo userSolutionsRepo;
+		private readonly CourseManager courseManager;		
 		private static readonly IAntiPlagiarismClient antiPlagiarismClient;
 
 		static AntiPlagiarismController()
@@ -42,6 +44,7 @@ namespace uLearn.Web.Controllers
 		public AntiPlagiarismController(ULearnDb db, CourseManager courseManager)
 			:this(db, new UserSolutionsRepo(db, courseManager))
 		{
+			this.courseManager = courseManager;
 		}
 		
 		public AntiPlagiarismController()
@@ -104,12 +107,51 @@ namespace uLearn.Web.Controllers
 					)
 				.ToDictionary(s => s.Id);
 			submissions[submissionId] = submission;
+
+			var course = courseManager.FindCourse(courseId);
+			var slide = course?.FindSlideById(submission.SlideId);
 			return View(new AntiPlagiarismDetailsModel
 			{
+				Course = course,
+				Slide = slide,
 				SubmissionId = submissionId,
 				Submissions = submissions,
 				AntiPlagiarismResult = antiPlagiarismsResult,
 			});
+		}
+		
+		public ActionResult SubmissionsPanel(int submissionId, Dictionary<int, double> submissionWeights)
+		{
+			var submission = userSolutionsRepo.FindSubmissionById(submissionId);
+			if (submission == null)
+				return HttpNotFound();
+
+			var courseId = submission.CourseId;
+			var slideId = submission.SlideId;
+			var userId = submission.UserId;
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId);
+			if (slide == null)
+				return HttpNotFound();
+			var submissions = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
+
+			return PartialView("~/Views/Exercise/SubmissionsPanel.cshtml", new ExerciseSubmissionsPanelModel(courseId, slide)
+			{
+				Submissions = submissions,
+				CurrentSubmissionId = submissionId,
+				CanTryAgain = false,
+				GetSubmissionDescription = s => GetSubmissionDescriptionForPanel(submissionWeights.ContainsKey(s.Id) ? (double?) submissionWeights[s.Id] : null),
+				FormUrl = Url.Action("Details", new { courseId }),
+				ShowButtons = false,
+				SelectControlName = "submissionId",
+			});
+		}
+
+		private static string GetSubmissionDescriptionForPanel(double? submissionWeight)
+		{
+			if (!submissionWeight.HasValue)
+				return ", не проверялась на списывание";
+			var weightPercents = (int)(submissionWeight.Value * 100);
+			return $", подозрительность — {weightPercents}%";
 		}
 	}
 
@@ -134,6 +176,10 @@ namespace uLearn.Web.Controllers
 	public class AntiPlagiarismDetailsModel
 	{
 		public int SubmissionId { get; set; }
+		
+		public Course Course { get; set; }
+		
+		public Slide Slide { get; set; }
 		
 		public GetAuthorPlagiarismsResult AntiPlagiarismResult { get; set; }
 		

@@ -1914,7 +1914,7 @@ h1 .copy-group-link {
 	margin-bottom: 8px;
 }
 
-.exercise__submissions-panel .inline-select {
+.exercise__submissions-panel .inline-select.with-buttons {
 	margin: 0 10px;
 }
 

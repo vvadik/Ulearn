@@ -18,6 +18,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<Dictionary<int, SnippetStatistics>> GetSnippetsStatisticsAsync(int clientId, Guid taskId, IEnumerable<int> snippetsIds);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId, Expression<Func<SnippetOccurence, bool>> filterFunction);
+		Task RemoveSnippetsOccurencesForTaskAsync(Guid taskId);
 	}
 
 	public class SnippetsRepo : ISnippetsRepo
@@ -144,6 +145,13 @@ namespace AntiPlagiarism.Web.Database.Repos
 		public Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId, Expression<Func<SnippetOccurence, bool>> filterFunction)
 		{
 			return db.SnippetsOccurences.Include(o => o.Submission).Where(o => o.SnippetId == snippetId).Where(filterFunction).ToListAsync();
+		}
+
+		public async Task RemoveSnippetsOccurencesForTaskAsync(Guid taskId)
+		{
+			db.SnippetsOccurences.RemoveRange(
+				await db.SnippetsOccurences.Include(o => o.Submission).Where(o => o.Submission.TaskId == taskId).ToListAsync()
+			);
 		}
 
 		public async Task<List<Snippet>> GetSnippetsForSubmission(Submission submission, int maxCount)

@@ -18,6 +18,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<List<Submission>> GetLastSubmissionsByAuthorsForTaskAsync(Guid taskId, IEnumerable<Guid> authorsIds);
 		Task<List<Submission>> GetSubmissionsByAuthorAndTaskAsync(Guid authorId, Guid taskId, int count);
 		Task<int> GetAuthorsCountAsync(Guid taskId);
+		Task<List<Submission>> GetSubmissionsByTaskAsync(Guid taskId);
 	}
 
 	public class SubmissionsRepo : ISubmissionsRepo
@@ -95,6 +96,11 @@ namespace AntiPlagiarism.Web.Database.Repos
 		public Task<int> GetAuthorsCountAsync(Guid taskId)
 		{
 			return db.Submissions.Where(s => s.TaskId == taskId).Select(s => s.AuthorId).Distinct().CountAsync();
+		}
+
+		public Task<List<Submission>> GetSubmissionsByTaskAsync(Guid taskId)
+		{
+			return db.Submissions.Include(s => s.Program).Where(s => s.TaskId == taskId).ToListAsync();
 		}
 	}
 }

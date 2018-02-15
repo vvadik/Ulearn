@@ -11,6 +11,7 @@ using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
 using Serilog;
 
@@ -95,6 +96,26 @@ namespace AntiPlagiarism.Web.Controllers
 		{
 			var codeUnits = codeUnitsExtractor.Extract(code);
 			return codeUnits.Select(u => u.Tokens.Count).Sum();
+		}
+
+		[HttpPost(Api.Urls.RebuildSnippetsForTask)]
+		public async Task<IActionResult> RebuildSnippetsForTask(RebuildSnippetsForTaskParameters parameters)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			await snippetsRepo.RemoveSnippetsOccurencesForTaskAsync(parameters.TaskId);
+			var submissions = await submissionsRepo.GetSubmissionsByTaskAsync(parameters.TaskId);
+			foreach (var submission in submissions)
+			{
+				await ExtractSnippetsFromSubmissionAsync(submission);
+			}
+			await CalculateTaskStatisticsParametersAsync(parameters.TaskId);
+
+			return Json(new RebuildSnippetsForTaskResult
+			{
+				SubmissionsIds = submissions.Select(s => s.Id).ToList(),
+			});
 		}
 
 		[HttpGet(Api.Urls.GetSubmissionPlagiarisms)]

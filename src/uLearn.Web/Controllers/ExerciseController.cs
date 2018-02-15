@@ -12,6 +12,7 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Elmah;
+using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
 using Serilog;
 using Serilog.Events;
@@ -476,6 +477,8 @@ namespace uLearn.Web.Controllers
 			Submissions = new List<UserExerciseSubmission>();
 			CurrentSubmissionId = null;
 			CanTryAgain = true;
+			ShowButtons = true;
+			SelectControlName = "version";
 		}
 
 		public string CourseId { get; set; }
@@ -483,6 +486,16 @@ namespace uLearn.Web.Controllers
 		public List<UserExerciseSubmission> Submissions { get; set; }
 		public int? CurrentSubmissionId { get; set; }
 		public bool CanTryAgain { get; set; }
+		public bool ShowButtons { get; set; }
+		public string SelectControlName { get; set; }
+
+		[CanBeNull]
+		public Func<UserExerciseSubmission, string> GetSubmissionDescription { get; set; }
+		
+		/* By default it's Url.RouteUrl("Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url }) */
+		[CanBeNull]
+		public string FormUrl { get; set; }
+
 	}
 
 	public class ExerciseControlsModel
