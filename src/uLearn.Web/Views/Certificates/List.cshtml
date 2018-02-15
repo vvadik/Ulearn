@@ -61,7 +61,7 @@
 		<div>
             @certificate.Instructor.VisibleName
             выдал@(certificate.Instructor.Gender.ChooseEnding()) сертификат
-            <span class="text-muted" title="@certificate.Timestamp.ToDatePrettyString()">@certificate.Timestamp.ToLongDateString()</span>
+            <span class="text-muted" title="@certificate.Timestamp.ToPrettyString()">@certificate.Timestamp.ToLongDateString()</span>
 		</div>
 		certificateIndex++;
 	}
