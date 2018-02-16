@@ -229,9 +229,14 @@ namespace uLearn.Web.Controllers
 	{
 		private static readonly IAntiPlagiarismClient antiPlagiarismClient;
 		private static readonly ILog log = LogManager.GetLogger(typeof(AntiPlagiarismResultObserver));
+		private static readonly bool isEnabled;
 
 		static AntiPlagiarismResultObserver()
 		{
+			isEnabled = Convert.ToBoolean(WebConfigurationManager.AppSettings["ulearn.antiplagiarism.enabled"] ?? "false");
+			if (!isEnabled)
+				return;
+			
 			var serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
 			var antiPlagiarismEndpointUrl = WebConfigurationManager.AppSettings["ulearn.antiplagiarism.endpoint"];
 			var antiPlagiarismToken = WebConfigurationManager.AppSettings["ulearn.antiplagiarism.token"];
@@ -240,6 +245,9 @@ namespace uLearn.Web.Controllers
 		
 		public async Task ProcessResult(ULearnDb db, UserExerciseSubmission submission, RunningResults result)
 		{
+			if (!isEnabled)
+				return;
+			
 			if (result.Verdict != Verdict.Ok)
 				return;
 
