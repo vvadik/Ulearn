@@ -85,17 +85,7 @@ namespace Database.DataContexts
 
 			db.UserExerciseSubmissions.Add(submission);
 
-			try
-			{
-				await db.SaveChangesAsync();
-			}
-			catch (DbEntityValidationException e)
-			{
-				log.Error(e);
-				throw new Exception(
-					string.Join("\r\n",
-						e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
-			}
+			await db.SaveChangesAsync();
 
 			return submission;
 		}
@@ -111,6 +101,22 @@ namespace Database.DataContexts
 
 			db.UserExerciseSubmissions.Remove(submission);
 			await db.SaveChangesAsync();
+		}
+
+		public async Task SetAntiPlagiarismSubmissionId(UserExerciseSubmission submission, int antiPlagiarismSubmissionId)
+		{
+			submission.AntiPlagiarismSubmissionId = antiPlagiarismSubmissionId;
+			await db.SaveChangesAsync();
+		}
+
+		public UserExerciseSubmission FindSubmissionByAntiPlagiarismSubmissionId(int antiPlagiarismSubmissionId)
+		{
+			return db.UserExerciseSubmissions.FirstOrDefault(s => s.AntiPlagiarismSubmissionId == antiPlagiarismSubmissionId);
+		}
+
+		public List<UserExerciseSubmission> GetSubmissionsByAntiPlagiarismSubmissionsIds(IEnumerable<int> antiPlagiarismSubmissionsIds)
+		{
+			return db.UserExerciseSubmissions.Where(s => s.AntiPlagiarismSubmissionId.HasValue && antiPlagiarismSubmissionsIds.Contains(s.AntiPlagiarismSubmissionId.Value)).ToList();
 		}
 
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
