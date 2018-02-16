@@ -84,7 +84,7 @@ namespace AntiPlagiarism.Web.Controllers
 				);
 
 			await ExtractSnippetsFromSubmissionAsync(submission);
-			await CalculateTaskStatisticsParametersAsync(submission.TaskId);
+			await CalculateTaskStatisticsParametersAsync(client.Id, submission.TaskId);
 			
 			return Json(new AddSubmissionResult
 			{
@@ -105,12 +105,12 @@ namespace AntiPlagiarism.Web.Controllers
 				return BadRequest(ModelState);
 
 			await snippetsRepo.RemoveSnippetsOccurencesForTaskAsync(parameters.TaskId);
-			var submissions = await submissionsRepo.GetSubmissionsByTaskAsync(parameters.TaskId);
+			var submissions = await submissionsRepo.GetSubmissionsByTaskAsync(client.Id, parameters.TaskId);
 			foreach (var submission in submissions)
 			{
 				await ExtractSnippetsFromSubmissionAsync(submission);
 			}
-			await CalculateTaskStatisticsParametersAsync(parameters.TaskId);
+			await CalculateTaskStatisticsParametersAsync(client.Id, parameters.TaskId);
 
 			return Json(new RebuildSnippetsForTaskResult
 			{
@@ -160,7 +160,7 @@ namespace AntiPlagiarism.Web.Controllers
 			if (suspicionLevels == null)
 				return Json(ApiError.Create("Not enough statistics for defining suspicion levels"));
 
-			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTaskAsync(parameters.AuthorId, parameters.TaskId, parameters.LastSubmissionsCount);			
+			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTaskAsync(client.Id, parameters.AuthorId, parameters.TaskId, parameters.LastSubmissionsCount);			
 			var result = new GetAuthorPlagiarismsResult
 			{
 				SuspicionLevels = suspicionLevels,
@@ -208,10 +208,10 @@ namespace AntiPlagiarism.Web.Controllers
 			}
 		}
 		
-		public async Task CalculateTaskStatisticsParametersAsync(Guid taskId)
+		public async Task CalculateTaskStatisticsParametersAsync(int clientId, Guid taskId)
 		{
-			var lastAuthorsIds = await submissionsRepo.GetLastAuthorsByTaskAsync(taskId, configuration.StatisticsAnalyzing.CountOfLastAuthorsForCalculatingMeanAndDeviation);
-			var lastSubmissions = await submissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(taskId, lastAuthorsIds);
+			var lastAuthorsIds = await submissionsRepo.GetLastAuthorsByTaskAsync(clientId, taskId, configuration.StatisticsAnalyzing.CountOfLastAuthorsForCalculatingMeanAndDeviation);
+			var lastSubmissions = await submissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(clientId, taskId, lastAuthorsIds);
 
 			var statisticsParameters = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions);
 			statisticsParameters.TaskId = taskId;

@@ -81,7 +81,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var maxSnippetsCount = configuration.PlagiarismDetector.CountOfColdestSnippetsUsedToSearch;
 			var snippetsOccurences = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission, maxSnippetsCount);
 			var snippetsStatistics = await snippetsRepo.GetSnippetsStatisticsAsync(submission.ClientId, submission.TaskId, snippetsOccurences.Select(o => o.SnippetId));
-			var authorsCount = await submissionsRepo.GetAuthorsCountAsync(submission.TaskId);
+			var authorsCount = await submissionsRepo.GetAuthorsCountAsync(submission.ClientId, submission.TaskId);
 			var matchedSnippets = new DefaultDictionary<int, List<MatchedSnippet>>();
 			foreach (var snippetOccurence in snippetsOccurences)
 			{
