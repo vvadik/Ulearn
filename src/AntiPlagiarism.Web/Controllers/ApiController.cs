@@ -11,7 +11,6 @@ using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
 using Serilog;
 
@@ -84,12 +83,32 @@ namespace AntiPlagiarism.Web.Controllers
 				);
 
 			await ExtractSnippetsFromSubmissionAsync(submission);
-			await CalculateTaskStatisticsParametersAsync(client.Id, submission.TaskId);
+			if (await NeedToRecalculateTaskStatistics(client.Id, submission.TaskId))
+				await CalculateTaskStatisticsParametersAsync(client.Id, submission.TaskId);
 			
 			return Json(new AddSubmissionResult
 			{
 				SubmissionId = submission.Id,
 			});
+		}
+
+		/* Определяет, пора ли пересчитывать параметры Mean и Deviation для заданной задачи.
+		   В конфигурации для этого есть специальный параметр configuration.StatisticsAnalyzing.RecalculateStatisticsAfterSubmisionsCount.
+		   Если он равен, например, 1000, то параметры будут пересчитываться после каждого тысячного решения по этой задаче.
+		   Но если решений пока меньше 1000, то параметры будут пересчитываться после 1-го, 2-го, 4-го, 8-го, 16-го, 32-го решения и так далее.
+		 */
+		private async Task<bool> NeedToRecalculateTaskStatistics(int clientId, Guid taskId)
+		{
+			var submissionsCount = await submissionsRepo.GetSubmissionsCountAsync(clientId, taskId);
+			var oldSubmissionsCount = (await tasksRepo.FindTaskStatisticsParametersAsync(taskId))?.SubmissionsCount ?? 0;
+			var recalculateStatisticsAfterSubmisionsCount = configuration.StatisticsAnalyzing.RecalculateStatisticsAfterSubmisionsCount;
+			logger.Information($"Определяю, надо ли пересчитать статистические параметры задачи (TaskStatisticsParameters, параметры Mean и Deviation), задача {taskId}. " +
+								$"Старое количество решений {oldSubmissionsCount}, новое {submissionsCount}, параметр recalculateStatisticsAfterSubmisionsCount={recalculateStatisticsAfterSubmisionsCount}.");
+
+			if (submissionsCount < recalculateStatisticsAfterSubmisionsCount)
+				return submissionsCount >= 2 * oldSubmissionsCount;
+
+			return submissionsCount - oldSubmissionsCount >= recalculateStatisticsAfterSubmisionsCount;
 		}
 
 		private int GetTokensCount(string code)
@@ -210,11 +229,15 @@ namespace AntiPlagiarism.Web.Controllers
 		
 		public async Task CalculateTaskStatisticsParametersAsync(int clientId, Guid taskId)
 		{
+			logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}");
 			var lastAuthorsIds = await submissionsRepo.GetLastAuthorsByTaskAsync(clientId, taskId, configuration.StatisticsAnalyzing.CountOfLastAuthorsForCalculatingMeanAndDeviation);
 			var lastSubmissions = await submissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(clientId, taskId, lastAuthorsIds);
-
+			var currentSubmissionsCount = await submissionsRepo.GetSubmissionsCountAsync(clientId, taskId);
+			
 			var statisticsParameters = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions);
+			logger.Information($"Новые статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}: Mean={statisticsParameters.Mean}, Deviation={statisticsParameters.Deviation}");
 			statisticsParameters.TaskId = taskId;
+			statisticsParameters.SubmissionsCount = currentSubmissionsCount;
 			await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters);
 		}
 		

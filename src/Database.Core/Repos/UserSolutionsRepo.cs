@@ -362,7 +362,7 @@ namespace Database.Repos
 			foreach (var checking in checkings)
 			{
 				log.Info($"Обновляю статус автоматической проверки #{checking.Id}: {checking.Status}");
-				db.AutomaticExerciseCheckings.AddOrUpdate(checking, c => c.Id == checking.Id);
+				db.AddOrUpdate(checking, c => c.Id == checking.Id);
 				await UpdateIsRightAnswerForSubmission(checking);
 			}
 
