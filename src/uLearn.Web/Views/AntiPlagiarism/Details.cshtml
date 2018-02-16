@@ -49,6 +49,10 @@
 	    {
 		    foreach (var plagiarism in researchedSubmission.Plagiarisms.OrderByDescending(p => p.Weight))
 		    {
+			    if (!submissionsByAntiPlagiarismIds.ContainsKey(plagiarism.SubmissionInfo.Id))
+			    {
+				    continue;
+			    }
 			    var plagiarismSubmission = submissionsByAntiPlagiarismIds[plagiarism.SubmissionInfo.Id];
 			    <div class="antiplagiarism row">
                     <div class="col-xs-6">
