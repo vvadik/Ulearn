@@ -122,11 +122,11 @@ namespace AntiPlagiarism.Web.Database.Repos
 		{
 			var selectedSnippetsStatistics = db.SnippetsStatistics.Where(s => s.TaskId == submission.TaskId && s.ClientId == submission.ClientId);
 			return db.SnippetsOccurences.Include(o => o.Snippet)
-				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => Tuple.Create(occurence, statistics))
-				.Where(o => o.Item1.SubmissionId == submission.Id)
-				.OrderBy(o => o.Item2.AuthorsCount)
+				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
+				.Where(o => o.occurence.SubmissionId == submission.Id)
+				.OrderBy(o => o.statistics.AuthorsCount)
 				.Take(maxCount)
-				.Select(o => o.Item1)
+				.Select(o => o.occurence)
 				.ToListAsync();
 		}
 
