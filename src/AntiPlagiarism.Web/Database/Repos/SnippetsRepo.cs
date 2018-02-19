@@ -167,10 +167,33 @@ namespace AntiPlagiarism.Web.Database.Repos
 				.Where(o => o.occurence.SubmissionId == submission.Id)
 				.OrderBy(o => o.statistics.AuthorsCount)
 				.Take(maxCount)
-				.Select(o => o.occurence)
 				.ToList();
 			logger.Debug("Тест 6 закончен");
 			logger.Debug($"Результат теста 6: {string.Join(", ", list6)}");
+			
+			logger.Debug("Тест 7");
+			var list7 = db.SnippetsOccurences.Include(o => o.Snippet)
+				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
+				.Where(o => o.occurence.SubmissionId == submission.Id)
+				.OrderBy(o => o.statistics.AuthorsCount)
+				.Take(maxCount)
+				.ToList()
+				.Select(o => o?.occurence)
+				.ToList();
+			logger.Debug("Тест 7 закончен");
+			logger.Debug($"Результат теста 7: {string.Join(", ", list7)}");
+			
+			logger.Debug("Тест 8");
+			var list8 = db.SnippetsOccurences.Include(o => o.Snippet)
+				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
+				.Where(o => o.occurence.SubmissionId == submission.Id)
+				.OrderBy(o => o.statistics.AuthorsCount)
+				.Take(maxCount)
+				.ToList()
+				.Select(o => o.occurence)
+				.ToList();
+			logger.Debug("Тест 8 закончен");
+			logger.Debug($"Результат теста 8: {string.Join(", ", list8)}");
 		}
 		
 		public async Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount)
