@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
@@ -27,6 +28,11 @@ namespace AntiPlagiarism.Web
                 .ConfigureHost((context, hostConfigurator) =>
                 {
                     var loggerConfiguration = new LoggerConfiguration().MinimumLevel.Debug();
+					
+					if (string.Equals(VostokHostingEnvironment.Current.Environment, VostokEnvironmentNames.Production, StringComparison.InvariantCultureIgnoreCase) ||
+						string.Equals(VostokHostingEnvironment.Current.Environment, VostokEnvironmentNames.Staging, StringComparison.InvariantCultureIgnoreCase))
+						loggerConfiguration.MinimumLevel.Information();
+					
                     if (context.Configuration.GetSection("hostLog").GetValue<bool>("console"))
                     {
                         loggerConfiguration = loggerConfiguration
