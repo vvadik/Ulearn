@@ -29,10 +29,6 @@ namespace AntiPlagiarism.Web
                 {
                     var loggerConfiguration = new LoggerConfiguration().MinimumLevel.Debug();
 					
-					if (string.Equals(VostokHostingEnvironment.Current.Environment, VostokEnvironmentNames.Production, StringComparison.InvariantCultureIgnoreCase) ||
-						string.Equals(VostokHostingEnvironment.Current.Environment, VostokEnvironmentNames.Staging, StringComparison.InvariantCultureIgnoreCase))
-						loggerConfiguration.MinimumLevel.Information();
-					
                     if (context.Configuration.GetSection("hostLog").GetValue<bool>("console"))
                     {
                         loggerConfiguration = loggerConfiguration
@@ -40,9 +36,17 @@ namespace AntiPlagiarism.Web
                     }
                     var pathFormat = context.Configuration.GetSection("hostLog")["pathFormat"];
                     if (!string.IsNullOrEmpty(pathFormat))
-                    {
+					{
+						var minimumLevelString = context.Configuration.GetSection("hostLog").GetValue<string>("minimumLevel", "debug");
+						if (!Enum.TryParse(minimumLevelString, true, out LogEventLevel minimumLevel) || !Enum.IsDefined(typeof(LogEventLevel), minimumLevel))
+							minimumLevel = LogEventLevel.Debug;
+						
                         loggerConfiguration = loggerConfiguration
-                            .WriteTo.RollingFile(pathFormat, outputTemplate: "{Timestamp:HH:mm:ss.fff} {Level:u3} [{Thread}] {Message:l}{NewLine}{Exception}");
+                            .WriteTo.RollingFile(
+								pathFormat,
+								outputTemplate: "{Timestamp:HH:mm:ss.fff} {Level:u3} [{Thread}] {Message:l}{NewLine}{Exception}",
+								restrictedToMinimumLevel: minimumLevel  
+								);
                     }
                     var hostLog = new SerilogLog(loggerConfiguration.CreateLogger());
                     hostConfigurator.SetHostLog(hostLog);
