@@ -74,7 +74,7 @@ namespace AntiPlagiarism.Web.Controllers
 			);
 
 			logger.Information(
-				"Добавляю новое решение {submissionId} по задаче {taskId}, автор {authorId}, язык {language}, доп. информация {additionalInfo}",
+				"Добавлено новое решение {submissionId} по задаче {taskId}, автор {authorId}, язык {language}, доп. информация {additionalInfo}",
 				submission.Id,
 				parameters.TaskId,
 				parameters.AuthorId,
