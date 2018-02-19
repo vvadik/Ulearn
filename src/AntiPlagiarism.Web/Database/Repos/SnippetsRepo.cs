@@ -120,94 +120,18 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 			return snippet;
 		}
-
-		private async Task SomeTests(Submission submission, int maxCount)
-		{
-			logger.Debug("Запускаю тесты, чтобы найти косяк");
-			
-			logger.Debug("Тест 1");
-			var list1 = db.SnippetsStatistics.Where(s => s.TaskId == submission.TaskId && s.ClientId == submission.ClientId).ToList();
-			logger.Debug("Тест 1 закончен");
-			logger.Debug($"Результат теста 1: {string.Join(", ", list1)}");
-			
-			logger.Debug("Тест 2");
-			var list2 = await db.SnippetsStatistics.Where(s => s.TaskId == submission.TaskId && s.ClientId == submission.ClientId).ToListAsync();
-			logger.Debug("Тест 2 закончен");
-			logger.Debug($"Результат теста 2: {string.Join(", ", list2)}");
-			
-			var selectedSnippetsStatistics = db.SnippetsStatistics.Where(s => s.TaskId == submission.TaskId && s.ClientId == submission.ClientId);
-			
-			logger.Debug("Тест 3");
-			var list3 = db.SnippetsOccurences.Include(o => o.Snippet)
-				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
-				.ToList();
-			logger.Debug("Тест 3 закончен");
-			logger.Debug($"Результат теста 3: {string.Join(", ", list3)}");
-
-			logger.Debug("Тест 4");
-			var list4 = db.SnippetsOccurences.Include(o => o.Snippet)
-				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
-				.Where(o => o.occurence.SubmissionId == submission.Id)
-				.ToList();
-			logger.Debug("Тест 4 закончен");
-			logger.Debug($"Результат теста 4: {string.Join(", ", list4)}");			
-			
-			logger.Debug("Тест 5");
-			var list5 = db.SnippetsOccurences.Include(o => o.Snippet)
-				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
-				.Where(o => o.occurence.SubmissionId == submission.Id)
-				.OrderBy(o => o.statistics.AuthorsCount)
-				.ToList();
-			logger.Debug("Тест 5 закончен");
-			logger.Debug($"Результат теста 5: {string.Join(", ", list5)}");
-			
-			logger.Debug("Тест 6");
-			var list6 = db.SnippetsOccurences.Include(o => o.Snippet)
-				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
-				.Where(o => o.occurence.SubmissionId == submission.Id)
-				.OrderBy(o => o.statistics.AuthorsCount)
-				.Take(maxCount)
-				.ToList();
-			logger.Debug("Тест 6 закончен");
-			logger.Debug($"Результат теста 6: {string.Join(", ", list6)}");
-			
-			logger.Debug("Тест 7");
-			var list7 = db.SnippetsOccurences.Include(o => o.Snippet)
-				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
-				.Where(o => o.occurence.SubmissionId == submission.Id)
-				.OrderBy(o => o.statistics.AuthorsCount)
-				.Take(maxCount)
-				.ToList()
-				.Select(o => o?.occurence)
-				.ToList();
-			logger.Debug("Тест 7 закончен");
-			logger.Debug($"Результат теста 7: {string.Join(", ", list7)}");
-			
-			logger.Debug("Тест 8");
-			var list8 = db.SnippetsOccurences.Include(o => o.Snippet)
-				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
-				.Where(o => o.occurence.SubmissionId == submission.Id)
-				.OrderBy(o => o.statistics.AuthorsCount)
-				.Take(maxCount)
-				.ToList()
-				.Select(o => o.occurence)
-				.ToList();
-			logger.Debug("Тест 8 закончен");
-			logger.Debug($"Результат теста 8: {string.Join(", ", list8)}");
-		}
 		
 		public async Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount)
 		{
-			await SomeTests(submission, maxCount);
-			
 			var selectedSnippetsStatistics = db.SnippetsStatistics.Where(s => s.TaskId == submission.TaskId && s.ClientId == submission.ClientId);
-			return await db.SnippetsOccurences.Include(o => o.Snippet)
+			return (await db.SnippetsOccurences.Include(o => o.Snippet)
 				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
 				.Where(o => o.occurence.SubmissionId == submission.Id)
 				.OrderBy(o => o.statistics.AuthorsCount)
 				.Take(maxCount)
+				.ToListAsync())
 				.Select(o => o.occurence)
-				.ToListAsync();
+				.ToList();
 		}
 
 		public Task<Dictionary<int, SnippetStatistics>> GetSnippetsStatisticsAsync(int clientId, Guid taskId, IEnumerable<int> snippetsIds)
