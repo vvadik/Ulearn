@@ -14,7 +14,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<Snippet> AddSnippetAsync(int tokensCount, SnippetType type, int hash);
 		Task<bool> IsSnippetExistsAsync(int tokensCount, SnippetType type, int hash);
 		Task<SnippetOccurence> AddSnippetOccurenceAsync(Submission submission, Snippet snippet, int firstTokenIndex);
-		List<SnippetOccurence> GetSnippetsOccurencesForSubmission(Submission submission, int maxCount);
+		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount);
 		Task<Dictionary<int, SnippetStatistics>> GetSnippetsStatisticsAsync(int clientId, Guid taskId, IEnumerable<int> snippetsIds);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId, Expression<Func<SnippetOccurence, bool>> filterFunction);
@@ -118,18 +118,16 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return snippet;
 		}
 
-		/* This method is not asynchronus because EF Core throws internal Null Reference Exception
-		   while iterating results of this query */
-		public List<SnippetOccurence> GetSnippetsOccurencesForSubmission(Submission submission, int maxCount)
+		public async Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount)
 		{
 			var selectedSnippetsStatistics = db.SnippetsStatistics.Where(s => s.TaskId == submission.TaskId && s.ClientId == submission.ClientId);
-			return db.SnippetsOccurences.Include(o => o.Snippet)
+			return await db.SnippetsOccurences.Include(o => o.Snippet)
 				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
 				.Where(o => o.occurence.SubmissionId == submission.Id)
 				.OrderBy(o => o.statistics.AuthorsCount)
 				.Take(maxCount)
 				.Select(o => o.occurence)
-				.ToList();
+				.ToListAsync();
 		}
 
 		public Task<Dictionary<int, SnippetStatistics>> GetSnippetsStatisticsAsync(int clientId, Guid taskId, IEnumerable<int> snippetsIds)
@@ -156,9 +154,9 @@ namespace AntiPlagiarism.Web.Database.Repos
 			);
 		}
 
-		public List<Snippet> GetSnippetsForSubmission(Submission submission, int maxCount)
+		public async Task<List<Snippet>> GetSnippetsForSubmission(Submission submission, int maxCount)
 		{
-			return (GetSnippetsOccurencesForSubmission(submission, maxCount)).Select(o => o.Snippet).ToList();
+			return (await GetSnippetsOccurencesForSubmissionAsync(submission, maxCount)).Select(o => o.Snippet).ToList();
 		}
 	}
 }
