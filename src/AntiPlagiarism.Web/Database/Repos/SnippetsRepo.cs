@@ -118,10 +118,10 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return snippet;
 		}
 
-		public Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount)
+		public async Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount)
 		{
 			var selectedSnippetsStatistics = db.SnippetsStatistics.Where(s => s.TaskId == submission.TaskId && s.ClientId == submission.ClientId);
-			return db.SnippetsOccurences.Include(o => o.Snippet)
+			return await db.SnippetsOccurences.Include(o => o.Snippet)
 				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
 				.Where(o => o.occurence.SubmissionId == submission.Id)
 				.OrderBy(o => o.statistics.AuthorsCount)
