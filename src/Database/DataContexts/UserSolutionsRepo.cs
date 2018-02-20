@@ -16,6 +16,7 @@ using EntityFramework.Functions;
 using log4net;
 using RunCsJob.Api;
 using uLearn;
+using uLearn.Model.Blocks;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
@@ -422,9 +423,8 @@ namespace Database.DataContexts
 
 			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
 			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)courseManager.GetCourse(checking.CourseId).GetSlideById(checking.SlideId);
-
-			var expectedOutput = exerciseSlide?.Exercise.ExpectedOutput.NormalizeEoln();
-			var isRightAnswer = result.Verdict == Verdict.Ok && output.Equals(expectedOutput);
+			
+			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
 			var score = isRightAnswer ? exerciseSlide.Exercise.CorrectnessScore : 0;
 
 			/* For skipped slides score is always 0 */
@@ -450,6 +450,23 @@ namespace Database.DataContexts
 			};
 
 			return newChecking;
+		}
+
+		private bool IsRightAnswer(RunningResults result, string output, ExerciseBlock exerciseBlock)
+		{
+			if (result.Verdict != Verdict.Ok )
+				return false;
+
+			if (exerciseBlock.ExerciseType == ExerciseType.CheckExitCode)
+				return true;
+
+			if (exerciseBlock.ExerciseType == ExerciseType.CheckOutput)
+			{
+				var expectedOutput = exerciseBlock?.ExpectedOutput.NormalizeEoln();
+				return output.Equals(expectedOutput);
+			}
+
+			throw new InvalidOperationException($"Unknown exercise type for checking: {exerciseBlock.ExerciseType}");
 		}
 
 		public async Task RunSubmission(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked)
