@@ -21,7 +21,11 @@
 .quiz-block-input {
 }
 
-.load-content {
+.quiz-block-input label {
+	font-weight: normal;
+}
+
+.quiz-block-input .load-content {
 }
 
 .visible-on-parent-hover {
