@@ -46,9 +46,9 @@
 				{
 					<div>
 						<b>Телеграм:</b>
-						@if (!string.IsNullOrEmpty(Model.User.TelegramChatTitle))
+						@if (!string.IsNullOrEmpty(Model.User.TelegramChatTitle) && Model.User.TelegramChatTitle != "@")
 						{
-							<a href="https://t.me/@(Model.User.TelegramChatTitle.Substring(1))" target="_blank">@Model.User.TelegramChatTitle</a>
+							<a href="https://t.me/@(Model.User.TelegramChatTitle.Substring(1))" target="_blank" title="Откроется в новой вкладке">@Model.User.TelegramChatTitle</a>
 						}
 						else
 						{
