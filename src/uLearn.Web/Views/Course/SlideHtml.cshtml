@@ -364,22 +364,7 @@
 	if (model.QuizState != QuizState.NotPassed && model.QuizModel.AnswersToQuizes[block.Id].FirstOrDefault() != null)
 	{
 		var userAnswers = model.QuizModel.AnswersToQuizes[block.Id].Select(x => x.ItemId).ToList();
-
-		var logger = LogManager.GetLogger("QuizOrderingBlock");
-		logger.InfoFormat("User answers for ordering block in quiz: {0}", string.Join(", ", userAnswers));
-		logger.InfoFormat("Items in ordering block in quiz:");
-		foreach (var item in items)
-		{
-			logger.InfoFormat("  {0} hash={1} text={2}", item.Id, item.GetHash(), item.Text);
-		}
-
 		items = items.OrderBy(item => userAnswers.IndexOf(item.GetHash())).ToArray();
-
-		logger.InfoFormat("I've ordered items as in users answer. Now they are in following order:");
-		foreach (var item in items)
-		{
-			logger.InfoFormat("  {0} hash={1} text={2}", item.Id, item.GetHash(), item.Text);
-		}
 	}
 	<div class="quiz-block-ordering @( context.CanUserFillQuiz ? "" : "not-movable")" id='@( block.Id + "_quizBlock")' @GetGuestOnclick(context.IsGuest)>
 		@if (model.QuizState == QuizState.Total && model.ShowCorrectAnswer)
