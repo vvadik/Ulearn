@@ -181,6 +181,7 @@
   <ItemGroup>
     <Compile Include="AcceptedSolutionInfo.cs" />
     <Compile Include="AnalyticsTableInfo.cs" />
+    <Compile Include="CSharp\ArrayLengthStylePrimitives.cs" />
     <Compile Include="CSharp\ArrayLengthStyleValidator.cs" />
     <Compile Include="CSharp\BaseStyleValidatorWithSemanticModel.cs" />
     <Compile Include="CSharp\ExponentiationPrimitives.cs" />
