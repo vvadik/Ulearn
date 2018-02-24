@@ -22,7 +22,8 @@ namespace uLearn.CSharp
 					|| syntaxNode is ForEachStatementSyntax;
 		}
 
-		public static bool ContainsAssignmentOf(this StatementSyntax statementSyntax, string variableName) // TODO: посмотреть насчёт синтаксической модели и передачи списка узлов
+		public static bool ContainsAssignmentOf(this StatementSyntax statementSyntax, string variableName,
+			SemanticModel semanticModel) // TODO: посмотреть насчёт синтаксической модели и передачи списка узлов
 		{ // TODO: сделать проверку на массивы (не здесь)
 			if (!statementSyntax.IsCycle())
 				return false;
@@ -38,16 +39,32 @@ namespace uLearn.CSharp
 			
 			foreach (var assignment in assignments)
 			{
-				if (assignment.Left.ToString() == variableName)
+				var variable = assignment
+					.GetAllDescendantVariables()
+					.FirstOrDefault();
+				var symbol = semanticModel.GetSymbolInfo(variable).Symbol;
+				if (symbol?.ToString() == variableName)
 					return true;
 			}
 			foreach (var declaration in declarations)
 			{
-				if (declaration.Identifier.Text == variableName)
+				var variable = declaration
+					.GetAllDescendantVariables()
+					.FirstOrDefault();
+				var symbol = semanticModel.GetSymbolInfo(variable).Symbol;
+				if (symbol?.ToString() == variableName)
 					return true;
 			}
 			
-			return false; // TODO
+			return false;
+		}
+
+		public static List<IdentifierNameSyntax> GetAllDescendantVariables(this SyntaxNode node)
+		{
+			return node
+				.DescendantNodes()
+				.OfType<IdentifierNameSyntax>()
+				.ToList();
 		}
 	}
 }

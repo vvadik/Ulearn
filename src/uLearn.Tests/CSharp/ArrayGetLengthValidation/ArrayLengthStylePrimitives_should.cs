@@ -129,35 +129,35 @@ public void A()
 			foundCycleNode.Should().Be(cycleNode);
 		}
 		
-		[Test]
-		public void Test()
-		{
-			var code = @"
-using System;
-
-namespace B
-{
-	public class C()
-	{
-		var a = GetSomething();
-		public void A()
-		{
-			foreach(var number in new List<int> {1})
-			{	
-				for (int i = 1; i < 485; i++)
-				{
-					a = GetSomething();
-				}
-			}
-		}
-	}
-}
-";
-			var syntaxTree = CSharpSyntaxTree.ParseText(code);
-			var nodes = syntaxTree.GetRoot().DescendantNodes().ToList();
-			var syntaxNode = nodes.OfType<InvocationExpressionSyntax>().First();
-			var cycleNode = nodes.OfType<ForStatementSyntax>().First();
-			cycleNode.ContainsAssignmentOf("a").Should().Be(true);
-		}
+//		[Test]
+//		public void Test()
+//		{
+//			var code = @"
+//using System;
+//
+//namespace B
+//{
+//	public class C()
+//	{
+//		var a = GetSomething();
+//		public void A()
+//		{
+//			foreach(var number in new List<int> {1})
+//			{	
+//				for (int i = 1; i < 485; i++)
+//				{
+//					a = GetSomething();
+//				}
+//			}
+//		}
+//	}
+//}
+//";
+//			var syntaxTree = CSharpSyntaxTree.ParseText(code);
+//			var nodes = syntaxTree.GetRoot().DescendantNodes().ToList();
+//			var syntaxNode = nodes.OfType<InvocationExpressionSyntax>().First();
+//			var cycleNode = nodes.OfType<ForStatementSyntax>().First();
+//			cycleNode.ContainsAssignmentOf("a").Should().Be(true);
+//		}
 	}
 }

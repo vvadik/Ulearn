@@ -34,9 +34,16 @@ namespace uLearn.CSharp
 					|| !argumentExpression.IsKind(SyntaxKind.NumericLiteralExpression))
 					continue;
 				
-				var variable = methodInvocation.Expression;
-				if (!cycleStatement.ContainsAssignmentOf(variable.ToString()))
-					yield return Report(methodInvocation, "Неэффективный код. GetLength вызывается в цикле для константы и возвращает каждый раз одно и то же. Лучше вынести результат выполнения метода в переменную за цикл.");
+				var variable = methodInvocation
+					.GetAllDescendantVariables()
+					.FirstOrDefault();
+
+				if (variable != null)
+				{
+					var variableSymbol = ModelExtensions.GetSymbolInfo(semanticModel, variable).Symbol;
+					if (!cycleStatement.ContainsAssignmentOf(variableSymbol.ToString(), semanticModel))
+						yield return Report(methodInvocation, "Неэффективный код. GetLength вызывается в цикле для константы и возвращает каждый раз одно и то же. Лучше вынести результат выполнения метода в переменную за цикл.");
+				}
 			}
 		}
 	}

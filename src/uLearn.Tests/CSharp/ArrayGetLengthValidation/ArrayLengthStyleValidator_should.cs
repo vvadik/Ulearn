@@ -127,6 +127,7 @@ namespace uLearn.CSharp.ArrayGetLengthValidation.TestData.Incorrect
 			{
 				count = arr.GetLength(1);  
 				Console.WriteLine(count);
+				arr = new int[2, 5];
 			} while (count < 2);
 		}
 	}
