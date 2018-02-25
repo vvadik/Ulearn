@@ -8,8 +8,10 @@ namespace uLearn.CSharp.ArrayGetLengthValidation.TestData.Incorrect
 		public void GetLengthInBody()
 		{
 			var arr = new int[2, 2];
-			foreach(var number in Enumerable.Range(0, 5))
-				Console.WriteLine(arr.GetLength(1));
+			foreach (var number in Enumerable.Range(0, 5))
+			{
+				var a = arr.GetLength(1);
+			}
 		}
 	}
 }

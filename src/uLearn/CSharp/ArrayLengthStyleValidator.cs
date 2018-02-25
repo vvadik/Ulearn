@@ -23,7 +23,10 @@ namespace uLearn.CSharp
 
 		private IEnumerable<string> InspectMethod<TCycle>(TCycle cycleStatement, SemanticModel semanticModel) where TCycle: StatementSyntax // TODO: вытаскивать все инициализации
 		{
-			var methodInvocations = cycleStatement.DescendantNodes().OfType<InvocationExpressionSyntax>();
+			var methodInvocations = cycleStatement
+				.DescendantNodes()
+				.OfType<InvocationExpressionSyntax>()
+				.ToList();
 
 			foreach (var methodInvocation in methodInvocations)
 			{
@@ -41,7 +44,9 @@ namespace uLearn.CSharp
 				if (variable != null)
 				{
 					var variableSymbol = ModelExtensions.GetSymbolInfo(semanticModel, variable).Symbol;
-					if (!cycleStatement.ContainsAssignmentOf(variableSymbol.ToString(), semanticModel))
+					var variableName = variableSymbol.ToString();
+					if (!cycleStatement.ContainsAssignmentOf(variableName, semanticModel)
+						&& !methodInvocations.Any(m => m.HasVariableAsArgument(variableName, semanticModel)))
 						yield return Report(methodInvocation, "Неэффективный код. GetLength вызывается в цикле для константы и возвращает каждый раз одно и то же. Лучше вынести результат выполнения метода в переменную за цикл.");
 				}
 			}

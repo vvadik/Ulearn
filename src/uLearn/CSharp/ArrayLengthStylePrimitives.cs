@@ -63,5 +63,14 @@ namespace uLearn.CSharp
 			var symbol = semanticModel.GetSymbolInfo(node).Symbol;
 			return symbol?.ToString() == variableName;
 		}
+
+		public static bool HasVariableAsArgument(this InvocationExpressionSyntax methodInvocation,
+			string variableName, SemanticModel semanticModel)
+		{
+			var variables = methodInvocation.ArgumentList.GetAllDescendantVariables();
+			return variables
+				.Select(v => semanticModel.GetSymbolInfo(v).Symbol)
+				.Any(s => s?.ToString() == variableName);
+		}
 	}
 }
