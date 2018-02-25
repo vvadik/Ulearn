@@ -42,7 +42,7 @@ namespace uLearn.CSharp
 				&& !IsComment(bracesPair.Open.Parent, openBraceLine + 1))
 				yield return new ReportWithLine
 				{
-					Report = Report(bracesPair.Open, "После открывающей скобки не должно быть лишнего переноса строки"),
+					Report = Report(bracesPair.Open, "РџРѕСЃР»Рµ РѕС‚РєСЂС‹РІР°СЋС‰РµР№ СЃРєРѕР±РєРё РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р»РёС€РЅРµРіРѕ РїРµСЂРµРЅРѕСЃР° СЃС‚СЂРѕРєРё"),
 					Line = openBraceLine
 				};
 
@@ -52,7 +52,7 @@ namespace uLearn.CSharp
 				yield return new ReportWithLine
 				{
 					Report = Report(bracesPair.Close,
-						"Перед закрывающей скобкой не должно быть лишнего переноса строки"),
+						"РџРµСЂРµРґ Р·Р°РєСЂС‹РІР°СЋС‰РµР№ СЃРєРѕР±РєРѕР№ РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р»РёС€РЅРµРіРѕ РїРµСЂРµРЅРѕСЃР° СЃС‚СЂРѕРєРё"),
 					Line = closeBraceLine
 				};
 		}
@@ -68,7 +68,7 @@ namespace uLearn.CSharp
 				return new ReportWithLine
 				{
 					Report = Report(bracesPair.Open,
-						"Между объявлением и открывающей скобкой не должно быть лишнего переноса строки"),
+						"РњРµР¶РґСѓ РѕР±СЉСЏРІР»РµРЅРёРµРј Рё РѕС‚РєСЂС‹РІР°СЋС‰РµР№ СЃРєРѕР±РєРѕР№ РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р»РёС€РЅРµРіРѕ РїРµСЂРµРЅРѕСЃР° СЃС‚СЂРѕРєРё"),
 					Line = openBraceLine
 				};
 			return null;
@@ -87,7 +87,7 @@ namespace uLearn.CSharp
 				{
 					Line = closeBraceLine,
 					Report = Report(bracesPair.Close,
-						"После закрывающей скобки должен быть дополнительный перенос строки")
+						"РџРѕСЃР»Рµ Р·Р°РєСЂС‹РІР°СЋС‰РµР№ СЃРєРѕР±РєРё РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ РїРµСЂРµРЅРѕСЃ СЃС‚СЂРѕРєРё")
 				};
 			return null;
 		}

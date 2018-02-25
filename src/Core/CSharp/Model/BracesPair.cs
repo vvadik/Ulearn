@@ -20,7 +20,7 @@ namespace uLearn.CSharp.Model
 
 		public override string ToString()
 		{
-			return $"строки {Open.GetLine() + 1}, {Close.GetLine() + 1}";
+			return $"СЃС‚СЂРѕРєРё {Open.GetLine() + 1}, {Close.GetLine() + 1}";
 		}
 	}
 }
