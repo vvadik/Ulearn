@@ -5,6 +5,7 @@ using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp.ArrayGetLengthValidation
 {

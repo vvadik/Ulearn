@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace uLearn.CSharp
 {
-	public class ArrayLengthStyleValidator: BaseStyleValidatorWithSemanticModel
+	public class ArrayLengthStyleValidator: BaseStyleValidator
 	{
 		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
@@ -21,18 +21,34 @@ namespace uLearn.CSharp
 				.Concat(errorsInDoWhileCycle);
 		}
 
-		private IEnumerable<string> InspectMethod<TCycle>(TCycle cycleStatement, SemanticModel semanticModel) where TCycle: StatementSyntax
+		private IEnumerable<string> InspectMethod<TCycle>(TCycle cycleStatement, SemanticModel semanticModel) where TCycle: StatementSyntax // TODO: вытаскивать все инициализации
 		{
-			var methodInvocations = cycleStatement.DescendantNodes().OfType<InvocationExpressionSyntax>();
+			var methodInvocations = cycleStatement
+				.DescendantNodes()
+				.OfType<InvocationExpressionSyntax>()
+				.ToList();
 
 			foreach (var methodInvocation in methodInvocations)
 			{
 				var symbol = ModelExtensions.GetSymbolInfo(semanticModel, methodInvocation).Symbol;
 				var argumentExpression = methodInvocation.ArgumentList.Arguments.FirstOrDefault()?.Expression;
-				if (symbol?.ToString() == "System.Array.GetLength(int)" &&
-					argumentExpression != null &&
-					argumentExpression.IsKind(SyntaxKind.NumericLiteralExpression))
-					yield return Report(methodInvocation, "Неэффективный код. GetLength вызывается в цикле для константы и возвращает каждый раз одно и то же. Лучше вынести результат выполнения метода в переменную за цикл.");
+				if (symbol?.ToString() != "System.Array.GetLength(int)"
+					|| argumentExpression == null
+					|| !argumentExpression.IsKind(SyntaxKind.NumericLiteralExpression))
+					continue;
+				
+				var variable = methodInvocation
+					.GetAllDescendantVariables()
+					.FirstOrDefault();
+
+				if (variable != null)
+				{
+					var variableSymbol = ModelExtensions.GetSymbolInfo(semanticModel, variable).Symbol;
+					var variableName = variableSymbol.ToString();
+					if (!cycleStatement.ContainsAssignmentOf(variableName, semanticModel)
+						&& !methodInvocations.Any(m => m.HasVariableAsArgument(variableName, semanticModel)))
+						yield return Report(methodInvocation, "Неэффективный код. GetLength вызывается в цикле для константы и возвращает каждый раз одно и то же. Лучше вынести результат выполнения метода в переменную за цикл.");
+				}
 			}
 		}
 	}

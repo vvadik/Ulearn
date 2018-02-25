@@ -18,7 +18,7 @@ namespace uLearn.CSharp
 			new VerbInMethodNameValidator(),
 			new RedundantIfStyleValidator(),
 			new NamingStyleValidator(),
-			new ExponentiationStyleValidator(),
+			new ExponentiationValidator(),
 			new BoolCompareValidator(),
 			new ArrayLengthStyleValidator(),
 			new IndentsValidator() // Выводит дополнительный текст в конце, поэтому лучше ему быть последним
