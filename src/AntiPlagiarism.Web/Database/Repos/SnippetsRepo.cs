@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AntiPlagiarism.Api.Models;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace AntiPlagiarism.Web.Database.Repos
 {
@@ -24,10 +25,12 @@ namespace AntiPlagiarism.Web.Database.Repos
 	public class SnippetsRepo : ISnippetsRepo
 	{
 		private readonly AntiPlagiarismDb db;
+		private readonly ILogger logger;
 
-		public SnippetsRepo(AntiPlagiarismDb db)
+		public SnippetsRepo(AntiPlagiarismDb db, ILogger logger)
 		{
 			this.db = db;
+			this.logger = logger;
 		}
 
 		public async Task<Snippet> AddSnippetAsync(int tokensCount, SnippetType type, int hash)
@@ -117,17 +120,18 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 			return snippet;
 		}
-
-		public Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount)
+		
+		public async Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount)
 		{
 			var selectedSnippetsStatistics = db.SnippetsStatistics.Where(s => s.TaskId == submission.TaskId && s.ClientId == submission.ClientId);
-			return db.SnippetsOccurences.Include(o => o.Snippet)
+			return (await db.SnippetsOccurences.Include(o => o.Snippet)
 				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
 				.Where(o => o.occurence.SubmissionId == submission.Id)
 				.OrderBy(o => o.statistics.AuthorsCount)
 				.Take(maxCount)
+				.ToListAsync())
 				.Select(o => o.occurence)
-				.ToListAsync();
+				.ToList();
 		}
 
 		public Task<Dictionary<int, SnippetStatistics>> GetSnippetsStatisticsAsync(int clientId, Guid taskId, IEnumerable<int> snippetsIds)

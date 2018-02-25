@@ -69,8 +69,9 @@ namespace uLearn.Web.Controllers
 				if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(15))
 				{
 					if (submissions.Any())
-						log.Info($"Отдаю на проверку решения: [{string.Join(",", submissions.Select(c => c.Id))}]");
-					return submissions.Select(ToRunnerSubmission).ToList();
+						log.Info($"Отдаю на проверку решения: [{string.Join(",", submissions.Select(c => c.Id))}], только сначала соберу их");
+					var builtSubmissions = submissions.Select(ToRunnerSubmission).ToList();
+					return builtSubmissions;
 				}
 				await repo.WaitAnyUnhandledSubmissions(TimeSpan.FromSeconds(10));
 			}
@@ -88,6 +89,8 @@ namespace uLearn.Web.Controllers
 					NeedRun = true
 				};
 			}
+			log.Info($"Собираю для отправки в RunCsJob решение {submission.Id}");
+			
 			var exerciseSlide = courseManager.FindCourse(submission.CourseId)?.FindSlideById(submission.SlideId) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return new FileRunnerSubmission
@@ -98,7 +101,9 @@ namespace uLearn.Web.Controllers
 					NeedRun = true
 				};
 
+			log.Info($"Ожидаю, если курс {submission.CourseId} заблокирован");
 			courseManager.WaitWhileCourseIsLocked(submission.CourseId);
+			log.Info($"Курс {submission.CourseId} разблокирован");
 
 			return exerciseSlide.Exercise.CreateSubmission(
 				submission.Id.ToString(),
