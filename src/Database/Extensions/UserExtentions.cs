@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -13,7 +14,7 @@ namespace Database.Extensions
 	public static class UserExtentions
 	{
 		private const string courseRoleClaimType = "CourseRole";
-
+		
 		public static bool HasAccessFor(this IPrincipal principal, string courseId, CourseRole minAccessLevel)
 		{
 			if (principal.IsSystemAdministrator())
@@ -87,8 +88,32 @@ namespace Database.Extensions
 
 		public static async Task<ClaimsIdentity> GenerateUserIdentityAsync(this ApplicationUser user, UserManager<ApplicationUser> manager)
 		{
-			var userRoles = new UserRolesRepo(new ULearnDb());
+			var userRoles = new UserRolesRepo();
 			return await user.GenerateUserIdentityAsync(manager, userRoles);
+		}
+
+		public static bool HasSystemAccess(this ApplicationUser user, SystemAccessType accessType)
+		{
+			var systemAccessesRepo = new SystemAccessesRepo();
+			return systemAccessesRepo.HasSystemAccess(user.Id, accessType);
+		}
+		
+		public static bool HasSystemAccess(this IPrincipal User, SystemAccessType accessType)
+		{
+			var systemAccessesRepo = new SystemAccessesRepo();
+			return systemAccessesRepo.HasSystemAccess(User.Identity.GetUserId(), accessType);
+		}
+
+		public static bool HasCourseAccess(this ApplicationUser User, string courseId, CourseAccessType accessType)
+		{
+			var coursesRepo = new CoursesRepo();
+			return coursesRepo.HasCourseAccess(User.Id, courseId, accessType);
+		}
+		
+		public static bool HasCourseAccess(this IPrincipal User, string courseId, CourseAccessType accessType)
+		{
+			var coursesRepo = new CoursesRepo();
+			return coursesRepo.HasCourseAccess(User.Identity.GetUserId(), courseId, accessType);
 		}
 	}
 }

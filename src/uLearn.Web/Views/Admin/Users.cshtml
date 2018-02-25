@@ -1,5 +1,5 @@
 ﻿@using Database.Models
-@using uLearn.Extensions
+@using Ulearn.Common.Extensions
 @model Database.UserSearchQueryModel
 
 @{
@@ -16,7 +16,7 @@
 		<a class="label label-info" href="@Url.Action("Users", new { Model.CourseId, courseRole = CourseRole.Instructor })">@CourseRole.Instructor.GetDisplayName()</a> может видеть статистику по успеваемости, проверять работы, отвечать на комментарии.
 	</p>
 	<p>
-		<a class="label label-success" href="@Url.Action("Users", new { Model.CourseId, courseRole = CourseRole.Tester })">@CourseRole.Tester.GetDisplayName()</a> может видеть ещё не опубликованные для всех материалы.
+		<a class="label label-success" href="@Url.Action("Users", new { Model.CourseId, courseRole = CourseRole.Tester })">@CourseRole.Tester.GetDisplayName()</a> может видеть ещё не опубликованные материалы.
 	</p>
 	<p>
 		<a class="label label-default" href="@Url.Action("Users", new { Model.CourseId })">Обычный пользователь</a> может видеть только опубликованные материалы.

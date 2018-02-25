@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Optimization;
 using AspNetBundling;
@@ -35,6 +34,7 @@ namespace uLearn.Web
 				"~/Scripts/jquery.unobtrusive-ajax*",
 				"~/Scripts/notify-custom.min.js",
 				"~/Scripts/jquery.query-object.js",
+				"~/Scripts/jquery.color-2.1.0.min.js",
 				"~/Scripts/jquery.validate.js",
 				"~/Scripts/jquery.validate-vsdoc.js",
 				"~/Scripts/jquery.validate.unobtrusive.js",
@@ -59,6 +59,8 @@ namespace uLearn.Web
 				"~/codemirror/addon/edit/closebrackets.js",
 				"~/codemirror/addon/edit/matchbrackets.js",
 				"~/codemirror/addon/selection/active-line.js",
+				"~/codemirror/addon/selection/mark-selection.js",
+				"~/codemirror/addon/fold/foldcode.js",
 				"~/Scripts/bootstrap.js",
 				"~/Scripts/bootstrap.file-input.js",
 				"~/Scripts/bootstrap-select.min.js",
@@ -95,6 +97,7 @@ namespace uLearn.Web
 				"~/Scripts/stepik.js",
 				"~/Scripts/modals.js",
 				"~/Scripts/connect-checkboxes.js",
+				"~/Scripts/antiplagiarism.js"
 			};
 		}
 
@@ -121,7 +124,8 @@ namespace uLearn.Web
 				"~/Content/likely.css",
 				"~/Content/notifications.css",
 				"~/Content/stepik.css",
-				"~/Content/modals.css"
+				"~/Content/modals.css",
+				"~/Content/antiplagiarism.css"
 			);
 		}
 	}

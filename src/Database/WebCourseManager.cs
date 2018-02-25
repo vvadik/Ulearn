@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
 using Database.DataContexts;
 using log4net;
 using uLearn;
@@ -22,15 +20,6 @@ namespace Database
 		{
 		}
 
-		private static DirectoryInfo GetCoursesDirectory()
-		{
-			var coursesDirectory = ConfigurationManager.AppSettings["ulearn.coursesDirectory"];
-			if (string.IsNullOrEmpty(coursesDirectory))
-				coursesDirectory = Utils.GetAppPath() + @"\..\Courses\";
-
-			return new DirectoryInfo(coursesDirectory);
-		}
-
 		private readonly object @lock = new object();
 
 		public override Course GetCourse(string courseId)
@@ -48,8 +37,7 @@ namespace Database
 
 			lock (@lock)
 			{
-				Guid loadedVersionId;
-				if (loadedCourseVersions.TryGetValue(courseId, out loadedVersionId)
+				if (loadedCourseVersions.TryGetValue(courseId, out var loadedVersionId)
 					&& loadedVersionId != publishedVersion.Id)
 				{
 					log.Info($"Загруженная версия курса {courseId} отличается от актуальной. Обновляю курс.");
@@ -62,8 +50,7 @@ namespace Database
 
 		private bool IsCourseVersionWasUpdatedRecent(string courseId)
 		{
-			DateTime lastFetchTime;
-			if (courseVersionFetchTime.TryGetValue(courseId, out lastFetchTime))
+			if (courseVersionFetchTime.TryGetValue(courseId, out var lastFetchTime))
 				return lastFetchTime > DateTime.Now.Subtract(fetchCourseVersionEvery);
 			return false;
 		}

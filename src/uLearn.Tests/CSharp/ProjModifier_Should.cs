@@ -25,14 +25,14 @@ namespace uLearn.CSharp
 		public void ReplaceLinksWithItems()
 		{
 			var project = CreateTestProject();
-			var copies = ProjModifier.ReplaceLinksWithItemsCopiedToProjectDir(project);
+			var copies = ProjModifier.ReplaceLinksWithItemsAndReturnWhatToCopy(project);
 			copies.Should().HaveCount(1);
 			var writer = new StringWriter();
 			foreach (var fileToCopy in copies)
 			{
 				writer.WriteLine("Copy " + fileToCopy.SourceFile + " to " + fileToCopy.DestinationFile);
 			}
-			project.Save(writer);
+			project.Save(writer);	
 			Approvals.Verify(writer.ToString());
 			project.Save(Path.Combine(project.DirectoryPath, "res.csproj"));
 		}

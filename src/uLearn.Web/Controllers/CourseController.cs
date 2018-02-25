@@ -13,18 +13,18 @@ using Database.Models;
 using Elmah;
 using log4net;
 using LtiLibrary.Owin.Security.Lti;
-using uLearn.Extensions;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
 using uLearn.Web.Models;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {
 	[ULearnAuthorize]
-	public class CourseController : Controller
+	public class CourseController : BaseController
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(CourseController));
 
@@ -97,31 +97,6 @@ namespace uLearn.Web.Controllers
 
 				if (queueItem == null)
 					return HttpNotFound();
-
-				/* If lock time is finished */
-				if (!queueItem.IsLockedBy(User.Identity) && queueItem.HasLastLockedBy(User.Identity))
-					return RedirectToAction(GetAdminQueueActionName(queueItem), "Admin", new
-					{
-						CourseId = courseId,
-						group = string.Join(",", groupsIds),
-						done = queueItem.IsChecked,
-						message = "time_is_over",
-					});
-
-				/* If it's not locked then lock them! */
-				if (!queueItem.IsLocked)
-					return RedirectToAction(GetAdminCheckActionName(queueItem), "Admin", new
-					{
-						CourseId = courseId,
-						group = string.Join(",", groupsIds),
-						id = queueItem.Id,
-						recheck = true
-					});
-
-				if (queueItem.IsLocked && !queueItem.IsLockedBy(User.Identity))
-				{
-					isManualCheckingReadonly = true;
-				}
 			}
 
 			var model = isGuest ?
@@ -302,6 +277,7 @@ namespace uLearn.Web.Controllers
 
 			var visiter = await VisitSlide(course.Id, slide.Id, userId);
 			var maxSlideScore = GetMaxSlideScoreForUser(course, slide, userId);
+			var defaultProhibitFutherReview = groupsRepo.GetDefaultProhibitFutherReviewForUser(course.Id, userId, User);
 
 			var score = Tuple.Create(visiter.Score, maxSlideScore);
 			var model = new CoursePageModel
@@ -311,7 +287,7 @@ namespace uLearn.Web.Controllers
 				CourseTitle = course.Title,
 				Slide = slide,
 				Score = score,
-				BlockRenderContext = CreateRenderContext(course, slide, manualChecking, exerciseSubmissionId, groupsIds, autoplay: autoplay, isManualCheckingReadonly: isManualCheckingReadonly),
+				BlockRenderContext = CreateRenderContext(course, slide, manualChecking, exerciseSubmissionId, groupsIds, autoplay: autoplay, isManualCheckingReadonly: isManualCheckingReadonly, defaultProhibitFutherReview: defaultProhibitFutherReview),
 				ManualChecking = manualChecking,
 				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
 				IsGuest = false
@@ -328,13 +304,9 @@ namespace uLearn.Web.Controllers
 			return maxSlideScore;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide,
-			AbstractManualSlideChecking manualChecking = null,
-			int? exerciseSubmissionId = null,
-			List<string> groupsIds = null,
-			bool isLti = false,
-			bool autoplay = false,
-			bool isManualCheckingReadonly = false)
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide, 
+			AbstractManualSlideChecking manualChecking = null, int? exerciseSubmissionId = null, List<string> groupsIds = null, bool isLti = false,
+			bool autoplay = false, bool isManualCheckingReadonly = false, bool defaultProhibitFutherReview = true)
 		{
 			/* ExerciseController will fill blockDatas later */
 			var blockData = slide.Blocks.Select(b => (dynamic)null).ToArray();
@@ -350,7 +322,8 @@ namespace uLearn.Web.Controllers
 				groupsIds,
 				isLti,
 				autoplay,
-				isManualCheckingReadonly
+				isManualCheckingReadonly,
+				defaultProhibitFutherReview
 			)
 			{
 				VersionId = exerciseSubmissionId

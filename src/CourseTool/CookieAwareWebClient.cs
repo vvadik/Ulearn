@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CourseTool
 {

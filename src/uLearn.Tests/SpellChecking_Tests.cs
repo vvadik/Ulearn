@@ -2,6 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using uLearn.SpellChecking;
+using Ulearn.Common.Extensions;
 
 namespace uLearn
 {

@@ -137,5 +137,13 @@ $$3$$".RenderMd("/").Trim());
 				@"<div class='tex'>\displaystyle 1</div>",
 				@" $$1$$ ".RenderMd("/").Trim());
 		}
+
+		[Test]
+		public void add_root_url()
+		{
+			Assert.AreEqual(
+				"<p><a href=\"https://ulearn.me/Link\">Hello world</a></p>\n",
+				@"[Hello world](/Link)".RenderMd("https://ulearn.me/"));
+		}
 	}
 }

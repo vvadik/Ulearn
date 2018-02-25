@@ -1,6 +1,5 @@
-﻿@using uLearn
-@using uLearn.Extensions
-
+﻿@using Ulearn.Common
+@using Ulearn.Common.Extensions
 @model uLearn.Web.Controllers.ManualCheckingQueueViewModel
 
 @{
@@ -47,7 +46,7 @@
 		<div>
 			<div>
 				<p>
-					<b>@check.User.VisibleName</b> заполнил@(check.User.Gender.ChooseEnding()) тест «@checkModel.ContextSlideTitle»
+					<b>@check.User.VisibleName</b> заполнил@(check.User.Gender.ChooseEnding()) тест «@checkModel.ContextSlideTitle.MakeNestedQuotes()»
 				</p>
 			</div>
 			<div>

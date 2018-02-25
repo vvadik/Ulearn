@@ -1,5 +1,4 @@
-﻿@using Database.Extensions
-@using Database.Models
+﻿@using Database.Models
 @using uLearn
 @using uLearn.Quizes
 @using uLearn.Web.Extensions
@@ -9,6 +8,7 @@
 @{
 	ViewBag.Title = string.Format("{0}: {1}", Model.CourseTitle, Model.Slide.Title);
 	ViewBag.Slide = Model.Slide;
+	ViewBag.CourseId = Model.CourseId;
 
 	var mainDivClass = "";
 }

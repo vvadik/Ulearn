@@ -4,9 +4,10 @@ using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using uLearn;
-using uLearn.Extensions;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace Stepik.Api
 {
@@ -384,7 +385,7 @@ namespace Stepik.Api
 				var isCurrentBlockText = IsCurrentBlockText(block, options);
 				if (isCurrentBlockText)
 				{
-					previousTextBlock.Text += GetTextForStepikBlockFromUlearnBlock(slide, block);
+					previousTextBlock.Text += GetTextForStepikBlockFromUlearnBlock(courseId, slide, block);
 				}
 				else
 				{
@@ -415,10 +416,13 @@ namespace Stepik.Api
 			return block is MdBlock || block is CodeBlock || (options.VideoUploadOptions == UploadVideoToStepikOption.Iframe && block is YoutubeBlock);
 		}
 
-		private string GetTextForStepikBlockFromUlearnBlock(Slide slide, SlideBlock block)
+		private string GetTextForStepikBlockFromUlearnBlock(string courseId, Slide slide, SlideBlock block)
 		{
 			if (block is MdBlock)
-				return ((MdBlock)block).Markdown.RenderMd(slide.Info.SlideFile, ulearnBaseUrl);
+			{
+				var mdBlock = (MdBlock)block;
+				return mdBlock.RenderMd(courseId, slide.Id, slide.Info.SlideFile, ulearnBaseUrl);
+			}
 
 			if (block is CodeBlock)
 			{

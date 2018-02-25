@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace Stepik.Api.Tests
 {

@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
 using log4net;
-using uLearn;
-using uLearn.Extensions;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {
@@ -382,7 +382,7 @@ namespace Database.DataContexts
 			return db.NotificationDeliveries.Where(d => notificationsIds.Contains(d.NotificationId) && transportsIds.Contains(d.NotificationTransportId));
 		}
 
-		public async Task MarkDeliveriesAsFailed(List<NotificationDelivery> deliveries)
+		public async Task MarkDeliveriesAsFailed(IEnumerable<NotificationDelivery> deliveries)
 		{
 			foreach (var delivery in deliveries)
 			{

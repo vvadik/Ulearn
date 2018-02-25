@@ -3,6 +3,7 @@
 @using uLearn.Web.Kontur.Passport
 @using uLearn.Web.Microsoft.Owin.Security.VK
 @using uLearn.Web.Views.Shared
+@using Ulearn.Common
 @model uLearn.Web.Controllers.ProfileModel
 
 @{
@@ -17,7 +18,7 @@
 			@UserAvatar.LargeAvatar(Model.User)
 		</div>
 		<div>
-			<div><b>@Model.User.UserName</b>, <a href="mailto:@Model.User.Email">@Model.User.Email</a><i>@(!Model.User.EmailConfirmed ? " (почта не подтверждена)" : "")</i></div>
+			<div>@Model.User.UserName, <a href="mailto:@Model.User.Email">@Model.User.Email</a><i>@(!Model.User.EmailConfirmed ? " (почта не подтверждена)" : "")</i></div>
 			@{
 				var vkLogin = Model.Logins.FirstOrDefault(l => l.LoginProvider == VkAuthenticationConstants.AuthenticationType);
 				if (vkLogin != null)
@@ -28,29 +29,51 @@
 				var konturPassportLogin = Model.Logins.FirstOrDefault(l => l.LoginProvider == KonturPassportConstants.AuthenticationType);
 				if (konturPassportLogin != null)
 				{
-					<div><b>Контур.Паспорт:</b> @konturPassportLogin.ProviderKey</div>
+					<div>
+                        <b>Контур.Паспорт:</b>
+                        @if (!string.IsNullOrEmpty(Model.User.KonturLogin))
+                        {
+	                        <a href="https://staff.skbkontur.ru/profile/@Model.User.KonturLogin" target="_blank" title="Откроется в новой вкладке">@Model.User.KonturLogin</a>
+	                        <span class="text-muted small">@konturPassportLogin.ProviderKey</span>
+                        }
+                        else
+                        {
+	                        <span class="text-muted small">@konturPassportLogin.ProviderKey</span>
+                        }
+                    </div>
 				}
 
 				if (Model.User.HasTelegram)
 				{
 					<div>
 						<b>Телеграм:</b>
-						@if (!string.IsNullOrEmpty(Model.User.TelegramChatTitle))
+						@if (!string.IsNullOrEmpty(Model.User.TelegramChatTitle) && Model.User.TelegramChatTitle != "@")
 						{
-							<a href="https://t.me/@(Model.User.TelegramChatTitle.Substring(1))" target="_blank">@Model.User.TelegramChatTitle</a>
+							<a href="https://t.me/@(Model.User.TelegramChatTitle.Substring(1))" target="_blank" title="Откроется в новой вкладке">@Model.User.TelegramChatTitle</a>
 						}
 						else
 						{
-							@Model.User.TelegramChatId <i>(никнейм не&nbsp;указан)</i>
+							<span class="text-muted small">@Model.User.TelegramChatId (никнейм не&nbsp;указан)</span>
 						}
 					</div>
 				}
 			}
-		</div>
+            
+            @if (User.IsSystemAdministrator())
+            {
+	            <div class="hijack__enter">
+                    @using (Html.BeginForm("Hijack", "Account", new { userId = Model.User.Id }, FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-warning btn-xs">Войти как @Model.User.VisibleName</button>
+                    }
+                </div>
+            }
+        </div>
 	</div>
 	
 	<div class="user-profile__courses">
-		<h2>Курсы</h2>
+		<h2>Статистика по&nbsp;курсам</h2>
 		@if (Model.UserCourses.Count == 0)
 		{
 			<p class="help-block">Нет курсов</p>
@@ -84,7 +107,8 @@
 			@foreach (var certificate in Model.Certificates)
 			{
 				<li>
-					@Html.RouteLink(Model.AllCourses[certificate.Template.CourseId].Title, "Certificate", new { certificateId = certificate.Id }),
+                    @Html.RouteLink(Model.AllCourses[certificate.Template.CourseId].Title, "Certificate", new { certificateId = certificate.Id }),
+                    выдал@(certificate.Instructor.Gender.ChooseEnding()) @certificate.Instructor.VisibleName
 					@certificate.Timestamp.ToAgoPrettyString()
 				</li>
 			}

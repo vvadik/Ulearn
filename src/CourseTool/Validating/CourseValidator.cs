@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using RunCsJob;
+using uLearn.Extensions;
 using uLearn.Model.Blocks;
+using Ulearn.Common.Extensions;
 
 namespace uLearn
 {
@@ -19,7 +21,7 @@ namespace uLearn
 			this.settings = settings;
 		}
 
-		public void ValidateExercises() // todo логирование log4net в файл (ошибки отдельно) и на консоль
+		public void ValidateExercises() // todo Р»РѕРіРёСЂРѕРІР°РЅРёРµ log4net РІ С„Р°Р№Р» (РѕС€РёР±РєРё РѕС‚РґРµР»СЊРЅРѕ) Рё РЅР° РєРѕРЅСЃРѕР»СЊ
 		{
 			foreach (var slide in slides.OfType<ExerciseSlide>())
 			{

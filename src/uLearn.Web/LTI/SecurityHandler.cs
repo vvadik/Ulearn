@@ -10,6 +10,7 @@ using LtiLibrary.Owin.Security.Lti.Provider;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
+using Ulearn.Common;
 
 namespace uLearn.Web.LTI
 {

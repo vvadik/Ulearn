@@ -9,7 +9,7 @@ using EntityFramework.Functions;
 using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
 using uLearn;
-using uLearn.Helpers;
+using Ulearn.Common;
 
 namespace Database.DataContexts
 {
@@ -32,7 +32,7 @@ namespace Database.DataContexts
 		}
 
 		/* Pass limit=0 to disable limiting */
-		public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager, int limit = 50)
+		public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager, int limit=100)
 		{
 			var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
 			IQueryable<ApplicationUser> users = db.Users;

@@ -2,15 +2,15 @@
 using System.IO;
 using ApprovalTests;
 using NUnit.Framework;
-using uLearn.Extensions;
 using uLearn.Model.Blocks;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp
 {
 	[TestFixture]
 	public class CsMembersRemover_should
 	{
-		private readonly DirectoryInfo dir = new DirectoryInfo(TestContext.CurrentContext.TestDirectory).GetSubdir("tests");
+		private readonly DirectoryInfo dir = new DirectoryInfo(TestContext.CurrentContext.TestDirectory).GetSubdirectory("tests");
 
 		private string LoadCode(string file = "OverloadedMethods.cs")
 		{

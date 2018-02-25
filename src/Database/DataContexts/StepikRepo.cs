@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
 using log4net;
 using uLearn;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {

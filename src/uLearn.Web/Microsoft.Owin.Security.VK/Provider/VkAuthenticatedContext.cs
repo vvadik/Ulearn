@@ -4,6 +4,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Provider;
 using Newtonsoft.Json.Linq;
+using Ulearn.Common;
 
 namespace uLearn.Web.Microsoft.Owin.Security.VK.Provider
 {

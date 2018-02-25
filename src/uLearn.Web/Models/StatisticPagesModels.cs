@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Database.Models;
-using uLearn.Extensions;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Models
 {
@@ -115,13 +116,17 @@ namespace uLearn.Web.Models
 			UserId = user.Id;
 			UserName = user.UserName;
 			UserEmail = user.Email ?? "";
-			UserVisibleName = user.VisibleName ?? "";
+			UserVisibleName = user.VisibleNameWithLastNameFirst ?? "";
+			UserFirstName = user.FirstName ?? "";
+			UserLastName = user.LastName ?? "";
 		}
 
-		public string UserId { get; set; }
-		public string UserVisibleName { get; set; }
-		public string UserName { get; set; }
-		public string UserEmail { get; set; }
+		public string UserId { get; private set; }
+		public string UserVisibleName { get; private set; }
+		public string UserName { get; private set; }
+		public string UserFirstName { get; private set; }
+		public string UserLastName { get; private set; }		
+		public string UserEmail { get; private set; }
 	}
 
 	public class DailyStatistics
