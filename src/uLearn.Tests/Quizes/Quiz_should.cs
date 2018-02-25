@@ -3,8 +3,8 @@ using System.Xml.Serialization;
 using ApprovalTests.Reporters;
 using FluentAssertions;
 using NUnit.Framework;
-using uLearn.Extensions;
 using uLearn.Model.Blocks;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Quizes
 {

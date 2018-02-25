@@ -1,8 +1,9 @@
 ﻿@using Database.Models
 @using uLearn
-@using uLearn.Extensions
 @using uLearn.Quizes
 @using uLearn.Web.Extensions
+@using Ulearn.Common
+@using Ulearn.Common.Extensions
 
 @model UnitStatisticPageModel
 @{
@@ -238,7 +239,7 @@
 
 		@if (!Model.VisitedUsers.Any())
 		{
-			<div class="text-muted">Здесь пока никого не было...</div>
+			<div class="text-muted">Здесь пока никого не было.</div>
 		}
 
 		@foreach (var userInfo in Model.VisitedUsers)

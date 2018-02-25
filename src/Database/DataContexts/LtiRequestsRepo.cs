@@ -8,7 +8,7 @@ using Database.Models;
 using EntityFramework.Functions;
 using LtiLibrary.Core.Lti1;
 using Newtonsoft.Json;
-using uLearn;
+using Ulearn.Common;
 
 namespace Database.DataContexts
 {

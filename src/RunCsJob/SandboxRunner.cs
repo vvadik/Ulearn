@@ -6,12 +6,11 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Security;
 using System.Text;
-using FluentAssertions.Common;
 using log4net;
 using Newtonsoft.Json;
 using RunCsJob.Api;
 using uLearn;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace RunCsJob
 {

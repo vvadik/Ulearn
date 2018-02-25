@@ -13,11 +13,10 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
-using Microsoft.Owin.Security.Cookies;
-using uLearn.Extensions;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {
@@ -187,14 +186,14 @@ namespace uLearn.Web.Controllers
 
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> ToggleSystemRole(string userId, string role)
+		public ActionResult ToggleSystemRole(string userId, string role)
 		{
 			if (userId == User.Identity.GetUserId())
 				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 			if (userManager.IsInRole(userId, role))
-				await userManager.RemoveFromRoleAsync(userId, role);
+				userManager.RemoveFromRole(userId, role);
 			else
-				await userManager.AddToRolesAsync(userId, role);
+				userManager.AddToRole(userId, role);
 			return Content(role);
 		}
 
@@ -281,7 +280,7 @@ namespace uLearn.Web.Controllers
 			var userCoursesIds = visitsRepo.GetUserCourses(user.Id).Select(s => s.ToLower());
 			var userCourses = courseManager.GetCourses().Where(c => userCoursesIds.Contains(c.Id.ToLower())).OrderBy(c => c.Title).ToList();
 
-			var allCourses = courseManager.GetCourses().ToDictionary(c => c.Id, c => c);
+			var allCourses = courseManager.GetCourses().ToDictionary(c => c.Id, c => c, StringComparer.InvariantCultureIgnoreCase);
 			var certificates = certificatesRepo.GetUserCertificates(user.Id).OrderBy(c => allCourses.GetOrDefault(c.Template.CourseId)?.Title ?? "<курс удалён>").ToList();
 
 			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10));
@@ -622,7 +621,7 @@ namespace uLearn.Web.Controllers
 			var correctSignature = GetEmailConfirmationSignature(email);
 			if (signature != correctSignature)
 			{
-				log.Warn("Invalid signature in confirmation email link");
+				log.Warn($"Invalid signature in confirmation email link, expected \"{correctSignature}\", actual \"{signature}\". Email is \"{email}\",");
 				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
 			}
 

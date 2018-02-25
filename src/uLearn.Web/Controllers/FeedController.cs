@@ -10,7 +10,6 @@ using Database.DataContexts;
 using Database.Models;
 using log4net;
 using Microsoft.AspNet.Identity;
-using Microsoft.CodeAnalysis.CSharp;
 using uLearn.Web.FilterAttributes;
 
 namespace uLearn.Web.Controllers

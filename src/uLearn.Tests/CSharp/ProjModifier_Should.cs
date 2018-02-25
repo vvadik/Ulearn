@@ -32,7 +32,7 @@ namespace uLearn.CSharp
 			{
 				writer.WriteLine("Copy " + fileToCopy.SourceFile + " to " + fileToCopy.DestinationFile);
 			}
-			project.Save(writer);
+			project.Save(writer);	
 			Approvals.Verify(writer.ToString());
 			project.Save(Path.Combine(project.DirectoryPath, "res.csproj"));
 		}

@@ -1,10 +1,9 @@
 ﻿@using Database.Extensions
 @using Database.Models
-@using uLearn
-@using uLearn.Extensions
 @using uLearn.Web.Controllers
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Course
+@using Ulearn.Common.Extensions
 
 @model ExerciseBlockData
 
@@ -43,11 +42,11 @@
 			var statusClass = "";
 			if (Model.ReviewState == ExerciseReviewState.WaitingForReview)
 			{
-				status = "Все тесты пройдены, код ожидает проверки преподавателем";
+				status = "Все тесты пройдены, решение ожидает код-ревью";
 				if (Model.InstructorView)
 				{
 					status = string.Format(
-						"Все тесты пройдены, код ожидает <a href=\"{0}\" title=\"Перейти к проверке\">проверки преподавателем</a>",
+						"Все тесты пройдены, решение ожидает <a href=\"{0}\" title=\"Перейти к код-ревью\">код-ревью</a>",
 						Url.Action("CheckExercise", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.Last().Id })
 						);
 				}
@@ -55,16 +54,23 @@
 			else if (Model.ReviewState == ExerciseReviewState.Reviewed)
 			{
 				var score = Model.SubmissionSelectedByUser.ManualCheckings.Max(c => c.Score);
+				var scoreVerb = score.SelectPluralWordInRussian(new RussianPluralizationOptions
+				{
+					One = "получен",
+					Two = "получено",
+					Five = "получено"
+				});
 				var pluralizedScore = score.PluralizeInRussian(RussianPluralizationOptions.Score);
 				if (Model.InstructorView)
 				{
-					status = string.Format("Все тесты пройдены, код <a href=\"{0}\" title=\"Отредактировать код-ревью\">проверен преподавателем</a> ({1})",
+					status = string.Format("Все тесты пройдены, за&nbsp;<a href=\"{0}\" title=\"Отредактировать код-ревью\">код-ревью</a> {1} +{2}",
 						Url.Action("CheckExercise", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.Last().Id, recheck = true }),
+						scoreVerb,
 						pluralizedScore);
 				}
 				else
 				{
-					status = string.Format("Все тесты пройдены, код проверен преподавателем ({0})", pluralizedScore);
+					status = string.Format("Все тесты пройдены, за&nbsp;код-ревью {0} +{1}", scoreVerb, pluralizedScore);
 				}
 			}
 			else if (Model.SubmissionSelectedByUser.AutomaticCheckingIsRightAnswer)
@@ -88,6 +94,18 @@
 			if (!string.IsNullOrEmpty(status) && (Model.ManualChecking == null || Model.ManualChecking.SubmissionId != Model.SubmissionSelectedByUser.Id))
 			{
 				<p class="exercise-status @statusClass">@Html.Raw(status)</p>
+			}
+		}
+
+		if (Model.InstructorView)
+		{
+			if (User.HasCourseAccess(Model.CourseId, CourseAccessType.FeatureUseAntiPlagiarism) || User.IsSystemAdministrator())
+			{
+				<p class="antiplagiarism-status"
+                   data-antiplagiarism-url="@Url.Action("Info", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })"
+                   data-antiplagiarism-details-url="@Url.Action("Details", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })">
+                    Проверка на&nbsp;списывание: ищу похожие решения у&nbsp;других студентов...
+                </p>
 			}
 		}
 

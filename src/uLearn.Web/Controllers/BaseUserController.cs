@@ -9,11 +9,11 @@ using Kontur.Spam.Client;
 using log4net;
 using Metrics;
 using Microsoft.AspNet.Identity;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {
-	public class BaseUserController : Controller
+	public class BaseUserController : BaseController
 	{
 		protected static readonly ILog log = LogManager.GetLogger(typeof(BaseUserController));
 

@@ -13,18 +13,18 @@ using Database.Models;
 using Elmah;
 using log4net;
 using LtiLibrary.Owin.Security.Lti;
-using uLearn.Extensions;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
 using uLearn.Web.Models;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {
 	[ULearnAuthorize]
-	public class CourseController : Controller
+	public class CourseController : BaseController
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(CourseController));
 

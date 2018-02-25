@@ -48,8 +48,8 @@
     <Reference Include="NHttp, Version=0.1.9.0, Culture=neutral, PublicKeyToken=156364e4f7b202d9, processorArchitecture=MSIL">
       <HintPath>..\packages\NHttp.0.1.9.0\lib\net20\NHttp.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=3.7.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.7.1\lib\net45\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.9.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
+      <HintPath>..\packages\NUnit.3.9.0\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\RestSharp.105.2.3\lib\net46\RestSharp.dll</HintPath>
@@ -77,13 +77,17 @@
     <Compile Include="YoutubeVideoUrlExtractorTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Stepik.Api\Stepik.Api.csproj">
-      <Project>{0bf85278-186b-4ff1-85a8-74992c7cb7ae}</Project>
-      <Name>Stepik.Api</Name>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{3CC038A1-6AA0-49B0-9485-DB9589626BC3}</Project>
+      <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\uLearn\uLearn.csproj">
-      <Project>{333DD5A7-9955-46CB-8905-79E800F2B435}</Project>
-      <Name>uLearn</Name>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{803c067a-5553-467d-9470-116fe2430255}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Stepik.Api\Stepik.Api.csproj">
+      <Project>{60247C0A-B6EE-46E2-AB66-C7285F5F1345}</Project>
+      <Name>Stepik.Api.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

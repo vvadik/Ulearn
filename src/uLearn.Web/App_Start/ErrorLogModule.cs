@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Web.Hosting;
 using Elmah;
 using log4net;
-using uLearn.Extensions;
 using uLearn.Telegram;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web
 {
@@ -22,6 +23,9 @@ namespace uLearn.Web
 
 		public ErrorLogModule()
 		{
+			/* TODO (andgein): remove this hack */
+			Utils.WebApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath;
+
 			Logged += OnLogged;
 			errorsBot = new ErrorsBot();
 		}
@@ -41,7 +45,7 @@ namespace uLearn.Web
 				error.Exception);
 
 			if (!IsErrorIgnoredForTelegramChannel(error))
-				errorsBot.PostToChannel(entryId, error);
+				errorsBot.PostToChannel(entryId, error.Exception);
 		}
 	}
 }

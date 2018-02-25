@@ -2,7 +2,7 @@ using System.IO;
 using ApprovalTests;
 using ApprovalTests.Reporters;
 using NUnit.Framework;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CourseTool
 {

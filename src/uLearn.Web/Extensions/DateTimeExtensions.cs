@@ -1,5 +1,5 @@
 ﻿using System;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Extensions
 {

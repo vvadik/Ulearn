@@ -10,7 +10,6 @@ using Graphite;
 using log4net;
 using log4net.Config;
 using Metrics;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Notifications
 {

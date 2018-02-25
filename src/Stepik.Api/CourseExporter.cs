@@ -4,9 +4,10 @@ using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using uLearn;
-using uLearn.Extensions;
 using uLearn.Model.Blocks;
 using uLearn.Quizes;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace Stepik.Api
 {

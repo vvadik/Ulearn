@@ -12,7 +12,7 @@ using Ionic.Zip;
 using log4net;
 using Newtonsoft.Json;
 using uLearn;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {
@@ -293,7 +293,7 @@ namespace Database.DataContexts
 			/* Replace %quizzes.*% */
 			content = ReplaceQuizzesBuiltinParameters(content, certificate, course);
 
-			var acceptedSolutionsCount = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, course.Slides.Select(s => s.Id), certificate.UserId).DistinctBy(s => s.SlideId).Count();
+			var acceptedSolutionsCount = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, course.Slides.Select(s => s.Id), certificate.UserId).Select(s => s.SlideId).Distinct().Count();
 			content = SubstituteOneParameter(content, "exercises.accepted", acceptedSolutionsCount.ToString());
 
 			return content;

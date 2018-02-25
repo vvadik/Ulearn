@@ -6,7 +6,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CourseTool
 {

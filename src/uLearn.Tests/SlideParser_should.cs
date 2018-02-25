@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using uLearn.Extensions;
 using uLearn.Model.Blocks;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp
 {
@@ -28,7 +28,7 @@ namespace uLearn.CSharp
 		[Test]
 		public void make_markdown_from_comments()
 		{
-			Slide slide = GenerateSlide("SingleComment.cs");
+			var slide = GenerateSlide("SingleComment.cs");
 			Assert.That(slide.Blocks.Length, Is.EqualTo(1));
 			Assert.That(slide.Blocks[0].IsCode(), Is.False);
 			Assert.That(slide.Blocks[0].Text(), Is.EqualTo("==Multiline comment\r\nShould become markdown text"));

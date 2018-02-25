@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
-using NUnit.Framework.Interfaces;
 using uLearn.NUnitTestRunning.TestsToRun;
 
 namespace uLearn.NUnitTestRunning

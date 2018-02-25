@@ -1,7 +1,7 @@
-﻿@using uLearn.Extensions
-@using uLearn.Quizes
+﻿@using uLearn.Quizes
 @using uLearn.Web.Controllers
 @using uLearn.Web.Views.Course
+@using Ulearn.Common.Extensions
 
 @model QuizModel
 @{
@@ -39,11 +39,11 @@
 	}
 	else if (Model.QuizState == QuizState.WaitForCheck)
 	{
-		status = "Ожидает проверки инструктором";
+		status = "Ожидает проверки преподавателем";
 	}
 	else if (Model.QuizState == QuizState.IsChecking)
 	{
-		status = "Проверяется инструктором";
+		status = "Проверяется преподавателем";
 	}
 
 	if (!string.IsNullOrEmpty(status))
