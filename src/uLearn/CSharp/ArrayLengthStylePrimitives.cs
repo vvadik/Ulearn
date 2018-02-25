@@ -8,12 +8,6 @@ namespace uLearn.CSharp
 {
 	public static class ArrayLengthStylePrimitives
 	{
-		public static SyntaxNode GetParentCycle(this SyntaxNode syntaxNode)
-		{
-			var ancestors = syntaxNode.Ancestors().ToList();
-			return ancestors.FirstOrDefault(c => c.IsCycle());
-		}
-
 		public static bool IsCycle(this SyntaxNode syntaxNode)
 		{
 			return syntaxNode is ForStatementSyntax
@@ -23,7 +17,7 @@ namespace uLearn.CSharp
 		}
 
 		public static bool ContainsAssignmentOf(this StatementSyntax statementSyntax, string variableName,
-			SemanticModel semanticModel) // TODO: посмотреть насчёт синтаксической модели и передачи списка узлов
+			SemanticModel semanticModel) // TODO: посмотреть насчёт передачи списка узлов
 		{ // TODO: сделать проверку на массивы (не здесь)
 			if (!statementSyntax.IsCycle())
 				return false;
@@ -42,17 +36,13 @@ namespace uLearn.CSharp
 				var variable = assignment
 					.GetAllDescendantVariables()
 					.FirstOrDefault();
-				var symbol = semanticModel.GetSymbolInfo(variable).Symbol;
-				if (symbol?.ToString() == variableName)
+				if (variable.HasName(variableName, semanticModel))
 					return true;
 			}
 			foreach (var declaration in declarations)
 			{
-				var variable = declaration
-					.GetAllDescendantVariables()
-					.FirstOrDefault();
-				var symbol = semanticModel.GetSymbolInfo(variable).Symbol;
-				if (symbol?.ToString() == variableName)
+				var variable = declaration.Identifier;
+				if (variable.Text == variableName)
 					return true;
 			}
 			
@@ -65,6 +55,13 @@ namespace uLearn.CSharp
 				.DescendantNodes()
 				.OfType<IdentifierNameSyntax>()
 				.ToList();
+		}
+
+		public static bool HasName(this SyntaxNode node, string variableName,
+			SemanticModel semanticModel)
+		{
+			var symbol = semanticModel.GetSymbolInfo(node).Symbol;
+			return symbol?.ToString() == variableName;
 		}
 	}
 }

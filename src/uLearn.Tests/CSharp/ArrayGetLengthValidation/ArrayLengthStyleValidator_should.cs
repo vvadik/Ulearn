@@ -98,44 +98,5 @@ namespace uLearn.CSharp.ArrayGetLengthValidation
 				Assert.Fail();
 			}
 		}
-		
-		[Test]
-		public void Test()
-		{
-			var code = @"
-using System;
-
-namespace uLearn.CSharp.ArrayGetLengthValidation.TestData.Incorrect
-{
-	public class GetLengthInDoWhileCycle
-	{
-		public void GetLengthInStatement()
-		{
-			var arr = new int[2, 2];
-			int count = 0;
-			do
-			{
-				Console.WriteLine(count);
-			} while (count++ < arr.GetLength(1));
-		}
-
-		public void GetLengthInBody()
-		{
-			var arr = new int[2, 2];
-			int count = 0;
-			do
-			{
-				count = arr.GetLength(1);  
-				Console.WriteLine(count);
-				arr = new int[2, 5];
-			} while (count < 2);
-		}
-	}
-}
-
-";
-
-			validator.FindError(code).Should().NotBeNullOrWhiteSpace();
-		}
 	}
 }

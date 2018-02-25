@@ -10,154 +10,70 @@ namespace uLearn.CSharp.ArrayGetLengthValidation
 	[TestFixture]
 	public class ArrayLengthStylePrimitives_should
 	{
+		private readonly PortableExecutableReference mscorlib =
+			MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
+		
 		[Test]
-		public void get_parent_for_cycle_if_exists()
+		public void ContainsAssignmentOf_Should_FindAssignmentInCycle()
 		{
 			var code = @"
-public void A()
-{
-	for(int i = 0; i < k; i++)
-	{
-		var a = GetSomething();
-	}	
-}
-";
-			var syntaxTree = CSharpSyntaxTree.ParseText(code);
-			var nodes = syntaxTree.GetRoot().DescendantNodes().ToList();
-			var syntaxNode = nodes.OfType<InvocationExpressionSyntax>().First();
-			var cycleNode = nodes.OfType<ForStatementSyntax>().First();
-			var foundCycleNode = syntaxNode.GetParentCycle();
-			foundCycleNode.Should().Be(cycleNode);
-		}
+using System;
 
-		[Test]
-		public void get_parent_while_cycle_if_exists()
-		{
-			var code = @"
-public void A()
+namespace uLearn.CSharp.ArrayGetLengthValidation.TestData.Incorrect
 {
-	while((new Random()).Next() > 1)
+	public class GetLengthInDoWhileCycle
 	{
-		var a = GetSomething();
+		public void GetLengthInBody()
+		{
+			var arr = new int[2, 2];
+			int count = 0;
+			do
+			{
+				count = arr.GetLength(1);  
+				Console.WriteLine(count);
+				arr = new int[2, 5];
+			} while (count < 2);
+		}
 	}
 }
 ";
 			var syntaxTree = CSharpSyntaxTree.ParseText(code);
+			var compilation = CSharpCompilation.Create("MyCompilation", new[] { syntaxTree },
+				new[] { mscorlib });
+			var semanticModel = compilation.GetSemanticModel(syntaxTree);
 			var nodes = syntaxTree.GetRoot().DescendantNodes().ToList();
-			var syntaxNode = nodes.OfType<InvocationExpressionSyntax>().First();
-			var cycleNode = nodes.OfType<WhileStatementSyntax>().First();
-			var foundCycleNode = syntaxNode.GetParentCycle();
-			foundCycleNode.Should().Be(cycleNode);
-		}
-
-		[Test]
-		public void get_parent_do_while_cycle_if_exists()
-		{
-			var code = @"
-public void A()
-{
-	do
-	{
-		var a = GetSomething();
-	} while((new Random()).Next() > 1)
-}
-";
-			var syntaxTree = CSharpSyntaxTree.ParseText(code);
-			var nodes = syntaxTree.GetRoot().DescendantNodes().ToList();
-			var syntaxNode = nodes.OfType<InvocationExpressionSyntax>().First();
 			var cycleNode = nodes.OfType<DoStatementSyntax>().First();
-			var foundCycleNode = syntaxNode.GetParentCycle();
-			foundCycleNode.Should().Be(cycleNode);
+			cycleNode.ContainsAssignmentOf("arr", semanticModel).Should().Be(true);
 		}
 		
 		[Test]
-		public void get_parent_foreach_cycle_if_exists()
+		public void ContainsAssignmentOf_Should_FindDeclarationInCycle()
 		{
 			var code = @"
-public void A()
+using System;
+
+namespace uLearn.CSharp.ArrayGetLengthValidation.TestData.Incorrect
 {
-	foreach(var number in Enumerable.Range(1, 485))
+	public class GetLengthInDoWhileCycle
 	{
-		var a = GetSomething();
+		public void GetLengthInBody()
+		{
+			int count = 0;
+			do
+			{
+				var arr = new int[2, 5];
+			} while (count++ < 2);
+		}
 	}
 }
 ";
 			var syntaxTree = CSharpSyntaxTree.ParseText(code);
+			var compilation = CSharpCompilation.Create("MyCompilation", new[] { syntaxTree },
+				new[] { mscorlib });
+			var semanticModel = compilation.GetSemanticModel(syntaxTree);
 			var nodes = syntaxTree.GetRoot().DescendantNodes().ToList();
-			var syntaxNode = nodes.OfType<InvocationExpressionSyntax>().First();
-			var cycleNode = nodes.OfType<ForEachStatementSyntax>().First();
-			var foundCycleNode = syntaxNode.GetParentCycle();
-			foundCycleNode.Should().Be(cycleNode);
+			var cycleNode = nodes.OfType<DoStatementSyntax>().First();
+			cycleNode.ContainsAssignmentOf("arr", semanticModel).Should().Be(true);
 		}
-		
-		[Test]
-		public void get_null_if_no_parent_cycle()
-		{
-			var code = @"
-public void A()
-{
-	var a = GetSomething();
-}
-";
-			var syntaxTree = CSharpSyntaxTree.ParseText(code);
-			var nodes = syntaxTree.GetRoot().DescendantNodes().ToList();
-			var syntaxNode = nodes.OfType<InvocationExpressionSyntax>().First();
-			var foundCycleNode = syntaxNode.GetParentCycle();
-			foundCycleNode.Should().Be(null);
-		}
-		
-		[Test]
-		public void get_correct_parent_cycle_if_several_exist()
-		{
-			var code = @"
-public void A()
-{
- 	foreach(var number in new List<int> {1})
- 	{	
- 		for (int i = 1; i < 485; i++)
- 		{
- 			var a = GetSomething();
- 		}
- 	}
-}
-";
-			var syntaxTree = CSharpSyntaxTree.ParseText(code);
-			var nodes = syntaxTree.GetRoot().DescendantNodes().ToList();
-			var syntaxNode = nodes.OfType<InvocationExpressionSyntax>().First();
-			var cycleNode = nodes.OfType<ForStatementSyntax>().First();
-			var foundCycleNode = syntaxNode.GetParentCycle();
-			foundCycleNode.Should().Be(cycleNode);
-		}
-		
-//		[Test]
-//		public void Test()
-//		{
-//			var code = @"
-//using System;
-//
-//namespace B
-//{
-//	public class C()
-//	{
-//		var a = GetSomething();
-//		public void A()
-//		{
-//			foreach(var number in new List<int> {1})
-//			{	
-//				for (int i = 1; i < 485; i++)
-//				{
-//					a = GetSomething();
-//				}
-//			}
-//		}
-//	}
-//}
-//";
-//			var syntaxTree = CSharpSyntaxTree.ParseText(code);
-//			var nodes = syntaxTree.GetRoot().DescendantNodes().ToList();
-//			var syntaxNode = nodes.OfType<InvocationExpressionSyntax>().First();
-//			var cycleNode = nodes.OfType<ForStatementSyntax>().First();
-//			cycleNode.ContainsAssignmentOf("a").Should().Be(true);
-//		}
 	}
 }
