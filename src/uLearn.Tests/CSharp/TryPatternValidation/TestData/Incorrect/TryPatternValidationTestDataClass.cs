@@ -12,7 +12,6 @@ namespace uLearn.CSharp.TryPatternValidation.TestData.Incorrect
 		public bool TryDoWork2(out int foo, ref int workResult)
 		{
 			foo = 0;
-			workResult = 0;
 			return true;
 		}
 
@@ -35,6 +34,11 @@ namespace uLearn.CSharp.TryPatternValidation.TestData.Incorrect
 		public bool TryDoWork(out int workResult, int foo)
 		{
 			workResult = 0;
+			return true;
+		}
+
+		public bool TryDoWork2(int foo, ref int workResult)
+		{
 			return true;
 		}
 	}
