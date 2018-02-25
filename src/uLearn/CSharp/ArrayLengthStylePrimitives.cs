@@ -67,8 +67,8 @@ namespace uLearn.CSharp
 		public static bool HasVariableAsArgument(this InvocationExpressionSyntax methodInvocation,
 			string variableName, SemanticModel semanticModel)
 		{
-			var variables = methodInvocation.ArgumentList.GetAllDescendantVariables();
-			return variables
+			var arguments = methodInvocation.ArgumentList.Arguments;
+			return arguments
 				.Select(v => semanticModel.GetSymbolInfo(v).Symbol)
 				.Any(s => s?.ToString() == variableName);
 		}
