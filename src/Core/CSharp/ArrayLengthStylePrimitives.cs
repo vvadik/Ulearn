@@ -16,7 +16,7 @@ namespace uLearn.CSharp
 		}
 
 		public static bool ContainsAssignmentOf(this StatementSyntax statementSyntax, string variableName,
-			SemanticModel semanticModel) // TODO: посмотреть насчёт передачи списка узлов
+			SemanticModel semanticModel)
 		{
 			if (!statementSyntax.IsCycle())
 				return false;
@@ -32,9 +32,7 @@ namespace uLearn.CSharp
 			
 			foreach (var assignment in assignments)
 			{
-				var variable = assignment
-					.GetAllDescendantVariables()
-					.FirstOrDefault();
+				var variable = assignment.Left;
 				if (variable.HasName(variableName, semanticModel))
 					return true;
 			}
@@ -46,14 +44,6 @@ namespace uLearn.CSharp
 			}
 			
 			return false;
-		}
-
-		public static List<IdentifierNameSyntax> GetAllDescendantVariables(this SyntaxNode node)
-		{
-			return node
-				.DescendantNodes()
-				.OfType<IdentifierNameSyntax>()
-				.ToList();
 		}
 
 		public static bool HasName(this SyntaxNode node, string variableName,

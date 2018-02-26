@@ -38,12 +38,13 @@ namespace uLearn.CSharp
 					continue;
 				
 				var variable = methodInvocation
-					.GetAllDescendantVariables()
+					.Expression
+					.DescendantNodes()
 					.FirstOrDefault();
 
 				if (variable != null)
 				{
-					var variableSymbol = ModelExtensions.GetSymbolInfo(semanticModel, variable).Symbol;
+					var variableSymbol = semanticModel.GetSymbolInfo(variable).Symbol;
 					var variableName = variableSymbol.ToString();
 					if (!cycleStatement.ContainsAssignmentOf(variableName, semanticModel)
 						&& !methodInvocations.Any(m => m.HasVariableAsArgument(variableName, semanticModel)))
