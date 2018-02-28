@@ -70,7 +70,7 @@ function initCodeEditor($parent) {
 
 	CodeMirror.commands.autocomplete = function (cm) {
 		cm.showHint({ hint: CodeMirror.hint.csharp });
-	}
+	};
 
 	codeMirrorClass($parent.find('.code-exercise'), true, false, false);
 	codeMirrorClass($parent.find('.code-sample'), false, false, false);    
@@ -127,11 +127,18 @@ function initCodeEditor($parent) {
 			var $el = $(element);
 			var langId = $el.data("lang");
 			$el.parent().find('.loading-spinner').hide();
+			
+			let theme = 'default';
+			if (editable || guest)
+				theme = 'cobalt';
+			if ($el.closest('.revealed').length > 0)
+				theme = 'pastel-on-dark';
+			
 			var editor = CodeMirror.fromTextArea(element,
 			{
 				mode: getMode(langId),
 				lineNumbers: true,
-				theme: (editable || guest) ? "cobalt" : "default",
+				theme: theme, 
 				indentWithTabs: true,
 				tabSize: 4,
 				indentUnit: 4,

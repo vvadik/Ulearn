@@ -66,17 +66,7 @@
     }
 
     <div class="exercise__review__new-comment-place"></div>
-
-    <div class="exercise__review__comment__header without-timestamp">
-        <div class="media">
-            <div class="media-left"> 
-                @UserAvatar.SmallAvatar(Model.CurrentUser)
-            </div>
-            <div class="media-body">
-                <span class="author">@Model.CurrentUser.VisibleName</span>
-            </div>
-        </div>
-    </div>
+    
     <div class="exercise__review__reply-form">
         <div>
             <input type="text" placeholder="Ответить..."/>
@@ -84,7 +74,7 @@
         </div>
         <div class="exercise__review__reply-footer">
             <div class="exercise__review__reply-button ib">
-                <button class="btn btn-success btn-sm" data-url="@Url.Action("AddExerciseCodeReviewComment")" data-id="@Model.Review.Id" title="Работает Ctrl+Enter">Ответить</button>
+                <button class="btn btn-primary btn-sm" data-url="@Url.Action("AddExerciseCodeReviewComment")" data-id="@Model.Review.Id" title="Работает Ctrl+Enter">Ответить</button>
             </div>
             <div class="pull-right">
                 <span class="markdown-formatting-helper with-long-tooltip cursor-pointer" data-toggle="tooltip" data-placement="bottom" title="**жирный текст**, __курсивный текст__, `код`, ```многострочный код```">
