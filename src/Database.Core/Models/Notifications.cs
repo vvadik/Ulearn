@@ -860,11 +860,22 @@ namespace Database.Models
 			if (slide == null)
 				return null;
 
-			var solutionCodeLines = checking.Submission.SolutionCode.Text.SplitToLines();
-			var commentsText = GetReviewText(Comment.Review, solutionCodeLines, html: true, withAuthorsNames: true);
+			var messagePrefix = $"{InitiatedBy.VisibleName.EscapeHtml()} оставил{InitiatedBy.Gender.ChooseEnding()} комментарий в код-ревью задания «{GetSlideTitle(course, slide).EscapeHtml()}»<br/><br/>";
+			if (transport is MailNotificationTransport)
+			{
+				var solutionCodeLines = checking.Submission.SolutionCode.Text.SplitToLines();
+				var commentsText = GetReviewText(Comment.Review, solutionCodeLines, html: true, withAuthorsNames: true);
 
-			return $"{InitiatedBy.VisibleName.EscapeHtml()} оставил{InitiatedBy.Gender.ChooseEnding()} комментарий в код-ревью задания «{GetSlideTitle(course, slide).EscapeHtml()}»<br/><br/>" +
-					commentsText;
+				return messagePrefix + commentsText;
+			}
+
+			if (transport is TelegramNotificationTransport)
+			{
+				var commentText = Comment.Text.EscapeHtml().RenderSimpleMarkdown(isHtml: false, telegramMode: true).LineEndingsToBrTags();
+				return messagePrefix + commentText;
+			}
+
+			throw new Exception($"Unknown transport type: {transport.GetType()}");
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
@@ -877,11 +888,21 @@ namespace Database.Models
 			if (slide == null)
 				return null;
 
-			var solutionCodeLines = checking.Submission.SolutionCode.Text.SplitToLines();
-			var commentsText = GetReviewText(Comment.Review, solutionCodeLines, html: false, withAuthorsNames: true);
+			var messagePrefix = $"{InitiatedBy.VisibleName} оставил{InitiatedBy.Gender.ChooseEnding()} комментарий в код-ревью задания «{GetSlideTitle(course, slide)}»<br/><br/>";
+			if (transport is MailNotificationTransport)
+			{
+				var solutionCodeLines = checking.Submission.SolutionCode.Text.SplitToLines();
+				var commentsText = GetReviewText(Comment.Review, solutionCodeLines, html: false, withAuthorsNames: true);
 
-			return $"{InitiatedBy.VisibleName} оставил{InitiatedBy.Gender.ChooseEnding()} комментарий в код-ревью задания «{GetSlideTitle(course, slide)}»<br/><br/>" +
-					commentsText;
+				return messagePrefix + commentsText;
+			}
+			
+			if (transport is TelegramNotificationTransport)
+			{
+				return messagePrefix + Comment.Text;
+			}
+
+			throw new Exception($"Unknown transport type: {transport.GetType()}");
 		}
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
