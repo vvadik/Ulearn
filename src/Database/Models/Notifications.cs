@@ -935,10 +935,9 @@ namespace Database.Models
 			if (slide == null)
 				return null;
 
-			var isStudent = transport.UserId == Comment.Review.ExerciseChecking.UserId;
-			var url = GetSlideUrl(course, slide, baseUrl);
-			if (!isStudent)
-				url += $"?CheckQueueItemId={Comment.Review.ExerciseCheckingId}";
+			var currentUserId = transport.UserId;
+			var isStudent = currentUserId == Comment.Review.ExerciseChecking.UserId;
+			var url = GetUrl(course, baseUrl, currentUserId);
 
 			var title = isStudent ? "Перейти к странице с заданием" : "Перейти к код-ревью";
 			return new NotificationButton(title, url);
@@ -970,6 +969,19 @@ namespace Database.Models
 				.Cast<Notification>()
 				.Where(n => n.CreateTime < CreateTime && n.CreateTime >= CreateTime - NotificationsRepo.sendNotificationsDelayAfterCreating)
 				.ToList();
+		}
+
+		public string GetUrl(Course course, string baseUrl, string currentUserId)
+		{
+			var slide = course.FindSlideById(Comment?.Review?.ExerciseChecking?.SlideId ?? Guid.Empty);
+			if (slide == null)
+				return null;
+			
+			var isStudent = currentUserId == Comment.Review.ExerciseChecking.UserId;
+			var url = GetSlideUrl(course, slide, baseUrl);
+			if (!isStudent)
+				url += $"?CheckQueueItemId={Comment.Review.ExerciseCheckingId}";
+			return url;
 		}
 	}
 

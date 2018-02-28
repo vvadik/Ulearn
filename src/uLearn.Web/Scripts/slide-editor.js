@@ -392,7 +392,8 @@ function createMarkTextForReview($review) {
 function placeCodeReviews() {
 	var $reviews = $('.exercise__reviews .exercise__review');
 
-	var startHeight = $('.exercise__reviews').offset().top;
+    let $exerciseReviews = $('.exercise__reviews');
+    var startHeight = $exerciseReviews.offset().top;
 	var lastReviewBottomHeight = 0;
 	$reviews.each(function() {
 		var $review = $(this);
@@ -404,6 +405,9 @@ function placeCodeReviews() {
 
 		lastReviewBottomHeight = $review.offset().top + $review.outerHeight() - startHeight;
 	});
+
+	let exerciseBlockHeight = $(exerciseCodeDoc.getEditor().display.wrapper).outerHeight();
+	$exerciseReviews.css('minHeight', exerciseBlockHeight + 'px');
 }
 
 function orderByStartLineAndPosition(first, second) {
