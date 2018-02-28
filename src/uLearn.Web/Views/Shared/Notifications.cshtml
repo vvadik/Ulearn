@@ -179,6 +179,22 @@
 	</div>
 }
 
+@helper Notification(ReceivedCommentToCodeReviewNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	var slide = course.GetSlideById(notification.Comment.Review.ExerciseChecking.SlideId);
+	<div class="notifications__received-comment-to-code-review-notification media">
+        <div class="media-left">
+            @UserAvatar.Avatar(notification.InitiatedBy)
+        </div>
+        <div class="media-body">
+            <div class="notifications__notification__header">@UserName(notification.InitiatedBy) прокомментировал@( notification.InitiatedBy.Gender.ChooseEnding()) код-ревью задания «@slide.Title.MakeNestedQuotes()»
+            </div>
+            <div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100, renderSimpleMarkdown: true)</div>
+            <div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+        </div>
+    </div>
+}
+
 @helper Notification(JoinedToYourGroupNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 	<div class="notifications__joined-to-your-group-notification media" data-href="@Url.Action("Groups", "Admin", new { courseId = notification.CourseId })">
