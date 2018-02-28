@@ -570,14 +570,15 @@ namespace Database.Models
 		protected string GetReviewText(ExerciseCodeReview review, string[] solutionCodeLines, bool html, bool withAuthorsNames)
 		{
 			var reviewText = "";
-			
-			if (review.StartLine == review.FinishLine)
-				reviewText += $"Строка {review.StartLine + 1}: ";
-			else
-				reviewText += $"Строки {review.StartLine + 1}—{review.FinishLine + 1}: ";
+
+			var reviewPosition = review.StartLine == review.FinishLine
+				? $"Строка {review.StartLine + 1}"
+				: $"Строки {review.StartLine + 1}—{review.FinishLine + 1}";
 
 			if (html)
 			{
+				reviewText += $"<b>{reviewPosition}</b>";
+				
 				var codeFragment = GetSolutionCodeFragments(solutionCodeLines, review).EscapeHtml().LineEndingsToBrTags();
 				var reviewCommentHtml = review.Comment.EscapeHtml().RenderSimpleMarkdown(isHtml: false, telegramMode: true).LineEndingsToBrTags();
 				reviewText += $"<br/><pre>{codeFragment}</pre>";
@@ -585,7 +586,6 @@ namespace Database.Models
 				var comments = review.NotDeletedComments;
 				if (comments.Any())
 				{
-					reviewText += "<b>Комментарии:</b><br/>";
 					if (withAuthorsNames)
 						reviewText += $"<i>{review.Author.VisibleName.EscapeHtml()}:</i><br/>";
 					reviewText += reviewCommentHtml;
@@ -598,14 +598,17 @@ namespace Database.Models
 							reviewText += $"<i>{comment.Author.VisibleName.EscapeHtml()}:</i><br/>";
 						reviewText += commentHtml;
 					}
+
+					reviewText += "<br/><br/>";
 				}
 				else
 				{
-					reviewText += $"<b>Комментарий:</b> {reviewCommentHtml}<br/><br/>";	
+					reviewText += $"Комментарий: {reviewCommentHtml}<br/><br/>";	
 				}
 			}
 			else
 			{
+				reviewText += reviewPosition;
 				reviewText += review.Comment + "\n\n";
 				var comments = review.NotDeletedComments;
 				foreach (var comment in comments)
@@ -904,6 +907,7 @@ namespace Database.Models
 
 			var authorsIds = new HashSet<string>(review.Comments.Select(c => c.AuthorId));
 			authorsIds.Add(review.AuthorId);
+			authorsIds.Add(review.ExerciseChecking.UserId); 
 
 			return authorsIds.ToList();
 		}
@@ -911,6 +915,16 @@ namespace Database.Models
 		public override bool IsActual()
 		{
 			return CommentId != null && Comment != null;
+		}
+		
+		public override List<Notification> GetBlockerNotifications(UlearnDb db)
+		{
+			var reviewId = Comment.ReviewId;
+			return new NotificationsRepo(db)
+				.FindNotifications<ReceivedCommentToCodeReviewNotification>(n => n.Comment.ReviewId == reviewId, n => n.Comment)
+				.Cast<Notification>()
+				.Where(n => n.CreateTime < CreateTime && n.CreateTime >= CreateTime - NotificationsRepo.sendNotificationsDelayAfterCreating)
+				.ToList();
 		}
 	}
 	

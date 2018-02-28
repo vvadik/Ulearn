@@ -93,7 +93,7 @@
 			}
 			if (!string.IsNullOrEmpty(status) && (Model.ManualChecking == null || Model.ManualChecking.SubmissionId != Model.SubmissionSelectedByUser.Id))
 			{
-				<p class="exercise-status @statusClass">@Html.Raw(status)</p>
+				<p class="exercise-block-status @statusClass">@Html.Raw(status)</p>
 			}
 		}
 

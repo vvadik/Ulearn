@@ -187,7 +187,8 @@ namespace uLearn.Web.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 				
 			var comment = await slideCheckingsRepo.AddExerciseCodeReviewComment(currentUserId, reviewId, text);
-			await NotifyAboutCodeReviewComment(comment);
+			if (review.ExerciseChecking.IsChecked)
+				await NotifyAboutCodeReviewComment(comment);
 
 			return PartialView("_ExerciseReviewComment", comment);
 		}

@@ -11,16 +11,19 @@
 .antiplagiarism-status.found-none,
 .antiplagiarism-status.found-level0 {
     background-color: #cafac1;
+    box-shadow: inset 0 -10px 10px -10px #7abb6e;
 }
 
 .antiplagiarism-status.found-faint,
 .antiplagiarism-status.found-level1 {
     background-color: #faf4c1;
+    box-shadow: inset 0 -10px 10px -10px #b3ab67;
 }
 
 .antiplagiarism-status.found-strong,
 .antiplagiarism-status.found-level2 {
-    background-color: #fac1c1;    
+    background-color: #fac1c1;
+    box-shadow: inset 0 -10px 10px -10px #c36868;
 }
 
 /* Antiplagiarism page */
