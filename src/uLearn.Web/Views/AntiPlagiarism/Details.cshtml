@@ -25,10 +25,12 @@
                 </h3>
 
                 @{
-	                var submissionWeights = Model.AntiPlagiarismResult.ResearchedSubmissions.ToDictionary(
-		                s => submissionsByAntiPlagiarismIds[s.SubmissionInfo.Id].Id,
-		                s => s.Plagiarisms.Max(p => p.Weight)
-		            );
+	                var submissionWeights = Model.AntiPlagiarismResult.ResearchedSubmissions
+		                .Where(s => submissionsByAntiPlagiarismIds.ContainsKey(s.SubmissionInfo.Id))
+		                .ToDictionary(
+                            s => submissionsByAntiPlagiarismIds[s.SubmissionInfo.Id].Id,
+                            s => s.Plagiarisms.Max(p => p.Weight)
+                        );
                 }
                 <div class="antiplagiarism__submissions-panel">
                     <div class="antiplagiarism__slide-title">
