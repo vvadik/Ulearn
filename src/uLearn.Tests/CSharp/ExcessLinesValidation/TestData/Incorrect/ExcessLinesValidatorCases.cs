@@ -1,6 +1,7 @@
 namespace uLearn.CSharp.ExcessLinesValidation.TestData.Incorrect
 
 {
+
 	public class BaseClass { }
 	
 	public class SomeClass
@@ -108,6 +109,7 @@ namespace uLearn.CSharp.ExcessLinesValidation.TestData.Incorrect
 	public class SomeClass8
 	{
 	}
+
 }
 namespace MyNamespace1
 {
