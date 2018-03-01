@@ -51,7 +51,12 @@ function setExerciseVersion(versionId, showOutput, styleMessage) {
 			var submissionId = parseInt($scoreForm.data('submissionId'));
 			$scoreForm.toggle(submissionId === versionId);
 		}
-	});
+
+        /* Fetching antiplagiarism status (fetchAntiPlagiarismStatus() is available on antiplagiarism.js) */
+        $('.antiplagiarism-status').each(function () {
+            fetchAntiPlagiarismStatus($(this));
+        });
+    });
 }
 
 function setSimpleResult($block, details) {
