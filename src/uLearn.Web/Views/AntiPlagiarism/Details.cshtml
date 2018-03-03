@@ -29,7 +29,7 @@
 		                .Where(s => submissionsByAntiPlagiarismIds.ContainsKey(s.SubmissionInfo.Id))
 		                .ToDictionary(
                             s => submissionsByAntiPlagiarismIds[s.SubmissionInfo.Id].Id,
-                            s => s.Plagiarisms.Max(p => p.Weight)
+                            s => s.Plagiarisms.Select(p => p.Weight).DefaultIfEmpty(0).Max()
                         );
                 }
                 <div class="antiplagiarism__submissions-panel">
