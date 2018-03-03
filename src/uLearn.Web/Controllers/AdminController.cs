@@ -309,7 +309,8 @@ namespace uLearn.Web.Controllers
 
 			var emptySlideMock = new Slide(Enumerable.Empty<SlideBlock>(), new SlideInfo(null, null, -1), "", Guid.Empty, meta: null);
 			var allCheckingsSlidesTitles = allCheckingsSlidesIds
-				.Select(s => new KeyValuePair<Guid, Slide>(s, course.GetSlideById(s)))
+				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s)))
+				.Where(kvp => kvp.Value != null)
 				.Union(new List<KeyValuePair<Guid, Slide>>
 				{
 					/* Divider between used slides and another ones */
