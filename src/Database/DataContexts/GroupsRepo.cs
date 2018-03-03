@@ -10,8 +10,9 @@ using JetBrains.Annotations;
 using log4net;
 using Microsoft.AspNet.Identity;
 using uLearn;
-using uLearn.Extensions;
 using uLearn.Quizes;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {
@@ -143,7 +144,7 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsManualCheckingEnabled, bool newIsManualCheckingEnabledForOldSolutions)
+		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsManualCheckingEnabled, bool newIsManualCheckingEnabledForOldSolutions, bool defaultProhibitFutherReview)
 		{
 			var group = FindGroupById(groupId);
 			group.Name = newName;
@@ -153,6 +154,7 @@ namespace Database.DataContexts
 				await AddManualCheckingsForOldSolutions(group.CourseId, group.Members.Select(m => m.UserId).ToList());
 
 			group.IsManualCheckingEnabledForOldSolutions = newIsManualCheckingEnabledForOldSolutions;
+			group.DefaultProhibitFutherReview = defaultProhibitFutherReview;
 			await db.SaveChangesAsync();
 
 			return group;
@@ -438,7 +440,7 @@ namespace Database.DataContexts
 			return GetUserGroupsNamesAsString(new List<string> { courseId }, userId, currentUser, maxCount);
 		}
 
-		public async Task EnableGroupInviteLink(int groupId, bool isEnabled)
+		public async Task EnableInviteLink(int groupId, bool isEnabled)
 		{
 			var group = db.Groups.Find(groupId);
 			group.IsInviteLinkEnabled = isEnabled;
@@ -483,6 +485,23 @@ namespace Database.DataContexts
 				.ToList();
 			var userGroups = db.Groups.Where(g => userGroupsIds.Contains(g.Id)).ToList();
 			return userGroups.Any(g => g.IsManualCheckingEnabled);
+		}
+
+		public bool GetDefaultProhibitFutherReviewForUser(string courseId, string userId, IPrincipal instructor)
+		{
+			var accessibleGroupsIds = new HashSet<int>(GetMyGroupsFilterAccessibleToUser(courseId, instructor).Select(g => g.Id));
+			var userGroupsIds = db.GroupMembers
+				.Where(m => m.Group.CourseId == courseId && m.UserId == userId && !m.Group.IsDeleted)
+				.DistinctBy(m => m.GroupId)
+				.Select(m => m.GroupId)
+				.ToList();
+			
+			/* Return true if exists at least one group with enabled DefaultProhibitFutherReview */
+			return db.Groups.Any(
+				g => accessibleGroupsIds.Contains(g.Id) &&
+					userGroupsIds.Contains(g.Id) &&
+					g.DefaultProhibitFutherReview
+			);
 		}
 
 		public async Task EnableAdditionalScoringGroupsForGroup(int groupId, IEnumerable<string> scoringGroupsIds)

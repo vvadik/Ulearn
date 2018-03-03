@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.0.2" />
+    <PackageReference Include="NETStandard.Library" Version="2.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Serilog" Version="2.6.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{3CC038A1-6AA0-49B0-9485-DB9589626BC3}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup>
+    <!-- Temporary workaround for getting Microsoft.AspNetCore.Mvc.Code.dll in the output folder
+         (for Ulearn.Web, which is .NET Framework project, not .NET Core) -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+</Project>

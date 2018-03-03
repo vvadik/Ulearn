@@ -9,9 +9,8 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Database.DataContexts;
 using Microsoft.AspNet.Identity;
-using uLearn.Extensions;
 using uLearn.Web.Kontur.Passport;
-using SkbKontur.Passport.Client;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web
 {

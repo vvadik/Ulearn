@@ -10,9 +10,10 @@ using NUnit.Framework;
 using RunCsJob;
 using RunCsJob.Api;
 using test;
-using uLearn.Extensions;
+using uLearn.Helpers;
 using uLearn.Model;
 using uLearn.Model.Blocks;
+using Ulearn.Common.Extensions;
 using SearchOption = System.IO.SearchOption;
 
 namespace uLearn.CSharp
@@ -23,7 +24,7 @@ namespace uLearn.CSharp
 		private ProjectExerciseBlock ex;
 		private List<SlideBlock> exBlocks;
 
-		private string tempSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, nameof(ProjectExerciseBlock_Should));
+		private readonly string tempSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, nameof(ProjectExerciseBlock_Should));
 		private DirectoryInfo tempSlideFolder => new DirectoryInfo(tempSlideFolderPath);
 
 		private string studentExerciseFolderPath => Path.Combine(tempSlideFolderPath, "ProjectExerciseBlockTests_Student_ExerciseFolder");
@@ -33,6 +34,8 @@ namespace uLearn.CSharp
 
 		private string studentCsProjFilePath => Path.Combine(studentExerciseFolderPath, TestsHelper.CsProjFilename);
 		private string checkerCsprojFilePath => Path.Combine(checkerExerciseFolderPath, TestsHelper.CsProjFilename);
+
+		private FileInfo studentExerciseZipFilePath => tempSlideFolder.GetFile("exercise.zip");
 
 		private Project studentZipCsproj;
 		private Project checkerZipCsproj;
@@ -55,9 +58,14 @@ namespace uLearn.CSharp
 				PathsToExcludeForStudent = new[] { "inner-dir-1\\inner-dir-2\\ExcludeMeForStudent.cs" }
 			};
 
-			var ctx = new BuildUpContext(new Unit(null, ex.SlideFolderPath), CourseSettings.DefaultSettings, null, String.Empty);
+			var unit = new Unit(null, ex.SlideFolderPath);
+			var ctx = new BuildUpContext(unit, CourseSettings.DefaultSettings, null, "Test", string.Empty);
 			exBlocks = ex.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
-			Utils.UnpackZip(ex.StudentsZip.Content(), studentExerciseFolderPath);
+			
+			var builder = new ExerciseStudentZipBuilder();
+			builder.BuildStudentZip(new ExerciseSlide(exBlocks, new SlideInfo(unit, null, 1), "", Guid.NewGuid()), studentExerciseZipFilePath);
+			
+			Utils.UnpackZip(studentExerciseZipFilePath.Content(), studentExerciseFolderPath);
 
 			var zipBytes = ex.GetZipBytesForChecker("i_am_user_code");
 			Utils.UnpackZip(zipBytes, checkerExerciseFolderPath);
@@ -139,7 +147,7 @@ namespace uLearn.CSharp
 				Input = "",
 				NeedRun = true,
 				ProjectFileName = "test.csproj",
-				ZipFileData = ex.StudentsZip.Content()
+				ZipFileData = studentExerciseZipFilePath.Content()
 			};
 			var result = SandboxRunner.Run(submission);
 

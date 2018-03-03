@@ -128,6 +128,9 @@ namespace uLearn.Web.Controllers
 			importantNotifications = RemoveBlockedNotifications(importantNotifications).ToList();
 			commentsNotifications = RemoveBlockedNotifications(commentsNotifications, importantNotifications).ToList();
 
+			importantNotifications = RemoveNotActualNotifications(importantNotifications).ToList();
+			commentsNotifications = RemoveNotActualNotifications(commentsNotifications).ToList();
+
 			var importantLastViewTimestamp = feedRepo.GetFeedViewTimestamp(userId, notificationTransport?.Id ?? -1);
 			var commentsLastViewTimestamp = feedRepo.GetFeedViewTimestamp(userId, commonFeedNotificationTransport.Id);
 
@@ -143,6 +146,11 @@ namespace uLearn.Web.Controllers
 				CommentsNotificationsTransportId = commonFeedNotificationTransport.Id,
 				CourseManager = courseManager,
 			};
+		}
+
+		private IEnumerable<Notification> RemoveNotActualNotifications(IEnumerable<Notification> notifications)
+		{
+			return notifications.Where(notification => notification.IsActual());
 		}
 
 		private IEnumerable<Notification> RemoveBlockedNotifications(IReadOnlyCollection<Notification> notifications, IReadOnlyCollection<Notification> searchBlockersAlsoIn=null)

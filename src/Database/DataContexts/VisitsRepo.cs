@@ -227,5 +227,30 @@ namespace Database.DataContexts
 		{
 			return db.Visits.Where(v => v.CourseId == courseId).Select(v => v.UserId).Distinct().ToList();
 		}
+		
+		public List<RatingEntry> GetCourseRating(string courseId, int minScore)
+		{
+			return db.Visits.Where(v => v.CourseId == courseId)
+				.GroupBy(v => v.UserId)
+				.Where(g => g.Sum(v => v.Score) >= minScore)
+				.ToList()
+				.Select(g => new RatingEntry(g.First().User, g.Sum(v => v.Score), g.Max(v => v.Timestamp)))
+				.OrderByDescending(r => r.Score)
+				.ToList();
+		}
+	}
+
+	public class RatingEntry
+	{
+		public RatingEntry(ApplicationUser user, int score, DateTime lastVisitTime)
+		{
+			User = user;
+			Score = score;
+			LastVisitTime = lastVisitTime;
+		}
+
+		public readonly ApplicationUser User;
+		public readonly int Score;
+		public readonly DateTime LastVisitTime;
 	}
 }

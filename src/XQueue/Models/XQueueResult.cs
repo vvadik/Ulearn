@@ -1,6 +1,5 @@
 ﻿using System.Runtime.Serialization;
-using uLearn;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace XQueue.Models
 {

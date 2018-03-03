@@ -7,10 +7,9 @@ using System.Web.Mvc;
 using Database.DataContexts;
 using log4net;
 using Telegram.Bot;
-using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {

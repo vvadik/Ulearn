@@ -8,6 +8,7 @@ using Database.Models;
 using log4net;
 using Metrics;
 using uLearn;
+using Ulearn.Common.Extensions;
 
 namespace Notifications
 {
@@ -62,9 +63,14 @@ namespace Notifications
 
 		private string GetEmailHtmlSignature(NotificationDelivery delivery)
 		{
-			var courseId = delivery.Notification.CourseId;
-			var courseTitle = courseManager.GetCourse(courseId).Title;
-			return GetEmailHtmlSignature(delivery.NotificationTransportId, delivery.Notification.GetNotificationType(), courseId, courseTitle);
+			/* Email signature is disabled from 2018.02.11 */
+			return "";
+			
+			/*
+				var courseId = delivery.Notification.CourseId;
+				var courseTitle = courseManager.GetCourse(courseId).Title;
+				return GetEmailHtmlSignature(delivery.NotificationTransportId, delivery.Notification.GetNotificationType(), courseId, courseTitle);
+			*/
 		}
 
 		private async Task SendAsync(MailNotificationTransport transport, NotificationDelivery notificationDelivery)
@@ -112,7 +118,7 @@ namespace Notifications
 				var button = notification.GetNotificationButton(transport, delivery, course, baseUrl);
 				if (button != null)
 				{
-					htmlMessage += $"<br/></br><a href=\"{button.Link.EscapeHtml()}\">{button.Text.EscapeHtml()}</a>";
+					htmlMessage += $"<br/><br/><a href=\"{button.Link.EscapeHtml()}\">{button.Text.EscapeHtml()}</a>";
 					textMessage += $"\n\n{button.Text}: {button.Link}";
 				}
 

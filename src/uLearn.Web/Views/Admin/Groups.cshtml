@@ -1,9 +1,9 @@
 ﻿@using Database.Extensions
 @using Database.Models
-@using uLearn
-@using uLearn.Extensions
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Shared
+@using Ulearn.Common
+@using Ulearn.Common.Extensions
 
 @model uLearn.Web.Controllers.GroupsViewModel
 
@@ -25,17 +25,30 @@
 	</div>
 
 	<div class="checkbox checkbox-default @(Model.CourseManualCheckingEnabled ? "hidden" : "")">
-		<input checked="checked" data-default-value="true" id="@(fieldsPrefix)manualCheckingForOldSolutions" name="manualCheckingForOldSolutions" type="checkbox" value="true">
-		<input type="hidden" name="manualCheckingForOldSolutions" value="false" />
-		<label for="@(fieldsPrefix)manualCheckingForOldSolutions">
-			Отправить на код-ревью и ручную проверку тестов старые решения участников
-			<span class="glyphicon glyphicon-question-sign with-long-tooltip"
-				data-toggle="tooltip"
-				data-placement="right"
-				title="Если эта опция выключена, то при вступлении студента в группу его старые решения не будут отправлены на код-ревью">
-			</span>
-		</label>
-	</div>
+        <input checked="checked" data-default-value="true" id="@(fieldsPrefix)manualCheckingForOldSolutions" name="manualCheckingForOldSolutions" type="checkbox" value="true">
+        <input type="hidden" name="manualCheckingForOldSolutions" value="false" />
+        <label for="@(fieldsPrefix)manualCheckingForOldSolutions">
+            Отправить на код-ревью и ручную проверку тестов старые решения участников
+            <span class="glyphicon glyphicon-question-sign with-long-tooltip"
+                  data-toggle="tooltip"
+                  data-placement="right"
+                  title="Если эта опция выключена, то при вступлении студента в группу его старые решения не будут отправлены на код-ревью">
+            </span>
+        </label>
+    </div>
+    
+	<div class="checkbox checkbox-default">
+        <input checked="checked" data-default-value="true" id="@(fieldsPrefix)defaultProhibitFutherReview" name="defaultProhibitFutherReview" type="checkbox" value="true">
+        <input type="hidden" name="defaultProhibitFutherReview" value="false" />
+        <label for="@(fieldsPrefix)defaultProhibitFutherReview">
+            По&nbsp;умолчанию запрещать второе прохождение код-ревью
+            <span class="glyphicon glyphicon-question-sign with-long-tooltip"
+                  data-toggle="tooltip"
+                  data-placement="right"
+                  title="В каждом код-ревью вы сможете выбирать, разрешить ли студенту второй раз отправить свой код на проверку. Эта опция задаёт лишь значение по умолчанию">
+            </span>
+        </label>
+    </div>
 
 	if (Model.ScoringGroupsCanBeSetInSomeUnit.Count > 0)
 	{
@@ -58,6 +71,22 @@
 			}
 		</div>
 	}
+}
+
+@helper GroupInviteLinkSettings() {
+    <div class="help-block">
+        <div class="modal__create_group__step3__invite-link-block" data-enabled="true">
+            Отправьте своим студентам ссылку для&nbsp;вступления в&nbsp;группу: <a href="#" class="modal__create-group__step3__invite-link">...</a>
+            <a href="#" class="modal__create-group__step3__enable-invite_link" data-group-id="" data-url="@Url.Action("EnableGroupInviteLink", new { groupId = "GROUP_ID", isEnabled = false })">
+                Выключить ссылку
+            </a>
+        </div>
+        <div class="modal__create_group__step3__invite-link-block" data-enabled="false">
+            <a href="#" class="modal__create-group__step3__enable-invite_link" data-group-id="" data-url="@Url.Action("EnableGroupInviteLink", new { groupId = "GROUP_ID", isEnabled = true})">
+                Включить инвайт-ссылку для&nbsp;вступления в&nbsp;группу
+            </a>
+        </div>
+    </div>
 }
 
 @{
@@ -242,9 +271,7 @@
 				</div>
 
 				<h3>Студенты</h3>
-				<div class="help-block">
-					Отправьте своим студентам ссылку для&nbsp;вступления в&nbsp;группу: <a href="#" class="modal__create-group__step3__invite-link">...</a>
-				</div>
+				@GroupInviteLinkSettings()
 				
 				@if (User.IsSystemAdministrator())
 				{
@@ -308,9 +335,7 @@
 					</div>
 
 					<h3>Студенты</h3>
-					<div class="help-block">
-						Отправьте своим студентам ссылку для&nbsp;вступления в&nbsp;группу: <a href="#" class="modal__create-group__step3__invite-link">...</a>
-					</div>
+                    @GroupInviteLinkSettings()
 					<ol class="modal__edit-group__members">
 						
 					</ol>

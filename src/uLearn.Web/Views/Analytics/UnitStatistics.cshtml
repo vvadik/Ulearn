@@ -1,8 +1,9 @@
 ﻿@using Database.Models
 @using uLearn
-@using uLearn.Extensions
 @using uLearn.Quizes
 @using uLearn.Web.Extensions
+@using Ulearn.Common
+@using Ulearn.Common.Extensions
 
 @model UnitStatisticPageModel
 @{
@@ -204,7 +205,7 @@
 <div class="row" id="students">
 	<div class="col-xs-12">
 		@{
-			var exercisesAndQuizzes = Model.Slides.Where(s => s is QuizSlide || s is ExerciseSlide).OrderBy(s => s.Index);
+			var exercisesAndQuizzes = Model.Slides.Where(s => s is QuizSlide || s is ExerciseSlide).OrderBy(s => s.Index).ToList();
 			var modifiableScoringGroups = Model.Unit.Scoring.Groups.Values.Where(g => g.CanBeSetByInstructor).ToList();
 		}
 
@@ -238,7 +239,7 @@
 
 		@if (!Model.VisitedUsers.Any())
 		{
-			<div class="text-muted">Здесь пока никого не было...</div>
+			<div class="text-muted">Здесь пока никого не было.</div>
 		}
 
 		@foreach (var userInfo in Model.VisitedUsers)

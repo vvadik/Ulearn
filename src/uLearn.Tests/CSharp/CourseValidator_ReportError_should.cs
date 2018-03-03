@@ -2,14 +2,15 @@
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using FluentAssertions;
+using log4net.Config;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
 using test;
-using uLearn.Extensions;
+using uLearn.Helpers;
 using uLearn.Model;
 using uLearn.Model.Blocks;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp
 {
@@ -26,6 +27,7 @@ namespace uLearn.CSharp
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
+			BasicConfigurator.Configure();
 			TestsHelper.RecreateDirectory(tempSlideFolderPath);
 		}
 
@@ -45,16 +47,16 @@ namespace uLearn.CSharp
 			if (File.Exists(studentZipFilepath))
 				File.Delete(studentZipFilepath);
 
-			var ctx = new BuildUpContext(new Unit(null, exBlock.SlideFolderPath), CourseSettings.DefaultSettings, null,
-				String.Empty);
+			var ctx = new BuildUpContext(new Unit(null, exBlock.SlideFolderPath), CourseSettings.DefaultSettings, null, "Test", string.Empty);
 			exBlock.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
 		}
 
 		[Test]
+		[Ignore("ProjectExerciseValidator generates exercise zip from exercise block. Zip file built here is not care")]
 		public void ReportError_If_StudentZip_HasErrors()
 		{
-			FileSystem.CopyDirectory(tempSlideFolder.GetSubdir("projDir").FullName,
-				tempSlideFolder.GetSubdir("FullProjDir").FullName);
+			FileSystem.CopyDirectory(tempSlideFolder.GetSubdirectory("projDir").FullName,
+				tempSlideFolder.GetSubdirectory("FullProjDir").FullName);
 			exBlock.CsProjFilePath = Path.Combine("FullProjDir", TestsHelper.CsProjFilename);
 			SaveTempZipFileWithFullProject();
 
@@ -77,19 +79,19 @@ namespace uLearn.CSharp
 			var noExcludedDirs = new string[0];
 
 			var csProjFile = TestsHelper.ProjExerciseFolder.GetFile(TestsHelper.CsProjFilename);
-			ProjModifier.ModifyCsproj(csProjFile, ProjModifier.ResolveLinks);
 
 			new LazilyUpdatingZip(
 					TestsHelper.ProjExerciseFolder,
 					noExcludedDirs,
 					noExcludedFiles,
 					ResolveCsprojLink,
+					ExerciseStudentZipBuilder.ResolveCsprojLinks(csProjFile, ProjectExerciseBlock.BuildingToolsVersion), 
 					zipWithFullProj)
 				.UpdateZip();
 
 			byte[] ResolveCsprojLink(FileInfo file)
 			{
-				return file.Name.Equals(exBlock.CsprojFileName) ? ProjModifier.ModifyCsproj(file, ProjModifier.ResolveLinks) : null;
+				return file.Name.Equals(exBlock.CsprojFileName) ? ProjModifier.ModifyCsproj(file, ProjModifier.ReplaceLinksWithItems) : null;
 			}
 		}
 
@@ -123,6 +125,7 @@ namespace uLearn.CSharp
 		public void ReportError_If_NUnitTestRunner_Tries_To_Run_NonExisting_Test_Class()
 		{
 			exBlock.NUnitTestClasses = new[] { "non_existing.test_class", };
+			exBlock.ReplaceStartupObjectForNUnitExercises();
 
 			var validatorOutput = TestsHelper.ValidateBlock(exBlock);
 
@@ -136,6 +139,7 @@ namespace uLearn.CSharp
 		public void ReportError_If_Solution_For_ProjectExerciseBlock_Is_Not_Solution()
 		{
 			exBlock.NUnitTestClasses = new[] { $"test.{nameof(OneFailingTest)}" };
+			exBlock.ReplaceStartupObjectForNUnitExercises();
 
 			var validatorOutput = TestsHelper.ValidateBlock(exBlock);
 

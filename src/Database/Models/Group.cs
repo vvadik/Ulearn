@@ -52,6 +52,10 @@ namespace Database.Models
 		[Required]
 		/* Могут ли студенты этой группы видеть сводную таблицу прогресса по курсу всех студентов группы */
 		public bool CanUsersSeeGroupProgress { get; set; }
+		
+		[Required]
+		/* Значение по умолчанию для галочки «Не принимать больше код-ревью у этого студента» */
+		public bool DefaultProhibitFutherReview { get; set; }
 
 		public DateTime? CreateTime { get; set; }
 

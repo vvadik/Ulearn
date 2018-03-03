@@ -6,8 +6,9 @@ using Database.DataContexts;
 using Database.Models;
 using log4net;
 using Metrics;
+using uLearn.Telegram;
 using uLearn.Web.Models;
-using uLearn.Web.Telegram;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {

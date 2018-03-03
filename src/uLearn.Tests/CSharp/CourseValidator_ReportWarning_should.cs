@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
-using uLearn.Extensions;
 using uLearn.Model;
 using uLearn.Model.Blocks;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp
 {
@@ -38,8 +37,7 @@ namespace uLearn.CSharp
 			if (File.Exists(studentZipFilepath))
 				File.Delete(studentZipFilepath);
 
-			var ctx = new BuildUpContext(new Unit(null, exBlock.SlideFolderPath), CourseSettings.DefaultSettings, null,
-				String.Empty);
+			var ctx = new BuildUpContext(new Unit(null, exBlock.SlideFolderPath), CourseSettings.DefaultSettings, null, "Test", string.Empty);
 			exBlock.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
 		}
 

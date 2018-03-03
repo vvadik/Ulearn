@@ -6,12 +6,14 @@ using System.Web;
 using System.Web.Mvc;
 using Database.Models;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
-using uLearn.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Kontur.Passport;
 using uLearn.Web.Microsoft.Owin.Security.VK;
 using uLearn.Web.Models;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {
@@ -76,17 +78,7 @@ namespace uLearn.Web.Controllers
 			var user = await userManager.FindAsync(loginInfo.Login);
 			if (user != null)
 			{
-				var avatarUrl = loginInfo.ExternalIdentity.FindFirstValue("AvatarUrl");
-				var sex = loginInfo.ExternalIdentity.FindFirstValue(ClaimTypes.Gender);
-				Gender? userSex = null;
-				if (Enum.TryParse(sex, out Gender parsedSex))
-					userSex = parsedSex;
-
-				if (!string.IsNullOrEmpty(avatarUrl))
-					user.AvatarUrl = avatarUrl;
-				if (userSex != null && user.Gender == null)
-					user.Gender = userSex;
-				await userManager.UpdateAsync(user);
+				await UpdateUserFieldsFromExternalLoginInfo(user.Id, loginInfo);
 
 				await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
 				await SendConfirmationEmailAfterLogin(user);
@@ -103,7 +95,7 @@ namespace uLearn.Web.Controllers
 			ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
 
 			Gender? loginGender = null;
-			loginInfo.ExternalIdentity.FindFirstValue(ClaimTypes.Gender)?.TryParseToNullableEnum<Gender>(out loginGender);
+			loginInfo.ExternalIdentity.FindFirstValue(ClaimTypes.Gender)?.TryParseToNullableEnum(out loginGender);
 			return View("ExternalLoginConfirmation",
 				new ExternalLoginConfirmationViewModel { UserName = loginInfo.DefaultUserName, Email = loginInfo.Email, Gender = loginGender });
 		}
@@ -196,15 +188,18 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize]
 		public async Task<ActionResult> LinkLoginCallback(string returnUrl="")
 		{
-			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext, XsrfKey, User.Identity.GetUserId());
+			var userId = User.Identity.GetUserId();
+			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext, XsrfKey, userId);
 			if (loginInfo == null)
 			{
 				log.Warn("LinkLoginCallback: GetExternalLoginInfoAsync() returned null");
 				return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.ErrorOccured });
 			}
-			var result = await userManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login);
+			var result = await userManager.AddLoginAsync(userId, loginInfo.Login);
 			if (result.Succeeded)
 			{
+				await UpdateUserFieldsFromExternalLoginInfo(userId, loginInfo);
+				
 				if (!string.IsNullOrEmpty(returnUrl))
 					return Redirect(this.FixRedirectUrl(returnUrl));
 
@@ -212,6 +207,27 @@ namespace uLearn.Web.Controllers
 			}
 			var otherUser = await userManager.FindAsync(loginInfo.Login);
 			return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.AlreadyLinkedToOtherUser, Provider = loginInfo.Login.LoginProvider, OtherUserId = otherUser?.Id ?? "" });
+		}
+
+		private async Task UpdateUserFieldsFromExternalLoginInfo(string userId, ExternalLoginInfo loginInfo)
+		{
+			var user = await userManager.FindByIdAsync(userId);
+			
+			var avatarUrl = loginInfo.ExternalIdentity.FindFirstValue("AvatarUrl");
+			var konturLogin = loginInfo.ExternalIdentity.FindFirstValue("KonturLogin");
+			var sex = loginInfo.ExternalIdentity.FindFirstValue(ClaimTypes.Gender);
+			Gender? userSex = null;
+			if (Enum.TryParse(sex, out Gender parsedSex))
+				userSex = parsedSex;
+
+			if (!string.IsNullOrEmpty(avatarUrl))
+				user.AvatarUrl = avatarUrl;
+			if (!string.IsNullOrEmpty(konturLogin))
+				user.KonturLogin = konturLogin;
+			if (userSex != null && user.Gender == null)
+				user.Gender = userSex;
+			
+			await userManager.UpdateAsync(user);
 		}
 
 		[HttpPost]

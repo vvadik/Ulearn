@@ -78,8 +78,9 @@ namespace uLearn.Web.Kontur.Passport
 				/* Replace name from Kontur\andgein to andgein */
 				if (name != null && name.Contains(@"\"))
 					name = name.Substring(name.IndexOf('\\') + 1);
-
+				
 				identity.AddClaim(new Claim(ClaimTypes.Name, name, xmlSchemaForStringType, Options.AuthenticationType));
+				identity.AddClaim(new Claim("KonturLogin", name, xmlSchemaForStringType, Options.AuthenticationType));				
 
 				var properties = Options.StateDataFormat.Unprotect(state);
 				return new AuthenticationTicket(identity, properties);
@@ -151,7 +152,6 @@ namespace uLearn.Web.Kontur.Passport
 			if (Options.ReturnEndpointPath != null &&
 				string.Equals(Options.ReturnEndpointPath, Request.Path.Value, StringComparison.OrdinalIgnoreCase))
 			{
-				log.Debug("InvokeAsync");
 				var ticket = await AuthenticateAsync();
 
 				var context = new KonturPassportReturnEndpointContext(Context, ticket)

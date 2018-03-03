@@ -1,5 +1,7 @@
 ﻿@using Microsoft.AspNet.Identity
-@using uLearn.Extensions
+@using uLearn.Web.Extensions
+@using Ulearn.Common
+@using Ulearn.Common.Extensions
 
 @model uLearn.Web.Controllers.UserCertificatesViewModel
 
@@ -27,7 +29,7 @@
 		{
 			<div class="certificates-list__info">
 				@Model.User.VisibleName
-				<span>пока не&nbsp;получил(а) ни&nbsp;одного сертификата за&nbsp;прохождение курсов.</span>
+				<span>пока не&nbsp;получил@(Model.User.Gender.ChooseEnding()) ни&nbsp;одного сертификата за&nbsp;прохождение курсов.</span>
 			</div>
 		}
 	}
@@ -35,15 +37,13 @@
 	{
 		<div class="certificates-list__info">
 			<div>
-				Вы можете поделиться ссылкой на&nbsp;эту страницу или отдельный сертификат с&nbsp;друзьями:
+                Поделитесь ссылкой на&nbsp;эту страницу или отдельный сертификат с&nbsp;друзьями. Это поможет другим людям находить курсы по&nbsp;программированию.
 			</div>
 			<div class="likely">
 				<div class="vkontakte">Поделиться</div>
 				<div class="telegram">Отправить</div>
 				<div class="twitter">Твитнуть</div>
 				<div class="facebook">Поделиться</div>
-				<div class="gplus">Плюсануть</div>
-				<div class="linkedin">Линкануть</div>
 			</div>
 		</div>
 	}
@@ -56,10 +56,12 @@
 				                   "Сертификат за курс «" + Model.CoursesTitles.GetOrDefault(certificate.Template.CourseId, "") + "»",
 				                   "Certificate",
 				                   new { certificateId = certificate.Id }
-				                   )</h3>
+				                   )
+        </h3>
 		<div>
-			<strong>@certificate.Timestamp.ToLongDateString()</strong>,
-			преподаватель: @certificate.Instructor.VisibleName
+            @certificate.Instructor.VisibleName
+            выдал@(certificate.Instructor.Gender.ChooseEnding()) сертификат
+            <span class="text-muted" title="@certificate.Timestamp.ToPrettyString()">@certificate.Timestamp.ToLongDateString()</span>
 		</div>
 		certificateIndex++;
 	}

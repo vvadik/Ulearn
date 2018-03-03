@@ -28,7 +28,7 @@ namespace uLearn.Web.Controllers
 
 		private readonly string stepikClientId;
 		private readonly string stepikClientSecret;
-		private string defaultXQueueName;
+		private readonly string defaultXQueueName;
 
 		public StepikController()
 			: this(new ULearnDb(), WebCourseManager.Instance)
@@ -315,7 +315,7 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var userId = User.Identity.GetUserId();
-			if (process.OwnerId != userId && User.IsSystemAdministrator())
+			if (process.OwnerId != userId && ! User.IsSystemAdministrator())
 				return HttpNotFound();
 
 			var course = courseManager.GetCourse(process.UlearnCourseId);

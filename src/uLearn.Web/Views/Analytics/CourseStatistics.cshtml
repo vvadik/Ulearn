@@ -1,9 +1,9 @@
-﻿@using Database.Extensions
+﻿@using System.Linq
+@using Database.Extensions
 @using Database.Models
-@using LtiLibrary.Core.Extensions
-@using uLearn
-@using uLearn.Extensions
 @using uLearn.Web.Extensions
+@using Ulearn.Common
+@using Ulearn.Common.Extensions
 @model CourseStatisticPageModel
 
 @functions {
@@ -63,28 +63,27 @@
 				Groups = Model.Groups,
 			})
 
-			<div class="form-group">
-				<div class="btn-group" role="group">
-					<button role="button" class="btn btn-primary" data-replace-action="@Url.Action("CourseStatistics")">Показать</button>
-
-					<div class="btn-group" role="group">
-						<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							<span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu pull-right">
-							<li>
-								<a href="@Url.Action("ExportCourseStatisticsAsXlsx")" data-replace-action="@Url.Action("ExportCourseStatisticsAsXlsx")">Скачать как xlsx</a>
-							</li>
-							<li>
-								<a href="@Url.Action("ExportCourseStatisticsAsJson")" data-replace-action="@Url.Action("ExportCourseStatisticsAsJson")">Скачать как json</a>
-							</li>
-							<li>
-								<a href="@Url.Action("ExportCourseStatisticsAsXml")" data-replace-action="@Url.Action("ExportCourseStatisticsAsXml")">Скачать как xml</a>
-							</li>
-						</ul>
-					</div>
-				</div>
-			</div>
+            <div class="form-group">
+                <button role="button" class="btn btn-primary" data-replace-action="@Url.Action("CourseStatistics")">Показать ведомость</button>
+                
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Скачать <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="@Url.Action("ExportCourseStatisticsAsXlsx")" data-replace-action="@Url.Action("ExportCourseStatisticsAsXlsx")">Скачать xlsx</a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("ExportCourseStatisticsAsJson")" data-replace-action="@Url.Action("ExportCourseStatisticsAsJson")">Скачать json</a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("ExportCourseStatisticsAsXml")" data-replace-action="@Url.Action("ExportCourseStatisticsAsXml")">Скачать xml</a>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div>
 		</div>
 	}
 }
@@ -149,7 +148,7 @@
 <table class="course-statistics" data-initial-order="desc">
 <thead>
 <tr>
-	<th rowspan="2">Фамилия Имя</th>
+	<th rowspan="2" class="student-name" data-sorter="true">Фамилия Имя</th>
 	@if (Model.IsInstructor)
 	{
 		<th rowspan="2">Эл. почта</th>

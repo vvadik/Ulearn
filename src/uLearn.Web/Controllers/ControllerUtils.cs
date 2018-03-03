@@ -11,8 +11,8 @@ using Database.Extensions;
 using Database.Models;
 using log4net;
 using Microsoft.AspNet.Identity;
-using uLearn.Extensions;
 using uLearn.Quizes;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {

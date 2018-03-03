@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
+﻿namespace uLearn.CSharp.IndentsValidation.TestData.Incorrect
 {
 	public class BracesShouldBeAlignedIfOpenBraceHasLeadingTriviaAndBracesNotOnSameLine
 	{

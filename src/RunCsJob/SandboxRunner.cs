@@ -1,16 +1,16 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Security;
 using System.Text;
-using FluentAssertions.Common;
 using log4net;
 using Newtonsoft.Json;
 using RunCsJob.Api;
 using uLearn;
-using uLearn.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace RunCsJob
 {
@@ -63,7 +63,7 @@ namespace RunCsJob
 
 			var randomSuffix = Guid.NewGuid().ToString("D");
 			randomSuffix = randomSuffix.Substring(randomSuffix.Length - 8);
-			var submissionCompilationDirectory = workingDirectory.GetSubdir($"{submission.Id}-{randomSuffix}");
+			var submissionCompilationDirectory = workingDirectory.GetSubdirectory($"{submission.Id}-{randomSuffix}");
 			try
 			{
 				submissionCompilationDirectory.Create();
@@ -128,7 +128,7 @@ namespace RunCsJob
 
 			if (!builderResult.Success)
 			{
-				log.Info($"Решение {submission.Id} не скомпилировалось: {builderResult.ToString().RemoveNewLines()}");
+				log.Info($"Решение {submission.Id} не скомпилировалось: {builderResult.ToString().Replace("\n", @"\n")}");
 				return new RunningResults(Verdict.CompilationError, compilationOutput: builderResult.ToString());
 			}
 
@@ -213,7 +213,16 @@ namespace RunCsJob
 			finally
 			{
 				if (!sandbox.HasExited)
-					sandbox.Kill();
+				{
+					try
+					{
+						sandbox.Kill();
+					}
+					catch (Win32Exception)
+					{
+						/* Sometimes we can catch Access Denied error because the process is already terminating. It's ok, we don't need to rethrow exception */	
+					}
+				}
 			}
 
 			if (hasOutputLimit)

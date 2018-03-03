@@ -9,10 +9,11 @@ using Kontur.Spam.Client;
 using log4net;
 using Metrics;
 using Microsoft.AspNet.Identity;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {
-	public class BaseUserController : Controller
+	public class BaseUserController : BaseController
 	{
 		protected static readonly ILog log = LogManager.GetLogger(typeof(BaseUserController));
 
@@ -20,7 +21,7 @@ namespace uLearn.Web.Controllers
 		protected UserManager<ApplicationUser> userManager;
 		protected readonly UsersRepo usersRepo;
 
-		protected GraphiteMetricSender metricSender;
+		protected readonly GraphiteMetricSender metricSender;
 
 		protected readonly string secretForHashes;
 
@@ -68,7 +69,7 @@ namespace uLearn.Web.Controllers
 		{
 			metricSender.SendCount("email_confirmation.send_confirmation_email.try");
 			var confirmationUrl = Url.Action("ConfirmEmail", "Account", new { email = user.Email, signature = GetEmailConfirmationSignature(user.Email) }, "https");
-			var subject = "Подтверждение адреса";
+			var subject = "РџРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ Р°РґСЂРµСЃР°";
 
 			var messageInfo = new MessageSentInfo
 			{
@@ -79,19 +80,19 @@ namespace uLearn.Web.Controllers
 				Variables = new Dictionary<string, object>
 				{
 					{ "title", subject },
-					{ "content", $"<h2>Привет, {user.VisibleName}!</h2><p>Подтверди адрес электронной почты, нажав на кнопку:</p>" },
-					{ "text_content", $"Привет, {user.VisibleName}!\nПодтверди адрес электронной почты, нажав на кнопку:" },
+					{ "content", $"<h2>РџСЂРёРІРµС‚, {user.VisibleName}!</h2><p>РџРѕРґС‚РІРµСЂРґРё Р°РґСЂРµСЃ СЌР»РµРєС‚СЂРѕРЅРЅРѕР№ РїРѕС‡С‚С‹, РЅР°Р¶Р°РІ РЅР° РєРЅРѕРїРєСѓ:</p>" },
+					{ "text_content", $"РџСЂРёРІРµС‚, {user.VisibleName}!\nРџРѕРґС‚РІРµСЂРґРё Р°РґСЂРµСЃ СЌР»РµРєС‚СЂРѕРЅРЅРѕР№ РїРѕС‡С‚С‹, РЅР°Р¶Р°РІ РЅР° РєРЅРѕРїРєСѓ:" },
 					{ "button", true },
 					{ "button_link", confirmationUrl },
-					{ "button_text", "Подтвердить адрес" },
+					{ "button_text", "РџРѕРґС‚РІРµСЂРґРёС‚СЊ Р°РґСЂРµСЃ" },
 					{
 						"content_after_button",
-						"<p>Подтвердив адрес, ты сможешь восстановить доступ к своему аккаунту " +
-						"в любой момент, а также получать уведомления об ответах на свои комментарии и других важных событиях</p>" +
-						"<p>Мы не подпиcываем ни на какую периодическую рассылку, " +
-						"а все уведомления можно выключить в профиле.</p><p>" +
-						"Если ссылка для подтверждения почты не работает, просто скопируй адрес " +
-						$"и вставь его в адресную строку браузера: <a href=\"{confirmationUrl}\">{confirmationUrl}</a></p>"
+						"<p>РџРѕРґС‚РІРµСЂРґРёРІ Р°РґСЂРµСЃ, С‚С‹ СЃРјРѕР¶РµС€СЊ РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ РґРѕСЃС‚СѓРї Рє СЃРІРѕРµРјСѓ Р°РєРєР°СѓРЅС‚Сѓ " +
+						"РІ Р»СЋР±РѕР№ РјРѕРјРµРЅС‚, Р° С‚Р°РєР¶Рµ РїРѕР»СѓС‡Р°С‚СЊ СѓРІРµРґРѕРјР»РµРЅРёСЏ РѕР±В РѕС‚РІРµС‚Р°С… РЅР°В СЃРІРѕРё РєРѕРјРјРµРЅС‚Р°СЂРёРё Рё РґСЂСѓРіРёС… РІР°Р¶РЅС‹С… СЃРѕР±С‹С‚РёСЏС…</p>" +
+						"<p>РњС‹ РЅРµВ РїРѕРґРїРёcС‹РІР°РµРј РЅРё РЅР° РєР°РєСѓСЋ РїРµСЂРёРѕРґРёС‡РµСЃРєСѓСЋ СЂР°СЃСЃС‹Р»РєСѓ, " +
+						"Р° РІСЃРµ СѓРІРµРґРѕРјР»РµРЅРёСЏ РјРѕР¶РЅРѕ РІС‹РєР»СЋС‡РёС‚СЊ РІВ РїСЂРѕС„РёР»Рµ.</p><p>" +
+						"Р•СЃР»Рё СЃСЃС‹Р»РєР° РґР»СЏ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ РїРѕС‡С‚С‹ РЅРµВ СЂР°Р±РѕС‚Р°РµС‚, РїСЂРѕСЃС‚Рѕ СЃРєРѕРїРёСЂСѓР№ Р°РґСЂРµСЃ " +
+						$"Рё РІСЃС‚Р°РІСЊ РµРіРѕ РІВ Р°РґСЂРµСЃРЅСѓСЋ СЃС‚СЂРѕРєСѓ Р±СЂР°СѓР·РµСЂР°: <a href=\"{confirmationUrl}\">{confirmationUrl}</a></p>"
 					}
 				}
 			};
@@ -102,7 +103,7 @@ namespace uLearn.Web.Controllers
 			}
 			catch (Exception e)
 			{
-				log.Error($"Не могу отправить письмо для подтверждения адреса на {user.Email}", e);
+				log.Error($"РќРµ РјРѕРіСѓ РѕС‚РїСЂР°РІРёС‚СЊ РїРёСЃСЊРјРѕ РґР»СЏ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ Р°РґСЂРµСЃР° РЅР° {user.Email}", e);
 				return false;
 			}
 			metricSender.SendCount("email_confirmation.send_confirmation_email.success");

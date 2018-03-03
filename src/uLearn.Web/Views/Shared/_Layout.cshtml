@@ -2,6 +2,7 @@
 @using Database.Extensions
 @using Database.Models
 @using uLearn
+@using uLearn.Web.Controllers
 @using uLearn.Web.Extensions
 <!DOCTYPE html>
 <html>
@@ -18,6 +19,7 @@
 	@Styles.Render("~/ulearn.bundle.css")
 	@Styles.Render("~/katex/katex.min.css")
 	@Scripts.Render("~/modernizr.bundle.js")
+    @Html.Partial("_Retargeting")
 </head>
 <body>
 <div id="header" class="navbar navbar-inverse navbar-fixed-top">
@@ -33,7 +35,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			@Html.ActionLink("uLearn", "Index", "Home", null, new { @class = "navbar-brand" })
+			@Html.ActionLink("Ulearn", "Index", "Home", null, new { @class = "navbar-brand" })
 			<ul class="notifications__mobile-nav nav navbar-nav pull-right visible-xs">
 				@if (User.Identity.IsAuthenticated)
 				{
@@ -132,6 +134,12 @@
 </script>
 
 @Html.Partial("_YandexMetrika")
+
+@if (AccountController.IsHijacked(HttpContext.Current.Request))
+{
+	@Html.Partial("_ReturnHijack")
+}
+
 </body>
 </html>
 

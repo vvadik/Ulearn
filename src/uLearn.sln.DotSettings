@@ -32,6 +32,7 @@
 	<s:String x:Key="/Default/CodeStyle/CodeCleanup/SilentCleanupProfile/@EntryValue">Team</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CommonFormatter/ALIGNMENT_TAB_FILL_STYLE/@EntryValue">USE_TABS_ONLY</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CommonFormatter/USE_INDENTS_FROM_MAIN_LANGUAGE_IN_FILE/@EntryValue">False</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGNMENT_TAB_FILL_STYLE/@EntryValue">USE_TABS_ONLY</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGN_MULTILINE_ARGUMENT/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGN_MULTILINE_PARAMETER/@EntryValue">False</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ANONYMOUS_METHOD_DECLARATION_BRACES/@EntryValue">NEXT_LINE</s:String>
@@ -43,9 +44,12 @@
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/INDENT_STYLE/@EntryValue">Tab</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/INITIALIZER_BRACES/@EntryValue">NEXT_LINE</s:String>
 	<s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/KEEP_BLANK_LINES_IN_CODE/@EntryValue">1</s:Int64>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_ACCESSORHOLDER_ATTRIBUTE_ON_SAME_LINE_EX/@EntryValue">NEVER</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_CONSTRUCTOR_INITIALIZER_ON_SAME_LINE/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_FIELD_ATTRIBUTE_ON_SAME_LINE/@EntryValue">False</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_FIELD_ATTRIBUTE_ON_SAME_LINE_EX/@EntryValue">NEVER</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_SIMPLE_ACCESSORHOLDER_ON_SINGLE_LINE/@EntryValue">False</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_SIMPLE_EMBEDDED_STATEMENT_ON_SAME_LINE/@EntryValue">NEVER</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SIMPLE_EMBEDDED_STATEMENT_STYLE/@EntryValue">LINE_BREAK</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AFTER_TYPECAST_PARENTHESES/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_MULTIPLICATIVE_OP/@EntryValue">True</s:Boolean>
@@ -63,11 +67,20 @@
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_MULTIPLE_TYPE_PARAMEER_CONSTRAINTS_STYLE/@EntryValue">WRAP_IF_LONG</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_OBJECT_AND_COLLECTION_INITIALIZER_STYLE/@EntryValue">WRAP_IF_LONG</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_TERNARY_EXPR_STYLE/@EntryValue">WRAP_IF_LONG</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CssFormatter/ALIGNMENT_TAB_FILL_STYLE/@EntryValue">USE_TABS_ONLY</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CssFormatter/KEEP_USER_LINEBREAKS/@EntryValue">False</s:Boolean>
 	<s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CssFormatter/MIN_BLANK_LINES_BETWEEN_DECLARATIONS/@EntryValue">0</s:Int64>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CssFormatter/PROPERTIES_STYLE/@EntryValue">SEPARATE_LINES</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CssFormatter/SELECTOR_STYLE/@EntryValue">SEPARATE_LINES</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CssFormatter/SPACE_AFTER_PROPERTY_SEMICOLON/@EntryValue">False</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/FSharpFormat/ALIGNMENT_TAB_FILL_STYLE/@EntryValue">USE_TABS_ONLY</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/HtmlFormatter/ALIGNMENT_TAB_FILL_STYLE/@EntryValue">USE_TABS_ONLY</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/JavaScriptCodeFormatting/ALIGNMENT_TAB_FILL_STYLE/@EntryValue">USE_TABS_ONLY</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/ProtobufCodeFormatting/ALIGNMENT_TAB_FILL_STYLE/@EntryValue">USE_TABS_ONLY</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/ResxFormatter/ALIGNMENT_TAB_FILL_STYLE/@EntryValue">USE_TABS_ONLY</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/VBFormat/ALIGNMENT_TAB_FILL_STYLE/@EntryValue">USE_TABS_ONLY</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/XmlDocFormatter/ALIGNMENT_TAB_FILL_STYLE/@EntryValue">USE_TABS_ONLY</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/XmlFormatter/ALIGNMENT_TAB_FILL_STYLE/@EntryValue">USE_TABS_ONLY</s:String>
 	<s:String x:Key="/Default/CodeStyle/CSharpMemberOrderPattern/CustomPattern/@EntryValue">&lt;?xml version="1.0" encoding="utf-8" ?&gt;&#xD;
 &#xD;
 &lt;!--&#xD;
@@ -336,6 +349,7 @@ II.2.12 &lt;HandlesEvent /&gt;&#xD;
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=6CA8EE9D0EDEFF43BD08343F22118B36/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=6CA8EE9D0EDEFF43BD08343F22118B36/AbsolutePath/@EntryValue">C:\projects\diadoc\git\trunk\_Src\Diadoc.DotSettings</s:String>
 	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=6CA8EE9D0EDEFF43BD08343F22118B36/RelativePath/@EntryValue">..\Diadoc.DotSettings</s:String>
+	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File6CA8EE9D0EDEFF43BD08343F22118B36/IsOn/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File_003A_003AC_003A_005Cdev_005Cdiadoc_005CDiadoc_002EDotSettings/@KeyIndexDefined">True</s:Boolean>
 	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File_003A_003AC_003A_005Cdev_005Cdiadoc_005CDiadoc_002EDotSettings/RelativePriority/@EntryValue">6</s:Double>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File_003A_003AC_003A_005Cdiadoc_005CDiadoc_002EDotSettings/@KeyIndexDefined">True</s:Boolean>
@@ -362,10 +376,19 @@ II.2.12 &lt;HandlesEvent /&gt;&#xD;
 	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File_003A_003AD_003A_005CSources_005Cgit_005Cdiadoc_005C_005FSrc_005CDiadoc_002EDotSettings/RelativePriority/@EntryValue">15</s:Double>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File6CA8EE9D0EDEFF43BD08343F22118B36/@KeyIndexDefined">True</s:Boolean>
 	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File6CA8EE9D0EDEFF43BD08343F22118B36/RelativePriority/@EntryValue">11</s:Double>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpAttributeForSingleLineMethodUpgrade/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpFileLayoutPatternsUpgrade/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpKeepExistingMigration/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpPlaceEmbeddedOnSameLineMigration/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpRenamePlacementToArrangementMigration/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EAddAccessorOwnerDeclarationBracesMigration/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002ECSharpPlaceAttributeOnSameLineMigration/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EMigrateBlankLinesAroundFieldToBlankLinesAroundProperty/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EMigrateThisQualifierSettings/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002EFormat_002ESettingsUpgrade_002EAlignmentTabFillStyleMigration/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002EJavaScript_002ECodeStyle_002ESettingsUpgrade_002EJsParsFormattingSettingsUpgrader/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002EJavaScript_002ECodeStyle_002ESettingsUpgrade_002EJsWrapperSettingsUpgrader/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002EXml_002ECodeStyle_002EFormatSettingsUpgrade_002EXmlMoveToCommonFormatterSettingsUpgrade/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0FCAA26C35B9F647933EDFD171AF0CB4/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0FCAA26C35B9F647933EDFD171AF0CB4/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0FCAA26C35B9F647933EDFD171AF0CB4/Description/@EntryValue">NotNullAttribute</s:String>

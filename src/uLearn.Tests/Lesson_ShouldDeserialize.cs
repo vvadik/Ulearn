@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
-using uLearn.Extensions;
 using uLearn.Model;
 using uLearn.Model.Blocks;
+using Ulearn.Common.Extensions;
 
 namespace uLearn
 {
@@ -86,7 +85,7 @@ namespace uLearn
 
 		private static SlideBlock[] DeserializeBlocks(string blocksXml)
 		{
-			var buildUpContext = new BuildUpContext(new Unit(null, new DirectoryInfo(".")), CourseSettings.DefaultSettings, null, "Заголовок слайда");
+			var buildUpContext = new BuildUpContext(new Unit(null, new DirectoryInfo(".")), CourseSettings.DefaultSettings, null, "Test", "Заголовок слайда");
 			var blocks = DeserializeLesson(blocksXml).Blocks;
 			return blocks.SelectMany(b => b.BuildUp(buildUpContext, ImmutableHashSet<string>.Empty)).ToArray();
 		}

@@ -4,25 +4,38 @@ using System.Linq;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using System.Web.Configuration;
 using System.Web.Http;
 using System.Web.Mvc;
+using AntiPlagiarism.Api;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Elmah;
+using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
-using uLearn.Extensions;
+using Serilog;
+using Serilog.Events;
+using uLearn.Helpers;
 using uLearn.Model.Blocks;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
 using uLearn.Web.Models;
+using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
 {
 	[ULearnAuthorize]
 	public class ExerciseController : BaseExerciseController
 	{
+		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache;
+		
+		public ExerciseController()
+		{
+			exerciseStudentZipsCache = new ExerciseStudentZipsCache();
+		}
+		
 		[System.Web.Mvc.HttpPost]
 		public async Task<ActionResult> RunSolution(string courseId, Guid slideId, bool isLti = false)
 		{
@@ -170,19 +183,12 @@ namespace uLearn.Web.Controllers
 			{
 				var checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(id);
 
-				if (checking.IsChecked && !recheck)
-					return Redirect(errorUrl + "Эта работа уже была проверена");
-
-				if (!checking.IsLockedBy(User.Identity))
-					return Redirect(errorUrl + "Эта работа проверяется другим инструктором");
-
 				var course = courseManager.GetCourse(checking.CourseId);
 				var slide = (ExerciseSlide)course.GetSlideById(checking.SlideId);
 				var exercise = slide.Exercise;
 
-				int score;
 				/* Invalid form: score isn't integer */
-				if (!int.TryParse(exerciseScore, out score))
+				if (!int.TryParse(exerciseScore, out var score))
 					return Redirect(errorUrl + "Неверное количество баллов");
 
 				/* Invalid form: score isn't from range 0..MAX_SCORE */
@@ -394,6 +400,25 @@ namespace uLearn.Web.Controllers
 
 			return PartialView(model);
 		}
+
+        [System.Web.Mvc.AllowAnonymous]
+		public ActionResult StudentZip(string courseId, Guid? slideId)
+		{
+			if (!slideId.HasValue)
+				return HttpNotFound();
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId.Value);
+			if (!(slide is ExerciseSlide))
+				return HttpNotFound();
+
+			var exerciseSlide = slide as ExerciseSlide;
+			if (!(exerciseSlide.Exercise is ProjectExerciseBlock))
+				return HttpNotFound();
+
+			var block = (ProjectExerciseBlock) exerciseSlide.Exercise;
+			var zipFile = exerciseStudentZipsCache.GenerateOrFindZip(courseId, exerciseSlide);
+			
+			return File(zipFile.FullName, "application/zip", block.CsprojFile.Name + ".zip");
+		}
 	}
 
 	[DataContract]
@@ -452,6 +477,8 @@ namespace uLearn.Web.Controllers
 			Submissions = new List<UserExerciseSubmission>();
 			CurrentSubmissionId = null;
 			CanTryAgain = true;
+			ShowButtons = true;
+			SelectControlName = "version";
 		}
 
 		public string CourseId { get; set; }
@@ -459,6 +486,16 @@ namespace uLearn.Web.Controllers
 		public List<UserExerciseSubmission> Submissions { get; set; }
 		public int? CurrentSubmissionId { get; set; }
 		public bool CanTryAgain { get; set; }
+		public bool ShowButtons { get; set; }
+		public string SelectControlName { get; set; }
+
+		[CanBeNull]
+		public Func<UserExerciseSubmission, string> GetSubmissionDescription { get; set; }
+		
+		/* By default it's Url.RouteUrl("Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url }) */
+		[CanBeNull]
+		public string FormUrl { get; set; }
+
 	}
 
 	public class ExerciseControlsModel
@@ -487,20 +524,23 @@ namespace uLearn.Web.Controllers
 
 	public class ExerciseScoreFormModel
 	{
-		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking, List<string> groupsIds = null, bool isCurrentSubmissionChecking = false)
+		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking, List<string> groupsIds = null,
+			bool isCurrentSubmissionChecking = false, bool defaultProhibitFutherReview = true)
 		{
 			CourseId = courseId;
 			Slide = slide;
 			Checking = checking;
 			GroupsIds = groupsIds;
 			IsCurrentSubmissionChecking = isCurrentSubmissionChecking;
+			DefaultProhibitFutherReview = defaultProhibitFutherReview;
 		}
-
+		
 		public string CourseId { get; set; }
 		public ExerciseSlide Slide { get; set; }
 		public ManualExerciseChecking Checking { get; set; }
 		public List<string> GroupsIds { get; set; }
 		public string GroupsIdsJoined => string.Join(",", GroupsIds ?? new List<string>());
 		public bool IsCurrentSubmissionChecking { get; set; }
+		public bool DefaultProhibitFutherReview { get; set; }
 	}
 }
