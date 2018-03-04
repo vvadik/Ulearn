@@ -16,7 +16,7 @@ class App extends React.Component {
           className={styles.number}
           id="x"
           value={x}
-          tabindex="1"
+          tabIndex="1"
           type="number"
           min="0"
           max="10"
@@ -27,7 +27,7 @@ class App extends React.Component {
           className={styles.number}
           id="y"
           value={y}
-          tabindex="2"
+          tabIndex="2"
           type="number"
           min="0"
           max="10"
