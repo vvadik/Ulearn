@@ -76,10 +76,10 @@ $(document).ready(function () {
             for (let tokenIndex = firstTokenIndex; tokenIndex <= lastTokenIndex; tokenIndex++)
                 highlightedTokes.push(tokenIndex);
         });
-        highlightedTokes.sort();
+        highlightedTokes.sort(function (a, b) {
+            return a - b;
+        });
         
-        console.log('Hightlighted tokens', highlightedTokes);
-
         let textMarkerOptions = {
             className: 'antiplagiarism__not-analyzed',
             title: 'Эта часть кода не анализируется на списывание',
@@ -90,8 +90,6 @@ $(document).ready(function () {
             if (idx === 0 || highlightedTokes[idx - 1] < highlightedTokes[idx] - 1) {
                 let currentHighlightFinish = tokens[highlightedTokes[idx]].start_position;
                 if (currentHighlightStart !== currentHighlightFinish) {  
-                    console.log('Current highlighted token is', idx, highlightedTokes[idx], tokens[highlightedTokes[idx]]);
-                    console.log('Mark text from', document.posFromIndex(currentHighlightStart), 'to', document.posFromIndex(currentHighlightFinish), 'with', textMarkerOptions);
                     document.markText(
                         document.posFromIndex(currentHighlightStart),
                         document.posFromIndex(currentHighlightFinish),
