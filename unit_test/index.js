@@ -18,9 +18,13 @@ const runTests = async () => {
     .filter(f => f.endsWith('.test.js'))
     .forEach(f => mocha.addFile(path.join(testDir, f)))
 
-  mocha.run(json => {
-    console.log(json)
-  })
+  return new Promise(resolve =>
+    mocha.run(json => {
+      resolve(json)
+    })
+  )
 }
 
-runTests().catch()
+runTests()
+  .then(console.log)
+  .catch(console.error)
