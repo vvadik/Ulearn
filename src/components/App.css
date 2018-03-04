@@ -1,0 +1,33 @@
+:local(.root) {
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(5, 1fr);
+  min-width: 300px;
+}
+
+:local(.number) {
+  text-align: center;
+  color: #00008b;
+}
+
+:local(.result) {
+  justify-self: center;
+  text-decoration: underline;
+  font-weight: 600;
+  color: #006400;
+}
+
+:local(.text) {
+  justify-self: center;
+  color: #333;
+}
+
+body {
+  background-color: #f6f6f6;
+  font-family: Roboto, Arial, sans-serif;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
