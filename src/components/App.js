@@ -34,7 +34,7 @@ class App extends React.Component {
           onChange={this.set('y')}
         />
         <span className={styles.text}>is</span>
-        <span className={styles.result} id="sum">
+        <span className={styles.result} id="result">
           {sum(x, y)}
         </span>
       </div>
