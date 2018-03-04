@@ -6,7 +6,6 @@
   "license": "MIT",
   "scripts": {
     "build-ui": "webpack --config webpack.ui-config.js",
-    "build-dll": "webpack --config webpack.dll-config.js",
     "build-ui-test": "webpack --config webpack.ui-test-config.js",
     "build-unit-test": "webpack --config webpack.unit-test-config.js",
     "run-ui-test": "yarn build-ui-test && node dist/ui_test/index.js",
