@@ -2,44 +2,22 @@ namespace uLearn.CSharp.RefArgumentsValidation.TestData.Incorrect
 {
 	internal class RefArgumentsValidationTestDataClass
 	{
-		public bool TryDoWork1(out int foo, out int workResult)
-		{
-			foo = 0;
-			workResult = 0;
-			return true;
-		}
-
-		public bool TryDoWork2(out int foo, ref int workResult)
-		{
-			foo = 0;
-			return true;
-		}
-
-		public bool DoWork1(int foo, out int workResult)
-		{
-			workResult = 0;
-			return true;
-		}
-
-		public void DoWork2(int foo, out int workResult)
+		public void DoWork(ref string foo, out int workResult)
 		{
 			workResult = 0;
 		}
 
-		public void TryDoWork(int foo, out int workResult)
+		public void DoWork(ref string foo, out int workResult, ref string foo2)
 		{
 			workResult = 0;
 		}
 
-		public bool TryDoWork(out int workResult, int foo)
+		public void DoWork(ref RefArgumentsValidationTestDataClass foo)
 		{
-			workResult = 0;
-			return true;
 		}
 
-		public bool TryDoWork2(int foo, ref int workResult)
+		public void DoWork(ref int foo, ref string foo2)
 		{
-			return true;
 		}
 	}
 }
