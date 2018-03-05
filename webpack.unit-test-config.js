@@ -24,7 +24,13 @@ module.exports = {
           loader: 'babel-loader',
           options: {
             presets: [
-              ['@babel/preset-env', { targets: { node: 'current' } }],
+              [
+                '@babel/preset-env',
+                {
+                  targets: { node: 'current' },
+                  useBuiltIns: true,
+                },
+              ],
               '@babel/preset-stage-0',
             ],
           },
