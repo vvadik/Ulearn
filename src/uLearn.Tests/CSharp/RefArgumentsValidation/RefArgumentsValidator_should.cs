@@ -8,13 +8,13 @@ using FluentAssertions;
 using NUnit.Framework;
 using Ulearn.Common.Extensions;
 
-namespace uLearn.CSharp.TryPatternValidation
+namespace uLearn.CSharp.RefArgumentsValidation
 {
 	[TestFixture]
-	internal class TryPatternValidator_should
+	internal class RefArgumentsValidator_should
 	{
 		private static readonly DirectoryInfo testDataDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
-			"..", "CSharp", "TryPatternValidation", "TestData"));
+			"..", "CSharp", "RefArgumentsValidation", "TestData"));
 
 		private static DirectoryInfo IncorrectTestDataDir => testDataDir.GetDirectories("Incorrect").Single();
 		private static DirectoryInfo CorrectTestDataDir => testDataDir.GetDirectories("Correct").Single();
@@ -28,7 +28,7 @@ namespace uLearn.CSharp.TryPatternValidation
 		public void FindErrors(string filename)
 		{
 			var code = IncorrectTestDataDir.GetFiles(filename).Single().ContentAsUtf8();
-			var errors = new TryPatternValidator().FindError(code);
+			var errors = new RefArgumentsValidator().FindError(code);
 			using (ApprovalResults.ForScenario(filename))
 			{
 				Approvals.Verify(errors);
@@ -39,7 +39,7 @@ namespace uLearn.CSharp.TryPatternValidation
 		public void NotFindErrors(string filename)
 		{
 			var code = CorrectTestDataDir.GetFiles(filename).Single().ContentAsUtf8();
-			var errors = new TryPatternValidator().FindError(code);
+			var errors = new RefArgumentsValidator().FindError(code);
 			if (errors != null)
 			{
 				Console.WriteLine(errors);

@@ -1,6 +1,6 @@
-namespace uLearn.CSharp.TryPatternValidation.TestData.Correct
+namespace uLearn.CSharp.RefArgumentsValidation.TestData.Correct
 {
-	internal class TryPatternValidationTestDataClass
+	internal class RefArgumentsValidationTestDataClass
 	{
 		public void Foo() { }
 

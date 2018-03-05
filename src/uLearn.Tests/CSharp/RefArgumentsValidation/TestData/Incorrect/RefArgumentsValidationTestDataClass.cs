@@ -1,6 +1,6 @@
-namespace uLearn.CSharp.TryPatternValidation.TestData.Incorrect
+namespace uLearn.CSharp.RefArgumentsValidation.TestData.Incorrect
 {
-	internal class TryPatternValidationTestDataClass
+	internal class RefArgumentsValidationTestDataClass
 	{
 		public bool TryDoWork1(out int foo, out int workResult)
 		{
