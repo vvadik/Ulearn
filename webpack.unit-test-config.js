@@ -28,7 +28,6 @@ module.exports = {
                 '@babel/preset-env',
                 {
                   targets: { node: 'current' },
-                  useBuiltIns: true,
                 },
               ],
               '@babel/preset-stage-0',

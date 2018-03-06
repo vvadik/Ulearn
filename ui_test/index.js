@@ -32,4 +32,4 @@ const runTests = async () => {
 runTests()
   .then(console.log)
   .catch(console.error)
-  .finally(global.browser.close)
+  .finally(() => global.browser.close())

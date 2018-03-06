@@ -22,7 +22,6 @@ module.exports = {
                 '@babel/preset-env',
                 {
                   targets: { browsers: 'last 3 chrome versions' },
-                  useBuiltIns: true,
                 },
               ],
               '@babel/preset-stage-0',
