@@ -21,7 +21,7 @@ namespace uLearn.CSharp
 				.Concat(errorsInDoWhileCycle);
 		}
 
-		private IEnumerable<string> InspectMethod<TCycle>(TCycle cycleStatement, SemanticModel semanticModel) where TCycle: StatementSyntax // TODO: вытаскивать все инициализации
+		private IEnumerable<string> InspectMethod<TCycle>(TCycle cycleStatement, SemanticModel semanticModel) where TCycle: StatementSyntax
 		{
 			var methodInvocations = cycleStatement
 				.DescendantNodes()
