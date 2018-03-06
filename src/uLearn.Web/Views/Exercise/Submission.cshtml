@@ -111,6 +111,7 @@
 
 		if (Model.ReviewState == ExerciseReviewState.Reviewed || Model.InstructorView || Model.Reviews.Any())
 		{
+			var showOnlyAutomaticalReviews = Model.ReviewState != ExerciseReviewState.Reviewed && !Model.InstructorView;
 			/* For reviewed submission without reviews don't show reviews panel at all */
 			var isEmpty = Model.Reviews.Count == 0 && !canAddReviews ? "empty" : "";
 			<div class="exercise__reviews @isEmpty">
@@ -118,13 +119,19 @@
 				{
 					/* Instructors can reply always. Students can reply only if exists a human (not ulearn bot) replied before */
 					var canReply = Model.InstructorView || !review.Author.IsUlearnBot() || review.NotDeletedComments.Any(c => !c.Author.IsUlearnBot());
-					
+
+					if (showOnlyAutomaticalReviews && !review.Author.IsUlearnBot())
+					{
+						continue;
+					}
+
 					@Html.Partial("_ExerciseReview", new ExerciseCodeReviewModel
 					{
 						Review = review,
 						ManualChecking = Model.ManualChecking,
 						CurrentUser = Model.CurrentUser,
 						CanReply = canReply,
+						ShowOnlyAutomaticalReviews = showOnlyAutomaticalReviews,
 					})
 				}
 			</div>

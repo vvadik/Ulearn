@@ -13,7 +13,7 @@
      data-finish-line="@Model.Review.FinishLine"
      data-finish-position="@Model.Review.FinishPosition">
     @{
-	    var hasTimestamp = Model.Review.AddingTime.Year >= 2000;
+	    var hasTimestamp = Model.Review.HasAddingTime;
     }
     <div class="exercise__review__header @(hasTimestamp ? "with-timestamp" : "without-timestamp")">
         <div class="media">
@@ -57,11 +57,25 @@
         </div>
     </div>
     <div class="exercise__review__comment">
+        @if (Model.Review.Author.IsUlearnBot())
+        {
+	        <div class="pull-right">
+                <span class="with-long-tooltip cursor-pointer" data-toggle="tooltip" data-placement="top" title="Код со стилевыми ошибками трудно или неприятно читать другим программистам, поэтому он может не пройти код-ревью">
+                    <span class="fa fa-question-circle"></span>
+                </span>
+            </div>
+        }
+        
         @Html.Raw(Html.HighlightLinks(Html.EncodeMultiLineText(Model.Review.Comment, keepFirstSpaces: true).RenderSimpleMarkdown()))
     </div>
 
     @foreach (var comment in Model.Review.NotDeletedComments)
     {
+	    if (Model.ShowOnlyAutomaticalReviews && !comment.Author.IsUlearnBot())
+	    {
+		    continue;
+	    }
+	    
 	    @Html.Partial("_ExerciseReviewComment", comment)
     }
     

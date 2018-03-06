@@ -65,17 +65,7 @@ namespace Database.DataContexts
 			};
 			db.ManualExerciseCheckings.Add(manualChecking);
 
-			try
-			{
-				await db.SaveChangesAsync();
-			}
-			catch (DbEntityValidationException e)
-			{
-				throw new Exception(
-					string.Join("\r\n", e.EntityValidationErrors.Select(v => v.Entry.Entity.ToString())) +
-					string.Join("\r\n",
-						e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
-			}
+			await db.SaveChangesAsync();
 
 			return manualChecking;
 		}
@@ -84,10 +74,17 @@ namespace Database.DataContexts
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var checkings = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId, false).Where(c => !c.IsChecked && !c.IsLocked);
+				var checkings = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId, noTracking: false).Where(c => !c.IsChecked && !c.IsLocked).ToList();
 				foreach (var checking in checkings)
+				{
 					// Use EntityState.Deleted because EF could don't know abount these checkings (they have been retrieved via AsNoTracking())
+					// TODO (andgein): Now it's not retrieived via AsNoTracking(). Fix this.
+					foreach (var review in checking.Reviews.ToList())
+						db.Entry(review).State = EntityState.Deleted;
+					
 					db.Entry(checking).State = EntityState.Deleted;
+				}
+
 				await db.SaveChangesAsync();
 				transaction.Commit();
 			}
@@ -205,7 +202,7 @@ namespace Database.DataContexts
 				StartPosition = startPosition,
 				FinishLine = finishLine,
 				FinishPosition = finishPosition,
-				AddingTime = setAddingTime ? DateTime.Now : DateTime.MinValue,
+				AddingTime = setAddingTime ? DateTime.Now : ExerciseCodeReview.NullAddingTime,
 			});
 
 			await db.SaveChangesAsync();

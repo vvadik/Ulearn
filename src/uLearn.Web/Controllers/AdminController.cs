@@ -368,7 +368,7 @@ namespace uLearn.Web.Controllers
 		private async Task<ActionResult> InternalManualCheck<T>(string courseId, string actionName, int queueItemId, bool ignoreLock = false, List<string> groupsIds = null, bool recheck = false) where T : AbstractManualSlideChecking
 		{
 			T checking;
-			var joinedGroupsIds = string.Join(",", groupsIds);
+			var joinedGroupsIds = string.Join(",", groupsIds ?? new List<string>());
 			using (var transaction = db.Database.BeginTransaction())
 			{
 				checking = slideCheckingsRepo.FindManualCheckingById<T>(queueItemId);

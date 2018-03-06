@@ -73,10 +73,17 @@ namespace Database.Repos
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var checkings = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId, false).Where(c => !c.IsChecked && !c.IsLocked);
+				var checkings = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId, noTracking: false).Where(c => !c.IsChecked && !c.IsLocked).ToList();
 				foreach (var checking in checkings)
-					// Use EntityState.Deleted because EF could know nothing abount these checkings (they have been retrieved via AsNoTracking())
+				{
+					// Use EntityState.Deleted because EF could don't know abount these checkings (they have been retrieved via AsNoTracking())
+					// TODO (andgein): Now it's not retrieived via AsNoTracking(). Fix this.
+					foreach (var review in checking.Reviews.ToList())
+						db.Entry(review).State = EntityState.Deleted;
+					
 					db.Entry(checking).State = EntityState.Deleted;
+				}
+
 				await db.SaveChangesAsync();
 				transaction.Commit();
 			}
@@ -194,7 +201,7 @@ namespace Database.Repos
 				StartPosition = startPosition,
 				FinishLine = finishLine,
 				FinishPosition = finishPosition,
-				AddingTime = setAddingTime ? DateTime.Now : DateTime.MinValue,
+				AddingTime = setAddingTime ? DateTime.Now : ExerciseCodeReview.NullAddingTime,
 			});
 
 			await db.SaveChangesAsync();

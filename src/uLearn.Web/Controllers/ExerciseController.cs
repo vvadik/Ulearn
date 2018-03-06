@@ -186,7 +186,12 @@ namespace uLearn.Web.Controllers
 
 			var submissionUserId = review.ExerciseCheckingId.HasValue ? review.ExerciseChecking.UserId : review.Submission.UserId;
 			var submissionCourseId = review.ExerciseCheckingId.HasValue ? review.ExerciseChecking.CourseId : review.Submission.CourseId;
-			if (submissionUserId != currentUserId && ! User.HasAccessFor(submissionCourseId, CourseRole.Instructor))
+			var isInstructor = User.HasAccessFor(submissionCourseId, CourseRole.Instructor);
+			if (submissionUserId != currentUserId && ! isInstructor)
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			
+			var canReply = isInstructor || !review.Author.IsUlearnBot() || review.NotDeletedComments.Any(c => !c.Author.IsUlearnBot());
+			if (!canReply)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 				
 			var comment = await slideCheckingsRepo.AddExerciseCodeReviewComment(currentUserId, reviewId, text);
