@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -49,16 +48,31 @@ namespace uLearn.CSharp
 			return methodDeclaration.ParameterList.Parameters
 				.Where(ArgumentIsRef)
 				.Select(it => (Parameter: it, TypeInfo: semanticModel.GetTypeInfo(it.Type)))
-				.Where(it => !IsPrimitive(it.TypeInfo.Type))
+				.Where(it => !IsPrimitive(it.TypeInfo.Type.SpecialType))
 				.Select(it => ReportLocal(it.Parameter));
 		}
 
-		private static bool IsPrimitive(ITypeSymbol typeSymbol)
+		private static bool IsPrimitive(SpecialType specialType)
 		{
-			var specialTypeString = typeSymbol.SpecialType.ToString();
-			if (!specialTypeString.StartsWith("System", StringComparison.InvariantCultureIgnoreCase))
-				return false;
-			return Type.GetType(specialTypeString.Replace('_', '.'))?.IsPrimitive == true;
+			switch (specialType)
+			{
+				case SpecialType.System_Boolean:
+				case SpecialType.System_Byte:
+				case SpecialType.System_SByte:
+				case SpecialType.System_Int16:
+				case SpecialType.System_UInt16:
+				case SpecialType.System_Int32:
+				case SpecialType.System_UInt32:
+				case SpecialType.System_Int64:
+				case SpecialType.System_UInt64:
+				case SpecialType.System_IntPtr:
+				case SpecialType.System_UIntPtr:
+				case SpecialType.System_Char:
+				case SpecialType.System_Double:
+				case SpecialType.System_Single:
+					return true;
+			}
+			return false;
 		}
 	}
 }
