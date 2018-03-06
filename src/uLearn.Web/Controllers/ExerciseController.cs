@@ -183,11 +183,14 @@ namespace uLearn.Web.Controllers
 		{
 			var review = slideCheckingsRepo.FindExerciseCodeReviewById(reviewId);
 			var currentUserId = User.Identity.GetUserId();
-			if (review.ExerciseChecking.UserId != currentUserId && ! User.HasAccessFor(review.ExerciseChecking.CourseId, CourseRole.Instructor))
+
+			var submissionUserId = review.ExerciseCheckingId.HasValue ? review.ExerciseChecking.UserId : review.Submission.UserId;
+			var submissionCourseId = review.ExerciseCheckingId.HasValue ? review.ExerciseChecking.CourseId : review.Submission.CourseId;
+			if (submissionUserId != currentUserId && ! User.HasAccessFor(submissionCourseId, CourseRole.Instructor))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 				
 			var comment = await slideCheckingsRepo.AddExerciseCodeReviewComment(currentUserId, reviewId, text);
-			if (review.ExerciseChecking.IsChecked)
+			if (review.ExerciseCheckingId.HasValue && review.ExerciseChecking.IsChecked)
 				await NotifyAboutCodeReviewComment(comment);
 
 			return PartialView("_ExerciseReviewComment", comment);
@@ -358,7 +361,7 @@ namespace uLearn.Web.Controllers
 				solution = lastSubmission?.SolutionCode.Text;
 			}
 
-			var submissionReviews = submission?.ManualCheckings.LastOrDefault()?.NotDeletedReviews;
+			var submissionReviews = submission?.GetOwnAndLastManualCheckingReviews();
 
 			var hasUncheckedReview = submission?.ManualCheckings.Any(c => !c.IsChecked) ?? false;
 			var hasCheckedReview = submission?.ManualCheckings.Any(c => c.IsChecked) ?? false;
@@ -439,10 +442,10 @@ namespace uLearn.Web.Controllers
 			model.ShowOnlyAccepted = onlyAccepted;
 			if (manualChecking != null)
 			{
-				if (string.Equals(manualChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
+				if (manualChecking.CourseId.EqualsIgnoreCase(courseId))
 				{
 					model.ManualChecking = manualChecking;
-					model.Reviews = submission?.ManualCheckings.SelectMany(c => c.NotDeletedReviews).ToList() ?? new List<ExerciseCodeReview>();
+					model.Reviews = submission?.GetOwnAndLastManualCheckingReviews() ?? new List<ExerciseCodeReview>();
 				}
 			}
 

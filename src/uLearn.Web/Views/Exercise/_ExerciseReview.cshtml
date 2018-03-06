@@ -57,31 +57,33 @@
         </div>
     </div>
     <div class="exercise__review__comment">
-        @Html.Raw(Html.EncodeMultiLineText(Model.Review.Comment, keepFirstSpaces: true).RenderSimpleMarkdown())
+        @Html.Raw(Html.HighlightLinks(Html.EncodeMultiLineText(Model.Review.Comment, keepFirstSpaces: true).RenderSimpleMarkdown()))
     </div>
 
     @foreach (var comment in Model.Review.NotDeletedComments)
     {
 	    @Html.Partial("_ExerciseReviewComment", comment)
     }
-
-    <div class="exercise__review__new-comment-place"></div>
     
-    <div class="exercise__review__reply-form">
-        <div>
-            <input type="text" placeholder="Ответить..."/>
-            <textarea name="text"></textarea>
-        </div>
-        <div class="exercise__review__reply-footer">
-            <div class="exercise__review__reply-button ib">
-                <button class="btn btn-primary btn-sm" data-url="@Url.Action("AddExerciseCodeReviewComment")" data-id="@Model.Review.Id" title="Работает Ctrl+Enter">Ответить</button>
+    @if (Model.CanReply)
+    {
+	    <div class="exercise__review__new-comment-place"></div>
+	    
+	    <div class="exercise__review__reply-form">
+            <div>
+                <input type="text" placeholder="Ответить..."/>
+                <textarea name="text"></textarea>
             </div>
-            <div class="pull-right">
-                <span class="markdown-formatting-helper with-long-tooltip cursor-pointer" data-toggle="tooltip" data-placement="bottom" title="**жирный текст**, __курсивный текст__, `код`, ```многострочный код```">
-                    <span class="fa fa-question-circle"></span> Форматирование
-                </span>
+            <div class="exercise__review__reply-footer">
+                <div class="exercise__review__reply-button ib">
+                    <button class="btn btn-primary btn-sm" data-url="@Url.Action("AddExerciseCodeReviewComment")" data-id="@Model.Review.Id" title="Работает Ctrl+Enter">Ответить</button>
+                </div>
+                <div class="pull-right">
+                    <span class="markdown-formatting-helper with-long-tooltip cursor-pointer" data-toggle="tooltip" data-placement="bottom" title="**жирный текст**, __курсивный текст__, `код`, ```многострочный код```">
+                        <span class="fa fa-question-circle"></span> Форматирование
+                    </span>
+                </div>
             </div>
         </div>
-    </div>
-
+    }
 </div>

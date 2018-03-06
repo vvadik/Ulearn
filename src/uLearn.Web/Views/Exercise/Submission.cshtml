@@ -109,18 +109,22 @@
             </p>
 		}
 
-		if (Model.ReviewState == ExerciseReviewState.Reviewed || Model.InstructorView)
+		if (Model.ReviewState == ExerciseReviewState.Reviewed || Model.InstructorView || Model.Reviews.Any())
 		{
-			/* For reviewed submission without reviews don't show reviews panel at all*/
+			/* For reviewed submission without reviews don't show reviews panel at all */
 			var isEmpty = Model.Reviews.Count == 0 && !canAddReviews ? "empty" : "";
 			<div class="exercise__reviews @isEmpty">
 				@foreach (var review in Model.Reviews.OrderBy(r => r.StartLine).ThenBy(r => r.StartPosition))
 				{
+					/* Instructors can reply always. Students can reply only if exists a human (not ulearn bot) replied before */
+					var canReply = Model.InstructorView || !review.Author.IsUlearnBot() || review.NotDeletedComments.Any(c => !c.Author.IsUlearnBot());
+					
 					@Html.Partial("_ExerciseReview", new ExerciseCodeReviewModel
 					{
 						Review = review,
 						ManualChecking = Model.ManualChecking,
 						CurrentUser = Model.CurrentUser,
+						CanReply = canReply,
 					})
 				}
 			</div>

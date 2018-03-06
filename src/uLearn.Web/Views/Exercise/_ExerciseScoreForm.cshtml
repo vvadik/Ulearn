@@ -63,11 +63,12 @@
 					}
 				</div>
 				<div class="ib">
-					<a href="#" class="exercise__other-score-link internal-page-link @(isPercentScoreActive ? "" : "active")">Другая оценка</a>
 					@{
-						var otherScoreInputDisplay = Model.Checking.IsChecked && !isPercentScoreActive ? "" : "display: none";
+						var displayOtherScoreInput = Model.Checking.IsChecked && !isPercentScoreActive;
+						var otherScoreInputDisplayProperty = displayOtherScoreInput ? "" : "display: none";
 					}
-					<input type="number" class="form-control" style="@otherScoreInputDisplay" min="0" max="@block.MaxReviewScore" name="exerciseScore" required="required"
+                    <a href="#" class="exercise__other-score-link internal-page-link @(displayOtherScoreInput ? "" : "active")">Другая оценка</a>
+					<input type="number" class="form-control" style="@otherScoreInputDisplayProperty" min="0" max="@block.MaxReviewScore" name="exerciseScore" required="required"
 							value="@(Model.Checking.IsChecked ? Model.Checking.Score.ToString() : "")"/>
 				</div>
 			</div>

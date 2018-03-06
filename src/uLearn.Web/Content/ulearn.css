@@ -1955,6 +1955,8 @@ h1 .copy-group-link {
 .exercise__review .exercise__review__comment {
 	padding: 6px 0 4px;
 	line-height: 17px;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 .exercise__review .exercise__review__comment pre {

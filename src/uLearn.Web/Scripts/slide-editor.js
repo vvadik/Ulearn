@@ -390,18 +390,21 @@ function createMarkTextForReview($review) {
 }
 
 function placeCodeReviews() {
-	var $reviews = $('.exercise__reviews .exercise__review');
-
+    let $reviews = $('.exercise__reviews .exercise__review');    
     let $exerciseReviews = $('.exercise__reviews');
-    var startHeight = $exerciseReviews.offset().top;
-	var lastReviewBottomHeight = 0;
-	$reviews.each(function() {
-		var $review = $(this);
-		var startLine = $review.data('startLine');
-		var startPosition = $review.data('startPosition');
-		var minHeight = exerciseCodeDoc.cm.charCoords({ line: startLine, ch: startPosition }, 'local').top;
-		var offset = Math.max(5, minHeight - lastReviewBottomHeight);
-		$review.css('marginTop', offset + 'px');
+    
+    if ($reviews.length === 0 || $exerciseReviews.length === 0)
+        return;
+    
+    let startHeight = $exerciseReviews.offset().top;
+    let lastReviewBottomHeight = 0;
+    $reviews.each(function() {
+        let $review = $(this);
+        let startLine = $review.data('startLine');
+        let startPosition = $review.data('startPosition');
+        let minHeight = exerciseCodeDoc.cm.charCoords({line: startLine, ch: startPosition}, 'local').top;
+        let offset = Math.max(5, minHeight - lastReviewBottomHeight);
+        $review.css('marginTop', offset + 'px');
 
 		lastReviewBottomHeight = $review.offset().top + $review.outerHeight() - startHeight;
 	});

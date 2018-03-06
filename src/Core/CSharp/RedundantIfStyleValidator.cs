@@ -9,12 +9,12 @@ namespace uLearn.CSharp
 {
 	public class RedundantIfStyleValidator : BaseStyleValidator
 	{
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
+		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
-			return InspectAll<IfStatementSyntax>(userSolution, Inspect);
+			return InspectAll<IfStatementSyntax>(userSolution, Inspect).ToList();
 		}
 
-		public IEnumerable<string> Inspect(IfStatementSyntax ifElseStatement)
+		public IEnumerable<SolutionStyleError> Inspect(IfStatementSyntax ifElseStatement)
 		{
 			bool trueStatementIsReturnBoolLiteral =
 				(ifElseStatement.Statement as ReturnStatementSyntax)
@@ -32,7 +32,7 @@ namespace uLearn.CSharp
 												.Call(r => r.Expression as LiteralExpressionSyntax)
 												.Call(IsBoolLiteral, false);
 			if (trueStatementIsReturnBoolLiteral && falseStatementIsReturnBoolLiteral == true)
-				yield return Report(ifElseStatement, "Используйте return вместо if");
+				yield return new SolutionStyleError(ifElseStatement, "Используйте return вместо if");
 		}
 
 		private static bool IsBoolLiteral(LiteralExpressionSyntax node)

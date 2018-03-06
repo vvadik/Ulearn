@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -6,7 +7,7 @@ namespace uLearn.CSharp
 {
 	public class HasRecursionStyleValidator : BaseStyleValidator
 	{
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
+		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			throw new System.NotImplementedException();
 		}
@@ -21,17 +22,17 @@ namespace uLearn.CSharp
 			this.maxLen = maxLen;
 		}
 
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
+		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
-			return InspectAll<BlockSyntax>(userSolution, Inspect);
+			return InspectAll<BlockSyntax>(userSolution, Inspect).ToList();
 		}
 
-		private IEnumerable<string> Inspect(BlockSyntax block)
+		private IEnumerable<SolutionStyleError> Inspect(BlockSyntax block)
 		{
-			var startLine = GetSpan(block.OpenBraceToken).StartLinePosition.Line;
-			var endLine = GetSpan(block.CloseBraceToken).EndLinePosition.Line;
-			if (endLine - startLine >= maxLen)
-				yield return Report(block.OpenBraceToken, "Слишком длинный блок инструкций. Попытайтесь разбить его на вспомогательные методы");
+			var startPosition = GetSpan(block.OpenBraceToken).StartLinePosition;
+			var endPosition = GetSpan(block.CloseBraceToken).EndLinePosition;
+			if (endPosition.Line - startPosition.Line >= maxLen)
+				yield return new SolutionStyleError(new FileLinePositionSpan("", startPosition, endPosition), "Слишком длинный блок инструкций. Попытайтесь разбить его на вспомогательные методы.");
 		}
 	}
 }

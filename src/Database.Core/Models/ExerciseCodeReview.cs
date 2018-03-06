@@ -12,10 +12,14 @@ namespace Database.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
 
-		[Required]
-		public int ExerciseCheckingId { get; set; }
+		public int? ExerciseCheckingId { get; set; }
 
 		public virtual ManualExerciseChecking ExerciseChecking { get; set; }
+		
+		/* This field is used only for reviews not attached to specific ManualExerciseChecking */
+		public int? SubmissionId { get; set; }
+		
+		public virtual UserExerciseSubmission Submission { get; set; }
 
 		[Required]
 		public int StartLine { get; set; }

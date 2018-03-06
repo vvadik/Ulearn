@@ -15,7 +15,7 @@
             </div>
             <div class="media-body">
                 @{
-                    var courseId = Model.Review.ExerciseChecking.CourseId;
+                    var courseId = Model.Review.ExerciseCheckingId.HasValue ? Model.Review.ExerciseChecking.CourseId : Model.Review.Submission.CourseId;
                     var canDelete = Model.AuthorId == User.Identity.GetUserId() || User.HasAccessFor(courseId, CourseRole.CourseAdmin);
                     if (canDelete)
                     {
@@ -34,6 +34,6 @@
     </div>
     
     <div class="exercise__review__comment">
-        @Html.Raw(Html.EncodeMultiLineText(Model.Text, keepFirstSpaces: true).RenderSimpleMarkdown())
+        @Html.Raw(Html.HighlightLinks(Html.EncodeMultiLineText(Model.Text, keepFirstSpaces: true).RenderSimpleMarkdown()))
     </div>
 </div>

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -7,12 +8,12 @@ namespace uLearn.CSharp
 {
 	public class BoolCompareValidator : BaseStyleValidator
 	{
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
+		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
-			return InspectAll<BinaryExpressionSyntax>(userSolution, semanticModel, Inspect);
+			return InspectAll<BinaryExpressionSyntax>(userSolution, semanticModel, Inspect).ToList();
 		}
 
-		private IEnumerable<string> Inspect(BinaryExpressionSyntax binaryExpression, SemanticModel semanticModel)
+		private IEnumerable<SolutionStyleError> Inspect(BinaryExpressionSyntax binaryExpression, SemanticModel semanticModel)
 		{
 			var operatorKind = binaryExpression.OperatorToken.Kind();
 			if (operatorKind != SyntaxKind.EqualsEqualsToken && operatorKind != SyntaxKind.ExclamationEqualsToken)
@@ -23,7 +24,7 @@ namespace uLearn.CSharp
 			var rightNodeTree = binaryExpression.Right as LiteralExpressionSyntax;
 			if (IsBooleanType(rightNodeTypeInfo) && IsBooleanType(leftNodeTypeInfo)
 				&& (IsBoolLiteral(leftNodeTree) || IsBoolLiteral(rightNodeTree)))
-				yield return Report(binaryExpression, "Ненужное сравнение с переменной типа bool. Вместо x == true лучше писать просто x, а вместо x != true лучше писать !x.");
+				yield return new SolutionStyleError(binaryExpression, "Ненужное сравнение с переменной типа bool. Вместо x == true лучше писать просто x, а вместо x != true лучше писать !x.");
 		}
 
 		private static bool IsBoolLiteral(LiteralExpressionSyntax node)

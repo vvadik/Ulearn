@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -11,7 +10,7 @@ using Microsoft.AspNet.Identity;
 
 namespace Database.Extensions
 {
-	public static class UserExtentions
+	public static class UserExtensions
 	{
 		private const string courseRoleClaimType = "CourseRole";
 		
@@ -114,6 +113,11 @@ namespace Database.Extensions
 		{
 			var coursesRepo = new CoursesRepo();
 			return coursesRepo.HasCourseAccess(User.Identity.GetUserId(), courseId, accessType);
+		}
+
+		public static bool IsUlearnBot(this ApplicationUser user)
+		{
+			return user.UserName == UsersRepo.UlearnBotUsername;
 		}
 	}
 }

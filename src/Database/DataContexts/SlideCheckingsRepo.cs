@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
+using JetBrains.Annotations;
 
 namespace Database.DataContexts
 {
@@ -192,24 +193,35 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public async Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment)
+		private async Task<ExerciseCodeReview> AddExerciseCodeReview([CanBeNull] UserExerciseSubmission submission, [CanBeNull] ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime)
 		{
 			var review = db.ExerciseCodeReviews.Add(new ExerciseCodeReview
 			{
 				AuthorId = userId,
 				Comment = comment,
-				ExerciseCheckingId = checking.Id,
+				ExerciseCheckingId = checking?.Id,
+				SubmissionId = submission?.Id,
 				StartLine = startLine,
 				StartPosition = startPosition,
 				FinishLine = finishLine,
 				FinishPosition = finishPosition,
-				AddingTime = DateTime.Now,
+				AddingTime = setAddingTime ? DateTime.Now : DateTime.MinValue,
 			});
 
 			await db.SaveChangesAsync();
 
 			/* Extract review from database to fill review.Author by EF's DynamicProxy */
 			return db.ExerciseCodeReviews.AsNoTracking().FirstOrDefault(r => r.Id == review.Id);
+		}
+		
+		public async Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime=true)
+		{
+			return await AddExerciseCodeReview(null, checking, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
+		}
+
+		public async Task<ExerciseCodeReview> AddExerciseCodeReview(UserExerciseSubmission submission, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime=false)
+		{
+			return await AddExerciseCodeReview(submission, null, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
 		}
 
 		public ExerciseCodeReview FindExerciseCodeReviewById(int reviewId)
@@ -232,9 +244,9 @@ namespace Database.DataContexts
 		public Dictionary<int, List<ExerciseCodeReview>> GetExerciseCodeReviewForCheckings(IEnumerable<int> checkingsIds)
 		{
 			return db.ExerciseCodeReviews
-				.Where(r => checkingsIds.Contains(r.ExerciseCheckingId) && !r.IsDeleted)
+				.Where(r => r.ExerciseCheckingId.HasValue && checkingsIds.Contains(r.ExerciseCheckingId.Value) && !r.IsDeleted)
 				.GroupBy(r => r.ExerciseCheckingId)
-				.ToDictionary(g => g.Key, g => g.ToList());
+				.ToDictionary(g => g.Key.Value, g => g.ToList());
 		}
 
 		public List<string> GetTopUserReviewComments(string courseId, Guid slideId, string userId, int count)

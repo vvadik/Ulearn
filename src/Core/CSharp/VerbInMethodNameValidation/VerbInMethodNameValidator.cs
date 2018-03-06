@@ -20,12 +20,12 @@ namespace uLearn.CSharp.VerbInMethodNameValidation
             englishVerbs = new HashSet<string>(Resources.englishVerbs.SplitToLines(), StringComparer.InvariantCultureIgnoreCase);
         }
 
-        protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
+        public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
         {
-            return InspectAll<MethodDeclarationSyntax>(userSolution, InspectMethodsNames);
+            return InspectAll<MethodDeclarationSyntax>(userSolution, InspectMethodsNames).ToList();
         }
 
-        private IEnumerable<string> InspectMethodsNames(MethodDeclarationSyntax methodDeclarationSyntax)
+        private IEnumerable<SolutionStyleError> InspectMethodsNames(MethodDeclarationSyntax methodDeclarationSyntax)
         {
             var syntaxToken = methodDeclarationSyntax.Identifier();
             if (exceptionsMethodNames.Contains(syntaxToken.ValueText))
@@ -42,7 +42,7 @@ namespace uLearn.CSharp.VerbInMethodNameValidation
                     yield break;
             }
 
-            yield return Report(syntaxToken, "В названии метода отсутствует глагол");
+			yield return new SolutionStyleError(syntaxToken, "В названии метода отсутствует глагол.");
         }
 
         private IEnumerable<string> SplitMethodName(string methodName)

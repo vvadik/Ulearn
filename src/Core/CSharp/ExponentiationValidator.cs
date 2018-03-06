@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -9,18 +10,21 @@ namespace uLearn.CSharp
 	{
 		private static readonly HashSet<double> forbiddenDegrees = 
 			new HashSet<double>{2.0, 3.0};
-		
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
+
+		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
-			return InspectAll<InvocationExpressionSyntax>(userSolution, semanticModel, InspectMethod);
+			return InspectAll<InvocationExpressionSyntax>(userSolution, semanticModel, InspectMethod).ToList();
 		}
 
-		private IEnumerable<string> InspectMethod(InvocationExpressionSyntax methodInvocation, SemanticModel semanticModel)
+		private IEnumerable<SolutionStyleError> InspectMethod(InvocationExpressionSyntax methodInvocation, SemanticModel semanticModel)
 		{
 			var symbol = semanticModel.GetSymbolInfo(methodInvocation).Symbol;
 			if (methodInvocation.IsMathPow(symbol) &&
 				methodInvocation.ArgumentList.ContainsForbiddenDegrees(forbiddenDegrees))
-				yield return Report(methodInvocation, "Неэффективный код. Если число нужно возвести в квадрат или куб, лучше сделать это с помощью умножения, не используя более общий, но менее быстрый Math.Pow");
+				yield return new SolutionStyleError(
+					methodInvocation,
+					"Неэффективный код. Если число нужно возвести в квадрат или куб, лучше сделать это с помощью умножения, не используя более общий, но менее быстрый Math.Pow"
+				);
 		}
 	}
 }

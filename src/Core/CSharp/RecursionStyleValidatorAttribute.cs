@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -13,24 +14,28 @@ namespace uLearn.CSharp
 			this.requireRecursion = requireRecursion;
 		}
 
-		public string FindError(SyntaxTree userSolution, SemanticModel semanticModel)
+		public List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			var recursiveMethods = userSolution.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().Where(IsRecursive).ToList();
 
+			SolutionStyleError error = null;
 			if (requireRecursion && !recursiveMethods.Any())
-				return "Решение должно быть рекурсивным";
+			{
+			 	error = new SolutionStyleError(userSolution.GetRoot(), "Решение должно быть рекурсивным");
+			}
 
 			if (!requireRecursion && recursiveMethods.Any())
-				return "Решение должно быть нерекурсивным";
-			
-			return null;
+				error = new SolutionStyleError(recursiveMethods.First(), "Решение должно быть нерекурсивным");
+
+			if (error != null)
+				return new List<SolutionStyleError> { error };
+
+			return new List<SolutionStyleError>();
 		}
 
 		private static bool IsRecursive(MethodDeclarationSyntax method)
 		{
-			return
-				method.Body != null
-				&& method.Body.DescendantNodes()
+			return method.Body != null && method.Body.DescendantNodes()
 					.OfType<SimpleNameSyntax>()
 					.Any(n => n.Identifier.ValueText == method.Identifier.ValueText);
 		}

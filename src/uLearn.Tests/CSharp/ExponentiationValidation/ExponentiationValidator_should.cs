@@ -42,7 +42,7 @@ namespace uLearn.CSharp.ExponentiationValidation
 		public void FindErrors(FileInfo file)
 		{
 			var code = file.ContentAsUtf8();
-			var errors = validator.FindError(code);
+			var errors = validator.FindErrors(code);
 			
 			errors.Should().NotBeNullOrEmpty();
 		}
@@ -51,7 +51,7 @@ namespace uLearn.CSharp.ExponentiationValidation
 		public void NotFindErrors(FileInfo file)
 		{
 			var code = file.ContentAsUtf8();
-			var errors = validator.FindError(code);
+			var errors = validator.FindErrors(code);
 			if (errors != null)
 			{
 				Console.WriteLine(errors);
@@ -60,13 +60,13 @@ namespace uLearn.CSharp.ExponentiationValidation
 			errors.Should().BeNullOrEmpty();
 		}
 
-		[Explicit]
 		[TestCaseSource(nameof(basicProgrammingFiles))]
+		[Explicit]
 		public void NotFindErrors_InBasicProgramming(FileInfo file)
 		{
 			var fileContent = file.ContentAsUtf8();
 
-			var errors = validator.FindError(fileContent);
+			var errors = validator.FindErrors(fileContent);
 
 			if (errors != null)
 			{
@@ -80,14 +80,14 @@ namespace uLearn.CSharp.ExponentiationValidation
 			}
 		}
 
-		[Explicit]
 		[TestCaseSource(nameof(submissionsFiles))]
+		[Explicit]
 		public void NotFindErrors_InCheckAcceptedFiles(FileInfo file)
 		{
 			Console.WriteLine(file.FullName);
 			var fileContent = file.ContentAsUtf8();
 
-			var errors = validator.FindError(fileContent);
+			var errors = validator.FindErrors(fileContent);
 			if (errors != null)
 			{
 				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
