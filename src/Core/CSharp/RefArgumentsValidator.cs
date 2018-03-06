@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -28,10 +29,7 @@ namespace uLearn.CSharp
 
 		private static bool MethodHasRefParameter(MethodDeclarationSyntax methodDeclaration)
 		{
-			var arguments = methodDeclaration.ParameterList.Parameters.ToArray();
-			if (arguments.Length == 0)
-				return false;
-			return arguments.Any(ArgumentIsRef);
+			return methodDeclaration.ParameterList.Parameters.Any(ArgumentIsRef);
 		}
 
 		private static bool ArgumentIsRef(ParameterSyntax parameterSyntax)
@@ -43,35 +41,24 @@ namespace uLearn.CSharp
 			MethodDeclarationSyntax methodDeclaration,
 			SemanticModel semanticModel)
 		{
-			var parameters = methodDeclaration.ParameterList.Parameters.Where(ArgumentIsRef).ToArray();
-			foreach (var parameter in parameters)
+			string ReportLocal(ParameterSyntax parameter)
 			{
-				var info = semanticModel.GetTypeInfo(parameter.Type);
-				if (!IsPrimitive(info.Type))
-					yield return Report(methodDeclaration, $"Ошибка в аргументе: {parameter.Identifier}");
+				return Report(methodDeclaration, $"Ошибка в аргументе: {parameter.Identifier}");
 			}
+
+			return methodDeclaration.ParameterList.Parameters
+				.Where(ArgumentIsRef)
+				.Select(it => (Parameter: it, TypeInfo: semanticModel.GetTypeInfo(it.Type)))
+				.Where(it => !IsPrimitive(it.TypeInfo.Type))
+				.Select(it => ReportLocal(it.Parameter));
 		}
 
 		private static bool IsPrimitive(ITypeSymbol typeSymbol)
 		{
-			switch (typeSymbol.SpecialType)
-			{
-				case SpecialType.System_Boolean:
-				case SpecialType.System_Char:
-				case SpecialType.System_SByte:
-				case SpecialType.System_Byte:
-				case SpecialType.System_Int16:
-				case SpecialType.System_UInt16:
-				case SpecialType.System_Int32:
-				case SpecialType.System_UInt32:
-				case SpecialType.System_Int64:
-				case SpecialType.System_UInt64:
-				case SpecialType.System_Decimal:
-				case SpecialType.System_Single:
-				case SpecialType.System_Double:
-					return true;
-			}
-			return false;
+			var specialTypeString = typeSymbol.SpecialType.ToString();
+			if (!specialTypeString.StartsWith("System", StringComparison.InvariantCultureIgnoreCase))
+				return false;
+			return Type.GetType(specialTypeString.Replace('_', '.'))?.IsPrimitive == true;
 		}
 	}
 }
