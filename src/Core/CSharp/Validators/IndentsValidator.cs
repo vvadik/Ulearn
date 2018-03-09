@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using uLearn.CSharp;
+using uLearn.CSharp.Model;
 
 namespace uLearn
 {
@@ -18,7 +19,7 @@ namespace uLearn
 		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			tree = userSolution;
-			bracesPairs = BuildBracesPairs().OrderBy(p => p.Open.SpanStart).ToArray();
+			bracesPairs = userSolution.BuildBracesPairs().OrderBy(p => p.Open.SpanStart).ToArray();
 
 			var errors = ReportIfCompilationUnitChildrenNotConsistent()
 				.Concat(ReportIfBracesNotAligned())
@@ -28,20 +29,6 @@ namespace uLearn
 				.Concat(ReportIfBracesNotIndented())
 				.ToArray();
 			return errors.Any() ? new[] { prefix }.Concat(errors) : Enumerable.Empty<string>();
-		}
-
-		private IEnumerable<BracesPair> BuildBracesPairs()
-		{
-			var braces = tree.GetRoot().DescendantTokens()
-				.Where(t => t.IsKind(SyntaxKind.OpenBraceToken) || t.IsKind(SyntaxKind.CloseBraceToken));
-			var openbracesStack = new Stack<SyntaxToken>();
-			foreach (var brace in braces)
-			{
-				if (brace.IsKind(SyntaxKind.OpenBraceToken))
-					openbracesStack.Push(brace);
-				else
-					yield return new BracesPair(openbracesStack.Pop(), brace);
-			}
 		}
 
 		private IEnumerable<string> ReportIfCompilationUnitChildrenNotConsistent()
@@ -163,28 +150,6 @@ namespace uLearn
 					yield return Report(braces.Open,
 						$"Парные фигурные скобки ({braces}) должны иметь отступ не меньше, чем у родителя.");
 			}
-		}
-	}
-
-	internal class BracesPair
-	{
-		public readonly SyntaxToken Open;
-		public readonly SyntaxToken Close;
-
-		public BracesPair(SyntaxToken open, SyntaxToken close)
-		{
-			Open = open;
-			Close = close;
-		}
-
-		public bool TokenInsideBraces(SyntaxToken token)
-		{
-			return token.SpanStart > Open.SpanStart && token.Span.End < Close.Span.End;
-		}
-
-		public override string ToString()
-		{
-			return $"строки {Open.GetLine() + 1}, {Close.GetLine() + 1}";
 		}
 	}
 

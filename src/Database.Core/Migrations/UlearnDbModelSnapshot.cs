@@ -466,6 +466,8 @@ namespace Database.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<DateTime>("AddingTime");
+
                     b.Property<string>("AuthorId")
                         .IsRequired()
                         .HasMaxLength(64);
@@ -494,6 +496,35 @@ namespace Database.Migrations
                     b.HasIndex("ExerciseCheckingId");
 
                     b.ToTable("ExerciseCodeReviews");
+                });
+
+            modelBuilder.Entity("Database.Models.ExerciseCodeReviewComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("AddingTime");
+
+                    b.Property<string>("AuthorId")
+                        .IsRequired()
+                        .HasMaxLength(64);
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<int>("ReviewId");
+
+                    b.Property<string>("Text")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddingTime");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("ReviewId", "IsDeleted");
+
+                    b.ToTable("ExerciseCodeReviewComments");
                 });
 
             modelBuilder.Entity("Database.Models.ExerciseSolutionByGrader", b =>
@@ -1983,6 +2014,19 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ManualExerciseChecking", "ExerciseChecking")
                         .WithMany("Reviews")
                         .HasForeignKey("ExerciseCheckingId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Database.Models.ExerciseCodeReviewComment", b =>
+                {
+                    b.HasOne("Database.Models.ApplicationUser", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Database.Models.ExerciseCodeReview", "Review")
+                        .WithMany("Comments")
+                        .HasForeignKey("ReviewId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

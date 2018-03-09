@@ -250,6 +250,9 @@
     <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Incorrect\GetLengthInInnerCycle.cs" />
     <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Incorrect\GetLengthInMethodCall.cs" />
     <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Incorrect\GetLengthInWhileCycle.cs" />
+    <Compile Include="CSharp\ExcessLinesValidation\ExcessLinesValidator_Should.cs" />
+    <Compile Include="CSharp\ExcessLinesValidation\TestData\Correct\ExcessLinesValidatorCases.cs" />
+    <Compile Include="CSharp\ExcessLinesValidation\TestData\Incorrect\ExcessLinesValidatorCases.cs" />
     <Compile Include="CSharp\BoolCompareValidation\BoolCompareValidator_should.cs" />
     <Compile Include="CSharp\BoolCompareValidation\TestData\Correct\NullableCompare.cs" />
     <Compile Include="CSharp\BoolCompareValidation\TestData\Correct\UnknownTypes.cs" />
@@ -302,6 +305,10 @@
     <Content Include="CSharp\testProject\projDir\AnotherTask.WrongAnswer.88.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Compile Include="CSharp\RefArgumentsValidation\TestData\Correct\RefArgumentsValidationTestDataClass.cs" />
+    <Compile Include="CSharp\RefArgumentsValidation\TestData\Incorrect\RefArgumentsValidationTestDataClass.cs" />
+    <Compile Include="CSharp\RefArgumentsValidation\RefArgumentsValidator_should.cs" />
+    <Compile Include="CSharp\VarInVariableDeclarationValidator_should.cs" />
     <Compile Include="CSharp\TestPaths.cs" />
     <Compile Include="CSharp\VerbInMethodNameValidator_should.cs" />
     <Compile Include="CSharp\testProject\projDir\inner-dir-1\inner-dir-2\ExcludeMeForStudent.cs">
