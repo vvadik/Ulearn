@@ -171,10 +171,11 @@ namespace Database.DataContexts
 		}
 
 		// Dictionary<(notificationTransportId, NotificationType), NotificationTransportSettings>
-		public DefaultDictionary<Tuple<int, NotificationType>, NotificationTransportSettings> GetNotificationTransportsSettings(string courseId)
+		public DefaultDictionary<Tuple<int, NotificationType>, NotificationTransportSettings> GetNotificationTransportsSettings(string courseId, string userId)
 		{
 			return db.NotificationTransportSettings
-				.Where(s => s.CourseId == courseId)
+				.Include(s => s.NotificationTransport)
+				.Where(s => s.CourseId == courseId && s.NotificationTransport.UserId == userId)
 				.ToDictionary(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s)
 				.ToDefaultDictionary(() => null);
 		}

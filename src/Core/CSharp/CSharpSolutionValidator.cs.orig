@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+<<<<<<< HEAD:src/uLearn/CSharp/CSharpSolutionValidator.cs
+using uLearn.CSharp.IndentsValidation;
+=======
 using uLearn.CSharp.VerbInMethodNameValidation;
+>>>>>>> master:src/Core/CSharp/CSharpSolutionValidator.cs
 
 namespace uLearn.CSharp
 {
@@ -50,21 +54,23 @@ namespace uLearn.CSharp
 			return error?.ToString();
 		}
 
-		public List<SolutionStyleError> FindValidatorErrors(string userCode, string solution)
+		public string FindValidatorErrors(string userCode, string solution)
 		{
-			var solutionTree = CSharpSyntaxTree.ParseText(userCode);
 			try
 			{
+				var solutionTree = CSharpSyntaxTree.ParseText(userCode);
 				var compilation = CSharpCompilation.Create("MyCompilation", new[] { solutionTree }, new[] { mscorlib });
 				var semanticModel = compilation.GetSemanticModel(solutionTree);
-				return validators
+				var errors = validators
 					.Where(v => !(v is IStrictValidator))
-					.SelectMany(v => v.FindErrors(solutionTree, semanticModel))
-					.ToList();
+					.Select(v => v.FindError(solutionTree, semanticModel))
+					.Where(err => err != null)
+					.ToArray();
+				return errors.Any() ? string.Join("\n\n", errors) : null;
 			}
 			catch (Exception e)
 			{
-				return new List<SolutionStyleError> { new SolutionStyleError(solutionTree.GetRoot(), e.Message)};
+				return e.Message;
 			}
 		}
 
@@ -77,9 +83,8 @@ namespace uLearn.CSharp
 				var semanticModel = compilation.GetSemanticModel(solutionTree);
 				return validators
 					.Where(v => v is IStrictValidator)
-					.SelectMany(v => v.FindErrors(solutionTree, semanticModel))
-					.FirstOrDefault()
-					?.Message;
+					.Select(v => v.FindError(solutionTree, semanticModel))
+					.FirstOrDefault(err => err != null);
 			}
 			catch (Exception e)
 			{

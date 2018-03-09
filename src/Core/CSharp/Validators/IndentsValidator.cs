@@ -3,43 +3,35 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using uLearn.CSharp;
+using uLearn.CSharp.Model;
 
-namespace uLearn.CSharp
+namespace uLearn
 {
 	public class IndentsValidator : BaseStyleValidator
 	{
+		private const string prefix = "Код плохо отформатирован.\n" +
+									"Автоматически отформатировать код в Visual Studio можно с помощью комбинации клавиш Ctrl+K+D";
+
 		private SyntaxTree tree;
 		private BracesPair[] bracesPairs;
 
-		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
+		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			tree = userSolution;
-			bracesPairs = BuildBracesPairs().OrderBy(p => p.Open.SpanStart).ToArray();
+			bracesPairs = userSolution.BuildBracesPairs().OrderBy(p => p.Open.SpanStart).ToArray();
 
-			return ReportIfCompilationUnitChildrenNotConsistent()
+			var errors = ReportIfCompilationUnitChildrenNotConsistent()
 				.Concat(ReportIfBracesNotAligned())
 				.Concat(ReportIfCloseBraceHasCodeOnSameLine())
 				.Concat(ReportIfOpenBraceHasCodeOnSameLine())
 				.Concat(ReportIfBracesContentNotIndentedOrNotConsistent())
 				.Concat(ReportIfBracesNotIndented())
-				.ToList();
+				.ToArray();
+			return errors.Any() ? new[] { prefix }.Concat(errors) : Enumerable.Empty<string>();
 		}
 
-		private IEnumerable<BracesPair> BuildBracesPairs()
-		{
-			var braces = tree.GetRoot().DescendantTokens()
-				.Where(t => t.IsKind(SyntaxKind.OpenBraceToken) || t.IsKind(SyntaxKind.CloseBraceToken));
-			var openbracesStack = new Stack<SyntaxToken>();
-			foreach (var brace in braces)
-			{
-				if (brace.IsKind(SyntaxKind.OpenBraceToken))
-					openbracesStack.Push(brace);
-				else
-					yield return new BracesPair(openbracesStack.Pop(), brace);
-			}
-		}
-
-		private IEnumerable<SolutionStyleError> ReportIfCompilationUnitChildrenNotConsistent()
+		private IEnumerable<string> ReportIfCompilationUnitChildrenNotConsistent()
 		{
 			var childLineIndents = tree.GetRoot().ChildNodes()
 				.Select(node => node.GetFirstToken())
@@ -48,16 +40,16 @@ namespace uLearn.CSharp
 				.ToList();
 			if (!childLineIndents.Any())
 			{
-				return Enumerable.Empty<SolutionStyleError>();
+				return Enumerable.Empty<string>();
 			}
 			var firstIndent = childLineIndents.First();
 			return childLineIndents
 				.Skip(1)
 				.Where(i => i.LengthInSpaces != firstIndent.LengthInSpaces)
-				.Select(i => new SolutionStyleError(i.IndentedToken, "На верхнем уровне вложенности все узлы должны иметь одинаковый отступ."));
+				.Select(i => Report(i.IndentedToken, "На верхнем уровне вложенности все узлы должны иметь одинаковый отступ"));
 		}
 
-		private IEnumerable<SolutionStyleError> ReportIfBracesNotAligned()
+		private IEnumerable<string> ReportIfBracesNotAligned()
 		{
 			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
 			{
@@ -65,12 +57,12 @@ namespace uLearn.CSharp
 				var closeBraceIndent = new Indent(braces.Close);
 				if (openBraceIndent.IndentedTokenIsFirstAtLine && openBraceIndent.LengthInSpaces != closeBraceIndent.LengthInSpaces)
 				{
-					yield return new SolutionStyleError(braces.Open, $"Парные фигурные скобки ({braces}) должны иметь одинаковый отступ.");
+					yield return Report(braces.Open, $"Парные фигурные скобки ({braces}) должны иметь одинаковый отступ.");
 				}
 			}
 		}
 
-		private IEnumerable<SolutionStyleError> ReportIfCloseBraceHasCodeOnSameLine()
+		private IEnumerable<string> ReportIfCloseBraceHasCodeOnSameLine()
 		{
 			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
 			{
@@ -78,12 +70,12 @@ namespace uLearn.CSharp
 				var closeBraceIndent = new Indent(braces.Close);
 				if (openBraceIndent.IndentedTokenIsFirstAtLine && !closeBraceIndent.IndentedTokenIsFirstAtLine)
 				{
-					yield return new SolutionStyleError(braces.Close, "Перед закрывающей фигурной скобкой на той же строке не должно быть кода.");
+					yield return Report(braces.Close, "Перед закрывающей фигурной скобкой на той же строке не должно быть кода.");
 				}
 			}
 		}
 
-		private IEnumerable<SolutionStyleError> ReportIfOpenBraceHasCodeOnSameLine()
+		private IEnumerable<string> ReportIfOpenBraceHasCodeOnSameLine()
 		{
 			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
 			{
@@ -91,11 +83,11 @@ namespace uLearn.CSharp
 					.Select(node => node.GetFirstToken())
 					.Any(t => braces.TokenInsideBraces(t) && t.GetLine() == braces.Open.GetLine());
 				if (openBraceHasCodeOnSameLine)
-					yield return new SolutionStyleError(braces.Open, "После открывающей фигурной скобки на той же строке не должно быть кода.");
+					yield return Report(braces.Open, "После открывающей фигурной скобки на той же строке не должно быть кода");
 			}
 		}
 
-		private IEnumerable<SolutionStyleError> ReportIfBracesContentNotIndentedOrNotConsistent()
+		private IEnumerable<string> ReportIfBracesContentNotIndentedOrNotConsistent()
 		{
 			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
 			{
@@ -115,12 +107,12 @@ namespace uLearn.CSharp
 				var minimalIndentAfterOpenbrace = new Indent(firstTokenOfLineWithMinimalIndent);
 				var firstChild = childLineIndents.First();
 				if (firstChild.LengthInSpaces <= minimalIndentAfterOpenbrace.LengthInSpaces)
-					yield return new SolutionStyleError(firstChild.IndentedToken,
+					yield return Report(firstChild.IndentedToken,
 						$"Содержимое парных фигурных скобок ({braces}) должно иметь дополнительный отступ.");
 				var badLines = childLineIndents.Where(t => t.LengthInSpaces != firstChild.LengthInSpaces);
 				foreach (var badIndent in badLines)
 				{
-					yield return new SolutionStyleError(badIndent.IndentedToken,
+					yield return Report(badIndent.IndentedToken,
 						$"Содержимое парных фигурных скобок ({braces}) должно иметь одинаковый отступ.");
 				}
 			}
@@ -144,7 +136,7 @@ namespace uLearn.CSharp
 			return default(SyntaxToken);
 		}
 
-		private IEnumerable<SolutionStyleError> ReportIfBracesNotIndented()
+		private IEnumerable<string> ReportIfBracesNotIndented()
 		{
 			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine() &&
 															Indent.TokenIsFirstAtLine(pair.Open)))
@@ -155,31 +147,9 @@ namespace uLearn.CSharp
 				var parentLineIndent = new Indent(correctOpenbraceParent);
 				var openbraceLineIndent = new Indent(braces.Open);
 				if (openbraceLineIndent.LengthInSpaces < parentLineIndent.LengthInSpaces)
-					yield return new SolutionStyleError(braces.Open,
+					yield return Report(braces.Open,
 						$"Парные фигурные скобки ({braces}) должны иметь отступ не меньше, чем у родителя.");
 			}
-		}
-	}
-
-	internal class BracesPair
-	{
-		public readonly SyntaxToken Open;
-		public readonly SyntaxToken Close;
-
-		public BracesPair(SyntaxToken open, SyntaxToken close)
-		{
-			Open = open;
-			Close = close;
-		}
-
-		public bool TokenInsideBraces(SyntaxToken token)
-		{
-			return token.SpanStart > Open.SpanStart && token.Span.End < Close.Span.End;
-		}
-
-		public override string ToString()
-		{
-			return $"строки {Open.GetLine() + 1}, {Close.GetLine() + 1}";
 		}
 	}
 
