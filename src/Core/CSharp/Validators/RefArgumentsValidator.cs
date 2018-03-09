@@ -4,11 +4,11 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace uLearn.CSharp
+namespace uLearn.CSharp.Validators
 {
 	public class RefArgumentsValidator : BaseStyleValidator
 	{
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution,
+		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution,
 			SemanticModel semanticModel)
 		{
 			var validationResult = userSolution.GetRoot()
@@ -17,13 +17,9 @@ namespace uLearn.CSharp
 				.Cast<MethodDeclarationSyntax>()
 				.Where(MethodHasRefParameter)
 				.SelectMany(t => ValidateRefs(t, semanticModel))
-				.ToArray();
+				.ToList();
 
-			if (validationResult.Length == 0)
-				yield break;
-			yield return "Разрешено передавать через ref только примитивные типы";
-			foreach (var error in validationResult)
-				yield return error;
+			return validationResult;
 		}
 
 		private static bool MethodHasRefParameter(MethodDeclarationSyntax methodDeclaration)
@@ -36,20 +32,20 @@ namespace uLearn.CSharp
 			return parameterSyntax.Modifiers.Any(x => x.IsKind(SyntaxKind.RefKeyword));
 		}
 
-		private IEnumerable<string> ValidateRefs(
-			MethodDeclarationSyntax methodDeclaration,
+		private IEnumerable<SolutionStyleError> ValidateRefs(
+			BaseMethodDeclarationSyntax methodDeclaration,
 			SemanticModel semanticModel)
 		{
-			string ReportLocal(ParameterSyntax parameter)
+			SolutionStyleError GetErrorForParameter(ParameterSyntax parameter)
 			{
-				return Report(methodDeclaration, $"Ошибка в аргументе: {parameter.Identifier}");
+				return new SolutionStyleError(parameter.GetFirstToken(), $"Разрешено передавать через `ref` только примитивные типы.");
 			}
 
 			return methodDeclaration.ParameterList.Parameters
 				.Where(ArgumentIsRef)
 				.Select(it => (Parameter: it, TypeInfo: semanticModel.GetTypeInfo(it.Type)))
 				.Where(it => !IsPrimitive(it.TypeInfo.Type.SpecialType))
-				.Select(it => ReportLocal(it.Parameter));
+				.Select(it => GetErrorForParameter(it.Parameter));
 		}
 
 		private static bool IsPrimitive(SpecialType specialType)

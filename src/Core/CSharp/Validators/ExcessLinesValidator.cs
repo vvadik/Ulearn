@@ -5,11 +5,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using uLearn.CSharp.Model;
 
-namespace uLearn.CSharp
+namespace uLearn.CSharp.Validators
 {
 	public class ExcessLinesValidator : BaseStyleValidator
 	{
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
+		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			var bracesPairs = userSolution.BuildBracesPairs().ToArray();
 
@@ -18,12 +18,11 @@ namespace uLearn.CSharp
 				.Concat(bracesPairs.SelectMany(ReportWhenExistExcessLineBetweenBraces))
 				.Concat(bracesPairs.Select(ReportWhenNotExistLineBetweenBlocks))
 				.Where(x => x != null)
-				.OrderBy(x => x.Line)
-				.Select(x => x.Report)
-				.ToArray();
+				.OrderBy(e => e.Span.StartLinePosition.Line)
+				.ToList();
 		}
 
-		private IEnumerable<ReportWithLine> ReportWhenExistExcessLineBetweenBraces(BracesPair bracesPair)
+		private IEnumerable<SolutionStyleError> ReportWhenExistExcessLineBetweenBraces(BracesPair bracesPair)
 		{
 			var openBraceLine = GetStartLine(bracesPair.Open);
 			var closeBraceLine = GetStartLine(bracesPair.Close);
@@ -40,24 +39,15 @@ namespace uLearn.CSharp
 			if (openBraceLine != firstStatementLine
 				&& openBraceLine + 1 != firstStatementLine
 				&& !IsComment(bracesPair.Open.Parent, openBraceLine + 1))
-				yield return new ReportWithLine
-				{
-					Report = Report(bracesPair.Open, "После открывающей скобки не должно быть лишнего переноса строки"),
-					Line = openBraceLine
-				};
+				yield return new SolutionStyleError(bracesPair.Open, "После открывающей скобки не должно быть лишнего переноса строки.");
 
 			if (closeBraceLine != lastStatementLine
 				&& closeBraceLine - 1 != lastStatementLine
 				&& !IsComment(bracesPair.Open.Parent, closeBraceLine - 1))
-				yield return new ReportWithLine
-				{
-					Report = Report(bracesPair.Close,
-						"Перед закрывающей скобкой не должно быть лишнего переноса строки"),
-					Line = closeBraceLine
-				};
+				yield return new SolutionStyleError(bracesPair.Close, "Перед закрывающей скобкой не должно быть лишнего переноса строки.");
 		}
 
-		private ReportWithLine ReportWhenExistExcessLineBetweenDeclaration(BracesPair bracesPair)
+		private SolutionStyleError ReportWhenExistExcessLineBetweenDeclaration(BracesPair bracesPair)
 		{
 			var openBraceLine = GetStartLine(bracesPair.Open);
 			var declarationLine = GetEndDeclaraionLine(bracesPair.Open.Parent);
@@ -65,16 +55,12 @@ namespace uLearn.CSharp
 				return null;
 
 			if (declarationLine + 1 != openBraceLine)
-				return new ReportWithLine
-				{
-					Report = Report(bracesPair.Open,
-						"Между объявлением и открывающей скобкой не должно быть лишнего переноса строки"),
-					Line = openBraceLine
-				};
+				return new SolutionStyleError(bracesPair.Open, "Между объявлением и открывающей скобкой не должно быть лишнего переноса строки.");
+
 			return null;
 		}
 
-		private ReportWithLine ReportWhenNotExistLineBetweenBlocks(BracesPair bracesPair)
+		private SolutionStyleError ReportWhenNotExistLineBetweenBlocks(BracesPair bracesPair)
 		{
 			var closeBraceLine = GetStartLine(bracesPair.Close);
 
@@ -83,12 +69,8 @@ namespace uLearn.CSharp
 				return null;
 			var nextSyntaxNodeLine = GetStartLine(nextSyntaxNode);
 			if (closeBraceLine + 1 == nextSyntaxNodeLine)
-				return new ReportWithLine
-				{
-					Line = closeBraceLine,
-					Report = Report(bracesPair.Close,
-						"После закрывающей скобки должен быть дополнительный перенос строки")
-				};
+				return new SolutionStyleError(bracesPair.Close, "После закрывающей скобки должен быть дополнительный перенос строки.");
+
 			return null;
 		}
 

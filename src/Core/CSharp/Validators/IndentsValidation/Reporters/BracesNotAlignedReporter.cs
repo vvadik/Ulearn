@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace uLearn.CSharp.IndentsValidation.Reporters
+namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 {
 	internal static class BracesNotAlignedReporter
 	{
-		public static IEnumerable<string> Report(BracesPair[] bracesPairs)
+		public static IEnumerable<SolutionStyleError> Report(BracesPair[] bracesPairs)
 		{
 			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
 			{
@@ -13,9 +13,9 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 				var closeBraceIndent = new Indent(braces.Close);
 				if (openBraceIndent.IndentedTokenIsFirstAtLine && openBraceIndent.LengthInSpaces != closeBraceIndent.LengthInSpaces)
 				{
-					yield return BaseStyleValidator.Report(
+					yield return new SolutionStyleError(
 						braces.Open,
-						$"Парные фигурные скобки ({braces}) должны иметь одинаковый отступ.");
+						$"РџР°СЂРЅС‹Рµ С„РёРіСѓСЂРЅС‹Рµ СЃРєРѕР±РєРё ({braces}) РґРѕР»Р¶РЅС‹ РёРјРµС‚СЊ РѕРґРёРЅР°РєРѕРІС‹Р№ РѕС‚СЃС‚СѓРї.");
 				}
 			}
 		}

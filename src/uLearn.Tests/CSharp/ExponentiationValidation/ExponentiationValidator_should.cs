@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
+using uLearn.CSharp.Validators;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp.ExponentiationValidation
@@ -60,7 +61,7 @@ namespace uLearn.CSharp.ExponentiationValidation
 			errors.Should().BeNullOrEmpty();
 		}
 
-		[TestCaseSource(nameof(basicProgrammingFiles))]
+		[TestCaseSource(nameof(BasicProgrammingFiles))]
 		[Explicit]
 		public void NotFindErrors_InBasicProgramming(FileInfo file)
 		{
@@ -80,7 +81,7 @@ namespace uLearn.CSharp.ExponentiationValidation
 			}
 		}
 
-		[TestCaseSource(nameof(submissionsFiles))]
+		[TestCaseSource(nameof(SubmissionsFiles))]
 		[Explicit]
 		public void NotFindErrors_InCheckAcceptedFiles(FileInfo file)
 		{

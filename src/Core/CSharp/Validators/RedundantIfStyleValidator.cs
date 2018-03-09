@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Ulearn.Common.Extensions;
 
-namespace uLearn.CSharp
+namespace uLearn.CSharp.Validators
 {
 	public class RedundantIfStyleValidator : BaseStyleValidator
 	{

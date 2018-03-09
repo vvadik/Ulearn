@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace uLearn.CSharp
+namespace uLearn.CSharp.Validators
 {
 	public class LineLengthStyleValidator : BaseStyleValidator
 	{

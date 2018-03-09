@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace uLearn.CSharp.IndentsValidation.Reporters
+namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 {
 	internal static class OpenBraceHasCodeOnSameLineReporter
 	{
-		public static IEnumerable<string> Report(BracesPair[] bracesPairs)
+		public static IEnumerable<SolutionStyleError> Report(BracesPair[] bracesPairs)
 		{
 			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
 			{
@@ -13,7 +13,7 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 					.Select(node => node.GetFirstToken())
 					.Any(t => braces.TokenInsideBraces(t) && t.GetLine() == braces.Open.GetLine());
 				if (openBraceHasCodeOnSameLine)
-					yield return BaseStyleValidator.Report(braces.Open, "После открывающей фигурной скобки на той же строке не должно быть кода");
+					yield return new SolutionStyleError(braces.Open, "РџРѕСЃР»Рµ РѕС‚РєСЂС‹РІР°СЋС‰РµР№ С„РёРіСѓСЂРЅРѕР№ СЃРєРѕР±РєРё РЅР° С‚РѕР№ Р¶Рµ СЃС‚СЂРѕРєРµ РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РєРѕРґР°.");
 			}
 		}
 	}

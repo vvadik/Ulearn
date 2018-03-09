@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
+using uLearn.CSharp.Validators;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp.BoolCompareValidation

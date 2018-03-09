@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Ulearn.Common.Extensions;
-using SyntaxNodeOrToken = uLearn.CSharp.IndentsValidation.SyntaxNodeOrToken;
+using SyntaxNodeOrToken = uLearn.CSharp.Validators.IndentsValidation.SyntaxNodeOrToken;
 
-namespace uLearn.CSharp
+namespace uLearn.CSharp.Validators
 {
 	public abstract class BaseStyleValidator : ICSharpSolutionValidator
 	{
@@ -20,61 +19,34 @@ namespace uLearn.CSharp
 			return syntaxNode.SyntaxTree.GetLineSpan(syntaxNode.Span);
 		}
 
-		public static string Report(SyntaxNode syntaxNode, string message)
-		{
-			return Report(GetSpan(syntaxNode), message);
-		}
-
-		public static string Report(SyntaxToken syntaxToken, string message)
-		{
-			return Report(GetSpan(syntaxToken), message);
-		}
-
 		public static FileLinePositionSpan GetSpan(SyntaxNodeOrToken syntaxNode)
 		{
 			return syntaxNode.GetFileLinePositionSpan();
 		}
 
-		public static string Report(SyntaxNodeOrToken syntaxNode, string message)
-		{
-			return Report(GetSpan(syntaxNode), message);
-		}
-
-		public static string Report(FileLinePositionSpan span, string message)
-		{
-			var linePosition = span.StartLinePosition;
-			return "Строка {0}, позиция {1}: {2}".WithArgs(linePosition.Line + 1, linePosition.Character, message);
-		}
-
-		public static IEnumerable<string> InspectAll<TNode>(SyntaxTree userSolution, SemanticModel semanticModel, Func<TNode, SemanticModel, IEnumerable<string>> inspect)
+		public static IEnumerable<SolutionStyleError> InspectAll<TNode>(SyntaxTree userSolution, SemanticModel semanticModel, Func<TNode, SemanticModel, IEnumerable<SolutionStyleError>> inspect)
 			where TNode : SyntaxNode
 		{
 			var nodes = userSolution.GetRoot().DescendantNodes().OfType<TNode>();
 			return nodes.SelectMany(node => inspect(node, semanticModel));
 		}
 
-		public static IEnumerable<string> InspectAll<TNode>(SyntaxTree userSolution, Func<TNode, IEnumerable<string>> inspect)
+		public static IEnumerable<SolutionStyleError> InspectAll<TNode>(SyntaxTree userSolution, Func<TNode, IEnumerable<SolutionStyleError>> inspect)
 			where TNode : SyntaxNode
 		{
 			var nodes = userSolution.GetRoot().DescendantNodes().OfType<TNode>();
 			return nodes.SelectMany(inspect);
 		}
 
-		public string FindError(string code)
+		public List<SolutionStyleError> FindErrors(string code)
 		{
 			var syntaxTree = CSharpSyntaxTree.ParseText(code);
 			var compilation = CSharpCompilation.Create("MyCompilation", new[] { syntaxTree }, new[] { mscorlib });
 			var semanticModel = compilation.GetSemanticModel(syntaxTree);
-			return FindError(syntaxTree, semanticModel);
+			return FindErrors(syntaxTree, semanticModel);
 		}
 
-		public string FindError(SyntaxTree userSolution, SemanticModel semanticModel)
-		{
-			var errors = ReportAllErrors(userSolution, semanticModel).ToList();
-			return errors.Any() ? string.Join("\n", errors) : null;
-		}
-
-		protected abstract IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel);
+		public abstract List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel);
 
 		private static readonly PortableExecutableReference mscorlib =
 			MetadataReference.CreateFromFile(typeof(object).Assembly.Location);

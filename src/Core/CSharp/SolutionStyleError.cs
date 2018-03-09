@@ -1,5 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 
+using SyntaxNodeOrToken = uLearn.CSharp.Validators.IndentsValidation.SyntaxNodeOrToken;
+
 namespace uLearn.CSharp
 {
 	public class SolutionStyleError
@@ -21,6 +23,11 @@ namespace uLearn.CSharp
 
 		public SolutionStyleError(SyntaxToken token, string message)
 			:this(GetFileLinePositionSpan(token), message)
+		{
+		}
+		
+		public SolutionStyleError(SyntaxNodeOrToken nodeOrToken, string message)
+			:this(nodeOrToken.GetFileLinePositionSpan(), message)
 		{
 		}
 		

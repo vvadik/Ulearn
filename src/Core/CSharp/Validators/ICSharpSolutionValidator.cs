@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace uLearn.CSharp
+namespace uLearn.CSharp.Validators
 {
 	public interface ICSharpSolutionValidator
 	{
@@ -14,8 +14,8 @@ namespace uLearn.CSharp
 
 	public class IsStaticMethodValidator : ICSharpSolutionValidator, IStrictValidator
 	{
-		public const string ShouldBeMethod = "Решение должно быть корректным определением статического метода";
-		public const string ShouldBeSingleMethod = "Решение должно состоять ровно из одного метода";
+		public const string ShouldBeMethod = "Решение должно быть корректным определением статического метода.";
+		public const string ShouldBeSingleMethod = "Решение должно состоять ровно из одного метода.";
 
 		public List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{

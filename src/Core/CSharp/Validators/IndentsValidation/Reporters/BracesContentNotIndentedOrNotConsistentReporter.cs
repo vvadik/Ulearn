@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace uLearn.CSharp.IndentsValidation.Reporters
+namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 {
 	internal static class BracesContentNotIndentedOrNotConsistentReporter
 	{
-		public static IEnumerable<string> Report(BracesPair[] bracesPairs)
+		public static IEnumerable<SolutionStyleError> Report(BracesPair[] bracesPairs)
 		{
 			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine()))
 			{
@@ -26,13 +26,13 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 				var minimalIndentAfterOpenbrace = new Indent(firstTokenOfLineWithMinimalIndent);
 				var firstChild = childLineIndents.First();
 				if (firstChild.LengthInSpaces <= minimalIndentAfterOpenbrace.LengthInSpaces)
-					yield return BaseStyleValidator.Report(firstChild.IndentedToken,
-						$"Содержимое парных фигурных скобок ({braces}) должно иметь дополнительный отступ.");
+					yield return new SolutionStyleError(firstChild.IndentedToken,
+						$"РЎРѕРґРµСЂР¶РёРјРѕРµ РїР°СЂРЅС‹С… С„РёРіСѓСЂРЅС‹С… СЃРєРѕР±РѕРє ({braces}) РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ РѕС‚СЃС‚СѓРї.");
 				var badLines = childLineIndents.Where(t => t.LengthInSpaces != firstChild.LengthInSpaces);
 				foreach (var badIndent in badLines)
 				{
-					yield return BaseStyleValidator.Report(badIndent.IndentedToken,
-						$"Содержимое парных фигурных скобок ({braces}) должно иметь одинаковый отступ.");
+					yield return new SolutionStyleError(badIndent.IndentedToken,
+						$"РЎРѕРґРµСЂР¶РёРјРѕРµ РїР°СЂРЅС‹С… С„РёРіСѓСЂРЅС‹С… СЃРєРѕР±РѕРє ({braces}) РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ РѕРґРёРЅР°РєРѕРІС‹Р№ РѕС‚СЃС‚СѓРї.");
 				}
 			}
 		}

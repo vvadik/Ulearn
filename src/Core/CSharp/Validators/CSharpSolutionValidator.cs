@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using uLearn.CSharp.IndentsValidation;
-using uLearn.CSharp.VerbInMethodNameValidation;
+using uLearn.CSharp.Validators.IndentsValidation;
+using uLearn.CSharp.Validators.VerbInMethodNameValidation;
 
-namespace uLearn.CSharp
+namespace uLearn.CSharp.Validators
 {
 	public class CSharpSolutionValidator : ISolutionValidator
 	{

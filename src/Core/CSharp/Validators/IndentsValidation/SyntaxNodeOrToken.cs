@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace uLearn.CSharp.IndentsValidation
+namespace uLearn.CSharp.Validators.IndentsValidation
 {
 	public class SyntaxNodeOrToken
 	{
@@ -78,7 +78,7 @@ namespace uLearn.CSharp.IndentsValidation
 				return SyntaxToken.LeadingTrivia;
 			return default(SyntaxTriviaList);
 		}
-
+		
 		public override string ToString()
 		{
 			if (SyntaxNode != null)

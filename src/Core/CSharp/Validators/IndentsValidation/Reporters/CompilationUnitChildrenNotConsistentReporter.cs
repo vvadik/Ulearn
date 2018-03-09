@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace uLearn.CSharp.IndentsValidation.Reporters
+namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 {
 	internal static class CompilationUnitChildrenNotConsistentReporter
 	{
-		public static IEnumerable<string> Report(SyntaxTree userSolution)
+		public static IEnumerable<SolutionStyleError> Report(SyntaxTree userSolution)
 		{
 			var childLineIndents = userSolution.GetRoot().ChildNodes()
 				.Select(node => node.GetFirstToken())
@@ -15,13 +15,13 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 				.ToList();
 			if (!childLineIndents.Any())
 			{
-				return Enumerable.Empty<string>();
+				return Enumerable.Empty<SolutionStyleError>();
 			}
 			var firstIndent = childLineIndents.First();
 			return childLineIndents
 				.Skip(1)
 				.Where(i => i.LengthInSpaces != firstIndent.LengthInSpaces)
-				.Select(i => BaseStyleValidator.Report(i.IndentedToken, "На верхнем уровне вложенности все узлы должны иметь одинаковый отступ"));
+				.Select(i => new SolutionStyleError(i.IndentedToken, "РќР° РІРµСЂС…РЅРµРј СѓСЂРѕРІРЅРµ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё РІСЃРµ СѓР·Р»С‹ РґРѕР»Р¶РЅС‹ РёРјРµС‚СЊ РѕРґРёРЅР°РєРѕРІС‹Р№ РѕС‚СЃС‚СѓРї."));
 		}
 	}
 }

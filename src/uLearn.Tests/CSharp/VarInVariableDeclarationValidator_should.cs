@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Linq;
+using FluentAssertions;
 using NUnit.Framework;
 using uLearn.CSharp.Validators;
 
@@ -22,9 +23,9 @@ namespace uLearn.CSharp
         [TestCase(@"class A {void SomeMethod(){ List<string> c = new List<string>();}}")]
         public void Warn_declaration_with_type(string code)
         {
-            var errors = validator.FindError(code);
+            var errors = validator.FindErrors(code);
 
-            errors.Should().Contain("Строка 1");
+            errors.Select(e => e.Span.StartLinePosition.Line).Should().Contain(0);
         }
 
 
@@ -40,7 +41,7 @@ namespace uLearn.CSharp
                   "private string GetString(){return \"abc\";}}")]
         public void ignore_correct_declaration(string code)
         {
-            validator.FindError(code).Should().BeNullOrEmpty();
+            validator.FindErrors(code).Should().BeNullOrEmpty();
         }
     }
 }

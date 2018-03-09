@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace uLearn.CSharp.IndentsValidation
+namespace uLearn.CSharp.Validators.IndentsValidation
 {
 	internal static class IndentsSyntaxExtensions
 	{

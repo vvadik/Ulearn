@@ -4,11 +4,11 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace uLearn.CSharp
+namespace uLearn.CSharp.Validators
 {
 	public class ArrayLengthStyleValidator: BaseStyleValidator
 	{
-		protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
+		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			var errorsInForCycle = InspectAll<ForStatementSyntax>(userSolution, semanticModel, InspectMethod);
 			var errorsInForEachCycle = InspectAll<ForEachStatementSyntax>(userSolution, semanticModel, InspectMethod);
@@ -18,10 +18,11 @@ namespace uLearn.CSharp
 			return errorsInForCycle
 				.Concat(errorsInForEachCycle)
 				.Concat(errorsInWhileCycle)
-				.Concat(errorsInDoWhileCycle);
+				.Concat(errorsInDoWhileCycle)
+				.ToList();
 		}
 
-		private IEnumerable<string> InspectMethod<TCycle>(TCycle cycleStatement, SemanticModel semanticModel) where TCycle: StatementSyntax
+		private IEnumerable<SolutionStyleError> InspectMethod<TCycle>(TCycle cycleStatement, SemanticModel semanticModel) where TCycle: StatementSyntax
 		{
 			var methodInvocations = cycleStatement
 				.DescendantNodes()
@@ -48,7 +49,7 @@ namespace uLearn.CSharp
 					var variableName = variableSymbol.ToString();
 					if (!cycleStatement.ContainsAssignmentOf(variableName, semanticModel)
 						&& !methodInvocations.Any(m => m.HasVariableAsArgument(variableName, semanticModel)))
-						yield return Report(methodInvocation, "Неэффективный код. GetLength вызывается в цикле для константы и возвращает каждый раз одно и то же. Лучше вынести результат выполнения метода в переменную за цикл.");
+						yield return new SolutionStyleError(methodInvocation, "Неэффективный код. GetLength вызывается в цикле для константы и возвращает каждый раз одно и то же. Лучше вынести результат выполнения метода в переменную за цикл.");
 				}
 			}
 		}

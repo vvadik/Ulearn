@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using uLearn.Properties;
 using Ulearn.Common.Extensions;
 
-namespace uLearn.CSharp.VerbInMethodNameValidation
+namespace uLearn.CSharp.Validators.VerbInMethodNameValidation
 {
     public class VerbInMethodNameValidator : BaseStyleValidator
     {

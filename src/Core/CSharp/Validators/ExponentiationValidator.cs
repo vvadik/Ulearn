@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace uLearn.CSharp
+namespace uLearn.CSharp.Validators
 {
 	public class ExponentiationValidator: BaseStyleValidator
 	{
@@ -23,7 +23,7 @@ namespace uLearn.CSharp
 				methodInvocation.ArgumentList.ContainsForbiddenDegrees(forbiddenDegrees))
 				yield return new SolutionStyleError(
 					methodInvocation,
-					"Неэффективный код. Если число нужно возвести в квадрат или куб, лучше сделать это с помощью умножения, не используя более общий, но менее быстрый Math.Pow"
+					"Неэффективный код. Если число нужно возвести в квадрат или куб, лучше сделать это с помощью умножения, не используя более общий, но менее быстрый `Math.Pow`."
 				);
 		}
 	}

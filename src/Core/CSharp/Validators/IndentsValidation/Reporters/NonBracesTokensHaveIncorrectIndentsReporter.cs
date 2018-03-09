@@ -3,11 +3,11 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace uLearn.CSharp.IndentsValidation.Reporters
+namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 {
 	internal static class NonBracesTokensHaveIncorrectIndentsReporter
 	{
-		public static IEnumerable<string> Report(SyntaxTree tree)
+		public static IEnumerable<SolutionStyleError> Report(SyntaxTree tree)
 		{
 			return tree.GetRoot().DescendantNodes()
 				.Where(NeedToValidateNonBracesTokens)
@@ -16,7 +16,7 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 				.Distinct();
 		}
 
-		private static IEnumerable<string> CheckNonBracesStatements(SyntaxNodeOrToken rootStatementSyntax)
+		private static IEnumerable<SolutionStyleError> CheckNonBracesStatements(SyntaxNodeOrToken rootStatementSyntax)
 		{
 			var rootLine = rootStatementSyntax.GetStartLine();
 			var rootEndLine = rootStatementSyntax.GetConditionEndLine();
@@ -34,7 +34,7 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 				var validateIndent = ValidateIndent(rootStatementSyntax, rootStart, parentStart, rootLine, parentLine);
 				if (validateIndent != null)
 				{
-					yield return BaseStyleValidator.Report(rootStatementSyntax, validateIndent);
+					yield return new SolutionStyleError(rootStatementSyntax, validateIndent);
 					yield break;
 				}
 			}
@@ -45,8 +45,8 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 				yield return report;
 		}
 
-		private static IEnumerable<string> ValidateStatementClauses(
-			SyntaxNodeOrToken[] statementClauses,
+		private static IEnumerable<SolutionStyleError> ValidateStatementClauses(
+			IEnumerable<SyntaxNodeOrToken> statementClauses,
 			SyntaxNodeOrToken rootStatementSyntax,
 			int rootStart,
 			int rootLine,
@@ -61,8 +61,8 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 
 				if (statementClause.HasExcessNewLines())
 				{
-					yield return BaseStyleValidator.Report(statementClause,
-						$"Выражение не должно иметь лишние переносы строк после родителя ({GetNodePosition(rootStatementSyntax)}).");
+					yield return new SolutionStyleError(statementClause,
+						$"Р’С‹СЂР°Р¶РµРЅРёРµ РЅРµ РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ Р»РёС€РЅРёРµ РїРµСЂРµРЅРѕСЃС‹ СЃС‚СЂРѕРє РїРѕСЃР»Рµ СЂРѕРґРёС‚РµР»СЏ ({GetNodePosition(rootStatementSyntax)}).");
 					continue;
 				}
 				if (!statementClause.OnSameIndentWithParent.HasValue)
@@ -72,7 +72,7 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 						var report = ValidateIndent(rootStatementSyntax, statementStart, rootStart, statementLine, rootLine);
 						if (report != null)
 						{
-							yield return BaseStyleValidator.Report(statementClause, report);
+							yield return new SolutionStyleError(statementClause, report);
 							continue;
 						}
 					}
@@ -83,8 +83,8 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 					{
 						if (statementStart != rootStart)
 						{
-							yield return BaseStyleValidator.Report(statementClause,
-								$"Выражение должно иметь такой же отступ, как у родителя ({GetNodePosition(rootStatementSyntax)}).");
+							yield return new SolutionStyleError(statementClause,
+								$"Р’С‹СЂР°Р¶РµРЅРёРµ РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ С‚Р°РєРѕР№ Р¶Рµ РѕС‚СЃС‚СѓРї, РєР°Рє Сѓ СЂРѕРґРёС‚РµР»СЏ ({GetNodePosition(rootStatementSyntax)}).");
 							continue;
 						}
 					}
@@ -95,7 +95,7 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 						var report = ValidateIndent(rootStatementSyntax, statementStart, rootStart, statementLine, rootLine);
 						if (report != null)
 						{
-							yield return BaseStyleValidator.Report(statementClause, report);
+							yield return new SolutionStyleError(statementClause, report);
 							continue;
 						}
 					}
@@ -130,19 +130,19 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 		{
 			if (statementLine == rootLine)
 			{
-				return "Выражение должно иметь дополнительный перенос строки " +
-						$"после родителя ({GetNodePosition(root)}).";
+				return "Р’С‹СЂР°Р¶РµРЅРёРµ РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ РїРµСЂРµРЅРѕСЃ СЃС‚СЂРѕРєРё " +
+						$"РїРѕСЃР»Рµ СЂРѕРґРёС‚РµР»СЏ ({GetNodePosition(root)}).";
 			}
 			if (statementStart <= rootStart)
 			{
-				return "Выражение должно иметь отступ больше, " +
-						$"чем у родителя ({GetNodePosition(root)}).";
+				return "Р’С‹СЂР°Р¶РµРЅРёРµ РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ РѕС‚СЃС‚СѓРї Р±РѕР»СЊС€Рµ, " +
+						$"С‡РµРј Сѓ СЂРѕРґРёС‚РµР»СЏ ({GetNodePosition(root)}).";
 			}
 			var delta = statementStart - rootStart;
 			if (delta < 4)
 			{
-				return "Выражение должно иметь отступ, не меньше 4 пробелов " +
-						$"относительно родителя ({GetNodePosition(root)}).";
+				return "Р’С‹СЂР°Р¶РµРЅРёРµ РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ РѕС‚СЃС‚СѓРї РЅРµ РјРµРЅСЊС€Рµ 4 РїСЂРѕР±РµР»РѕРІ " +
+						$"РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ СЂРѕРґРёС‚РµР»СЏ ({GetNodePosition(root)}).";
 			}
 			return null;
 		}
@@ -160,7 +160,7 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 		private static string GetNodePosition(SyntaxNodeOrToken nodeOrToken)
 		{
 			var linePosition = nodeOrToken.GetFileLinePositionSpan().StartLinePosition;
-			return $"cтрока {linePosition.Line + 1}, позиция {linePosition.Character}";
+			return $"cС‚СЂРѕРєР° {linePosition.Line + 1}, РїРѕР·РёС†РёСЏ {linePosition.Character}";
 		}
 	}
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
+using uLearn.CSharp.Validators;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp.ArrayGetLengthValidation
@@ -42,7 +43,7 @@ namespace uLearn.CSharp.ArrayGetLengthValidation
 		public void FindErrors(FileInfo file)
 		{
 			var code = file.ContentAsUtf8();
-			var errors = validator.FindError(code);
+			var errors = validator.FindErrors(code);
 
 			errors.Should().NotBeNullOrEmpty();
 		}
@@ -51,7 +52,7 @@ namespace uLearn.CSharp.ArrayGetLengthValidation
 		public void NotFindErrors(FileInfo file)
 		{
 			var code = file.ContentAsUtf8();
-			var errors = validator.FindError(code);
+			var errors = validator.FindErrors(code);
 			if (errors != null)
 			{
 				Console.WriteLine(errors);
@@ -66,7 +67,7 @@ namespace uLearn.CSharp.ArrayGetLengthValidation
 		{
 			var fileContent = file.ContentAsUtf8();
 
-			var errors = validator.FindError(fileContent);
+			var errors = validator.FindErrors(fileContent);
 
 			if (errors != null)
 			{
@@ -86,7 +87,7 @@ namespace uLearn.CSharp.ArrayGetLengthValidation
 		{
 			var fileContent = file.ContentAsUtf8();
 
-			var errors = validator.FindError(fileContent);
+			var errors = validator.FindErrors(fileContent);
 			if (errors != null)
 			{
 				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",

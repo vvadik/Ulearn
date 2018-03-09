@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace uLearn.CSharp.IndentsValidation.Reporters
+namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 {
 	internal static class BracesNotIndentedReporter
 	{
-		public static IEnumerable<string> Report(BracesPair[] bracesPairs)
+		public static IEnumerable<SolutionStyleError> Report(BracesPair[] bracesPairs)
 		{
 			foreach (var braces in bracesPairs.Where(pair => pair.Open.GetLine() != pair.Close.GetLine() &&
 															Indent.TokenIsFirstAtLine(pair.Open)))
@@ -17,8 +17,8 @@ namespace uLearn.CSharp.IndentsValidation.Reporters
 				var parentLineIndent = new Indent(correctOpenbraceParent);
 				var openbraceLineIndent = new Indent(braces.Open);
 				if (openbraceLineIndent.LengthInSpaces < parentLineIndent.LengthInSpaces)
-					yield return BaseStyleValidator.Report(braces.Open,
-						$"Ïàðíûå ôèãóðíûå ñêîáêè ({braces}) äîëæíû èìåòü îòñòóï íå ìåíüøå, ÷åì ó ðîäèòåëÿ.");
+					yield return new SolutionStyleError(braces.Open,
+						$"ÐŸÐ°Ñ€Ð½Ñ‹Ðµ Ñ„Ð¸Ð³ÑƒÑ€Ð½Ñ‹Ðµ ÑÐºÐ¾Ð±ÐºÐ¸ ({braces}) Ð´Ð¾Ð»Ð¶Ð½Ñ‹ Ð¸Ð¼ÐµÑ‚ÑŒ Ð¾Ñ‚ÑÑ‚ÑƒÐ¿ Ð½Ðµ Ð¼ÐµÐ½ÑŒÑˆÐµ, Ñ‡ÐµÐ¼ Ñƒ Ñ€Ð¾Ð´Ð¸Ñ‚ÐµÐ»Ñ.");
 			}
 		}
 	}

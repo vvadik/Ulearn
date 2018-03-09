@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -6,12 +7,12 @@ namespace uLearn.CSharp.Validators
 {
     public class VarInVariableDeclarationValidator : BaseStyleValidator
     {
-        protected override IEnumerable<string> ReportAllErrors(SyntaxTree userSolution, SemanticModel semanticModel)
+		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
         {
-            return InspectAll<VariableDeclarationSyntax>(userSolution, semanticModel, Inspect);
+            return InspectAll<VariableDeclarationSyntax>(userSolution, semanticModel, Inspect).ToList();
         }
 
-        private IEnumerable<string> Inspect(VariableDeclarationSyntax variableDeclarationSyntax, SemanticModel semanticModel)
+        private IEnumerable<SolutionStyleError> Inspect(VariableDeclarationSyntax variableDeclarationSyntax, SemanticModel semanticModel)
         {
             if (variableDeclarationSyntax.Type.IsVar || variableDeclarationSyntax.Parent is FieldDeclarationSyntax)
                 yield break;
@@ -29,7 +30,7 @@ namespace uLearn.CSharp.Validators
                 var variableTypeInfo = semanticModel.GetTypeInfo(variableDeclarationSyntax.Type);
 
                 if (Equals(initializerTypeInfo.Type, variableTypeInfo.Type))
-                    yield return Report(variable, "Используй var при инициализации локальной переменной");
+                    yield return new SolutionStyleError(variable, "Используйте `var` при инициализации локальной переменной.");
             }
         }
     }
