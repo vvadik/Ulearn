@@ -1,5 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Database.Models
 {
@@ -40,5 +43,12 @@ namespace Database.Models
 
 		[Required]
 		public bool HiddenFromTopComments { get; set; }
+		
+		public DateTime AddingTime { get; set; }
+		
+		public virtual IList<ExerciseCodeReviewComment> Comments { get; set; }
+		
+		[NotMapped]
+		public List<ExerciseCodeReviewComment> NotDeletedComments => Comments.Where(r => !r.IsDeleted).ToList();
 	}
 }
