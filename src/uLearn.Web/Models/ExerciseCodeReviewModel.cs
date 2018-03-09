@@ -6,5 +6,6 @@ namespace uLearn.Web.Models
 	{
 		public ExerciseCodeReview Review { get; set; }
 		public ManualExerciseChecking ManualChecking { get; set; }
+		public ApplicationUser CurrentUser { get; set; }
 	}
 }

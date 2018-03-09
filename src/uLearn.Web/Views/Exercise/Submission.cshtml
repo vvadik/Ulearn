@@ -91,22 +91,22 @@
 				status = "Результат проверки: " + Model.SubmissionSelectedByUser.AutomaticChecking.GetVerdict();
 				statusClass = "wrong";
 			}
-			if (!string.IsNullOrEmpty(status) && (Model.ManualChecking == null || Model.ManualChecking.SubmissionId != Model.SubmissionSelectedByUser.Id))
+			if (!string.IsNullOrEmpty(status) && Model.ManualChecking == null)
 			{
-				<p class="exercise-status @statusClass">@Html.Raw(status)</p>
+				<p class="exercise-block-status @statusClass">@Html.Raw(status)</p>
 			}
+			
 		}
 
-		if (Model.InstructorView)
+		var showAntiplagiarismStatus = Model.InstructorView && (User.HasCourseAccess(Model.CourseId, CourseAccessType.FeatureUseAntiPlagiarism) || User.IsSystemAdministrator());
+		
+		if (showAntiplagiarismStatus)
 		{
-			if (User.HasCourseAccess(Model.CourseId, CourseAccessType.FeatureUseAntiPlagiarism) || User.IsSystemAdministrator())
-			{
-				<p class="antiplagiarism-status"
-                   data-antiplagiarism-url="@Url.Action("Info", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })"
-                   data-antiplagiarism-details-url="@Url.Action("Details", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })">
-                    Проверка на&nbsp;списывание: ищу похожие решения у&nbsp;других студентов...
-                </p>
-			}
+			<p class="antiplagiarism-status"
+               data-antiplagiarism-url="@Url.Action("Info", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })"
+               data-antiplagiarism-details-url="@Url.Action("Details", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })">
+                Проверка на&nbsp;списывание: ищу похожие решения у&nbsp;других студентов...
+            </p>
 		}
 
 		if (Model.ReviewState == ExerciseReviewState.Reviewed || Model.InstructorView)
@@ -120,6 +120,7 @@
 					{
 						Review = review,
 						ManualChecking = Model.ManualChecking,
+						CurrentUser = Model.CurrentUser,
 					})
 				}
 			</div>

@@ -203,18 +203,10 @@ namespace Database.DataContexts
 				StartPosition = startPosition,
 				FinishLine = finishLine,
 				FinishPosition = finishPosition,
+				AddingTime = DateTime.Now,
 			});
 
-			try
-			{
-				await db.SaveChangesAsync();
-			}
-			catch (DbEntityValidationException e)
-			{
-				throw new Exception(
-					string.Join("\r\n",
-						e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
-			}
+			await db.SaveChangesAsync();
 
 			/* Extract review from database to fill review.Author by EF's DynamicProxy */
 			return db.ExerciseCodeReviews.AsNoTracking().FirstOrDefault(r => r.Id == review.Id);
@@ -282,6 +274,35 @@ namespace Database.DataContexts
 					r.ExerciseChecking.SlideId == slideId &&
 					!r.IsDeleted
 			).ToList();
+		}
+
+		public async Task<ExerciseCodeReviewComment> AddExerciseCodeReviewComment(string authorId, int reviewId, string text)
+		{
+			var codeReviewComment = new ExerciseCodeReviewComment
+			{
+				AuthorId = authorId,
+				ReviewId = reviewId,
+				Text = text,
+				IsDeleted = false,
+				AddingTime = DateTime.Now,
+			};
+
+			db.ExerciseCodeReviewComments.Add(codeReviewComment);
+			await db.SaveChangesAsync();
+
+			/* Extract review from database to fill review.Author by EF's DynamicProxy */
+			return db.ExerciseCodeReviewComments.AsNoTracking().FirstOrDefault(r => r.Id == codeReviewComment.Id);
+		}
+
+		public ExerciseCodeReviewComment FindExerciseCodeReviewCommentById(int commentId)
+		{
+			return db.ExerciseCodeReviewComments.Find(commentId);
+		}
+		
+		public async Task DeleteExerciseCodeReviewComment(ExerciseCodeReviewComment comment)
+		{
+			comment.IsDeleted = true;
+			await db.SaveChangesAsync();
 		}
 	}
 }
