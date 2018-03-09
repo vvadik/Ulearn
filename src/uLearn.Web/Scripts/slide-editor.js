@@ -70,7 +70,7 @@ function initCodeEditor($parent) {
 
 	CodeMirror.commands.autocomplete = function (cm) {
 		cm.showHint({ hint: CodeMirror.hint.csharp });
-	}
+	};
 
 	codeMirrorClass($parent.find('.code-exercise'), true, false, false);
 	codeMirrorClass($parent.find('.code-sample'), false, false, false);    
@@ -96,8 +96,9 @@ function initCodeEditor($parent) {
 		return "text/" + langIds[lang];
 	}
 
-	function unselectAllReviews() {
-		$('.exercise__review.selected').removeClass('selected');
+	function unselectAllReviews(removeClassSelected) {
+		if (removeClassSelected || "undefined" === typeof(removeClassSelected))
+			$('.exercise__review.selected').removeClass('selected');
 		if (currentReviewTextMarker) {
 			currentReviewTextMarker.clear();
 			currentReviewTextMarker = null;
@@ -110,9 +111,11 @@ function initCodeEditor($parent) {
 		var finishLine = $review.data('finish-line');
 		var finishPosition = $review.data('finish-position');
 
-		unselectAllReviews();
-
-		$review.addClass('selected');
+        unselectAllReviews(! $review.hasClass('selected'));
+        if (! $review.hasClass('selected'))             
+            $review.addClass('selected');
+        
+        
 		currentReviewTextMarker = exerciseCodeDoc.markText({ line: startLine, ch: startPosition }, { line: finishLine, ch: finishPosition }, {
 			className: 'exercise__code__reviewed-fragment__selected'
 		});
@@ -124,11 +127,18 @@ function initCodeEditor($parent) {
 			var $el = $(element);
 			var langId = $el.data("lang");
 			$el.parent().find('.loading-spinner').hide();
+			
+			let theme = 'default';
+			if (editable || guest)
+				theme = 'cobalt';
+			if ($el.closest('.revealed').length > 0)
+				theme = 'pastel-on-dark';
+			
 			var editor = CodeMirror.fromTextArea(element,
 			{
 				mode: getMode(langId),
 				lineNumbers: true,
-				theme: (editable || guest) ? "cobalt" : "default",
+				theme: theme, 
 				indentWithTabs: true,
 				tabSize: 4,
 				indentUnit: 4,
@@ -212,8 +222,23 @@ function initCodeEditor($parent) {
 				editor.on("mousedown", function(cm) { loginForContinue(); });
 		});
 	}
+	
+	let collapseCommentForm = function ($textarea, unselectCurrentReview) {
+        let $replyForm = $textarea.closest('.exercise__review__reply-form');
 
-	$('.exercise__reviews').on('click', '.exercise__review', function () {
+        let $input = $replyForm.find('input[type="text"]');
+        let $footer = $replyForm.find('.exercise__review__reply-footer');
+        $textarea.hide();
+        $footer.hide();
+        $input.show();
+
+        if (unselectCurrentReview)
+        	unselectAllReviews();
+    };
+
+    let $exerciseReviews = $('.exercise__reviews');
+    
+    $exerciseReviews.on('click', '.exercise__review', function () {
 		if (!$exerciseCodeBlock)
 			return;
 
@@ -221,7 +246,7 @@ function initCodeEditor($parent) {
 		selectReview($review);
 	});
 
-	$('.exercise__reviews').on('click', '.exercise__delete-review', function (e) {
+	$exerciseReviews.on('click', '.exercise__delete-review', function (e) {
 		e.preventDefault();
 
 		var $self = $(this);
@@ -251,6 +276,105 @@ function initCodeEditor($parent) {
 		var $review = $(this);
 		createMarkTextForReview($review);
 	});
+	
+	$exerciseReviews.on('focus', '.exercise__review__reply-form input[type="text"]', function (e) {		
+		let $self = $(this);
+		let $replyForm = $self.closest('.exercise__review__reply-form');
+		$self.hide();
+		
+		let $textarea = $replyForm.find('textarea');
+		let $footer = $replyForm.find('.exercise__review__reply-footer');
+		$textarea.show().focus();
+		$footer.show();
+
+        let $button = $replyForm.find('.exercise__review__reply-button button');
+		$button.attr('disabled', 'disabled');
+		
+		let $review = $self.closest('.exercise__review');
+        selectReview($review);
+
+        placeCodeReviews();
+    });
+
+    $exerciseReviews.on('keyup', '.exercise__review__reply-form textarea', function (e) {
+        let $self = $(this);
+        let $replyForm = $self.closest('.exercise__review__reply-form');
+        let $button = $replyForm.find('.exercise__review__reply-button button');
+        
+        if ($self.val() === '')
+        	$button.attr('disabled', 'disabled');
+        else {
+            $button.removeAttr('disabled');
+            
+            /* Send comment by Ctrl+Enter (or Cmd+Enter on Mac OS) */
+            if ((e.ctrlKey || e.metaKey) && (e.keyCode === 13 || e.keyCode === 10)) {
+                $button.click();
+            }
+        }
+
+        placeCodeReviews();
+    });
+	
+    $exerciseReviews.on('blur', '.exercise__review__reply-form textarea', function (e) {
+        let $self = $(this);
+               
+        if ($self.val() !== '')
+        	return;
+        
+        collapseCommentForm($self, true);
+        placeCodeReviews();
+    });
+
+    /* autoEnlargeTextarea is exported from slide-comments.js */
+    $exerciseReviews.on('input', '.exercise__review__reply-form textarea', autoEnlargeTextarea);
+
+    $exerciseReviews.on('click', '.exercise__review__reply-button button', function (e) {
+    	e.preventDefault();
+    	
+		let $self = $(this);
+        let $replyForm = $self.closest('.exercise__review__reply-form');
+        let $textarea = $replyForm.find('textarea');
+        
+        let reviewId = $self.data('id');
+        let url = $self.data('url');
+        let token = $('input[name="__RequestVerificationToken"]').val();
+        $.post(url, {
+            __RequestVerificationToken: token,
+			reviewId: reviewId,
+			text: $textarea.val(),
+        }, function (data) {
+         	let $review = $self.closest('.exercise__review');
+         	let $place = $review.find('.exercise__review__new-comment-place');
+         	$(data).insertBefore($place);
+         	$textarea.val('');
+         	/* Return height of textarea*/
+         	$textarea.css('height', $textarea.data('minHeight') + 'px').removeData('minHeight');
+         	collapseCommentForm($textarea, false);
+            placeCodeReviews();
+        });
+    });
+    
+    $exerciseReviews.on('click', '.exercise__delete-review-comment', function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+		
+		let $self = $(this);
+		let $comment = $self.closest('.exercise__review-comment');
+
+        let url = $self.data('url');
+        let token = $('input[name="__RequestVerificationToken"]').val();
+        $.post(url, {
+            __RequestVerificationToken: token,
+        }, function (data) {
+        	if (data.status === 'ok') {
+                $comment.hide();
+                placeCodeReviews();
+            } else {
+        		console.log(data);
+        		alert('Не могу удалить комментарий: произошла ошибка');
+			}
+        });
+    });    
 }
 
 function createMarkTextForReview($review) {
@@ -268,7 +392,8 @@ function createMarkTextForReview($review) {
 function placeCodeReviews() {
 	var $reviews = $('.exercise__reviews .exercise__review');
 
-	var startHeight = $('.exercise__reviews').offset().top;
+    let $exerciseReviews = $('.exercise__reviews');
+    var startHeight = $exerciseReviews.offset().top;
 	var lastReviewBottomHeight = 0;
 	$reviews.each(function() {
 		var $review = $(this);
@@ -280,6 +405,9 @@ function placeCodeReviews() {
 
 		lastReviewBottomHeight = $review.offset().top + $review.outerHeight() - startHeight;
 	});
+
+	let exerciseBlockHeight = $(exerciseCodeDoc.getEditor().display.wrapper).outerHeight();
+	$exerciseReviews.css('minHeight', exerciseBlockHeight + 'px');
 }
 
 function orderByStartLineAndPosition(first, second) {
