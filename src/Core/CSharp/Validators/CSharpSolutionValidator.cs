@@ -20,6 +20,7 @@ namespace uLearn.CSharp
 			new NamingStyleValidator(),
 			new ExponentiationValidator(),
 			new BoolCompareValidator(),
+			new ArrayLengthStyleValidator(),
 			new IndentsValidator() // Выводит дополнительный текст в конце, поэтому лучше ему быть последним
 		};
 

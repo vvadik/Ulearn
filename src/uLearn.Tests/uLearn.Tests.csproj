@@ -235,6 +235,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSharp\ArrayGetLengthValidation\ArrayLengthStylePrimitives_should.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\ArrayLengthStyleValidator_should.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Correct\ArrayAssignedInCycleOrInnerCycle.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Correct\GetLengthNotInCycle.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Correct\GetLengthOfArrayCreatedInTheSameCycle.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Correct\GetLengthOfArrayThatUsedAsMethodArgument.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Correct\GetLengthWithVariable.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Correct\NoGetLengthCall.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Incorrect\AssignToArrayElement.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Incorrect\GetLengthInDoWhileCycle.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Incorrect\GetLengthInForCycle.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Incorrect\GetLengthInForeachCycle.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Incorrect\GetLengthInInnerCycle.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Incorrect\GetLengthInMethodCall.cs" />
+    <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Incorrect\GetLengthInWhileCycle.cs" />
     <Compile Include="CSharp\ExcessLinesValidation\ExcessLinesValidator_Should.cs" />
     <Compile Include="CSharp\ExcessLinesValidation\TestData\Correct\ExcessLinesValidatorCases.cs" />
     <Compile Include="CSharp\ExcessLinesValidation\TestData\Incorrect\ExcessLinesValidatorCases.cs" />
@@ -294,6 +309,7 @@
     <Compile Include="CSharp\RefArgumentsValidation\TestData\Incorrect\RefArgumentsValidationTestDataClass.cs" />
     <Compile Include="CSharp\RefArgumentsValidation\RefArgumentsValidator_should.cs" />
     <Compile Include="CSharp\VarInVariableDeclarationValidator_should.cs" />
+    <Compile Include="CSharp\TestPaths.cs" />
     <Compile Include="CSharp\VerbInMethodNameValidator_should.cs" />
     <Compile Include="CSharp\testProject\projDir\inner-dir-1\inner-dir-2\ExcludeMeForStudent.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

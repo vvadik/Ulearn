@@ -6,13 +6,13 @@ using FluentAssertions;
 using NUnit.Framework;
 using Ulearn.Common.Extensions;
 
-namespace uLearn.CSharp.ExponentiationValidation
+namespace uLearn.CSharp.ArrayGetLengthValidation
 {
 	[TestFixture]
-	public class ExponentiationValidator_should
+	public class ArrayLengthStyleValidator_should
 	{
 		private static DirectoryInfo TestDataDir => new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
-			"..", "CSharp", "ExponentiationValidation", "TestData"));
+			"..", "CSharp", "ArrayGetLengthValidation", "TestData"));
 		private static DirectoryInfo IncorrectTestDataDir => TestDataDir.GetDirectories("Incorrect").Single();
 		private static DirectoryInfo CorrectTestDataDir => TestDataDir.GetDirectories("Correct").Single();
 
@@ -36,7 +36,7 @@ namespace uLearn.CSharp.ExponentiationValidation
 			.EnumerateFiles("*.cs", SearchOption.AllDirectories)
 			.Where(f => f.Name.Contains("Accepted"));
 		
-		private readonly ExponentiationValidator validator = new ExponentiationValidator();
+		private readonly ArrayLengthStyleValidator validator = new ArrayLengthStyleValidator();
 
 		[TestCaseSource(nameof(IncorrectFiles))]
 		public void FindErrors(FileInfo file)
@@ -84,7 +84,6 @@ namespace uLearn.CSharp.ExponentiationValidation
 		[TestCaseSource(nameof(SubmissionsFiles))]
 		public void NotFindErrors_InCheckAcceptedFiles(FileInfo file)
 		{
-			Console.WriteLine(file.FullName);
 			var fileContent = file.ContentAsUtf8();
 
 			var errors = validator.FindError(fileContent);
