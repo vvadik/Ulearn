@@ -117,8 +117,20 @@
 			<div class="exercise__reviews @isEmpty">
 				@foreach (var review in Model.Reviews.OrderBy(r => r.StartLine).ThenBy(r => r.StartPosition))
 				{
-					/* Instructors can reply always. Students can reply only if exists a human (not ulearn bot) replied before */
-					var canReply = Model.InstructorView || !review.Author.IsUlearnBot() || review.NotDeletedComments.Any(c => !c.Author.IsUlearnBot());
+					/* Instructors can reply always. Students can reply only if exists a human (not ulearn bot) replied before and if checking is already checked */
+					var canReply = false;
+					if (Model.InstructorView)
+					{
+						canReply = true;
+					}
+					else
+					{
+						var existHumanReply = !review.Author.IsUlearnBot() || review.NotDeletedComments.Any(c => !c.Author.IsUlearnBot());
+						if ((! review.ExerciseCheckingId.HasValue || review.ExerciseChecking.IsChecked) && existHumanReply)
+						{
+							canReply = true;
+						}
+					}
 
 					if (showOnlyAutomaticalReviews && !review.Author.IsUlearnBot())
 					{

@@ -409,8 +409,16 @@ function placeCodeReviews() {
 		lastReviewBottomHeight = $review.offset().top + $review.outerHeight() - startHeight;
 	});
 
+    /* Make codemirror window and reviews panel equal by heights */
 	let exerciseBlockHeight = $(exerciseCodeDoc.getEditor().display.wrapper).outerHeight();
 	$exerciseReviews.css('minHeight', exerciseBlockHeight + 'px');
+	let $codeMirrorSizer = $(exerciseCodeDoc.getEditor().display.sizer);
+	let currentSizerHeight = parseInt($codeMirrorSizer.css('minHeight'));
+	let exerciseReviewsHeight = $exerciseReviews.outerHeight();
+	$codeMirrorSizer.css('height', Math.max(currentSizerHeight, exerciseReviewsHeight) + 'px');
+
+	/* New reviews can be added so we need to call .tooltip() again */
+    $exerciseReviews.find('[data-toggle="tooltip"]').tooltip();
 }
 
 function orderByStartLineAndPosition(first, second) {

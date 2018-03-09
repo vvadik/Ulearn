@@ -118,6 +118,7 @@ namespace uLearn.Web.Controllers
 				Review = review,
 				ManualChecking = checking,
 				CurrentUser = currentUser,
+				CanReply = true,
 			});
 		}
 

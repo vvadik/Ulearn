@@ -22,7 +22,10 @@ namespace uLearn.CSharp.Validators
 			new ExponentiationValidator(),
 			new BoolCompareValidator(),
 			new ArrayLengthStyleValidator(),
-			new IndentsValidator() // Выводит дополнительный текст в конце, поэтому лучше ему быть последним
+			new ExcessLinesValidator(),
+			new RefArgumentsValidator(),
+			new VarInVariableDeclarationValidator(),
+			new IndentsValidator()
 		};
 
 		public CSharpSolutionValidator(bool removeDefaults=false)

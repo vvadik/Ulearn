@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using uLearn.CSharp.Model;
+using uLearn.CSharp.Validators.IndentsValidation;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp

@@ -573,7 +573,7 @@ namespace Database.Models
 
 			var reviewPosition = review.StartLine == review.FinishLine
 				? $"Строка {review.StartLine + 1}"
-				: $"Строки {review.StartLine + 1}—{review.FinishLine + 1}";
+				: $"Строки {review.StartLine + 1}–{review.FinishLine + 1}";
 
 			if (html)
 			{

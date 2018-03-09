@@ -57,16 +57,14 @@
         </div>
     </div>
     <div class="exercise__review__comment">
+        @Html.Raw(Html.HighlightLinks(Html.EncodeMultiLineText(Model.Review.Comment, keepFirstSpaces: true).RenderSimpleMarkdown()))
+        
         @if (Model.Review.Author.IsUlearnBot())
         {
-	        <div class="pull-right">
-                <span class="with-long-tooltip cursor-pointer" data-toggle="tooltip" data-placement="top" title="Код со стилевыми ошибками трудно или неприятно читать другим программистам, поэтому он может не пройти код-ревью">
-                    <span class="fa fa-question-circle"></span>
-                </span>
-            </div>
+            <span class="with-long-tooltip cursor-pointer" data-toggle="tooltip" data-placement="top" title="Код со стилевыми ошибками трудно или неприятно читать другим программистам, поэтому он может не пройти код-ревью">
+                <span class="fa fa-question-circle"></span>
+            </span>
         }
-        
-        @Html.Raw(Html.HighlightLinks(Html.EncodeMultiLineText(Model.Review.Comment, keepFirstSpaces: true).RenderSimpleMarkdown()))
     </div>
 
     @foreach (var comment in Model.Review.NotDeletedComments)
@@ -81,11 +79,23 @@
     
     @if (Model.CanReply)
     {
+	    var isThreadWithoutReplies = !Model.Review.NotDeletedComments.Any();
+	    var submission = Model.Review.ExerciseCheckingId.HasValue ? Model.Review.ExerciseChecking.Submission : Model.Review.Submission;
+	    var placeholder = "Ответить...";
+	    if (Model.Review.Author.IsUlearnBot() && isThreadWithoutReplies)
+	    {
+		    placeholder = "Прокомментировать...";
+	    }
+	    if (submission.UserId == Model.CurrentUser.Id && isThreadWithoutReplies)
+	    {
+		    placeholder = "Уточнить у преподавателя...";
+	    }
+	    
 	    <div class="exercise__review__new-comment-place"></div>
 	    
 	    <div class="exercise__review__reply-form">
             <div>
-                <input type="text" placeholder="Ответить..."/>
+                <input type="text" placeholder="@placeholder"/>
                 <textarea name="text"></textarea>
             </div>
             <div class="exercise__review__reply-footer">

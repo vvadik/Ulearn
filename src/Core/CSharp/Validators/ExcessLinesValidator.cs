@@ -3,7 +3,6 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using uLearn.CSharp.Model;
 
 namespace uLearn.CSharp.Validators
 {
@@ -69,7 +68,7 @@ namespace uLearn.CSharp.Validators
 				return null;
 			var nextSyntaxNodeLine = GetStartLine(nextSyntaxNode);
 			if (closeBraceLine + 1 == nextSyntaxNodeLine)
-				return new SolutionStyleError(bracesPair.Close, "После закрывающей скобки должен быть дополнительный перенос строки.");
+				return new SolutionStyleError(bracesPair.Close, "После закрывающей скобки нужно оставить одну пустую строку.");
 
 			return null;
 		}

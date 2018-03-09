@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
+using uLearn.CSharp.Validators.IndentsValidation;
 
-namespace uLearn.CSharp.Model
+namespace uLearn.CSharp
 {
 	public class BracesPair
 	{
@@ -20,7 +21,7 @@ namespace uLearn.CSharp.Model
 
 		public override string ToString()
 		{
-			return $"строки {Open.GetLine() + 1}, {Close.GetLine() + 1}";
+			return $"строки {Open.GetLine() + 1}–{Close.GetLine() + 1}";
 		}
 	}
 }
