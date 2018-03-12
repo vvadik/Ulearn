@@ -367,7 +367,7 @@ namespace uLearn.Web.Controllers
 				solution = lastSubmission?.SolutionCode.Text;
 			}
 
-			var submissionReviews = submission?.GetOwnAndLastManualCheckingReviews();
+			var submissionReviews = submission?.GetAllReviews();
 
 			var hasUncheckedReview = submission?.ManualCheckings.Any(c => !c.IsChecked) ?? false;
 			var hasCheckedReview = submission?.ManualCheckings.Any(c => c.IsChecked) ?? false;
@@ -451,7 +451,7 @@ namespace uLearn.Web.Controllers
 				if (manualChecking.CourseId.EqualsIgnoreCase(courseId))
 				{
 					model.ManualChecking = manualChecking;
-					model.Reviews = submission?.GetOwnAndLastManualCheckingReviews() ?? new List<ExerciseCodeReview>();
+					model.Reviews = submission?.GetAllReviews() ?? new List<ExerciseCodeReview>();
 				}
 			}
 
