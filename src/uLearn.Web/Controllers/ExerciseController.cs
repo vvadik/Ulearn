@@ -127,7 +127,8 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> DeleteExerciseCodeReview(string courseId, int reviewId)
 		{
 			var review = slideCheckingsRepo.FindExerciseCodeReviewById(reviewId);
-			if (!string.Equals(review.ExerciseChecking.CourseId, courseId, StringComparison.OrdinalIgnoreCase))
+			var reviewCourseId = review.ExerciseCheckingId.HasValue ? review.ExerciseChecking.CourseId : review.Submission.CourseId;
+			if (! reviewCourseId.EqualsIgnoreCase(courseId))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			if (review.AuthorId != User.Identity.GetUserId() && !User.HasAccessFor(courseId, CourseRole.CourseAdmin))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
