@@ -11,7 +11,7 @@ using uLearn.Model.Blocks;
 using Ulearn.Common.Extensions;
 using SearchOption = Microsoft.VisualBasic.FileIO.SearchOption;
 
-namespace uLearn
+namespace uLearn.CourseTool.Validating
 {
 	public class ProjectExerciseValidator : BaseValidator
 	{
