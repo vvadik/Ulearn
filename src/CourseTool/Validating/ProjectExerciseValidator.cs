@@ -88,7 +88,10 @@ namespace uLearn.CourseTool.Validating
 			var buildResult = ex.BuildSolution(solutionCode);
 
 			if (buildResult.HasStyleErrors)
-				ReportSlideWarning(slide, $"Correct solution file {ex.CorrectSolutionFileName} has style issues. {buildResult.StyleErrors}");
+			{
+				var errorMessage = string.Join("\n", buildResult.StyleErrors.SelectMany(e => e.GetMessageWithPositions()));
+				ReportSlideWarning(slide, $"Correct solution file {ex.CorrectSolutionFileName} has style issues. {errorMessage}");
+			}
 		}
 
 		private void ReportWarningIfWrongAnswersAreSolutionsOrNotOk()
