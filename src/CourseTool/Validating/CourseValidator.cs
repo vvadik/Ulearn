@@ -82,7 +82,7 @@ namespace uLearn.CourseTool.Validating
 			}
 			if (solution.HasStyleErrors)
 			{
-				var errorMessages = string.Join("\n", solution.StyleErrors.SelectMany(e => e.GetMessageWithPositions()));
+				var errorMessages = string.Join("\n", solution.StyleErrors.Select(e => e.GetMessageWithPositions()));
 				ReportSlideWarning(slide, "Style issue(s): " + errorMessages);
 			}
 

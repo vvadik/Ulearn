@@ -89,7 +89,7 @@ namespace uLearn.CourseTool.Validating
 
 			if (buildResult.HasStyleErrors)
 			{
-				var errorMessage = string.Join("\n", buildResult.StyleErrors.SelectMany(e => e.GetMessageWithPositions()));
+				var errorMessage = string.Join("\n", buildResult.StyleErrors.Select(e => e.GetMessageWithPositions()));
 				ReportSlideWarning(slide, $"Correct solution file {ex.CorrectSolutionFileName} has style issues. {errorMessage}");
 			}
 		}
