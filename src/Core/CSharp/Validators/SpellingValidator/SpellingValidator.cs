@@ -47,7 +47,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			foreach (var word in wordsInIdentifier)
 			{
 				if (!hunspell.Spell(word))
-					yield return new SolutionStyleError(identifier, $"В слове {word} допущена опечатка");
+					yield return new SolutionStyleError(identifier, $"В слове {word} допущена опечатка. Возможные исправления: {string.Join(", ", hunspell.Suggest(word))}");
 			}
 		}
 	}
