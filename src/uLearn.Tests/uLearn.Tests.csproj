@@ -310,6 +310,11 @@
     <Compile Include="CSharp\RefArgumentsValidation\TestData\Correct\RefArgumentsValidationTestDataClass.cs" />
     <Compile Include="CSharp\RefArgumentsValidation\TestData\Incorrect\RefArgumentsValidationTestDataClass.cs" />
     <Compile Include="CSharp\RefArgumentsValidation\RefArgumentsValidator_should.cs" />
+    <Compile Include="CSharp\SpellingValidation\SpellingValidator_should.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithAmeticanVariantOfEnglish.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithoutMisspellings.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Incorrect\FileWithBritishVariantOfEnglish.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Incorrect\FileWithMisspellings.cs" />
     <Compile Include="CSharp\VarInVariableDeclarationValidator_should.cs" />
     <Compile Include="CSharp\TestPaths.cs" />
     <Compile Include="CSharp\VerbInMethodNameValidator_should.cs" />

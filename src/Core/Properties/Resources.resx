@@ -133,6 +133,12 @@
   <data name="ru_RU_dic" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\SpellChecking\ru_RU.dic;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="en_US_aff" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CSharp\Validators\SpellingValidator\en_US.aff;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="en_US_dic" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CSharp\Validators\SpellingValidator\en_US.dic;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="NUnitTestRunner" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\nunittestrunning\nunittestrunner.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>

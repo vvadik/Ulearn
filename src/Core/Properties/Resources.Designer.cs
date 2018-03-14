@@ -251,5 +251,29 @@ namespace uLearn.Properties {
                 return ((byte[])(obj));
             }
         }
-    }
+
+		/// <summary>
+		///   Looks up a localized resource of type System.Byte[].
+		/// </summary>
+		public static byte[] en_US_aff
+		{
+			get
+			{
+				object obj = ResourceManager.GetObject("en_US_aff", resourceCulture);
+				return ((byte[])(obj));
+			}
+		}
+
+		/// <summary>
+		///   Looks up a localized resource of type System.Byte[].
+		/// </summary>
+		public static byte[] en_US_dic
+		{
+			get
+			{
+				object obj = ResourceManager.GetObject("en_US_dic", resourceCulture);
+				return ((byte[])(obj));
+			}
+		}
+	}
 }

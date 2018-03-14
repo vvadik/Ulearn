@@ -68,6 +68,22 @@ namespace Ulearn.Common.Extensions
 			return Regex.Split(text, @"(?<=\r?\n)").Where(s => !string.IsNullOrEmpty(s)).ToArray();
 		}
 
+		public static IEnumerable<string> SplitByCamelCase(this string text)
+		{
+			var word = "";
+			foreach (var letter in text)
+			{
+				if ((char.IsUpper(letter) || !char.IsLetter(letter)) && word != "")
+				{
+					yield return word;
+					word = "";
+				}
+				if (char.IsLetter(letter))
+					word += letter;
+			}
+			yield return word;
+		}
+
 		public static string RemoveCommonNesting(this string text)
 		{
 			var lines = text.SplitToLines();
