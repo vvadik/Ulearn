@@ -117,6 +117,7 @@ namespace uLearn.Web
 				"~/Content/tablesorter.css",
 				"~/tablesorter-master/css/widget.grouping.css",
 				"~/Content/ulearn.css",
+				"~/Content/bootstrap.ulearn.css",
 				"~/Content/bounce.css",
 				"~/flexslider/flexslider.css",
 				"~/Content/jquery-ui.min.css",

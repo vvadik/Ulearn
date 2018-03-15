@@ -1589,7 +1589,8 @@ h1 .copy-group-link {
 }
 
 .modal__edit-group__members {
-	padding-left: 15px;
+	padding-left: 0px;
+    list-style: none;
 }
 
 .modal__edit-group__members .group__member {
@@ -1605,6 +1606,7 @@ h1 .copy-group-link {
 
 .modal__edit-group__members .group__member .group__member__remove-link {
 	font-size: 18px;
+    line-height: 18px;
 	color: #c55;
 	display: none;
 }
@@ -1617,6 +1619,45 @@ h1 .copy-group-link {
 	text-decoration: none;
 	color: #611;
 }
+
+/* Mass operations */
+.modal__edit-group__members .group__member .checkbox {
+    display: inline;
+    vertical-align: text-bottom;
+}
+
+.modal__edit-group__members li.group__member .checkbox label:before {
+    top: 1px;
+}
+
+.modal__edit-group__members li.group__member .checkbox label:after {
+    margin-top: 1px;
+}
+
+.modal__edit-group__members .group__member .checkbox .user__avatar {
+    margin-left: 2px;
+}
+
+.modal__edit-group__mass-operations {
+    margin-bottom: 7px;
+    color: #666;
+}
+
+.modal__edit-group__mass-operations button:not(:first-child) {
+    margin-left: 5px;
+}
+
+.modal__edit-group__mass-operations .input-group {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-left: 15px;
+}
+
+.modal__edit-group__mass-copy-status.text-success {
+    vertical-align: middle;
+    margin-left: 5px;
+}
+/* End of mass operations */
 
 .modal__create-group__step3__enable-invite_link {
 	display: block;	

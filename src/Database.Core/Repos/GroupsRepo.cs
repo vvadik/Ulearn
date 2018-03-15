@@ -43,7 +43,7 @@ namespace Database.Repos
 			this.courseManager = courseManager;
 		}
 
-		public bool CanUserSeeAllCourseGroups(IPrincipal user, string courseId)
+		public bool CanUserSeeAllCourseGroups(ClaimsPrincipal user, string courseId)
 		{
 			return user.HasAccessFor(courseId, CourseRole.CourseAdmin);
 		}
@@ -183,8 +183,11 @@ namespace Database.Repos
 		public async Task RemoveGroup(int groupId)
 		{
 			var group = db.Groups.Find(groupId);
-			group.IsDeleted = true;
-			await db.SaveChangesAsync();
+			if (group != null)
+			{
+				group.IsDeleted = true;
+				await db.SaveChangesAsync();
+			}
 		}
 
 		public async Task<GroupMember> AddUserToGroup(int groupId, string userId)
@@ -215,6 +218,11 @@ namespace Database.Repos
 			return groupMember;
 		}
 
+		public async Task<GroupMember> AddUserToGroup(int groupId, ApplicationUser user)
+		{
+			return await AddUserToGroup(groupId, user.Id);
+		}
+
 		private async Task AddManualCheckingsForOldSolutions(string courseId, IEnumerable<string> usersIds)
 		{
 			foreach (var userId in usersIds)
@@ -232,7 +240,7 @@ namespace Database.Repos
 				.GroupBy(s => s.SlideId)
 				.ToDictionary(g => g.Key, g => g.ToList());
 			foreach (var acceptedSubmissionsForSlide in acceptedSubmissionsBySlide.Values)
-				/* If exists at least one manual checking for at least one submissions on slide, than ignore this slide */
+				/* If exists at least one manual checking for at least one submissions on slide, then ignore this slide */
 				if (!acceptedSubmissionsForSlide.Any(s => s.ManualCheckings.Any()))
 				{
 					/* Otherwise found the latest accepted submission */
@@ -264,11 +272,6 @@ namespace Database.Repos
 			}
 		}
 
-		public async Task<GroupMember> AddUserToGroup(int groupId, ApplicationUser user)
-		{
-			return await AddUserToGroup(groupId, user.Id);
-		}
-
 		public async Task<GroupMember> RemoveUserFromGroup(int groupId, string userId)
 		{
 			var member = db.GroupMembers.FirstOrDefault(m => m.GroupId == groupId && m.UserId == userId);
@@ -277,6 +280,25 @@ namespace Database.Repos
 
 			await db.SaveChangesAsync();
 			return member;
+		}
+		
+		public async Task<List<GroupMember>> RemoveUsersFromGroup(int groupId, List<string> userIds)
+		{
+			var members = db.GroupMembers.Where(m => m.GroupId == groupId && userIds.Contains(m.UserId)).ToList();
+			db.GroupMembers.RemoveRange(members);
+
+			await db.SaveChangesAsync();
+			return members;
+		}
+		
+		public async Task<List<GroupMember>> CopyUsersFromOneGroupToAnother(int fromGroupId, int toGroupId, List<string> userIds)
+		{
+			var membersUserIds = db.GroupMembers.Where(m => m.GroupId == fromGroupId && userIds.Contains(m.UserId)).Select(m => m.UserId).ToList();
+			var newMembers = new List<GroupMember>();
+			foreach (var memberUserId in membersUserIds)
+				newMembers.Add(await AddUserToGroup(toGroupId, memberUserId));
+			
+			return newMembers;
 		}
 
 		public Group FindGroupById(int groupId)
@@ -446,8 +468,11 @@ namespace Database.Repos
 		public async Task EnableInviteLink(int groupId, bool isEnabled)
 		{
 			var group = db.Groups.Find(groupId);
-			group.IsInviteLinkEnabled = isEnabled;
-			await db.SaveChangesAsync();
+			if (group != null)
+			{
+				group.IsInviteLinkEnabled = isEnabled;
+				await db.SaveChangesAsync();
+			}
 		}
 
 		public IEnumerable<string> GetUsersIdsForAllGroups(string courseId)

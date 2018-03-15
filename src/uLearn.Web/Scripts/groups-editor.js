@@ -220,6 +220,7 @@
 		$modal.find('.group__accesses').html('');
 		$modal.find('.modal__edit-group__members').html('');
 		$modal.find('.modal-header__tabs a').first().click();
+		$modal.find('.modal__edit-group__mass-operations').find('button,select,input').attr('disabled', 'disabled');
 		if (! $modal.is(':visible'))
 			$modal.modal();
 
@@ -287,6 +288,95 @@
 			$member.remove();
 		});
 	});
+	
+	$('.modal__edit-group__members').on('change', '.group__member__remove-checkbox', function (e) {
+		let $self = $(this);
+		let $groupMember = $self.closest('.group__member');
+		$groupMember.toggleClass('checked');
+		
+		let $countChecked = $('.modal__edit-group__members').find('.group__member.checked').length;
+		let $massOperationsPanel = $('.modal__edit-group__mass-operations');
+        let $massOperationsInputs = $massOperationsPanel.find('button,input,select');
+        if ($countChecked > 0) {            
+            $massOperationsInputs.removeAttr('disabled');
+
+            /* If no group selected for copying disable button anymore */
+            let copyToGroupId = $('.modal__edit-group__mass-operations select[name="copyToGroupId"]').val();
+            if (copyToGroupId === '-1')
+                $massOperationsInputs.filter('.modal__edit-group__mass-copy-button').attr('disabled', 'disabled');
+        }
+		else
+            $massOperationsInputs.attr('disabled', 'disabled');
+    });
+	
+	$('.modal__edit-group__mass-remove-button').click(function(e) {
+	    e.preventDefault();
+        let $self = $(this);
+
+        let url = $self.data('url');
+        let $modal = $('#modal__edit-group');
+        let groupId = $modal.find('input[name="groupId"]').val();
+        let $membersToRemove = $('.modal__edit-group__members').find('.group__member.checked');
+        $.ajax({
+            type: 'post',
+            url: url,
+            data: {
+                'groupId': groupId,
+                'userId': $membersToRemove.map(function (_, el) { return $(el).data('userId'); }).get().join(",")
+            },
+            dataType: 'json'
+        }).done(function (data) {
+            if (data.status === 'error') {
+                alert(data.message);
+                return;
+            }
+
+            $membersToRemove.remove();
+        });
+    });
+
+    $('.modal__edit-group__mass-copy-button').click(function(e) {
+        e.preventDefault();
+        let $self = $(this);
+
+        let url = $self.data('url');
+        let $modal = $('#modal__edit-group');
+        let fromGroupId = $modal.find('input[name="groupId"]').val();
+        let toGroupId = $modal.find('.modal__edit-group__mass-operations').find('select[name="copyToGroupId"]').val();
+        let $membersToCopy = $('.modal__edit-group__members').find('.group__member.checked');
+        $.ajax({
+            type: 'post',
+            url: url,
+            data: {
+                'fromGroupId': fromGroupId,
+                'toGroupId': toGroupId,
+                'userId': $membersToCopy.map(function (_, el) { return $(el).data('userId'); }).get().join(",")
+            },
+            dataType: 'json'
+        }).done(function (data) {
+            if (data.status === 'error') {
+                alert(data.message);
+                return;
+            }
+
+            let $status = $('.modal__edit-group__mass-copy-status');
+            $status.addClass('text-success').text('Сделано!');
+            setTimeout(function () {
+                $status.text('').removeClass('text-success');
+            },
+            1000);
+        });
+    });
+    
+    $('.modal__edit-group__mass-operations select[name="copyToGroupId"]').change(function (e) {
+        let $self = $(this);
+        let val = $self.val();
+        let $button = $self.closest('.modal__edit-group__mass-operations').find('.modal__edit-group__mass-copy-button');
+        if (val === '-1')
+            $button.attr('disabled', 'disabled');
+        else
+            $button.removeAttr('disabled');
+    });
 	
 	$('.modal__edit-group__button').click(function (e) {
 		e.preventDefault();
