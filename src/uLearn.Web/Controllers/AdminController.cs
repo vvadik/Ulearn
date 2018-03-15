@@ -863,8 +863,7 @@ namespace uLearn.Web.Controllers
 			var members = await groupsRepo.RemoveUsersFromGroup(groupId, userIds);
 			
 			var currentUserId = User.Identity.GetUserId();
-			foreach (var member in members)
-				await notificationsRepo.AddNotification(group.CourseId, new GroupMemberHasBeenRemovedNotification { UserId = member.UserId, GroupId = groupId }, currentUserId);
+			await notificationsRepo.AddNotification(group.CourseId, new GroupMembersHaveBeenRemovedNotification(group.Id, userIds, usersRepo), currentUserId);
 			
 			return Json(new { status = "ok", removed_count = members.Count });
 		}
@@ -882,9 +881,10 @@ namespace uLearn.Web.Controllers
 			var userIds = Request.Form.GetMultipleValues("userId");
 			log.Info($"Копирую пользователей {string.Join(", ", userIds)} из группы «{fromGroup.Name}» (Id = {fromGroup.Id}) в группу «{toGroup.Name}» (Id = {toGroup.Id})");
 
-			var members = await groupsRepo.CopyUsersFromOneGroupToAnother(fromGroupId, toGroupId, userIds);
+			var members = await groupsRepo.CopyUsersFromOneGroupToAnother(fromGroupId, toGroupId, userIds);	
 			
-			// TODO (andgein): send notification
+			var currentUserId = User.Identity.GetUserId();
+			await notificationsRepo.AddNotification(toGroup.CourseId, new GroupMembersHaveBeenAddedNotification(toGroup.Id, userIds, usersRepo), currentUserId);
 			
 			return Json(new { status = "ok", copied_count = members.Count });
 		}
