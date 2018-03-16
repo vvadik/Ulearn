@@ -88,6 +88,7 @@ namespace Database.DataContexts
 			CancelCascaseDeleting<LikedYourCommentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
 			CancelCascaseDeleting<RepliedToYourCommentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
 			CancelCascaseDeleting<RepliedToYourCommentNotification, Comment, int>(modelBuilder, c => c.ParentComment, c => c.ParentCommentId);
+			CancelCascaseDeleting<NewCommentForInstructorsOnlyNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
 			
 			CancelCascaseDeleting<UploadedPackageNotification, CourseVersion, Guid>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
 			CancelCascaseDeleting<PublishedPackageNotification, CourseVersion, Guid>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);

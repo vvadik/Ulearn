@@ -890,8 +890,7 @@ li.li-success {
 
 .comments .comment:not(.is-reply):not(:nth-child(2)),
 .comments.comments__feed .comment:not(:nth-child(2)) {
-	border-top: 1px solid rgba(200, 200, 200, 0.5);
-	padding-top: 15px;
+	padding-top: 7px;
 }
 
 .comments .comment .comment__new-text {
@@ -1018,6 +1017,73 @@ li.li-success {
 	background-color: #fcfcf3;
 }
 
+/* Instructors-only comments */
+.comments-for-instructors-only {
+    background-color: #313131;
+    padding: 20px;
+    color: white !important;
+    margin: 5px -20px 20px;
+}
+
+.comments-for-instructors-only .cm-s-pastel-on-dark.CodeMirror {
+    background-color: #313131;
+}
+
+.comments-for-instructors-only__description {
+    font-style: italic;
+    margin-bottom: 15px;
+}
+
+.notifications__notification .comments-for-instructors-only__description {
+    font-style: normal;
+}
+
+.comments-for-instructors-only code {
+    color: white;
+    background-color: #39562d;
+}
+
+.comments-for-instructors-only h2 {
+    margin-bottom: 20px;
+}
+
+.comments-for-instructors-only h3 {
+    margin-bottom: 20px;
+    line-height: 20px;
+}
+
+.comments-for-instructors-only p:last-child {
+    margin: 0;
+}
+
+.comments-for-instructors-only [name=commentText] {
+    background-color: #313131;
+    border: 1px solid rgba(100, 100, 100, 0.5);
+}
+
+.comments-for-instructors-only [name=commentText]::placeholder {
+    color: #aaaaaa;
+}
+
+.comments-for-instructors-only a,
+.comments-for-instructors-only a:hover,
+.comments-for-instructors-only a:focus,
+.comments-for-instructors-only a:active {
+    color: #a1caec;
+}
+
+.comments-for-instructors-only .comment .comment__delete-link * {
+    color: #ff9393;
+}
+
+.comments-for-instructors-only .comment .comment__likes-count.is-liked .glyphicon,
+.comments-for-instructors-only .comment .comment__likes-count.is-liked .comment__likes-count__counter {
+    color: #f14747;
+}
+
+.comments-for-instructors-only .comment:not(.is-pinned) .label-switcher.comment__pinned {
+    background-color: #313131;
+}
 
 /* User avatars */
 .user__avatar {

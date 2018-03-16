@@ -90,7 +90,8 @@ function autoEnlargeTextarea() {
 	}
 
 	var showCommentsRulesIfNeeded = function ($textarea) {
-		if ($('.comments__rules:visible').length === 0)
+		/* Don't show comments rules if they are already shown or under instructors-only comments */
+		if ($('.comments__rules:visible').length === 0 && $textarea.closest('.comments-for-instructors-only').length === 0)
 			$textarea.after($commentsRules.clone());
 	}
 

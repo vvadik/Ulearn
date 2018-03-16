@@ -234,7 +234,7 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			var commentsPolicy = commentsRepo.GetCommentsPolicy(courseId);
 
-			var comments = commentsRepo.GetCourseComments(courseId).OrderByDescending(x => x.PublishTime).ToList();
+			var comments = commentsRepo.GetCourseComments(courseId).Where(c => ! c.IsForInstructorsOnly).OrderByDescending(x => x.PublishTime).ToList();
 			var commentsLikes = commentsRepo.GetCommentsLikesCounts(comments);
 			var commentsLikedByUser = commentsRepo.GetCourseCommentsLikedByUser(courseId, userId);
 			var commentsById = comments.ToDictionary(x => x.Id);

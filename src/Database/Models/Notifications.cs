@@ -221,6 +221,11 @@ namespace Database.Models
 		[MinCourseRole(CourseRole.Instructor)]
 		[IsEnabledByDefault(true)]
 		GroupMembersHaveBeenAdded = 106,
+		
+		[Display(Name = @"Новый комментарий для преподавателей", GroupName = @"Новые комментарии для преподавателей")]
+		[MinCourseRole(CourseRole.Instructor)]
+		[IsEnabledByDefault(true)]
+		NewCommentForInstructorsOnly = 107,
 
 		// Course admins
 		[Display(Name = @"Добавлен новый преподаватель", GroupName = @"Добавлены новые преподаватели")]
@@ -496,7 +501,7 @@ namespace Database.Models
 			if (slide == null)
 				return null;
 
-			return $"<b>{Comment.Author.VisibleName.EscapeHtml()} прокомментировал{Comment.Author.Gender.ChooseEnding()} «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" +
+			return $"<b>{Comment.Author.VisibleName.EscapeHtml()}</b> прокомментировал{Comment.Author.Gender.ChooseEnding()} «{GetSlideTitle(course, slide).EscapeHtml()}»:<br/><br/>" +
 					$"{GetHtmlCommentText()}";
 		}
 
@@ -506,7 +511,7 @@ namespace Database.Models
 			if (slide == null)
 				return null;
 
-			return $"{Comment.Author.VisibleName} прокомментировал{Comment.Author.Gender.ChooseEnding()} «{GetSlideTitle(course, slide)}»\n\n{Comment.Text.Trim()}";
+			return $"{Comment.Author.VisibleName} прокомментировал{Comment.Author.Gender.ChooseEnding()} «{GetSlideTitle(course, slide)}»:\n\n{Comment.Text.Trim()}";
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
@@ -1248,6 +1253,39 @@ namespace Database.Models
 		{
 			return $"{InitiatedBy.VisibleName}</b> добавил{InitiatedBy.Gender.ChooseEnding()} " +
 					$"{UsersCount.PluralizeInRussian(RussianPluralizationOptions.StudentsDative)} в группу «{Group.Name}» (курс «{course.Title}»): {UserDescriptions}.";
+		}
+	}
+	
+	[NotificationType(NotificationType.NewCommentForInstructorsOnly)]
+	public class NewCommentForInstructorsOnlyNotification : AbstractCommentNotification
+	{
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			var slide = course.FindSlideById(Comment.SlideId);
+			if (slide == null)
+				return null;
+
+			return $"<b>{Comment.Author.VisibleName.EscapeHtml()}</b> оставил{Comment.Author.Gender.ChooseEnding()} комментарий для преподавателей в&nbsp;«{GetSlideTitle(course, slide).EscapeHtml()}»:<br/><br/>" +
+					$"{GetHtmlCommentText()}";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			var slide = course.FindSlideById(Comment.SlideId);
+			if (slide == null)
+				return null;
+
+			return $"{Comment.Author.VisibleName} оставил{Comment.Author.Gender.ChooseEnding()} комментарий для преподавателей в «{GetSlideTitle(course, slide)}»:\n\n{Comment.Text.Trim()}";
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.Instructor, CourseId);
+		}
+
+		public override List<Notification> GetBlockerNotifications(ULearnDb db)
+		{
+			return new NotificationsRepo(db).FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
 		}
 	}
 

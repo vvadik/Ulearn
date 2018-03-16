@@ -609,6 +609,10 @@
     <Compile Include="Migrations\201803151326386_AddMassGroupOperationNotifications.Designer.cs">
       <DependentUpon>201803151326386_AddMassGroupOperationNotifications.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803160501457_AddCommentsForInstructorsOnly.cs" />
+    <Compile Include="Migrations\201803160501457_AddCommentsForInstructorsOnly.Designer.cs">
+      <DependentUpon>201803160501457_AddCommentsForInstructorsOnly.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -952,6 +956,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803151326386_AddMassGroupOperationNotifications.resx">
       <DependentUpon>201803151326386_AddMassGroupOperationNotifications.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803160501457_AddCommentsForInstructorsOnly.resx">
+      <DependentUpon>201803160501457_AddCommentsForInstructorsOnly.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
