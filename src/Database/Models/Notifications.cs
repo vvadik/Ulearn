@@ -849,9 +849,9 @@ namespace Database.Models
 			if (scoringGroup == null)
 				return null;
 
-			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()}</b> поставил{InitiatedBy.Gender.ChooseEnding()} вам баллы <b>{scoringGroup.Name.EscapeHtml()}</b> в&nbsp;модуле «{GetUnitTitle(course, unit).EscapeHtml()}»:<br/>" +
+			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()}</b> поставил{InitiatedBy.Gender.ChooseEnding()} вам баллы <b>{scoringGroup.Name.EscapeHtml()}</b> в модуле «{GetUnitTitle(course, unit).EscapeHtml()}»:<br/>" +
 					$"вы получили {Score.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}<br/><br/>" +
-					"Полную ведомость смотрите на&nbsp;<a href=\"https://ulearn.me\">ulearn.me</a>.";
+					"Полную ведомость смотрите на <a href=\"https://ulearn.me\">ulearn.me</a>.";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
@@ -1265,7 +1265,7 @@ namespace Database.Models
 			if (slide == null)
 				return null;
 
-			return $"<b>{Comment.Author.VisibleName.EscapeHtml()}</b> оставил{Comment.Author.Gender.ChooseEnding()} комментарий для преподавателей в&nbsp;«{GetSlideTitle(course, slide).EscapeHtml()}»:<br/><br/>" +
+			return $"<b>{Comment.Author.VisibleName.EscapeHtml()}</b> оставил{Comment.Author.Gender.ChooseEnding()} комментарий для преподавателей в «{GetSlideTitle(course, slide).EscapeHtml()}»:<br/><br/>" +
 					$"{GetHtmlCommentText()}";
 		}
 
