@@ -1075,7 +1075,7 @@ namespace uLearn.Web.Controllers
 				CanBeRevoked = false,
 			});
 
-			var members = groupsRepo.GetGroupMembers(groupId);
+			var members = groupsRepo.GetGroupMembers(groupId).OrderBy(m => m.User.VisibleNameWithLastNameFirst);
 
 			var enabledScoringGroups = groupsRepo.GetEnabledAdditionalScoringGroupsForGroup(groupId);
 

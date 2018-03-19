@@ -1709,19 +1709,33 @@ h1 .copy-group-link {
     color: #666;
 }
 
-.modal__edit-group__mass-operations button:not(:first-child) {
+.modal__edit-group__mass-operations .checkbox {
+	display: inline-block;
+	margin: 0;
+	height: 24px;
+}
+
+/* Dirty hack */
+.modal__edit-group__mass-operations .checkbox input:not(:checked) + label {
+	top: 1px;
+}
+
+.modal__edit-group__mass-operations .modal__edit-group__mass-copy-button {
     margin-left: 5px;
 }
 
 .modal__edit-group__mass-operations .input-group {
     display: inline-block;
     vertical-align: bottom;
-    margin-left: 15px;
 }
 
 .modal__edit-group__mass-copy-status.text-success {
     vertical-align: middle;
     margin-left: 5px;
+}
+
+.modal__edit-group__mass-remove-button {
+	margin-right: 20px;
 }
 /* End of mass operations */
 

@@ -22,16 +22,16 @@
         <span title="@Model.User.UserName">
             @if (User.HasSystemAccess(SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator())
             {
-	            @Html.ActionLink(Model.User.VisibleName, "Profile", "Account", new { userId = Model.UserId }, new {})<text>,</text>
+	            @Html.ActionLink(Model.User.VisibleNameWithLastNameFirst, "Profile", "Account", new { userId = Model.UserId }, new { tabindex = "-1" })<text>,</text>
             }
             else
             {
-	            @Model.User.VisibleName
+	            @Model.User.VisibleNameWithLastNameFirst
             }
         </span>
 		@if (!string.IsNullOrEmpty(Model.User.Email))
 		{
-			<a href="mailto:@Model.User.Email" title="@Model.User.Email">@Model.User.Email.TruncateWithEllipsis(30)</a><text>,</text>
+			<a href="mailto:@Model.User.Email" title="@Model.User.Email" tabindex="-1">@Model.User.Email.TruncateWithEllipsis(50)</a><text>,</text>
 		}
 		@if (Model.AddingTime.HasValue)
 		{

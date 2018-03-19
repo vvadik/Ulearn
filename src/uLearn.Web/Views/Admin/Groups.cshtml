@@ -99,7 +99,7 @@
 		var copyableGroupsSelectListItems = Model.GroupsMayBeCopied.Select(g => new SelectListItemWithAttributes
 		{
 			Value = g.Id.ToString(),
-			Text = g.Name.TruncateWithEllipsis(20) + ": " + g.Members.Count.PluralizeInRussian(new RussianPluralizationOptions
+			Text = g.Name.TruncateWithEllipsis(30) + ": " + g.Members.Count.PluralizeInRussian(new RussianPluralizationOptions
 			{
 				One = "студент",
 				Two = "студента",
@@ -334,7 +334,7 @@
 </div>
 
 <div class="modal fade "id="modal__edit-group" data-group-info-url="@Url.Action("GroupInfo", "Admin", new { groupId = "GROUP_ID" })">
-	<div class="modal-dialog">
+	<div class="modal-dialog medium">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -372,7 +372,13 @@
                     @GroupInviteLinkSettings()
                     
                     <div class="modal__edit-group__mass-operations">
-                        <button class="modal__edit-group__mass-remove-button btn btn-danger btn-xs" data-url="@Url.Action("RemoveUsersFromGroup")">Удалить из группы</button>
+                        
+                        <div class="checkbox checkbox-default checkbox-xsmall">
+                            <input type="checkbox" name="group__member__remove-all" id="group__member__remove-all" class="group__member__remove-all-checkbox"/>
+                            <label class="text-muted" for="group__member__remove-all" data-text="Выбрать всех">Выбрать всех</label>
+                        </div>
+                        
+                        <button class="pull-right modal__edit-group__mass-remove-button btn btn-danger btn-xs" data-url="@Url.Action("RemoveUsersFromGroup")">Удалить из группы</button>
                         <nobr>
                             <div class="input-group input-group-xs">
                                 @Html.DropDownListWithItemAttributes("copyToGroupId", GetCopyableCgroupsSelectListItems("Скопировать студентов в группу"), new { @class = "form-control" })

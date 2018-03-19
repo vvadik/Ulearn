@@ -215,13 +215,14 @@
 		window.location.reload();
 	});
 
-    let openModelForEditingGroup = function (groupId) {
+    let openModalForEditingGroup = function (groupId) {
         let $modal = $('#modal__edit-group');
         $modal.find('input[name="groupId"]').val(groupId);
         $modal.find('.group__accesses').html('');
         $modal.find('.modal__edit-group__members').html('');
         $modal.find('.modal-header__tabs a').first().click();
-        $modal.find('.modal__edit-group__mass-operations').find('button,select,input').attr('disabled', 'disabled');
+        $modal.find('.modal__edit-group__mass-operations').show();
+        updateMassOperationsControlsState();
         if (!$modal.is(':visible'))
             $modal.modal();
 
@@ -239,8 +240,10 @@
             let $members = $modal.find('.modal__edit-group__members');
             if (data.members.length > 0)
                 $members.html(data.members.join(''));
-            else 
+            else {
+                $('.modal__edit-group__mass-operations').hide();
                 $members.html('<p class="modal__edit-group__no-members">В&nbsp;группе пока нет студентов</p>');
+            }
 
             $modal.find('.modal__create_group__step3__invite-link-block').hide();
             $modal.find('.modal__create_group__step3__invite-link-block').filter('[data-enabled="' + data.group.isInviteLinkEnabled + '"]').show();
@@ -271,7 +274,7 @@
 		var $self = $(this);
 		var groupId = $self.data('groupId');
 
-		openModelForEditingGroup(groupId);
+		openModalForEditingGroup(groupId);
 	});
 
 	$('.modal__edit-group__members').on('click', '.group__member__remove-link', function (e) {
@@ -295,24 +298,49 @@
 		});
 	});
 	
+	var updateMassOperationsControlsState = function () {
+        let $countChecked = $('.modal__edit-group__members').find('.group__member.checked').length;
+        let $massOperationsPanel = $('.modal__edit-group__mass-operations');
+        let $massOperationsLabel = $massOperationsPanel.find('.group__member__remove-all-checkbox + label');
+        let $removeAllCheckbox = $massOperationsPanel.find('.group__member__remove-all-checkbox');
+        let $massOperationsInputs = $massOperationsPanel.find('button,select');
+        if ($countChecked > 0) {
+            $massOperationsInputs.show();
+            $massOperationsLabel.text('');
+
+            /* If no group selected for copying disable button anymore */
+            let copyToGroupId = $('.modal__edit-group__mass-operations select[name="copyToGroupId"]').val();
+            let $copyButton = $massOperationsInputs.filter('.modal__edit-group__mass-copy-button');
+            if (copyToGroupId === '-1')
+                $copyButton.attr('disabled', 'disabled');
+            else
+                $copyButton.removeAttr('disabled');
+        }
+        else {
+            $removeAllCheckbox.prop('checked', false);
+            $massOperationsInputs.hide();
+            $massOperationsLabel.text($massOperationsLabel.data('text'));
+        }
+    };
+	
 	$('.modal__edit-group__members').on('change', '.group__member__remove-checkbox', function (e) {
 		let $self = $(this);		
 		let $groupMember = $self.closest('.group__member');
 		$groupMember.toggleClass('checked');
-		
-		let $countChecked = $('.modal__edit-group__members').find('.group__member.checked').length;
-		let $massOperationsPanel = $('.modal__edit-group__mass-operations');
-        let $massOperationsInputs = $massOperationsPanel.find('button,input,select');
-        if ($countChecked > 0) {            
-            $massOperationsInputs.removeAttr('disabled');
 
-            /* If no group selected for copying disable button anymore */
-            let copyToGroupId = $('.modal__edit-group__mass-operations select[name="copyToGroupId"]').val();
-            if (copyToGroupId === '-1')
-                $massOperationsInputs.filter('.modal__edit-group__mass-copy-button').attr('disabled', 'disabled');
-        }
-		else
-            $massOperationsInputs.attr('disabled', 'disabled');
+        updateMassOperationsControlsState();
+    });
+	
+	$('.group__member__remove-all-checkbox').change(function (e) {
+		var $self = $(this);
+		var $checkboxes = $self.closest('#modal__edit-group__members').find('.group__member__remove-checkbox');
+
+        let isChecked = $self.prop('checked');
+        $checkboxes.prop('checked', isChecked);
+        var $groupMembers = $checkboxes.closest('.group__member');
+        $groupMembers.toggleClass('checked', isChecked);
+		
+        updateMassOperationsControlsState();
     });
 	
 	$('.modal__edit-group__mass-remove-button').click(function(e) {
@@ -338,7 +366,7 @@
             }
 
             $membersToRemove.remove();
-            $('.modal__edit-group__mass-operations').find('input,button,select').attr('disabled', 'disabled');
+            updateMassOperationsControlsState()
         });
     });
 
@@ -367,7 +395,7 @@
             }
 
             let $status = $('.modal__edit-group__mass-copy-status');
-            $status.addClass('text-success').text('Сделано!');
+            $status.addClass('text-success').text('Скопировано!');
             setTimeout(function () {
                 $status.text('').removeClass('text-success');
             },
@@ -452,7 +480,7 @@
 				return;
 			}
 
-			openModelForEditingGroup(data.groupId);
+			openModalForEditingGroup(data.groupId);
 		});
 	});
 	
@@ -487,7 +515,7 @@
 			$form.find('.copy-group-button').removeAttr('disabled');
 		else
 			$form.find('.copy-group-button').attr('disabled', true);
-	}
+	};
 
 	$('.copy-group-link').click(function(e) {
 		e.preventDefault();

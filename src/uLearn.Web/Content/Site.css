@@ -205,6 +205,12 @@ footer:hover {
     }
 }
 
+@media (min-width: 800px) {
+	.modal-dialog.medium {
+		width: 700px;
+	}
+}
+
 .glyphicon.glyphicon-sm {
 	font-size: 10px;
 }
