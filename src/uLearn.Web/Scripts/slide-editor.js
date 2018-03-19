@@ -132,7 +132,7 @@ function initCodeEditor($parent) {
 			if (editable || guest)
 				theme = 'cobalt';
 			if ($el.closest('.revealed').length > 0)
-				theme = 'pastel-on-dark';
+				theme = 'xq-dark';
 			
 			var editor = CodeMirror.fromTextArea(element,
 			{
