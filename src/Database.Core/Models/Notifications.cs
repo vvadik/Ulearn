@@ -192,10 +192,13 @@ namespace Database.Models
 		[IsEnabledByDefault(true)]
 		RevokedAccessToGroup = 103,
 
+		/*
+		 * Not used more. Use GroupMembersHaveBeenRemoved instead.
 		[Display(Name = @"Преподаватель удалил студента из вашей группы", GroupName = @"Преподаватель удалил студентов из ваших групп")]
 		[MinCourseRole(CourseRole.Instructor)]
 		[IsEnabledByDefault(true)]
 		GroupMemberHasBeenRemoved = 104,
+		*/
 		
 		[Display(Name = @"Преподаватель удалил студентов из вашей группы", GroupName = @"Преподаватель удалил студентов из ваших групп")]
 		[MinCourseRole(CourseRole.Instructor)]
@@ -1080,7 +1083,7 @@ namespace Database.Models
 		}
 	}
 
-	[NotificationType(NotificationType.GroupMemberHasBeenRemoved)]
+	[Obsolete("Use GroupMembersHaveBeenRemovedNotification instead")]
 	public class GroupMemberHasBeenRemovedNotification : Notification
 	{
 		public string UserId { get; set; }
@@ -1140,6 +1143,8 @@ namespace Database.Models
 		{
 			if (userNames.Count == 0)
 				return "";
+			if (userNames.Count == 1)
+				return userNames.First();
 			if (userNames.Count > 3)
 				return $"{userNames[0]}, {userNames[1]}, {userNames[2]} и ещё {(userNames.Count - 3).PluralizeInRussian(RussianPluralizationOptions.Students)}";
 			return string.Join(", ", userNames.Take(userNames.Count - 1)) + " и " + userNames.Last();
@@ -1200,7 +1205,7 @@ namespace Database.Models
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
 			var usersCount = UserIds.Split(',').Length;
-			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()}</b> удалил{InitiatedBy.Gender.ChooseEnding()} " +
+			return $"{InitiatedBy.VisibleName} удалил{InitiatedBy.Gender.ChooseEnding()} " +
 					$"{usersCount.PluralizeInRussian(RussianPluralizationOptions.StudentsDative)} из группы «{Group.Name}» (курс «{course.Title}»): {UserDescriptions}.";
 		}
 	}
@@ -1225,7 +1230,7 @@ namespace Database.Models
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			return $"{InitiatedBy.VisibleName}</b> добавил{InitiatedBy.Gender.ChooseEnding()} " +
+			return $"{InitiatedBy.VisibleName} добавил{InitiatedBy.Gender.ChooseEnding()} " +
 					$"{UsersCount.PluralizeInRussian(RussianPluralizationOptions.StudentsDative)} в группу «{Group.Name}» (курс «{course.Title}»): {UserDescriptions}.";
 		}
 	}

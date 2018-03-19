@@ -123,7 +123,7 @@
 			Two = "студентов",
 			Five = "студентов",
 			Gender = Gender.Male,
-			hideNumberOne = false,
+			hideNumberOne = true,
 			smallNumbersAreWords = false
 		};
 	}

@@ -845,7 +845,7 @@ namespace uLearn.Web.Controllers
 			
 			var currentUserId = User.Identity.GetUserId();
 			if (member != null)
-				await notificationsRepo.AddNotification(group.CourseId, new GroupMemberHasBeenRemovedNotification { UserId = userId, GroupId = groupId }, currentUserId);
+				await notificationsRepo.AddNotification(group.CourseId, new GroupMembersHaveBeenRemovedNotification(groupId, new List<string> { userId }, usersRepo), currentUserId);
 
 			return Json(new { status = "ok", removed = member != null ? "true" : "false" });
 		}

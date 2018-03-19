@@ -325,12 +325,10 @@ function autoEnlargeTextarea() {
 	var scrollToCommentFromHash = function() {
 		var hash = window.location.hash;
 		var match;
-		if ((match = /^#comment-(\d+)$/.exec(hash)) !== null && $('.comment[data-comment-id=' + match[1] + ']').length > 0)
-			scrollTo($('.comment[data-comment-id=' + match[1] + ']')
-				.animate({ backgroundColor: '#ffe6e3' })
-				.delay(1500)
-				.animate({ backgroundColor: 'initial' })
-				);
+		if ((match = /^#comment-(\d+)$/.exec(hash)) !== null && $('.comment[data-comment-id=' + match[1] + ']').length > 0) {
+			var $comment = $('.comment[data-comment-id=' + match[1] + ']');
+            scrollTo($comment);
+        }
 	};	
 
     let $comments = $('.comments');
