@@ -491,6 +491,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\BaseExerciseController.cs" />
     <Compile Include="Controllers\CertificatesController.cs" />
+    <Compile Include="Controllers\ErrorsController.cs" />
     <Compile Include="Controllers\FeedController.cs" />
     <Compile Include="Controllers\GraderController.cs" />
     <Compile Include="Controllers\JsonDataContractController.cs" />
@@ -904,6 +905,7 @@
     <Content Include="codemirror\theme\vibrant-ink.css" />
     <Content Include="codemirror\theme\xq-dark.css" />
     <Content Include="codemirror\theme\xq-light.css" />
+    <Content Include="Content\404.jpg" />
     <Content Include="Content\antiplagiarism.css" />
     <Content Include="Content\awesome-bootstrap-checkbox.css" />
     <Content Include="Content\bootstrap-select.min.css" />
@@ -1168,6 +1170,8 @@
     <Content Include="tablesorter-master\tablesorter.jquery.json" />
     <Content Include="tablesorter-master\test.html" />
     <Content Include="Views\AntiPlagiarism\Details.cshtml" />
+    <Content Include="Views\Errors\404.cshtml" />
+    <Content Include="Views\Errors\Error.cshtml" />
     <Content Include="Views\Exercise\_ExerciseReviewComment.cshtml" />
     <Content Include="Views\Shared\_Retargeting.cshtml" />
     <Content Include="Views\Shared\_ReturnHijack.cshtml" />
@@ -1180,7 +1184,6 @@
     </Content>
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
