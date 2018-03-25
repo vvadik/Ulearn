@@ -73,7 +73,7 @@ namespace uLearn.CSharp.SpellingValidation
 			if (errors.Any())
 			{
 				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
-						"..", "CSharp", "ExampleFiles", "errors", $"{file.Name}_errors.txt"),
+						"..", "CSharp", "ExampleFiles", "errors", "spelling_validation", $"{file.Name}_errors.txt"),
 					$@"{fileContent}
 
 {errors.JoinStringsWith(err => $"{err.GetMessageWithPositions()}", Environment.NewLine)}");
@@ -92,7 +92,7 @@ namespace uLearn.CSharp.SpellingValidation
 			if (!errors.Any())
 			{
 				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
-						"..", "CSharp", "ExampleFiles", "submissions_errors", $"{file.Name}_errors.txt"),
+						"..", "CSharp", "ExampleFiles", "submissions_errors", "spelling_validation", $"{file.Name}_errors.txt"),
 					$@"{fileContent}
 
 {errors.JoinStringsWith(err => $"{err.GetMessageWithPositions()}", Environment.NewLine)}");
