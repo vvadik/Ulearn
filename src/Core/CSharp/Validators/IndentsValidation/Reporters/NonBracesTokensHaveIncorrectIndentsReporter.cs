@@ -63,7 +63,7 @@ namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 				{
 					yield return new SolutionStyleError(
 						statementClause,
-						"Не рекомендуется оставлять лишние пустые строки, пожалуйста уберите их");
+						"Не рекомендуется оставлять лишние пустые строки. Пожалуйста, уберите их");
 					continue;
 				}
 
@@ -87,7 +87,7 @@ namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 						{
 							yield return new SolutionStyleError(
 								statementClause,
-								"Данное выражение рекомендуется выровнить таким же количеством отступов, как у предка");
+								"Рекомендуется выровнять таким же отступом, как и родительский блок");
 							continue;
 						}
 					}
@@ -134,18 +134,18 @@ namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 		{
 			if (statementLine == rootLine)
 			{
-				return "Добавьте пожалуйста дополнительный перенос строки";
+				return "Добавьте, пожалуйста, дополнительный перенос строки";
 			}
 
 			if (statementStart <= rootStart)
 			{
-				return "Относительно предка данное выражение имеет некорректную позицию (мало отступов)";
+				return "Выражение имеет слишком маленький отступ по сравнению с родительским блоком";
 			}
 
 			var delta = statementStart - rootStart;
 			if (delta < 4)
 			{
-				return "Относительно предка данное выражение имеет некорректную позицию (меньше 4 пробелов)";
+				return "Выражение имеет слишком маленький отступ по сравнению с родительским блоком. Рекомендуется ставить 4 пробела";
 			}
 
 			return null;
