@@ -58,35 +58,8 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			}
 		}
 
-		private SolutionStyleError CheckConcatenatedWordsInLowerCaseForError(
-			string concatenatedWords,
-			SyntaxToken tokenWithConcatenatedWords
-			)
+		private SolutionStyleError CheckConcatenatedWordsInLowerCaseForError(string concatenatedWords, SyntaxToken tokenWithConcatenatedWords)
 		{
-			//var biggestUncheckedPrefix = concatenatedWords;
-			//var biggestValidWordsSequence = "";
-			//while (!string.IsNullOrWhiteSpace(biggestUncheckedPrefix))
-			//{
-			//	if (hunspell.Spell(biggestUncheckedPrefix))
-			//	{
-			//		var prefixStartPosition = concatenatedWords.IndexOf(biggestUncheckedPrefix);
-			//		var nextWordStartPosition = prefixStartPosition + biggestUncheckedPrefix.Length;
-			//		biggestValidWordsSequence += biggestUncheckedPrefix;
-			//		biggestUncheckedPrefix = concatenatedWords.Substring(nextWordStartPosition);
-			//	}
-			//	else
-			//	{
-			//		biggestUncheckedPrefix = biggestUncheckedPrefix.Remove(biggestUncheckedPrefix.Length - 1);
-			//	}
-			//}
-
-			//if (biggestValidWordsSequence != concatenatedWords)
-			//{
-			//	var incorrectWordStartPosition = concatenatedWords.Length - biggestValidWordsSequence.Length;
-			//	var incorrectWord = concatenatedWords.Substring(incorrectWordStartPosition);
-			//	return new SolutionStyleError(tokenWithConcatenatedWords, $"В слове {incorrectWord} допущена опечатка. Возможные исправления: {string.Join(", ", hunspell.Suggest(incorrectWord))}");
-			//}
-			//return null;
 			var currentCheckingWord = "";
 			foreach (var symbol in concatenatedWords)
 			{
@@ -96,7 +69,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			}
 
 			return currentCheckingWord != ""
-				? new SolutionStyleError(tokenWithConcatenatedWords, $"В слове {currentCheckingWord} допущена опечатка. Возможные исправления: {string.Join(", ", hunspell.Suggest(currentCheckingWord))}")
+				? new SolutionStyleError(tokenWithConcatenatedWords, $"В слове {concatenatedWords} допущена опечатка.")
 				: null;
 		}
 	}
