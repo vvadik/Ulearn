@@ -66,7 +66,12 @@
 @if (Model.CanViewAndAddCommentsForInstructorsOnly)
 {
 	<div class="comments comments-for-instructors-only">
-        <div class="comments-for-instructors-only__description">Студенты не&nbsp;видят эти комментарии</div>
+        <div class="comments-for-instructors-only__description">
+            Студенты не&nbsp;видят эти комментарии
+            <span class="with-long-tooltip cursor-pointer" data-toggle="tooltip" data-placement="top" title="Это блок комментариев, доступных только преподавателям">
+                <span class="fa fa-question-circle"></span>
+            </span>
+        </div>
         @foreach (var topLevelComment in forInstructorsOnlyTopLevelComments)
         {
 	        @Html.Partial("_Comment", BuildCommentViewModel(topLevelComment, Model.Slide))

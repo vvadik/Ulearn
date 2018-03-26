@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using uLearn.CSharp.ExcessLinesValidation.TestData;
 
 namespace uLearn.CSharp.ExcessLinesValidation.TestData.Correct
@@ -35,6 +36,13 @@ namespace uLearn.CSharp.ExcessLinesValidation.TestData.Correct
 			: this(0)
 		{
 			
+		}
+
+		public SomeClass3(Func<string, string> makeCaption, Func<string> beginList,
+			Func<IEnumerable<double>, string> makeStatistics, int itemMaker, Func<string> endList)
+		{
+			var a = 1;
+			field = a;
 		}
 
 		private int Property => 0;
@@ -157,6 +165,13 @@ namespace uLearn.CSharp.ExcessLinesValidation.TestData.Correct
 			{
 				SomeMethod12();
 			}
+		}
+		
+		public void ReportMakerParameters(Func<string, string> makeCaption, Func<string> beginList,
+			Func<IEnumerable<double>, string> makeStatistics, int itemMaker, Func<string> endList)
+		{
+			var a = 1;
+			Console.WriteLine(a);
 		}
 	}
 

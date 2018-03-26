@@ -129,20 +129,20 @@ p {
 }
 
 .revealed {
-	background-color: #3369b7;
+	background-color: #cee1fb;
 	padding: 20px;
-	color: white !important;
+	color: #000 !important;
     margin-left: -20px;
     margin-right: -20px;
 }
 
-.revealed .cm-s-pastel-on-dark.CodeMirror,
-.revealed .cm-s-xq-dark.CodeMirror {
-	background-color: #3369b7;
+.revealed .CodeMirror {
+	background-color: #cee1fb;
 }
 
-.revealed .cm-s-xq-dark .CodeMirror-gutters {
-    background: #3369b7;
+.revealed .CodeMirror .CodeMirror-gutters {
+    background-color: #cee1fb;
+	color: #333;
 }
 
 .revealed__description {
@@ -150,9 +150,10 @@ p {
 	margin-bottom: 15px;
 }
 
-.revealed code {
-	color: white;
-	background-color: #231f7d;
+.revealed code,
+.revealed pre:not(.CodeMirror-line),
+.revealed .inline-pre {
+	background-color: #e0edff;
 }
 
 .revealed h2 {
@@ -1030,15 +1031,15 @@ li.li-success {
 
 /* Instructors-only comments */
 .comments-for-instructors-only {
-    background-color: #3369b7;
+    background-color: #cee1fb;
     padding: 20px;
-    color: white !important;
+    color: #000 !important;
     margin: 5px -20px 20px;
 }
 
 .comments-for-instructors-only .cm-s-pastel-on-dark.CodeMirror,
 .comments-for-instructors-only .cm-s-xq-dark.CodeMirror {
-    background-color: #3369b7;
+    background-color: #cee1fb;
 }
 
 .comments-for-instructors-only__description {
@@ -1050,9 +1051,10 @@ li.li-success {
     font-style: normal;
 }
 
-.comments-for-instructors-only code {
-    color: white;
-    background-color: #39562d;
+.comments-for-instructors-only code,
+.comments-for-instructors-only pre,
+.comments-for-instructors-only .inline-pre {
+    background-color: #e0edff;
 }
 
 .comments-for-instructors-only h2 {
@@ -1069,37 +1071,38 @@ li.li-success {
 }
 
 .comments-for-instructors-only [name=commentText] {
-    background-color: #3369b7;
-    border: 1px solid white;
+    background-color: #cee1fb;
+    border: 1px solid #8dacda;
 }
 
 .comments-for-instructors-only [name=commentText]::placeholder {
-    color: #ddf;
+    color: #98b9e3;
 }
 
 .comments-for-instructors-only .btn-primary {
-    background-color: #3369b7;
-    color: white;
-    border: 1px solid white;
+    background-color: #cee1fb;
+	color: #235db1;
+	border-color: #8dacda;
 }
 
 .comments-for-instructors-only .btn-primary[disabled] {
-    color: #77aaf3;
-    border: 1px solid #77aaf3;
+    color: #235db1;
+    border: 1px solid #8dacda;
 }
 
 .comments-for-instructors-only .btn-primary[disabled]:hover,
 .comments-for-instructors-only .btn-primary[disabled]:focus,
 .comments-for-instructors-only .btn-primary[disabled]:active{
-    background-color: #3369b7;
-    border: 1px solid #77aaf3;
+    background-color: #cee1fb;
+    border: 1px solid #8dacda;
+	color: #235db1;
 }
 
 .comments-for-instructors-only .btn-primary:hover,
 .comments-for-instructors-only .btn-primary:focus,
 .comments-for-instructors-only .btn-primary:active {
-    background-color: #5b8cd4;
-    border: 1px solid white;
+    background-color: #4279ca;
+	color: white;
 }
 
 
@@ -1108,7 +1111,7 @@ li.li-success {
 .comments-for-instructors-only a:hover,
 .comments-for-instructors-only a:focus,
 .comments-for-instructors-only a:active {
-    color: #96dff1;
+    /*color: #7d7d7d;*/
 }
 
 .comments-for-instructors-only .comment .comment__delete-link * {
@@ -1122,11 +1125,11 @@ li.li-success {
 }
 
 .comments-for-instructors-only .comment:not(.is-pinned) .label-switcher.comment__pinned {
-    background-color: #3369b7;
+    background-color: #cee1fb;
 }
 
 .comments-for-instructors-only .comment:not(.is-correct-answer) .label-switcher.comment__correct-answer {
-    background-color: #3369b7;
+    background-color: #cee1fb;
     color: #ddf;
     border-color: #ddf;
 }
@@ -1134,13 +1137,14 @@ li.li-success {
 .comments-for-instructors-only .comment.is-correct-answer .label-switcher.comment__correct-answer,
 .comments-for-instructors-only .comment.is-correct-answer .label-switcher.comment__correct-answer .glyphicon {
     background-color: white;
-    color: #3369b7;
+    color: #cee1fb;
 }
 
 .comments-for-instructors-only .comment .comment__likes-count .glyphicon,
 .comments-for-instructors-only .comment .comment__publish-time,
-.comments-for-instructors-only .comment .comment__publish-time a {
-    color: white;
+.comments-for-instructors-only .comment .comment__publish-time a,
+.comments-for-instructors-only .comment .comment__footer .comment__hide-link a {
+    color: #7d7d7d;
 }
 
 /* User avatars */
