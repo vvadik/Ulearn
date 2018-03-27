@@ -129,7 +129,7 @@ p {
 }
 
 .revealed {
-	background-color: #cee1fb;
+	background-color: #e7f1ff;
 	padding: 20px;
 	color: #000 !important;
     margin-left: -20px;
@@ -137,11 +137,11 @@ p {
 }
 
 .revealed .CodeMirror {
-	background-color: #cee1fb;
+	background-color: #e7f1ff;
 }
 
 .revealed .CodeMirror .CodeMirror-gutters {
-    background-color: #cee1fb;
+    background-color: #e7f1ff;
 	color: #333;
 }
 
@@ -1031,7 +1031,7 @@ li.li-success {
 
 /* Instructors-only comments */
 .comments-for-instructors-only {
-    background-color: #cee1fb;
+    background-color: #e7f1ff;
     padding: 20px;
     color: #000 !important;
     margin: 5px -20px 20px;
@@ -1039,7 +1039,7 @@ li.li-success {
 
 .comments-for-instructors-only .cm-s-pastel-on-dark.CodeMirror,
 .comments-for-instructors-only .cm-s-xq-dark.CodeMirror {
-    background-color: #cee1fb;
+    background-color: #e7f1ff;
 }
 
 .comments-for-instructors-only__description {
@@ -1071,7 +1071,7 @@ li.li-success {
 }
 
 .comments-for-instructors-only [name=commentText] {
-    background-color: #cee1fb;
+    background-color: #e7f1ff;
     border: 1px solid #8dacda;
 }
 
@@ -1080,7 +1080,7 @@ li.li-success {
 }
 
 .comments-for-instructors-only .btn-primary {
-    background-color: #cee1fb;
+    background-color: #e7f1ff;
 	color: #235db1;
 	border-color: #8dacda;
 }
@@ -1093,7 +1093,7 @@ li.li-success {
 .comments-for-instructors-only .btn-primary[disabled]:hover,
 .comments-for-instructors-only .btn-primary[disabled]:focus,
 .comments-for-instructors-only .btn-primary[disabled]:active{
-    background-color: #cee1fb;
+    background-color: #e7f1ff;
     border: 1px solid #8dacda;
 	color: #235db1;
 }
@@ -1125,11 +1125,11 @@ li.li-success {
 }
 
 .comments-for-instructors-only .comment:not(.is-pinned) .label-switcher.comment__pinned {
-    background-color: #cee1fb;
+    background-color: #e7f1ff;
 }
 
 .comments-for-instructors-only .comment:not(.is-correct-answer) .label-switcher.comment__correct-answer {
-    background-color: #cee1fb;
+    background-color: #e7f1ff;
     color: #ddf;
     border-color: #ddf;
 }
@@ -1137,7 +1137,7 @@ li.li-success {
 .comments-for-instructors-only .comment.is-correct-answer .label-switcher.comment__correct-answer,
 .comments-for-instructors-only .comment.is-correct-answer .label-switcher.comment__correct-answer .glyphicon {
     background-color: white;
-    color: #cee1fb;
+    color: #e7f1ff;
 }
 
 .comments-for-instructors-only .comment .comment__likes-count .glyphicon,
