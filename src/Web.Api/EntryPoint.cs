@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
@@ -35,8 +36,16 @@ namespace Web.Api
                     var pathFormat = context.Configuration.GetSection("hostLog")["pathFormat"];
                     if (!string.IsNullOrEmpty(pathFormat))
                     {
-                        loggerConfiguration = loggerConfiguration
-                            .WriteTo.RollingFile(pathFormat, outputTemplate: "{Timestamp:HH:mm:ss.fff} {Level:u3} [{Thread}] {Message:l}{NewLine}{Exception}");
+						var minimumLevelString = context.Configuration.GetSection("hostLog").GetValue<string>("minimumLevel", "debug");
+						if (!Enum.TryParse(minimumLevelString, true, out LogEventLevel minimumLevel) || !Enum.IsDefined(typeof(LogEventLevel), minimumLevel))
+							minimumLevel = LogEventLevel.Debug;
+						
+						loggerConfiguration = loggerConfiguration
+							.WriteTo.RollingFile(
+								pathFormat,
+								outputTemplate: "{Timestamp:HH:mm:ss.fff} {Level:u3} [{Thread}] {Message:l}{NewLine}{Exception}",
+								restrictedToMinimumLevel: minimumLevel  
+							);
                     }
                     var hostLog = new SerilogLog(loggerConfiguration.CreateLogger());
                     hostConfigurator.SetHostLog(hostLog);

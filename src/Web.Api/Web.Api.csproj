@@ -27,4 +27,8 @@
     <ProjectReference Include="..\Database.Core\Database.Core.csproj" />
     <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\Parameters" />
+    <Folder Include="Models\Results" />
+  </ItemGroup>
 </Project>

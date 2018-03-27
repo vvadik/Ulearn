@@ -125,7 +125,6 @@ namespace Database
 			CancelCascaseDeleting<RepliedToYourCommentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
 			CancelCascaseDeleting<RepliedToYourCommentNotification, Comment>(modelBuilder, c => c.ParentComment, c => c.ParentCommentId);
 			
-			
 			CancelCascaseDeleting<UploadedPackageNotification, CourseVersion>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
 			CancelCascaseDeleting<PublishedPackageNotification, CourseVersion>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
 

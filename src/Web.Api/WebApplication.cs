@@ -32,9 +32,11 @@ namespace Web.Api
                 .Enrich.With<FlowContextEnricher>()
                 .MinimumLevel.Debug()
                 .WriteTo.Airlock(LogEventLevel.Information);
+			
             if (hostingEnvironment.Log != null)
                 loggerConfiguration = loggerConfiguration.WriteTo.VostokLog(hostingEnvironment.Log);
             var logger = loggerConfiguration.CreateLogger();
+			
             return new WebHostBuilder()
                 .UseKestrel()
                 .UseUrls($"http://*:{hostingEnvironment.Configuration["port"]}/")
@@ -61,7 +63,7 @@ namespace Web.Api
 
 		private void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, Logger logger)
 		{
-			services.AddDbContext<UlearnDb>(
+			services.AddDbContextPool<UlearnDb>(
 				options => options.UseSqlServer(hostingEnvironment.Configuration["database"])
 			);
 			
@@ -69,11 +71,13 @@ namespace Web.Api
 			services.AddSingleton<ILogger>(logger);
 			services.AddSingleton<ULearnUserManager>();
 			services.AddSingleton<InitialDataCreator>();
+			services.AddSingleton<WebCourseManager>();
 			
 			/* DI for database repos */
 			services.AddScoped<UsersRepo>();
 			services.AddScoped<CommentsRepo>();
 			services.AddScoped<UserRolesRepo>();
+			services.AddScoped<CoursesRepo>();
 			
 			/* Asp.NET Core MVC */
 			services.AddMvc();
