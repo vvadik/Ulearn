@@ -1128,18 +1128,6 @@ li.li-success {
     background-color: #e7f1ff;
 }
 
-.comments-for-instructors-only .comment:not(.is-correct-answer) .label-switcher.comment__correct-answer {
-    background-color: #e7f1ff;
-    color: #ddf;
-    border-color: #ddf;
-}
-
-.comments-for-instructors-only .comment.is-correct-answer .label-switcher.comment__correct-answer,
-.comments-for-instructors-only .comment.is-correct-answer .label-switcher.comment__correct-answer .glyphicon {
-    background-color: white;
-    color: #e7f1ff;
-}
-
 .comments-for-instructors-only .comment .comment__likes-count .glyphicon,
 .comments-for-instructors-only .comment .comment__publish-time,
 .comments-for-instructors-only .comment .comment__publish-time a,
