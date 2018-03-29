@@ -6,7 +6,7 @@ using Vostok.Hosting;
 using Vostok.Logging;
 using Vostok.Logging.Serilog;
 
-namespace Web.Api
+namespace Ulearn.Web.Api
 {
     public static class EntryPoint
     {

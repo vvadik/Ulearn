@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace Ulearn.Web.Api.Models.Common
 {
 	[DataContract]
-	public class CourseInfo
+	public class ShortCourseInfo
 	{
 		[DataMember(Name = "id")]
 		public string Id { get; set; }
@@ -12,7 +11,7 @@ namespace Ulearn.Web.Api.Models.Common
 		[DataMember(Name = "title")]
 		public string Title { get; set; }
 		
-		[DataMember(Name = "units")]
-		public List<UnitInfo> Units { get; set; }
+		[DataMember(Name = "api_url")]
+		public string ApiUrl { get; set; }
 	}
 }

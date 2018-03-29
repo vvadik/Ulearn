@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Extensions;
 
-namespace Web.Api.Controllers
+namespace Ulearn.Web.Api.Controllers
 {
 	[Route("/account")]
 	public class AccountController : BaseController

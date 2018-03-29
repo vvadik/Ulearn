@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <RootNamespace>Ulearn.Web.Api</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
@@ -31,7 +32,7 @@
     <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Configuration" />
     <Folder Include="Models\Parameters" />
-    <Folder Include="Models\Results" />
   </ItemGroup>
 </Project>

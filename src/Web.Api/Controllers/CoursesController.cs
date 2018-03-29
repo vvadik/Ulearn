@@ -3,11 +3,10 @@ using Database;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using uLearn;
-using uLearn.Quizes;
-using Web.Api.Models.Common;
-using SlideInfo = Web.Api.Models.Common.SlideInfo;
+using Ulearn.Web.Api.Models.Common;
+using Ulearn.Web.Api.Models.Results.Courses;
 
-namespace Web.Api.Controllers
+namespace Ulearn.Web.Api.Controllers
 {
 	[Route("/courses")]
 	public class CoursesController : BaseController
@@ -16,55 +15,36 @@ namespace Web.Api.Controllers
 			: base(logger, courseManager)
 		{
 		}
+
+		[HttpGet("")]
+		public IActionResult CoursesList()
+		{
+			var courses = courseManager.GetCourses();
+			return Json(new CoursesListResult
+			{
+				Courses = courses.Select(
+					c => new ShortCourseInfo
+					{
+						Id = c.Id,
+						Title = c.Title,
+						ApiUrl = Url.Action(nameof(CourseInfo), "Courses", new { courseId = c.Id })
+					}
+				).ToList()
+			});
+		}
 		
 		[HttpGet("{courseId}")]
-		public IActionResult CourseInfo(string courseId)
+		public IActionResult CourseInfo(Course course)
 		{
-			var course = courseManager.FindCourse(courseId);
 			if (course == null)
-				return Json(new { status = "error", message = $"Course {courseId} not found" });
+				return Json(new { status = "error", message = "Course not found" });
 			
 			return Json(new CourseInfo
 			{
 				Id = course.Id,
 				Title = course.Title,
-				Units = course.Units.Select(BuildUnitInfo).ToList()
+				Units = course.Units.Select(unit => BuildUnitInfo(course.Id, unit)).ToList()
 			});
-		}
-
-		private static UnitInfo BuildUnitInfo(Unit unit)
-		{
-			return new UnitInfo
-			{
-				Id = unit.Id,
-				Title = unit.Title,
-				Slides = unit.Slides.Select(BuildSlideInfo).ToList()
-			};
-		}
-
-		private static SlideInfo BuildSlideInfo(Slide slide)
-		{
-			return new SlideInfo
-			{
-				Id = slide.Id,
-				Title = slide.Title,
-				Url = slide.Url,
-				MaxScore = slide.MaxScore,
-				Type = GetSlideType(slide)
-			};
-		}
-
-		private static SlideType GetSlideType(Slide slide)
-		{
-			switch (slide)
-			{
-				case ExerciseSlide _:
-					return SlideType.Exercise;
-				case QuizSlide _:
-					return SlideType.Quiz;
-				default:
-					return SlideType.Lesson;
-			}
 		}
 	}
 }

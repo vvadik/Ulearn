@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Web.Api.Models.Common
+namespace Ulearn.Web.Api.Models.Common
 {
 	[DataContract]
 	public class UnitInfo
