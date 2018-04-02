@@ -82,7 +82,7 @@ namespace Ulearn.Web.Api.Controllers
 						slide => new CodeReviewExerciseStatistics
 						{
 							Exercise = BuildSlideInfo(course.Id, slide),
-							ReviewedSubmissionsCount = checkingsCheckedByInstructor.Count(c => c.SlideId == slide.Id),
+							ReviewedSubmissionsCount = checkingsCheckedByInstructor.Where(c => c.SlideId == slide.Id).DistinctBy(c => c.SubmissionId).Count(),
 							QueueSize = checkingQueue.Count(c => c.SlideId == slide.Id),
 							CommentsCount = comments.Count(c => c.ExerciseChecking.SlideId == slide.Id),
 						}
