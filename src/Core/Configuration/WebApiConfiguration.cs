@@ -12,5 +12,6 @@ namespace Web.Api.Configuration
 	public class UlearnWebConfiguration
 	{
 		public string CookieKeyRingDirectory { get; set; }
+		public string CookieDomain { get; set; }
 	}
 }

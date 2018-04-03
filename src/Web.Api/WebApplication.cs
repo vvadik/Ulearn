@@ -137,6 +137,7 @@ namespace Ulearn.Web.Api
 			{
 				options.Cookie.Name = "ulearn.auth";
 				options.Cookie.Expiration = TimeSpan.FromDays(14);
+				options.Cookie.Domain = configuration.Web.CookieDomain;
 				options.LoginPath = "/users/login";
 				options.LogoutPath = "/users/logout";
 				options.Events.OnRedirectToLogin = context =>
