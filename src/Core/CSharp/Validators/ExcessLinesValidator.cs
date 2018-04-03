@@ -62,12 +62,13 @@ namespace uLearn.CSharp.Validators
 		private SolutionStyleError ReportWhenNotExistLineBetweenBlocks(BracesPair bracesPair)
 		{
 			var closeBraceLine = GetStartLine(bracesPair.Close);
+			var openBraceLine = GetStartLine(bracesPair.Open);
 
 			var nextSyntaxNode = GetNextNode(bracesPair.Open.Parent);
 			if (nextSyntaxNode == null || nextSyntaxNode is StatementSyntax)
 				return null;
 			var nextSyntaxNodeLine = GetStartLine(nextSyntaxNode);
-			if (closeBraceLine + 1 == nextSyntaxNodeLine)
+			if (closeBraceLine + 1 == nextSyntaxNodeLine && closeBraceLine != openBraceLine)
 				return new SolutionStyleError(StyleErrorType.ExcessLines04, bracesPair.Close);
 
 			return null;

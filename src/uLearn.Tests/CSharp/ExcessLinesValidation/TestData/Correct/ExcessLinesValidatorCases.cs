@@ -173,6 +173,9 @@ namespace uLearn.CSharp.ExcessLinesValidation.TestData.Correct
 			var a = 1;
 			Console.WriteLine(a);
 		}
+		
+		public void SomeMethod14() { SomeMethod13(); }
+		public void SomeMethod15() { SomeMethod13(); }
 	}
 
 	public class SomeClass6
