@@ -142,7 +142,7 @@ namespace uLearn.Web.Controllers
 			metricSender.SendCount($"exercise.{exerciseMetricId}.{verdictForMetric}");
 
 			if (automaticChecking.IsRightAnswer)
-				await CreateStyleErrorsReviewsForSubmission(submission, buildResult.StyleErrors);
+				await CreateStyleErrorsReviewsForSubmission(submission, buildResult.StyleErrors, exerciseMetricId);
 
 			var result = new RunSolutionResult
 			{
@@ -163,7 +163,7 @@ namespace uLearn.Web.Controllers
 			return result;
 		}
 
-		private async Task CreateStyleErrorsReviewsForSubmission(UserExerciseSubmission submission, IEnumerable<SolutionStyleError> styleErrors)
+		private async Task CreateStyleErrorsReviewsForSubmission(UserExerciseSubmission submission, IEnumerable<SolutionStyleError> styleErrors, string exerciseMetricId)
 		{
 			var ulearnBotUserId = usersRepo.GetUlearnBotUserId();
 			foreach (var error in styleErrors)
@@ -180,6 +180,12 @@ namespace uLearn.Web.Controllers
 					error.Span.EndLinePosition.Character,
 					error.Message
 				);
+				
+				var errorName = Enum.GetName(typeof(StyleErrorType), error.ErrorType);
+				metricSender.SendCount("exercise.style_error");
+				metricSender.SendCount($"exercise.style_error.{errorName}");
+				metricSender.SendCount($"exercise.{exerciseMetricId}.style_error");
+				metricSender.SendCount($"exercise.{exerciseMetricId}.style_error.{errorName}");
 			}
 		}
 	}

@@ -87,7 +87,6 @@ namespace uLearn.CSharp
 
 	public enum StyleErrorType
 	{
-		/* Indents validator */
 		[MessageTemplate("Содержимое парных фигурных скобок ({0}) должно иметь дополнительный отступ.")]
 		Indents01,
 		
