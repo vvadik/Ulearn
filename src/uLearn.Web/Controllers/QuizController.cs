@@ -11,6 +11,7 @@ using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
+using JetBrains.Annotations;
 using log4net;
 using Metrics;
 using uLearn.Quizes;
@@ -53,7 +54,8 @@ namespace uLearn.Web.Controllers
 			notificationsRepo = new NotificationsRepo(db);
 		}
 
-		internal class QuizAnswer
+		[UsedImplicitly]
+		private class QuizAnswer
 		{
 			public readonly string QuizType;
 			public readonly string QuizId;
@@ -69,7 +71,7 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		internal class QuizInfoForDb
+		private class QuizInfoForDb
 		{
 			public string QuizId;
 			public string ItemId;

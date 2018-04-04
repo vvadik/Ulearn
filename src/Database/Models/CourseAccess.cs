@@ -51,9 +51,11 @@ namespace Database.Models
 		[Display(Name = "Видеть решения всех пользователей")]
 		ViewAllStudentsSubmissions = 2,
 
-		/* Назначать людей преподавателями */
 		[Display(Name = "Назначать преподавателей")]
 		AddAndRemoveInstructors = 3,
+		
+		[Display(Name = "Получать в АПИ статистику по код-ревью (/codereveiew/statistics)")]
+		ApiViewCodeReviewStatistics = 101,
 		
 		[Display(Name = "Фича: антиплагиат")]
 		FeatureUseAntiPlagiarism = 1001,

@@ -22,14 +22,14 @@ namespace Ulearn.Web.Api.Models.Results.CodeReviewStatistics
 		public ShortUserInfo Instructor { get; set; }
 		
 		[DataMember(Name = "exercises")]
-		public Dictionary<Guid, CodeReviewExerciseStatistics> Exercises { get; set; }
+		public List<CodeReviewExerciseStatistics> Exercises { get; set; }
 	}
 
 	[DataContract]
 	public class CodeReviewExerciseStatistics
 	{
-		[DataMember(Name = "exercise")]
-		public SlideInfo Exercise { get; set; }
+		[DataMember(Name = "slide_id")]
+		public Guid SlideId { get; set; }
 		
 		[DataMember(Name = "reviewed_submissions_count")]
 		public int ReviewedSubmissionsCount { get; set; }

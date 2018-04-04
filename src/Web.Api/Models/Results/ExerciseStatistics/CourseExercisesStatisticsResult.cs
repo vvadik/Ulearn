@@ -9,7 +9,7 @@ namespace Ulearn.Web.Api.Models.Results.ExerciseStatistics
 	public class CourseExercisesStatisticsResult
 	{
 		[DataMember(Name = "exercises")]
-		public Dictionary<Guid, OneExerciseStatistics> Exercises { get; set; }
+		public List<OneExerciseStatistics> Exercises { get; set; }
 		
 		[DataMember(Name = "analyzed_submissions_count")]
 		public int AnalyzedSubmissionsCount { get; set; }

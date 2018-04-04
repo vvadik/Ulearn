@@ -48,7 +48,7 @@ namespace Ulearn.Web.Api.Controllers
 			if (! to.HasValue)
 				to = DateTime.MaxValue;
 			
-			count = Math.Max(count, 1000);
+			count = Math.Max(count, 10000);
 			
 			var instructorIds = userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, course.Id);
 			var instructors = usersRepo.GetUsersByIds(instructorIds);
@@ -79,16 +79,17 @@ namespace Ulearn.Web.Api.Controllers
 				var instructorStatistics = new CodeReviewInstructorStatistics
 				{
 					Instructor = BuildShortUserInfo(instructor),
-					Exercises = exerciseSlides.ToDictionary(
-						slide => slide.Id,
+					Exercises = exerciseSlides.Select(
 						slide => new CodeReviewExerciseStatistics
 						{
-							Exercise = BuildSlideInfo(course.Id, slide),
+							SlideId = slide.Id,
 							ReviewedSubmissionsCount = checkingsCheckedByInstructor.Where(c => c.SlideId == slide.Id).DistinctBy(c => c.SubmissionId).Count(),
 							QueueSize = checkingQueue.Count(c => c.SlideId == slide.Id),
 							CommentsCount = comments.Count(c => c.ExerciseChecking.SlideId == slide.Id),
 						}
 					)
+					.Where(s => s.ReviewedSubmissionsCount + s.QueueSize + s.CommentsCount > 0) // Ignore empty (zeros) records
+					.ToList()
 				};
 				result.Instructors.Add(instructorStatistics);
 			}

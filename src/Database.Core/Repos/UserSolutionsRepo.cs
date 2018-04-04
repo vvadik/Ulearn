@@ -145,9 +145,12 @@ namespace Database.Repos
 			}
 		}
 
-		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId)
+		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, bool includeManualCheckings=true)
 		{
-			return db.UserExerciseSubmissions.Include(s => s.ManualCheckings).Where(x => x.CourseId == courseId);
+			var query = db.UserExerciseSubmissions.AsQueryable();
+			if (includeManualCheckings)
+				query = query.Include(s => s.ManualCheckings);
+			return query.Where(x => x.CourseId == courseId);
 		}
 
 		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds)
