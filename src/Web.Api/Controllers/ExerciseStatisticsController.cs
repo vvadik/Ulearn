@@ -34,7 +34,7 @@ namespace Ulearn.Web.Api.Controllers
 			if (! to.HasValue)
 				to = DateTime.MaxValue;
 
-			count = Math.Max(count, 10000);
+			count = Math.Min(count, 10000);
 			
 			var exerciseSlides = course.Slides.OfType<ExerciseSlide>().ToList();
 			/* TODO (andgein): I can't select all submissions because ApplicationUserId column doesn't exist in database (ApplicationUser_Id exists).

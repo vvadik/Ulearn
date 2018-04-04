@@ -38,7 +38,7 @@ namespace Ulearn.Web.Api.Controllers
 		
 		[Route("{courseId}/instructors")]
 		[CourseAccessAuthorize(CourseAccessType.ApiViewCodeReviewStatistics)]
-		public async Task<IActionResult> InstructorsStatistics(Course course, int count=1000, DateTime? from=null, DateTime? to=null)
+		public async Task<IActionResult> InstructorsStatistics(Course course, int count=10000, DateTime? from=null, DateTime? to=null)
 		{
 			if (course == null)
 				return NotFound();
@@ -48,7 +48,7 @@ namespace Ulearn.Web.Api.Controllers
 			if (! to.HasValue)
 				to = DateTime.MaxValue;
 			
-			count = Math.Max(count, 10000);
+			count = Math.Min(count, 10000);
 			
 			var instructorIds = userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, course.Id);
 			var instructors = usersRepo.GetUsersByIds(instructorIds);
