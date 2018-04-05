@@ -20,7 +20,7 @@ namespace uLearn.CSharp
 {
 	[TestFixture]
 	public class ProjectExerciseBlock_Should
-	{
+	{		
 		private ProjectExerciseBlock ex;
 		private List<SlideBlock> exBlocks;
 
@@ -39,7 +39,7 @@ namespace uLearn.CSharp
 
 		private Project studentZipCsproj;
 		private Project checkerZipCsproj;
-
+		
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
@@ -106,6 +106,8 @@ namespace uLearn.CSharp
 		{
 			var projFiles = studentExerciseFolder.GetFiles().Select(f => f.Name);
 
+			Console.WriteLine(File.ReadAllText("test_debug.txt"));
+			
 			projFiles.Should().Contain("~$Link.cs");
 		}
 
