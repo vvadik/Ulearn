@@ -102,6 +102,11 @@ namespace uLearn.CSharp
 		[Test]
 		public void When_CreateStudentZip_Contain_Resolved_Link_Files()
 		{
+			Console.WriteLine(
+				string.Join(", ",
+					Directory.EnumerateFiles(studentExerciseFolder.Parent.FullName, "*", SearchOption.AllDirectories)
+				)
+			);
 			var projFiles = studentExerciseFolder.GetFiles().Select(f => f.Name);
 
 			projFiles.Should().Contain("~$Link.cs");
