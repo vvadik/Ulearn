@@ -50,7 +50,6 @@ namespace uLearn.CSharp
 			TestsHelper.RecreateDirectory(studentExerciseFolderPath);
 
 			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
-			File.WriteAllText("test_debug.txt", "");
 
 			ex = new ProjectExerciseBlock
 			{
@@ -107,8 +106,6 @@ namespace uLearn.CSharp
 		{
 			var projFiles = studentExerciseFolder.GetFiles().Select(f => f.Name);
 
-			Console.WriteLine(File.ReadAllText("test_debug.txt"));
-			
 			projFiles.Should().Contain("~$Link.cs");
 		}
 

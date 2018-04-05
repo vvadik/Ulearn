@@ -138,11 +138,6 @@ namespace uLearn
 			var copies = new List<FileToCopy>();
 			foreach (var link in linkedItems)
 			{
-				File.AppendAllText(
-					"test_debug.txt",
-					$"ProjModifier.ReplaceLinksWithItemsAndReturnWhatToCopy(): linked item {link.item.EvaluatedInclude}, newPath = {link.newPath}\n"
-				);
-				
 				copies.Add(new FileToCopy(link.item.EvaluatedInclude, link.newPath));
 				link.item.UnevaluatedInclude = link.newPath;
 				link.item.RemoveMetadata("Link");
