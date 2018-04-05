@@ -46,7 +46,8 @@ namespace uLearn.Model.Blocks
 				}
 				foreach (var fileToAdd in filesToAdd)
 				{
-					var relativePath = new FileInfo(fileToAdd.Path).GetRelativePath(dir.FullName);
+					Console.WriteLine($"LazilyUpdatingZip: file to add: {fileToAdd.Path}, content size if {fileToAdd.Data.Length} (I am building archive from {dir})");
+					var relativePath = dir.GetFile(fileToAdd.Path).GetRelativePath(dir.FullName);
 					var directoriesList = GetDirectoriesList(new FileInfo(relativePath));
 					if (!excludedDirs.Intersect(directoriesList).Any())
 						zip.UpdateEntry(fileToAdd.Path, fileToAdd.Data);
