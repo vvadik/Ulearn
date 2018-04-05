@@ -7,6 +7,9 @@ using Ulearn.Common.Extensions;
 
 namespace uLearn
 {
+	/*
+	 * These settings are loading from course.xml from the root folder of course. 
+	 */
 	[XmlRoot("Course", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/course")]
 	public class CourseSettings
 	{
@@ -18,10 +21,10 @@ namespace uLearn
 
 		[XmlElement("manual-checking")]
 		public bool IsManualCheckingEnabled { get; set; }
-
+		
 		[XmlElement("scoring")]
 		public ScoringSettings Scoring { get; set; }
-
+		
 		[XmlIgnore]
 		public string DefaultLanguage
 		{

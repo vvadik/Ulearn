@@ -293,13 +293,14 @@ namespace Database.DataContexts
 
 		public async Task<List<UserExerciseSubmission>> GetUnhandledSubmissions(int count)
 		{
-			log.Info("getUnhandledSubmissions(): lock semaphore");
+			log.Info("GetUnhandledSubmissions(): trying to acquire semaphore");
 			var semaphoreLocked = await getSubmissionsSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
 			if (!semaphoreLocked)
 			{
 				log.Error("GetUnhandledSubmissions(): Can't lock semaphore for 2 seconds");
 				return new List<UserExerciseSubmission>();
 			}
+			log.Info("GetUnhandledSubmissions(): semaphore acquired!");
 
 			try
 			{
@@ -307,12 +308,12 @@ namespace Database.DataContexts
 			}
 			catch (Exception e)
 			{
-				log.Error("GetUnhandledSubmissions()", e);
+				log.Error("GetUnhandledSubmissions() error", e);
 				return new List<UserExerciseSubmission>();
 			}
 			finally
 			{
-				log.Info("getUnhandledSubmissions(): release semaphore");
+				log.Info("GetUnhandledSubmissions(): trying to release semaphore");
 				getSubmissionsSemaphore.Release();
 			}
 		}

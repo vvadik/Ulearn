@@ -40,13 +40,18 @@
 		{
 			var status = "";
 			var statusClass = "";
+			var exercise = Model.Slide.Exercise;
+			var texts = exercise.Texts;
 			if (Model.ReviewState == ExerciseReviewState.WaitingForReview)
 			{
-				status = "Все тесты пройдены, решение ожидает код-ревью";
+				status = string.IsNullOrEmpty(texts.WaitingForCodeReview) ? "Все тесты пройдены, решение ожидает код-ревью" : texts.WaitingForCodeReview;
 				if (Model.InstructorView)
 				{
+					var messageFormat = string.IsNullOrEmpty(texts.WaitingForCodeReviewInstructorView)
+						? "Все тесты пройдены, решение ожидает <a href=\"{0}\" title=\"Перейти к код-ревью\">код-ревью</a>"
+						: texts.WaitingForCodeReviewInstructorView;	
 					status = string.Format(
-						"Все тесты пройдены, решение ожидает <a href=\"{0}\" title=\"Перейти к код-ревью\">код-ревью</a>",
+						messageFormat,
 						Url.Action("CheckExercise", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.Last().Id })
 						);
 				}
@@ -63,22 +68,28 @@
 				var pluralizedScore = score.PluralizeInRussian(RussianPluralizationOptions.Score);
 				if (Model.InstructorView)
 				{
-					status = string.Format("Все тесты пройдены, за&nbsp;<a href=\"{0}\" title=\"Отредактировать код-ревью\">код-ревью</a> {1} +{2}",
+					var messageFormat = string.IsNullOrEmpty(texts.CodeReviewPassedInstructorView)
+						? "Все тесты пройдены, за&nbsp;<a href=\"{0}\" title=\"Отредактировать код-ревью\">код-ревью</a> {1} +{2}"
+						: texts.CodeReviewPassedInstructorView;
+					status = string.Format(messageFormat,
 						Url.Action("CheckExercise", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.Last().Id, recheck = true }),
 						scoreVerb,
 						pluralizedScore);
 				}
 				else
 				{
-					status = string.Format("Все тесты пройдены, за&nbsp;код-ревью {0} +{1}", scoreVerb, pluralizedScore);
+					var messageFormat = string.IsNullOrEmpty(texts.CodeReviewPassed) ? "Все тесты пройдены, за&nbsp;код-ревью {0} +{1}" : texts.CodeReviewPassed; 
+					status = string.Format(messageFormat, scoreVerb, pluralizedScore);
 				}
 			}
 			else if (Model.SubmissionSelectedByUser.AutomaticCheckingIsRightAnswer)
 			{
-				status = "Все тесты пройдены";
+				status = string.IsNullOrEmpty(texts.AllTestsPassed) ? "Все тесты пройдены" : texts.AllTestsPassed;
 				if (!Model.Slide.Exercise.RequireReview)
 				{
-					status += ", задача сдана";
+					status = string.IsNullOrEmpty(texts.AllTestsPassedWithoutReview)
+						? "Все тесты пройдены, задача сдана"
+						: texts.AllTestsPassedWithoutReview;
 				}
 			}
 			else if (Model.SubmissionSelectedByUser.AutomaticChecking != null && Model.SubmissionSelectedByUser.AutomaticChecking.Status != AutomaticExerciseCheckingStatus.Done)
