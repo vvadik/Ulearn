@@ -51,7 +51,7 @@ namespace uLearn.Model.Blocks
 						$"LazilyUpdatingZip: file to add: {fileToAdd.Path}, content size if {fileToAdd.Data.Length} (I am building archive from {dir})\n"
 					);
 					
-					var directoriesList = GetDirectoriesList(new FileInfo(fileToAdd.Path), dir);
+					var directoriesList = GetDirectoriesList(fileToAdd.Path);
 					if (!excludedDirs.Intersect(directoriesList).Any())
 						zip.UpdateEntry(fileToAdd.Path, fileToAdd.Data);
 				}
@@ -59,14 +59,10 @@ namespace uLearn.Model.Blocks
 			}
 		}
 
-		public static IEnumerable<string> GetDirectoriesList(FileInfo file, DirectoryInfo untilDirectory)
+		public static IEnumerable<string> GetDirectoriesList(string filename)
 		{
-			var currentDirectory = file.Directory;
-			while (!string.IsNullOrEmpty(currentDirectory?.FullName) && currentDirectory?.FullName != untilDirectory.FullName)
-			{
-				yield return currentDirectory.Name;
-				currentDirectory = currentDirectory.Parent;
-			}
+			var pathParts = filename.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+			return pathParts.Take(pathParts.Length - 1);
 		}
 
 		private bool IsActual()
@@ -99,10 +95,11 @@ namespace uLearn.Model.Blocks
 		public void TestGetDirectoriesList()
 		{
 			const string fileName = "directory-1/directory-2/subdirectory/file.txt";
-			var directories = LazilyUpdatingZip.GetDirectoriesList(new FileInfo(fileName), new DirectoryInfo("/")).ToList();
+			var directories = LazilyUpdatingZip.GetDirectoriesList(fileName).ToList();
 			CollectionAssert.Contains(directories, "directory-1");
 			CollectionAssert.Contains(directories, "directory-2");
 			CollectionAssert.Contains(directories, "subdirectory");
+			CollectionAssert.DoesNotContain(directories, "file.txt");
 		}
 	}
 }
