@@ -18,13 +18,13 @@
 	};
 
 	$('.add-user-to-group__input').each(function() {
-        let $self = $(this);
-        let $error = $('.add-user-to-group__error');
+        var $self = $(this);
+        var $error = $('.add-user-to-group__error');
         $self.autocomplete({
 			source: $self.data('url'),
 			select: function (event, ui) {
-                let item = ui.item;
-                let groupId = $self.data('groupId');
+                var item = ui.item;
+                var groupId = $self.data('groupId');
                 $error.text('');
 				$.ajax({
 					type: 'post',
@@ -38,7 +38,7 @@
 						$error.text(data.message);
 						return;
 					}
-                    let $members = $('#modal__edit-group .modal__edit-group__members');
+                    var $members = $('#modal__edit-group .modal__edit-group__members');
 					$members.find('.modal__edit-group__no-members').remove();
                     $members.append(data.html);
 				});
@@ -93,9 +93,9 @@
 		});
 	});
 
-    let openModalCreateGroupStep3 = function (groupId) {
-        let $modal = $('#modal__create-group__step3');
-        let groupInfoUrl = $modal.data('groupInfoUrl').replace('GROUP_ID', groupId);
+    var openModalCreateGroupStep3 = function (groupId) {
+        var $modal = $('#modal__create-group__step3');
+        var groupInfoUrl = $modal.data('groupInfoUrl').replace('GROUP_ID', groupId);
 
         $modal.find('input[type="text"]').val();
         $modal.find('input[type="checkbox"]').prop('checked', true);
@@ -215,8 +215,8 @@
 		window.location.reload();
 	});
 
-    let openModalForEditingGroup = function (groupId) {
-        let $modal = $('#modal__edit-group');
+    var openModalForEditingGroup = function (groupId) {
+        var $modal = $('#modal__edit-group');
         $modal.find('input[name="groupId"]').val(groupId);
         $modal.find('.group__accesses').html('');
         $modal.find('.modal__edit-group__members').html('');
@@ -226,7 +226,7 @@
         if (!$modal.is(':visible'))
             $modal.modal();
 
-        let url = $modal.data('groupInfoUrl').replace('GROUP_ID', groupId);
+        var url = $modal.data('groupInfoUrl').replace('GROUP_ID', groupId);
         $.getJSON(url, function (data) {
             if (data.status === 'error') {
                 alert(data.message + ". Пожалуйста, обновите страницу");
@@ -237,7 +237,7 @@
             $modal.find('.modal__edit-group__group-name').text(data.group.name);
             $modal.find('.group__accesses').html(data.accesses.join(''));
 
-            let $members = $modal.find('.modal__edit-group__members');
+            var $members = $modal.find('.modal__edit-group__members');
             if (data.members.length > 0)
                 $members.html(data.members.join(''));
             else {
@@ -299,18 +299,18 @@
 	});
 	
 	var updateMassOperationsControlsState = function () {
-        let $countChecked = $('.modal__edit-group__members').find('.group__member.checked').length;
-        let $massOperationsPanel = $('.modal__edit-group__mass-operations');
-        let $massOperationsLabel = $massOperationsPanel.find('.group__member__remove-all-checkbox + label');
-        let $removeAllCheckbox = $massOperationsPanel.find('.group__member__remove-all-checkbox');
-        let $massOperationsInputs = $massOperationsPanel.find('button,select');
+        var $countChecked = $('.modal__edit-group__members').find('.group__member.checked').length;
+        var $massOperationsPanel = $('.modal__edit-group__mass-operations');
+        var $massOperationsLabel = $massOperationsPanel.find('.group__member__remove-all-checkbox + label');
+        var $removeAllCheckbox = $massOperationsPanel.find('.group__member__remove-all-checkbox');
+        var $massOperationsInputs = $massOperationsPanel.find('button,select');
         if ($countChecked > 0) {
             $massOperationsInputs.show();
             $massOperationsLabel.text('');
 
             /* If no group selected for copying disable button anymore */
-            let copyToGroupId = $('.modal__edit-group__mass-operations select[name="copyToGroupId"]').val();
-            let $copyButton = $massOperationsInputs.filter('.modal__edit-group__mass-copy-button');
+            var copyToGroupId = $('.modal__edit-group__mass-operations select[name="copyToGroupId"]').val();
+            var $copyButton = $massOperationsInputs.filter('.modal__edit-group__mass-copy-button');
             if (copyToGroupId === '-1')
                 $copyButton.attr('disabled', 'disabled');
             else
@@ -324,8 +324,8 @@
     };
 	
 	$('.modal__edit-group__members').on('change', '.group__member__remove-checkbox', function (e) {
-		let $self = $(this);		
-		let $groupMember = $self.closest('.group__member');
+		var $self = $(this);		
+		var $groupMember = $self.closest('.group__member');
 		$groupMember.toggleClass('checked');
 
         updateMassOperationsControlsState();
@@ -335,7 +335,7 @@
 		var $self = $(this);
 		var $checkboxes = $self.closest('#modal__edit-group__members').find('.group__member__remove-checkbox');
 
-        let isChecked = $self.prop('checked');
+        var isChecked = $self.prop('checked');
         $checkboxes.prop('checked', isChecked);
         var $groupMembers = $checkboxes.closest('.group__member');
         $groupMembers.toggleClass('checked', isChecked);
@@ -345,12 +345,12 @@
 	
 	$('.modal__edit-group__mass-remove-button').click(function(e) {
 	    e.preventDefault();
-        let $self = $(this);
+        var $self = $(this);
 
-        let url = $self.data('url');
-        let $modal = $('#modal__edit-group');
-        let groupId = $modal.find('input[name="groupId"]').val();
-        let $membersToRemove = $('.modal__edit-group__members').find('.group__member.checked');
+        var url = $self.data('url');
+        var $modal = $('#modal__edit-group');
+        var groupId = $modal.find('input[name="groupId"]').val();
+        var $membersToRemove = $('.modal__edit-group__members').find('.group__member.checked');
         $.ajax({
             type: 'post',
             url: url,
@@ -372,13 +372,13 @@
 
     $('.modal__edit-group__mass-copy-button').click(function(e) {
         e.preventDefault();
-        let $self = $(this);
+        var $self = $(this);
 
-        let url = $self.data('url');
-        let $modal = $('#modal__edit-group');
-        let fromGroupId = $modal.find('input[name="groupId"]').val();
-        let toGroupId = $modal.find('.modal__edit-group__mass-operations').find('select[name="copyToGroupId"]').val();
-        let $membersToCopy = $('.modal__edit-group__members').find('.group__member.checked');
+        var url = $self.data('url');
+        var $modal = $('#modal__edit-group');
+        var fromGroupId = $modal.find('input[name="groupId"]').val();
+        var toGroupId = $modal.find('.modal__edit-group__mass-operations').find('select[name="copyToGroupId"]').val();
+        var $membersToCopy = $('.modal__edit-group__members').find('.group__member.checked');
         $.ajax({
             type: 'post',
             url: url,
@@ -394,7 +394,7 @@
                 return;
             }
 
-            let $status = $('.modal__edit-group__mass-copy-status');
+            var $status = $('.modal__edit-group__mass-copy-status');
             $status.addClass('text-success').text('Скопировано!');
             setTimeout(function () {
                 $status.text('').removeClass('text-success');
@@ -404,9 +404,9 @@
     });
     
     $('.modal__edit-group__mass-operations select[name="copyToGroupId"]').change(function (e) {
-        let $self = $(this);
-        let val = $self.val();
-        let $button = $self.closest('.modal__edit-group__mass-operations').find('.modal__edit-group__mass-copy-button');
+        var $self = $(this);
+        var val = $self.val();
+        var $button = $self.closest('.modal__edit-group__mass-operations').find('.modal__edit-group__mass-copy-button');
         if (val === '-1')
             $button.attr('disabled', 'disabled');
         else

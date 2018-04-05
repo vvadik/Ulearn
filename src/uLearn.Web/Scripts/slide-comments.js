@@ -1,16 +1,16 @@
 /* Set this function as handler for `input` event on textarea */
 function autoEnlargeTextarea() {
-    let $this = $(this);
+    var $this = $(this);
     // Save current height as min height in first time
     if (!$this.data('min-height'))
         $this.data('min-height', parseInt($this.css('height')));
     // By default, max textarea's height is 400px, after it will be scrollable
-    let maxHeight = $this.data('max-height') ? $this.data('max-height') : 400;
+    var maxHeight = $this.data('max-height') ? $this.data('max-height') : 400;
 
-    let $clone = $this.clone().css('visibility', 'hidden');
+    var $clone = $this.clone().css('visibility', 'hidden');
     $this.after($clone);
     $clone.css('height', 'auto');
-    let newHeight = Math.max($clone[0].scrollHeight + 5, $this.data('min-height'));
+    var newHeight = Math.max($clone[0].scrollHeight + 5, $this.data('min-height'));
     $clone.remove();
     newHeight = Math.min(newHeight, maxHeight);
     $this.css('height', newHeight + 'px');
@@ -331,7 +331,7 @@ function autoEnlargeTextarea() {
         }
 	};	
 
-    let $comments = $('.comments');
+    var $comments = $('.comments');
     $comments.on('click', '.reply-form input[name=commentText]', expandReplyForm);
 	$comments.on('click', '.comment .comment__likes-count', likeComment);
 	$comments.on('keyup', 'textarea[name=commentText]', onTextareaKeyUp);

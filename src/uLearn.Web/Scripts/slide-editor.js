@@ -128,7 +128,7 @@ function initCodeEditor($parent) {
 			var langId = $el.data("lang");
 			$el.parent().find('.loading-spinner').hide();
 			
-			let theme = 'default';
+			var theme = 'default';
 			if (editable || guest)
 				theme = 'cobalt';
 			
@@ -221,11 +221,11 @@ function initCodeEditor($parent) {
 		});
 	}
 	
-	let collapseCommentForm = function ($textarea, unselectCurrentReview) {
-        let $replyForm = $textarea.closest('.exercise__review__reply-form');
+	var collapseCommentForm = function ($textarea, unselectCurrentReview) {
+        var $replyForm = $textarea.closest('.exercise__review__reply-form');
 
-        let $input = $replyForm.find('input[type="text"]');
-        let $footer = $replyForm.find('.exercise__review__reply-footer');
+        var $input = $replyForm.find('input[type="text"]');
+        var $footer = $replyForm.find('.exercise__review__reply-footer');
         $textarea.hide();
         $footer.hide();
         $input.show();
@@ -234,7 +234,7 @@ function initCodeEditor($parent) {
         	unselectAllReviews();
     };
 
-    let $exerciseReviews = $('.exercise__reviews');
+    var $exerciseReviews = $('.exercise__reviews');
     
     $exerciseReviews.on('click', '.exercise__review', function () {
 		if (!$exerciseCodeBlock)
@@ -276,28 +276,28 @@ function initCodeEditor($parent) {
 	});
 	
 	$exerciseReviews.on('focus', '.exercise__review__reply-form input[type="text"]', function (e) {		
-		let $self = $(this);
-		let $replyForm = $self.closest('.exercise__review__reply-form');
+		var $self = $(this);
+		var $replyForm = $self.closest('.exercise__review__reply-form');
 		$self.hide();
 		
-		let $textarea = $replyForm.find('textarea');
-		let $footer = $replyForm.find('.exercise__review__reply-footer');
+		var $textarea = $replyForm.find('textarea');
+		var $footer = $replyForm.find('.exercise__review__reply-footer');
 		$textarea.show().focus();
 		$footer.show();
 
-        let $button = $replyForm.find('.exercise__review__reply-button button');
+        var $button = $replyForm.find('.exercise__review__reply-button button');
 		$button.attr('disabled', 'disabled');
 		
-		let $review = $self.closest('.exercise__review');
+		var $review = $self.closest('.exercise__review');
         selectReview($review);
 
         placeCodeReviews();
     });
 
     $exerciseReviews.on('keyup', '.exercise__review__reply-form textarea', function (e) {
-        let $self = $(this);
-        let $replyForm = $self.closest('.exercise__review__reply-form');
-        let $button = $replyForm.find('.exercise__review__reply-button button');
+        var $self = $(this);
+        var $replyForm = $self.closest('.exercise__review__reply-form');
+        var $button = $replyForm.find('.exercise__review__reply-button button');
         
         if ($self.val() === '')
         	$button.attr('disabled', 'disabled');
@@ -314,7 +314,7 @@ function initCodeEditor($parent) {
     });
 	
     $exerciseReviews.on('blur', '.exercise__review__reply-form textarea', function (e) {
-        let $self = $(this);
+        var $self = $(this);
                
         if ($self.val() !== '')
         	return;
@@ -329,20 +329,20 @@ function initCodeEditor($parent) {
     $exerciseReviews.on('click', '.exercise__review__reply-button button', function (e) {
     	e.preventDefault();
     	
-		let $self = $(this);
-        let $replyForm = $self.closest('.exercise__review__reply-form');
-        let $textarea = $replyForm.find('textarea');
+		var $self = $(this);
+        var $replyForm = $self.closest('.exercise__review__reply-form');
+        var $textarea = $replyForm.find('textarea');
         
-        let reviewId = $self.data('id');
-        let url = $self.data('url');
-        let token = $('input[name="__RequestVerificationToken"]').val();
+        var reviewId = $self.data('id');
+        var url = $self.data('url');
+        var token = $('input[name="__RequestVerificationToken"]').val();
         $.post(url, {
             __RequestVerificationToken: token,
 			reviewId: reviewId,
 			text: $textarea.val(),
         }, function (data) {
-         	let $review = $self.closest('.exercise__review');
-         	let $place = $review.find('.exercise__review__new-comment-place');
+         	var $review = $self.closest('.exercise__review');
+         	var $place = $review.find('.exercise__review__new-comment-place');
          	$(data).insertBefore($place);
          	$textarea.val('');
          	/* Return height of textarea*/
@@ -356,11 +356,11 @@ function initCodeEditor($parent) {
 		e.preventDefault();
 		e.stopPropagation();
 		
-		let $self = $(this);
-		let $comment = $self.closest('.exercise__review-comment');
+		var $self = $(this);
+		var $comment = $self.closest('.exercise__review-comment');
 
-        let url = $self.data('url');
-        let token = $('input[name="__RequestVerificationToken"]').val();
+        var url = $self.data('url');
+        var token = $('input[name="__RequestVerificationToken"]').val();
         $.post(url, {
             __RequestVerificationToken: token,
         }, function (data) {
@@ -388,31 +388,31 @@ function createMarkTextForReview($review) {
 }
 
 function placeCodeReviews() {
-    let $reviews = $('.exercise__reviews .exercise__review');    
-    let $exerciseReviews = $('.exercise__reviews');
+    var $reviews = $('.exercise__reviews .exercise__review');    
+    var $exerciseReviews = $('.exercise__reviews');
     
     if ($reviews.length === 0 || $exerciseReviews.length === 0)
         return;
     
-    let startHeight = $exerciseReviews.offset().top;
-    let lastReviewBottomHeight = 0;
+    var startHeight = $exerciseReviews.offset().top;
+    var lastReviewBottomHeight = 0;
     $reviews.each(function() {
-        let $review = $(this);
-        let startLine = $review.data('startLine');
-        let startPosition = $review.data('startPosition');
-        let minHeight = exerciseCodeDoc.cm.charCoords({line: startLine, ch: startPosition}, 'local').top;
-        let offset = Math.max(5, minHeight - lastReviewBottomHeight);
+        var $review = $(this);
+        var startLine = $review.data('startLine');
+        var startPosition = $review.data('startPosition');
+        var minHeight = exerciseCodeDoc.cm.charCoords({line: startLine, ch: startPosition}, 'local').top;
+        var offset = Math.max(5, minHeight - lastReviewBottomHeight);
         $review.css('marginTop', offset + 'px');
 
 		lastReviewBottomHeight = $review.offset().top + $review.outerHeight() - startHeight;
 	});
 
     /* Make codemirror window and reviews panel equal by heights */
-	let exerciseBlockHeight = $(exerciseCodeDoc.getEditor().display.wrapper).outerHeight();
+	var exerciseBlockHeight = $(exerciseCodeDoc.getEditor().display.wrapper).outerHeight();
 	$exerciseReviews.css('minHeight', exerciseBlockHeight + 'px');
-	let $codeMirrorSizer = $(exerciseCodeDoc.getEditor().display.sizer);
-	let currentSizerHeight = parseInt($codeMirrorSizer.css('minHeight'));
-	let exerciseReviewsHeight = $exerciseReviews.outerHeight();
+	var $codeMirrorSizer = $(exerciseCodeDoc.getEditor().display.sizer);
+	var currentSizerHeight = parseInt($codeMirrorSizer.css('minHeight'));
+	var exerciseReviewsHeight = $exerciseReviews.outerHeight();
 	$codeMirrorSizer.css('height', Math.max(currentSizerHeight, exerciseReviewsHeight) + 'px');
 
 	/* New reviews can be added so we need to call .tooltip() again */

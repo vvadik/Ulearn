@@ -1,17 +1,17 @@
 function fetchAntiPlagiarismStatus($plagiarismStatus) {
     $plagiarismStatus.removeClass('found-level0 found-level1 found-level2');
     
-    let url = $plagiarismStatus.data('antiplagiarismUrl');
+    var url = $plagiarismStatus.data('antiplagiarismUrl');
     $.getJSON(url, function (data) {
         $plagiarismStatus.addClass('found-level' + data.suspicion_level);
-        let message = '';
+        var message = '';
         switch (data.suspicion_level)
         {
             case 0: message = 'похожих решений не найдено'; break;
             case 1:
             case 2:
-                let singleNumberMessage = 'найдено похожее решение у {count} другого студента. {link}';
-                let pluralNumberMessage = 'найдены похожие решения у {count} других студентов. {link}';
+                var singleNumberMessage = 'найдено похожее решение у {count} другого студента. {link}';
+                var pluralNumberMessage = 'найдены похожие решения у {count} других студентов. {link}';
                 message = data.suspicious_authors_count === 1 ? singleNumberMessage : pluralNumberMessage;
                 break;
         }
@@ -24,20 +24,20 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
 
 $(document).ready(function () {
     $('.antiplagiarism__data').each(function () {
-        let $self = $(this);
-        let originalSubmissionId = $self.data('originalSubmissionId');
-        let plagiarismSubmissionId = $self.data('plagiarismSubmissionId');
+        var $self = $(this);
+        var originalSubmissionId = $self.data('originalSubmissionId');
+        var plagiarismSubmissionId = $self.data('plagiarismSubmissionId');
 
-        let $originalSubmission = $('.code[data-submission-id="' + originalSubmissionId + '"]');
-        let $plagiarismSubmission = $('.code[data-submission-id="' + plagiarismSubmissionId + '"]');
-        let originalCodeMirror = $originalSubmission[0].codeMirrorEditor;
-        let plagiarismCodeMirror = $plagiarismSubmission[0].codeMirrorEditor;
+        var $originalSubmission = $('.code[data-submission-id="' + originalSubmissionId + '"]');
+        var $plagiarismSubmission = $('.code[data-submission-id="' + plagiarismSubmissionId + '"]');
+        var originalCodeMirror = $originalSubmission[0].codeMirrorEditor;
+        var plagiarismCodeMirror = $plagiarismSubmission[0].codeMirrorEditor;
         
-        let antiplagiarismData = JSON.parse($self[0].innerHTML);       
-        let plagiarismData = antiplagiarismData.plagiarism;
+        var antiplagiarismData = JSON.parse($self[0].innerHTML);       
+        var plagiarismData = antiplagiarismData.plagiarism;
 
-        let originalTokens = getTokensDictionaryByIndex(antiplagiarismData.tokens_positions);
-        let plagiarismTokens = getTokensDictionaryByIndex(plagiarismData.tokens_positions);
+        var originalTokens = getTokensDictionaryByIndex(antiplagiarismData.tokens_positions);
+        var plagiarismTokens = getTokensDictionaryByIndex(plagiarismData.tokens_positions);
        
         highlightNotAnalyzedParts(originalCodeMirror, antiplagiarismData.analyzed_code_units, originalTokens);
         highlightNotAnalyzedParts(plagiarismCodeMirror, plagiarismData.analyzed_code_units, plagiarismTokens);
@@ -47,7 +47,7 @@ $(document).ready(function () {
 
     function getRandomColor() {
         // 30 random hues with step of 12 degrees
-        let hue = Math.floor(Math.random() * 30) * 12;
+        var hue = Math.floor(Math.random() * 30) * 12;
 
         return $.Color({
             hue: hue,
@@ -58,7 +58,7 @@ $(document).ready(function () {
     }
     
     function getTokensDictionaryByIndex(tokensPositionsArray) {
-        let result = {};
+        var result = {};
         $.each(tokensPositionsArray, function (idx, tokenInfo) {
             result[tokenInfo.token_index] = tokenInfo;
             result[tokenInfo.token_index].finish_position = tokenInfo.start_position + tokenInfo.length;
@@ -67,28 +67,28 @@ $(document).ready(function () {
     }
     
     function highlightNotAnalyzedParts(codeMirrorEditor, analyzedCodeUnits, tokens) {
-        let document = codeMirrorEditor.getDoc();
+        var document = codeMirrorEditor.getDoc();
 
-        let highlightedTokes = [];
+        var highlightedTokes = [];
         $.each(analyzedCodeUnits, function (idx, codeUnit) {
-            let firstTokenIndex = codeUnit.first_token_index;
-            let lastTokenIndex = codeUnit.first_token_index + codeUnit.tokens_count - 1;
-            for (let tokenIndex = firstTokenIndex; tokenIndex <= lastTokenIndex; tokenIndex++)
+            var firstTokenIndex = codeUnit.first_token_index;
+            var lastTokenIndex = codeUnit.first_token_index + codeUnit.tokens_count - 1;
+            for (var tokenIndex = firstTokenIndex; tokenIndex <= lastTokenIndex; tokenIndex++)
                 highlightedTokes.push(tokenIndex);
         });
         highlightedTokes.sort(function (a, b) {
             return a - b;
         });
         
-        let textMarkerOptions = {
+        var textMarkerOptions = {
             className: 'antiplagiarism__not-analyzed',
             title: 'Эта часть кода не анализируется на списывание',
         };
 
-        let currentHighlightStart = 0;
-        for (let idx = 0; idx < highlightedTokes.length; idx++) {
+        var currentHighlightStart = 0;
+        for (var idx = 0; idx < highlightedTokes.length; idx++) {
             if (idx === 0 || highlightedTokes[idx - 1] < highlightedTokes[idx] - 1) {
-                let currentHighlightFinish = tokens[highlightedTokes[idx]].start_position;
+                var currentHighlightFinish = tokens[highlightedTokes[idx]].start_position;
                 if (currentHighlightStart !== currentHighlightFinish) {  
                     document.markText(
                         document.posFromIndex(currentHighlightStart),
@@ -109,15 +109,15 @@ $(document).ready(function () {
     }
     
     function highlightMatchedTokensInSubmission(matchedSnippets, codeMirrorEditor, tokens, firstTokenIndexSelector) {
-        let tokensPlagiarismTypes = {};
-        let maxTokenIndex = 0;
+        var tokensPlagiarismTypes = {};
+        var maxTokenIndex = 0;
         $.each(matchedSnippets, function (idx, matchedSnippet) {
-            let snippetType = matchedSnippet.snippet_type;
-            for (let tokenIndex = matchedSnippet[firstTokenIndexSelector];
+            var snippetType = matchedSnippet.snippet_type;
+            for (var tokenIndex = matchedSnippet[firstTokenIndexSelector];
                  tokenIndex < matchedSnippet[firstTokenIndexSelector] + matchedSnippet.snippet_tokens_count;
                  tokenIndex++) {
-                let oldValue = tokensPlagiarismTypes[tokenIndex];
-                let newValue = snippetType;
+                var oldValue = tokensPlagiarismTypes[tokenIndex];
+                var newValue = snippetType;
                 if (oldValue === undefined || (newValue === 'tokensKindsAndValues'))
                     tokensPlagiarismTypes[tokenIndex] = newValue;
                 
@@ -126,10 +126,10 @@ $(document).ready(function () {
             }
         });
 
-        let document = codeMirrorEditor.getDoc();
-        let currentStart = 0, currentFinish = 0, currentPlagiarismType = '';
+        var document = codeMirrorEditor.getDoc();
+        var currentStart = 0, currentFinish = 0, currentPlagiarismType = '';
 
-        let hightlightCurrentTokensSequence = function() {
+        var hightlightCurrentTokensSequence = function() {
             document.markText(
                 document.posFromIndex(currentStart),
                 document.posFromIndex(currentFinish),
@@ -142,7 +142,7 @@ $(document).ready(function () {
             );
         };
         
-        for (let tokenIndex = 0; tokenIndex <= maxTokenIndex; tokenIndex++) {
+        for (var tokenIndex = 0; tokenIndex <= maxTokenIndex; tokenIndex++) {
             if (! (tokenIndex in tokensPlagiarismTypes)) {
                 hightlightCurrentTokensSequence();
             } else if (! (tokenIndex - 1 in tokensPlagiarismTypes)) {
@@ -168,9 +168,9 @@ $(document).ready(function () {
     
     /* Changing submission on panel */
     $('.antiplagiarism__submissions-panel [name="submissionId"]').change(function () {
-        let $self = $(this);
+        var $self = $(this);
         $('.antiplagiarism').hide();
-        let $form = $self.closest('form');        
+        var $form = $self.closest('form');        
         $form.submit();
     });
 });
