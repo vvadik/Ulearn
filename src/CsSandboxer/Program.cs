@@ -79,7 +79,7 @@ namespace CsSandboxer
 			var permSet = new PermissionSet(PermissionState.None);
 			permSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, assemblyPath));
 			permSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.PathDiscovery, assemblyPath));
-			permSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.PathDiscovery, Path.GetDirectoryName(typeof(Sandboxer).Assembly.Location)));
+			permSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.PathDiscovery, Environment.CurrentDirectory));
 			permSet.AddPermission(new EnvironmentPermission(EnvironmentPermissionAccess.Read, "InsideSandbox"));
 			
 			/*
