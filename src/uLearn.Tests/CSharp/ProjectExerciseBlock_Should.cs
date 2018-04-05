@@ -50,6 +50,7 @@ namespace uLearn.CSharp
 			TestsHelper.RecreateDirectory(studentExerciseFolderPath);
 
 			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
+			File.WriteAllText("test_debug.txt", "");
 
 			ex = new ProjectExerciseBlock
 			{

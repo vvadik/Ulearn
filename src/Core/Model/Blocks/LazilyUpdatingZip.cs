@@ -51,8 +51,7 @@ namespace uLearn.Model.Blocks
 						$"LazilyUpdatingZip: file to add: {fileToAdd.Path}, content size if {fileToAdd.Data.Length} (I am building archive from {dir})\n"
 					);
 					
-					var relativePath = dir.GetFile(fileToAdd.Path).GetRelativePath(dir.FullName);
-					var directoriesList = GetDirectoriesList(new FileInfo(relativePath));
+					var directoriesList = GetDirectoriesList(new FileInfo(fileToAdd.Path), dir);
 					if (!excludedDirs.Intersect(directoriesList).Any())
 						zip.UpdateEntry(fileToAdd.Path, fileToAdd.Data);
 				}
@@ -60,10 +59,10 @@ namespace uLearn.Model.Blocks
 			}
 		}
 
-		public static IEnumerable<string> GetDirectoriesList(FileInfo file)
+		public static IEnumerable<string> GetDirectoriesList(FileInfo file, DirectoryInfo untilDirectory)
 		{
 			var currentDirectory = file.Directory;
-			while (!string.IsNullOrEmpty(currentDirectory?.FullName))
+			while (!string.IsNullOrEmpty(currentDirectory?.FullName) && currentDirectory?.FullName != untilDirectory.FullName)
 			{
 				yield return currentDirectory.Name;
 				currentDirectory = currentDirectory.Parent;
@@ -100,7 +99,7 @@ namespace uLearn.Model.Blocks
 		public void TestGetDirectoriesList()
 		{
 			const string fileName = "directory-1/directory-2/subdirectory/file.txt";
-			var directories = LazilyUpdatingZip.GetDirectoriesList(new FileInfo(fileName)).ToList();
+			var directories = LazilyUpdatingZip.GetDirectoriesList(new FileInfo(fileName), new DirectoryInfo("/")).ToList();
 			CollectionAssert.Contains(directories, "directory-1");
 			CollectionAssert.Contains(directories, "directory-2");
 			CollectionAssert.Contains(directories, "subdirectory");
