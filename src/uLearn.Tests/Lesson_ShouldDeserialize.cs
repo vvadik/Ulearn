@@ -12,6 +12,12 @@ namespace uLearn
 	[TestFixture]
 	public class Lesson_ShouldDeserialize
 	{
+		[OneTimeSetUp]
+		public void OneTimeSetup()
+		{
+			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
+		}
+		
 		[Test]
 		public void SimpleMdBlock()
 		{
