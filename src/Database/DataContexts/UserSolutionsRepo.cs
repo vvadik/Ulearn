@@ -30,8 +30,8 @@ namespace Database.DataContexts
 		private readonly VisitsRepo visitsRepo;
 		private readonly CourseManager courseManager;
 
-		private static readonly ConcurrentDictionary<int, DateTime> unhandledSubmissions = new ConcurrentDictionary<int, DateTime>();
-		private static readonly ConcurrentDictionary<int, DateTime> handledSubmissions = new ConcurrentDictionary<int, DateTime>();
+		private static readonly volatile ConcurrentDictionary<int, DateTime> unhandledSubmissions = new ConcurrentDictionary<int, DateTime>();
+		private static readonly volatile ConcurrentDictionary<int, DateTime> handledSubmissions = new ConcurrentDictionary<int, DateTime>();
 		private static readonly TimeSpan handleTimeout = TimeSpan.FromMinutes(3);
 
 		public UserSolutionsRepo(ULearnDb db, CourseManager courseManager)
@@ -289,7 +289,7 @@ namespace Database.DataContexts
 			return submission;
 		}
 
-		private static readonly SemaphoreSlim getSubmissionsSemaphore = new SemaphoreSlim(1);
+		private static readonly volatile SemaphoreSlim getSubmissionsSemaphore = new SemaphoreSlim(1);
 
 		public async Task<List<UserExerciseSubmission>> GetUnhandledSubmissions(int count)
 		{
@@ -340,9 +340,8 @@ namespace Database.DataContexts
 				db.ObjectContext().AcceptAllChanges();
 			}
 
-			DateTime value;
 			foreach (var submission in submissions)
-				unhandledSubmissions.TryRemove(submission.Id, out value);
+				unhandledSubmissions.TryRemove(submission.Id, out _);
 
 			return submissions;
 		}

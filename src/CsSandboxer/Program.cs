@@ -92,7 +92,7 @@ namespace CsSandboxer
 				SecurityPermissionFlag.Execution |                  // Required to execute test code
 				SecurityPermissionFlag.SerializationFormatter       // Required to support cross-appdomain test result formatting by NUnit TestContext
 			));
-			/* In .NET < 3.5 add following EnvironmentPermission:
+			/* In .NET <= 3.5 add following EnvironmentPermission:
 			permSet.AddPermission(new EnvironmentPermission(PermissionState.Unrestricted)); // Required for NUnit.Framework.Assert.GetStackTrace()
 			*/ 
 

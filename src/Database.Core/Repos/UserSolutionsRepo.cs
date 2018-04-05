@@ -24,8 +24,8 @@ namespace Database.Repos
 		private readonly VisitsRepo visitsRepo;
 		private readonly WebCourseManager courseManager;
 
-		private static readonly ConcurrentDictionary<int, DateTime> unhandledSubmissions = new ConcurrentDictionary<int, DateTime>();
-		private static readonly ConcurrentDictionary<int, DateTime> handledSubmissions = new ConcurrentDictionary<int, DateTime>();
+		private static readonly volatile ConcurrentDictionary<int, DateTime> unhandledSubmissions = new ConcurrentDictionary<int, DateTime>();
+		private static readonly volatile ConcurrentDictionary<int, DateTime> handledSubmissions = new ConcurrentDictionary<int, DateTime>();
 		private static readonly TimeSpan handleTimeout = TimeSpan.FromMinutes(3);
 
 		public UserSolutionsRepo(
@@ -283,7 +283,7 @@ namespace Database.Repos
 			return submission;
 		}
 
-		private static readonly SemaphoreSlim getSubmissionsSemaphore = new SemaphoreSlim(1);
+		private static readonly volatile SemaphoreSlim getSubmissionsSemaphore = new SemaphoreSlim(1);
 
 		public async Task<List<UserExerciseSubmission>> GetUnhandledSubmissions(int count)
 		{
