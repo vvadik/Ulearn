@@ -5,11 +5,13 @@
 		var $self = $(this);
 		var addReviewUrl = $self.data('url');
 
-		$self.find('.exercise__close-review').click(function(e) {
-			$self.hide();
-			$self.closest('.exercise').find('.code')[0].codeMirrorEditor.focus();
-			e.preventDefault();
-		});
+		var closeReviewForm = function(e) {
+            $self.hide();
+            $self.closest('.exercise').find('.code')[0].codeMirrorEditor.focus();
+            e.preventDefault();
+        };
+		
+		$self.find('.exercise__close-review').click(closeReviewForm);
 		$self.find('.exercise__add-review__comment').on('input', function () {
 			if ($(this).val() === '')
 				$self.find('.exercise__add-review__button').attr('disabled', 'disabled');
@@ -36,11 +38,14 @@
 			});
 		});
 
-		/* Trigger button clock on Ctrl + Enter */
+		/* Trigger button clock on Ctrl + Enter, process Escape key */
 		$self.find('.exercise__add-review__comment').keydown(function(e) {
 			if (e.ctrlKey && e.keyCode === 13) {
 				$self.find('.exercise__add-review__button').trigger('click');
 			}
+			if (e.keyCode === 27) { // Escape
+				closeReviewForm(e);	
+            }			
 		});
 	});
 

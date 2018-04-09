@@ -289,6 +289,10 @@ namespace uLearn.Web.Controllers
 			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId) as ExerciseSlide;
+			if (slide == null)
+				return new HttpStatusCodeResult(HttpStatusCode.NotFound);
+
 			if (!ignoreNewestSubmission && !updateCheckingId.HasValue)
 			{
 				var lastAcceptedSubmission = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).OrderByDescending(s => s.Timestamp).FirstOrDefault();
@@ -324,6 +328,10 @@ namespace uLearn.Web.Controllers
 				checking = await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, submission);
 			await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId());
 			await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, exerciseScore);
+			/* 100%-mark sets ProhibitFurtherChecking to true */
+			if (exerciseScore == slide.Exercise.MaxReviewScore)
+				await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking);
+			
 			await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 
 			await NotifyAboutManualExerciseChecking(checking);

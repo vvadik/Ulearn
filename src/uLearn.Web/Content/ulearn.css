@@ -2216,6 +2216,10 @@ h1 .copy-group-link {
 	margin-right: 10px;
 }
 
+.exercise__score .exercise__other-score-container {
+	vertical-align: middle;
+}
+
 .exercise__score input {
 	display: inline-block;
 	width: auto;

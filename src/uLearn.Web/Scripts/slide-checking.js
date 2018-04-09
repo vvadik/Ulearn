@@ -12,13 +12,13 @@
 			$lock.animate({ left: 15 });
 			$lock.closest('.user-submission').find('.status').text('');
 		}, 8000);
-	}
+	};
 
 	var clearLockTimeout = function ($lock) {
 		var lockTimeout = $lock[0].lockTimeout;
 		if (lockTimeout)
 			clearTimeout(lockTimeout);
-	}
+	};
 
 	var sendSimpleScore = function ($scoreForm, ignoreNewestSubmission) {
 		ignoreNewestSubmission = ignoreNewestSubmission || false;
@@ -69,7 +69,7 @@
 		}).always(function() {
 			$status.removeClass('waiting');
 		});
-	}
+	};
 
 	$scoreBlock.on('click', '.simple-score-link', function(e) {
 		e.preventDefault();
@@ -92,6 +92,10 @@
 		$otherScoreInput.show();
 		$otherScoreInput.focus();
 		$otherScoreLink.addClass('active');
+
+        /* Restore prohibitFurtherReview checkbox state */
+        var $checkbox = $exerciseScoreForm.closest('.exercise').find('[name="prohibitFurtherReview"]');
+        $checkbox.prop('checked', $checkbox.data('initial-state'));
 	});
 
 	$scoreBlock.find('.btn-group').on('click', '.btn', function () {
@@ -112,6 +116,17 @@
 			$otherScoreInput.hide();
 			$otherScoreLink.removeClass('active');
 			$otherScoreInput.val(wasActive ? "" : $self.data('value'));
+			
+			/* Clicking on button "100%" makes prohibitFurtherReview checkbox checked. */
+            var $checkbox = $exerciseScoreForm.closest('.exercise').find('[name="prohibitFurtherReview"]');
+			if ($self.data('percent') === 100) {
+				/* Remember checkbox state before changing */
+				$checkbox.data('initial-state', $checkbox.prop('checked'));
+				$checkbox.prop('checked', true);
+			} else {
+				/* Restore checkbox state */
+				$checkbox.prop('checked', $checkbox.data('initial-state'));				
+			}
 		}
 	});
 
