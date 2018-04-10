@@ -48,6 +48,7 @@ namespace uLearn.Web.Controllers
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly SystemAccessesRepo systemAccessesRepo;
 		private readonly StyleErrorsRepo styleErrorsRepo;
+		private readonly CertificateGenerator certificateGenerator;
 
 		public AdminController()
 		{
@@ -62,11 +63,13 @@ namespace uLearn.Web.Controllers
 			groupsRepo = new GroupsRepo(db, courseManager);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
-			certificatesRepo = new CertificatesRepo(db, courseManager);
+			certificatesRepo = new CertificatesRepo(db);
 			additionalScoresRepo = new AdditionalScoresRepo(db);
 			notificationsRepo = new NotificationsRepo(db);
 			systemAccessesRepo = new SystemAccessesRepo(db);
 			styleErrorsRepo = new StyleErrorsRepo(db);
+			
+			certificateGenerator = new CertificateGenerator(db, courseManager);
 		}
 
 		public ActionResult CourseList(string courseCreationLastTry = null)
@@ -1148,7 +1151,7 @@ namespace uLearn.Web.Controllers
 			var certificates = certificatesRepo.GetCertificates(courseId);
 			var templateParameters = certificateTemplates.ToDictionary(
 				kv => kv.Key,
-				kv => certificatesRepo.GetTemplateParametersWithoutBuiltins(kv.Value).ToList()
+				kv => certificateGenerator.GetTemplateParametersWithoutBuiltins(kv.Value).ToList()
 			);
 
 			return View(new CertificatesViewModel
@@ -1181,7 +1184,7 @@ namespace uLearn.Web.Controllers
 		private string SaveUploadedTemplate(HttpPostedFileBase archive)
 		{
 			var archiveName = Utils.NewNormalizedGuid();
-			var templateArchivePath = certificatesRepo.GetTemplateArchivePath(archiveName);
+			var templateArchivePath = certificateGenerator.GetTemplateArchivePath(archiveName);
 			try
 			{
 				archive.SaveAs(templateArchivePath.FullName);
@@ -1264,7 +1267,7 @@ namespace uLearn.Web.Controllers
 
 		private Dictionary<string, string> GetCertificateParametersFromRequest(CertificateTemplate template)
 		{
-			var templateParameters = certificatesRepo.GetTemplateParametersWithoutBuiltins(template);
+			var templateParameters = certificateGenerator.GetTemplateParametersWithoutBuiltins(template);
 			var certificateParameters = new Dictionary<string, string>();
 			foreach (var parameter in templateParameters)
 			{
@@ -1307,8 +1310,8 @@ namespace uLearn.Web.Controllers
 			if (template == null || ! template.CourseId.EqualsIgnoreCase(courseId))
 				return HttpNotFound();
 
-			var notBuiltinTemplateParameters = certificatesRepo.GetTemplateParametersWithoutBuiltins(template).ToList();
-			var builtinTemplateParameters = certificatesRepo.GetBuiltinTemplateParameters(template).ToList();
+			var notBuiltinTemplateParameters = certificateGenerator.GetTemplateParametersWithoutBuiltins(template).ToList();
+			var builtinTemplateParameters = certificateGenerator.GetBuiltinTemplateParameters(template).ToList();
 			builtinTemplateParameters.Sort();
 
 			var model = new PreviewCertificatesViewModel
@@ -1399,7 +1402,7 @@ namespace uLearn.Web.Controllers
 			if (template == null || ! template.CourseId.EqualsIgnoreCase(courseId))
 				return HttpNotFound();
 
-			var templateParameters = certificatesRepo.GetTemplateParametersWithoutBuiltins(template).ToList();
+			var templateParameters = certificateGenerator.GetTemplateParametersWithoutBuiltins(template).ToList();
 			var certificateRequests = new List<CertificateRequest>();
 
 			for (var certificateIndex = 0; certificateIndex < maxCertificateId; certificateIndex++)
@@ -1445,10 +1448,10 @@ namespace uLearn.Web.Controllers
 			var instructor = await userManager.FindByIdAsync(User.Identity.GetUserId());
 			var course = courseManager.GetCourse(courseId);
 
-			var builtinParameters = certificatesRepo.GetBuiltinTemplateParameters(template);
+			var builtinParameters = certificateGenerator.GetBuiltinTemplateParameters(template);
 			var builtinParametersValues = builtinParameters.ToDictionary(
 				p => p,
-				p => certificatesRepo.GetTemplateBuiltinParameterForUser(template, course, user, instructor, p)
+				p => certificateGenerator.GetTemplateBuiltinParameterForUser(template, course, user, instructor, p)
 			);
 
 			return Json(builtinParametersValues, JsonRequestBehavior.AllowGet);

@@ -41,7 +41,7 @@ namespace uLearn.Web.Controllers
 		{
 			userRolesRepo = new UserRolesRepo(db);
 			groupsRepo = new GroupsRepo(db, courseManager);
-			certificatesRepo = new CertificatesRepo(db, courseManager);
+			certificatesRepo = new CertificatesRepo(db);
 			visitsRepo = new VisitsRepo(db);
 			notificationsRepo = new NotificationsRepo(db);
 			coursesRepo = new CoursesRepo(db);
