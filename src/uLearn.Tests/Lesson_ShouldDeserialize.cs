@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Xml.Serialization;
 using FluentAssertions;
 using NUnit.Framework;
 using uLearn.Model;
@@ -78,6 +80,20 @@ namespace uLearn
 			((ProjectExerciseBlock)ex).UserCodeFilePath.Should().Be("user-code-name-111");
 		}
 
+		[Test]
+		public void ExerciseHints()
+		{
+			var ex = DeserializeLesson("<proj-exercise>" +
+										"<hint>Hint 1</hint>" +
+										"<hint>Hint 2</hint>" +
+										"</proj-exercise>").Blocks.Single() as ProjectExerciseBlock;
+			if (ex == null)
+				Assert.Fail("Can't parse exercise with hints");
+			ex.Hints.Should().HaveCount(2);
+			ex.Hints.Should().Contain(new List<string> { "Hint 1", "Hint 2" });
+			ex.HintsMd.Should().HaveSameCount(ex.Hints);
+		}
+
 		private static Lesson DeserializeLesson(string blocksXml)
 		{
 			var input = $@"
@@ -96,4 +112,5 @@ namespace uLearn
 			return blocks.SelectMany(b => b.BuildUp(buildUpContext, ImmutableHashSet<string>.Empty)).ToArray();
 		}
 	}
+	
 }

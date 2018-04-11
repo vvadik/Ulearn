@@ -35,7 +35,7 @@ namespace uLearn.Model.Blocks
 			get => ExerciseInitialCode;
 			set => ExerciseInitialCode = value;
 		}
-
+		
 		[XmlElement("hint")]
 		public List<string> Hints { get; set; }
 
@@ -70,8 +70,10 @@ namespace uLearn.Model.Blocks
 		[XmlElement("scoring-group")]
 		public string ScoringGroup { get; set; }
 
+		[XmlIgnore]
 		public int MaxReviewScore => MaxScore - CorrectnessScore;
 
+		[XmlIgnore]
 		public List<string> HintsMd
 		{
 			get
