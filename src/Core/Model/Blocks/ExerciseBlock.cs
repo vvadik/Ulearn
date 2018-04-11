@@ -80,7 +80,6 @@ namespace uLearn.Model.Blocks
 			{
 				return Hints = Hints?.Select(h => h.RemoveCommonNesting()).ToList() ?? new List<string>();
 			}
-			set { Hints = value; }
 		}
 
 		public abstract string GetSourceCode(string code);
