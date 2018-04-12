@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -78,7 +79,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		private async Task<SnippetStatistics> GetOrAddSnippetStatisticsAsync(Snippet snippet, Guid taskId, int clientId)
 		{
-			using (var transaction = db.Database.BeginTransaction())
+			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted))
 			{
 				var foundStatistics = await db.SnippetsStatistics.SingleOrDefaultAsync(
 					s => s.SnippetId == snippet.Id &&
@@ -103,7 +104,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		private async Task<Snippet> GetOrAddSnippetAsync(Snippet snippet)
 		{
-			using (var transaction = db.Database.BeginTransaction())
+			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted))
 			{
 				var foundSnippet = await db.Snippets.SingleOrDefaultAsync(
 					s => s.SnippetType == snippet.SnippetType

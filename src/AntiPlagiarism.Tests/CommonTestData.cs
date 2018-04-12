@@ -1,6 +1,6 @@
 ﻿namespace AntiPlagiarism.Tests
 {
-	public static class TestData
+	public static class CommonTestData
 	{
 		public const string SimpleProgramWithMethodAndProperty = @"using System;
 using System.Collections;

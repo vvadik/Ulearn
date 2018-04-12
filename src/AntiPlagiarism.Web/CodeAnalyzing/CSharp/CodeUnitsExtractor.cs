@@ -6,6 +6,7 @@ using AntiPlagiarism.Web.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using uLearn.CSharp;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
 {
@@ -40,10 +41,13 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
 			codeUnits.AddRange(GetCodeUnitsFromChilds(obj as ClassDeclarationSyntax, currentCodePath, z => z.Members));
 			codeUnits.AddRange(GetCodeUnitsFromChilds(obj as PropertyDeclarationSyntax, currentCodePath, PropertyEnumerator));
 			codeUnits.AddRange(GetCodeUnitsFromChilds(obj as MethodDeclarationSyntax, currentCodePath, MethodEnumerator));
+			codeUnits.AddRange(GetCodeUnitsFromChilds(obj as ConstructorDeclarationSyntax, currentCodePath, MethodEnumerator));
+			codeUnits.AddRange(GetCodeUnitsFromChilds(obj as OperatorDeclarationSyntax, currentCodePath, MethodEnumerator));
 
 			codeUnits.AddRange(GetCodeUnitFrom(obj as AccessorDeclarationSyntax, currentCodePath, z => z.Body));
 			codeUnits.AddRange(GetCodeUnitFrom(obj as ArrowExpressionClauseSyntax, currentCodePath, z => z.Expression));
 			codeUnits.AddRange(GetCodeUnitFrom(obj as BlockSyntax, currentCodePath, z => z));
+			codeUnits.AddRange(GetCodeUnitFrom(obj as ConstructorInitializerSyntax, currentCodePath, z => z));
 
 			return codeUnits;
 		}
@@ -100,16 +104,15 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
             }
         }
 
-		private static IEnumerable<CSharpSyntaxNode> MethodEnumerator(MethodDeclarationSyntax z)
-        {
+		private static IEnumerable<CSharpSyntaxNode> MethodEnumerator(BaseMethodDeclarationSyntax z)
+		{
+			if (z is ConstructorDeclarationSyntax constructor)
+				yield return constructor.Initializer;
+			
             if (z.Body != null)
-            {
                 yield return z.Body;
-            }
             else if (z.ExpressionBody != null)
-            {
                 yield return z.ExpressionBody;
-            }
         }
 
 		private static string InternalGetNodeName(CompilationUnitSyntax node) => "ROOT";
@@ -117,6 +120,8 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
 		private static string InternalGetNodeName(BaseTypeDeclarationSyntax node) => node.Identifier.ValueText;
 		private static string InternalGetNodeName(PropertyDeclarationSyntax node) => node.Identifier.ValueText;
 		private static string InternalGetNodeName(MethodDeclarationSyntax node) => node.Identifier.ToString();
+		private static string InternalGetNodeName(ConstructorDeclarationSyntax node) => node.Identifier.ToString();
+		private static string InternalGetNodeName(OperatorDeclarationSyntax node) => "Operator" + node.OperatorToken;
 		private static string InternalGetNodeName(CSharpSyntaxNode node) => node.Kind().ToString();
 
 		public static string GetNodeName(SyntaxNode node)

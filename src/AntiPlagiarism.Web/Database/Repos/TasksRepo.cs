@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Data;
 using System.Threading.Tasks;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Ulearn.Common.Extensions;
 
 namespace AntiPlagiarism.Web.Database.Repos
@@ -28,7 +30,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		public async Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
 		{
-			using (var transaction = db.Database.BeginTransaction())
+			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted))
 			{
 				db.AddOrUpdate(parameters, p => p.TaskId == parameters.TaskId);
 				await db.SaveChangesAsync();
