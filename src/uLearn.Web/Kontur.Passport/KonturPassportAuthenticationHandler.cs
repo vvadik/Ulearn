@@ -69,7 +69,7 @@ namespace uLearn.Web.Kontur.Passport
 				identity.AddClaim(new Claim("AvatarUrl", avatarUrl, xmlSchemaForStringType, Options.AuthenticationType));
 				if (realNameParts != null && realNameParts.Length > 0)
 				{
-					/* Suppose that Гейн Андрей Александрович is Surname (Гейн), GiveName (Андрей) and other. So we splitted name from Kontur.Passport into parts */
+					/* Suppose that Гейн Андрей Александрович is Surname (Гейн), GivenName (Андрей) and other. So we splitted name from Kontur.Passport into parts */
 					identity.AddClaim(new Claim(ClaimTypes.Surname, realNameParts[0], xmlSchemaForStringType, Options.AuthenticationType));
 					if (realNameParts.Length > 1)
 						identity.AddClaim(new Claim(ClaimTypes.GivenName, realNameParts[1], xmlSchemaForStringType, Options.AuthenticationType));

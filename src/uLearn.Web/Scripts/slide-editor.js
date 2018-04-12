@@ -73,11 +73,13 @@ function initCodeEditor($parent) {
 	else
 		$exerciseCodeBlock = $('.code-reviewed')[0];
 
-	CodeMirror.commands.autocomplete = function (cm) {
-		cm.showHint({ hint: CodeMirror.hint.csharp });
-	};
+	﻿CodeMirror.commands.autocomplete = function (cm) {        
+        var hint = cm.options.langInfo.hint;
+        if (hint)
+            cm.showHint({ hint: hint });
+    };
 
-	codeMirrorClass($parent.find('.code-exercise'), true, false, false);
+    codeMirrorClass($parent.find('.code-exercise'), true, false, false);
 	codeMirrorClass($parent.find('.code-sample'), false, false, false);    
 	codeMirrorClass($parent.find('.code-guest'), false, true, false);
 	codeMirrorClass($parent.find('.code-review'), false, false, true);
@@ -89,17 +91,35 @@ function initCodeEditor($parent) {
 		exerciseCodeDoc = exerciseCodeEditor.getDoc();
 	}
 
-	function getMode(lang) {
+	function getLangInfo(langId) {
 		// see http://codemirror.net/mode/
 
-		var langIds = {
-			"cs": "x-csharp",
-			"py": "x-python"
-		};
+		if (!langId)
+            return { mode: "text/plain", hint: null };
 
-		lang = lang || "cs";
-		return "text/" + langIds[lang];
-	}
+        switch (langId) {
+            case "cs":
+            case "сsharp":
+                return { mode: "text/x-csharp", hint: CodeMirror.hint.csharp };
+            case "py":
+            case "python":
+                return { mode: "text/x-python", hint: CodeMirror.hint.python };
+            case "js":
+            case "javascript":
+                return { mode: "text/javascript", hint: CodeMirror.hint.javascript };
+            case "ts":
+            case "typescript":
+                return { mode: "text/typescript", hint: CodeMirror.hint.javascript };
+            case "css":
+                return { mode: "text/css", hint: CodeMirror.hint.css };
+            case "html":
+                return { mode: "text/html", hint: CodeMirror.hint.html };
+			case "java":
+				return { mode: "text/x-java", hint: CodeMirror.hint.java };
+            default:
+                return { mode: "text/" + langId, hint: null };
+        }
+    }
 
 	function unselectAllReviews(removeClassSelected) {
 		if (removeClassSelected || "undefined" === typeof(removeClassSelected))
@@ -136,10 +156,14 @@ function initCodeEditor($parent) {
 			var theme = 'default';
 			if (editable || guest)
 				theme = 'cobalt';
-			
-			var editor = CodeMirror.fromTextArea(element,
+
+            var langInfo = getLangInfo(langId);
+            var mac = CodeMirror.keyMap.default === CodeMirror.keyMap.macDefault;
+            var ctrlSpace = (mac ? "Cmd" : "Ctrl") + "-Space";
+            var editor = CodeMirror.fromTextArea(element,
 			{
-				mode: getMode(langId),
+				mode: langInfo.mode,
+				langInfo: langInfo, 
 				lineNumbers: true,
 				theme: theme, 
 				indentWithTabs: true,
@@ -147,7 +171,7 @@ function initCodeEditor($parent) {
 				indentUnit: 4,
 				lineWrapping: true,
 				extraKeys: {
-					"Ctrl-Space": "autocomplete",
+					ctrlSpace: "autocomplete",
 					".": function(cm) {
 						setTimeout(function() { cm.execCommand("autocomplete"); }, 100);
 						return CodeMirror.Pass;

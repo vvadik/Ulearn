@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Lesson xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://ulearn.azurewebsites.net/lesson">
+	<title>Код на джаве</title>
+	<id>C1DA3BA7256142D58F245CCEF2B176A1</id>
+	<default-include-code-file>_Code.java</default-include-code-file>
+	
+	<md>###Весь файл</md>
+	<include-code />
+</Lesson>

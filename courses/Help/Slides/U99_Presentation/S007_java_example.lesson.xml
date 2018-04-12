@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Lesson xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://ulearn.azurewebsites.net/lesson">
+	
+	<title>Первый шаг на джаве</title>
+	<id>{90BCB61E-57F0-4BAA-8BC9-10C9CFD27F5A}</id>
+	<default-include-code-file>_Code.java</default-include-code-file>
+	
+	<md>
+		Любая, даже самая сложная дорога, начинается с первого шага.
+
+		Выведите на консоль фразу `The first step!`
+
+		<code>
+			System.out.println('Участки кода можно вставлять внутрь Markdown-блоков');
+		</code>
+
+		<note>
+			Заметки для преподавателей можно вставлять внутрь Markdown-блоков
+		</note>
+
+		Допишите код функции `Main`, а затем запустите и проверьте ваше решение с помощью кнопки «Отправить».
+	</md>
+	
+	<exercise>
+		<inital-code>            
+			public static void Main()
+			{
+    			// пишите код тут
+			}
+		</inital-code>
+		<hint>Вывод на консоль производится методом ```System.out.println```</hint>
+		<comment>Молодец</comment>
+		<expected>The first step!</expected>
+		<require-review>true</require-review>
+		<scoring-group>homework</scoring-group>
+		<solution>Main</solution>
+	</exercise>
+	
+</Lesson>
