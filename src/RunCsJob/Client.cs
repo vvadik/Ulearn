@@ -22,8 +22,9 @@ namespace RunCsJob
 		private const string instanceIdEnvironmentVariableName = "WEBSITE_INSTANCE_ID";
 		private const string arrAffinityCookieName = "ARRAffinity";
 		private static readonly ILog log = LogManager.GetLogger(typeof(Client));
+		private string clientName;
 
-		public Client(string address, string token)
+		public Client(string address, string token, string clientName)
 		{
 			this.token = token;
 
@@ -39,11 +40,16 @@ namespace RunCsJob
 			var instanceId = Environment.GetEnvironmentVariable(instanceIdEnvironmentVariableName);
 			if (!string.IsNullOrEmpty(instanceId))
 				cookieContainer.Add(baseAddress, new Cookie(arrAffinityCookieName, instanceId));
+
+			this.clientName = clientName;
 		}
 
 		public async Task<List<RunnerSubmission>> TryGetSubmissions(int threadsCount)
 		{
-			var uri = GetUri("GetSubmissions", new[] { "count", threadsCount.ToString(CultureInfo.InvariantCulture) });
+			var uri = GetUri("GetSubmissions", new[]
+			{
+				"count", threadsCount.ToString(CultureInfo.InvariantCulture),
+			});
 			try
 			{
 				log.Info($"Отправляю запрос на {uri}");
@@ -85,6 +91,7 @@ namespace RunCsJob
 		{
 			var query = HttpUtility.ParseQueryString(string.Empty);
 			query["token"] = token;
+			query["client"] = clientName;
 			foreach (var parameter in parameters)
 			{
 				query[parameter[0]] = parameter[1];

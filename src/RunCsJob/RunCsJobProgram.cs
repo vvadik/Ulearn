@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Channels;
@@ -18,6 +19,7 @@ namespace RunCsJob
 		private readonly string token;
 		private readonly TimeSpan sleep;
 		private readonly int jobsToRequest;
+		private readonly string agentName; 
 
 		private readonly ManualResetEvent shutdownEvent = new ManualResetEvent(false);
 		private readonly List<Thread> threads = new List<Thread>();
@@ -44,6 +46,13 @@ namespace RunCsJob
 				var workingDirectory = ConfigurationManager.AppSettings["ulearn.runcsjob.submissionsWorkingDirectory"];
 				if (!string.IsNullOrWhiteSpace(workingDirectory))
 					Settings.WorkingDirectory = new DirectoryInfo(workingDirectory);
+
+				agentName = ConfigurationManager.AppSettings["ulearn.runcsjob.agentName"];
+				if (string.IsNullOrEmpty(agentName))
+				{
+					agentName = Environment.MachineName;
+					log.Info($"Автоопределённое имя клиента: {agentName}. Его можно переопределить в настройках (appSettings/ulearn.runcsjob.agentName)");					
+				}
 			}
 			catch (Exception e)
 			{
@@ -93,7 +102,7 @@ namespace RunCsJob
 			{
 				threads.Add(new Thread(WorkerThread)
 				{
-					Name = $"RunCsJob Worker Thread #{i}",
+					Name = $"RunCsJob Worker #{i}",
 					IsBackground = true
 				});
 			}
@@ -127,10 +136,11 @@ namespace RunCsJob
 
 		private void RunOneThread()
 		{
+			var fullAgentName = $"{agentName}:Process={Process.GetCurrentProcess().Id}:ThreadId={Thread.CurrentThread.ManagedThreadId}:Thread={Thread.CurrentThread.Name}";
 			Client client;
 			try
 			{
-				client = new Client(address, token);
+				client = new Client(address, token, fullAgentName);
 			}
 			catch (Exception e)
 			{
