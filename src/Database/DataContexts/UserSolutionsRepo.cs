@@ -46,6 +46,7 @@ namespace Database.DataContexts
 			string courseId, Guid slideId,
 			string code, string compilationError, string output,
 			string userId, string executionServiceName, string displayName,
+			SubmissionLanguage language,
 			AutomaticExerciseCheckingStatus status = AutomaticExerciseCheckingStatus.Waiting)
 		{
 			if (string.IsNullOrWhiteSpace(code))
@@ -82,6 +83,7 @@ namespace Database.DataContexts
 				Likes = new List<Like>(),
 				AutomaticChecking = automaticChecking,
 				AutomaticCheckingIsRightAnswer = false,
+				Language = language,
 			};
 
 			db.UserExerciseSubmissions.Add(submission);
@@ -291,7 +293,7 @@ namespace Database.DataContexts
 
 		private static volatile SemaphoreSlim getSubmissionsSemaphore = new SemaphoreSlim(1);
 
-		public async Task<List<UserExerciseSubmission>> GetUnhandledSubmissions(int count)
+		public async Task<List<UserExerciseSubmission>> GetUnhandledSubmissions(int count, string agentName, SubmissionLanguage language)
 		{
 			log.Info("GetUnhandledSubmissions(): trying to acquire semaphore");
 			var semaphoreLocked = await getSubmissionsSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
@@ -304,7 +306,7 @@ namespace Database.DataContexts
 
 			try
 			{
-				return await TryGetExerciseSubmissions(count);
+				return await TryGetExerciseSubmissions(count, agentName, language);
 			}
 			catch (Exception e)
 			{
@@ -315,10 +317,11 @@ namespace Database.DataContexts
 			{
 				log.Info("GetUnhandledSubmissions(): trying to release semaphore");
 				getSubmissionsSemaphore.Release();
+				log.Info("GetUnhandledSubmissions(): semaphore released");
 			}
 		}
 
-		private async Task<List<UserExerciseSubmission>> TryGetExerciseSubmissions(int count)
+		private async Task<List<UserExerciseSubmission>> TryGetExerciseSubmissions(int count, string agentName, SubmissionLanguage language)
 		{
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 			List<UserExerciseSubmission> submissions;
@@ -328,12 +331,17 @@ namespace Database.DataContexts
 					.AsNoTracking()
 					.Where(s =>
 						s.Timestamp > notSoLongAgo
-						&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting)
+						&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
+						&& s.Language == language)
 					.OrderByDescending(s => s.Timestamp)
 					.Take(count)
 					.ToList();
 				foreach (var submission in submissions)
+				{
 					submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
+					submission.AutomaticChecking.CheckingAgentName = agentName;
+				}
+
 				await SaveAll(submissions.Select(s => s.AutomaticChecking));
 
 				transaction.Commit();
@@ -449,6 +457,7 @@ namespace Database.DataContexts
 				Elapsed = DateTime.Now - checking.Timestamp,
 				IsRightAnswer = isRightAnswer,
 				Score = score,
+				CheckingAgentName = checking.CheckingAgentName,
 			};
 
 			return newChecking;

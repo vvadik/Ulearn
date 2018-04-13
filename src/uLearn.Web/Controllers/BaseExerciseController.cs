@@ -90,6 +90,7 @@ namespace uLearn.Web.Controllers
 				courseId, exerciseSlide.Id,
 				userCode, compilationErrorMessage, null,
 				userId, "uLearn", GenerateSubmissionName(exerciseSlide, userName),
+				SubmissionLanguage.CSharp,
 				dontRunSubmission ? AutomaticExerciseCheckingStatus.Done : AutomaticExerciseCheckingStatus.Waiting
 			);
 

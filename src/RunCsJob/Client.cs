@@ -22,7 +22,7 @@ namespace RunCsJob
 		private const string instanceIdEnvironmentVariableName = "WEBSITE_INSTANCE_ID";
 		private const string arrAffinityCookieName = "ARRAffinity";
 		private static readonly ILog log = LogManager.GetLogger(typeof(Client));
-		private string agentName;
+		private readonly string agentName;
 
 		public Client(string address, string token, string agentName)
 		{
@@ -46,10 +46,7 @@ namespace RunCsJob
 
 		public async Task<List<RunnerSubmission>> TryGetSubmissions(int threadsCount)
 		{
-			var uri = GetUri("GetSubmissions", new[]
-			{
-				"count", threadsCount.ToString(CultureInfo.InvariantCulture),
-			});
+			var uri = GetUri("GetSubmissions", new [] {"language", SubmissionLanguage.CSharp.ToString("g")}, new [] {"count", threadsCount.ToString(CultureInfo.InvariantCulture)});
 			try
 			{
 				log.Info($"Отправляю запрос на {uri}");

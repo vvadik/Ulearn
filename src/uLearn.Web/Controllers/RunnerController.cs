@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Web.Http;
+using System.Web.Mvc;
 using AntiPlagiarism.Api;
 using AntiPlagiarism.Api.Models.Parameters;
 using Database;
@@ -15,6 +16,7 @@ using Database.DataContexts;
 using Database.Models;
 using log4net;
 using LtiLibrary.Core.Extensions;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Newtonsoft.Json;
 using RunCsJob.Api;
 using Serilog;
@@ -56,23 +58,33 @@ namespace uLearn.Web.Controllers
 		{
 		}
 
-		[HttpGet]
-		[Route("GetSubmissions")]
-		public async Task<List<RunnerSubmission>> GetSubmissions([FromUri] string token, [FromUri] int count)
+		[System.Web.Http.HttpGet]
+		[System.Web.Http.Route("GetSubmissions")]
+		public async Task<List<RunnerSubmission>> GetSubmissions([FromUri] string token, [FromUri] int count, [FromUri] string language, [FromUri] string agent = "")
 		{
-			CheckRunner(token);
+			CheckRunner(token);			
+			
+			if (!Enum.TryParse<SubmissionLanguage>(language, out var submissionLanguage))
+				throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+			
 			var sw = Stopwatch.StartNew();
 			while (true)
 			{
 				var repo = new UserSolutionsRepo(new ULearnDb(), courseManager);
-				var submissions = await repo.GetUnhandledSubmissions(count);
+				var submissions = await repo.GetUnhandledSubmissions(count, agent, submissionLanguage);
 				if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(15))
 				{
+					var submissionIds = string.Join(",", submissions.Select(c => c.Id));
 					if (submissions.Any())
-						log.Info($"Отдаю на проверку решения: [{string.Join(",", submissions.Select(c => c.Id))}], только сначала соберу их");
+						log.Info($"Отдаю на проверку решения: [{submissionIds}], агент {agent}, только сначала соберу их");
+
+
 					var builtSubmissions = submissions.Select(ToRunnerSubmission).ToList();
+					if (submissions.Any())
+						log.Info($"Собрал решения: [{submissionIds}], отдаю их агенту {agent}");
 					return builtSubmissions;
 				}
+
 				await repo.WaitAnyUnhandledSubmissions(TimeSpan.FromSeconds(10));
 			}
 		}
@@ -89,8 +101,9 @@ namespace uLearn.Web.Controllers
 					NeedRun = true
 				};
 			}
+
 			log.Info($"Собираю для отправки в RunCsJob решение {submission.Id}");
-			
+
 			var exerciseSlide = courseManager.FindCourse(submission.CourseId)?.FindSlideById(submission.SlideId) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return new FileRunnerSubmission
@@ -111,9 +124,9 @@ namespace uLearn.Web.Controllers
 			);
 		}
 
-		[HttpPost]
-		[Route("PostResults")]
-		public async Task PostResults([FromUri] string token, List<RunningResults> results)
+		[System.Web.Http.HttpPost]
+		[System.Web.Http.Route("PostResults")]
+		public async Task PostResults([FromUri] string token, [FromUri] string agent, List<RunningResults> results)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -122,7 +135,7 @@ namespace uLearn.Web.Controllers
 				throw new HttpResponseException(HttpStatusCode.BadRequest);
 			}
 			CheckRunner(token);
-			log.Info($"Получил от RunCsJob результаты проверки решений: [{string.Join(", ", results.Select(r => r.Id))}]");
+			log.Info($"Получил от RunCsJob результаты проверки решений: [{string.Join(", ", results.Select(r => r.Id))}] от агента {agent}");
 			await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResults(results), 3);
 
 			var submissionsByIds = userSolutionsRepo

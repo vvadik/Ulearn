@@ -44,7 +44,9 @@ namespace uLearn.Web.Controllers
 		{
 			var code = Request.InputStream.GetString();
 
-			var submission = await solutionsRepo.AddUserExerciseSubmission("web", Guid.Empty, code, null, null, User.Identity.GetUserId(), "null", User.Identity.Name + ": CsSandbox Web Executor");
+			var submission = await solutionsRepo.AddUserExerciseSubmission(
+				"web", Guid.Empty, code, null, null, User.Identity.GetUserId(), "null", User.Identity.Name + ": CsSandbox Web Executor", SubmissionLanguage.CSharp
+			);
 			try
 			{
 				await solutionsRepo.RunSubmission(submission, timeout, waitUntilChecked: true);
