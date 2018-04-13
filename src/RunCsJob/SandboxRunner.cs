@@ -6,10 +6,12 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Security;
 using System.Text;
+using System.Threading;
 using log4net;
 using Newtonsoft.Json;
 using RunCsJob.Api;
 using uLearn;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
 namespace RunCsJob
@@ -179,7 +181,12 @@ namespace RunCsJob
 		{
 			try
 			{
-				Directory.Delete(path, true);
+				/* Sometimes we can't remove directory after Time Limit Exceeded, because process is alive yet. Just wait some seconds before directory removing */ 
+				FuncUtils.TrySeveralTimes(() =>
+				{
+					Directory.Delete(path, true);
+					return true;
+				}, 3, () => Thread.Sleep(TimeSpan.FromSeconds(1)));
 			}
 			catch (Exception e)
 			{
