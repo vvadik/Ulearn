@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using AntiPlagiarism.Web.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using uLearn.CSharp;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
 {
@@ -43,6 +41,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
 			codeUnits.AddRange(GetCodeUnitsFromChilds(obj as MethodDeclarationSyntax, currentCodePath, MethodEnumerator));
 			codeUnits.AddRange(GetCodeUnitsFromChilds(obj as ConstructorDeclarationSyntax, currentCodePath, MethodEnumerator));
 			codeUnits.AddRange(GetCodeUnitsFromChilds(obj as OperatorDeclarationSyntax, currentCodePath, MethodEnumerator));
+			codeUnits.AddRange(GetCodeUnitsFromChilds(obj as ConversionOperatorDeclarationSyntax, currentCodePath, MethodEnumerator));
 
 			codeUnits.AddRange(GetCodeUnitFrom(obj as AccessorDeclarationSyntax, currentCodePath, z => z.Body));
 			codeUnits.AddRange(GetCodeUnitFrom(obj as ArrowExpressionClauseSyntax, currentCodePath, z => z.Expression));
@@ -122,6 +121,8 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
 		private static string InternalGetNodeName(MethodDeclarationSyntax node) => node.Identifier.ToString();
 		private static string InternalGetNodeName(ConstructorDeclarationSyntax node) => node.Identifier.ToString();
 		private static string InternalGetNodeName(OperatorDeclarationSyntax node) => "Operator" + node.OperatorToken;
+		private static string InternalGetNodeName(ConversionOperatorDeclarationSyntax node) => 
+			"Conversion-" + node.Type + "-from-" + string.Join("-", node.ParameterList.Parameters.Select(p => p.Type));
 		private static string InternalGetNodeName(CSharpSyntaxNode node) => node.Kind().ToString();
 
 		public static string GetNodeName(SyntaxNode node)

@@ -98,6 +98,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.CSharp
 			var codeUnits = ExtractCodeUnitsFromTestFile("Operators.cs");
 			
 			Assert.AreEqual(4, codeUnits.Count(u => u.Path.Parts.Any(p => p.Name.StartsWith("Operator"))));
+			Assert.AreEqual(3, codeUnits.Count(u => u.Path.Parts.Any(p => p.Name.StartsWith("Conversion-"))));
 		}
 
 		private List<CodeUnit> ExtractCodeUnitsFromTestFile(string filename)

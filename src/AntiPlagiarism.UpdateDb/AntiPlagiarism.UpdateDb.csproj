@@ -6,4 +6,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AntiPlagiarism.Web\AntiPlagiarism.Web.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETCore.App" Version="2.0.6" />
+  </ItemGroup>
 </Project>
