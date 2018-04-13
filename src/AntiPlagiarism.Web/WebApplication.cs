@@ -86,6 +86,7 @@ namespace AntiPlagiarism.Web
 			services.AddScoped<PlagiarismDetector>();
 			services.AddScoped<StatisticsParametersFinder>();
 			services.AddSingleton<CodeUnitsExtractor>();
+			services.AddSingleton<SubmissionSnippetsExtractor>();
 			
 			/* Asp.NET Core MVC */
 			services.AddMvc();

@@ -1,6 +1,8 @@
-﻿namespace AntiPlagiarism.Web.Configuration
+﻿using uLearn.Configuration;
+
+namespace AntiPlagiarism.Web.Configuration
 {
-	public class AntiPlagiarismConfiguration
+	public class AntiPlagiarismConfiguration : AbstractConfiguration
 	{
 		public int SnippetTokensCount { get; set; }
 		

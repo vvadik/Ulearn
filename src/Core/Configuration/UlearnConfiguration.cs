@@ -8,6 +8,17 @@ namespace uLearn.Configuration
 	{
 		public static T Read<T>(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
 		{
+			var configuration = GetConfiguration(initialData, isAppsettingsJsonOptional);
+			return configuration.Get<T>();
+		}
+		
+		public static T Read<T>(bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
+		{
+			return Read<T>(new Dictionary<string, string>(), isAppsettingsJsonOptional);
+		}
+
+		public static IConfiguration GetConfiguration(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false)
+		{
 			var applicationPath = string.IsNullOrEmpty(Utils.WebApplicationPhysicalPath)
 				? Directory.GetCurrentDirectory()
 				: Utils.WebApplicationPhysicalPath;
@@ -16,14 +27,15 @@ namespace uLearn.Configuration
 				.SetBasePath(applicationPath)
 				.AddJsonFile("appsettings.json", optional: isAppsettingsJsonOptional, reloadOnChange: true)
 				.Build();
-			
-			return configuration.Get<T>();
+
+			return configuration;
 		}
 		
-		public static T Read<T>(bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
+		public static IConfiguration GetConfiguration(bool isAppsettingsJsonOptional=false)
 		{
-			return Read<T>(new Dictionary<string, string>(), isAppsettingsJsonOptional);
+			return GetConfiguration(new Dictionary<string, string>(), isAppsettingsJsonOptional);
 		}
+		
 	}
 	
 	public abstract class AbstractConfiguration

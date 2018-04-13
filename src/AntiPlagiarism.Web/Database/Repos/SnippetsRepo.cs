@@ -17,10 +17,12 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<bool> IsSnippetExistsAsync(int tokensCount, SnippetType type, int hash);
 		Task<SnippetOccurence> AddSnippetOccurenceAsync(Submission submission, Snippet snippet, int firstTokenIndex);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount);
+		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission);
 		Task<Dictionary<int, SnippetStatistics>> GetSnippetsStatisticsAsync(int clientId, Guid taskId, IEnumerable<int> snippetsIds);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId, Expression<Func<SnippetOccurence, bool>> filterFunction);
 		Task RemoveSnippetsOccurencesForTaskAsync(Guid taskId);
+		Task<Snippet> GetOrAddSnippetAsync(Snippet snippet);
 	}
 
 	public class SnippetsRepo : ISnippetsRepo
@@ -102,7 +104,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			}
 		}
 
-		private async Task<Snippet> GetOrAddSnippetAsync(Snippet snippet)
+		public async Task<Snippet> GetOrAddSnippetAsync(Snippet snippet)
 		{
 			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted))
 			{
@@ -124,6 +126,9 @@ namespace AntiPlagiarism.Web.Database.Repos
 		
 		public async Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount)
 		{
+			if (maxCount == 0)
+				return await db.SnippetsOccurences.Where(o => o.SubmissionId == submission.Id).ToListAsync();
+			
 			var selectedSnippetsStatistics = db.SnippetsStatistics.Where(s => s.TaskId == submission.TaskId && s.ClientId == submission.ClientId);
 			return (await db.SnippetsOccurences.Include(o => o.Snippet)
 				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
@@ -133,6 +138,11 @@ namespace AntiPlagiarism.Web.Database.Repos
 				.ToListAsync())
 				.Select(o => o.occurence)
 				.ToList();
+		}
+
+		public Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission)
+		{
+			return GetSnippetsOccurencesForSubmissionAsync(submission, 0);
 		}
 
 		public Task<Dictionary<int, SnippetStatistics>> GetSnippetsStatisticsAsync(int clientId, Guid taskId, IEnumerable<int> snippetsIds)

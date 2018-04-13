@@ -24,22 +24,18 @@ namespace AntiPlagiarism.Web.Controllers
 		private readonly ITasksRepo tasksRepo;
 		private readonly StatisticsParametersFinder statisticsParametersFinder;
 		private readonly PlagiarismDetector plagiarismDetector;
-		private readonly CodeUnitsExtractor codeUnitsExtractor;		
+		private readonly CodeUnitsExtractor codeUnitsExtractor;
+		private readonly SubmissionSnippetsExtractor submissionSnippetsExtractor;
 		private readonly AntiPlagiarismConfiguration configuration;
 
 		private readonly SnippetsExtractor snippetsExtractor = new SnippetsExtractor();
-
-		private readonly List<ITokenInSnippetConverter> tokenConverters = new List<ITokenInSnippetConverter>
-		{
-			new TokensKindsOnlyConverter(),
-			new TokensKindsAndValuesConverter(),
-		};
 
 		public ApiController(
 			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo,
 			StatisticsParametersFinder statisticsParametersFinder,
 			PlagiarismDetector plagiarismDetector,
 			CodeUnitsExtractor codeUnitsExtractor,
+			SubmissionSnippetsExtractor submissionSnippetsExtractor,
 			ILogger logger,
 			IOptions<AntiPlagiarismConfiguration> configuration)
 			: base(logger)
@@ -50,6 +46,7 @@ namespace AntiPlagiarism.Web.Controllers
 			this.statisticsParametersFinder = statisticsParametersFinder;
 			this.plagiarismDetector = plagiarismDetector;
 			this.codeUnitsExtractor = codeUnitsExtractor;
+			this.submissionSnippetsExtractor = submissionSnippetsExtractor;
 			this.configuration = configuration.Value;
 		}
 		
@@ -212,19 +209,8 @@ namespace AntiPlagiarism.Web.Controllers
 
 		private async Task ExtractSnippetsFromSubmissionAsync(Submission submission)
 		{
-			logger.Information("Достаю сниппеты из решения {submissionId}, длина сниппетов: {tokensCount} токенов", submission.Id, configuration.SnippetTokensCount);
-			var codeUnits = codeUnitsExtractor.Extract(submission.ProgramText);
-			foreach (var codeUnit in codeUnits)
-			{
-				foreach (var tokenConverter in tokenConverters)
-				{
-					var snippets = snippetsExtractor.GetSnippets(codeUnit.Tokens, configuration.SnippetTokensCount, tokenConverter);
-					foreach (var (index, snippet) in snippets.Enumerate())
-					{
-						await snippetsRepo.AddSnippetOccurenceAsync(submission, snippet, codeUnit.FirstTokenIndex + index);
-					}
-				}
-			}
+			foreach (var (firstTokenIndex, snippet) in submissionSnippetsExtractor.ExtractSnippetsFromSubmission(submission))
+				await snippetsRepo.AddSnippetOccurenceAsync(submission, snippet, firstTokenIndex);
 		}
 		
 		public async Task CalculateTaskStatisticsParametersAsync(int clientId, Guid taskId)
