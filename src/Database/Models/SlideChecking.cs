@@ -109,6 +109,9 @@ namespace Database.Models
 
 		[StringLength(40)]
 		public string ExecutionServiceName { get; set; }
+		
+		[StringLength(256)]
+		public string CheckingAgentName { get; set; }
 
 		public string GetVerdict()
 		{

@@ -22,9 +22,9 @@ namespace RunCsJob
 		private const string instanceIdEnvironmentVariableName = "WEBSITE_INSTANCE_ID";
 		private const string arrAffinityCookieName = "ARRAffinity";
 		private static readonly ILog log = LogManager.GetLogger(typeof(Client));
-		private string clientName;
+		private string agentName;
 
-		public Client(string address, string token, string clientName)
+		public Client(string address, string token, string agentName)
 		{
 			this.token = token;
 
@@ -41,7 +41,7 @@ namespace RunCsJob
 			if (!string.IsNullOrEmpty(instanceId))
 				cookieContainer.Add(baseAddress, new Cookie(arrAffinityCookieName, instanceId));
 
-			this.clientName = clientName;
+			this.agentName = agentName;
 		}
 
 		public async Task<List<RunnerSubmission>> TryGetSubmissions(int threadsCount)
@@ -91,7 +91,7 @@ namespace RunCsJob
 		{
 			var query = HttpUtility.ParseQueryString(string.Empty);
 			query["token"] = token;
-			query["client"] = clientName;
+			query["agent"] = agentName;
 			foreach (var parameter in parameters)
 			{
 				query[parameter[0]] = parameter[1];

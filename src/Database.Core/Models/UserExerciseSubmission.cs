@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using uLearn;
 
 namespace Database.Models
 {
@@ -14,7 +15,6 @@ namespace Database.Models
 		public int Id { get; set; }
 
 		[Required]
-//		[StringLength(64)]
 		public string UserId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
@@ -41,6 +41,8 @@ namespace Database.Models
 		public virtual IList<Like> Likes { get; set; }
 
 		public int AutomaticCheckingId { get; set; }
+		
+		public SubmissionLanguage Language { get; set; }
 
 		[Required]
 		public virtual AutomaticExerciseChecking AutomaticChecking { get; set; }
