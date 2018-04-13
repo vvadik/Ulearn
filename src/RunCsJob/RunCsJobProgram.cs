@@ -8,6 +8,7 @@ using System.Runtime.Remoting.Channels;
 using System.Threading;
 using log4net;
 using log4net.Config;
+using Metrics;
 using RunCsJob.Api;
 using uLearn;
 
@@ -152,6 +153,7 @@ namespace RunCsJob
 
 		private void MainLoop(Client client)
 		{
+			var serviceKeepAliver = new ServiceKeepAliver("runcsjob");
 			while (!shutdownEvent.WaitOne(0))
 			{
 				List<RunnerSubmission> newUnhandled;
@@ -181,6 +183,7 @@ namespace RunCsJob
 						log.Error("Не могу отправить результаты проверки на ulearn", e);
 					}
 				}
+				serviceKeepAliver.Ping(TimeSpan.FromMinutes(1));
 				Thread.Sleep(sleep);
 			}
 		}

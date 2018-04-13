@@ -243,6 +243,10 @@
       <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
       <Name>CsSandboxer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Metrics\Metrics.csproj">
+      <Project>{6BF55402-68F0-4BA3-9F03-E42C3912C9CA}</Project>
+      <Name>Metrics</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
       <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
       <Name>RunCsJob.Api</Name>
