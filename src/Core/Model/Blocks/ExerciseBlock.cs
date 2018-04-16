@@ -163,7 +163,7 @@ namespace uLearn.Model.Blocks
 
 	public class ExerciseTexts
 	{
-		// «Все тесты пройдены». Показывается тем, у кого потенциально бывает код-ревью, но это решения не отправлено на него.
+		// «Все тесты пройдены». Показывается тем, у кого потенциально бывает код-ревью, но это решение не отправлено на него.
 		// Например, потому что есть более новое решение.
 		[XmlElement("all-tests-passed")]
 		public string AllTestsPassed { get; set; }
@@ -181,7 +181,7 @@ namespace uLearn.Model.Blocks
 		[XmlElement("code-review-passed-instructor-view")]
 		public string CodeReviewPassedInstructorView { get; set; }
 		
-		// «Все тесты пройдены, решение ожидает код-ревью». Показывается студенту
+		// «Все тесты пройдены, решение ожидает код-ревью». Показывается студенту.
 		[XmlElement("waiting-for-code-review")]
 		public string WaitingForCodeReview { get; set; }
 		

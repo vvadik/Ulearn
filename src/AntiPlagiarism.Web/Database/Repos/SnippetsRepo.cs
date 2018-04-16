@@ -56,17 +56,23 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		public async Task<SnippetOccurence> AddSnippetOccurenceAsync(Submission submission, Snippet snippet, int firstTokenIndex)
 		{
+			logger.Information($"Сохраняю в базу информацию о сниппете {snippet} в решении #{submission.Id} в позиции {firstTokenIndex}");
+			logger.Information($"Ищу сниппет {snippet} в базе (или создаю новый)");
 			var foundSnippet = await GetOrAddSnippetAsync(snippet);
+			logger.Information($"Сниппет в базе имеет номер {foundSnippet.Id}");
 			var snippetOccurence = new SnippetOccurence
 			{
 				SubmissionId = submission.Id,
 				Snippet = foundSnippet,
 				FirstTokenIndex = firstTokenIndex,
 			};
+			logger.Information($"Добавляю в базу объект {snippetOccurence}");
 			await db.SnippetsOccurences.AddAsync(snippetOccurence);
 			await db.SaveChangesAsync();
 
+			logger.Information($"Добавил. Пересчитываю статистику сниппета (количество авторов, у которых он встречается)");
 			var snippetStatistics = await GetOrAddSnippetStatisticsAsync(foundSnippet, submission.TaskId, submission.ClientId);
+			logger.Information($"Старая статистика сниппета {foundSnippet}: {snippetStatistics}");
 			snippetStatistics.AuthorsCount = await db.SnippetsOccurences.Include(o => o.Submission)
 				.Where(o => o.SnippetId == foundSnippet.Id &&
 							o.Submission.ClientId == submission.ClientId &&
@@ -74,8 +80,10 @@ namespace AntiPlagiarism.Web.Database.Repos
 				.Select(o => o.Submission.AuthorId)
 				.Distinct()
 				.CountAsync();
+			logger.Information($"Количество авторов, у которых встречается сниппет {foundSnippet} — {snippetStatistics.AuthorsCount}");
 			await db.SaveChangesAsync();
 			
+			logger.Information($"Закончил сохранение в базу информации о сниппете {foundSnippet} в решении #{submission.Id} в позиции {firstTokenIndex}");
 			return snippetOccurence;
 		}
 
