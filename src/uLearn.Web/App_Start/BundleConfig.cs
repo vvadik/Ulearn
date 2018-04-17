@@ -85,7 +85,6 @@ namespace uLearn.Web
 				"~/Scripts/likely.js",
 				"~/Scripts/analytics.js",
 				"~/Scripts/course-statistics.js",
-				"~/Scripts/ulearn-updates-invitation.js",
 				"~/Scripts/suggest-mail-notifications.js",
 				"~/Scripts/diagnostics.js",
 				"~/Scripts/forms.replace-action.js",
