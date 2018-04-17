@@ -8,10 +8,15 @@ using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Core;
+using Serilog.Debugging;
 using Serilog.Events;
+using Serilog.Extensions.Logging;
 using uLearn.Configuration;
 using Vostok.Logging.Serilog.Enrichers;
+using ILogger = Serilog.ILogger;
 
 namespace AntiPlagiarism.UpdateDb
 {
@@ -44,9 +49,10 @@ namespace AntiPlagiarism.UpdateDb
 			
 			services.Configure<AntiPlagiarismUpdateDbConfiguration>(ApplicationConfiguration.GetConfiguration());
 			services.Configure<AntiPlagiarismConfiguration>(ApplicationConfiguration.GetConfiguration().GetSection("antiplagiarism"));
-			
-			services.AddSingleton(GetLogger(configuration));	
-			services.AddScoped(_ => GetDatabase(configuration));
+
+			var logger = GetLogger(configuration);
+			services.AddSingleton(logger);	
+			services.AddScoped(_ => GetDatabase(configuration, logger));
 			services.AddScoped<AntiPlagiarismSnippetsUpdater>();
 			services.AddScoped<ISnippetsRepo, SnippetsRepo>();
 			services.AddScoped<ISubmissionsRepo, SubmissionsRepo>();
@@ -57,11 +63,12 @@ namespace AntiPlagiarism.UpdateDb
 			return services.BuildServiceProvider();
 		}
 
-		private AntiPlagiarismDb GetDatabase(AntiPlagiarismUpdateDbConfiguration configuration)
+		private AntiPlagiarismDb GetDatabase(AntiPlagiarismUpdateDbConfiguration configuration, ILogger logger)
 		{
 			var optionsBuilder = new DbContextOptionsBuilder<AntiPlagiarismDb>();
 			optionsBuilder.UseSqlServer(configuration.Database);
-			
+			optionsBuilder.UseLoggerFactory(new SerilogLoggerFactory(logger));
+
 			return new AntiPlagiarismDb(optionsBuilder.Options);
 		}
 
@@ -85,6 +92,31 @@ namespace AntiPlagiarism.UpdateDb
 				);
 			
 			return loggerConfiguration.CreateLogger();
+		}
+	}
+	
+	internal class SerilogLoggerFactory : ILoggerFactory, IDisposable
+	{
+		private readonly SerilogLoggerProvider provider;
+
+		public SerilogLoggerFactory(ILogger logger=null, bool dispose=false)
+		{
+			provider = new SerilogLoggerProvider(logger, dispose);
+		}
+
+		public void Dispose()
+		{
+			provider.Dispose();
+		}
+
+		public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
+		{
+			return provider.CreateLogger(categoryName);
+		}
+
+		public void AddProvider(ILoggerProvider provider)
+		{
+			SelfLog.WriteLine("Ignoring added logger provider {0}", provider);
 		}
 	}
 }
