@@ -558,7 +558,9 @@ namespace uLearn.Web.Controllers
 				model.Users.Add(user);
 			}
 
-			model.UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, model.Users.Select(u => u.UserId), User);
+			var userIds = model.Users.Select(u => u.UserId).ToList();
+			model.UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User);
+			model.UsersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User, onlyArchived: true);
 
 			return model;
 		}

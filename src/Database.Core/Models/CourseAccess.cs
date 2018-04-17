@@ -47,6 +47,9 @@ namespace Database.Models
 		[Display(Name = "Назначать преподавателей")]
 		AddAndRemoveInstructors = 3,
 		
+		[Display(Name = "Видеть, в каких группах состоят все студенты")]
+		ViewAllGroupMembers = 4,		
+		
 		[Display(Name = "Получать в АПИ статистику по код-ревью (/codereveiew/statistics)")]
 		ApiViewCodeReviewStatistics = 101,
 		

@@ -91,12 +91,14 @@ namespace uLearn.Web.Controllers
 			var usersList = users.ToList();
 
 			var currentUserId = User.Identity.GetUserId();
+			var userIds = usersList.Select(u => u.UserId).ToList();
 			var model = new UserListModel
 			{
 				CanToggleRoles = User.HasAccess(CourseRole.CourseAdmin),
 				ShowDangerEntities = User.IsSystemAdministrator(),
 				Users = usersList.Select(user => GetUserModel(user, coursesForUsers, courses)).ToList(),
-				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, usersList.Select(u => u.UserId), User),
+				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User),
+				UsersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User, onlyArchived: true),
 				CanViewAndToggleCourseAccesses = false,
 				CanViewAndToogleSystemAccesses = User.IsSystemAdministrator(),
 				CanViewProfiles = systemAccessesRepo.HasSystemAccess(currentUserId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator(),
@@ -284,6 +286,7 @@ namespace uLearn.Web.Controllers
 			var certificates = certificatesRepo.GetUserCertificates(user.Id).OrderBy(c => allCourses.GetOrDefault(c.Template.CourseId)?.Title ?? "<курс удалён>").ToList();
 
 			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10));
+			var courseArchivedGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10, onlyArchived: true));
 
 			return View(new ProfileModel
 			{
@@ -291,6 +294,7 @@ namespace uLearn.Web.Controllers
 				Logins = logins,
 				UserCourses = userCourses,
 				CourseGroups = courseGroups,
+				CourseArchivedGroups = courseArchivedGroups,
 				Certificates = certificates,
 				AllCourses = allCourses,
 			});
@@ -762,6 +766,7 @@ namespace uLearn.Web.Controllers
 		public List<Certificate> Certificates { get; set; }
 		public Dictionary<string, Course> AllCourses { get; set; }
 		public Dictionary<string, string> CourseGroups { get; set; }
+		public Dictionary<string, string> CourseArchivedGroups { get; set; }
 	}
 
 	public class IsErrorAttribute : Attribute

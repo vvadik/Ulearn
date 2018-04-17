@@ -35,5 +35,8 @@ namespace Database.Models
 	{
 		[Display(Name = "Видеть профили всех пользователей")]
 		ViewAllProfiles = 1,
+		
+		[Display(Name = "Видеть, в каких группах состоят все студенты")]
+		ViewAllGroupMembers = 2,
 	}
 }

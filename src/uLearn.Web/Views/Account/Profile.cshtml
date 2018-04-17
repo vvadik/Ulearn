@@ -86,9 +86,15 @@
 					@if (!string.IsNullOrEmpty(Model.CourseGroups[course.Id]))
 					{
 						<div title="Группы, в которых состоит студент">
-							@Model.CourseGroups[course.Id]
+							Группы: @Model.CourseGroups[course.Id]
 						</div>
 					}
+                    @if (!string.IsNullOrEmpty(Model.CourseArchivedGroups[course.Id]))
+                    {
+	                    <div title="Архивные группы, в которых состоит студент" class="text-muted">
+                            Архивные: @Model.CourseArchivedGroups[course.Id]
+                        </div>
+                    }
 					
 				</li>
 			}

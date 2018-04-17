@@ -297,6 +297,7 @@ namespace uLearn.Web.Controllers
 				BlockRenderContext = CreateRenderContext(course, slide, manualChecking, exerciseSubmissionId, groupsIds, autoplay: autoplay, isManualCheckingReadonly: isManualCheckingReadonly, defaultProhibitFutherReview: defaultProhibitFutherReview),
 				ManualChecking = manualChecking,
 				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
+				ContextManualCheckingUserArchivedGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User, onlyArchived: true) : "",
 				IsGuest = false
 			};
 			return model;

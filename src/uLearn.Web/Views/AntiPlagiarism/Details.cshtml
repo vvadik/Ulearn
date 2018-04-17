@@ -1,5 +1,6 @@
 ﻿@using Database.Extensions
 @using Database.Models
+@using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata
 @using uLearn.Extensions
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Shared
@@ -13,6 +14,20 @@
 	var submissionsByAntiPlagiarismIds = Model.Submissions.Values
 		.Where(s => s.AntiPlagiarismSubmissionId != null)
 		.ToDictionary(s => s.AntiPlagiarismSubmissionId);
+}
+
+@helper PrintUserGroups(string userId)
+{
+	<span class="antiplagiarism__user-groups">
+        @Model.UsersGroups[userId]@*
+      *@@if (!string.IsNullOrEmpty(Model.UsersGroups[userId]) && !string.IsNullOrEmpty(Model.UsersArchivedGroups[userId])){<text>,</text>}
+        @if (!string.IsNullOrEmpty(Model.UsersArchivedGroups[userId]))
+        {
+	        <span class="antiplagiarism__user-groups__archived" title="это группа заархивирована">
+                @Model.UsersArchivedGroups[userId]
+            </span>
+        }
+    </span>
 }
 
 <div class="container">
@@ -74,9 +89,7 @@
 	                            <span title="@submission.User.UserName">@submission.User.VisibleName</span><text>,</text>
                             }
                             <span title="@submission.Timestamp.ToPrettyString()">@submission.Timestamp.ToAgoPrettyString()</span>
-                            <span class="antiplagiarism__user-groups">
-                                @Model.UsersGroups[submission.UserId]
-                            </span>
+                            @PrintUserGroups(submission.UserId)
                         </div>
                         <textarea class="code code-antiplagiarism" data-lang="cs" data-submission-id="@submission.Id-@plagiarismSubmission.Id">@submission.SolutionCode.Text</textarea>
                     </div>
@@ -92,9 +105,7 @@
 	                            <span title="@plagiarismSubmission.User.UserName">@plagiarismSubmission.User.VisibleName</span><text>,</text>
                             }
                             <span title="@plagiarismSubmission.Timestamp.ToPrettyString()">@plagiarismSubmission.Timestamp.ToAgoPrettyString()</span>
-                            <span class="antiplagiarism__user-groups">
-                                @Model.UsersGroups[plagiarismSubmission.UserId]
-                            </span>
+                            @PrintUserGroups(plagiarismSubmission.UserId)
                             <div class="pull-right" title="Процент похожести. Чем больше, тем более подозрительна эта пара">
                                 @((int) (plagiarism.Weight * 100))%
                             </div>

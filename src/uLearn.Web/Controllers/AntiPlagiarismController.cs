@@ -117,6 +117,7 @@ namespace uLearn.Web.Controllers
 			var userIds = new HashSet<string>(antiPlagiarismsResult.ResearchedSubmissions.SelectMany(s => s.Plagiarisms).Select(s => s.SubmissionInfo.AuthorId.ToString()));
 			userIds.Add(submission.UserId);
 			var usersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User).ToDefaultDictionary();
+			var usersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User, onlyArchived: true).ToDefaultDictionary();
 
 			var course = courseManager.FindCourse(courseId);
 			var slide = course?.FindSlideById(submission.SlideId);
@@ -127,6 +128,7 @@ namespace uLearn.Web.Controllers
 				SubmissionId = submissionId,
 				Submissions = submissions,
 				UsersGroups = usersGroups,
+				UsersArchivedGroups = usersArchivedGroups,
 				AntiPlagiarismResult = antiPlagiarismsResult,
 			});
 		}
@@ -194,9 +196,10 @@ namespace uLearn.Web.Controllers
 		
 		public DefaultDictionary<string, string> UsersGroups { get; set; }
 		
+		public DefaultDictionary<string, string> UsersArchivedGroups { get; set; }
+		
 		public GetAuthorPlagiarismsResult AntiPlagiarismResult { get; set; }
 		
 		public Dictionary<int, UserExerciseSubmission> Submissions { get; set; }
-		
 	}
 }

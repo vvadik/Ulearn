@@ -57,15 +57,31 @@
 					if (Model.ManualChecking != null)
 					{
 						<p class="exercise-status">
-							@Model.ManualChecking.User.VisibleName@*												 
-							*@@if (!string.IsNullOrEmpty(Model.ContextManualCheckingUserGroups))
-							  {
-								  <span>(@Model.ContextManualCheckingUserGroups),</span>
-							  }
-							  else
-							  {
-								  <span>,</span>
-							  }
+                            @Model.ManualChecking.User.VisibleName
+                            @if (Model.ContextManualCheckingUserGroups + Model.ContextManualCheckingUserArchivedGroups != "")
+                            {
+	                            @* These comments are dirty hack for removing spaces between words *@
+	                            <span>
+                                (@*												 
+							      *@@if (Model.ContextManualCheckingUserGroups != "")
+                                    {
+	                                    @Model.ContextManualCheckingUserGroups@*												 
+							      *@}@*												 
+							      *@@if (Model.ContextManualCheckingUserGroups != "" && Model.ContextManualCheckingUserArchivedGroups != "")
+                                    {@*												 
+							           *@<text>;</text>
+                                    }@*												 
+                                  *@@if (Model.ContextManualCheckingUserArchivedGroups != "")
+                                    {
+	                                    <text>архивные группы: @Model.ContextManualCheckingUserArchivedGroups</text>@*												 
+							      *@}@*												 
+							   *@),
+                                </span>
+                            }
+                            else
+							{
+							    <span>,</span>
+							}
 							@Model.ManualChecking.Timestamp.ToPrettyString()
 						</p>
 					}
