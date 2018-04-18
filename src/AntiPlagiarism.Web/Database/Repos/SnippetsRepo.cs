@@ -73,7 +73,8 @@ namespace AntiPlagiarism.Web.Database.Repos
 			logger.Information("Выключаю AutoDetectChangesEnabled ");
 			db.ChangeTracker.AutoDetectChangesEnabled = false;
 			
-			await db.SnippetsOccurences.AddAsync(snippetOccurence);
+			/* ...and use non-async Add() here because of perfomance issues with async versions */
+			db.SnippetsOccurences.Add(snippetOccurence);
 			db.Entry(snippetOccurence).State = EntityState.Added;
 			await db.SaveChangesAsync();
 		
@@ -90,13 +91,14 @@ namespace AntiPlagiarism.Web.Database.Repos
 			db.ChangeTracker.AutoDetectChangesEnabled = false;
 			
 			logger.Information($"Старая статистика сниппета {foundSnippet}: {snippetStatistics}");
-			snippetStatistics.AuthorsCount = await db.SnippetsOccurences.Include(o => o.Submission)
+			/* Use non-async Add() here because of perfomance issues with async versions */
+			snippetStatistics.AuthorsCount = db.SnippetsOccurences.Include(o => o.Submission)
 				.Where(o => o.SnippetId == foundSnippet.Id &&
 							o.Submission.ClientId == submission.ClientId &&
 							o.Submission.TaskId == submission.TaskId)
 				.Select(o => o.Submission.AuthorId)
 				.Distinct()
-				.CountAsync();
+				.Count();
 			db.Entry(snippetStatistics).State = EntityState.Modified;
 			logger.Information($"Количество авторов, у которых встречается сниппет {foundSnippet} — {snippetStatistics.AuthorsCount}");
 			await db.SaveChangesAsync();

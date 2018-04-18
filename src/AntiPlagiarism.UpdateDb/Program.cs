@@ -79,11 +79,16 @@ namespace AntiPlagiarism.UpdateDb
 				.Enrich.With<FlowContextEnricher>()
 				.MinimumLevel.Debug();
 			
-			loggerConfiguration = loggerConfiguration
-				.WriteTo.Console(outputTemplate: "{Timestamp:HH:mm:ss.fff} {Level:u3} [{Thread}] {Message:l}{NewLine}{Exception}", restrictedToMinimumLevel: LogEventLevel.Information);
+			if (configuration.HostLog.Console)
+				loggerConfiguration = loggerConfiguration.WriteTo.Console(
+					outputTemplate: "{Timestamp:HH:mm:ss.fff} {Level:u3} [{Thread}] {Message:l}{NewLine}{Exception}", 
+					restrictedToMinimumLevel: LogEventLevel.Information
+				);
 
-			var pathFormat = "logs/log-{Date}.log";
-			var minimumLevel = LogEventLevel.Debug;
+			var pathFormat = configuration.HostLog.PathFormat;
+			if (!Enum.TryParse<LogEventLevel>(configuration.HostLog.MinimumLevel, out var minimumLevel))
+				minimumLevel = LogEventLevel.Debug;
+			
 			loggerConfiguration = loggerConfiguration
 				.WriteTo.RollingFile(
 					pathFormat,

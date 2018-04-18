@@ -7,6 +7,8 @@ namespace AntiPlagiarism.UpdateDb.Configuration
 	{
 		public string Database { get; set; }
 		
+		public HostLogConfiguration HostLog { get; set; }
+		
 		public AntiPlagiarismConfiguration AntiPlagiarism { get; set; }
 	}
 }

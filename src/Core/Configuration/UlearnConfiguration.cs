@@ -43,6 +43,15 @@ namespace uLearn.Configuration
 		 
 	}
 	
+	public class HostLogConfiguration
+	{
+		public bool Console { get; set; }
+		
+		public string PathFormat { get; set; }
+		
+		public string MinimumLevel { get; set; }
+	}
+	
 	public class UlearnConfiguration : AbstractConfiguration
 	{
 		public TelegramConfiguration Telegram { get; set; }
