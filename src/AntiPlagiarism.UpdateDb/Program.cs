@@ -86,7 +86,7 @@ namespace AntiPlagiarism.UpdateDb
 				);
 
 			var pathFormat = configuration.HostLog.PathFormat;
-			if (!Enum.TryParse<LogEventLevel>(configuration.HostLog.MinimumLevel, out var minimumLevel))
+			if (!Enum.TryParse<LogEventLevel>(configuration.HostLog.MinimumLevel, true, out var minimumLevel))
 				minimumLevel = LogEventLevel.Debug;
 			
 			loggerConfiguration = loggerConfiguration
