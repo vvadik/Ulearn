@@ -68,27 +68,22 @@ namespace AntiPlagiarism.Web.Database.Repos
 			};
 			logger.Information($"Добавляю в базу объект {snippetOccurence}");
 			
-			/* We stands with perfomance issue on EF Core: https://github.com/aspnet/EntityFrameworkCore/issues/11680
-			   So we decided to disable AutoDetectChangesEnabled temporary for these query */
-			logger.Information("Выключаю AutoDetectChangesEnabled ");
-			db.ChangeTracker.AutoDetectChangesEnabled = false;
+			
+			DisableAutoDetectChanges();
 			
 			/* ...and use non-async Add() here because of perfomance issues with async versions */
 			db.SnippetsOccurences.Add(snippetOccurence);
 			db.Entry(snippetOccurence).State = EntityState.Added;
 			await db.SaveChangesAsync();
 		
-			logger.Information("Включаю AutoDetectChangesEnabled обратно");
-			db.ChangeTracker.AutoDetectChangesEnabled = true;
+			EnableAutoDetectChanges();
 			
 			
 			logger.Information($"Добавил. Пересчитываю статистику сниппета (количество авторов, у которых он встречается)");
 			var snippetStatistics = await GetOrAddSnippetStatisticsAsync(foundSnippet, submission.TaskId, submission.ClientId);
 
-			/* We stands with perfomance issue on EF Core: https://github.com/aspnet/EntityFrameworkCore/issues/11680
-			   So we decided to disable AutoDetectChangesEnabled temporary for these query */
-			logger.Information("Выключаю AutoDetectChangesEnabled ");
-			db.ChangeTracker.AutoDetectChangesEnabled = false;
+			
+			DisableAutoDetectChanges();
 			
 			logger.Information($"Старая статистика сниппета {foundSnippet}: {snippetStatistics}");
 			/* Use non-async Add() here because of perfomance issues with async versions */
@@ -103,8 +98,8 @@ namespace AntiPlagiarism.Web.Database.Repos
 			logger.Information($"Количество авторов, у которых встречается сниппет {foundSnippet} — {snippetStatistics.AuthorsCount}");
 			await db.SaveChangesAsync();
 		
-			logger.Information("Включаю AutoDetectChangesEnabled обратно");
-			db.ChangeTracker.AutoDetectChangesEnabled = true;
+			EnableAutoDetectChanges();
+
 			
 			logger.Information($"Закончил сохранение в базу информации о сниппете {foundSnippet} в решении #{submission.Id} в позиции {firstTokenIndex}");
 			return snippetOccurence;
@@ -112,27 +107,50 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		private async Task<SnippetStatistics> GetOrAddSnippetStatisticsAsync(Snippet snippet, Guid taskId, int clientId)
 		{
-			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted))
+			DisableAutoDetectChanges();
+			try
 			{
-				var foundStatistics = await db.SnippetsStatistics.SingleOrDefaultAsync(
-					s => s.SnippetId == snippet.Id &&
-						s.TaskId == taskId &&
-						s.ClientId == clientId
-						);
-				if (foundStatistics != null)
-					return foundStatistics;
-
-				var addedStatistics = await db.SnippetsStatistics.AddAsync(new SnippetStatistics
+				using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted))
 				{
-					SnippetId = snippet.Id,					
-					ClientId = clientId,
-					TaskId = taskId,
-				});
-				await db.SaveChangesAsync();
-				transaction.Commit();
+					var foundStatistics = await db.SnippetsStatistics.SingleOrDefaultAsync(
+						s => s.SnippetId == snippet.Id &&
+							s.TaskId == taskId &&
+							s.ClientId == clientId
+					);
+					if (foundStatistics != null)
+						return foundStatistics;
 
-				return addedStatistics.Entity;
+					var addedStatistics = db.SnippetsStatistics.Add(new SnippetStatistics
+					{
+						SnippetId = snippet.Id,
+						ClientId = clientId,
+						TaskId = taskId,
+					});
+					db.Entry(addedStatistics).State = EntityState.Added;
+					await db.SaveChangesAsync();
+					transaction.Commit();
+
+					return addedStatistics.Entity;
+				}
 			}
+			finally
+			{
+				EnableAutoDetectChanges();
+			}
+		}
+
+		/* We stands with perfomance issue on EF Core: https://github.com/aspnet/EntityFrameworkCore/issues/11680
+  		   So we decided to disable AutoDetectChangesEnabled temporary for some queries */
+		private void DisableAutoDetectChanges()
+		{
+			logger.Information("Выключаю AutoDetectChangesEnabled ");
+			db.ChangeTracker.AutoDetectChangesEnabled = false;
+		}
+
+		private void EnableAutoDetectChanges()
+		{
+			logger.Information("Включаю AutoDetectChangesEnabled обратно");
+			db.ChangeTracker.AutoDetectChangesEnabled = true;
 		}
 
 		public async Task<Snippet> GetOrAddSnippetAsync(Snippet snippet)
