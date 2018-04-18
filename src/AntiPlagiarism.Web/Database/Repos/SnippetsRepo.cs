@@ -67,11 +67,28 @@ namespace AntiPlagiarism.Web.Database.Repos
 				FirstTokenIndex = firstTokenIndex,
 			};
 			logger.Information($"Добавляю в базу объект {snippetOccurence}");
+			
+			/* We stands with perfomance issue on EF Core: https://github.com/aspnet/EntityFrameworkCore/issues/11680
+			   So we decided to disable AutoDetectChangesEnabled temporary for these query */
+			logger.Information("Выключаю AutoDetectChangesEnabled ");
+			db.ChangeTracker.AutoDetectChangesEnabled = false;
+			
 			await db.SnippetsOccurences.AddAsync(snippetOccurence);
+			db.Entry(snippetOccurence).State = EntityState.Added;
 			await db.SaveChangesAsync();
-
+		
+			logger.Information("Включаю AutoDetectChangesEnabled обратно");
+			db.ChangeTracker.AutoDetectChangesEnabled = true;
+			
+			
 			logger.Information($"Добавил. Пересчитываю статистику сниппета (количество авторов, у которых он встречается)");
 			var snippetStatistics = await GetOrAddSnippetStatisticsAsync(foundSnippet, submission.TaskId, submission.ClientId);
+
+			/* We stands with perfomance issue on EF Core: https://github.com/aspnet/EntityFrameworkCore/issues/11680
+			   So we decided to disable AutoDetectChangesEnabled temporary for these query */
+			logger.Information("Выключаю AutoDetectChangesEnabled ");
+			db.ChangeTracker.AutoDetectChangesEnabled = false;
+			
 			logger.Information($"Старая статистика сниппета {foundSnippet}: {snippetStatistics}");
 			snippetStatistics.AuthorsCount = await db.SnippetsOccurences.Include(o => o.Submission)
 				.Where(o => o.SnippetId == foundSnippet.Id &&
@@ -80,8 +97,12 @@ namespace AntiPlagiarism.Web.Database.Repos
 				.Select(o => o.Submission.AuthorId)
 				.Distinct()
 				.CountAsync();
+			db.Entry(snippetStatistics).State = EntityState.Modified;
 			logger.Information($"Количество авторов, у которых встречается сниппет {foundSnippet} — {snippetStatistics.AuthorsCount}");
 			await db.SaveChangesAsync();
+		
+			logger.Information("Включаю AutoDetectChangesEnabled обратно");
+			db.ChangeTracker.AutoDetectChangesEnabled = true;
 			
 			logger.Information($"Закончил сохранение в базу информации о сниппете {foundSnippet} в решении #{submission.Id} в позиции {firstTokenIndex}");
 			return snippetOccurence;

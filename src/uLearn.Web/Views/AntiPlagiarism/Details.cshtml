@@ -23,7 +23,7 @@
       *@@if (!string.IsNullOrEmpty(Model.UsersGroups[userId]) && !string.IsNullOrEmpty(Model.UsersArchivedGroups[userId])){<text>,</text>}
         @if (!string.IsNullOrEmpty(Model.UsersArchivedGroups[userId]))
         {
-	        <span class="antiplagiarism__user-groups__archived" title="это группа заархивирована">
+	        <span class="antiplagiarism__user-groups__archived" title="Эта группа заархивирована">
                 @Model.UsersArchivedGroups[userId]
             </span>
         }
