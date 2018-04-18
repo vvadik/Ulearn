@@ -39,10 +39,8 @@ namespace uLearn.Model.Blocks
 				prelude = context.Dir.GetContent(PreludeFile);
 
 			var exerciseCode = regionRemover.Prepare(code);
-			IEnumerable<Label> notRemoved;
-			exerciseCode = regionRemover.Remove(exerciseCode, RemovedLabels, out notRemoved);
-			int index;
-			exerciseCode = regionRemover.RemoveSolution(exerciseCode, SolutionLabel, out index);
+			exerciseCode = regionRemover.Remove(exerciseCode, RemovedLabels, out var _);
+			exerciseCode = regionRemover.RemoveSolution(exerciseCode, SolutionLabel, out var index);
 			index += prelude.Length;
 
 			ExerciseInitialCode = ExerciseInitialCode.RemoveCommonNesting();
