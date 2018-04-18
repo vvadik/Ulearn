@@ -67,7 +67,8 @@ namespace AntiPlagiarism.UpdateDb
 		{
 			var optionsBuilder = new DbContextOptionsBuilder<AntiPlagiarismDb>();
 			optionsBuilder.UseSqlServer(configuration.Database);
-			optionsBuilder.UseLoggerFactory(new SerilogLoggerFactory(logger));
+			if (configuration.HostLog.EnableEntityFrameworkLogging)
+				optionsBuilder.UseLoggerFactory(new SerilogLoggerFactory(logger));
 
 			return new AntiPlagiarismDb(optionsBuilder.Options);
 		}

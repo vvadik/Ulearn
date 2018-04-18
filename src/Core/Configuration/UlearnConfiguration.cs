@@ -50,6 +50,8 @@ namespace uLearn.Configuration
 		public string PathFormat { get; set; }
 		
 		public string MinimumLevel { get; set; }
+		
+		public bool EnableEntityFrameworkLogging { get; set; }
 	}
 	
 	public class UlearnConfiguration : AbstractConfiguration
