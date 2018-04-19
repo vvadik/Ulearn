@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AntiPlagiarism.UpdateDb.Configuration;
 using AntiPlagiarism.Web.CodeAnalyzing;
@@ -6,7 +7,9 @@ using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
 using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -24,19 +27,27 @@ namespace AntiPlagiarism.UpdateDb
 	{
 		public static void Main(string[] args)
 		{
-			new Program().RunAsync().Wait();
+			new Program().RunAsync(args).Wait();
 		}
 
-		public async Task RunAsync()
+		public async Task RunAsync(string[] args)
 		{
 			Console.WriteLine(
 				@"This tool will help you to update antiplagiarism database. " +
 				@"I.e. in case when new logic for code units extraction have been added."
 			);
 
+			var firstSubmissionId = 0;
+			if (args.Contains("--start"))
+			{
+				var startArgIndex = args.IndexOf("--start");
+				if (startArgIndex + 1 >= args.Length || !int.TryParse(args[startArgIndex + 1], out firstSubmissionId))
+					firstSubmissionId = 0;
+			}
+
 			var provider = GetServiceProvider();
 			var updater = provider.GetService<AntiPlagiarismSnippetsUpdater>();
-			await updater.UpdateAsync().ConfigureAwait(false);
+			await updater.UpdateAsync(firstSubmissionId).ConfigureAwait(false);
 		}
 
 		private ServiceProvider GetServiceProvider()

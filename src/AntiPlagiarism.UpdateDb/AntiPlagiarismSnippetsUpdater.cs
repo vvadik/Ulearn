@@ -28,11 +28,10 @@ namespace AntiPlagiarism.UpdateDb
 			this.logger = logger;
 		}
 
-		public async Task UpdateAsync()
+		public async Task UpdateAsync(int startFromIndex=0)
 		{
 			logger.Information("Начинаю обновлять информацию о сниппетах в базе данных");
 
-			var startFromIndex = 0;
 			var maxCount = 1000;
 			while (true)
 			{
@@ -57,6 +56,11 @@ namespace AntiPlagiarism.UpdateDb
 				}
 
 				startFromIndex = lastSubmissionId + 1;
+				
+				logger.Information("Запускаю сборку мусора");
+				logger.Information($"Потребление памяти до сборки мусора: {GC.GetTotalMemory(false) / 1024}Кб. GC's Gen0: {GC.CollectionCount(0)} Gen1: {GC.CollectionCount(1)} Gen2 :{GC.CollectionCount(2)})");
+				GC.Collect();
+				logger.Information($"Потребление памяти после сборки мусора: {GC.GetTotalMemory(false) / 1024}Кб. GC's Gen0: {GC.CollectionCount(0)} Gen1: {GC.CollectionCount(1)} Gen2 :{GC.CollectionCount(2)})");
 			}
 			
 			logger.Information("AntiPlagiarismSnippetsUpdater закончил свою работу");
