@@ -5,26 +5,26 @@ using System.Threading.Tasks;
 using AntiPlagiarism.Web.CodeAnalyzing;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 namespace AntiPlagiarism.UpdateDb
 {
 	public class AntiPlagiarismSnippetsUpdater
 	{
-		private readonly ISubmissionsRepo submissionsRepo;
 		private readonly ISnippetsRepo snippetsRepo;
 		private readonly SubmissionSnippetsExtractor submissionSnippetsExtractor;
+		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly ILogger logger;
 
-		public AntiPlagiarismSnippetsUpdater(
-			ISubmissionsRepo submissionsRepo,
-			ISnippetsRepo snippetsRepo,
+		public AntiPlagiarismSnippetsUpdater(ISnippetsRepo snippetsRepo,
 			SubmissionSnippetsExtractor submissionSnippetsExtractor,
+			IServiceScopeFactory serviceScopeFactory,
 			ILogger logger)
 		{
-			this.submissionsRepo = submissionsRepo;
 			this.snippetsRepo = snippetsRepo;
 			this.submissionSnippetsExtractor = submissionSnippetsExtractor;
+			this.serviceScopeFactory = serviceScopeFactory;
 			this.logger = logger;
 		}
 
@@ -35,9 +35,16 @@ namespace AntiPlagiarism.UpdateDb
 			var maxCount = 1000;
 			while (true)
 			{
-				var submissions = await submissionsRepo.GetSubmissionsAsync(startFromIndex, maxCount);
-				if (submissions.Count == 0)
-					break;
+				/* Re-create submissions repo each time for preventing memory leaks */
+				List<Submission> submissions;
+				using (var scope = serviceScopeFactory.CreateScope())
+				{
+					var submissionsRepo = scope.ServiceProvider.GetService<ISubmissionsRepo>();
+
+					submissions = await submissionsRepo.GetSubmissionsAsync(startFromIndex, maxCount);
+					if (submissions.Count == 0)
+						break;
+				}
 
 				var firstSubmissionId = submissions.First().Id;
 				var lastSubmissionId = submissions.Last().Id;
