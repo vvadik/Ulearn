@@ -79,7 +79,7 @@ namespace uLearn.NUnitTestRunning
 				if (result.ResultState.Status == TestStatus.Failed && result.ResultState.Site != FailureSite.Child
 					&& result.ResultState.Label != "Cancelled")
 				{
-					Console.WriteLine($"Error on NUnit test: {result.Name} {result.Message} {result.StackTrace}");
+					Console.WriteLine($"Как минимум один из тестов не пройден!\nНазвание теста: {result.Name}\nСообщение:\n{result.Message}\nСтек вызовов:\n{result.StackTrace}");
 				}
 			}
 

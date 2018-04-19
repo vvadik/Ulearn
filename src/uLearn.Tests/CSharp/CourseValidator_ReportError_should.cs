@@ -148,7 +148,9 @@ namespace uLearn.CSharp
 				.Contain(
 					$"Correct solution file {exBlock.CorrectSolutionFileName} is not solution. RunResult = Id: test.csproj, Verdict: Ok")
 				.And
-				.Contain("Error on NUnit test: I_am_a_failure");
+				.Contain("Как минимум один из тестов не пройден")
+				.And
+				.Contain("I_am_a_failure");
 		}
 	}
 }
