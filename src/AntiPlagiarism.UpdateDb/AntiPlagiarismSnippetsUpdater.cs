@@ -52,7 +52,7 @@ namespace AntiPlagiarism.UpdateDb
 					}
 					catch (Exception e)
 					{
-						logger.Error($"Ошибка при обновлении списка сниппетов решения #{submission.Id}. Продолжаю работу со следующего решения", e);
+						logger.Error(e, $"Ошибка при обновлении списка сниппетов решения #{submission.Id}. Продолжаю работу со следующего решения");
 					}
 				}
 
@@ -80,7 +80,7 @@ namespace AntiPlagiarism.UpdateDb
 					}
 					catch (Exception e)
 					{
-						logger.Error($"Ошибка при добавлении сниппета #{foundSnippet.Id} в решении ${submission.Id}", e);
+						logger.Error(e, $"Ошибка при добавлении сниппета #{foundSnippet.Id} в решении #{submission.Id}");
 					}
 				}
 			}
