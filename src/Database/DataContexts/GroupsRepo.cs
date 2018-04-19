@@ -12,6 +12,7 @@ using log4net;
 using Microsoft.AspNet.Identity;
 using NUnit.Framework.Constraints;
 using uLearn;
+using uLearn.Extensions;
 using uLearn.Quizes;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
@@ -434,7 +435,7 @@ namespace Database.DataContexts
 			var usersGroups = GetUsersGroups(courseIds, userIds, currentUser, maxCount + 1, onlyArchived);
 			return usersGroups.ToDictionary(
 				kv => kv.Key,
-				kv => kv.Value.Select((g, idx) => idx >= maxCount ? "..." : g.Name).ToList());
+				kv => kv.Value.Select((g, idx) => idx >= maxCount ? "..." : g.Name.TruncateWithEllipsis(40)).ToList());
 		}
 
 		public Dictionary<string, List<int>> GetUsersGroupsIds(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)

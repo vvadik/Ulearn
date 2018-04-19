@@ -1,5 +1,6 @@
 ﻿@using Database.Models
 @using Database.Extensions
+@using uLearn.Extensions
 @using uLearn.Web.Extensions
 
 @model GroupsFilterViewModel
@@ -45,7 +46,7 @@
 			Model.Groups.Select(
 				group => new SelectListItemWithAttributes
 				{
-					Text = group.Name,
+					Text = group.Name.TruncateWithEllipsis(40),    
 					Value = group.Id.ToString(),
 					Selected = Model.SelectedGroupsIds.Contains(group.Id.ToString())
 				})

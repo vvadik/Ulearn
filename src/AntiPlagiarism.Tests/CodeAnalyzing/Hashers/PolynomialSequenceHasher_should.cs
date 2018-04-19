@@ -1,4 +1,5 @@
-﻿using AntiPlagiarism.Web.CodeAnalyzing.Hashers;
+﻿using System;
+using AntiPlagiarism.Web.CodeAnalyzing.Hashers;
 using NUnit.Framework;
 
 namespace AntiPlagiarism.Tests.CodeAnalyzing.Hashers
@@ -71,6 +72,15 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.Hashers
 				Assert.AreEqual("some_string".GetHashCode(), hasher.GetCurrentHash());
 				hasher.Reset();
 			}
+		}
+
+		[Test]
+		public void NotDequeFromEmptyQueue()
+		{
+			var hasher = new PolynomialSequenceHasher(137);
+			hasher.Enqueue("some_string");
+			hasher.Dequeue();
+			Assert.Throws<InvalidOperationException>(() => hasher.Dequeue());
 		}
 
 		[Test]

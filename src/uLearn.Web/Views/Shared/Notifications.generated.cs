@@ -36,6 +36,7 @@ namespace uLearn.Web.Views.Shared
     using uLearn.Quizes;
     using uLearn.Web;
     using uLearn.Web.Extensions;
+	using uLearn.Extensions;
     using uLearn.Web.Models;
     using uLearn.Web.Views.Shared;
     

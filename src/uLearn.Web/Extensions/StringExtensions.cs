@@ -6,20 +6,6 @@ namespace uLearn.Web.Extensions
 {
 	public static class StringExtensions
 	{
-		public static string TruncateWithEllipsis(this string s, int maxLength, string ellipsis="...")
-		{
-			if (maxLength < 0)
-				return s;
-
-			if (ellipsis.Length > maxLength)
-				throw new ArgumentOutOfRangeException("length", maxLength, "length must be at least as long as ellipsis.");
-
-			if (s.Length > maxLength - ellipsis.Length)
-				return s.Substring(0, maxLength - ellipsis.Length) + ellipsis;
-
-			return s;
-		}
-
 		public static string TruncateHtmlWithEllipsis(this string s, int maxLength, string ellipsis = "...")
 		{
 			if (maxLength < 0)
