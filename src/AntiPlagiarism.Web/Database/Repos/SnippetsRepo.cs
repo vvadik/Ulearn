@@ -126,7 +126,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 						ClientId = clientId,
 						TaskId = taskId,
 					});
-					db.Entry(addedStatistics).State = EntityState.Added;
+					addedStatistics.State = EntityState.Added;
 					await db.SaveChangesAsync();
 					transaction.Commit();
 
