@@ -30,7 +30,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		public async Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
 		{
-			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted))
+			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable))
 			{
 				db.AddOrUpdate(parameters, p => p.TaskId == parameters.TaskId);
 				await db.SaveChangesAsync();

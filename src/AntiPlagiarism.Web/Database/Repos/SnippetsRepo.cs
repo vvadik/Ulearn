@@ -110,7 +110,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			DisableAutoDetectChanges();
 			try
 			{
-				using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted))
+				using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable))
 				{
 					var foundStatistics = await db.SnippetsStatistics.SingleOrDefaultAsync(
 						s => s.SnippetId == snippet.Id &&
@@ -155,7 +155,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		public async Task<Snippet> GetOrAddSnippetAsync(Snippet snippet)
 		{
-			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted))
+			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable))
 			{
 				var foundSnippet = await db.Snippets.SingleOrDefaultAsync(
 					s => s.SnippetType == snippet.SnippetType
