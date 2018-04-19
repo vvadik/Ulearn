@@ -35,7 +35,7 @@ namespace uLearn.Web.Controllers
 
 		private readonly string telegramSecret;
 
-		private static readonly List<string> hijackCookies = new List<string> { ".AspNet.ApplicationCookie" };
+		private static readonly List<string> hijackCookies = new List<string> { "ulearn.auth" };
 
 		public AccountController()
 		{
@@ -728,8 +728,9 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		public ActionResult ReturnHijack()
 		{
+			var hijackedUserId = User.Identity.GetUserId();
 			CopyHijackedCookies(HttpContext.Request, HttpContext.Response, s => s + ".hijack", s => s, removeOld: true);
-			return Redirect("/");
+			return RedirectToAction("Profile", "Account", new { userId = hijackedUserId });
 		}
 
 		private void CopyHijackedCookies(HttpRequestBase request, HttpResponseBase response, Func<string, string> actualCookie, Func<string, string> newCookie, bool removeOld)
