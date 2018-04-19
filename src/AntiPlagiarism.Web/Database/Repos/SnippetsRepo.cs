@@ -112,23 +112,6 @@ namespace AntiPlagiarism.Web.Database.Repos
 			DisableAutoDetectChanges();
 			try
 			{
-				return await FuncUtils.TrySeveralTimesAsync(
-					() => TryGetOrAddSnippetStatisticsAsync(snippet, taskId, clientId),
-					3,
-					() => Task.Delay(TimeSpan.FromSeconds(1)),
-					typeof(SqlException)					
-				);
-			}
-			finally
-			{
-				EnableAutoDetectChanges();
-			}
-		}
-
-		private async Task<SnippetStatistics> TryGetOrAddSnippetStatisticsAsync(Snippet snippet, Guid taskId, int clientId)
-		{
-			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable))
-			{
 				var foundStatistics = await db.SnippetsStatistics.SingleOrDefaultAsync(
 					s => s.SnippetId == snippet.Id &&
 						s.TaskId == taskId &&
@@ -144,10 +127,32 @@ namespace AntiPlagiarism.Web.Database.Repos
 					TaskId = taskId,
 				});
 				addedStatistics.State = EntityState.Added;
-				await db.SaveChangesAsync();
-				transaction.Commit();
+				
+				try
+				{
+					await db.SaveChangesAsync();
+				}
+				catch (SqlException e)
+				{
+					if (e.Number == DbErrors.CanNotInsertDuplicateKeyRowInObject)
+					{
+						/* It's ok: this statistics already exists */
+						foundStatistics = await db.SnippetsStatistics.SingleOrDefaultAsync(
+							s => s.SnippetId == snippet.Id &&
+								s.TaskId == taskId &&
+								s.ClientId == clientId
+						);
+						if (foundStatistics != null)
+							return foundStatistics;
+					}
+					throw;				
+				}
 
 				return addedStatistics.Entity;
+			}
+			finally
+			{
+				EnableAutoDetectChanges();
 			}
 		}
 
@@ -165,34 +170,38 @@ namespace AntiPlagiarism.Web.Database.Repos
 			db.ChangeTracker.AutoDetectChangesEnabled = true;
 		}
 
-		public Task<Snippet> GetOrAddSnippetAsync(Snippet snippet)
+		public async Task<Snippet> GetOrAddSnippetAsync(Snippet snippet)
 		{
-			return FuncUtils.TrySeveralTimesAsync(
-				() => TryGetOrAddSnippetAsync(snippet),
-				3,
-				() => Task.Delay(TimeSpan.FromSeconds(1)),
-				typeof(SqlException)				
+			var foundSnippet = await db.Snippets.SingleOrDefaultAsync(
+				s => s.SnippetType == snippet.SnippetType
+					&& s.TokensCount == snippet.TokensCount
+					&& s.Hash == snippet.Hash
 			);
-		}
+			
+			if (foundSnippet != null)
+				return foundSnippet;
 
-		private async Task<Snippet> TryGetOrAddSnippetAsync(Snippet snippet)
-		{
-			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable))
+			db.Snippets.Add(snippet);
+			try
 			{
-				var foundSnippet = await db.Snippets.SingleOrDefaultAsync(
-					s => s.SnippetType == snippet.SnippetType
-						&& s.TokensCount == snippet.TokensCount
-						&& s.Hash == snippet.Hash
-				);
-				if (foundSnippet != null)
-					return foundSnippet;
-
-				await db.Snippets.AddAsync(snippet);
 				await db.SaveChangesAsync();
-				transaction.Commit();
+				return snippet;
 			}
-
-			return snippet;
+			catch (SqlException e)
+			{
+				if (e.Number == DbErrors.CanNotInsertDuplicateKeyRowInObject)
+				{
+					/* It's ok: this snippet already exists */
+					foundSnippet = await db.Snippets.SingleOrDefaultAsync(
+						s => s.SnippetType == snippet.SnippetType
+							&& s.TokensCount == snippet.TokensCount
+							&& s.Hash == snippet.Hash
+					);
+					if (foundSnippet != null)
+						return foundSnippet;
+				}
+				throw;				
+			}
 		}
 
 		public async Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount)
@@ -244,5 +253,11 @@ namespace AntiPlagiarism.Web.Database.Repos
 		{
 			return (await GetSnippetsOccurencesForSubmissionAsync(submission, maxCount)).Select(o => o.Snippet).ToList();
 		}
+	}
+
+	internal static class DbErrors
+	{
+		/* Cannot insert duplicate key row in object, see https://msdn.microsoft.com/en-us/library/cc645728.aspx */
+		public const int CanNotInsertDuplicateKeyRowInObject = 2601;
 	}
 }
