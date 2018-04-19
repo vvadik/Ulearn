@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Data;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
 namespace AntiPlagiarism.Web.Database.Repos
@@ -30,11 +32,25 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		public async Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
 		{
+			await FuncUtils.TrySeveralTimesAsync(
+				async () =>
+				{
+					await TrySaveTaskStatisticsParametersAsync(parameters);
+					return true;
+				},
+				3,
+				() => Task.Delay(TimeSpan.FromSeconds(1)),
+				typeof(SqlException)
+			);
+		}
+
+		private async Task TrySaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
+		{
 			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable))
 			{
 				db.AddOrUpdate(parameters, p => p.TaskId == parameters.TaskId);
 				await db.SaveChangesAsync();
-				transaction.Commit();	
+				transaction.Commit();
 			}
 		}
 	}

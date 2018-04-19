@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using AntiPlagiarism.Api.Models;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Ulearn.Common;
 
 namespace AntiPlagiarism.Web.Database.Repos
 {
@@ -110,32 +112,42 @@ namespace AntiPlagiarism.Web.Database.Repos
 			DisableAutoDetectChanges();
 			try
 			{
-				using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable))
-				{
-					var foundStatistics = await db.SnippetsStatistics.SingleOrDefaultAsync(
-						s => s.SnippetId == snippet.Id &&
-							s.TaskId == taskId &&
-							s.ClientId == clientId
-					);
-					if (foundStatistics != null)
-						return foundStatistics;
-
-					var addedStatistics = db.SnippetsStatistics.Add(new SnippetStatistics
-					{
-						SnippetId = snippet.Id,
-						ClientId = clientId,
-						TaskId = taskId,
-					});
-					addedStatistics.State = EntityState.Added;
-					await db.SaveChangesAsync();
-					transaction.Commit();
-
-					return addedStatistics.Entity;
-				}
+				return await FuncUtils.TrySeveralTimesAsync(
+					() => TryGetOrAddSnippetStatisticsAsync(snippet, taskId, clientId),
+					3,
+					() => Task.Delay(TimeSpan.FromSeconds(1)),
+					typeof(SqlException)					
+				);
 			}
 			finally
 			{
 				EnableAutoDetectChanges();
+			}
+		}
+
+		private async Task<SnippetStatistics> TryGetOrAddSnippetStatisticsAsync(Snippet snippet, Guid taskId, int clientId)
+		{
+			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable))
+			{
+				var foundStatistics = await db.SnippetsStatistics.SingleOrDefaultAsync(
+					s => s.SnippetId == snippet.Id &&
+						s.TaskId == taskId &&
+						s.ClientId == clientId
+				);
+				if (foundStatistics != null)
+					return foundStatistics;
+
+				var addedStatistics = db.SnippetsStatistics.Add(new SnippetStatistics
+				{
+					SnippetId = snippet.Id,
+					ClientId = clientId,
+					TaskId = taskId,
+				});
+				addedStatistics.State = EntityState.Added;
+				await db.SaveChangesAsync();
+				transaction.Commit();
+
+				return addedStatistics.Entity;
 			}
 		}
 
@@ -153,7 +165,17 @@ namespace AntiPlagiarism.Web.Database.Repos
 			db.ChangeTracker.AutoDetectChangesEnabled = true;
 		}
 
-		public async Task<Snippet> GetOrAddSnippetAsync(Snippet snippet)
+		public Task<Snippet> GetOrAddSnippetAsync(Snippet snippet)
+		{
+			return FuncUtils.TrySeveralTimesAsync(
+				() => TryGetOrAddSnippetAsync(snippet),
+				3,
+				() => Task.Delay(TimeSpan.FromSeconds(1)),
+				typeof(SqlException)				
+			);
+		}
+
+		private async Task<Snippet> TryGetOrAddSnippetAsync(Snippet snippet)
 		{
 			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable))
 			{
@@ -172,7 +194,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 			return snippet;
 		}
-		
+
 		public async Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount)
 		{
 			if (maxCount == 0)
