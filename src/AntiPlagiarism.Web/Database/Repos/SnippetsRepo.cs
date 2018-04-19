@@ -172,35 +172,47 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		public async Task<Snippet> GetOrAddSnippetAsync(Snippet snippet)
 		{
-			var foundSnippet = await db.Snippets.SingleOrDefaultAsync(
-				s => s.SnippetType == snippet.SnippetType
-					&& s.TokensCount == snippet.TokensCount
-					&& s.Hash == snippet.Hash
-			);
-			
-			if (foundSnippet != null)
-				return foundSnippet;
+			DisableAutoDetectChanges();
 
-			db.Snippets.Add(snippet);
 			try
 			{
-				await db.SaveChangesAsync();
-				return snippet;
-			}
-			catch (SqlException e)
-			{
-				if (e.Number == DbErrors.CanNotInsertDuplicateKeyRowInObject)
+				var foundSnippet = await db.Snippets.SingleOrDefaultAsync(
+					s => s.SnippetType == snippet.SnippetType
+						&& s.TokensCount == snippet.TokensCount
+						&& s.Hash == snippet.Hash
+				);
+
+				if (foundSnippet != null)
+					return foundSnippet;
+
+				db.Snippets.Add(snippet);
+				db.Entry(snippet).State = EntityState.Added;
+				try
 				{
-					/* It's ok: this snippet already exists */
-					foundSnippet = await db.Snippets.SingleOrDefaultAsync(
-						s => s.SnippetType == snippet.SnippetType
-							&& s.TokensCount == snippet.TokensCount
-							&& s.Hash == snippet.Hash
-					);
-					if (foundSnippet != null)
-						return foundSnippet;
+					await db.SaveChangesAsync();
+					return snippet;
 				}
-				throw;				
+				catch (SqlException e)
+				{
+					if (e.Number == DbErrors.CanNotInsertDuplicateKeyRowInObject)
+					{
+						logger.Warning(e, $"Возникла ошибка при добавлении сниппета {snippet}. Но это ничего, просто найду себе такой же в базе");
+						/* It's ok: this snippet already exists */
+						foundSnippet = await db.Snippets.SingleOrDefaultAsync(
+							s => s.SnippetType == snippet.SnippetType
+								&& s.TokensCount == snippet.TokensCount
+								&& s.Hash == snippet.Hash
+						);
+						if (foundSnippet != null)
+							return foundSnippet;
+					}
+
+					throw;
+				}
+			}
+			finally
+			{
+				EnableAutoDetectChanges();
 			}
 		}
 
