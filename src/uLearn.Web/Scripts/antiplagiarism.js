@@ -39,8 +39,14 @@ $(document).ready(function () {
         var originalTokens = getTokensDictionaryByIndex(antiplagiarismData.tokens_positions);
         var plagiarismTokens = getTokensDictionaryByIndex(plagiarismData.tokens_positions);
        
-        highlightNotAnalyzedParts(originalCodeMirror, antiplagiarismData.analyzed_code_units, originalTokens);
-        highlightNotAnalyzedParts(plagiarismCodeMirror, plagiarismData.analyzed_code_units, plagiarismTokens);
+        /* Batch all operations as one: see https://codemirror.net/doc/manual.html for details. It's much faster because
+         * doesn't need to fully relayout and redraw DOM tree */
+        originalCodeMirror.operation(function () {
+            highlightNotAnalyzedParts(originalCodeMirror, antiplagiarismData.analyzed_code_units, originalTokens);    
+        });
+        plagiarismCodeMirror.operation(function() {
+            highlightNotAnalyzedParts(plagiarismCodeMirror, plagiarismData.analyzed_code_units, plagiarismTokens);    
+        });        
         
         highlightMatchedTokens(plagiarismData.matched_snippets, originalCodeMirror, plagiarismCodeMirror, originalTokens, plagiarismTokens);
     });
@@ -104,8 +110,13 @@ $(document).ready(function () {
     }    
 
     function highlightMatchedTokens(matchedSnippets, originalCodeMirror, plagiarismCodeMirror, originalTokens, plagiarismTokens) {
-        highlightMatchedTokensInSubmission(matchedSnippets, originalCodeMirror, originalTokens, 'original_submission_first_token_index');
-        highlightMatchedTokensInSubmission(matchedSnippets, plagiarismCodeMirror, plagiarismTokens, 'plagiarism_submission_first_token_index');
+        /* Batch all operations as one: see https://codemirror.net/doc/manual.html for details */
+        originalCodeMirror.operation(function () {
+            highlightMatchedTokensInSubmission(matchedSnippets, originalCodeMirror, originalTokens, 'original_submission_first_token_index');    
+        });
+        plagiarismCodeMirror.operation(function () {
+            highlightMatchedTokensInSubmission(matchedSnippets, plagiarismCodeMirror, plagiarismTokens, 'plagiarism_submission_first_token_index');    
+        });        
     }
     
     function highlightMatchedTokensInSubmission(matchedSnippets, codeMirrorEditor, tokens, firstTokenIndexSelector) {
