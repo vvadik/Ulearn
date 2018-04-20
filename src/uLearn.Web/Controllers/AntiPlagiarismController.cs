@@ -60,6 +60,16 @@ namespace uLearn.Web.Controllers
 			var submission = userSolutionsRepo.FindSubmissionById(submissionId);
 			if (!string.Equals(submission.CourseId, courseId, StringComparison.InvariantCultureIgnoreCase))
 				return HttpNotFound();
+
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(submission.SlideId) as ExerciseSlide;
+			if (slide == null)
+				return HttpNotFound();
+
+			if (!slide.Exercise.CheckForPlagiarism)
+				return Json(new AntiPlagiarismInfoModel
+				{
+					Status = "not_checked",
+				}, JsonRequestBehavior.AllowGet);
 			
 			var antiPlagiarismsResult = await antiPlagiarismClient.GetAuthorPlagiarismsAsync(new GetAuthorPlagiarismsParameters
 			{
@@ -69,6 +79,7 @@ namespace uLearn.Web.Controllers
 
 			var model = new AntiPlagiarismInfoModel
 			{
+				Status = "checked",
 				SuspicionLevel = SuspicionLevel.None,
 				SuspiciousAuthorsCount = 0,
 			};
@@ -179,6 +190,9 @@ namespace uLearn.Web.Controllers
 	[DataContract]
 	public class AntiPlagiarismInfoModel
 	{
+		[DataMember(Name = "status")]
+		public string Status { get; set; }
+		
 		[DataMember(Name = "suspicion_level")]
 		public SuspicionLevel SuspicionLevel { get; set; }
 		

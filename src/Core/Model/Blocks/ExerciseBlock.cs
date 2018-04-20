@@ -55,6 +55,9 @@ namespace uLearn.Model.Blocks
 		[XmlElement("texts")]
 		public ExerciseTexts Texts { get; set; } = new ExerciseTexts();
 
+		[XmlElement("check-for-plagiarism")]
+		public bool CheckForPlagiarism { get; set; } = true;
+
 		[XmlElement("hide-solutions")]
 		public bool HideShowSolutionsButton { get; set; }
 

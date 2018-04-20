@@ -3,6 +3,12 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
     
     var url = $plagiarismStatus.data('antiplagiarismUrl');
     $.getJSON(url, function (data) {
+        if (data.status === 'not_checked') {
+            $plagiarismStatus.addClass('not-checked');
+            $plagiarismStatus.text('Эта задача не проверяется на списывание');
+            return;
+        }
+        
         $plagiarismStatus.addClass('found-level' + data.suspicion_level);
         var message = '';
         switch (data.suspicion_level)

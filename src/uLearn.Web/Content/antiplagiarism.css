@@ -8,6 +8,10 @@
     margin: 0;
 }
 
+.antiplagiarism-status.not-checked {
+    background-color: #eaf5e5;
+}
+
 .antiplagiarism-status.found-none,
 .antiplagiarism-status.found-level0 {
     background-color: #cafac1;
