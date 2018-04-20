@@ -232,11 +232,14 @@ namespace AntiPlagiarism.Web.Controllers
 			var taskStatisticsParameters = await tasksRepo.FindTaskStatisticsParametersAsync(taskId);
 			if (taskStatisticsParameters == null)
 				return null;
+			
+			var faintSuspicionCoefficient = configuration.StatisticsAnalyzing.FaintSuspicionCoefficient;
+			var strongSuspicionCoefficient = configuration.StatisticsAnalyzing.StrongSuspicionCoefficient; 
 
 			return new SuspicionLevels
 			{
-				FaintSuspicion = Math.Min(taskStatisticsParameters.Mean + 4 * taskStatisticsParameters.Deviation, 1),
-				StrongSuspicion = Math.Min(taskStatisticsParameters.Mean + 6 * taskStatisticsParameters.Deviation, 1),
+				FaintSuspicion = Math.Min(taskStatisticsParameters.Mean + faintSuspicionCoefficient * taskStatisticsParameters.Deviation, 1),
+				StrongSuspicion = Math.Min(taskStatisticsParameters.Mean + strongSuspicionCoefficient * taskStatisticsParameters.Deviation, 1),
 			};
 		}
 	}

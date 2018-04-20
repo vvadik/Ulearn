@@ -20,6 +20,10 @@ namespace AntiPlagiarism.Web.Configuration
 		public int CountOfLastAuthorsForCalculatingMeanAndDeviation { get; set; }
 		
 		public int RecalculateStatisticsAfterSubmisionsCount { get; set; }
+		
+		public int FaintSuspicionCoefficient { get; set; }
+		
+		public int StrongSuspicionCoefficient { get; set; }
 	}
 
 	public class PlagiarismDetectorConfiguration

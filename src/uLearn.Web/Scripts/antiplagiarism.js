@@ -16,12 +16,13 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
             case 0: message = 'похожих решений не найдено'; break;
             case 1:
             case 2:
-                var singleNumberMessage = 'найдено похожее решение у {count} другого студента. {link}';
-                var pluralNumberMessage = 'найдены похожие решения у {count} других студентов. {link}';
+                var singleNumberMessage = 'у {count} другого студента найдено {very} похожее решение. {link}';
+                var pluralNumberMessage = 'у {count} других студентов найдены {very} похожие решения. {link}';
                 message = data.suspicious_authors_count === 1 ? singleNumberMessage : pluralNumberMessage;
                 break;
         }
         message = message.replace('{count}', data.suspicious_authors_count);
+        message = message.replace('{very}', data.suspicion_level === 2 ? '<b>очень</b>' : '');
         message = message.replace('{link}', '<a href="' + $plagiarismStatus.data('antiplagiarismDetailsUrl') + '" target="_blank">Посмотреть</a>');
         
         $plagiarismStatus.html('Проверка на списывание: ' + message);
@@ -187,6 +188,7 @@ $(document).ready(function () {
     $('.antiplagiarism__submissions-panel [name="submissionId"]').change(function () {
         var $self = $(this);
         $('.antiplagiarism').hide();
+        $('.suspicion-level-description').hide();
         var $form = $self.closest('form');        
         $form.submit();
     });

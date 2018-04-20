@@ -83,21 +83,26 @@ namespace uLearn.Web.Controllers
 				SuspicionLevel = SuspicionLevel.None,
 				SuspiciousAuthorsCount = 0,
 			};
-			var suspicionAuthorsIds = new HashSet<Guid>();
+			var faintSuspicionAuthorsIds = new HashSet<Guid>();
+			var strongSuspicionAuthorsIds = new HashSet<Guid>();
 			foreach (var researchedSubmission in antiPlagiarismsResult.ResearchedSubmissions)
 			{
 				foreach (var plagiarism in researchedSubmission.Plagiarisms)
 				{
 					if (plagiarism.Weight >= antiPlagiarismsResult.SuspicionLevels.StrongSuspicion)
+					{
+						strongSuspicionAuthorsIds.Add(plagiarism.SubmissionInfo.AuthorId);
 						model.SuspicionLevel = SuspicionLevel.Strong;
+					}
 					else if (plagiarism.Weight >= antiPlagiarismsResult.SuspicionLevels.FaintSuspicion && model.SuspicionLevel == SuspicionLevel.None)
+					{
+						faintSuspicionAuthorsIds.Add(plagiarism.SubmissionInfo.AuthorId);
 						model.SuspicionLevel = SuspicionLevel.Faint;
-
-					suspicionAuthorsIds.Add(plagiarism.SubmissionInfo.AuthorId);
+					}
 				}
 			}
 
-			model.SuspiciousAuthorsCount = suspicionAuthorsIds.Count;
+			model.SuspiciousAuthorsCount = model.SuspicionLevel == SuspicionLevel.Faint ? faintSuspicionAuthorsIds.Count : strongSuspicionAuthorsIds.Count;
 
 			return Json(model, JsonRequestBehavior.AllowGet);
 		}

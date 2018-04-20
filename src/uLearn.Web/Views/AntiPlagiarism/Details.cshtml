@@ -63,18 +63,50 @@
         </div>
         
 	    var researchedSubmission = Model.AntiPlagiarismResult.ResearchedSubmissions.FirstOrDefault(s => s.SubmissionInfo.Id == submission.AntiPlagiarismSubmissionId);
+	    const int maxPlagiarismsShown = 30;
 	    if (researchedSubmission != null && researchedSubmission.Plagiarisms.Count > 0)
 	    {
 		    var plagiarisms = researchedSubmission.Plagiarisms.AsEnumerable();
 		    /* For each author select only one plagiarism, with maximal weight */
 		    plagiarisms = plagiarisms.GroupBy(p => p.SubmissionInfo.AuthorId).ToDictionary(g => g.Key, g => g.MaxBy(p => p.Weight)).Select(kvp => kvp.Value);
-		    plagiarisms = plagiarisms.OrderByDescending(p => p.Weight);
-		    foreach (var plagiarism in plagiarisms)
+		    plagiarisms = plagiarisms.OrderByDescending(p => p.Weight).Take(maxPlagiarismsShown + 1).ToList();
+		    var wasFaintSuspicion = false;
+		    var wasStrongSuspicion = false;
+		    foreach (var plagiarism in plagiarisms.Take(maxPlagiarismsShown))
 		    {
 			    if (!submissionsByAntiPlagiarismIds.ContainsKey(plagiarism.SubmissionInfo.Id))
 			    {
 				    continue;
 			    }
+			    
+			    if (plagiarism.Weight >= Model.AntiPlagiarismResult.SuspicionLevels.StrongSuspicion)
+			    {
+				    if (!wasStrongSuspicion)
+				    {
+					    wasStrongSuspicion = true;
+					    <div class="suspicion-level-description strong-level">
+                            <h3>
+                                Подозрительно похожие решения
+                            </h3>
+                            <div>
+                                Скорее всего, эти решения списаны или взяты из одного источника:
+                            </div>
+                        </div>
+				    }
+			    } 
+			    else if (plagiarism.Weight >= Model.AntiPlagiarismResult.SuspicionLevels.FaintSuspicion && !wasFaintSuspicion)
+			    {
+				    wasFaintSuspicion = true;
+				    <div class="suspicion-level-description faint-level">
+                        <h3>
+                            Похожие решения меньшей подозрительности
+                        </h3>
+                        <div>
+                            Возможно, эти решения похожи случайно. Внимательно посмотрите на них, прежде чем штрафовать студентов:
+                        </div>
+                    </div>
+			    }
+			    
 			    var plagiarismSubmission = submissionsByAntiPlagiarismIds[plagiarism.SubmissionInfo.Id];
 			    <div class="antiplagiarism row">
                     <div class="col-xs-6">
@@ -117,11 +149,23 @@
                         @(new { analyzed_code_units = researchedSubmission.AnalyzedCodeUnits, tokens_positions = researchedSubmission.TokensPositions, plagiarism = plagiarism }.JsonSerialize())
                     </div>
                 </div>
-		    }	    
+		    }
+		    if (plagiarisms.Count() > maxPlagiarismsShown)
+		    {
+			    <div class="text-muted">
+                    Показано @maxPlagiarismsShown самых похожих решений.
+                </div>
+		    }
 	    }
 	    else
 	    {
-		    <div class="text-muted">Мы не нашли ничего похожего на это решение. Вероятно, этот код написан самостоятельно.</div>
+		    <div class="text-muted">
+                Мы не нашли ничего похожего на&nbsp;это решение. Вероятно, этот код написан самостоятельно. 
+            </div>
+		    <div class="text-muted">
+                Попробуйте выбрать одно из предыдущих решений этого студента по этой задаче. Список версий доступен выше.
+            </div>
+		    <br />
 		    <textarea class="code code-sample" data-lang="cs">@submission.SolutionCode.Text</textarea>
 	    }
     }

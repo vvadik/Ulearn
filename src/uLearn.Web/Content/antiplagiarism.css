@@ -8,6 +8,10 @@
     margin: 0;
 }
 
+.antiplagiarism-status b {
+    font-weight: 600;
+}
+
 .antiplagiarism-status.not-checked {
     background-color: #eaf5e5;
 }
@@ -28,6 +32,23 @@
 .antiplagiarism-status.found-level2 {
     background-color: #fac1c1;
     box-shadow: inset 0 -10px 10px -10px #c36868;
+}
+
+.suspicion-level-description {
+    padding: 15px 20px;
+    margin: 20px -20px 0;
+}
+
+.suspicion-level-description.strong-level {
+    background-color: #fd7b686e;
+}
+
+.suspicion-level-description.faint-level {
+    background-color: #fddb686e;
+}
+
+.suspicion-level-description h3 {
+    margin-top: 0;
 }
 
 /* Antiplagiarism page */
