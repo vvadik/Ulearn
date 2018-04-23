@@ -29,6 +29,8 @@ namespace AntiPlagiarism.Web.Configuration
 	public class PlagiarismDetectorConfiguration
 	{
 		public int CountOfColdestSnippetsUsedToSearch { get; set; }
+
+		public int SnippetAuthorsCountThreshold { get; set; }
 	}
 
 	public class ActionsConfiguration

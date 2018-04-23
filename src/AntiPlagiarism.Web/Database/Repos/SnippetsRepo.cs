@@ -18,7 +18,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<Snippet> AddSnippetAsync(int tokensCount, SnippetType type, int hash);
 		Task<bool> IsSnippetExistsAsync(int tokensCount, SnippetType type, int hash);
 		Task<SnippetOccurence> AddSnippetOccurenceAsync(Submission submission, Snippet snippet, int firstTokenIndex);
-		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount);
+		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount, int authorsCountThreshold);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission);
 		Task<Dictionary<int, SnippetStatistics>> GetSnippetsStatisticsAsync(int clientId, Guid taskId, IEnumerable<int> snippetsIds);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId);
@@ -83,7 +83,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			
 			logger.Information($"Добавил. Пересчитываю статистику сниппета (количество авторов, у которых он встречается)");
 			var snippetStatistics = await GetOrAddSnippetStatisticsAsync(foundSnippet, submission.TaskId, submission.ClientId);
-
+			
 			
 			DisableAutoDetectChanges();
 			
@@ -136,8 +136,9 @@ namespace AntiPlagiarism.Web.Database.Repos
 				{
 					if (e.Number == DbErrors.CanNotInsertDuplicateKeyRowInObject)
 					{
+						logger.Warning(e, $"Возникла ошибка при добавлении объекта SnippetStatistics для сниппета {snippet}. Но это ничего, просто найду себе такой же в базе");
 						/* It's ok: this statistics already exists */
-						foundStatistics = await db.SnippetsStatistics.SingleOrDefaultAsync(
+						foundStatistics = await db.SnippetsStatistics.AsNoTracking().SingleOrDefaultAsync(
 							s => s.SnippetId == snippet.Id &&
 								s.TaskId == taskId &&
 								s.ClientId == clientId
@@ -198,7 +199,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 					{
 						logger.Warning(e, $"Возникла ошибка при добавлении сниппета {snippet}. Но это ничего, просто найду себе такой же в базе");
 						/* It's ok: this snippet already exists */
-						foundSnippet = await db.Snippets.SingleOrDefaultAsync(
+						foundSnippet = await db.Snippets.AsNoTracking().SingleOrDefaultAsync(
 							s => s.SnippetType == snippet.SnippetType
 								&& s.TokensCount == snippet.TokensCount
 								&& s.Hash == snippet.Hash
@@ -216,7 +217,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			}
 		}
 
-		public async Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount)
+		public async Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount, int authorsCountThreshold)
 		{
 			if (maxCount == 0)
 				return await db.SnippetsOccurences.Where(o => o.SubmissionId == submission.Id).ToListAsync();
@@ -224,7 +225,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			var selectedSnippetsStatistics = db.SnippetsStatistics.Where(s => s.TaskId == submission.TaskId && s.ClientId == submission.ClientId);
 			return (await db.SnippetsOccurences.Include(o => o.Snippet)
 				.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
-				.Where(o => o.occurence.SubmissionId == submission.Id)
+				.Where(o => o.occurence.SubmissionId == submission.Id && o.statistics.AuthorsCount <= authorsCountThreshold)
 				.OrderBy(o => o.statistics.AuthorsCount)
 				.Take(maxCount)
 				.ToListAsync())
@@ -234,7 +235,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		public Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission)
 		{
-			return GetSnippetsOccurencesForSubmissionAsync(submission, 0);
+			return GetSnippetsOccurencesForSubmissionAsync(submission, 0, int.MaxValue);
 		}
 
 		public Task<Dictionary<int, SnippetStatistics>> GetSnippetsStatisticsAsync(int clientId, Guid taskId, IEnumerable<int> snippetsIds)
@@ -261,9 +262,9 @@ namespace AntiPlagiarism.Web.Database.Repos
 			);
 		}
 
-		public async Task<List<Snippet>> GetSnippetsForSubmission(Submission submission, int maxCount)
+		public async Task<List<Snippet>> GetSnippetsForSubmission(Submission submission, int maxCount, int authorsCountThreshold)
 		{
-			return (await GetSnippetsOccurencesForSubmissionAsync(submission, maxCount)).Select(o => o.Snippet).ToList();
+			return (await GetSnippetsOccurencesForSubmissionAsync(submission, maxCount, authorsCountThreshold)).Select(o => o.Snippet).ToList();
 		}
 	}
 

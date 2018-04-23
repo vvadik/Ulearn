@@ -12,17 +12,15 @@ namespace AntiPlagiarism.UpdateDb
 {
 	public class AntiPlagiarismSnippetsUpdater
 	{
-		private readonly ISnippetsRepo snippetsRepo;
 		private readonly SubmissionSnippetsExtractor submissionSnippetsExtractor;
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly ILogger logger;
 
-		public AntiPlagiarismSnippetsUpdater(ISnippetsRepo snippetsRepo,
+		public AntiPlagiarismSnippetsUpdater(
 			SubmissionSnippetsExtractor submissionSnippetsExtractor,
 			IServiceScopeFactory serviceScopeFactory,
 			ILogger logger)
 		{
-			this.snippetsRepo = snippetsRepo;
 			this.submissionSnippetsExtractor = submissionSnippetsExtractor;
 			this.serviceScopeFactory = serviceScopeFactory;
 			this.logger = logger;
@@ -32,33 +30,35 @@ namespace AntiPlagiarism.UpdateDb
 		{
 			logger.Information("Начинаю обновлять информацию о сниппетах в базе данных");
 
-			var maxCount = 1000;
+			const int maxSubmissionsCount = 1000;
 			while (true)
 			{
-				/* Re-create submissions repo each time for preventing memory leaks */
-				List<Submission> submissions;
+				int lastSubmissionId;
 				using (var scope = serviceScopeFactory.CreateScope())
 				{
+					/* Re-create submissions repo each time for preventing memory leaks */					
 					var submissionsRepo = scope.ServiceProvider.GetService<ISubmissionsRepo>();
 
-					submissions = await submissionsRepo.GetSubmissionsAsync(startFromIndex, maxCount);
+					var submissions = await submissionsRepo.GetSubmissionsAsync(startFromIndex, maxSubmissionsCount);
 					if (submissions.Count == 0)
 						break;
-				}
 
-				var firstSubmissionId = submissions.First().Id;
-				var lastSubmissionId = submissions.Last().Id;
-				logger.Information($"Получил {submissions.Count} следующих решений из базы данных. Идентификаторы решений от {firstSubmissionId} до {lastSubmissionId}");
+					var snippetsRepo = scope.ServiceProvider.GetService<ISnippetsRepo>();
 
-				foreach (var submission in submissions)
-				{
-					try
+					var firstSubmissionId = submissions.First().Id;
+					lastSubmissionId = submissions.Last().Id;
+					logger.Information($"Получил {submissions.Count} следующих решений из базы данных. Идентификаторы решений от {firstSubmissionId} до {lastSubmissionId}");
+
+					foreach (var submission in submissions)
 					{
-						await UpdateSnippetsFromSubmissionAsync(submission);
-					}
-					catch (Exception e)
-					{
-						logger.Error(e, $"Ошибка при обновлении списка сниппетов решения #{submission.Id}. Продолжаю работу со следующего решения");
+						try
+						{
+							await UpdateSnippetsFromSubmissionAsync(snippetsRepo, submission);
+						}
+						catch (Exception e)
+						{
+							logger.Error(e, $"Ошибка при обновлении списка сниппетов решения #{submission.Id}. Продолжаю работу со следующего решения");
+						}
 					}
 				}
 
@@ -73,7 +73,7 @@ namespace AntiPlagiarism.UpdateDb
 			logger.Information("AntiPlagiarismSnippetsUpdater закончил свою работу");
 		}
 
-		private async Task UpdateSnippetsFromSubmissionAsync(Submission submission)
+		private async Task UpdateSnippetsFromSubmissionAsync(ISnippetsRepo snippetsRepo, Submission submission)
 		{
 			var occurences = new HashSet<Tuple<int, int>>(
 				(await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission))
