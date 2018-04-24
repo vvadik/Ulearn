@@ -11,6 +11,7 @@ using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Operations;
 using Microsoft.Extensions.Options;
 using Serilog;
 
@@ -247,13 +248,25 @@ namespace AntiPlagiarism.Web.Controllers
 				return null;
 			
 			var faintSuspicionCoefficient = configuration.StatisticsAnalyzing.FaintSuspicionCoefficient;
-			var strongSuspicionCoefficient = configuration.StatisticsAnalyzing.StrongSuspicionCoefficient; 
+			var strongSuspicionCoefficient = configuration.StatisticsAnalyzing.StrongSuspicionCoefficient;
+			var minSuspicionLevel = configuration.StatisticsAnalyzing.MinSuspicionLevel;
 
 			return new SuspicionLevels
 			{
-				FaintSuspicion = Math.Min(taskStatisticsParameters.Mean + faintSuspicionCoefficient * taskStatisticsParameters.Deviation, 1),
-				StrongSuspicion = Math.Min(taskStatisticsParameters.Mean + strongSuspicionCoefficient * taskStatisticsParameters.Deviation, 1),
+				FaintSuspicion = GetSuspicionLevelWithThreshold(taskStatisticsParameters.Mean + faintSuspicionCoefficient * taskStatisticsParameters.Deviation, minSuspicionLevel, 1),
+				StrongSuspicion = GetSuspicionLevelWithThreshold(taskStatisticsParameters.Mean + strongSuspicionCoefficient * taskStatisticsParameters.Deviation, minSuspicionLevel, 1),
 			};
+		}
+
+		private static double GetSuspicionLevelWithThreshold(double value, double minValue, double maxValue)
+		{
+			if (minValue > maxValue)
+				throw new ArgumentException("minValue should be less than maxValue");
+			if (value < minValue)
+				return minValue;
+			if (value > maxValue)
+				return maxValue;
+			return value;
 		}
 	}
 }

@@ -24,6 +24,8 @@ namespace AntiPlagiarism.Web.Configuration
 		public int FaintSuspicionCoefficient { get; set; }
 		
 		public int StrongSuspicionCoefficient { get; set; }
+		
+		public double MinSuspicionLevel { get; set; }
 	}
 
 	public class PlagiarismDetectorConfiguration
