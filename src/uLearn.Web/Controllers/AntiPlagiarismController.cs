@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Web.Mvc;
@@ -132,8 +134,9 @@ namespace uLearn.Web.Controllers
 
 			var userIds = new HashSet<string>(antiPlagiarismsResult.ResearchedSubmissions.SelectMany(s => s.Plagiarisms).Select(s => s.SubmissionInfo.AuthorId.ToString()));
 			userIds.Add(submission.UserId);
-			var usersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User).ToDefaultDictionary();
-			var usersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User, onlyArchived: true).ToDefaultDictionary();
+			/* Pass special MockUserCanSeeAllGroups() instead of User because we want to show all users groups, not only available */
+			var usersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, new MockUserCanSeeAllGroups()).ToDefaultDictionary();
+			var usersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, new MockUserCanSeeAllGroups(), onlyArchived: true).ToDefaultDictionary();
 
 			var course = courseManager.FindCourse(courseId);
 			var slide = course?.FindSlideById(submission.SlideId);
@@ -220,5 +223,15 @@ namespace uLearn.Web.Controllers
 		public GetAuthorPlagiarismsResult AntiPlagiarismResult { get; set; }
 		
 		public Dictionary<int, UserExerciseSubmission> Submissions { get; set; }
+	}
+
+	public class MockUserCanSeeAllGroups : IPrincipal
+	{
+		public bool IsInRole(string role)
+		{
+			return true;
+		}
+
+		public IIdentity Identity => new ClaimsIdentity();
 	}
 }
