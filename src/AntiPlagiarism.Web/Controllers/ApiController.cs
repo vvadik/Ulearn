@@ -249,12 +249,13 @@ namespace AntiPlagiarism.Web.Controllers
 			
 			var faintSuspicionCoefficient = configuration.StatisticsAnalyzing.FaintSuspicionCoefficient;
 			var strongSuspicionCoefficient = configuration.StatisticsAnalyzing.StrongSuspicionCoefficient;
-			var minSuspicionLevel = configuration.StatisticsAnalyzing.MinSuspicionLevel;
+			var minFaintSuspicionLevel = configuration.StatisticsAnalyzing.MinFaintSuspicionLevel;
+			var minStrongSuspicionLevel = configuration.StatisticsAnalyzing.MinStrongSuspicionLevel;
 
 			return new SuspicionLevels
 			{
-				FaintSuspicion = GetSuspicionLevelWithThreshold(taskStatisticsParameters.Mean + faintSuspicionCoefficient * taskStatisticsParameters.Deviation, minSuspicionLevel, 1),
-				StrongSuspicion = GetSuspicionLevelWithThreshold(taskStatisticsParameters.Mean + strongSuspicionCoefficient * taskStatisticsParameters.Deviation, minSuspicionLevel, 1),
+				FaintSuspicion = GetSuspicionLevelWithThreshold(taskStatisticsParameters.Mean + faintSuspicionCoefficient * taskStatisticsParameters.Deviation, minFaintSuspicionLevel, 1),
+				StrongSuspicion = GetSuspicionLevelWithThreshold(taskStatisticsParameters.Mean + strongSuspicionCoefficient * taskStatisticsParameters.Deviation, minStrongSuspicionLevel, 1),
 			};
 		}
 
