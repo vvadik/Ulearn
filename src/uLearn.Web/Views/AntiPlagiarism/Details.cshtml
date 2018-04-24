@@ -63,7 +63,7 @@
         </div>
         
 	    var researchedSubmission = Model.AntiPlagiarismResult.ResearchedSubmissions.FirstOrDefault(s => s.SubmissionInfo.Id == submission.AntiPlagiarismSubmissionId);
-	    const int maxPlagiarismsShown = 30;
+	    const int maxPlagiarismsShown = 10;
 	    if (researchedSubmission != null && researchedSubmission.Plagiarisms.Count > 0)
 	    {
 		    var plagiarisms = researchedSubmission.Plagiarisms.AsEnumerable();
