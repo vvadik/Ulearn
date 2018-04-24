@@ -132,20 +132,18 @@ namespace AntiPlagiarism.Web.Database.Repos
 				{
 					await db.SaveChangesAsync();
 				}
-				catch (SqlException e)
+				catch (DbUpdateException e)
 				{
-					if (e.Number == DbErrors.CanNotInsertDuplicateKeyRowInObject)
-					{
-						logger.Warning(e, $"Возникла ошибка при добавлении объекта SnippetStatistics для сниппета {snippet}. Но это ничего, просто найду себе такой же в базе");
-						/* It's ok: this statistics already exists */
-						foundStatistics = await db.SnippetsStatistics.AsNoTracking().SingleOrDefaultAsync(
-							s => s.SnippetId == snippet.Id &&
-								s.TaskId == taskId &&
-								s.ClientId == clientId
-						);
-						if (foundStatistics != null)
-							return foundStatistics;
-					}
+					logger.Warning(e, $"Возникла ошибка при добавлении объекта SnippetStatistics для сниппета {snippet}. Но это ничего, просто найду себе такой же в базе");
+					/* It's ok: this statistics already exists */
+					foundStatistics = await db.SnippetsStatistics.AsNoTracking().SingleOrDefaultAsync(
+						s => s.SnippetId == snippet.Id &&
+							s.TaskId == taskId &&
+							s.ClientId == clientId
+					);
+					if (foundStatistics != null)
+						return foundStatistics;
+					
 					throw;				
 				}
 
@@ -193,20 +191,17 @@ namespace AntiPlagiarism.Web.Database.Repos
 					await db.SaveChangesAsync();
 					return snippet;
 				}
-				catch (SqlException e)
+				catch (DbUpdateException e)
 				{
-					if (e.Number == DbErrors.CanNotInsertDuplicateKeyRowInObject)
-					{
-						logger.Warning(e, $"Возникла ошибка при добавлении сниппета {snippet}. Но это ничего, просто найду себе такой же в базе");
-						/* It's ok: this snippet already exists */
-						foundSnippet = await db.Snippets.AsNoTracking().SingleOrDefaultAsync(
-							s => s.SnippetType == snippet.SnippetType
-								&& s.TokensCount == snippet.TokensCount
-								&& s.Hash == snippet.Hash
-						);
-						if (foundSnippet != null)
-							return foundSnippet;
-					}
+					logger.Warning(e, $"Возникла ошибка при добавлении сниппета {snippet}. Но это ничего, просто найду себе такой же в базе");
+					/* It's ok: this snippet already exists */
+					foundSnippet = await db.Snippets.AsNoTracking().SingleOrDefaultAsync(
+						s => s.SnippetType == snippet.SnippetType
+							&& s.TokensCount == snippet.TokensCount
+							&& s.Hash == snippet.Hash
+					);
+					if (foundSnippet != null)
+						return foundSnippet;
 
 					throw;
 				}
