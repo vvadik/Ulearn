@@ -1248,6 +1248,7 @@
     <Content Include="Views\Errors\404.cshtml" />
     <Content Include="Views\Errors\Error.cshtml" />
     <Content Include="Views\Exercise\_ExerciseReviewComment.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Retargeting.cshtml" />
     <Content Include="Views\Shared\_ReturnHijack.cshtml" />
     <Content Include="Web.config" />

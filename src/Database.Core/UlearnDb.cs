@@ -93,6 +93,8 @@ namespace Database
 				.HasForeignKey(d => d.NotificationId)
 				.OnDelete(DeleteBehavior.Restrict);
 
+			modelBuilder.Entity<UserRole>().HasOne(r => r.User).WithMany().HasForeignKey(r => r.UserId).OnDelete(DeleteBehavior.Cascade);
+
 			CancelCascaseDeleting<ExerciseCodeReview, ApplicationUser>(modelBuilder, c => c.Author, c => c.AuthorId);
 
 			CancelCascaseDeleting<UserExerciseSubmission, ApplicationUser>(modelBuilder, c => c.User, c => c.UserId);

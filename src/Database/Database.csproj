@@ -644,6 +644,10 @@
     <Compile Include="Migrations\201804130337227_AddSubmissionsLanguageAndAgentName.Designer.cs">
       <DependentUpon>201804130337227_AddSubmissionsLanguageAndAgentName.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201804240540418_RemoveDeleteRestrictionForUser.cs" />
+    <Compile Include="Migrations\201804240540418_RemoveDeleteRestrictionForUser.Designer.cs">
+      <DependentUpon>201804240540418_RemoveDeleteRestrictionForUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -997,6 +1001,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804130337227_AddSubmissionsLanguageAndAgentName.resx">
       <DependentUpon>201804130337227_AddSubmissionsLanguageAndAgentName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804240540418_RemoveDeleteRestrictionForUser.resx">
+      <DependentUpon>201804240540418_RemoveDeleteRestrictionForUser.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

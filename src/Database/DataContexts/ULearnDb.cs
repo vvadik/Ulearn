@@ -51,6 +51,8 @@ namespace Database.DataContexts
 				.WithMany(n => n.Deliveries)
 				.HasForeignKey(d => d.NotificationId)
 				.WillCascadeOnDelete(false);
+			
+			modelBuilder.Entity<UserRole>().HasRequired(r => r.User).WithMany().HasForeignKey(r => r.UserId).WillCascadeOnDelete();
 
 			CancelCascaseDeleting<ExerciseCodeReview, ApplicationUser, string>(modelBuilder, c => c.Author, c => c.AuthorId);
 
