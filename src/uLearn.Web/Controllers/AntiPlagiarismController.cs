@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -15,6 +16,7 @@ using Database.DataContexts;
 using Database.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Schema;
 using Serilog;
 using uLearn.Web.FilterAttributes;
 using Ulearn.Common;
@@ -73,11 +75,7 @@ namespace uLearn.Web.Controllers
 					Status = "not_checked",
 				}, JsonRequestBehavior.AllowGet);
 			
-			var antiPlagiarismsResult = await antiPlagiarismClient.GetAuthorPlagiarismsAsync(new GetAuthorPlagiarismsParameters
-			{
-				AuthorId = Guid.Parse(submission.UserId),
-				TaskId = submission.SlideId
-			});
+			var antiPlagiarismsResult = await GetAuthorPlagiarismsAsync(submission);
 
 			var model = new AntiPlagiarismInfoModel
 			{
@@ -113,13 +111,9 @@ namespace uLearn.Web.Controllers
 		{
 			var submission = userSolutionsRepo.FindSubmissionById(submissionId);
 			if (! submission.CourseId.EqualsIgnoreCase(courseId))
-				return HttpNotFound(); 
-					
-			var antiPlagiarismsResult = await antiPlagiarismClient.GetAuthorPlagiarismsAsync(new GetAuthorPlagiarismsParameters
-			{
-				AuthorId = Guid.Parse(submission.UserId),
-				TaskId = submission.SlideId
-			});
+				return HttpNotFound();
+
+			var antiPlagiarismsResult = await GetAuthorPlagiarismsAsync(submission);
 
 			var antiPlagiarismSubmissionsIds = antiPlagiarismsResult.ResearchedSubmissions.Select(s => s.SubmissionInfo.Id);
 			var plagiarismsSubmissionsIds = antiPlagiarismsResult.ResearchedSubmissions
@@ -134,7 +128,7 @@ namespace uLearn.Web.Controllers
 
 			var userIds = new HashSet<string>(antiPlagiarismsResult.ResearchedSubmissions.SelectMany(s => s.Plagiarisms).Select(s => s.SubmissionInfo.AuthorId.ToString()));
 			userIds.Add(submission.UserId);
-			/* Pass special MockUserCanSeeAllGroups() instead of User because we want to show all users groups, not only available */
+			/* Use special MockUserCanSeeAllGroups() instead of User because we want to show all users groups, not only available */
 			var usersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, new MockUserCanSeeAllGroups()).ToDefaultDictionary();
 			var usersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, new MockUserCanSeeAllGroups(), onlyArchived: true).ToDefaultDictionary();
 
@@ -184,6 +178,39 @@ namespace uLearn.Web.Controllers
 				return ", не проверялась на списывание";
 			var weightPercents = (int)(submissionWeight.Value * 100);
 			return $", подозрительность — {weightPercents}%";
+		}
+
+		private static readonly ConcurrentDictionary<int, Tuple<DateTime, GetAuthorPlagiarismsResult>> plagiarismsCache = new ConcurrentDictionary<int, Tuple<DateTime, GetAuthorPlagiarismsResult>>();
+		private static readonly TimeSpan cacheLifeTime = TimeSpan.FromMinutes(10);
+
+		private static async Task<GetAuthorPlagiarismsResult> GetAuthorPlagiarismsAsync(UserExerciseSubmission submission)
+		{
+			RemoveOldValuesFromCache();
+			if (plagiarismsCache.TryGetValue(submission.Id, out var cachedValue))
+			{
+				return cachedValue.Item2;
+			}
+			
+			var value = await antiPlagiarismClient.GetAuthorPlagiarismsAsync(new GetAuthorPlagiarismsParameters
+			{
+				AuthorId = Guid.Parse(submission.UserId),
+				TaskId = submission.SlideId
+			});
+			plagiarismsCache.AddOrUpdate(submission.Id, _id => Tuple.Create(DateTime.Now, value), (_id, _old) => Tuple.Create(DateTime.Now, value));
+			return value;
+		}
+
+		private static void RemoveOldValuesFromCache()
+		{
+			foreach (var key in plagiarismsCache.Keys.ToList())
+			{
+				if (plagiarismsCache.TryGetValue(key, out var cachedValue))
+				{
+					/* Remove cached value if it is too old */
+					if (DateTime.Now.Subtract(cachedValue.Item1) > cacheLifeTime)
+						plagiarismsCache.TryRemove(key, out var _);
+				}
+			}
 		}
 	}
 
