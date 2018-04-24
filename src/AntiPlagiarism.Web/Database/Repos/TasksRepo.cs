@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Extensions;
@@ -12,6 +14,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 {
 	public interface ITasksRepo
 	{
+		Task<List<Guid>> GetTaskIds();
 		Task<TaskStatisticsParameters> FindTaskStatisticsParametersAsync(Guid taskId);
 		Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters);
 	}
@@ -23,6 +26,11 @@ namespace AntiPlagiarism.Web.Database.Repos
 		public TasksRepo(AntiPlagiarismDb db)
 		{
 			this.db = db;
+		}
+
+		public Task<List<Guid>> GetTaskIds()
+		{
+			return db.TasksStatisticsParameters.Select(p => p.TaskId).ToListAsync();
 		}
 
 		public Task<TaskStatisticsParameters> FindTaskStatisticsParametersAsync(Guid taskId)

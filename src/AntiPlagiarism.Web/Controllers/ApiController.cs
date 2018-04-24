@@ -134,6 +134,19 @@ namespace AntiPlagiarism.Web.Controllers
 			});
 		}
 
+		[HttpPost(Api.Urls.RecalculateSnippetStatistics)]
+		public async Task<IActionResult> RecalculateSnippetStatistics()
+		{
+			var taskIds = await tasksRepo.GetTaskIds();
+			foreach (var taskId in taskIds)
+				await CalculateTaskStatisticsParametersAsync(client.Id, taskId);
+
+			return Json(new RecalculateSnippetStatisticsResult
+			{
+				TaskIds = taskIds
+			});
+		}
+
 		[HttpGet(Api.Urls.GetSubmissionPlagiarisms)]
 		public async Task<IActionResult> GetSubmissionPlagiarisms(GetSubmissionPlagiarismsParameters parameters)
 		{
