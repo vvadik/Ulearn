@@ -180,23 +180,26 @@ namespace uLearn.Web.Controllers
 			return $", подозрительность — {weightPercents}%";
 		}
 
-		private static readonly ConcurrentDictionary<int, Tuple<DateTime, GetAuthorPlagiarismsResult>> plagiarismsCache = new ConcurrentDictionary<int, Tuple<DateTime, GetAuthorPlagiarismsResult>>();
+		private static readonly ConcurrentDictionary<Tuple<Guid, Guid>, Tuple<DateTime, GetAuthorPlagiarismsResult>> plagiarismsCache = new ConcurrentDictionary<Tuple<Guid, Guid>, Tuple<DateTime, GetAuthorPlagiarismsResult>>();
 		private static readonly TimeSpan cacheLifeTime = TimeSpan.FromMinutes(10);
 
 		private static async Task<GetAuthorPlagiarismsResult> GetAuthorPlagiarismsAsync(UserExerciseSubmission submission)
 		{
 			RemoveOldValuesFromCache();
-			if (plagiarismsCache.TryGetValue(submission.Id, out var cachedValue))
+			var userId = Guid.Parse(submission.UserId);
+			var taskId = submission.SlideId;
+			var cacheKey = Tuple.Create(userId, taskId);
+			if (plagiarismsCache.TryGetValue(cacheKey, out var cachedValue))
 			{
 				return cachedValue.Item2;
 			}
-			
+
 			var value = await antiPlagiarismClient.GetAuthorPlagiarismsAsync(new GetAuthorPlagiarismsParameters
 			{
-				AuthorId = Guid.Parse(submission.UserId),
-				TaskId = submission.SlideId
+				AuthorId = userId,
+				TaskId = taskId
 			});
-			plagiarismsCache.AddOrUpdate(submission.Id, _id => Tuple.Create(DateTime.Now, value), (_id, _old) => Tuple.Create(DateTime.Now, value));
+			plagiarismsCache.AddOrUpdate(cacheKey, _key => Tuple.Create(DateTime.Now, value), (_key, _old) => Tuple.Create(DateTime.Now, value));
 			return value;
 		}
 
