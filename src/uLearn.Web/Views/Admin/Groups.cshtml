@@ -100,7 +100,7 @@
 		var copyableGroupsSelectListItems = Model.GroupsMayBeCopied.Select(g => new SelectListItemWithAttributes
 		{
 			Value = g.Id.ToString(),
-			Text = g.Name.TruncateWithEllipsis(30) + ": " + g.Members.Count.PluralizeInRussian(new RussianPluralizationOptions
+			Text = g.Name.TruncateWithEllipsis(30) + ": " + g.NotDeletedMembers.Count.PluralizeInRussian(new RussianPluralizationOptions
 			{
 				One = "студент",
 				Two = "студента",
@@ -165,7 +165,7 @@
 			<div class="group @(group.IsArchived ? "archived-group" : "") row" data-group-id="@group.Id">
 				<div class="col-xs-8 col-md-4 col-lg-2">
 					<div class="group__title">@group.Name</div>
-					<div class="group__members-count">@group.Members.Count.PluralizeInRussian(RussianPluralizationOptions.Man)</div>
+					<div class="group__members-count">@group.NotDeletedMembers.Count.PluralizeInRussian(RussianPluralizationOptions.Man)</div>
 				</div>
 				@*
 					<div class="group__labels col-xs-4 col-md-4 col-lg-2"

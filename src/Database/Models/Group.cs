@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Database.Models
 {
@@ -58,8 +59,11 @@ namespace Database.Models
 		public bool DefaultProhibitFutherReview { get; set; }
 
 		public DateTime? CreateTime { get; set; }
-
+		
 		public virtual ICollection<GroupMember> Members { get; set; }
+
+		[NotMapped]
+		public List<GroupMember> NotDeletedMembers => Members.Where(m => !m.User.IsDeleted).ToList(); 
 
 		public Group()
 		{

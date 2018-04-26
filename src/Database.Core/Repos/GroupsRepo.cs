@@ -107,7 +107,7 @@ namespace Database.Repos
 
 		private async Task CopyGroupMembers(Group group, Group newGroup)
 		{
-			var members = group.Members.Select(m => new GroupMember
+			var members = group.NotDeletedMembers.Select(m => new GroupMember
 			{
 				UserId = m.UserId,
 				GroupId = newGroup.Id,
@@ -158,7 +158,7 @@ namespace Database.Repos
 			group.IsManualCheckingEnabled = newIsManualCheckingEnabled;
 
 			if (!group.IsManualCheckingEnabledForOldSolutions && newIsManualCheckingEnabledForOldSolutions)
-				await AddManualCheckingsForOldSolutions(group.CourseId, group.Members.Select(m => m.UserId).ToList());
+				await AddManualCheckingsForOldSolutions(group.CourseId, group.NotDeletedMembers.Select(m => m.UserId).ToList());
 
 			group.IsManualCheckingEnabledForOldSolutions = newIsManualCheckingEnabledForOldSolutions;
 			group.DefaultProhibitFutherReview = defaultProhibitFutherReview;
