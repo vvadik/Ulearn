@@ -77,6 +77,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			db.SnippetsOccurences.Add(snippetOccurence);
 			db.Entry(snippetOccurence).State = EntityState.Added;
 			await db.SaveChangesAsync();
+			db.Entry(snippetOccurence).State = EntityState.Unchanged;
 		
 			EnableAutoDetectChanges();
 			
@@ -99,6 +100,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			db.Entry(snippetStatistics).State = EntityState.Modified;
 			logger.Information($"Количество авторов, у которых встречается сниппет {foundSnippet} — {snippetStatistics.AuthorsCount}");
 			await db.SaveChangesAsync();
+			db.Entry(snippetStatistics).State = EntityState.Unchanged;
 		
 			EnableAutoDetectChanges();
 
@@ -131,6 +133,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 				try
 				{
 					await db.SaveChangesAsync();
+					addedStatistics.State = EntityState.Unchanged;
 				}
 				catch (DbUpdateException e)
 				{
@@ -189,6 +192,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 				try
 				{
 					await db.SaveChangesAsync();
+					db.Entry(snippet).State = EntityState.Unchanged;
 					return snippet;
 				}
 				catch (DbUpdateException e)
