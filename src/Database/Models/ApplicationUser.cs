@@ -44,6 +44,9 @@ namespace Database.Models
 
 		public Gender? Gender { get; set; }
 
+		[Index("IDX_ApplicationUser_ByIsDeleted")]
+		public bool IsDeleted { get; set; }
+
 		[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
 		public string Names
 		{

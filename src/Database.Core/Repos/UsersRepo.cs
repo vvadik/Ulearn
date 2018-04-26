@@ -33,14 +33,15 @@ namespace Database.Repos
 
 		public ApplicationUser FindUserById(string id)
 		{
-			return db.Users.Find(id);
+			var user = db.Users.Find(id);
+			return user.IsDeleted ? null : user;
 		}
 
 		/* Pass limit=0 to disable limiting */
 		public Task<List<UserRolesInfo>> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager, int limit=100)
 		{
 			var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
-			IQueryable<ApplicationUser> users = db.Users;
+			var users = db.Users.Where(u => !u.IsDeleted);
 			if (!string.IsNullOrEmpty(query.NamePrefix))
 			{
 				var usersIds = GetUsersByNamePrefix(query.NamePrefix).Select(u => u.Id);
@@ -59,6 +60,7 @@ namespace Database.Repos
 		public Task<List<UserRolesInfo>> GetCourseInstructors(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
 		{
 			return db.Users
+				.Where(u => !u.IsDeleted)
 				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, courseId, includeHighRoles: true))
 				.GetUserRolesInfo(limit, userManager);
 		}
@@ -67,6 +69,7 @@ namespace Database.Repos
 		public Task<List<UserRolesInfo>> GetCourseAdmins(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
 		{
 			return db.Users
+				.Where(u => !u.IsDeleted)	
 				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, courseId, includeHighRoles: true))
 				.GetUserRolesInfo(limit, userManager);
 		}
@@ -76,7 +79,7 @@ namespace Database.Repos
 			var role = db.Roles.FirstOrDefault(r => r.Name == LmsRoles.SysAdmin.ToString());
 			if (role == null)
 				return new List<string>();
-			return db.Users.FilterByRole(role, userManager).Select(u => u.Id).ToList();
+			return db.Users.Where(u => ! u.IsDeleted).FilterByRole(role, userManager).Select(u => u.Id).ToList();
 		}
 
 		public async Task ChangeTelegram(string userId, long chatId, string chatTitle)
@@ -103,12 +106,12 @@ namespace Database.Repos
 		private IQueryable<UserIdWrapper> GetUsersByNamePrefix(string name)
 		{
 			if (string.IsNullOrEmpty(name))
-				return db.Users.Select(u => new UserIdWrapper(u.Id));
+				return db.Users.Where(u => ! u.IsDeleted).Select(u => new UserIdWrapper(u.Id));
 			
 			var splittedName = name.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 			var nameQuery = string.Join(" & ", splittedName.Select(s => "\"" + s.Trim().Replace("\"", "\\\"") + "*\""));
 			return db.Users
-				.FromSql("SELECT * FROM dbo.AspNetUsers WHERE CONTAINS([Names], {0})", nameQuery)
+				.FromSql("SELECT * FROM dbo.AspNetUsers WHERE IsDeleted = 0 AND CONTAINS([Names], {0})", nameQuery)
 				.Select(u => new UserIdWrapper(u.Id));
 		}
 
@@ -160,12 +163,12 @@ namespace Database.Repos
 
 		public List<ApplicationUser> FindUsersByUsernameOrEmail(string usernameOrEmail)
 		{
-			return db.Users.Where(u => u.UserName == usernameOrEmail || u.Email == usernameOrEmail).ToList();
+			return db.Users.Where(u => (u.UserName == usernameOrEmail || u.Email == usernameOrEmail) && ! u.IsDeleted).ToList();
 		}
 
 		public IEnumerable<ApplicationUser> GetUsersByIds(IEnumerable<string> usersIds)
 		{
-			return db.Users.Where(u => usersIds.Contains(u.Id));
+			return db.Users.Where(u => usersIds.Contains(u.Id) && ! u.IsDeleted);
 		}
 	}
 

@@ -113,7 +113,7 @@ namespace uLearn.Web.Controllers
 			var user = await userManager.FindByNameAsync(info);
 			if (user != null)
 				return new List<ApplicationUser> { user };
-			return db.Users.Where(appUser => appUser.Email == info).ToList();
+			return db.Users.Where(u => u.Email == info && ! u.IsDeleted).ToList();
 		}
 
 		private async Task SendRestorePasswordEmail(string requestId, ApplicationUser user)

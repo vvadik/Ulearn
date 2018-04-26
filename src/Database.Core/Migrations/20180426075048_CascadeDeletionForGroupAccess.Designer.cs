@@ -11,9 +11,10 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 namespace Database.Migrations
 {
     [DbContext(typeof(UlearnDb))]
-    partial class UlearnDbModelSnapshot : ModelSnapshot
+    [Migration("20180426075048_CascadeDeletionForGroupAccess")]
+    partial class CascadeDeletionForGroupAccess
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,8 +86,6 @@ namespace Database.Migrations
 
                     b.Property<short>("Gender");
 
-                    b.Property<bool>("IsDeleted");
-
                     b.Property<string>("KonturLogin")
                         .HasMaxLength(200);
 
@@ -130,8 +129,6 @@ namespace Database.Migrations
                         .HasMaxLength(256);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IsDeleted");
 
                     b.HasIndex("NormalizedEmail")
                         .HasName("EmailIndex");

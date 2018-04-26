@@ -28,14 +28,15 @@ namespace Database.DataContexts
 
 		public ApplicationUser FindUserById(string id)
 		{
-			return db.Users.Find(id);
+			var user = db.Users.Find(id);
+			return user.IsDeleted ? null : user;
 		}
 
 		/* Pass limit=0 to disable limiting */
 		public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager, int limit=100)
 		{
 			var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
-			IQueryable<ApplicationUser> users = db.Users;
+			var users = db.Users.Where(u => !u.IsDeleted);
 			if (!string.IsNullOrEmpty(query.NamePrefix))
 			{
 				var usersIds = GetUsersByNamePrefix(query.NamePrefix).Select(u => u.Id);
@@ -54,6 +55,7 @@ namespace Database.DataContexts
 		public List<UserRolesInfo> GetCourseInstructors(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
 		{
 			return db.Users
+				.Where(u => ! u.IsDeleted)
 				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, courseId, includeHighRoles: true))
 				.GetUserRolesInfo(limit, userManager);
 		}
@@ -62,6 +64,7 @@ namespace Database.DataContexts
 		public List<UserRolesInfo> GetCourseAdmins(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
 		{
 			return db.Users
+				.Where(u => ! u.IsDeleted)
 				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, courseId, includeHighRoles: true))
 				.GetUserRolesInfo(limit, userManager);
 		}
@@ -71,7 +74,7 @@ namespace Database.DataContexts
 			var role = db.Roles.FirstOrDefault(r => r.Name == LmsRoles.SysAdmin.ToString());
 			if (role == null)
 				return new List<string>();
-			return db.Users.FilterByRole(role, userManager).Select(u => u.Id).ToList();
+			return db.Users.Where(u => !u.IsDeleted).FilterByRole(role, userManager).Select(u => u.Id).ToList();
 		}
 
 		public async Task ChangeTelegram(string userId, long chatId, string chatTitle)
@@ -103,7 +106,7 @@ namespace Database.DataContexts
 		public IQueryable<UserIdWrapper> GetUsersByNamePrefix(string name)
 		{
 			if (string.IsNullOrEmpty(name))
-				return db.Users.Select(u => new UserIdWrapper(u.Id));
+				return db.Users.Where(u => !u.IsDeleted).Select(u => new UserIdWrapper(u.Id));
 			;
 			var splittedName = name.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 			var nameQuery = string.Join(" & ", splittedName.Select(s => "\"" + s.Trim().Replace("\"", "\\\"") + "*\""));

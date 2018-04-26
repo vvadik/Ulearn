@@ -60,7 +60,7 @@ namespace Database.DataContexts
 			CancelCascaseDeleting<ManualExerciseChecking, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 
 			CancelCascaseDeleting<ExerciseCodeReviewComment, ApplicationUser, string>(modelBuilder, c => c.Author, c => c.AuthorId);
-			//CancelCascaseDeleting<ExerciseCodeReviewComment, ExerciseCodeReview, int>(modelBuilder, c => c.Review, c => c.ReviewId);
+//			CancelCascaseDeleting<ExerciseCodeReviewComment, ExerciseCodeReview, int>(modelBuilder, c => c.Review, c => c.ReviewId);
 
 			CancelCascaseDeleting<Certificate, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 			CancelCascaseDeleting<Certificate, ApplicationUser, string>(modelBuilder, c => c.Instructor, c => c.InstructorId);
@@ -103,6 +103,9 @@ namespace Database.DataContexts
 
 			CancelCascaseDeleting<NotificationTransport, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId, isRequired: false);
 
+			CancelCascaseDeleting<GroupAccess, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
+			CancelCascaseDeleting<GroupAccess, ApplicationUser, string>(modelBuilder, c => c.GrantedBy, c => c.GrantedById);
+			
 			CancelCascaseDeleting<LabelOnGroup, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
 			CancelCascaseDeleting<GroupLabel, ApplicationUser, string>(modelBuilder, c => c.Owner, c => c.OwnerId);
 			CancelCascaseDeleting<LabelOnGroup, GroupLabel, int>(modelBuilder, c => c.Label, c => c.LabelId);

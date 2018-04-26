@@ -648,6 +648,14 @@
     <Compile Include="Migrations\201804240540418_RemoveDeleteRestrictionForUser.Designer.cs">
       <DependentUpon>201804240540418_RemoveDeleteRestrictionForUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201804260747460_CancelCascadeDeletionForGroupAccesses.cs" />
+    <Compile Include="Migrations\201804260747460_CancelCascadeDeletionForGroupAccesses.Designer.cs">
+      <DependentUpon>201804260747460_CancelCascadeDeletionForGroupAccesses.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804260950525_ApplicationUserIsDeleted.cs" />
+    <Compile Include="Migrations\201804260950525_ApplicationUserIsDeleted.Designer.cs">
+      <DependentUpon>201804260950525_ApplicationUserIsDeleted.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1004,6 +1012,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804240540418_RemoveDeleteRestrictionForUser.resx">
       <DependentUpon>201804240540418_RemoveDeleteRestrictionForUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804260747460_CancelCascadeDeletionForGroupAccesses.resx">
+      <DependentUpon>201804260747460_CancelCascadeDeletionForGroupAccesses.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804260950525_ApplicationUserIsDeleted.resx">
+      <DependentUpon>201804260950525_ApplicationUserIsDeleted.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

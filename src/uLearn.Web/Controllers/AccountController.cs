@@ -237,10 +237,10 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> DeleteUser(string userId)
 		{
-			var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+			var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId && ! u.IsDeleted);
 			if (user != null)
 			{
-				db.Users.Remove(user);
+				user.IsDeleted = true;
 				await db.SaveChangesAsync();
 			}
 			return RedirectToAction("List");
@@ -250,7 +250,7 @@ namespace uLearn.Web.Controllers
 		/* Now we use AccountController.Profile and don't use AccountController.Info, but this method exists for back compatibility */
 		public ActionResult Info(string userName)
 		{
-			var user = db.Users.FirstOrDefault(u => u.Id == userName || u.UserName == userName);
+			var user = db.Users.FirstOrDefault(u => (u.Id == userName || u.UserName == userName) && ! u.IsDeleted);
 			if (user == null)
 				return HttpNotFound();
 

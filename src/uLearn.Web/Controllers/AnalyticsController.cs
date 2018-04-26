@@ -698,6 +698,8 @@ namespace uLearn.Web.Controllers
 		public ActionResult UserSolutions(string courseId, string userId, Guid slideId, int? version = null)
 		{
 			var user = db.Users.Find(userId);
+			if (user == null || user.IsDeleted)
+				return HttpNotFound();
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.FindSlideById(slideId) as ExerciseSlide;
 			if (slide == null)

@@ -10,4 +10,6 @@ VALUES
 ('20180305190918_AddSubmissionReferenceToExerciseCodeReview', '2.0.1-rtm-125'),
 ('20180315185806_AddMassGroupOperationNotifications', '2.0.1-rtm-125'),
 ('20180413040407_AddSubmissionsLanguageAndAgentName', '2.0.1-rtm-125'),
-('20180424055500_RemoveDeleteRestrictionForUser', '2.0.1-rtm-125')
+('20180424055500_RemoveDeleteRestrictionForUser', '2.0.1-rtm-125'),
+('20180426075048_CascadeDeletionForGroupAccess', '2.0.1-rtm-125'),
+('20180426095138_ApplicationUserIsDeleted', '2.0.1-rtm-125')

@@ -11,9 +11,10 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 namespace Database.Migrations
 {
     [DbContext(typeof(UlearnDb))]
-    partial class UlearnDbModelSnapshot : ModelSnapshot
+    [Migration("20180426095138_ApplicationUserIsDeleted")]
+    partial class ApplicationUserIsDeleted
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

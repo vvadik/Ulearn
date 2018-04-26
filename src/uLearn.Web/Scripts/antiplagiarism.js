@@ -56,6 +56,17 @@ $(document).ready(function () {
         });        
         
         highlightMatchedTokens(plagiarismData.matched_snippets, originalCodeMirror, plagiarismCodeMirror, originalTokens, plagiarismTokens);
+
+        dv = CodeMirror.MergeView($self.insertAfter('<div></div>')[0], {
+            value: $originalSubmission.text(),
+            origLeft: null,
+            orig: $plagiarismSubmission.text(),
+            lineNumbers: true,
+            mode: "text/html",
+            highlightDifferences: true,
+            connect: "align",
+            collapseIdentical: true
+        });
     });
 
     function getRandomColor() {

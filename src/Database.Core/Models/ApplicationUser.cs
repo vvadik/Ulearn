@@ -62,7 +62,9 @@ namespace Database.Models
 		public DateTime? LastConfirmationEmailTime { get; set; }
 
 		public Gender? Gender { get; set; }
-
+		
+		public bool IsDeleted { get; set; }
+		
 		[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
 		public string Names
 		{
