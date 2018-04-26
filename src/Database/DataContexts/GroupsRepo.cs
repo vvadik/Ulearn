@@ -381,17 +381,17 @@ namespace Database.DataContexts
 
 		public List<ApplicationUser> GetGroupMembersAsUsers(int groupId)
 		{
-			return db.GroupMembers.Where(m => m.GroupId == groupId).Select(m => m.User).ToList();
+			return db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId && !m.User.IsDeleted).Select(m => m.User).ToList();
 		}
 
 		public List<GroupMember> GetGroupMembers(int groupId)
 		{
-			return db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId).ToList();
+			return db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId && !m.User.IsDeleted).ToList();
 		}
 		
 		public List<GroupMember> GetGroupsMembers(List<int> groupsIds)
 		{
-			return db.GroupMembers.Include(m => m.User).Where(m => groupsIds.Contains(m.GroupId)).ToList();
+			return db.GroupMembers.Include(m => m.User).Where(m => groupsIds.Contains(m.GroupId) && !m.User.IsDeleted).ToList();
 		}
 
 		/* Instructor can view student if he is course admin or if student is member of one of accessable for instructor group */
@@ -678,13 +678,13 @@ namespace Database.DataContexts
 
 		public List<GroupAccess> GetGroupAccesses(int groupId)
 		{
-			return db.GroupAccesses.Include(a => a.User).Where(a => a.GroupId == groupId && a.IsEnabled).ToList();
+			return db.GroupAccesses.Include(a => a.User).Where(a => a.GroupId == groupId && a.IsEnabled && !a.User.IsDeleted).ToList();
 		}
 
 		public DefaultDictionary<int, List<GroupAccess>> GetGroupsAccesses(IEnumerable<int> groupsIds)
 		{
 			return db.GroupAccesses.Include(a => a.User)
-				.Where(a => groupsIds.Contains(a.GroupId) && a.IsEnabled)
+				.Where(a => groupsIds.Contains(a.GroupId) && a.IsEnabled && !a.User.IsDeleted)
 				.GroupBy(a => a.GroupId)
 				.ToDictionary(g => g.Key, g => g.ToList())
 				.ToDefaultDictionary();
