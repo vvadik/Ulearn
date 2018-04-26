@@ -2,14 +2,18 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
     $plagiarismStatus.removeClass('found-level0 found-level1 found-level2');
     
     var url = $plagiarismStatus.data('antiplagiarismUrl');
+    var $plagiarismStatusFixedCopy = $plagiarismStatus.clone().addClass('fixed').hide().insertAfter($plagiarismStatus);
+    var $codeMirror = $plagiarismStatus.parent().find('.CodeMirror');
     $.getJSON(url, function (data) {
         if (data.status === 'not_checked') {
             $plagiarismStatus.addClass('not-checked');
             $plagiarismStatus.text('Эта задача не проверяется на списывание');
             return;
         }
-        
-        $plagiarismStatus.addClass('found-level' + data.suspicion_level);
+
+        let className = 'found-level' + data.suspicion_level;
+        $plagiarismStatus.addClass(className);
+        $plagiarismStatusFixedCopy.addClass(className);
         var message = '';
         switch (data.suspicion_level)
         {
@@ -26,6 +30,26 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
         message = message.replace('{link}', '<a href="' + $plagiarismStatus.data('antiplagiarismDetailsUrl') + '" target="_blank">Посмотреть</a>');
         
         $plagiarismStatus.html('Проверка на списывание: ' + message);
+        $plagiarismStatusFixedCopy.html($plagiarismStatus.html());
+    });
+    
+    var plagiarismStatusOffset = $plagiarismStatus.offset().top;
+    var headerHeight = $('#header').outerHeight();    
+    var codeMirrorBottom = $codeMirror.offset().top + $codeMirror.outerHeight();
+    $(window).scroll(function () {
+        var scrollTop = $(window).scrollTop();
+
+        var isVisible = $plagiarismStatusFixedCopy.is(':visible');
+        if (scrollTop >= plagiarismStatusOffset - headerHeight && scrollTop < codeMirrorBottom - 2 * headerHeight) {
+            if (! isVisible) {                
+                $plagiarismStatusFixedCopy.show();
+            }
+        }
+        else {
+            if (isVisible) {
+                $plagiarismStatusFixedCopy.hide();
+            }
+        }
     });
 }
 
@@ -42,7 +66,7 @@ $(document).ready(function () {
         
         var antiplagiarismData = JSON.parse($self[0].innerHTML);       
         var plagiarismData = antiplagiarismData.plagiarism;
-
+        
         var originalTokens = getTokensDictionaryByIndex(antiplagiarismData.tokens_positions);
         var plagiarismTokens = getTokensDictionaryByIndex(plagiarismData.tokens_positions);
        
