@@ -93,11 +93,12 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var maxSnippetsCount = configuration.PlagiarismDetector.CountOfColdestSnippetsUsedToSearch;
 			var authorsCountThreshold = configuration.PlagiarismDetector.SnippetAuthorsCountThreshold;
 			var snippetsOccurences = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission, maxSnippetsCount, authorsCountThreshold);
-			var snippetsStatistics = await snippetsRepo.GetSnippetsStatisticsAsync(submission.ClientId, submission.TaskId, snippetsOccurences.Select(o => o.SnippetId));
+			var snippetsIds = new HashSet<int>(snippetsOccurences.Select(o => o.SnippetId));
+			var snippetsStatistics = await snippetsRepo.GetSnippetsStatisticsAsync(submission.ClientId, submission.TaskId, snippetsIds);
 			var authorsCount = await submissionsRepo.GetAuthorsCountAsync(submission.ClientId, submission.TaskId);
 			var matchedSnippets = new DefaultDictionary<int, List<MatchedSnippet>>();
 			var allOtherOccurences = (await snippetsRepo.GetSnippetsOccurencesAsync(
-				snippetsOccurences.Select(o => o.SnippetId).ToList(),
+				snippetsIds,
 				/* Filter only snippet occurences in submissions BY THIS client, THIS task, THIS language and NOT BY THIS author */
 				o => o.Submission.ClientId == submission.ClientId &&
 					o.Submission.TaskId == submission.TaskId &&

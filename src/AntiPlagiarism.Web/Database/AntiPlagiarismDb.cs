@@ -23,6 +23,10 @@ namespace AntiPlagiarism.Web.Database
 			modelBuilder.Entity<SnippetOccurence>()
 				.HasIndex(c => new { c.SubmissionId, c.FirstTokenIndex })
 				.IsUnique(false);
+			
+			modelBuilder.Entity<SnippetOccurence>()
+				.HasIndex(c => new { c.SubmissionId, c.SnippetId })
+				.IsUnique(false);
 
 			modelBuilder.Entity<Snippet>()
 				.HasIndex(c => new { c.TokensCount, c.SnippetType, c.Hash })
@@ -35,6 +39,7 @@ namespace AntiPlagiarism.Web.Database
 			var submissionEntityBuilder = modelBuilder.Entity<Submission>();
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AuthorId });
+			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.Language, c.AuthorId });
 		}
 
 		public void MigrateToLatestVersion()

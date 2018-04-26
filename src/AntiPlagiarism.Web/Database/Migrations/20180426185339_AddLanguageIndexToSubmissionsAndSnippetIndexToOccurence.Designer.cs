@@ -10,9 +10,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AntiPlagiarism.Web.Migrations
 {
     [DbContext(typeof(AntiPlagiarismDb))]
-    partial class AntiPlagiarismDbModelSnapshot : ModelSnapshot
+    [Migration("20180426185339_AddLanguageIndexToSubmissionsAndSnippetIndexToOccurence")]
+    partial class AddLanguageIndexToSubmissionsAndSnippetIndexToOccurence
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
