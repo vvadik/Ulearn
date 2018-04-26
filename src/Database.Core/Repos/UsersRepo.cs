@@ -34,7 +34,7 @@ namespace Database.Repos
 		public ApplicationUser FindUserById(string id)
 		{
 			var user = db.Users.Find(id);
-			return user.IsDeleted ? null : user;
+			return user == null || user.IsDeleted ? null : user;
 		}
 
 		/* Pass limit=0 to disable limiting */
