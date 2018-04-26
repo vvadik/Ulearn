@@ -97,14 +97,14 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var snippetsStatistics = await snippetsRepo.GetSnippetsStatisticsAsync(submission.ClientId, submission.TaskId, snippetsIds);
 			var authorsCount = await submissionsRepo.GetAuthorsCountAsync(submission.ClientId, submission.TaskId);
 			var matchedSnippets = new DefaultDictionary<int, List<MatchedSnippet>>();
-			var allOtherOccurences = (await snippetsRepo.GetSnippetsOccurencesAsync(
+			var allOtherOccurences = snippetsRepo.GetSnippetsOccurences(
 				snippetsIds,
 				/* Filter only snippet occurences in submissions BY THIS client, THIS task, THIS language and NOT BY THIS author */
 				o => o.Submission.ClientId == submission.ClientId &&
 					o.Submission.TaskId == submission.TaskId &&
 					o.Submission.Language == submission.Language &&
 					o.Submission.AuthorId != submission.AuthorId
-			)).GroupBy(o => o.SnippetId).ToDictionary(kvp => kvp.Key, kvp => kvp.ToList());
+			).GroupBy(o => o.SnippetId).ToDictionary(kvp => kvp.Key, kvp => kvp.ToList());
 			foreach (var snippetOccurence in snippetsOccurences)
 			{
 				var otherOccurences = allOtherOccurences.GetOrDefault(snippetOccurence.SnippetId, new List<SnippetOccurence>());

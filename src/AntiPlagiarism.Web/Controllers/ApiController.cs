@@ -12,6 +12,7 @@ using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Operations;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog;
 
@@ -27,6 +28,7 @@ namespace AntiPlagiarism.Web.Controllers
 		private readonly PlagiarismDetector plagiarismDetector;
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
 		private readonly SubmissionSnippetsExtractor submissionSnippetsExtractor;
+		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly AntiPlagiarismConfiguration configuration;
 
 		private readonly SnippetsExtractor snippetsExtractor = new SnippetsExtractor();
@@ -38,6 +40,7 @@ namespace AntiPlagiarism.Web.Controllers
 			CodeUnitsExtractor codeUnitsExtractor,
 			SubmissionSnippetsExtractor submissionSnippetsExtractor,
 			ILogger logger,
+			IServiceScopeFactory serviceScopeFactory,
 			IOptions<AntiPlagiarismConfiguration> configuration)
 			: base(logger)
 		{
@@ -48,6 +51,7 @@ namespace AntiPlagiarism.Web.Controllers
 			this.plagiarismDetector = plagiarismDetector;
 			this.codeUnitsExtractor = codeUnitsExtractor;
 			this.submissionSnippetsExtractor = submissionSnippetsExtractor;
+			this.serviceScopeFactory = serviceScopeFactory;
 			this.configuration = configuration.Value;
 		}
 		
@@ -197,13 +201,19 @@ namespace AntiPlagiarism.Web.Controllers
 			};
 			foreach (var submission in submissions)
 			{
-				result.ResearchedSubmissions.Add(new ResearchedSubmission
+				using (var scope = serviceScopeFactory.CreateScope())
 				{
-					SubmissionInfo = submission.GetSubmissionInfoForApi(),
-					Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels),
-					TokensPositions = plagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
-					AnalyzedCodeUnits = GetAnalyzedCodeUnits(submission),
-				});
+					/* Create internal plagiarismDetector for preventing memory leaks */
+					var internalPlagiarismDetector = scope.ServiceProvider.GetService<PlagiarismDetector>();
+					
+					result.ResearchedSubmissions.Add(new ResearchedSubmission
+					{
+						SubmissionInfo = submission.GetSubmissionInfoForApi(),
+						Plagiarisms = await internalPlagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels),
+						TokensPositions = internalPlagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
+						AnalyzedCodeUnits = GetAnalyzedCodeUnits(submission),
+					});
+				}
 			}
 
 			return Json(result);
