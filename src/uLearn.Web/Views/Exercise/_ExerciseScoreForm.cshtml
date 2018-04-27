@@ -96,12 +96,15 @@
 				</label>
 			</div>
 
-			<input type="submit" class="btn @(Model.Checking.IsChecked ? "btn-primary" : "btn-default")" value="Сохранить и вернуться"/>
+            @{
+	            /* This submissions should not be calculated as left checking */
+	            Model.ManualCheckingsLeft--;
+            }
+            
+            <input type="submit" class="btn @(Model.Checking.IsChecked || Model.ManualCheckingsLeft == 0 ? "btn-primary" : "btn-default")" value="Сохранить и вернуться"/>
 
 			@if (!Model.Checking.IsChecked)
 			{
-				/* This submissions should not be calculated as left checking */
-				Model.ManualCheckingsLeft--;
 				if (Model.ManualCheckingsLeft == 0)
 				{
 					<div class="text-muted no-manual-checkings-left">
