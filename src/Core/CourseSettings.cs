@@ -44,7 +44,7 @@ namespace uLearn
 
 		public static readonly CourseSettings DefaultSettings = new CourseSettings(
 			null,
-			new[] { new Language("cs", "6"), new Language("py", "3") },
+			new[] { new Language("cs", "7"), new Language("py", "3") },
 			new[] { new PreludeFile("cs", "Prelude.cs") },
 			"dictionary.txt"
 		);

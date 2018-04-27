@@ -55,22 +55,30 @@ namespace Database.DataContexts
 			var compilationErrorHash = (await textsRepo.AddText(compilationError)).Hash;
 			var outputHash = (await textsRepo.AddText(output)).Hash;
 
-			var automaticChecking = new AutomaticExerciseChecking
+			AutomaticExerciseChecking automaticChecking;
+			if (language.HasAutomaticChecking())
 			{
-				CourseId = courseId,
-				SlideId = slideId,
-				UserId = userId,
-				Timestamp = DateTime.Now,
-				CompilationErrorHash = compilationErrorHash,
-				IsCompilationError = !string.IsNullOrWhiteSpace(compilationError),
-				OutputHash = outputHash,
-				ExecutionServiceName = executionServiceName,
-				DisplayName = displayName,
-				Status = status,
-				IsRightAnswer = false,
-			};
+				automaticChecking = new AutomaticExerciseChecking
+				{
+					CourseId = courseId,
+					SlideId = slideId,
+					UserId = userId,
+					Timestamp = DateTime.Now,
+					CompilationErrorHash = compilationErrorHash,
+					IsCompilationError = !string.IsNullOrWhiteSpace(compilationError),
+					OutputHash = outputHash,
+					ExecutionServiceName = executionServiceName,
+					DisplayName = displayName,
+					Status = status,
+					IsRightAnswer = false,
+				};
 
-			db.AutomaticExerciseCheckings.Add(automaticChecking);
+				db.AutomaticExerciseCheckings.Add(automaticChecking);
+			}
+			else
+			{
+				automaticChecking = null;
+			}
 
 			var submission = new UserExerciseSubmission
 			{
@@ -82,7 +90,7 @@ namespace Database.DataContexts
 				CodeHash = code.Split('\n').Select(x => x.Trim()).Aggregate("", (x, y) => x + y).GetHashCode(),
 				Likes = new List<Like>(),
 				AutomaticChecking = automaticChecking,
-				AutomaticCheckingIsRightAnswer = false,
+				AutomaticCheckingIsRightAnswer = automaticChecking?.IsRightAnswer ?? true,
 				Language = language,
 			};
 
@@ -286,8 +294,13 @@ namespace Database.DataContexts
 			if (submission == null)
 				return null;
 			submission.SolutionCode = textsRepo.GetText(submission.SolutionCodeHash);
-			submission.AutomaticChecking.Output = textsRepo.GetText(submission.AutomaticChecking.OutputHash);
-			submission.AutomaticChecking.CompilationError = textsRepo.GetText(submission.AutomaticChecking.CompilationErrorHash);
+			
+			if (submission.AutomaticChecking != null)
+			{
+				submission.AutomaticChecking.Output = textsRepo.GetText(submission.AutomaticChecking.OutputHash);
+				submission.AutomaticChecking.CompilationError = textsRepo.GetText(submission.AutomaticChecking.CompilationErrorHash);
+			}
+			
 			return submission;
 		}
 
@@ -480,9 +493,9 @@ namespace Database.DataContexts
 			throw new InvalidOperationException($"Unknown exercise type for checking: {exerciseBlock.ExerciseType}");
 		}
 
-		public async Task RunSubmission(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked)
+		public async Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked)
 		{
-			log.Info($"Запускаю проверку решения. ID посылки: {submission.Id}");
+			log.Info($"Запускаю автоматическую проверку решения. ID посылки: {submission.Id}");
 			unhandledSubmissions.TryAdd(submission.Id, DateTime.Now);
 
 			if (!waitUntilChecked)

@@ -13,7 +13,6 @@ namespace uLearn.Model
 		public Unit Unit { get; }
 		public Lesson Lesson { get; private set; }
 		public string SlideTitle { get; private set; }
-//		public HashSet<string> ZippedProjectExercises = new HashSet<string>();
 		private List<RegionsExtractor> Extractors { get; }
 
 		public BuildUpContext(Unit unit, CourseSettings courseSettings, Lesson lesson, string courseId, string slideTitle)

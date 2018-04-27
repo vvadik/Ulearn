@@ -86,11 +86,12 @@ namespace uLearn.Web.Controllers
 
 			var compilationErrorMessage = buildResult.HasErrors ? buildResult.ErrorMessage : null;
 			var dontRunSubmission = buildResult.HasErrors;
+			var submissionLanguage = SubmissionLanguageHelpers.ByLangId(exerciseSlide.Exercise.LangId);
 			var submission = await userSolutionsRepo.AddUserExerciseSubmission(
 				courseId, exerciseSlide.Id,
 				userCode, compilationErrorMessage, null,
 				userId, "uLearn", GenerateSubmissionName(exerciseSlide, userName),
-				SubmissionLanguage.CSharp,
+				submissionLanguage,
 				dontRunSubmission ? AutomaticExerciseCheckingStatus.Done : AutomaticExerciseCheckingStatus.Waiting
 			);
 
@@ -99,7 +100,8 @@ namespace uLearn.Web.Controllers
 
 			try
 			{
-				await userSolutionsRepo.RunSubmission(submission, executionTimeout, waitUntilChecked);
+				if (submissionLanguage.HasAutomaticChecking())
+					await userSolutionsRepo.RunAutomaticChecking(submission, executionTimeout, waitUntilChecked);
 			}
 			catch (SubmissionCheckingTimeout)
 			{
@@ -126,7 +128,7 @@ namespace uLearn.Web.Controllers
 			var automaticChecking = submission.AutomaticChecking;
 			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
 			var sendToReview = exerciseBlock.RequireReview &&
-								automaticChecking.IsRightAnswer &&
+								submission.AutomaticCheckingIsRightAnswer &&
 								!isProhibitedUserToSendForReview &&
 								groupsRepo.IsManualCheckingEnabledForUser(course, userId);
 			if (sendToReview)
@@ -139,20 +141,23 @@ namespace uLearn.Web.Controllers
 			}
 			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, userId);
 
-			var verdictForMetric = automaticChecking.GetVerdict().Replace(" ", "");
-			metricSender.SendCount($"exercise.{exerciseMetricId}.{verdictForMetric}");
+			if (automaticChecking != null)
+			{
+				var verdictForMetric = automaticChecking.GetVerdict().Replace(" ", "");
+				metricSender.SendCount($"exercise.{exerciseMetricId}.{verdictForMetric}");
+			}
 
-			if (automaticChecking.IsRightAnswer)
+			if (submission.AutomaticCheckingIsRightAnswer)
 				await CreateStyleErrorsReviewsForSubmission(submission, buildResult.StyleErrors, exerciseMetricId);
 
 			var result = new RunSolutionResult
 			{
-				IsCompileError = automaticChecking.IsCompilationError,
-				ErrorMessage = automaticChecking.CompilationError.Text,
-				IsRightAnswer = automaticChecking.IsRightAnswer,
+				IsCompileError = automaticChecking?.IsCompilationError ?? false,
+				ErrorMessage = automaticChecking?.CompilationError.Text ?? "",
+				IsRightAnswer = submission.AutomaticCheckingIsRightAnswer,
 				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseSlide.Exercise.ExpectedOutput.NormalizeEoln(),
-				ActualOutput = automaticChecking.Output.Text,
-				ExecutionServiceName = automaticChecking.ExecutionServiceName,
+				ActualOutput = automaticChecking?.Output.Text ?? "",
+				ExecutionServiceName = automaticChecking?.ExecutionServiceName ?? "ulearn",
 				SentToReview = sendToReview,
 				SubmissionId = submission.Id,
 			};

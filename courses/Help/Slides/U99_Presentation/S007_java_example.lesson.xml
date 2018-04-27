@@ -10,7 +10,7 @@
 
 		Выведите на консоль фразу `The first step!`
 
-		<code>
+		<code lang-id="java">
 			System.out.println('Участки кода можно вставлять внутрь Markdown-блоков');
 		</code>
 

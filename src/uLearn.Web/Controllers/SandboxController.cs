@@ -49,7 +49,7 @@ namespace uLearn.Web.Controllers
 			);
 			try
 			{
-				await solutionsRepo.RunSubmission(submission, timeout, waitUntilChecked: true);
+				await solutionsRepo.RunAutomaticChecking(submission, timeout, waitUntilChecked: true);
 			}
 			catch (SubmissionCheckingTimeout)
 			{

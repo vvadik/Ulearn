@@ -438,7 +438,7 @@ namespace Database.Repos
 			return newChecking;
 		}
 
-		public async Task RunSubmission(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked)
+		public async Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked)
 		{
 			log.Info($"Запускаю проверку решения. ID посылки: {submission.Id}");
 			unhandledSubmissions.TryAdd(submission.Id, DateTime.Now);

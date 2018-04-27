@@ -17,7 +17,7 @@ namespace uLearn
 
 		public List<SolutionStyleError> FindValidatorErrors(string userCode, string solution)
 		{
-			return null;
+			return new List<SolutionStyleError>();
 		}
 
 		public string FindStrictValidatorErrors(string userCode, string solution)

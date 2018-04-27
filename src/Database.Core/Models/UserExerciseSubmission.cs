@@ -40,14 +40,13 @@ namespace Database.Models
 
 		public virtual IList<Like> Likes { get; set; }
 
-		public int AutomaticCheckingId { get; set; }
+		public int? AutomaticCheckingId { get; set; }
+		
+		public virtual AutomaticExerciseChecking AutomaticChecking { get; set; }
+		
+		public bool AutomaticCheckingIsRightAnswer { get; set; }
 		
 		public SubmissionLanguage Language { get; set; }
-
-		[Required]
-		public virtual AutomaticExerciseChecking AutomaticChecking { get; set; }
-
-		public bool AutomaticCheckingIsRightAnswer { get; set; }
 
 		public virtual IList<ManualExerciseChecking> ManualCheckings { get; set; }
 		
