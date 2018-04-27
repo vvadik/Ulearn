@@ -30,6 +30,7 @@ namespace uLearn.Web
 			var configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
 			
 			// Enable the application to use a cookie to store information for the signed in user
+			var cookieKeyRingDirectoy = new DirectoryInfo(Path.Combine(Utils.GetAppPath(), configuration.Web.CookieKeyRingDirectory));
 			app.UseCookieAuthentication(new CookieAuthenticationOptions
 			{
 				AuthenticationType = "Identity.Application",
@@ -49,7 +50,7 @@ namespace uLearn.Web
 			       See https://docs.microsoft.com/en-us/aspnet/core/security/cookie-sharing?tabs=aspnetcore2x for details */
 				TicketDataFormat = new AspNetTicketDataFormat(
 					new DataProtectorShim(
-						DataProtectionProvider.Create(new DirectoryInfo(configuration.Web.CookieKeyRingDirectory), builder => builder.SetApplicationName("ulearn"))
+						DataProtectionProvider.Create(cookieKeyRingDirectoy, builder => builder.SetApplicationName("ulearn"))
 							.CreateProtector(
 								"Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware",
 								"Identity.Application",

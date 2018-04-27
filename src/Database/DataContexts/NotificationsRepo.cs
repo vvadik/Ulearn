@@ -85,22 +85,12 @@ namespace Database.DataContexts
 
 		public async Task AddNotificationTransport(NotificationTransport transport)
 		{
-			using (var transaction = db.Database.BeginTransaction())
-			{
-				DeleteOldNotificationTransports(transport.GetType(), transport.UserId);
-				/*
-				if (transport is MailNotificationTransport)
-					DeleteOldNotificationTransports<MailNotificationTransport>(transport.UserId);
-				if (transport is TelegramNotificationTransport)
-					DeleteOldNotificationTransports<TelegramNotificationTransport>(transport.UserId);
-				*/
+			DeleteOldNotificationTransports(transport.GetType(), transport.UserId);
+			
+			transport.IsDeleted = false;
+			db.NotificationTransports.Add(transport);
 
-				transport.IsDeleted = false;
-				db.NotificationTransports.Add(transport);
-
-				await db.SaveChangesAsync();
-				transaction.Commit();
-			}
+			await db.SaveChangesAsync();
 		}
 
 		public NotificationTransport FindNotificationTransport(int transportId)
