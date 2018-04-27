@@ -126,5 +126,15 @@
 			hideNumberOne = true,
 			smallNumbersAreWords = false
 		};
+
+		public static readonly RussianPluralizationOptions Checkings = new RussianPluralizationOptions
+		{
+			One = "работа",
+			Two = "работы",
+			Five = "работ",
+			Gender = Gender.Female,
+			hideNumberOne = false,
+			smallNumbersAreWords = false,
+		};
 	}
 }

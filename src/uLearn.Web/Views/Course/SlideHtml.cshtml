@@ -219,10 +219,11 @@
 					context.Course.Id,
 					(ExerciseSlide)context.Slide,
 					checking,
+					context.ManualCheckingsLeft,
 					context.GroupsIds,
-					(context.VersionId == null || checking.Submission.Id == context.VersionId) && !context.IsManualCheckingReadonly,
-					context.DefaultProhibitFutherReview
-				))
+					isCurrentSubmissionChecking: (context.VersionId == null || checking.Submission.Id == context.VersionId) && !context.IsManualCheckingReadonly,
+					defaultProhibitFutherReview: context.DefaultProhibitFutherReview
+					))
 		}
 	</div>
 }

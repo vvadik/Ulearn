@@ -65,12 +65,12 @@
 				? new QuizBlockData(Model, x, Model.QuizState)
 				: null)
 			.ToArray<dynamic>(),
-		Model.IsGuest,
-		true,
-		Model.ManualQuizCheckQueueItem,
-		Model.CanUserFillQuiz,
-		null,
-		Model.IsLti
+		isGuest: Model.IsGuest,
+		revealHidden: true,
+		manualChecking: Model.ManualQuizCheckQueueItem,
+		canUserFillQuiz: Model.CanUserFillQuiz,
+		groupsIds: null,
+		isLti: Model.IsLti
 		);
 
 	MvcForm form = null;

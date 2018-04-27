@@ -592,12 +592,13 @@ namespace uLearn.Web.Controllers
 
 	public class ExerciseScoreFormModel
 	{
-		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking, List<string> groupsIds = null,
+		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking, int manualCheckingsLeft, List<string> groupsIds = null,
 			bool isCurrentSubmissionChecking = false, bool defaultProhibitFutherReview = true)
 		{
 			CourseId = courseId;
 			Slide = slide;
 			Checking = checking;
+			ManualCheckingsLeft = manualCheckingsLeft;
 			GroupsIds = groupsIds;
 			IsCurrentSubmissionChecking = isCurrentSubmissionChecking;
 			DefaultProhibitFutherReview = defaultProhibitFutherReview;
@@ -610,5 +611,6 @@ namespace uLearn.Web.Controllers
 		public string GroupsIdsJoined => string.Join(",", GroupsIds ?? new List<string>());
 		public bool IsCurrentSubmissionChecking { get; set; }
 		public bool DefaultProhibitFutherReview { get; set; }
+		public int ManualCheckingsLeft { get; set; }
 	}
 }

@@ -1,4 +1,6 @@
-﻿@model uLearn.Web.Controllers.ExerciseScoreFormModel
+﻿@using uLearn.Extensions
+@using Ulearn.Common.Extensions
+@model uLearn.Web.Controllers.ExerciseScoreFormModel
 
 @{
 	var block = Model.Slide.Exercise;
@@ -30,7 +32,7 @@
 </div>
 
 <div class="row">
-	<div class="col-xs-12 col-md-6">
+	<div class="col-xs-12">
 		<form method="POST" action="@Url.Action("ScoreExercise", "Exercise", new { recheck = Model.Checking.IsChecked })"
 			class="exercise__score-form" data-submission-id="@Model.Checking.Submission.Id"
 			style="@(Model.IsCurrentSubmissionChecking ? "" : "display: none")">
@@ -98,9 +100,24 @@
 
 			@if (!Model.Checking.IsChecked)
 			{
-				<input type="submit" class="btn btn-primary" value="Сохранить и перейти к следующему"
-						data-url="@Url.Action("CheckNextExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
-						onclick="$('[name=nextUrl]').val($(this).data('url'))"/>
+				/* This submissions should not be calculated as left checking */
+				Model.ManualCheckingsLeft--;
+				if (Model.ManualCheckingsLeft == 0)
+				{
+					<div class="text-muted no-manual-checkings-left">
+                        Это последняя работа по&nbsp;задаче «@Model.Slide.Title.TruncateWithEllipsis(30)»
+                    </div>
+				}
+				else
+				{
+					<input type="submit" class="btn btn-primary" value="Сохранить и перейти к следующему"
+                           data-url="@Url.Action("CheckNextExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
+                           onclick="$('[name=nextUrl]').val($(this).data('url'))"/>
+					<div class="text-muted manual-checkings-left">
+                        По этой задаче остал@(Model.ManualCheckingsLeft % 10 == 1 && (Model.ManualCheckingsLeft % 100 / 10 != 1) ? "ась" : "ось")
+                        @Model.ManualCheckingsLeft.PluralizeInRussian(RussianPluralizationOptions.Checkings)
+                    </div>
+				}
 			}
 		</form>
 	</div>
