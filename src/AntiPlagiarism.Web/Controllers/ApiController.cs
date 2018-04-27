@@ -140,11 +140,18 @@ namespace AntiPlagiarism.Web.Controllers
 		}
 
 		[HttpPost(Api.Urls.RecalculateSnippetStatistics)]
-		public async Task<IActionResult> RecalculateSnippetStatistics()
+		public async Task<IActionResult> RecalculateSnippetStatistics(RecalculateSnippetStatisticsParameters parameters)
 		{
 			var taskIds = await tasksRepo.GetTaskIds();
+			
+			if (parameters.FromTaskId.HasValue)
+				taskIds = taskIds.Skip(taskIds.FindIndex(taskId => taskId == parameters.FromTaskId)).ToList();
+
 			foreach (var taskId in taskIds)
+			{
 				await CalculateTaskStatisticsParametersAsync(client.Id, taskId);
+				GC.Collect();
+			}
 
 			return Json(new RecalculateSnippetStatisticsResult
 			{
@@ -239,16 +246,22 @@ namespace AntiPlagiarism.Web.Controllers
 		
 		public async Task CalculateTaskStatisticsParametersAsync(int clientId, Guid taskId)
 		{
-			logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}");
-			var lastAuthorsIds = await submissionsRepo.GetLastAuthorsByTaskAsync(clientId, taskId, configuration.StatisticsAnalyzing.CountOfLastAuthorsForCalculatingMeanAndDeviation);
-			var lastSubmissions = await submissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(clientId, taskId, lastAuthorsIds);
-			var currentSubmissionsCount = await submissionsRepo.GetSubmissionsCountAsync(clientId, taskId);
-			
-			var statisticsParameters = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions);
-			logger.Information($"Новые статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}: Mean={statisticsParameters.Mean}, Deviation={statisticsParameters.Deviation}");
-			statisticsParameters.TaskId = taskId;
-			statisticsParameters.SubmissionsCount = currentSubmissionsCount;
-			await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters);
+			/* Create local submissions repo for preventing memory leaks */
+			using (var scope = serviceScopeFactory.CreateScope())
+			{
+				var localSubmissionsRepo = scope.ServiceProvider.GetService<SubmissionsRepo>();
+
+				logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}");
+				var lastAuthorsIds = await localSubmissionsRepo.GetLastAuthorsByTaskAsync(clientId, taskId, configuration.StatisticsAnalyzing.CountOfLastAuthorsForCalculatingMeanAndDeviation);
+				var lastSubmissions = await localSubmissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(clientId, taskId, lastAuthorsIds);
+				var currentSubmissionsCount = await localSubmissionsRepo.GetSubmissionsCountAsync(clientId, taskId);
+
+				var statisticsParameters = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions);
+				logger.Information($"Новые статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}: Mean={statisticsParameters.Mean}, Deviation={statisticsParameters.Deviation}");
+				statisticsParameters.TaskId = taskId;
+				statisticsParameters.SubmissionsCount = currentSubmissionsCount;
+				await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters);
+			}
 		}
 		
 		private async Task<SuspicionLevels> GetSuspicionLevelsAsync(Guid taskId)
