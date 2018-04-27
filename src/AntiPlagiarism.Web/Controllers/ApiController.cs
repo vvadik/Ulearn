@@ -249,7 +249,7 @@ namespace AntiPlagiarism.Web.Controllers
 			/* Create local submissions repo for preventing memory leaks */
 			using (var scope = serviceScopeFactory.CreateScope())
 			{
-				var localSubmissionsRepo = scope.ServiceProvider.GetService<SubmissionsRepo>();
+				var localSubmissionsRepo = scope.ServiceProvider.GetService<ISubmissionsRepo>();
 
 				logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}");
 				var lastAuthorsIds = await localSubmissionsRepo.GetLastAuthorsByTaskAsync(clientId, taskId, configuration.StatisticsAnalyzing.CountOfLastAuthorsForCalculatingMeanAndDeviation);
