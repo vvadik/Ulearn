@@ -136,11 +136,11 @@ namespace Database.DataContexts
 			}
 		}
 
-		public override Task<int> SaveChangesAsync()
+		public override async Task<int> SaveChangesAsync()
 		{
 			try
 			{
-				return base.SaveChangesAsync();
+				return await base.SaveChangesAsync();
 			}
 			catch (DbEntityValidationException ex)
 			{
