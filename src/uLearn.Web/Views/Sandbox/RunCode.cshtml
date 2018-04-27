@@ -6,7 +6,7 @@
 	ViewBag.Title = "Run code";
 }
 
-<div class="container">
+<div class="container exercise__submission">
 	@if (User.HasAccess(CourseRole.Instructor))
 	{
 		@SlideHtml.CodeTextArea(@"using System;

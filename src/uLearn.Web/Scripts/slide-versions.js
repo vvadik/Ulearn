@@ -5,9 +5,15 @@
 		window.history.pushState({ path: newurl }, '', newurl);
 }
 
-function setExerciseVersion(versionId, showOutput,) {
+function setExerciseVersion(versionId, showOutput) {
 	showOutput = showOutput || false;
 	var url = $('.exercise__submission').data('version-update-url');
+	
+    /* Sandbox runner case */
+    if (! url) {
+        return;
+    }	
+    
 	url = url.replace('VERSION_ID', versionId);
 	url = url.replace('SHOW_OUTPUT', showOutput);
 

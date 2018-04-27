@@ -448,7 +448,7 @@ namespace Database.DataContexts
 			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)courseManager.GetCourse(checking.CourseId).GetSlideById(checking.SlideId);
 			
 			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
-			var score = isRightAnswer ? exerciseSlide.Exercise.CorrectnessScore : 0;
+			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Exercise.CorrectnessScore : 0;
 
 			/* For skipped slides score is always 0 */
 			if (visitsRepo.IsSkipped(checking.CourseId, checking.SlideId, checking.UserId))
@@ -479,6 +479,10 @@ namespace Database.DataContexts
 		private bool IsRightAnswer(RunningResults result, string output, ExerciseBlock exerciseBlock)
 		{
 			if (result.Verdict != Verdict.Ok )
+				return false;
+			
+			/* For sandbox runner */
+			if (exerciseBlock == null)
 				return false;
 
 			if (exerciseBlock.ExerciseType == ExerciseType.CheckExitCode)
