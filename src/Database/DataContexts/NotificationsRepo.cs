@@ -98,7 +98,7 @@ namespace Database.DataContexts
 				transport.IsDeleted = false;
 				db.NotificationTransports.Add(transport);
 
-				await db.SaveChangesAsync().ConfigureAwait(false);
+				await db.SaveChangesAsync();
 				transaction.Commit();
 			}
 		}

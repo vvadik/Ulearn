@@ -67,7 +67,7 @@ namespace uLearn.Web.Controllers
 				UserId = User.Identity.GetUserId(),
 				IsEnabled = false,
 			};
-			notificationsRepo.AddNotificationTransport(mailNotificationTransport).Wait(5000);
+			AddNotificationTransport(mailNotificationTransport).Wait(5000);
 
 			var timestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
 			var signature = GetNotificationTransportEnablingSignature(mailNotificationTransport.Id, timestamp);
@@ -79,6 +79,11 @@ namespace uLearn.Web.Controllers
 				LinkTimestamp = timestamp,
 				LinkSignature = signature,
 			});
+		}
+
+		public async Task AddNotificationTransport(MailNotificationTransport transport)
+		{
+			await notificationsRepo.AddNotificationTransport(transport).ConfigureAwait(false);
 		}
 
 		public string GetNotificationTransportEnablingSignature(int transportId, long timestamp)
