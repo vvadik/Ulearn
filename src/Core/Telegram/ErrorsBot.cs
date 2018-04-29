@@ -13,7 +13,6 @@ namespace uLearn.Telegram
 
 		public ErrorsBot()
 		{
-			//channel = ConfigurationManager.AppSettings["ulearn.telegram.errors.channel"];
 			channel = ApplicationConfiguration.Read<UlearnConfiguration>().Telegram.Errors.Channel;
 		}
 
@@ -34,13 +33,14 @@ namespace uLearn.Telegram
 			}
 			catch (Exception e)
 			{
-				log.Error($"Не могу отправить сообщение в телеграм-канал {channel}", e);
+				/* Not error because it may cause recursive fails */
+				log.Info($"Не могу отправить сообщение в телеграм-канал {channel}", e);
 			}
 		}
 
 		public void PostToChannel(string message, ParseMode parseMode = ParseMode.Default)
 		{
-			PostToChannelAsync(message, parseMode).Wait();
+			PostToChannelAsync(message, parseMode).Wait(5000);
 		}
 
 		public void PostToChannel(string errorId, Exception exception)
