@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,9 +18,9 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		};
 		
 		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
-		{
+		{	
 			return InspectAll<MethodDeclarationSyntax>(userSolution, InspectMethodsNamesAndArguments)
-				.Concat(InspectAll<VariableDeclaratorSyntax>(userSolution, InspectVariablesNames))
+				.Concat(InspectAll<VariableDeclarationSyntax>(userSolution, semanticModel, InspectVariablesNames))
 				.Concat(InspectAll<PropertyDeclarationSyntax>(userSolution, InspectPropertiesNames))
 				.ToList();
 		}
@@ -27,20 +28,60 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		private IEnumerable<SolutionStyleError> InspectMethodsNamesAndArguments(MethodDeclarationSyntax methodDeclaration)
 		{
 			var methodIdentifier = methodDeclaration.Identifier;
-			var parameters = methodDeclaration.ParameterList.Parameters;
-			return CheckIdentifierNameForSpellingErrors(methodIdentifier)
-				.Concat(parameters
-					.SelectMany(p => CheckIdentifierNameForSpellingErrors(p.Identifier)));
+			var errorsInParameters = InspectMethodParameters(methodDeclaration);
+
+			return CheckIdentifierNameForSpellingErrors(methodIdentifier).Concat(errorsInParameters);
 		}
 
-		private IEnumerable<SolutionStyleError> InspectVariablesNames(VariableDeclaratorSyntax variableDeclaratorSyntax)
+		private List<SolutionStyleError> InspectMethodParameters(MethodDeclarationSyntax methodDeclaration)
 		{
-			var variableDeclarator = variableDeclaratorSyntax.Identifier;
-			return CheckIdentifierNameForSpellingErrors(variableDeclarator);
+			var parameters = methodDeclaration.ParameterList.Parameters;
+			return parameters
+				.Select(InspectMethodParameter)
+				.Where(err => err != null)
+				.ToList();
+		}
+
+		private SolutionStyleError InspectMethodParameter(ParameterSyntax parameter)
+		{
+			var identifier = parameter.Identifier;
+			var identifierText = identifier.Text;
+			var errorsInParameterName = CheckIdentifierNameForSpellingErrors(identifier);
+			foreach (var errorInParameterName in errorsInParameterName)
+			{
+				var parameterTypeAsString = parameter.Type.ToString();
+				if (!parameterTypeAsString.StartsWith(identifierText, StringComparison.InvariantCultureIgnoreCase)
+					|| identifierText.Equals(parameterTypeAsString.MakeTypeNameAbbreviation(), StringComparison.InvariantCultureIgnoreCase))
+					return errorInParameterName;
+			}
+
+			return null;
+		}
+
+		private IEnumerable<SolutionStyleError> InspectVariablesNames(VariableDeclarationSyntax variableDeclarationSyntax, SemanticModel semanticModel)
+		{
+			var typeInfo = semanticModel.GetTypeInfo(variableDeclarationSyntax.Type);
+			return variableDeclarationSyntax.Variables.SelectMany(v => InspectVariablesNames(v, typeInfo));
+		}
+
+		private IEnumerable<SolutionStyleError> InspectVariablesNames(VariableDeclaratorSyntax variableDeclaratorSyntax, TypeInfo variableTypeInfo)
+		{
+			var variableIdentifier = variableDeclaratorSyntax.Identifier;
+			var variableType = variableTypeInfo.Type;
+			if (!variableType.Name.StartsWith(variableIdentifier.Text, StringComparison.InvariantCultureIgnoreCase))
+				return new List<SolutionStyleError>();
+			
+			return CheckIdentifierNameForSpellingErrors(variableIdentifier);
 		}
 
 		private IEnumerable<SolutionStyleError> InspectPropertiesNames(PropertyDeclarationSyntax propertyDeclaration)
 		{
+			var propertyType = propertyDeclaration.Type;
+			var propertyTypeAsString = propertyType.ToString();
+			var propertyTypeNameAbbreviation = propertyTypeAsString.MakeTypeNameAbbreviation();
+			if (propertyDeclaration.Identifier.Text.Equals(propertyTypeNameAbbreviation))
+				return new List<SolutionStyleError>();
+			
 			return CheckIdentifierNameForSpellingErrors(propertyDeclaration.Identifier);
 		}
 
@@ -57,7 +98,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 				}
 			}
 		}
-
+		
 		private SolutionStyleError CheckConcatenatedWordsInLowerCaseForError(string concatenatedWords, SyntaxToken tokenWithConcatenatedWords)
 		{
 			var currentCheckingWord = "";

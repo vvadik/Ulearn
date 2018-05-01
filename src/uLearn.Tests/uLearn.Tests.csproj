@@ -314,6 +314,7 @@
     <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithAmeticanVariantOfEnglish.cs" />
     <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithExceptions.cs" />
     <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithoutMisspellings.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithShortNamesOrAbbreviations.cs" />
     <Compile Include="CSharp\SpellingValidation\TestData\Incorrect\FileWithBritishVariantOfEnglish.cs" />
     <Compile Include="CSharp\SpellingValidation\TestData\Incorrect\FileWithMisspellings.cs" />
     <Compile Include="CSharp\VarInVariableDeclarationValidator_should.cs" />

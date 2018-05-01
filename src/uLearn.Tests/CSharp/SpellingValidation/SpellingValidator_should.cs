@@ -46,7 +46,7 @@ namespace uLearn.CSharp.SpellingValidation
 			var code = file.ContentAsUtf8();
 			var errors = validator.FindErrors(code);
 
-			errors.Should().NotBeEmpty();
+			errors.Should().NotBeNullOrEmpty();
 		}
 
 		[TestCaseSource(nameof(CorrectFiles))]
@@ -59,7 +59,7 @@ namespace uLearn.CSharp.SpellingValidation
 				Console.WriteLine(errors);
 			}
 
-			errors.Should().BeEmpty();
+			errors.Should().BeNullOrEmpty();
 		}
 
 		[Explicit]

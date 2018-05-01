@@ -1,9 +1,11 @@
-﻿namespace uLearn.CSharp.SpellingValidation.TestData.Correct
+﻿using System.Collections.Generic;
+
+namespace uLearn.CSharp.SpellingValidation.TestData.Correct
 {
 	public class FileWithoutMisspellings
 	{
 		public int Count => 1;
-		public void MakeSomething()
+		public void MakeSomething(List<int> lis)
 		{
 			var length = 1;
 			var complexWord = 1;

@@ -81,7 +81,8 @@ namespace Ulearn.Common.Extensions
 				if (char.IsLetter(letter))
 					word += letter;
 			}
-			yield return word;
+			if (word != "")
+				yield return word;
 		}
 
 		public static string RemoveCommonNesting(this string text)
