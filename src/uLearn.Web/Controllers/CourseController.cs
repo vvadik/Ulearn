@@ -153,6 +153,8 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			var slide = slideIndex == -1 ? GetInitialSlideForStartup(courseId, visibleUnits) : course.Slides[slideIndex];
+			if (slide == null)
+				return HttpNotFound();
 			return RedirectToRoute("Course.SlideById", new { courseId, slideId = slide.Url });
 		}
 

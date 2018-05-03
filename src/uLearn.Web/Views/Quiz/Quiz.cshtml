@@ -9,22 +9,37 @@
 
 	var status = "";
 	var triesCountMessage = Model.MaxDropCount == QuizController.InfinityDropsCount ? "∞ (преподаватели не ограничены в попытках)" : (Model.MaxDropCount + 1).ToString();
+	const string allTriesExceeded = "Использованы все попытки. Вы можете пройти тест ещё раз, но ваши баллы за него не изменятся";
 	if (!Model.IsGuest && Model.QuizState == QuizState.NotPassed)
 	{
-		status = string.Format(
-			"Попытка {0} из {1}",
-			Model.TryNumber + 1,
-			triesCountMessage
-		);
+		if (Model.MaxDropCount == QuizController.InfinityDropsCount || Model.TryNumber <= Model.MaxDropCount)
+		{
+			status = string.Format(
+				"Попытка {0} из {1}",
+				Model.TryNumber + 1,
+				triesCountMessage
+				);
+		}
+		else
+		{
+			status = allTriesExceeded;
+		}
 	}
 	else if (!Model.IsGuest && Model.QuizState == QuizState.Subtotal)
 	{
-		status = string.Format(
-			"Использован{0} {1} из {2}",
-			Model.TryNumber % 10 == 1 && (Model.TryNumber / 10) % 10 != 1 ? "а" : "о",
-			Model.TryNumber.PluralizeInRussian(RussianPluralizationOptions.Tries),
-			triesCountMessage
-		);
+		if (Model.MaxDropCount == QuizController.InfinityDropsCount || Model.TryNumber <= Model.MaxDropCount + 1)
+		{
+			status = string.Format(
+				"Использован{0} {1} из {2}",
+				Model.TryNumber % 10 == 1 && (Model.TryNumber / 10) % 10 != 1 ? "а" : "о",
+				Model.TryNumber.PluralizeInRussian(RussianPluralizationOptions.Tries),
+				triesCountMessage
+				);	
+		}
+		else
+		{
+			status = allTriesExceeded;
+		}
 	}
 	else if (!Model.IsGuest && Model.QuizState == QuizState.Total)
 	{
@@ -108,7 +123,7 @@
 						data-url="@Url.Action("CheckNextQuizForSlide", "Admin", new { courseId = Model.Course.Id, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
 						onclick="$('[name=nextUrl]').val($(this).data('url'))">
 			}
-			else if (Model.QuizState == QuizState.Subtotal)
+			else if (Model.QuizState == QuizState.Subtotal || Model.QuizState == QuizState.Total && !Model.Slide.ManualChecking)
 			{
 				using (Html.BeginForm("DropQuiz", "Quiz"))
 				{
@@ -121,7 +136,11 @@
 						{
 							<text>Количество попыток для&nbsp;преподавателей неограничено</text>
 						}
-						else
+						else if (Model.TryNumber > Model.MaxDropCount)
+						{
+							<text>Ваши попытки закончились. Вы можете попробовать пройти тест ещё раз, <strong>но ваши баллы за&nbsp;него не&nbsp;изменятся</strong>.</text>
+						}
+                        else 
 						{
 							<text>У вас остал@(remains == 1 ? "а" : "о")сь @remains.PluralizeInRussian(RussianPluralizationOptions.Tries) из @(Model.MaxDropCount + 1)</text>
 						}

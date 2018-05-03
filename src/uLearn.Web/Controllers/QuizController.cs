@@ -213,7 +213,8 @@ namespace uLearn.Web.Controllers
 					await visitsRepo.MarkVisitsAsWithManualChecking(slideId, userId);
 				}
 			}
-			else
+			/* Recalculate score for quiz if this attempt is allowed. Don't recalculate score if this attempt is more then MaxDropCount */
+			else if (tryIndex < slide.MaxDropCount)
 			{
 				var score = allQuizInfos
 					.DistinctBy(forDb => forDb.QuizId)
@@ -686,8 +687,10 @@ namespace uLearn.Web.Controllers
 			if (slide is QuizSlide)
 			{
 				var userId = User.Identity.GetUserId();
-				if (userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b) < GetMaxDropCount(courseId, slide as QuizSlide) &&
-					!userQuizzesRepo.IsQuizScoredMaximum(courseId, userId, slideId))
+				var userQuizDrops = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b);
+				var maxDropCount = GetMaxDropCount(courseId, slide as QuizSlide);
+				var isQuizScoredMaximum = userQuizzesRepo.IsQuizScoredMaximum(courseId, userId, slideId);
+				if (userQuizDrops < maxDropCount && !isQuizScoredMaximum)
 				{
 					await userQuizzesRepo.DropQuiz(userId, slideId);
 					await slideCheckingsRepo.RemoveAttempts(courseId, slideId, userId);
@@ -695,6 +698,13 @@ namespace uLearn.Web.Controllers
 					if (isLti)
 						LtiUtils.SubmitScore(slide, userId);
 				}
+				else if ((userQuizDrops >= maxDropCount || isQuizScoredMaximum) && !(slide as QuizSlide).ManualChecking)
+				{
+					/* Allow user to drop quiz after all tries are exceeded, but don't update score */
+					await userQuizzesRepo.DropQuiz(userId, slideId);
+					await slideCheckingsRepo.RemoveAttempts(courseId, slideId, userId);
+				}
+				
 			}
 			var model = new { courseId, slideId = slide.Id, isLti };
 			if (isLti)
@@ -742,8 +752,6 @@ namespace uLearn.Web.Controllers
 				return Tuple.Create(queueItem.IsLocked ? QuizState.IsChecking : QuizState.WaitForCheck, states.Count);
 			}
 
-			if (states.Count > maxDropCount && maxDropCount != InfinityDropsCount)
-				return Tuple.Create(QuizState.Total, states.Count);
 			if (states.Any(b => !b))
 				return Tuple.Create(QuizState.Subtotal, states.Count);
 			return Tuple.Create(QuizState.NotPassed, states.Count);
