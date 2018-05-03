@@ -212,6 +212,8 @@ namespace uLearn.Web.Controllers
 		private async Task UpdateUserFieldsFromExternalLoginInfo(string userId, ExternalLoginInfo loginInfo)
 		{
 			var user = await userManager.FindByIdAsync(userId);
+			if (user == null)
+				return;
 			
 			var avatarUrl = loginInfo.ExternalIdentity.FindFirstValue("AvatarUrl");
 			var konturLogin = loginInfo.ExternalIdentity.FindFirstValue("KonturLogin");

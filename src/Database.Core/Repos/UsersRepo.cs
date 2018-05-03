@@ -170,6 +170,14 @@ namespace Database.Repos
 		{
 			return db.Users.Where(u => usersIds.Contains(u.Id) && ! u.IsDeleted);
 		}
+		
+		public async Task DeleteUserAsync(ApplicationUser user)
+		{
+			user.IsDeleted = true;
+			/* Change name to make creating new user with same name possible */
+			user.UserName = user.UserName + "__deleted__" + (new Random().Next(100000));
+			await db.SaveChangesAsync();
+		}
 	}
 
 	/* System.String is not available for table-valued functions so we need to create ComplexTyped wrapper */

@@ -237,11 +237,13 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> DeleteUser(string userId)
 		{
-			var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId && ! u.IsDeleted);
+			var user = usersRepo.FindUserById(userId);
 			if (user != null)
 			{
-				user.IsDeleted = true;
-				await db.SaveChangesAsync();
+				/* Log out user everywhere: https://msdn.microsoft.com/en-us/library/dn497579%28v=vs.108%29.aspx?f=255&MSPPError=-2147217396 */
+				await userManager.UpdateSecurityStampAsync(userId);
+				
+				await usersRepo.DeleteUserAsync(user);
 			}
 			return RedirectToAction("List");
 		}
@@ -353,7 +355,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> Manage(ManageMessageId? message, string provider="", string otherUserId="")
 		{
 			ViewBag.StatusMessage = message?.GetAttribute<DisplayAttribute>().GetName();
-			if (message == ManageMessageId.AlreadyLinkedToOtherUser )
+			if (message == ManageMessageId.AlreadyLinkedToOtherUser)
 			{
 				var otherUser = await userManager.FindByIdAsync(otherUserId);
 				ViewBag.StatusMessage += $" {provider ?? ""}. Аккаунт уже привязан к пользователю {otherUser?.UserName ?? ""}.";
@@ -686,6 +688,9 @@ namespace uLearn.Web.Controllers
 
 			var userId = User.Identity.GetUserId();
 			var user = usersRepo.FindUserById(userId);
+			if (user == null)
+				return new HttpNotFoundResult();
+			
 			if (user.EmailConfirmed || !user.LastConfirmationEmailTime.HasValue)
 				return new HttpStatusCodeResult(HttpStatusCode.OK);
 

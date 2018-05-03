@@ -200,6 +200,11 @@ namespace uLearn.Web.Controllers
 			await requestRepo.DeleteRequest(model.RequestId);
 
 			var user = await userManager.FindByIdAsync(userId);
+			if (user == null)
+			{
+				answer.Errors = new[] { "Пользователь был удалён администраторами" };
+				return View(answer);
+			}
 			await AuthenticationManager.LoginAsync(HttpContext, user, false);
 
 			return RedirectToAction("Index", "Home");

@@ -59,6 +59,8 @@ namespace uLearn.Web.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.OK);
 
 			var user = usersRepo.FindUserById(userId);
+			if (user == null)
+				return new HttpNotFoundResult();
 			if (string.IsNullOrEmpty(user.Email) || !user.EmailConfirmed)
 				return new HttpStatusCodeResult(HttpStatusCode.OK);
 

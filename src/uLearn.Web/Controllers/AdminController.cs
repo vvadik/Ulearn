@@ -1447,6 +1447,8 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var user = await userManager.FindByIdAsync(userId);
+			if (user == null)
+				return HttpNotFound();
 			var instructor = await userManager.FindByIdAsync(User.Identity.GetUserId());
 			var course = courseManager.GetCourse(courseId);
 
