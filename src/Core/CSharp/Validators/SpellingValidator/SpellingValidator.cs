@@ -14,7 +14,8 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		private static readonly Hunspell hunspell = new Hunspell(Resources.en_US_aff, Resources.en_US_dic);
 		private static readonly HashSet<string> wordsToExcept = new HashSet<string>
 		{
-			"func", "arg", "args", "pos", "sw", "bmp", "prev", "next", "rnd", "ui", "autocomplete", "tuple", "len", "api", "tuples", "vm"
+			"func", "arg", "args", "pos", "sw", "bmp", "prev", "next", "rnd", "ui", "autocomplete", "tuple", "len", "api", "tuples", "vm",
+			"ai"
 		};
 		
 		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
@@ -68,7 +69,10 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		{
 			var variableIdentifier = variableDeclaratorSyntax.Identifier;
 			var variableType = variableTypeInfo.Type;
-			if (!variableType.Name.StartsWith(variableIdentifier.Text, StringComparison.InvariantCultureIgnoreCase))
+			var variableTypeName = variableType.Name;
+			var variableName = variableIdentifier.Text;
+			if (variableTypeName.StartsWith(variableName, StringComparison.InvariantCultureIgnoreCase)
+				|| variableTypeName.MakeTypeNameAbbreviation().Equals(variableName, StringComparison.InvariantCultureIgnoreCase))
 				return new List<SolutionStyleError>();
 			
 			return CheckIdentifierNameForSpellingErrors(variableIdentifier);
@@ -78,8 +82,9 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		{
 			var propertyType = propertyDeclaration.Type;
 			var propertyTypeAsString = propertyType.ToString();
-			var propertyTypeNameAbbreviation = propertyTypeAsString.MakeTypeNameAbbreviation();
-			if (propertyDeclaration.Identifier.Text.Equals(propertyTypeNameAbbreviation))
+			var propertyName = propertyDeclaration.Identifier.Text;
+			if (propertyTypeAsString.StartsWith(propertyName, StringComparison.InvariantCultureIgnoreCase)
+				|| propertyTypeAsString.MakeTypeNameAbbreviation().Equals(propertyName, StringComparison.InvariantCultureIgnoreCase))
 				return new List<SolutionStyleError>();
 			
 			return CheckIdentifierNameForSpellingErrors(propertyDeclaration.Identifier);
