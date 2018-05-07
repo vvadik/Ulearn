@@ -140,7 +140,7 @@
 						{
 							<text>Ваши попытки закончились. Вы можете попробовать пройти тест ещё раз, <strong>но ваши баллы за&nbsp;него не&nbsp;изменятся</strong>.</text>
 						}
-                        else 
+                        else if (Model.QuizState != QuizState.Total)
 						{
 							<text>У вас остал@(remains == 1 ? "а" : "о")сь @remains.PluralizeInRussian(RussianPluralizationOptions.Tries) из @(Model.MaxDropCount + 1)</text>
 						}
