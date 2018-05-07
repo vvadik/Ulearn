@@ -214,7 +214,7 @@ namespace uLearn.Web.Controllers
 				}
 			}
 			/* Recalculate score for quiz if this attempt is allowed. Don't recalculate score if this attempt is more then MaxDropCount */
-			else if (tryIndex < slide.MaxDropCount)
+			else if (tryIndex <= maxDropCount)
 			{
 				var score = allQuizInfos
 					.DistinctBy(forDb => forDb.QuizId)

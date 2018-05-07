@@ -2,9 +2,9 @@
 {
 	public class QuizBlockData
 	{
-		public QuizModel QuizModel { get; set; }
-		public int BlockIndex { get; set; }
-		public QuizState QuizState;
+		public QuizModel QuizModel { get; private set; }
+		public int BlockIndex { get; private set; }
+		public QuizState QuizState { get; private set; }
 
 		public QuizBlockData(QuizModel model, int index, QuizState quizState)
 		{
@@ -13,6 +13,10 @@
 			QuizState = quizState;
 		}
 
-		public bool ShowCorrectAnswer => QuizState == QuizState.Total && !QuizModel.Slide.ManualChecking;
+		private bool TriesFinished => QuizModel.TryNumber > QuizModel.MaxDropCount; 
+
+		public bool ShowCorrectAnswers => (QuizState == QuizState.Total || QuizState == QuizState.Subtotal && TriesFinished) && !QuizModel.Slide.ManualChecking;
+
+		public bool ShowExplanations => ShowCorrectAnswers;
 	}
 }
