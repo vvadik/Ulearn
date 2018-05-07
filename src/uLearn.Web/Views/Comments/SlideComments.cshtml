@@ -58,7 +58,7 @@
 
 @{
 	var forInstructorsOnlyTopLevelComments = Model.TopLevelComments.Where(c => c.IsForInstructorsOnly).ToList();
-	var forAllTopLevelComments = Model.TopLevelComments.Where(c => !c.IsForInstructorsOnly).ToList();
+	var forEveryoneTopLevelComments = Model.TopLevelComments.Where(c => !c.IsForInstructorsOnly).ToList();
 }
 
 <h3>Комментарии</h3>
@@ -82,10 +82,10 @@
  
 @if (!Model.ShowOnlyInstructorsOnlyComments)
 {
-	 if (forAllTopLevelComments.Any() || Model.IsAuthorizedAndCanComment)
+	 if (forEveryoneTopLevelComments.Any() || Model.IsAuthorizedAndCanComment)
 	 {
 		 <div class="comments">
-             @foreach (var topLevelComment in forAllTopLevelComments)
+             @foreach (var topLevelComment in forEveryoneTopLevelComments)
              {
 	             @Html.Partial("_Comment", BuildCommentViewModel(topLevelComment, Model.Slide))
              }
@@ -115,6 +115,14 @@
 			 <div class="comments">
                  <div class="comments_policy__message">
                      Комментариев пока нет. @Html.ActionLink("Войдите", "Login", "Account", new { returnUrl = Request.RawUrl }, new { }), чтобы написать свой.
+                 </div>
+             </div>
+		 }
+		 else
+		 {
+			 <div class="comments">
+                 <div class="comments_policy__message">
+                     Комментарии могут оставлять только преподаватели.
                  </div>
              </div>
 		 }
