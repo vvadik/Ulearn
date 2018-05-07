@@ -693,7 +693,6 @@ namespace uLearn.Web.Controllers
 				if (userQuizDrops < maxDropCount && !isQuizScoredMaximum)
 				{
 					await userQuizzesRepo.DropQuiz(userId, slideId);
-					await slideCheckingsRepo.RemoveAttempts(courseId, slideId, userId);
 					await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 					if (isLti)
 						LtiUtils.SubmitScore(slide, userId);
@@ -702,7 +701,6 @@ namespace uLearn.Web.Controllers
 				{
 					/* Allow user to drop quiz after all tries are exceeded, but don't update score */
 					await userQuizzesRepo.DropQuiz(userId, slideId);
-					await slideCheckingsRepo.RemoveAttempts(courseId, slideId, userId);
 				}
 				
 			}

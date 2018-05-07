@@ -43,7 +43,14 @@
 	}
 	else if (!Model.IsGuest && Model.QuizState == QuizState.Total)
 	{
-		status = string.Format("Решено с {0} попытки", Model.TryNumber);
+		if (Model.MaxDropCount == QuizController.InfinityDropsCount || Model.TryNumber <= Model.MaxDropCount + 1)
+		{
+			status = string.Format("Решено с {0} попытки", Model.TryNumber);
+		}
+		else
+		{
+			status = allTriesExceeded;
+		}
 	}
 	else if (Model.ManualQuizCheckQueueItem != null)
 	{
