@@ -8,11 +8,11 @@
 	var quizSlide = Model.Slide;
 
 	var status = "";
-	var triesCountMessage = Model.MaxDropCount == QuizController.InfinityDropsCount ? "∞ (преподаватели не ограничены в попытках)" : (Model.MaxDropCount + 1).ToString();
+	var triesCountMessage = Model.MaxTriesCount == QuizController.InfinityTriesCount ? "∞ (преподаватели не ограничены в попытках)" : Model.MaxTriesCount.ToString();
 	const string allTriesExceeded = "Использованы все попытки. Вы можете пройти тест ещё раз, но ваши баллы за него не изменятся";
 	if (!Model.IsGuest && Model.QuizState == QuizState.NotPassed)
 	{
-		if (Model.MaxDropCount == QuizController.InfinityDropsCount || Model.TryNumber <= Model.MaxDropCount)
+		if (Model.MaxTriesCount == QuizController.InfinityTriesCount || Model.TryNumber < Model.MaxTriesCount)
 		{
 			status = string.Format(
 				"Попытка {0} из {1}",
@@ -27,7 +27,7 @@
 	}
 	else if (!Model.IsGuest && Model.QuizState == QuizState.Subtotal)
 	{
-		if (Model.MaxDropCount == QuizController.InfinityDropsCount || Model.TryNumber <= Model.MaxDropCount + 1)
+		if (Model.MaxTriesCount == QuizController.InfinityTriesCount || Model.TryNumber <= Model.MaxTriesCount)
 		{
 			status = string.Format(
 				"Использован{0} {1} из {2}",
@@ -43,7 +43,7 @@
 	}
 	else if (!Model.IsGuest && Model.QuizState == QuizState.Total)
 	{
-		if (Model.MaxDropCount == QuizController.InfinityDropsCount || Model.TryNumber <= Model.MaxDropCount + 1)
+		if (Model.MaxTriesCount == QuizController.InfinityTriesCount || Model.TryNumber <= Model.MaxTriesCount)
 		{
 			status = string.Format("Решено с {0} попытки", Model.TryNumber);
 		}
@@ -57,7 +57,7 @@
 		status = string.Format("{0}, попытка {1} из {2}",
 			Model.ManualQuizCheckQueueItem.User.VisibleName,
 			Model.TryNumber,
-			Model.MaxDropCount + 1);
+			Model.MaxTriesCount);
 	}
 	else if (Model.QuizState == QuizState.WaitForCheck)
 	{
@@ -77,7 +77,7 @@
 		<p class="alert alert-danger">@Request.QueryString["error"]</p>
 	}
 
-	var remains = Model.MaxDropCount - Model.TryNumber + 1;
+	var remains = Model.MaxTriesCount - Model.TryNumber;
 	var context = new BlockRenderContext(
 		Model.Course,
 		Model.Slide,
@@ -139,17 +139,17 @@
 					<input type="hidden" name="isLti" value="@Model.IsLtiToString">
 					<button class="btn btn-primary" type="submit">Пройти тест ещё раз</button>
 					<small class="quiz__remains">
-						@if (Model.MaxDropCount == QuizController.InfinityDropsCount)
+						@if (Model.MaxTriesCount == QuizController.InfinityTriesCount)
 						{
 							<text>Количество попыток для&nbsp;преподавателей неограничено</text>
 						}
-						else if (Model.TryNumber > Model.MaxDropCount)
+						else if (Model.TryNumber >= Model.MaxTriesCount)
 						{
 							<text>Ваши попытки закончились. Вы можете попробовать пройти тест ещё раз, <strong>но ваши баллы за&nbsp;него не&nbsp;изменятся</strong>.</text>
 						}
                         else if (Model.QuizState != QuizState.Total)
 						{
-							<text>У вас остал@(remains == 1 ? "а" : "о")сь @remains.PluralizeInRussian(RussianPluralizationOptions.Tries) из @(Model.MaxDropCount + 1)</text>
+							<text>У вас остал@(remains == 1 ? "а" : "о")сь @remains.PluralizeInRussian(RussianPluralizationOptions.Tries) из @Model.MaxTriesCount</text>
 						}
 					</small>
 				}

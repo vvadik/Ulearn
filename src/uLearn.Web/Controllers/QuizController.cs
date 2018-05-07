@@ -28,8 +28,8 @@ namespace uLearn.Web.Controllers
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(QuizController));
 
-		private const int defaultMaxDropsCount = 1;
-		public const int InfinityDropsCount = int.MaxValue - 1;
+		private const int defaultMaxTriesCount = 2;
+		public const int InfinityTriesCount = int.MaxValue - 1;
 		public const int MaxFillinblockSize = 1024;
 
 		private readonly ULearnDb db = new ULearnDb();
@@ -107,8 +107,8 @@ namespace uLearn.Web.Controllers
 				return PartialView(GuestQuiz(course, slide));
 			}
 			var slideId = slide.Id;
-			var maxDropCount = GetMaxDropCount(courseId, slide);
-			var state = GetQuizState(courseId, userId, slideId, maxDropCount);
+			var maxTriesCount = GetMaxTriesCount(courseId, slide);
+			var state = GetQuizState(courseId, userId, slideId);
 			var quizState = state.Item1;
 			var tryNumber = state.Item2;
 			var resultsForQuizes = GetResultForQuizes(courseId, userId, slideId, state.Item1);
@@ -136,7 +136,7 @@ namespace uLearn.Web.Controllers
 				Slide = slide,
 				QuizState = quizState,
 				TryNumber = tryNumber,
-				MaxDropCount = maxDropCount,
+				MaxTriesCount = maxTriesCount,
 				ResultsForQuizes = resultsForQuizes,
 				AnswersToQuizes = userAnswers,
 				IsLti = isLti,
@@ -166,8 +166,8 @@ namespace uLearn.Web.Controllers
 				return new HttpNotFoundResult();
 
 			var userId = User.Identity.GetUserId();
-			var maxDropCount = GetMaxDropCount(courseId, slide);
-			var quizState = GetQuizState(courseId, userId, slideId, maxDropCount);
+			var maxTriesCount = GetMaxTriesCount(courseId, slide);
+			var quizState = GetQuizState(courseId, userId, slideId);
 			if (!CanUserFillQuiz(quizState.Item1))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Already answered");
 
@@ -213,8 +213,8 @@ namespace uLearn.Web.Controllers
 					await visitsRepo.MarkVisitsAsWithManualChecking(slideId, userId);
 				}
 			}
-			/* Recalculate score for quiz if this attempt is allowed. Don't recalculate score if this attempt is more then MaxDropCount */
-			else if (tryIndex <= maxDropCount)
+			/* Recalculate score for quiz if this attempt is allowed. Don't recalculate score if this attempt is more then maxTriesCount */
+			else if (tryIndex < maxTriesCount)
 			{
 				var score = allQuizInfos
 					.DistinctBy(forDb => forDb.QuizId)
@@ -688,16 +688,16 @@ namespace uLearn.Web.Controllers
 			{
 				var userId = User.Identity.GetUserId();
 				var userQuizDrops = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b);
-				var maxDropCount = GetMaxDropCount(courseId, slide as QuizSlide);
+				var maxTriesCount = GetMaxTriesCount(courseId, slide as QuizSlide);
 				var isQuizScoredMaximum = userQuizzesRepo.IsQuizScoredMaximum(courseId, userId, slideId);
-				if (userQuizDrops < maxDropCount && !isQuizScoredMaximum)
+				if (userQuizDrops + 1 < maxTriesCount && !isQuizScoredMaximum)
 				{
 					await userQuizzesRepo.DropQuiz(userId, slideId);
 					await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 					if (isLti)
 						LtiUtils.SubmitScore(slide, userId);
 				}
-				else if ((userQuizDrops >= maxDropCount || isQuizScoredMaximum) && !(slide as QuizSlide).ManualChecking)
+				else if ((userQuizDrops + 1 >= maxTriesCount || isQuizScoredMaximum) && !(slide as QuizSlide).ManualChecking)
 				{
 					/* Allow user to drop quiz after all tries are exceeded, but don't update score */
 					await userQuizzesRepo.DropQuiz(userId, slideId);
@@ -721,16 +721,15 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private int GetMaxDropCount(string courseId, QuizSlide quizSlide)
+		private int GetMaxTriesCount(string courseId, QuizSlide quizSlide)
 		{
 			if (User.HasAccessFor(courseId, CourseRole.Tester))
-				return InfinityDropsCount;
+				return InfinityTriesCount;
 
 			if (quizSlide == null)
-				return defaultMaxDropsCount;
-
-			var slideMaxDropCount = quizSlide.MaxDropCount;
-			return slideMaxDropCount == 0 ? defaultMaxDropsCount : quizSlide.MaxDropCount;
+				return defaultMaxTriesCount;
+			
+			return quizSlide.MaxTriesCount;
 		}
 
 		private Dictionary<string, int> GetResultForQuizes(string courseId, string userId, Guid slideId, QuizState state)
@@ -738,7 +737,7 @@ namespace uLearn.Web.Controllers
 			return userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId);
 		}
 
-		private Tuple<QuizState, int> GetQuizState(string courseId, string userId, Guid slideId, int maxDropCount)
+		private Tuple<QuizState, int> GetQuizState(string courseId, string userId, Guid slideId)
 		{
 			log.Info($"Ищу статус прохождения теста {courseId}:{slideId} для пользователя {userId}");
 			var states = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).ToList();

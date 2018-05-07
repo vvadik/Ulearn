@@ -13,7 +13,7 @@
 			QuizState = quizState;
 		}
 
-		private bool TriesFinished => QuizModel.TryNumber > QuizModel.MaxDropCount; 
+		private bool TriesFinished => QuizModel.TryNumber + 1 > QuizModel.MaxTriesCount; 
 
 		public bool ShowCorrectAnswers => (QuizState == QuizState.Total || QuizState == QuizState.Subtotal && TriesFinished) && !QuizModel.Slide.ManualChecking;
 

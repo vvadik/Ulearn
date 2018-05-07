@@ -9,7 +9,9 @@ namespace uLearn.Quizes
 		public QuizSlide(SlideInfo slideInfo, Quiz quiz)
 			: base(quiz.Blocks, slideInfo, quiz.Title, Guid.Parse(quiz.Id), quiz.Meta)
 		{
-			MaxDropCount = quiz.MaxDropCount;
+			/* Backward compatibility: don't use MaxDropCount now, use MaxTriesCount instead of it */
+			const int defaultMaxDropCount = 1;
+			MaxTriesCount = quiz.MaxTriesCount > 0 ? quiz.MaxTriesCount : ((quiz.MaxDropCount == 0 ? defaultMaxDropCount: quiz.MaxDropCount) + 1);
 			MaxScore = quiz.MaxScore;
 			ManualChecking = quiz.ManualChecking;
 			QuizNormalizedXml = quiz.NormalizedXml;
@@ -18,7 +20,7 @@ namespace uLearn.Quizes
 
 		public override bool ShouldBeSolved => true;
 
-		public int MaxDropCount { get; private set; }
+		public int MaxTriesCount { get; private set; }
 
 		public bool ManualChecking { get; private set; }
 

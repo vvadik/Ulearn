@@ -26,8 +26,12 @@ namespace uLearn.Quizes
 		[XmlAttribute("id")]
 		public string Id;
 		
+		/* Deprecated. Use tries insted of maxDropCount */
 		[XmlAttribute("maxDropCount")]
 		public int MaxDropCount;
+
+		[XmlAttribute("tries")]
+		public int MaxTriesCount;
 
 		[XmlAttribute("manualCheck")]
 		public bool ManualChecking;

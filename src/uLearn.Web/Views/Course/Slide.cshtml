@@ -3,6 +3,7 @@
 @using uLearn.Quizes
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Course
+@using Ulearn.Common.Extensions
 @model CoursePageModel
 
 @{
@@ -25,18 +26,20 @@
 <div class="@mainDivClass">
 	<div class="container body-content">
 		<div class="row">
-			<div class='slide'>
-				<h1>
-					@if (Model.ManualChecking != null)
-					{
-						@Html.RouteLink(Model.Slide.Title, "Course.SlideById", new { courseId = Model.CourseId, slideId = Model.Slide.Url }, new { title = "Перейти к слайду" })
-					}
-					else
-					{
-						@Model.Slide.Title
-					}
-					<span class="score">@GetScore(Model.Score)</span>
-				</h1>
+			<div class="slide">
+                <h1>
+                    <span class="slide__title">
+                        @if (Model.ManualChecking != null)
+                        {
+                            @Html.RouteLink(Model.Slide.Title, "Course.SlideById", new { courseId = Model.CourseId, slideId = Model.Slide.Url }, new { title = "Перейти к слайду" })
+                        }
+                        else
+                        {
+                            @Model.Slide.Title
+                        }
+                    </span>
+                    <span class="score">@GetScore(Model.Score)</span>
+                </h1>
 				@if (!string.IsNullOrEmpty(Model.Error))
 				{
 					<p class="alert alert-danger">@Model.Error</p>
@@ -144,4 +147,4 @@
 }
 
 @helper GetScore(Tuple<int, int> score)
-{ @( score.Item2 == 0 ? "" : string.Format("{0}/{1}", score.Item1, score.Item2)) }
+{ @(score.Item2 == 0 ? "" : string.Format("{0} из {1}", score.Item1.PluralizeInRussian(RussianPluralizationOptions.Score), score.Item2)) }
