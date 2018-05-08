@@ -34,7 +34,7 @@ namespace uLearn.Web
 			app.UseCookieAuthentication(new CookieAuthenticationOptions
 			{
 				AuthenticationType = "Identity.Application",
-				CookieName = "ulearn.auth",
+				CookieName = configuration.Web.CookieName,
 				CookieDomain = configuration.Web.CookieDomain,
 				
 				LoginPath = new PathString("/Login"),
