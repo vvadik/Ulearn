@@ -77,9 +77,9 @@ namespace uLearn.Quizes
 				Blocks = new SlideBlock[]
 				{
 					new MdBlock("para"),
-					new CodeBlock("code", null),
+					new CodeBlock("code", "cs", "7"),
 					new MdBlock("para2"),
-					new CodeBlock("code2", null),
+					new CodeBlock("code2", "cs", "7"),
 					new MdBlock("para3"),
 					new MdBlock("note") { Hide = true },
 					new MdBlock("hidden") { Hide = true },
