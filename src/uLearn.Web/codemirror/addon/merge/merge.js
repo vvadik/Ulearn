@@ -43,7 +43,7 @@
         if (!this.edit.state.trackAlignable) this.edit.state.trackAlignable = new TrackAlignable(this.edit)
         this.orig.state.trackAlignable = new TrackAlignable(this.orig)
       }
-
+        
       this.orig.state.diffViews = [this];
       var classLocation = options.chunkClassLocation || "background";
       if (Object.prototype.toString.call(classLocation) != "[object Array]") classLocation = [classLocation]

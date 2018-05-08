@@ -133,15 +133,16 @@
 </div>
 @RenderBody()
 
-@*@Html.Action("SuggestMailTransport", "Notifications")*@
 @Html.Action("CheckIsEmailConfirmed", "Account")
 
 @Scripts.Render("~/scripts.bundle.js")
 @* Add Sentry (https://sentry.io) script for error logging *@
 <script src="https://cdn.ravenjs.com/3.23.2/raven.min.js" crossorigin="anonymous"></script>
 <script>
-	Raven.config('https://992e1a5327ad4e48af004ae709b51aba@sentry.io/181214').install()
+    Raven.config('https://992e1a5327ad4e48af004ae709b51aba@sentry.io/181214').install()
 </script>
+@* See https://codemirror.net/demo/merge.html for details *@ 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
 @RenderSection("scripts", required: false)
 
 <script>

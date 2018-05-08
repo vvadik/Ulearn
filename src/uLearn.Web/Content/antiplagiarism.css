@@ -80,8 +80,9 @@
     margin-bottom: 5px;
 }
 
-.code-antiplagiarism + .CodeMirror {
-    font-size: 13px;
+.antiplagiarism .code + .CodeMirror,
+.antiplagiarism + div .CodeMirror {
+    font-size: 13px;    
 }
 
 .antiplagiarism {
@@ -122,4 +123,12 @@
 
 .antiplagiarism__plagiarism-token-tokensKindsAndValues {
     background-color: rgba(255, 117, 117, 0.7);
+}
+
+.antiplagiarism__full-matched {
+    background-color: rgba(255, 117, 117, 0.3);
+}
+
+.antiplagiarism__not-matched {
+    background-color: rgba(74, 255, 74, 0.3);
 }

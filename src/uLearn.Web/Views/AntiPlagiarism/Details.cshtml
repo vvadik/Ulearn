@@ -145,6 +145,8 @@
                         
                         <textarea class="code code-antiplagiarism" data-lang="cs" data-submission-id="@plagiarismSubmission.Id">@plagiarismSubmission.SolutionCode.Text</textarea>
                     </div>
+                </div>
+			    <div>
                     <div class="hidden antiplagiarism__data" data-original-submission-id="@submission.Id-@plagiarismSubmission.Id" data-plagiarism-submission-id="@plagiarismSubmission.Id">
                         @(new { analyzed_code_units = researchedSubmission.AnalyzedCodeUnits, tokens_positions = researchedSubmission.TokensPositions, plagiarism = plagiarism }.JsonSerialize())
                     </div>
