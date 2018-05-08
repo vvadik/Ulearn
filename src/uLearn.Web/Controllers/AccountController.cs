@@ -13,10 +13,12 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
+using uLearn.Configuration;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
+using Web.Api.Configuration;
 
 namespace uLearn.Web.Controllers
 {
@@ -35,7 +37,13 @@ namespace uLearn.Web.Controllers
 
 		private readonly string telegramSecret;
 
-		private static readonly List<string> hijackCookies = new List<string> { "ulearn.auth" };
+		private static readonly List<string> hijackCookies = new List<string>();
+
+		static AccountController()
+		{
+			var configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
+			hijackCookies.Add(configuration.Web.CookieName);
+		}
 
 		public AccountController()
 		{

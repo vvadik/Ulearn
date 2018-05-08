@@ -135,7 +135,7 @@ namespace Ulearn.Web.Api
 
 			services.ConfigureApplicationCookie(options =>
 			{
-				options.Cookie.Name = "ulearn.auth";
+				options.Cookie.Name = configuration.Web.CookieName;
 				options.Cookie.Expiration = TimeSpan.FromDays(14);
 				options.Cookie.Domain = configuration.Web.CookieDomain;
 				options.LoginPath = "/users/login";
