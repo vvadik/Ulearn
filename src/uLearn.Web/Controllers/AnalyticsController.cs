@@ -71,7 +71,10 @@ namespace uLearn.Web.Controllers
 					Course = course,
 					Units = course.Units,
 				});
-			var selectedUnit = course.GetUnitById(unitId.Value);
+			var selectedUnit = course.FindUnitById(unitId.Value);
+			if (selectedUnit == null)
+				return HttpNotFound();
+			
 			var slides = selectedUnit.Slides;
 			var slidesIds = slides.Select(s => s.Id).ToList();
 			var quizzes = slides.OfType<QuizSlide>();
@@ -479,7 +482,10 @@ namespace uLearn.Web.Controllers
 			if (user == null)
 				return HttpNotFound();
 
-			var unit = course.GetUnitById(unitId);
+			var unit = course.FindUnitById(unitId);
+			if (unit == null)
+				return HttpNotFound();
+			
 			var slides = unit.Slides;
 			var exercises = slides.OfType<ExerciseSlide>();
 			var acceptedSubmissions = userSolutionsRepo
@@ -505,7 +511,10 @@ namespace uLearn.Web.Controllers
 		public ActionResult SlideRatings(string courseId, Guid unitId)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var unit = course.GetUnitById(unitId);
+			var unit = course.FindUnitById(unitId);
+			if (unit == null)
+				return HttpNotFound();
+			
 			var slides = unit.Slides.ToArray();
 			var model = GetSlideRateStats(course, slides);
 			return PartialView(model);
@@ -519,7 +528,9 @@ namespace uLearn.Web.Controllers
 			{
 				var course = courseManager.GetCourse(courseId);
 
-				var unit = course.GetUnitById(unitId.Value);
+				var unit = course.FindUnitById(unitId.Value);
+				if (unit == null)
+					return HttpNotFound();
 				slides = unit.Slides.ToArray();
 			}
 			var model = GetDailyStatistics(slides);
@@ -536,7 +547,9 @@ namespace uLearn.Web.Controllers
 		public ActionResult UsersProgress(string courseId, Guid unitId, DateTime periodStart)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var unit = course.GetUnitById(unitId);
+			var unit = course.FindUnitById(unitId);
+			if (unit == null)
+				return HttpNotFound();
 			var slides = unit.Slides.ToArray();
 			var users = GetUserInfos(slides, periodStart).OrderByDescending(GetRating).ToArray();
 			return PartialView(new UserProgressViewModel
