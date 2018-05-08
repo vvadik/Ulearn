@@ -19,6 +19,7 @@ namespace uLearn.Quizes
 			{
 				Title = "Title",
 				Id = "Id",
+				MaxTriesCount = 3,
 				Blocks = new SlideBlock[]
 				{
 					new MdBlock { Markdown = "This is quiz!" },
