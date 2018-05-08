@@ -5,17 +5,31 @@
 		public QuizModel QuizModel { get; private set; }
 		public int BlockIndex { get; private set; }
 		public QuizState QuizState { get; private set; }
+		public readonly bool IsInstructor;		
 
-		public QuizBlockData(QuizModel model, int index, QuizState quizState)
+		public QuizBlockData(QuizModel model, int index, QuizState quizState, bool isInstructor=false)
 		{
 			QuizModel = model;
 			BlockIndex = index;
 			QuizState = quizState;
+			IsInstructor = isInstructor;			
 		}
 
 		private bool TriesFinished => QuizModel.TryNumber + 1 > QuizModel.MaxTriesCount; 
 
-		public bool ShowCorrectAnswers => (QuizState == QuizState.Total || QuizState == QuizState.Subtotal && TriesFinished) && !QuizModel.Slide.ManualChecking;
+		public bool ShowCorrectAnswers
+		{
+			get
+			{
+				if (QuizModel.Slide.ManualChecking)
+					return false;
+				if (QuizState == QuizState.Total)
+					return true;
+				if (QuizState == QuizState.Subtotal)
+					return TriesFinished || IsInstructor;
+				return false;
+			}
+		}
 
 		public bool ShowExplanations => ShowCorrectAnswers;
 	}

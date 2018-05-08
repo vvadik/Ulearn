@@ -3,7 +3,8 @@
 <Quiz
 	xmlns="https://ulearn.azurewebsites.net/quiz"
 	id="41138C54848F4F49856BB738B7E39D28"
-	scoringGroup="laboratory">
+	scoringGroup="laboratory"
+    tries="3">
 	<title>Пример теста</title>
 	
 	<p xml:space="preserve">

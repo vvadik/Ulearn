@@ -1,4 +1,6 @@
-﻿@using uLearn.Quizes
+﻿@using Database.Extensions
+@using Database.Models
+@using uLearn.Quizes
 @using uLearn.Web.Controllers
 @using uLearn.Web.Views.Course
 @using Ulearn.Common.Extensions
@@ -84,7 +86,7 @@
 		quizSlide.Info.DirectoryRelativePath,
 		Enumerable.Range(0, Model.Slide.Blocks.Length)
 			.Select(x => quizSlide.Blocks[x] is AbstractQuestionBlock
-				? new QuizBlockData(Model, x, Model.QuizState)
+				? new QuizBlockData(Model, x, Model.QuizState, User.HasAccessFor(Model.Course.Id, CourseRole.Instructor))
 				: null)
 			.ToArray<dynamic>(),
 		isGuest: Model.IsGuest,
