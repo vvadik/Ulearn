@@ -37,6 +37,8 @@ namespace uLearn.Model.Blocks
 
 		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
 		{
+			if (LangId == null)
+				LangId = context.CourseSettings.DefaultLanguage;
 			if (LangVer == null)
 				LangVer = context.CourseSettings.GetLanguageVersion(LangId);
 			yield return this;
