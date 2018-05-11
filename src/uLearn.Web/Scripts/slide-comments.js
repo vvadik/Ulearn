@@ -329,9 +329,24 @@ function autoEnlargeTextarea() {
 			var $comment = $('.comment[data-comment-id=' + match[1] + ']');
             scrollTo($comment);
         }
-	};	
+	};
 
-    var $comments = $('.comments');
+    var $comments = $('.comments');	
+	
+    /* Set up sticky comment reply form */
+    var $notForInstructorsOnlyComments = $comments.filter(':not(.comments-for-instructors-only)');
+    var commentsHeight = $notForInstructorsOnlyComments.height()
+    $(window).scroll(function () {        
+        var commentsOffset = $notForInstructorsOnlyComments.offset().top;
+        var commentsBottom = commentsOffset + commentsHeight;
+        var $lastReplyForm = $notForInstructorsOnlyComments.find('.reply-form:not(.is-reply)');
+        
+        var scrollBottom = $(window).scrollTop() + $(window).height();
+
+        $lastReplyForm.toggleClass('fixed', scrollBottom >= commentsOffset + $lastReplyForm.height() + 50 && scrollBottom < commentsBottom);
+    });
+    
+    /* Set up handlers */
     $comments.on('click', '.reply-form input[name=commentText]', expandReplyForm);
 	$comments.on('click', '.comment .comment__likes-count', likeComment);
 	$comments.on('keyup', 'textarea[name=commentText]', onTextareaKeyUp);

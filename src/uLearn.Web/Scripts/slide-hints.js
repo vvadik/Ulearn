@@ -6,7 +6,6 @@
 
 function showHintForUser($button) {
 	var slideId = $button.data("slide-id");
-	console.log("request hint for " + slideId);
 	$.ajax({
         type: "POST",
         url: $button.data("url"),
@@ -29,7 +28,7 @@ function showHintForUser($button) {
         }
         buttonNameChange($button.data("hints-count"));
     }).fail(function(req) {
-        console.log(req.responseText);
+        console.log("FAIL", req.responseText);
     }).always(function(ans) {
     });
 }
@@ -64,9 +63,8 @@ function getHints(courseId, slideId, hintsCount) {
         }
         buttonNameChange(hintsCount);
     }).fail(function (req) {
-        console.log("FAIL: " + req.responseText);
+        console.log("FAIL", req.responseText);
     }).always(function (ans) {
-	    console.log(ans);
     });
 
 }
