@@ -89,12 +89,17 @@ namespace uLearn.CSharp
 		{
 			var newMember = ((MemberDeclarationSyntax)newNode).WithoutAttributes();
 			var excludeSolutionAttr = node.GetAttributes<ExcludeFromSolutionAttribute>().SingleOrDefault();
+			
+			var excludedFromSolution = excludeSolutionAttr != null && (excludeSolutionAttr.ArgumentList == null || (bool)excludeSolutionAttr.GetObjArgument(0));
+			if (excludedFromSolution)
+			{
+				var nodeName = node is FieldDeclarationSyntax field ? field.Declaration.Variables.First().Identifier.Text : node.Identifier().Text;
+				Exercise.ExcludedFromSolution.Add(nodeName);
+			}
 
 			var isSolutionPart = excludeSolutionAttr != null || node.HasAttribute<ExerciseAttribute>();
-
-			if (node is TypeDeclarationSyntax && node.HasAttribute<ExerciseAttribute>()
-				|| excludeSolutionAttr != null && (excludeSolutionAttr.ArgumentList == null ||
-													(bool)excludeSolutionAttr.GetObjArgument(0)))
+			
+			if (node is TypeDeclarationSyntax && node.HasAttribute<ExerciseAttribute>() || excludedFromSolution)
 				Exercise.EthalonSolution += newMember.ToFullString();
 
 			return isSolutionPart ? null : newMember;
@@ -103,7 +108,11 @@ namespace uLearn.CSharp
 		public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
 		{
 			if (node.HasAttribute<ExerciseAttribute>())
+			{
 				ExerciseClassName = FindParentClassName(node);
+				Exercise.ExcludedFromSolution.Add(node.Identifier.Text);
+			}
+
 			return VisitMemberDeclaration(node, base.VisitClassDeclaration(node));
 		}
 
@@ -152,6 +161,7 @@ namespace uLearn.CSharp
 				ExerciseClassName = ExerciseClassName ?? FindParentClassName(node);
 				Exercise.EthalonSolution += node.WithoutAttributes().ToFullString();
 				Exercise.ExerciseInitialCode = GetExerciseCode(node);
+				Exercise.ExcludedFromSolution.Add(node.Identifier.Text);
 				if (node.HasAttribute<SingleStatementMethodAttribute>())
 					Exercise.Validator.ValidatorName += " SingleStatementMethod";
 				if (node.HasAttribute<RecursionStyleValidatorAttribute>())

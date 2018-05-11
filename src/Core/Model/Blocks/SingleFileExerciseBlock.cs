@@ -55,13 +55,20 @@ namespace uLearn.Model.Blocks
 		}
 
 		// То, что будет выполняться для проверки задания
+		[XmlIgnore]
 		public string ExerciseCode { get; set; }
 
 		// Индекс внутри ExerciseCode, куда нужно вставить код пользователя.
+		[XmlIgnore]
 		public int IndexToInsertSolution { get; set; }
 
 		// Если это вставить в ExerciseCode по индексу IndexToInsertSolution и выполнить полученный код, он должен вывести ExpectedOutput
+		[XmlIgnore]
 		public string EthalonSolution { get; set; }
+
+		// Временно создано для конвертации .cs-слайдов в .xml-слайды. Когда .cs-слайдов не останется, можно удалить
+		[XmlIgnore]
+		public List<string> ExcludedFromSolution { get; set; } = new List<string>();
 
 		public override string GetSourceCode(string code)
 		{

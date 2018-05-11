@@ -42,7 +42,7 @@ namespace uLearn.Model
 		SingleFileExerciseBlock,
 
 		[XmlEnum("proj-exercise")]
-		ProjectExerciseBlock
+		ProjectExerciseBlock,
 	}
 
 	[XmlRoot("Lesson", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/lesson")]
@@ -110,7 +110,8 @@ namespace uLearn.Model
 				case MdBlock _: return BlockType.Md;
 				case ProjectExerciseBlock _: return BlockType.ProjectExerciseBlock;
 				case SingleFileExerciseBlock _: return BlockType.SingleFileExerciseBlock;
-				default: throw new Exception("unknown slide block " + b);
+				case TexBlock _: return BlockType.Tex; 
+				default: throw new Exception("Unknown slide block " + b);
 			}
 		}
 	}
