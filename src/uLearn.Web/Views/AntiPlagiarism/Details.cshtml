@@ -109,7 +109,7 @@
 			    
 			    var plagiarismSubmission = submissionsByAntiPlagiarismIds[plagiarism.SubmissionInfo.Id];
 			    <div class="antiplagiarism row">
-                    <div class="col-xs-6">
+                    <div class="original-submission col-xs-6">
                         <div class="antiplagiarism__author">
                             @UserAvatar.SmallAvatar(submission.User)
                             @if (User.HasSystemAccess(SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator())
@@ -125,8 +125,11 @@
                         </div>
                         <textarea class="code code-antiplagiarism" data-lang="cs" data-submission-id="@submission.Id-@plagiarismSubmission.Id">@submission.SolutionCode.Text</textarea>
                     </div>
-                    <div class="col-xs-6">
+                    <div class="plagiarism-submission col-xs-6">
                         <div class="antiplagiarism__author">
+                            <div class="pull-right" title="Процент похожести. Чем больше, тем более подозрительна эта пара">
+                                @((int) (plagiarism.Weight * 100))%
+                            </div>
                             @UserAvatar.SmallAvatar(plagiarismSubmission.User)
                             @if (User.HasSystemAccess(SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator())
                             {
@@ -138,9 +141,7 @@
                             }
                             <span title="@plagiarismSubmission.Timestamp.ToPrettyString()">@plagiarismSubmission.Timestamp.ToAgoPrettyString()</span>
                             @PrintUserGroups(plagiarismSubmission.UserId)
-                            <div class="pull-right" title="Процент похожести. Чем больше, тем более подозрительна эта пара">
-                                @((int) (plagiarism.Weight * 100))%
-                            </div>
+
                         </div>
                         
                         <textarea class="code code-antiplagiarism" data-lang="cs" data-submission-id="@plagiarismSubmission.Id">@plagiarismSubmission.SolutionCode.Text</textarea>

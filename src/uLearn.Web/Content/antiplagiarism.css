@@ -113,22 +113,18 @@
     color: #00000061 !important;
 }
 
-.antiplagiarism__matched-snippet {
-    /*background-color: #fdd5d5;*/
-}
-
-.antiplagiarism__plagiarism-token-tokensKindsOnly {
-    background-color: rgba(255, 255, 74, 0.7);
-}
-
-.antiplagiarism__plagiarism-token-tokensKindsAndValues {
-    background-color: rgba(255, 117, 117, 0.7);
-}
-
 .antiplagiarism__full-matched {
-    background-color: rgba(255, 117, 117, 0.3);
+    /*background-color: rgba(255, 117, 117, 0.3);*/
+    background-color: #ff7773;
+    color: white !important;
 }
 
 .antiplagiarism__not-matched {
-    background-color: rgba(74, 255, 74, 0.3);
+    /*background-color: rgba(74, 255, 74, 0.3);*/
+    background-color: #77ff73;    
+}
+
+.antiplagiarism .original-submission .antiplagiarism__full-matched,
+.antiplagiarism .original-submission .antiplagiarism__not-matched {
+    cursor: pointer;
 }

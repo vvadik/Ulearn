@@ -89,27 +89,7 @@ $(document).ready(function () {
         
         var antiplagiarismData = JSON.parse($self[0].innerHTML);       
         var plagiarismData = antiplagiarismData.plagiarism;
-        
-        /*
-        var mergeView = CodeMirror.MergeView($('<div></div>').insertBefore($self)[0], {
-            value: $originalSubmission.text(),
-            origLeft: null,
-            orig: $plagiarismSubmission.text(),
-            lineNumbers: true,
-            mode: "text/x-csharp",
-            highlightDifferences: true,
-            connect: "align",
-            collapseIdentical: false,
-
-            indentWithTabs: true,
-            tabSize: 4,
-            indentUnit: 4,
-            lineWrapping: true,
-            matchBrackets: true,
-            styleSelectedText: true,
-        });
-        */
-                
+                        
         var originalTokens = getTokensDictionaryByIndex(antiplagiarismData.tokens_positions);
         var plagiarismTokens = getTokensDictionaryByIndex(plagiarismData.tokens_positions);
         
@@ -127,21 +107,23 @@ $(document).ready(function () {
         });
         
         /* Setup click handlers */
-        originalCodeMirror.on('gutterClick', function (cm, originalLine) {
-            var bestMatchedLine = bestMatchedLines[originalLine];
-            if (bestMatchedLine === undefined || bestMatchedLine === -1)
-                return;
+        $(originalCodeMirror.getWrapperElement()).on('click', function (e) {
+            var cursor = originalCodeMirror.getCursor();
+            let originalLine = cursor.line;
             
-            console.log('Scroll to', bestMatchedLine);
+            var bestMatchedLine = bestMatchedLines[originalLine];
+            if (bestMatchedLine === undefined || bestMatchedLine < 0) // -2 or -1
+                return;
+
             var originalPosition = originalCodeMirror.cursorCoords({ line: originalLine, ch: 1 }, 'local');
             var plagiarismPosition = plagiarismCodeMirror.cursorCoords({ line: bestMatchedLine, ch: 1}, 'local');
-            
+
             var originalMarginTop = 0, plagiarismMarginTop = 0;
             if (originalPosition.top < plagiarismPosition.top)
                 originalMarginTop = plagiarismPosition.top - originalPosition.top;
             else
                 plagiarismMarginTop = originalPosition.top - plagiarismPosition.top;
-            
+
             $(originalCodeMirror.display.wrapper).animate({'marginTop': originalMarginTop});
             $(plagiarismCodeMirror.display.wrapper).animate({'marginTop': plagiarismMarginTop});
         });
@@ -153,9 +135,7 @@ $(document).ready(function () {
         });
         plagiarismCodeMirror.operation(function() {
             highlightNotAnalyzedParts(plagiarismCodeMirror, plagiarismData.analyzed_code_units, plagiarismTokens);    
-        });        
-        
-        // highlightMatchedTokens(plagiarismData.matched_snippets, originalCodeMirror, plagiarismCodeMirror, originalTokens, plagiarismTokens);
+        });       
         
     });
     
@@ -218,14 +198,19 @@ $(document).ready(function () {
         /* Search best match for each line (or return -1 if several lines has equal weight ) */
         var result = [];
         for (var lineId = 0; lineId < originalTokensByLines.length; lineId++) {
-            var bestMatch = -1;
+            if (! (lineId in originalTokensByLines) || originalTokensByLines[lineId].length === 0) {
+                result[lineId] = -2; // -2 means "no token in this line"
+                continue;
+            } 
+            
+            var bestMatch = -1; // -1 means "can not find best matched line"
             var bestMatchWeight = 0;
             for (var pLineId = 0; pLineId < plagiarismTokensByLines.length; pLineId++) {
                 if (lineWeights[lineId][pLineId] > bestMatchWeight) {
                     bestMatchWeight = lineWeights[lineId][pLineId];
                     bestMatch = pLineId;
                 } else if (lineWeights[lineId][pLineId] === bestMatchWeight)
-                    bestMatch = -1
+                    bestMatch = -1;     
             }
             result[lineId] = bestMatch;
         }            
@@ -254,48 +239,95 @@ $(document).ready(function () {
             className: 'antiplagiarism__not-matched',
             title: '',
         };
-        
-        $.each(bestMatchedLines, function (lineId, bestMatchedLine) {
-            if (bestMatchedLine === -1)
+
+        function highlightBestMatchedLine(lineId, bestMatchedLine, allowSuggests) {
+            allowSuggests = allowSuggests || 'both';
+            
+            if (bestMatchedLine < 0) // -2 or -1
                 return;
+            
             var originalLine = originalSubmissionLines[lineId];
             var plagiarismLine = plagiarismSubmissionLines[bestMatchedLine];
             var diff = getDiff(originalLine, plagiarismLine);
-            console.log(diff);
-            
+
             /* Each `diff` item is 2-element array: [0, "qwer"] for commont substring,
-               [1, "abcd"] for adding and [-1, "zxcv"] for removing substring*/
+               [1, "abcd"] for adding and [-1, "zxcv"] for removing substring */
             var originalCharIndex = 0;
             var plagiarismCharIndex = 0;
-            $.each(diff, function(_, diffItem) {
+            $.each(diff, function (_, diffItem) {
                 var diffType = diffItem[0];
                 var diffString = diffItem[1];
                 if (diffType === 0) {
-                    originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {line: lineId, ch: originalCharIndex + diffString.length}, fullMatchedTextMarkerOptions);
-                    plagiarismCodeMirror.markText({line: bestMatchedLine, ch: plagiarismCharIndex}, {line: bestMatchedLine, ch: plagiarismCharIndex + diffString.length}, fullMatchedTextMarkerOptions);
+                    originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {
+                        line: lineId,
+                        ch: originalCharIndex + diffString.length
+                    }, setTitleForClicking(fullMatchedTextMarkerOptions));
+                    plagiarismCodeMirror.markText({
+                        line: bestMatchedLine,
+                        ch: plagiarismCharIndex
+                    }, {
+                        line: bestMatchedLine,
+                        ch: plagiarismCharIndex + diffString.length
+                    }, fullMatchedTextMarkerOptions);
                     originalCharIndex += diffString.length;
                     plagiarismCharIndex += diffString.length;
                 } else if (diffType === -1) {
-                    originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {line: lineId, ch: originalCharIndex + diffString.length}, notMatchedTextMarkerOptions);
+                    originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {
+                        line: lineId,
+                        ch: originalCharIndex + diffString.length
+                    }, setTitleForClicking(notMatchedTextMarkerOptions));
                     originalCharIndex += diffString.length;
                 } else if (diffType === 1) {
-                    plagiarismCodeMirror.markText({line: bestMatchedLine, ch: plagiarismCharIndex}, {line: bestMatchedLine, ch: plagiarismCharIndex + diffString.length}, notMatchedTextMarkerOptions);
+                    plagiarismCodeMirror.markText({
+                        line: bestMatchedLine,
+                        ch: plagiarismCharIndex
+                    }, {
+                        line: bestMatchedLine,
+                        ch: plagiarismCharIndex + diffString.length
+                    }, notMatchedTextMarkerOptions);
                     plagiarismCharIndex += diffString.length;
                 }
             });
-        });
+
+            /* See next line and try to concat it to matched block */
+            /* allowSuggests is parameter for preventing recursion stack overflow: We should not see previous line if now we are seeing the next line */
+            var nextLineId = lineId + 1;
+            if (nextLineId in bestMatchedLines && bestMatchedLines[nextLineId] === -1 && (allowSuggests === 'both' || allowSuggests === 'next'))
+                suggestMatchedLineAroundBlock(nextLineId, bestMatchedLine + 1, 'next');            
+            
+            /* See previous line */
+            var previousLineId = lineId - 1;
+            if (previousLineId in bestMatchedLines && bestMatchedLines[previousLineId] === -1 && (allowSuggests === 'both' || allowSuggests === 'prev'))
+                suggestMatchedLineAroundBlock(previousLineId, bestMatchedLine - 1, 'prev');            
+        }
+        
+        function suggestMatchedLineAroundBlock(lineId, suggestedBestMatchedLine, allowSuggests) {
+            var suggestedDiff = getDiff(originalSubmissionLines[lineId], plagiarismSubmissionLines[suggestedBestMatchedLine]);
+
+            /* Add next line from original submission to common part if diff with suggested (next from plagiarism) line is small */
+            var commonLength = 0;
+            $.each(suggestedDiff, function (_, diffItem) {
+                if (diffItem[0] === 0)
+                    commonLength += diffItem[1].length;
+            });
+
+            if (2 * commonLength / (originalSubmissionLines[lineId].length + plagiarismSubmissionLines[suggestedBestMatchedLine].length) >= 0.75) {
+                highlightBestMatchedLine(lineId, suggestedBestMatchedLine, allowSuggests);
+            }
+        }
+        
+        $.each(bestMatchedLines, highlightBestMatchedLine);    
     }
-
-    function getRandomColor() {
-        // 30 random hues with step of 12 degrees
-        var hue = Math.floor(Math.random() * 30) * 12;
-
-        return $.Color({
-            hue: hue,
-            saturation: 0.9,
-            lightness: 0.9,
-            alpha: 0.5
-        }).toRgbaString();
+    
+    function setTitleForClicking(textMarkOptions) {
+        var newOptions = {
+            className: textMarkOptions.className,
+            title: textMarkOptions.title,
+        };
+        if (newOptions.title !== "")
+            newOptions.title += ". ";
+        newOptions.title += "Нажмите, чтобы увидеть аналогичное место во втором решении"
+        return newOptions;
     }
     
     function getTokensDictionaryByIndex(tokensPositionsArray) {
@@ -343,69 +375,6 @@ $(document).ready(function () {
 
         document.markText(document.posFromIndex(currentHighlightStart), document.posFromIndex(1e10), textMarkerOptions);
     }    
-
-    function highlightMatchedTokens(matchedSnippets, originalCodeMirror, plagiarismCodeMirror, originalTokens, plagiarismTokens) {
-        /* Batch all operations as one: see https://codemirror.net/doc/manual.html for details */
-        originalCodeMirror.operation(function () {
-            highlightMatchedTokensInSubmission(matchedSnippets, originalCodeMirror, originalTokens, 'original_submission_first_token_index');    
-        });
-        plagiarismCodeMirror.operation(function () {
-            highlightMatchedTokensInSubmission(matchedSnippets, plagiarismCodeMirror, plagiarismTokens, 'plagiarism_submission_first_token_index');    
-        });        
-    }
-    
-    function highlightMatchedTokensInSubmission(matchedSnippets, codeMirrorEditor, tokens, firstTokenIndexSelector) {
-        var tokensPlagiarismTypes = {};
-        var maxTokenIndex = 0;
-        $.each(matchedSnippets, function (idx, matchedSnippet) {
-            var snippetType = matchedSnippet.snippet_type;
-            for (var tokenIndex = matchedSnippet[firstTokenIndexSelector];
-                 tokenIndex < matchedSnippet[firstTokenIndexSelector] + matchedSnippet.snippet_tokens_count;
-                 tokenIndex++) {
-                var oldValue = tokensPlagiarismTypes[tokenIndex];
-                var newValue = snippetType;
-                if (oldValue === undefined || (newValue === 'tokensKindsAndValues'))
-                    tokensPlagiarismTypes[tokenIndex] = newValue;
-                
-                if (tokenIndex > maxTokenIndex)
-                    maxTokenIndex = tokenIndex;
-            }
-        });
-
-        var document = codeMirrorEditor.getDoc();
-        var currentStart = 0, currentFinish = 0, currentPlagiarismType = '';
-
-        var hightlightCurrentTokensSequence = function() {
-            document.markText(
-                document.posFromIndex(currentStart),
-                document.posFromIndex(currentFinish),
-                {
-                    className: 'antiplagiarism__plagiarism-token-' + currentPlagiarismType,
-                    title: currentPlagiarismType === 'tokensKindsAndValues'
-                        ? 'Эта часть кода совпадает полностью' 
-                        : 'Эта часть кода подозрительно похожа'
-                }
-            );
-        };
-        
-        for (var tokenIndex = 0; tokenIndex <= maxTokenIndex; tokenIndex++) {
-            if (! (tokenIndex in tokensPlagiarismTypes)) {
-                hightlightCurrentTokensSequence();
-            } else if (! (tokenIndex - 1 in tokensPlagiarismTypes)) {
-                currentStart = tokens[tokenIndex].start_position;
-                currentPlagiarismType = tokensPlagiarismTypes[tokenIndex];
-            } else if (tokensPlagiarismTypes[tokenIndex] !== tokensPlagiarismTypes[tokenIndex - 1]) {
-                hightlightCurrentTokensSequence();
-                currentStart = tokens[tokenIndex].start_position;
-                currentPlagiarismType = tokensPlagiarismTypes[tokenIndex];
-            }
-            
-            if (tokenIndex in tokensPlagiarismTypes)
-                currentFinish = tokens[tokenIndex].finish_position;
-        }        
-
-        hightlightCurrentTokensSequence();        
-    }
       
     /* Fetching antiplagiarism status */
     $('.antiplagiarism-status').each(function () {
