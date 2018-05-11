@@ -301,17 +301,14 @@
 			}
 		</label>
 	</div>
-	if (model.QuizState == QuizState.Total)
-	{
-		if (model.ShowCorrectAnswers)
-		{
-			<div>Правильный ответ: @sample</div>
-		}
-		if (model.ShowExplanations && !string.IsNullOrEmpty(block.Explanation))
-		{
-			<div class="text-muted">@block.Explanation</div>
-		}
-	}
+    if (model.ShowCorrectAnswers)
+    {
+        <div>Правильный ответ: @sample</div>
+    }
+    if (model.ShowExplanations && !string.IsNullOrEmpty(block.Explanation))
+    {
+        <div class="text-muted">@block.Explanation</div>
+    }
 }
 
 @helper QuizBlock(IsTrueBlock block, BlockRenderContext context)
