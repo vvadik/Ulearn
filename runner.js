@@ -8,7 +8,7 @@ const readFileAsync = util.promisify(fs.readFile)
 const writeFileAsync = util.promisify(fs.writeFile)
 
 const runTests = () =>
-  Promise.all([execAsync('yarn run-ui-test'), execAsync('yarn run-unit-test')])
+  return Promise.all([execAsync('yarn build-ui && yarn run-ui-test'), execAsync('yarn run-unit-test')])
 
 const report = async () => {
   const uiPath = path.join(__dirname, 'dist', 'ui_test', 'ui-test-result.json')
@@ -22,7 +22,7 @@ const report = async () => {
   const [ui, unit] = (await Promise.all([
     readFileAsync(uiPath),
     readFileAsync(unitPath),
-  ])).map(buffer => buffer.toString())
+  ])).map(buffer => JSON.parse(buffer.toString()))
 
   const result = {
     ui,
