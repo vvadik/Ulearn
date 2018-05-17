@@ -58,6 +58,10 @@ namespace uLearn.CSharp
 
 		public static SyntaxToken Identifier(this MemberDeclarationSyntax syntax)
 		{
+			if (syntax is FieldDeclarationSyntax fieldDeclarationSyntax)
+			{
+				return fieldDeclarationSyntax.Declaration.Variables.FirstOrDefault().Identifier;
+			}
 			return ((dynamic)syntax).Identifier;
 		}
 

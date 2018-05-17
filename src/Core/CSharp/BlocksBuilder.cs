@@ -166,6 +166,8 @@ namespace uLearn.CSharp
 				Blocks[Blocks.Count - 1] = new CodeBlock(lastBlock.Code + "\r\n\r\n" + code, LangId);
 			else
 				Blocks.Add(new CodeBlock(code, LangId));
+			
+			(Blocks[Blocks.Count - 1] as CodeBlock)?.SourceCodeLabels.Add(node.Identifier().Text);
 		}
 
 		private string CreateCodeBlock(MethodDeclarationSyntax node)
@@ -190,8 +192,8 @@ namespace uLearn.CSharp
 
 		private void EmbedCode(string filename)
 		{
-			Blocks.Add(new CodeBlock(di.GetContent(filename), LangId));
-			//			Blocks.Add(new IncludeCodeBlock(filename));
+			//Blocks.Add(new CodeBlock(di.GetContent(filename), LangId));
+			Blocks.Add(new IncludeCodeBlock(filename));
 		}
 
 		private void EmbedVideo(string videoId)

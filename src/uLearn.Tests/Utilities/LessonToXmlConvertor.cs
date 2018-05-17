@@ -24,6 +24,7 @@ namespace uLearn.Utilities
 
 			var attrOverrides = new XmlAttributeOverrides();
 			attrOverrides.Add(typeof(ExerciseBlock), "LegacyExerciseInitialCode", attrs);
+			attrOverrides.Add(typeof(Lesson), "DefaultInclideFile", attrs);
 			
 			return new XmlSerializer(typeof(Lesson), attrOverrides);
 		}
@@ -32,12 +33,12 @@ namespace uLearn.Utilities
 		[Explicit]
 		public void ConvertLessonSlidesToXml()
 		{
-			var coursesDirectory = new DirectoryInfo(@"C:\tmp\ulearn\10 course conversion");
+			var coursesDirectory = new DirectoryInfo(@"C:\tmp\ulearn\10 course conversion"); // Insert your path here!
 			var courseDirectories = coursesDirectory.GetDirectories("Slides", SearchOption.AllDirectories);
 			foreach (var courseDirectory in courseDirectories)
 			{
 				var course = new CourseLoader().LoadCourse(courseDirectory);
-				Console.WriteLine($"course {course.Id}");
+				Console.WriteLine($"Converting course {course.Title}");
 				foreach (var slide in course.Slides)
 				{
 					ConvertSlide(slide);
@@ -53,25 +54,46 @@ namespace uLearn.Utilities
 			if (!string.Equals(slide.Info.SlideFile.Extension, ".cs", StringComparison.InvariantCultureIgnoreCase))
 				return;
 			
-			Console.WriteLine("Converting " + slide.Info.SlideFile.FullName);			
+			Console.WriteLine("Converting " + slide.Info.SlideFile.FullName);
+
+			var copiedFileName = RemoveFirstPathFromSlideName(slide.Info.SlideFile.Name);
+			var copiedFilePath = Path.Combine(slide.Info.SlideFile.Directory.FullName, copiedFileName);
+			File.Copy(slide.Info.SlideFile.FullName, copiedFilePath);
+
+			/* Replace CodeBlock's with IncludeCode blocks with help of default-include-code-file */
+			var newBlocks = new List<SlideBlock>();
+			foreach (var block in slide.Blocks)
+			{
+				if (!(block is CodeBlock))
+				{
+					newBlocks.Add(block);
+					continue;
+				}
+
+				var codeBlock = (CodeBlock)block;
+				newBlocks.Add(new IncludeCodeBlock
+				{
+					DisplayLabels = codeBlock.SourceCodeLabels.Select(s => new Label { Name = s }).ToArray(),
+				});
+			}
 			
 			if (slide is ExerciseSlide exerciseSlide)
 			{
-				var copiedFileName = RemoveFirstPathFromSlideName(exerciseSlide.Info.SlideFile.Name);
-				var copiedFilePath = Path.Combine(exerciseSlide.Info.SlideFile.Directory.FullName, copiedFileName);
-				File.Copy(exerciseSlide.Info.SlideFile.FullName, copiedFilePath);
 				exerciseSlide.Exercise.CodeFile = copiedFileName;
 				
-				/* Set correct SolutionLable */
-				if (exerciseSlide.Exercise is SingleFileExerciseBlock block)
+				/* Set correct SolutionLabel */
+				if (exerciseSlide.Exercise is SingleFileExerciseBlock exerciseBlock)
 				{
-					if (block.ExcludedFromSolution.Count > 1)
-						Console.WriteLine($"WARNING: {block.ExcludedFromSolution.Count} blocks have been excluded from solution. Can't decide what is correct solution label");
-					Assert.IsTrue(block.ExcludedFromSolution.Count >= 1);
-					block.SolutionLabel = new Label { Name = block.ExcludedFromSolution[0] };
+					if (exerciseBlock.ExcludedFromSolution.Count > 1)
+						Console.WriteLine($"WARNING: {exerciseBlock.ExcludedFromSolution.Count} blocks have been excluded from solution. " +
+										   "Can't decide which method is correct solution and should be marked as SolutionLabel. " +
+										   "You may put them in #region and mark this region as SolutionLabel by yourself.");
+					Assert.IsTrue(exerciseBlock.ExcludedFromSolution.Count >= 1);
+					exerciseBlock.SolutionLabel = new Label { Name = exerciseBlock.ExcludedFromSolution[0] };
 				}
+				
 
-				/* Remove ulearn-specific attribute from code */
+				/* Remove ulearn-specific attributes from code */
 				var ulearnAttributes = new List<string>
 				{
 					"CommentAfterExerciseIsSolved", "ExcludeFromSolution", "Exercise", "ExpectedOutput", 
@@ -83,10 +105,13 @@ namespace uLearn.Utilities
 				File.WriteAllText(copiedFilePath, afterUlearnAttributeRemoval.ToFullString());
 			}
 			
-			var lesson = new Lesson(slide.Title, slide.Id, slide.Blocks);
+			var lesson = new Lesson(slide.Title, slide.Id, newBlocks.ToArray());
+			lesson.DefaultIncludeCodeFile = copiedFileName;
+			
 			var path = Path.ChangeExtension(slide.Info.SlideFile.FullName, "lesson.xml");
 			using (var writer = new StreamWriter(path, false, Encoding.UTF8))
 				lessonSerializer.Serialize(writer, lesson);
+			
 			slide.Info.SlideFile.Delete();
 		}
 

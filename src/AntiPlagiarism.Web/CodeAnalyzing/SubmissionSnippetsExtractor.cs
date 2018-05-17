@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
 using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database.Models;
-using AntiPlagiarism.Web.Extensions;
 using Microsoft.Extensions.Options;
 using Serilog;
+using Ulearn.Common.Extensions;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing
 {

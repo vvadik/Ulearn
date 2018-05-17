@@ -58,7 +58,7 @@ namespace uLearn.Model
 		public SlideMetaDescription Meta { get; set; }
 
 		[XmlElement("default-include-file")]
-		public string DefaultInclideFile;
+		public string DefaultInclideFile { get; set; }
 
 		[XmlElement("default-include-code-file")]
 		public string DefaultIncludeCodeFile

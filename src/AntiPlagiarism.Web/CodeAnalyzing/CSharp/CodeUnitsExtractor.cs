@@ -5,6 +5,7 @@ using AntiPlagiarism.Web.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Ulearn.Common.Extensions;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
 {

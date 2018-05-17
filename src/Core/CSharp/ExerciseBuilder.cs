@@ -22,7 +22,7 @@ namespace uLearn.CSharp
 			this.prelude = prelude;
 			Exercise = new SingleFileExerciseBlock
 			{
-				Validator = new ValidatorDescription { ValidatorName = "cs" },
+				Validator = new ValidatorDescription { ValidatorName = langId },
 				LangId = langId
 			};
 		}
