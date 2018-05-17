@@ -329,13 +329,13 @@ p + .revealed {
 	margin-right: 5px;
 }
 
-.nav .group-statistics-link a .beta {
-	font-size: 80%;
-	position: relative;
-	top: -4px;
+.nav .units-list-item .slides-list a:hover {
 	text-decoration: none;
-	display: inline-block;
 }
+
+.nav .units-list-item .slides-list a:not(.selected):hover .underline-on-parent-hover {
+	text-decoration: underline;
+} 
 
 #nav_arrows {
 	margin-top: 10px;
@@ -361,15 +361,18 @@ p + .revealed {
 	color: #428bca;
 }
 
-.slide-list-item.selected {
+.selected .slide-list-item {
 	background-color: #f5f5f5;
 	list-style-type: none;
-	cursor: pointer;
+	cursor: auto;
 	color: #428bca;
+}
+
+.selected .slide-list-item a {
 	pointer-events: none;
 }
 
-.slide-list-item.selected *:not(.navbar-label-danger) {
+.selected  .slide-list-item *:not(.navbar-label-danger) {
 	color: #444480;
 }
 
