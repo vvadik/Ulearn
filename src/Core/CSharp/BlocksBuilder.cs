@@ -163,11 +163,14 @@ namespace uLearn.CSharp
 			var code = (string)CreateCodeBlock((dynamic)node);
 			var lastBlock = Blocks.LastOrDefault() as CodeBlock;
 			if (lastBlock != null)
-				Blocks[Blocks.Count - 1] = new CodeBlock(lastBlock.Code + "\r\n\r\n" + code, LangId);
+				lastBlock.Code = lastBlock.Code + "\r\n\r\n" + code;
 			else
 				Blocks.Add(new CodeBlock(code, LangId));
-			
-			(Blocks[Blocks.Count - 1] as CodeBlock)?.SourceCodeLabels.Add(node.Identifier().Text);
+
+			var declarationWithIdentifier = node is MethodDeclarationSyntax || node is ClassDeclarationSyntax || node is PropertyDeclarationSyntax || node is EnumDeclarationSyntax;
+			var identifier = declarationWithIdentifier ? node.Identifier().Text : "";
+			var showOnlyBody = node.GetAttributes<ShowBodyOnSlideAttribute>().Any();
+			(Blocks[Blocks.Count - 1] as CodeBlock)?.SourceCodeLabels.Add(new Label { Name = identifier, OnlyBody = showOnlyBody });
 		}
 
 		private string CreateCodeBlock(MethodDeclarationSyntax node)
@@ -192,8 +195,10 @@ namespace uLearn.CSharp
 
 		private void EmbedCode(string filename)
 		{
-			//Blocks.Add(new CodeBlock(di.GetContent(filename), LangId));
-			Blocks.Add(new IncludeCodeBlock(filename));
+			Blocks.Add(new CodeBlock(di.GetContent(filename), LangId));
+			
+			// Following code is useful for converting cs slides into xml
+			// Blocks.Add(new IncludeCodeBlock(filename));
 		}
 
 		private void EmbedVideo(string videoId)

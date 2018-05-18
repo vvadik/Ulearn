@@ -25,7 +25,7 @@ namespace uLearn.Model.Blocks
 		public string LangVer { get; set; }
 		
 		[XmlIgnore]
-		public List<string> SourceCodeLabels { get; set; } = new List<string>();
+		public List<Label> SourceCodeLabels { get; set; } = new List<Label>();
 
 		public CodeBlock(string code, string langId, string langVer = null)
 		{

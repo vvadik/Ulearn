@@ -15,7 +15,7 @@ namespace uLearn.Model
 			regions = RegionsParser.GetRegions(code);
 		}
 
-		public string GetRegion(Label label)
+		public string GetRegion(Label label, bool withoutAttributes=false)
 		{
 			var region = regions.GetOrDefault(label.Name, null);
 			if (region == null)

@@ -35,7 +35,7 @@ namespace uLearn.Model.Blocks
 			}
 
 			var extractor = context.GetExtractor(CodeFile, LangId);
-			yield return new CodeBlock(string.Join("\r\n\r\n", extractor.GetRegions(DisplayLabels)), LangId, LangVer) { Hide = Hide };
+			yield return new CodeBlock(string.Join("\r\n\r\n", extractor.GetRegions(DisplayLabels, withoutAttributes: true)), LangId, LangVer) { Hide = Hide };
 		}
 	}
 }

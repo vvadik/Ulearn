@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -25,13 +26,15 @@ namespace uLearn.CSharp
 				);
 		}
 
-		public string GetRegion(Label label)
+		public string GetRegion(Label label, bool withoutAttributes=false)
 		{
 			if (!members.ContainsKey(label.Name))
 				return null;
 			var nodes = members[label.Name];
 			if (label.OnlyBody)
 				return string.Join("\r\n\r\n", nodes.Select(GetBody));
+			if (withoutAttributes)
+				nodes = nodes.Select(node => node.WithoutAttributes()).ToList();
 			return String.Join("\r\n\r\n", nodes.Select(node => node.ToPrettyString()));
 		}
 

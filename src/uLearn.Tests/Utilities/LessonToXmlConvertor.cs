@@ -24,7 +24,7 @@ namespace uLearn.Utilities
 
 			var attrOverrides = new XmlAttributeOverrides();
 			attrOverrides.Add(typeof(ExerciseBlock), "LegacyExerciseInitialCode", attrs);
-			attrOverrides.Add(typeof(Lesson), "DefaultInclideFile", attrs);
+			attrOverrides.Add(typeof(Lesson), "DefaultIncludeFile", attrs);
 			
 			return new XmlSerializer(typeof(Lesson), attrOverrides);
 		}
@@ -33,6 +33,8 @@ namespace uLearn.Utilities
 		[Explicit]
 		public void ConvertLessonSlidesToXml()
 		{
+			/* See Core/CSharp/BlocksBuilder.cs:196 (EmbedCode) before converting */
+			
 			var coursesDirectory = new DirectoryInfo(@"C:\tmp\ulearn\10 course conversion"); // Insert your path here!
 			var courseDirectories = coursesDirectory.GetDirectories("Slides", SearchOption.AllDirectories);
 			foreach (var courseDirectory in courseDirectories)
@@ -55,10 +57,9 @@ namespace uLearn.Utilities
 				return;
 			
 			Console.WriteLine("Converting " + slide.Info.SlideFile.FullName);
-
+			
 			var copiedFileName = RemoveFirstPathFromSlideName(slide.Info.SlideFile.Name);
 			var copiedFilePath = Path.Combine(slide.Info.SlideFile.Directory.FullName, copiedFileName);
-			File.Copy(slide.Info.SlideFile.FullName, copiedFilePath);
 
 			/* Replace CodeBlock's with IncludeCode blocks with help of default-include-code-file */
 			var newBlocks = new List<SlideBlock>();
@@ -69,14 +70,38 @@ namespace uLearn.Utilities
 					newBlocks.Add(block);
 					continue;
 				}
-
+				
 				var codeBlock = (CodeBlock)block;
+
+				var hasUnknownLabelBlocks = codeBlock.SourceCodeLabels.Any(l => string.IsNullOrEmpty(l.Name));
+				if (hasUnknownLabelBlocks)
+				{
+					newBlocks.Add(block);
+					continue;
+				}
+
 				newBlocks.Add(new IncludeCodeBlock
 				{
-					DisplayLabels = codeBlock.SourceCodeLabels.Select(s => new Label { Name = s }).ToArray(),
+					DisplayLabels = codeBlock.SourceCodeLabels.ToArray(),
 				});
 			}
+
+			var hasIncludeCodeBlocks = newBlocks.Any(b => b is IncludeCode);
 			
+			/* Remove ulearn-specific attributes from code */
+			if (hasIncludeCodeBlocks)
+			{
+				var ulearnAttributes = new List<string>
+				{
+					"CommentAfterExerciseIsSolved", "ExcludeFromSolution", "Exercise", "ExpectedOutput",
+					"HideExpectedOutputOnError", "HideOnSlide", "Hint", "IsStaticMethod", "RecursionStyleValidator",
+					"ShowBodyOnSlide", "SingleStatementMethod", "Slide",
+				};
+				var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(slide.Info.SlideFile.FullName));
+				var afterUlearnAttributeRemoval = new RemoveAttributesRewriter(ulearnAttributes).Visit(tree.GetRoot());
+				File.WriteAllText(copiedFilePath, afterUlearnAttributeRemoval.ToFullString());
+			}
+
 			if (slide is ExerciseSlide exerciseSlide)
 			{
 				exerciseSlide.Exercise.CodeFile = copiedFileName;
@@ -91,22 +116,11 @@ namespace uLearn.Utilities
 					Assert.IsTrue(exerciseBlock.ExcludedFromSolution.Count >= 1);
 					exerciseBlock.SolutionLabel = new Label { Name = exerciseBlock.ExcludedFromSolution[0] };
 				}
-				
-
-				/* Remove ulearn-specific attributes from code */
-				var ulearnAttributes = new List<string>
-				{
-					"CommentAfterExerciseIsSolved", "ExcludeFromSolution", "Exercise", "ExpectedOutput", 
-					"HideExpectedOutputOnError", "HideOnSlide", "Hint", "IsStaticMethod", "RecursionStyleValidator", 
-					"ShowBodyOnSlide", "SingleStatementMethod", "Slide",
-				};
-				var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(copiedFilePath));
-				var afterUlearnAttributeRemoval = new RemoveUlearnAttributesRewriter(ulearnAttributes).Visit(tree.GetRoot());
-				File.WriteAllText(copiedFilePath, afterUlearnAttributeRemoval.ToFullString());
 			}
 			
 			var lesson = new Lesson(slide.Title, slide.Id, newBlocks.ToArray());
-			lesson.DefaultIncludeCodeFile = copiedFileName;
+			if (hasIncludeCodeBlocks)
+				lesson.DefaultIncludeCodeFile = copiedFileName;
 			
 			var path = Path.ChangeExtension(slide.Info.SlideFile.FullName, "lesson.xml");
 			using (var writer = new StreamWriter(path, false, Encoding.UTF8))
@@ -122,11 +136,11 @@ namespace uLearn.Utilities
 		}
 	}
 
-	public class RemoveUlearnAttributesRewriter: CSharpSyntaxRewriter
+	public class RemoveAttributesRewriter: CSharpSyntaxRewriter
 	{
 		private readonly List<string> attributeNames;
 
-		public RemoveUlearnAttributesRewriter(List<string> attributeNames)
+		public RemoveAttributesRewriter(List<string> attributeNames)
 		{
 			this.attributeNames = attributeNames;
 		}

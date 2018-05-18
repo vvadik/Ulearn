@@ -58,13 +58,13 @@ namespace uLearn.Model
 		public SlideMetaDescription Meta { get; set; }
 
 		[XmlElement("default-include-file")]
-		public string DefaultInclideFile { get; set; }
+		public string DefaultIncludeFile { get; set; }
 
 		[XmlElement("default-include-code-file")]
 		public string DefaultIncludeCodeFile
 		{
-			get => DefaultInclideFile;
-			set => DefaultInclideFile = value;
+			get => DefaultIncludeFile;
+			set => DefaultIncludeFile = value;
 		}
 
 		[XmlElement(typeof(YoutubeBlock))]

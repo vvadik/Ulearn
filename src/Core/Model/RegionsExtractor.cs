@@ -8,7 +8,7 @@ namespace uLearn.Model
 {
 	public interface ISingleRegionExtractor
 	{
-		string GetRegion(Label label);
+		string GetRegion(Label label, bool withoutAttributes);
 	}
 
 	public class RegionsExtractor
@@ -29,14 +29,14 @@ namespace uLearn.Model
 				extractors.Add(new CsMembersExtractor(code));
 		}
 
-		public string GetRegion(Label label)
+		public string GetRegion(Label label, bool withoutAttributes=false)
 		{
-			return extractors.Select(extractor => extractor.GetRegion(label)).FirstOrDefault(res => res != null);
+			return extractors.Select(extractor => extractor.GetRegion(label, withoutAttributes)).FirstOrDefault(res => res != null);
 		}
 
-		public IEnumerable<string> GetRegions(IEnumerable<Label> labels)
+		public IEnumerable<string> GetRegions(IEnumerable<Label> labels, bool withoutAttributes=false)
 		{
-			return labels.Select(GetRegion).Where(s => s != null).Select(s => s.FixExtraEolns());
+			return labels.Select(l => GetRegion(l, withoutAttributes)).Where(s => s != null).Select(s => s.FixExtraEolns());
 		}
 	}
 }
