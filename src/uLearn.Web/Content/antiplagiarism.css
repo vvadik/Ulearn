@@ -115,16 +115,42 @@
 
 .antiplagiarism__full-matched {
     /*background-color: rgba(255, 117, 117, 0.3);*/
-    background-color: #ff7773;
+    background-color: #f34742;
     color: white !important;
+}
+
+.antiplagiarism__full-matched.CodeMirror-selectedtext {
+    background-color: #904742;
+}
+
+.CodeMirror-line [role="presentation"]:hover .antiplagiarism__full-matched {
+    background-color: #f57875;
 }
 
 .antiplagiarism__not-matched {
     /*background-color: rgba(74, 255, 74, 0.3);*/
-    background-color: #77ff73;    
+    background-color: #47f342;    
 }
 
-.antiplagiarism .original-submission .antiplagiarism__full-matched,
-.antiplagiarism .original-submission .antiplagiarism__not-matched {
+.antiplagiarism__not-matched .cm-tab {
+    background-color: #a7f3a2;
+}
+
+.antiplagiarism__not-matched .cm-tab:before {
+    content: ' →';
+    color: #468c2a;
+    position: absolute;
+}
+
+.antiplagiarism__not-matched.CodeMirror-selectedtext {
+    background-color: #479042;
+}
+
+.CodeMirror-line [role="presentation"]:hover .antiplagiarism__not-matched {
+    background-color: #78f575;
+}
+
+.antiplagiarism .antiplagiarism__full-matched,
+.antiplagiarism .antiplagiarism__not-matched {
     cursor: pointer;
 }

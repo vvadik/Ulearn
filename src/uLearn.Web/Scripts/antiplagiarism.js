@@ -115,17 +115,22 @@ $(document).ready(function () {
             if (bestMatchedLine === undefined || bestMatchedLine < 0) // -2 or -1
                 return;
 
-            var originalPosition = originalCodeMirror.cursorCoords({ line: originalLine, ch: 1 }, 'local');
-            var plagiarismPosition = plagiarismCodeMirror.cursorCoords({ line: bestMatchedLine, ch: 1}, 'local');
+            alignCodeMirrors(originalCodeMirror, plagiarismCodeMirror, originalLine, bestMatchedLine, 'original');
+        });
+        $(plagiarismCodeMirror.getWrapperElement()).on('click', function (e) {
+            var cursor = plagiarismCodeMirror.getCursor();
+            let plagiarismLine = cursor.line;
 
-            var originalMarginTop = 0, plagiarismMarginTop = 0;
-            if (originalPosition.top < plagiarismPosition.top)
-                originalMarginTop = plagiarismPosition.top - originalPosition.top;
-            else
-                plagiarismMarginTop = originalPosition.top - plagiarismPosition.top;
-
-            $(originalCodeMirror.display.wrapper).animate({'marginTop': originalMarginTop});
-            $(plagiarismCodeMirror.display.wrapper).animate({'marginTop': plagiarismMarginTop});
+            var originalLine = undefined;
+            $.each(bestMatchedLines, function (index, value) {
+                if (value === plagiarismLine)
+                    originalLine = index;
+            });
+            
+            if (originalLine === undefined)
+                return;
+            
+            alignCodeMirrors(originalCodeMirror, plagiarismCodeMirror, originalLine, plagiarismLine, 'plagiarism');
         });
         
         /* Batch all operations as one: see https://codemirror.net/doc/manual.html for details. It's much faster because
@@ -138,6 +143,29 @@ $(document).ready(function () {
         });       
         
     });
+    
+    function alignCodeMirrors(originalCodeMirror, plagiarismCodeMirror, originalLine, plagiarismLine, shouldNotMoved) {
+        var originalPosition = originalCodeMirror.cursorCoords({ line: originalLine, ch: 1 }, 'local');
+        var plagiarismPosition = plagiarismCodeMirror.cursorCoords({ line: plagiarismLine, ch: 1}, 'local');
+
+        var originalMarginTop = 0, plagiarismMarginTop = 0;
+        if (originalPosition.top < plagiarismPosition.top)
+            originalMarginTop = plagiarismPosition.top - originalPosition.top;
+        else
+            plagiarismMarginTop = originalPosition.top - plagiarismPosition.top;
+
+        var marginTopDiff = 0;
+        if (shouldNotMoved === 'original') 
+            marginTopDiff = parseInt($(originalCodeMirror.getWrapperElement()).css('marginTop')) - originalMarginTop;
+        else if (shouldNotMoved === 'plagiarism')
+            marginTopDiff = parseInt($(plagiarismCodeMirror.getWrapperElement()).css('marginTop')) - plagiarismMarginTop;
+        
+        $(originalCodeMirror.getWrapperElement()).animate({'marginTop': originalMarginTop}, 500, 'linear');
+        $(plagiarismCodeMirror.getWrapperElement()).animate({'marginTop': plagiarismMarginTop}, 500, 'linear');
+        
+        /* Scroll full document for making effect that only right submissions is scrolled, not left */
+        $('html').animate({scrollTop: $('html').scrollTop() - marginTopDiff}, 500, 'linear');        
+    }
     
     /* Returns array result, result[i] contains token indecies which contains in i-th line of input */
     function getTokensByLines(text, tokens) {
@@ -197,6 +225,7 @@ $(document).ready(function () {
         
         /* Search best match for each line (or return -1 if several lines has equal weight ) */
         var result = [];
+        var reversedResult = [];
         for (var lineId = 0; lineId < originalTokensByLines.length; lineId++) {
             if (! (lineId in originalTokensByLines) || originalTokensByLines[lineId].length === 0) {
                 result[lineId] = -2; // -2 means "no token in this line"
@@ -212,7 +241,13 @@ $(document).ready(function () {
                 } else if (lineWeights[lineId][pLineId] === bestMatchWeight)
                     bestMatch = -1;     
             }
+            
+            /* Doesn't allow duplicated values in result array (except -1 or -2) */
+            if (bestMatch >= 0 && bestMatch in reversedResult)
+                bestMatch = -1;
+            
             result[lineId] = bestMatch;
+            reversedResult[bestMatch] = lineId;
         }            
         return result;
     }
@@ -229,15 +264,25 @@ $(document).ready(function () {
         return result;
     }
     
+    function isLatinChar(c) {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    }
+    function isLatinUppercase(c) {
+        return c >= 'A' && c <= 'Z';
+    }
+    function isDigit(c) {
+        return c >= '0' && c <= '9';
+    }
+    
     function highlightBestMatchedLines(originalCodeMirror, plagiarismCodeMirror, bestMatchedLines, originalSubmissionLines, plagiarismSubmissionLines)
     {
         var fullMatchedTextMarkerOptions = {
             className: 'antiplagiarism__full-matched',
-            title: 'Эта часть кода совпадает полностью',
+            title: 'Эта часть кода совпадает полностью. Нажмите, чтобы увидеть аналогичное место в другом решении',
         };        
         var notMatchedTextMarkerOptions = {
             className: 'antiplagiarism__not-matched',
-            title: '',
+            title: 'Нажмите, чтобы увидеть аналогичное место в другом решении',
         };
 
         function highlightBestMatchedLine(lineId, bestMatchedLine, allowSuggests) {
@@ -257,34 +302,38 @@ $(document).ready(function () {
             $.each(diff, function (_, diffItem) {
                 var diffType = diffItem[0];
                 var diffString = diffItem[1];
+                
+                /* Correcting: full-matched blocks can start only from beginning of the word
+                   (upper-case letter, or if previous char it not letter) or from beginnin og the number.
+                   Bad full-matched blocks are marked with special value of diffType: -100. It means that it should be marked in both texts, but as not-matched */
+                var BAD_FULL_MATCHED = -100;
                 if (diffType === 0) {
-                    originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {
-                        line: lineId,
-                        ch: originalCharIndex + diffString.length
-                    }, setTitleForClicking(fullMatchedTextMarkerOptions));
-                    plagiarismCodeMirror.markText({
-                        line: bestMatchedLine,
-                        ch: plagiarismCharIndex
-                    }, {
-                        line: bestMatchedLine,
-                        ch: plagiarismCharIndex + diffString.length
-                    }, fullMatchedTextMarkerOptions);
+                    var firstChar = diffString[0];
+                    var previousChar = originalCharIndex > 0 ? originalLine[originalCharIndex - 1] : '';
+                    if (isLatinChar(firstChar)) {
+                        var isFirstLetter = previousChar === '' || isLatinUppercase(firstChar) || !isLatinChar(previousChar)
+                        if (! isFirstLetter)
+                            diffType = BAD_FULL_MATCHED;                                                    
+                    }
+                    else if (isDigit(firstChar))
+                    {
+                        if (isDigit(previousChar))
+                            diffType = BAD_FULL_MATCHED;
+                    }
+                } 
+                
+                if (diffType === 0) {
+                    originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {line: lineId, ch: originalCharIndex + diffString.length}, fullMatchedTextMarkerOptions);
+                    plagiarismCodeMirror.markText({line: bestMatchedLine, ch: plagiarismCharIndex}, {line: bestMatchedLine, ch: plagiarismCharIndex + diffString.length}, fullMatchedTextMarkerOptions);
                     originalCharIndex += diffString.length;
                     plagiarismCharIndex += diffString.length;
-                } else if (diffType === -1) {
-                    originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {
-                        line: lineId,
-                        ch: originalCharIndex + diffString.length
-                    }, setTitleForClicking(notMatchedTextMarkerOptions));
+                }
+                if (diffType === -1 || diffType === BAD_FULL_MATCHED) {
+                    originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {line: lineId, ch: originalCharIndex + diffString.length}, notMatchedTextMarkerOptions);
                     originalCharIndex += diffString.length;
-                } else if (diffType === 1) {
-                    plagiarismCodeMirror.markText({
-                        line: bestMatchedLine,
-                        ch: plagiarismCharIndex
-                    }, {
-                        line: bestMatchedLine,
-                        ch: plagiarismCharIndex + diffString.length
-                    }, notMatchedTextMarkerOptions);
+                }
+                if (diffType === 1 || diffType === BAD_FULL_MATCHED) {
+                    plagiarismCodeMirror.markText({line: bestMatchedLine, ch: plagiarismCharIndex}, {line: bestMatchedLine,ch: plagiarismCharIndex + diffString.length}, notMatchedTextMarkerOptions);
                     plagiarismCharIndex += diffString.length;
                 }
             });
@@ -317,17 +366,6 @@ $(document).ready(function () {
         }
         
         $.each(bestMatchedLines, highlightBestMatchedLine);    
-    }
-    
-    function setTitleForClicking(textMarkOptions) {
-        var newOptions = {
-            className: textMarkOptions.className,
-            title: textMarkOptions.title,
-        };
-        if (newOptions.title !== "")
-            newOptions.title += ". ";
-        newOptions.title += "Нажмите, чтобы увидеть аналогичное место во втором решении"
-        return newOptions;
     }
     
     function getTokensDictionaryByIndex(tokensPositionsArray) {
