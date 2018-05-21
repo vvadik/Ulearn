@@ -15,7 +15,6 @@ namespace uLearn.Model.Blocks
 		protected ExerciseBlock()
 		{
 			MaxScore = 5;
-			MaxReviewAttempts = 2;
 			CorrectnessScore = MaxScore;
 			Validator = new ValidatorDescription();
 		}
@@ -66,9 +65,6 @@ namespace uLearn.Model.Blocks
 
 		[XmlElement("correctness-score")]
 		public int CorrectnessScore { get; set; }
-
-		[XmlElement("max-review-attempts")]
-		public int MaxReviewAttempts { get; set; }
 
 		[XmlElement("scoring-group")]
 		public string ScoringGroup { get; set; }

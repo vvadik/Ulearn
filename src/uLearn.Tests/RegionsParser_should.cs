@@ -24,6 +24,18 @@ namespace uLearn
 			};
 			CollectionAssert.AreEquivalent(expected, regions);
 		}
+		
+		[Test]
+		public void SimpleParsingWithLongRegionName()
+		{
+			const string code = "region abcdef\nendregion abcdef";
+			var regions = RegionsParser.GetRegions(code);
+			var expected = new Dictionary<string, RegionsParser.Region>
+			{
+				{ "abcdef", new RegionsParser.Region(14, 0, 0, code.Length) }
+			};
+			CollectionAssert.AreEquivalent(expected, regions);
+		}
 
 		[Test]
 		public void Errors()

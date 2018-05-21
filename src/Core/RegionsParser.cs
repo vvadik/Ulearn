@@ -99,7 +99,10 @@ namespace uLearn
 
 		private static string GetRegionName(string line)
 		{
-			return line.Split(new char[0], StringSplitOptions.RemoveEmptyEntries).Last();
+			var regionIndex = line.LastIndexOf("region ", StringComparison.Ordinal);
+			if (regionIndex == -1)
+				return "";
+			return line.Substring(regionIndex + "region ".Length).Trim();
 		}
 	}
 }

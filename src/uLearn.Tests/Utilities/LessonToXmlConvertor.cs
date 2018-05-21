@@ -33,7 +33,7 @@ namespace uLearn.Utilities
 		[Explicit]
 		public void ConvertLessonSlidesToXml()
 		{
-			/* See Core/CSharp/BlocksBuilder.cs:196 (EmbedCode) before converting */
+			/* See Core/CSharp/BlocksBuilder.cs:200 (EmbedCode) before converting */
 			
 			var coursesDirectory = new DirectoryInfo(@"C:\tmp\ulearn\10 course conversion"); // Insert your path here!
 			var courseDirectories = coursesDirectory.GetDirectories("Slides", SearchOption.AllDirectories);
