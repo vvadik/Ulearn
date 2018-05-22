@@ -396,14 +396,25 @@ namespace uLearn.Web.Controllers
 					QuizBlockScore = 0,
 					QuizBlockMaxScore = choiceBlock.MaxScore
 				}).ToList();
-			var isRightQuizBlock = ans.All(x => x.IsRightAnswer) &&
-									choiceBlock.Items.Where(x => x.IsCorrect == ChoiceItemCorrectness.True)
-										.Select(x => x.Id)
-										.All(x => ans.Where(y => y.IsRightAnswer).Select(y => y.ItemId).Contains(x));
+			
+			var mistakesCount = GetChoiceBlockMistakesCount(choiceBlock, ans);
+			var isRightQuizBlock = mistakesCount.HasNotMoreThatAllowed(choiceBlock.AllowedMistakesCount);
+			
 			blockScore = isRightQuizBlock ? choiceBlock.MaxScore : 0;
 			foreach (var info in ans)
 				info.QuizBlockScore = blockScore;
 			return ans;
+		}
+
+		private MistakesCount GetChoiceBlockMistakesCount(ChoiceBlock choiceBlock, List<QuizInfoForDb> ans)
+		{
+			var checkedUnnecessary = ans.Count(x => !x.IsRightAnswer);
+			
+			var totallyTrueItemIds = choiceBlock.Items.Where(x => x.IsCorrect == ChoiceItemCorrectness.True).Select(x => x.Id);
+			var userItemIds = ans.Select(y => y.ItemId).ToImmutableHashSet();
+			var notCheckedNecessary = totallyTrueItemIds.Count(x => ! userItemIds.Contains(x));
+			
+			return new MistakesCount(checkedUnnecessary, notCheckedNecessary);
 		}
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(OrderingBlock orderingBlock, IGrouping<string, QuizAnswer> answers)

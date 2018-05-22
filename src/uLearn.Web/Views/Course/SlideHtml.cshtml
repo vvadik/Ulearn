@@ -12,6 +12,19 @@
 @* ReSharper restore RedundantUsingDirective *@
 
 
+@functions
+{
+
+	private static bool IsBlockCorrect(QuizBlockData model, AbstractQuestionBlock block)
+	{
+		int blockScore;
+		var isBlockCorrect = model.QuizModel != null && model.QuizModel.ResultsForQuizes != null && 
+							model.QuizModel.ResultsForQuizes.TryGetValue(block.Id, out blockScore) && blockScore == block.MaxScore;
+		return isBlockCorrect;
+	}
+
+}
+
 @helper Slide(BlockRenderContext context, HtmlHelper Html, int currentScore = 0)
 {
 	<div class="slide">
@@ -61,12 +74,9 @@
 	QuizBlockData model = context.GetBlockData(block);
 	if (model.QuizState != QuizState.NotPassed && model.QuizState != QuizState.WaitForCheck && model.QuizState != QuizState.IsChecking)
 	{
-		if (model.QuizModel != null && model.QuizModel.ResultsForQuizes != null)
-		{
-			var res = model.QuizModel.ResultsForQuizes.TryGetValue(block.Id, out blockScore) && blockScore == block.MaxScore;
-			mark = "glyphicon " + (res ? "glyphicon-ok" : "glyphicon-remove");
-			style = "color: " + (res ? "green" : "red");
-		}
+		var isBlockCorrect = IsBlockCorrect(model, block);
+		mark = "glyphicon " + (isBlockCorrect ? "glyphicon-ok" : "glyphicon-remove");
+		style = "color: " + (isBlockCorrect ? "green" : "red");
 	}
 	<h4>
 		<i class="@mark" style="@style"></i>
@@ -232,9 +242,11 @@
 {
 	var items = block.ShuffledItems();
 	var isMultiply = block.Multiple;
-	var typeInp = isMultiply ? "checkbox" : "radio";
+	var inputType = isMultiply ? "checkbox" : "radio";
 	QuizBlockData model = context.GetBlockData(block) ?? new QuizBlockData(new QuizModel(), 1, QuizState.NotPassed);
-	<div class="quiz-block-mark @typeInp @typeInp-default" id='@( block.Id + "_quizBlock")'>
+
+	var mistakesCount = new MistakesCount();
+	<div class="quiz-block-mark @inputType @inputType-default" id='@( block.Id + "_quizBlock")'>
 		@for (var itemIndex = 0; itemIndex < items.Length; itemIndex++)
 		{
 			var item = items[itemIndex];
@@ -246,13 +258,15 @@
 			var readonlyAttr = context.CanUserFillQuiz ? "" : "disabled";
 			
 			var isCorrect = item.IsCorrect == ChoiceItemCorrectness.True || item.IsCorrect == ChoiceItemCorrectness.Maybe && itemChecked;
+			mistakesCount.CheckedUnnecessary += itemChecked && !isCorrect ? 1 : 0;
+			mistakesCount.NotCheckedNecessary += !itemChecked && isCorrect ? 1 : 0;
 			if (model.ShowCorrectAnswers)
 			{
 				itemClass = isCorrect ? "right-quiz" : itemChecked ? "wrong-quiz" : "";
 				title = (isCorrect ? "Правильный" : "Неправильный") + " вариант";
 			}
 			<div class="quiz">
-				<input @ans autocomplete="off" id='@( block.Id + "quizBlock" + item.Id)' name=@( "group" + id) type="@typeInp" @GetGuestDisable(context.IsGuest) @readonlyAttr>
+				<input @ans autocomplete="off" id='@( block.Id + "quizBlock" + item.Id)' name=@( "group" + id) type="@inputType" @GetGuestDisable(context.IsGuest) @readonlyAttr>
 				<label class="@itemClass" title="@title" for="@( block.Id + "quizBlock" + item.Id)" @GetGuestOnclick(context.IsGuest)>
 					@item.Description.Trim().RenderTex().ToLegacyHtmlString()
                     
@@ -267,7 +281,49 @@
 				}
 			</div>
 		}
-	</div>
+        @{
+	        var isBlockCorrect = IsBlockCorrect(model, block);
+	        if (model.ShowCorrectAnswers && isBlockCorrect && mistakesCount.HasAtLeastOneMistake())
+	        {
+		        @ShowMistakesExplanation(mistakesCount)
+	        }
+        }
+        
+    </div>
+}
+
+@helper ShowMistakesExplanation(MistakesCount mistakesCount)
+{
+	var text = "";
+	if (mistakesCount.CheckedUnnecessary > 0)
+	{
+		var unnecessaryItemsText = mistakesCount.CheckedUnnecessary.PluralizeInRussian(new RussianPluralizationOptions
+		{
+			One = "лишний вариант",
+			Two = "лишних варианта",
+			Five = "лишних вариантов",
+			hideNumberOne = false,
+			smallNumbersAreWords = false,
+		});
+		text = "Вы выбрали " + unnecessaryItemsText;
+	}
+	if (mistakesCount.NotCheckedNecessary > 0)
+	{
+		var necessaryItemsText = mistakesCount.CheckedUnnecessary.PluralizeInRussian(new RussianPluralizationOptions
+		{
+			One = "правильный вариант",
+			Two = "правильных варианта",
+			Five = "правильных вариантов",
+			hideNumberOne = false,
+			smallNumbersAreWords = false,
+		});
+		text += text == "" ? "Вы " : " и ";
+		text += "не выбрали " + necessaryItemsText;
+	}
+	text += ". Нестрашно, в этом вопросе это допустимо. Вы все равно получаете полный балл!";
+	<div class="quiz-mistakes-explanation">
+        @text
+    </div>
 }
 
 @helper QuizBlock(FillInBlock block, BlockRenderContext context)

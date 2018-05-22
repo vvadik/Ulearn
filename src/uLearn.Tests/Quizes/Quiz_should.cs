@@ -33,7 +33,7 @@ namespace uLearn.Quizes
 						Text = "What is the \nbest color?",
 						Items = new[]
 						{
-							new ChoiceItem { Id = "1", Description = "black", IsCorrect = true },
+							new ChoiceItem { Id = "1", Description = "black", IsCorrect = ChoiceItemCorrectness.True },
 							new ChoiceItem { Id = "2", Description = "green" },
 							new ChoiceItem { Id = "3", Description = "red" },
 						}
@@ -44,8 +44,8 @@ namespace uLearn.Quizes
 						Text = "What does the fox say?",
 						Items = new[]
 						{
-							new ChoiceItem { Description = "Apapapapa", IsCorrect = true },
-							new ChoiceItem { Description = "Ding ding ding", IsCorrect = true },
+							new ChoiceItem { Description = "Apapapapa", IsCorrect = ChoiceItemCorrectness.True },
+							new ChoiceItem { Description = "Ding ding ding", IsCorrect = ChoiceItemCorrectness.True },
 							new ChoiceItem { Description = "Mew" },
 						}
 					},

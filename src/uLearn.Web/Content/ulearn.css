@@ -578,6 +578,12 @@ p + .revealed {
 .manualQuizAnswer {
 	background-color: lightblue !important;
 }
+
+.quiz-mistakes-explanation {
+	margin-left: -20px;
+	margin-top: 10px;
+	color: #070;
+}
 /* ReSharper restore Html.CssClassElementsNotFound */
 
 .video-container {

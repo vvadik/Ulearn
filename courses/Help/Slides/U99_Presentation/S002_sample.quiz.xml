@@ -6,7 +6,7 @@
 	scoringGroup="laboratory"
     tries="3">
 	<title>Пример теста</title>
-	
+
 	<p xml:space="preserve">
 Можно использовать TeX: $\Theta(n)$
 
@@ -47,6 +47,7 @@ Header 1				| h2
 	</choice>
 
 	<choice id="choiceQuestionMultiple" multiple="true" shuffle="true">
+        <allowedMistakes checkedUnnecessary="1" notCheckedNecessary="0" />
 		<text>Выберите варианты</text>
 		<item id="1" isCorrect="true">Первый вариант</item>
 		<item id="2" isCorrect="false">Второй вариант</item>

@@ -149,7 +149,7 @@ namespace uLearn.Quizes
 		public ChoiceItem[] Items;
 		
 		[XmlElement("allowedMistakes")]
-		public AllowedMistakesCount AllowedMistakesCount { get; set; }
+		public MistakesCount AllowedMistakesCount { get; set; } = new MistakesCount(0, 0);
 
 		public ChoiceItem[] ShuffledItems()
 		{
@@ -482,12 +482,33 @@ namespace uLearn.Quizes
 		}
 	}
 
-	public class AllowedMistakesCount
+	public class MistakesCount
 	{
+		public MistakesCount()
+			: this(0, 0)
+		{
+		}
+		
+		public MistakesCount(int checkedUnnecessary, int notCheckedNecessary)
+		{
+			CheckedUnnecessary = checkedUnnecessary;
+			NotCheckedNecessary = notCheckedNecessary;
+		}
+		
 		[XmlAttribute("checkedUnnecessary")]
 		public int CheckedUnnecessary { get; set; }
 		
 		[XmlAttribute("notCheckedNecessary")]
 		public int NotCheckedNecessary { get; set; }
+
+		public bool HasAtLeastOneMistake()
+		{
+			return CheckedUnnecessary > 0 || NotCheckedNecessary > 0;
+		}
+
+		public bool HasNotMoreThatAllowed(MistakesCount allowedMistakesCount)
+		{
+			return CheckedUnnecessary <= allowedMistakesCount.CheckedUnnecessary && NotCheckedNecessary <= allowedMistakesCount.NotCheckedNecessary;
+		}
 	}
 }
