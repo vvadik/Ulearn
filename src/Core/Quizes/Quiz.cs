@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
@@ -434,7 +435,7 @@ namespace uLearn.Quizes
 		public string Id;
 
 		[XmlAttribute("isCorrect")]
-		public ChoiceItemCorrectness IsCorrect;
+		public ChoiceItemCorrectness IsCorrect = ChoiceItemCorrectness.False;
 
 		[XmlAttribute("explanation")]
 		public string _explanation;
