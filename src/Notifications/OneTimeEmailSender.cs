@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using System.Xml.Serialization;
 using Database.Models;
 using log4net;
@@ -41,7 +42,7 @@ namespace Notifications
 			foreach (var email in config.Emails)
 			{
 				log.Info($"Send email to {email}");
-				var button = new EmailButton(config.Button.Link, config.Button.Text);
+				var button = config.Button == null ? null : new EmailButton(config.Button.Link, config.Button.Text);
 				await emailSender.SendEmailAsync(email, config.Subject, config.Text, config.Html, button).ConfigureAwait(false);
 			}
 		}
@@ -63,7 +64,7 @@ namespace Notifications
 		public string Html { get; set; }
 		
 		[XmlElement("button")]
-		public ButtonConfig Button { get; set; } = new ButtonConfig();
+		public ButtonConfig Button { get; set; }
 	}
 
 	public class ButtonConfig
