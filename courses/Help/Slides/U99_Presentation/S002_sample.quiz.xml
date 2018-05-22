@@ -50,7 +50,7 @@ Header 1				| h2
 		<text>Выберите варианты</text>
 		<item id="1" isCorrect="true">Первый вариант</item>
 		<item id="2" isCorrect="false">Второй вариант</item>
-		<item id="3" isCorrect="false">Третий вариант</item>
+		<item id="3" isCorrect="maybe">Третий вариант. Его можно как выбрать, так и не выбирать</item>
 		<item id="4" isCorrect="false">Четвёртый вариант</item>
 	</choice>
 

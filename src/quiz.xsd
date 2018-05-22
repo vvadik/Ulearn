@@ -24,7 +24,7 @@
 						<xs:restriction base="notEmptyString">
 							<xs:whiteSpace value="preserve" />
 						</xs:restriction>
-					</xs:simpleType>
+					</xs:simpleType>								
 				</xs:element>
 				<xs:element name="isTrue" type="IsTrueBlock" />
 				<xs:element name="choice" type="ChoiceBlock">
@@ -91,7 +91,7 @@
 
 	<xs:complexType name="IsTrueBlock">
 		<xs:sequence minOccurs="1" maxOccurs="1">
-			<xs:element name="text" minOccurs="1" maxOccurs="1" type="notEmptyString"></xs:element>
+			<xs:element name="text" minOccurs="1" maxOccurs="1" type="notEmptyString"/>
 		</xs:sequence>
 		<xs:attribute name="id" type="notEmptyString" use="required" />
 		<xs:attribute name="answer" type="xs:boolean" use="optional" />
@@ -101,18 +101,27 @@
 
 	<xs:complexType name="ChoiceBlock">
 		<xs:sequence minOccurs="1" maxOccurs="1">
-			<xs:element name="text" minOccurs="1" maxOccurs="1" type="notEmptyString"></xs:element>
+			<xs:element name="text" minOccurs="1" maxOccurs="1" type="notEmptyString"/>
 			<xs:element name="item" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:simpleContent>
 						<xs:extension base="notEmptyString">
 							<xs:attribute name="id" type="notEmptyString" use="required" />
-							<xs:attribute name="isCorrect" type="xs:boolean" use="required" />
+							<xs:attribute name="isCorrect" use="required">
+								<xs:simpleType>
+									<xs:restriction base="notEmptyString">
+										<xs:enumeration value="true" />
+										<xs:enumeration value="false" />
+										<xs:enumeration value="maybe" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:attribute>
 							<xs:attribute name="explanation" type="xs:string" use="optional" />
 						</xs:extension>
 					</xs:simpleContent>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="allowedMistakes" minOccurs="0" maxOccurs="1" type="AllowedMistakes"/>
 		</xs:sequence>
 		<xs:attribute name="id" type="notEmptyString" use="required" />
 		<xs:attribute name="multiple" type="xs:boolean" use="optional" />
@@ -142,7 +151,7 @@
 
 	<xs:complexType name="OrderingBlock">
 		<xs:sequence minOccurs="1" maxOccurs="1">
-			<xs:element name="text" minOccurs="1" maxOccurs="1" type="notEmptyString"></xs:element>
+			<xs:element name="text" minOccurs="1" maxOccurs="1" type="notEmptyString"/>
 
 			<xs:element name="explanation" type="xs:string" minOccurs="0" maxOccurs="1" />
 			<xs:element name="item" minOccurs="0" maxOccurs="unbounded">
@@ -161,13 +170,13 @@
 
 	<xs:complexType name="MatchingBlock">
 		<xs:sequence minOccurs="1" maxOccurs="1">
-			<xs:element name="text" minOccurs="1" maxOccurs="1" type="notEmptyString"></xs:element>
+			<xs:element name="text" minOccurs="1" maxOccurs="1" type="notEmptyString"/>
 			<xs:element name="explanation" type="xs:string" minOccurs="0" maxOccurs="1" />
 			<xs:element name="match" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:sequence minOccurs="1" maxOccurs="1">
-						<xs:element name="fixed" minOccurs="1" maxOccurs="1" type="notEmptyString"></xs:element>
-						<xs:element name="movable" minOccurs="1" maxOccurs="1" type="notEmptyString"></xs:element>
+						<xs:element name="fixed" minOccurs="1" maxOccurs="1" type="notEmptyString"/>
+						<xs:element name="movable" minOccurs="1" maxOccurs="1" type="notEmptyString"/>
 					</xs:sequence>
 					<xs:attribute name="id" type="notEmptyString" use="required" />
 				</xs:complexType>
@@ -183,4 +192,9 @@
 			<xs:minLength value="1" />
 		</xs:restriction>
 	</xs:simpleType>
+	
+	<xs:complexType name="AllowedMistakes">
+		<xs:attribute name="checkedUnnecessary" type="xs:int" use="optional"/>
+		<xs:attribute name="notCheckedNecessary" type="xs:int" use="optional"/>
+	</xs:complexType>
 </xs:schema>

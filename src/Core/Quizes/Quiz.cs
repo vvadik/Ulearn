@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using JetBrains.Annotations;
 using uLearn.Model;
 using uLearn.Model.Blocks;
 using uLearn.Model.Edx.EdxComponents;
@@ -146,6 +147,9 @@ namespace uLearn.Quizes
 
 		[XmlElement("item")]
 		public ChoiceItem[] Items;
+		
+		[XmlElement("allowedMistakes")]
+		public AllowedMistakesCount AllowedMistakesCount { get; set; }
 
 		public ChoiceItem[] ShuffledItems()
 		{
@@ -156,13 +160,19 @@ namespace uLearn.Quizes
 		{
 			if (Items.DistinctBy(i => i.Id).Count() != Items.Length)
 				throw new FormatException("Duplicate choice id in quizBlock " + Id);
-			if (!Multiple && Items.Count(i => i.IsCorrect) != 1)
+			if (!Multiple && Items.Count(i => i.IsCorrect == ChoiceItemCorrectness.True) != 1)
 				throw new FormatException("Should be exaclty one correct item for non-multiple choice. BlockId=" + Id);
+			if (!Multiple && Items.Count(i => i.IsCorrect == ChoiceItemCorrectness.Maybe) != 0)
+				throw new FormatException("'Maybe' items are not allowed for for non-multiple choice. BlockId=" + Id);
 		}
 
 		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
 		{
-			var items = Items.Select(x => new Choice { Correct = x.IsCorrect, Text = EdxTexReplacer.ReplaceTex(x.Description) }).ToArray();
+			var items = Items.Select(x => new Choice
+			{
+				Correct = x.IsCorrect.IsTrueOrMaybe(),
+				Text = EdxTexReplacer.ReplaceTex(x.Description)
+			}).ToArray();
 			ChoiceResponse cr;
 			if (Multiple)
 			{
@@ -424,10 +434,24 @@ namespace uLearn.Quizes
 		public string Id;
 
 		[XmlAttribute("isCorrect")]
-		public bool IsCorrect;
+		public ChoiceItemCorrectness IsCorrect;
 
 		[XmlAttribute("explanation")]
-		public string Explanation;
+		public string _explanation;
+
+		[XmlIgnore]
+		public string Explanation
+		{
+			get
+			{
+				if (!string.IsNullOrEmpty(_explanation))
+					return _explanation;
+				if (IsCorrect == ChoiceItemCorrectness.Maybe)
+					return "Это опциональный вариант: его можно было как выбрать, так и не выбирать";
+				return "";
+			}
+			set => _explanation = value;
+		}
 
 		[XmlText]
 		public string Description;
@@ -436,5 +460,34 @@ namespace uLearn.Quizes
 		{
 			return (Description ?? "") + '\t' + (Explanation ?? "");
 		}
+	}
+
+	public enum ChoiceItemCorrectness
+	{
+		[XmlEnum("true")]
+		True,
+		
+		[XmlEnum("false")]
+		False,
+		
+		[XmlEnum("maybe")]
+		Maybe,
+	}
+
+	public static class ChoiceItemCorrectnessExtensions
+	{
+		public static bool IsTrueOrMaybe(this ChoiceItemCorrectness correctness)
+		{
+			return correctness == ChoiceItemCorrectness.True || correctness == ChoiceItemCorrectness.Maybe;
+		}
+	}
+
+	public class AllowedMistakesCount
+	{
+		[XmlAttribute("checkedUnnecessary")]
+		public int CheckedUnnecessary { get; set; }
+		
+		[XmlAttribute("notCheckedNecessary")]
+		public int NotCheckedNecessary { get; set; }
 	}
 }

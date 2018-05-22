@@ -490,7 +490,7 @@ namespace Stepik.Api
 
 		private static StepikApiChoiceOption ConvertUlearnChoiceItemIntoStepikChoiceOption(ChoiceItem item)
 		{
-			return new StepikApiChoiceOption(item.Description, item.IsCorrect, item.Explanation);
+			return new StepikApiChoiceOption(item.Description, item.IsCorrect.IsTrueOrMaybe(), item.Explanation);
 		}
 
 		private static StepikApiSection ConvertUlearnUnitIntoStepikSection(Unit unit)

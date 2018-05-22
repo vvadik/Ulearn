@@ -244,19 +244,22 @@
 			var itemClass = "";
 			var title = "";
 			var readonlyAttr = context.CanUserFillQuiz ? "" : "disabled";
-			if (model.QuizState == QuizState.Total)
+			
+			var isCorrect = item.IsCorrect == ChoiceItemCorrectness.True || item.IsCorrect == ChoiceItemCorrectness.Maybe && itemChecked;
+			if (model.ShowCorrectAnswers)
 			{
-				itemClass = item.IsCorrect ? "right-quiz" : itemChecked ? "wrong-quiz" : "";
-				title = (item.IsCorrect ? "Правильный" : "Неправильный") + " вариант";
+				itemClass = isCorrect ? "right-quiz" : itemChecked ? "wrong-quiz" : "";
+				title = (isCorrect ? "Правильный" : "Неправильный") + " вариант";
 			}
 			<div class="quiz">
 				<input @ans autocomplete="off" id='@( block.Id + "quizBlock" + item.Id)' name=@( "group" + id) type="@typeInp" @GetGuestDisable(context.IsGuest) @readonlyAttr>
 				<label class="@itemClass" title="@title" for="@( block.Id + "quizBlock" + item.Id)" @GetGuestOnclick(context.IsGuest)>
 					@item.Description.Trim().RenderTex().ToLegacyHtmlString()
-					@if (model.ShowCorrectAnswers && item.IsCorrect)
-					{
-						<i class="glyphicon glyphicon-ok" style="color: green" title="@title"></i>
-					}
+                    
+                    @if (model.ShowCorrectAnswers && isCorrect)
+                    {
+                        <i class="glyphicon glyphicon-ok" style="color: green" title="@title"></i>
+                    }
 				</label>
 				@if (model.ShowExplanations && !string.IsNullOrEmpty(item.Explanation))
 				{

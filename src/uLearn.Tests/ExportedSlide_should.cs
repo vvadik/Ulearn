@@ -38,7 +38,7 @@ namespace uLearn
 							{
 								Description = "Test description",
 								Explanation = "Test explanation",
-								IsCorrect = true
+								IsCorrect = ChoiceItemCorrectness.True
 							},
 						}
 					},

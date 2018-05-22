@@ -320,6 +320,7 @@ p + .revealed {
 }
 
 .nav .group-statistics-link a:hover,
+.nav .group-statistics-link a:active,
 .nav .group-statistics-link a:focus {
 	background-color: initial;
 	text-decoration: underline;
@@ -329,11 +330,15 @@ p + .revealed {
 	margin-right: 5px;
 }
 
-.nav .units-list-item .slides-list a:hover {
+.nav .units-list-item .slides-list a:hover,
+.nav .units-list-item .slides-list a:active,
+.nav .units-list-item .slides-list a:focus {
 	text-decoration: none;
 }
 
-.nav .units-list-item .slides-list a:not(.selected):hover .underline-on-parent-hover {
+.nav .units-list-item .slides-list a:not(.selected):hover .underline-on-parent-hover,
+.nav .units-list-item .slides-list a:not(.selected):active .underline-on-parent-hover,
+.nav .units-list-item .slides-list a:not(.selected):focus .underline-on-parent-hover {
 	text-decoration: underline;
 } 
 

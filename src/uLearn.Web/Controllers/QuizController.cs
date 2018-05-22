@@ -369,15 +369,15 @@ namespace uLearn.Web.Controllers
 			if (!choiceBlock.Multiple)
 			{
 				var answerItemId = answers.First().ItemId;
-				var isTrue = choiceBlock.Items.First(x => x.Id == answerItemId).IsCorrect;
-				blockScore = isTrue ? choiceBlock.MaxScore : 0;
+				var isCorrect = choiceBlock.Items.First(x => x.Id == answerItemId).IsCorrect.IsTrueOrMaybe();
+				blockScore = isCorrect ? choiceBlock.MaxScore : 0;
 				return new List<QuizInfoForDb>
 				{
 					new QuizInfoForDb
 					{
 						QuizId = choiceBlock.Id,
 						ItemId = answerItemId,
-						IsRightAnswer = isTrue,
+						IsRightAnswer = isCorrect,
 						Text = null,
 						QuizType = typeof(ChoiceBlock),
 						QuizBlockScore = blockScore,
@@ -389,7 +389,7 @@ namespace uLearn.Web.Controllers
 				.Select(x => new QuizInfoForDb
 				{
 					QuizId = choiceBlock.Id,
-					IsRightAnswer = choiceBlock.Items.Where(y => y.IsCorrect).Any(y => y.Id == x),
+					IsRightAnswer = choiceBlock.Items.Where(y => y.IsCorrect.IsTrueOrMaybe()).Any(y => y.Id == x),
 					ItemId = x,
 					Text = null,
 					QuizType = typeof(ChoiceBlock),
@@ -397,7 +397,7 @@ namespace uLearn.Web.Controllers
 					QuizBlockMaxScore = choiceBlock.MaxScore
 				}).ToList();
 			var isRightQuizBlock = ans.All(x => x.IsRightAnswer) &&
-									choiceBlock.Items.Where(x => x.IsCorrect)
+									choiceBlock.Items.Where(x => x.IsCorrect == ChoiceItemCorrectness.True)
 										.Select(x => x.Id)
 										.All(x => ans.Where(y => y.IsRightAnswer).Select(y => y.ItemId).Contains(x));
 			blockScore = isRightQuizBlock ? choiceBlock.MaxScore : 0;
@@ -607,7 +607,7 @@ namespace uLearn.Web.Controllers
 			{
 				AnswersId = ans,
 				Id = questionIndex.ToString(),
-				RealyRightAnswer = new HashSet<string>(block.Items.Where(x => x.IsCorrect).Select(x => x.Id)),
+				RealyRightAnswer = new HashSet<string>(block.Items.Where(x => x.IsCorrect.IsTrueOrMaybe()).Select(x => x.Id)),
 				Score = score,
 				MaxScore = maxScore,
 				IsRight = isRight
