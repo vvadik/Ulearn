@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace uLearn.Extensions
 {
@@ -16,6 +17,12 @@ namespace uLearn.Extensions
 				return s.Substring(0, maxLength - ellipsis.Length).TrimEnd() + ellipsis;
 
 			return s;
+		}
+		
+		/* Warning: this does not work for all cases and should not be used to process untrusted user input. */
+		public static string StripHtmlTags(this string input)
+		{
+			return Regex.Replace(input, "<.*?>", string.Empty);
 		}
 	}
 }

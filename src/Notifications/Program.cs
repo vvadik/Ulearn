@@ -45,6 +45,15 @@ namespace Notifications
 		static void Main(string[] args)
 		{
 			XmlConfigurator.Configure();
+
+			/* Pass first argument 'send' to send emails to addresses from `emails.txt` with content from `content.txt` (notifications daemon is not started in this case)*/
+			if (args[0] == "send")
+			{
+				var sender = new OneTimeEmailSender();
+				sender.SendEmailsAsync().Wait();
+				return;
+			}
+			
 			new Program().MainLoop().Wait();
 		}
 

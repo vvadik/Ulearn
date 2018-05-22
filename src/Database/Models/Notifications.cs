@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Core.Objects;
-using System.Data.Odbc;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.Xml;
 using Database.DataContexts;
 using uLearn;
 using Ulearn.Common;
@@ -296,6 +295,7 @@ namespace Database.Models
 		}
 
 		public string Link { get; private set; }
+		
 		public string Text { get; private set; }
 	}
 

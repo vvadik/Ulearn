@@ -227,6 +227,7 @@
     <Compile Include="IEmailSender.cs" />
     <Compile Include="INotificationSender.cs" />
     <Compile Include="NotificationSender.cs" />
+    <Compile Include="OneTimeEmailSender.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TelegramSender.cs" />
