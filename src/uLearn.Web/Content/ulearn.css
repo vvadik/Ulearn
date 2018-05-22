@@ -516,8 +516,11 @@ p + .revealed {
 }
 
 .quiz-submit-btn {
-	margin-top: -10px;
 	margin-bottom: 5px;
+}
+
+.quiz-button {
+	margin-top: 20px; 
 }
 
 .quiz-status,
