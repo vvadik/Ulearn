@@ -305,6 +305,7 @@ $(document).ready(function () {
                 
                 /* Correcting: full-matched blocks can start only from beginning of the word
                    (upper-case letter, or if previous char it not letter) or from beginnin og the number.
+                   Also full-matched blocks should have length at least 4 chars.
                    Bad full-matched blocks are marked with special value of diffType: -100. It means that it should be marked in both texts, but as not-matched */
                 var BAD_FULL_MATCHED = -100;
                 if (diffType === 0) {
@@ -320,6 +321,9 @@ $(document).ready(function () {
                         if (isDigit(previousChar))
                             diffType = BAD_FULL_MATCHED;
                     }
+                    
+                    if (diffString.length < 4)
+                        diffType = BAD_FULL_MATCHED;
                 } 
                 
                 if (diffType === 0) {
