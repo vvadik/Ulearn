@@ -557,9 +557,28 @@ p + .revealed {
 	display: none;
 }
 
-.quiz-block-delimiter {
-	margin-bottom: 30px;
-	margin-top: 30px;
+.quiz-block__is-question {
+	margin-top: 20px;
+	margin-bottom: 40px;
+}
+
+.quiz-block__is-question__title {
+	margin-bottom: 15px;
+}
+
+@media (min-width: 1300px) {
+	.quiz-block__is-question__title.with-mark {
+		margin-left: -27px;
+	}
+
+	.quiz-block__is-question__title .glyphicon {
+		margin-right: 5px;
+		top: 0;
+	}
+}
+
+.quiz-block__is-question__title > * {
+	vertical-align: middle;	
 }
 
 .hide-side-bar-button {

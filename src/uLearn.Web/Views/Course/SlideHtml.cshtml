@@ -78,33 +78,33 @@
 		mark = "glyphicon " + (isBlockCorrect ? "glyphicon-ok" : "glyphicon-remove");
 		style = "color: " + (isBlockCorrect ? "green" : "red");
 	}
-	<h4>
-		<i class="@mark" style="@style"></i>
-		<span class="quiz-block__text">
-			@block.QuestionIndex. @block.Text.RenderTex().ToLegacyHtmlString()
-		</span>
-		<span class="quiz-block__score">
-			@if (blockScore >= 0)
-			{
-				<nobr>@blockScore из @block.MaxScore балл@( block.MaxScore == 1 ? "а" : "ов")</nobr>
-			}
-			else
-			{
-				<nobr>@block.MaxScore.PluralizeInRussian(RussianPluralizationOptions.Score)</nobr>
-			}
-		</span>
-	</h4>
-
-	@QuizBlock((dynamic)block, context)
-	if (context.ManualChecking != null)
-	{
-		<h4>Оцените от 0 до @block.MaxScore</h4>
-		<div>
-			<input type="number" class="form-control" min="0" max="@block.MaxScore" name="quiz__score__@( block.Id)"/>
-		</div>
-	}
-
-	<div class="quiz-block-delimiter"></div>
+	<div class="quiz-block__is-question">
+        <h4 class="quiz-block__is-question__title @(string.IsNullOrEmpty(mark) ? "" : "with-mark")">
+            <i class="@mark" style="@style"></i>
+            <span class="quiz-block__text">
+                @block.QuestionIndex. @block.Text.RenderTex().ToLegacyHtmlString()
+            </span>
+            <span class="quiz-block__score">
+                @if (blockScore >= 0)
+                {
+                    <nobr>@blockScore из @block.MaxScore балл@( block.MaxScore == 1 ? "а" : "ов")</nobr>
+                }
+                else
+                {
+                    <nobr>@block.MaxScore.PluralizeInRussian(RussianPluralizationOptions.Score)</nobr>
+                }
+            </span>
+        </h4>
+    
+        @QuizBlock((dynamic)block, context)
+        @if (context.ManualChecking != null)
+        {
+            <h4>Оцените от 0 до @block.MaxScore</h4>
+            <div>
+                <input type="number" class="form-control" min="0" max="@block.MaxScore" name="quiz__score__@( block.Id)"/>
+            </div>
+        }
+    </div>
 }
 
 
