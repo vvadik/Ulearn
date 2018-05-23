@@ -304,6 +304,10 @@ p + .revealed {
 	color: #838383;
 }
 
+.slide .score {
+	white-space: nowrap;
+}
+
 .units-list-item > a:before {
 	content: attr(data-score);
 	float: right;
@@ -520,7 +524,8 @@ p + .revealed {
 }
 
 .quiz-button {
-	margin-top: 20px; 
+	margin-top: 15px;
+	margin-bottom: 15px; 
 }
 
 .quiz-status,
@@ -561,7 +566,7 @@ p + .revealed {
 }
 
 .quiz-block__is-question {
-	margin-top: 20px;
+	margin-top: 10px;
 	margin-bottom: 40px;
 }
 
@@ -571,12 +576,16 @@ p + .revealed {
 
 @media (min-width: 1300px) {
 	.quiz-block__is-question__title.with-mark {
-		margin-left: -27px;
 	}
 
 	.quiz-block__is-question__title .glyphicon {
 		margin-right: 5px;
 		top: 0;
+		left: -27px;
+	}
+	
+	.quiz-block__is-question__title.with-mark .quiz-block__text {
+		margin-left: -27px;
 	}
 }
 
