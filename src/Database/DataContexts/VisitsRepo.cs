@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using Z.EntityFramework.Plus;
 
 namespace Database.DataContexts
 {
@@ -18,17 +19,22 @@ namespace Database.DataContexts
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 		}
 
-		public async Task AddVisit(string courseId, Guid slideId, string userId)
+		public async Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
 		{
-			if (IsUserVisitedSlide(courseId, slideId, userId))
-				return;
-			db.Visits.Add(new Visit
+			var visit = FindVisit(courseId, slideId, userId);
+			if (visit == null)
 			{
-				UserId = userId,
-				CourseId = courseId,
-				SlideId = slideId,
-				Timestamp = DateTime.Now
-			});
+				db.Visits.Add(new Visit
+				{
+					UserId = userId,
+					CourseId = courseId,
+					SlideId = slideId,
+					Timestamp = DateTime.Now,
+					IpAddress = ipAddress,
+				});
+			}
+			else if (visit.IpAddress != ipAddress)
+				visit.IpAddress = ipAddress;
 			await db.SaveChangesAsync();
 		}
 
@@ -36,12 +42,17 @@ namespace Database.DataContexts
 		{
 			return db.Visits.Count(x => x.CourseId == courseId && x.SlideId == slideId);
 		}
-
+		
+		public Visit FindVisit(string courseId, Guid slideId, string userId)
+		{
+			return db.Visits.FirstOrDefault(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId);
+		}
+		
 		public bool IsUserVisitedSlide(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits.Any(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId);
+			return FindVisit(courseId, slideId, userId) != null;
 		}
-
+		
 		public HashSet<Guid> GetIdOfVisitedSlides(string courseId, string userId)
 		{
 			return new HashSet<Guid>(db.Visits.Where(v => v.UserId == userId && v.CourseId == courseId).Select(x => x.SlideId));
@@ -115,14 +126,9 @@ namespace Database.DataContexts
 				.FirstOrDefault();
 		}
 
-		public Visit FindVisiter(string courseId, Guid slideId, string userId)
-		{
-			return db.Visits.FirstOrDefault(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId);
-		}
-
 		public async Task SkipSlide(string courseId, Guid slideId, string userId)
 		{
-			var visiter = FindVisiter(courseId, slideId, userId);
+			var visiter = FindVisit(courseId, slideId, userId);
 			if (visiter != null)
 				visiter.IsSkipped = true;
 			else

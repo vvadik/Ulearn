@@ -11,9 +11,10 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 namespace Database.Migrations
 {
     [DbContext(typeof(UlearnDb))]
-    partial class UlearnDbModelSnapshot : ModelSnapshot
+    [Migration("20180524205443_AddIpAddressToVisit")]
+    partial class AddIpAddressToVisit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

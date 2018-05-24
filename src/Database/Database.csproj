@@ -204,6 +204,10 @@
     <Reference Include="System.Xml.XPath.XDocument, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\packages\System.Xml.XPath.XDocument.4.3.0\lib\net46\System.Xml.XPath.XDocument.dll</HintPath>
     </Reference>
+    <Reference Include="Z.EntityFramework.Plus.EF6, Version=1.7.19.0, Culture=neutral, PublicKeyToken=59b66d028979105b">
+      <HintPath>..\packages\Z.EntityFramework.Plus.EF6.1.7.19\lib\net45\Z.EntityFramework.Plus.EF6.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataContexts\AdditionalScoresRepo.cs" />
@@ -660,6 +664,10 @@
     <Compile Include="Migrations\201804270135420_RemoveRequiredAutomaticChecking.Designer.cs">
       <DependentUpon>201804270135420_RemoveRequiredAutomaticChecking.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201805242057533_AddIpAddressToVisit.cs" />
+    <Compile Include="Migrations\201805242057533_AddIpAddressToVisit.Designer.cs">
+      <DependentUpon>201805242057533_AddIpAddressToVisit.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1025,6 +1033,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804270135420_RemoveRequiredAutomaticChecking.resx">
       <DependentUpon>201804270135420_RemoveRequiredAutomaticChecking.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201805242057533_AddIpAddressToVisit.resx">
+      <DependentUpon>201805242057533_AddIpAddressToVisit.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

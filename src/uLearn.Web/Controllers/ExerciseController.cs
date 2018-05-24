@@ -368,7 +368,7 @@ namespace uLearn.Web.Controllers
 		private ExerciseBlockData CreateExerciseBlockData(Course course, Slide slide, UserExerciseSubmission submission, bool onlyAccepted, string currentUserId)
 		{
 			var userId = submission?.UserId ?? currentUserId;
-			var visit = visitsRepo.FindVisiter(course.Id, slide.Id, userId);
+			var visit = visitsRepo.FindVisit(course.Id, slide.Id, userId);
 
 			var solution = submission?.SolutionCode.Text;
 			if (string.IsNullOrEmpty(solution))

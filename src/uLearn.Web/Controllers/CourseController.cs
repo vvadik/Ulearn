@@ -478,8 +478,8 @@ namespace uLearn.Web.Controllers
 		{
 			if (string.IsNullOrEmpty(userId))
 				return null;
-			await visitsRepo.AddVisit(courseId, slideId, userId);
-			return visitsRepo.FindVisiter(courseId, slideId, userId);
+			await visitsRepo.AddVisit(courseId, slideId, userId, GetRealClientIp());
+			return visitsRepo.FindVisit(courseId, slideId, userId);
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
