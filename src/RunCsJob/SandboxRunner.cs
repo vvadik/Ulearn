@@ -8,6 +8,7 @@ using System.Security;
 using System.Text;
 using System.Threading;
 using log4net;
+using Metrics;
 using Newtonsoft.Json;
 using RunCsJob.Api;
 using uLearn;
@@ -25,6 +26,7 @@ namespace RunCsJob
 		}
 
 		private const int timeLimitInSeconds = 10;
+		public TimeSpan CompilationTimeLimit = TimeSpan.FromSeconds(10);
 		public TimeSpan TimeLimit = TimeSpan.FromSeconds(timeLimitInSeconds);
 		public TimeSpan IdleTimeLimit = TimeSpan.FromSeconds(2 * timeLimitInSeconds);
 		public int MemoryLimit = 64 * 1024 * 1024;
@@ -38,6 +40,7 @@ namespace RunCsJob
 	public class SandboxRunner
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(SandboxRunner));
+		private readonly GraphiteMetricSender metricSender = new GraphiteMetricSender("runcsjob");
 
 		private readonly RunnerSubmission submission;
 		private readonly SandboxRunnerSettings settings;
@@ -83,7 +86,7 @@ namespace RunCsJob
 				if (submission is ProjRunnerSubmission)
 					result = instance.RunMsBuild(submissionCompilationDirectory.FullName);
 				else
-					result = instance.RunCsc60(submissionCompilationDirectory.FullName);
+					result = instance.RunCsc(submissionCompilationDirectory.FullName);
 				result.Id = submission.Id;
 				return result;
 			}
@@ -137,16 +140,18 @@ namespace RunCsJob
 			return RunSandbox($"\"{builderResult.PathToExe}\" {submission.Id}");
 		}
 
-		public RunningResults RunCsc60(string submissionCompilationDirectory)
+		public RunningResults RunCsc(string submissionCompilationDirectory)
 		{
 			log.Info($"Запускаю проверку C#-решения {submission.Id}, компилирую с помощью Roslyn");
 
-			var res = AssemblyCreator.CreateAssemblyWithRoslyn((FileRunnerSubmission)submission, submissionCompilationDirectory);
-			var diagnostics = res.EmitResult.Diagnostics;
-			var compilationOutput = diagnostics.DumpCompilationOutput();
+			var res = AssemblyCreator.CreateAssemblyWithRoslyn((FileRunnerSubmission)submission, submissionCompilationDirectory, settings.CompilationTimeLimit);
 
 			try
 			{
+				metricSender.SendCount("exercise.compilation.csc.elapsed", (int) res.Elapsed.TotalMilliseconds);
+				var diagnostics = res.EmitResult.Diagnostics;
+				var compilationOutput = diagnostics.DumpCompilationOutput();
+
 				if (diagnostics.HasErrors())
 				{
 					log.Error($"Ошибка компиляции:\n{compilationOutput}");
