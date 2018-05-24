@@ -59,6 +59,12 @@ namespace uLearn
 				throw new NotFoundException($"No unit with id {unitId}");
 			return unit;
 		}
+		
+		[CanBeNull]
+		public Unit FindUnitBySlideId(Guid slideId)
+		{
+			return Units.FirstOrDefault(u => u.Slides.Any(s => s.Id == slideId));
+		}
 
 		[CanBeNull]
 		public Slide FindSlide(int index)

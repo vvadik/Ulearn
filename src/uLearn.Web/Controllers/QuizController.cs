@@ -124,7 +124,7 @@ namespace uLearn.Web.Controllers
 				quizVersion = quizzesRepo.AddQuizVersionIfNeeded(courseId, slide);
 
 			/* Restore quiz slide from version stored in the database */
-			var quiz = quizVersion.RestoredQuiz;
+			var quiz = quizVersion.GetRestoredQuiz(course, course.FindUnitBySlideId(slide.Id));
 			slide = new QuizSlide(slide.Info, quiz);
 
 			var userAnswers = userQuizzesRepo.GetAnswersForShowOnSlide(courseId, slide, userId);
@@ -274,6 +274,9 @@ namespace uLearn.Web.Controllers
 				if (!checking.IsLockedBy(User.Identity))
 					return Redirect(errorUrl + "Эта работа проверяется другим инструктором");
 
+				var course = courseManager.GetCourse(checking.CourseId);
+				var unit = course.FindUnitBySlideId(checking.SlideId);
+
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}");
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.{checking.SlideId}");
 
@@ -293,7 +296,8 @@ namespace uLearn.Web.Controllers
 
 				var totalScore = 0;
 
-				foreach (var question in quizVersion.RestoredQuiz.Blocks.OfType<AbstractQuestionBlock>())
+				var quiz = quizVersion.GetRestoredQuiz(course, unit);
+				foreach (var question in quiz.Blocks.OfType<AbstractQuestionBlock>())
 				{
 					var scoreFieldName = "quiz__score__" + question.Id;
 					var scoreStr = Request.Form[scoreFieldName];
@@ -315,7 +319,7 @@ namespace uLearn.Web.Controllers
 				metricSender.SendCount($"quiz.manual_score.score", totalScore);
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.score", totalScore);
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.{checking.SlideId}.score", totalScore);
-				if (totalScore == quizVersion.RestoredQuiz.MaxScore)
+				if (totalScore == quiz.MaxScore)
 				{
 					metricSender.SendCount($"quiz.manual_score.full_scored");
 					metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.full_scored");
@@ -517,7 +521,9 @@ namespace uLearn.Web.Controllers
 		public ActionResult Analytics(string courseId, Guid slideId, DateTime periodStart)
 		{
 			var course = courseManager.GetCourse(courseId);
+			var unit = course.FindUnitBySlideId(slideId);
 			var quizSlide = (QuizSlide)course.GetSlideById(slideId);
+			
 			var quizVersions = quizzesRepo.GetQuizVersions(courseId, quizSlide.Id).ToList();
 			var dict = new SortedDictionary<string, List<QuizAnswerInfo>>();
 			var passes = db.UserQuizzes
@@ -525,13 +531,15 @@ namespace uLearn.Web.Controllers
 				.GroupBy(q => q.UserId)
 				.Join(db.Users, g => g.Key, user => user.Id, (g, user) => new { UserId = user.Id, user.UserName, UserQuizzes = g.ToList(), QuizVersion = g.FirstOrDefault().QuizVersion })
 				.ToList();
+			
 			foreach (var pass in passes)
 			{
 				var slide = quizSlide;
 				if (pass.QuizVersion != null)
-					slide = new QuizSlide(quizSlide.Info, pass.QuizVersion.RestoredQuiz);
+					slide = new QuizSlide(quizSlide.Info, pass.QuizVersion.GetRestoredQuiz(course, unit));
 				dict[pass.UserName] = GetUserQuizAnswers(slide, pass.UserQuizzes).ToList();
 			}
+			
 			var userIds = passes.Select(p => p.UserId).Distinct().ToList();
 			var userNameById = passes.ToDictionary(p => p.UserId, p => p.UserName);
 			var groups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User).ToDictionary(kv => userNameById[kv.Key], kv => kv.Value);
@@ -548,7 +556,8 @@ namespace uLearn.Web.Controllers
 
 			return PartialView(new QuizAnalyticsModel
 			{
-				CourseId = courseId,
+				Course = course,
+				Unit = course.FindUnitBySlideId(quizSlide.Id),
 				SlideId = quizSlide.Id,
 
 				UserAnswers = dict,

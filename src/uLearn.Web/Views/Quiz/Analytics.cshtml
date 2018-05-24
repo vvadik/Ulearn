@@ -1,4 +1,5 @@
-﻿@using uLearn.Model.Blocks
+﻿@using uLearn.Extensions
+@using uLearn.Model.Blocks
 @using uLearn.Quizes
 @using Ulearn.Common.Extensions
 @model QuizAnalyticsModel
@@ -16,14 +17,6 @@
 		return 1;
 	}
 
-	private string GetSubstring(string text, int length)
-	{
-		var substring = text.Substring(0, Math.Min(length, text.Length));
-		if (substring.Length < text.Length)
-			substring += "...";
-		return substring;
-	}
-
 }
 
 @{
@@ -31,7 +24,7 @@
 }
 @foreach (var quizVersion in Model.QuizVersions)
 {
-	var quiz = quizVersion.RestoredQuiz;
+	var quiz = quizVersion.GetRestoredQuiz(Model.Course, Model.Unit);
 	var isManualCheck = quiz.ManualChecking;
 	<div>
 		@{ var maxQuestionIndex = quiz.Blocks.OfType<AbstractQuestionBlock>().Max(x => x.QuestionIndex); }
@@ -67,7 +60,7 @@
 							var choiseBlock = ((ChoiceBlock)block);
 							foreach (var item in choiseBlock.Items.OrderBy(x => x.Id))
 							{
-								<th title="@item.Description">@GetSubstring(item.Description, 40)</th>
+								<th title="@item.Description">@item.Description.TruncateWithEllipsis(40)</th>
 							}
 						}
 						else if (block is FillInBlock)
@@ -79,7 +72,7 @@
 							var orderingBlock = (OrderingBlock)block;
 							foreach (var item in orderingBlock.Items.OrderBy(x => x.Id))
 							{
-								<th title="@item.Text">@GetSubstring(item.Text, 40)</th>
+								<th title="@item.Text">@item.Text.TruncateWithEllipsis(40)</th>
 							}
 						}
 						else if (block is MatchingBlock)
@@ -87,7 +80,7 @@
 							var matchingBlock = (MatchingBlock)block;
 							foreach (var text in matchingBlock.Matches.OrderBy(x => x.Id).Select(x => x.FixedItem))
 							{
-								<th title="@text">@GetSubstring(text, 40)</th>
+								<th title="@text">@text.TruncateWithEllipsis(40)</th>
 							}
 						}
 						else
@@ -190,17 +183,20 @@
 		</table>
 		@if (quizVersionIdx != Model.QuizVersions.Count - 1)
 		{
+			var restoredQuiz = quizVersion.GetRestoredQuiz(Model.Course, Model.Unit);
 			var nextQuizVersion = Model.QuizVersions[quizVersionIdx + 1];
+			var nextQuiz = nextQuizVersion.GetRestoredQuiz(Model.Course, Model.Unit);
+			
 			using (Html.BeginForm("MergeQuizVersions", "Quiz", FormMethod.Post))
 			{
 				@Html.AntiForgeryToken()
 				<div class="analytics__quiz-version__info">
-					Изменено @quizVersion.LoadingTime
-				</div>
-				if (quizVersion.RestoredQuiz.HasEqualStructureWith(nextQuizVersion.RestoredQuiz))
+                    Изменено @quizVersion.LoadingTime
+                </div>
+				if (restoredQuiz.HasEqualStructureWith(nextQuiz))
 				{
 					<div class="analytics__quiz-version__merge">
-						@Html.Hidden("courseId", Model.CourseId)
+						@Html.Hidden("courseId", Model.Course.Id)
 						@Html.Hidden("slideId", Model.SlideId)
 						@Html.Hidden("quizVersionId", nextQuizVersion.Id)
 						@Html.Hidden("mergeWithQuizVersionId", quizVersion.Id)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using uLearn;
 using uLearn.Quizes;
 using Ulearn.Common.Extensions;
 
@@ -28,7 +29,11 @@ namespace Database.Models
 		[Index("IDX_QuizVersion_QuizVersionBySlideAndTime", 2)]
 		public DateTime LoadingTime { get; set; }
 
-		[NotMapped]
-		public Quiz RestoredQuiz => NormalizedXml.DeserializeXml<Quiz>().InitQuestionIndices();
+		public Quiz GetRestoredQuiz(Course course, Unit unit)
+		{
+			var quiz = NormalizedXml.DeserializeXml<Quiz>().InitQuestionIndices();
+			QuizSlideLoader.BuildUp(quiz, unit, course.Id, course.Settings);
+			return quiz;
+		}
 	}
 }

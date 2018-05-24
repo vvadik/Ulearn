@@ -7,7 +7,8 @@ namespace uLearn.Web.Models
 {
 	public class QuizAnalyticsModel
 	{
-		public string CourseId { get; set; }
+		public Course Course { get; set; }
+		public Unit Unit { get; set; }		
 		public Guid SlideId { get; set; }
 
 		public SortedDictionary<string, List<QuizAnswerInfo>> UserAnswers { get; set; }
