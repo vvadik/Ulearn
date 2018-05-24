@@ -111,7 +111,9 @@
 			@Html.Hidden("errorUrl", Url.RouteUrl("Course.SlideById", new { courseId = Model.Course.Id, slideId = Model.Slide.Url, CheckQueueItemId = Model.ManualQuizCheckQueueItem.Id, group = Model.GroupsIdsJoined }) + "&error=")
 			@Html.Hidden("nextUrl", Url.Action("ManualQuizCheckingQueue", "Admin", new { courseId = Model.Course.Id, group = Model.GroupsIdsJoined }))
 		}
-		@SlideHtml.Blocks(context, Html)
+		<div class="quiz__blocks">
+		    @SlideHtml.Blocks(context, Html)
+        </div>
 	}
 
 	if (!Model.IsGuest)

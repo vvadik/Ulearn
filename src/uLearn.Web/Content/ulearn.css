@@ -570,6 +570,10 @@ p + .revealed {
 	margin-bottom: 40px;
 }
 
+.quiz__blocks .quiz-block__is-question:last-child {
+	margin-bottom: 15px;
+}
+
 .quiz-block__is-question__title {
 	margin-bottom: 15px;
 }
